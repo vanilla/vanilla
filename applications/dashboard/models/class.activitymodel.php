@@ -7,15 +7,32 @@ Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRAN
 You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
-
+/**
+ * Activity Model
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Activity data management.
+ *
+ * @since 2.0.0
+ * @package Dashboard
+ */
 class ActivityModel extends Gdn_Model {
    /**
-    * Class constructor. Defines the related database table name.
+    * Defines the related database table name.
     */
    public function __construct() {
       parent::__construct('Activity');
    }
    
+   /**
+    * Build basis of common activity SQL query.
+    *
+    * @since 2.0.0
+    * @access public
+    */
    public function ActivityQuery() {
       $this->SQL
          ->Select('a.*')
@@ -35,6 +52,13 @@ class ActivityModel extends Gdn_Model {
          ->Join('User ru', 'a.RegardingUserID = ru.UserID', 'left');
    }
    
+   /**
+    * Delete a particular activity item.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $ActivityID Unique ID of acitivity to be deleted.
+    */
    public function Delete($ActivityID) {
       // Get the activity first
       $Activity = $this->GetID($ActivityID);
@@ -58,6 +82,17 @@ class ActivityModel extends Gdn_Model {
       }
    }
 
+   /**
+    * Modifies standard Gdn_Model->GetWhere to use AcitivityQuery.
+    *
+    * Events: AfterGet.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $Field Column name for where clause.
+    * @param mixed $Value Value for where clause.
+    * @return DataSet SQL results.
+    */
    public function GetWhere($Field, $Value = '') {
       $this->ActivityQuery();
       $Result = $this->SQL
@@ -67,9 +102,22 @@ class ActivityModel extends Gdn_Model {
 
       $this->EventArguments['Data'] =& $Result;
       $this->FireEvent('AfterGet');
+      
       return $Result;
    }
    
+   /**
+    * Modifies standard Gdn_Model->Get to use AcitivityQuery.
+    *
+    * Events: BeforeGet, AfterGet.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $UserID Unique ID of user to gather activity for.
+    * @param int $Offset Number to skip.
+    * @param int $Limit How many to return.
+    * @return DataSet SQL results.
+    */
    public function Get($UserID = '', $Offset = '0', $Limit = '50') {
       $Offset = is_numeric($Offset) ? $Offset : 0;
       if ($Offset < 0)
@@ -102,9 +150,20 @@ class ActivityModel extends Gdn_Model {
 
       $this->EventArguments['Data'] =& $Result;
       $this->FireEvent('AfterGet');
+      
       return $Result;
    }
    
+   /**
+    * Get number of activity related to a user.
+    *
+    * Events: BeforeGetCount.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $UserID Unique ID of user.
+    * @return int Number of activity items found.
+    */
    public function GetCount($UserID = '') {
       $this->SQL
          ->Select('a.ActivityID', 'count', 'ActivityCount')
@@ -130,7 +189,19 @@ class ActivityModel extends Gdn_Model {
          ->FirstRow()
          ->ActivityCount;
    }
-
+   
+   /**
+    * Get activity related to a particular role.
+    *
+    * Events: AfterGet.
+    *
+    * @since 2.0.18
+    * @access public
+    * @param string $RoleID Unique ID of role.
+    * @param int $Offset Number to skip.
+    * @param int $Limit Max number to return.
+    * @return DataSet SQL results.
+    */
    public function GetForRole($RoleID = '', $Offset = '0', $Limit = '50') {
       if (!is_array($RoleID))
          $RoleID = array($RoleID);
@@ -155,9 +226,18 @@ class ActivityModel extends Gdn_Model {
          
       $this->EventArguments['Data'] =& $Result;
       $this->FireEvent('AfterGet');
+      
       return $Result;
    }
    
+   /**
+    * Get number of activity related to a particular role.
+    *
+    * @since 2.0.18
+    * @access public
+    * @param int $RoleID Unique ID of role.
+    * @return int Number of activity items.
+    */
    public function GetCountForRole($RoleID = '') {
       if (!is_array($RoleID))
          $RoleID = array($RoleID);
@@ -174,7 +254,15 @@ class ActivityModel extends Gdn_Model {
          ->FirstRow()
          ->ActivityCount;
    }
-
+   
+   /**
+    * Get a particular activity record.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $ActivityID Unique ID of activity item.
+    * @return DataSet A single SQL result.
+    */
    public function GetID($ActivityID) {
       $this->ActivityQuery();
       return $this->SQL
@@ -183,6 +271,18 @@ class ActivityModel extends Gdn_Model {
          ->FirstRow();
    }
    
+   /**
+    * Get notifications for a user.
+    *
+    * Events: BeforeGetNotifications.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $UserID Unique ID of user.
+    * @param int $Offset Number to skip.
+    * @param int $Limit Max number to return.
+    * @return DataSet SQL results.
+    */
    public function GetNotifications($UserID, $Offset = '0', $Limit = '50') {
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetNotifications');
@@ -194,6 +294,19 @@ class ActivityModel extends Gdn_Model {
          ->Get();
    }
    
+   /**
+    * Get notifications for a user since designated ActivityID.
+    *
+    * Events: BeforeGetNotificationsSince.
+    *
+    * @since 2.0.18
+    * @access public
+    * @param int $UserID Unique ID of user.
+    * @param int $LastActivityID ID of activity to start at.
+    * @param array $FilterToActivityTypeIDs Limits returned activity to particular types.
+    * @param int $Limit Max number to return.
+    * @return DataSet SQL results.
+    */
    public function GetNotificationsSince($UserID, $LastActivityID, $FilterToActivityTypeIDs = '', $Limit = '5') {
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetNotificationsSince');
@@ -212,6 +325,16 @@ class ActivityModel extends Gdn_Model {
       return $Result;
    }
    
+   /**
+    * Get number of notifications for a user.
+    *
+    * Events: BeforeGetNotificationsCount.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $UserID Unique ID of user.
+    * @return int Number of notifications.
+    */
    public function GetCountNotifications($UserID) {
       $this->SQL
          ->Select('a.ActivityID', 'count', 'ActivityCount')
@@ -226,7 +349,17 @@ class ActivityModel extends Gdn_Model {
          ->FirstRow()
          ->ActivityCount;
    }
-
+   
+   /**
+    * Get comments related to designated activity items.
+    *
+    * Events: BeforeGetComments.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param array $ActivityIDs IDs of activity items.
+    * @return DataSet SQL results.
+    */
    public function GetComments($ActivityIDs) {
       $this->ActivityQuery();
       $this->FireEvent('BeforeGetComments');
@@ -237,10 +370,24 @@ class ActivityModel extends Gdn_Model {
          ->Get();
    }
    
+   /**
+    * Add a new activity item.
+    *
+    * Getting reworked for 2.1 so I'm cheating and skipping params for now. -mlr
+    *
+    * @since 2.0.0
+    * @access public
+    * @param int $ActivityUserID
+    * @param string $ActivityType
+    * @param string $Story
+    * @param int $RegardingUserID
+    * @param int $CommentActivityID
+    * @param string $Route
+    * @param mixed $SendEmail
+    * @return int ActivityID of item created.
+    */
    public function Add($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $CommentActivityID = '', $Route = '', $SendEmail = '') {
       static $ActivityTypes = array();
-   
-      // Make sure the user is authenticated.
 
       // Get the ActivityTypeID & see if this is a notification
       if (isset($ActivityTypes[$ActivityType])) {
@@ -336,6 +483,16 @@ class ActivityModel extends Gdn_Model {
       return $ActivityID;
    }
    
+   /**
+    * Get default notification preference for an activity type.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $ActivityType
+    * @param array $Preferences
+    * @param string $Type
+    * @return bool
+    */
    public static function NotificationPreference($ActivityType, $Preferences, $Type = NULL) {
       if ($Type === NULL) {
          $Result = self::NotificationPreference($ActivityType, $Preferences, 'Email')
@@ -353,6 +510,16 @@ class ActivityModel extends Gdn_Model {
       return $Preference;
    }
    
+   
+   /**
+    * Send notification.
+    *
+    * @since 2.0.17
+    * @access public
+    * @param int $ActivityID
+    * @param array $Story
+    * @param string $Force
+    */
    public function SendNotification($ActivityID, $Story = '', $Force = FALSE) {
       $Activity = $this->GetID($ActivityID);
       if (!is_object($Activity))
@@ -413,7 +580,7 @@ class ActivityModel extends Gdn_Model {
    }
    
    /**
-    * The Notification Queue is used to stack up notifications to users. Ensures
+    * @var array The Notification Queue is used to stack up notifications to users. Ensures
     * that they only receive one notification about a single topic. For example:
     * if someone comments on a discussion that they started and they have
     * bookmarked, it will only notify them about one or the other, not both.
@@ -424,10 +591,24 @@ class ActivityModel extends Gdn_Model {
     * again.
     */
    private $_NotificationQueue = array();
+   
+   /**
+    * Clear notification queue.
+    *
+    * @since 2.0.17
+    * @access public
+    */
    public function ClearNotificationQueue() {
       unset($this->_NotificationQueue);
       $this->_NotificationQueue = array();
    }
+   
+   /**
+    * Send all notifications in the queue.
+    *
+    * @since 2.0.17
+    * @access public
+    */
    public function SendNotificationQueue() {
       foreach ($this->_NotificationQueue as $UserID => $Notifications) {
          if (is_array($Notifications)) {
@@ -467,6 +648,13 @@ class ActivityModel extends Gdn_Model {
    
    /**
     * Queue a notification for sending.
+    *
+    * @since 2.0.17
+    * @access public
+    * @param int $ActivityID
+    * @param string $Story
+    * @param string $Position
+    * @param bool $Force
     */
    public function QueueNotification($ActivityID, $Story = '', $Position = 'last', $Force = FALSE) {
       $Activity = $this->GetID($ActivityID);

@@ -80,6 +80,10 @@ echo $Form->Errors();
          echo $Form->Label('Conditions', '');
          echo '<div class="Info2">', T('Limit the pocket to one or more roles or permissions.'), '</div>';
          $this->ConditionModule->Render();
+         echo '<div class="Info2">', T('Limit the display of this plugin to "mobile only".'), '</div>';
+         echo $Form->CheckBox("MobileOnly", T("Only display on mobile browsers."));
+         echo '<div class="Info2">', T('Limit the display of this plugin for mobile devices.'), '</div>';
+         echo $Form->CheckBox("MobileNever", T("Never display on mobile browsers."));
       ?>
    </li>
    <li>

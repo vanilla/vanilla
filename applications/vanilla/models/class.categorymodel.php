@@ -157,8 +157,13 @@ class CategoryModel extends Gdn_Model {
    public static function JoinUserData(&$Categories, $AddUserCategory = TRUE) {
       if ($AddUserCategory) {
          if (Gdn::Session()->UserID) {
-            $UserData = Gdn::SQL()->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
-            $UserData = Gdn_DataSet::Index($UserData, 'CategoryID');
+            $Key = 'UserCategory_'.Gdn::Session()->UserID;
+            $UserData = Gdn::Cache()->Get($Key);
+            if (!$UserData) {
+               $UserData = Gdn::SQL()->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
+               $UserData = Gdn_DataSet::Index($UserData, 'CategoryID');
+               Gdn::Cache()->Store($Key, $UserData, array(Gdn_Cache::FEATURE_EXPIRY => 3600));
+            }
          } else
             $UserData = array();
          
@@ -958,6 +963,7 @@ class CategoryModel extends Gdn_Model {
             'UserCategory',
             $Set,
             array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $Category['CategoryID']));
+         Gdn::Cache()->Remove('UserCategory_'.Gdn::Session()->UserID);
       }
    }
    

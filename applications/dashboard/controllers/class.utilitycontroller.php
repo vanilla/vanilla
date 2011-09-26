@@ -13,6 +13,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Dashboard
  */
  
+set_time_limit(0);
+
 /**
  * Perform miscellaneous operations for Dashboard.
  *

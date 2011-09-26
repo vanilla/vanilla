@@ -66,7 +66,6 @@ class UserMetaModel extends Gdn_Model {
             Gdn::Cache()->Store($CacheKey, $UserMeta);
          }
          
-         
          if ($Key === NULL)
             return $UserMeta;
          
@@ -82,7 +81,6 @@ class UserMetaModel extends Gdn_Model {
          }
          return $Result;
       }
-      
       
       $Sql = clone Gdn::SQL();
       $UserMetaQuery = $Sql

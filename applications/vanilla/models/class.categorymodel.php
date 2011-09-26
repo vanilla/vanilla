@@ -155,14 +155,21 @@ class CategoryModel extends Gdn_Model {
     * @param bool $AddUserCategory
     */
    public static function JoinUserData(&$Categories, $AddUserCategory = TRUE) {
+      $IDs = array_keys($Categories);
+      
       if ($AddUserCategory) {
          if (Gdn::Session()->UserID) {
-            $UserData = Gdn::SQL()->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
-            $UserData = Gdn_DataSet::Index($UserData, 'CategoryID');
+            $Key = 'UserCategory_'.Gdn::Session()->UserID;
+            $UserData = Gdn::Cache()->Get($Key);
+            if ($UserData === Gdn_Cache::CACHEOP_FAILURE) {
+               $UserData = Gdn::SQL()->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
+               $UserData = Gdn_DataSet::Index($UserData, 'CategoryID');
+               Gdn::Cache()->Store($Key, $UserData);
+            }
          } else
             $UserData = array();
          
-         foreach ($Categories as $ID => $Category) {
+         foreach ($IDs as $ID) {
             $Row = GetValue($ID, $UserData);
             if ($Row) {
                $Categories[$ID]['UserDateMarkedRead'] = $Row['DateMarkedRead'];
@@ -173,7 +180,7 @@ class CategoryModel extends Gdn_Model {
             }
             
             // Calculate the following field.
-            $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
+            $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Row, FALSE));
             $Categories[$ID]['Following'] = $Following;
 
             // Calculate the read field.
@@ -192,13 +199,12 @@ class CategoryModel extends Gdn_Model {
       
       // Add permissions.
       $Session = Gdn::Session();
-      foreach ($Categories as $CID => $Category) {
+      foreach ($IDs as $CID) {
          $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
       }
-      
    }
    
    /**
@@ -959,6 +965,8 @@ class CategoryModel extends Gdn_Model {
             $Set,
             array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $Category['CategoryID']));
       }
+      $Key = 'UserCategory_'.Gdn::Session()->UserID;
+      Gdn::Cache()->Remove($Key);
    }
    
    /**

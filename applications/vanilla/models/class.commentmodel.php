@@ -299,9 +299,6 @@ class CommentModel extends VanillaModel {
 					);
 				}
 			}
-			// decho('Limit: '.$Limit.'; Offset: '.$Offset.'; CountComments: '.$TotalComments);
-			// decho('Setting Watch Records for Discussion '.$Discussion->DiscussionID.' to CountWatch: '.$CountWatch.' Limit: '.$Limit.' Offset: '.$Offset.' TotalComments ' . $TotalComments);
-			// die();
 		}
    }
 

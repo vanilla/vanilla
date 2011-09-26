@@ -61,7 +61,6 @@ class UserMetaModel extends Gdn_Model {
          $UserMeta = Gdn::Cache()->Get($CacheKey);
          
          if ($UserMeta === Gdn_Cache::CACHEOP_FAILURE) {
-            decho($UserMeta);
             $UserMeta = $this->GetWhere(array('UserID' => $UserID), 'Name')->ResultArray();
             $UserMeta = ConsolidateArrayValuesByKey($UserMeta, 'Name', 'Value');
             Gdn::Cache()->Store($CacheKey, $UserMeta);

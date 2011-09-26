@@ -633,12 +633,46 @@ function &ArrayMergeRecursiveDistinct(array &$array1, &$array2 = null)
 
 class Gdn_ConfigurationSource extends Gdn_Pluggable {
    
+   /**
+    * Top level configuration object to reference
+    * @var Gdn_Configuration
+    */
    protected $Configuration;
    
+   /**
+    * Type of source (e.g. file or string)
+    * @var string
+    */
    protected $Type;
+   
+   /**
+    * Name of source (e.g. filename, or string source tag)
+    * @var string
+    */
    protected $Source;
+   
+   /**
+    * Group name for this config source (e.g. Configuration)
+    * @var string
+    */
    protected $Group;
+   
+   /**
+    * Settings as they were when loaded (to facilitate logging config change diffs)
+    * @var array
+    */
+   protected $Initial;
+   
+   /**
+    * Current array of live config settings
+    * @var array
+    */
    protected $Settings;
+   
+   /**
+    * Whether this config source has been modified since loading
+    * @var boolean
+    */
    protected $Dirty;
    
    public function __construct($Configuration, $Type, $Source, $Group, $Settings) {
@@ -649,6 +683,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $this->Type = $Type;
       $this->Source = $Source;
       $this->Group = $Group;
+      $this->Initial = $Settings;
       $this->Settings = $Settings;
       $this->Dirty = FALSE;
    }
@@ -868,6 +903,14 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
 
             // Do a sanity check on the config save.
             if ($this->Source == PATH_CONF.'/config.php') {
+               
+               // Log root config changes
+               try {
+                  $LogData = $this->Initial;
+                  $LogData['_New'] = $this->Settings;
+                  LogModel::Insert('Edit', 'Configuration', $LogData);
+               } catch (Exception $Ex){}
+               
                if (!isset($Data['Database'])) {
                   if ($Pm = Gdn::PluginManager()) {
                      $Pm->EventArguments['Data'] = $Data;

@@ -267,7 +267,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // If making headings disabled and there was no default value for
       // selection, make sure to select the first non-disabled value, or the
       // browser will auto-select the first disabled option.
-      $ForceCleanSelection = ($DoHeadings && !$HasValue);
+      $ForceCleanSelection = ($DoHeadings && !$HasValue && !$IncludeNull);
       
       // Write out the category options
       if (is_array($SafeCategoryData)) {

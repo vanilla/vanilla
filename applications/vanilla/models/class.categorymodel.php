@@ -178,7 +178,7 @@ class CategoryModel extends Gdn_Model {
             }
             
             // Calculate the following field.
-            $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
+            $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Row, FALSE));
             $Categories[$ID]['Following'] = $Following;
 
             // Calculate the read field.
@@ -963,8 +963,9 @@ class CategoryModel extends Gdn_Model {
             'UserCategory',
             $Set,
             array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $Category['CategoryID']));
-         Gdn::Cache()->Remove('UserCategory_'.Gdn::Session()->UserID);
       }
+      $Key = 'UserCategory_'.Gdn::Session()->UserID;
+      Gdn::Cache()->Remove($Key);
    }
    
    /**

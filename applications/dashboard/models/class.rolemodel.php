@@ -173,7 +173,7 @@ class RoleModel extends Gdn_Model {
       if (self::$Roles == NULL) {
          $Key = 'Roles';
          $Roles = Gdn::Cache()->Get($Key);
-         if (!$Roles) {
+         if ($Roles === Gdn_Cache::CACHEOP_FAILURE) {
             $Roles = Gdn::SQL()->Get('Role', 'Name')->ResultArray();
             $Roles = Gdn_DataSet::Index($Roles, array('RoleID'));
             Gdn::Cache()->Store($Key, $Roles, array(Gdn_Cache::FEATURE_EXPIRY => 24 * 3600));

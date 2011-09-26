@@ -435,7 +435,7 @@ class Gdn {
    public static function Get($Key, $Default = NULL) {
       $Response = Gdn::UserMetaModel()->GetUserMeta(0, $Key, $Default);
       if (sizeof($Response) == 1)
-         return GetValue($Key, $Response, NULL);
+         return GetValue($Key, $Response, $Default);
       return $Default;
    }
    

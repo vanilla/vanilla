@@ -221,7 +221,6 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
    /* Finally... */
 
    public function Commit() {
-      
       if (is_null($this->Type))
          throw new Exception(T("Adding a Regarding event requires a type."));
 
@@ -244,8 +243,10 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       if ($CollapseMode) {
          // Check for an existing report of this type
          $ExistingRegardingEntity = $RegardingModel->GetRelated($this->Type, $this->ForeignType, $this->ForeignID);
-         if ($ExistingRegardingEntity !== FALSE)
+         if ($ExistingRegardingEntity) {
             $Collapse = TRUE;
+            $RegardingID = GetValue('RegardingID', $ExistingRegardingEntity);
+         }
       }
       
       if (!$Collapse) {
@@ -283,8 +284,10 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          switch ($ActionType) {
             case 'discussion':
                $DiscussionModel = new DiscussionModel();
+               if ($Collapse)
+                  $Discussion = $DiscussionModel->GetWhere(array('RegardingID' => GetValue('RegardingID', $ExistingRegardingEntity, FALSE)))->FirstRow(DATASET_TYPE_ARRAY);
                
-               if (!$Collapse) {
+               if (!$Collapse || !$Discussion) {
                   $CategoryID = GetValue('Parameters', $Action);
                
                   // Make a new discussion
@@ -298,22 +301,21 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                      'RegardingID'  => $RegardingID
                   ));
                   
+                  if (!$DiscussionID) {
+                     throw new Gdn_UserException($DiscussionModel->Validation->ResultsText());
+                  }
+                  
                   $DiscussionModel->UpdateDiscussionCount($CategoryID);
                } else {
-                  // Add a comment to the existing discussion
-                  
-                  // First, find out which discussion it was, based on RegardingID
-                  $Discussion = $DiscussionModel->GetWhere(array('RegardingID' => GetValue('RegardingID', $ExistingRegardingEntity, FALSE)))->FirstRow(DATASET_TYPE_ARRAY);
-                  if ($Discussion !== FALSE) {
-                     $CommentModel = new CommentModel();
-                     $CommentID = $CommentModel->Save(array(
-                        'DiscussionID' => GetValue('DiscussionID', $Discussion),
-                        'Body'         => $this->Comment,
-                        'InsertUserID' => $this->UserID
-                     ));
-                     
-                     $CommentModel->Save2($CommentID, TRUE);
-                  }
+                  // Add a comment to the existing discussion.
+                  $CommentModel = new CommentModel();
+                  $CommentID = $CommentModel->Save(array(
+                     'DiscussionID' => GetValue('DiscussionID', $Discussion),
+                     'Body'         => $this->Comment,
+                     'InsertUserID' => $this->UserID
+                  ));
+
+                  $CommentModel->Save2($CommentID, TRUE);
                }
                
                break;

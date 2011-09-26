@@ -477,9 +477,6 @@ class UserModel extends Gdn_Model {
       $Data = array();
       
       if (!$SkipCacheQuery) {
-         
-         // TODO: add $UserCache layer
-         
          $Keys = array();
          // Make keys for cache query
          foreach ($IDs as $UserID) {
@@ -609,13 +606,15 @@ class UserModel extends Gdn_Model {
       $RolesDataArray = Gdn::Cache()->Get($UserRolesKey);
       
       if ($RolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
-         $RolesDataArray = $this->SQL->Select('r.RoleID, r.Name')
-            ->From('UserRole ur')
-            ->Join('Role r', 'ur.RoleID = r.RoleID')
-            ->Where('ur.UserID', $UserID)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $RolesDataArray = $this->SQL->GetWhere('UserRole', array('UserID' => $UserID))->ResultArray();
+         $RolesDataArray = ConsolidateArrayValuesByKey($Roles, 'RoleID');
       }
-      return new Gdn_DataSet($RolesDataArray);
+      
+      $Result = array();
+      foreach ($RolesDataArray as $RoleID) {
+         $Result[] = RoleModel::Roles($RoleID, TRUE);
+      }
+      return new Gdn_DataSet($Result);
    }
 
    public function GetSession($UserID, $Refresh = FALSE) {

@@ -255,9 +255,6 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
    }
    
    public function UserMetaModel() {
-      static $UserMetaModel = NULL;
-      if (is_null($UserMetaModel))
-         $UserMetaModel = new UserMetaModel();
-      return $UserMetaModel;
+      return Gdn::UserMetaModel();
    }
 }

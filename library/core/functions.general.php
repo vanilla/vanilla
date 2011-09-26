@@ -616,6 +616,21 @@ if (!function_exists('Debug')) {
    }
 }
 
+if (!function_exists('DebugMethod')) {
+   function DebugMethod($MethodName, $MethodArgs) {
+      echo $MethodName."(";
+      $SA = array();
+      foreach ($MethodArgs as $FuncArg) {
+         if (!is_array($FuncArg) && !is_object($FuncArg))
+            $SA[] = "'{$FuncArg}'";
+         else
+            $SA[] = gettype($FuncArg)."/".get_class($FuncArg);
+      }
+      echo implode(', ', $SA);
+      echo ")\n";
+   }
+}
+
 if (!function_exists('Deprecated')) {
    /**
     * Mark a function deprecated.

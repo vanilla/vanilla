@@ -862,11 +862,11 @@ class UserModel extends Gdn_Model {
                $Photo = ArrayValue('Photo', $FormPostValues);
                if ($Photo !== FALSE) {
                   if (GetValue('CheckExisting', $Settings)) {
-                     $User = $this->Get($UserID);
+                     $User = $this->GetID($UserID);
                      $OldPhoto = GetValue('Photo', $User);
                   }
 
-                  if (!isset($OldPhoto) || $Photo != $Photo) {
+                  if (isset($OldPhoto) && $OldPhoto != $Photo) {
                      if (strpos($Photo, '//'))
                         $PhotoUrl = $Photo;
                      else
@@ -958,7 +958,7 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields['UserID'] = 1;
          
-         if ($this->Get($UserID) !== FALSE) {
+         if ($this->GetID($UserID) !== FALSE) {
             $this->SQL->Put($this->Name, $Fields);
          } else {
             // Insert the new user

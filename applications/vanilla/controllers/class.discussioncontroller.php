@@ -151,11 +151,13 @@ class DiscussionController extends VanillaController {
       $this->Form->AddHidden('CommentID', '');
 
       // Retrieve & apply the draft if there is one:
-      $DraftModel = new DraftModel();
-      $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
-      $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
-      if ($Draft)
-         $this->Form->SetFormValue('Body', $Draft->Body);
+      if (Gdn::Session()->UserID) {
+         $DraftModel = new DraftModel();
+         $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
+         $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+         if ($Draft)
+            $this->Form->SetFormValue('Body', $Draft->Body);
+      }
       
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -780,9 +782,13 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->Form->AddHidden('DisplayNewCommentOnly', 'true'); // Only load/display the new comment after posting (don't load all new comments since the page last loaded).
 
       // Retrieve & apply the draft if there is one:
-      $DraftModel = new DraftModel();
-      $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
-      $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+      $Draft = FALSE;
+      if (Gdn::Session()->UserID) {
+         $DraftModel = new DraftModel();
+         $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
+         $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+      }
+      
       if ($Draft)
          $this->Form->SetFormValue('Body', $Draft->Body);
       else {

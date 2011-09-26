@@ -1625,6 +1625,9 @@ class ImportModel extends Gdn_Model {
       }
 
       // User counts.
+      if (!$this->ImportExists('User', 'DateFirstVisit')) {
+         $Sqls['User.DateFirstVisit'] = 'update :_User set DateFirstVisit = DateInserted';
+      }
       if (!$this->ImportExists('User', 'CountDiscussions')) {
          $Sqls['User.CountDiscussions'] = $this->GetCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID');
       }

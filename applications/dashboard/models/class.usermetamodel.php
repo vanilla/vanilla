@@ -83,7 +83,6 @@ class UserMetaModel extends Gdn_Model {
          return $Result;
       }
       
-      
       $Sql = clone Gdn::SQL();
       $UserMetaQuery = $Sql
          ->Select('*')
@@ -158,8 +157,8 @@ class UserMetaModel extends Gdn_Model {
          } else {
             $Px = $this->SQL->Database->DatabasePrefix;
             $Sql = "insert {$Px}UserMeta (UserID, Name, Value) values(:UserID, :Name, :Value) on duplicate key update Value = :Value1";
-            $Params = array(':UserID' => $UserID, ':Name' => $Name, ':Value' => $Value, ':Value1' => $Value1);
-            $this->SQL->Query($Sql, $Params);
+            $Params = array(':UserID' => $UserID, ':Name' => $Key, ':Value' => $Value, ':Value1' => $Value);
+            $this->Database->Query($Sql, $Params);
          }
          
          return;

@@ -51,7 +51,8 @@ class UserMetaModel extends Gdn_Model {
          if (is_array($UserID)) {
             $Result = array();
             foreach ($UserID as $ID) {
-               $Result[$ID] = $this->GetUserMeta($ID, $Key, $Default);
+               $Meta = $this->GetUserMeta($ID, $Key, $Default);
+               $Result[$ID] = array($Key => $Meta);
             }
             return $Result;
          }
@@ -69,8 +70,10 @@ class UserMetaModel extends Gdn_Model {
          if ($Key === NULL)
             return $UserMeta;
          
-         if (strpos($Key, '%') === FALSE)
-            return GetValue($Key, $UserMeta, $Default);
+         if (strpos($Key, '%') === FALSE) {
+            $Result = GetValue($Key, $UserMeta, $Default);
+            return array($Key => $Result);
+         }
          
          $Regex = '`'.str_replace('%', '.*', preg_quote($Key)).'`i';
          

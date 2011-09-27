@@ -607,7 +607,7 @@ class UserModel extends Gdn_Model {
       
       if ($RolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
          $RolesDataArray = $this->SQL->GetWhere('UserRole', array('UserID' => $UserID))->ResultArray();
-         $RolesDataArray = ConsolidateArrayValuesByKey($Roles, 'RoleID');
+         $RolesDataArray = ConsolidateArrayValuesByKey($RolesDataArray, 'RoleID');
       }
       
       $Result = array();

@@ -378,7 +378,7 @@ class ProfileController extends Gdn_Controller {
    public function Notifications($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
 		
-		$Limit = 50;
+		$Limit = 30;
 		$Offset = is_numeric($Offset) ? $Offset : 0;
       if ($Offset < 0)
          $Offset = 0;

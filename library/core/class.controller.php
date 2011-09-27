@@ -1366,29 +1366,23 @@ class Gdn_Controller extends Gdn_Pluggable {
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
                
+               $CssPaths = array(); 
                if(strpos($CssFile, '/') !== FALSE) {
-                  // A direct path to the file was given.
-                  $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
+                   if( $this->Theme) {
+                     $CssPaths = $this->getCssThemePath( $CssFile); 
+                   } 
+                   // A direct path to the file was given.
+                   $CssPaths[] = CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile)));
                } else {
-                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
-                  $AppFolder = $CssInfo['AppFolder'];
-                  if ($AppFolder == '')
+                   $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
+                   $AppFolder = $CssInfo['AppFolder'];
+                   if ($AppFolder == '')
                      $AppFolder = $this->ApplicationFolder;
    
                   // CSS comes from one of four places:
                   $CssPaths = array();
                   if ($this->Theme) {
-                     // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
-                     // $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
-                     // 2. Theme-wide theme view. eg. root/themes/theme_name/design/
-                     // a) Check to see if a customized version of the css is there.
-                     if ($this->ThemeOptions) {
-                        $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
-                        if (is_string($Filenames) && $Filenames != '%s')
-                           $CssPaths[] = PATH_THEMES.DS.$this->Theme.DS.'design'.DS.ChangeBasename($CssFile, $Filenames);
-                     }
-                     // b) Use the default filename.
-                     $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
+                     $CssPaths = $this->getCssThemePath( $CssFile); 
                   }
 
 
@@ -1737,5 +1731,23 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function Title($Title) {
       $this->SetData('Title', $Title);
    }
+
+  /**
+   * 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
+   * $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
+   * 2. Theme-wide theme view. eg. root/themes/theme_name/design/
+   * a) Check to see if a customized version of the css is there.
+   */
+    public function getCssThemePath($CssFile) {
+        $CssPath = array(); 
+        if ($this->ThemeOptions) {
+          $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
+          if (is_string($Filenames) && $Filenames != '%s')
+             $CssPaths[] = PATH_THEMES.DS.$this->Theme.DS.'design'.DS.ChangeBasename($CssFile, $Filenames);
+        }
+        // b) Use the default filename.
+        $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
+        return $CssPaths; 
+    }
    
 }

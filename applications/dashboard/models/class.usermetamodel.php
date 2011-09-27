@@ -52,7 +52,7 @@ class UserMetaModel extends Gdn_Model {
             $Result = array();
             foreach ($UserID as $ID) {
                $Meta = $this->GetUserMeta($ID, $Key, $Default);
-               $Result[$ID] = array($Key => $Meta);
+               $Result[$ID] = $Meta;
             }
             return $Result;
          }

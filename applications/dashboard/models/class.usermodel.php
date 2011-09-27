@@ -722,7 +722,7 @@ class UserModel extends Gdn_Model {
    }
    
    public function RemovePicture($UserID) {
-      $this->SetField($UserID, 'Photo', 'NULL');
+      $this->SetField($UserID, 'Photo', NULL);
    }
 
    public function ProfileCount($User, $Column) {

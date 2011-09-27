@@ -1973,7 +1973,7 @@ class UserModel extends Gdn_Model {
             Gdn::Database()->Query($Sql, array(':UserID' => $UserID, ':Name' => $Name, ':Value' => $Value, ':Value1' => $Value));
       }
       if (count($Deletes))
-         Gdn::SQL()->WhereIn('Name', $Deletes)->Delete('UserMeta');
+         Gdn::SQL()->WhereIn('Name', $Deletes)->Where('UserID',$UserID)->Delete('UserMeta');
    }
 
    public function SetTransientKey($UserID, $ExplicitKey = '') {

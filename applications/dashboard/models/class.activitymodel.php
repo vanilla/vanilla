@@ -54,6 +54,8 @@ class ActivityModel extends Gdn_Model {
             ->Join('User au', 'a.ActivityUserID = au.UserID')
             ->Join('User ru', 'a.RegardingUserID = ru.UserID', 'left');
       }
+         
+      $this->FireEvent('AfterActivityQuery');
    }
    
    /**

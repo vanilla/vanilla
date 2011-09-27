@@ -650,6 +650,19 @@ class CommentModel extends VanillaModel {
                array('LastDiscussionID' => $Discussion->DiscussionID,
                   'LastCommentID' => $Discussion->LastCommentID,
                   'CountComments' => $CountComments));
+            
+            // Update the cache.
+            if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+               $CategoryCache = array(
+                   'LastDiscussionID' => $DiscussionID,
+                   'LastCommentID' => $CommentID,
+                   'LastTitle' => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
+                   'LastUserID' => $Fields['InsertUserID'],
+                   'LastDateInserted' => $Fields['DateInserted'],
+                   'LastUrl' => "/discussion/comment/$CommentID#Comment_$CommentID"
+               );
+               CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
+            }
 			}
 			
 			// Prepare the notification queue.

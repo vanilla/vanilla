@@ -53,6 +53,7 @@ class DiscussionModel extends VanillaModel {
          $Perms = CategoryModel::CategoryWatch();
       else
          $Perms = self::CategoryPermissions();
+      
       if($Perms !== TRUE) {
          $this->SQL->WhereIn('d.CategoryID', $Perms);
       }
@@ -863,7 +864,7 @@ class DiscussionModel extends VanillaModel {
             } else {
                // Inserting.
                if (!GetValue('Format', $Fields))
-                  $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
+                  $Fields['Format'] = C('Garden.InputFormatter', '');
 
                // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
@@ -878,6 +879,19 @@ class DiscussionModel extends VanillaModel {
 
                if (!$Spam) {
                   $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+                  
+                  // Update the cache.
+                  if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+                     $CategoryCache = array(
+                         'LastDiscussionID' => $DiscussionID,
+                         'LastCommentID' => NULL,
+                         'LastTitle' => Gdn_Format::Text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
+                         'LastUserID' => $Fields['InsertUserID'],
+                         'LastDateInserted' => $Fields['DateInserted'],
+                         'LastUrl' => '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Fields['Name'])
+                     );
+                     CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
+                  }
                } else {
                   return SPAM;
                }

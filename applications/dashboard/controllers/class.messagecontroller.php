@@ -92,7 +92,7 @@ class MessageController extends DashboardController {
       $this->AddSideMenu('dashboard/message');
       
       // Generate some Controller & Asset data arrays
-      $this->LocationData = $this->_GetLocationData();
+      $this->SetData('Locations', $this->_GetLocationData());
       $this->AssetData = $this->_GetAssetData();
       
       // Set the model on the form.
@@ -105,7 +105,7 @@ class MessageController extends DashboardController {
 
 
       // If seeing the form for the first time...
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if (!$this->Form->AuthenticatedPostBack()) {
          $this->Form->SetData($this->Message);
       } else {
          if ($MessageID = $this->Form->Save()) {

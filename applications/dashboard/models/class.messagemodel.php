@@ -29,9 +29,10 @@ class MessageModel extends Gdn_Model {
     * @param int The MessageID to filter to.
     */
    public function GetID($MessageID) {
-      $Message = $this->GetWhere(array('MessageID' => $MessageID))->FirstRow();
-      $Message = $this->DefineLocation($Message);
-      return $Message;
+      if (Gdn::Cache()->ActiveEnabled())
+         return self::Messages($MessageID);
+      else
+         return parent::GetID($MessageID);
    }
    
    public function DefineLocation($Message) {
@@ -52,8 +53,31 @@ class MessageModel extends Gdn_Model {
       $Prefs = $Session->GetPreference('DismissedMessages', array());
       if (count($Prefs) == 0)
          $Prefs[] = 0;
+      
+      $Exceptions = array_map('strtolower', $Exceptions);
          
-      list($Application, $Controller, $Method) = explode('/', $Location);
+      list($Application, $Controller, $Method) = explode('/', strtolower($Location));
+      
+      if (Gdn::Cache()->ActiveEnabled()) {
+         // Get the messages from the cache.
+         $Messages = self::Messages();
+         $Result = array();
+         foreach ($Messages as $MessageID => $Message) {
+            if (in_array($MessageID, $Prefs) || !$Message['Enabled'])
+               continue;
+
+            $MApplication = strtolower($Message['Application']);
+            $MController = strtolower($Message['Controller']);
+            $MMethod = strtolower($Message['Method']);
+
+            if (in_array($MController, $Exceptions))
+               $Result[] = $Message;
+            elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method)
+               $Result[] = $Message;
+         }
+         return $Result;
+      }
+      
       return $this->SQL
          ->Select()
          ->From('Message')
@@ -68,7 +92,7 @@ class MessageModel extends Gdn_Model {
          ->EndWhereGroup()
          ->WhereNotIn('MessageID', $Prefs)
          ->OrderBy('Sort', 'asc')
-         ->Get();
+         ->Get()->ResultArray();
    }
    
    /**
@@ -96,6 +120,24 @@ class MessageModel extends Gdn_Model {
       return $Locations;
    }
    
+   public static function Messages($ID = FALSE) {
+      if ($ID === NULL) {
+         Gdn::Cache()->Remove('Messages');
+         return;
+      }
+      
+      $Messages = Gdn::Cache()->Get('Messages');
+      if ($Messages === Gdn_Cache::CACHEOP_FAILURE) {
+         $Messages = Gdn::SQL()->Get('Message', 'Sort')->ResultArray();
+         $Messages = Gdn_DataSet::Index($Messages, array('MessageID'));
+         Gdn::Cache()->Store('Messages', $Messages);
+      }
+      if ($ID === FALSE)
+         return $Messages;
+      else
+         return GetValue($ID, $Messages);
+   }
+   
    public function Save($FormPostValues, $Settings = FALSE) {
       // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
       $Location = ArrayValue('Location', $FormPostValues, '');
@@ -103,13 +145,16 @@ class MessageModel extends Gdn_Model {
          $Location = explode('/', $Location);
          $Application = GetValue(0, $Location, '');
          if (in_array($Application, $this->_SpecialLocations)) {
+            $FormPostValues['Application'] = NULL;
             $FormPostValues['Controller'] = $Application;
+            $FormPostValues['Method'] = NULL;
          } else {
             $FormPostValues['Application'] = $Application;
             $FormPostValues['Controller'] = GetValue(1, $Location, '');
             $FormPostValues['Method'] = GetValue(2, $Location, '');
          }
       }
+      Gdn::Cache()->Remove('Messages');
 
       return parent::Save($FormPostValues, $Settings);
    }

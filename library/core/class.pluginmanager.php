@@ -561,8 +561,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $EventKey = strtolower($EventClassName == '' ? $NewMethodName : $EventClassName.'_'.$EventName.'_Create');
 
       // Throw an error if this method has already been created.
-      if (array_key_exists($EventKey, $this->_NewMethodCollection) === TRUE)
-         trigger_error(ErrorMessage('New object methods must be unique. The new "'.$EventKey.'" method has already been assigned by the "'.$this->_NewMethodCollection[$EventKey].'" plugin. It cannot also be assigned by the "'.$NewMethodClassName.'" plugin.', 'PluginManager', 'RegisterNewMethod'), E_USER_ERROR);
+      if (array_key_exists($EventKey, $this->_NewMethodCollection) === TRUE) {
+         trigger_error('New object methods must be unique. The new "'.$EventKey.'" method has already been assigned by the "'.$this->_NewMethodCollection[$EventKey].'" plugin. It cannot also be assigned by the "'.$NewMethodClassName.'" plugin.', E_USER_NOTICE);
+         return;
+      }
 
       // Otherwise, specify this class as the source for the new method.
       $this->_NewMethodCollection[$EventKey] = $NewMethodKey;

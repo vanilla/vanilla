@@ -33,23 +33,29 @@ class ActivityModel extends Gdn_Model {
     * @since 2.0.0
     * @access public
     */
-   public function ActivityQuery() {
+   public function ActivityQuery($Join = TRUE) {
       $this->SQL
          ->Select('a.*')
          ->Select('t.FullHeadline, t.ProfileHeadline, t.AllowComments, t.ShowIcon, t.RouteCode')
          ->Select('t.Name', '', 'ActivityType')
-         ->Select('au.Name', '', 'ActivityName')
-         ->Select('au.Gender', '', 'ActivityGender')
-         ->Select('au.Photo', '', 'ActivityPhoto')
-         ->Select('au.Email', '', 'ActivityEmail')
-         ->Select('ru.Name', '', 'RegardingName')
-         ->Select('ru.Gender', '', 'RegardingGender')
-         ->Select('ru.Email', '', 'RegardingEmail')
-         ->Select('ru.Photo', '', 'RegardingPhoto')
          ->From('Activity a')
-         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
-         ->Join('User au', 'a.ActivityUserID = au.UserID')
-         ->Join('User ru', 'a.RegardingUserID = ru.UserID', 'left');
+         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID');
+      
+      if ($Join) {
+         $this->SQL
+            ->Select('au.Name', '', 'ActivityName')
+            ->Select('au.Gender', '', 'ActivityGender')
+            ->Select('au.Photo', '', 'ActivityPhoto')
+            ->Select('au.Email', '', 'ActivityEmail')
+            ->Select('ru.Name', '', 'RegardingName')
+            ->Select('ru.Gender', '', 'RegardingGender')
+            ->Select('ru.Email', '', 'RegardingEmail')
+            ->Select('ru.Photo', '', 'RegardingPhoto')
+            ->Join('User au', 'a.ActivityUserID = au.UserID')
+            ->Join('User ru', 'a.RegardingUserID = ru.UserID', 'left');
+      }
+         
+      $this->FireEvent('AfterActivityQuery');
    }
    
    /**
@@ -127,7 +133,7 @@ class ActivityModel extends Gdn_Model {
       if ($Limit < 0)
          $Limit = 0;
 
-      $this->ActivityQuery();
+      $this->ActivityQuery(FALSE);
       $this->SQL->Where('a.CommentActivityID is null');
       if ($UserID != '') {
          $this->SQL
@@ -139,14 +145,22 @@ class ActivityModel extends Gdn_Model {
       }
       
       $Session = Gdn::Session();
-      if (!$Session->IsValid() || $Session->UserID != $UserID)
-         $this->SQL->Where('t.Public', '1');
+      if (!$Session->IsValid() || $Session->UserID != $UserID) {
+         // Get all of the activity types that are public.
+         $SQL2 = clone Gdn::SQL();
+         $SQL2->Reset();
+         $ActivityTypes = $SQL2->GetWhere('ActivityType', array('Public' => 1))->ResultArray();
+         $ActivityTypes = ConsolidateArrayValuesByKey($ActivityTypes, 'ActivityTypeID');
+         $this->SQL->WhereIn('a.ActivityTypeID', $ActivityTypes);
+      }
 
       $this->FireEvent('BeforeGet');
       $Result = $this->SQL
-         ->OrderBy('a.DateInserted', 'desc')
+         ->OrderBy('a.ActivityID', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
+      
+      Gdn::UserModel()->JoinUsers($Result, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Photo', 'Email', 'Gender')));
 
       $this->EventArguments['Data'] =& $Result;
       $this->FireEvent('AfterGet');
@@ -283,15 +297,19 @@ class ActivityModel extends Gdn_Model {
     * @param int $Limit Max number to return.
     * @return DataSet SQL results.
     */
-   public function GetNotifications($UserID, $Offset = '0', $Limit = '50') {
-      $this->ActivityQuery();
+   public function GetNotifications($UserID, $Offset = '0', $Limit = '30') {
+      $this->ActivityQuery(FALSE);
       $this->FireEvent('BeforeGetNotifications');
-      return $this->SQL
+      $Result = $this->SQL
          ->Where('RegardingUserID', $UserID)
          ->Where('t.Notify', '1')
          ->Limit($Limit, $Offset)
          ->OrderBy('a.ActivityID', 'desc')
          ->Get();
+      
+      Gdn::UserModel()->JoinUsers($Result, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Photo', 'Email', 'Gender')));
+      
+      return $Result;
    }
    
    /**
@@ -361,13 +379,15 @@ class ActivityModel extends Gdn_Model {
     * @return DataSet SQL results.
     */
    public function GetComments($ActivityIDs) {
-      $this->ActivityQuery();
+      $this->ActivityQuery(FALSE);
       $this->FireEvent('BeforeGetComments');
-      return $this->SQL
+      $Result = $this->SQL
          ->WhereIn('a.CommentActivityID', $ActivityIDs)
          ->OrderBy('a.CommentActivityID', 'desc')
          ->OrderBy('a.DateInserted', 'asc')
          ->Get();
+      Gdn::UserModel()->JoinUsers($Result, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Photo', 'Email', 'Gender')));
+      return $Result;
    }
    
    /**

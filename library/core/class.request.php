@@ -861,6 +861,11 @@ class Gdn_Request {
       return $this;
    }
    
+   public function WithDeliveryMethod($DeliveryMethod) {
+      $this->SetValueOn(self::INPUT_GET, 'DeliveryMethod', $DeliveryMethod);
+      return $this;
+   }
+   
    public function WithRoute($Route) {
       $ParsedURI = Gdn::Router()->GetDestination($Route);
       if ($ParsedURI)

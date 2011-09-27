@@ -170,6 +170,7 @@ class CategoryModel extends Gdn_Model {
             $UserData = array();
          
          foreach ($IDs as $ID) {
+            $Category = $Categories[$ID];
             $Row = GetValue($ID, $UserData);
             if ($Row) {
                $Categories[$ID]['UserDateMarkedRead'] = $Row['DateMarkedRead'];
@@ -200,6 +201,7 @@ class CategoryModel extends Gdn_Model {
       // Add permissions.
       $Session = Gdn::Session();
       foreach ($IDs as $CID) {
+         $Category = $Categories[$CID];
          $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);

@@ -367,6 +367,29 @@ class EntryController extends Gdn_Controller {
             $ExistingUsers = $UserModel->GetWhere()->ResultArray();
          else
             $ExistingUsers = array();
+         
+         // Check to automatically link the user.
+         if (C('Garden.Registration.AutoConnect') && count($ExistingUsers) > 0) {
+            foreach ($ExistingUsers as $Row) {
+               if ($this->Form->GetFormValue('Email') == $Row['Email']) {
+                  $UserID = $Row['UserID'];
+                  $this->Form->SetFormValue('UserID', $UserID);
+                  $Data = $this->Form->FormValues();
+                  $UserModel->Save($Data, array('NoConfirmEmail' => TRUE));
+                  
+                  if ($Attributes = $this->Form->GetFormValue('Attributes')) {
+                     $UserModel->SaveAttribute($UserID, $Attributes);
+                  }
+                  
+                  // Sign the user in.
+                  Gdn::Session()->Start($UserID);
+         //         $this->_SetRedirect(TRUE);
+                  $this->_SetRedirect($this->Request->Get('display') == 'popup');
+                  $this->Render();
+                  return;
+               }
+            }
+         }
 
          $NameUnique = C('Garden.Registration.NameUnique', TRUE);
          $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);

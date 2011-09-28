@@ -812,7 +812,7 @@ jQuery(document).ready(function($) {
 jQuery(window).load(function() {
    
    var toggler = function(t_img, t_width) {
-      if (t_img.css('width') == 'auto')
+      if (parseInt(t_img.css('width'), 10) > t_width)
          t_img.css('width',t_width);
       else
          t_img.css('width','auto');

@@ -40,6 +40,29 @@ class CommentModel extends VanillaModel {
       $this->FireEvent('AfterConstruct');
    }
    
+   public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
+      if (!Gdn::Cache()->ActiveEnabled())
+         return;
+      
+      if (!$Limit) {
+         $Limit = C('Vanilla.Comments.PerPage', 30);
+      }
+      if (is_array($PageWhere))
+         $Curr = array_values($PageWhere);
+      else
+         $Curr = FALSE;
+      
+      $New = array(GetValueR('0.DateInserted', $Result));
+      
+      if (count($Result) >= $Limit)
+         $New[] = GetValueR((count($Result) - 1).'.DateInserted', $Result);
+      
+      if ($Curr != $New) {
+         $CacheKey = "Comment.Page.$DiscussionID.$Page";
+         Gdn::Cache()->Store($CacheKey, $New, array(Gdn_Cache::FEATURE_EXPIRY => 86400));
+      }
+   }
+   
    /**
     * Select the data for a single comment.
     * 
@@ -89,9 +112,18 @@ class CommentModel extends VanillaModel {
       $this->EventArguments['Limit'] =& $Limit;
       $this->EventArguments['Offset'] =& $Offset;
       $this->FireEvent('BeforeGet');
+      
       $this->SQL
-         ->Where('c.DiscussionID', $DiscussionID)
-         ->Limit($Limit, $Offset);
+         ->Where('c.DiscussionID', $DiscussionID);
+      
+      $Page = PageNumber($Offset, $Limit);
+      $PageWhere = $this->PageWhere($DiscussionID, $Page);
+      
+      if ($PageWhere) {
+         $this->SQL->Where($PageWhere)->Limit($Limit + 10);
+      } else {
+         $this->SQL->Limit($Limit, $Offset);
+      }
       
       $this->OrderBy($this->SQL);
 
@@ -101,6 +133,8 @@ class CommentModel extends VanillaModel {
       
       $this->EventArguments['Comments'] =& $Result;
       $this->FireEvent('AfterGet');
+      
+      $this->CachePageWhere($Result->Result(), $PageWhere, $DiscussionID, $Page);
       
       return $Result;
    }
@@ -183,6 +217,24 @@ class CommentModel extends VanillaModel {
             $Value->OrderBy($Parts[0], $Parts[1]);
          }
       }
+   }
+   
+   public function PageWhere($DiscussionID, $Page) {
+      if (!Gdn::Cache()->ActiveEnabled())
+         return FALSE;
+      
+      $CacheKey = "Comment.Page.$DiscussionID.$Page";
+      $Value = Gdn::Cache()->Get($CacheKey);
+      if ($Value === FALSE) {
+         return FALSE;
+      } elseif (is_array($Value)) {
+         $Result = array('DateInserted >=' => $Value[0]);
+         if (isset($Value[1])) {
+            $Result['DateInserted <='] = $Value[1];
+         }
+         return $Result;
+      }
+      return FALSE;
    }
 	
 	/**
@@ -650,6 +702,19 @@ class CommentModel extends VanillaModel {
                array('LastDiscussionID' => $Discussion->DiscussionID,
                   'LastCommentID' => $Discussion->LastCommentID,
                   'CountComments' => $CountComments));
+            
+            // Update the cache.
+            if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+               $CategoryCache = array(
+                   'LastDiscussionID' => $DiscussionID,
+                   'LastCommentID' => $CommentID,
+                   'LastTitle' => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
+                   'LastUserID' => $Fields['InsertUserID'],
+                   'LastDateInserted' => $Fields['DateInserted'],
+                   'LastUrl' => "/discussion/comment/$CommentID#Comment_$CommentID"
+               );
+               CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
+            }
 			}
 			
 			// Prepare the notification queue.
@@ -814,6 +879,19 @@ class CommentModel extends VanillaModel {
          
 //         $ActivityModel->QueueNotification($ActivityID);
          $NotifiedUsers[] = $UserID;
+      }
+   }
+   
+   public function RemovePageCache($DiscussionID, $From = 1) {
+      if (!Gdn::Cache()->ActiveEnabled())
+         return;
+      
+      $CountComments = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CountComments');
+      $PageCount = PageNumber($CountComments - 1, C('Vanilla.Comments.PerPage', 30));
+      
+      for ($Page = $From; $Page <= $PageCount; $Page++) {
+         $CacheKey = "Comment.Page.$DiscussionID.$Page";
+         Gdn::Cache()->Remove($CacheKey);
       }
    }
    
@@ -996,6 +1074,9 @@ class CommentModel extends VanillaModel {
 
          // Update the user's comment count
          $this->UpdateUser($Data['InsertUserID']);
+         
+         // Clear the page cache.
+         $this->RemovePageCache($Data['DiscussionID']);
       }
       return TRUE;
    }

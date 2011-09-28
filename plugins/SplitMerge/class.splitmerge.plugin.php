@@ -98,7 +98,9 @@ class SplitMergePlugin extends Gdn_Plugin {
             $CommentModel->UpdateCommentCount($DiscussionID);
 //            $CommentModel->UpdateUserCommentCounts($DiscussionID);
             $CommentModel->UpdateCommentCount($NewDiscussionID);
-   
+            $CommentModel->RemovePageCache($DiscussionID, 1);
+            
+            
             // Clear selections
             unset($CheckedComments[$DiscussionID]);
             Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
@@ -175,6 +177,7 @@ class SplitMergePlugin extends Gdn_Plugin {
    
                // Update counts on all affected discussions
                $CommentModel->UpdateCommentCount($DiscussionID);
+               $CommentModel->RemovePageCache($DiscussionID);
 //               $CommentModel->UpdateUserCommentCounts($DiscussionID);
             }
    

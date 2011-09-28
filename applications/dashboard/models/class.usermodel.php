@@ -662,6 +662,7 @@ class UserModel extends Gdn_Model {
       
       $SystemUser = array(
          'Name' => T('System'),
+         'PhotoUrl' => Asset('/applications/dashboard/design/images/usericon.png', TRUE),
          'Password' => RandomString('20'),
          'HashMethod' => 'Random',
          'Email' => 'system@domain.com',
@@ -721,7 +722,7 @@ class UserModel extends Gdn_Model {
    }
    
    public function RemovePicture($UserID) {
-      $this->SetField($UserID, 'Photo', 'NULL');
+      $this->SetField($UserID, 'Photo', NULL);
    }
 
    public function ProfileCount($User, $Column) {
@@ -809,6 +810,9 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
+         if (in_array('AllIPAddresses', $Fields) && is_array($Fields)) {
+            $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
+         }
          
          if (!$Insert && array_key_exists('Password', $Fields)) {
             // Encrypt the password for saving only if it won't be hashed in _Insert()
@@ -1090,6 +1094,8 @@ class UserModel extends Gdn_Model {
       // Check for an IP address.
       if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
          $IPAddress = $Keywords;
+      } elseif (strtolower($Keywords) == 'banned') {
+         $this->SQL->Where('u.Banned >', 0);
       } else {
          // Check to see if the search exactly matches a role name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
@@ -1147,7 +1153,12 @@ class UserModel extends Gdn_Model {
       }
 
       // Check to see if the search exactly matches a role name.
-      $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
+      $RoleID = FALSE;
+      if (strtolower($Keywords) == 'banned') {
+         $this->SQL->Where('u.Banned >', 0);
+      } else {
+         $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
+      }
 
       if (isset($Where))
          $this->SQL->Where($Where);
@@ -1429,10 +1440,18 @@ class UserModel extends Gdn_Model {
       if (!$UserID) {
          throw new Exception('A valid UserId is required.');
       }
+      
+//      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+//      $AllIPs = GetValue('AllIPAddresses', $User, array());
+      $IP = Gdn::Request()->IpAddress();
+//      if (!in_array($IP, $AllIPs)) {
+//         $AllIPs[] = $IP;
+//         SetValue('AllIPAddresses', $User, $AllIPs);
+//      }
 
       $this->SQL->Update('User')
          ->Set('DateLastActive', Gdn_Format::ToDateTime())
-         ->Set('LastIPAddress', Gdn::Request()->IpAddress())
+         ->Set('LastIPAddress', $IP)
          ->Set('CountVisits', 'CountVisits + 1', FALSE);
 
       if (isset($Attributes) && is_array($Attributes)) {
@@ -1621,6 +1640,11 @@ class UserModel extends Gdn_Model {
       $this->EventArguments['UserID'] = $UserID;
       $this->EventArguments['Options'] = $Options;
       $this->FireEvent('BeforeDeleteUser');
+      
+      if ($UserID == $this->GetSystemUserID()) {
+         $this->Validation->AddValidationResult('', 'You cannot delete the system user.');
+         return FALSE;
+      }
 
       // Remove photos
       $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
@@ -1957,6 +1981,9 @@ class UserModel extends Gdn_Model {
          
          SetValue('PhotoUrl', $User, $PhotoUrl);
       }
+      if ($v = GetValue('AllIPAddresses', $User)) {
+         SetValue('AllIPAddresses', $User, explode(',', $v));
+      }
    }
 
    public static function SetMeta($UserID, $Meta, $Prefix = '') {
@@ -1972,7 +1999,7 @@ class UserModel extends Gdn_Model {
             Gdn::Database()->Query($Sql, array(':UserID' => $UserID, ':Name' => $Name, ':Value' => $Value, ':Value1' => $Value));
       }
       if (count($Deletes))
-         Gdn::SQL()->WhereIn('Name', $Deletes)->Delete('UserMeta');
+         Gdn::SQL()->WhereIn('Name', $Deletes)->Where('UserID',$UserID)->Delete('UserMeta');
    }
 
    public function SetTransientKey($UserID, $ExplicitKey = '') {

@@ -282,7 +282,7 @@ class RoleModel extends Gdn_Model {
          $UserID = GetValue($UserIDColumn, $User);
          $Key = $Keys[$UserID];
          
-         $RoleIDs = GetValue($Key, $UserRoles);
+         $RoleIDs = GetValue($Key, $UserRoles, array());
          $Roles = array();
          foreach ($RoleIDs as $RoleID) {
             $Roles[$RoleID] = $AllRoles[$RoleID]['Name'];

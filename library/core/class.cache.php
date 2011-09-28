@@ -443,10 +443,20 @@ abstract class Gdn_Cache {
       $UsePrefix = !GetValue(Gdn_Cache::FEATURE_NOPREFIX, $Options, FALSE);
       $ForcePrefix = GetValue(Gdn_Cache::FEATURE_FORCEPREFIX, $Options, NULL);
       
+      $Prefix = '';
       if ($UsePrefix)
-         $Key = $this->GetPrefix($ForcePrefix).'!'.$Key;
+         $this->GetPrefix($ForcePrefix).'!';
       
-      return $Key;
+      if (is_array($Key)) {
+         $Result = array();
+         foreach ($Key as $i => $v) {
+            $Result[$i] = $Prefix.$v;
+         }
+      } else {
+         $Result = $Prefix.$Key;
+      }
+      
+      return $Result;
    }
    
    /*

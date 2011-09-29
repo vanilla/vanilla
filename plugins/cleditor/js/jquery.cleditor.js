@@ -294,8 +294,9 @@ jQuery(document).ready(function($) {
     }
 
     // Bind the window resize event when the width or height is auto or %
-    if (/auto|%/.test("" + options.width + options.height))
-      $(window).resize(function() {refresh(editor);});
+    // Commented out 20110928mlr - causes infinite refresh loop with embed plugin
+    //if (/auto|%/.test("" + options.width + options.height))
+      //$(window).resize(function() {refresh(editor);});
 
     // Create the iframe and resize the controls
     refresh(editor);

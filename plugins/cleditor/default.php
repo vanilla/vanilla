@@ -44,14 +44,16 @@ v1.0.1 31AUG2011 - by Todd @ Vanilla
 -- 1. Fixed js error with new versions of jQuery.
 
 v1.1 14SEPT2011 - by Linc @ Vanilla
-- Fixed:
--- 1. Disabled CLEditor for IE6 or less if using Vanilla 2.0.18b5+.
+-- Disabled CLEditor for IE6 or less if using Vanilla 2.0.18b5+.
+
+v1.1.1 28SEPT2011 - Linc
+-- Fixed infinite height loop confict with embed plugin.
  */
 
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',

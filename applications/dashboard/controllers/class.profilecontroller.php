@@ -393,7 +393,7 @@ class ProfileController extends Gdn_Controller {
       // Get notifications data
       $this->ActivityModel = new ActivityModel();
       $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID, $Offset, $Limit);
-		$TotalRecords = $this->ActivityModel->GetCountNotifications($Session->UserID);
+		//$TotalRecords = $this->ActivityModel->GetCountNotifications($Session->UserID);
 		
 		// Build a pager
 		$PagerFactory = new Gdn_PagerFactory();
@@ -404,7 +404,7 @@ class ProfileController extends Gdn_Controller {
 		$this->Pager->Configure(
 			$Offset,
 			$Limit,
-			$TotalRecords,
+			FALSE,
 			'profile/notifications/%1$s/'
 		);
 		// Deliver json data if necessary

@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
 
    // Categories->Delete()
    // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
-   $('[name="Form/DeleteDiscussions"]').click(function() {
+   $('[name$=DeleteDiscussions]').click(function() {
       if ($(this).attr('checked')) {
          $('#ReplacementCategory,#ReplacementWarning').slideDown('fast');
          $('#DeleteDiscussions').slideUp('fast');
@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
    });
    // Categories->Delete()
    // Hide onload if unchecked   
-   if (!$('[name="Form/DeleteDiscussions"]').attr('checked')) {
+   if (!$('[name$=DeleteDiscussions]').attr('checked')) {
       $('#ReplacementCategory,#ReplacementWarning').hide();
       $('#DeleteDiscussions').show();
    } else {

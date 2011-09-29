@@ -827,17 +827,23 @@ class UserModel extends Gdn_Model {
             if (isset($Fields['Email']) && $UserID == Gdn::Session()->UserID && $Fields['Email'] != Gdn::Session()->User->Email && !Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
                $User = Gdn::Session()->User;
                $Attributes = Gdn::Session()->User->Attributes;
-               $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
+               
+               $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
+               if (RoleModel::Roles($ConfirmEmailRoleID)) {
+                  // The confirm email role is set and it exists so go ahead with the email confirmation.
+                  $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
+                  
+                  if ($RoleIDs)
+                     $ConfirmedEmailRoles = $RoleIDs;
+                  else
+                     $ConfirmedEmailRoles = ConsolidateArrayValuesByKey($this->GetRoles($UserID), 'RoleID');
+                  $Attributes['ConfirmedEmailRoles'] = $ConfirmedEmailRoles;
 
-               if ($RoleIDs)
-                  $ConfirmedEmailRoles = $RoleIDs;
-               else
-                  $ConfirmedEmailRoles = ConsolidateArrayValuesByKey($this->GetRoles($UserID), 'RoleID');
-               $Attributes['ConfirmedEmailRoles'] = $ConfirmedEmailRoles;
+                  $RoleIDs = (array)C('Garden.Registration.ConfirmEmailRole');
 
-               $RoleIDs = (array)C('Garden.Registration.ConfirmEmailRole');
-               $SaveRoles = TRUE;
-               $Fields['Attributes'] = serialize($Attributes);
+                  $SaveRoles = TRUE;
+                  $Fields['Attributes'] = serialize($Attributes);
+               }
             } 
          }
          

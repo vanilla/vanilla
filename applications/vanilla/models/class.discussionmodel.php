@@ -888,58 +888,61 @@ class DiscussionModel extends VanillaModel {
                   return SPAM;
                }
                
-               // Assign the new DiscussionID to the comment before saving
+               // Assign the new DiscussionID to the comment before saving.
                $FormPostValues['IsNewDiscussion'] = TRUE;
                $FormPostValues['DiscussionID'] = $DiscussionID;
                
-               // Notify users of mentions
-               $DiscussionName = ArrayValue('Name', $Fields, '');
-               $Usernames = GetMentions($DiscussionName);
-               $UserModel = Gdn::UserModel();
-               foreach ($Usernames as $Username) {
-                  $User = $UserModel->GetByUsername($Username);
-                  if ($User && $User->UserID != $Session->UserID) {
-                     AddActivity(
-                        $Session->UserID,
-                        'DiscussionMention',
-                        '',
-                        $User->UserID,
-                        '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName)
-                     );
-                  }
-               }
-					
-               // Notify any users who were mentioned in the comment
+               // Notify users of mentions.
 					$DiscussionName = ArrayValue('Name', $Fields, '');
                $Story = ArrayValue('Body', $Fields, '');
-               $Usernames = GetMentions($Story);
+               
+               $Usernames = array_merge(GetMentions($DiscussionName), GetMentions($Story));
+               $Usernames = array_unique($Usernames);
+               
                $NotifiedUsers = array();
+               $UserModel = Gdn::UserModel();
+               $ActivityModel = new ActivityModel();
                foreach ($Usernames as $Username) {
                   $User = $UserModel->GetByUsername($Username);
-                  if ($User && $User->UserID != $Session->UserID) {
-                     $NotifiedUsers[] = $User->UserID;   
-                     $ActivityModel = new ActivityModel();   
+                  if ($User && $User->UserID != $Session->UserID && !in_array($User->UserID, $NotifiedUsers)) {
                      $ActivityID = $ActivityModel->Add(
                         $Session->UserID,
-                        'CommentMention',
+                        'DiscussionMention',
                         Anchor(Gdn_Format::Text($DiscussionName), '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName), FALSE),
                         $User->UserID,
                         '',
                         '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName),
-                        FALSE
+                        'QueueOnly'
                      );
-                     $ActivityModel->SendNotification($ActivityID, $Story);
+                     if ($ActivityID)
+                        $NotifiedUsers[] = $User->UserID;
                   }
                }
-					
-               $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
+               
                try {
                   $Fields['DiscussionID'] = $DiscussionID;
-                  $this->NotifyNewDiscussion($Fields);
+                  $this->NotifyNewDiscussion($Fields, $NotifiedUsers, $ActivityModel);
                } catch(Exception $Ex) {
                   throw $Ex;
                }
+               
+               // Throw an event for users to add their own events.
+               $this->EventArguments['Discussion'] = $Fields;
+               $this->EventArguments['NotifiedUsers'] = $NotifiedUsers;
+               $this->EventArguments['ActivityModel'] = $ActivityModel;
+               $this->FireEvent('BeforeNotification');
+
+               // Send all notifications.
+               $ActivityModel->SendNotificationQueue();
+               
+               $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             }
+            
+            // Throw an event for users to add their own events.
+            $this->EventArguments['Discussion'] = $Fields;
+            $this->EventArguments['NotifiedUsers'] = $NotifiedUsers;
+            $this->EventArguments['ActivityModel'] = $ActivityModel;
+            $this->FireEvent('BeforeNotification');
             
             // Get CategoryID of this discussion
             $Data = $this->SQL
@@ -980,28 +983,30 @@ class DiscussionModel extends VanillaModel {
     */
    public function RecordActivity($UserID, $DiscussionID, $DiscussionName) {
       // Report that the discussion was created
-      AddActivity(
-         $UserID,
-         'NewDiscussion',
-         Anchor(Gdn_Format::Text($DiscussionName), 'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName))
-      );
+//      AddActivity(
+//         $UserID,
+//         'NewDiscussion',
+//         Anchor(Gdn_Format::Text($DiscussionName), 'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName))
+//      );
       
-      // Get the user's discussion count
-      $Data = $this->SQL
+      // Get the user's discussion count.
+      $CountDiscussions = $this->SQL
          ->Select('DiscussionID', 'count', 'CountDiscussions')
          ->From('Discussion')
          ->Where('InsertUserID', $UserID)
-         ->Get();
+         ->Get()->Value('CountDiscussions', 0);
       
-      // Save the count to the user table
-      $this->SQL
-         ->Update('User')
-         ->Set('CountDiscussions', $Data->NumRows() > 0 ? $Data->FirstRow()->CountDiscussions : 0)
-         ->Where('UserID', $UserID)
-         ->Put();
+      // Save the count to the user table.
+      Gdn::UserModel()->SetField($UserID, 'CountDiscussions', $CountDiscussions);
    }
 
-   public function NotifyNewDiscussion($Discussion) {
+   /**
+    *
+    * @param type $Discussion
+    * @param type $NotifiedUsers
+    * @param ActivityModel $ActivityModel 
+    */
+   public function NotifyNewDiscussion($Discussion, &$NotifiedUsers, $ActivityModel) {
       if (is_numeric($Discussion)) {
          $Discussion = $this->GetID($Discussion);
       }
@@ -1027,13 +1032,18 @@ class DiscussionModel extends VanillaModel {
          
          if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
             continue;
+         
+         if (in_array($UserID, $NotifiedUsers))
+            continue;
 
-         AddActivity($Discussion['InsertUserID'],
+         $ID = $ActivityModel->Add($Discussion['InsertUserID'],
             'NewDiscussion',
             Anchor(Gdn_Format::Text($Discussion['Name']), ExternalUrl('discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']))),
             $UserID,
             '/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']),
-            TRUE);
+            'QueuOnly');
+         if ($ID)
+            $NotifiedUsers[] = $UserID;
       }
    }
    

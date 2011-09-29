@@ -328,7 +328,7 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->ErrorCount() > 0)
          return $this->Render();
 
-      $UserModel = new UserModel();
+      $UserModel = Gdn::UserModel();
 
       // Check to see if there is an existing user associated with the information above.
       $Auth = $UserModel->GetAuthentication($this->Form->GetFormValue('UniqueID'), $this->Form->GetFormValue('Provider'));
@@ -348,7 +348,7 @@ class EntryController extends Gdn_Controller {
          }
          
          // Synchronize the user's data.
-         $UserModel->Save($Data, array('NoConfirmEmail' => TRUE));
+         $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
          
          if ($Attributes = $this->Form->GetFormValue('Attributes')) {
             $UserModel->SaveAttribute($UserID, $Attributes);

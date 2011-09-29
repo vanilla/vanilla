@@ -94,7 +94,7 @@ $SystemUserID = C('Garden.SystemUserID');
 if ($SystemUserID) {
    $SysUser = Gdn::UserModel()->GetID($SystemUserID);
 
-   if (!$SysUser || GetValue('Deleted', $SysUser)) {
+   if (!$SysUser || GetValue('Deleted', $SysUser) || GetValue('Admin', $SysUser) != 2) {
       $SystemUserID = FALSE;
       RemoveFromConfig('Garden.SystemUserID');
    }

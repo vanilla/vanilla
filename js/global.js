@@ -163,7 +163,7 @@ jQuery(document).ready(function($) {
          window.opener.location.replace(RedirectUrl);
          window.close();
       } else {
-         setTimeout(function() {document.location.replace(RedirectUrl);}, 200);
+         document.location.replace(RedirectUrl);
       }
    }
 
@@ -430,9 +430,19 @@ jQuery(document).ready(function($) {
       }
    });
 
-   // Jump to the hash if desired.
-   if (gdn.definition('LocationHash', 0) && window.location.hash == '') {
-      window.location.hash = gdn.definition('LocationHash');
+   if (window.location.hash == '') {
+      // Jump to the hash if desired.
+      if (gdn.definition('LocationHash', 0)) {
+         window.location.hash = gdn.definition('LocationHash');
+      }
+      if (gdn.definition('ScrollTo', 0)) {
+         var scrollTo = $(gdn.definition('ScrollTo'));
+         if (scrollTo.length) {
+            $('html').animate({
+                scrollTop: scrollTo.offset().top - 10
+            });​
+         }
+      }
    }
    
    gdn.stats = function() {

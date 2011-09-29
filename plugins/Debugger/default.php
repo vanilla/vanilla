@@ -64,7 +64,7 @@ class DebuggerPlugin extends Gdn_Plugin {
       if (method_exists($Sender, 'CanonicalUrl')) {
          $CanonicalUrl = htmlspecialchars($Sender->CanonicalUrl(), ENT_COMPAT, 'UTF-8');
 
-         $String .= '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\">$CanonicalUrl</a></div>";
+         $String .= '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\" accesskey=\"r\">$CanonicalUrl</a></div>";
       }
 
       $Database = Gdn::Database();

@@ -113,6 +113,6 @@ class Gdn_DatabaseDebug extends Gdn_Database {
    }
 	
 	public function QueryTimes() {
-		return $this->_QueryTimes;
+		return array();
 	}
 }

@@ -445,7 +445,7 @@ abstract class Gdn_Cache {
       
       $Prefix = '';
       if ($UsePrefix)
-         $this->GetPrefix($ForcePrefix).'!';
+         $Prefix = $this->GetPrefix($ForcePrefix).'!';
       
       if (is_array($Key)) {
          $Result = array();

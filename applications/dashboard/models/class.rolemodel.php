@@ -249,6 +249,8 @@ class RoleModel extends Gdn_Model {
          $Keys[$UserID] = FormatString(UserModel::USERROLES_KEY, array('UserID' => $UserID));
       }
       $UserRoles = Gdn::Cache()->Get($Keys);
+      if (!is_array($UserRoles))
+         $UserRoles = array();
       
       // Grab all of the data that doesn't exist from the DB.
       $MissingIDs = array();
@@ -285,6 +287,8 @@ class RoleModel extends Gdn_Model {
          $RoleIDs = GetValue($Key, $UserRoles, array());
          $Roles = array();
          foreach ($RoleIDs as $RoleID) {
+            if (!array_key_exists($RoleID, $AllRoles))
+               continue;
             $Roles[$RoleID] = $AllRoles[$RoleID]['Name'];
          }
          SetValue($RolesColumn, $User, $Roles);

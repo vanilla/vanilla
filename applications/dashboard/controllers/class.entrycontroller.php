@@ -280,7 +280,7 @@ class EntryController extends Gdn_Controller {
    public function Connect($Method) {
       $this->AddJsFile('entry.js');
       $this->View = 'connect';
-      $IsPostBack = $this->Form->IsPostBack() && $this->Form->GetFormValue('Connect') == 'Connect';
+      $IsPostBack = $this->Form->IsPostBack() && $this->Form->GetFormValue('Connect', NULL) !== NULL;
 
       if (!$IsPostBack) {
          // Here are the initial data array values. that can be set by a plugin.

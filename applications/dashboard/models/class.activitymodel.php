@@ -442,12 +442,13 @@ class ActivityModel extends Gdn_Model {
       } else if ($SendEmail === 'QueueOnly') {
          $SendEmail = '';
          $QueueEmail = TRUE;
-         $AddActivity = FALSE;
+         $AddActivity = TRUE;
+         $Notify = TRUE;
       } else {
          $AddActivity = TRUE;
       }
       
-      if ($Notify) {
+      if ($AddActivity && $Notify) {
          // Only add the activity if the user wants to be notified in some way.
          $RegardingUser = Gdn::UserModel()->GetID($RegardingUserID);
          if ($SendEmail != 'Force' && !self::NotificationPreference($ActivityType, GetValue('Preferences', $RegardingUser))) {
@@ -456,8 +457,8 @@ class ActivityModel extends Gdn_Model {
          }
       }
          
-      // If this is a notification, increment the regardinguserid's count
-      if ($AddActivity && $Notify) {
+      // If this is a notification, increment the regardinguserid's count.
+      if ($Notify) {
          $this->SQL
             ->Update('User')
             ->Set('CountNotifications', 'coalesce(CountNotifications) + 1', FALSE)
@@ -521,7 +522,7 @@ class ActivityModel extends Gdn_Model {
          return $Result;
       }
       
-      $ConfigPreference = C('Preferences.Email.'.$ActivityType, '0');
+      $ConfigPreference = C("Preferences.$Type.$ActivityType", '0');
       if ($ConfigPreference !== FALSE)
          $Preference = ArrayValue($Type.'.'.$ActivityType, $Preferences, $ConfigPreference);
       else
@@ -689,15 +690,15 @@ class ActivityModel extends Gdn_Model {
          $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
       }
       $User = Gdn::UserModel()->GetID($Activity->RegardingUserID, DATASET_TYPE_OBJECT); //$this->SQL->Select('UserID, Name, Email, Preferences')->From('User')->Where('UserID', $Activity->RegardingUserID)->Get()->FirstRow();
-
+      
       if ($User) {
          if ($Force)
             $Preference = $Force;
          else {
-            $Preferences = Gdn_Format::Unserialize($User->Preferences);
+//            $Preferences = Gdn_Format::Unserialize($User->Preferences);
             $ConfigPreference = C('Preferences.Email.'.$Activity->ActivityType, '0');
             if ($ConfigPreference !== FALSE)
-               $Preference = ArrayValue('Email.'.$Activity->ActivityType, $Preferences, $ConfigPreference);
+               $Preference = GetValue('Email.'.$Activity->ActivityType, $User->Preferences, $ConfigPreference);
             else
                $Preference = FALSE;
          }

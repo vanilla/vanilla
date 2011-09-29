@@ -191,8 +191,6 @@ class DiscussionModel extends VanillaModel {
       // Join in the users.
       Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
       CategoryModel::JoinCategories($Data);
-//      print_r($Data);
-//      die();
 		
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Data);
@@ -285,12 +283,6 @@ class DiscussionModel extends VanillaModel {
 			}
 			$Discussion->CountUnreadComments = is_numeric($Discussion->CountUnreadComments) ? $Discussion->CountUnreadComments : 0;
 			$Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
-/*			decho('CountComments: '
-				.$Discussion->CountComments.'; CountCommentWatch: '
-				.$Discussion->CountCommentWatch.'; CountUnreadComments: '
-				.$Discussion->CountUnreadComments
-			);
-*/
 		}
 	}
 	

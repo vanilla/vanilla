@@ -22,7 +22,7 @@ $Configuration['Vanilla']['Discussion']['SpamCount']           = '3';
 $Configuration['Vanilla']['Discussion']['SpamTime']            = '60';
 $Configuration['Vanilla']['Discussion']['SpamLock']            = '120';
 
-$Configuration['Vanilla']['Comments']['PerPage']               = '50';
+$Configuration['Vanilla']['Comments']['PerPage']               = '30';
 $Configuration['Vanilla']['Discussions']['PerCategory']        = '5';
 $Configuration['Vanilla']['Discussions']['PerPage']            = '30';
 $Configuration['Vanilla']['Discussions']['Home']               = 'discussions';

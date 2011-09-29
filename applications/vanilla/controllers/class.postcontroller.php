@@ -436,7 +436,7 @@ class PostController extends VanillaController {
                         // Don't reload the first comment if this new comment is the first one.
                         $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
                         // Do not load more than a single page of data...
-                        $Limit = C('Vanilla.Comments.PerPage', 50);
+                        $Limit = C('Vanilla.Comments.PerPage', 30);
 
                         // Redirect if the new new comment isn't on the same page.
                         $Redirect |= !$DisplayNewCommentOnly && PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);

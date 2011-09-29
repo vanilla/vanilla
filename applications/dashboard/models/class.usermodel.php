@@ -663,7 +663,7 @@ class UserModel extends Gdn_Model {
       
       $SystemUser = array(
          'Name' => T('System'),
-         'PhotoUrl' => Asset('/applications/dashboard/design/images/usericon.png', TRUE),
+         'Photo' => Asset('/applications/dashboard/design/images/usericon.png', TRUE),
          'Password' => RandomString('20'),
          'HashMethod' => 'Random',
          'Email' => 'system@domain.com',

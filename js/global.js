@@ -439,8 +439,8 @@ jQuery(document).ready(function($) {
          var scrollTo = $(gdn.definition('ScrollTo'));
          if (scrollTo.length) {
             $('html').animate({
-                scrollTop: scrollTo.offset().top - 10
-            });​
+               scrollTop: scrollTo.offset().top - 10
+            });
          }
       }
    }

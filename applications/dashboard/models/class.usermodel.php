@@ -212,9 +212,10 @@ class UserModel extends Gdn_Model {
       } else {
          $this->SQL->Select('u.*');
       }
-      $this->SQL->Select('i.Name', '', 'InviteName')
-         ->From('User u')
-         ->Join('User as i', 'u.InviteUserID = i.UserID', 'left');
+      $this->SQL->From('User u');
+//      $this->SQL->Select('i.Name', '', 'InviteName')
+//         ->From('User u')
+//         ->Join('User as i', 'u.InviteUserID = i.UserID', 'left');
    }
 
    public function DefinePermissions($UserID, $Serialize = TRUE) {
@@ -515,7 +516,7 @@ class UserModel extends Gdn_Model {
          foreach ($DatabaseData as $DatabaseUserID => $DatabaseUser) {
             $Data[$DatabaseUserID] = $DatabaseUser;
             $this->SetCalculatedFields($DatabaseUser);
-            $this->UserCache($DatabaseUser);
+            $Result = $this->UserCache($DatabaseUser);
          }
       }
       

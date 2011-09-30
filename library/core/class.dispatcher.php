@@ -136,6 +136,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_ControllerMethod = '';
       $this->_ControllerMethodArgs = array();
       $this->_PropertyCollection = array();
+      $this->_Data = array();
    }
    
    public function Cleanup() {
@@ -261,6 +262,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Controller->$Name = $Mixed;
          }
 
+         // Pass along any data.
+         if (is_array($this->_Data))
+            $Controller->Data = $this->_Data;
+
          // Set up a default controller method in case one isn't defined.
          $ControllerMethod = str_replace('_', '', $this->_ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
@@ -376,6 +381,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     */
    public function PassAsset($AssetName, $Asset) {
       $this->_AssetCollection[$AssetName][] = $Asset;
+      return $this;
+   }
+
+   public function PassData($Name, $Value) {
+      $this->_Data[$Name] = $Value;
+      return $this;
    }
 
    /**
@@ -386,6 +397,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     */
    public function PassProperty($Name, $Mixed) {
       $this->_PropertyCollection[$Name] = $Mixed;
+      return $this;
    }
 
    /**

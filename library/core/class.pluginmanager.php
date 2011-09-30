@@ -713,6 +713,34 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       list($NewMethodClassName, $NewMethodName) = $NewMethodKeyParts;
 
       return $this->GetPluginInstance($NewMethodClassName, self::ACCESS_CLASSNAME, $Sender)->$NewMethodName($Sender, GetValue('RequestArgs', $Sender, array()));
+   /**
+    * Get the callback for an event handler.
+    * @param string $ClassName The name of the class throwing the event.
+    * @param string $MethodName The name of the event.
+    * @param string $Type The type of event handler.
+    *  - Create: A new method creation.
+    *  - Override: A method override.
+    * @return callback 
+    * @since 2.1
+    */
+   public function GetCallback($ClassName, $MethodName, $Type = 'Create') {
+      $EventKey = strtolower("{$ClassName}_{$MethodName}_{$Type}");
+      
+      switch ($Type) {
+         case 'Create':
+            $MethodKey = GetValue($EventKey, $this->_NewMethodCollection);
+            break;
+         case 'Override':
+            $MethodKey = GetValue($EventKey, $this->_MethodOverrideCollection);
+            break;
+      }
+      $Parts = explode('.', $MethodKey, 2);
+      if (count($Parts) != 2)
+         return FALSE;
+      
+      list($ClassName, $MethodName) = $Parts;
+      $Instance = $this->GetPluginInstance($ClassName, self::ACCESS_CLASSNAME);
+      return array($Instance, $MethodName);
    }
 
    /**

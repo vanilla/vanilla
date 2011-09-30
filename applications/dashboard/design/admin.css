@@ -1681,6 +1681,17 @@ div.Summary table tbody td {
 	margin-right: 6px;
 }
 
+
+
+.NormalList {
+   list-style: disc;
+   list-style-position: inside;
+   margin: 10px 0;
+}
+.NormalList li {
+   margin: 4px 0;
+}
+
 /* Help Links */
 .Help {
    padding: 8px;

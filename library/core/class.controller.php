@@ -1338,6 +1338,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             array_map('htmlspecialchars', $Data);
             exit("<Exception><Code>{$Data['Code']}</Code><Message>{$Data['Exception']}</Message></Exception>");
             break;
+         default:
+            header('Content-Type: text/plain', TRUE);
+            exit($Ex->getMessage());
       }
    }
 

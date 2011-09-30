@@ -162,6 +162,12 @@ class DiscussionModel extends VanillaModel {
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
 		$this->EventArguments['Wheres'] = &$Wheres;
 		$this->FireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
+      
+      $IncludeAnnouncements = FALSE;
+      if (strtolower(GetValue('Announce', $Wheres)) == 'all') {
+         $IncludeAnnouncements = TRUE;
+         unset($Wheres['Announce']);
+      }
 
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
@@ -181,8 +187,10 @@ class DiscussionModel extends VanillaModel {
       $Data = $this->SQL->Get();
          
       // If not looking at discussions filtered by bookmarks or user, filter announcements out.
-		if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
-			$this->RemoveAnnouncements($Data);
+      if (!$IncludeAnnouncements) {
+         if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
+            $this->RemoveAnnouncements($Data);
+      }
 		
 		// Change discussions returned based on additional criteria	
 		$this->AddDiscussionColumns($Data);

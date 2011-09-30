@@ -258,7 +258,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->SelfUrl = $this->Request;
 
          // Pass along any objects
-         foreach($this->_PropertyCollection as $Name => $Mixed) {
+         foreach ($this->_PropertyCollection as $Name => $Mixed) {
             $Controller->$Name = $Mixed;
          }
 
@@ -269,27 +269,27 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Set up a default controller method in case one isn't defined.
          $ControllerMethod = str_replace('_', '', $this->_ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
-         
+
          $this->FireEvent('AfterAnalyzeRequest');
-         
+
          // Take enabled plugins into account, as well
-         $PluginManagerHasReplacementMethod = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
-         if (!$PluginManagerHasReplacementMethod && ($this->_ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
+         $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
+         if (!$PluginReplacement && ($this->_ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
             // Check to see if there is an 'x' version of the method.
-            if (method_exists($Controller, 'x'.$ControllerMethod)) {
+            if (method_exists($Controller, 'x' . $ControllerMethod)) {
                // $PluginManagerHasReplacementMethod = TRUE;
-               $ControllerMethod = 'x'.$ControllerMethod;
+               $ControllerMethod = 'x' . $ControllerMethod;
             } else {
                if ($this->_ControllerMethod != '')
                   array_unshift($this->_ControllerMethodArgs, $this->_ControllerMethod);
-               
+
                $this->_ControllerMethod = 'Index';
                $ControllerMethod = 'Index';
-               
-               $PluginManagerHasReplacementMethod = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
+
+               $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
             }
          }
-         
+
          // Pass in the querystring values
          $Controller->ApplicationFolder = $this->_ApplicationFolder;
          $Controller->Application = $this->EnabledApplication();
@@ -301,34 +301,43 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
 
          // Set special controller method options for REST APIs.
-         $this->_ReflectControllerArgs($Controller);
          Gdn::Controller($Controller);
-         
-         $this->FireEvent('BeforeControllerMethod');
-         
          $Controller->Initialize();
 
          // Call the requested method on the controller - error out if not defined.
-         if ($PluginManagerHasReplacementMethod || method_exists($Controller, $ControllerMethod)) {
-            // call_user_func_array is too slow!!
-            //call_user_func_array(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs);
+         if ($PluginReplacement) {
+            // Set the application folder to the plugin's key.
+            $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginReplacement, Gdn_PluginManager::ACCESS_CLASSNAME);
+            if ($PluginInfo) {
+               $Controller->ApplicationFolder = 'plugins/'.GetValue('Name', $PluginInfo);
+            }
             
-            if ($PluginManagerHasReplacementMethod) {
-              try {
-                 Gdn::PluginManager()->CallNewMethod($Controller, $Controller->ControllerName, $ControllerMethod);
-              } catch (Exception $Ex) {
-                 $Controller->RenderException($Ex);
-              }
-            } else { 
-              $Args = $this->_ControllerMethodArgs;
-              $Count = count($Args);
-
-              try {
-                 call_user_func_array(array($Controller, $ControllerMethod), $Args);
-              } catch (Exception $Ex) {
-                 $Controller->RenderException($Ex);
-                 exit();
-              }
+            // Reflect the args for the method.
+            $Callback = Gdn::PluginManager()->GetCallback($Controller->ControllerName, $ControllerMethod);
+            // Augment the arguments to the plugin with the sender and these arguments.
+            $InputArgs = array_merge(array($Controller), $this->_ControllerMethodArgs, array('Sender' => $Controller, 'Args' => $this->_ControllerMethodArgs));
+//            decho(array_keys($InputArgs), 'InputArgs');
+            $Args = ReflectArgs($Callback, $InputArgs, $Request->Get());
+//            array_shift($Args);
+//            decho($Args, 'Args');
+//            die();
+            
+            $this->FireEvent('BeforeControllerMethod');
+            try {
+               call_user_func_array($Callback, $Args);
+            } catch (Exception $Ex) {
+               $Controller->RenderException($Ex);
+            }
+         } elseif (method_exists($Controller, $ControllerMethod)) {
+            $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $Request->Get());
+            $this->_ControllerMethodArgs = $Args;
+            
+            $this->FireEvent('BeforeControllerMethod');
+            try {
+               call_user_func_array(array($Controller, $ControllerMethod), $Args);
+            } catch (Exception $Ex) {
+               $Controller->RenderException($Ex);
+               exit();
             }
          } else {
             Gdn::Request()->WithRoute('Default404');
@@ -478,42 +487,48 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $DefaultController = Gdn::Router()->GetRoute('DefaultController');
          $this->Request = $DefaultController['Destination'];
       }
-      
+
       $Parts = explode('/', str_replace('\\', '/', $this->Request));
-      
+
       /**
        * The application folder is either the first argument or is not provided. The controller is therefore
        * either the second argument or the first, depending on the result of the previous statement. Check that.
        */
-      
       try {
-      
          // 1] if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
          if (in_array($Parts[0], $this->EnabledApplicationFolders()))
             $this->FindController(1, $Parts);
-         
+
          // 2] if no match, see if the first argument is a controller
          $this->FindController(0, $Parts);
-         
+
+         // 3] See if there is a plugin trying to create a root method.
+         list($MethodName, $DeliveryMethod) = $this->_SplitDeliveryMethod(GetValue(0, $Parts), TRUE);
+         if ($MethodName && Gdn::PluginManager()->HasNewMethod('RootController', $MethodName, TRUE)) {
+            $this->_DeliveryMethod = $DeliveryMethod;
+            $Parts[0] = $MethodName;
+            $Parts = array_merge(array('root'), $Parts);
+            $this->FindController(0, $Parts);
+         }
+
          throw new GdnDispatcherControllerNotFoundException();
-         
       } catch (GdnDispatcherControllerFoundException $e) {
 
          // Success!
          if (in_array($this->_DeliveryMethod, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XML)))
             $this->_DeliveryType = DELIVERY_TYPE_DATA;
-         
+
          return TRUE;
       } catch (GdnDispatcherControllerNotFoundException $e) {
-         header("HTTP/1.1 404 Not Found" );
+         header("HTTP/1.1 404 Not Found");
          $Request->WithRoute('Default404');
          return $this->AnalyzeRequest($Request);
       }
    }
-   
+
    protected function FindController($ControllerKey, $Parts) {
-      
-      $Application = GetValue($ControllerKey-1, $Parts, NULL);
+
+      $Application = GetValue($ControllerKey - 1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);
       $Controller = ucfirst(strtolower($Controller));
 

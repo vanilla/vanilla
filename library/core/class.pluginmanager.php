@@ -713,6 +713,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       list($NewMethodClassName, $NewMethodName) = $NewMethodKeyParts;
 
       return $this->GetPluginInstance($NewMethodClassName, self::ACCESS_CLASSNAME, $Sender)->$NewMethodName($Sender, GetValue('RequestArgs', $Sender, array()));
+   }
    /**
     * Get the callback for an event handler.
     * @param string $ClassName The name of the class throwing the event.

@@ -775,10 +775,6 @@ class UserModel extends Gdn_Model {
       // Define the primary key in this model's table.
       $this->DefineSchema();
 
-      // Add & apply any extra validation rules:
-      if (array_key_exists('Email', $FormPostValues) && GetValue('ValidateEmail', $Settings, TRUE))
-         $this->Validation->ApplyRule('Email', 'Email');
-
       // Custom Rule: This will make sure that at least one role was selected if saving roles for this user.
       if ($SaveRoles) {
          $this->Validation->AddRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');
@@ -803,7 +799,23 @@ class UserModel extends Gdn_Model {
       $this->FireEvent('BeforeSaveValidation');
 
       $RecordRoleChange = TRUE;
-      if ($this->Validate($FormPostValues, $Insert) && $this->ValidateUniqueFields(GetValue('Name', $FormPostValues), GetValue('Email', $FormPostValues), $UserID)) {
+      
+      if ($UserID && GetValue('FixUnique', $Settings)) {
+         $UniqueValid = $this->ValidateUniqueFields(GetValue('Name', $FormPostValues), GetValue('Email', $FormPostValues), $UserID, TRUE);
+         if (!$UniqueValid['Name'])
+            unset($FormPostValues['Name']);
+         if (!$UniqueValid['Email'])
+            unset($FormPostValues['Email']);
+         $UniqueValid = TRUE;
+      } else {
+         $UniqueValid = $this->ValidateUniqueFields(GetValue('Name', $FormPostValues), GetValue('Email', $FormPostValues), $UserID);
+      }
+      
+      // Add & apply any extra validation rules:
+      if (array_key_exists('Email', $FormPostValues) && GetValue('ValidateEmail', $Settings, TRUE))
+         $this->Validation->ApplyRule('Email', 'Email');
+      
+      if ($this->Validate($FormPostValues, $Insert) && $UniqueValid) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $RoleIDs = GetValue('RoleID', $Fields, 0);
          $Username = GetValue('Name', $Fields);
@@ -827,17 +839,23 @@ class UserModel extends Gdn_Model {
             if (isset($Fields['Email']) && $UserID == Gdn::Session()->UserID && $Fields['Email'] != Gdn::Session()->User->Email && !Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
                $User = Gdn::Session()->User;
                $Attributes = Gdn::Session()->User->Attributes;
-               $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
+               
+               $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
+               if (RoleModel::Roles($ConfirmEmailRoleID)) {
+                  // The confirm email role is set and it exists so go ahead with the email confirmation.
+                  $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
+                  
+                  if ($RoleIDs)
+                     $ConfirmedEmailRoles = $RoleIDs;
+                  else
+                     $ConfirmedEmailRoles = ConsolidateArrayValuesByKey($this->GetRoles($UserID), 'RoleID');
+                  $Attributes['ConfirmedEmailRoles'] = $ConfirmedEmailRoles;
 
-               if ($RoleIDs)
-                  $ConfirmedEmailRoles = $RoleIDs;
-               else
-                  $ConfirmedEmailRoles = ConsolidateArrayValuesByKey($this->GetRoles($UserID), 'RoleID');
-               $Attributes['ConfirmedEmailRoles'] = $ConfirmedEmailRoles;
+                  $RoleIDs = (array)C('Garden.Registration.ConfirmEmailRole');
 
-               $RoleIDs = (array)C('Garden.Registration.ConfirmEmailRole');
-               $SaveRoles = TRUE;
-               $Fields['Attributes'] = serialize($Attributes);
+                  $SaveRoles = TRUE;
+                  $Fields['Attributes'] = serialize($Attributes);
+               }
             } 
          }
          
@@ -1557,21 +1575,21 @@ class UserModel extends Gdn_Model {
    /**
     * Checks to see if $Username and $Email are already in use by another member.
     */
-   public function ValidateUniqueFields($Username, $Email, $UserID = '') {
+   public function ValidateUniqueFields($Username, $Email, $UserID = '', $Return = FALSE) {
       //die(var_dump(array($Username, $Email, $UserID)));
-
-
       $Valid = TRUE;
       $Where = array();
       if (is_numeric($UserID))
          $Where['UserID <> '] = $UserID;
+      
+      $Result = array('Name' => TRUE, 'Email' => TRUE);
 
       // Make sure the username & email aren't already being used
       if (C('Garden.Registration.NameUnique', TRUE) && $Username) {
          $Where['Name'] = $Username;
          $TestData = $this->GetWhere($Where);
          if ($TestData->NumRows() > 0) {
-            $this->Validation->AddValidationResult('Name', 'The name you entered is already in use by another member.');
+            $Result['Name'] = FALSE;
             $Valid = FALSE;
          }
          unset($Where['Name']);
@@ -1581,11 +1599,20 @@ class UserModel extends Gdn_Model {
          $Where['Email'] = $Email;
          $TestData = $this->GetWhere($Where);
          if ($TestData->NumRows() > 0) {
-            $this->Validation->AddValidationResult('Email', 'The email you entered is in use by another member.');
+            $Result['Email'] = FALSE;
             $Valid = FALSE;
          }
       }
-      return $Valid;
+      
+      if ($Return) {
+         return $Result;
+      } else {
+         if (!$Result['Name'])
+            $this->Validation->AddValidationResult('Name', 'The name you entered is already in use by another member.');
+         if (!$Result['Email'])
+            $this->Validation->AddValidationResult('Email', 'The email you entered is in use by another member.');
+         return $Valid;
+      }
    }
 
    /**

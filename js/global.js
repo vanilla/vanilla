@@ -432,15 +432,15 @@ jQuery(document).ready(function($) {
 
    if (window.location.hash == '') {
       // Jump to the hash if desired.
-      if (gdn.definition('LocationHash', 0)) {
+      if (gdn.definition('LocationHash', 0) != 0) {
          window.location.hash = gdn.definition('LocationHash');
       }
-      if (gdn.definition('ScrollTo', 0)) {
+      if (gdn.definition('ScrollTo', 0) != 0) {
          var scrollTo = $(gdn.definition('ScrollTo'));
-         if (scrollTo.length) {
+         if (scrollTo.length > 0) {
             $('html').animate({
-                scrollTop: scrollTo.offset().top - 10
-            });​
+               scrollTop: scrollTo.offset().top - 10
+            });
          }
       }
    }
@@ -720,7 +720,7 @@ jQuery(document).ready(function($) {
  * @return string
  */
 
-(function($){
+jQuery(document).ready(function($){
 	
 	var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	
@@ -815,7 +815,7 @@ jQuery(document).ready(function($) {
 			return output;
 		}
 	});
-})(jQuery);
+});
 
 // Shrink large images to fit into message space, and pop into new window when clicked.
 // This needs to happen in onload because otherwise the image sizes are not yet known.

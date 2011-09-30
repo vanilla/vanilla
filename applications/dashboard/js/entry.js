@@ -1,7 +1,7 @@
 // This file contains javascript that is specific to the dashboard/entry controller.
 jQuery(document).ready(function($) {
    // Check to see if the selected email is valid
-   $('#Register input[name=User/Email], body.register input[name=User/Email]').blur(function() {
+   $('#Register input[name$=Email], body.register input[name$=Email]').blur(function() {
       var email = $(this).val();
       if (email != '') {
          var checkUrl = gdn.url('/dashboard/user/emailavailable/'+encodeURIComponent(email)+'/x');
@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
    });
 	
    // Check to see if the selected username is valid
-   $('#Register input[name=User/Name], body.register input[name=User/Name]').blur(function() {
+   $('#Register input[name$=Name], body.register input[name$=Name]').blur(function() {
       var name = $(this).val();
       if (name != '') {
          var checkUrl = gdn.url('/dashboard/user/usernameavailable/'+encodeURIComponent(name));
@@ -50,7 +50,7 @@ jQuery(document).ready(function($) {
          return;
       }
 
-      var selectedName = $('input[name=Form/UserSelect]:checked').val();
+      var selectedName = $('input[name$=UserSelect]:checked').val();
       if (!selectedName || selectedName == 'other') {
          var name = $('#Form_ConnectName').val();
          if (typeof(name) == 'string' && name != '') {
@@ -79,11 +79,11 @@ jQuery(document).ready(function($) {
 
    checkConnectName();
    $('#Form_ConnectName').blur(checkConnectName);
-   $('input[name=Form/UserSelect]').click(checkConnectName);
+   $('input[name$=UserSelect]').click(checkConnectName);
    
    // Check to see if passwords match
-   $('input[name=User/PasswordMatch]').blur(function() {
-      if ($('#Register input[name=User/Password], body.register input[name=User/Password]').val() == $(this).val())
+   $('input[name$=PasswordMatch]').blur(function() {
+      if ($('#Register input[name$=Password], body.register input[name$=Password]').val() == $(this).val())
          $('#PasswordsDontMatch').hide();
       else
          $('#PasswordsDontMatch').show();

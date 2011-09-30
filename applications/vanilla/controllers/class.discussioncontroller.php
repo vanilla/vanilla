@@ -68,7 +68,7 @@ class DiscussionController extends VanillaController {
       }
       
       // Define the query offset & limit.
-      $Limit = C('Vanilla.Comments.PerPage', 50);
+      $Limit = C('Vanilla.Comments.PerPage', 30);
 
       $OffsetProvided = $Page != '';
       list($Offset, $Limit) = OffsetLimit($Page, $Limit);
@@ -253,7 +253,7 @@ class DiscussionController extends VanillaController {
       
       // Figure out how many comments are before this one
       $Offset = $this->CommentModel->GetOffset($Comment);
-      $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
+      $Limit = Gdn::Config('Vanilla.Comments.PerPage', 30);
       
       // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
       //$Offset = floor($Offset / $Limit) * $Limit;
@@ -734,7 +734,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $ActualResponses = $this->Discussion->CountComments - 1;
       // Define the query offset & limit
       if (!is_numeric($Limit) || $Limit < 0)
-         $Limit = C('Vanilla.Comments.PerPage', 50);
+         $Limit = C('Vanilla.Comments.PerPage', 30);
 
       $OffsetProvided = $Offset != '';
       list($Offset, $Limit) = OffsetLimit($Offset, $Limit);

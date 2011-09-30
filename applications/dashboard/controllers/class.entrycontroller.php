@@ -280,7 +280,7 @@ class EntryController extends Gdn_Controller {
    public function Connect($Method) {
       $this->AddJsFile('entry.js');
       $this->View = 'connect';
-      $IsPostBack = $this->Form->IsPostBack() && $this->Form->GetFormValue('Connect') == 'Connect';
+      $IsPostBack = $this->Form->IsPostBack() && $this->Form->GetFormValue('Connect', NULL) !== NULL;
 
       if (!$IsPostBack) {
          // Here are the initial data array values. that can be set by a plugin.
@@ -328,7 +328,7 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->ErrorCount() > 0)
          return $this->Render();
 
-      $UserModel = new UserModel();
+      $UserModel = Gdn::UserModel();
 
       // Check to see if there is an existing user associated with the information above.
       $Auth = $UserModel->GetAuthentication($this->Form->GetFormValue('UniqueID'), $this->Form->GetFormValue('Provider'));
@@ -338,10 +338,17 @@ class EntryController extends Gdn_Controller {
          // The user is already connected.
          $this->Form->SetFormValue('UserID', $UserID);
          
+         $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
          $Data = $this->Form->FormValues();
          
+         // Don't overwrite the user photo if the user uploaded a new one.
+         $Photo = GetValue('Photo', $User);
+         if (GetValue('Photo', $Data) && $Photo && !StringBeginsWith($Photo, 'http')) {
+            unset($Data['Photo']);
+         }
+         
          // Synchronize the user's data.
-         $UserModel->Save($Data, array('NoConfirmEmail' => TRUE));
+         $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
          
          if ($Attributes = $this->Form->GetFormValue('Attributes')) {
             $UserModel->SaveAttribute($UserID, $Attributes);
@@ -422,7 +429,7 @@ class EntryController extends Gdn_Controller {
                $ExistingUsers);
          }
          
-         if (!isset($NameFound)) {
+         if (!isset($NameFound) && !$IsPostBack) {
             $this->Form->SetFormValue('ConnectName', $this->Form->GetFormValue('Name'));
          }
 
@@ -523,7 +530,7 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE), array('NoConfirmEmail' => TRUE));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 

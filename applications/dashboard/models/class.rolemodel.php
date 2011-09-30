@@ -18,6 +18,11 @@ class RoleModel extends Gdn_Model {
       parent::__construct('Role');
    }
    
+   public function ClearCache() {
+      $Key = 'Roles';
+      Gdn::Cache()->Remove($Key);
+   }
+   
    public function Define($Values) {
       if(array_key_exists('RoleID', $Values)) {
          $RoleID = $Values['RoleID'];
@@ -41,7 +46,7 @@ class RoleModel extends Gdn_Model {
             $this->SQL->Update('Role', $Values, array('RoleID' => $RoleID))->Put();
          }
       }
-      
+      $this->ClearCache();
    }
    
    /**
@@ -234,6 +239,8 @@ class RoleModel extends Gdn_Model {
             ->Set('Permissions', '')
             ->Where(array('UserRole.RoleID' => $RoleID))
             ->Put();
+         
+         $this->ClearCache();
       } else {
          $RoleID = FALSE;
       }

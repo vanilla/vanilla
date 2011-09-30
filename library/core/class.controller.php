@@ -1293,10 +1293,14 @@ class Gdn_Controller extends Gdn_Pluggable {
          try {
             switch ($Ex->getCode()) {
                case 401:
-                  Gdn::Dispatcher()->Dispatch('DefaultPermission');
+                  Gdn::Dispatcher()
+                     ->PassData('Message', $Ex->getMessage())
+                     ->Dispatch('DefaultPermission');
                   break;
                case 404:
-                  Gdn::Dispatcher()->Dispatch('Default404');
+                  Gdn::Dispatcher()
+                     ->PassData('Message', $Ex->getMessage())
+                     ->Dispatch('Default404');
                   break;
                default:
                   Gdn_ExceptionHandler($Ex);

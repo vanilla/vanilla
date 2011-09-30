@@ -738,7 +738,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             $SubPaths[] = "views/$ControllerName/$View";
          else {
             $SubPaths[] = "views/$View";
-            $SubPaths[] = "views/{$this->ControllerName}/$View";
+            
+            $SubPaths[] = 'views/'.StringEndsWith($this->ControllerName, 'Controller', TRUE, TRUE)."/$View";
          }
 
          // Views come from one of four places:

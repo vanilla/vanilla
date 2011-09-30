@@ -752,7 +752,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @return True if method exists.
     */
    public function HasNewMethod($ClassName, $MethodName) {
-      return array_key_exists(strtolower($ClassName.'_'.$MethodName.'_Create'), $this->_NewMethodCollection) ? TRUE : FALSE;
+      $Key = strtolower($ClassName.'_'.$MethodName.'_Create');
+      if (array_key_exists($Key, $this->_NewMethodCollection)) {
+         $Result = explode('.', $this->_NewMethodCollection[$Key]);
+         return $Result[0];
+      } else {
+         return FALSE;
+      }
    }
 
    public function ScanPluginFile($PluginFile, $VariableName = NULL) {

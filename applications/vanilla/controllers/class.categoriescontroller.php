@@ -221,7 +221,7 @@ class CategoriesController extends VanillaController {
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {
 			if ($Category->CategoryID > 0)
-				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'd.Announce' => 0));
+				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'Announce' => 'all'));
       }
       
       // Add modules

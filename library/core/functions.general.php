@@ -625,6 +625,8 @@ if (!function_exists('DebugMethod')) {
       foreach ($MethodArgs as $FuncArg) {
          if (!is_array($FuncArg) && !is_object($FuncArg))
             $SA[] = "'{$FuncArg}'";
+         elseif (is_array($FuncArg))
+            $SA[] = "'Array(".sizeof($FuncArg).")'";
          else
             $SA[] = gettype($FuncArg)."/".get_class($FuncArg);
       }

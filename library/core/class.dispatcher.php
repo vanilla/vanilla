@@ -514,9 +514,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          throw new GdnDispatcherControllerNotFoundException();
       } catch (GdnDispatcherControllerFoundException $e) {
 
-         // Success!
-         if (in_array($this->_DeliveryMethod, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XML)))
-            $this->_DeliveryType = DELIVERY_TYPE_DATA;
+         switch ($this->_DeliveryMethod) {
+            case DELIVERY_METHOD_JSON:
+            case DELIVERY_METHOD_XML:
+               $this->_DeliveryType = DELIVERY_TYPE_DATA;
+               break;
+            case DELIVERY_METHOD_TEXT:
+               $this->_DeliveryType = DELIVERY_TYPE_VIEW;
+               break;
+            case DELIVERY_METHOD_XHTML:
+               break;
+            default:
+               $this->_DeliveryMethod = DELIVERY_METHOD_XHTML;
+               break;
+         }
 
          return TRUE;
       } catch (GdnDispatcherControllerNotFoundException $e) {
@@ -527,20 +538,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    }
 
    protected function FindController($ControllerKey, $Parts) {
-
       $Application = GetValue($ControllerKey - 1, $Parts, NULL);
       $Controller = GetValue($ControllerKey, $Parts, NULL);
       $Controller = ucfirst(strtolower($Controller));
 
       // Check for a file extension on the controller.
-      $Ext = strrchr($Controller, '.');
-      if ($Ext) {
-         $Controller = substr($Controller, 0, -strlen($Ext));
-         $Ext = strtoupper(trim($Ext, '.'));
-         if (in_array($Ext, array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML))) {
-            $this->_DeliveryMethod = strtoupper($Ext);
-         }
-      }
+      list($Controller, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Controller, TRUE);
       
       if (!is_null($Application)) {
          Gdn_Autoloader::Priority(
@@ -581,7 +584,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          
          $Length = sizeof($Parts);
          if ($Length > $ControllerKey + 1)
-            list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1]);
+            list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1], TRUE);
    
          if ($Length > $ControllerKey + 2) {
             for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
@@ -664,7 +667,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    protected function _SplitDeliveryMethod($Name, $AllowAll = FALSE) {
       $Parts = explode('.', $Name, 2);
       if (count($Parts) >= 2) {
-         if ($AllowAll || in_array(strtoupper($Parts[1]), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML))) {
+         if ($AllowAll || in_array(strtoupper($Parts[1]), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT))) {
             return array($Parts[0], strtoupper($Parts[1]));
          } else {
             return array($Name, $this->_DeliveryMethod);

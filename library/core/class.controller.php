@@ -1063,7 +1063,11 @@ class Gdn_Controller extends Gdn_Pluggable {
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON)
-         ob_clean(); 
+         ob_clean();
+      
+      if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
+         $this->ContentType('text/plain');
+      }
 
       // Send headers to the browser
       $this->SendHeaders();

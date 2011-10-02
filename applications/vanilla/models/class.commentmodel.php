@@ -41,7 +41,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
-      if (!Gdn::Cache()->ActiveEnabled())
+      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
          return;
       
       if (!$Limit) {
@@ -220,7 +220,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function PageWhere($DiscussionID, $Page) {
-      if (!Gdn::Cache()->ActiveEnabled())
+      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
          return FALSE;
       
       $CacheKey = "Comment.Page.$DiscussionID.$Page";

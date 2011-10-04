@@ -235,29 +235,7 @@ class Gdn_Request {
     * @return mixed
     */
    public function GetValue($Key, $Default = FALSE) {
-      $QueryOrder = array(
-         self::INPUT_CUSTOM,
-         self::INPUT_GET,
-         self::INPUT_POST,
-         self::INPUT_FILES,
-         self::INPUT_SERVER,
-         self::INPUT_ENV,
-         self::INPUT_COOKIES
-      );
-      $NumDataTypes = sizeof($QueryOrder);
-      
-      for ($i=0; $i < $NumDataTypes; $i++) {
-         $DataType = $QueryOrder[$i];
-         if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
-         if (array_key_exists($Key, $this->_RequestArguments[$DataType])) {
-            $Data = $this->_RequestArguments[$DataType][$Key];
-            if (is_array($Data) || is_object($Data))
-               return $Data;
-            else
-               return filter_var($Data, FILTER_SANITIZE_STRING);
-         }
-      }
-      return $Default;
+      return $this->Merged($Key, $Default);
    }
    
    /**

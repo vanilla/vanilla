@@ -604,24 +604,21 @@ class Gdn_Request {
     * @return mixed
     */
    public function Merged($Key = NULL, $Default = NULL) {
-      static $Merged = NULL;
-      if (is_null($Merged)) {
-         $Merged = array();
-         $QueryOrder = array(
-            self::INPUT_CUSTOM,
-            self::INPUT_GET,
-            self::INPUT_POST,
-            self::INPUT_FILES,
-            self::INPUT_SERVER,
-            self::INPUT_ENV,
-            self::INPUT_COOKIES
-         );
-         $NumDataTypes = sizeof($QueryOrder);
-         for ($i=$NumDataTypes; $i > 0; $i--) {
-            $DataType = $QueryOrder[$i-1];
-            if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
-            $Merged = array_merge($Merged, $this->_RequestArguments[$DataType]);
-         }
+      $Merged = array();
+      $QueryOrder = array(
+         self::INPUT_CUSTOM,
+         self::INPUT_GET,
+         self::INPUT_POST,
+         self::INPUT_FILES,
+         self::INPUT_SERVER,
+         self::INPUT_ENV,
+         self::INPUT_COOKIES
+      );
+      $NumDataTypes = sizeof($QueryOrder);
+      for ($i=$NumDataTypes; $i > 0; $i--) {
+         $DataType = $QueryOrder[$i-1];
+         if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
+         $Merged = array_merge($Merged, $this->_RequestArguments[$DataType]);
       }
       
       return (is_null($Key)) ? $Merged : GetValue($Key, $Merged, $Default);

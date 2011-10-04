@@ -509,7 +509,7 @@ class Gdn_Configuration {
          $Session = Gdn::Session();
          $User = $Session->UserID > 0 && is_object($Session->User) ? $Session->User->Name : 'Unknown';
          $NewLines[] = '';
-         $NewLines[] = '// Last edited by '.$User.' (' . RemoteIp() . ')' . Gdn_Format::ToDateTime();
+         $NewLines[] = '// Last edited by '.$User.' (' . RemoteIp() . ') ' . Gdn_Format::ToDateTime();
       }
 
       $FileContents = FALSE;

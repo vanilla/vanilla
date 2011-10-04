@@ -135,7 +135,7 @@ class CategoriesController extends VanillaController {
       $this->SetData('_Page', $Page);
 
       // Set the canonical Url.
-      $this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.GetValue('UrlCode', $Category, $CategoryIdentifier), PageNumber($Offset, $Limit, TRUE)), TRUE));
+      $this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.GetValue('UrlCode', $Category, $CategoryIdentifier), PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
       
       // Change the controller name so that it knows to grab the discussion views
       $this->ControllerName = 'DiscussionsController';
@@ -148,8 +148,6 @@ class CategoriesController extends VanillaController {
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-
-      $this->CanonicalUrl(Url('/categories', TRUE));
 
       // Render default view
       $this->Render();
@@ -223,7 +221,7 @@ class CategoriesController extends VanillaController {
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {
 			if ($Category->CategoryID > 0)
-				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'd.Announce' => 0));
+				$this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'Announce' => 'all'));
       }
       
       // Add modules

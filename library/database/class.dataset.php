@@ -71,12 +71,19 @@ class Gdn_DataSet implements IteratorAggregate {
    /**
     * @todo Undocumented method.
     */
-   public function __construct($Result = NULL) {
+   public function __construct($Result = NULL, $DataSetType = NULL) {
       // Set defaults
       $this->Connection = NULL;
       $this->_Cursor = -1;
       $this->_PDOStatement = NULL;
       $this->_Result = $Result;
+      if ($DataSetType !== NULL) {
+         $this->_DatasetType = $DataSetType;
+      } elseif ($Result) {
+         if (isset($Result[0]) && is_array($Result[0])) {
+            $this->_DatasetType = DATASET_TYPE_ARRAY;
+         }
+      }
    }
 
    public function  __destruct() {

@@ -59,16 +59,16 @@ class Smf2ImportModel extends Gdn_Model {
             );
             
             // Save the uploaded image in preview size
-            if (!file_exists(PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName))
+            /*if (!file_exists(PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName))
             $UploadImage->SaveImageAs(
                $Image,
                PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName,
                Gdn::Config('Garden.Preview.MaxHeight', 100),
                Gdn::Config('Garden.Preview.MaxWidth', 75)
-            );
+            );*/
    
             // Save the uploaded image in thumbnail size
-            $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
+            $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 40);
             if (!file_exists(PATH_ROOT.'/uploads/userpics/n'.$ImageBaseName))
             $UploadImage->SaveImageAs(
                $Image,

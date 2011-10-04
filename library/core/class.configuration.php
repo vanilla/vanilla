@@ -71,12 +71,14 @@ class Gdn_Configuration {
     * @var array.
     */
    protected $_SaveData;
+   protected $_SaveDataBak;
    
    protected $_Files = array();
    protected $_UseCaching = FALSE;
    
    public function ClearSaveData() {
       $this->_SaveData = array();
+      $this->_SaveDataBak = array();
    }
    
    public function Caching($Caching = NULL) {
@@ -362,6 +364,9 @@ class Gdn_Configuration {
          $LoadedFromCache = FALSE;
          // Include the file.
          require($File);
+         
+         if ($LoadFor == 'Save')
+            $this->_SaveDataBak = $$Name;
       }
       
       // Make sure the config variable is here and is an array.
@@ -428,6 +433,22 @@ class Gdn_Configuration {
       return $$VariableName;
    }
    
+   protected function _LogChange($NewData = NULL, $OldData = NULL) {
+      if ($NewData === NULL)
+         $NewData = $this->_SaveData;
+      if ($OldData === NULL)
+         $OldData = $this->_SaveDataBak;
+      
+      $Data = $OldData;
+      $Data['_New'] = $NewData;
+      
+      // Log the change.
+      try {
+         LogModel::Insert('Edit', 'Configuration', $Data);
+      } catch (Exception $Ex) {
+      }
+   }
+   
    protected static function _MergeConfig(&$Data, &$Loaded) {
       foreach($Loaded as $Key => $Value) {
          if(!array_key_exists($Key, $Data)) {
@@ -477,6 +498,9 @@ class Gdn_Configuration {
 
       // Do a sanity check on the config save.
       if ($File == PATH_LOCAL_CONF.'/config.php') {
+         if (C('Garden.LogConfigurationEdits'))
+            $this->_LogChange();
+         
          if (!isset($Data['Database'])) {
             if ($Pm = Gdn::PluginManager()) {
                $Pm->EventArguments['Data'] = $Data;
@@ -489,6 +513,8 @@ class Gdn_Configuration {
             return FALSE;
          }
       }
+      
+      
 
       $NewLines = array();
       $NewLines[] = "<?php if (!defined('APPLICATION')) exit();";

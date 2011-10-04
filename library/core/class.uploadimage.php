@@ -32,6 +32,11 @@ class Gdn_UploadImage extends Gdn_Upload {
       
       return TRUE;
    }
+   
+   public function Clear() {
+      parent::Clear();
+		$this->_AllowedFileExtensions = array('jpg','jpeg','gif','png','bmp');
+   }
 
    /**
     * Validates the uploaded image. Returns the temporary name of the uploaded file.
@@ -73,7 +78,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       
       // Make function work like it used to.
       $Args = func_get_args();
-      $SaveGig = FALSE;
+      $SaveGif = FALSE;
       if (count($Args) > 5) {
          $Crop = GetValue(4, $Args, $Crop);
          $OutputType = GetValue(5, $Args, $OutputType);
@@ -199,8 +204,10 @@ class Gdn_UploadImage extends Gdn_Upload {
          // No need to check these, if we get here then whichever function we need will be available
          if ($OutputType == 'gif')
             imagegif($TargetImage, $TargetPath);
-         else if ($OutputType == 'png') {
+         elseif ($OutputType == 'png') {
             imagepng($TargetImage, $TargetPath, (int)($ImageQuality/10));
+         } elseif ($OutputType == 'ico') {
+            self::ImageIco($TargetImage, $TargetPath);
          } else
             imagejpeg($TargetImage, $TargetPath, $ImageQuality);
       } else {
@@ -234,5 +241,14 @@ class Gdn_UploadImage extends Gdn_Upload {
          $Path = "$TargetFolder/$Subdir/$Name.$Extension";
       } while(file_exists($Path));
       return $Path;
+   }
+   
+   public static function ImageIco($GD, $TargetPath) {
+      require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.ico.php';
+      require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.functions.php';
+      $Ico = new phpthumb_ico();
+      $Arr = array('ico' => $GD);
+      $IcoString = $Ico->GD2ICOstring($Arr);
+      file_put_contents($TargetPath, $IcoString);
    }
 }

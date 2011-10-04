@@ -378,7 +378,7 @@ class ProfileController extends Gdn_Controller {
    public function Notifications($Offset = '0') {
       $this->Permission('Garden.SignIn.Allow');
 		
-		$Limit = 50;
+		$Limit = 30;
 		$Offset = is_numeric($Offset) ? $Offset : 0;
       if ($Offset < 0)
          $Offset = 0;
@@ -393,7 +393,7 @@ class ProfileController extends Gdn_Controller {
       // Get notifications data
       $this->ActivityModel = new ActivityModel();
       $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID, $Offset, $Limit);
-		$TotalRecords = $this->ActivityModel->GetCountNotifications($Session->UserID);
+		//$TotalRecords = $this->ActivityModel->GetCountNotifications($Session->UserID);
 		
 		// Build a pager
 		$PagerFactory = new Gdn_PagerFactory();
@@ -404,7 +404,7 @@ class ProfileController extends Gdn_Controller {
 		$this->Pager->Configure(
 			$Offset,
 			$Limit,
-			$TotalRecords,
+			FALSE,
 			'profile/notifications/%1$s/'
 		);
 		// Deliver json data if necessary
@@ -520,7 +520,7 @@ class ProfileController extends Gdn_Controller {
 //            );
 
             // Save the uploaded image in thumbnail size
-            $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 50);
+            $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 40);
             $UploadImage->SaveImageAs(
                $TmpImage,
                "userpics/$Subdir/n$Basename",
@@ -534,7 +534,7 @@ class ProfileController extends Gdn_Controller {
          }
          // If there were no errors, associate the image with the user
          if ($this->Form->ErrorCount() == 0) {
-            if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'Photo' => $UserPhoto)))
+            if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'Photo' => $UserPhoto), array('CheckExisting' => TRUE)))
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
          }
          // If there were no problems, redirect back to the user account
@@ -762,7 +762,7 @@ class ProfileController extends Gdn_Controller {
          $this->Form->AddError('You must first upload a picture before you can create a thumbnail.');
       
       // Define the thumbnail size
-      $this->ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 32);
+      $this->ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 40);
       
       // Define the source (profile sized) picture & dimensions.
       $Basename = ChangeBasename($this->User->Photo, 'p%s');

@@ -178,6 +178,10 @@ class SettingsController extends DashboardController {
          $this->SetData('Logo', $Logo);
       }
       
+      // Get the current favicon.
+      $Favicon = C('Garden.FavIcon');
+      $this->SetData('Favicon', $Favicon);
+      
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
@@ -185,7 +189,7 @@ class SettingsController extends DashboardController {
       } else {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
-         
+         $SaveData = array();
          if ($this->Form->Save() !== FALSE) {
             $Upload = new Gdn_Upload();
             try {
@@ -193,7 +197,7 @@ class SettingsController extends DashboardController {
                $TmpImage = $Upload->ValidateUpload('Logo', FALSE);
                if ($TmpImage) {
                   // Generate the target image name
-                  $TargetImage = $Upload->GenerateTargetName(PATH_ROOT . DS . 'uploads');
+                  $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
                   $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
                   
                   // Delete any previously uploaded images.
@@ -206,14 +210,32 @@ class SettingsController extends DashboardController {
                      $ImageBaseName
                   );
                   $ImageBaseName = $Parts['SaveName'];
+                  $SaveData['Garden.Logo'] = $ImageBaseName;
+                  $this->SetData('Logo', $ImageBaseName);
+               }
+               
+               if (GetValue('Favicon', $_FILES)) {
+                  $ImgUpload = new Gdn_UploadImage();
+                  $TmpFavicon = $ImgUpload->ValidateUpload('Favicon', FALSE);
+                  if ($TmpFavicon) {
+                     $ICOName = 'favicon_'.substr(md5(microtime()), 16).'.ico';
+
+                     if ($Favicon)
+                        $Upload->Delete($Favicon);
+
+                     // Resize the to a png.
+                     $ImgUpload->SaveImageAs($TmpFavicon, $ICOName, 16, 16, array('OutputType' => 'ico', 'Crop' => TRUE));
+                     $SaveData['Garden.FavIcon'] = $ICOName;
+                     $this->SetData('Favicon', $ICOName);
+                  }
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());
             }
             // If there were no errors, save the path to the logo in the config
-            if ($this->Form->ErrorCount() == 0 && $Upload->GetUploadedFileName() != '') {
-               SaveToConfig('Garden.Logo', $ImageBaseName);
-               $this->SetData('Logo', $ImageBaseName);
+            if ($this->Form->ErrorCount() == 0) {
+               SaveToConfig($SaveData);
+               
             }
             
             $this->InformMessage(T("Your settings have been saved."));
@@ -264,7 +286,7 @@ class SettingsController extends DashboardController {
                if ($ID)
                $this->Form->SetData($BanModel->GetID($ID));
             }
-            $this->SetData('_BanTypes', array('IPAddress' => 'IP Address', 'Email' => 'Email', 'Name' => 'Name'));
+            $this->SetData('_BanTypes', array('IPAddress' => T('IP Address'), 'Email' => T('Email'), 'Name' => T('Name')));
             $this->View = 'Ban';
             break;
          case 'delete':
@@ -1057,6 +1079,25 @@ class SettingsController extends DashboardController {
       if ($this->Form->ErrorCount() == 0)
          Redirect('/settings/plugins');
    }
+   
+   /**
+    * Remove the logo from config & delete it.
+    *
+    * @since 2.1
+    * @param string $TransientKey Security token.
+    */
+   public function RemoveFavicon($TransientKey = '') {
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Themes.Manage')) {
+         $Favicon = C('Garden.FavIcon', '');
+         RemoveFromConfig('Garden.Logo');
+         $Upload = new Gdn_Upload();
+         $Upload->Delete($Favicon);
+      }
+
+      Redirect('/settings/banner');
+   }
+   
    
    /**
     * Remove the logo from config & delete it.

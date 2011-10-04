@@ -92,6 +92,10 @@ jQuery(document).ready(function($) {
 
    $(".PopupWindow").live('click', function() {
       var $this = $(this);
+      
+      if ($this.hasClass('NoMSIE') && $.browser.misie) {
+         return;
+      }
 
       var width = $this.attr('popupWidth'); width = width ? width : 960;
       var height = $this.attr('popupHeight'); height = height ? height : 600;
@@ -159,7 +163,7 @@ jQuery(document).ready(function($) {
          window.opener.location.replace(RedirectUrl);
          window.close();
       } else {
-         setTimeout(function() {document.location.replace(RedirectUrl);}, 200);
+         document.location.replace(RedirectUrl);
       }
    }
 
@@ -426,9 +430,19 @@ jQuery(document).ready(function($) {
       }
    });
 
-   // Jump to the hash if desired.
-   if (gdn.definition('LocationHash', 0) && window.location.hash == '') {
-      window.location.hash = gdn.definition('LocationHash');
+   if (window.location.hash == '') {
+      // Jump to the hash if desired.
+      if (gdn.definition('LocationHash', 0) != 0) {
+         window.location.hash = gdn.definition('LocationHash');
+      }
+      if (gdn.definition('ScrollTo', 0) != 0) {
+         var scrollTo = $(gdn.definition('ScrollTo'));
+         if (scrollTo.length > 0) {
+            $('html').animate({
+               scrollTop: scrollTo.offset().top - 10
+            });
+         }
+      }
    }
    
    gdn.stats = function() {
@@ -706,7 +720,7 @@ jQuery(document).ready(function($) {
  * @return string
  */
 
-(function($){
+jQuery(document).ready(function($){
 	
 	var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	
@@ -801,7 +815,7 @@ jQuery(document).ready(function($) {
 			return output;
 		}
 	});
-})(jQuery);
+});
 
 // Shrink large images to fit into message space, and pop into new window when clicked.
 // This needs to happen in onload because otherwise the image sizes are not yet known.

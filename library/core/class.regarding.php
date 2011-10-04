@@ -157,21 +157,21 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
     */
 
    // Cache regarding data for displayed comments
-   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-      if (GetValue('RegardingCache', $Sender, NULL) != NULL) return;
-
-      $Comments = $Sender->Data('CommentData');
-      $CommentIDList = array();
-      if ($Comments && $Comments instanceof Gdn_DataSet) {
-         $Comments->DataSeek(-1);
-         while ($Comment = $Comments->NextRow()) {
-            if (!isset($Comment->CommentID) || !is_numeric($Comment->CommentID))
-               continue;
-            $CommentIDList[] = $Comment->CommentID;
-         }
-      }
-      $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
-   }
+//   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
+//      if (GetValue('RegardingCache', $Sender, NULL) != NULL) return;
+//
+//      $Comments = $Sender->Data('Comments');
+//      $CommentIDList = array();
+//      if ($Comments && $Comments instanceof Gdn_DataSet) {
+//         $Comments->DataSeek(-1);
+//         while ($Comment = $Comments->NextRow()) {
+//            if (!isset($Comment->CommentID) || !is_numeric($Comment->CommentID))
+//               continue;
+//            $CommentIDList[] = $Comment->CommentID;
+//         }
+//      }
+//      $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
+//   }
 
    protected function CacheRegarding($Sender, $ParentType, $ParentID, $ForeignType, $ForeignIDs) {
 

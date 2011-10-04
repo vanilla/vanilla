@@ -561,8 +561,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $EventKey = strtolower($EventClassName == '' ? $NewMethodName : $EventClassName.'_'.$EventName.'_Create');
 
       // Throw an error if this method has already been created.
-      if (array_key_exists($EventKey, $this->_NewMethodCollection) === TRUE)
-         trigger_error(ErrorMessage('New object methods must be unique. The new "'.$EventKey.'" method has already been assigned by the "'.$this->_NewMethodCollection[$EventKey].'" plugin. It cannot also be assigned by the "'.$NewMethodClassName.'" plugin.', 'PluginManager', 'RegisterNewMethod'), E_USER_ERROR);
+      if (array_key_exists($EventKey, $this->_NewMethodCollection) === TRUE) {
+         trigger_error('New object methods must be unique. The new "'.$EventKey.'" method has already been assigned by the "'.$this->_NewMethodCollection[$EventKey].'" plugin. It cannot also be assigned by the "'.$NewMethodClassName.'" plugin.', E_USER_NOTICE);
+         return;
+      }
 
       // Otherwise, specify this class as the source for the new method.
       $this->_NewMethodCollection[$EventKey] = $NewMethodKey;
@@ -712,6 +714,35 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       return $this->GetPluginInstance($NewMethodClassName, self::ACCESS_CLASSNAME, $Sender)->$NewMethodName($Sender, GetValue('RequestArgs', $Sender, array()));
    }
+   /**
+    * Get the callback for an event handler.
+    * @param string $ClassName The name of the class throwing the event.
+    * @param string $MethodName The name of the event.
+    * @param string $Type The type of event handler.
+    *  - Create: A new method creation.
+    *  - Override: A method override.
+    * @return callback 
+    * @since 2.1
+    */
+   public function GetCallback($ClassName, $MethodName, $Type = 'Create') {
+      $EventKey = strtolower("{$ClassName}_{$MethodName}_{$Type}");
+      
+      switch ($Type) {
+         case 'Create':
+            $MethodKey = GetValue($EventKey, $this->_NewMethodCollection);
+            break;
+         case 'Override':
+            $MethodKey = GetValue($EventKey, $this->_MethodOverrideCollection);
+            break;
+      }
+      $Parts = explode('.', $MethodKey, 2);
+      if (count($Parts) != 2)
+         return FALSE;
+      
+      list($ClassName, $MethodName) = $Parts;
+      $Instance = $this->GetPluginInstance($ClassName, self::ACCESS_CLASSNAME);
+      return array($Instance, $MethodName);
+   }
 
    /**
     * Checks to see if there are any plugins that create the method being
@@ -722,7 +753,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @return True if method exists.
     */
    public function HasNewMethod($ClassName, $MethodName) {
-      return array_key_exists(strtolower($ClassName.'_'.$MethodName.'_Create'), $this->_NewMethodCollection) ? TRUE : FALSE;
+      $Key = strtolower($ClassName.'_'.$MethodName.'_Create');
+      if (array_key_exists($Key, $this->_NewMethodCollection)) {
+         $Result = explode('.', $this->_NewMethodCollection[$Key]);
+         return $Result[0];
+      } else {
+         return FALSE;
+      }
    }
 
    public function ScanPluginFile($PluginFile, $VariableName = NULL) {

@@ -208,10 +208,11 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->Preferences['Notifications']['Popup.CommentMention'] = T('Notify me when people mention me in comments.');
       $Sender->Preferences['Notifications']['Popup.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
 
-      if (Gdn::Session()->CheckPermission('Garden.AdvancedNotifications.Allow'))
+      if (Gdn::Session()->CheckPermission('Garden.AdvancedNotifications.Allow')) {
          $Sender->Preferences['Notifications']['Email.NewDiscussion'] = array(T('Notify me when people start new discussions.'), 'Meta');
          $Sender->Preferences['Notifications']['Email.NewComment'] = array(T('Notify me when people comment on a discussion.'), 'Meta');
 //      $Sender->Preferences['Notifications']['Popup.NewDiscussion'] = T('Notify me when people start new discussions.');
+      }
    }
 	
 	/**

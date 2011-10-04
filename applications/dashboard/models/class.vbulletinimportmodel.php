@@ -40,9 +40,7 @@ class vBulletinImportModel extends Gdn_Model {
       
       $ProfileHeight = C('Garden.Profile.MaxHeight', 1000);
       $ProfileWidth = C('Garden.Profile.MaxWidth', 250);
-      $PreviewHeight = C('Garden.Preview.MaxHeight', 100);
-      $PreviewWidth = C('Garden.Preview.MaxWidth', 75);
-      $ThumbSize = C('Garden.Thumbnail.Size', 50);
+      $ThumbSize = C('Garden.Thumbnail.Size', 40);
       
       foreach ($UserData->Result() as $User) {
          try {

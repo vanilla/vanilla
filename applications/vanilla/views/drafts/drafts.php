@@ -4,8 +4,8 @@ $ShowOptions = TRUE;
 $Alt = '';
 foreach ($this->DraftData->Result() as $Draft) {
 	$Offset = GetValue('CountComments', $Draft, 0);
-	if($Offset > C('Vanilla.Comments.PerPage', 50)) {
-		$Offset -= C('Vanilla.Comments.PerPage', 50);
+	if($Offset > C('Vanilla.Comments.PerPage', 30)) {
+		$Offset -= C('Vanilla.Comments.PerPage', 30);
 	} else {
 		$Offset = 0;
 	}

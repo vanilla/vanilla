@@ -213,6 +213,8 @@ class ImportModel extends Gdn_Model {
 	}
 
    public function CustomFinalization() {
+      $this->SetRoleDefaults();
+      
       $Imp = $this->GetCustomImportModel();
       if ($Imp !== NULL)
          $Imp->AfterImport();
@@ -275,6 +277,8 @@ class ImportModel extends Gdn_Model {
 					$DestModified = TRUE;
             } elseif ($Type) {
                $StructureType = $Type;
+            } else {
+               $StructureType = 'varchar(255)';
             }
 
 				$St->Column($Name, $StructureType, NULL);
@@ -811,31 +815,46 @@ class ImportModel extends Gdn_Model {
 
       $Data = $this->SQL->Get('zPermission')->ResultArray();
       foreach ($Data as $Row) {
-         $Preset = strtolower(GetValue('_Permissions', $Row));
+         $Presets = array_map('trim', explode(',', GetValue('_Permissions', $Row)));
 
+         
          foreach ($ColumnSets as $ColumnSet) {
             $Set = array();
             $Set['RoleID'] = $Row['RoleID'];
-            
-            foreach ($ColumnSet as $ColumnName => $Default) {
-               if (isset($Row[$ColumnName]))
-                  $Value = $Row[$ColumnName];
-               elseif (strpos($ColumnName, '.') === FALSE)
-                  $Value = $Default;
-               elseif ($Preset == 'all')
-                  $Value = 1;
-               elseif ($Preset == 'view')
-                  $Value = StringEndsWith($ColumnName, 'View', TRUE);
-               else
-                  $Value = $Default & 1;
 
-               $Set["`$ColumnName`"] = $Value;
+            foreach ($Presets as $Preset) {
+               if (strpos($Preset, '.') !== FALSE) {
+                  // This preset is a specific permission.
+                  
+                  if (array_key_exists($Preset, $ColumnSet)) {   
+                     $Set["`$Preset`"] = 1;
+                  }
+                  continue;
+               }
+               $Preset = strtolower($Preset);
+               
+
+               foreach ($ColumnSet as $ColumnName => $Default) {
+                  if (isset($Row[$ColumnName]))
+                     $Value = $Row[$ColumnName];
+                  elseif (strpos($ColumnName, '.') === FALSE)
+                     $Value = $Default;
+                  elseif ($Preset == 'all')
+                     $Value = 1;
+                  elseif ($Preset == 'view')
+                     $Value = StringEndsWith($ColumnName, 'View', TRUE) && !in_array($ColumnName, array('Garden.Settings.View'));
+                  elseif ($Preset == $ColumnName)
+                     $Value = 1;
+                  else
+                     $Value = $Default & 1;
+
+                  $Set["`$ColumnName`"] = $Value;
+               }
             }
             $this->SQL->Insert('Permission', $Set);
             unset($Set);
          }
       }
-
       return TRUE;
    }
 
@@ -1392,6 +1411,59 @@ class ImportModel extends Gdn_Model {
       
       file_put_contents(PATH_LOCAL_UPLOADS.'/'.$SQLPath, $Queries, FILE_APPEND | LOCK_EX);
    }
+   
+   public function SetRoleDefaults() {
+      if (!$this->ImportExists('Role', 'RoleID'))
+         return;
+      
+      $Data = $this->SQL->Get('zRole')->ResultArray();
+      
+      $RoleDefaults = array(
+          'Garden.Registration.DefaultRoles' => array(), 
+          'Garden.Registration.ApplicantRoleID' => 0,
+          'Garden.Registration.ConfirmEmail' => FALSE,
+          'Garden.Registration.ConfirmEmailRole' => '');
+      $GuestRoleID = FALSE;
+      
+      foreach ($Data as $Row) {
+         if ($this->ImportExists('Role', '_Default'))
+            $Name = $Row['_Default'];
+         else
+            $Name = GetValue('Name', $Row);
+         $RoleID = $Row['RoleID'];
+         
+         switch (strtolower($Name)) {
+            case 'email':
+            case 'confirm email':
+            case 'users awaiting email confirmation':
+               $RoleDefaults['Garden.Registration.ConfirmEmail'] = TRUE;
+               $RoleDefaults['Garden.Registration.ConfirmEmailRole'] = $RoleID;
+               break;
+            case 'member':
+            case 'members':
+            case 'registered':
+            case 'registered users':
+               $RoleDefaults['Garden.Registration.DefaultRoles'][] = $RoleID;
+               break;
+            case 'guest':
+            case 'guests':
+            case 'unauthenticated':
+            case 'unregistered':
+            case 'unregistered':
+            case 'unregistered / not logged in':
+               $GuestRoleID = $RoleID;
+               break;
+            case 'applicant':
+            case 'applicants':
+               $RoleDefaults['Garden.Registration.ApplicantRoleID'] = $RoleID;
+               break;
+         }
+      }
+      SaveToConfig($RoleDefaults);
+      if ($GuestRoleID) {
+         $this->SQL->Replace('UserRole', array('UserID' => 0, 'RoleID' => $GuestRoleID), array('UserID' => 0, 'RoleID' => $GuestRoleID));
+      }
+   }
 
    public function Stat($Key, $Value = NULL, $Op = 'set') {
       if(!isset($this->Data['Stats']))
@@ -1553,6 +1625,9 @@ class ImportModel extends Gdn_Model {
       }
 
       // User counts.
+      if (!$this->ImportExists('User', 'DateFirstVisit')) {
+         $Sqls['User.DateFirstVisit'] = 'update :_User set DateFirstVisit = DateInserted';
+      }
       if (!$this->ImportExists('User', 'CountDiscussions')) {
          $Sqls['User.CountDiscussions'] = $this->GetCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID');
       }
@@ -1619,12 +1694,24 @@ class ImportModel extends Gdn_Model {
 
       // Update the url codes of categories.
       if (!$this->ImportExists('Category', 'UrlCode')) {
-         $Categories = Gdn::SQL()->Get('Category')->ResultArray();
+         $Categories = CategoryModel::Categories();
+         $TakenCodes = array();
+         
          foreach ($Categories as $Category) {
             $UrlCode = Gdn_Format::Url($Category['Name']);
             if (strlen($UrlCode) > 50)
                $UrlCode = $Category['CategoryID'];
+            
+            if (in_array($UrlCode, $TakenCodes)) {
+               $ParentCategory = CategoryModel::Categories($Category['ParentCategoryID']);
+               if ($ParentCategory && $ParentCategory['CategoryID'] != -1) {
+                  $UrlCode = Gdn_Format::Url($ParentCategory['Name']).'-'.$UrlCode;
+               }
+               if (in_array($UrlCode, $TakenCodes))
+                  $UrlCode = $Category['CategoryID'];
+            }
 
+            $TakenCodes[] = $UrlCode;
             Gdn::SQL()->Put(
                'Category',
                array('UrlCode' => $UrlCode),

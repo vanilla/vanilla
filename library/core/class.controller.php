@@ -738,7 +738,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             $SubPaths[] = "views/$ControllerName/$View";
          else {
             $SubPaths[] = "views/$View";
-            $SubPaths[] = "views/{$this->ControllerName}/$View";
+            
+            $SubPaths[] = 'views/'.StringEndsWith($this->ControllerName, 'Controller', TRUE, TRUE)."/$View";
          }
 
          // Views come from one of four places:
@@ -776,8 +777,11 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_ViewLocations[$LocationName] = $ViewPath;
       }
       // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
-      if ($ViewPath === FALSE && $ThrowError)
-         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+      if ($ViewPath === FALSE && $ThrowError) {
+         Gdn::Dispatcher()->PassData('ViewPaths', $ViewPaths);
+         throw NotFoundException('View');
+//         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+      }
 
       return $ViewPath;
    }
@@ -1059,7 +1063,11 @@ class Gdn_Controller extends Gdn_Pluggable {
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON)
-         ob_clean(); 
+         ob_clean();
+      
+      if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
+         $this->ContentType('text/plain');
+      }
 
       // Send headers to the browser
       $this->SendHeaders();
@@ -1197,10 +1205,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Remove standard and "protected" data from the top level.
          foreach ($this->Data as $Key => $Value) {
-            if (in_array($Key, array('Title')))
+            if ($Key && in_array($Key, array('Title')))
                continue;
-            if (isset($Key[0]) && $Key[0] == '_')
+            if (isset($Key[0]) && $Key[0] === '_')
                continue; // protected
+            
             $Data[$Key] = $Value;
          }
       }
@@ -1213,7 +1222,13 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       // Remove values that should not be transmitted via api
-      $Data = RemoveKeysFromNestedArray($Data, array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions'));
+      $Remove = array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions', 'Attributes');
+      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         $Remove[] = 'InsertIPAddress';
+         $Remove[] = 'UpdateIPAddress';
+         $Remove[] = 'LastIPAddress';
+      }
+      $Data = RemoveKeysFromNestedArray($Data, $Remove);
       
       // Make sure the database connection is closed before exiting.
       $this->Finalize();
@@ -1288,10 +1303,14 @@ class Gdn_Controller extends Gdn_Pluggable {
          try {
             switch ($Ex->getCode()) {
                case 401:
-                  Gdn::Dispatcher()->Dispatch('DefaultPermission');
+                  Gdn::Dispatcher()
+                     ->PassData('Message', $Ex->getMessage())
+                     ->Dispatch('DefaultPermission');
                   break;
                case 404:
-                  Gdn::Dispatcher()->Dispatch('Default404');
+                  Gdn::Dispatcher()
+                     ->PassData('Message', $Ex->getMessage())
+                     ->Dispatch('Default404');
                   break;
                default:
                   Gdn_ExceptionHandler($Ex);
@@ -1337,6 +1356,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             array_map('htmlspecialchars', $Data);
             exit("<Exception><Code>{$Data['Code']}</Code><Message>{$Data['Exception']}</Message></Exception>");
             break;
+         default:
+            header('Content-Type: text/plain', TRUE);
+            exit($Ex->getMessage());
       }
    }
 
@@ -1500,7 +1522,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
          }
          // Add the favicon
-         $this->Head->SetFavIcon(C('Garden.FavIcon', Asset('themes/'.$this->Theme.'/design/favicon.png')));
+         $this->Head->SetFavIcon(Gdn_Upload::Url(C('Garden.FavIcon', Asset('themes/'.$this->Theme.'/design/favicon.png', TRUE))));
          
          // Make sure the head module gets passed into the assets collection.
          $this->AddModule('Head');

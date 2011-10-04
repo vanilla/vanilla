@@ -6,7 +6,8 @@ $DeleteUser = $Session->CheckPermission('Garden.Users.Delete');
 foreach ($this->UserData->Result() as $User) {
    $Alt = $Alt ? FALSE : TRUE;
    ?>
-   <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
+   <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
+<!--      <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $User->UserID; ?>" /></td>-->
       <td><strong><?php echo UserAnchor($User); ?></strong></td>
       <td class="Alt"><?php echo Gdn_Format::Email($User->Email); ?></td>
       <td style="max-width: 200px;">
@@ -16,6 +17,10 @@ foreach ($this->UserData->Result() as $User) {
 
          if ($User->Banned && !in_array('Banned', $Roles)) {
             $RolesString = T('Banned');
+         }
+         
+         if ($User->Admin > 1) {
+            $RolesString = ConcatSep(', ', $RolesString, T('System'));
          }
 
          foreach ($Roles as $RoleID => $RoleName) {

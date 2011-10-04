@@ -92,7 +92,7 @@ class MessageController extends DashboardController {
       $this->AddSideMenu('dashboard/message');
       
       // Generate some Controller & Asset data arrays
-      $this->LocationData = $this->_GetLocationData();
+      $this->SetData('Locations', $this->_GetLocationData());
       $this->AssetData = $this->_GetAssetData();
       
       // Set the model on the form.
@@ -105,7 +105,7 @@ class MessageController extends DashboardController {
 
 
       // If seeing the form for the first time...
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if (!$this->Form->AuthenticatedPostBack()) {
          $this->Form->SetData($this->Message);
       } else {
          if ($MessageID = $this->Form->Save()) {
@@ -160,8 +160,8 @@ class MessageController extends DashboardController {
     */
    protected function _GetAssetData() {
       $AssetData = array();
-      $AssetData['Content'] = 'Above Main Content';
-      $AssetData['Panel'] = 'Below Sidebar';
+      $AssetData['Content'] = T('Above Main Content');
+      $AssetData['Panel'] = T('Below Sidebar');
       $this->EventArguments['AssetData'] = &$AssetData;
       $this->FireEvent('AfterGetAssetData');
       return $AssetData;
@@ -175,13 +175,13 @@ class MessageController extends DashboardController {
     */
    protected function _GetLocationData() {
       $ControllerData = array();
-      $ControllerData['[Base]'] = 'All Pages';
-      $ControllerData['[NonAdmin]'] = 'All Forum Pages';
+      $ControllerData['[Base]'] = T('All Pages');
+      $ControllerData['[NonAdmin]'] = T('All Forum Pages');
       // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
       // $ControllerData['[Admin]'] = 'All Dashboard Pages';
-      $ControllerData['Dashboard/Profile/Index'] = 'Profile Page';
-      $ControllerData['Vanilla/Discussions/Index'] = 'Discussions Page';
-      $ControllerData['Vanilla/Discussion/Index'] = 'Comments Page';
+      $ControllerData['Dashboard/Profile/Index'] = T('Profile Page');
+      $ControllerData['Vanilla/Discussions/Index'] = T('Discussions Page');
+      $ControllerData['Vanilla/Discussion/Index'] = T('Comments Page');
       // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
       // $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
       $this->EventArguments['ControllerData'] = &$ControllerData;

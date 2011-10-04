@@ -43,7 +43,12 @@ $DisabledCount = $PluginCount - $EnabledCount;
 <?php
 $Alt = FALSE;
 foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
-   if (isset($PluginInfo['Hidden']) && $PluginInfo['Hidden'] === TRUE) continue;
+   // Skip Hidden & Trigger plugins
+   if (isset($PluginInfo['Hidden']) && $PluginInfo['Hidden'] === TRUE) 
+      continue;
+   if (isset($PluginInfo['Trigger']) && $PluginInfo['Trigger'] == TRUE) // Any 'true' value.
+      continue;
+   
    $Css = array_key_exists($PluginName, $this->EnabledPlugins) ? 'Enabled' : 'Disabled';
    $State = strtolower($Css);
    if ($this->Filter == 'all' || $this->Filter == $State) {

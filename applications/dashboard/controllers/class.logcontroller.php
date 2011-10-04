@@ -83,12 +83,24 @@ class LogController extends DashboardController {
     *
     * @param int $Page Page number.
     */
-   public function Edits($Page = '') {
+   public function Edits($Type = '', $Page = '') {
       $this->Permission('Garden.Moderation.Manage');
       list($Offset, $Limit) = OffsetLimit($Page, 10);
       $this->SetData('Title', T('Edit/Delete Log'));
 
-      $Where = array('Operation' => array('Edit', 'Delete'));
+      
+      $Where = array(
+          'Operation' => array('Edit', 'Delete')//,
+//          'RecordType' => array('Discussion', 'Comment', 'Activity')
+          );
+      
+      $Type = strtolower($Type);
+      if ($Type == 'configuration') {
+         $this->Permission('Garden.Settings.Manage');
+         $Where['RecordType'] = array('Configuration');
+      } else {
+         $Where['RecordType'] = array('Discussion', 'Comment', 'Activity');
+      }
       
       $RecordCount = $this->LogModel->GetCountWhere($Where);
       $this->SetData('RecordCount', $RecordCount);
@@ -173,8 +185,12 @@ class LogController extends DashboardController {
 
       // Grab the logs.
       $Logs = $this->LogModel->GetIDs($LogIDs);
-      foreach ($Logs as $Log) {
-         $this->LogModel->Restore($Log);
+      try {
+         foreach ($Logs as $Log) {
+            $this->LogModel->Restore($Log);
+         }
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex->getMessage());
       }
       $this->LogModel->Recalculate();
    }

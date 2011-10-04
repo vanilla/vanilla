@@ -69,12 +69,12 @@ jQuery(document).ready(function($) {
    setExpander();
 
    $('tbody .CheckboxCell input').live('click', function(e) {
-      var selected = $(this).attr('checked');
+      var selected = $(this).attr('checked') == 'checked';
       $(this).closest('tr').toggleClass('Selected', selected);
    });
 
    $('#SelectAll').live('click', function(e) {
-      var selected = $(this).attr('checked');
+      var selected = $(this).attr('checked') == 'checked';
       var table = $(this).closest('table');
       $('input:checkbox', table).attr('checked', selected);
       if (selected)

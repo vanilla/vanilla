@@ -9,11 +9,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class RoleModel extends Gdn_Model {
+   public static $Roles = NULL;
+   
    /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
       parent::__construct('Role');
+   }
+   
+   public function ClearCache() {
+      $Key = 'Roles';
+      Gdn::Cache()->Remove($Key);
    }
    
    public function Define($Values) {
@@ -39,7 +46,7 @@ class RoleModel extends Gdn_Model {
             $this->SQL->Update('Role', $Values, array('RoleID' => $RoleID))->Put();
          }
       }
-      
+      $this->ClearCache();
    }
    
    /**
@@ -167,6 +174,29 @@ class RoleModel extends Gdn_Model {
       return $this->SQL->Get();
    }
    
+   public static function Roles($RoleID = NULL, $Force = FALSE) {
+      if (self::$Roles == NULL) {
+         $Key = 'Roles';
+         $Roles = Gdn::Cache()->Get($Key);
+         if ($Roles === Gdn_Cache::CACHEOP_FAILURE) {
+            $Roles = Gdn::SQL()->Get('Role', 'Name')->ResultArray();
+            $Roles = Gdn_DataSet::Index($Roles, array('RoleID'));
+            Gdn::Cache()->Store($Key, $Roles, array(Gdn_Cache::FEATURE_EXPIRY => 24 * 3600));
+         }
+      } else {
+         $Roles = self::$Roles;
+      }
+      
+      if ($RoleID === NULL)
+         return $Roles;
+      elseif (array_key_exists($RoleID, $Roles))
+         return $Roles[$RoleID];
+      elseif ($Force)
+         return array('RoleID' => $RoleID, 'Name' => '');
+      else
+         return NULL;
+   }
+   
    public function Save($FormPostValues) {
       // Define the primary key in this model's table.
       $this->DefineSchema();
@@ -209,6 +239,8 @@ class RoleModel extends Gdn_Model {
             ->Set('Permissions', '')
             ->Where(array('UserRole.RoleID' => $RoleID))
             ->Put();
+         
+         $this->ClearCache();
       } else {
          $RoleID = FALSE;
       }
@@ -217,18 +249,55 @@ class RoleModel extends Gdn_Model {
 
    public static function SetUserRoles(&$Users, $UserIDColumn = 'UserID', $RolesColumn = 'Roles') {
       $UserIDs = array_unique(ConsolidateArrayValuesByKey($Users, $UserIDColumn));
-      $UserRoles = Gdn::SQL()
-         ->Select('ur.UserID, ur.RoleID, r.Name')
+      
+      // Try and get all of the mappings from the cache.
+      $Keys = array();
+      foreach ($UserIDs as $UserID) {
+         $Keys[$UserID] = FormatString(UserModel::USERROLES_KEY, array('UserID' => $UserID));
+      }
+      $UserRoles = Gdn::Cache()->Get($Keys);
+      if (!is_array($UserRoles))
+         $UserRoles = array();
+      
+      // Grab all of the data that doesn't exist from the DB.
+      $MissingIDs = array();
+      foreach($Keys as $UserID => $Key) {
+         if (!array_key_exists($Key, $UserRoles)) {
+            $MissingIDs[$UserID] = $Key;
+         }
+      }
+      if (count($MissingIDs) > 0) {
+         $DbUserRoles = Gdn::SQL()
+         ->Select('ur.*')
          ->From('UserRole ur')
-         ->Join('Role r', 'ur.RoleID = r.RoleID')
-         ->WhereIn('ur.UserID', $UserIDs)
+         ->WhereIn('ur.UserID', array_keys($MissingIDs))
          ->Get()->ResultArray();
-
-      $UserRoles = Gdn_DataSet::Index($UserRoles, 'UserID', array('Unique' => FALSE));
+         
+         $DbUserRoles = Gdn_DataSet::Index($DbUserRoles, 'UserID', array('Unique' => FALSE));
+         
+         // Store the user role mappings.
+         foreach ($DbUserRoles as $UserID => $Rows) {
+            $RoleIDs = ConsolidateArrayValuesByKey($Rows, 'RoleID');
+            $Key = $Keys[$UserID];
+            Gdn::Cache()->Store($Key, $RoleIDs);
+            $UserRoles[$Key] = $RoleIDs;
+         }
+      }
+      
+      $AllRoles = self::Roles(); // roles indexed by role id.
+      
+      // Join the users.
       foreach ($Users as &$User) {
          $UserID = GetValue($UserIDColumn, $User);
-         $Roles = GetValue($UserID, $UserRoles, array());
-         $Roles = ConsolidateArrayValuesByKey($Roles, 'RoleID', 'Name');
+         $Key = $Keys[$UserID];
+         
+         $RoleIDs = GetValue($Key, $UserRoles, array());
+         $Roles = array();
+         foreach ($RoleIDs as $RoleID) {
+            if (!array_key_exists($RoleID, $AllRoles))
+               continue;
+            $Roles[$RoleID] = $AllRoles[$RoleID]['Name'];
+         }
          SetValue($RolesColumn, $User, $Roles);
       }
    }

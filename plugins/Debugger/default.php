@@ -64,14 +64,13 @@ class DebuggerPlugin extends Gdn_Plugin {
       if (method_exists($Sender, 'CanonicalUrl')) {
          $CanonicalUrl = htmlspecialchars($Sender->CanonicalUrl(), ENT_COMPAT, 'UTF-8');
 
-         $String .= '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\">$CanonicalUrl</a></div>";
+         $String .= '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\" accesskey=\"r\">$CanonicalUrl</a></div>";
       }
 
       $Database = Gdn::Database();
       $SQL = $Database->SQL();
       if(!is_null($Database)) {
          $Queries = $Database->Queries();
-         $QueryTimes = $Database->QueryTimes();
          $String .= '<h3>'.count($Queries).' queries in '.$Database->ExecutionTime().'s</h3>';
          foreach ($Queries as $Key => $QueryInfo) {
             $Query = $QueryInfo['Sql'];
@@ -82,7 +81,7 @@ class DebuggerPlugin extends Gdn_Plugin {
                $Query = $SQL->ApplyParameters($Query, $tmp);
             }
             $String .= $QueryInfo['Method']
-               .'<small>'.@number_format($QueryTimes[$Key], 6).'s</small>'
+               .'<small>'.@number_format($QueryInfo['Time'], 6).'s</small>'
                .(isset($QueryInfo['Cache']) ? '<div><b>Cache:</b> '.var_export($QueryInfo['Cache'], TRUE).'</div>' : '')
                .'<pre>'.htmlspecialchars($Query).';</pre>';
          }

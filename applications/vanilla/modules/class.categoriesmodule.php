@@ -17,11 +17,20 @@ class CategoriesModule extends Gdn_Module {
       // Load categories
       $this->Data = FALSE;
       if (C('Vanilla.Categories.Use') == TRUE && !C('Vanilla.Categories.HideModule')) {
-         if (!property_exists($Sender, 'CategoryModel') || !is_object($Sender->CategoryModel)) {
-            $Sender->CategoryModel = new CategoryModel();
+         $Categories = CategoryModel::Categories();
+         $Categories2 = $Categories;
+         
+         // Filter out the categories we aren't watching.
+         foreach ($Categories2 as $i => $Category) {
+            if (!$Category['PermsDiscussionsView'] || !$Category['Following']) {
+               unset($Categories[$i]);
+            }
          }
-         $Sender->CategoryModel->Watching = TRUE;
-         $this->Data = $Sender->CategoryModel->GetFull();
+         
+         $Data = new Gdn_DataSet($Categories);
+         $Data->DatasetType(DATASET_TYPE_ARRAY);
+         $Data->DatasetType(DATASET_TYPE_OBJECT);
+         $this->Data = $Data;
       }
       parent::__construct($Sender);
    }

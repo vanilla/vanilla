@@ -18,7 +18,7 @@ class MessageModule extends Gdn_Module {
    }
    
    public function AssetTarget() {
-      return $this->_Message == FALSE ? 'Content' : $this->_Message->AssetTarget;
+      return $this->_Message == FALSE ? 'Content' : GetValue('AssetTarget', $this->_Message);
    }
    
 }

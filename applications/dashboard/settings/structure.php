@@ -77,6 +77,7 @@ $Construct
    ->Column('DateFirstVisit', 'datetime', TRUE)
    ->Column('DateLastActive', 'datetime', TRUE)
    ->Column('LastIPAddress', 'varchar(15)', TRUE)
+   ->Column('AllIPAddresses', 'varchar(100)', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
@@ -93,7 +94,7 @@ $SystemUserID = C('Garden.SystemUserID');
 if ($SystemUserID) {
    $SysUser = Gdn::UserModel()->GetID($SystemUserID);
 
-   if (!$SysUser || GetValue('Deleted', $SysUser)) {
+   if (!$SysUser || GetValue('Deleted', $SysUser) || GetValue('Admin', $SysUser) != 2) {
       $SystemUserID = FALSE;
       RemoveFromConfig('Garden.SystemUserID');
    }
@@ -484,7 +485,7 @@ $Construct->Table('Tag')
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
    ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Error'))
-   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity'), FALSE, 'index')
+   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'Configuration'), FALSE, 'index')
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record
    ->Column('RecordDate', 'datetime')

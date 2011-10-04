@@ -46,10 +46,9 @@ class DiscussionController extends VanillaController {
     * 
     * @param int $DiscussionID Unique discussion ID
     * @param string $DiscussionStub URL-safe title slug
-    * @param int $Offset How many comments to skip
-    * @param int $Limit Total comments to display
+    * @param int $Page The current page of comments
     */
-   public function Index($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+   public function Index($DiscussionID = '', $DiscussionStub = '', $Page = '') {
       // Setup head
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.ui.packed.js');
@@ -68,6 +67,15 @@ class DiscussionController extends VanillaController {
          throw new Exception(sprintf(T('%s Not Found'), T('Discussion')), 404);
       }
       
+      // Define the query offset & limit.
+      $Limit = C('Vanilla.Comments.PerPage', 30);
+
+      $OffsetProvided = $Page != '';
+      list($Offset, $Limit) = OffsetLimit($Page, $Limit);
+      
+      // Set the canonical url to have the proper page title.
+      $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
+      
       // Check permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
@@ -78,12 +86,6 @@ class DiscussionController extends VanillaController {
 
       // Actual number of comments, excluding the discussion itself
       $ActualResponses = $this->Discussion->CountComments - 1;
-      // Define the query offset & limit
-      if (!is_numeric($Limit) || $Limit < 0)
-         $Limit = C('Vanilla.Comments.PerPage', 50);
-
-      $OffsetProvided = $Offset != '';
-      list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
 
       // If $Offset isn't defined, assume that the user has not clicked to
       // view a next or previous page, and this is a "view" to be counted.
@@ -93,8 +95,8 @@ class DiscussionController extends VanillaController {
 
       $this->Offset = $Offset;
       if (C('Vanilla.Comments.AutoOffset')) {
-         if ($this->Discussion->CountCommentWatch > 0 && $OffsetProvided == '')
-            $this->AddDefinition('LocationHash', '#Item_'.$this->Discussion->CountCommentWatch);
+         if ($this->Discussion->CountCommentWatch > 1 && $OffsetProvided == '')
+            $this->AddDefinition('ScrollTo', 'a[name=Item_'.$this->Discussion->CountCommentWatch.']');
 
          if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
             // Round down to the appropriate offset based on the user's read comments & comments per page
@@ -118,15 +120,12 @@ class DiscussionController extends VanillaController {
       if ($this->Offset < 0)
          $this->Offset = 0;
 
-      // Set the canonical url to have the proper page title.
-      $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE)), TRUE));
-
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
 
       // Make sure to set the user's discussion watch records
-      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
+      $this->CommentModel->SetWatch($this->Discussion, $this->CommentData->NumRows(), $this->Offset, $this->Discussion->CountComments);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -151,11 +150,13 @@ class DiscussionController extends VanillaController {
       $this->Form->AddHidden('CommentID', '');
 
       // Retrieve & apply the draft if there is one:
-      $DraftModel = new DraftModel();
-      $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
-      $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
-      if ($Draft)
-         $this->Form->SetFormValue('Body', $Draft->Body);
+      if (Gdn::Session()->UserID) {
+         $DraftModel = new DraftModel();
+         $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
+         $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+         if ($Draft)
+            $this->Form->SetFormValue('Body', $Draft->Body);
+      }
       
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -252,7 +253,7 @@ class DiscussionController extends VanillaController {
       
       // Figure out how many comments are before this one
       $Offset = $this->CommentModel->GetOffset($Comment);
-      $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
+      $Limit = Gdn::Config('Vanilla.Comments.PerPage', 30);
       
       // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
       //$Offset = floor($Offset / $Limit) * $Limit;
@@ -733,7 +734,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $ActualResponses = $this->Discussion->CountComments - 1;
       // Define the query offset & limit
       if (!is_numeric($Limit) || $Limit < 0)
-         $Limit = C('Vanilla.Comments.PerPage', 50);
+         $Limit = C('Vanilla.Comments.PerPage', 30);
 
       $OffsetProvided = $Offset != '';
       list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
@@ -780,9 +781,13 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->Form->AddHidden('DisplayNewCommentOnly', 'true'); // Only load/display the new comment after posting (don't load all new comments since the page last loaded).
 
       // Retrieve & apply the draft if there is one:
-      $DraftModel = new DraftModel();
-      $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
-      $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+      $Draft = FALSE;
+      if (Gdn::Session()->UserID) {
+         $DraftModel = new DraftModel();
+         $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
+         $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
+      }
+      
       if ($Draft)
          $this->Form->SetFormValue('Body', $Draft->Body);
       else {

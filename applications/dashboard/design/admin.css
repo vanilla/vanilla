@@ -105,7 +105,7 @@ body {
 	text-align: right;
 }
 .Wrap {
-   margin: 10px;
+   margin: 20px;
 }
 h1, h2, h3, h4, h5, h6 {
    color: #000;
@@ -113,6 +113,12 @@ h1, h2, h3, h4, h5, h6 {
    font-weight: normal;
    margin: 0;
 }
+
+hr {
+   border: none;
+   border-top: solid 1px #A5D0E7;
+}
+
 #Content h1, #Content h2, #Content h3, #Content h4, #Content h5 {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
 }
@@ -142,8 +148,8 @@ h1, h2, h3, h4, h5, h6 {
 	padding: 0;
 }
 p {
-   margin: 0.5em 0 0 0;
-   line-height: 1.6em;
+   margin: .5em 0;
+   line-height: 1.4em;
 }
 small {
 	font-size: 12px;
@@ -192,10 +198,7 @@ h5 {
 .Arrow {
 	font-size: 18px;
 }
-a,
-a:link,
-a:visited,
-a:active {
+a {
    text-decoration: none;
    color: #2786c2;
 }
@@ -264,17 +267,12 @@ select.Day,
 select.Year {
    margin-left: 4px;
 }
-a.SmallButton,
-a.Button,
-input.Button,
-input.SmallButton {
+.SmallButton,
+.Button {
    margin: 0;
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
-   border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+   border-radius: .5ex;
+	-moz-border-radius: .5ex;
+	-webkit-border-radius: .5ex;
 	background: #3fbcf3;
 	background:-webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
 	background:-moz-linear-gradient(top, #aee7fe, #3fbcf3);
@@ -284,55 +282,69 @@ input.SmallButton {
 	color:#003673;
 	cursor:pointer;
 	font-size:12px;
-	font-weight:bold;
 	padding:6px 10px;
 	text-decoration:none;
 	text-shadow:0 1px 0 #B7F5FD;
+   font-weight: normal;
+}
+.Button {
+   box-shadow: 0px 0px 2px #999;
+   -moz-box-shadow: 0px 0px 2px #999;
+   -webkit-box-shadow: 0px 0px 2px #999;
+	font-weight:bold;
+   margin: 0 0 20px 20px;
 }
 a.Button {
 	padding: 5px 7px;
 }
-a.SmallButton {
+.SmallButton {
 	margin-right: 10px;
 	padding: 4px;
-	font-size: 12px;
+	font-size: 11px;
+   display: inline-block;
+   text-align: center;
+   line-height: 1;
 }
-a.SmallButton:hover,
-a.Button:hover,
-input.Button:hover,
-input.SmallButton:hover {
-	border: 1px solid #0B64C6;
+.SmallButton:hover,
+.Button:hover {
+	border-color: #0B64C6;
 	color: #001F44;
 	text-shadow:0 1px 0 #EEFFFF;
 }
-a.SmallButton:focus,
-a.Button:focus,
-input.Button:focus,
-input.SmallButton:focus {
-	background: #81CFF6;
-	border:1px solid #0B64C6;
-	color:#001F44;
-	text-shadow:0 1px 0 #EEFFFF;
-}
-input.SmallButton,
-a.SmallButton {
-   border-radius: 3px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	font-size:11px;
-	font-weight:normal;
-	padding:2px 4px;
-	box-shadow:0 0 0 #999999;
-	-moz-box-shadow:0 0 0 #999999;
-	-webkit-box-shadow:0 0 0 #999999;
-}
-input.SmallButton:hover,
-a.SmallButton:hover,
-.SmallBlueButton:hover {
+
+.SmallButton:hover {
 	box-shadow:0 0 2px #999999;
 	-moz-box-shadow:0 0 2px #999999;
 	-webkit-box-shadow:0 0 2px #999999;
 }
+
+.ButtonList .SmallButton {
+   margin: 0;
+   border-collapse: collapse;
+   border-radius: 0;
+   -webkit-border-radius: 0;
+   -moz-border-radius: 0;
+   border-left-width: 0;
+   min-width: 40px;
+}
+
+.InputButtons {
+   margin-top: 8px;
+}
+
+.ButtonList {
+   margin-right: 20px;
+}
+
+.ButtonList :first-child {
+   border-radius: .5ex 0 0 .5ex;
+   border-left-width: 1px;
+}
+.ButtonList :last-child {
+   border-radius: 0 .5ex .5ex 0;
+}
+
+
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -1107,10 +1119,6 @@ ul.PanelInfo li.Active {
 #dashboard_user_index div.Info .Button {
    margin-right: 20px;
 }
-#Form_User a.SmallButton {
-	line-height: 3;
-	margin-right: 6px;
-}
 
 
 /* ================================================== Splash Information Page */
@@ -1436,14 +1444,10 @@ table.SelectionGrid div.Buttons {
 }
 table.SelectionGrid div.Buttons a {
    display: block;
-   padding: 2px 4px;
    margin: 4px 0;
 }
 table.Themes em {
 	padding-top: 13px;
-}
-table.Themes div.Buttons a {
-	margin: 0 0 8px;
 }
 table.SelectionGrid dl {
 	padding: 0 0 10px;
@@ -1465,18 +1469,6 @@ table.SelectionGrid td.Active {
    background:#e2f4ff none repeat scroll 0 0;
 }
 
-
-#dashboard_user_browse #Content form div.Info,
-#dashboard_user_index #Content form div.Info {
-	padding: 10px 10px 0;
-}
-#dashboard_user_browse #Content form input.Button,
-#dashboard_user_index #Content form input.Button {
-	margin: 0 20px 10px;
-}
-#Content form input.Button {
-	margin: 0 20px 20px;
-}
 /* A general rule to remove padding from info (form adds it) */
 #Content form ul div.Info {
 	padding: 0;
@@ -1486,10 +1478,6 @@ table.SelectionGrid td.Active {
 body#dashboard_settings_registration #Content form ul div.Info {
 	padding: 10px;
 	margin: 10px;
-}
-table tbody td.Info strong,
-a.SmallButton {
-	margin-right: 10px;
 }
 #dashboard_settings_registration #Content form ul {
 	padding: 0;
@@ -1668,27 +1656,21 @@ div.Summary table tbody td {
    color: #999;
 }
 
-.NumberedPager {
+.Pager {
    font-size:16px;
    font-weight:bold;
-   margin:1px 0 0;
+   padding: 8px 0;
    text-align:right;
+   line-height: 10px;
 }
 
-.NumberedPager a,
-.NumberedPager span {
+.Pager a,
+.Pager span {
 	padding: 0 4px;
 }
-.NumberedPager span,
-.NumberedPager a.Highlight {
+.Pager span,
+.Pager a.Highlight {
 	color: #777;
-}
-.NumberedPager a.Next,
-.NumberedPager span.Next,
-.NumberedPager a.Previous,
-.NumberedPager span.Previous {
-	font-size: 16px;
-	line-height: 10px;
 }
 .NumberedPager a.Next,
 .NumberedPager span.Next {
@@ -1697,6 +1679,17 @@ div.Summary table tbody td {
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
 	margin-right: 6px;
+}
+
+
+
+.NormalList {
+   list-style: disc;
+   list-style-position: inside;
+   margin: 10px 0;
+}
+.NormalList li {
+   margin: 4px 0;
 }
 
 /* Help Links */

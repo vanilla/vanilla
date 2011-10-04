@@ -30,7 +30,7 @@ foreach ($this->MessageData->Result() as $Message) {
             ArrayValue($Message->Location, $this->_GetLocationData(), 'Custom Page')
          );
       ?><div>
-         <strong><?php echo $Message->Enabled == '1' ? 'Enabled' : 'Disabled'; ?></strong>
+         <strong><?php echo $Message->Enabled == '1' ? T('Enabled') : T('Disabled'); ?></strong>
          <?php
          echo Anchor(T('Edit'), '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage SmallButton');
          echo Anchor(T('Delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage SmallButton');

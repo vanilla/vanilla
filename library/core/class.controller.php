@@ -1222,7 +1222,13 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       // Remove values that should not be transmitted via api
-      $Data = RemoveKeysFromNestedArray($Data, array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions'));
+      $Remove = array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions', 'Attributes');
+      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         $Remove[] = 'InsertIPAddress';
+         $Remove[] = 'UpdateIPAddress';
+         $Remove[] = 'LastIPAddress';
+      }
+      $Data = RemoveKeysFromNestedArray($Data, $Remove);
       
       // Make sure the database connection is closed before exiting.
       $this->Finalize();

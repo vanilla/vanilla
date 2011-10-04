@@ -271,7 +271,7 @@ class Gdn_Session {
       if (!C('Garden.Installed', FALSE)) return;
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
-      $this->UserID = $UserID ? $UserID : Gdn::Authenticator()->GetIdentity();
+      $this->UserID = $UserID !== FALSE ? $UserID : Gdn::Authenticator()->GetIdentity();
       $this->User = FALSE;
 
       // Now retrieve user information

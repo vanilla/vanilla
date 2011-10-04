@@ -214,18 +214,20 @@ class SettingsController extends DashboardController {
                   $this->SetData('Logo', $ImageBaseName);
                }
                
-               $ImgUpload = new Gdn_UploadImage();
-               $TmpFavicon = $ImgUpload->ValidateUpload('Favicon', FALSE);
-               if ($TmpFavicon) {
-                  $ICOName = 'favicon_'.substr(md5(microtime()), 16).'.ico';
-                  
-                  if ($Favicon)
-                     $Upload->Delete($Favicon);
-                  
-                  // Resize the to a png.
-                  $ImgUpload->SaveImageAs($TmpFavicon, $ICOName, 16, 16, array('OutputType' => 'ico', 'Crop' => TRUE));
-                  $SaveData['Garden.FavIcon'] = $ICOName;
-                  $this->SetData('Favicon', $ICOName);
+               if (GetValue('Favicon', $_FILES)) {
+                  $ImgUpload = new Gdn_UploadImage();
+                  $TmpFavicon = $ImgUpload->ValidateUpload('Favicon', FALSE);
+                  if ($TmpFavicon) {
+                     $ICOName = 'favicon_'.substr(md5(microtime()), 16).'.ico';
+
+                     if ($Favicon)
+                        $Upload->Delete($Favicon);
+
+                     // Resize the to a png.
+                     $ImgUpload->SaveImageAs($TmpFavicon, $ICOName, 16, 16, array('OutputType' => 'ico', 'Crop' => TRUE));
+                     $SaveData['Garden.FavIcon'] = $ICOName;
+                     $this->SetData('Favicon', $ICOName);
+                  }
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());

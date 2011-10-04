@@ -32,6 +32,11 @@ class Gdn_UploadImage extends Gdn_Upload {
       
       return TRUE;
    }
+   
+   public function Clear() {
+      parent::Clear();
+		$this->_AllowedFileExtensions = array('jpg','jpeg','gif','png','bmp');
+   }
 
    /**
     * Validates the uploaded image. Returns the temporary name of the uploaded file.

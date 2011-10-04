@@ -946,12 +946,6 @@ class DiscussionModel extends VanillaModel {
                $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             }
             
-            // Throw an event for users to add their own events.
-            $this->EventArguments['Discussion'] = $Fields;
-            $this->EventArguments['NotifiedUsers'] = $NotifiedUsers;
-            $this->EventArguments['ActivityModel'] = $ActivityModel;
-            $this->FireEvent('BeforeNotification');
-            
             // Get CategoryID of this discussion
             $Data = $this->SQL
                ->Select('CategoryID')

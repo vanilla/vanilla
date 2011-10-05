@@ -331,6 +331,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // table. The returned array of objects contains the following properties:
       // Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
       $ExistingColumns = $this->ExistingColumns();
+      $AlterSql = array();
 
       // 1. Remove any unnecessary columns if this is an explicit modification
       if ($Explicit) {
@@ -339,12 +340,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          // table that are NOT in $this->_Columns.
          $RemoveColumns = array_diff(array_keys($ExistingColumns), array_keys($this->_Columns));
          foreach ($RemoveColumns as $Column) {
-            $this->DropColumn($Column);
+            $AlterSql[] = "drop column `$Column`";
          }
       }
 
       // Prepare the alter query
-      $AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName.'` ';
+      $AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName."`\n";
       
       // 2. Alter the table storage engine.
       $Indexes = $this->_IndexSql($this->_Columns);
@@ -381,12 +382,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          if (!array_key_exists($ColumnName, $ExistingColumns)) {
 
             // This column name is not in the existing column collection, so add the column
-            $AddColumnSql = $AlterSqlPrefix.' add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns));
+            $AddColumnSql = 'add '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns));
             if($PrevColumnName !== FALSE)
                $AddColumnSql .= " after `$PrevColumnName`";
+            
+            $AlterSql[] = $AddColumnSql;
 
-            if (!$this->Query($AddColumnSql))
-               throw new Exception(sprintf(T('Failed to add the `%1$s` column to the `%1$s` table.'), $Column, $this->_DatabasePrefix.$this->_TableName));
+//            if (!$this->Query($AlterSqlPrefix.$AddColumnSql))
+//               throw new Exception(sprintf(T('Failed to add the `%1$s` column to the `%1$s` table.'), $Column, $this->_DatabasePrefix.$this->_TableName));
          } else {
 				$ExistingColumn = $ExistingColumns[$ColumnName];
 
@@ -395,11 +398,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $Comment = "/* Existing: $ExistingColumnDef, New: $ColumnDef */\n";
             
 				if ($ExistingColumnDef != $ColumnDef) {  //$Column->Type != $ExistingColumn->Type || $Column->AllowNull != $ExistingColumn->AllowNull || ($Column->Length != $ExistingColumn->Length && !in_array($Column->Type, array('tinyint', 'smallint', 'int', 'bigint', 'float', 'double')))) {
-               // The existing & new column types do not match, so modify the column
-					if (!$this->Query($Comment.$AlterSqlPrefix.' change `'.$ColumnName.'` '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns))))
-						throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'),
-                     $ColumnName,
-                     $this->_DatabasePrefix.$this->_TableName));
+               // The existing & new column types do not match, so modify the column.
+               $ChangeSql = $Comment.'change `'.$ColumnName.'` '.$this->_DefineColumn(GetValue($ColumnName, $this->_Columns));
+               $AlterSql[] = $ChangeSql;
+//					if (!$this->Query($AlterSqlPrefix.$ChangeSql))
+//						throw new Exception(sprintf(T('Failed to modify the data type of the `%1$s` column on the `%2$s` table.'),
+//                     $ColumnName,
+//                     $this->_DatabasePrefix.$this->_TableName));
 
                // Check for a modification from an enum to an int.
                if(strcasecmp($ExistingColumn->Type, 'enum') == 0 && in_array(strtolower($Column->Type), $this->Types('int'))) {
@@ -423,8 +428,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          $PrevColumnName = $ColumnName;
       }
       
-      // 4. Update Indexes
-
+      if (count($AlterSql) > 0) {
+         if (!$this->Query($AlterSqlPrefix.implode(",\n", $AlterSql))) {
+            throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
+         }
+      }
+      
+      // 4. Update Indexes.
       $IndexSql = array();
       // Go through the indexes to add or modify.
       foreach($Indexes as $Name => $Sql) {

@@ -1845,10 +1845,17 @@ if (!function_exists('ReflectArgs')) {
          $Args1 = array_merge($Args2, $Args1);
       $Args1 = array_change_key_case($Args1);
 
-      if (is_string($Callback))
+      if (is_string($Callback)) {
          $Meth = new ReflectionFunction($Callback);
-      else
+         $MethName = $Meth;
+      } else {
          $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
+         if (is_string($Callback[0])) {
+            $MethName = $Callback[0].'::'.$Meth->getName();
+         } else {
+            $MethName = get_class($Callback[0]).'->'.$Meth->getName();
+         }
+      }
       
       $MethArgs = $Meth->getParameters();
       
@@ -1861,15 +1868,17 @@ if (!function_exists('ReflectArgs')) {
          $ParamNameL = strtolower($ParamName);
 
          if (isset($Args1[$ParamNameL]))
-            $Args[$ParamName] = $Args1[$ParamNameL];
+            $ParamValue =& $Args1[$ParamNameL];
          elseif (isset($Args1[$Index]))
-            $Args[$ParamName] = $Args1[$Index];
+            $ParamValue =& $Args1[$Index];
          elseif ($MethParam->isDefaultValueAvailable())
-            $Args[$ParamName] = $MethParam->getDefaultValue();
+            $ParamValue =& $MethParam->getDefaultValue();
          else {
-            $Args[$ParamName] = NULL;
-            $MissingArgs[] = "{$Index}: {$ParamName}";
+            $ParamValue = NULL;
+            $MissingArgs[] = '$'.$ParamName;
          }
+         
+         $Args[$ParamName] = $ParamValue;
       }
       
       // Add optional parameters so that methods that use get_func_args() will still work.
@@ -1878,7 +1887,7 @@ if (!function_exists('ReflectArgs')) {
       }
       
       if (count($MissingArgs) > 0) {
-         throw new Exception("Missing arguments: ".implode(', ', $MissingArgs));
+         throw new Exception("$MethName() expects the following parameters: ".implode(', ', $MissingArgs).'.');
       }
 
       return $Args;

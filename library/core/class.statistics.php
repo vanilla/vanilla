@@ -341,7 +341,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       ));
    }
    
-   public function SettingsController_AnalyticsTick_Create(&$Sender) {
+   public function SettingsController_AnalyticsTick_Create($Sender) {
       Gdn::Statistics()->Tick();
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);

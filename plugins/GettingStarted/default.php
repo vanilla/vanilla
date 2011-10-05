@@ -22,7 +22,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
 */    
     
    // Adds a "My Forums" menu option to the dashboard area
-   public function SettingsController_Render_Before(&$Sender) {
+   public function SettingsController_Render_Before($Sender) {
       // Have they visited their dashboard?
       if (strtolower($Sender->RequestMethod) != 'index')
          $this->SaveStep('Plugins.GettingStarted.Dashboard');
@@ -109,18 +109,18 @@ class GettingStartedPlugin extends Gdn_Plugin {
    }
    
    // If the user posts back any forms to their profile, they've completed step 4: profile customization
-   public function ProfileController_Render_Before(&$Sender) {
+   public function ProfileController_Render_Before($Sender) {
       if (property_exists($Sender, 'Form') && $Sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStarted.Profile');
    }
 
    // If the user starts a discussion, they've completed step 5: profile customization
-   public function PostController_Render_Before(&$Sender) {
+   public function PostController_Render_Before($Sender) {
       if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStarted.Discussion');
    }
    
-   public function PluginController_DismissGettingStarted_Create(&$Sender) {
+   public function PluginController_DismissGettingStarted_Create($Sender) {
       Gdn::PluginManager()->DisablePlugin('GettingStarted');
       echo 'TRUE';
    }

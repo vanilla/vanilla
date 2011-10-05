@@ -17,7 +17,7 @@ class DashboardHooks implements Gdn_IPlugin {
     *
     * @param Gdn_Controller $Sender
     */
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
       $Session = Gdn::Session();
 
       // Enable theme previewing
@@ -96,7 +96,7 @@ class DashboardHooks implements Gdn_IPlugin {
 			$Sender->AddJsFile('js/embed_local.js');
    }
    
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
       $Menu->AddLink('Dashboard', FALSE, '/dashboard/settings', 'Garden.Settings.Manage');

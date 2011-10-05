@@ -39,7 +39,7 @@ class VanillaHooks implements Gdn_IPlugin {
     * 
     * @param object $Sender UserModel.
     */
-   public function UserModel_SessionQuery_Handler(&$Sender) {
+   public function UserModel_SessionQuery_Handler($Sender) {
       //$Sender->SQL->Select('u.CountDiscussions, u.CountUnreadDiscussions, u.CountDrafts, u.CountBookmarks');
    }
    
@@ -162,7 +162,7 @@ class VanillaHooks implements Gdn_IPlugin {
     * 
     * @param object $Sender DashboardController.
     */ 
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
       $Session = Gdn::Session();
       if ($Sender->Menu)
          $Sender->Menu->AddLink('Discussions', T('Discussions'), '/discussions', FALSE, array('Standard' => TRUE));
@@ -176,7 +176,7 @@ class VanillaHooks implements Gdn_IPlugin {
     * 
     * @param object $Sender ProfileController.
     */ 
-   public function ProfileController_AddProfileTabs_Handler(&$Sender) {
+   public function ProfileController_AddProfileTabs_Handler($Sender) {
       if (is_object($Sender->User) && $Sender->User->UserID > 0) {
          $UserID = $Sender->User->UserID;
          // Add the discussion tab
@@ -236,7 +236,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param object $Sender SettingsController.
 	 */
-   public function SettingsController_DashboardData_Handler(&$Sender) {
+   public function SettingsController_DashboardData_Handler($Sender) {
       $DiscussionModel = new DiscussionModel();
       // Number of Discussions
       $CountDiscussions = $DiscussionModel->GetCount();
@@ -266,7 +266,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param object $Sender ProfileController.
 	 */
-   public function ProfileController_Comments_Create(&$Sender) {
+   public function ProfileController_Comments_Create($Sender) {
 		$View = $Sender->View;
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
 		$Username = ArrayValue(1, $Sender->RequestArgs, '');
@@ -325,7 +325,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param object $Sender ProfileController.
 	 */
-   public function ProfileController_Discussions_Create(&$Sender) {
+   public function ProfileController_Discussions_Create($Sender) {
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
 		$Username = ArrayValue(1, $Sender->RequestArgs, '');
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
@@ -382,7 +382,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param object $Sender SettingsController.
 	 */
-   public function SettingsController_DefineAdminPermissions_Handler(&$Sender) {
+   public function SettingsController_DefineAdminPermissions_Handler($Sender) {
       if (isset($Sender->RequiredAdminPermissions)) {
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Settings.Manage';
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Categories.Manage';
@@ -416,7 +416,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param object $Sender DashboardController.
 	 */
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
       $Menu->AddLink('Forum', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Vanilla.Spam.Manage');

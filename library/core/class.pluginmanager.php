@@ -667,7 +667,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @param string The name of the method that is being overridden.
     * @return mixed Return value of overridden method.
     */
-   public function CallMethodOverride(&$Sender, $ClassName, $MethodName) {
+   public function CallMethodOverride($Sender, $ClassName, $MethodName) {
       $EventKey = strtolower($ClassName.'_'.$MethodName.'_Override');
       $OverrideKey = ArrayValue($EventKey, $this->_MethodOverrideCollection, '');
       $OverrideKeyParts = explode('.', $OverrideKey);
@@ -702,7 +702,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @param string The name of the method that is being created.
     * @return mixed Return value of new method.
     */
-   public function CallNewMethod(&$Sender, $ClassName, $MethodName) {
+   public function CallNewMethod($Sender, $ClassName, $MethodName) {
       $Return = FALSE;
       $EventKey = strtolower($ClassName.'_'.$MethodName.'_Create');
       $NewMethodKey = ArrayValue($EventKey, $this->_NewMethodCollection, '');

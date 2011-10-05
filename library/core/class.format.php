@@ -323,7 +323,11 @@ class Gdn_Format {
       }
 
       if (isset($Suffix)) {
-         $Result = number_format($Number2, 1).$Suffix;
+         $Result = number_format($Number2, 1);
+			if (substr($Result, -2) == '.0')
+				$Result = substr($Result, 0, -2);
+			
+			$Result .= $Suffix;
          if ($Format == 'html') {
             $Result = Wrap($Result, 'span', array('title' => number_format($Number)));
          }

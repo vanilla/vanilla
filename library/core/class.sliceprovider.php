@@ -22,7 +22,7 @@ class Gdn_SliceProvider {
    protected $SliceHandler;
    protected $SliceConfig;
 
-   public function EnableSlicing(&$Sender) {
+   public function EnableSlicing($Sender) {
       $this->SliceHandler = $Sender;
       $this->SliceConfig = array(
          'css'       => array(),

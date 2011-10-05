@@ -698,6 +698,14 @@ class EntryController extends Gdn_Controller {
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
                if ($PasswordHash->CheckPassword($this->Form->GetFormValue('Password'), GetValue('Password', $User), GetValue('HashMethod', $User))) {
+                  
+                  // Update weak passwords
+                  $HashMethod = GetValue('HashMethod', $User);
+                  if ($PasswordHash->Weak || ($HashMethod && strcasecmp($HashMethod, 'Vanilla') != 0)) {
+                     $Pw = $PasswordHash->HashPassword($Password);
+                     Gdn::UserModel()->SetField(GetValue('UserID', $User), array('Password' => $Pw, 'HashMethod' => 'Vanilla'));
+                  }
+                  
                   Gdn::Session()->Start(GetValue('UserID', $User), TRUE, (bool)$this->Form->GetFormValue('RememberMe'));
                   if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
                      $this->Form->AddError('ErrorPermission');

@@ -1553,21 +1553,20 @@ class UserModel extends Gdn_Model {
 		if(GetValue('Deleted', $UserData))
 			return FALSE;
 		
-		
       $PasswordHash = new Gdn_PasswordHash();
 		$HashMethod = GetValue('HashMethod', $UserData);
       if(!$PasswordHash->CheckPassword($Password, $UserData->Password, $HashMethod, $UserData->Name))
          return FALSE;
-
+      
       if ($PasswordHash->Weak || ($HashMethod && strcasecmp($HashMethod, 'Vanilla') != 0)) {
-         $PasswordHash = new Gdn_PasswordHash();
+         $Pw = $PasswordHash->HashPassword($Password);
          $this->SQL->Update('User')
-            ->Set('Password', $PasswordHash->HashPassword($Password))
+            ->Set('Password', $Pw)
 				->Set('HashMethod', 'Vanilla')
             ->Where('UserID', $UserData->UserID)
             ->Put();
       }
-
+      
       $UserData->Attributes = Gdn_Format::Unserialize($UserData->Attributes);
       return $UserData;
    }

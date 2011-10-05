@@ -41,18 +41,20 @@ class Gdn_UploadImage extends Gdn_Upload {
    /**
     * Validates the uploaded image. Returns the temporary name of the uploaded file.
     */
-   public function ValidateUpload($InputName) {
+   public function ValidateUpload($InputName, $ThrowError = TRUE) {
    
       if (!function_exists('gd_info'))
          throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
    
       // Make sure that all standard file upload checks are performed.
-      $TmpFileName = parent::ValidateUpload($InputName);
+      $TmpFileName = parent::ValidateUpload($InputName, $ThrowError);
       
-      // Now perform image-specific checks
-      $Size = getimagesize($TmpFileName);
-      if ($Size === FALSE)
-         throw new Exception(T('The uploaded file was not an image.'));
+      // Now perform image-specific checks.
+      if ($TmpFileName) {
+         $Size = getimagesize($TmpFileName);
+         if ($Size === FALSE)
+            throw new Exception(T('The uploaded file was not an image.'));
+      }
       
       return $TmpFileName;
    }

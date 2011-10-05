@@ -671,7 +671,6 @@ class EntryController extends Gdn_Controller {
       // Additional signin methods are set up with plugins.
       $Methods = array();
 
-      $this->SetData('MainFormArgs', array($Arg1));
       $this->SetData('Methods', $Methods);
       $this->SetData('FormUrl', Url('entry/signin'));
       
@@ -1498,16 +1497,18 @@ class EntryController extends Gdn_Controller {
          $TargetHostname = parse_url($Target, PHP_URL_HOST);
          
          // Only allow external redirects to trusted domains.
-         $TrustedDomains = C('Garden.TrustedDomains');
-			if (!is_array($TrustedDomains))
-				$TrustedDomains = array();
+         $TrustedDomains = C('Garden.TrustedDomains', TRUE);
+         
+         if (is_array($TrustedDomains)) {
+            // Add this domain to the trusted hosts.
+            $TrustedDomains[] = $MyHostname;
+            $Sender->EventArguments['TrustedDomains'] = &$TrustedDomains;
+            $this->FireEvent('BeforeTargetReturn');
+         }
 			
-			// Add this domain to the trusted hosts
-			$TrustedDomains[] = $MyHostname;
-         $Sender->EventArguments['TrustedDomains'] = &$TrustedDomains;
-         $this->FireEvent('BeforeTargetReturn');
-			
-			if (count($TrustedDomains) == 0) {
+         if ($TrustedDomains === TRUE) {
+            return $Target;
+			} elseif (count($TrustedDomains) == 0) {
 				// Only allow http redirects if they are to the same host name.
 				if ($MyHostname != $TargetHostname)
 					$Target = '';

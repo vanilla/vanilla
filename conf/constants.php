@@ -25,6 +25,10 @@ define('DELIVERY_TYPE_DATA', 'DATA'); // Just deliver the data.
 define('DELIVERY_METHOD_XHTML', 'XHTML');
 define('DELIVERY_METHOD_JSON', 'JSON');
 define('DELIVERY_METHOD_XML', 'XML');
+/**
+ * @since 2.1
+ */
+define('DELIVERY_METHOD_TEXT', 'TXT');
 
 // Handler enumerators:
 define('HANDLER_TYPE_NORMAL', 'NORMAL'); // Standard call to a method on the object.

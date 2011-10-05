@@ -1801,6 +1801,11 @@ if (!function_exists('ReflectArgs')) {
          }
       }
 
+      // Add optional parameters so that methods that use get_func_args() will still work.
+      for ($Index = count($Args); array_key_exists($Index, $Args1); $Index++) {
+         $Args[$Index] = $Args1[$Index];
+      }
+      
       return $Args;
    }
 }

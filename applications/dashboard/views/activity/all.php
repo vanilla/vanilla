@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Tabs ActivityTabs">
    <ul>
-      <li class="Active"><?php echo Anchor(T('Recent Activity'), 'activity'); ?></li>
+      <li class="Active"><?php echo Anchor(T('Recent Activity'), 'activity', 'TabLink'); ?></li>
    </ul>
 </div>
 <?php

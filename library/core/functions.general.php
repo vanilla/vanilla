@@ -619,7 +619,7 @@ if (!function_exists('Debug')) {
 }
 
 if (!function_exists('DebugMethod')) {
-   function DebugMethod($MethodName, $MethodArgs) {
+   function DebugMethod($MethodName, $MethodArgs = array()) {
       echo $MethodName."(";
       $SA = array();
       foreach ($MethodArgs as $FuncArg) {

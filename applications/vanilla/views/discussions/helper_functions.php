@@ -84,7 +84,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 <?php
 }
 
-function WriteFilterTabs(&$Sender) {
+function WriteFilterTabs($Sender) {
    $Session = Gdn::Session();
    $Title = property_exists($Sender, 'Category') ? GetValue('Name', $Sender->Category, '') : '';
    if ($Title == '')

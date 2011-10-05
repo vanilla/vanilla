@@ -65,7 +65,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @access public
     */
-   public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
+   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       // Add a "send X a message" link to the side menu on the profile page
       $Session = Gdn::Session();
       if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID) {
@@ -87,7 +87,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @access public
     */
-   public function ProfileController_AfterPreferencesDefined_Handler(&$Sender) {
+   public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
       $Sender->Preferences['Notifications']['Email.ConversationMessage'] = T('Notify me of private messages.');
       $Sender->Preferences['Notifications']['Email.AddedToConversation'] = T('Notify me when I am added to private conversations.');
       $Sender->Preferences['Notifications']['Popup.ConversationMessage'] = T('Notify me of private messages.');
@@ -100,7 +100,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @access public
     */
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
       // Add the menu options for conversations
       $Session = Gdn::Session();
       if ($Sender->Menu && $Session->IsValid()) {
@@ -119,7 +119,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @since 2.0.?
     * @access public
     */
-   public function SettingsController_DashboardData_Handler(&$Sender) {
+   public function SettingsController_DashboardData_Handler($Sender) {
       $ConversationModel = new ConversationModel();
       // Number of Conversations
       $CountConversations = $ConversationModel->GetCountWhere();

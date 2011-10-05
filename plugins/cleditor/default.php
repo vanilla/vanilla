@@ -68,11 +68,11 @@ $PluginInfo['cleditor'] = array(
 
 class cleditorPlugin extends Gdn_Plugin {
 
-	public function PostController_Render_Before(&$Sender) {
+	public function PostController_Render_Before($Sender) {
 		$this->_AddCLEditor($Sender);
 	}
 	
-	public function DiscussionController_Render_Before(&$Sender) {
+	public function DiscussionController_Render_Before($Sender) {
 		$this->_AddCLEditor($Sender);
 	}
 	

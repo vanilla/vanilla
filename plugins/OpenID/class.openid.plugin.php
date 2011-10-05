@@ -80,7 +80,7 @@ class OpenIDPlugin extends Gdn_Plugin {
    /**
     * Act as a mini dispatcher for API requests to the plugin app
     */
-   public function PluginController_OpenID_Create(&$Sender) {
+   public function PluginController_OpenID_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }

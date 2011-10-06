@@ -718,28 +718,23 @@ jQuery(document).ready(function($) {
 	
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
 	pingForNotifications = function(wait) {
-		if (!wait)
-			wait = 60000;
-			
-		setTimeout(function() {
-			$.ajax({
-				type: "POST",
-				url: gdn.url('dashboard/notifications/inform'),
-				data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON'},
-				dataType: 'json',
-				error: function(XMLHttpRequest, textStatus, errorThrown) {
-					gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
-				},
-				success: function(json) {
-					gdn.inform(json);
-					pingForNotifications();
-				}
-			});
-	
-		}, wait); // Ping once a minute.
+      console.log((new Date()).toUTCString());
+      $.ajax({
+         type: "POST",
+         url: gdn.url('dashboard/notifications/inform'),
+         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON'},
+         dataType: 'json',
+         error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log(XMLHttpRequest.responseText);
+         },
+         success: function(json) {
+            gdn.inform(json);
+         }
+      });
 	}
-   if (gdn.definition('SignedIn', '0') != '0')
-      pingForNotifications(false);
+   if (gdn.definition('SignedIn', '0') != '0') {
+      setInterval(pingForNotifications, 60000);
+   }
 	
 	// Stash something in the user's session (or unstash the value if it was not provided)
 	stash = function(name, value) {

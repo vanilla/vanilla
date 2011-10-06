@@ -52,7 +52,10 @@ class LogModel extends Gdn_Pluggable {
             break;
          case 'Registration':
          case 'User':
-            $Result = $this->FormatRecord(array('Email', 'Name', 'DiscoveryText'), $Data);
+            $Result = $this->FormatRecord(array('Email', 'Name'), $Data);
+            if ($DiscoveryText = GetValue('DiscoveryText', $Data)) {
+               $Result .= '<br /><b>'.T('Why do you want to join?').'</b><br />'.Gdn_Format::Display($DiscoveryText);
+            }
             break;
          default:
             $Result = '';
@@ -257,12 +260,17 @@ class LogModel extends Gdn_Pluggable {
          $LogRow2 = Gdn::SQL()->GetWhere('Log', $Where)->FirstRow(DATASET_TYPE_ARRAY);
          if ($LogRow2) {
             $LogID = $LogRow2['LogID'];
+            $Set = array();
+            
+            $Data = array_merge(unserialize($LogRow2['Data']), $Data);
 
             $OtherUserIDs = explode(',',$LogRow2['OtherUserIDs']);
             if (!is_array($OtherUserIDs))
                $OtherUserIDs = array();
             
-            if ($InsertUserID != $LogRow2['InsertUserID'] && !in_array($InsertUserID, $OtherUserIDs)) {
+            if (!$LogRow2['InsertUserID']) {
+               $Set['InsertUserID'] = $InsertUserID;
+            } elseif ($InsertUserID != $LogRow2['InsertUserID'] && !in_array($InsertUserID, $OtherUserIDs)) {
                $OtherUserIDs[] = $InsertUserID;
             }
             
@@ -275,10 +283,14 @@ class LogModel extends Gdn_Pluggable {
             } else {
                $Count = (int)$LogRow2['CountGroup'] + 1;
             }
+            $Set['OtherUserIDs'] = implode(',', $OtherUserIDs);
+            $Set['CountGroup'] = $Count;
+            $Set['Data'] = serialize($Data);
+            $Set['DateUpdated'] = Gdn_Format::ToDateTime();
             
             Gdn::SQL()->Put(
                'Log',
-               array('OtherUserIDs' => implode(',', $OtherUserIDs), 'CountGroup' => $Count, 'DateUpdated' => Gdn_Format::ToDateTime()),
+               $Set,
                array('LogID' => $LogID));
          } else {
             $LogID = Gdn::SQL()->Insert('Log', $LogRow);
@@ -421,14 +433,21 @@ class LogModel extends Gdn_Pluggable {
             }
 
             // Insert the record back into the db.
-            $ID = Gdn::SQL()
-               ->Options('Ignore', TRUE)
-               ->Insert($TableName, $Set);
-            if (!$ID && isset($Log['RecordID']))
-               $ID = $Log['RecordID'];
 
             if ($Log['Operation'] == 'Spam' && $Log['RecordType'] = 'Registration') {
-               Gdn::UserModel()->SaveRoles($ID, Gdn::UserModel()->NewUserRoleIDs());
+               SaveToConfig(array('Garden.Registration.NameUnique' => FALSE, 'Garden.Registration.EmailUnique' => FALSE), FALSE);
+               $ID = Gdn::UserModel()->InsertForBasic($Set, FALSE, array('ValidateSpam' => FALSE));
+               if (!$ID) {
+                  throw new Exception(Gdn::UserModel()->Validation->ResultsText());
+               } else {
+                  Gdn::UserModel()->SendWelcomeEmail($ID, '', 'Register');
+               }
+            } else {
+               $ID = Gdn::SQL()
+                  ->Options('Ignore', TRUE)
+                  ->Insert($TableName, $Set);
+               if (!$ID && isset($Log['RecordID']))
+                  $ID = $Log['RecordID'];
             }
 
             break;

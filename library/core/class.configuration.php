@@ -157,10 +157,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $WrapPHP = GetValue('WrapPHP', $Options, TRUE);
       $ByLine = GetValue('ByLine', $Options, FALSE);
       
+      $FirstLine = '';
       $Lines = array();
       if ($WrapPHP)
-         $Lines[] = "<?php".PHP_EOL;
-      $Lines[] = "if (!defined('APPLICATION')) exit();".PHP_EOL;
+         $FirstLine .= "<?php ";
+      $FirstLine .= "if (!defined('APPLICATION')) exit();";
+      $Lines[] = $FirstLine;
       
       if (!is_array($Data))
          return $Lines[0];
@@ -216,6 +218,20 @@ class Gdn_Configuration extends Gdn_Pluggable {
          $Result = $Value;
          
       return $Result;
+   }
+   
+   /**
+    * Get a reference to the internal ConfigurationSource for a given type and ID
+    * 
+    * @param string $Type 'file' or 'string'
+    * @param string $Identifier filename or string tag
+    * @return ConfigurationSource
+    */
+   public function GetSource($Type, $Identifier) {
+      $SourceTag = "{$Type}:{$Identifier}";
+      if (!array_key_exists($SourceTag, $this->Sources)) return FALSE;
+      
+      return $this->Sources[$SourceTag];
    }
 
    /**
@@ -394,6 +410,16 @@ class Gdn_Configuration extends Gdn_Pluggable {
       }
    }
 
+   /**
+    * Load and parse a file based config
+    * 
+    * DO NOT USE, THIS IS RUBBISH
+    * 
+    * @deprecated
+    * @param type $Path
+    * @param type $Options
+    * @return array 
+    */
    public static function LoadFile($Path, $Options = array()) {
       if (is_string($Options))
          $Options = array('VariableName' => $Options);
@@ -421,7 +447,16 @@ class Gdn_Configuration extends Gdn_Pluggable {
       }
    }
 
-   public function OverlayDynamic($Name = 'Configuration') {
+   /**
+    * Re-apply the settings from the current dynamic config source
+    * 
+    * It may be necessary to load some default configs after loading the client
+    * config. These defaults may be overridden in the client's initial config,
+    * so that will need to be re-applied once the correct defaults are included.
+    * 
+    * This method does that
+    */
+   public function OverlayDynamic() {
       if ($this->Dynamic instanceof Gdn_ConfigurationSource)
          self::MergeConfig($this->Data, $this->Dynamic->Export());
    }

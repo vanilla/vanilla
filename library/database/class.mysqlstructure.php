@@ -147,8 +147,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $PrimaryKey = array();
       $UniqueKey = array();
       $FullTextKey = array();
+      $AllowFullText = TRUE;
       $Keys = '';
       $Sql = '';
+      
+      $ForceDatabaseEngine = C('Database.ForceStorageEngine');
+      if ($ForceDatabaseEngine && !$this->_TableStorageEngine) {
+         $this->_TableStorageEngine = $ForceDatabaseEngine;
+         $AllowFullText = $this->_SupportsFulltext();
+      }
 
       foreach ($this->_Columns as $ColumnName => $Column) {
          if ($Sql != '')
@@ -167,7 +174,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                $Keys .= ",\nindex `".Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
             elseif ($ColumnKeyType == 'unique')
                $UniqueKey[] = $ColumnName;
-            elseif ($ColumnKeyType == 'fulltext')
+            elseif ($ColumnKeyType == 'fulltext' && $AllowFullText)
                $FullTextKey[] = $ColumnName;
          }
       }
@@ -348,6 +355,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $AlterSqlPrefix = 'alter table `'.$this->_DatabasePrefix.$this->_TableName."`\n";
       
       // 2. Alter the table storage engine.
+      $ForceDatabaseEngine = C('Database.ForceStorageEngine');
+      if ($ForceDatabaseEngine && !$this->_TableStorageEngine) {
+         $this->_TableStorageEngine = $ForceDatabaseEngine;
+      }
       $Indexes = $this->_IndexSql($this->_Columns);
       $IndexesDb = $this->_IndexSqlDb();
 
@@ -526,6 +537,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    }
 
    protected function _SupportsFulltext() {
-      return strcasecmp($this->_TableStorageEngine, 'InnoDB') != 0;
+      return strcasecmp($this->_TableStorageEngine, 'myisam') == 0;
    }
 }

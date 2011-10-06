@@ -88,6 +88,12 @@ class SearchModel extends Gdn_Model {
       } else {
          $this->_SearchMode = $SearchMode;
       }
+      
+      if ($ForceDatabaseEngine = C('Database.ForceStorageEngine')) {
+         if (strcasecmp($ForceDatabaseEngine, 'myisam') != 0)
+            $SearchMode = 'like';
+      }
+      
       $this->_SearchMode = $SearchMode;
 
       $this->FireEvent('Search');

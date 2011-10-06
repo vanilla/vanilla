@@ -88,6 +88,12 @@ class SearchModel extends Gdn_Model {
       } else {
          $this->_SearchMode = $SearchMode;
       }
+      
+      if ($ForceDatabaseEngine = C('Database.ForceStorageEngine')) {
+         if (strcasecmp($ForceDatabaseEngine, 'myisam') != 0)
+            $SearchMode = 'like';
+      }
+      
       $this->_SearchMode = $SearchMode;
 
       $this->FireEvent('Search');
@@ -115,9 +121,10 @@ class SearchModel extends Gdn_Model {
 			$this->_Parameters[$Key] = $Search;
 		}
 		
-		$Result = $this->Database->Query($Sql, $this->_Parameters)->ResultArray();
-		$this->Reset();
-		$this->SQL->Reset();
+      $Parameters= $this->_Parameters;
+      $this->Reset();
+      $this->SQL->Reset();
+		$Result = $this->Database->Query($Sql, $Parameters)->ResultArray();
       
 		foreach ($Result as $Key => $Value) {
 			if (isset($Value['Summary'])) {

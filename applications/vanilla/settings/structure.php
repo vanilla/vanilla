@@ -103,7 +103,6 @@ $Construct
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
    ->Column('RegardingID', 'int(11)', TRUE, 'index')
-   ->Engine('MyISAM')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('UserCategory')
@@ -141,7 +140,6 @@ $Construct->Table('Comment')
 	->Column('Flag', 'tinyint', 0)
 	->Column('Score', 'float', NULL)
 	->Column('Attributes', 'text', TRUE)
-	->Engine('MyISAM')
 	->Set($Explicit, $Drop);
 
 // Allows the tracking of already-read comments & votes on a per-user basis.

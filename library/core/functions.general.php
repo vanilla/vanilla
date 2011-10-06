@@ -2205,7 +2205,7 @@ if (!function_exists('StringBeginsWith')) {
     */
    function StringBeginsWith($Haystack, $Needle, $CaseInsensitive = FALSE, $Trim = FALSE) {
       if (strlen($Haystack) < strlen($Needle))
-         return FALSE;
+         return $Trim ? $Haystack : FALSE;
       elseif (strlen($Needle) == 0) {
          if ($Trim)
             return $Haystack;
@@ -2229,9 +2229,9 @@ if (!function_exists('StringEndsWith')) {
     * @return bool|string Returns true/false unless $Trim is true.
     */
    function StringEndsWith($Haystack, $Needle, $CaseInsensitive = FALSE, $Trim = FALSE) {
-      if (strlen($Haystack) < strlen($Needle))
-         return FALSE;
-      elseif (strlen($Needle) == 0) {
+      if (strlen($Haystack) < strlen($Needle)) {
+         return $Trim ? $Haystack : FALSE;
+      } elseif (strlen($Needle) == 0) {
          if ($Trim)
             return $Haystack;
          return TRUE;

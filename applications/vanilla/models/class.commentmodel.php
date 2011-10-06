@@ -909,6 +909,8 @@ class CommentModel extends VanillaModel {
       // Get the discussion.
       $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->FirstRow(DATASET_TYPE_ARRAY);
 
+      $this->FireEvent('BeforeUpdateCommentCountQuery');
+      
       $Data = $this->SQL
          ->Select('c.CommentID', 'max', 'LastCommentID')
          ->Select('c.DateInserted', 'max', 'DateLastComment')

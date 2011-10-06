@@ -1021,6 +1021,12 @@ class CommentModel extends VanillaModel {
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
          
       if ($Data) {
+      	 // Allow event to bypass updating the comment count
+      	 $this->EventArguments['UpdateCount'] = TRUE;
+	 $this->EventArguments['DiscussionID'] = $Data['DiscussionID'];
+	 $this->FireEvent('BeforeDeleteComment');
+	 if ($this->EventArguments['UpdateCount'])
+	 {
 			// If this is the last comment, get the one before and update the LastCommentID field
 			if ($Data['LastCommentID'] == $CommentID) {
 				$OldData = $this->SQL
@@ -1061,8 +1067,9 @@ class CommentModel extends VanillaModel {
 				->Set('CountComments', 'CountComments - 1', FALSE)
 				->Where('DiscussionID', $Data['DiscussionID'])
 				->Put();
-			
-			$this->FireEvent('DeleteComment');
+	 }		
+	
+	 $this->FireEvent('DeleteComment');
 
          // Log the deletion.
          unset($Data['LastCommentID'], $Data['DiscussionDateInserted']);

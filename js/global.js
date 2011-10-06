@@ -717,8 +717,7 @@ jQuery(document).ready(function($) {
 	}
 	
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
-	pingForNotifications = function(wait) {
-      console.log((new Date()).toUTCString());
+	pingForNotifications = function() {
       $.ajax({
          type: "POST",
          url: gdn.url('dashboard/notifications/inform'),

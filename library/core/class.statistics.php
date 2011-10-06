@@ -21,6 +21,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
 class Gdn_Statistics extends Gdn_Plugin {
+   public static $Increments = array('d' => 'days', 'w' => 'weeks', 'm' => 'months', 'y' => 'years');
    
    public function __construct() {
       parent::__construct();
@@ -623,8 +624,20 @@ class Gdn_Statistics extends Gdn_Plugin {
       return $Result;
    }
    
+   public static function TimeSlotAdd($SlotType, $Number, $Timestamp = FALSE) {
+      $Timestamp = self::TimeSlotStamp($SlotType, $Timestamp);
+      $Result = strtotime(sprintf('%+d %s', $Number, self::$Increments[$SlotType]), $Timestamp);
+      return $Result;
+   }
+   
+   public static function TimeSlotBounds($SlotType = 'd', $Timestamp = FALSE) {
+      $From = self::TimeSlotStamp($SlotType, $Timestamp);
+      $To = strtotime('+1 '.self::$Increments[$SlotType], $From);
+      return array($From, $To);
+   }
+   
    public static function TimeSlotStamp($SlotType = 'd', $Timestamp = FALSE) {
-      $Result = self::TimeFromTimeSlot(self::TimeSlot('d', $Timestamp));
+      $Result = self::TimeFromTimeSlot(self::TimeSlot($SlotType, $Timestamp));
       return $Result;
    }
    
@@ -633,7 +646,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       $Month = substr($TimeSlot,4,2);
       $Day = (int)substr($TimeSlot,6,2);
       if ($Day == 0) $Day = 1;
-      $DateRaw = mktime(0, 0, 1, $Month, $Day, $Year);
+      $DateRaw = mktime(0, 0, 0, $Month, $Day, $Year);
       
       if ($DateRaw === FALSE)
          throw new Exception("Invalid timeslot '{$TimeSlot}', unable to convert to epoch");

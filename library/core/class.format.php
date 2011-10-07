@@ -310,27 +310,37 @@ class Gdn_Format {
    public static function BigNumber($Number, $Format = '') {
       if (!is_numeric($Number))
          return $Number;
+		
+		$Negative = FALSE;
+		$WorkingNumber = $Number;
+		if ($Number < 0) {
+			$Negative = TRUE;
+			$WorkingNumber = $Number - ($Number * 2);
+		}
 
-      if ($Number >= 1000000000) {
-         $Number2 = $Number / 1000000000;
+      if ($WorkingNumber >= 1000000000) {
+         $Number2 = $WorkingNumber / 1000000000;
          $Suffix = "B";
-      } elseif ($Number >= 1000000) {
-         $Number2 = $Number / 1000000;
+      } elseif ($WorkingNumber >= 1000000) {
+         $Number2 = $WorkingNumber / 1000000;
          $Suffix = "M";
-      } elseif ($Number >= 1000) {
-         $Number2 = $Number / 1000;
+      } elseif ($WorkingNumber >= 1000) {
+         $Number2 = $WorkingNumber / 1000;
          $Suffix = "K";
       }
+		
+		if ($Negative)
+			$Number2 = $Number2 - ($Number2 * 2);
 
       if (isset($Suffix)) {
          $Result = number_format($Number2, 1);
 			if (substr($Result, -2) == '.0')
 				$Result = substr($Result, 0, -2);
-			
+				
 			$Result .= $Suffix;
-         if ($Format == 'html') {
+         if ($Format == 'html')
             $Result = Wrap($Result, 'span', array('title' => number_format($Number)));
-         }
+
          return $Result;
       } else {
          return $Number;

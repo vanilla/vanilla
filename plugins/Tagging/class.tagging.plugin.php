@@ -12,13 +12,19 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
-   'Version' => '1.1',
+   'Version' => '1.2',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
 );
+
+/*
+v1.2 (2011-11-02 Matt Lincoln Russell lincoln@vanillaforums.com)
+- Added inline tags after first comment in discussion view.
+
+*/
 
 class TaggingPlugin extends Gdn_Plugin {
    
@@ -40,6 +46,23 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Render_Before($Sender) {
       $this->_AddTagModule($Sender);
+   }
+   
+   /**
+    * Show tags after first comment.
+    */
+   public function DiscussionController_AfterCommentBody_Handler($Sender) {
+      // Allow disabling of inline tags.
+      if (C('Plugins.Tagging.DisableInline', FALSE))
+         return;
+      
+      if (!property_exists($Sender->EventArguments['Object'], 'CommentID')) {
+         $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
+         include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
+         $TagModule = new TagModule($Sender);
+         $TagModule->GetData($DiscussionID);
+         echo $TagModule->InlineDisplay();
+      }
    }
 
    /**

@@ -236,6 +236,15 @@ class Gdn_Statistics extends Gdn_Plugin {
       if ($SuccessTimeSlot !== FALSE)
          self::LastSentDate($SuccessTimeSlot);
    }
+   
+   public static function FirstDate() {
+      $FirstDate = Gdn::SQL()
+         ->Select('DateInserted', 'min')
+         ->From('User')
+         ->Where('DateInserted >', '0000-00-00')
+         ->Get()->Value('DateInserted');
+      return $FirstDate;
+   }
 
    public static function LastSentDate($SetLastSentDate = NULL) {
       static $LastSentDate = NULL;

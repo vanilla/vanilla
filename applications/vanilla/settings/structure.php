@@ -69,7 +69,7 @@ if ($CategoryExists) {
 
 // Construct the discussion table.
 $Construct->Table('Discussion');
-
+$DiscussionExists = $Construct->TableExists();
 $FirstCommentIDExists = $Construct->ColumnExists('FirstCommentID');
 $BodyExists = $Construct->ColumnExists('Body');
 $LastCommentIDExists = $Construct->ColumnExists('LastCommentID');
@@ -83,6 +83,7 @@ $Construct
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')
+   ->Column('FirstCommentID', 'int', TRUE)
    ->Column('LastCommentID', 'int', TRUE)
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
 	->Column('Body', 'text', FALSE, 'fulltext')
@@ -104,6 +105,12 @@ $Construct
    ->Column('Attributes', 'text', TRUE)
    ->Column('RegardingID', 'int(11)', TRUE, 'index')
    ->Set($Explicit, $Drop);
+
+if ($DiscussionExists && !$FirstCommentIDExists) {
+   $Px = $SQL->Database->DatabasePrefix;
+   $UpdateSQL = "update {$Px}Discussion d set FirstCommentID = (select min(c.CommentID) from {$Px}Comment c where c.DiscussionID = d.DiscussionID)";
+   $SQL->Query($UpdateSQL, 'update');
+}
 
 $Construct->Table('UserCategory')
    ->Column('UserID', 'int', FALSE, 'primary')
@@ -369,16 +376,6 @@ if (!$CountBookmarksExists) {
       where ud.Bookmarked = 1
          and ud.DiscussionID = d.DiscussionID
    )");
-}
-
-// Update lastcommentid & firstcommentid
-if ($FirstCommentIDExists)
-   $Construct->Query("update {$Prefix}Discussion set LastCommentID = null where LastCommentID = FirstCommentID");
-
-// This is the final structure of the discussion table after removed & updated columns.
-if ($FirstCommentIDExists) {
-   $Construct->Table('Discussion')->DropColumn('FirstCommentID');
-   $Construct->Reset();
 }
 
 $Construct->Table('TagDiscussion')

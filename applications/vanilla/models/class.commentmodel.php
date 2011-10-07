@@ -639,20 +639,39 @@ class CommentModel extends VanillaModel {
     * @param int $Insert Used as a boolean for whether this is a new comment.
     * @param bool $CheckExisting Not used.
     * @param bool $IncUser Whether or not to just increment the user's comment count rather than recalculate it.
+    * @param bool $UseSession Whether or not the activity UserID is determined from the session or comment data.
     */
-   public function Save2($CommentID, $Insert, $CheckExisting = TRUE, $IncUser = FALSE) {
-      $Session = Gdn::Session();
+   public function Save2($CommentID, $Insert, $CheckExisting = TRUE, $IncUser = FALSE, $UseSession = TRUE) {
+      // Throw event to allow user to handle notifications
+      $this->EventArguments['Continue'] = TRUE;
+      $this->EventArguments['CommentID'] = $CommentID;
+      $this->EventArguments['Insert'] = $Insert;
+      $this->EventArguments['UseSession'] = $UseSession;
+      $this->FireEvent('BeforeCommentNotifications');
+      if ( !$this->EventArguments['Continue'] )
+         return;
       
       // Load comment data
       $Fields = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
       
-      // Clear any session stashes related to this discussion
-      $Session->Stash('CommentForDiscussionID_'.GetValue('DiscussionID', $Fields));
+      // By default, determine activity UserID from session
+      if ($UseSession) {
+      	 $Session = Gdn::Session();
+      
+         // Clear any session stashes related to this discussion
+         $Session->Stash('CommentForDiscussionID_'.GetValue('DiscussionID', $Fields));
 
-      // Make a quick check so that only the user making the comment can make the notification.
-      // This check may be used in the future so should not be depended on later in the method.
-      if ($Fields['InsertUserID'] != $Session->UserID)
-         return;
+         // Make a quick check so that only the user making the comment can make the notification.
+         // This check may be used in the future so should not be depended on later in the method.
+         if ($Fields['InsertUserID'] != $Session->UserID)
+            return;
+            
+         $UserID = $Session->UserID;
+      }
+      else {
+      	 // Otherwise, use InsertUserID from comment data
+      	 $UserID = $Fields['InsertUserID'];
+      }
 
       // Update the discussion author's CountUnreadDiscussions (ie.
       // the number of discussions created by the user that s/he has
@@ -665,7 +684,7 @@ class CommentModel extends VanillaModel {
 //         ->Join('Comment c', 'd.DiscussionID = c.DiscussionID')
 //         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = d.InsertUserID')
 //         ->Where('w.CountComments >', 0)
-//         ->Where('c.InsertUserID', $Session->UserID)
+//         ->Where('c.InsertUserID', $UserID)
 //         ->Where('c.InsertUserID <>', 'd.InsertUserID', TRUE, FALSE)
 //         ->GroupBy('d.InsertUserID')
 //         ->Get();
@@ -679,7 +698,7 @@ class CommentModel extends VanillaModel {
 //            ->Put();
 //      }
 
-      $this->UpdateUser($Session->UserID, $IncUser && $Insert);
+      $this->UpdateUser($UserID, $IncUser && $Insert);
 
       if ($Insert) {
 			$DiscussionModel = new DiscussionModel();
@@ -732,10 +751,10 @@ class CommentModel extends VanillaModel {
             // Check user can still see the discussion.
             $UserMayView = $UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID);
             
-            if ($User && $User->UserID != $Session->UserID && $UserMayView) {
+            if ($User && $User->UserID != $UserID && $UserMayView) {
                $NotifiedUsers[] = $User->UserID;
                $ActivityID = $ActivityModel->Add(
-                  $Session->UserID,
+                  $UserID,
                   'CommentMention',
                   Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
                   $User->UserID,
@@ -750,7 +769,7 @@ class CommentModel extends VanillaModel {
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
          foreach ($BookmarkData->Result() as $Bookmark) {
-            if (in_array($Bookmark->UserID, $NotifiedUsers) || $Bookmark->UserID == $Session->UserID)
+            if (in_array($Bookmark->UserID, $NotifiedUsers) || $Bookmark->UserID == $UserID)
                continue;
 
             // Check user can still see the discussion.
@@ -760,7 +779,7 @@ class CommentModel extends VanillaModel {
                $NotifiedUsers[] = $Bookmark->UserID;
 //               $ActivityModel = new ActivityModel();
                $ActivityID = $ActivityModel->Add(
-                  $Session->UserID,
+                  $UserID,
                   'BookmarkComment',
                   Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID),
                   $Bookmark->UserID,
@@ -773,11 +792,11 @@ class CommentModel extends VanillaModel {
          }
 
          // Record user-comment activity.
-         if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers)) {
-            $ActivityID = $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, FALSE);
+         if ($Discussion !== FALSE && !in_array($UserID, $NotifiedUsers)) {
+            $ActivityID = $this->RecordActivity($ActivityModel, $Discussion, $UserID, $CommentID, FALSE);
             if ($ActivityID) {
                $ActivityModel->QueueNotification($ActivityID, $Story);
-               $NotifiedUsers[] = $Session->UserID;
+               $NotifiedUsers[] = $UserID;
             }
 			}
          

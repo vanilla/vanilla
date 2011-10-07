@@ -1948,6 +1948,13 @@ class Gdn_Form extends Gdn_Pluggable {
       
    }
 
+   /**
+    * Gets the validation results in the form.
+    * @return array
+    */
+   public function ValidationResults() {
+      return $this->_ValidationResults;
+   }
    
    
    /**

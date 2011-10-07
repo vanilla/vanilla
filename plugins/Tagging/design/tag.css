@@ -4,3 +4,16 @@
     border-bottom: 1px solid #999;
     color: #444;
 }
+.InlineTags ul,
+.InlineTags li {
+   display: inline;
+}
+.InlineTags li:after {
+   content: ', ';
+}
+.InlineTags li:last-child:after {
+   content: '';
+}
+.MessageList .Meta.InlineTags {
+   min-height: 0;
+}

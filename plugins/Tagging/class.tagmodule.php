@@ -40,11 +40,42 @@ class TagModule extends Gdn_Module {
    public function AssetTarget() {
       return 'Panel';
    }
+   
+   public function InlineDisplay() {
+      if ($this->_TagData->NumRows() == 0)
+         return '';
+      $String = '';
+      ob_start();
+      ?>
+      <div class="InlineTags Meta">
+         <?php echo T('Tagged'); ?>:
+         <ul>
+         <?php
+         foreach ($this->_TagData->Result() as $Tag) {
+            if ($Tag->Name != '') {
+         ?>
+            <li><?php 
+               if (urlencode($Tag->Name) == $Tag->Name) {
+                  echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged/'.urlencode($Tag->Name));
+               } else {
+                  echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged?Tag='.urlencode($Tag->Name));
+               }
+            ?></li>
+         <?php
+            }
+         }
+         ?>
+         </ul>
+      </div>
+      <?php
+      $String = ob_get_contents();
+      @ob_end_clean();
+      return $String;
+   }
 
    public function ToString() {
       if ($this->_TagData->NumRows() == 0)
          return '';
-      
       $String = '';
       ob_start();
       ?>

@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
    
    $('.HomeOptions a').click(function() {
-      var route = $(this).attr('class');
+      var route = this.className;
       if (route == 'categoriesdiscussions')
          route = 'categories/discussions';
       else if (route == 'categoriesall')

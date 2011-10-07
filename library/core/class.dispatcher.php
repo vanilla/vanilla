@@ -309,7 +309,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // Set the application folder to the plugin's key.
             $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginReplacement, Gdn_PluginManager::ACCESS_CLASSNAME);
             if ($PluginInfo) {
-               $Controller->ApplicationFolder = 'plugins/'.GetValue('Name', $PluginInfo);
+               $Controller->ApplicationFolder = 'plugins/'.GetValue('Index', $PluginInfo);
             }
             
             // Reflect the args for the method.

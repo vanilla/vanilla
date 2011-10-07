@@ -47,7 +47,16 @@
             echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))
          ?>
       </li>
-      <li class="CaptchaInput"><?php
+      <?php if ($this->Form->GetValue('DiscoveryText') || GetValue('DiscoveryText', $this->Form->ValidationResults()) ): ?>
+      <li>
+         <?php
+            echo $this->Form->Label('Why do you want to join?', 'DiscoveryText');
+            echo $this->Form->TextBox('DiscoveryText', array('MultiLine' => TRUE));
+         ?>
+      </li>
+      <?php endif; ?>
+      <li class="CaptchaInput">
+      <?php
          echo $this->Form->Label("Security Check", '');
          echo recaptcha_get_html($CaptchaPublicKey, NULL, $CaptchaSSL);
       ?></li>

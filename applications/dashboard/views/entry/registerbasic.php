@@ -43,6 +43,14 @@
             echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))
          ?>
       </li>
+      <?php if ($this->Form->GetValue('DiscoveryText') || GetValue('DiscoveryText', $this->Form->ValidationResults()) ): ?>
+      <li>
+         <?php
+            echo $this->Form->Label('Why do you want to join?', 'DiscoveryText');
+            echo $this->Form->TextBox('DiscoveryText', array('MultiLine' => TRUE));
+         ?>
+      </li>
+      <?php endif; ?>
       <li>
          <?php
             echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));

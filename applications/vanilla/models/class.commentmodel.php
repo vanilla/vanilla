@@ -723,6 +723,21 @@ class CommentModel extends VanillaModel {
 
          // Notify any users who were mentioned in the comment.
          $Usernames = GetMentions($Fields['Body']);
+         
+         // Find the first quote in the body and notify the person quotes as a mention.
+         $Matches = array();
+         if ($Fields['Format'] == 'Html') {
+         	preg_match('/<blockquote rel="([^"]+)"/', $Fields['Body'], $Matches);
+         } else if ($Fields['Format'] == 'BBCode') {
+         	preg_match('/[quote="([^"]+)"/', $Fields['Body'], $Matches);
+         } else {
+         	preg_match('/> ([^\n]+)\n/', $Fields['Body'], $Matches);
+         }
+         if (count($Matches) > 1) {
+         	$Usernames[] = $Matches[1];
+         	$Usernames = array_unique($Usernames);
+         }
+         
          $UserModel = Gdn::UserModel();
          $Story = '['.$Discussion->Name."]\n".ArrayValue('Body', $Fields, '');
          $NotifiedUsers = array();

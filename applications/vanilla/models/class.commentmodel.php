@@ -910,6 +910,7 @@ class CommentModel extends VanillaModel {
       $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->FirstRow(DATASET_TYPE_ARRAY);
 
       $Data = $this->SQL
+         ->Select('c.CommentID', 'min', 'FirstCommentID')
          ->Select('c.CommentID', 'max', 'LastCommentID')
          ->Select('c.DateInserted', 'max', 'DateLastComment')
          ->Select('c.CommentID', 'count', 'CountComments')
@@ -926,7 +927,9 @@ class CommentModel extends VanillaModel {
          if (!$Discussion['Sink'] && $Data['DateLastComment'])
             $this->SQL->Set('DateLastComment', $Data['DateLastComment']);
 
-         $this->SQL->Set('LastCommentID', $Data['LastCommentID'])
+         $this->SQL
+            ->Set('FirstCommentID', $Data['FirstCommentID'])
+            ->Set('LastCommentID', $Data['LastCommentID'])
             ->Set('CountComments', $Data['CountComments'] + 1)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
@@ -1011,73 +1014,36 @@ class CommentModel extends VanillaModel {
     */
    public function Delete($CommentID, $Options = array()) {
       $this->EventArguments['CommentID'] = $CommentID;
-
-      // Grab the comment to check on it.
-      $Data = $this->SQL
-         ->Select('c.*, d.LastCommentID, d.DateInserted as DiscussionDateInserted')
-         ->From('Comment c')
-         ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-         ->Where('c.CommentID', $CommentID)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      
+      $Comment = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
+      if (!$Comment)
+         return FALSE;
          
-      if ($Data) {
-			// If this is the last comment, get the one before and update the LastCommentID field
-			if ($Data['LastCommentID'] == $CommentID) {
-				$OldData = $this->SQL
-					->Select('c.CommentID, c.InsertUserID, c.DateInserted')
-					->From('Comment c')
-					->Where('c.DiscussionID', $Data['DiscussionID'])
-					->OrderBy('c.CommentID', 'desc')
-					->Limit(1, 1)
-					->Get()->FirstRow(DATASET_TYPE_ARRAY);
-            
-				if (is_array($OldData)) {
-					$this->SQL->Update('Discussion')
-                  ->Set('LastCommentID', $OldData['CommentID'])
-                  ->Set('LastCommentUserID', $OldData['InsertUserID'])
-                  ->Set('DateLastComment', $OldData['DateInserted'])
-						->Where('DiscussionID', $Data['DiscussionID'])
-						->Put();
-				} else { // It was the ONLY comment
-               $this->SQL->Update('Discussion')
-                  ->Set('LastCommentID', NULL)
-                  ->Set('LastCommentUserID', NULL)
-                  ->Set('DateLastComment', $Data['DateInserted'])
-                  ->Where('DiscussionID', $Data['DiscussionID'])
-                  ->Put();
-            }
-			}
-			
-			// Decrement the UserDiscussion comment count if the user has seen this comment
-			$Offset = $this->GetOffset($CommentID);
-			$this->SQL->Update('UserDiscussion')
-				->Set('CountComments', 'CountComments - 1', FALSE)
-				->Where('DiscussionID', $Data['DiscussionID'])
-				->Where('CountComments >', $Offset)
-				->Put();
-				
-			// Decrement the Discussion's Comment Count
-			$this->SQL->Update('Discussion')
-				->Set('CountComments', 'CountComments - 1', FALSE)
-				->Where('DiscussionID', $Data['DiscussionID'])
-				->Put();
-			
-			$this->FireEvent('DeleteComment');
+      // Decrement the UserDiscussion comment count if the user has seen this comment
+      $Offset = $this->GetOffset($CommentID);
+      $this->SQL->Update('UserDiscussion')
+         ->Set('CountComments', 'CountComments - 1', FALSE)
+         ->Where('DiscussionID', $Comment['DiscussionID'])
+         ->Where('CountComments >', $Offset)
+         ->Put();
 
-         // Log the deletion.
-         unset($Data['LastCommentID'], $Data['DiscussionDateInserted']);
-         if (GetValue('Log', $Options, TRUE))
-            LogModel::Insert('Delete', 'Comment', $Data);
+      $this->FireEvent('DeleteComment');
 
-			// Delete the comment.
-			$this->SQL->Delete('Comment', array('CommentID' => $CommentID));
+      // Log the deletion.
+      if (GetValue('Log', $Options, TRUE))
+         LogModel::Insert('Delete', 'Comment', $Comment);
 
-         // Update the user's comment count
-         $this->UpdateUser($Data['InsertUserID']);
-         
-         // Clear the page cache.
-         $this->RemovePageCache($Data['DiscussionID']);
-      }
+      // Delete the comment.
+      $this->SQL->Delete('Comment', array('CommentID' => $CommentID));
+
+      // Update the comment count
+      $this->UpdateCommentCount($Comment['DiscussionID']);
+
+      // Update the user's comment count
+      $this->UpdateUser($Comment['InsertUserID']);
+
+      // Clear the page cache.
+      $this->RemovePageCache($Comment['DiscussionID']);
       return TRUE;
    }
 }

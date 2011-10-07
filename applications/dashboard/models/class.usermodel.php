@@ -15,6 +15,7 @@ class UserModel extends Gdn_Model {
    const USERROLES_KEY = 'user.{UserID}.roles';
    const USERPERMISSIONS_KEY = 'user.{UserID}.permissions.{PermissionsIncrement}';
    const INC_PERMISSIONS_KEY = 'permissions.increment';
+   const REDIRECT_APPROVE = 'REDIRECT_APPROVE';
    
    static $UserCache = array();
    
@@ -1385,12 +1386,6 @@ class UserModel extends Gdn_Model {
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
-         // Check for spam.
-         $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
-         if ($Spam) {
-            $this->Validation->AddValidationResult('Spam', 'You are not allowed to register at this time.');
-            return;
-         }
 
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
@@ -1411,6 +1406,13 @@ class UserModel extends Gdn_Model {
 
          if (!$this->ValidateUniqueFields($Username, $Email))
             return FALSE;
+         
+         // Check for spam.
+         if (GetValue('ValidateSpam', $Options, TRUE)) {
+            $ValidateSpam = $this->ValidateSpamRegistration($FormPostValues);
+            if ($ValidateSpam !== TRUE)
+               return $ValidateSpam;
+         }
 
          // Define the other required fields:
          $Fields['Email'] = $Email;
@@ -1570,6 +1572,31 @@ class UserModel extends Gdn_Model {
       $UserData->Attributes = Gdn_Format::Unserialize($UserData->Attributes);
       return $UserData;
    }
+   
+   /**
+    *
+    * @param array $User
+    * @return bool|string
+    * @since 2.1 
+    */
+   public function ValidateSpamRegistration($User) {
+      $Spam = SpamModel::IsSpam('Registration', $User, array('Log' => FALSE));
+      if ($Spam) {
+         // This is spam so we want to check to see if the user has entered discovery text.
+         $DiscoveryText = GetValue('DiscoveryText', $User);
+         if (ValidateRequired($DiscoveryText)) {
+            // Insert the user registration attempt.
+            LogModel::Insert('Spam', 'Registration', $User, array('GroupBy' => array('RecordIPAddress')));
+            
+            // The user entered discovery text.
+            return self::REDIRECT_APPROVE;
+         } else {
+            $this->Validation->AddValidationResult('DiscoveryText', 'Tell us why you want to join!');
+            return FALSE;
+         }
+      }
+      return TRUE;
+    }
 
    /**
     * Checks to see if $Username and $Email are already in use by another member.

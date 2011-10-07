@@ -1093,8 +1093,11 @@ class EntryController extends Gdn_Controller {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
             $AuthUserID = $this->UserModel->Register($Values);
-         
-            if (!$AuthUserID) {
+            if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
+               $this->Form->SetFormValue('Target', '/entry/registerthanks');
+               $this->_SetRedirect();
+               return;
+            } elseif (!$AuthUserID) {
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
             } else {
                // The user has been created successfully, so sign in now.
@@ -1155,7 +1158,11 @@ class EntryController extends Gdn_Controller {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
             $AuthUserID = $this->UserModel->Register($Values);
-            if (!$AuthUserID) {
+            if ($AuthUserID == UserModel::REDIRECT_APPROVE) {
+               $this->Form->SetFormValue('Target', '/entry/registerthanks');
+               $this->_SetRedirect();
+               return;
+            } elseif (!$AuthUserID) {
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
                if ($this->_DeliveryType != DELIVERY_TYPE_ALL)
                   $this->_DeliveryType = DELIVERY_TYPE_MESSAGE;
@@ -1248,6 +1255,14 @@ class EntryController extends Gdn_Controller {
          $this->InvitationCode = $InvitationCode;
       }
       $this->Render();      
+   }
+   
+   /**
+    * @since 2.1
+    */
+   public function RegisterThanks() {
+      $this->SetData('Title', T('Thank You!'));
+      $this->Render();
    }
    
    /**

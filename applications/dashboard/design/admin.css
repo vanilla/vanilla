@@ -292,7 +292,7 @@ select.Year {
    -moz-box-shadow: 0px 0px 2px #999;
    -webkit-box-shadow: 0px 0px 2px #999;
 	font-weight:bold;
-   margin: 0 0 20px 20px;
+   margin: 0 0 0 20px;
 }
 a.Button {
 	padding: 5px 7px;

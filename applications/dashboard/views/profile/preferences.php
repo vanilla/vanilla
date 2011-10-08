@@ -15,6 +15,7 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
          $CountTypes = 0;
          foreach ($this->PreferenceTypes[$PreferenceGroup] as $PreferenceType) {
             echo Wrap(T($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
+            $PreferenceTypeOrder[$PreferenceType] = $CountTypes;
             $CountTypes++;
          }
          echo Wrap('&nbsp;', 'td');
@@ -28,17 +29,24 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
                $LastName = '';
                $i = 0;
                foreach ($Names as $Name) {
+                  $NameTypeExplode = explode(".", $Name);
+                  $NameType = $NameTypeExplode[0];
                   $ConfigPref = C('Preferences.'.$Name, '0');
                   if ($ConfigPref === FALSE) {
                      echo Wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
                   } else {
-                     echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
+                  	if (count($Names) < $CountTypes) {
+               			   $PreferenceTypeOrderCount = 0;
+               			   foreach ($PreferenceTypeOrder as $PreferenceTypeName => $PreferenceTypeOrderValue) {
+               			       if ($NameType == $PreferenceTypeName) {
+               				   if ($PreferenceTypeOrderValue == $PreferenceTypeOrderCount) echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
+               			       } else echo Wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
+               			       $PreferenceTypeOrderCount++;
+               			   }
+               		} else echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
                   }
                   $LastName = $Name;
                   $i++;
-               }
-               for(;$i < $CountTypes; $i++) {
-                  echo Wrap('&#160;', 'td', array('class' => 'PrefCheckBox'));
                }
 
                $Desc = $this->Preferences[$PreferenceGroup][$LastName];

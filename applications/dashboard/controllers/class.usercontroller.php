@@ -618,7 +618,7 @@ class UserController extends DashboardController {
    public function UsernameAvailable($Name = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       $Available = TRUE;
-      if ($Name != '') {
+      if (C('Garden.Registration.NameUnique', TRUE) && $Name != '') {
          $UserModel = Gdn::UserModel();
          if ($UserModel->GetByUsername($Name))
             $Available = FALSE;

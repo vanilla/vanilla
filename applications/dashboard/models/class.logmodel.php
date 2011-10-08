@@ -435,7 +435,7 @@ class LogModel extends Gdn_Pluggable {
             // Insert the record back into the db.
 
             if ($Log['Operation'] == 'Spam' && $Log['RecordType'] = 'Registration') {
-               SaveToConfig(array('Garden.Registration.NameUnique' => FALSE, 'Garden.Registration.EmailUnique' => FALSE), FALSE);
+               SaveToConfig(array('Garden.Registration.NameUnique' => FALSE, 'Garden.Registration.EmailUnique' => FALSE), '', FALSE);
                $ID = Gdn::UserModel()->InsertForBasic($Set, FALSE, array('ValidateSpam' => FALSE));
                if (!$ID) {
                   throw new Exception(Gdn::UserModel()->Validation->ResultsText());

@@ -146,7 +146,7 @@ class VanillaHooks implements Gdn_IPlugin {
             $PermissionCategoryID = -1;
          
          $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
-         return (ArrayValue('Vanilla.Discussions.View', $Result[0], FALSE)) ? TRUE : FALSE;
+         return (GetValue('Vanilla.Discussions.View', GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
       }
       return FALSE;
    }

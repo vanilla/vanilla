@@ -165,8 +165,13 @@ class MessagesController extends ConversationsController {
          $Wheres['Bookmarked'] = '1';
 
       $UserID = $this->Request->Get('userid', Gdn::Session()->UserID);
-      if ($UserID != Gdn::Session()->UserID)
+      if ($UserID != Gdn::Session()->UserID) {
+         if (!C('Conversations.Moderation.Allow', FALSE)) {
+            Gdn::Dispatcher()->Dispatch('DefaultPermission');
+            exit();
+         }
          $this->Permission('Conversations.Moderation.Manage');
+      }
       
       // Fetch from model  
       $ConversationData = $this->ConversationModel->Get(
@@ -268,9 +273,15 @@ class MessagesController extends ConversationsController {
             break;
          }
       }
-      if (!$InConversation)
+      if (!$InConversation) {
+         // Conversation moderation must be enabled and they must have permission
+         if (!C('Conversations.Moderation.Allow', FALSE)) {
+            Gdn::Dispatcher()->Dispatch('DefaultPermission');
+            exit();
+         }
          $this->Permission('Conversations.Moderation.Manage');
-
+      }
+      
       $this->Conversation = $this->ConversationModel->GetID($ConversationID);
       $this->SetData('Conversation', $this->Conversation);
       

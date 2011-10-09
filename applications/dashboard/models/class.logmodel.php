@@ -22,7 +22,7 @@ class LogModel extends Gdn_Pluggable {
       $Models['Comment'] = new CommentModel();
       
       foreach ($Logs as $Log) {
-         if ($Log['Operation'] == 'Moderate' && array_key_exists($Log['RecordType'], $Models)) {
+         if (in_array($Log['Operation'], array('Spam', 'Moderate')) && array_key_exists($Log['RecordType'], $Models)) {
             // Also delete the record.
             $Model = $Models[$Log['RecordType']];
             $Model->Delete($Log['RecordID'], array('Log' => FALSE));
@@ -434,7 +434,7 @@ class LogModel extends Gdn_Pluggable {
 
             // Insert the record back into the db.
 
-            if ($Log['Operation'] == 'Spam' && $Log['RecordType'] = 'Registration') {
+            if ($Log['Operation'] == 'Spam' && $Log['RecordType'] == 'Registration') {
                SaveToConfig(array('Garden.Registration.NameUnique' => FALSE, 'Garden.Registration.EmailUnique' => FALSE), '', FALSE);
                $ID = Gdn::UserModel()->InsertForBasic($Set, FALSE, array('ValidateSpam' => FALSE));
                if (!$ID) {

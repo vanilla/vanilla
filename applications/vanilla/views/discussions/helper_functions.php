@@ -55,7 +55,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
          <span class="CommentCount"><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
          <?php
             if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
-               echo '<strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s New', '%s New Plural').'</strong>';
+               echo '<strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
 
             $Sender->FireEvent('AfterCountMeta');
 

@@ -483,40 +483,42 @@ jQuery(document).ready(function($) {
    };
    $('.Popin').popin();
    
-   $.fn.hijack = function() {
-      this.click(function() {
-         var $elem = $(this);
-         $elem.addClass('TinyProgress');
-         
-         $.ajax({
-            type: "POST",
-            url: this.href,
-            data: { DeliveryType: 'VIEW', 'DeliveryMethod': 'JSON' },
-            dataType: 'json',
-            complete: function() {
-               $elem.removeClass('TinyProgress');
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               // Popup the error.
-               $.popup({}, XMLHttpRequest.responseText);
-            },
-            success: function(json) {
-               var informed = gdn.inform(json);
-               gdn.processTargets(json.Targets);
-               // If there is a redirect url, go to it.
-               if (json.RedirectUrl) {
-                  setTimeout(function() {
-                        window.location.replace(json.RedirectUrl);
-                     },
-                     informed ? 3000 : 0);
-               }
+   var hijackClick = function(e) {
+      var $elem = $(this);
+      var href = $elem.attr('href');
+      $elem.removeAttr('href');
+      $elem.addClass('InProgress');
+
+      $.ajax({
+         type: "POST",
+         url: href,
+         data: {DeliveryType: 'VIEW', 'DeliveryMethod': 'JSON'},
+         dataType: 'json',
+         complete: function() {
+            $elem.removeClass('InProgress');
+            $elem.attr('href', href);
+         },
+         error: function(xhr) {
+            gdn.informError(xhr);
+         },
+         success: function(json) {
+            if (json == null) json = {};
+            
+            var informed = gdn.inform(json);
+            gdn.processTargets(json.Targets);
+            // If there is a redirect url, go to it.
+            if (json.RedirectUrl) {
+               setTimeout(function() {
+                     window.location.replace(json.RedirectUrl);
+                  },
+                  informed ? 3000 : 0);
             }
-         });
-         
-         return false;
+         }
       });
+
+      return false;
    };
-   $('.Hijack').hijack();
+   $('.Hijack').live('click', hijackClick);
 
    $.fn.openToggler = function() {
      $(this).click(function() {

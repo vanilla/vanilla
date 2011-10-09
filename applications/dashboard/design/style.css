@@ -252,6 +252,11 @@ input.Button {
 	padding: 10px 40px 10px 0;
 	background: url('images/progress_sm.gif') center center no-repeat;
 }
+.InProgress {
+   color: transparent !Important;
+   background: url('images/progress_sm.gif') center center no-repeat;
+   cursor: wait;
+}
 .Conversations .Deleted {
    text-decoration: line-through;
 }

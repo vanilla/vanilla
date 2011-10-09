@@ -748,6 +748,24 @@ jQuery(document).ready(function($) {
 		gdn.inform({'InformMessages' : new Array(options)});
 	}
    
+   // Inform an error returned from an ajax call.
+   gdn.informError = function(xhr) {
+      if (typeof(xhr) == 'string')
+         xhr = {responseText: xhr, code: 500};
+      
+      var message = xhr.responseText;
+      var code = xhr.status;
+      
+      try {
+         var data = $.parseJSON(message);
+         if (data.Exception)
+            message = data.Exception;
+      } catch(e) {
+      }
+      
+      gdn.informMessage('<span class="InformSprite SkullBones Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
+   }
+   
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
 	if (informMessageStack) {

@@ -51,7 +51,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
             echo UserAnchor($Author);
             ?>
          </span>
-         <span class="DateCreated">
+         <span class="MItem DateCreated">
             <?php
             echo Anchor(Gdn_Format::Date($Object->DateInserted), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow'));
             ?>
@@ -65,11 +65,10 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 			?>
          <div class="CommentInfo">
             <?php
-            if ($Session->CheckPermission('Garden.Moderation.Manage')) {
-               echo ' '.IPAnchor($Object->InsertIPAddress).' ';
-            }
-
             $Sender->FireEvent('CommentInfo');
+            if ($Session->CheckPermission('Garden.Moderation.Manage')) {
+               echo ' <span class="MItem">'.IPAnchor($Object->InsertIPAddress).'<span class="MItem"> ';
+            }
             ?>
          </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
@@ -110,33 +109,33 @@ function WriteOptionList($Object, $Sender, $Session) {
    if ($Sender->EventArguments['Type'] == 'Discussion') {
       // Can the user edit the discussion?
       if (($CanEdit && $Session->UserID == $Object->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editdiscussion/'.$Object->DiscussionID, 'EditDiscussion').$TimeLeft.'</span>';
+         $Sender->Options .= ' <span class="MItem">'.Anchor(T('Edit'), '/vanilla/post/editdiscussion/'.$Object->DiscussionID, 'EditDiscussion').$TimeLeft.'</span> ';
          
       // Can the user announce?
       if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'AnnounceDiscussion') . '</span>';
+         $Sender->Options .= ' <span class="MItem">'.Anchor(T($Sender->Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'AnnounceDiscussion') . '</span> ';
 
       // Can the user sink?
       if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Sink == '1' ? 'Unsink' : 'Sink'), 'vanilla/discussion/sink/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</span>';
+         $Sender->Options .= ' <span class="MItem">'.Anchor(T($Sender->Discussion->Sink == '1' ? 'Unsink' : 'Sink'), 'vanilla/discussion/sink/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</span> ';
 
       // Can the user close?
       if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T($Sender->Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</span>';
+         $Sender->Options .= ' <span class="MItem">'.Anchor(T($Sender->Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Object->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</span> ';
       
       // Can the user delete?
       if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T('Delete Discussion'), 'vanilla/discussion/delete/'.$Object->DiscussionID.'/'.$Session->TransientKey(), 'DeleteDiscussion') . '</span>';
+         $Sender->Options .= ' <span class="MItem">'.Anchor(T('Delete Discussion'), 'vanilla/discussion/delete/'.$Object->DiscussionID.'/'.$Session->TransientKey(), 'DeleteDiscussion') . '</span> ';
    } else {
       // And if this is just another comment in the discussion ...
       
       // Can the user edit the comment?
       if (($CanEdit && $Session->UserID == $Object->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T('Edit'), '/vanilla/post/editcomment/'.$Object->CommentID, 'EditComment').$TimeLeft.'</span>';
+         $Sender->Options .= ' <span class="MItem">'.Anchor(T('Edit'), '/vanilla/post/editcomment/'.$Object->CommentID, 'EditComment').$TimeLeft.'</span> ';
 
       // Can the user delete the comment?
       if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
-         $Sender->Options .= '<span>'.Anchor(T('Delete'), 'vanilla/discussion/deletecomment/'.$Object->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Object->DiscussionID}/x"), 'DeleteComment') . '</span>';
+         $Sender->Options .= ' <span class="MItem">'.Anchor(T('Delete'), 'vanilla/discussion/deletecomment/'.$Object->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Object->DiscussionID}/x"), 'DeleteComment') . '</span> ';
    }
    
    // Allow plugins to add options

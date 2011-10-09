@@ -950,6 +950,16 @@ a.BigButton:focus {
    font-size: 11px;
    color: #70727c;
 }
+.MItem {
+   margin-left: 8px;
+   margin-right: 8px;
+}
+.MItem:first-child {
+   margin-left: 0;
+}
+.MItem:last-child {
+   margin-right: 0;
+}
 .DataList .Excerpt {
    font-size: 12px;
 	line-height: 1.4;
@@ -961,13 +971,6 @@ a.BigButton:focus {
 .DataList .Excerpt p {
 	display: inline;
 	padding: 0;
-}
-.Meta span,
-.Meta strong {
-   margin-right: 12px;
-}
-.Meta .MetaLabel {
-   margin-right: 2px;
 }
 .HasNew {
    border-radius: 2px;
@@ -1170,10 +1173,6 @@ conversation messages, etc). */
    overflow: hidden;
    background: #eee;
 }
-.MessageList .Meta span {
-   line-height: 2.5;
-   padding-left: 10px;
-}
 .MessageList .Meta .Author {
 	padding: 0;
 }
@@ -1186,10 +1185,6 @@ conversation messages, etc). */
 }
 .MessageList .Meta .CommentInfo {
    line-height: normal;
-}
-.MessageList .Meta .CommentInfo span {
-   padding-left: 0px;
-   padding-right: 10px;
 }
 .Preview {
 	text-align: left;

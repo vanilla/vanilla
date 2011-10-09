@@ -52,29 +52,31 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
          <?php if ($Discussion->Closed == '1') { ?>
          <span class="Tag Closed"><?php echo T('Closed'); ?></span>
          <?php } ?>
-         <span class="CommentCount"><?php printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments); ?></span>
-         <?php
+         <span class="MItem CommentCount"><?php 
+            printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
+            
             if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
-               echo '<strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s New', '%s New Plural').'</strong>';
-
+               echo ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s New', '%s New Plural').'</strong>';
+         ?></span>
+         <?php
             $Sender->FireEvent('AfterCountMeta');
 
             if ($Discussion->LastCommentID != '') {
-               echo '<span class="LastCommentBy">'.sprintf(T('Most recent by %1$s'), UserAnchor($Last)).'</span>';
-               echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span>';
+               echo ' <span class="MItem LastCommentBy">'.sprintf(T('Most recent by %1$s'), UserAnchor($Last)).'</span> ';
+               echo ' <span class="MItem LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span>';
             } else {
-               echo '<span class="LastCommentBy">'.sprintf(T('Started by %1$s'), UserAnchor($First)).'</span>';
-               echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate);
+               echo ' <span class="MItem LastCommentBy">'.sprintf(T('Started by %1$s'), UserAnchor($First)).'</span> ';
+               echo ' <span class="MItem LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate);
                
                if ($Source = GetValue('Source', $Discussion)) {
                   echo ' '.sprintf(T('via %s'), T($Source.' Source', $Source));
                }
                
-               echo '</span>';
+               echo '</span> ';
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'Tag Category'));
+               echo ' '.Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'Tag Category'));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>

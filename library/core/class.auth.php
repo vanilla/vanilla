@@ -31,7 +31,7 @@ class Gdn_Auth extends Gdn_Pluggable {
    }
    
    public function StartAuthenticator() {
-      if (!C('Garden.Installed', FALSE) && !$ForceStart) return;
+      if (!C('Garden.Installed', FALSE)) return;
       // Start the 'session'
       Gdn::Session()->Start(FALSE, FALSE);
       

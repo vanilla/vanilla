@@ -7,6 +7,7 @@
 class LogModel extends Gdn_Pluggable {
    /// PROPERTIES ///
 
+   protected static $_Instance = NULL;
    protected $_RecalcIDs = array('Discussion' => array());
 
    /// METHODS ///
@@ -293,13 +294,32 @@ class LogModel extends Gdn_Pluggable {
                $Set,
                array('LogID' => $LogID));
          } else {
+            $L = self::_Instance();
+            $L->EventArguments['Log'] =& $LogRow;
+            $L->FireEvent('BeforeInsert');
+            
             $LogID = Gdn::SQL()->Insert('Log', $LogRow);
          }
       } else {
          // Insert the log entry.
+         $L = self::_Instance();
+         $L->EventArguments['Log'] =& $LogRow;
+         $L->FireEvent('BeforeInsert');
+         
          $LogID = Gdn::SQL()->Insert('Log', $LogRow);
       }
       return $LogID;
+   }
+   
+   /**
+    *
+    * @return LogModel
+    */
+   protected static function _Instance() {
+      if (!self::$_Instance)
+         self::$_Instance = new LogModel();
+
+      return self::$_Instance;
    }
 
    public static function LogChange($Operation, $RecordType, $NewData, $OldData = NULL) {

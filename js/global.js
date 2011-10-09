@@ -350,6 +350,9 @@ jQuery(document).ready(function($) {
             case 'Remove':
                $target.remove();
                break;
+            case 'SlideUp':
+               $target.slideUp('fast', function() { $target.remove(); });
+               break;
             case 'Text':
                $target.text(item.Data);
                break;
@@ -479,6 +482,41 @@ jQuery(document).ready(function($) {
      });
    };
    $('.Popin').popin();
+   
+   $.fn.hijack = function() {
+      this.click(function() {
+         var $elem = $(this);
+         $elem.addClass('TinyProgress');
+         
+         $.ajax({
+            type: "POST",
+            url: this.href,
+            data: { DeliveryType: 'VIEW', 'DeliveryMethod': 'JSON' },
+            dataType: 'json',
+            complete: function() {
+               $elem.removeClass('TinyProgress');
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               // Popup the error.
+               $.popup({}, XMLHttpRequest.responseText);
+            },
+            success: function(json) {
+               var informed = gdn.inform(json);
+               gdn.processTargets(json.Targets);
+               // If there is a redirect url, go to it.
+               if (json.RedirectUrl) {
+                  setTimeout(function() {
+                        window.location.replace(json.RedirectUrl);
+                     },
+                     informed ? 3000 : 0);
+               }
+            }
+         });
+         
+         return false;
+      });
+   };
+   $('.Hijack').hijack();
 
    $.fn.openToggler = function() {
      $(this).click(function() {
@@ -600,7 +638,7 @@ jQuery(document).ready(function($) {
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
 		if (!response || !response.InformMessages)
-			return;
+			return false;
 		
 		// If there is no message container in the page, add one
 		var informMessages = $('div.InformMessages');
@@ -690,6 +728,7 @@ jQuery(document).ready(function($) {
 			}
 		}
 		informMessages.show();
+      return true;
    }
 	
 	// Send an informMessage to the screen (same arguments as controller.InformMessage).

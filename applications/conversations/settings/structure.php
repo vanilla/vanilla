@@ -131,5 +131,5 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'AddedToConversation'))->NumR
 
 $PermissionModel = Gdn::PermissionModel();
 $PermissionModel->Define(array(
-   'Conversations.Moderation.Manage' => 'Garden.Moderation.Manage'
-   ));
+   'Conversations.Moderation.Manage' => 0
+));

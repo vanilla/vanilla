@@ -23,6 +23,11 @@ class StatisticsController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
    
+   public function Info() {
+      $this->SetData('FirstDate', Gdn::Statistics()->FirstDate());
+      $this->Render();
+   }
+   
    /**
     * Highlight menu path. Automatically run on every use.
     *

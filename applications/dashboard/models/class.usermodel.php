@@ -1580,14 +1580,12 @@ class UserModel extends Gdn_Model {
     * @since 2.1 
     */
    public function ValidateSpamRegistration($User) {
-      $Spam = SpamModel::IsSpam('Registration', $User, array('Log' => FALSE));
+      $DiscoveryText = GetValue('DiscoveryText', $User);
+      $Log = ValidateRequired($DiscoveryText);
+      $Spam = SpamModel::IsSpam('Registration', $User, array('Log' => $Log));
+      
       if ($Spam) {
-         // This is spam so we want to check to see if the user has entered discovery text.
-         $DiscoveryText = GetValue('DiscoveryText', $User);
-         if (ValidateRequired($DiscoveryText)) {
-            // Insert the user registration attempt.
-            LogModel::Insert('Spam', 'Registration', $User, array('GroupBy' => array('RecordIPAddress')));
-            
+         if ($Log) {
             // The user entered discovery text.
             return self::REDIRECT_APPROVE;
          } else {

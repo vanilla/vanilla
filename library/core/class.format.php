@@ -327,7 +327,8 @@ class Gdn_Format {
       } elseif ($WorkingNumber >= 1000) {
          $Number2 = $WorkingNumber / 1000;
          $Suffix = "K";
-      }
+      } else
+         $Number2 = $Number;
 		
 		if ($Negative)
 			$Number2 = $Number2 - ($Number2 * 2);

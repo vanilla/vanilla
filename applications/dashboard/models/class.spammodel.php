@@ -28,7 +28,7 @@ class SpamModel extends Gdn_Pluggable {
     * @param array $Options Options for fine-tuning this method call.
     *  - Log: Log the record if it is found to be spam.
     */
-   public static function IsSpam($RecordType, &$Data, $Options = array()) {
+   public static function IsSpam($RecordType, $Data, $Options = array()) {
       // Set some information about the user in the data.
       TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
       

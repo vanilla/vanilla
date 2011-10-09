@@ -304,14 +304,17 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Set special controller method options for REST APIs.
          Gdn::Controller($Controller);
          $Controller->Initialize();
+         
+         $this->EventArguments['Controller'] = &$Controller;
+         $this->FireEvent('AfterControllerCreate');
 
          // Call the requested method on the controller - error out if not defined.
          if ($PluginReplacement) {
             // Set the application folder to the plugin's key.
-            $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginReplacement, Gdn_PluginManager::ACCESS_CLASSNAME);
-            if ($PluginInfo) {
-               $Controller->ApplicationFolder = 'plugins/'.GetValue('Name', $PluginInfo);
-            }
+//            $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginReplacement, Gdn_PluginManager::ACCESS_CLASSNAME);
+//            if ($PluginInfo) {
+//               $Controller->ApplicationFolder = 'plugins/'.GetValue('Index', $PluginInfo);
+//            }
             
             // Reflect the args for the method.
             $Callback = Gdn::PluginManager()->GetCallback($Controller->ControllerName, $ControllerMethod);

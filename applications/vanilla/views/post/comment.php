@@ -44,12 +44,12 @@ $Editing = isset($this->Comment);
    $CancelClass = 'Back';
    if (!$NewOrDraft) {
       $CancelText = T('Cancel');
-      $CancelClass = 'Cancel';
+      $CancelClass = 'MItem Cancel';
    }
 
-   echo Gdn_Theme::Link('forumroot', $CancelText, NULL, array(
+   echo ' '.Gdn_Theme::Link('forumroot', $CancelText, NULL, array(
        'class' => $CancelClass
-   ));
+   )).' ';
    
    $ButtonOptions = array('class' => 'Button CommentButton');
    /*

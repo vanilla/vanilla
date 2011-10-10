@@ -100,7 +100,6 @@ body {
 	text-align: right;
 }
 h1, h2, h3, h4, h5, h6 {
-   color: #000;
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
    font-weight: normal;
    margin: 0;
@@ -163,14 +162,20 @@ textarea {
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
-.TextBoxWrapper {
-	width: auto;
-	padding-right: 8px;
-}
+
 textarea.TextBox {
    width: 500px;
    height: 100px;
    min-height: 100px;
+}
+
+.TextBoxWrapper {
+	width: auto;
+	padding-right: 8px;
+}
+
+.TextBoxWrapper textarea {
+   width: 100%;
 }
 #Popup textarea.TextBox {
    width: 100%;
@@ -238,6 +243,10 @@ input.Button {
 }
 .Buttons {
    margin-top: 10px;
+   text-align: right;
+}
+.Buttons .Back {
+   float: left;
 }
 .Loading {
    height: 100px;
@@ -911,25 +920,21 @@ a.BigButton:focus {
 }
 .DataList .Item {
    margin: 0;
-   padding: 4px 0;
+   padding: 8px;
    border: 0;
 	position: relative;
    border-bottom: 1px solid #bec8cc;
 }
+ul.Discussions .Item {
+   padding: 4px 8px;
+}
 .DataList .Item .Item {
    border-bottom: none;
 }
-.DataList .Options,
-.MessageList .Options {
-   margin: 2px 4px 0 0;
+.DataList .Options {
 	position: absolute;
-	right: 0;
-   top: 0;
-}
-.DataList .OptionButton {
-	position: absolute;
-	top: 0;
-	right: 0;
+	right: 4px;
+   top: 4px;
 }
 .DataList a.Title {
    display: block;
@@ -1020,6 +1025,10 @@ a.BigButton:focus {
    border-top: 1px solid #bec8cc;
    padding: 5px 0;
 }
+.Item .Author a{
+   font-size: 15px;
+   font-weight: bold;
+}
 .Condensed,
 .Condensed li {
 	clear: left;
@@ -1062,21 +1071,12 @@ body.Profile ul.Activities {
 	font-size: 13px;
 	/* padding: 0 0 0 4px; */
 }
-.Activities .Excerpt a,
-.Activities .Meta a {
-   color: #1e79a7;
-}
-.Activities .Excerpt a:hover,
-.Activities .Meta a:hover {
-   color: #ff0084;
-}
 .Activities .Excerpt img {
 	padding: 2px;
 	border: 1px solid #999;
 }
 .Activities ul.DataList {
 	margin-left: 50px;
-	width: 400px;
 }
 .Activities .ItemContent {
 	width: 631px;
@@ -1101,15 +1101,6 @@ body.Profile ul.Activities {
 	font-size: 13px;
 	line-height: 1;
 }
-.HasPhoto .Excerpt,
-.HasPhoto .Meta {
-	/* padding-left: 49px !important; */
-	display: block;
-}
-.Activities .DataList .HasPhoto .Meta {
-	padding: 2px 0 0;
-	line-height: 1;
-}
 .Activities .DataList .Photo img {
 	height: 32px;
 	width: 32px;
@@ -1127,43 +1118,9 @@ body.Profile ul.Activities {
    line-height: 100%;
    font-weight: normal;
 }
-.Activities .CommentForm form div {
-	text-align: right;
-}
-.Activities .CommentForm textarea.TextBox {
-   width: 380px;
-	min-height: 40px;
-   height: 40px;
-   margin-bottom: 2px;
-	font-size: 12px;
-}
-.Activities .CommentForm input.Button {
-	font-size: 12px;
-	box-shadow: 0 0 1px #999;
-	-moz-box-shadow: 0 0 1px #999;
-	-webkit-box-shadow: 0 0 1px #999;  
-}
-
 
 /* ============================================================== MessageList */
-/* used for lists of message-based content (discussion comments, private
-conversation messages, etc). */
 
-.MessageList,
-.MessageList li {
-   list-style: none;
-   margin: 0;
-   padding: 0;
-}
-.MessageList .Item {
-   border-bottom: 1px solid #BEC8CC;
-	padding: 10px 10px 4px 10px;
-}
-.MessageList .Meta {
-   font-size: 11px;
-   color: #777;
-	min-height: 40px;
-}
 .Item .Author img {
    height: 40px;
    width: 40px;
@@ -1173,25 +1130,19 @@ conversation messages, etc). */
    overflow: hidden;
    background: #eee;
 }
-.MessageList .Meta .Author {
-	padding: 0;
-}
-.MessageList .Meta .Author a {
-   font-size: 15px;
-   font-weight: bold;
-}
-.MessageList .Meta span {
-   line-height: inherit;
-}
-.MessageList .Meta .CommentInfo {
-   line-height: normal;
-}
 .Preview {
-	text-align: left;
-	background: #E3F4FF;
-	padding: 1px 8px;
-	margin: 4px 0 8px;
+	background: #fff;
+   color: #000;
+	padding: 4px;
+   border: 1px solid #AAAAAA;;
+   min-height: 100px;
 }
+.CommentForm .Preview {
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px
+}
+
 .Popup .Preview {
 	padding: 8px;
 	margin: 0;
@@ -1199,25 +1150,21 @@ conversation messages, etc). */
 body.Post .Popup a.Close {
 	color: #1e79a7;
 }
-.Preview .Message,
-.MessageList .Message {
+.Message{
    clear: both;
    line-height: 140%;
    font-size: 100%;
 	word-wrap: break-word;
 }
-.Preview .Message,
-.Preview .Message p,
-.MessageList .Message,
-.MessageList .Message p {
-   margin: 8px 0;
+p {
+   margin: 1em 0;
 }
-.Preview .Message blockquote,
-.MessageList .Message blockquote {
-   padding: 4px 16px;
-   margin: 4px 0;
+blockquote {
+   padding: 1ex 16px;
+   margin: 1em 0;
+   background: rgba(145, 218, 255, .3);
 }
-.MessageList .Message small {
+.Message small {
 	font-size: 11px;
 	color: #777;
 }
@@ -1234,28 +1181,24 @@ code, pre {
 }
 pre {
    display: block;
+   margin: 1em 0;
 }
-.Preview .Message strong,
-.MessageList .Message strong {
+.Message strong, .Message b {
    font-weight: bold;
 }
-.Preview .Message em,
-.MessageList .Message em {
+.Message em,
+.Message i {
    font-style: oblique;
 }
-.Preview .Message ul,
-.Preview .Message ol,
-.MessageList .Message ul,
-.MessageList .Message ol {
-   margin-left: 3em ! important;
+.Message ul,
+.Message ol {
+   margin: 1em 0 1em 3em;
 }
-.Preview .Message ol li,
-.MessageList .Message ol li {
-  list-style: decimal ! important;
+.Message ol li {
+  list-style: decimal !important;
 }
-.Preview .Message ul li,
-.MessageList .Message ul li {
-  list-style: disc ! important;
+.Message ul li {
+  list-style: disc !important;
 }
 .Message h1,
 .Message h2,
@@ -1500,8 +1443,16 @@ table.PreferenceGroup td.Description {
 	font-size: 12px;
 }
 
+/* ================================================= CommentForm */
+
+.CommentForm {
+   background: #cfecff;
+   padding: 8px;
+   clear: both;
+   color: #1E79A7;
+}
+
 /* ================================================= Tabs, Headings & Footers */
-.MessageForm,
 .Tabs,
 .Headings {
 	display: block;
@@ -1619,7 +1570,6 @@ table.PreferenceGroup td.Description {
 }
 
 /* ================================================ Administration Checkboxes */
-.MessageList .Item,
 body.Discussion #Content,
 .DiscussionsTabs {
 	position: relative;
@@ -1909,7 +1859,7 @@ div.Popup form ul li label.RadioLabel {
   + Mine: the user created the discussion
   + New: there are new comments since the last viewed the discussion
 */
-.Mine { background: #e3f4ff; }
+.Mine { }
 
 .Tag {
    background: #777777;
@@ -1917,7 +1867,6 @@ div.Popup form ul li label.RadioLabel {
    -webkit-border-radius: 2px;
    border-radius: 2px;
    color: #FFFFFF;
-   font-weight: bold;
    padding: 1px 4px;
 }
 .Tag a {
@@ -1937,9 +1886,6 @@ div.Popup form ul li label.RadioLabel {
 /* ================================================================= Comments */
 body.Discussion #Content {
    margin-bottom: 20px;
-}
-ul.Discussion {
-   margin-bottom: 1px;
 }
 /*
   Note: Discussion & Comment Option (dropdown) Menu customizations. The layout
@@ -1967,35 +1913,10 @@ body.Discussion a.Bookmark {
    float: right;
 	margin: 5px 0 0 8px;
 }
-body.Discussion .Back {
-   padding: 3px 6px;
-   text-align: left;
-}
-
-
-/* =================================================================== Drafts */
-.DataList .ItemContent {
-   margin: 0 0 0 9px;
-}
-.Drafts .ItemContent a.Title,
-.Discussions .ItemContent a.Title {
-	max-width: 580px;
-}
 
 /* =============================================== Discussion & Comment Forms */
 .Editing {
 	background: #E3F4FF;
-}
-.CommentForm textarea.TextBox {
-   width: 100%;
-   height: 100px;
-   min-height: 100px;
-   margin: 0 0 6px;
-}
-.Comment .CommentForm {
-	background: none;
-	padding: 6px 0px;
-	border: 0;
 }
 #DiscussionForm label {
    font-size: 14px;
@@ -2041,13 +1962,6 @@ body.Post #Content {
 }
 #DiscussionForm .Category label {
    padding: 0 8px 0 0;
-}
-.CommentForm .Buttons {
-   text-align: right;
-}
-.CommentForm a.Back,
-.CommentForm a.Cancel {
-   float: left;
 }
 #DiscussionForm a.Cancel {
 	margin-left: 18px;
@@ -2130,35 +2044,6 @@ textarea.MultiComplete {
 .AddPeople form div {
 	text-align: right;
 }
-
-/* ========================================================= Add Message Form */
-#MessageForm {
-	background: #E9F9FF;
-	padding: 4px 8px 8px;
-	margin: 1px 0 0;
-   border-bottom-left-radius: 2px;
-   border-bottom-right-radius: 2px;
-  -moz-border-radius-bottomleft: 2px;
-  -moz-border-radius-bottomright: 2px;
-  -webkit-border-bottom-left-radius: 2px;
-  -webkit-border-bottom-right-radius: 2px;
-}
-#MessageForm h2 {
-  font-size: 115%;
-  color: #2786C2;
-  font-weight: bold;
-  border: 0;
-}
-#MessageForm form div {
-	text-align: right;
-}
-#MessageForm textarea {
-  width: 100%;
-  height: 100px;
-  min-height: 100px;
-  margin-bottom: 2px;
-}
-
 
 /* ==================================================== New Conversation Form */
 body.add #Panel {

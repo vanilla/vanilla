@@ -81,11 +81,13 @@ body {
    width: 960px;
    text-align: left;
    margin: 15px auto 0;
+   overflow: hidden;
 }
 #Content {
    float: left;
    width: 680px;
    margin: 0 0 40px;
+   overflow: hidden;
 }
 .Hidden {
    display: none;
@@ -663,6 +665,7 @@ body #Head h1 {
 #Panel {
    width: 250px;
    float: right;
+   overflow: hidden;
 }
 .Box {
    border-radius: 1px;
@@ -1125,10 +1128,9 @@ body.Profile ul.Activities {
    height: 40px;
    width: 40px;
    border: 0;
-   margin: 0 10px 0 0;
+   margin: 0 10px 4px 0;
    float: left;
    overflow: hidden;
-   background: #eee;
 }
 .Preview {
 	background: #fff;

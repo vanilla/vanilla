@@ -67,7 +67,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
             <?php
             $Sender->FireEvent('CommentInfo');
             if ($Session->CheckPermission('Garden.Moderation.Manage')) {
-               echo ' <span class="MItem">'.IPAnchor($Object->InsertIPAddress).'<span class="MItem"> ';
+               echo ' <span>'.IPAnchor($Object->InsertIPAddress).'<span class="MItem"> ';
             }
             ?>
          </div>

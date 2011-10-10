@@ -79,6 +79,7 @@ class CategoryModel extends Gdn_Model {
          if (!$Categories) {
             $Sql = Gdn::SQL();
             $Sql = clone $Sql;
+            $Sql->Reset();
             $Session = Gdn::Session();
 
             $Sql->Select('c.*')

@@ -81,13 +81,11 @@ body {
    width: 960px;
    text-align: left;
    margin: 15px auto 0;
-   overflow: hidden;
 }
 #Content {
    float: left;
    width: 680px;
    margin: 0 0 40px;
-   overflow: hidden;
 }
 .Hidden {
    display: none;
@@ -1450,7 +1448,6 @@ table.PreferenceGroup td.Description {
 .CommentForm {
    background: #cfecff;
    padding: 8px;
-   clear: both;
    color: #1E79A7;
 }
 

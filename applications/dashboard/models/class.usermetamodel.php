@@ -50,6 +50,7 @@ class UserMetaModel extends Gdn_Model {
     */
    public function GetUserMeta($UserID, $Key, $Default = NULL) {
       $Sql = clone Gdn::SQL();
+      $Sql->Reset();
       $UserMetaQuery = $Sql
          ->Select('*')
          ->From('UserMeta u');

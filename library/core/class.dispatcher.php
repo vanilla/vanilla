@@ -303,6 +303,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Set special controller method options for REST APIs.
          Gdn::Controller($Controller);
          $Controller->Initialize();
+         
+         $this->EventArguments['Controller'] = &$Controller;
+         $this->FireEvent('AfterControllerCreate');
 
          // Call the requested method on the controller - error out if not defined.
          if ($PluginReplacement) {

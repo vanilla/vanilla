@@ -1042,8 +1042,9 @@ class DiscussionModel extends VanillaModel {
             'NewDiscussion',
             Anchor(Gdn_Format::Text($Discussion['Name']), ExternalUrl('discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']))),
             $UserID,
+            '',
             '/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']),
-            'QueuOnly');
+            'QueueOnly');
          if ($ID)
             $NotifiedUsers[] = $UserID;
       }

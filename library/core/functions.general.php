@@ -1884,9 +1884,10 @@ if (!function_exists('ReflectArgs')) {
     * @param callback $Callback A callback to the function.
     * @param array $Args1 An array of arguments.
     * @param array $Args2 An optional other array of arguments.
+    * @param array $AddMissing Whether or not to add missing arguments.
     * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
     */
-   function ReflectArgs($Callback, $Args1, $Args2 = NULL) {
+   function ReflectArgs($Callback, $Args1, $Args2 = NULL, $AddMissing = FALSE) {
       $Result = array();
       
       if (is_string($Callback) && !function_exists($Callback))
@@ -1922,11 +1923,13 @@ if (!function_exists('ReflectArgs')) {
          $ParamNameL = strtolower($ParamName);
 
          if (isset($Args1[$ParamNameL]))
-            $ParamValue =& $Args1[$ParamNameL];
+            $ParamValue = $Args1[$ParamNameL];
          elseif (isset($Args1[$Index]))
-            $ParamValue =& $Args1[$Index];
+            $ParamValue = $Args1[$Index];
          elseif ($MethParam->isDefaultValueAvailable())
-            $ParamValue =& $MethParam->getDefaultValue();
+            $ParamValue = $MethParam->getDefaultValue();
+         elseif ($AddMissing)
+            $ParamValue = NULL; 
          else {
             $ParamValue = NULL;
             $MissingArgs[] = '$'.$ParamName;

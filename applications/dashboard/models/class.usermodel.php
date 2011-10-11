@@ -993,7 +993,7 @@ class UserModel extends Gdn_Model {
    }
 
    public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
-      if(is_string($RoleIDs) && !is_numeric($RoleIDs)) {
+      if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
          $RoleNames = array_map('trim', explode(',', $RoleIDs));
          $RoleIDs = $this->SQL

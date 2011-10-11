@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Allows site admins to add free-form HTML to various places around the application.',
-   'Version' => '1.0.2b',
+   'Version' => '1.0.3b',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -109,7 +109,7 @@ class PocketsPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $Sender.
     */
-   public function PluginController_Pockets_Create(&$Sender, $Args = array()) {
+   public function PluginController_Pockets_Create($Sender, $Args = array()) {
       $Sender->Permission('Plugins.Pockets.Manage');
       $Sender->AddSideMenu('plugin/pockets');
       $Sender->AddJsFile('plugins/Pockets/pockets.js');
@@ -174,7 +174,7 @@ class PocketsPlugin extends Gdn_Plugin {
 //      }
 
       $Sender->Form = $Form;
-      $Sender->Render(dirname(__FILE__).'/views/index.php');
+      $Sender->Render('Index', '', 'plugins/Pockets');
    }
 
    protected function _Add($Sender) {
@@ -256,7 +256,7 @@ class PocketsPlugin extends Gdn_Plugin {
       $Sender->SetData('LocationsArray', $this->GetLocationsArray());
       $Sender->SetData('Pages', array('' => '('.T('All').')', 'activity' => 'activity', 'comments' => 'comments', 'dashboard' => 'dashboard', 'discussions' => 'discussions', 'inbox' => 'inbox', 'profile' => 'profile'));
       
-      return $Sender->Render(dirname(__FILE__).'/views/addedit.php');
+      return $Sender->Render('AddEdit', '', 'plugins/Pockets');
    }
 
    protected function _Edit($Sender, $PocketID) {
@@ -277,7 +277,7 @@ class PocketsPlugin extends Gdn_Plugin {
       }
 
       $Sender->Form = $Form;
-      $Sender->Render(dirname(__FILE__).'/views/delete.php');
+      $Sender->Render('Delete', '', 'plugins/Pockets');
       return TRUE;
    }
 

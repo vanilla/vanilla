@@ -974,24 +974,19 @@ class UserModel extends Gdn_Model {
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
-         $UserID = 1;
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
-         $Fields['UserID'] = 1;
          
-         if ($this->GetID($UserID) !== FALSE) {
-            $this->SQL->Put($this->Name, $Fields);
-         } else {
-            // Insert the new user
-            $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
-            AddActivity(
-               $UserID,
-               'Join',
-               T('Welcome to Vanilla!')
-            );
-         }
+         // Insert the new user
+         $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
+         AddActivity(
+            $UserID,
+            'Join',
+            T('Welcome to Vanilla!')
+         );
+         
          $this->SaveRoles($UserID, array(16), FALSE);
       }
       return $UserID;

@@ -23,6 +23,11 @@ class MessageModel extends Gdn_Model {
       
    }
    
+   public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
+      parent::Delete($Where, $Limit, $ResetData);
+      self::Messages(NULL);
+   }
+   
    /**
     * Returns a single message object for the specified id or FALSE if not found.
     *

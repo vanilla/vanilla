@@ -20,18 +20,18 @@ if ($this->Data('_HasDeletedUsers')) {
 $this->FireEvent('BeforeConversation');
 echo $this->Pager->ToString('less');
 ?>
-<ul class="MessageList Conversation">
+<ul class="DataList MessageList Conversation">
    <?php
    $MessagesViewLocation = $this->FetchViewLocation('messages');
    include($MessagesViewLocation);
    ?>
 </ul>
 <?php echo $this->Pager->ToString(); ?>
-<div id="MessageForm">
+<div id="MessageForm" class="CommentForm">
    <h2><?php echo T('Add Message'); ?></h2>
    <?php
    echo $this->Form->Open(array('action' => Url('/messages/addmessage/')));
-   echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'MessageBox')), 'div', array('class' => 'TextBoxWrapper'));
+   echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'TextBox')), 'div', array('class' => 'TextBoxWrapper'));
 
    echo '<div class="Buttons">',
       $this->Form->Button('Send Message'),

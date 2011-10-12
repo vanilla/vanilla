@@ -41,7 +41,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       && ($Session->UserID == $Activity->InsertUserID
          || $Session->CheckPermission('Garden.Activity.Delete'))
       )
-      echo '<div class="OptionButton">'.Anchor(T('Activity.Delete', 'Delete'), 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
+      echo '<div class="Options">'.Anchor(T('Activity.Delete', 'Delete'), 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
 
    if ($PhotoAnchor != '') {
    ?>
@@ -51,10 +51,10 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       <?php echo $Title; ?>
       <div class="Excerpt"><?php echo $Excerpt; ?></div>
       <div class="Meta">
-         <span class="DateCreated"><?php echo Gdn_Format::Date($Activity->DateInserted); ?></span>
+         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateInserted); ?></span>
          <?php
          if ($Activity->AllowComments == '1' && $Session->IsValid())
-            echo '<span class="AddComment">'.Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
+            echo '<span class="MItem AddComment">'.Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
          
          $Sender->FireEvent('AfterMeta');
          ?>
@@ -88,7 +88,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
             $CommentForm->AddHidden('ActivityID', $Activity->ActivityID);
             $CommentForm->AddHidden('Return', Gdn_Url::Request());
             echo $CommentForm->Open(array('action' => Url('/dashboard/activity/comment'), 'class' => 'Hidden'));
-            echo $CommentForm->TextBox('Body', array('MultiLine' => TRUE, 'value' => ''));
+            echo '<div class="TextBoxWrapper">'.$CommentForm->TextBox('Body', array('MultiLine' => TRUE, 'value' => '')).'</div>';
             echo $CommentForm->Close('Comment');
          ?></li>
       <?php } ?>

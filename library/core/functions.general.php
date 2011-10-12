@@ -1884,10 +1884,9 @@ if (!function_exists('ReflectArgs')) {
     * @param callback $Callback A callback to the function.
     * @param array $Args1 An array of arguments.
     * @param array $Args2 An optional other array of arguments.
-    * @param array $AddMissing Whether or not to add missing arguments.
     * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
     */
-   function ReflectArgs($Callback, $Args1, $Args2 = NULL, $AddMissing = FALSE) {
+   function ReflectArgs($Callback, $Args1, $Args2 = NULL) {
       $Result = array();
       
       if (is_string($Callback) && !function_exists($Callback))
@@ -1928,8 +1927,6 @@ if (!function_exists('ReflectArgs')) {
             $ParamValue = $Args1[$Index];
          elseif ($MethParam->isDefaultValueAvailable())
             $ParamValue = $MethParam->getDefaultValue();
-         elseif ($AddMissing)
-            $ParamValue = NULL; 
          else {
             $ParamValue = NULL;
             $MissingArgs[] = '$'.$ParamName;
@@ -1944,7 +1941,7 @@ if (!function_exists('ReflectArgs')) {
       }
       
       if (count($MissingArgs) > 0) {
-         throw new Exception("$MethName() expects the following parameters: ".implode(', ', $MissingArgs).'.');
+         trigger_error("$MethName() expects the following parameters: ".implode(', ', $MissingArgs).'.', E_USER_NOTICE);
       }
 
       return $Args;

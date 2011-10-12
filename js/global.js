@@ -351,7 +351,10 @@ jQuery(document).ready(function($) {
                $target.remove();
                break;
             case 'SlideUp':
-               $target.slideUp('fast', function() { $target.remove(); });
+               $target.slideUp('fast');
+               break;
+            case 'SlideDown':
+               $target.slideDown('fast');
                break;
             case 'Text':
                $target.text(item.Data);
@@ -639,7 +642,7 @@ jQuery(document).ready(function($) {
 	
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
-		if (!response || !response.InformMessages)
+		if (!response || !response.InformMessages || response.InformMessages.length == 0)
 			return false;
 		
 		// If there is no message container in the page, add one

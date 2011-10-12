@@ -926,7 +926,7 @@ a.BigButton:focus {
 	position: relative;
    border-bottom: 1px solid #bec8cc;
 }
-ul.Discussions .Item {
+.Discussions .Item {
    padding: 4px 8px;
 }
 .DataList .Item .Item {

@@ -702,7 +702,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
                'DateInserted' => Gdn_Format::ToDateTime(),
                'UpdateUserID' => $SystemUserID,
                'DateUpdated' => Gdn_Format::ToDateTime(),
-               'CategoryID' => $CategoryID == '' ? NULL : $CategoryID,
+               'CategoryID' => $CategoryID,
                'ForeignID' => $ForeignID,
                'Type' => $ForeignType,
                'Name' => $ForeignName == '' ? T('Undefined foreign content') : $ForeignName,

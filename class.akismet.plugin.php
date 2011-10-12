@@ -91,6 +91,7 @@ class AkismetPlugin extends Gdn_Plugin {
    }
 
    public function SettingsController_Akismet_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Akismet Settings'));
 
       $Cf = new ConfigurationModule($Sender);

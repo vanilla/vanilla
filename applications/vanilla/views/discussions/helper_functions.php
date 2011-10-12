@@ -56,7 +56,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
             
             if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
-               echo ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s New', '%s New Plural').'</strong>';
+               echo ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
          ?></span>
          <?php
             $Sender->FireEvent('AfterCountMeta');
@@ -76,7 +76,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo ' '.Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'Tag Category'));
+               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'Category'));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>

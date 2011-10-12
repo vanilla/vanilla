@@ -1400,16 +1400,17 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->Delete('Draft', array('DiscussionID' => $DiscussionID));
 
       $Log = GetValue('Log', $Options, TRUE);
-      if ($Log) {
-         LogModel::Insert('Delete', 'Discussion', $Data);
-      }
+      $LogOptions = GetValue('LogOptions', $Options, array());
+      if ($Log === TRUE)
+         $Log = 'Delete';
+      
+      LogModel::BeginTransaction();
+      LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
       
       // Log all of the comment deletes.
       $Comments = $this->SQL->GetWhere('Comment', array('DiscussionID' => $DiscussionID))->ResultArray();
-      if ($Log || array_key_exists('LogOperation', $Options)) {
-         foreach ($Comments as $Comment) {
-            LogModel::Insert(GetValue('LogOperation', $Options, 'Delete'), 'Comment', $Comment);
-         }
+      foreach ($Comments as $Comment) {
+         LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
       }
       
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
@@ -1438,12 +1439,5 @@ class DiscussionModel extends VanillaModel {
 		}
 			
       return TRUE;
-   }
-
-   public static function IsNew($Discussion) {
-      // Check for a user category.
-
-
-      // Check for user discussion.
    }
 }

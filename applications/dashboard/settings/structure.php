@@ -486,6 +486,7 @@ $Construct->Table('Log')
    ->PrimaryKey('LogID')
    ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Error'))
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'Configuration'), FALSE, 'index')
+   ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record
    ->Column('RecordDate', 'datetime')

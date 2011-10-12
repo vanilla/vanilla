@@ -77,6 +77,21 @@ if (!function_exists('Anchor')) {
    }
 }
 
+if (!function_exists('FixNl2Br')) {
+   /**
+    * Removes the break above and below tags that have a natural margin.
+    * @param string $Text The text to fix.
+    * @return string
+    * @since 2.1
+    */
+   function FixNl2Br($Text) {
+      $allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+      $Text = preg_replace('!<br\s*/>\s*(<' . $allblocks . '[^>]*>)!', "$1", $Text);
+      $Text = preg_replace('!(</' . $allblocks . '[^>]*>)<br\s*/>!', "$1", $Text);
+      return $Text;
+   }
+}
+
 /**
  * English "possessive" formatting.
  * This can be overridden in language definition files like:

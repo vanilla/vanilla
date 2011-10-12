@@ -1324,7 +1324,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SendHeaders();
 
       $Code = $Ex->getCode();
-      if (Debug())
+      if (Debug() && !is_a($Ex, 'Gdn_UserException'))
          $Message = $Ex->getMessage()."\n\n".$Ex->getTraceAsString();
       else
          $Message = $Ex->getMessage();

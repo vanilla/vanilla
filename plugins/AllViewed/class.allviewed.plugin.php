@@ -75,7 +75,6 @@ class AllViewedPlugin extends Gdn_Plugin {
       
       // Get new comment count
       return $SQL
-         ->Select('c.CommentID')
          ->From('Comment c')
          ->Where('DiscussionID', $DiscussionID)
          ->Where('DateInserted >', Gdn_Format::ToDateTime($DateAllViewed))

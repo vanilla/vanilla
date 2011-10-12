@@ -1854,11 +1854,11 @@ if (!function_exists('ReflectArgs')) {
          $ParamNameL = strtolower($ParamName);
 
          if (isset($Args1[$ParamNameL]))
-            $ParamValue =& $Args1[$ParamNameL];
+            $ParamValue = $Args1[$ParamNameL];
          elseif (isset($Args1[$Index]))
-            $ParamValue =& $Args1[$Index];
+            $ParamValue = $Args1[$Index];
          elseif ($MethParam->isDefaultValueAvailable())
-            $ParamValue =& $MethParam->getDefaultValue();
+            $ParamValue = $MethParam->getDefaultValue();
          else {
             $ParamValue = NULL;
             $MissingArgs[] = '$'.$ParamName;
@@ -1873,7 +1873,7 @@ if (!function_exists('ReflectArgs')) {
       }
       
       if (count($MissingArgs) > 0) {
-         throw new Exception("$MethName() expects the following parameters: ".implode(', ', $MissingArgs).'.');
+         trigger_error("$MethName() expects the following parameters: ".implode(', ', $MissingArgs).'.', E_USER_NOTICE);
       }
 
       return $Args;

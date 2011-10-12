@@ -57,13 +57,13 @@ foreach ($this->ConversationData->Result() as $Conversation) {
          <?php 
          $this->FireEvent('BeforeConversationMeta');
 
-         echo '<span class="MetaItem">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span>';
+         echo ' <span class="MItem">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
 
          if ($Conversation->CountNewMessages > 0) {
-            echo '<strong class="MetaItem">'.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong>';
+            echo ' <strong class="MItem"> '.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';
          }
          
-         echo '<span class="MetaItem">'.Gdn_Format::Date($Conversation->DateLastMessage).'</span>';
+         echo ' <span class="MItem">'.Gdn_Format::Date($Conversation->DateLastMessage).'</span> ';
          ?>
       </div>
    </div>

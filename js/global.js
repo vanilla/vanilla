@@ -350,6 +350,12 @@ jQuery(document).ready(function($) {
             case 'Remove':
                $target.remove();
                break;
+            case 'SlideUp':
+               $target.slideUp('fast');
+               break;
+            case 'SlideDown':
+               $target.slideDown('fast');
+               break;
             case 'Text':
                $target.text(item.Data);
                break;
@@ -479,6 +485,43 @@ jQuery(document).ready(function($) {
      });
    };
    $('.Popin').popin();
+   
+   var hijackClick = function(e) {
+      var $elem = $(this);
+      var href = $elem.attr('href');
+      $elem.removeAttr('href');
+      $elem.addClass('InProgress');
+
+      $.ajax({
+         type: "POST",
+         url: href,
+         data: {DeliveryType: 'VIEW', 'DeliveryMethod': 'JSON'},
+         dataType: 'json',
+         complete: function() {
+            $elem.removeClass('InProgress');
+            $elem.attr('href', href);
+         },
+         error: function(xhr) {
+            gdn.informError(xhr);
+         },
+         success: function(json) {
+            if (json == null) json = {};
+            
+            var informed = gdn.inform(json);
+            gdn.processTargets(json.Targets);
+            // If there is a redirect url, go to it.
+            if (json.RedirectUrl) {
+               setTimeout(function() {
+                     window.location.replace(json.RedirectUrl);
+                  },
+                  informed ? 3000 : 0);
+            }
+         }
+      });
+
+      return false;
+   };
+   $('.Hijack').live('click', hijackClick);
 
    $.fn.openToggler = function() {
      $(this).click(function() {
@@ -599,8 +642,8 @@ jQuery(document).ready(function($) {
 	
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
-		if (!response || !response.InformMessages)
-			return;
+		if (!response || !response.InformMessages || response.InformMessages.length == 0)
+			return false;
 		
 		// If there is no message container in the page, add one
 		var informMessages = $('div.InformMessages');
@@ -690,6 +733,7 @@ jQuery(document).ready(function($) {
 			}
 		}
 		informMessages.show();
+      return true;
    }
 	
 	// Send an informMessage to the screen (same arguments as controller.InformMessage).
@@ -708,6 +752,24 @@ jQuery(document).ready(function($) {
 		
 		gdn.inform({'InformMessages' : new Array(options)});
 	}
+   
+   // Inform an error returned from an ajax call.
+   gdn.informError = function(xhr) {
+      if (typeof(xhr) == 'string')
+         xhr = {responseText: xhr, code: 500};
+      
+      var message = xhr.responseText;
+      var code = xhr.status;
+      
+      try {
+         var data = $.parseJSON(message);
+         if (data.Exception)
+            message = data.Exception;
+      } catch(e) {
+      }
+      
+      gdn.informMessage('<span class="InformSprite SkullBones Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
+   }
    
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);

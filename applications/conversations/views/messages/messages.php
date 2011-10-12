@@ -34,7 +34,7 @@ foreach ($this->MessageData->Result() as $Message) {
             echo UserAnchor($Author, 'Name');
             ?>
          </span>
-         <span class="DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
+         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
       </div>
       <div class="Message">
          <?php

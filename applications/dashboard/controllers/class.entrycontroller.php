@@ -697,8 +697,15 @@ class EntryController extends Gdn_Controller {
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
                $Password = $this->Form->GetFormValue('Password');
-               if ($PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User))) {
-                  
+               try {
+                  $PasswordChecked = $PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User));
+               } catch (Gdn_UserException $Ex) {
+                  $this->Form->AddError($Ex);
+                  $this->Render();
+                  return;
+               }
+               
+               if ($PasswordChecked) {
                   // Update weak passwords
                   $HashMethod = GetValue('HashMethod', $User);
                   if ($PasswordHash->Weak || ($HashMethod && strcasecmp($HashMethod, 'Vanilla') != 0)) {

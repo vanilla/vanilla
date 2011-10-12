@@ -162,8 +162,7 @@ jQuery(document).ready(function($) {
                $(frm).trigger('PreviewLoaded', [frm]);
                $(parent).find('li.Active').removeClass('Active');
                $(btn).parents('li').addClass('Active');
-               $(frm).find('#Form_Body').after(json.Data);
-               $(frm).find('#Form_Body').hide();
+               $(frm).find('.TextBoxWrapper').hide().after(json.Data);
                
             } else if (!draft) {
                // Clean up the form
@@ -217,7 +216,7 @@ jQuery(document).ready(function($) {
       $(parent).find('li.Active').removeClass('Active');
       $('a.WriteButton').parents('li').addClass('Active');
       $(parent).find('div.Preview').remove();
-      $(parent).find('textarea').show();
+      $(parent).find('.TextBoxWrapper').show();
       $('span.TinyProgress').remove();
    }
 

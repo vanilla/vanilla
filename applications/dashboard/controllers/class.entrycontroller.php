@@ -1522,7 +1522,7 @@ class EntryController extends Gdn_Controller {
          if (is_array($TrustedDomains)) {
             // Add this domain to the trusted hosts.
             $TrustedDomains[] = $MyHostname;
-            $Sender->EventArguments['TrustedDomains'] = &$TrustedDomains;
+            $this->EventArguments['TrustedDomains'] = &$TrustedDomains;
             $this->FireEvent('BeforeTargetReturn');
          }
 			

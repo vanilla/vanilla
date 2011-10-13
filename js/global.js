@@ -217,6 +217,15 @@ jQuery(document).ready(function($) {
    // This turns SignInPopup anchors into in-page popups
    if ($.fn.popup)
       $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
+   
+   if ($.fn.popup)
+      $('.PopupClose').live('click', function(event){
+         var Popup = $(event.target).parents('.Popup');
+         if (Popup.length) {
+            var PopupID = Popup.prop('id');
+            $.popup.close({popupId: PopupID});
+         }
+      });
 
    // Make sure that message dismissalls are ajax'd
    $('a.Dismiss').live('click', function() {

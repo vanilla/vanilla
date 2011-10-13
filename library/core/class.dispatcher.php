@@ -546,7 +546,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Controller = ucfirst(strtolower($Controller));
 
       // Check for a file extension on the controller.
-      list($Controller, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Controller, TRUE);
+      list($Controller, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Controller, FALSE);
       
       if (!is_null($Application)) {
          Gdn_Autoloader::Priority(

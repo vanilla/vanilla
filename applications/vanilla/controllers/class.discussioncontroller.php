@@ -656,17 +656,20 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       if (!$Discussion && $ForeignID != '' && $ForeignType != '') {
          if ($ForeignName == '' || $ForeignBody == '') {
             $PageInfo = FetchPageInfo($ForeignUrl);
-            if (!$PageInfo['Exception']) {
-               $ForeignName = $PageInfo['Title'];
-               $ForeignBody = Wrap(Anchor($ForeignName, $ForeignUrl), 'strong')."\n"
-                  .'<br />'
-                  .Wrap(Anchor($ForeignUrl, $ForeignUrl), 'small')."\n"
-                  .Wrap($PageInfo['Description'], 'p');
+            $ForeignName = GetValue('Title', $PageInfo, '');
+            $ForeignDescription = GetValue('Description', $PageInfo, '');
+            $ForeignImages = GetValue('Images', $PageInfo, array());
+            if (!is_array($ForeignImages))
+               $ForeignImages = array();
+               
+            $ForeignBody = Wrap(Anchor($ForeignName, $ForeignUrl), 'strong')."\n"
+               .'<br />'
+               .Wrap(Anchor($ForeignUrl, $ForeignUrl), 'small')."\n"
+               .Wrap($ForeignDescription, 'p');
                   
-               if (count($PageInfo['Images']) > 0)
-                  $ForeignBody = Anchor(Img($PageInfo['Images'][0], array('alt' => $ForeignName, 'class' => 'Thumbnail')), $ForeignUrl)."\n"
+               if (count($ForeignImages) > 0)
+                  $ForeignBody = Anchor(Img($ForeignImages[0], array('alt' => $ForeignName, 'class' => 'Thumbnail')), $ForeignUrl)."\n"
                      .$ForeignBody;
-            }
          }
          $Body = $ForeignBody;
          if ($Body == '' && $ForeignUrl != '')

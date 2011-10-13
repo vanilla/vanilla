@@ -1030,10 +1030,12 @@ a.BigButton:focus {
    font-size: 15px;
    font-weight: bold;
 }
+/*
 .Condensed,
 .Condensed li {
 	clear: left;
 }
+*/
 .Condensed .Title,
 .Condensed a.Title {
 	display: inline;
@@ -2213,7 +2215,7 @@ body.Entry #Content h1 {
    color: #02475A;
    font-size:140%;
    font-weight:bold;
-   padding: 6px;
+   padding: 6px 0;
 	margin: 0;
 	text-align: left;
 }
@@ -2320,9 +2322,10 @@ body#dashboard_entry_index ul li label.CheckBoxLabel,
 	font-weight: normal;
 	margin: 10px 0 0 10px;
 }
-body.Entry li.Buttons input.Button,
-.SignInPopup li.Buttons input.Button {
-	margin: 10px 0;
+.SignInPopup li.Buttons,
+body.Entry li.Buttons {
+	text-align: left;
+	padding: 0 0 10px;
 }
 .Entry {
 	position: relative;
@@ -2839,13 +2842,13 @@ body.embed .Connect h2 {
 	font-weight: bold;
 	border-bottom: 1px solid #BEC8CC;
 }
-.Embed .MessageForm {
+.EmbedCommentForm {
    background: #f2f2f2;
    border-top: 1px solid #ffffff;
    border-bottom: 1px solid #BEC8CC;
    padding: 7px 8px;
 }
-.Embed .TextBox {
+.EmbedCommentForm .TextBox {
 	width: 100%;
 	height: 50px;
 	min-height: 50px;
@@ -2855,13 +2858,16 @@ body.embed .Connect h2 {
 	-webkit-border-radius: 0;
 	font-size: 12px;
 }
-.Embed .Author {
+.Embed .Buttons {
+	font-size: 11px;
+}
+.EmbedCommentForm .Author {
 	display: inline-block;
 	font-size: 11px;
 	color: #777;
 	padding: 0 8px 0 0;
 }
-.Embed input.Button {
+.Embed .CommentForm input.Button {
 	font-size: 12px;
 }
 .Embed .Foot {

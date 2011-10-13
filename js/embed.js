@@ -191,9 +191,9 @@ window.vanilla.embed = function(host) {
    vanillaIframe.allowtransparency = true;
    vanillaIframe.border = "0";
    vanillaIframe.width = "100%";
-   vanillaIframe.height = "1000";
+   vanillaIframe.height = "300";
    vanillaIframe.style.width = "100%";
-   vanillaIframe.style.height = "1000px";
+   vanillaIframe.style.height = "300px";
    vanillaIframe.style.border = "0";
    vanillaIframe.style.display = "block";
    (document.getElementById('vanilla-comments')).appendChild(vanillaIframe);

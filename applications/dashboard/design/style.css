@@ -2213,7 +2213,7 @@ body.Entry #Content h1 {
    color: #02475A;
    font-size:140%;
    font-weight:bold;
-   padding: 6px;
+   padding: 6px 0;
 	margin: 0;
 	text-align: left;
 }
@@ -2320,9 +2320,10 @@ body#dashboard_entry_index ul li label.CheckBoxLabel,
 	font-weight: normal;
 	margin: 10px 0 0 10px;
 }
-body.Entry li.Buttons input.Button,
-.SignInPopup li.Buttons input.Button {
-	margin: 10px 0;
+.SignInPopup li.Buttons,
+body.Entry li.Buttons {
+	text-align: left;
+	padding: 0 0 10px;
 }
 .Entry {
 	position: relative;

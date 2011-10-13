@@ -2840,13 +2840,13 @@ body.embed .Connect h2 {
 	font-weight: bold;
 	border-bottom: 1px solid #BEC8CC;
 }
-.Embed .MessageForm {
+.EmbedCommentForm {
    background: #f2f2f2;
    border-top: 1px solid #ffffff;
    border-bottom: 1px solid #BEC8CC;
    padding: 7px 8px;
 }
-.Embed .TextBox {
+.EmbedCommentForm .TextBox {
 	width: 100%;
 	height: 50px;
 	min-height: 50px;
@@ -2856,13 +2856,16 @@ body.embed .Connect h2 {
 	-webkit-border-radius: 0;
 	font-size: 12px;
 }
-.Embed .Author {
+.Embed .Buttons {
+	font-size: 11px;
+}
+.EmbedCommentForm .Author {
 	display: inline-block;
 	font-size: 11px;
 	color: #777;
 	padding: 0 8px 0 0;
 }
-.Embed input.Button {
+.Embed .CommentForm input.Button {
 	font-size: 12px;
 }
 .Embed .Foot {

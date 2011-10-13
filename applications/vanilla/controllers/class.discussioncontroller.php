@@ -679,19 +679,17 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
             $CategoryID = C('Vanilla.Embed.DefaultCategoryID', 0);
             if ($CategoryID <= 0) {
                // No default category defined, so grab the first non-root category and use that.
-               try {
-                  $CategoryID = $this->DiscussionModel
-                     ->SQL
-                     ->Select('CategoryID')
-                     ->From('Category')
-                     ->Where('CategoryID >', 0)
-                     ->Get()
-                     ->FirstRow()
-                     ->CategoryID;
-               } catch (Exception $ex) {
-                  // No categories in the db? default to 0
-                  $CategoryID = 0;
-               }
+               $CategoryID = $this->DiscussionModel
+                  ->SQL
+                  ->Select('CategoryID')
+                  ->From('Category')
+                  ->Where('CategoryID >', 0)
+                  ->Get()
+                  ->FirstRow()
+                  ->CategoryID;
+               // No categories in the db? default to 0
+               if (!$CategoryID)
+               $CategoryID = 0;
             }
          }
          
@@ -703,7 +701,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
                'DateInserted' => Gdn_Format::ToDateTime(),
                'UpdateUserID' => $SystemUserID,
                'DateUpdated' => Gdn_Format::ToDateTime(),
-               'CategoryID' => $CategoryID == '' ? NULL : $CategoryID,
+               'CategoryID' => $CategoryID,
                'ForeignID' => $ForeignID,
                'Type' => $ForeignType,
                'Name' => $ForeignName == '' ? T('Undefined foreign content') : $ForeignName,

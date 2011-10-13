@@ -200,6 +200,10 @@ class Gdn_Configuration extends Gdn_Pluggable {
     * @return mixed The configuration value.
     */
    public function Get($Name, $DefaultValue = FALSE) {
+      
+      // Shortcut, get the whole config
+      if ($Name == '.') return $this->Data;
+      
       $Path = explode('.', $Name);
       
       $Value = $this->Data;

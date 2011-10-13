@@ -547,7 +547,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Application = GetValue($ControllerKey-1, $Parts, NULL);
 
       // Check for a file extension on the controller.
-      list($Controller, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Controller, TRUE);
+      list($Controller, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Controller, FALSE);
       
       // If we're loading from a fully qualified path, prioritize this app's library
       if (!is_null($Application)) {
@@ -587,7 +587,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          
          $Length = sizeof($Parts);
          if ($Length > $ControllerKey + 1)
-            list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1], TRUE);
+            list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1], FALSE);
    
          if ($Length > $ControllerKey + 2) {
             for ($i = $ControllerKey + 2; $i < $Length; ++$i) {

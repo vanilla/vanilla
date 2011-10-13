@@ -1,10 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
 $this->EmbedType = GetValue('0', $this->RequestArgs, 'comments');
-  
+$AllowEmbed = C('Garden.Embed.Allow');
 ?>
 <h1><?php echo T('&lt;Embed&gt; Vanilla'); ?></h1>
 <div class="Info">
-   <?php echo T('Vanilla can be embedded into your site in a variety of ways. Click the tabs below to find out more.'); ?>
+   <?php
+   echo T('AboutEmbedding', 'Embedding allows all or part of your community to be embedded into other applications & web pages.');
+   if (!$AllowEmbed) {
+      echo Wrap('<span style="background: #ff0;">'.T('Embedding is currently DISABLED.').'</span>', 'p');
+      echo Anchor('Enable Embedding', 'embed/enable/'.Gdn::Session()->TransientKey(), 'SmallButton');
+   } else {
+      echo Wrap('<span style="background: #ff0;">'.T('Embedding is currently ENABLED.').'</span>', 'p');
+      echo Anchor('Disable Embedding', 'embed/disable/'.Gdn::Session()->TransientKey(), 'SmallButton');
+      echo Wrap(T('Vanilla can be embedded into your site in a variety of ways. Click the tabs below to find out more.'), 'p');
+   ?>
 </div>
 <div class="Tabs FilterTabs">
    <ul>
@@ -80,12 +89,12 @@ var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the
 &lt;script type="text/javascript">
 /* Configuration Settings: Edit before pasting into your web page */
 var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the full http url & path to your vanilla forum
-var vanilla_identifier = 'your-content-identifier'; // Required: a unique identifier for the web page & comments
+var vanilla_identifier = 'your-content-identifier'; // Required: your unique identifier for the content being commented on
 
 /* Optional */
 // var vanilla_url = 'http://yourdomain.com/page-with-comments.html'; // Not required: the full http url & path of the page where this script is embedded.
 // var vanilla_type = 'blog'; // possibly used to render the discussion body a certain way in the forum? Also used to filter down to foreign types so that matching foreign_id's across type don't clash.
-// var vanilla_name = 'Page with Comments';
+// var vanilla_name = 'Title of Page with Comments';
 // var vanilla_body = ''; // Want the forum discussion body to appear a particular way?
 // var vanilla_discussion_id = ''; // In case you want to embed a particular discussion
 // var vanilla_category_id = ''; // vanilla category id to force the discussion to be inserted into?
@@ -125,4 +134,8 @@ var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the
    
    <p>Vanilla will then replace the content of the anchor (in this case, the word "Comments") with the number of comments on the page in question.</p>
 </div>
-<?php }
+<?php
+   }
+}
+?>
+</div>

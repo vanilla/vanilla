@@ -11,7 +11,7 @@ if (!function_exists('WriteComment'))
    </div>
 <?php } else { ?>
    <h3><?php echo T('Leave Comments'); ?></h3>
-   <div class="MessageForm CommentForm">
+   <div class="MessageForm CommentForm EmbedCommentForm">
       <?php
       echo $this->Form->Open();
       echo $this->Form->Errors();
@@ -38,7 +38,7 @@ if (!function_exists('WriteComment'))
       ?>
    </div>
 <?php } ?>
-<ul class="MessageList Discussion">
+<ul class="DataList MessageList Discussion">
    <?php
    $this->FireEvent('BeforeCommentsRender');
    $CurrentOffset = $this->Offset;

@@ -35,7 +35,13 @@ class EmbedController extends DashboardController {
     * @since 2.0.18
     * @access public
     */
-   public function Index() {
+   public function Index($Toggle = '', $TransientKey = '') {
+      $this->Permission('Garden.Settings.Manage');
+      
+      if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+         SaveToConfig('Garden.Embed.Allow', $Toggle == 'enable' ? TRUE : FALSE);
+         Redirect('embed');
+      }
       $this->AddSideMenu('dashboard/embed');
       $this->Title('Embed Vanilla');
       $this->Form = new Gdn_Form();

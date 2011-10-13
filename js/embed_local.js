@@ -1,13 +1,25 @@
-jQuery(document).ready(function($) {   
+jQuery(document).ready(function($) {
    if (typeof(gdn) == "undefined") {
       gdn = {};
       gdn.definition = function() {
          return '';
       }
    }
+   
+   /*
+    Embedded pages can have very low height settings. As a result, when an
+    absolutely positioned popup appears on the page, iframed content doesn't
+    know to increase the page height. So, we need to detect when popups appear
+    and increase the page height manually so the container knows to do the same.
+   */
+   $('body').bind('popupReveal', function() {
+      var height = ($.popup.getPagePosition().top*1) + ($('.Popup').height()*1);
+      $('body').css('minHeight', height+'px');
+   });
+   
       
    var currentHeight = null,
-      minHeight = 300,
+      minHeight = 100,
       remotePostMessage = function(message, target) {},
       inIframe = top !== self,
       inDashboard = gdn.definition('InDashboard', '') != '',

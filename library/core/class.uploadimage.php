@@ -110,14 +110,14 @@ class Gdn_UploadImage extends Gdn_Upload {
          
       if ($Width == '' || !is_numeric($Width))
          $Width = $WidthSource;
-      
-      // Icons cannot be converted
-      if ($Type == 17)
-         $OutputType = 'ico';
 
-      if (!$OutputType) {
+      if (!$OutputType) {      
          $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico');
          $OutputType = GetValue($Type, $OutputTypes, 'jpg');
+      }
+      elseif ($Type == 17 && $OutputType != 'ico') {
+         // Icons cannot be converted
+         throw new Exception(T('Upload cannot convert icons.'));
       }
 
       // Figure out the target path.

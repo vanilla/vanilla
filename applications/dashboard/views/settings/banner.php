@@ -62,7 +62,7 @@ echo $this->Form->Errors();
             );
          } else {
             echo Wrap(
-               T('FaviconDescription', "The shortcut icon that shows up in your browser's bookmark menu."),
+               T('FaviconDescription', "The shortcut icon that shows up in your browser's bookmark menu (16x16 px)."),
                'div',
                array('class' => 'Info')
             );

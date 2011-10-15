@@ -311,11 +311,19 @@ a.Button {
 	color: #001F44;
 	text-shadow:0 1px 0 #EEFFFF;
 }
-
 .SmallButton:hover {
 	box-shadow:0 0 2px #999999;
 	-moz-box-shadow:0 0 2px #999999;
 	-webkit-box-shadow:0 0 2px #999999;
+}
+.Button.Active,
+.Button:active,
+.SmallButton.Active,
+.SmallButton:active {
+	background: #003673;
+	border-color: #000;
+	color:#B7F5FD;
+	text-shadow:0 1px 0 #001D3F;
 }
 
 .ButtonList .SmallButton {

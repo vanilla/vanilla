@@ -186,6 +186,12 @@ class Gdn_Theme {
          return '';
 
       $Url = Gdn::Request()->Url($Path, $WithDomain);
+      
+      if ($TK = GetValue('TK', $Options)) {
+         if (in_array($TK, array(1, 'true')))
+            $TK = 'TransientKey';
+         $Url .= (strpos($Url, '?') === FALSE ? '?' : '&').$TK.'='.urlencode(Gdn::Session()->TransientKey());
+      }
 
       if (strcasecmp(trim($Path, '/'), Gdn::Request()->Path()) == 0)
          $Class = ConcatSep(' ', $Class, 'Selected');

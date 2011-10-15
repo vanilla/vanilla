@@ -667,11 +667,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          
    }
 
+   /**
+    * Parses methods that may be using dot-syntax to express a delivery type
+    * 
+    * For example, /controller/method.json
+    * method.json should be split up and return array('method', 'JSON')
+    * 
+    * @param type $Name Name of method to search for forced delivery types
+    * @param type $AllowAll Whether to allow delivery types that don't exist
+    * @return type 
+    */
    protected function _SplitDeliveryMethod($Name, $AllowAll = FALSE) {
-      $Parts = explode('.', $Name, 2);
+      $Parts = explode('.', $Name);
       if (count($Parts) >= 2) {
-         if ($AllowAll || in_array(strtoupper($Parts[1]), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT))) {
-            return array($Parts[0], strtoupper($Parts[1]));
+         $DeliveryPart = array_pop($Parts);
+         $MethodPart = implode('.', $Parts);
+         
+         if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT))) {
+            return array($MethodPart, strtoupper($DeliveryPart));
          } else {
             return array($Name, $this->_DeliveryMethod);
          }

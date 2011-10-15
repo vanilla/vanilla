@@ -321,20 +321,21 @@ class Gdn_FileSystem {
  
          // Figure out the MIME type
          $MimeTypes = array(
-           "pdf" => "application/pdf",
-           "txt" => "text/plain",
+           "pdf"  => "application/pdf",
+           "txt"  => "text/plain",
            "html" => "text/html",
-           "htm" => "text/html",
-           "exe" => "application/octet-stream",
-           "zip" => "application/zip",
-           "doc" => "application/msword",
-           "xls" => "application/vnd.ms-excel",
-           "ppt" => "application/vnd.ms-powerpoint",
-           "gif" => "image/gif",
-           "png" => "image/png",
-           "jpeg"=> "image/jpg",
-           "jpg" =>  "image/jpg",
-           "php" => "text/plain"
+           "htm"  => "text/html",
+           "exe"  => "application/octet-stream",
+           "zip"  => "application/zip",
+           "doc"  => "application/msword",
+           "xls"  => "application/vnd.ms-excel",
+           "ppt"  => "application/vnd.ms-powerpoint",
+           "gif"  => "image/gif",
+           "png"  => "image/png",
+           "jpeg" => "image/jpg",
+           "jpg"  => "image/jpg",
+           "php"  => "text/plain",
+           "ico"  => "image/vnd.microsoft.icon"
          );
          
          if ($MimeType == '') {

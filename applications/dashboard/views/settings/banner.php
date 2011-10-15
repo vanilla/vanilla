@@ -21,7 +21,7 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->Label('Banner Logo', 'Garden.Logo');
+         echo $this->Form->Label('Banner Logo', 'Logo');
          $Logo = $this->Data('Logo');
          if ($Logo) {
             echo Wrap(
@@ -30,13 +30,13 @@ echo $this->Form->Errors();
             );
             echo Wrap(Anchor(T('Remove Banner Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
             echo Wrap(
-               T('Browse for a new banner logo if you would like to change it:'),
+               T('LogoBrowse', 'Browse for a new banner logo if you would like to change it:'),
                'div',
                array('class' => 'Info')
             );
          } else {
             echo Wrap(
-               T('The banner logo appears at the top of your forum.'),
+               T('LogoDescription', 'The banner logo appears at the top of your forum.'),
                'div',
                array('class' => 'Info')
             );
@@ -47,22 +47,22 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->Label('Shortcut Icon', 'Garden.Favicon');
+         echo $this->Form->Label('Favicon', 'Favicon');
          $Favicon = $this->Data('Favicon');
          if ($Favicon) {
             echo Wrap(
                Img(Gdn_Upload::Url($Favicon)),
                'div'
             );
-            echo Wrap(Anchor(T('Remove Shortcut Icon'), '/dashboard/settings/removefavicon/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+            echo Wrap(Anchor(T('Remove Favicon'), '/dashboard/settings/removefavicon/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
             echo Wrap(
-               T('Browse for a new shortcut icon if you would like to change it:'),
+               T('FaviconBrowse', 'Browse for a new favicon if you would like to change it:'),
                'div',
                array('class' => 'Info')
             );
          } else {
             echo Wrap(
-               T("The shortut icon shows up in your browser's menu."),
+               T('FaviconDescription', "The shortcut icon that shows up in your browser's bookmark menu (16x16 px)."),
                'div',
                array('class' => 'Info')
             );

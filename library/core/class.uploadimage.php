@@ -35,7 +35,7 @@ class Gdn_UploadImage extends Gdn_Upload {
    
    public function Clear() {
       parent::Clear();
-		$this->_AllowedFileExtensions = array('jpg','jpeg','gif','png','bmp');
+		$this->_AllowedFileExtensions = array('jpg','jpeg','gif','png','bmp','ico');
    }
 
    /**
@@ -111,9 +111,13 @@ class Gdn_UploadImage extends Gdn_Upload {
       if ($Width == '' || !is_numeric($Width))
          $Width = $WidthSource;
 
-      if (!$OutputType) {
-         $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png');
+      if (!$OutputType) {      
+         $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico');
          $OutputType = GetValue($Type, $OutputTypes, 'jpg');
+      }
+      elseif ($Type == 17 && $OutputType != 'ico') {
+         // Icons cannot be converted
+         throw new Exception(T('Upload cannot convert icons.'));
       }
 
       // Figure out the target path.
@@ -123,10 +127,10 @@ class Gdn_UploadImage extends Gdn_Upload {
       if (!file_exists(dirname($TargetPath)))
          mkdir(dirname($TargetPath), 0777, TRUE);
       
-      // Don't resize if the source dimensions are smaller than the target dimensions
+      // Don't resize if the source dimensions are smaller than the target dimensions or an icon
       $XCoord = GetValue('SourceX', $Options, 0);
       $YCoord = GetValue('SourceY', $Options, 0);
-      if ($HeightSource > $Height || $WidthSource > $Width) {
+      if (($HeightSource > $Height || $WidthSource > $Width) && $Type != 17) {
          $AspectRatio = (float) $WidthSource / $HeightSource;
          if ($Crop === FALSE) {
             if (round($Width / $AspectRatio) > $Height) {
@@ -163,6 +167,11 @@ class Gdn_UploadImage extends Gdn_Upload {
 
       $Process = TRUE;
       if ($WidthSource <= $Width && $HeightSource <= $Height && $Type == 1 && $SaveGif) {
+         $Process = FALSE;
+      }
+      
+      // Never process icons
+      if ($Type == 17) {
          $Process = FALSE;
       }
 

@@ -1390,8 +1390,11 @@ class EntryController extends Gdn_Controller {
       if ($UserID && !Gdn::Session()->CheckPermission('Garden.Users.Edit'))
          $UserID = '';
       
-      $this->UserModel->SendEmailConfirmationEmail($UserID);
+      try {
+         $this->UserModel->SendEmailConfirmationEmail($UserID);
+      } catch (Exception $Ex) {}
       $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+      
       $this->Render();
    }
    

@@ -23,7 +23,7 @@ $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_
 
 $Configuration['Cache']['Enabled']                              = TRUE;
 $Configuration['Cache']['Method']                               = 'dirtycache';
-$Configuration['Cache']['Filecache']['Store']                   = PATH_LOCAL_CACHE.'/Filecache';
+$Configuration['Cache']['Filecache']['Store']                   = PATH_CACHE.'/Filecache';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';

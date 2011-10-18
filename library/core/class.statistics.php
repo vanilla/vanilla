@@ -122,7 +122,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       }
       
       // If the config file is not writable, show a warning to admin users and return
-      $ConfFile = PATH_LOCAL_CONF.DS.'config.php';
+      $ConfFile = PATH_CONF.'/config.php';
       if (!is_writable($ConfFile)) {
          // Admins see a helpful notice
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
@@ -557,7 +557,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       }
       
       // If the config file is not writable, gtfo
-      $ConfFile = PATH_LOCAL_CONF.DS.'config.php';
+      $ConfFile = PATH_CONF.'/config.php';
       if (!is_writable($ConfFile))
          return;
       

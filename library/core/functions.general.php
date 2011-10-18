@@ -10,91 +10,6 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
 
-/*
-function Gdn_Autoload($ClassName) {
-   if (!class_exists('Gdn_FileSystem', FALSE))
-      return false;
-      
-   if (!class_exists('Gdn_LibraryMap', FALSE))
-      return false;
-
-   if (!class_exists('Gdn', FALSE))
-      return false;
-   
-   if (substr($ClassName, 0, 4) === 'Gdn_')
-      $LibraryFileName = 'class.' . strtolower(substr($ClassName, 4)) . '.php';
-   else
-      $LibraryFileName = 'class.' . strtolower($ClassName) . '.php';
-   
-   if (!is_null($ApplicationManager = Gdn::Factory('ApplicationManager')))
-      $ApplicationWhiteList = Gdn::Factory('ApplicationManager')->EnabledApplicationFolders();
-   else
-      $ApplicationWhiteList = NULL;
-   
-   // If we're turning on an application, temporarily allow it in the autoloader
-   $TemporaryAppFolders = C('TemporaryApplications', FALSE);
-   if ($TemporaryAppFolders !== FALSE && is_array($TemporaryAppFolders) && sizeof($TemporaryAppFolders))
-      $ApplicationWhiteList = array_flip(array_flip(array_merge($ApplicationWhiteList, $TemporaryAppFolders)));
-      
-   $LibraryPath = FALSE;
-
-   if (Gdn::PluginManager() instanceof Gdn_PluginManager) {
-      // Look for plugin files.
-      if ($LibraryPath === FALSE) {
-         foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $Trash) {
-            // If we have already loaded the plugin manager, use its internal folder list, otherwise scan all subfolders during search
-            $PluginFolders = (Gdn::PluginManager()->Started()) ? Gdn::PluginManager()->EnabledPluginFolders($SearchPath) : TRUE;
-            
-            $LibraryPath = Gdn_FileSystem::FindByMapping('library', $SearchPath, $PluginFolders, $LibraryFileName);
-         }
-      }
-
-      // Look harder for plugin files.
-      if ($LibraryPath === FALSE) {
-         $LibraryPath = Gdn_FileSystem::FindByMapping('plugin', FALSE, FALSE, $ClassName);
-      }
-   }
-
-   // If this is a model, look in the models folder(s)
-   if (!$LibraryPath && strtolower(substr($ClassName, -5)) == 'model')
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "models/{$LibraryFileName}");
-
-   // Look for the class in the applications' library folders.
-   if ($LibraryPath === FALSE) {
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "library/{$LibraryFileName}");
-   }
-
-   // Look for the class in the core.
-   if ($LibraryPath === FALSE)
-      $LibraryPath = Gdn_FileSystem::FindByMapping(
-         'library',
-         PATH_LIBRARY,
-         array(
-            'core',
-            'database',
-            'vendors/phpmailer'
-         ),
-         $LibraryFileName
-      );
-
-   // If it still hasn't been found, check for modules
-   if ($LibraryPath === FALSE)
-      $LibraryPath = Gdn_FileSystem::FindByMapping('library', PATH_APPLICATIONS, $ApplicationWhiteList, "modules/{$LibraryFileName}");
-
-   if ($LibraryPath !== FALSE)
-      include_once($LibraryPath);
-}
-
-if (!function_exists('__autoload')) {
-   function __autoload($ClassName) {
-      trigger_error('__autoload() is deprecated. Use sp_autoload_call() instead.', E_USER_DEPRECATED);
-      spl_autoload_call($ClassName);
-   }
-}
-
-spl_autoload_register('Gdn_Autoload', FALSE);
-*/
-
 if (!function_exists('AbsoluteSource')) {
    /**
     * Takes a source path (ie. an image src from an html page), and an
@@ -700,6 +615,23 @@ if (!function_exists('Debug')) {
          error_reporting(E_ALL);
       else
          error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+   }
+}
+
+if (!function_exists('DebugMethod')) {
+   function DebugMethod($MethodName, $MethodArgs = array()) {
+      echo $MethodName."(";
+      $SA = array();
+      foreach ($MethodArgs as $FuncArg) {
+         if (!is_array($FuncArg) && !is_object($FuncArg))
+            $SA[] = "'{$FuncArg}'";
+         elseif (is_array($FuncArg))
+            $SA[] = "'Array(".sizeof($FuncArg).")'";
+         else
+            $SA[] = gettype($FuncArg)."/".get_class($FuncArg);
+      }
+      echo implode(', ', $SA);
+      echo ")\n";
    }
 }
 
@@ -1956,19 +1888,7 @@ if (!function_exists('RemoteIP')) {
 
 if (!function_exists('RemoveFromConfig')) {
    function RemoveFromConfig($Name) {
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_LOCAL_CONF.DS.'config.php';
-      $Config->Load($Path, 'Save');
-      if (!is_array($Name))
-         $Name = array($Name);
-      
-      foreach ($Name as $k) {
-         $Config->Remove($k);
-      }
-      $Result = $Config->Save($Path);
-      if ($Result)
-         $Config->Load($Path, 'Use');
-      return $Result;
+      Gdn::Config()->RemoveFromConfig($Name);
    }
 }
 
@@ -2118,32 +2038,7 @@ if (!function_exists('SaveToConfig')) {
     * @return bool: Whether or not the save was successful. NULL if no changes were necessary.
     */
    function SaveToConfig($Name, $Value = '', $Options = array()) {
-      // Don't save the value if it hasn't changed.
-      if (GetValue('CheckExisting', $Options) && is_string($Name) && C($Name) == $Value)
-         return TRUE;
-      
-      $Save = $Options === FALSE ? FALSE : GetValue('Save', $Options, TRUE);
-      $RemoveEmpty = GetValue('RemoveEmpty', $Options);
-
-      $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Path = PATH_LOCAL_CONF.DS.'config.php';
-      $Config->Load($Path, 'Save');
-
-      if (!is_array($Name))
-         $Name = array($Name => $Value);
-
-      foreach ($Name as $k => $v) {
-         if (!$v && $RemoveEmpty) {
-            $Config->Remove($k);
-         } else {
-            $Config->Set($k, $v, TRUE, $Save);
-         }
-      }
-
-      if ($Save)
-         return $Config->Save($Path);
-      else
-         return TRUE;
+      Gdn::Config()->SaveToConfig($Name, $Value, $Options);
    }
 }
 

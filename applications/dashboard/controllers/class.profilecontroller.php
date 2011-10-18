@@ -494,9 +494,9 @@ class ProfileController extends Gdn_Controller {
             $TmpImage = $UploadImage->ValidateUpload('Picture');
             
             // Generate the target image name.
-            $TargetImage = $UploadImage->GenerateTargetName(PATH_LOCAL_UPLOADS, '', TRUE);
+            $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', TRUE);
             $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
-            $Subdir = StringBeginsWith(dirname($TargetImage), PATH_LOCAL_UPLOADS.'/', FALSE, TRUE);
+            $Subdir = StringBeginsWith(dirname($TargetImage), PATH_UPLOADS.'/', FALSE, TRUE);
 
             // Delete any previously uploaded image.
             $UploadImage->Delete(ChangeBasename($this->User->Photo, 'p%s'));

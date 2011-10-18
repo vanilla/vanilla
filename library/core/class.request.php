@@ -235,29 +235,7 @@ class Gdn_Request {
     * @return mixed
     */
    public function GetValue($Key, $Default = FALSE) {
-      $QueryOrder = array(
-         self::INPUT_CUSTOM,
-         self::INPUT_GET,
-         self::INPUT_POST,
-         self::INPUT_FILES,
-         self::INPUT_SERVER,
-         self::INPUT_ENV,
-         self::INPUT_COOKIES
-      );
-      $NumDataTypes = sizeof($QueryOrder);
-      
-      for ($i=0; $i < $NumDataTypes; $i++) {
-         $DataType = $QueryOrder[$i];
-         if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
-         if (array_key_exists($Key, $this->_RequestArguments[$DataType])) {
-            $Data = $this->_RequestArguments[$DataType][$Key];
-            if (is_array($Data) || is_object($Data))
-               return $Data;
-            else
-               return filter_var($Data, FILTER_SANITIZE_STRING);
-         }
-      }
-      return $Default;
+      return $this->Merged($Key, $Default);
    }
    
    /**
@@ -592,9 +570,9 @@ class Gdn_Request {
    }
 
    /**
-    * Get a value from the post array or return the entire post array.
+    * Get a value from the post array or return the entire POST array.
     *
-    * @param string|null $Key The key of the post item or null to return the entire post array.
+    * @param string|null $Key The key of the post item or null to return the entire array.
     * @param mixed $Default The value to return if the item isn't set.
     * @return mixed
     */
@@ -616,6 +594,34 @@ class Gdn_Request {
             'Domain'             => ''
       );
       $this->_LoadEnvironment();
+   }
+   
+   /**
+    * Get a value from the merged param array or return the entire merged array
+    *
+    * @param string|null $Key The key of the post item or null to return the entire array.
+    * @param mixed $Default The value to return if the item isn't set.
+    * @return mixed
+    */
+   public function Merged($Key = NULL, $Default = NULL) {
+      $Merged = array();
+      $QueryOrder = array(
+         self::INPUT_CUSTOM,
+         self::INPUT_GET,
+         self::INPUT_POST,
+         self::INPUT_FILES,
+         self::INPUT_SERVER,
+         self::INPUT_ENV,
+         self::INPUT_COOKIES
+      );
+      $NumDataTypes = sizeof($QueryOrder);
+      for ($i=$NumDataTypes; $i > 0; $i--) {
+         $DataType = $QueryOrder[$i-1];
+         if (!array_key_exists($DataType, $this->_RequestArguments)) continue;
+         $Merged = array_merge($Merged, $this->_RequestArguments[$DataType]);
+      }
+      
+      return (is_null($Key)) ? $Merged : GetValue($Key, $Merged, $Default);
    }
    
    /**
@@ -858,6 +864,11 @@ class Gdn_Request {
    
    public function WithDeliveryType($DeliveryType) {
       $this->SetValueOn(self::INPUT_GET, 'DeliveryType', $DeliveryType);
+      return $this;
+   }
+   
+   public function WithDeliveryMethod($DeliveryMethod) {
+      $this->SetValueOn(self::INPUT_GET, 'DeliveryMethod', $DeliveryMethod);
       return $this;
    }
    

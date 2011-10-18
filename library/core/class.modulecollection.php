@@ -18,10 +18,10 @@ class Gdn_ModuleCollection extends Gdn_Module {
    /// METHODS ///
    public function Render() {
       $RenderedCount = 0;
-      foreach($this->Items as $Item) {
+      foreach ($this->Items as $Item) {
          $this->EventArguments['AssetName'] = $this->AssetName;
 
-         if(is_string($Item)) {
+         if (is_string($Item)) {
             if (!empty($Item)) {
                if ($RenderedCount > 0)
                   $this->FireEvent('BetweenRenderAsset');
@@ -29,7 +29,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
                echo $Item;
                $RenderedCount++;
             }
-         } elseif($Item instanceof Gdn_IModule) {
+         } elseif ($Item instanceof Gdn_IModule) {
             $LengthBefore = ob_get_length();
             $Item->Render();
             $LengthAfter = ob_get_length();
@@ -43,6 +43,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
             throw new Exception();
          }
       }
+      unset($this->EventArguments['AssetName']);
    }
    
    public function ToString() {

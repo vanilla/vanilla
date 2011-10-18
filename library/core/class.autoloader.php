@@ -352,7 +352,6 @@ class Gdn_Autoloader {
    }
    
    public static function RegisterMap($MapType, $ContextType, $SearchPath, $Options = array()) {
-   
       $DefaultOptions = array(
          'SearchSubfolders'      => TRUE,
          'Extension'             => NULL,
@@ -368,9 +367,8 @@ class Gdn_Autoloader {
       $Extension = GetValue('Extension', $Options, NULL);
       
       // Determine cache root on-disk location
-      $Hits = 0; str_replace(PATH_LOCAL_ROOT, '', $SearchPath, $Hits);
-      if ($Hits) $MapRootLocation = PATH_LOCAL_CACHE;
-      else $MapRootLocation = PATH_CACHE;
+      $Hits = 0; str_replace(PATH_ROOT, '', $SearchPath, $Hits);
+      $MapRootLocation = PATH_CACHE;
       
       // Build a unique identifier that refers to this map (same map type, context, extension, and cachefile location)
       $MapIdentifier = implode('|',array(
@@ -446,12 +444,12 @@ class Gdn_Autoloader {
     */
    public static function SmartFree($ContextType = NULL, $MapResourceArray = NULL) {
 
-      $CacheFolder = @opendir(PATH_LOCAL_CACHE);
+      $CacheFolder = @opendir(PATH_CACHE);
       if (!$CacheFolder) return TRUE;
       while ($File = readdir($CacheFolder)) {
          $Extension = pathinfo($File, PATHINFO_EXTENSION);
          if ($Extension == 'ini' && $File != 'locale_map.ini')
-            @unlink(CombinePaths(array(PATH_LOCAL_CACHE, $File)));
+            @unlink(CombinePaths(array(PATH_CACHE, $File)));
       }
 
 //      echo __METHOD__."\n";

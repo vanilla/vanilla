@@ -10,7 +10,7 @@
  */
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.1a1');
+define('APPLICATION_VERSION', '2.1a2');
 
 // Report and track all errors.
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
@@ -84,6 +84,6 @@ if (defined('PROFILER') && PROFILER) {
    //
    $run_id = $xhprof_runs->save_run($xhprof_data, $xhprof_namespace);
 
-   echo "http://{$XHPROF_SERVER_NAME}/index.php?run={$run_id}&source={$xhprof_namespace}\n";
+   echo CombinePaths(array("http://{$XHPROF_SERVER_NAME}","/?run={$run_id}&source={$xhprof_namespace}\n"));
 
 }

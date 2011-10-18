@@ -122,7 +122,7 @@ class Gdn_UploadImage extends Gdn_Upload {
 
       // Figure out the target path.
       $TargetParsed = Gdn_Upload::Parse($Target);
-      $TargetPath = PATH_LOCAL_UPLOADS.'/'.ltrim($TargetParsed['Name'], '/');
+      $TargetPath = PATH_UPLOADS.'/'.ltrim($TargetParsed['Name'], '/');
 
       if (!file_exists(dirname($TargetPath)))
          mkdir(dirname($TargetPath), 0777, TRUE);

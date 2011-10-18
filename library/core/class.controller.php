@@ -449,31 +449,27 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function AddModule($Module, $AssetTarget = '') {
       $this->FireEvent('BeforeAddModule');
-
-      if (!is_object($Module)) {
+      $AssetModule = $Module;
+      
+      if (!is_object($AssetModule)) {
          if (property_exists($this, $Module) && is_object($this->$Module)) {
-            $Module = $this->$Module;
+            $AssetModule = $this->$Module;
          } else {
-//            if ($Module == 'BookmarkedModule') {
-//               $Asset = '<div class="Popin" rel="/module/'.htmlspecialchars($Module).'" />';
-//               $this->AddAsset($AssetTarget ? $AssetTarget : 'Panel', $Asset, $Module);
-//            } else {
-               $ModuleClassExists = class_exists($Module);
+            $ModuleClassExists = class_exists($Module);
 
-               if ($ModuleClassExists) {
-                  // Make sure that the class implements Gdn_IModule
-                  $ReflectionClass = new ReflectionClass($Module);
-                  if ($ReflectionClass->implementsInterface("Gdn_IModule"))
-                     $Module = new $Module($this);
-
-               }
-//            }
+            if ($ModuleClassExists) {
+               // Make sure that the class implements Gdn_IModule
+               $ReflectionClass = new ReflectionClass($Module);
+               if ($ReflectionClass->implementsInterface("Gdn_IModule"))
+                  $AssetModule = new $Module($this);
+            }
          }
       }
-      if (is_object($Module)) {
-         $AssetTarget = ($AssetTarget == '' ? $Module->AssetTarget() : $AssetTarget);
+      
+      if (is_object($AssetModule)) {
+         $AssetTarget = ($AssetTarget == '' ? $AssetModule->AssetTarget() : $AssetTarget);
          // echo '<div>adding: '.$Module->Name().' ('.(property_exists($Module, 'HtmlId') ? $Module->HtmlId : '').') to '.$AssetTarget.' <textarea>'.$Module->ToString().'</textarea></div>';
-         $this->AddAsset($AssetTarget, $Module, $Module->Name());
+         $this->AddAsset($AssetTarget, $AssetModule, $AssetModule->Name());
       }
 
       $this->FireEvent('AfterAddModule');
@@ -801,39 +797,41 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo Method GetAsset() and $AssetName needs descriptions.
     */
    public function GetAsset($AssetName) {
-      if(!array_key_exists($AssetName, $this->Assets))
+      if (!array_key_exists($AssetName, $this->Assets))
          return '';
-      if(!is_array($this->Assets[$AssetName]))
+      if (!is_array($this->Assets[$AssetName]))
          return $this->Assets[$AssetName];
       
       // Include the module sort
       $Modules = Gdn::Config('Modules', array());
-      if($this->ModuleSortContainer === FALSE)
+      if ($this->ModuleSortContainer === FALSE)
          $ModuleSort = FALSE; // no sort wanted
-      elseif(array_key_exists($this->ModuleSortContainer, $Modules) && array_key_exists($AssetName, $Modules[$this->ModuleSortContainer]))
+      elseif (array_key_exists($this->ModuleSortContainer, $Modules) && array_key_exists($AssetName, $Modules[$this->ModuleSortContainer]))
          $ModuleSort = $Modules[$this->ModuleSortContainer][$AssetName]; // explicit sort
-      elseif(array_key_exists($this->Application, $Modules) && array_key_exists($AssetName, $Modules[$this->Application]))
+      elseif (array_key_exists($this->Application, $Modules) && array_key_exists($AssetName, $Modules[$this->Application]))
          $ModuleSort = $Modules[$this->Application][$AssetName]; // application default sort
 
+      // Get all the assets for this AssetContainer
       $ThisAssets = $this->Assets[$AssetName];
       $Assets = array();
-      if(isset($ModuleSort) && is_array($ModuleSort)) {
+      
+      if (isset($ModuleSort) && is_array($ModuleSort)) {
          // There is a specified sort so sort by it.
-         foreach($ModuleSort as $Name) {
-            if(array_key_exists($Name, $ThisAssets)) {
+         foreach ($ModuleSort as $Name) {
+            if (array_key_exists($Name, $ThisAssets)) {
                $Assets[] = $ThisAssets[$Name];
                unset($ThisAssets[$Name]);
             }
          }
       }
-      // Pick up any leftover assets
-      foreach($ThisAssets as $Name => $Asset) {
+      
+      // Pick up any leftover assets that werent explicitly sorted
+      foreach ($ThisAssets as $Name => $Asset)
          $Assets[] = $Asset;
-      }
          
-      if(count($Assets) == 0) {
+      if (count($Assets) == 0) {
          return '';
-      } elseif(count($Assets) == 1) {
+      } elseif (count($Assets) == 1) {
          return $Assets[0];
       } else {
          $Result = new Gdn_ModuleCollection();
@@ -1221,14 +1219,17 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
       }
       
-      // Remove values that should not be transmitted via api
-      $Remove = array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions', 'Attributes');
-      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         $Remove[] = 'InsertIPAddress';
-         $Remove[] = 'UpdateIPAddress';
-         $Remove[] = 'LastIPAddress';
+      $CleanOutut = C('Api.Clean', TRUE);
+      if ($CleanOutut) {
+         // Remove values that should not be transmitted via api
+         $Remove = array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions', 'Attributes');
+         if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            $Remove[] = 'InsertIPAddress';
+            $Remove[] = 'UpdateIPAddress';
+            $Remove[] = 'LastIPAddress';
+         }
+         $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }
-      $Data = RemoveKeysFromNestedArray($Data, $Remove);
       
       // Make sure the database connection is closed before exiting.
       $this->Finalize();

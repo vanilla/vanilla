@@ -297,12 +297,13 @@ class Gdn_FileSystem {
     * @param string $ServeMode Whether to download the file as an attachment, or inline
     */
    public static function ServeFile($File, $Name = '', $MimeType = '', $ServeMode = 'attachment') {
-      if (is_readable($File)) {
-         // Get the db connection and make sure it is closed
-         $Database = Gdn::Database();
-         $Database->CloseConnection();
-         
-         $Size = filesize($File);
+      
+      $FileIsLocal = (substr($File, 0, 4) == 'http') ? FALSE : TRUE;
+      $FileAvailable = ($FileIsLocal) ? is_readable($File) : TRUE;
+      
+      if ($FileAvailable) {
+         // Close the database connection
+         Gdn::Database()->CloseConnection();
          
          // Determine if Path extension should be appended to Name
          $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));

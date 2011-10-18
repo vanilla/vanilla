@@ -1421,15 +1421,15 @@ class Gdn_Form extends Gdn_Pluggable {
       //   return TRUE;
       //} else {
       $KeyName = $this->InputPrefix . '/TransientKey';
-      $PostBackKey = isset($_POST[$KeyName]) ? $_POST[$KeyName] : FALSE;
-      $Session = Gdn::Session();
+      $PostBackKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST, $KeyName, FALSE);
+      
       // DEBUG:
       //$Result .= '<div>KeyName: '.$KeyName.'</div>';
       //echo '<div>PostBackKey: '.$PostBackKey.'</div>';
       //echo '<div>TransientKey: '.$Session->TransientKey().'</div>';
       //echo '<div>AuthenticatedPostBack: ' . ($Session->ValidateTransientKey($PostBackKey) ? 'Yes' : 'No');
       //die();
-      return $Session->ValidateTransientKey($PostBackKey);
+      return Gdn::Session()->ValidateTransientKey($PostBackKey);
       //}
    }
    

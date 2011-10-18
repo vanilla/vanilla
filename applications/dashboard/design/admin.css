@@ -292,7 +292,7 @@ select.Year {
    -moz-box-shadow: 0px 0px 2px #999;
    -webkit-box-shadow: 0px 0px 2px #999;
 	font-weight:bold;
-   margin: 0 0 20px 20px;
+   margin: 0 0 0 20px;
 }
 a.Button {
 	padding: 5px 7px;
@@ -351,7 +351,20 @@ a.Button {
 .ButtonList :last-child {
    border-radius: 0 .5ex .5ex 0;
 }
+.CancelButton {
+   border-color: #919191;
+   background: -webkit-gradient(linear, center bottom, center top, from(#D1D1D1), to(#F1F1F1));
+   background: -moz-linear-gradient(top, #F1F1F1, #D1D1D1);
+   -pie-background: linear-gradient(top, #F1F1F1, #D1D1D1);
+   background: linear-gradient(top, #F1F1F1, #D1D1D1);
+   color: #414141;
+   text-shadow: 0px 1px 0px #E1E1E1;
+}
 
+.CancelButton:hover {
+   border-color: #616161;
+   color: #212121;
+}
 
 .Loading {
    height: 100px;

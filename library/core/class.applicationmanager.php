@@ -20,7 +20,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
 class Gdn_ApplicationManager {
-
+   
    /**
     * An array of available applications. Never access this directly, instead
     * use $this->AvailableApplications();
@@ -146,7 +146,7 @@ class Gdn_ApplicationManager {
     * @todo Undocumented method.
     */
    public function EnabledApplicationFolders() {
-      $EnabledApplications = Gdn::Config('EnabledApplications', array());
+      $EnabledApplications = C('EnabledApplications', array());
       $EnabledApplications['Dashboard'] = 'dashboard';
       return array_values($EnabledApplications);
    }
@@ -233,7 +233,7 @@ class Gdn_ApplicationManager {
       }
 
       // 2. Disable it
-      RemoveFromConfig('EnabledApplications'.'.'.$ApplicationName);
+      RemoveFromConfig("EnabledApplications.{$ApplicationName}");
 
       // Clear the object caches.
       Gdn_Autoloader::SmartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);

@@ -879,8 +879,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             if ($i == $KeyCount - 1) {   
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
-                  $Settings[$Key] = Gdn_Format::Serialize($Value);
-                  $this->Dirty = TRUE;
+                  $OldVal = $Settings[$Key];
+                  $SetVal = Gdn_Format::Serialize($Value);
+                  $Settings[$Key] = $SetVal;
+                  if ($SetVal != $OldVal)
+                     $this->Dirty = TRUE;
                }
             } else {
                // Build the array as we loop over the key. Doucement.

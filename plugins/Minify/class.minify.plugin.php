@@ -134,7 +134,7 @@ class MinifyPlugin extends Gdn_Plugin {
       $Token = md5($Query).$Suffix;
       
       // Save file name with token.
-      $CacheFile = PATH_LOCAL_CACHE."/Minify/query_$Token";
+      $CacheFile = PATH_CACHE."/Minify/query_$Token";
       if (!file_exists($CacheFile)) {
          if (!file_exists(dirname($CacheFile)))
             mkdir(dirname($CacheFile), 0777, TRUE);
@@ -148,7 +148,7 @@ class MinifyPlugin extends Gdn_Plugin {
     * Create 'Minify' cache folder.
     */
    public function Setup() {
-      $Folder = PATH_LOCAL_CACHE.'/Minify';
+      $Folder = PATH_CACHE.'/Minify';
       if (!file_exists($Folder))
          @mkdir($Folder);
    }

@@ -547,9 +547,10 @@ class Gdn_Validation {
 
                      // Call the function. Core-defined validation functions can
                      // be found in ./functions.validation.php
-                     $FieldInfo = NULL;
+                     $FieldInfo = array('Name' => $FieldName);
                      if (is_array($this->_Schema) && array_key_exists($FieldName, $this->_Schema))
-                        $FieldInfo = $this->_Schema[$FieldName];
+                        $FieldInfo = array_merge($FieldInfo, (array)$this->_Schema[$FieldName]);
+                     $FieldInfo = (object)$FieldInfo;
 
                      $ValidationResult = $Function($FieldValue, $FieldInfo, $PostedFields);
                      if ($ValidationResult !== TRUE) {

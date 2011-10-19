@@ -97,9 +97,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Register hooked methods
       $this->RegisterPlugins();
-
+      
       $this->Started = TRUE;
-
+      $this->FireEvent('AfterStart');
    }
 
    public function Started() {
@@ -841,7 +841,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $this->AlternatePluginSearchPaths = array();
 
          // Add default search path(s) to list
-         $this->PluginSearchPaths[rtrim(PATH_LOCAL_PLUGINS,'/')] = 'local';
          $this->PluginSearchPaths[rtrim(PATH_PLUGINS,'/')] = 'core';
 
          // Check for, and load, alternate search paths from config

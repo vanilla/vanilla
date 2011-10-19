@@ -316,25 +316,30 @@ class UtilityController extends DashboardController {
     * @access public
     */
    public function Update() {
-      // Check for permission or flood control.
-      // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
-      $Now = time();
-      $LastTime = Gdn::Get('Garden.Update.LastTimestamp', 0);
+      
+      try {
+         // Check for permission or flood control.
+         // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
+         $Now = time();
+         $LastTime = Gdn::Get('Garden.Update.LastTimestamp', 0);
 
-      if ($LastTime + (60 * 60 * 24) > $Now) {
-         // Check for flood control.
-         $Count = Gdn::Get('Garden.Update.Count', 0) + 1;
-         if ($Count > 5) {
-            if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-               // We are only allowing an update of 5 times every 24 hours.
-               throw PermissionException();
+         if ($LastTime + (60 * 60 * 24) > $Now) {
+            // Check for flood control.
+            $Count = Gdn::Get('Garden.Update.Count', 0) + 1;
+            if ($Count > 5) {
+               if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+                  // We are only allowing an update of 5 times every 24 hours.
+                  throw PermissionException();
+               }
             }
+         } else {
+            $Count = 1;
          }
-      } else {
-         $Count = 1;
-      }
-      Gdn::Set('Garden.Update.LastTimestamp', $Now);
-      Gdn::Set('Garden.Update.Count', $Count);
+         Gdn::Set('Garden.Update.LastTimestamp', $Now);
+         Gdn::Set('Garden.Update.Count', $Count);
+      } catch (PermissionException $Ex) {
+         return;
+      } catch (Exception $Ex) {}
       
       try {
          // Run the structure.

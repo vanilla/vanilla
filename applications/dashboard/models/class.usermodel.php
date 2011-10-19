@@ -978,31 +978,26 @@ class UserModel extends Gdn_Model {
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
-         $UserID = 1;
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
-         $Fields['UserID'] = 1;
          
-         if ($this->GetID($UserID) !== FALSE) {
-            $this->SQL->Put($this->Name, $Fields);
-         } else {
-            // Insert the new user
-            $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
-            AddActivity(
-               $UserID,
-               'Join',
-               T('Welcome to Vanilla!')
-            );
-         }
+         // Insert the new user
+         $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
+         AddActivity(
+            $UserID,
+            'Join',
+            T('Welcome to Vanilla!')
+         );
+         
          $this->SaveRoles($UserID, array(16), FALSE);
       }
       return $UserID;
    }
 
    public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
-      if(is_string($RoleIDs) && !is_numeric($RoleIDs)) {
+      if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
          $RoleNames = array_map('trim', explode(',', $RoleIDs));
          $RoleIDs = $this->SQL
@@ -1705,7 +1700,7 @@ class UserModel extends Gdn_Model {
       // Remove photos
       $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
       foreach ($PhotoData->Result() as $Photo) {
-         @unlink(PATH_LOCAL_UPLOADS.DS.$Photo->Name);
+         @unlink(PATH_UPLOADS.DS.$Photo->Name);
       }
       $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
       

@@ -240,6 +240,8 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       $ControllerMethod = 'Controller_Index';
       if (is_array($RequestArgs) && sizeof($Sender->RequestArgs)) {
          list($MethodName) = $Sender->RequestArgs;
+         // Account for suffix
+         $MethodName = array_shift($Trash = explode('.', $MethodName));
          $TestControllerMethod = 'Controller_'.$MethodName;
          if (method_exists($this, $TestControllerMethod))
             $ControllerMethod = $TestControllerMethod;

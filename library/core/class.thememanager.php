@@ -181,7 +181,6 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          $this->AlternateThemeSearchPaths = array();
 
          // Add default search path(s) to list
-         $this->ThemeSearchPaths[rtrim(PATH_LOCAL_THEMES,'/')] = 'local';
          $this->ThemeSearchPaths[rtrim(PATH_THEMES,'/')] = 'core';
 
                   // Check for, and load, alternate search paths from config

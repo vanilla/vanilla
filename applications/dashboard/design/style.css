@@ -243,7 +243,7 @@ input.Button {
 }
 .Buttons {
    margin-top: 10px;
-   text-align: right;
+   /* text-align: right; */
 }
 .Buttons .Back {
    float: left;
@@ -955,6 +955,8 @@ a.BigButton:focus {
 .DataList .Meta {
    font-size: 11px;
    color: #70727c;
+   overflow: hidden;
+   height: 100%;
 }
 .MItem {
    margin-left: 8px;
@@ -2860,6 +2862,7 @@ body.embed .Connect h2 {
 }
 .Embed .Buttons {
 	font-size: 11px;
+	text-align: right;
 }
 .EmbedCommentForm .Author {
 	display: inline-block;

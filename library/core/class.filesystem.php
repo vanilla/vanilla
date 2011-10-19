@@ -297,12 +297,13 @@ class Gdn_FileSystem {
     * @param string $ServeMode Whether to download the file as an attachment, or inline
     */
    public static function ServeFile($File, $Name = '', $MimeType = '', $ServeMode = 'attachment') {
-      if (is_readable($File)) {
-         // Get the db connection and make sure it is closed
-         $Database = Gdn::Database();
-         $Database->CloseConnection();
-         
-         $Size = filesize($File);
+      
+      $FileIsLocal = (substr($File, 0, 4) == 'http') ? FALSE : TRUE;
+      $FileAvailable = ($FileIsLocal) ? is_readable($File) : TRUE;
+      
+      if ($FileAvailable) {
+         // Close the database connection
+         Gdn::Database()->CloseConnection();
          
          // Determine if Path extension should be appended to Name
          $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));
@@ -320,20 +321,21 @@ class Gdn_FileSystem {
  
          // Figure out the MIME type
          $MimeTypes = array(
-           "pdf" => "application/pdf",
-           "txt" => "text/plain",
+           "pdf"  => "application/pdf",
+           "txt"  => "text/plain",
            "html" => "text/html",
-           "htm" => "text/html",
-           "exe" => "application/octet-stream",
-           "zip" => "application/zip",
-           "doc" => "application/msword",
-           "xls" => "application/vnd.ms-excel",
-           "ppt" => "application/vnd.ms-powerpoint",
-           "gif" => "image/gif",
-           "png" => "image/png",
-           "jpeg"=> "image/jpg",
-           "jpg" =>  "image/jpg",
-           "php" => "text/plain"
+           "htm"  => "text/html",
+           "exe"  => "application/octet-stream",
+           "zip"  => "application/zip",
+           "doc"  => "application/msword",
+           "xls"  => "application/vnd.ms-excel",
+           "ppt"  => "application/vnd.ms-powerpoint",
+           "gif"  => "image/gif",
+           "png"  => "image/png",
+           "jpeg" => "image/jpg",
+           "jpg"  => "image/jpg",
+           "php"  => "text/plain",
+           "ico"  => "image/vnd.microsoft.icon"
          );
          
          if ($MimeType == '') {

@@ -58,8 +58,8 @@ if (defined('PATH_CACHE'))
    $min_cachePath = PATH_CACHE.'/Minify';
 else
    $min_cachePath = implode('/', array_slice($PathMinParts, 0, -3)).'/cache/Minify';
-if (defined('PATH_LOCAL_CACHE'))
-   $min_cachePath_local = PATH_LOCAL_CACHE.'/Minify';
+if (defined('PATH_CACHE'))
+   $min_cachePath_local = PATH_CACHE.'/Minify';
 else
    $min_cachePath_local = $min_cachePath;
 

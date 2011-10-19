@@ -7,9 +7,9 @@
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2010, Tim Gunter 
- * @license Proprietary
- * @package Api
- * @since 1.0
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0.18
  */
 
 class ProxyRequest {
@@ -27,6 +27,10 @@ class ProxyRequest {
    public $ContentType;
    public $ContentLength;
    public $ConnectionMode;
+   
+   protected $FileTransfer;
+   protected $UseSSL;
+   protected $SaveFile;
    
    public $ActionLog;
    
@@ -135,6 +139,9 @@ class ProxyRequest {
          $DataAmountSent = floor(($DataSent/$DataToSend) * 100);
          //echo " : Writen {$DataSent}/{$DataToSend} bytes ({$DataAmountSent}%)\n";
       } while($DataSent < $DataToSend);
+      
+      $this->Action(" Request Headers: ".print_r($this->RequestHeaders,TRUE));
+      
       return $DataSent;
    }
    
@@ -177,7 +184,7 @@ class ProxyRequest {
 				$TransferEncoding = strtolower($Value);
       }
       
-      //print_r($this->ResponseHeaders);
+      $this->Action(print_r($this->ResponseHeaders,TRUE));
       
       $Loud = ($ConnectionMode == 'close');
       
@@ -266,12 +273,35 @@ class ProxyRequest {
       throw new Exception("Unable to detect reading mode for incoming data");
    }
    
+   public function CurlHeader(&$Handler, $HeaderString) {
+      $Line = explode(':',trim($HeaderString));
+      $Key = trim(array_shift($Line));
+      $Value = trim(implode(':',$Line));
+      $this->ResponseHeaders[$Key] = $Value;
+      return strlen($HeaderString);
+   }
+   
    protected function CurlReceive(&$Handler) {
+      $this->ResponseHeaders = array();
       $Response = curl_exec($Handler);
       
       $this->ResponseStatus = curl_getinfo($Handler, CURLINFO_HTTP_CODE);
       $this->ContentType = strtolower(curl_getinfo($Handler, CURLINFO_CONTENT_TYPE));
       $this->ContentLength = (int)curl_getinfo($Handler, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+      
+      $RequestHeaderInfo = trim(curl_getinfo($Handler, CURLINFO_HEADER_OUT));
+      $RequestHeaderLines = explode("\n",$RequestHeaderInfo);
+      $Request = trim(array_shift($RequestHeaderLines));
+      $this->RequestHeaders['HTTP'] = $Request;
+      // Parse header status line
+      foreach ($RequestHeaderLines as $Line) {
+         $Line = explode(':',trim($Line));
+         $Key = trim(array_shift($Line));
+         $Value = trim(implode(':',$Line));
+         $this->RequestHeaders[$Key] = $Value;
+      }
+      $this->Action(" Request Headers: ".print_r($this->RequestHeaders,TRUE));
+      $this->Action(" Response Headers: ".print_r($this->ResponseHeaders,TRUE));
       
       if ($Response == FALSE) {
          $Success = FALSE;
@@ -279,39 +309,44 @@ class ProxyRequest {
          return $this->ResponseBody;
       }
       
-      $ResponseParts = explode("\r\n\r\n", $Response);
-
-      $ResponseHeaderData = trim(array_shift($ResponseParts));
-      $ResponseHeaderLines = explode("\n",$ResponseHeaderData);
-
-      // Parse header status line
-      $Status = trim(array_shift($ResponseHeaderLines));
-      $this->ResponseHeaders['HTTP'] = $Status;
-      foreach ($ResponseHeaderLines as $Line) {
-         $Line = explode(':',trim($Line));
-         $Key = trim(array_shift($Line));
-         $Value = trim(implode(':',$Line));
-         $this->ResponseHeaders[$Key] = $Value;
+      $this->ResponseBody = trim($Response);
+      
+      if ($this->SaveFile) {
+         $Success = file_exists($this->SaveFile);
+         $SavedFileResponse = array(
+            'Error'     => curl_error($Handler),
+            'Success'   => $Success,
+            'Size'      => filesize($this->SaveFile),
+            'Time'      => curl_getinfo($Handler, CURLINFO_TOTAL_TIME),
+            'Speed'     => curl_getinfo($Handler, CURLINFO_SPEED_DOWNLOAD),
+            'Type'      => curl_getinfo($Handler, CURLINFO_CONTENT_TYPE),
+            'File'      => $this->SaveFile
+         );
+         $this->ResponseBody = json_encode($SavedFileResponse);
       }
       
-      $this->ResponseBody = trim(implode("\r\n\r\n",$ResponseParts));
       return $this->ResponseBody;
    }
    
-   public function Request($Options, $QueryParams = NULL) {
+   public function Request($Options, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
       
-      if (is_string($Options)) {
-         $Options = array(
-             'URL'      => $Options
-         );
-      }
+      /*
+       * Allow requests that just want to use defaults to provide a string instead
+       * of an optionlist.
+       */
+      
+      if (is_string($Options))
+         $Options = array('URL' => $Options);
 
       $Defaults = array(
           'URL'                  => NULL,
+          'Host'                 => NULL,
           'Method'               => 'GET',
           'ConnectTimeout'       => 5,
-          'Timeout'              => 2,
+          'Timeout'              => 5,
+          'SaveAs'               => NULL,
           'Redirects'            => TRUE,
+          'SSLNoVerify'          => FALSE,
           'Recycle'              => FALSE,      // Whether to reuse this pointer if possible.
           'RequestsPerPointer'   => 0,          // How often to recycle pointers reusable pointers.
           'Cookies'              => TRUE,       // Send cookies?
@@ -320,25 +355,36 @@ class ProxyRequest {
           'Debug'                => FALSE,      // Debug output on?
           'Simulate'             => FALSE       // Don't actually request, just set up
       );
+      
+      $this->Options = $Options = array_merge($Defaults, $Options);
 
       $this->ResponseHeaders = array();
       $this->ResponseStatus = "";
       $this->ResponseBody = "";
-      
       $this->ContentLength = 0;
       $this->ContentType = '';
       $this->ConnectionMode = '';
       $this->ActionLog = array();
       
-      $this->Options = $Options = array_merge($Defaults, $Options);
-      
-      if (is_null($QueryParams)) $QueryParams = array();
+      if (!is_array($QueryParams)) $QueryParams = array();
+      if (!is_array($Files)) $Files = array();
+      if (!is_array($ExtraHeaders)) $ExtraHeaders = array();
 
-      $RelativeURL = GetValue('URL', $Options);
+      // Get the URL
+      $RelativeURL = GetValue('URL', $Options, NULL);
+      if (is_null($RelativeURL))
+         $RelativeURL = GetValue('Url', $Options, NULL);
+      
+      if (is_null($RelativeURL))
+         throw new Exception("No URL provided");
+      
       $RequestMethod = GetValue('Method', $Options);
+      $ForceHost = GetValue('Host', $Options);
       $FollowRedirects = GetValue('Redirects', $Options);
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
       $Timeout = GetValue('Timeout', $Options);
+      $SaveAs = GetValue('SaveAs', $Options);
+      $SSLNoVerify = GetValue('SSLNoVerify', $Options);
       $Recycle = GetValue('Recycle', $Options);
       $SendCookies = GetValue('Cookies', $Options);
       $CloseSesssion = GetValue('CloseSession', $Options);
@@ -346,48 +392,109 @@ class ProxyRequest {
       $Debug = GetValue('Debug', $Options, FALSE);
       $Simulate = GetValue('Simulate', $Options);
       
-      if ($CloseSesssion)
-         @session_write_close();
-      
       $OldVolume = $this->Loud;
       if ($Debug)
          $this->Loud = TRUE;
 
       $Url = $RelativeURL;
+      $PostData = $QueryParams;
+      
+      /*
+       * If files were provided, preprocess the list and exclude files that don't
+       * exist. Also, change the method to POST if it is currently GET and there 
+       * are valid files to send.
+       */
+      
+      $SendFiles = array();
+      foreach ($Files as $File => $FilePath)
+         if (file_exists($FilePath))
+            $SendFiles[$File] = $FilePath;
+      
+      $this->FileTransfer = (bool)sizeof($SendFiles);
+      if ($this->FileTransfer && $Method == "GET") {
+         $this->Options['Method'] = 'POST';
+         $RequestMethod = GetValue('Method', $Options);
+      }
+      
+      /*
+       * If extra headers were provided, preprocess the list into the correct 
+       * format for inclusion into both cURL and fsockopen header queues.
+       */
+      
+      // Tack on Host header if forced
+      if (!is_null($ForceHost))
+         $ExtraHeaders['Host'] = $ForceHost;
+      
+      $SendExtraHeaders = array();
+      foreach ($ExtraHeaders as $ExtraHeader => $ExtraHeaderValue)
+         $SendExtraHeaders[] = "{$ExtraHeader}: {$ExtraHeaderValue}";
+         
+      /*
+       * If the request is being saved to a file, prepare to save to the 
+       * filesystem.
+       */
+      $this->SaveFile = FALSE;
+      if ($SaveAs) {
+         $SavePath = dirname($SaveAs);
+         $CanSave = @mkdir($SavePath, 0775, TRUE);
+         if (!is_writable($SavePath))
+            throw new Exception("Cannot write to save path: {$SavePath}");
+         
+         $this->SaveFile = $SaveAs;
+      }
+      
+      /*
+       * Parse Query Parameters and collapse into a querystring in the case of
+       * GETs.
+       */
       
       $RequestMethod = strtoupper($RequestMethod);
-      $PostData = http_build_query($QueryParams);
       switch ($RequestMethod) {
          case 'POST':
-            
             break;
          
          case 'GET':
          default:
-            if (stristr($RelativeURL, '?'))
-               $Url .= '&';
-            else
-               $Url .= '?';
-            $Url .= $PostData;
+            $PostData = http_build_query($PostData);
+            if (strlen($PostData)) {
+               if (stristr($RelativeURL, '?'))
+                  $Url .= '&';
+               else
+                  $Url .= '?';
+               $Url .= $PostData;
+            }
             break;
       }
       
-
-      if ($Debug) echo " : Requesting {$Url}\n";
       $this->Action("Requesting {$Url}");
 
       $UrlParts = parse_url($Url);
-      $Scheme = GetValue('scheme', $UrlParts, 'http');
+      
+      // Extract scheme
+      $Scheme = strtolower(GetValue('scheme', $UrlParts, 'http'));
+      $this->Action(" scheme: {$Scheme}");
+      
+      // Extract hostname
       $Host = GetValue('host', $UrlParts, '');
-      $Port = GetValue('port', $UrlParts, '80');
-      if (empty($Port)) $Port = 80;
+      $this->Action(" host: {$Host}");
+      
+      // Extract / deduce port
+      $Port = GetValue('port', $UrlParts, NULL);
+      if (empty($Port)) $Port = ($Scheme == 'https') ? 443 : 80;
+      $this->Action(" port: {$Port}");
+      
+      // Extract Path&Query
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
+      $this->UseSSL = ($Scheme == 'https') ? TRUE : FALSE;
       
-      // Get the cookie.
+      /*
+       * ProxyRequest can masquerade as the current user, so collect and encode
+       * their current cookies as the default case is to send them.
+       */
+      
       $Cookie = '';
       $EncodeCookies = TRUE;
-
       foreach($_COOKIE as $Key => $Value) {
          if (strncasecmp($Key, 'XDEBUG', 6) == 0)
             continue;
@@ -395,33 +502,64 @@ class ProxyRequest {
          if (strlen($Cookie) > 0)
             $Cookie .= '; ';
 
-         $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
-         $Cookie .= "{$Key}={$EValue}";
+         $EncodedValue = ($EncodeCookies) ? urlencode($Value) : $Value;
+         $Cookie .= "{$Key}={$EncodedValue}";
       }
+      
+      // This prevents problems for sites that use sessions.
+      if ($CloseSesssion)
+         @session_write_close();
+      
       $Response = '';
-      if ((function_exists('curl_init') && !$Recycle) || !function_exists('fsockopen')) {
-
-         //$Url = $Scheme.'://'.$Host.$Path;
-         $this->Action("cURL");
-
+      
+      /**
+       * Use cURL if it is available
+       */
+      if (function_exists('curl_init') && (!$Recycle || $this->UseSSL || $this->FileTransfer || $this->SaveFile)) {
+         $this->Action(" Codepath: cURL");
+         
          $Handler = curl_init();
-         curl_setopt($Handler, CURLOPT_URL, $Url);
-         curl_setopt($Handler, CURLOPT_PORT, $Port);
-         curl_setopt($Handler, CURLOPT_HEADER, 1);
+         curl_setopt($Handler, CURLOPT_HEADER, FALSE);
+         curl_setopt($Handler, CURLINFO_HEADER_OUT, TRUE);
+         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, TRUE);
          curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
-         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
          curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
+         curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
+         
+         if ($this->UseSSL) {
+            $this->Action(" Using SSL");
+            curl_setopt($Handler, CURLOPT_SSL_VERIFYPEER, !$SSLNoVerify);
+            curl_setopt($Handler, CURLOPT_SSL_VERIFYHOST, !$SSLNoVerify);
+         }
          
          if ($Timeout > 0)
             curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
 
-         if ($Cookie != '' && $SendCookies)
+         if ($Cookie != '' && $SendCookies) {
+            $this->Action(" Sending client cookies");
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
-
+         }
+         
+         if ($this->SaveFile) {
+            $this->Action(" Saving to file: {$this->SaveFile}");
+            $FileHandle = fopen($this->SaveFile, 'w+');
+            curl_setopt($Handler, CURLOPT_FILE, $FileHandle);
+         }
+         
+         if (sizeof($SendExtraHeaders))
+            curl_setopt($Handler, CURLOPT_HTTPHEADER, $SendExtraHeaders);
+         
          if ($RequestMethod == 'POST') {
-            curl_setopt($Handler, CURLOPT_POST, 1);
+            if ($this->FileTransfer)
+               foreach ($SendFiles as $File => $FilePath)
+                  $PostData[$File] = "@{$FilePath}";
+            curl_setopt($Handler, CURLOPT_POST, TRUE);
             curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
          }
+         
+         // Set URL
+         curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_PORT, $Port);
          
          $this->CurlReceive($Handler);
 
@@ -429,18 +567,28 @@ class ProxyRequest {
          
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
-         $this->Action("fsockopen");
+         $this->Action(" Codepath: fsockopen");
+         
+         if ($this->UseSSL)
+            throw new Exception("SSL not supported by ProxyRequest via fsockopen.");
+         
+         if ($this->FileTransfer)
+            throw new Exception("File Transfer not supported by ProxyRequest via fsockopen.");
+         
+         if ($this->SaveFile)
+            throw new Exception("File downloads not supported by ProxyRequest via fsockopen.");
          
          $Pointer = FALSE;
          $HostAddress = $this->FsockConnect($Pointer, $Host, 80, $Options);
 
-         $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
+         $SendHost = (is_null($ForceHost)) ? $Host : $ForceHost;
+         $HostHeader = $SendHost.(($Port != 80) ? ":{$Port}" : '');
          $SendHeaders = array();
          
          $SendHeaders[] = "{$RequestMethod} $Path?$Query HTTP/1.1";
          $SendHeaders[] = "Host: {$HostHeader}";
-            // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
-            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
+         // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
+         // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
          //$SendHeaders[] = "User-Agent: Vanilla/2.0 RunnerBot";
          $SendHeaders[] = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1";
          $SendHeaders[] = "Accept: */*";
@@ -458,7 +606,11 @@ class ProxyRequest {
          if (strlen($Cookie) > 0 && $SendCookies)
             $SendHeaders[] = "Cookie: {$Cookie}";
             
+         if (sizeof($SendExtraHeaders))
+            $SendHeaders = array_merge($SendHeaders, $SendExtraHeaders);
+            
          if ($RequestMethod == 'POST') {
+            $PostData = http_build_query($PostData);
             $SendHeaders[] = "Content-Type: application/x-www-form-urlencoded";
             $PostDataLength = strlen($PostData);
             $SendHeaders[] = "Content-Length: {$PostDataLength}";

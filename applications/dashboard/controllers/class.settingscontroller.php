@@ -1088,7 +1088,7 @@ class SettingsController extends DashboardController {
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Themes.Manage')) {
          $Favicon = C('Garden.FavIcon', '');
-         RemoveFromConfig('Garden.Logo');
+         RemoveFromConfig('Garden.FavIcon');
          $Upload = new Gdn_Upload();
          $Upload->Delete($Favicon);
       }

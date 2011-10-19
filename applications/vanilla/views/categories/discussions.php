@@ -14,7 +14,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
    <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
       <div class="Tabs CategoryTabs">
          <ul>
-            <li class="Active"><?php echo Anchor($Category->Name, '/categories/'.$Category->UrlCode); ?></li>
+            <li class="Active"><?php echo Anchor($Category->Name, '/categories/'.$Category->UrlCode, 'TabLink'); ?></li>
          </ul>
       </div>
       

@@ -23,7 +23,7 @@ $Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_
 
 $Configuration['Cache']['Enabled']                              = TRUE;
 $Configuration['Cache']['Method']                               = 'dirtycache';
-$Configuration['Cache']['Filecache']['Store']                   = PATH_LOCAL_CACHE.'/Filecache';
+$Configuration['Cache']['Filecache']['Store']                   = PATH_CACHE.'/Filecache';
 
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
@@ -78,7 +78,7 @@ $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?
 $Configuration['Garden']['Forms']['HoneypotName']               = 'hpt';
 $Configuration['Garden']['Upload']['MaxFileSize']               = '50M';
-$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','jpeg','gif','png','bmp','tiff','zip','gz','tar.gz','tgz','psd','ai','fla','swf','pdf','doc','xls','ppt','docx','xlsx','log','rar','7z');
+$Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt','jpg','jpeg','gif','png','bmp','tiff', 'ico', 'zip','gz','tar.gz','tgz','psd','ai','fla','swf','pdf','doc','xls','ppt','docx','xlsx','log','rar','7z');
 $Configuration['Garden']['Picture']['MaxHeight']                = 1000;
 $Configuration['Garden']['Picture']['MaxWidth']                 = 600;
 $Configuration['Garden']['Profile']['MaxHeight']                = 1000;

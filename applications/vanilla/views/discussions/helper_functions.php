@@ -54,11 +54,11 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
          <?php } ?>
          <span class="MItem CommentCount"><?php 
             printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
-            
-            if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
-               echo ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
          ?></span>
          <?php
+            if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
+               echo ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+         
             $Sender->FireEvent('AfterCountMeta');
 
             if ($Discussion->LastCommentID != '') {

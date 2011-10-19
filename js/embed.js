@@ -165,6 +165,9 @@ window.vanilla.embed = function(host) {
       var foreign_url = typeof(vanilla_url) == 'undefined' ? document.URL.split('#')[0] : vanilla_url;
       // If embedding comments, this value will be used as the first comment body related to the discussion.
       var foreign_body = typeof(vanilla_body) == 'undefined' ? '' : vanilla_body;
+      // If path was defined, and we're sitting at app root, use the defined path instead.
+      if (typeof(vanilla_path) != 'undefined' && path == '/')
+         path = vanilla_path;
       
       // Force type based on incoming variables
       if (discussion_id != '' || foreign_id != '')

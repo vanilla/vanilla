@@ -944,8 +944,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          return FALSE;
 
       // Write enabled state to config
-      SaveToConfig('EnabledPlugins.'.$PluginName, TRUE);
-
+      SaveToConfig("EnabledPlugins.{$PluginName}", TRUE);
+      
       $this->EnabledPlugins[$PluginName] = TRUE;
 
       $PluginClassName = GetValue('ClassName', $PluginInfo);
@@ -977,7 +977,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $this->_PluginHook($PluginName, self::ACTION_DISABLE, TRUE);
 
       // 3. Disable it
-      RemoveFromConfig('EnabledPlugins'.'.'.$PluginName);
+      RemoveFromConfig("EnabledPlugins.{$PluginName}");
       unset($this->EnabledPlugins[$PluginName]);
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);

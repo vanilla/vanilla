@@ -685,7 +685,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
    protected $Initial;
    
    /**
-    * Current array of live config settings
+    * Current array of live config settings for this source
     * @var array
     */
    protected $Settings;
@@ -879,10 +879,10 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             if ($i == $KeyCount - 1) {   
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
-                  $OldVal = $Settings[$Key];
+                  $OldVal = GetValue($Key, $Settings, NULL);
                   $SetVal = Gdn_Format::Serialize($Value);
                   $Settings[$Key] = $SetVal;
-                  if ($SetVal != $OldVal)
+                  if (!$KeyExists || $SetVal != $OldVal)
                      $this->Dirty = TRUE;
                }
             } else {

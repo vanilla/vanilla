@@ -122,14 +122,18 @@ class UserModel extends Gdn_Model {
       
       // Massage the roles for email confirmation.
       if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Options)) {
-         TouchValue('Attributes', $Fields, array());
-         $ConfirmationCode = RandomString(8);
-         $Fields['Attributes']['EmailKey'] = $ConfirmationCode;
-         
-         if (isset($Fields['Roles'])) {
-            $Fields['Attributes']['ConfirmedEmailRoles'] = $Fields['Roles'];
+         $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
+         if ($ConfirmRoleID) {
+            TouchValue('Attributes', $Fields, array());
+            $ConfirmationCode = RandomString(8);
+            $Fields['Attributes']['EmailKey'] = $ConfirmationCode;
+
+            if (isset($Fields['Roles'])) {
+               $Fields['Attributes']['ConfirmedEmailRoles'] = $Fields['Roles'];
+            }
+
+            $Fields['Roles'] = array($ConfirmRoleID);
          }
-         $Fields['Roles'] = (array)C('Garden.Registration.ConfirmEmailRole');
       }
 
       // Make sure to encrypt the password for saving...

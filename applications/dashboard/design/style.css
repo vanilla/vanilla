@@ -2862,6 +2862,7 @@ body.embed .Connect h2 {
 }
 .Embed .Buttons {
 	font-size: 11px;
+	text-align: right;
 }
 .EmbedCommentForm .Author {
 	display: inline-block;

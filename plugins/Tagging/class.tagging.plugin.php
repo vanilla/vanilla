@@ -358,6 +358,7 @@ class TaggingPlugin extends Gdn_Plugin {
       SaveToConfig(array(
           'Vanilla.Discussions.SortField' => $SortField,
           'Vanilla.Discussions.SortDirection' => $SortDirection),
+          '',
           FALSE);
    }
 

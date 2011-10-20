@@ -90,7 +90,7 @@ class AkismetPlugin extends Gdn_Plugin {
       $Sender->EventArguments['IsSpam'] = $Result;
    }
 
-   public function SettingsController_Akismet_Create($Sender, $Args) {
+   public function SettingsController_Akismet_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Akismet Settings'));
 

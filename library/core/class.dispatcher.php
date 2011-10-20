@@ -184,6 +184,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
       
+      // Move this up to allow pre-routing
+      $this->FireEvent('BeforeDispatch');
+      $this->AnalyzeRequest($Request);
+      
       // By default, all requests can be blocked by UpdateMode/PrivateCommunity
       $CanBlock = self::BLOCK_ANY;
       
@@ -229,9 +233,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          Redirect('/entry/signin?Target='.urlencode($this->Request));
          exit();
       }
-      
-      $this->FireEvent('BeforeDispatch');
-      $this->AnalyzeRequest($Request);
       
       $ControllerName = $this->ControllerName();
       if ($ControllerName != '' && class_exists($ControllerName)) {

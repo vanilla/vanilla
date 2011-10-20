@@ -60,7 +60,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
          echo ' <span class="MItem">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
 
          if ($Conversation->CountNewMessages > 0) {
-            echo ' <strong class="MItem"> '.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';
+            echo ' <strong class="HasNew"> '.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';
          }
          
          echo ' <span class="MItem">'.Gdn_Format::Date($Conversation->DateLastMessage).'</span> ';

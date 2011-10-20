@@ -60,16 +60,16 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                   .GetOptions($Category, $this)
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
                   .'<div class="Meta">
-                     <span class="RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>
-                     <span class="DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
-                     <span class="CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';
+                     <span class="MItem RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>
+                     <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
+                     <span class="MItem CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';
                      if ($Category->LastTitle != '') {
-                        $CatList .= '<span class="LastDiscussionTitle">'.sprintf(
+                        $CatList .= '<span class="MItem LastDiscussionTitle">'.sprintf(
                               T('Most recent: %1$s by %2$s'),
                               Anchor(SliceString($Category->LastTitle, 40), $Category->LastUrl),
                               UserAnchor($LastComment)
                            ).'</span>'
-                           .'<span class="LastCommentDate">'.Gdn_Format::Date($Category->LastDateInserted).'</span>';
+                           .'<span class="MItem LastCommentDate">'.Gdn_Format::Date($Category->LastDateInserted).'</span>';
                      }
                      // If this category is one level above the max display depth, and it
                      // has children, add a replacement string for them.

@@ -1,16 +1,33 @@
 <?php if (!defined('APPLICATION')) exit();
-
+/**
+ * Ban Model
+ *
+ * @package Dashboard
+ */
+ 
+/**
+ * Manage banning of users.
+ *
+ * @since 2.0.18
+ * @package Dashboard
+ */
 class BanModel extends Gdn_Model {
-   /// Properties
+   /* @var array */
    protected static $_AllBans;
 
-
-   /// Methods
-
+   /**
+    * Defines the related database table name.
+    */
    public function  __construct() {
       parent::__construct('Ban');
    }
-
+   
+   /*
+    * Get and store list of current bans.
+    *
+    * @since 2.0.18
+    * @access public
+    */
    public static function &AllBans() {
       if (!self::$_AllBans) {
          self::$_AllBans = Gdn::SQL()->Get('Ban')->ResultArray();
@@ -19,7 +36,16 @@ class BanModel extends Gdn_Model {
 //      $AllBans =& self::$_AllBans;
       return self::$_AllBans;
    }
-
+   
+   /**
+    * Convert bans to new type.
+    *
+    * @since 2.0.18
+    * @access public
+    *
+    * @param array $NewBan Data about the new ban.
+    * @param array $OldBan Data about the old ban.
+    */
    public function ApplyBan($NewBan = NULL, $OldBan = NULL) {
       if (!$NewBan && !$OldBan)
          return;
@@ -99,7 +125,13 @@ class BanModel extends Gdn_Model {
       }
       return $Result;
    }
-
+   
+   /**
+    * Add ban data to all Get requests.
+    *
+    * @since 2.0.18
+    * @access public
+    */
    public function  _BeforeGet() {
       $this->SQL
          ->Select('Ban.*')
@@ -110,7 +142,15 @@ class BanModel extends Gdn_Model {
    }
 
    /**
+    * Add ban data to all Get requests.
+    *
+    * @since 2.0.18
+    * @access public
+    *
+    * @param mixed User data (array or object).
     * @param Gdn_Validation $Validation
+    * @param bool $UpdateBlocks
+    * @return bool Whether user is banned.
     */
    public static function CheckUser($User, $Validation = NULL, $UpdateBlocks = FALSE) {
       $Bans = self::AllBans();
@@ -142,7 +182,17 @@ class BanModel extends Gdn_Model {
       }
       return count($Banned) == 0;
    }
-
+   
+   /**
+    * Remove a ban.
+    *
+    * @since 2.0.18
+    * @access public
+    * 
+    * @param array $Where
+    * @param int $Limit
+    * @param bool $ResetData
+    */
    public function  Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
       if (isset($Where['BanID'])) {
          $OldBan = $this->GetID($Where['BanID'], DATASET_TYPE_ARRAY);
@@ -164,7 +214,16 @@ class BanModel extends Gdn_Model {
 //
 //      return $Result;
 //   }
-
+   
+   /**
+    * Save data about ban from form.
+    *
+    * @since 2.0.18
+    * @access public
+    * 
+    * @param array $FormPostValues
+    * @param array $Settings
+    */
    public function Save($FormPostValues, $Settings = FALSE) {
       $CurrentBanID = GetValue('BanID', $FormPostValues);
 
@@ -181,6 +240,15 @@ class BanModel extends Gdn_Model {
       $this->ApplyBan($FormPostValues, $CurrentBan);
    }
 
+   /**
+    * Change ban data on a user (ban or unban them).
+    *
+    * @since 2.0.18
+    * @access public
+    *
+    * @param array $User
+    * @param bool $BannedValue Whether user is banned.
+    */
    public function SaveUser($User, $BannedValue) {
       $Banned = $User['Banned'];
 
@@ -197,7 +265,14 @@ class BanModel extends Gdn_Model {
          ->Where('u.UserID', $User['UserID'])
          ->Put();
    }
-
+   
+   /**
+    * Set number of banned users in $Data.
+    *
+    * @since 2.0.18
+    * @access public
+    * @param array $Data
+    */
    public function SetCounts(&$Data) {
       $CountUsers = $this->SQL
          ->Select('UserID', 'count', 'CountUsers')

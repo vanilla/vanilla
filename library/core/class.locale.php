@@ -1,70 +1,39 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
  * The Locale class is used to load, define, change, and render translations
  * for different locales. It is a singleton class.
  *
- *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-
-/**
- * The Locale class is used to load, define, change, and render translations
- * for different locales. It is a singleton class.
- *
- * This class can be used through the Gdn object.
- * <b>Usage</b>:
- * <code>
- * $Locale = Gdn::Locale()
- * $String = T('Some Code', 'Default Text');
- * </code>
- *
- * @see Gdn::Locale()
- * @see T()
+ * @since 2.0
  */
 class Gdn_Locale extends Gdn_Pluggable {
-
-
+   
    /**
     * Holds the associative array of language definitions.
     * ie. $this->_Definition['Code'] = 'Definition';
-    *
     * @var array
     */
    protected $_Definition = array();
-
-
+   
    /**
     * The name of the currently loaded Locale
-    *
     * @var string
     */
    public $_Locale = '';
    
    public function __construct($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
-      $this->Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
       parent::__construct();
+      $this->Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
    }
-
+   
    public function Refresh() {
       $LocalName = $this->Current();
 
-      $ApplicationManager = Gdn::Factory('ApplicationManager');
-      $ApplicationWhiteList = $ApplicationManager->EnabledApplicationFolders();
-
+      $ApplicationWhiteList = Gdn::ApplicationManager()->EnabledApplicationFolders();
       $PluginWhiteList = Gdn::PluginManager()->EnabledPluginFolders();
 
       $ForceRemapping = TRUE;
@@ -204,6 +173,9 @@ class Gdn_Locale extends Gdn_Pluggable {
       // Also load any custom defined definitions from the conf directory
       if (file_exists($ConfLocaleOverride))
          include($ConfLocaleOverride);
+      
+      $this->EventArguments['Definition'] = &$Definition;
+      $this->FireEvent('AfterSet');
 
       // All of the included files should have contained
       // $Definition['Code'] = 'Definition'; assignments. The overwrote each

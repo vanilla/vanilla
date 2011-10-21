@@ -79,8 +79,6 @@ class Gdn_LibraryMap {
       // If cache data array is passed in, merge it with our existing cache
       if (is_array($ExistingCacheArray))
          self::Import($CacheName, $ExistingCacheArray, TRUE);
-      
-      var_dump(self::$Caches); die();
    }
    
    /**

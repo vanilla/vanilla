@@ -59,7 +59,7 @@ $Editing = isset($this->Comment);
       $ButtonOptions['Disabled'] = 'disabled';
    */
 
-   echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);
+   echo ' '.$this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);
    $this->FireEvent('AfterFormButtons');
    echo "</div>\n";
    echo $this->Form->Close();

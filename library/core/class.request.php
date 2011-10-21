@@ -98,8 +98,11 @@ class Gdn_Request {
             case 'SCRIPT':
                $Value = !is_null($Value) ? trim($Value, '/') : $Value;
                break;
-            case 'SCHEME':
             case 'HOST':
+               $HostParts = explode(':', $Value);
+               $Value = array_shift($HostParts);
+               break;
+            case 'SCHEME':
             case 'METHOD':
             case 'FOLDER':
             default:

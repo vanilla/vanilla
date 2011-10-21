@@ -16,6 +16,7 @@ class UserModel extends Gdn_Model {
    const USERPERMISSIONS_KEY = 'user.{UserID}.permissions.{PermissionsIncrement}';
    const INC_PERMISSIONS_KEY = 'permissions.increment';
    const REDIRECT_APPROVE = 'REDIRECT_APPROVE';
+   const USERNAME_REGEX_MIN = '[^"#@/\\\t\r\n]';
    
    static $UserCache = array();
    

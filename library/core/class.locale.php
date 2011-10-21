@@ -174,7 +174,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       if (file_exists($ConfLocaleOverride))
          include($ConfLocaleOverride);
       
-      $Sender->EventArguments['Definition'] = &$Definition;
+      $this->EventArguments['Definition'] = &$Definition;
       $this->FireEvent('AfterSet');
 
       // All of the included files should have contained

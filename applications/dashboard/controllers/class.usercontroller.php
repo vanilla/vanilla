@@ -576,7 +576,7 @@ class UserController extends DashboardController {
    protected function _OrderUrl($Field) {
       $Get = Gdn::Request()->Get();
       $Get['order'] = $Field;
-      return Url('/dashboard/user?'.http_build_query($Get));
+      return '/dashboard/user?'.http_build_query($Get);
    }	
    
    /**

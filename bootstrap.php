@@ -191,10 +191,13 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
  * the locale management system.
  */
 
-$Codeset = Gdn::Config('Garden.LocaleCodeset', 'UTF8');
-$CurrentLocale = Gdn::Config('Garden.Locale', 'en-CA');
+// Set the locale in PHP
+$Codeset = C('Garden.LocaleCodeset', 'UTF8');
+$CurrentLocale = C('Garden.Locale', 'en-CA');
 $SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
 setlocale(LC_ALL, $SetLocale);
+
+// Load the Garden locale system
 $Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
 Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
 unset($Gdn_Locale);

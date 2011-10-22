@@ -90,9 +90,8 @@ echo $this->Form->Errors();
          When you create the Facebook application, you can choose what to enter in most fields, but make sure you enter the following value in the "Site Url" field:
          <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>" />
       </p>
-      <p><?php echo Anchor(Img('/plugins/Facebook/design/help-siteurl.png', array('style' => 'max-width: 940px;')), '/plugins/Facebook/design/help-siteurl.png', array('target' => '_blank')); ?></p>
       <p>Once your application has been set up, you must copy the "Application ID" and "Application Secret" into the form on this page and click save.</p>
-      <p><?php echo Anchor(Img('/plugins/Facebook/design/help-appvalues.png', array('style' => 'max-width: 746px;')), '/plugins/Facebook/design/help-appvalues.png', array('target' => '_blank')); ?></p>
+      <p><?php echo Anchor(Img('/plugins/Facebook/design/help-newapp.png', array('style' => 'max-width: 961px;')), '/plugins/Facebook/design/help-newapp.png', array('target' => '_blank')); ?></p>
    </div>
 </div>
 <?php 

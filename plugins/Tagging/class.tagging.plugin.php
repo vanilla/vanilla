@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
-   'Version' => '1.2',
+   'Version' => '1.3',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -21,13 +21,15 @@ $PluginInfo['Tagging'] = array(
 );
 
 /*
-v1.2 (2011-11-02 Matt Lincoln Russell lincoln@vanillaforums.com)
+v1.2 (2011-10-02 Matt Lincoln Russell lincoln@vanillaforums.com)
 - Added inline tags after first comment in discussion view.
+
+v1.3 (2011-10-21 Lincoln)
+- Removed redundant enable/disable plugin functionality.
 
 */
 
 class TaggingPlugin extends Gdn_Plugin {
-   
    /**
     * Add the Tagging admin menu option.
     */
@@ -37,6 +39,9 @@ class TaggingPlugin extends Gdn_Plugin {
       $Menu->AddLink('Forum', T('Tagging'), 'settings/tagging', 'Garden.Settings.Manage');
    }
    
+   /**
+    * Display the tag module in a category.
+    */
    public function CategoriesController_Render_Before($Sender) {
       $this->_AddTagModule($Sender);
    }
@@ -172,9 +177,6 @@ class TaggingPlugin extends Gdn_Plugin {
     * Save tags when saving a discussion.
     */
    public function DiscussionModel_AfterSaveDiscussion_Handler($Sender) {
-      if (!C('Plugins.Tagging.Enabled'))
-         return;
-      
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
       $IsInsert = GetValue('Insert', $Sender->EventArguments);
@@ -259,9 +261,6 @@ class TaggingPlugin extends Gdn_Plugin {
     * Validate tags when saving a discussion.
     */
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
-      if (!C('Plugins.Tagging.Enabled'))
-         return;
-      
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $TagsString = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
       $NumTagsMax = C('Plugin.Tagging.Max', 5);
@@ -390,7 +389,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function PostController_BeforeFormButtons_Handler($Sender) {
-      if (C('Plugins.Tagging.Enabled') && in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
          $Discussion = GetValue('Discussion', $Sender->EventArguments);
          if ($Discussion && !$Sender->Form->IsPostBack()) {
             // Load the existing tags.
@@ -415,9 +414,6 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add javascript to the post/edit discussion page so that tagging autocomplete works.
     */
    public function PostController_Render_Before($Sender) {
-      if (!C('Plugins.Tagging.Enabled'))
-         return;
-      
       $Sender->AddCSSFile('plugins/Tagging/design/token-input.css');
       $Sender->AddJsFile('plugins/Tagging/jquery.tokeninput.js');
       $Sender->AddJsFile($this->GetResource('tagging.js', FALSE,FALSE));
@@ -535,17 +531,6 @@ class TaggingPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Turn tagging on or off.
-    */
-   public function SettingsController_ToggleTagging_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
-      if (Gdn::Session()->ValidateTransientKey(GetValue(0, $Sender->RequestArgs)))
-         SaveToConfig('Plugins.Tagging.Enabled', C('Plugins.Tagging.Enabled') ? FALSE : TRUE);
-         
-      Redirect('settings/tagging');
-   }
-
-   /**
     * Setup is called when the plugin is enabled.
     */
    public function Setup() {
@@ -556,9 +541,6 @@ class TaggingPlugin extends Gdn_Plugin {
     * Adds the tag module to the page.
     */
    private function _AddTagModule($Sender) {
-      if (!C('Plugins.Tagging.Enabled'))
-         return;
-      
       $Sender->AddCSSFile('plugins/Tagging/design/tag.css');
       $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
       include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');

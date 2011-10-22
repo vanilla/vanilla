@@ -90,7 +90,8 @@ class TagModel extends Gdn_Model {
          $Tag = trim($Tag);
          if (!$Tag)
             unset($Tags[$Index]);
-         $Tags[$Index] = $Tag;
+         else
+            $Tags[$Index] = $Tag;
       }
       $Tags = array_unique($Tags);
       return $Tags;

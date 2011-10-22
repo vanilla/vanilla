@@ -788,7 +788,7 @@ class DiscussionModel extends VanillaModel {
       $DiscussionID = ArrayValue('DiscussionID', $FormPostValues, '');
       
       // See if there is a source ID.
-      if (array_key_exists('SourceID', $FormPostValues)) {
+      if (GetValue('SourceID', $FormPostValues)) {
          $DiscussionID = $this->SQL->GetWhere('Discussion', ArrayTranslate($FormPostValues, array('Source', 'SourceID')))->Value('DiscussionID');
          if ($DiscussionID)
             $FormPostValues['DiscussionID'] = $DiscussionID;

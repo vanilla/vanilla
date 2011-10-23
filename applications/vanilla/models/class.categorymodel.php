@@ -157,8 +157,11 @@ class CategoryModel extends Gdn_Model {
     */
    public static function JoinUserData(&$Categories, $AddUserCategory = TRUE) {
       if ($AddUserCategory) {
+         $SQL = clone Gdn::SQL();
+         $SQL->Reset();
+         
          if (Gdn::Session()->UserID) {
-            $UserData = Gdn::SQL()->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
+            $UserData = $SQL->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
             $UserData = Gdn_DataSet::Index($UserData, 'CategoryID');
          } else
             $UserData = array();

@@ -533,6 +533,8 @@ jQuery(document).ready(function($) {
    $('.Hijack').live('click', hijackClick);
 
    $.fn.openToggler = function() {
+      var lastOpen = null;
+      
      $(this).click(function() {
         var $flyout = $('.Flyout', this);
 
@@ -554,8 +556,15 @@ jQuery(document).ready(function($) {
         }
 
         if ($flyout.css('display') == 'none') {
+           if (lastOpen != null) {
+              $('.Flyout', lastOpen).hide();
+              $(lastOpen).removeClass('Open');
+           }
+           
            $(this).addClass('Open')
            $flyout.show();
+           
+           lastOpen = this;
         } else {
            $flyout.hide()
            $(this).removeClass('Open');

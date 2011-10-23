@@ -6,7 +6,7 @@ $Form->Method = 'get';
 echo $Form->Open();
 echo $Form->Errors();
 ?>
-<div class="Box">
+<div>
    <ul>
       <li>
          <?php
@@ -15,7 +15,7 @@ echo $Form->Errors();
          ?>
       </li>
    </ul>
-   <div class="ButtonContainer">
+   <div class="Buttons">
       <?php echo $Form->Button('Go'); ?>
    </div>
 </div>

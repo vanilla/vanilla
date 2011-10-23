@@ -27,6 +27,7 @@ $Editing = isset($this->Comment);
    echo $this->Form->Errors();
    
    $CommentOptions = array('MultiLine' => TRUE);
+   $CommentOptions['tabindex'] = 1;
    /*
     Caused non-root users to not be able to add comments. Must take categories
     into account. Look at CheckPermission for more information.
@@ -34,7 +35,7 @@ $Editing = isset($this->Comment);
       $CommentOptions['Disabled'] = 'disabled';
       $CommentOptions['Value'] = T('You do not have permission to write new comments.');
    }
-   */
+    */
    $this->FireEvent('BeforeBodyField');
    echo Wrap($this->Form->TextBox('Body', $CommentOptions), 'div', array('class' => 'TextBoxWrapper'));
    $this->FireEvent('AfterBodyField');
@@ -52,6 +53,7 @@ $Editing = isset($this->Comment);
    )).' ';
    
    $ButtonOptions = array('class' => 'Button CommentButton');
+   $ButtonOptions['tabindex'] = 2;
    /*
     Caused non-root users to not be able to add comments. Must take categories
     into account. Look at CheckPermission for more information.

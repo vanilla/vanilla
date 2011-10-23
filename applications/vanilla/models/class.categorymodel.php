@@ -217,6 +217,9 @@ class CategoryModel extends Gdn_Model {
       $IDs = array_keys($Categories);
       
       if ($AddUserCategory) {
+         $SQL = clone Gdn::SQL();
+         $SQL->Reset();
+         
          if (Gdn::Session()->UserID) {
             $Key = 'UserCategory_'.Gdn::Session()->UserID;
             $UserData = Gdn::Cache()->Get($Key);

@@ -76,9 +76,17 @@ class Gdn_Format {
          $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
          $GenderSuffixCode = 'Third';
       }
-      
-      $Gender = T($Activity->ActivityGender == 'm' ? 'his' : 'her');
-      $Gender2 = T($Activity->ActivityGender == 'm' ? 'he' : 'she');
+
+      $Gender = T('their'); //TODO: this isn't preferable but I don't know a better option
+      $Gender2 = T('they'); //TODO: this isn't preferable either
+      if ($Activity->ActivityGender == 'm') {
+        $Gender = T('his');
+        $Gender2 = T('he');
+      } else if ($Activity->ActivityGender == 'f') {
+        $Gender = T('her');
+        $Gender2 = T('she');
+      }
+
       if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID)) {
          $Gender = $Gender2 = T('your');
       }

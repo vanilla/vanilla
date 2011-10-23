@@ -30,7 +30,7 @@ echo $this->Form->Errors();
    <li class="Gender">
       <?php
          echo $this->Form->Label('Gender', 'Gender');
-         echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))
+         echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
       ?>
    </li>
    <?php

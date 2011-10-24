@@ -86,8 +86,8 @@ if (!function_exists('FixNl2Br')) {
     */
    function FixNl2Br($Text) {
       $allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
-      $Text = preg_replace('!<br\s*/>\s*(<' . $allblocks . '[^>]*>)!', "$1", $Text);
-      $Text = preg_replace('!(</' . $allblocks . '[^>]*>)<br\s*/>!', "$1", $Text);
+      $Text = preg_replace('!(?:<br\s*/>){1,2}\s*(<' . $allblocks . '[^>]*>)!', "\n$1", $Text);
+      $Text = preg_replace('!(</' . $allblocks . '[^>]*>)\s*(?:<br\s*/>){1,2}!', "$1\n", $Text);
       return $Text;
    }
 }

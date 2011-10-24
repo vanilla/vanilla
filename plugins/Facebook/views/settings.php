@@ -44,7 +44,7 @@ input.CopyInput {
    width: 280px;
 }
 #Form_ApplicationID {
-   width: 120px;  
+   width: 280px;  
 }
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
@@ -70,6 +70,16 @@ echo $this->Form->Errors();
                echo $this->Form->TextBox('Secret');
             ?>
          </li>
+         <li>
+            <?php
+               echo $this->Form->CheckBox('UseFacebookNames', 'Use Facebook names for usernames.');
+            ?>
+         </li>
+         <li>
+            <?php
+               echo $this->Form->CheckBox('SendConnectEmail', 'Send users a welcome email.');
+            ?>
+         </li>
       </ul>
       <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
    </div>
@@ -80,9 +90,8 @@ echo $this->Form->Errors();
          When you create the Facebook application, you can choose what to enter in most fields, but make sure you enter the following value in the "Site Url" field:
          <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>" />
       </p>
-      <p><?php echo Anchor(Img('/plugins/Facebook/design/help-siteurl.png', array('style' => 'max-width: 940px;')), '/plugins/Facebook/design/help-siteurl.png', array('target' => '_blank')); ?></p>
       <p>Once your application has been set up, you must copy the "Application ID" and "Application Secret" into the form on this page and click save.</p>
-      <p><?php echo Anchor(Img('/plugins/Facebook/design/help-appvalues.png', array('style' => 'max-width: 746px;')), '/plugins/Facebook/design/help-appvalues.png', array('target' => '_blank')); ?></p>
+      <p><?php echo Anchor(Img('/plugins/Facebook/design/help-newapp.png', array('style' => 'max-width: 961px;')), '/plugins/Facebook/design/help-newapp.png', array('target' => '_blank')); ?></p>
    </div>
 </div>
 <?php 

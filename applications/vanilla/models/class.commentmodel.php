@@ -44,9 +44,15 @@ class CommentModel extends VanillaModel {
       if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
          return;
       
-      if (!$Limit) {
-         $Limit = C('Vanilla.Comments.PerPage', 30);
+      $ConfigLimit = C('Vanilla.Comments.PerPage', 30);
+      
+      if (!$Limit)
+         $Limit = $ConfigLimit;
+      
+      if ($Limit != $ConfigLimit) {
+         return;
       }
+      
       if (is_array($PageWhere))
          $Curr = array_values($PageWhere);
       else
@@ -117,7 +123,7 @@ class CommentModel extends VanillaModel {
          ->Where('c.DiscussionID', $DiscussionID);
       
       $Page = PageNumber($Offset, $Limit);
-      $PageWhere = $this->PageWhere($DiscussionID, $Page);
+      $PageWhere = $this->PageWhere($DiscussionID, $Page, $Limit);
       
       if ($PageWhere) {
          $this->SQL->Where($PageWhere)->Limit($Limit + 10);
@@ -219,9 +225,13 @@ class CommentModel extends VanillaModel {
       }
    }
    
-   public function PageWhere($DiscussionID, $Page) {
+   public function PageWhere($DiscussionID, $Page, $Limit) {
       if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
          return FALSE;
+      
+      if ($Limit != C('Vanilla.Comments.PerPage', 30)) {
+         return FALSE;
+      }
       
       $CacheKey = "Comment.Page.$DiscussionID.$Page";
       $Value = Gdn::Cache()->Get($CacheKey);

@@ -219,12 +219,12 @@ class Gdn_Locale extends Gdn_Pluggable {
     * @param string $Translation The definition associated with the specified code. If $Code is an array
     *  of definitions, this value will not be used.
     */
-   public function SetTranslation($Code, $Translation = '') {
+   public function SetTranslation($Code, $Translation = '', $Save = FALSE) {
       if (!is_array($Code))
          $Code = array($Code => $Translation);
 
       foreach ($Code as $k => $v)
-         $this->LocaleContainer->SaveToConfig($k, $v, FALSE);
+         $this->LocaleContainer->SaveToConfig($k, $v, $Save);
    }
 
    /**
@@ -248,8 +248,11 @@ class Gdn_Locale extends Gdn_Pluggable {
       
       // If developer mode is on, and this translation returned the default value,
       // remember it and save it to the developer locale.
-      if ($this->DeveloperMode && $Translation == $Default)
-         $this->DeveloperContainer->SaveToConfig($Code, $Translation);
+      if ($this->DeveloperMode && $Translation == $Default) {
+         $DevKnows = $this->DeveloperContainer->Get($Code, FALSE);
+         if ($DevKnows === FALSE)
+            $this->DeveloperContainer->SaveToConfig($Code, $Translation);
+      }
       
       return $Translation;
    }
@@ -288,5 +291,21 @@ class Gdn_Locale extends Gdn_Pluggable {
     */
    public function GetAvailableLocaleSources() {
       return Gdn_FileSystem::Folders(PATH_APPLICATIONS.'/dashboard/locale');
+   }
+   
+   /**
+    * Get all definitions from the loaded locale
+    */
+   public function GetDefinitions() {
+      return $this->LocaleContainer->Get('.');
+   }
+   
+   /**
+    * Get all known core
+    */
+   public function GetDeveloperDefinitions() {
+      if (!$this->DeveloperMode) return FALSE;
+      
+      return $this->DeveloperContainer->Get('.');
    }
 }

@@ -776,6 +776,10 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       return __METHOD__.":{$this->Type}:{$this->Source}:".(int)$this->Dirty;
    }
    
+   public function Group() {
+      return $this->Group;
+   }
+   
    /**
     * Source Loaders
     */
@@ -956,7 +960,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
                   $OldVal = GetValue($Key, $Settings, NULL);
-                  $SetVal = Gdn_Format::Serialize($Value);
+                  $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
                   $Settings[$Key] = $SetVal;
                   if (!$KeyExists || $SetVal != $OldVal)
                      $this->Dirty = TRUE;
@@ -996,7 +1000,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             $Group = $this->Group;
             $Data = &$this->Settings;
             ksort($Data);
-
+            
             // Check for the case when the configuration is the group.
             if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data))
                $Data = $Data[$Group];
@@ -1027,7 +1031,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                'WrapPHP'         => TRUE,
                'ByLine'          => TRUE
             ));
-
+            
             if ($FileContents === FALSE)
                trigger_error(ErrorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
 

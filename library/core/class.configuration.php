@@ -904,7 +904,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
          
          // Key will always be in here if it is anywhere at all
          if (array_key_exists($Key, $Settings)) {
-            if ($i == ($KeyPartsCount - 1)) {
+            if ($i == ($KeyCount - 1)) {
                // We are at the setting, so unset it.
                $Found = TRUE;
                unset($Settings[$Key]);

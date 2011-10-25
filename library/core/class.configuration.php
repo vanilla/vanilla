@@ -964,7 +964,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
                   $OldVal = GetValue($Key, $Settings, NULL);
-                  $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
+                  $SetVal = $Value;
+                  if (!is_bool($Value) && !is_numeric($String))
+                     $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
                   $Settings[$Key] = $SetVal;
                   if (!$KeyExists || $SetVal != $OldVal)
                      $this->Dirty = TRUE;

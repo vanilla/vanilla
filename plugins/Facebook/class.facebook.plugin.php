@@ -114,7 +114,9 @@ class FacebookPlugin extends Gdn_Plugin {
       if ($Sender->Form->IsPostBack()) {
          $Settings = array(
              'Plugins.Facebook.ApplicationID' => $Sender->Form->GetFormValue('ApplicationID'),
-             'Plugins.Facebook.Secret' => $Sender->Form->GetFormValue('Secret'));
+             'Plugins.Facebook.Secret' => $Sender->Form->GetFormValue('Secret'),
+             'Plugins.Facebook.UseFacebookNames' => $Sender->Form->GetFormValue('UseFacebookNames'),
+             'Garden.Registration.SendConnectEmail' => $Sender->Form->GetFormValue('SendConnectEmail'));
 
          SaveToConfig($Settings);
          $Sender->InformMessage(T("Your settings have been saved."));
@@ -122,6 +124,8 @@ class FacebookPlugin extends Gdn_Plugin {
       } else {
          $Sender->Form->SetFormValue('ApplicationID', C('Plugins.Facebook.ApplicationID'));
          $Sender->Form->SetFormValue('Secret', C('Plugins.Facebook.Secret'));
+         $Sender->Form->SetFormValue('UseFacebookNames', C('Plugins.Facebook.UseFacebookNames'));
+         $Sender->Form->SetFormValue('SendConnectEmail', C('Garden.Registration.SendConnectEmail', TRUE));
       }
 
       $Sender->AddSideMenu();
@@ -210,6 +214,22 @@ class FacebookPlugin extends Gdn_Plugin {
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
       $Form->SetFormValue('Email', GetValue('email', $Profile));
       $Form->SetFormValue('Photo', "http://graph.facebook.com/$ID/picture");
+      
+      if (C('Plugins.Facebook.UseFacebookNames')) {
+         $Form->SetFormValue('Name', GetValue('name', $Profile));
+         SaveToConfig(array(
+             'Garden.User.ValidationRegex' => UserModel::USERNAME_REGEX_MIN,
+             'Garden.User.ValidationLength' => '{3,50}',
+             'Garden.Registration.NameUnique' => FALSE
+         ), '', FALSE);
+      }
+      
+      // Save some original data in the attributes of the connection for later API calls.
+      $Attributes = array(
+          'Facebook.Profile' => $Profile
+      );
+      $Form->SetFormValue('Attributes', $Attributes);
+      
       $Sender->SetData('Verified', TRUE);
    }
 

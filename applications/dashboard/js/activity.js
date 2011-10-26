@@ -84,8 +84,8 @@ jQuery(document).ready(function($) {
          url: action,
          data: postValues,
          dataType: 'json',
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, XMLHttpRequest.responseText);
+         error: function(xhr) {
+            gdn.informError(xhr);
          },
          success: function(json) {
             json = $.postParseJson(json);
@@ -123,12 +123,14 @@ jQuery(document).ready(function($) {
             url: $(frm).attr('action'),
             data: postValues,
             dataType: 'json',
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $.popup({}, XMLHttpRequest.responseText);
+            complete: function() {
+               $('span.Progress').remove();
+            },
+            error: function(xhr) {
+               gdn.informError(xhr);
             },
             success: function(json) {
                json = $.postParseJson(json);
-               $('span.Progress').remove();
                if (json['FormSaved'] == true) {
                   $(inp).val('');
                   // If there were no activities

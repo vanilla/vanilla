@@ -53,7 +53,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       <div class="Meta">
          <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateInserted); ?></span>
          <?php
-         if ($Activity->AllowComments == '1' && $Session->IsValid())
+         if ($Activity->AllowComments == '1' && $Session->CheckPermission('Garden.Profiles.Edit'))
             echo '<span class="MItem AddComment">'.Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
          
          $Sender->FireEvent('AfterMeta');
@@ -78,7 +78,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       if ($FoundComments == FALSE)
          echo '<ul class="DataList ActivityComments Hidden">';
 
-      if ($Session->IsValid()) {
+      if ($Session->CheckPermission('Garden.Profiles.Edit')) {
          ?>
          <li class="CommentForm">
          <?php

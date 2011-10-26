@@ -44,7 +44,7 @@ input.CopyInput {
    width: 280px;
 }
 #Form_ApplicationID {
-   width: 120px;  
+   width: 280px;  
 }
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
@@ -68,6 +68,16 @@ echo $this->Form->Errors();
             <?php
                echo $this->Form->Label('Application Secret', 'Secret');
                echo $this->Form->TextBox('Secret');
+            ?>
+         </li>
+         <li>
+            <?php
+               echo $this->Form->CheckBox('UseFacebookNames', 'Use Facebook names for usernames.');
+            ?>
+         </li>
+         <li>
+            <?php
+               echo $this->Form->CheckBox('SendConnectEmail', 'Send users a welcome email.');
             ?>
          </li>
       </ul>

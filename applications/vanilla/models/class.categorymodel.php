@@ -217,6 +217,9 @@ class CategoryModel extends Gdn_Model {
       $IDs = array_keys($Categories);
       
       if ($AddUserCategory) {
+         $SQL = clone Gdn::SQL();
+         $SQL->Reset();
+         
          if (Gdn::Session()->UserID) {
             $Key = 'UserCategory_'.Gdn::Session()->UserID;
             $UserData = Gdn::Cache()->Get($Key);
@@ -1104,6 +1107,7 @@ class CategoryModel extends Gdn_Model {
       $Category = $Categories[$ID];
       $Category = array_merge($Category, $Data);
       $Categories[$ID] = $Category;
+      self::CalculateData($Categories);
       Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
    }
    

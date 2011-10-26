@@ -115,6 +115,7 @@ class ActivityController extends Gdn_Controller {
       $Comment = $this->Form->GetFormValue('Comment');
       $this->CommentData = FALSE;
       if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
+         $this->Permission('Garden.Profiles.Edit');
          $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
          
          // Update About if necessary
@@ -215,6 +216,8 @@ class ActivityController extends Gdn_Controller {
     * @access public
     */
    public function Comment() {
+      $this->Permission('Garden.Profiles.Edit');
+      
       $Session = Gdn::Session();
       $this->Form->SetModel($this->ActivityModel);
       $NewActivityID = 0;

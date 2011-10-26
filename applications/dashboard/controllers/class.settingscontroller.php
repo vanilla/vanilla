@@ -312,23 +312,20 @@ class SettingsController extends DashboardController {
       // Page setup
       $this->AddSideMenu('dashboard/settings/homepage');
       $this->Title(T('Homepage'));
-      $this->AddJsFile('homepage.js');
       
+      $CurrentRoute = GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), '');
+      $this->SetData('CurrentTarget', $CurrentRoute);
       if (!$this->Form->AuthenticatedPostBack()) {
-         $this->Route = Gdn::Router()->GetRoute('DefaultController');
          $this->Form->SetData(array(
-            'Target' => $this->Route['Destination']
+            'Target' => $CurrentRoute
          ));
       } else {
-            Gdn::Router()->DeleteRoute('DefaultController');
-            Gdn::Router()->SetRoute(
-               'DefaultController',
-               ArrayValue('Target', $this->Form->FormValues()),
-               'Internal'
-            );
-
-            $this->InformMessage(T("The homepage was saved successfully."));
-         }
+         $NewRoute = GetValue('Target', $this->Form->FormValues(), '');
+         Gdn::Router()->DeleteRoute('DefaultController');
+         Gdn::Router()->SetRoute('DefaultController', $NewRoute, 'Internal');
+         $this->SetData('CurrentTarget', $NewRoute);
+         $this->InformMessage(T("The homepage was saved successfully."));
+      }
       
       $this->Render();      
    }      

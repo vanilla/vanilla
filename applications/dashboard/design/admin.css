@@ -88,7 +88,7 @@ body {
 	width: 100%;
 }
 #Content {
-	padding: 0;
+	padding: 0 0 20px;
 	margin: 0 0 0 200px;
 	border-left: 1px solid #82bddd;
 }
@@ -1061,7 +1061,6 @@ ul.PanelInfo li a {
 	padding: 10px;
    color: #000;
 }
-
 ul.PanelInfo li a {
 	font-size: 13px;
 	color: #000;
@@ -1090,7 +1089,18 @@ span.New {
 	right: auto;
 }
 ul.PanelInfo li.Active {
-   background: url('images/arrow.png') center left no-repeat #ffffff;
+   background-image: url('images/arrow.png');
+	background-position: center left;
+	background-repeat: no-repeat;
+	background-color: rgba(0, 0, 0, 0.03);
+	background-color: #F5F9FF;
+}
+ul.PanelInfo li.Active a {
+	text-shadow: 0 1px 0 #fff;
+}
+ul.PanelInfo li:hover,
+ul.PanelInfo li.Active:hover {
+	background-color: rgba(0, 0, 0, 0.06);
 }
 
 /* ================================================= Dashboard Customizations */
@@ -1733,44 +1743,70 @@ div.Summary table tbody td {
 	line-height: 1.5;
 }
 .Aside {
-   border: solid 1px #ccc;
-   background: #ff8;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   width: 220px;
+   border: solid 1px #cc8;
+	border-width: 1px 0 1px 1px;
+   border-top: solid 1px #aa8;
+   background: #ffc;
+   border-radius: 0 0 0 3px;
+   -moz-border-radius: 0 0 0 3px;
+   -webkit-border-radius: 0 0 0 3px;
+   /* width: 220px; */
+	max-width: 500px;
    float: right;
    z-index: 200;
    position: relative;
-   margin: 6px;
+   margin: 0;
+	font-size: 12px;
 }
-
 /* Homepage Admin */
 .HomeOptions {
 	padding: 0 20px;
 }
 .HomeOptions a {
-	color: #333;
+	color: #777;
 	font-weight: bold;
+	font-size: 12px;
 	text-decoration: none;
 	display: inline-block;
 	vertical-align: bottom;
-	width: 180px;
 	margin: 0 10px 10px 0;
-	padding: 0 6px;
+	padding: 0;
+	line-height: 2.6;
+}
+.HomeOptions a:last-child {
+	margin: 0 0 10px 0;
+}
+.HomeOptions a span {
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
-	border: 1px solid #ddd;
-	background: url('images/homepage-sprites.png') 6px 23px no-repeat #eee;
-	height: 152px;
+	background: #f5f5f5;
+	border: 4px solid #ccc;
+	padding: 6px;
+	margin: 0;
+	height: 122px;
+	width: 180px;
+	background: url('images/homepage-sprites.png') 6px 6px no-repeat transparent;
+	display: block;
 }
-.HomeOptions a.categoriesdiscussions { background-position: -184px 23px; }
-.HomeOptions a.categoriesall { background-position: -564px 23px; }
-.HomeOptions a.activity { background-position: -374px 23px; }
+.HomeOptions a.categoriesdiscussions span { background-position: -184px 6px; }
+.HomeOptions a.categoriesall span { background-position: -564px 6px; }
+.HomeOptions a.activity span { background-position: -374px 6px; }
 .HomeOptions a:hover {
-	background-color: #f5f5f5;
-	border-color: #ccc;
+	color: #000;
+}
+.HomeOptions a:hover span {
+	background-color: #fafafa;
+	border-color: #aaa;
+}
+.HomeOptions a.Current {
+	color: #000;
+	background: url('images/check.png') 2px 3px no-repeat;
+	text-indent: 36px;
+}
+.HomeOptions a.Current span {
+   background-color: #ffc;
+   border-color: #cc5;
 }
 
 ol.Sortable, ol.Sortable ol {

@@ -1764,13 +1764,13 @@ div.Summary table tbody td {
 .HomeOptions a {
 	color: #777;
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 12px;
 	text-decoration: none;
 	display: inline-block;
 	vertical-align: bottom;
 	margin: 0 10px 10px 0;
 	padding: 0;
-	line-height: 2;
+	line-height: 2.6;
 }
 .HomeOptions a span {
 	border-radius: 2px;
@@ -1797,7 +1797,7 @@ div.Summary table tbody td {
 }
 .HomeOptions a.Current {
 	color: #000;
-	background: url('images/check.png') 2px 0 no-repeat;
+	background: url('images/check.png') 2px 3px no-repeat;
 	text-indent: 36px;
 }
 .HomeOptions a.Current span {

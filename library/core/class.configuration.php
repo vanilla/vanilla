@@ -965,8 +965,14 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
                   $OldVal = GetValue($Key, $Settings, NULL);
                   $SetVal = $Value;
-                  if (!is_bool($Value) && !is_numeric($Value))
+                  
+                  // Serialize if array or obj
+                  if (is_array($Value) || is_object($Value)) {
+                     $SetVal = Gdn_Format::Serialize($Value);
+                  // ArrayValueEncode if string
+                  } elseif (is_string($Value) && !is_numeric($Value) && !is_bool($Value)) {
                      $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
+                  }
                   $Settings[$Key] = $SetVal;
                   if (!$KeyExists || $SetVal != $OldVal)
                      $this->Dirty = TRUE;

@@ -401,6 +401,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
     */
    public function Load($File, $Name = 'Configuration', $Dynamic = FALSE) {
       $ConfigurationSource = Gdn_ConfigurationSource::FromFile($this, $File, $Name);
+      if (!$ConfigurationSource) return FALSE;
+      
       $ConfigurationSource->Splitting($this->Splitting);
       
       if (!$ConfigurationSource) return FALSE;
@@ -428,6 +430,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
     */
    public function LoadString($String, $Tag, $Name = 'Configuration', $Dynamic = TRUE) {
       $ConfigurationSource = Gdn_ConfigurationSource::FromString($this, $String, $Tag, $Name);
+      if (!$ConfigurationSource) return FALSE;
+      
       $ConfigurationSource->Splitting($this->Splitting);
       
       $SourceTag = "string:{$Tag}";
@@ -960,7 +964,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
                   $OldVal = GetValue($Key, $Settings, NULL);
-                  $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
+                  $SetVal = $Value;
+                  if (!is_bool($Value) && !is_numeric($Value))
+                     $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
                   $Settings[$Key] = $SetVal;
                   if (!$KeyExists || $SetVal != $OldVal)
                      $this->Dirty = TRUE;

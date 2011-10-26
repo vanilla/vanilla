@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
 </div>
 <h1><?php echo T('Homepage'); ?></h1>
 <div class="Info">
-   <?php printf(T('Use the content at this url as your homepage.', 'Choose the page people should see when they visit: <strong>%s</strong>'), Url('/', TRUE)) ?>
+   <?php printf(T('Use the content at this url as your homepage.', 'Choose the page people should see when they visit: <strong style="white-space: nowrap;">%s</strong>'), Url('/', TRUE)) ?>
 </div>
 <div class="HomeOptions">
    <?php

@@ -1756,6 +1756,7 @@ div.Summary table tbody td {
    z-index: 200;
    position: relative;
    margin: 0;
+	font-size: 12px;
 }
 /* Homepage Admin */
 .HomeOptions {
@@ -1771,6 +1772,9 @@ div.Summary table tbody td {
 	margin: 0 10px 10px 0;
 	padding: 0;
 	line-height: 2.6;
+}
+.HomeOptions a:last-child {
+	margin: 0 0 10px 0;
 }
 .HomeOptions a span {
 	border-radius: 2px;

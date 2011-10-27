@@ -175,6 +175,20 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       return $this->PluginCache;
    }
    
+   public function ForceAutoloaderIndex() {
+      $AutoloaderMap = Gdn_Autoloader::GetMap(Gdn_Autoloader::MAP_LIBRARY, Gdn_Autoloader::CONTEXT_PLUGIN);
+      if (!$AutoloaderMap) return;
+      
+      $ExtraPaths = array();
+      foreach ($this->AvailablePlugins() as $AvailablePlugin)
+         $ExtraPaths[] = array(
+            'path'  => GetValue('RealRoot', $AvailablePlugin),
+            'topic' => strtolower(GetValue('Folder', $AvailablePlugin))
+         );
+      
+      $AutoloaderMap->Index($ExtraPaths);
+   }
+   
    public function ClearPluginCache($SearchPaths = NULL) {
       if (!is_null($SearchPaths)) {
          if (!is_array($SearchPaths))

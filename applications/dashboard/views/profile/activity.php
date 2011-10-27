@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 if ($Session->IsValid() && CheckPermission('Garden.Profiles.Edit')) {
-   $this->FireEvent('BeforeStatusForm');      
+   $this->FireEvent('BeforeStatusForm');
    $ButtonText = $Session->UserID == $this->User->UserID ? 'Share' : 'Add Comment';
    echo $this->Form->Open(array('action' => Url('/profile/activity/'.$this->User->UserID.'/'.$this->User->Name), 'class' => 'Activity'));
    echo $this->Form->Errors();

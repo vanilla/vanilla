@@ -1,9 +1,9 @@
 jQuery(document).ready(function($) {
-   
+
    // Ajax-test addons before enabling
    $('a.EnableAddon').click(function() {
       gdn.clearAddonErrors();
-      
+
       var url = $(this).attr('href');
       var urlParts = url.split('/');
       var addonType = urlParts[urlParts.length - 4];
@@ -22,17 +22,17 @@ jQuery(document).ready(function($) {
             addonType = 'Locale';
             break;
       }
-      
+
       if ($(this).hasClass('EnableTheme'))
          addonType = 'Theme';
-         
+
       if (addonType != 'Theme') {
          $('.TinyProgress').remove();
          $(this).after('<span class="TinyProgress">&#160;</span>');
       }
       var addonName = urlParts[urlParts.length - 2];
       var testUrl = gdn.url('/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey'));
-      
+
       $.ajax({
          type: "GET",
          url: testUrl,
@@ -52,7 +52,7 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
    gdn.clearAddonErrors  = function() {
       $('div.TestAddonErrors:not(.Hidden)').remove();
       $('.TinyProgress').remove();
@@ -71,12 +71,12 @@ jQuery(document).ready(function($) {
    // Ajax-test addons before enabling
    $('a.PreviewAddon').click(function() {
       gdn.clearAddonErrors();
-      
+
       var url = $(this).attr('href');
       var urlParts = url.split('/');
       var addonName = urlParts[urlParts.length - 1];
       var testUrl = gdn.url('/dashboard/settings/testaddon/Theme/'+addonName+'/'+gdn.definition('TransientKey'));
-      
+
       $.ajax({
          type: "GET",
          url: testUrl,

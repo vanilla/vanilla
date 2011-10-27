@@ -1,8 +1,8 @@
 jQuery(document).ready(function($) {
-   
+
    // Set the max chars in the activity comment boxes
    $('form.Activity textarea').setMaxChars(1000);
-   
+
    // Hide activity deletes and hijack their clicks to confirm
    $('ul.Activities a.Delete, ul.Activities a.DeleteComment').popup({
       confirm: true,
@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
          });
       }
    });
-   
+
    // Reveal activity deletes on hover
    $('ul.Activities li').livequery(function() {
       $(this).find('a.Delete').hide();
@@ -34,19 +34,19 @@ jQuery(document).ready(function($) {
       comments.find('a.CommentLink').click();
       return false;
    });
-   
+
    // Hijack commentlink clicks
    $('a.CommentLink').live('click', function() {
       // Hide the anchor
       var anchor = this;
       $(anchor).hide();
       var row = $(anchor).parents('li.CommentForm');
-   
+
       // Reveal the form
       var frm = $(row).find('form');
       frm.show();
-      
-      // Focus on the textbox 
+
+      // Focus on the textbox
       var textbox = frm.find('textarea');
       textbox.focus().blur(function() {
          // Hide the form onblur if empty
@@ -67,14 +67,14 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
    // Hijack comment form button clicks
    $('ul.ActivityComments form input.Button').live('click', function() {
       var button = this;
       var frm = $(button).parents('form');
       var row = $(frm).parents('li.CommentForm');
       var textbox = $(row).find('textarea');
-      
+
       // Post the form, place the results above the input, and erase the textbox
       var postValues = frm.serialize() + '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       var activityId = frm.find('[name$=ActivityID]').val();
@@ -89,7 +89,7 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             json = $.postParseJson(json);
-            
+
             // Remove any old errors from the form
             $('div.Errors').remove();
 
@@ -97,7 +97,7 @@ jQuery(document).ready(function($) {
                if (json.ErrorMessages)
                   $(row).prepend(json.ErrorMessages);
             } else {
-               $(row).before(json.Data);         
+               $(row).before(json.Data);
                textbox.val('').blur();
                // Make sure that hidden items appear
                $('ul.ActivityComments li.Hidden').slideDown('fast');
@@ -106,7 +106,7 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
       // Hijack activity comment form submits
    $('form.Activity :submit').live('click', function() {
       var but = this;

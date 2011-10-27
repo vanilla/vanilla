@@ -29,7 +29,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
    private $ParentType = NULL;
    private $ParentID = NULL;
    private $ParentElement = NULL;
-   
+
    private $UserID = NULL;
    private $ForeignURL = NULL;
    private $Comment = NULL;
@@ -43,41 +43,41 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       $this->ForeignID = $ForeignID;
       parent::__construct();
    }
-   
+
    public function VerifiedAs($SourceElement = NULL) {
       if (is_null($SourceElement))
          return $this->SourceElement;
       else
          $this->SourceElement = $SourceElement;
-      
+
       switch ($this->ForeignType) {
          case 'discussion':
             $OCField = "Body";
             break;
-            
+
          case 'comment':
             $OCField = "Body";
             break;
-         
+
          case 'conversation':
             $OCField = NULL;
             break;
-            
+
          case 'conversationmessage':
             $OCField = "Body";
             break;
-            
+
          default:
             $OCField = "Body";
             break;
       }
-      
+
       if (!is_null($OCField) && !is_null($OCData = GetValue($OCField, $this->SourceElement, NULL)))
          $this->OriginalContent = $OCData;
-      
+
       return $this;
    }
-   
+
    public function AutoParent($ParentType, $ParentIDKey = NULL) {
       if (!is_null($this->SourceElement)) {
          if (is_null($ParentIDKey))
@@ -86,7 +86,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          if ($ParentID !== FALSE)
             $this->WithParent($ParentType, $ParentID);
       }
-      
+
       return $this;
    }
 
@@ -99,13 +99,13 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       // If we can lookup this object, it is verified
       $VerifyModel = new $ModelName;
       $ParentElement = $VerifyModel->GetID($ParentID);
-      
+
       if ($ParentElement !== FALSE) {
          $this->ParentType = $ParentType;
          $this->ParentID = $ParentID;
          $this->ParentElement = $ParentElement;
       }
-         
+
       return $this;
    }
 
@@ -138,7 +138,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
    public function Entitled($CollaborativeTitle) {
       $this->CollaborativeTitle = $CollaborativeTitle;
-      
+
       // Figure out how much space we have for the title
       $MaxLength = 90;
       $Stripped = FormatString($CollaborativeTitle,array(
@@ -146,10 +146,10 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
       ));
       $UsedLength = strlen($Stripped);
       $AvailableLength = $MaxLength - $UsedLength;
-      
+
       // Check if the SourceElement contains a 'Name'
       $Name = GetValue('Name', $this->SourceElement, FALSE);
-      
+
       // If not...
       if ($Name === FALSE) {
          // ...and we have a parent element...
@@ -158,19 +158,19 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             $Name = GetValue('Name', $this->ParentElement, FALSE);
          }
       }
-      
+
       // If all that failed, use the 'Body' of the source
       if ($Name === FALSE)
          $Name = GetValue('Body', $this->SourceElement, '');
-      
+
       // Trim it if it is too long
       if (strlen($Name) > $AvailableLength)
          $Name = substr($Name, 0, $AvailableLength-3).'...';
-      
+
       $CollaborativeTitle = FormatString($CollaborativeTitle,array(
          'RegardingTitle'     => $Name
       ));
-      
+
       $this->CollaborativeTitle = $CollaborativeTitle;
       return $this;
    }
@@ -184,26 +184,26 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             case 'discussion':
                $URL = sprintf('discussion/%d', $this->ForeignID);
                break;
-               
+
             case 'comment':
                $URL = sprintf('discussion/comment/%d', $this->ForeignID);
                break;
-            
+
             case 'conversation':
                $URL = sprintf('messages/%d', $this->ForeignID);
                break;
-               
+
             case 'conversationmessage':
                $URL = sprintf('messages/%d', $this->ParentID);
                break;
-               
+
             default:
                $URL = "/";
                break;
          }
          $URL = Url($URL);
       }
-      
+
       $this->ForeignURL = $URL;
       return $this;
    }
@@ -237,7 +237,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          $this->UserID = Gdn::Session()->UserID;
 
       $RegardingModel = new RegardingModel();
-      
+
       $CollapseMode = C('Garden.Regarding.AutoCollapse', TRUE);
       $Collapse = FALSE;
       if ($CollapseMode) {
@@ -248,7 +248,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             $RegardingID = GetValue('RegardingID', $ExistingRegardingEntity);
          }
       }
-      
+
       if (!$Collapse) {
          // Create a new Regarding entry
          $RegardingPreSend = array(
@@ -265,20 +265,20 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             'OriginalContent' => $this->OriginalContent,
             'Reports'         => 1
          );
-         
-         
+
+
          $RegardingID = $RegardingModel->Save($RegardingPreSend);
-         
+
          if (!$RegardingID)
             return FALSE;
       }
-      
+
       // Handle collaborations
-      
+
       // Don't error on foreach
       if (!is_array($this->CollaborativeActions))
          $this->CollaborativeActions = array();
-      
+
       foreach ($this->CollaborativeActions as $Action) {
          $ActionType = GetValue('Type', $Action);
          switch ($ActionType) {
@@ -286,10 +286,10 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                $DiscussionModel = new DiscussionModel();
                if ($Collapse)
                   $Discussion = $DiscussionModel->GetWhere(array('RegardingID' => GetValue('RegardingID', $ExistingRegardingEntity, FALSE)))->FirstRow(DATASET_TYPE_ARRAY);
-               
+
                if (!$Collapse || !$Discussion) {
                   $CategoryID = GetValue('Parameters', $Action);
-               
+
                   // Make a new discussion
                   $DiscussionID = $DiscussionModel->Save(array(
                      'Name'         => $this->CollaborativeTitle,
@@ -300,11 +300,11 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                      'Close'        => 0,
                      'RegardingID'  => $RegardingID
                   ));
-                  
+
                   if (!$DiscussionID) {
                      throw new Gdn_UserException($DiscussionModel->Validation->ResultsText());
                   }
-                  
+
                   $DiscussionModel->UpdateDiscussionCount($CategoryID);
                } else {
                   // Add a comment to the existing discussion.
@@ -317,26 +317,26 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
                   $CommentModel->Save2($CommentID, TRUE);
                }
-               
+
                break;
 
             case 'conversation':
-                  
+
                $ConversationModel = new ConversationModel();
                $ConversationMessageModel = new ConversationMessageModel();
-               
+
                $Users = GetValue('Parameters', $Action);
                $UserList = explode(',', $Users);
                if (!sizeof($UserList))
                   throw new Exception(sprintf(T("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
-               
+
                $ConversationID = $ConversationModel->Save(array(
                   'To'              => 'Admins',
                   'Body'            => $this->CollaborativeTitle,
                   'RecipientUserID' => $UserList,
                   'RegardingID'     => $RegardingID
                ), $ConversationMessageModel);
-               
+
                break;
          }
       }

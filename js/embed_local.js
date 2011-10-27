@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
          return '';
       }
    }
-   
+
    /*
     Embedded pages can have very low height settings. As a result, when an
     absolutely positioned popup appears on the page, iframed content doesn't
@@ -16,8 +16,8 @@ jQuery(document).ready(function($) {
       var height = ($.popup.getPagePosition().top*1) + ($('.Popup').height()*1);
       $('body').css('minHeight', height+'px');
    });
-   
-      
+
+
    var currentHeight = null,
       minHeight = 100,
       remotePostMessage = function(message, target) {},
@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
       isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
-      
+
    if (inIframe) {
       if ("postMessage" in parent) {
          remotePostMessage = function(message, target) {
@@ -45,10 +45,10 @@ jQuery(document).ready(function($) {
             var id = Math.floor(Math.random() * 100000);
             if (remoteUrl.substr(remoteUrl.length - 1) != '/')
                remoteUrl += '/';
-               
+
             return remoteUrl + "/poll.html#poll:" + id + ":" + message;
          }
-        
+
          remotePostMessage = function(message, target) {
             if (message.indexOf(':') >= 0) {
                // Check to replace a similar message.
@@ -63,7 +63,7 @@ jQuery(document).ready(function($) {
             }
             messages.push(message);
          }
-        
+
          setLocation = function(newLocation) {
             if (messages.length == 0)
                parent.window.frames[0].location.replace(newLocation);
@@ -73,7 +73,7 @@ jQuery(document).ready(function($) {
                },500);
             }
          }
-         
+
          var nextMessageTime = new Date();
          setMessage = function() {
             if (messages.length == 0)
@@ -91,11 +91,11 @@ jQuery(document).ready(function($) {
 
             document.getElementById('messageFrame').src = url;
          }
-           
+
          $(function() {
             var body = document.getElementsByTagName("body")[0],
                messageIframe = document.createElement("iframe");
-       
+
             messageIframe.id = "messageFrame";
             messageIframe.name = "messageFrame";
             messageIframe.src = messageUrl('');
@@ -113,7 +113,7 @@ jQuery(document).ready(function($) {
       var hashIndex = path.indexOf('#');
       if (hashIndex > -1)
          path = path.substr(0, hashIndex);
-      
+
       document.location = remoteUrl + '#' + path;
    } else if (inIframe && inDashboard && !embedDashboard) {
       remotePostMessage('unembed', '*');
@@ -127,32 +127,32 @@ jQuery(document).ready(function($) {
             newHeight = minHeight;
          if (newHeight != currentHeight) {
             currentHeight = newHeight;
-               
+
             remotePostMessage('height:'+currentHeight, '*');
          }
       }
-   
+
       setHeight();
       setInterval(setHeight, 300);
-    
+
       // Simulate a page unload when popups are opened (so they are scrolled into view).
       $('body').bind('popupReveal', function() {
          remotePostMessage('scrollto:' + $('div.Popup').offset().top, '*');
       });
-      
+
       $(window).unload(function() { remotePostMessage('unload', '*'); });
       $('a').live('click', function() {
          var href = $(this).attr('href'),
             isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
             noTop = $(this).hasClass('SignOut');
-                
+
          if (isHttp && href.substr(0, webroot.length) != webroot) {
             $(this).attr('target', '_blank');
          } else if (isEmbeddedComments) {
             // Target the top of the page if clicking an anchor in a list of embedded comments
             if (!noTop)
                $(this).attr('target', '_top');
-               
+
             // If clicking a "register" link, change the post-registration target to the page that is currently embedded.
             if ($(this).parents('.CreateAccount').length > 0) {
                // Examine querystring parameters for a target & replace it with the embed page
@@ -163,7 +163,7 @@ jQuery(document).ready(function($) {
                   var afterTarget = '';
                   if (target.indexOf('&') > 0)
                      afterTarget = target.substring(target.indexOf('&'));
-                  
+
                   $(this).attr('href', href.substring(0, targetIndex + 7)
                      + encodeURIComponent(gdn.definition('ForeignUrl', ''))
                      + afterTarget);
@@ -178,7 +178,7 @@ jQuery(document).ready(function($) {
                hash = path.substr(hashIndex);
                path = path.substr(0, hashIndex);
             }
-            
+
             if (path != '')
                remotePostMessage('location:' + path, '*');
 
@@ -186,7 +186,7 @@ jQuery(document).ready(function($) {
       });
 
    }
-   
+
    var path = gdn.definition('Path', '~');
    if (path != '~' && !isEmbeddedComments) {
       if (path.length > 0 && path[0] != '/')

@@ -24,7 +24,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 				echo '</div>';
 			echo '</div>';
       }
-      
+
       $this->FireEvent('BeforeBodyInput');
 		echo '<div class="P">';
 	      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));

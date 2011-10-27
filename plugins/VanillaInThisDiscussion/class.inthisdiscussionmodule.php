@@ -12,14 +12,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders a list of users who are taking part in a particular discussion.
  */
 class InThisDiscussionModule extends Gdn_Module {
-   
+
    protected $_UserData;
-   
+
    public function __construct($Sender = '') {
       $this->_UserData = FALSE;
       parent::__construct($Sender);
    }
-   
+
    public function GetData($DiscussionID, $Limit = 50) {
       $SQL = Gdn::SQL();
       $this->_UserData = $SQL
@@ -40,7 +40,7 @@ class InThisDiscussionModule extends Gdn_Module {
    public function ToString() {
       if ($this->_UserData->NumRows() == 0)
          return '';
-      
+
       $String = '';
       ob_start();
       ?>

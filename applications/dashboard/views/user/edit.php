@@ -37,9 +37,9 @@ if ($this->Data('AllowEditing')) { ?>
    <ul>
       <li>
          <strong><?php echo T('Check all roles that apply to this user:'); ?></strong>
-         <?php 
-            //echo $this->Form->CheckBoxList("RoleID", $this->RoleData, $this->UserRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); 
-         echo $this->Form->CheckBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); 
+         <?php
+            //echo $this->Form->CheckBoxList("RoleID", $this->RoleData, $this->UserRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID'));
+         echo $this->Form->CheckBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData));
          ?>
       </li>
    </ul>
@@ -64,7 +64,7 @@ if ($this->Data('AllowEditing')) { ?>
          </div>
       </li>
    </ul>
-<?php 
+<?php
 
    $this->FireEvent('AfterFormInputs');
    echo $this->Form->Close('Save');

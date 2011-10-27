@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders recently active discussions
  */
 class DiscussionsModule extends Gdn_Module {
-   
+
    public function GetData($Limit = 10) {
       $DiscussionModel = new DiscussionModel();
       $this->Data = $DiscussionModel->Get(0, $Limit);

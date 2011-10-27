@@ -54,7 +54,7 @@
 		</li>
 	</ul>
 	<?php
-		// echo $this->Form->Button("Get me outta here!", array('Name' => 'User/StopLinking')); 
+		// echo $this->Form->Button("Get me outta here!", array('Name' => 'User/StopLinking'));
 		echo $this->Form->Close();
 	?>
 </div>

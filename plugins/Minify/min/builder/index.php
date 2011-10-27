@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 if (phpversion() < 5) {
     exit('Minify requires PHP5 or greater.');
@@ -41,12 +41,12 @@ b {color:#c00}
 </head>
 
 <?php if (! isset($min_cachePath)): ?>
-<p class=topNote><strong>Note:</strong> Please set <code>$min_cachePath</code> 
+<p class=topNote><strong>Note:</strong> Please set <code>$min_cachePath</code>
 in /min/config.php to improve performance.</p>
 <?php endIf; ?>
 
 <p id=minRewriteFailed class="hide"><strong>Note:</strong> Your webserver does not seem to
- support mod_rewrite (used in /min/.htaccess). Your Minify URIs will contain "?", which 
+ support mod_rewrite (used in /min/.htaccess). Your Minify URIs will contain "?", which
 <a href="http://www.stevesouders.com/blog/2008/08/23/revving-filenames-dont-use-querystring/"
 >may reduce the benefit of proxy cache servers</a>.</p>
 
@@ -100,9 +100,9 @@ available URIs to add.</p>
 </div>
 
 <h3>Combining CSS files that contain <code>@import</code></h3>
-<p>If your CSS files contain <code>@import</code> declarations, Minify will not 
+<p>If your CSS files contain <code>@import</code> declarations, Minify will not
 remove them. Therefore, you will want to remove those that point to files already
-in your list, and move any others to the top of the first file in your list 
+in your list, and move any others to the top of the first file in your list
 (imports below any styles will be ignored by browsers as invalid).</p>
 <p>If you desire, you can use Minify URIs in imports and they will not be touched
 by Minify. E.g. <code>@import "<span class=minRoot>/min/?</span>g=css2";</code></p>
@@ -110,13 +110,13 @@ by Minify. E.g. <code>@import "<span class=minRoot>/min/?</span>g=css2";</code><
 </div><!-- #app -->
 
 <hr>
-<p>Need help? Search or post to the <a class=ext 
+<p>Need help? Search or post to the <a class=ext
 href="http://groups.google.com/group/minify">Minify discussion list</a>.</p>
-<p><small>This app is minified :) <a class=ext 
-href="http://code.google.com/p/minify/source/browse/trunk/min/builder/index.php">view 
+<p><small>This app is minified :) <a class=ext
+href="http://code.google.com/p/minify/source/browse/trunk/min/builder/index.php">view
 source</a></small></p>
 
-<script type="text/javascript" 
+<script type="text/javascript"
 src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
 
 <script type="text/javascript">
@@ -127,11 +127,11 @@ $(function () {
     $.get(url, function (ocStatus) {
         $.get(url + '&hello=1', function (ocHello) {
             if (ocHello != 'World!') {
-                msg += 'It appears output is being automatically compressed, interfering ' 
+                msg += 'It appears output is being automatically compressed, interfering '
                      + ' with Minify\'s own compression. ';
                 if (ocStatus == '1')
                     msg += 'The option "zlib.output_compression" is enabled in your PHP configuration. '
-                         + 'Minify set this to "0", but it had no effect. This option must be disabled ' 
+                         + 'Minify set this to "0", but it had no effect. This option must be disabled '
                          + 'in php.ini or .htaccess.';
                 else
                     msg += 'The option "zlib.output_compression" is disabled in your PHP configuration '

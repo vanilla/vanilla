@@ -16,7 +16,7 @@ jQuery(document).ready(function($) {
          route = 'categories/discussions';
       else if (route == 'categoriesall')
          route = 'categories/all';
-         
+
       $('#Form_Target').val(route);
       return false;
    });

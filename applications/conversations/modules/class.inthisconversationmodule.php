@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders a list of people in the specified conversation.
  */
 class InThisConversationModule extends Gdn_Module {
-   
+
    public function SetData($Data) {
       $this->Data = $Data;
    }

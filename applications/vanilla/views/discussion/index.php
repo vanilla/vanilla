@@ -11,9 +11,9 @@ if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
 
 $PageClass = '';
-if($this->Pager->FirstPage()) 
-	$PageClass = 'FirstPage'; 
-	
+if($this->Pager->FirstPage())
+	$PageClass = 'FirstPage';
+
 ?>
 <div class="Tabs HeadingTabs DiscussionTabs <?php echo $PageClass; ?>">
    <?php
@@ -75,7 +75,7 @@ if ($this->Discussion->Closed == '1') {
    <div class="Foot">
       <?php
       echo Anchor(T('Add a Comment'), SignInUrl($this->SelfUrl.(strpos($this->SelfUrl, '?') ? '&' : '?').'post#Form_Body'), 'TabLink'.(SignInPopup() ? ' SignInPopup' : ''));
-      ?> 
+      ?>
    </div>
-   <?php 
+   <?php
 }

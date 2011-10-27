@@ -24,11 +24,11 @@ $PluginInfo['embedvanilla'] = array(
 );
 
 class EmbedVanillaPlugin extends Gdn_Plugin {
-   
+
 	public function Base_Render_Before($Sender) {
       // Set P3P header because IE won't allow cookies thru the iFrame without it
       $Sender->SetHeader('P3P', 'CP="CAO PSA OUR"');
-      
+
 		$InDashboard = !($Sender->MasterView == 'default' || $Sender->MasterView == '');
 		$Sender->AddJsFile('plugins/embedvanilla/local.js');
 
@@ -46,23 +46,23 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 			$Sender->AddDefinition('ForceRemoteUrl', TRUE);
 
       $Sender->AddDefinition('Path', Gdn::Request()->Path());
-			
+
 		if ($InDashboard)
 			$Sender->AddDefinition('InDashboard', C('Plugins.EmbedVanilla.EmbedDashboard'));
 	}
-	
+
 	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla'), 'plugin/embed', 'Garden.Settings.Manage');
    }
-	
+
 	public function PluginController_Embed_Create($Sender) {
 	  $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Embed Vanilla');
 		$Sender->AddCssFile($this->GetResource('design/settings.css', FALSE, FALSE));
       $Sender->AddSideMenu('plugin/embed');
       $Sender->Form = new Gdn_Form();
-		
+
 		$ThemeManager = new Gdn_ThemeManager();
 		$Sender->SetData('AvailableThemes', $ThemeManager->AvailableThemes());
       $Sender->SetData('EnabledThemeFolder', $ThemeManager->EnabledTheme());
@@ -72,7 +72,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl', 'Plugins.EmbedVanilla.EmbedDashboard'));
-      
+
       $Sender->Form->SetModel($ConfigurationModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
@@ -83,7 +83,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
          if ($Sender->Form->Save() !== FALSE)
             $Sender->InformMessage(T("Your settings have been saved."));
       }
-		
+
 		// Handle changing the theme to the recommended one
 		$ThemeFolder = GetValue(0, $Sender->RequestArgs);
 		$TransientKey = GetValue(1, $Sender->RequestArgs);
@@ -104,18 +104,18 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 
       $Sender->Render(PATH_PLUGINS.'/embedvanilla/views/settings.php');
    }
-	
+
 	public function PluginController_GadgetInfo_Create($Sender) {
 		$Sender->Render('plugins/embedvanilla/views/gadget.php');
 	}
-	
+
 	public function PluginController_Gadget_Create($Sender) {
 		echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
 <Module>
-  <ModulePrefs title=\"Discussions\" 
-    title_url=\"http://vanillaforums.org/\" 
+  <ModulePrefs title=\"Discussions\"
+    title_url=\"http://vanillaforums.org/\"
     scrolling=\"true\"
-    author=\"Mark O'Sullivan\" 
+    author=\"Mark O'Sullivan\"
     author_email=\"mark@vanillaforums.com\"
     height=\"500\">
     <Require feature=\"dynamic-height\"/>
@@ -129,7 +129,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		$Sender->Finalize();
 		die();
 	}
-	
+
    public function Setup() {
       // Nothing to do here!
    }
@@ -139,18 +139,18 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 if (!function_exists('IsSearchEngine')) {
    function IsSearchEngine() {
       $Engines = array(
-         'googlebot', 
-         'slurp', 
-         'search.msn.com', 
-         'nutch', 
-         'simpy', 
-         'bot', 
-         'aspseek', 
-         'crawler', 
-         'msnbot', 
-         'libwww-perl', 
-         'fast', 
-         'baidu', 
+         'googlebot',
+         'slurp',
+         'search.msn.com',
+         'nutch',
+         'simpy',
+         'bot',
+         'aspseek',
+         'crawler',
+         'msnbot',
+         'libwww-perl',
+         'fast',
+         'baidu',
       );
       $HttpUserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER, ''));
       if ($HttpUserAgent != '') {

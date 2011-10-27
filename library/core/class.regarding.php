@@ -121,10 +121,10 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
    /*
     * Event system: Provide information for external hooks
     */
-   
+
    public function MatchEvent($RegardingType, $ForeignType, $ForeignID = NULL) {
       $RegardingData = GetValue('RegardingData', $this->EventArguments);
-      
+
       $FoundRegardingType = strtolower(GetValue('Type', $RegardingData));
       if (!is_array($RegardingType))
          $RegardingType = array($RegardingType);
@@ -133,7 +133,7 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
          if (fnmatch($RegardingTypeInstance, $FoundRegardingType))
             $Found = TRUE;
       if (!$Found) return FALSE;
-      
+
       $FoundForeignType = strtolower(GetValue('ForeignType', $RegardingData));
       if (!is_array($ForeignType))
          $ForeignType = array($ForeignType);
@@ -142,13 +142,13 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
          if (fnmatch($ForeignTypeInstance, $FoundForeignType))
             $Found = TRUE;
       if (!$Found) return FALSE;
-      
+
       if (!is_null($ForeignID)) {
          $FoundForeignID = GetValue('ForeignID', $RegardingData);
          if ($FoundForeignID != $ForeignID)
             return FALSE;
       }
-      
+
       return $this->EventArguments;
    }
 

@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
       $('input:checked').each(function(index, element) {
          if ($(element).attr('id') == 'SelectAll')
             return;
-         
+
          IDs.push($(element).val());
       });
       return IDs;
@@ -96,7 +96,7 @@ jQuery(document).ready(function($) {
                $.popup.reveal(settings, data);
             })
          });
-      
+
       return false;
    });
 

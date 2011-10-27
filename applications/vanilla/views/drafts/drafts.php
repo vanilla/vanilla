@@ -9,7 +9,7 @@ foreach ($this->DraftData->Result() as $Draft) {
 	} else {
 		$Offset = 0;
 	}
-	
+
    $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/discussion/'.$Draft->DiscussionID.'/'.$Offset.'/#Form_Comment';
    $Alt = $Alt == ' Alt' ? '' : ' Alt';
    ?>

@@ -11,8 +11,8 @@ Included files:
 4. images/buttons.gif (as v.1.3.0 - unchanged)
 
 Changelog:
-v0.1: 25AUG2010 - Initial release. 
-- Known bugs: 
+v0.1: 25AUG2010 - Initial release.
+- Known bugs:
 -- 1. Both HTML and WYSIWYG view are visible in 'Write comment' view. Quick fix: click HTML view button twice to toggle on/off.
 
 Optional: Edit line 19 of jquery.cleditor.min.js to remove extra toolbar buttons.
@@ -38,7 +38,7 @@ some glitches.
 v0.5: 02NOV2010 - by Tim @ Vanilla
 - Fixed:
 -- 1. Added backreference to the cleditor JS object and attached it to the textarea, for external interaction
- 
+
 v1.0.1 31AUG2011 - by Todd @ Vanilla
 - Fixed:
 -- 1. Fixed js error with new versions of jQuery.
@@ -58,7 +58,7 @@ $PluginInfo['cleditor'] = array(
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
    'RequiredApplications' => array('Vanilla' => '>=2'),
-   'RequiredTheme' => FALSE, 
+   'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
    'RegisterPermissions' => FALSE,
@@ -71,16 +71,16 @@ class cleditorPlugin extends Gdn_Plugin {
 	public function PostController_Render_Before($Sender) {
 		$this->_AddCLEditor($Sender);
 	}
-	
+
 	public function DiscussionController_Render_Before($Sender) {
 		$this->_AddCLEditor($Sender);
 	}
-	
+
 	private function _AddCLEditor($Sender) {
 		// Turn off safestyles so the inline styles get applied to comments
 		$Config = Gdn::Factory(Gdn::AliasConfig);
 		$Config->Set('Garden.Html.SafeStyles', FALSE);
-		
+
 		// Add the CLEditor to the form
 		$Options = array('ie' => 'gt IE 6', 'notie' => TRUE); // Exclude IE6
 		$Sender->RemoveJsFile('jquery.autogrow.js');

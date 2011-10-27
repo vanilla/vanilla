@@ -675,7 +675,7 @@ body #Head h1 {
    margin: 0 0 10px;
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
+	-webkit-box-shadow: 0px 0px 2px #999;
 }
 .Box h4 {
    font-size: 110%;
@@ -847,20 +847,20 @@ a.BigButton {
    -webkit-border-radius: 3px;
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
+	-webkit-box-shadow: 0px 0px 2px #999;
    }
 a.BigButton:hover {
    color: #111;
    border: 1px solid #666;
 	box-shadow: 0px 0px 5px #aaa;
 	-moz-box-shadow: 0px 0px 5px #aaa;
-	-webkit-box-shadow: 0px 0px 5px #aaa;  
+	-webkit-box-shadow: 0px 0px 5px #aaa;
 }
 a.BigButton:focus {
    background: #eee;
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
+	-webkit-box-shadow: 0px 0px 2px #999;
 }
 /* Category Depths */
 .PanelCategories .Depth2 { padding-left: 8px; }
@@ -990,7 +990,7 @@ a.BigButton:focus {
 	font-weight:bold;
 	padding: 3px;
 	line-height: 1;
-   
+
 }
 .Tag a {
    color: #ffffff;
@@ -2006,14 +2006,14 @@ textarea.MultiComplete {
    padding: 5px;
    cursor: default;
    display: block;
-   /* 
-   if width will be 100% horizontal scrollbar will apear 
+   /*
+   if width will be 100% horizontal scrollbar will apear
    when scroll mode will be used
    */
    /*width: 100%;*/
    font-size: 12px;
-   /* 
-   it is very important, if line-height not setted or setted 
+   /*
+   it is very important, if line-height not setted or setted
    in relative units scroll will be broken in firefox
    */
    line-height: 16px;
@@ -2079,7 +2079,7 @@ body.add #Content {
 	text-align: left;
 	color:#666666;
 	font-size:14px;
-	font-weight:bold;	
+	font-weight:bold;
 }
 #ConversationForm .TextBox {
 	width: 100%;
@@ -2102,7 +2102,7 @@ body.Conversations a.Cancel {
 	color: #fff;
 	font-size: 120%;
 	font-weight: bold;
-	padding: 6px 9px 4px;	
+	padding: 6px 9px 4px;
 }
 .Popup #ConversationForm textarea.MultiComplete,
 .Popup #ConversationForm .TextBox {
@@ -2489,7 +2489,7 @@ body#dashboard_entry_index input.InputBox,
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 .Errors ul {
 	border: 1px solid #a00 !important;
@@ -2537,7 +2537,7 @@ div.Popup .Errors {
    overflow: auto;
 	box-shadow: 0px 0px 2px #333;
 	-moz-box-shadow: 0px 0px 2px #333;
-	-webkit-box-shadow: 0px 0px 2px #333;  
+	-webkit-box-shadow: 0px 0px 2px #333;
 }
 .Errors pre,
 .Errors pre * {
@@ -2575,7 +2575,7 @@ position on the page to notify users of things like drafts being saved, etc. */
   position: absolute;
   top: auto;
   margin-left: 20px;
-  overflow: visible; 
+  overflow: visible;
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 .InformMessages .InformWrapper {
@@ -2903,10 +2903,10 @@ body.embed .Connect h2 {
 
 .RegardingEvent {
    padding: 10px;
-   
+
    position: relative;
    padding-left: 38px;
-   
+
    color: #fff !important;
    text-shadow: 0 1px 1px #000;
    text-align: left !important;

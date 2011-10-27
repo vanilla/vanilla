@@ -19,7 +19,7 @@ $PluginInfo['Emotify'] = array(
  */
 
 class EmotifyPlugin implements Gdn_IPlugin {
-	
+
 	/**
 	 * Replace emoticons in comments.
 	 */
@@ -31,7 +31,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 		$Object->FormatBody = $this->DoEmoticons($Object->FormatBody);
 		$Sender->EventArguments['Object'] = $Object;
 	}
-	
+
 	public function DiscussionController_Render_Before($Sender) {
 		$this->_EmotifySetup($Sender);
 	}
@@ -187,21 +187,21 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			'[..]' => 'transformer'
 		);
 	}
-	
+
 	/**
 	 * Replace emoticons in comment preview.
 	 */
 	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
 		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
-		
+
 		$Sender->Comment->Body = $this->DoEmoticons($Sender->Comment->Body);
 	}
-	
+
 	public function PostController_Render_Before($Sender) {
 		$this->_EmotifySetup($Sender);
 	}
-	
+
 	/**
 	 * Thanks to punbb 1.3.5 (GPL License) for this function - ported from their do_smilies function.
 	 */
@@ -224,15 +224,15 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	 * Prepare a page to be emotified.
 	 */
 	private function _EmotifySetup($Sender) {
-		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');   
+		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');
       $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
 		// Deliver the emoticons to the page.
 		$Sender->AddDefinition('Emoticons', base64_encode(json_encode($this->GetEmoticons())));
 	}
-	
+
 	public function Setup() {
 		//SaveToConfig('Plugins.Emotify.FormatEmoticons', TRUE);
 		SaveToConfig('Garden.Format.Hashtags', FALSE); // Autohashing to search is incompatible with emotify
 	}
-	
+
 }

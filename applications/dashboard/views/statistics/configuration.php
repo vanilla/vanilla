@@ -34,17 +34,17 @@
    .ConfigurationHelp a:hover img {
        border: 1px solid #777;
    }
-   
+
    .StatisticsVerification {
       padding: 10px;
       margin: 10px 0px;
    }
-   
+
    .StatisticsOk {
       background: #d6ffcf;
       color: #06a800;
    }
-   
+
    .StatisticsProblem {
       background: #ffd1d1;
       color: #c90000;

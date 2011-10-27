@@ -3,7 +3,7 @@
  * Utility functions for generating group URIs in HTML files
  *
  * Before including this file, /min/lib must be in your include_path.
- * 
+ *
  * @package Minify
  */
 
@@ -18,7 +18,7 @@ require_once 'Minify/Build.php';
  * <script type="text/javascript" src="<?php echo Minify_groupUri('js'); ?>"></script>
  * </code>
  *
- * If you do not want ampersands as HTML entities, set Minify_Build::$ampersand = "&" 
+ * If you do not want ampersands as HTML entities, set Minify_Build::$ampersand = "&"
  * before using this function.
  *
  * @param string $group a key from groupsConfig.php
@@ -26,7 +26,7 @@ require_once 'Minify/Build.php';
  * directives in .htaccess are functional. This will remove the "?" from URIs, making them
  * more cacheable by proxies.
  * @return string
- */ 
+ */
 function Minify_groupUri($group, $forceAmpersand = false)
 {
     $path = $forceAmpersand
@@ -42,10 +42,10 @@ function Minify_groupUri($group, $forceAmpersand = false)
 /**
  * Get the last modification time of the source js/css files used by Minify to
  * build the page.
- * 
- * If you're caching the output of Minify_groupUri(), you'll want to rebuild 
+ *
+ * If you're caching the output of Minify_groupUri(), you'll want to rebuild
  * the cache if it's older than this timestamp.
- * 
+ *
  * <code>
  * // simplistic HTML cache system
  * $file = '/path/to/cache/file';
@@ -61,7 +61,7 @@ function Minify_groupUri($group, $forceAmpersand = false)
  *
  * @param array $groups an array of keys from groupsConfig.php
  * @return int Unix timestamp of the latest modification
- */ 
+ */
 function Minify_groupsMtime($groups)
 {
     $max = 0;

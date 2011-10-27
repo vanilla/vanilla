@@ -11,10 +11,10 @@
          'jsaction'  => $FormAction
       ));
       echo $this->Form->Errors();
-      
+
       $PluginName = $this->Plugin->GetPluginKey('Name');
       $ButtonName = T($this->Plugin->IsEnabled() ? "Disable {$PluginName}" : "Enable {$PluginName}");
-      
+
       echo $this->Form->Close($ButtonName, '', array(
                               'class' => 'SliceSubmit SliceForm SmallButton'
                            ));

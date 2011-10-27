@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-   
+
 /* Comment Form */
 
    if ($.autogrow)
@@ -9,14 +9,14 @@ jQuery(document).ready(function($) {
 
    // Hijack the "Cancel" button on the comment form
    var cancelButton = $('a.Cancel');
-      
+
    // Hide it if they leave the area without typing
    $('div.CommentForm textarea').blur(function(ev) {
       var Comment = $(ev.target).val();
       if (!Comment || Comment == '')
          $('a.Cancel').hide();
    });
-   
+
    // Reveal the textarea and hide previews.
    $('a.WriteButton, a.Cancel').livequery('click', function() {
       if ($(this).hasClass('WriteButton')) {
@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
 
       return false;
    });
-   
+
    // Hijack comment form button clicks
    $('div.CommentForm :submit, a.PreviewButton, a.DraftButton').livequery('click', function() {
       var btn = this;
@@ -70,7 +70,7 @@ jQuery(document).ready(function($) {
          lastCommentID = lastCommentID.indexOf('Discussion_') == 0 ? 0 : lastCommentID.replace('Comment_', '');
       else
          lastCommentID = 0;
-         
+
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action') + '/' + discussionID;
       $(frm).find(':submit').attr('disabled', 'disabled');
@@ -110,7 +110,7 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             json = $.postParseJson(json);
-            
+
             var processedTargets = false;
             // If there are targets, process them
             if (json.Targets && json.Targets.length > 0) {
@@ -137,7 +137,7 @@ jQuery(document).ready(function($) {
                $('div.Popup,.Overlay').remove();
 
             var commentID = json.CommentID;
-            
+
             // Assign the comment id to the form if it was defined
             if (commentID != null && commentID != '') {
                $(inpCommentID).val(commentID);
@@ -145,11 +145,11 @@ jQuery(document).ready(function($) {
 
             if (json.DraftID != null && json.DraftID != '')
                $(inpDraftID).val(json.DraftID);
-               
+
             if (json.MyDrafts != null) {
                if (json.CountDrafts != null && json.CountDrafts > 0)
                   json.MyDrafts += '<span>'+json.CountDrafts+'</span>';
-                  
+
                $('ul#Menu li.MyDrafts a').html(json.MyDrafts);
             }
 
@@ -163,7 +163,7 @@ jQuery(document).ready(function($) {
                $(parent).find('li.Active').removeClass('Active');
                $(btn).parents('li').addClass('Active');
                $(frm).find('.TextBoxWrapper').hide().after(json.Data);
-               
+
             } else if (!draft) {
                // Clean up the form
                if (processedTargets)
@@ -210,7 +210,7 @@ jQuery(document).ready(function($) {
       frm.triggerHandler('submit');
       return false;
    });
-   
+
    function resetCommentForm(sender) {
       var parent = $(sender).parents('div.CommentForm');
       $(parent).find('li.Active').removeClass('Active');
@@ -236,21 +236,21 @@ jQuery(document).ready(function($) {
             url: gdn.url('/vanilla/drafts/delete/' + draftInp.val() + '/' + gdn.definition('TransientKey')),
             data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
             dataType: 'json'
-         });         
-         
+         });
+
       draftInp.val('');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() {$(this).remove();});
       $(frm).trigger('clearCommentForm');
    }
-   
+
    // Set up paging
    if ($.morepager)
       $('.MorePager').morepager({
          pageContainerSelector: 'ul.Discussion',
          afterPageLoaded: function() {$(document).trigger('CommentPagingComplete');}
       });
-      
+
    // Autosave comments
    $('a.DraftButton').livequery(function() {
       var btn = this;
@@ -281,7 +281,7 @@ jQuery(document).ready(function($) {
             },
             success: function(json) {
                json = $.postParseJson(json);
-               
+
                $(msg).after(json.Data);
                $(msg).hide();
                $(parent).find('span.TinyProgress').remove();
@@ -292,7 +292,7 @@ jQuery(document).ready(function($) {
          $(parent).find('span.TinyProgress').remove();
          $(msg).show();
       }
-      
+
       $(document).trigger('CommentEditingComplete', [msg]);
       return false;
    });
@@ -318,17 +318,17 @@ jQuery(document).ready(function($) {
          }
       }
    });
-   
-   getNewTimeout = function() {   
+
+   getNewTimeout = function() {
       if(autoRefresh <= 0)
          return;
-   
+
       setTimeout(function() {
          discussionID = gdn.definition('DiscussionID', 0);
          lastCommentID = gdn.definition('LastCommentID', '');
          if(lastCommentID == '')
             return;
-         
+
          $.ajax({
             type: "POST",
             url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
@@ -340,24 +340,24 @@ jQuery(document).ready(function($) {
             },
             success: function(json) {
                json = $.postParseJson(json);
-               
+
                if(json.Data && json.LastCommentID) {
                   gdn.definition('LastCommentID', json.LastCommentID, true);
                   $(json.Data).appendTo("ul.Discussion")
                      .effect("highlight", {}, "slow");
                }
                gdn.processTargets(json.Targets);
-               
+
                getNewTimeout();
             }
          });
       }, autoRefresh);
    }
-   
+
    // Load new comments like a chat.
    autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
    getNewTimeout();
-   
+
    /* Comment Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))

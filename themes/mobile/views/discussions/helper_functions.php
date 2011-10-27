@@ -10,7 +10,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= ($Discussion->CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $Sender->FireEvent('BeforeDiscussionName');
-   
+
    $DiscussionName = Gdn_Format::Text($Discussion->Name);
    if ($DiscussionName == '')
       $DiscussionName = T('Blank Discussion Topic');
@@ -37,7 +37,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             .'</span>';
             if ($Discussion->LastCommentID != '')
                echo '<span class="LastCommentBy">'.sprintf(T('Latest %1$s'), $Discussion->LastName).'</span> ';
-               
+
             echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span> ';
          ?>
       </div>

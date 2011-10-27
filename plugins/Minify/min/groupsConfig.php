@@ -4,7 +4,7 @@
  * @package Minify
  */
 
-/** 
+/**
  * You may wish to use the Minify URI Builder app to suggest
  * changes. http://yourdomain/min/builder/
  **/
@@ -21,7 +21,7 @@ if ($WebRoot != '')
    $WebRoot = '//'.$WebRoot.'/';
 else
    $WebRoot = '//';
-   
+
 return array(
    'globaljs' => array(
       $WebRoot.'js/library/jquery.js',
@@ -31,7 +31,7 @@ return array(
       $WebRoot.'js/library/jquery.gardenhandleajaxform.js',
       $WebRoot.'js/global.js'
    )
-   
+
     // 'js' => array('//js/file1.js', '//js/file2.js'),
     // 'css' => array('//css/file1.css', '//css/file2.css'),
 

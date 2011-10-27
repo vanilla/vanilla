@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class SearchModel extends Gdn_Model {
 	/// PROPERTIES ///
 	protected $_Parameters = array();
-	
+
 	protected $_SearchSql = array();
 
    protected $_SearchMode = 'match';
@@ -19,7 +19,7 @@ class SearchModel extends Gdn_Model {
    public $ForceSearchMode = '';
 
    protected $_SearchText = '';
-	
+
 	/// METHODS ///
 	public function AddSearch($Sql) {
 		$this->_SearchSql[] = $Sql;
@@ -57,18 +57,18 @@ class SearchModel extends Gdn_Model {
          $Sql->Where("match($Columns) against ($Param{$Boolean})", NULL, FALSE, FALSE);
       }
 	}
-	
+
 	public function Parameter() {
 		$Parameter = ':Search'.count($this->_Parameters);
 		$this->_Parameters[$Parameter] = '';
 		return $Parameter;
 	}
-	
+
 	public function Reset() {
 		$this->_Parameters = array();
 		$this->_SearchSql = '';
 	}
-	
+
 	public function Search($Search, $Offset = 0, $Limit = 20) {
 		// If there are no searches then return an empty array.
 		if(trim($Search) == '')
@@ -79,7 +79,7 @@ class SearchModel extends Gdn_Model {
          $SearchMode = $this->ForceSearchMode;
       else
          $SearchMode = strtolower(C('Garden.Search.Mode', 'matchboolean'));
-      
+
       if ($SearchMode == 'matchboolean') {
          if (strpos($Search, '+') !== FALSE || strpos($Search, '-') !== FALSE)
             $SearchMode = 'boolean';
@@ -88,16 +88,16 @@ class SearchModel extends Gdn_Model {
       } else {
          $this->_SearchMode = $SearchMode;
       }
-      
+
       if ($ForceDatabaseEngine = C('Database.ForceStorageEngine')) {
          if (strcasecmp($ForceDatabaseEngine, 'myisam') != 0)
             $SearchMode = 'like';
       }
-      
+
       $this->_SearchMode = $SearchMode;
 
       $this->FireEvent('Search');
-      
+
       if(count($this->_SearchSql) == 0)
 			return array();
 
@@ -108,9 +108,9 @@ class SearchModel extends Gdn_Model {
 			->OrderBy('s.DateInserted', 'desc')
 			->Limit($Limit, $Offset)
 			->GetSelect();
-		
+
 		$Sql = str_replace($this->Database->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $this->_SearchSql)."\n)", $Sql);
-		
+
 		$this->EventArguments['Search'] = $Search;
 		$this->FireEvent('AfterBuildSearchQuery');
 
@@ -120,19 +120,19 @@ class SearchModel extends Gdn_Model {
 		foreach($this->_Parameters as $Key => $Value) {
 			$this->_Parameters[$Key] = $Search;
 		}
-		
+
       $Parameters= $this->_Parameters;
       $this->Reset();
       $this->SQL->Reset();
 		$Result = $this->Database->Query($Sql, $Parameters)->ResultArray();
-      
+
 		foreach ($Result as $Key => $Value) {
 			if (isset($Value['Summary'])) {
 				$Value['Summary'] = Gdn_Format::Text(Gdn_Format::To($Value['Summary'], $Value['Format']));
 				$Result[$Key] = $Value;
 			}
 		}
-      
+
 		return $Result;
 	}
 }

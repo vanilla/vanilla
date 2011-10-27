@@ -106,7 +106,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * @var Gdn_Schema
     */
    public $Schema;
-   
+
    /**
     * Contains the sql driver for the object.
     *
@@ -232,7 +232,7 @@ class Gdn_Model extends Gdn_Pluggable {
          // This is done after validation to allow custom validations to work.
          $SchemaFields = $this->Schema->Fields();
          $Fields = array_intersect_key($Fields, $SchemaFields);
-         
+
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {
@@ -257,8 +257,8 @@ class Gdn_Model extends Gdn_Pluggable {
       // primary key (always included in $Where when updating) might be "required"
       $AllFields = $Fields;
       if (is_array($Where))
-         $AllFields = array_merge($Fields, $Where); 
-         
+         $AllFields = array_merge($Fields, $Where);
+
       if ($this->Validate($AllFields)) {
          $this->AddUpdateFields($Fields);
 
@@ -323,14 +323,14 @@ class Gdn_Model extends Gdn_Pluggable {
 
       return $this->SQL->Get($this->Name, $OrderFields, $OrderDirection, $Limit, $Offset);
    }
-   
+
    /**
     * Returns a count of the # of records in the table
     * @param array $Wheres
     */
    public function GetCount($Wheres = '') {
       $this->_BeforeGet();
-      
+
       $this->SQL
          ->Select('*', 'count', 'Count')
          ->From($this->Name);
@@ -369,7 +369,7 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->_BeforeGet();
-      
+
       return $this->SQL->GetWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
    }
 
@@ -447,11 +447,11 @@ class Gdn_Model extends Gdn_Pluggable {
    }
 
 	public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {
-		
+
 		if (!isset($this->Schema)) $this->DefineSchema();
 		// TODO: need to be sure that $this->PrimaryKey is only one primary key
 		$FieldName = $this->PrimaryKey;
-		
+
 		// Load the existing values
 		$Row = $this->SQL
 			->Select($Column)
@@ -459,18 +459,18 @@ class Gdn_Model extends Gdn_Pluggable {
 			->Where($FieldName, $RowID)
 			->Get()
 			->FirstRow();
-		
+
 		if(!$Row) throw new Exception(T('ErrorRecordNotFound'));
 		$Values = Gdn_Format::Unserialize($Row->$Column);
-		
+
 		if (is_string($Values) && $Values != '')
 			throw new Exception(T('Serialized column failed to be unserialized.'));
-		
+
 		if (!is_array($Values)) $Values = array();
 		if (!is_array($Name)) $Name = array($Name => $Value); // Assign the new value(s)
 
 		$Values = Gdn_Format::Serialize(array_merge($Values, $Name));
-		
+
 		// Save the values back to the db
 		return $this->SQL
 			->From($this->Name)
@@ -478,12 +478,12 @@ class Gdn_Model extends Gdn_Pluggable {
 			->Set($Column, $Values)
 			->Put();
 	}
-    
-    
+
+
 	public function SetProperty($RowID, $Property, $ForceValue = FALSE) {
 		if (!isset($this->Schema)) $this->DefineSchema();
 		$PrimaryKey = $this->PrimaryKey;
-        
+
 		if ($ForceValue !== FALSE) {
             $Value = $ForceValue;
 		} else {

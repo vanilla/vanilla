@@ -12,13 +12,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the 5 most recent activities for use in a side panel.
  */
 class RecentActivityModule extends Gdn_Module {
-   
+
    public $ActivityModuleTitle = '';
    protected $_RoleID = '';
    public function GetData($Limit = 5, $RoleID = '') {
       if (!is_array($RoleID) && $RoleID != '')
          $RoleID = array($RoleID);
-         
+
       $ActivityModel = new ActivityModel();
       if (is_array($RoleID)) {
          $Data = $ActivityModel->GetForRole($RoleID, 0, $Limit);
@@ -39,10 +39,10 @@ class RecentActivityModule extends Gdn_Module {
    public function ToString() {
       if (!Gdn::Session()->CheckPermission('Garden.Activity.View'))
          return '';
-      
+
       if (StringIsNullOrEmpty($this->ActivityModuleTitle))
          $this->ActivityModuleTitle = T('Recent Activity');
-         
+
       $Data = $this->ActivityData;
       if (is_object($Data) && $Data->NumRows() > 0)
          return parent::ToString();

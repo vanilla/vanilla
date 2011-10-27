@@ -21,10 +21,10 @@ class Gdn_Factory {
    protected $_Objects = array();
    /** @var array The property dependancies for the factory. */
    protected $_Dependencies = array();
-   
+
    /**
     * Checks whether or not a factory alias exists.
-    * 
+    *
     * @param string $Alias The alias of the factory to check for.
     * @return boolean Whether or not a factory definintion exists.
     */
@@ -32,10 +32,10 @@ class Gdn_Factory {
       $Result = array_key_exists($Alias, $this->_Objects);
       return $Result;
    }
-   
+
    /**
     * Creates an object with mapped to the name.
-    * 
+    *
     * @param $Alias The class code of the object to create.
     * @param $Args The arguments to pass to the constructor of the object.
     */
@@ -43,10 +43,10 @@ class Gdn_Factory {
       //if (!$this->Exists($Alias))
       if (!array_key_exists($Alias, $this->_Objects))
          return NULL;
-      
+
       $Def = &$this->_Objects[$Alias];
       $ClassName = $Def['ClassName'];
-      
+
       // Make sure the class has beeen included.
       if (!class_exists($ClassName)) {
          $Path = $Def['Path'];
@@ -55,15 +55,15 @@ class Gdn_Factory {
             $Path = PATH_ROOT . substr($Path, 1);
             $Def['Path'] = $Path;
          }
-         
+
          if (file_exists($Path))
             require_once($Path);
       }
-      
+
       if (!class_exists($ClassName, FALSE)) {
          throw new Exception(sprintf('Class %s not found while trying to get an object for %s. Check the path %s.', $ClassName, $Alias, $Def['Path']));
       }
-      
+
       // Create the object differently depending on the type.
       $Result = NULL;
       $FactoryType = $Def['FactoryType'];
@@ -86,7 +86,7 @@ class Gdn_Factory {
             } else {
                $Singleton = $SingletonDef;
             }
-            
+
             if(is_null($Singleton)) {
                // Lazy create the singleton instance.
                $Singleton = $this->_InstantiateObject($Alias, $ClassName, $Args);
@@ -96,14 +96,14 @@ class Gdn_Factory {
             break;
          case Gdn::FactoryRealSingleton:
             $RealSingletonDef = $FactorySupplimentData;
-            
+
             // Not yet stored as an object... need to instantiate
             if (!is_object($RealSingletonDef)) {
                $RealSingleton = NULL;
             } else {
                $RealSingleton = $RealSingletonDef;
             }
-            
+
             if (is_null($RealSingleton)) {
                // Lazy create the singleton instance.
                $RealSingleton = call_user_func_array(array($ClassName,$RealSingletonDef), $Args);
@@ -119,10 +119,10 @@ class Gdn_Factory {
       }
       return $Result;
    }
-   
+
    /**
     * Install a class to the factory.
-    * 
+    *
     * @param string $Alias An alias for the class that will be used to retreive instances of it.
     * @param string $ClassName The actual name of the class.
     * @param string $Path The path to the class' file. You can prefix the path with ~ to start at the application root (PATH_ROOT).
@@ -141,10 +141,10 @@ class Gdn_Factory {
       if(!in_array($FactoryType, array(Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton))) {
          throw new Exception(sprintf('$FactoryType must be one of %s, %s, %s, %s.', Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton));
       }
-      
+
       // Set the initial definition of the object.
       $Def = array('ClassName' => $ClassName, 'Path' => $Path, 'FactoryType' => $FactoryType);
-      
+
       // Set the other data of the object.
       switch($FactoryType) {
          case Gdn::FactoryInstance:
@@ -160,18 +160,18 @@ class Gdn_Factory {
          default:
             throw Exception();
       }
-      
+
       $this->_Objects[$Alias] = $Def;
    }
-   
+
    /**
     * Install a dependency for the factory.
-    * 
+    *
     * This method provides support for simple dependency injection.
     * When an object with dependencies is created then the factory will call inline{@link Gdn_Factory::Factory()}
     * for each dependency and set the object properties before returning it.
     * Those dependencies can also have their own dependencies which will all be set when the object is returned.
-    * 
+    *
     * @param string $Alias The alias of the class that will have the dependency.
     * @param string $PropertyName The name of the property on the class that will have the dependency.
     * @param string $SourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
@@ -184,8 +184,8 @@ class Gdn_Factory {
          $this->_Dependencies[$Alias][$PropertyName] = $SourceAlias;
       }
    }
-   
-   /** 
+
+   /**
     * Instantiate a new object.
     *
     * @param string $ClassName The name of the class to instantiate.
@@ -224,7 +224,7 @@ class Gdn_Factory {
       $this->_SetDependancies($Alias, $Result);
       return $Result;
    }
-   
+
    private function _SetDependancies($Alias, $Object) {
       // Set any dependancies for the object.
       if(array_key_exists($Alias, $this->_Dependencies)) {
@@ -235,8 +235,8 @@ class Gdn_Factory {
          }
       }
    }
-   
-   /** 
+
+   /**
     * Uninstall a factory definition.
     *
     * @param string $Alias The object alias to uninstall.
@@ -245,10 +245,10 @@ class Gdn_Factory {
       if(array_key_exists($Alias, $this->_Objects))
          unset($this->_Objects[$Alias]);
    }
-   
-   /** 
+
+   /**
     * Uninstall a dependency definition.
-    * 
+    *
     * @param string $Alias The object alias to uninstall the dependency for.
     * @param string $PropertyName The name of the property dependency to uninstall.
     * Note: If $PropertyName is null then all of the dependencies will be uninstalled for $Alias.

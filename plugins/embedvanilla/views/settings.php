@@ -67,14 +67,14 @@ $RecommendedThemeName = 'Embed-Friendly';
       $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
       if ($PreviewImage && in_array(strtolower(pathinfo($PreviewImage, PATHINFO_EXTENSION)), array('gif','jpg','png')))
          echo Img('/themes/'.$RecommendedThemeFolder.'/'.$PreviewImage, array('alt' => $RecommendedThemeName, 'height' => '112', 'width' => '150'));
-         
+
       ?>
       <em>We recommend the <?php echo Wrap($RecommendedThemeName, 'b'); ?> theme. <?php
       if ($HasRecommendedTheme)
          echo Anchor(T('Click here to apply it.'), 'plugin/embed/'.$RecommendedThemeFolder.'/'.$Session->TransientKey());
       else
          echo Anchor(T('Click here to get it.'), 'http://vanillaforums.org/addons');
-      
+
       ?></em>
    </div>
    <?php } ?>

@@ -9,7 +9,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
 <div class="Info About">
    <h3><?php echo T('Basic Information'); ?></h3>
    <dl>
-      <?php               
+      <?php
       if ($this->User->ShowEmail == 1 || $Session->CheckPermission('Garden.Registration.Manage')) {
          echo '<dt>'.T('Email').'</dt>
          <dd>'.Gdn_Format::Email($this->User->Email).'</dd>';
@@ -23,7 +23,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       <dd class="Value LastActive"><?php echo Gdn_Format::Date($this->User->DateLastActive); ?></dd>
       <dt class="Label Roles"><?php echo T('Roles'); ?><dt>
       <dd class="Value Roles"><?php echo implode(', ', $this->Roles); ?></dd>
-      <?php               
+      <?php
       if ($this->User->InviteUserID > 0) {
          $Inviter = new stdClass();
          $Inviter->UserID = $this->User->InviteUserID;

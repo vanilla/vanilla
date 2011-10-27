@@ -17,7 +17,7 @@ class MorePagerModule extends Gdn_Module {
     * The id applied to the div tag that contains the pager.
     */
    public $ClientID;
-   
+
    /**
     * The name of the stylesheet class to be applied to the pager. Default is
     * 'Pager';
@@ -34,7 +34,7 @@ class MorePagerModule extends Gdn_Module {
     * place of the pager. Default is an empty string.
     */
    public $PagerEmpty;
-   
+
    /**
     * The xhtml code that should wrap around the pager link.
     *  ie. '<div %1$s>%2$s</div>';
@@ -53,34 +53,34 @@ class MorePagerModule extends Gdn_Module {
     * is 30.
     */
    public $Limit;
-   
+
    /**
     * The total number of records in the dataset.
     */
    public $TotalRecords;
-   
+
    /**
     * The string to contain the record offset. ie. /controller/action/%s/
     */
    public $Url;
-   
+
    /**
     * The first record of the current page (the dataset offset).
     */
    private $Offset;
-   
+
    /**
     * The last offset of the current page. (ie. Offset to LastOffset of TotalRecords)
     */
    private $_LastOffset;
-   
+
    /**
     * Certain properties are required to be defined before the pager can build
     * itself. Once they are created, this property is set to true so they are
     * not needlessly recreated.
     */
    private $_PropertiesDefined;
-   
+
    /**
     * A boolean value indicating if the total number of records is known or
     * not. Retrieving this number can be a costly database query, so sometimes
@@ -117,24 +117,24 @@ class MorePagerModule extends Gdn_Module {
       if ($this->_PropertiesDefined === FALSE || $ForceConfigure === TRUE) {
          $this->Url = $Url;
 
-         $this->Offset = $Offset;         
+         $this->Offset = $Offset;
          $this->Limit = is_numeric($Limit) && $Limit > 0 ? $Limit : $this->Limit;
          $this->TotalRecords = is_numeric($TotalRecords) ? $TotalRecords : 0;
          $this->_Totalled = ($this->TotalRecords >= $this->Limit) ? FALSE : TRUE;
          $this->_LastOffset = $this->Offset + $this->Limit;
          if ($this->_LastOffset > $this->TotalRecords)
             $this->_LastOffset = $this->TotalRecords;
-               
+
          $this->_PropertiesDefined = TRUE;
       }
    }
-   
+
    // Builds a string with information about the page list's current position (ie. "1 to 15 of 56").
    // Returns the built string.
    public function Details() {
       if ($this->_PropertiesDefined === FALSE)
          trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
-         
+
       $Details = FALSE;
       if ($this->TotalRecords > 0) {
          if ($this->_Totalled === TRUE) {
@@ -145,7 +145,7 @@ class MorePagerModule extends Gdn_Module {
       }
       return $Details;
    }
-   
+
    /**
     * Whether or not this is the first page of the pager.
     *
@@ -184,7 +184,7 @@ class MorePagerModule extends Gdn_Module {
    public function ToString($Type = 'more') {
       if ($this->_PropertiesDefined === FALSE)
          trigger_error(ErrorMessage('You must configure the pager with $Pager->Configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
-      
+
       // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
       $this->Url = str_replace(array('%1$s', '%2$s', '%s'), array('{Offset}', '{Size}', '{Offset}'), $this->Url);
 
@@ -197,7 +197,7 @@ class MorePagerModule extends Gdn_Module {
             $ActualRecordsLeft = $RecordsLeft = $this->TotalRecords - $this->_LastOffset;
             if ($RecordsLeft > $this->Limit)
                $RecordsLeft = $this->Limit;
-               
+
             $NextOffset = $this->Offset + $this->Limit;
 
             $Pager .= Anchor(
@@ -213,11 +213,11 @@ class MorePagerModule extends Gdn_Module {
             $RecordsBefore = $this->Offset;
             if ($RecordsBefore > $this->Limit)
                $RecordsBefore = $this->Limit;
-               
+
             $PreviousOffset = $this->Offset - $this->Limit;
             if ($PreviousOffset < 0)
                $PreviousOffset = 0;
-               
+
             $Pager .= Anchor(
                sprintf(T($this->LessCode), $this->Offset),
                self::FormatUrl($this->Url, $PreviousOffset, $RecordsBefore)

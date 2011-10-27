@@ -16,7 +16,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @version @@GARDEN-VERSION@@
  * @namespace Garden.Core
  */
- 
+
 class Gdn_Slice {
 
    protected $Dispatcher;
@@ -37,14 +37,14 @@ class Gdn_Slice {
                ->FromEnvironment()
                ->WithURI($SliceArgs[0])
                ->WithDeliveryType(DELIVERY_TYPE_VIEW);
-            
+
             ob_start();
             $this->Dispatcher->Dispatch($Request, FALSE);
             return ob_get_clean();
 
          break;
          case 2:
-         
+
          break;
       }
    }

@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * Manages the embedding of a forum on a foreign page.
  *
@@ -22,22 +22,22 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class EmbedController extends DashboardController {
    /**
     * Models to include.
-    * 
+    *
     * @since 2.0.18
     * @access public
     * @var array
     */
    public $Uses = array('Database', 'Form');
-   
+
    /**
     * Display the embedded forum.
-    * 
+    *
     * @since 2.0.18
     * @access public
     */
    public function Index($Toggle = '', $TransientKey = '') {
       $this->Permission('Garden.Settings.Manage');
-      
+
       if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
          SaveToConfig('Garden.Embed.Allow', $Toggle == 'enable' ? TRUE : FALSE);
          Redirect('embed');
@@ -49,14 +49,14 @@ class EmbedController extends DashboardController {
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array('Garden.TrustedDomains'));
-      
+
       $this->Form->SetModel($ConfigurationModel);
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Format trusted domains as a string
          $TrustedDomains = GetValue('Garden.TrustedDomains', $ConfigurationModel->Data);
          if (is_array($TrustedDomains))
             $TrustedDomains = implode("\n", $TrustedDomains);
-         
+
          $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
 
          // Apply the config settings to the form.
@@ -69,17 +69,17 @@ class EmbedController extends DashboardController {
          $this->Form->SetFormValue('Garden.TrustedDomains', $TrustedDomains);
          if ($this->Form->Save() !== FALSE)
             $this->InformMessage(T("Your settings have been saved."));
-         
+
          // Reformat array as string so it displays properly in the form
          $this->Form->SetFormValue('Garden.TrustedDomains', implode("\n", $TrustedDomains));
       }
-      
+
       $this->Render();
    }
-   
+
    /**
     * Allow for a custom embed theme.
-    * 
+    *
     * @since 2.0.18
     * @access public
     */

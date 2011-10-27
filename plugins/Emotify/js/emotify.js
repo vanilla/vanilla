@@ -1,5 +1,5 @@
 $(function(){
-  
+
   // Insert a clickable icon list after the textbox
   $('textarea#Form_Body').livequery(function() {
 	 // Pick up the emoticons from the def list
@@ -7,7 +7,7 @@ $(function(){
 
 	if (emoticons)
 		emoticons = eval("("+$.base64Decode(emoticons)+")");
-	 
+
     var buts = '';
 	 var last = '';
     for (e in emoticons) {
@@ -21,7 +21,7 @@ $(function(){
       <a class=\"EmotifyDropdown\"><span>Emoticons</span></a> \
       <div class=\"EmoticonContainer Hidden\">"+buts+"</div> \
     </div>");
-    
+
     $('.EmotifyDropdown').live('click', function() {
       if ($(this).hasClass('EmotifyDropdownActive'))
         $(this).removeClass('EmotifyDropdownActive');
@@ -31,19 +31,19 @@ $(function(){
       $(this).next().toggle();
       return false;
     });
-    
+
     // Hide emotify options when previewing
     $('form#Form_Comment').bind("PreviewLoaded", function(e, frm) {
       frm.find('.EmotifyDropdown').removeClass('EmotifyDropdownActive');
       frm.find('.EmotifyDropdown').hide();
       frm.find('.EmoticonContainer').hide();
     });
-    
+
     // Reveal emotify dropdowner when write button clicked
     $('form#Form_Comment').bind('WriteButtonClick', function(e, frm) {
       frm.find('.EmotifyDropdown').show();
     });
-    
+
     // Hide emoticon box when textarea is focused
     $('textarea#Form_Body').live('focus', function() {
       var frm = $(this).parents('form');
@@ -62,7 +62,7 @@ $(function(){
       var container = $(this).parents('.EmoticonContainer');
       $(container).hide();
       $(container).prev().removeClass('EmotifyDropdownActive');
-      
+
       // If cleditor is running, update it's contents
       var ed = $(textbox).get(0).editor;
       if (ed) {
@@ -72,7 +72,7 @@ $(function(){
         var Frame = $(ed.$frame).get(0);
         var FrameBody = null;
         var FrameDocument = null;
-        
+
         // DOM
         if (Frame.contentDocument) {
            FrameDocument = Frame.contentDocument;
@@ -97,5 +97,5 @@ $(function(){
       return false;
     });
   });
-  
+
 });

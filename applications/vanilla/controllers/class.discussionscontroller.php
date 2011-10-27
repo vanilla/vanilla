@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Vanilla
  */
- 
+
 /**
  * Handles displaying discussions in most contexts.
  *
@@ -23,13 +23,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class DiscussionsController extends VanillaController {
    /**
     * Models to include.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var array
     */
    public $Uses = array('Database', 'DiscussionModel', 'Form');
-   
+
    /**
     * A boolean value indicating if discussion options should be displayed when
     * rendering the discussion view.
@@ -39,74 +39,74 @@ class DiscussionsController extends VanillaController {
     * @var boolean
     */
    public $ShowOptions;
-   
+
    /**
-    * Category object. 
-    * 
+    * Category object.
+    *
     * Used to limit which discussion are returned to a particular category.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var object
     */
    public $Category;
-   
+
    /**
     * Unique identifier for category.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var int
     */
    public $CategoryID;
-   
+
    /**
     * Default all discussions view: chronological by most recent comment.
-    * 
+    *
     * @since 2.0.0
     * @access public
-    * 
+    *
     * @param int $Page Multiplied by PerPage option to determine offset.
     */
    public function Index($Page = '0') {
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
-      
+
       // Validate $Page
       if (!is_numeric($Page) || $Page < 0)
          $Page = 0;
-      
+
       // Setup head.
       if (!$this->Data('Title'))
          $this->Title(T('All Discussions'));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
-      
+
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
-      
+
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
       $DiscussionModel = new DiscussionModel();
       $DiscussionModel->Watching = TRUE;
-      
+
       // Get Discussion Count
       $CountDiscussions = $DiscussionModel->GetCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
-      
+
       // Get Announcements
       $this->AnnounceData = $Page == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
 		$this->SetData('Announcements', $this->AnnounceData !== FALSE ? $this->AnnounceData : array(), TRUE);
-      
+
       // Get Discussions
       $this->DiscussionData = $DiscussionModel->Get($Page, $Limit);
-      
+
 //      var_dump($this->DiscussionData);
 //      die();
-      
+
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Page . ' to ' . $Limit);
 
@@ -127,14 +127,14 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
 		$this->FireEvent('AfterBuildPager');
-      
+
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-      
+
       // Set a definition of the user's current timezone from the db. jQuery
       // will pick this up, compare to the browser, and update the user's
       // timezone if necessary.
@@ -143,16 +143,16 @@ class DiscussionsController extends VanillaController {
          $ClientHour = $CurrentUser->HourOffset + date('G', time());
          $this->AddDefinition('SetClientHour', $ClientHour);
       }
-      
+
       // Render default view (discussions/index.php)
       $this->Render();
    }
-   
+
    /**
     * Highlight route and include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -165,18 +165,18 @@ class DiscussionsController extends VanillaController {
 		$this->AddJsFile('discussions.js');
 		$this->AddJsFile('options.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
-			
+
 		// Inform moderator of checked comments in this discussion
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
 		if (count($CheckedDiscussions) > 0)
 			ModerationController::InformCheckedDiscussions($this);
-			
+
 		$this->FireEvent('AfterInitialize');
    }
-   
+
    /**
     * Display discussions the user has bookmarked.
-    * 
+    *
     * @since 2.0.0
     * @access public
     *
@@ -184,7 +184,7 @@ class DiscussionsController extends VanillaController {
     */
    public function Bookmarked($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
-      
+
       // Set criteria & get discussions data
       $Session = Gdn::Session();
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
@@ -195,7 +195,7 @@ class DiscussionsController extends VanillaController {
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
       $this->Category = FALSE;
-      
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
 		$this->EventArguments['PagerType'] = 'MorePager';
@@ -216,26 +216,26 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Limit', $Limit);
 
 		$this->FireEvent('AfterBuildBookmarkedPager');
-      
+
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-      
+
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      
+
       // Render default view (discussions/bookmarked.php)
       $this->SetData('Title', T('My Bookmarks'));
       $this->Render('Index');
    }
-   
+
    /**
     * Display discussions started by the user.
-    * 
+    *
     * @since 2.0.0
     * @access public
     *
@@ -243,7 +243,7 @@ class DiscussionsController extends VanillaController {
     */
    public function Mine($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
-      
+
       // Set criteria & get discussions data
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $Session = Gdn::Session();
@@ -252,7 +252,7 @@ class DiscussionsController extends VanillaController {
       $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
       $this->SetData('Discussions', $this->DiscussionData);
       $CountDiscussions = $this->SetData('CountDiscussions', $DiscussionModel->GetCount($Wheres));
-      
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
 		$this->EventArguments['PagerType'] = 'MorePager';
@@ -273,19 +273,19 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Limit', $Limit);
 
 		$this->FireEvent('AfterBuildMinePager');
-      
+
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-      
+
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
-      
+
       // Render default view (discussions/mine.php)
       $this->SetData('Title', T('My Discussions'));
       $this->Render('Index');
@@ -322,7 +322,7 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Value', $CountBookmarks);
       $this->xRender('Value', 'utility', 'dashboard');
    }
-	
+
 	/**
 	 * Takes a set of discussion identifiers and returns their comment counts in the same order.
 	 */
@@ -330,13 +330,13 @@ class DiscussionsController extends VanillaController {
 		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
 		if (!is_array($vanilla_identifier))
 			$vanilla_identifier = array($vanilla_identifier);
-			
+
 		$CountData = Gdn::SQL()
 			->Select('ForeignID, CountComments')
 			->From('Discussion')
 			->WhereIn('ForeignID', $vanilla_identifier)
 			->Get();
-		
+
 		$FinalData = array();
 		if ($CountData->NumRows() == 0) {
 			foreach ($vanilla_identifier as $identifier) {
@@ -352,7 +352,7 @@ class DiscussionsController extends VanillaController {
 				$Row->CountComments--;
 				if ($Row->CountComments < 0)
 					$Row->CountComments = 0;
-	
+
 				$FinalData[$Row->ForeignID] = $Row->CountComments;
 				$i++;
 			}

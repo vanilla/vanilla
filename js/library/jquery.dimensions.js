@@ -11,39 +11,39 @@
  */
 
 (function($){
-   
+
 $.dimensions = {
    version: '1.2'
 };
 
 // Create innerHeight, innerWidth, outerHeight and outerWidth methods
 $.each( [ 'Height', 'Width' ], function(i, name){
-   
+
    // innerHeight and innerWidth
    $.fn[ 'inner' + name ] = function() {
       if (!this[0]) return;
-      
+
       var torl = name == 'Height' ? 'Top'    : 'Left',  // top or left
           borr = name == 'Height' ? 'Bottom' : 'Right'; // bottom or right
-      
+
       return this.is(':visible') ? this[0]['client' + name] : num( this, name.toLowerCase() ) + num(this, 'padding' + torl) + num(this, 'padding' + borr);
    };
-   
+
    // outerHeight and outerWidth
    $.fn[ 'outer' + name ] = function(options) {
       if (!this[0]) return;
-      
+
       var torl = name == 'Height' ? 'Top'    : 'Left',  // top or left
           borr = name == 'Height' ? 'Bottom' : 'Right'; // bottom or right
-      
+
       options = $.extend({ margin: false }, options || {});
-      
-      var val = this.is(':visible') ? 
-            this[0]['offset' + name] : 
+
+      var val = this.is(':visible') ?
+            this[0]['offset' + name] :
             num( this, name.toLowerCase() )
                + num(this, 'border' + torl + 'Width') + num(this, 'border' + borr + 'Width')
                + num(this, 'padding' + torl) + num(this, 'padding' + borr);
-      
+
       return val + (options.margin ? (num(this, 'margin' + torl) + num(this, 'margin' + borr)) : 0);
    };
 });
@@ -52,19 +52,19 @@ $.each( [ 'Height', 'Width' ], function(i, name){
 $.each( ['Left', 'Top'], function(i, name) {
    $.fn[ 'scroll' + name ] = function(val) {
       if (!this[0]) return;
-      
+
       return val != undefined ?
-      
+
          // Set the scroll offset
          this.each(function() {
             this == window || this == document ?
-               window.scrollTo( 
+               window.scrollTo(
                   name == 'Left' ? val : $(window)[ 'scrollLeft' ](),
                   name == 'Top'  ? val : $(window)[ 'scrollTop'  ]()
                ) :
                this[ 'scroll' + name ] = val;
          }) :
-         
+
          // Return the scroll offset
          this[0] == window || this[0] == document ?
             self[ (name == 'Left' ? 'pageXOffset' : 'pageYOffset') ] ||
@@ -77,33 +77,33 @@ $.each( ['Left', 'Top'], function(i, name) {
 $.fn.extend({
    position: function() {
       var left = 0, top = 0, elem = this[0], offset, parentOffset, offsetParent, results;
-      
+
       if (elem) {
          // Get *real* offsetParent
          offsetParent = this.offsetParent();
-         
+
          // Get correct offsets
          offset       = this.offset();
          parentOffset = offsetParent.offset();
-         
+
          // Subtract element margins
          offset.top  -= num(elem, 'marginTop');
          offset.left -= num(elem, 'marginLeft');
-         
+
          // Add offsetParent borders
          parentOffset.top  += num(offsetParent, 'borderTopWidth');
          parentOffset.left += num(offsetParent, 'borderLeftWidth');
-         
+
          // Subtract the two offsets
          results = {
             top:  offset.top  - parentOffset.top,
             left: offset.left - parentOffset.left
          };
       }
-      
+
       return results;
    },
-   
+
    offsetParent: function() {
       var offsetParent = this[0].offsetParent;
       while ( offsetParent && (!/^body|html$/i.test(offsetParent.tagName) && $.css(offsetParent, 'position') == 'static') )

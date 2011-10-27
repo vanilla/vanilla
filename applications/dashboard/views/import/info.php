@@ -44,4 +44,3 @@ elseif(!$Complete)
 else
    echo Anchor(T('Finished'), 'dashboard/import/restart', 'Button');
 
-	

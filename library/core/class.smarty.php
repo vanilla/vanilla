@@ -64,7 +64,7 @@ class Gdn_Smarty {
             $Controller->Data[$Key] = (array)$Value;
          }
       }
-     
+
       $Controller->Data['BodyClass'] = GetValue('CssClass', $Controller->Data, '', TRUE);
 
       $Smarty->assign('Assets', (array)$Controller->Assets);

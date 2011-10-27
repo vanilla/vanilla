@@ -17,13 +17,13 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $Sender->EventArguments['CssClass'] = &$CssClass;
    $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
-   
+
    $Sender->FireEvent('BeforeDiscussionName');
-   
+
    $DiscussionName = $Discussion->Name;
    if ($DiscussionName == '')
       $DiscussionName = T('Blank Discussion Topic');
-      
+
    $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
 
    static $FirstDiscussion = TRUE;
@@ -52,13 +52,13 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
          <?php if ($Discussion->Closed == '1') { ?>
          <span class="Tag Closed"><?php echo T('Closed'); ?></span>
          <?php } ?>
-         <span class="MItem CommentCount"><?php 
+         <span class="MItem CommentCount"><?php
             printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
          ?></span>
          <?php
             if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
                echo ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
-         
+
             $Sender->FireEvent('AfterCountMeta');
 
             if ($Discussion->LastCommentID != '') {
@@ -67,17 +67,17 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             } else {
                echo ' <span class="MItem LastCommentBy">'.sprintf(T('Started by %1$s'), UserAnchor($First)).'</span> ';
                echo ' <span class="MItem LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate);
-               
+
                if ($Source = GetValue('Source', $Discussion)) {
                   echo ' '.sprintf(T('via %s'), T($Source.' Source', $Source));
                }
-               
+
                echo '</span> ';
             }
-         
+
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
                echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'Category'));
-               
+
             $Sender->FireEvent('DiscussionMeta');
          ?>
       </div>
@@ -91,7 +91,7 @@ function WriteFilterTabs($Sender) {
    $Title = property_exists($Sender, 'Category') ? GetValue('Name', $Sender->Category, '') : '';
    if ($Title == '')
       $Title = T('All Discussions');
-      
+
    $Bookmarked = T('My Bookmarks');
    $MyDiscussions = T('My Discussions');
    $MyDrafts = T('My Drafts');
@@ -113,7 +113,7 @@ function WriteFilterTabs($Sender) {
 
    if (is_numeric($CountDrafts) && $CountDrafts > 0)
       $MyDrafts .= '<span>'.$CountDrafts.'</span>';
-      
+
    ?>
 <div class="Tabs DiscussionsTabs">
    <ul>
@@ -162,7 +162,7 @@ function WriteFilterTabs($Sender) {
             $Class = 'Breadcrumb';
             echo '<span class="Crumb"> &raquo; </span>';
          }
-         
+
          echo '<span class="'.$Class.'">', Anchor(Gdn_Format::Text($Breadcrumb['Name']), $Breadcrumb['Url']), '</span>';
       }
       $Sender->FireEvent('AfterBreadcrumbs');
@@ -170,7 +170,7 @@ function WriteFilterTabs($Sender) {
    }
    if (!property_exists($Sender, 'CanEditDiscussions'))
       $Sender->CanEditDiscussions = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
-   
+
    if ($Sender->CanEditDiscussions) {
    ?>
    <span class="AdminCheck">
@@ -188,11 +188,11 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
    if ($Session->IsValid() && $Sender->ShowOptions) {
       echo '<div class="Options">';
       $Sender->Options = '';
-      
+
       // Dismiss an announcement
       if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
          $Sender->Options .= '<li>'.Anchor(T('Dismiss'), 'vanilla/discussion/dismissannouncement/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'DismissAnnouncement') . '</li>';
-      
+
       // Edit discussion
       if ($Discussion->FirstUserID == $Session->UserID || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
          $Sender->Options .= '<li>'.Anchor(T('Edit'), 'vanilla/post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion') . '</li>';
@@ -208,14 +208,14 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       // Close discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID))
          $Sender->Options .= '<li>'.Anchor(T($Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</li>';
-      
+
       // Delete discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID))
          $Sender->Options .= '<li>'.Anchor(T('Delete'), 'vanilla/discussion/delete/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'DeleteDiscussion') . '</li>';
-      
+
       // Allow plugins to add options
       $Sender->FireEvent('DiscussionOptions');
-      
+
       if ($Sender->Options != '') {
       ?>
          <div class="ToggleFlyout OptionsMenu">
@@ -248,7 +248,7 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
-      
+
       echo '</div>';
    }
 }

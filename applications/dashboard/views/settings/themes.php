@@ -24,7 +24,7 @@ if ($AddonUrl != '')
    echo '<div class="FilterMenu">',
       Anchor(T('Get More Themes'), $AddonUrl, 'SmallButton'),
       '</div>';
-         
+
 ?>
 <?php echo $this->Form->Errors(); ?>
 <div class="Messages Errors TestAddonErrors Hidden">
@@ -41,33 +41,33 @@ if ($AddonUrl != '')
    $AuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
    $NewVersion = $this->Data('EnabledTheme.NewVersion');
    $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-   
+
    $PreviewUrl = $this->Data('EnabledTheme.ScreenshotUrl', FALSE);
    if ($PreviewUrl !== FALSE)
       echo Img($PreviewUrl, array('alt' => $this->Data('EnabledThemeName'), 'height' => '112', 'width' => '150'));
-   
+
    echo '<h4>';
       echo $ThemeUrl != '' ? Url($this->Data('EnabledThemeName'), $ThemeUrl) : $this->Data('EnabledThemeName');
       if ($Version != '')
          echo '<span class="Version">'.sprintf(T('version %s'), $Version).'</span>';
-         
+
       if ($Author != '')
          echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author).'</span>';
-   
+
    echo '</h4>';
    echo '<div class="Description">'.GetValue('Description', $this->Data('EnabledTheme'), '').'</div>';
 	if ($this->Data('EnabledTheme.Options')) {
       $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'),
          Anchor(T('Theme Options'), '/dashboard/settings/themeoptions'));
-      
+
       echo '<div class="Options">',
          $OptionsDescription,
          '</div>';
-      
+
    }
 
    $this->FireEvent('AfterCurrentTheme');
-   
+
    $RequiredApplications = GetValue('RequiredApplications', $this->Data('EnabledTheme'), FALSE);
    if (is_array($RequiredApplications)) {
       echo '<div class="Requirements">'.T('Requires: ');
@@ -75,14 +75,14 @@ if ($AddonUrl != '')
       $i = 0;
       if ($i > 0)
          echo ', ';
-      
-      foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
+
+      foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
          printf(T('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
          ++$i;
       }
       echo '</div>';
    }
-   
+
    if ($Upgrade) {
       echo '<div class="Alert">';
       echo Url(
@@ -102,7 +102,7 @@ if ($AddonUrl != '')
    $Alt = FALSE;
    $Cols = 3;
    $Col = 0;
-   
+
    foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
       $ScreenName = GetValue('Name', $ThemeInfo, $ThemeName);
       $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
@@ -111,17 +111,17 @@ if ($AddonUrl != '')
          $Version = GetValue('Version', $ThemeInfo, '');
          $ThemeUrl = GetValue('Url', $ThemeInfo, '');
          $Author = GetValue('Author', $ThemeInfo, '');
-         $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');   
+         $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');
          $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
          $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
          $PreviewUrl = GetValue('ScreenshotUrl', $ThemeInfo, FALSE);
-         
+
          $Col++;
          if ($Col == 1) {
             $ColClass = 'FirstCol';
             echo '<tr>';
          } elseif ($Col == 2) {
-            $ColClass = 'MiddleCol';      
+            $ColClass = 'MiddleCol';
          } else {
             $ColClass = 'LastCol';
             $Col = 0;
@@ -136,12 +136,12 @@ if ($AddonUrl != '')
 							/*
                      if ($Version != '')
                         $Info = sprintf(T('Version %s'), $Version);
-                        
+
                      if ($Author != '')
                         $Info .= sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
 							*/
                   echo '</h4>';
-                  
+
                   if ($PreviewUrl !== FALSE) {
                      echo Anchor(Img($PreviewUrl, array('alt' => $this->Data('EnabledThemeName'), 'height' => '112', 'width' => '150')),
                         'dashboard/settings/previewtheme/'.$ThemeName,
@@ -160,7 +160,7 @@ if ($AddonUrl != '')
                   $Description = GetValue('Description', $ThemeInfo);
                   if ($Description)
                      echo '<em>'.$Description.'</em>';
-                     
+
                   $RequiredApplications = GetValue('RequiredApplications', $ThemeInfo, FALSE);
                   if (is_array($RequiredApplications)) {
                      echo '<dl>
@@ -168,16 +168,16 @@ if ($AddonUrl != '')
                         <dd>';
 
                      $i = 0;
-                     foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
+                     foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
                         if ($i > 0)
                            echo ', ';
-                           
+
                         printf(T('%1$s %2$s'), $RequiredApplication, $VersionInfo);
                         ++$i;
                      }
                      echo '</dl>';
                   }
-                  
+
                   if ($Upgrade) {
                      echo '<div class="Alert">';
                      echo Anchor(

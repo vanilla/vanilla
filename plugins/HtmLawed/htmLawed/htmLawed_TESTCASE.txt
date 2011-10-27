@@ -154,7 +154,7 @@ A   c  o  m  m  e  n  t -->
 	]]>
 </script><!-- comment --><![CDATA[ cdata ]]> <a>text</b> text<pre id="none">p r e</pre>
 <textarea>text</textarea>	  <textarea>
-	  text	text  
+	  text	text
 </textarea>		text  text <br /><hr />
 text <img src="none" alt="none" /> t<em class="none">e<strong>x</strong>t</em>
 text <img src="none" alt="none" /> 	<b>t<em> e <strong> x </strong> t</em></b>

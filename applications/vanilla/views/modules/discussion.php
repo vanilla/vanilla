@@ -10,7 +10,7 @@
          echo '<span>'.$Discussion->CountComments.'</span>';
          if ($Discussion->CountUnreadComments > 0 || $Discussion->CountUnreadComments === '')
             echo '<strong>'.Plural($Discussion->CountUnreadComments, '%s new', '%s new').'</strong>';
-            
+
          $Last = new stdClass();
          $Last->UserID = $Discussion->LastUserID;
          $Last->Name = $Discussion->LastName;

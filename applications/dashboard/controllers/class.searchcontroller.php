@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * Manages basic searching.
  *
@@ -22,27 +22,27 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class SearchController extends Gdn_Controller {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Database');
-   
+
    // Object initialization
    public $Form;
-   public $SearchModel;   
+   public $SearchModel;
 
    /**
     * Object instantiation & form prep.
     */
 	public function __construct() {
 		parent::__construct();
-   
+
       // Object instantiation
       $this->SearchModel = new SearchModel();
 		$Form = Gdn::Factory('Form');
-		
+
 		// Form prep
 		$Form->Method = 'get';
 		$Form->InputPrefix = '';
 		$this->Form = $Form;
 	}
-	
+
 	/**
     * Add JS, CSS, modules. Automatically run on every use.
     *
@@ -57,13 +57,13 @@ class SearchController extends Gdn_Controller {
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
-      
+
       $this->AddCssFile('style.css');
       $this->AddCssFile('menu.css');
       $this->AddModule('GuestModule');
       parent::Initialize();
    }
-	
+
 	/**
     * Default search functionality.
     *
@@ -75,10 +75,10 @@ class SearchController extends Gdn_Controller {
 		$this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');
 		$this->Title(T('Search'));
-      
+
       list($Offset, $Limit) = OffsetLimit($Page, C('Garden.Search.PerPage', 20));
       $this->SetData('_Limit', $Limit);
-		
+
 		$Search = $this->Form->GetFormValue('Search');
       $Mode = $this->Form->GetFormValue('Mode');
       if ($Mode)
@@ -101,7 +101,7 @@ class SearchController extends Gdn_Controller {
 			$NumResults = 0;
 		if ($NumResults == $Offset + $Limit)
 			$NumResults++;
-		
+
 		// Build a pager
 		$PagerFactory = new Gdn_PagerFactory();
 		$this->Pager = $PagerFactory->GetPager('MorePager', $this);
@@ -114,13 +114,13 @@ class SearchController extends Gdn_Controller {
 			$NumResults,
 			'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::Url($Search)
 		);
-		
+
 		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'results';
       }
-		
+
       $this->CanonicalUrl(Url('search', TRUE));
 
 		$this->Render();

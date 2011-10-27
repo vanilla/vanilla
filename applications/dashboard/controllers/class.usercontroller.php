@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * Manage users.
  *
@@ -22,7 +22,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class UserController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Database', 'Form');
-   
+
    /**
     * Highlight menu path. Automatically run on every use.
     *
@@ -34,7 +34,7 @@ class UserController extends DashboardController {
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
-   
+
    /**
     * User management list.
     *
@@ -54,13 +54,13 @@ class UserController extends DashboardController {
          '',
          FALSE
       );
-      
+
       // Page setup
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('user.js');
       $this->Title(T('Users'));
       $this->AddSideMenu('dashboard/user');
-      
+
       // Form setup
       $this->Form->Method = 'get';
 
@@ -79,7 +79,7 @@ class UserController extends DashboardController {
       $UserModel = new UserModel();
       //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
       list($Offset, $Limit) = OffsetLimit($Page, 30);
-      
+
       $Filter = $this->_GetFilter();
       if ($Filter)
          $Filter['Keywords'] = $Keywords;
@@ -87,7 +87,7 @@ class UserController extends DashboardController {
          $Filter = $Keywords;
 
       $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
-      
+
       // Sorting
       if (in_array($Order, array('DateInserted','DateFirstVisit', 'DateLastActive'))) {
          $Order = 'u.'.$Order;
@@ -100,7 +100,7 @@ class UserController extends DashboardController {
       // Get user list
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
       RoleModel::SetUserRoles($this->UserData->Result());
-      
+
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
@@ -110,7 +110,7 @@ class UserController extends DashboardController {
 
       $this->Render();
    }
-   
+
    /**
     * Create a user.
     *
@@ -119,24 +119,24 @@ class UserController extends DashboardController {
     */
    public function Add() {
       $this->Permission('Garden.Users.Add');
-      
+
       // Page setup
       $this->AddJsFile('user.js');
       $this->Title(T('Add User'));
       $this->AddSideMenu('dashboard/user');
-      
+
       $RoleModel = new RoleModel();
       $AllRoles = $RoleModel->GetArray();
-      
+
       // By default, people with access here can freely assign all roles
       $this->RoleData = $AllRoles;
-      
+
       $UserModel = new UserModel();
       $this->User = FALSE;
 
       // Set the model on the form.
       $this->Form->SetModel($UserModel);
-      
+
       try {
          // These are all the 'effective' roles for this add action. This list can
          // be trimmed down from the real list to allow subsets of roles to be edited.
@@ -154,7 +154,7 @@ class UserController extends DashboardController {
             $RequestedRoles = array_flip($RequestedRoles);
             $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
 
-            // Put the data back into the forum object as if the user had submitted 
+            // Put the data back into the forum object as if the user had submitted
             // this themselves
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
 
@@ -177,7 +177,7 @@ class UserController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    /**
     * Show how many applicants are in the queue.
     *
@@ -198,7 +198,7 @@ class UserController extends DashboardController {
       if ($Count > 0)
          echo '<span class="Alert">', $Count, '</span>';
    }
-	
+
 	/**
     * Show applicants queue.
     *
@@ -210,7 +210,7 @@ class UserController extends DashboardController {
       $this->AddSideMenu('dashboard/user/applicants');
       $this->AddJsFile('jquery.gardencheckcolumn.js');
       $this->Title(T('Applicants'));
-      
+
       $this->FireEvent('BeforeApplicants');
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
@@ -229,7 +229,7 @@ class UserController extends DashboardController {
       $this->View = 'applicants';
       $this->Render();
    }
-   
+
    /**
     * Approve a user application.
     *
@@ -254,7 +254,7 @@ class UserController extends DashboardController {
          $this->Applicants();
       }
    }
-	
+
 	/**
     * Autocomplete a username.
     *
@@ -271,7 +271,7 @@ class UserController extends DashboardController {
       }
       $this->Render();
    }
-	
+
 	/**
     * Page thru user list.
     *
@@ -285,7 +285,7 @@ class UserController extends DashboardController {
       $this->View = 'index';
       $this->Index($Keywords, $Page, $Order = '');
    }
-   
+
    /**
     * Decline a user application.
     *
@@ -308,7 +308,7 @@ class UserController extends DashboardController {
          $this->Applicants();
       }
    }
-   
+
    /**
     * Delete a user account.
     *
@@ -327,33 +327,33 @@ class UserController extends DashboardController {
 
       $RoleModel = new RoleModel();
       $AllRoles = $RoleModel->GetArray();
-      
+
       // By default, people with access here can freely assign all roles
       $this->RoleData = $AllRoles;
-      
+
       $UserModel = new UserModel();
       $this->User = $UserModel->GetID($UserID);
-      
+
       try {
-         
+
          $CanDelete = TRUE;
          $this->EventArguments['CanDelete'] = &$CanDelete;
          $this->EventArguments['TargetUser'] = &$this->User;
-         
+
          // These are all the 'effective' roles for this delete action. This list can
          // be trimmed down from the real list to allow subsets of roles to be
          // edited.
          $this->EventArguments['RoleData'] = &$this->RoleData;
-         
+
          $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
          $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
          $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
          $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
          $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
-         
+
          $this->FireEvent("BeforeUserDelete");
          $this->SetData('CanDelete', $CanDelete);
-         
+
          $Method = in_array($Method, array('delete', 'keep', 'wipe')) ? $Method : '';
          $this->Method = $Method;
          if ($Method != '')
@@ -369,7 +369,7 @@ class UserController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    /**
     * Edit a user account.
     *
@@ -379,12 +379,12 @@ class UserController extends DashboardController {
     */
    public function Edit($UserID) {
       $this->Permission('Garden.Users.Edit');
-      
+
       // Page setup
       $this->AddJsFile('user.js');
       $this->Title(T('Edit User'));
       $this->AddSideMenu('dashboard/user');
-      
+
       // Determine if username can be edited
       $this->CanEditUsername = TRUE;
       $this->CanEditUsername = $this->CanEditUsername & Gdn::Config("Garden.Profile.EditUsernames");
@@ -392,7 +392,7 @@ class UserController extends DashboardController {
 
       $RoleModel = new RoleModel();
       $AllRoles = $RoleModel->GetArray();
-      
+
       // By default, people with access here can freely assign all roles
       $this->RoleData = $AllRoles;
 
@@ -406,77 +406,77 @@ class UserController extends DashboardController {
       $this->Form->AddHidden('UserID', $UserID);
 
       try {
-         
+
          $AllowEditing = TRUE;
          $this->EventArguments['AllowEditing'] = &$AllowEditing;
          $this->EventArguments['TargetUser'] = &$this->User;
-         
+
          // These are all the 'effective' roles for this edit action. This list can
          // be trimmed down from the real list to allow subsets of roles to be
          // edited.
          $this->EventArguments['RoleData'] = &$this->RoleData;
-         
+
          $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
          $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
          $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
          $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
          $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
-         
+
          $this->FireEvent("BeforeUserEdit");
          $this->SetData('AllowEditing', $AllowEditing);
-         
+
          if (!$this->Form->AuthenticatedPostBack()) {
             $this->Form->SetData($this->User);
-            
+
          } else {
             if (!$this->CanEditUsername)
                $this->Form->SetFormValue("Name", $this->User->Name);
-            
+
             // If a new password was specified, add it to the form's collection
             $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
             $NewPassword = $this->Form->GetValue('NewPassword', '');
             if ($ResetPassword !== FALSE)
                $this->Form->SetFormValue('Password', $NewPassword);
-            
+
             // Role changes
-            
+
             // These are the new roles the editing user wishes to apply to the target
             // user, adjusted for his ability to affect those roles
             $RequestedRoles = $this->Form->GetFormValue('RoleID');
-            
+
             if (!is_array($RequestedRoles)) $RequestedRoles = array();
             $RequestedRoles = array_flip($RequestedRoles);
             $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
-            
-            // These roles will stay turned on regardless of the form submission contents 
+
+            // These roles will stay turned on regardless of the form submission contents
             // because the editing user does not have permission to modify them
             $ImmutableRoles = array_diff_key($AllRoles, $this->RoleData);
             $UserImmutableRoles = array_intersect_key($ImmutableRoles, $this->UserRoleData);
-            
+
             // Apply immutable roles
             foreach ($UserImmutableRoles as $IMRoleID => $IMRoleName)
                $UserNewRoles[$IMRoleID] = $IMRoleName;
-            
-            // Put the data back into the forum object as if the user had submitted 
+
+            // Put the data back into the forum object as if the user had submitted
             // this themselves
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
-            
+
             if ($this->Form->Save(array('SaveRoles' => TRUE)) !== FALSE) {
                if ($this->Form->GetValue('Password', '') != '')
                   $UserModel->SendPasswordEmail($UserID, $NewPassword);
 
                $this->InformMessage(T('Your changes have been saved.'));
             }
-            
+
             $this->UserRoleData = $UserNewRoles;
          }
       } catch (Exception $Ex) {
          $this->Form->AddError($Ex);
       }
-      
+
       $this->Render();
    }
-   
+
    /**
     * Determine whether user can register with this email address.
     *
@@ -495,7 +495,7 @@ class UserController extends DashboardController {
       }
       if (!$Available)
          $this->Form->AddError(sprintf(T('%s unavailable'), T('Email')));
-         
+
       $this->Render();
 	}
 
@@ -511,7 +511,7 @@ class UserController extends DashboardController {
          $Parts = explode(' ', $Filter, 3);
          if (count($Parts) < 2)
             return FALSE;
-         
+
          $Field = $Parts[0];
          if (count($Parts) == 2) {
             $Op = '=';
@@ -528,7 +528,7 @@ class UserController extends DashboardController {
       }
       return FALSE;
    }
-   
+
    /**
     * Handle a user application.
     *
@@ -540,7 +540,7 @@ class UserController extends DashboardController {
     */
    private function HandleApplicant($Action, $UserID) {
       $this->Permission('Garden.Users.Approve');
-      
+
       //$this->_DeliveryType = DELIVERY_TYPE_BOOL;
       if (!in_array($Action, array('Approve', 'Decline')) || !is_numeric($UserID)) {
          $this->Form->AddError('ErrorInput');
@@ -552,10 +552,10 @@ class UserController extends DashboardController {
             try {
                $this->EventArguments['UserID'] = $UserID;
                $this->FireEvent("Before{$Action}User");
-               
+
                $Email = new Gdn_Email();
                $Result = $UserModel->$Action($UserID, $Email);
-               
+
                $this->FireEvent("After{$Action}User");
             } catch(Exception $ex) {
                $Result = FALSE;
@@ -577,8 +577,8 @@ class UserController extends DashboardController {
       $Get = Gdn::Request()->Get();
       $Get['order'] = $Field;
       return '/dashboard/user?'.http_build_query($Get);
-   }	
-   
+   }
+
    /**
     * Convenience function for listing users. At time of this writing, it is
     * being used by wordpress widgets to display recently active users.
@@ -598,16 +598,16 @@ class UserController extends DashboardController {
       $SortDirection = $SortDirection == 'asc' ? 'asc' : 'desc';
       $Limit = is_numeric($Limit) && $Limit < 100 && $Limit > 0 ? $Limit : 30;
       $Offset = is_numeric($Offset) ? $Offset : 0;
-      
+
       // Get user list
       $UserModel = new UserModel();
       $UserData = $UserModel->GetSummary('u.'.$SortField, $SortDirection, $Limit, $Offset);
       $this->SetData('UserData', $UserData);
-      
+
       $this->MasterView = 'empty';
       $this->Render('filenotfound', 'home');
    }
-   
+
    /**
     * Determine whether user can register with this username.
     *
@@ -625,8 +625,8 @@ class UserController extends DashboardController {
       }
       if (!$Available)
          $this->Form->AddError(sprintf(T('%s unavailable'), T('Name')));
-         
+
       $this->Render();
    }
-   
+
 }

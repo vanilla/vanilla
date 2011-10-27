@@ -31,12 +31,12 @@ if (!function_exists('UserPhotoDefaultUrl')) {
       $Url = $Protocol.'gravatar.com/avatar.php?'
          .'gravatar_id='.md5(strtolower($Email))
          .'&amp;size='.C('Garden.Thumbnail.Width', 50);
-         
+
       if (C('Plugins.Gravatar.UseVanillicon', FALSE))
          $Url .= '&amp;default='.urlencode(Asset('http://vanillicon.com/'.md5($User->Name).'.png'));
       else
          $Url .= '&amp;default='.urlencode(Asset(C('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE));
-      
+
       return $Url;
    }
 }

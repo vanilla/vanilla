@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
             },
             success: function(json, status, $frm) {
                json = $.postParseJson(json);
-               
+
                if (json.FormSaved == true) {
                   gdn.inform(json);
                   if (json.RedirectUrl) {
@@ -52,12 +52,12 @@ jQuery(document).ready(function($) {
                      }
                   }
                }
-               
+
                // Re-attach the handler
                $($(handle).selector).handleAjaxForm(options);
              }
          }, options || {});
-         
+
          $(this).ajaxForm(options);
       });
    }

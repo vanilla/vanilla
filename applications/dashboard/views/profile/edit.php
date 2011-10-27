@@ -9,7 +9,7 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Username', 'Name');
          $Attributes = array();
-         
+
          if (!$this->CanEditUsername) {
             $Attributes['disabled'] = 'disabled';
          }
@@ -26,7 +26,7 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->CheckBox('ShowEmail', T('Allow other members to see your email?'), array('value' => '1'));
       ?>
-   </li>   
+   </li>
    <li class="Gender">
       <?php
          echo $this->Form->Label('Gender', 'Gender');

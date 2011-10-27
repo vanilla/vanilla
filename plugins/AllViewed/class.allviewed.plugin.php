@@ -2,13 +2,13 @@
 /**
  * 'All Viewed' plugin for Vanilla Forums.
  *
- * v1.2 
+ * v1.2
  * - Fixed "New" count jumping back to "Total" (rather than 1) after new comment if user hadn't actually viewed a discussion.
  * - Removed spurious config checks and &s
  *
  * @package AllViewed
  */
- 
+
 $PluginInfo['AllViewed'] = array(
    'Name' => 'All Viewed',
    'Description' => 'Allows users to mark all discussions as viewed.',
@@ -40,7 +40,7 @@ class AllViewedPlugin extends Gdn_Plugin {
          $Sender->Menu->AddLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
       }
    }
-   
+
    /**
     * Allows user to mark all discussions as viewed.
     *
@@ -52,7 +52,7 @@ class AllViewedPlugin extends Gdn_Plugin {
       $UserModel->UpdateAllViewed();
       Redirect('discussions');
    }
-   
+
    /**
     * Get the number of comments inserted since the given timestamp.
     *
@@ -63,16 +63,16 @@ class AllViewedPlugin extends Gdn_Plugin {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
-      
+
       // Validate DiscussionID
       $DiscussionID = (int) $DiscussionID;
       if (!$DiscussionID)
          throw new Exception('A valid DiscussionID is required in GetCommentCountSince.');
-      
+
       // Prep DB
       $Database = Gdn::Database();
       $SQL = $Database->SQL();
-      
+
       // Get new comment count
       return $SQL
          ->From('Comment c')
@@ -80,7 +80,7 @@ class AllViewedPlugin extends Gdn_Plugin {
          ->Where('DateInserted >', Gdn_Format::ToDateTime($DateAllViewed))
          ->GetCount();
    }
-   
+
    /**
     * Modify CountUnreadComments to account for DateAllViewed
     *
@@ -95,7 +95,7 @@ class AllViewedPlugin extends Gdn_Plugin {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
-      
+
       // Recalculate New count with user's DateAllViewed
       $DateAllViewed = Gdn_Format::ToTimestamp($Session->User->DateAllViewed);
       foreach($Sender->EventArguments['Data']->Result() as $Discussion) {
@@ -104,10 +104,10 @@ class AllViewedPlugin extends Gdn_Plugin {
 			      // Discussion is newer than last 'AllViewed' click
 			      continue;
 			   }
-			   
+
 			   if (Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $DateAllViewed) {
 				   // Covered by AllViewed
-				   $Discussion->CountUnreadComments = 0; 
+				   $Discussion->CountUnreadComments = 0;
 			   }
             elseif (Gdn_Format::ToTimestamp($Discussion->DateLastViewed) == $DateAllViewed || !$Discussion->DateLastViewed) {
                // User clicked AllViewed
@@ -119,7 +119,7 @@ class AllViewedPlugin extends Gdn_Plugin {
 			}
 		}
    }
-   
+
    /**
     * Update user's AllViewed datetime.
     *
@@ -130,41 +130,41 @@ class AllViewedPlugin extends Gdn_Plugin {
       // Only for members
       $Session = Gdn::Session();
       if(!$Session->IsValid()) return;
-      
+
       // Can only activate on yourself
-      $UserID = $Session->User->UserID; 
-            
+      $UserID = $Session->User->UserID;
+
       // Validite UserID
       $UserID = (int) $UserID;
       if (!$UserID)
          throw new Exception('A valid UserId is required.');
-      
+
       // Create timestamp first so all uses match.
       $AllViewed = Gdn_Format::ToDateTime();
-      
+
       // Update User timestamp
       $Sender->SQL->Update('User')
          ->Set('DateAllViewed', $AllViewed)
          ->Where('UserID', $UserID)
          ->Put();
-      
+
       // Update DateLastViewed = now
       $Sender->SQL->Update('UserDiscussion')
          ->Set('DateLastViewed', $AllViewed)
          ->Where('UserID', $UserID)
          ->Put();
-      
+
       // Set in current session
       $Session->User->DateAllViewed = Gdn_Format::ToDateTime();
    }
-   
+
    /**
     * 1-Time on Enable.
     */
    public function Setup() {
       $this->Structure();
    }
-   
+
    /**
     * Database changes.
     *

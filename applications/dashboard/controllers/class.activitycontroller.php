@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * Manages the activity stream.
  *
@@ -22,18 +22,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class ActivityController extends Gdn_Controller {
    /**
     * Models to include.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var array
     */
    public $Uses = array('Database', 'Form', 'ActivityModel');
-   
+
    /**
     * Include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -45,24 +45,24 @@ class ActivityController extends Gdn_Controller {
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
-      
+
       $this->AddCssFile('style.css');
-      
+
       // Add Modules
       $this->AddModule('GuestModule');
       $this->AddModule('SignedInModule');
-      
+
       parent::Initialize();
    }
-   
+
    /**
     * Display a single activity item & comments.
-    * 
+    *
     * Email notifications regarding activities link to this method.
-    * 
+    *
     * @since 2.0.0
     * @access public
-    * 
+    *
     * @param int $ActivityID Unique ID of activity item to display.
     */
    public function Item($ActivityID = 0) {
@@ -71,60 +71,60 @@ class ActivityController extends Gdn_Controller {
 
       if (!is_numeric($ActivityID) || $ActivityID < 0)
          $ActivityID = 0;
-         
+
       $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $ActivityID);
       $this->CommentData = $this->ActivityModel->GetComments(array($ActivityID));
       $this->SetData('ActivityData', $this->ActivityData);
-      
+
       $this->Render();
    }
-   
+
    /**
     * Default activity stream.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @todo Validate comment length rather than truncating.
-    * 
+    *
     * @param int $RoleID Unique ID of role to limit activity to.
     * @param int $Offset Number of activity items to skip.
     */
    public function Index($RoleID = '', $Page = FALSE) {
       $this->Permission('Garden.Activity.View');
-      
+
       // Limit to specific RoleIDs?
       if ($RoleID == 0)
          $RoleID = '';
-         
+
       if ($RoleID != '')
          $RoleID = explode(',', $RoleID);
-         
+
       // Which page to load
       list($Offset, $Limit) = OffsetLimit($Page, 30);
       $Offset = is_numeric($Offset) ? $Offset : 0;
       if ($Offset < 0)
          $Offset = 0;
-      
+
       // Page meta
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('activity.js');
       $this->Title(T('Recent Activity'));
-      
-      // Comment submission 
+
+      // Comment submission
       $Session = Gdn::Session();
       $Comment = $this->Form->GetFormValue('Comment');
       $this->CommentData = FALSE;
       if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
          $this->Permission('Garden.Profiles.Edit');
          $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
-         
+
          // Update About if necessary
          $ActivityType = 'WallComment';
          $NewActivityID = $this->ActivityModel->Add(
             $Session->UserID,
             $ActivityType,
             $Comment);
-         
+
          if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             Redirect('activity');
          } else {
@@ -142,7 +142,7 @@ class ActivityController extends Gdn_Controller {
             $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
          }
          $this->View = 'all';
-         
+
          // Build a pager
          $PagerFactory = new Gdn_PagerFactory();
          $this->Pager = $PagerFactory->GetPager('MorePager', $this);
@@ -155,7 +155,7 @@ class ActivityController extends Gdn_Controller {
             FALSE,
             'activity/'.(is_array($RoleID) ? implode(',', $RoleID) : '0').'/%1$s/%2$s/'
          );
-         
+
          // Deliver json data if necessary
          if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
             $this->SetJson('LessRow', $this->Pager->ToString('less'));
@@ -163,25 +163,25 @@ class ActivityController extends Gdn_Controller {
             $this->View = 'activities';
          }
       }
-      
+
       // Add RecentUser module
       $RecentUserModule = new RecentUserModule($this);
       $RecentUserModule->GetData();
       $this->AddModule($RecentUserModule);
-      
+
       $this->SetData('ActivityData', $this->ActivityData);
 
       $this->CanonicalUrl(Url('/activity', TRUE));
-      
+
       $this->Render();
    }
-   
+
    /**
     * Delete an activity item.
-    * 
+    *
     * @since 2.0.0
     * @access public
-    * 
+    *
     * @param int $ActivityID Unique ID of item to delete.
     * @param string $TransientKey Verify intent.
     */
@@ -199,29 +199,29 @@ class ActivityController extends Gdn_Controller {
          if ($HasPermission)
             $this->ActivityModel->Delete($ActivityID);
       }
-      
+
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
          Redirect(GetIncomingValue('Target', $this->SelfUrl));
-      
+
       // Still here? Getting a 404.
       $this->ControllerName = 'Home';
       $this->View = 'FileNotFound';
       $this->Render();
    }
-   
+
    /**
     * Comment on an activity item.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
    public function Comment() {
       $this->Permission('Garden.Profiles.Edit');
-      
+
       $Session = Gdn::Session();
       $this->Form->SetModel($this->ActivityModel);
       $NewActivityID = 0;
-      
+
       // Form submitted
       if ($this->Form->AuthenticatedPostBack()) {
          $Body = $this->Form->GetValue('Body', '');
@@ -241,7 +241,7 @@ class ActivityController extends Gdn_Controller {
                $this->ErrorMessage($this->Form->Errors());
          }
       }
-      
+
       // Redirect back to the sending location if this isn't an ajax request
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
          Redirect($this->Form->GetValue('Return', Gdn_Url::WebRoot()));
@@ -249,12 +249,12 @@ class ActivityController extends Gdn_Controller {
          // Load the newly added comment
          $this->Comment = $this->ActivityModel->GetID($NewActivityID);
          $this->Comment->ActivityType .= ' Hidden'; // Hide it so jquery can reveal it
-         
+
          // Set it in the appropriate view
          $this->View = 'comment';
       }
 
       // And render
       $this->Render();
-   }   
+   }
 }

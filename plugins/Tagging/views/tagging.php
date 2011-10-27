@@ -15,7 +15,7 @@
       echo $this->Form->TextBox('Search');
       echo ' '.$this->Form->Button(T('Go'));
       printf(T('%s tag(s) found.'), $this->Data('RecordCount'));
-      
+
    ?>
 </div>
 <div class="Info">

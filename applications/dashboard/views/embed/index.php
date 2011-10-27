@@ -67,12 +67,12 @@ var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the
 &lt;div class="vanilla-credit">&lt;a class="vanilla-anchor" href="http://vanillaforums.com">Discussions by &lt;span class="vanilla-logo">Vanilla&lt;/span>&lt;/a>&lt;/div>
 </pre>
    </div>
-</div>   
-   
+</div>
+
 <?php } else if ($this->EmbedType == 'modules') { ?>
    <h1><?php echo T('Embed modules from your Vanilla forum into your site'); ?></h1>
    <div class="Info"></div>
-   
+
 <?php } else { ?>
 <h1><?php echo T('Use Vanilla as a commenting system in your site'); ?></h1>
 <div class="Info">
@@ -80,11 +80,11 @@ var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the
    contributed comments will also be present and indexable in your discussion
    forum. Vanilla Comments can be installed on any website using the following
    generic script.</p>
-   
+
    <p><strong>Note:</strong> You MUST define the <code>vanilla_forum_url</code>
    and <code>vanilla_identifier</code> settings before pasting this script into
    your web page.</p>
-   
+
    <pre>&lt;div id="vanilla-comments">&lt;/div>
 &lt;script type="text/javascript">
 /* Configuration Settings: Edit before pasting into your web page */
@@ -131,7 +131,7 @@ var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the
 </pre>
    <p>Next you need to tell Vanilla where to place the comment counts, and what count to use. To achieve this, simply add a <strong>vanilla-identifier</strong> attribute to the anchor linking to the comments in question. The vanilla-identifier is the same value used above when embedding the comments into the page.</p>
    <pre>&lt;a href="http://yourdomain.com/path/to/page/with/comments/#vanilla_comments" vanilla-identifier="embed-test">Comments&lt;/a></pre>
-   
+
    <p>Vanilla will then replace the content of the anchor (in this case, the word "Comments") with the number of comments on the page in question.</p>
 </div>
 <?php

@@ -44,7 +44,7 @@ input.CopyInput {
    width: 280px;
 }
 #Form_ApplicationID {
-   width: 280px;  
+   width: 280px;
 }
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
@@ -94,5 +94,5 @@ echo $this->Form->Errors();
       <p><?php echo Anchor(Img('/plugins/Facebook/design/help-newapp.png', array('style' => 'max-width: 961px;')), '/plugins/Facebook/design/help-newapp.png', array('target' => '_blank')); ?></p>
    </div>
 </div>
-<?php 
+<?php
    echo $this->Form->Close();

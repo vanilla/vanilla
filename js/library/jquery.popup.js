@@ -1,7 +1,7 @@
 /*
 This is a highly modified version of the Facebox plugin for jQuery by Chris
 Wanstrath. Original Credits:
- 
+
 Facebox (for jQuery)
 version: 1.0 (12/19/2007)
 @requires jQuery v1.2 or later
@@ -70,7 +70,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                   type: 'GET',
                   url: target,
                   data: {
-                     'DeliveryType': settings.deliveryType 
+                     'DeliveryType': settings.deliveryType
                   },
                   error: function(request, textStatus, errorThrown) {
                      $.popup.reveal(settings, request.responseText);
@@ -84,28 +84,28 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 //          });
             }
          }
-        
+
          return false;
       });
-    
+
       this.mouseover(function() {
          settings.sender = this;
          if ($.popup.findTarget(settings))
             $(this).addClass(settings.mouseoverClass);
       });
-    
+
       this.mouseout(function() {
          settings.sender = this;
          if ($.popup.findTarget(settings))
             $(this).removeClass(settings.mouseoverClass);
       });
-    
+
       return this;
    }
-  
+
    $.popup.findTarget = function(settings) {
       settings.foundTarget = settings.targetUrl;
-    
+
       // See if the matched element was an anchor. If it was, use the href.
       if (!settings.foundTarget && $(settings.sender).attr('href') != 'undefined') {
          settings.foundTarget = settings.sender.href;
@@ -118,7 +118,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                settings.foundTarget = anchor[0].href;
          }
       }
-    
+
       return settings.foundTarget;
    }
 
@@ -127,10 +127,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $(document).unbind('keydown.popup');
       $('#'+settings.popupId).trigger('popupClose');
       $('.Overlay').remove();
-    
+
       return false;
    }
-    
+
    $.popup.init = function(settings) {
       // Define a unique identifier for this popup
       var i = 1;
@@ -145,16 +145,16 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          popupHtml = settings.popupHtml;
       else
          popupHtml = settings.confirmHtml;
-    
+
       popupHtml = popupHtml.replace('{popup.id}', settings.popupId);
-    
+
       $('body').append(popupHtml);
       if (settings.containerCssClass != '')
          $('#'+settings.popupId).addClass(settings.containerCssClass);
-      
+
       var pagesize = $.popup.getPageSize();
       $('div.Overlay').css({height: pagesize[1]});
-    
+
       var pagePos = $.popup.getPagePosition();
       $('#'+settings.popupId).css({
          top: pagePos.top,
@@ -165,7 +165,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $(document).bind('keydown.popup', function(e) {
          if (e.keyCode == 27)
             $.popup.close(settings);
-      })    
+      })
 
       if (settings.onUnload) {
          $('#'+settings.popupId).bind('popupClose',function(){
@@ -192,11 +192,11 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       settings.onLoad(settings);
       if ($('#'+settings.popupId+' .Loading').length == 1)
          return true;
-    
+
       $('#'+settings.popupId+' .Content').empty();
       $('#'+settings.popupId+' .Body').children().hide().end().append('<div class="Loading">&#160;</div>');
    }
-  
+
    $.popup.reveal = function(settings, data) {
       // First see if we've retrieved json or something else
       var json = false;
@@ -228,12 +228,12 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          // if (formSaved == false)
          $('#'+settings.popupId+' .Content').html(data);
       }
-    
+
       $('#'+settings.popupId+' .Loading').remove();
       $('#'+settings.popupId+' .Body').children().fadeIn('normal');
 
       settings.afterLoad();
-    
+
       // Now, if there are any forms in the popup, hijack them if necessary.
       if (settings.hijackForms == true) {
          $('#'+settings.popupId+' form').ajaxForm({
@@ -244,7 +244,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             dataType: 'json',
             beforeSubmit: function() {
                settings.onSave(settings); // Notify the user that it is being saved.
-            },  
+            },
             success: function(json) {
                json = $.postParseJson(json);
                gdn.inform(json);
@@ -281,7 +281,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             return false;
          });
       }
-    
+
       // If there is a cancel button in the popup, hide it (the popup has it's own close button)
       $('#'+settings.popupId+' a.Cancel').hide();
 
@@ -290,7 +290,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       return false;
    }
-  
+
    $.popup.settings = {
       targetUrl:        false,        // Use this URL instead of one provided by the matched element?
       confirm:          false,        // Pop up a confirm message?
@@ -353,10 +353,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          if (top !== self && $(parent.document).width())
             return true;
       } catch(e) { }
-    
+
       return false;
    }
-  
+
    $.popup.getPageSize = function() {
       var inFrame = $.popup.inFrame();
       var doc = $(inFrame ? parent.document : document);
@@ -369,7 +369,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       );
       return arrayPageSize;
    };
-  
+
    $.popup.getPagePosition = function() {
       var inFrame = $.popup.inFrame();
       var doc = $(inFrame ? parent.document : document);

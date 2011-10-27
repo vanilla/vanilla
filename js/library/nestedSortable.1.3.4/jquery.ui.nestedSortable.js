@@ -169,7 +169,7 @@
 			// If the item is in a position not allowed, send it back
 			if (this.beyondMaxLevels) {
 				var parent = this.placeholder.parent().closest(this.options.items);
-				
+
 				for (var i = this.beyondMaxLevels - 1; i > 0; i--) {
 					parent = parent.parent().closest(this.options.items);
 				}

@@ -67,7 +67,7 @@ class ConfigurationModule extends Gdn_Module {
    public function Initialize($Schema = NULL) {
       if ($Schema !== NULL)
          $this->Schema($Schema);
-      
+
       $Form = $this->Form();
 
       if ($Form->IsPostBack()) {
@@ -107,7 +107,7 @@ class ConfigurationModule extends Gdn_Module {
       $LabelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $LabelCode);
       $LabelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $LabelCode);
       $LabelCode = trim($LabelCode);
-      
+
       $LabelCode = StringEndsWith($LabelCode, " ID", TRUE, TRUE);
 
       return $LabelCode;

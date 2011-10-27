@@ -19,7 +19,7 @@ $PluginInfo['Minify'] = array(
 );
 
 class MinifyPlugin extends Gdn_Plugin {
-   
+
    /** @var string Subfolder that Vanilla lives in */
    protected $BasePath = "";
 
@@ -31,7 +31,7 @@ class MinifyPlugin extends Gdn_Plugin {
    public function HeadModule_BeforeToString_Handler($Head) {
       // Set BasePath for the plugin
       $this->BasePath = Gdn::Request()->WebRoot();
-      
+
       // Get current tags
       $Tags = $Head->Tags();
 
@@ -46,7 +46,7 @@ class MinifyPlugin extends Gdn_Plugin {
          'jquery.gardenhandleajaxform.js',
          'global.js'
       );
-      
+
       // Process all tags, finding JS & CSS files
       foreach ($Tags as $Index => $Tag) {
          $IsJs = GetValue(HeadModule::TAG_KEY, $Tag) == 'script';
@@ -58,7 +58,7 @@ class MinifyPlugin extends Gdn_Plugin {
             $Href = GetValue('href', $Tag, '!');
          else
             $Href = GetValue('src', $Tag, '!');
-         
+
          // Skip the rest if path doesn't start with a slash
          if ($Href[0] != '/')
             continue;
@@ -66,11 +66,11 @@ class MinifyPlugin extends Gdn_Plugin {
          // Strip any querystring off the href.
          $HrefWithVersion = $Href;
          $Href = preg_replace('`\?.*`', '', $Href);
-         
+
          // Strip BasePath & extra slash from Href (Minify adds an extra slash when substituting basepath)
          if($this->BasePath != '')
             $Href = preg_replace("`^/{$this->BasePath}/`U", '', $Href);
-            
+
          // Skip the rest if the file doesn't exist
          $FixPath = ($Href[0] != '/') ? '/' : ''; // Put that slash back to test for it in file structure
          $Path = PATH_ROOT . $FixPath . $Href;
@@ -92,13 +92,13 @@ class MinifyPlugin extends Gdn_Plugin {
             $JsToCache[] = $Href;
          }
       }
-      
+
       // Add minified css & js directly to the head module.
       $Url = 'plugins/Minify/min/?' . ($this->BasePath != '' ? "b={$this->BasePath}&" : '');
-      
+
       // Update HeadModule's $Tags
       $Head->Tags($Tags);
-      
+
       // Add minified CSS to HeadModule.
       $Token = $this->_PrepareToken($CssToCache, ".css");
       if (file_exists(PATH_CACHE."/Minify/minify_$Token")) {
@@ -106,10 +106,10 @@ class MinifyPlugin extends Gdn_Plugin {
       } else {
          $Head->AddCss($Url.'token='.urlencode($Token), 'screen', FALSE);
       }
-      
+
       // Add global minified JS separately (and first)
       $Head->AddScript($Url . 'g=globaljs', 'text/javascript', -100);
-      
+
       // Add other minified JS to HeadModule.
       $Token = $this->_PrepareToken($JsToCache, '.js');
       if (file_exists(PATH_CACHE."/Minify/minify_$Token")) {
@@ -118,7 +118,7 @@ class MinifyPlugin extends Gdn_Plugin {
          $Head->AddScript($Url . 'token=' . $Token, 'text/javascript', NULL, FALSE);
       }
    }
-   
+
    /**
     * Build unique, repeatable identifier for cache files.
     *
@@ -132,7 +132,7 @@ class MinifyPlugin extends Gdn_Plugin {
          $Query['b'] = $this->BasePath;
       $Query = serialize($Query);
       $Token = md5($Query).$Suffix;
-      
+
       // Save file name with token.
       $CacheFile = PATH_CACHE."/Minify/query_$Token";
       if (!file_exists($CacheFile)) {
@@ -140,10 +140,10 @@ class MinifyPlugin extends Gdn_Plugin {
             mkdir(dirname($CacheFile), 0777, TRUE);
          file_put_contents($CacheFile, $Query);
       }
-      
+
       return $Token;
    }
-   
+
    /**
     * Create 'Minify' cache folder.
     */
@@ -152,13 +152,13 @@ class MinifyPlugin extends Gdn_Plugin {
       if (!file_exists($Folder))
          @mkdir($Folder);
    }
-   
+
    /**
     * Empty cache when disabling this plugin.
-    */ 
+    */
    public function OnDisable() { $this->_EmptyCache(); }
-   
-   /** 
+
+   /**
     * Empty cache when enabling or disabling any other plugin, application, or theme.
     */
    public function SettingsController_AfterEnablePlugin_Handler() { $this->_EmptyCache(); }
@@ -166,7 +166,7 @@ class MinifyPlugin extends Gdn_Plugin {
    public function SettingsController_AfterEnableApplication_Handler() { $this->_EmptyCache(); }
    public function SettingsController_AfterDisableApplication_Handler() { $this->_EmptyCache(); }
    public function SettingsController_AfterEnableTheme_Handler() { $this->_EmptyCache(); }
-   
+
    /**
     * Empty Minify's cache.
     */

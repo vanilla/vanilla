@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Vanilla
  */
- 
+
 /**
  * Master application controller for Vanilla, extended by all others except Settings.
  *
@@ -20,12 +20,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class VanillaController extends Gdn_Controller {
-   
+
    /**
     * Include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -39,11 +39,11 @@ class VanillaController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddCssFile('style.css');
-      
+
       // Add modules
       $this->AddModule('GuestModule');
       $this->AddModule('SignedInModule');
-      
+
       parent::Initialize();
    }
 

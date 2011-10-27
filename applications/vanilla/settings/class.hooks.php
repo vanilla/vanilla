@@ -15,14 +15,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Vanilla
  */
- 
+
 /**
- * Defines all plugins Vanilla uses. 
- * 
- * These fire automatically when their respective events are called with 
+ * Defines all plugins Vanilla uses.
+ *
+ * These fire automatically when their respective events are called with
  * $this->FireEvent('EventName') and are passed the object that calls the event by reference.
  * Plugin methods are usually defined by names in the pattern: {Class}_{Event}_Handler.
- * The Render method may be hooked into using {Class}_Render_Before. 
+ * The Render method may be hooked into using {Class}_Render_Before.
  * You may use "Base" as the class when hooking into Dashboard events.
  *
  * @link http://vanillaforums.org/docs/PluginQuickStart
@@ -32,34 +32,34 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class VanillaHooks implements Gdn_IPlugin {
    /**
     * Add some extra fields to the session query.
-    * 
+    *
     * @since 2.0.0
     * @package Vanilla
     * @todo Uncomment or delete this method.
-    * 
+    *
     * @param object $Sender UserModel.
     */
    public function UserModel_SessionQuery_Handler($Sender) {
       //$Sender->SQL->Select('u.CountDiscussions, u.CountUnreadDiscussions, u.CountDrafts, u.CountBookmarks');
    }
-   
+
 	/**
 	 * Remove Vanilla data when deleting a user.
     *
     * @since 2.0.0
     * @package Vanilla
-    * 
+    *
     * @param object $Sender UserModel.
     */
    public function UserModel_BeforeDeleteUser_Handler($Sender) {
       $UserID = GetValue('UserID', $Sender->EventArguments);
       $Options = GetValue('Options', $Sender->EventArguments, array());
       $Options = is_array($Options) ? $Options : array();
-      
+
       // Remove discussion watch records and drafts
 		$Sender->SQL->Delete('UserDiscussion', array('UserID' => $UserID));
 		$Sender->SQL->Delete('Draft', array('InsertUserID' => $UserID));
-      
+
       // Comment deletion depends on method selected
       $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
       if ($DeleteMethod == 'delete') {
@@ -80,10 +80,10 @@ class VanillaHooks implements Gdn_IPlugin {
                ->Where('DiscussionID', $Row['DiscussionID'])
                ->Put();
          }
-         
+
          $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
-         
-         // Delete the user's dicussions 
+
+         // Delete the user's dicussions
          $Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID));
       } else if ($DeleteMethod == 'wipe') {
          // Erase the user's dicussions
@@ -92,7 +92,7 @@ class VanillaHooks implements Gdn_IPlugin {
             ->Set('Format', 'Deleted')
             ->Where('InsertUserID', $UserID)
             ->Put();
-         
+
          // Erase the user's comments
 			$Sender->SQL->From('Comment')
 				->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
@@ -119,7 +119,7 @@ class VanillaHooks implements Gdn_IPlugin {
          ->Where('UserID', $UserID)
          ->Put();
    }
-   
+
    /**
     * Check whether a user has access to view discussions in a particular category.
     *
@@ -138,44 +138,44 @@ class VanillaHooks implements Gdn_IPlugin {
 		if ($UserID && $CategoryID) {
          if ($PermissionModel === NULL)
             $PermissionModel = new PermissionModel();
-         
+
          $Category = CategoryModel::Categories($CategoryID);
          if ($Category)
             $PermissionCategoryID = $Category['PermissionCategoryID'];
          else
             $PermissionCategoryID = -1;
-         
+
          $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
          return (GetValue('Vanilla.Discussions.View', GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
       }
       return FALSE;
    }
-   
+
    /**
     * Adds 'Discussion' item to menu.
-    * 
+    *
     * 'Base_Render_Before' will trigger before every pageload across apps.
     * If you abuse this hook, Tim with throw a Coke can at your head.
-    * 
+    *
     * @since 2.0.0
     * @package Vanilla
-    * 
+    *
     * @param object $Sender DashboardController.
-    */ 
+    */
    public function Base_Render_Before($Sender) {
       $Session = Gdn::Session();
       if ($Sender->Menu)
          $Sender->Menu->AddLink('Discussions', T('Discussions'), '/discussions', FALSE, array('Standard' => TRUE));
    }
-   
+
    /**
     * Adds 'Discussions' tab to profiles and adds CSS & JS files to their head.
-    * 
+    *
     * @since 2.0.0
     * @package Vanilla
-    * 
+    *
     * @param object $Sender ProfileController.
-    */ 
+    */
    public function ProfileController_AddProfileTabs_Handler($Sender) {
       if (is_object($Sender->User) && $Sender->User->UserID > 0) {
          $UserID = $Sender->User->UserID;
@@ -187,21 +187,21 @@ class VanillaHooks implements Gdn_IPlugin {
          $Sender->AddJsFile('discussions.js');
       }
    }
-   
+
    /**
     * Adds email notification options to profiles.
-    * 
+    *
     * @since 2.0.0
     * @package Vanilla
-    * 
+    *
     * @param object $Sender ProfileController.
-    */ 
+    */
    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
       $Sender->Preferences['Notifications']['Email.DiscussionComment'] = T('Notify me when people comment on my discussions.');
       $Sender->Preferences['Notifications']['Email.DiscussionMention'] = T('Notify me when people mention me in discussion titles.');
       $Sender->Preferences['Notifications']['Email.CommentMention'] = T('Notify me when people mention me in comments.');
       $Sender->Preferences['Notifications']['Email.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
-      
+
 
       $Sender->Preferences['Notifications']['Popup.DiscussionComment'] = T('Notify me when people comment on my discussions.');
       $Sender->Preferences['Notifications']['Popup.DiscussionMention'] = T('Notify me when people mention me in discussion titles.');
@@ -214,10 +214,10 @@ class VanillaHooks implements Gdn_IPlugin {
 //      $Sender->Preferences['Notifications']['Popup.NewDiscussion'] = T('Notify me when people start new discussions.');
       }
    }
-	
+
 	/**
 	 * Add the discussion search to the search.
-	 * 
+	 *
     * @since 2.0.0
     * @package Vanilla
 	 *
@@ -227,10 +227,10 @@ class VanillaHooks implements Gdn_IPlugin {
 		$SearchModel = new VanillaSearchModel();
 		$SearchModel->Search($Sender);
 	}
-   
+
    /**
 	 * Load forum information into the BuzzData collection.
-	 * 
+	 *
     * @since 2.0.0
     * @package Vanilla
 	 *
@@ -257,10 +257,10 @@ class VanillaHooks implements Gdn_IPlugin {
       // Number of New Comments in the last week
       $Sender->BuzzData[T('New comments in the last week')] = number_format($CommentModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week')))));
    }
-   
+
    /**
 	 * Creates virtual 'Comments' method in ProfileController.
-	 * 
+	 *
     * @since 2.0.0
     * @package Vanilla
 	 *
@@ -274,18 +274,18 @@ class VanillaHooks implements Gdn_IPlugin {
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username);
       $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
-      
+
       // Load the data for the requested tab.
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
-      
+
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $CommentModel = new CommentModel();
       $Sender->CommentData = $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
       $CountComments = $Offset + $Sender->CommentData->NumRows();
       if ($Sender->CommentData->NumRows() == $Limit)
          $CountComments = $Offset + $Limit + 1;
-      
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
       $Sender->Pager = $PagerFactory->GetPager('MorePager', $Sender);
@@ -298,7 +298,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $CountComments,
          'profile/comments/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
       );
-      
+
       // Deliver JSON data if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL && $Offset > 0) {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
@@ -306,20 +306,20 @@ class VanillaHooks implements Gdn_IPlugin {
          $Sender->View = 'profilecomments';
       }
 		$Sender->Offset = $Offset;
-      
+
       // Set the HandlerType back to normal on the profilecontroller so that it fetches it's own views
       $Sender->HandlerType = HANDLER_TYPE_NORMAL;
-      
+
       // Do not show discussion options
       $Sender->ShowOptions = FALSE;
-      
+
       // Render the ProfileController
       $Sender->Render();
    }
-   
+
    /**
 	 * Creates virtual 'Discussions' method in ProfileController.
-	 * 
+	 *
     * @since 2.0.0
     * @package Vanilla
 	 *
@@ -332,18 +332,18 @@ class VanillaHooks implements Gdn_IPlugin {
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username);
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
-      
+
       // Load the data for the requested tab.
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
-      
+
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new DiscussionModel();
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('d.InsertUserID' => $Sender->User->UserID));
       $CountDiscussions = $Offset + $Sender->DiscussionData->NumRows();
       if ($Sender->DiscussionData->NumRows() == $Limit)
          $CountDiscussions = $Offset + $Limit + 1;
-      
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
       $Sender->Pager = $PagerFactory->GetPager('MorePager', $Sender);
@@ -356,27 +356,27 @@ class VanillaHooks implements Gdn_IPlugin {
          $CountDiscussions,
          'profile/discussions/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
       );
-      
+
       // Deliver JSON data if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL && $Offset > 0) {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
          $Sender->View = 'discussions';
       }
-      
+
       // Set the HandlerType back to normal on the profilecontroller so that it fetches it's own views
       $Sender->HandlerType = HANDLER_TYPE_NORMAL;
-      
+
       // Do not show discussion options
       $Sender->ShowOptions = FALSE;
-      
+
       // Render the ProfileController
       $Sender->Render();
    }
-   
+
    /**
 	 * Makes sure forum administrators can see the dashboard admin pages.
-	 * 
+	 *
     * @since 2.0.0
     * @package Vanilla
 	 *
@@ -389,7 +389,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Spam.Manage';
       }
    }
-   
+
    public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
       $Path = GetValue('Path', $Args);
       if (preg_match('`discussion\/(\d+)`i', $Path, $Matches)) {
@@ -400,17 +400,17 @@ class VanillaHooks implements Gdn_IPlugin {
          $Comment = $CommentModel->GetID($CommentID);
          $DiscussionID = GetValue('DiscussionID', $Comment);
       }
-      
+
       if (isset($DiscussionID)) {
          $DiscussionModel = new DiscussionModel();
          $Discussion = $DiscussionModel->GetID($DiscussionID);
          $DiscussionModel->AddView($DiscussionID, GetValue('CountViews', $Discussion));
       }
    }
-   
+
    /**
 	 * Adds items to dashboard menu.
-	 * 
+	 *
     * @since 2.0.0
     * @package Vanilla
 	 *
@@ -422,10 +422,10 @@ class VanillaHooks implements Gdn_IPlugin {
       $Menu->AddLink('Forum', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Vanilla.Spam.Manage');
       $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
    }
-   
+
    /**
 	 * Automatically executed when application is enabled.
-	 * 
+	 *
     * @since 2.0.0
     * @package Vanilla
 	 */
@@ -434,11 +434,11 @@ class VanillaHooks implements Gdn_IPlugin {
       $Config = Gdn::Factory(Gdn::AliasConfig);
       $Drop = Gdn::Config('Vanilla.Version') === FALSE ? TRUE : FALSE;
       $Explicit = TRUE;
-      
+
       // Call structure.php to update database
       $Validation = new Gdn_Validation(); // Needed by structure.php to validate permission names
       include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'structure.php');
-      
+
       $ApplicationInfo = array();
       include(CombinePaths(array(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'about.php')));
       $Version = ArrayValue('Version', ArrayValue('Vanilla', $ApplicationInfo, array()), 'Undefined');

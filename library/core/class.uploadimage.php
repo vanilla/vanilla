@@ -15,24 +15,24 @@ class Gdn_UploadImage extends Gdn_Upload {
 
    public static function CanUploadImages() {
       // Check that we have the necessary tools to allow image uploading
-      
+
       // Is the Uploads directory available and correctly permissioned?
       if (!Gdn_Upload::CanUpload())
          return FALSE;
-      
+
       // Do we have GD?
       if (!function_exists('gd_info'))
          return FALSE;
-      
+
       $GdInfo = gd_info();
       // Do we have a good version of GD?
       $GdVersion = preg_replace('/[a-z ()]+/i', '', $GdInfo['GD Version']);
       if ($GdVersion < 2)
          return FALSE;
-      
+
       return TRUE;
    }
-   
+
    public function Clear() {
       parent::Clear();
 		$this->_AllowedFileExtensions = array('jpg','jpeg','gif','png','bmp','ico');
@@ -42,23 +42,23 @@ class Gdn_UploadImage extends Gdn_Upload {
     * Validates the uploaded image. Returns the temporary name of the uploaded file.
     */
    public function ValidateUpload($InputName, $ThrowError = TRUE) {
-   
+
       if (!function_exists('gd_info'))
          throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
-   
+
       // Make sure that all standard file upload checks are performed.
       $TmpFileName = parent::ValidateUpload($InputName, $ThrowError);
-      
+
       // Now perform image-specific checks.
       if ($TmpFileName) {
          $Size = getimagesize($TmpFileName);
          if ($Size === FALSE)
             throw new Exception(T('The uploaded file was not an image.'));
       }
-      
+
       return $TmpFileName;
    }
-   
+
    /**
     * Saves the specified image at $Target in the specified format with the
     * specified dimensions (or the existing dimensions if height/width are not
@@ -77,7 +77,7 @@ class Gdn_UploadImage extends Gdn_Upload {
     */
    public static function SaveImageAs($Source, $Target, $Height = '', $Width = '', $Options = array()) {
       $Crop = FALSE; $OutputType = ''; $ImageQuality = C('Garden.UploadImage.Quality', 75);
-      
+
       // Make function work like it used to.
       $Args = func_get_args();
       $SaveGif = FALSE;
@@ -95,23 +95,23 @@ class Gdn_UploadImage extends Gdn_Upload {
       }
 
       // Make sure type, height & width are properly defined.
-      
+
       if (!function_exists('gd_info'))
          throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
-         
-      $GdInfo = gd_info();      
+
+      $GdInfo = gd_info();
       $Size = getimagesize($Source);
       list($WidthSource, $HeightSource, $Type) = $Size;
       $WidthSource = GetValue('SourceWidth', $Options, $WidthSource);
       $HeightSource = GetValue('SourceHeight', $Options, $HeightSource);
-      
+
       if ($Height == '' || !is_numeric($Height))
          $Height = $HeightSource;
-         
+
       if ($Width == '' || !is_numeric($Width))
          $Width = $WidthSource;
 
-      if (!$OutputType) {      
+      if (!$OutputType) {
          $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico');
          $OutputType = GetValue($Type, $OutputTypes, 'jpg');
       }
@@ -126,7 +126,7 @@ class Gdn_UploadImage extends Gdn_Upload {
 
       if (!file_exists(dirname($TargetPath)))
          mkdir(dirname($TargetPath), 0777, TRUE);
-      
+
       // Don't resize if the source dimensions are smaller than the target dimensions or an icon
       $XCoord = GetValue('SourceX', $Options, 0);
       $YCoord = GetValue('SourceY', $Options, 0);
@@ -144,7 +144,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             if ($WidthDiff > $HeightDiff) {
                // Crop the original width down
                $NewWidthSource = round(($Width * $HeightSource) / $Height);
-               
+
                // And set the original x position to the cropped start point.
                if (!isset($Options['SourceX']))
                   $XCoord = round(($WidthSource - $NewWidthSource) / 2);
@@ -152,7 +152,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             } else {
                // Crop the original height down
                $NewHeightSource = round(($Height * $WidthSource) / $Width);
-               
+
                // And set the original y position to the cropped start point.
                if (!isset($Options['SourceY']))
                   $YCoord = round(($HeightSource - $NewHeightSource) / 2);
@@ -169,7 +169,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       if ($WidthSource <= $Width && $HeightSource <= $Height && $Type == 1 && $SaveGif) {
          $Process = FALSE;
       }
-      
+
       // Never process icons
       if ($Type == 17) {
          $Process = FALSE;
@@ -235,7 +235,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       Gdn::PluginManager()->CallEventHandlers($Sender, 'Gdn_UploadImage', 'SaveImageAs');
       return $Sender->EventArguments['Parsed'];
    }
-   
+
    public function GenerateTargetName($TargetFolder, $Extension = 'jpg', $Chunk = FALSE) {
       if (!$Extension) {
          $Extension = trim(pathinfo($this->_UploadedFile['name'], PATHINFO_EXTENSION), '.');
@@ -253,7 +253,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       } while(file_exists($Path));
       return $Path;
    }
-   
+
    public static function ImageIco($GD, $TargetPath) {
       require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.ico.php';
       require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.functions.php';

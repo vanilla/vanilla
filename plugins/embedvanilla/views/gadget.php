@@ -6,5 +6,5 @@
    echo Img('plugins/embedvanilla/design/gadgethelp.png', array('class' => 'Screenshot', 'alt' => 'Blogger Instructions'));
    echo T('Finally, enter this gadget url and click "Add by Url":');
    echo '<input type="text" value="'.Url('plugin/gadget', TRUE).'" class="GadgetInput" />';
-   ?>   
+   ?>
 </div>

@@ -9,7 +9,7 @@
  * related to that discussion.
  */
 class DraftsModule extends Gdn_Module {
-   
+
    public $Form;
    public function GetData($Limit = 20, $DiscussionID = '') {
       $Session = Gdn::Session();

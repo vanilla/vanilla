@@ -118,22 +118,22 @@ class TwitterPlugin extends Gdn_Plugin {
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsConfigured())
 			return;
-			
+
 		echo "\n".$this->_GetButton();
 	}
-	
+
 	public function Base_BeforeSignInLink_Handler($Sender) {
       if (!$this->IsConfigured())
 			return;
-		
+
 		// if (!IsMobile())
 		// 	return;
 
 		if (!Gdn::Session()->IsValid())
 			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect TwitterConnect'));
 	}
-	
-	private function _GetButton() {      
+
+	private function _GetButton() {
       $ImgSrc = Asset('/plugins/Twitter/design/twitter-icon.png');
       $ImgAlt = T('Sign In with Twitter');
       $SigninHref = $this->_AuthorizeHref();
@@ -149,7 +149,7 @@ class TwitterPlugin extends Gdn_Plugin {
          $RedirectUri .= (strpos($RedirectUri, '?') === FALSE ? '?' : '&').$Query;
 
       $Params = array('oauth_callback' => $RedirectUri);
-      
+
       $Url = 'https://api.twitter.com/oauth/request_token';
       $Request = OAuthRequest::from_consumer_and_token($Consumer, NULL, 'POST', $Url, $Params);
       $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
@@ -198,12 +198,12 @@ class TwitterPlugin extends Gdn_Plugin {
    public function Base_ConnectData_Handler($Sender, $Args) {
       if (GetValue(0, $Args) != 'twitter')
          return;
-      
+
       $Form = $Sender->Form; //new Gdn_Form();
 
       $RequestToken = GetValue('oauth_token', $_GET);
       $AccessToken = $Form->GetFormValue('AccessToken');
-      
+
       if ($AccessToken) {
          $AccessToken = $this->GetOAuthToken($AccessToken);
          $this->AccessToken($AccessToken);
@@ -221,7 +221,7 @@ class TwitterPlugin extends Gdn_Plugin {
              'oauth_verifier' => GetValue('oauth_verifier', $_GET)
          );
          $Request = OAuthRequest::from_consumer_and_token($Consumer, $RequestToken, 'POST', $Url, $Params);
-         
+
          $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
          $Request->sign_request($SignatureMethod, $Consumer, $RequestToken);
          $Post = $Request->to_postdata();
@@ -238,19 +238,19 @@ class TwitterPlugin extends Gdn_Plugin {
             $Data = OAuthUtil::parse_parameters($Response);
 
             $AccessToken = new OAuthToken(GetValue('oauth_token', $Data), GetValue('oauth_token_secret', $Data));
-            
+
             // Save the access token to the database.
             $this->SetOAuthToken($AccessToken->key, $AccessToken->secret, 'access');
             $this->AccessToken($AccessToken->key, $AccessToken->secret);
 
             // Delete the request token.
             $this->DeleteOAuthToken($RequestToken);
-            
+
          } else {
             // There was some sort of error.
             throw new Exception('There was an error authenticating with twitter.', 400);
          }
-         
+
          $NewToken = TRUE;
       }
 
@@ -271,7 +271,7 @@ class TwitterPlugin extends Gdn_Plugin {
             throw $Ex;
          }
       }
-      
+
       $ID = GetValue('id', $Profile);
       $Form->SetFormValue('UniqueID', $ID);
       $Form->SetFormValue('Provider', self::$ProviderKey);
@@ -280,7 +280,7 @@ class TwitterPlugin extends Gdn_Plugin {
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
       $Form->SetFormValue('Photo', GetValue('profile_image_url', $Profile));
       $Form->AddHidden('AccessToken', $AccessToken->key);
-      
+
       // Save some original data in the attributes of the connection for later API calls.
       $Attributes = array(
           'Twitter.AccessToken' => array($AccessToken->key, $AccessToken->secret),
@@ -288,7 +288,7 @@ class TwitterPlugin extends Gdn_Plugin {
           'Twitter.Profile' => $Profile
       );
       $Form->SetFormValue('Attributes', $Attributes);
-      
+
       $Sender->SetData('Verified', TRUE);
    }
 
@@ -359,13 +359,13 @@ class TwitterPlugin extends Gdn_Plugin {
       if (is_a($Token, 'OAuthToken')) {
          $Token = $Token->key;
       }
-      
+
       Gdn::SQL()->Delete('UserAuthenticationToken', array('Token' => $Token, 'ProviderKey' => self::$ProviderKey));
    }
 
    /**
     *
-    * @param OAuthRequest $Request 
+    * @param OAuthRequest $Request
     */
    protected function _Curl($Request) {
       $C = curl_init();

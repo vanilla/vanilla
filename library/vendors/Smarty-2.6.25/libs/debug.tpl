@@ -37,12 +37,12 @@ h2 {
 }
 
 body {
-    background: black; 
+    background: black;
 }
 
 p, table, div {
     background: #f0ead8;
-} 
+}
 
 p {
     margin: 0;

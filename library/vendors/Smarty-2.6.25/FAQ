@@ -117,7 +117,7 @@ A: Be sure you set $compile_check=false once your templates are initially
    change too often, turn on the caching engine and adjust your application so
    it doesn't do unnecessary work (like db calls) if a cached page is
    available. See the documentation for examples.
-   
+
 Q: Do you have a mailing list?
 A:  We have a few mailing lists. "general" for you to share your ideas or ask
 	questions, "dev" for those interested in the development efforts of Smarty,
@@ -226,7 +226,7 @@ A: In Edit - Properties - Rewrite HTML you can specify if Dreamweaver should
 
 HOWTO
 -----
-   
+
 Q: How do I generate different cache files per template based on arguments
    passed to the page?
 A: Use your $REQUEST_URI as the cache_id when fetching the page:

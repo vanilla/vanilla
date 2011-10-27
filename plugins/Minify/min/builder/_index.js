@@ -13,7 +13,7 @@ var MUB = {
                     MUB._minRoot = '/min/';
                     $('span.minRoot').html('/min/');
                 } else
-                    fail();                
+                    fail();
             }
             ,error : fail
         });
@@ -22,7 +22,7 @@ var MUB = {
      * Get markup for new source LI element
      */
     ,newLi : function () {
-        return '<li id="li' + MUB._uid + '">http://' + location.host + '/<input type=text size=20>' 
+        return '<li id="li' + MUB._uid + '">http://' + location.host + '/<input type=text size=20>'
         + ' <button title="Remove">x</button> <button title="Include Earlier">&uarr;</button>'
         + ' <button title="Include Later">&darr;</button> <span></span></li>';
     }
@@ -64,11 +64,11 @@ var MUB = {
      * the INPUT and check the URL on the site.
      */
     ,liUpdateTestLink : function () { // call in context of li element
-        if (! $('input', this)[0].value) 
+        if (! $('input', this)[0].value)
             return;
         var li = this;
         $('span', this).html('');
-        var url = 'http://' + location.host + '/' 
+        var url = 'http://' + location.host + '/'
                 + $('input', this)[0].value.replace(/^\//, '');
         $.ajax({
             url : url
@@ -157,7 +157,7 @@ var MUB = {
             if (! fail && this.value && (m = this.value.match(/\.(css|js)$/))) {
                 var thisExt = m[1];
                 if (ext === false)
-                    ext = thisExt; 
+                    ext = thisExt;
                 else if (thisExt !== ext) {
                     fail = true;
                     return alert('extensions must match!');
@@ -168,7 +168,7 @@ var MUB = {
                     return alert('duplicate file!');
                 }
                 sources.push(this.value);
-            } 
+            }
         });
         if (fail || ! sources.length)
             return;
@@ -177,7 +177,7 @@ var MUB = {
            ,uriH = uri.replace(/</, '&lt;').replace(/>/, '&gt;').replace(/&/, '&amp;');
         $('#uriA').html(uriH)[0].href = uri;
         $('#uriHtml').val(
-            ext === 'js' 
+            ext === 'js'
             ? '<script type="text/javascript" src="' + uriH + '"></script>'
             : '<link type="text/css" rel="stylesheet" href="' + uriH + '" />'
         );

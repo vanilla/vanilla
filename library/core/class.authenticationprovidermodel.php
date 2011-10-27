@@ -13,7 +13,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
    public function __construct() {
       parent::__construct('UserAuthenticationProvider');
    }
-   
+
    public function GetProviderByKey($AuthenticationProviderKey) {
       $ProviderData = Gdn::SQL()
          ->Select('uap.*')
@@ -21,10 +21,10 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
          ->Where('uap.AuthenticationKey', $AuthenticationProviderKey)
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
-         
+
       return $ProviderData;
    }
-   
+
    public function GetProviderByURL($AuthenticationProviderURL) {
       $ProviderData = Gdn::SQL()
          ->Select('uap.*')
@@ -32,24 +32,24 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
          ->Where('uap.URL', "%{$AuthenticationProviderURL}%")
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
-         
+
       return $ProviderData;
    }
-   
+
    public function GetProviderByScheme($AuthenticationSchemeAlias, $UserID = NULL) {
       $ProviderQuery = Gdn::SQL()
          ->Select('uap.*')
          ->From('UserAuthenticationProvider uap')
          ->Where('uap.AuthenticationSchemeAlias', $AuthenticationSchemeAlias);
-      
+
       if (!is_null($UserID) && $UserID)
          $ProviderQuery->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')->Where('ua.UserID', $UserID);
-      
+
       $ProviderData = $ProviderQuery->Get();
       if ($ProviderData->NumRows())
          return $ProviderData->FirstRow(DATASET_TYPE_ARRAY);
-         
+
       return FALSE;
    }
-   
+
 }

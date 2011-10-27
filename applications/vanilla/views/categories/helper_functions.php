@@ -5,7 +5,7 @@
 function GetOptions($Category, $Sender) {
    if (!Gdn::Session()->IsValid())
       return;
-   
+
    $Result = '';
    $Options = '';
    $CategoryID = GetValue('CategoryID', $Category);
@@ -29,7 +29,7 @@ function GetOptions($Category, $Sender) {
       $Result .= '<div class="ToggleFlyout OptionsMenu"><div class="MenuTitle">'.T('Options').'</div>'
          .'<ul class="Flyout MenuItems">'.$Options.'</ul>'
          .'</div>';
-      
+
    $Result .= '</div>';
    return $Result;
    }

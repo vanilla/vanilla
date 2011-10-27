@@ -12,7 +12,7 @@ class NewDiscussionModule extends Gdn_Module {
    public function AssetTarget() {
       return 'Panel';
    }
-   
+
    public function ToString() {
       $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', 'any');
       if ($HasPermission)

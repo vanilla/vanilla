@@ -30,7 +30,7 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
       $InThisDiscussionModule->GetData($Sender->DiscussionID);
       $Sender->AddModule($InThisDiscussionModule);
    }
-   
+
    public function Setup() {
       // No setup required
    }

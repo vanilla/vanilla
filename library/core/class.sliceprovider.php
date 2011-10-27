@@ -40,12 +40,12 @@ class Gdn_SliceProvider {
          case TRUE:
             $ReplacementIndex = 2;
          break;
-         
+
          case FALSE:
             $ReplacementIndex = 1;
          break;
       }
-      
+
       if ($ExplodedPath[0] == strtolower(Gdn::Dispatcher()->Application()) && $ExplodedPath[1] == strtolower(Gdn::Dispatcher()->Controller()))
          $ReplacementIndex++;
 
@@ -53,22 +53,22 @@ class Gdn_SliceProvider {
       $SlicePath = implode('/',$ExplodedPath);
       return Gdn::Slice($SlicePath);
    }
-   
+
    public function AddSliceAsset($Asset) {
       $Extension = strtolower(array_pop($Trash = explode('.',basename($Asset))));
       switch ($Extension) {
          case 'css':
-            if (!in_array($Asset, $this->SliceConfig['css'])) 
+            if (!in_array($Asset, $this->SliceConfig['css']))
                $this->SliceConfig['css'][] = $Asset;
             break;
-            
+
          case 'js':
-            if (!in_array($Asset, $this->SliceConfig['js'])) 
+            if (!in_array($Asset, $this->SliceConfig['js']))
                $this->SliceConfig['js'][] = $Asset;
             break;
       }
    }
-   
+
    public function RenderSliceConfig() {
       return json_encode($this->SliceConfig);
    }

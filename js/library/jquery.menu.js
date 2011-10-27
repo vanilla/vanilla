@@ -111,11 +111,11 @@ jQuery children() function.
       // Add the "first" css class to the first menu item
         if (i == 0)
         $(this).addClass('First');
-        
+
       // Add the "last" css class to the last menu item
       if (i == $(this).parent().children(opt.itemSel).length-1)
         $(this).addClass('Last');
-        
+
       // If there are children under the current item, show them on hover (and
       // hide on blur)
         if ($(this).children(opt.menuSel).length) {
@@ -127,7 +127,7 @@ jQuery children() function.
             // $('#Debug').html($('#Debug').html() + '<br />show');
             $(row).addClass('Active');
             opt.show.call($(row).children(opt.menuSel).get(0));
-            
+
             // Bind a click event to the body so that when anything else is
             // clicked, the menu disappears. "one" will cause the event to
             // unbind after the first time it fires. Note: I had to put a

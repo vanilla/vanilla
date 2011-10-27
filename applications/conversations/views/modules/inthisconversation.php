@@ -13,7 +13,7 @@
             );
       else
          echo Wrap(UserAnchor($User, 'UserLink'), 'strong');
-      
+
       echo Gdn_Format::Date($User->DateLastActive);
 
       echo '</li>';

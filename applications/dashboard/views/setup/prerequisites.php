@@ -10,7 +10,7 @@ echo $this->Form->Open();
 </div>
 <div class="Form">
    <?php
-      echo $this->Form->Errors(); 
+      echo $this->Form->Errors();
    ?>
    <div class="Button">
       <?php echo Anchor(T('Try Again'), '/dashboard/setup'); ?>

@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-   
+
    // Load news & tutorials from Vanilla
    var lists = $('div.Column div.List'),
       newsColumn = $('div.NewsColumn div.List'),
@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
    lists.addClass('Loading');
    loadFeed(newsColumn, 'news', 3, 'extended');
    loadFeed(helpColumn, 'help', 3, 'extended');
-   
+
    // Phone-home to the VanillaForums server to check for updates
    var updateChecks = gdn.definition('UpdateChecks', '');
    if (updateChecks != '') {

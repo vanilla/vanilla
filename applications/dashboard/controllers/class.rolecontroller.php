@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * RBAC (Role Based Access Control) system.
  *
@@ -22,7 +22,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class RoleController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Database', 'Form', 'RoleModel');
-   
+
    /**
     * Set menu path. Automatically run on every use.
     *
@@ -34,7 +34,7 @@ class RoleController extends DashboardController {
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
-   
+
    /**
     * Create new role.
     *
@@ -51,7 +51,7 @@ class RoleController extends DashboardController {
       $this->View = 'Edit';
       $this->Edit();
    }
-   
+
    /**
     * Remove a role.
     *
@@ -64,23 +64,23 @@ class RoleController extends DashboardController {
 
 		$this->Title(T('Delete Role'));
       $this->AddSideMenu('dashboard/role');
-      
+
       $Role = $this->RoleModel->GetByRoleID($RoleID);
       if ($Role->Deletable == '0')
          $this->Form->AddError('You cannot delete this role.');
-      
+
       // Make sure the form knows which item we are deleting.
       $this->Form->AddHidden('RoleID', $RoleID);
-      
+
       // Figure out how many users will be affected by this deletion
       $this->AffectedUsers = $this->RoleModel->GetUserCount($RoleID);
-      
+
       // Figure out how many users will be orphaned by this deletion
       $this->OrphanedUsers = $this->RoleModel->GetUserCount($RoleID, TRUE);
 
       // Get a list of roles other than this one that can act as a replacement
       $this->ReplacementRoles = $this->RoleModel->GetByNotRoleID($RoleID);
-      
+
       if ($this->Form->AuthenticatedPostBack()) {
          // Make sure that a replacement role has been selected if there were going to be orphaned users
          if ($this->OrphanedUsers > 0) {
@@ -98,7 +98,7 @@ class RoleController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    /**
     * Manage default role assignments.
     *
@@ -144,7 +144,7 @@ class RoleController extends DashboardController {
 
       $this->Render();
    }
-   
+
    /**
     * Show a warning if default roles are not setup yet.
     *
@@ -173,7 +173,7 @@ class RoleController extends DashboardController {
             '</div>';
       }
    }
-   
+
    /**
     * Edit a role.
     *
@@ -186,26 +186,26 @@ class RoleController extends DashboardController {
 
       if ($this->Head && $this->Head->Title() == '')
          $this->Head->Title(T('Edit Role'));
-         
+
       $this->AddSideMenu('dashboard/role');
       $PermissionModel = Gdn::PermissionModel();
       $this->Role = $this->RoleModel->GetByRoleID($RoleID);
       // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
       $this->AddJsFile('jquery.gardencheckboxgrid.js');
-      
+
       // Set the model on the form.
       $this->Form->SetModel($this->RoleModel);
-      
+
       // Make sure the form knows which item we are editing.
       $this->Form->AddHidden('RoleID', $RoleID);
-      
+
       $LimitToSuffix = !$this->Role || $this->Role->CanSession == '1' ? '' : 'View';
-      
+
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Get the role data for the requested $RoleID and put it into the form.
          $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix), true);
-            
+
          $this->Form->SetData($this->Role);
       } else {
          // If the form has been posted back...
@@ -217,10 +217,10 @@ class RoleController extends DashboardController {
             $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID, $LimitToSuffix), true);
          }
       }
-      
+
       $this->Render();
    }
-   
+
    /**
     * Show list of roles.
     *

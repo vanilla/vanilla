@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 /**
  * Renders an asset from the controller.
- * 
+ *
  * @param array The parameters passed into the function.
  * The parameters that can be passed to this function are as follows.
  * - <b>name</b>: The name of the asset.
@@ -27,10 +27,10 @@ function smarty_function_asset($Params, &$Smarty) {
 	$Class = ArrayValue('class', $Params, '');
 	if ($Class != '')
 		$Class = ' class="'.$Class.'"';
-	
+
 	$Controller = $Smarty->Controller;
    $Controller->EventArguments['AssetName'] = $Name;
-   
+
    $Result = '';
 
    ob_start();
@@ -48,7 +48,7 @@ function smarty_function_asset($Params, &$Smarty) {
    } else {
       $Result .= $Asset;
    }
-   
+
    ob_start();
    $Controller->FireEvent('AfterRenderAsset');
    $Result .= ob_get_clean();

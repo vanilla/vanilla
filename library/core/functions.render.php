@@ -57,14 +57,14 @@ if (!function_exists('Anchor')) {
 
       if ($Destination == '' && $ForceAnchor === FALSE)
          return $Text;
-      
+
       if ($Attributes == '')
          $Attributes = array();
-			
+
 		$SSL = GetValue('SSL', $Attributes, NULL);
 		if ($SSL)
 			unset($Attributes['SSL']);
-		
+
 		$WithDomain = GetValue('WithDomain', $Attributes, FALSE);
 		if ($WithDomain)
 			unset($Attributes['WithDomain']);
@@ -101,7 +101,7 @@ if (!function_exists('FormatPossessive')) {
    function FormatPossessive($Word) {
 		if(function_exists('FormatPossessiveCustom'))
 			return FormatPossesiveCustom($Word);
-			
+
       return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
    }
 }
@@ -163,7 +163,7 @@ if (!function_exists('UserAnchor')) {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
-      
+
       $Px = $Options;
       $Name = GetValue($Px.'Name', $User, T('Unknown'));
       $UserID = GetValue($Px.'UserID', $User, 0);
@@ -205,10 +205,10 @@ if (!function_exists('UserPhoto')) {
 		$User = (object)$User;
       if (is_string($Options))
          $Options = array('LinkClass' => $Options);
-      
+
       $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
       $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoMedium');
-      
+
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
       $Photo = $User->Photo;
@@ -241,7 +241,7 @@ if (!function_exists('UserUrl')) {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
-      
+
       return '/profile/'.($NameUnique ? '' : GetValue('UserID', $User, 0).'/').rawurlencode(GetValue('Name', $User));
    }
 }
@@ -254,10 +254,10 @@ if (!function_exists('Wrap')) {
    function Wrap($String, $Tag = 'span', $Attributes = '') {
 		if ($Tag == '')
 			return $String;
-		
+
       if (is_array($Attributes))
          $Attributes = Attribute($Attributes);
-         
+
       return '<'.$Tag.$Attributes.'>'.$String.'</'.$Tag.'>';
    }
 }

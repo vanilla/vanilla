@@ -1,15 +1,15 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
-   
+
    $('a.ClearConversation').popup({
       confirm: true,
       followConfirm: false
    });
-   
+
    $('textarea.MessageBox, textarea.TextBox').livequery(function() {
       $(this).autogrow();
    });
-   
+
    // Hijack "add message" clicks and handle via ajax...
    $.fn.handleMessageForm = function() {
       this.click(function() {
@@ -39,7 +39,7 @@ jQuery(document).ready(function($) {
             },
             success: function(json) {
                json = $.postParseJson(json);
-               
+
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 
@@ -47,17 +47,17 @@ jQuery(document).ready(function($) {
                   $(frm).prepend(json.ErrorMessages);
                   json.ErrorMessages = null;
                }
-               
+
                if (json.FormSaved) {
                   // Clean up the form
-                  clearMessageForm();                
-   
+                  clearMessageForm();
+
                   // And show the new comments
                   $('ul.Conversation').append(json.Data);
-                  
+
                   // Remove any "More" pager links
                   $('#PagerMore').remove();
-                  
+
                   // And scroll to them
                   var target = $('#' + json.MessageID);
                   if (target.offset()) {
@@ -73,11 +73,11 @@ jQuery(document).ready(function($) {
             }
          });
          return false;
-      
+
       });
    }
    $('#Form_ConversationMessage :submit').handleMessageForm();
-   
+
    // Utility function to clear out the message form
    function clearMessageForm() {
       $('div.Popup').remove();
@@ -86,7 +86,7 @@ jQuery(document).ready(function($) {
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
    }
-   
+
    // Enable multicomplete on selected inputs
    $('.MultiComplete').livequery(function() {
       $(this).autocomplete(
@@ -99,20 +99,20 @@ jQuery(document).ready(function($) {
          }
       ).autogrow();
    });
-   
+
    // Set up paging
    $('.MorePager').morepager({
       pageContainerSelector: 'ul.Conversations, ul.Conversation'
    });
-   
+
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;
       $(btn).hide();
       $(btn).before('<span class="TinyProgress">&#160;</span>');
-      
+
       var frm = $(btn).parents('form');
       var textbox = $(frm).find('textarea');
-      
+
       // Post the form, show the status and then redirect.
       $.ajax({
          type: "POST",

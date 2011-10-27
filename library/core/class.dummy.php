@@ -25,22 +25,22 @@ class Gdn_Dummy {
    public function __call ($Name, $Arguments ) {
       return $this;
    }
-   
+
    public function __get($Name) {
       return $this;
    }
-   
+
    public function __set($Name, $Value) {
       return $this;
    }
-   
+
    /**
     * Holds a static instance of this class.
     *
     * @var Dummy
     */
    private static $_Instance;
-   
+
    /**
     * Return the singleton instance of this object.
     *

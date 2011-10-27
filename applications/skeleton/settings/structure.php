@@ -3,7 +3,7 @@
 
 if (!isset($Drop))
    $Drop = FALSE; // Safe default - Set to TRUE to drop the table if it already exists.
-   
+
 if (!isset($Explicit))
    $Explicit = FALSE; // Safe default - Set to TRUE to remove all other columns from table.
 
@@ -17,21 +17,21 @@ $Validation = new Gdn_Validation(); // To validate permissions (if necessary).
 
 
 // Example: New table construction.
-/* 
+/*
 $Construct->Table('ExampleTable')
 	->PrimaryKey('ExampleTableID')
    ->Column('ExampleUserID', 'int', TRUE)
    ->Column('Field1', 'varchar(50)')
    ->Set($Explicit, $Drop); // If you omit $Explicit and $Drop they default to false.
-*/ 
+*/
 
 // Example: Add column to existing table.
-/* 
+/*
 $Construct->Table('User')
    ->Column('NewColumnNeeded', 'varchar(255)', TRUE) // Always allow for NULLs unless it's truly required.
-   ->Set(); 
-*/  
-   
+   ->Set();
+*/
+
 /**
  * Column() has the following arguments:
  *

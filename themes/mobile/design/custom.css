@@ -48,7 +48,7 @@ a.Close {
 	color: #EDEFF4;
 }
 body.Post a.Close {
-	color: inherit;	
+	color: inherit;
 }
 
 /* Banner */
@@ -335,7 +335,7 @@ div.MorePager a:hover {
 	color: #3B5998;
 	line-height: 1;
 	padding: 3px 6px;
-	text-decoration: none;	
+	text-decoration: none;
 }
 
 /* Entry Pages */
@@ -413,7 +413,7 @@ div.Popup div.Messages ul {
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 div.DismissMessage {
 	color: #000;

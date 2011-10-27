@@ -112,7 +112,7 @@ class Gdn_UploadImage extends Gdn_Upload {
          $Width = $WidthSource;
 
       if (!$OutputType) {      
-         $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 6 => 'png', 17 => 'ico');
+         $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico');
          $OutputType = GetValue($Type, $OutputTypes, 'jpg');
       }
       elseif ($Type == 17 && $OutputType != 'ico') {
@@ -193,16 +193,10 @@ class Gdn_UploadImage extends Gdn_Upload {
                   imagealphablending($SourceImage, TRUE);
                }
                break;
-            case IMAGETYPE_BMP:
-               require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.functions.php';
-               require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.bmp.php';
-               $Bmp = new phpthumb_bmp();
-               $SourceImage = $Bmp->phpthumb_bmpfile2gd($Source);
-               break;
          }
 
          if (!$SourceImage)
-            throw new Exception(T('You can only upload the following image types: gif, jpg, png.'));
+            throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $Type));
 
          // Create a new image from the raw source
          if (function_exists('imagecreatetruecolor')) {

@@ -402,7 +402,7 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
    
    protected function _Disable() {
-      RemoveFromConfig('Plugins.Flagging.Enabled');
+      SaveToConfig('Plugins.Flagging.Enabled', FALSE);
    }
    
 }

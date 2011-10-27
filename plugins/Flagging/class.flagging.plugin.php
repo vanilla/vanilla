@@ -391,6 +391,9 @@ class FlaggingPlugin extends Gdn_Plugin {
          ->Column('Comment', 'text')
          ->Column('DateInserted', 'datetime')
          ->Set(FALSE, FALSE);
+         
+      if (C('Plugins.Flagging.Enabled', NULL) === NULL)
+         SaveToConfig('Plugins.Flagging.Enabled', FALSE);
    }
 
    public function Setup() {

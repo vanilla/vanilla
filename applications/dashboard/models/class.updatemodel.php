@@ -35,7 +35,7 @@ class UpdateModel extends Gdn_Model {
             throw new Exception("$Path not found.", 404);
          return FALSE;
       }
-      
+
       $Result = array();
 
       $InfoPaths = array(
@@ -104,7 +104,7 @@ class UpdateModel extends Gdn_Model {
             if (!GetValue('Name', $Info)) {
                $Info['Name'] = $Key;
             }
-            
+
             if (!GetValue('Description', $Info)) {
                $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Description'));
                $Valid = FALSE;
@@ -137,7 +137,7 @@ class UpdateModel extends Gdn_Model {
                   break;
                case 'ThemeInfo':
                   $Addon['AddonTypeID'] = ADDON_TYPE_THEME;
-                  break;  
+                  break;
             }
          }
       }
@@ -780,7 +780,7 @@ class UpdateModel extends Gdn_Model {
       $Url = $this->AddonSiteUrl.'/addon/getlist.json?ids='.$SlugsString;
       $SiteAddons = ProxyRequest($Url);
       $UpdateAddons = array();
-      
+
       if ($SiteAddons) {
          $SiteAddons = GetValue('Addons', json_decode($SiteAddons, TRUE));
          $UpdateAddons = $this->CompareAddons($MyAddons, $SiteAddons);
@@ -799,7 +799,7 @@ class UpdateModel extends Gdn_Model {
          if (file_exists($Path))
             $Paths[] = $Path;
       }
-      
+
       // Execute the structures.
       $Database = Gdn::Database();
       $SQL = Gdn::SQL();

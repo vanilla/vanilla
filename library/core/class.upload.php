@@ -57,7 +57,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 		if (!is_dir($UploadPath))
 			return FALSE;
 
-      if (!IsWritable($UploadPath) || !is_readable($UploadPath)) 
+      if (!IsWritable($UploadPath) || !is_readable($UploadPath))
 			return FALSE;
 
 		return TRUE;
@@ -211,7 +211,7 @@ class Gdn_Upload extends Gdn_Pluggable {
          $Target = PATH_UPLOADS.'/'.$Parsed['Name'];
          if (!file_exists(dirname($Target)))
             mkdir(dirname($Target));
-         
+
          if (!move_uploaded_file($Source, $Target))
             throw new Exception(sprintf(T('Failed to move uploaded file to target destination (%s).'), $Target));
       }
@@ -236,7 +236,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
       if ($Urls === NULL) {
          $Urls = array('' => Asset('/uploads', TRUE));
-         
+
          $Sender = new stdClass();
          $Sender->Returns = array();
          $Sender->EventArguments = array();

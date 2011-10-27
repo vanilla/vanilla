@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-   
+
    // Show drafts delete button on hover
    $('li.Item').livequery(function() {
       var btn = $(this).find('a.Delete');

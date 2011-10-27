@@ -17,7 +17,7 @@ interface Gdn_IIdentity {
     * @return int
     */
    public function GetIdentity();
-	
+
 	/**
     * Generates the user's session cookie.
     *
@@ -25,5 +25,5 @@ interface Gdn_IIdentity {
     * @param boolean $Persist Should the user's session remain persistent across visits?
     */
    public function SetIdentity($UserID, $Persist = FALSE);
-	
+
 }

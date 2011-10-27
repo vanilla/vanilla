@@ -7,10 +7,10 @@ jQuery / Garden CheckColumn Plugin v1
    opt = $.extend({
      noOptionsYet: 0
    }, opt);
-   
+
   // Remove the cellpadding on anchor cells
   $(this).find('thead td').css('padding', '0px');
-   
+
   // Handle column heading clicks
   $(this).find('thead td').each(function() {
       var columnIndex = $(this).attr('cellIndex');
@@ -35,8 +35,8 @@ jQuery / Garden CheckColumn Plugin v1
       anchor.href = '#';
       $(this).html(anchor);
   });
-  
-   
+
+
    // Return the object for chaining
      return $(this);
   }

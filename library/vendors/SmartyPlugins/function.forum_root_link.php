@@ -25,7 +25,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 function smarty_function_forum_root_link($Params, &$Smarty) {
    $Text = GetValue('text', $Params, '', TRUE);
    $Format = GetValue('format', $Params, '<li><a href="%url" class="%class">%text</a></li>');
-   
+
    $Options = array();
    if (isset($Params['class'])) $Options['class'] = $Params['class'];
 

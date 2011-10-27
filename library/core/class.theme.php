@@ -54,13 +54,13 @@ class Gdn_Theme {
       $Result ='<span class="Breadcrumbs">'.$Result.'</span>';
       return $Result;
    }
-   
+
    public static function Link($Path, $Text = FALSE, $Format = NULL, $Options = array()) {
       $Session = Gdn::Session();
       $Class = GetValue('class', $Options, '');
       $WithDomain = GetValue('WithDomain', $Options);
       $Target = GetValue('Target', $Options, '');
-      
+
       if (is_null($Format))
          $Format = '<a href="%url" class="%class">%text</a>';
 
@@ -186,7 +186,7 @@ class Gdn_Theme {
          return '';
 
       $Url = Gdn::Request()->Url($Path, $WithDomain);
-      
+
       if ($TK = GetValue('TK', $Options)) {
          if (in_array($TK, array(1, 'true')))
             $TK = 'TransientKey';
@@ -237,7 +237,7 @@ class Gdn_Theme {
       }
       return $Result;
    }
-   
+
    public static function Pagename() {
       $Application = Gdn::Dispatcher()->Application();
       $Controller = Gdn::Dispatcher()->Controller();
@@ -246,20 +246,20 @@ class Gdn_Theme {
          case 'discussion':
          case 'post':
             return 'discussions';
-            
+
          case 'inbox':
             return 'inbox';
-            
+
          case 'activity':
             return 'activity';
-            
+
          case 'profile':
             $Args = Gdn::Dispatcher()->ControllerArguments();
             if (!sizeof($Args) || (sizeof($Args) && $Args[0] == Gdn::Session()->UserID))
                return 'profile';
             break;
       }
-      
+
       return 'unknown';
    }
 

@@ -69,7 +69,7 @@ class Gdn_Condition {
       foreach ($Conditions as $Condition) {
          if (!is_array($Condition) || count($Condition) < 2)
             continue;
-         
+
          $Expr = isset($Condition[2]) ? $Condition[2] : NULL;
 
          $Test = Gdn_Condition::TestOne($Condition[0], $Condition[1], $Expr);

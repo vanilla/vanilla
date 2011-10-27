@@ -26,7 +26,7 @@ function WriteRangeTab($Range, $Sender) {
    <input type="hidden" name="VanillaID" class="VanillaID" value="<?php echo $VanillaID ?>" />
    <input type="hidden" name="VanillaVersion" class="VanillaVersion" value="<?php echo $VanillaVersion ?>" />
    <input type="hidden" name="SecurityToken" class="SecurityToken" value="<?php echo $SecurityToken; ?>" />
-   
+
    <ul>
       <?php
       WriteRangeTab(VanillaStatsPlugin::RESOLUTION_DAY, $this);
@@ -49,7 +49,7 @@ function WriteRangeTab($Range, $Sender) {
       'DateStart': '<?php echo $this->BoundaryStart; ?>',
       'DateEnd': '<?php echo $this->BoundaryEnd; ?>',
       'RangeStart': '<?php echo $this->DateStart; ?>',
-      'RangeEnd': '<?php echo $this->DateEnd; ?>' 
+      'RangeEnd': '<?php echo $this->DateEnd; ?>'
    });
 </script>
 <div class="Column Column1 NewsColumn">

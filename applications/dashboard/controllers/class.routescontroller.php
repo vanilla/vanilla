@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * Controlling default routes in Garden's MVC dispatcher system.
  *
@@ -22,7 +22,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class RoutesController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
-   
+
    /**
     * Set menu path. Automatically run on every use.
     *
@@ -47,7 +47,7 @@ class RoutesController extends DashboardController {
       $this->View = 'Edit';
       $this->Edit();
    }
-   
+
    /**
     * Edit a route.
     *
@@ -59,44 +59,44 @@ class RoutesController extends DashboardController {
       $this->Permission('Garden.Routes.Manage');
       $this->AddSideMenu('dashboard/routes');
       $this->Route = Gdn::Router()->GetRoute($RouteIndex);
-      
+
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array('Route', 'Target', 'Type'));
-      
+
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
-            
+
       // If seeing the form for the first time...
       if (!$this->Form->AuthenticatedPostBack()) {
-      
+
          // Apply the route info to the form.
          if ($this->Route !== FALSE)
             $this->Form->SetData(array(
-               'Route'  => $this->Route['Route'], 
-               'Target' => $this->Route['Destination'], 
+               'Route'  => $this->Route['Route'],
+               'Target' => $this->Route['Destination'],
                'Type'   => $this->Route['Type']
             ));
-            
+
       } else {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Route', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Target', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Type', 'Required');
-         
+
          // Validate & Save
          $FormPostValues = $this->Form->FormValues();
-         
+
          // Dunno.
          if ($this->Route['Reserved'])
             $FormPostValues['Route'] = $this->Route['Route'];
-            
+
          if ($ConfigurationModel->Validate($FormPostValues)) {
             $NewRouteName = ArrayValue('Route', $FormPostValues);
 
             if ($this->Route !== FALSE && $NewRouteName != $this->Route['Route'])
                Gdn::Router()->DeleteRoute($this->Route['Route']);
-         
+
             Gdn::Router()->SetRoute(
                $NewRouteName,
                ArrayValue('Target', $FormPostValues),
@@ -109,10 +109,10 @@ class RoutesController extends DashboardController {
             $this->Form->SetValidationResults($ConfigurationModel->ValidationResults());
          }
       }
-      
+
       $this->Render();
    }
-   
+
    /**
     * Remove a route.
     *
@@ -125,17 +125,17 @@ class RoutesController extends DashboardController {
       $this->Permission('Garden.Routes.Manage');
       $this->DeliveryType(DELIVERY_TYPE_BOOL);
       $Session = Gdn::Session();
-      
+
       // If seeing the form for the first time...
       if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey))
          Gdn::Router()->DeleteRoute($RouteIndex);
-      
+
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
          Redirect('dashboard/routes');
 
-      $this->Render();      
+      $this->Render();
    }
-   
+
    /**
     * Show list of current routes.
     *
@@ -147,9 +147,9 @@ class RoutesController extends DashboardController {
       $this->AddSideMenu('dashboard/routes');
       $this->AddJsFile('routes.js');
       $this->Title(T('Routes'));
-      
+
       $this->MyRoutes = Gdn::Router()->Routes;
       $this->Render();
    }
-  
+
 }

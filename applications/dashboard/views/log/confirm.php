@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div>
    <?php
-   
+
    $ItemCount = $this->Data('ItemCount');
 
    if (!$ItemCount) {
@@ -49,8 +49,8 @@
          ' ',
          Anchor(T('No'), '#', array('class' => 'Button ConfirmNo', 'style' => 'display: inline-block; width: 50px')),
          '</div>';
-      
-      
+
+
       echo $this->Form->Close();
    }
    ?>

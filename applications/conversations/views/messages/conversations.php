@@ -41,7 +41,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
 
       if ($Names) {
          echo '<h3 class="Users">';
-         
+
          if ($PhotoUser) {
             echo '<div class="Author Photo">'.UserPhoto($PhotoUser).'</div>';
          }
@@ -54,7 +54,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
       ?>
       <div class="Excerpt"><?php echo Anchor($Message, $Url, 'Message'); ?></div>
       <div class="Meta">
-         <?php 
+         <?php
          $this->FireEvent('BeforeConversationMeta');
 
          echo ' <span class="MItem">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
@@ -62,7 +62,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
          if ($Conversation->CountNewMessages > 0) {
             echo ' <strong class="HasNew"> '.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';
          }
-         
+
          echo ' <span class="MItem">'.Gdn_Format::Date($Conversation->DateLastMessage).'</span> ';
          ?>
       </div>

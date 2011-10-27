@@ -39,20 +39,20 @@ class DashboardHooks implements Gdn_IPlugin {
 
       if ($Session->IsValid() && $EmailKey = Gdn::Session()->GetAttribute('EmailKey')) {
          $NotifyEmailConfirm = TRUE;
-         
+
          // If this user was manually moved out of the confirmation role, get rid of their 'awaiting confirmation' flag
          $ConfirmEmailRole = C('Garden.Registration.ConfirmEmailRole', FALSE);
-         
+
          $UserRoles = array();
          $RoleData = Gdn::UserModel()->GetRoles($Session->UserID);
-         if ($RoleData !== FALSE && $RoleData->NumRows() > 0) 
+         if ($RoleData !== FALSE && $RoleData->NumRows() > 0)
             $UserRoles = ConsolidateArrayValuesByKey($RoleData->Result(DATASET_TYPE_ARRAY), 'RoleID','Name');
-         
+
          if ($ConfirmEmailRole !== FALSE && !array_key_exists($ConfirmEmailRole, $UserRoles)) {
             Gdn::UserModel()->SaveAttribute($Session->UserID, "EmailKey", NULL);
             $NotifyEmailConfirm = FALSE;
          }
-         
+
          if ($NotifyEmailConfirm) {
             $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
             $Sender->InformMessage($Message, '');
@@ -69,7 +69,7 @@ class DashboardHooks implements Gdn_IPlugin {
 //		else if (in_array($Sender->MasterView, array('', 'default')))
 		if (in_array($Sender->MasterView, array('', 'default')))
 			$Exceptions[] = '[NonAdmin]';
-			
+
 		if ($Sender->MasterView != 'admin' && (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache))) {
          $MessageModel = new MessageModel();
          $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
@@ -85,17 +85,17 @@ class DashboardHooks implements Gdn_IPlugin {
 			if ($CountApplicants > 0)
 				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
 		}
-		
+
       if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Gdn_Statistics = Gdn::Factory('Statistics');
          $Gdn_Statistics->Check($Sender);
       }
-		
+
 		// Allow forum embedding
 		if (C('Garden.Embed.Allow'))
 			$Sender->AddJsFile('js/embed_local.js');
    }
-   
+
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
@@ -105,23 +105,23 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage');
 		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Themes.Manage');
-      if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) 
+      if ($ThemeOptionsName = C('Garden.ThemeOptions.Name'))
          $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
 		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
 		// May 18, 2011 - Not quite ready for prime time - mosullivan
 		// $Menu->AddLink('Appearance', T('Embed Vanilla'), 'dashboard/embed', 'Garden.Settings.Manage');
-		
+
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
-			
+
       if (C('Garden.Registration.Manage', TRUE))
 			$Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
-      
+
 		$Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage');
-			
+
       if (C('Garden.Registration.Method') == 'Approval')
          $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Applicants.Manage');
 
@@ -130,11 +130,11 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Moderation', T('Moderation Queue').' <span class="Popin" rel="/dashboard/log/count/moderate"></span>', 'dashboard/log/moderation', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Edit/Delete Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Ban List'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
-		
+
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
-		
+
 		$Menu->AddItem('Reputation', T('Reputation'), FALSE, array('class' => 'Reputation'));
-		
+
 		$Menu->AddItem('Add-ons', T('Addons'), FALSE, array('class' => 'Addons'));
       $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');
       $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Applications.Manage');
@@ -144,7 +144,7 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Site Settings', T('Outgoing Email'), 'dashboard/settings/email', 'Garden.Settings.Manage');
       $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
       $Menu->AddLink('Site Settings', T('Statistics'), 'dashboard/statistics', 'Garden.Settings.Manage');
-		
+
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
 		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
    }

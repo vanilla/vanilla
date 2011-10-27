@@ -28,7 +28,7 @@ class Gdn_Format {
 	* check the current users role and decide if his/her post
 	* should contain rel="nofollow" links.
 	* The default setting is true, meaning all links will contain
-	* the rel="nofollow" attribute.   
+	* the rel="nofollow" attribute.
     */
 	public static $DisplayNoFollow = true;
 
@@ -60,7 +60,7 @@ class Gdn_Format {
 
       $GenderSuffixCode = 'First';
       $GenderSuffixGender = $Activity->ActivityGender;
-      
+
       if ($ViewingUserID == $Activity->ActivityUserID) {
          $ActivityName = $ActivityNameP = T('You');
       } else {
@@ -76,7 +76,7 @@ class Gdn_Format {
          $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
          $GenderSuffixCode = 'Third';
       }
-      
+
       $Gender = T($Activity->ActivityGender == 'm' ? 'his' : 'her');
       $Gender2 = T($Activity->ActivityGender == 'm' ? 'he' : 'she');
       if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID)) {
@@ -153,7 +153,7 @@ class Gdn_Format {
       $FullHeadline = T("Activity.{$Activity->ActivityType}.FullHeadline", T($Activity->FullHeadline));
       $ProfileHeadline = T("Activity.{$Activity->ActivityType}.ProfileHeadline", T($Activity->ProfileHeadline));
       $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' || !$ProfileHeadline ? $FullHeadline : $ProfileHeadline);
-      
+
       return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix, $RegardingWallLink, $ActivityRouteLink);
    }
 
@@ -217,7 +217,7 @@ class Gdn_Format {
       // $String = str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
       // return str_replace(array("'", "\n", "\r"), array('\\\'', '\\\n', '\\\r'), $String);
    }
-   
+
    /**
     * Takes a mixed variable, filters unsafe things, renders BBCode and returns it.
     *
@@ -227,7 +227,7 @@ class Gdn_Format {
    public static function Auto($Mixed) {
       $Formatter = C('Garden.InputFormatter');
       if (!method_exists('Gdn_Format', $Formatter)) return $Mixed;
-      
+
       return Gdn_Format::$Formatter($Mixed);
    }
 
@@ -310,7 +310,7 @@ class Gdn_Format {
    public static function BigNumber($Number, $Format = '') {
       if (!is_numeric($Number))
          return $Number;
-		
+
 		$Negative = FALSE;
 		$WorkingNumber = $Number;
 		if ($Number < 0) {
@@ -329,7 +329,7 @@ class Gdn_Format {
          $Suffix = "K";
       } else
          $Number2 = $Number;
-		
+
 		if ($Negative)
 			$Number2 = $Number2 - ($Number2 * 2);
 
@@ -337,7 +337,7 @@ class Gdn_Format {
          $Result = number_format($Number2, 1);
 			if (substr($Result, -2) == '.0')
 				$Result = substr($Result, 0, -2);
-				
+
 			$Result .= $Suffix;
          if ($Format == 'html')
             $Result = Wrap($Result, 'span', array('title' => number_format($Number)));
@@ -360,7 +360,7 @@ class Gdn_Format {
       $Pow = floor(($Bytes ? log($Bytes) : 0) / log(1024));
       $Pow = min($Pow, count($Units) - 1);
       $Bytes /= pow(1024, $Pow);
-      return round($Bytes, $Precision) . $Units[$Pow]; 
+      return round($Bytes, $Precision) . $Units[$Pow];
    }
 
    /**
@@ -447,12 +447,12 @@ class Gdn_Format {
       // Was a mysqldatetime passed?
       if (!is_numeric($Timestamp))
          $Timestamp = self::ToTimestamp($Timestamp);
-         
+
       if (!$Timestamp)
          $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
 
       $Now = time();
-      
+
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();
       if ($Session->UserID > 0) {
@@ -499,7 +499,7 @@ class Gdn_Format {
       }
       return $Result;
    }
-   
+
    /**
     * Format a string from of "Deleted" content (comment, message, etc).
     *
@@ -509,7 +509,7 @@ class Gdn_Format {
    public static function Deleted($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Deleted');
-      } else {         
+      } else {
          $Formatter = Gdn::Factory('HtmlFormatter');
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
@@ -518,7 +518,7 @@ class Gdn_Format {
          }
       }
    }
-   
+
    /**
     * Takes a mixed variable, formats it for display on the screen, and returns
     * it.
@@ -534,7 +534,7 @@ class Gdn_Format {
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
          $Mixed = self::Mentions($Mixed);
          $Mixed = self::Links($Mixed);
-         
+
          return $Mixed;
       }
    }
@@ -542,7 +542,7 @@ class Gdn_Format {
    /**
     * Formats an email address in a non-scrapable format that Garden can then
     * make linkable using jquery.
-    * 
+    *
     * @param string $Email
     * @return string
     */
@@ -568,14 +568,14 @@ class Gdn_Format {
             return htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
       }
    }
-   
+
    /**
    * Show times relative to now
-   * 
+   *
    * e.g. "4 hours ago"
-   * 
+   *
    * Credit goes to: http://byteinn.com/res/426/Fuzzy_Time_function/
-   * 
+   *
    * @param int optional $Timestamp, otherwise time() is used
    * @return string
    */
@@ -584,7 +584,7 @@ class Gdn_Format {
          $Timestamp = time();
       elseif (!is_numeric($Timestamp))
          $Timestamp = self::ToTimestamp($Timestamp);
-      
+
       $time = $Timestamp;
 
       define('NOW',        time());
@@ -594,7 +594,7 @@ class Gdn_Format {
       define('ONE_WEEK',   ONE_DAY*7);
       define('ONE_MONTH',  ONE_WEEK*4);
       define('ONE_YEAR',   ONE_MONTH*12);
-      
+
       $SecondsAgo = NOW - $time;
 
       // sod = start of day :)
@@ -731,7 +731,7 @@ class Gdn_Format {
                $Result = FixNl2Br($Result);
             }
          }
-         
+
          return $Result;
       }
    }
@@ -811,7 +811,7 @@ class Gdn_Format {
          return $Mixed;
       }
    }
-   
+
    protected static function LinksCallback($Matches) {
       static $Width, $Height, $InTag = 0, $InAnchor = FALSE;
       if (!isset($Width)) {
@@ -843,8 +843,8 @@ class Gdn_Format {
          return $Matches[0];
       $Url = $Matches[4];
 
-      if ((preg_match('`(?:https?|ftp)://www\.youtube\.com\/watch\?v=([^&]+)`', $Url, $Matches) 
-         || preg_match('`(?:https?)://www\.youtu\.be\/([^&]+)`', $Url, $Matches)) 
+      if ((preg_match('`(?:https?|ftp)://www\.youtube\.com\/watch\?v=([^&]+)`', $Url, $Matches)
+         || preg_match('`(?:https?)://www\.youtu\.be\/([^&]+)`', $Url, $Matches))
          && C('Garden.Format.YouTube')) {
          $ID = $Matches[1];
          $Result = <<<EOT
@@ -864,7 +864,7 @@ EOT;
             $Url = $Matches[1];
             $Punc = $Matches[2];
          }
-         
+
          // Get human-readable text from url.
          $Text = $Url;
          if (strpos($Text ,'%') !== FALSE) {
@@ -878,7 +878,7 @@ EOT;
       }
       return $Result;
    }
-   
+
    /** Formats BBCode list items.
     *
     * @param array $Matches
@@ -893,10 +893,10 @@ EOT;
       $Result = '<ul>'.$Result.'</ul>';
       return $Result;
    }
-   
+
    /**
     * Returns embedded video width and height, based on configuration.
-    * 
+    *
     * @return array array(Width, Height)
     */
    protected static function GetEmbedSize() {
@@ -907,14 +907,14 @@ EOT;
          'big'  => array( 853, 505),
          'huge' => array(1280, 745));
       $Size = Gdn::Config('Garden.Format.EmbedSize', 'normal');
-      
+
       // We allow custom sizes <Width>x<Height>
       if (!isset($Sizes[$Size])) {
          if (strpos($Size, 'x')) {
             list($Width, $Height) = explode('x', $Size);
             $Width = intval($Width);
             $Height = intval($Height);
-            
+
             // Dimensions are too small, or 0
             if ($Width<30 or $Height<30) {
                $Size = 'normal';
@@ -938,7 +938,7 @@ EOT;
    public static function Markdown($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Markdown');
-      } else {         
+      } else {
          $Formatter = Gdn::Factory('HtmlFormatter');
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
@@ -951,7 +951,7 @@ EOT;
          }
       }
    }
-   
+
    public static function Mentions($Mixed) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Mentions');
@@ -970,14 +970,14 @@ EOT;
                $Mixed
             );
          }
-         
+
          // This one handles all other mentions
 //         $Mixed = preg_replace(
 //            '/([\s]+)(@([\d\w_]{1,20}))/si',
 //            '\\1'.Anchor('\\2', '/profile/\\3'),
 //            $Mixed
 //         );
-         
+
          // Handle #hashtag searches
 			if(C('Garden.Format.Hashtags')) {
 				$Mixed = preg_replace(
@@ -986,7 +986,7 @@ EOT;
 					$Mixed
 				);
 			}
-         
+
 //         $Mixed = preg_replace(
 //            '/([\s]+)(#([\d\w_]+))/si',
 //            '\\1'.Anchor('\\2', '/search?Search=%23\\3'),
@@ -1106,7 +1106,7 @@ EOT;
    public static function To($Mixed, $FormatMethod) {
       if ($FormatMethod == '')
          return $Mixed;
-      
+
       if (is_string($Mixed)) {
          if (method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
@@ -1144,7 +1144,7 @@ EOT;
    }
 
    /** Format a timestamp or the current time to go into the database.
-    * 
+    *
     * @param int $Timestamp
     * @return string The formatted date and time.
     */
@@ -1190,7 +1190,7 @@ EOT;
       $timespan -= 3600 * ($hours = (int) floor($timespan / 3600));
       $timespan -= 60 * ($minutes = (int) floor($timespan / 60));
       $seconds = $timespan;
-         
+
       $Result = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
       return $Result;
    }
@@ -1238,7 +1238,7 @@ EOT;
     */
    public static function Unserialize($SerializedString) {
 		$Result = $SerializedString;
-		
+
       if(is_string($SerializedString)) {
 			if(substr_compare('a:', $SerializedString, 0, 2) === 0 || substr_compare('O:', $SerializedString, 0, 2) === 0)
 				$Result = unserialize($SerializedString);
@@ -1249,28 +1249,28 @@ EOT;
       }
       return $Result;
    }
-   
+
    public static function VanillaSprintf($PlaceholderString, $ReplaceWith) {
       // Set replacement array inside callback
-      Gdn_Format::VanillaSprintfCallback(NULL, $ReplaceWith);  
-      
+      Gdn_Format::VanillaSprintfCallback(NULL, $ReplaceWith);
+
       $FinalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', array('Gdn_Format', 'VanillaSprintfCallback'), $PlaceholderString);
-      
+
       // Cleanup replacement list
       Gdn_Format::VanillaSprintfCallback(NULL, array());
-      
+
       return $FinalString;
    }
-   
+
    protected static function VanillaSprintfCallback($Match, $InternalReplacementList = FALSE) {
       static $InternalReplacement = array();
-      
+
       if (is_array($InternalReplacementList)) {
          $InternalReplacement = $InternalReplacementList;
       } else {
          $MatchStr = $Match[2];
          $Format = (count($SplitMatch = explode(':',$MatchStr)) > 1) ? $SplitMatch[1] : FALSE;
-         
+
          if (array_key_exists($MatchStr, $InternalReplacement)) {
             if ($Format) {
                // TODO: Apply format
@@ -1281,5 +1281,5 @@ EOT;
          return $Match[1];
       }
    }
-   
+
 }

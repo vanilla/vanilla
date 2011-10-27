@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Conversations
  */
- 
+
 /**
  * Handles hooks into Dashboard and Vanilla.
  *
@@ -20,12 +20,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Conversations
  */
 class ConversationsHooks implements Gdn_IPlugin {
-   
+
    public function UserModel_SessionQuery_Handler($Sender) {
       // Add some extra fields to the session query
       //$Sender->SQL->Select('u.CountUnreadConversations');
    }
-   
+
    /**
     * Remove data when deleting a user.
     *
@@ -36,7 +36,7 @@ class ConversationsHooks implements Gdn_IPlugin {
       $UserID = GetValue('UserID', $Sender->EventArguments);
       $Options = GetValue('Options', $Sender->EventArguments, array());
       $Options = is_array($Options) ? $Options : array();
-      
+
       $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
       if ($DeleteMethod == 'delete') {
          $Sender->SQL->Delete('Conversation', array('InsertUserID' => $UserID));
@@ -58,7 +58,7 @@ class ConversationsHooks implements Gdn_IPlugin {
          ->Where('UserID', $UserID)
          ->Put();
    }
-   
+
    /**
     * Add 'Inbox' and 'Send Message' to profile menu.
     *
@@ -79,7 +79,7 @@ class ConversationsHooks implements Gdn_IPlugin {
          $Sender->EventArguments['SideMenu'] = $SideMenu;
       }
    }
-   
+
    /**
     * Additional options for the Preferences screen.
     *
@@ -92,7 +92,7 @@ class ConversationsHooks implements Gdn_IPlugin {
       $Sender->Preferences['Notifications']['Popup.ConversationMessage'] = T('Notify me of private messages.');
       $Sender->Preferences['Notifications']['Popup.AddedToConversation'] = T('Notify me when I am added to private conversations.');
    }
-   
+
    /**
     * Add 'Inbox' to global menu.
     *
@@ -107,11 +107,11 @@ class ConversationsHooks implements Gdn_IPlugin {
          $CountUnreadConversations = $Session->User->CountUnreadConversations;
          if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
             $Inbox .= ' <span>'.$CountUnreadConversations.'</span>';
-            
+
          $Sender->Menu->AddLink('Conversations', $Inbox, '/messages/all', FALSE, array('Standard' => TRUE));
       }
    }
-   
+
    /**
     * Load some information into the BuzzData collection (for Dashboard report).
     *
@@ -138,8 +138,8 @@ class ConversationsHooks implements Gdn_IPlugin {
       $Sender->BuzzData[T('New messages in the last day')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day')))));
       // Number of New Messages in the last week
       $Sender->BuzzData[T('New messages in the last week')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week')))));
-   }   
-   
+   }
+
    /**
     * Database & config changes to be done upon enable.
     *

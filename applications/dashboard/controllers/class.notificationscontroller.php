@@ -33,10 +33,10 @@ class NotificationsController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $this->AddModule('GuestModule');
       parent::Initialize();
-   }   
-   
+   }
+
    /**
-    * Adds inform messages to response for inclusion in pages dynamically. 
+    * Adds inform messages to response for inclusion in pages dynamically.
     *
     * @since 2.0.18
     * @access public
@@ -44,18 +44,18 @@ class NotificationsController extends Gdn_Controller {
    public function Inform() {
       $this->DeliveryType(DELIVERY_TYPE_BOOL);
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      
+
       // Retrieve all notifications and inform them.
       NotificationsController::InformNotifications($this);
-      
+
       $this->Render();
    }
-   
+
    /**
     * Grabs all new notifications and adds them to the sender's inform queue.
     *
     * This method gets called by dashboard's hooks file to display new
-    * notifications on every pageload. 
+    * notifications on every pageload.
     *
     * @since 2.0.18
     * @access public
@@ -66,15 +66,15 @@ class NotificationsController extends Gdn_Controller {
       $Session = Gdn::Session();
       if (!$Session->IsValid())
          return;
-		
+
       // Set the user's DateLastInform attribute to now. This value can be used
       // by addons to determine if their inform messages have already been sent.
       $InformLastActivityID = $Session->GetAttribute('Notifications.InformLastActivityID', 0);
-      
+
       // Allow pluggability
       $Sender->EventArguments['InformLastActivityID'] = &$InformLastActivityID;
       $Sender->FireEvent('BeforeInformNotifications');
-      
+
 		// Retrieve default preferences
 		$Preferences = array();
 		$DefaultPreferences = C('Preferences.Popup', array());
@@ -82,7 +82,7 @@ class NotificationsController extends Gdn_Controller {
 			if ($Val)
 				$Preferences[] = $Preference;
 		}
-		
+
 //		$User = Gdn::Database()->SQL()->Select('Preferences')->From('User')->Where('UserID', $Session->UserID)->Get()->FirstRow();
 //      if ($User) {
 //         $PrefData = Gdn_Format::Unserialize($User->Preferences);
@@ -98,7 +98,7 @@ class NotificationsController extends Gdn_Controller {
 //				}
 //			}
 //		}
-		
+
 //		if (count($Preferences) > 0) {
 			// Grab the activity type ids for the desired notification prefs.
 			$ActivityTypeIDs = array();
@@ -110,20 +110,20 @@ class NotificationsController extends Gdn_Controller {
 //               $ActivityTypes[] = $ActivityType['Name'];
             }
 			}
-			
+
 			if (count($ActivityTypeIDs) > 0) {
 				// Retrieve new notifications
 				$ActivityModel = new ActivityModel();
 				$NotificationData = $ActivityModel->GetNotificationsSince($Session->UserID, $InformLastActivityID, $ActivityTypeIDs);
 				$InformLastActivityID = -1;
-      
+
 				// Add (no more than 5) notifications to the inform stack
 				foreach ($NotificationData->Result() as $Notification) {
 					// Make sure the user wants to be notified of this
    //					if (!in_array($Notification->ActivityType, $Preferences)) {
    //                  continue;
    //               }
-               
+
                $UserPhoto = UserPhoto(UserBuilder($Notification, 'Activity'), 'Icon');
 
                $ActivityType = explode(' ', $Notification->ActivityType);

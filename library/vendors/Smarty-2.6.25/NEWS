@@ -31,7 +31,7 @@ Version 2.6.20 (Feb 15th, 2008)
   mohrt)
 - fix /e tag checking when using arrays with regex_replace
   (mohrt)
-- fix that function results can be used with condition like "is even" in 
+- fix that function results can be used with condition like "is even" in
   {if} tags (U.Tews)
 - fix handling of non-empty <pre>-tags and empty <textarea>- and
   <script>-tags (Spuerhund, messju)
@@ -46,7 +46,7 @@ Version 2.6.19 (Feb 11th, 2008)
   name (danilo)
 - fix calling registered objects' methods with an empty argument list
   (marcello, messju)
- 
+
 Version 2.6.18 (Mar 7th, 2007)
 ------------------------------
 
@@ -66,7 +66,7 @@ Version 2.6.17 (Mar 5th, 2007)
   (danilo, boots)
 - update smarty_core_write_file() and smarty_modifier_date_format() to better
   recognize Windows (boots, danilo)
-- emulate %h, %n, %r, %R, %t in the date_format modifier on Windows 
+- emulate %h, %n, %r, %R, %t in the date_format modifier on Windows
   (danilo, boots)
 
 Version 2.6.16 (Dec 1st, 2006)
@@ -79,10 +79,10 @@ Version 2.6.15 (Nov 30th, 2006)
 -------------------------------
 
 - change file writing semantics in smarty_core_write_file() to unlink() only
-  when rename() fails or a Windows system is detected (c960657, boots) 
+  when rename() fails or a Windows system is detected (c960657, boots)
 - update debug.tpl to xhtml 1.1 compliance, fix javascript escaping in debug
   output and apply a Smarty based color scheme (cybot, boots)
-- enhance reporting precision of debug_print_var modifier (cybot, boots) 
+- enhance reporting precision of debug_print_var modifier (cybot, boots)
 - make html_select_date work consistently with 0000-00-00 00:00:00 and
   0000-00-00 inputs (cybot, boots)
 - fix wrong handling of insert's name attribute. (messju)
@@ -92,7 +92,7 @@ Version 2.6.15 (Nov 30th, 2006)
 - fixed ordering of replacements in trimwhitespace output filter (Getty, boots)
 - update mailto function plugin to work around a firefox/thunderbird
   escaping bug (elijahlofgren, boots)
-- emulate %l in the date_format modifier on windows (boots) 
+- emulate %l in the date_format modifier on windows (boots)
 - fix handling of apostrophes in capitalize modifier (Alec Smecher, boots)
 
 Version 2.6.14 (May 28th, 2006)

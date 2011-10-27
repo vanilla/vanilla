@@ -6,8 +6,8 @@ ul.token-input-list {
     font-size:15px;
     margin:0 !important;
     padding:3px;
-    overflow: hidden; 
-    height: auto !important; 
+    overflow: hidden;
+    height: auto !important;
     height: 1%;
     width: 100%;
     cursor: text;
@@ -30,8 +30,8 @@ ul.token-input-list li input {
     margin: 2px 0;
 }
 li.token-input-token {
-    overflow: hidden; 
-    height: auto !important; 
+    overflow: hidden;
+    height: auto !important;
     height: 1%;
     margin: 3px;
     padding: 1px 3px;

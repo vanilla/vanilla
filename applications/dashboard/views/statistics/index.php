@@ -6,7 +6,7 @@
       background: #dbf3fc;
       color: #222222;
    }
-   
+
    body .NotifyMessage strong {
       color: #252525;
    }
@@ -32,7 +32,7 @@ echo $this->Form->Errors();
 <div class="Info NotifyMessage">
    <?php
       echo "<strong>".T("Last time your forum communicated with the statistics server it received the following message:")."</strong>";
-      echo "<p><i>".Gdn_Format::Html($this->Data('NotifyMessage'))."</i></p>"; 
+      echo "<p><i>".Gdn_Format::Html($this->Data('NotifyMessage'))."</i></p>";
    ?>
 </div>
 <?php } ?>

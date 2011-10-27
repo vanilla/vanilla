@@ -9,25 +9,25 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class MessageModel extends Gdn_Model {
-   
+
    private $_SpecialLocations = array('[Base]', '[Admin]', '[NonAdmin]');
-   
+
    protected static $Messages;
-   
+
    /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
       parent::__construct('Message');
-      
-      
+
+
    }
-   
+
    public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
       parent::Delete($Where, $Limit, $ResetData);
       self::Messages(NULL);
    }
-   
+
    /**
     * Returns a single message object for the specified id or FALSE if not found.
     *
@@ -39,7 +39,7 @@ class MessageModel extends Gdn_Model {
       else
          return parent::GetID($MessageID);
    }
-   
+
    public function DefineLocation($Message) {
       if (is_object($Message)) {
          if (in_array($Message->Controller, $this->_SpecialLocations)) {
@@ -52,17 +52,17 @@ class MessageModel extends Gdn_Model {
       }
       return $Message;
    }
-   
+
    public function GetMessagesForLocation($Location, $Exceptions = array('[Base]')) {
       $Session = Gdn::Session();
       $Prefs = $Session->GetPreference('DismissedMessages', array());
       if (count($Prefs) == 0)
          $Prefs[] = 0;
-      
+
       $Exceptions = array_map('strtolower', $Exceptions);
-         
+
       list($Application, $Controller, $Method) = explode('/', strtolower($Location));
-      
+
       if (Gdn::Cache()->ActiveEnabled()) {
          // Get the messages from the cache.
          $Messages = self::Messages();
@@ -82,7 +82,7 @@ class MessageModel extends Gdn_Model {
          }
          return $Result;
       }
-      
+
       return $this->SQL
          ->Select()
          ->From('Message')
@@ -99,7 +99,7 @@ class MessageModel extends Gdn_Model {
          ->OrderBy('Sort', 'asc')
          ->Get()->ResultArray();
    }
-   
+
    /**
     * Returns a distinct array of controllers that have enabled messages.
     */
@@ -110,7 +110,7 @@ class MessageModel extends Gdn_Model {
          ->Where('Enabled', '1')
          ->GroupBy('Application,Controller,Method')
          ->Get();
-         
+
       $Locations = array();
       foreach ($Data as $Row) {
          if (in_array($Row->Controller, $this->_SpecialLocations)) {
@@ -124,13 +124,13 @@ class MessageModel extends Gdn_Model {
       }
       return $Locations;
    }
-   
+
    public static function Messages($ID = FALSE) {
       if ($ID === NULL) {
          Gdn::Cache()->Remove('Messages');
          return;
       }
-      
+
       $Messages = Gdn::Cache()->Get('Messages');
       if ($Messages === Gdn_Cache::CACHEOP_FAILURE) {
          $Messages = Gdn::SQL()->Get('Message', 'Sort')->ResultArray();
@@ -142,7 +142,7 @@ class MessageModel extends Gdn_Model {
       else
          return GetValue($ID, $Messages);
    }
-   
+
    public function Save($FormPostValues, $Settings = FALSE) {
       // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
       $Location = ArrayValue('Location', $FormPostValues, '');
@@ -163,7 +163,7 @@ class MessageModel extends Gdn_Model {
 
       return parent::Save($FormPostValues, $Settings);
    }
-   
+
    public function SetMessageCache() {
       // Retrieve an array of all controllers that have enabled messages associated
       SaveToConfig('Garden.Messages.Cache', $this->GetEnabledLocations());

@@ -10,13 +10,13 @@ foreach ($this->MessageData->Result() as $Message) {
    $Class .= $Alt ? ' Alt' : '';
    if ($this->Conversation->DateLastViewed < $Message->DateInserted)
       $Class .= ' New';
-   
+
    if ($Message->InsertUserID == $Session->UserID)
       $Class .= ' Mine';
-      
+
    if ($Message->InsertPhoto != '')
       $Class .= ' HasPhoto';
-      
+
    $Format = empty($Message->Format) ? 'Display' : $Message->Format;
    $Author = UserBuilder($Message, 'Insert');
 

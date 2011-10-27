@@ -1327,7 +1327,7 @@ class PHPMailer {
   public function TextLine($value) {
     return $value . $this->LE;
   }
-  
+
   public function ThrowExceptions($NewValue = NULL) {
      if ($NewValue !== NULL)
         $this->exceptions = $NewValue;

@@ -6,7 +6,7 @@
  * modifications to preserve some comments (see below). Also, rather than using
  * stdin/stdout, JSMin::minify() accepts a string as input and returns another
  * string as output.
- * 
+ *
  * Comments containing IE conditional compilation are preserved, as are multi-line
  * comments that begin with "/*!" (for documentation purposes). In the latter case
  * newlines are inserted around the comment to enhance readability.
@@ -56,7 +56,7 @@ class JSMin {
     const ACTION_KEEP_A     = 1;
     const ACTION_DELETE_A   = 2;
     const ACTION_DELETE_A_B = 3;
-    
+
     protected $a           = "\n";
     protected $b           = '';
     protected $input       = '';
@@ -64,7 +64,7 @@ class JSMin {
     protected $inputLength = 0;
     protected $lookAhead   = null;
     protected $output      = '';
-    
+
     /**
      * Minify Javascript
      *
@@ -76,7 +76,7 @@ class JSMin {
         $jsmin = new JSMin($js);
         return $jsmin->min();
     }
-    
+
     /**
      * Setup process
      */
@@ -85,7 +85,7 @@ class JSMin {
         $this->input       = str_replace("\r\n", "\n", $input);
         $this->inputLength = strlen($this->input);
     }
-    
+
     /**
      * Perform minification, return result
      */
@@ -95,7 +95,7 @@ class JSMin {
             return $this->output;
         }
         $this->action(self::ACTION_DELETE_A_B);
-        
+
         while ($this->a !== null) {
             // determine next command
             $command = self::ACTION_KEEP_A; // default
@@ -106,13 +106,13 @@ class JSMin {
             } elseif ($this->a === "\n") {
                 if ($this->b === ' ') {
                     $command = self::ACTION_DELETE_A_B;
-                } elseif (false === strpos('{[(+-', $this->b) 
+                } elseif (false === strpos('{[(+-', $this->b)
                           && ! $this->isAlphaNum($this->b)) {
                     $command = self::ACTION_DELETE_A;
                 }
             } elseif (! $this->isAlphaNum($this->a)) {
                 if ($this->b === ' '
-                    || ($this->b === "\n" 
+                    || ($this->b === "\n"
                         && (false === strpos('}])+-"\'', $this->a)))) {
                     $command = self::ACTION_DELETE_A_B;
                 }
@@ -122,7 +122,7 @@ class JSMin {
         $this->output = trim($this->output);
         return $this->output;
     }
-    
+
     /**
      * ACTION_KEEP_A = Output A. Copy B to A. Get the next B.
      * ACTION_DELETE_A = Copy B to A. Get the next B.
@@ -182,7 +182,7 @@ class JSMin {
             // end case ACTION_DELETE_A_B
         }
     }
-    
+
     protected function isRegexpLiteral()
     {
         if (false !== strpos("\n{;(,=:[!&|?", $this->a)) { // we aren't dividing
@@ -207,7 +207,7 @@ class JSMin {
         }
         return false;
     }
-    
+
     /**
      * Get next char. Convert ctrl char to space.
      */
@@ -231,7 +231,7 @@ class JSMin {
         }
         return $c;
     }
-    
+
     /**
      * Get next char. If is ctrl character, translate to a space or newline.
      */
@@ -240,7 +240,7 @@ class JSMin {
         $this->lookAhead = $this->get();
         return $this->lookAhead;
     }
-    
+
     /**
      * Is $c a letter, digit, underscore, dollar sign, escape, or non-ASCII?
      */
@@ -248,7 +248,7 @@ class JSMin {
     {
         return (preg_match('/^[0-9a-zA-Z_\\$\\\\]$/', $c) || ord($c) > 126);
     }
-    
+
     protected function singleLineComment()
     {
         $comment = '';
@@ -264,7 +264,7 @@ class JSMin {
             }
         }
     }
-    
+
     protected function multipleLineComment()
     {
         $this->get();
@@ -290,7 +290,7 @@ class JSMin {
             $comment .= $get;
         }
     }
-    
+
     /**
      * Get the next character, skipping over comments.
      * Some comments may be preserved.

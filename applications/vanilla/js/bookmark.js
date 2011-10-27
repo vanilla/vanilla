@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
-   
-   // Handle bookmark button clicks   
+
+   // Handle bookmark button clicks
    $('a.Bookmark').live('click', function() {
       var btn = this;
       var parent = $(this).parents('.Bookmarks');
@@ -35,7 +35,7 @@ jQuery(document).ready(function($) {
                   $(btn).removeClass('Bookmarked');
 
                $('.CountBookmarks', $(btn)).text(json.CountDiscussionBookmarks);
-                  
+
             }
             $('a.MyBookmarks').html(json.MenuText+'<span>'+json.CountBookmarks+'</span>');
             // Add/remove the bookmark from the side menu.
@@ -43,6 +43,6 @@ jQuery(document).ready(function($) {
          }
       });
       return false;
-   });   
+   });
 
 });

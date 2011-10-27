@@ -201,7 +201,7 @@
         {
             // these tests motivated by a bug in which strings that end
             // with backslashes followed by quotes were incorrectly decoded.
-            
+
             foreach(array('\\"', '\\\\"', '\\"\\"', '\\""\\""', '\\\\"\\\\"') as $v) {
                 $this->assertEquals(array($v), $this->json_l->decode($this->json_l->encode(array($v))));
                 $this->assertEquals(array('a' => $v), $this->json_l->decode($this->json_l->encode(array('a' => $v))));

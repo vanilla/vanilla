@@ -28,7 +28,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
                ++$i;
                if ($Count == $i)
                   $CssClass .= ' Last';
-               
+
                $CssClass = trim($CssClass);
                ?>
                <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
@@ -36,7 +36,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
                      $MethodName = $Method;
                      if ($MethodName == 'Captcha')
                         $MethodName = 'Basic';
-                        
+
                      echo $this->Form->Radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
                   ?></th>
                   <td class="Alt"><?php echo T($Description); ?></td>
@@ -89,7 +89,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
             'When you use registration by invitation users will have a link called <a href="%s" class="Popup">My Invitations</a> on their profile pages.'),
             Url('/dashboard/profile/invitations')),
             '<br /><br />';
-         
+
          echo T('Choose who can send out invitations to new members:');
       ?>
       </div>
@@ -111,11 +111,11 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
                ++$i;
                if ($Count == $i)
                   $CssClass .= ' Last';
-               
+
                $CssClass = trim($CssClass);
                $CurrentValue = ArrayValue($Role['RoleID'], $this->ExistingRoleInvitations, FALSE);
                ?>
-               <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>               
+               <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
                   <th><?php echo $Role['Name']; ?></th>
                   <td class="Alt">
                      <?php

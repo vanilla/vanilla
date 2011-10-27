@@ -12,7 +12,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       $CssClass .= ' HasPhoto';
    if (in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate')))
       $CssClass .= ' Condensed';
-      
+
    $Title = '';
    $Excerpt = $Activity->Story;
    if (!in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate'))) {
@@ -55,7 +55,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
          <?php
          if ($Activity->AllowComments == '1' && $Session->CheckPermission('Garden.Profiles.Edit'))
             echo '<span class="MItem AddComment">'.Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
-         
+
          $Sender->FireEvent('AfterMeta');
          ?>
       </div>
@@ -69,7 +69,7 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
             if (is_object($Comment) && $Comment->CommentActivityID == $Activity->ActivityID) {
                if ($FoundComments == FALSE)
                   echo '<ul class="DataList ActivityComments">';
-                  
+
                $FoundComments = TRUE;
                WriteActivityComment($Comment, $Sender, $Session);
             }
@@ -104,7 +104,7 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
    $CssClass = 'Item ActivityComment Condensed '.$Comment->ActivityType;
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
-   
+
 ?>
 <li id="Activity_<?php echo $Comment->ActivityID; ?>" class="<?php echo $CssClass; ?>">
    <?php if ($PhotoAnchor != '') { ?>

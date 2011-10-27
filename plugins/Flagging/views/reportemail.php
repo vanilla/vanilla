@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<?php 
+<?php
 $Flag = $this->Data['Plugin.Flagging.Data'];
 $Report = $this->Data['Plugin.Flagging.Report'];
 $DiscussionID = $this->Data['Plugin.Flagging.DiscussionID'];

@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * Managing core Dashboard settings.
  *
@@ -22,16 +22,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class SettingsController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form', 'Database');
-   
+
    /** @var string */
    public $ModuleSortContainer = 'Dashboard';
 
    /** @var object Gdn_Form */
    public $Form;
-   
+
    /** @var array List of permissions that should all have access to main dashboard. */
    public $RequiredAdminPermissions = array();
-   
+
    /**
     * Hightlight menu path. Automatically run on every use.
     *
@@ -43,7 +43,7 @@ class SettingsController extends DashboardController {
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
-   
+
    /**
     * Application management screen.
     *
@@ -55,25 +55,25 @@ class SettingsController extends DashboardController {
     */
    public function Applications($Filter = '', $ApplicationName = '', $TransientKey = '') {
       $this->Permission('Garden.Applications.Manage');
-      
+
       // Page setup
       $this->AddJsFile('addons.js');
       $this->AddJsFile('applications.js');
       $this->Title(T('Applications'));
       $this->AddSideMenu('dashboard/settings/applications');
-      
+
       // Validate & set parameters
       $Session = Gdn::Session();
       $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $ApplicationName : '';
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $this->Filter = $Filter;
-      $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();      
-      
+      $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
+
       $ApplicationManager = new Gdn_ApplicationManager();
       $this->AvailableApplications = $ApplicationManager->AvailableVisibleApplications();
       $this->EnabledApplications = $ApplicationManager->EnabledVisibleApplications();
-      
+
       // Loop through all of the available visible apps and mark them if they have an update available
       // Retrieve the list of apps that require updates from the config file
       $RequiredUpdates = Gdn_Format::Unserialize(C('Garden.RequiredUpdates', ''));
@@ -81,7 +81,7 @@ class SettingsController extends DashboardController {
          foreach ($RequiredUpdates as $UpdateInfo) {
             if (is_object($UpdateInfo))
                $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
+
             $NewVersion = ArrayValue('Version', $UpdateInfo, '');
             $Name = ArrayValue('Name', $UpdateInfo, '');
             $Type = ArrayValue('Type', $UpdateInfo, '');
@@ -97,7 +97,7 @@ class SettingsController extends DashboardController {
             }
          }
       }
-      
+
       if ($ApplicationName != '') {
          $this->EventArguments['ApplicationName'] = $ApplicationName;
          if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
@@ -120,11 +120,11 @@ class SettingsController extends DashboardController {
                $ApplicationManager->EnableApplication($ApplicationName, $Validation);
                Gdn_LibraryMap::ClearCache();
                $this->Form->SetValidationResults($Validation->Results());
-               
+
                $this->EventArguments['Validation'] = $Validation;
                $this->FireEvent('AfterEnableApplication');
             }
-            
+
          }
          if ($this->Form->ErrorCount() == 0)
             Redirect('settings/applications/'.$this->Filter);
@@ -140,7 +140,7 @@ class SettingsController extends DashboardController {
     * @param array $Ban Data about the ban.
     *    Valid keys are BanType and BanValue. BanValue is what is to be banned.
     *    Valid values for BanType are email, ipaddress or name.
-    */ 
+    */
    protected function _BanFilter($Ban) {
       $BanModel = $this->_BanModel;
       $BanWhere = $BanModel->BanWhere($Ban);
@@ -149,7 +149,7 @@ class SettingsController extends DashboardController {
             return "$Name $Value";
       }
    }
-   
+
    /**
     * Banner management screen.
     *
@@ -160,11 +160,11 @@ class SettingsController extends DashboardController {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/settings/banner');
       $this->Title(T('Banner'));
-      
+
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array('Garden.Title'));
-      
+
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
 
@@ -177,11 +177,11 @@ class SettingsController extends DashboardController {
             $Logo = substr($Logo, strlen('uploads/'));
          $this->SetData('Logo', $Logo);
       }
-      
+
       // Get the current favicon.
       $Favicon = C('Garden.FavIcon');
       $this->SetData('Favicon', $Favicon);
-      
+
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
@@ -199,11 +199,11 @@ class SettingsController extends DashboardController {
                   // Generate the target image name
                   $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
                   $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
-                  
+
                   // Delete any previously uploaded images.
                   if ($Logo)
                      $Upload->Delete($Logo);
-                  
+
                   // Save the uploaded image
                   $Parts = $Upload->SaveAs(
                      $TmpImage,
@@ -213,7 +213,7 @@ class SettingsController extends DashboardController {
                   $SaveData['Garden.Logo'] = $ImageBaseName;
                   $this->SetData('Logo', $ImageBaseName);
                }
-               
+
                $ImgUpload = new Gdn_UploadImage();
                $TmpFavicon = $ImgUpload->ValidateUpload('Favicon', FALSE);
                if ($TmpFavicon) {
@@ -233,16 +233,16 @@ class SettingsController extends DashboardController {
             // If there were no errors, save the path to the logo in the config
             if ($this->Form->ErrorCount() == 0) {
                SaveToConfig($SaveData);
-               
+
             }
-            
+
             $this->InformMessage(T("Your settings have been saved."));
          }
       }
-      
-      $this->Render();      
+
+      $this->Render();
    }
-   
+
    /**
     * Manage user bans (add, edit, delete, list).
     *
@@ -255,7 +255,7 @@ class SettingsController extends DashboardController {
     */
    public function Bans($Action = '', $Search = '', $Page = '', $ID = '') {
       $this->Permission('Garden.Moderation.Manage');
-      
+
       // Page setup
       $this->AddSideMenu();
       $this->Title(T('Ban List'));
@@ -299,7 +299,7 @@ class SettingsController extends DashboardController {
 
       $this->Render();
    }
-   
+
    /**
     * Homepage management screen.
     *
@@ -308,11 +308,11 @@ class SettingsController extends DashboardController {
     */
    public function Homepage() {
       $this->Permission('Garden.Settings.Manage');
-      
+
       // Page setup
       $this->AddSideMenu('dashboard/settings/homepage');
       $this->Title(T('Homepage'));
-      
+
       $CurrentRoute = GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), '');
       $this->SetData('CurrentTarget', $CurrentRoute);
       if (!$this->Form->AuthenticatedPostBack()) {
@@ -326,9 +326,9 @@ class SettingsController extends DashboardController {
          $this->SetData('CurrentTarget', $NewRoute);
          $this->InformMessage(T("The homepage was saved successfully."));
       }
-      
-      $this->Render();      
-   }      
+
+      $this->Render();
+   }
 
    /**
     * Outgoing Email management screen.
@@ -341,7 +341,7 @@ class SettingsController extends DashboardController {
       $this->AddSideMenu('dashboard/settings/email');
       $this->AddJsFile('email.js');
       $this->Title(T('Outgoing Email'));
-      
+
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
@@ -354,15 +354,15 @@ class SettingsController extends DashboardController {
          'Garden.Email.SmtpPort',
          'Garden.Email.SmtpSecurity'
       ));
-      
+
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
-      
+
       // Load the locales for the locale dropdown
       $Locale = Gdn::Locale();
       $AvailableLocales = $Locale->GetAvailableLocaleSources();
       $this->LocaleData = ArrayCombine($AvailableLocales, $AvailableLocales);
-      
+
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
@@ -372,7 +372,7 @@ class SettingsController extends DashboardController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
-         
+
          // If changing locale, redefine locale sources:
          /*
          $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
@@ -382,20 +382,20 @@ class SettingsController extends DashboardController {
             $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
          }
          */
-         
+
          if ($this->Form->Save() !== FALSE)
             $this->InformMessage(T("Your settings have been saved."));
 
       }
-      
-      $this->Render();      
-   }      
+
+      $this->Render();
+   }
 
    /**
     * Main dashboard.
     *
-    * You can override this method with a method in your plugin named 
-    * SettingsController_Index_Create. You can hook into it with methods named 
+    * You can override this method with a method in your plugin named
+    * SettingsController_Index_Create. You can hook into it with methods named
     * SettingsController_Index_Before and SettingsController_Index_After.
     *
     * @since 2.0.0
@@ -404,7 +404,7 @@ class SettingsController extends DashboardController {
    public function xIndex() {
       $this->AddJsFile('settings.js');
       $this->Title(T('Dashboard'));
-         
+
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
@@ -422,7 +422,7 @@ class SettingsController extends DashboardController {
       $this->AddSideMenu('dashboard/settings');
 
       $UserModel = Gdn::UserModel();
-      
+
       // Load some data to display on the dashboard
       $this->BuzzData = array();
       // Get the number of users in the database
@@ -437,24 +437,24 @@ class SettingsController extends DashboardController {
       $this->BuzzData[T('New users in the last week')] = number_format(
          $UserModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week'))))
       );
-      
+
       // Get recently active users
       $this->ActiveUserData = $UserModel->GetActiveUsers(5);
-      
+
       // Check for updates
       $this->AddUpdateCheck();
-      
+
       // Fire an event so other applications can add some data to be displayed
       $this->FireEvent('DashboardData');
-      
+
       $this->Render();
    }
-   
+
    /**
     * Adds information to the definition list that causes the app to "phone
-    * home" and see if there are upgrades available. 
+    * home" and see if there are upgrades available.
     *
-    * Currently added to the dashboard only. Nothing renders with this method. 
+    * Currently added to the dashboard only. Nothing renders with this method.
     * It is public so it can be added by plugins.
     */
    public function AddUpdateCheck() {
@@ -471,7 +471,7 @@ class SettingsController extends DashboardController {
          || $UpdateCheckDate < strtotime("-1 day") // was not done within the last day
       ) {
          $UpdateData = array();
-         
+
          // Grab all of the plugins & versions
          $Plugins = Gdn::PluginManager()->AvailablePlugins();
          foreach ($Plugins as $Plugin => $Info) {
@@ -484,7 +484,7 @@ class SettingsController extends DashboardController {
                   'Type' => 'Plugin'
                );
          }
-         
+
          // Grab all of the applications & versions
          $ApplicationManager = Gdn::Factory('ApplicationManager');
          $Applications = $ApplicationManager->AvailableApplications();
@@ -517,8 +517,8 @@ class SettingsController extends DashboardController {
          // will pick it up and ping the VanillaForums.org server with this info).
          $this->AddDefinition('UpdateChecks', Gdn_Format::Serialize($UpdateData));
       }
-   }   
-   
+   }
+
    /**
     * Manage list of locales.
     *
@@ -591,18 +591,18 @@ class SettingsController extends DashboardController {
 
             if (GetValue($Key, $EnabledLocales) == $DefaultLocale)
                $LocaleFound = TRUE;
-               
+
          }
          $this->SetData('DefaultLocaleWarning', !$LocaleFound);
          $this->SetData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
       }
-      
+
       $this->SetData('AvailableLocales', $AvailableLocales);
       $this->SetData('EnabledLocales', $EnabledLocales);
       $this->SetData('Locales', $LocaleModel->AvailableLocales());
       $this->Render();
    }
-   
+
    /**
     * Manage list of plugins.
     *
@@ -614,25 +614,25 @@ class SettingsController extends DashboardController {
     */
    public function Plugins($Filter = '', $PluginName = '', $TransientKey = '') {
       $this->Permission('Garden.Plugins.Manage');
-      
+
       // Page setup
       $this->AddJsFile('addons.js');
       $this->Title(T('Plugins'));
       $this->AddSideMenu('dashboard/settings/plugins');
-      
+
       // Validate and set properties
       $Session = Gdn::Session();
       $PluginName = $Session->ValidateTransientKey($TransientKey) ? $PluginName : '';
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $this->Filter = $Filter;
-      
+
       // Retrieve all available plugins from the plugins directory
       $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins();
       self::SortAddons($this->EnabledPlugins);
       $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
       self::SortAddons($this->AvailablePlugins);
-      
+
       // Loop through all of the available plugins and mark them if they have an update available
       // Retrieve the list of plugins that require updates from the config file
       $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
@@ -640,7 +640,7 @@ class SettingsController extends DashboardController {
          foreach ($RequiredUpdates as $UpdateInfo) {
             if (is_object($UpdateInfo))
                $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
+
             $NewVersion = ArrayValue('Version', $UpdateInfo, '');
             $Name = ArrayValue('Name', $UpdateInfo, '');
             $Type = ArrayValue('Type', $UpdateInfo, '');
@@ -656,7 +656,7 @@ class SettingsController extends DashboardController {
             }
          }
       }
-      
+
       if ($PluginName != '') {
          try {
             $this->EventArguments['PluginName'] = $PluginName;
@@ -670,7 +670,7 @@ class SettingsController extends DashboardController {
                   $this->Form->SetValidationResults($Validation->Results());
                else
                   Gdn_LibraryMap::ClearCache();
-               
+
                $this->EventArguments['Validation'] = $Validation;
                $this->FireEvent('AfterEnablePlugin');
             }
@@ -682,7 +682,7 @@ class SettingsController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    /**
     * Configuration of registration settings.
     *
@@ -695,10 +695,10 @@ class SettingsController extends DashboardController {
 		if(!C('Garden.Registration.Manage', TRUE))
 			return Gdn::Dispatcher()->Dispatch('Default404');
       $this->AddSideMenu('dashboard/settings/registration');
-      
+
       $this->AddJsFile('registration.js');
       $this->Title(T('Registration'));
-      
+
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -710,28 +710,28 @@ class SettingsController extends DashboardController {
          'Garden.Registration.ConfirmEmail',
          'Garden.Registration.ConfirmEmailRole'
       ));
-      
+
       // Set the model on the forms.
       $this->Form->SetModel($ConfigurationModel);
-      
+
       // Load roles with sign-in permission
       $RoleModel = new RoleModel();
       $this->RoleData = $RoleModel->GetByPermission('Garden.SignIn.Allow');
       $this->SetData('_Roles', ConsolidateArrayValuesByKey($this->RoleData->ResultArray(), 'RoleID', 'Name'));
-      
+
       // Get the currently selected default roles
       // $this->ExistingRoleData = Gdn::Config('Garden.Registration.DefaultRoles');
       // if (is_array($this->ExistingRoleData) === FALSE)
       //    $this->ExistingRoleData = array();
-         
+
       // Get currently selected InvitationOptions
       $this->ExistingRoleInvitations = Gdn::Config('Garden.Registration.InviteRoles');
       if (is_array($this->ExistingRoleInvitations) === FALSE)
          $this->ExistingRoleInvitations = array();
-         
+
       // Get the currently selected Expiration Length
       $this->InviteExpiration = Gdn::Config('Garden.Registration.InviteExpiration', '');
-      
+
       // Registration methods.
       $this->RegistrationMethods = array(
          // 'Closed' => "Registration is closed.",
@@ -750,7 +750,7 @@ class SettingsController extends DashboardController {
          '5' => '5',
          '-1' => T('Unlimited')
       );
-      
+
       // Options for when invitations should expire.
       $this->InviteExpirationOptions = array(
         '-1 week' => T('1 week after being sent'),
@@ -758,24 +758,24 @@ class SettingsController extends DashboardController {
         '-1 month' => T('1 month after being sent'),
         'FALSE' => T('never')
       );
-      
+
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          $this->Form->SetData($ConfigurationModel->Data);
-      } else {   
+      } else {
          // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');   
+         $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');
          // if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
          //    $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
 
          if ($this->Form->GetValue('Garden.Registration.ConfirmEmail'))
             $ConfigurationModel->Validation->ApplyRule('Garden.Registration.ConfirmEmailRole', 'Required');
-         
+
          // Define the Garden.Registration.RoleInvitations setting based on the postback values
          $InvitationRoleIDs = $this->Form->GetValue('InvitationRoleID');
          $InvitationCounts = $this->Form->GetValue('InvitationCount');
          $this->ExistingRoleInvitations = ArrayCombine($InvitationRoleIDs, $InvitationCounts);
          $ConfigurationModel->ForceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
-         
+
          // Save!
          if ($this->Form->Save() !== FALSE) {
             $this->InformMessage(T("Your settings have been saved."));
@@ -783,7 +783,7 @@ class SettingsController extends DashboardController {
                $this->RedirectUrl = $RedirectUrl;
          }
       }
-      
+
       $this->Render();
    }
 
@@ -808,7 +808,7 @@ class SettingsController extends DashboardController {
       }
       uasort($Array, array('SettingsController', 'CompareAddonName'));
    }
-   
+
    /**
     * Compare addon names for uasort.
     *
@@ -822,7 +822,7 @@ class SettingsController extends DashboardController {
    public static function CompareAddonName($A, $B) {
       return strcasecmp(GetValue('Name', $A), GetValue('Name', $B));
    }
-   
+
    /**
     * Test and addon to see if there are any fatal errors during install.
     *
@@ -835,7 +835,7 @@ class SettingsController extends DashboardController {
    public function TestAddon($AddonType = '', $AddonName = '', $TransientKey = '') {
       if (!in_array($AddonType, array('Plugin', 'Application', 'Theme', 'Locale')))
          $AddonType = 'Plugin';
-         
+
       $Session = Gdn::Session();
       $AddonName = $Session->ValidateTransientKey($TransientKey) ? $AddonName : '';
       if ($AddonType == 'Locale') {
@@ -860,7 +860,7 @@ class SettingsController extends DashboardController {
             }
          }
       }
-      
+
       ob_clean();
       echo 'Success';
    }
@@ -890,7 +890,7 @@ class SettingsController extends DashboardController {
             $ConfigSaveData = array(
                'Garden.ThemeOptions.Styles.Key' => $StyleKey,
                'Garden.ThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename"));
-            
+
             // Save the text to the locale.
             $Translations = array();
             foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
@@ -900,7 +900,7 @@ class SettingsController extends DashboardController {
             }
 
             SaveToConfig($ConfigSaveData);
-            
+
             $this->InformMessage(T("Your changes have been saved."));
          } elseif ($Style) {
             SaveToConfig(array(
@@ -943,15 +943,15 @@ class SettingsController extends DashboardController {
    public function Themes($ThemeName = '', $TransientKey = '') {
       $this->AddJsFile('addons.js');
       $this->SetData('Title', T('Themes'));
-         
+
       $this->Permission('Garden.Themes.Manage');
       $this->AddSideMenu('dashboard/settings/themes');
-      
+
       $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo(TRUE);
       $this->SetData('EnabledThemeFolder', GetValue('Folder', $ThemeInfo));
       $this->SetData('EnabledTheme', Gdn::ThemeManager()->EnabledThemeInfo());
       $this->SetData('EnabledThemeName', GetValue('Name', $ThemeInfo, GetValue('Index', $ThemeInfo)));
-      
+
       // Loop through all of the available themes and mark them if they have an update available
       // Retrieve the list of themes that require updates from the config file
       $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
@@ -959,7 +959,7 @@ class SettingsController extends DashboardController {
          foreach ($RequiredUpdates as $UpdateInfo) {
             if (is_object($UpdateInfo))
                $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
+
             $NewVersion = ArrayValue('Version', $UpdateInfo, '');
             $Name = ArrayValue('Name', $UpdateInfo, '');
             $Type = ArrayValue('Type', $UpdateInfo, '');
@@ -976,13 +976,13 @@ class SettingsController extends DashboardController {
          }
       }
       $this->SetData('AvailableThemes', Gdn::ThemeManager()->AvailableThemes());
-      
+
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
             if ($ThemeInfo === FALSE)
                throw new Exception(sprintf(T("Could not find a theme identified by '%s'"), $ThemeName));
-            
+
             Gdn::Session()->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
             Gdn::ThemeManager()->EnableTheme($ThemeName);
             $this->EventArguments['ThemeName'] = $ThemeName;
@@ -991,14 +991,14 @@ class SettingsController extends DashboardController {
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);
          }
-         
+
          if ($this->Form->ErrorCount() == 0)
             Redirect('/settings/themes');
 
       }
       $this->Render();
    }
-   
+
    /**
     * Show a preview of a theme.
     *
@@ -1009,20 +1009,20 @@ class SettingsController extends DashboardController {
    public function PreviewTheme($ThemeName = '') {
       $this->Permission('Garden.Themes.Manage');
       $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
-      
+
       $PreviewThemeName = $ThemeName;
       $PreviewThemeFolder = GetValue('Folder', $ThemeInfo);
-      
+
       // If we failed to get the requested theme, cancel preview
       if ($ThemeInfo === FALSE) {
          $PreviewThemeName = '';
          $PreviewThemeFolder = '';
       }
-      
+
       Gdn::Session()->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
       Redirect('/');
    }
-   
+
    /**
     * Closes current theme preview.
     *
@@ -1034,7 +1034,7 @@ class SettingsController extends DashboardController {
       $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => ''));
       Redirect('settings/themes');
    }
-   
+
    /**
     * Remove an addon.
     *
@@ -1060,7 +1060,7 @@ class SettingsController extends DashboardController {
             $RequiredPermission = 'Garden.Plugins.Manage';
          break;
       }
-      
+
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission($RequiredPermission)) {
          try {
@@ -1074,7 +1074,7 @@ class SettingsController extends DashboardController {
       if ($this->Form->ErrorCount() == 0)
          Redirect('/settings/plugins');
    }
-   
+
    /**
     * Remove the logo from config & delete it.
     *
@@ -1092,8 +1092,8 @@ class SettingsController extends DashboardController {
 
       Redirect('/settings/banner');
    }
-   
-   
+
+
    /**
     * Remove the logo from config & delete it.
     *
@@ -1111,7 +1111,7 @@ class SettingsController extends DashboardController {
 
       Redirect('/settings/banner');
    }
-   
+
    /**
     * Prompts new admins how to get started using new install.
     *
@@ -1122,7 +1122,7 @@ class SettingsController extends DashboardController {
       $this->SetData('Title', T('Getting Started'));
       $this->AddSideMenu('dashboard/settings/gettingstarted');
       $this->TextEnterEmails = T('TextEnterEmails', 'Type email addresses separated by commas here');
-      
+
       if ($this->Form->AuthenticatedPostBack()) {
          // Do invitations to new members.
          $Message = $this->Form->GetFormValue('InvitationMessage');
@@ -1131,7 +1131,7 @@ class SettingsController extends DashboardController {
          $Recipients = $this->Form->GetFormValue('Recipients');
          if ($Recipients == $this->TextEnterEmails)
             $Recipients = '';
-            
+
          $Recipients = explode(',', $Recipients);
          $CountRecipients = 0;
          foreach ($Recipients as $Recipient) {
@@ -1161,8 +1161,8 @@ class SettingsController extends DashboardController {
          if ($this->Form->ErrorCount() == 0)
             $this->InformMessage(T('Your invitations were sent successfully.'));
       }
-      
+
       $this->Render();
    }
-   
+
 }

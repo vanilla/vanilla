@@ -97,7 +97,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Register hooked methods
       $this->RegisterPlugins();
-      
+
       $this->Started = TRUE;
       $this->FireEvent('AfterStart');
    }
@@ -150,12 +150,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $CacheIntegrityHash = GetValue('CacheIntegrityHash',$SearchPathCache);
             if ($CacheIntegrityHash != $PathIntegrityHash) {
                // Need to re-index this folder
-               
-               // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for 
+
+               // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for
                // so that the merge below does what was intended
                $this->PluginCache = array_diff_key($this->PluginCache, $CachePluginInfo);
                $this->PluginsByClass = array_diff_key($this->PluginsByClass, $CacheClassInfo);
-               
+
                $CachePluginInfo = array();
                $CacheClassInfo = array();
                $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CachePluginInfo, $CacheClassInfo, $PathListing);
@@ -174,21 +174,21 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       return $this->PluginCache;
    }
-   
+
    public function ForceAutoloaderIndex() {
       $AutoloaderMap = Gdn_Autoloader::GetMap(Gdn_Autoloader::MAP_LIBRARY, Gdn_Autoloader::CONTEXT_PLUGIN);
       if (!$AutoloaderMap) return;
-      
+
       $ExtraPaths = array();
       foreach ($this->AvailablePlugins() as $AvailablePlugin)
          $ExtraPaths[] = array(
             'path'  => GetValue('RealRoot', $AvailablePlugin),
             'topic' => strtolower(GetValue('Folder', $AvailablePlugin))
          );
-      
+
       $AutoloaderMap->Index($ExtraPaths);
    }
-   
+
    public function ClearPluginCache($SearchPaths = NULL) {
       if (!is_null($SearchPaths)) {
          if (!is_array($SearchPaths))
@@ -196,7 +196,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       } else {
          $SearchPaths = $this->SearchPaths();
       }
-      
+
       foreach ($SearchPaths as $SearchPath => $SearchPathName) {
          $SearchPathCacheKey = "Garden.Plugins.PathCache.{$SearchPath}";
          $SearchPathCache = Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
@@ -433,7 +433,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
    /**
     * Check whether a plugin is enabled
-    * 
+    *
     * @param string $PluginName
     * @return bool
     */
@@ -632,10 +632,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
 
       $EventKey = strtolower($EventClassName.'_'.$EventName.'_'.$EventHandlerType);
-      
+
       if (!array_key_exists($EventKey, $this->_EventHandlerCollection))
          return FALSE;
-      
+
       if (is_null($PassedEventKey))
          $PassedEventKey = $EventKey;
 
@@ -651,7 +651,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $EventCaller = array_shift($Stack);
          $Sender->EventArguments['WildEventStack'] = $EventCaller;
       }
-      
+
       // Loop through the handlers and execute them
       foreach ($this->_EventHandlerCollection[$EventKey] as $PluginKey) {
          $PluginKeyParts = explode('.', $PluginKey);
@@ -666,7 +666,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $Return = TRUE;
          }
       }
-      
+
       return $Return;
    }
 
@@ -735,12 +735,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @param string $Type The type of event handler.
     *  - Create: A new method creation.
     *  - Override: A method override.
-    * @return callback 
+    * @return callback
     * @since 2.1
     */
    public function GetCallback($ClassName, $MethodName, $Type = 'Create') {
       $EventKey = strtolower("{$ClassName}_{$MethodName}_{$Type}");
-      
+
       switch ($Type) {
          case 'Create':
             $MethodKey = GetValue($EventKey, $this->_NewMethodCollection);
@@ -752,7 +752,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $Parts = explode('.', $MethodKey, 2);
       if (count($Parts) != 2)
          return FALSE;
-      
+
       list($ClassName, $MethodName) = $Parts;
       $Instance = $this->GetPluginInstance($ClassName, self::ACCESS_CLASSNAME);
       return array($Instance, $MethodName);
@@ -893,7 +893,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          return array_keys(array_intersect_key($Folders,$this->EnabledPlugins()));
       }
    }
-   
+
    public function AvailablePluginFolders($SearchPath = NULL) {
       if (is_null($SearchPath)) {
          return array_keys($this->AvailablePlugins());
@@ -959,7 +959,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Write enabled state to config
       SaveToConfig("EnabledPlugins.{$PluginName}", TRUE);
-      
+
       $this->EnabledPlugins[$PluginName] = TRUE;
 
       $PluginClassName = GetValue('ClassName', $PluginInfo);
@@ -968,7 +968,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       Gdn::Locale()->Set(Gdn::Locale()->Current(), Gdn::ApplicationManager()->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
       return TRUE;
    }
-   
+
    public function DisablePlugin($PluginName) {
       // Get the plugin and make sure its name is the correct case.
       $Plugin = $this->GetPluginInfo($PluginName);
@@ -1031,9 +1031,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $Result = implode(', ', $Htmls);
       }
       return $Result;
-      
+
    }
-   
+
     /**
     * Remove the plugin.
     *

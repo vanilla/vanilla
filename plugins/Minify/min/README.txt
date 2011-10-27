@@ -23,7 +23,7 @@ Let's say you want to serve this file:
 Here's the "Minify URL" for this file:
   http://example.com/min/?f=wp-content/themes/default/default.css
 
-In other words, the "f" argument is set to the file path from root without the 
+In other words, the "f" argument is set to the file path from root without the
 initial "/". As CSS files may contain relative URIs, Minify will automatically
 "fix" these by rewriting them as root relative.
 
@@ -59,8 +59,8 @@ In (X)HTML files, don't forget to replace any "&" characters with "&amp;".
 SPECIFYING ALLOWED DIRECTORIES
 
 By default, Minify will serve any *.css/*.js files within the DOCUMENT_ROOT. If
-you'd prefer to limit Minify's access to certain directories, set the 
-$min_serveOptions['minApp']['allowDirs'] array in config.php. E.g. to limit 
+you'd prefer to limit Minify's access to certain directories, set the
+$min_serveOptions['minApp']['allowDirs'] array in config.php. E.g. to limit
 to the /js and /themes/default directories, use:
 
 $min_serveOptions['minApp']['allowDirs'] = array('//js', '//themes/default');
@@ -68,8 +68,8 @@ $min_serveOptions['minApp']['allowDirs'] = array('//js', '//themes/default');
 
 GROUPS: FASTER PERFORMANCE AND BETTER URLS
 
-For the best performance, edit groupsConfig.php to pre-specify groups of files 
-to be combined under preset keys. E.g., here's an example configuration in 
+For the best performance, edit groupsConfig.php to pre-specify groups of files
+to be combined under preset keys. E.g., here's an example configuration in
 groupsConfig.php:
 
 return array(
@@ -79,16 +79,16 @@ return array(
 This pre-selects the following files to be combined under the key "js":
   http://example.com/js/Class.js
   http://example.com/js/email.js
-  
+
 You can now serve these files with this simple URL:
   http://example.com/min/?g=js
-  
+
 
 GROUPS: SPECIFYING FILES OUTSIDE THE DOC_ROOT
 
 In the groupsConfig.php array, the "//" in the file paths is a shortcut for
 the DOCUMENT_ROOT, but you can also specify paths from the root of the filesystem
-or relative to the DOC_ROOT: 
+or relative to the DOC_ROOT:
 
 return array(
     'js' => array(
@@ -102,8 +102,8 @@ return array(
 FAR-FUTURE EXPIRES HEADERS
 
 Minify can send far-future (one year) Expires headers. To enable this you must
-add a number to the querystring (e.g. /min/?g=js&1234 or /min/f=file.js&1234) 
-and alter it whenever a source file is changed. If you have a build process you 
+add a number to the querystring (e.g. /min/?g=js&1234 or /min/f=file.js&1234)
+and alter it whenever a source file is changed. If you have a build process you
 can use a build/source control revision number.
 
 If you serve files as a group, you can use the utility function Minify_groupUri()
@@ -113,7 +113,7 @@ to get a "versioned" Minify URI for use in your HTML. E.g.:
 // add /min/lib to your include_path first!
 require $_SERVER['DOCUMENT_ROOT'] . '/min/utils.php';
 
-$jsUri = Minify_groupUri('js'); 
+$jsUri = Minify_groupUri('js');
 echo "<script type='text/javascript' src='{$jsUri}'></script>";
 
 

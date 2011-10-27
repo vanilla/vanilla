@@ -46,7 +46,7 @@ WpkUQDIDJEoFUzKMVuJf4KO/FJ345+BNLGgbJ6WujreoM1X/gYfdnJ/J
 EOD;
     return $cert;
   }
-} 
+}
 
 /**
  * A mock store for testing

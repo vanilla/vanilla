@@ -58,7 +58,7 @@ Follow the link below to log in.");
       jQuery(document).ready(function($) {
          if ($('input.RecipientBox').val() == '')
             $('input.RecipientBox').val("<?php echo $this->TextEnterEmails; ?>");
-            
+
          $('input.RecipientBox').focus(function() {
             if ($(this).val() == "<?php echo $this->TextEnterEmails; ?>")
                $(this).val('');

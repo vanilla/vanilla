@@ -73,6 +73,6 @@ echo $this->Form->Errors();
       <p>Once you have registered at Twitter, you must copy the "Consumer Key" and "Consumer Secret" into the form on this page and click save.</p>
       <p><?php echo Anchor(Img('/plugins/Twitter/design/help-consumervalues-sm.png', array('style' => 'max-width: 763px;')), '/plugins/Twitter/design/help-consumervalues.png', array('target' => '_blank')); ?></p>
    </div>
-</div>   
+</div>
 <?php
    echo $this->Form->Close();

@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * Managing site statistic reporting.
  *
@@ -22,12 +22,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class StatisticsController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
-   
+
    public function Info() {
       $this->SetData('FirstDate', Gdn::Statistics()->FirstDate());
       $this->Render();
    }
-   
+
    /**
     * Highlight menu path. Automatically run on every use.
     *
@@ -39,7 +39,7 @@ class StatisticsController extends DashboardController {
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
-   
+
    /**
     * Statistics setup & configuration.
     *
@@ -52,38 +52,38 @@ class StatisticsController extends DashboardController {
       //$this->AddJsFile('statistics.js');
       $this->Title(T('Vanilla Statistics'));
       $this->EnableSlicing($this);
-      
+
       if ($this->Form->IsPostBack()) {
-         
+
          $Flow = TRUE;
-         
+
          if ($Flow && $this->Form->GetFormValue('ClearCredentials')) {
             Gdn::InstallationID(FALSE);
             Gdn::InstallationSecret(FALSE);
             Gdn::Statistics()->Tick();
             $Flow = FALSE;
          }
-         
+
          if ($Flow && $this->Form->GetFormValue('SaveIdentity')) {
             Gdn::InstallationID($this->Form->GetFormValue('InstallationID'));
             Gdn::InstallationSecret($this->Form->GetFormValue('InstallationSecret'));
             $this->InformMessage(T("Your settings have been saved."));
          }
-         
+
          if ($Flow && $this->Form->GetFormValue('AllowLocal')) {
             SaveToConfig('Garden.Analytics.AllowLocal', TRUE);
          }
-         
+
          if ($Flow && $this->Form->GetFormValue('Allow')) {
             SaveToConfig('Garden.Analytics.Enabled', TRUE);
          }
-         
+
          if ($Flow && $this->Form->GetFormValue('Reregister')) {
             Gdn::Statistics()->Register();
          }
-         
+
       }
-      
+
       $AnalyticsEnabled = Gdn_Statistics::CheckIsEnabled();
       if ($AnalyticsEnabled) {
          $ConfFile = PATH_CONF.'/config.php';
@@ -91,20 +91,20 @@ class StatisticsController extends DashboardController {
          if (!$ConfWritable)
             $AnalyticsEnabled = FALSE;
       }
-      
+
       $this->SetData('AnalyticsEnabled', $AnalyticsEnabled);
-      
+
       $NotifyMessage = Gdn::Get('Garden.Analytics.Notify', FALSE);
       $this->SetData('NotifyMessage', $NotifyMessage);
       if ($NotifyMessage !== FALSE)
          Gdn::Set('Garden.Analytics.Notify', NULL);
-      
+
       $this->Form->SetFormValue('InstallationID', Gdn::InstallationID());
       $this->Form->SetFormValue('InstallationSecret', Gdn::InstallationSecret());
-      
+
       $this->Render();
    }
-   
+
    /**
     * Verify connection credentials.
     *
@@ -116,5 +116,5 @@ class StatisticsController extends DashboardController {
       $this->SetData('StatisticsVerified', $CredentialsValid);
       $this->Render();
    }
-   
+
 }

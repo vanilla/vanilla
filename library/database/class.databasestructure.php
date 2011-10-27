@@ -81,21 +81,21 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     */
    public function __construct($Database = NULL) {
       parent::__construct();
-      
+
       if(is_null($Database))
          $this->Database = Gdn::Database();
       else
          $this->Database = $Database;
-      
+
       $this->DatabasePrefix($this->Database->DatabasePrefix);
-      
+
       $this->Reset();
    }
-   
+
    protected function _CreateColumn($Name, $Type, $Null, $Default, $KeyType) {
       $Length = '';
       $Precision = '';
-      
+
       // Check to see if the type starts with a 'u' for unsigned.
       if(is_string($Type) && strncasecmp($Type, 'u', 1) == 0) {
          $Type = substr($Type, 1);
@@ -103,7 +103,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
       } else {
          $Unsigned = FALSE;
       }
-      
+
       // Check for a length in the type.
       if(is_string($Type) && preg_match('/(\w+)\s*\(\s*(\d+)\s*(?:,\s*(\d+)\s*)?\)/', $Type, $Matches)) {
          $Type = $Matches[1];
@@ -111,7 +111,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
          if(count($Matches) >= 4)
             $Precision = $Matches[3];
       }
-      
+
       $Column = new stdClass();
       $Column->Name = $Name;
       $Column->Type = is_array($Type) ? 'enum' : $Type;
@@ -123,7 +123,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
       $Column->KeyType = $KeyType;
       $Column->Unsigned = $Unsigned;
       $Column->AutoIncrement = FALSE;
-      
+
       // Handle enums and sets as types.
       if(is_array($Type)) {
          if(count($Type) === 2 && is_array(ArrayValue(1, $Type))) {
@@ -139,10 +139,10 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
          $Column->Type = $Type;
          $Column->Enum = FALSE;
       }
-      
+
       return $Column;
    }
-   
+
    /**
     * Defines a column to be added to $this->Table().
     *
@@ -207,7 +207,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
       }
       return $Result;
    }
-   
+
    /**
 	 * And associative array of $ColumnName => $ColumnProperties columns for the table.
 	 * @return array
@@ -236,7 +236,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 	public function ColumnTypeString($Column) {
 		if(is_string($Column))
 			$Column = $this->_Columns[$Column];
-		
+
 		$Type = GetValue('Type', $Column);
 		$Length = GetValue('Length', $Column);
 		$Precision = GetValue('Precision', $Column);
@@ -317,10 +317,10 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
       $Column = $this->_CreateColumn($Name, $Type, FALSE, NULL, 'primary');
       $Column->AutoIncrement = TRUE;
       $this->_Columns[$Name] = $Column;
-      
+
       return $this;
    }
-	
+
 	/**
 	 * Send a query to the database and return the result.
 	 * @param string $Sql The sql to execute.
@@ -337,7 +337,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 			return $Result;
 		}
 	}
-   
+
    /**
     * Renames a column in $this->Table().
     *
@@ -415,7 +415,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
    public function Table($Name = '', $CharacterEncoding = '') {
 		if(!$Name)
 			return $this->_TableName;
-		
+
       $this->_TableName = $Name;
       if ($CharacterEncoding == '')
          $CharacterEncoding = Gdn::Config('Database.CharacterEncoding', '');

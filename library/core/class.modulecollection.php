@@ -8,13 +8,13 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-/** 
+/**
  * A module that contains other modules.
  */
 class Gdn_ModuleCollection extends Gdn_Module {
    /// PROPERTIES ///
    public $Items = array();
-   
+
    /// METHODS ///
    public function Render() {
       $RenderedCount = 0;
@@ -45,7 +45,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
       }
       unset($this->EventArguments['AssetName']);
    }
-   
+
    public function ToString() {
       ob_start();
       $this->Render();

@@ -10,35 +10,35 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class RoleModel extends Gdn_Model {
    public static $Roles = NULL;
-   
+
    /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
       parent::__construct('Role');
    }
-   
+
    public function ClearCache() {
       $Key = 'Roles';
       Gdn::Cache()->Remove($Key);
    }
-   
+
    public function Define($Values) {
       if(array_key_exists('RoleID', $Values)) {
          $RoleID = $Values['RoleID'];
          unset($Values['RoleID']);
-         
+
          $this->SQL->Replace('Role', $Values, array('RoleID' => $RoleID), TRUE);
       } else {
          // Check to see if there is a role with the same name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Values['Name']))->Value('RoleID', NULL);
-         
+
          if(is_null($RoleID)) {
             // Figure out the next role ID.
             $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Get()->Value('RoleID', 0);
             $RoleID = $MaxRoleID + 1;
             $Values['RoleID'] = $RoleID;
-            
+
             // Insert the role.
             $this->SQL->Insert('Role', $Values);
          } else {
@@ -48,7 +48,7 @@ class RoleModel extends Gdn_Model {
       }
       $this->ClearCache();
    }
-   
+
    /**
     * Returns a resultset of all roles.
     */
@@ -59,7 +59,7 @@ class RoleModel extends Gdn_Model {
          ->OrderBy('Sort', 'asc')
          ->Get();
    }
-   
+
    /**
     * Returns an array of RoleID => RoleName pairs.
     *
@@ -94,7 +94,7 @@ class RoleModel extends Gdn_Model {
    public function GetByRoleID($RoleID) {
       return $this->GetWhere(array('RoleID' => $RoleID))->FirstRow();
    }
-   
+
    /**
     * Returns a resultset of role data related to the specified UserID.
     *
@@ -117,15 +117,15 @@ class RoleModel extends Gdn_Model {
    public function GetByNotRoleID($RoleID) {
       return $this->GetWhere(array('RoleID <>' => $RoleID));
    }
-   
+
    public function GetPermissions($RoleID) {
       $PermissionModel = Gdn::PermissionModel();
       $LimitToSuffix = $this->CanSession == '1' ? '' : 'View';
-      
+
       $Result = $PermissionModel->GetPermissions($RoleID, $LimitToSuffix);
-      return $Result;      
+      return $Result;
    }
-   
+
    /**
     * Returns the number of users assigned to the provided RoleID. If
     * $UsersOnlyWithThisRole is TRUE, it will return the number of users who
@@ -144,13 +144,13 @@ class RoleModel extends Gdn_Model {
             ->Where('ur.RoleID', $RoleID)
             ->Get()
             ->FirstRow();
-            
+
          return $Data ? $Data->UserCount : 0;
       } else {
          return $this->SQL->GetCount('UserRole', array('RoleID' => $RoleID));
       }
    }
-   
+
    /**
     * Retrieves all roles with the specified permission(s).
     *
@@ -159,12 +159,12 @@ class RoleModel extends Gdn_Model {
    public function GetByPermission($Permission) {
       if (!is_array($Permission))
          $Permission = array($Permission);
-         
+
       $this->SQL->Select('r.*')
          ->From('Role r')
          ->Join('Permission per', "per.RoleID = r.RoleID")
          ->Where('per.JunctionTable is null');
-         
+
       $this->SQL->BeginWhereGroup();
       $PermissionCount = count($Permission);
       for ($i = 0; $i < $PermissionCount; ++$i) {
@@ -173,7 +173,7 @@ class RoleModel extends Gdn_Model {
       $this->SQL->EndWhereGroup();
       return $this->SQL->Get();
    }
-   
+
    public static function Roles($RoleID = NULL, $Force = FALSE) {
       if (self::$Roles == NULL) {
          $Key = 'Roles';
@@ -186,7 +186,7 @@ class RoleModel extends Gdn_Model {
       } else {
          $Roles = self::$Roles;
       }
-      
+
       if ($RoleID === NULL)
          return $Roles;
       elseif (array_key_exists($RoleID, $Roles))
@@ -196,7 +196,7 @@ class RoleModel extends Gdn_Model {
       else
          return NULL;
    }
-   
+
    public function Save($FormPostValues) {
       // Define the primary key in this model's table.
       $this->DefineSchema();
@@ -207,13 +207,13 @@ class RoleModel extends Gdn_Model {
          // Figure out the next role ID.
          $MaxRoleID = $this->SQL->Select('r.RoleID', 'MAX')->From('Role r')->Get()->Value('RoleID', 0);
          $RoleID = $MaxRoleID + 1;
-         
+
          $this->AddInsertFields($FormPostValues);
          $FormPostValues['RoleID'] = strval($RoleID); // string for validation
       } else {
          $this->AddUpdateFields($FormPostValues);
       }
-      
+
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {
          $this->Validation->AddValidationField('Permission', $FormPostValues);
@@ -228,18 +228,18 @@ class RoleModel extends Gdn_Model {
          }
          // Now update the role permissions
          $Role = $this->GetByRoleID($RoleID);
-         
+
          $PermissionModel = Gdn::PermissionModel();
          $Permissions = $PermissionModel->PivotPermissions($Permissions, array('RoleID' => $RoleID));
          $PermissionModel->SaveAll($Permissions, array('RoleID' => $RoleID));
-         
+
          // Remove the cached permissions for all users with this role.
          $this->SQL->Update('User')
             ->Join('UserRole', 'User.UserID = UserRole.UserID')
             ->Set('Permissions', '')
             ->Where(array('UserRole.RoleID' => $RoleID))
             ->Put();
-         
+
          $this->ClearCache();
       } else {
          $RoleID = FALSE;
@@ -249,7 +249,7 @@ class RoleModel extends Gdn_Model {
 
    public static function SetUserRoles(&$Users, $UserIDColumn = 'UserID', $RolesColumn = 'Roles') {
       $UserIDs = array_unique(ConsolidateArrayValuesByKey($Users, $UserIDColumn));
-      
+
       // Try and get all of the mappings from the cache.
       $Keys = array();
       foreach ($UserIDs as $UserID) {
@@ -258,7 +258,7 @@ class RoleModel extends Gdn_Model {
       $UserRoles = Gdn::Cache()->Get($Keys);
       if (!is_array($UserRoles))
          $UserRoles = array();
-      
+
       // Grab all of the data that doesn't exist from the DB.
       $MissingIDs = array();
       foreach($Keys as $UserID => $Key) {
@@ -272,9 +272,9 @@ class RoleModel extends Gdn_Model {
          ->From('UserRole ur')
          ->WhereIn('ur.UserID', array_keys($MissingIDs))
          ->Get()->ResultArray();
-         
+
          $DbUserRoles = Gdn_DataSet::Index($DbUserRoles, 'UserID', array('Unique' => FALSE));
-         
+
          // Store the user role mappings.
          foreach ($DbUserRoles as $UserID => $Rows) {
             $RoleIDs = ConsolidateArrayValuesByKey($Rows, 'RoleID');
@@ -283,14 +283,14 @@ class RoleModel extends Gdn_Model {
             $UserRoles[$Key] = $RoleIDs;
          }
       }
-      
+
       $AllRoles = self::Roles(); // roles indexed by role id.
-      
+
       // Join the users.
       foreach ($Users as &$User) {
          $UserID = GetValue($UserIDColumn, $User);
          $Key = $Keys[$UserID];
-         
+
          $RoleIDs = GetValue($Key, $UserRoles, array());
          $Roles = array();
          foreach ($RoleIDs as $RoleID) {
@@ -301,7 +301,7 @@ class RoleModel extends Gdn_Model {
          SetValue($RolesColumn, $User, $Roles);
       }
    }
-   
+
    public function Delete($RoleID, $ReplacementRoleID) {
       // First update users that will be orphaned
       if (is_numeric($ReplacementRoleID) && $ReplacementRoleID > 0) {
@@ -313,11 +313,11 @@ class RoleModel extends Gdn_Model {
             ->Where(array('UserRole.RoleID' => $RoleID))
             ->Put();
       }
-      
+
       // Remove permissions for this role.
       $PermissionModel = Gdn::PermissionModel();
       $PermissionModel->Delete($RoleID);
-      
+
       // Remove the role
       $this->SQL->Delete('Role', array('RoleID' => $RoleID));
    }

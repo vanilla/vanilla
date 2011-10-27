@@ -37,7 +37,7 @@ class LogController extends DashboardController {
 
       $this->Render();
    }
-   
+
    /**
     * Count log items.
     *
@@ -60,7 +60,7 @@ class LogController extends DashboardController {
       if ($Count > 0)
          echo '<span class="Alert">', $Count, '</span>';
    }
-   
+
    /**
     * Delete logs.
     *
@@ -74,7 +74,7 @@ class LogController extends DashboardController {
       // Grab the logs.
       $this->LogModel->Delete($LogIDs);
    }
-   
+
    /**
     * View list of edits (edit/delete actions).
     *
@@ -88,12 +88,12 @@ class LogController extends DashboardController {
       list($Offset, $Limit) = OffsetLimit($Page, 10);
       $this->SetData('Title', T('Edit/Delete Log'));
 
-      
+
       $Where = array(
           'Operation' => array('Edit', 'Delete')//,
 //          'RecordType' => array('Discussion', 'Comment', 'Activity')
           );
-      
+
       $Type = strtolower($Type);
       if ($Type == 'configuration') {
          $this->Permission('Garden.Settings.Manage');
@@ -101,7 +101,7 @@ class LogController extends DashboardController {
       } else {
          $Where['RecordType'] = array('Discussion', 'Comment', 'Activity');
       }
-      
+
       $RecordCount = $this->LogModel->GetCountWhere($Where);
       $this->SetData('RecordCount', $RecordCount);
       if ($Offset >= $RecordCount)
@@ -116,7 +116,7 @@ class LogController extends DashboardController {
       $this->AddSideMenu('dashboard/log/edits');
       $this->Render();
    }
-   
+
    /**
     * Convenience method to call model's FormatContent.
     *
@@ -128,7 +128,7 @@ class LogController extends DashboardController {
    protected function FormatContent($Log) {
       return $this->LogModel->FormatContent($Log);
    }
-   
+
    /**
     * Always triggered first. Add Javascript files.
     *
@@ -141,7 +141,7 @@ class LogController extends DashboardController {
       $this->AddJsFile('jquery.expander.js');
       $this->AddJsFile('jquery.ui.packed.js');
    }
-   
+
    /**
     * View moderation logs.
     *
@@ -156,7 +156,7 @@ class LogController extends DashboardController {
       $this->SetData('Title', T('Moderation Queue'));
 
       $Where = array('Operation' => 'Moderate');
-      
+
       $RecordCount = $this->LogModel->GetCountWhere($Where);
       $this->SetData('RecordCount', $RecordCount);
       if ($Offset >= $RecordCount)

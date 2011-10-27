@@ -72,7 +72,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
       $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
 
       $Result = htmLawed($Html, $Config, $Spec);
-      
+
       return $Result;
 	}
 

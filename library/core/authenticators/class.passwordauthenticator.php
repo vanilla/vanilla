@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 /**
  * Authentication Module: Local User/Password auth tokens.
- * 
+ *
  * @author Mark O'Sullivan
  * @copyright 2009 Mark O'Sullivan
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -27,15 +27,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Garden
  */
 class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
-   
+
    public function __construct() {
       $this->_DataSourceType = Gdn_Authenticator::DATA_FORM;
-      
+
       $this->HookDataField('Email', 'Email');
       $this->HookDataField('Password', 'Password');
       $this->HookDataField('RememberMe', 'RememberMe', FALSE);
       $this->HookDataField('ClientHour', 'ClientHour', FALSE);
-      
+
       // Initialize built-in authenticator functionality
       parent::__construct();
    }
@@ -51,11 +51,11 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     */
    public function Authenticate($Email = '', $Password = '') {
       if (!$Email || !$Password) {
-      
+
          // We werent given parameters, check if they exist in our DataSource
          if ($this->CurrentStep() != Gdn_Authenticator::MODE_VALIDATE)
             return Gdn_Authenticator::AUTH_INSUFFICIENT;
-         
+
          // Get the values from the DataSource
          $Email = $this->GetValue('Email');
          $Password = $this->GetValue('Password');
@@ -67,7 +67,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
       }
 
       $UserID = 0;
-   
+
       // Retrieve matching username/password values
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
@@ -92,7 +92,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
 
             // Update some information about the user...
             $UserModel->UpdateLastVisit($UserID, $UserData->Attributes, $ClientHour);
-            
+
             Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_SUCCESS);
             $this->FireEvent('Authenticated');
          } else {
@@ -101,13 +101,13 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
       }
       return $UserID;
    }
-   
+
    public function CurrentStep() {
       // Was data submitted through the form already?
       if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->IsPostBack() === TRUE)) {
          return $this->_CheckHookedFields();
       }
-      
+
       return Gdn_Authenticator::MODE_GATHER;
    }
 
@@ -116,39 +116,39 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     */
    public function DeAuthenticate() {
       $this->SetIdentity(NULL);
-      
+
       return Gdn_Authenticator::AUTH_SUCCESS;
    }
-   
+
    public function LoginResponse() {
       return Gdn_Authenticator::REACT_RENDER;
    }
-   
+
    public function PartialResponse() {
       return Gdn_Authenticator::REACT_REDIRECT;
    }
-   
+
    public function SuccessResponse() {
       return Gdn_Authenticator::REACT_REDIRECT;
    }
-   
+
    public function LogoutResponse() {
       return Gdn_Authenticator::REACT_REDIRECT;
    }
-   
+
    public function RepeatResponse() {
       return Gdn_Authenticator::REACT_RENDER;
    }
-   
+
    // What to do if the entry/auth/* page is triggered but login is denied or fails
    public function FailedResponse() {
       return Gdn_Authenticator::REACT_RENDER;
    }
-   
+
    public function WakeUp() {
       // Do nothing.
    }
-   
+
    public function GetURL($URLType) {
       // We arent overriding anything
       return FALSE;

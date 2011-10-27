@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
    if ($.browser.msie) {
       $('body').addClass('MSIE');
    }
-   
+
    var d = new Date();
    var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getMinutes();
 
@@ -22,7 +22,7 @@ jQuery(document).ready(function($) {
          );
       }
    });
-   
+
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $('a.ForgotPassword').live('click', function() {
       $('.Methods').toggle();
@@ -30,19 +30,19 @@ jQuery(document).ready(function($) {
 		$('#Form_User_SignIn').toggle();
       return false;
    });
-   
+
    if ($.fn.autogrow)
       $('textarea.Autogrow').livequery(function() {
          $(this).autogrow();
       });
-      
+
    $.postParseJson = function(json) {
       if (json.Data) json.Data = $.base64Decode(json.Data);
       return json;
    }
-   
+
 	var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-	
+
 	var uTF8Encode = function(string) {
 		string = string.replace(/\x0d\x0a/g, "\x0a");
 		var output = "";
@@ -61,7 +61,7 @@ jQuery(document).ready(function($) {
 		}
 		return output;
 	};
-	
+
 	var uTF8Decode = function(input) {
 		var string = "";
 		var i = 0;
@@ -84,7 +84,7 @@ jQuery(document).ready(function($) {
 		}
 		return string;
 	}
-	
+
 	$.extend({
 		base64Encode: function(input) {
 			var output = "";
@@ -134,7 +134,7 @@ jQuery(document).ready(function($) {
 			return output;
 		}
 	});
-		
+
 	gdn = { };
 	gdn.Libraries = {};
 
@@ -142,10 +142,10 @@ jQuery(document).ready(function($) {
    gdn.definition = function(definition, defaultVal, set) {
       if (defaultVal == null)
          defaultVal = definition;
-         
+
       var $def = $('#Definitions #' + definition);
       var def;
-      
+
       if(set) {
          $def.val(defaultVal);
          def = defaultVal;
@@ -154,10 +154,10 @@ jQuery(document).ready(function($) {
          if ($def.length == 0)
             def = defaultVal;
       }
-         
+
       return def;
    }
-   
+
    gdn.elementSupports = function(element, attribute) {
       var test = document.createElement(element);
       if (attribute in test)
@@ -165,7 +165,7 @@ jQuery(document).ready(function($) {
       else
          return false;
    }
-   
+
    gdn.querySep = function(url) {
       return url.indexOf('?') == -1 ? '?' : '&';
    }
@@ -175,7 +175,7 @@ jQuery(document).ready(function($) {
       document.location = gdn.url('/profile/notifications');
       return false;
    });
-   
+
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
@@ -186,7 +186,7 @@ jQuery(document).ready(function($) {
 
    $(".PopupWindow").live('click', function() {
       var $this = $(this);
-      
+
       if ($this.hasClass('NoMSIE') && $.browser.misie) {
          return;
       }
@@ -208,16 +208,16 @@ jQuery(document).ready(function($) {
          win.focus();
       return false;
    });
-   
+
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.
    if ($.fn.popup)
       $('a.Popdown').popup({hijackForms: false});
-   
+
    // This turns SignInPopup anchors into in-page popups
    if ($.fn.popup)
       $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
-   
+
    if ($.fn.popup)
       $('.PopupClose').live('click', function(event){
          var Popup = $(event.target).parents('.Popup');
@@ -247,7 +247,7 @@ jQuery(document).ready(function($) {
    // class.
    if ($.fn.handleAjaxForm)
       $('.AjaxForm').handleAjaxForm();
-   
+
 	// Show hoverhelp on hover
 	$('.HoverHelp').hover(
 		function() {
@@ -306,7 +306,7 @@ jQuery(document).ready(function($) {
    gdn.generateString = function(length) {
       if (length == null)
          length = 5;
-         
+
       var chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
       var string = '';
       var pos = 0;
@@ -316,15 +316,15 @@ jQuery(document).ready(function($) {
       }
       return string;
    };
-   
+
    // Combine two paths and make sure that there is only a single directory concatenator
    gdn.combinePaths = function(path1, path2) {
       if (path1.substr(-1, 1) == '/')
          path1 = path1.substr(0, path1.length - 1);
-         
+
       if (path2.substring(0, 1) == '/')
          path2 = path2.substring(1);
-      
+
       return path1 + '/' + path2;
    };
 
@@ -373,23 +373,23 @@ jQuery(document).ready(function($) {
          }
       }
    };
-   
+
    gdn.requires = function(Library) {
       if (!(Library instanceof Array))
          Library = [Library];
-      
+
       var Response = true;
-      
+
       $(Library).each(function(i,Lib){
          // First check if we already have this library
          var LibAvailable = gdn.available(Lib);
-         
+
          if (!LibAvailable) Response = false;
-         
+
          // Skip any libs that are ready or processing
          if (gdn.Libraries[Lib] === false || gdn.Libraries[Lib] === true)
             return;
-         
+
          // As yet unseen. Try to load
          gdn.Libraries[Lib] = false;
          var Src = '/js/'+Lib+'.js';
@@ -399,35 +399,35 @@ jQuery(document).ready(function($) {
          script.src = Src;
          head.appendChild(script);
       });
-      
+
       if (Response) gdn.loaded(null);
       return Response;
    };
-   
+
    gdn.loaded = function(Library) {
-      if (Library != null) 
+      if (Library != null)
          gdn.Libraries[Library] = true;
-         
+
       $(document).trigger('libraryloaded',[Library])
    }
-   
+
    gdn.available = function(Library) {
       if (!(Library instanceof Array))
          Library = [Library];
-         
+
       for (var i = 0; i<Library.length; i++) {
          var Lib = Library[i];
          if (gdn.Libraries[Lib] !== true) return false;
       }
       return true;
    }
-   
+
    gdn.url = function(path) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
 
       var urlFormat = gdn.definition("UrlFormat", "");
-      
+
       if (path.substr(0, 1) == "/")
          path = path.substr(1);
 
@@ -442,7 +442,7 @@ jQuery(document).ready(function($) {
       $('input:text').each(function() {
          var $this = $(this);
          var placeholder = $this.attr('placeholder');
-         
+
          if (!$this.val() && placeholder) {
             $this.val(placeholder);
             $this.blur(function() {
@@ -459,7 +459,7 @@ jQuery(document).ready(function($) {
          }
       });
    }
-   
+
 //   var searchText = gdn.definition('Search', 'Search');
 //   if (!$('div.Search input.InputBox').val())
 //      $('div.Search input.InputBox').val(searchText);
@@ -474,7 +474,7 @@ jQuery(document).ready(function($) {
 
    $.fn.popin = function(options) {
       var settings = $.extend({}, options);
-      
+
       this.each(function(i, elem) {
          var url = $(elem).attr('rel');
          var $elem = $(elem);
@@ -494,7 +494,7 @@ jQuery(document).ready(function($) {
      });
    };
    $('.Popin').popin();
-   
+
    var hijackClick = function(e) {
       var $elem = $(this);
       var href = $elem.attr('href');
@@ -515,7 +515,7 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             if (json == null) json = {};
-            
+
             var informed = gdn.inform(json);
             gdn.processTargets(json.Targets);
             // If there is a redirect url, go to it.
@@ -534,7 +534,7 @@ jQuery(document).ready(function($) {
 
    $.fn.openToggler = function() {
       var lastOpen = null;
-      
+
      $(this).click(function() {
         var $flyout = $('.Flyout', this);
 
@@ -560,10 +560,10 @@ jQuery(document).ready(function($) {
               $('.Flyout', lastOpen).hide();
               $(lastOpen).removeClass('Open');
            }
-           
+
            $(this).addClass('Open')
            $flyout.show();
-           
+
            lastOpen = this;
         } else {
            $flyout.hide()
@@ -572,12 +572,12 @@ jQuery(document).ready(function($) {
      });
    }
    $('.ToggleFlyout').openToggler();
-   
+
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {
       $(this).before('<span class="AfterButtonLoading">&#160;</span>').removeClass('SpinOnClick');
    });
-   
+
    // Confirmation for item removals
    $('a.RemoveItem').click(function() {
       if (!confirm('Are you sure you would like to remove this item?')) {
@@ -599,7 +599,7 @@ jQuery(document).ready(function($) {
          }
       }
    }
-   
+
    gdn.stats = function() {
       // Call directly back to the deployment and invoke the stats handler
       var StatsURL = gdn.url('settings/analyticstick.json');
@@ -613,13 +613,13 @@ jQuery(document).ready(function($) {
          }
       });
    }
-   
+
    // Ping back to the deployment server to track views, and trigger
    // conditional stats tasks
    var AnalyticsTask = gdn.definition('AnalyticsTask', false);
    if (AnalyticsTask == 'tick')
 	     gdn.stats();
-   
+
    // If a dismissable InformMessage close button is clicked, hide it.
    $('div.InformWrapper.Dismissable a.Close').live('click', function() {
       $(this).parents('div.InformWrapper').fadeOut('fast', function() {
@@ -639,12 +639,12 @@ jQuery(document).ready(function($) {
 			$('div.InformMessages').attr('autodismisstimerid', timerId);
 		}
 	}
-	
+
 	// Handle autodismissals
 	$('div.InformWrapper.AutoDismiss:first').livequery(function() {
 		gdn.setAutoDismiss();
 	});
-   
+
 	// Prevent autodismiss if hovering any inform messages
 	$('div.InformWrapper').live('mouseover mouseout', function(e) {
 		if (e.type == 'mouseover') {
@@ -657,12 +657,12 @@ jQuery(document).ready(function($) {
 			gdn.setAutoDismiss();
 		}
 	});
-	
+
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
 		if (!response || !response.InformMessages || response.InformMessages.length == 0)
 			return false;
-		
+
 		// If there is no message container in the page, add one
 		var informMessages = $('div.InformMessages');
 		if (informMessages.length == 0) {
@@ -670,36 +670,36 @@ jQuery(document).ready(function($) {
 			informMessages = $('div.InformMessages');
 		}
 		var wrappers = $('div.InformMessages div.InformWrapper');
-		
+
 		// Loop through the inform messages and add them to the container
 		for (var i = 0; i < response.InformMessages.length; i++) {
 			css = 'InformWrapper';
 			if (response.InformMessages[i]['CssClass'])
 				css += ' ' + response.InformMessages[i]['CssClass'];
-				
+
 			elementId = '';
 			if (response.InformMessages[i]['id'])
 				elementId = response.InformMessages[i]['id'];
-				
+
 			sprite = '';
 			if (response.InformMessages[i]['Sprite']) {
 				css += ' HasSprite';
 				sprite = response.InformMessages[i]['Sprite'];
 			}
-			
+
 			dismissCallback = response.InformMessages[i]['DismissCallback'];
 			dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
 			if (dismissCallbackUrl)
 				dismissCallbackUrl = gdn.url(dismissCallbackUrl);
-				
+
 			try {
 				var message = response.InformMessages[i]['Message'];
 				var emptyMessage = message == '';
-				
+
 				// Is there a sprite?
 				if (sprite != '')
 					message = '<span class="InformSprite '+sprite+'"></span>' + message;
-				
+
 				// If the message is dismissable, add a close button
 				if (css.indexOf('Dismissable') > 0)
 					message = '<a class="Close"><span>×</span></a>' + message;
@@ -709,7 +709,7 @@ jQuery(document).ready(function($) {
 				message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
 				// Insert the current url as a target for inform anchors
 				message = message.replace(/{SelfUrl}/g, document.URL);
-				
+
 				var skip = false;
 				for (var j = 0; j < wrappers.length; j++) {
 					if ($(wrappers[j]).text() == $(message).text()) {
@@ -753,12 +753,12 @@ jQuery(document).ready(function($) {
 		informMessages.show();
       return true;
    }
-	
+
 	// Send an informMessage to the screen (same arguments as controller.InformMessage).
 	gdn.informMessage = function(message, options) {
 		if (!options)
 			options = new Array();
-			
+
 		if (typeof(options) == 'string') {
 			var css = options;
 			options = new Array();
@@ -767,35 +767,35 @@ jQuery(document).ready(function($) {
 		options['Message'] = message;
 		if (!options['CssClass'])
 			options['CssClass'] = 'Dismissable AutoDismiss';
-		
+
 		gdn.inform({'InformMessages' : new Array(options)});
 	}
-   
+
    // Inform an error returned from an ajax call.
    gdn.informError = function(xhr) {
       if (typeof(xhr) == 'string')
          xhr = {responseText: xhr, code: 500};
-      
+
       var message = xhr.responseText;
       var code = xhr.status;
-      
+
       try {
          var data = $.parseJSON(message);
          if (data.Exception)
             message = data.Exception;
       } catch(e) {
       }
-      
+
       gdn.informMessage('<span class="InformSprite SkullBones Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
    }
-   
+
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
 	if (informMessageStack) {
 		informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
 		gdn.inform(informMessageStack);
 	}
-	
+
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
 	pingForNotifications = function() {
       $.ajax({
@@ -814,7 +814,7 @@ jQuery(document).ready(function($) {
    if (gdn.definition('SignedIn', '0') != '0') {
       setInterval(pingForNotifications, 60000);
    }
-	
+
 	// Stash something in the user's session (or unstash the value if it was not provided)
 	stash = function(name, value) {
 		$.ajax({
@@ -830,10 +830,10 @@ jQuery(document).ready(function($) {
 				return json.Unstash;
 			}
 		});
-		
+
 		return '';
 	}
-	
+
 	// When a stash anchor is clicked, look for inputs with values to stash
 	$('a.Stash').click(function() {
 		var comment = $('#Form_Comment textarea').val();
@@ -845,7 +845,7 @@ jQuery(document).ready(function($) {
 // Shrink large images to fit into message space, and pop into new window when clicked.
 // This needs to happen in onload because otherwise the image sizes are not yet known.
 jQuery(window).load(function() {
-   
+
    var toggler = function(t_img, t_width) {
       if (t_img.css('width') == 'auto')
          t_img.css('width',t_width);
@@ -853,16 +853,16 @@ jQuery(window).load(function() {
          t_img.css('width','auto');
       return false;
    }
-   
+
    jQuery('div.Message img').each(function(i,img) {
       var img = jQuery(img);
       var container = img.parents('div.Message');
       if (img.width() > container.width()) {
          var smwidth = container.width();
-         
+
          img.css('width', smwidth).css('cursor', 'pointer');
          img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
-         
+
          img.next().click(function() {
             return toggler(img, smwidth);
          });

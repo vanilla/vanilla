@@ -88,7 +88,7 @@ class Gdn_FormatterChain {
     *
     * @param array $A The first formatter array to compare.
     * @param array $B The second formatter array to compare.
-    * @return int 
+    * @return int
     */
    public static function Compare($A, $B) {
       if ($A[1] < $B[1])

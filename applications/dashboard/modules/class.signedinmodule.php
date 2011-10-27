@@ -9,7 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class SignedInModule extends Gdn_Module {
-   
+
    public function AssetTarget() {
       $this->_ApplicationFolder = 'dashboard';
       return 'Panel';

@@ -9,16 +9,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class TagModule extends Gdn_Module {
-   
+
    protected $_TagData;
    protected $_DiscussionID;
-   
+
    public function __construct($Sender = '') {
       $this->_TagData = FALSE;
       $this->_DiscussionID = 0;
       parent::__construct($Sender);
    }
-   
+
    public function GetData($DiscussionID = '') {
       $SQL = Gdn::SQL();
       if (is_numeric($DiscussionID) && $DiscussionID > 0) {
@@ -28,7 +28,7 @@ class TagModule extends Gdn_Module {
       } else {
          $SQL->Where('t.CountDiscussions >', 0, FALSE);
       }
-            
+
       $this->_TagData = $SQL
          ->Select('t.*')
          ->From('Tag t')
@@ -40,7 +40,7 @@ class TagModule extends Gdn_Module {
    public function AssetTarget() {
       return 'Panel';
    }
-   
+
    public function InlineDisplay() {
       if ($this->_TagData->NumRows() == 0)
          return '';
@@ -54,7 +54,7 @@ class TagModule extends Gdn_Module {
          foreach ($this->_TagData->Result() as $Tag) {
             if ($Tag->Name != '') {
          ?>
-            <li><?php 
+            <li><?php
                if (urlencode($Tag->Name) == $Tag->Name) {
                   echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged/'.urlencode($Tag->Name));
                } else {
@@ -86,7 +86,7 @@ class TagModule extends Gdn_Module {
          foreach ($this->_TagData->Result() as $Tag) {
             if ($Tag->Name != '') {
          ?>
-            <li><strong><?php 
+            <li><strong><?php
                            if (urlencode($Tag->Name) == $Tag->Name) {
                               echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged/'.urlencode($Tag->Name));
                            } else {

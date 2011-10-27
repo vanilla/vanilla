@@ -58,7 +58,7 @@ extracted to PHP namespace, saving an extract call for every template. There is
 now support for applying modifiers to static values and functions. You can now
 access constants with $smarty.const.VAR.  See the NEWS file for complete
 changes.
- 
+
 2.3.1
 -----
 
@@ -135,7 +135,7 @@ through a list (or array) of values.
 This release has quite a few new features and fixes. Most notable are the
 introduction of block functions, so you can write plugins that work on a block
 of text with {func}{/func} notation. Also output filters were added, so you can
-apply a function against the output of your templates. This differs from the 
+apply a function against the output of your templates. This differs from the
 postfilter function, which works on the compiled template at compile time, and
 output filters work on the template output at runtime.
 

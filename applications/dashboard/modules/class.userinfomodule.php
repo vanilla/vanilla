@@ -12,15 +12,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders a list of users who are taking part in a particular discussion.
  */
 class UserInfoModule extends Gdn_Module {
-   
+
    public $User;
    public $Roles;
-   
+
    public function __construct($Sender = '') {
       $this->User = FALSE;
       parent::__construct($Sender);
    }
-   
+
    public function AssetTarget() {
       return 'Panel';
    }

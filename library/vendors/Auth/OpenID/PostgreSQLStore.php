@@ -29,7 +29,7 @@ class Auth_OpenID_PostgreSQLStore extends Auth_OpenID_SQLStore {
                 "UNIQUE (server_url, timestamp, salt))";
 
         $this->sql['assoc_table'] =
-            "CREATE TABLE %s (server_url VARCHAR(2047) NOT NULL, ". 
+            "CREATE TABLE %s (server_url VARCHAR(2047) NOT NULL, ".
                              "handle VARCHAR(255) NOT NULL, ".
                              "secret BYTEA NOT NULL, ".
                              "issued INTEGER NOT NULL, ".

@@ -1,17 +1,17 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
-   
+
    // Hijack "clear status" link clicks
    $('#Status a.Change').live('click', function() {
       // hijack the request and clear out the status
       jQuery.get($(this).attr('href') + '?DeliveryType=BOOL');
-      $('#Status').remove();      
+      $('#Status').remove();
       return false;
    });
 
    // Set the max chars in the about form.
    $('form.About textarea').setMaxChars(1000);
-   
+
    // Popup the picture form when the link is clicked
    $('li.PictureLink a').popup({hijackForms: false, afterLoad: function() {
       $('.Popup :submit').hide();
@@ -50,12 +50,12 @@ jQuery(document).ready(function($) {
          onSelect: setPreviewAndCoords,
          aspectRatio: 1
       });
-      
+
       $('.Popup :submit').click(function() {
          $('.Popup .Body').children().hide().end().append('<div class="Loading">&nbsp;</div>');
       });
    }});
-   
+
    $('li.Popup a').popup();
 
    $('#cropbox').Jcrop({
@@ -81,13 +81,13 @@ jQuery(document).ready(function($) {
          marginTop: '-' + Math.round(ry * c.y) + 'px'
       });
    }
-   
+
    // Remove Profile Picture
    $('a.RemovePictureLink').popup({
       confirm: true,
       followConfirm: false
    });
-   
+
    // Handle heading clicks on preferences form
    $('table.PreferenceGroup thead td.PrefCheckBox').livequery(function() {
       var cell = this;
@@ -102,7 +102,7 @@ jQuery(document).ready(function($) {
           if (checkbox) {
             if (i == 0)
                state = $(checkbox).attr('checked');
-               
+
             if (state) {
               checkbox.removeAttr('checked');
             } else {
@@ -125,7 +125,7 @@ jQuery(document).ready(function($) {
          for (i = 0; i < checkboxes.length; i++) {
             if (i == 0)
                state = $(checkboxes[0]).attr('checked');
-            
+
             if (state)
                $(checkboxes[i]).removeAttr('checked');
             else

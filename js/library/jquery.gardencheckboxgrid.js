@@ -4,7 +4,7 @@ jQuery / Garden CheckBoxGrid Plugin v1
 Usage:
 (1) Use Garden's /garden/library/class.form.php to render a
  $Form->OrganizedCheckBoxList();
- 
+
 (2) Include this file on the page, and the labels in the table will be
 transformed into hyperlinks, allowing the checking/unchecking of all items in a
 specific row, column, or the entire table.
@@ -15,10 +15,10 @@ specific row, column, or the entire table.
    opt = $.extend({
      noOptionsYet: 0
    }, opt);
-   
+
   // Remove the cellpadding on label cells
   $(this).find('th, thead td').css('padding', '0px');
-   
+
   // Handle table heading clicks
   $(this).find('thead th').each(function() {
       var text = $(this).html();
@@ -56,7 +56,7 @@ specific row, column, or the entire table.
       anchor.href = '#';
       $(this).html(anchor);
   });
-  
+
   // Handle column heading clicks
   $(this).find('thead td').each(function() {
       var columnIndex = $(this).parent().children().index($(this)); //$(this).attr('cellIndex');
@@ -75,7 +75,7 @@ specific row, column, or the entire table.
             found = true;
             checked = $(checkbox).attr('checked');
           }
-          
+
           if (checked) {
             checkbox.removeAttr('checked');
           } else {
@@ -88,8 +88,8 @@ specific row, column, or the entire table.
       anchor.href = '#';
       $(this).html(anchor);
   });
-  
-   
+
+
    // Return the object for chaining
      return $(this);
   }

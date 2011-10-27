@@ -247,23 +247,23 @@ class Gdn_Validation {
    public function ApplyRule($FieldName, $RuleName, $CustomError = '') {
       // Make sure that $FieldName is in the validation fields collection
       $this->ValidationFields();
-      
+
       if (!array_key_exists($FieldName, $this->_ValidationFields))
          $this->_ValidationFields[$FieldName] = '';
-         
+
       $this->_ApplyRule($FieldName, $RuleName, $CustomError);
    }
-   
+
    /**
     * Apply an array of validation rules all at once.
-    * @param array $Fields 
+    * @param array $Fields
     */
    public function ApplyRules($Fields) {
       foreach ($Fields as $Index => $Row) {
          $Validation = GetValue('Validation', $Row);
          if (!$Validation)
             continue;
-         
+
          $FieldName = GetValue('Name', $Row, $Index);
          if (is_string($Validation)) {
             $this->ApplyRule($FieldName, $Validation);
@@ -278,7 +278,7 @@ class Gdn_Validation {
          }
       }
    }
-      
+
    protected function _ApplyRule($FieldName, $RuleName, $CustomError = '') {
       if (!is_array($this->_FieldRules))
          $this->_FieldRules = array();
@@ -333,7 +333,7 @@ class Gdn_Validation {
       foreach($this->_ValidationFields as $Field => $Val) {
          $this->AddValidationField($Field, $PostedFields);
       }
-      
+
       if ($Schema != NULL) {
          // 2. Any field that is required by the schema
          foreach($Schema as $Field => $Properties) {
@@ -358,7 +358,7 @@ class Gdn_Validation {
    public function ValidationFields() {
       if (!is_array($this->_ValidationFields))
          $this->_ValidationFields = array();
-         
+
       return $this->_ValidationFields;
    }
 
@@ -611,10 +611,10 @@ class Gdn_Validation {
    public function Results($Reset = FALSE) {
       if (!is_array($this->_ValidationResults) || $Reset)
          $this->_ValidationResults = array();
-      
+
       return $this->_ValidationResults;
    }
-   
+
    public function ResultsText() {
       $Errors = array();
       foreach ($this->Results() as $Name => $Value) {
@@ -626,7 +626,7 @@ class Gdn_Validation {
             $Errors[] = trim(sprintf(T($Value), T($Name)), '.');
          }
       }
-      
+
       $Result = implode('. ', $Errors);
       return $Result;
    }

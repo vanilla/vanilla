@@ -1,7 +1,7 @@
 By default, each application has it's own "design" folder for css and image
 files off the root of that application (ie. /scaffolding/design/). If you wanted
 to override them, you could copy them into your custom theme folder and edit
-them there. 
+them there.
 
 If you want a view to be used across applications (ie. one master view for
 vanilla, scffolding, etc), you could place it in:

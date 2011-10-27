@@ -85,7 +85,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
       }
       return $String;
    }
-   
+
    public function EscapeIdentifier($RefExpr) {
       // The MySql back tick syntax is the default escape sequence so nothing needs to be done.
       return $RefExpr;
@@ -103,7 +103,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
    public function FetchColumnSql($Table) {
       if ($Table[0] != '`' && !StringBeginsWith($Table, $this->Database->DatabasePrefix))
          $Table = $this->Database->DatabasePrefix.$Table;
-      
+
       return "show columns from ".$this->FormatTableName($Table);
    }
 
@@ -215,7 +215,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
    public function GetDelete($TableName, $Wheres = array()) {
       $Conditions = '';
       $Joins = '';
-      
+
       if (count($this->_Joins) > 0) {
          $Joins .= "\n";
 
@@ -224,7 +224,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          //    $Joins .= implode("\n", $this->_FilterTableAliases($this->_Joins));
          // else
          $Joins .= implode("\n", $this->_Joins);
-      }      
+      }
 
       if (count($Wheres) > 0) {
          $Conditions = "\nwhere ";
@@ -260,7 +260,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             // This is a big insert with a bunch of rows.
             $Sql .= "\n(".implode(', ', array_keys($Data[0])).') '
                ."\nvalues ";
-            
+
             // Append each insert statement.
             for($i = 0; $i < count($Data); $i++) {
                if($i > 0)
@@ -310,9 +310,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
       if (count($this->_Joins) > 0) {
          $sql .= "\n";
-         
+
          $Join = $this->_Joins[count($this->_Joins) - 1];
-   
+
          $sql .= implode("\n", $this->_Joins);
       }
 

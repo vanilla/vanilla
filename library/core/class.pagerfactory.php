@@ -23,7 +23,7 @@ class Gdn_PagerFactory {
 
    public function GetPager($PagerType, $Sender) {
       $PagerType = $PagerType.'Module';
-         
+
       if (!class_exists($PagerType))
          $PagerType = 'PagerModule';
 

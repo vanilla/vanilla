@@ -1,11 +1,11 @@
 jQuery(document).ready(function($) {
-   
+
    $('a.TagName').popup({
       onUnload: function() {
          $('#Content').load(gdn.url('/dashboard/settings/tagging?DeliveryType=VIEW'));
       }
    });
-   
+
    // Confirm deletes before performing them
    $('a.Delete').popup({
       confirm: true,

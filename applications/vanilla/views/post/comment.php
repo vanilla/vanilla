@@ -11,10 +11,10 @@ $Editing = isset($this->Comment);
          <?php
          if (!$Editing)
             echo '<li>'.Anchor(T('Preview'), '#', 'PreviewButton TabLink')."</li>\n";
-         
+
          if ($NewOrDraft)
             echo '<li>'.Anchor(T('Save Draft'), '#', 'DraftButton TabLink')."</li>\n";
-   
+
          $this->FireEvent('AfterCommentTabs');
          ?>
       </ul>
@@ -25,7 +25,7 @@ $Editing = isset($this->Comment);
    }
    echo $this->Form->Open();
    echo $this->Form->Errors();
-   
+
    $CommentOptions = array('MultiLine' => TRUE);
    /*
     Caused non-root users to not be able to add comments. Must take categories
@@ -50,7 +50,7 @@ $Editing = isset($this->Comment);
    echo ' '.Gdn_Theme::Link('forumroot', $CancelText, NULL, array(
        'class' => $CancelClass
    )).' ';
-   
+
    $ButtonOptions = array('class' => 'Button CommentButton');
    /*
     Caused non-root users to not be able to add comments. Must take categories

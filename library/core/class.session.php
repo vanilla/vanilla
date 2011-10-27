@@ -160,7 +160,7 @@ class Gdn_Session {
          $Authenticator = Gdn::Authenticator();
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
-      
+
       $this->UserID = 0;
       $this->User = FALSE;
       $this->_Attributes = array();
@@ -289,7 +289,7 @@ class Gdn_Session {
                $HourOffset = GetValue('HourOffset', $this->User->Attributes);
                $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
             }
-            
+
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');
 
@@ -386,19 +386,19 @@ class Gdn_Session {
          return FALSE;
       return $ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE;
    }
-	
+
 	/**
 	 * Place a name/value pair into the user's session stash.
 	 */
 	public function Stash($Name = '', $Value = '', $UnsetOnRetrieve = TRUE) {
 		if ($Name == '')
 			return;
-		
+
       // Grab the user's session
       $Session = $this->_GetStashSession();
       if (!$Session)
          return;
-      
+
       $Attributes = unserialize($Session->Attributes);
       if (!is_array($Attributes))
          $Attributes = array();
@@ -425,7 +425,7 @@ class Gdn_Session {
       }
       return $Value;
 	}
-	   
+
 	/**
 	 * Used by $this->Stash() to create & manage sessions for users & guests.
 	 * This is a stop-gap solution until full session management for users &
@@ -463,7 +463,7 @@ class Gdn_Session {
             ->Where('SessionID', $SessionID)
             ->Get()
             ->FirstRow();
-            
+
          // Save a session cookie
          $Name = $CookieName.'SessionID';
          $Path = C('Garden.Cookie.Path', '/');

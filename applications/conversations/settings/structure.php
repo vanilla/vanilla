@@ -10,10 +10,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 if (!isset($Drop))
    $Drop = FALSE;
-   
+
 if (!isset($Explicit))
    $Explicit = TRUE;
-   
+
 $SQL = $Database->SQL();
 $Construct = $Database->Structure();
 $Px = $Database->DatabasePrefix;
@@ -47,7 +47,7 @@ $Construct
 // Contains the user/conversation relationship. Keeps track of all users who are
 // taking part in the conversation. It also keeps DateCleared, which is a
 // per-user date relating to when each users last cleared the conversation
-// history, and 
+// history, and
 $Construct->Table('UserConversation');
 
 $UpdateCountReadMessages = $Construct->TableExists() && !$Construct->ColumnExists('CountReadMessages');
@@ -62,7 +62,7 @@ $Construct
    ->Column('Bookmarked', 'tinyint(1)', '0')
    ->Column('Deleted', 'tinyint(1)', '0') // User deleted this conversation
    ->Set($Explicit, $Drop);
-   
+
 // Contains messages for each conversation, as well as who inserted the message
 // and when it was inserted. Users cannot edit or delete their messages once
 // they have been sent.
@@ -110,7 +110,7 @@ set CountReadMessages = (
 $Construct->Table('User')
    ->Column('CountUnreadConversations', 'int', NULL)
    ->Set(FALSE, FALSE);
-   
+
 // Insert some activity types
 ///  %1 = ActivityName
 ///  %2 = ActivityName Possessive
@@ -125,7 +125,7 @@ $Construct->Table('User')
 if ($SQL->GetWhere('ActivityType', array('Name' => 'ConversationMessage'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'ConversationMessage', 'FullHeadline' => '%1$s sent you a %8$s.', 'ProfileHeadline' => '%1$s sent you a %8$s.', 'RouteCode' => 'message', 'Notify' => '1', 'Public' => '0'));
 
-// X added Y to a conversation   
+// X added Y to a conversation
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AddedToConversation'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'AddedToConversation', 'FullHeadline' => '%1$s added %3$s to a %8$s.', 'ProfileHeadline' => '%1$s added %3$s to a %8$s.', 'RouteCode' => 'conversation', 'Notify' => '1', 'Public' => '0'));
 

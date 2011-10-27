@@ -61,7 +61,7 @@ class Gdn_Email extends Gdn_Pluggable {
       ob_end_clean();
       return $this;
    }
-   
+
    /**
     * Adds to the "Cc" recipient collection.
     *
@@ -113,9 +113,9 @@ class Gdn_Email extends Gdn_Pluggable {
 
       if ($SenderName == '')
          $SenderName = C('Garden.Email.SupportName', C('Garden.Title', ''));
-      
+
       if($this->PhpMailer->Sender == '' || $bOverrideSender) $this->PhpMailer->Sender = $SenderEmail;
-      
+
       ob_start();
       $this->PhpMailer->SetFrom($SenderEmail, $SenderName, FALSE);
       ob_end_clean();
@@ -142,10 +142,10 @@ class Gdn_Email extends Gdn_Pluggable {
     * @return Email
     */
    public function Message($Message) {
-   
+
       // htmlspecialchars_decode is being used here to revert any specialchar escaping done by Gdn_Format::Text()
       // which, untreated, would result in &#039; in the message in place of single quotes.
-   
+
       if ($this->PhpMailer->ContentType == 'text/html') {
          $this->PhpMailer->MsgHTML(htmlspecialchars_decode($Message,ENT_QUOTES));
       } else {
@@ -171,7 +171,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * @todo add port settings
     */
    public function Send($EventName = '') {
-      
+
       if (Gdn::Config('Garden.Email.UseSmtp')) {
          $this->PhpMailer->IsSMTP();
          $SmtpHost = Gdn::Config('Garden.Email.SmtpHost', '');
@@ -188,11 +188,11 @@ class Gdn_Email extends Gdn_Pluggable {
          if(!empty($Username))
             $this->PhpMailer->SMTPAuth = TRUE;
 
-         
+
       } else {
          $this->PhpMailer->IsMail();
       }
-      
+
       if($EventName != ''){
          $this->EventArguments['EventName'] = $EventName;
          $this->FireEvent('SendMail');
@@ -202,28 +202,28 @@ class Gdn_Email extends Gdn_Pluggable {
       if (!$this->PhpMailer->Send()) {
          throw new Exception($this->PhpMailer->ErrorInfo);
       }
-      
+
       return true;
    }
-   
+
    /**
     * Adds subject of the message to the email.
-    * 
+    *
     * @param string $Subject The subject of the message.
     */
    public function Subject($Subject) {
       $this->PhpMailer->Subject = $Subject;
-      return $this;  
+      return $this;
    }
 
-   
+
    public function AddTo($RecipientEmail, $RecipientName = ''){
       ob_start();
       $this->PhpMailer->AddAddress($RecipientEmail, $RecipientName);
       ob_end_clean();
       return $this;
    }
-   
+
    /**
     * Adds to the "To" recipient collection.
     *
@@ -246,16 +246,16 @@ class Gdn_Email extends Gdn_Pluggable {
          } else
             $this->Cc($RecipientEmail, $RecipientName);
          return $this;
-         
+
       } elseif ($RecipientEmail instanceof stdClass) {
          $RecipientName = GetValue('Name', $RecipientEmail);
          $RecipientEmail = GetValue('Email', $RecipientEmail);
          return $this->To($RecipientEmail, $RecipientName);
-      
+
       } elseif ($RecipientEmail instanceof Gdn_DataSet) {
          foreach($RecipientEmail->ResultObject() as $Object) $this->To($Object);
          return $this;
-        
+
       } elseif (is_array($RecipientEmail)) {
          $Count = count($RecipientEmail);
          if (!is_array($RecipientName)) $RecipientName = array_fill(0, $Count, '');
@@ -264,13 +264,13 @@ class Gdn_Email extends Gdn_Pluggable {
             foreach($RecipientEmail as $Email => $Name) $this->To($Email, $Name);
          } else
             trigger_error(ErrorMessage('Size of arrays do not match', 'Email', 'To'), E_USER_ERROR);
-         
+
          return $this;
       }
-      
+
       trigger_error(ErrorMessage('Incorrect first parameter ('.GetType($RecipientEmail).') passed to function.', 'Email', 'To'), E_USER_ERROR);
    }
-   
+
    public function Charset($Use = ''){
       if ($Use != '') {
          $this->PhpMailer->CharSet = $Use;
@@ -278,5 +278,5 @@ class Gdn_Email extends Gdn_Pluggable {
       }
       return $this->PhpMailer->CharSet;
    }
-   
+
 }

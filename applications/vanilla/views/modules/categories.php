@@ -13,12 +13,12 @@ if ($this->Data !== FALSE) {
       <li<?php
       if (!is_numeric($CategoryID))
          echo ' class="Active"';
-         
+
       ?>><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong><span class="Count"><?php echo number_format($CountDiscussions); ?></span></span></li>
 <?php
    $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
    $DoHeadings = C('Vanilla.Categories.DoHeadings');
-   
+
    foreach ($this->Data->Result() as $Category) {
       if ($Category->CategoryID < 0 || $MaxDepth > 0 && $Category->Depth > $MaxDepth)
          continue;
@@ -27,7 +27,7 @@ if ($this->Data !== FALSE) {
          $CssClass = 'Heading';
       else
          $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '');
-      
+
       echo '<li class="'.$CssClass.'">';
 
       if ($DoHeadings && $Category->Depth == 1) {

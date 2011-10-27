@@ -31,7 +31,7 @@
 							$Attribs = array();
 							if (SignInPopup() && strpos(Gdn::Request()->Url(), 'entry') === FALSE)
 								$Attribs['class'] = 'SignInPopup';
-								
+
 							$this->Menu->AddLink('Entry', T('Sign In'), SignInUrl($this->SelfUrl), FALSE, array('class' => 'NonTab'), $Attribs);
 						}
 						echo $this->Menu->ToString();
@@ -40,7 +40,7 @@
             <div class="Search"><?php
 					$Form = Gdn::Factory('Form');
 					$Form->InputPrefix = '';
-					echo 
+					echo
 						$Form->Open(array('action' => Url('/search'), 'method' => 'get')),
 						$Form->TextBox('Search'),
 						$Form->Button('Go', array('Name' => '')),

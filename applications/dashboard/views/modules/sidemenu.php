@@ -2,7 +2,7 @@
 <div>
    <?php
    $this->CheckPermissions();
-   
+
    // Loop through all the groups.
    foreach ($this->Items as $Item) {
       // Output the group.

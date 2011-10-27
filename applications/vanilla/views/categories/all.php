@@ -75,7 +75,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                      // has children, add a replacement string for them.
                      if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
                         $CatList .= '{ChildCategories}';
-         
+
                   $CatList .= '</div>
                </div>
             </li>';
@@ -86,7 +86,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
    // the replacement one last time.
    if ($ChildCategories != '')
       $CatList = str_replace('{ChildCategories}', '<span class="ChildCategories">'.Wrap(T('Child Categories:'), 'b').' '.$ChildCategories.'</span>', $CatList);
-   
+
    echo $CatList;
 ?>
 </ul>

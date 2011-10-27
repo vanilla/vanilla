@@ -7,7 +7,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
    <dl>
       <dt class="Name"><?php echo T('Username'); ?></dt>
       <dd class="Name"><?php echo $this->User->Name; ?></dd>
-      <?php               
+      <?php
       if ($this->User->ShowEmail == 1 || $Session->CheckPermission('Garden.Registration.Manage')) {
          echo '<dt class="Email">'.T('Email').'</dt>
          <dd class="Email">'.Gdn_Format::Email($this->User->Email).'</dd>';
@@ -23,7 +23,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       <dd class="Roles"><?php echo implode(', ', $this->Roles); ?></dd>
       <?php if ($Session->CheckPermission('Garden.Moderation.Manage')): ?>
       <dt class="IP"><?php echo T('Register IP'); ?></dt>
-      <dd class="IP"><?php 
+      <dd class="IP"><?php
          $IP = IPAnchor($this->User->InsertIPAddress);
          echo $IP ? $IP : T('n/a');
       ?></dd>

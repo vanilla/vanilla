@@ -28,7 +28,7 @@ window.vanilla.embed = function(host) {
 
    if (window.gadgets)
       embedUrl = '';
-      
+
    if (typeof(host) == 'undefined') {
       host = '';
       for (i = 0; i < scripts.length; i++) {
@@ -40,7 +40,7 @@ window.vanilla.embed = function(host) {
          }
       }
    }
-      
+
    window.vanilla.embeds[id] = this;
    if (window.postMessage) {
       onMessage = function(e) {
@@ -69,7 +69,7 @@ window.vanilla.embed = function(host) {
          var newMessageId = message[0];
          if (newMessageId == messageId)
             return;
-         
+
          messageId = newMessageId;
          message.splice(0, 1);
          processMessage(message);
@@ -150,7 +150,7 @@ window.vanilla.embed = function(host) {
       if (host.indexOf('?') >= 0) {
          path = path.replace('?', '&');
       }
-      
+
       // What type of embed are we performing?
       var embed_type = typeof(vanilla_embed_type) == 'undefined' ? 'standard' : vanilla_embed_type;
       // Are we loading a particular discussion based on discussion_id?
@@ -169,11 +169,11 @@ window.vanilla.embed = function(host) {
       var foreign_url = typeof(vanilla_foreign_url) == 'undefined' ? document.URL : vanilla_foreign_url;
       // If embedding comments, this value will be used as the first comment body related to the discussion.
       var foreign_body = typeof(vanilla_foreign_body) == 'undefined' ? '' : vanilla_foreign_body;
-      
+
       // Force type based on incoming variables
       if (discussion_id != '' || foreign_id != '')
          embed_type = 'comments';
-         
+
       if (embed_type == 'comments') {
          return 'http://' + host + '/vanilla/discussion/embed/'
             +'?DiscussionID='+encodeURIComponent(discussion_id)
@@ -183,7 +183,7 @@ window.vanilla.embed = function(host) {
             +'&ForeignUrl='+encodeURIComponent(foreign_url)
             +'&ForeignBody='+encodeURIComponent(foreign_body)
             +'&CategoryID='+encodeURIComponent(category_id);
-      } else 
+      } else
          var timestamp = new Date().getTime();
          return 'http://' + host + path + '&t=' + timestamp + '&remote=' + encodeURIComponent(embedUrl);
    }

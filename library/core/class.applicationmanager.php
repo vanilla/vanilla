@@ -20,7 +20,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
 class Gdn_ApplicationManager {
-   
+
    /**
     * An array of available applications. Never access this directly, instead
     * use $this->AvailableApplications();
@@ -36,7 +36,7 @@ class Gdn_ApplicationManager {
     * @var array
     */
    private $_EnabledApplications = NULL;
-   
+
    /**
     * The valid paths to search for applications.
     *
@@ -53,7 +53,7 @@ class Gdn_ApplicationManager {
    public function AvailableApplications() {
       if (!is_array($this->_AvailableApplications)) {
          $ApplicationInfo = array();
-         
+
          $AppFolders = Gdn_FileSystem::Folders(PATH_APPLICATIONS); // Get an array of all application folders
          $ApplicationAboutFiles = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, 'settings' . DS . 'about.php', $AppFolders); // Now look for about files within them.
          // Include them all right here and fill the application info array
@@ -110,14 +110,14 @@ class Gdn_ApplicationManager {
 
       return $this->_EnabledApplications;
    }
-   
+
    public function CheckApplication($ApplicationName) {
       if (array_key_exists($ApplicationName, $this->_EnabledApplications))
          return TRUE;
-         
+
       return FALSE;
    }
-   
+
    public function AvailableVisibleApplications() {
       $AvailableApplications = $this->AvailableApplications();
       foreach ($AvailableApplications as $ApplicationName => $Info) {
@@ -188,14 +188,14 @@ class Gdn_ApplicationManager {
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
       if ($ApplicationFolder == '')
          throw new Exception(T('The application folder was not properly defined.'));
-      
+
       // Hook directly into the autoloader and force it to load the newly tested application
       Gdn_Autoloader::AttachApplication($ApplicationName);
-      
+
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
-      
+
       // Call the application's setup method
       $Hooks = $ApplicationName.'Hooks';
       if (!class_exists($Hooks)) {
@@ -207,7 +207,7 @@ class Gdn_ApplicationManager {
          $Hooks = new $Hooks();
          $Hooks->Setup();
       }
-      
+
       return TRUE;
    }
 

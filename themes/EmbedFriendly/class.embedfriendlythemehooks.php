@@ -9,7 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
-	
+
    public function Setup() {
 		// Set the order for the modules (make sure new discussion module is before content).
 		SaveToConfig('Modules.Vanilla.Content', array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'Content', 'Ads'));
@@ -19,7 +19,7 @@ class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
    public function OnDisable() {
       return TRUE;
    }
-	
+
 	public function SettingsController_AfterCurrentTheme_Handler($Sender) {
 		$SingleColumn = C('Themes.EmbedFriendly.SingleColumn');
 		echo Wrap(
@@ -31,12 +31,12 @@ class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
 			), 'div')
 		, 'div', array('class' => 'Description'));
 	}
-	
+
 	public function SettingsController_EmbedFriendlyTogglePanel_Create($Sender) {
 		$this->_TogglePanel($Sender);
 		Redirect('settings/themes');
 	}
-	
+
 	public function PluginController_BeforeEmbedRecommend_Handler($Sender) {
 		$SingleColumn = C('Themes.EmbedFriendly.SingleColumn');
 		echo '<div class="EmbedRecommend">
@@ -51,7 +51,7 @@ class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
 			, 'em')
 		.'</div>';
 	}
-	
+
 	public function PluginController_EmbedFriendlyTogglePanel_Create($Sender) {
 		$this->_TogglePanel($Sender);
 		Redirect('plugin/embed');
@@ -69,11 +69,11 @@ class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
 		if (($Sender->MasterView == 'default' || $Sender->MasterView == '') && C('Themes.EmbedFriendly.SingleColumn'))
 			$Sender->AddCSSFile('singlecolumn.css');
 	}
-	
+
    public function CategoriesController_Render_Before($Sender) {
 		$this->_AddButton($Sender, 'NewDiscussionModule');
    }
-   
+
    public function DiscussionsController_Render_Before($Sender) {
 		$this->_AddButton($Sender, 'NewDiscussionModule');
    }
@@ -85,14 +85,14 @@ class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
    public function DraftsController_Render_Before($Sender) {
 		$this->_AddButton($Sender, 'NewDiscussionModule');
    }
-	
+
 	public function MessagesController_Render_Before($Sender) {
 		$this->_AddButton($Sender, 'NewConversationModule');
 	}
-	
+
 	private function _AddButton($Sender, $ModuleName) {
 		if (C('Themes.EmbedFriendly.SingleColumn'))
 			$Sender->AddModule($ModuleName, 'Content');
 	}
-   
+
 }

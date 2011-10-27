@@ -37,12 +37,12 @@ interface Gdn_IPlugin {
     * @return boolean
     */
    public function Setup();
-   
+
    /**
     * These methods are invoked if present, but are not required and will be silently ignored
     * if they do not exist.
     */
-   
+
    // public function OnLoad()    - Called as the plugin is instantiated (each page load)
    // public function OnDisable() - Called as the plugin is disabled
    // public function CleanUp()   - Called as the plugin is removed

@@ -3,10 +3,10 @@
    <title><?php echo $this->Head->Title(); ?></title>
    <link href="<?php echo Url('', TRUE, TRUE); ?>"/>
    <updated><?php echo date(DATE_ATOM); ?></updated>
-   
+
    <?php
       $this->RenderAsset('AtomHead');
-      
+
       /* Sample Atom Content:
       <entry>
          <title>Atom-Powered Robots Run Amok</title>

@@ -597,7 +597,7 @@
       libs/plugins/modifier.truncate.php:
       fixed handling of $etc in the truncate modifier when $etc is longer
       than $length.
-      
+
       thanks to Sylvinus!
 
 2007-01-10  boots  <jayboots@yahoo.com>
@@ -606,7 +606,7 @@
       libs/plugins/modifier.date_format.php
       libs/plugins/modifier.date_format.php:
       fix handling of %I with mysql timestamps
-      
+
       Thanks to Danilo Buerger
 
     * NEWS
@@ -616,7 +616,7 @@
     * NEWS
       libs/plugins/modifier.date_format.php:
       Emulate %R in the date_format modifier on Windows
-      
+
       Thanks to Danilo Buerger
 
 2006-12-10  Yannick Torres  <yannick.torres@keliglia.com>
@@ -654,13 +654,13 @@
       NEWS:
       Fixed replacement bug introduced in trimwhitespaces output filter that
       was introduced in the last release.
-      
+
       Thanks to Spuerhund from the forums.
 
     * (Smarty_2_6_16)
       libs/plugins/outputfilter.trimwhitespace.php:
       Fixed replacement bug introduced by last changes.
-      
+
       Thanks to Spuerhund from the forums.
 
 2006-11-30  Monte Ohrt  <monte@ohrt.com>
@@ -696,11 +696,11 @@
     * NEWS
       libs/internals/core.write_file.php:
       change file writing semantics in smarty_core_write_file()
-      
+
       This avoids unlink() unless rename() fails or a Windows system is detected
-      
+
       see: http://www.phpinsider.com/smarty-forum/viewtopic.php?t=6956
-      
+
       Thanks to c960657 from the forums.
 
 2006-11-07  boots  <jayboots@yahoo.com>
@@ -709,17 +709,17 @@
       libs/debug.tpl:
       update debug.tpl to xhtml 1.1 compliance, fix javascript escaping in debug
       output and apply a Smarty based color scheme
-      
+
       see: http://www.phpinsider.com/smarty-forum/viewtopic.php?t=7178
-      
+
       thanks to cybot from the forums!
 
     * NEWS
       libs/plugins/modifier.debug_print_var.php:
       enhance reporting precision of debug_print_var modifier
-      
+
       see: http://www.phpinsider.com/smarty-forum/viewtopic.php?t=9281
-      
+
       thanks to cybot from the forums
 
 2006-11-01  boots  <jayboots@yahoo.com>
@@ -728,7 +728,7 @@
       libs/plugins/function.html_select_date.php:
       make html_select_date work consistently with 0000-00-00 00:00:00 and
       0000-00-00 inputs
-      
+
       Thanks to cybot from forums
 
 2006-10-16  George Miroshnikov  <support@infinity.com.ua>
@@ -1473,7 +1473,7 @@
 
     * libs/plugins/function.html_table.php:
       Added ability to specify column headings in {html_table}
-      
+
       Added th_attrs attribute which works similary to td_attr and tr_attr but
       for TH elements. Changes the cols attribute to allow mixed values; a
       numeric still specifies the number of columns to render but now an array
@@ -1481,7 +1481,7 @@
       is determine from the size of the array. Further, a comma-separated
       string of column names can be used which is internally coverted to an
       array and used as if it was specified as a normal array.
-      
+
       Thanks for lynlyn for the feature request.
 
 2006-06-23  boots  <jayboots@yahoo.com>
@@ -1492,7 +1492,7 @@
     * NEWS
       libs/plugins/outputfilter.trimwhitespace.php:
       fixed ordering of replacements in trimwhitespace output filter
-      
+
       Thanks to Getty from IRC for reporting this.
 
 2006-06-20  boots  <jayboots@yahoo.com>
@@ -1501,14 +1501,14 @@
       libs/plugins/function.mailto.php:
       update mailto function plugin to work around a firefox/thunderbird escaping
       bug
-      
+
       Thanks to elijahlofgren from the forums for reporting this and providing
       the necessary patch
 
     * NEWS
       libs/plugins/modifier.date_format.php:
       emulate %l in the date_format modifier on windows
-      
+
       thanks to Gibberish from the forums for reporting this
 
 2006-06-14  boots  <jayboots@yahoo.com>
@@ -1516,7 +1516,7 @@
     * NEWS
       libs/plugins/modifier.capitalize.php:
       Fix handling of apostrophes in the capitalize modifier.
-      
+
       Thanks to asmecher from the forums for reporting this and providing a
       partial solution.
 
@@ -1549,7 +1549,7 @@
     * NEWS
       libs/plugins/function.popup_init.php:
       changed {popup_init} to only emit code once during a request
-      
+
       Thanks to TGKnIght from forums
 
 2006-04-22  Messju Mohr  <messju@lammfellpuschen.de>
@@ -1608,7 +1608,7 @@
     * NEWS
       libs/Smarty_Compiler.class.php:
       fixed use of references $cache_attrs and $repeat in Smarty_Compiler.
-      
+
       php does not allow to pass an assigned by reference to a function. since
       php-5.1.2
       the reference to the lval gets lost when passing an assignment.
@@ -1626,7 +1626,7 @@
     * NEWS
       libs/Smarty_Compiler.class.php:
       Fix improper tokenization of certain inline math expressions.
-      
+
       Thanks to gerard at forums for reporting this.
 
 2005-12-19  Messju Mohr  <messju@lammfellpuschen.de>
@@ -1663,17 +1663,17 @@
       fixed code generation of non-cacheable blocks to play well with php's
       "Alternative syntax" used for example in compiled {if}..{else}..{/if}
       blocks.
-      
+
       (see: http://php.net/manual/en/control-structures.alternative-syntax.php
       on "Alternative syntax")
-      
+
       thanks to kihara from the forum.
 
 2005-11-26  Messju Mohr  <messju@lammfellpuschen.de>
 
     * NEWS:
       fixed handling of multiple identical calls to {insert}.
-      
+
       the function was called multiple times, but all inserts where replaced
       by the results of the first call to the insert function.
 
@@ -2079,7 +2079,7 @@
     * libs/Smarty.class.php:
       fixed serialization of values containing newlines (like _cache_attrs)
       in core_write_cache_file()
-      
+
       bumped version to 2.6.6-dev-3 to indicate that the fileformat of cache
       has changed
 
@@ -2158,7 +2158,7 @@
     * libs/Smarty_Compiler.class.php:
       reduced the code that is generated on a {foreach}-block that has a
       name.
-      
+
       instead of pre-computing all foreach-properties (like first, last,
       show) on each iteration, they are computed on demand as soon as
       {$smarty.foreach.*}-variables are used.
@@ -2166,7 +2166,7 @@
     * NEWS
       libs/Smarty_Compiler.class.php:
       slight optimization in the compilation of $smarty.const.FOO .
-      
+
       more complex consts like $smarty.const.$name still compile to
       constant($this->_tpl_vars['name'])
 
@@ -2176,7 +2176,7 @@
       libs/Smarty_Compiler.class.php:
       make block functions and registered objects' block methods use a
       local variable for block_content instead of $this->_block_content
-      
+
       it's not necessary to have $smarty->_block_content accessible.
 
 2005-01-04  Yannick Torres  <yannick.torres@keliglia.com>
@@ -2250,7 +2250,7 @@
     * libs/plugins/function.html_options.php:
       fixed semantically misleading check for $options (use isset() instead
       of is_array() because it is always an array).
-      
+
       thanks to albert almeida.
 
 2004-11-08  Messju Mohr  <messju@lammfellpuschen.de>
@@ -2276,7 +2276,7 @@
       in the replacement of internal nocache-tags to dynamic content that
       lead to false results with deeply nested includes or with
       nocache-blocks inside nocache-blocks.
-      
+
       many thanks to Lars Jankowfsky for providing big help on reproducing
       and tracking down this bug!
 
@@ -2286,10 +2286,10 @@
       libs/Smarty_Compiler.class.php:
       - better header for compiled includes (more in line with compiled
       templates)
-      
+
       - reuse cache_serials if a file is compiled more than once in one
         process (force_compile)
-      
+
       - don't print nocache-delimiters wenn already inside
       process_cached_inserts()
 
@@ -2378,7 +2378,7 @@
       libs/Smarty_Compiler.class.php:
       moved $this->_num_const_regexp out of $this->_var_regexp and added it
       to the places that affect $this->_var_regexp
-      
+
       this should fix some problems parsing plugin-names endings with digits
 
 2004-09-14  Messju Mohr  <messju@lammfellpuschen.de>
@@ -2468,7 +2468,7 @@
     * NEWS
       libs/core/core.write_file.php:
       tempnam() seems to be borken on many installation.
-      
+
       now we try tempnam first and if that fails we generate our own
       temp-filename with uniqid()
 
@@ -2523,7 +2523,7 @@
       libs/Smarty_Compiler.class.php:
       fixed occasional wrong error messages on mismatched tags when
       {else}, {elseif}, {foreachelse} or {sectionelse} is involved
-      
+
       thanks to Ooypunk for pointing me on this
 
 2004-08-12  Nuno Lopes  <nunoplopes@sapo.pt>
@@ -2561,7 +2561,7 @@
     * NEWS
       libs/Smarty_Compiler.class.php:
       fixed handling of methods arguments.
-      
+
       thanks to Manfred Wischin for finding this one and providing the
       conceptual fix.
 
@@ -2571,10 +2571,10 @@
       libs/plugins/function.html_radios.php:
       there was little flaw in smarty_function_html_radios() and
       smarty_function_html_checkboxes():
-      
+
       the newly introduced assign-attribute was still added to the
       tag-output as an extra-attribute.
-      
+
       fixed.
 
     * NEWS
@@ -2590,7 +2590,7 @@
       libs/plugins/function.html_select_time.php
       libs/plugins/modifier.date_format.php:
       backed out renaming of _get_plugin_filepath() to get_plugin_filepath()
-      
+
       we'll stick to _get_plugin_filepath() and look for a more viable
       solution to be exposed to plugin-writers.
 
@@ -2775,7 +2775,7 @@
     * NEWS
       libs/Smarty.class.php:
       enhanced auto-generated filenames for templates_c and cache
-      
+
       incremented Smarty::_version because the tempfiles' structure changed
       a little
 
@@ -2813,7 +2813,7 @@
       libs/core/core.write_file.php:
       use tempnam() instead of unqid() to create better temporary files in
       smarty_core_write_file().
-      
+
       (thanks to xces for finding this race-condition and his work on
       fixing it)
 
@@ -2897,7 +2897,7 @@
     * NEWS
       libs/core/core.write_compiled_include.php:
       made smarty_core_write_compiled_include() php5-aware
-      
+
       if someone knows a better way than patching the source with the
       tokenizer, please stand up!
 
@@ -2932,7 +2932,7 @@
       libs/Smarty.class.php:
       removed unused functionality to load a subset of lines from a file in
       Smarty::_read_file()
-      
+
       additionally removed a warning that is emitted since php-4.3.5 when
       fread() is called on an empty file (with filesize()==0). thanks to
       Andreas Streichardt who pointed this out.
@@ -3083,7 +3083,7 @@
       unrolled call to the is_compiled()-check to be able to supply the
       correct resource_base_path for config_load. this avoids errors when
       config-files are accessed where security is enabled.
-      
+
       thanks to shuther for pointing out this bug.
 
 2004-03-20  Nuno Lopes  <nunoplopes@sapo.pt>
@@ -3095,7 +3095,7 @@
 
     * libs/core/core.is_secure.php:
       removed merging of $smarty->template_dir into $smarty->secure_dir
-      
+
       the resource_base_path is considerd secure instead. this change should
       have absolutely no impact on smarty's security's behaviour
 
@@ -3123,7 +3123,7 @@
     * libs/Smarty.class.php:
       moved setting of a default resource_base_path from
       Smarty::_parse_resource_name() to Smarty::_fetch_resource_info()
-      
+
       this shouldn't affect anything, since all calls to
       _parse_resource_name() that are not done from within
       _fetch_resource_info() all pass their own resource_base_path
@@ -3134,7 +3134,7 @@
       libs/Smarty.class.php:
       removed '.' from the list of default resource_base_paths in
       _parse_resource_name()
-      
+
       this should only affect _parse_resource_name() for templates, not for
       php-resources and not for config_files. the latter pass two their own
       resource_base_path.
@@ -3379,7 +3379,7 @@
     * NEWS
       libs/plugins/function.html_image.php:
       fix: $smarty->security is now correctly handled
-      
+
       minor optimizations:
          core/core.is_secure.php is only included when needed
          $dpi_default is only determined when needed
@@ -3529,7 +3529,7 @@
       allow single-digit days and months without smarty_make_timestamp()
       this makes dates like "1968-11-6" work correctly since no strtotime()
       is involved
-      
+
       add warning when unknown parameter is passed
 
 2003-12-16  Messju Mohr  <messju@lammfellpuschen.de>
@@ -3613,7 +3613,7 @@
       libs/plugins/function.html_options.php:
       fix bug when comparing array-keys to "selected" in html_options and
       html_checkboxes
-      
+
       in_array() uses "strict" comparason now.
 
     * libs/plugins/function.html_checkboxes.php
@@ -3904,7 +3904,7 @@
     * libs/Smarty.class.php
       libs/core/core.is_secure.php:
       move check for template_dir in secure_dir-array into core.is_secure.php
-      
+
       this makes template_exists() work correctly with security=true even if
       template_dir is not inside the secure_dir-array
 
@@ -3913,7 +3913,7 @@
     * libs/plugins/shared.make_timestamp.php:
       tightened check for YYYYMMDDHHMMSS-format. thanks konstantin for
       pointing this out.
-      
+
       removed a few tabs.
 
     * libs/Smarty_Compiler.class.php:
@@ -4135,7 +4135,7 @@
     * docs/designers.sgml:
       added parameter-descriptions for count_characters (thanks Konstantin
       A. Pelepelin)
-      
+
       fixed docs for {html_checkboxes}
 
 2003-08-14  Messju Mohr  <messju@lammfellpuschen.de>
@@ -4153,7 +4153,7 @@
       - handling of section-attribute
       - reusing the same config-file multiple times
       - serialization of config-data for php<4.2.0 (no var_export)
-      
+
       many thanks to atu for pointing this out and for testing
 
 2003-08-13  Messju Mohr  <messju@lammfellpuschen.de>
@@ -4324,7 +4324,7 @@
       libs/Smarty_Compiler.class.php:
       enabled registration of class-methods as callbacks for the
       register_*-functions
-      
+
       use: array('classname', 'method_name')) as callback
 
 2003-07-29  Messju Mohr  <messju@lammfellpuschen.de>
@@ -5148,7 +5148,7 @@
       libs/Smarty.class.php:
       enabled array(&$obj. 'source', 'timestamp', 'secure', 'trusted') as
       callback for register_resource()
-      
+
       enabled array(&$obj, 'method') as callback for
       $default_template_handler_func
 

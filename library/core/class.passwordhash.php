@@ -85,14 +85,14 @@ class Gdn_PasswordHash extends PasswordHash {
             $Parts = explode('$', $StoredHash);
             $StoredHash = GetValue(0, $Parts);
             $StoredSalt = GetValue(1, $Parts);
-            
+
             if (md5($Password) == $StoredHash)
                $Result = TRUE;
             elseif (sha1($StoredSalt.sha1($Password)) == $StoredHash)
                $Result = TRUE;
             else
                $Result = FALSE;
-            
+
             break;
          case 'reset':
             throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), Url('entry/passwordrequest')));
@@ -105,7 +105,7 @@ class Gdn_PasswordHash extends PasswordHash {
             $SaltLength = strlen($StoredHash) - 32;
             $Salt = trim(substr($StoredHash, -$SaltLength, $SaltLength));
             $VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - $SaltLength);
-            
+
 				$VbHash = md5(md5($Password).$Salt);
 				$Result = $VbHash == $VbStoredHash;
 				break;
@@ -113,15 +113,15 @@ class Gdn_PasswordHash extends PasswordHash {
 			default:
 				$Result = $this->CheckVanilla($Password, $StoredHash);
 		}
-		
+
 		return $Result;
    }
-	
+
 	function CheckVanilla($Password, $StoredHash) {
 		$this->Weak = FALSE;
       if (!isset($StoredHash[0]))
          return FALSE;
-      
+
       if ($StoredHash[0] === '_' || $StoredHash[0] === '$') {
          return parent::CheckPassword($Password, $StoredHash);
       } else if ($Password && $StoredHash !== '*'

@@ -101,7 +101,7 @@ function hexdump($d){
    $ascii .= htmlspecialchars($d[$i]);
   }else{
    $ascii .= '.';
-  } 
+  }
   // Add extra column spacing
   if($j == 7){
    $hexi .= ' ';
@@ -110,12 +110,12 @@ function hexdump($d){
   // Add row
   if(++$j == 16 || $i == $len-1){
    // Join the hexi / ascii output
-   echo sprintf("%04X   %-49s   %s", $offset, $hexi, $ascii);   
+   echo sprintf("%04X   %-49s   %s", $offset, $hexi, $ascii);
    // Reset vars
    $hexi = $ascii = '';
    $offset += 16;
-   $j = 0;  
-   // Add newline   
+   $j = 0;
+   // Add newline
    if ($i !== $len-1){
     echo "\n";
    }
@@ -150,9 +150,9 @@ div.help{border-top: 1px dotted gray; margin-top: 15px; padding-top: 15px; color
 #inputD{overflow:auto; background-color:#ffff99; border:1px #cc9966 solid; padding:3px;}
 #inputR{overflow:auto; background-color:#ffffcc; border:1px #ffcc99 solid; padding:3px;}
 #inputC, #settingF, #inputD, #inputR, #outputD, #outputR, textarea{font-size:100%; font-family:'Bitstream vera sans mono', 'courier new', 'courier', monospace;}
-#outputD{overflow:auto; background-color: #99ffcc; border:1px #66cc99 solid; padding:3px;} 
-#outputH{overflow:auto; background-color:white; padding:3px; border:1px #dcdcdc solid;} 
-#outputR{overflow:auto; background-color: #ccffcc; border:1px #99cc99 solid; padding:3px;} 
+#outputD{overflow:auto; background-color: #99ffcc; border:1px #66cc99 solid; padding:3px;}
+#outputH{overflow:auto; background-color:white; padding:3px; border:1px #dcdcdc solid;}
+#outputR{overflow:auto; background-color: #ccffcc; border:1px #99cc99 solid; padding:3px;}
 span.cmtcdata{color: orange;}
 span.ctag{color:red;}
 span.ent{border-bottom:1px dotted #999999;}
@@ -163,7 +163,7 @@ span.notice{color:green;}
 span.otag{color:blue;}
 #topmost{margin:auto; width:98%;}
 /*]]>*/--></style>
-<script type="text/javascript"><!--//--><![CDATA[//><!-- 
+<script type="text/javascript"><!--//--><![CDATA[//><!--
 window.name = 'hlmain';
 function hl(i){
  <?php if(!$_hilite){echo 'return;'; }?>
@@ -214,7 +214,7 @@ function run(e, q, c){
   }
  }
  for(var k = e.firstChild; k != null; k = k.nextSibling){
-  if(k.nodeType == 3){     
+  if(k.nodeType == 3){
    var m = q.exec(k.data);
    if(m){
     var v = m[0];
@@ -241,15 +241,15 @@ function run(e, q, c){
   }
  }
 }
-function toggle(i){  
- var e = document.getElementById(i);  
+function toggle(i){
+ var e = document.getElementById(i);
  if(!e){return;}
  if(e.style){
-  var a = e.style.display;   
+  var a = e.style.display;
   if(a == 'block'){e.style.display = 'none'; return;}
   if(a == 'none'){e.style.display = 'block';}
   else{e.style.display = 'none';}
-  return;   
+  return;
  }
  var a = e.visibility;
  if(a == 'hidden'){e.visibility = 'show'; return;}
@@ -320,7 +320,7 @@ tRs = {
  },
  adBtn: function(){
   var textareas = document.getElementsByTagName('textarea');
-  for(var i = 0; i < textareas.length; i++){	
+  for(var i = 0; i < textareas.length; i++){
    var txtclass=textareas[i].className;
    if(txtclass.substring(0,tRs.resizeClass.length)==tRs.resizeClass ||
    txtclass.substring(txtclass.length -tRs.resizeClass.length)==tRs.resizeClass){
@@ -331,7 +331,7 @@ tRs = {
     a.title = 'click-drag to resize'
     tRs.adEv(a, 'mousedown', tRs.initResize);
     textareas[i].parentNode.appendChild(a);
-   }	
+   }
   }
  },
  initResize: function(event){
@@ -399,17 +399,17 @@ if($do){
   echo '<input type="hidden" value="1" name="w3c_validate" id="w3c_validate" />';
  }
 ?>
- 
+
 <button type="button" title="rendered as web-page without a doctype or charset declaration" style="float: right;" onclick="javascript: sndUnproc(); return false;" onkeypress="javascript: sndUnproc(); return false;">View unprocessed</button>
 <button type="button" onclick="javascript:document.getElementById('text').focus();document.getElementById('text').select()" title="select all to copy" style="float:right;">Select all</button>
 
 <?php
 if($_w3c_validate && $validation){
 ?>
-  
+
 <button type="button" title="HTML 4.01 W3C online validation" style="float: right;" onclick="javascript: sndValidn('text', 'html401'); return false;" onkeypress="javascript: sndValidn('text', 'html401'); return false;">Check HTML</button>
 <button type="button" title="XHTML 1.1 W3C online validation" style="float: right;" onclick="javascript: sndValidn('text', 'xhtml110'); return false;" onkeypress="javascript: sndValidn('text', 'xhtml110'); return false;">Check XHTML</button>
-  
+
 <?php
  }
 }
@@ -440,7 +440,7 @@ if($limit_exceeded){
 <tr>
 <td><span class="help" title="$config argument">Config:</span></td>
 <td><ul>
- 
+
 <?php
 $cfg = array(
 'abs_url'=>array('3', '0', 'absolute/relative URL conversion', '-1'),
@@ -491,12 +491,12 @@ foreach($cfg as $k=>$v){
    else{
     foreach($v[4] as $z){
      echo ' ', $z[3], ': <input type="text" size="', $z[0], '" name="h', $k. $j. $z[1], '" value="', htmlspecialchars(isset($_POST['h'. $k. $j. $z[1]][0]) ? $_POST['h'. $k. $j. $z[1]] : $z[2]), '"', (isset($v['d']) ? ' disabled="disabled"' : ''), ' />';
-    }    
+    }
    }
   }
  }
  elseif(ctype_digit($v[3])){ // input text
-  echo '<input type="text" size="', $v[3], '" name="h', $k, '" value="', htmlspecialchars(isset($_POST['h'. $k][0]) ? $_POST['h'. $k] : $v[1]), '"', (isset($v['d']) ? ' disabled="disabled"' : ''), ' />';  
+  echo '<input type="text" size="', $v[3], '" name="h', $k, '" value="', htmlspecialchars(isset($_POST['h'. $k][0]) ? $_POST['h'. $k] : $v[1]), '"', (isset($v['d']) ? ' disabled="disabled"' : ''), ' />';
  }
  else{} // text-area
  echo ' <span class="help">', $v[2], '</span></li>';
@@ -539,17 +539,17 @@ if($do){
  unset($cfg['and_mark']); // disabling and_mark
 
  $cfg['show_setting'] = 'hlcfg';
- $st = microtime(); 
+ $st = microtime();
  $out = htmLawed($_POST['text'], $cfg, str_replace(array('$', '{'), '', $_POST['spec']));
  $et = microtime();
  echo '<br /><a href="htmLawedTest.php" title="[toggle visibility] syntax-highlighted" onclick="javascript:toggle(\'inputR\'); return false;"><span class="notice">Input code &raquo;</span></a> <span class="help" title="tags estimated as half of total &gt; and &lt; chars; values may be inaccurate for non-ASCII text"><small><big>', strlen($_POST['text']), '</big> chars, ~<big>', round((substr_count($_POST['text'], '>') + substr_count($_POST['text'], '<'))/2), '</big> tags</small>&nbsp;</span><div id="inputR" style="display: none;">', format($_POST['text']), '</div><script type="text/javascript">hl(\'inputR\');</script>', (!isset($_POST['text'][$_hlimit]) ? ' <a href="htmLawedTest.php" title="[toggle visibility] hexdump; non-viewable characters like line-returns are shown as dots" onclick="javascript:toggle(\'inputD\'); return false;"><span class="notice">Input binary &raquo;&nbsp;</span></a><div id="inputD" style="display: none;">'. hexdump($_POST['text']). '</div>' : ''), ' <a href="htmLawedTest.php" title="[toggle visibility] finalized internal settings as interpreted by htmLawed; for developers" onclick="javascript:toggle(\'settingF\'); return false;"><span class="notice">Finalized internal settings &raquo;&nbsp;</span></a> <div id="settingF" style="display: none;">', str_replace(array('    ', "\t", '  '), array('  ', '&nbsp;  ', '&nbsp; '), nl2br(htmlspecialchars(print_r($GLOBALS['hlcfg']['config'], true)))), '</div><script type="text/javascript">hl(\'settingF\');</script>', '<br /><a href="htmLawedTest.php" title="[toggle visibility] suitable for copy-paste" onclick="javascript:toggle(\'outputF\'); return false;"><span class="notice">Output &raquo;</span></a> <span class="help" title="approx., server-specific value excluding the \'include()\' call"><small>htmLawed processing time <big>', number_format(((substr($et,0,9)) + (substr($et,-10)) - (substr($st,0,9)) - (substr($st,-10))),4), '</big> s</small></span>', (($mem = memory_get_peak_usage()) !== false ? '<span class="help"><small>, peak memory usage <big>'. round(($mem-$pre_mem)/1048576, 2). '</big> <small>MB</small>' : ''), '</small></span><div id="outputF"  style="display: block;"><div><textarea id="text2" class="textarea" name="text2" rows="5" cols="100" style="width: 100%;">', htmlspecialchars($out), '</textarea></div><button type="button" onclick="javascript:document.getElementById(\'text2\').focus();document.getElementById(\'text2\').select()" title="select all to copy" style="float:right;">Select all</button>';
  if($_w3c_validate && $validation)
  {
 ?>
-  
+
 <button type="button" title="HTML 4.01 W3C online validation" style="float: right;" onclick="javascript: sndValidn('text2', 'html401'); return false;" onkeypress="javascript: sndValidn('text2', 'html401'); return false;">Check HTML</button>
 <button type="button" title="XHTML 1.1 W3C online validation" style="float: right;" onclick="javascript: sndValidn('text2', 'xhtml110'); return false;" onkeypress="javascript: sndValidn('text2', 'xhtml110'); return false;">Check XHTML</button>
-  
+
 <?php
  }
  echo '</div><br /><a href="htmLawedTest.php" title="[toggle visibility] syntax-highlighted" onclick="javascript:toggle(\'outputR\'); return false;"><span class="notice">Output code &raquo;</span></a><div id="outputR" style="display: block;">', format($out), '</div><script type="text/javascript">hl(\'outputR\');</script>', (!isset($_POST['text'][$_hlimit]) ? '<br /><a href="htmLawedTest.php" title="[toggle visibility] hexdump; non-viewable characters like line-returns are shown as dots" onclick="javascript:toggle(\'outputD\'); return false;"><span class="notice">Output binary &raquo;</span></a><div id="outputD" style="display: none;">'. hexdump($out). '</div>' : ''), '<br /><a href="htmLawedTest.php" title="[toggle visibility] XHTML 1 Transitional doctype" onclick="javascript:toggle(\'outputH\'); return false;"><span class="notice">Output rendered &raquo;</span></a><div id="outputH" style="display: block;">', $out, '</div>';

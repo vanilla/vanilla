@@ -1,6 +1,6 @@
-jQuery(document).ready(function($) {   
+jQuery(document).ready(function($) {
    // Handle the various option button clicks...
-   
+
    // 1. "Dismiss" clicks
    $('a.DismissAnnouncement').click(function() {
       var btn = this;
@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
    // 3. Sink discussion
    $('a.SinkDiscussion').popup({
       confirm: true,
@@ -59,9 +59,9 @@ jQuery(document).ready(function($) {
             $(row).addClass('Sink');
          else
             $(row).removeClass('Sink');
-            
+
          if (json.LinkText)
-            $(sender).text(json.LinkText);            
+            $(sender).text(json.LinkText);
       }
    });
 
@@ -75,9 +75,9 @@ jQuery(document).ready(function($) {
             $(row).addClass('Close');
          else
             $(row).removeClass('Close');
-            
+
          if (json.LinkText)
-            $(sender).text(json.LinkText);            
+            $(sender).text(json.LinkText);
       }
    });
 

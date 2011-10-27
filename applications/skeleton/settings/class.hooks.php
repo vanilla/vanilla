@@ -14,7 +14,7 @@ class SkeletonHooks implements Gdn_IPlugin {
       // You can find existing hooks by searching for 'FireEvent'
       // Request new hooks on the VanillaForums.org community forum!
    }
-   
+
    /**
     * Special function automatically run upon clicking 'Enable' on your application.
     * Change the word 'skeleton' anywhere you see it.
@@ -27,14 +27,14 @@ class SkeletonHooks implements Gdn_IPlugin {
       // You can use if(C('Skeleton.Setup', FALSE)) to test whether to repeat part of your setup.
       SaveToConfig('Skeleton.Setup', TRUE);
    }
-   
+
    /**
     * Special function automatically run upon clicking 'Disable' on your application.
     */
    public function OnDisable() {
       // Optional. Delete this if you don't need it.
    }
-   
+
    /**
     * Special function automatically run upon clicking 'Remove' on your application.
     */

@@ -111,7 +111,7 @@ if (!function_exists('ValidateWebAddress')) {
    function ValidateWebAddress($Value, $Field = '') {
       if ($Value == '')
          return TRUE; // Required picks up this error
-      
+
       return filter_var($Value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED) !== FALSE;
    }
 }
@@ -119,13 +119,13 @@ if (!function_exists('ValidateWebAddress')) {
 if (!function_exists('ValidateUsernameRegex')) {
    function ValidateUsernameRegex() {
       static $ValidateUsernameRegex;
-      
+
       if (is_null($ValidateUsernameRegex)) {
          $ValidateUsernameRegex = sprintf("[%s]%s",
             C("Garden.User.ValidationRegex","\d\w_"),
             C("Garden.User.ValidationLength","{3,20}"));
       }
-      
+
       return $ValidateUsernameRegex;
    }
 }
@@ -133,7 +133,7 @@ if (!function_exists('ValidateUsernameRegex')) {
 if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
       $ValidateUsernameRegex = ValidateUsernameRegex();
-      
+
       return ValidateRegex(
          $Value,
          "/^({$ValidateUsernameRegex})?$/siu"
@@ -172,7 +172,7 @@ if (!function_exists('ValidateDate')) {
 				$Hour = ArrayValue(4, $Matches, 0);
 				$Minutes = ArrayValue(5, $Matches, 0);
 				$Seconds = ArrayValue(6, $Matches, 0);
-			   
+
             return checkdate($Month, $Day, $Year) && $Hour < 24 && $Minutes < 61 && $Seconds < 61;
          }
       }
@@ -247,7 +247,7 @@ if (!function_exists('ValidateLength')) {
          $Diff = mb_strlen($Value, 'UTF-8') - $Field->Length;
       else
          $Diff = strlen($Value) - $Field->Length;
-         
+
       if ($Diff <= 0) {
          return TRUE;
       } else {

@@ -21,7 +21,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
       ?>
       <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
          <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>" /></td>
-         <td class="UsernameCell"><?php 
+         <td class="UsernameCell"><?php
             echo UserAnchor($Row, '', 'Insert');
 
             if (!empty($Row['OtherUserIDs'])) {
@@ -85,7 +85,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 
                   }
                }
-              
+
                echo '</div>';
             ?>
          </td>

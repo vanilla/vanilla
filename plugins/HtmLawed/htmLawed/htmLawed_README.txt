@@ -203,7 +203,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
   htmLawed should work with PHP 4.3 and higher. Either 'include()' the 'htmLawed.php' file or copy-paste the entire code.
 
   To easily *test* htmLawed using a form-based interface, use the provided demo:- htmLawedTest.php ('htmLawed.php' and 'htmLawedTest.php' should be in the same directory on the web-server).
-  
+
   *Note*: For code for usage of the htmLawed class (for htmLawed in OOP), please refer to the htmLawed:- http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed website; the filtering itself can be configured, etc., as described here.
 
 
@@ -253,7 +253,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
 
   *anti_link_spam*
   Anti-link-spam measure; see section:- #3.4.7
-      
+
   '0' - no measure taken  *
   'array("regex1", "regex2")' - will ensure a 'rel' attribute with 'nofollow' in its value in case the 'href' attribute value matches the regular expression pattern 'regex1', and/or will remove 'href' if its value matches the regular expression pattern 'regex2'. E.g., 'array("/./", "/://\W*(?!(abc\.com|xyz\.org))/")'; see section:- #3.4.7 for more.
 
@@ -478,7 +478,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
   `Output`: '<input title="depth" value="10em" /><input title="depth" />'
 
   *Special characters*: The characters ';', ',', '/', '(', ')', '|', '~' and space have special meanings in the rules. Words in the rules that use such characters, or the characters themselves, should be `escaped` by enclosing in pairs of double-quotes ('"'). A back-tick ('`') can be used to escape a literal '"'. An example rule illustrating this is 'input=value(maxlen=30/match="/^\w/"/default="your `"ID`"")'.
-   
+
   *Note*: To deny an attribute for all elements for which it is legal, '$config["deny_attribute"]' (see section:- #3.4) can be used instead of '$spec'. Also, attributes can be allowed element-specifically through '$spec' while being denied globally through '$config["deny_attribute"]'. The 'hook_tag' parameter (section:- #3.4.9) can also be used to implement the '$spec' functionality.
 
 
@@ -500,7 +500,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
   *  Allowing 'script', 'applet', 'embed', 'iframe' or 'object' elements, or certain of their attributes like 'allowscriptaccess'
 
   *  Allowing HTML comments (some Internet Explorer versions are vulnerable with, e.g., '<!--[if gte IE 4]><script>alert("xss");</script><![endif]-->'
-  
+
   *  Allowing dynamic CSS expressions (a feature of the IE browser)
 
   `Unsafe` HTML can be removed by setting '$config' appropriately. E.g., '$config["elements"] = "* -script"' (section:- #3.3), '$config["safe"] = 1' (section:- #3.6), etc.
@@ -550,7 +550,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
 
   *  Attribute values may not be double-quoted, or may be single-quoted.
 
-  *  Left-padding of numeric entities (like, '&#0160;', '&x07ff;') with '0' is okay as long as the number of characters between between the '&' and the ';' does not exceed 8. All entities must end with ';' though. 
+  *  Left-padding of numeric entities (like, '&#0160;', '&x07ff;') with '0' is okay as long as the number of characters between between the '&' and the ';' does not exceed 8. All entities must end with ';' though.
 
   *  Named character entities must be properly cased. E.g., '&Lt;' or '&TILDE;' will not be let through without modification.
 
@@ -566,7 +566,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
 
   *  Input authors should be notified of admin-specified allowed elements, attributes, configuration values (like conversion of named entities to numeric ones), etc.
 
-  *  With '$config["unique_ids"]' not '0' and the 'id' attribute being permitted, writers should carefully avoid using duplicate or invalid 'id' values as even though htmLawed will correct/remove the values, the final output may not be the one desired. E.g., when '<a id="home"></a><input id="home" /><label for="home"></label>' is processed into 
+  *  With '$config["unique_ids"]' not '0' and the 'id' attribute being permitted, writers should carefully avoid using duplicate or invalid 'id' values as even though htmLawed will correct/remove the values, the final output may not be the one desired. E.g., when '<a id="home"></a><input id="home" /><label for="home"></label>' is processed into
 '<a id="home"></a><input id="prefix_home" /><label for="home"></label>'.
 
   *  Note that even if intended HTML is lost in a highly ill-written input, the processed output will be more secure and standard-compliant.
@@ -614,7 +614,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
   *  htmLawed might convert certain entities to actual characters and remove backslashes and CSS comment-markers ('/*') in 'style' attribute values in order to detect malicious HTML like crafted IE-specific dynamic expressions like '&#101;xpression...'. If this is too harsh, admins can allow CSS expressions through htmLawed core but then use a custom function through the 'hook_tag' parameter (section:- #3.4.9) to more specifically identify CSS expressions in the 'style' attribute values. Also, using '$config["style_pass"]', it is possible to have htmLawed pass 'style' attribute values without even looking at them (section:- #3.4.8).
 
   *  htmLawed does not correct certain possible attribute-based security vulnerabilities (e.g., '<a href="http://x%22+style=%22background-image:xss">x</a>'). These arise when browsers mis-identify markup in `escaped` text, defeating the very purpose of escaping text (a bad browser will read the given example as '<a href="http://x" style="background-image:xss">x</a>').
-  
+
   *  Because of poor Unicode support in PHP, htmLawed does not remove the `high value` HTML-invalid characters with multi-byte code-points. Such characters however are extremely unlikely to be in the input. (see section:- #3.1).
 
   *  Like any script using PHP's PCRE regex functions, PHP setup-specific low PCRE limit values can cause htmLawed to at least partially fail with very long input texts.
@@ -624,49 +624,49 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
 
 
   Safest, allowing only `safe` HTML markup --
-  
+
     $config = array('safe'=>1);
     $out = htmLawed($in);
-    
+
   Simplest, allowing all valid HTML markup except 'javascript:' --
-  
+
     $out = htmLawed($in);
-    
+
   Allowing all valid HTML markup including 'javascript:' --
-  
+
     $config = array('schemes'=>'*:*');
     $out = htmLawed($in, $config);
-    
+
   Allowing only 'safe' HTML and the elements 'a', 'em', and 'strong' --
-  
+
     $config = array('safe'=>1, 'elements'=>'a, em, strong');
     $out = htmLawed($in, $config);
-    
+
   Not allowing elements 'script' and 'object' --
-  
+
     $config = array('elements'=>'* -script -object');
     $out = htmLawed($in, $config);
-    
+
   Not allowing attributes 'id' and 'style' --
-  
+
     $config = array('deny_attribute'=>'id, style');
     $out = htmLawed($in, $config);
-    
+
   Permitting only attributes 'title' and 'href' --
-  
+
     $config = array('deny_attribute'=>'* -title -href');
     $out = htmLawed($in, $config);
-    
+
   Remove bad/disallowed tags altogether instead of converting them to entities --
-  
+
     $config = array('keep_bad'=>0);
     $out = htmLawed($in, $config);
-    
+
   Allowing attribute 'title' only in 'a' and not allowing attributes 'id', 'style', or scriptable `on*` attributes like 'onclick' --
-  
+
     $config = array('deny_attribute'=>'title, id, style, on*');
     $spec = 'a=title';
-    $out = htmLawed($in, $config, $spec); 
+    $out = htmLawed($in, $config, $spec);
 
   Some case-studies are presented below.
 
@@ -903,9 +903,9 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
 
     &lt;*&gt; Pseudo-tags &lt;*&gt;
     Non-HTML tag xml
-    
+
     Disallowed tag p
-    
+
     <ul><li>OK</li></ul>
 
   An option like '1' is useful, e.g., when a writer previews his submission, whereas one like '3' is useful before content is finalized and made available to all.
@@ -1262,7 +1262,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
   This code will not work if '$config["clean_ms_char"]' is set to '1' (section:- #3.1), in which case one should instead deploy a hook function (section:- #3.7). (htmLawed internally uses certain control characters, code-points '1' to '7', and use of these characters as markers in the logic of hook functions may cause issues.)
 
   Admins may also be able to use '$config["and_mark"]' to deal with such mixed markup; see section:- #3.2.
- 
+
 
 == 4  Other =======================================================oo
 
@@ -1289,13 +1289,13 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
   (The release date for the downloadable package of files containing documentation, demo script, test-cases, etc., besides the 'htmLawed.php' file may be updated independently if the secondary files are revised.)
 
   `Version number - Release date. Notes`
-  
+
   1.1.9.3 - 17 May 2010. Checks for correct nesting of 'param'
-  
+
   1.1.9.2 - 26 April 2010. Minor fix regarding rendering of denied URL schemes
-  
+
   1.1.9.1 - 26 February 2010. htmLawed now uses the LGPL version 3 license; support for 'flashvars' attribute for 'embed'
-  
+
   1.1.9 - 22 December 2009. Soft-hyphens are now removed only from URL-accepting attribute values
 
   1.1.8.1 - 16 July 2009. Minor code-change to fix a PHP error notice
@@ -1307,7 +1307,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
   1.1.3-6 - 28-31 January - 4 February 2009. Altered logic to catch certain types of dynamic crafted CSS expressions
 
   1.1.2 - 22 January 2009. Fixed bug in parsing of 'font' attributes during tag transformation
-  
+
   1.1.1 - 27 September 2008. Better nesting correction when omitable closing tags are absent
 
   1.1 - 29 June 2008. '$config["hook_tag"]' and '$config["format"]' introduced for custom tag/attribute check/modification/injection and output compaction/beautification; fixed a regex-in-$spec parsing bug
@@ -1632,7 +1632,7 @@ A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/intern
   *  'hl_spec' - converting user-supplied $spec value to one used by htmLawed internally
   *  'hl_tag' - handling tags
   *  'hl_tag2' - transforming tags
-  *  'hl_tidy' - compact/beautify HTML 
+  *  'hl_tidy' - compact/beautify HTML
   *  'hl_version' - reporting htmLawed version
   *  'htmLawed' - main function
   *  'kses' - main function of 'kses'

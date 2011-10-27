@@ -61,13 +61,13 @@ class Gdn_FileSystem {
    public static function Folders($SourceFolders) {
       if(!is_array($SourceFolders))
          $SourceFolders = array($SourceFolders);
-   
+
       $BlackList = Gdn::Config('Garden.FolderBlacklist');
       if (!is_array($BlackList))
          $BlackList = array('.', '..');
-         
+
       $Result = array();
-      
+
       foreach($SourceFolders as $SourceFolder) {
          if ($DirectoryHandle = opendir($SourceFolder)) {
             while (($Item = readdir($DirectoryHandle)) !== FALSE) {
@@ -157,7 +157,7 @@ class Gdn_FileSystem {
                // Search all subfolders
                if ($WhiteList === TRUE)
                   $WhiteList = scandir($SourceFolder);
-               
+
                $SubFolders = array();
                foreach ($WhiteList as $WhiteFolder) {
                   $SubFolder = CombinePaths(array($SourceFolder, $WhiteFolder));
@@ -201,7 +201,7 @@ class Gdn_FileSystem {
       // If the application folder was provided, it will be the only entry in the whitelist, so prepend it.
       if (is_array($FolderWhiteList) && count($FolderWhiteList) == 1)
          $LibraryName = CombinePaths(array($FolderWhiteList[0], $LibraryName));
-         
+
       $LibraryKey = str_replace('.', '__', $LibraryName);
       Gdn_LibraryMap::PrepareCache($MappingCacheName);
       $LibraryPath = Gdn_LibraryMap::GetCache($MappingCacheName, $LibraryKey);
@@ -261,22 +261,22 @@ class Gdn_FileSystem {
     * @param string $FileContents The contents of the file being saved.
     */
    public static function SaveFile($FileName, $FileContents, $Flags = VANILLA_FILE_PUT_FLAGS) {
-   
+
       // Check that the folder exists and is writable
       $DirName = dirname($FileName);
       $FileBaseName = basename($FileName);
       if (!is_dir($DirName))
          throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.',$FileBaseName,$DirName));
-         
+
       if (!IsWritable($DirName))
          throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.',$FileBaseName,$DirName));
-         
+
       if (file_put_contents($FileName, $FileContents, $Flags) === FALSE)
          throw new Exception(sprintf('Requested save operation [%1$s] could not be completed!',$FileBaseName));
 
       return TRUE;
    }
-   
+
    /**
     * Similar to the unix touch command, this method checks to see if $FileName
     * exists. If it does not, it creates the file with nothing inside it.
@@ -287,7 +287,7 @@ class Gdn_FileSystem {
       if (!file_exists($FileName))
          file_put_contents($FileName, '', LOCK_EX);
    }
-   
+
    /**
     * Serves a file to the browser.
     *
@@ -297,14 +297,14 @@ class Gdn_FileSystem {
     * @param string $ServeMode Whether to download the file as an attachment, or inline
     */
    public static function ServeFile($File, $Name = '', $MimeType = '', $ServeMode = 'attachment') {
-      
+
       $FileIsLocal = (substr($File, 0, 4) == 'http') ? FALSE : TRUE;
       $FileAvailable = ($FileIsLocal) ? is_readable($File) : TRUE;
-      
+
       if ($FileAvailable) {
          // Close the database connection
          Gdn::Database()->CloseConnection();
-         
+
          // Determine if Path extension should be appended to Name
          $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));
          $FileExtension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
@@ -318,7 +318,7 @@ class Gdn_FileSystem {
             $Extension = $NameExtension;
          }
          $Name = rawurldecode($Name);
- 
+
          // Figure out the MIME type
          $MimeTypes = array(
            "pdf"  => "application/pdf",
@@ -337,7 +337,7 @@ class Gdn_FileSystem {
            "php"  => "text/plain",
            "ico"  => "image/vnd.microsoft.icon"
          );
-         
+
          if ($MimeType == '') {
             if (array_key_exists($FileExtension, $MimeTypes)){
               $MimeType = $MimeTypes[$FileExtension];
@@ -345,18 +345,18 @@ class Gdn_FileSystem {
               $MimeType = 'application/force-download';
             };
          };
-         
+
          @ob_end_clean();
-         
+
          // required for IE, otherwise Content-Disposition may be ignored
          if (ini_get('zlib.output_compression'))
             ini_set('zlib.output_compression', 'Off');
-         
+
          if ($ServeMode == 'inline')
             header('Content-Disposition: inline; filename="'.$Name.'"');
          else
             header('Content-Disposition: attachment; filename="'.$Name.'"');
-         
+
          header('Content-Type: '.$MimeType);
          header("Content-Transfer-Encoding: binary");
          header('Accept-Ranges: bytes');
@@ -369,12 +369,12 @@ class Gdn_FileSystem {
          die('not readable');
       }
    }
-   
+
    /**
     * Remove a folder (and all the sub-folders and files).
     * Taken from http://php.net/manual/en/function.rmdir.php
-    * 
-    * @param string $Dir 
+    *
+    * @param string $Dir
     * @return void
     */
    public static function RemoveFolder($Path) {
@@ -405,53 +405,53 @@ class Gdn_FileSystem {
       }
       rmdir($Path);
    }
-   
+
    public static function CheckFolderR($Path, $Flags = 0) {
       $TrimPath = ltrim($Path, '/');
       $PathParts = explode('/', $TrimPath);
       $Prepend = (strlen($Path) !== strlen($TrimPath)) ? DS : '';
-      
+
       $CurrentPath = array();
       foreach ($PathParts as $FolderPart) {
          array_push($CurrentPath, $FolderPart);
          $TestFolder = $Prepend.implode(DS, $CurrentPath);
-         
+
          if ($Flags & Gdn_FileSystem::O_CREATE) {
             if (!is_dir($TestFolder))
                @mkdir($TestFolder);
          }
-         
+
          if (!is_dir($TestFolder))
             return FALSE;
 
       }
-      
+
       if ($Flags & Gdn_FileSystem::O_READ) {
          if (!is_readable($Path))
             return FALSE;
       }
-         
+
       if ($Flags & Gdn_FileSystem::O_WRITE) {
          if (!is_writable($Path))
             return FALSE;
       }
       return TRUE;
    }
-   
+
     /**
      * Copy file or folder from source to destination
-     * 
+     *
      * It can do recursive copy as well and is very smart
      * It recursively creates the dest file or directory path if there weren't exists
      * Situtaions :
      * - Src:/home/test/file.txt ,Dst:/home/test/b ,Result:/home/test/b -> If source was file copy file.txt name with b as name to destination
      * - Src:/home/test/file.txt ,Dst:/home/test/b/ ,Result:/home/test/b/file.txt -> If source was file Creates b directory if does not exsits and copy file.txt into it
-     * - Src:/home/test ,Dst:/home/ ,Result:/home/test/** -> If source was directory copy test directory and all of its content into dest     
+     * - Src:/home/test ,Dst:/home/ ,Result:/home/test/** -> If source was directory copy test directory and all of its content into dest
      * - Src:/home/test/ ,Dst:/home/ ,Result:/home/**-> if source was direcotry copy its content to dest
      * - Src:/home/test ,Dst:/home/test2 ,Result:/home/test2/** -> if source was directoy copy it and its content to dest with test2 as name
      * - Src:/home/test/ ,Dst:/home/test2 ,Result:->/home/test2/** if source was directoy copy it and its content to dest with test2 as name
-     * 
-     * @author Sina Salek - http://sina.salek.ws/en/contact 
+     *
+     * @author Sina Salek - http://sina.salek.ws/en/contact
      * @param $source //file or folder
      * @param $dest ///file or folder
      * @param $options //folderPermission,filePermission
@@ -471,7 +471,7 @@ class Gdn_FileSystem {
          }
          $result=copy($source, $__dest);
          chmod($__dest,$options['filePermission']);
-        
+
       } elseif(is_dir($source)) {
          if ($dest[strlen($dest)-1]=='/') {
              if ($source[strlen($source)-1]=='/') {
@@ -508,11 +508,11 @@ class Gdn_FileSystem {
              }
          }
          closedir($dirHandle);
-        
+
       } else {
          $result=false;
       }
       return $result;
    }
-   
+
 }

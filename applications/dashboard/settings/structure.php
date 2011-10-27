@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 if (!isset($Drop))
    $Drop = FALSE;
-   
+
 if (!isset($Explicit))
    $Explicit = TRUE;
 
@@ -137,7 +137,7 @@ $Construct->Table('UserAuthentication')
 	->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
 	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
-	
+
 $Construct->Table('UserAuthenticationProvider')
    ->Column('AuthenticationKey', 'varchar(64)', FALSE, 'primary')
    ->Column('AuthenticationSchemeAlias', 'varchar(32)', FALSE)
@@ -170,7 +170,7 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
-   
+
 $Construct->Table('Session')
 	->Column('SessionID', 'char(32)', FALSE, 'primary')
 	->Column('UserID', 'int', 0)
@@ -198,7 +198,7 @@ if($PermissionModel instanceof PermissionModel) {
 	$Construct->Table('Permission')
 		->PrimaryKey('PermissionID')
 		->Column('RoleID', 'int', 0, 'key')
-		->Column('JunctionTable', 'varchar(100)', TRUE) 
+		->Column('JunctionTable', 'varchar(100)', TRUE)
 		->Column('JunctionColumn', 'varchar(100)', TRUE)
 		->Column('JunctionID', 'int', TRUE)
 		// The actual permissions will be added by PermissionModel::Define()
@@ -324,7 +324,7 @@ $Construct->Table('Invitation')
    ->Column('DateInserted', 'datetime')
    ->Column('AcceptedUserID', 'int', TRUE)
    ->Set($Explicit, $Drop);
-   
+
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->Table('Activity');
@@ -384,7 +384,7 @@ $SQL->Replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AboutUpdate'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'AboutUpdate', 'FullHeadline' => '%1$s updated %6$s profile.', 'ProfileHeadline' => '%1$s updated %6$s profile.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:')); 
+   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'PictureChange'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'PictureChange', 'FullHeadline' => '%1$s changed %6$s profile picture.', 'ProfileHeadline' => '%1$s changed %6$s profile picture.'));
 //if ($SQL->GetWhere('ActivityType', array('Name' => 'RoleChange'))->NumRows() == 0)
@@ -445,7 +445,7 @@ if ($PhotoIDExists) {
 if ($Construct->TableExists('Tag')) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
-   
+
    $DupTags = Gdn::SQL()
       ->Select('Name')
       ->Select('TagID', 'min', 'TagID')
@@ -454,7 +454,7 @@ if ($Construct->TableExists('Tag')) {
       ->GroupBy('Name')
       ->Having('CountTags >', 1)
       ->Get()->ResultArray();
-   
+
    foreach ($DupTags as $Row) {
       $Name = $Row['Name'];
       $TagID = $Row['TagID'];
@@ -463,10 +463,10 @@ if ($Construct->TableExists('Tag')) {
       foreach ($DeleteTags as $DRow) {
          // Update all of the discussions to the new tag.
          Gdn::SQL()->Options('Ignore', TRUE)->Put(
-            'TagDiscussion', 
-            array('TagID' => $TagID), 
+            'TagDiscussion',
+            array('TagID' => $TagID),
             array('TagID' => $DRow['TagID']));
-         
+
          // Delete the tag.
          Gdn::SQL()->Delete('Tag', array('TagID' => $DRow['TagID']));
       }

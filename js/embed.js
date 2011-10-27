@@ -28,7 +28,7 @@ window.vanilla.embed = function(host) {
 
    if (window.gadgets)
       embedUrl = '';
-      
+
    if (typeof(host) == 'undefined') {
       host = '';
       for (i = 0; i < scripts.length; i++) {
@@ -40,7 +40,7 @@ window.vanilla.embed = function(host) {
          }
       }
    }
-      
+
    window.vanilla.embeds[id] = this;
    if (window.postMessage) {
       onMessage = function(e) {
@@ -69,7 +69,7 @@ window.vanilla.embed = function(host) {
          var newMessageId = message[0];
          if (newMessageId == messageId)
             return;
-         
+
          messageId = newMessageId;
          message.splice(0, 1);
          processMessage(message);
@@ -168,11 +168,11 @@ window.vanilla.embed = function(host) {
       // If path was defined, and we're sitting at app root, use the defined path instead.
       if (typeof(vanilla_path) != 'undefined' && path == '/')
          path = vanilla_path;
-      
+
       // Force type based on incoming variables
       if (discussion_id != '' || foreign_id != '')
          embed_type = 'comments';
-         
+
       if (embed_type == 'comments') {
          return 'http://' + host + '/vanilla/discussion/embed/'
             +'?vanilla_discussion_id='+encodeURIComponent(discussion_id)
@@ -182,7 +182,7 @@ window.vanilla.embed = function(host) {
             +'&vanilla_url='+encodeURIComponent(foreign_url)
             +'&vanilla_body='+encodeURIComponent(foreign_body)
             +'&vanilla_category_id='+encodeURIComponent(category_id);
-      } else 
+      } else
          return 'http://' + host + path + '&remote=' + encodeURIComponent(embedUrl);
    }
    var vanillaIframe = document.createElement('iframe');
@@ -200,14 +200,14 @@ window.vanilla.embed = function(host) {
    vanillaIframe.style.border = "0";
    vanillaIframe.style.display = "block";
    (document.getElementById('vanilla-comments')).appendChild(vanillaIframe);
-   
+
    // Include our embed css into the page
    var vanilla_embed_css = document.createElement('link');
    vanilla_embed_css.rel = 'stylesheet';
    vanilla_embed_css.type = 'text/css';
    vanilla_embed_css.href = vanilla_forum_url + (vanilla_forum_url.substring(vanilla_forum_url.length-1) == '/' ? '' : '/') +'applications/dashboard/design/embed.css';
    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_embed_css);
-   
+
    return this;
 };
 try {

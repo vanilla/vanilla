@@ -27,14 +27,14 @@ class Gdn_Form extends Gdn_Pluggable {
     * @access public
     */
    public $Action = '';
-   
+
    /**
     * @var string Class name to assign to form elements with errors when InlineErrors is enabled.
     * @since 2.0.18
     * @access public
     */
    public $ErrorClass = 'Error';
-   
+
    /**
     * @var array Associative array of hidden inputs with their "Name" attribute as the key.
     * @access public
@@ -70,7 +70,7 @@ class Gdn_Form extends Gdn_Pluggable {
     * @access protected
     */
    protected $_DataArray;
-   
+
    /**
     * @var bool Whether to display inline errors with form elements.
     *    Set with $this->ShowErrors() and $this->HideErrors().
@@ -84,7 +84,7 @@ class Gdn_Form extends Gdn_Pluggable {
     * @access protected
     */
    protected $_Model;
-   
+
    /**
     * @var array Associative array of $FieldName => $ValidationFunctionName arrays that
     *    describe how each field specified failed validation.
@@ -93,14 +93,14 @@ class Gdn_Form extends Gdn_Pluggable {
    protected $_ValidationResults = array();
 
    /**
-    * @var array $Field => $Value pairs from the form in the $_POST or $_GET collection 
-    *    (depending on which method was specified for sending form data in $this->Method). 
-    *    Populated & accessed by $this->FormValues(). 
+    * @var array $Field => $Value pairs from the form in the $_POST or $_GET collection
+    *    (depending on which method was specified for sending form data in $this->Method).
+    *    Populated & accessed by $this->FormValues().
     *    Values can be retrieved with $this->GetFormValue($FieldName).
     * @access private
     */
    private $_FormValues;
-   
+
    /**
     * @var array Collection of IDs that have been created for form elements. This
     *    private property is used to record all IDs so that duplicate IDs are not
@@ -119,14 +119,14 @@ class Gdn_Form extends Gdn_Pluggable {
          $TableModel = new Gdn_Model($TableName);
          $this->SetModel($TableModel);
       }
-      
+
       // Get custom error class
       $this->ErrorClass = C('Garden.Forms.InlineErrorClass', 'Error');
-      
+
       parent::__construct();
    }
-   
-   
+
+
    /// =========================================================================
    /// UI Components: Methods that return XHTML form elements.
    /// =========================================================================
@@ -145,7 +145,7 @@ class Gdn_Form extends Gdn_Pluggable {
       else
          $Attributes['class'] = $this->ErrorClass;
    }
-   
+
    /**
     * Returns XHTML for a button.
     *
@@ -219,7 +219,7 @@ class Gdn_Form extends Gdn_Pluggable {
    public function CategoryDropDown($FieldName = 'CategoryID', $Options = FALSE) {
       $Value = ArrayValueI('Value', $Options); // The selected category id
       $CategoryData = GetValue('CategoryData', $Options, CategoryModel::Categories());
-      
+
       // Sanity check
       if (is_object($CategoryData))
          $CategoryData = (array)$CategoryData;
@@ -238,37 +238,37 @@ class Gdn_Form extends Gdn_Pluggable {
          }
 
          $SafeCategoryData[$CategoryID] = $Category;
-      }  
-      
+      }
+
       // Opening select tag
       $Return = '<select';
       $Return .= $this->_IDAttribute($FieldName, $Options);
       $Return .= $this->_NameAttribute($FieldName, $Options);
       $Return .= $this->_AttributesToString($Options);
       $Return .= ">\n";
-      
+
       // Get value from attributes
-      if ($Value === FALSE) 
+      if ($Value === FALSE)
          $Value = $this->GetValue($FieldName);
-      if (!is_array($Value)) 
+      if (!is_array($Value))
          $Value = array($Value);
-         
+
       // Prevent default $Value from matching key of zero
       $HasValue = ($Value !== array(FALSE) && $Value !== array('')) ? TRUE : FALSE;
-      
+
       // Start with null option?
       $IncludeNull = GetValue('IncludeNull', $Options);
       if ($IncludeNull === TRUE)
          $Return .= '<option value=""></option>';
-         
+
       // Show root categories as headings (ie. you can't post in them)?
       $DoHeadings = C('Vanilla.Categories.DoHeadings');
-      
+
       // If making headings disabled and there was no default value for
       // selection, make sure to select the first non-disabled value, or the
       // browser will auto-select the first disabled option.
       $ForceCleanSelection = ($DoHeadings && !$HasValue && !$IncludeNull);
-      
+
       // Write out the category options
       if (is_array($SafeCategoryData)) {
          foreach($SafeCategoryData as $CategoryID => $Category) {
@@ -285,13 +285,13 @@ class Gdn_Form extends Gdn_Pluggable {
                $Return .= ' disabled="disabled"';
             else if ($Selected)
                $Return .= ' selected="selected"'; // only allow selection if NOT disabled
-            
+
             $Name = GetValue('Name', $Category, 'Blank Category Name');
             if ($Depth > 1) {
                $Name = str_pad($Name, strlen($Name)+$Depth-1, ' ', STR_PAD_LEFT);
                $Name = str_replace(' ', '&#160;', $Name);
             }
-               
+
             $Return .= '>' . $Name . "</option>\n";
          }
       }
@@ -304,7 +304,7 @@ class Gdn_Form extends Gdn_Pluggable {
     * Cannot consider all checkbox values to be boolean. (2009-04-02 mosullivan)
     * Cannot assume checkboxes are stored in database as string 'TRUE'. (2010-07-28 loki_racer)
     *
-    * @param string $FieldName Name of the field that is being displayed/posted with this input. 
+    * @param string $FieldName Name of the field that is being displayed/posted with this input.
     *    It should related directly to a field name in $this->_DataArray.
     * @param string $Label Label to place next to the checkbox.
     * @param array $Attributes Associative array of attributes for the input. (e.g. onclick, class)\
@@ -317,21 +317,21 @@ class Gdn_Form extends Gdn_Pluggable {
 
       if ($this->GetValue($FieldName) == $Value)
          $Attributes['checked'] = 'checked';
-         
+
       // Show inline errors?
       $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
-      
+
       // Add error class to input element
-      if ($ShowErrors) 
+      if ($ShowErrors)
          $this->AddErrorClass($Attributes);
 
       $Input = $this->Input($FieldName, 'checkbox', $Attributes);
       if ($Label != '') $Input = '<label for="' . ArrayValueI('id', $Attributes,
          $this->EscapeID($FieldName, FALSE)) . '" class="CheckBoxLabel">' . $Input . ' ' .
           T($Label) . '</label>';
-          
+
       // Append validation error message
-      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
+      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))
          $Return .= $this->InlineError($FieldName);
 
       return $Input;
@@ -364,7 +364,7 @@ class Gdn_Form extends Gdn_Pluggable {
    public function CheckBoxList($FieldName, $DataSet, $ValueDataSet = NULL, $Attributes = FALSE) {
       // Never display individual inline errors for these CheckBoxes
       $Attributes['InlineErrors'] = FALSE;
-      
+
       $Return = '';
       // If the form hasn't been posted back, use the provided $ValueDataSet
       if ($this->IsPostBack() === FALSE) {
@@ -402,7 +402,7 @@ class Gdn_Form extends Gdn_Pluggable {
             // Set attributes for this instance
             $Instance = $Attributes;
             $Instance = RemoveKeyFromArray($Instance, array('TextField', 'ValueField'));
-            
+
             $Instance['id'] = $FieldName . $i;
 
             if (is_array($ID)) {
@@ -411,13 +411,13 @@ class Gdn_Form extends Gdn_Pluggable {
                $Text = GetValue($TextField, $ID, '');
                $ID = GetValue($ValueField, $ID, '');
             } else {
-               
+
 
                if (is_numeric($Text))
                   $Text = $ID;
             }
             $Instance['value'] = $ID;
-            
+
             if (is_array($CheckedValues) && in_array($ID, $CheckedValues)) {
                $Instance['checked'] = 'checked';
             }
@@ -426,7 +426,7 @@ class Gdn_Form extends Gdn_Pluggable {
             ++$i;
          }
       }
-      
+
       return '<ul class="'.ConcatSep(' ', 'CheckBoxList', GetValue('listclass', $Attributes)).'">' . $Return . '</ul>';
    }
 
@@ -461,7 +461,7 @@ class Gdn_Form extends Gdn_Pluggable {
    public function CheckBoxGrid($FieldName, $DataSet, $ValueDataSet, $Attributes) {
       // Never display individual inline errors for these CheckBoxes
       $Attributes['InlineErrors'] = FALSE;
-      
+
       $Return = '';
       $CheckedValues = $ValueDataSet;
       if (is_object($ValueDataSet)) $CheckedValues = ConsolidateArrayValuesByKey(
@@ -514,7 +514,7 @@ class Gdn_Form extends Gdn_Pluggable {
                   $Group[$ColName] = array();
                   if (!in_array($ColName, $Cols))
                      $Cols[] = $ColName;
-                     
+
                }
 
                if (!in_array($RowName, $Rows))
@@ -545,7 +545,7 @@ class Gdn_Form extends Gdn_Pluggable {
       */
       return $Return . $this->GetCheckBoxGridGroup($LastGroup, $Group, $Rows, $Cols);
    }
-   
+
    public function CheckBoxGridGroups($Data, $FieldName) {
       $Result = '';
       foreach($Data as $GroupName => $GroupData) {
@@ -553,23 +553,23 @@ class Gdn_Form extends Gdn_Pluggable {
       }
       return $Result;
    }
-   
+
    public function CheckBoxGridGroup($GroupName, $Data, $FieldName) {
         // Never display individual inline errors for these CheckBoxes
       $Attributes['InlineErrors'] = FALSE;
-      
+
       // Get the column and row info.
       $Columns = $Data['_Columns'];
       ksort($Columns);
       $Rows = $Data['_Rows'];
       ksort($Rows);
       unset($Data['_Columns'], $Data['_Rows']);
-      
+
       if(array_key_exists('_Info', $Data)) {
          $GroupName = $Data['_Info']['Name'];
          unset($Data['_Info']);
       }
-      
+
       $Result = '<table class="CheckBoxGrid">';
       // Append the header.
       $Result .= '<thead><tr><th>'.T($GroupName).'</th>';
@@ -579,17 +579,17 @@ class Gdn_Form extends Gdn_Pluggable {
             '<td'.($Alt ? ' class="Alt"' : '').'>'
             . T($ColumnName)
             . '</td>';
-            
+
          $Alt = !$Alt;
       }
       $Result . '</tr></thead>';
-      
+
       // Append the rows.
       $Result .= '<tbody>';
       $CheckCount = 0;
       foreach($Rows as $RowName => $X) {
          $Result .= '<tr><th>';
-         
+
          // If the row name is still seperated by dots then put those in spans.
          $RowNames = explode('.', $RowName);
          for($i = 0; $i < count($RowNames) - 1; ++$i) {
@@ -608,13 +608,13 @@ class Gdn_Form extends Gdn_Pluggable {
                   $Attributes['checked'] = 'checked';
 //               $Attributes['id'] = "{$GroupName}_{$FieldName}_{$CheckCount}";
                $CheckCount++;
-                  
+
                $Result .= $this->CheckBox($FieldName.'[]', '', $Attributes);
             } else {
                $Result .= ' ';
-            }        
+            }
             $Result .= '</td>';
-               
+
             $Alt = !$Alt;
          }
          $Result .= '</tr>';
@@ -622,7 +622,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $Result .= '</tbody></table>';
       return $Result;
    }
-   
+
    /**
     * Returns the closing of the form tag with an optional submit button.
     *
@@ -638,14 +638,14 @@ class Gdn_Form extends Gdn_Pluggable {
 
       return $Return;
    }
-   
+
    /**
     * Returns XHTML for a standard date input control.
     *
     * @param string $FieldName The name of the field that is being displayed/posted with this input. It
     *    should related directly to a field name in $this->_DataArray.
     * @param array $Attributes An associative array of attributes for the input, e.g. onclick, class.
-    *    Special attributes: 
+    *    Special attributes:
     *       YearRange, specified in yyyy-yyyy format. Default is 1900 to current year.
     *       Fields, array of month, day, year. Those are only valid values. Order matters.
     * @return string
@@ -679,21 +679,21 @@ class Gdn_Form extends Gdn_Pluggable {
       for($i = $EndYear; $i >= $StartYear; --$i) {
          $Years[$i] = $i;
       }
-      
+
       // Show inline errors?
       $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
-      
+
       // Add error class to input element
-      if ($ShowErrors) 
+      if ($ShowErrors)
          $this->AddErrorClass($Attributes);
-      
+
       // Never display individual inline errors for these DropDowns
       $Attributes['InlineErrors'] = FALSE;
 
       $CssClass = ArrayValueI('class', $Attributes, '');
-      
+
       $SubmittedTimestamp = ($this->GetValue($FieldName) > 0) ? strtotime($this->GetValue($FieldName)) : FALSE;
-      
+
       // Allow us to specify which fields to show & order
       $Fields = ArrayValueI('fields', $Attributes, array('month', 'day', 'year'));
       if (is_array($Fields)) {
@@ -723,16 +723,16 @@ class Gdn_Form extends Gdn_Pluggable {
             }
          }
       }
-      
+
       $Return .= '<input type="hidden" name="DateFields[]" value="' . $FieldName . '" />';
-          
+
       // Append validation error message
-      if ($ShowErrors)  
+      if ($ShowErrors)
          $Return .= $this->InlineError($FieldName);
-         
+
       return $Return;
    }
-   
+
    /**
     * Returns XHTML for a select list.
     *
@@ -753,7 +753,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *               option text.
     *   Value       A string or array of strings.  $this->_DataArray->$FieldName
     *   IncludeNull TRUE to include a blank row    FALSE
-    *               String to create disabled 
+    *               String to create disabled
     *               first option.
     *   InlineErrors  Show inline error message?   TRUE
     *               Allows disabling per-dropdown
@@ -764,31 +764,31 @@ class Gdn_Form extends Gdn_Pluggable {
    public function DropDown($FieldName, $DataSet, $Attributes = FALSE) {
       // Show inline errors?
       $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
-      
+
       // Add error class to input element
-      if ($ShowErrors) 
+      if ($ShowErrors)
          $this->AddErrorClass($Attributes);
-      
+
       // Opening select tag
       $Return = '<select';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       $Return .= $this->_NameAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ">\n";
-      
+
       // Get value from attributes and ensure it's an array
       $Value = ArrayValueI('Value', $Attributes);
-      if ($Value === FALSE) 
+      if ($Value === FALSE)
          $Value = $this->GetValue($FieldName, GetValue('Default', $Attributes));
-      if (!is_array($Value)) 
+      if (!is_array($Value))
          $Value = array($Value);
-         
+
       // Prevent default $Value from matching key of zero
       $HasValue = ($Value !== array(FALSE) && $Value !== array('')) ? TRUE : FALSE;
-      
+
       // Start with null option?
       $IncludeNull = ArrayValueI('IncludeNull', $Attributes, FALSE);
-      if ($IncludeNull === TRUE) 
+      if ($IncludeNull === TRUE)
          $Return .= "<option value=\"\"></option>\n";
       elseif ($IncludeNull)
          $Return .= "<option value=\"\">$IncludeNull</option>\n";
@@ -824,14 +824,14 @@ class Gdn_Form extends Gdn_Pluggable {
          }
       }
       $Return .= '</select>';
-      
+
       // Append validation error message
-      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
+      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))
          $Return .= $this->InlineError($FieldName);
-      
+
       return $Return;
    }
-   
+
    /**
     * Returns XHTML for all form-related errors that have occurred.
     *
@@ -856,7 +856,7 @@ class Gdn_Form extends Gdn_Pluggable {
       }
       return $Return;
    }
-   
+
    /**
     * Encodes the string in a php-form safe-encoded format.
     *
@@ -982,7 +982,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return .= ' />';
       return $Return;
    }
-   
+
    /**
     * Returns XHTML of inline error for specified field.
     *
@@ -999,7 +999,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $AppendError .= sprintf(T($ValidationError),T($FieldName)).' ';
       }
       $AppendError .= '</p>';
-      
+
       return $AppendError;
    }
 
@@ -1018,14 +1018,14 @@ class Gdn_Form extends Gdn_Pluggable {
          $CssClass = ArrayValueI('class', $Attributes);
          if ($CssClass == FALSE) $Attributes['class'] = 'InputBox';
       }
-      
+
       // Show inline errors?
       $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
-      
+
       // Add error class to input element
-      if ($ShowErrors) 
+      if ($ShowErrors)
          $this->AddErrorClass($Attributes);
-      
+
       $Return = '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       if ($Type == 'file') $Return .= Attribute('name',
@@ -1041,9 +1041,9 @@ class Gdn_Form extends Gdn_Pluggable {
          $Return .= '<input type="hidden" name="Checkboxes[]" value="' . $FieldName .
              '" />';
       }
-      
+
       // Append validation error message
-      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
+      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))
          $Return .= $this->InlineError($FieldName);
 
       return $Return;
@@ -1067,13 +1067,13 @@ class Gdn_Form extends Gdn_Pluggable {
 
       return '<label for="' . $For . '"' . $this->_AttributesToString($Attributes).'>' . T($TranslationCode) . "</label>\n";
    }
-   
+
    /**
     * Generate a friendly looking label translation code from a camel case variable name
     * @param string|array $Item The item to generate the label from.
     *  - string: Generate the label directly from the item.
     *  - array: Generate the label from the item as if it is a schema row passed to Gdn_Form::Simple().
-    * @return string 
+    * @return string
     */
    public static function LabelCode($Item) {
       if (is_array($Item)) {
@@ -1084,8 +1084,8 @@ class Gdn_Form extends Gdn_Pluggable {
       } else {
          $LabelCode = $Item;
       }
-      
-      
+
+
       if (strpos($LabelCode, '.') !== FALSE)
          $LabelCode = trim(strrchr($LabelCode, '.'), '.');
 
@@ -1127,7 +1127,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $ActionFromAttributes = ArrayValueI('action', $Attributes);
       if ($this->Action == '')
          $this->Action = Url();
-         
+
       $this->Action = $ActionFromAttributes === FALSE ? $this->Action : $ActionFromAttributes;
 
       if (strcasecmp($this->Method, 'get') == 0) {
@@ -1172,13 +1172,13 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return .= $this->GetHidden();
       return $Return;
    }
-   
+
    /**
     * Returns XHTML for a radio input element.
-    * 
+    *
     * Provides way of wrapping Input() with a label.
     *
-    * @param string $FieldName Name of the field that is being displayed/posted with this input. 
+    * @param string $FieldName Name of the field that is being displayed/posted with this input.
     *    It should related directly to a field name in $this->_DataArray.
     * @param string $Label Label to place next to the radio.
     * @param array $Attributes Associative array of attributes for the input (e.g. onclick, class).
@@ -1189,30 +1189,30 @@ class Gdn_Form extends Gdn_Pluggable {
       $Value = ArrayValueI('Value', $Attributes, 'TRUE');
       $Attributes['value'] = $Value;
       $FormValue = $this->GetValue($FieldName, ArrayValueI('Default', $Attributes));
-      
+
       // Check for 'checked'
-      if ($FormValue == $Value) 
+      if ($FormValue == $Value)
          $Attributes['checked'] = 'checked';
-      
+
       // Never display individual inline errors for this Input
       $Attributes['InlineErrors'] = FALSE;
-      
+
       // Get standard radio Input
       $Input = $this->Input($FieldName, 'radio', $Attributes);
-      
+
       // Wrap with label
       if ($Label != '') {
-         $Input = '<label for="' . ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)) . 
+         $Input = '<label for="' . ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)) .
             '" class="RadioLabel">' . $Input . ' ' . T($Label) . '</label>';
       }
-      
+
       return $Input;
    }
 
    /**
     * Returns XHTML for an unordered list of radio button elements.
     *
-    * @param string $FieldName The name of the field that is being displayed/posted with this input. 
+    * @param string $FieldName The name of the field that is being displayed/posted with this input.
     *    It should related directly to a field name in $this->_DataArray. ie. RoleID
     * @param mixed $DataSet The data to fill the options in the select list. Either an associative
     *    array or a database dataset.
@@ -1247,12 +1247,12 @@ class Gdn_Form extends Gdn_Pluggable {
          $LiOpen = '';
          $LiClose = '';
       }
-      
+
       // Show inline errors?
       $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
-      
+
       // Add error class to input element
-      if ($ShowErrors) 
+      if ($ShowErrors)
          $this->AddErrorClass($Attributes);
 
       if (is_object($DataSet)) {
@@ -1276,9 +1276,9 @@ class Gdn_Form extends Gdn_Pluggable {
 
       if ($List)
          $Return .= '</ul>';
-      
+
       // Append validation error message
-      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
+      if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))
          $Return .= $this->InlineError($FieldName);
 
       return $Return;
@@ -1296,45 +1296,45 @@ class Gdn_Form extends Gdn_Pluggable {
    public function TextBox($FieldName, $Attributes = FALSE) {
       if (!is_array($Attributes))
          $Attributes = array();
-      
+
       $MultiLine = ArrayValueI('MultiLine', $Attributes);
-      
+
       if ($MultiLine) {
          $Attributes['rows'] = ArrayValueI('rows', $Attributes, '6'); // For xhtml compliance
          $Attributes['cols'] = ArrayValueI('cols', $Attributes, '100'); // For xhtml compliance
       }
-      
+
       // Show inline errors?
       $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
-      
+
       $CssClass = ArrayValueI('class', $Attributes);
       if ($CssClass == FALSE) $Attributes['class'] = $MultiLine ? 'TextBox' : 'InputBox';
-      
+
       // Add error class to input element
       if ($ShowErrors) $this->AddErrorClass($Attributes);
-      
+
       $Return = $MultiLine === TRUE ? '<textarea' : '<input type="text"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       $Return .= $this->_NameAttribute($FieldName, $Attributes);
       $Return .= $MultiLine === TRUE ? '' : $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
-      
+
       $Value = ArrayValueI('value', $Attributes, $this->GetValue($FieldName));
-      
+
       $Return .= $MultiLine === TRUE ? '>' . htmlentities($Value, ENT_COMPAT, 'UTF-8') . '</textarea>' : ' />';
-      
+
       // Append validation error message
-      if ($ShowErrors)  
+      if ($ShowErrors)
          $Return .= $this->InlineError($FieldName);
-      
+
       return $Return;
    }
-   
+
 
    /// =========================================================================
    /// Methods for interfacing with the model & db.
    /// =========================================================================
-   
+
    /**
     * Adds an error to the errors collection and optionally relates it to the
     * specified FieldName. Errors added with this method can be rendered with
@@ -1369,7 +1369,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $ErrorCode = '@'.strip_tags($Error->getMessage());
          }
       }
-      
+
       if ($FieldName == '') $FieldName = '<General Error>';
 
       if (!is_array($this->_ValidationResults)) $this->_ValidationResults = array();
@@ -1403,7 +1403,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
       $this->HiddenInputs[$FieldName] = $Value;
    }
-   
+
    /**
     * Returns a boolean value indicating if the current page has an
     * authenticated postback. It validates the postback by looking at a
@@ -1422,7 +1422,7 @@ class Gdn_Form extends Gdn_Pluggable {
       //} else {
       $KeyName = $this->InputPrefix . '/TransientKey';
       $PostBackKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST, $KeyName, FALSE);
-      
+
       // DEBUG:
       //$Result .= '<div>KeyName: '.$KeyName.'</div>';
       //echo '<div>PostBackKey: '.$PostBackKey.'</div>';
@@ -1432,7 +1432,7 @@ class Gdn_Form extends Gdn_Pluggable {
       return Gdn::Session()->ValidateTransientKey($PostBackKey);
       //}
    }
-   
+
    /**
     * Checks $this->FormValues() to see if the specified button translation
     * code was submitted with the form (helps figuring out what button was
@@ -1445,7 +1445,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $NameKey = $this->EscapeString($ButtonCode);
       return array_key_exists($NameKey, $this->FormValues()) ? TRUE : FALSE;
    }
-   
+
    /**
     * Emptys the $this->_FormValues collection so that all form fields will load empty.
     */
@@ -1499,7 +1499,7 @@ class Gdn_Form extends Gdn_Pluggable {
          } else {
             $tmp = $ID;
             $this->_IDCollection[$ID] = 1;
-            
+
          }
       } else {
          // If not forcing unique (ie. getting the id for a label's "for" tag),
@@ -1513,9 +1513,9 @@ class Gdn_Form extends Gdn_Pluggable {
       }
       return $tmp;
    }
-   
+
    /**
-    * 
+    *
     *
     * @return array
     */
@@ -1523,7 +1523,7 @@ class Gdn_Form extends Gdn_Pluggable {
       if(is_null($this->_FormValues)) {
          $this->FormValues();
       }
-      
+
       $Result = array(array());
       foreach($this->_FormValues as $Key => $Value) {
          if(is_array($Value)) {
@@ -1537,10 +1537,10 @@ class Gdn_Form extends Gdn_Pluggable {
             $Result[0][$Key] = $Value;
          }
       }
-      
+
       return $Result;
    }
-   
+
    /**
     * If the form has been posted back, this method return an associative
     * array of $FieldName => $Value pairs which were sent in the form.
@@ -1563,7 +1563,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $this->_FormValues = array();
          $Collection = $this->Method == 'get' ? $_GET : $_POST;
          $InputType = $this->Method == 'get' ? INPUT_GET : INPUT_POST;
-         
+
          foreach($Collection as $Field => $Value) {
             $FieldName = substr($Field, $TableNameLength);
             $FieldName = $this->_UnescapeString($FieldName);
@@ -1583,7 +1583,7 @@ class Gdn_Form extends Gdn_Pluggable {
                }
             }
          }
-         
+
          // Make sure that unchecked checkboxes get added to the collection
          if (array_key_exists('Checkboxes', $Collection)) {
             $UncheckedCheckboxes = $Collection['Checkboxes'];
@@ -1595,7 +1595,7 @@ class Gdn_Form extends Gdn_Pluggable {
                }
             }
          }
-         
+
          // Make sure that Date inputs (where the day, month, and year are
          // separated into their own dropdowns on-screen) get added to the
          // collection as a single field as well...
@@ -1683,7 +1683,7 @@ class Gdn_Form extends Gdn_Pluggable {
       }
       return $Return;
    }
-   
+
    /**
     * Disable inline errors (this is the default).
     */
@@ -1701,7 +1701,7 @@ class Gdn_Form extends Gdn_Pluggable {
       /*
       2009-01-10 - $_GET should not dictate a "post" back.
       return count($_POST) > 0 ? TRUE : FALSE;
-      
+
       2009-03-31 - switching back to "get" dictating a postback
       */
       $FormCollection = $this->Method == 'get' ? $_GET : $_POST;
@@ -1749,7 +1749,7 @@ class Gdn_Form extends Gdn_Pluggable {
       }
       return $SaveResult;
    }
-   
+
    /**
     * Assign a set of data to be displayed in the form elements.
     *
@@ -1763,7 +1763,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $ResultSet = $Data->ResultArray();
             if (count($ResultSet) > 0)
                $this->_DataArray = $ResultSet[0];
-               
+
          } else {
             // Otherwise assume it is an object representation of a data row.
             $this->_DataArray = Gdn_Format::ObjectAsArray($Data);
@@ -1772,7 +1772,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $this->_DataArray = $Data;
       }
    }
-   
+
    /**
     * Sets the value associated with $FieldName from the sent form fields.
     * Essentially overwrites whatever was retrieved from the form.
@@ -1801,7 +1801,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $this->InputPrefix = $this->_Model->Name;
       if ($DataSet !== FALSE) $this->SetData($DataSet);
    }
-   
+
    /**
     * @todo add documentation
     */
@@ -1822,9 +1822,9 @@ class Gdn_Form extends Gdn_Pluggable {
    public function SetValue($FieldName, $Value) {
       if (!is_array($this->_DataArray))
          $this->_DataArray = array();
-      
+
       $this->_DataArray[$FieldName] = $Value;
-   } 
+   }
 
    /**
     * Enable inline errors.
@@ -1832,7 +1832,7 @@ class Gdn_Form extends Gdn_Pluggable {
    public function ShowErrors() {
       $this->_InlineErrors = TRUE;
    }
-   
+
    /**
     * Generates a multi-field form from a schema.
     * @param array $Schema An array where each item of the array is a row that identifies a form field with the following information:
@@ -1848,26 +1848,26 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    public function Simple($Schema, $Options = array()) {
       $Result = GetValueR('Wrap.0', $Options, '<ul>');
-      
+
       $ItemWrap = GetValue('ItemWrap', $Options, array("<li>\n  ", "\n</li>\n"));
-      
+
       foreach ($Schema as $Index => $Row) {
          if (is_string($Row))
             $Row = array('Name' => $Index, 'Control' => $Row);
-         
+
          if (!isset($Row['Name']))
             $Row['Name'] = $Index;
          if (!isset($Row['Options']))
             $Row['Options'] = array();
-         
+
          $Result .= $ItemWrap[0];
 
          $LabelCode = self::LabelCode($Row);
-         
+
          $Description = GetValue('Description', $Row, '');
          if ($Description)
             $Description = '<div class="Info">'.$Description.'</div>';
-         
+
          TouchValue('Control', $Row, 'TextBox');
 
          switch (strtolower($Row['Control'])) {
@@ -1945,7 +1945,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $this->AddError('@'.$Valid);
          return FALSE;
       }
-      
+
    }
 
    /**
@@ -1955,8 +1955,8 @@ class Gdn_Form extends Gdn_Pluggable {
    public function ValidationResults() {
       return $this->_ValidationResults;
    }
-   
-   
+
+
    /**
     * Takes an associative array of $Attributes and returns them as a string of
     * param="value" sets to be placed in an input, select, textarea, etc tag.
@@ -1984,12 +1984,12 @@ class Gdn_Form extends Gdn_Pluggable {
          'fields',
          'inlineerrors');
       $Return = '';
-      
+
       // Build string from array
       if (is_array($Attributes)) {
          foreach($Attributes as $Attribute => $Value) {
             // Ignore reserved attributes
-            if (!in_array(strtolower($Attribute), $ReservedAttributes)) 
+            if (!in_array(strtolower($Attribute), $ReservedAttributes))
                $Return .= ' ' . $Attribute . '="' . $Value . '"';
          }
       }
@@ -2010,7 +2010,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $ID = ArrayValueI('id', $Attributes, FALSE);
       if (!$ID)
          $ID = $this->EscapeID($FieldName);
-      
+
       return ' id="'.htmlspecialchars($ID).'"';
    }
 
@@ -2028,7 +2028,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $Name = $this->EscapeFieldName(ArrayValueI('name', $Attributes, $FieldName));
       return (empty($Name)) ? '' : ' name="' . $Name . '"';
    }
-   
+
    /**
     * Decodes the encoded string from a php-form safe-encoded format to the
     * format it was in when presented to the form.

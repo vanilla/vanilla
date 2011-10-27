@@ -55,7 +55,7 @@ class FacebookPlugin extends Gdn_Plugin {
    public function EntryController_SignIn_Handler($Sender, $Args) {
       if (!$this->IsConfigured())
          return;
-      
+
       if (isset($Sender->Data['Methods'])) {
          $AccessToken = $this->AccessToken();
 
@@ -86,21 +86,21 @@ class FacebookPlugin extends Gdn_Plugin {
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsConfigured())
          return;
-		
+
 		echo "\n".$this->_GetButton();
 	}
-	
+
 	public function Base_BeforeSignInLink_Handler($Sender) {
       if (!$this->IsConfigured())
 			return;
-		
+
 		// if (!IsMobile())
 		// 	return;
 
 		if (!Gdn::Session()->IsValid())
 			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect FacebookConnect'));
 	}
-	
+
 	private function _GetButton() {
       $ImgSrc = Asset('/plugins/Facebook/design/facebook-icon.png');
       $ImgAlt = T('Login with Facebook');
@@ -108,7 +108,7 @@ class FacebookPlugin extends Gdn_Plugin {
       $PopupSigninHref = $this->AuthorizeUri('display=popup');
       return "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
    }
-	
+
    public function SettingsController_Facebook_Create($Sender, $Args) {
       $Sender->Permission('Garden.Settings.Manage');
       if ($Sender->Form->IsPostBack()) {
@@ -214,7 +214,7 @@ class FacebookPlugin extends Gdn_Plugin {
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
       $Form->SetFormValue('Email', GetValue('email', $Profile));
       $Form->SetFormValue('Photo', "http://graph.facebook.com/$ID/picture");
-      
+
       if (C('Plugins.Facebook.UseFacebookNames')) {
          $Form->SetFormValue('Name', GetValue('name', $Profile));
          SaveToConfig(array(
@@ -223,13 +223,13 @@ class FacebookPlugin extends Gdn_Plugin {
              'Garden.Registration.NameUnique' => FALSE
          ), '', FALSE);
       }
-      
+
       // Save some original data in the attributes of the connection for later API calls.
       $Attributes = array(
           'Facebook.Profile' => $Profile
       );
       $Form->SetFormValue('Attributes', $Attributes);
-      
+
       $Sender->SetData('Verified', TRUE);
    }
 
@@ -286,7 +286,7 @@ class FacebookPlugin extends Gdn_Plugin {
          $RedirectUri .= http_build_query($Args);
          $this->_RedirectUri = $RedirectUri;
       }
-      
+
       return $this->_RedirectUri;
    }
 
@@ -297,7 +297,7 @@ class FacebookPlugin extends Gdn_Plugin {
          return FALSE;
       return TRUE;
    }
-   
+
    public function Setup() {
       $Error = '';
       if (!function_exists('curl_init'))

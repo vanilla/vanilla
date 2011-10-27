@@ -10,7 +10,7 @@
       <pubDate><?php echo date(DATE_RFC822); ?></pubDate>
       <?php
          $this->RenderAsset('RssHead');
-      
+
          /* Sample RSS Content:
          <item>
             <title>Atom-Powered Robots Run Amok</title>

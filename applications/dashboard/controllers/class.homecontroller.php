@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 /**
  * Manages default info, error, and site status pages.
  *
@@ -22,7 +22,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class HomeController extends Gdn_Controller {
    /**
     * JS & CSS includes for all methods in this controller.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -41,7 +41,7 @@ class HomeController extends Gdn_Controller {
 
    /**
     * Display dashboard welcome message.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -49,11 +49,11 @@ class HomeController extends Gdn_Controller {
       $this->View = 'FileNotFound';
       $this->FileNotFound();
    }
-   
+
    /**
     * A standard 404 File Not Found error message is delivered when this action
     * is encountered.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -64,10 +64,10 @@ class HomeController extends Gdn_Controller {
       } else
          $this->RenderException(NotFoundException());
    }
-   
+
    /**
     * Display 'site down for maintenance' page.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -76,10 +76,10 @@ class HomeController extends Gdn_Controller {
       $this->SetData('UpdateMode', TRUE);
       $this->Render();
    }
-   
+
    /**
     * Display 'content deleted' page.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -87,30 +87,30 @@ class HomeController extends Gdn_Controller {
       header("HTTP/1.0 410", TRUE, 410);
       $this->Render();
    }
-   
+
    /**
     * Display TOS page.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
    public function TermsOfService() {
       $this->Render();
    }
-   
+
    /**
     * Display privacy info page.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
    public function PrivacyPolicy() {
       $this->Render();
    }
-   
+
    /**
     * Display 'no permission' page.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -121,5 +121,5 @@ class HomeController extends Gdn_Controller {
       } else
          $this->RenderException(PermissionException());
    }
-   
+
 }

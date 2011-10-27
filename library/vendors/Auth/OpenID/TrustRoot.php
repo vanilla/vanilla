@@ -210,7 +210,7 @@ class Auth_OpenID_TrustRoot {
         if ($parts['host'] == 'localhost') {
             return true;
         }
-        
+
         $host_parts = explode('.', $parts['host']);
         if ($parts['wildcard']) {
             // Remove the empty string from the beginning of the array

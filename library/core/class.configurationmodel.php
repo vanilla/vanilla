@@ -152,13 +152,13 @@ class Gdn_ConfigurationModel {
          $Settings = $this->Validation->ValidationFields();
          if (is_array($this->_ForceSettings))
             $Settings = MergeArrays($Settings, $this->_ForceSettings);
-            
+
          $SaveResults = SaveToConfig($Settings);
-         
+
          // If the Live flag is true, set these in memory too
          if ($SaveResults && $Live)
             Gdn::Config()->Set($Settings, TRUE);
-         
+
          return $SaveResults;
       } else {
          return FALSE;

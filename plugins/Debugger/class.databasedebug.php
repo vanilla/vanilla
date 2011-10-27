@@ -10,23 +10,23 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class Gdn_DatabaseDebug extends Gdn_Database {
 	/// PROPERTIES ///
-	
+
 	protected $_ExecutionTime = 0;
-	
+
 	protected $_Queries = array();
-	
+
 	/// METHODS ///
-	
+
 	public function ExecutionTime() {
 		return $this->_ExecutionTime;
 	}
-	
+
 	private static function FormatArgs($Args) {
 		if(!is_array($Args))
 			return '';
-		
+
 		$Result = '';
-		
+
 		foreach($Args as $i => $Expr) {
 			if(strlen($Result) > 0)
 				$Result .= ', ';
@@ -34,7 +34,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 		}
 		return $Result;
 	}
-	
+
 	private static function FormatExpr($Expr) {
 		if(is_array($Expr)) {
          if (count($Expr) > 3) {
@@ -58,11 +58,11 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 			return $Expr;
 		}
 	}
-	
+
 	public function Queries() {
 		return $this->_Queries;
 	}
-	
+
    public function Query($Sql, $InputParameters = NULL, $Options = array()) {
 		$Trace = debug_backtrace();
 		$Method = '';
@@ -70,12 +70,12 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 			$Class = GetValue('class', $Info, '');
 			if($Class === '' || StringEndsWith($Class, 'Model', TRUE) || StringEndsWith($Class, 'Plugin', TRUE)) {
 				$Type = ArrayValue('type', $Info, '');
-				
+
 				$Method = $Class.$Type.$Info['function'].'('.self::FormatArgs($Info['args']).')';
             break;
 			}
 		}
-		
+
       // Save the query for debugging
       // echo '<br />adding to queries: '.$Sql;
       $Query = array('Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method);
@@ -83,7 +83,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
       if (isset($Options['Cache'])) {
          $CacheKeys = (array)$Options['Cache'];
          $Cache = array();
-         
+
          $AllSet = TRUE;
          foreach ($CacheKeys as $CacheKey) {
             $Value = Gdn::Cache()->Get($CacheKey);
@@ -97,21 +97,21 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 
       // Start the Query Timer
       $TimeStart = Now();
-      
+
       $Result = parent::Query($Sql, $InputParameters, $Options);
-      
+
       // Aggregate the query times
       $TimeEnd = Now();
       $this->_ExecutionTime += ($TimeEnd - $TimeStart);
-      
+
       if ($SaveQuery && !StringBeginsWith($Sql, 'set names')) {
          $Query['Time'] = ($TimeEnd - $TimeStart);
          $this->_Queries[] = $Query;
       }
-      
+
       return $Result;
    }
-	
+
 	public function QueryTimes() {
 		return array();
 	}

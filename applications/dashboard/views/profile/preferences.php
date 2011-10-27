@@ -59,7 +59,7 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
       </tbody>
    </table>
 <?php
-}  
+}
 echo $this->Form->Close(T('Save Preferences'));
 $this->FireEvent("AfterPreferencesRender");
 ?>

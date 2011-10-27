@@ -2,8 +2,8 @@
 
 /**
  * Bootstrap Before
- * 
- * This file gives developers the opportunity to hook into Garden before any 
+ *
+ * This file gives developers the opportunity to hook into Garden before any
  * real work has been done. Nothing has been included yet, aside from this file.
  * No Garden features are available yet.
  */
@@ -12,9 +12,9 @@ if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php'))
 
 /**
  * Define Core Constants
- * 
+ *
  * Garden depends on the presence of a certain base set of defines that allow it
- * to be aware of its own place within the system. These are conditionally 
+ * to be aware of its own place within the system. These are conditionally
  * defined here, in case they've already been set by a zealous bootstrap.before.
  */
 
@@ -53,9 +53,9 @@ Gdn::Config()->Caching(TRUE);
 
 /**
  * Bootstrap Early
- * 
- * A lot of the framework is loaded now, most importantly the autoloader, 
- * default config and the general and error functions. More control is possible 
+ *
+ * A lot of the framework is loaded now, most importantly the autoloader,
+ * default config and the general and error functions. More control is possible
  * here, but some things have already been loaded and are immutable.
  */
 if (file_exists(PATH_CONF.'/bootstrap.early.php'))
@@ -69,8 +69,8 @@ Gdn::Request()->FromEnvironment();
 
 /**
  * Extension Managers
- * 
- * Now load the Application, Theme and Plugin managers into the Factory, and 
+ *
+ * Now load the Application, Theme and Plugin managers into the Factory, and
  * process the Application-specific configuration defaults.
  */
 
@@ -87,11 +87,11 @@ Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 // Load the configurations for the installed items.
 foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder)
    Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
-   
+
 /**
  * Installer Redirect
- * 
- * If Garden is not yet installed, force the request to /dashboard/setup and 
+ *
+ * If Garden is not yet installed, force the request to /dashboard/setup and
  * begin installation.
  */
 if (Gdn::Config('Garden.Installed', FALSE) === FALSE && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
@@ -104,8 +104,8 @@ Gdn::Config()->OverlayDynamic();
 
 /**
  * Bootstrap Late
- * 
- * All configurations are loaded, as well as the Application, Plugin and Theme 
+ *
+ * All configurations are loaded, as well as the Application, Plugin and Theme
  * managers.
  */
 if (file_exists(PATH_CONF.'/bootstrap.late.php'))
@@ -113,8 +113,8 @@ if (file_exists(PATH_CONF.'/bootstrap.late.php'))
 
 /**
  * Factory Services
- * 
- * These are the helper classes that facilitate Garden's operation. They can be 
+ *
+ * These are the helper classes that facilitate Garden's operation. They can be
  * overwritten using FactoryOverwrite, but their defaults are installed here.
  */
 
@@ -155,7 +155,7 @@ Gdn::FactoryInstall('Dummy', 'Gdn_Dummy');
 
 /**
  * Extension Startup
- * 
+ *
  * Allow installed Extensions (Applications, Themes, Plugins) to execute startup
  * and bootstrap procedures that they may have, here.
  */
@@ -166,7 +166,7 @@ foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationN
    $Gdn_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/bootstrap.php";
    if (file_exists($Gdn_Path))
       include_once($Gdn_Path);
-      
+
    // Include the application's hooks.
    $Hooks_Path = PATH_APPLICATIONS."/{$ApplicationFolder}/settings/class.hooks.php";
    if (file_exists($Hooks_Path))
@@ -186,8 +186,8 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
 
 /**
  * Locales
- * 
- * Install any custom locales provided by applications and plugins, and set up 
+ *
+ * Install any custom locales provided by applications and plugins, and set up
  * the locale management system.
  */
 
@@ -209,13 +209,13 @@ Gdn::Authenticator()->StartAuthenticator();
 
 /**
  * Bootstrap After
- * 
+ *
  * After the bootstrap has finished loading, this hook allows developers a last
  * chance to customize Garden's runtime environment before the actual request
  * is handled.
  */
 if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))
    require_once(PATH_ROOT.'/conf/bootstrap.after.php');
-   
+
 // Include "Render" functions now - this way pluggables and custom confs can override them.
 require_once(PATH_LIBRARY_CORE.'/functions.render.php');

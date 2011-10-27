@@ -41,7 +41,7 @@ echo $this->Form->Errors();
                array('class' => 'Info')
             );
          }
-         
+
          echo $this->Form->Input('Logo', 'file');
       ?>
    </li>

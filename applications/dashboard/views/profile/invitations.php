@@ -45,7 +45,7 @@ foreach ($this->InvitationData->Format('Text')->Result() as $Invitation) {
             echo $Invitation->Email;
          else
             echo Anchor($Invitation->AcceptedName, '/profile/'.$Invitation->AcceptedUserID);
-            
+
          if ($Invitation->AcceptedName == '') {
             echo '<div>'
                .Anchor(T('Uninvite'), '/profile/uninvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'Uninvite')
@@ -60,7 +60,7 @@ foreach ($this->InvitationData->Format('Text')->Result() as $Invitation) {
          } else {
             echo T('Accepted');
          }
-            
+
       ?></td>
    </tr>
 <?php } ?>

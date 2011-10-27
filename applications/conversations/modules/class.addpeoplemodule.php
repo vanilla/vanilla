@@ -20,7 +20,7 @@ class AddPeopleModule extends Gdn_Module {
       $Session = Gdn::Session();
       if (property_exists($Sender, 'Conversation'))
          $this->Conversation = $Sender->Conversation;
-         
+
       $this->Form = Gdn::Factory('Form', 'AddPeople');
       // $this->Form->Action = $Sender->SelfUrl;
       // If the form was posted back, check for people to add to the conversation
@@ -38,14 +38,14 @@ class AddPeopleModule extends Gdn_Module {
          $Sender->ConversationModel->AddUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
          // if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
          //    Redirect('/messages/'.$this->Conversation->ConversationID);
-            
+
          $Sender->InformMessage(T('Your changes were saved.'));
          $Sender->RedirectUrl = Url('/messages/'.$this->Conversation->ConversationID);
       }
       $this->_ApplicationFolder = $Sender->Application;
       $this->_ThemeFolder = $Sender->Theme;
-   }   
-   
+   }
+
    public function AssetTarget() {
       return 'Panel';
    }

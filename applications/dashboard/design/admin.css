@@ -22,7 +22,7 @@ Welcome to the Admin CSS File! Some things you should know:
    + Themes
    + Footer
 */
-   
+
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -166,7 +166,7 @@ code {
    overflow: auto;
 	box-shadow: 0px 0px 1px #999;
 	-moz-box-shadow: 0px 0px 1px #999;
-	-webkit-box-shadow: 0px 0px 1px #999;  
+	-webkit-box-shadow: 0px 0px 1px #999;
 }
 pre {
 	background: #F0F0F0;
@@ -487,7 +487,7 @@ div.EmptyInfo {
 	padding: 6px;
 	box-shadow: 0px 0px 2px #777;
 	-moz-box-shadow: 0px 0px 2px #777;
-	-webkit-box-shadow: 0px 0px 2px #777;  
+	-webkit-box-shadow: 0px 0px 2px #777;
 }
 /* Note: MorePager is related to the /applications/dashboard/modules/MorePagerModule. */
 .MorePager {
@@ -533,7 +533,7 @@ tr#PagerMore td {
    padding: 0 0 10px;
 	padding:0 20px 10px;
 	position:relative;
-	top:-10px;	
+	top:-10px;
 }
 .FilterMenu strong {
    font-weight: bold;
@@ -1211,7 +1211,7 @@ div.Popup div.Info {
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 div.Popup .Loading {
    display: block;
@@ -1245,7 +1245,7 @@ div.Popup div.Body {
 	border: 1px solid #01416b;
 	box-shadow: 0px 0px 3px #01416b;
 	-moz-box-shadow: 0px 0px 3px #01416b;
-	-webkit-box-shadow: 0px 0px 3px #01416b;  
+	-webkit-box-shadow: 0px 0px 3px #01416b;
 }
 div.Popup div.Body div.Body {
    border: 0;
@@ -1918,7 +1918,7 @@ div.Errors {
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 div.Errors ul {
 	border-bottom: 1px solid #a00 !important;
@@ -1949,7 +1949,7 @@ div.Errors pre {
    overflow: auto;
 	box-shadow: 0px 0px 2px #333;
 	-moz-box-shadow: 0px 0px 2px #333;
-	-webkit-box-shadow: 0px 0px 2px #333;  
+	-webkit-box-shadow: 0px 0px 2px #333;
 }
 div.Errors pre,
 div.Errors pre * {
@@ -1989,7 +1989,7 @@ div.InformMessages {
   width: 100%;/*IE5.5*/
   top: auto;
   left: 20px;
-  overflow: visible; 
+  overflow: visible;
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 div.InformMessages div.InformWrapper {

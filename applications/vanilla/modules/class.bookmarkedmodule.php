@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders recently active bookmarked discussions
  */
 class BookmarkedModule extends Gdn_Module {
-   
+
    public function GetData($Limit = 10) {
       $this->Data = FALSE;
       if (Gdn::Session()->IsValid() && C('Vanilla.Modules.ShowBookmarkedModule', TRUE)) {
@@ -29,7 +29,7 @@ class BookmarkedModule extends Gdn_Module {
             DiscussionModel::CategoryPermissions();
 
             $DiscussionModel->SQL->WhereIn('d.DiscussionID', $BookmarkIDs);
-            
+
             $this->Data = $DiscussionModel->Get(
                0,
                $Limit,
@@ -48,10 +48,10 @@ class BookmarkedModule extends Gdn_Module {
    public function ToString() {
       if (!isset($this->Data))
          $this->GetData();
-      
+
       if (is_object($this->Data) && $this->Data->NumRows() > 0)
          return parent::ToString();
-      
+
       return '';
    }
 }

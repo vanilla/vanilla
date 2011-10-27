@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
       if (!options.button)
          return false;
       var lastVal = null;
-      
+
       var save = function() {
          var currentVal = $(textarea).val();
          if (currentVal != undefined && currentVal != '' && currentVal != lastVal) {
@@ -14,11 +14,11 @@ jQuery(document).ready(function($) {
             lastVal = currentVal
             $(options.button).click();
          }
-         
+
          setTimeout(save, options.interval);
       };
       setTimeout(save, options.interval);
-      
+
       return this;
    }
 });

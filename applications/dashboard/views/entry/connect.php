@@ -21,7 +21,7 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 			<?php
 			if ($ConnectPhoto)
 				echo Img($ConnectPhoto, array('alt' => T('Profile Picture')));
-	
+
 			if ($ConnectName && $ConnectSource) {
 				$NameFormat = T('You are connected as %s through %s.');
 			} elseif ($ConnectName) {
@@ -31,18 +31,18 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 			} else {
 				$NameFormat = '';
 			}
-			
+
 			$NameFormat = '%1$s';
 			echo sprintf(
 				$NameFormat,
 				'<span class="Name">'.htmlspecialchars($ConnectName).'</span>',
 				'<span class="Source">'.htmlspecialchars($ConnectSource).'</span>');
-			
+
 			echo Wrap(T('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3');
 			?>
 		</div>
 		<?php endif; ?>
-	
+
 		<?php if ($this->Form->GetFormValue('UserID')): ?>
 		<div class="SignedIn">
 			<?php echo '<div class="Info">',T('You are now signed in.'),'</div>'; ?>
@@ -74,7 +74,7 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 					} else {
 						echo $this->Form->Label('Username', 'ConnectName');
 						echo '<div class="FinePrint">',T('ConnectChooseName', 'Choose a name to identify yourself on the site.'),'</div>';
-	
+
 						if (count($ExistingUsers) > 0) {
 							foreach ($ExistingUsers as $Row) {
 								echo Wrap($this->Form->Radio('UserSelect', $Row['Name'], array('value' => $Row['UserID'])), 'div');
@@ -82,7 +82,7 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 							echo Wrap($this->Form->Radio('UserSelect', T('Other'), array('value' => 'other')), 'div');
 						}
 					}
-	
+
 					if (!$NoConnectName)
 						echo $this->Form->Textbox('ConnectName');
 					?>
@@ -95,12 +95,12 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 					?>
 				</li>
 			</ul>
-	
+
 		<?php
 		echo '<div class="Buttons">', Wrap($this->Form->Button('Connect'), 'div', array('class' => 'ButtonContainer')), '</div>';
-	
+
 		endif;
-		
+
 		echo $this->Form->Close();
 		?>
 	</div>

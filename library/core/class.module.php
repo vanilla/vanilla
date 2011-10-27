@@ -39,10 +39,10 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     * @var string
     */
    protected $_ApplicationFolder;
-   
+
    /**
     * Data that is passed into the view.
-    * 
+    *
     * @var array
     */
    protected $_Data = array();
@@ -80,10 +80,10 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
       }
       if ($ApplicationFolder !== FALSE)
          $this->_ApplicationFolder = $ApplicationFolder;
-      
+
       if (is_object($Sender))
          $this->_Sender = $Sender;
-         
+
       parent::__construct();
    }
 
@@ -94,7 +94,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
    public function AssetTarget() {
       trigger_error(ErrorMessage("Any class extended from the Module class must implement it's own AssetTarget method.", get_class($this), 'AssetTarget'), E_USER_ERROR);
    }
-   
+
    public function Data($Name = NULL, $Default = '') {
       if ($Name == NULL)
          $Result = $this->_Data;
@@ -137,7 +137,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
 
       if (substr($View, -6) == 'module')
          $View = substr($View, 0, -6);
-         
+
       if (substr($View, 0, 4) == 'gdn_')
          $View = substr($View, 4);
 
@@ -196,11 +196,11 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
       }
       return $Path;
    }
-   
+
    public function Render() {
       echo $this->ToString();
    }
-   
+
    public function SetData($Name, $Value) {
       $this->_Data[$Name] = $Value;
    }

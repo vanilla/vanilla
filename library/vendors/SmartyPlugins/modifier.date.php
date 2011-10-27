@@ -14,5 +14,5 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @see Gdn_Format::Date()
  */
 function smarty_modifier_date($Date, $Format = '') {
-	return Gdn_Format::Date($Date, $Format);	
+	return Gdn_Format::Date($Date, $Format);
 }

@@ -183,7 +183,7 @@ window.vanilla.embed = function(host) {
             +'&vanilla_body='+encodeURIComponent(foreign_body)
             +'&vanilla_category_id='+encodeURIComponent(category_id);
       } else 
-         return 'http://' + host + path + '&remote=' + encodeURIComponent(embedUrl);
+         return 'http://' + host + path.replace('?', '&') + '&remote=' + encodeURIComponent(embedUrl);
    }
    var vanillaIframe = document.createElement('iframe');
    vanillaIframe.id = "vanilla"+id;

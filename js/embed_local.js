@@ -187,7 +187,9 @@ jQuery(document).ready(function($) {
 
    }
    
-   var path = gdn.definition('Path', '~');
+   var href = window.location.href;
+   var isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://';
+   var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);
    if (path != '~' && !isEmbeddedComments) {
       if (path.length > 0 && path[0] != '/')
          path = '/'+path;

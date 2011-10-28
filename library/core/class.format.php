@@ -982,7 +982,7 @@ EOT;
 			if(C('Garden.Format.Hashtags')) {
 				$Mixed = preg_replace(
 					'/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?]|$)/i',
-					'\1'.Anchor('#\2', '/search?Search=%23\2&amp;Mode=like').'\3',
+					'\1'.Anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
 					$Mixed
 				);
 			}

@@ -458,19 +458,22 @@ class PermissionModel extends Gdn_Model {
       $Key = "{$JunctionTable}__{$JunctionColumn}";
 
       if (!isset($this->_PermissionColumns[$Key])) {
-         $this->SQL
+         $SQL = clone $this->SQL;
+         $SQL->Reset();
+         
+         $SQL
             ->Select('*')
             ->From('Permission')
             ->Limit(1);
 
          if ($JunctionTable !== FALSE && $JunctionColumn !== FALSE) {
-            $this->SQL
+            $SQL
                ->Where('JunctionTable', $JunctionTable)
                ->Where('JunctionColumn', $JunctionColumn)
                ->Where('RoleID', 0);
          }
 
-         $Cols = $this->SQL->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $Cols = $SQL->Get()->FirstRow(DATASET_TYPE_ARRAY);
             
          unset($Cols['RoleID'], $Cols['JunctionTable'], $Cols['JunctionColumn'], $Cols['JunctionID']);
          

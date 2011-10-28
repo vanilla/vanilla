@@ -87,6 +87,7 @@ class PermissionModel extends Gdn_Model {
             ->Set($this->_Backtick($NewColumns), '', FALSE)
             ->Put('Permission', array(), $Where);
       }
+      $this->ClearPermissions();
    }
    
    public function Delete($RoleID = NULL, $JunctionTable = NULL, $JunctionColumn = NULL, $JunctionID = NULL) {

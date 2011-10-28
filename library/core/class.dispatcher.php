@@ -68,21 +68,21 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     *
     * @var string
     */
-   private $_ControllerFolder;
+   public $ControllerFolder;
 
    /**
     * The name of the controller to be dispatched.
     *
     * @var string
     */
-   private $_ControllerName;
+   public $ControllerName;
 
    /**
     * The method of the controller to be called.
     *
     * @var string
     */
-   private $_ControllerMethod;
+   public $ControllerMethod;
 
    /**
     * Any query string arguments supplied to the controller method.
@@ -131,9 +131,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->Request = '';
       $this->_ApplicationFolder = '';
       $this->_AssetCollection = array();
-      $this->_ControllerFolder = '';
-      $this->_ControllerName = '';
-      $this->_ControllerMethod = '';
+      $this->ControllerFolder = '';
+      $this->ControllerName = '';
+      $this->ControllerMethod = '';
       $this->_ControllerMethodArgs = array();
       $this->_PropertyCollection = array();
       $this->_Data = array();
@@ -151,7 +151,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * Return the properly formatted controller class name.
     */
    public function ControllerName() {
-      return $this->_ControllerName.'Controller';
+      return $this->ControllerName.'Controller';
    }
    
    public function Application() {
@@ -159,11 +159,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    }
    
    public function Controller() {
-      return $this->_ControllerName;
+      return $this->ControllerName;
    }
    
    public function ControllerMethod() {
-      return $this->_ControllerMethod;
+      return $this->ControllerMethod;
    }
    
    public function ControllerArguments() {
@@ -240,6 +240,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller = new $ControllerName();
          
          $this->EventArguments['Controller'] =& $Controller;
+         $this->FireEvent('AfterControllerCreate');
 
          // Pass along any assets
          if (is_array($this->_AssetCollection)) {
@@ -269,34 +270,34 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Controller->Data = $this->_Data;
 
          // Set up a default controller method in case one isn't defined.
-         $ControllerMethod = str_replace('_', '', $this->_ControllerMethod);
+         $ControllerMethod = str_replace('_', '', $this->ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
 
          $this->FireEvent('AfterAnalyzeRequest');
 
          // Take enabled plugins into account, as well
-         $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
-         if (!$PluginReplacement && ($this->_ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
+         $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->ControllerMethod);
+         if (!$PluginReplacement && ($this->ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
             // Check to see if there is an 'x' version of the method.
             if (method_exists($Controller, 'x' . $ControllerMethod)) {
                // $PluginManagerHasReplacementMethod = TRUE;
                $ControllerMethod = 'x' . $ControllerMethod;
             } else {
-               if ($this->_ControllerMethod != '')
-                  array_unshift($this->_ControllerMethodArgs, $this->_ControllerMethod);
+               if ($this->ControllerMethod != '')
+                  array_unshift($this->_ControllerMethodArgs, $this->ControllerMethod);
 
-               $this->_ControllerMethod = 'Index';
+               $this->ControllerMethod = 'Index';
                $ControllerMethod = 'Index';
 
-               $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->_ControllerMethod);
+               $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->ControllerMethod);
             }
          }
 
          // Pass in the querystring values
          $Controller->ApplicationFolder = $this->_ApplicationFolder;
          $Controller->Application = $this->EnabledApplication();
-         $Controller->ControllerFolder = $this->_ControllerFolder;
-         $Controller->RequestMethod = $this->_ControllerMethod;
+         $Controller->ControllerFolder = $this->ControllerFolder;
+         $Controller->RequestMethod = $this->ControllerMethod;
          $Controller->RequestArgs = $this->_ControllerMethodArgs;
          $Controller->Request = $Request;
          $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
@@ -307,7 +308,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->Initialize();
          
          $this->EventArguments['Controller'] = &$Controller;
-         $this->FireEvent('AfterControllerCreate');
+         $this->FireEvent('AfterControllerInit');
 
          // Call the requested method on the controller - error out if not defined.
          if ($PluginReplacement) {
@@ -434,9 +435,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       // Clear the slate
       $this->_ApplicationFolder = '';
-      $this->_ControllerFolder = '';
-      $this->_ControllerName = '';
-      $this->_ControllerMethod = 'index';
+      $this->ControllerFolder = '';
+      $this->ControllerName = '';
+      $this->ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
       $this->Request = $Request->Path(FALSE);
 
@@ -582,13 +583,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             Gdn_Autoloader::PRIORITY_TYPE_PREFER,
             Gdn_Autoloader::PRIORITY_PERSIST);
       
-         $this->_ControllerName = $Controller;
+         $this->ControllerName = $Controller;
          $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
-         $this->_ControllerFolder = '';
+         $this->ControllerFolder = '';
          
          $Length = sizeof($Parts);
          if ($Length > $ControllerKey + 1)
-            list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1], FALSE);
+            list($this->ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1], FALSE);
    
          if ($Length > $ControllerKey + 2) {
             for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
@@ -616,10 +617,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    private function _MapParts($Parts, $ControllerKey) {
       $Length = count($Parts);
       if ($Length > $ControllerKey)
-         $this->_ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
+         $this->ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
 
       if ($Length > $ControllerKey + 1)
-         list($this->_ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1]);
+         list($this->ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1]);
 
       if ($Length > $ControllerKey + 2) {
          for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
@@ -634,10 +635,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if (count($Controller->Request->Get()) == 0)
          return;
 
-      if (!method_exists($Controller, $this->_ControllerMethod))
+      if (!method_exists($Controller, $this->ControllerMethod))
          return;
 
-      $Meth = new ReflectionMethod($Controller, $this->_ControllerMethod);
+      $Meth = new ReflectionMethod($Controller, $this->ControllerMethod);
       $MethArgs = $Meth->getParameters();
       $Args = array();
       $Get = array_change_key_case($Controller->Request->Get());

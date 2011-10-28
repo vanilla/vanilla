@@ -5,6 +5,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
 <head>
    <title>Bonk</title>
+   <meta name="robots" content="noindex" />
    <?php
    if ($CssPath !== FALSE)
       echo '<link rel="stylesheet" type="text/css" href="',Asset($CssPath),'" />';

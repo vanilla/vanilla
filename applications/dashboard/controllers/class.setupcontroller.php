@@ -49,10 +49,12 @@ class SetupController extends DashboardController {
       $this->ApplicationFolder = 'dashboard';
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
-      
-      $Installed = Gdn::Config('Garden.Installed') ? TRUE : FALSE;
-      if ($Installed)
-         throw new Exception('Vanilla has already been installed.');
+      $Installed = C('Garden.Installed');
+      if ($Installed) {
+         $this->View = "AlreadyInstalled";
+         $this->Render();
+         return;
+      }
       
       if (!$this->_CheckPrerequisites()) {
          $this->View = 'prerequisites';

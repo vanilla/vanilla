@@ -343,7 +343,7 @@ class EntryController extends Gdn_Controller {
          
          // Don't overwrite the user photo if the user uploaded a new one.
          $Photo = GetValue('Photo', $User);
-         if (GetValue('Photo', $Data) && $Photo && !StringBeginsWith($Photo, 'http')) {
+         if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
             unset($Data['Photo']);
          }
          
@@ -382,11 +382,23 @@ class EntryController extends Gdn_Controller {
                   $UserID = $Row['UserID'];
                   $this->Form->SetFormValue('UserID', $UserID);
                   $Data = $this->Form->FormValues();
-                  $UserModel->Save($Data, array('NoConfirmEmail' => TRUE));
+                  
+                  // Don't overwrite a photo if the user has already uploaded one.
+                  $Photo = GetValue('Photo', $Row);
+                  if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+                     unset($Data['Photo']);
+                  }
+                  $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
                   
                   if ($Attributes = $this->Form->GetFormValue('Attributes')) {
                      $UserModel->SaveAttribute($UserID, $Attributes);
                   }
+                  
+                  // Save the userauthentication link.
+                  $UserModel->SaveAuthentication(array(
+                      'UserID' => $UserID,
+                      'Provider' => $this->Form->GetFormValue('Provider'),
+                      'UniqueID' => $this->Form->GetFormValue('UniqueID')));
                   
                   // Sign the user in.
                   Gdn::Session()->Start($UserID, TRUE, TRUE);

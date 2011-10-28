@@ -877,6 +877,8 @@ class Gdn_Autoloader_Map {
    }
    
    protected function GetClassNameFromFile($File) {
+      if (StringEndsWith($File, '.plugin.php')) return FALSE;
+      
       $FileName = basename($File);
       $Modes = array(
          'class'     => self::LOOKUP_CLASS_MASK,

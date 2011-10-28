@@ -113,10 +113,7 @@ class FlaggingPlugin extends Gdn_Plugin {
       
       // Set the model on the form.
       $Sender->Form->SetModel($ConfigurationModel);
-      
-      $CategoryModel = new CategoryModel();
-      $Sender->CategoryData = $CategoryModel->GetFull('', 'Vanilla.Discussions.Add');
-      
+            
       // If seeing the form for the first time...
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
@@ -391,6 +388,9 @@ class FlaggingPlugin extends Gdn_Plugin {
          ->Column('Comment', 'text')
          ->Column('DateInserted', 'datetime')
          ->Set(FALSE, FALSE);
+         
+      if (C('Plugins.Flagging.Enabled', NULL) === NULL)
+         SaveToConfig('Plugins.Flagging.Enabled', FALSE);
    }
 
    public function Setup() {
@@ -402,7 +402,7 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
    
    protected function _Disable() {
-      RemoveFromConfig('Plugins.Flagging.Enabled');
+      SaveToConfig('Plugins.Flagging.Enabled', FALSE);
    }
    
 }

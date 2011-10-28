@@ -64,7 +64,7 @@ class CommentModel extends VanillaModel {
          $New[] = GetValueR((count($Result) - 1).'.DateInserted', $Result);
       
       if ($Curr != $New) {
-         $CacheKey = "Comment.Page.$DiscussionID.$Page";
+         $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
          Gdn::Cache()->Store($CacheKey, $New, array(Gdn_Cache::FEATURE_EXPIRY => 86400));
       }
    }
@@ -233,7 +233,7 @@ class CommentModel extends VanillaModel {
          return FALSE;
       }
       
-      $CacheKey = "Comment.Page.$DiscussionID.$Page";
+      $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
       $Value = Gdn::Cache()->Get($CacheKey);
       if ($Value === FALSE) {
          return FALSE;
@@ -897,10 +897,11 @@ class CommentModel extends VanillaModel {
          return;
       
       $CountComments = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CountComments');
-      $PageCount = PageNumber($CountComments - 1, C('Vanilla.Comments.PerPage', 30));
+      $Limit = C('Vanilla.Comments.PerPage', 30);
+      $PageCount = PageNumber($CountComments, $Limit) + 1;
       
       for ($Page = $From; $Page <= $PageCount; $Page++) {
-         $CacheKey = "Comment.Page.$DiscussionID.$Page";
+         $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
          Gdn::Cache()->Remove($CacheKey);
       }
    }

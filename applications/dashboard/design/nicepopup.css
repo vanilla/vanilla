@@ -1,35 +1,5 @@
-/* =================================================================== Popups */
-div.Popup div.Messages {
-   text-align: left;
-   position: inherit;
-   top: auto;
-   left: auto;
-   z-index: auto;
-   margin: 10px 0 !important;
-}
-div.Popup div.Warning {
-   margin: 10px 0 0;
-}
-div.Popup div.Messages ul {
-   display: block;
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-}
-div.Popup div.Info {
-   border: 0;
-}
-* html div.Popup div.Messages {
-  position: inherit;
-  width: auto;
-  top: auto;
-  left: auto;
-  overflow: auto; 
-}
-div.Popup .Loading {
-   display: block;
-}
-.Overlay {
+
+body div.Overlay {
    position: absolute;
    top: 0;
    left: 0;
@@ -37,6 +7,7 @@ div.Popup .Loading {
    height: 100%;
    background: rgba(255,255,255,0.7);
 }
+
 div.Popup {
   position: absolute;
   width: 100%;
@@ -45,12 +16,13 @@ div.Popup {
   z-index: 5000;
   text-align: center;
 }
-div.Popup div.Body {
+
+body div.Popup div.Body {
    margin: 0px auto;
    text-align: left;
    position: relative;
    padding: 0 0 8px 0;
-   max-width: 500px;
+   width: 500px;
    border-radius: 5px;
    -moz-border-radius: 5px;
    -webkit-border-radius: 5px;
@@ -60,9 +32,50 @@ div.Popup div.Body {
    -moz-box-shadow: 0px 0px 3px #01416b;
    -webkit-box-shadow: 0px 0px 3px #01416b;  
 }
+
 div.Popup div.Body div.Body {
    border: 0;
 }
+
+div.Popup div.Border {
+   border: 0px;
+}
+
+div.Popup div.Messages {
+   text-align: left;
+   position: inherit;
+   top: auto;
+   left: auto;
+   z-index: auto;
+   margin: 10px 0 !important;
+}
+
+div.Popup div.Warning {
+   margin: 10px 0 0;
+}
+
+div.Popup div.Messages ul {
+   display: block;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+div.Popup div.Info {
+   border: 0;
+}
+
+* html div.Popup div.Messages {
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto; 
+}
+
+div.Popup .Loading {
+   display: block;
+}
+
 div.Popup div.Legal,
 div.Popup .Content form {
    max-height: 450px;
@@ -73,8 +86,8 @@ div.Popup .Content form {
 div.Popup .Loading {
   text-align: center;
 }
-div.Popup h1,
-div.Popup h2 {
+body div.Popup h1,
+body div.Popup h2 {
    padding: 6px 9px 4px;
    text-shadow: 0 1px 0 #fff;
    border-radius: 4px 4px 0 0;
@@ -85,6 +98,7 @@ div.Popup h2 {
    margin: 0 0 5px 0;
    color: #f8fdff;
    background: url('images/dashboard-bg.png') top center repeat-x #014687;
+   border: 0px;
    border-bottom: 1px solid #000;
    text-shadow: 0 1px 0 #000;
 }
@@ -120,7 +134,7 @@ body.Entry div.Popup p {
    color: #000;
 }
 /* Note: The close class is used on the "close" anchor in popups. */
-a.Close {
+div.Popup a.Close {
    line-height: 1;
    color: #555;
    cursor: pointer;
@@ -140,10 +154,10 @@ a.Close {
    width: 18px;
    overflow: hidden;
 }
-a.Close span {
+div.Popup a.Close span {
    display: none;
 }
-a.Close:hover {
+div.Popup a.Close:hover {
    color: #111;
 }
 div.Popup .Footer {
@@ -193,16 +207,22 @@ div.Popup .Footer input.Button {
    color: #212121;
 }
 
-body div.Popup div.Info {
+body div.Popup div.Wrap {
+   font-size: 14px;
+   position: relative;
+   margin: 10px;
+   padding: 10px;
+   line-height: 1.4;
    margin-bottom: 1px;
 }
 
-body div.Popup div.Warning {
+div.Popup div.PopupNotice {
    margin-top: 20px;
    background: #dae5ea;
+   padding: 10px 20px;
 }
 
-.Popup .Warning p {
+.Popup div.PopupNotice p {
    border-left: 5px solid #7dc2df;
    padding: 0px 0px 0px 5px;
    margin: 0px;

@@ -435,9 +435,7 @@ class LogModel extends Gdn_Pluggable {
                continue;
             
             $this->_RestoreOne($LogRow, $DeleteLog);
-         }
-      } else {
-         
+         }  
       }
    }
    
@@ -452,18 +450,6 @@ class LogModel extends Gdn_Pluggable {
       
       if ($Log['RecordType'] == 'Configuration') {
          throw new Gdn_UserException('Restoring configuration edits is currently not supported.');
-      }
-
-      // Keep track of a discussion ID so that it's count can be recalculated.
-      if ($Log['Operation'] != 'Edit') {
-         switch ($Log['RecordType']) {
-            case 'Discussion':
-               $this->_RecalcIDs['Discussion'][$Log['RecordID']] = TRUE;
-               break;
-            case 'Comment':
-               $this->_RecalcIDs['Discussion'][$Log['ParentRecordID']] = TRUE;
-               break;
-         }
       }
 
       if ($Log['RecordType'] == 'Registration')
@@ -514,7 +500,6 @@ class LogModel extends Gdn_Pluggable {
             }
 
             // Insert the record back into the db.
-
             if ($Log['Operation'] == 'Spam' && $Log['RecordType'] == 'Registration') {
                SaveToConfig(array('Garden.Registration.NameUnique' => FALSE, 'Garden.Registration.EmailUnique' => FALSE), '', FALSE);
                $ID = Gdn::UserModel()->InsertForBasic($Set, FALSE, array('ValidateSpam' => FALSE));
@@ -529,6 +514,18 @@ class LogModel extends Gdn_Pluggable {
                   ->Insert($TableName, $Set);
                if (!$ID && isset($Log['RecordID']))
                   $ID = $Log['RecordID'];
+               
+               // Keep track of a discussion ID so that it's count can be recalculated.
+               if ($Log['Operation'] != 'Edit') {
+                  switch ($Log['RecordType']) {
+                     case 'Discussion':
+                        $this->_RecalcIDs['Discussion'][$ID] = TRUE;
+                        break;
+                     case 'Comment':
+                        $this->_RecalcIDs['Discussion'][$Log['ParentRecordID']] = TRUE;
+                        break;
+                  }
+               }
             }
 
             break;

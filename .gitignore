@@ -7,6 +7,8 @@
 /uploads/*.*
 /conf/config.php
 /conf/bootstrap.before.php
+/conf/bootstrap.early.php
+/conf/bootstrap.late.php
 /conf/bootstrap.after.php
 /conf/locale-*
 /applications/vanillaforumscom

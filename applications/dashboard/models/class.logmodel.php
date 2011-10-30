@@ -329,18 +329,6 @@ class LogModel extends Gdn_Pluggable {
       if ($Handled)
          return; // a plugin handled the restore.
 
-      // Keep track of a discussion ID so that it's count can be recalculated.
-      if ($Log['Operation'] != 'Edit') {
-         switch ($Log['RecordType']) {
-            case 'Discussion':
-               $this->_RecalcIDs['Discussion'][$Log['RecordID']] = TRUE;
-               break;
-            case 'Comment':
-               $this->_RecalcIDs['Discussion'][$Log['ParentRecordID']] = TRUE;
-               break;
-         }
-      }
-
       if ($Log['RecordType'] == 'Registration')
          $TableName = 'User';
       else
@@ -401,6 +389,16 @@ class LogModel extends Gdn_Pluggable {
                   ->Insert($TableName, $Set);
                if (!$ID && isset($Log['RecordID']))
                   $ID = $Log['RecordID'];
+            }
+            
+            // Keep track of a discussion ID so that it's count can be recalculated.
+            switch ($Log['RecordType']) {
+               case 'Discussion':
+                  $this->_RecalcIDs['Discussion'][$Log['RecordID']] = TRUE;
+                  break;
+               case 'Comment':
+                  $this->_RecalcIDs['Discussion'][$Log['ParentRecordID']] = TRUE;
+                  break;
             }
 
             break;

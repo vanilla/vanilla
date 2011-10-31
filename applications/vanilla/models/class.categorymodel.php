@@ -224,7 +224,7 @@ class CategoryModel extends Gdn_Model {
             $Key = 'UserCategory_'.Gdn::Session()->UserID;
             $UserData = Gdn::Cache()->Get($Key);
             if ($UserData === Gdn_Cache::CACHEOP_FAILURE) {
-               $UserData = Gdn::SQL()->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
+               $UserData = $SQL->GetWhere('UserCategory', array('UserID' => Gdn::Session()->UserID))->ResultArray();
                $UserData = Gdn_DataSet::Index($UserData, 'CategoryID');
                Gdn::Cache()->Store($Key, $UserData);
             }

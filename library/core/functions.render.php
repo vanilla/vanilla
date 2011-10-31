@@ -92,23 +92,27 @@ if (!function_exists('Anchor')) {
    /**
     * Builds and returns an anchor tag.
     */
-   function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
+   function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = FALSE) {
       if (!is_array($CssClass) && $CssClass != '')
          $CssClass = array('class' => $CssClass);
 
       if ($Destination == '' && $ForceAnchor === FALSE)
          return $Text;
       
-      if ($Attributes == '')
+      if (!is_array($Attributes))
          $Attributes = array();
-			
-		$SSL = GetValue('SSL', $Attributes, NULL);
-		if ($SSL)
-			unset($Attributes['SSL']);
+      
+      $SSL = FALSE;
+      if (isset($Attributes['SSL'])) {
+         $SSL = $Attributes['SSL'];
+         unset($Attributes['SSL']);
+      }
 		
-		$WithDomain = GetValue('WithDomain', $Attributes, FALSE);
-		if ($WithDomain)
+		$WithDomain = FALSE;
+      if (isset($Attributes['WithDomain'])) {
+         $WithDomain = $Attributes['WithDomain'];
 			unset($Attributes['WithDomain']);
+      }
 
       $Prefix = substr($Destination, 0, 7);
       if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))

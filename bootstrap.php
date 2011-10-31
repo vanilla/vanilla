@@ -111,6 +111,9 @@ Gdn::Config()->OverlayDynamic();
 if (file_exists(PATH_CONF.'/bootstrap.late.php'))
    require_once(PATH_CONF.'/bootstrap.late.php');
 
+if (C('Debug'))
+   Debug(TRUE);
+
 /**
  * Factory Services
  * 

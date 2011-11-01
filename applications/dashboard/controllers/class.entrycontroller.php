@@ -506,8 +506,7 @@ class EntryController extends Gdn_Controller {
             $User['Name'] = $User['ConnectName'];
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
-
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE), array('NoConfirmEmail' => TRUE));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 

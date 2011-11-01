@@ -350,7 +350,7 @@ class CommentModel extends VanillaModel {
 				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
 				if(!$ArchiveDate || (Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($ArchiveDate))) {
 					// Insert watch data.
-               $this->SQL->Options('Ignore');
+               $this->SQL->Options('Ignore', TRUE);
 					$this->SQL->Insert(
 						'UserDiscussion',
 						array(

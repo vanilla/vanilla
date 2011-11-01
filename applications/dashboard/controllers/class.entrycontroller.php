@@ -499,8 +499,11 @@ class EntryController extends Gdn_Controller {
             if ($this->Form->ValidateRule('ConnectName', 'ValidateRequired')) {
                $ConnectName = $this->Form->GetFormValue('ConnectName');
 
-               // Check to see if there is already a user with the given name.
-               $User = $UserModel->GetWhere(array('Name' => $ConnectName))->FirstRow(DATASET_TYPE_ARRAY);
+               $User = FALSE;
+               if (C('Garden.Registration.NameUnique')) {
+                  // Check to see if there is already a user with the given name.
+                  $User = $UserModel->GetWhere(array('Name' => $ConnectName))->FirstRow(DATASET_TYPE_ARRAY);
+               }
 
                if (!$User) {
                   $this->Form->ValidateRule('ConnectName', 'ValidateUsername');

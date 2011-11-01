@@ -699,7 +699,7 @@ class EntryController extends Gdn_Controller {
                $User = Gdn::UserModel()->GetByUsername($Email);
 
             if (!$User) {
-               $this->Form->AddError('ErrorCredentials');
+               $this->Form->AddError('User not found.');
             } else {
                $ClientHour = $this->Form->GetFormValue('ClientHour');
                $HourOffset = Gdn_Format::ToTimestamp($ClientHour) - time();
@@ -736,7 +736,7 @@ class EntryController extends Gdn_Controller {
                      $this->_SetRedirect();
                   }
                } else {
-                  $this->Form->AddError('ErrorCredentials');
+                  $this->Form->AddError('Invalid password.');
                }
             }
          }

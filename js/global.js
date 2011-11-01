@@ -773,11 +773,16 @@ jQuery(document).ready(function($) {
    
    // Inform an error returned from an ajax call.
    gdn.informError = function(xhr) {
+      if (xhr == undefined || xhr == null)
+         return;
       if (typeof(xhr) == 'string')
          xhr = {responseText: xhr, code: 500};
       
       var message = xhr.responseText;
       var code = xhr.status;
+      
+      if (message == undefined || message == null || message == '')
+         return;
       
       try {
          var data = $.parseJSON(message);

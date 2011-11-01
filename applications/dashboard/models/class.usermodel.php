@@ -138,7 +138,7 @@ class UserModel extends Gdn_Model {
       }
 
       // Make sure to encrypt the password for saving...
-      if (array_key_exists('Password', $Fields)) {
+      if (array_key_exists('Password', $Fields) && !GetValue('HashMethod', $Fields)) {
          $PasswordHash = new Gdn_PasswordHash();
          $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
          $Fields['HashMethod'] = 'Vanilla';

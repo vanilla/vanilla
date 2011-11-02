@@ -70,5 +70,10 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');
       ?>
    </li>
+   <li>
+      <?php
+         echo $this->Form->CheckBox('Vanilla.AdminCheckboxes.Use', 'Enable admin checkboxes on discussions and comments.');
+      ?>
+   </li>
 </ul>
 <?php echo $this->Form->Close('Save');

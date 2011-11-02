@@ -51,7 +51,8 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Comments.PerPage',
          'Vanilla.Archive.Date',
 			'Vanilla.Archive.Exclude',
-			'Garden.EditContentTimeout'
+			'Garden.EditContentTimeout',
+			'Vanilla.AdminCheckboxes.Use'
       ));
       
       // Set the model on the form.

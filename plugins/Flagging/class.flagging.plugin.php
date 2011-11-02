@@ -17,7 +17,7 @@ $PluginInfo['Flagging'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/plugin/flagging',
-   'SettingsPermission' => 'Garden.Settings.Manage',
+   'SettingsPermission' => 'Garden.Moderation.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => array('Plugins.Flagging.Notify'),
    'Author' => "Tim Gunter",
@@ -40,7 +40,7 @@ class FlaggingPlugin extends Gdn_Plugin {
          $LinkText .= " ({$NumFlaggedItems})";
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Forum', T('Forum'));
-      $Menu->AddLink('Forum', $LinkText, 'plugin/flagging', 'Garden.Settings.Manage');
+      $Menu->AddLink('Forum', $LinkText, 'plugin/flagging', 'Garden.Moderation.Manage');
    }
    
    /**
@@ -88,7 +88,7 @@ class FlaggingPlugin extends Gdn_Plugin {
     * Create virtual Flagging controller.
     */
    public function PluginController_Flagging_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->Permission('Garden.Moderation.Manage');
       $Sender->Title('Content Flagging');
       $Sender->AddSideMenu('plugin/flagging');
       $Sender->Form = new Gdn_Form();

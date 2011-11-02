@@ -48,6 +48,13 @@ function TutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
 	right: 10px;
    line-height: 1;
 }
+.Welcome a {
+   color: #fff;
+   text-decoration: underline;
+}
+.Welcome a:hover {
+   text-decoration: none;
+}
 .Welcome .Video a {
    border: 10px solid #1c4c80;
    border-color: rgba(255, 255, 255, 0.1);
@@ -160,7 +167,8 @@ echo $this->Form->Errors();
    <div class="Welcome">
       <h2><?php echo T('Getting Started with Vanilla'); ?></h2>
       <p><strong><?php echo T('Kick-start your community and increase user engagement.'); ?></strong></p>
-      <p><?php echo T("Vanilla is the simplest, most powerful community platform in the world. It's super-duper easy to use. Start with this introductory video and continue with the steps below. Enjoy!"); ?></p>
+      <p><?php echo T("Check out these tutorials to get started using Vanilla", "Vanilla is the simplest, most powerful community platform in the world. It's super-duper easy to use. Start with this introductory video and continue with the steps below. Enjoy!"); ?></p>
+      <p><?php echo Anchor(T("Check out the full list of video tutorials here."), 'settings/tutorials'); ?></p>
       <div class="Video"><?php echo TutLink('introduction', FALSE, 'large'); ?></div>
    </div>
    <div class="Step">

@@ -126,7 +126,7 @@ if (!class_exists('MenuModule', FALSE)) {
             $Session_TransientKey = $Session->TransientKey();
             $Permissions = $Session->GetPermissions();
             $HasPermissions = count($Permissions) > 0;
-            $Admin = $Session->User->Admin == '1' ? TRUE : FALSE;
+            $Admin = $Session->User->Admin > 0 ? TRUE : FALSE;
          }
          
          $Menu = '';

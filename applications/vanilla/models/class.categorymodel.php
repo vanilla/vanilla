@@ -119,7 +119,7 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
-   public function ClearCache() {
+   public static function ClearCache() {
       Gdn::Cache()->Remove(self::CACHE_KEY);
    }
    
@@ -918,6 +918,7 @@ class CategoryModel extends Gdn_Model {
             )->Put();
          }
       }
+      self::ClearCache();
    }
    
    /**

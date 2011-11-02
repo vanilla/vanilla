@@ -4,7 +4,7 @@
    <?php
    // Make sure to force this form to post to the correct place in case the view is
    // rendered within another view (ie. /dashboard/entry/index/):
-   echo $this->Form->Open(array('Action' => Url('/entry/passwordrequest'), 'id' => 'Form_User_Password'));
+   echo $this->Form->Open(array('Action' => Url('/entry/passwordrequest?'.http_build_query($this->Request->Get())), 'id' => 'Form_User_Password'));
    echo $this->Form->Errors(); ?>
    <ul>
       <li>

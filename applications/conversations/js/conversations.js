@@ -33,9 +33,8 @@ jQuery(document).ready(function($) {
             url: $(frm).attr('action'),
             data: postValues,
             dataType: 'json',
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $('div.Popup').remove();
-               $.popup({}, XMLHttpRequest.responseText);
+            error: function(xhr) {
+               gdn.informError(xhr);
             },
             success: function(json) {
                json = $.postParseJson(json);

@@ -772,17 +772,31 @@ jQuery(document).ready(function($) {
 	}
    
    // Inform an error returned from an ajax call.
-   gdn.informError = function(xhr) {
+   gdn.informError = function(xhr, silentAbort) {
       if (xhr == undefined || xhr == null)
          return;
+      
       if (typeof(xhr) == 'string')
          xhr = {responseText: xhr, code: 500};
       
       var message = xhr.responseText;
       var code = xhr.status;
+      switch (xhr.statusText) {
+         case 'error':
+            if (silentAbort) 
+               return;
+            message = 'There was an error performing your request. Please try again.';
+            break;
+         case 'timeout':
+            message = 'Your request timed out. Please try again.';
+            break;
+         case 'abort':
+            return;
+      }
       
-      if (message == undefined || message == null || message == '')
+      if (message == undefined || message == null || message == '') {
          return;
+      }
       
       try {
          var data = $.parseJSON(message);

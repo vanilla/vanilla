@@ -781,29 +781,31 @@ jQuery(document).ready(function($) {
       
       var message = xhr.responseText;
       var code = xhr.status;
-      switch (xhr.statusText) {
-         case 'error':
-            if (silentAbort) 
-               return;
-            message = 'There was an error performing your request. Please try again.';
-            break;
-         case 'timeout':
-            message = 'Your request timed out. Please try again.';
-            break;
-         case 'abort':
-            return;
-      }
       
       if (message == undefined || message == null || message == '') {
-         return;
+         switch (xhr.statusText) {
+            case 'error':
+               if (silentAbort) 
+                  return;
+               message = 'There was an error performing your request. Please try again.';
+               break;
+            case 'timeout':
+               message = 'Your request timed out. Please try again.';
+               break;
+            case 'abort':
+               return;
+         }
       }
       
       try {
          var data = $.parseJSON(message);
-         if (data.Exception)
+         if (typeof(data.Exception) == 'string')
             message = data.Exception;
       } catch(e) {
       }
+      
+      if (message == '')
+         message = 'There was an error performing your request. Please try again.';
       
       gdn.informMessage('<span class="InformSprite SkullBones Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
    }

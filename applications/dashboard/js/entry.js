@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
             data: { email: email },
             dataType: 'text',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               gdn.informError(xhr);
+               gdn.informError(xhr, true);
             },
             success: function(text) {
                if (text == 'FALSE')
@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
             url: checkUrl,
             dataType: 'text',
             error: function(xhr) {
-               gdn.informError(xhr);
+               gdn.informError(xhr, true);
             },
             success: function(text) {
                if (text == 'FALSE')

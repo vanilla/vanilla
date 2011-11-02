@@ -132,6 +132,7 @@ $(function() {
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
    }
+   else return; // Ignore the rest if we're not embedded.
 
    var path = gdn.definition('Path', '~');
    if (path != '~') {

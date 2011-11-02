@@ -2503,6 +2503,10 @@ body#dashboard_entry_index input.InputBox,
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
 }
+.Errors a {
+   color: #fff;
+   text-decoration: underline;
+}
 .Errors ul li {
    color: #fff !important;
    background: #d50a0a !important;

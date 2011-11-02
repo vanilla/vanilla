@@ -267,7 +267,7 @@ function Gdn_ExceptionHandler($Exception) {
       }
       
       // Attempt to log an error message no matter what.
-      LogMessage($File, $Line, $SenderObject, $SenderMethod, $SenderMessage, $SenderCode);
+      LogException($Exception);
    }
    catch (Exception $e)
    {
@@ -289,6 +289,39 @@ if (!function_exists('ErrorMessage')) {
     */
    function ErrorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
       return $Message.'|'.$SenderObject.'|'.$SenderMethod.'|'.$Code;
+   }
+}
+
+if (!function_exists('LogException')) {
+   /**
+    * Log an exception.
+    * 
+    * @param Exception $Ex 
+    */
+   function LogException($Ex) {
+      if(!class_exists('Gdn', FALSE))
+         return;
+      if (!Gdn::Config('Garden.Errors.LogEnabled', FALSE))
+         return;
+      
+      $Px = 'Garden ';
+      $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
+      if (!$ErrorLogFile) {
+         $Type = 0;
+      } else {
+         $Type = 3;
+         $Date = date(Gdn::Config('Garden.Errors.LogDateFormat', 'd M Y - H:i:s'));
+         $Px = "$Date $Px";
+      }
+      
+      $Message = 'Exception: '.$Ex->getMessage().' in '.$Ex->getFile().' on '.$Ex->getLine();
+      @error_log($Px.$Message, $Type, $ErrorLogFile);
+      
+      $TraceLines = explode("\n", $Ex->getTraceAsString());
+      foreach ($TraceLines as $i => $Line) {
+         $j = $i + i;
+         @error_log("$Px  $Line", $Type, $ErrorLogFile);
+      }
    }
 }
 

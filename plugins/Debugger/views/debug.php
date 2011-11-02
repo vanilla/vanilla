@@ -21,7 +21,7 @@ if (method_exists($Sender, 'CanonicalUrl')) {
 if (Gdn::Cache()->ActiveEnabled()) {
    echo '<h3>Cache Information</h3>';
    echo '<pre>';
-   echo '<b>Cache Revision</b>: '.Gdn::Cache()->IncrementRevision()."\n";
+   echo '<b>Cache Revision</b>: '.Gdn::Cache()->GetRevision()."\n";
    echo '<b>Permissions Revision</b>: '.Gdn::UserModel()->GetPermissionsIncrement();
    echo '</pre>';
 }

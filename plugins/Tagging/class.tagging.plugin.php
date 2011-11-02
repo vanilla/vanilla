@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
-   'Version' => '1.3',
+   'Version' => '1.3.1',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -95,7 +95,7 @@ class TaggingPlugin extends Gdn_Plugin {
       }
       
       $Tag = StringEndsWith($Tag, '.rss', TRUE, TRUE);
-      list($Offset, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
    
       $Sender->SetData('Tag', $Tag, TRUE);
       $Sender->Title(T('Tagged with ').htmlspecialchars($Tag));
@@ -131,7 +131,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $DiscussionModel = new DiscussionModel();
       $this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
-      $Sender->DiscussionData = $DiscussionModel->Get(FALSE);
+      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
       
       $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);
       $Sender->SetJson('Loading', $Offset . ' to ' . $Limit);
@@ -329,7 +329,7 @@ class TaggingPlugin extends Gdn_Plugin {
     *
     * @param Gdn_SQLDriver $Sql
     */
-   protected function _SetTagSql($Sql, $Tag, $Limit, $Offset = 0, $Op = 'or') {
+   protected function _SetTagSql($Sql, $Tag, &$Limit, &$Offset = 0, $Op = 'or') {
       $SortField = 'd.DateLastComment';
       $SortDirection = 'desc';
       
@@ -361,6 +361,8 @@ class TaggingPlugin extends Gdn_Plugin {
             ->Limit($Limit, $Offset)
             ->OrderBy('DiscussionID', 'desc')
             ->Get()->ResultArray();
+         $Limit = '';
+         $Offset = 0;
          
          $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
          

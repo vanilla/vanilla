@@ -772,19 +772,40 @@ jQuery(document).ready(function($) {
 	}
    
    // Inform an error returned from an ajax call.
-   gdn.informError = function(xhr) {
+   gdn.informError = function(xhr, silentAbort) {
+      if (xhr == undefined || xhr == null)
+         return;
+      
       if (typeof(xhr) == 'string')
          xhr = {responseText: xhr, code: 500};
       
       var message = xhr.responseText;
       var code = xhr.status;
       
+      if (message == undefined || message == null || message == '') {
+         switch (xhr.statusText) {
+            case 'error':
+               if (silentAbort) 
+                  return;
+               message = 'There was an error performing your request. Please try again.';
+               break;
+            case 'timeout':
+               message = 'Your request timed out. Please try again.';
+               break;
+            case 'abort':
+               return;
+         }
+      }
+      
       try {
          var data = $.parseJSON(message);
-         if (data.Exception)
+         if (typeof(data.Exception) == 'string')
             message = data.Exception;
       } catch(e) {
       }
+      
+      if (message == '')
+         message = 'There was an error performing your request. Please try again.';
       
       gdn.informMessage('<span class="InformSprite SkullBones Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
    }

@@ -411,7 +411,7 @@ class ProxyRequest {
             $SendFiles[$File] = $FilePath;
       
       $this->FileTransfer = (bool)sizeof($SendFiles);
-      if ($this->FileTransfer && $Method == "GET") {
+      if ($this->FileTransfer && $RequestMethod == "GET") {
          $this->Options['Method'] = 'POST';
          $RequestMethod = GetValue('Method', $Options);
       }

@@ -89,6 +89,7 @@ class SearchController extends Gdn_Controller {
          $this->Form->AddError($Ex);
          $ResultSet = array();
       } catch (Exception $Ex) {
+         LogException($Ex);
          $this->Form->AddError($Ex);
          $ResultSet = array();
       }

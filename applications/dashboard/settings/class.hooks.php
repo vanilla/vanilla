@@ -99,7 +99,9 @@ class DashboardHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
-      $Menu->AddLink('Dashboard', FALSE, '/dashboard/settings', 'Garden.Settings.Manage');
+      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.Manage');
+		$Menu->AddLink('Dashboard', T('Getting Started'), '/dashboard/settings/gettingstarted', 'Garden.Settings.Manage');
+		$Menu->AddLink('Dashboard', T('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
 		$Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage');

@@ -1,8 +1,17 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) exit(); ?>
+<div class="Help Aside">
+   <?php
+   echo Wrap(T('Need More Help?'), 'h2');
+   echo '<ul>';
+   echo Wrap(Anchor(T("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
+   echo '</ul>';
+   ?>
+</div>
+<h1><?php echo T('Advanced'); ?></h1>
+<?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo T('Advanced'); ?></h1>
 <ul>
    <li>
       <?php

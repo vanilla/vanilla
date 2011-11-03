@@ -752,6 +752,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $this->Initial = $Settings;
       $this->Settings = $Settings;
       $this->Dirty = FALSE;
+      $this->Splitting = TRUE;
    }
    
    public function Splitting($Splitting = TRUE) {
@@ -897,7 +898,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                $this->Dirty = TRUE;
             } else {
                // Advance the pointer
-               $Settings =& $Settings[$Key];
+               $Settings = &$Settings[$Key];
             }
          } else {
             $Found = FALSE;

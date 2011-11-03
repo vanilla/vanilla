@@ -91,9 +91,9 @@ class DashboardHooks implements Gdn_IPlugin {
          $Gdn_Statistics->Check($Sender);
       }
 		
-		// Allow forum embedding
-		if (C('Garden.Embed.Allow'))
-			$Sender->AddJsFile('js/embed_local.js');
+      // Allow forum embedding
+      if (C('Garden.Embed.Allow'))
+         $Sender->AddJsFile('js/embed_local.js');
    }
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {

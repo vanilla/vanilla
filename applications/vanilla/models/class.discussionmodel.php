@@ -900,68 +900,9 @@ class DiscussionModel extends VanillaModel {
                // Assign the new DiscussionID to the comment before saving.
                $FormPostValues['IsNewDiscussion'] = TRUE;
                $FormPostValues['DiscussionID'] = $DiscussionID;
-               
-               // Notify users of mentions.
-					$DiscussionName = ArrayValue('Name', $Fields, '');
-               $Story = ArrayValue('Body', $Fields, '');
-               
-               $Usernames = array_merge(GetMentions($DiscussionName), GetMentions($Story));
-               $Usernames = array_unique($Usernames);
-               
-               $NotifiedUsers = array();
-               $UserModel = Gdn::UserModel();
-               $ActivityModel = new ActivityModel();
-               foreach ($Usernames as $Username) {
-                  $User = $UserModel->GetByUsername($Username);
-                  if ($User && $User->UserID != $Session->UserID && !in_array($User->UserID, $NotifiedUsers)) {
-                     $ActivityID = $ActivityModel->Add(
-                        $Session->UserID,
-                        'DiscussionMention',
-                        Anchor(Gdn_Format::Text($DiscussionName), '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName), FALSE),
-                        $User->UserID,
-                        '',
-                        '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName),
-                        'QueueOnly'
-                     );
-                     if ($ActivityID)
-                        $NotifiedUsers[] = $User->UserID;
-                  }
-               }
-               
-               try {
-                  $Fields['DiscussionID'] = $DiscussionID;
-                  $this->NotifyNewDiscussion($Fields, $NotifiedUsers, $ActivityModel);
-               } catch(Exception $Ex) {
-                  throw $Ex;
-               }
-               
-               // Throw an event for users to add their own events.
-               $this->EventArguments['Discussion'] = $Fields;
-               $this->EventArguments['NotifiedUsers'] = $NotifiedUsers;
-               $this->EventArguments['ActivityModel'] = $ActivityModel;
-               $this->FireEvent('BeforeNotification');
-
-               // Send all notifications.
-               $ActivityModel->SendNotificationQueue();
-               
-               $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
             }
             
-            // Get CategoryID of this discussion
-            $Data = $this->SQL
-               ->Select('CategoryID')
-               ->From('Discussion')
-               ->Where('DiscussionID', $DiscussionID)
-               ->Get();
-            
-            $CategoryID = FALSE;
-            if ($Data->NumRows() > 0)
-               $CategoryID = $Data->FirstRow()->CategoryID;
-            
-            // Update discussion counter for affected categories
-            $this->UpdateDiscussionCount($CategoryID, ($Insert ? $DiscussionID : FALSE));
-            if ($StoredCategoryID)
-               $this->UpdateDiscussionCount($StoredCategoryID);
+            $this->SaveNotifications($FormPostValues);
 				
 				// Fire an event that the discussion was saved.
 				$this->EventArguments['FormPostValues'] = $FormPostValues;
@@ -972,6 +913,99 @@ class DiscussionModel extends VanillaModel {
       }
       
       return $DiscussionID;
+   }
+   
+   /**
+    * Processes notifications after a discussion is saved.
+    *
+    * Updates category discussion counters. Sends notifications.
+    *
+    * @access public
+    * 
+    * @param array $Discussion Discussion data.
+    * @param bool $UseSession Whether or not the activity UserID is determined from the session or discussion data.
+    */ 
+   public function SaveNotifications($Discussion, $UseSession = TRUE) {
+      // Allow plugin to handle notifications
+      $this->EventArguments['Continue'] = TRUE;
+      $this->EventArguments['Discussion'] = $Discussion;
+      $this->EventArguments['UseSession'] = $UseSession;
+      $this->FireEvent('BeforeDiscussionNotifications');
+      if ( !$this->EventArguments['Continue'] )
+         return;
+		 
+      // By default, determine activity UserID from session
+      if ($UseSession) {
+         $Session = Gdn::Session();
+         $UserID = $Session->UserID;
+      }
+      else {
+         // Otherwise, use InsertUserID from discussion data
+         $UserID = $Discussion['InsertUserID'];
+      }
+	  
+      $DiscussionID = $Discussion['DiscussionID'];
+   
+      if ($Discussion['IsNewDiscussion']) {
+         // Notify users of mentions.
+         $DiscussionName = $Discussion['Name'];
+         $Story = $Discussion['Body'];
+		   
+         $Usernames = array_merge(GetMentions($DiscussionName), GetMentions($Story));
+         $Usernames = array_unique($Usernames);
+		   
+         $NotifiedUsers = array();
+         $UserModel = Gdn::UserModel();
+         $ActivityModel = new ActivityModel();
+         foreach ($Usernames as $Username) {
+            $User = $UserModel->GetByUsername($Username);
+            if ($User && $User->UserID != $UserID && !in_array($User->UserID, $NotifiedUsers)) {
+               $ActivityID = $ActivityModel->Add(
+                  $UserID,
+                  'DiscussionMention',
+                  Anchor(Gdn_Format::Text($DiscussionName), '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName), FALSE),
+                  $User->UserID,
+                  '',
+                  '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName),
+                  'QueueOnly'
+                  );
+               if ($ActivityID)
+                  $NotifiedUsers[] = $User->UserID;
+            }
+         }
+		   
+         try {
+            $this->NotifyNewDiscussion($Discussion, $NotifiedUsers, $ActivityModel);
+         } catch(Exception $Ex) {
+            throw $Ex;
+         }
+		   
+         // Throw an event for users to add their own events.
+         $this->EventArguments['NotifiedUsers'] = $NotifiedUsers;
+         $this->EventArguments['ActivityModel'] = $ActivityModel;
+         $this->FireEvent('BeforeNotification');
+
+         // Send all notifications.
+         $ActivityModel->SendNotificationQueue();
+		   
+         $this->RecordActivity($UserID, $DiscussionID, $DiscussionName);
+      }
+	
+      // Get CategoryID of this discussion
+      $Data = $this->SQL
+            ->Select('CategoryID')
+            ->From('Discussion')
+            ->Where('DiscussionID', $DiscussionID)
+            ->Get();
+
+      $CategoryID = FALSE;
+      if ($Data->NumRows() > 0)
+         $CategoryID = $Data->FirstRow()->CategoryID;
+
+      // Update discussion counter for affected categories
+      $this->UpdateDiscussionCount($CategoryID, ($Insert ? $DiscussionID : FALSE));
+      if ($StoredCategoryID)
+         $this->UpdateDiscussionCount($StoredCategoryID);
    }
    
    /**

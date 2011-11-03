@@ -64,6 +64,8 @@ class VanillaSearchModel extends Gdn_Model {
 		// Build search part of query
 		$SearchModel->AddMatchSql($this->SQL, 'd.Name, d.Body', 'd.DateInserted');
 		
+		$this->FireEvent('BeforeDiscussionSql');
+		
 		// Build base query
 		$this->SQL
 			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
@@ -99,6 +101,8 @@ class VanillaSearchModel extends Gdn_Model {
 		
 		// Build search part of query
 		$SearchModel->AddMatchSql($this->SQL, 'c.Body', 'c.DateInserted');
+		
+		$this->FireEvent('BeforeCommentSql');
 		
 		// Build base query
 		$this->SQL

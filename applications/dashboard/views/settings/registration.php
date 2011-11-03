@@ -1,4 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<div class="Help Aside">
+   <?php
+   echo Wrap(T('Need More Help?'), 'h2');
+   echo '<ul>';
+   echo Wrap(Anchor(T("Video tutorial on user registration"), 'settings/tutorials/user-registration'), 'li');
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('User Registration Settings'); ?></h1>
 <?php
 echo $this->Form->Open();

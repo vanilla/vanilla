@@ -1,9 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $EditUser = $Session->CheckPermission('Garden.Users.Edit');
-echo $this->Form->Open(array('action' => Url('/user/browse')));
 ?>
+<div class="Help Aside">
+   <?php
+   echo Wrap(T('Need More Help?'), 'h2');
+   echo '<ul>';
+   echo Wrap(Anchor(T("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'), 'li');
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('Manage Users'); ?></h1>
+<?php echo $this->Form->Open(array('action' => Url('/user/browse'))); ?>
 <div class="Wrap">
    <?php
       echo $this->Form->Errors();

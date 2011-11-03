@@ -1781,7 +1781,7 @@ div.Summary table tbody td {
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 	background: #f5f5f5;
-	border: 4px solid #ccc;
+	border: 2px solid #ccc;
 	padding: 6px;
 	margin: 0;
 	height: 122px;
@@ -1805,8 +1805,8 @@ div.Summary table tbody td {
 	text-indent: 36px;
 }
 .HomeOptions a.Current span {
-   background-color: #ffc;
-   border-color: #cc5;
+   background-color: #D6FFCF;
+   border-color: #06A800;
 }
 
 ol.Sortable, ol.Sortable ol {
@@ -2214,24 +2214,14 @@ span.InformSprite.Bone { background-position: -346px -586px; }
 span.InformSprite.Golf { background-position: -394px -586px; }
 span.InformSprite.Dice { background-position: -442px -586px; }
 
+/* Plugins */
+.PluginIcon {
+	display: block;
+	height: 50px;
+	width: 50px;
+}
+
 /* Getting Started Screen */
-.Welcome {
-	position: relative;
-	min-height: 165px;
-	background: #00346d;
-	background:-webkit-gradient(linear, center bottom, center top, from(#014a8a), to(#00346d));
-	background:-moz-linear-gradient(top, #00346d, #014a8a);
-	-pie-background:linear-gradient(top, #00346d, #014a8a);
-	background:linear-gradient(top, #00346d, #014a8a);
-	padding: 20px 400px 20px 20px;
-	color: #fff;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-}
-.Welcome strong {
-	color: #FFF6CD;
-}
 .Welcome h2 {
 	overflow: hidden;
 	text-indent: -1000px;
@@ -2239,92 +2229,4 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 	height: 42px;
 	width: 341px;
 	background: url('images/welcome-message.png') top left no-repeat transparent;
-}
-.Welcome a {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-}
-.Step {
-	background: #efefef;
-	border: 1px solid #dfdfdf;
-	margin: 20px 0 0;
-	padding: 16px 20px 20px;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	position: relative;
-}
-.NumberPoint {
-	position: absolute;
-	top: 0px;
-	left: -16px;
-	border-radius: 40px;
-	-webkit-border-radius: 40px;
-   -moz-border-radius: 40px;
-   border: 5px solid #3CB3E8;
-	font-size: 28px;
-	height: 36px;
-	width: 36px;
-	background: #aee7fe;
-	-moz-transform: rotate(-20.5deg);
-	-o-transform: rotate(-20.5deg);
-	-webkit-transform: rotate(-20.5deg);
-	text-align: center;
-	font-family: monospace,Arial,Sans-Serif;
-	font-weight: bold;
-	color: #003673;
-	text-shadow: 1px 1px 0 rgba(256, 256, 256, 0.5);
-	box-shadow: 0 1px 1px #003673;
-	-moz-box-shadow: 0 1px 1px #003673;
-	-webkit-box-shadow: 0 1px 1px #003673;
-}
-.Step textarea,
-.Step .RecipientBox {
-   font-family: arial;
-   color: #666;
-   font-size: 14px;
-	width: 100%;
-	padding: 3px;
-	margin-bottom: 10px;
-}
-.Step textarea:focus,
-.Step .RecipientBox:focus {
-	color: #222;
-}
-.Step textarea {
-	height: 85px;
-}
-.Step .RecipientBox {
-	padding: 3px 1px;
-}
-.Step h2 {
-	padding-left: 16px;
-	font-size: 14px;
-}
-.Step .Videos {
-	padding: 10px 0 0;
-}
-.Step .Videos a {
-	display: inline-block;
-	border: 6px solid #ddd;
-}
-.Step .Videos a:hover {
-	border: 6px solid #ccc;
-}
-.Step .Videos a:visited {
-	border: 6px solid #bbb;
-}
-.Step .Videos a img {
-	display: block;
-}
-#Content form .Step input.Button {
-   margin: 0;
-}
-
-/* Plugins */
-.PluginIcon {
-	display: block;
-	height: 50px;
-	width: 50px;
 }

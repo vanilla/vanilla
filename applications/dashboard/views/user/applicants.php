@@ -1,10 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
-
 $Session = Gdn::Session();
-echo $this->Form->Open(array('action' => Url('/dashboard/user/applicants')));
 ?>
+<div class="Help Aside">
+   <?php
+   echo Wrap(T('Need More Help?'), 'h2');
+   echo '<ul>';
+   echo Wrap(Anchor(T("Video tutorial on user registration"), 'settings/tutorials/user-registration'), 'li');
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('Manage Applicants'); ?></h1>
 <?php
+   echo $this->Form->Open(array('action' => Url('/dashboard/user/applicants')));
    echo $this->Form->Errors();
    $NumApplicants = $this->UserData->NumRows();
    if ($NumApplicants == 0) { ?>

@@ -1,8 +1,17 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) exit(); ?>
+<div class="Help Aside">
+   <?php
+   echo Wrap(T('Need More Help?'), 'h2');
+   echo '<ul>';
+   echo Wrap(Anchor(T("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
+   echo '</ul>';
+   ?>
+</div>
+<h1><?php echo T('Advanced'); ?></h1>
+<?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo T('Advanced'); ?></h1>
 <ul>
    <li>
       <?php
@@ -59,6 +68,11 @@ echo $this->Form->Errors();
 	<li>
       <?php
          echo $this->Form->CheckBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');
+      ?>
+   </li>
+   <li>
+      <?php
+         echo $this->Form->CheckBox('Vanilla.AdminCheckboxes.Use', 'Enable admin checkboxes on discussions and comments.');
       ?>
    </li>
 </ul>

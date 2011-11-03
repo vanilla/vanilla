@@ -1,9 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
 $Advanced = C('Garden.Roles.Manage');
-echo $this->Form->Open();
 ?>
+<div class="Help Aside">
+   <?php
+   echo Wrap(T('Need More Help?'), 'h2');
+   echo '<ul>';
+   echo Wrap(Anchor(T("Video tutorial on managing roles &amp; permissions"), 'settings/tutorials/roles-and-permissions'), 'li');
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('Manage Roles & Permissions'); ?></h1>
-<?php $this->DefaultRolesWarning(); ?>
+<?php
+echo $this->Form->Open();
+$this->DefaultRolesWarning();
+?>
 <div class="Info"><?php
    echo T('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
    $this->FireEvent('AfterRolesInfo');

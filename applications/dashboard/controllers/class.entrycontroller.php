@@ -499,8 +499,11 @@ class EntryController extends Gdn_Controller {
             if ($this->Form->ValidateRule('ConnectName', 'ValidateRequired')) {
                $ConnectName = $this->Form->GetFormValue('ConnectName');
 
-               // Check to see if there is already a user with the given name.
-               $User = $UserModel->GetWhere(array('Name' => $ConnectName))->FirstRow(DATASET_TYPE_ARRAY);
+               $User = FALSE;
+               if (C('Garden.Registration.NameUnique')) {
+                  // Check to see if there is already a user with the given name.
+                  $User = $UserModel->GetWhere(array('Name' => $ConnectName))->FirstRow(DATASET_TYPE_ARRAY);
+               }
 
                if (!$User) {
                   $this->Form->ValidateRule('ConnectName', 'ValidateUsername');
@@ -524,14 +527,17 @@ class EntryController extends Gdn_Controller {
          if (isset($User) && $User) {
             // Make sure the user authenticates.
             if (!$User['UserID'] == Gdn::Session()->UserID) {
-
-               if ($this->Form->ValidateRule('ConnectPassword', 'ValidateRequired', sprintf(T('ValidateRequired'), T('Password')))
-                  && !$PasswordHash->CheckPassword($this->Form->GetFormValue('ConnectPassword'), $User['Password'], $User['HashMethod'], $this->Form->GetFormValue('ConnectName'))) {
-
-                  if ($ConnectNameEntered) {
-                     $this->Form->AddError('The username you entered has already been taken.');
-                  } else {
-                     $this->Form->AddError('The password you entered is incorrect.');
+               if ($this->Form->ValidateRule('ConnectPassword', 'ValidateRequired', sprintf(T('ValidateRequired'), T('Password')))) {
+                  try {
+                     if (!$PasswordHash->CheckPassword($this->Form->GetFormValue('ConnectPassword'), $User['Password'], $User['HashMethod'], $this->Form->GetFormValue('ConnectName'))) {
+                        if ($ConnectNameEntered) {
+                           $this->Form->AddError('The username you entered has already been taken.');
+                        } else {
+                           $this->Form->AddError('The password you entered is incorrect.');
+                        }
+                     }
+                  } catch (Gdn_UserException $Ex) {
+                     $this->Form->AddError($Ex);
                   }
                }
             }
@@ -541,8 +547,7 @@ class EntryController extends Gdn_Controller {
             $User['Name'] = $User['ConnectName'];
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
-
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE), array('NoConfirmEmail' => TRUE));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
@@ -700,7 +705,7 @@ class EntryController extends Gdn_Controller {
                $User = Gdn::UserModel()->GetByUsername($Email);
 
             if (!$User) {
-               $this->Form->AddError('ErrorCredentials');
+               $this->Form->AddError('User not found.');
             } else {
                $ClientHour = $this->Form->GetFormValue('ClientHour');
                $HourOffset = Gdn_Format::ToTimestamp($ClientHour) - time();
@@ -737,7 +742,7 @@ class EntryController extends Gdn_Controller {
                      $this->_SetRedirect();
                   }
                } else {
-                  $this->Form->AddError('ErrorCredentials');
+                  $this->Form->AddError('Invalid password.');
                }
             }
          }

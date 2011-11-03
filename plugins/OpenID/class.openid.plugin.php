@@ -167,8 +167,13 @@ class OpenIDPlugin extends Gdn_Plugin {
                $Sender->SetData('Title', T('Sign In with OpenID'));
                $Sender->Render('Url', '', 'plugins/OpenID');
             } else {
-               $Url = $OpenID->authUrl();
-               Redirect($Url);
+               try {
+                  $Url = $OpenID->authUrl();
+                  Redirect($Url);
+               } catch (Exception $Ex) {
+                  $Sender->Form->AddError($Ex);
+                  $Sender->Render('Url', '', 'plugins/OpenID');
+               }
             }
             break;
       }

@@ -1,7 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-
 ?>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo Wrap(Anchor(T("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('Banner'); ?></h1>
 <?php
 echo $this->Form->Open(array('enctype' => 'multipart/form-data'));

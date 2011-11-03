@@ -1060,8 +1060,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       // If there were uncontrolled errors above the json data, wipe them out
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
-      if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON)
+      if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
          ob_clean();
+         $this->ContentType('application/json');
+      }
       
       if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
          $this->ContentType('text/plain');

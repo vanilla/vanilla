@@ -1165,4 +1165,11 @@ class SettingsController extends DashboardController {
       $this->Render();
    }
    
+   public function Tutorials($Tutorial = '') {
+      $this->SetData('Title', T('Help &amp; Tutorials'));
+      $this->AddSideMenu('dashboard/settings/tutorials');
+      $this->SetData('CurrentTutorial', $Tutorial);
+      $this->Render();
+   }
+   
 }

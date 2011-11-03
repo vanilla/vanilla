@@ -44,6 +44,9 @@ class CommentModel extends VanillaModel {
       if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
          return;
       
+      if (count($Result) == 0)
+         return;
+      
       $ConfigLimit = C('Vanilla.Comments.PerPage', 30);
       
       if (!$Limit)
@@ -61,11 +64,12 @@ class CommentModel extends VanillaModel {
       $New = array(GetValueR('0.DateInserted', $Result));
       
       if (count($Result) >= $Limit)
-         $New[] = GetValueR((count($Result) - 1).'.DateInserted', $Result);
+         $New[] = GetValueR(($Limit - 1).'.DateInserted', $Result);
       
       if ($Curr != $New) {
          $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
          Gdn::Cache()->Store($CacheKey, $New, array(Gdn_Cache::FEATURE_EXPIRY => 86400));
+         Gdn::Controller()->SetData('_PageCacheStore', array($CacheKey, $New));
       }
    }
    
@@ -140,7 +144,7 @@ class CommentModel extends VanillaModel {
       $this->EventArguments['Comments'] =& $Result;
       $this->FireEvent('AfterGet');
       
-      $this->CachePageWhere($Result->Result(), $PageWhere, $DiscussionID, $Page);
+      $this->CachePageWhere($Result->Result(), $PageWhere, $DiscussionID, $Page, $Limit);
       
       return $Result;
    }
@@ -235,6 +239,7 @@ class CommentModel extends VanillaModel {
       
       $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
       $Value = Gdn::Cache()->Get($CacheKey);
+      Gdn::Controller()->SetData('_PageCache', array($CacheKey, $Value));
       if ($Value === FALSE) {
          return FALSE;
       } elseif (is_array($Value)) {

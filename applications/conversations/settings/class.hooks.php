@@ -119,6 +119,7 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @access public
     */
    public function SettingsController_DashboardData_Handler($Sender) {
+      /*
       $ConversationModel = new ConversationModel();
       // Number of Conversations
       $CountConversations = $ConversationModel->GetCountWhere();
@@ -138,6 +139,7 @@ class ConversationsHooks implements Gdn_IPlugin {
       $Sender->BuzzData[T('New messages in the last day')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day')))));
       // Number of New Messages in the last week
       $Sender->BuzzData[T('New messages in the last week')] = number_format($ConversationMessageModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week')))));
+      */
    }   
    
    /**

@@ -21,9 +21,6 @@
    margin-left: 340px;
    padding: 20px;
 }
-.ConfigurationHelp strong {
-    display: block;
-}
 .ConfigurationHelp img {
    width: 99%;
 }
@@ -32,6 +29,10 @@
 }
 .ConfigurationHelp a:hover img {
     border: 1px solid #777;
+}
+.ConfigurationHelp ol {
+    list-style-type: decimal;
+    padding-left: 20px;
 }
 input.CopyInput {
    font-family: monospace;
@@ -68,9 +69,13 @@ echo $this->Form->Errors();
       <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
    </div>
    <div class="ConfigurationHelp">
-      <strong>How to set up Twitter Connect</strong>
-      <p>In order to set up Twitter Connect, you must register Vanilla with Twitter at: <a href="http://dev.twitter.com/apps/new">http://dev.twitter.com/apps/new</a></p>
-      <p>Once you have registered at Twitter, you must copy the "Consumer Key" and "Consumer Secret" into the form on this page and click save.</p>
+      <p><strong>How to set up Twitter Connect</strong></p>
+      <ol>
+         <li>You must register Vanilla with Twitter at: <a href="http://dev.twitter.com/apps/new">http://dev.twitter.com/apps/new</a></li>
+         <li>Set the <strong>Callback URL</strong> by appending &ldquo;/entry/twauthorize&rdquo; to the end of your forum&rsquo;s URL. 
+         (If your forum is at example.com/forum, your Callback URL would be http://example.com/forum/entry/twauthorize).</li>
+         <li>After registering, copy the "Consumer Key" and "Consumer Secret" into the form on this page and click Save.</li>
+      </ol>
       <p><?php echo Anchor(Img('/plugins/Twitter/design/help-consumervalues-sm.png', array('style' => 'max-width: 763px;')), '/plugins/Twitter/design/help-consumervalues.png', array('target' => '_blank')); ?></p>
    </div>
 </div>   

@@ -44,6 +44,9 @@ class CommentModel extends VanillaModel {
       if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
          return;
       
+      if (count($Result) == 0)
+         return;
+      
       $ConfigLimit = C('Vanilla.Comments.PerPage', 30);
       
       if (!$Limit)

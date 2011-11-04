@@ -114,13 +114,9 @@ class DiscussionModel extends VanillaModel {
       
       // Buid main query
       $this->SQL
-         ->Select('d.Type')
+         ->Select('d.*')
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
-			->Select('d.CountBookmarks')
-         
-         ->Select('d.Body') // <-- Need these for rss!
-         ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->From('Discussion d');
@@ -189,8 +185,6 @@ class DiscussionModel extends VanillaModel {
       $Session = Gdn::Session();
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
       $this->DiscussionSummaryQuery($AdditionalFields, FALSE);
-      $this->SQL
-         ->Select('d.*');
          
       if ($UserID > 0) {
          $this->SQL
@@ -421,8 +415,6 @@ class DiscussionModel extends VanillaModel {
          return new Gdn_DataSet();
 
       $this->DiscussionSummaryQuery(array(), FALSE);
-      $this->SQL
-         ->Select('d.*');
 
       if ($UserID) {
          $this->SQL->Select('w.UserID', '', 'WatchUserID')

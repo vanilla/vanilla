@@ -83,7 +83,7 @@ class CategoriesController extends VanillaController {
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');      
       if ($this->Head) {
-         $this->Head->Title(GetValue('Name', $Category, ''));
+         $this->Title(GetValue('Name', $Category, ''));
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
          $this->AddJsFile('options.js');

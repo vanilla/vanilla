@@ -304,7 +304,12 @@ if (!function_exists('LogException')) {
       if (!Gdn::Config('Garden.Errors.LogEnabled', FALSE))
          return;
       
-      $Px = 'Garden ';
+      try {
+         $Px = Gdn::Request()->Host().' Garden ';
+      } catch (Exception $Ex) {
+         $Px = 'Garden ';
+      }
+      
       $ErrorLogFile = Gdn::Config('Garden.Errors.LogFile');
       if (!$ErrorLogFile) {
          $Type = 0;

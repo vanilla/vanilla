@@ -49,8 +49,8 @@ echo $this->Form->Open(array('action' => Url('/dashboard/user/applicants')));
 </table>
 <div class="Info">
 <?php
-   echo $this->Form->Button('Approve', array('Name' => $this->Form->EscapeFieldName('Submit'), 'class' => 'SmallButton'));
-   echo $this->Form->Button('Decline', array('Name' => $this->Form->EscapeFieldName('Submit'), 'class' => 'SmallButton'));
+   echo $this->Form->Button('Approve', array('Name' => 'Submit', 'class' => 'SmallButton'));
+   echo $this->Form->Button('Decline', array('Name' => 'Submit', 'class' => 'SmallButton'));
 ?></div><?php
 }
 echo $this->Form->Close();

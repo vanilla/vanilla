@@ -550,14 +550,14 @@ class ActivityModel extends Gdn_Model {
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
             $Email->To($User->Email, $User->Name);
             //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
-            $Email->Message(
-               sprintf(
-                  $Story == '' ? T('EmailNotification') : T('EmailStoryNotification'),
+            
+            $Message = sprintf(
+                  $Story == '' ? T('EmailNotification', "%1\$s\n\n%2\$s") : T('EmailStoryNotification', "%3\$s\n\n%2\$s"),
                   $ActivityHeadline,
                   ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route),
                   $Story
-               )
-            );
+               );
+            $Email->Message($Message);
             
             $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity);
             $this->EventArguments = $Notification;
@@ -689,15 +689,13 @@ class ActivityModel extends Gdn_Model {
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
             $Email->To($User->Email, $User->Name);
-            //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
-            $Email->Message(
-               sprintf(
-                  $Story == '' ? T('EmailNotification') : T('EmailStoryNotification'),
+            $Message = sprintf(
+                  $Story == '' ? T('EmailNotification', "%1\$s\n\n%2\$s") : T('EmailStoryNotification', "%3\$s\n\n%2\$s"),
                   $ActivityHeadline,
-                  ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route, TRUE),
+                  ExternalUrl($Activity->Route == '' ? '/' : $Activity->Route),
                   $Story
-               )
-            );
+               );
+            $Email->Message($Message);
             if (!array_key_exists($User->UserID, $this->_NotificationQueue))
                $this->_NotificationQueue[$User->UserID] = array();
 

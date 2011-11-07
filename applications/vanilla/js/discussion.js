@@ -306,44 +306,38 @@ jQuery(document).ready(function($) {
       }
    });
    
-   getNewTimeout = function() {   
-      if(autoRefresh <= 0)
+   getNew = function() {
+      discussionID = gdn.definition('DiscussionID', 0);
+      lastCommentID = gdn.definition('LastCommentID', '');
+      if(lastCommentID == '')
          return;
-   
-      setTimeout(function() {
-         discussionID = gdn.definition('DiscussionID', 0);
-         lastCommentID = gdn.definition('LastCommentID', '');
-         if(lastCommentID == '')
-            return;
-         
-         $.ajax({
-            type: "POST",
-            url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
-            data: "DeliveryType=ASSET&DeliveryMethod=JSON",
-            dataType: "json",
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               // Popup the error
-               $.popup({}, XMLHttpRequest.responseText);
-            },
-            success: function(json) {
-               json = $.postParseJson(json);
-               
-               if(json.Data && json.LastCommentID) {
-                  gdn.definition('LastCommentID', json.LastCommentID, true);
-                  $(json.Data).appendTo("ul.Discussion")
-                     .effect("highlight", {}, "slow");
-               }
-               gdn.processTargets(json.Targets);
-               
-               getNewTimeout();
+
+      $.ajax({
+         type: "POST",
+         url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
+         data: "DeliveryType=ASSET&DeliveryMethod=JSON",
+         dataType: "json",
+         error: function(xhr) {
+            gdn.informError(xh2, true);
+         },
+         success: function(json) {
+            json = $.postParseJson(json);
+
+            if(json.Data && json.LastCommentID) {
+               gdn.definition('LastCommentID', json.LastCommentID, true);
+               $(json.Data).appendTo("ul.Discussion")
+                  .effect("highlight", {}, "slow");
             }
-         });
-      }, autoRefresh);
+            gdn.processTargets(json.Targets);
+         }
+      });
    }
    
    // Load new comments like a chat.
-   autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
-   getNewTimeout();
+   var autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
+   if (autoRefresh > 1000) {
+      window.setInterval(getNew, autoRefresh);
+   }
    
    /* Comment Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {

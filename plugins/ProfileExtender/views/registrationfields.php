@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 	
 $CountFields = 0;
-foreach ($this->RegistrationFields as $Field) {
+foreach ($Sender->RegistrationFields as $Field) {
 	$CountFields++;
 	echo '<li>';
-		echo $this->Form->Hidden('CustomLabel[]', array('value' => $Field));
-		echo $this->Form->Label($Field, 'CustomValue[]');
-		echo $this->Form->TextBox('CustomValue[]');
+		echo $Sender->Form->Hidden('CustomLabel[]', array('value' => $Field));
+		echo $Sender->Form->Label($Field, 'CustomValue[]');
+		echo $Sender->Form->TextBox('CustomValue[]');
 	echo '</li>';
 }

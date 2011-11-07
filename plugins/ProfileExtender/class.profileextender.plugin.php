@@ -41,11 +41,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Add fields to registration forms.
     */
    public function EntryController_RegisterBeforePassword_Handler($Sender) {
-      $Sender->RegistrationFields = C('Plugins.ProfileExtender.RegistrationFields', '');
-      $Sender->RegistrationFields = explode(',', $Sender->RegistrationFields);               
-      $Sender->Render($this->GetView('registrationfields.php'));
+      $Sender->RegistrationFields = $this->GetFields('Registration');               
+      include($this->GetView('registrationfields.php'));
    }
    
+   /**
+    * Get array of current fields.
+    *
+    * @param string $Type Profile, Registration, or Hide
+    */
+   public function GetFields($Type = 'Profile') {
+      return array_filter((array)explode(',', C('Plugins.ProfileExtender.'.$Type.'Fields', '')));
+   }
+      
    /**
     * Add fields to edit profile form.
     */
@@ -60,7 +68,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     */
    private function ProfileFields($Sender) {
       // Retrieve user's existing profile fields
-      $Sender->ProfileFields = explode(',', C('Plugins.ProfileExtender.ProfileFields', ''));
+      $Sender->ProfileFields = $this->GetFields('Profile');
+      print_r($Sender->ProfileFields);
       $Sender->IsPostBack = $Sender->Form->IsPostBack();
       
       $Sender->UserFields = array();
@@ -119,10 +128,11 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          
          // Reorder the custom fields
          // Use order of Plugins.ProfileExtender.ProfileFields first
-         $Listed = (array)explode(',', C('Plugins.ProfileExtender.ProfileFields'));
+         $Listed = $this->GetFields('Profile');
          $Fields1 = array();
          foreach ($Listed as $FieldName) {
-            $Fields1[$FieldName] = $Fields[$FieldName];
+            if (isset($Fields[$FieldName]))
+               $Fields1[$FieldName] = $Fields[$FieldName];
          }
          // Then append the user's arbitrary custom fields (if they have any) alphabetically by label
          $Fields2 = array_diff_key($Fields, $Listed);
@@ -140,7 +150,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          }
          
          // Display all non-hidden fields
-         $HideFields = (array)explode(',', C('Plugins.ProfileExtender.HideFields'));
+         $HideFields = $this->GetFields('Hide');
          foreach ($Fields as $Label => $Value) {
             if (in_array($Label, $HideFields))
                continue;
@@ -189,17 +199,23 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       
       // Update UserMeta
       if ($UserID > 0 && is_array($Fields)) {
-         $UserModel = new UserModel();
-         $UserModel->SetMeta($UserID, $Fields, 'Profile_');
+         Gdn::UserModel()->SetMeta($UserID, $Fields, 'Profile_');
       }
    }
    
    /**
-	 * Add fields during registration.
+	 * Save custom fields during registration.
 	 */
-	public function UserModel_BeforeInsertUser_Handler($Sender) {	
-      $Fields = Gdn::Controller()->Form->FormValues();
+	public function UserModel_AfterInsertUser_Handler($Sender) {	   
+	   // Get user-submitted
+	   $Fields = Gdn::Controller()->Form->FormValues();
+	   $SaveFields = array_combine($Fields['CustomLabel'], $Fields['CustomValue']);
+	   
+	   // Only grab valid fields
+	   $RegistrationFields = array_flip((array)explode(',', C('Plugins.ProfileExtender.RegistrationFields')));
+      $SaveFields = array_intersect_key($SaveFields, $RegistrationFields);
       
+      Gdn::UserModel()->SetMeta($Sender->EventArguments['InsertUserID'], $SaveFields, 'Profile_');
 	}
    
    /**

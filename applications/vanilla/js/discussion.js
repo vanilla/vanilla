@@ -31,7 +31,8 @@ jQuery(document).ready(function($) {
       return false;
    });
    
-   // Hijack comment form button clicks
+   // Hijack comment form button clicks.
+   var draftSaving = 0;
    $('div.CommentForm :submit, a.PreviewButton, a.DraftButton').livequery('click', function() {
       var btn = this;
       var parent = $(btn).parents('div.CommentForm');
@@ -53,6 +54,12 @@ jQuery(document).ready(function($) {
          // Don't save draft if string is empty
          if (jQuery.trim($(textbox).val()) == '')
             return false;
+         
+         if (draftSaving > 0)
+            return false;
+         
+//         console.log('Saving draft: '+(new Date()).toUTCString());
+         draftSaving++;
       }
 
       // Post the form, and append the results to #Discussion, and erase the textbox
@@ -84,7 +91,7 @@ jQuery(document).ready(function($) {
          data: postValues,
          dataType: 'json',
          error: function(xhr) {
-            gdn.informError(xhr);
+            gdn.informError(xhr, draft);
          },
          success: function(json) {
             json = $.postParseJson(json);
@@ -183,6 +190,8 @@ jQuery(document).ready(function($) {
             // Remove any spinners, and re-enable buttons.
             $('span.TinyProgress').remove();
             $(frm).find(':submit').removeAttr("disabled");
+            if (draft)
+               draftSaving--;
          }
       });
       frm.triggerHandler('submit');
@@ -252,16 +261,16 @@ jQuery(document).ready(function($) {
             url: $(btn).attr('href'),
             data: 'DeliveryType=VIEW&DeliveryMethod=JSON',
             dataType: 'json',
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               // Remove any old popups
-               $('div.Popup,.Overlay').remove();
-               $.popup({}, XMLHttpRequest.responseText);
+            error: function(xhr) {
+               gdn.informError(xhr);
             },
             success: function(json) {
                json = $.postParseJson(json);
                
                $(msg).after(json.Data);
                $(msg).hide();
+            },
+            complete: function() {
                $(parent).find('span.TinyProgress').remove();
             }
          });
@@ -357,8 +366,8 @@ jQuery(document).ready(function($) {
          url: gdn.url('/moderation/checkedcomments'),
          data: {'DiscussionID' : discussionID , 'CheckIDs' : aCheckIDs, 'DeliveryMethod' : 'JSON', 'TransientKey' : gdn.definition('TransientKey')},
          dataType: "json",
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            gdn.informMessage(XMLHttpRequest.responseText, {'CssClass' : 'Dismissable'});
+         error: function(xhr) {
+            gdn.informError(xhr, true);
          },
          success: function(json) {
             gdn.inform(json);

@@ -15,6 +15,7 @@ if (!isset($Explicit))
    
 $SQL = Gdn::Database()->SQL();
 $Construct = Gdn::Database()->Structure();
+$Px = $Construct->DatabasePrefix();
 
 $Construct->Table('Category');
 $CategoryExists = $Construct->TableExists();
@@ -131,15 +132,16 @@ $Construct->Table('UserDiscussion')
    ->Column('Bookmarked', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
-$Construct->Table('Comment')
-	->PrimaryKey('CommentID')
-	->Column('DiscussionID', 'int', FALSE, 'key')
+$Construct->Table('Comment');
+$CommentIndexes = $Construct->IndexSqlDb();
+$Construct->PrimaryKey('CommentID')
+	->Column('DiscussionID', 'int', FALSE, 'index.1')
 	->Column('InsertUserID', 'int', TRUE, 'key')
 	->Column('UpdateUserID', 'int', TRUE)
 	->Column('DeleteUserID', 'int', TRUE)
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
-	->Column('DateInserted', 'datetime', NULL, 'key')
+	->Column('DateInserted', 'datetime', NULL, 'index.1')
 	->Column('DateDeleted', 'datetime', TRUE)
 	->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
@@ -148,6 +150,13 @@ $Construct->Table('Comment')
 	->Column('Score', 'float', NULL)
 	->Column('Attributes', 'text', TRUE)
 	->Set($Explicit, $Drop);
+
+if (isset($CommentIndexes['FK_Comment_DiscussionID'])) {
+   $Construct->Query("drop index FK_Comment_DiscussionID on {$Px}Comment");
+}
+if (isset($CommentIndexes['FK_Comment_DateInserted'])) {
+   $Construct->Query("drop index FK_Comment_DateInserted on {$Px}Comment");
+}
 
 // Allows the tracking of already-read comments & votes on a per-user basis.
 $Construct->Table('UserComment')

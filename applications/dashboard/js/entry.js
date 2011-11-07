@@ -1,7 +1,7 @@
 // This file contains javascript that is specific to the dashboard/entry controller.
 jQuery(document).ready(function($) {
    // Check to see if the selected email is valid
-   $('#Register input[name=$Email], body.register input[name$=Email]').blur(function() {
+   $('#Register input[name$=Email], body.register input[name$=Email]').blur(function() {
       var email = $(this).val();
       if (email != '') {
          var checkUrl = gdn.url('/dashboard/user/emailavailable/'+encodeURIComponent(email)+'/x');

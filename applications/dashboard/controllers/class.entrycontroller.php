@@ -338,7 +338,14 @@ class EntryController extends Gdn_Controller {
          // The user is already connected.
          $this->Form->SetFormValue('UserID', $UserID);
          
+         $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
          $Data = $this->Form->FormValues();
+         
+         // Don't overwrite the user photo if the user uploaded a new one.
+         $Photo = GetValue('Photo', $User);
+         if (GetValue('Photo', $Data) && $Photo && !StringBeginsWith($Photo, 'http')) {
+            unset($Data['Photo']);
+         }
          
          // Synchronize the user's data.
          $UserModel->Save($Data, array('NoConfirmEmail' => TRUE));
@@ -399,7 +406,7 @@ class EntryController extends Gdn_Controller {
                $ExistingUsers);
          }
          
-         if (!isset($NameFound)) {
+         if (!isset($NameFound) && !$IsPostBack) {
             $this->Form->SetFormValue('ConnectName', $this->Form->GetFormValue('Name'));
          }
 
@@ -500,7 +507,7 @@ class EntryController extends Gdn_Controller {
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
 
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE), array('NoConfirmEmail' => TRUE));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 

@@ -113,7 +113,7 @@ class Gdn_Autoloader {
                      }
                      
                      $PluginMap = self::GetMap(self::MAP_LIBRARY, self::CONTEXT_PLUGIN);
-                     if (!$PluginMap->MapIsOnDisk())
+                     if ($PluginMap && !$PluginMap->MapIsOnDisk())
                         Gdn::PluginManager()->ForceAutoloaderIndex();
                   }
                }

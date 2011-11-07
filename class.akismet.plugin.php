@@ -8,7 +8,7 @@
 $PluginInfo['Akismet'] = array(
    'Name' => 'Akismet',
    'Description' => 'Akismet spam protection integration for Vanilla.',
-   'Version' => '1.0b',
+   'Version' => '1.0.1b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'SettingsUrl' => '/settings/akismet',
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -72,7 +72,7 @@ class AkismetPlugin extends Gdn_Plugin {
       $RecordType = $Args['RecordType'];
       $Data =& $Args['Data'];
 
-
+      $Result = FALSE;
       switch ($RecordType) {
          case 'User':
 //            $Data['Name'] = '';

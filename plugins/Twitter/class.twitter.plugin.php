@@ -204,9 +204,10 @@ class TwitterPlugin extends Gdn_Plugin {
          return;
 
       $RequestToken = GetValue('oauth_token', $_GET);
+      $AccessToken = $this->AccessToken();
 
       // Get the access token.
-      if ($RequestToken || !($AccessToken = $this->AccessToken())) {
+      if ($RequestToken || !$AccessToken) {
          // Get the request secret.
          $RequestToken = $this->GetOAuthToken($RequestToken);
 

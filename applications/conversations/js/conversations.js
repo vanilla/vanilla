@@ -126,7 +126,7 @@ jQuery(document).ready(function($) {
          success: function(json) {
             gdn.inform(json);
             if (json.RedirectUrl)
-              setTimeout("document.location='" + json.RedirectUrl + "';", 300);
+              setTimeout(function() { window.location.replace(json.RedirectUrl); }, 300);
          }
       });
       return false;

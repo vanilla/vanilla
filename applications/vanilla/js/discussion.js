@@ -306,7 +306,13 @@ jQuery(document).ready(function($) {
       }
    });
    
-   getNew = function() {
+   var gettingNew = 0;
+   var getNew = function() {
+      if (gettingNew > 0) {
+         return;
+      }
+      gettingNew++;
+      
       discussionID = gdn.definition('DiscussionID', 0);
       lastCommentID = gdn.definition('LastCommentID', '');
       if(lastCommentID == '')
@@ -318,7 +324,7 @@ jQuery(document).ready(function($) {
          data: "DeliveryType=ASSET&DeliveryMethod=JSON",
          dataType: "json",
          error: function(xhr) {
-            gdn.informError(xh2, true);
+            gdn.informError(xhr, true);
          },
          success: function(json) {
             json = $.postParseJson(json);
@@ -329,6 +335,9 @@ jQuery(document).ready(function($) {
                   .effect("highlight", {}, "slow");
             }
             gdn.processTargets(json.Targets);
+         },
+         complete: function() {
+            gettingNew--;
          }
       });
    }

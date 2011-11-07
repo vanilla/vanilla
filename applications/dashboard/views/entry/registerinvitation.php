@@ -24,6 +24,7 @@
             echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.T('Name Unavailable').'</span>';
          ?>
       </li>
+      <?php $this->FireEvent('RegisterBeforePassword'); ?>
       <li>
          <?php
             echo $this->Form->Label('Password', 'Password');
@@ -43,6 +44,7 @@
             echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))
          ?>
       </li>
+      <?php $this->FireEvent('RegisterFormBeforeTerms'); ?>
       <li>
          <?php
             echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));

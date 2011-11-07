@@ -114,17 +114,17 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    public function UserInfoModule_OnBasicInfo_Handler($Sender) {
       
       try {
-         // Render the custom fields
+         // Get the custom fields
          $Fields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile_%', 'Profile_');
          
-         // Order, Part 1: Get user's fields by order of Plugins.ProfileExtender.ProfileFields
+         // Reorder the custom fields
+         // Use order of Plugins.ProfileExtender.ProfileFields first
          $Listed = (array)explode(',', C('Plugins.ProfileExtender.ProfileFields'));
          $Fields1 = array();
          foreach ($Listed as $FieldName) {
             $Fields1[$FieldName] = $Fields[$FieldName];
          }
-         
-         // Order, Part 2: Append the user's arbitrary custom fields (if they have any) alphabetically by label
+         // Then append the user's arbitrary custom fields (if they have any) alphabetically by label
          $Fields2 = array_diff_key($Fields, $Listed);
          ksort($Fields2);
          $Fields = array_merge($Fields1, $Fields2);
@@ -170,19 +170,21 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $this->TrimValues($CustomValues, $ValueLimit);
             $Fields = array_combine($CustomLabels, $CustomValues);
          }
+         
+         // Delete any custom fields that had their value removed
+         if (is_array($Fields)) {
+            foreach ($Fields as $Label => $Value) {
+               if ($Value == '')
+                  $Fields[$Label] = NULL;
+            }
+         }
       }
       
       // Delete any custom fields that had their label removed
-      $CurrentFields = Gdn::UserModel()->GetMeta($UserID, 'Profile_%', 'Profile_');
-      foreach ($CurrentFields as $CurrentKey => $CurrentValue) {
-         if (!array_key_exists($CurrentKey, $Fields))
-            $Fields[$CurrentKey] = NULL;
-      }
-      
-      // Delete any custom fields that had their value removed
-      foreach ($Fields as $FieldKey => $FieldValue) {
-         if ($FieldValue == '')
-            $Fields[$FieldKey] = NULL; 
+      $ExitingFields = Gdn::UserModel()->GetMeta($UserID, 'Profile_%', 'Profile_');
+      foreach ($ExitingFields as $Label => $Value) {
+         if (!array_key_exists($Label, $Fields))
+            $Fields[$Label] = NULL;
       }
       
       // Update UserMeta

@@ -87,6 +87,15 @@ class ActivityModel extends Gdn_Model {
          parent::Delete(array('ActivityID' => $ActivityID));
       }
    }
+   
+   /**
+    *
+    * @param int $ID 
+    * @since 2.1
+    */
+   public function DeleteComment($ID) {
+      return $this->SQL->Delete('ActivityComment', array('ActivityCommentID' => $ID));
+   }
 
    /**
     * Modifies standard Gdn_Model->GetWhere to use AcitivityQuery.
@@ -110,6 +119,23 @@ class ActivityModel extends Gdn_Model {
       $this->FireEvent('AfterGet');
       
       return $Result;
+   }
+   
+   /**
+    * @param type $Activities 
+    * @since 2.1
+    */
+   public function JoinComments(&$Activities) {
+      $ActivityIDs = ConsolidateArrayValuesByKey($Activities, 'ActivityID');
+      $Comments = $this->GetComments($ActivityIDs);
+      $Comments = Gdn_DataSet::Index($Comments, array('ActivityID'), array('Unique' => FALSE));
+      foreach ($Activities as &$Activity) {
+         if (isset($Comments[$Activity['ActivityID']])) {
+            $Activity['Comments'] = $Comments[$Activity['ActivityID']];
+         } else {
+            $Activity['Comments'] = array();
+         }
+      }
    }
    
    /**
@@ -368,6 +394,15 @@ class ActivityModel extends Gdn_Model {
          ->ActivityCount;
    }
    
+   public function GetComment($ID) {
+      $Data = $this->SQL->GetWhere('ActivityComment', array('ActivityCommentID' => $ID))->ResultArray();
+      if ($Data) {
+         Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'), array('Join' => array('Name', 'Photo', 'Email')));
+         return array_shift($Data);
+      }
+      return FALSE;
+   }
+   
    /**
     * Get comments related to designated activity items.
     *
@@ -379,14 +414,13 @@ class ActivityModel extends Gdn_Model {
     * @return DataSet SQL results.
     */
    public function GetComments($ActivityIDs) {
-      $this->ActivityQuery(FALSE);
-      $this->FireEvent('BeforeGetComments');
       $Result = $this->SQL
-         ->WhereIn('a.CommentActivityID', $ActivityIDs)
-         ->OrderBy('a.CommentActivityID', 'desc')
-         ->OrderBy('a.DateInserted', 'asc')
-         ->Get();
-      Gdn::UserModel()->JoinUsers($Result, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Photo', 'Email', 'Gender')));
+         ->Select('c.*')
+         ->From('ActivityComment c')
+         ->WhereIn('c.ActivityID', $ActivityIDs)
+         ->OrderBy('c.ActivityID, c.DateInserted')
+         ->Get()->ResultArray();
+      Gdn::UserModel()->JoinUsers($Result, array('InsertUserID'), array('Join' => array('Name', 'Photo', 'Email')));
       return $Result;
    }
    
@@ -622,6 +656,29 @@ class ActivityModel extends Gdn_Model {
    public function ClearNotificationQueue() {
       unset($this->_NotificationQueue);
       $this->_NotificationQueue = array();
+   }
+   
+   /**
+    * Save a comment on an activity.
+    * @param array $Data
+    * @return int|bool 
+    * @since 2.1
+    */
+   public function Comment($Data) {
+      $Data['InsertUserID'] = Gdn::Session()->UserID;
+      $Data['DateInserted'] = Gdn_Format::ToDateTime();
+      $Data['InsertIPAddress'] = Gdn::Request()->IpAddress();
+      
+      $this->Validation->ApplyRule('ActivityID', 'Required');
+      $this->Validation->ApplyRule('Body', 'Required');
+      $this->Validation->ApplyRule('DateInserted', 'Required');
+      $this->Validation->ApplyRule('InsertUserID', 'Required');
+      
+      if ($this->Validate($Data)) {
+         $ID = $this->SQL->Insert('ActivityComment', $Data);
+         return $ID;
+      }
+      return FALSE;
    }
    
    /**

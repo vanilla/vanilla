@@ -29,6 +29,20 @@ class ActivityController extends Gdn_Controller {
     */
    public $Uses = array('Database', 'Form', 'ActivityModel');
    
+   public function __get($Name) {
+      switch ($Name) {
+         case 'CommentData':
+            Deprecated('ActivityController->CommentData', "ActivityController->Data('Activities')");
+            $Result = new Gdn_DataSet(array(), DATASET_TYPE_OBJECT);
+            return $Result;
+         case 'ActivityData':
+            Deprecated('ActivityController->ActivityData', "ActivityController->Data('Activities')");
+            $Result = new Gdn_DataSet($this->Data('Activities'), DATASET_TYPE_ARRAY);
+            $Result->DatasetType(DATASET_TYPE_OBJECT);
+            return $Result;
+      }
+   }
+   
    /**
     * Include JS, CSS, and modules used by all methods.
     *
@@ -73,7 +87,7 @@ class ActivityController extends Gdn_Controller {
          $ActivityID = 0;
          
       $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $ActivityID);
-      $this->CommentData = $this->ActivityModel->GetComments(array($ActivityID));
+      $this->SetData('Comments', $this->ActivityModel->GetComments(array($ActivityID)));
       $this->SetData('ActivityData', $this->ActivityData);
       
       $this->Render();
@@ -105,15 +119,15 @@ class ActivityController extends Gdn_Controller {
       if ($Offset < 0)
          $Offset = 0;
       
-      // Page meta
-      $this->AddJsFile('jquery.gardenmorepager.js');
+      // Page meta.
       $this->AddJsFile('activity.js');
       $this->Title(T('Recent Activity'));
       
       // Comment submission 
       $Session = Gdn::Session();
       $Comment = $this->Form->GetFormValue('Comment');
-      $this->CommentData = FALSE;
+      $Activities = array();
+      
       if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
          $this->Permission('Garden.Profiles.Edit');
          $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
@@ -130,50 +144,41 @@ class ActivityController extends Gdn_Controller {
          } else {
             // Load just the single new comment
             $this->HideActivity = TRUE;
-            $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $NewActivityID);
+            $Activities = $this->ActivityModel->GetWhere('ActivityID', $NewActivityID)->ResultArray();
             $this->View = 'activities';
          }
       } else {
-         $this->ActivityData = is_array($RoleID) ? $this->ActivityModel->GetForRole($RoleID, $Offset, $Limit) : $this->ActivityModel->Get('', $Offset, $Limit);
-//         $TotalRecords = is_array($RoleID) ? $this->ActivityModel->GetCountForRole($RoleID) : $this->ActivityModel->GetCount();
-         if ($this->ActivityData->NumRows() > 0) {
-            $ActivityData = $this->ActivityData->ResultArray();
-            $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
-            $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
-         }
+         $Activities = $this->ActivityModel->Get('', $Offset, $Limit)->ResultArray();
          $this->View = 'all';
-         
-         // Build a pager
-         $PagerFactory = new Gdn_PagerFactory();
-         $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-         $this->Pager->MoreCode = 'More';
-         $this->Pager->LessCode = 'Newer Activity';
-         $this->Pager->ClientID = 'Pager';
-         $this->Pager->Configure(
-            $Offset,
-            $Limit,
-            FALSE,
-            'activity/'.(is_array($RoleID) ? implode(',', $RoleID) : '0').'/%1$s/%2$s/'
-         );
-         
-         // Deliver json data if necessary
-         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-            $this->SetJson('LessRow', $this->Pager->ToString('less'));
-            $this->SetJson('MoreRow', $this->Pager->ToString('more'));
-            $this->View = 'activities';
-         }
       }
-      
-      // Add RecentUser module
-      $RecentUserModule = new RecentUserModule($this);
-      $RecentUserModule->GetData();
-      $this->AddModule($RecentUserModule);
-      
-      $this->SetData('ActivityData', $this->ActivityData);
+      $this->ActivityModel->JoinComments($Activities);
+      $this->SetData('Activities', $Activities);
 
       $this->CanonicalUrl(Url('/activity', TRUE));
       
       $this->Render();
+   }
+   
+   public function DeleteComment($ID, $TK, $Target = '') {
+      $Session = Gdn::Session();
+      
+      if (!$Session->ValidateTransientKey($TK))
+         throw PermissionException();
+      
+      $Comment = $this->ActivityModel->GetComment($ID);
+      if (!$ID)
+         throw NotFoundException();
+      
+      if ($Session->CheckPermission('Garden.Activity.Delete') || $Comment['InsertUserID'] = $Session->UserID) {
+         $this->ActivityModel->DeleteComment($ID);
+      } else {
+         throw PermissionException();
+      }
+      
+      if ($this->DeliveryType() === DELIVERY_TYPE_ALL)
+         Redirect($Target);
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
    /**
@@ -227,15 +232,12 @@ class ActivityController extends Gdn_Controller {
          $Body = $this->Form->GetValue('Body', '');
          $ActivityID = $this->Form->GetValue('ActivityID', '');
          if (is_numeric($ActivityID) && $ActivityID > 0) {
-            $NewActivityID = $this->ActivityModel->Add(
-               $Session->UserID,
-               'ActivityComment',
-               $Body,
-               '',
-               $ActivityID,
-               '',
-               TRUE
-            );
+            $ActivityComment = array(
+                'ActivityID' => $ActivityID,
+                'Body' => $Body,
+                'Format' => 'Text');
+            
+            $ID = $this->ActivityModel->Comment($ActivityComment);
             $this->Form->SetValidationResults($this->ActivityModel->ValidationResults());
             if ($this->Form->ErrorCount() > 0)
                $this->ErrorMessage($this->Form->Errors());
@@ -246,11 +248,10 @@ class ActivityController extends Gdn_Controller {
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
          Redirect($this->Form->GetValue('Return', Gdn_Url::WebRoot()));
       } else {
-         // Load the newly added comment
-         $this->Comment = $this->ActivityModel->GetID($NewActivityID);
-         $this->Comment->ActivityType .= ' Hidden'; // Hide it so jquery can reveal it
+         // Load the newly added comment.
+         $this->SetData('Comment', $this->ActivityModel->GetComment($ID));
          
-         // Set it in the appropriate view
+         // Set it in the appropriate view.
          $this->View = 'comment';
       }
 

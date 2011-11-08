@@ -4,7 +4,7 @@ if ($this->ActivityData->NumRows() > 0) {
    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
    echo '</ul>';
    
-   echo PagerModule::Write(array('CurrentRecords' => $this->ActivityData->NumRows()));
+   echo PagerModule::Write(array('CurrentRecords' => count($this->Data('Activities'))));
 } else {
    ?>
 <div class="Empty"><?php echo T('Not much happening here, yet.'); ?></div>

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
+function WriteActivity($Activity, &$Sender, &$Session) {
    $Activity = (object)$Activity;
    // If this was a status update or a wall comment, don't bother with activity strings
    $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
@@ -61,63 +61,58 @@ function WriteActivity($Activity, &$Sender, &$Session, $Comment) {
       </div>
    </div>
    <?php
-   if ($Activity->AllowComments == '1') {
-      // If there are comments, show them
-      $FoundComments = FALSE;
-      if (property_exists($Sender, 'CommentData') && is_object($Sender->CommentData)) {
-         foreach ($Sender->CommentData->Result() as $Comment) {
-            if (is_object($Comment) && $Comment->CommentActivityID == $Activity->ActivityID) {
-               if ($FoundComments == FALSE)
-                  echo '<ul class="DataList ActivityComments">';
-                  
-               $FoundComments = TRUE;
-               WriteActivityComment($Comment, $Sender, $Session);
-            }
-         }
+   $Comments = $Activity->Comments;
+   if (count($Comments) > 0) {
+      echo '<ul class="DataList ActivityComments">';
+      foreach ($Comments as $Comment) {
+         WriteActivityComment($Comment, $Sender, $Session);
       }
-      if ($FoundComments == FALSE)
-         echo '<ul class="DataList ActivityComments Hidden">';
-
-      if ($Session->CheckPermission('Garden.Profiles.Edit')) {
-         ?>
-         <li class="CommentForm">
-         <?php
-            echo Anchor(T('Write a comment'), '/dashboard/activity/comment/'.$Activity->ActivityID, 'CommentLink');
-            $CommentForm = Gdn::Factory('Form');
-            $CommentForm->SetModel($Sender->ActivityModel);
-            $CommentForm->AddHidden('ActivityID', $Activity->ActivityID);
-            $CommentForm->AddHidden('Return', Gdn_Url::Request());
-            echo $CommentForm->Open(array('action' => Url('/dashboard/activity/comment'), 'class' => 'Hidden'));
-            echo '<div class="TextBoxWrapper">'.$CommentForm->TextBox('Body', array('MultiLine' => TRUE, 'value' => '')).'</div>';
-            echo $CommentForm->Close('Comment');
-         ?></li>
-      <?php } ?>
-      </ul>
-   <?php } ?>
+   } else {
+      echo '<ul class="DataList ActivityComments Hidden">';
+   }
+   
+   if ($Session->CheckPermission('Garden.Profiles.Edit')):
+      ?>
+      <li class="CommentForm">
+      <?php
+         echo Anchor(T('Write a comment'), '/dashboard/activity/comment/'.$Activity->ActivityID, 'CommentLink');
+         $CommentForm = Gdn::Factory('Form');
+         $CommentForm->SetModel($Sender->ActivityModel);
+         $CommentForm->AddHidden('ActivityID', $Activity->ActivityID);
+         $CommentForm->AddHidden('Return', Gdn_Url::Request());
+         echo $CommentForm->Open(array('action' => Url('/dashboard/activity/comment'), 'class' => 'Hidden'));
+         echo '<div class="TextBoxWrapper">'.$CommentForm->TextBox('Body', array('MultiLine' => TRUE, 'value' => '')).'</div>';
+         echo $CommentForm->Close('Comment');
+      ?></li>
+   <?php 
+   endif;
+   
+   echo '</ul>';
+?>
 </li>
 <?php
 }
 
 function WriteActivityComment($Comment, &$Sender, &$Session) {
-   $Author = UserBuilder($Comment, 'Activity');
+   $Author = UserBuilder($Comment, 'Insert');
    $PhotoAnchor = UserPhoto($Author, 'Photo');
-   $CssClass = 'Item ActivityComment Condensed '.$Comment->ActivityType;
+   $CssClass = 'Item ActivityComment Condensed ActivityComment';
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
    
 ?>
-<li id="Activity_<?php echo $Comment->ActivityID; ?>" class="<?php echo $CssClass; ?>">
+<li id="ActivityComment_<?php echo $Comment['ActivityCommentID']; ?>" class="<?php echo $CssClass; ?>">
    <?php if ($PhotoAnchor != '') { ?>
    <div class="Author Photo"><?php echo $PhotoAnchor; ?></div>
    <?php } ?>
    <div class="ItemContent ActivityComment">
       <?php echo UserAnchor($Author, 'Title Name'); ?>
-      <div class="Excerpt"><?php echo Gdn_Format::Display($Comment->Story); ?></div>
+      <div class="Excerpt"><?php echo Gdn_Format::To($Comment['Body'], $Comment['Format']); ?></div>
       <div class="Meta">
-         <span class="DateCreated"><?php echo Gdn_Format::Date($Comment->DateInserted); ?></span>
+         <span class="DateCreated"><?php echo Gdn_Format::Date($Comment['DateInserted'], 'html'); ?></span>
          <?php
-            if ($Session->UserID == $Comment->InsertUserID || $Session->CheckPermission('Garden.Activity.Delete'))
-               echo Anchor(T('Delete'), 'dashboard/activity/delete/'.$Comment->ActivityID.'/'.$Session->TransientKey().'?Return='.urlencode(Gdn_Url::Request()), 'DeleteComment');
+            if ($Session->UserID == $Comment['InsertUserID'] || $Session->CheckPermission('Garden.Activity.Delete'))
+               echo Anchor(T('Delete'), "dashboard/activity/deletecomment?id={$Comment['ActivityCommentID']}&tk=".$Session->TransientKey().'&target='.urlencode(Gdn_Url::Request()), 'DeleteComment');
          ?>
       </div>
    </div>

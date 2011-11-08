@@ -14,11 +14,12 @@ if ($Session->CheckPermission('Garden.Profiles.Edit')) {
    echo $this->Form->Button(T('Share'));
    echo $this->Form->Close();
 }
-if ($this->ActivityData->NumRows() > 0) {
+$Activities = $this->Data('Activities', array());
+if (count($Activities) > 0) {
    echo '<ul class="DataList Activities">';
    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
    echo '</ul>';
-   echo PagerModule::Write(array('CurrentRecords' => $this->ActivityData->NumRows()));
+   echo PagerModule::Write(array('CurrentRecords' => count($Activities)));
 } else {
    ?>
 <div class="Empty"><?php echo T('Not much happening here, yet.'); ?></div>

@@ -17,6 +17,7 @@ if (!isset($Explicit))
 $Database = Gdn::Database();
 $SQL = $Database->SQL();
 $Construct = $Database->Structure();
+$Px = $Database->DatabasePrefix;
 
 // Role Table
 $Construct->Table('Role');
@@ -324,15 +325,31 @@ $Construct->Table('Invitation')
    ->Column('DateInserted', 'datetime')
    ->Column('AcceptedUserID', 'int', TRUE)
    ->Set($Explicit, $Drop);
+
+// ActivityType Table
+$Construct->Table('ActivityType')
+	->PrimaryKey('ActivityTypeID')
+   ->Column('Name', 'varchar(20)')
+   ->Column('AllowComments', 'tinyint(1)', '0')
+   ->Column('ShowIcon', 'tinyint(1)', '0')
+   ->Column('ProfileHeadline', 'varchar(255)')
+   ->Column('FullHeadline', 'varchar(255)')
+   ->Column('RouteCode', 'varchar(255)', TRUE)
+   ->Column('Notify', 'tinyint(1)', '0') // Add to RegardingUserID's notification list?
+   ->Column('Public', 'tinyint(1)', '1') // Should everyone be able to see this, or just the RegardingUserID?
+   ->Set($Explicit, $Drop);
    
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
+
 $Construct->Table('Activity');
+$ActivityExists = $Construct->TableExists();
 $EmailedExists = $Construct->ColumnExists('Emailed');
+$CommentActivityIDExists = $Construct->ColumnExists('CommentActivityID');
 
 $Construct
 	->PrimaryKey('ActivityID')
-   ->Column('CommentActivityID', 'int', TRUE, 'key')
+//   ->Column('CommentActivityID', 'int', TRUE, 'key')
    ->Column('ActivityTypeID', 'int')
    ->Column('ActivityUserID', 'int', TRUE, 'key')
    ->Column('RegardingUserID', 'int', TRUE, 'key')
@@ -349,18 +366,28 @@ if (!$EmailedExists) {
    $SQL->Put('Activity', array('Emailed' => 1));
 }
 
-// ActivityType Table
-$Construct->Table('ActivityType')
-	->PrimaryKey('ActivityTypeID')
-   ->Column('Name', 'varchar(20)')
-   ->Column('AllowComments', 'tinyint(1)', '0')
-   ->Column('ShowIcon', 'tinyint(1)', '0')
-   ->Column('ProfileHeadline', 'varchar(255)')
-   ->Column('FullHeadline', 'varchar(255)')
-   ->Column('RouteCode', 'varchar(255)', TRUE)
-   ->Column('Notify', 'tinyint(1)', '0') // Add to RegardingUserID's notification list?
-   ->Column('Public', 'tinyint(1)', '1') // Should everyone be able to see this, or just the RegardingUserID?
+$ActivityCommentExists = $Construct->TableExists('ActivityComment');
+
+$Construct
+   ->Table('ActivityComment')
+   ->PrimaryKey('ActivityCommentID')
+   ->Column('ActivityID', 'int', FALSE, 'key')
+   ->Column('Body', 'text')
+   ->Column('Format', 'varchar(20)')
+   ->Column('InsertUserID', 'int')
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Set($Explicit, $Drop);
+
+// Move activity comments to the activity comment table.
+if (!$ActivityCommentExists && $CommentActivityIDExists) {
+   $Q = "insert {$Px}ActivityComment (ActivityID, Body, Format, InsertUserID, DateInserted, InsertIPAddress)
+      select CommentActivityID, Story, 'Text', InsertUserID, DateInserted, InsertIPAddress
+      from {$Px}Activity
+      where CommentActivityID > 0";
+   $Construct->Query($Q);
+   $SQL->Delete('Activity', array('CommentActivityID >' => 0));
+}
 
 // Insert some activity types
 ///  %1 = ActivityName

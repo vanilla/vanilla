@@ -324,7 +324,6 @@ if (!function_exists('LogException')) {
       
       $TraceLines = explode("\n", $Ex->getTraceAsString());
       foreach ($TraceLines as $i => $Line) {
-         $j = $i + i;
          @error_log("$Px  $Line", $Type, $ErrorLogFile);
       }
    }

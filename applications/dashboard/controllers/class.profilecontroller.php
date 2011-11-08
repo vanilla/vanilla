@@ -91,17 +91,15 @@ class ProfileController extends Gdn_Controller {
     * @param int $UserID Unique ID.
     * @param int $Offset How many to skip (for paging).
     */
-   public function Activity($UserReference = '', $Username = '', $UserID = '', $Offset = '0') {
+   public function Activity($UserReference = '', $Username = '', $UserID = '', $Page = '') {
       $this->Permission('Garden.Profiles.View');
 		
 		// Object setup
 		$Session = Gdn::Session();
 		$this->ActivityModel = new ActivityModel();
 		
-		// Calculate offset
-		$Offset = is_numeric($Offset) ? $Offset : 0;
-      if ($Offset < 0)
-         $Offset = 0;
+		// Calculate offset.
+      list($Offset, $Limit) = OffsetLimit($Page, 30);
       
       // Get user, tab, and comment
       $this->GetUserInfo($UserReference, $Username, $UserID);
@@ -154,46 +152,19 @@ class ProfileController extends Gdn_Controller {
       } else {
          // Load data to display
          $this->ProfileUserID = $this->User->UserID;
-			$Limit = 50;
-         $this->SetData('ActivityData', $this->ActivityModel->Get($this->User->UserID, $Offset, $Limit), TRUE);
-			$TotalRecords = $this->ActivityModel->GetCount($this->User->UserID);
-         if ($this->ActivityData->NumRows() > 0) {
-            $ActivityData = $this->ActivityData->Result();
-            $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
-            $LastActivity = $this->ActivityData->FirstRow();
+			$Limit = 30;
+         $Activities = $this->ActivityModel->Get($this->User->UserID, $Offset, $Limit)->ResultArray();
+         $this->ActivityModel->JoinComments($Activities);
+         $this->SetData('Activities', $Activities);
+         if (count($Activities) > 0) {
+            $LastActivity = $Activities[0];
             $LastModifiedDate = Gdn_Format::ToTimestamp($this->User->DateUpdated);
-            $LastActivityDate = Gdn_Format::ToTimestamp($LastActivity->DateInserted);
+            $LastActivityDate = Gdn_Format::ToTimestamp($LastActivity['DateInserted']);
             if ($LastModifiedDate < $LastActivityDate)
                $LastModifiedDate = $LastActivityDate;
                
             // Make sure to only query this page if the user has no new activity since the requesting browser last saw it.
             $this->SetLastModified($LastModifiedDate);
-            $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
-         } else {
-            $this->CommentData = FALSE;
-         }
-			
-         // Build a pager
-         $PagerFactory = new Gdn_PagerFactory();
-         $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-         $this->Pager->MoreCode = 'More';
-         $this->Pager->LessCode = 'Newer Activity';
-         $this->Pager->ClientID = 'Pager';
-         $this->Pager->Configure(
-            $Offset,
-            $Limit,
-            $TotalRecords,
-            'profile/activity/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$this->User->UserID.'/%1$s/'
-         );
-         
-         // Deliver json data if necessary
-         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-            $this->SetJson('LessRow', $this->Pager->ToString('less'));
-            $this->SetJson('MoreRow', $this->Pager->ToString('more'));
-				if ($Offset > 0) {
-					$this->View = 'activities';
-					$this->ControllerName = 'Activity';
-				}
          }
       }
 
@@ -392,7 +363,10 @@ class ProfileController extends Gdn_Controller {
       
       // Get notifications data
       $this->ActivityModel = new ActivityModel();
-      $this->ActivityData = $this->ActivityModel->GetNotifications($Session->UserID, $Offset, $Limit);
+      $Activities = $this->ActivityModel->GetNotifications($Session->UserID, $Offset, $Limit)->ResultArray();
+      $this->ActivityModel->JoinComments($Activities);
+      $this->SetData('Activities', $Activities);
+      unset($Activities);
 		//$TotalRecords = $this->ActivityModel->GetCountNotifications($Session->UserID);
 		
 		// Build a pager

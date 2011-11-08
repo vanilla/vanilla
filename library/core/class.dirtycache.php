@@ -59,4 +59,8 @@ class Gdn_Dirtycache extends Gdn_Cache {
    public function Decrement($Key, $Amount = 1, $Options = array()) {
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
+   
+   public function Flush() {
+      return TRUE;
+   }
 }

@@ -213,4 +213,8 @@ class Gdn_Memcache extends Gdn_Cache {
       $RealKey = $this->MakeKey($Key, $FinalOptions);
       return $this->Memcache->decrement($RealKey, $Amount);
    }
+   
+   public function Flush() {
+      return $this->Memcache->flush();
+   }
 }

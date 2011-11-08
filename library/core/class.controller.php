@@ -1062,7 +1062,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
          ob_clean();
-         $this->ContentType('application/json');
+//         $this->ContentType('application/json');
       }
       
       if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
@@ -1699,57 +1699,63 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_Json[$Key] = $Value;
    }
    
-   public function StatusCode($StatusCode, $Message = NULL) {
-      if (is_null($Message)) {
-         switch ($StatusCode) {
-            case 100: $Message = 'Continue'; break;
-            case 101: $Message = 'Switching Protocols'; break;
-            
-            case 200: $Message = 'OK'; break;
-            case 201: $Message = 'Created'; break;
-            case 202: $Message = 'Accepted'; break;
-            case 203: $Message = 'Non-Authoritative Information'; break;
-            case 204: $Message = 'No Content'; break;
-            case 205: $Message = 'Reset Content'; break;
-            
-            case 300: $Message = 'Multiple Choices'; break;
-            case 301: $Message = 'Moved Permanently'; break;
-            case 302: $Message = 'Found'; break;
-            case 303: $Message = 'See Other'; break;
-            case 304: $Message = 'Not Modified'; break;
-            case 305: $Message = 'Use Proxy'; break;
-            case 307: $Message = 'Temporary Redirect'; break;
-         
-            case 400: $Message = 'Bad Request'; break;
-            case 401: $Message = 'Not Authorized'; break;
-            case 402: $Message = 'Payment Required'; break;
-            case 403: $Message = 'Forbidden'; break;
-            case 404: $Message = 'Not Found'; break;
-            case 405: $Message = 'Method Not Allowed'; break;
-            case 406: $Message = 'Not Acceptable'; break;
-            case 407: $Message = 'Proxy Authentication Required'; break;
-            case 408: $Message = 'Request Timeout'; break;
-            case 409: $Message = 'Conflict'; break;
-            case 410: $Message = 'Gone'; break;
-            case 411: $Message = 'Length Required'; break;
-            case 412: $Message = 'Precondition Failed'; break;
-            case 413: $Message = 'Request Entity Too Large'; break;
-            case 414: $Message = 'Request-URI Too Long'; break;
-            case 415: $Message = 'Unsupported Media Type'; break;
-            case 416: $Message = 'Requested Range Not Satisfiable'; break;
-            case 417: $Message = 'Expectation Failed'; break;
-            
-            case 500: $Message = 'Internal Server Error'; break;
-            case 501: $Message = 'Not Implemented'; break;
-            case 502: $Message = 'Bad Gateway'; break;
-            case 503: $Message = 'Service Unavailable'; break;
-            case 504: $Message = 'Gateway Timeout'; break;
-            case 505: $Message = 'HTTP Version Not Supported'; break;
-            
-            default: $Message = 'Unknown'; break;
-         }
+   public function StatusCode($StatusCode, $Message = NULL, $SetHeader = TRUE) {
+      if (is_null($Message))
+         $Message = self::GetStatusMessage($StatusCode);
+      
+      if ($SetHeader)
+         $this->SetHeader('Status', "{$StatusCode} {$Message}");
+      return $Message;
+   }
+   
+   public static function GetStatusMessage($StatusCode) {
+      switch ($StatusCode) {
+         case 100: $Message = 'Continue'; break;
+         case 101: $Message = 'Switching Protocols'; break;
+
+         case 200: $Message = 'OK'; break;
+         case 201: $Message = 'Created'; break;
+         case 202: $Message = 'Accepted'; break;
+         case 203: $Message = 'Non-Authoritative Information'; break;
+         case 204: $Message = 'No Content'; break;
+         case 205: $Message = 'Reset Content'; break;
+
+         case 300: $Message = 'Multiple Choices'; break;
+         case 301: $Message = 'Moved Permanently'; break;
+         case 302: $Message = 'Found'; break;
+         case 303: $Message = 'See Other'; break;
+         case 304: $Message = 'Not Modified'; break;
+         case 305: $Message = 'Use Proxy'; break;
+         case 307: $Message = 'Temporary Redirect'; break;
+
+         case 400: $Message = 'Bad Request'; break;
+         case 401: $Message = 'Not Authorized'; break;
+         case 402: $Message = 'Payment Required'; break;
+         case 403: $Message = 'Forbidden'; break;
+         case 404: $Message = 'Not Found'; break;
+         case 405: $Message = 'Method Not Allowed'; break;
+         case 406: $Message = 'Not Acceptable'; break;
+         case 407: $Message = 'Proxy Authentication Required'; break;
+         case 408: $Message = 'Request Timeout'; break;
+         case 409: $Message = 'Conflict'; break;
+         case 410: $Message = 'Gone'; break;
+         case 411: $Message = 'Length Required'; break;
+         case 412: $Message = 'Precondition Failed'; break;
+         case 413: $Message = 'Request Entity Too Large'; break;
+         case 414: $Message = 'Request-URI Too Long'; break;
+         case 415: $Message = 'Unsupported Media Type'; break;
+         case 416: $Message = 'Requested Range Not Satisfiable'; break;
+         case 417: $Message = 'Expectation Failed'; break;
+
+         case 500: $Message = 'Internal Server Error'; break;
+         case 501: $Message = 'Not Implemented'; break;
+         case 502: $Message = 'Bad Gateway'; break;
+         case 503: $Message = 'Service Unavailable'; break;
+         case 504: $Message = 'Gateway Timeout'; break;
+         case 505: $Message = 'HTTP Version Not Supported'; break;
+
+         default: $Message = 'Unknown'; break;
       }
-      $this->SetHeader('Status', "{$StatusCode} {$Message}");
       return $Message;
    }
    

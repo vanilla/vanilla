@@ -818,7 +818,12 @@ jQuery(document).ready(function($) {
 	}
 	
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
+   var notificationsPinging = 0;
 	pingForNotifications = function() {
+      if (notificationsPinging > 0)
+         return;
+      notificationsPinging++;
+      
       $.ajax({
          type: "POST",
          url: gdn.url('dashboard/notifications/inform'),
@@ -829,6 +834,9 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             gdn.inform(json);
+         },
+         complete: function() {
+            notificationsPinging--;
          }
       });
 	}

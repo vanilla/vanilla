@@ -955,8 +955,6 @@ a.BigButton:focus {
 .DataList .Meta {
    font-size: 11px;
    color: #70727c;
-   overflow: hidden;
-   height: 100%;
 }
 .MItem {
    margin-left: 8px;

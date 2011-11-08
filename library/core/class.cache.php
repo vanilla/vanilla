@@ -333,6 +333,18 @@ abstract class Gdn_Cache {
    abstract public function AddContainer($Options);
    
    /**
+    * Invalidate all items in the cache
+    * 
+    * Gdn_Cache::Flush() invalidates all existing cache items immediately.
+    * After invalidation none of the items will be returned in response to a 
+    * retrieval command (unless it's stored again under the same key after 
+    * Gdn_Cache::Flush() has invalidated the items).
+    * 
+    * @return boolean TRUE on success of FALSE on failure
+    */
+   abstract public function Flush();
+   
+   /**
     * 
     * 
     * @param type $Key Cache key

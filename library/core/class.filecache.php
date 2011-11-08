@@ -320,4 +320,14 @@ class Gdn_Filecache extends Gdn_Cache {
    public function Decrement($Key, $Amount = 1, $Options = array()) {
       return $this->Increment($Key, 0-$Amount, $Options);
    }
+   
+   public function Flush() {
+      foreach ($this->Containers as &$Container) {
+         $CacheLocation = $Container[Gdn_Filecache::CONTAINER_LOCATION];
+         if (is_dir($CacheLocation)) {
+            Gdn_FileSystem::RemoveFolder ($CacheLocation);
+            @mkdir($CacheLocation,0755,TRUE);
+         }
+      }
+   }
 }

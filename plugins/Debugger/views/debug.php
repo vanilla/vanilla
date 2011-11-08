@@ -55,4 +55,4 @@ if(!is_null($Database)) {
 global $Start;
 echo '<h3>Page completed in '.round(Now() - $_SERVER['REQUEST_TIME'], 4).'s</h3>';
 ?>
-</div>;
+</div>

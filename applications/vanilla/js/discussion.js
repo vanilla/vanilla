@@ -31,7 +31,8 @@ jQuery(document).ready(function($) {
       return false;
    });
    
-   // Hijack comment form button clicks
+   // Hijack comment form button clicks.
+   var draftSaving = 0;
    $('div.CommentForm :submit, a.PreviewButton, a.DraftButton').livequery('click', function() {
       var btn = this;
       var parent = $(btn).parents('div.CommentForm');
@@ -53,6 +54,12 @@ jQuery(document).ready(function($) {
          // Don't save draft if string is empty
          if (jQuery.trim($(textbox).val()) == '')
             return false;
+         
+         if (draftSaving > 0)
+            return false;
+         
+//         console.log('Saving draft: '+(new Date()).toUTCString());
+         draftSaving++;
       }
 
       // Post the form, and append the results to #Discussion, and erase the textbox
@@ -84,7 +91,7 @@ jQuery(document).ready(function($) {
          data: postValues,
          dataType: 'json',
          error: function(xhr) {
-            gdn.informError(xhr);
+            gdn.informError(xhr, draft);
          },
          success: function(json) {
             json = $.postParseJson(json);
@@ -183,6 +190,8 @@ jQuery(document).ready(function($) {
             // Remove any spinners, and re-enable buttons.
             $('span.TinyProgress').remove();
             $(frm).find(':submit').removeAttr("disabled");
+            if (draft)
+               draftSaving--;
          }
       });
       frm.triggerHandler('submit');
@@ -252,16 +261,16 @@ jQuery(document).ready(function($) {
             url: $(btn).attr('href'),
             data: 'DeliveryType=VIEW&DeliveryMethod=JSON',
             dataType: 'json',
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               // Remove any old popups
-               $('div.Popup,.Overlay').remove();
-               $.popup({}, XMLHttpRequest.responseText);
+            error: function(xhr) {
+               gdn.informError(xhr);
             },
             success: function(json) {
                json = $.postParseJson(json);
                
                $(msg).after(json.Data);
                $(msg).hide();
+            },
+            complete: function() {
                $(parent).find('span.TinyProgress').remove();
             }
          });
@@ -297,44 +306,47 @@ jQuery(document).ready(function($) {
       }
    });
    
-   getNewTimeout = function() {   
-      if(autoRefresh <= 0)
+   var gettingNew = 0;
+   var getNew = function() {
+      if (gettingNew > 0) {
          return;
-   
-      setTimeout(function() {
-         discussionID = gdn.definition('DiscussionID', 0);
-         lastCommentID = gdn.definition('LastCommentID', '');
-         if(lastCommentID == '')
-            return;
-         
-         $.ajax({
-            type: "POST",
-            url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
-            data: "DeliveryType=ASSET&DeliveryMethod=JSON",
-            dataType: "json",
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               // Popup the error
-               $.popup({}, XMLHttpRequest.responseText);
-            },
-            success: function(json) {
-               json = $.postParseJson(json);
-               
-               if(json.Data && json.LastCommentID) {
-                  gdn.definition('LastCommentID', json.LastCommentID, true);
-                  $(json.Data).appendTo("ul.Discussion")
-                     .effect("highlight", {}, "slow");
-               }
-               gdn.processTargets(json.Targets);
-               
-               getNewTimeout();
+      }
+      gettingNew++;
+      
+      discussionID = gdn.definition('DiscussionID', 0);
+      lastCommentID = gdn.definition('LastCommentID', '');
+      if(lastCommentID == '')
+         return;
+
+      $.ajax({
+         type: "POST",
+         url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
+         data: "DeliveryType=ASSET&DeliveryMethod=JSON",
+         dataType: "json",
+         error: function(xhr) {
+            gdn.informError(xhr, true);
+         },
+         success: function(json) {
+            json = $.postParseJson(json);
+
+            if(json.Data && json.LastCommentID) {
+               gdn.definition('LastCommentID', json.LastCommentID, true);
+               $(json.Data).appendTo("ul.Discussion")
+                  .effect("highlight", {}, "slow");
             }
-         });
-      }, autoRefresh);
+            gdn.processTargets(json.Targets);
+         },
+         complete: function() {
+            gettingNew--;
+         }
+      });
    }
    
    // Load new comments like a chat.
-   autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
-   getNewTimeout();
+   var autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
+   if (autoRefresh > 1000) {
+      window.setInterval(getNew, autoRefresh);
+   }
    
    /* Comment Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {
@@ -357,8 +369,8 @@ jQuery(document).ready(function($) {
          url: gdn.url('/moderation/checkedcomments'),
          data: {'DiscussionID' : discussionID , 'CheckIDs' : aCheckIDs, 'DeliveryMethod' : 'JSON', 'TransientKey' : gdn.definition('TransientKey')},
          dataType: "json",
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            gdn.informMessage(XMLHttpRequest.responseText, {'CssClass' : 'Dismissable'});
+         error: function(xhr) {
+            gdn.informError(xhr, true);
          },
          success: function(json) {
             gdn.inform(json);

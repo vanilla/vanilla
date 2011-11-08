@@ -10,6 +10,7 @@
  * @package Garden
  * @since 2.0
  */
+
 class Gdn_Locale extends Gdn_Pluggable {
    
    /**

@@ -230,7 +230,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $SafeCategoryData = array();
       foreach ($CategoryData as $CategoryID => $Category) {
          if ($Value != $CategoryID) {
-            if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsAdd'])
+            if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsAdd'] || !$Category['PermsDiscussionsView'])
                continue;
 
             if ($Category['Archived'])

@@ -71,7 +71,7 @@ jQuery(document).ready(function($) {
    // Hijack comment form button clicks
    $('ul.ActivityComments form input.Button').live('click', function() {
       var button = this;
-      $(button).addClass('InProgress');
+      gdn.disable(button);
       var frm = $(button).parents('form');
       var row = $(frm).parents('li.CommentForm');
       var textbox = $(row).find('textarea');
@@ -105,7 +105,7 @@ jQuery(document).ready(function($) {
             }
          },
          complete: function() {
-            $(button).removeClass('InProgress');
+            gdn.enable(button);
          }
       });
       return false;

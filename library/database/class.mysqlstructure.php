@@ -1,7 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
+
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * MySQL structure driver
+ * 
+ * MySQL-specific structure tools for performing structural changes on MySQL 
+ * database servers.
+ *
+ * @author Todd Burry <todd@vanillaforums.com> 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
 
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {

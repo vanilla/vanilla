@@ -1,14 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
+ * Output formatter chain
+ * 
  * This object facilitates chaining custom formatters for use in the Gdn_FormatObject.
  * A custom formatter is an object with a Format($String) method that formats a string in a particular way.
  * Certain calls to the various Gdn_Format methods (such as Html and To) will look for a custom formatter to use before formatting.
@@ -17,7 +11,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *  - Create the object with a Format($String) method.
  *  - Call the static method Gdn_FormatterChain::Chain() to install it on top of the other formatter.
  *  - Depending on the priority you specified your formatter will be called before or after the existing formatter.
+ *
+ * @author Todd Burry <todd@vanillaforums.com> 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class Gdn_FormatterChain {
    /// Constants ///
    const PRIORITY_DEFAULT = 0;

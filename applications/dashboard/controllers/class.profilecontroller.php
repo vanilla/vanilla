@@ -103,6 +103,9 @@ class ProfileController extends Gdn_Controller {
       
       // Get user, tab, and comment
       $this->GetUserInfo($UserReference, $Username, $UserID);
+      $UserID = $this->User->UserID;
+      $Username = $this->User->Name;
+      
       $this->SetTabView('Activity');
       $Comment = $this->Form->GetFormValue('Comment');
       
@@ -145,7 +148,7 @@ class ProfileController extends Gdn_Controller {
          } else {
             // Load just the single new comment
             $this->HideActivity = TRUE;
-            $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $NewActivityID);
+            $this->ActivityData = $this->ActivityModel->GetWhere(array('ActivityID' => $NewActivityID));
             $this->View = 'activities';
             $this->ControllerName = 'activity';
          }
@@ -153,7 +156,9 @@ class ProfileController extends Gdn_Controller {
          // Load data to display
          $this->ProfileUserID = $this->User->UserID;
 			$Limit = 30;
-         $Activities = $this->ActivityModel->Get($this->User->UserID, $Offset, $Limit)->ResultArray();
+         $Activities = $this->ActivityModel->GetWhere(
+            array('ActivityUserID' => $UserID, 'NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), 
+            $Offset, $Limit)->ResultArray();
          $this->ActivityModel->JoinComments($Activities);
          $this->SetData('Activities', $Activities);
          if (count($Activities) > 0) {

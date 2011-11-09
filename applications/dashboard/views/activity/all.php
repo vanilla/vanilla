@@ -8,7 +8,7 @@
 $this->FireEvent('BeforeStatusForm');
 $Session = Gdn::Session();
 if ($Session->CheckPermission('Garden.Profiles.Edit')) {
-   echo $this->Form->Open(array('action' => Url('/activity'), 'class' => 'Activity'));
+   echo $this->Form->Open(array('action' => Url('/activity/post'), 'class' => 'Activity'));
    echo $this->Form->Errors();
    echo Wrap($this->Form->TextBox('Comment', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
    echo $this->Form->Button(T('Share'));

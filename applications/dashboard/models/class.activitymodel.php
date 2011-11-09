@@ -20,6 +20,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Dashboard
  */
 class ActivityModel extends Gdn_Model {
+   const NOTIFY_PUBLIC = -1;
+   const NOTIFY_MODS = -2;
+   const NOTIFY_ADMINS = -3;
+   
    /**
     * Defines the related database table name.
     */
@@ -104,16 +108,24 @@ class ActivityModel extends Gdn_Model {
     *
     * @since 2.0.0
     * @access public
-    * @param string $Field Column name for where clause.
-    * @param mixed $Value Value for where clause.
+    * @param array $Where The where condition.
+    * @param int $Offset The offset of the query.
+    * @param int $Limit the limit of the query.
     * @return DataSet SQL results.
     */
-   public function GetWhere($Field, $Value = '') {
-      $this->ActivityQuery();
+   public function GetWhere($Where, $Offset = 0, $Limit = 30) {
+      if (is_string($Where)) {
+         $Where = array($Where => $Offset);
+         $Offset = 0;
+      }
+      
+      $this->ActivityQuery(FALSE);
       $Result = $this->SQL
-         ->Where($Field, $Value)
+         ->Where($Where)
          ->OrderBy('a.DateInserted', 'desc')
+         ->Limit($Limit, $Offset)
          ->Get();
+      Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender')));
 
       $this->EventArguments['Data'] =& $Result;
       $this->FireEvent('AfterGet');
@@ -145,40 +157,26 @@ class ActivityModel extends Gdn_Model {
     *
     * @since 2.0.0
     * @access public
-    * @param int $UserID Unique ID of user to gather activity for.
+    * @param int $NotifyUserID Unique ID of user to gather activity for or one of the NOTIFY_* constants in this class.
     * @param int $Offset Number to skip.
     * @param int $Limit How many to return.
     * @return DataSet SQL results.
     */
-   public function Get($UserID = '', $Offset = '0', $Limit = '50') {
+   public function Get($NotifyUserID = FALSE, $Offset = 0, $Limit = 30) {
       $Offset = is_numeric($Offset) ? $Offset : 0;
       if ($Offset < 0)
          $Offset = 0;
 
       $Limit = is_numeric($Limit) ? $Limit : 0;
       if ($Limit < 0)
-         $Limit = 0;
+         $Limit = 30;
 
       $this->ActivityQuery(FALSE);
-      $this->SQL->Where('a.CommentActivityID is null');
-      if ($UserID != '') {
-         $this->SQL
-            //->BeginWhereGroup()
-            ->Where('a.ActivityUserID', $UserID);
-            // ->OrWhere('a.RegardingUserID', $UserID)
-            //->EndWhereGroup();
-            // mosullivan 2011-03-08: "Or" killing query speed
-      }
       
-      $Session = Gdn::Session();
-      if (!$Session->IsValid() || $Session->UserID != $UserID) {
-         // Get all of the activity types that are public.
-         $SQL2 = clone Gdn::SQL();
-         $SQL2->Reset();
-         $ActivityTypes = $SQL2->GetWhere('ActivityType', array('Public' => 1))->ResultArray();
-         $ActivityTypes = ConsolidateArrayValuesByKey($ActivityTypes, 'ActivityTypeID');
-         $this->SQL->WhereIn('a.ActivityTypeID', $ActivityTypes);
+      if (!$NotifyUserID) {
+         $NotifyUserID = self::NOTIFY_PUBLIC;
       }
+      $this->SQL->WhereIn('NotifyUserID', (array)$NotifyUserID);
 
       $this->FireEvent('BeforeGet');
       $Result = $this->SQL
@@ -318,17 +316,16 @@ class ActivityModel extends Gdn_Model {
     *
     * @since 2.0.0
     * @access public
-    * @param int $UserID Unique ID of user.
+    * @param int $NotifyUserID Unique ID of user.
     * @param int $Offset Number to skip.
     * @param int $Limit Max number to return.
     * @return DataSet SQL results.
     */
-   public function GetNotifications($UserID, $Offset = '0', $Limit = '30') {
+   public function GetNotifications($NotifyUserID, $Offset = '0', $Limit = '30') {
       $this->ActivityQuery(FALSE);
       $this->FireEvent('BeforeGetNotifications');
       $Result = $this->SQL
-         ->Where('RegardingUserID', $UserID)
-         ->Where('t.Notify', '1')
+         ->Where('NotifyUserID', $NotifyUserID)
          ->Limit($Limit, $Offset)
          ->OrderBy('a.ActivityID', 'desc')
          ->Get();

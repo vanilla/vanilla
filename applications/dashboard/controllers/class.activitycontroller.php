@@ -86,7 +86,7 @@ class ActivityController extends Gdn_Controller {
       if (!is_numeric($ActivityID) || $ActivityID < 0)
          $ActivityID = 0;
          
-      $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $ActivityID);
+      $this->ActivityData = $this->ActivityModel->GetWhere(array('ActivityID' => $ActivityID));
       $this->SetData('Comments', $this->ActivityModel->GetComments(array($ActivityID)));
       $this->SetData('ActivityData', $this->ActivityData);
       
@@ -100,18 +100,10 @@ class ActivityController extends Gdn_Controller {
     * @access public
     * @todo Validate comment length rather than truncating.
     * 
-    * @param int $RoleID Unique ID of role to limit activity to.
     * @param int $Offset Number of activity items to skip.
     */
-   public function Index($RoleID = '', $Page = FALSE) {
+   public function Index($Page = FALSE) {
       $this->Permission('Garden.Activity.View');
-      
-      // Limit to specific RoleIDs?
-      if ($RoleID == 0)
-         $RoleID = '';
-         
-      if ($RoleID != '')
-         $RoleID = explode(',', $RoleID);
          
       // Which page to load
       list($Offset, $Limit) = OffsetLimit($Page, 30);
@@ -126,36 +118,13 @@ class ActivityController extends Gdn_Controller {
       // Comment submission 
       $Session = Gdn::Session();
       $Comment = $this->Form->GetFormValue('Comment');
-      $Activities = array();
-      
-      if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
-         $this->Permission('Garden.Profiles.Edit');
-         $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
-         
-         // Update About if necessary
-         $ActivityType = 'WallComment';
-         $NewActivityID = $this->ActivityModel->Add(
-            $Session->UserID,
-            $ActivityType,
-            $Comment);
-         
-         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            Redirect('activity');
-         } else {
-            // Load just the single new comment
-            $this->HideActivity = TRUE;
-            $Activities = $this->ActivityModel->GetWhere('ActivityID', $NewActivityID)->ResultArray();
-            $this->View = 'activities';
-         }
-      } else {
-         $Activities = $this->ActivityModel->Get('', $Offset, $Limit)->ResultArray();
-         $this->View = 'all';
-      }
+      $Activities = $this->ActivityModel->GetWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), $Offset, $Limit)->ResultArray();
       $this->ActivityModel->JoinComments($Activities);
+      
       $this->SetData('Activities', $Activities);
-
       $this->CanonicalUrl(Url('/activity', TRUE));
       
+      $this->View = 'all';
       $this->Render();
    }
    
@@ -257,5 +226,18 @@ class ActivityController extends Gdn_Controller {
 
       // And render
       $this->Render();
-   }   
+   }
+   
+   public function Post() {
+      $this->Permission('Garden.Profiles.Edit');
+      if ($this->Form->IsPostBack()) {
+         $Data = $this->Form->FormValues();
+         
+      }
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
+         Redirect('/activity');
+      }
+      
+      $this->Render();
+   }
 }

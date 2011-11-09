@@ -344,26 +344,56 @@ $Construct->Table('ActivityType')
 
 $Construct->Table('Activity');
 $ActivityExists = $Construct->TableExists();
+$ReadExists = $Construct->ColumnExists('IsRead');
 $EmailedExists = $Construct->ColumnExists('Emailed');
 $CommentActivityIDExists = $Construct->ColumnExists('CommentActivityID');
+$NotifyUserIDExists = $Construct->ColumnExists('NotifyUserID');
 
 $Construct
 	->PrimaryKey('ActivityID')
-//   ->Column('CommentActivityID', 'int', TRUE, 'key')
    ->Column('ActivityTypeID', 'int')
+   ->Column('NotifyUserID', 'int', 0, 'index') // user being notified or -1: public, -2 mods, -3 admins
    ->Column('ActivityUserID', 'int', TRUE, 'key')
-   ->Column('RegardingUserID', 'int', TRUE, 'key')
+   ->Column('RegardingUserID', 'int', TRUE, 'key') // deprecated?
+   ->Column('Photo', 'varchar(255)', TRUE)
+   ->Column('HeadlineFormat', 'varchar(255)', TRUE)
    ->Column('Story', 'text', TRUE)
    ->Column('Route', 'varchar(255)', TRUE)
-   ->Column('CountComments', 'int', '0')
+   ->Column('RecordType', 'varchar(20)', TRUE)
+   ->Column('RecordID', 'int', TRUE)
+//   ->Column('CountComments', 'int', '0')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('IsRead', 'tinyint', 0)
    ->Column('Emailed', 'tinyint(1)', 0)
+   ->Column('Data', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
 if (!$EmailedExists) {
    $SQL->Put('Activity', array('Emailed' => 1));
+}
+if (!$ReadExists) {
+   $SQL->Put('Activity', array('IsRead' => 1));
+}
+
+if (!$NotifyUserIDExists && $ActivityExists) {
+   // Update all of the activities that are notifications.
+   $SQL->Update('Activity a')
+      ->Join('ActivityType at', 'a.ActivityTypeID = at.ActivityTypeID')
+      ->Set('a.NotifyUserID', 'a.RegardingUserID', FALSE)
+      ->Where('at.Notify', 1)
+      ->Put();
+   
+   // Update all public activities.
+   $SQL->Update('Activity a')
+      ->Join('ActivityType at', 'a.ActivityTypeID = at.ActivityTypeID')
+      ->Set('a.NotifyUserID', ActivityModel::NOTIFY_PUBLIC)
+      ->Where('at.Public', 1)
+      ->Where('a.NotifyUserID', 0)
+      ->Put();
+   
+   $SQL->Delete('Activity', array('NotifyUserID' => 0));
 }
 
 $ActivityCommentExists = $Construct->TableExists('ActivityComment');

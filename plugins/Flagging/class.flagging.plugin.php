@@ -370,7 +370,7 @@ class FlaggingPlugin extends Gdn_Plugin {
       
       // Turn off disabled Flagging plugin (deprecated)
       if (C('Plugins.Flagging.Enabled', NULL) === FALSE) {
-         RemoveFromConfig(['EnabledPlugins']['Flagging']);
+         RemoveFromConfig('EnabledPlugins.Flagging');
       }
    }
 

@@ -29,6 +29,9 @@ $PluginInfo['ProfileExtender'] = array(
  * When enabled, this plugin will import content from CustomProfileFields.
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
+   /** @var array */
+   public $MagicLabels = array('Twitter');
+   
    /**
     * Add the Dashboard menu item.
     */
@@ -53,6 +56,21 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    public function GetFields($Type = 'Profile') {
       return array_filter((array)explode(',', C('Plugins.ProfileExtender.'.$Type.'Fields', '')));
    }
+   
+   /**
+    * Special manipulations.
+    */
+   public function ParseSpecialFields($Fields = array()) {
+      foreach ($Fields as $Label => $Value) {
+         switch ($Label) {
+            case 'Twitter':
+               $Fields['Twitter'] = Anchor($Value, 'http://twitter.com/'.$Value);
+               break;
+         }
+      }
+      
+      return $Fields;
+   }
       
    /**
     * Add fields to edit profile form.
@@ -74,7 +92,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Sender->UserFields = array();
       if (is_object($Sender->User))
          $Sender->UserFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile_%', 'Profile_');
-               
+      
       $Sender->Render($this->GetView('profilefields.php'));
    }
    
@@ -148,13 +166,18 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 			   }
          }
          
+         // Send them off for magic formatting
+         $Fields = $this->ParseSpecialFields($Fields);
+         
          // Display all non-hidden fields
          $HideFields = $this->GetFields('Hide');
          foreach ($Fields as $Label => $Value) {
             if (in_array($Label, $HideFields))
                continue;
+            if (!in_array($Label, $this->MagicLabels))
+               $Value = Gdn_Format::Links(htmlspecialchars($Value));
             echo '<dt class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.Gdn_Format::Text($Label).'</dt>';
-            echo '<dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.Gdn_Format::Links(htmlspecialchars($Value)).'</dd>';
+            echo '<dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.$Value.'</dd>';
          }
       } catch (Exception $ex) {
          // No errors

@@ -1,17 +1,11 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+
 <h1><?php echo T($this->Data['Title']); ?></h1>
 <div class="Info">
    <?php echo T('FlaggedContent', 'The following content has been flagged by users for moderator review.'); ?>
 </div>
-<div class="FilterMenu">
-   <?php
-      $ToggleName = C('Plugins.Flagging.Enabled') ? T('Disable Content Flagging') : T('Enable Content Flagging');
-      echo "<div>".Wrap(Anchor($ToggleName, 'plugin/flagging/toggle/'.Gdn::Session()->TransientKey(), 'SmallButton'))."</div>";
-   ?>
-</div>
 
 <?php 
-if (C('Plugins.Flagging.Enabled')) {
    // Settings
    echo $this->Form->Open();
    echo $this->Form->Errors();
@@ -22,7 +16,7 @@ if (C('Plugins.Flagging.Enabled')) {
       <li>
          <?php
             echo $this->Form->Label('Category to Use', 'Plugins.Flagging.CategoryID');
-            echo $this->Form->CategoryDropDown('CategoryID', C('Plugins.Flagging.CategoryID'));
+            echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', C('Plugins.Flagging.CategoryID'));
          ?>
       </li>
    </ul>
@@ -95,4 +89,3 @@ if (C('Plugins.Flagging.Enabled')) {
       }
    ?>
 </div>
-<?php } ?>

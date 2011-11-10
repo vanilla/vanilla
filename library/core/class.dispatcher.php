@@ -558,8 +558,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $ControllerName = $Controller.'Controller';
       $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
-      if ($ControllerPath !== FALSE) {
-         
+      if ($ControllerPath) {
          // This was a guess search with no specified application. Look up
          // the application folder from the controller path.
          if (is_null($Application)) {

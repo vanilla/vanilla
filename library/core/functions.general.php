@@ -917,6 +917,25 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
          case 'urlencode':
             $Result = urlencode($Value);
             break;
+         case 'user':
+            $ArgsBak = $Args;
+            if (is_array($Value)) {
+               $Result = '';
+               for ($i = 0; $i < count($Value); $i++) {
+                  $User = Gdn::UserModel()->GetID($Value[$i]);
+                  if ($i == count($Value) - 1)
+                     $Result .= ' '.T('sep and', 'and').' ';
+                  elseif ($i > 0)
+                     $Result .= ', ';
+                  $Result .= UserAnchor($User);
+               }
+            } else {
+               $User = Gdn::UserModel()->GetID($Value);
+               $Result = UserAnchor($User);
+            }
+               
+            $Args = $ArgsBak;
+            break;
          default:
             $Result = $Value;
             break;

@@ -14,7 +14,7 @@ $PluginInfo['ButtonBar'] = array(
    'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
    'Version' => '1.1',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'Author' => "Tim Gunter",

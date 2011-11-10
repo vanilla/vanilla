@@ -69,7 +69,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    private function ProfileFields($Sender) {
       // Retrieve user's existing profile fields
       $Sender->ProfileFields = $this->GetFields('Profile');
-      print_r($Sender->ProfileFields);
       $Sender->IsPostBack = $Sender->Form->IsPostBack();
       
       $Sender->UserFields = array();

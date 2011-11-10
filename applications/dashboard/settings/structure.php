@@ -470,6 +470,9 @@ if (!$WallPostType) {
       ->Put();
 }
 
+$ActivityModel = new ActivityModel();
+$ActivityModel->DefineType('Default');
+
 // Message Table
 $Construct->Table('Message')
 	->PrimaryKey('MessageID')

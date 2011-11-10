@@ -898,6 +898,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
          case 'rawurlencode':
             $Result = rawurlencode($Value);
             break;
+         case 'text':
+            $Result = Gdn_Format::Text($Value, FALSE);
+            break;
          case 'time':
             $Result = Gdn_Format::Date($Value, '%l:%M%p');
             break;

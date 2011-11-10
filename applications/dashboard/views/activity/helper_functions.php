@@ -16,7 +16,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    $Title = '';
    $Excerpt = $Activity->Story;
    if (!in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate'))) {
-      $Title = '<div class="Title">'.Gdn_Format::ActivityHeadline($Activity, $Sender->ProfileUserID).'</div>';
+      $Title = '<div class="Title">'.GetValue('Headline', $Activity).'</div>';
    } else if ($ActivityType == 'WallPost') {
       $RegardingUser = UserBuilder($Activity, 'Regarding');
       $PhotoAnchor = UserPhoto($RegardingUser);

@@ -22,7 +22,7 @@ if (C('Plugins.Flagging.Enabled')) {
       <li>
          <?php
             echo $this->Form->Label('Category to Use', 'Plugins.Flagging.CategoryID');
-            echo $this->Form->CategoryDropDown('CategoryID', C('Plugins.Flagging.CategoryID'));
+            echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', C('Plugins.Flagging.CategoryID'));
          ?>
       </li>
    </ul>

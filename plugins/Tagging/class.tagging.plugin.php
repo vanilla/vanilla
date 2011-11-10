@@ -376,7 +376,7 @@ class TaggingPlugin extends Gdn_Plugin {
                ->From('TagDiscussion td')
                ->Join('Tag t', 'td.TagID = t.TagID')
                ->Where('td.DiscussionID', GetValue('DiscussionID', $Discussion))
-               ->Where('t.Type', '')
+               ->Where("coalesce(t.Type, '')", '')
                ->Get()->ResultArray();
             
             $Tags = ConsolidateArrayValuesByKey($Tags, 'Name');

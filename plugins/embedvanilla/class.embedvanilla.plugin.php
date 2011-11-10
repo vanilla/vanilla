@@ -9,13 +9,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 ChangeLog
 1.0.2 - Moved WordPress plugin to WP.org repository & updated link to http://wordpress.org/extend/plugins/vanilla-forums/
+1.0.6 - Set P3P header in Render_Before (MLR)
+1.0.7 - Move P3P header to the Dispatcher (MLR)
 */
 
 // Define the plugin:
 $PluginInfo['embedvanilla'] = array(
    'Name' => '&lt;Embed&gt; Vanilla',
    'Description' => "Embed Vanilla allows you to embed your Vanilla forum within another application like WordPress, Drupal, or some custom website you've created. <b>Only enable this plugin if you are planning to embed your site.</b>",
-   'Version' => '1.0.6',
+   'Version' => '1.0.7',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
@@ -24,11 +26,17 @@ $PluginInfo['embedvanilla'] = array(
 );
 
 class EmbedVanillaPlugin extends Gdn_Plugin {
+   /**
+    * Set P3P header because IE won't allow cookies thru the iFrame without it.
+    *
+    * This must be done in the Dispatcher because of PrivateCommunity.
+    * That precludes using Controller->SetHeader.
+    */
+   public function Base_BeforeDispatch_Handler($Sender) {
+      header('P3P: CP="CAO PSA OUR"', TRUE);
+   }
    
-	public function Base_Render_Before($Sender) {
-      // Set P3P header because IE won't allow cookies thru the iFrame without it
-      $Sender->SetHeader('P3P', 'CP="CAO PSA OUR"');
-      
+	public function Base_Render_Before($Sender) {      
 		$InDashboard = !($Sender->MasterView == 'default' || $Sender->MasterView == '');
 		$Sender->AddJsFile('plugins/embedvanilla/local.js');
 

@@ -143,22 +143,6 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Enable/Disable Flagging.
-    */
-   public function Controller_Toggle($Sender) {
-		
-		// Enable/Disable Content Flagging
-		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
-			if (C('Plugins.Flagging.Enabled')) {
-				$this->_Disable();
-			} else {
-				$this->_Enable();
-			}
-			Redirect('plugin/flagging');
-		}
-   }
-   
-   /**
     * Dismiss a flag, then view index.
     */
    public function Controller_Dismiss($Sender) {
@@ -179,16 +163,13 @@ class FlaggingPlugin extends Gdn_Plugin {
     * Add Flagging styling to Discussion.
     */
    public function DiscussionController_BeforeCommentsRender_Handler($Sender) {
-      if (!C('Plugins.Flagging.Enabled')) return;
       $Sender->AddCssFile($this->GetResource('design/flagging.css', FALSE, FALSE));
    }
    
    /**
     * Create 'Flag' link for comments in a discussion.
     */
-   public function DiscussionController_CommentOptions_Handler($Sender) {
-      if (!C('Plugins.Flagging.Enabled')) return;
-      
+   public function DiscussionController_CommentOptions_Handler($Sender) {      
       // Signed in users only. No guest reporting!
       if (!Gdn::Session()->UserID) return;
       
@@ -227,8 +208,6 @@ class FlaggingPlugin extends Gdn_Plugin {
     * Handle flagging process in a discussion.
     */
    public function DiscussionController_Flag_Create($Sender) {
-      if (!C('Plugins.Flagging.Enabled')) return;
-      
       // Signed in users only.
       if (!($UserID = Gdn::Session()->UserID)) return;
       $UserName = Gdn::Session()->User->Name;
@@ -388,21 +367,15 @@ class FlaggingPlugin extends Gdn_Plugin {
          ->Column('Comment', 'text')
          ->Column('DateInserted', 'datetime')
          ->Set(FALSE, FALSE);
-         
-      if (C('Plugins.Flagging.Enabled', NULL) === NULL)
-         SaveToConfig('Plugins.Flagging.Enabled', FALSE);
+      
+      // Turn off disabled Flagging plugin (deprecated)
+      if (C('Plugins.Flagging.Enabled', NULL) === FALSE) {
+         RemoveFromConfig(['EnabledPlugins']['Flagging']);
+      }
    }
 
    public function Setup() {
       $this->Structure();
-   }
-   
-   protected function _Enable() {
-      SaveToConfig('Plugins.Flagging.Enabled', TRUE);
-   }
-   
-   protected function _Disable() {
-      SaveToConfig('Plugins.Flagging.Enabled', FALSE);
    }
    
 }

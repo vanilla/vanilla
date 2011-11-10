@@ -24,6 +24,15 @@ class ActivityModel extends Gdn_Model {
    const NOTIFY_MODS = -2;
    const NOTIFY_ADMINS = -3;
    
+   const SENT_ARCHIVE = 1; // The activity was added before this system was put in place.
+   const SENT_OK = 2; // The activity sent just fine.
+   const SENT_PENDING = 3; // The activity is waiting to be sent.
+   const SENT_FAIL = 4; // The activity could not be sent.
+   const SENT_ERROR = 5; // There was an error sending the activity, but it can be retried.
+   
+   public static $ActivityTypes = NULL;
+   public static $Queue = array();
+   
    /**
     * Defines the related database table name.
     */
@@ -200,6 +209,19 @@ class ActivityModel extends Gdn_Model {
       $this->FireEvent('AfterGet');
       
       return $Result;
+   }
+   
+   public static function GetActivityType($ActivityType) {
+      if (self::$ActivityTypes === NULL) {
+         $Data = Gdn::SQL()->Get('ActivityType')->ResultArray();
+         foreach ($Data as $Row) {
+            self::$ActivityTypes[$Row['Name']] = $Row;
+            self::$ActivityTypes[$Row['ActivityTypeID']] = $Row;
+         }
+      }
+      if (isset(self::$ActivityTypes[$ActivityType]))
+         return self::$ActivityTypes[$ActivityType];
+      return FALSE;
    }
    
    /**
@@ -552,14 +574,31 @@ class ActivityModel extends Gdn_Model {
     * @access public
     * @param string $ActivityType
     * @param array $Preferences
-    * @param string $Type
+    * @param string $Type One of the following:
+    *  - Popup: Popup a notification.
+    *  - Email: Email the notification.
+    *  - NULL: True if either notification is true.
+    *  - both: Return an array of (Popup, Email).
     * @return bool
     */
    public static function NotificationPreference($ActivityType, $Preferences, $Type = NULL) {
+      if (is_numeric($Preferences)) {
+         $User = Gdn::UserModel()->GetID($Preferences);
+         if (!$User)
+            return $Type == 'both' ? array(FALSE, FALSE) : FALSE;
+         $Preferences = GetValue('Preferences', $User);
+      }
+      
       if ($Type === NULL) {
          $Result = self::NotificationPreference($ActivityType, $Preferences, 'Email')
                 || self::NotificationPreference($ActivityType, $Preferences, 'Popup');
          
+         return $Result;
+      } elseif ($Type === 'both') {
+         $Result = array(
+            self::NotificationPreference($ActivityType, $Preferences, 'Popup'),
+            self::NotificationPreference($ActivityType, $Preferences, 'Email')
+            );
          return $Result;
       }
       
@@ -571,7 +610,6 @@ class ActivityModel extends Gdn_Model {
       
       return $Preference;
    }
-   
    
    /**
     * Send notification.
@@ -789,5 +827,108 @@ class ActivityModel extends Gdn_Model {
                $this->_NotificationQueue[$User->UserID][] = $Notification;
          }
       }
+   }
+   
+   /**
+    * Queue an activity for saving later.
+    * @param array $Data The data in the activity.
+    * @param string|FALSE $Preference The name of the preference governing the activity.
+    * @param array $Options Additional options for saving.
+    * @return type 
+    */
+   public function Queue($Data, $Preference = FALSE, $Options = array()) {
+      $this->_Touch($Data);
+      if (!isset($Data['NotifyUserID']) || !isset($Data['ActivityType']))
+         throw Exception('Data missing NotifyUserID and/or ActivityType', 400);
+      
+      if ($Data['ActivityUserID'] == $Data['NotifyUserID'] && !GetValue('Force', $Options))
+         return; // don't notify users of something they did.
+      
+      $Notified = $Data['Notified'];
+      $Emailed = $Data['Emailed'];
+      
+      if (isset(self::$Queue[$Data['NotifyUserID']][$Data['ActivityType']])) {
+         list($CurrentData, $CurrentOptions) = self::$Queue[$Data['NotifyUserID']][$Data['ActivityType']];
+         
+         $Notified = $Notified ? $Notified : $CurrentData['Notified'];
+         $Emailed = $Emailed ? $Emailed : $CurrentData['Emailed'];
+         $Data = array_merge($CurrentData, $Data);
+         $Options = array_merge($CurrentOptions, $Options);
+      }
+      
+      if ($Preference) {
+         list($Popup, $Email) = self::NotificationPreference($Preference, $Data['NotifyUserID'], 'both');
+         if (!$Popup && !$Email)
+            return; // don't queue if user doesn't want to be notified at all.
+         
+         if ($Popup)
+            $Notified = self::SENT_PENDING;
+         if ($Email)
+            $Emailed = self::SENT_PENDING;
+      }
+      $Data['Notified'] = $Notified;
+      $Data['Emailed'] = $Emailed;
+      
+      self::$Queue[$Data['NotifyUserID']][$Data['ActivityType']] = array($Data, $Options);
+   }
+   
+   public function Save($Data, $Preference = FALSE, $Options = array()) {
+      $Activity = $Data;
+      $this->_Touch($Activity);
+      
+      if ($Activity['ActivityUserID'] == $Activity['NotifyUserID'] && !GetValue('Force', $Options))
+         return; // don't notify users of something they did.
+      
+      // Check the user's preference.
+      if ($Preference) {
+         list($Popup, $Email) = self::NotificationPreference($Preference, $Data['NotifyUserID'], 'both');
+         if (!$Popop && !$Email && !GetValue('Force', $Options))
+            return;
+         
+         if ($Popup)
+            $Activity['Notified'] = self::SENT_PENDING;
+         if ($Email)
+            $Activity['Emailed'] = self::SENT_PENDING;
+      }
+      
+      if (isset($Activity['Data']) && is_array($Activity['Data'])) {
+         $Activity['Data'] = serialize($Activity['Data']);
+      }
+      $Activity['ActivityTypeID'] = ArrayValue('ActivityTypeID', self::GetActivityType($Activity['ActivityType']));
+      
+      $this->DefineSchema();
+      $Activity = $this->FilterSchema($Activity);
+      
+      $ActivityID = GetValue('ActivityID', $Activity);
+      if (!$ActivityID) {
+         $this->AddInsertFields($Activity);
+         $ActivityID = $this->SQL->Insert('Activity', $Activity);
+         $Activity['ActivityID'] = $ActivityID;
+      } else {
+         $this->AddUpdateFields($Activity);
+         unset($Activity['ActivityID']);
+         $this->SQL->Put('Activity', $Activity, array('ActivityID' => $ActivityID));
+         $Activity['ActivityID'] = $ActivityID;
+      }
+      return $Activity;
+   }
+   
+   public function SaveQueue() {
+      $Result = array();
+      foreach (self::$Queue as $UserID => $Activities) {
+         foreach ($Activities as $ActivityType => $Row) {
+            $Result[] = $this->Save($Row[0], FALSE, $Row[1]);
+         }
+      }
+      self::$Queue = array();
+      return $Result;
+   }
+   
+   protected function _Touch(&$Data) {
+      TouchValue('ActivityType', $Data, 'Default');
+      TouchValue('ActivityUserID', $Data, Gdn::Session()->UserID);
+      TouchValue('NotifyUserID', $Data, self::NOTIFY_PUBLIC);
+      TouchValue('Notified', $Data, 0);
+      TouchValue('Emailed', $Data, 0);
    }
 }

@@ -63,6 +63,16 @@ class ActivityModel extends Gdn_Model {
    }
    
    /**
+    * Define a new activity type.
+    * @param string $Name The string code of the activity type.
+    * @param array $Activity The data that goes in the ActivityType table.
+    * @since 2.1
+    */
+   public function DefineType($Name, $Activity = array()) {
+      $this->SQL->Replace('ActivityType', $Activity, array('Name' => $Name), TRUE);
+   }
+   
+   /**
     * Delete a particular activity item.
     *
     * @since 2.0.0

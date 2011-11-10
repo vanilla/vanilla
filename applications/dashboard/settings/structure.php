@@ -332,8 +332,8 @@ $Construct->Table('ActivityType')
    ->Column('Name', 'varchar(20)')
    ->Column('AllowComments', 'tinyint(1)', '0')
    ->Column('ShowIcon', 'tinyint(1)', '0')
-   ->Column('ProfileHeadline', 'varchar(255)')
-   ->Column('FullHeadline', 'varchar(255)')
+   ->Column('ProfileHeadline', 'varchar(255)', TRUE)
+   ->Column('FullHeadline', 'varchar(255)', TRUE)
    ->Column('RouteCode', 'varchar(255)', TRUE)
    ->Column('Notify', 'tinyint(1)', '0') // Add to RegardingUserID's notification list?
    ->Column('Public', 'tinyint(1)', '1') // Should everyone be able to see this, or just the RegardingUserID?
@@ -344,7 +344,7 @@ $Construct->Table('ActivityType')
 
 $Construct->Table('Activity');
 $ActivityExists = $Construct->TableExists();
-$ReadExists = $Construct->ColumnExists('IsRead');
+$NotifiedExists = $Construct->ColumnExists('Notified');
 $EmailedExists = $Construct->ColumnExists('Emailed');
 $CommentActivityIDExists = $Construct->ColumnExists('CommentActivityID');
 $NotifyUserIDExists = $Construct->ColumnExists('NotifyUserID');
@@ -365,7 +365,7 @@ $Construct
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-   ->Column('IsRead', 'tinyint', 0)
+   ->Column('Notified', 'tinyint(1)', 0)
    ->Column('Emailed', 'tinyint(1)', 0)
    ->Column('Data', 'text', TRUE)
    ->Set($Explicit, $Drop);
@@ -373,8 +373,8 @@ $Construct
 if (!$EmailedExists) {
    $SQL->Put('Activity', array('Emailed' => 1));
 }
-if (!$ReadExists) {
-   $SQL->Put('Activity', array('IsRead' => 1));
+if (!$NotifiedExists) {
+   $SQL->Put('Activity', array('Notified' => 1));
 }
 
 if (!$NotifyUserIDExists && $ActivityExists) {

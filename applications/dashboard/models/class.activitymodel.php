@@ -71,6 +71,37 @@ class ActivityModel extends Gdn_Model {
       $this->FireEvent('AfterActivityQuery');
    }
    
+   public function CalculateData(&$Data) {
+      foreach ($Data as &$Row) {
+         $this->CalculateRow($Row);
+      }
+   }
+   
+   public function CalculateRow(&$Row) {
+      $ActivityType = self::GetActivityType($Row['ActivityTypeID']);
+      $Row['ActivityType'] = GetValue('Name', $ActivityType);
+      if (is_string($Row['Data']))
+         $Row['Data'] = @unserialize($Row['Data']);
+      
+      if (!$Row['Photo']) {
+         if (isset($Row['ActivityPhoto']))
+            $Row['Photo'] = $Row['ActivityPhoto'];
+         else {
+            $User = Gdn::UserModel()->GetID($Row['ActivityUserID'], DATASET_TYPE_ARRAY);
+            if ($User)
+               $Row['Photo'] = Gdn_Upload::Url($User['Photo']);
+         }
+      }
+      
+      $Row['Url'] = ExternalUrl($Row['Route']);
+      
+      if ($Row['HeadlineFormat']) {
+         $Row['Headline'] = FormatString($Row['HeadlineFormat'], $Row);
+      } else {
+         $Row['Headline'] = Gdn_Format::ActivityHeadline($Row);
+      }
+   }
+   
    /**
     * Define a new activity type.
     * @param string $Name The string code of the activity type.
@@ -145,6 +176,8 @@ class ActivityModel extends Gdn_Model {
          ->Limit($Limit, $Offset)
          ->Get();
       Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender')));
+      
+      $this->CalculateData($Result->ResultArray());
 
       $this->EventArguments['Data'] =& $Result;
       $this->FireEvent('AfterGet');
@@ -361,9 +394,10 @@ class ActivityModel extends Gdn_Model {
          ->Limit($Limit, $Offset)
          ->OrderBy('a.ActivityID', 'desc')
          ->Get();
+      $Result->DatasetType(DATASET_TYPE_ARRAY);
       
-      Gdn::UserModel()->JoinUsers($Result, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Photo', 'Email', 'Gender')));
-      
+      Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Photo', 'Email', 'Gender')));
+      $this->CalculateData($Result->ResultArray());
       return $Result;
    }
    
@@ -424,10 +458,10 @@ class ActivityModel extends Gdn_Model {
    }
    
    public function GetComment($ID) {
-      $Data = $this->SQL->GetWhere('ActivityComment', array('ActivityCommentID' => $ID))->ResultArray();
-      if ($Data) {
-         Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'), array('Join' => array('Name', 'Photo', 'Email')));
-         return array_shift($Data);
+      $Activity = $this->SQL->GetWhere('ActivityComment', array('ActivityCommentID' => $ID))->ResultArray();
+      if ($Activity) {
+         Gdn::UserModel()->JoinUsers($Activity, array('InsertUserID'), array('Join' => array('Name', 'Photo', 'Email')));
+         return array_shift($Activity);
       }
       return FALSE;
    }
@@ -538,8 +572,10 @@ class ActivityModel extends Gdn_Model {
       if ($Route != '')
          $Fields['Route'] = $Route;
          
-      if (is_numeric($RegardingUserID))
+      if (is_numeric($RegardingUserID)) {
          $Fields['RegardingUserID'] = $RegardingUserID;
+         $Fields['NotifyUserID'] = $RegardingUserID;
+      }
          
       if (is_numeric($CommentActivityID))
          $Fields['CommentActivityID'] = $CommentActivityID;
@@ -662,14 +698,14 @@ class ActivityModel extends Gdn_Model {
             $this->FireEvent('BeforeSendNotification');
             try {
                $Email->Send();
-               $Emailed = 2; // similar to http 200 OK
+               $Emailed = self::SENT_OK;
             } catch (phpmailerException $pex) {
                if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
-                  $Emailed = 4;
+                  $Emailed = self::SENT_FAIL;
                else
-                  $Emailed = 5;
+                  $Emailed = self::SENT_ERROR;
             } catch (Exception $ex) {
-               $Emailed = 4; // similar to http 5xx
+               $Emailed = self::SENT_FAIL; // similar to http 5xx
             }
             try {
                $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
@@ -705,22 +741,22 @@ class ActivityModel extends Gdn_Model {
    
    /**
     * Save a comment on an activity.
-    * @param array $Data
+    * @param array $Activity
     * @return int|bool 
     * @since 2.1
     */
-   public function Comment($Data) {
-      $Data['InsertUserID'] = Gdn::Session()->UserID;
-      $Data['DateInserted'] = Gdn_Format::ToDateTime();
-      $Data['InsertIPAddress'] = Gdn::Request()->IpAddress();
+   public function Comment($Activity) {
+      $Activity['InsertUserID'] = Gdn::Session()->UserID;
+      $Activity['DateInserted'] = Gdn_Format::ToDateTime();
+      $Activity['InsertIPAddress'] = Gdn::Request()->IpAddress();
       
       $this->Validation->ApplyRule('ActivityID', 'Required');
       $this->Validation->ApplyRule('Body', 'Required');
       $this->Validation->ApplyRule('DateInserted', 'Required');
       $this->Validation->ApplyRule('InsertUserID', 'Required');
       
-      if ($this->Validate($Data)) {
-         $ID = $this->SQL->Insert('ActivityComment', $Data);
+      if ($this->Validate($Activity)) {
+         $ID = $this->SQL->Insert('ActivityComment', $Activity);
          return $ID;
       }
       return FALSE;

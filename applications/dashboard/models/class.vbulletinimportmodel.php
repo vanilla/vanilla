@@ -25,6 +25,8 @@ class vBulletinImportModel extends Gdn_Model {
       $Router->SetRoute('member\.php\?u=(\d+)', 'dashboard/profile/$1/x', 'Permanent');
       // Make different sizes of avatars
       $this->ProcessAvatars();
+      // Prep config for ProfileExtender plugin based on imported fields
+      $this->ProfileExtenderPrep();
    }
    
    /**
@@ -65,5 +67,21 @@ class vBulletinImportModel extends Gdn_Model {
             );
          } catch (Exception $ex) { }
       }
+   }
+   
+   /**
+    * Get profile fields imported and add to ProfileFields list.
+    */
+   public function ProfileExtenderPrep() {
+      $ProfileKeyData = $this->SQL->Select('m.Name')->Distinct()->From('UserMeta m')->Like('m.Name', 'Profile_%')->Get();
+      $ExistingKeys = array_filter((array)explode(',', C('Plugins.ProfileExtender.ProfileFields', '')));
+      foreach ($ProfileKeyData->Result() as $Key) {
+         $Name = str_replace('Profile_', '', $Key->Name);
+         if (!in_array($Name, $ExistingKeys)) {
+            $ExistingKeys[] = $Name;
+         }
+      }
+      if (count($ExistingKeys))
+         SaveToConfig('Plugins.ProfileExtender.ProfileFields', implode(',', $ExistingKeys));
    }
 }

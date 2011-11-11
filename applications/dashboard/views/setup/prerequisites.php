@@ -17,4 +17,4 @@ echo $this->Form->Open();
    </div>
 </div>
 <?php
-$this->Form->Close();
+echo $this->Form->Close();

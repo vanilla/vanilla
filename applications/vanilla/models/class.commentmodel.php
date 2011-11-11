@@ -789,7 +789,7 @@ class CommentModel extends VanillaModel {
          }
 
          // Record user-comment activity.
-         if ($Discussion !== FALSE && !in_array($Session->UserID, $NotifiedUsers)) {
+         if ($Discussion !== FALSE && !in_array(GetValue('InsertUserID', $Discussion), $NotifiedUsers)) {
             $ActivityID = $this->RecordActivity($ActivityModel, $Discussion, $Session->UserID, $CommentID, FALSE);
             if ($ActivityID) {
                $ActivityModel->QueueNotification($ActivityID, $Story);
@@ -860,7 +860,7 @@ class CommentModel extends VanillaModel {
     */
    public function RecordAdvancedNotications($ActivityModel, $Discussion, $Comment, &$NotifiedUsers) {
       // Grab all of the users that need to be notified.
-      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
+      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewComment'))->ResultArray();
       
       // Grab all of their follow/unfollow preferences.
       $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');
@@ -877,8 +877,8 @@ class CommentModel extends VanillaModel {
       
       
       foreach ($UserIDs as $UserID) {
-//         if ($UserID == $Comment['InsertUserID'])
-//            continue;
+         if ($UserID == $Comment['InsertUserID'])
+            continue;
          
          if (in_array($UserID, $NotifiedUsers))
             continue;

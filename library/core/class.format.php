@@ -1,24 +1,18 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
+ * Output formatter
+ * 
  * Utility class that helps to format strings, objects, and arrays.
  *
- *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
+
 class Gdn_Format {
 
    /**
@@ -943,7 +937,7 @@ EOT;
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
          } else {
-            require_once(PATH_LIBRARY.DS.'vendors'.DS.'markdown'.DS.'markdown.php');
+            require_once(PATH_LIBRARY.'/vendors/markdown/markdown.php');
             $Mixed = Markdown($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);

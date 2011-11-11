@@ -1,22 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
- * This is a cache implementation that stores its cache items in the filesystem.
+ * Cache Layer: Files
+ * 
+ * A cache layer that stores its items as files on the filesystem.
  *
- * @author Tim Gunter
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
- 
+
 class Gdn_Filecache extends Gdn_Cache {
 
    const OPT_MOD_SPLIT = 65000;
@@ -319,5 +314,15 @@ class Gdn_Filecache extends Gdn_Cache {
    
    public function Decrement($Key, $Amount = 1, $Options = array()) {
       return $this->Increment($Key, 0-$Amount, $Options);
+   }
+   
+   public function Flush() {
+      foreach ($this->Containers as &$Container) {
+         $CacheLocation = $Container[Gdn_Filecache::CONTAINER_LOCATION];
+         if (is_dir($CacheLocation)) {
+            Gdn_FileSystem::RemoveFolder ($CacheLocation);
+            @mkdir($CacheLocation,0755,TRUE);
+         }
+      }
    }
 }

@@ -138,7 +138,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Display custom fields on Profile.
     */
    public function UserInfoModule_OnBasicInfo_Handler($Sender) {
-      
       try {
          // Get the custom fields
          $Fields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile_%', 'Profile_');
@@ -188,40 +187,37 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Save custom profile fields when saving the user.
     */
    public function UserModel_AfterSave_Handler($Sender) {
-      $ValueLimit = Gdn::Session()->CheckPermission('Garden.Moderation.Manage') ? 255 : C('Plugins.ProfileExtender.TextMaxLength', 140);
-      $UserID = GetValue('UserID', $Sender->EventArguments);
+      // Confirm we have submitted form values
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments);
-
-      // Build array of all extended profile fields
-      $Fields = FALSE;
       if (is_array($FormPostValues)) {
+         // Confirm we have custom fields
          $CustomLabels = GetValue('CustomLabel', $FormPostValues);
-         $CustomValues = GetValue('CustomValue', $FormPostValues);
+         $CustomValues = GetValue('CustomValue', $FormPostValues);         
          if (is_array($CustomLabels) && is_array($CustomValues)) {
+            $UserID = GetValue('UserID', $Sender->EventArguments);
+            
+            // Trim fields to proper length & build array
+            $ValueLimit = Gdn::Session()->CheckPermission('Garden.Moderation.Manage') ? 255 : C('Plugins.ProfileExtender.TextMaxLength', 140);
             $this->TrimValues($CustomLabels, 50);
             $this->TrimValues($CustomValues, $ValueLimit);
             $Fields = array_combine($CustomLabels, $CustomValues);
-         }
-         
-         // Delete any custom fields that had their value removed
-         if (is_array($Fields)) {
+            
+            // Delete custom fields that had their value removed
             foreach ($Fields as $Label => $Value) {
                if ($Value == '')
                   $Fields[$Label] = NULL;
             }
+            
+            // Delete custom fields that had their label removed
+            $ExitingFields = Gdn::UserModel()->GetMeta($UserID, 'Profile_%', 'Profile_');
+            foreach ($ExitingFields as $Label => $Value) {
+               if (!array_key_exists($Label, $Fields))
+                  $Fields[$Label] = NULL;
+            }
+            
+            // Update UserMeta
+            Gdn::UserModel()->SetMeta($UserID, $Fields, 'Profile_');
          }
-      }
-      
-      // Delete any custom fields that had their label removed
-      $ExitingFields = Gdn::UserModel()->GetMeta($UserID, 'Profile_%', 'Profile_');
-      foreach ($ExitingFields as $Label => $Value) {
-         if (!array_key_exists($Label, $Fields))
-            $Fields[$Label] = NULL;
-      }
-      
-      // Update UserMeta
-      if ($UserID > 0 && is_array($Fields)) {
-         Gdn::UserModel()->SetMeta($UserID, $Fields, 'Profile_');
       }
    }
    
@@ -230,14 +226,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 	 */
 	public function UserModel_AfterInsertUser_Handler($Sender) {	   
 	   // Get user-submitted
-	   $Fields = Gdn::Controller()->Form->FormValues();
-	   $SaveFields = array_combine($Fields['CustomLabel'], $Fields['CustomValue']);
+	   $FormPostValues = Gdn::Controller()->Form->FormValues();
+	   $CustomLabels = GetValue('CustomLabel', $FormPostValues);
+      $CustomValues = GetValue('CustomValue', $FormPostValues);
 	   
-	   // Only grab valid fields
-	   $RegistrationFields = array_flip((array)explode(',', C('Plugins.ProfileExtender.RegistrationFields')));
-      $SaveFields = array_intersect_key($SaveFields, $RegistrationFields);
+	   if (is_array($CustomLabels) && is_array($CustomValues)) {
+         $Fields = array_combine($CustomLabels, $CustomValues);
+	   
+   	   // Only grab valid fields
+   	   $RegistrationFields = array_flip((array)explode(',', C('Plugins.ProfileExtender.RegistrationFields')));
+         $SaveFields = array_intersect_key($Fields, $RegistrationFields);
       
-      Gdn::UserModel()->SetMeta($Sender->EventArguments['InsertUserID'], $SaveFields, 'Profile_');
+         Gdn::UserModel()->SetMeta(GetValue('InsertUserID', $Sender->EventArguments), $SaveFields, 'Profile_');
+      }
 	}
    
    /**

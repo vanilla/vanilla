@@ -87,6 +87,7 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 						echo $this->Form->Textbox('ConnectName');
 					?>
 				</li>
+				<?php $this->FireEvent('RegisterBeforePassword'); ?>
 				<li id="ConnectPassword">
 					<?php
 					echo $this->Form->Label('Password', 'ConnectPassword');

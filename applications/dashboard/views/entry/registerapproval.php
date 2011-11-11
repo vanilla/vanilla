@@ -25,6 +25,7 @@
             echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.T('Name Unavailable').'</span>';
          ?>
       </li>
+      <?php $this->FireEvent('RegisterBeforePassword'); ?>
       <li>
          <?php
             echo $this->Form->Label('Password', 'Password');
@@ -50,6 +51,7 @@
             echo $this->Form->TextBox('DiscoveryText', array('MultiLine' => TRUE));
          ?>
       </li>
+      <?php $this->FireEvent('RegisterBeforeTerms'); ?>
       <li>
          <?php
             echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));

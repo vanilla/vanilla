@@ -32,7 +32,7 @@ class vBulletinImportModel extends Gdn_Model {
     */
    public function ProcessAvatars() {
       $UploadImage = new Gdn_UploadImage();
-      $UserData = $this->SQL->Select('u.*')->From('User u')->Where('u.Photo is not null')->Get();
+      $UserData = $this->SQL->Select('u.Photo')->From('User u')->Where('u.Photo is not null')->Get();
       
       // Make sure the avatars folder exists.
       if (!file_exists(PATH_UPLOADS.'/userpics'))

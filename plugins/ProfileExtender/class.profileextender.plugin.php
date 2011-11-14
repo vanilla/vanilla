@@ -76,7 +76,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Add fields to edit profile form.
     */
    public function ProfileController_EditMyAccountAfter_Handler($Sender) {
-      //$this->ProfileFields($Sender);
+      $this->ProfileFields($Sender);
    }
    
    /**

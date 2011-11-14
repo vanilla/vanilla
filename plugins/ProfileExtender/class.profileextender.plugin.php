@@ -76,7 +76,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Add fields to edit profile form.
     */
    public function ProfileController_EditMyAccountAfter_Handler($Sender) {
-      $this->ProfileFields($Sender);
+      //$this->ProfileFields($Sender);
    }
    
    /**
@@ -86,14 +86,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     */
    private function ProfileFields($Sender) {
       // Retrieve user's existing profile fields
-      $Sender->ProfileFields = $this->GetFields('Profile');
-      $Sender->IsPostBack = $Sender->Form->IsPostBack();
+      $this->ProfileFields = $this->GetFields('Profile');
+      $this->IsPostBack = $Sender->Form->IsPostBack();
       
-      $Sender->UserFields = array();
+      $this->UserFields = array();
       if (is_object($Sender->User))
-         $Sender->UserFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile_%', 'Profile_');
+         $this->UserFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile_%', 'Profile_');
       
-      $Sender->Render($this->GetView('profilefields.php'));
+      include($this->GetView('profilefields.php'));
    }
    
    /**

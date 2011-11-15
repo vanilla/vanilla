@@ -1,17 +1,21 @@
 <?php if (!defined('APPLICATION')) exit();
-	
+
+// Get posted values
+$CustomLabels = GetValue('CustomLabel', $Sender->Form->FormValues(), array());
+$CustomValues = GetValue('CustomValue', $Sender->Form->FormValues(), array());
+
 // Write out the suggested fields first
-   if (count($this->ProfileFields) > 0)
-      echo Wrap(Wrap(T('More Information'), 'label'), 'li');
+if (count($this->ProfileFields) > 0)
+   echo Wrap(Wrap(T('More Information'), 'label'), 'li');
 	
 $CountFields = 0;
 foreach ($this->ProfileFields as $Field) {
+	$Value = $this->IsPostBack ? GetValue($CountFields, $CustomValues, '') : GetValue($Field, $this->UserFields, '');
 	$CountFields++;
-	$Value = $this->IsPostBack ? GetValue($Field, $_POST, '') : GetValue($Field, $this->UserFields, '');
 	echo '<li>';
-		echo $this->Form->Hidden('CustomLabel[]', array('value' => $Field));
-		echo $this->Form->Label($Field, 'CustomValue[]');
-		echo $this->Form->TextBox('CustomValue[]', array('value' => $Value));
+		echo $Sender->Form->Hidden('CustomLabel[]', array('value' => $Field));
+		echo $Sender->Form->Label($Field, 'CustomValue[]');
+		echo $Sender->Form->TextBox('CustomValue[]', array('value' => $Value));
 	echo '</li>';
 }
 
@@ -55,26 +59,31 @@ if (CheckPermission('Plugins.ProfileExtender.Add')) : ?>
    </li>
 
 <?php
+   // Use stored or posted values?
+   if ($this->IsPostBack)
+      $FieldList = array_combine($CustomLabels, $CustomValues);
+   else 
+      $FieldList = $this->UserFields;
+   
    // Write out user-defined custom fields
-   $CustomLabel = GetValue('CustomLabel', $this->Form->FormValues(), array());
-   $CustomValue = GetValue('CustomValue', $this->Form->FormValues(), array());
-   foreach ($this->UserFields as $Field => $Value) {
+   foreach ($FieldList as $Field => $Value) {
       if (!in_array($Field, $this->ProfileFields)) {
          if ($this->IsPostBack) {
-            $Field = GetValue($CountFields, $CustomLabel, '');
-            $Value = GetValue($CountFields, $CustomValue, '');
+            $Field = GetValue($CountFields, $CustomLabels, '');
+            $Value = GetValue($CountFields, $CustomValues, '');
          }
          $CountFields++;
          echo '<li>';
-            echo $this->Form->TextBox('CustomLabel[]', array('value' => $Field, 'class' => 'CustomLabel'));
-            echo $this->Form->TextBox('CustomValue[]', array('value' => $Value, 'class' => 'CustomValue'));
+            echo $Sender->Form->TextBox('CustomLabel[]', array('value' => $Field, 'class' => 'CustomLabel'));
+            echo $Sender->Form->TextBox('CustomValue[]', array('value' => $Value, 'class' => 'CustomValue'));
          echo '</li>';
       }
    }
+   
    // Write out one empty row
    echo '<li>';
-      echo $this->Form->TextBox('CustomLabel[]', array('class' => 'CustomLabel'));
-      echo $this->Form->TextBox('CustomValue[]', array('class' => 'CustomValue'));
+      echo $Sender->Form->TextBox('CustomLabel[]', array('class' => 'CustomLabel'));
+      echo $Sender->Form->TextBox('CustomValue[]', array('class' => 'CustomValue'));
    echo '</li>';
 
 endif;

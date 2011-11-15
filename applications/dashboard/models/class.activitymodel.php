@@ -964,7 +964,13 @@ class ActivityModel extends Gdn_Model {
       TouchValue('ActivityType', $Data, 'Default');
       TouchValue('ActivityUserID', $Data, Gdn::Session()->UserID);
       TouchValue('NotifyUserID', $Data, self::NOTIFY_PUBLIC);
+      TouchValue('Headline', $Data, NULL);
+      TouchValue('Story', $Data, NULL);
       TouchValue('Notified', $Data, 0);
       TouchValue('Emailed', $Data, 0);
+      TouchValue('Photo', $Data, NULL);
+      TouchValue('Route', $Data, NULL);
+      if (!isset($Data['Data']) || !is_array($Data['Data']))
+         $Data['Data'] = array();
    }
 }

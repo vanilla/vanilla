@@ -1,0 +1,67 @@
+.ButtonBar {
+   padding-top: 4px;
+   height: 24px;
+}
+
+.ButtonBarMarkupHint {
+   color: black;
+   font-size: 11px;
+}
+
+#DiscussionForm .ButtonBar {
+   margin-bottom: -6px;
+}
+
+#DiscussionForm .ButtonBarMarkupHint {
+   margin-top: -6px;
+}
+
+.ButtonBar div {
+    background-color: white;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    border-color: #AAA;
+    border-style: solid;
+    border-width: 1px;
+    border-bottom: 0px;
+    
+   -webkit-border-top-left-radius: 3px;
+   -webkit-border-top-right-radius: 3px;
+   -moz-border-radius-topleft: 3px;
+   -moz-border-radius-topright: 3px;
+   border-top-left-radius: 3px;
+   border-top-right-radius: 3px;
+    
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    z-index: 50;
+}
+
+.ButtonBar div:hover {
+   background-color: #E9E9E9;
+   cursor: pointer;
+}
+
+.ButtonBar div span {
+   display: none;
+}
+
+.ButtonBar div.ButtonOff {
+   display: none;
+   cursor: auto;
+   opacity: 0.3;
+}
+.ButtonBar div.ButtonOff:hover {
+   background-color: white;
+}
+
+.ButtonBar .ButtonBarBold { background-image: url('images/bold.png'); }
+.ButtonBar .ButtonBarItalic { background-image: url('images/italic.png'); }
+.ButtonBar .ButtonBarUnderline { background-image: url('images/underline.png'); }
+.ButtonBar .ButtonBarStrike { background-image: url('images/strike.png'); }
+.ButtonBar .ButtonBarCode { background-image: url('images/code.png'); }
+.ButtonBar .ButtonBarImage { background-image: url('images/image.png'); }
+.ButtonBar .ButtonBarUrl { background-image: url('images/url.png'); }
+.ButtonBar .ButtonBarQuote { background-image: url('images/quote.png'); }
+.ButtonBar .ButtonBarSpoiler { background-image: url('images/spoiler.png'); }

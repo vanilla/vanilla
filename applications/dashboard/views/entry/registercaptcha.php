@@ -28,6 +28,7 @@
             echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.T('Name Unavailable').'</span>';
          ?>
       </li>
+      <?php $this->FireEvent('RegisterBeforePassword'); ?>
       <li>
          <?php
             echo $this->Form->Label('Password', 'Password');
@@ -60,6 +61,7 @@
          echo $this->Form->Label("Security Check", '');
          echo recaptcha_get_html($CaptchaPublicKey, NULL, $CaptchaSSL);
       ?></li>
+      <?php $this->FireEvent('RegisterFormBeforeTerms'); ?>
       <li>
          <?php
             echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));

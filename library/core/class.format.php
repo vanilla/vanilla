@@ -47,6 +47,7 @@ class Gdn_Format {
     * @return string
     */
    public static function ActivityHeadline($Activity, $ProfileUserID = '', $ViewingUserID = '') {
+      $Activity = (object)$Activity;
       if ($ViewingUserID == '') {
          $Session = Gdn::Session();
          $ViewingUserID = $Session->IsValid() ? $Session->UserID : -1;

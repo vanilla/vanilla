@@ -955,11 +955,7 @@ class CommentModel extends VanillaModel {
             ->CountComments;
 
          // Save to the attributes column of the user table for this user.
-         $this->SQL
-            ->Update('User')
-            ->Set('CountComments', $CountComments)
-            ->Where('UserID', $UserID)
-            ->Put();
+         Gdn::UserModel()->SetField($UserID, 'CountComments', $CountComments);
       }
    }
    

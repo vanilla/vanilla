@@ -969,8 +969,8 @@ class ActivityModel extends Gdn_Model {
       
       // Check the user's preference.
       if ($Preference) {
-         list($Popup, $Email) = self::NotificationPreference($Preference, $Data['NotifyUserID'], 'both');
-         if (!$Popop && !$Email && !GetValue('Force', $Options))
+         list($Popup, $Email) = self::NotificationPreference($Preference, $Activity['NotifyUserID'], 'both');
+         if (!$Popup && !$Email && !GetValue('Force', $Options))
             return;
          
          if ($Popup)
@@ -979,10 +979,41 @@ class ActivityModel extends Gdn_Model {
             $Activity['Emailed'] = self::SENT_PENDING;
       }
       
+      $ActivityType = self::GetActivityType($Activity['ActivityType']);
+      $Activity['ActivityTypeID'] = ArrayValue('ActivityTypeID', $ActivityType);
+      
+      $NotificationInc = $Activity['NotifyUserID'] > 0 ? 1 : 0;
+      
+      if ($GroupBy = GetValue('GroupBy', $Options)) {
+         $GroupBy = (array)$GroupBy;
+         $Where = array();
+         foreach ($GroupBy as $ColumnName) {
+            $Where[$ColumnName] = $Activity[$ColumnName];
+         }
+         $Where['NotifyUserID'] = $Activity['NotifyUserID'];
+         // Make sure to only group activities by day.
+         $Where['DateInserted >'] = Gdn_Format::ToDateTime(strtotime('-1 day'));
+         
+         // See if there is another activity to group these into.
+         $GroupActivity = $this->SQL->GetWhere(
+            'Activity', 
+            $Where)->FirstRow(DATASET_TYPE_ARRAY);
+         
+         if ($GroupActivity) {
+            $GroupActivity['Data'] = @unserialize($GroupActivity['Data']);
+            $Activity = $this->MergeActivities($GroupActivity, $Activity);
+            $NotificationInc = 0;
+         }
+      }
+      
+      if ($Activity['Emailed'] == self::SENT_PENDING) {
+         $this->Email($Activity);
+      }
+      
+      $ActivityData = $Activity['Data'];
       if (isset($Activity['Data']) && is_array($Activity['Data'])) {
          $Activity['Data'] = serialize($Activity['Data']);
       }
-      $Activity['ActivityTypeID'] = ArrayValue('ActivityTypeID', self::GetActivityType($Activity['ActivityType']));
       
       $this->DefineSchema();
       $Activity = $this->FilterSchema($Activity);
@@ -990,14 +1021,21 @@ class ActivityModel extends Gdn_Model {
       $ActivityID = GetValue('ActivityID', $Activity);
       if (!$ActivityID) {
          $this->AddInsertFields($Activity);
+         TouchValue('DateUpdated', $Activity, $Activity['DateInserted']);
          $ActivityID = $this->SQL->Insert('Activity', $Activity);
          $Activity['ActivityID'] = $ActivityID;
       } else {
-         $this->AddUpdateFields($Activity);
+         $Activity['DateUpdated'] = Gdn_Format::ToDateTime();
          unset($Activity['ActivityID']);
          $this->SQL->Put('Activity', $Activity, array('ActivityID' => $ActivityID));
          $Activity['ActivityID'] = $ActivityID;
       }
+      $Activity['Data'] = $ActivityData;
+      
+      if ($NotificationInc > 0) {
+         Gdn::UserModel()->SetField($Activity['NotifyUserID'], 'CountNotifications', $NotificationInc);
+      }
+      
       return $Activity;
    }
    

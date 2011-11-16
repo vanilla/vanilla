@@ -2425,6 +2425,14 @@ class UserModel extends Gdn_Model {
          $this->ClearCache ($RowID, array('permissions'));
       else
          $this->UpdateUserCache($RowID, $Property, $Value);
+      
+      if (!is_array($Property))
+         $Property = array($Property => $Value);
+      
+      $this->EventArguments['UserID'] = $RowID;
+      $this->EventArguments['Fields'] = $Property;
+      $this->FireEvent('AfterSetField');
+      
 		return $Value;
    }
    

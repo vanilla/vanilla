@@ -729,6 +729,22 @@ class Gdn_Format {
          return $Result;
       }
    }
+   
+   /**
+    * Format a string as plain text.
+    * @param string $Body The text to format.
+    * @param string $Format The current format of the text.
+    * @return string
+    * @since 2.1
+    */
+   public static function PlainText($Body, $Format = 'Html') {
+      $Result = Gdn_Format::To($Body, $Format);
+      
+      if ($Format != 'Text')
+         $Result = Gdn_Format::Text($Result, FALSE);
+      $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
+      return $Result;
+   }
 
    public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
       $Regex = "`([<>])`i";

@@ -306,7 +306,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $sql .= implode("\n", $this->_Joins);
       }
 
-      $sql .= " set \n ".implode(",\n ", $Sets);
+      $sql .= "\nset ".implode(",\n ", $Sets);
       if (is_array($Where) && count($Where) > 0) {
          $sql .= "\nwhere ".implode("\n ", $Where);
 

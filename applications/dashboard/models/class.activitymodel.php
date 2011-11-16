@@ -149,7 +149,7 @@ class ActivityModel extends Gdn_Model {
             ->Put();
          
          // Delete comments on the activity item
-         parent::Delete(array('CommentActivityID' => $ActivityID), FALSE, TRUE);
+         $this->SQL->Delete('ActivityComment', array('ActivityID' => $ActivityID));
          // Delete the activity item
          parent::Delete(array('ActivityID' => $ActivityID));
       }
@@ -284,8 +284,7 @@ class ActivityModel extends Gdn_Model {
       $this->SQL
          ->Select('a.ActivityID', 'count', 'ActivityCount')
          ->From('Activity a')
-         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
-         ->Where('a.CommentActivityID is null');
+         ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID');
       
       if ($UserID != '') {
          $this->SQL
@@ -334,7 +333,6 @@ class ActivityModel extends Gdn_Model {
       $Result = $this->SQL
          ->Join('UserRole ur', 'a.ActivityUserID = ur.UserID')
          ->WhereIn('ur.RoleID', $RoleID)
-         ->Where('a.CommentActivityID is null')
          ->Where('t.Public', '1')
          ->OrderBy('a.DateInserted', 'desc')
          ->Limit($Limit, $Offset)
@@ -364,7 +362,6 @@ class ActivityModel extends Gdn_Model {
          ->Join('ActivityType t', 'a.ActivityTypeID = t.ActivityTypeID')
          ->Join('UserRole ur', 'a.ActivityUserID = ur.UserID')
          ->WhereIn('ur.RoleID', $RoleID)
-         ->Where('a.CommentActivityID is null')
          ->Where('t.Public', '1')
          ->Get()
          ->FirstRow()
@@ -380,11 +377,12 @@ class ActivityModel extends Gdn_Model {
     * @return DataSet A single SQL result.
     */
    public function GetID($ActivityID) {
-      $this->ActivityQuery();
-      return $this->SQL
-         ->Where('a.ActivityID', $ActivityID)
-         ->Get()
-         ->FirstRow();
+      $Activity = parent::GetID($ActivityID);
+      $this->CalculateRow($Activity);
+      $Activities = array($Activity);
+      self::JoinUsers($Activities);
+      
+      return $Activity;
    }
    
    /**

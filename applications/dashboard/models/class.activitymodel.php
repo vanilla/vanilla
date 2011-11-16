@@ -93,6 +93,14 @@ class ActivityModel extends Gdn_Model {
          }
       }
       
+      $Data = $Row['Data'];
+      if (isset($Data['ActivityUserIDs']))
+         $Row['ActivityUserID'] = array_merge(array($Row['ActivityUserID']), $Data['ActivityUserIDs']);
+      
+      if (isset($Data['RegardingUserIDs']))
+         $Row['RegardingUserID'] = array_merge(array($Row['RegardingUserID']), $Data['RegardingUserIDs']);
+      
+      
       $Row['Url'] = ExternalUrl($Row['Route']);
       
       if ($Row['HeadlineFormat']) {
@@ -172,7 +180,7 @@ class ActivityModel extends Gdn_Model {
       $this->ActivityQuery(FALSE);
       $Result = $this->SQL
          ->Where($Where)
-         ->OrderBy('a.DateInserted', 'desc')
+         ->OrderBy('a.DateUpdated', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
       Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender')));
@@ -947,6 +955,51 @@ class ActivityModel extends Gdn_Model {
          $Activity['ActivityID'] = $ActivityID;
       }
       return $Activity;
+   }
+   
+   public function MergeActivities($OldActivity, $NewActivity, $Options = array()) {
+      $GroupHeadlineFormat = GetValue('GroupHeadlineFormat', $Options, $NewActivity['HeadlineFormat']);
+      $GroupStory = GetValue('GroupStory', $Options, $NewActivity['Story']);
+      
+//      decho($OldActivity, 'OldAct');
+
+      // Group the two activities together.
+      $ActivityUserIDs = GetValue('ActivityUserIDs', $OldActivity['Data'], array());
+      array_unshift($ActivityUserIDs, $OldActivity['ActivityUserID']);
+      if (($i = array_search($NewActivity['ActivityUserID'], $ActivityUserIDs)) !== FALSE) {
+         unset($ActivityUserIDs[$i]);
+         $ActivityUserIDs = array_values($ActivityUserIDs);
+      }
+      $ActivityUserIDs = array_unique($ActivityUserIDs);
+//      decho($ActivityUserIDs, 'AIDs');
+      
+      if (GetValue('RegardingUserID', $NewActivity)) {
+         $RegardingUserIDs = GetValue('RegardingUserIDs', $OldActivity['Data'], array());
+         array_unshift($RegardingUserIDs, $OldActivity['RegardingUserID']);
+         if (($i = array_search($NewActivity['RegardingUserID'])) !== FALSE) {
+            unset($RegardingUserIDs[$i]);
+            $RegardingUserIDs = array_values($RegardingUserIDs);
+         }
+      }
+
+      $RecordIDs = GetValue('RecordIDs', $GroupData, array());
+      if ($OldActivity['RecordID'])
+         $RecordIDs[] = $OldActivity['RecordID'];
+      $RecordIDs = array_unique($RecordIDs);
+
+      $NewActivity = array_merge($OldActivity, $NewActivity);
+      
+      if (count($ActivityUserIDs) > 0)
+         $NewActivity['Data']['ActivityUserIDs'] = $ActivityUserIDs;
+      if (count($RecordIDs) > 0)
+         $NewActivity['Data']['RecordIDs'] = $RecordIDs;
+      if (isset($RegardingUserIDs) && count($RegardingUserIDs) > 0) {
+         $NewActivity['Data']['RegardingUserIDs'] = $RegardingUserIDs;
+      }
+      
+//      decho($NewActivity, 'MergedActivity');
+//      die();
+      return $NewActivity;
    }
    
    public function SaveQueue() {

@@ -88,8 +88,13 @@ class ActivityModel extends Gdn_Model {
             $Row['Photo'] = $Row['ActivityPhoto'];
          else {
             $User = Gdn::UserModel()->GetID($Row['ActivityUserID'], DATASET_TYPE_ARRAY);
-            if ($User)
-               $Row['Photo'] = Gdn_Upload::Url($User['Photo']);
+            if ($User) {
+               $Photo = $User['Photo'];
+               if (!$Photo || StringBeginsWith($Photo, 'http'))
+                  $Row['Photo'] = $Photo;
+               else
+                  $Row['Photo'] = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+            }
          }
       }
       

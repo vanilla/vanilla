@@ -839,7 +839,7 @@ jQuery(document).ready(function($) {
 	
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
    var notificationsPinging = 0;
-	pingForNotifications = function() {
+	var pingForNotifications = function() {
       if (notificationsPinging > 0)
          return;
       notificationsPinging++;
@@ -861,6 +861,7 @@ jQuery(document).ready(function($) {
       });
 	}
    if (gdn.definition('SignedIn', '0') != '0') {
+      pingForNotifications();
       setInterval(pingForNotifications, 60000);
    }
 	

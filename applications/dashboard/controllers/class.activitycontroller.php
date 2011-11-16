@@ -29,6 +29,11 @@ class ActivityController extends Gdn_Controller {
     */
    public $Uses = array('Database', 'Form', 'ActivityModel');
    
+   /**
+    * @var ActivityModel
+    */
+   public $ActivityModel;
+   
    public function __get($Name) {
       switch ($Name) {
          case 'CommentData':
@@ -228,16 +233,47 @@ class ActivityController extends Gdn_Controller {
       $this->Render();
    }
    
-   public function Post() {
+   public function Post($UserID = FALSE) {
       $this->Permission('Garden.Profiles.Edit');
+      $Activities = array();
+      
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
          
+         
+         
+         if ($UserID && $UserID != Gdn::Session()->UserID) {
+            // This is a wall post.
+            $Activity = array(
+                'ActivityType' => 'WallPost',
+                'ActivityUserID' => $UserID,
+                'RegardingUserID' => Gdn::Session()->UserID,
+                'HeadlineFormat' => T('HeadlineFormat.WallPost', '{RegardingUserID,you} &rarr; {ActivityUserID,you}'),
+                'Story' => $Data['Comment']
+            );
+         } else {
+            // This is a status update.
+            $Activity = array(
+                'ActivityType' => 'Status',
+                'HeadlineFormat' => T('HeadlineFormat.Status', '{ActivityUserID,user}'),
+                'Story' => $Data['Comment']
+            );
+         }
+         
+         $Activity = $this->ActivityModel->Save($Activity);
+         if ($Activity) {
+            Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', $Activity['Story']);
+            
+            $Activities = array($Activity);
+            $this->ActivityModel->CalculateData($Activities);
+            ActivityModel::JoinUsers($Activities);
+         }
       }
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
-         Redirect('/activity');
+         Redirect($this->Request->Get('Target', '/activity'));
       }
       
-      $this->Render();
+      $this->SetData('Activities', $Activities);
+      $this->Render('Activities');
    }
 }

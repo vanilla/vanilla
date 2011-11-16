@@ -6,6 +6,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
    $ActivityType = $ActivityType[0];
    $Author = UserBuilder($Activity, 'Activity');
+   $Author->Photo = $Activity->Photo;
    $PhotoAnchor = UserPhoto($Author, 'Photo');
    $CssClass = 'Item Activity '.$ActivityType;
    if ($PhotoAnchor != '')
@@ -51,9 +52,11 @@ function WriteActivity($Activity, &$Sender, &$Session) {
       <?php echo $Title; ?>
       <div class="Excerpt"><?php echo $Excerpt; ?></div>
       <div class="Meta">
-         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateInserted); ?></span>
+         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateUpdated); ?></span>
          <?php
-         if ($Activity->AllowComments == '1' && $Session->CheckPermission('Garden.Profiles.Edit'))
+         $AllowComments = $Activity->NotifyUserID < 0;
+         
+         if ($AllowComments && $Session->CheckPermission('Garden.Profiles.Edit'))
             echo '<span class="MItem AddComment">'.Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
          
          $Sender->FireEvent('AfterMeta');
@@ -61,7 +64,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
       </div>
    </div>
    <?php
-   $Comments = $Activity->Comments;
+   $Comments = GetValue('Comments', $Activity, array());
    if (count($Comments) > 0) {
       echo '<ul class="DataList ActivityComments">';
       foreach ($Comments as $Comment) {

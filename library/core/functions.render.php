@@ -104,6 +104,49 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
+if (!function_exists('FormatSelf')) {
+   function FormatUsername($User, $Format, $ViewingUserID = FALSE) {
+      if ($ViewingUserID === FALSE)
+         $ViewingUserID = Gdn::Session()->UserID;
+      $UserID = GetValue('UserID', $User);
+      $Name = GetValue('Name', $User);
+      $Gender = strtolower(GetValue('Gender', $User));
+      
+      $UCFirst = substr($Format, 0, 1) == strtoupper(substr($Format, 0, 1));
+      
+      
+      switch (strtolower($Format)) {
+         case 'you':
+            if ($ViewingUserID == $UserID)
+               return T("Format $Format", $Format);
+            return $Name;
+         case 'his':
+         case 'her':
+         case 'your':
+            if ($ViewingUserID == $UserID)
+               return T("Format Your", 'Your');
+            else {
+               switch ($Gender) {
+                  case 'm':
+                     $Format = 'his';
+                     break;
+                  case 'f':
+                     $Format = 'her';
+                     break;
+                  default:
+                     $Format = 'their';
+                     break;
+               }
+               if ($UCFirst)
+                  $Format = ucfirst($Format);
+               return T("Format $Format", $Format);
+            }
+         default:
+            return $Name;
+      }
+   }
+}
+
 if (!function_exists('HoverHelp')) {
    function HoverHelp($String, $Help) {
       return Wrap($String.Wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));

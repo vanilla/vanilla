@@ -918,11 +918,21 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             $Result = urlencode($Value);
             break;
          case 'user':
+         case 'you':
+         case 'his':
+         case 'her':
+         case 'your':
+            $Result = print_r($Value, TRUE);
             $ArgsBak = $Args;
+            if (is_array($Value) && count($Value) == 1)
+               $Value = array_shift($Value);
+            
             if (is_array($Value)) {
                $Result = '';
                for ($i = 0; $i < count($Value); $i++) {
                   $User = Gdn::UserModel()->GetID($Value[$i]);
+                  $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+                  
                   if ($i == count($Value) - 1)
                      $Result .= ' '.T('sep and', 'and').' ';
                   elseif ($i > 0)
@@ -931,6 +941,8 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                }
             } else {
                $User = Gdn::UserModel()->GetID($Value);
+               $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+               
                $Result = UserAnchor($User);
             }
                

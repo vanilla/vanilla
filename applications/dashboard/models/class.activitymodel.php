@@ -688,6 +688,75 @@ class ActivityModel extends Gdn_Model {
       }
    }
    
+   public function Email(&$Activity) {
+      if (is_numeric($Activity)) {
+         $ActivityID = $Activity;
+         $Activity = $this->GetID($ActivityID);
+      } else {
+         $ActivityID = GetValue('ActivityID', $Activity);
+      }
+      
+      if (!$Activity)
+         return FALSE;
+      
+      $Activity = (array)$Activity;
+      
+      $User = Gdn::UserModel()->GetID($Activity['NotifyUserID'], DATASET_TYPE_ARRAY);
+      if (!$User)
+         return FALSE;
+      
+      // Format the activity headline based on the user being emailed.
+      if ($Activity['HeadlineFormat']) {
+         $SessionUserID = Gdn::Session()->UserID;
+         Gdn::Session()->UserID = $User['UserID'];
+         $Activity['Headline'] = FormatString($Activity['HeadlineFormat'], $Activity);
+         Gdn::Session()->UserID = $SessionUserID;
+      } else {
+         $Activity['Headline'] = Gdn_Format::ActivityHeadline($Activity, '', $User['UserID']);
+      }
+      
+      // Build the email to send.
+      $Email = new Gdn_Email();
+      $Email->Subject(sprintf(T('[%1$s] %2$s'), C('Garden.Title'), Gdn_Format::PlainText($Activity['Headline'])));
+      $Email->To($User['Email'], $User['Name']);
+      
+      $Url = ExternalUrl($Activity['Route'] == '' ? '/' : $Activity['Route']);
+      
+      if ($Activity['Story']) {
+         $Message = sprintf(T('EmailStoryNotification', "%3\$s\n\n%2\$s"), 
+               Gdn_Format::PlainText($Activity['Headline']),
+               $Url,
+               Gdn_Format::PlainText($Activity['Story'])
+            );
+      } else {
+         $Message = sprintf(T('EmailNotification', "%1\$s\n\n%2\$s"), Gdn_Format::PlainText($Activity['Headline']), $Url); 
+      }
+      $Email->Message($Message);
+      
+      // Fire an event for the notification.
+      $Notification = array('ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity['Route'], 'Story' => $Activity['Story'], 'Headline' => $Activity['Headline'], 'Activity' => $Activity);
+      $this->EventArguments = $Notification;
+      $this->FireEvent('BeforeSendNotification');
+      
+      // Send the email.
+      try {
+         $Email->Send();
+         $Emailed = self::SENT_OK;
+      } catch (phpmailerException $pex) {
+         if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
+            $Emailed = self::SENT_FAIL;
+         else
+            $Emailed = self::SENT_ERROR;
+      } catch (Exception $ex) {
+         $Emailed = self::SENT_FAIL; // similar to http 5xx
+      }
+      $Activity['Emaailed'] = $Emailed;
+      if ($ActivityID) {
+         // Save the emailed flag back to the activity.
+         $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
+      }
+   }
+   
    /**
     * @var array The Notification Queue is used to stack up notifications to users. Ensures
     * that they only receive one notification about a single topic. For example:
@@ -776,6 +845,16 @@ class ActivityModel extends Gdn_Model {
       // Clear out the queue
       unset($this->_NotificationQueue);
       $this->_NotificationQueue = array();
+   }
+   
+   public function SetNotified($ActivityIDs) {
+      if (!is_array($ActivityIDs) || count($ActivityIDs) == 0)
+         return;
+      
+      $this->SQL->Update('Activity')
+         ->Set('Notified', self::SENT_OK)
+         ->WhereIn('ActivityID', $ActivityIDs)
+         ->Put();
    }
    
    /**

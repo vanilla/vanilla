@@ -514,33 +514,27 @@ class ActivityModel extends Gdn_Model {
     * @param mixed $SendEmail
     * @return int ActivityID of item created.
     */
-   public function Add($ActivityUserID, $ActivityType, $Story = '', $RegardingUserID = '', $CommentActivityID = '', $Route = '', $SendEmail = '') {
+   public function Add($ActivityUserID, $ActivityType, $Story = NULL, $RegardingUserID = NULL, $CommentActivityID = NULL, $Route = NULL, $SendEmail = '') {
       static $ActivityTypes = array();
 
-      // Get the ActivityTypeID & see if this is a notification
-      if (isset($ActivityTypes[$ActivityType])) {
-         $ActivityTypeRow = $ActivityTypes[$ActivityType];
-      } else {
-         $ActivityTypeRow = $this->SQL
-            ->Select('ActivityTypeID, Name, Notify')
-            ->From('ActivityType')
-            ->Where('Name', $ActivityType)
-            ->Get()
-            ->FirstRow();
-
-         $ActivityTypes[$ActivityType] = $ActivityTypeRow;
-      }
+      // Get the ActivityTypeID & see if this is a notification.
+      $ActivityTypeRow = self::GetActivityType($ActivityType);
          
       if ($ActivityTypeRow !== FALSE) {
-         $ActivityTypeID = $ActivityTypeRow->ActivityTypeID;
-         $Notify = $ActivityTypeRow->Notify == '1';
+         $ActivityTypeID = $ActivityTypeRow['ActivityTypeID'];
+         $Notify = (bool)$ActivityTypeRow['Notify'];
       } else {
          trigger_error(ErrorMessage(sprintf('Activity type could not be found: %s', $ActivityType), 'ActivityModel', 'Add'), E_USER_ERROR);
       }
-      if ($ActivityTypeRow->Name == 'ActivityComment' && $Story == '') {
-         $this->Validation->AddValidationResult('Body', 'You must provide a comment.');
-         return FALSE;
-      }
+      
+      $Activity = array(
+          'ActivityUserID' => $ActivityUserID,
+          'ActivityType' => $ActivityType,
+          'Story' => $Story,
+          'RegardingUserID' => $RegardingUserID,
+          'Route' => $Route
+      );
+      
 
       // Massage $SendEmail to allow for only sending an email.
       $QueueEmail = FALSE;
@@ -556,62 +550,30 @@ class ActivityModel extends Gdn_Model {
          $AddActivity = TRUE;
       }
       
-      if ($AddActivity && $Notify) {
-         // Only add the activity if the user wants to be notified in some way.
-         $RegardingUser = Gdn::UserModel()->GetID($RegardingUserID);
-         if ($SendEmail != 'Force' && !self::NotificationPreference($ActivityType, GetValue('Preferences', $RegardingUser))) {
-//            echo "User doesn't want to be notified...";
-            return FALSE;
-         }
-      }
-         
-      // If this is a notification, increment the regardinguserid's count.
-      if ($Notify) {
-         $this->SQL
-            ->Update('User')
-            ->Set('CountNotifications', 'coalesce(CountNotifications) + 1', FALSE)
-            ->Where('UserID', $RegardingUserID)
-            ->Put();
-      }
-      
-      $Fields = array('ActivityTypeID' => $ActivityTypeID,
-         'ActivityUserID' => $ActivityUserID
-      );
-      if ($Story != '')
-         $Fields['Story'] = $Story;
-         
-      if ($Route != '')
-         $Fields['Route'] = $Route;
-         
-      if (is_numeric($RegardingUserID)) {
-         $Fields['RegardingUserID'] = $RegardingUserID;
-         $Fields['NotifyUserID'] = $RegardingUserID;
-      }
-         
-      if (is_numeric($CommentActivityID))
-         $Fields['CommentActivityID'] = $CommentActivityID;
-
-//      if ($AddActivity) {
-         $this->AddInsertFields($Fields);
-         $this->DefineSchema();
-         $ActivityID = $this->Insert($Fields); // NOTICE! This will silently fail if there are errors. Developers can figure out what's wrong by dumping the results of $this->ValidationResults();
-//      }
-
       // If $SendEmail was FALSE or TRUE, let it override the $Notify setting.
       if ($SendEmail === FALSE || $SendEmail === TRUE)
          $Notify = $SendEmail;
+      
+      $Preference = FALSE;
+      if ($Notify && $RegardingUserID) {
+         $Activity['NotifyUserID'] = $Activity[$RegardingUserID];
+         $Preference = $ActivityType;
+      } else {
+         $Activity['NotifyUserID'] = self::NOTIFY_PUBLIC;
+      }
 
       // Otherwise let the decision to email lie with the $Notify setting.
-
-      // Send a notification to the user.
-      if ($Notify) {
-         if ($QueueEmail)
-            $this->QueueNotification($ActivityID, $Story, 'last', $SendEmail == 'Force');
-         else
-            $this->SendNotification($ActivityID, $Story, $SendEmail == 'Force');
+      if ($SendEmail == 'Force') {
+         $Activity['Emailed'] = self::SENT_PENDING;
       }
       
-      return $ActivityID;
+      $Activity = $this->Save($Activity, $Preference);
+      
+      return GetValue('ActivityID', $Activity);
+   }
+   
+   public static function JoinUsers(&$Activities) {
+      Gdn::UserModel()->JoinUsers($Activities, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender')));
    }
    
    /**

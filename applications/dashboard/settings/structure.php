@@ -348,13 +348,14 @@ $NotifiedExists = $Construct->ColumnExists('Notified');
 $EmailedExists = $Construct->ColumnExists('Emailed');
 $CommentActivityIDExists = $Construct->ColumnExists('CommentActivityID');
 $NotifyUserIDExists = $Construct->ColumnExists('NotifyUserID');
+$DateUpdatedExists = $Construct->ColumnExists('DateUpdated');
 
 $Construct
 	->PrimaryKey('ActivityID')
    ->Column('ActivityTypeID', 'int')
    ->Column('NotifyUserID', 'int', 0, 'index') // user being notified or -1: public, -2 mods, -3 admins
    ->Column('ActivityUserID', 'int', TRUE, 'key')
-   ->Column('RegardingUserID', 'int', TRUE, 'key') // deprecated?
+   ->Column('RegardingUserID', 'int', TRUE) // deprecated?
    ->Column('Photo', 'varchar(255)', TRUE)
    ->Column('HeadlineFormat', 'varchar(255)', TRUE)
    ->Column('Story', 'text', TRUE)
@@ -362,9 +363,10 @@ $Construct
    ->Column('RecordType', 'varchar(20)', TRUE)
    ->Column('RecordID', 'int', TRUE)
 //   ->Column('CountComments', 'int', '0')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
+   ->Column('InsertUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('DateUpdated', 'datetime', !$DateUpdatedExists, 'index')
    ->Column('Notified', 'tinyint(1)', 0)
    ->Column('Emailed', 'tinyint(1)', 0)
    ->Column('Data', 'text', TRUE)
@@ -375,6 +377,12 @@ if (!$EmailedExists) {
 }
 if (!$NotifiedExists) {
    $SQL->Put('Activity', array('Notified' => 1));
+}
+
+if (!$DateUpdatedExists) {
+   $SQL->Update('Activity')
+      ->Set('DateUpdated', 'DateInserted', FALSE, FALSE)
+      ->Put();
 }
 
 if (!$NotifyUserIDExists && $ActivityExists) {
@@ -472,6 +480,8 @@ if (!$WallPostType) {
 
 $ActivityModel = new ActivityModel();
 $ActivityModel->DefineType('Default');
+$ActivityModel->DefineType('Registration');
+$ActivityModel->DefineType('Status');
 
 // Message Table
 $Construct->Table('Message')

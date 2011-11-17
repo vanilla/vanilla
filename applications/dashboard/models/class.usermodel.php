@@ -482,6 +482,9 @@ class UserModel extends Gdn_Model {
       if (is_object($User) && $DatasetType == DATASET_TYPE_ARRAY)
          $User = (array)$User;
       
+      $this->EventArguments['LoadedUser'] = &$User;
+      $this->FireEvent('AfterGetID');
+      
       return $User;
    }
    
@@ -532,6 +535,10 @@ class UserModel extends Gdn_Model {
             $Result = $this->UserCache($DatabaseUser);
          }
       }
+      
+      $this->EventArguments['RequestedIDs'] = $IDs;
+      $this->EventArguments['LoadedUsers'] = &$Data;
+      $this->FireEvent('AfterGetIDs');
       
       return $Data;
    }

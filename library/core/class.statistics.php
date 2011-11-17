@@ -349,6 +349,9 @@ class Gdn_Statistics extends Gdn_Plugin {
       Gdn::Statistics()->Tick();
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      
+      $this->FireEvent("AnalyticsTick");
+      
       $Sender->Render('tick','statistics','dashboard');
    }
    

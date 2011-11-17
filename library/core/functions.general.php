@@ -835,7 +835,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    // Parse out the field and format.
    $Parts = explode(',', $Match);
    $Field = trim($Parts[0]);
-   $Format = strtolower(trim(GetValue(1, $Parts, '')));
+   $Format = trim(GetValue(1, $Parts, ''));
    $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
    $FomatArgs = GetValue(3, $Parts, '');
 

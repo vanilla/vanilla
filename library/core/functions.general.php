@@ -987,11 +987,7 @@ if (!function_exists('FormatArrayAssignment')) {
       } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
          $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
       } else {
-         if (strpos($Value, "'") !== FALSE) {
-            $Array[] = $Prefix .= ' = "'.Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value)).'";';
-         } else {
-            $Array[] = $Prefix .= " = '".Gdn_Format::ArrayValueForPhp($Value)."';";
-         }
+         $Array[] = $Prefix .= ' = '.var_export($Value, TRUE).';';
       }
    }
 }

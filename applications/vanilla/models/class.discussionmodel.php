@@ -482,6 +482,10 @@ class DiscussionModel extends VanillaModel {
    public function GetCount($Wheres = '', $ForceNoAnnouncements = FALSE) {
       $Session = Gdn::Session();
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
+      
+      $this->EventArguments['Wheres'] = &$Wheres;
+      $this->FireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results
+      
       if (is_array($Wheres) && count($Wheres) == 0)
          $Wheres = '';
       
@@ -490,6 +494,8 @@ class DiscussionModel extends VanillaModel {
          $Perms = CategoryModel::CategoryWatch();
       else
          $Perms = self::CategoryPermissions();
+      
+      $Count = 0;
       
       if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
          // Grab the counts from the faster category cache.
@@ -502,48 +508,31 @@ class DiscussionModel extends VanillaModel {
          }
          
          $Categories = CategoryModel::Categories();
-         $Count = 0;
          
          foreach ($Categories as $Cat) {
             if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms))
                continue;
             $Count += (int)$Cat['CountDiscussions'];
          }
-         return $Count;
+      } else {
+         if($Perms !== TRUE) {
+            $this->SQL->WhereIn('c.CategoryID', $Perms);
+         }
+         
+         $this->SQL
+            ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+            ->From('Discussion d')
+            ->Join('Category c', 'd.CategoryID = c.CategoryID')
+            ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
+            ->Where($Wheres);
+         
+         $Count = $this->SQL
+            ->Get()
+            ->FirstRow()
+            ->CountDiscussions;
       }
       
-      
-//      if($Perms !== TRUE) {
-//         $this->SQL->WhereIn('c.CategoryID', $Perms);
-//      }
-//      
-//      $this->EventArguments['Wheres'] = &$Wheres;
-//		$this->FireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results
-//         
-//      // Small optimization for basic queries
-//      if ($Wheres == '') {
-//         $this->SQL
-//            ->Select('c.CountDiscussions', 'sum', 'CountDiscussions')
-//            ->From('Category c');
-//      } else {
-//         $this->SQL
-//	         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
-//	         ->From('Discussion d')
-//            ->Join('Category c', 'd.CategoryID = c.CategoryID')
-//	         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
-//            ->Where($Wheres);
-//      }
-//      
-//      $Result = $this->SQL
-//         ->Get()
-//         ->FirstRow()
-//         ->CountDiscussions;
-//      
-//      if (isset($Count) && $Result != $Count) {
-//         throw new Exception("Result: $Result, Count: $Count");
-//      }
-//      
-//      return $Result;
+      return $Count;
    }
 
    /**

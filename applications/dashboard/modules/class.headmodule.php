@@ -193,7 +193,9 @@ if (!class_exists('HeadModule', FALSE)) {
             $TagName = $Collection[self::TAG_KEY];
 
             if ($TagName == $Tag) {
-               if ($Query && count(array_intersect_assoc($Query, $Collection)) == count($Query)) {
+               // If no property is specified and the tag is found, remove it directly.
+               // Otherwise remove it only if all specified property/value pairs match.
+               if (!$Query || count(array_intersect_assoc($Query, $Collection)) == count($Query)) {
                   unset($this->_Tags[$Index]);
                }
             }

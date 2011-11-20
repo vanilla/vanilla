@@ -472,6 +472,10 @@ jQuery(document).ready(function($) {
       },
       
       PerformMarkdown: function(TextArea, Operation) {
+         var htmlOpts = {
+            opener: '<',
+            closer: '>'
+         }
          var markdownOpts = {
             opener: '',
             closer: '',
@@ -492,7 +496,7 @@ jQuery(document).ready(function($) {
                break;
 
             case 'strike':
-               $(TextArea).insertRoundTag('-',markdownOpts);
+               $(TextArea).insertRoundTag('del',htmlOpts);
                break;
 
             case 'code':
@@ -501,12 +505,23 @@ jQuery(document).ready(function($) {
 
             case 'image':
                var thisOpts = $.extend(markdownOpts, {
-                  prefix:'!',
                   opentag:'(',
                   closetag:')',
                   opener:'',
                   closer:''
                });
+
+               var hasSelection = $(TextArea).hasSelection();
+               if (hasSelection !== false)
+                  var NewURL = hasSelection;
+               else {
+                  var NewURL = prompt("Enter your URL:",'http://');
+                  thisOpts.prepend = NewURL;
+               }
+               
+               var GuessText = NewURL.replace('http://','').replace('www.','');
+               thisOpts.prefix = '!['+GuessText+']';
+               
                $(TextArea).insertRoundTag('',thisOpts);
                break;
 
@@ -532,7 +547,7 @@ jQuery(document).ready(function($) {
 
             case 'quote':
                var thisOpts = $.extend(markdownOpts, {
-                  prefix:'> ',
+                  prefix:'\n> ',
                   opentag:'',
                   closetag:'',
                   opener:'',

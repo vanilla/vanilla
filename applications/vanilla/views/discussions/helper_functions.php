@@ -136,7 +136,7 @@ function WriteFilterTabs($Sender) {
       <?php
          $Sender->FireEvent('AfterBookmarksTab');
       }
-      if ($CountDiscussions > 0 || $Sender->RequestMethod == 'mine') {
+      if (($CountDiscussions > 0 || $Sender->RequestMethod == 'mine') && C('Vanilla.Discussions.ShowMineTab', TRUE)) {
       ?>
       <li<?php echo $Sender->RequestMethod == 'mine' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDiscussions, '/discussions/mine', 'MyDiscussions TabLink'); ?></li>
       <?php

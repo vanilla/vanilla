@@ -1190,6 +1190,10 @@ pre {
    display: block;
    margin: 1em 0;
 }
+pre code {
+   border: none;
+   padding: 0;
+}
 .Message strong, .Message b {
    font-weight: bold;
 }

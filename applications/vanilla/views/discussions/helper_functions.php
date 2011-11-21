@@ -15,8 +15,11 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $Sender->EventArguments['CssClass'] = &$CssClass;
+   
    $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
+   $Sender->EventArguments['FirstUser'] = &$First;
+   $Sender->EventArguments['LastUser'] = &$Last;
    
    $Sender->FireEvent('BeforeDiscussionName');
    
@@ -52,6 +55,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
          <?php if ($Discussion->Closed == '1') { ?>
          <span class="Tag Closed"><?php echo T('Closed'); ?></span>
          <?php } ?>
+         <?php $Sender->FireEvent('AfterDiscussionLabels'); ?>
          <span class="MItem CommentCount"><?php 
             printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
          ?></span>
@@ -105,13 +109,13 @@ function WriteFilterTabs($Sender) {
    }
    if ($CountBookmarks === NULL) {
       $Bookmarked .= '<span class="Popin" rel="'.Url('/discussions/UserBookmarkCount').'">-</span>';
-   } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0)
+   } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
       $Bookmarked .= '<span>'.$CountBookmarks.'</span>';
 
-   if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
+   if (is_numeric($CountDiscussions) && $CountDiscussions > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
       $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';
 
-   if (is_numeric($CountDrafts) && $CountDrafts > 0)
+   if (is_numeric($CountDrafts) && $CountDrafts > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
       $MyDrafts .= '<span>'.$CountDrafts.'</span>';
       
    ?>
@@ -136,7 +140,7 @@ function WriteFilterTabs($Sender) {
       <?php
          $Sender->FireEvent('AfterBookmarksTab');
       }
-      if ($CountDiscussions > 0 || $Sender->RequestMethod == 'mine') {
+      if (($CountDiscussions > 0 || $Sender->RequestMethod == 'mine') && C('Vanilla.Discussions.ShowMineTab', TRUE)) {
       ?>
       <li<?php echo $Sender->RequestMethod == 'mine' ? ' class="Active"' : ''; ?>><?php echo Anchor($MyDiscussions, '/discussions/mine', 'MyDiscussions TabLink'); ?></li>
       <?php

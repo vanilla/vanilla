@@ -82,7 +82,12 @@ class Gdn_Smarty {
       $Smarty->security_settings['IF_FUNCS'] = array_merge($Smarty->security_settings['IF_FUNCS'],
          array('CheckPermission', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url'));
       $Smarty->secure_dir = array($Path);
-      $Smarty->display($Path);
+      
+      $CompileID = $Smarty->compile_id;
+      if (defined('CLIENT_NAME'))
+         $CompileID = CLIENT_NAME;
+      
+      $Smarty->display($Path, NULL, $CompileID);
    }
 
    /**

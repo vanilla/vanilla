@@ -31,74 +31,103 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class VanillaHooks implements Gdn_IPlugin {
    /**
-    * Add some extra fields to the session query.
-    * 
-    * @since 2.0.0
-    * @package Vanilla
-    * @todo Uncomment or delete this method.
-    * 
-    * @param object $Sender UserModel.
+    * Delete all of the Vanilla related information for a specific user.
+    * @param int $UserID The ID of the user to delete.
+    * @param array $Options An array of options:
+    *  - DeleteMethod: One of delete, wipe, or NULL
+    * @since 2.1
     */
-   public function UserModel_SessionQuery_Handler($Sender) {
-      //$Sender->SQL->Select('u.CountDiscussions, u.CountUnreadDiscussions, u.CountDrafts, u.CountBookmarks');
-   }
-   
-	/**
-	 * Remove Vanilla data when deleting a user.
-    *
-    * @since 2.0.0
-    * @package Vanilla
-    * 
-    * @param object $Sender UserModel.
-    */
-   public function UserModel_BeforeDeleteUser_Handler($Sender) {
-      $UserID = GetValue('UserID', $Sender->EventArguments);
-      $Options = GetValue('Options', $Sender->EventArguments, array());
-      $Options = is_array($Options) ? $Options : array();
+   public function DleteUserData($UserID, $Options = array()) {
+      $SQL = Gdn::SQL();
       
       // Remove discussion watch records and drafts
-		$Sender->SQL->Delete('UserDiscussion', array('UserID' => $UserID));
-		$Sender->SQL->Delete('Draft', array('InsertUserID' => $UserID));
+		$SQL->Delete('UserDiscussion', array('UserID' => $UserID));
+		$SQL->Delete('Draft', array('InsertUserID' => $UserID));
       
       // Comment deletion depends on method selected
       $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
       if ($DeleteMethod == 'delete') {
+         // Clear out the last posts to the categories.
+         $SQL
+            ->Update('Category c')
+            ->Join('Discussion d', 'd.DiscussionID = c.LastDiscussionID')
+            ->Where('d.InsertUserID', $UserID)
+            ->Set('c.LastDiscussionID', NULL)
+            ->Set('c.LastCommentID', NULL)
+            ->Put();
+         
+         $SQL
+            ->Update('Category c')
+            ->Join('Comment d', 'd.CommentID = c.LastCommentID')
+            ->Where('d.InsertUserID', $UserID)
+            ->Set('c.LastDiscussionID', NULL)
+            ->Set('c.LastCommentID', NULL)
+            ->Put();
+         
          // Grab all of the discussions that the user has engaged in.
-         $DiscussionIDs = $Sender->SQL
+         $DiscussionIDs = $SQL
             ->Select('DiscussionID')
-            ->Select('CommentID', 'count', 'CountComments')
             ->From('Comment')
             ->Where('InsertUserID', $UserID)
             ->GroupBy('DiscussionID')
             ->Get()->ResultArray();
+         $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
 
+         
+         $SQL->Delete('Comment', array('InsertUserID' => $UserID));
+         
          // Update the comment counts.
-         foreach ($DiscussionIDs as $Row) {
-            $Sender->SQL
-               ->Update('Discussion')
-               ->Set('CountComments', "CountComments - {$Row['CountComments']}", FALSE)
-               ->Where('DiscussionID', $Row['DiscussionID'])
-               ->Put();
+         $CommentCounts = $SQL
+            ->Select('DiscussionID')
+            ->Select('CommentID', 'count', 'CountComments')
+            ->Select('CommentID', 'max', 'LastCommentID')
+            ->WhereIn('DiscussionID', $DiscussionIDs)
+            ->GroupBy('DiscussionID')
+            ->Get('Comment')->ResultArray();
+         
+         foreach ($CommentCounts as $Row) {
+            $SQL->Put('Discussion',
+               array('CountComments' => $Row['CountComments'] + 1, 'LastCommentID' => $Row['LastCommentID']),
+               array('DiscussionID' => $Row['DiscussionID']));
          }
          
-         $Sender->SQL->Delete('Comment', array('InsertUserID' => $UserID));
+         // Update the last user IDs.
+         $SQL->Update('Discussion d')
+            ->Join('Comment c', 'd.LastCommentID = c.CommentID', 'left')
+            ->Set('d.LastCommentUserID', 'c.InsertUserID', FALSE, FALSE)
+            ->Set('d.DateLastComment', 'c.DateInserted', FALSE, FALSE)
+            ->WhereIn('d.DiscussionID', $DiscussionIDs)
+            ->Put();
+         
+         // Update the last posts.
+         $Discussions = $SQL
+            ->WhereIn('DiscussionID', $DiscussionIDs)
+            ->Where('LastCommentUserID', $UserID)
+            ->Get('Discussion');
          
          // Delete the user's dicussions 
-         $Sender->SQL->Delete('Discussion', array('InsertUserID' => $UserID));
+         $SQL->Delete('Discussion', array('InsertUserID' => $UserID));
+         
+         // Update the appropriat recent posts in the categories.
+         $CategoryModel = new CategoryModel();
+         $Categories = $CategoryModel->GetWhere(array('LastDiscussionID' => NULL))->ResultArray();
+         foreach ($Categories as $Category) {
+            $CategoryModel->SetRecentPost($Category['CategoryID']);
+         }
       } else if ($DeleteMethod == 'wipe') {
          // Erase the user's dicussions
-         $Sender->SQL->Update('Discussion')
+         $SQL->Update('Discussion')
             ->Set('Body', T('The user and all related content has been deleted.'))
             ->Set('Format', 'Deleted')
             ->Where('InsertUserID', $UserID)
             ->Put();
          
          // Erase the user's comments
-			$Sender->SQL->From('Comment')
+			$SQL->From('Comment')
 				->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
 				->Delete('Comment c', array('d.InsertUserID' => $UserID));
 
-         $Sender->SQL->Update('Comment')
+         $SQL->Update('Comment')
             ->Set('Body', T('The user and all related content has been deleted.'))
             ->Set('Format', 'Deleted')
             ->Where('InsertUserID', $UserID)
@@ -108,7 +137,7 @@ class VanillaHooks implements Gdn_IPlugin {
       }
 
       // Remove the user's profile information related to this application
-      $Sender->SQL->Update('User')
+      $SQL->Update('User')
          ->Set(array(
 				'CountDiscussions' => 0,
 				'CountUnreadDiscussions' => 0,
@@ -118,6 +147,22 @@ class VanillaHooks implements Gdn_IPlugin {
 			))
          ->Where('UserID', $UserID)
          ->Put();
+   }
+   
+	/**
+	 * Remove Vanilla data when deleting a user.
+    *
+    * @since 2.0.0
+    * @package Vanilla
+    * 
+    * @param UserModel $Sender UserModel.
+    */
+   public function UserModel_BeforeDeleteUser_Handler($Sender) {
+      $UserID = GetValue('UserID', $Sender->EventArguments);
+      $Options = GetValue('Options', $Sender->EventArguments, array());
+      $Options = is_array($Options) ? $Options : array();
+      
+      $this->DleteUserData($UserID, $Options);
    }
    
    /**

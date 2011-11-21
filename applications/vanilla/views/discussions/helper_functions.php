@@ -105,13 +105,13 @@ function WriteFilterTabs($Sender) {
    }
    if ($CountBookmarks === NULL) {
       $Bookmarked .= '<span class="Popin" rel="'.Url('/discussions/UserBookmarkCount').'">-</span>';
-   } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0)
+   } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
       $Bookmarked .= '<span>'.$CountBookmarks.'</span>';
 
-   if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
+   if (is_numeric($CountDiscussions) && $CountDiscussions > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
       $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';
 
-   if (is_numeric($CountDrafts) && $CountDrafts > 0)
+   if (is_numeric($CountDrafts) && $CountDrafts > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
       $MyDrafts .= '<span>'.$CountDrafts.'</span>';
       
    ?>

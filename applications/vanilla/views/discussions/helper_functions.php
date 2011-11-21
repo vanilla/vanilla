@@ -15,8 +15,11 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $Sender->EventArguments['CssClass'] = &$CssClass;
+   
    $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
+   $Sender->EventArguments['FirstUser'] = &$First;
+   $Sender->EventArguments['LastUser'] = &$Last;
    
    $Sender->FireEvent('BeforeDiscussionName');
    
@@ -52,6 +55,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
          <?php if ($Discussion->Closed == '1') { ?>
          <span class="Tag Closed"><?php echo T('Closed'); ?></span>
          <?php } ?>
+         <?php $Sender->FireEvent('AfterDiscussionLabels'); ?>
          <span class="MItem CommentCount"><?php 
             printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
          ?></span>

@@ -556,6 +556,10 @@ class ProfileController extends Gdn_Controller {
          )
       );
       
+      // Allow email notification of applicants (if they have permission & are using approval registration)
+      if (CheckPermission('Garden.Applicants.Manage') && C('Garden.Registration.Method') == 'Approval')
+         $this->Preferences['Notifications']['Email.Applicant'] = array(T('NotifyApplicant', 'Notify me when anyone applies for membership.'), 'Meta');
+      
       $this->FireEvent('AfterPreferencesDefined');
 		
 		// Loop through the preferences looking for duplicates, and merge into a single row

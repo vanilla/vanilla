@@ -1124,6 +1124,19 @@ class CategoryModel extends Gdn_Model {
 		return $Property;
    }
    
+   public function SetRecentPost($CategoryID) {
+      $Row = $this->SQL->GetWhere('Discussion', array('CategoryID' => $CategoryID), 'DateLastComment', 'desc', 1)->FirstRow(DATASET_TYPE_ARRAY);
+      
+      $Fields = array('LastCommentID' => NULL, 'LastDiscussionID' => NULL);
+      
+      if ($Row) {
+         $Fields['LastCommentID'] = $Row['LastCommentID'];
+         $Fields['LastDiscussionID'] = $Row['DiscussionID'];
+      }
+      $this->SetField($CategoryID, $Fields);
+      $this->SetCache($CategoryID, array('LastTitle' => NULL, 'LastUserID' => NULL, 'LastDateInserted' => NULL, 'LastUrl' => NULL));
+   }
+   
    /**
     * If looking at the root node, make sure it exists and that the 
     * nested set columns exist in the table.

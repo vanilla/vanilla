@@ -465,7 +465,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
       $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');
       $String = array('varchar', 'char', 'mediumtext', 'text');
       $Length = array('varbinary');
-      $Other = array('enum');
+      $Other = array('enum', 'tinyblob', 'blob', 'mediumblob', 'longblob');
 
       switch(strtolower($Class)) {
          case 'date': return $Date;

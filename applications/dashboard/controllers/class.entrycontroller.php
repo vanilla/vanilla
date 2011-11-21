@@ -1086,8 +1086,16 @@ class EntryController extends Gdn_Controller {
                   Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
 
                $this->EventArguments['AuthUserID'] = $AuthUserID;
-               $this->FireEvent('RegistrationPending');
+               $this->FireEvent('RegistrationPending');  
                $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
+               
+               // Grab all of the users that need to be notified.
+               $Data = Gdn::Database()->SQL()->GetWhere('UserMeta', array('Name' => 'Preferences.Email.Applicant'))->ResultArray();
+               $ActivityModel = new ActivityModel();
+               $Story = Anchor(Gdn_Format::Text('New applicant: '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
+               foreach ($Data as $Row) {
+                  $ActivityModel->Add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
+               }
             }
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);

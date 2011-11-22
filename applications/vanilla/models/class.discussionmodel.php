@@ -480,8 +480,6 @@ class DiscussionModel extends VanillaModel {
 	 * @return int Number of discussions.
 	 */
    public function GetCount($Wheres = '', $ForceNoAnnouncements = FALSE) {
-      $Session = Gdn::Session();
-      $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
       if (is_array($Wheres) && count($Wheres) == 0)
          $Wheres = '';
       
@@ -512,38 +510,26 @@ class DiscussionModel extends VanillaModel {
          return $Count;
       }
       
+      if($Perms !== TRUE) {
+         $this->SQL->WhereIn('c.CategoryID', $Perms);
+      }
       
-//      if($Perms !== TRUE) {
-//         $this->SQL->WhereIn('c.CategoryID', $Perms);
-//      }
-//      
-//      $this->EventArguments['Wheres'] = &$Wheres;
-//		$this->FireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results
-//         
-//      // Small optimization for basic queries
-//      if ($Wheres == '') {
-//         $this->SQL
-//            ->Select('c.CountDiscussions', 'sum', 'CountDiscussions')
-//            ->From('Category c');
-//      } else {
-//         $this->SQL
-//	         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
-//	         ->From('Discussion d')
-//            ->Join('Category c', 'd.CategoryID = c.CategoryID')
-//	         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
-//            ->Where($Wheres);
-//      }
-//      
-//      $Result = $this->SQL
-//         ->Get()
-//         ->FirstRow()
-//         ->CountDiscussions;
-//      
-//      if (isset($Count) && $Result != $Count) {
-//         throw new Exception("Result: $Result, Count: $Count");
-//      }
-//      
-//      return $Result;
+      $this->EventArguments['Wheres'] = &$Wheres;
+		$this->FireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results
+         
+      $this->SQL
+         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion d')
+         ->Join('Category c', 'd.CategoryID = c.CategoryID')
+         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.Gdn::Session()->UserID, 'left')
+         ->Where($Wheres);
+      
+      $Result = $this->SQL
+         ->Get()
+         ->FirstRow()
+         ->CountDiscussions;
+      
+      return $Result;
    }
 
    /**

@@ -1225,6 +1225,7 @@ EOT;
          $Mixed = str_replace(' ', '-', trim($Mixed)); // get rid of spaces
          $Mixed = preg_replace('/-+/', '-', $Mixed); // limit to 1 hyphen at a time
          $Mixed = urlencode(strtolower($Mixed));
+         $Mixed = trim($Mixed, '.-');
          return $Mixed;
       } else {
          // Better Unicode support.
@@ -1235,6 +1236,7 @@ EOT;
          $Mixed = preg_replace('`([^\PS+])`u', '', $Mixed); // get rid of symbols
          $Mixed = preg_replace('`[\s\-/+]+`u', '-', $Mixed); // replace certain characters with dashes
          $Mixed = rawurlencode(strtolower($Mixed));
+         $Mixed = trim($Mixed, '.-');
 			return $Mixed;
       }
    }

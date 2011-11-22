@@ -510,7 +510,7 @@ class DiscussionModel extends VanillaModel {
          return $Count;
       }
       
-      if($Perms !== TRUE) {
+      if ($Perms !== TRUE) {
          $this->SQL->WhereIn('c.CategoryID', $Perms);
       }
       

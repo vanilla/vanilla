@@ -37,7 +37,7 @@ class VanillaHooks implements Gdn_IPlugin {
     *  - DeleteMethod: One of delete, wipe, or NULL
     * @since 2.1
     */
-   public function DleteUserData($UserID, $Options = array()) {
+   public function DeleteUserData($UserID, $Options = array()) {
       $SQL = Gdn::SQL();
       
       // Remove discussion watch records and drafts
@@ -162,7 +162,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Options = GetValue('Options', $Sender->EventArguments, array());
       $Options = is_array($Options) ? $Options : array();
       
-      $this->DleteUserData($UserID, $Options);
+      $this->DeleteUserData($UserID, $Options);
    }
    
    /**

@@ -703,13 +703,15 @@ class Gdn_Format {
             // Mentions & Hashes
             $Mixed = Gdn_Format::Mentions($Mixed);
 
-            $Result = $Formatter->Format($Mixed);
-            
             // nl2br
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
                $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                $Mixed = FixNl2Br($Mixed);
             }
+            
+            $Result = $Formatter->Format($Mixed);
+            
+            
 
 //            $Result = $Result.
 //               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".

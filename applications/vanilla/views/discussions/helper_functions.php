@@ -108,15 +108,15 @@ function WriteFilterTabs($Sender) {
       $CountDrafts = $Session->User->CountDrafts;
    }
    if ($CountBookmarks === NULL) {
-      $Bookmarked .= '<span class="Popin" rel="'.Url('/discussions/UserBookmarkCount').'">-</span>';
+      $Bookmarked .= ' <span class="Count Popin" rel="'.Url('/discussions/UserBookmarkCount').'">-</span>';
    } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
-      $Bookmarked .= '<span>'.$CountBookmarks.'</span>';
+      $Bookmarked .= ' <span class="Count">'.$CountBookmarks.'</span>';
 
    if (is_numeric($CountDiscussions) && $CountDiscussions > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
-      $MyDiscussions .= '<span>'.$CountDiscussions.'</span>';
+      $MyDiscussions .= ' <span class="Count">'.$CountDiscussions.'</span>';
 
    if (is_numeric($CountDrafts) && $CountDrafts > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
-      $MyDrafts .= '<span>'.$CountDrafts.'</span>';
+      $MyDrafts .= ' <span class="Count">'.$CountDrafts.'</span>';
       
    ?>
 <div class="Tabs DiscussionsTabs">

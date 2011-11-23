@@ -708,8 +708,10 @@ class Gdn_Format {
                $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                $Mixed = FixNl2Br($Mixed);
             }
-
+            
             $Result = $Formatter->Format($Mixed);
+            
+            
 
 //            $Result = $Result.
 //               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
@@ -1225,6 +1227,7 @@ EOT;
          $Mixed = str_replace(' ', '-', trim($Mixed)); // get rid of spaces
          $Mixed = preg_replace('/-+/', '-', $Mixed); // limit to 1 hyphen at a time
          $Mixed = urlencode(strtolower($Mixed));
+         $Mixed = trim($Mixed, '.-');
          return $Mixed;
       } else {
          // Better Unicode support.
@@ -1235,6 +1238,7 @@ EOT;
          $Mixed = preg_replace('`([^\PS+])`u', '', $Mixed); // get rid of symbols
          $Mixed = preg_replace('`[\s\-/+]+`u', '-', $Mixed); // replace certain characters with dashes
          $Mixed = rawurlencode(strtolower($Mixed));
+         $Mixed = trim($Mixed, '.-');
 			return $Mixed;
       }
    }

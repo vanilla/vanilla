@@ -47,6 +47,7 @@ class NotificationsController extends Gdn_Controller {
       
       // Retrieve all notifications and inform them.
       NotificationsController::InformNotifications($this);
+      $this->FireEvent('BeforeInformNotifications');
       
       $this->Render();
    }

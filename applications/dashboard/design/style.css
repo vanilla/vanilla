@@ -564,16 +564,7 @@ body #Head h1 {
    color: #fff;
    text-decoration: underline;
 }
-#Menu a span,
-#Menu li.Active a span,
-#Menu li.Highlight a:hover span {
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   border-radius: 2px;
-   padding: 0 2px;
-   font-size: 9px;
-   line-height: 12px;
-   font-weight: normal;
+#Menu .Alert {
 	text-shadow: none;
    background: #f2fcff;
    color: #299fc7;
@@ -1523,17 +1514,8 @@ table.PreferenceGroup td.Description {
    font-weight: normal;
    padding: 1px .8ex;
 }
-.Tabs li a span {
-   line-height: 1;
-   font-size: 80%;
-   padding: 0 3px;
-   border-radius: 3px;
-   -webkit-border-radius: 3px;
-   -moz-border-radius: 3px;
-   font-weight: normal;
+.Tabs .Count {
    background: #1e79a7;
-   color: #eaf4fd;
-   margin: 0 0 0 4px;
 }
 .Tabs .SubTab {
 	margin: 10px 0 0;

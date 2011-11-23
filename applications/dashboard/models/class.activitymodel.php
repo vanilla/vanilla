@@ -556,7 +556,7 @@ class ActivityModel extends Gdn_Model {
       
       $Preference = FALSE;
       if ($Notify && $RegardingUserID) {
-         $Activity['NotifyUserID'] = $Activity[$RegardingUserID];
+         $Activity['NotifyUserID'] = $Activity['RegardingUserID'];
          $Preference = $ActivityType;
       } else {
          $Activity['NotifyUserID'] = self::NOTIFY_PUBLIC;

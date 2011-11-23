@@ -2551,15 +2551,15 @@ div.Popup .Errors {
 /* Note: InformMessages are "growl" style messages that appear in a fixed
 position on the page to notify users of things like drafts being saved, etc. */
 .InformMessages {
-   text-align: left !important;
+   text-align: left;
    position: fixed;
    top: auto;
-   bottom: 20px;
-   left: 20px;
+   bottom: 0;
+   left: 0;
    z-index: 200;
-   margin: 0 !important;
-   padding: 0 !important;
-   list-style: none !important;
+   margin: 0;
+   padding: 0;
+   list-style: none;
    font-size: 12px;
    display: block;
    width: auto;
@@ -2567,12 +2567,13 @@ position on the page to notify users of things like drafts being saved, etc. */
 * html .InformMessages {
   position: absolute;
   top: auto;
-  margin-left: 20px;
+  margin-left: 10px;
   overflow: visible; 
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
-.InformMessages .InformWrapper {
+.InformWrapper {
 	display: block;
+   margin: 10px;
 }
 .InformMessages .InformMessage {
    color: #fff !important;
@@ -2584,10 +2585,9 @@ position on the page to notify users of things like drafts being saved, etc. */
 	background: rgb(0, 0, 0) !important;
 	background: rgba(0, 0, 0, 0.7) !important;
    border: none !important;
-   width: auto !important;
-	max-width: 400px !important;
-   margin: 10px auto 0 !important;
-   padding: 9px 14px 8px !important;
+   width: auto;
+	max-width: 400px;
+   padding: 9px 14px 8px;
    display:-moz-inline-stack;
    display:inline-block;
    zoom:1;
@@ -2636,6 +2636,30 @@ position on the page to notify users of things like drafts being saved, etc. */
 .InformMessages .InformMessage:hover a.Close {
 	display: block;
 }
+
+/* iPad/iPhone */
+@media only screen and (device-width: 768px),
+only screen and (max-device-width: 480px) {
+   .InformMessages .InformMessage a.Close {
+      color: #fff;
+      display: block;
+   }
+}
+
+/* Small screens */
+@media (max-width: 500px) {
+   .InformMessages {
+      width: 100%;
+   }
+   .InformWrapper {
+      margin: 5px;
+   }
+   .InformMessages .InformMessage {
+      display: block;
+      max-width: inherit;
+   }
+}
+
 .InformMessages .Actions a { margin-right: 4px; }
 .InformMessages .Actions a:last-child { margin-right: 0; }
 .InformMessages .Actions a.CancelAction {	color: #aaa; }

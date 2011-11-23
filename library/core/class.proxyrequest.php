@@ -328,6 +328,31 @@ class ProxyRequest {
       return $this->ResponseBody;
    }
    
+   /**
+    * Send a request and receive the response
+    * 
+    * Options:
+    *   URL
+    *   Host
+    *   Method
+    *   ConnectTimeout
+    *   Timeout
+    *   Redirects
+    *   Cookies
+    *   SaveAs
+    *   Recycle
+    *   RequestsPerPointer
+    *   CloseSession
+    *   Redirected
+    *   Debug
+    *   Simulate
+    * 
+    * @param type $Options
+    * @param array $QueryParams
+    * @param array $Files
+    * @param type $ExtraHeaders
+    * @return type 
+    */
    public function Request($Options, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
       
       /*

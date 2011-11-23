@@ -286,7 +286,7 @@ class EntryController extends Gdn_Controller {
          // Here are the initial data array values. that can be set by a plugin.
          $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => $this->Target());
          $this->Form->SetData($Data);
-         $this->Form->AddHidden('Target', '/cf73e"><script>alert(1)</script>17efcbd613');
+         $this->Form->AddHidden('Target', $this->Request->Get('Target', '/'));
       }
 
       // The different providers can check to see if they are being used and modify the data array accordingly.

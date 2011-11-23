@@ -551,6 +551,12 @@ class ProxyRequest {
          curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
          curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
          
+         if ($FollowRedirects) {
+            curl_setopt($Handler, CURLOPT_FOLLOWLOCATION, TRUE);
+            curl_setopt($Handler, CURLOPT_AUTOREFERER, TRUE);
+            curl_setopt($Handler, CURLOPT_MAXREDIRS, 10);
+         }
+         
          if ($this->UseSSL) {
             $this->Action(" Using SSL");
             curl_setopt($Handler, CURLOPT_SSL_VERIFYPEER, !$SSLNoVerify);
@@ -663,12 +669,12 @@ class ProxyRequest {
          
          // Read from the server
          $this->FsockReceive($Pointer);
-
+         
          if (!$Recycle || $this->ConnectionMode == 'close') {
             if ($Debug) echo " : Closing onetime pointer for {$HostAddress}\n";
             $this->FsockDisconnect($Pointer, $HostAddress);
          }
-
+         
          if (in_array($this->ResponseStatus, array(301,302)) && $FollowRedirects) {
             $Location = GetValue('Location', $this->ResponseHeaders, NULL);
             if (is_null($Location))

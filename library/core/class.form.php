@@ -220,8 +220,11 @@ class Gdn_Form extends Gdn_Pluggable {
       // Respect category permissions (remove categories that the user shouldn't see).
       $SafeCategoryData = array();
       foreach ($CategoryData as $CategoryID => $Category) {
+         if (!$Category['PermsDiscussionsAdd'])
+            continue;
+         
          if ($Value != $CategoryID) {
-            if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsAdd'] || !$Category['PermsDiscussionsView'])
+            if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsView'])
                continue;
 
             if ($Category['Archived'])

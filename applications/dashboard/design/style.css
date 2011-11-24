@@ -1514,9 +1514,6 @@ table.PreferenceGroup td.Description {
    font-weight: normal;
    padding: 1px .8ex;
 }
-.Tabs .Count {
-   background: #1e79a7;
-}
 .Tabs .SubTab {
 	margin: 10px 0 0;
 	padding: 4px 8px;

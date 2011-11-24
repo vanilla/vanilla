@@ -1,17 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
 function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
-   static $Alt = FALSE;
-   $CssClass = 'Item';
-   $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
-   $CssClass .= $Alt ? ' Alt ' : '';
-   $Alt = !$Alt;
-   $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
-   $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
-   $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
-   $CssClass .= ($Discussion->CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
-   $DiscussionUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '');
-//   $DiscussionUrl = $Discussion->Url;
+   $CssClass = CssClass($Discussion);
+   $DiscussionUrl = $Discussion->Url;
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $Sender->EventArguments['CssClass'] = &$CssClass;
@@ -48,14 +39,9 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
       <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
-         <?php $Sender->FireEvent('BeforeDiscussionMeta'); ?>
-         <?php if ($Discussion->Announce == '1') { ?>
-         <span class="Tag Announcement"><?php echo T('Announcement'); ?></span>
-         <?php } ?>
-         <?php if ($Discussion->Closed == '1') { ?>
-         <span class="Tag Closed"><?php echo T('Closed'); ?></span>
-         <?php } ?>
-         <?php $Sender->FireEvent('AfterDiscussionLabels'); ?>
+         <?php 
+         WriteTags($Discussion);
+         ?>
          <span class="MItem CommentCount"><?php 
             printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
          ?></span>
@@ -88,6 +74,39 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    </div>
 </li>
 <?php
+}
+
+function CssClass($Discussion) {
+   static $Alt = FALSE;
+   $CssClass = 'Item';
+   $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
+   $CssClass .= $Alt ? ' Alt ' : '';
+   $Alt = !$Alt;
+   $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
+   $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
+   $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
+   $CssClass .= ($Discussion->CountUnreadComments > 0 && Gdn::Session()->IsValid()) ? ' New' : '';
+   
+   return $CssClass;
+}
+
+function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
+   if (!$Discussion->$Column)
+      return '';
+   
+   if (!$CssClass)
+      $CssClass = "Tag $Code";
+   
+   return ' <span class="Tag '.$CssClass.'">'.T($Code).'</span> ';
+}
+
+function WriteTags($Discussion) {
+   Gdn::Controller()->FireEvent('BeforeDiscussionMeta');
+         
+   echo Tag($Discussion, 'Announce', 'Announcement');
+   echo Tag($Discussion, 'Closed', 'Closed');
+   
+   Gdn::Controller()->FireEvent('AfterDiscussionLabels');
 }
 
 function WriteFilterTabs($Sender) {

@@ -821,6 +821,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       // Validate the form posted values
       $UserID = GetValue('UserID', $FormPostValues);
@@ -1279,6 +1282,9 @@ class UserModel extends Gdn_Model {
       // TODO: DO I REALLY NEED THIS???
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 
@@ -1379,6 +1385,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 
@@ -1432,6 +1441,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 

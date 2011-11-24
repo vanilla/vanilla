@@ -572,7 +572,7 @@ class DiscussionController extends VanillaController {
     */
    public function DeleteComment($CommentID = '', $TransientKey = '') {
       $Session = Gdn::Session();
-      $DefaultTarget = '/vanilla/discussions/';
+      $DefaultTarget = '/discussions/';
       if (
          is_numeric($CommentID)
          && $CommentID > 0

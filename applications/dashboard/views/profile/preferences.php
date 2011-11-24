@@ -25,6 +25,15 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
       <tbody>
          <?php
             foreach ($Preferences as $Names) {
+               // Make sure there are preferences.
+               $ConfigCount = 0;
+               foreach ($Names as $Name) {
+                  if (C('Preferences.'.$Name, '0') !== FALSE)
+                     $ConfigCount++;
+               }
+               if ($ConfigCount == 0)
+                  continue;
+               
                echo '<tr>';
                $LastName = '';
                $i = 0;

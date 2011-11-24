@@ -108,10 +108,10 @@ class Gdn_Controller extends Gdn_Pluggable {
    public $Menu;
 
    /**
-    * If specified, this string will be used to identify the sort collection
-    * in conf/modules.php to use when organizing modules within page assets.
-    * $Configuration['Modules']['ModuleSortContainer']['AssetName'] = array('Module1', 'Module2');
+    * An associative array of assets and what order their modules should be rendered in.
+    * You can set module sort orders in the config using Modules.ModuleSortContainer.AssetName.
     *
+    * @example $Configuration['Modules']['Vanilla']['Panel'] = array('CategoryModule', 'NewDiscussionModule');
     * @var string
     */
    public $ModuleSortContainer;

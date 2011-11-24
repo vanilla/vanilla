@@ -165,6 +165,8 @@ window.vanilla.embed = function(host) {
       var foreign_url = typeof(vanilla_url) == 'undefined' ? document.URL.split('#')[0] : vanilla_url;
       // If embedding comments, this value will be used as the first comment body related to the discussion.
       var foreign_body = typeof(vanilla_body) == 'undefined' ? '' : vanilla_body;
+      // Are we forcing a locale via Multilingual plugin?
+      var embed_locale = typeof(vanilla_embed_locale) == 'undefined' ? '' : vanilla_embed_locale;
       // If path was defined, and we're sitting at app root, use the defined path instead.
       if (typeof(vanilla_path) != 'undefined' && path == '/')
          path = vanilla_path;
@@ -183,7 +185,7 @@ window.vanilla.embed = function(host) {
             +'&vanilla_body='+encodeURIComponent(foreign_body)
             +'&vanilla_category_id='+encodeURIComponent(category_id);
       } else 
-         return 'http://' + host + path.replace('?', '&') + '&remote=' + encodeURIComponent(embedUrl);
+         return 'http://' + host + path.replace('?', '&') + '&remote=' + encodeURIComponent(embedUrl) + '&locale=' + encodeURIComponent(embed_locale);
    }
    var vanillaIframe = document.createElement('iframe');
    vanillaIframe.id = "vanilla"+id;

@@ -220,7 +220,10 @@ class ActivityController extends Gdn_Controller {
       
       // Redirect back to the sending location if this isn't an ajax request
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-         Redirect($this->Form->GetValue('Return', Gdn_Url::WebRoot()));
+         $Target = $this->Form->GetValue('Return');
+         if (!$Target)
+            $Target = '/activity';
+         Redirect($Target);
       } else {
          // Load the newly added comment.
          $this->SetData('Comment', $this->ActivityModel->GetComment($ID));

@@ -123,6 +123,11 @@ class CategoryModel extends Gdn_Model {
       Gdn::Cache()->Remove(self::CACHE_KEY);
    }
    
+   public static function ClearUserCache() {
+      $Key = 'UserCategory_'.Gdn::Session()->UserID;
+      Gdn::Cache()->Remove($Key);
+   }
+   
    /**
     * 
     * 
@@ -215,7 +220,6 @@ class CategoryModel extends Gdn_Model {
     */
    public static function JoinUserData(&$Categories, $AddUserCategory = TRUE) {
       $IDs = array_keys($Categories);
-      
       if ($AddUserCategory) {
          $SQL = clone Gdn::SQL();
          $SQL->Reset();

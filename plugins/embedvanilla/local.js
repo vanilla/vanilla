@@ -16,9 +16,6 @@ $(function() {
       forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
-
-   if (!inIframe)
-      return;
       
    if (inIframe) {
       if ("postMessage" in parent) {
@@ -135,6 +132,7 @@ $(function() {
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
    }
+   else return; // Ignore the rest if we're not embedded.
 
    var path = gdn.definition('Path', '~');
    if (path != '~') {

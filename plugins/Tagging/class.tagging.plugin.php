@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Allow tagging of discussions.',
-   'Version' => '1.1',
+   'Version' => '1.1p1',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -376,7 +376,7 @@ class TaggingPlugin extends Gdn_Plugin {
                ->From('TagDiscussion td')
                ->Join('Tag t', 'td.TagID = t.TagID')
                ->Where('td.DiscussionID', GetValue('DiscussionID', $Discussion))
-               ->Where('t.Type', '')
+               ->Where("coalesce(t.Type, '')", '')
                ->Get()->ResultArray();
             
             $Tags = ConsolidateArrayValuesByKey($Tags, 'Name');

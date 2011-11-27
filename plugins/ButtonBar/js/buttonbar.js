@@ -252,13 +252,14 @@ jQuery(document).ready(function($) {
       },
       
       BindShortcuts: function(TextArea) {
-         ButtonBar.BindShortcut(TextArea, 'bold', 'ctrl+b');
-         ButtonBar.BindShortcut(TextArea, 'italic', 'ctrl+i');
-         ButtonBar.BindShortcut(TextArea, 'underline', 'ctrl+u');
-         ButtonBar.BindShortcut(TextArea, 'strike', 'ctrl+s');
-         ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+l');
-         ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+q');
-         ButtonBar.BindShortcut(TextArea, 'prompturl', 'ctrl+shift+l');
+         ButtonBar.BindShortcut(TextArea, 'bold', 'ctrl+B');
+         ButtonBar.BindShortcut(TextArea, 'italic', 'ctrl+I');
+         ButtonBar.BindShortcut(TextArea, 'underline', 'ctrl+U');
+         ButtonBar.BindShortcut(TextArea, 'strike', 'ctrl+S');
+         ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
+         ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
+         ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
+         ButtonBar.BindShortcut(TextArea, 'prompturl', 'ctrl+shift+L');
          ButtonBar.BindShortcut(TextArea, 'post', 'tab');
       },
       
@@ -432,7 +433,19 @@ jQuery(document).ready(function($) {
                break;
 
             case 'code':
-               $(TextArea).insertRoundTag('code',htmlOpts);
+               var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
+               if (multiline) {
+                  var thisOpts = $.extend(htmlOpts, {
+                     opentag:'<pre><code>',
+                     closetag:'</code></pre>',
+                     opener:'',
+                     closer:'',
+                     closeslice: ''
+                  });
+                  $(TextArea).insertRoundTag('',thisOpts);
+               } else {
+                  $(TextArea).insertRoundTag('code',htmlOpts);
+               }
                break;
 
             case 'image':

@@ -31,15 +31,15 @@ $.fn.insertAtCaret = function (tagName) {
    });
 };
 
-$.fn.insertRoundCaret = function(strStart, strEnd) {
+$.fn.insertRoundCaret = function(strStart, strEnd, strReplace) {
    return this.each(function() {
       if (document.selection) {
          // IE support
          stringBefore = this.value;
          this.focus();
          sel = document.selection.createRange();
-         insertstring = sel.text;
-         fullinsertstring = strStart + sel.text + strEnd;
+         insertstring = strReplace ? strReplace : sel.text;
+         fullinsertstring = strStart + insertString + strEnd;
          sel.text = fullinsertstring;
          document.selection.empty();
          this.focus();
@@ -57,15 +57,21 @@ $.fn.insertRoundCaret = function(strStart, strEnd) {
          startPos = this.selectionStart;
          endPos = this.selectionEnd;
          scrollTop = this.scrollTop;
+         
+         if (!strReplace)
+            strReplace = this.value.substring(startPos, endPos);
+         
          this.value = this.value.substring(0, startPos) + strStart
-                    + this.value.substring(startPos, endPos) + strEnd
+                    + strReplace + strEnd
                     + this.value.substring(endPos, this.value.length);
          this.focus();
          this.selectionStart = startPos + strStart.length;
-         this.selectionEnd = endPos + strStart.length;
+         this.selectionEnd = this.selectionStart + strReplace.length;
          this.scrollTop = scrollTop;
       } else {
-         this.value += strStart + strEnd;
+         if (!strReplace)
+            strReplace = '';
+         this.value += strStart + strReplace + strEnd;
          this.focus();
       }
       
@@ -176,6 +182,14 @@ $.fn.insertRoundTag = function(tagName, opts, props){
       }
    }
    
+   strReplace = '';
+   if (prefix) {
+      var selection = $(this).hasSelection();
+      if (selection) {
+         strReplace = selection.replace(/\n\r?/g, '\n'+prefix);
+      }
+   }
+   
    if (closetype == 'full') {
       if (!hasFocused)
          strStart = strStart + closer;
@@ -191,7 +205,7 @@ $.fn.insertRoundTag = function(tagName, opts, props){
       else
          strEnd = strEnd + closeslice + closer + suffix;
    }
-   $(this).insertRoundCaret(strStart+prepend, strEnd);
+   $(this).insertRoundCaret(strStart+prepend, strEnd, strReplace);
 }
 
 jQuery(document).ready(function($) {
@@ -496,7 +510,19 @@ jQuery(document).ready(function($) {
                break;
 
             case 'code':
-               $(TextArea).insertRoundTag('`',markdownOpts);
+               var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
+               if (multiline) {
+                  var thisOpts = $.extend(markdownOpts, {
+                     prefix:'    ',
+                     opentag:'',
+                     closetag:'',
+                     opener:'',
+                     closer:''
+                  });
+                  $(TextArea).insertRoundTag('',thisOpts);
+               } else {
+                  $(TextArea).insertRoundTag('`',markdownOpts);
+               }
                break;
 
             case 'image':

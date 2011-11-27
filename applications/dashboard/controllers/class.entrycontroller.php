@@ -1021,6 +1021,7 @@ class EntryController extends Gdn_Controller {
 
       // Define gender dropdown options
       $this->GenderOptions = array(
+         'u' => T('Unspecified'),
          'm' => T('Male'),
          'f' => T('Female')
       );

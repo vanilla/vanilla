@@ -5,18 +5,12 @@ jQuery(document).ready(function($) {
    if ($.autogrow)
       $('textarea.TextBox').livequery(function() {
          $(this).autogrow();
+         $(this).focus();
       });
 
    // Hijack the "Cancel" button on the comment form
    var cancelButton = $('a.Cancel');
       
-   // Hide it if they leave the area without typing
-   $('div.CommentForm textarea').blur(function(ev) {
-      var Comment = $(ev.target).val();
-      if (!Comment || Comment == '')
-         $('a.Cancel').hide();
-   });
-   
    // Reveal the textarea and hide previews.
    $('a.WriteButton, a.Cancel').livequery('click', function() {
       if ($(this).hasClass('WriteButton')) {
@@ -249,6 +243,11 @@ jQuery(document).ready(function($) {
 
    // Edit comment
    $('a.EditComment').livequery('click', function() {
+      //get rid of any comments previously being edited
+      var comment = $(document).find('ul.Discussion li.Editing div.Comment');
+      $(comment).find('div.Message').show();
+      $(comment).find('div.CommentForm').remove();
+      
       var btn = this;
       var container = $(btn).parents('li.Comment');
       $(container).addClass('Editing');

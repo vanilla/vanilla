@@ -2042,6 +2042,20 @@ if (!function_exists('SaveToConfig')) {
    }
 }
 
+if (!function_exists('SliceParagraph')) {
+   function SliceParagraph($String, $MaxLength = 500, $Suffix = '') {
+      $Pos = strpos($String, "\n\n");
+      if ($Pos == FALSE)
+         return SliceString($String, $MaxLength, $Suffix);
+      
+      $String = substr($String, 0, $Pos);
+      if (strlen($String) > $MaxLength)
+         return SliceString($String, $MaxLength, $Suffix);
+      
+      return $String;
+   }
+}
+
 if (!function_exists('SliceString')) {
    function SliceString($String, $Length, $Suffix = '…') {
       if (function_exists('mb_strimwidth')) {

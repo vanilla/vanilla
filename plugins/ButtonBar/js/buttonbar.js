@@ -217,8 +217,12 @@ jQuery(document).ready(function($) {
          var ThisButtonBar = $(TextArea).closest('form').find('.ButtonBar');
          $(ThisButtonBar).data('ButtonBarTarget', TextArea);
          
-         // Apply the page's InputFormat to this textarea
-         $(TextArea).data('InputFormat', gdn.definition('InputFormat', 'Html'));
+         var format = $(TextArea).attr('format');
+         if (!format)
+            gdn.definition('InputFormat', 'Html');
+         
+         // Apply the page's InputFormat to this textarea.
+         $(TextArea).data('InputFormat', format);
          
          // Build button UIs
          $(ThisButtonBar).find('div').each(function(i, el){

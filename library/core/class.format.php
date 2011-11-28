@@ -742,8 +742,15 @@ class Gdn_Format {
    public static function PlainText($Body, $Format = 'Html') {
       $Result = Gdn_Format::To($Body, $Format);
       
-      if ($Format != 'Text')
-         $Result = Gdn_Format::Text($Result, FALSE);
+      if ($Format != 'Text') {
+         // Remove returns and then replace html return tags with returns.
+         $Result = str_replace(array("\n", "\r"), '', $Result);
+         $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
+         $Allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+         $Result = preg_replace('`</'.$Allblocks.'>`', "\n\n", $Result);
+         
+         $Result = strip_tags($Result);
+      }
       $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
       return $Result;
    }

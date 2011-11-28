@@ -186,7 +186,7 @@ $.fn.insertRoundTag = function(tagName, opts, props){
    if (prefix) {
       var selection = $(this).hasSelection();
       if (selection) {
-         strReplace = selection.replace(/\n\r?/g, '\n'+prefix);
+         strReplace = selection.replace(/\n/g, '\n'+prefix);
       }
    }
    
@@ -219,7 +219,7 @@ jQuery(document).ready(function($) {
          
          var format = $(TextArea).attr('format');
          if (!format)
-            gdn.definition('InputFormat', 'Html');
+            format = gdn.definition('InputFormat', 'Html');
          
          // Apply the page's InputFormat to this textarea.
          $(TextArea).data('InputFormat', format);

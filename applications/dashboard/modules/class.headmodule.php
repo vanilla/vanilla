@@ -135,6 +135,9 @@ if (!class_exists('HeadModule', FALSE)) {
          }
 
          $Attributes = array('src' => Asset($Src, FALSE, GetValue('version', $Options)), 'type' => $Type);
+         if (isset($Options['defer'])) {
+            $Attributes['defer'] = $Options['defer'];
+         }
 
          foreach ($Options as $Key => $Value) {
             $Attributes['_'.strtolower($Key)] = $Value;

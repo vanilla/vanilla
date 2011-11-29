@@ -6,7 +6,7 @@
  * 
  * Thanks to http://technology.hostei.com/?p=3
  */
-$.fn.insertAtCaret = function (tagName) {
+jQuery.fn.insertAtCaret = function (tagName) {
    return this.each(function(){
       if (document.selection) {
          //IE support
@@ -31,7 +31,7 @@ $.fn.insertAtCaret = function (tagName) {
    });
 };
 
-$.fn.insertRoundCaret = function(strStart, strEnd, strReplace) {
+jQuery.fn.insertRoundCaret = function(strStart, strEnd, strReplace) {
    return this.each(function() {
       if (document.selection) {
          // IE support
@@ -78,7 +78,7 @@ $.fn.insertRoundCaret = function(strStart, strEnd, strReplace) {
    });
 }
 
-$.fn.hasSelection = function() {
+jQuery.fn.hasSelection = function() {
    var sel = false;
    this.each(function() {
       if (document.selection) {

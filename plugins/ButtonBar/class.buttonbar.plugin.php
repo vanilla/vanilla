@@ -12,7 +12,7 @@
 $PluginInfo['ButtonBar'] = array(
    'Name' => 'Button Bar',
    'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
-   'Version' => '1.1',
+   'Version' => '1.2.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -30,18 +30,11 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    public function DiscussionController_Render_Before($Sender) {
-      $DefaultFormatter = C('Garden.InputFormatter','Html');
-      $Discussion = GetValue('Discussion', $Sender, NULL);
-      if (is_null($Discussion)) return;
-      
-      $Formatter = GetValue('Format', $Discussion, $DefaultFormatter);
-            
+      $Formatter = C('Garden.InputFormatter','Html');
       $this->AttachButtonBarResources($Sender, $Formatter);
    }
    public function PostController_Render_Before($Sender) {
-      $DefaultFormatter = C('Garden.InputFormatter','Html');
-      $Formatter = $DefaultFormatter;
-      
+      $Formatter = C('Garden.InputFormatter','Html');
       $this->AttachButtonBarResources($Sender, $Formatter);
    }
       

@@ -555,7 +555,7 @@ class ActivityModel extends Gdn_Model {
          $Notify = $SendEmail;
       
       $Preference = FALSE;
-      if ($Notify && $RegardingUserID) {
+      if (($ActivityTypeRow['Notify'] || !$ActivityTypeRow['Public']) && $RegardingUserID) {
          $Activity['NotifyUserID'] = $Activity['RegardingUserID'];
          $Preference = $ActivityType;
       } else {
@@ -563,8 +563,15 @@ class ActivityModel extends Gdn_Model {
       }
 
       // Otherwise let the decision to email lie with the $Notify setting.
-      if ($SendEmail == 'Force') {
+      if ($SendEmail == 'Force' || $Notify) {
          $Activity['Emailed'] = self::SENT_PENDING;
+         $Preference = FALSE;
+      } elseif ($Notify) {
+         $Activity['Emailed'] = self::SENT_PENDING;
+         $Preference = FALSE;
+      } elseif ($SendEmail === FALSE) {
+         $Activity['Emailed'] = FALSE;
+         $Preference = FALSE;
       }
       
       $Activity = $this->Save($Activity, $Preference);
@@ -631,8 +638,10 @@ class ActivityModel extends Gdn_Model {
     */
    public function SendNotification($ActivityID, $Story = '', $Force = FALSE) {
       $Activity = $this->GetID($ActivityID);
-      if (!is_object($Activity))
+      if (!$Activity)
          return;
+      
+      $Activity = (object)$Activity;
       
       $Story = Gdn_Format::Text($Story == '' ? $Activity->Story : $Story, FALSE);
       // If this is a comment on another activity, fudge the activity a bit so that everything appears properly.
@@ -706,7 +715,7 @@ class ActivityModel extends Gdn_Model {
          return FALSE;
       
       // Format the activity headline based on the user being emailed.
-      if ($Activity['HeadlineFormat']) {
+      if (GetValue('HeadlineFormat', $Activity)) {
          $SessionUserID = Gdn::Session()->UserID;
          Gdn::Session()->UserID = $User['UserID'];
          $Activity['Headline'] = FormatString($Activity['HeadlineFormat'], $Activity);

@@ -223,7 +223,6 @@ class EntryController extends Gdn_Controller {
          break;
       }
       
-      // AddActivity($AuthenticatedUserID, 'SignIn');
       switch ($Reaction) {
       
          case Gdn_Authenticator::REACT_RENDER:

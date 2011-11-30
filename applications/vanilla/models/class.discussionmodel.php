@@ -971,13 +971,6 @@ class DiscussionModel extends VanillaModel {
     * @param string $DiscussionName Name of the discussion created.
     */
    public function RecordActivity($UserID, $DiscussionID, $DiscussionName) {
-      // Report that the discussion was created
-//      AddActivity(
-//         $UserID,
-//         'NewDiscussion',
-//         Anchor(Gdn_Format::Text($DiscussionName), 'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName))
-//      );
-      
       // Get the user's discussion count.
       $CountDiscussions = $this->SQL
          ->Select('DiscussionID', 'count', 'CountDiscussions')

@@ -1127,13 +1127,6 @@ class UserModel extends Gdn_Model {
                Plural($NewCount, 'role', 'roles')
             );
          }
-
-//         AddActivity(
-//            $Session->UserID != 0 ? $Session->UserID : $UserID,
-//            'RoleChange',
-//            $Story,
-//            $UserID
-//         );
       }
    }
 

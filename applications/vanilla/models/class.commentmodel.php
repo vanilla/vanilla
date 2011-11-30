@@ -777,42 +777,6 @@ class CommentModel extends VanillaModel {
    }
    
    /**
-    * Helper function for recording comment-related activity.
-    * 
-    * @since 2.0.0
-    * @access public
-    * @see CategoryModel::Save2()
-    *
-    * @param object $ActivityModel Passed along so we can use its Add method.
-    * @param object $Discussion Discussion data used to compose link for activity stream.
-    * @param int $ActivityUserID User taking the action; passed to ActivityModel::Add().
-    * @param int $CommentID Unique ID of comment inserted or updated. Used to compose link for activity stream.
-    * @param int $SendEmail Passed directly to ActivityModel::Add().
-    */  
-//   public function RecordActivity(&$ActivityModel, $Discussion, $ActivityUserID, $CommentID, $SendEmail = '') {
-//      if (!in_array(GetValue('Type', $Discussion, ''), array('', 'Discussion')))
-//         return;
-//
-//      // Check InsertUser can still see the discussion.
-//      $UserModel = Gdn::UserModel();
-//      $UserMayView = $UserModel->GetCategoryViewPermission($Discussion->InsertUserID, $Discussion->CategoryID);
-//      
-//      if ($Discussion->InsertUserID != $ActivityUserID && ($UserMayView || $SendEmail == 'Force')) {
-//			$ActivityID = $ActivityModel->Add(
-//				$ActivityUserID,
-//				'DiscussionComment',
-//				Anchor(Gdn_Format::Text($Discussion->Name), "discussion/comment/$CommentID/#Comment_$CommentID"),
-//				$Discussion->InsertUserID,
-//				'',
-//				'discussion/comment/'.$CommentID.'/#Comment_'.$CommentID,
-//				$SendEmail
-//			);
-//         return $ActivityID;
-//      }
-//      
-//	}
-   
-   /**
     * Record advanced notifications for users.
     * 
     * @param ActivityModel $ActivityModel

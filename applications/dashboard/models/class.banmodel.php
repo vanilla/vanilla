@@ -95,7 +95,7 @@ class BanModel extends Gdn_Model {
       foreach ($NewUsers as $User) {
          if ($User['Banned'])
             continue;
-         $this->SaveUser($User, TRUE);
+         $this->SaveUser($User, TRUE, $NewBan);
       }
    }
    
@@ -249,21 +249,37 @@ class BanModel extends Gdn_Model {
     * @param array $User
     * @param bool $BannedValue Whether user is banned.
     */
-   public function SaveUser($User, $BannedValue) {
+   public function SaveUser($User, $BannedValue, $Ban = FALSE) {
       $Banned = $User['Banned'];
 
       if ($Banned == $BannedValue)
          return;
+      
+      Gdn::UserModel()->SetField($User['UserID'], 'Banned', $BannedValue);
 
       // Add the activity.
-      $ActivityType = $BannedValue ? 'Banned' : 'Unbanned';
-      AddActivity(Gdn::Session()->UserID, $ActivityType, '', $User['UserID']);
-
-      $this->SQL
-         ->Update('User u')
-         ->Set('u.Banned', $BannedValue)
-         ->Where('u.UserID', $User['UserID'])
-         ->Put();
+      $ActivityModel = new ActivityModel();
+      $Activity = array(
+          'ActivityType' => 'Ban',
+          'ActivityUserID' => $User['UserID'],
+          'RegardingUserID' => Gdn::Session()->UserID,
+          'NotifyUserID' => ActivityModel::NOTIFY_MODS
+          );
+      
+      $BannedString = $BannedValue ? 'banned' : 'unbanned';
+      if ($Ban) {
+         $Activity['HeadlineFormat'] = '{ActivityUserID,user} was '.$BannedString.' (based on {Data.BanType}: {Data.BanValue}).';
+         $Activity['Data'] = ArrayTranslate($Ban, array('BanType', 'BanValue'));
+         $Activity['Story'] = $Ban['Notes'];
+         $Activity['RecordType'] = 'Ban';
+         
+         if (isset($Ban['BanID'])) {
+            $Activity['BanID'] = $Ban['BanID'];
+         }
+      } else {
+         $Activity['HeadlineFormat'] = '{ActivityUserID,user} was '.$BannedString.'.';
+      }
+      $ActivityModel->Save($Activity);
    }
    
    /**

@@ -486,6 +486,7 @@ $ActivityModel = new ActivityModel();
 $ActivityModel->DefineType('Default');
 $ActivityModel->DefineType('Registration');
 $ActivityModel->DefineType('Status');
+$ActivityModel->DefineType('Ban');
 
 // Message Table
 $Construct->Table('Message')

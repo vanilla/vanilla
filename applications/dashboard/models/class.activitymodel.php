@@ -720,6 +720,17 @@ class ActivityModel extends Gdn_Model {
          $Activity['Headline'] = FormatString($Activity['HeadlineFormat'], $Activity);
          Gdn::Session()->UserID = $SessionUserID;
       } else {
+         if (!isset($Activity['ActivityGender'])) {
+            $AT = self::GetActivityType($Activity['ActivityType']);
+            
+            $Data = array($Activity);
+            self::JoinUsers($Data);
+            $Activity = $Data[0];
+            $Activity['RouteCode'] = GetValue('RouteCode', $AT);
+            $Activity['FullHeadline'] = GetValue('FullHeadline', $AT);
+            $Activity['ProfileHeadline'] = GetValue('ProfileHeadline', $AT);
+         }
+         
          $Activity['Headline'] = Gdn_Format::ActivityHeadline($Activity, '', $User['UserID']);
       }
       

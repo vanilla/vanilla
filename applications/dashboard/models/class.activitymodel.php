@@ -378,9 +378,11 @@ class ActivityModel extends Gdn_Model {
     */
    public function GetID($ActivityID) {
       $Activity = parent::GetID($ActivityID);
-      $this->CalculateRow($Activity);
-      $Activities = array($Activity);
-      self::JoinUsers($Activities);
+      if ($Activity) {
+         $this->CalculateRow($Activity);
+         $Activities = array($Activity);
+         self::JoinUsers($Activities);
+      }
       
       return $Activity;
    }
@@ -565,13 +567,10 @@ class ActivityModel extends Gdn_Model {
       // Otherwise let the decision to email lie with the $Notify setting.
       if ($SendEmail == 'Force' || $Notify) {
          $Activity['Emailed'] = self::SENT_PENDING;
-         $Preference = FALSE;
       } elseif ($Notify) {
          $Activity['Emailed'] = self::SENT_PENDING;
-         $Preference = FALSE;
       } elseif ($SendEmail === FALSE) {
-         $Activity['Emailed'] = FALSE;
-         $Preference = FALSE;
+         $Activity['Emailed'] = self::SENT_ARCHIVE;
       }
       
       $Activity = $this->Save($Activity, $Preference);
@@ -982,9 +981,9 @@ class ActivityModel extends Gdn_Model {
          if (!$Popup && !$Email && !GetValue('Force', $Options))
             return;
          
-         if ($Popup)
+         if ($Popup && !$Activity['Notified'])
             $Activity['Notified'] = self::SENT_PENDING;
-         if ($Email)
+         if ($Email && !$Activity['Emailed'])
             $Activity['Emailed'] = self::SENT_PENDING;
       }
       

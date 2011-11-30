@@ -107,7 +107,7 @@ class Gdn_Format {
             $GenderSuffixCode = 'Third';
             $GenderSuffixGender = $Activity->RegardingGender;
          }
-         $RegardingWallActivityPath = '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID;
+         $RegardingWallActivityPath = '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD;
          $RegardingWallLink = Url($RegardingWallActivityPath);
          $RegardingWall = Anchor(T('wall'), $RegardingWallActivityPath);
       }
@@ -124,7 +124,6 @@ class Gdn_Format {
          $ActivityRouteLink = Url($Activity->Route);
          $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
       }
-      //if ($Activity->ActivityID == 131) d($ActivityRouteLink, $Activity);
 
       // Translate the gender suffix.
       $GenderSuffixCode = "GenderSuffix.$GenderSuffixCode.$GenderSuffixGender";

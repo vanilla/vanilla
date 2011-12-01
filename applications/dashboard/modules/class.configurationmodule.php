@@ -37,7 +37,7 @@ class ConfigurationModule extends Gdn_Module {
    /**
     * @param Gdn_Controller $Controller The controller using this model.
     */
-   public function __construct($Sender) {
+   public function __construct($Sender = NULL) {
       parent::__construct($Sender);
 
       if (property_exists($Sender, 'Form'))

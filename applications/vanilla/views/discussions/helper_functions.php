@@ -151,7 +151,7 @@ function WriteFilterTabs($Sender) {
             $CssClass = 'Active';
          }
 
-         echo "<li class=\"$CssClass\">".Anchor(T('Categories'), '/categories/all', 'TabLink').'</li>';
+         echo " <li class=\"$CssClass\">".Anchor(T('Categories'), '/categories/all', 'TabLink').'</li> ';
       }
       ?>
       <?php if ($CountBookmarks > 0 || $Sender->RequestMethod == 'bookmarked') { ?>

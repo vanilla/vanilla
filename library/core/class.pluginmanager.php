@@ -372,6 +372,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
    public function RegisterPlugin($ClassName) {
       $ClassMethods = get_class_methods($ClassName);
+      if ($ClassMethods === NULL) {
+         throw new Exception("There was an error getting the $ClassName class methods.", 401);
+      }
+      
       foreach ($ClassMethods as $Method) {
          $MethodName = strtolower($Method);
          // Loop through their individual methods looking for event handlers and method overrides.

@@ -614,6 +614,15 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       return $this->_DeliveryMethod;
    }
+   
+   public function Description($Value = FALSE, $PlainText = FALSE) {
+      if ($Value != FALSE) {
+         if ($PlainText)
+            $Value = Gdn_Format::PlainText($Value);
+         $this->SetData('_Description', $Value);
+      }
+      return $this->Data('_Description');
+   }
 
    /**
     * Add error messages to be displayed to the user.
@@ -1460,7 +1469,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                if (strpos($JsFile, '//') !== FALSE) {
                   // This is a link to an external file.
-                  $this->Head->AddScript($JsFile);
+                  $this->Head->AddScript($JsFile, 'text/javascript', GetValue('Options', $JsInfo, array()));
                   continue;
                } if (strpos($JsFile, '/') !== FALSE) {
                   // A direct path to the file was given.

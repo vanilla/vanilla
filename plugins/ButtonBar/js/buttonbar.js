@@ -6,7 +6,7 @@
  * 
  * Thanks to http://technology.hostei.com/?p=3
  */
-$.fn.insertAtCaret = function (tagName) {
+jQuery.fn.insertAtCaret = function (tagName) {
    return this.each(function(){
       if (document.selection) {
          //IE support
@@ -31,15 +31,15 @@ $.fn.insertAtCaret = function (tagName) {
    });
 };
 
-$.fn.insertRoundCaret = function(strStart, strEnd) {
+jQuery.fn.insertRoundCaret = function(strStart, strEnd, strReplace) {
    return this.each(function() {
       if (document.selection) {
          // IE support
          stringBefore = this.value;
          this.focus();
          sel = document.selection.createRange();
-         insertstring = sel.text;
-         fullinsertstring = strStart + sel.text + strEnd;
+         insertstring = strReplace ? strReplace : sel.text;
+         fullinsertstring = strStart + insertString + strEnd;
          sel.text = fullinsertstring;
          document.selection.empty();
          this.focus();
@@ -57,22 +57,28 @@ $.fn.insertRoundCaret = function(strStart, strEnd) {
          startPos = this.selectionStart;
          endPos = this.selectionEnd;
          scrollTop = this.scrollTop;
+         
+         if (!strReplace)
+            strReplace = this.value.substring(startPos, endPos);
+         
          this.value = this.value.substring(0, startPos) + strStart
-                    + this.value.substring(startPos, endPos) + strEnd
+                    + strReplace + strEnd
                     + this.value.substring(endPos, this.value.length);
          this.focus();
          this.selectionStart = startPos + strStart.length;
-         this.selectionEnd = endPos + strStart.length;
+         this.selectionEnd = this.selectionStart + strReplace.length;
          this.scrollTop = scrollTop;
       } else {
-         this.value += strStart + strEnd;
+         if (!strReplace)
+            strReplace = '';
+         this.value += strStart + strReplace + strEnd;
          this.focus();
       }
       
    });
 }
 
-$.fn.hasSelection = function() {
+jQuery.fn.hasSelection = function() {
    var sel = false;
    this.each(function() {
       if (document.selection) {
@@ -176,6 +182,14 @@ $.fn.insertRoundTag = function(tagName, opts, props){
       }
    }
    
+   strReplace = '';
+   if (prefix) {
+      var selection = $(this).hasSelection();
+      if (selection) {
+         strReplace = selection.replace(/\n/g, '\n'+prefix);
+      }
+   }
+   
    if (closetype == 'full') {
       if (!hasFocused)
          strStart = strStart + closer;
@@ -191,7 +205,7 @@ $.fn.insertRoundTag = function(tagName, opts, props){
       else
          strEnd = strEnd + closeslice + closer + suffix;
    }
-   $(this).insertRoundCaret(strStart+prepend, strEnd);
+   $(this).insertRoundCaret(strStart+prepend, strEnd, strReplace);
 }
 
 jQuery(document).ready(function($) {
@@ -203,8 +217,12 @@ jQuery(document).ready(function($) {
          var ThisButtonBar = $(TextArea).closest('form').find('.ButtonBar');
          $(ThisButtonBar).data('ButtonBarTarget', TextArea);
          
-         // Apply the page's InputFormat to this textarea
-         $(TextArea).data('InputFormat', gdn.definition('InputFormat', 'Html'));
+         var format = $(TextArea).attr('format');
+         if (!format)
+            format = gdn.definition('InputFormat', 'Html');
+         
+         // Apply the page's InputFormat to this textarea.
+         $(TextArea).data('InputFormat', format);
          
          // Build button UIs
          $(ThisButtonBar).find('div').each(function(i, el){
@@ -238,13 +256,14 @@ jQuery(document).ready(function($) {
       },
       
       BindShortcuts: function(TextArea) {
-         ButtonBar.BindShortcut(TextArea, 'bold', 'ctrl+b');
-         ButtonBar.BindShortcut(TextArea, 'italic', 'ctrl+i');
-         ButtonBar.BindShortcut(TextArea, 'underline', 'ctrl+u');
-         ButtonBar.BindShortcut(TextArea, 'strike', 'ctrl+s');
-         ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+l');
-         ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+q');
-         ButtonBar.BindShortcut(TextArea, 'prompturl', 'ctrl+shift+l');
+         ButtonBar.BindShortcut(TextArea, 'bold', 'ctrl+B');
+         ButtonBar.BindShortcut(TextArea, 'italic', 'ctrl+I');
+         ButtonBar.BindShortcut(TextArea, 'underline', 'ctrl+U');
+         ButtonBar.BindShortcut(TextArea, 'strike', 'ctrl+S');
+         ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
+         ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
+         ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
+         ButtonBar.BindShortcut(TextArea, 'prompturl', 'ctrl+shift+L');
          ButtonBar.BindShortcut(TextArea, 'post', 'tab');
       },
       
@@ -418,7 +437,19 @@ jQuery(document).ready(function($) {
                break;
 
             case 'code':
-               $(TextArea).insertRoundTag('code',htmlOpts);
+               var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
+               if (multiline) {
+                  var thisOpts = $.extend(htmlOpts, {
+                     opentag:'<pre><code>',
+                     closetag:'</code></pre>',
+                     opener:'',
+                     closer:'',
+                     closeslice: ''
+                  });
+                  $(TextArea).insertRoundTag('',thisOpts);
+               } else {
+                  $(TextArea).insertRoundTag('code',htmlOpts);
+               }
                break;
 
             case 'image':
@@ -496,7 +527,19 @@ jQuery(document).ready(function($) {
                break;
 
             case 'code':
-               $(TextArea).insertRoundTag('`',markdownOpts);
+               var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
+               if (multiline) {
+                  var thisOpts = $.extend(markdownOpts, {
+                     prefix:'    ',
+                     opentag:'',
+                     closetag:'',
+                     opener:'',
+                     closer:''
+                  });
+                  $(TextArea).insertRoundTag('',thisOpts);
+               } else {
+                  $(TextArea).insertRoundTag('`',markdownOpts);
+               }
                break;
 
             case 'image':

@@ -244,12 +244,12 @@ class Gdn_UploadImage extends Gdn_Upload {
       do {
          if ($Chunk) {
             $Name = RandomString(12);
-            $Subdir = sprintf('%03d', mt_rand(0, 999));
+            $Subdir = sprintf('%03d', mt_rand(0, 999)).'/';
          } else {
             $Name = RandomString(12);
             $Subdir = '';
          }
-         $Path = "$TargetFolder/$Subdir/$Name.$Extension";
+         $Path = "$TargetFolder/{$Subdir}$Name.$Extension";
       } while(file_exists($Path));
       return $Path;
    }

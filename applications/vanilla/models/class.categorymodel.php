@@ -123,6 +123,11 @@ class CategoryModel extends Gdn_Model {
       Gdn::Cache()->Remove(self::CACHE_KEY);
    }
    
+   public static function ClearUserCache() {
+      $Key = 'UserCategory_'.Gdn::Session()->UserID;
+      Gdn::Cache()->Remove($Key);
+   }
+   
    /**
     * 
     * 
@@ -215,6 +220,7 @@ class CategoryModel extends Gdn_Model {
     */
    public static function JoinUserData(&$Categories, $AddUserCategory = TRUE) {
       $IDs = array_keys($Categories);
+      $DoHeadings = C('Vanilla.Categories.DoHeadings');
       
       if ($AddUserCategory) {
          $SQL = clone Gdn::SQL();
@@ -231,14 +237,23 @@ class CategoryModel extends Gdn_Model {
          } else
             $UserData = array();
          
+//         Gdn::Controller()->SetData('UserData', $UserData);
+         
          foreach ($IDs as $ID) {
             $Category = $Categories[$ID];
+            $DateMarkedRead = GetValue('DateMarkedRead', $Category);
             $Row = GetValue($ID, $UserData);
             if ($Row) {
-               $Categories[$ID]['UserDateMarkedRead'] = $Row['DateMarkedRead'];
+               $UserDateMarkedRead = $Row['DateMarkedRead'];
+               $DateMarkedRead = $Categories[$ID]['DateMarkedRead'];
+               
+               if (!$DateMarkedRead || ($UserDateMarkedRead && Gdn_Format::ToTimestamp($UserDateMarkedRead) > Gdn_Format::ToTimestamp($DateMarkedRead))) {
+                  $Categories[$ID]['DateMarkedRead'] = $UserDateMarkedRead;
+                  $DateMarkedRead = $UserDateMarkedRead;
+               }
+               
                $Categories[$ID]['Unfollow'] = $Row['Unfollow'];
             } else {
-               $Categories[$ID]['UserDateMarkedRead'] = NULL;
                $Categories[$ID]['Unfollow'] = FALSE;
             }
             
@@ -247,17 +262,18 @@ class CategoryModel extends Gdn_Model {
             $Categories[$ID]['Following'] = $Following;
 
             // Calculate the read field.
-            if (isset($Category['DateLastComment'])) {
-               $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
-               if (!$DateMarkedRead)
-                  $DateMarkedRead = GetValue('DateMarkedRead', $Category);
-               if ($DateMarkedRead || !GetValue('DateLastComment', $Category))
-                  $Categories[$ID]['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['DateLastComment']);
+            if ($DoHeadings && $Category['Depth'] <= 1) {
+               $Categories[$ID]['Read'] = FALSE;
+            } elseif ($DateMarkedRead) {
+               if (GetValue('LastDateInserted', $Category))
+                  $Categories[$ID]['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['LastDateInserted']);
                else
-                  $Categories[$ID]['Read'] = FALSE;
+                  $Categories[$ID]['Read'] = TRUE;
+            } else {
+               $Categories[$ID]['Read'] = FALSE;
             }
-            
          }
+            
       }
       
       // Add permissions.
@@ -1191,17 +1207,14 @@ class CategoryModel extends Gdn_Model {
          // Calculate the following field.
          $Following = !((bool)GetValue('Archived', $Category) || (bool)GetValue('Unfollow', $Category));
          $Category->Following = $Following;
-
-         // Calculate the read field.
-         if (property_exists($Category, 'DateLastComment')) {
-            $DateMarkedRead = GetValue('UserDateMarkedRead', $Category);
-            if (!$DateMarkedRead)
-               $DateMarkedRead = GetValue('DateMarkedRead', $Category);
-            if ($DateMarkedRead || !GetValue('DateLastComment', $Category))
-               $Category->Read = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category->DateLastComment);
-            else
-               $Category->Read = FALSE;
-         }
+            
+         $DateMarkedRead = GetValue('DateMarkedRead', $Category);
+         $UserDateMarkedRead = GetValue('UserDateMarkedRead', $Category);
+         
+         if (!$DateMarkedRead)
+            $DateMarkedRead = $UserDateMarkedRead;
+         elseif ($UserDateMarkedRead && Gdn_Format::ToTimestamp($UserDateMarkedRead) > Gdn_Format::ToTimeStamp($DateMarkedRead))
+            $DateMarkedRead = $UserDateMarkedRead;
          
          // Set appropriate Last* columns.
          SetValue('LastTitle', $Category, GetValue('LastDiscussionTitle', $Category, NULL));
@@ -1217,6 +1230,16 @@ class CategoryModel extends Gdn_Model {
             SetValue('LastUserID', $Category, GetValue('LastCommentUserID', $Category, NULL));
             SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));
             SetValue('LastUrl', $Category, '/discussion/comment/'.GetValue('LastCommentID', $Category).'#Comment_'.GetValue('LastCommentID', $Category));
+         }
+         
+         if ($DateMarkedRead) {
+            $LastDateInserted = GetValue('LastDateInserted', $Category);
+            if ($LastDateInserted)
+               $Category->Read = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($LastDateInserted);
+            else
+               $Category->Read = TRUE;
+         } else {
+            $Category->Read = FALSE;
          }
 
          foreach ($Result2 as $Category2) {

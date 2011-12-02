@@ -1319,12 +1319,6 @@ body.Profile #Panel {
 .User a {
    text-decoration: none;
 }
-.User h1 {
-   padding: 0 0 8px;
-   margin: 0;
-   line-height: 100%;
-   border: 0;
-}
 #Status {
    border-top-left-radius: 2px;
    border-top-right-radius: 2px;
@@ -1457,13 +1451,6 @@ table.PreferenceGroup td.Description {
 }
 
 /* About in content area */
-body.Profile .About.Box {
-	background: none;
-	padding: 0;
-}
-body.Profile div.About h4 {
-   display: none;
-}
 body.Profile div.About dl {
    padding: 0;
 }

@@ -276,14 +276,15 @@ if (!function_exists('UserUrl')) {
    /**
     * Return the url for a user.
     * @param array|object $User The user to get the url for.
+    * @param string $Px The prefix to apply before fieldnames. @since 2.1
     * @return string The url suitable to be passed into the Url() function.
     */
-   function UserUrl($User) {
+   function UserUrl($User, $Px = '') {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      return '/profile/'.($NameUnique ? '' : GetValue('UserID', $User, 0).'/').rawurlencode(GetValue('Name', $User));
+      return '/profile/'.($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').rawurlencode(GetValue($Px.'Name', $User));
    }
 }
 

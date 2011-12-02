@@ -166,21 +166,25 @@ class ActivityController extends Gdn_Controller {
     */
    public function Delete($ActivityID = '', $TransientKey = '') {
       $Session = Gdn::Session();
-      if (
-         $Session->ValidateTransientKey($TransientKey)
-         && is_numeric($ActivityID)
-      ) {
-         $HasPermission = $Session->CheckPermission('Garden.Activity.Delete');
-         if (!$HasPermission) {
-            $Activity = $this->ActivityModel->GetID($ActivityID);
-            $HasPermission = $Activity->InsertUserID == $Session->UserID;
-         }
-         if ($HasPermission)
-            $this->ActivityModel->Delete($ActivityID);
-      }
+      if (!$Session->ValidateTransientKey($TransientKey))
+         throw PermissionException();
       
-      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect(GetIncomingValue('Target', $this->SelfUrl));
+      if (!is_numeric($ActivityID))
+         throw Gdn_UserException('Invalid activity ID');
+      
+      
+      $HasPermission = $Session->CheckPermission('Garden.Activity.Delete');
+      if (!$HasPermission) {
+         $Activity = $this->ActivityModel->GetID($ActivityID);
+         $HasPermission = $Activity->InsertUserID == $Session->UserID;
+      }
+      if (!$HasPermission)
+         throw PermissionException();
+
+      $this->ActivityModel->Delete($ActivityID);
+      
+//      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+//         Redirect(GetIncomingValue('Target', $this->SelfUrl));
       
       // Still here? Getting a 404.
       $this->ControllerName = 'Home';

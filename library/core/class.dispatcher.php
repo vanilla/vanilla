@@ -165,6 +165,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       return $this->_ControllerMethodArgs;
    }
 
+   public function Start() {
+      $this->FireEvent('AppStartup');
+   }
+   
    /**
     * Analyzes the supplied query string and decides how to dispatch the request.
     */

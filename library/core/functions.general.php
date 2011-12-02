@@ -627,7 +627,9 @@ if (!function_exists('DebugMethod')) {
       echo $MethodName."(";
       $SA = array();
       foreach ($MethodArgs as $FuncArg) {
-         if (!is_array($FuncArg) && !is_object($FuncArg))
+         if (is_null($FuncArg))
+            $SA[] = 'NULL';
+         elseif (!is_array($FuncArg) && !is_object($FuncArg))
             $SA[] = "'{$FuncArg}'";
          elseif (is_array($FuncArg))
             $SA[] = "'Array(".sizeof($FuncArg).")'";

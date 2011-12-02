@@ -6,8 +6,10 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    $ActivityType = explode(' ', $Activity->ActivityType); // Make sure you strip out any extra css classes munged in here
    $ActivityType = $ActivityType[0];
    $Author = UserBuilder($Activity, 'Activity');
-   $Author->Photo = $Activity->Photo;
-   $PhotoAnchor = UserPhoto($Author, 'Photo');
+   $PhotoAnchor = Anchor(
+      Img($Activity->Photo, array('class' => 'ProfilePhotoMedium')),
+      $Activity->PhotoUrl, 'Photo');
+   
    $CssClass = 'Item Activity '.$ActivityType;
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';

@@ -52,6 +52,7 @@ $Dispatcher->EnabledApplicationFolders($EnabledApplications);
 $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 
 // 4. Process the request.
+$Dispatcher->Start();
 $Dispatcher->Dispatch();
 $Dispatcher->Cleanup();
 

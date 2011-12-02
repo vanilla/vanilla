@@ -90,7 +90,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *    Values can be retrieved with $this->GetFormValue($FieldName).
     * @access private
     */
-   private $_FormValues;
+   public $_FormValues;
    
    /**
     * @var array Collection of IDs that have been created for form elements. This
@@ -1670,7 +1670,7 @@ class Gdn_Form extends Gdn_Pluggable {
    public function GetValue($FieldName, $Default = FALSE) {
       $Return = '';
       // Only retrieve values from the form collection if this is a postback.
-      if ($this->IsPostBack()) {
+      if ($this->IsMyPostBack()) {
          $Return = $this->GetFormValue($FieldName, $Default);
       } else {
          $Return = ArrayValue($FieldName, $this->_DataArray, $Default);
@@ -1699,9 +1699,21 @@ class Gdn_Form extends Gdn_Pluggable {
       2009-03-31 - switching back to "get" dictating a postback
       */
       $FormCollection = $this->Method == 'get' ? $_GET : $_POST;
-      return count($FormCollection) > 0 || (is_array($this->_FormValues) && count($this->_FormValues) > 0) ? TRUE : FALSE;
+      return count($FormCollection) > 0 || (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
    }
 
+   /**
+    * Check if THIS particular form was submitted
+    * 
+    * Just like IsPostBack(), except auto populates FormValues and doesnt just check
+    * "was some data submitted lol?!".
+    * 
+    * @return boolean
+    */
+   public function IsMyPostBack() {
+      return (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+   }
+   
    /**
     * This is a convenience method so that you don't have to code this every time
     * you want to save a simple model's data.

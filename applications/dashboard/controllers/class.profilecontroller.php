@@ -944,12 +944,6 @@ class ProfileController extends Gdn_Controller {
       $this->Title(Gdn_Format::Text($this->User->Name));
       
       if ($this->_DeliveryType != DELIVERY_TYPE_VIEW) {
-         // Setup UserInfo module
-         $UserInfoModule = new UserInfoModule($this);
-         $UserInfoModule->User = $this->User;
-         $UserInfoModule->Roles = $this->Roles;
-         $this->AddModule($UserInfoModule);
-         
          // Javascript needed
          $this->AddJsFile('jquery.jcrop.pack.js');
          $this->AddJsFile('profile.js');

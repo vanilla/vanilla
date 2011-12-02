@@ -719,7 +719,7 @@ class CommentModel extends VanillaModel {
              'ActivityType' => 'Comment',
              'ActivityUserID' => $Fields['InsertUserID'],
              'HeadlineFormat' => $HeadlineFormat,
-             'RecordTye' => 'Comment',
+             'RecordType' => 'Comment',
              'RecordID' => $CommentID,
              'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
              'Data' => array('Name' => $Discussion->Name)

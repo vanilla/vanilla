@@ -967,7 +967,7 @@ class ProfileController extends Gdn_Controller {
 				$NotificationsHtml = $Notifications;
             $CountNotifications = $Session->User->CountNotifications;
             if (is_numeric($CountNotifications) && $CountNotifications > 0)
-               $NotificationsHtml .= '<span>'.$CountNotifications.'</span>';
+               $NotificationsHtml .= ' <span class="Count">'.$CountNotifications.'</span>';
                
             $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications', $NotificationsHtml);
          }

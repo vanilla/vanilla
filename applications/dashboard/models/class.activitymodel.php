@@ -135,19 +135,7 @@ class ActivityModel extends Gdn_Model {
    public function Delete($ActivityID) {
       // Get the activity first
       $Activity = $this->GetID($ActivityID);
-      if (is_object($Activity)) {
-         $Users = array();
-         $Users[] = $Activity->ActivityUserID;
-         if (is_numeric($Activity->RegardingUserID) && $Activity->RegardingUserID > 0)
-            $Users[] = $Activity->RegardingUserID;
-            
-         // Update the user's dateupdated field so that profile pages will not
-         // be cached and will reflect this deletion.
-         $this->SQL->Update('User')
-            ->Set('DateUpdated', Gdn_Format::ToDateTime())
-            ->WhereIn('UserID', $Users)
-            ->Put();
-         
+      if ($Activity) {
          // Delete comments on the activity item
          $this->SQL->Delete('ActivityComment', array('ActivityID' => $ActivityID));
          // Delete the activity item

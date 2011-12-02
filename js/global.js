@@ -655,7 +655,7 @@ jQuery(document).ready(function($) {
 					$(this).remove();
 				});
 				$('div.InformMessages').removeAttr('autodismisstimerid');
-			}, 5000);
+			}, 7000);
 			$('div.InformMessages').attr('autodismisstimerid', timerId);
 		}
 	}

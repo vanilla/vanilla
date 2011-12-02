@@ -243,11 +243,13 @@ input.Button {
 }
 .Buttons {
    margin-top: 10px;
-   /* text-align: right; */
 }
-/*.Buttons .Back {
+.CommentForm .Buttons {
+   text-align: right; 
+}
+.CommentForm .Buttons .Back {
    float: left;
-}*/
+}
 .Loading {
    height: 100px;
    padding: 0 20px;

@@ -26,7 +26,7 @@ $Editing = isset($this->Comment);
    echo $this->Form->Open();
    echo $this->Form->Errors();
    
-   $CommentOptions = array('MultiLine' => TRUE);
+   $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
    /*
     Caused non-root users to not be able to add comments. Must take categories
     into account. Look at CheckPermission for more information.

@@ -199,7 +199,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $LastKey = $Key;
          }
 
-         $Prefix = '$'.$VariableName."['".addslashes($Key)."']";
+         $Prefix = '$'.$VariableName."[".var_export($Key, TRUE)."]";
          FormatArrayAssignment($Lines, $Prefix, $Value);
       }
 
@@ -318,7 +318,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             if ($i == $KeyCount - 1) {   
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
-                  $Settings[$Key] = Gdn_Format::Serialize($Value);
+                  $Settings[$Key] = $Value;
                }
             } else {
                // Build the array as we loop over the key. Doucement.
@@ -584,31 +584,13 @@ class Gdn_Configuration extends Gdn_Pluggable {
          }
       }
 
-      $NewLines = array();
-      $NewLines[] = "<?php if (!defined('APPLICATION')) exit();";
-      $LastName = '';
-      foreach ($Data as $Name => $Value) {
-         // Write a newline to seperate sections.
-         if ($LastName != $Name && is_array($Value)) {
-            $NewLines[] = '';
-            $NewLines[] = '// '.$Name;
-         }
-         
-         $Line = "\${$Group}['{$Name}']";
-         FormatArrayAssignment($NewLines, $Line, $Value);
-      }
-      
-      // Record who made the change and when
-      if (is_array($NewLines)) {
-         $Session = Gdn::Session();
-         $User = $Session->UserID > 0 && is_object($Session->User) ? $Session->User->Name : 'Unknown';
-         $NewLines[] = '';
-         $NewLines[] = '// Last edited by '.$User.' (' . RemoteIp() . ') ' . Gdn_Format::ToDateTime();
-      }
-
-      $FileContents = FALSE;
-      if ($NewLines !== FALSE)
-         $FileContents = implode("\n", $NewLines);
+      // Build string
+      $FileContents = $this->Format($Data, array(
+         'VariableName' => $Group,
+         'Headers'      => TRUE,
+         'ByLine'       => TRUE,
+         'WrapPHP'      => TRUE
+      ));
 
       if ($FileContents === FALSE)
          trigger_error(ErrorMessage('Failed to define configuration file contents.', $Group, 'Save'), E_USER_ERROR);
@@ -770,6 +752,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $this->Initial = $Settings;
       $this->Settings = $Settings;
       $this->Dirty = FALSE;
+      $this->Splitting = TRUE;
    }
    
    public function Splitting($Splitting = TRUE) {
@@ -915,7 +898,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                $this->Dirty = TRUE;
             } else {
                // Advance the pointer
-               $Settings =& $Settings[$Key];
+               $Settings = &$Settings[$Key];
             }
          } else {
             $Found = FALSE;
@@ -967,12 +950,14 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                   $SetVal = $Value;
                   
                   // Serialize if array or obj
+                  /*
                   if (is_array($Value) || is_object($Value)) {
                      $SetVal = Gdn_Format::Serialize($Value);
                   // ArrayValueEncode if string
                   } elseif (is_string($Value) && !is_numeric($Value) && !is_bool($Value)) {
                      $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
                   }
+                  */
                   $Settings[$Key] = $SetVal;
                   if (!$KeyExists || $SetVal != $OldVal)
                      $this->Dirty = TRUE;
@@ -987,6 +972,40 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             }
          }
       }
+   }
+   
+   /**
+    * Gets a setting from the configuration array. Returns $DefaultValue if the value isn't found.
+    *
+    * @param string $Name The name of the configuration setting to get. If the setting is contained
+    * within an associative array, use dot denomination to get the setting. ie.
+    * <code>$this->Get('Database.Host')</code> would retrieve <code>$Configuration[$Group]['Database']['Host']</code>.
+    * @param mixed $DefaultValue If the parameter is not found in the group, this value will be returned.
+    * @return mixed The configuration value.
+    */
+   public function Get($Name, $DefaultValue = FALSE) {
+      
+      // Shortcut, get the whole config
+      if ($Name == '.') return $this->Settings;
+      
+      $Keys = explode('.', $Name);
+      $KeyCount = count($Keys);
+      
+      $Value = $this->Settings;
+      for ($i = 0; $i < $KeyCount; ++$i) {
+         if (is_array($Value) && array_key_exists($Keys[$i], $Value)) {
+            $Value = $Value[$Keys[$i]];
+         } else {
+            return $DefaultValue;
+         }
+      }
+      
+      if (is_string($Value))
+         $Result = Gdn_Format::Unserialize($Value);
+      else
+         $Result = $Value;
+         
+      return $Result;
    }
    
    public function Save() {

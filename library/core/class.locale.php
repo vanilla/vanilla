@@ -10,6 +10,7 @@
  * @package Garden
  * @since 2.0
  */
+
 class Gdn_Locale extends Gdn_Pluggable {
    
    /**
@@ -91,19 +92,14 @@ class Gdn_Locale extends Gdn_Pluggable {
     */
    public function Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
       
-      $SafeLocaleName = preg_replace('/([^\w\d_-])/', '', $LocaleName); // Removes everything from the string except letters, numbers, dashes, and underscores
-      
       // Get locale sources
+      $this->Locale = $LocaleName;
       $LocaleSources = $this->GetLocaleSources($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
-
+      if (!is_array($LocaleSources))
+         $LocaleSources = array();
+      
       // Create a locale config container
       $this->Unload();
-
-      // Now set the locale name and import all of the sources.
-      $this->Locale = $LocaleName;
-      $LocaleSources = Gdn_LibraryMap::GetCache('locale', $SafeLocaleName);
-      if (is_null($SafeLocaleName))
-         $LocaleSources = array();
       
       $ConfLocaleOverride = PATH_CONF.'/locale.php';
       $Count = count($LocaleSources);

@@ -135,6 +135,9 @@ if (!class_exists('HeadModule', FALSE)) {
          }
 
          $Attributes = array('src' => Asset($Src, FALSE, GetValue('version', $Options)), 'type' => $Type);
+         if (isset($Options['defer'])) {
+            $Attributes['defer'] = $Options['defer'];
+         }
 
          foreach ($Options as $Key => $Value) {
             $Attributes['_'.strtolower($Key)] = $Value;
@@ -300,6 +303,10 @@ if (!class_exists('HeadModule', FALSE)) {
             if ($CurrentUrl != $CanonicalUrl) {
                $this->AddTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
             }
+         }
+         
+         if ($Description = $this->_Sender->Description()) {
+            $this->AddTag('meta', array('name' => 'description', 'content' => $Description));
          }
 
          $this->FireEvent('BeforeToString');

@@ -80,6 +80,7 @@ class DiscussionController extends VanillaController {
       
       // Setup
       $this->Title($this->Discussion->Name);
+      $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format)));
 
       // Actual number of comments, excluding the discussion itself
       $ActualResponses = $this->Discussion->CountComments - 1;
@@ -572,7 +573,7 @@ class DiscussionController extends VanillaController {
     */
    public function DeleteComment($CommentID = '', $TransientKey = '') {
       $Session = Gdn::Session();
-      $DefaultTarget = '/vanilla/discussions/';
+      $DefaultTarget = '/discussions/';
       if (
          is_numeric($CommentID)
          && $CommentID > 0

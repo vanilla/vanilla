@@ -66,6 +66,9 @@ class LogModel extends Gdn_Pluggable {
             if ($DiscoveryText = GetValue('DiscoveryText', $Data)) {
                $Result .= '<br /><b>'.T('Why do you want to join?').'</b><br />'.Gdn_Format::Display($DiscoveryText);
             }
+            if (GetValue('Banned', $Data)) {
+               $Result .= "<br />".T('Banned');
+            }
             break;
          default:
             $Result = '';

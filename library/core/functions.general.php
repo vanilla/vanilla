@@ -1,12 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * General functions
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
+ */
 
 include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
 
@@ -623,7 +627,9 @@ if (!function_exists('DebugMethod')) {
       echo $MethodName."(";
       $SA = array();
       foreach ($MethodArgs as $FuncArg) {
-         if (!is_array($FuncArg) && !is_object($FuncArg))
+         if (is_null($FuncArg))
+            $SA[] = 'NULL';
+         elseif (!is_array($FuncArg) && !is_object($FuncArg))
             $SA[] = "'{$FuncArg}'";
          elseif (is_array($FuncArg))
             $SA[] = "'Array(".sizeof($FuncArg).")'";
@@ -983,11 +989,7 @@ if (!function_exists('FormatArrayAssignment')) {
       } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
          $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
       } else {
-         if (strpos($Value, "'") !== FALSE) {
-            $Array[] = $Prefix .= ' = "'.Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value)).'";';
-         } else {
-            $Array[] = $Prefix .= " = '".Gdn_Format::ArrayValueForPhp($Value)."';";
-         }
+         $Array[] = $Prefix .= ' = '.var_export($Value, TRUE).';';
       }
    }
 }
@@ -2039,6 +2041,20 @@ if (!function_exists('SaveToConfig')) {
     */
    function SaveToConfig($Name, $Value = '', $Options = array()) {
       Gdn::Config()->SaveToConfig($Name, $Value, $Options);
+   }
+}
+
+if (!function_exists('SliceParagraph')) {
+   function SliceParagraph($String, $MaxLength = 500, $Suffix = '') {
+      $Pos = strpos($String, "\n\n");
+      if ($Pos == FALSE)
+         return SliceString($String, $MaxLength, $Suffix);
+      
+      $String = substr($String, 0, $Pos);
+      if (strlen($String) > $MaxLength)
+         return SliceString($String, $MaxLength, $Suffix);
+      
+      return $String;
    }
 }
 

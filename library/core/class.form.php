@@ -1,26 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-/**
- * Helps with the rendering of form controls that link directly to a data model.
- *
- * @author Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- */
 
 /**
+ * Form validation layer
+ * 
  * Helps with the rendering of form controls that link directly to a data model.
  *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
- * @todo change formatting of tables in documentation
+ * @since 2.0
  */
+
 class Gdn_Form extends Gdn_Pluggable {
    /**
     * @var string Action with which the form should be sent.
@@ -99,7 +90,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *    Values can be retrieved with $this->GetFormValue($FieldName).
     * @access private
     */
-   private $_FormValues;
+   public $_FormValues;
    
    /**
     * @var array Collection of IDs that have been created for form elements. This
@@ -229,8 +220,11 @@ class Gdn_Form extends Gdn_Pluggable {
       // Respect category permissions (remove categories that the user shouldn't see).
       $SafeCategoryData = array();
       foreach ($CategoryData as $CategoryID => $Category) {
+         if (!$Category['PermsDiscussionsAdd'])
+            continue;
+         
          if ($Value != $CategoryID) {
-            if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsAdd'])
+            if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsView'])
                continue;
 
             if ($Category['Archived'])
@@ -1676,7 +1670,7 @@ class Gdn_Form extends Gdn_Pluggable {
    public function GetValue($FieldName, $Default = FALSE) {
       $Return = '';
       // Only retrieve values from the form collection if this is a postback.
-      if ($this->IsPostBack()) {
+      if ($this->IsMyPostBack()) {
          $Return = $this->GetFormValue($FieldName, $Default);
       } else {
          $Return = ArrayValue($FieldName, $this->_DataArray, $Default);
@@ -1705,9 +1699,21 @@ class Gdn_Form extends Gdn_Pluggable {
       2009-03-31 - switching back to "get" dictating a postback
       */
       $FormCollection = $this->Method == 'get' ? $_GET : $_POST;
-      return count($FormCollection) > 0 || (is_array($this->_FormValues) && count($this->_FormValues) > 0) ? TRUE : FALSE;
+      return count($FormCollection) > 0 || (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
    }
 
+   /**
+    * Check if THIS particular form was submitted
+    * 
+    * Just like IsPostBack(), except auto populates FormValues and doesnt just check
+    * "was some data submitted lol?!".
+    * 
+    * @return boolean
+    */
+   public function IsMyPostBack() {
+      return (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+   }
+   
    /**
     * This is a convenience method so that you don't have to code this every time
     * you want to save a simple model's data.

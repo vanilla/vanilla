@@ -286,7 +286,7 @@ class EntryController extends Gdn_Controller {
          // Here are the initial data array values. that can be set by a plugin.
          $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => $this->Target());
          $this->Form->SetData($Data);
-         $this->Form->AddHidden('Target');
+         $this->Form->AddHidden('Target', $this->Request->Get('Target', '/'));
       }
 
       // The different providers can check to see if they are being used and modify the data array accordingly.
@@ -1086,8 +1086,16 @@ class EntryController extends Gdn_Controller {
                   Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
 
                $this->EventArguments['AuthUserID'] = $AuthUserID;
-               $this->FireEvent('RegistrationPending');
+               $this->FireEvent('RegistrationPending');  
                $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
+               
+               // Grab all of the users that need to be notified.
+               $Data = Gdn::Database()->SQL()->GetWhere('UserMeta', array('Name' => 'Preferences.Email.Applicant'))->ResultArray();
+               $ActivityModel = new ActivityModel();
+               $Story = Anchor(Gdn_Format::Text('New applicant: '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
+               foreach ($Data as $Row) {
+                  $ActivityModel->Add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
+               }
             }
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);

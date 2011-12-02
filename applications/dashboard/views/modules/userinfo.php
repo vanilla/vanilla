@@ -20,7 +20,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       <dt class="LastActive"><?php echo T('Last Active'); ?></dt>
       <dd class="LastActive"><?php echo Gdn_Format::Date($this->User->DateLastActive); ?></dd>
       <dt class="Roles"><?php echo T('Roles'); ?></dt>
-      <dd class="Roles"><?php echo implode(', ', $this->Roles); ?></dd>
+      <dd class="Roles"><?php echo htmlspecialchars(implode(', ', ConsolidateArrayValuesByKey($this->Roles, 'Name'))); ?></dd>
       <?php if ($Session->CheckPermission('Garden.Moderation.Manage')): ?>
       <dt class="IP"><?php echo T('Register IP'); ?></dt>
       <dd class="IP"><?php 

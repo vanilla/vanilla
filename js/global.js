@@ -158,6 +158,23 @@ jQuery(document).ready(function($) {
       return def;
    }
    
+   gdn.disable = function(e) {
+      var href = $(e).attr('href');
+      if (href) {
+         $.data(e, 'hrefBak', href);
+      }
+      $(e).addClass('InProgress').removeAttr('href').attr('disabled', true);
+   }
+   
+   gdn.enable = function(e) {
+      $(e).attr('disabled', false).removeClass('InProgress');
+      var href = $.data(e, 'hrefBak');
+      if (href) {
+         $(e).attr('href', href);
+         $.removeData(e, 'hrefBak');
+      }
+   }
+   
    gdn.elementSupports = function(element, attribute) {
       var test = document.createElement(element);
       if (attribute in test)
@@ -498,8 +515,10 @@ jQuery(document).ready(function($) {
    var hijackClick = function(e) {
       var $elem = $(this);
       var href = $elem.attr('href');
-      $elem.removeAttr('href');
-      $elem.addClass('InProgress');
+      if (!href)
+         return;
+      gdn.disable(this);
+      
 
       $.ajax({
          type: "POST",
@@ -507,6 +526,7 @@ jQuery(document).ready(function($) {
          data: {DeliveryType: 'VIEW', 'DeliveryMethod': 'JSON'},
          dataType: 'json',
          complete: function() {
+            gdn.enable(this);
             $elem.removeClass('InProgress');
             $elem.attr('href', href);
          },
@@ -818,7 +838,12 @@ jQuery(document).ready(function($) {
 	}
 	
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
+   var notificationsPinging = 0;
 	pingForNotifications = function() {
+      if (notificationsPinging > 0)
+         return;
+      notificationsPinging++;
+      
       $.ajax({
          type: "POST",
          url: gdn.url('dashboard/notifications/inform'),
@@ -829,6 +854,9 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             gdn.inform(json);
+         },
+         complete: function() {
+            notificationsPinging--;
          }
       });
 	}

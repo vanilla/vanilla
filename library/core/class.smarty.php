@@ -1,12 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * Smart abstraction layer
+ * 
+ * Vanilla implementation of Smarty templating engine.
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
+ */
 
 class Gdn_Smarty {
    /// Constructor ///
@@ -78,7 +82,12 @@ class Gdn_Smarty {
       $Smarty->security_settings['IF_FUNCS'] = array_merge($Smarty->security_settings['IF_FUNCS'],
          array('CheckPermission', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url'));
       $Smarty->secure_dir = array($Path);
-      $Smarty->display($Path);
+      
+      $CompileID = $Smarty->compile_id;
+      if (defined('CLIENT_NAME'))
+         $CompileID = CLIENT_NAME;
+      
+      $Smarty->display($Path, NULL, $CompileID);
    }
 
    /**

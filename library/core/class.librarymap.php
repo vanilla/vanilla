@@ -9,7 +9,9 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @since 2.0
+ * @deprecated
  */
+
 class Gdn_LibraryMap {
    
    /**

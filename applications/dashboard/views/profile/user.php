@@ -15,5 +15,6 @@ $Session = Gdn::Session();
 
       echo '</div>';
    }
+   echo Gdn_Theme::Module('UserInfoModule');
    ?>
 </div>

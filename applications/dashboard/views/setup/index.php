@@ -10,3 +10,5 @@ echo $this->Form->Open();
       <li><?php echo Anchor(T('Click here to carry on to your dashboard'), 'settings'); ?>.</li>
    </ul>
 </div>
+<?php
+echo $this->Form->Close();

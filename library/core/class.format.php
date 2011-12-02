@@ -1,24 +1,18 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
+ * Output formatter
+ * 
  * Utility class that helps to format strings, objects, and arrays.
  *
- *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
+
 class Gdn_Format {
 
    /**
@@ -714,8 +708,10 @@ class Gdn_Format {
                $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                $Mixed = FixNl2Br($Mixed);
             }
-
+            
             $Result = $Formatter->Format($Mixed);
+            
+            
 
 //            $Result = $Result.
 //               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
@@ -734,6 +730,29 @@ class Gdn_Format {
          
          return $Result;
       }
+   }
+   
+   /**
+    * Format a string as plain text.
+    * @param string $Body The text to format.
+    * @param string $Format The current format of the text.
+    * @return string
+    * @since 2.1
+    */
+   public static function PlainText($Body, $Format = 'Html') {
+      $Result = Gdn_Format::To($Body, $Format);
+      
+      if ($Format != 'Text') {
+         // Remove returns and then replace html return tags with returns.
+         $Result = str_replace(array("\n", "\r"), '', $Result);
+         $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
+         $Allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+         $Result = preg_replace('`</'.$Allblocks.'>`', "\n\n", $Result);
+         
+         $Result = strip_tags($Result);
+      }
+      $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
+      return $Result;
    }
 
    public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
@@ -943,7 +962,7 @@ EOT;
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
          } else {
-            require_once(PATH_LIBRARY.DS.'vendors'.DS.'markdown'.DS.'markdown.php');
+            require_once(PATH_LIBRARY.'/vendors/markdown/markdown.php');
             $Mixed = Markdown($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
@@ -1215,6 +1234,7 @@ EOT;
          $Mixed = str_replace(' ', '-', trim($Mixed)); // get rid of spaces
          $Mixed = preg_replace('/-+/', '-', $Mixed); // limit to 1 hyphen at a time
          $Mixed = urlencode(strtolower($Mixed));
+         $Mixed = trim($Mixed, '.-');
          return $Mixed;
       } else {
          // Better Unicode support.
@@ -1225,6 +1245,7 @@ EOT;
          $Mixed = preg_replace('`([^\PS+])`u', '', $Mixed); // get rid of symbols
          $Mixed = preg_replace('`[\s\-/+]+`u', '-', $Mixed); // replace certain characters with dashes
          $Mixed = rawurlencode(strtolower($Mixed));
+         $Mixed = trim($Mixed, '.-');
 			return $Mixed;
       }
    }

@@ -1,32 +1,27 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
+ * Controller base class
+ * 
  * A base class that all controllers can inherit for common controller
  * properties and methods.
- *
- * @author Mark O'Sullivan
- * @copyright 2003 Mark O'Sullivan
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
- */
-
-/**
+ * 
  * @method void Render() Render the controller's view.
  * @param string $View
  * @param string $ControllerName
  * @param string $ApplicationFolder
  * @param string $AssetName The name of the asset container that the content should be rendered in.
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
+ * @abstract
  */
+
 class Gdn_Controller extends Gdn_Pluggable {
 
    /**
@@ -113,10 +108,10 @@ class Gdn_Controller extends Gdn_Pluggable {
    public $Menu;
 
    /**
-    * If specified, this string will be used to identify the sort collection
-    * in conf/modules.php to use when organizing modules within page assets.
-    * $Configuration['Modules']['ModuleSortContainer']['AssetName'] = array('Module1', 'Module2');
+    * An associative array of assets and what order their modules should be rendered in.
+    * You can set module sort orders in the config using Modules.ModuleSortContainer.AssetName.
     *
+    * @example $Configuration['Modules']['Vanilla']['Panel'] = array('CategoryModule', 'NewDiscussionModule');
     * @var string
     */
    public $ModuleSortContainer;
@@ -619,6 +614,15 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       return $this->_DeliveryMethod;
    }
+   
+   public function Description($Value = FALSE, $PlainText = FALSE) {
+      if ($Value != FALSE) {
+         if ($PlainText)
+            $Value = Gdn_Format::PlainText($Value);
+         $this->SetData('_Description', $Value);
+      }
+      return $this->Data('_Description');
+   }
 
    /**
     * Add error messages to be displayed to the user.
@@ -1060,8 +1064,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       // If there were uncontrolled errors above the json data, wipe them out
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
-      if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON)
+      if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
          ob_clean();
+//         $this->ContentType('application/json');
+      }
       
       if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
          $this->ContentType('text/plain');
@@ -1463,7 +1469,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                if (strpos($JsFile, '//') !== FALSE) {
                   // This is a link to an external file.
-                  $this->Head->AddScript($JsFile);
+                  $this->Head->AddScript($JsFile, 'text/javascript', GetValue('Options', $JsInfo, array()));
                   continue;
                } if (strpos($JsFile, '/') !== FALSE) {
                   // A direct path to the file was given.
@@ -1697,57 +1703,63 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_Json[$Key] = $Value;
    }
    
-   public function StatusCode($StatusCode, $Message = NULL) {
-      if (is_null($Message)) {
-         switch ($StatusCode) {
-            case 100: $Message = 'Continue'; break;
-            case 101: $Message = 'Switching Protocols'; break;
-            
-            case 200: $Message = 'OK'; break;
-            case 201: $Message = 'Created'; break;
-            case 202: $Message = 'Accepted'; break;
-            case 203: $Message = 'Non-Authoritative Information'; break;
-            case 204: $Message = 'No Content'; break;
-            case 205: $Message = 'Reset Content'; break;
-            
-            case 300: $Message = 'Multiple Choices'; break;
-            case 301: $Message = 'Moved Permanently'; break;
-            case 302: $Message = 'Found'; break;
-            case 303: $Message = 'See Other'; break;
-            case 304: $Message = 'Not Modified'; break;
-            case 305: $Message = 'Use Proxy'; break;
-            case 307: $Message = 'Temporary Redirect'; break;
-         
-            case 400: $Message = 'Bad Request'; break;
-            case 401: $Message = 'Not Authorized'; break;
-            case 402: $Message = 'Payment Required'; break;
-            case 403: $Message = 'Forbidden'; break;
-            case 404: $Message = 'Not Found'; break;
-            case 405: $Message = 'Method Not Allowed'; break;
-            case 406: $Message = 'Not Acceptable'; break;
-            case 407: $Message = 'Proxy Authentication Required'; break;
-            case 408: $Message = 'Request Timeout'; break;
-            case 409: $Message = 'Conflict'; break;
-            case 410: $Message = 'Gone'; break;
-            case 411: $Message = 'Length Required'; break;
-            case 412: $Message = 'Precondition Failed'; break;
-            case 413: $Message = 'Request Entity Too Large'; break;
-            case 414: $Message = 'Request-URI Too Long'; break;
-            case 415: $Message = 'Unsupported Media Type'; break;
-            case 416: $Message = 'Requested Range Not Satisfiable'; break;
-            case 417: $Message = 'Expectation Failed'; break;
-            
-            case 500: $Message = 'Internal Server Error'; break;
-            case 501: $Message = 'Not Implemented'; break;
-            case 502: $Message = 'Bad Gateway'; break;
-            case 503: $Message = 'Service Unavailable'; break;
-            case 504: $Message = 'Gateway Timeout'; break;
-            case 505: $Message = 'HTTP Version Not Supported'; break;
-            
-            default: $Message = 'Unknown'; break;
-         }
+   public function StatusCode($StatusCode, $Message = NULL, $SetHeader = TRUE) {
+      if (is_null($Message))
+         $Message = self::GetStatusMessage($StatusCode);
+      
+      if ($SetHeader)
+         $this->SetHeader('Status', "{$StatusCode} {$Message}");
+      return $Message;
+   }
+   
+   public static function GetStatusMessage($StatusCode) {
+      switch ($StatusCode) {
+         case 100: $Message = 'Continue'; break;
+         case 101: $Message = 'Switching Protocols'; break;
+
+         case 200: $Message = 'OK'; break;
+         case 201: $Message = 'Created'; break;
+         case 202: $Message = 'Accepted'; break;
+         case 203: $Message = 'Non-Authoritative Information'; break;
+         case 204: $Message = 'No Content'; break;
+         case 205: $Message = 'Reset Content'; break;
+
+         case 300: $Message = 'Multiple Choices'; break;
+         case 301: $Message = 'Moved Permanently'; break;
+         case 302: $Message = 'Found'; break;
+         case 303: $Message = 'See Other'; break;
+         case 304: $Message = 'Not Modified'; break;
+         case 305: $Message = 'Use Proxy'; break;
+         case 307: $Message = 'Temporary Redirect'; break;
+
+         case 400: $Message = 'Bad Request'; break;
+         case 401: $Message = 'Not Authorized'; break;
+         case 402: $Message = 'Payment Required'; break;
+         case 403: $Message = 'Forbidden'; break;
+         case 404: $Message = 'Not Found'; break;
+         case 405: $Message = 'Method Not Allowed'; break;
+         case 406: $Message = 'Not Acceptable'; break;
+         case 407: $Message = 'Proxy Authentication Required'; break;
+         case 408: $Message = 'Request Timeout'; break;
+         case 409: $Message = 'Conflict'; break;
+         case 410: $Message = 'Gone'; break;
+         case 411: $Message = 'Length Required'; break;
+         case 412: $Message = 'Precondition Failed'; break;
+         case 413: $Message = 'Request Entity Too Large'; break;
+         case 414: $Message = 'Request-URI Too Long'; break;
+         case 415: $Message = 'Unsupported Media Type'; break;
+         case 416: $Message = 'Requested Range Not Satisfiable'; break;
+         case 417: $Message = 'Expectation Failed'; break;
+
+         case 500: $Message = 'Internal Server Error'; break;
+         case 501: $Message = 'Not Implemented'; break;
+         case 502: $Message = 'Bad Gateway'; break;
+         case 503: $Message = 'Service Unavailable'; break;
+         case 504: $Message = 'Gateway Timeout'; break;
+         case 505: $Message = 'HTTP Version Not Supported'; break;
+
+         default: $Message = 'Unknown'; break;
       }
-      $this->SetHeader('Status', "{$StatusCode} {$Message}");
       return $Message;
    }
    

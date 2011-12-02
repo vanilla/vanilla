@@ -1,7 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
+
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * MySQL structure driver
+ * 
+ * MySQL-specific structure tools for performing structural changes on MySQL 
+ * database servers.
+ *
+ * @author Todd Burry <todd@vanillaforums.com> 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
 
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
@@ -495,7 +504,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @todo This method and $Column need descriptions.
     */
    protected function _DefineColumn($Column) {
-      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'mediumtext', 'text', 'decimal', 'float', 'double', 'enum', 'timestamp')))
+      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'mediumtext', 'text', 'decimal', 'float', 'double', 'enum', 'timestamp', 'tinyblob', 'blob', 'mediumblob', 'longblob')))
          throw new Exception(sprintf(T('The specified data type (%1$s) is not accepted for the MySQL database.'), $Column->Type));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;

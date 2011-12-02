@@ -182,39 +182,48 @@ class DiscussionsController extends VanillaController {
     *
     * @param int $Offset Number of discussions to skip.
     */
-   public function Bookmarked($Page = 'p1') {
+   public function Bookmarked($Page = '0') {
       $this->Permission('Garden.SignIn.Allow');
       
-      // Set criteria & get discussions data
-      $Session = Gdn::Session();
-      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
-      $Wheres = array('w.Bookmarked' => '1', 'w.UserID' => $Session->UserID);
+      // Determine offset from $Page
+      list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', 'bookmarked', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
+      
+      // Validate $Page
+      if (!is_numeric($Page) || $Page < 0)
+         $Page = 0;
+      
       $DiscussionModel = new DiscussionModel();
-      $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
+      $Wheres = array(
+         'w.Bookmarked' => '1', 
+         'w.UserID' => Gdn::Session()->UserID
+      );
+      
+      $this->DiscussionData = $DiscussionModel->Get($Page, $Limit, $Wheres);
       $this->SetData('Discussions', $this->DiscussionData);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
       $this->Category = FALSE;
       
+      $this->SetJson('Loading', $Page . ' to ' . $Limit);
+      
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-		$this->EventArguments['PagerType'] = 'MorePager';
+		$this->EventArguments['PagerType'] = 'Pager';
 		$this->FireEvent('BeforeBuildBookmarkedPager');
       $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
-      $this->Pager->MoreCode = 'More Discussions';
-      $this->Pager->LessCode = 'Newer Discussions';
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
-         $Offset,
+         $Page,
          $Limit,
          $CountDiscussions,
          'discussions/bookmarked/%1$s'
       );
-
-      $this->SetData('_PagerUrl', 'discussions/bookmarked/{Page}');
+      
+      if (!$this->Data('_PagerUrl'))
+         $this->SetData('_PagerUrl', 'discussions/bookmarked/{Page}');
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
-
 		$this->FireEvent('AfterBuildBookmarkedPager');
       
       // Deliver JSON data if necessary
@@ -230,7 +239,7 @@ class DiscussionsController extends VanillaController {
       
       // Render default view (discussions/bookmarked.php)
       $this->SetData('Title', T('My Bookmarks'));
-      $this->Render('Index');
+      $this->Render('index');
    }
    
    /**

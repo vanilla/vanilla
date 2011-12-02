@@ -1,22 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
- * Dispatcher handles all requests.
+ * Framework dispatcher
+ * 
+ * Handles all requests and routing.
  *
- * @author Mark O'Sullivan
- * @copyright 2003 Mark O'Sullivan
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
  */
 
 class Gdn_Dispatcher extends Gdn_Pluggable {
@@ -170,6 +165,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       return $this->_ControllerMethodArgs;
    }
 
+   public function Start() {
+      $this->FireEvent('AppStartup');
+   }
+   
    /**
     * Analyzes the supplied query string and decides how to dispatch the request.
     */
@@ -563,8 +562,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $ControllerName = $Controller.'Controller';
       $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
-      if ($ControllerPath !== FALSE) {
-         
+      if ($ControllerPath) {
          // This was a guess search with no specified application. Look up
          // the application folder from the controller path.
          if (is_null($Application)) {

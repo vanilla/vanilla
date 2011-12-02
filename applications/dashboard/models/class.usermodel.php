@@ -195,6 +195,7 @@ class UserModel extends Gdn_Model {
       
       // Join the user data using prefixes (ex: 'Name' for 'InsertUserID' becomes 'InsertName')
       $Join = GetValue('Join', $Options, array('Name', 'Email', 'Photo'));
+      $UserPhotoDefaultUrl = function_exists('UserPhotoDefaultUrl');
       
       foreach ($Data as &$Row) {
          foreach ($Prefixes as $Px) {
@@ -202,7 +203,16 @@ class UserModel extends Gdn_Model {
             if ($ID) {
                $User = GetValue($ID, $Users, FALSE);
                foreach ($Join as $Column) {
-                  SetValue($Px.$Column, $Row, $User[$Column]);
+                  $Value = $User[$Column];
+                  if ($Column == 'Photo') {
+                     if (!$Value) {
+                        if ($UserPhotoDefaultUrl)
+                           $Value = UserPhotoDefaultUrl($User);
+                     } elseif (!preg_match('`^https?://`i', $Value)) {
+                        $Value = Gdn_Upload::Url(ChangeBasename($Value, 'n%s'));
+                     }
+                  }
+                  SetValue($Px.$Column, $Row, $Value);
                }
             } else {
                foreach ($Join as $Column) {

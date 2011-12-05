@@ -1310,12 +1310,6 @@ body.Profile #Panel {
 .User a {
    text-decoration: none;
 }
-.User h1 {
-   padding: 0 0 8px;
-   margin: 0;
-   line-height: 100%;
-   border: 0;
-}
 #Status {
    border-top-left-radius: 2px;
    border-top-right-radius: 2px;
@@ -1448,18 +1442,8 @@ table.PreferenceGroup td.Description {
 }
 
 /* About in content area */
-body.Profile .About.Box {
-	background: none;
-	padding: 0;
-}
-body.Profile div.About h4 {
-   display: none;
-}
-body.Profile div.About dl {
-   padding: 0;
-}
-body.Profile div.About dt,
-body.Profile div.About dd {
+dl.About dt,
+dl.About dd {
    color: #666;
    padding: 0;
    margin: 0;
@@ -1468,17 +1452,17 @@ body.Profile div.About dd {
    line-height: 14px;
    display: inline;
 }
-body.Profile div.About dt {
+dl.About dt {
    background: url('images/profile-sprites.png') 2px -139px no-repeat transparent;
    padding-left: 14px;
 }
-body.Profile div.About dt.Name { background-position: 0 -26px; }
-body.Profile div.About dt.Email { background-position: 0 -53px; }
-body.Profile div.About dt.Joined,
-body.Profile div.About dt.LastActive { background-position: 0 3px; }
-body.Profile div.About dt.Roles { background-position: 1px -81px; }
-body.Profile div.About dt.Posts { background-position: 0 -113px; }
-body.Profile div.About dd {
+dl.About dt.Name { background-position: 0 -26px; }
+dl.About dt.Email { background-position: 0 -53px; }
+dl.About dt.Joined,
+dl.About dt.LastActive { background-position: 0 3px; }
+dl.About dt.Roles { background-position: 1px -81px; }
+dl.About dt.Posts { background-position: 0 -113px; }
+dl.About dd {
    padding: 0 8px 0 0;
    color: #333;
 }

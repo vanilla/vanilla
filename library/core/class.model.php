@@ -273,10 +273,11 @@ class Gdn_Model extends Gdn_Pluggable {
          $Where = array($this->Name.'ID' => $Where);
 
       if($ResetData) {
-         $this->SQL->Delete($this->Name, $Where, $Limit);
+         $Result = $this->SQL->Delete($this->Name, $Where, $Limit);
       } else {
-         $this->SQL->NoReset()->Delete($this->Name, $Where, $Limit);
+         $Result = $this->SQL->NoReset()->Delete($this->Name, $Where, $Limit);
       }
+      return $Result;
    }
 
    /**

@@ -2080,15 +2080,28 @@ if (!function_exists('SaveToConfig')) {
 
 if (!function_exists('SliceParagraph')) {
    function SliceParagraph($String, $MaxLength = 500, $Suffix = '') {
-      $Pos = strpos($String, "\n\n");
-      if ($Pos == FALSE)
-         return SliceString($String, $MaxLength, $Suffix);
+      if ($MaxLength >= strlen($String))
+         return $String;
       
-      $String = substr($String, 0, $Pos);
-      if (strlen($String) > $MaxLength)
-         return SliceString($String, $MaxLength, $Suffix);
-      
-      return $String;
+      if (function_exists('mb_strpos')) {
+         $Pos = mb_strrpos($String, "\n\n", $MaxLength - 1);
+
+         if ($Pos == FALSE)
+            return SliceString($String, $MaxLength, $Suffix);
+
+         $String = mb_substr($String, 0, $Pos);
+
+         return $String;
+      } else {
+         $Pos = strrpos($String, "\n\n", $MaxLength - 1);
+
+         if ($Pos == FALSE)
+            return SliceString($String, $MaxLength, $Suffix);
+
+         $String = substr($String, 0, $Pos);
+
+         return $String;
+      }
    }
 }
 

@@ -746,8 +746,15 @@ class Gdn_Format {
          // Remove returns and then replace html return tags with returns.
          $Result = str_replace(array("\n", "\r"), '', $Result);
          $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
-         $Allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+         
+         // Fix lists.
+         $Result = str_replace('<li>', '* ', $Result);
+         $Result = preg_replace('`</(?:li|ol|ul)>`', "\n", $Result);
+         
+         $Allblocks = '(?:table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
          $Result = preg_replace('`</'.$Allblocks.'>`', "\n\n", $Result);
+         
+         // TODO: Fix hard returns within pre blocks.
          
          $Result = strip_tags($Result);
       }

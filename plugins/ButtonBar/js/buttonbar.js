@@ -544,8 +544,8 @@ jQuery(document).ready(function($) {
 
             case 'image':
                var thisOpts = $.extend(markdownOpts, {
-                  prefix:'!',
-                  opentag:'(',
+                  prefix:'',
+                  opentag:'![](',
                   closetag:')',
                   opener:'',
                   closer:''

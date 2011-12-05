@@ -60,6 +60,9 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     * @param object $Sender
     */
    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+      if (!$Sender)
+         $Sender = Gdn::Controller();
+      
       if (is_object($Sender)) {
          $this->_ApplicationFolder = $Sender->ApplicationFolder;
          $this->_ThemeFolder = $Sender->Theme;

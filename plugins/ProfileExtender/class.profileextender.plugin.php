@@ -91,7 +91,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       
       $this->UserFields = array();
       if (is_object($Sender->User))
-         $this->UserFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile_%', 'Profile_');
+         $this->UserFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
       
       include($this->GetView('profilefields.php'));
    }
@@ -140,7 +140,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    public function UserInfoModule_OnBasicInfo_Handler($Sender) {
       try {
          // Get the custom fields
-         $Fields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile_%', 'Profile_');
+         $Fields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
          
          // Reorder the custom fields
          // Use order of Plugins.ProfileExtender.ProfileFields first
@@ -160,7 +160,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 			   $Fields = Gdn::UserModel()->GetAttribute($Sender->User->UserID, 'CustomProfileFields', FALSE);
 			   if ($Fields) {
 			      // Migrate to UserMeta & delete original
-			      Gdn::UserModel()->SetMeta($Sender->User->UserID, $Fields, 'Profile_');
+			      Gdn::UserModel()->SetMeta($Sender->User->UserID, $Fields, 'Profile.');
 			      Gdn::UserModel()->SaveAttribute($Sender->User->UserID, 'CustomProfileFields', FALSE);
 			   }
          }
@@ -209,14 +209,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
             
             // Delete custom fields that had their label removed
-            $ExitingFields = Gdn::UserModel()->GetMeta($UserID, 'Profile_%', 'Profile_');
+            $ExitingFields = Gdn::UserModel()->GetMeta($UserID, 'Profile.%', 'Profile.');
             foreach ($ExitingFields as $Label => $Value) {
                if (!array_key_exists($Label, $Fields))
                   $Fields[$Label] = NULL;
             }
             
             // Update UserMeta
-            Gdn::UserModel()->SetMeta($UserID, $Fields, 'Profile_');
+            Gdn::UserModel()->SetMeta($UserID, $Fields, 'Profile.');
          }
       }
    }
@@ -237,7 +237,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    	   $RegistrationFields = array_flip((array)explode(',', C('Plugins.ProfileExtender.RegistrationFields')));
          $SaveFields = array_intersect_key($Fields, $RegistrationFields);
       
-         Gdn::UserModel()->SetMeta(GetValue('InsertUserID', $Sender->EventArguments), $SaveFields, 'Profile_');
+         Gdn::UserModel()->SetMeta(GetValue('InsertUserID', $Sender->EventArguments), $SaveFields, 'Profile.');
       }
 	}
    

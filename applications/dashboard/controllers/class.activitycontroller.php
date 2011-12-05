@@ -176,15 +176,17 @@ class ActivityController extends Gdn_Controller {
       $HasPermission = $Session->CheckPermission('Garden.Activity.Delete');
       if (!$HasPermission) {
          $Activity = $this->ActivityModel->GetID($ActivityID);
-         $HasPermission = $Activity->InsertUserID == $Session->UserID;
+         if (!$Activity)
+            throw NotFoundException('Activity');
+         $HasPermission = $Activity['InsertUserID'] == $Session->UserID;
       }
       if (!$HasPermission)
          throw PermissionException();
 
       $this->ActivityModel->Delete($ActivityID);
       
-//      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-//         Redirect(GetIncomingValue('Target', $this->SelfUrl));
+      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+         Redirect(GetIncomingValue('Target', $this->SelfUrl));
       
       // Still here? Getting a 404.
       $this->ControllerName = 'Home';

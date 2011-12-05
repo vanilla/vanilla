@@ -533,7 +533,15 @@ class Gdn_Configuration {
          $Result = FALSE;
          if (file_put_contents($TmpFile, $FileContents) !== FALSE) {
             chmod($TmpFile, 0775);
-            $Result = rename($TmpFile, $File);
+            if (!rename($TmpFile, $File)) {
+               // The rename may not work on Windows servers so try a copy.
+               if (copy($TmpFile, $File)) {
+                  unlink($TmpFile);
+                  $Result = TRUE;
+               }
+            } else {
+               $Result = TRUE;
+            }
          }
       }
 

@@ -53,8 +53,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                      url: target,
                      data: {'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON'},
                      dataType: 'json',
-                     error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        $.popup({}, XMLHttpRequest.responseText);
+                     error: function(xhr) {
+                        gdn.informError(xhr);
                      },
                      success: function(json) {
                         json = $.postParseJson(json);

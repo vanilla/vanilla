@@ -50,10 +50,6 @@ div.Popup div.Messages {
    margin: 10px 0 !important;
 }
 
-div.Popup div.Warning {
-   margin: 10px 0 0;
-}
-
 div.Popup div.Messages ul {
    display: block;
    border-radius: 2px;
@@ -62,6 +58,7 @@ div.Popup div.Messages ul {
 }
 div.Popup div.Info {
    border: 0;
+   margin-bottom: 1px;
 }
 
 * html div.Popup div.Messages {
@@ -237,4 +234,35 @@ div.Popup form span.FieldHelper {
 
 body div.Popup .Content form div.Buttons {
    margin-top: 10px;
+}
+
+body div.Popup div.Warning {
+   margin: 10px 0 0;
+   margin-top: 20px;
+   background: #dae5ea;
+}
+
+.Popup .Warning p {
+   border-left: 5px solid #7dc2df;
+   padding: 0px 0px 0px 5px;
+   margin: 0px;
+}
+
+div.Popup div.Notice {
+   font-style: italic;
+   font-size: 12px;
+}
+
+body div.Popup .Content form {
+   padding: 0px;
+   margin: 0px;
+}
+
+div.Popup .InfoRow {
+   margin: 10px 0px;
+}
+
+div.Popup .InfoRow label {
+   font-weight: bold;
+   display: block;
 }

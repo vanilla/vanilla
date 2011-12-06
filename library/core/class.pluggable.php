@@ -76,7 +76,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
     * contain the name of the class that the next event will fire off.
     * @var string
     */
-   public $FireClass;
+   public $FireAs;
    
    /**
     * The public constructor of the class. If any extender of this class

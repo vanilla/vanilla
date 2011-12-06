@@ -76,7 +76,7 @@ class vBulletinImportModel extends Gdn_Model {
       $ProfileKeyData = $this->SQL->Select('m.Name')->Distinct()->From('UserMeta m')->Like('m.Name', 'Profile_%')->Get();
       $ExistingKeys = array_filter((array)explode(',', C('Plugins.ProfileExtender.ProfileFields', '')));
       foreach ($ProfileKeyData->Result() as $Key) {
-         $Name = str_replace('Profile_', '', $Key->Name);
+         $Name = str_replace('Profile.', '', $Key->Name);
          if (!in_array($Name, $ExistingKeys)) {
             $ExistingKeys[] = $Name;
          }

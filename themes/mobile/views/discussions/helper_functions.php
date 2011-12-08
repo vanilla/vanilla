@@ -31,14 +31,16 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
       <div class="Meta">
          <span class="Author"><?php echo $Discussion->FirstName; ?></span>
          <?php
-            echo '<span class="Counts'.($Discussion->CountUnreadComments > 0 ? ' NewCounts' : '').'">'
+            Gdn::Controller()->FireEvent('BeforeDiscussionMeta');
+         
+            echo '<span class="MItem '.($Discussion->CountUnreadComments > 0 ? 'Counts NewCounts' : 'Tag').'">'
                .($Discussion->CountUnreadComments > 0 ? $Discussion->CountUnreadComments.'/' : '')
                .$Discussion->CountComments
             .'</span>';
             if ($Discussion->LastCommentID != '')
-               echo '<span class="LastCommentBy">'.sprintf(T('Latest %1$s'), $Discussion->LastName).'</span> ';
+               echo '<span class="MItem LastCommentBy">'.sprintf(T('Latest %1$s'), $Discussion->LastName).'</span> ';
                
-            echo '<span class="LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span> ';
+            echo '<span class="MItem LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span> ';
          ?>
       </div>
    </div>

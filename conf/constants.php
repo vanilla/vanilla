@@ -29,6 +29,7 @@ define('DELIVERY_METHOD_XML', 'XML');
  * @since 2.1
  */
 define('DELIVERY_METHOD_TEXT', 'TXT');
+define('DELIVERY_METHOD_PLAIN', 'PLAIN');
 
 // Handler enumerators:
 define('HANDLER_TYPE_NORMAL', 'NORMAL'); // Standard call to a method on the object.

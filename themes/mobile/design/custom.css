@@ -112,18 +112,10 @@ body.Post a.Close {
 	vertical-align: middle;
 }
 .Banner ul li a span {
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	padding: 1px 2px 0 1px;
 	background: #f00;
 	border-right: 1px solid #a00;
 	border-bottom: 1px solid #a00;
 	color: #fff;
-	font-size: 9px;
-	position: relative;
-	top: -3px;
-	line-height: 1;
 }
 
 /* Activities */
@@ -247,18 +239,6 @@ div.Tabs li.Active a {
    padding: 6px 10px;
 	position: relative;
 	top: 1px;
-}
-div.Tabs li a span {
-   line-height: 1;
-   font-size: 80%;
-   padding: 0 3px;
-   border-radius: 3px;
-   -webkit-border-radius: 3px;
-   -moz-border-radius: 3px;
-   font-weight: normal;
-	background: #E3F4FF;
-   color: #70727C;
-   margin: 0 0 0 4px;
 }
 form.Activity {
 	background: #fff;
@@ -434,9 +414,11 @@ div.Warning {
 	border-bottom: 1px solid #b00;
 	color: #fff;
 	text-shadow: 1px 1px 1px #444;
+   margin: 5px 0;
 }
-div.Warning a.Dismiss {
+div.Warning a {
 	color: #fff;
+   text-decoration: underline;
 }
 #Content div.Box {
 	color: #000;
@@ -454,14 +436,13 @@ ul.Discussions {
 }
 ul.Discussions div.Meta span.Author {
 	font-weight: bold;
-	margin-right: 8px;
-}
-ul.Discussions div.Meta span.LastCommentBy,
-ul.Discussions div.Meta span.LastCommentDate {
-	margin-right: 0;
 }
 ul.DataList div.Options {
 	display: none;
+}
+.MItem {
+    margin-left: 4px;
+    margin-right: 4px;
 }
 ul.DataList a.Title {
 	display: inline;
@@ -494,8 +475,8 @@ ul.DataList .Mine span.NewCounts {
 ul.Discussions li img {
 	height: 45px;
 	width: 45px;
-	padding: 0 6px 0 4px;
 	float: left;
+   margin-right: 5px;
 }
 ul.Discussions div.ItemContent, ul.Drafts div.ItemContent {
 	margin: 0 0 0 4px;
@@ -506,6 +487,7 @@ div.MessageForm,
 #MessageForm {
 	margin: 0;
 	border:0;
+   padding: 5px;
 	border-radius: 0;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
@@ -516,7 +498,7 @@ div.MessageForm,
 #ConversationForm form {
 	border: none;
 	background: transparent;
-	padding: 6px;
+	padding: 0;
 }
 #DiscussionForm h2,
 #MessageForm h2,
@@ -595,4 +577,23 @@ div.FootMenu span {
 .ac_over {
    background: #3b5998;
    color: #fff;
+}
+
+.Tag {
+    background: #EDEFF4;
+    color: #485F8F;
+    border: solid 1px #A1AABC;
+}
+
+.Mine .Tag {
+   background: #F8FAFE;
+}
+
+.Tag a {
+    color: #485F8F;
+}
+
+.Tabs li a span {
+   background: #F8FAFE;
+   color: #485F8F;
 }

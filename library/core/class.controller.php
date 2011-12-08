@@ -1239,6 +1239,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       // Make sure the database connection is closed before exiting.
       $this->Finalize();
+      $this->SendHeaders();
 
       // Check for a special view.
       $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), FALSE, FALSE, FALSE);
@@ -1252,6 +1253,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             header('Content-Type: text/xml', TRUE);
             echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
             $this->_RenderXml($Data);
+            exit();
+            break;
+         case DELIVERY_METHOD_PLAIN:
             exit();
             break;
          case DELIVERY_METHOD_JSON:

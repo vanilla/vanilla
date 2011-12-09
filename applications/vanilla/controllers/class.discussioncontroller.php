@@ -80,7 +80,6 @@ class DiscussionController extends VanillaController {
       
       // Setup
       $this->Title($this->Discussion->Name);
-      $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format)));
 
       // Actual number of comments, excluding the discussion itself
       $ActualResponses = $this->Discussion->CountComments - 1;
@@ -124,6 +123,15 @@ class DiscussionController extends VanillaController {
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
+      
+      if ($this->Offset == 0)
+         $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format), 160));
+      else {
+         $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
+         
+         $FirstComment = $this->Data('Comments')->FirstRow();
+         $this->Description(SliceParagraph(Gdn_Format::PlainText(GetValue('Body', $FirstComment), GetValue('Format', $FirstComment)), 160));         
+      }
 
       // Make sure to set the user's discussion watch records
       $this->CommentModel->SetWatch($this->Discussion, $this->CommentData->NumRows(), $this->Offset, $this->Discussion->CountComments);

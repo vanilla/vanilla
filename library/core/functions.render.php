@@ -157,19 +157,25 @@ if (!function_exists('Plural')) {
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '', $Options = NULL) {
+   function UserAnchor($User, $CssClass = NULL, $Options = NULL) {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      $Px = $Options;
+      if (is_string($Options))
+         $Options = array('Px' => $Options);
+      
+      $Px = GetValue('Px', $Options);
+      
       $Name = GetValue($Px.'Name', $User, T('Unknown'));
       $UserID = GetValue($Px.'UserID', $User, 0);
+      
+      $Attributes = array(
+          'class' => $CssClass,
+          'rel' => GetValue('Rel', $Options)
+          );
 
-      if ($CssClass != '')
-         $CssClass = ' class="'.$CssClass.'"';
-
-      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.$CssClass.'>'.htmlspecialchars($Name).'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.htmlspecialchars($Name).'</a>';
    }
 }
 

@@ -475,12 +475,14 @@ class Gdn_Controller extends Gdn_Pluggable {
          if ($this->_CanonicalUrl) {
             return $this->_CanonicalUrl;
          } else {
-            $Parts = array(strtolower($this->ApplicationFolder));
+            $Parts = array();
+            
+            $Controller = strtolower(StringEndsWith($this->ControllerName, 'Controller', TRUE, TRUE));
+            
+            if ($Controller == 'settings')
+               $Parts[] = strtolower($this->ApplicationFolder);
 
-            if (substr_compare($this->ControllerName, 'controller', -10, 10, TRUE) == 0)
-               $Parts[] = substr(strtolower($this->ControllerName), 0, -10);
-            else
-               $Parts[] = strtolower($this->ControllerName);
+            $Parts[] = $Controller;
 
             if (strcasecmp($this->RequestMethod, 'index') != 0)
                $Parts[] = strtolower($this->RequestMethod);

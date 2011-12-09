@@ -88,6 +88,8 @@ class EntryController extends Gdn_Controller {
     */
    public function Initialize() {
       $this->Head = new HeadModule($this);
+      $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex'));
+      
       $this->AddJsFile('jquery.js');
       $this->AddJsFile('jquery.livequery.js');
       $this->AddJsFile('jquery.form.js');

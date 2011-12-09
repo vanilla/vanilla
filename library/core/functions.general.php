@@ -2045,28 +2045,59 @@ if (!function_exists('SaveToConfig')) {
 }
 
 if (!function_exists('SliceParagraph')) {
-   function SliceParagraph($String, $MaxLength = 500, $Suffix = '') {
+   /**
+    * Slices a string at a paragraph. 
+    * This function will attempt to slice a string at paragraph that is no longer than the specified maximum length.
+    * If it can't slice the string at a paragraph it will attempt to slice on a sentence.
+    * 
+    * Note that you should not expect this function to return a string that is always shorter than max-length.
+    * The purpose of this function is to provide a string that is reaonably easy to consume by a human.
+    * 
+    * @param string $String The string to slice.
+    * @param int $MaxLength The maximum length of the string.
+    * @param string $Suffix The suffix if the string must be sliced mid-sentence.
+    * @return string
+    */
+   function SliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
       if ($MaxLength >= strlen($String))
          return $String;
       
-      if (function_exists('mb_strpos')) {
-         $Pos = mb_strrpos($String, "\n\n", $MaxLength - 1);
-
-         if ($Pos == FALSE)
-            return SliceString($String, $MaxLength, $Suffix);
-
-         $String = mb_substr($String, 0, $Pos);
-
-         return $String;
+//      $String = preg_replace('`\s+\n`', "\n", $String);
+      
+      // See if there is a paragraph.
+      $Pos = strrpos(SliceString($String, $MaxLength, ''), "\n\n");
+      
+      if ($Pos === FALSE) {
+         // There was no paragraph so try and split on sentences.
+         $Sentences = preg_split('`([.!?:]\s+)`', $String, NULL, PREG_SPLIT_DELIM_CAPTURE);
+         
+         $Result = '';
+         if (count($Sentences) > 1) {
+            $Result = $Sentences[0].$Sentences[1];
+            
+            for ($i = 2; $i < count($Sentences); $i++) {
+               $Sentence = $Sentences[$i];
+               
+               if ((strlen($Result) + strlen($Sentence)) <= $MaxLength || preg_match('`[.!?:]\s+`', $Sentence))
+                  $Result .= $Sentence;
+               else
+                  break;
+            }
+         }
+         
+         if ($Result) {
+            return rtrim($Result);
+         }
+         
+         // There was no sentence. Slice off the last word and call it a day.
+         $Pos = strrpos(SliceString($String, $MaxLength, ''), ' ');
+         if ($Pos === FALSE) {
+            return $String.$Suffix;
+         } else {
+            return SliceString($String, $Pos + 1, $Suffix);
+         }
       } else {
-         $Pos = strrpos($String, "\n\n", $MaxLength - 1);
-
-         if ($Pos == FALSE)
-            return SliceString($String, $MaxLength, $Suffix);
-
-         $String = substr($String, 0, $Pos);
-
-         return $String;
+         return SliceString($String, $Pos + 1, '');
       }
    }
 }

@@ -439,11 +439,13 @@ class Gdn_Format {
          return T('Null Date', '-');
 
       // Was a mysqldatetime passed?
-      if (!is_numeric($Timestamp))
+      if (!is_numeric($Timestamp)) {
          $Timestamp = self::ToTimestamp($Timestamp);
+      }
          
       if (!$Timestamp)
          $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
+      $GmTimestamp = $Timestamp;
 
       $Now = time();
       
@@ -489,7 +491,7 @@ class Gdn_Format {
       $Result = strftime($Format, $Timestamp);
 
       if ($Html) {
-         $Result = Wrap($Result, 'span', array('title' => strftime($FullFormat, $Timestamp)));
+         $Result = Wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));
       }
       return $Result;
    }

@@ -30,7 +30,7 @@ $PluginInfo['ProfileExtender'] = array(
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
    /** @var array */
-   public $MagicLabels = array('Twitter');
+   public $MagicLabels = array('Twitter', 'Google+', 'Real Name');
    
    /**
     * Add the Dashboard menu item.
@@ -65,6 +65,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          switch ($Label) {
             case 'Twitter':
                $Fields['Twitter'] = Anchor($Value, 'http://twitter.com/'.$Value);
+               break;
+            case 'Google+':
+               $Fields['Google+'] = Anchor('Google+', $Value, '', array('rel' => 'me'));
+               break;
+            case 'Real Name':
+               $Fields['Real Name'] = Wrap(htmlspecialchars($Value), 'span', array('itemprop' => 'name'));
                break;
          }
       }
@@ -175,8 +181,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                continue;
             if (!in_array($Label, $this->MagicLabels))
                $Value = Gdn_Format::Links(htmlspecialchars($Value));
-            echo '<dt class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.Gdn_Format::Text($Label).'</dt>';
-            echo '<dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.$Value.'</dd>';
+            echo ' <dt class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.Gdn_Format::Text($Label).'</dt> ';
+            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.$Value.'</dd> ';
          }
       } catch (Exception $ex) {
          // No errors

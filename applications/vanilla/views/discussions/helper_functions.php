@@ -3,6 +3,10 @@
 function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $CssClass = CssClass($Discussion);
    $DiscussionUrl = $Discussion->Url;
+   
+   if ($Session->UserID)
+      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch + 1);
+   
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $Sender->EventArguments['CssClass'] = &$CssClass;

@@ -311,7 +311,7 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     * @param int $UserID Unique ID.
     */
-   public function Index($UserReference = '', $Username = '', $UserID = '') {
+   public function Index($UserReference = '', $Username = '', $UserID = '', $Page = FALSE) {
       $this->GetUserInfo($UserReference, $Username, $UserID);
 
       if ($this->User->Admin == 2 && $this->Head) {
@@ -321,7 +321,7 @@ class ProfileController extends Gdn_Controller {
       }
 
 		if ($this->User->UserID == Gdn::Session()->UserID)
-			return $this->Notifications();
+			return $this->Notifications($Page);
 		elseif (C('Garden.Profile.ShowActivities', TRUE))
 			return $this->Activity($UserReference, $Username, $UserID);
       else
@@ -373,15 +373,12 @@ class ProfileController extends Gdn_Controller {
     *
     * @since 2.0.0
     * @access public
-    * @param int $Offset Number to skip (paging).
+    * @param int $Page Number to skip (paging).
     */
-   public function Notifications($Offset = '0') {
+   public function Notifications($Page = FALSE) {
       $this->Permission('Garden.SignIn.Allow');
 		
-		$Limit = 30;
-		$Offset = is_numeric($Offset) ? $Offset : 0;
-      if ($Offset < 0)
-         $Offset = 0;
+      list($Offset, $Limit) = OffsetLimit($Page, 30);
 
       $this->GetUserInfo(); 
       $this->SetTabView('Notifications');

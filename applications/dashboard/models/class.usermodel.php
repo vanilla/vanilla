@@ -1742,7 +1742,7 @@ class UserModel extends Gdn_Model {
                 FALSE,
                 array('GroupBy' => array('ActivityTypeID', 'ActivityUserID')));
             
-            Gdn::UserModel()->SetProperty($UserID, 'ApprovedByUserID', Gdn::Session()->UserID);
+            Gdn::UserModel()->SaveAttribute($UserID, 'ApprovedByUserID', Gdn::Session()->UserID);
          }
          
          

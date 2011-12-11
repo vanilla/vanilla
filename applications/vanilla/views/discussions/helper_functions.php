@@ -5,7 +5,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $DiscussionUrl = $Discussion->Url;
    
    if ($Session->UserID)
-      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch + 1);
+      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch);
    
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;

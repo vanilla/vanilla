@@ -53,7 +53,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
          </span>
          <span class="MItem DateCreated">
             <?php
-            echo Anchor(Gdn_Format::Date($Object->DateInserted), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow'));
+            echo Anchor(Gdn_Format::Date($Object->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow'));
             ?>
          </span>
          <?php

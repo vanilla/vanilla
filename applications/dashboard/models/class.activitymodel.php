@@ -754,7 +754,7 @@ class ActivityModel extends Gdn_Model {
          $Emailed = self::SENT_OK;
          
          // Delete the activity now that it has been emailed.
-         if (!$NoDelete && !$Activity['Notify']) {
+         if (!$NoDelete && !$Activity['Notified']) {
             if ($Activity['ActivityID']) {
                $this->Delete($Activity['ActivityID']);
             } else {
@@ -946,7 +946,7 @@ class ActivityModel extends Gdn_Model {
    public function Queue($Data, $Preference = FALSE, $Options = array()) {
       $this->_Touch($Data);
       if (!isset($Data['NotifyUserID']) || !isset($Data['ActivityType']))
-         throw Exception('Data missing NotifyUserID and/or ActivityType', 400);
+         throw new Exception('Data missing NotifyUserID and/or ActivityType', 400);
       
       if ($Data['ActivityUserID'] == $Data['NotifyUserID'] && !GetValue('Force', $Options))
          return; // don't notify users of something they did.

@@ -860,8 +860,10 @@ jQuery(document).ready(function($) {
          }
       });
 	}
+   gdn.pingForNotifications = pingForNotifications;
+   
    if (gdn.definition('SignedIn', '0') != '0') {
-      pingForNotifications();
+//      pingForNotifications();
       setInterval(pingForNotifications, 60000);
    }
 	

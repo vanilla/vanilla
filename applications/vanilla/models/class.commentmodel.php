@@ -739,7 +739,7 @@ class CommentModel extends VanillaModel {
                continue;
             
             $Activity['NotifyUserID'] = $User->UserID;
-            $ActivityModel->Queue($Activiy, 'Mention');
+            $ActivityModel->Queue($Activity, 'Mention');
          }
          
          // Notify users who have bookmarked the discussion.

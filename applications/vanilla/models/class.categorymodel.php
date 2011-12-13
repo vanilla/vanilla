@@ -354,7 +354,7 @@ class CategoryModel extends Gdn_Model {
                ->Put();
          } else {
             // Delete comments in this category
-            $this->SQL->From('Comment')
+            $this->SQL
                ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
                ->Delete('Comment c', array('d.CategoryID' => $Category->CategoryID));
                

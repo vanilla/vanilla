@@ -1306,7 +1306,9 @@ abstract class Gdn_SQLDriver {
       //$this->_AliasMap[$Alias] = $TableName;
 
       // Return the string with the database table prefix prepended
-      return $this->Database->DatabasePrefix . $TableString;
+      if (!$this->Options('NoDatabasePrefix')) 
+         $TableString = $this->Database->DatabasePrefix . $TableString;
+      return $TableString;
    }
    
    /**

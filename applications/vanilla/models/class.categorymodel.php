@@ -355,9 +355,11 @@ class CategoryModel extends Gdn_Model {
          } else {
             // Delete comments in this category
             // Resorted to Query because of incompatibility of aliasing in MySQL 5.5 -mlr 2011-12-13
-            $this->Database->Query("delete :_Comment.* from :_Comment c 
+            $Sql = "delete c from :_Comment c 
                join :_Discussion d on c.DiscussionID = d.DiscussionID 
-               where d.CategoryID = :CategoryID", array(':CategoryID' => $Category->CategoryID));
+               where d.CategoryID = :CategoryID";
+            $Sql = str_replace(':_', $this->Database->DatabasePrefix, $Sql);
+            $this->Database->Query($Sql, array(':CategoryID' => $Category->CategoryID));
                
             // Delete discussions in this category
             $this->SQL->Delete('Discussion', array('CategoryID' => $Category->CategoryID));

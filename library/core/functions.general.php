@@ -930,12 +930,22 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = array_shift($Value);
             
             if (is_array($Value)) {
+               $Max = C('Garden.FormatUsername.Max', 10);
+               
+               $Count = count($Value);
                $Result = '';
-               for ($i = 0; $i < count($Value); $i++) {
+               for ($i = 0; $i < $Count; $i++) {
+                  if ($i >= $Max && $Count > $Max + 1) {
+                     $Others = $Count - $i;
+                     $Result .= ' '.T('sep and', 'and').' '
+                        .Plural($Others, '%s other', '%s others');
+                     break;
+                  }
+                  
                   $User = Gdn::UserModel()->GetID($Value[$i]);
                   $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
                   
-                  if ($i == count($Value) - 1)
+                  if ($i == $Count - 1)
                      $Result .= ' '.T('sep and', 'and').' ';
                   elseif ($i > 0)
                      $Result .= ', ';

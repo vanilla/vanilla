@@ -354,9 +354,10 @@ class CategoryModel extends Gdn_Model {
                ->Put();
          } else {
             // Delete comments in this category
-            $this->SQL
-               ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-               ->Delete('Comment c', array('d.CategoryID' => $Category->CategoryID));
+            // Resorted to Query because of incompatibility of aliasing in MySQL 5.5 -mlr 2011-12-13
+            $this->SQL->Query("delete :_Comment.* from :_Comment c 
+               join :_Discussion d on c.DiscussionID = d.DiscussionID 
+               where d.CategoryID = :CategoryID", array(':CategoryID' => $Category->CategoryID));
                
             // Delete discussions in this category
             $this->SQL->Delete('Discussion', array('CategoryID' => $Category->CategoryID));

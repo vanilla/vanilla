@@ -185,7 +185,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       // Move this up to allow pre-routing
       $this->FireEvent('BeforeDispatch');
-      $this->AnalyzeRequest($Request);
       
       // By default, all requests can be blocked by UpdateMode/PrivateCommunity
       $CanBlock = self::BLOCK_ANY;
@@ -204,9 +203,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $this->FireEvent('BeforeBlockDetect');
          
          $PathRequest = Gdn::Request()->Path();
-         foreach ($BlockExceptions as $BlockException => $BlockLevel)
+         foreach ($BlockExceptions as $BlockException => $BlockLevel) {
             if (preg_match($BlockException, $PathRequest))
                throw new Exception("Block detected", $BlockLevel);
+         }
          
          // Never block an admin
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
@@ -224,8 +224,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
    
       // If we're in updatemode and arent explicitly prevented from blocking, block
-      if (Gdn::Config('Garden.UpdateMode', FALSE) && $CanBlock > self::BLOCK_NEVER)
+      if (Gdn::Config('Garden.UpdateMode', FALSE) && $CanBlock > self::BLOCK_NEVER) {
          $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
+      }
+      
+      // Analze the request AFTER checking for update mode.
+      $this->AnalyzeRequest($Request);
       
       // If we're in updatemode and can block, redirect to signin
       if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {

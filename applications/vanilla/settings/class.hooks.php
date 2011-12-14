@@ -249,15 +249,13 @@ class VanillaHooks implements Gdn_IPlugin {
     */ 
    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
       $Sender->Preferences['Notifications']['Email.DiscussionComment'] = T('Notify me when people comment on my discussions.');
-      $Sender->Preferences['Notifications']['Email.DiscussionMention'] = T('Notify me when people mention me in discussion titles.');
-      $Sender->Preferences['Notifications']['Email.CommentMention'] = T('Notify me when people mention me in comments.');
       $Sender->Preferences['Notifications']['Email.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
+      $Sender->Preferences['Notifications']['Email.Mention'] = T('Notify me when people mention me.');
       
 
       $Sender->Preferences['Notifications']['Popup.DiscussionComment'] = T('Notify me when people comment on my discussions.');
-      $Sender->Preferences['Notifications']['Popup.DiscussionMention'] = T('Notify me when people mention me in discussion titles.');
-      $Sender->Preferences['Notifications']['Popup.CommentMention'] = T('Notify me when people mention me in comments.');
       $Sender->Preferences['Notifications']['Popup.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
+      $Sender->Preferences['Notifications']['Popup.Mention'] = T('Notify me when people mention me.');
 
       if (Gdn::Session()->CheckPermission('Garden.AdvancedNotifications.Allow')) {
          $Sender->Preferences['Notifications']['Email.NewDiscussion'] = array(T('Notify me when people start new discussions.'), 'Meta');

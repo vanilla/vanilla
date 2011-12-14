@@ -837,7 +837,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    // Parse out the field and format.
    $Parts = explode(',', $Match);
    $Field = trim($Parts[0]);
-   $Format = strtolower(trim(GetValue(1, $Parts, '')));
+   $Format = trim(GetValue(1, $Parts, ''));
    $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
    $FomatArgs = GetValue(3, $Parts, '');
 
@@ -900,6 +900,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
          case 'rawurlencode':
             $Result = rawurlencode($Value);
             break;
+         case 'text':
+            $Result = Gdn_Format::Text($Value, FALSE);
+            break;
          case 'time':
             $Result = Gdn_Format::Date($Value, '%l:%M%p');
             break;
@@ -915,6 +918,47 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             break;
          case 'urlencode':
             $Result = urlencode($Value);
+            break;
+         case 'user':
+         case 'you':
+         case 'his':
+         case 'her':
+         case 'your':
+            $Result = print_r($Value, TRUE);
+            $ArgsBak = $Args;
+            if (is_array($Value) && count($Value) == 1)
+               $Value = array_shift($Value);
+            
+            if (is_array($Value)) {
+               $Max = C('Garden.FormatUsername.Max', 10);
+               
+               $Count = count($Value);
+               $Result = '';
+               for ($i = 0; $i < $Count; $i++) {
+                  if ($i >= $Max && $Count > $Max + 1) {
+                     $Others = $Count - $i;
+                     $Result .= ' '.T('sep and', 'and').' '
+                        .Plural($Others, '%s other', '%s others');
+                     break;
+                  }
+                  
+                  $User = Gdn::UserModel()->GetID($Value[$i]);
+                  $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+                  
+                  if ($i == $Count - 1)
+                     $Result .= ' '.T('sep and', 'and').' ';
+                  elseif ($i > 0)
+                     $Result .= ', ';
+                  $Result .= UserAnchor($User);
+               }
+            } else {
+               $User = Gdn::UserModel()->GetID($Value);
+               $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+               
+               $Result = UserAnchor($User);
+            }
+               
+            $Args = $ArgsBak;
             break;
          default:
             $Result = $Value;
@@ -2045,16 +2089,60 @@ if (!function_exists('SaveToConfig')) {
 }
 
 if (!function_exists('SliceParagraph')) {
-   function SliceParagraph($String, $MaxLength = 500, $Suffix = '') {
-      $Pos = strpos($String, "\n\n");
-      if ($Pos == FALSE)
-         return SliceString($String, $MaxLength, $Suffix);
+   /**
+    * Slices a string at a paragraph. 
+    * This function will attempt to slice a string at paragraph that is no longer than the specified maximum length.
+    * If it can't slice the string at a paragraph it will attempt to slice on a sentence.
+    * 
+    * Note that you should not expect this function to return a string that is always shorter than max-length.
+    * The purpose of this function is to provide a string that is reaonably easy to consume by a human.
+    * 
+    * @param string $String The string to slice.
+    * @param int $MaxLength The maximum length of the string.
+    * @param string $Suffix The suffix if the string must be sliced mid-sentence.
+    * @return string
+    */
+   function SliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
+      if ($MaxLength >= strlen($String))
+         return $String;
       
-      $String = substr($String, 0, $Pos);
-      if (strlen($String) > $MaxLength)
-         return SliceString($String, $MaxLength, $Suffix);
+//      $String = preg_replace('`\s+\n`', "\n", $String);
       
-      return $String;
+      // See if there is a paragraph.
+      $Pos = strrpos(SliceString($String, $MaxLength, ''), "\n\n");
+      
+      if ($Pos === FALSE) {
+         // There was no paragraph so try and split on sentences.
+         $Sentences = preg_split('`([.!?:]\s+)`', $String, NULL, PREG_SPLIT_DELIM_CAPTURE);
+         
+         $Result = '';
+         if (count($Sentences) > 1) {
+            $Result = $Sentences[0].$Sentences[1];
+            
+            for ($i = 2; $i < count($Sentences); $i++) {
+               $Sentence = $Sentences[$i];
+               
+               if ((strlen($Result) + strlen($Sentence)) <= $MaxLength || preg_match('`[.!?:]\s+`', $Sentence))
+                  $Result .= $Sentence;
+               else
+                  break;
+            }
+         }
+         
+         if ($Result) {
+            return rtrim($Result);
+         }
+         
+         // There was no sentence. Slice off the last word and call it a day.
+         $Pos = strrpos(SliceString($String, $MaxLength, ''), ' ');
+         if ($Pos === FALSE) {
+            return $String.$Suffix;
+         } else {
+            return SliceString($String, $Pos + 1, $Suffix);
+         }
+      } else {
+         return SliceString($String, $Pos + 1, '');
+      }
    }
 }
 

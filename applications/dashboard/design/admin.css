@@ -262,7 +262,7 @@ select {
    font-size: 14px;
    margin: 0;
    padding: 3px;
-   }
+}
 select.Day,
 select.Year {
    margin-left: 4px;

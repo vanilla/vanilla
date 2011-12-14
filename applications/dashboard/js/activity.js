@@ -51,7 +51,7 @@ jQuery(document).ready(function($) {
       textbox.focus().blur(function() {
          // Hide the form onblur if empty
          if (this.value == '') {
-            var comments = $(anchor).parents('.Comments');
+            var comments = $(anchor).parents('.ActivityComments');
             var children = $(comments).children();
             var rowCount = children.length - 1; // Subtract the commentform row
             if (rowCount > 0) {
@@ -71,6 +71,7 @@ jQuery(document).ready(function($) {
    // Hijack comment form button clicks
    $('ul.ActivityComments form input.Button').live('click', function() {
       var button = this;
+      gdn.disable(button);
       var frm = $(button).parents('form');
       var row = $(frm).parents('li.CommentForm');
       var textbox = $(row).find('textarea');
@@ -102,6 +103,9 @@ jQuery(document).ready(function($) {
                // Make sure that hidden items appear
                $('ul.ActivityComments li.Hidden').slideDown('fast');
             }
+         },
+         complete: function() {
+            gdn.enable(button);
          }
       });
       return false;

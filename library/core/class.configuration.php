@@ -498,11 +498,17 @@ class Gdn_Configuration extends Gdn_Pluggable {
       return $$VariableName;
    }
    
+   /**
+    * Merge a newly loaded config into the current active state
+    * 
+    * Resursively 
+    * 
+    * @param array $Data Reference to the current active state
+    * @param array $Loaded Reference to the new to-merge data
+    */
    protected static function MergeConfig(&$Data, &$Loaded) {
       foreach ($Loaded as $Key => $Value) {
-         if (!array_key_exists($Key, $Data)) {
-            $Data[$Key] = $Value;
-         } elseif(is_array($Data[$Key]) && is_array($Value)) {
+         if (array_key_exists($Key,$Data) && is_array($Data[$Key]) && is_array($Value)) {
             self::MergeConfig($Data[$Key], $Value);
          } else {
             $Data[$Key] = $Value;

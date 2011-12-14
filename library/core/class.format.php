@@ -47,6 +47,7 @@ class Gdn_Format {
     * @return string
     */
    public static function ActivityHeadline($Activity, $ProfileUserID = '', $ViewingUserID = '') {
+      $Activity = (object)$Activity;
       if ($ViewingUserID == '') {
          $Session = Gdn::Session();
          $ViewingUserID = $Session->IsValid() ? $Session->UserID : -1;
@@ -106,7 +107,7 @@ class Gdn_Format {
             $GenderSuffixCode = 'Third';
             $GenderSuffixGender = $Activity->RegardingGender;
          }
-         $RegardingWallActivityPath = '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD . '#Activity_' . $Activity->ActivityID;
+         $RegardingWallActivityPath = '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD;
          $RegardingWallLink = Url($RegardingWallActivityPath);
          $RegardingWall = Anchor(T('wall'), $RegardingWallActivityPath);
       }
@@ -123,7 +124,6 @@ class Gdn_Format {
          $ActivityRouteLink = Url($Activity->Route);
          $Route = Anchor(T($Activity->RouteCode), $Activity->Route);
       }
-      //if ($Activity->ActivityID == 131) d($ActivityRouteLink, $Activity);
 
       // Translate the gender suffix.
       $GenderSuffixCode = "GenderSuffix.$GenderSuffixCode.$GenderSuffixGender";
@@ -439,11 +439,13 @@ class Gdn_Format {
          return T('Null Date', '-');
 
       // Was a mysqldatetime passed?
-      if (!is_numeric($Timestamp))
+      if (!is_numeric($Timestamp)) {
          $Timestamp = self::ToTimestamp($Timestamp);
+      }
          
       if (!$Timestamp)
          $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
+      $GmTimestamp = $Timestamp;
 
       $Now = time();
       
@@ -489,7 +491,7 @@ class Gdn_Format {
       $Result = strftime($Format, $Timestamp);
 
       if ($Html) {
-         $Result = Wrap($Result, 'span', array('title' => strftime($FullFormat, $Timestamp)));
+         $Result = Wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));
       }
       return $Result;
    }
@@ -746,8 +748,15 @@ class Gdn_Format {
          // Remove returns and then replace html return tags with returns.
          $Result = str_replace(array("\n", "\r"), '', $Result);
          $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
-         $Allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+         
+         // Fix lists.
+         $Result = str_replace('<li>', '* ', $Result);
+         $Result = preg_replace('`</(?:li|ol|ul)>`', "\n", $Result);
+         
+         $Allblocks = '(?:table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
          $Result = preg_replace('`</'.$Allblocks.'>`', "\n\n", $Result);
+         
+         // TODO: Fix hard returns within pre blocks.
          
          $Result = strip_tags($Result);
       }
@@ -1223,14 +1232,16 @@ EOT;
     * @return mixed
     */
    public static function Url($Mixed) {
-      if (!is_string($Mixed)) {
+      if (!is_string($Mixed))
          return self::To($Mixed, 'Url');
-      } elseif (preg_replace('`([^\PP])`u', '', 'Test') == '') {
+      
+      
+      if (preg_replace('`([^\PP])`u', '', 'Test') == '') {
          // No Unicode PCRE support.
          $Mixed = trim($Mixed);
          $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
          $Mixed = strtr($Mixed, self::$_UrlTranslations);
-         $Mixed = preg_replace('/([^\w\d_:.])/', ' ', $Mixed); // get rid of punctuation and symbols
+         $Mixed = preg_replace('/([^\w\d_:])/', ' ', $Mixed); // get rid of punctuation and symbols
          $Mixed = str_replace(' ', '-', trim($Mixed)); // get rid of spaces
          $Mixed = preg_replace('/-+/', '-', $Mixed); // limit to 1 hyphen at a time
          $Mixed = urlencode(strtolower($Mixed));
@@ -1243,7 +1254,7 @@ EOT;
          $Mixed = strtr($Mixed, self::$_UrlTranslations);
          $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed); // get rid of punctuation
          $Mixed = preg_replace('`([^\PS+])`u', '', $Mixed); // get rid of symbols
-         $Mixed = preg_replace('`[\s\-/+]+`u', '-', $Mixed); // replace certain characters with dashes
+         $Mixed = preg_replace('`[\s\-/+.]+`u', '-', $Mixed); // replace certain characters with dashes
          $Mixed = rawurlencode(strtolower($Mixed));
          $Mixed = trim($Mixed, '.-');
 			return $Mixed;

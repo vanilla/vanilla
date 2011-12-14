@@ -616,6 +616,7 @@ class Gdn_Statistics extends Gdn_Plugin {
    public static function TimeSlot($SlotType = 'd', $Timestamp = FALSE) {
       if (!$Timestamp)
          $Timestamp = self::Time();
+      
       if ($SlotType == 'd')
          $Result = gmdate('Ymd', $Timestamp);
       elseif ($SlotType == 'w') {
@@ -626,6 +627,8 @@ class Gdn_Statistics extends Gdn_Plugin {
          $Result = gmdate('Ym', $Timestamp).'00';
       elseif ($SlotType == 'y')
          $Result = gmdate('Y', $Timestamp).'0000';
+      elseif ($SlotType == 'a')
+         $Result = '00000000';
       
       return $Result;
    }
@@ -648,6 +651,9 @@ class Gdn_Statistics extends Gdn_Plugin {
    }
    
    public static function TimeFromTimeSlot($TimeSlot) {
+      if ($TimeSlot == '00000000')
+         return 0;
+      
       $Year = substr($TimeSlot,0,4);
       $Month = substr($TimeSlot,4,2);
       $Day = (int)substr($TimeSlot,6,2);

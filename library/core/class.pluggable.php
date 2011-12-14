@@ -71,6 +71,14 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
 
 
    /**
+    * In some cases it may be desirable to fire an event from a different class
+    * than is currently available via $this. If this variable is set, it should
+    * contain the name of the class that the next event will fire off.
+    * @var string
+    */
+   public $FireAs;
+   
+   /**
     * The public constructor of the class. If any extender of this class
     * overrides this one, parent::__construct(); should be called to ensure
     * interoperability.
@@ -93,6 +101,22 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
    public function GetReturn($PluginName, $HandlerName) {
       return $this->Returns[strtolower($HandlerName)][strtolower($PluginName)];
    }
+   
+   
+   /**
+    * Fire the next event off a custom parent class
+    * 
+    * @param mixed $Options Either the parent class, or an option array
+    */
+   public function FireAs($Options) {
+      if (!is_array($Options))
+         $Options = array('FireClass' => $Options);
+      
+      if (array_key_exists('FireClass', $Options))
+         $this->FireAs = GetValue('FireClass', $Options);
+      
+      return $this;
+   }
 
 
    /**
@@ -109,8 +133,11 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
          throw new Exception("Event fired from pluggable class '{$RealClassName}', but Gdn_Pluggable::__construct() was never called.");
       }
       
+      $FireClass = !is_null($this->FireAs) ? $this->FireAs : $this->ClassName;
+      $this->FireAs = NULL;
+      
       // Look to the PluginManager to see if there are related event handlers and call them
-      return Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $EventName);
+      return Gdn::PluginManager()->CallEventHandlers($this, $FireClass, $EventName);
    }
 
 

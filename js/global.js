@@ -655,7 +655,7 @@ jQuery(document).ready(function($) {
 					$(this).remove();
 				});
 				$('div.InformMessages').removeAttr('autodismisstimerid');
-			}, 5000);
+			}, 7000);
 			$('div.InformMessages').attr('autodismisstimerid', timerId);
 		}
 	}
@@ -839,7 +839,7 @@ jQuery(document).ready(function($) {
 	
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
    var notificationsPinging = 0;
-	pingForNotifications = function() {
+	var pingForNotifications = function() {
       if (notificationsPinging > 0)
          return;
       notificationsPinging++;
@@ -860,7 +860,10 @@ jQuery(document).ready(function($) {
          }
       });
 	}
+   gdn.pingForNotifications = pingForNotifications;
+   
    if (gdn.definition('SignedIn', '0') != '0') {
+//      pingForNotifications();
       setInterval(pingForNotifications, 60000);
    }
 	

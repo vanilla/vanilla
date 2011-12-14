@@ -104,6 +104,49 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
+if (!function_exists('FormatSelf')) {
+   function FormatUsername($User, $Format, $ViewingUserID = FALSE) {
+      if ($ViewingUserID === FALSE)
+         $ViewingUserID = Gdn::Session()->UserID;
+      $UserID = GetValue('UserID', $User);
+      $Name = GetValue('Name', $User);
+      $Gender = strtolower(GetValue('Gender', $User));
+      
+      $UCFirst = substr($Format, 0, 1) == strtoupper(substr($Format, 0, 1));
+      
+      
+      switch (strtolower($Format)) {
+         case 'you':
+            if ($ViewingUserID == $UserID)
+               return T("Format $Format", $Format);
+            return $Name;
+         case 'his':
+         case 'her':
+         case 'your':
+            if ($ViewingUserID == $UserID)
+               return T("Format Your", 'Your');
+            else {
+               switch ($Gender) {
+                  case 'm':
+                     $Format = 'his';
+                     break;
+                  case 'f':
+                     $Format = 'her';
+                     break;
+                  default:
+                     $Format = 'their';
+                     break;
+               }
+               if ($UCFirst)
+                  $Format = ucfirst($Format);
+               return T("Format $Format", $Format);
+            }
+         default:
+            return $Name;
+      }
+   }
+}
+
 if (!function_exists('HoverHelp')) {
    function HoverHelp($String, $Help) {
       return Wrap($String.Wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
@@ -157,19 +200,25 @@ if (!function_exists('Plural')) {
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '', $Options = NULL) {
+   function UserAnchor($User, $CssClass = NULL, $Options = NULL) {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      $Px = $Options;
+      if (is_string($Options))
+         $Options = array('Px' => $Options);
+      
+      $Px = GetValue('Px', $Options);
+      
       $Name = GetValue($Px.'Name', $User, T('Unknown'));
       $UserID = GetValue($Px.'UserID', $User, 0);
+      
+      $Attributes = array(
+          'class' => $CssClass,
+          'rel' => GetValue('Rel', $Options)
+          );
 
-      if ($CssClass != '')
-         $CssClass = ' class="'.$CssClass.'"';
-
-      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.$CssClass.'>'.htmlspecialchars($Name).'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.htmlspecialchars($Name).'</a>';
    }
 }
 
@@ -233,14 +282,15 @@ if (!function_exists('UserUrl')) {
    /**
     * Return the url for a user.
     * @param array|object $User The user to get the url for.
+    * @param string $Px The prefix to apply before fieldnames. @since 2.1
     * @return string The url suitable to be passed into the Url() function.
     */
-   function UserUrl($User) {
+   function UserUrl($User, $Px = '') {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      return '/profile/'.($NameUnique ? '' : GetValue('UserID', $User, 0).'/').rawurlencode(GetValue('Name', $User));
+      return '/profile/'.($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').rawurlencode(GetValue($Px.'Name', $User));
    }
 }
 

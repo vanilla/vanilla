@@ -566,16 +566,7 @@ body #Head h1 {
    color: #fff;
    text-decoration: underline;
 }
-#Menu a span,
-#Menu li.Active a span,
-#Menu li.Highlight a:hover span {
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   border-radius: 2px;
-   padding: 0 2px;
-   font-size: 9px;
-   line-height: 12px;
-   font-weight: normal;
+#Menu .Alert {
 	text-shadow: none;
    background: #f2fcff;
    color: #299fc7;
@@ -1451,11 +1442,8 @@ table.PreferenceGroup td.Description {
 }
 
 /* About in content area */
-body.Profile div.About dl {
-   padding: 0;
-}
-body.Profile div.About dt,
-body.Profile div.About dd {
+dl.About dt,
+dl.About dd {
    color: #666;
    padding: 0;
    margin: 0;
@@ -1464,17 +1452,17 @@ body.Profile div.About dd {
    line-height: 14px;
    display: inline;
 }
-body.Profile div.About dt {
+dl.About dt {
    background: url('images/profile-sprites.png') 2px -139px no-repeat transparent;
    padding-left: 14px;
 }
-body.Profile div.About dt.Name { background-position: 0 -26px; }
-body.Profile div.About dt.Email { background-position: 0 -53px; }
-body.Profile div.About dt.Joined,
-body.Profile div.About dt.LastActive { background-position: 0 3px; }
-body.Profile div.About dt.Roles { background-position: 1px -81px; }
-body.Profile div.About dt.Posts { background-position: 0 -113px; }
-body.Profile div.About dd {
+dl.About dt.Name { background-position: 0 -26px; }
+dl.About dt.Email { background-position: 0 -53px; }
+dl.About dt.Joined,
+dl.About dt.LastActive { background-position: 0 3px; }
+dl.About dt.Roles { background-position: 1px -81px; }
+dl.About dt.Posts { background-position: 0 -113px; }
+dl.About dd {
    padding: 0 8px 0 0;
    color: #333;
 }
@@ -1549,18 +1537,6 @@ body.Profile div.About dd {
    font-size: 80%;
    font-weight: normal;
    padding: 1px .8ex;
-}
-.Tabs li a span {
-   line-height: 1;
-   font-size: 80%;
-   padding: 0 3px;
-   border-radius: 3px;
-   -webkit-border-radius: 3px;
-   -moz-border-radius: 3px;
-   font-weight: normal;
-   background: #1e79a7;
-   color: #eaf4fd;
-   margin: 0 0 0 4px;
 }
 .Tabs .SubTab {
 	margin: 10px 0 0;
@@ -2596,15 +2572,15 @@ div.Popup .Errors {
 /* Note: InformMessages are "growl" style messages that appear in a fixed
 position on the page to notify users of things like drafts being saved, etc. */
 .InformMessages {
-   text-align: left !important;
+   text-align: left;
    position: fixed;
    top: auto;
-   bottom: 20px;
-   left: 20px;
+   bottom: 0;
+   left: 0;
    z-index: 200;
-   margin: 0 !important;
-   padding: 0 !important;
-   list-style: none !important;
+   margin: 0;
+   padding: 0;
+   list-style: none;
    font-size: 12px;
    display: block;
    width: auto;
@@ -2612,12 +2588,13 @@ position on the page to notify users of things like drafts being saved, etc. */
 * html .InformMessages {
   position: absolute;
   top: auto;
-  margin-left: 20px;
+  margin-left: 10px;
   overflow: visible; 
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
-.InformMessages .InformWrapper {
+.InformWrapper {
 	display: block;
+   margin: 10px;
 }
 .InformMessages .InformMessage {
    color: #fff !important;
@@ -2629,10 +2606,9 @@ position on the page to notify users of things like drafts being saved, etc. */
 	background: rgb(0, 0, 0) !important;
 	background: rgba(0, 0, 0, 0.7) !important;
    border: none !important;
-   width: auto !important;
-	max-width: 400px !important;
-   margin: 10px auto 0 !important;
-   padding: 9px 14px 8px !important;
+   width: auto;
+	max-width: 400px;
+   padding: 9px 14px 8px;
    display:-moz-inline-stack;
    display:inline-block;
    zoom:1;
@@ -2681,6 +2657,30 @@ position on the page to notify users of things like drafts being saved, etc. */
 .InformMessages .InformMessage:hover a.Close {
 	display: block;
 }
+
+/* iPad/iPhone */
+@media only screen and (device-width: 768px),
+only screen and (max-device-width: 480px) {
+   .InformMessages .InformMessage a.Close {
+      color: #fff;
+      display: block;
+   }
+}
+
+/* Small screens */
+@media (max-width: 500px) {
+   .InformMessages {
+      width: 100%;
+   }
+   .InformWrapper {
+      margin: 5px;
+   }
+   .InformMessages .InformMessage {
+      display: block;
+      max-width: inherit;
+   }
+}
+
 .InformMessages .Actions a { margin-right: 4px; }
 .InformMessages .Actions a:last-child { margin-right: 0; }
 .InformMessages .Actions a.CancelAction {	color: #aaa; }

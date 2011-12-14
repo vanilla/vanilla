@@ -479,16 +479,17 @@ class ConversationModel extends Gdn_Model {
             ->Where('ConversationID', $ConversationID)
             ->Put();
          
+         $ActivityModel = new ActivityModel();
          foreach ($AddedUserIDs as $AddedUserID) {
-            // And notify them that they were added to the conversation
-            AddActivity(
-               $Session->UserID,
-               'AddedToConversation',
-               '',
-               $AddedUserID,
-               '/messages/'.$ConversationID
+            $ActivityModel->Queue(array(
+                  'ActivityType' => 'AddedToConversation',
+                  'NotifyUserID' => $AddedUserID,
+                  'HeadlineFormat' => T('You were added to a conversation.', '{InsertUserID,user} added {NotifyUserID,you} to a <a href="{Url,htmlencode}">conversation</a>.'),
+                ),
+                'ConversationMessage'
             );
          }
+         $ActivityModel->SaveQueue();
          
          $this->UpdateUserUnreadCount($AddedUserIDs);
       }

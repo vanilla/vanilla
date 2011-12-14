@@ -81,18 +81,18 @@ class TagModule extends Gdn_Module {
       ?>
       <div class="Box Tags">
          <h4><?php echo T($this->_DiscussionID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
-         <ul class="PanelInfo">
+         <ul class="TagCloud">
          <?php
          foreach ($this->_TagData->Result() as $Tag) {
             if ($Tag->Name != '') {
          ?>
-            <li><strong><?php 
+            <li><span><?php 
                            if (urlencode($Tag->Name) == $Tag->Name) {
                               echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged/'.urlencode($Tag->Name));
                            } else {
                               echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged?Tag='.urlencode($Tag->Name));
                            }
-                        ?></strong> <span class="Count"><?php echo number_format($Tag->CountDiscussions); ?></span></li>
+                        ?></span> <span class="Count"><?php echo number_format($Tag->CountDiscussions); ?></span></li>
          <?php
             }
          }

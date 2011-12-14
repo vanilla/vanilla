@@ -139,6 +139,7 @@ class ProxyRequest {
           'SaveAs'               => NULL,
           'Redirects'            => TRUE,
           'SSLNoVerify'          => FALSE,
+          'PreEncodePost'        => TRUE,
           'Cookies'              => TRUE,       // Send cookies?
           'CloseSession'         => TRUE,       // Whether to close the session. Should always do this.
           'Redirected'           => FALSE,      // Flag. Is this a redirected request?
@@ -175,6 +176,7 @@ class ProxyRequest {
       $Timeout = GetValue('Timeout', $Options);
       $SaveAs = GetValue('SaveAs', $Options);
       $SSLNoVerify = GetValue('SSLNoVerify', $Options);
+      $PreEncodePost = GetValue('PreEncodePost', $Options);
       $SendCookies = GetValue('Cookies', $Options);
       $CloseSesssion = GetValue('CloseSession', $Options);
       $Redirected = GetValue('Redirected', $Options);
@@ -346,6 +348,10 @@ class ProxyRequest {
          if ($this->FileTransfer)
             foreach ($SendFiles as $File => $FilePath)
                $PostData[$File] = "@{$FilePath}";
+         else
+            if ($PreEncodePost)
+               $PostData = http_build_query($PostData);
+         
          curl_setopt($Handler, CURLOPT_POST, TRUE);
          curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
       }

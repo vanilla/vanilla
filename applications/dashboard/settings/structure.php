@@ -17,6 +17,7 @@ if (!isset($Explicit))
 $Database = Gdn::Database();
 $SQL = $Database->SQL();
 $Construct = $Database->Structure();
+$Px = $Database->DatabasePrefix;
 
 // Role Table
 $Construct->Table('Role');
@@ -324,30 +325,6 @@ $Construct->Table('Invitation')
    ->Column('DateInserted', 'datetime')
    ->Column('AcceptedUserID', 'int', TRUE)
    ->Set($Explicit, $Drop);
-   
-// Activity Table
-// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('Activity');
-$EmailedExists = $Construct->ColumnExists('Emailed');
-
-$Construct
-	->PrimaryKey('ActivityID')
-   ->Column('CommentActivityID', 'int', TRUE, 'key')
-   ->Column('ActivityTypeID', 'int')
-   ->Column('ActivityUserID', 'int', TRUE, 'key')
-   ->Column('RegardingUserID', 'int', TRUE, 'key')
-   ->Column('Story', 'text', TRUE)
-   ->Column('Route', 'varchar(255)', TRUE)
-   ->Column('CountComments', 'int', '0')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('DateInserted', 'datetime')
-   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-   ->Column('Emailed', 'tinyint(1)', 0)
-   ->Set($Explicit, $Drop);
-
-if (!$EmailedExists) {
-   $SQL->Put('Activity', array('Emailed' => 1));
-}
 
 // ActivityType Table
 $Construct->Table('ActivityType')
@@ -355,12 +332,100 @@ $Construct->Table('ActivityType')
    ->Column('Name', 'varchar(20)')
    ->Column('AllowComments', 'tinyint(1)', '0')
    ->Column('ShowIcon', 'tinyint(1)', '0')
-   ->Column('ProfileHeadline', 'varchar(255)')
-   ->Column('FullHeadline', 'varchar(255)')
+   ->Column('ProfileHeadline', 'varchar(255)', TRUE)
+   ->Column('FullHeadline', 'varchar(255)', TRUE)
    ->Column('RouteCode', 'varchar(255)', TRUE)
    ->Column('Notify', 'tinyint(1)', '0') // Add to RegardingUserID's notification list?
    ->Column('Public', 'tinyint(1)', '1') // Should everyone be able to see this, or just the RegardingUserID?
    ->Set($Explicit, $Drop);
+   
+// Activity Table
+// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
+
+$Construct->Table('Activity');
+$ActivityExists = $Construct->TableExists();
+$NotifiedExists = $Construct->ColumnExists('Notified');
+$EmailedExists = $Construct->ColumnExists('Emailed');
+$CommentActivityIDExists = $Construct->ColumnExists('CommentActivityID');
+$NotifyUserIDExists = $Construct->ColumnExists('NotifyUserID');
+$DateUpdatedExists = $Construct->ColumnExists('DateUpdated');
+
+$Construct
+	->PrimaryKey('ActivityID')
+   ->Column('ActivityTypeID', 'int')
+   ->Column('NotifyUserID', 'int', 0, 'index') // user being notified or -1: public, -2 mods, -3 admins
+   ->Column('ActivityUserID', 'int', TRUE, 'key')
+   ->Column('RegardingUserID', 'int', TRUE) // deprecated?
+   ->Column('Photo', 'varchar(255)', TRUE)
+   ->Column('HeadlineFormat', 'varchar(255)', TRUE)
+   ->Column('Story', 'text', TRUE)
+   ->Column('Route', 'varchar(255)', TRUE)
+   ->Column('RecordType', 'varchar(20)', TRUE)
+   ->Column('RecordID', 'int', TRUE)
+//   ->Column('CountComments', 'int', '0')
+   ->Column('InsertUserID', 'int', TRUE)
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('DateUpdated', 'datetime', !$DateUpdatedExists, 'index')
+   ->Column('Notified', 'tinyint(1)', 0)
+   ->Column('Emailed', 'tinyint(1)', 0)
+   ->Column('Data', 'text', TRUE)
+   ->Set($Explicit, $Drop);
+
+if (!$EmailedExists) {
+   $SQL->Put('Activity', array('Emailed' => 1));
+}
+if (!$NotifiedExists) {
+   $SQL->Put('Activity', array('Notified' => 1));
+}
+
+if (!$DateUpdatedExists) {
+   $SQL->Update('Activity')
+      ->Set('DateUpdated', 'DateInserted', FALSE, FALSE)
+      ->Put();
+}
+
+if (!$NotifyUserIDExists && $ActivityExists) {
+   // Update all of the activities that are notifications.
+   $SQL->Update('Activity a')
+      ->Join('ActivityType at', 'a.ActivityTypeID = at.ActivityTypeID')
+      ->Set('a.NotifyUserID', 'a.RegardingUserID', FALSE)
+      ->Where('at.Notify', 1)
+      ->Put();
+   
+   // Update all public activities.
+   $SQL->Update('Activity a')
+      ->Join('ActivityType at', 'a.ActivityTypeID = at.ActivityTypeID')
+      ->Set('a.NotifyUserID', ActivityModel::NOTIFY_PUBLIC)
+      ->Where('at.Public', 1)
+      ->Where('a.NotifyUserID', 0)
+      ->Put();
+   
+   $SQL->Delete('Activity', array('NotifyUserID' => 0));
+}
+
+$ActivityCommentExists = $Construct->TableExists('ActivityComment');
+
+$Construct
+   ->Table('ActivityComment')
+   ->PrimaryKey('ActivityCommentID')
+   ->Column('ActivityID', 'int', FALSE, 'key')
+   ->Column('Body', 'text')
+   ->Column('Format', 'varchar(20)')
+   ->Column('InsertUserID', 'int')
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Set($Explicit, $Drop);
+
+// Move activity comments to the activity comment table.
+if (!$ActivityCommentExists && $CommentActivityIDExists) {
+   $Q = "insert {$Px}ActivityComment (ActivityID, Body, Format, InsertUserID, DateInserted, InsertIPAddress)
+      select CommentActivityID, Story, 'Text', InsertUserID, DateInserted, InsertIPAddress
+      from {$Px}Activity
+      where CommentActivityID > 0";
+   $Construct->Query($Q);
+   $SQL->Delete('Activity', array('CommentActivityID >' => 0));
+}
 
 // Insert some activity types
 ///  %1 = ActivityName
@@ -416,6 +481,12 @@ if (!$WallPostType) {
       ->Where('RegardingUserID is not null')
       ->Put();
 }
+
+$ActivityModel = new ActivityModel();
+$ActivityModel->DefineType('Default');
+$ActivityModel->DefineType('Registration');
+$ActivityModel->DefineType('Status');
+$ActivityModel->DefineType('Ban');
 
 // Message Table
 $Construct->Table('Message')

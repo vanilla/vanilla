@@ -58,6 +58,10 @@ class HomeController extends Gdn_Controller {
     * @access public
     */
    public function FileNotFound() {
+      $this->RemoveCssFile('admin.css');
+      $this->AddCssFile('style.css');
+      $this->MasterView = 'default';
+      
       if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
          header("HTTP/1.0 404", TRUE, 404);
          $this->Render();

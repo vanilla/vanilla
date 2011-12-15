@@ -24,7 +24,7 @@ echo $Form->Errors();
    <li>
       <?php
          echo $Form->Label('Page', 'Page');
-         //echo '<div class="Info2">', T('Select the location of the pocket.', 'Select the location of the pocket.'), '</div>';
+         echo '<div class="Info2">', T('Select the location of the pocket.', 'Select the location of the pocket.'), '</div>';
          echo $Form->DropDown('Page', $this->Data('Pages'));
       ?>
    </li>
@@ -47,32 +47,30 @@ echo $Form->Errors();
    <li>
       <?php
          echo $Form->Label('Repeat', 'RepeatType');
-
+//
          echo '<div>', $Form->Radio('RepeatType', 'Before', array('Value' => Pocket::REPEAT_BEFORE)), '</div>';
-
+//
          echo '<div>', $Form->Radio('RepeatType', 'After', array('Value' => Pocket::REPEAT_AFTER)), '</div>';
-
+//
          echo '<div>', $Form->Radio('RepeatType', 'Repeat Every', array('Value' => Pocket::REPEAT_EVERY)), '</div>';
          
          // Options for repeat every.
-         echo '<div class="RepeatOptions RepeatEveryOptions">',
+         echo '<div class="RepeatOptions RepeatEveryOptions P">',
             '<div class="Info2">', T('Enter numbers starting at 1.'), '</div>',
-            '<p>',
             $Form->Label('Frequency', 'EveryFrequency', array('Class' => 'SubLabel')),
             $Form->TextBox('EveryFrequency', array('Class' => 'SmallInput')),
-            '</p><p>',
-            $Form->Label('Begin At', 'EveryBegin', array('Class' => 'SubLabel')),
+            ' <br /> '.$Form->Label('Begin At', 'EveryBegin', array('Class' => 'SubLabel')),
             $Form->TextBox('EveryBegin', array('Class' => 'SmallInput')),
-            '</p></div>';
+            '</div>';
 
          echo '<div>', $Form->Radio('RepeatType', 'Given Indexes', array('Value' => Pocket::REPEAT_INDEX)), '</div>';
 
          // Options for repeat indexes.
-         echo '<div class="RepeatOptions RepeatIndexesOptions"',
-            '<div class="Info2">', T('Enter a comma-delimited list of indexes, starting at 1.'), '</div><p>',
+         echo '<div class="RepeatOptions RepeatIndexesOptions P">',
+            '<div class="Info2">', T('Enter a comma-delimited list of indexes, starting at 1.'), '</div>',
             $Form->Label('Indexes', 'Indexes', array('Class' => 'SubLabel')),
             $Form->TextBox('Indexes'),
-            '</p></div>';
+            '</div>';
       ?>
    </li>
    <li>

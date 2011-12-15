@@ -179,10 +179,11 @@ class ActivityModel extends Gdn_Model {
          ->OrderBy('a.DateUpdated', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
-      Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender', 'Photo')));
       
+      self::GetUsers($Result->ResultArray());
+      Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender', 'Photo')));
       $this->CalculateData($Result->ResultArray());
-
+      
       $this->EventArguments['Data'] =& $Result;
       $this->FireEvent('AfterGet');
       
@@ -246,6 +247,32 @@ class ActivityModel extends Gdn_Model {
       $this->FireEvent('AfterGet');
       
       return $Result;
+   }
+   
+   public static function GetUsers(&$Data) {
+      $UserIDs = array();
+      
+      foreach ($Data as &$Row) {
+         if (is_string($Row['Data']))
+            $Row['Data'] = @unserialize($Row['Data']);
+         
+         $UserIDs[$Row['ActivityUserID']] = 1;
+         $UserIDs[$Row['RegardingUserID']] = 1;
+         
+         if (isset($Row['Data']['ActivityUserIDs'])) {
+            foreach ($Row['Data']['ActivityUserIDs'] as $UserID) {
+               $UserIDs[$UserID] = 1;
+            }
+         }
+         
+         if (isset($Row['Data']['RegardingUserIDs'])) {
+            foreach ($Row['Data']['RegardingUserIDs'] as $UserID) {
+               $UserIDs[$UserID] = 1;
+            }
+         }
+      }
+      
+      Gdn::UserModel()->GetIDs(array_keys($UserIDs));
    }
    
    public static function GetActivityType($ActivityType) {
@@ -400,8 +427,10 @@ class ActivityModel extends Gdn_Model {
          ->Get();
       $Result->DatasetType(DATASET_TYPE_ARRAY);
       
+      self::GetUsers($Result->ResultArray());
       Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Photo', 'Email', 'Gender')));
       $this->CalculateData($Result->ResultArray());
+      
       return $Result;
    }
    

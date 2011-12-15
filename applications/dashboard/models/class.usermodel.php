@@ -508,6 +508,12 @@ class UserModel extends Gdn_Model {
          // Make keys for cache query
          foreach ($IDs as $UserID) {
             if (!$UserID) continue;
+            
+            if (isset(self::$UserCache[$UserID])) {
+               $Data[$UserID] = self::$UserCache[$UserID];
+               continue;
+            }
+            
             $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          }
          

@@ -1524,17 +1524,17 @@ class UserModel extends Gdn_Model {
 //         $AllIPs[] = $IP;
 //         SetValue('AllIPAddresses', $User, $AllIPs);
 //      }
-
-      $this->SQL->Update('User')
-         ->Set('DateLastActive', Gdn_Format::ToDateTime())
-         ->Set('LastIPAddress', $IP)
-         ->Set('CountVisits', 'CountVisits + 1', FALSE);
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      $Fields = array(
+         'DateLastActive' => Gdn_Format::ToDateTime(),
+         'LastIPAddress' => $IP,
+         'CountVisits' => GetValue('CountVisits', $User, 0) + 1);
 
       if (isset($Attributes) && is_array($Attributes)) {
          // Generate a new transient key for the user (used to authenticate postbacks).
          $Attributes['TransientKey'] = RandomString(12);
-         $this->SQL->Set(
-         	'Attributes', Gdn_Format::Serialize($Attributes));
+         $Fields['Attributes'] = serialize($Attributes);
       }
 
       // Set the hour offset based on the client's clock.

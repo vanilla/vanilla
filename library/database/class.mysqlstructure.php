@@ -157,6 +157,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       $UniqueKey = array();
       $FullTextKey = array();
       $AllowFullText = TRUE;
+      $Indexes = array();
       $Keys = '';
       $Sql = '';
       
@@ -175,12 +176,16 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          $ColumnKeyTypes = (array)$Column->KeyType;
 
          foreach ($ColumnKeyTypes as $ColumnKeyType) {
+            $KeyTypeParts = explode('.', $ColumnKeyType, 2);
+            $ColumnKeyType = $KeyTypeParts[0];
+            $IndexGroup = GetValue(1, $KeyTypeParts, '');
+            
             if ($ColumnKeyType == 'primary')
                $PrimaryKey[] = $ColumnName;
             elseif ($ColumnKeyType == 'key')
-               $Keys .= ",\nkey `".Gdn_Format::AlphaNumeric('`FK_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+               $Indexes['FK'][$IndexGroup][] = $ColumnName;
             elseif ($ColumnKeyType == 'index')
-               $Keys .= ",\nindex `".Gdn_Format::AlphaNumeric('`IX_'.$this->_TableName.'_'.$ColumnName).'` (`'.$ColumnName.'`)';
+               $Indexes['IX'][$IndexGroup][] = $ColumnName;
             elseif ($ColumnKeyType == 'unique')
                $UniqueKey[] = $ColumnName;
             elseif ($ColumnKeyType == 'fulltext' && $AllowFullText)
@@ -196,6 +201,19 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       // Build full text index.
       if (count($FullTextKey) > 0)
          $Keys .= ",\nfulltext index `".Gdn_Format::AlphaNumeric('TX_'.$this->_TableName).'` (`'.implode('`, `', $FullTextKey)."`)";
+      // Build the rest of the keys.
+      foreach ($Indexes as $IndexType => $IndexGroups) {
+         $CreateString = ArrayValue($IndexType, array('FK' => 'key', 'IX' => 'index'));
+         foreach ($IndexGroups as $IndexGroup => $ColumnNames) {
+            if (!$IndexGroup) {
+               foreach ($ColumnNames as $ColumnName) {
+                  $Keys .= ",\n{$CreateString} `{$IndexType}_{$this->_TableName}_{$ColumnName}` (`{$ColumnName}`)";
+               }
+            } else {
+               $Keys .= ",\n{$CreateString} `{$IndexType}_{$this->_TableName}_{$IndexGroup}` (`".implode('`, `', $ColumnNames).'`)';
+            }
+         }
+      }
 
       $Sql = 'create table `'.$this->_DatabasePrefix.$this->_TableName.'` ('
          .$Sql
@@ -242,15 +260,23 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
    }
    
    protected function _IndexSql($Columns, $KeyType = FALSE) {
+//      if ($this->TableName() != 'Comment')
+//         return array();
+      
       $Result = array();
       $Keys = array();
       $Prefixes = array('key' => 'FK_', 'index' => 'IX_', 'unique' => 'UX_', 'fulltext' => 'TX_');
+      $Indexes = array();
       
       // Gather the names of the columns.
       foreach ($Columns as $ColumnName => $Column) {
          $ColumnKeyTypes = (array)$Column->KeyType;
 
          foreach ($ColumnKeyTypes as $ColumnKeyType) {
+            $Parts = explode('.', $ColumnKeyType, 2);
+            $ColumnKeyType = $Parts[0];
+            $IndexGroup = GetValue(1, $Parts, '');
+            
             if(!$ColumnKeyType || ($KeyType && $KeyType != $ColumnKeyType))
                continue;
 
@@ -258,23 +284,32 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             if ($ColumnKeyType == 'fulltext' && !$this->_SupportsFulltext())
                continue;
 
-            if($ColumnKeyType == 'key' || $ColumnKeyType == 'index') {
-               $Name = $Prefixes[$ColumnKeyType].$this->_TableName.'_'.$ColumnName;
-               $Result[$Name] = $ColumnKeyType." $Name (`$ColumnName`)";
-            } else {
-               // This is a multi-column key type so just collect the column name.
-               $Keys[$ColumnKeyType][] = $ColumnName;
-            }
+            $Indexes[$ColumnKeyType][$IndexGroup][] = $ColumnName;
          }
       }
       
       // Make the multi-column keys into sql statements.
-      foreach($Keys as $KeyType2 => $Columns) {
-         if($KeyType2 == 'primary') {
-            $Result['PRIMARY'] = 'primary key (`'.implode('`, `', $Columns).'`)';
+      foreach($Indexes as $ColumnKeyType => $IndexGroups) {
+         $CreateType = arrayValue($ColumnKeyType, array('index' => 'index', 'key' => 'key', 'unique' => 'unique index', 'fulltext' => 'fulltext index', 'primary' => 'primary key'));
+         
+         if($ColumnKeyType == 'primary') {
+            $Result['PRIMARY'] = 'primary key (`'.implode('`, `', $IndexGroups['']).'`)';
          } else {
-            $Name = $Prefixes[$KeyType2].$this->_TableName;
-            $Result[$Name] = "$KeyType2 index $Name (`".implode('`, `', $Columns).'`)';
+            foreach ($IndexGroups as $IndexGroup => $ColumnNames) {
+               $Multi = (strlen($IndexGroup) > 0 || in_array($ColumnKeyType, array('unique', 'fulltext')));
+
+               if ($Multi) {
+                  $IndexName = "{$Prefixes[$ColumnKeyType]}{$this->_TableName}".($IndexGroup ? '_'.$IndexGroup : '');
+
+                  $Result[$IndexName] = "$CreateType $IndexName (`".implode('`, `', $ColumnNames).'`)';
+               } else {
+                  foreach ($ColumnNames as $ColumnName) {
+                     $IndexName = "{$Prefixes[$ColumnKeyType]}{$this->_TableName}_$ColumnName";
+
+                     $Result[$IndexName] = "$CreateType $IndexName (`$ColumnName`)";
+                  }
+               }
+            }
          }
       }
       
@@ -460,10 +495,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       foreach($Indexes as $Name => $Sql) {
          if(array_key_exists($Name, $IndexesDb)) {
             if($Indexes[$Name] != $IndexesDb[$Name]) {
+               $IndexSql[$Name] = "/* '{$IndexesDb[$Name]}' => '{$Indexes[$Name]}' */\n";
                if($Name == 'PRIMARY')
-                  $IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
+                  $IndexSql[$Name] .= $AlterSqlPrefix."drop primary key;\n";
                else
-                  $IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
+                  $IndexSql[$Name] .= $AlterSqlPrefix.'drop index '.$Name.";\n";
                $IndexSql[$Name] .= $AlterSqlPrefix."add $Sql;\n";
             }
             unset($IndexesDb[$Name]);

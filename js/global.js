@@ -135,8 +135,15 @@ jQuery(document).ready(function($) {
 		}
 	});
 		
-	gdn = { };
+	gdn = { focused: true };
 	gdn.Libraries = {};
+   
+   $(window).blur(function() {
+      gdn.focused = false;
+   });
+   $(window).focus(function(){
+      gdn.focused = true;
+   });
 
    // Grab a definition from hidden inputs in the page
    gdn.definition = function(definition, defaultVal, set) {
@@ -840,7 +847,7 @@ jQuery(document).ready(function($) {
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
    var notificationsPinging = 0;
 	var pingForNotifications = function() {
-      if (notificationsPinging > 0)
+      if (notificationsPinging > 0 || !gdn.focused)
          return;
       notificationsPinging++;
       

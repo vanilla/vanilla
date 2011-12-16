@@ -768,6 +768,7 @@ class CommentModel extends VanillaModel {
          $this->EventArguments['Comment'] = $Fields;
          $this->EventArguments['Discussion'] = $Discussion;
          $this->EventArguments['NotifiedUsers'] = array_keys(ActivityModel::$Queue);
+         $this->EventArguments['MentionedUsers'] = $Usernames;
          $this->EventArguments['ActivityModel'] = $ActivityModel;
          $this->FireEvent('BeforeNotification');
 				

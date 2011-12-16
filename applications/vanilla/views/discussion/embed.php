@@ -17,21 +17,35 @@ if (!function_exists('WriteComment'))
       echo $this->Form->Errors();
       echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
       echo "<div class=\"Buttons\">\n";
+      
+      $AllowSigninPopup = C('Garden.SignIn.Popup');
+      $Attributes = FALSE;
+      if (!$AllowSigninPopup)
+         $Attributes = array('target' => '_parent');
+      
       if ($Session->IsValid()) {
          $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl(Gdn::Request()->PathAndQuery());
+         
          echo Wrap(
             sprintf(
                T('Commenting as %1$s (%2$s)'),
                Gdn_Format::Text($Session->User->Name),
-               Anchor(T('Sign Out'), $AuthenticationUrl, 'SignOut')
+               Anchor(T('Sign Out'), $AuthenticationUrl, 'SignOut', $Attributes)
             ),
             'div',
             array('class' => 'Author')
          );
          echo $this->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         $AuthenticationUrl = Gdn::Authenticator()->SignInUrl(Gdn::Request()->PathAndQuery());
-         echo Anchor(T('Comment As ...'), $AuthenticationUrl, 'SignInPopup Button Stash');
+         $AuthenticationUrl = SignInUrl($this->Data('ForeignUrl', '/'));
+         
+         if ($AllowSigninPopup) {
+            $CssClass = 'SignInPopup Button Stash';
+         } else {
+            $CssClass = 'Button Stash';
+         }
+         
+         echo Anchor(T('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);
       }
       echo "</div>\n";
       echo $this->Form->Close();

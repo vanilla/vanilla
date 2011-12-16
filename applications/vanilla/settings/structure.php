@@ -226,6 +226,10 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'CommentMention'))->NumRows()
 if ($SQL->GetWhere('ActivityType', array('Name' => 'BookmarkComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'BookmarkComment', 'FullHeadline' => '%1$s commented on your %8$s.', 'ProfileHeadline' => '%1$s commented on your %8$s.', 'RouteCode' => 'bookmarked discussion', 'Notify' => '1', 'Public' => '0'));
 
+$ActivityModel = new ActivityModel();
+$ActivityModel->DefineType('Discussion');
+$ActivityModel->DefineType('Comment');
+
 $PermissionModel = Gdn::PermissionModel();
 $PermissionModel->Database = $Database;
 $PermissionModel->SQL = $SQL;

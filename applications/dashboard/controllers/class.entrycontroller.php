@@ -88,6 +88,8 @@ class EntryController extends Gdn_Controller {
     */
    public function Initialize() {
       $this->Head = new HeadModule($this);
+      $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex'));
+      
       $this->AddJsFile('jquery.js');
       $this->AddJsFile('jquery.livequery.js');
       $this->AddJsFile('jquery.form.js');
@@ -223,7 +225,6 @@ class EntryController extends Gdn_Controller {
          break;
       }
       
-      // AddActivity($AuthenticatedUserID, 'SignIn');
       switch ($Reaction) {
       
          case Gdn_Authenticator::REACT_RENDER:
@@ -286,7 +287,7 @@ class EntryController extends Gdn_Controller {
          // Here are the initial data array values. that can be set by a plugin.
          $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => $this->Target());
          $this->Form->SetData($Data);
-         $this->Form->AddHidden('Target', '/cf73e"><script>alert(1)</script>17efcbd613');
+         $this->Form->AddHidden('Target', $this->Request->Get('Target', '/'));
       }
 
       // The different providers can check to see if they are being used and modify the data array accordingly.
@@ -1071,6 +1072,8 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          $this->UserModel->Validation->ApplyRule('DiscoveryText', 'Required', 'Tell us why you want to join!');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+         
+         $this->FireEvent('RegisterValidation');
 
          try {
             $Values = $this->Form->FormValues();
@@ -1086,8 +1089,16 @@ class EntryController extends Gdn_Controller {
                   Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
 
                $this->EventArguments['AuthUserID'] = $AuthUserID;
-               $this->FireEvent('RegistrationPending');
+               $this->FireEvent('RegistrationPending');  
                $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
+               
+               // Grab all of the users that need to be notified.
+               $Data = Gdn::Database()->SQL()->GetWhere('UserMeta', array('Name' => 'Preferences.Email.Applicant'))->ResultArray();
+               $ActivityModel = new ActivityModel();
+               $Story = Anchor(Gdn_Format::Text('New applicant: '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
+               foreach ($Data as $Row) {
+                  $ActivityModel->Add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
+               }
             }
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);
@@ -1113,7 +1124,9 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
-
+         
+         $this->FireEvent('RegisterValidation');
+         
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
@@ -1179,6 +1192,9 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+         
+         $this->FireEvent('RegisterValidation');
+         
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
@@ -1248,7 +1264,9 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
-
+         
+         $this->FireEvent('RegisterValidation');
+         
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);

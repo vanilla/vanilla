@@ -240,7 +240,7 @@ class PostController extends VanillaController {
          $this->Draft = $this->DraftModel->GetID($DraftID);
          $this->CategoryID = $this->Draft->CategoryID;
       } else {
-         $this->Discussion = $this->DiscussionModel->GetID($DiscussionID);
+         $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
          $this->CategoryID = $this->Discussion->CategoryID;
       }
       

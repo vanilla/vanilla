@@ -123,6 +123,15 @@ class DiscussionController extends VanillaController {
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
+      
+      if ($this->Offset == 0)
+         $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format), 160));
+      else {
+         $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
+         
+         $FirstComment = $this->Data('Comments')->FirstRow();
+         $this->Description(SliceParagraph(Gdn_Format::PlainText(GetValue('Body', $FirstComment), GetValue('Format', $FirstComment)), 160));         
+      }
 
       // Make sure to set the user's discussion watch records
       $this->CommentModel->SetWatch($this->Discussion, $this->CommentData->NumRows(), $this->Offset, $this->Discussion->CountComments);
@@ -572,7 +581,7 @@ class DiscussionController extends VanillaController {
     */
    public function DeleteComment($CommentID = '', $TransientKey = '') {
       $Session = Gdn::Session();
-      $DefaultTarget = '/vanilla/discussions/';
+      $DefaultTarget = '/discussions/';
       if (
          is_numeric($CommentID)
          && $CommentID > 0

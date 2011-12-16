@@ -1,12 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * General functions
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
+ */
 
 include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
 
@@ -623,7 +627,9 @@ if (!function_exists('DebugMethod')) {
       echo $MethodName."(";
       $SA = array();
       foreach ($MethodArgs as $FuncArg) {
-         if (!is_array($FuncArg) && !is_object($FuncArg))
+         if (is_null($FuncArg))
+            $SA[] = 'NULL';
+         elseif (!is_array($FuncArg) && !is_object($FuncArg))
             $SA[] = "'{$FuncArg}'";
          elseif (is_array($FuncArg))
             $SA[] = "'Array(".sizeof($FuncArg).")'";
@@ -831,7 +837,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    // Parse out the field and format.
    $Parts = explode(',', $Match);
    $Field = trim($Parts[0]);
-   $Format = strtolower(trim(GetValue(1, $Parts, '')));
+   $Format = trim(GetValue(1, $Parts, ''));
    $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
    $FomatArgs = GetValue(3, $Parts, '');
 
@@ -894,6 +900,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
          case 'rawurlencode':
             $Result = rawurlencode($Value);
             break;
+         case 'text':
+            $Result = Gdn_Format::Text($Value, FALSE);
+            break;
          case 'time':
             $Result = Gdn_Format::Date($Value, '%l:%M%p');
             break;
@@ -909,6 +918,47 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             break;
          case 'urlencode':
             $Result = urlencode($Value);
+            break;
+         case 'user':
+         case 'you':
+         case 'his':
+         case 'her':
+         case 'your':
+            $Result = print_r($Value, TRUE);
+            $ArgsBak = $Args;
+            if (is_array($Value) && count($Value) == 1)
+               $Value = array_shift($Value);
+            
+            if (is_array($Value)) {
+               $Max = C('Garden.FormatUsername.Max', 10);
+               
+               $Count = count($Value);
+               $Result = '';
+               for ($i = 0; $i < $Count; $i++) {
+                  if ($i >= $Max && $Count > $Max + 1) {
+                     $Others = $Count - $i;
+                     $Result .= ' '.T('sep and', 'and').' '
+                        .Plural($Others, '%s other', '%s others');
+                     break;
+                  }
+                  
+                  $User = Gdn::UserModel()->GetID($Value[$i]);
+                  $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+                  
+                  if ($i == $Count - 1)
+                     $Result .= ' '.T('sep and', 'and').' ';
+                  elseif ($i > 0)
+                     $Result .= ', ';
+                  $Result .= UserAnchor($User);
+               }
+            } else {
+               $User = Gdn::UserModel()->GetID($Value);
+               $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+               
+               $Result = UserAnchor($User);
+            }
+               
+            $Args = $ArgsBak;
             break;
          default:
             $Result = $Value;
@@ -983,11 +1033,7 @@ if (!function_exists('FormatArrayAssignment')) {
       } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
          $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
       } else {
-         if (strpos($Value, "'") !== FALSE) {
-            $Array[] = $Prefix .= ' = "'.Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value)).'";';
-         } else {
-            $Array[] = $Prefix .= " = '".Gdn_Format::ArrayValueForPhp($Value)."';";
-         }
+         $Array[] = $Prefix .= ' = '.var_export($Value, TRUE).';';
       }
    }
 }
@@ -2039,6 +2085,64 @@ if (!function_exists('SaveToConfig')) {
     */
    function SaveToConfig($Name, $Value = '', $Options = array()) {
       Gdn::Config()->SaveToConfig($Name, $Value, $Options);
+   }
+}
+
+if (!function_exists('SliceParagraph')) {
+   /**
+    * Slices a string at a paragraph. 
+    * This function will attempt to slice a string at paragraph that is no longer than the specified maximum length.
+    * If it can't slice the string at a paragraph it will attempt to slice on a sentence.
+    * 
+    * Note that you should not expect this function to return a string that is always shorter than max-length.
+    * The purpose of this function is to provide a string that is reaonably easy to consume by a human.
+    * 
+    * @param string $String The string to slice.
+    * @param int $MaxLength The maximum length of the string.
+    * @param string $Suffix The suffix if the string must be sliced mid-sentence.
+    * @return string
+    */
+   function SliceParagraph($String, $MaxLength = 500, $Suffix = '…') {
+      if ($MaxLength >= strlen($String))
+         return $String;
+      
+//      $String = preg_replace('`\s+\n`', "\n", $String);
+      
+      // See if there is a paragraph.
+      $Pos = strrpos(SliceString($String, $MaxLength, ''), "\n\n");
+      
+      if ($Pos === FALSE) {
+         // There was no paragraph so try and split on sentences.
+         $Sentences = preg_split('`([.!?:]\s+)`', $String, NULL, PREG_SPLIT_DELIM_CAPTURE);
+         
+         $Result = '';
+         if (count($Sentences) > 1) {
+            $Result = $Sentences[0].$Sentences[1];
+            
+            for ($i = 2; $i < count($Sentences); $i++) {
+               $Sentence = $Sentences[$i];
+               
+               if ((strlen($Result) + strlen($Sentence)) <= $MaxLength || preg_match('`[.!?:]\s+`', $Sentence))
+                  $Result .= $Sentence;
+               else
+                  break;
+            }
+         }
+         
+         if ($Result) {
+            return rtrim($Result);
+         }
+         
+         // There was no sentence. Slice off the last word and call it a day.
+         $Pos = strrpos(SliceString($String, $MaxLength, ''), ' ');
+         if ($Pos === FALSE) {
+            return $String.$Suffix;
+         } else {
+            return SliceString($String, $Pos + 1, $Suffix);
+         }
+      } else {
+         return SliceString($String, $Pos + 1, '');
+      }
    }
 }
 

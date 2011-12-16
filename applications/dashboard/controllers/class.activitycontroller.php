@@ -30,6 +30,25 @@ class ActivityController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'ActivityModel');
    
    /**
+    * @var ActivityModel
+    */
+   public $ActivityModel;
+   
+   public function __get($Name) {
+      switch ($Name) {
+         case 'CommentData':
+            Deprecated('ActivityController->CommentData', "ActivityController->Data('Activities')");
+            $Result = new Gdn_DataSet(array(), DATASET_TYPE_OBJECT);
+            return $Result;
+         case 'ActivityData':
+            Deprecated('ActivityController->ActivityData', "ActivityController->Data('Activities')");
+            $Result = new Gdn_DataSet($this->Data('Activities'), DATASET_TYPE_ARRAY);
+            $Result->DatasetType(DATASET_TYPE_OBJECT);
+            return $Result;
+      }
+   }
+   
+   /**
     * Include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
@@ -72,8 +91,8 @@ class ActivityController extends Gdn_Controller {
       if (!is_numeric($ActivityID) || $ActivityID < 0)
          $ActivityID = 0;
          
-      $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $ActivityID);
-      $this->CommentData = $this->ActivityModel->GetComments(array($ActivityID));
+      $this->ActivityData = $this->ActivityModel->GetWhere(array('ActivityID' => $ActivityID));
+      $this->SetData('Comments', $this->ActivityModel->GetComments(array($ActivityID)));
       $this->SetData('ActivityData', $this->ActivityData);
       
       $this->Render();
@@ -86,18 +105,10 @@ class ActivityController extends Gdn_Controller {
     * @access public
     * @todo Validate comment length rather than truncating.
     * 
-    * @param int $RoleID Unique ID of role to limit activity to.
     * @param int $Offset Number of activity items to skip.
     */
-   public function Index($RoleID = '', $Page = FALSE) {
+   public function Index($Page = FALSE) {
       $this->Permission('Garden.Activity.View');
-      
-      // Limit to specific RoleIDs?
-      if ($RoleID == 0)
-         $RoleID = '';
-         
-      if ($RoleID != '')
-         $RoleID = explode(',', $RoleID);
          
       // Which page to load
       list($Offset, $Limit) = OffsetLimit($Page, 30);
@@ -105,75 +116,43 @@ class ActivityController extends Gdn_Controller {
       if ($Offset < 0)
          $Offset = 0;
       
-      // Page meta
-      $this->AddJsFile('jquery.gardenmorepager.js');
+      // Page meta.
       $this->AddJsFile('activity.js');
       $this->Title(T('Recent Activity'));
       
       // Comment submission 
       $Session = Gdn::Session();
       $Comment = $this->Form->GetFormValue('Comment');
-      $this->CommentData = FALSE;
-      if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() && !StringIsNullOrEmpty($Comment)) {
-         $this->Permission('Garden.Profiles.Edit');
-         $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
-         
-         // Update About if necessary
-         $ActivityType = 'WallComment';
-         $NewActivityID = $this->ActivityModel->Add(
-            $Session->UserID,
-            $ActivityType,
-            $Comment);
-         
-         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            Redirect('activity');
-         } else {
-            // Load just the single new comment
-            $this->HideActivity = TRUE;
-            $this->ActivityData = $this->ActivityModel->GetWhere('ActivityID', $NewActivityID);
-            $this->View = 'activities';
-         }
-      } else {
-         $this->ActivityData = is_array($RoleID) ? $this->ActivityModel->GetForRole($RoleID, $Offset, $Limit) : $this->ActivityModel->Get('', $Offset, $Limit);
-//         $TotalRecords = is_array($RoleID) ? $this->ActivityModel->GetCountForRole($RoleID) : $this->ActivityModel->GetCount();
-         if ($this->ActivityData->NumRows() > 0) {
-            $ActivityData = $this->ActivityData->ResultArray();
-            $ActivityIDs = ConsolidateArrayValuesByKey($ActivityData, 'ActivityID');
-            $this->CommentData = $this->ActivityModel->GetComments($ActivityIDs);
-         }
-         $this->View = 'all';
-         
-         // Build a pager
-         $PagerFactory = new Gdn_PagerFactory();
-         $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-         $this->Pager->MoreCode = 'More';
-         $this->Pager->LessCode = 'Newer Activity';
-         $this->Pager->ClientID = 'Pager';
-         $this->Pager->Configure(
-            $Offset,
-            $Limit,
-            FALSE,
-            'activity/'.(is_array($RoleID) ? implode(',', $RoleID) : '0').'/%1$s/%2$s/'
-         );
-         
-         // Deliver json data if necessary
-         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-            $this->SetJson('LessRow', $this->Pager->ToString('less'));
-            $this->SetJson('MoreRow', $this->Pager->ToString('more'));
-            $this->View = 'activities';
-         }
-      }
+      $Activities = $this->ActivityModel->GetWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), $Offset, $Limit)->ResultArray();
+      $this->ActivityModel->JoinComments($Activities);
       
-      // Add RecentUser module
-      $RecentUserModule = new RecentUserModule($this);
-      $RecentUserModule->GetData();
-      $this->AddModule($RecentUserModule);
-      
-      $this->SetData('ActivityData', $this->ActivityData);
-
+      $this->SetData('Activities', $Activities);
       $this->CanonicalUrl(Url('/activity', TRUE));
       
+      $this->View = 'all';
       $this->Render();
+   }
+   
+   public function DeleteComment($ID, $TK, $Target = '') {
+      $Session = Gdn::Session();
+      
+      if (!$Session->ValidateTransientKey($TK))
+         throw PermissionException();
+      
+      $Comment = $this->ActivityModel->GetComment($ID);
+      if (!$ID)
+         throw NotFoundException();
+      
+      if ($Session->CheckPermission('Garden.Activity.Delete') || $Comment['InsertUserID'] = $Session->UserID) {
+         $this->ActivityModel->DeleteComment($ID);
+      } else {
+         throw PermissionException();
+      }
+      
+      if ($this->DeliveryType() === DELIVERY_TYPE_ALL)
+         Redirect($Target);
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
    /**
@@ -187,18 +166,24 @@ class ActivityController extends Gdn_Controller {
     */
    public function Delete($ActivityID = '', $TransientKey = '') {
       $Session = Gdn::Session();
-      if (
-         $Session->ValidateTransientKey($TransientKey)
-         && is_numeric($ActivityID)
-      ) {
-         $HasPermission = $Session->CheckPermission('Garden.Activity.Delete');
-         if (!$HasPermission) {
-            $Activity = $this->ActivityModel->GetID($ActivityID);
-            $HasPermission = $Activity->InsertUserID == $Session->UserID;
-         }
-         if ($HasPermission)
-            $this->ActivityModel->Delete($ActivityID);
+      if (!$Session->ValidateTransientKey($TransientKey))
+         throw PermissionException();
+      
+      if (!is_numeric($ActivityID))
+         throw Gdn_UserException('Invalid activity ID');
+      
+      
+      $HasPermission = $Session->CheckPermission('Garden.Activity.Delete');
+      if (!$HasPermission) {
+         $Activity = $this->ActivityModel->GetID($ActivityID);
+         if (!$Activity)
+            throw NotFoundException('Activity');
+         $HasPermission = $Activity['InsertUserID'] == $Session->UserID;
       }
+      if (!$HasPermission)
+         throw PermissionException();
+
+      $this->ActivityModel->Delete($ActivityID);
       
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
          Redirect(GetIncomingValue('Target', $this->SelfUrl));
@@ -227,15 +212,12 @@ class ActivityController extends Gdn_Controller {
          $Body = $this->Form->GetValue('Body', '');
          $ActivityID = $this->Form->GetValue('ActivityID', '');
          if (is_numeric($ActivityID) && $ActivityID > 0) {
-            $NewActivityID = $this->ActivityModel->Add(
-               $Session->UserID,
-               'ActivityComment',
-               $Body,
-               '',
-               $ActivityID,
-               '',
-               TRUE
-            );
+            $ActivityComment = array(
+                'ActivityID' => $ActivityID,
+                'Body' => $Body,
+                'Format' => 'Text');
+            
+            $ID = $this->ActivityModel->Comment($ActivityComment);
             $this->Form->SetValidationResults($this->ActivityModel->ValidationResults());
             if ($this->Form->ErrorCount() > 0)
                $this->ErrorMessage($this->Form->Errors());
@@ -244,17 +226,63 @@ class ActivityController extends Gdn_Controller {
       
       // Redirect back to the sending location if this isn't an ajax request
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-         Redirect($this->Form->GetValue('Return', Gdn_Url::WebRoot()));
+         $Target = $this->Form->GetValue('Return');
+         if (!$Target)
+            $Target = '/activity';
+         Redirect($Target);
       } else {
-         // Load the newly added comment
-         $this->Comment = $this->ActivityModel->GetID($NewActivityID);
-         $this->Comment->ActivityType .= ' Hidden'; // Hide it so jquery can reveal it
+         // Load the newly added comment.
+         $this->SetData('Comment', $this->ActivityModel->GetComment($ID));
          
-         // Set it in the appropriate view
+         // Set it in the appropriate view.
          $this->View = 'comment';
       }
 
       // And render
       $this->Render();
-   }   
+   }
+   
+   public function Post($UserID = FALSE) {
+      $this->Permission('Garden.Profiles.Edit');
+      $Activities = array();
+      
+      if ($this->Form->IsPostBack()) {
+         $Data = $this->Form->FormValues();
+         
+         
+         
+         if ($UserID && $UserID != Gdn::Session()->UserID) {
+            // This is a wall post.
+            $Activity = array(
+                'ActivityType' => 'WallPost',
+                'ActivityUserID' => $UserID,
+                'RegardingUserID' => Gdn::Session()->UserID,
+                'HeadlineFormat' => T('HeadlineFormat.WallPost', '{RegardingUserID,you} &rarr; {ActivityUserID,you}'),
+                'Story' => $Data['Comment']
+            );
+         } else {
+            // This is a status update.
+            $Activity = array(
+                'ActivityType' => 'Status',
+                'HeadlineFormat' => T('HeadlineFormat.Status', '{ActivityUserID,user}'),
+                'Story' => $Data['Comment']
+            );
+         }
+         
+         $Activity = $this->ActivityModel->Save($Activity);
+         if ($Activity) {
+            Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', $Activity['Story']);
+            
+            $Activities = array($Activity);
+            $this->ActivityModel->CalculateData($Activities);
+            ActivityModel::JoinUsers($Activities);
+         }
+      }
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
+         Redirect($this->Request->Get('Target', '/activity'));
+      }
+      
+      $this->SetData('Activities', $Activities);
+      $this->Render('Activities');
+   }
 }

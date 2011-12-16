@@ -99,7 +99,7 @@ class LogController extends DashboardController {
          $this->Permission('Garden.Settings.Manage');
          $Where['RecordType'] = array('Configuration');
       } else {
-         $Where['RecordType'] = array('Discussion', 'Comment', 'Activity');
+         $Where['RecordType'] = array('Discussion', 'Comment', 'Activity', 'User');
       }
       
       $RecordCount = $this->LogModel->GetCountWhere($Where);

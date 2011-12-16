@@ -675,7 +675,7 @@ class SettingsController extends DashboardController {
                $this->FireEvent('AfterEnablePlugin');
             }
          } catch (Exception $e) {
-            $this->Form->AddError(strip_tags($e->getMessage()));
+            $this->Form->AddError($e);
          }
          if ($this->Form->ErrorCount() == 0)
             Redirect('/settings/plugins/'.$this->Filter);

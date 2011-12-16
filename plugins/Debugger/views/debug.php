@@ -9,12 +9,6 @@ if (method_exists($Sender, 'CanonicalUrl')) {
    echo '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\" accesskey=\"r\">$CanonicalUrl</a></div>";
 }
 ?>
-<h3>Controller Data</h3>
-<pre>
-<?php 
-   echo DebuggerPlugin::FormatData(Gdn::Controller()->Data); 
-?>
-</pre>
 
 <?php
 // Add some cache info.
@@ -55,4 +49,13 @@ if(!is_null($Database)) {
 global $Start;
 echo '<h3>Page completed in '.round(Now() - $_SERVER['REQUEST_TIME'], 4).'s</h3>';
 ?>
-</div>;
+
+<h3>Controller Data</h3>
+<pre>
+<?php 
+   echo DebuggerPlugin::FormatData(Gdn::Controller()->Data); 
+?>
+</pre>
+
+
+</div>

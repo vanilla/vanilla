@@ -1,35 +1,21 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
+ * Event Framework: Pluggable
+ * 
  * The Pluggable class is extended by other classes to enable the plugins
  * and the custom event model in plugins. Any class that extends this class
  * has the ability to throw custom events at any time, which can then be
  * handled by plugins.
  *
- * @author Mark O'Sullivan
- * @copyright 2009 Mark O'Sullivan
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
- * @version @@GARDEN-VERSION@@
- * @namespace Garden.Core
+ * @since 2.0
+ * @abstract
  */
 
-/**
- * The Pluggable class is extended by other classes to enable the plugins
- * and the custom event model in plugins. Any class that extends this class
- * has the ability to throw custom events at any time, which can then be
- * handled by plugins.
- *
- * @package Garden
- */
 abstract class Gdn_Pluggable extends Gdn_SliceProvider {
 
 
@@ -85,6 +71,14 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
 
 
    /**
+    * In some cases it may be desirable to fire an event from a different class
+    * than is currently available via $this. If this variable is set, it should
+    * contain the name of the class that the next event will fire off.
+    * @var string
+    */
+   public $FireAs;
+   
+   /**
     * The public constructor of the class. If any extender of this class
     * overrides this one, parent::__construct(); should be called to ensure
     * interoperability.
@@ -107,6 +101,22 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
    public function GetReturn($PluginName, $HandlerName) {
       return $this->Returns[strtolower($HandlerName)][strtolower($PluginName)];
    }
+   
+   
+   /**
+    * Fire the next event off a custom parent class
+    * 
+    * @param mixed $Options Either the parent class, or an option array
+    */
+   public function FireAs($Options) {
+      if (!is_array($Options))
+         $Options = array('FireClass' => $Options);
+      
+      if (array_key_exists('FireClass', $Options))
+         $this->FireAs = GetValue('FireClass', $Options);
+      
+      return $this;
+   }
 
 
    /**
@@ -123,8 +133,11 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
          throw new Exception("Event fired from pluggable class '{$RealClassName}', but Gdn_Pluggable::__construct() was never called.");
       }
       
+      $FireClass = !is_null($this->FireAs) ? $this->FireAs : $this->ClassName;
+      $this->FireAs = NULL;
+      
       // Look to the PluginManager to see if there are related event handlers and call them
-      return Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $EventName);
+      return Gdn::PluginManager()->CallEventHandlers($this, $FireClass, $EventName);
    }
 
 

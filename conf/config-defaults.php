@@ -114,21 +114,23 @@ $Configuration['Garden']['Format']['EmbedSize']                 = 'normal'; // t
 
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';
-$Configuration['Preferences']['Email']['AddedToConversation']   = '1';
+//$Configuration['Preferences']['Email']['AddedToConversation']   = '1'; // merged with ConversationMessage
 $Configuration['Preferences']['Email']['BookmarkComment']       = '1';
 $Configuration['Preferences']['Email']['WallComment']           = '0';
 $Configuration['Preferences']['Email']['ActivityComment']       = '0';
 $Configuration['Preferences']['Email']['DiscussionComment']     = '0';
-$Configuration['Preferences']['Email']['DiscussionMention']     = '0';
-$Configuration['Preferences']['Email']['CommentMention']        = '0';
+//$Configuration['Preferences']['Email']['DiscussionMention']     = '0'; // merged with regular mention
+//$Configuration['Preferences']['Email']['CommentMention']        = '0';
 $Configuration['Preferences']['Popup']['ConversationMessage']   = '1';
-$Configuration['Preferences']['Popup']['AddedToConversation']   = '1';
+//$Configuration['Preferences']['Popup']['AddedToConversation']   = '1';
 $Configuration['Preferences']['Popup']['BookmarkComment']       = '1';
 $Configuration['Preferences']['Popup']['WallComment']           = '1';
 $Configuration['Preferences']['Popup']['ActivityComment']       = '1';
 $Configuration['Preferences']['Popup']['DiscussionComment']     = '1';
-$Configuration['Preferences']['Popup']['DiscussionMention']     = '1';
-$Configuration['Preferences']['Popup']['CommentMention']        = '1';
+//$Configuration['Preferences']['Popup']['DiscussionMention']     = '1';
+//$Configuration['Preferences']['Popup']['CommentMention']        = '1';
+$Configuration['Preferences']['Email']['Mention']               = '0';
+$Configuration['Preferences']['Popup']['Mention']               = '1';
 
 // Modules
 $Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');

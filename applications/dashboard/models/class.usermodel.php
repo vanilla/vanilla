@@ -195,15 +195,32 @@ class UserModel extends Gdn_Model {
       
       // Join the user data using prefixes (ex: 'Name' for 'InsertUserID' becomes 'InsertName')
       $Join = GetValue('Join', $Options, array('Name', 'Email', 'Photo'));
+      $UserPhotoDefaultUrl = function_exists('UserPhotoDefaultUrl');
       
       foreach ($Data as &$Row) {
          foreach ($Prefixes as $Px) {
             $ID = GetValue($Px.'UserID', $Row);
-            $User = GetValue($ID, $Users, FALSE);
-            
-            foreach ($Join as $Column) {
-               SetValue($Px.$Column, $Row, $User[$Column]);
+            if ($ID) {
+               $User = GetValue($ID, $Users, FALSE);
+               foreach ($Join as $Column) {
+                  $Value = $User[$Column];
+                  if ($Column == 'Photo') {
+                     if (!$Value) {
+                        if ($UserPhotoDefaultUrl)
+                           $Value = UserPhotoDefaultUrl($User);
+                     } elseif (!preg_match('`^https?://`i', $Value)) {
+                        $Value = Gdn_Upload::Url(ChangeBasename($Value, 'n%s'));
+                     }
+                  }
+                  SetValue($Px.$Column, $Row, $Value);
+               }
+            } else {
+               foreach ($Join as $Column) {
+                  SetValue($Px.$Column, $Row, NULL);
+               }
             }
+            
+            
          }
       }
    }
@@ -475,6 +492,9 @@ class UserModel extends Gdn_Model {
       if (is_object($User) && $DatasetType == DATASET_TYPE_ARRAY)
          $User = (array)$User;
       
+      $this->EventArguments['LoadedUser'] = &$User;
+      $this->FireEvent('AfterGetID');
+      
       return $User;
    }
    
@@ -488,6 +508,12 @@ class UserModel extends Gdn_Model {
          // Make keys for cache query
          foreach ($IDs as $UserID) {
             if (!$UserID) continue;
+            
+            if (isset(self::$UserCache[$UserID])) {
+               $Data[$UserID] = self::$UserCache[$UserID];
+               continue;
+            }
+            
             $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          }
          
@@ -525,6 +551,10 @@ class UserModel extends Gdn_Model {
             $Result = $this->UserCache($DatabaseUser);
          }
       }
+      
+      $this->EventArguments['RequestedIDs'] = $IDs;
+      $this->EventArguments['LoadedUsers'] = &$Data;
+      $this->FireEvent('AfterGetIDs');
       
       return $Data;
    }
@@ -900,7 +930,13 @@ class UserModel extends Gdn_Model {
                      else
                         $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
 
-                     AddActivity($UserID, 'PictureChange', Img($PhotoUrl, array('alt' => T('Thumbnail'))));
+                     $ActivityModel = new ActivityModel();
+                     $ActivityModel->Save(array(
+                         'ActivityUserID' => $UserID,
+                         'ActivityType' => 'PictureChange',
+                         'HeadlineFormat' => T('HeadlineFormat.PictureChange', '{ActivityUserID,You} changed {ActivityUserID,your} profile picture.'),
+                         'Story' => Img($PhotoUrl, array('alt' => T('Thumbnail')))
+                         ));
                   }
                }
    
@@ -919,14 +955,25 @@ class UserModel extends Gdn_Model {
                // And insert the new user.
                $UserID = $this->_Insert($Fields, $Settings);
    
-               // Report that the user was created
-               $Session = Gdn::Session();
-               AddActivity(
-                  $Session->UserID,
-                  GetValue('ActivityType', $Settings, 'JoinCreated'),
-                  T('Welcome Aboard!'),
-                  $UserID
-               );
+               if ($UserID) {
+                  // Report that the user was created.
+                  $ActivityModel = new ActivityModel();
+                  $ActivityModel->Save(array(
+                      'ActivityType' => 'Registration',
+                      'ActivityUserID' => $UserID,
+                      'HeadlineFormat' => T('HeadlineFormat.Registration', '{ActivityUserID,You} joined.'),
+                      'Story' => T('Welcome Aboard!')),
+                      FALSE,
+                      array('GroupBy' => 'ActivityTypeID'));
+                  
+                  // Report the creation for mods.
+                  $ActivityModel->Save(array(
+                      'ActivityType' => 'Registration',
+                      'ActivityUserID' => Gdn::Session()->UserID,
+                      'RegardingUserID' => $UserID,
+                      'NotifyUserID' => ActivityModel::NOTIFY_MODS,
+                      'HeadlineFormat' => T('HeadlineFormat.AddUser', '{ActivityUserID,user} added an account for {RegardingUserID,user}.')));
+               }
             }
             // Now update the role settings if necessary.
             if ($SaveRoles) {
@@ -986,11 +1033,18 @@ class UserModel extends Gdn_Model {
          
          // Insert the new user
          $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
-         AddActivity(
-            $UserID,
-            'Join',
-            T('Welcome to Vanilla!')
-         );
+         
+         if ($UserID) {
+            $ActivityModel = new ActivityModel();
+            $ActivityModel->Save(array(
+               'ActivityUserID' => $UserID,
+               'ActivityType' => 'Registration',
+               'HeadlineFormat' => T('HeadlineFormat.Registration', '{ActivityUserID,You} joined.'),
+               'Story' => T('Welcome Aboard!')
+               ),
+               FALSE,
+               array('GroupBy' => 'ActivityTypeID'));
+         }
          
          $this->SaveRoles($UserID, array(16), FALSE);
       }
@@ -1089,13 +1143,6 @@ class UserModel extends Gdn_Model {
                Plural($NewCount, 'role', 'roles')
             );
          }
-
-//         AddActivity(
-//            $Session->UserID != 0 ? $Session->UserID : $UserID,
-//            'RoleChange',
-//            $Story,
-//            $UserID
-//         );
       }
    }
 
@@ -1298,13 +1345,16 @@ class UserModel extends Gdn_Model {
             ->Where('InvitationID', $Invitation->InvitationID)
             ->Put();
 
-         // Report that the user was created
-         AddActivity(
-            $UserID,
-            'JoinInvite',
-            T('Welcome Aboard!'),
-            $InviteUserID
-         );
+         // Report that the user was created.
+         $ActivityModel = new ActivityModel();
+         $ActivityModel->Save(array(
+             'ActivityUserID' => $UserID,
+             'ActivityType' => 'Registration',
+             'HeadlineFormat' => T('HeadlineFormat.Registration', '{ActivityUserID,You} joined.'),
+             'Story' => T('Welcome Aboard!')
+             ),
+             FALSE,
+             array('GroupBy' => 'ActivityTypeID'));
       } else {
          $UserID = FALSE;
       }
@@ -1419,12 +1469,17 @@ class UserModel extends Gdn_Model {
 
          // And insert the new user
          $UserID = $this->_Insert($Fields, $Options);
-
-         AddActivity(
-            $UserID,
-            'Join',
-            T('Welcome Aboard!')
-         );
+         if ($UserID) {
+            $ActivityModel = new ActivityModel();
+            $ActivityModel->Save(array(
+               'ActivityUserID' => $UserID,
+               'ActivityType' => 'Registration',
+               'HeadlineFormat' => T('HeadlineFormat.Registration', '{ActivityUserID,You} joined.'),
+               'Story' => T('Welcome Aboard!')
+                ),
+                FALSE,
+                array('GroupBy' => 'ActivityTypeID'));
+         }
       }
       return $UserID;
    }
@@ -1469,17 +1524,17 @@ class UserModel extends Gdn_Model {
 //         $AllIPs[] = $IP;
 //         SetValue('AllIPAddresses', $User, $AllIPs);
 //      }
-
-      $this->SQL->Update('User')
-         ->Set('DateLastActive', Gdn_Format::ToDateTime())
-         ->Set('LastIPAddress', $IP)
-         ->Set('CountVisits', 'CountVisits + 1', FALSE);
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      $Fields = array(
+         'DateLastActive' => Gdn_Format::ToDateTime(),
+         'LastIPAddress' => $IP,
+         'CountVisits' => GetValue('CountVisits', $User, 0) + 1);
 
       if (isset($Attributes) && is_array($Attributes)) {
          // Generate a new transient key for the user (used to authenticate postbacks).
          $Attributes['TransientKey'] = RandomString(12);
-         $this->SQL->Set(
-         	'Attributes', Gdn_Format::Serialize($Attributes));
+         $Fields['Attributes'] = serialize($Attributes);
       }
 
       // Set the hour offset based on the client's clock.
@@ -1671,18 +1726,34 @@ class UserModel extends Gdn_Model {
 				$Email->To($User->Email);
 				//$Email->From(C('Garden.SupportEmail'), C('Garden.SupportName'));
 				$Email->Send();
+            
+            // Report that the user was approved.
+            $ActivityModel = new ActivityModel();
+            $ActivityModel->Save(array(
+                'ActivityUserID' => $UserID,
+                'ActivityType' => 'Registration',
+                'HeadlineFormat' => T('HeadlineFormat.Registration', '{ActivityUserID,You} joined.'),
+                'Story' => T('Welcome Aboard!')
+               ),
+               FALSE,
+               array('GroupBy' => 'ActivityTypeID'));
+            
+            // Report the approval for moderators.
+            $ActivityModel->Save(array(
+                'ActivityType' => 'Registration',
+                'ActivityUserID' => Gdn::Session()->UserID,
+                'RegardingUserID' => $UserID,
+                'NotifyUserID' => ActivityModel::NOTIFY_MODS,
+                'HeadlineFormat' => T('HeadlineFormat.RegistrationApproval', '{ActivityUserID,user} approved the applications for {RegardingUserID,user}.')),
+                FALSE,
+                array('GroupBy' => array('ActivityTypeID', 'ActivityUserID')));
+            
+            Gdn::UserModel()->SaveAttribute($UserID, 'ApprovedByUserID', Gdn::Session()->UserID);
          }
+         
+         
 
-         // Report that the user was approved
-         $Session = Gdn::Session();
-         AddActivity(
-            $Session->UserID,
-            'JoinApproved',
-            T('Welcome Aboard!'),
-            $UserID,
-            '',
-            FALSE
-         );
+         
       }
       return TRUE;
    }
@@ -2370,6 +2441,14 @@ class UserModel extends Gdn_Model {
          $this->ClearCache ($RowID, array('permissions'));
       else
          $this->UpdateUserCache($RowID, $Property, $Value);
+      
+      if (!is_array($Property))
+         $Property = array($Property => $Value);
+      
+      $this->EventArguments['UserID'] = $RowID;
+      $this->EventArguments['Fields'] = $Property;
+      $this->FireEvent('AfterSetField');
+      
 		return $Value;
    }
    

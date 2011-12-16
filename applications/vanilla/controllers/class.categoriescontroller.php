@@ -83,13 +83,16 @@ class CategoriesController extends VanillaController {
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');      
       if ($this->Head) {
-         $this->Title(GetValue('Name', $Category, ''));
          $this->AddJsFile('discussions.js');
          $this->AddJsFile('bookmark.js');
          $this->AddJsFile('options.js');
          $this->AddJsFile('jquery.gardenmorepager.js');
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
       }
+      
+      
+      $this->Title(GetValue('Name', $Category, ''));
+      $this->Description(GetValue('Description', $Category), TRUE);
       
       // Set CategoryID
       $this->SetData('CategoryID', GetValue('CategoryID', $Category), TRUE);

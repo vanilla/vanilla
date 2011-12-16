@@ -1,19 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
 /**
-* 1. <li<?php echo Alternate()?>>
-* Result: <li class="Alt"> and <li>
-* 2. <li class="<?php echo Alternate('AltA', 'AltB')"?>>
-* Result: <li class="AltA"> and <li class="AltB">
-*/
+ * UI functions
+ *
+ * @author Mark O'Sullivan <markm@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
+ */
+
 if (!function_exists('Alternate')) {
    function Alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class'){
       static $i = 0;
@@ -106,6 +104,49 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
+if (!function_exists('FormatSelf')) {
+   function FormatUsername($User, $Format, $ViewingUserID = FALSE) {
+      if ($ViewingUserID === FALSE)
+         $ViewingUserID = Gdn::Session()->UserID;
+      $UserID = GetValue('UserID', $User);
+      $Name = GetValue('Name', $User);
+      $Gender = strtolower(GetValue('Gender', $User));
+      
+      $UCFirst = substr($Format, 0, 1) == strtoupper(substr($Format, 0, 1));
+      
+      
+      switch (strtolower($Format)) {
+         case 'you':
+            if ($ViewingUserID == $UserID)
+               return T("Format $Format", $Format);
+            return $Name;
+         case 'his':
+         case 'her':
+         case 'your':
+            if ($ViewingUserID == $UserID)
+               return T("Format Your", 'Your');
+            else {
+               switch ($Gender) {
+                  case 'm':
+                     $Format = 'his';
+                     break;
+                  case 'f':
+                     $Format = 'her';
+                     break;
+                  default:
+                     $Format = 'their';
+                     break;
+               }
+               if ($UCFirst)
+                  $Format = ucfirst($Format);
+               return T("Format $Format", $Format);
+            }
+         default:
+            return $Name;
+      }
+   }
+}
+
 if (!function_exists('HoverHelp')) {
    function HoverHelp($String, $Help) {
       return Wrap($String.Wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
@@ -159,19 +200,25 @@ if (!function_exists('Plural')) {
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
 if (!function_exists('UserAnchor')) {
-   function UserAnchor($User, $CssClass = '', $Options = NULL) {
+   function UserAnchor($User, $CssClass = NULL, $Options = NULL) {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      $Px = $Options;
+      if (is_string($Options))
+         $Options = array('Px' => $Options);
+      
+      $Px = GetValue('Px', $Options);
+      
       $Name = GetValue($Px.'Name', $User, T('Unknown'));
       $UserID = GetValue($Px.'UserID', $User, 0);
+      
+      $Attributes = array(
+          'class' => $CssClass,
+          'rel' => GetValue('Rel', $Options)
+          );
 
-      if ($CssClass != '')
-         $CssClass = ' class="'.$CssClass.'"';
-
-      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.$CssClass.'>'.htmlspecialchars($Name).'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.htmlspecialchars($Name).'</a>';
    }
 }
 
@@ -235,14 +282,15 @@ if (!function_exists('UserUrl')) {
    /**
     * Return the url for a user.
     * @param array|object $User The user to get the url for.
+    * @param string $Px The prefix to apply before fieldnames. @since 2.1
     * @return string The url suitable to be passed into the Url() function.
     */
-   function UserUrl($User) {
+   function UserUrl($User, $Px = '') {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      return '/profile/'.($NameUnique ? '' : GetValue('UserID', $User, 0).'/').rawurlencode(GetValue('Name', $User));
+      return '/profile/'.($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').rawurlencode(GetValue($Px.'Name', $User));
    }
 }
 

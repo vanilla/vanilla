@@ -1,4 +1,17 @@
-<?php
+<?php if (!defined('APPLICATION')) exit();
+
+/**
+ * Routing system
+ * 
+ * Allows paths within the application to redirect, either internally or via
+ * http, to other locations.
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
+ */
 
 class Gdn_Router extends Gdn_Pluggable {
 

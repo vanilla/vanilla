@@ -9,10 +9,9 @@ if (!property_exists($this, 'ProfileUserID'))
 if (!function_exists('WriteActivity'))
    include($this->FetchViewLocation('helper_functions', 'activity'));
 
-$Comment = property_exists($this, 'CommentData') && is_object($this->CommentData) ? $this->CommentData->NextRow() : FALSE;
-foreach ($this->ActivityData->Result() as $Activity) {
+foreach ($this->Data('Activities') as $Activity) {
    if ($this->HideActivity)
       $Activity->ActivityType .= ' Hidden';
    
-   WriteActivity($Activity, $this, $Session, $Comment);
+   WriteActivity($Activity, $this, $Session);
 }

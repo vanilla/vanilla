@@ -8,19 +8,22 @@
 $this->FireEvent('BeforeStatusForm');
 $Session = Gdn::Session();
 if ($Session->CheckPermission('Garden.Profiles.Edit')) {
-   echo $this->Form->Open(array('action' => Url('/activity'), 'class' => 'Activity'));
+   echo $this->Form->Open(array('action' => Url('/activity/post'), 'class' => 'Activity'));
    echo $this->Form->Errors();
    echo Wrap($this->Form->TextBox('Comment', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
    echo $this->Form->Button(T('Share'));
    echo $this->Form->Close();
 }
-if ($this->ActivityData->NumRows() > 0) {
-   echo '<ul class="DataList Activities">';
+echo '<ul class="DataList Activities">';
+
+$Activities = $this->Data('Activities', array());
+if (count($Activities) > 0) {
    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
-   echo '</ul>';
-   echo PagerModule::Write(array('CurrentRecords' => $this->ActivityData->NumRows()));
+   echo PagerModule::Write(array('CurrentRecords' => count($Activities)));
 } else {
    ?>
-<div class="Empty"><?php echo T('Not much happening here, yet.'); ?></div>
+<li><div class="Empty"><?php echo T('Not much happening here, yet.'); ?></div></li>
    <?php
 }
+
+echo '</ul>';

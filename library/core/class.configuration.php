@@ -199,7 +199,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $LastKey = $Key;
          }
 
-         $Prefix = '$'.$VariableName."['".addslashes($Key)."']";
+         $Prefix = '$'.$VariableName."[".var_export($Key, TRUE)."]";
          FormatArrayAssignment($Lines, $Prefix, $Value);
       }
 
@@ -318,7 +318,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             if ($i == $KeyCount - 1) {   
                // If we are on the last iteration of the key, then set the value.
                if ($KeyExists === FALSE || $Overwrite === TRUE) {
-                  $Settings[$Key] = Gdn_Format::Serialize($Value);
+                  $Settings[$Key] = $Value;
                }
             } else {
                // Build the array as we loop over the key. Doucement.
@@ -498,11 +498,17 @@ class Gdn_Configuration extends Gdn_Pluggable {
       return $$VariableName;
    }
    
+   /**
+    * Merge a newly loaded config into the current active state
+    * 
+    * Resursively 
+    * 
+    * @param array $Data Reference to the current active state
+    * @param array $Loaded Reference to the new to-merge data
+    */
    protected static function MergeConfig(&$Data, &$Loaded) {
       foreach ($Loaded as $Key => $Value) {
-         if (!array_key_exists($Key, $Data)) {
-            $Data[$Key] = $Value;
-         } elseif(is_array($Data[$Key]) && is_array($Value)) {
+         if (array_key_exists($Key,$Data) && is_array($Data[$Key]) && is_array($Value)) {
             self::MergeConfig($Data[$Key], $Value);
          } else {
             $Data[$Key] = $Value;
@@ -950,12 +956,14 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                   $SetVal = $Value;
                   
                   // Serialize if array or obj
+                  /*
                   if (is_array($Value) || is_object($Value)) {
                      $SetVal = Gdn_Format::Serialize($Value);
                   // ArrayValueEncode if string
                   } elseif (is_string($Value) && !is_numeric($Value) && !is_bool($Value)) {
                      $SetVal = Gdn_Format::ArrayValueForPhp(str_replace('"', '\"', $Value));
                   }
+                  */
                   $Settings[$Key] = $SetVal;
                   if (!$KeyExists || $SetVal != $OldVal)
                      $this->Dirty = TRUE;

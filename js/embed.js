@@ -177,7 +177,7 @@ window.vanilla.embed = function(host) {
          
       if (embed_type == 'comments') {
          return 'http://' + host + '/vanilla/discussion/embed/'
-            +'?vanilla_discussion_id='+encodeURIComponent(discussion_id)
+            +'&vanilla_discussion_id='+encodeURIComponent(discussion_id)
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
             +'&vanilla_type='+encodeURIComponent(foreign_type)
             +'&vanilla_name='+encodeURIComponent(foreign_name)

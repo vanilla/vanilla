@@ -729,10 +729,12 @@ class CommentModel extends VanillaModel {
          $Usernames = GetMentions($Fields['Body']);
          $UserModel = Gdn::UserModel();
          $NotifiedUsers = array();
-         foreach ($Usernames as $Username) {
+         foreach ($Usernames as $i => $Username) {
             $User = $UserModel->GetByUsername($Username);
-            if (!$User)
+            if (!$User) {
+               unset($Usernames[$i]);
                continue;
+            }
             
             // Check user can still see the discussion.
             if (!$UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID))

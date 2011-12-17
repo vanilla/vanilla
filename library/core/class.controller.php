@@ -1469,9 +1469,16 @@ class Gdn_Controller extends Gdn_Pluggable {
                $this->AddJsFile('custom.js'); // only to non-admin pages.
 
             
-            // And now search for/add all JS files
+            // And now search for/add all JS files.
+            $Cdns = array(
+                'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',
+                );
+            
             foreach ($this->_JsFiles as $Index => $JsInfo) {
                $JsFile = $JsInfo['FileName'];
+               
+               if (isset($Cdns[$JsFile]))
+                  $JsFile = $Cdns[$JsFile];
 
                if (strpos($JsFile, '//') !== FALSE) {
                   // This is a link to an external file.

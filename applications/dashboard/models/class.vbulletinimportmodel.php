@@ -31,9 +31,16 @@ class vBulletinImportModel extends Gdn_Model {
       $Router->SetRoute('showpost\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
       $Router->SetRoute('archive\.php\t-(\d+)\.html', 'discussion/$1', 'Permanent');
       
-      // Profiles & Attachments
+      // Profiles
       $Router->SetRoute('member\.php\?u=(\d+)', 'profile/$1/x', 'Permanent');
+      $Router->SetRoute('usercp\.php', 'profile', 'Permanent');
+      $Router->SetRoute('profile\.php', 'profile', 'Permanent');
+      
+      // Other
       $Router->SetRoute('attachment\.php\?attachmentid=(\d+)', 'discussion/download/$1', 'Permanent');
+      $Router->SetRoute('search\.php', 'discussions', 'Permanent');
+      $Router->SetRoute('private\.php', 'messages/all', 'Permanent');
+      $Router->SetRoute('subscription\.php', 'discussions/bookmarked', 'Permanent');
       
       // Make different sizes of avatars
       $this->ProcessAvatars();

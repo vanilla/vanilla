@@ -60,13 +60,18 @@ class vBulletinImportModel extends Gdn_Model {
       if (!file_exists(PATH_UPLOADS.'/userpics'))
          mkdir(PATH_UPLOADS.'/userpics');
       
+      // Get sizes
       $ProfileHeight = C('Garden.Profile.MaxHeight', 1000);
       $ProfileWidth = C('Garden.Profile.MaxWidth', 250);
       $ThumbSize = C('Garden.Thumbnail.Size', 40);
       
+      // Temporarily set maximum quality
+      SaveToConfig('Garden.UploadImage.Quality', 100, FALSE);
+      
+      // Create profile and thumbnail sizes
       foreach ($UserData->Result() as $User) {
          try {
-            $Image = PATH_ROOT . DS . 'uploads' . DS . $User->Photo;
+            $Image = PATH_ROOT . DS . 'uploads' . DS . GetValue('Photo', $User);
             $ImageBaseName = pathinfo($Image, PATHINFO_BASENAME);            
             
             // Save profile size

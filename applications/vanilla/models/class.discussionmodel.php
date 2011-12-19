@@ -936,6 +936,7 @@ class DiscussionModel extends VanillaModel {
                $this->EventArguments['Discussion'] = $Fields;
                $this->EventArguments['Activity'] = $Activity;
                $this->EventArguments['NotifiedUsers'] = $NotifiedUsers;
+               $this->EventArguments['MentionedUsers'] = $Usernames;
                $this->EventArguments['ActivityModel'] = $ActivityModel;
                $this->FireEvent('BeforeNotification');
 

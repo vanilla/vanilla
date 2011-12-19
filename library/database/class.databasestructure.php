@@ -168,7 +168,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
       $KeyTypes = (array)$KeyType;
       $KeyTypes1 = array();
       foreach ($KeyTypes as $KeyType1) {
-         if (in_array($KeyType1, array('primary', 'key', 'index', 'unique', 'fulltext', FALSE)))
+         $Parts = explode('.', $KeyType1, 2);
+         
+         if (in_array($Parts[0], array('primary', 'key', 'index', 'unique', 'fulltext', FALSE)))
             $KeyTypes1[] = $KeyType1;
       }
       if (count($KeyTypes1) == 0)

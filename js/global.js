@@ -135,8 +135,15 @@ jQuery(document).ready(function($) {
 		}
 	});
 		
-	gdn = { };
+	gdn = { focused: true };
 	gdn.Libraries = {};
+   
+   $(window).blur(function() {
+      gdn.focused = false;
+   });
+   $(window).focus(function(){
+      gdn.focused = true;
+   });
 
    // Grab a definition from hidden inputs in the page
    gdn.definition = function(definition, defaultVal, set) {
@@ -680,8 +687,11 @@ jQuery(document).ready(function($) {
 	
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
-		if (!response || !response.InformMessages || response.InformMessages.length == 0)
+		if (!response)
 			return false;
+      
+      if (!response.InformMessages || response.InformMessages.length == 0)
+         return false;
 		
 		// If there is no message container in the page, add one
 		var informMessages = $('div.InformMessages');
@@ -838,16 +848,16 @@ jQuery(document).ready(function($) {
 	}
 	
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
-   var notificationsPinging = 0;
+   var notificationsPinging = 0, pingCount = 0;
 	var pingForNotifications = function() {
-      if (notificationsPinging > 0)
+      if (notificationsPinging > 0 || !gdn.focused)
          return;
       notificationsPinging++;
       
       $.ajax({
          type: "POST",
          url: gdn.url('dashboard/notifications/inform'),
-         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON'},
+         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON', 'Count': pingCount++},
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log(XMLHttpRequest.responseText);

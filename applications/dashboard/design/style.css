@@ -957,6 +957,7 @@ a.BigButton:focus {
 .MItem {
    margin-left: 8px;
    margin-right: 8px;
+   white-space: nowrap;
 }
 .MItem:first-child {
    margin-left: 0;
@@ -2220,7 +2221,6 @@ body.Entry #Content {
    float: none;
    margin: 0 auto;
    width: 360px;
-   text-align: center;
 }
 body.Entry #Content h1 {
    border: none;

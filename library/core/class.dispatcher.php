@@ -183,6 +183,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
       
+      if (Gdn::Session()->NewVisit()) {
+         Gdn::UserModel()->FireEvent('Visit');
+      }
+      
       // Move this up to allow pre-routing
       $this->FireEvent('BeforeDispatch');
       

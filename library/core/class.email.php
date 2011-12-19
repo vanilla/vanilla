@@ -131,7 +131,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * The message to be sent.
     *
     * @param string $Message The message to be sent.
-    * @tod: implement
+    * @param string $TextVersion Optional plaintext version of the message
     * @return Email
     */
    public function Message($Message) {
@@ -140,7 +140,18 @@ class Gdn_Email extends Gdn_Pluggable {
       // which, untreated, would result in &#039; in the message in place of single quotes.
    
       if ($this->PhpMailer->ContentType == 'text/html') {
+         $TextVersion = FALSE;
+         if (stristr($Message, '<!-- //TEXT VERSION FOLLOWS//')) {
+            $EmailParts = explode('<!-- //TEXT VERSION FOLLOWS//', $Message);
+            $TextVersion = array_pop($EmailParts);
+            $Message = array_shift($EmailParts);
+            $TextVersion = trim($TextVersion);
+            $Message = trim($Message);
+         }
+         
          $this->PhpMailer->MsgHTML(htmlspecialchars_decode($Message,ENT_QUOTES));
+         if ($TextVersion !== FALSE && !empty($TextVersion))
+            $this->PhpMailer->AltBody = $TextVersion;
       } else {
          $this->PhpMailer->Body = htmlspecialchars_decode($Message,ENT_QUOTES);
       }

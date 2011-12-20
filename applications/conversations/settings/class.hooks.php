@@ -99,10 +99,9 @@ class ConversationsHooks implements Gdn_IPlugin {
     */
    public function Base_Render_Before($Sender) {
       // Add the menu options for conversations
-      $Session = Gdn::Session();
-      if ($Sender->Menu && $Session->IsValid()) {
+      if ($Sender->Menu && Gdn::Session()->IsValid()) {
          $Inbox = T('Inbox');
-         $CountUnreadConversations = $Session->User->CountUnreadConversations;
+         $CountUnreadConversations = GetValue('CountUnreadConversations', Gdn::Session()->User);
          if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
             $Inbox .= ' <span>'.$CountUnreadConversations.'</span>';
             

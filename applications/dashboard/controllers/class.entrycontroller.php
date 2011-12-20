@@ -1087,15 +1087,19 @@ class EntryController extends Gdn_Controller {
 
                if ($this->Form->GetFormValue('RememberMe'))
                   Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
+               
+               // Notification text
+               $Label = T('NewApplicantEmail', 'New applicant:');
+               $Story = Anchor(Gdn_Format::Text($Label.' '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
 
                $this->EventArguments['AuthUserID'] = $AuthUserID;
-               $this->FireEvent('RegistrationPending');  
+               $this->EventArguments['Story'] = &$Story;
+               $this->FireEvent('RegistrationPending');
                $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
                
                // Grab all of the users that need to be notified.
                $Data = Gdn::Database()->SQL()->GetWhere('UserMeta', array('Name' => 'Preferences.Email.Applicant'))->ResultArray();
                $ActivityModel = new ActivityModel();
-               $Story = Anchor(Gdn_Format::Text('New applicant: '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
                foreach ($Data as $Row) {
                   $ActivityModel->Add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
                }

@@ -142,7 +142,7 @@ window.vanilla.embed = function(host) {
          return;
 
       document.getElementById('vanilla'+id).style['height'] = height + "px";
-      if (window.gadgets && gadgets.window.adjustHeight) {
+      if (window.gadgets && gadgets.window && gadgets.window.adjustHeight) {
          try {
             gadgets.window.adjustHeight();
          } catch (ex) {

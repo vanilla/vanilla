@@ -41,7 +41,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
-      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
+      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return;
       
       if (count($Result) == 0)
@@ -230,7 +230,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function PageWhere($DiscussionID, $Page, $Limit) {
-      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
+      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return FALSE;
       
       if ($Limit != C('Vanilla.Comments.PerPage', 30)) {

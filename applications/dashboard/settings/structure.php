@@ -349,7 +349,11 @@ $EmailedExists = $Construct->ColumnExists('Emailed');
 $CommentActivityIDExists = $Construct->ColumnExists('CommentActivityID');
 $NotifyUserIDExists = $Construct->ColumnExists('NotifyUserID');
 $DateUpdatedExists = $Construct->ColumnExists('DateUpdated');
-$ActivityIndexes = $Construct->IndexSqlDb();
+
+if ($ActivityExists)
+   $ActivityIndexes = $Construct->IndexSqlDb();
+else
+   $ActivityIndexes = array();
 
 $Construct
 	->PrimaryKey('ActivityID')

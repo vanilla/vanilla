@@ -133,7 +133,12 @@ $Construct->Table('UserDiscussion')
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment');
-$CommentIndexes = $Construct->IndexSqlDb();
+
+if ($Construct->TableExists())
+   $CommentIndexes = $Construct->IndexSqlDb();
+else
+   $CommentIndexes = array();
+
 $Construct->PrimaryKey('CommentID')
 	->Column('DiscussionID', 'int', FALSE, 'index.1')
 	->Column('InsertUserID', 'int', TRUE, 'key')

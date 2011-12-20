@@ -190,7 +190,7 @@ class Gdn_ApplicationManager {
          throw new Exception(T('The application folder was not properly defined.'));
       
       // Hook directly into the autoloader and force it to load the newly tested application
-      Gdn_Autoloader::AttachApplication($ApplicationName);
+      Gdn_Autoloader::AttachApplication($ApplicationFolder);
       
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();

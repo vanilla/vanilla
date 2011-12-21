@@ -283,8 +283,9 @@ div.Popup input.DateBox,
 div.Popup input.InputBox, 
 div.Popup input.SmallInput, 
 div.Popup textarea.TextBox {
-   font-size: 15px;
    padding: 6px 3px;
+   font-size: 15px;
+   font-weight: normal;
    font-family: arial;
    color: #444;
    width: 250px;

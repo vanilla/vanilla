@@ -57,7 +57,10 @@ div.Popup div.Messages ul {
    -webkit-border-radius: 2px;
 }
 div.Popup div.Info {
-   border: 0;
+   margin: 10px 10px 1px 10px;
+   padding: 10px;
+   border: none;
+   color: black;
    margin-bottom: 1px;
 }
 
@@ -239,7 +242,9 @@ body div.Popup .Content form div.Buttons {
 body div.Popup div.Warning {
    margin: 10px 0 0;
    margin-top: 20px;
+   padding: 10px 20px;
    background: #dae5ea;
+   border: none;
 }
 
 .Popup .Warning p {

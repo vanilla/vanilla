@@ -61,6 +61,10 @@ div.Popup div.Info {
    padding: 10px;
    border: none;
    color: black;
+   background-color: transparent;
+   border-radius: 0px;
+   -moz-border-radius: 0px;
+   -webkit-border-radius: 0px;
    margin-bottom: 1px;
 }
 
@@ -245,6 +249,9 @@ body div.Popup div.Warning {
    padding: 10px 20px;
    background: #dae5ea;
    border: none;
+   border-radius: 0px;
+   -moz-border-radius: 0px;
+   -webkit-border-radius: 0px;
 }
 
 .Popup .Warning p {

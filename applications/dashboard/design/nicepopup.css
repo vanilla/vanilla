@@ -278,3 +278,23 @@ div.Popup .InfoRow label {
    font-weight: bold;
    display: block;
 }
+
+div.Popup input.DateBox, 
+div.Popup input.InputBox, 
+div.Popup input.SmallInput, 
+div.Popup textarea.TextBox {
+   font-size: 15px;
+   padding: 6px 3px;
+   font-family: arial;
+   color: #444;
+   width: 250px;
+   border: 1px solid #CCC;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   margin: 0;
+}
+
+div.Popup div.Buttons input {
+   font-size: 12px;
+}

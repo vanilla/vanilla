@@ -896,7 +896,7 @@ class DiscussionModel extends VanillaModel {
                $NotifiedUsers = array();
                $UserModel = Gdn::UserModel();
                $ActivityModel = new ActivityModel();
-               $HeadlineFormat = T('HeadlineFormat.Comment', '{ActivityUserID,user} <a href="{Url,html}">{Data.Name,text}</a>');
+               $HeadlineFormat = T('HeadlineFormat.Discussion', '{ActivityUserID,user} <a href="{Url,html}">{Data.Name,text}</a>');
                $Activity = array(
                    'ActivityType' => 'Discussion',
                    'ActivityUserID' => $Fields['InsertUserID'],
@@ -920,8 +920,10 @@ class DiscussionModel extends VanillaModel {
                   if (!$UserModel->GetCategoryViewPermission($User->UserID, GetValue('CategoryID', $Fields)))
                      continue;
                   
+                  $Activity['HeadlineFormat'] = T('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
+                  
                   $Activity['NotifyUserID'] = GetValue('UserID', $User);
-                  $ActivityModel->Queue($Activiy, 'Mention');
+                  $ActivityModel->Queue($Activity, 'Mention');
                }
                
                // Notify everyone that has advanced notifications.
@@ -1005,9 +1007,6 @@ class DiscussionModel extends VanillaModel {
             continue;
          
          if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
-            continue;
-         
-         if (in_array($UserID, $NotifiedUsers))
             continue;
          
          $Activity['NotifyUserID'] = $UserID;

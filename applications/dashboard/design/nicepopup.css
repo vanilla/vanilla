@@ -57,7 +57,14 @@ div.Popup div.Messages ul {
    -webkit-border-radius: 2px;
 }
 div.Popup div.Info {
-   border: 0;
+   margin: 10px 10px 1px 10px;
+   padding: 10px;
+   border: none;
+   color: black;
+   background-color: transparent;
+   border-radius: 0px;
+   -moz-border-radius: 0px;
+   -webkit-border-radius: 0px;
    margin-bottom: 1px;
 }
 
@@ -239,7 +246,12 @@ body div.Popup .Content form div.Buttons {
 body div.Popup div.Warning {
    margin: 10px 0 0;
    margin-top: 20px;
+   padding: 10px 20px;
    background: #dae5ea;
+   border: none;
+   border-radius: 0px;
+   -moz-border-radius: 0px;
+   -webkit-border-radius: 0px;
 }
 
 .Popup .Warning p {
@@ -265,4 +277,25 @@ div.Popup .InfoRow {
 div.Popup .InfoRow label {
    font-weight: bold;
    display: block;
+}
+
+div.Popup input.DateBox, 
+div.Popup input.InputBox, 
+div.Popup input.SmallInput, 
+div.Popup textarea.TextBox {
+   padding: 6px 3px;
+   font-size: 15px;
+   font-weight: normal;
+   font-family: arial;
+   color: #444;
+   width: 250px;
+   border: 1px solid #CCC;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   margin: 0;
+}
+
+div.Popup div.Buttons input {
+   font-size: 12px;
 }

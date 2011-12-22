@@ -604,6 +604,9 @@ class DiscussionModel extends VanillaModel {
       if (!$Data)
          return $Data;
       
+      $Data->Attributes = @unserialize($Data->Attributes);
+      $Data->Url = Url('/discussion/'.$Data->DiscussionID.'/'.Gdn_Format::Url($Data->Name), TRUE);
+      
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);
       if (!$Category) $Category = FALSE;

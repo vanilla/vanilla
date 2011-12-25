@@ -3002,6 +3002,7 @@ body.embed .Connect h2 {
 .ProfilePhotoSmall {
    height: 24px;
    width: 24px;
+   vertical-align: bottom;
 }
 .ProfilePhotoMedium {
    height: 40px;

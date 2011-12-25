@@ -115,9 +115,10 @@ class MessagesController extends ConversationsController {
       if ($this->Form->AuthenticatedPostBack()) {
          $ConversationID = $this->Form->GetFormValue('ConversationID', '');
          $NewMessageID = $this->Form->Save();
+         
          if ($NewMessageID) {
             if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-               Redirect('messages/'.$ConversationID.'/#'.$NewMessageID);
+               Redirect('messages/'.$ConversationID.'/#'.$NewMessageID, 302);
                
             $this->SetJson('MessageID', $NewMessageID);
             // If this was not a full-page delivery type, return the partial response
@@ -276,8 +277,7 @@ class MessagesController extends ConversationsController {
       if (!$InConversation) {
          // Conversation moderation must be enabled and they must have permission
          if (!C('Conversations.Moderation.Allow', FALSE)) {
-            Gdn::Dispatcher()->Dispatch('DefaultPermission');
-            exit();
+            throw PermissionException();
          }
          $this->Permission('Conversations.Moderation.Manage');
       }

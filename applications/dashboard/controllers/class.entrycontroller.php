@@ -665,6 +665,8 @@ class EntryController extends Gdn_Controller {
          $this->_SetRedirect();
       } elseif (!Gdn::Session()->IsValid())
          $this->_SetRedirect();
+      
+      $this->SetData('Target', $this->Target());
       $this->Leaving = FALSE;
       $this->Render();
    }

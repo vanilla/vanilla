@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Application gateway
+ * Application Gateway
  *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
@@ -10,7 +10,7 @@
  */
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.1a8');
+define('APPLICATION_VERSION', '2.1a9');
 
 // Report and track all errors.
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);

@@ -38,7 +38,7 @@ jQuery.fn.insertRoundCaret = function(strStart, strEnd, strReplace) {
          stringBefore = this.value;
          this.focus();
          sel = document.selection.createRange();
-         insertstring = strReplace ? strReplace : sel.text;
+         insertString = strReplace ? strReplace : sel.text;
          fullinsertstring = strStart + insertString + strEnd;
          sel.text = fullinsertstring;
          document.selection.empty();
@@ -225,7 +225,7 @@ jQuery(document).ready(function($) {
          $(TextArea).data('InputFormat', format);
          
          // Build button UIs
-         $(ThisButtonBar).find('div').each(function(i, el){
+         $(ThisButtonBar).find('.Button-Wrap').each(function(i, el){
             var Operation = $(el).find('span').text();
             
             var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
@@ -239,9 +239,9 @@ jQuery(document).ready(function($) {
          ButtonBar.BindShortcuts(TextArea);
          
          // Attach events
-         $(ThisButtonBar).find('div').mousedown(function(event){
+         $(ThisButtonBar).find('.Button-Wrap').mousedown(function(event){
             var MyButtonBar = $(event.target).closest('.ButtonBar');
-            var Button = $(event.target).find('span').closest('div');
+            var Button = $(event.target).find('span').closest('.Button-Wrap');
             if ($(Button).hasClass('ButtonOff')) return;
             
             var TargetTextArea = $(MyButtonBar).data('ButtonBarTarget');
@@ -286,7 +286,7 @@ jQuery(document).ready(function($) {
       },
       
       DisableButton: function(ButtonBarObj, Operation) {
-         $(ButtonBarObj).find('div').each(function(i,Button){
+         $(ButtonBarObj).find('.Button-Wrap').each(function(i,Button){
             var ButtonOperation = $(Button).find('span').text();
             if (ButtonOperation == Operation)
                $(Button).addClass('ButtonOff');
@@ -306,7 +306,7 @@ jQuery(document).ready(function($) {
       PrepareBBCode: function(ButtonBarObj, TextArea) {
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://en.wikipedia.org/wiki/BBCode">BBCode</a></b> in your post.')
+            .html('You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.')
             .insertAfter(TextArea);
       },
       
@@ -315,7 +315,7 @@ jQuery(document).ready(function($) {
          
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php">Simple Html</a></b> in your post.')
+            .html('You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.')
             .insertAfter(TextArea);
       },
       
@@ -325,7 +325,7 @@ jQuery(document).ready(function($) {
          
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://en.wikipedia.org/wiki/Markdown">Markdown</a></b> in your post.')
+            .html('You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.')
             .insertAfter(TextArea);
       },
       
@@ -523,7 +523,7 @@ jQuery(document).ready(function($) {
                break;
 
             case 'strike':
-               $(TextArea).insertRoundTag('-',markdownOpts);
+               $(TextArea).insertRoundTag('del',{opener: '<', closer: '>'});
                break;
 
             case 'code':

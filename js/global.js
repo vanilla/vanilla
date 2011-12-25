@@ -873,7 +873,7 @@ jQuery(document).ready(function($) {
    gdn.pingForNotifications = pingForNotifications;
    
    if (gdn.definition('SignedIn', '0') != '0') {
-//      pingForNotifications();
+      setTimeout(pingForNotifications, 3000);
       setInterval(pingForNotifications, 60000);
    }
 	

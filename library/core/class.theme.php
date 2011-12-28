@@ -35,12 +35,20 @@ class Gdn_Theme {
       $Result = '';
 
       if ($HomeLink) {
+         $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE));
          if (!is_string($HomeLink))
-            $HomeLink = T('Home');
-            $Result .= '<span class="CrumbLabel"><a href="'.Url('/').'">'.$HomeLink.'</a></span> ';
+            $Row['Name'] = T('Home');
+         
+         
+         $Result .= '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
       }
+      
+      $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
 
       foreach ($Data as $Row) {
+         if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
+            continue; // don't show default route twice.
+         
          $Row['Url'] = Url($Row['Url']);
          $Label = '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span> ', $Result, $Label);

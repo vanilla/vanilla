@@ -2141,7 +2141,7 @@ if (!function_exists('SliceParagraph')) {
             return SliceString($String, $Pos + 1, $Suffix);
          }
       } else {
-         return SliceString($String, $Pos + 1, '');
+         return substr($String, 0, $Pos + 1);
       }
    }
 }

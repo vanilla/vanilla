@@ -166,7 +166,8 @@ class CategoriesController extends VanillaController {
       // Setup head
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
-      $this->Title(T('All Categories'));
+      $this->Title(C('Garden.HomepageTitle', C('Garden.Title')), '');
+      $this->Description(C('Garden.Description', NULL));
      
 		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
 		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
@@ -209,7 +210,8 @@ class CategoriesController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
-      $this->Title(T('All Categories'));
+      $this->Title(C('Garden.HomepageTitle', C('Garden.Title')), '');
+      $this->Description(C('Garden.Description', NULL));
       
 		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
 		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);

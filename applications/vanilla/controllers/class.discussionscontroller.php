@@ -79,7 +79,9 @@ class DiscussionsController extends VanillaController {
       
       // Setup head.
       if (!$this->Data('Title'))
-         $this->Title(T('All Discussions'));
+         $this->Title(C('Garden.HomepageTitle', C('Garden.Title')), '');
+      if (!$this->Description())
+         $this->Description(C('Garden.Description', NULL));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
       

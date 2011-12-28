@@ -57,7 +57,8 @@ class MessagesController extends ConversationsController {
     */
    public function Initialize() {
       parent::Initialize();
-      $this->Menu->HighlightRoute('/messages/all');
+      $this->Menu->HighlightRoute('/messages/inbox');
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox')));
    }
    
    /**
@@ -153,7 +154,7 @@ class MessagesController extends ConversationsController {
     */
    public function All($Page = '') {
       $Session = Gdn::Session();
-      $this->Title(T('Conversations'));
+      $this->Title(T('Inbox'));
 
       list($Offset, $Limit) = OffsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
       

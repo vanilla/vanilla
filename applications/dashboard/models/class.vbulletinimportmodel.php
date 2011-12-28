@@ -23,13 +23,13 @@ class vBulletinImportModel extends Gdn_Model {
       
       // Categories
       $Router->SetRoute('forumdisplay\.php\?f=(\d+)', 'categories/$1', 'Permanent');
-      $Router->SetRoute('archive\.php\f-(\d+)\.html', 'categories/$1', 'Permanent');
+      $Router->SetRoute('archive\.php/f-(\d+)\.html', 'categories/$1', 'Permanent');
       
       // Discussions & Comments
       $Router->SetRoute('showthread\.php\?t=(\d+)', 'discussion/$1', 'Permanent');
-      $Router->SetRoute('showthread\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
-      $Router->SetRoute('showpost\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
-      $Router->SetRoute('archive\.php\t-(\d+)\.html', 'discussion/$1', 'Permanent');
+      //$Router->SetRoute('showthread\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
+      //$Router->SetRoute('showpost\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
+      $Router->SetRoute('archive\.php/t-(\d+)\.html', 'discussion/$1', 'Permanent');
       
       // Profiles
       $Router->SetRoute('member\.php\?u=(\d+)', 'profile/$1/x', 'Permanent');

@@ -89,6 +89,7 @@ class DiscussionsController extends VanillaController {
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
+      $this->SetData('Breadcrumbs', array(array('Name' => T('All Discussions'), 'Url' => '/discussions')));
       
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);

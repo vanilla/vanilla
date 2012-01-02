@@ -267,8 +267,10 @@ if (!class_exists('HeadModule', FALSE)) {
             // Return $this->_Title if set;
             return $this->_Title;
          } else {
+            $Subtitle = GetValueR('Data._Subtitle', $this->_Sender, C('Garden.Title'));
+            
             // Default Return title from controller's Data.Title + banner title;
-            return ConcatSep(' - ', GetValueR('Data.Title', $this->_Sender, ''), C('Garden.Title'));
+            return ConcatSep(' - ', GetValueR('Data.Title', $this->_Sender, ''), $Subtitle);
          }
       }
 

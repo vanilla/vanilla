@@ -79,7 +79,9 @@ class DiscussionsController extends VanillaController {
       
       // Setup head.
       if (!$this->Data('Title'))
-         $this->Title(T('All Discussions'));
+         $this->Title(C('Garden.HomepageTitle', C('Garden.Title')), '');
+      if (!$this->Description())
+         $this->Description(C('Garden.Description', NULL));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
       
@@ -87,6 +89,7 @@ class DiscussionsController extends VanillaController {
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
+      $this->SetData('Breadcrumbs', array(array('Name' => T('All Discussions'), 'Url' => '/discussions')));
       
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);

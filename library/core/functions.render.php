@@ -104,7 +104,7 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
-if (!function_exists('FormatSelf')) {
+if (!function_exists('FormatUsername')) {
    function FormatUsername($User, $Format, $ViewingUserID = FALSE) {
       if ($ViewingUserID === FALSE)
          $ViewingUserID = Gdn::Session()->UserID;
@@ -205,7 +205,10 @@ if (!function_exists('UserAnchor')) {
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      if (is_string($Options))
+      if (is_array($CssClass)) {
+         $Options = $CssClass;
+         $CssClass = NULL;
+      } elseif (is_string($Options))
          $Options = array('Px' => $Options);
       
       $Px = GetValue('Px', $Options);
@@ -249,9 +252,13 @@ if (!function_exists('UserBuilder')) {
  */
 if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $Options = array()) {
-		$User = (object)$User;
       if (is_string($Options))
          $Options = array('LinkClass' => $Options);
+      
+      if ($Px = GetValue('Px', $Options))
+         $User = UserBuilder($User, $Px);
+      else
+         $User = (object)$User;
       
       $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
       $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoMedium');

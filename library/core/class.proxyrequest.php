@@ -14,8 +14,6 @@
 
 class ProxyRequest {
    
-   protected static $ConnectionHandles;
-   
    public $MaxReadSize = 4096;
    
    public $RequestHeaders;
@@ -37,8 +35,6 @@ class ProxyRequest {
    protected $Options;
    
    public function __construct($Loud = FALSE) {
-      self::$ConnectionHandles = array();
-      
       $this->Loud = $Loud;
    }
    

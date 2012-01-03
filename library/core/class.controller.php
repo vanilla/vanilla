@@ -1400,7 +1400,10 @@ class Gdn_Controller extends Gdn_Pluggable {
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
                
-               if(strpos($CssFile, '/') !== FALSE) {
+               if (StringBeginsWith($CssFile, 'http')) {
+                  $this->Head->AddCss($CssFile, 'all', TRUE, $CssInfo['Options']);
+                  continue;
+               } elseif(strpos($CssFile, '/') !== FALSE) {
                   // A direct path to the file was given.
                   $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
                } else {

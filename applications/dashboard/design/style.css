@@ -90,6 +90,9 @@ body {
 .Hidden {
    display: none;
 }
+.ClearFix {
+   clear: both;
+}
 .nowrap {
    white-space: nowrap;
 }

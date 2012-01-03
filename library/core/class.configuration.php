@@ -1074,7 +1074,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             if (empty($this->Source))
                trigger_error(ErrorMessage('You must specify a file path to be saved.', 'Configuration', 'Save'), E_USER_ERROR);
 
-            if (!is_writable($this->Source))
+            $CheckWrite = $this->Source;
+            if (!file_exists($CheckWrite))
+               $CheckWrite = dirname ($CheckWrite);
+            
+            if (!is_writable($CheckWrite))
                throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."), $this->Source));
 
             $Group = $this->Group;

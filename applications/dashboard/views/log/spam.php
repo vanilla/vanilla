@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->Data('Title'); ?></h1>
+<div class="Info"><?php echo T('Content flagged as spam is stored here for moderator review.'); ?></div>
 <?php
 echo '<noscript><div class="Errors"><ul><li>', T('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->Open();

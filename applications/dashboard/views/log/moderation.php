@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->Data('Title'); ?></h1>
+<div class="Info"><?php echo T('To prevent abuse, some tools automatically hide content and list it here until it is manually approved by a moderator.'); ?></div>
+
 <?php
 echo '<noscript><div class="Errors"><ul><li>', T('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->Open();

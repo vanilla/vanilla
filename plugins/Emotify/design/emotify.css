@@ -122,6 +122,11 @@
     right: -7px;
     cursor: pointer;
 }
+
+.EmbedCommentForm .EmotifyDropdown {
+   top: -29px;
+}
+
 .EmotifyDropdownActive {
     background-color: #eee;
 }

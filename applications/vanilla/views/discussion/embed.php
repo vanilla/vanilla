@@ -19,9 +19,9 @@ if (!function_exists('WriteComment'))
       echo "<div class=\"Buttons\">\n";
       
       $AllowSigninPopup = C('Garden.SignIn.Popup');
-      $Attributes = FALSE;
+      $Attributes = array('tabindex' => '-1');
       if (!$AllowSigninPopup)
-         $Attributes = array('target' => '_parent');
+         $Attributes['target'] = '_parent';
       
       if ($Session->IsValid()) {
          $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl(Gdn::Request()->PathAndQuery());

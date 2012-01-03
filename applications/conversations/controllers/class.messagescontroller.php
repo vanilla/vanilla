@@ -57,7 +57,8 @@ class MessagesController extends ConversationsController {
     */
    public function Initialize() {
       parent::Initialize();
-      $this->Menu->HighlightRoute('/messages/all');
+      $this->Menu->HighlightRoute('/messages/inbox');
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox')));
    }
    
    /**
@@ -115,9 +116,10 @@ class MessagesController extends ConversationsController {
       if ($this->Form->AuthenticatedPostBack()) {
          $ConversationID = $this->Form->GetFormValue('ConversationID', '');
          $NewMessageID = $this->Form->Save();
+         
          if ($NewMessageID) {
             if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-               Redirect('messages/'.$ConversationID.'/#'.$NewMessageID);
+               Redirect('messages/'.$ConversationID.'/#'.$NewMessageID, 302);
                
             $this->SetJson('MessageID', $NewMessageID);
             // If this was not a full-page delivery type, return the partial response
@@ -152,7 +154,7 @@ class MessagesController extends ConversationsController {
     */
    public function All($Page = '') {
       $Session = Gdn::Session();
-      $this->Title(T('Conversations'));
+      $this->Title(T('Inbox'));
 
       list($Offset, $Limit) = OffsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
       
@@ -276,8 +278,7 @@ class MessagesController extends ConversationsController {
       if (!$InConversation) {
          // Conversation moderation must be enabled and they must have permission
          if (!C('Conversations.Moderation.Allow', FALSE)) {
-            Gdn::Dispatcher()->Dispatch('DefaultPermission');
-            exit();
+            throw PermissionException();
          }
          $this->Permission('Conversations.Moderation.Manage');
       }

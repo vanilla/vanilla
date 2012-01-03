@@ -226,18 +226,18 @@ class ConversationModel extends Gdn_Model {
       $this->DefineSchema();
       $MessageModel->DefineSchema();
 
-      if (!GetValue('RecipientUserIDs', $FormPostValues) && isset($FormPostValues['To'])) {
-            $To = explode(',', $FormPostValues['To']);
-            $To = array_map('trim', $To);
+      if (!GetValue('RecipientUserID', $FormPostValues) && isset($FormPostValues['To'])) {
+         $To = explode(',', $FormPostValues['To']);
+         $To = array_map('trim', $To);
 
-            $RecipientUserIDs = $this->SQL
-               ->Select('UserID')
-               ->From('User')
-               ->WhereIn('Name', $To)
-               ->Get();
-            $RecipientUserIDs = ConsolidateArrayValuesByKey($RecipientUserIDs, 'UserID');
-            $FormPostValues['RecipientUserID'] = $RecipientUserIDs;
-         }
+         $RecipientUserIDs = $this->SQL
+            ->Select('UserID')
+            ->From('User')
+            ->WhereIn('Name', $To)
+            ->Get();
+         $RecipientUserIDs = ConsolidateArrayValuesByKey($RecipientUserIDs, 'UserID');
+         $FormPostValues['RecipientUserID'] = $RecipientUserIDs;
+      }
       
       // Add & apply any extra validation rules:      
       $this->Validation->ApplyRule('Body', 'Required');

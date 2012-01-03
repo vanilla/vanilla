@@ -86,7 +86,7 @@ class GoogleSignInPlugin extends Gdn_Plugin {
          // Add the twitter method to the controller.
          $Method = array(
             'Name' => 'Google',
-            'SignInHtml' => "<a id=\"GoogleAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
+            'SignInHtml' => "<a id=\"GoogleAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
 
          $Sender->Data['Methods'][] = $Method;
       }
@@ -102,7 +102,7 @@ class GoogleSignInPlugin extends Gdn_Plugin {
       $ImgAlt = T('Sign In with Google');
       $SigninHref = $this->_AuthorizeHref();
       $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-      return "<a id=\"GoogleAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
+      return "<a id=\"GoogleAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
    }
 	
 	public function Base_BeforeSignInLink_Handler($Sender) {

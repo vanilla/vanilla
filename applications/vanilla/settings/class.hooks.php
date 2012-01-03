@@ -322,6 +322,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username);
+      $Sender->_SetBreadcrumbs(T('Comments'), '/profile/comments');
       $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
       
       // Load the data for the requested tab.
@@ -380,6 +381,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username);
+      $Sender->_SetBreadcrumbs(T('Discussions'), '/profile/discussions');
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
       
       // Load the data for the requested tab.

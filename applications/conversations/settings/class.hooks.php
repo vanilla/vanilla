@@ -103,7 +103,7 @@ class ConversationsHooks implements Gdn_IPlugin {
          $Inbox = T('Inbox');
          $CountUnreadConversations = GetValue('CountUnreadConversations', Gdn::Session()->User);
          if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
-            $Inbox .= ' <span>'.$CountUnreadConversations.'</span>';
+            $Inbox .= ' <span class="Alert">'.$CountUnreadConversations.'</span>';
             
          $Sender->Menu->AddLink('Conversations', $Inbox, '/messages/all', FALSE, array('Standard' => TRUE));
       }

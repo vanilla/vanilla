@@ -862,10 +862,12 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $$Name = NULL;
       
       // Parse the string
-      $String = str_replace(array('<?php','<?','?>'), '', $String);
-      $Parsed = eval($String);
-      if ($Parsed === FALSE)
-         throw new Exception('Could not parse config string.');
+      if (!empty($String)) {
+         $String = str_replace(array('<?php','<?','?>'), '', $String);
+         $Parsed = eval($String);
+         if ($Parsed === FALSE)
+            throw new Exception('Could not parse config string.');
+      }
       
       // Make sure the config variable is here and is an array.
       if (is_null($$Name) || !is_array($$Name))

@@ -218,8 +218,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       if (!is_array($Code))
          $Code = array($Code => $Translation);
 
-      foreach ($Code as $k => $v)
-         $this->LocaleContainer->SaveToConfig($k, $v, $Save);
+      $this->LocaleContainer->SaveToConfig($Code, NULL, $Save);
    }
 
    /**

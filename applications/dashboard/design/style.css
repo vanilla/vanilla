@@ -104,11 +104,11 @@ body {
 }
 h1, h2, h3, h4, h5, h6 {
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
-   font-weight: normal;
-   margin: 0;
+   font-weight: bold;
+   margin: 5px 0;
 }
 p {
-   margin: 0.5em 0 0 0;
+   margin: 0.5em 0;
    line-height: 1.6em;
 }
 .P {
@@ -116,32 +116,24 @@ p {
 }
 h1 {
    font-size:140%;
-   font-weight:bold;
-   margin-bottom:10px;
 }
 h2 {
    font-size:130%;
-   font-weight:bold;
-   margin-bottom:10px;
 }
 h3 {
    font-size:120%;
-   font-weight: bold;
 }
 h4 {
    font-size: 120%;
-   color: #6C6C6C;
 }
 h5 {
    font-size: 120%;
-   color: #6C6C6C;
 }
 a {
    text-decoration: none;
    color: #1e79a7;
 }
 a:hover {
-   text-decoration: none;
    color: #ff0084;
 }
 img.Thumbnail {

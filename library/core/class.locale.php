@@ -113,9 +113,8 @@ class Gdn_Locale extends Gdn_Pluggable {
          $this->LocaleContainer->Load($ConfLocaleOverride, 'Definition', TRUE);
       
       // Import core (static) translations
-      if ($this->DeveloperMode) {
-         $this->DeveloperContainer->SaveToConfig($this->LocaleContainer->Get('.'));
-      }
+      if ($this->DeveloperMode)
+         $this->DeveloperContainer->MassImport($this->LocaleContainer->Get('.'));
       
       // Allow hooking custom definitions
       $this->FireEvent('AfterSet');

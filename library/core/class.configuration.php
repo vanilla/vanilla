@@ -88,6 +88,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $this->AutoSave = (boolean)$AutoSave;
    }
    
+   /**
+    * Allow dot-delimited splitting on keys?
+    * 
+    * @param boolean $Splitting 
+    */
    public function Splitting($Splitting = TRUE) {
       $this->Splitting = (boolean)$Splitting;
    }
@@ -499,6 +504,19 @@ class Gdn_Configuration extends Gdn_Pluggable {
    }
    
    /**
+    * Import a large pre-formatted set of configs efficiently
+    * 
+    * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
+    * 
+    * @param type $Data 
+    */
+   public function MassImport($Data) {
+      if ($this->Splitting) return;
+      $this->Data = array_merge($this->Data, $Data);
+      $this->Dynamic->MassImport($Data);
+   }
+   
+   /**
     * Merge a newly loaded config into the current active state
     * 
     * Resursively 
@@ -854,6 +872,29 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
          $$Name = array();
       
       return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $$Name);
+   }
+   
+   /**
+    * Import a large pre-formatted set of configs efficiently
+    * 
+    * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
+    * 
+    * @param type $Data 
+    */
+   public function MassImport($Data) {
+      if ($this->Splitting) return;
+      
+      // Only do dirty checks if we aren't already dirty
+      if (!$this->Dirty)
+         $CheckCopy = $this->Settings;
+      
+      $this->Settings = array_merge($this->Settings, $Data);
+      
+      // Only do dirty checks if we aren't already dirty
+      if (!$this->Dirty) {
+         if ($CheckCopy != $this->Settings)
+            $this->Dirty = TRUE;
+      }
    }
    
    public function ToFile($File) {

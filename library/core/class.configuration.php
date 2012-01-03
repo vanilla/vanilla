@@ -88,6 +88,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $this->AutoSave = (boolean)$AutoSave;
    }
    
+   /**
+    * Allow dot-delimited splitting on keys?
+    * 
+    * @param boolean $Splitting 
+    */
    public function Splitting($Splitting = TRUE) {
       $this->Splitting = (boolean)$Splitting;
    }
@@ -499,6 +504,19 @@ class Gdn_Configuration extends Gdn_Pluggable {
    }
    
    /**
+    * Import a large pre-formatted set of configs efficiently
+    * 
+    * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
+    * 
+    * @param type $Data 
+    */
+   public function MassImport($Data) {
+      if ($this->Splitting) return;
+      $this->Data = array_merge($this->Data, $Data);
+      $this->Dynamic->MassImport($Data);
+   }
+   
+   /**
     * Merge a newly loaded config into the current active state
     * 
     * Resursively 
@@ -844,16 +862,41 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $$Name = NULL;
       
       // Parse the string
-      $String = str_replace(array('<?php','<?','?>'), '', $String);
-      $Parsed = eval($String);
-      if ($Parsed === FALSE)
-         throw new Exception('Could not parse config string.');
+      if (!empty($String)) {
+         $String = str_replace(array('<?php','<?','?>'), '', $String);
+         $Parsed = eval($String);
+         if ($Parsed === FALSE)
+            throw new Exception('Could not parse config string.');
+      }
       
       // Make sure the config variable is here and is an array.
       if (is_null($$Name) || !is_array($$Name))
          $$Name = array();
       
       return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $$Name);
+   }
+   
+   /**
+    * Import a large pre-formatted set of configs efficiently
+    * 
+    * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
+    * 
+    * @param type $Data 
+    */
+   public function MassImport($Data) {
+      if ($this->Splitting) return;
+      
+      // Only do dirty checks if we aren't already dirty
+      if (!$this->Dirty)
+         $CheckCopy = $this->Settings;
+      
+      $this->Settings = array_merge($this->Settings, $Data);
+      
+      // Only do dirty checks if we aren't already dirty
+      if (!$this->Dirty) {
+         if ($CheckCopy != $this->Settings)
+            $this->Dirty = TRUE;
+      }
    }
    
    public function ToFile($File) {
@@ -1031,7 +1074,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             if (empty($this->Source))
                trigger_error(ErrorMessage('You must specify a file path to be saved.', 'Configuration', 'Save'), E_USER_ERROR);
 
-            if (!is_writable($this->Source))
+            $CheckWrite = $this->Source;
+            if (!file_exists($CheckWrite))
+               $CheckWrite = dirname ($CheckWrite);
+            
+            if (!is_writable($CheckWrite))
                throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."), $this->Source));
 
             $Group = $this->Group;

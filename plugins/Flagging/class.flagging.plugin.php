@@ -37,7 +37,7 @@ class FlaggingPlugin extends Gdn_Plugin {
       
       $LinkText = T('Flagged Content');
       if ($NumFlaggedItems)
-         $LinkText .= " ({$NumFlaggedItems})";
+         $LinkText .= ' <span class="Alert">'.$NumFlaggedItems.'</span>';
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Forum', T('Forum'));
       $Menu->AddLink('Forum', $LinkText, 'plugin/flagging', 'Garden.Moderation.Manage');

@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
 ?>
 <div class="Categories">

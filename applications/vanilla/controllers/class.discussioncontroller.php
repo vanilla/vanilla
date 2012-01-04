@@ -124,7 +124,10 @@ class DiscussionController extends VanillaController {
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
       
-      if ($this->Offset == 0)
+      $PageNumber = PageNumber($this->Offset, $Limit);
+      $this->SetData('Page', $PageNumber);
+      
+      if ($PageNumber == 1)
          $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format), 160));
       else {
          $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
@@ -183,6 +186,8 @@ class DiscussionController extends VanillaController {
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
+      
+		$this->CanEditComments = Gdn::Session()->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
 
       // Report the discussion id so js can use it.      
       $this->AddDefinition('DiscussionID', $DiscussionID);
@@ -264,9 +269,8 @@ class DiscussionController extends VanillaController {
       $Offset = $this->CommentModel->GetOffset($Comment);
       $Limit = Gdn::Config('Vanilla.Comments.PerPage', 30);
       
-      // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
-      //$Offset = floor($Offset / $Limit) * $Limit;
       $PageNumber = PageNumber($Offset, $Limit, TRUE);
+      $this->SetData('Page', $PageNumber);
       
       $this->View = 'index';
       $this->Index($DiscussionID, 'x', $PageNumber);

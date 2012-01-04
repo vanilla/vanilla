@@ -1,6 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 include($this->FetchViewLocation('helper_functions', 'categories'));
 
+echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
@@ -11,13 +13,8 @@ if (C('Vanilla.Categories.ShowTabs')) {
    $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');
    include_once $ViewLocation;
    WriteFilterTabs($this);
-} else {
-   ?>
-   <div class="Tabs Headings CategoryHeadings">
-      <div class="ItemHeading"><?php echo T('All Categories'); ?></div>
-   </div>
-   <?php
 }
+
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    $Alt = FALSE;
    foreach ($this->CategoryData->Result() as $Category) {
@@ -46,8 +43,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
             $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
-               <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>'
-               .GetOptions($Category, $this).'
+               <div class="ItemContent Category">'.GetOptions($Category, $this).Gdn_Format::Text($Category->Name).'</div>
             </li>';
             $Alt = FALSE;
          } else {
@@ -56,8 +52,8 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $Alt = !$Alt;
             $CatList .= '<li class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category '.$CssClasses.'">'
-                  .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .GetOptions($Category, $this)
+                  .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
                   .'<div class="Meta">
                      <span class="MItem RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>

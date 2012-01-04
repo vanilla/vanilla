@@ -17,7 +17,7 @@ echo $this->Form->Errors();
          echo $this->Form->Label('Value or Pattern', 'BanValue');
          echo $this->Form->TextBox('BanValue');
       ?>
-      <span>Use % for wildcards, e.g. &lsquo;%@hotmail.com&rsquo;</span>
+      <span>Use asterisks for wildcards, e.g. &lsquo;*@hotmail.com&rsquo;</span>
    </li>
    <li>
       <?php

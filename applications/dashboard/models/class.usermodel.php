@@ -1524,6 +1524,9 @@ class UserModel extends Gdn_Model {
     * @param string|int|float $ClientHour
     */
    function UpdateLastVisit($UserID, $Attributes, $ClientHour='') {
+      //echo Gdn_Format::ToDateTime();
+      //die();
+      
       $UserID = (int) $UserID;
       if (!$UserID) {
          throw new Exception('A valid UserId is required.');
@@ -2335,6 +2338,7 @@ class UserModel extends Gdn_Model {
          $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Attributes, '');
          $UserData['CountNotifications'] = 0;
          $UserData['Attributes'] = $Attributes;
+         $UserData['InsertIPAddress'] = Gdn::Request()->IpAddress();
          if ($UserData['DateOfBirth'] == '')
             $UserData['DateOfBirth'] = '1975-09-16';
             

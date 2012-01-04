@@ -1524,9 +1524,6 @@ class UserModel extends Gdn_Model {
     * @param string|int|float $ClientHour
     */
    function UpdateLastVisit($UserID, $Attributes, $ClientHour='') {
-      //echo Gdn_Format::ToDateTime();
-      //die();
-      
       $UserID = (int) $UserID;
       if (!$UserID) {
          throw new Exception('A valid UserId is required.');

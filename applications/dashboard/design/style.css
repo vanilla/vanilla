@@ -743,10 +743,11 @@ body #Head h1 {
    background: #e3f4ff;
    border-bottom: 1px solid #abdafb;
    padding: 2px 4px;
-   text-align: right;
 }
-.PanelInfo li.Heading {
-   text-align: left;
+.PanelInfo .Aside {
+   float: right;
+}
+.PanelInfo .Heading {
    color: #000;
    font-weight: bold;
 }
@@ -758,19 +759,6 @@ body #Head h1 {
    font-weight: normal;
    text-align: left;
    font-weight: normal;
-}
-.PanelInfo li a {
-   float: left;
-}
-.Moderators ul.PanelInfo li {
-	text-align: left;
-}
-.Moderators ul.PanelInfo li a {
-   float: none;
-	font-weight: bold;
-}
-.Moderators ul.PanelInfo li a img {
-	vertical-align: middle;
 }
 .PanelInfo .Meta {
    font-size: 11px;

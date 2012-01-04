@@ -2344,6 +2344,9 @@ class UserModel extends Gdn_Model {
             
          // Make sure there isn't another user with this username.
          if ($this->ValidateUniqueFields($UserData['Name'], $UserData['Email'])) {
+            if (!BanModel::CheckUser($UserData, $this->Validation, TRUE))
+               throw PermissionException('Banned');
+            
             // Insert the new user.
             $this->AddInsertFields($UserData);
             $UserID = $this->_Insert($UserData);

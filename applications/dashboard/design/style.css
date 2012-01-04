@@ -582,18 +582,24 @@ body #Head h1 {
    visibility: visible;
 }
 .MenuTitle {
-   color: #000;
+/*   color: #000;*/
    border: 1px solid #bbb;
    padding: 4px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    border-radius: 2px;
    user-select: none;
-   background: url('images/buttons.png') right -96px no-repeat;
+/*   background: url('images/buttons.png') right -96px no-repeat;*/
    padding-right: 18px;
    -webkit-user-select: none;
    -moz-user-select: none;
    -o-user-select: none;
+   background: url("images/options-button.png") no-repeat scroll center 2px #EFEFEF;
+   color: transparent;
+   height: 16px;
+   overflow: hidden;
+   padding: 0;
+   width: 22px;
 }
 .Open .MenuTitle {
    border: 1px solid #282828;
@@ -602,12 +608,10 @@ body #Head h1 {
    -webkit-border-bottom-left-radius: 0;
    -webkit-border-bottom-right-radius: 0;
    box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
    border-bottom-left-radius: 0;
    border-bottom-right-radius: 0;
-   color: #fff;
-   background: url('images/buttons.png') right -144px no-repeat #282828;
+   background-color: #282828;
+   background-position: center -19px
 }
 .MenuItems {
    border: 1px solid #282828;

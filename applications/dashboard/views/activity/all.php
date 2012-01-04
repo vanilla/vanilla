@@ -1,9 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="Tabs ActivityTabs">
-   <ul>
-      <li class="Active"><?php echo Anchor(T('Recent Activity'), 'activity', 'TabLink'); ?></li>
-   </ul>
-</div>
+<h1><?php echo $this->Data('Title'); ?></h1>
 <?php
 $this->FireEvent('BeforeStatusForm');
 $Session = Gdn::Session();

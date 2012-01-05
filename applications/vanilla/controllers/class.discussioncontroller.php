@@ -647,11 +647,11 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $Limit = GetIncomingValue('Limit', $Limit);
       $ForeignID = GetIncomingValue('vanilla_identifier', '');
       $ForeignType = GetIncomingValue('vanilla_type', '');
-      $ForeignName = GetIncomingValue('vanilla_name', '');
+      $ForeignName = GetIncomingValue('vanilla_name', FALSE);
       $ForeignUrl = GetIncomingValue('vanilla_url', '');
       $this->SetData('ForeignUrl', $ForeignUrl);
       $this->AddDefinition('ForeignUrl', $ForeignUrl);
-      $ForeignBody = GetIncomingValue('vanilla_body', '');
+      $ForeignBody = GetIncomingValue('vanilla_body', FALSE);
       $CategoryID = GetIncomingValue('vanilla_category_id', '');
       
       // Retrieve the discussion record.
@@ -663,22 +663,26 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          
       // If no discussion record was found, but foreign id was provided, create it now
       if (!$Discussion && $ForeignID != '' && $ForeignType != '') {
-         if ($ForeignName == '' || $ForeignBody == '') {
+         if ($ForeignName === FALSE || $ForeignBody === FALSE) {
             $PageInfo = FetchPageInfo($ForeignUrl);
-            $ForeignName = GetValue('Title', $PageInfo, '');
+            if ($ForeignName === FALSE)
+               $ForeignName = GetValue('Title', $PageInfo, '');
+               
             $ForeignDescription = GetValue('Description', $PageInfo, '');
             $ForeignImages = GetValue('Images', $PageInfo, array());
             if (!is_array($ForeignImages))
                $ForeignImages = array();
                
-            $ForeignBody = Wrap(Anchor($ForeignName, $ForeignUrl), 'strong')."\n"
-               .'<br />'
-               .Wrap(Anchor($ForeignUrl, $ForeignUrl), 'small')."\n"
-               .Wrap($ForeignDescription, 'p');
+            if ($ForeignBody === FALSE) {
+               $ForeignBody = Wrap(Anchor($ForeignName, $ForeignUrl), 'strong')."\n"
+                  .'<br />'
+                  .Wrap(Anchor($ForeignUrl, $ForeignUrl), 'small')."\n"
+                  .Wrap($ForeignDescription, 'p');
                   
                if (count($ForeignImages) > 0)
                   $ForeignBody = Anchor(Img($ForeignImages[0], array('alt' => $ForeignName, 'class' => 'Thumbnail')), $ForeignUrl)."\n"
                      .$ForeignBody;
+            }
          }
          $Body = $ForeignBody;
          if ($Body == '' && $ForeignUrl != '')

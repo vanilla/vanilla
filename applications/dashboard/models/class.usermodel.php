@@ -508,6 +508,12 @@ class UserModel extends Gdn_Model {
          // Make keys for cache query
          foreach ($IDs as $UserID) {
             if (!$UserID) continue;
+            
+            if (isset(self::$UserCache[$UserID])) {
+               $Data[$UserID] = self::$UserCache[$UserID];
+               continue;
+            }
+            
             $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          }
          
@@ -815,6 +821,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       // Validate the form posted values
       $UserID = GetValue('UserID', $FormPostValues);
@@ -1273,6 +1282,9 @@ class UserModel extends Gdn_Model {
       // TODO: DO I REALLY NEED THIS???
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 
@@ -1373,6 +1385,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 
@@ -1426,6 +1441,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 
@@ -1518,17 +1536,17 @@ class UserModel extends Gdn_Model {
 //         $AllIPs[] = $IP;
 //         SetValue('AllIPAddresses', $User, $AllIPs);
 //      }
-
-      $this->SQL->Update('User')
-         ->Set('DateLastActive', Gdn_Format::ToDateTime())
-         ->Set('LastIPAddress', $IP)
-         ->Set('CountVisits', 'CountVisits + 1', FALSE);
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      $Fields = array(
+         'DateLastActive' => Gdn_Format::ToDateTime(),
+         'LastIPAddress' => $IP,
+         'CountVisits' => GetValue('CountVisits', $User, 0) + 1);
 
       if (isset($Attributes) && is_array($Attributes)) {
          // Generate a new transient key for the user (used to authenticate postbacks).
          $Attributes['TransientKey'] = RandomString(12);
-         $this->SQL->Set(
-         	'Attributes', Gdn_Format::Serialize($Attributes));
+         $Fields['Attributes'] = serialize($Attributes);
       }
 
       // Set the hour offset based on the client's clock.
@@ -2317,11 +2335,15 @@ class UserModel extends Gdn_Model {
          $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Attributes, '');
          $UserData['CountNotifications'] = 0;
          $UserData['Attributes'] = $Attributes;
+         $UserData['InsertIPAddress'] = Gdn::Request()->IpAddress();
          if ($UserData['DateOfBirth'] == '')
             $UserData['DateOfBirth'] = '1975-09-16';
             
          // Make sure there isn't another user with this username.
          if ($this->ValidateUniqueFields($UserData['Name'], $UserData['Email'])) {
+            if (!BanModel::CheckUser($UserData, $this->Validation, TRUE))
+               throw PermissionException('Banned');
+            
             // Insert the new user.
             $this->AddInsertFields($UserData);
             $UserID = $this->_Insert($UserData);

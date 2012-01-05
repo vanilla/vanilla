@@ -72,6 +72,8 @@ class ActivityController extends Gdn_Controller {
       $this->AddModule('SignedInModule');
       
       parent::Initialize();
+      
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Activity'), 'Url' => '/activity')));
    }
    
    /**

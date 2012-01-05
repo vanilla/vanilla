@@ -16,7 +16,7 @@
    margin-top: -6px;
 }
 
-.ButtonBar div {
+.ButtonBar .Button-Wrap {
     background-color: white;
     background-position: 50% 50%;
     background-repeat: no-repeat;
@@ -38,21 +38,21 @@
     z-index: 50;
 }
 
-.ButtonBar div:hover {
+.ButtonBar .Button-Wrap:hover {
    background-color: #E9E9E9;
    cursor: pointer;
 }
 
-.ButtonBar div span {
+.ButtonBar .Button-Wrap span {
    display: none;
 }
 
-.ButtonBar div.ButtonOff {
+.ButtonBar .ButtonOff {
    display: none;
    cursor: auto;
    opacity: 0.3;
 }
-.ButtonBar div.ButtonOff:hover {
+.ButtonBar .ButtonOff:hover {
    background-color: white;
 }
 

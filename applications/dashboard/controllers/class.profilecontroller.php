@@ -79,6 +79,8 @@ class ProfileController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $this->AddModule('GuestModule');
       parent::Initialize();
+      
+      $this->SetData('Breadcrumbs', array());
    }
    
    /** 
@@ -105,6 +107,8 @@ class ProfileController extends Gdn_Controller {
       $this->GetUserInfo($UserReference, $Username, $UserID);
       $UserID = $this->User->UserID;
       $Username = $this->User->Name;
+      
+      $this->_SetBreadcrumbs(T('Activity'), Url('/profile/activity'));
       
       $this->SetTabView('Activity');
       $Comment = $this->Form->GetFormValue('Comment');
@@ -357,6 +361,8 @@ class ProfileController extends Gdn_Controller {
       list($Offset, $Limit) = OffsetLimit($Page, 30);
 
       $this->GetUserInfo(); 
+      $this->_SetBreadcrumbs(T('Notifications'), '/profile/notifications');
+      
       $this->SetTabView('Notifications');
       $Session = Gdn::Session();
       
@@ -706,6 +712,25 @@ class ProfileController extends Gdn_Controller {
       
       $this->View = 'Invitations';
       $this->Invitations();
+   }
+   
+   public function _SetBreadcrumbs($Name = NULL, $Url = NULL) {
+      // Add the root link.
+      if ($this->User->UserID == Gdn::Session()->UserID) {
+         $Root = array('Name' => T('Profile'), 'Url' => '/profile');
+         $Breadcrumb = array('Name' => $Name, 'Url' => $Url);
+      } else {
+         $NameUnique = C('Garden.Registration.NameUnique');
+         
+         $Root = array('Name' => $this->User->Name, 'Url' => UserUrl($this->User));
+         $Breadcrumb = array('Name' => $Name, 'Url' => $Url.'/'.($NameUnique ? '' : $this->User->UserID.'/').rawurlencode($this->User->Name));
+      }
+      
+      $this->Data['Breadcrumbs'][] = $Root;
+      
+      if ($Name && !StringBeginsWith($Root['Url'], $Url)) {
+         $this->Data['Breadcrumbs'][] = array('Name' => $Name, 'Url' => $Url);
+      }
    }
    
    /**

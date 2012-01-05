@@ -322,6 +322,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username);
+      $Sender->_SetBreadcrumbs(T('Comments'), '/profile/comments');
       $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
       
       // Load the data for the requested tab.
@@ -380,6 +381,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username);
+      $Sender->_SetBreadcrumbs(T('Discussions'), '/profile/discussions');
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
       
       // Load the data for the requested tab.
@@ -467,8 +469,8 @@ class VanillaHooks implements Gdn_IPlugin {
 	 */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Moderation', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Vanilla.Spam.Manage');
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-      $Menu->AddLink('Forum', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Vanilla.Spam.Manage');
       $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
    }
    

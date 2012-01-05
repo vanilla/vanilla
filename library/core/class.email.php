@@ -34,7 +34,7 @@ class Gdn_Email extends Gdn_Pluggable {
       $this->PhpMailer = new PHPMailer();
       $this->PhpMailer->CharSet = Gdn::Config('Garden.Charset', 'utf-8');
       $this->PhpMailer->SingleTo = Gdn::Config('Garden.Email.SingleTo', FALSE);
-      $this->PhpMailer->PluginDir = PATH_LIBRARY.DS.'vendors'.DS.'phpmailer'.DS;
+      $this->PhpMailer->PluginDir = CombinePaths(array(PATH_LIBRARY,'vendors/phpmailer/'));
       $this->Clear();
       parent::__construct();
    }
@@ -131,7 +131,7 @@ class Gdn_Email extends Gdn_Pluggable {
     * The message to be sent.
     *
     * @param string $Message The message to be sent.
-    * @tod: implement
+    * @param string $TextVersion Optional plaintext version of the message
     * @return Email
     */
    public function Message($Message) {
@@ -140,7 +140,20 @@ class Gdn_Email extends Gdn_Pluggable {
       // which, untreated, would result in &#039; in the message in place of single quotes.
    
       if ($this->PhpMailer->ContentType == 'text/html') {
+         $TextVersion = FALSE;
+         if (stristr($Message, '<!-- //TEXT VERSION FOLLOWS//')) {
+            $EmailParts = explode('<!-- //TEXT VERSION FOLLOWS//', $Message);
+            $TextVersion = array_pop($EmailParts);
+            $Message = array_shift($EmailParts);
+            $TextVersion = trim(strip_tags(preg_replace('/<(head|title|style|script)[^>]*>.*?<\/\\1>/s','',$TextVersion)));
+            $Message = trim($Message);
+         }
+         
          $this->PhpMailer->MsgHTML(htmlspecialchars_decode($Message,ENT_QUOTES));
+         if ($TextVersion !== FALSE && !empty($TextVersion)) {
+            $TextVersion = html_entity_decode($TextVersion);
+            $this->PhpMailer->AltBody = $TextVersion;
+         }
       } else {
          $this->PhpMailer->Body = htmlspecialchars_decode($Message,ENT_QUOTES);
       }

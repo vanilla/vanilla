@@ -146,6 +146,7 @@ class Gdn_Session {
          $Authenticator = Gdn::Authenticator();
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
+      $this->SetCookie('-Vv', NULL, -3600);
       
       $this->UserID = 0;
       $this->User = FALSE;
@@ -163,6 +164,54 @@ class Gdn_Session {
     */
    public function GetPermissions() {
       return is_array($this->_Permissions) ? $this->_Permissions : array();
+   }
+   
+   public function GetCookie($Suffix, $Default = NULL) {
+      return GetValue(C('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
+   }
+   
+   public function SetCookie($Suffix, $Value, $Expires) {
+      $Name = C('Garden.Cookie.Name').$Suffix;
+      $Path = C('Garden.Cookie.Path');
+      $Domain = C('Garden.Cookie.Domain');
+      
+      // If the domain being set is completely incompatible with the current domain then make the domain work.
+      $CurrentHost = Gdn::Request()->Host();
+      if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
+         $Domain = '';
+      
+      // Allow people to specify up to a year of expiry.
+      if (abs($Expires) < 31556926)
+         $Expires = time() + $Expires;
+      
+      setcookie($Name, $Value, $Expires, $Path, $Domain);
+      $_COOKIE[$Name] = $Value;
+   }
+   
+   public function NewVisit() {
+      static $NewVisit = NULL;
+      
+      if ($NewVisit !== NULL)
+         return $NewVisit;
+      
+      if (!$this->User)
+         return FALSE;
+      
+      $Current = $this->GetCookie('-Vv');
+      $Now = time();
+      $Expires = $Now + 1200; // 20 minutes.
+      
+      // Figure out if this is a new visit.
+      if ($Current)
+         $NewVisit = FALSE;
+      elseif (Gdn_Format::ToTimeStamp($this->User->DateLastActive) + 1200 > $Expires)
+         $NewVisit = FALSE;
+      else
+         $NewVisit = TRUE;
+      
+      $this->SetCookie('-Vv', $Now, $Expires);
+      
+      return $NewVisit;
    }
 
 	/**
@@ -270,7 +319,7 @@ class Gdn_Session {
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
             }
 
-            $Returning = Gdn::Authenticator()->ReturningUser($this->User);
+            $Returning = !$this->NewVisit();
             if ($Returning) {
                $HourOffset = GetValue('HourOffset', $this->User->Attributes);
                $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
@@ -289,8 +338,9 @@ class Gdn_Session {
 
             // If the user hasn't been active in the session-time, update their date last active
             $SessionLength = Gdn::Config('Garden.Session.Length', '15 minutes');
-            if (Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago'))
+            if (Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago')) {
                $UserModel->Save(array('UserID' => $this->UserID, 'DateLastActive' => Gdn_Format::ToDateTime()));
+            }
 
          } else {
             $this->UserID = 0;

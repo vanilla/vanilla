@@ -163,7 +163,11 @@ class SettingsController extends DashboardController {
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Garden.Title'));
+      $ConfigurationModel->SetField(array(
+         'Garden.HomepageTitle' => C('Garden.Title'),
+         'Garden.Title',
+         'Garden.Description'
+         ));
       
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
@@ -183,7 +187,7 @@ class SettingsController extends DashboardController {
       $this->SetData('Favicon', $Favicon);
       
       // If seeing the form for the first time...
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if (!$this->Form->AuthenticatedPostBack()) {
          // Apply the config settings to the form.
          $this->Form->SetData($ConfigurationModel->Data);
       } else {
@@ -258,7 +262,7 @@ class SettingsController extends DashboardController {
       
       // Page setup
       $this->AddSideMenu();
-      $this->Title(T('Ban List'));
+      $this->Title(T('Banning Options'));
       $this->AddJsFile('bans.js');
 
       list($Offset, $Limit) = OffsetLimit($Page, 20);

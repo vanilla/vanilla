@@ -41,7 +41,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
-      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
+      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return;
       
       if (count($Result) == 0)
@@ -230,7 +230,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function PageWhere($DiscussionID, $Page, $Limit) {
-      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted')
+      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return FALSE;
       
       if ($Limit != C('Vanilla.Comments.PerPage', 30)) {
@@ -729,14 +729,18 @@ class CommentModel extends VanillaModel {
          $Usernames = GetMentions($Fields['Body']);
          $UserModel = Gdn::UserModel();
          $NotifiedUsers = array();
-         foreach ($Usernames as $Username) {
+         foreach ($Usernames as $i => $Username) {
             $User = $UserModel->GetByUsername($Username);
-            if (!$User)
+            if (!$User) {
+               unset($Usernames[$i]);
                continue;
+            }
             
             // Check user can still see the discussion.
             if (!$UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID))
                continue;
+            
+            $Activity['HeadlineFormat'] = T('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
             
             $Activity['NotifyUserID'] = $User->UserID;
             $ActivityModel->Queue($Activity, 'Mention');
@@ -768,6 +772,7 @@ class CommentModel extends VanillaModel {
          $this->EventArguments['Comment'] = $Fields;
          $this->EventArguments['Discussion'] = $Discussion;
          $this->EventArguments['NotifiedUsers'] = array_keys(ActivityModel::$Queue);
+         $this->EventArguments['MentionedUsers'] = $Usernames;
          $this->EventArguments['ActivityModel'] = $ActivityModel;
          $this->FireEvent('BeforeNotification');
 				

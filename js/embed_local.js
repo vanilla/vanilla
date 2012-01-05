@@ -142,8 +142,11 @@ jQuery(document).ready(function($) {
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
       $('a').live('click', function() {
-         var href = $(this).attr('href'),
-            isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
+         var href = $(this).attr('href');
+         if (!href)
+            return;
+         
+         var isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
             noTop = $(this).hasClass('SignOut');
                 
          if (isHttp && href.substr(0, webroot.length) != webroot) {

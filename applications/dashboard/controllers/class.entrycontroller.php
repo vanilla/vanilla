@@ -665,6 +665,8 @@ class EntryController extends Gdn_Controller {
          $this->_SetRedirect();
       } elseif (!Gdn::Session()->IsValid())
          $this->_SetRedirect();
+      
+      $this->SetData('Target', $this->Target());
       $this->Leaving = FALSE;
       $this->Render();
    }
@@ -1072,6 +1074,8 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          $this->UserModel->Validation->ApplyRule('DiscoveryText', 'Required', 'Tell us why you want to join!');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+         
+         $this->FireEvent('RegisterValidation');
 
          try {
             $Values = $this->Form->FormValues();
@@ -1085,15 +1089,19 @@ class EntryController extends Gdn_Controller {
 
                if ($this->Form->GetFormValue('RememberMe'))
                   Gdn::Authenticator()->SetIdentity($AuthUserID, TRUE);
+               
+               // Notification text
+               $Label = T('NewApplicantEmail', 'New applicant:');
+               $Story = Anchor(Gdn_Format::Text($Label.' '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
 
                $this->EventArguments['AuthUserID'] = $AuthUserID;
-               $this->FireEvent('RegistrationPending');  
+               $this->EventArguments['Story'] = &$Story;
+               $this->FireEvent('RegistrationPending');
                $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
                
                // Grab all of the users that need to be notified.
                $Data = Gdn::Database()->SQL()->GetWhere('UserMeta', array('Name' => 'Preferences.Email.Applicant'))->ResultArray();
                $ActivityModel = new ActivityModel();
-               $Story = Anchor(Gdn_Format::Text('New applicant: '.$Values['Name']), ExternalUrl('dashboard/user/applicants'));
                foreach ($Data as $Row) {
                   $ActivityModel->Add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
                }
@@ -1122,7 +1130,9 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
-
+         
+         $this->FireEvent('RegisterValidation');
+         
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
@@ -1188,6 +1198,9 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
+         
+         $this->FireEvent('RegisterValidation');
+         
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
@@ -1257,7 +1270,9 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
-
+         
+         $this->FireEvent('RegisterValidation');
+         
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);

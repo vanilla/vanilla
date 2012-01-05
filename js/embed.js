@@ -142,8 +142,13 @@ window.vanilla.embed = function(host) {
          return;
 
       document.getElementById('vanilla'+id).style['height'] = height + "px";
-      if (window.gadgets && gadgets.window.adjustHeight)
-         gadgets.window.adjustHeight();
+      if (window.gadgets && gadgets.window && gadgets.window.adjustHeight) {
+         try {
+            gadgets.window.adjustHeight();
+         } catch (ex) {
+            // Do nothing...
+         }
+      }
    }
 
    vanillaUrl = function(path) {
@@ -177,7 +182,7 @@ window.vanilla.embed = function(host) {
          
       if (embed_type == 'comments') {
          return 'http://' + host + '/vanilla/discussion/embed/'
-            +'?vanilla_discussion_id='+encodeURIComponent(discussion_id)
+            +'&vanilla_discussion_id='+encodeURIComponent(discussion_id)
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
             +'&vanilla_type='+encodeURIComponent(foreign_type)
             +'&vanilla_name='+encodeURIComponent(foreign_name)
@@ -192,8 +197,8 @@ window.vanilla.embed = function(host) {
    vanillaIframe.name = "vanilla"+id;
    vanillaIframe.src = vanillaUrl(currentPath);
    vanillaIframe.scrolling = "no";
-   vanillaIframe.frameborder = "0";
-   vanillaIframe.allowtransparency = true;
+   vanillaIframe.frameBorder = "0";
+   vanillaIframe.allowTransparency = true;
    vanillaIframe.border = "0";
    vanillaIframe.width = "100%";
    vanillaIframe.height = "300";

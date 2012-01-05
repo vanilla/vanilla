@@ -242,11 +242,19 @@ class ConversationMessageModel extends Gdn_Model {
          $UpdateCountUserIDs = array();
          $NotifyUserIDs = array();
          
-         // Collapse for call to UpdateUserCache and ActivityModel
+         // Collapse for call to UpdateUserCache and ActivityModel.
+         $InsertUserFound = FALSE;
          foreach ($UserData as $UpdateUser) {
             $LastMessageID = GetValue('LastMessageID', $UpdateUser);
             $UserID = GetValue('UserID', $UpdateUser);
             $Deleted = GetValue('Deleted', $UpdateUser);
+            
+            if ($UserID == GetValue('InsertUserID', $Fields)) {
+               $InsertUserFound = TRUE;
+               if ($Deleted) {
+                  $this->SQL->Put('UserConversation', array('Deleted' => 0), array('ConversationID' => $ConversationID, 'UserID' => $UserID));
+               }
+            }
             
             // Update unread for users that were up to date
             if ($LastMessageID == $MessageID)
@@ -255,6 +263,15 @@ class ConversationMessageModel extends Gdn_Model {
             // Send activities to users that have not deleted the conversation
             if (!$Deleted)
                $NotifyUserIDs[] = $UserID;
+         }
+         
+         if (!$InsertUserFound) {
+            $UserConversation = array(
+               'UserID' => GetValue('InsertUserID', $Fields),
+               'ConversationID' => $ConversationID,
+               'LastMessageID' => $LastMessageID,
+               'CountReadMessages' => $CountMessages);
+            $this->SQL->Insert('UserConversation', $UserConversation);
          }
          
          if (sizeof($UpdateCountUserIDs)) {

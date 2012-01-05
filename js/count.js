@@ -1,11 +1,11 @@
 (function () {
-   var anchors = document.getElementsByTagName('a');
+   var spans = document.getElementsByTagName('span');
    var identifiers = new Array;
-   // Loop through all anchors looking for vanilla identifiers
-   for (i = 0; i < anchors.length; i++) {
-      for (j = 0; j < anchors[i].attributes.length; j++) {
-         if (anchors[i].attributes[j].name == 'vanilla-identifier') {
-            identifiers.push(anchors[i].attributes[j].value);
+   // Loop through all spans looking for vanilla identifiers
+   for (i = 0; i < spans.length; i++) {
+      for (j = 0; j < spans[i].attributes.length; j++) {
+         if (spans[i].attributes[j].name == 'vanilla-identifier') {
+            identifiers.push(spans[i].attributes[j].value);
          }
       }
    }
@@ -33,23 +33,23 @@
 }());
 
 function vanilla_assign_comment_counts(data) {
-   var anchors = document.getElementsByTagName('a');
-   var tpl = '<span class="vanilla-count-button"><span class="vanilla-count-text">Comments</span><span class="vanilla-count"><span class="vanilla-bubble-arrow"></span>{count}</span></span>';
-   for (i = 0; i < anchors.length; i++) {
-      for (j = 0; j < anchors[i].attributes.length; j++) {
-         if (anchors[i].attributes[j].name == 'vanilla-identifier') {
-            // Add our css class to the anchor for styling
-            var cssClass = (anchors[i].className + ' vanilla-comment-count-anchor').trim();
-            anchors[i].className = cssClass;
-            // Add our button html
-            var count = data.CountData[anchors[i].attributes[j].value.toString()];
+   var spans = document.getElementsByTagName('span');
+   for (i = 0; i < spans.length; i++) {
+      for (j = 0; j < spans[i].attributes.length; j++) {
+         if (spans[i].attributes[j].name == 'vanilla-identifier') {
+            // Add our counts
+            var count = data.CountData[spans[i].attributes[j].value.toString()];
             if (typeof(count) == "undefined")
                count = 0;
-
-            anchors[i].innerHTML = tpl.replace('{count}', count);
+               
+            if (count == 0)
+               spans[i].innerHTML = 'No Comments';
+            else
+               spans[i].innerHTML = ((count == 1) ? '1 Comment' : count + ' Comments');
+               
             // Add our hashtag to the href so we jump to comments
-            var href = anchors[i].href.split('#')[0];
-            anchors[i].href = href+'#vanilla-comments';
+            var href = spans[i].parentNode.href.split('#')[0];
+            spans[i].parentNode.href = href+'#vanilla-comments';
          }
       }
    }

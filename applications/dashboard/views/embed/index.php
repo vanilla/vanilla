@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->EmbedType = GetValue('0', $this->RequestArgs, 'comments');
+$this->EmbedType = GetValue('0', $this->RequestArgs, 'wordpress');
 $AllowEmbed = C('Garden.Embed.Allow');
 ?>
 <h1><?php echo T('&lt;Embed&gt; Vanilla'); ?></h1>
@@ -17,13 +17,25 @@ $AllowEmbed = C('Garden.Embed.Allow');
 </div>
 <div class="Tabs FilterTabs">
    <ul>
+      <li<?php echo $this->EmbedType == 'wordpress' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('WordPress Plugin'), 'embed/wordpress'); ?></li>
       <li<?php echo $this->EmbedType == 'comments' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Embed Comments'), 'embed/comments'); ?></li>
       <li<?php echo $this->EmbedType == 'forum' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Embed Forum'), 'embed/forum'); ?></li>
-      <li<?php echo $this->EmbedType == 'modules' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Embed Modules'), 'embed/modules'); ?></li>
+      <!-- <li<?php echo $this->EmbedType == 'modules' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Embed Modules'), 'embed/modules'); ?></li> -->
       <li<?php echo $this->EmbedType == 'settings' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Advanced Settings'), 'embed/settings'); ?></li>
    </ul>
 </div>
-<?php if ($this->EmbedType == 'settings') { ?>
+<?php if ($this->EmbedType == 'wordpress') { ?>
+   <h1><?php echo T('Ready-to-use Embedding Plugin for WordPress'); ?></h1>
+   <div class="Info">
+      <h2>Using WordPress?</h2>
+      <p>If you need to integrate Vanilla with your WordPress site, grab our ready-to-use plugin from WordPress.org for easy integration.</p>
+   </div>
+   <?php echo Anchor('Get Our WordPress Plugin from WordPress.org Now', 'http://wordpress.org/extend/plugins/vanilla-forums/', 'Button'); ?>
+   <div class="Info">
+      <h2>Not Using WordPress?</h2>
+      <p>If you are not using WordPress, you can use the generic/universal instructions for embedding <?php echo Anchor('Vanilla', 'embed/forum'); ?> or <?php echo Anchor('Vanilla Comments', 'embed/comments'); ?>.</p>
+   </div>
+<?php } else if ($this->EmbedType == 'settings') { ?>
    <h1><?php echo T('Advanced settings for embedded community elements'); ?></h1>
    <div class="Info">
       <h2>Trusted Domains</h2>
@@ -49,20 +61,7 @@ $AllowEmbed = C('Garden.Embed.Allow');
    <h1><?php echo T('Embed your entire Vanilla forum'); ?></h1>
    <div class="Info">
       <p><?php echo T('To embed your entire Vanilla community forum into your web site, copy and paste this script into the page where you would like the forum to appear.'); ?></p>
-      <pre>&lt;div id="vanilla-comments">&lt;/div>
-&lt;script type="text/javascript">
-/* Configuration Settings: Edit before pasting into your web page */
-var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the full http url & path to your vanilla forum
-
-/*** DON'T EDIT BELOW THIS LINE ***/
-(function() {
-   var vanilla = document.createElement('script');
-   vanilla.type = 'text/javascript';
-   var timestamp = new Date().getTime();
-   vanilla.src = vanilla_forum_url + '/js/embed.js';
-   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla);
-})();
-&lt;/script>
+      <pre>&lt;script type="text/javascript" src="<?php echo Url('js/embed.js', TRUE); ?>">&lt;/script>
 &lt;noscript>Please enable JavaScript to view the &lt;a href="http://vanillaforums.com/?ref_noscript">discussions powered by Vanilla.&lt;/a>&lt;/noscript>
 &lt;div class="vanilla-credit">&lt;a class="vanilla-anchor" href="http://vanillaforums.com">Discussions by &lt;span class="vanilla-logo">Vanilla&lt;/span>&lt;/a>&lt;/div>
 </pre>
@@ -88,16 +87,15 @@ var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the
    <pre>&lt;div id="vanilla-comments">&lt;/div>
 &lt;script type="text/javascript">
 /* Configuration Settings: Edit before pasting into your web page */
-var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the full http url & path to your vanilla forum
+var vanilla_forum_url = '<?php echo Url('/'); ?>'; // Required: the full http url & path to your vanilla forum
 var vanilla_identifier = 'your-content-identifier'; // Required: your unique identifier for the content being commented on
 
 /* Optional */
 // var vanilla_url = 'http://yourdomain.com/page-with-comments.html'; // Not required: the full http url & path of the page where this script is embedded.
-// var vanilla_type = 'blog'; // possibly used to render the discussion body a certain way in the forum? Also used to filter down to foreign types so that matching foreign_id's across type don't clash.
-// var vanilla_name = 'Title of Page with Comments';
-// var vanilla_body = ''; // Want the forum discussion body to appear a particular way?
-// var vanilla_discussion_id = ''; // In case you want to embed a particular discussion
-// var vanilla_category_id = ''; // vanilla category id to force the discussion to be inserted into?
+// var vanilla_name = 'Title of Page with Comments'; // Not required. We will attempt to crawl the page for this information.
+// var vanilla_body = ''; // Not required. We will attempt to crawl the page for this information.
+// var vanilla_discussion_id = ''; // Not required. You can define this value if you want the comments attached to a particular discussion.
+// var vanilla_category_id = ''; // Not required. You can define this value if you want the discussions generated to be placed in a specific category.
 
 /*** DON'T EDIT BELOW THIS LINE ***/
 (function() {
@@ -118,7 +116,7 @@ var vanilla_identifier = 'your-content-identifier'; // Required: your unique ide
    <p>Include the following code on the page that displays the comment counts, most likely the main page of your blog or website. The code should be pasted at the bottom of the webpage right before the closing &lt;/body> tag.</p>
 
    <pre>&lt;script type="text/javascript">
-var vanilla_forum_url = 'http://yourdomain.com/path/to/forum/'; // Required: the full http url & path to your vanilla forum
+var vanilla_forum_url = '<?php echo Url('/', TRUE); ?>'; // Required: the full http url & path to your vanilla forum
 /*** DON'T EDIT BELOW THIS LINE ***/
 (function() {
    var timestamp = new Date().getTime();

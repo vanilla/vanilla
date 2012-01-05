@@ -719,12 +719,10 @@ class Gdn_Request {
       } else {
          $Scheme = $this->Scheme();
       }
-      
-      if (strpos($Path, '://') !== FALSE)
+      if (in_array(strpos($Path, '://'), array(4, 5))) // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
          return $Path;
 
       $Parts = array();
-
       if ($WithDomain) {
          $Parts[] = $Scheme.'://'.$this->Host();
       } else

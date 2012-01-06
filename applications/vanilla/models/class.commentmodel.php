@@ -388,7 +388,7 @@ class CommentModel extends VanillaModel {
          ->Where('DiscussionID', $DiscussionID)
          ->Get()
          ->FirstRow()
-         ->CountComments + 1; // Add 1 so the comment in the discussion table is counted
+         ->CountComments;
    }
    
    /**
@@ -868,7 +868,7 @@ class CommentModel extends VanillaModel {
             $this->SQL
                ->Set('FirstCommentID', $Data['FirstCommentID'])
                ->Set('LastCommentID', $Data['LastCommentID'])
-               ->Set('CountComments', $Data['CountComments'] + 1)
+               ->Set('CountComments', $Data['CountComments'])
                ->Where('DiscussionID', $DiscussionID)
                ->Put();
 

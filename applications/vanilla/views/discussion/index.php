@@ -42,6 +42,7 @@ if($this->Pager->FirstPage())
 <?php $this->FireEvent('BeforeDiscussion'); ?>
 <ul class="DataList MessageList Discussion <?php echo $PageClass; ?>">
    <?php echo $this->FetchView('comments'); ?>
+   echo '<h2>'.Plural($this->Data('Discussion.CountComments'), '%s Comment', '%s Comments').'</h2>';
 </ul>
 <?php
 $this->FireEvent('AfterDiscussion');

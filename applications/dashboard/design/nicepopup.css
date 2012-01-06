@@ -112,13 +112,15 @@ div.Popup h3 {
    padding: 20px 0 10px;
 }
 div.Popup p {
-   padding: 6px 10px 10px;
+   padding: 0px;
+   margin: 0px;
+   margin-bottom: 10px;
 }
 div.Popup small {
    font-size: 80%;
 }
 div.Popup form p {
-   padding: 0;
+   padding: 0px;
 }
 div.Popup form ul li label {
    color:#222;

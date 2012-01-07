@@ -225,7 +225,7 @@ if (!class_exists('HeadModule', FALSE)) {
          // Loop through each tag.
          $Tags = array();
          foreach ($this->_Tags as $Index => $Attributes) {
-            $Tag = $Attributes[self::TAG_KEY];
+            $TagType = $Attributes[self::TAG_KEY];
             if ($TagType == $RequestedType)
                $Tags[] = $Attributes;
          }

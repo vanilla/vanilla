@@ -821,6 +821,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       // Validate the form posted values
       $UserID = GetValue('UserID', $FormPostValues);
@@ -1163,6 +1166,8 @@ class UserModel extends Gdn_Model {
          $IPAddress = $Keywords;
       } elseif (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+      } elseif (preg_match('/^\d+$/', $Keywords)) {
+         $UserID = $Keywords;
       } else {
          // Check to see if the search exactly matches a role name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
@@ -1185,6 +1190,8 @@ class UserModel extends Gdn_Model {
             ->OrWhere('u.InsertIPAddress', $IPAddress)
             ->OrWhere('u.LastIPAddress', $IPAddress)
             ->EndWhereGroup();
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          // Search on the user table.
          $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
@@ -1223,6 +1230,8 @@ class UserModel extends Gdn_Model {
       $RoleID = FALSE;
       if (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
       }
@@ -1238,6 +1247,8 @@ class UserModel extends Gdn_Model {
 
       if ($RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          // Search on the user table.
          $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
@@ -1279,6 +1290,9 @@ class UserModel extends Gdn_Model {
       // TODO: DO I REALLY NEED THIS???
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 
@@ -1379,6 +1393,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 
@@ -1432,6 +1449,9 @@ class UserModel extends Gdn_Model {
       // Make sure that the checkbox val for email is saved as the appropriate enum
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
+      
+      if (array_key_exists('Banned', $FormPostValues))
+         $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
       $this->AddInsertFields($FormPostValues);
 
@@ -2323,11 +2343,15 @@ class UserModel extends Gdn_Model {
          $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Attributes, '');
          $UserData['CountNotifications'] = 0;
          $UserData['Attributes'] = $Attributes;
+         $UserData['InsertIPAddress'] = Gdn::Request()->IpAddress();
          if ($UserData['DateOfBirth'] == '')
             $UserData['DateOfBirth'] = '1975-09-16';
             
          // Make sure there isn't another user with this username.
          if ($this->ValidateUniqueFields($UserData['Name'], $UserData['Email'])) {
+            if (!BanModel::CheckUser($UserData, $this->Validation, TRUE))
+               throw PermissionException('Banned');
+            
             // Insert the new user.
             $this->AddInsertFields($UserData);
             $UserID = $this->_Insert($UserData);

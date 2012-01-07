@@ -8,7 +8,7 @@ $SpamLock = ArrayCombine(array(60, 120, 180, 240, 300, 600), array(1, 2, 3, 4, 5
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo T('Manage Spam'); ?></h1>
+<h1><?php echo T('Flood Control'); ?></h1>
 <div class="Info"><?php echo T('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'); ?></div>
 <table class="AltColumns">
    <thead>

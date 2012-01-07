@@ -64,7 +64,7 @@ class Gdn_PasswordHash extends PasswordHash {
    function CheckPassword($Password, $StoredHash, $Method = FALSE, $Username = NULL) {
       $Result = FALSE;
       $ResetUrl = Url('entry/passwordrequest'.(Gdn::Request()->Get('display') ? '?display='.urlencode(Gdn::Request()->Get('display')) : ''));
-		switch(strtolower($Method)) {
+      switch(strtolower($Method)) {
          case 'django':
             $Result = $this->CheckDjango($Password, $StoredHash);
             break;
@@ -94,25 +94,24 @@ class Gdn_PasswordHash extends PasswordHash {
          case 'smf':
             $Result = (sha1(strtolower($Username).$Password) == $StoredHash);
             break;
-			case 'vbulletin':
+         case 'vbulletin':
             // assume vbulletin's password hash has a fixed length of 32, the salt length will vary between version 3 and 4
             $SaltLength = strlen($StoredHash) - 32;
             $Salt = trim(substr($StoredHash, -$SaltLength, $SaltLength));
             $VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - $SaltLength);
             
-				$VbHash = md5(md5($Password).$Salt);
-				$Result = $VbHash == $VbStoredHash;
-				break;
-			case 'vanilla':
-			default:
-				$Result = $this->CheckVanilla($Password, $StoredHash);
-		}
-		
-		return $Result;
+            $VbHash = md5(md5($Password).$Salt);
+            $Result = $VbHash == $VbStoredHash;
+            break;
+         case 'vanilla':
+         default:
+            $Result = $this->CheckVanilla($Password, $StoredHash);
+      }
+      return $Result;
    }
-	
-	function CheckVanilla($Password, $StoredHash) {
-		$this->Weak = FALSE;
+   
+   function CheckVanilla($Password, $StoredHash) {
+      $this->Weak = FALSE;
       if (!isset($StoredHash[0]))
          return FALSE;
       
@@ -125,5 +124,5 @@ class Gdn_PasswordHash extends PasswordHash {
          return TRUE;
       }
       return FALSE;
-	}
+   }
 }

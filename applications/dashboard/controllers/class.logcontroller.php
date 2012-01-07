@@ -86,7 +86,7 @@ class LogController extends DashboardController {
    public function Edits($Type = '', $Page = '') {
       $this->Permission('Garden.Moderation.Manage');
       list($Offset, $Limit) = OffsetLimit($Page, 10);
-      $this->SetData('Title', T('Edit/Delete Log'));
+      $this->SetData('Title', T('Change Log'));
 
       
       $Where = array(
@@ -206,7 +206,7 @@ class LogController extends DashboardController {
    public function Spam($Page = '') {
       $this->Permission('Garden.Moderation.Manage');
       list($Offset, $Limit) = OffsetLimit($Page, 10);
-      $this->SetData('Title', T('Manage Spam'));
+      $this->SetData('Title', T('Spam Queue'));
 
       $Where = array('Operation' => array('Spam'));
 

@@ -21,3 +21,6 @@ Thumbs.db
 _notes
 
 ~*
+.project
+.settings
+.buildpath

@@ -844,6 +844,8 @@ class CommentModel extends VanillaModel {
          $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
       $DiscussionID = $Discussion['DiscussionID'];
 
+      $this->FireEvent('BeforeUpdateCommentCountQuery');
+      
       $Data = $this->SQL
          ->Select('c.CommentID', 'min', 'FirstCommentID')
          ->Select('c.CommentID', 'max', 'LastCommentID')

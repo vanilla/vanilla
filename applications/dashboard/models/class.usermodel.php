@@ -1166,6 +1166,8 @@ class UserModel extends Gdn_Model {
          $IPAddress = $Keywords;
       } elseif (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+      } elseif (preg_match('/^\d+$/', $Keywords)) {
+         $UserID = $Keywords;
       } else {
          // Check to see if the search exactly matches a role name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
@@ -1188,6 +1190,8 @@ class UserModel extends Gdn_Model {
             ->OrWhere('u.InsertIPAddress', $IPAddress)
             ->OrWhere('u.LastIPAddress', $IPAddress)
             ->EndWhereGroup();
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          // Search on the user table.
          $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
@@ -1226,6 +1230,8 @@ class UserModel extends Gdn_Model {
       $RoleID = FALSE;
       if (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
       }
@@ -1241,6 +1247,8 @@ class UserModel extends Gdn_Model {
 
       if ($RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          // Search on the user table.
          $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);

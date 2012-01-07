@@ -27,6 +27,7 @@ $Editing = isset($this->Comment);
    echo $this->Form->Errors();
    
    $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
+   $CommentOptions['tabindex'] = 1;
    /*
     Caused non-root users to not be able to add comments. Must take categories
     into account. Look at CheckPermission for more information.
@@ -52,6 +53,7 @@ $Editing = isset($this->Comment);
    )).' ';
    
    $ButtonOptions = array('class' => 'Button CommentButton');
+   $ButtonOptions['tabindex'] = 2;
    /*
     Caused non-root users to not be able to add comments. Must take categories
     into account. Look at CheckPermission for more information.

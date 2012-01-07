@@ -188,7 +188,7 @@ if (!class_exists('HeadModule', FALSE)) {
          if (is_array($Property))
             $Query = array_change_key_case($Property);
          elseif ($Property)
-            $Query = array(strtolower($Property), $Value);
+            $Query = array(strtolower($Property) => $Value);
          else
             $Query = FALSE;
    

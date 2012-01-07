@@ -283,7 +283,7 @@ class ConversationModel extends Gdn_Model {
          // Now that the message & conversation have been inserted, insert all of the recipients
          foreach ($RecipientUserIDs as $UserID) {
             $CountReadMessages = $UserID == $Session->UserID ? 1 : 0;
-            $this->SQL->Insert('UserConversation', array(
+            $this->SQL->Options('Ignore', TRUE)->Insert('UserConversation', array(
                'UserID' => $UserID,
                'ConversationID' => $ConversationID,
                'LastMessageID' => $MessageID,

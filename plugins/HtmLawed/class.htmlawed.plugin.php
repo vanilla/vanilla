@@ -42,7 +42,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'cdata' => 3,
        'css_expression' => 1,
        'deny_attribute' => 'on*',
-       'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
+       'elements' => '*-applet-form-input-textarea-script-style', // object, embed allowed
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
        'valid_xml' => 2
@@ -69,8 +69,10 @@ class HTMLawedPlugin extends Gdn_Plugin {
          $Config['hook_tag'] = 'HTMLawedHookTag';
       }
 
-      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
-
+      $Spec = 'object=-classid-type, -codebase;'
+         .'embed=type(oneof=application/x-shockwave-flash)'
+         .'iframe=source(match=`^(http://www.youtube.com/|http://player.vimeo.com/)`)';
+            
       $Result = htmLawed($Html, $Config, $Spec);
       
       return $Result;

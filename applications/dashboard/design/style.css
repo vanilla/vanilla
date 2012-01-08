@@ -1071,9 +1071,6 @@ a.BigButton:focus {
 
 /* =============================================================== Activities */
 
-body.Activity h1 {
-   margin: 0;
-}
 body.Profile ul.Activities {
    margin-top: 10px;
    border-top: 1px solid #ddd;

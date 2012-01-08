@@ -13,5 +13,5 @@ Gdn::FactoryInstall('RoleModel', 'RoleModel');
 Gdn::FactoryInstall('Head', 'HeadModule');
 
 // Menu.
-Gdn::FactoryInstall('Menu', 'MenuModule');
+Gdn::FactoryInstall('Menu', 'SideMenuModule');
 Gdn::Dispatcher()->PassProperty('Menu', Gdn::Factory('Menu'));

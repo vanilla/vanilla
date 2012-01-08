@@ -383,6 +383,16 @@ a.Button {
 	padding: 10px 40px 10px 0 !important;
 	background: url('images/progress_sm.gif') center center no-repeat;
 }
+.InProgress {
+   color: transparent !Important;
+   background: url('images/progress_sm.gif') center center no-repeat !important;
+   border-color: transparent !important;
+   -moz-box-shadow: none !important;
+   -webkit-box-shadow: none !important;
+   box-shadow: none !important;
+   color: transparent !important;
+   text-shadow: none !important;
+}
 
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */

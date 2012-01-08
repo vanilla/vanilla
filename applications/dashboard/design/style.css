@@ -90,9 +90,21 @@ body {
 .Hidden {
    display: none;
 }
-.ClearFix {
-   clear: both;
-}
+
+.ClearFix:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+	}
+.ClearFix { display: inline-table; }
+/* Hides from IE-mac \*/
+* html .ClearFix { height: 1%; }
+.ClearFix { display: block; }
+/* End hide from IE-mac */
+
 .nowrap {
    white-space: nowrap;
 }

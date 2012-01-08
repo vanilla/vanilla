@@ -1173,7 +1173,7 @@ body.Post .Popup a.Close {
 	color: #1e79a7;
 }
 .Message{
-   clear: both;
+   clear: left;
    line-height: 140%;
    font-size: 100%;
 	word-wrap: break-word;
@@ -1912,7 +1912,7 @@ a.Bookmarking {
 }
 a.Bookmark span,
 a.Bookmarking span {
-   display: none;
+   visibility: hidden;
 }
 a.Bookmarked {
    background-position: center center;

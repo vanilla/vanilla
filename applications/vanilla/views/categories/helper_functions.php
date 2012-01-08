@@ -26,7 +26,7 @@ function GetOptions($Category, $Sender) {
    $Sender->FireEvent('DiscussionOptions');
 
    if ($Options != '') {
-      $Result .= '<div class="ToggleFlyout OptionsMenu"><div class="MenuTitle">'.T('Options').'</div>'
+      $Result .= '<div class="ToggleFlyout OptionsMenu"><div class="OptionsTitle">'.T('Options').'</div>'
          .'<ul class="Flyout MenuItems">'.$Options.'</ul>'
          .'</div>';
       

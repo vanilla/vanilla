@@ -237,12 +237,12 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       
       if ($Sender->Options != '') {
       ?>
-         <div class="ToggleFlyout OptionsMenu">
-            <div class="MenuTitle"><?php echo T('Options'); ?></div>
+         <span class="ToggleFlyout OptionsMenu">
+            <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
             <ul class="Flyout MenuItems">
                <?php echo $Sender->Options; ?>
             </ul>
-         </div>
+         </span>
       <?php
       }
 

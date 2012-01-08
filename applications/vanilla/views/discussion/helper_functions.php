@@ -180,7 +180,7 @@ function WriteDiscussionOptions($Discussion = NULL) {
    
    echo '<span class="ToggleFlyout OptionsMenu">';
    
-   echo '<span class="MenuTitle">'.T('Options').'</span>';
+   echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
    
    echo '<ul class="Flyout MenuItems" style="display: none;">';
    foreach ($Options as $Code => $Option) {

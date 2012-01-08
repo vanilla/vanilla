@@ -600,7 +600,7 @@ body #Head h1 {
    background-color: #282828 !Important;
    background-position: center bottom !Important;
 }
-.Discussion:hover .OptionsTitle, .Item:hover .OptionsTitle {
+div.Discussion:hover .OptionsTitle, .Item:hover .OptionsTitle {
    border-color: #bbb;
    background-position: center center;
    background-color: #efefef;
@@ -924,6 +924,9 @@ a.BigButton:focus {
 /* Note: DataList is used in search results, vanilla discussions & drafts */
 .Empty {
    margin: 10px 0;
+}
+.PageTitle {
+   padding-right: 8px; /* match .DataList .Item */
 }
 .DataList .Item {
    margin: 0;
@@ -1577,7 +1580,8 @@ dl.About dd {
 
 /* ================================================ Administration Checkboxes */
 .AdminCheck {
-   vertical-align: middle;
+   display: inline-block;
+   vertical-align: top;
 }
 
 /* ======================================================== Thumbnail Cropper */

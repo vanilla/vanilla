@@ -351,13 +351,13 @@ jQuery(document).ready(function($) {
    /* Comment Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
-         $('.MessageList .AdminCheck :checkbox').attr('checked', 'checked');
+         $('.DataList .AdminCheck :checkbox').attr('checked', 'checked');
       else
-         $('.MessageList .AdminCheck :checkbox').removeAttr('checked');
+         $('.DataList .AdminCheck :checkbox').removeAttr('checked');
    });
    $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids
-      var checkIDs = $('.MessageList .AdminCheck :checkbox');
+      var checkIDs = $('.DataList .AdminCheck :checkbox');
       var aCheckIDs = new Array();
       var discussionID = gdn.definition('DiscussionID');
       checkIDs.each(function() {

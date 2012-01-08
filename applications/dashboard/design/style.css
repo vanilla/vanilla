@@ -90,6 +90,9 @@ body {
 .Hidden {
    display: none;
 }
+.ClearFix {
+   clear: both;
+}
 .nowrap {
    white-space: nowrap;
 }
@@ -101,11 +104,11 @@ body {
 }
 h1, h2, h3, h4, h5, h6 {
    font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
-   font-weight: normal;
-   margin: 0;
+   font-weight: bold;
+   margin: 5px 0;
 }
 p {
-   margin: 0.5em 0 0 0;
+   margin: 0.5em 0;
    line-height: 1.6em;
 }
 .P {
@@ -113,32 +116,24 @@ p {
 }
 h1 {
    font-size:140%;
-   font-weight:bold;
-   margin-bottom:10px;
 }
 h2 {
    font-size:130%;
-   font-weight:bold;
-   margin-bottom:10px;
 }
 h3 {
    font-size:120%;
-   font-weight: bold;
 }
 h4 {
    font-size: 120%;
-   color: #6C6C6C;
 }
 h5 {
    font-size: 120%;
-   color: #6C6C6C;
 }
 a {
    text-decoration: none;
    color: #1e79a7;
 }
 a:hover {
-   text-decoration: none;
    color: #ff0084;
 }
 img.Thumbnail {
@@ -587,18 +582,24 @@ body #Head h1 {
    visibility: visible;
 }
 .MenuTitle {
-   color: #000;
+/*   color: #000;*/
    border: 1px solid #bbb;
    padding: 4px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    border-radius: 2px;
    user-select: none;
-   background: url('images/buttons.png') right -96px no-repeat;
+/*   background: url('images/buttons.png') right -96px no-repeat;*/
    padding-right: 18px;
    -webkit-user-select: none;
    -moz-user-select: none;
    -o-user-select: none;
+   background: url("images/options-button.png") no-repeat scroll center 2px #EFEFEF;
+   color: transparent;
+   height: 16px;
+   overflow: hidden;
+   padding: 0;
+   width: 22px;
 }
 .Open .MenuTitle {
    border: 1px solid #282828;
@@ -607,12 +608,10 @@ body #Head h1 {
    -webkit-border-bottom-left-radius: 0;
    -webkit-border-bottom-right-radius: 0;
    box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
    border-bottom-left-radius: 0;
    border-bottom-right-radius: 0;
-   color: #fff;
-   background: url('images/buttons.png') right -144px no-repeat #282828;
+   background-color: #282828;
+   background-position: center -19px
 }
 .MenuItems {
    border: 1px solid #282828;
@@ -740,10 +739,11 @@ body #Head h1 {
    background: #e3f4ff;
    border-bottom: 1px solid #abdafb;
    padding: 2px 4px;
-   text-align: right;
 }
-.PanelInfo li.Heading {
-   text-align: left;
+.PanelInfo .Aside {
+   float: right;
+}
+.PanelInfo .Heading {
    color: #000;
    font-weight: bold;
 }
@@ -755,19 +755,6 @@ body #Head h1 {
    font-weight: normal;
    text-align: left;
    font-weight: normal;
-}
-.PanelInfo li a {
-   float: left;
-}
-.Moderators ul.PanelInfo li {
-	text-align: left;
-}
-.Moderators ul.PanelInfo li a {
-   float: none;
-	font-weight: bold;
-}
-.Moderators ul.PanelInfo li a img {
-	vertical-align: middle;
 }
 .PanelInfo .Meta {
    font-size: 11px;
@@ -1205,21 +1192,7 @@ pre code {
 .Message ul li {
   list-style: disc !important;
 }
-.Message h1,
-.Message h2,
-.Message h3,
-.Message h4,
-.Message h5 {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-	font-weight: bold;
-	border: none;
-	color: #000;
-}
-.Message h1 { font-size: 22px; }
-.Message h2 { font-size: 20px; }
-.Message h3 { font-size: 18px; }
-.Message h4 { font-size: 16px; }
-.Message h5 { font-size: 14px; }
+
 .Message .ImageResized {
 	font-size: 11px;
 	font-weight: normal;

@@ -1,10 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 ?>
-<div class="Tabs ConversationsTabs">
-   <ul>
-      <li class="Active"><?php echo Anchor(T('Inbox'), '/messages/inbox', array('class' => 'TabLink')); ?></li>
-   </ul>
-</div>
+<h1><?php echo $this->Data('Title'); ?></h1>
 <?php
 if ($this->ConversationData->NumRows() > 0) {
 ?>

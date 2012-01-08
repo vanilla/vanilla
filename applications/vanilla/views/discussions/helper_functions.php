@@ -33,7 +33,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 <li class="<?php echo $CssClass; ?>">
    <?php
    if (!property_exists($Sender, 'CanEditDiscussions'))
-      $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');;
+      $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');
 
    $Sender->FireEvent('BeforeDiscussionContent');
 
@@ -50,8 +50,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
          ?></span>
          <?php
-            if ($Session->IsValid() && $Discussion->CountUnreadComments > 0)
-               echo ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+            echo NewComments($Discussion);
          
             $Sender->FireEvent('AfterCountMeta');
 
@@ -92,6 +91,17 @@ function CssClass($Discussion) {
    $CssClass .= ($Discussion->CountUnreadComments > 0 && Gdn::Session()->IsValid()) ? ' New' : '';
    
    return $CssClass;
+}
+
+function NewComments($Discussion) {
+   if (!Gdn::Session()->IsValid())
+      return '';
+   
+   if ($Discussion->CountUnreadComments === TRUE)
+      return ' <strong class="HasNew">'.T('new discussion', 'new').'</strong>';
+   elseif ($Discussion->CountUnreadComments > 0)
+      return ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+   return '';
 }
 
 function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
@@ -143,6 +153,16 @@ function WriteFilterTabs($Sender) {
       
    ?>
 <div class="Tabs DiscussionsTabs">
+   <?php
+   if (!property_exists($Sender, 'CanEditDiscussions'))
+      $Sender->CanEditDiscussions = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
+   
+   if ($Sender->CanEditDiscussions) {
+   ?>
+   <span class="Options"><span class="AdminCheck">
+      <input type="checkbox" name="Toggle" />
+   </span></span>
+   <?php } ?>
    <ul>
       <?php $Sender->FireEvent('BeforeDiscussionTabs'); ?>
       <li<?php echo strtolower($Sender->ControllerName) == 'discussionscontroller' && strtolower($Sender->RequestMethod) == 'index' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?></li>
@@ -176,34 +196,6 @@ function WriteFilterTabs($Sender) {
       $Sender->FireEvent('AfterDiscussionTabs');
       ?>
    </ul>
-   <?php
-   $Breadcrumbs = Gdn::Controller()->Data('Breadcrumbs');
-   if ($Breadcrumbs) {
-      echo '<div class="SubTab Breadcrumbs">';
-      $First = TRUE;
-      foreach ($Breadcrumbs as $Breadcrumb) {
-         if ($First) {
-            $Class = 'Breadcrumb FirstCrumb';
-            $First = FALSE;
-         } else {
-            $Class = 'Breadcrumb';
-            echo '<span class="Crumb"> &raquo; </span>';
-         }
-         
-         echo '<span class="'.$Class.'">', Anchor(Gdn_Format::Text($Breadcrumb['Name']), $Breadcrumb['Url']), '</span>';
-      }
-      $Sender->FireEvent('AfterBreadcrumbs');
-      echo '</div>';
-   }
-   if (!property_exists($Sender, 'CanEditDiscussions'))
-      $Sender->CanEditDiscussions = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
-   
-   if ($Sender->CanEditDiscussions) {
-   ?>
-   <span class="AdminCheck">
-      <input type="checkbox" name="Toggle" />
-   </span>
-   <?php } ?>
 </div>
    <?php
 }
@@ -213,7 +205,7 @@ function WriteFilterTabs($Sender) {
  */
 function WriteOptions($Discussion, &$Sender, &$Session) {
    if ($Session->IsValid() && $Sender->ShowOptions) {
-      echo '<div class="Options">';
+      echo '<span class="Options">';
       $Sender->Options = '';
       
       // Dismiss an announcement
@@ -253,17 +245,6 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          </div>
       <?php
       }
-      // Admin check.
-      if ($Sender->CanEditDiscussions) {
-         if (!property_exists($Sender, 'CheckedDiscussions')) {
-            $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
-            if (!is_array($Sender->CheckedDiscussions))
-               $Sender->CheckedDiscussions = array();
-         }
-
-         $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
-         echo '<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
-      }
 
       // Bookmark link
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
@@ -276,6 +257,18 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          array('title' => $Title)
       );
       
-      echo '</div>';
+      // Admin check.
+      if ($Sender->CanEditDiscussions) {
+         if (!property_exists($Sender, 'CheckedDiscussions')) {
+            $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
+            if (!is_array($Sender->CheckedDiscussions))
+               $Sender->CheckedDiscussions = array();
+         }
+
+         $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
+         echo '<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+      }
+      
+      echo '</span>';
    }
 }

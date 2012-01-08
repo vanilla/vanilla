@@ -14,7 +14,7 @@ if ($this->Data !== FALSE) {
       if (!is_numeric($CategoryID))
          echo ' class="Active"';
          
-      ?>><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong><span class="Count"><?php echo number_format($CountDiscussions); ?></span></span></li>
+      ?>><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <span class="Aside"><span class="Count"><?php echo Gdn_Format::BigNumber($CountDiscussions); ?></span></span></span></li>
 <?php
    $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
    $DoHeadings = C('Vanilla.Categories.DoHeadings');
@@ -34,7 +34,7 @@ if ($this->Data !== FALSE) {
          echo Gdn_Format::Text($Category->Name);
       } else {
          echo Wrap(Anchor(Gdn_Format::Text($Category->Name), '/categories/'.rawurlencode($Category->UrlCode)), 'strong')
-            .'<span class="Count">'.number_format($Category->CountAllDiscussions).'</span>';
+            .' <span class="Aside"><span class="Count">'.number_format($Category->CountAllDiscussions).'</span></span>';
       }
       echo "</li>\n";
    }

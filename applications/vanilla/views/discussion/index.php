@@ -1,47 +1,42 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::Session();
-$DiscussionName = Gdn_Format::Text($this->Discussion->Name);
-if ($DiscussionName == '')
-   $DiscussionName = T('Blank Discussion Topic');
-
-$this->EventArguments['DiscussionName'] = &$DiscussionName;
-$this->FireEvent('BeforeDiscussionTitle');
 
 if (!function_exists('WriteComment'))
-   include($this->FetchViewLocation('helper_functions', 'discussion'));
+   include $this->FetchViewLocation('helper_functions', 'discussion');
 
-$PageClass = '';
-if($this->Pager->FirstPage()) 
-	$PageClass = 'FirstPage'; 
-	
+// Wrap the discussion related content in a div.
+echo '<div class="Discussion '.CssClass($this->Data('Discussion')).'">';
+
+// Write the page title.
+echo '<!-- Page Title -->
+<div id="Item_0" class="PageTitle">';
+
+echo '<div class="Options">';
+
+WriteDiscussionOptions();
+WriteBookmarkLink();
+WriteAdminCheck();
+
+echo '</div>';
+
+echo '<h1>'.$this->Data('Discussion.Name').'</h1>';
+
+echo "</div>\n\n";
+
+// Write the initial discussion.
+if ($this->Data('Page') == 1) {
+   include $this->FetchViewLocation('discussion', 'discussion');
+   echo '</div>'; // close discussion wrap
+} else {
+   echo '</div>'; // close discussion wrap
+}
+
+// Write the comments.
+
+
+$Session = Gdn::Session(); 
 ?>
-<div class="Tabs HeadingTabs DiscussionTabs <?php echo $PageClass; ?>">
-   <?php
-   if ($Session->IsValid()) {
-      // Bookmark link
-      echo Anchor(
-         '<span>*</span>',
-         '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
-         'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-         array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
-      );
-   }
-   ?>
-
-   <ul>
-      <li><?php
-         if (C('Vanilla.Categories.Use') == TRUE) {
-            echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode, 'TabLink');
-         } else {
-            echo Anchor(T('All Discussions'), 'discussions', 'TabLink');
-         }
-      ?></li>
-   </ul>
-   <div class="SubTab"><?php echo $DiscussionName; ?></div>
-</div>
-<?php $this->FireEvent('BeforeDiscussion'); ?>
-<ul class="DataList MessageList Discussion <?php echo $PageClass; ?>">
-   <?php echo $this->FetchView('comments'); ?>
+<ul class="DataList Comments">
+   <?php include $this->FetchViewLocation('comments'); ?>
 </ul>
 <?php
 $this->FireEvent('AfterDiscussion');

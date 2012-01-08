@@ -575,33 +575,53 @@ body #Head h1 {
    line-height: 100%;
 }
 .Item .OptionsMenu {
-   vertical-align: top;
    visibility: hidden;
 }
 .Open.OptionsMenu, .Item:hover .OptionsMenu {
    visibility: visible;
 }
-.MenuTitle {
-/*   color: #000;*/
-   border: 1px solid #bbb;
-   padding: 4px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+.OptionsTitle {
+   border: solid 1px transparent;
    border-radius: 2px;
    user-select: none;
-/*   background: url('images/buttons.png') right -96px no-repeat;*/
-   padding-right: 18px;
-   -webkit-user-select: none;
-   -moz-user-select: none;
-   -o-user-select: none;
-   background: url("images/options-button.png") no-repeat scroll center 2px #EFEFEF;
+   background: url("images/options-button.png") no-repeat scroll center top;
    color: transparent;
    height: 16px;
    overflow: hidden;
    padding: 0;
    width: 22px;
+   display: inline-block;
+}
+.Open .OptionsTitle {
+   border-color: #282828 !Important;
+   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   border-bottom-left-radius: 0;
+   border-bottom-right-radius: 0;
+   background-color: #282828 !Important;
+   background-position: center bottom !Important;
+}
+.Discussion:hover .OptionsTitle, .Item:hover .OptionsTitle {
+   border-color: #bbb;
+   background-position: center center;
+   background-color: #efefef;
+}
+
+.MenuTitle {
+   color: #000;
+   border: 1px solid #bbb;
+   padding: 4px;
+   border-radius: 2px;
+   user-select: none;
+   background: url('images/buttons.png') right -96px no-repeat;
+   padding-right: 18px;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -o-user-select: none;
+   display: inline-block;
 }
 .Open .MenuTitle {
+   color: #fff;
+   background: url("images/buttons.png") no-repeat scroll right -145px #282828;
    border: 1px solid #282828;
    -moz-border-radius-bottomleft: 0;
    -moz-border-radius-bottomright: 0;
@@ -610,8 +630,6 @@ body #Head h1 {
    box-shadow:2px 2px 3px rgba(0,0,0,0.5);
    border-bottom-left-radius: 0;
    border-bottom-right-radius: 0;
-   background-color: #282828;
-   background-position: center -19px
 }
 .MenuItems {
    border: 1px solid #282828;
@@ -655,6 +673,9 @@ body #Head h1 {
    z-index: 100;
 }
 
+.OptionsMenu .Flyout {
+   top: 18px;
+}
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
@@ -917,10 +938,8 @@ a.BigButton:focus {
 .DataList .Item .Item {
    border-bottom: none;
 }
-.DataList .Options {
-	position: absolute;
-	right: 4px;
-   top: 4px;
+.Options {
+	float: right;
 }
 .DataList a.Title {
    display: block;
@@ -1557,15 +1576,6 @@ dl.About dd {
 }
 
 /* ================================================ Administration Checkboxes */
-body.Discussion #Content,
-.DiscussionsTabs {
-	position: relative;
-}
-.Tabs .AdminCheck {
-   position: absolute;
-   right: 26px;
-   bottom: 5px;
-}
 .AdminCheck {
    display: inline-block;
    height: 22px;
@@ -1895,10 +1905,6 @@ a.Bookmarked {
 }
 a.Bookmarking {
    background-position: bottom center;
-}
-body.Discussion a.Bookmark {
-   float: right;
-	margin: 5px 0 0 8px;
 }
 
 /* =============================================== Discussion & Comment Forms */

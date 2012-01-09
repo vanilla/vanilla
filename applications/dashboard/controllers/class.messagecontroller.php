@@ -182,6 +182,7 @@ class MessageController extends DashboardController {
       $ControllerData['Dashboard/Profile/Index'] = T('Profile Page');
       $ControllerData['Vanilla/Discussions/Index'] = T('Discussions Page');
       $ControllerData['Vanilla/Discussion/Index'] = T('Comments Page');
+      $ControllerData['Dashboard/Entry/SignIn'] = T('Sign In');
       // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
       // $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
       $this->EventArguments['ControllerData'] = &$ControllerData;

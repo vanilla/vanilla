@@ -110,6 +110,13 @@ class ConversationsHooks implements Gdn_IPlugin {
    }
    
    /**
+    * Let us add Messages to the Inbox page.
+    */
+   public function Base_AfterGetLocationData_Handler($Sender, $Args) {
+      $Args['ControllerData']['Conversations/messages/inbox'] = T('Inbox Page');
+   }
+   
+   /**
     * Load some information into the BuzzData collection (for Dashboard report).
     *
     * @since 2.0.?

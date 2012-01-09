@@ -14,8 +14,11 @@
 
 class ProxyRequest {
    
+   protected $CookieJar;
+   
    public $MaxReadSize = 4096;
    
+   public $RequestDefaults;
    public $RequestHeaders;
    
    public $ResponseHeaders;
@@ -34,8 +37,33 @@ class ProxyRequest {
    
    protected $Options;
    
-   public function __construct($Loud = FALSE) {
+   public function __construct($Loud = FALSE, $RequestDefaults = NULL) {
       $this->Loud = $Loud;
+      
+      $CookieKey = md5(mt_rand(0, 72312189).microtime(true));
+      $this->CookieJar = CombinePaths(array(PATH_CACHE,"cookiejar.{$CookieKey}"));
+      
+      if (!is_array($RequestDefaults)) $RequestDefaults = array();
+      $Defaults = array(
+          'URL'                  => NULL,
+          'Host'                 => NULL,
+          'Method'               => 'GET',
+          'ConnectTimeout'       => 5,
+          'Timeout'              => 5,
+          'SaveAs'               => NULL,
+          'Redirects'            => TRUE,
+          'SSLNoVerify'          => FALSE,
+          'PreEncodePost'        => TRUE,
+          'Cookies'              => TRUE,       // Send my cookies?
+          'CookieJar'            => FALSE,      // Create a cURL CookieJar?
+          'CookieSession'        => FALSE,      // Should old cookies be trashed starting now?
+          'CloseSession'         => TRUE,       // Whether to close the session. Should always do this.
+          'Redirected'           => FALSE,      // Flag. Is this a redirected request?
+          'Debug'                => FALSE,      // Debug output on?
+          'Simulate'             => FALSE       // Don't actually request, just set up
+      );
+      
+      $this->RequestDefaults = array_merge($Defaults, $RequestDefaults);
    }
    
    public function CurlHeader(&$Handler, $HeaderString) {
@@ -125,25 +153,8 @@ class ProxyRequest {
       
       if (is_string($Options))
          $Options = array('URL' => $Options);
-
-      $Defaults = array(
-          'URL'                  => NULL,
-          'Host'                 => NULL,
-          'Method'               => 'GET',
-          'ConnectTimeout'       => 5,
-          'Timeout'              => 5,
-          'SaveAs'               => NULL,
-          'Redirects'            => TRUE,
-          'SSLNoVerify'          => FALSE,
-          'PreEncodePost'        => TRUE,
-          'Cookies'              => TRUE,       // Send cookies?
-          'CloseSession'         => TRUE,       // Whether to close the session. Should always do this.
-          'Redirected'           => FALSE,      // Flag. Is this a redirected request?
-          'Debug'                => FALSE,      // Debug output on?
-          'Simulate'             => FALSE       // Don't actually request, just set up
-      );
       
-      $this->Options = $Options = array_merge($Defaults, $Options);
+      $this->Options = $Options = array_merge($this->RequestDefaults, $Options);
 
       $this->ResponseHeaders = array();
       $this->ResponseStatus = "";
@@ -174,6 +185,8 @@ class ProxyRequest {
       $SSLNoVerify = GetValue('SSLNoVerify', $Options);
       $PreEncodePost = GetValue('PreEncodePost', $Options);
       $SendCookies = GetValue('Cookies', $Options);
+      $CookieJar = GetValue('CookieJar', $Options);
+      $CookieSession = GetValue('CookieSession', $Options);
       $CloseSesssion = GetValue('CloseSession', $Options);
       $Redirected = GetValue('Redirected', $Options);
       $Debug = GetValue('Debug', $Options, FALSE);
@@ -275,6 +288,7 @@ class ProxyRequest {
       $Query = GetValue('query', $UrlParts, '');
       $this->UseSSL = ($Scheme == 'https') ? TRUE : FALSE;
       
+      $this->Action("Parameters: ".print_r($PostData, true));
       /*
        * ProxyRequest can masquerade as the current user, so collect and encode
        * their current cookies as the default case is to send them.
@@ -311,6 +325,14 @@ class ProxyRequest {
       curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
       curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
 
+      if ($CookieJar) {
+         curl_setopt($Handler, CURLOPT_COOKIEJAR, $this->CookieJar);
+         curl_setopt($Handler, CURLOPT_COOKIEFILE, $this->CookieJar);
+      }
+      
+      if ($CookieSession)
+         curl_setopt($Handler, CURLOPT_COOKIESESSION, TRUE);
+      
       if ($FollowRedirects) {
          curl_setopt($Handler, CURLOPT_FOLLOWLOCATION, TRUE);
          curl_setopt($Handler, CURLOPT_AUTOREFERER, TRUE);
@@ -374,5 +396,14 @@ class ProxyRequest {
       }
       
       $this->ActionLog[] = $Message;
+   }
+   
+   public function __destruct() {
+      if (file_exists($this->CookieJar))
+         @unlink($this->CookieJar);
+   }
+   
+   public function Clean() {
+      return $this;
    }
 }

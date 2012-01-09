@@ -27,6 +27,10 @@ echo $Form->Errors();
             echo $Description;
             echo $Form->CategoryDropDown($Row['Name'], $Row['Options']);
             break;
+         case 'labelcheckbox':
+            echo $Form->Label($LabelCode);
+            echo $Form->CheckBox($Row['Name']);
+            break;
          case 'checkbox':
             echo $Description;
             echo $Form->CheckBox($Row['Name'], T($LabelCode));

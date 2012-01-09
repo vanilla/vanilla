@@ -78,8 +78,13 @@ class DiscussionsController extends VanillaController {
          $Page = 0;
       
       // Setup head.
-      if (!$this->Data('Title'))
-         $this->Title(C('Garden.HomepageTitle', C('Garden.Title')), '');
+      if (!$this->Data('Title')) {
+         $Title = C('Garden.HomepageTitle');
+         if ($Title)
+            $this->Title($Title, '');
+         else
+            $this->Title(T('Recent Discussions'));
+      }
       if (!$this->Description())
          $this->Description(C('Garden.Description', NULL));
       if ($this->Head)

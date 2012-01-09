@@ -31,9 +31,13 @@ $Session = Gdn::Session();
    ?>
 </div>
 <h1><?php echo T('Banner'); ?></h1>
-<div class="Info">
-   <p><b>Heads up!</b> Spend a little time thinking about how you describe your site here. 
-      Giving your site a meaningful title and concise description could help your position in search engines.
+<div class="PageInfo">
+   <h2><?php echo T('Heads up!');?></h2>
+   <p>
+   <?php 
+   echo T('Spend a little time thinking about how you describe your site here.', 
+      'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
+   ?>
    </p>
 </div>
 
@@ -70,8 +74,8 @@ echo $this->Form->Errors();
             <?php
                echo $this->Form->Label('Banner Title', 'Garden.Title');
                echo Wrap(
-                     T("The banner title appears on your site's banner with your title bar.", 
-                       "The banner title appears on your site's banner with your title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Some themes may also hide this title."),
+                     T("The banner title appears on your site's banner and in your browswer's title bar.", 
+                       "The banner title appears on your site's banner and in your browswer's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may also hide this title."),
                      'div',
                      array('class' => 'Info')
                   );

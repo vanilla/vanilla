@@ -28,9 +28,7 @@ foreach ($this->ConversationData->Result() as $Conversation) {
    $Names = '';
    $PhotoUser = NULL;
    foreach ($Conversation->Participants as $User) {
-      if (GetValue('UserID', $User) == Gdn::Session()->UserID)
-         continue;
-      $Names = ConcatSep(', ', $Names, GetValue('Name', $User));
+      $Names = ConcatSep(', ', $Names, FormatUsername($User, 'You'));
       if (!$PhotoUser && GetValue('Photo', $User))
          $PhotoUser = $User;
    }

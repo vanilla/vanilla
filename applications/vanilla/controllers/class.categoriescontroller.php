@@ -166,7 +166,12 @@ class CategoriesController extends VanillaController {
       // Setup head
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
-      $this->Title(C('Garden.HomepageTitle', C('Garden.Title')), '');
+      $Title = C('Garden.HomepageTitle');
+      if ($Title)
+         $this->Title($Title, '');
+      else
+         $this->Title(T('All Categories'));
+            
       $this->Description(C('Garden.Description', NULL));
       
       $this->SetData('Breadcrumbs', array(array('Name' => T('All Categories'), 'Url' => '/categories/all')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
@@ -212,7 +217,11 @@ class CategoriesController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
-      $this->Title(C('Garden.HomepageTitle', C('Garden.Title')), '');
+      $Title = C('Garden.HomepageTitle');
+      if ($Title)
+         $this->Title($Title, '');
+      else
+         $this->Title(T('All Categories'));
       $this->Description(C('Garden.Description', NULL));
       
 		// Set the category follow toggle before we load category data so that it affects the category query appropriately.

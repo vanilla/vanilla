@@ -2,27 +2,12 @@
 $Session = Gdn::Session();
 $NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID') ? TRUE : FALSE;
 $Editing = isset($this->Comment);
+if ($Editing) 
+   $this->Form->SetFormValue('Body', $this->Comment->Body);
 ?>
 <div class="MessageForm CommentForm">
-   <?php if (!$Editing) { ?>
-   <div class="Tabs CommentTabs">
-      <ul>
-         <li class="Active"><?php echo Anchor(T('Write Comment'), '#', 'WriteButton TabLink'); ?></li>
-         <?php
-         if (!$Editing)
-            echo '<li>'.Anchor(T('Preview'), '#', 'PreviewButton TabLink')."</li>\n";
-         
-         if ($NewOrDraft)
-            echo '<li>'.Anchor(T('Save Draft'), '#', 'DraftButton TabLink')."</li>\n";
-   
-         $this->FireEvent('AfterCommentTabs');
-         ?>
-      </ul>
-   </div>
+   <h2><?php echo T($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
    <?php
-   } else {
-      $this->Form->SetFormValue('Body', $this->Comment->Body);
-   }
    echo $this->Form->Open();
    echo $this->Form->Errors();
    
@@ -61,7 +46,28 @@ $Editing = isset($this->Comment);
       $ButtonOptions['Disabled'] = 'disabled';
    */
 
-   echo ' '.$this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);
+   if (!$Editing && $Session->IsValid()) {
+      echo Anchor(T('Preview'), '#', 'PreviewButton')."\n";
+      echo Anchor(T('Edit'), '#', 'WriteButton Hidden')."\n";
+      if ($NewOrDraft)
+         echo Anchor(T('Save Draft'), '#', 'DraftButton')."\n";
+   }
+   if ($Session->IsValid())
+      echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);
+   else {
+      $AllowSigninPopup = C('Garden.SignIn.Popup');
+      $Attributes = array('tabindex' => '-1');
+      if (!$AllowSigninPopup)
+         $Attributes['target'] = '_parent';
+      
+      $AuthenticationUrl = SignInUrl($this->Data('ForeignUrl', '/'));
+      $CssClass = 'Button Stash';
+      if ($AllowSigninPopup)
+         $CssClass .= ' SignInPopup';
+         
+      echo Anchor(T('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);
+   }
+   
    $this->FireEvent('AfterFormButtons');
    echo "</div>\n";
    echo $this->Form->Close();

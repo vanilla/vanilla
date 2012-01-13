@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
                $('.CountBookmarks', $(btn)).text(json.CountDiscussionBookmarks);
                   
             }
-            $('a.MyBookmarks').html(json.MenuText+'<span>'+json.CountBookmarks+'</span>');
+            $('a.MyBookmarks').html(json.MenuText+' <span class="Count">'+json.CountBookmarks+'</span>');
             // Add/remove the bookmark from the side menu.
             gdn.processTargets(json.Targets);
          }

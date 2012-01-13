@@ -161,6 +161,11 @@ class DiscussionController extends VanillaController {
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
 
+      // Look in the session stash for a comment
+      $StashComment = $Session->Stash('CommentForDiscussionID_'.$this->Discussion->DiscussionID, '', FALSE);
+      if ($StashComment)
+         $this->Form->SetFormValue('Body', $StashComment);
+         
       // Retrieve & apply the draft if there is one:
       if (Gdn::Session()->UserID) {
          $DraftModel = new DraftModel();

@@ -8,7 +8,7 @@ require_once $this->FetchViewLocation('helper_functions');
       foreach ($this->Data->Result() as $Discussion) {
          WriteModuleDiscussion($Discussion);
       }
-      if ($this->Data->NumRows() > 10) {
+      if ($this->Data->NumRows() == $this->Limit) {
       ?>
       <li class="ShowAll"><?php echo Anchor(T('All Bookmarks'), 'discussions/bookmarked'); ?></li>
       <?php } ?>

@@ -103,6 +103,11 @@ class DashboardHooks implements Gdn_IPlugin {
       // Allow forum embedding
       if (C('Garden.Embed.Allow'))
          $Sender->AddJsFile('js/embed_local.js');
+         
+      // Allow return to mobile site
+		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+		   $Sender->AddAsset('Foot', Wrap(Anchor(T('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
    }
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {

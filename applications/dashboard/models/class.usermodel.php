@@ -1023,7 +1023,7 @@ class UserModel extends Gdn_Model {
       $FormPostValues['DateOfBirth'] = '1975-09-16';
       $FormPostValues['DateLastActive'] = Gdn_Format::ToDateTime();
       $FormPostValues['DateUpdated'] = Gdn_Format::ToDateTime();
-      $FormPostValues['Gender'] = 'm';
+      $FormPostValues['Gender'] = 'u';
       $FormPostValues['Admin'] = '1';
 
       $this->AddInsertFields($FormPostValues);
@@ -1822,7 +1822,7 @@ class UserModel extends Gdn_Model {
             'About' => '',
             'Email' => 'user_'.$UserID.'@deleted.email',
             'ShowEmail' => '0',
-            'Gender' => 'm',
+            'Gender' => 'u',
             'CountVisits' => 0,
             'CountInvitations' => 0,
             'CountNotifications' => 0,
@@ -2338,7 +2338,7 @@ class UserModel extends Gdn_Model {
          $UserData['Name'] = $Data['Name'];
          $UserData['Password'] = RandomString(16);
          $UserData['Email'] = ArrayValue('Email', $Data, 'no@email.com');
-         $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Attributes, 'm'), 0, 1));
+         $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Attributes, 'u'), 0, 1));
          $UserData['HourOffset'] = ArrayValue('HourOffset', $Attributes, 0);
          $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Attributes, '');
          $UserData['CountNotifications'] = 0;

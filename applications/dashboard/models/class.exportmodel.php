@@ -202,7 +202,7 @@ class ExportModel {
 		'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
 		'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
 		'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
-		'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('m', 'f'), 'Score' => 'float'),
+		'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('u', 'm', 'f'), 'Score' => 'float'),
 		'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
 		);
 	/**

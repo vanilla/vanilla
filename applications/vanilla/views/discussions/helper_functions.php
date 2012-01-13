@@ -239,8 +239,7 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
             <ul class="Flyout MenuItems">
                <?php echo $Sender->Options; ?>
             </ul>
-         </span>
-      <?php
+         </span><?php
       }
 
       // Bookmark link

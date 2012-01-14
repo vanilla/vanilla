@@ -591,26 +591,34 @@ class DiscussionController extends VanillaController {
    public function DeleteComment($CommentID = '', $TransientKey = '') {
       $Session = Gdn::Session();
       $DefaultTarget = '/discussions/';
-      if (
-         is_numeric($CommentID)
-         && $CommentID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
+      $ValidCommentID = is_numeric($CommentID) && $CommentID > 0;
+      $ValidUser = $Session->UserID > 0 && $Session->ValidateTransientKey($TransientKey);
+      
+      if ($ValidCommentID && $ValidUser) {
+         // Get comment and discussion data
          $Comment = $this->CommentModel->GetID($CommentID);
-         if ($Comment) {
-            $Discussion = $this->DiscussionModel->GetID($Comment->DiscussionID);
-            $DefaultTarget = '/vanilla/discussions/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
-            $HasPermission = $Comment->InsertUserID == $Session->UserID;
-            if (!$HasPermission && $Discussion)
-               $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
+         $DiscussionID = GetValue('DiscussionID', $Comment);
+         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+         
+         if ($Comment && $Discussion) {
+            $DefaultTarget = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
             
-            if ($Discussion && $HasPermission) {
-               if (!$this->CommentModel->Delete($CommentID))
-                  $this->Form->AddError('Failed to delete comment');
-            } else {
-               $this->Form->AddError('ErrPermission');
-            }
+            // Make sure comment is this user's or they have Delete permission
+            if ($Comment->InsertUserID != $Session->UserID)
+               $this->Permission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
+               
+            // If theirs, make sure that content can (still) be edited if.
+            $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+            $CanEdit = $EditContentTimeout == -1 || strtotime($Comment->DateInserted) + $EditContentTimeout > time();
+            if (!$CanEdit)
+               $this->Permission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
+            
+            // Delete the comment
+            if (!$this->CommentModel->Delete($CommentID))
+               $this->Form->AddError('Failed to delete comment');
+         }
+         else {
+            $this->Form->AddError('Invalid comment');
          }
       } else {
          $this->Form->AddError('ErrPermission');

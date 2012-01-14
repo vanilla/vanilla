@@ -979,7 +979,7 @@ a.BigButton:focus {
 }
 .DataList .Excerpt a {
    color: #333;
-	display: block;
+	/*display: block; Causes links in activity body to become block -linc */
 }
 .DataList .Excerpt p {
 	display: inline;

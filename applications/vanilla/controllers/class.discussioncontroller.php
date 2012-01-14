@@ -607,7 +607,7 @@ class DiscussionController extends VanillaController {
             if ($Comment->InsertUserID != $Session->UserID)
                $this->Permission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
                
-            // If theirs, make sure that content can (still) be edited if.
+            // Make sure that content can (still) be edited
             $EditContentTimeout = C('Garden.EditContentTimeout', -1);
             $CanEdit = $EditContentTimeout == -1 || strtotime($Comment->DateInserted) + $EditContentTimeout > time();
             if (!$CanEdit)

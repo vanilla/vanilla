@@ -87,6 +87,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
          if ($Source = GetValue('Source', $Object)) {
             echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
          }
+         $Sender->FireEvent('InsideCommentMeta');
          
 			WriteCommentOptions($Object);
 			?>
@@ -160,7 +161,7 @@ function GetDiscussionOptions($Discussion = NULL) {
    
    // Allow plugins to add options.
    $Sender->EventArguments['Options'] =& $Result;
-   $Sender->FireEvent('GetDiscussionOptions');
+   $Sender->FireEvent('DiscussionOptions');
    
    return $Result;
 }
@@ -192,7 +193,7 @@ function WriteDiscussionOptions($Discussion = NULL) {
 }
 
 function GetCommentOptions($Comment = NULL) {
-	$Return = array();
+	$Options = array();
    $Sender = Gdn::Controller();
    $Session = Gdn::Session();
 	$Discussion = Gdn::Controller()->Data('Discussion');
@@ -212,17 +213,17 @@ function GetCommentOptions($Comment = NULL) {
 	
 	// Can the user edit the comment?
 	if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $PermissionCategoryID))
-		$Return['EditComment'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
+		$Options['EditComment'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
 
 	// Can the user delete the comment?
 	if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
-		$Return['DeleteComment'] = array('Label' => T('Delete'), 'Url' => 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
+		$Options['DeleteComment'] = array('Label' => T('Delete'), 'Url' => 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
    
    // Allow plugins to add options
-	$Sender->EventArguments['CommentOptions'] = $Return;
+	$Sender->EventArguments['CommentOptions'] = $Options;
    $Sender->FireEvent('CommentOptions');
    
-	return $Return;
+	return $Options;
 }
 
 function WriteCommentOptions($Comment) {

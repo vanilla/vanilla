@@ -15,6 +15,7 @@ $Discussion = $this->Data('Discussion');
             echo Anchor(Gdn_Format::Date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
             ?>
          </span>
+         <?php $this->FireEvent('AfterDiscussionMeta'); ?>
       </div>
    </div>
    <?php $this->FireEvent('BeforeDiscussionBody'); ?>

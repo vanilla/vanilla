@@ -7,6 +7,9 @@ if (!function_exists('WriteComment'))
    
 $CurrentOffset = $this->Offset;
 
+$this->EventArguments['CurrentOffset'] = &$CurrentOffset;
+$this->FireEvent('BeforeFirstComment');
+
 // Only prints individual comment list items
 $CommentData = $this->CommentData->Result();
 foreach ($CommentData as $Comment) {

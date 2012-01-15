@@ -29,19 +29,19 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         $Options = array('0' => T('Authors cannot edit their posts'),
-                        '350' => T('Authors can edit for 5 minutes after posting'), 
-                        '900' => T('Authors can edit for 15 minutes after posting'), 
-                       '3600' => T('Authors can edit for 1 hour after posting'),
-                      '14400' => T('Authors can edit for 4 hours after posting'),
-                      '86400' => T('Authors can edit for 1 day after posting'),
-                     '604800' => T('Authors can edit for 1 week after posting'),
-                    '2592000' => T('Authors can edit for 1 month after posting'),
-                         '-1' => T('Authors can always edit their posts'));
+         $Options = array('0' => T('Authors may never edit'),
+                        '350' => sprintf(T('Authors may edit for %s'), T('5 minutes')), 
+                        '900' => sprintf(T('Authors may edit for %s'), T('15 minutes')), 
+                       '3600' => sprintf(T('Authors may edit for %s'), T('1 hour')),
+                      '14400' => sprintf(T('Authors may edit for %s'), T('4 hours')),
+                      '86400' => sprintf(T('Authors may edit for %s'), T('1 day')),
+                     '604800' => sprintf(T('Authors may edit for %s'), T('1 week')),
+                    '2592000' => sprintf(T('Authors may edit for %s'), T('1 month')),
+                         '-1' => T('Authors may always edit'));
          $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
          echo $this->Form->Label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
          echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields);
-			echo Wrap(T('EditContentTimeout.Notes', 'Note: If a user is in a role that has permission to edit content, those permissions will override any value selected here.'), 'div', array('class' => 'Info'));
+			echo Wrap(T('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', array('class' => 'Info'));
       ?>
    </li>
    <li>

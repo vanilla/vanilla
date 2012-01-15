@@ -1589,7 +1589,7 @@ dl.About dd {
 
 /* ================================================ Administration Checkboxes */
 .AdminCheck {
-   display: inline-block;
+   float: right;
    vertical-align: top;
 	line-height: 1;
 }

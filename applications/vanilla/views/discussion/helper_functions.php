@@ -221,12 +221,13 @@ function GetCommentOptions($Comment = NULL) {
    // Allow plugins to add options
 	$Sender->EventArguments['CommentOptions'] = $Return;
    $Sender->FireEvent('CommentOptions');
+   
 	return $Return;
 }
 
 function WriteCommentOptions($Comment) {
 	$Controller = Gdn::Controller();
-   if (GetValue('CanEditComments', $Controller)) {
+   //if (GetValue('CanEditComments', $Controller)) {
       $Id = $Comment->CommentID;
 		$Options = GetCommentOptions($Comment);
 		$Session = Gdn::Session();
@@ -234,6 +235,13 @@ function WriteCommentOptions($Comment) {
 			return;
 
       echo '<div class="Options">';
+         if (C('Vanilla.AdminCheckboxes.Use')) {
+   		   if (!property_exists($Controller, 'CheckedComments'))
+   				$Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
+   	
+   			$ItemSelected = InSubArray($Id, $Controller->CheckedComments);
+   			echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+			}
 		   echo '<span class="ToggleFlyout OptionsMenu">';
 				echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
 				echo '<ul class="Flyout MenuItems" style="display: none;">';
@@ -242,14 +250,8 @@ function WriteCommentOptions($Comment) {
 					}
 				echo '</ul>';
 			echo '</span>';
-
-			if (!property_exists($Controller, 'CheckedComments'))
-				$Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
-	
-			$ItemSelected = InSubArray($Id, $Controller->CheckedComments);
-			echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
       echo '</div>';
-   }
+   //}
 }
 
 function WriteCommentForm() {

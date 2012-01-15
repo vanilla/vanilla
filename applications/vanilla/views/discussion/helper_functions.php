@@ -34,29 +34,28 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Alt = ($CurrentOffset % 2) != 0;
 
    $Author = UserBuilder($Object, 'Insert');
-   $Type = property_exists($Object, 'CommentID') ? 'Comment' : 'Discussion';
+   //$Type = property_exists($Object, 'CommentID') ? 'Comment' : 'Discussion';
 	$Sender->EventArguments['Object'] = $Object;
-   $Sender->EventArguments['Type'] = $Type;
+   //$Sender->EventArguments['Type'] = $Type;
    $Sender->EventArguments['Author'] = $Author;
    $CssClass = 'Item Comment';
    $Permalink = GetValue('Url', $Object, FALSE);
 
    if (!property_exists($Sender, 'CanEditComments'))
 		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
-		
 
-   if ($Type == 'Comment') {
+   //if ($Type == 'Comment') {
       $Sender->EventArguments['Comment'] = $Object;   
       $Id = 'Comment_'.$Object->CommentID;
       if ($Permalink === FALSE)
          $Permalink = '/discussion/comment/'.$Object->CommentID.'/#Comment_'.$Object->CommentID;
-   } else {
+   /*} else {
       $Sender->EventArguments['Discussion'] = $Object;   
       $CssClass .= ' FirstComment';
       $Id = 'Discussion_'.$Object->DiscussionID;
       if ($Permalink === FALSE)
          $Permalink = '/discussion/'.$Object->DiscussionID.'/'.Gdn_Format::Url($Object->Name).'/p1';
-   }
+   }*/
    $Sender->EventArguments['CssClass'] = &$CssClass;
    $Sender->Options = '';
    $CssClass .= $Object->InsertUserID == $Session->UserID ? ' Mine' : '';
@@ -64,7 +63,6 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    if ($Alt)
       $CssClass .= ' Alt';
    $Alt = !$Alt;
-	
 	
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>

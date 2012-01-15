@@ -1,13 +1,19 @@
 <?php if (!defined('APPLICATION')) exit(); 
+
 $Discussion = $this->Data('Discussion');
+$Author = UserBuilder($Discussion, 'Insert');
+
+$this->EventArguments['Discussion'] = &$Discussion;
+$this->EventArguments['Author'] = &$Author;
+
 ?>
 <div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="Item ItemDiscussion">
    <div class="DiscussionHeader">
       <div class="Meta">
          <span class="Author">
             <?php
-            echo UserPhoto($Discussion, array('Px' => 'Insert'));
-            echo UserAnchor($Discussion, array('Px' => 'Insert'));
+            echo UserPhoto($Author);
+            echo UserAnchor($Author);
             ?>
          </span>
          <span class="MItem DateCreated">

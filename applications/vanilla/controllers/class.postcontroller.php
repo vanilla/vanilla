@@ -269,8 +269,9 @@ class PostController extends VanillaController {
       
       // Set discussion data
       $this->DiscussionID = $DiscussionID;
-      $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);      
-            
+      $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion);
+      
       // Setup head
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
@@ -288,7 +289,7 @@ class PostController extends VanillaController {
       $this->EventArguments['Editing'] = $Editing;
       
       // If closed, cancel & go to discussion
-      if ($Discussion->Closed == 1 && !$Editing)
+      if ($Discussion->Closed == 1 && !$Editing && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
          Redirect('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
       
       // Add hidden IDs to form

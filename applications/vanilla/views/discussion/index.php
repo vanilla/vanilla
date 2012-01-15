@@ -32,7 +32,7 @@ if ($this->Data('Page') == 1) {
 
 // Write the comments.
 echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
-echo $this->Pager->ToString('more');
+//echo $this->Pager->ToString('more');
 
 $Session = Gdn::Session(); 
 ?>

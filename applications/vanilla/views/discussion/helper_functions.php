@@ -256,7 +256,9 @@ function WriteCommentForm() {
 	$Session = Gdn::Session();
 	$Controller = Gdn::Controller();
 	$Discussion = $Controller->Data('Discussion');
-	// Write out the comment form
+	$PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion);
+	
+	// Closed notification
 	if ($Discussion->Closed == '1') {
 		?>
 		<div class="Foot Closed">
@@ -264,7 +266,9 @@ function WriteCommentForm() {
 			<?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
 		</div>
 		<?php
-	} else {
+	} 
+	
+	// Comment form
+	if (!$Discussion->Closed || $Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
 		echo $Controller->FetchView('comment', 'post');
-	}
 }

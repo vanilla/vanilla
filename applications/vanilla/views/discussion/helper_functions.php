@@ -85,7 +85,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
          </span>
          <?php
          if ($Source = GetValue('Source', $Object)) {
-            echo sprintf(T('via %s'), T($Source.' Source', $Source));
+            echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
          }
          
 			WriteCommentOptions($Object);
@@ -94,7 +94,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
             <?php
             $Sender->FireEvent('CommentInfo');
             if ($Session->CheckPermission('Garden.Moderation.Manage')) {
-               echo ' <span>'.IPAnchor($Object->InsertIPAddress).'<span class="MItem"> ';
+               echo Wrap(IPAnchor($Object->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
             }
             ?>
          </div>

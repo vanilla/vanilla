@@ -1916,6 +1916,7 @@ div.Popup form ul li label.RadioLabel {
 	width: 24px;
 }
 .ItemDiscussion .Message {
+	margin-bottom: 5px; /* Consistency with when only h1 starts page */
 	padding: 8px;
 	font-size: 110%;
 	background: #F6F6F6;
@@ -1931,6 +1932,9 @@ div.Popup form ul li label.RadioLabel {
 	font-size: 15px;
 	padding: 10px 0 2px;
 	border-bottom: 1px solid #BEC8CC;
+}
+.BeforeCommentPaging {
+   float: right;
 }
 
 /* ================================================================= Comments */

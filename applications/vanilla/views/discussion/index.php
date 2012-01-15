@@ -31,8 +31,8 @@ if ($this->Data('Page') == 1) {
 }
 
 // Write the comments.
+echo '<span class="BeforeCommentPaging">'.$this->Pager->ToString('more').'</span>';
 echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
-//echo $this->Pager->ToString('more');
 
 $Session = Gdn::Session(); 
 ?>

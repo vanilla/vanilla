@@ -422,7 +422,8 @@ a.Small img {
    right: -1px;
    top: -1px;
 }
-.DismissMessage strong {
+.DismissMessage strong,
+.DismissMessage b {
 	font-weight: bold;
 }
 .DismissMessage a.Dismiss:hover {
@@ -432,35 +433,34 @@ a.Small img {
    color: #fff;
 }
 .DismissMessage {
+	font-size: 13px;
 	text-align: left;
 	position: relative;
    color: #000;
    border: none;
-   border-radius: 0;
-   -moz-border-radius: 0;
-   -webkit-border-radius: 0;
+   border-radius: 1;
+   -moz-border-radius: 1;
+   -webkit-border-radius: 1;
    margin: 0 0 10px;
    padding: 10px;
 }
-.DismissMessage p {
-   margin: 2px 0;
+.CasualMessage {
+   background: #CFECFF;
+   border: 1px solid #ABDAFB;
+   color: #1E79A7;
 }
-.DismissMessage.Info {
-   background: #f3f4f8;
+.InfoMessage {
+   background: #F6F6F6;
    border: 1px solid #ddd;
 }
-.DismissMessage.Warning {
+.AlertMessage {
+   background: #fff8ce;
+   border: 1px solid #DEDDAF;
+}
+.WarningMessage {
    background: #ffebe9;
    border: 1px solid #FFCCC9;
 }
-.DismissMessage.Box {
-   background: #fff8ce;
-   border: 1px solid #c5bea4;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-}
-
 
 /* =================================================================== Header */
 #Head {

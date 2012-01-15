@@ -82,7 +82,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $MessageModule = new MessageModule($Sender, $Message);
             if ($SignInOnly) // Insert special messages even in SignIn popup
                echo $MessageModule;
-            else
+            elseif ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
                $Sender->AddModule($MessageModule);
          }
 			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.

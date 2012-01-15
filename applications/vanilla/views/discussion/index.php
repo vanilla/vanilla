@@ -12,8 +12,8 @@ echo '<!-- Page Title -->
 
 echo '<div class="Options">';
 
-WriteDiscussionOptions();
 WriteBookmarkLink();
+WriteDiscussionOptions();
 WriteAdminCheck();
 
 echo '</div>';

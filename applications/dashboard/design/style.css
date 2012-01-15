@@ -577,7 +577,7 @@ body #Head h1 {
 
 /* Option (dropdown) Menus */
 .OptionsMenu {
-   display: inline-block;
+   float: right;
    font-size: 10px;
    font-weight: normal;
    line-height: 100%;
@@ -1890,26 +1890,30 @@ div.Popup form ul li label.RadioLabel {
    color: #000;
 }
 .Discussion .PageTitle h1 {
-	font-size: 22px;
+	font-size: 24px;
+	line-height: 1.2;
 }
-.Item-Discussion .MItem {
+/*.ItemDiscussion .MItem {
 	margin: 0;
 }
-.Item-Discussion .MItem a,
-.Item-Discussion .Author a {
+.ItemDiscussion .MItem a,
+.ItemDiscussion .Author a {
 	color: #888888;
    font-size: 12px;
    font-style: italic;
 	font-weight: normal;
 }
-.Item-Discussion .Author .ProfileLink {
+.ItemDiscussion .Author .ProfileLink {
 	display: none;
+}*/
+.ItemDiscussion .MItem a {
+   font-size: 11px; 
 }
-.Item-Discussion .Author img {
+.ItemDiscussion .Author img {
 	height: 24px;
 	width: 24px;
 }
-.Item-Discussion .Message {
+.ItemDiscussion .Message {
 	padding: 10px 0;
 	font-size: 110%;
 }
@@ -1930,7 +1934,7 @@ body.Discussion #Content {
 a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
-   display: inline-block;
+   float: right;
    background: url('images/star.png') 0 0 no-repeat;
    height: 18px;
    width: 18px;

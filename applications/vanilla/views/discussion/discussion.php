@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); 
 $Discussion = $this->Data('Discussion');
 ?>
-<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="Item Item-Discussion">
+<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="Item ItemDiscussion">
    <div class="Discussion-Header">
       <div class="Meta">
          <span class="Author">

@@ -975,6 +975,9 @@ a.BigButton:focus {
 .MItem:last-child {
    margin-right: 0;
 }
+.CommentInfo {
+   line-height: 1.5; 
+}
 .DataList .Excerpt {
    font-size: 12px;
 	line-height: 1.4;

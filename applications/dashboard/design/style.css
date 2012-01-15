@@ -774,7 +774,9 @@ div.Discussion:hover .OptionsTitle:hover,
 .PanelInfo li strong {
    font-weight: normal;
    text-align: left;
-   font-weight: normal;
+}
+.PanelInfo li .LastMessage {
+   float: right;
 }
 .PanelInfo .Meta {
    font-size: 11px;

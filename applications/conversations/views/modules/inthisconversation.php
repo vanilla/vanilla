@@ -14,7 +14,7 @@
       else
          echo Wrap(UserAnchor($User, 'UserLink'), 'strong');
       
-      echo Gdn_Format::Date($User->DateLastActive);
+      echo Wrap(Gdn_Format::Date($User->DateLastActive), 'span', array('class' => 'LastMessage'));
 
       echo '</li>';
    }

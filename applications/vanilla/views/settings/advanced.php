@@ -32,7 +32,8 @@ echo $this->Form->Errors();
          $Options = array('0' => T('Authors cannot edit their posts'),
                         '350' => T('Authors can edit for 5 minutes after posting'), 
                         '900' => T('Authors can edit for 15 minutes after posting'), 
-                       '1800' => T('Authors can edit for 30 minutes after posting'),
+                       '3600' => T('Authors can edit for 1 hour after posting'),
+                      '14400' => T('Authors can edit for 4 hours after posting'),
                       '86400' => T('Authors can edit for 1 day after posting'),
                      '604800' => T('Authors can edit for 1 week after posting'),
                     '2592000' => T('Authors can edit for 1 month after posting'),
@@ -45,13 +46,13 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         $Options2 = array('0' => T('Don\'t Refresh'), 
+         $Options2 = array('0' => T('Never - Users Must Refresh Page'), 
                            '5' => T('Every 5 seconds'),
                           '10' => T('Every 10 seconds'),
                           '30' => T('Every 30 seconds'),
                           '60' => T('Every 1 minute'),
                          '300' => T('Every 5 minutes'));
-         echo $this->Form->Label('Refresh Comments', 'Vanilla.Comments.AutoRefresh');
+         echo $this->Form->Label('Auto-Fetch New Comments', 'Vanilla.Comments.AutoRefresh');
          echo $this->Form->DropDown('Vanilla.Comments.AutoRefresh', $Options2, $Fields);
       ?>
    </li>

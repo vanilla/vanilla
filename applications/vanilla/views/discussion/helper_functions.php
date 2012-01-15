@@ -202,7 +202,7 @@ function GetCommentOptions($Comment = NULL) {
 	$CanEdit = $EditContentTimeout == -1 || strtotime($Comment->DateInserted) + $EditContentTimeout > time();
 	$TimeLeft = '';
 	if ($CanEdit && $EditContentTimeout > 0 && !$Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID)) {
-		$TimeLeft = strtotime($Object->DateInserted) + $EditContentTimeout - time();
+		$TimeLeft = strtotime($Comment->DateInserted) + $EditContentTimeout - time();
 		$TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::Seconds($TimeLeft).')' : '';
 	}
 

@@ -2,7 +2,7 @@
 $Discussion = $this->Data('Discussion');
 ?>
 <div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="Item ItemDiscussion">
-   <div class="Discussion-Header">
+   <div class="DiscussionHeader">
       <div class="Meta">
          <span class="Author">
             <?php

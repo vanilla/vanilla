@@ -1914,8 +1914,16 @@ div.Popup form ul li label.RadioLabel {
 	width: 24px;
 }
 .ItemDiscussion .Message {
-	padding: 10px 0;
+	padding: 8px;
 	font-size: 110%;
+	background: #F6F6F6;
+	box-shadow: rgb(215, 215, 215) 0px 0px 2px 0px;
+	border-radius: 1px;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+}
+.DiscussionHeader {
+   padding: 5px 0 9px 0;
 }
 .CommentHeading {
 	font-size: 15px;

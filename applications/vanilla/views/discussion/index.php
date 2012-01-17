@@ -6,6 +6,10 @@ if (!function_exists('WriteComment'))
 // Wrap the discussion related content in a div.
 echo '<div class="Discussion '.CssClass($this->Data('Discussion')).'">';
 
+// Category
+if (C('Vanilla.Categories.Use') == TRUE)
+   echo Anchor($this->Data('Discussion.Category'), 'categories/'.$this->Data('Discussion.CategoryUrlCode'), 'CategoryLink');
+
 // Write the page title.
 echo '<!-- Page Title -->
 <div id="Item_0" class="PageTitle">';

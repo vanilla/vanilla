@@ -579,6 +579,15 @@ body #Head h1 {
 .Options {
 	float: right;
 }
+.CategoryLink {
+   padding: 2px 4px;
+   font-size: 11px;
+   background: #CFECFF; /*#F6F6F6;*/
+   box-shadow: #ABDAFB 0px 0px 2px 0px;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   border-radius: 1px;
+}
 .PageTitle .Options {
 	height: 10px;
 }

@@ -49,11 +49,15 @@ class LogModel extends Gdn_Pluggable {
       // TODO: Check for a custom log type handler.
 
       switch ($Log['RecordType']) {
+         case 'Activity':
+            $Result = $this->FormatKey('Story', $Data);
+            break;
          case 'Discussion':
             $Result =
                '<b>'.$this->FormatKey('Name', $Data).'</b><br />'.
                $this->FormatKey('Body', $Data);
             break;
+         case 'ActivityComment':
          case 'Comment':
             $Result = $this->FormatKey('Body', $Data);
             break;

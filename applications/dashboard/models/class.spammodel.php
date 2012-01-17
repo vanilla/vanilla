@@ -48,6 +48,10 @@ class SpamModel extends Gdn_Pluggable {
          }
       }
       
+      if (!isset($Data['Body']) && isset($Data['Story'])) {
+         $Data['Body'] = $Data['Story'];
+      }
+      
       TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
 
       $Sp = self::_Instance();

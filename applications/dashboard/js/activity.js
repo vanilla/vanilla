@@ -91,6 +91,8 @@ jQuery(document).ready(function($) {
          success: function(json) {
             json = $.postParseJson(json);
             
+            gdn.inform(json);
+            
             // Remove any old errors from the form
             $('div.Errors').remove();
 
@@ -135,6 +137,9 @@ jQuery(document).ready(function($) {
             },
             success: function(json) {
                json = $.postParseJson(json);
+               
+               gdn.inform(json);
+               
                if (json['FormSaved'] == true) {
                   $(inp).val('');
                   // If there were no activities

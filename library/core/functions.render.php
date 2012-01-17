@@ -16,7 +16,7 @@ if (!function_exists('Alternate')) {
    function Alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class'){
       static $i = 0;
       $Value = $i++ % 2 ? $Odd : $Even;
-      if($Value != '' && $Even == '')
+      if($Value != '' && $Even == '' && $AttributeName)
          $Value = ' '.$AttributeName.'="'.$Value.'"';
       return $Value;
    }

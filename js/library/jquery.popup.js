@@ -212,7 +212,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       if (json == false) {
          // This is something other than json, so just put it into the popup directly
-         $('#'+settings.popupId+' .Content').append(data);
+         if (data) // Prevent blank popups
+            $('#'+settings.popupId+' .Content').append(data);
+         else
+            gdn.informError(xhr);
       } else {
          gdn.inform(json);
          formSaved = json['FormSaved'];
@@ -230,7 +233,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          // we need to reload the invitation table. Is there a reason not to reload
          // the content?
          // if (formSaved == false)
-         $('#'+settings.popupId+' .Content').html(data);
+         if (data) // Prevent blank popups
+            $('#'+settings.popupId+' .Content').html(data);
+         else 
+            gdn.informError(xhr);
       }
     
       $('#'+settings.popupId+' .Loading').remove();

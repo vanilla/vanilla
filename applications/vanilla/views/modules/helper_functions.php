@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-
 function WriteModuleDiscussion($Discussion) {
 ?>
 <li id="<?php echo 'Bookmark_'.$Discussion->DiscussionID; ?>">
@@ -16,9 +15,7 @@ function WriteModuleDiscussion($Discussion) {
          if ($Discussion->CountUnreadComments > 0 || $Discussion->CountUnreadComments === '')
             echo '<span class="MItem HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new').'</span> ';
          
-         echo '<span class="MItem">'.T('recently').' '.Gdn_Format::Date($Discussion->LastDate, 'html').' '.T('by').' '.UserAnchor($Last).'</span>';
-         
-         
+         echo '<span class="MItem">'.Gdn_Format::Date($Discussion->LastDate, 'html').UserAnchor($Last).'</span>';         
       ?>
    </div>
 </li>

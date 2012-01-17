@@ -135,21 +135,18 @@ function WriteFilterTabs($Sender) {
    $CountBookmarks = 0;
    $CountDiscussions = 0;
    $CountDrafts = 0;
+   
    if ($Session->IsValid()) {
       $CountBookmarks = $Session->User->CountBookmarks;
       $CountDiscussions = $Session->User->CountDiscussions;
       $CountDrafts = $Session->User->CountDrafts;
    }
-   if ($CountBookmarks === NULL) {
-      $Bookmarked .= ' <span class="Count Popin" rel="'.Url('/discussions/UserBookmarkCount').'">-</span>';
-   } elseif (is_numeric($CountBookmarks) && $CountBookmarks > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
-      $Bookmarked .= ' <span class="Count">'.$CountBookmarks.'</span>';
-
-   if (is_numeric($CountDiscussions) && $CountDiscussions > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
-      $MyDiscussions .= ' <span class="Count">'.$CountDiscussions.'</span>';
-
-   if (is_numeric($CountDrafts) && $CountDrafts > 0 && C('Vanilla.Discussions.ShowCounts', TRUE))
-      $MyDrafts .= ' <span class="Count">'.$CountDrafts.'</span>';
+   
+   if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
+      $Bookmarked .= CountString($CountBookmarks, Url('/discussions/UserBookmarkCount'));
+      $MyDiscussions .= CountString($CountDiscussions);
+      $MyDrafts .= CountString($CountDrafts);
+   }
       
    ?>
 <div class="Tabs DiscussionsTabs">
@@ -235,17 +232,6 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       // Allow plugins to add options
       $Sender->FireEvent('DiscussionOptions');
       
-      if ($Sender->Options != '') {
-      ?>
-         <span class="ToggleFlyout OptionsMenu">
-            <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
-            <ul class="Flyout MenuItems">
-               <?php echo $Sender->Options; ?>
-            </ul>
-         </span>
-      <?php
-      }
-
       // Bookmark link
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(
@@ -256,6 +242,16 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
+      
+      if ($Sender->Options != '') {
+      ?>
+         <span class="ToggleFlyout OptionsMenu">
+            <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
+            <ul class="Flyout MenuItems">
+               <?php echo $Sender->Options; ?>
+            </ul>
+         </span><?php
+      }
       
       // Admin check.
       if ($Sender->CanEditDiscussions) {

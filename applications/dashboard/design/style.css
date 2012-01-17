@@ -164,10 +164,12 @@ textarea {
    padding: 3px;
    margin: 0;
    width: 250px;
-   border: 1px solid #aaa;
-   border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
+	box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset; 
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
+	background: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	padding: 3px;	
 }
 
 textarea.TextBox {
@@ -250,12 +252,6 @@ input.Button {
 }
 .Buttons {
    margin-top: 10px;
-}
-.CommentForm .Buttons {
-   text-align: right; 
-}
-.CommentForm .Buttons .Back {
-   float: left;
 }
 .Loading {
    height: 100px;
@@ -426,7 +422,8 @@ a.Small img {
    right: -1px;
    top: -1px;
 }
-.DismissMessage strong {
+.DismissMessage strong,
+.DismissMessage b {
 	font-weight: bold;
 }
 .DismissMessage a.Dismiss:hover {
@@ -436,35 +433,34 @@ a.Small img {
    color: #fff;
 }
 .DismissMessage {
+	font-size: 13px;
 	text-align: left;
 	position: relative;
    color: #000;
    border: none;
-   border-radius: 0;
-   -moz-border-radius: 0;
-   -webkit-border-radius: 0;
+   border-radius: 1;
+   -moz-border-radius: 1;
+   -webkit-border-radius: 1;
    margin: 0 0 10px;
    padding: 10px;
 }
-.DismissMessage p {
-   margin: 2px 0;
+.CasualMessage {
+   background: #CFECFF;
+   border: 1px solid #ABDAFB;
+   color: #1E79A7;
 }
-.DismissMessage.Info {
-   background: #f3f4f8;
+.InfoMessage {
+   background: #F6F6F6;
    border: 1px solid #ddd;
 }
-.DismissMessage.Warning {
+.AlertMessage {
+   background: #fff8ce;
+   border: 1px solid #DEDDAF;
+}
+.WarningMessage {
    background: #ffebe9;
    border: 1px solid #FFCCC9;
 }
-.DismissMessage.Box {
-   background: #fff8ce;
-   border: 1px solid #c5bea4;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-}
-
 
 /* =================================================================== Header */
 #Head {
@@ -581,7 +577,7 @@ body #Head h1 {
 
 /* Option (dropdown) Menus */
 .OptionsMenu {
-   display: inline-block;
+   float: right;
    font-size: 10px;
    font-weight: normal;
    line-height: 100%;
@@ -593,29 +589,21 @@ body #Head h1 {
    visibility: visible;
 }
 .OptionsTitle {
-   border: solid 1px transparent;
-   border-radius: 2px;
    user-select: none;
-   background: url("images/options-button.png") no-repeat scroll center top;
+   background: url("images/cog-expander.png") no-repeat 0 0;
    color: transparent;
-   height: 16px;
+   height: 28px;
    overflow: hidden;
    padding: 0;
-   width: 22px;
+   width: 20px;
    display: inline-block;
 }
-.Open .OptionsTitle {
-   border-color: #282828 !Important;
-   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   border-bottom-left-radius: 0;
-   border-bottom-right-radius: 0;
-   background-color: #282828 !Important;
-   background-position: center bottom !Important;
+div.Discussion:hover .OptionsTitle:hover,
+.Item:hover .OptionsTitle:hover {
+   background-position: -28px 0;
 }
-div.Discussion:hover .OptionsTitle, .Item:hover .OptionsTitle {
-   border-color: #bbb;
-   background-position: center center;
-   background-color: #efefef;
+.Open .OptionsTitle {
+   background-position: -56px 0 !important;
 }
 
 .MenuTitle {
@@ -645,15 +633,14 @@ div.Discussion:hover .OptionsTitle, .Item:hover .OptionsTitle {
 }
 .MenuItems {
    border: 1px solid #282828;
-   -moz-border-radius-bottomleft:2px;
-   -moz-border-radius-bottomright:2px;
-   -webkit-border-radius-bottom-left:2px;
-   -webkit-border-radius-bottom-right:2px;
-   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+   border-radius:2px;
+   -moz-border-radius:2px;
+   -webkit-border-radius:2px;
+/*   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
    -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
    -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
+*/
    background:none repeat scroll 0 0 #444444;
-   border:1px solid #282828;
    min-width: 125px;
    line-height: 100%;
    font-size: 10px;
@@ -686,7 +673,7 @@ div.Discussion:hover .OptionsTitle, .Item:hover .OptionsTitle {
 }
 
 .OptionsMenu .Flyout {
-   top: 18px;
+   top: 26px;
 }
 
 /* ======================================================== Panels / Sidebars */
@@ -787,7 +774,9 @@ div.Discussion:hover .OptionsTitle, .Item:hover .OptionsTitle {
 .PanelInfo li strong {
    font-weight: normal;
    text-align: left;
-   font-weight: normal;
+}
+.PanelInfo li .LastMessage {
+   float: right;
 }
 .PanelInfo .Meta {
    font-size: 11px;
@@ -986,13 +975,16 @@ a.BigButton:focus {
 .MItem:last-child {
    margin-right: 0;
 }
+.CommentInfo {
+   line-height: 1.5; 
+}
 .DataList .Excerpt {
    font-size: 12px;
 	line-height: 1.4;
 }
 .DataList .Excerpt a {
    color: #333;
-	display: block;
+	/*display: block; Causes links in activity body to become block -linc */
 }
 .DataList .Excerpt p {
 	display: inline;
@@ -1050,12 +1042,6 @@ a.BigButton:focus {
    font-size: 15px;
    font-weight: bold;
 }
-/*
-.Condensed,
-.Condensed li {
-	clear: left;
-}
-*/
 .Condensed .Title,
 .Condensed a.Title {
 	display: inline;
@@ -1149,19 +1135,6 @@ body.Profile ul.Activities {
    float: left;
    overflow: hidden;
 }
-.Preview {
-	background: #fff;
-   color: #000;
-	padding: 4px;
-   border: 1px solid #AAAAAA;;
-   min-height: 100px;
-}
-.CommentForm .Preview {
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px
-}
-
 .Popup .Preview {
 	padding: 8px;
 	margin: 0;
@@ -1169,7 +1142,7 @@ body.Profile ul.Activities {
 body.Post .Popup a.Close {
 	color: #1e79a7;
 }
-.Message{
+.Message {
    clear: left;
    line-height: 140%;
    font-size: 100%;
@@ -1477,10 +1450,40 @@ dl.About dd {
 /* ================================================= CommentForm */
 
 .CommentForm {
-   background: #cfecff;
-   padding: 8px;
-   color: #1E79A7;
+	padding: 2px;
 }
+.CommentForm h2 {
+	color: #000;
+	font-size: 15px;
+	padding: 10px 2px 0;
+}
+.CommentForm form {
+	padding: 2px;
+	background: rgba(0, 0, 0, 0.03);
+}
+.Preview {
+	background: #fff;
+   color: #000;
+	padding: 4px;
+   min-height: 100px;
+}
+.CommentForm .Buttons {
+	position: relative;
+   text-align: right; 
+	margin: 0;
+	padding: 6px;
+}
+.CommentForm .Buttons .Back {
+	left: 6px;
+   position: absolute;
+	line-height: 2.2;
+}
+.CommentForm .WriteButton,
+.CommentForm .PreviewButton,
+.CommentForm .DraftButton {
+	margin: 0 6px;
+}
+
 
 /* ================================================= Tabs, Headings & Footers */
 .Tabs,
@@ -1589,8 +1592,9 @@ dl.About dd {
 
 /* ================================================ Administration Checkboxes */
 .AdminCheck {
-   display: inline-block;
+   float: right;
    vertical-align: top;
+	line-height: 1;
 }
 
 /* ======================================================== Thumbnail Cropper */
@@ -1701,7 +1705,7 @@ div.Popup h1,
 div.Popup h2 {
 	font-size:120%;
 	font-weight:bold;
-	margin-bottom: 0;
+	margin: 0;
 	color: #fff;
 	background: #38abe3;
 	border-bottom: 1px solid #3DB9E5;
@@ -1890,6 +1894,51 @@ div.Popup form ul li label.RadioLabel {
 .Tag.Category a {
    color: #000;
 }
+.Discussion .PageTitle h1 {
+	font-size: 24px;
+	line-height: 1.2;
+}
+/*.ItemDiscussion .MItem {
+	margin: 0;
+}
+.ItemDiscussion .MItem a,
+.ItemDiscussion .Author a {
+	color: #888888;
+   font-size: 12px;
+   font-style: italic;
+	font-weight: normal;
+}
+.ItemDiscussion .Author .ProfileLink {
+	display: none;
+}*/
+.ItemDiscussion .MItem a {
+   font-size: 11px; 
+}
+.ItemDiscussion .Author img {
+	height: 24px;
+	width: 24px;
+}
+.ItemDiscussion .Message {
+	margin-bottom: 5px; /* Consistency with when only h1 starts page */
+	padding: 8px;
+	font-size: 110%;
+	background: #F6F6F6;
+	box-shadow: rgb(215, 215, 215) 0px 0px 2px 0px;
+	border-radius: 1px;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+}
+.DiscussionHeader {
+   padding: 5px 0 9px 0;
+}
+.CommentHeading {
+	font-size: 15px;
+	padding: 10px 0 2px;
+	border-bottom: 1px solid #BEC8CC;
+}
+.BeforeCommentPaging {
+   float: right;
+}
 
 /* ================================================================= Comments */
 body.Discussion #Content {
@@ -1902,20 +1951,26 @@ body.Discussion #Content {
 a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
-   display: inline-block;
-   background: url('images/star_sprite.png') top center no-repeat;
-   height: 22px;
-   width: 22px;
+   float: right;
+   background: url('images/star.png') 0 0 no-repeat;
+   height: 18px;
+   width: 18px;
+	margin: 0 4px;
+	vertical-align: top;
+	overflow: hidden;
+	text-indent: -1000px;
+	font-size: 1px;
 }
-a.Bookmark span,
-a.Bookmarking span {
-   visibility: hidden;
+a.Bookmark:hover {
+	background-position: -18px 0;
 }
-a.Bookmarked {
-   background-position: center center;
+a.Bookmarked,
+a.Bookmarked:hover {
+   background-position: -36px 0;
 }
-a.Bookmarking {
-   background-position: bottom center;
+a.Bookmarking,
+a.Bookmarking:hover {
+   background-position: -54px 0;
 }
 
 /* =============================================== Discussion & Comment Forms */
@@ -2873,10 +2928,9 @@ body.embed .Connect h2 {
 	border-bottom: 1px solid #BEC8CC;
 }
 .EmbedCommentForm {
-   background: #f2f2f2;
+	padding: 0;
    border-top: 1px solid #ffffff;
    border-bottom: 1px solid #BEC8CC;
-   padding: 7px 8px;
 }
 .EmbedCommentForm .TextBox {
 	width: 100%;

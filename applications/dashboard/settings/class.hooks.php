@@ -82,7 +82,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $MessageModule = new MessageModule($Sender, $Message);
             if ($SignInOnly) // Insert special messages even in SignIn popup
                echo $MessageModule;
-            else
+            elseif ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
                $Sender->AddModule($MessageModule);
          }
 			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
@@ -103,6 +103,11 @@ class DashboardHooks implements Gdn_IPlugin {
       // Allow forum embedding
       if (C('Garden.Embed.Allow'))
          $Sender->AddJsFile('js/embed_local.js');
+         
+      // Allow return to mobile site
+		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+		   $Sender->AddAsset('Foot', Wrap(Anchor(T('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
    }
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {

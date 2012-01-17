@@ -167,21 +167,35 @@ class FlaggingPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Create 'Flag' link for comments in a discussion.
+    * Add 'Flag' link for discussions.
     */
-   public function DiscussionController_CommentOptions_Handler($Sender) {      
+   public function DiscussionController_AfterDiscussionMeta_Handler($Sender, $Args) {      
       // Signed in users only. No guest reporting!
-      if (!Gdn::Session()->UserID) return;
+      if (Gdn::Session()->UserID)
+         $this->AddFlagButton($Sender, $Args, 'discussion');
+   }
+   
+   /**
+    * Add 'Flag' link for comments.
+    */
+   public function DiscussionController_InsideCommentMeta_Handler($Sender, $Args) {      
+      // Signed in users only. No guest reporting!
+      if (Gdn::Session()->UserID)
+         $this->AddFlagButton($Sender, $Args);
+   }
+   
+   /**
+    * Output Flag link.
+    */
+   protected function AddFlagButton($Sender, $Args, $Context = 'comment') {
+      $ElementID = ($Context == 'comment') ? $Args['Comment']->CommentID : $Args['Discussion']->DiscussionID;
       
-      $Context = strtolower($Sender->EventArguments['Type']);
-      $ElementID = ($Context == 'comment') ? $Sender->EventArguments['Comment']->CommentID : $Sender->EventArguments['Discussion']->DiscussionID;
-      
-      if (!is_object($Sender->EventArguments['Author'])) {
+      if (!is_object($Args['Author'])) {
          $ElementAuthorID = 0;
          $ElementAuthor = 'Unknown';
       } else {
-         $ElementAuthorID = $Sender->EventArguments['Author']->UserID;
-         $ElementAuthor = $Sender->EventArguments['Author']->Name;
+         $ElementAuthorID = $Args['Author']->UserID;
+         $ElementAuthor = $Args['Author']->Name;
       }
       switch ($Context) {
          case 'comment':
@@ -189,19 +203,15 @@ class FlaggingPlugin extends Gdn_Plugin {
             break;
             
          case 'discussion':
-            $URL = "/discussion/{$ElementID}/".Gdn_Format::Url($Sender->EventArguments['Discussion']->Name);
+            $URL = "/discussion/{$ElementID}/".Gdn_Format::Url($Args['Discussion']->Name);
             break;
             
          default:
             return;
       }
       $EncodedURL = str_replace('=','-',base64_encode($URL));
-      $Sender->Options .= '<span class="MItem">'.Anchor(T('Flag'), "discussion/flag/{$Context}/{$ElementID}/{$ElementAuthorID}/".Gdn_Format::Url($ElementAuthor)."/{$EncodedURL}", 'FlagContent Popup') . '</span>';
-   }
-   
-   // Note: Mark added this slick code. Tim does not approve.
-   public function PostController_CommentOptions_Handler($Sender) {
-      $this->DiscussionController_CommentOptions_Handler($Sender);
+      $FlagLink = Anchor(T('Flag'), "discussion/flag/{$Context}/{$ElementID}/{$ElementAuthorID}/".Gdn_Format::Url($ElementAuthor)."/{$EncodedURL}", 'FlagContent Popup');
+      echo Wrap($FlagLink, 'span', array('class' => 'MItem CommentFlag'));
    }
    
    /**

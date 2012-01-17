@@ -1051,7 +1051,7 @@ class DiscussionModel extends VanillaModel {
             ) d
               on c.CategoryID = d.CategoryID
             set 
-               c.CountDiscussions = coalesce(d.CountDiscussions, 0)
+               c.CountDiscussions = coalesce(d.CountDiscussions, 0),
                c.CountComments = coalesce(d.CountComments, 0)";
 			$Sql = str_replace(':_', $this->Database->DatabasePrefix, $Sql);
 			$this->Database->Query($Sql, $Params, 'DiscussionModel_UpdateDiscussionCount');

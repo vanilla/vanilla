@@ -255,6 +255,7 @@ class ProfileController extends Gdn_Controller {
       
       // Define gender dropdown options
       $this->GenderOptions = array(
+         'u' => T('Unspecified'),
          'm' => T('Male'),
          'f' => T('Female')
       );
@@ -339,12 +340,20 @@ class ProfileController extends Gdn_Controller {
     * @since 2.0.?
     * @access public
     */
-   public function NoMobile() {
-      $Expiration = time() + 172800;
-      $Expire = 0;
-      $UserID = ((Gdn::Session()->IsValid()) ? Gdn::Session()->UserID : 0);
-      $KeyData = $UserID."-{$Expiration}";
-      Gdn_CookieIdentity::SetCookie('VanillaNoMobile', $KeyData, array($UserID, $Expiration, 'force'), $Expire);
+   public function NoMobile($Unset = 0) {
+      if ($Unset == 1) {
+         // Allow mobile again
+         Gdn_CookieIdentity::DeleteCookie('VanillaNoMobile');
+      }
+      else {
+         // Set 48-hour "no mobile" cookie
+         $Expiration = time() + 172800;
+         $Expire = 0;
+         $UserID = ((Gdn::Session()->IsValid()) ? Gdn::Session()->UserID : 0);
+         $KeyData = $UserID."-{$Expiration}";
+         Gdn_CookieIdentity::SetCookie('VanillaNoMobile', $KeyData, array($UserID, $Expiration, 'force'), $Expire);
+      }
+      
       Redirect("/", 302);
    }
    

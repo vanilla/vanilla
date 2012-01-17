@@ -94,8 +94,11 @@ class AllViewedPlugin extends Gdn_Plugin {
       // Only for members
       if(!Gdn::Session()->IsValid()) return;
       
-      // Recalculate New count with user's DateAllViewed
-      $DateAllViewed = Gdn_Format::ToTimestamp(Gdn::Session()->User->DateAllViewed);
+      // Get user's DateAllViewed (work around user caching by querying directly)
+      $UserData = $Sender->SQL->Select('DateAllViewed')->From('User')->Where('UserID', Gdn::Session()->UserID)->Get()->FirstRow();
+      $DateAllViewed = Gdn_Format::ToTimestamp(GetValue('DateAllViewed', $UserData));
+      
+      // Recalculate New count with user's DateAllViewed      
       foreach($Sender->EventArguments['Data']->Result() as $Discussion) {
 		   if ($DateAllViewed != 0) { 
             // They've used AllViewed at least once

@@ -12,8 +12,8 @@ echo '<!-- Page Title -->
 
 echo '<div class="Options">';
 
-WriteDiscussionOptions();
 WriteBookmarkLink();
+WriteDiscussionOptions();
 WriteAdminCheck();
 
 echo '</div>';
@@ -31,7 +31,8 @@ if ($this->Data('Page') == 1) {
 }
 
 // Write the comments.
-
+echo '<span class="BeforeCommentPaging">'.$this->Pager->ToString('more').'</span>';
+echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
 
 $Session = Gdn::Session(); 
 ?>
@@ -49,28 +50,4 @@ if($this->Pager->LastPage()) {
 
 echo $this->Pager->ToString('more');
 
-// Write out the comment form
-if ($this->Discussion->Closed == '1') {
-   ?>
-   <div class="Foot Closed">
-      <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
-      <?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
-   </div>
-   <?php
-} else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->PermissionCategoryID)) {
-   echo $this->FetchView('comment', 'post');
-} else if ($Session->IsValid()) { ?>
-   <div class="Foot Closed">
-      <div class="Note Closed"><?php echo T('Commenting not allowed.'); ?></div>
-      <?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
-   </div>
-   <?php
-} else {
-   ?>
-   <div class="Foot">
-      <?php
-      echo Anchor(T('Add a Comment'), SignInUrl($this->SelfUrl.(strpos($this->SelfUrl, '?') ? '&' : '?').'post#Form_Body'), 'TabLink'.(SignInPopup() ? ' SignInPopup' : ''));
-      ?> 
-   </div>
-   <?php 
-}
+WriteCommentForm();

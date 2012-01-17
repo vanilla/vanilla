@@ -4,7 +4,7 @@ if (!function_exists('WriteComment'))
    include $this->FetchViewLocation('helper_functions', 'discussion');
 
 // Wrap the discussion related content in a div.
-echo '<div class="Discussion '.CssClass($this->Data('Discussion')).'">';
+echo '<div class="MessageList Discussion '.CssClass($this->Data('Discussion')).'">';
 
 // Write the page title.
 echo '<!-- Page Title -->
@@ -35,7 +35,7 @@ if ($this->Data('Page') == 1) {
 
 $Session = Gdn::Session(); 
 ?>
-<ul class="DataList Comments">
+<ul class="MessageList DataList Comments">
    <?php include $this->FetchViewLocation('comments'); ?>
 </ul>
 <?php

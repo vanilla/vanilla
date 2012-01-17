@@ -234,13 +234,6 @@ function WriteCommentOptions($Comment) {
 			return;
 
       echo '<div class="Options">';
-         if (C('Vanilla.AdminCheckboxes.Use')) {
-   		   if (!property_exists($Controller, 'CheckedComments'))
-   				$Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
-   	
-   			$ItemSelected = InSubArray($Id, $Controller->CheckedComments);
-   			echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
-			}
 		   echo '<span class="ToggleFlyout OptionsMenu">';
 				echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
 				echo '<ul class="Flyout MenuItems" style="display: none;">';
@@ -249,6 +242,13 @@ function WriteCommentOptions($Comment) {
 					}
 				echo '</ul>';
 			echo '</span>';
+         if (C('Vanilla.AdminCheckboxes.Use')) {
+   		   if (!property_exists($Controller, 'CheckedComments'))
+   				$Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
+   	
+   			$ItemSelected = InSubArray($Id, $Controller->CheckedComments);
+   			echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+			}
       echo '</div>';
    //}
 }

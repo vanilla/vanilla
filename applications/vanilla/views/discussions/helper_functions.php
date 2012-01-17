@@ -232,6 +232,16 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       // Allow plugins to add options
       $Sender->FireEvent('DiscussionOptions');
       
+      if ($Sender->Options != '') {
+      ?>
+         <span class="ToggleFlyout OptionsMenu">
+            <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
+            <ul class="Flyout MenuItems">
+               <?php echo $Sender->Options; ?>
+            </ul>
+         </span><?php
+      }
+
       // Bookmark link
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(
@@ -242,16 +252,6 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
          'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
-      
-      if ($Sender->Options != '') {
-      ?>
-         <span class="ToggleFlyout OptionsMenu">
-            <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
-            <ul class="Flyout MenuItems">
-               <?php echo $Sender->Options; ?>
-            </ul>
-         </span><?php
-      }
       
       // Admin check.
       if ($Sender->CanEditDiscussions) {

@@ -139,7 +139,7 @@ class LogController extends DashboardController {
       parent::Initialize();
       $this->AddJsFile('log.js');
       $this->AddJsFile('jquery.expander.js');
-      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
    }
    
    /**

@@ -1236,13 +1236,16 @@ pre code {
 .Message ul li {
   list-style: disc !important;
 }
-
+.Comment .Message {
+   padding-top: 4px;
+}
 .Message .ImageResized {
 	font-size: 11px;
 	font-weight: normal;
 	cursor: pointer;
 	margin-bottom: 10px;
 }
+
 /* The "Foot" is at the bottom of the #Content section. Used for more results
 links, sign in buttons, etc */
 .Foot {

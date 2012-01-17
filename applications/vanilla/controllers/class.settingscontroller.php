@@ -425,7 +425,6 @@ class SettingsController extends Gdn_Controller {
       // Set up head
       $this->AddSideMenu('vanilla/settings/managecategories');
       $this->AddJsFile('categories.js');
-//       $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('js/library/jquery.alphanumeric.js');
       $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');
       $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery.ui.nestedSortable.js');

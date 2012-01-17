@@ -51,7 +51,7 @@ class DiscussionController extends VanillaController {
    public function Index($DiscussionID = '', $DiscussionStub = '', $Page = '') {
       // Setup head
       $Session = Gdn::Session();
-      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('options.js');
       $this->AddJsFile('bookmark.js');
@@ -650,7 +650,7 @@ ul.MessageList li.Item { background: #fff; }
 ul.MessageList li.Item.Mine { background: #E3F4FF; }
 </style>');
       $Session = Gdn::Session();
-      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('options.js');

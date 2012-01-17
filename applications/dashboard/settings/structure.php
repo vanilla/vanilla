@@ -85,6 +85,7 @@ $Construct
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
+   ->Column('Verified', 'tinyint(1)', '0') // user if verified as a non-spammer
    ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);

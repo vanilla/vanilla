@@ -192,6 +192,10 @@ function WriteDiscussionOptions($Discussion = NULL) {
 
 function GetCommentOptions($Comment = NULL) {
 	$Options = array();
+   
+   if (!is_numeric(GetValue('CommentID', $Comment)))
+      return $Options;
+   
    $Sender = Gdn::Controller();
    $Session = Gdn::Session();
 	$Discussion = Gdn::Controller()->Data('Discussion');

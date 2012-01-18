@@ -575,9 +575,23 @@ body #Head h1 {
    color: #299fc7;
 }
 
-/* Option (dropdown) Menus */
+/* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
+.Options {
+	float: right;
+}
+.CategoryLink {
+   padding: 2px 4px;
+   font-size: 11px;
+   background: #CFECFF; /*#F6F6F6;*/
+   box-shadow: #ABDAFB 0px 0px 2px 0px;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   border-radius: 1px;
+}
+.PageTitle .Options {
+	height: 10px;
+}
 .OptionsMenu {
-   float: right;
    font-size: 10px;
    font-weight: normal;
    line-height: 100%;
@@ -597,6 +611,7 @@ body #Head h1 {
    padding: 0;
    width: 20px;
    display: inline-block;
+	vertical-align: top;
 }
 div.Discussion:hover .OptionsTitle:hover,
 .Item:hover .OptionsTitle:hover {
@@ -671,10 +686,38 @@ div.Discussion:hover .OptionsTitle:hover,
    display: none;
    z-index: 100;
 }
-
 .OptionsMenu .Flyout {
-   top: 26px;
+   top: 21px;
 }
+a.Bookmark,
+a.Bookmarked,
+a.Bookmarking {
+	display: inline-block;
+   background: url('images/star.png') 0 0 no-repeat;
+   height: 18px;
+   width: 18px;
+	margin: 0 4px;
+	vertical-align: top;
+	overflow: hidden;
+	text-indent: -1000px;
+	font-size: 1px;
+}
+a.Bookmark:hover {
+	background-position: -18px 0;
+}
+a.Bookmarked,
+a.Bookmarked:hover {
+   background-position: -36px 0;
+}
+a.Bookmarking,
+a.Bookmarking:hover {
+   background-position: -54px 0;
+}
+.AdminCheck {
+   vertical-align: top;
+	line-height: 1;
+}
+
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
@@ -942,9 +985,6 @@ a.BigButton:focus {
 .DataList .Item .Item {
    border-bottom: none;
 }
-.Options {
-	float: right;
-}
 .DataList a.Title {
    display: block;
    margin: 0;
@@ -1196,13 +1236,16 @@ pre code {
 .Message ul li {
   list-style: disc !important;
 }
-
+.Comment .Message {
+   padding-top: 4px;
+}
 .Message .ImageResized {
 	font-size: 11px;
 	font-weight: normal;
 	cursor: pointer;
 	margin-bottom: 10px;
 }
+
 /* The "Foot" is at the bottom of the #Content section. Used for more results
 links, sign in buttons, etc */
 .Foot {
@@ -1590,13 +1633,6 @@ dl.About dd {
 	font-size: 11px;
 }
 
-/* ================================================ Administration Checkboxes */
-.AdminCheck {
-   float: right;
-   vertical-align: top;
-	line-height: 1;
-}
-
 /* ======================================================== Thumbnail Cropper */
 form.Thumbnail table {
    width: 100%;
@@ -1943,34 +1979,6 @@ div.Popup form ul li label.RadioLabel {
 /* ================================================================= Comments */
 body.Discussion #Content {
    margin-bottom: 20px;
-}
-/*
-  Note: Discussion & Comment Option (dropdown) Menu customizations. The layout
-  css for these is in /applications/garden/design/menu.css. Override them here.
-*/
-a.Bookmark,
-a.Bookmarked,
-a.Bookmarking {
-   float: right;
-   background: url('images/star.png') 0 0 no-repeat;
-   height: 18px;
-   width: 18px;
-	margin: 0 4px;
-	vertical-align: top;
-	overflow: hidden;
-	text-indent: -1000px;
-	font-size: 1px;
-}
-a.Bookmark:hover {
-	background-position: -18px 0;
-}
-a.Bookmarked,
-a.Bookmarked:hover {
-   background-position: -36px 0;
-}
-a.Bookmarking,
-a.Bookmarking:hover {
-   background-position: -54px 0;
 }
 
 /* =============================================== Discussion & Comment Forms */

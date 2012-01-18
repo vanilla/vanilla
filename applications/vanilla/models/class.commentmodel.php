@@ -740,10 +740,12 @@ class CommentModel extends VanillaModel {
             if (!$UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID))
                continue;
             
+            $HeadlineFormatBak = $Activity['HeadlineFormat'];
             $Activity['HeadlineFormat'] = T('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
             
             $Activity['NotifyUserID'] = $User->UserID;
             $ActivityModel->Queue($Activity, 'Mention');
+            $Activity['HeadlineFormat'] = $HeadlineFormatBak;
          }
          
          // Notify users who have bookmarked the discussion.

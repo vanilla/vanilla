@@ -8,13 +8,11 @@
       echo '<li>';
 
       if (GetValue('Deleted', $User))
-         echo Wrap(UserAnchor($User, 'UserLink'), 'del',
+         echo Wrap(UserPhoto($User, array('ImageClass' => 'ProfilePhotoSmall')).' '.UserAnchor($User, 'UserLink'), 'del',
             array('title' => sprintf(T('%s has left this conversation.'), htmlspecialchars(GetValue('Name', $User))))
             );
       else
-         echo Wrap(UserAnchor($User, 'UserLink'), 'strong');
-      
-      echo Wrap(Gdn_Format::Date($User->DateLastActive), 'span', array('class' => 'LastMessage'));
+         echo UserPhoto($User, array('ImageClass' => 'ProfilePhotoSmall')).' '.UserAnchor($User, 'UserLink');
 
       echo '</li>';
    }

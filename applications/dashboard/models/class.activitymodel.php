@@ -846,6 +846,12 @@ class ActivityModel extends Gdn_Model {
       $this->Validation->ApplyRule('InsertUserID', 'Required');
       
       if ($this->Validate($Activity)) {
+         // Check for spam.
+         $Spam = SpamModel::IsSpam('ActivityComment', $Activity);
+         if ($Spam)
+            return SPAM;
+         
+         
          $ID = $this->SQL->Insert('ActivityComment', $Activity);
          return $ID;
       }
@@ -1077,12 +1083,20 @@ class ActivityModel extends Gdn_Model {
          if (!$Delete) {
             $this->AddInsertFields($Activity);
             TouchValue('DateUpdated', $Activity, $Activity['DateInserted']);
+            
+            if (GetValue('CheckSpam', $Options)) {
+               $Spam = SpamModel::IsSpam('Activity', $Activity);
+               if ($Spam)
+                  return SPAM;
+            }
+            
             $ActivityID = $this->SQL->Insert('Activity', $Activity);
             $Activity['ActivityID'] = $ActivityID;
          }
       } else {
          $Activity['DateUpdated'] = Gdn_Format::ToDateTime();
          unset($Activity['ActivityID']);
+         
          $this->SQL->Put('Activity', $Activity, array('ActivityID' => $ActivityID));
          $Activity['ActivityID'] = $ActivityID;
       }

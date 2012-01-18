@@ -19,11 +19,12 @@ function WriteBookmarkLink() {
    $Discussion = Gdn::Controller()->Data('Discussion');
 
    // Bookmark link
+	$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
    echo Anchor(
-      T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'),
+      $Title,
       '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
       'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-      array('title' => T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
+      array('title' => $Title)
    );
 }
 
@@ -178,15 +179,12 @@ function WriteDiscussionOptions($Discussion = NULL) {
       return;
    
    echo '<span class="ToggleFlyout OptionsMenu">';
-   
-   echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
-   
-   echo '<ul class="Flyout MenuItems" style="display: none;">';
-   foreach ($Options as $Code => $Option) {
-      echo '<li>'.Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)).'</li>';
-   }
-   echo '</ul>';
-   
+		echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
+		echo '<ul class="Flyout MenuItems">';
+		foreach ($Options as $Code => $Option) {
+			echo '<li>'.Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)).'</li>';
+		}
+		echo '</ul>';
    echo '</span>';
 }
 

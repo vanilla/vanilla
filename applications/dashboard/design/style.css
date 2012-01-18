@@ -596,12 +596,14 @@ body #Head h1 {
    font-weight: normal;
    line-height: 100%;
 }
+/*
 .Item .OptionsMenu {
    visibility: hidden;
 }
 .Open.OptionsMenu, .Item:hover .OptionsMenu {
    visibility: visible;
 }
+*/
 .OptionsTitle {
    user-select: none;
    background: url("images/cog-expander.png") no-repeat 0 0;
@@ -1956,13 +1958,7 @@ div.Popup form ul li label.RadioLabel {
 }
 .ItemDiscussion .Message {
 	margin-bottom: 5px; /* Consistency with when only h1 starts page */
-	padding: 8px;
 	font-size: 110%;
-	background: #F6F6F6;
-	box-shadow: rgb(215, 215, 215) 0px 0px 2px 0px;
-	border-radius: 1px;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
 }
 .DiscussionHeader {
    padding: 5px 0 9px 0;

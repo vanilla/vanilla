@@ -558,46 +558,42 @@ jQuery(document).ready(function($) {
    };
    $('.Hijack').live('click', hijackClick);
 
-   $.fn.openToggler = function() {
-      var lastOpen = null;
+   // Activate ToggleFlyout menus
+   var lastOpen = null;
+   $(document).delegate('.ToggleFlyout', 'click', function() {
+      var $flyout = $('.Flyout', this);
       
-     $(this).click(function() {
-        var $flyout = $('.Flyout', this);
-
-        // Dynamically fill the flyout.
-        var rel = $(this).attr('rel');
-        if (rel) {
-           $(this).attr('rel', '');
-           $flyout.addClass('Progress');
-            $.ajax({
-               url: gdn.url(rel),
-               data: {DeliveryType: 'VIEW'},
-               success: function(data) {
-                  $flyout.html(data);
-               },
-               complete: function() {
-                  $flyout.removeClass('Progress');
-               }
-            });
-        }
-
-        if ($flyout.css('display') == 'none') {
-           if (lastOpen != null) {
-              $('.Flyout', lastOpen).hide();
-              $(lastOpen).removeClass('Open');
-           }
-           
-           $(this).addClass('Open')
-           $flyout.show();
-           
-           lastOpen = this;
-        } else {
-           $flyout.hide()
-           $(this).removeClass('Open');
-        }
-     });
-   }
-   $('.ToggleFlyout').openToggler();
+      // Dynamically fill the flyout.
+      var rel = $(this).attr('rel');
+      if (rel) {
+         $(this).attr('rel', '');
+         $flyout.addClass('Progress');
+         $.ajax({
+            url: gdn.url(rel),
+            data: {DeliveryType: 'VIEW'},
+            success: function(data) {
+               $flyout.html(data);
+            },
+            complete: function() {
+               $flyout.removeClass('Progress');
+            }
+         });
+      }
+      
+      if ($flyout.css('display') == 'none') {
+         if (lastOpen != null) {
+            $('.Flyout', lastOpen).hide();
+            $(lastOpen).removeClass('Open');
+         }
+        
+         $(this).addClass('Open')
+         $flyout.show();
+         lastOpen = this;
+      } else {
+         $flyout.hide()
+         $(this).removeClass('Open');
+      }
+   });
    
    // Add a spinner onclick of buttons with this class
    $('input.SpinOnClick').live('click', function() {

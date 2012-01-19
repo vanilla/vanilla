@@ -622,7 +622,7 @@ div.Discussion:hover .OptionsTitle:hover,
 .Open .OptionsTitle {
    background-position: -56px 0 !important;
 }
-
+/*
 .MenuTitle {
    color: #000;
    border: 1px solid #bbb;
@@ -648,6 +648,7 @@ div.Discussion:hover .OptionsTitle:hover,
    border-bottom-left-radius: 0;
    border-bottom-right-radius: 0;
 }
+*/
 .MenuItems {
    border: 1px solid #282828;
    border-radius:2px;

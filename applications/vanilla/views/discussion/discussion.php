@@ -3,11 +3,16 @@
 $Discussion = $this->Data('Discussion');
 $Author = UserBuilder($Discussion, 'Insert');
 
+// Prep event args
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
 
+// DEPRECATED ARGUMENTS (as of 2.1)
+$this->EventArguments['Object'] = &$Discussion; 
+$this->EventArguments['Type'] = 'Discussion';
+
 ?>
-<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="Item ItemDiscussion">
+<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo CssClass($Discussion); ?>">
    <div class="DiscussionHeader">
       <div class="Meta">
          <span class="Author">

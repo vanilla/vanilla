@@ -475,7 +475,7 @@ class ActivityModel extends Gdn_Model {
     * @param int $UserID Unique ID of user.
     * @return int Number of notifications.
     */
-   public function GetCountNotifications($UserID) {
+   /*public function GetCountNotifications($UserID) {
       $this->SQL
          ->Select('a.ActivityID', 'count', 'ActivityCount')
          ->From('Activity a')
@@ -488,7 +488,7 @@ class ActivityModel extends Gdn_Model {
          ->Get()
          ->FirstRow()
          ->ActivityCount;
-   }
+   }*/
    
    public function GetComment($ID) {
       $Activity = $this->SQL->GetWhere('ActivityComment', array('ActivityCommentID' => $ID))->ResultArray();
@@ -1103,7 +1103,8 @@ class ActivityModel extends Gdn_Model {
       $Activity['Data'] = $ActivityData;
       
       if ($NotificationInc > 0) {
-         Gdn::UserModel()->SetField($Activity['NotifyUserID'], 'CountNotifications', $NotificationInc);
+         $CountNotifications =  Gdn::UserModel()->GetID($Activity['NotifyUserID'])->CountNotifications + $NotificationInc;
+         Gdn::UserModel()->SetField($Activity['NotifyUserID'], 'CountNotifications', $CountNotifications);
       }
       
       return $Activity;

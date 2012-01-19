@@ -29,44 +29,55 @@ function WriteBookmarkLink() {
 }
 
 /**
- * $Object is either a Comment or the original Discussion.
+ * Outputs a formatted comment to the browser.
+ *
+ * Prior to 2.1, this also output the discussion ("FirstComment") to the browser.
+ * That has moved to the discussion.php view.
+ * 
+ * @param DataSet $Comment.
+ * @param Gdn_Controller $Sender.
+ * @param Gdn_Session $Session.
+ * @param int $CurrentOffet How many comments into the discussion we are (for anchors).
  */
-function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
+function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
+   // Build author
+   $Author = UserBuilder($Comment, 'Insert');
+   
+   // Set CSS classes
+   $CssClass = 'Item ItemComment';
+   $CssClass .= $Comment->InsertUserID == $Session->UserID ? ' Mine' : '';
+   
+   // Alternate comments
    $Alt = ($CurrentOffset % 2) != 0;
-
-   $Author = UserBuilder($Object, 'Insert');
-   //$Type = property_exists($Object, 'CommentID') ? 'Comment' : 'Discussion';
-	$Sender->EventArguments['Object'] = $Object;
-   //$Sender->EventArguments['Type'] = $Type;
-   $Sender->EventArguments['Author'] = $Author;
-   $CssClass = 'Item Comment';
-   $Permalink = GetValue('Url', $Object, FALSE);
-
-   if (!property_exists($Sender, 'CanEditComments'))
-		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
-
-   //if ($Type == 'Comment') {
-      $Sender->EventArguments['Comment'] = $Object;   
-      $Id = 'Comment_'.$Object->CommentID;
-      if ($Permalink === FALSE)
-         $Permalink = '/discussion/comment/'.$Object->CommentID.'/#Comment_'.$Object->CommentID;
-   /*} else {
-      $Sender->EventArguments['Discussion'] = $Object;   
-      $CssClass .= ' FirstComment';
-      $Id = 'Discussion_'.$Object->DiscussionID;
-      if ($Permalink === FALSE)
-         $Permalink = '/discussion/'.$Object->DiscussionID.'/'.Gdn_Format::Url($Object->Name).'/p1';
-   }*/
-   $Sender->EventArguments['CssClass'] = &$CssClass;
-   $Sender->Options = '';
-   $CssClass .= $Object->InsertUserID == $Session->UserID ? ' Mine' : '';
-
    if ($Alt)
       $CssClass .= ' Alt';
    $Alt = !$Alt;
-	
-   $Sender->FireEvent('BeforeCommentDisplay');
-?>
+   
+   // Reset options
+   $Sender->Options = '';
+   
+   // Build permalink
+   $Permalink = GetValue('Url', $Comment, FALSE);
+   $Id = 'Comment_'.$Comment->CommentID;
+   if ($Permalink === FALSE)
+      $Permalink = '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID; 
+   
+   // Set CanEditComments (whether to show checkboxes)
+   if (!property_exists($Sender, 'CanEditComments'))
+		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
+   
+   // Prep event args
+   $Sender->EventArguments['Comment'] = &$Comment;
+   $Sender->EventArguments['Author'] = &$Author;
+   $Sender->EventArguments['CssClass'] = &$CssClass;
+   $Sender->EventArguments['Permalink'] = &$Permalink;
+   
+   // DEPRECATED ARGUMENTS (as of 2.1)
+	$Sender->EventArguments['Object'] = &$Comment; 
+   $Sender->EventArguments['Type'] = 'Comment';
+   
+   // First comment template event; best place to modify Options array
+   $Sender->FireEvent('BeforeCommentDisplay'); ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">
    <div class="Comment">
       <div class="Meta">
@@ -78,24 +89,25 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
             ?>
          </span>
          <span class="MItem DateCreated">
-            <?php
-            echo Anchor(Gdn_Format::Date($Object->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow'));
-            ?>
+            <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
          </span>
          <?php
-         if ($Source = GetValue('Source', $Object)) {
+         // Include source if one was set
+         if ($Source = GetValue('Source', $Comment))
             echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
-         }
+         
+         // Add your own options or data as spans with 'MItem' class
          $Sender->FireEvent('InsideCommentMeta');
          
-			WriteCommentOptions($Object);
+			WriteCommentOptions($Comment);
 			?>
          <div class="CommentInfo">
             <?php
             $Sender->FireEvent('CommentInfo');
-            if ($Session->CheckPermission('Garden.Moderation.Manage')) {
-               echo Wrap(IPAnchor($Object->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
-            }
+            
+            // Include IP Address if we have permission
+            if ($Session->CheckPermission('Garden.Moderation.Manage')) 
+               echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
             ?>
          </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
@@ -103,10 +115,9 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
       <div class="Message">
 			<?php 
             $Sender->FireEvent('BeforeCommentBody'); 
-			   $Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
-			   $Sender->FireEvent('AfterCommentFormat');
-			   $Object = $Sender->EventArguments['Object'];
-			   echo $Object->FormatBody;
+			   $Comment->FormatBody = Gdn_Format::To($Comment->Body, $Comment->Format);
+			   $Sender->FireEvent('AfterCommentFormat'); // Use to override comment formatting
+			   echo $Comment->FormatBody;
 			?>
 		</div>
       <?php $Sender->FireEvent('AfterCommentBody'); ?>

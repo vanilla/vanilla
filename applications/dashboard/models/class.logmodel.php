@@ -110,11 +110,11 @@ class LogModel extends Gdn_Pluggable {
 
    public function FormatKey($Key, $Data) {
       if (isset($Data['_New']) && isset($Data['_New'][$Key])) {
-         $Old = Gdn_Format::Text(GetValue($Key, $Data, ''), FALSE);
-         $New = Gdn_Format::Text($Data['_New'][$Key], FALSE);
+         $Old = htmlspecialchars(GetValue($Key, $Data, ''));
+         $New = htmlspecialchars($Data['_New'][$Key]);
          $Result = $this->FormatDiff($Old, $New);
       } else {
-         $Result = Gdn_Format::Text(GetValue($Key, $Data, ''), FALSE);
+         $Result = htmlspecialchars(GetValue($Key, $Data, ''));
       }
       return nl2br(trim(($Result)));
    }
@@ -414,6 +414,9 @@ class LogModel extends Gdn_Pluggable {
          return;
 
       $In = implode(',', array_keys($DiscussionIDs));
+      if (empty($In))
+         return;
+      
       $Px = Gdn::Database()->DatabasePrefix;
       $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
       Gdn::Database()->Query($Sql);
@@ -442,7 +445,15 @@ class LogModel extends Gdn_Pluggable {
                continue;
             
             $this->_RestoreOne($LogRow, $DeleteLog);
-         }  
+         }
+      }
+      // Check for child data.
+      if (isset($Log['_Data'])) {
+         $Data = $Log['_Data'];
+         foreach ($Data as $RecordType => $Row) {
+            $LogRow = array_merge($Log, array('RecordType' => $RecordType, 'Data' => $Row));
+            $this->_RestoreOne($LogRow, FALSE);
+         }
       }
    }
    

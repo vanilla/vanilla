@@ -66,18 +66,22 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @access public
     */
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-      // Add a "send X a message" link to the side menu on the profile page
       $Session = Gdn::Session();
-      if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID) {
+      if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID && C('Conversations.Moderation.Allow', FALSE)) {
          $SideMenu = $Sender->EventArguments['SideMenu'];
-         $SideMenu->AddLink('Options', sprintf(T('Send %s a Message'), $Sender->User->Name), '/messages/add/'.$Sender->User->Name, FALSE, array('class' => 'MessageLink'));
-
-         if (C('Conversations.Moderation.Allow', FALSE)) {
-            $SideMenu->AddLink('Options', T('Inbox'), '/messages/inbox?userid='.$Sender->User->UserID, 'Conversations.Moderation.Manage', array('class' => 'InboxLink'));
-         }
-
+         $SideMenu->AddLink('Options', T('Inbox'), '/messages/inbox?userid='.$Sender->User->UserID, 'Conversations.Moderation.Manage', array('class' => 'InboxLink'));
          $Sender->EventArguments['SideMenu'] = $SideMenu;
       }
+   }
+   
+   /**
+    * Add "Message" option to profile options.
+    */
+   public function ProfileController_BeforeProfileOptions_Handler($Sender) {
+      // Add a "send X a message" link to the side menu on the profile page
+      $Session = Gdn::Session();
+      if (!$Controller->EditMode && $Session->IsValid() && $Session->UserID != $Sender->User->UserID)
+         echo ' '.Anchor(T('Message'), '/messages/add/'.$Sender->User->Name, 'Button').' ';
    }
    
    /**

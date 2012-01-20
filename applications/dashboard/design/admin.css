@@ -383,6 +383,7 @@ a.Button {
 .TinyProgress {
 	padding: 10px 40px 10px 0 !important;
 	background: url('images/progress_sm.gif') center center no-repeat;
+   display: inline !Important;
 }
 .InProgress {
    color: transparent !Important;
@@ -1224,7 +1225,7 @@ div.Popup div.Messages {
 	margin: 10px 0 !important;
 }
 div.Popup div.Warning {
-	margin: 10px 0 0;
+	margin: 10px 0;
 }
 div.Popup div.Messages ul {
 	display: block;

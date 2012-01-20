@@ -80,7 +80,7 @@ class ConversationsHooks implements Gdn_IPlugin {
    public function ProfileController_BeforeProfileOptions_Handler($Sender) {
       // Add a "send X a message" link to the side menu on the profile page
       $Session = Gdn::Session();
-      if (!$Controller->EditMode && $Session->IsValid() && $Session->UserID != $Sender->User->UserID)
+      if (!$Sender->EditMode && $Session->IsValid() && $Session->UserID != $Sender->User->UserID)
          echo ' '.Anchor(T('Message'), '/messages/add/'.$Sender->User->Name, 'Button').' ';
    }
    

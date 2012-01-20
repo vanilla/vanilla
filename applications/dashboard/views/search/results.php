@@ -13,18 +13,17 @@ if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 				echo Anchor(nl2br(SliceString(Gdn_Format::Text($Row->Summary, FALSE), 250)), $Row->Url);
 			?></div>
 			<div class="Meta">
-				<span><?php printf(T('by %s'), UserAnchor($Row)); ?></span>
-				<span><?php echo Gdn_Format::Date($Row->DateInserted); ?></span>
+				<span class="MItem"><?php printf(T('by %s'), UserAnchor($Row)); ?></span>
+				<span class="MItem"><?php echo Anchor(Gdn_Format::Date($Row->DateInserted), $Row->Url); ?></span>
             <?php
             if (isset($Row->CategoryID)) {
                $Category = CategoryModel::Categories($Row->CategoryID);
                if ($Category !== NULL) {
                   $Url = Url('categories/'.$Category['UrlCode']);
-                  echo "<span><a class='Category' href='{$Url}'>{$Category['Name']}</a></span>";
+                  echo '<span class="MItem"><a class="Category" href="'.$Url.'">'.$Category['Name'].'</a></span>';
                }
             }
             ?>
-				<span><?php echo Anchor(T('permalink'), $Row->Url); ?></span>
 			</div>
 		</div>
 	</li>

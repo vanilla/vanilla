@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+include $this->FetchViewLocation('helper_functions');
 
 PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 ?>
@@ -17,6 +18,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
          $RecordLabel = GetValueR('Data.Type', $Row);
          if (!$RecordLabel)
             $RecordLabel = $Row['RecordType'];
+         $RecordLabel = Gdn_Form::LabelCode($RecordLabel);
 
       ?>
       <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
@@ -49,6 +51,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                echo '<span class="Tags">';
                echo '<span class="Tag Tag-'.$Row['Operation'].'">'.T($Row['Operation']).'</span> ';
                echo '<span class="Tag Tag-'.$RecordLabel.'">'.Anchor(T($RecordLabel), $Url).'</span> ';
+               
                echo '</span>';
 
                if ($Row['RecordIPAddress']) {
@@ -73,6 +76,9 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                      UserAnchor($Row, 'Meta-Value', 'Record'),
                      '</span> ';
                }
+               
+               // Write the other record counts.
+               echo OtherRecordsMeta($Row['Data']);
 
                // Write custom meta information.
                $CustomMeta = GetValueR('Data._Meta', $Row, FALSE);
@@ -88,6 +94,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
               
                echo '</div>';
             ?>
+            
          </td>
          <td class="DateCell"><?php
             echo Gdn_Format::Date($Row['DateInserted'], 'html');

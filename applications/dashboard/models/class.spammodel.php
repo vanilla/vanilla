@@ -73,6 +73,8 @@ class SpamModel extends Gdn_Pluggable {
                break;
             case 'Comment':
             case 'Discussion':
+            case 'Activity':
+            case 'ActivityComment':
                $LogOptions['GroupBy'] = array('RecordID');
                break;
          }

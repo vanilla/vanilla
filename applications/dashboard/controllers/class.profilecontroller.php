@@ -917,8 +917,9 @@ class ProfileController extends Gdn_Controller {
 		
 		// Show edit menu if in edit mode
 		// Show profile pic & filter menu otherwise
+      $SideMenu = new SideMenuModule($this);
+      $this->EventArguments['SideMenu'] = &$SideMenu; // Doing this out here for backwards compatibility.
 		if ($this->EditMode) {
-         $SideMenu = new SideMenuModule($this);
          $SideMenu->HtmlId = 'UserOptions';
 			$SideMenu->AutoLinkGroups = FALSE;
          $Session = Gdn::Session();
@@ -974,7 +975,6 @@ class ProfileController extends Gdn_Controller {
             }
          }
             
-         $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('AfterAddSideMenu');
          $this->AddModule($SideMenu, 'Panel');
       } else {

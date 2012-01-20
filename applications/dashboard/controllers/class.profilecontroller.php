@@ -826,7 +826,7 @@ class ProfileController extends Gdn_Controller {
          }
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0) {
-            // Redirect('dashboard/profile/'.$this->ProfileUrl());
+            Redirect('dashboard/profile/picture/'.$this->ProfileUrl());
 				$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
          }
       }

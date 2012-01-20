@@ -1483,8 +1483,8 @@ form.Thumbnail .Warning {
    -webkit-border-radius: 3px;
 }
 /* Discussions & Comments in user profile */
-.DataList.Discussions li:first-child,
-.DataList.SearchResults li:first-child {
+.Profile .DataList.Discussions li:first-child,
+.Profile .DataList.SearchResults li:first-child {
 	border-top: 1px solid #BEC8CC;
 }
 

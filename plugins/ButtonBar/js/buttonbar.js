@@ -212,7 +212,6 @@ jQuery(document).ready(function($) {
    
    ButtonBar = {
       AttachTo: function(TextArea) {
-         
          // Load the buttonbar and bind this textarea to it
          var ThisButtonBar = $(TextArea).closest('form').find('.ButtonBar');
          $(ThisButtonBar).data('ButtonBarTarget', TextArea);
@@ -225,7 +224,7 @@ jQuery(document).ready(function($) {
          $(TextArea).data('InputFormat', format);
          
          // Build button UIs
-         $(ThisButtonBar).find('.Button-Wrap').each(function(i, el){
+         $(ThisButtonBar).find('.ButtonWrap').each(function(i, el){
             var Operation = $(el).find('span').text();
             
             var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
@@ -239,9 +238,9 @@ jQuery(document).ready(function($) {
          ButtonBar.BindShortcuts(TextArea);
          
          // Attach events
-         $(ThisButtonBar).find('.Button-Wrap').mousedown(function(event){
+         $(ThisButtonBar).find('.ButtonWrap').mousedown(function(event){
             var MyButtonBar = $(event.target).closest('.ButtonBar');
-            var Button = $(event.target).find('span').closest('.Button-Wrap');
+            var Button = $(event.target).find('span').closest('.ButtonWrap');
             if ($(Button).hasClass('ButtonOff')) return;
             
             var TargetTextArea = $(MyButtonBar).data('ButtonBarTarget');
@@ -286,7 +285,7 @@ jQuery(document).ready(function($) {
       },
       
       DisableButton: function(ButtonBarObj, Operation) {
-         $(ButtonBarObj).find('.Button-Wrap').each(function(i,Button){
+         $(ButtonBarObj).find('.ButtonWrap').each(function(i,Button){
             var ButtonOperation = $(Button).find('span').text();
             if (ButtonOperation == Operation)
                $(Button).addClass('ButtonOff');

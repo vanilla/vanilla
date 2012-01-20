@@ -74,7 +74,7 @@ jQuery(document).ready(function($) {
       var prefix = discussionID.attr('name').replace('DiscussionID', '');
       discussionID = discussionID.val();
       // Get the last comment id on the page
-      var comments = $('ul.Comments li.Comment');
+      var comments = $('ul.Comments li.ItemComment');
       var lastComment = $(comments).get(comments.length-1);
       var lastCommentID = $(lastComment).attr('id');
       if (lastCommentID)
@@ -254,7 +254,7 @@ jQuery(document).ready(function($) {
    // Edit comment
    $('a.EditComment').livequery('click', function() {
       var btn = this;
-      var container = $(btn).parents('li.Comment');
+      var container = $(btn).parents('li.ItemComment');
       $(container).addClass('Editing');
       var parent = $(container).find('div.Comment');
       var msg = $(parent).find('div.Message');
@@ -300,7 +300,7 @@ jQuery(document).ready(function($) {
       followConfirm: false,
       deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
       afterConfirm: function(json, sender) {
-         var row = $(sender).parents('li.Comment');
+         var row = $(sender).parents('li.ItemComment');
          if (json.ErrorMessage) {
             $.popup({}, json.ErrorMessage);
          } else {

@@ -242,16 +242,16 @@ class ProfileController extends Gdn_Controller {
     * @access public
     * @param mixed $UserReference Username or User ID.
     */
-   public function Edit($UserReference = '') {
+   public function Edit($UserReference = '', $Username = '') {
 		$this->EditMode(TRUE);
       $this->Permission('Garden.SignIn.Allow');
-      $this->GetUserInfo($UserReference);
+      $this->GetUserInfo($UserReference, $Username);
       $Session = Gdn::Session();
       if ($Session->UserID != $this->User->UserID)
          $this->Permission('Garden.Users.Edit');
       
       // Decide if they have ability to edit the username
-      $this->CanEditUsername = Gdn::Config("Garden.Profile.EditUsernames");
+      $this->CanEditUsername = C("Garden.Profile.EditUsernames");
       $this->CanEditUsername = $this->CanEditUsername | $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();
@@ -913,7 +913,7 @@ class ProfileController extends Gdn_Controller {
 			return;
 		
 		// Make sure to add the "Edit Profile" buttons.
-		$this->AddModule('EditProfileModule');
+		$this->AddModule('ProfileOptionsModule');
 		
 		// Show edit menu if in edit mode
 		// Show profile pic & filter menu otherwise

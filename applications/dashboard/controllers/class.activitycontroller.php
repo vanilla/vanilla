@@ -292,7 +292,6 @@ class ActivityController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
-         
          if ($UserID && $UserID != Gdn::Session()->UserID) {
             // This is a wall post.
             $Activity = array(
@@ -310,6 +309,7 @@ class ActivityController extends Gdn_Controller {
                 'Story' => $Data['Comment'],
                 'NotifyUserID' => $NotifyUserID
             );
+            $this->SetJson('StatusMessage', Gdn_Format::Display($Data['Comment']));
          }
          
          $Activity = $this->ActivityModel->Save($Activity, FALSE, array('CheckSpam' => TRUE));
@@ -328,6 +328,7 @@ class ActivityController extends Gdn_Controller {
             ActivityModel::JoinUsers($Activities);
          }
       }
+
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
          Redirect($this->Request->Get('Target', '/activity'));
       }

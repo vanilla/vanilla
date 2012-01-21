@@ -9,22 +9,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Renders a user's photo (if they've uploaded one).
+ * Displays profile options like "Message", "Edit Profile", or "Back to Profile" buttons on the top of the profile page.
  */
-class UserPhotoModule extends Gdn_Module {
-   
-   public $User;
-   
-   public function __construct($Sender = '') {
-      $this->User = FALSE;
-      parent::__construct($Sender);
-   }
+class ProfileOptionsModule extends Gdn_Module {
    
    public function AssetTarget() {
-      return 'Panel';
+      return 'Content';
    }
 
    public function ToString() {
-		return parent::ToString();
+      return parent::ToString();
    }
 }

@@ -664,15 +664,16 @@ div.Discussion:hover .OptionsTitle:hover,
    font-size: 10px;
 	color: #fff;
 }
-.MenuItems li {
+/*.MenuItems li {
    padding: 6px !Important;
-}
+}*/
 .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
    color: #fff;
 	display: block;
 	text-decoration: none;
+	padding: 6px;
 }
-.MenuItems li:hover {
+.MenuItems li a:hover {
    background: #282828;
 }
 .ToggleFlyout {

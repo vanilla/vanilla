@@ -279,7 +279,7 @@ class ProfileController extends Gdn_Controller {
          }
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->GetID($this->User->UserID);
-            $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
+            $this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
             // $this->RedirectUrl = Url('/profile/'.$this->ProfileUrl($User->Name));
          }
       }
@@ -447,7 +447,7 @@ class ProfileController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          
          if ($this->Form->Save()) {
-				$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your password has been changed.'), 'Dismissable AutoDismiss HasSprite');
+				$this->InformMessage(Sprite('Check', 'InformSprite').T('Your password has been changed.'), 'Dismissable AutoDismiss HasSprite');
             $this->Form->ClearInputs();
          }
       }
@@ -539,7 +539,7 @@ class ProfileController extends Gdn_Controller {
          }
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0) {
-				$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
+				$this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
             Redirect($this->DeliveryType() == DELIVERY_TYPE_VIEW ? 'dashboard/profile/'.$this->ProfileUrl() : 'dashboard/profile/picture/'.$this->ProfileUrl());
 				
          }
@@ -665,7 +665,7 @@ class ProfileController extends Gdn_Controller {
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
          UserModel::SetMeta($this->User->UserID, $Meta, 'Preferences.');
-			$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
+			$this->InformMessage(Sprite('Check', 'InformSprite').T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
       }
       $this->Render();
    }
@@ -827,7 +827,7 @@ class ProfileController extends Gdn_Controller {
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0) {
             Redirect('dashboard/profile/picture/'.$this->ProfileUrl());
-				$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
+				$this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
          }
       }
       // Delete the source image if it is externally hosted.
@@ -939,39 +939,39 @@ class ProfileController extends Gdn_Controller {
               $this->AddJsFile('user.js');
             }
             
-            $SideMenu->AddLink('Options', T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
-            $SideMenu->AddLink('Options', T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
+            $SideMenu->AddLink('Options', Sprite('SpEdit').T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
+            $SideMenu->AddLink('Options', Sprite('SpDelete').T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
             if ($this->User->Photo != '' && $AllowImages)
-               $SideMenu->AddLink('Options', T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$Session->TransientKey(), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
+               $SideMenu->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$Session->TransientKey(), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
             
-            $SideMenu->AddLink('Options', T('Edit Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
+            $SideMenu->AddLink('Options', Sprite('SpPreferences').T('Edit Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
 
             // Add profile options for everyone
-            $SideMenu->AddLink('Options', T('Change Picture'), '/profile/picture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'PictureLink'));
+            $SideMenu->AddLink('Options', Sprite('SpPicture').T('Change Picture'), '/profile/picture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'PictureLink'));
             if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-               $SideMenu->AddLink('Options', T('Edit Thumbnail'), '/profile/thumbnail/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
+               $SideMenu->AddLink('Options', Sprite('SpThumbnail').T('Edit Thumbnail'), '/profile/thumbnail/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
             }
          } else {
             // Add profile options for the profile owner
             // Don't allow account editing if it has been turned off.
             if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
-				   $SideMenu->AddLink('Options', T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+				   $SideMenu->AddLink('Options', Sprite('SpEdit').T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
                	
 				   // No password may have been set if they have only signed in with a connect plugin
 				   $passwordLabel = T('Change My Password');
 				   if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")
 					   $passwordLabel = T('Set A Password');
-				   $SideMenu->AddLink('Options', $passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
+				   $SideMenu->AddLink('Options', Sprite('SpPassword').$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
             }
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
-               $SideMenu->AddLink('Options', T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));
+               $SideMenu->AddLink('Options', Sprite('SpInvitations').T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));
 
-            $SideMenu->AddLink('Options', T('My Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
+            $SideMenu->AddLink('Options', Sprite('SpPreferences').T('My Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
             if ($AllowImages)
-               $SideMenu->AddLink('Options', T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
+               $SideMenu->AddLink('Options', Sprite('SpPicture').T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
                
             if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-               $SideMenu->AddLink('Options', T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
+               $SideMenu->AddLink('Options', Sprite('SpThumbnail').T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
             }
          }
             
@@ -1022,7 +1022,7 @@ class ProfileController extends Gdn_Controller {
          // Show notifications?
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = T('Notifications');
-				$NotificationsHtml = $Notifications;
+				$NotificationsHtml = Sprite('SpNotifications').$Notifications;
             $CountNotifications = $Session->User->CountNotifications;
             if (is_numeric($CountNotifications) && $CountNotifications > 0)
                $NotificationsHtml .= ' <span class="Count">'.$CountNotifications.'</span>';
@@ -1032,7 +1032,7 @@ class ProfileController extends Gdn_Controller {
          
          // Show activity?
          if (C('Garden.Profile.ShowActivities', TRUE))
-            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
+            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity', Sprite('SpActivity').T('Activity'));
             
          $this->FireEvent('AddProfileTabs');
       }

@@ -728,6 +728,7 @@ a.Bookmarking:hover {
    float: right;
    overflow: hidden;
 }
+/*
 .Box {
    border-radius: 1px;
    -moz-border-radius: 1px;
@@ -743,6 +744,14 @@ a.Bookmarking:hover {
    font-weight: bold;
    margin: 0;
    padding: 0 0 1px;
+}
+*/
+.Box {
+   margin: 0 0 10px;
+}
+.Box h4 {
+   font-size: 110%;
+   font-weight: bold;
 }
 .Box dl {
    overflow: hidden;
@@ -798,9 +807,15 @@ a.Bookmarking:hover {
 .PanelActivity li .Story {
 	font-size: 85%;
 }
+/*
 .PanelInfo li {
    background: #e3f4ff;
    border-bottom: 1px solid #abdafb;
+   padding: 2px 4px;
+}
+*/
+.PanelInfo li {
+   border-bottom: 1px solid rgba(0,0,0,0.1);
    padding: 2px 4px;
 }
 .PanelInfo .Aside {
@@ -810,8 +825,14 @@ a.Bookmarking:hover {
    color: #000;
    font-weight: bold;
 }
+/*
 .PanelInfo {
    border-top: 1px solid #abdafb;
+	border-bottom: 0;
+}
+*/
+.PanelInfo {
+   border-top: 1px solid rgba(0,0,0,0.1);
 	border-bottom: 0;
 }
 .PanelInfo li strong {
@@ -851,11 +872,14 @@ a.Bookmarking:hover {
 	padding: 2px 0;
 }
 .PanelInfo .Active {
-   background: #fff;
+   background: rgba(0,0,0,0.03);
+	font-weight: bold;
 }
+/*
 .PanelInfo .Active a {
    color: #1e79a7;
 }
+*/
 .PanelActivity .ShowAll,
 .PanelInfo .ShowAll {
    font-weight: bold;
@@ -866,6 +890,7 @@ a.Bookmarking:hover {
 #UserOptions {
 	margin-bottom: 10px;
 }
+/*
 body.Profile .PanelInfo {
    border-bottom: 1px solid #abdafb;
 }
@@ -876,6 +901,7 @@ body.Profile .PanelInfo li {
 body.Profile .PanelInfo li a {
    float: none;
 }
+*/
 a.BigButton {
    text-align: center;
    display: block;
@@ -966,6 +992,14 @@ a.BigButton:focus {
 
 /* ================================================ DataList (Search Results) */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
+.SearchForm {
+	background: rgba(0,0,0,0.03);
+	padding: 10px;
+}
+.SearchForm input.InputBox {
+	width: 560px;
+	margin-right: 10px;
+}
 .Empty {
    margin: 10px 0;
 }
@@ -977,13 +1011,16 @@ a.BigButton:focus {
    padding: 8px;
    border: 0;
 	position: relative;
-   border-bottom: 1px solid #bec8cc;
+   border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.DataList .Item:first-child {
+	border-top: 1px solid rgba(0,0,0,0.1);
 }
 .Discussions .Item {
    padding: 4px 8px;
 }
 .DataList .Item .Item {
-   border-bottom: none;
+   border: none;
 }
 .DataList a.Title {
    display: block;
@@ -1099,7 +1136,7 @@ a.BigButton:focus {
 
 body.Profile ul.Activities {
    margin-top: 10px;
-   border-top: 1px solid #ddd;
+   /* border-top: 1px solid #ddd; */
 }
 .Activities li.HasPhoto .Title {
 	padding: 0;
@@ -1136,7 +1173,7 @@ body.Profile ul.Activities {
 	margin-left: 42px;
 }
 .Activities .DataList li {
-	background: #D7E7FF;
+	background: rgba(0,0,0,0.05);
 	margin-bottom: 2px;
 	padding: 6px;
 }
@@ -1247,7 +1284,7 @@ pre code {
 }
 
 /* The "Foot" is at the bottom of the #Content section. Used for more results
-links, sign in buttons, etc */
+links, sign in buttons, etc 
 .Foot {
 	border-bottom: 1px solid #abdafb;
    padding: 6px;
@@ -1269,6 +1306,7 @@ links, sign in buttons, etc */
 	padding: 0 0 0 8px;
 	font-weight: bold;
 }
+*/
 
 /* =============================================================== Categories */
 .ChildCategories {
@@ -1482,11 +1520,6 @@ form.Thumbnail .Warning {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-/* Discussions & Comments in user profile */
-.Profile .DataList.Discussions li:first-child,
-.Profile .DataList.SearchResults li:first-child {
-	border-top: 1px solid #BEC8CC;
-}
 
 
 /* ================================================= CommentForm */
@@ -1528,6 +1561,7 @@ form.Thumbnail .Warning {
 
 
 /* ================================================= Tabs, Headings & Footers */
+/*
 .Tabs,
 .Headings {
 	display: block;
@@ -1550,6 +1584,7 @@ form.Thumbnail .Warning {
    display: inline;
    margin: 0;
 }
+
 .TabLink,
 .TabLink:link,
 .TabLink:hover,
@@ -1576,6 +1611,7 @@ form.Thumbnail .Warning {
    background: #fff;
    color: #474747;
 }
+*/
 .Count {
    background: #444;
    background-color: rgba(0, 0, 0, .6);
@@ -1588,6 +1624,7 @@ form.Thumbnail .Warning {
    font-weight: normal;
    padding: 1px .8ex;
 }
+/*
 .Tabs .SubTab {
 	margin: 10px 0 0;
 	padding: 4px 8px;
@@ -1631,6 +1668,7 @@ form.Thumbnail .Warning {
 .Headings .MetaHeading {
 	font-size: 11px;
 }
+*/
 
 /* =================================================================== Popups */
 .Popup .Info {
@@ -1916,7 +1954,7 @@ body.Discussion #Content {
    margin-bottom: 20px;
 }
 
-/* =============================================== Discussion & Comment Forms */
+/* ================================= Conversation, Discussion & Comment Forms */
 .Editing {
 	background: #E3F4FF;
 }
@@ -1925,13 +1963,16 @@ body.Discussion #Content {
    font-weight: bold;
    color: #666;
 }
-body.Post #Panel {
+body.Conversations.add #Panel,
+body.Vanilla.Post #Panel {
    display: none;
 }
-body.Post #Content {
+body.Conversations.add #Content,
+body.Vanilla.Post #Content {
    width: 100%;
 }
-#DiscussionForm h2 {
+/*
+ #DiscussionForm h2 {
    border: none;
    color: #02475A;
    font-size: 140%;
@@ -1939,17 +1980,12 @@ body.Post #Content {
    margin: 0;
    padding: 6px;
 }
+*/
+#ConversationForm form,
 #DiscussionForm form {
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #CFECFF none repeat scroll 0 0;
-   border: 1px solid #7caccb;
+   background: rgba(0, 0, 0, 0.03);
    margin: 0;
-   padding: 20px;
-}
-#DiscussionForm .Tabs {
-   margin: 0 -20px;
+   padding: 13px 20px 20px;
 }
 #DiscussionForm textarea {
    width: 100%;
@@ -2048,13 +2084,8 @@ textarea.MultiComplete {
 }
 
 /* ==================================================== New Conversation Form */
-body.add #Panel {
-   display: none;
-}
-body.add #Content {
-   width: auto;
-}
-#ConversationForm form {
+/*
+ #ConversationForm form {
    border-radius: 2px;
 	-moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -2073,6 +2104,7 @@ body.add #Content {
 	text-align: left;
 	border: 0;
 }
+*/
 #ConversationForm label {
 	display: block;
 	text-align: left;
@@ -2088,24 +2120,6 @@ body.add #Content {
 }
 body.Conversations a.Cancel {
    margin-left: 20px;
-}
-.Popup #ConversationForm form {
-	background: none;
-   -border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-   border-radius: 0;
-	padding: 10px;
-}
-.Popup #ConversationForm h2 {
-	color: #fff;
-	font-size: 120%;
-	font-weight: bold;
-	padding: 6px 9px 4px;	
-}
-.Popup #ConversationForm textarea.MultiComplete,
-.Popup #ConversationForm .TextBox {
-	width: 100%;
 }
 
 /* Upload Progress Bar */

@@ -28,6 +28,7 @@
    width: 24px;
    z-index: 50;
 }
+#DiscussionForm .TextBoxWrapper,
 .CommentForm .TextBoxWrapper {
    clear: left;
 }

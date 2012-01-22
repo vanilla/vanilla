@@ -1509,6 +1509,19 @@ if (!function_exists('PrefixString')) {
    }
 }
 
+if (!function_exists('PrepareArray')) {
+   /**
+    * Makes sure that the key in question exists and is an array itself
+    * 
+    * @param string $Key Key to prepare
+    * @param array $Array Array to repare
+    */
+   function PrepareArray($Key, &$Array) {
+      if (!array_key_exists($Key, $Array) || !is_array($Array[$Key]))
+         $SubsystemAlerts[$SystemType] = array();
+   }
+}
+
 if (!function_exists('ProxyHead')) {
    
    function ProxyHead($Url, $Headers=NULL, $Timeout = FALSE, $FollowRedirects = FALSE) {

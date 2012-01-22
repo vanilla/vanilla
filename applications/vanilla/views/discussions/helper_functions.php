@@ -69,7 +69,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'Category'));
+               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>
@@ -235,24 +235,21 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       // Bookmark link
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       echo Anchor(
-         '<span class="Star">'
-            .Img('applications/dashboard/design/images/pixel.png', array('alt' => $Title))
-         .'</span>',
+         $Title,
          '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
          'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
       
       if ($Sender->Options != '') {
-      ?>
-         <span class="ToggleFlyout OptionsMenu">
-            <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
-            <ul class="Flyout MenuItems">
-               <?php echo $Sender->Options; ?>
-            </ul>
-         </span><?php
+         echo '<span class="ToggleFlyout OptionsMenu">';
+            echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
+            echo '<ul class="Flyout MenuItems">';
+               echo $Sender->Options;
+            echo '</ul>';
+         echo '</span>';
       }
-      
+
       // Admin check.
       if ($Sender->CanEditDiscussions) {
          if (!property_exists($Sender, 'CheckedDiscussions')) {

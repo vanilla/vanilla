@@ -33,6 +33,9 @@ class Gdn_Theme {
 
    public static function Breadcrumbs($Data, $Format = '<a href="{Url,html}">{Name,html}</a>', $HomeLink = TRUE) {
       $Result = '';
+      
+      if (!is_array($Data))
+         $Data = array();
 
       if ($HomeLink) {
          $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE));

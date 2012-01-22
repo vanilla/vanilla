@@ -12,7 +12,7 @@ if ($this->Data !== FALSE) {
    <ul class="PanelInfo PanelCategories">
       <li class="ClearFix<?php
       if (!is_numeric($CategoryID))
-         echo ' Active';?>"><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <span class="Aside"><span class="Count"><?php echo Gdn_Format::BigNumber($CountDiscussions); ?></span></span></span></li>
+         echo ' Active';?>"><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <span class="Aside"><span class="Count"><?php echo Gdn_Format::BigNumber($CountDiscussions, 'html'); ?></span></span></span></li>
 <?php
    $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
    $DoHeadings = C('Vanilla.Categories.DoHeadings');

@@ -1,13 +1,24 @@
 <?php if (!defined('APPLICATION')) exit(); 
+
 $Discussion = $this->Data('Discussion');
+$Author = UserBuilder($Discussion, 'Insert');
+
+// Prep event args
+$this->EventArguments['Discussion'] = &$Discussion;
+$this->EventArguments['Author'] = &$Author;
+
+// DEPRECATED ARGUMENTS (as of 2.1)
+$this->EventArguments['Object'] = &$Discussion; 
+$this->EventArguments['Type'] = 'Discussion';
+
 ?>
-<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="Item ItemDiscussion">
+<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo CssClass($Discussion); ?>">
    <div class="DiscussionHeader">
       <div class="Meta">
          <span class="Author">
             <?php
-            echo UserPhoto($Discussion, array('Px' => 'Insert'));
-            echo UserAnchor($Discussion, array('Px' => 'Insert'));
+            echo UserPhoto($Author);
+            echo UserAnchor($Author);
             ?>
          </span>
          <span class="MItem DateCreated">
@@ -15,6 +26,7 @@ $Discussion = $this->Data('Discussion');
             echo Anchor(Gdn_Format::Date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
             ?>
          </span>
+         <?php $this->FireEvent('AfterDiscussionMeta'); ?>
       </div>
    </div>
    <?php $this->FireEvent('BeforeDiscussionBody'); ?>

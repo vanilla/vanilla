@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
    });
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
-   $('a.ForgotPassword').live('click', function() {
+   $(document).delegate('a.ForgotPassword', 'click', function() {
       $('.Methods').toggle();
       $('#Form_User_Password').toggle();
 		$('#Form_User_SignIn').toggle();
@@ -207,7 +207,7 @@ jQuery(document).ready(function($) {
 		$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
    }
 
-   $(".PopupWindow").live('click', function() {
+   $(document).delegate(".PopupWindow", 'click', function() {
       var $this = $(this);
       
       if ($this.hasClass('NoMSIE') && $.browser.misie) {
@@ -242,7 +242,7 @@ jQuery(document).ready(function($) {
       $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
    
    if ($.fn.popup)
-      $('.PopupClose').live('click', function(event){
+      $(document).delegate('.PopupClose', 'click', function(event){
          var Popup = $(event.target).parents('.Popup');
          if (Popup.length) {
             var PopupID = Popup.prop('id');
@@ -251,7 +251,7 @@ jQuery(document).ready(function($) {
       });
 
    // Make sure that message dismissalls are ajax'd
-   $('a.Dismiss').live('click', function() {
+   $(document).delegate('a.Dismiss', 'click', function() {
       var anchor = this;
       var container = $(anchor).parent();
       var transientKey = gdn.definition('TransientKey');
@@ -318,7 +318,7 @@ jQuery(document).ready(function($) {
 
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters
    $.fn.setMaxChars = function(iMaxChars) {
-      $(this).live('keyup', function() {
+      $(this).bind('keyup', function() {
          var txt = $(this).val();
          if (txt.length > iMaxChars)
             $(this).val(txt.substr(0, iMaxChars));
@@ -518,13 +518,12 @@ jQuery(document).ready(function($) {
    };
    $('.Popin').popin();
    
-   var hijackClick = function(e) {
+   var hijackClick = function(e) {   
       var $elem = $(this);
       var href = $elem.attr('href');
       if (!href)
          return;
       gdn.disable(this);
-      
 
       $.ajax({
          type: "POST",
@@ -556,51 +555,53 @@ jQuery(document).ready(function($) {
 
       return false;
    };
-   $('.Hijack').live('click', hijackClick);
+   $(document).delegate('.Hijack', 'click', hijackClick);
 
-   $.fn.openToggler = function() {
-      var lastOpen = null;
+   // Activate ToggleFlyout menus
+   var lastOpen = null;
+   $(document).delegate('.ToggleFlyout', 'click', function() {
+      var $flyout = $('.Flyout', this);
       
-     $(this).click(function() {
-        var $flyout = $('.Flyout', this);
-
-        // Dynamically fill the flyout.
-        var rel = $(this).attr('rel');
-        if (rel) {
-           $(this).attr('rel', '');
-           $flyout.addClass('Progress');
-            $.ajax({
-               url: gdn.url(rel),
-               data: {DeliveryType: 'VIEW'},
-               success: function(data) {
-                  $flyout.html(data);
-               },
-               complete: function() {
-                  $flyout.removeClass('Progress');
-               }
-            });
-        }
-
-        if ($flyout.css('display') == 'none') {
-           if (lastOpen != null) {
-              $('.Flyout', lastOpen).hide();
-              $(lastOpen).removeClass('Open');
-           }
-           
-           $(this).addClass('Open')
-           $flyout.show();
-           
-           lastOpen = this;
-        } else {
-           $flyout.hide()
-           $(this).removeClass('Open');
-        }
-     });
-   }
-   $('.ToggleFlyout').openToggler();
+      // Dynamically fill the flyout.
+      var rel = $(this).attr('rel');
+      if (rel) {
+         $(this).attr('rel', '');
+         $flyout.addClass('Progress');
+         $.ajax({
+            url: gdn.url(rel),
+            data: {DeliveryType: 'VIEW'},
+            success: function(data) {
+               $flyout.html(data);
+            },
+            complete: function() {
+               $flyout.removeClass('Progress');
+            }
+         });
+      }
+      
+      if ($flyout.css('display') == 'none') {
+         if (lastOpen != null) {
+            $('.Flyout', lastOpen).hide();
+            $(lastOpen).removeClass('Open');
+         }
+        
+         $(this).addClass('Open');
+         $flyout.show();
+         lastOpen = this;
+      } else {
+         $flyout.hide();
+         $(this).removeClass('Open');
+      }
+   });
+   
+   // Close ToggleFlyout menu even if their links are hijacked
+   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+      $('.ToggleFlyout').removeClass('Open');
+      $('.Flyout').hide();
+   });
    
    // Add a spinner onclick of buttons with this class
-   $('input.SpinOnClick').live('click', function() {
+   $(document).delegate('input.SpinOnClick', 'click', function() {
       $(this).before('<span class="AfterButtonLoading">&#160;</span>').removeClass('SpinOnClick');
    });
    
@@ -647,7 +648,7 @@ jQuery(document).ready(function($) {
 	     gdn.stats();
    
    // If a dismissable InformMessage close button is clicked, hide it.
-   $('div.InformWrapper.Dismissable a.Close').live('click', function() {
+   $(document).delegate('div.InformWrapper.Dismissable a.Close', 'click', function() {
       $(this).parents('div.InformWrapper').fadeOut('fast', function() {
          $(this).remove();
       });
@@ -672,7 +673,7 @@ jQuery(document).ready(function($) {
 	});
    
 	// Prevent autodismiss if hovering any inform messages
-	$('div.InformWrapper').live('mouseover mouseout', function(e) {
+	$(document).delegate('div.InformWrapper', 'mouseover mouseout', function(e) {
 		if (e.type == 'mouseover') {
 			var timerId = $('div.InformMessages').attr('autodismisstimerid');
 			if (timerId) {

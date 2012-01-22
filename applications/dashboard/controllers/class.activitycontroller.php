@@ -220,6 +220,13 @@ class ActivityController extends Gdn_Controller {
                 'Format' => 'Text');
             
             $ID = $this->ActivityModel->Comment($ActivityComment);
+            
+            if ($ID == SPAM) {
+               $this->StatusMessage = T('Your post has been flagged for moderation.');
+               $this->Render('Blank', 'Utility');
+               return;
+            }
+            
             $this->Form->SetValidationResults($this->ActivityModel->ValidationResults());
             if ($this->Form->ErrorCount() > 0)
                $this->ErrorMessage($this->Form->Errors());
@@ -250,9 +257,6 @@ class ActivityController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
-         
-         
-         
          if ($UserID && $UserID != Gdn::Session()->UserID) {
             // This is a wall post.
             $Activity = array(
@@ -269,9 +273,16 @@ class ActivityController extends Gdn_Controller {
                 'HeadlineFormat' => T('HeadlineFormat.Status', '{ActivityUserID,user}'),
                 'Story' => $Data['Comment']
             );
+            $this->SetJson('StatusMessage', Gdn_Format::Display($Data['Comment']));
          }
          
-         $Activity = $this->ActivityModel->Save($Activity);
+         $Activity = $this->ActivityModel->Save($Activity, FALSE, array('CheckSpam' => TRUE));
+         if ($Activity == SPAM) {
+            $this->StatusMessage = T('Your post has been flagged for moderation.');
+            $this->Render('Blank', 'Utility');
+            return;
+         }
+         
          if ($Activity) {
             Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', $Activity['Story']);
             
@@ -280,6 +291,7 @@ class ActivityController extends Gdn_Controller {
             ActivityModel::JoinUsers($Activities);
          }
       }
+
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
          Redirect($this->Request->Get('Target', '/activity'));
       }

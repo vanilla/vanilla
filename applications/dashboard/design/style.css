@@ -1942,8 +1942,7 @@ div.Popup form ul li label.RadioLabel {
 }
 .CommentHeading {
 	font-size: 15px;
-	padding: 10px 0 2px;
-	border-bottom: 1px solid #BEC8CC;
+	padding: 10px 0 0;
 }
 .BeforeCommentPaging {
    float: right;

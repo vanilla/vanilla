@@ -230,15 +230,12 @@ class UserModel extends Gdn_Model {
     * information about the user (password, attributes, preferences, etc).
     */
    public function UserQuery($SafeData = FALSE) {
-      if ($SafeData) {
+      if ($SafeData)
          $this->SQL->Select('u.UserID, u.Name, u.Photo, u.About, u.Gender, u.CountVisits, u.InviteUserID, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Admin, u.Deleted, u.CountDiscussions, u.CountComments');
-      } else {
+      else
          $this->SQL->Select('u.*');
-      }
+      
       $this->SQL->From('User u');
-//      $this->SQL->Select('i.Name', '', 'InviteName')
-//         ->From('User u')
-//         ->Join('User as i', 'u.InviteUserID = i.UserID', 'left');
    }
 
    public function DefinePermissions($UserID, $Serialize = TRUE) {

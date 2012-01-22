@@ -3,7 +3,7 @@ echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 $Session = Gdn::Session();
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 
-WriteFilterTabs($this);
+// WriteFilterTabs($this);
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
 <ul class="DataList Discussions">

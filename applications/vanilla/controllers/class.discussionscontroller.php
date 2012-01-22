@@ -91,6 +91,7 @@ class DiscussionsController extends VanillaController {
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
       
       // Add modules
+      $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
@@ -178,7 +179,7 @@ class DiscussionsController extends VanillaController {
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
 		if (count($CheckedDiscussions) > 0)
 			ModerationController::InformCheckedDiscussions($this);
-			
+         
 		$this->FireEvent('AfterInitialize');
    }
    
@@ -242,6 +243,7 @@ class DiscussionsController extends VanillaController {
       }
       
       // Add modules
+      $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       
@@ -299,6 +301,7 @@ class DiscussionsController extends VanillaController {
       }
       
       // Add modules
+      $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');

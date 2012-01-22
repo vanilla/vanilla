@@ -188,6 +188,7 @@ class CategoriesController extends VanillaController {
       
       // Add modules
       $this->AddModule('NewDiscussionModule');
+		$this->AddModule('DiscussionFilterModule');
       $this->AddModule('BookmarkedModule');
 		$this->AddModule($CategoryFollowToggleModule);
 
@@ -242,6 +243,7 @@ class CategoriesController extends VanillaController {
       
       // Add modules
       $this->AddModule('NewDiscussionModule');
+		$this->AddModule('DiscussionFilterModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
 		$this->AddModule($CategoryFollowToggleModule);

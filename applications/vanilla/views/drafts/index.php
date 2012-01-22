@@ -1,10 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
+echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $Session = Gdn::Session();
 $ShowOptions = TRUE;
 $Alt = '';
 $ViewLocation = $this->FetchViewLocation('drafts', 'drafts');
-WriteFilterTabs($this);
+// WriteFilterTabs($this);
 if ($this->DraftData->NumRows() > 0) {
    echo $this->Pager->ToString('less');
 ?>

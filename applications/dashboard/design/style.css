@@ -120,11 +120,10 @@ h1, h2, h3, h4, h5, h6 {
    margin: 5px 0;
 }
 p {
-   margin: 0.5em 0;
-   line-height: 1.6em;
+   margin: 10px 0;
 }
 .P {
-   margin: 0.5em 0;
+   margin: 10px 0;
 }
 h1 {
    font-size:140%;
@@ -351,9 +350,6 @@ input.Button {
 	text-align: right;
 	font-weight: bold;
 	font-size: 16px;
-}
-#PagerBefore {
-   margin: 1px 0;
 }
 .NumberedPager a,
 .NumberedPager span {
@@ -664,13 +660,16 @@ div.Discussion:hover .OptionsTitle:hover,
    font-size: 11px;
 	color: #fff;
 }
-.MenuItems a {
+/*.MenuItems li {
+   padding: 6px !Important;
+}*/
+.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
    color: #fff;
 	display: block;
 	text-decoration: none;
-   padding: 6px;
+	padding: 6px;
 }
-.MenuItems li:hover {
+.MenuItems li a:hover {
    background: #282828;
 }
 .ToggleFlyout {
@@ -727,13 +726,11 @@ a.Bookmarking:hover {
    overflow: hidden;
 }
 .Box {
-   border-radius: 1px;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
+   border-radius: 2px;
    background: #cfecff;
    color: #888;
    padding: 6px 10px;
-   margin: 0 0 10px;
+   margin: 10px 0;
 }
 .Box h4 {
    font-size: 110%;
@@ -977,6 +974,9 @@ a.BigButton:focus {
 	position: relative;
    border-bottom: 1px solid #bec8cc;
 }
+.DataList .Item:first-child {
+   border-top: 1px solid #bec8cc;
+}
 .Discussions .Item {
    padding: 4px 8px;
 }
@@ -1186,8 +1186,8 @@ body.Post .Popup a.Close {
    font-size: 100%;
 	word-wrap: break-word;
 }
-p {
-   margin: 1em 0;
+.Message h1, .Message h2, .Message h3 {
+   margin: 10px 0;
 }
 blockquote {
    padding: 1ex 16px;
@@ -1874,18 +1874,14 @@ div.Popup form ul li label.RadioLabel {
 .ItemDiscussion .Author img {
 	height: 24px;
 	width: 24px;
+   margin: 0 5px 5px 0;
 }
 .ItemDiscussion .Message {
 	margin-bottom: 5px; /* Consistency with when only h1 starts page */
 	font-size: 110%;
 }
 .DiscussionHeader {
-   padding: 5px 0 9px 0;
-}
-.CommentHeading {
-	font-size: 15px;
-	padding: 10px 0 2px;
-	border-bottom: 1px solid #BEC8CC;
+   margin: 5px 0 10px;
 }
 .BeforeCommentPaging {
    float: right;

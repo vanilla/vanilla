@@ -1518,7 +1518,7 @@ if (!function_exists('PrepareArray')) {
     */
    function PrepareArray($Key, &$Array) {
       if (!array_key_exists($Key, $Array) || !is_array($Array[$Key]))
-         $SubsystemAlerts[$SystemType] = array();
+         $Array[$Key] = array();
    }
 }
 

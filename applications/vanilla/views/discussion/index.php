@@ -6,18 +6,14 @@ if (!function_exists('WriteComment'))
 // Wrap the discussion related content in a div.
 echo '<div class="MessageList Discussion '.CssClass($this->Data('Discussion')).'">';
 
-// Category
-if (C('Vanilla.Categories.Use') == TRUE)
-   echo Anchor($this->Data('Discussion.Category'), 'categories/'.$this->Data('Discussion.CategoryUrlCode'), 'CategoryLink');
-
 // Write the page title.
 echo '<!-- Page Title -->
 <div id="Item_0" class="PageTitle">';
 
 echo '<div class="Options">';
 
-WriteDiscussionOptions();
 WriteBookmarkLink();
+WriteDiscussionOptions();
 WriteAdminCheck();
 
 echo '</div>';
@@ -35,7 +31,8 @@ if ($this->Data('Page') == 1) {
 }
 
 // Write the comments.
-echo '<span class="BeforeCommentPaging">'.$this->Pager->ToString('more').'</span>';
+$this->Pager->Wrapper = '<div %1$s>%2$s</div>';
+echo '<span class="BeforeCommentPaging">'.$this->Pager->ToString('less').'</span>';
 echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
 
 $Session = Gdn::Session(); 
@@ -52,6 +49,8 @@ if($this->Pager->LastPage()) {
    $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
 }
 
+echo '<div class="P">';
 echo $this->Pager->ToString('more');
+echo '</div>';
 
 WriteCommentForm();

@@ -9,7 +9,6 @@
          }
       }
    }
-   
    if (identifiers.length > 0) {
       // Grab the comment counts
       var vanilla_count_script = document.createElement('script');

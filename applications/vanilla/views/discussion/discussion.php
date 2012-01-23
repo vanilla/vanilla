@@ -26,6 +26,16 @@ $this->EventArguments['Type'] = 'Discussion';
             echo Anchor(Gdn_Format::Date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
             ?>
          </span>
+         <?php
+         // Category
+         if (C('Vanilla.Categories.Use')) {
+            echo ' <span class="Category">';
+            echo ' '.T('in').' ';
+            echo Anchor($this->Data('Discussion.Category'), 'categories/'.$this->Data('Discussion.CategoryUrlCode'));
+            echo '</span> ';
+         }
+         ?>
+         
          <?php $this->FireEvent('AfterDiscussionMeta'); ?>
       </div>
    </div>

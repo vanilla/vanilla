@@ -1315,7 +1315,7 @@ body.Profile.EditMode #Content form {
 
 form.Activity {
    display: block;
-   padding: 10px 10px 0 10px;
+   margin: 10px;
 	text-align: right;
 }
 form.Activity textarea {

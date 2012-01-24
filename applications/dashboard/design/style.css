@@ -1013,6 +1013,9 @@ body.Search #Content {
 .DataList .Item:first-child {
    border-top: 1px solid #bec8cc;
 }
+.DataList .Item:first-child {
+   border-top: 1px solid #bec8cc;
+}
 .Discussions .Item {
    padding: 4px 8px;
 }

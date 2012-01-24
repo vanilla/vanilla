@@ -120,10 +120,10 @@ h1, h2, h3, h4, h5, h6 {
    margin: 5px 0;
 }
 p {
-   margin: 10px 0;
+   margin: 5px 0;
 }
 .P {
-   margin: 10px 0;
+   margin: 5px 0;
 }
 h1 {
    font-size:140%;
@@ -1186,7 +1186,7 @@ body.Post .Popup a.Close {
    font-size: 100%;
 	word-wrap: break-word;
 }
-.Message h1, .Message h2, .Message h3 {
+.Message h1, .Message h2, .Message h3, .Message p, .Message .P {
    margin: 10px 0;
 }
 blockquote {
@@ -1470,17 +1470,8 @@ form.Thumbnail .Warning {
 
 
 /* ================================================= CommentForm */
-
-.CommentForm {
-	padding: 2px;
-}
-.CommentForm h2 {
-	color: #000;
-	font-size: 15px;
-	padding: 10px 2px 0;
-}
 .CommentForm form {
-	padding: 2px;
+	padding: 5px;
 	background: rgba(0, 0, 0, 0.03);
 }
 .Preview {

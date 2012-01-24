@@ -135,7 +135,7 @@ $Configuration['Preferences']['Popup']['Mention']               = '1';
 // Modules
 $Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'ProfileFilterModule', 'UserInfoModule', 'GuestModule', 'Ads');
 $Configuration['Modules']['Garden']['Content'] = array('MessageModule', 'Notices', 'Content', 'Ads');
-$Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'DiscussionFilterModule', 'SignedInModule', 'GuestModule', 'Ads');
+$Configuration['Modules']['Vanilla']['Panel'] = array('GuestModule', 'NewDiscussionModule', 'DiscussionFilterModule', 'SignedInModule', 'Ads');
 $Configuration['Modules']['Vanilla']['Content'] = array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'CategoryModeratorsModule', 'Content', 'Ads');
 $Configuration['Modules']['Conversations']['Panel'] = array('NewConversationModule', 'SignedInModule', 'GuestModule', 'Ads');
 $Configuration['Modules']['Conversations']['Content'] = array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'Content', 'Ads');

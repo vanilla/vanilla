@@ -83,7 +83,7 @@ body {
    margin: 15px auto 0;
 }
 #Content {
-   float: left;
+   float: right;
    width: 680px;
    margin: 0 0 40px;
 }
@@ -343,10 +343,14 @@ input.Button {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
-#PagerMore {
+/*
+ #PagerMore {
    margin-bottom: 1px;
 }
-.NumberedPager, .PrevNextPager {
+*/
+.MorePager,
+.NumberedPager,
+.PrevNextPager {
    margin: 1px 0 0;
 	text-align: right;
 	font-weight: bold;
@@ -725,7 +729,7 @@ a.Bookmarking:hover {
 /* ======================================================== Panels / Sidebars */
 #Panel {
    width: 250px;
-   float: right;
+   float: left;
    overflow: hidden;
 }
 /*
@@ -992,6 +996,13 @@ a.BigButton:focus {
 
 /* ================================================ DataList (Search Results) */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
+body.Search #Panel {
+	display: none;
+}
+body.Search #Content {
+	float: none;
+	width: auto;
+}
 .SearchForm {
 	background: rgba(0,0,0,0.03);
 	padding: 10px;
@@ -1133,11 +1144,12 @@ a.BigButton:focus {
 }
 
 /* =============================================================== Activities */
-
+/* 
 body.Profile ul.Activities {
    margin-top: 10px;
-   /* border-top: 1px solid #ddd; */
+   border-top: 1px solid #ddd;
 }
+*/
 .Activities li.HasPhoto .Title {
 	padding: 0;
 }
@@ -1383,7 +1395,7 @@ body.Profile.EditMode #Content form {
 }
 form.Activity {
    display: block;
-   padding: 10px 10px 0 10px;
+   padding: 10px;
 	text-align: right;
 }
 form.Activity textarea {
@@ -2880,16 +2892,9 @@ body.embed .Connect h2 {
 	text-decoration: none !important;
 	font-weight: bold;
 }
-.Embed h3 {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-	font-size: 15px;
-	font-weight: bold;
-	border-bottom: 1px solid #BEC8CC;
-}
 .EmbedCommentForm {
 	padding: 0;
    border-top: 1px solid #ffffff;
-   border-bottom: 1px solid #BEC8CC;
 }
 .EmbedCommentForm .TextBox {
 	width: 100%;

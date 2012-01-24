@@ -861,16 +861,6 @@ a.Bookmarking:hover {
 #UserOptions {
 	margin-bottom: 10px;
 }
-body.Profile .PanelInfo {
-   border-bottom: 1px solid #abdafb;
-}
-body.Profile .PanelInfo li {
-	border-bottom: 0;
-	text-align: left;
-}
-body.Profile .PanelInfo li a {
-   float: none;
-}
 a.BigButton {
    text-align: center;
    display: block;
@@ -2176,15 +2166,6 @@ body.Entry #Content {
    float: none;
    margin: 0 auto;
    width: 360px;
-}
-body.Entry #Content h1 {
-   border: none;
-   color: #02475A;
-   font-size:140%;
-   font-weight:bold;
-   padding: 6px 0;
-	margin: 0;
-	text-align: left;
 }
 body.Entry #Content form {
 	text-align: left;

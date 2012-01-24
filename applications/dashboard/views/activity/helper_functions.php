@@ -124,3 +124,44 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
 </li>
 <?php
 }
+
+function WriteActivityTabs() {
+   $Sender = Gdn::Controller();
+   $ModPermission = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+   $AdminPermission = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+   
+   if (!$ModPermission && !$AdminPermission)
+      return;
+?>
+   <div class="Tabs ActivityTabs">
+      <ul>
+         <li <?php if ($Sender->Data('Filter') == 'public') echo 'class="Active"'; ?>>
+            <?php
+            echo Anchor(T('Public'), '/activity', 'TabLink');
+            ?>
+         </li>
+         <?php
+         if ($ModPermission): 
+         ?>
+         <li <?php if ($Sender->Data('Filter') == 'mods') echo 'class="Active"'; ?>>
+            <?php
+            echo Anchor(T('Moderator'), '/activity/mods', 'TabLink');
+            ?>
+         </li>
+         <?php
+         endif;
+         
+         if ($AdminPermission):
+         ?>
+         <li <?php if ($Sender->Data('Filter') == 'admins') echo 'class="Active"'; ?>>
+            <?php
+            echo Anchor(T('Admin'), '/activity/admins', 'TabLink');
+            ?>
+         </li>
+         <?php
+         endif;
+         ?>
+      </ul>
+   </div>
+<?php
+}

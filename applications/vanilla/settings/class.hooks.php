@@ -37,12 +37,13 @@ class VanillaHooks implements Gdn_IPlugin {
     *  - DeleteMethod: One of delete, wipe, or NULL
     * @since 2.1
     */
-   public function DeleteUserData($UserID, $Options = array()) {
+   public function DeleteUserData($UserID, $Options = array(), &$Data = NULL) {
       $SQL = Gdn::SQL();
       
-      // Remove discussion watch records and drafts
+      // Remove discussion watch records and drafts.
 		$SQL->Delete('UserDiscussion', array('UserID' => $UserID));
-		$SQL->Delete('Draft', array('InsertUserID' => $UserID));
+      
+		Gdn::UserModel()->GetDelete('Draft', array('InsertUserID' => $UserID), $Data);
       
       // Comment deletion depends on method selected
       $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
@@ -74,7 +75,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
 
          
-         $SQL->Delete('Comment', array('InsertUserID' => $UserID));
+         Gdn::UserModel()->GetDelete('Comment', array('InsertUserID' => $UserID), $Data);
          
          // Update the comment counts.
          $CommentCounts = $SQL
@@ -106,7 +107,7 @@ class VanillaHooks implements Gdn_IPlugin {
             ->Get('Discussion');
          
          // Delete the user's dicussions 
-         $SQL->Delete('Discussion', array('InsertUserID' => $UserID));
+         Gdn::UserModel()->GetDelete('Discussion', array('InsertUserID' => $UserID), $Data);
          
          // Update the appropriat recent posts in the categories.
          $CategoryModel = new CategoryModel();
@@ -161,8 +162,9 @@ class VanillaHooks implements Gdn_IPlugin {
       $UserID = GetValue('UserID', $Sender->EventArguments);
       $Options = GetValue('Options', $Sender->EventArguments, array());
       $Options = is_array($Options) ? $Options : array();
+      $Content =& $Sender->EventArguments['Content'];
       
-      $this->DeleteUserData($UserID, $Options);
+      $this->DeleteUserData($UserID, $Options, $Content);
    }
    
    /**

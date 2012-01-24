@@ -518,13 +518,12 @@ jQuery(document).ready(function($) {
    };
    $('.Popin').popin();
    
-   var hijackClick = function(e) {
+   var hijackClick = function(e) {   
       var $elem = $(this);
       var href = $elem.attr('href');
       if (!href)
          return;
       gdn.disable(this);
-      
 
       $.ajax({
          type: "POST",
@@ -586,13 +585,19 @@ jQuery(document).ready(function($) {
             $(lastOpen).removeClass('Open');
          }
         
-         $(this).addClass('Open')
+         $(this).addClass('Open');
          $flyout.show();
          lastOpen = this;
       } else {
-         $flyout.hide()
+         $flyout.hide();
          $(this).removeClass('Open');
       }
+   });
+   
+   // Close ToggleFlyout menu even if their links are hijacked
+   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+      $('.ToggleFlyout').removeClass('Open');
+      $('.Flyout').hide();
    });
    
    // Add a spinner onclick of buttons with this class

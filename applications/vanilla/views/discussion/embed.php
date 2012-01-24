@@ -52,7 +52,7 @@ if (!function_exists('WriteComment'))
       ?>
    </div>
 <?php } ?>
-<ul class="DataList MessageList Discussion">
+<ul class="DataList MessageList Comments">
    <?php
    $this->FireEvent('BeforeCommentsRender');
    $CurrentOffset = $this->Offset;

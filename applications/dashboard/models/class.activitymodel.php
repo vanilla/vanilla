@@ -195,12 +195,27 @@ class ActivityModel extends Gdn_Model {
     * @since 2.1
     */
    public function JoinComments(&$Activities) {
-      $ActivityIDs = ConsolidateArrayValuesByKey($Activities, 'ActivityID');
+      // Grab all of the activity IDs.
+      $ActivityIDs = array();
+      foreach ($Activities as $Activity) {
+         if ($ID = GetValue('CommentActivityID', $Activity['Data'])) {
+            // This activity shares its comments with another activity.
+            $ActivityIDs[] = $ID;
+         } else {
+            $ActivityIDs[] = $Activity['ActivityID'];
+         }
+      }
+      $ActivityIDs = array_unique($ActivityIDs);
+      
       $Comments = $this->GetComments($ActivityIDs);
       $Comments = Gdn_DataSet::Index($Comments, array('ActivityID'), array('Unique' => FALSE));
       foreach ($Activities as &$Activity) {
-         if (isset($Comments[$Activity['ActivityID']])) {
-            $Activity['Comments'] = $Comments[$Activity['ActivityID']];
+         $ID = GetValue('CommentActivityID', $Activity['Data']);
+         if (!$ID)
+            $ID = $Activity['ActivityID'];
+         
+         if (isset($Comments[$ID])) {
+            $Activity['Comments'] = $Comments[$ID];
          } else {
             $Activity['Comments'] = array();
          }
@@ -392,14 +407,15 @@ class ActivityModel extends Gdn_Model {
     * @since 2.0.0
     * @access public
     * @param int $ActivityID Unique ID of activity item.
-    * @return DataSet A single SQL result.
+    * @return array|object A single SQL result.
     */
-   public function GetID($ActivityID) {
-      $Activity = parent::GetID($ActivityID);
+   public function GetID($ActivityID, $DataType = FALSE) {
+      $Activity = parent::GetID($ActivityID, $DataType);
       if ($Activity) {
          $this->CalculateRow($Activity);
          $Activities = array($Activity);
          self::JoinUsers($Activities);
+         $Activity = array_pop($Activities);
       }
       
       return $Activity;
@@ -831,28 +847,36 @@ class ActivityModel extends Gdn_Model {
    
    /**
     * Save a comment on an activity.
-    * @param array $Activity
+    * @param array $Comment
     * @return int|bool 
     * @since 2.1
     */
-   public function Comment($Activity) {
-      $Activity['InsertUserID'] = Gdn::Session()->UserID;
-      $Activity['DateInserted'] = Gdn_Format::ToDateTime();
-      $Activity['InsertIPAddress'] = Gdn::Request()->IpAddress();
+   public function Comment($Comment) {
+      $Comment['InsertUserID'] = Gdn::Session()->UserID;
+      $Comment['DateInserted'] = Gdn_Format::ToDateTime();
+      $Comment['InsertIPAddress'] = Gdn::Request()->IpAddress();
       
       $this->Validation->ApplyRule('ActivityID', 'Required');
       $this->Validation->ApplyRule('Body', 'Required');
       $this->Validation->ApplyRule('DateInserted', 'Required');
       $this->Validation->ApplyRule('InsertUserID', 'Required');
       
-      if ($this->Validate($Activity)) {
+      if ($this->Validate($Comment)) {
          // Check for spam.
-         $Spam = SpamModel::IsSpam('ActivityComment', $Activity);
+         $Spam = SpamModel::IsSpam('ActivityComment', $Comment);
          if ($Spam)
             return SPAM;
          
+         $ID = $this->SQL->Insert('ActivityComment', $Comment);
          
-         $ID = $this->SQL->Insert('ActivityComment', $Activity);
+         if ($ID) {
+            // Check to see if this comment bumps the activity.
+            $Activity = $this->GetID($Comment['ActivityID'], DATASET_TYPE_ARRAY);
+            if ($Activity && GetValue('Bump', $Activity['Data'])) {
+               $this->SQL->Put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $Activity['ActivityID']));
+            }
+         }
+         
          return $ID;
       }
       return FALSE;

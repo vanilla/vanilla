@@ -120,11 +120,10 @@ h1, h2, h3, h4, h5, h6 {
    margin: 5px 0;
 }
 p {
-   margin: 0.5em 0;
-   line-height: 1.6em;
+   margin: 5px 0;
 }
 .P {
-   margin: 0.5em 0;
+   margin: 5px 0;
 }
 h1 {
    font-size:140%;
@@ -351,9 +350,6 @@ input.Button {
 	text-align: right;
 	font-weight: bold;
 	font-size: 16px;
-}
-#PagerBefore {
-   margin: 1px 0;
 }
 .NumberedPager a,
 .NumberedPager span {
@@ -661,7 +657,7 @@ div.Discussion:hover .OptionsTitle:hover,
    background:none repeat scroll 0 0 #444444;
    min-width: 125px;
    line-height: 100%;
-   font-size: 10px;
+   font-size: 11px;
 	color: #fff;
 }
 /*.MenuItems li {
@@ -730,13 +726,11 @@ a.Bookmarking:hover {
    overflow: hidden;
 }
 .Box {
-   border-radius: 1px;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
+   border-radius: 2px;
    background: #cfecff;
    color: #888;
    padding: 6px 10px;
-   margin: 0 0 10px;
+   margin: 10px 0;
 }
 .Box h4 {
    font-size: 110%;
@@ -867,16 +861,6 @@ a.Bookmarking:hover {
 #UserOptions {
 	margin-bottom: 10px;
 }
-body.Profile .PanelInfo {
-   border-bottom: 1px solid #abdafb;
-}
-body.Profile .PanelInfo li {
-	border-bottom: 0;
-	text-align: left;
-}
-body.Profile .PanelInfo li a {
-   float: none;
-}
 a.BigButton {
    text-align: center;
    display: block;
@@ -979,6 +963,9 @@ a.BigButton:focus {
    border: 0;
 	position: relative;
    border-bottom: 1px solid #bec8cc;
+}
+.DataList .Item:first-child {
+   border-top: 1px solid #bec8cc;
 }
 .Discussions .Item {
    padding: 4px 8px;
@@ -1189,8 +1176,8 @@ body.Post .Popup a.Close {
    font-size: 100%;
 	word-wrap: break-word;
 }
-p {
-   margin: 1em 0;
+.Message h1, .Message h2, .Message h3, .Message p, .Message .P {
+   margin: 10px 0;
 }
 blockquote {
    padding: 1ex 16px;
@@ -1325,28 +1312,10 @@ body.Profile.EditMode #Content form {
 	padding: 10px 20px 20px;
 	background: rgba(0,0,0,0.05);
 }
-.User {
-   line-height: 150%;
-}
-.User,
-.User a {
-   text-decoration: none;
-}
-#Status {
-   margin: 0;
-   padding: 0 0 8px;
-}
-#Status a.Change {
-   text-transform: lowercase;
-   font-size: 11px;
-   text-decoration: none;
-}
-#Status a:hover {
-   text-decoration: underline;
-}
+
 form.Activity {
    display: block;
-   padding: 10px 10px 0 10px;
+   margin: 10px;
 	text-align: right;
 }
 form.Activity textarea {
@@ -1491,17 +1460,8 @@ form.Thumbnail .Warning {
 
 
 /* ================================================= CommentForm */
-
-.CommentForm {
-	padding: 2px;
-}
-.CommentForm h2 {
-	color: #000;
-	font-size: 15px;
-	padding: 10px 2px 0;
-}
 .CommentForm form {
-	padding: 2px;
+	padding: 5px;
 	background: rgba(0, 0, 0, 0.03);
 }
 .Preview {
@@ -1895,18 +1855,14 @@ div.Popup form ul li label.RadioLabel {
 .ItemDiscussion .Author img {
 	height: 24px;
 	width: 24px;
+   margin: 0 5px 5px 0;
 }
 .ItemDiscussion .Message {
 	margin-bottom: 5px; /* Consistency with when only h1 starts page */
 	font-size: 110%;
 }
 .DiscussionHeader {
-   padding: 5px 0 9px 0;
-}
-.CommentHeading {
-	font-size: 15px;
-	padding: 10px 0 2px;
-	border-bottom: 1px solid #BEC8CC;
+   margin: 5px 0 10px;
 }
 .BeforeCommentPaging {
    float: right;
@@ -2210,15 +2166,6 @@ body.Entry #Content {
    float: none;
    margin: 0 auto;
    width: 360px;
-}
-body.Entry #Content h1 {
-   border: none;
-   color: #02475A;
-   font-size:140%;
-   font-weight:bold;
-   padding: 6px 0;
-	margin: 0;
-	text-align: left;
 }
 body.Entry #Content form {
 	text-align: left;

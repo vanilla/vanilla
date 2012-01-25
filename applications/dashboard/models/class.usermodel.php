@@ -1007,14 +1007,14 @@ class UserModel extends Gdn_Model {
    }
    
    /**
-    * Force the admin user into UserID 1.
+    * Create an admin user account
     */
    public function SaveAdminUser($FormPostValues) {
       $UserID = 0;
 
       // Add & apply any extra validation rules:
-      $Name = ArrayValue('Name', $FormPostValues, '');
-      $FormPostValues['Email'] = ArrayValue('Email', $FormPostValues, strtolower($Name.'@'.Gdn_Url::Host()));
+      $Name = GetValue('Name', $FormPostValues, '');
+      $FormPostValues['Email'] = GetValue('Email', $FormPostValues, strtolower($Name.'@'.Gdn_Url::Host()));
       $FormPostValues['ShowEmail'] = '0';
       $FormPostValues['TermsOfService'] = '1';
       $FormPostValues['DateOfBirth'] = '1975-09-16';
@@ -1027,8 +1027,8 @@ class UserModel extends Gdn_Model {
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-         $Username = ArrayValue('Name', $Fields);
-         $Email = ArrayValue('Email', $Fields);
+         $Username = GetValue('Name', $Fields);
+         $Email = GetValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          
          // Insert the new user

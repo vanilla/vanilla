@@ -382,6 +382,9 @@ jQuery(document).ready(function($) {
             case 'Remove':
                $target.remove();
                break;
+            case 'ReplaceWith':
+               $target.replaceWith(item.Data);
+               break;
             case 'SlideUp':
                $target.slideUp('fast');
                break;

@@ -455,6 +455,8 @@ class PostController extends VanillaController {
 									$this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
 
                         $this->SetData('NewComments', TRUE);
+                        
+                        $this->ClassName = 'DiscussionController';
                         $this->ControllerName = 'discussion';
                         $this->View = 'comments';
                      }

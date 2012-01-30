@@ -164,7 +164,6 @@ class ProxyRequest {
       $this->ConnectionMode = '';
       $this->ActionLog = array();
       
-      if (!is_array($QueryParams)) $QueryParams = array();
       if (!is_array($Files)) $Files = array();
       if (!is_array($ExtraHeaders)) $ExtraHeaders = array();
 
@@ -255,7 +254,7 @@ class ProxyRequest {
          
          case 'GET':
          default:
-            $PostData = http_build_query($PostData);
+            $PostData = is_array($PostData) ? http_build_query($PostData) : $PostData;
             if (strlen($PostData)) {
                if (stristr($RelativeURL, '?'))
                   $Url .= '&';
@@ -406,4 +405,28 @@ class ProxyRequest {
    public function Clean() {
       return $this;
    }
+   
+   /**
+    * Check if the provided response matches the provided response type
+    * 
+    * Class is a string representation of the HTTP status code, with 'x' used
+    * as a wildcard.
+    * 
+    * Class '2xx' = All 200-level responses
+    * Class '30x' = All 300-level responses up to 309
+    * 
+    * @param string $Class 
+    * @return boolean Whether the response matches or not
+    */
+   public function ResponseClass($Class) {
+      $Code = (string)$this->ResponseStatus;
+      if (is_null($Code)) return FALSE;
+      if (strlen($Code) != strlen($Class)) return FALSE;
+      
+      for ($i = 0; $i < strlen($Class); $i++)
+         if ($Class{$i} != 'x' && $Class{$i} != $Code{$i}) return FALSE;
+      
+      return TRUE;
+   }
+   
 }

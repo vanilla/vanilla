@@ -30,9 +30,15 @@ if ($this->Data('Page') == 1) {
    echo '</div>'; // close discussion wrap
 }
 
+echo '<div class="CommentsWrap">';
+
 // Write the comments.
-$this->Pager->Wrapper = '<div %1$s>%2$s</div>';
-echo '<span class="BeforeCommentPaging">'.$this->Pager->ToString('less').'</span>';
+$this->Pager->Wrapper = '<span %1$s>%2$s</span>';
+echo '<span class="BeforeCommentHeading">';
+$this->FireEvent('CommentHeading');
+echo $this->Pager->ToString('less');
+echo '</span>';
+
 echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
 
 $Session = Gdn::Session(); 
@@ -50,7 +56,9 @@ if($this->Pager->LastPage()) {
 }
 
 echo '<div class="P">';
+$this->Pager->Wrapper = '<div %1$s>%2$s</div>';
 echo $this->Pager->ToString('more');
+echo '</div>';
 echo '</div>';
 
 WriteCommentForm();

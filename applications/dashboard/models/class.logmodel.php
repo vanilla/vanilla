@@ -476,6 +476,16 @@ class LogModel extends Gdn_Pluggable {
          $TableName = $Log['RecordType'];
 
       $Data = $Log['Data'];
+      
+      if (is_string($Data['Attributes']))
+         $Data['Attributes'] = @unserialize($Data['Attributes']);
+         
+      // Record a bit of information about the restoration.
+      if (!is_array($Data['Attributes']))
+         $Data['Attributes'] = array();
+      $Data['Attributes']['RestoreUserID'] = Gdn::Session()->UserID;
+      $Data['Attributes']['DateRestored'] = Gdn_Format::ToDateTime();
+      
       if (!isset($Columns[$TableName])) {
          $Columns[$TableName] = Gdn::SQL()->FetchColumns($TableName);
       }

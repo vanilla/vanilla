@@ -1175,6 +1175,7 @@ body.Post .Popup a.Close {
    line-height: 140%;
    font-size: 100%;
 	word-wrap: break-word;
+   margin-top: 5px;
 }
 .Message h1, .Message h2, .Message h3, .Message p, .Message .P {
    margin: 10px 0;
@@ -1223,9 +1224,6 @@ pre code {
 }
 .Message ul li {
   list-style: disc !important;
-}
-.Comment .Message {
-   padding-top: 4px;
 }
 .Message .ImageResized {
 	font-size: 11px;
@@ -1835,6 +1833,12 @@ div.Popup form ul li label.RadioLabel {
 .Discussion .PageTitle h1 {
 	font-size: 24px;
 	line-height: 1.2;
+}
+.ItemDiscussion {
+   margin-bottom: 20px;
+}
+.ItemDiscussion .Message {
+   margin-top: 20px;
 }
 /*.ItemDiscussion .MItem {
 	margin: 0;

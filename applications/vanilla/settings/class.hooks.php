@@ -385,6 +385,7 @@ class VanillaHooks implements Gdn_IPlugin {
 		$Sender->GetUserInfo($UserReference, $Username);
       $Sender->_SetBreadcrumbs(T('Discussions'), '/profile/discussions');
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
+		$Sender->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
       
       // Load the data for the requested tab.
       if (!is_numeric($Offset) || $Offset < 0)

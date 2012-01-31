@@ -1427,7 +1427,6 @@ body.Profile.EditMode #Content form {
 
 form.Activity {
    display: block;
-   /* padding: 10px; */
    margin: 10px;
 	text-align: right;
 }

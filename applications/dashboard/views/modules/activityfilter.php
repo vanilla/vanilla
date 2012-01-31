@@ -12,7 +12,7 @@ if (!$ModPermission && !$AdminPermission)
    <ul class="PanelInfo">
       <li <?php if ($Controller->Data('Filter') == 'public') echo 'class="Active"'; ?>>
          <?php
-         echo Anchor(Sprite('SpPublicActivities').T('Public'), '/activity');
+         echo Anchor(Sprite('SpPublicActivities').T('Recent Activity'), '/activity');
          ?>
       </li>
       <?php
@@ -20,7 +20,7 @@ if (!$ModPermission && !$AdminPermission)
       ?>
       <li <?php if ($Controller->Data('Filter') == 'mods') echo 'class="Active"'; ?>>
          <?php
-         echo Anchor(Sprite('SpModeratorActivities').T('Moderator'), '/activity/mods');
+         echo Anchor(Sprite('SpModeratorActivities').T('Moderator Activity'), '/activity/mods');
          ?>
       </li>
       <?php
@@ -30,7 +30,7 @@ if (!$ModPermission && !$AdminPermission)
       ?>
       <li <?php if ($Controller->Data('Filter') == 'admins') echo 'class="Active"'; ?>>
          <?php
-         echo Anchor(Sprite('SpAdminActivities').T('Admin'), '/activity/admins');
+         echo Anchor(Sprite('SpAdminActivities').T('Administrator Activity'), '/activity/admins');
          ?>
       </li>
       <?php endif; ?>

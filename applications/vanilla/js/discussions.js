@@ -21,11 +21,11 @@ jQuery(document).ready(function($) {
       });
 
    /* Discussion Checkboxes */
-   $('.DiscussionsTabs .AdminCheck :checkbox').click(function() {
+   $('.DiscussionsTabs .AdminCheck :checkbox, thead .AdminCheck :checkbox').click(function() {
       if ($(this).attr('checked'))
-         $('.DataList .AdminCheck :checkbox').attr('checked', 'checked');
+         $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').attr('checked', 'checked');
       else
-         $('.DataList .AdminCheck :checkbox').removeAttr('checked');
+         $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').removeAttr('checked');
    });
    $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids

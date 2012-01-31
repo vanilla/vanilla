@@ -2,7 +2,9 @@
 $this->Title(T('Start a New Conversation'));
 ?>
 <div id="ConversationForm">
-   <h1><?php echo T('Start a New Conversation'); ?></h1>
+   <ul class="FormType">
+		<li><?php echo Anchor(Sprite('SpNewConversation').Wrap(T('New Conversation'), 'strong'), '#', array('class' => 'Type-NewConversation Active')); ?></li>
+	</ul>
    <?php
    echo $this->Form->Open();
    echo $this->Form->Errors();

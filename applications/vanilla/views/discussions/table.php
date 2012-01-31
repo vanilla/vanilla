@@ -128,7 +128,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 			<td class="User LastUser"><?php echo T('Most Recent'); ?></td>
 			<td class="BigCount CountReplies"><?php echo T('Replies'); ?></td>
 			<td class="BigCount CountViews"><?php echo T('Views'); ?></td>
-			<td class="Opts"><span class="AdminCheck"><input type="checkbox" name="Toggle" /></span></td>
+			<td class="Opts"><?php WriteCheckController(); ?></td>
 		</tr>
 	</thead>
 	<tbody>

@@ -20,7 +20,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       </ul>
       
       <?php if ($this->DiscussionData->NumRows() == $this->DiscussionsPerCategory) : ?>
-      <div class="More">
+      <div class="MorePager">
          <?php echo Anchor(T('More Discussions'), '/categories/'.$Category->UrlCode); ?>
       </div>
       <?php endif; ?>

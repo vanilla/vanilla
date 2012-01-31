@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
       });
 
    /* Discussion Checkboxes */
-   $('.DiscussionsTabs .AdminCheck :checkbox, thead .AdminCheck :checkbox').click(function() {
+   $('.ControlOptions .AdminCheck :checkbox').click(function() {
       if ($(this).attr('checked'))
          $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').attr('checked', 'checked');
       else
@@ -29,7 +29,7 @@ jQuery(document).ready(function($) {
    });
    $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids
-      var checkIDs = $('.DataList .AdminCheck :checkbox');
+      var checkIDs = $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox');
       var aCheckIDs = new Array();
       checkIDs.each(function() {
          checkID = $(this);

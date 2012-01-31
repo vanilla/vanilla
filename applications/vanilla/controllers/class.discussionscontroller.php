@@ -79,6 +79,17 @@ class DiscussionsController extends VanillaController {
     * @param int $Page Multiplied by PerPage option to determine offset.
     */
    public function Index($Page = '0') {
+      // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
+      $Layout = C('Vanilla.Discussions.Layout');
+      switch($Layout) {
+         case 'table':
+            $this->View = 'table';
+            break;
+         default:
+            // $this->View = 'index';
+            break;
+      }
+      
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
@@ -163,7 +174,6 @@ class DiscussionsController extends VanillaController {
          $this->AddDefinition('SetClientHour', $ClientHour);
       }
       
-      // Render default view (discussions/index.php)
       $this->Render();
    }
    

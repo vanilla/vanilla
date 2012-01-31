@@ -293,3 +293,14 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       echo '</span>';
    }
 }
+
+function WriteCheckController() {
+   $CanEditDiscussions = Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
+   if ($CanEditDiscussions) {
+   ?>
+   <span class="Options ControlOptions"><span class="AdminCheck">
+      <input type="checkbox" name="Toggle" />
+   </span></span>
+   <?php
+   }
+}

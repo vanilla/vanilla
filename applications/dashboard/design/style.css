@@ -329,8 +329,8 @@ input.Button {
 .Info {
    font-size: 13px;
    background: #fafafa;
-   border: 1px solid #eee;
-	border: 1px solid rgba(0,0,0,0.1);
+   border: 2px solid #eee;
+	border: 2px solid rgba(0,0,0,0.1);
    color: #888;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -367,7 +367,7 @@ input.Button {
    margin: 1px 0 0;
 	text-align: right;
 	font-weight: bold;
-	font-size: 16px;
+	/* font-size: 16px; */
 }
 .NumberedPager a,
 .NumberedPager span {
@@ -590,6 +590,7 @@ body #Head h1 {
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
+.ControlOptions,
 .Options {
 	float: right;
 }
@@ -735,6 +736,13 @@ a.Bookmarking:hover {
 .AdminCheck {
    vertical-align: top;
 	line-height: 1;
+}
+.ControlOptions .AdminCheck {
+	display: block;
+	padding: 6px 8px 0;
+}
+.Opts .ControlOptions .AdminCheck {
+	padding: 0;
 }
 
 
@@ -1010,6 +1018,7 @@ a.BigButton:focus {
 .CategoryList .Depth10 { padding-left: 225px !important; }
 .CategoryList .Depth11 { padding-left: 250px !important; }
 .CategoryList .Depth12 { padding-left: 275px !important; }
+.CategoryListWithHeadings .Depth1 { padding-left: 0 !important; }
 .CategoryListWithHeadings .Depth2 { padding-left: 0 !important; }
 .CategoryListWithHeadings .Depth3 { padding-left: 25px !important; }
 .CategoryListWithHeadings .Depth4 { padding-left: 50px !important; }
@@ -1901,7 +1910,6 @@ div.Popup form ul li label.RadioLabel {
 .DiscussionsTable .CommentDate {
 	display: block;
 	line-height: 1;
-	margin: 0 0 0 30px;
 }
 /* Hide the alt text in case the image url is invalid */
 .CategoryTable img,

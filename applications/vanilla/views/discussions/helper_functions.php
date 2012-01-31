@@ -29,6 +29,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
       $Sender->FireEvent('BetweenDiscussion');
    else
       $FirstDiscussion = FALSE;
+      
+   $Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
@@ -78,6 +80,32 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 </li>
 <?php
 }
+
+function WriteMiniPager($Discussion) {
+   if (!property_exists($Discussion, 'CountPages'))
+      return;
+   
+   if ($Discussion->CountPages > 1) {
+      echo '<span class="MiniPager">';
+         if ($Discussion->CountPages < 5) {
+            for ($i = 0; $i < $Discussion->CountPages; $i++) {
+               WritePageLink($Discussion, $i+1);
+            }
+         } else {
+            WritePageLink($Discussion, 1);
+            WritePageLink($Discussion, 2);
+            echo '<span class="Elipsis">...</span>';
+            WritePageLink($Discussion, $Discussion->CountPages-1);
+            WritePageLink($Discussion, $Discussion->CountPages);
+            // echo Anchor('Go To Page', '#', 'GoToPageLink');
+         }
+      echo '</span>';
+   }
+}
+function WritePageLink($Discussion, $PageNumber) {
+   echo Anchor($PageNumber, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/p'.$PageNumber);
+}
+
 
 function CssClass($Discussion) {
    static $Alt = FALSE;

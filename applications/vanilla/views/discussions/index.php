@@ -4,6 +4,8 @@ $Session = Gdn::Session();
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 
 // WriteFilterTabs($this);
+echo Gdn_Theme::Module('DiscussionFilterModule');
+
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
 <ul class="DataList Discussions">

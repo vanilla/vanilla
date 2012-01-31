@@ -9,13 +9,12 @@ $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
 $this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
 
-/*
 if (C('Vanilla.Categories.ShowTabs')) {
-   $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');
-   include_once $ViewLocation;
-   WriteFilterTabs($this);
+//   $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');
+//   include_once $ViewLocation;
+//   WriteFilterTabs($this);
+   echo Gdn_Theme::Module('DiscussionFilterModule');
 }
-*/
 
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    $Alt = FALSE;

@@ -31,7 +31,7 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
    $MyDrafts .= FilterCountString($CountDrafts);
 }
 ?>
-<div class="Box BoxDiscussionFilter">
+<div class="Box BoxFilter BoxDiscussionFilter">
    <ul class="PanelInfo">
       <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Anchor(Sprite('SpDiscussions').T('All Discussions'), 'discussions'); ?></li>
       <?php      

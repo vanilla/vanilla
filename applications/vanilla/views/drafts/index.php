@@ -6,6 +6,7 @@ $ShowOptions = TRUE;
 $Alt = '';
 $ViewLocation = $this->FetchViewLocation('drafts', 'drafts');
 // WriteFilterTabs($this);
+echo Gdn_Theme::Module('DiscussionFilterModule');
 if ($this->DraftData->NumRows() > 0) {
    echo $this->Pager->ToString('less');
 ?>

@@ -61,6 +61,16 @@ class DiscussionsController extends VanillaController {
    public $CategoryID;
    
    /**
+    * "Table" layout for discussions. Mimics more traditional forum discussion layout.
+    * 
+    * @param int $Page Multiplied by PerPage option to determine offset.
+    */
+   public function Table($Page = '0') {
+      $this->View = 'table';
+      $this->Index($Page);
+   }
+   
+   /**
     * Default all discussions view: chronological by most recent comment.
     * 
     * @since 2.0.0
@@ -179,6 +189,8 @@ class DiscussionsController extends VanillaController {
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
 		if (count($CheckedDiscussions) > 0)
 			ModerationController::InformCheckedDiscussions($this);
+         
+      $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
          
 		$this->FireEvent('AfterInitialize');
    }

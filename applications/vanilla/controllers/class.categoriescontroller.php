@@ -57,6 +57,14 @@ class CategoriesController extends VanillaController {
    public $Category;
    
    /**
+    * "Table" layout for categories. Mimics more traditional forum category layout.
+    */
+   public function Table() {
+      $this->View = 'table';
+      $this->All();
+   }
+   
+   /**
     * Show all discussions in a particular category.
     * 
     * @since 2.0.0

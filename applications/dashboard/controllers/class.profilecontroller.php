@@ -920,74 +920,78 @@ class ProfileController extends Gdn_Controller {
       $SideMenu = new SideMenuModule($this);
       $this->EventArguments['SideMenu'] = &$SideMenu; // Doing this out here for backwards compatibility.
 		if ($this->EditMode) {
-         $SideMenu->HtmlId = 'UserOptions';
-			$SideMenu->AutoLinkGroups = FALSE;
-         $Session = Gdn::Session();
-         $ViewingUserID = $Session->UserID;
-         $SideMenu->AddItem('Options', '');
-         
-         // Check that we have the necessary tools to allow image uploading
-         $AllowImages = Gdn_UploadImage::CanUploadImages();
-			
-			// Is the photo hosted remotely?
-			$RemotePhoto = in_array(substr($this->User->Photo, 0, 7), array('http://', 'https:/'));
-         
-         if ($this->User->UserID != $ViewingUserID) {
-            // Include user js files for people with edit users permissions
-            if ($Session->CheckPermission('Garden.Users.Edit')) {
-//              $this->AddJsFile('jquery.gardenmorepager.js');
-              $this->AddJsFile('user.js');
-            }
-            
-            $SideMenu->AddLink('Options', Sprite('SpEdit').T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
-            $SideMenu->AddLink('Options', Sprite('SpDelete').T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
-            if ($this->User->Photo != '' && $AllowImages)
-               $SideMenu->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$Session->TransientKey(), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
-            
-            $SideMenu->AddLink('Options', Sprite('SpPreferences').T('Edit Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
-
-            // Add profile options for everyone
-            $SideMenu->AddLink('Options', Sprite('SpPicture').T('Change Picture'), '/profile/picture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'PictureLink'));
-            if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-               $SideMenu->AddLink('Options', Sprite('SpThumbnail').T('Edit Thumbnail'), '/profile/thumbnail/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
-            }
-         } else {
-            // Add profile options for the profile owner
-            // Don't allow account editing if it has been turned off.
-            if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
-				   $SideMenu->AddLink('Options', Sprite('SpEdit').T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
-               	
-				   // No password may have been set if they have only signed in with a connect plugin
-				   $passwordLabel = T('Change My Password');
-				   if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")
-					   $passwordLabel = T('Set A Password');
-				   $SideMenu->AddLink('Options', Sprite('SpPassword').$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
-            }
-            if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
-               $SideMenu->AddLink('Options', Sprite('SpInvitations').T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));
-
-            $SideMenu->AddLink('Options', Sprite('SpPreferences').T('My Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
-            if ($AllowImages)
-               $SideMenu->AddLink('Options', Sprite('SpPicture').T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
-               
-            if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-               $SideMenu->AddLink('Options', Sprite('SpThumbnail').T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
-            }
-         }
-            
+			$this->BuildEditMenu($SideMenu, $CurrentUrl);
          $this->FireEvent('AfterAddSideMenu');
          $this->AddModule($SideMenu, 'Panel');
       } else {
 			// Make sure the userphoto module gets added to the page
-			$UserPhotoModule = new UserPhotoModule($this);
-			$UserPhotoModule->User = $this->User;
-			$this->AddModule($UserPhotoModule);
+			$this->AddModule('UserPhotoModule');
 
 			// And add the filter menu module
          $this->FireEvent('AfterAddSideMenu');
 			$this->AddModule('ProfileFilterModule');
 		}
    }
+	
+	public function BuildEditMenu(&$Module, $CurrentUrl = '') {
+		if (!$this->User)
+			return;
+		
+		$Module->HtmlId = 'UserOptions';
+		$Module->AutoLinkGroups = FALSE;
+		$Session = Gdn::Session();
+		$ViewingUserID = $Session->UserID;
+		$Module->AddItem('Options', '');
+         
+		// Check that we have the necessary tools to allow image uploading
+		$AllowImages = Gdn_UploadImage::CanUploadImages();
+			
+		// Is the photo hosted remotely?
+		$RemotePhoto = in_array(substr($this->User->Photo, 0, 7), array('http://', 'https:/'));
+		
+		if ($this->User->UserID != $ViewingUserID) {
+			// Include user js files for people with edit users permissions
+			if ($Session->CheckPermission('Garden.Users.Edit')) {
+//              $this->AddJsFile('jquery.gardenmorepager.js');
+			  $this->AddJsFile('user.js');
+			}
+			
+			$Module->AddLink('Options', Sprite('SpEdit').T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
+			$Module->AddLink('Options', Sprite('SpDelete').T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
+			if ($this->User->Photo != '' && $AllowImages)
+				$Module->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$Session->TransientKey(), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
+			
+			$Module->AddLink('Options', Sprite('SpPreferences').T('Edit Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
+
+			// Add profile options for everyone
+			$Module->AddLink('Options', Sprite('SpPicture').T('Change Picture'), '/profile/picture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'PictureLink'));
+			if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
+				$Module->AddLink('Options', Sprite('SpThumbnail').T('Edit Thumbnail'), '/profile/thumbnail/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
+			}
+		} else {
+			// Add profile options for the profile owner
+			// Don't allow account editing if it has been turned off.
+			if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
+				$Module->AddLink('Options', Sprite('SpEdit').T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+					
+				// No password may have been set if they have only signed in with a connect plugin
+				$passwordLabel = T('Change My Password');
+				if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")
+					$passwordLabel = T('Set A Password');
+				$Module->AddLink('Options', Sprite('SpPassword').$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
+			}
+			if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
+				$Module->AddLink('Options', Sprite('SpInvitations').T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));
+
+			$Module->AddLink('Options', Sprite('SpPreferences').T('My Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
+			if ($AllowImages)
+				$Module->AddLink('Options', Sprite('SpPicture').T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
+				
+			if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
+				$Module->AddLink('Options', Sprite('SpThumbnail').T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
+			}
+		}
+	}
    
    /**
     * Build the user profile.

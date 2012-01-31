@@ -98,15 +98,13 @@ $(function() {
    }
 
    // If not embedded and we should be, redirect to the embedded version.
-   if (!inIframe && forceRemoteUrl && remoteUrl != '') {
+   if (!inIframe && forceRemoteUrl && (remoteUrl != '' || !(inDashboard && !embedDashboard))) {
       var path = document.location.toString().substr(webroot.length);
       var hashIndex = path.indexOf('#');
       if (hashIndex > -1)
          path = path.substr(0, hashIndex);
       
       document.location = remoteUrl + '#' + path;
-   } else if (inIframe && inDashboard && !embedDashboard) {
-      remotePostMessage('unembed', '*');
    }
 
    // hijack all anchors to see if they should go to "top" or be within the embed (ie. are they in Vanilla or not?)
@@ -163,6 +161,12 @@ $(function() {
             // return false;
          }
       });
+   }
+   
+   // Unembed the dashboard.
+   // Note: This must be done AFTER the location is set.
+   if (inIframe && inDashboard && !embedDashboard) {
+      remotePostMessage('unembed', '*');
    }
 
 });

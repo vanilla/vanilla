@@ -59,6 +59,9 @@ class MessagesController extends ConversationsController {
       parent::Initialize();
       $this->Menu->HighlightRoute('/messages/inbox');
       $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox')));
+      $this->AddModule('MeModule');
+      $this->AddModule('SignedInModule');
+      $this->AddModule('NewConversationModule');
    }
    
    /**
@@ -213,8 +216,6 @@ class MessagesController extends ConversationsController {
       }
       
       // Build and display page.
-      $this->AddModule('SignedInModule');
-      $this->AddModule('NewConversationModule');
       $this->Render();
    }
    
@@ -376,9 +377,6 @@ class MessagesController extends ConversationsController {
       }
       
       // Add modules.
-      $this->AddModule('SignedInModule');
-      $this->AddModule('NewConversationModule');
-
       $ClearHistoryModule = new ClearHistoryModule($this);
       $ClearHistoryModule->ConversationID($ConversationID);
       $this->AddModule($ClearHistoryModule);

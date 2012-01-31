@@ -68,6 +68,7 @@ class ActivityController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       
       // Add Modules
+      $this->AddModule('MeModule');
       $this->AddModule('GuestModule');
       $this->AddModule('SignedInModule');
       
@@ -146,6 +147,8 @@ class ActivityController extends Gdn_Controller {
       
       $this->SetData('Filter', strtolower($Filter));
       $this->SetData('Activities', $Activities);
+      
+      $this->AddModule('ActivityFilterModule');
       
       $this->View = 'all';
       $this->Render();

@@ -26,11 +26,11 @@ function GetOptions($Category, $Sender) {
    $Sender->FireEvent('DiscussionOptions');
 
    if ($Options != '') {
-      $Result .= '<div class="ToggleFlyout OptionsMenu"><div class="OptionsTitle">'.T('Options').'</div>'
-         .'<ul class="Flyout MenuItems">'.$Options.'</ul>'
-         .'</div>';
-      
-   $Result .= '</div>';
-   return $Result;
+         $Result .= '<span class="ToggleFlyout OptionsMenu">';
+            $Result .= '<span class="OptionsTitle">'.T('Options').'</span>';
+            $Result .= '<ul class="Flyout MenuItems">'.$Options.'</ul>';
+         $Result .= '</span>';
+      $Result .= '</div>';
+      return $Result;
    }
 }

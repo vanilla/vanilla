@@ -538,5 +538,6 @@ class PostController extends VanillaController {
    public function Initialize() {
       parent::Initialize();
       $this->AddCssFile('vanilla.css');
+		$this->AddModule('NewDiscussionModule');
    }
 }

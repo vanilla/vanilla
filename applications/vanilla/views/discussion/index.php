@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-
+$Session = Gdn::Session(); 
 if (!function_exists('WriteComment'))
    include $this->FetchViewLocation('helper_functions', 'discussion');
 
@@ -30,15 +30,16 @@ if ($this->Data('Page') == 1) {
    echo '</div>'; // close discussion wrap
 }
 
-// Write the comments.
 $this->Pager->Wrapper = '<div %1$s>%2$s</div>';
-echo '<span class="BeforeCommentPaging">'.$this->Pager->ToString('less').'</span>';
-echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
+// Write the comments.
+if ($this->CommentData->NumRows() > 0) {
+	echo '<span class="BeforeCommentPaging">'.$this->Pager->ToString('less').'</span>';
+	echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
+}
 
-$Session = Gdn::Session(); 
 ?>
 <ul class="MessageList DataList Comments">
-   <?php include $this->FetchViewLocation('comments'); ?>
+	<?php include $this->FetchViewLocation('comments'); ?>
 </ul>
 <?php
 $this->FireEvent('AfterDiscussion');

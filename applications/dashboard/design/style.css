@@ -74,7 +74,6 @@ body {
    background: #fff;
    margin: 0;
    padding: 0;
-   text-align: center;
    font-size: small;
 }
 #Body {
@@ -340,6 +339,23 @@ input.Button {
 }
 .Info strong {
 	font-weight: bold;
+}
+.BreadcrumbWrap {
+	clear: both;
+	line-height: 2.4;
+	font-size: 12px;
+}
+.Crumb {
+	margin: 0 6px;
+}
+.Breadcrumbs {
+	display: block;
+	margin: 0 auto;
+	width: 960px;
+}
+.BreadcrumbWrap.TopBreadcrumb {
+	background: #f7f7f7;
+	background: rgba(0,0,0,0.03);
 }
 #PagerLess {
    -moz-border-radius-topright: 2px;
@@ -1144,7 +1160,7 @@ a.BigButton:focus {
 	font-weight:bold;
 	padding: 3px;
 	line-height: 1;
-   
+   white-space: nowrap;
 }
 .Tag a {
    color: #ffffff;
@@ -1293,6 +1309,7 @@ body.Post .Popup a.Close {
    line-height: 140%;
    font-size: 100%;
 	word-wrap: break-word;
+   margin-top: 5px;
 }
 .Message h1, .Message h2, .Message h3, .Message p, .Message .P {
    margin: 10px 0;
@@ -1342,9 +1359,6 @@ pre code {
 }
 .Message ul li {
   list-style: disc !important;
-}
-.Comment .Message {
-   padding-top: 4px;
 }
 .Message .ImageResized {
 	font-size: 11px;
@@ -1851,6 +1865,25 @@ div.Popup form ul li label.RadioLabel {
 	font-size: 24px;
 	line-height: 1.2;
 }
+.ItemDiscussion {
+   margin-bottom: 20px;
+}
+.ItemDiscussion .Message {
+   margin-top: 20px;
+}
+/*.ItemDiscussion .MItem {
+	margin: 0;
+}
+.ItemDiscussion .MItem a,
+.ItemDiscussion .Author a {
+	color: #888888;
+   font-size: 12px;
+   font-style: italic;
+	font-weight: normal;
+}
+.ItemDiscussion .Author .ProfileLink {
+	display: none;
+}*/
 .ItemDiscussion .MItem a {
    font-size: 11px; 
 }
@@ -1866,7 +1899,7 @@ div.Popup form ul li label.RadioLabel {
 .DiscussionHeader {
    margin: 5px 0 10px;
 }
-.BeforeCommentPaging {
+.BeforeCommentHeading {
    float: right;
 }
 
@@ -1996,7 +2029,7 @@ body.Discussion #Content {
 	margin: 0 6px;
 	padding: 4px 0;
 }
-.FormType li a.Active {
+.FormType li.Active a {
 	color: #000;
 	border-bottom: 2px solid #ddd;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.1);

@@ -5,12 +5,18 @@ if (!function_exists('WriteComment'))
 
 ?>
 <div class="Embed">
+<?php
+echo '<span class="BeforeCommentHeading">';
+$this->FireEvent('CommentHeading');
+echo '</span>';
+?>
+   
 <?php if ($this->Discussion->Closed == '1') { ?>
    <div class="Foot Closed">
       <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
    </div>
 <?php } else { ?>
-   <h3><?php echo T('Leave Comments'); ?></h3>
+   <h2><?php echo T('Leave Comments'); ?></h2>
    <div class="MessageForm CommentForm EmbedCommentForm">
       <?php
       echo $this->Form->Open();

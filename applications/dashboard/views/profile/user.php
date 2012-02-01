@@ -15,6 +15,8 @@ $Session = Gdn::Session();
 
       echo '</div>';
    }
+   $this->FireEvent('BeforeUserInfo');
    echo Gdn_Theme::Module('UserInfoModule');
+   $this->FireEvent('AfterUserInfo');
    ?>
 </div>

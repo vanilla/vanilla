@@ -786,7 +786,10 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE)), TRUE));
 
       // Load the comments
-      $this->CommentModel->OrderBy('c.DateInserted desc'); // allow custom sort
+      $CurrentOrderBy = $this->CommentModel->OrderBy();
+      if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
+         $this->CommentModel->OrderBy('c.DateInserted desc'); // allow custom sort
+      
       $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
       
       // Build a pager

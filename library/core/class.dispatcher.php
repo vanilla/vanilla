@@ -245,6 +245,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ControllerName != '' && class_exists($ControllerName)) {
          // Create it and call the appropriate method/action
          $Controller = new $ControllerName();
+         Gdn::Controller($Controller);
          
          $this->EventArguments['Controller'] =& $Controller;
          $this->FireEvent('AfterControllerCreate');
@@ -311,7 +312,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
 
          // Set special controller method options for REST APIs.
-         Gdn::Controller($Controller);
          $Controller->Initialize();
          
          $this->EventArguments['Controller'] = &$Controller;

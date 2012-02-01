@@ -201,7 +201,7 @@ class CategoriesController extends VanillaController {
             
       $this->Description(C('Garden.Description', NULL));
       
-      $this->SetData('Breadcrumbs', array(array('Name' => T('Categories'), 'Url' => '/categories/all')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
      
 		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
 		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
@@ -219,7 +219,7 @@ class CategoriesController extends VanillaController {
       $this->AddModule('BookmarkedModule');
 		$this->AddModule($CategoryFollowToggleModule);
 
-      $this->CanonicalUrl(Url('/categories/all', TRUE));
+      $this->CanonicalUrl(Url('/categories', TRUE));
       
       // Set a definition of the user's current timezone from the db. jQuery
       // will pick this up, compare to the browser, and update the user's

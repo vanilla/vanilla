@@ -8,7 +8,7 @@ if ($this->Data !== FALSE) {
    }
    ?>
 <div class="Box BoxCategories">
-   <h4><?php echo Anchor(T('Categories'), 'categories/all'); ?></h4>
+   <h4><?php echo Anchor(T('Categories'), 'categories'); ?></h4>
    <ul class="PanelInfo PanelCategories">
       <li class="ClearFix<?php
       /*

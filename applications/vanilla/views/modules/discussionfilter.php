@@ -37,11 +37,11 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
       <?php      
       if (C('Vanilla.Categories.ShowTabs')) {
          $CssClass = 'AllCategories';
-         if (strtolower($Controller->ControllerName) == 'categoriescontroller' && strtolower($Controller->RequestMethod) == 'all') {
+         if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), array('index', 'all'))) {
             $CssClass .= ' Active';
          }
 
-         echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpAllCategories').T('Categories'), '/categories/all').'</li> ';
+         echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpAllCategories').T('Categories'), '/categories').'</li> ';
       }
       ?>
       <?php if ($CountBookmarks > 0 || $Controller->RequestMethod == 'bookmarked') { ?>

@@ -112,7 +112,7 @@ class ProfileController extends Gdn_Controller {
       $UserID = $this->User->UserID;
       $Username = $this->User->Name;
       
-      $this->_SetBreadcrumbs(T('Activity'), Url('/profile/activity'));
+      $this->_SetBreadcrumbs(T('Activity'), '/profile/activity');
       
       $this->SetTabView('Activity');
       $Comment = $this->Form->GetFormValue('Comment');
@@ -284,7 +284,9 @@ class ProfileController extends Gdn_Controller {
          }
       }
       
-      $this->Render();
+		$this->Title(T('Edit My Profile'));
+		$this->_SetBreadcrumbs(T('Edit My Profile'), '/profile/edit');
+		$this->Render();
    }
    
    /**
@@ -338,7 +340,9 @@ class ProfileController extends Gdn_Controller {
       $Session = Gdn::Session();
       $this->InvitationCount = $this->UserModel->GetInvitationCount($Session->UserID);
       $this->InvitationData = $InvitationModel->GetByUserID($Session->UserID);
-      $this->Render();
+		$this->Title(T('My Invitations'));
+		$this->_SetBreadcrumbs(T('My Invitations'), '/profile/invitations');
+		$this->Render();
    }
    
    /**
@@ -414,8 +418,7 @@ class ProfileController extends Gdn_Controller {
 				$this->ControllerName = 'Activity';
 			}
 		}
-		
-      $this->Render();
+		$this->Render();
    }   
    
    /**
@@ -451,6 +454,8 @@ class ProfileController extends Gdn_Controller {
             $this->Form->ClearInputs();
          }
       }
+		$this->Title(T('Change My Password'));
+		$this->_SetBreadcrumbs(T('Change My Password'), '/profile/password');
       $this->Render();
    }
    
@@ -547,6 +552,8 @@ class ProfileController extends Gdn_Controller {
 		if ($this->Form->ErrorCount() > 0)
 			$this->DeliveryType(DELIVERY_TYPE_ALL);
 
+		$this->Title(T('Change My Picture'));
+		$this->_SetBreadcrumbs(T('Change My Picture'), '/profile/picture');
       $this->Render();
    }
    
@@ -667,6 +674,8 @@ class ProfileController extends Gdn_Controller {
          UserModel::SetMeta($this->User->UserID, $Meta, 'Preferences.');
 			$this->InformMessage(Sprite('Check', 'InformSprite').T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
       }
+		$this->Title(T('Notification Preferences'));
+		$this->_SetBreadcrumbs(T('Notification Preferences'), '/profile/preferences');
       $this->Render();
    }
    /**
@@ -834,6 +843,9 @@ class ProfileController extends Gdn_Controller {
       if ($PhotoParsed['Type']) {
          @unlink($Source);
       }
+
+		$this->Title(T('Edit My Thumbnail'));
+		$this->_SetBreadcrumbs(T('Edit My Thumbnail'), '/profile/thumbnail');
       $this->Render();
    }
    
@@ -972,7 +984,7 @@ class ProfileController extends Gdn_Controller {
 			// Add profile options for the profile owner
 			// Don't allow account editing if it has been turned off.
 			if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
-				$Module->AddLink('Options', Sprite('SpEdit').T('Edit My Account'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+				$Module->AddLink('Options', Sprite('SpEdit').T('Edit My Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
 					
 				// No password may have been set if they have only signed in with a connect plugin
 				$passwordLabel = T('Change My Password');
@@ -983,7 +995,7 @@ class ProfileController extends Gdn_Controller {
 			if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
 				$Module->AddLink('Options', Sprite('SpInvitations').T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));
 
-			$Module->AddLink('Options', Sprite('SpPreferences').T('My Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
+			$Module->AddLink('Options', Sprite('SpPreferences').T('Notification Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
 			if ($AllowImages)
 				$Module->AddLink('Options', Sprite('SpPicture').T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
 				

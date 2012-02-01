@@ -102,7 +102,7 @@ class CategoriesController extends VanillaController {
 			$Category = (object)$Category;
 				
 			// Load the breadcrumbs.
-			$this->SetData('Breadcrumbs', array_merge(array(array('Name' => T('All Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category))));
+			$this->SetData('Breadcrumbs', array_merge(array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category))));
 			
 			$this->SetData('Category', $Category, TRUE);
 	
@@ -201,7 +201,7 @@ class CategoriesController extends VanillaController {
             
       $this->Description(C('Garden.Description', NULL));
       
-      $this->SetData('Breadcrumbs', array(array('Name' => T('All Categories'), 'Url' => '/categories/all')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Categories'), 'Url' => '/categories/all')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
      
 		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
 		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);

@@ -116,7 +116,8 @@ class DiscussionsController extends VanillaController {
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
-      $this->SetData('Breadcrumbs', array(array('Name' => T('All Discussions'), 'Url' => '/discussions')));
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Recent Discussions'), 'Url' => '/discussions')));
+      
       
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
@@ -271,6 +272,7 @@ class DiscussionsController extends VanillaController {
       
       // Render default view (discussions/bookmarked.php)
       $this->SetData('Title', T('My Bookmarks'));
+		$this->SetData('Breadcrumbs', array(array('Name' => T('My Bookmarks'), 'Url' => '/discussions/bookmarked')));
       $this->Render('index');
    }
    
@@ -330,6 +332,7 @@ class DiscussionsController extends VanillaController {
       
       // Render default view (discussions/mine.php)
       $this->SetData('Title', T('My Discussions'));
+      $this->SetData('Breadcrumbs', array(array('Name' => T('My Discussions'), 'Url' => '/discussions/mine')));
       $this->Render('Index');
    }
 

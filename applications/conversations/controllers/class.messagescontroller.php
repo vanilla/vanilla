@@ -100,6 +100,8 @@ class MessagesController extends ConversationsController {
       if ($Target = Gdn::Request()->Get('Target'))
             $this->Form->AddHidden('Target', $Target);
 
+      $this->Title(T('New Conversation'));
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox'), array('Name' => $this->Data('Title'), 'Url' => 'messages/add')));
       $this->Render();      
    }
    

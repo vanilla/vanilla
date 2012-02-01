@@ -214,8 +214,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          // This is something other than json, so just put it into the popup directly
          if (data) // Prevent blank popups
             $('#'+settings.popupId+' .Content').append(data);
-         else
-            gdn.informError(xhr);
       } else {
          gdn.inform(json);
          formSaved = json['FormSaved'];
@@ -235,8 +233,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          // if (formSaved == false)
          if (data) // Prevent blank popups
             $('#'+settings.popupId+' .Content').html(data);
-         else 
-            gdn.informError(xhr);
       }
     
       $('#'+settings.popupId+' .Loading').remove();
@@ -268,6 +264,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                } else {
                   $.popup.reveal(settings, json) // Setup the form again
                }
+            },
+            error: function(xhr) {
+               gdn.informError(xhr);
             }
          });
 

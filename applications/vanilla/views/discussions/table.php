@@ -69,7 +69,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 			<?php
 				echo UserPhoto($First, 'PhotoLink');
 				echo UserAnchor($First, 'UserLink');
-				echo Anchor(Gdn_Format::Date($Discussion->FirstDate), $FirstPageUrl, 'CommentDate');
+				echo Anchor(Gdn_Format::Date($Discussion->FirstDate, 'html'), $FirstPageUrl, 'CommentDate');
 			?>
 		</div>
    </td>
@@ -79,7 +79,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 			if ($Last) {
 				echo UserPhoto($Last, 'PhotoLink');
 				echo UserAnchor($Last, 'UserLink');
-				echo Anchor(Gdn_Format::Date($Discussion->LastDate), $LastPageUrl, 'CommentDate');
+				echo Anchor(Gdn_Format::Date($Discussion->LastDate, 'html'), $LastPageUrl, 'CommentDate');
 			} else {
 				echo '&nbsp;';
 			}
@@ -92,7 +92,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 		// echo number_format($Discussion->CountComments);
 		
 		// Round Number
-		echo Gdn_Format::BigNumber($Discussion->CountReplies);
+		echo Gdn_Format::BigNumber($Discussion->CountReplies, 'html');
 		?>
 	</td>
 	<td class="BigCount CountViews">
@@ -101,7 +101,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 		// echo number_format($Discussion->CountViews);
 		
 		// Round Number
-		echo Gdn_Format::BigNumber($Discussion->CountViews);
+		echo Gdn_Format::BigNumber($Discussion->CountViews, 'html');
 		?>
 	</td>
 	<td class="Opts">

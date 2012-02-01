@@ -6,12 +6,10 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 
 ?>
 <div id="DiscussionForm">
-   <ul class="FormType">
-		<li><?php echo Anchor(Sprite('SpNewDiscussion').Wrap(T('New Discussion'), 'strong'), '#', array('class' => 'Type-NewDiscussion Active')); ?></li>
-		<li><?php echo Anchor(Sprite('SpNewPoll').Wrap(T('New Poll'), 'strong'), '#', array('class' => 'Type-NewPoll')); ?></li>
-		<li><?php echo Anchor(Sprite('SpAskQuestion').Wrap(T('Ask Question'), 'strong'), '#', array('class' => 'Type-AskQuestion')); ?></li>
-	</ul>
    <?php
+		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+			echo Wrap($this->Data('Title'), 'h1');
+	
       echo $this->Form->Open();
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');

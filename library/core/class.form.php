@@ -1108,9 +1108,12 @@ class Gdn_Form extends Gdn_Pluggable {
     *
     * @todo check that missing DataObject parameter
     */
-   public function Open($Attributes = FALSE) {
+   public function Open($Attributes = array()) {
+      if (!is_array($Attributes))
+         $Attributes = array();
+      
       $Return = '<form';
-      if ($this->InputPrefix != '') $Return .= $this->_IDAttribute($this->InputPrefix,
+      if ($this->InputPrefix != '' || array_key_exists('id', $Attributes)) $Return .= $this->_IDAttribute($this->InputPrefix,
          $Attributes);
 
       // Method

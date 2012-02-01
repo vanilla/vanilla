@@ -2,5 +2,5 @@
 
 <div class="SplashInfo">
    <h1><?php echo T('PermissionErrorTitle', 'Permission Problem'); ?></h1>
-   <p><?php echo T('PermissionErrorMessage', "You don't have permission to do that."); ?></p>
+   <p><?php echo $this->Data('Message', T('PermissionErrorMessage', "You don't have permission to do that.")); ?></p>
 </div>

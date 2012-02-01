@@ -91,6 +91,8 @@ jQuery(document).ready(function($) {
          success: function(json) {
             json = $.postParseJson(json);
             
+            gdn.inform(json);
+            
             // Remove any old errors from the form
             $('div.Errors').remove();
 
@@ -119,7 +121,7 @@ jQuery(document).ready(function($) {
       // Only submit the form if the textarea isn't empty
       if ($(inp).val() != '') {
          $('span.Progress').remove();
-         $(but).after('<span class="Progress">&#160;</span>');
+         $(but).before('<span class="Progress">&#160;</span>');
          var postValues = $(frm).serialize();
          postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON';
          $.ajax({
@@ -135,6 +137,9 @@ jQuery(document).ready(function($) {
             },
             success: function(json) {
                json = $.postParseJson(json);
+               
+               gdn.inform(json);
+               
                if (json['FormSaved'] == true) {
                   $(inp).val('');
                   // If there were no activities
@@ -148,10 +153,8 @@ jQuery(document).ready(function($) {
                   // Make sure that hidden items appear
                   $('ul.Activities li.Hidden').slideDown('fast');
                   // If the user's status was updated, show it.
-                  if (typeof(json['UserData']) != 'undefined') {
-                     $('div.User').remove();
-                     $('div.Profile').prepend(json['UserData']);
-                  }
+                  if (typeof(json['StatusMessage']) != 'undefined')
+                     $('#Status span').html(json['StatusMessage']);
                }
             }
          });

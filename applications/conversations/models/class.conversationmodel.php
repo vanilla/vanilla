@@ -190,7 +190,7 @@ class ConversationModel extends Gdn_Model {
     */
    public function GetRecipients($ConversationID, $IgnoreUserID = '0') {
       return $this->SQL
-         ->Select('uc.UserID, u.Name, u.Email, uc.Deleted')
+         ->Select('uc.UserID, u.Name, u.Email, uc.Deleted, u.Photo')
          ->Select('cm.DateInserted', 'max', 'DateLastActive')
          ->From('UserConversation uc')
          ->Join('User u', 'uc.UserID = u.UserID')

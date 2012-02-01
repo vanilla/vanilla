@@ -109,8 +109,25 @@ class ActivityController extends Gdn_Controller {
     * 
     * @param int $Offset Number of activity items to skip.
     */
-   public function Index($Page = FALSE) {
-      $this->Permission('Garden.Activity.View');
+   public function Index($Filter = FALSE, $Page = FALSE) {
+      switch (strtolower($Filter)) {
+         case 'mods':
+            $this->Title(T('Recent Moderator Activity'));
+            $this->Permission('Garden.Moderation.Manage');
+            $NotifyUserID = ActivityModel::NOTIFY_MODS;
+            break;
+         case 'admins':
+            $this->Title(T('Recent Admin Activity'));
+            $this->Permission('Garden.Settings.Manage');
+            $NotifyUserID = ActivityModel::NOTIFY_ADMINS;
+            break;
+         default:
+            $Filter = 'public';
+            $this->Title(T('Recent Activity'));
+            $this->Permission('Garden.Activity.View');
+            $NotifyUserID = ActivityModel::NOTIFY_PUBLIC;
+            break;
+      }
          
       // Which page to load
       list($Offset, $Limit) = OffsetLimit($Page, 30);
@@ -120,16 +137,15 @@ class ActivityController extends Gdn_Controller {
       
       // Page meta.
       $this->AddJsFile('activity.js');
-      $this->Title(T('Recent Activity'));
       
       // Comment submission 
       $Session = Gdn::Session();
       $Comment = $this->Form->GetFormValue('Comment');
-      $Activities = $this->ActivityModel->GetWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), $Offset, $Limit)->ResultArray();
+      $Activities = $this->ActivityModel->GetWhere(array('NotifyUserID' => $NotifyUserID), $Offset, $Limit)->ResultArray();
       $this->ActivityModel->JoinComments($Activities);
       
+      $this->SetData('Filter', strtolower($Filter));
       $this->SetData('Activities', $Activities);
-      $this->CanonicalUrl(Url('/activity', TRUE));
       
       $this->View = 'all';
       $this->Render();
@@ -220,6 +236,13 @@ class ActivityController extends Gdn_Controller {
                 'Format' => 'Text');
             
             $ID = $this->ActivityModel->Comment($ActivityComment);
+            
+            if ($ID == SPAM) {
+               $this->StatusMessage = T('Your post has been flagged for moderation.');
+               $this->Render('Blank', 'Utility');
+               return;
+            }
+            
             $this->Form->SetValidationResults($this->ActivityModel->ValidationResults());
             if ($this->Form->ErrorCount() > 0)
                $this->ErrorMessage($this->Form->Errors());
@@ -244,15 +267,31 @@ class ActivityController extends Gdn_Controller {
       $this->Render();
    }
    
-   public function Post($UserID = FALSE) {
-      $this->Permission('Garden.Profiles.Edit');
+   public function Post($Notify = FALSE, $UserID = FALSE) {
+      if (is_numeric($Notify)) {
+         $UserID = $Notify;
+         $Notify = FALSE;
+      }
+      
+      switch ($Notify) {
+         case 'mods':
+            $this->Permission('Garden.Moderation.Manage');
+            $NotifyUserID = ActivityModel::NOTIFY_MODS;
+            break;
+         case 'admins':
+            $this->Permission('Garden.Settings.Manage');
+            $NotifyUserID = ActivityModel::NOTIFY_ADMINS;
+            break;
+         default:
+            $this->Permission('Garden.Profiles.Edit');
+            $NotifyUserID = ActivityModel::NOTIFY_PUBLIC;
+            break;
+      }
+      
       $Activities = array();
       
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
-         
-         
-         
          if ($UserID && $UserID != Gdn::Session()->UserID) {
             // This is a wall post.
             $Activity = array(
@@ -267,19 +306,29 @@ class ActivityController extends Gdn_Controller {
             $Activity = array(
                 'ActivityType' => 'Status',
                 'HeadlineFormat' => T('HeadlineFormat.Status', '{ActivityUserID,user}'),
-                'Story' => $Data['Comment']
+                'Story' => $Data['Comment'],
+                'NotifyUserID' => $NotifyUserID
             );
+            $this->SetJson('StatusMessage', Gdn_Format::Display($Data['Comment']));
          }
          
-         $Activity = $this->ActivityModel->Save($Activity);
+         $Activity = $this->ActivityModel->Save($Activity, FALSE, array('CheckSpam' => TRUE));
+         if ($Activity == SPAM) {
+            $this->StatusMessage = T('Your post has been flagged for moderation.');
+            $this->Render('Blank', 'Utility');
+            return;
+         }
+         
          if ($Activity) {
-            Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', $Activity['Story']);
+            if (!$UserID && $NotifyUserID == ActivityModel::NOTIFY_PUBLIC)
+               Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', $Activity['Story']);
             
             $Activities = array($Activity);
             $this->ActivityModel->CalculateData($Activities);
             ActivityModel::JoinUsers($Activities);
          }
       }
+
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
          Redirect($this->Request->Get('Target', '/activity'));
       }

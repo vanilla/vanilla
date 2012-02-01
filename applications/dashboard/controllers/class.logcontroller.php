@@ -14,6 +14,18 @@
 class LogController extends DashboardController {
    /** @var array Objects to prep. */
    public $Uses = array('Form', 'LogModel');
+   
+   /**
+    *
+    * @var Gdn_Form 
+    */
+   public $Form;
+   
+   /**
+    *
+    * @var LogModel
+    */
+   public $LogModel;
 
    /**
     * Confirmation page.
@@ -26,14 +38,28 @@ class LogController extends DashboardController {
     */
    public function Confirm($Action, $LogIDs = '') {
       $this->Permission('Garden.Moderation.Manage');
+      
+      $this->Form->InputPrefix = '';
+      $this->Form->IDPrefix = 'Confirm_';
 
       if (trim($LogIDs))
-         $LogIDs = explode(',', $LogIDs);
+         $LogIDArray = explode(',', $LogIDs);
       else
-         $LogIDs = array();
+         $LogIDArray = array();
+      
+      // We also want to collect the users from the log.
+      $Logs = $this->LogModel->GetIDs($LogIDArray);
+      $Users = array();
+      foreach ($Logs as $Log) {
+         $UserID = $Log['RecordUserID'];
+         $Users[$UserID] = array('UserID' => $UserID);
+      }
+      Gdn::UserModel()->JoinUsers($Users, array('UserID'));
+      $this->SetData('Users', $Users);
 
       $this->SetData('Action', $Action);
-      $this->SetData('ItemCount', count($LogIDs));
+      $this->SetData('ActionUrl', Url("/log/$Action?logids=".urlencode($LogIDs)));
+      $this->SetData('ItemCount', count($LogIDArray));
 
       $this->Render();
    }
@@ -73,6 +99,37 @@ class LogController extends DashboardController {
       $this->Permission('Garden.Moderation.Manage');
       // Grab the logs.
       $this->LogModel->Delete($LogIDs);
+   }
+   
+   /**
+    * Delete spam and optionally delete the users.
+    * @param type $LogIDs 
+    */
+   public function DeleteSpam($LogIDs) {
+      $this->Permission('Garden.Moderation.Manage');
+      
+      if (!$this->Form->IsPostBack())
+         return;
+      
+      $LogIDs = explode(',', $LogIDs);
+      
+      // Ban the appropriate users.
+      $UserIDs = $this->Form->GetFormValue('UserID', array());
+      if (!is_array($UserIDs))
+         $UserIDs = array();
+      
+      // Grab the rest of the log entries.
+      $OtherLogIDs = $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserIDs));
+      $OtherLogIDs = ConsolidateArrayValuesByKey($OtherLogIDs, 'LogID');
+      $LogIDs = array_merge($LogIDs, $OtherLogIDs);
+      
+      foreach ($UserIDs as $UserID) {
+         Gdn::UserModel()->Ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => TRUE, 'Log' => TRUE));
+      }
+      
+      // Grab the logs.
+      $this->LogModel->Delete($LogIDs);
+      $this->Render('Blank', 'Utility');
    }
    
    /**
@@ -139,7 +196,8 @@ class LogController extends DashboardController {
       parent::Initialize();
       $this->AddJsFile('log.js');
       $this->AddJsFile('jquery.expander.js');
-      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
+      $this->Form->InputPrefix = '';
    }
    
    /**
@@ -193,6 +251,41 @@ class LogController extends DashboardController {
          $this->Form->AddError($Ex->getMessage());
       }
       $this->LogModel->Recalculate();
+   }
+   
+   public function NotSpam($LogIDs) {
+      $this->Permission('Garden.Moderation.Manage');
+      
+      if (!$this->Form->IsPostBack())
+         return;
+      
+      $Logs = array();
+      
+      // Verify the appropriate users.
+      $UserIDs = $this->Form->GetFormValue('UserID', array());
+      if (!is_array($UserIDs))
+         $UserIDs = array();
+      
+      foreach ($UserIDs as $UserID) {
+         Gdn::UserModel()->SetField($UserID, 'Verified', TRUE);
+         $Logs = array_merge($Logs, $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserID)));
+      }
+
+      // Grab the logs.
+      $Logs = array_merge($Logs, $this->LogModel->GetIDs($LogIDs));
+      try {
+         foreach ($Logs as $Log) {
+            $this->LogModel->Restore($Log);
+         }
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex->getMessage());
+      }
+      $this->LogModel->Recalculate();
+      
+      $this->SetData('Complete');
+      $this->SetData('Count', count($Logs));
+      $this->Render('Blank', 'Utility');
+      
    }
 
    /**

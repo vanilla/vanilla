@@ -40,6 +40,42 @@ class UserModel extends Gdn_Model {
 
       return $Message;
    }
+   
+   public function Ban($UserID, $Options) {
+      $this->SetField($UserID, 'Banned', TRUE);
+      
+      $LogID = FALSE;
+      if (GetValue('DeleteContent', $Options)) {
+         $LogID = $this->DeleteContent($UserID, $Options);
+      }
+      if (GetValue('AddActivity', $Options, TRUE)) {
+         switch (GetValue('Reason', $Options, '')) {
+            case '':
+               $Story = NULL;
+               break;
+            case 'Spam':
+               $Story = T('Banned for spamming.');
+               break;
+            case 'Abuse':
+               $Story = T('Banned for being abusive.');
+               break;
+            default:
+               $Story = $Options['Reason'];
+               break;
+         }
+         
+         $Activity = array(
+             'ActivityType' => 'Ban',
+             'NotifyUserID' => ActivityModel::NOTIFY_MODS,
+             'RegardingUserID' => $UserID,
+             'HeadlineFormat' => T('HeadlineFormat.Ban', '{ActivityUserID,you} banned {RegardingUserID,user}.'),
+             'Story' => $Story,
+             'Data' => array('LogID' => $LogID));
+         
+         $ActivityModel = new ActivityModel();
+         $ActivityModel->Save($Activity);
+      }
+   }
 
    public function ConfirmEmail($User, $EmailKey) {
       $Attributes = GetValue('Attributes', $User);
@@ -1010,28 +1046,28 @@ class UserModel extends Gdn_Model {
    }
    
    /**
-    * Force the admin user into UserID 1.
+    * Create an admin user account
     */
    public function SaveAdminUser($FormPostValues) {
       $UserID = 0;
 
       // Add & apply any extra validation rules:
-      $Name = ArrayValue('Name', $FormPostValues, '');
-      $FormPostValues['Email'] = ArrayValue('Email', $FormPostValues, strtolower($Name.'@'.Gdn_Url::Host()));
+      $Name = GetValue('Name', $FormPostValues, '');
+      $FormPostValues['Email'] = GetValue('Email', $FormPostValues, strtolower($Name.'@'.Gdn_Url::Host()));
       $FormPostValues['ShowEmail'] = '0';
       $FormPostValues['TermsOfService'] = '1';
       $FormPostValues['DateOfBirth'] = '1975-09-16';
       $FormPostValues['DateLastActive'] = Gdn_Format::ToDateTime();
       $FormPostValues['DateUpdated'] = Gdn_Format::ToDateTime();
-      $FormPostValues['Gender'] = 'm';
+      $FormPostValues['Gender'] = 'u';
       $FormPostValues['Admin'] = '1';
 
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
-         $Username = ArrayValue('Name', $Fields);
-         $Email = ArrayValue('Email', $Fields);
+         $Username = GetValue('Name', $Fields);
+         $Email = GetValue('Email', $Fields);
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          
          // Insert the new user
@@ -1166,6 +1202,8 @@ class UserModel extends Gdn_Model {
          $IPAddress = $Keywords;
       } elseif (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+      } elseif (preg_match('/^\d+$/', $Keywords)) {
+         $UserID = $Keywords;
       } else {
          // Check to see if the search exactly matches a role name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
@@ -1188,6 +1226,8 @@ class UserModel extends Gdn_Model {
             ->OrWhere('u.InsertIPAddress', $IPAddress)
             ->OrWhere('u.LastIPAddress', $IPAddress)
             ->EndWhereGroup();
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          // Search on the user table.
          $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
@@ -1226,6 +1266,8 @@ class UserModel extends Gdn_Model {
       $RoleID = FALSE;
       if (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
       }
@@ -1241,6 +1283,8 @@ class UserModel extends Gdn_Model {
 
       if ($RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
+      } elseif (isset($UserID)) {
+         $this->SQL->Where('u.UserID', $UserID);
       } else {
          // Search on the user table.
          $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
@@ -1769,41 +1813,14 @@ class UserModel extends Gdn_Model {
       }
       return TRUE;
    }
-
-   public function Delete($UserID, $Options = array()) {
-      // Fire an event so applications can remove their associated user data.
-      $this->EventArguments['UserID'] = $UserID;
-      $this->EventArguments['Options'] = $Options;
-      $this->FireEvent('BeforeDeleteUser');
-      
+   
+   public function Delete($User, $Options = array()) {
       if ($UserID == $this->GetSystemUserID()) {
          $this->Validation->AddValidationResult('', 'You cannot delete the system user.');
          return FALSE;
       }
-
-      // Remove photos
-      $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
-      foreach ($PhotoData->Result() as $Photo) {
-         @unlink(PATH_UPLOADS.DS.$Photo->Name);
-      }
-      $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
       
-      // Remove invitations
-      $this->SQL->Delete('Invitation', array('InsertUserID' => $UserID));
-      $this->SQL->Delete('Invitation', array('AcceptedUserID' => $UserID));
-      
-      // Remove activities
-      $this->SQL->Delete('Activity', array('ActivityUserID' => $UserID));
-      $this->SQL->Delete('Activity', array('RegardingUserID' => $UserID));
-      
-      // Remove shared authentications
-      $this->SQL->Delete('UserAuthentication', array('UserID' => $UserID));
-
-      // Remove role associations
-      $this->SQL->Delete('UserRole', array('UserID' => $UserID));
-
-      // Remove foreign account associations
-      $this->SQL->Delete('UserAuthentication', array('UserID' => $UserID));
+      $this->DeleteContent($UserID, $Options);
       
       // Remove the user's information
       $this->SQL->Update('User')
@@ -1814,7 +1831,7 @@ class UserModel extends Gdn_Model {
             'About' => '',
             'Email' => 'user_'.$UserID.'@deleted.email',
             'ShowEmail' => '0',
-            'Gender' => 'm',
+            'Gender' => 'u',
             'CountVisits' => 0,
             'CountInvitations' => 0,
             'CountNotifications' => 0,
@@ -1838,6 +1855,56 @@ class UserModel extends Gdn_Model {
       $this->ClearCache($UserID);
       
       return TRUE;
+   }
+
+   public function DeleteContent($UserID, $Options = array()) {
+      $Log = GetValue('Log', $Options);
+      $Result = FALSE;
+      $Content = array();
+      
+      // Fire an event so applications can remove their associated user data.
+      $this->EventArguments['UserID'] = $UserID;
+      $this->EventArguments['Options'] = $Options;
+      $this->EventArguments['Content'] =& $Content;
+      $this->FireEvent('BeforeDeleteUser');
+      
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      
+      if (!$Log)
+         $Content = NULL;
+
+      // Remove photos
+      $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
+      foreach ($PhotoData->Result() as $Photo) {
+         @unlink(PATH_UPLOADS.DS.$Photo->Name);
+      }
+      $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
+      
+      // Remove invitations
+      $this->SQL->GetDelete('Invitation', array('InsertUserID' => $UserID), $Content);
+      $this->SQL->GetDelete('Invitation', array('AcceptedUserID' => $UserID), $Content);
+      
+      // Remove activities
+      $this->SQL->GetDelete('Activity', array('ActivityUserID' => $UserID), $Content);
+      $this->SQL->GetDelete('Activity', array('RegardingUserID' => $UserID), $Content);
+      
+      // Remove activity comments.
+      $this->GetDelete('ActivityComment', array('InsertUserID' => $UserID), $Content);
+      
+      // Remove shared authentications.
+      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Content);
+
+      // Remove role associations.
+      $this->GetDelete('UserRole', array('UserID' => $UserID), $Content);      
+      
+      if ($Log) {
+         $User['_Data'] = $Content;
+         unset($Content); // in case data gets copied
+         
+         $Result = LogModel::Insert('Delete', 'User', $User, GetValue('LogOptions', $Options, array()));
+      }
+      
+      return $Result;
    }
 
    public function Decline($UserID) {
@@ -1934,6 +2001,33 @@ class UserModel extends Gdn_Model {
          // Otherwise return CountInvitations
          return $User->CountInvitations;
       }
+   }
+   
+   /**
+    * Get rows from a table then delete them.
+    * 
+    * @param string $Table The name of the table.
+    * @param array $Where The where condition for the delete.
+    * @param array $Data The data to put the result.
+    * @since 2.1
+    */
+   public function GetDelete($Table, $Where, &$Data) {
+      if (is_array($Data)) {
+         // Grab the records.
+         $Result = $this->SQL->GetWhere($Table, $Where)->ResultArray();
+         
+         if (empty($Result))
+            return;
+         
+         // Put the records in the result array.
+         if (isset($Data[$Table])) {
+            $Data[$Table] = array_merge($Data[$Table], $Result);
+         } else {
+            $Data[$Table] = $Result;
+         }
+      }
+      
+      $this->SQL->Delete($Table, $Where);
    }
 
    /**
@@ -2330,7 +2424,7 @@ class UserModel extends Gdn_Model {
          $UserData['Name'] = $Data['Name'];
          $UserData['Password'] = RandomString(16);
          $UserData['Email'] = ArrayValue('Email', $Data, 'no@email.com');
-         $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Attributes, 'm'), 0, 1));
+         $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Attributes, 'u'), 0, 1));
          $UserData['HourOffset'] = ArrayValue('HourOffset', $Attributes, 0);
          $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Attributes, '');
          $UserData['CountNotifications'] = 0;

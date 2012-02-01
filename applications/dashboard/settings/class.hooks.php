@@ -69,16 +69,25 @@ class DashboardHooks implements Gdn_IPlugin {
 //		else if (in_array($Sender->MasterView, array('', 'default')))
 		if (in_array($Sender->MasterView, array('', 'default')))
 			$Exceptions[] = '[NonAdmin]';
+      
+      // SignIn popup is a special case
+      $SignInOnly = ($Sender->DeliveryType() == DELIVERY_TYPE_VIEW && $Location == 'Dashboard/entry/signin');
+      if ($SignInOnly)
+         $Exceptions = array();
 			
 		if ($Sender->MasterView != 'admin' && (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache))) {
          $MessageModel = new MessageModel();
          $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
          foreach ($MessageData as $Message) {
             $MessageModule = new MessageModule($Sender, $Message);
-            $Sender->AddModule($MessageModule);
+            if ($SignInOnly) // Insert special messages even in SignIn popup
+               echo $MessageModule;
+            elseif ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
+               $Sender->AddModule($MessageModule);
          }
 			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
       }
+      
 		// If there are applicants, alert admins by showing in the main menu
 		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
 			$CountApplicants = Gdn::UserModel()->GetApplicantCount();
@@ -94,6 +103,11 @@ class DashboardHooks implements Gdn_IPlugin {
       // Allow forum embedding
       if (C('Garden.Embed.Allow'))
          $Sender->AddJsFile('js/embed_local.js');
+         
+      // Allow return to mobile site
+		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+		   $Sender->AddAsset('Foot', Wrap(Anchor(T('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
    }
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {

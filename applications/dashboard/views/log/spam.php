@@ -7,8 +7,8 @@ echo $this->Form->Open();
 ?>
 <div class="Info">
    <?php
+   echo Anchor(T('Spam'), '#', array('class' => 'SpamButton SmallButton'));
    echo Anchor(T('Not Spam'), '#', array('class' => 'NotSpamButton SmallButton'));
-   echo Anchor(T('Delete Forever'), '#', array('class' => 'DeleteButton SmallButton'));
    ?>
 </div>
 <?php
@@ -19,8 +19,8 @@ echo '</div id="LogTable">';
 ?>
 <div class="Info">
    <?php
+   echo Anchor(T('Spam'), '#', array('class' => 'SpamButton SmallButton'));
    echo Anchor(T('Not Spam'), '#', array('class' => 'NotSpamButton SmallButton'));
-   echo Anchor(T('Delete Forever'), '#', array('class' => 'DeleteButton SmallButton'));
    ?>
 </div>
 <?php

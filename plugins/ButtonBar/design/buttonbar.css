@@ -16,7 +16,7 @@
    margin-top: -6px;
 }
 
-.ButtonBar .Button-Wrap {
+.ButtonBar .ButtonWrap {
     background-color: white;
     background-position: 50% 50%;
     background-repeat: no-repeat;
@@ -38,12 +38,12 @@
     z-index: 50;
 }
 
-.ButtonBar .Button-Wrap:hover {
+.ButtonBar .ButtonWrap:hover {
    background-color: #E9E9E9;
    cursor: pointer;
 }
 
-.ButtonBar .Button-Wrap span {
+.ButtonBar .ButtonWrap span {
    display: none;
 }
 

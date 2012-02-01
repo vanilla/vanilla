@@ -1,11 +1,11 @@
 <div class="ButtonBar">
-   <span class="Button-Wrap"><span>bold</span></span>
-   <span class="Button-Wrap"><span>italic</span></span>
-   <span class="Button-Wrap"><span>underline</span></span>
-   <span class="Button-Wrap"><span>strike</span></span>
-   <span class="Button-Wrap"><span>code</span></span>
-   <span class="Button-Wrap"><span>image</span></span>
-   <span class="Button-Wrap"><span>url</span></span>
-   <span class="Button-Wrap"><span>quote</span></span>
-   <span class="Button-Wrap"><span>spoiler</span></span>
+   <span class="ButtonWrap"><span>bold</span></span>
+   <span class="ButtonWrap"><span>italic</span></span>
+   <span class="ButtonWrap"><span>underline</span></span>
+   <span class="ButtonWrap"><span>strike</span></span>
+   <span class="ButtonWrap"><span>code</span></span>
+   <span class="ButtonWrap"><span>image</span></span>
+   <span class="ButtonWrap"><span>url</span></span>
+   <span class="ButtonWrap"><span>quote</span></span>
+   <span class="ButtonWrap"><span>spoiler</span></span>
 </div>

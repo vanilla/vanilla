@@ -112,6 +112,15 @@ class Gdn_ApplicationManager {
       return FALSE;
    }
    
+   public function GetApplicationInfo($ApplicationName, $Target = NULL) {
+      $ApplicationInfo = GetValue($ApplicationName, $this->AvailableApplications(), NULL);
+      if (is_null($ApplicationInfo)) return FALSE;
+      
+      if (!is_null($Target))
+         return GetValueR($Target, $ApplicationInfo, FALSE);
+      return $ApplicationInfo;
+   }
+   
    public function AvailableVisibleApplications() {
       $AvailableApplications = $this->AvailableApplications();
       foreach ($AvailableApplications as $ApplicationName => $Info) {

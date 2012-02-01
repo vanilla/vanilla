@@ -16,7 +16,7 @@ if (!function_exists('Alternate')) {
    function Alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class'){
       static $i = 0;
       $Value = $i++ % 2 ? $Odd : $Even;
-      if($Value != '' && $Even == '')
+      if($Value != '' && $Even == '' && $AttributeName)
          $Value = ' '.$AttributeName.'="'.$Value.'"';
       return $Value;
    }
@@ -215,13 +215,14 @@ if (!function_exists('UserAnchor')) {
       
       $Name = GetValue($Px.'Name', $User, T('Unknown'));
       $UserID = GetValue($Px.'UserID', $User, 0);
+		$Text = GetValue('Text', $Options, htmlspecialchars($Name)); // Allow anchor text to be overridden.
       
       $Attributes = array(
           'class' => $CssClass,
           'rel' => GetValue('Rel', $Options)
           );
 
-      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.htmlspecialchars($Name).'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
 

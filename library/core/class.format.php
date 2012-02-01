@@ -71,9 +71,17 @@ class Gdn_Format {
          $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
          $GenderSuffixCode = 'Third';
       }
-      
-      $Gender = T($Activity->ActivityGender == 'm' ? 'his' : 'her');
-      $Gender2 = T($Activity->ActivityGender == 'm' ? 'he' : 'she');
+
+      $Gender = T('their'); //TODO: this isn't preferable but I don't know a better option
+      $Gender2 = T('they'); //TODO: this isn't preferable either
+      if ($Activity->ActivityGender == 'm') {
+        $Gender = T('his');
+        $Gender2 = T('he');
+      } else if ($Activity->ActivityGender == 'f') {
+        $Gender = T('her');
+        $Gender2 = T('she');
+      }
+
       if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID)) {
          $Gender = $Gender2 = T('your');
       }
@@ -489,6 +497,52 @@ class Gdn_Format {
           $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
 
       $Result = strftime($Format, $Timestamp);
+
+      if ($Html) {
+         $Result = Wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));
+      }
+      return $Result;
+   }
+   
+   /**
+    * Formats a MySql datetime or a unix timestamp for display in the system.
+    * 
+    * @param int $Timestamp
+    * @param string $Format 
+    * @since 2.1
+    */
+   public static function DateFull($Timestamp, $Format = '') {
+      if ($Timestamp === NULL)
+         return T('Null Date', '-');
+
+      // Was a mysqldatetime passed?
+      if (!is_numeric($Timestamp)) {
+         $Timestamp = self::ToTimestamp($Timestamp);
+      }
+         
+      if (!$Timestamp)
+         $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
+      $GmTimestamp = $Timestamp;
+
+      $Now = time();
+      
+      // Alter the timestamp based on the user's hour offset
+      $Session = Gdn::Session();
+      if ($Session->UserID > 0) {
+         $SecondsOffset = ($Session->User->HourOffset * 3600);
+         $Timestamp += $SecondsOffset;
+         $Now += $SecondsOffset;
+      }
+
+      $Html = FALSE;
+      if (strcasecmp($Format, 'html') == 0) {
+         $Format = '';
+         $Html = TRUE;
+      }
+      
+      $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
+
+      $Result = strftime($FullFormat, $Timestamp);
 
       if ($Html) {
          $Result = Wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));

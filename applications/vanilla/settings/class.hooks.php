@@ -37,12 +37,13 @@ class VanillaHooks implements Gdn_IPlugin {
     *  - DeleteMethod: One of delete, wipe, or NULL
     * @since 2.1
     */
-   public function DeleteUserData($UserID, $Options = array()) {
+   public function DeleteUserData($UserID, $Options = array(), &$Data = NULL) {
       $SQL = Gdn::SQL();
       
-      // Remove discussion watch records and drafts
+      // Remove discussion watch records and drafts.
 		$SQL->Delete('UserDiscussion', array('UserID' => $UserID));
-		$SQL->Delete('Draft', array('InsertUserID' => $UserID));
+      
+		Gdn::UserModel()->GetDelete('Draft', array('InsertUserID' => $UserID), $Data);
       
       // Comment deletion depends on method selected
       $DeleteMethod = GetValue('DeleteMethod', $Options, 'delete');
@@ -74,7 +75,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
 
          
-         $SQL->Delete('Comment', array('InsertUserID' => $UserID));
+         Gdn::UserModel()->GetDelete('Comment', array('InsertUserID' => $UserID), $Data);
          
          // Update the comment counts.
          $CommentCounts = $SQL
@@ -106,7 +107,7 @@ class VanillaHooks implements Gdn_IPlugin {
             ->Get('Discussion');
          
          // Delete the user's dicussions 
-         $SQL->Delete('Discussion', array('InsertUserID' => $UserID));
+         Gdn::UserModel()->GetDelete('Discussion', array('InsertUserID' => $UserID), $Data);
          
          // Update the appropriat recent posts in the categories.
          $CategoryModel = new CategoryModel();
@@ -161,8 +162,9 @@ class VanillaHooks implements Gdn_IPlugin {
       $UserID = GetValue('UserID', $Sender->EventArguments);
       $Options = GetValue('Options', $Sender->EventArguments, array());
       $Options = is_array($Options) ? $Options : array();
+      $Content =& $Sender->EventArguments['Content'];
       
-      $this->DeleteUserData($UserID, $Options);
+      $this->DeleteUserData($UserID, $Options, $Content);
    }
    
    /**
@@ -228,11 +230,11 @@ class VanillaHooks implements Gdn_IPlugin {
          $DiscussionsLabel = T('Discussions');
          $CommentsLabel = T('Comments');
          if (C('Vanilla.Profile.ShowCounts', TRUE)) {
-            $DiscussionsLabel .= CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID");
-            $CommentsLabel .= CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID");
+            $DiscussionsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID").'</span>';
+            $CommentsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID").'</span>';
          }
-         $Sender->AddProfileTab('Discussions', 'profile/discussions/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Discussions', $DiscussionsLabel);
-         $Sender->AddProfileTab('Comments', 'profile/comments/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Comments', $CommentsLabel);
+         $Sender->AddProfileTab(T('Discussions'), 'profile/discussions/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Discussions', $DiscussionsLabel);
+         $Sender->AddProfileTab(T('Comments'), 'profile/comments/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name), 'Comments', $CommentsLabel);
          // Add the discussion tab's CSS and Javascript.
          $Sender->AddJsFile('jquery.gardenmorepager.js');
          $Sender->AddJsFile('discussions.js');

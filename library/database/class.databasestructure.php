@@ -462,7 +462,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     */
    public function Types($Class = 'all') {
       $Date = array('datetime', 'date');
-      $Decimal = array('decimal');
+      $Decimal = array('decimal', 'numeric');
       $Float = array('float', 'double');
       $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');
       $String = array('varchar', 'char', 'mediumtext', 'text');

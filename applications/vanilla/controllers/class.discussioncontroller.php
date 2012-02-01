@@ -51,7 +51,7 @@ class DiscussionController extends VanillaController {
    public function Index($DiscussionID = '', $DiscussionStub = '', $Page = '') {
       // Setup head
       $Session = Gdn::Session();
-      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('options.js');
       $this->AddJsFile('bookmark.js');
@@ -124,7 +124,10 @@ class DiscussionController extends VanillaController {
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
       
-      if ($this->Offset == 0)
+      $PageNumber = PageNumber($this->Offset, $Limit);
+      $this->SetData('Page', $PageNumber);
+      
+      if ($PageNumber == 1)
          $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format), 160));
       else {
          $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
@@ -158,6 +161,11 @@ class DiscussionController extends VanillaController {
       $this->Form->AddHidden('DiscussionID', $this->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
 
+      // Look in the session stash for a comment
+      $StashComment = $Session->Stash('CommentForDiscussionID_'.$this->Discussion->DiscussionID, '', FALSE);
+      if ($StashComment)
+         $this->Form->SetFormValue('Body', $StashComment);
+         
       // Retrieve & apply the draft if there is one:
       if (Gdn::Session()->UserID) {
          $DraftModel = new DraftModel();
@@ -183,6 +191,8 @@ class DiscussionController extends VanillaController {
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
+      
+		$this->CanEditComments = Gdn::Session()->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
 
       // Report the discussion id so js can use it.      
       $this->AddDefinition('DiscussionID', $DiscussionID);
@@ -264,9 +274,8 @@ class DiscussionController extends VanillaController {
       $Offset = $this->CommentModel->GetOffset($Comment);
       $Limit = Gdn::Config('Vanilla.Comments.PerPage', 30);
       
-      // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
-      //$Offset = floor($Offset / $Limit) * $Limit;
       $PageNumber = PageNumber($Offset, $Limit, TRUE);
+      $this->SetData('Page', $PageNumber);
       
       $this->View = 'index';
       $this->Index($DiscussionID, 'x', $PageNumber);
@@ -582,26 +591,34 @@ class DiscussionController extends VanillaController {
    public function DeleteComment($CommentID = '', $TransientKey = '') {
       $Session = Gdn::Session();
       $DefaultTarget = '/discussions/';
-      if (
-         is_numeric($CommentID)
-         && $CommentID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
+      $ValidCommentID = is_numeric($CommentID) && $CommentID > 0;
+      $ValidUser = $Session->UserID > 0 && $Session->ValidateTransientKey($TransientKey);
+      
+      if ($ValidCommentID && $ValidUser) {
+         // Get comment and discussion data
          $Comment = $this->CommentModel->GetID($CommentID);
-         if ($Comment) {
-            $Discussion = $this->DiscussionModel->GetID($Comment->DiscussionID);
-            $DefaultTarget = '/vanilla/discussions/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
-            $HasPermission = $Comment->InsertUserID == $Session->UserID;
-            if (!$HasPermission && $Discussion)
-               $HasPermission = $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
+         $DiscussionID = GetValue('DiscussionID', $Comment);
+         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+         
+         if ($Comment && $Discussion) {
+            $DefaultTarget = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
             
-            if ($Discussion && $HasPermission) {
-               if (!$this->CommentModel->Delete($CommentID))
-                  $this->Form->AddError('Failed to delete comment');
-            } else {
-               $this->Form->AddError('ErrPermission');
-            }
+            // Make sure comment is this user's or they have Delete permission
+            if ($Comment->InsertUserID != $Session->UserID)
+               $this->Permission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
+               
+            // Make sure that content can (still) be edited
+            $EditContentTimeout = C('Garden.EditContentTimeout', -1);
+            $CanEdit = $EditContentTimeout == -1 || strtotime($Comment->DateInserted) + $EditContentTimeout > time();
+            if (!$CanEdit)
+               $this->Permission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
+            
+            // Delete the comment
+            if (!$this->CommentModel->Delete($CommentID))
+               $this->Form->AddError('Failed to delete comment');
+         }
+         else {
+            $this->Form->AddError('Invalid comment');
          }
       } else {
          $this->Form->AddError('ErrPermission');
@@ -633,7 +650,7 @@ ul.MessageList li.Item { background: #fff; }
 ul.MessageList li.Item.Mine { background: #E3F4FF; }
 </style>');
       $Session = Gdn::Session();
-      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('options.js');
@@ -769,7 +786,10 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE)), TRUE));
 
       // Load the comments
-      $this->CommentModel->OrderBy('c.DateInserted desc'); // allow custom sort
+      $CurrentOrderBy = $this->CommentModel->OrderBy();
+      if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
+         $this->CommentModel->OrderBy('c.DateInserted desc'); // allow custom sort
+      
       $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
       
       // Build a pager

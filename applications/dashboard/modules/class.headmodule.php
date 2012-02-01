@@ -188,7 +188,7 @@ if (!class_exists('HeadModule', FALSE)) {
          if (is_array($Property))
             $Query = array_change_key_case($Property);
          elseif ($Property)
-            $Query = array(strtolower($Property), $Value);
+            $Query = array(strtolower($Property) => $Value);
          else
             $Query = FALSE;
    
@@ -196,7 +196,9 @@ if (!class_exists('HeadModule', FALSE)) {
             $TagName = $Collection[self::TAG_KEY];
 
             if ($TagName == $Tag) {
-               if ($Query && count(array_intersect_assoc($Query, $Collection)) == count($Query)) {
+               // If no property is specified and the tag is found, remove it directly.
+               // Otherwise remove it only if all specified property/value pairs match.
+               if (!$Query || count(array_intersect_assoc($Query, $Collection)) == count($Query)) {
                   unset($this->_Tags[$Index]);
                }
             }
@@ -223,7 +225,7 @@ if (!class_exists('HeadModule', FALSE)) {
          // Loop through each tag.
          $Tags = array();
          foreach ($this->_Tags as $Index => $Attributes) {
-            $Tag = $Attributes[self::TAG_KEY];
+            $TagType = $Attributes[self::TAG_KEY];
             if ($TagType == $RequestedType)
                $Tags[] = $Attributes;
          }

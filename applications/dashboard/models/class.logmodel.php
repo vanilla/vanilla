@@ -22,7 +22,7 @@ class LogModel extends Gdn_Pluggable {
          $LogIDs = explode(',', $LogIDs);
       
       // Get the log entries.
-      $Logs = Gdn::SQL()->GetWhere('Log', array('LogID' => $LogIDs))->ResultArray();
+      $Logs = $this->GetIDs($LogIDs);
       $Models = array();
       $Models['Discussion'] = new DiscussionModel();
       $Models['Comment'] = new CommentModel();
@@ -477,14 +477,23 @@ class LogModel extends Gdn_Pluggable {
 
       $Data = $Log['Data'];
       
-      if (is_string($Data['Attributes']))
-         $Data['Attributes'] = @unserialize($Data['Attributes']);
-         
-      // Record a bit of information about the restoration.
-      if (!is_array($Data['Attributes']))
-         $Data['Attributes'] = array();
-      $Data['Attributes']['RestoreUserID'] = Gdn::Session()->UserID;
-      $Data['Attributes']['DateRestored'] = Gdn_Format::ToDateTime();
+      if (isset($Data['Attributes']))
+         $Attr = 'Attributes';
+      elseif (isset($Data['Data']))
+         $Attr = 'Data';
+      else
+         $Attr = '';
+      
+      if ($Attr) {
+         if (is_string($Data[$Attr]))
+            $Data[$Attr] = @unserialize($Data[$Attr]);
+
+         // Record a bit of information about the restoration.
+         if (!is_array($Data[$Attr]))
+            $Data[$Attr] = array();
+         $Data[$Attr]['RestoreUserID'] = Gdn::Session()->UserID;
+         $Data[$Attr]['DateRestored'] = Gdn_Format::ToDateTime();
+      }
       
       if (!isset($Columns[$TableName])) {
          $Columns[$TableName] = Gdn::SQL()->FetchColumns($TableName);

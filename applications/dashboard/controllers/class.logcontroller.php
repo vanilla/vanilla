@@ -118,13 +118,15 @@ class LogController extends DashboardController {
       if (!is_array($UserIDs))
          $UserIDs = array();
       
-      // Grab the rest of the log entries.
-      $OtherLogIDs = $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserIDs));
-      $OtherLogIDs = ConsolidateArrayValuesByKey($OtherLogIDs, 'LogID');
-      $LogIDs = array_merge($LogIDs, $OtherLogIDs);
-      
-      foreach ($UserIDs as $UserID) {
-         Gdn::UserModel()->Ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => TRUE, 'Log' => TRUE));
+      if (!empty($UserIDs)) {
+         // Grab the rest of the log entries.
+         $OtherLogIDs = $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserIDs));
+         $OtherLogIDs = ConsolidateArrayValuesByKey($OtherLogIDs, 'LogID');
+         $LogIDs = array_merge($LogIDs, $OtherLogIDs);
+
+         foreach ($UserIDs as $UserID) {
+            Gdn::UserModel()->Ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => TRUE, 'Log' => TRUE));
+         }
       }
       
       // Grab the logs.
@@ -273,19 +275,19 @@ class LogController extends DashboardController {
 
       // Grab the logs.
       $Logs = array_merge($Logs, $this->LogModel->GetIDs($LogIDs));
-      try {
+      
+//      try {
          foreach ($Logs as $Log) {
             $this->LogModel->Restore($Log);
          }
-      } catch (Exception $Ex) {
-         $this->Form->AddError($Ex->getMessage());
-      }
+//      } catch (Exception $Ex) {
+//         $this->Form->AddError($Ex->getMessage());
+//      }
       $this->LogModel->Recalculate();
       
       $this->SetData('Complete');
       $this->SetData('Count', count($Logs));
       $this->Render('Blank', 'Utility');
-      
    }
 
    /**

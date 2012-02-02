@@ -768,7 +768,7 @@ a.Bookmarking:hover {
    float: left;
    overflow: hidden;
 }
-#Panel :first-child {
+#Panel > :first-child {
 	margin-top: 0;
 }
 /*
@@ -1239,6 +1239,7 @@ body.Profile ul.Activities {
 .Activities ul.DataList {
 	margin-left: 50px;
 }
+/*
 .Activities .ItemContent {
 	width: 631px;
 }
@@ -1249,6 +1250,13 @@ body.Profile ul.Activities {
 .Activities .Item .HasPhoto .ItemContent {
 	width: auto;
 	margin-left: 42px;
+}
+*/
+.Activities .ItemContent {
+	margin: 0 14px 0 53px;
+}
+.Activities .ActivityComments .ItemContent {
+	margin: 0 0 0 42px;
 }
 .Activities .DataList li {
 	background: #f3f3f3;

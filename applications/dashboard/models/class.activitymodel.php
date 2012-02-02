@@ -784,7 +784,7 @@ class ActivityModel extends Gdn_Model {
          
          // Delete the activity now that it has been emailed.
          if (!$NoDelete && !$Activity['Notified']) {
-            if ($Activity['ActivityID']) {
+            if (GetValue('ActivityID', $Activity)) {
                $this->Delete($Activity['ActivityID']);
             } else {
                $Activity['_Delete'] = TRUE;

@@ -788,7 +788,7 @@ a.Bookmarking:hover {
 }
 */
 .Box {
-   margin: 16px 0;
+   margin: 10px 0;
 }
 .Box h4 {
    font-size: 110%;
@@ -1092,12 +1092,6 @@ a.BigButton:focus {
 .DataList .Item:first-child {
 	border-top: 1px solid #ddd;
 	border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-.DataList .Item:first-child {
-   border-top: 1px solid #bec8cc;
-}
-.DataList .Item:first-child {
-   border-top: 1px solid #bec8cc;
 }
 .Discussions .Item {
    padding: 4px 8px;

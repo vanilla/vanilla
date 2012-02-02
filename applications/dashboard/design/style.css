@@ -1725,8 +1725,7 @@ div.Popup small {
 div.Popup form p {
 	padding: 0;
 }
-body.Profile #Form_Invitation ul li label,
-body.Profile #Form_User ul li label,
+body.Profile.EditMode ul li label,
 div.Popup form ul li label {
 	color:#000;
 	display:block;
@@ -1735,7 +1734,7 @@ div.Popup form ul li label {
 	margin: 10px 0 0;
 }
 body.Entry form ul li.Gender label.RadioLabel,
-body.Profile #Form_User ul li.Gender label.RadioLabel,
+body.Profile.EditMode ul li.Gender label.RadioLabel,
 div.Popup form ul li.Gender label.RadioLabel {
 	display: inline;
 	padding-right: 20px;
@@ -1743,19 +1742,18 @@ div.Popup form ul li.Gender label.RadioLabel {
 li.Gender {
 	margin-bottom: 10px;
 }
-body.Profile #Form_User ul li label.RadioLabel,
-body.Profile #Form_User ul li label.CheckBoxLabel,
+body.Profile.EditMode ul li label.RadioLabel,
+body.Profile.EditMode ul li label.CheckBoxLabel,
 div.Popup form ul li label.RadioLabel,
 div.Popup form ul li label.CheckBoxLabel {
 	font-weight: normal;
 }
-div.Profile #Form_User input.Button,
+div.Profile.EditMode input.Button,
 div.Popup input.Button {
 	margin: 4px 0 2px;
 }
-div.Popup #Form_User .Warning,
-#dashboard_profile_picture #Form_User .Warning {
-	margin: 6px 0;
+body.Profile.EditMode .Warning {
+	margin: 10px 0;
 }
 div.Popup form ul li label.RadioLabel {
 	font-size: 12px;

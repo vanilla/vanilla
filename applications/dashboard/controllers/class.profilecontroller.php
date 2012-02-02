@@ -60,7 +60,7 @@ class ProfileController extends Gdn_Controller {
       $this->_TabApplication = 'Dashboard';
       $this->CurrentTab = 'Activity';
       $this->ProfileTabs = array();
-		$this->EditMode = FALSE;
+		$this->EditMode = TRUE;
       parent::__construct();
    }
    
@@ -84,6 +84,10 @@ class ProfileController extends Gdn_Controller {
       $this->AddModule('GuestModule');
       parent::Initialize();
       
+		
+		if ($this->EditMode)
+			$this->CssClass .= 'EditMode';
+
       $this->SetData('Breadcrumbs', array());
    }
    
@@ -99,6 +103,7 @@ class ProfileController extends Gdn_Controller {
     */
    public function Activity($UserReference = '', $Username = '', $UserID = '', $Page = '') {
       $this->Permission('Garden.Profiles.View');
+		$this->EditMode(FALSE);
 		
 		// Object setup
 		$Session = Gdn::Session();
@@ -243,7 +248,6 @@ class ProfileController extends Gdn_Controller {
     * @param mixed $UserReference Username or User ID.
     */
    public function Edit($UserReference = '', $Username = '') {
-		$this->EditMode(TRUE);
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username);
       $Session = Gdn::Session();
@@ -301,8 +305,9 @@ class ProfileController extends Gdn_Controller {
     * @param int $UserID Unique ID.
     */
    public function Index($UserReference = '', $Username = '', $UserID = '', $Page = FALSE) {
+		$this->EditMode(FALSE);
       $this->GetUserInfo($UserReference, $Username, $UserID);
-
+		
       if ($this->User->Admin == 2 && $this->Head) {
          // Don't index internal accounts. This is in part to prevent vendors from getting endless Google alerts.
          $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex'));
@@ -325,7 +330,6 @@ class ProfileController extends Gdn_Controller {
     * @access public
     */
    public function Invitations() {
-		$this->EditMode(TRUE);
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo();
       $InvitationModel = new InvitationModel();
@@ -377,6 +381,7 @@ class ProfileController extends Gdn_Controller {
     */
    public function Notifications($Page = FALSE) {
       $this->Permission('Garden.SignIn.Allow');
+		$this->EditMode(FALSE);
 		
       list($Offset, $Limit) = OffsetLimit($Page, 30);
 
@@ -428,7 +433,6 @@ class ProfileController extends Gdn_Controller {
     * @access public
     */
    public function Password() {
-		$this->EditMode(TRUE);
       $this->Permission('Garden.SignIn.Allow');
       
       // Get user data and set up form
@@ -468,7 +472,6 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Picture($UserReference = '', $Username = '') {
-		$this->EditMode(TRUE);
       // Permission checks
       $this->Permission('Garden.Profiles.Edit');
       $Session = Gdn::Session();
@@ -568,7 +571,6 @@ class ProfileController extends Gdn_Controller {
     */
    public function Preferences($UserReference = '', $Username = '', $UserID = '') {
 		$this->AddJsFile('profile.js');
-		$this->EditMode(TRUE);
       $Session = Gdn::Session();
       $this->Permission('Garden.SignIn.Allow');
       
@@ -726,7 +728,6 @@ class ProfileController extends Gdn_Controller {
     * @param string $TransientKey Security token.
     */
    public function SendInvite($InvitationID = '', $TransientKey = '') {
-		$this->EditMode(TRUE);
       $this->Permission('Garden.SignIn.Allow');
       $InvitationModel = new InvitationModel();
       $Session = Gdn::Session();
@@ -774,7 +775,6 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Thumbnail($UserReference = '', $Username = '') {
-		$this->EditMode(TRUE);
       // Initial permission checks (valid user)
       $this->Permission('Garden.SignIn.Allow');            
       $Session = Gdn::Session();
@@ -858,7 +858,6 @@ class ProfileController extends Gdn_Controller {
     * @param string $TransientKey Security token.
     */
    public function UnInvite($InvitationID = '', $TransientKey = '') {
-		$this->EditMode(TRUE);
       $this->Permission('Garden.SignIn.Allow');
       $InvitationModel = new InvitationModel();
       $Session = Gdn::Session();
@@ -1198,8 +1197,8 @@ class ProfileController extends Gdn_Controller {
 	
 	public function EditMode($Switch) {
 		$this->EditMode = $Switch;
-		if ($Switch && !strpos($this->CssClass, 'EditMode'))
-			$this->CssClass .= ' EditMode';
+		if (!$this->EditMode && strpos($this->CssClass, 'EditMode'))
+			$this->CssClass = str_replace('EditMode', '', $this->CssClass);
 	}
    
 }

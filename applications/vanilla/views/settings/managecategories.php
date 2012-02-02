@@ -31,7 +31,7 @@ if (C('Vanilla.Categories.Use')) {
       echo '<h2>', T('Did You Know?'), '</h2>';
       echo '<ul>';
       echo '<li>', sprintf(T('You can make the categories page your homepage.', 'You can make your categories page your homepage <a href="%s">here</a>.'), Url('/dashboard/settings/homepage')), '</li>';
-      echo '<li>', sprintf(T('Make sure you click View Page', 'Make sure you click <a href="%s">View Page</a> to see what your categories page looks like after saving.'), Url('/categories/all')), '</li>';
+      echo '<li>', sprintf(T('Make sure you click View Page', 'Make sure you click <a href="%s">View Page</a> to see what your categories page looks like after saving.'), Url('/categories')), '</li>';
       echo '<li>', T('Drag and drop the categories below to sort and nest them.'), '</li>';
       echo '</ul>';
       ?>
@@ -39,7 +39,7 @@ if (C('Vanilla.Categories.Use')) {
    <h1><?php
       echo T('Category Page Layout');
       echo ' ';
-      echo Anchor(T('View Page'), 'categories/all');
+      echo Anchor(T('View Page'), 'categories');
    ?></h1>
    <?php
    echo $this->Form->Open();

@@ -9,15 +9,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Renders a user's photo (if they've uploaded one).
+ * Renders the activity filter menu
  */
-class UserPhotoModule extends Gdn_Module {
+class ActivityFilterModule extends Gdn_Module {
    
    public function AssetTarget() {
       return 'Panel';
    }
 
    public function ToString() {
-		return parent::ToString();
+      return parent::ToString();
    }
 }

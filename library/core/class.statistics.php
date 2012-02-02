@@ -120,7 +120,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       if (!is_writable($ConfFile)) {
          // Admins see a helpful notice
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-            $Warning = '<span class="InformSprite Sliders"></span> ';
+            $Warning = Sprite('Sliders', 'InformSprite');
             $Warning .= T('Your config.php file is not writable.<br/> Find out <a href="http://vanillaforums.org/docs/vanillastatistics">how to fix this &raquo;</a>');
             Gdn::Controller()->InformMessage($Warning, array('CssClass' => 'HasSprite'));
          }
@@ -547,7 +547,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          if (Gdn::Get('Garden.Analytics.Notify', FALSE) !== FALSE) {
-            $CallMessage = '<span class="InformSprite Bandaid"></span> ';
+            $CallMessage = Sprite('Bandaid', 'InformSprite');
             $CallMessage .= sprintf(T("There's a problem with Vanilla Analytics that needs your attention.<br/> Handle it <a href=\"%s\">here &raquo;</a>"),Url('dashboard/statistics'));
             Gdn::Controller()->InformMessage($CallMessage,array('CssClass' => 'HasSprite'));
          }

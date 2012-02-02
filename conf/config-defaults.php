@@ -102,6 +102,7 @@ $Configuration['Garden']['PrivateCommunity']                    = FALSE;
 $Configuration['Garden']['EditContentTimeout']                  = -1; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds.
 $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowGuestModule']          = TRUE;
+$Configuration['Garden']['Modules']['ShowMeModule']             = TRUE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
 $Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
 
@@ -133,11 +134,11 @@ $Configuration['Preferences']['Email']['Mention']               = '0';
 $Configuration['Preferences']['Popup']['Mention']               = '1';
 
 // Modules
-$Configuration['Modules']['Garden']['Panel'] = array('UserPhotoModule', 'UserInfoModule', 'GuestModule', 'Ads');
-$Configuration['Modules']['Garden']['Content'] = array('MessageModule', 'Notices', 'Content', 'Ads');
-$Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'SignedInModule', 'GuestModule', 'Ads');
-$Configuration['Modules']['Vanilla']['Content'] = array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'CategoryModeratorsModule', 'Content', 'Ads');
-$Configuration['Modules']['Conversations']['Panel'] = array('NewConversationModule', 'SignedInModule', 'GuestModule', 'Ads');
+$Configuration['Modules']['Dashboard']['Panel'] = array('MeModule', 'ActivityFilterModule', 'UserPhotoModule', 'ProfileFilterModule', 'SideMenuModule', 'UserInfoModule', 'GuestModule', 'Ads');
+$Configuration['Modules']['Dashboard']['Content'] = array('ProfileOptionsModule', 'MessageModule', 'Notices', 'ActivityFilterModule', 'ProfileFilterModule', 'Content', 'Ads');
+$Configuration['Modules']['Vanilla']['Panel'] = array('MeModule', 'GuestModule', 'NewDiscussionModule', 'DiscussionFilterModule', 'SignedInModule', 'Ads');
+$Configuration['Modules']['Vanilla']['Content'] = array('ProfileOptionsModule', 'MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'DiscussionFilterModule', 'CategoryModeratorsModule', 'Content', 'Ads');
+$Configuration['Modules']['Conversations']['Panel'] = array('MeModule', 'NewConversationModule', 'SignedInModule', 'GuestModule', 'Ads');
 $Configuration['Modules']['Conversations']['Content'] = array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'Content', 'Ads');
 
 // Routes

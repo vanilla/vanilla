@@ -41,6 +41,7 @@ class VanillaController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       
       // Add modules
+      $this->AddModule('MeModule');
       $this->AddModule('GuestModule');
       $this->AddModule('SignedInModule');
       

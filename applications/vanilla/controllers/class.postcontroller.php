@@ -24,6 +24,11 @@ class PostController extends VanillaController {
     * @var Gdn_Form
     */
    public $Form;
+	
+	/**
+	 * @var array An associative array of form types and their locations.
+	 */
+	public $FormCollection;
 
    /**
     * Models to include.
@@ -35,14 +40,28 @@ class PostController extends VanillaController {
    public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel');
    
    /**
-    * Alias for Discussion method.
+    * General "post" form, allows posting of any kind of form. Attach to PostController_AfterFormCollection_Handler.
     * 
     * @since 2.0.0
     * @access public
     */
-   public function Index() {
-      $this->View = 'discussion';
-      $this->Discussion();
+   public function Index($CurrentFormName = 'discussion') {
+      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('post.js');
+      $this->AddJsFile('autosave.js');
+		
+		$this->SetData('CurrentFormName', $CurrentFormName);
+		$Forms = array();
+		$Forms[] = array('Name' => 'Discussion', 'Label' => Sprite('SpNewDiscussion').T('New Discussion'), 'Url' => 'vanilla/post/discussion');
+		/*
+		$Forms[] = array('Name' => 'Question', 'Label' => Sprite('SpAskQuestion').T('Ask Question'), 'Url' => 'vanilla/post/discussion');
+		$Forms[] = array('Name' => 'Poll', 'Label' => Sprite('SpNewPoll').T('New Poll'), 'Url' => 'activity');
+		*/
+		$this->SetData('Forms', $Forms);
+		$this->FireEvent('AfterForms');
+
+		$this->SetData('Breadcrumbs', array(array('Name' => T('Post'), 'Url' => '/post')));
+      $this->Render();
    }
    
    /**
@@ -96,7 +115,7 @@ class PostController extends VanillaController {
       } else {
          // Permission to add
          $this->Permission('Vanilla.Discussions.Add');
-         $this->Title(T('Start a New Discussion'));
+         $this->Title(T('New Discussion'));
       }
       
       // Set the model on the form
@@ -220,8 +239,10 @@ class PostController extends VanillaController {
       
       $this->FireEvent('BeforeDiscussionRender');
       
+		$this->SetData('Breadcrumbs', array(array('Name' => $this->Data('Title'), 'Url' => '/post/discussion')));
+
       // Render view (posts/discussion.php or post/preview.php)
-      $this->Render();
+		$this->Render();
    }
    
    /**
@@ -540,5 +561,6 @@ class PostController extends VanillaController {
    public function Initialize() {
       parent::Initialize();
       $this->AddCssFile('vanilla.css');
+		$this->AddModule('NewDiscussionModule');
    }
 }

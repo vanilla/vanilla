@@ -328,7 +328,14 @@ class SettingsController extends DashboardController {
          Gdn::Router()->DeleteRoute('DefaultController');
          Gdn::Router()->SetRoute('DefaultController', $NewRoute, 'Internal');
          $this->SetData('CurrentTarget', $NewRoute);
-         $this->InformMessage(T("The homepage was saved successfully."));
+         
+         // Save the preferred layout setting
+         SaveToConfig(array(
+            'Vanilla.Discussions.Layout' => GetValue('DiscussionsLayout', $this->Form->FormValues(), ''),
+            'Vanilla.Categories.Layout' => GetValue('CategoriesLayout', $this->Form->FormValues(), '')
+         ));
+         
+         $this->InformMessage(T("Your changes were saved successfully."));
       }
       
       $this->Render();      

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-
+$Session = Gdn::Session(); 
 if (!function_exists('WriteComment'))
    include $this->FetchViewLocation('helper_functions', 'discussion');
 
@@ -41,10 +41,9 @@ echo '</span>';
 
 echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
 
-$Session = Gdn::Session(); 
 ?>
 <ul class="MessageList DataList Comments">
-   <?php include $this->FetchViewLocation('comments'); ?>
+	<?php include $this->FetchViewLocation('comments'); ?>
 </ul>
 <?php
 $this->FireEvent('AfterDiscussion');

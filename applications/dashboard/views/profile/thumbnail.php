@@ -4,6 +4,9 @@ echo '<h2>'.T('Edit My Thumbnail').'</h2>';
 echo $this->Form->Errors();
 echo $this->Form->Open(array('class' => 'Thumbnail'));
 ?>
+<div class="Info"><?php
+   echo T('Define Thumbnail', 'Click and drag across the picture to define your thumbnail.');
+?></div>
 <table>
    <thead>
       <tr>
@@ -17,10 +20,6 @@ echo $this->Form->Open(array('class' => 'Thumbnail'));
             <?php echo Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo,'p%s')), array('id' => 'cropbox')); ?>
          </td>
          <td>
-            <div class="Warning"><?php
-               echo T('Define Thumbnail', 'Click and drag across the picture to define your thumbnail icon below.');
-            ?></div>
-
             <div style="<?php echo 'width:'.$this->ThumbSize.'px;height:'.$this->ThumbSize.'px;'; ?>overflow:hidden;">
                <?php echo Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')), array('id' => 'preview')); ?>
             </div>

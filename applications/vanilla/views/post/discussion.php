@@ -6,8 +6,10 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 
 ?>
 <div id="DiscussionForm">
-   <h1><?php echo $this->Data('Title'); ?></h1>
    <?php
+		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+			echo Wrap($this->Data('Title'), 'h1');
+	
       echo $this->Form->Open();
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');

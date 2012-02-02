@@ -74,7 +74,6 @@ body {
    background: #fff;
    margin: 0;
    padding: 0;
-   text-align: center;
    font-size: small;
 }
 #Body {
@@ -83,7 +82,7 @@ body {
    margin: 15px auto 0;
 }
 #Content {
-   float: left;
+   float: right;
    width: 680px;
    margin: 0 0 40px;
 }
@@ -167,6 +166,7 @@ textarea {
 	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
 	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
 	background: #fff;
+	border: 1px solid #999;
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	padding: 3px;	
 }
@@ -290,13 +290,25 @@ input.Button {
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
 .Warning {
-   background: #ffc;
-   border: 1px solid #ff9;
-   color: #000;
+   background: #fee;
+   border: 2px solid #fbb;
+   color: #d00;
    padding: 6px 8px;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+.Count {
+   background: #444;
+   background-color: rgba(0, 0, 0, 0.6);
    border-radius: 3px;
-   -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   border-radius: 3px;
+   color: #fff;
+   font-size: 80%;
+   font-weight: normal;
+   padding: 1px .8ex;
 }
 .Alert {
    background: #d00;
@@ -316,16 +328,34 @@ input.Button {
 .Info {
    font-size: 13px;
    background: #fafafa;
-   border: 1px solid #eee;
+   border: 2px solid #eee;
+	border: 2px solid rgba(0,0,0,0.1);
    color: #888;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   border-radius: 4px;
-   padding: 6px;
-   margin: 0 0 10px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
+   padding: 6px 8px;
+   margin: 10px 0;
 }
 .Info strong {
 	font-weight: bold;
+}
+.BreadcrumbWrap {
+	clear: both;
+	line-height: 2.4;
+	font-size: 12px;
+}
+.Crumb {
+	margin: 0 6px;
+}
+.Breadcrumbs {
+	display: block;
+	margin: 0 auto;
+	width: 960px;
+}
+.BreadcrumbWrap.TopBreadcrumb {
+	background: #f7f7f7;
+	background: rgba(0,0,0,0.03);
 }
 #PagerLess {
    -moz-border-radius-topright: 2px;
@@ -342,14 +372,18 @@ input.Button {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
-#PagerMore {
+/*
+ #PagerMore {
    margin-bottom: 1px;
 }
-.NumberedPager, .PrevNextPager {
+*/
+.MorePager,
+.NumberedPager,
+.PrevNextPager {
    margin: 1px 0 0;
 	text-align: right;
 	font-weight: bold;
-	font-size: 16px;
+	/* font-size: 16px; */
 }
 .NumberedPager a,
 .NumberedPager span {
@@ -572,6 +606,7 @@ body #Head h1 {
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
+.ControlOptions,
 .Options {
 	float: right;
 }
@@ -602,7 +637,7 @@ body #Head h1 {
 */
 .OptionsTitle {
    user-select: none;
-   background: url("images/cog-expander.png") no-repeat 0 0;
+   background: url("images/sprites.png") no-repeat 0 0;
    color: transparent;
    height: 28px;
    overflow: hidden;
@@ -685,6 +720,7 @@ div.Discussion:hover .OptionsTitle:hover,
    right: -10px;
    display: none;
    z-index: 100;
+	text-align: left;
 }
 .OptionsMenu .Flyout {
    top: 21px;
@@ -693,7 +729,7 @@ a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
 	display: inline-block;
-   background: url('images/star.png') 0 0 no-repeat;
+   background: url('images/sprites.png') 0 -28px no-repeat;
    height: 18px;
    width: 18px;
 	margin: 0 4px;
@@ -703,28 +739,39 @@ a.Bookmarking {
 	font-size: 1px;
 }
 a.Bookmark:hover {
-	background-position: -18px 0;
+	background-position: -18px -28px;
 }
 a.Bookmarked,
 a.Bookmarked:hover {
-   background-position: -36px 0;
+   background-position: -36px -28px;
 }
 a.Bookmarking,
 a.Bookmarking:hover {
-   background-position: -54px 0;
+   background-position: -54px -28px;
 }
 .AdminCheck {
    vertical-align: top;
 	line-height: 1;
+}
+.ControlOptions .AdminCheck {
+	display: block;
+	padding: 6px 8px 0;
+}
+.Opts .ControlOptions .AdminCheck {
+	padding: 0;
 }
 
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
    width: 250px;
-   float: right;
+   float: left;
    overflow: hidden;
 }
+#Panel > :first-child {
+	margin-top: 0;
+}
+/*
 .Box {
    border-radius: 2px;
    background: #cfecff;
@@ -738,6 +785,14 @@ a.Bookmarking:hover {
    font-weight: bold;
    margin: 0;
    padding: 0 0 1px;
+}
+*/
+.Box {
+   margin: 10px 0;
+}
+.Box h4 {
+   font-size: 110%;
+   font-weight: bold;
 }
 .Box dl {
    overflow: hidden;
@@ -758,6 +813,18 @@ a.Bookmarking:hover {
    font-size: 100%;
    padding: 0 0 4px;
    color: #555;
+}
+.MeBox img {
+	float: left;	
+}
+.MeBox .WhoIs {
+	min-height: 40px;
+	margin-left: 48px;
+	line-height: 1.3;
+}
+.MeBox .Username {
+	font-weight: bold;
+	vertical-align: middle
 }
 .PanelActivity {
    border-top: 1px solid #abdafb;
@@ -793,9 +860,16 @@ a.Bookmarking:hover {
 .PanelActivity li .Story {
 	font-size: 85%;
 }
+/*
 .PanelInfo li {
    background: #e3f4ff;
    border-bottom: 1px solid #abdafb;
+   padding: 2px 4px;
+}
+*/
+.PanelInfo li {
+	border-bottom: 1px solid #ddd;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
    padding: 2px 4px;
 }
 .PanelInfo .Aside {
@@ -805,8 +879,15 @@ a.Bookmarking:hover {
    color: #000;
    font-weight: bold;
 }
+/*
 .PanelInfo {
    border-top: 1px solid #abdafb;
+	border-bottom: 0;
+}
+*/
+.PanelInfo {
+	border-top: 1px solid #ddd;
+   border-top: 1px solid rgba(0, 0, 0, 0.1);
 	border-bottom: 0;
 }
 .PanelInfo li strong {
@@ -846,11 +927,15 @@ a.Bookmarking:hover {
 	padding: 2px 0;
 }
 .PanelInfo .Active {
-   background: #fff;
+	background: #f7f7f7;
+   background: rgba(0, 0, 0, 0.03);
+	font-weight: bold;
 }
+/*
 .PanelInfo .Active a {
    color: #1e79a7;
 }
+*/
 .PanelActivity .ShowAll,
 .PanelInfo .ShowAll {
    font-weight: bold;
@@ -858,6 +943,35 @@ a.Bookmarking:hover {
    text-align: right;
 	background: none;
 }
+/* BoxFilter in the #Content area */
+#Content .BoxFilter {
+	margin: 0 0 6px;
+}
+#Content .BoxFilter .PanelInfo {
+	border: none;
+}
+#Content .PanelInfo .Aside {
+	float: none;
+}
+#Content .BoxFilter .PanelInfo li,
+#Content .BoxFilter .PanelInfo li.Active {
+	padding: 0;
+	border: none;
+	background: none;
+	display: inline-block;
+}
+#Content .BoxFilter a {
+	margin: 0 10px 0 0;
+	padding: 4px 0;
+	display: block;
+}
+#Content .BoxFilter .Active a {
+	color: #000;
+	border-bottom: 2px solid #ddd;
+	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+#Content .BoxFilter { display: none; } /* Hide these by default, can be unhidden for backwards compat. */
+/* End BoxFilter in #Content area */
 #UserOptions {
 	margin-bottom: 10px;
 }
@@ -920,6 +1034,7 @@ a.BigButton:focus {
 .CategoryList .Depth10 { padding-left: 225px !important; }
 .CategoryList .Depth11 { padding-left: 250px !important; }
 .CategoryList .Depth12 { padding-left: 275px !important; }
+.CategoryListWithHeadings .Depth1 { padding-left: 0 !important; }
 .CategoryListWithHeadings .Depth2 { padding-left: 0 !important; }
 .CategoryListWithHeadings .Depth3 { padding-left: 25px !important; }
 .CategoryListWithHeadings .Depth4 { padding-left: 50px !important; }
@@ -951,6 +1066,15 @@ a.BigButton:focus {
 
 /* ================================================ DataList (Search Results) */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
+.SearchForm {
+	background: #f7f7f7;
+	background: rgba(0, 0, 0, 0.03);
+	padding: 10px;
+}
+.SearchForm input.InputBox {
+	width: 560px;
+	margin-right: 10px;
+}
 .Empty {
    margin: 10px 0;
 }
@@ -962,16 +1086,18 @@ a.BigButton:focus {
    padding: 8px;
    border: 0;
 	position: relative;
-   border-bottom: 1px solid #bec8cc;
+	border-bottom: 1px solid #ddd;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 .DataList .Item:first-child {
-   border-top: 1px solid #bec8cc;
+	border-top: 1px solid #ddd;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 .Discussions .Item {
    padding: 4px 8px;
 }
 .DataList .Item .Item {
-   border-bottom: none;
+   border: none;
 }
 .DataList a.Title {
    display: block;
@@ -1028,7 +1154,7 @@ a.BigButton:focus {
 	font-weight:bold;
 	padding: 3px;
 	line-height: 1;
-   
+   white-space: nowrap;
 }
 .Tag a {
    color: #ffffff;
@@ -1084,11 +1210,12 @@ a.BigButton:focus {
 }
 
 /* =============================================================== Activities */
-
+/* 
 body.Profile ul.Activities {
    margin-top: 10px;
    border-top: 1px solid #ddd;
 }
+*/
 .Activities li.HasPhoto .Title {
 	padding: 0;
 }
@@ -1112,6 +1239,7 @@ body.Profile ul.Activities {
 .Activities ul.DataList {
 	margin-left: 50px;
 }
+/*
 .Activities .ItemContent {
 	width: 631px;
 }
@@ -1123,8 +1251,16 @@ body.Profile ul.Activities {
 	width: auto;
 	margin-left: 42px;
 }
+*/
+.Activities .ItemContent {
+	margin: 0 14px 0 53px;
+}
+.Activities .ActivityComments .ItemContent {
+	margin: 0 0 0 42px;
+}
 .Activities .DataList li {
-	background: #D7E7FF;
+	background: #f3f3f3;
+	background: rgba(0, 0, 0, 0.05);
 	margin-bottom: 2px;
 	padding: 6px;
 }
@@ -1183,7 +1319,8 @@ body.Post .Popup a.Close {
 blockquote {
    padding: 1ex 16px;
    margin: 1em 0;
-   background: rgba(145, 218, 255, .3);
+	background: #f3f3f3;
+   background: rgba(0, 0, 0, 0.05);
 }
 .Message small {
 	font-size: 11px;
@@ -1233,7 +1370,7 @@ pre code {
 }
 
 /* The "Foot" is at the bottom of the #Content section. Used for more results
-links, sign in buttons, etc */
+links, sign in buttons, etc 
 .Foot {
 	border-bottom: 1px solid #abdafb;
    padding: 6px;
@@ -1255,6 +1392,7 @@ links, sign in buttons, etc */
 	padding: 0 0 0 8px;
 	font-weight: bold;
 }
+*/
 
 /* =============================================================== Categories */
 .ChildCategories {
@@ -1308,7 +1446,8 @@ body.Profile.picture .SmallPopup h1 {
 /* BGColor on profile forms */
 body.Profile.EditMode #Content form {
 	padding: 10px 20px 20px;
-	background: rgba(0,0,0,0.05);
+	background: #f3f3f3;
+	background: rgba(0, 0, 0, 0.05);
 }
 
 form.Activity {
@@ -1324,19 +1463,21 @@ form.Activity textarea {
 }
 
 /* Invitations Form */
+table.PreferenceGroup,
 #Form_Invitation table {
    width: 100%;
    border-collapse: collapse;
    margin: 10px 0;
 }
+table.PreferenceGroup th,
+table.PreferenceGroup td,
 #Form_Invitation th,
 #Form_Invitation td {
    padding: 2px 6px;
+	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
-#Form_Invitation table th,
-#Form_Invitation table td {
-   border-bottom: 1px solid rgba(0,0,0,0.2);
-}
+table.PreferenceGroup th,
 #Form_Invitation table th {
    font-weight: bold;
 }
@@ -1349,6 +1490,7 @@ body.Profile ul.Notifications {
 	margin: 0;
 	padding: 10px 0 4px !important;
 }
+/*
 table.PreferenceGroup thead td {
 	font-weight: bold;
 	border-top: 1px solid #aaa;
@@ -1359,12 +1501,13 @@ table.PreferenceGroup tbody td {
 	border-bottom: 1px solid #eee;
 	padding: 2px 6px;
 }
-table.PreferenceGroup tbody td.PrefCheckBox {
-	text-align: center;
-}
 table.PreferenceGroup td.Description {
 	font-size: 12px;
 }
+table.PreferenceGroup tbody td.PrefCheckBox {
+	text-align: center;
+}
+*/
 
 /* About in content area */
 dl.About dt,
@@ -1450,16 +1593,12 @@ form.Thumbnail .Warning {
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 }
-/* Discussions & Comments in user profile */
-.Profile .DataList.Discussions li:first-child,
-.Profile .DataList.SearchResults li:first-child {
-	border-top: 1px solid #BEC8CC;
-}
 
 
 /* ================================================= CommentForm */
 .CommentForm form {
 	padding: 5px;
+	background: #f7f7f7;
 	background: rgba(0, 0, 0, 0.03);
 }
 .Preview {
@@ -1483,112 +1622,6 @@ form.Thumbnail .Warning {
 .CommentForm .PreviewButton,
 .CommentForm .DraftButton {
 	margin: 0 6px;
-}
-
-
-/* ================================================= Tabs, Headings & Footers */
-.Tabs,
-.Headings {
-	display: block;
-   border-bottom: 1px solid #abdafb;
-   padding: 5px 8px;
-   margin: 0;
-   background: #cfecff;
-   position: relative;
-}
-.MessageForm .Tabs {
-	padding: 0;
-	border: 0;
-	background: none;
-	text-align: left;
-}
-.MessageForm .Tabs ul {
-	display: inline;
-}
-.Tabs li {
-   display: inline;
-   margin: 0;
-}
-.TabLink,
-.TabLink:link,
-.TabLink:hover,
-.TabLink:active,
-.TabLink:visited {
-   margin: 0;
-   border: 1px solid #abdafb;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   background: #bbe2f7;
-   display: inline;
-   font-weight: bold;
-   color: #1e79a7;
-   text-decoration: none;
-   padding: 5px 10px;
-	line-height: 2.6;
-	white-space: nowrap;
-}
-.TabLink:hover {
-   background: #f3fcff;
-}
-.Active .TabLink {
-   background: #fff;
-   color: #474747;
-}
-.Count {
-   background: #444;
-   background-color: rgba(0, 0, 0, .6);
-   border-radius: 3px;
-   -webkit-border-radius: 3px;
-   -moz-border-radius: 3px;
-   border-radius: 3px;
-   color: #fff;
-   font-size: 80%;
-   font-weight: normal;
-   padding: 1px .8ex;
-}
-.Tabs .SubTab {
-	margin: 10px 0 0;
-	padding: 4px 8px;
-	background: #f3fcff;
-   border-radius: 2px;
-   -webkit-border-radius: 2px;
-   -moz-border-radius: 2px;
-}
-.HeadingTabs {
-	padding: 8px 8px 8px 12px;
-}
-.HeadingTabs ul {
-	display: inline;
-	float: right;
-}
-.HeadingTabs .SubTab {
-	font-size: 14px;
-	display: inline;
-	font-weight: bold;
-	background: none;
-	padding: 0;
-	line-height: 2.4;
-}
-.SearchTabs input.InputBox {
-	width: 560px;
-	margin-right: 10px;
-}
-.Headings {
-	position: relative;
-	text-align: left;
-}
-.Headings div {
-	display: inline-block;
-	padding-right: 10px;
-}
-.Headings .ItemHeading {
-	font-size: 14px;
-	font-weight: bold;
-	line-height: 2;
-}
-.Headings .MetaHeading {
-	font-size: 11px;
 }
 
 /* =================================================================== Popups */
@@ -1652,7 +1685,8 @@ a.Close {
 	top: 16px;
 	right: 20px;
 	line-height: 1;
-	color: rgba(255,255,255,0.9);
+	color: #fff;
+	color: rgba(255, 255, 255, 0.9);
 	cursor: pointer;
 	font-family: arial;
 	font-size: 22px;
@@ -1660,7 +1694,8 @@ a.Close {
 	padding: 0;
 }
 a.Close:hover {
-	color: rgba(255,255,255,1);
+	color: #fff;
+	color: rgba(255, 255, 255, 1);
 }
 div.Popup .Footer {
 	border: none;
@@ -1807,8 +1842,6 @@ div.Popup form ul li label.RadioLabel {
   + Mine: the user created the discussion
   + New: there are new comments since the last viewed the discussion
 */
-.Mine { }
-
 .Tag {
    background: #777777;
    -moz-border-radius: 2px;
@@ -1872,12 +1905,137 @@ div.Popup form ul li label.RadioLabel {
    float: right;
 }
 
+/* ======================================= Category & Discussions Table Views */
+.CategoryTable {
+	width: 100%;
+}
+.CategoryTable thead td,
+.DiscussionsTable thead td {
+	font-weight: bold;
+}
+.CategoryTable td,
+.DiscussionsTable td {
+	padding: 2px;
+	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	vertical-align: middle;
+}
+.CategoryTable td:first-child,
+.DiscussionsTable td:first-child {
+	padding-left: 6px;
+}
+.CategoryTable .Title,
+.DiscussionsTable .Title {
+	font-size: 14px;
+	font-weight: bold;
+}
+.DiscussionsTable td.User {
+	min-width: 100px;
+	text-align: left;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+.DiscussionsTable td.User .Wrap {
+	margin-right: 6px;
+}
+.CategoryTable .LatestPostTitle,
+.CategoryTable .Meta,
+.DiscussionsTable .PhotoLink,
+.DiscussionsTable .UserLink,
+.DiscussionsTable .CommentDate {
+	display: block;
+	line-height: 1;
+}
+/* Hide the alt text in case the image url is invalid */
+.CategoryTable img,
+.DiscussionsTable img {
+	height: 24px;
+	width: 24px;
+   overflow: hidden;
+	font-size: 1px;
+	color: transparent;
+	float: left;
+	margin: 1px 5px 0 0;
+	vertical-align: top;
+}
+.CategoryTable .LatestPostTitle,
+.DiscussionsTable .UserLink {
+	font-weight: bold;
+	font-size: 13px;
+}
+.CategoryTable .UserLink,
+.CategoryTable .CommentDate,
+.DiscussionsTable .CommentDate {
+	font-size: 10px;
+	margin-right: 5px;
+}
+.CategoryTable td.BigCount,
+.DiscussionsTable td.BigCount {
+	text-align: center;
+}
+.CategoryTable td.BigCount,
+.DiscussionsTable tbody td.BigCount {
+	font-weight: bold;
+}
+.CategoryTable td.Opts,
+.DiscussionsTable td.Opts {
+	white-space: nowrap;
+	text-align: right;
+}
+.MiniPager {
+	margin-left: 10px;
+	font-size: 11px;
+	color: #333;
+}
+.MiniPager a,
+.MiniPager span {
+	margin: 0 1px;
+}
+tr.CategoryHeading td {
+	font-weight: bold;
+	background: #f7f7f7;
+	background: rgba(0, 0, 0, 0.03);
+}
+.CategoryTable .ChildCategories {
+	font-size: 11px;
+}
+
+
 /* ================================================================= Comments */
 body.Discussion #Content {
    margin-bottom: 20px;
 }
 
-/* =============================================== Discussion & Comment Forms */
+/* ================================= Conversation, Discussion & Comment Forms */
+.SpNewConversation,
+.SpAskQuestion,
+.SpNewPoll,
+.SpNewDiscussion {
+	display: inline-block;
+	height: 16px;
+	width: 16px;
+	background: url('images/sprites.png') 0 -68px no-repeat;
+	margin: 0 5px 2px 0;
+	vertical-align: middle;
+}
+.SpNewConversation { background-position: -64px -68px; }
+.SpAskQuestion { background-position: -48px -68px; }
+.SpNewPoll { background-position: -32px -68px; }
+.FormType {
+	margin: 0 0 10px;
+}
+.FormType li {
+	display: inline-block;
+}
+.FormType li a {
+	margin: 0 6px;
+	padding: 4px 0;
+}
+.FormType li.Active a {
+	color: #000;
+	border-bottom: 2px solid #ddd;
+	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
 .Editing {
 	background: #E3F4FF;
 }
@@ -1886,13 +2044,16 @@ body.Discussion #Content {
    font-weight: bold;
    color: #666;
 }
-body.Post #Panel {
+body.Conversations.add #Panel,
+body.Vanilla.Post #Panel {
    display: none;
 }
-body.Post #Content {
+body.Conversations.add #Content,
+body.Vanilla.Post #Content {
    width: 100%;
 }
-#DiscussionForm h2 {
+/*
+ #DiscussionForm h2 {
    border: none;
    color: #02475A;
    font-size: 140%;
@@ -1900,17 +2061,13 @@ body.Post #Content {
    margin: 0;
    padding: 6px;
 }
+*/
+#ConversationForm form,
 #DiscussionForm form {
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #CFECFF none repeat scroll 0 0;
-   border: 1px solid #7caccb;
+	background: #f7f7f7;
+   background: rgba(0, 0, 0, 0.03);
    margin: 0;
-   padding: 20px;
-}
-#DiscussionForm .Tabs {
-   margin: 0 -20px;
+   padding: 13px 20px 20px;
 }
 #DiscussionForm textarea {
    width: 100%;
@@ -1945,6 +2102,14 @@ textarea.MultiComplete {
 	width: 100%;
    height: 20px;
    text-align: left;
+}
+#Panel input.InputBox,
+.AddPeople textarea.MultiComplete {
+  width: 100%;
+  margin-bottom: 2px;
+}
+.AddPeople form div {
+	text-align: right;
 }
 .ac_results {
    padding: 0;
@@ -1999,23 +2164,10 @@ textarea.MultiComplete {
 .AddPeople h4 {
   border-bottom: 0px;
 }
-#Panel input.InputBox,
-.AddPeople textarea.MultiComplete {
-  width: 100%;
-  margin-bottom: 2px;
-}
-.AddPeople form div {
-	text-align: right;
-}
 
 /* ==================================================== New Conversation Form */
-body.add #Panel {
-   display: none;
-}
-body.add #Content {
-   width: auto;
-}
-#ConversationForm form {
+/*
+ #ConversationForm form {
    border-radius: 2px;
 	-moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -2034,6 +2186,7 @@ body.add #Content {
 	text-align: left;
 	border: 0;
 }
+*/
 #ConversationForm label {
 	display: block;
 	text-align: left;
@@ -2049,24 +2202,6 @@ body.add #Content {
 }
 body.Conversations a.Cancel {
    margin-left: 20px;
-}
-.Popup #ConversationForm form {
-	background: none;
-   -border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-   border-radius: 0;
-	padding: 10px;
-}
-.Popup #ConversationForm h2 {
-	color: #fff;
-	font-size: 120%;
-	font-weight: bold;
-	padding: 6px 9px 4px;	
-}
-.Popup #ConversationForm textarea.MultiComplete,
-.Popup #ConversationForm .TextBox {
-	width: 100%;
 }
 
 /* Upload Progress Bar */
@@ -2106,14 +2241,13 @@ body.Conversations a.Cancel {
 }
 
 
-/* Adding CSS for multiple sign-in methods */
-
 /* Container */
 .Border {
 	border-radius: 8px;
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
-	background: none repeat scroll 0 0 rgba(82, 82, 82, 0.7);
+	background: #ddd;
+	background: rgba(82, 82, 82, 0.7);
 	padding: 10px;
 }
 
@@ -2557,6 +2691,7 @@ position on the page to notify users of things like drafts being saved, etc. */
 	line-height: 1.6;
 }
 .InformMessages .InformMessage:hover {
+	background: #333;
 	background: rgba(0, 0, 0, 0.8) !important;
 }
 .InformMessages .InformMessage a {
@@ -2785,6 +2920,7 @@ span.InformSprite.Bone { background-position: -346px -586px; }
 span.InformSprite.Golf { background-position: -394px -586px; }
 span.InformSprite.Dice { background-position: -442px -586px; }
 
+
 /* ============================= Embedded Discussion & Comment Customizations */
 body.embed {
 	text-align: left;
@@ -2819,16 +2955,9 @@ body.embed .Connect h2 {
 	text-decoration: none !important;
 	font-weight: bold;
 }
-.Embed h3 {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-	font-size: 15px;
-	font-weight: bold;
-	border-bottom: 1px solid #BEC8CC;
-}
 .EmbedCommentForm {
 	padding: 0;
    border-top: 1px solid #ffffff;
-   border-bottom: 1px solid #BEC8CC;
 }
 .EmbedCommentForm .TextBox {
 	width: 100%;
@@ -2970,3 +3099,100 @@ body.embed .Connect h2 {
    height: 24px;
    width: 24px;
 }
+
+
+/* DEPRECATED: The following CSS has been deprecated in core as of 2.1a10. We
+  are keeping it in for themes that have custom views that depend on it. */ 
+.Tabs,
+.Headings {
+	display: block;
+   border-bottom: 1px solid #abdafb;
+   padding: 5px 8px;
+   margin: 0;
+   background: #cfecff;
+   position: relative;
+}
+.MessageForm .Tabs {
+	padding: 0;
+	border: 0;
+	background: none;
+	text-align: left;
+}
+.MessageForm .Tabs ul {
+	display: inline;
+}
+.Tabs li {
+   display: inline;
+   margin: 0;
+}
+.TabLink,
+.TabLink:link,
+.TabLink:hover,
+.TabLink:active,
+.TabLink:visited {
+   margin: 0;
+   border: 1px solid #abdafb;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #bbe2f7;
+   display: inline;
+   font-weight: bold;
+   color: #1e79a7;
+   text-decoration: none;
+   padding: 5px 10px;
+	line-height: 2.6;
+	white-space: nowrap;
+}
+.TabLink:hover {
+   background: #f3fcff;
+}
+.Active .TabLink {
+   background: #fff;
+   color: #474747;
+}
+.Tabs .SubTab {
+	margin: 10px 0 0;
+	padding: 4px 8px;
+	background: #f3fcff;
+   border-radius: 2px;
+   -webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
+}
+.HeadingTabs {
+	padding: 8px 8px 8px 12px;
+}
+.HeadingTabs ul {
+	display: inline;
+	float: right;
+}
+.HeadingTabs .SubTab {
+	font-size: 14px;
+	display: inline;
+	font-weight: bold;
+	background: none;
+	padding: 0;
+	line-height: 2.4;
+}
+.SearchTabs input.InputBox {
+	width: 560px;
+	margin-right: 10px;
+}
+.Headings {
+	position: relative;
+	text-align: left;
+}
+.Headings div {
+	display: inline-block;
+	padding-right: 10px;
+}
+.Headings .ItemHeading {
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 2;
+}
+.Headings .MetaHeading {
+	font-size: 11px;
+}
+
+/* END DEPRECATED CSS */

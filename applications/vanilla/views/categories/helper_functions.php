@@ -18,9 +18,9 @@ function GetOptions($Category, $Sender) {
 
    // Follow/Unfollow category.
    if (!GetValue('Following', $Category))
-      $Options .= '<li>'.Anchor(T('Follow'), "/vanilla/category/follow?categoryid=$CategoryID&value=1&tkey=$TKey").'</li>';
+      $Options .= '<li>'.Anchor(T('Unhide'), "/vanilla/category/follow?categoryid=$CategoryID&value=1&tkey=$TKey").'</li>';
    else
-      $Options .= '<li>'.Anchor(T('Unfollow'), "/vanilla/category/follow?categoryid=$CategoryID&value=0&tkey=$TKey").'</li>';
+      $Options .= '<li>'.Anchor(T('Hide'), "/vanilla/category/follow?categoryid=$CategoryID&value=0&tkey=$TKey").'</li>';
 
    // Allow plugins to add options
    $Sender->FireEvent('DiscussionOptions');

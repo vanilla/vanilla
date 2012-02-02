@@ -247,7 +247,7 @@ class VanillaHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @package Vanilla
     * 
-    * @param object $Sender ProfileController.
+    * @param ProfileController $Sender
     */ 
    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
       $Sender->Preferences['Notifications']['Email.DiscussionComment'] = T('Notify me when people comment on my discussions.');
@@ -259,10 +259,52 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->Preferences['Notifications']['Popup.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
       $Sender->Preferences['Notifications']['Popup.Mention'] = T('Notify me when people mention me.');
 
+//      if (Gdn::Session()->CheckPermission('Garden.AdvancedNotifications.Allow')) {
+//         $Sender->Preferences['Notifications']['Email.NewDiscussion'] = array(T('Notify me when people start new discussions.'), 'Meta');
+//         $Sender->Preferences['Notifications']['Email.NewComment'] = array(T('Notify me when people comment on a discussion.'), 'Meta');
+////      $Sender->Preferences['Notifications']['Popup.NewDiscussion'] = T('Notify me when people start new discussions.');
+//      }
+      
       if (Gdn::Session()->CheckPermission('Garden.AdvancedNotifications.Allow')) {
-         $Sender->Preferences['Notifications']['Email.NewDiscussion'] = array(T('Notify me when people start new discussions.'), 'Meta');
-         $Sender->Preferences['Notifications']['Email.NewComment'] = array(T('Notify me when people comment on a discussion.'), 'Meta');
-//      $Sender->Preferences['Notifications']['Popup.NewDiscussion'] = T('Notify me when people start new discussions.');
+         $PostBack = $Sender->Form->IsPostBack();
+         $Set = array();
+
+         // Add the category definitions to for the view to pick up.
+         $DoHeadings = C('Vanilla.Categories.DoHeadings');
+         // Grab all of the categories.
+         $Categories = array();
+         $Prefixes = array('Email.NewDiscussion', 'Popup.NewDiscussion', 'Email.NewComment', 'Popup.NewComment');
+         foreach (CategoryModel::Categories() as $Category) {
+            if (!$Category['PermsDiscussionsView'] || $Category['Depth'] <= 0 || $Category['Depth'] > 2 || $Category['Archived'])
+               continue;
+
+            $Category['Heading'] = ($DoHeadings && $Category['Depth'] <= 1);
+            $Categories[] = $Category;
+
+            if ($PostBack) {
+               foreach ($Prefixes as $Prefix) {
+                  $FieldName = "$Prefix.{$Category['CategoryID']}";
+                  $Value = $Sender->Form->GetFormValue($FieldName, NULL);
+                  if (!$Value)
+                     $Value = NULL;
+                  $Set[$FieldName] = $Value;
+               }
+            }
+         }
+         $Sender->SetData('CategoryNotifications', $Categories);
+         if ($PostBack) {
+            UserModel::SetMeta($Sender->User->UserID, $Set, 'Preferences.');
+         }
+      }
+   }
+   
+   /**
+    *
+    * @param ProfileController $Sender 
+    */
+   public function ProfileController_CustomNotificationPreferneces_Handler($Sender) {
+      if (Gdn::Session()->CheckPermission('Garden.AdvancedNotifications.Allow')) {
+         include $Sender->FetchViewLocation('NotificationPreferences', 'Settings', 'Vanilla');
       }
    }
 	

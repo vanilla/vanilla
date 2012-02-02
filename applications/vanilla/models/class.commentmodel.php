@@ -792,26 +792,48 @@ class CommentModel extends VanillaModel {
     * @param array $NotifiedUsers 
     */
    public function RecordAdvancedNotications($ActivityModel, $Activity, $Discussion) {
-      // Grab all of the users that need to be notified.
-      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewComment'))->ResultArray();
+      if (is_numeric($Discussion)) {
+         $Discussion = $this->GetID($Discussion);
+      }
       
-      // Grab all of their follow/unfollow preferences.
-      $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');
       $CategoryID = GetValue('CategoryID', $Discussion);
-      $UserPrefs = $this->SQL
-         ->Select('*')
-         ->From('UserCategory')
-         ->Where('CategoryID', $CategoryID)
-         ->WhereIn('UserID', $UserIDs)
-         ->Get()->ResultArray();
-      $UserPrefs = Gdn_DataSet::Index($UserPrefs, 'UserID');
       
-      foreach ($UserIDs as $UserID) {
-         if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
+      // Figure out the category that governs this notification preference.
+      $i = 0;
+      $Category = CategoryModel::Categories($CategoryID);
+      if (!$Category)
+         return;
+      
+      while ($Category['Depth'] > 2 && $i < 20) {
+         if (!$Category || $Category['Archived'])
+            return;
+         $i++;
+         $Category = CategoryModel::Categories($Category['ParentCategoryID']);
+      } 
+
+      // Grab all of the users that need to be notified.
+      $Data = $this->SQL
+         ->WhereIn('Name', array('Preferences.Email.NewComment.'.$Category['CategoryID'], 'Preferences.Popup.NewComment.'.$Category['CategoryID']))
+         ->Get('UserMeta')->ResultArray();
+      
+      $NotifyUsers = array();
+      foreach ($Data as $Row) {
+         if (!$Row['Value'])
             continue;
          
+         $UserID = $Row['UserID'];
+         $Name = $Row['Name'];
+         if (strpos($Name, '.Email.') !== FALSE) {
+            $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;
+         } elseif (strpos($Name, '.Popup.') !== FALSE) {
+            $NotifyUsers[$UserID]['Notified'] = ActivityModel::SENT_PENDING;
+         }
+      }
+      
+      foreach ($NotifyUsers as $UserID => $Prefs) {
          $Activity['NotifyUserID'] = $UserID;
-         $Activity['Emailed'] = ActivityModel::SENT_PENDING;
+         $Activity['Emailed'] = GetValue('Emailed', $Prefs, FALSE);
+         $Activity['Notified'] = GetValue('Notified', $Prefs, FALSE);
          $ActivityModel->Queue($Activity);
       }
    }

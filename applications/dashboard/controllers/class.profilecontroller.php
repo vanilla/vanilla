@@ -568,6 +568,9 @@ class ProfileController extends Gdn_Controller {
       // Get user data
       $this->GetUserInfo($UserReference, $Username, $UserID);
 		$UserPrefs = Gdn_Format::Unserialize($this->User->Preferences);
+      if ($this->User->UserID != $Session->UserID)
+         $this->Permission('Garden.Users.Edit');
+      
       if (!is_array($UserPrefs))
          $UserPrefs = array();
       $MetaPrefs = UserModel::GetMeta($this->User->UserID, 'Preferences.%', 'Preferences.');
@@ -618,9 +621,6 @@ class ProfileController extends Gdn_Controller {
 				}
 			}
 		}
-		
-      if ($this->User->UserID != $Session->UserID)
-         $this->Permission('Garden.Users.Edit');
 
       // Loop the preferences, setting defaults from the configuration.
       $Defaults = array();
@@ -634,8 +634,11 @@ class ProfileController extends Gdn_Controller {
                $Defaults[$Pref] = GetValue($Pref, $MetaPrefs, FALSE);
             else
                $Defaults[$Pref] = GetValue($Pref, $UserPrefs, C('Preferences.'.$Pref, '0'));
+            
+            unset($MetaPrefs[$Pref]);
          }
       }
+      $Defaults = array_merge($Defaults, $MetaPrefs);
          
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Use global defaults
@@ -665,8 +668,12 @@ class ProfileController extends Gdn_Controller {
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
          UserModel::SetMeta($this->User->UserID, $Meta, 'Preferences.');
-			$this->InformMessage('<span class="InformSprite Check"></span>'.T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
+			
+         if (count($this->Form->Errors() == 0))
+            $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
       }
+      
+      $this->Title(T('Notification Preferences'));
       $this->Render();
    }
    /**
@@ -966,7 +973,7 @@ class ProfileController extends Gdn_Controller {
             if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
                $SideMenu->AddLink('Options', T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));
 
-            $SideMenu->AddLink('Options', T('My Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
+            $SideMenu->AddLink('Options', T('Notification Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'PreferencesLink'));
             if ($AllowImages)
                $SideMenu->AddLink('Options', T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
                

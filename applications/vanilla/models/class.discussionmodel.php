@@ -899,7 +899,12 @@ class DiscussionModel extends VanillaModel {
                $NotifiedUsers = array();
                $UserModel = Gdn::UserModel();
                $ActivityModel = new ActivityModel();
-               $HeadlineFormat = T('HeadlineFormat.Discussion', '{ActivityUserID,user} <a href="{Url,html}">{Data.Name,text}</a>');
+               if (GetValue('Type', $FormPostValues))
+                  $Code = 'HeadlineFormat.Discussion.'.$FormPostValues['Type'];
+               else
+                  $Code = 'HeadlineFormat.Discussion';
+               
+               $HeadlineFormat = T($Code, '{ActivityUserID,user} Started a new discussion. <a href="{Url,html}">{Data.Name,text}</a>');
                $Activity = array(
                    'ActivityType' => 'Discussion',
                    'ActivityUserID' => $Fields['InsertUserID'],
@@ -986,35 +991,60 @@ class DiscussionModel extends VanillaModel {
       if (is_numeric($Discussion)) {
          $Discussion = $this->GetID($Discussion);
       }
+      
+      $CategoryID = GetValue('CategoryID', $Discussion);
+      
+      // Figure out the category that governs this notification preference.
+      $i = 0;
+      $Category = CategoryModel::Categories($CategoryID);
+      if (!$Category)
+         return;
+      
+      while ($Category['Depth'] > 2 && $i < 20) {
+         if (!$Category || $Category['Archived'])
+            return;
+         $i++;
+         $Category = CategoryModel::Categories($Category['ParentCategoryID']);
+      } 
 
       // Grab all of the users that need to be notified.
-      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
+      $Data = $this->SQL
+         ->WhereIn('Name', array('Preferences.Email.NewDiscussion.'.$Category['CategoryID'], 'Preferences.Popup.NewDiscussion.'.$Category['CategoryID']))
+         ->Get('UserMeta')->ResultArray();
       
-      // Grab all of their follow/unfollow preferences.
-      $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');
-      $CategoryID = $Discussion['CategoryID'];
-      $UserPrefs = $this->SQL
-         ->Select('*')
-         ->From('UserCategory')
-         ->Where('CategoryID', $CategoryID)
-         ->WhereIn('UserID', $UserIDs)
-         ->Get()->ResultArray();
-      $UserPrefs = Gdn_DataSet::Index($UserPrefs, 'UserID');
+//      decho($Data, 'Data');
       
       
-      $Activity['Emailed'] = ActivityModel::SENT_PENDING;
-
+      $NotifyUsers = array();
       foreach ($Data as $Row) {
-         $UserID = $Row['UserID'];
-         if ($UserID == $Discussion['InsertUserID'])
+         if (!$Row['Value'])
             continue;
          
-         if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
+         $UserID = $Row['UserID'];
+         $Name = $Row['Name'];
+         if (strpos($Name, '.Email.') !== FALSE) {
+            $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;
+         } elseif (strpos($Name, '.Popup.') !== FALSE) {
+            $NotifyUsers[$UserID]['Notified'] = ActivityModel::SENT_PENDING;
+         }
+      }
+      
+//      decho($NotifyUsers);
+      
+      $InsertUserID = GetValue('InsertUserID', $Discussion);
+      foreach ($NotifyUsers as $UserID => $Prefs) {
+         if ($UserID == $InsertUserID)
             continue;
          
          $Activity['NotifyUserID'] = $UserID;
+         $Activity['Emailed'] = GetValue('Emailed', $Prefs, FALSE);
+         $Activity['Notified'] = GetValue('Notified', $Prefs, FALSE);
          $ActivityModel->Queue($Activity);
+         
+//         decho($Activity, 'die');
       }
+      
+//      die();
    }
    
    /**

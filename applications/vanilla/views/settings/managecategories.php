@@ -53,7 +53,10 @@ if (C('Vanilla.Categories.Use')) {
       .Wrap($this->Form->CheckBox('Vanilla.Categories.DoHeadings', 'Display root categories as headings.'), 'div')
       .Wrap($this->Form->CheckBox('Vanilla.Categories.HideModule', 'Do not display the categories in the side panel.'), 'div')
    .'</div>'
-   .$this->Form->Close('Save');
+   .'<div class="Buttons Wrap">'
+   .$this->Form->Button('Save')
+   .'</div>'
+   .$this->Form->Close();
 
    echo Wrap(T('Organize Categories'), 'h1')
    .'<ol class="Sortable">';

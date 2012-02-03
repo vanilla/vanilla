@@ -318,6 +318,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * @param object $Sender ProfileController.
 	 */
    public function ProfileController_Comments_Create($Sender) {
+		$Sender->EditMode(FALSE);
 		$View = $Sender->View;
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
 		$Username = ArrayValue(1, $Sender->RequestArgs, '');
@@ -378,6 +379,8 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * @param object $Sender ProfileController.
 	 */
    public function ProfileController_Discussions_Create($Sender) {
+		$Sender->EditMode(FALSE);
+		
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
 		$Username = ArrayValue(1, $Sender->RequestArgs, '');
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);

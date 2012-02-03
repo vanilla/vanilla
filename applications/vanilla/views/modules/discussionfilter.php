@@ -31,32 +31,31 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
    $MyDrafts .= FilterCountString($CountDrafts);
 }
 ?>
-<div class="Box BoxDiscussionFilter">
-   <h4><?php echo T('Discussion Filters'); ?></h4>
+<div class="Box BoxFilter BoxDiscussionFilter">
    <ul class="PanelInfo">
-      <li<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('All Discussions'), 'discussions'); ?></li>
+      <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Anchor(Sprite('SpDiscussions').T('All Discussions'), 'discussions'); ?></li>
       <?php      
       if (C('Vanilla.Categories.ShowTabs')) {
-         $CssClass = '';
-         if (strtolower($Controller->ControllerName) == 'categoriescontroller' && strtolower($Controller->RequestMethod) == 'all') {
-            $CssClass = 'Active';
+         $CssClass = 'AllCategories';
+         if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), array('index', 'all'))) {
+            $CssClass .= ' Active';
          }
 
-         echo '<li class="'.$CssClass.'">'.Anchor(T('Categories'), '/categories/all').'</li> ';
+         echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpAllCategories').T('Categories'), '/categories').'</li> ';
       }
       ?>
       <?php if ($CountBookmarks > 0 || $Controller->RequestMethod == 'bookmarked') { ?>
-      <li class="MyBookmarks<?php echo $Controller->RequestMethod == 'bookmarked' ? ' Active' : ''; ?>"><?php echo Anchor($Bookmarked, '/discussions/bookmarked'); ?></li>
+      <li class="MyBookmarks<?php echo $Controller->RequestMethod == 'bookmarked' ? ' Active' : ''; ?>"><?php echo Anchor(Sprite('SpBookmarks').$Bookmarked, '/discussions/bookmarked'); ?></li>
       <?php
       }
       if (($CountDiscussions > 0 || $Controller->RequestMethod == 'mine') && C('Vanilla.Discussions.ShowMineTab', TRUE)) {
       ?>
-      <li class="MyDiscussions<?php echo $Controller->RequestMethod == 'mine' ? ' Active' : ''; ?>"><?php echo Anchor($MyDiscussions, '/discussions/mine'); ?></li>
+      <li class="MyDiscussions<?php echo $Controller->RequestMethod == 'mine' ? ' Active' : ''; ?>"><?php echo Anchor(Sprite('SpMyDiscussions').$MyDiscussions, '/discussions/mine'); ?></li>
       <?php
       }
       if ($CountDrafts > 0 || $Controller->ControllerName == 'draftscontroller') {
       ?>
-      <li class="MyDrafts<?php echo $Controller->ControllerName == 'draftscontroller' ? ' Active' : ''; ?>"><?php echo Anchor($MyDrafts, '/drafts'); ?></li>
+      <li class="MyDrafts<?php echo $Controller->ControllerName == 'draftscontroller' ? ' Active' : ''; ?>"><?php echo Anchor(Sprite('SpMyDrafts').$MyDrafts, '/drafts'); ?></li>
       <?php
       }
       $Controller->FireEvent('AfterDiscussionFilters');

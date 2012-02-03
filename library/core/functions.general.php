@@ -1511,14 +1511,43 @@ if (!function_exists('PrefixString')) {
 
 if (!function_exists('PrepareArray')) {
    /**
-    * Makes sure that the key in question exists and is an array itself
+    * Makes sure that the key in question exists and is of the specified type,
+    * by default also an array.
     * 
     * @param string $Key Key to prepare
     * @param array $Array Array to repare
+    * @param string $PrepareType Optional, 
     */
-   function PrepareArray($Key, &$Array) {
-      if (!array_key_exists($Key, $Array) || !is_array($Array[$Key]))
-         $Array[$Key] = array();
+   function PrepareArray($Key, &$Array, $PrepareType = 'array') {
+      if (!array_key_exists($Key, $Array))
+         $Array[$Key] = NULL;
+      
+      switch ($PrepareType) {
+         case 'array':
+            if (!is_array($Array[$Key]))
+               $Array[$Key] = array();
+            break;
+            
+         case 'integer':
+            if (!is_integer($Array[$Key]))
+               $Array[$Key] = 0;
+            break;
+            
+         case 'float':
+            if (!is_float($Array[$Key]))
+               $Array[$Key] = 0.0;
+            break;
+            
+         case 'null':
+            if (!is_null($Array[$Key]))
+               $Array[$Key] = NULL;
+            break;
+            
+         case 'string':
+            if (!is_string($Array[$Key]))
+               $Array[$Key] = '';
+            break;
+      }
    }
 }
 

@@ -1,9 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->Title(T('Start a New Conversation'));
 ?>
 <div id="ConversationForm">
-   <h1><?php echo T('Start a New Conversation'); ?></h1>
    <?php
+   echo Wrap($this->Data('Title'), 'h1');
    echo $this->Form->Open();
    echo $this->Form->Errors();
    

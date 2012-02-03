@@ -353,3 +353,9 @@ if (!function_exists('SignOutUrl')) {
       return '/entry/signout?TransientKey='.urlencode(Gdn::Session()->TransientKey()).($Target ? '&Target='.urlencode($Target) : '');
    }
 }
+
+if (!function_exists('Sprite')) {
+	function Sprite($Name, $Type = 'Sprite') {
+		return '<span class="'.$Type.' '.$Name.'"></span>';
+	}
+}

@@ -19,7 +19,7 @@ foreach ($Controller->ProfileTabs as $TabCode => $TabInfo) {
       $SortOrder[] = $TabCode;
 }
 ?>
-<div class="Box BoxProfileFilter">
+<div class="Box BoxFilter BoxProfileFilter">
    <ul class="PanelInfo">
    <?php
    // Get sorted filter links

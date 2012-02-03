@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="Tabs SearchTabs">
+<div class="SearchForm">
 <?php
 $Form = $this->Form;
 $Form->InputPrefix = '';

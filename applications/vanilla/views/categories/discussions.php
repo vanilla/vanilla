@@ -13,21 +13,17 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       if ($this->DiscussionData->NumRows() > 0) : ?>
       
    <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
-      <div class="Tabs CategoryTabs">
-         <ul>
-            <li class="Active"><?php echo Anchor($Category->Name, '/categories/'.$Category->UrlCode, 'TabLink'); ?></li>
-         </ul>
-      </div>
+      <?php echo Wrap(Anchor($Category->Name, '/categories/'.$Category->UrlCode), 'h2'); ?>
       
       <ul class="DataList Discussions">
          <?php include($this->FetchViewLocation('discussions', 'discussions')); ?>
       </ul>
       
-      <div class="Foot">
-         <?php if ($this->DiscussionData->NumRows() == $this->DiscussionsPerCategory) : ?>
-            <?php echo Anchor(T('More Discussions'), '/categories/'.$Category->UrlCode, 'TabLink'); ?>
-         <?php endif; ?>
+      <?php if ($this->DiscussionData->NumRows() == $this->DiscussionsPerCategory) : ?>
+      <div class="MorePager">
+         <?php echo Anchor(T('More Discussions'), '/categories/'.$Category->UrlCode); ?>
       </div>
+      <?php endif; ?>
       
    </div>
    

@@ -227,8 +227,8 @@ class VanillaHooks implements Gdn_IPlugin {
       if (is_object($Sender->User) && $Sender->User->UserID > 0) {
          $UserID = $Sender->User->UserID;
          // Add the discussion tab
-         $DiscussionsLabel = T('Discussions');
-         $CommentsLabel = T('Comments');
+         $DiscussionsLabel = Sprite('SpDiscussions').T('Discussions');
+         $CommentsLabel = Sprite('SpComments').T('Comments');
          if (C('Vanilla.Profile.ShowCounts', TRUE)) {
             $DiscussionsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID").'</span>';
             $CommentsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID").'</span>';
@@ -360,6 +360,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * @param object $Sender ProfileController.
 	 */
    public function ProfileController_Comments_Create($Sender) {
+		$Sender->EditMode(FALSE);
 		$View = $Sender->View;
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
 		$Username = ArrayValue(1, $Sender->RequestArgs, '');
@@ -420,6 +421,8 @@ class VanillaHooks implements Gdn_IPlugin {
 	 * @param object $Sender ProfileController.
 	 */
    public function ProfileController_Discussions_Create($Sender) {
+		$Sender->EditMode(FALSE);
+		
       $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
 		$Username = ArrayValue(1, $Sender->RequestArgs, '');
       $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
@@ -427,6 +430,7 @@ class VanillaHooks implements Gdn_IPlugin {
 		$Sender->GetUserInfo($UserReference, $Username);
       $Sender->_SetBreadcrumbs(T('Discussions'), '/profile/discussions');
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
+		$Sender->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
       
       // Load the data for the requested tab.
       if (!is_numeric($Offset) || $Offset < 0)

@@ -8,16 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-/**
- * Renders a user's photo (if they've uploaded one).
- */
-class UserPhotoModule extends Gdn_Module {
+class MeModule extends Gdn_Module {
    
    public function AssetTarget() {
       return 'Panel';
-   }
-
-   public function ToString() {
-		return parent::ToString();
    }
 }

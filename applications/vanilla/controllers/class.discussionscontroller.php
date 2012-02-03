@@ -61,6 +61,16 @@ class DiscussionsController extends VanillaController {
    public $CategoryID;
    
    /**
+    * "Table" layout for discussions. Mimics more traditional forum discussion layout.
+    * 
+    * @param int $Page Multiplied by PerPage option to determine offset.
+    */
+   public function Table($Page = '0') {
+      $this->View = 'table';
+      $this->Index($Page);
+   }
+   
+   /**
     * Default all discussions view: chronological by most recent comment.
     * 
     * @since 2.0.0
@@ -69,6 +79,17 @@ class DiscussionsController extends VanillaController {
     * @param int $Page Multiplied by PerPage option to determine offset.
     */
    public function Index($Page = '0') {
+      // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
+      $Layout = C('Vanilla.Discussions.Layout');
+      switch($Layout) {
+         case 'table':
+            $this->View = 'table';
+            break;
+         default:
+            // $this->View = 'index';
+            break;
+      }
+      
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
@@ -91,10 +112,12 @@ class DiscussionsController extends VanillaController {
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
       
       // Add modules
+      $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
-      $this->SetData('Breadcrumbs', array(array('Name' => T('All Discussions'), 'Url' => '/discussions')));
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Recent Discussions'), 'Url' => '/discussions')));
+      
       
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
@@ -152,7 +175,6 @@ class DiscussionsController extends VanillaController {
          $this->AddDefinition('SetClientHour', $ClientHour);
       }
       
-      // Render default view (discussions/index.php)
       $this->Render();
    }
    
@@ -178,7 +200,9 @@ class DiscussionsController extends VanillaController {
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
 		if (count($CheckedDiscussions) > 0)
 			ModerationController::InformCheckedDiscussions($this);
-			
+         
+      $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
+         
 		$this->FireEvent('AfterInitialize');
    }
    
@@ -242,11 +266,13 @@ class DiscussionsController extends VanillaController {
       }
       
       // Add modules
+      $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       
       // Render default view (discussions/bookmarked.php)
       $this->SetData('Title', T('My Bookmarks'));
+		$this->SetData('Breadcrumbs', array(array('Name' => T('My Bookmarks'), 'Url' => '/discussions/bookmarked')));
       $this->Render('index');
    }
    
@@ -299,12 +325,14 @@ class DiscussionsController extends VanillaController {
       }
       
       // Add modules
+      $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
       
       // Render default view (discussions/mine.php)
       $this->SetData('Title', T('My Discussions'));
+      $this->SetData('Breadcrumbs', array(array('Name' => T('My Discussions'), 'Url' => '/discussions/mine')));
       $this->Render('Index');
    }
 
@@ -360,19 +388,22 @@ class DiscussionsController extends VanillaController {
 				$FinalData[$identifier] = 0;
 			}
 		} else {
-			$i = 0;
 			foreach ($CountData->Result() as $Row) {
-				while ($Row->ForeignID != $vanilla_identifier[$i]) {
-					$FinalData[$vanilla_identifier[$i]] = 0;
-					$i++;
-				}
-				$Row->CountComments--;
-				if ($Row->CountComments < 0)
-					$Row->CountComments = 0;
-	
 				$FinalData[$Row->ForeignID] = $Row->CountComments;
-				$i++;
 			}
+         // Loop through the data, reducing the comment count by 1 b/c what they really want is a "reply" count.
+         // Also ensure that all of the requested values return a value
+         foreach($vanilla_identifier as $id) {
+            if (!array_key_exists($id, $FinalData)) {
+               $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
+            } else {
+               $Count = $FinalData[$id];
+               if ($Count > 0)
+                  $Count = $Count - 1; // Reduce the count by 1, but don't go below zero
+                  
+               $FinalData[$id] = $Count;
+            }
+         }
 		}
 
 		$this->SetData('CountData', $FinalData);

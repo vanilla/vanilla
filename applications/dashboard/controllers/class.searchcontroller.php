@@ -60,6 +60,7 @@ class SearchController extends Gdn_Controller {
       
       $this->AddCssFile('style.css');
       $this->AddCssFile('menu.css');
+		$this->AddModule('MeModule');
       $this->AddModule('GuestModule');
       parent::Initialize();
    }

@@ -674,6 +674,7 @@ class ProfileController extends Gdn_Controller {
       }
       
       $this->Title(T('Notification Preferences'));
+      $this->_SetBreadcrumbs($this->Data('Title'), $this->CanonicalUrl());
       $this->Render();
    }
    /**

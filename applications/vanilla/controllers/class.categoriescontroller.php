@@ -93,6 +93,17 @@ class CategoriesController extends VanillaController {
 			}
 			return;
 		} else {
+			// Figure out which discussions layout to choose (Defined on "Homepage" settings page).
+			$Layout = C('Vanilla.Discussions.Layout');
+			switch($Layout) {
+				case 'table':
+					$this->View = 'table';
+					break;
+				default:
+					// $this->View = 'index';
+					break;
+			}
+			
 			$Category = CategoryModel::Categories($CategoryIdentifier);
 			
 			if (empty($Category)) {

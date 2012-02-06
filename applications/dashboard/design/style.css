@@ -1904,7 +1904,8 @@ div.Popup form ul li label.RadioLabel {
 }
 
 /* ======================================= Category & Discussions Table Views */
-.CategoryTable {
+.CategoryTable,
+.DiscussionsTable {
 	width: 100%;
 }
 .CategoryTable thead td,

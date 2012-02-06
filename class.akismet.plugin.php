@@ -21,16 +21,40 @@ class AkismetPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
 
    /// METHODS ///
+   
+   /**
+    * @return Akismet
+    */
+   public static function Akismet() {
+      static $Akismet;
+      if (!$Akismet) {
+         $Key = C('Plugins.Akismet.Key');
+         
+         if (!$Key)
+            return NULL;
+         
+         $Akismet = new Akismet(Gdn::Request()->Url('/', TRUE), $Key);
+         
+         $Server = C('Plugins.Akismet.Server');
+         if ($Server) {
+            $Akismet->setAkismetServer($Server);
+         }
+      }
+      
+      return $Akismet;
+   }
 
    public function CheckAkismet($RecordType, $Data) {
-      $Key = C('Plugins.Akismet.Key');
       $UserID = $this->UserID();
-      if (!$Key || !$UserID)
+      
+      if (!$UserID)
          return FALSE;
 
-      static $Akismet;
-      if (!$Akismet) $Akismet = new Akismet(Gdn::Request()->Url('/', TRUE), $Key);
-
+      $Akismet = self::Akismet();
+      
+      if (!$Akismet)
+         return FALSE;
+      
       $Akismet->setCommentAuthor($Data['Username']);
       $Akismet->setCommentAuthorEmail($Data['Email']);
 
@@ -39,7 +63,12 @@ class AkismetPlugin extends Gdn_Plugin {
       $Akismet->setUserIP($Data['IPAddress']);
 
       $Result = $Akismet->isCommentSpam();
+      
       return $Result;
+   }
+   
+   public function Setup() {
+      $this->Structure();
    }
    
    public function Structure() {
@@ -82,10 +111,13 @@ class AkismetPlugin extends Gdn_Plugin {
          case 'Comment':
          case 'Discussion':
          case 'Activity':
+         case 'ActivityComment':
             $Result = $this->CheckAkismet($RecordType, $Data);
             if ($Result)
                $Data['Log_InsertUserID'] = $this->UserID();
             break;
+         default:
+            $Result = FALSE;
       }
       $Sender->EventArguments['IsSpam'] = $Result;
    }
@@ -95,7 +127,11 @@ class AkismetPlugin extends Gdn_Plugin {
       $Sender->SetData('Title', T('Akismet Settings'));
 
       $Cf = new ConfigurationModule($Sender);
-      $Cf->Initialize(array('Plugins.Akismet.Key' => array('Description' => 'Enter the key you obtained from <a href="http://akismet.com">akismet.com</a>')));
+      $Cf->Initialize(array(
+          'Plugins.Akismet.Key' => array('Description' => 'Enter the key you obtained from <a href="http://akismet.com">akismet.com</a>'),
+          'Plugins.Akismet.Server' => array('Description' => 'You can use either Akismet or TypePad antispam.', 'Control' => 'DropDown', 
+              'Items' => array('' => 'Aksimet', 'api.antispam.typepad.com' => 'TypePad', 'DefaultValue' => ''))
+          ));
 
       $Sender->AddSideMenu('dashboard/settings/plugins');
       $Cf->RenderAll();

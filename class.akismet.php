@@ -178,7 +178,7 @@ class Akismet
 	 *  @throws		Will throw an exception if the API key passed to the constructor is invalid.
 	 */
 	public function isCommentSpam() {
-		$response = $this->sendRequest($this->getQueryString(), $this->wordPressAPIKey . '.rest.akismet.com', '/' . $this->akismetVersion . '/comment-check');
+		$response = $this->sendRequest($this->getQueryString(), $this->wordPressAPIKey . '.' . $this->akismetServer, '/' . $this->akismetVersion . '/comment-check');
 		
 		if($response[1] == 'invalid' && !$this->isKeyValid()) {
 			throw new exception('The Wordpress API key passed to the Akismet constructor is invalid.  Please obtain a valid one from http://wordpress.com/api-keys/');

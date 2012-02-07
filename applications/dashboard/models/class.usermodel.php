@@ -46,8 +46,14 @@ class UserModel extends Gdn_Model {
       
       $LogID = FALSE;
       if (GetValue('DeleteContent', $Options)) {
+         $Options['Log'] = 'Ban';
          $LogID = $this->DeleteContent($UserID, $Options);
       }
+      
+      if ($LogID) {
+         $this->SaveAttribute($UserID, 'BanLogID', $LogID);
+      }
+      
       if (GetValue('AddActivity', $Options, TRUE)) {
          switch (GetValue('Reason', $Options, '')) {
             case '':
@@ -67,13 +73,75 @@ class UserModel extends Gdn_Model {
          $Activity = array(
              'ActivityType' => 'Ban',
              'NotifyUserID' => ActivityModel::NOTIFY_MODS,
-             'RegardingUserID' => $UserID,
-             'HeadlineFormat' => T('HeadlineFormat.Ban', '{ActivityUserID,you} banned {RegardingUserID,user}.'),
+             'ActivityUserID' => $UserID,
+             'RegardingUserID' => Gdn::Session()->UserID,
+             'HeadlineFormat' => T('HeadlineFormat.Ban', '{RegardingUserID,You} banned {ActivityUserID,you}.'),
              'Story' => $Story,
              'Data' => array('LogID' => $LogID));
          
          $ActivityModel = new ActivityModel();
          $ActivityModel->Save($Activity);
+      }
+   }
+   
+   /**
+    * Unban a user.
+    * @since 2.1
+    * @param int $UserID
+    * @param array $Options 
+    */
+   public function UnBan($UserID, $Options = array()) {
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User)
+         throw NotFoundException();
+      
+      if (!$User['Banned'])
+         throw new Gdn_UserException(T("The user isn't banned."));
+      
+      // Unban the user.
+      $this->SetField($UserID, 'Banned', FALSE);
+      
+      // Restore the user's content.
+      if (GetValue('RestoreContent', $Options)) {
+         $BanLogID = $this->GetAttribute($UserID, 'BanLogID');
+         
+         if ($BanLogID) {
+            $LogModel = new LogModel();
+
+            try {
+               $LogModel->Restore($BanLogID);
+            } catch (Exception $Ex) {
+               if ($Ex->getCode() != 404)
+                  throw $Ex;
+            }
+            $this->SaveAttribute($UserID, 'BanLogID', NULL);
+         }
+      }
+      
+      // Add an activity for the unbanning.
+      if (GetValue('AddActivity', $Options, TRUE)) {
+         $ActivityModel = new ActivityModel();
+         
+         $Story = GetValue('Story', $Options, NULL);
+         
+         // Notify the moderators of the unban.
+         $Activity = array(
+             'ActivityType' => 'Ban',
+             'NotifyUserID' => ActivityModel::NOTIFY_MODS,
+             'ActivityUserID' => $UserID,
+             'RegardingUserID' => Gdn::Session()->UserID,
+             'HeadlineFormat' => T('HeadlineFormat.Unban', '{RegardingUserID,You} unbanned {ActivityUserID,you}.'),
+             'Story' => $Story);
+         
+         $ActivityModel->Queue($Activity);
+         
+         // Notify the user of the unban.
+         $Activity['NotifyUserID'] = $UserID;
+         $Activity['Emailed'] = ActivityModel::SENT_PENDING;
+         $Activity['HeadlineFormat'] = T('HeadlineFormat.Unban.Notification', "You've been unbanned.");
+         $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
+         
+         $ActivityModel->SaveQueue();
       }
    }
 
@@ -646,7 +714,7 @@ class UserModel extends Gdn_Model {
          $Sql->Where('u.UserID', $UserID);
 
       if (strpos($Key, '%') !== FALSE)
-         $Sql->Like('u.Name', $Key);
+         $Sql->Like('u.Name', $Key, 'none');
       else
          $Sql->Where('u.Name', $Key);
 
@@ -1711,7 +1779,6 @@ class UserModel extends Gdn_Model {
     * Checks to see if $Username and $Email are already in use by another member.
     */
    public function ValidateUniqueFields($Username, $Email, $UserID = '', $Return = FALSE) {
-      //die(var_dump(array($Username, $Email, $UserID)));
       $Valid = TRUE;
       $Where = array();
       if (is_numeric($UserID))
@@ -1822,6 +1889,12 @@ class UserModel extends Gdn_Model {
       
       $this->DeleteContent($UserID, $Options);
       
+      // Remove shared authentications.
+      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Options);
+
+      // Remove role associations.
+      $this->GetDelete('UserRole', array('UserID' => $UserID), $Options);
+      
       // Remove the user's information
       $this->SQL->Update('User')
          ->Set(array(
@@ -1859,6 +1932,9 @@ class UserModel extends Gdn_Model {
 
    public function DeleteContent($UserID, $Options = array()) {
       $Log = GetValue('Log', $Options);
+      if ($Log === TRUE)
+         $Log = 'Delete';
+      
       $Result = FALSE;
       $Content = array();
       
@@ -1881,27 +1957,20 @@ class UserModel extends Gdn_Model {
       $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
       
       // Remove invitations
-      $this->SQL->GetDelete('Invitation', array('InsertUserID' => $UserID), $Content);
-      $this->SQL->GetDelete('Invitation', array('AcceptedUserID' => $UserID), $Content);
+      $this->GetDelete('Invitation', array('InsertUserID' => $UserID), $Content);
+      $this->GetDelete('Invitation', array('AcceptedUserID' => $UserID), $Content);
       
       // Remove activities
-      $this->SQL->GetDelete('Activity', array('ActivityUserID' => $UserID), $Content);
-      $this->SQL->GetDelete('Activity', array('RegardingUserID' => $UserID), $Content);
+      $this->GetDelete('Activity', array('InsertUserID' => $UserID), $Content);
       
       // Remove activity comments.
       $this->GetDelete('ActivityComment', array('InsertUserID' => $UserID), $Content);
-      
-      // Remove shared authentications.
-      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Content);
-
-      // Remove role associations.
-      $this->GetDelete('UserRole', array('UserID' => $UserID), $Content);      
       
       if ($Log) {
          $User['_Data'] = $Content;
          unset($Content); // in case data gets copied
          
-         $Result = LogModel::Insert('Delete', 'User', $User, GetValue('LogOptions', $Options, array()));
+         $Result = LogModel::Insert($Log, 'User', $User, GetValue('LogOptions', $Options, array()));
       }
       
       return $Result;

@@ -1392,7 +1392,7 @@ links, sign in buttons, etc
 }
 
 /* ============================================================= Profile Page */
-body.Profile #Content {
+/*body.Profile #Content {
    width: auto;
    margin: 0 0 40px 20px;
    width: 690px;
@@ -1401,7 +1401,7 @@ body.Profile #Content {
 body.Profile #Panel {
    float: left;
    width: 250px;
-}
+} */
 .ChangePicture span {
 	position: absolute;
 	background: #333;
@@ -1888,7 +1888,8 @@ div.Popup form ul li label.RadioLabel {
 }
 
 /* ======================================= Category & Discussions Table Views */
-.CategoryTable {
+.CategoryTable,
+.DiscussionsTable {
 	width: 100%;
 }
 .CategoryTable thead td,

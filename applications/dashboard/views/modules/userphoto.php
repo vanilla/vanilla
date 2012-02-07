@@ -19,6 +19,6 @@ if ($User->Photo != '') {
       ?>
    </div>
 <?php } else if ($User->UserID == Gdn::Session()->UserID) { ?>
-   <div class="Photo"><?php echo Anchor(Wrap(T('Add a Profile Picture')).$Img, '/profile/picture/', 'AddPicture BigButton'); ?></div>
+   <div class="Photo"><?php echo Anchor(T('Add a Profile Picture'), '/profile/picture/', 'AddPicture BigButton'); ?></div>
 <?php
 }

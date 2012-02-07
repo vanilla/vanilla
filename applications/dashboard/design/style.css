@@ -1411,6 +1411,16 @@ links, sign in buttons, etc
 }
 
 /* ============================================================= Profile Page */
+/*body.Profile #Content {
+   width: auto;
+   margin: 0 0 40px 20px;
+   width: 690px;
+	float: right;
+}
+body.Profile #Panel {
+   float: left;
+   width: 250px;
+} */
 .ChangePicture span {
 	position: absolute;
 	background: #333;

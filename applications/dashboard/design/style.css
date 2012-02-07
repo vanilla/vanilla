@@ -215,7 +215,7 @@ a.Button,
    cursor: pointer;
    margin: 0;
    font-size: 11px;
-   padding: 4px;
+   padding: 4px 6px;
 	background: #f8f8f8;
 	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
 	background:-moz-linear-gradient(top, #ffffff, #cccccc);
@@ -224,17 +224,17 @@ a.Button,
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	box-shadow: 0px 0px 1px #999;
+	-moz-box-shadow: 0px 0px 1px #999;
+	-webkit-box-shadow: 0px 0px 1px #999;
 	white-space: nowrap;
 }
 a.Button {
    display: inline-block;
-   padding: 4px;
+   padding: 4px 4px 5px; /* Account for text-shadow w/ spacing */
    line-height: 100%;
    margin: 3px auto;
 }
@@ -526,21 +526,24 @@ body #Head h1 {
 }
 #Head form {
    float: right;
-   width: 250px;
+   /* width: 250px; */
    padding: 0;
 }
 #Head form input.InputBox {
-   width: 204px;
+	vertical-align: top;
+   width: 200px;
    border: 0;
    padding: 4px;
 	margin: 0 6px 0 0;
-   background: #fff;
+   color: #969696;
+   font-size: 13px;
+   /*
+	background: #fff; 
    -moz-border-radius: 2px;
    -webkit-border: 2px;
    border-bottom: 2px;
-   color: #969696;
-   font-size: 13px;
 	vertical-align: bottom;
+	*/
 }
 #Head form input.Button {
 	font-size: 11px;

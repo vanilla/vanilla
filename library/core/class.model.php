@@ -133,6 +133,7 @@ class Gdn_Model extends Gdn_Pluggable {
       $this->SQL = $this->Database->SQL();
       $this->Validation = new Gdn_Validation();
       $this->Name = $Name;
+      $this->PrimaryKey = $Name.'ID';
       parent::__construct();
    }
 
@@ -199,6 +200,29 @@ class Gdn_Model extends Gdn_Pluggable {
          $PrimaryKeyVal = FALSE;
       }
       return $PrimaryKeyVal;
+   }
+   
+   /**
+    * Update a row in the database.
+    * 
+    * @since 2.1
+    * @param int $RowID
+    * @param array|string $Property
+    * @param atom $Value 
+    */
+   public function SetField($RowID, $Property, $Value = FALSE) {
+      if (!is_array($Property))
+         $Property = array($Property => $Value);
+      
+      $this->DefineSchema();
+      
+      $Set = array_intersect_key($Property, $this->Schema->Fields());
+      
+		$this->SQL
+            ->Update($this->Name)
+            ->Set($Set)
+            ->Where($this->PrimaryKey, $RowID)
+            ->Put();
    }
 
 

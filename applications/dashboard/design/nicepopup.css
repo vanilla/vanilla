@@ -260,6 +260,7 @@ body div.Popup div.Warning {
    border-left: 5px solid #7dc2df;
    padding: 0px 0px 0px 5px;
    margin: 0px;
+   color: black;
 }
 
 div.Popup div.Notice {

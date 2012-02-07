@@ -215,7 +215,7 @@ a.Button,
    cursor: pointer;
    margin: 0;
    font-size: 11px;
-   padding: 4px;
+   padding: 4px 6px;
 	background: #f8f8f8;
 	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
 	background:-moz-linear-gradient(top, #ffffff, #cccccc);
@@ -224,12 +224,12 @@ a.Button,
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	box-shadow: 0px 0px 1px #999;
+	-moz-box-shadow: 0px 0px 1px #999;
+	-webkit-box-shadow: 0px 0px 1px #999;
 	white-space: nowrap;
 }
 a.Button {
@@ -526,21 +526,24 @@ body #Head h1 {
 }
 #Head form {
    float: right;
-   width: 250px;
+   /* width: 250px; */
    padding: 0;
 }
 #Head form input.InputBox {
-   width: 204px;
+	vertical-align: top;
+   width: 200px;
    border: 0;
    padding: 4px;
 	margin: 0 6px 0 0;
-   background: #fff;
+   color: #969696;
+   font-size: 13px;
+   /*
+	background: #fff; 
    -moz-border-radius: 2px;
    -webkit-border: 2px;
    border-bottom: 2px;
-   color: #969696;
-   font-size: 13px;
 	vertical-align: bottom;
+	*/
 }
 #Head form input.Button {
 	font-size: 11px;
@@ -825,8 +828,37 @@ a.Bookmarking:hover {
 }
 .MeBox .Username {
 	font-weight: bold;
-	vertical-align: middle
+	vertical-align: top;
 }
+.MeMenu {
+   display: block;
+}
+.MeMenu a {
+	float: left;
+	padding: 4px 6px;
+	position: relative;
+	line-height: 1;
+}
+.MeMenu a:hover {
+	background: #eee;
+	background: rgba(0,0,0,0.07);
+}
+.MeMenu .Alert {
+	position: absolute;
+	top: -2px;
+	right: -3px;
+	font-size: 9px;
+	line-height: 1;
+	padding: 1px;
+	border: 1px solid #d00;
+	box-shadow: 0 1px 1px #333;
+	-moz-box-shadow: 0 1px 1px #333;
+	-webkit-box-shadow: 0 1px 1px #333;
+}
+.MeMenu em {
+	display: none;
+}
+
 .PanelActivity {
    border-top: 1px solid #abdafb;
 	border-bottom: 0;
@@ -2902,6 +2934,135 @@ span.InformSprite.Sock { background-position: -298px -586px; }
 span.InformSprite.Bone { background-position: -346px -586px; }
 span.InformSprite.Golf { background-position: -394px -586px; }
 span.InformSprite.Dice { background-position: -442px -586px; }
+
+.Sprite16 {
+	background: url('images/sprites.png') 0 0 no-repeat;
+	display: inline-block;
+	height: 16px;
+	width: 16px;
+}
+
+/* 16px Sprites White */
+.SpDashboard,
+.SpCog { background-position: 0 -212px; }
+.SpSettings { background-position: -16px -212px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -212px; }
+.SpSignOut,
+.SpExit { background-position: -48px -212px; }
+.SpMarker { background-position: -64px -212px; }
+.SpDocuments { background-position: -80px -212px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -228px; }
+.SpInmail { background-position: -16px -228px; }
+.SpRoundBubble { background-position: -32px -228px; }
+.SpSquareBubble { background-position: -48px -228px; }
+.SpRoundBubbles { background-position: -64px -228px; }
+.SpSquareBubbles { background-position: -80px -228px; }
+.SpTag { background-position: 0 -244px; }
+.SpWrite { background-position: -16px -244px; }
+.SpLock { background-position: -32px -244px; }
+.SpRoundAlert { background-position: -48px -244px; }
+.SpTriangleAlert { background-position: -64px -244px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -244px; }
+.SpSearch { background-position: 0 -260px; }
+.SpTrash { background-position: -16px -260px; }
+.SpUser { background-position: -32px -260px; }
+.SpRefresh { background-position: -48px -260px; }
+.SpPencil { background-position: -64px -260px; }
+.SpPlus { background-position: -80px -260px; }
+
+/* 16px Sprites White Transparent */
+.SpDashboard,
+.SpCog { background-position: 0 -276px; }
+.SpSettings { background-position: -16px -276px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -276px; }
+.SpSignOut,
+.SpExit { background-position: -48px -276px; }
+.SpMarker { background-position: -64px -276px; }
+.SpDocuments { background-position: -80px -276px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -292px; }
+.SpInmail { background-position: -16px -292px; }
+.SpRoundBubble { background-position: -32px -292px; }
+.SpSquareBubble { background-position: -48px -292px; }
+.SpRoundBubbles { background-position: -64px -292px; }
+.SpSquareBubbles { background-position: -80px -292px; }
+.SpTag { background-position: 0 -308px; }
+.SpWrite { background-position: -16px -308px; }
+.SpLock { background-position: -32px -308px; }
+.SpRoundAlert { background-position: -48px -308px; }
+.SpTriangleAlert { background-position: -64px -308px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -308px; }
+.SpSearch { background-position: 0 -324px; }
+.SpTrash { background-position: -16px -324px; }
+.SpUser { background-position: -32px -324px; }
+.SpRefresh { background-position: -48px -324px; }
+.SpPencil { background-position: -64px -324px; }
+.SpPlus { background-position: -80px -324px; }
+/* 16px Sprites Black */
+.SpDashboard,
+.SpCog { background-position: 0 -84px; }
+.SpSettings { background-position: -16px -84px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -84px; }
+.SpSignOut,
+.SpExit { background-position: -48px -84px; }
+.SpMarker { background-position: -64px -84px; }
+.SpDocuments { background-position: -80px -84px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -100px; }
+.SpInmail { background-position: -16px -100px; }
+.SpRoundBubble { background-position: -32px -100px; }
+.SpSquareBubble { background-position: -48px -100px; }
+.SpRoundBubbles { background-position: -64px -100px; }
+.SpSquareBubbles { background-position: -80px -100px; }
+.SpTag { background-position: 0 -116px; }
+.SpWrite { background-position: -16px -116px; }
+.SpLock { background-position: -32px -116px; }
+.SpRoundAlert { background-position: -48px -116px; }
+.SpTriangleAlert { background-position: -64px -116px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -116px; }
+.SpSearch { background-position: 0 -132px; }
+.SpTrash { background-position: -16px -132px; }
+.SpUser { background-position: -32px -132px; }
+.SpRefresh { background-position: -48px -132px; }
+.SpPencil { background-position: -64px -132px; }
+.SpPlus { background-position: -80px -132px; }
+/* 16px Sprites Black Transparent */
+.SpDashboard,
+.SpCog { background-position: 0 -148px; }
+.SpSettings { background-position: -16px -148px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -148px; }
+.SpSignOut,
+.SpExit { background-position: -48px -148px; }
+.SpMarker { background-position: -64px -148px; }
+.SpDocuments { background-position: -80px -148px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -164px; }
+.SpInmail { background-position: -16px -164px; }
+.SpRoundBubble { background-position: -32px -164px; }
+.SpSquareBubble { background-position: -48px -164px; }
+.SpRoundBubbles { background-position: -64px -164px; }
+.SpSquareBubbles { background-position: -80px -164px; }
+.SpTag { background-position: 0 -180px; }
+.SpWrite { background-position: -16px -180px; }
+.SpLock { background-position: -32px -180px; }
+.SpRoundAlert { background-position: -48px -180px; }
+.SpTriangleAlert { background-position: -64px -180px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -180px; }
+.SpSearch { background-position: 0 -196px; }
+.SpTrash { background-position: -16px -196px; }
+.SpUser { background-position: -32px -196px; }
+.SpRefresh { background-position: -48px -196px; }
+.SpPencil { background-position: -64px -196px; }
+.SpPlus { background-position: -80px -196px; }
 
 
 /* ============================= Embedded Discussion & Comment Customizations */

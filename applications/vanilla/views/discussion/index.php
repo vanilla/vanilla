@@ -38,8 +38,8 @@ echo '<span class="BeforeCommentHeading">';
 $this->FireEvent('CommentHeading');
 echo $this->Pager->ToString('less');
 echo '</span>';
-
-echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
+if ($this->Data['CommentData']->NumRows() > 0)
+	echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
 
 ?>
 <ul class="MessageList DataList Comments">

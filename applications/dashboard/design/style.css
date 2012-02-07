@@ -294,6 +294,7 @@ input.Button {
    border: 2px solid #fbb;
    color: #d00;
    padding: 6px 8px;
+   margin: 10px 0;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -1099,15 +1100,10 @@ a.BigButton:focus {
 .DataList .Item .Item {
    border: none;
 }
-.DataList a.Title {
-   display: block;
-   margin: 0;
-   font-size: 14px;
-   font-weight: bold;
-}
 .DataList .Title {
    font-size: 14px;
    display: block;
+   font-weight: bold;
    margin: 0;
 }
 .DataList .Title a {
@@ -1135,10 +1131,6 @@ a.BigButton:focus {
 .DataList .Excerpt {
    font-size: 12px;
 	line-height: 1.4;
-}
-.DataList .Excerpt a {
-   color: #333;
-	/*display: block; Causes links in activity body to become block -linc */
 }
 .DataList .Excerpt p {
 	display: inline;
@@ -1204,10 +1196,6 @@ a.BigButton:focus {
 .Condensed .Excerpt {
 	display: inline;
 }
-.Condensed .Excerpt a {
-	display: block;
-	padding: 3px 0;
-}
 
 /* =============================================================== Activities */
 /* 
@@ -1224,17 +1212,10 @@ body.Profile ul.Activities {
 .Activities .Title a {
 	font-size: 14px;
 }
-.Activities .Excerpt {
-	color: #80828C;
-}
 .Activities li.Condensed .Excerpt {
 	color: #000;
 	font-size: 13px;
 	/* padding: 0 0 0 4px; */
-}
-.Activities .Excerpt img {
-	padding: 2px;
-	border: 1px solid #999;
 }
 .Activities ul.DataList {
 	margin-left: 50px;
@@ -1860,6 +1841,9 @@ div.Popup form ul li label.RadioLabel {
 }
 .Tag.Category a {
    color: #000;
+}
+.Tag-Banned {
+   background-color: #C70028;
 }
 .Discussion .PageTitle h1 {
 	font-size: 24px;

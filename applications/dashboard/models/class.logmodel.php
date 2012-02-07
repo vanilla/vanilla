@@ -430,11 +430,15 @@ class LogModel extends Gdn_Pluggable {
       if (is_numeric($Log)) {
          // Grab the log.
          $LogID = $Log;
-         $Log = Gdn::SQL()->GetWhere('Log', array('LogID' => $LogID))->FirstRow(DATASET_TYPE_ARRAY);
+         $Log = $this->GetWhere(array('LogID' => $LogID));
+         
          if (!$Log) {
             throw NotFoundException('Log');
          }
+         $Log = array_pop($Log);
       }
+      
+//      decho($Log, 'Log');
       
       $this->_RestoreOne($Log, $DeleteLog);
       // Check for a transaction.
@@ -448,13 +452,22 @@ class LogModel extends Gdn_Pluggable {
          }
       }
       // Check for child data.
-      if (isset($Log['_Data'])) {
-         $Data = $Log['_Data'];
-         foreach ($Data as $RecordType => $Row) {
-            $LogRow = array_merge($Log, array('RecordType' => $RecordType, 'Data' => $Row));
-            $this->_RestoreOne($LogRow, FALSE);
+      if (isset($Log['Data']['_Data'])) {
+         $Data = $Log['Data']['_Data'];
+         foreach ($Data as $RecordType => $Rows) {
+            foreach ($Rows as $Row) {
+               $LogRow = array_merge($Log, array('RecordType' => $RecordType, 'Data' => $Row));
+               
+               if ($RecordType == 'Comment') {
+                  $LogRow['ParentRecordID'] = $Row['DiscussionID'];
+               }
+               
+               $this->_RestoreOne($LogRow, FALSE);
+            }
          }
       }
+      
+//      die();
    }
    
    protected function _RestoreOne($Log, $DeleteLog = TRUE) {
@@ -495,6 +508,8 @@ class LogModel extends Gdn_Pluggable {
          $Data[$Attr]['DateRestored'] = Gdn_Format::ToDateTime();
       }
       
+//      decho($Data, 'Row being restored');
+      
       if (!isset($Columns[$TableName])) {
          $Columns[$TableName] = Gdn::SQL()->FetchColumns($TableName);
       }
@@ -526,6 +541,7 @@ class LogModel extends Gdn_Pluggable {
          case 'Delete':
          case 'Spam':
          case 'Moderate':
+         case 'Ban':
             $IDColumn = $Log['RecordType'].'ID';
             
             if (!$Log['RecordID']) {
@@ -551,6 +567,11 @@ class LogModel extends Gdn_Pluggable {
                   ->Insert($TableName, $Set);
                if (!$ID && isset($Log['RecordID']))
                   $ID = $Log['RecordID'];
+               
+               // Unban a user.
+               if ($Log['RecordType'] == 'User' && $Log['Operation'] == 'Ban') {
+                  Gdn::UserModel()->SetField($ID, 'Banned', 0);
+               }
                
                // Keep track of a discussion ID so that it's count can be recalculated.
                if ($Log['Operation'] != 'Edit') {

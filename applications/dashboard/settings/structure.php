@@ -569,7 +569,7 @@ $Construct->Table('Tag')
 
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
-   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Error'))
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Ban', 'Error'))
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration'), FALSE, 'index')
    ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')

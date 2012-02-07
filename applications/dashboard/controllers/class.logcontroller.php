@@ -99,6 +99,7 @@ class LogController extends DashboardController {
       $this->Permission('Garden.Moderation.Manage');
       // Grab the logs.
       $this->LogModel->Delete($LogIDs);
+      $this->Render('Blank', 'Utility');
    }
    
    /**
@@ -149,7 +150,7 @@ class LogController extends DashboardController {
 
       
       $Where = array(
-          'Operation' => array('Edit', 'Delete')//,
+          'Operation' => array('Edit', 'Delete', 'Ban')//,
 //          'RecordType' => array('Discussion', 'Comment', 'Activity')
           );
       
@@ -253,6 +254,7 @@ class LogController extends DashboardController {
          $this->Form->AddError($Ex->getMessage());
       }
       $this->LogModel->Recalculate();
+      $this->Render('Blank', 'Utility');
    }
    
    public function NotSpam($LogIDs) {

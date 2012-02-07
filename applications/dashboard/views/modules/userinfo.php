@@ -4,6 +4,11 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
 ?>
 <div class="About P">
    <dl class="About">
+      <?php
+      if ($this->User->Banned) {
+         echo '<dd class="Value"><span class="Tag Tag-Banned">'.T('Banned').'</span></dd>';
+      }
+      ?>
       <dt class="Name"><?php echo T('Username'); ?></dt>
       <dd class="Name" itemprop="name"><?php echo $this->User->Name; ?></dd>
       <?php               

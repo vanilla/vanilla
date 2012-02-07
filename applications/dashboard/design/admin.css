@@ -151,6 +151,9 @@ p {
    margin: .5em 0;
    line-height: 1.4em;
 }
+.P {
+   margin: 5px 0;
+}
 small {
 	font-size: 12px;
 	color: #555;
@@ -1672,6 +1675,14 @@ div.Summary table tbody td {
 	margin: 6px 0 10px;
 }
 
+.Count {
+   background: #02639E;
+   border-radius: 2px;
+   color: #fff;
+   font-size: 11px;
+   padding: 1px 6px !Important;
+}
+
 .Tag {
    background: #555;
    color: #fff;
@@ -1693,7 +1704,7 @@ div.Summary table tbody td {
 .Tag-Edit {
    background-color: #F27527;
 }
-.Tag-Delete {
+.Tag-Delete, .Tag-Ban {
    background-color: #C70028;
 }
 .Tag-Moderate {

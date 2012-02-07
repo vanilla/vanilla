@@ -135,12 +135,19 @@ class ActivityModel extends Gdn_Model {
     * @access public
     * @param int $ActivityID Unique ID of acitivity to be deleted.
     */
-   public function Delete($ActivityID) {
-      // Get the activity first
+   public function Delete($ActivityID, $Options = array()) {
+      // Get the activity first.
       $Activity = $this->GetID($ActivityID);
       if ($Activity) {
+         // Log the deletion.
+         $Log = GetValue('Log', $Options);
+         if ($Log) {
+            LogModel::Insert($Log, 'Activity', $Activity);
+         }
+         
          // Delete comments on the activity item
          $this->SQL->Delete('ActivityComment', array('ActivityID' => $ActivityID));
+         
          // Delete the activity item
          parent::Delete(array('ActivityID' => $ActivityID));
       }
@@ -615,7 +622,7 @@ class ActivityModel extends Gdn_Model {
    }
    
    public static function JoinUsers(&$Activities) {
-      Gdn::UserModel()->JoinUsers($Activities, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender')));
+      Gdn::UserModel()->JoinUsers($Activities, array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender', 'Photo')));
    }
    
    /**

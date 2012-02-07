@@ -276,6 +276,10 @@ class ActivityController extends Gdn_Controller {
          $Notify = FALSE;
       }
       
+      if (!$UserID) {
+         $UserID = Gdn::Session()->UserID;
+      }
+      
       switch ($Notify) {
          case 'mods':
             $this->Permission('Garden.Moderation.Manage');
@@ -296,7 +300,7 @@ class ActivityController extends Gdn_Controller {
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
          $Data['Format'] = C('Garden.InputFormatter');
-         if ($UserID && $UserID != Gdn::Session()->UserID) {
+         if ($UserID != Gdn::Session()->UserID) {
             // This is a wall post.
             $Activity = array(
                 'ActivityType' => 'WallPost',
@@ -326,8 +330,8 @@ class ActivityController extends Gdn_Controller {
          }
          
          if ($Activity) {
-            if (!$UserID && $NotifyUserID == ActivityModel::NOTIFY_PUBLIC)
-               Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', $Activity['Story']);
+            if ($UserID == Gdn::Session()->UserID && $NotifyUserID == ActivityModel::NOTIFY_PUBLIC)
+               Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', Gdn_Format::PlainText($Activity['Story'], $Activity['Format']));
             
             $Activities = array($Activity);
             ActivityModel::JoinUsers($Activities);

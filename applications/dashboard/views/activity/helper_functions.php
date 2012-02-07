@@ -13,11 +13,15 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    $CssClass = 'Item Activity '.$ActivityType;
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
-   if (in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate')))
-      $CssClass .= ' Condensed';
+   
+   $Format = GetValue('Format', $Activity);
       
    $Title = '';
    $Excerpt = $Activity->Story;
+   if ($Format) {
+      $Excerpt = Gdn_Format::To($Excerpt, $Format);
+   }
+   
    if (!in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate'))) {
       $Title = '<div class="Title">'.GetValue('Headline', $Activity).'</div>';
    } else if ($ActivityType == 'WallPost') {
@@ -26,12 +30,15 @@ function WriteActivity($Activity, &$Sender, &$Session) {
       $Title = '<div class="Title">'
          .UserAnchor($RegardingUser, 'Name')
          .' <span>&rarr;</span> '
-         .UserAnchor($Author, 'Title Name')
+         .UserAnchor($Author, 'Name')
          .'</div>';
-      $Excerpt = Gdn_Format::Display($Excerpt);
+      
+      if (!$Format)
+         $Excerpt = Gdn_Format::Display($Excerpt);
    } else {
-      $Title = UserAnchor($Author, 'Title Name');
-      $Excerpt = Gdn_Format::Display($Excerpt);
+      $Title = UserAnchor($Author, 'Name');
+      if (!$Format)
+         $Excerpt = Gdn_Format::Display($Excerpt);
    }
    $Sender->EventArguments['Activity'] = &$Activity;
    $Sender->EventArguments['CssClass'] = &$CssClass;
@@ -53,6 +60,10 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    <div class="ItemContent Activity">
       <?php echo $Title; ?>
       <div class="Excerpt"><?php echo $Excerpt; ?></div>
+      <?php 
+      $Sender->EventArguments['Activity'] = $Activity;
+      $Sender->FireAs('ActivityController')->FireEvent('AfterActivityBody'); 
+      ?>
       <div class="Meta">
          <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateUpdated); ?></span>
          <?php
@@ -101,7 +112,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
 function WriteActivityComment($Comment, &$Sender, &$Session) {
    $Author = UserBuilder($Comment, 'Insert');
    $PhotoAnchor = UserPhoto($Author, 'Photo');
-   $CssClass = 'Item ActivityComment Condensed ActivityComment';
+   $CssClass = 'Item ActivityComment ActivityComment';
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
    

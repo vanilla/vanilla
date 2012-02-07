@@ -295,6 +295,7 @@ class ActivityController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
+         $Data['Format'] = C('Garden.InputFormatter');
          if ($UserID && $UserID != Gdn::Session()->UserID) {
             // This is a wall post.
             $Activity = array(
@@ -302,7 +303,8 @@ class ActivityController extends Gdn_Controller {
                 'ActivityUserID' => $UserID,
                 'RegardingUserID' => Gdn::Session()->UserID,
                 'HeadlineFormat' => T('HeadlineFormat.WallPost', '{RegardingUserID,you} &rarr; {ActivityUserID,you}'),
-                'Story' => $Data['Comment']
+                'Story' => $Data['Comment'],
+                'Format' => $Data['Format']
             );
          } else {
             // This is a status update.
@@ -310,6 +312,7 @@ class ActivityController extends Gdn_Controller {
                 'ActivityType' => 'Status',
                 'HeadlineFormat' => T('HeadlineFormat.Status', '{ActivityUserID,user}'),
                 'Story' => $Data['Comment'],
+                'Format' => $Data['Format'],
                 'NotifyUserID' => $NotifyUserID
             );
             $this->SetJson('StatusMessage', Gdn_Format::Display($Data['Comment']));
@@ -327,8 +330,8 @@ class ActivityController extends Gdn_Controller {
                Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', $Activity['Story']);
             
             $Activities = array($Activity);
-            $this->ActivityModel->CalculateData($Activities);
             ActivityModel::JoinUsers($Activities);
+            $this->ActivityModel->CalculateData($Activities);
          }
       }
 

@@ -15,6 +15,7 @@
    }
    td.PrefCheckBox {
       width: 50px;
+		text-align: center;
    }
    table.PreferenceGroup tbody tr:hover td {
       background: #efefef;
@@ -23,7 +24,7 @@
       width: 486px;
    }
 </style>
-<h1><?php echo $this->Data('Title');  ?></h1>
+<h2><?php echo $this->Data('Title');  ?></h2>
 <div class="Preferences">
 <?php
 echo $this->Form->Open();

@@ -170,8 +170,13 @@ class ProfileController extends Gdn_Controller {
          // Load data to display
          $this->ProfileUserID = $this->User->UserID;
 			$Limit = 30;
+         
+         $NotifyUserIDs = array(ActivityModel::NOTIFY_PUBLIC);
+         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+            $NotifyUserIDs[] = ActivityModel::NOTIFY_MODS;
+         
          $Activities = $this->ActivityModel->GetWhere(
-            array('ActivityUserID' => $UserID, 'NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), 
+            array('ActivityUserID' => $UserID, 'NotifyUserID' => $NotifyUserIDs), 
             $Offset, $Limit)->ResultArray();
          $this->ActivityModel->JoinComments($Activities);
          $this->SetData('Activities', $Activities);
@@ -677,9 +682,9 @@ class ProfileController extends Gdn_Controller {
          }
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
          UserModel::SetMeta($this->User->UserID, $Meta, 'Preferences.');
-			$this->InformMessage(Sprite('Check', 'InformSprite').T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
+			
          if (count($this->Form->Errors() == 0))
-            $this->InformMessage('<span class="InformSprite Check"></span>'.T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
+            $this->InformMessage(Sprite('Check', 'InformSprite').T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
       }
       
       $this->Title(T('Notification Preferences'));

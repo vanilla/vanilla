@@ -28,7 +28,7 @@ if ($Session->IsValid() && C('Garden.Modules.ShowMeModule')) {
 				echo Anchor(Sprite('SpDashboard', 'Sprite16').Wrap(T('Dashboard'), 'em'), '/dashboard/settings', array('title' => T('Dashboard')));
 				
 			// Sign Out
-			echo Anchor(Sprite('SpSignOut', 'Sprite16').Wrap(T('Sign Out'), 'em'), SignOutUrl(), array('title' => T('Sign Out')));
+			// echo Anchor(Sprite('SpSignOut', 'Sprite16').Wrap(T('Sign Out'), 'em'), SignOutUrl(), array('title' => T('Sign Out')));
 
 		echo '</div>';
 	echo '</div>';

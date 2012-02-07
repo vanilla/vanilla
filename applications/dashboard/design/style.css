@@ -234,7 +234,7 @@ a.Button,
 }
 a.Button {
    display: inline-block;
-   padding: 4px 4px 5px; /* Account for text-shadow w/ spacing */
+   padding: 4px;
    line-height: 100%;
    margin: 3px auto;
 }

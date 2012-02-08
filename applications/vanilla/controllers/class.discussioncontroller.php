@@ -812,6 +812,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->Form->Action = Url('/vanilla/post/comment/');
       $this->Form->AddHidden('DiscussionID', $this->Discussion->DiscussionID);
       $this->Form->AddHidden('CommentID', '');
+      $this->Form->AddHidden('Embedded', 'true'); // Tell the post controller that this is an embedded page (in case there are custom views it needs to pick up from a theme).
       $this->Form->AddHidden('DisplayNewCommentOnly', 'true'); // Only load/display the new comment after posting (don't load all new comments since the page last loaded).
 
       // Retrieve & apply the draft if there is one:

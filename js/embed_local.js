@@ -152,10 +152,14 @@ jQuery(document).ready(function($) {
          if (isHttp && href.substr(0, webroot.length) != webroot) {
             $(this).attr('target', '_blank');
          } else if (isEmbeddedComments) {
+            // If clicking a pager link, just follow it.
+            if ($(this).parents('.Pager').length > 0)
+               noTop = true;
+            
             // Target the top of the page if clicking an anchor in a list of embedded comments
             if (!noTop)
                $(this).attr('target', '_top');
-               
+                              
             // If clicking a "register" link, change the post-registration target to the page that is currently embedded.
             if ($(this).parents('.CreateAccount').length > 0) {
                // Examine querystring parameters for a target & replace it with the embed page
@@ -171,7 +175,7 @@ jQuery(document).ready(function($) {
                      + encodeURIComponent(gdn.definition('ForeignUrl', ''))
                      + afterTarget);
                }
-            }
+            }            
          } else {
             // Strip the path from the root folder of the app
             var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);

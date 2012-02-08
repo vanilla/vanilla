@@ -2051,9 +2051,11 @@ body.Discussion #Content {
 	border-bottom: 2px solid #ddd;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
+/* 
 .Editing {
 	background: #E3F4FF;
 }
+*/
 #DiscussionForm label {
    font-size: 14px;
    font-weight: bold;

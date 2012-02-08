@@ -471,14 +471,15 @@ jQuery(document).ready(function($) {
 
    // Fill in placeholders.
    if (!gdn.elementSupports('input', 'placeholder')) {
-      $('input:text').each(function() {
+      $('input:text,textarea').each(function() {
          var $this = $(this);
          var placeholder = $this.attr('placeholder');
          
          if (!$this.val() && placeholder) {
             $this.val(placeholder);
             $this.blur(function() {
-               $this.val(placeholder);
+               if ($this.val() == '')
+                  $this.val(placeholder);
             });
             $this.focus(function() {
                if ($this.val() == placeholder)

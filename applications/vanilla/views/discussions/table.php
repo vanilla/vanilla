@@ -24,11 +24,15 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
    $Sender->EventArguments['CssClass'] = &$CssClass;
    
    $First = UserBuilder($Discussion, 'First');
-   $Last = UserBuilder($Discussion, 'Last');
-   $Sender->EventArguments['FirstUser'] = &$First;
-   $Sender->EventArguments['LastUser'] = &$Last;
-   
-   $Sender->FireEvent('BeforeDiscussionName');
+   if ($Discussion->LastUserID)
+      $Last = UserBuilder($Discussion, 'Last');
+   else {
+      $Last = $First;
+   }
+//   $Sender->EventArguments['FirstUser'] = &$First;
+//   $Sender->EventArguments['LastUser'] = &$Last;
+//   
+//   $Sender->FireEvent('BeforeDiscussionName');
    
    $DiscussionName = $Discussion->Name;
    if ($DiscussionName == '')
@@ -51,35 +55,39 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 			WriteMiniPager($Discussion);
 			echo NewComments($Discussion);
 			$Sender->FireEvent('AfterDiscussionTitle');
-			/*
 			// Other stuff that was in the standard view that you may want to display:
+         echo '<div class="Meta">';
 			WriteTags($Discussion);
+         echo '</div>';
 			
-			if ($Source = GetValue('Source', $Discussion))
-				echo ' '.sprintf(T('via %s'), T($Source.' Source', $Source));
-	
-			if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-				echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
-			*/
+//			if ($Source = GetValue('Source', $Discussion))
+//				echo ' '.sprintf(T('via %s'), T($Source.' Source', $Source));
+//	
+//			if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
+//				echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
 			?>
 		</div>
 	</td>
-	<td class="User FirstUser">
-		<div class="Wrap">
+	<td class="BlockColumn FirstUser">
+		<div class="Block Wrap">
 			<?php
 				echo UserPhoto($First, 'PhotoLink');
-				echo UserAnchor($First, 'UserLink');
-				echo Anchor(Gdn_Format::Date($Discussion->FirstDate, 'html'), $FirstPageUrl, 'CommentDate');
+				echo UserAnchor($First, 'UserLink BlockTitle');
+            echo '<div class="Meta">';
+				echo Anchor(Gdn_Format::Date($Discussion->FirstDate, 'html'), $FirstPageUrl, 'CommentDate MItem');
+            echo '</div>';
 			?>
 		</div>
    </td>
-	<td class="User LastUser">
-		<div class="Wrap">
+	<td class="BlockColumn LastUser">
+		<div class="Block Wrap">
 			<?php
 			if ($Last) {
 				echo UserPhoto($Last, 'PhotoLink');
-				echo UserAnchor($Last, 'UserLink');
-				echo Anchor(Gdn_Format::Date($Discussion->LastDate, 'html'), $LastPageUrl, 'CommentDate');
+				echo UserAnchor($Last, 'UserLink BlockTitle');
+            echo '<div class="Meta">';
+				echo Anchor(Gdn_Format::Date($Discussion->LastDate, 'html'), $LastPageUrl, 'CommentDate MItem');
+            echo '</div>';
 			} else {
 				echo '&nbsp;';
 			}
@@ -120,12 +128,12 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
-<table class="DiscussionsTable">
+<table class="DataTable DiscussionsTable">
 	<thead>
 		<tr>
 			<td class="DiscussionName"><?php echo T('Discussion'); ?></td>
-			<td class="User FirstUser"><?php echo T('Started By'); ?></td>
-			<td class="User LastUser"><?php echo T('Most Recent'); ?></td>
+			<td class="BlockColumn User FirstUser"><?php echo T('Started By'); ?></td>
+			<td class="BlockColumn User LastUser"><?php echo T('Most Recent'); ?></td>
 			<td class="BigCount CountReplies"><?php echo T('Replies'); ?></td>
 			<td class="BigCount CountViews"><?php echo T('Views'); ?></td>
 			<td class="Opts"><?php WriteCheckController(); ?></td>

@@ -21,11 +21,11 @@ if (C('Vanilla.Categories.ShowTabs')) {
 }
 */
 ?>
-<table class="CategoryTable<?php echo $DoHeadings ? ' CategoryTableWithHeadings' : ''; ?>">
+<table class="DataTable CategoryTable<?php echo $DoHeadings ? ' CategoryTableWithHeadings' : ''; ?>">
    <thead>
       <tr>
          <td class="CategoryName"><?php echo T('Category'); ?></td>
-         <td class="LatestComment"><?php echo T('Latest Comment'); ?></td>
+         <td class="BlockColumn LatestPost"><?php echo T('Latest Post'); ?></td>
          <td class="BigCount CountDiscussions"><?php echo T('Discussions'); ?></td>
          <td class="BigCount CountComments"><?php echo T('Comments'); ?></td>
          <td class="Opts"></td>
@@ -34,7 +34,7 @@ if (C('Vanilla.Categories.ShowTabs')) {
    <tbody>
 <?php
    $Alt = FALSE;
-   foreach ($this->CategoryData->Result() as $Category) {
+   foreach ($this->Data('Categories')->Result() as $Category) {
       $this->EventArguments['CatList'] = &$CatList;
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;
@@ -80,21 +80,21 @@ if (C('Vanilla.Categories.ShowTabs')) {
                   if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
                      $CatList .= '{ChildCategories}';
                $CatList .= '</td>
-               <td class="LatestPost">
-                  <div class="Wrap">';
+               <td class="BlockColumn LatestPost">
+                  <div class="Block Wrap">';
                      if ($LastComment && $Category->LastTitle != '') {
                         $CatList .= UserPhoto($LastComment, 'PhotoLink');
                         $CatList .= Anchor(
                            SliceString(Gdn_Format::Text($Category->LastTitle), 100),
                            $Category->LastUrl,
-                           'LatestPostTitle'
+                           'BlockTitle LatestPostTitle'
                         );
                         $CatList .= '<div class="Meta">';
-                        $CatList .= UserAnchor($LastComment, 'UserLink');
-                        $CatList .= Anchor(
+                        $CatList .= ' '.UserAnchor($LastComment, 'UserLink MItem');
+                        $CatList .= ' '.Anchor(
                            Gdn_Format::Date($Category->LastDateInserted),
                            $Category->LastUrl,
-                           'CommentDate'
+                           'CommentDate MItem'
                         );
                         $CatList .= '</div>';
                      } else {
@@ -104,12 +104,12 @@ if (C('Vanilla.Categories.ShowTabs')) {
                </td>
                <td class="BigCount CountDiscussions">
                   <div class="Wrap">'
-                     .Gdn_Format::BigNumber($Category->CountAllDiscussions)
+                     .Gdn_Format::BigNumber($Category->CountAllDiscussions, 'html')
                   .'</div>
                </td>
                <td class="BigCount CountComments">
                   <div class="Wrap">'
-                     .Gdn_Format::BigNumber($Category->CountAllComments)
+                     .Gdn_Format::BigNumber($Category->CountAllComments, 'html')
                   .'</div>
                </td>
                <td class="Opts">'.GetOptions($Category, $this).'</td>

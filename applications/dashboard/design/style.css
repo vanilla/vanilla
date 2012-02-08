@@ -1940,19 +1940,30 @@ div.Popup form ul li label.RadioLabel {
    width: 160px;
 }
 
+.DataTable .Block {
+   width: 160px;
+}
+
+.DataTable .BlockColumn-User {
+   width: 120px;
+}
+.BlockColumn-User .Block {
+   width: 120px;
+}
+
 td.BigCount {
    width: 90px;
    text-align: center;
    font-weight: bold;
 }
 
-tbody td.BigCount {
-   font-size: 18px;
-   vertical-align: middle;
+.DiscussionsTable td.BigCount {
+   width: 70px;
 }
 
-.DataTable .Block {
-   width: 160px;
+tbody td.BigCount {
+   font-size: 16px;
+   vertical-align: middle;
 }
 
 .DataTable .Meta {
@@ -1966,6 +1977,7 @@ tbody td.BigCount {
 td.Opts {
 	white-space: nowrap;
 	text-align: right;
+   width: 1px;
 }
 
 .MiniPager {
@@ -2002,12 +2014,14 @@ tr.CategoryHeading td {
    font-size: 12px;
 }
 
-.Block img {
-	height: 24px;
-	width: 24px;
+.Block .PhotoLink {
 	float: left;
-	margin: 1px 5px 0 0;
-	vertical-align: top;
+	margin: 0 5px 5px 0;
+}
+
+.Block img {
+   height: 24px;
+	width: 24px;
 }
 
 .Block .MItem {

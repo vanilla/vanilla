@@ -68,7 +68,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 			?>
 		</div>
 	</td>
-	<td class="BlockColumn FirstUser">
+	<td class="BlockColumn BlockColumn-User FirstUser">
 		<div class="Block Wrap">
 			<?php
 				echo UserPhoto($First, 'PhotoLink');
@@ -79,7 +79,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 			?>
 		</div>
    </td>
-	<td class="BlockColumn LastUser">
+	<td class="BlockColumn BlockColumn-User LastUser">
 		<div class="Block Wrap">
 			<?php
 			if ($Last) {
@@ -132,8 +132,8 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 	<thead>
 		<tr>
 			<td class="DiscussionName"><?php echo T('Discussion'); ?></td>
-			<td class="BlockColumn User FirstUser"><?php echo T('Started By'); ?></td>
-			<td class="BlockColumn User LastUser"><?php echo T('Most Recent'); ?></td>
+			<td class="BlockColumn BlockColumn-User FirstUser"><?php echo T('Started By'); ?></td>
+			<td class="BlockColumn BlockColumn-User LastUser"><?php echo T('Most Recent'); ?></td>
 			<td class="BigCount CountReplies"><?php echo T('Replies'); ?></td>
 			<td class="BigCount CountViews"><?php echo T('Views'); ?></td>
 			<td class="Opts"><?php WriteCheckController(); ?></td>

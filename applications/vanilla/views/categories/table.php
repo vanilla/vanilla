@@ -91,6 +91,7 @@ if (C('Vanilla.Categories.ShowTabs')) {
                         );
                         $CatList .= '<div class="Meta">';
                         $CatList .= ' '.UserAnchor($LastComment, 'UserLink MItem');
+                        $CatList .= ' <span class="Bullet">•</span> ';
                         $CatList .= ' '.Anchor(
                            Gdn_Format::Date($Category->LastDateInserted),
                            $Category->LastUrl,

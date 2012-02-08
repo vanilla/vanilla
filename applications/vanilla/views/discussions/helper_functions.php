@@ -272,6 +272,7 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       if ($Sender->Options != '') {
          echo '<span class="ToggleFlyout OptionsMenu">';
             echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
+            echo '<span class="SpFlyoutHandle"></span>';
             echo '<ul class="Flyout MenuItems">';
                echo $Sender->Options;
             echo '</ul>';

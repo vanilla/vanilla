@@ -28,6 +28,7 @@ function GetOptions($Category, $Sender) {
    if ($Options != '') {
          $Result .= '<span class="ToggleFlyout OptionsMenu">';
             $Result .= '<span class="OptionsTitle">'.T('Options').'</span>';
+            $Result .= '<span class="SpFlyoutHandle"></span>';
             $Result .= '<ul class="Flyout MenuItems">'.$Options.'</ul>';
          $Result .= '</span>';
       $Result .= '</div>';

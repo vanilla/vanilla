@@ -220,6 +220,7 @@ function WriteDiscussionOptions($Discussion = NULL) {
    ?>
    <span class="ToggleFlyout OptionsMenu">
       <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
+		<span class="SpFlyoutHandle"></span>
       <ul class="Flyout MenuItems" style="display: none;">
       <?php foreach ($Options as $Code => $Option) : ?>
 			<li><?php echo Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)); ?></li>
@@ -294,6 +295,7 @@ function WriteCommentOptions($Comment) {
    ?>
    <span class="ToggleFlyout OptionsMenu">
       <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
+		<span class="SpFlyoutHandle"></span>
       <ul class="Flyout MenuItems">
       <?php foreach ($Options as $Code => $Option) : ?>
          <li><?php echo Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)); ?></li>
@@ -308,8 +310,6 @@ function WriteCommentOptions($Comment) {
       $ItemSelected = InSubArray($Id, $Controller->CheckedComments);
       echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
    }
-   ?>
-   <?php
 }
 
 /**

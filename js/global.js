@@ -358,6 +358,9 @@ jQuery(document).ready(function($) {
          var item = targets[i];
          $target = $(item.Target);
          switch(item.Type) {
+            case 'AddClass':
+               $target.addClass(item.Data);
+               break;
             case 'Ajax':
                $.ajax({
                   type: "POST",
@@ -381,6 +384,9 @@ jQuery(document).ready(function($) {
                break;
             case 'Remove':
                $target.remove();
+               break;
+            case 'RemoveClass':
+               $target.removeClass(item.Data);
                break;
             case 'ReplaceWith':
                $target.replaceWith(item.Data);

@@ -106,9 +106,10 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          // Add your own options or data as spans with 'MItem' class
          $Sender->FireEvent('InsideCommentMeta');
          
-         // Add Options
-			WriteCommentOptions($Comment);
 			?>
+         <div class="Options">
+            <?php WriteCommentOptions($Comment); ?>
+         </div>
          <div class="CommentInfo">
             <?php
             $Sender->FireEvent('CommentInfo');
@@ -291,25 +292,23 @@ function WriteCommentOptions($Comment) {
 	if (empty($Options))
 		return;
    ?>
-   <div class="Options">
-      <span class="ToggleFlyout OptionsMenu">
-         <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
-			<ul class="Flyout MenuItems">
-         <?php foreach ($Options as $Code => $Option) : ?>
-				<li><?php echo Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)); ?></li>
-         <?php endforeach; ?>
-			</ul>
-		</span>
-		<?php
-      if (C('Vanilla.AdminCheckboxes.Use')) {
-		   if (!property_exists($Controller, 'CheckedComments'))
-				$Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
-	
-			$ItemSelected = InSubArray($Id, $Controller->CheckedComments);
-			echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
-		}
-		?>
-   </div>
+   <span class="ToggleFlyout OptionsMenu">
+      <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
+      <ul class="Flyout MenuItems">
+      <?php foreach ($Options as $Code => $Option) : ?>
+         <li><?php echo Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)); ?></li>
+      <?php endforeach; ?>
+      </ul>
+   </span>
+   <?php
+   if (C('Vanilla.AdminCheckboxes.Use')) {
+      if (!property_exists($Controller, 'CheckedComments'))
+         $Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
+
+      $ItemSelected = InSubArray($Id, $Controller->CheckedComments);
+      echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+   }
+   ?>
    <?php
 }
 

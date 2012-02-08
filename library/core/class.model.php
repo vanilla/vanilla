@@ -214,15 +214,10 @@ class Gdn_Model extends Gdn_Pluggable {
       if (!is_array($Property))
          $Property = array($Property => $Value);
       
-      $this->DefineSchema();
-      
+      $this->DefineSchema();      
       $Set = array_intersect_key($Property, $this->Schema->Fields());
       
-		$this->SQL
-            ->Update($this->Name)
-            ->Set($Set)
-            ->Where($this->PrimaryKey, $RowID)
-            ->Put();
+		$this->SQL->Put($this->Name, $Set, array($this->PrimaryKey => $RowID));
    }
 
 

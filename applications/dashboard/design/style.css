@@ -83,7 +83,7 @@ body {
 }
 #Content {
    float: right;
-   width: 680px;
+   width: 730px;
    margin: 0 0 40px;
 }
 .Hidden {
@@ -768,7 +768,7 @@ a.Bookmarking:hover {
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
-   width: 250px;
+   width: 200px;
    float: left;
    overflow: hidden;
 }
@@ -3237,6 +3237,10 @@ body.embed .Connect h2 {
 .ProfilePhotoMedium {
    height: 40px;
    width: 40px;
+}
+.ProfilePhotoLarge {
+	height: 200px;
+	width: 200px;
 }
 .PhotoGrid {
    line-height: 1;

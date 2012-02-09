@@ -2026,8 +2026,7 @@ tr.CategoryHeading td {
 
 .Block .MItem {
    font-size: 10px;
-   margin-right: 3px;
-   margin-left: 0;
+   margin: 0;
 }
 
 /* ================================================================= Comments */

@@ -43,7 +43,7 @@ class Gdn_Theme {
             $Row['Name'] = T('Home');
          
          
-         $Result .= '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
+         $Result .= '<span class="CrumbLabel HomeCrumb">'.FormatString($Format, $Row).'</span> ';
       }
       
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');

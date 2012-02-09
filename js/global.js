@@ -882,7 +882,7 @@ jQuery(document).ready(function($) {
 	}
    gdn.pingForNotifications = pingForNotifications;
    
-   if (gdn.definition('SignedIn', '0') != '0') {
+   if (gdn.definition('SignedIn', '0') != '0' && gdn.definition('DoInform', '1') != '0') {
       setTimeout(pingForNotifications, 3000);
       setInterval(pingForNotifications, 60000);
    }

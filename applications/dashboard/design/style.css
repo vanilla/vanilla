@@ -1304,7 +1304,7 @@ body.Profile ul.Activities {
 
 /* ============================================================== MessageList */
 
-.Item .Author img {
+.Author .ProfilePhotoMedium {
    height: 40px;
    width: 40px;
    border: 0;

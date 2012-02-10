@@ -339,18 +339,21 @@ class EntryController extends Gdn_Controller {
          // The user is already connected.
          $this->Form->SetFormValue('UserID', $UserID);
          
-         $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-         $Data = $this->Form->FormValues();
-         
-         // Don't overwrite the user photo if the user uploaded a new one.
-         $Photo = GetValue('Photo', $User);
-         if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
-            unset($Data['Photo']);
+         if (C('Garden.Registration.ConnectSynchronize', TRUE)) {
+            $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+            $Data = $this->Form->FormValues();
+
+            // Don't overwrite the user photo if the user uploaded a new one.
+            $Photo = GetValue('Photo', $User);
+            if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+               unset($Data['Photo']);
+            }
+
+            // Synchronize the user's data.
+            $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
          }
          
-         // Synchronize the user's data.
-         $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
-         
+         // Always save the attributes because they may contain authorization information.
          if ($Attributes = $this->Form->GetFormValue('Attributes')) {
             $UserModel->SaveAttribute($UserID, $Attributes);
          }
@@ -384,12 +387,14 @@ class EntryController extends Gdn_Controller {
                   $this->Form->SetFormValue('UserID', $UserID);
                   $Data = $this->Form->FormValues();
                   
-                  // Don't overwrite a photo if the user has already uploaded one.
-                  $Photo = GetValue('Photo', $Row);
-                  if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
-                     unset($Data['Photo']);
+                  if (C('Garden.Registration.ConnectSynchronize', TRUE)) {
+                     // Don't overwrite a photo if the user has already uploaded one.
+                     $Photo = GetValue('Photo', $Row);
+                     if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+                        unset($Data['Photo']);
+                     }
+                     $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
                   }
-                  $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
                   
                   if ($Attributes = $this->Form->GetFormValue('Attributes')) {
                      $UserModel->SaveAttribute($UserID, $Attributes);

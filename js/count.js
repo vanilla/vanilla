@@ -20,13 +20,6 @@
          +'&vanilla_identifier[]='
          +identifiers.join('&vanilla_identifier[]=');
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_count_script);
-
-      // Include our embed css into the page
-      var vanilla_embed_css = document.createElement('link');
-      vanilla_embed_css.rel = 'stylesheet';
-      vanilla_embed_css.type = 'text/css';
-      vanilla_embed_css.href = vanilla_forum_url + (vanilla_forum_url.substring(vanilla_forum_url.length-1) == '/' ? '' : '/') +'applications/dashboard/design/embed.css';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_embed_css);
    }
    
 }());

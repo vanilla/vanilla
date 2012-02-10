@@ -310,47 +310,47 @@ jQuery(document).ready(function($) {
       }
    });
    
-   var gettingNew = 0;
-   var getNew = function() {
-      if (gettingNew > 0) {
-         return;
-      }
-      gettingNew++;
-      
-      discussionID = gdn.definition('DiscussionID', 0);
-      lastCommentID = gdn.definition('LastCommentID', '');
-      if(lastCommentID == '')
-         return;
-
-      $.ajax({
-         type: "POST",
-         url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
-         data: "DeliveryType=ASSET&DeliveryMethod=JSON",
-         dataType: "json",
-         error: function(xhr) {
-            gdn.informError(xhr, true);
-         },
-         success: function(json) {
-            json = $.postParseJson(json);
-
-            if(json.Data && json.LastCommentID) {
-               gdn.definition('LastCommentID', json.LastCommentID, true);
-               $(json.Data).appendTo("ul.Comments")
-                  .effect("highlight", {}, "slow");
-            }
-            gdn.processTargets(json.Targets);
-         },
-         complete: function() {
-            gettingNew--;
-         }
-      });
-   }
-   
-   // Load new comments like a chat.
-   var autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
-   if (autoRefresh > 1000) {
-      window.setInterval(getNew, autoRefresh);
-   }
+//   var gettingNew = 0;
+//   var getNew = function() {
+//      if (gettingNew > 0) {
+//         return;
+//      }
+//      gettingNew++;
+//      
+//      discussionID = gdn.definition('DiscussionID', 0);
+//      lastCommentID = gdn.definition('LastCommentID', '');
+//      if(lastCommentID == '')
+//         return;
+//
+//      $.ajax({
+//         type: "POST",
+//         url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
+//         data: "DeliveryType=ASSET&DeliveryMethod=JSON",
+//         dataType: "json",
+//         error: function(xhr) {
+//            gdn.informError(xhr, true);
+//         },
+//         success: function(json) {
+//            json = $.postParseJson(json);
+//
+//            if(json.Data && json.LastCommentID) {
+//               gdn.definition('LastCommentID', json.LastCommentID, true);
+//               $(json.Data).appendTo("ul.Comments")
+//                  .effect("highlight", {}, "slow");
+//            }
+//            gdn.processTargets(json.Targets);
+//         },
+//         complete: function() {
+//            gettingNew--;
+//         }
+//      });
+//   }
+//   
+//   // Load new comments like a chat.
+//   var autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 0) * 1000;
+//   if (autoRefresh > 1000) {
+//      window.setInterval(getNew, autoRefresh);
+//   }
    
    /* Comment Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {

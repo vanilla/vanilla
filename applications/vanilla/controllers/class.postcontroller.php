@@ -446,41 +446,42 @@ class PostController extends VanillaController {
                   } else {
                      // If the comment model isn't sorted by DateInserted or CommentID then we can't do any fancy loading of comments.
                      $OrderBy = GetValueR('0.0', $this->CommentModel->OrderBy());
-                     $Redirect = !in_array($OrderBy, array('c.DateInserted', 'c.CommentID'));
-							$DisplayNewCommentOnly = $this->Form->GetFormValue('DisplayNewCommentOnly');
+//                     $Redirect = !in_array($OrderBy, array('c.DateInserted', 'c.CommentID'));
+//							$DisplayNewCommentOnly = $this->Form->GetFormValue('DisplayNewCommentOnly');
 
-                     if (!$Redirect) {
-                        // Otherwise load all new comments that the user hasn't seen yet
-                        $LastCommentID = $this->Form->GetFormValue('LastCommentID');
-                        if (!is_numeric($LastCommentID))
-                           $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
+//                     if (!$Redirect) {
+//                        // Otherwise load all new comments that the user hasn't seen yet
+//                        $LastCommentID = $this->Form->GetFormValue('LastCommentID');
+//                        if (!is_numeric($LastCommentID))
+//                           $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
+//
+//                        // Don't reload the first comment if this new comment is the first one.
+//                        $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
+//                        // Do not load more than a single page of data...
+//                        $Limit = C('Vanilla.Comments.PerPage', 30);
+//
+//                        // Redirect if the new new comment isn't on the same page.
+//                        $Redirect |= !$DisplayNewCommentOnly && PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);
+//                     }
 
-                        // Don't reload the first comment if this new comment is the first one.
-                        $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
-                        // Do not load more than a single page of data...
-                        $Limit = C('Vanilla.Comments.PerPage', 30);
-
-                        // Redirect if the new new comment isn't on the same page.
-                        $Redirect |= !$DisplayNewCommentOnly && PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);
-                     }
-
-                     if ($Redirect) {
-                        // The user posted a comment on a page other than the last one, so just redirect to the last page.
-                        $this->RedirectUrl = Gdn::Request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);
-                        $this->CommentData = NULL;
-                     } else {
-                        // Make sure to load all new comments since the page was last loaded by this user
-								if ($DisplayNewCommentOnly)
-									$this->SetData('CommentData', $this->CommentModel->GetIDData($CommentID), TRUE);
-								else 
-									$this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
+//                     if ($Redirect) {
+//                        // The user posted a comment on a page other than the last one, so just redirect to the last page.
+//                        $this->RedirectUrl = Gdn::Request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);
+//                        $this->CommentData = NULL;
+//                     } else {
+//                        // Make sure to load all new comments since the page was last loaded by this user
+//								if ($DisplayNewCommentOnly)
+                        $this->Offset = $this->CommentModel->GetOffset($CommentID);
+                        $this->SetData('CommentData', $this->CommentModel->GetIDData($CommentID), TRUE);
+//								else 
+//									$this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
 
                         $this->SetData('NewComments', TRUE);
                         
                         $this->ClassName = 'DiscussionController';
                         $this->ControllerName = 'discussion';
                         $this->View = 'comments';
-                     }
+//                     }
                      
                      // Make sure to set the user's discussion watch records
                      $CountComments = $this->CommentModel->GetCount($DiscussionID);

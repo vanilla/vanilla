@@ -921,7 +921,8 @@ jQuery(document).ready(function($) {
 	// When a stash anchor is clicked, look for inputs with values to stash
 	$('a.Stash').click(function() {
 		var comment = $('#Form_Comment textarea').val();
-		if (comment != '')
+		var placeholder = $('#Form_Comment textarea').attr('placeholder');
+		if (comment != '' && comment != placeholder)
 			stash('CommentForDiscussionID_' + gdn.definition('DiscussionID'), comment);
 	});
 });

@@ -639,6 +639,7 @@ class DiscussionController extends VanillaController {
     * Alternate version of Index that uses the embed master view.
     */
    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
+      $this->AddDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
       $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
       $this->Theme = 'default'; // Force the default theme on embedded comments
       // Add some css to help with the transparent bg on embedded comments
@@ -653,6 +654,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('options.js');
       $this->AddJsFile('discussion.js');
+      $this->RemoveJsFile('autosave.js');
       $this->MasterView = 'empty';
       
       // Define incoming variables (prefer querystring parameters over method parameters)

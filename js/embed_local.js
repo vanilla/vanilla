@@ -147,8 +147,8 @@ jQuery(document).ready(function($) {
             return;
          
          var isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
-            noTop = $(this).hasClass('SignOut');
-                
+            noTop = $(this).hasClass('SignOut') || $(this).hasClass('NoTop');
+            
          if (isHttp && href.substr(0, webroot.length) != webroot) {
             $(this).attr('target', '_blank');
          } else if (isEmbeddedComments) {

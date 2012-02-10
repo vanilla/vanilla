@@ -272,7 +272,7 @@ jQuery(document).ready(function($) {
       $('.AjaxForm').handleAjaxForm();
    
    // Make the highlight effect themable.
-   if ($.effects.highlight) {
+   if ($.effects && $.effects.highlight) {
       $.effects.highlight0 = $.effects.highlight;
       
       $.effects.highlight = function(opts) {

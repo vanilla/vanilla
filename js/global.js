@@ -271,6 +271,17 @@ jQuery(document).ready(function($) {
    if ($.fn.handleAjaxForm)
       $('.AjaxForm').handleAjaxForm();
    
+   // Make the highlight effect themable.
+   if ($.effects.highlight) {
+      $.effects.highlight0 = $.effects.highlight;
+      
+      $.effects.highlight = function(opts) {
+         var color = $('#HighlightColor').css('backgroundColor');
+         if (color)
+            opts.options.color = color;
+         return $.effects.highlight0.call(this, opts);
+   }
+   
 	// Show hoverhelp on hover
 	$('.HoverHelp').hover(
 		function() {

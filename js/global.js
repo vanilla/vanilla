@@ -280,7 +280,8 @@ jQuery(document).ready(function($) {
          if (color)
             opts.options.color = color;
          return $.effects.highlight0.call(this, opts);
-   }
+		};
+	}
    
 	// Show hoverhelp on hover
 	$('.HoverHelp').hover(

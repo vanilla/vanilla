@@ -1424,6 +1424,17 @@ links, sign in buttons, etc
 	font-size: 14px;
 }
 
+.RssButton {
+   display: inline-block;
+   background: url(images/rss.gif) no-repeat center center;
+   height: 16px;
+   width: 16px;
+   vertical-align: bottom;
+   color: transparent;
+   overflow: hidden;
+   text-indent: -100px;
+}
+
 /* ============================================================= Profile Page */
 /*body.Profile #Content {
    width: auto;

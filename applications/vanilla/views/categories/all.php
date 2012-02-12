@@ -1,5 +1,4 @@
 <?php if (!defined('APPLICATION')) exit();
-include($this->FetchViewLocation('helper_functions', 'categories'));
 
 echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 

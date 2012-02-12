@@ -30,6 +30,11 @@ class CategoriesController extends VanillaController {
    public $Uses = array('Database', 'Form', 'CategoryModel');
    
    /**
+    * @var CategoryModel 
+    */
+   public $CategoryModel;
+   
+   /**
     * Should the discussions have their options available.
     * 
     * @since 2.0.0
@@ -60,7 +65,10 @@ class CategoriesController extends VanillaController {
     * "Table" layout for categories. Mimics more traditional forum category layout.
     */
    public function Table() {
-      $this->View = 'table';
+      if ($this->SyndicationMethod == SYNDICATION_NONE)
+         $this->View = 'table';
+      else
+         $this->View = 'all';
       $this->All();
    }
    
@@ -83,8 +91,7 @@ class CategoriesController extends VanillaController {
 					$this->Discussions();
 					break;
 				case 'table':
-					$this->View = 'table';
-					$this->All();
+					$this->Table();
 					break;
 				default:
 					$this->View = 'all';
@@ -97,7 +104,8 @@ class CategoriesController extends VanillaController {
 			$Layout = C('Vanilla.Discussions.Layout');
 			switch($Layout) {
 				case 'table':
-					$this->View = 'table';
+               if ($this->SyndicationMethod == SYNDICATION_NONE)
+                  $this->View = 'table';
 					break;
 				default:
 					// $this->View = 'index';
@@ -221,6 +229,13 @@ class CategoriesController extends VanillaController {
       // Get category data
       $CategoryModel = new CategoryModel();
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
+      
+//      $Categories = CategoryModel::Categories();
+//      CategoryModel::JoinRecentPosts($Categories);
+//      $this->SetData('Categories2', $Categories);
+      
+      
+      
       $this->CategoryData = $this->CategoryModel->GetFull();
 		$this->SetData('Categories', $this->CategoryData);
       
@@ -241,6 +256,7 @@ class CategoriesController extends VanillaController {
          $this->AddDefinition('SetClientHour', $ClientHour);
       }
 
+      include_once $this->FetchViewLocation('helper_functions', 'categories');
       $this->Render();
 	}
 

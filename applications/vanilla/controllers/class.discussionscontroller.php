@@ -66,7 +66,8 @@ class DiscussionsController extends VanillaController {
     * @param int $Page Multiplied by PerPage option to determine offset.
     */
    public function Table($Page = '0') {
-      $this->View = 'table';
+      if ($this->SyndicationMethod == SYNDICATION_NONE)
+         $this->View = 'table';
       $this->Index($Page);
    }
    
@@ -83,7 +84,8 @@ class DiscussionsController extends VanillaController {
       $Layout = C('Vanilla.Discussions.Layout');
       switch($Layout) {
          case 'table':
-            $this->View = 'table';
+            if ($this->SyndicationMethod == SYNDICATION_NONE)
+               $this->View = 'table';
             break;
          default:
             // $this->View = 'index';

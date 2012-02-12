@@ -566,6 +566,29 @@ class ProfileController extends Gdn_Controller {
    }
    
    /**
+    * Gets or sets a user's preference. This method is meant for ajax calls.
+    * @since 2.1
+    * @param string $Key The name of the preference.
+    */
+   public function Preference($Key = FALSE) {
+      $this->Permission('Garden.SignIn.Allow');
+      
+      $this->Form->InputPrefix = '';
+      
+      if ($this->Form->IsPostBack()) {
+         $Data = $this->Form->FormValues();
+         Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, $Data);
+      } else {
+         $User = Gdn::UserModel()->GetID(Gdn::Session()->UserID, DATASET_TYPE_ARRAY);
+         $Pref = GetValueR($Key, $User['Preferences'], NULL);
+         
+         $this->SetData($Key, $Pref);
+      }
+      
+      $this->Render('Blank', 'Utility');
+   }
+   
+   /**
     * Edit user's preferences (mostly notification settings).
     *
     * @since 2.0.0

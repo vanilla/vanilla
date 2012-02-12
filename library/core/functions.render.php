@@ -22,6 +22,19 @@ if (!function_exists('Alternate')) {
    }
 }
 
+/**
+ * English "plural" formatting for numbers that can get really big.
+ */
+if (!function_exists('BigPlural')) {
+   function BigPlural($Number, $Singular, $Plural = FALSE) {
+      if (!$Plural) {
+         $Plural = $Singular.'s';
+      }
+      $Title = sprintf(T($Number == 1 ? $Singular : $Plural), number_format($Number));
+      
+      return '<span title="'.$Title.'">'.Gdn_Format::BigNumber($Number).'</span>';
+   }
+}
 
 if (!function_exists('Condense')) {
    function Condense($Html) {

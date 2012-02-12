@@ -1149,6 +1149,7 @@ a.BigButton:focus {
 .DataList .Excerpt {
    font-size: 12px;
 	line-height: 1.4;
+   margin: 5px 0;
 }
 .DataList .Excerpt p {
 	display: inline;
@@ -2317,9 +2318,6 @@ ul.Tabs li a.EntryTabFor_password {
 
 
 /* ============================================================ Entry Screens */
-body.Entry {
-   text-align: center;
-}
 body.Entry #Panel {
    display: none;
 }

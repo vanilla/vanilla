@@ -1918,6 +1918,7 @@ div.Popup form ul li label.RadioLabel {
 /* ======================================= Category & Discussions Table Views */
 .DataTable {
 	width: 100%;
+   table-layout: fixed;
 }
 
 .DataTable td {
@@ -1933,18 +1934,14 @@ div.Popup form ul li label.RadioLabel {
 }
 
 .DataTable .BlockColumn {
-   width: 160px;
+   width: 25%;
 }
-
-.DataTable .Block {
-   width: 160px;
+tbody .BlockColumn {
+   padding: 8px 4px; /* compensate for line-height 1 */
 }
 
 .DataTable .BlockColumn-User {
-   width: 120px;
-}
-.BlockColumn-User .Block {
-   width: 120px;
+   width: 15%;
 }
 
 td.BigCount {
@@ -1959,7 +1956,7 @@ td.BigCount {
 
 tbody td.BigCount {
    font-size: 16px;
-   vertical-align: middle;
+   padding: 8px 4px;
 }
 
 .DataTable .Meta {
@@ -1978,7 +1975,7 @@ td.Opts {
 
 .MiniPager {
    display: inline-block;
-	margin-left: 10px;
+	margin-left: 3px;
 	font-size: 11px;
 	color: #333;
 }
@@ -2012,7 +2009,7 @@ tr.CategoryHeading td {
 
 .Block .PhotoLink {
 	float: left;
-	margin: 0 5px 5px 0;
+	margin: 0 5px 0 0;
 }
 
 .Block img {

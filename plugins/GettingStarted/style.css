@@ -1,0 +1,41 @@
+div.GettingStarted {
+   background: #fff;
+   padding: 0 0 10px;
+   margin: 0;
+   border-bottom: 1px solid #A5D0E7;
+	position: relative;
+}
+div.GettingStarted a.Dismiss {
+	position: absolute;
+	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+	font-weight: bold;
+	font-size: 22px;
+	top: 1px;
+	right: 10px;
+}
+div.GettingStarted p {
+	color: #02455B;
+	font-size: 13px;
+	padding: 2px 0 0;
+	margin: 0;
+}
+div.GettingStarted ul li {
+	color: #000;
+   font-size: 16px;
+	margin: 0 0 0 50px;
+   padding: 8px 0px;
+	list-style: decimal;
+	max-width: 600px;
+}
+div.GettingStarted ul li.Done,
+div.GettingStarted ul li.Done a,
+div.GettingStarted ul li.Done p {
+	color: #888;
+}
+div.GettingStarted ul li strong {
+	padding: 3px 0;
+}
+div.GettingStarted ul li.Done strong {
+	background: url('check.png') no-repeat center left;
+	padding-left: 36px;
+}

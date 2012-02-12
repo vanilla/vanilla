@@ -1,0 +1,161 @@
+
+/* Date Range Input & Toggle */
+input.DateRange {
+   font-size: 12px;
+   font-weight: bold;
+   width: 240px;
+}
+a.RangeToggle,
+a.RangeToggle:hover,
+a.RangeToggle:focus {
+   position: absolute;
+   top: 3px;
+   right: 0;
+   border: none;
+   background: url('daterange-sprites.png') right 9px no-repeat transparent;
+   padding: 8px 30px 8px 10px;
+   margin: 0 10px 0 0;
+   font-size: 14px;
+   line-height: 14px;
+   font-weight: bold;
+   cursor: pointer;
+   color: #000;
+}
+a.RangeToggle:hover { background-position: right -92px; }
+a.RangeToggle:focus { background-position: right -191px; }
+a.RangeToggleActive,
+a.RangeToggleActive:hover,
+a.RangeToggleActive:focus {
+   background-position: right -292px;
+   background-color: #DBF3FC;
+   border: 1px solid #8BC1DE;
+   border-bottom: 1px solid #DBF3FC;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
+   z-index: 300;
+}
+a.RangeToggleActive:hover { background-position: right -394px; }
+a.RangeToggleActive:focus { background-position: right -492px; }
+
+/* Slider */
+div.Picker div.SliderHandle {
+   position: absolute;
+   font-size: 9px;
+   text-align: center;
+   height: 52px;
+   width: 60px;
+   margin-left: -30px; /* half the width of the handle */
+   padding: 2px 0 0;
+   background: url('daterange-sprites.png') 0 -550px no-repeat transparent;
+   cursor: pointer;
+   z-index: 200;
+}
+div.Picker {
+   display: none;
+   background: #DBF3FC;
+   padding: 10px 20px;
+   border-top: 1px solid #8BC1DE;
+}
+div.Picker div.SlidePager {
+   position: absolute;
+   width: 780px;
+   top: 30px;
+   margin-left: -40px;
+   background: yellow;
+}
+div.Picker div.SlidePage {
+   position: absolute;
+   text-align: center;
+   z-index: 150;
+   width: 18px;
+   height: 18px;
+   cursor: pointer;
+   background-image: url('daterange-sprites.png');
+   background-repeat: no-repeat;
+}
+div.Picker div.SlidePage span {
+   display: none;
+}
+div.Picker div.PageBack { background-position: 1px -750px; }
+div.Picker div.CannotPageBack { background-position: 1px -800px; cursor: default; }
+div.Picker div.PageForward { background-position: 1px -650px; right: 0; }
+div.Picker div.CannotPageForward { background-position: 1px -700px; right: 0; cursor: default; }
+div.Picker div.SlidePager div.CannotPage {
+   cursor: default;
+}
+div.Picker div.Slider {
+   text-align: center;
+   position: relative;
+   width: 700px;
+   margin: 0 auto;
+   cursor: pointer;
+}
+/* Bump the handles back half their width so percentages can be used to hit the
+beginning (0%) and end (100%) of the slider. */
+div.Picker div.HandleContainer {
+   position: absolute;
+   width: 700px;
+}
+div.Picker div.HandleStart {
+   left: 0%;
+}
+div.Picker div.HandleEnd {
+   left: 100%;
+}
+div.Slider div.SelectedRange {
+   position: absolute;
+   background: url('slider-sprites.png') 0 -150px repeat-x transparent;
+   top: 32px;
+   height: 13px;
+   z-index: 100;
+   cursor: move;
+}
+div.Picker div.Slider div.Range {
+   margin-top: 31px;
+   display: inline-block;
+   height: 16px;
+   width: 687px;
+   background: url('slider-sprites.png') center -100px repeat-x transparent;
+}
+div.Picker div.Slider div.RangeStart {
+   background-position: 0 0;
+   background-repeat: none;
+   width: 6px;
+}
+div.Picker div.Slider div.RangeEnd {
+   background-position: 7px -50px;
+   background-repeat: none;
+   width: 7px;
+}
+div.Picker div.Slider div.SliderDates {
+   line-height: 1;
+   padding-bottom: 4px;
+   position:relative;
+   height: 12px;
+}
+div.Picker div.Slider div.SliderDates div.SliderDate {
+   display: inline;
+   font-size: 11px;
+   position: absolute;
+   text-align: left;
+   height: 12px;
+   overflow: visible;
+   width: 100px;
+}
+/* Inputs */
+div.Picker hr {
+   border: none;
+   border-top: 1px solid #99D3F4;
+   border-bottom: 1px solid #fff;
+}
+div.Picker div.InputRange {
+   font-size: 12px;
+   text-align: center;
+}
+div.Picker div.InputRange input {
+   width: 100px;
+}
+div.Picker div.InputRange label.DateEnd {
+   padding-left: 20px;
+}

@@ -1,0 +1,51 @@
+input.SmallButton {
+   font-size: 12px;
+   padding: 3px;
+   margin-left: 5px;
+}
+
+#Content div.Info span.PasswordForce {
+   font-size: 85%;
+   padding: 0px;
+}
+
+div.AuthenticationChooser {
+   margin: 20px;
+   padding: 0px;
+   margin-top: 0px;
+}
+
+#Content div.AuthenticationChooser form ul {
+   padding: 0px;
+}
+#Content table.SplitConfiguration td.VanillaConfig form ul {
+   padding:0;
+}
+
+table.SplitConfiguration td.VanillaConfig {
+   width: 460px;
+   margin: 0px 30px 20px 20px;
+   padding-top: 15px;
+}
+
+table.SplitConfiguration td.RemoteConfig {
+   margin: 0px 0px 20px 0px;
+   padding-top: 15px;
+}
+
+#Content table.SplitConfiguration td.VanillaConfig form ul {
+   padding: 0px;
+}
+
+td.VanillaConfig input[type='text'] {
+   width: 460px;
+}
+
+td.VanillaConfig div.HighlightBox, div.AuthenticatorDescription {
+   padding: 10px;
+   color: black;
+   margin-bottom: 15px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}

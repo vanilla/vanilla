@@ -1,0 +1,304 @@
+
+body div.Overlay {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(255,255,255,0.7);
+}
+
+div.Popup {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5000;
+  text-align: center;
+}
+
+body div.Popup div.Body {
+   margin: 0px auto;
+   text-align: left;
+   position: relative;
+   padding: 0 0 8px 0;
+   width: 500px;
+   border-radius: 5px;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;
+   background: #f1fbfe;
+   border: 1px solid #01416b;
+   box-shadow: 0px 0px 3px #01416b;
+   -moz-box-shadow: 0px 0px 3px #01416b;
+   -webkit-box-shadow: 0px 0px 3px #01416b;  
+}
+
+div.Popup div.Body div.Body {
+   border: 0;
+}
+
+div.Popup div.Border {
+   border: 0px;
+}
+
+div.Popup div.Messages {
+   text-align: left;
+   position: inherit;
+   top: auto;
+   left: auto;
+   z-index: auto;
+   margin: 10px 0 !important;
+}
+
+div.Popup div.Messages ul {
+   display: block;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+div.Popup div.Info {
+   margin: 10px 10px 1px 10px;
+   padding: 10px;
+   border: none;
+   color: black;
+   background-color: transparent;
+   border-radius: 0px;
+   -moz-border-radius: 0px;
+   -webkit-border-radius: 0px;
+   margin-bottom: 1px;
+}
+
+* html div.Popup div.Messages {
+  position: inherit;
+  width: auto;
+  top: auto;
+  left: auto;
+  overflow: auto; 
+}
+
+div.Popup .Loading {
+   display: block;
+}
+
+div.Popup div.Legal,
+div.Popup .Content form {
+   max-height: 450px;
+   overflow: auto;
+   padding: 0px;
+   margin: 0px;
+}
+div.Popup .Loading {
+  text-align: center;
+}
+body div.Popup h1,
+body div.Popup h2 {
+   padding: 6px 9px 4px;
+   text-shadow: 0 1px 0 #fff;
+   border-radius: 4px 4px 0 0;
+   -webkit-border-radius: 4px 4px 0 0;
+   -moz-border-radius: 4px 4px 0 0;
+   font-size:14px;
+   font-weight:bold;
+   margin: 0 0 5px 0;
+   color: #f8fdff;
+   background: url('images/dashboard-bg.png') top center repeat-x #014687;
+   border: 0px;
+   border-bottom: 1px solid #000;
+   text-shadow: 0 1px 0 #000;
+}
+div.Popup h3 {
+   font-size: 13px;
+   font-weight: bold;
+   padding: 20px 0 10px;
+}
+div.Popup p {
+   padding: 0px;
+   margin: 0px;
+   margin-bottom: 10px;
+}
+div.Popup small {
+   font-size: 80%;
+}
+div.Popup form p {
+   padding: 0px;
+}
+div.Popup form ul li label {
+   color:#222;
+   display:block;
+   font-size:14px;
+   font-weight:bold;
+   margin: 10px 0 0;
+}
+div.Popup form ul li label.RadioLabel,
+div.Popup form ul li label.CheckBoxLabel {
+   font-weight: normal;
+}
+div.Popup input.Button {
+   margin: 4px 0 2px;
+}
+body.Entry div.Popup p {
+   color: #000;
+}
+/* Note: The close class is used on the "close" anchor in popups. */
+div.Popup a.Close {
+   line-height: 1;
+   color: #555;
+   cursor: pointer;
+   font-family: arial;
+   font-size: 22px;
+   font-weight: bold;
+   padding: 0;
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
+   border-bottom: 1px solid #006edf;
+   position:absolute;
+   right:10px;
+   top:7px;
+   height: 18px;
+   width: 18px;
+   overflow: hidden;
+}
+div.Popup a.Close span {
+   display: none;
+}
+div.Popup a.Close:hover {
+   color: #111;
+}
+div.Popup .Footer {
+   border: none;
+   background: none;
+   padding: 0;
+   margin: 0;
+   text-align: right;
+}
+div.Popup .Footer input.Button {
+   font-size: 11px;
+   margin-right: 2px;
+}
+
+.Button {
+   margin: 0;
+   border-radius: .5ex;
+   -moz-border-radius: .5ex;
+   -webkit-border-radius: .5ex;
+   background: #3fbcf3;
+   background:-webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
+   background:-moz-linear-gradient(top, #aee7fe, #3fbcf3);
+   -pie-background:linear-gradient(top, #aee7fe, #3fbcf3);
+   background:linear-gradient(top, #aee7fe, #3fbcf3);
+   border:1px solid #0F7FE6;
+   color:#003673;
+   cursor:pointer;
+   font-size:12px;
+   padding:6px 10px;
+   text-decoration:none;
+   text-shadow:0 1px 0 #B7F5FD;
+   font-weight: normal;
+}
+
+.CancelButton {
+   border-color: #919191;
+   background: -webkit-gradient(linear, center bottom, center top, from(#D1D1D1), to(#F1F1F1));
+   background: -moz-linear-gradient(top, #F1F1F1, #D1D1D1);
+   -pie-background: linear-gradient(top, #F1F1F1, #D1D1D1);
+   background: linear-gradient(top, #F1F1F1, #D1D1D1);
+   color: #414141;
+   text-shadow: 0px 1px 0px #E1E1E1;
+}
+
+.CancelButton:hover {
+   border-color: #616161;
+   color: #212121;
+}
+
+body div.Popup div.Wrap {
+   font-size: 14px;
+   position: relative;
+   margin: 10px;
+   padding: 10px;
+   line-height: 1.4;
+   margin-bottom: 1px;
+}
+
+div.Popup div.PopupNotice {
+   margin-top: 20px;
+   background: #dae5ea;
+   padding: 10px 20px;
+}
+
+.Popup div.PopupNotice p {
+   border-left: 5px solid #7dc2df;
+   padding: 0px 0px 0px 5px;
+   margin: 0px;
+}
+
+div.Popup form span.FieldHelper {
+   margin-left: 5px;
+   text-transform: uppercase;
+   font-size: 11px;
+   color: #616161;
+}
+
+body div.Popup .Content form div.Buttons {
+   margin-top: 10px;
+}
+
+body div.Popup div.Warning {
+   margin: 10px 0 0;
+   margin-top: 20px;
+   padding: 10px 20px;
+   background: #dae5ea;
+   border: none;
+   border-radius: 0px;
+   -moz-border-radius: 0px;
+   -webkit-border-radius: 0px;
+}
+
+.Popup .Warning p {
+   border-left: 5px solid #7dc2df;
+   padding: 0px 0px 0px 5px;
+   margin: 0px;
+   color: black;
+}
+
+div.Popup div.Notice {
+   font-style: italic;
+   font-size: 12px;
+}
+
+body div.Popup .Content form {
+   padding: 0px;
+   margin: 0px;
+}
+
+div.Popup .InfoRow {
+   margin: 10px 0px;
+}
+
+div.Popup .InfoRow label {
+   font-weight: bold;
+   display: block;
+}
+
+div.Popup input.DateBox, 
+div.Popup input.InputBox, 
+div.Popup input.SmallInput, 
+div.Popup textarea.TextBox {
+   padding: 6px 3px;
+   font-size: 15px;
+   font-weight: normal;
+   font-family: arial;
+   color: #444;
+   width: 250px;
+   border: 1px solid #CCC;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   margin: 0;
+}
+
+div.Popup div.Buttons input {
+   font-size: 12px;
+}

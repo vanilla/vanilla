@@ -1,0 +1,16 @@
+/* Style the buttons that appear in the inform message when previewing */
+input.PreviewThemeButton {
+   background: none !important;
+   border: none !important;
+	color: #aff !important;
+   text-decoration: none !important;
+   font-size: 12px !important;
+   cursor: pointer !important;
+   display: inline !important;
+   padding: 0 !important;
+   margin: 0 !important;
+}
+input.PreviewThemeButton:hover {
+	color: #cff !important;
+	text-decoration: underline !important;
+}

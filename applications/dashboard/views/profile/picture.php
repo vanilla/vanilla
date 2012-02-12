@@ -1,0 +1,71 @@
+<?php if (!defined('APPLICATION')) exit();
+$Session = Gdn::Session();
+         
+// Check that we have the necessary tools to allow image uploading
+$AllowImages = Gdn_UploadImage::CanUploadImages();
+
+// Is the photo hosted remotely?
+$RemotePhoto = in_array(substr($this->User->Photo, 0, 7), array('http://', 'https:/'));
+
+// Define the current profile picture
+$Picture = '';
+if ($this->User->Photo != '') {
+   if (StringBeginsWith($this->User->Photo, 'http'))
+      $Picture = Img($this->User->Photo, array('class' => 'ProfilePhotoLarge'));
+   else
+      $Picture = Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
+}
+
+// Define the current thumbnail icon
+$Thumbnail = $this->User->Photo;
+if (!$Thumbnail && function_exists('UserPhotoDefaultUrl'))
+   $Thumbnail = UserPhotoDefaultUrl($this->User);
+
+if ($Thumbnail && !preg_match('`^https?://`i', $Thumbnail))
+   $Thumbnail = Gdn_Upload::Url(ChangeBasename($Thumbnail, 'n%s'));
+         
+$Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));
+?>
+<div class="SmallPopup">
+<h1><?php echo T('Change My Picture'); ?></h1>
+<?php
+echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->Errors();
+?>
+<ul>
+   <?php if ($Picture != '') { ?>
+   <li class="CurrentPicture">
+      <table>
+         <thead>
+            <tr>
+               <td><?php echo T('Picture'); ?></td>
+               <td><?php echo T('Thumbnail'); ?></td>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td><?php
+               echo $Picture;
+               if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
+                  echo Wrap(Anchor(T('Remove Picture'), '/profile/removepicture/'.rawurldecode($this->User->Name).'/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Button PopConfirm'), 'p');
+               ?>
+               </td>
+               <td><?php
+               echo $Thumbnail;
+               echo Wrap(Anchor(T('Edit Thumbnail'), '/profile/thumbnail/'.$this->ProfileUrl(), 'Button'), 'p');
+               }
+               ?>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+   </li>
+   <?php } ?>
+   <li>
+      <p><?php echo T('Select an image on your computer (2mb max)'); ?></p>
+      <?php echo $this->Form->Input('Picture', 'file'); ?>
+   </li>
+</ul>
+<div class="Warning"><?php echo T('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
+<?php echo $this->Form->Close('Upload'); ?>
+</div>

@@ -1,0 +1,12 @@
+# Original
+# If you modify this file then change the above line to: # Modified
+<IfModule mod_rewrite.c>
+   RewriteEngine On
+   # Certain hosts may require the following line.
+   # If vanilla is in a subfolder then you need to specify it after the /. 
+   # (ex. You put Vanilla in /forum so change the next line to: RewriteBase /forum)
+   # RewriteBase /
+   RewriteCond %{REQUEST_FILENAME} !-d
+   RewriteCond %{REQUEST_FILENAME} !-f
+   RewriteRule ^(.*)$ index.php\?p=$1 [QSA,L]
+</IfModule>

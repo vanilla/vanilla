@@ -1,0 +1,8 @@
+<?php if (!defined('APPLICATION')) exit();
+$this->FireEvent('BeforeCommentPreviewFormat');
+$this->Comment->Body = Gdn_Format::To($this->Comment->Body, C('Garden.InputFormatter'));
+$this->FireEvent('AfterCommentPreviewFormat');
+?>
+<div class="Preview">
+   <div class="Message"><?php echo $this->Comment->Body; ?></div>
+</div>

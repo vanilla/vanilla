@@ -1,0 +1,26 @@
+<?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
+
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+      <title><?php echo $this->Head->Title(); ?></title>
+      <link><?php echo htmlspecialchars(Url('', TRUE, TRUE)); ?></link>
+      <pubDate><?php echo date(DATE_RFC822); ?></pubDate>
+      <?php
+         $this->RenderAsset('RssHead');
+      
+         /* Sample RSS Content:
+         <item>
+            <title>Atom-Powered Robots Run Amok</title>
+            <link>http://example.org/2003/12/13/atom03</link>
+            <guid isPermaLink="false">urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</guid>
+            <pubDate>Sat, 13 Dec 2003 18:30:02 GMT</pubDate>
+            <description>Some text.</description>
+         </item>
+         */
+         $this->RenderAsset('Content');
+      ?>
+   </channel>
+</rss>

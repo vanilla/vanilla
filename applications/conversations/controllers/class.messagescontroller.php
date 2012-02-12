@@ -160,6 +160,7 @@ class MessagesController extends ConversationsController {
    public function All($Page = '') {
       $Session = Gdn::Session();
       $this->Title(T('Inbox'));
+      Gdn_Theme::Section('ConversationList');
 
       list($Offset, $Limit) = OffsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
       
@@ -257,6 +258,7 @@ class MessagesController extends ConversationsController {
    public function Index($ConversationID = FALSE, $Offset = -1, $Limit = '') {
       $this->Offset = $Offset;
       $Session = Gdn::Session();
+      Gdn_Theme::Section('Conversation');
       
       // Figure out Conversation ID
       if (!is_numeric($ConversationID) || $ConversationID < 0)

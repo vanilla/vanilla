@@ -84,6 +84,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddModule('GuestModule');
       parent::Initialize();
       
+      Gdn_Theme::Section('Profile');
 		
 		if ($this->EditMode)
 			$this->CssClass .= 'EditMode';

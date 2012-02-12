@@ -99,6 +99,7 @@ class EntryController extends Gdn_Controller {
       
       $this->AddCssFile('style.css');
       parent::Initialize();
+      Gdn_Theme::Section('Entry');
    }
    
    /**

@@ -56,6 +56,7 @@ class DiscussionController extends VanillaController {
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussion.js');
       $this->AddJsFile('autosave.js');
+      Gdn_Theme::Section('Discussion');
       
       // Load the discussion record
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;

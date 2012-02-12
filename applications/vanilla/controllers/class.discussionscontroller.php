@@ -91,6 +91,7 @@ class DiscussionsController extends VanillaController {
             // $this->View = 'index';
             break;
       }
+      Gdn_Theme::Section('DiscussionList');
       
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));

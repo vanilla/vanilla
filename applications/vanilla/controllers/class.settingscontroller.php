@@ -136,6 +136,7 @@ class SettingsController extends Gdn_Controller {
       // Change master template
       $this->MasterView = 'admin';
       parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
    }   
    
    /**

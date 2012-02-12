@@ -100,6 +100,7 @@ class CategoriesController extends VanillaController {
 			}
 			return;
 		} else {
+         Gdn_Theme::Section('DiscussionList');
 			// Figure out which discussions layout to choose (Defined on "Homepage" settings page).
 			$Layout = C('Vanilla.Discussions.Layout');
 			switch($Layout) {
@@ -209,7 +210,7 @@ class CategoriesController extends VanillaController {
 	 * @access public
 	 */
 	public function All() {
-      // Setup head
+      // Setup head.
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
       $Title = C('Garden.HomepageTitle');
@@ -217,6 +218,7 @@ class CategoriesController extends VanillaController {
          $this->Title($Title, '');
       else
          $this->Title(T('All Categories'));
+      Gdn_Theme::Section('CategoryList');
             
       $this->Description(C('Garden.Description', NULL));
       
@@ -278,6 +280,7 @@ class CategoriesController extends VanillaController {
       else
          $this->Title(T('All Categories'));
       $this->Description(C('Garden.Description', NULL));
+      Gdn_Theme::Section('DiscussionList');
       
 		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
 		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);

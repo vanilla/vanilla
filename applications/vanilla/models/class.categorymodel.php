@@ -191,13 +191,13 @@ class CategoryModel extends Gdn_Model {
             $Row['LastTitle'] = Gdn_Format::Text($Discussion['Name']);
             $Row['LastUserID'] = $Discussion['InsertUserID'];
             $Row['LastDateInserted'] = $Discussion['DateInserted'];
-            $Row['LastUrl'] = "/discussion/{$Discussion['DiscussionID']}/".Gdn_Format::Text($Discussion['Name']);
+            $Row['LastUrl'] = Url("/discussion/{$Discussion['DiscussionID']}/".Gdn_Format::Text($Discussion['Name']), TRUE);
          }
          $Comment = GetValue($Row['LastCommentID'], $Comments);
          if ($Comment) {
             $Row['LastUserID'] = $Comment['InsertUserID'];
             $Row['LastDateInserted'] = $Comment['DateInserted'];
-            $Row['LastUrl'] = "/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}";
+            $Row['LastUrl'] = Url("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}", TRUE);
          } else {
             $Row['NoComment'] = TRUE;
          }
@@ -571,13 +571,13 @@ class CategoryModel extends Gdn_Model {
       return $Result;
    }
    
-   public function GetFullCache($CategoryID = FALSE, $Permissions = FALSE) {
+   public function GetFull($CategoryID = FALSE, $Permissions = FALSE) {
       $Categories = self::Categories();
       $Joined = self::JoinRecentPosts($Categories);
-      if ($Joined)
+      if ($Joined && Gdn::Cache()->ActiveEnabled())
          Gdn::Cache()->Store(self::CACHE_KEY, $Categories);
       
-      // Filter our the categories we aren't supposed to view.
+      // Filter out the categories we aren't supposed to view.
       if ($CategoryID && !is_array($CategoryID))
          $CategoryID = array($CategoryID);
       elseif ($this->Watching)
@@ -610,76 +610,6 @@ class CategoryModel extends Gdn_Model {
       $Result = new Gdn_DataSet($Categories, DATASET_TYPE_ARRAY);
       $Result->DatasetType(DATASET_TYPE_OBJECT);
       return $Result;
-   }
-
-   /**
-    * Get full data for a single category or all categories. Respects Permissions.
-    *
-    * If no CategoryID is provided, it gets all categories.
-    * 
-    * @since 2.0.0
-    * @access public
-    *
-    * @param int $CategoryID Unique ID of category to return.
-    * @param string $Permissions Permission to check.
-    * @return object SQL results.
-    */
-   public function GetFull($CategoryID = '', $Permissions = FALSE) {
-      if (Gdn::Cache()->ActiveEnabled())
-         return $this->GetFullCache($CategoryID, $Permissions);
-      
-      // Minimally check for view discussion permission
-      if (!$Permissions)
-         $Permissions = 'Vanilla.Discussions.View';
-
-      // Get the category IDs.
-      if ($Permissions == 'Vanilla.Discussions.View') {
-         if ($this->Watching)
-            $CategoryIDs = self::CategoryWatch();
-         else
-            $CategoryIDs = DiscussionModel::CategoryPermissions();
-         if ($CategoryIDs !== TRUE)
-            $this->SQL->WhereIn('c.CategoryID', $CategoryIDs);
-      } else {
-         $this->SQL->Permission($Permissions, 'c', 'PermissionCategoryID', 'Category');
-      }
-      
-      // Check to see about getting the query from the cache.
-
-      // Build base query
-      $this->SQL
-         ->Select('c.*')
-         ->Select('co.DateInserted', '', 'DateLastComment')
-         ->Select('co.InsertUserID', '', 'LastCommentUserID')
-         ->Select('d.Name', '', 'LastDiscussionTitle')
-         ->Select('d.CountComments', '', 'LastDiscussionCountComments')
-         ->Select('d.InsertUserID', '', 'LastDiscussionUserID')
-         ->Select('d.DateInserted', '', 'DateLastDiscussion')
-         ->From('Category c')
-         ->Join('Comment co', 'c.LastCommentID = co.CommentID', 'left')
-         ->Join('Discussion d', 'd.DiscussionID = c.LastDiscussionID', 'left')
-         ->Where('c.AllowDiscussions', '1');
-
-      $this->FireEvent('AfterGetFullQuery');
-      
-      if (Gdn::Session()->UserID > 0) {
-         $UserID = Gdn::Session()->UserID;
-         // Add in user/category stuff.
-         $this->SQL
-            ->Join('UserCategory uc', "uc.UserID = $UserID and uc.CategoryID = c.CategoryID", 'left')
-            ->Select('uc.DateMarkedRead')
-            ->Select('uc.Unfollow');
-      }
-
-      // Single record or full list?
-      if (is_numeric($CategoryID) && $CategoryID != 0) {
-         return $this->SQL->Where('c.CategoryID', $CategoryID)->Get()->FirstRow();
-      } else {
-         $CategoryData = $this->SQL->OrderBy('TreeLeft', 'asc')->Get();
-         $this->AddCategoryColumns($CategoryData);
-         Gdn::UserModel()->JoinUsers($CategoryData, array('LastUserID'));
-         return $CategoryData;
-      }
    }
    
    /**
@@ -792,7 +722,6 @@ class CategoryModel extends Gdn_Model {
             $Cat['_PermissionCategoryID'] = $Cat['PermissionCategoryID'];
             $Cat['_ParentCategoryID'] = $Cat['ParentCategoryID'];
          } catch (Exception $Ex) {
-            $Foo = 'Bar';
          }
 
          if ($Cat['CategoryID'] == -1) {
@@ -910,7 +839,6 @@ class CategoryModel extends Gdn_Model {
             // This category does not have custom permissions so must inherit its parent's permissions.
             $PermissionCategoryID = GetValueR("$ParentCategoryID.PermissionCategoryID", $PermTree, 0);
             if ($CategoryID != -1 && !GetValueR("$ParentCategoryID.Touched", $PermTree)) {
-               $Foo = 'Bar';
                throw new Exception("Category $ParentCategoryID not touched before touching $CategoryID.");
             }
             if ($PermTree[$CategoryID]['PermissionCategoryID'] != $PermissionCategoryID)
@@ -1265,7 +1193,7 @@ class CategoryModel extends Gdn_Model {
 		foreach ($Data as &$Category) {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
          $Category['CountAllComments'] = $Category['CountComments'];
-         $Category['Url'] = '/categories/'.rawurlencode($Category['UrlCode']);
+         $Category['Url'] = Url('/categories/'.rawurlencode($Category['UrlCode']), TRUE);
          $Category['ChildIDs'] = array();
 		}
       

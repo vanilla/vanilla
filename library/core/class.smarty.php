@@ -80,7 +80,7 @@ class Gdn_Smarty {
       $Smarty->Controller = $Controller; // for smarty plugins
       $Smarty->security = TRUE;
       $Smarty->security_settings['IF_FUNCS'] = array_merge($Smarty->security_settings['IF_FUNCS'],
-         array('CheckPermission', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url'));
+         array('CheckPermission', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url', 'InSection'));
       $Smarty->secure_dir = array($Path);
       
       $CompileID = $Smarty->compile_id;

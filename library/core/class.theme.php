@@ -61,6 +61,19 @@ class Gdn_Theme {
       return $Result;
    }
    
+   /**
+    * Returns whether or not the page is in the current section.
+    * @param string|array $Section 
+    */
+   public static function InSection($Section) {
+      $Section = (array)$Section;
+      foreach ($Section as $Name) {
+         if (isset(self::$_Section[$Name]))
+            return TRUE;
+      }
+      return FALSE;
+   }
+   
    public static function Link($Path, $Text = FALSE, $Format = NULL, $Options = array()) {
       $Session = Gdn::Session();
       $Class = GetValue('class', $Options, '');
@@ -267,6 +280,41 @@ class Gdn_Theme {
       }
       
       return 'unknown';
+   }
+   
+   /**
+    * @var array
+    */
+   protected static $_Section = array();
+   
+   /**
+    * The current section the site is in. This can be one or more values. Think of it like a server-side css-class.
+    * @since 2.1
+    * @param string $Section The name of the section
+    * @param string $Method One of:
+    *  - add
+    *  - remove
+    *  - set
+    *  - get
+    */
+   public static function Section($Section, $Method = 'add') {
+      $Section = array_fill_keys((array)$Section, TRUE);
+      
+      
+      switch (strtolower($Method)) {
+         case 'add':
+            self::$_Section = array_merge(self::$_Section, $Section);
+            break;
+         case 'remove':
+            self::$_Section = array_diff_key(self::$_Section, $Section);
+            break;
+         case 'set':
+            self::$_Section = $Section;
+            break;
+         case 'get':
+         default:
+            return array_keys(self::$_Section);
+      }
    }
 
    public static function Text($Code, $Default) {

@@ -193,6 +193,18 @@ if (!function_exists('Img')) {
    }
 }
 
+if (!function_exists('InSection')) {
+   /**
+    * Returns whether or not the page is in one of the given section(s).
+    * @since 2.1
+    * @param string|array $Section
+    * @return bool
+    */
+   function InSection($Section) {
+      return Gdn_Theme::InSection($Section);
+   }
+}
+
 if (!function_exists('IPAnchor')) {
    /**
     * Returns an IP address with a link to the user search.

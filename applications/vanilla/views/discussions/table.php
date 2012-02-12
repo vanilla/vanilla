@@ -51,7 +51,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 	<td class="DiscussionName">
 		<div class="Wrap">
 			<?php
-			echo Anchor($DiscussionName, $DiscussionUrl, 'Title');
+			echo Anchor($DiscussionName, $DiscussionUrl, 'Title').' ';
 			WriteMiniPager($Discussion);
 			echo NewComments($Discussion);
 			$Sender->FireEvent('AfterDiscussionTitle');
@@ -79,6 +79,24 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 			?>
 		</div>
    </td>
+	<td class="BigCount CountComments">
+		<?php
+		// Exact Number
+		// echo number_format($Discussion->CountComments);
+		
+		// Round Number
+		echo BigPlural($Discussion->CountReplies, '%s comment');
+		?>
+	</td>
+	<td class="BigCount CountViews">
+		<?php
+		// Exact Number
+		// echo number_format($Discussion->CountViews);
+		
+		// Round Number
+		echo BigPlural($Discussion->CountViews, '%s view');
+		?>
+	</td>
 	<td class="BlockColumn BlockColumn-User LastUser">
 		<div class="Block Wrap">
 			<?php
@@ -94,29 +112,6 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 			?>
 		</div>
 	</td>
-	<td class="BigCount CountComments">
-		<?php
-		// Exact Number
-		// echo number_format($Discussion->CountComments);
-		
-		// Round Number
-		echo Gdn_Format::BigNumber($Discussion->CountReplies, 'html');
-		?>
-	</td>
-	<td class="BigCount CountViews">
-		<?php
-		// Exact Number
-		// echo number_format($Discussion->CountViews);
-		
-		// Round Number
-		echo Gdn_Format::BigNumber($Discussion->CountViews, 'html');
-		?>
-	</td>
-	<td class="Opts">
-		<div class="Wrap">
-			<?php WriteOptions($Discussion, $Sender, $Session); ?>
-		</div>
-	</td>
 </tr>
 <?php
 }
@@ -125,7 +120,20 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
  * Render the page.
  */
 
+$PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
+if ($this->Data('_PagerUrl')) {
+   $PagerOptions['Url'] = $this->Data('_PagerUrl');
+}
+
 echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+
+echo '<p class="PageDescription">';
+echo PagerModule::Write($PagerOptions);
+echo $this->Data('_Description');
+echo '</p>';
+
+
+
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
 <table class="DataTable DiscussionsTable">
@@ -133,10 +141,9 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 		<tr>
 			<td class="DiscussionName"><?php echo T('Discussion'); ?></td>
 			<td class="BlockColumn BlockColumn-User FirstUser"><?php echo T('Started By'); ?></td>
-			<td class="BlockColumn BlockColumn-User LastUser"><?php echo T('Most Recent'); ?></td>
 			<td class="BigCount CountReplies"><?php echo T('Replies'); ?></td>
 			<td class="BigCount CountViews"><?php echo T('Views'); ?></td>
-			<td class="Opts"><?php WriteCheckController(); ?></td>
+			<td class="BlockColumn BlockColumn-User LastUser"><?php echo T('Most Recent'); ?></td>
 		</tr>
 	</thead>
 	<tbody>
@@ -158,10 +165,10 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 	</tbody>
 </table>
 <?php
-   $PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
-   if ($this->Data('_PagerUrl')) {
-      $PagerOptions['Url'] = $this->Data('_PagerUrl');
-   }
+//   $PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
+//   if ($this->Data('_PagerUrl')) {
+//      $PagerOptions['Url'] = $this->Data('_PagerUrl');
+//   }
    echo PagerModule::Write($PagerOptions);
 } else {
    ?>

@@ -2,11 +2,12 @@
 /**
  * "Table" layout for categories. Mimics more traditional forum category layout.
  */
+?>
 
-include($this->FetchViewLocation('helper_functions', 'categories'));
+<h1 class="HomepageTitle"><?php echo $this->Data('Title'); ?></h1>
+<p class="PageDescription"><?php echo $this->Description(); ?></p>
 
-echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
-
+<?php
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
@@ -20,19 +21,24 @@ if (C('Vanilla.Categories.ShowTabs')) {
    WriteFilterTabs($this);
 }
 */
-$TableOpen = '<table class="DataTable CategoryTable' . ($DoHeadings ? ' CategoryTableWithHeadings' : '') . '">
-   <thead>
+$TableOpen = '<table class="DataTable CategoryTable' . ($DoHeadings ? ' CategoryTableWithHeadings' : '') . '">';
+
+//if (!$DoHeadings) {
+   $TableOpen .= '<thead>
       <tr>
          <td class="CategoryName">'.T('Category').'</td>
-         <td class="BlockColumn LatestPost">'.T('Latest Post').'</td>
          <td class="BigCount CountDiscussions">'.T('Discussions').'</td>
          <td class="BigCount CountComments">'.T('Comments').'</td>
-         <td class="Opts"></td>
+         <td class="BlockColumn LatestPost">'.T('Latest Post').'</td>
       </tr>
    </thead>
    <tbody>';
+//}
 $TableClose = '</tbody>
 </table>';
+
+if ($DoHeadings)
+   $TableClose .= '</div>'; // close out .HeadingGroup
 
 $Alt = FALSE;
 $TableIsOpen = FALSE;
@@ -61,7 +67,7 @@ foreach ($this->Data('Categories')->Result() as $Category) {
             $CatList .= $TableClose;
 
          $TableIsOpen = TRUE;
-         $CatList .= $TableOpen;
+//         $CatList .= $TableOpen;
       }
 
       if ($Category->Depth >= $MaxDisplayDepth && $MaxDisplayDepth > 0) {
@@ -69,12 +75,19 @@ foreach ($this->Data('Categories')->Result() as $Category) {
             $ChildCategories .= ', ';
          $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
       } else if ($DoHeadings && $Category->Depth == 1) {
-         $CatList .= '<tr class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
-            <td colspan="5">'
-               // .GetOptions($Category, $this)
-               .Gdn_Format::Text($Category->Name)
-            .'</td>
-         </tr>';
+         
+         $CatList .= '<div class="CategoryGroup">'.
+            '<h2>'.$Category->Name.'</h2>'.
+            $TableOpen;
+         
+//         $CatList .= '<thead>
+//         <tr class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
+//            <td>'.Gdn_Format::Text($Category->Name).'</td>
+//            <td>'.T('Discussions').'</td>
+//            <td>'.T('Comments').'</td>
+//            <td>'.T('Last Post').'</td>
+//         </tr>
+//         </thead>';
          $Alt = FALSE;
       } else {
          $LastComment = UserBuilder($Category, 'Last');
@@ -83,13 +96,23 @@ foreach ($this->Data('Categories')->Result() as $Category) {
          $CatList .= '<tr class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
             <td class="CategoryName">'
                .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
-               .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'));
+               .Wrap($Category->Description.' '.Anchor(T('RSS'), $Category->Url.'/feed.rss', 'RssButton', array('title' => T('RSS feed'))), 'div', array('class' => 'CategoryDescription'));
 
                // If this category is one level above the max display depth, and it
                // has children, add a replacement string for them.
                if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
                   $CatList .= '{ChildCategories}';
             $CatList .= '</td>
+            <td class="BigCount CountDiscussions">
+               <div class="Wrap">'
+                  .BigPlural($Category->CountAllDiscussions, '%s discussion')
+               .'</div>
+            </td>
+            <td class="BigCount CountComments">
+               <div class="Wrap">'
+                  .BigPlural($Category->CountAllComments, '%s comment')
+               .'</div>
+            </td>
             <td class="BlockColumn LatestPost">
                <div class="Block Wrap">';
                   if ($LastComment && $Category->LastTitle != '') {
@@ -103,7 +126,7 @@ foreach ($this->Data('Categories')->Result() as $Category) {
                      $CatList .= ' '.UserAnchor($LastComment, 'UserLink MItem');
                      $CatList .= ' <span class="Bullet">•</span> ';
                      $CatList .= ' '.Anchor(
-                        Gdn_Format::Date($Category->LastDateInserted),
+                        Gdn_Format::Date($Category->LastDateInserted, 'html'),
                         $Category->LastUrl,
                         'CommentDate MItem'
                      );
@@ -113,17 +136,6 @@ foreach ($this->Data('Categories')->Result() as $Category) {
                   }
                   $CatList .= '</div>
             </td>
-            <td class="BigCount CountDiscussions">
-               <div class="Wrap">'
-                  .Gdn_Format::BigNumber($Category->CountAllDiscussions, 'html')
-               .'</div>
-            </td>
-            <td class="BigCount CountComments">
-               <div class="Wrap">'
-                  .Gdn_Format::BigNumber($Category->CountAllComments, 'html')
-               .'</div>
-            </td>
-            <td class="Opts">'.GetOptions($Category, $this).'</td>
          </tr>';
       }
    }

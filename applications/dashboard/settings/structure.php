@@ -60,6 +60,7 @@ $Construct
    ->Column('Password', 'varbinary(100)') // keep this longer because of some imports.
 	->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('Photo', 'varchar(255)', NULL)
+   ->Column('Title', 'varchar(100)', NULL)
    ->Column('About', 'text', TRUE)
    ->Column('Email', 'varchar(200)', FALSE, 'index')
    ->Column('ShowEmail', 'tinyint(1)', '0')

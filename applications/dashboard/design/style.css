@@ -338,11 +338,11 @@ input.Button {
 .Info strong {
 	font-weight: bold;
 }
-.HomeCrumb a {
+/*.HomeCrumb a {
 	background: url('images/sprites.png') -83px -1px no-repeat;
 	padding-left: 24px;
-}
-.BreadcrumbWrap {
+}*/
+/*.BreadcrumbWrap {
 	clear: both;
 	line-height: 2.4;
 	font-size: 12px;
@@ -358,7 +358,7 @@ input.Button {
 .BreadcrumbWrap.TopBreadcrumb {
 	background: #f7f7f7;
 	background: rgba(0,0,0,0.03);
-}
+}*/
 #PagerLess {
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;

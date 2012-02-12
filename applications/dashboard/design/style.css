@@ -379,36 +379,21 @@ input.Button {
    margin-bottom: 1px;
 }
 */
-.MorePager,
-.NumberedPager,
-.PrevNextPager {
-   margin: 1px 0 0;
-	text-align: right;
-	font-weight: bold;
-	/* font-size: 16px; */
+
+.Pager {
+   font-weight: bold;
+   float: right;
+   
 }
-.NumberedPager a,
-.NumberedPager span {
-	padding: 0 4px;
+.Pager a, .Pager span {
+   display: inline-block;
+   margin: 0 3px;
 }
-.NumberedPager span,
-.NumberedPager a.Highlight {
-	color: #777;
+.Pager span {
+   color: #777;
 }
-.NumberedPager a.Next,
-.NumberedPager span.Next,
-.NumberedPager a.Previous,
-.NumberedPager span.Previous {
-	font-size: 16px;
-	line-height: 10px;
-}
-.NumberedPager a.Next,
-.NumberedPager span.Next {
-	margin-left: 6px;
-}
-.NumberedPager a.Previous,
-.NumberedPager span.Previous {
-	margin-right: 6px;
+.Pager .Highlight {
+	color: #000;
 }
 /* Small UserPhoto() images */
 a.Small:hover {

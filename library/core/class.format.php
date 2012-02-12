@@ -982,7 +982,7 @@ EOT;
     * 
     * @return array array(Width, Height)
     */
-   protected static function GetEmbedSize() {
+   public static function GetEmbedSize() {
       $Sizes = array(
          'tiny' => array( 400, 225),
          'small'=> array( 560, 340),

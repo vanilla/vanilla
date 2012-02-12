@@ -687,6 +687,29 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
+   public static function MakeTree($Categories) {
+      $Result = array();
+      
+      foreach ($Categories as $Category) {
+         if ($Category['Depth'] == 1) {
+            $Row = $Category;
+            $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
+            $Result[] = $Row;
+         }
+      }
+      return $Result;
+   }
+   
+   protected static function _MakeTreeChildren($Category, $Categories) {
+      $Result = array();
+      foreach ($Category['ChildIDs'] as $ID) {
+         $Row = $Categories[$ID];
+         $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
+         $Result[] = $Row;
+      }
+      return $Result;
+   }
+   
    /**
     * Rebuilds the category tree. We are using the Nested Set tree model.
     * 

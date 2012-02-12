@@ -1,9 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-if ($Session->IsValid() && C('Garden.Modules.ShowMeModule')) {
-	$Name = $Session->User->Name;
+if (!$Session->IsValid())
+   return;
+
+$Name = $Session->User->Name;
 ?>
-<div class="Box MeBox">
+<div class="MeBox">
 	<?php
 	echo UserPhoto($Session->User);
 	echo '<div class="WhoIs">';
@@ -34,5 +36,3 @@ if ($Session->IsValid() && C('Garden.Modules.ShowMeModule')) {
 	echo '</div>';
 	?>
 </div>
-<?php
-}

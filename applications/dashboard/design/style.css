@@ -1419,6 +1419,9 @@ links, sign in buttons, etc
    overflow: hidden;
    text-indent: -100px;
 }
+.DataTable .RssButton {
+   float: right;
+}
 
 /* ============================================================= Profile Page */
 /*body.Profile #Content {

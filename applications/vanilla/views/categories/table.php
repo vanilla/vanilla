@@ -96,7 +96,8 @@ foreach ($this->Data('Categories')->Result() as $Category) {
          $CatList .= '<tr class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
             <td class="CategoryName">'
                .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
-               .Wrap($Category->Description.' '.Anchor(T('RSS'), $Category->Url.'/feed.rss', 'RssButton', array('title' => T('RSS feed'))), 'div', array('class' => 'CategoryDescription'));
+               .' '.Anchor(T('RSS'), $Category->Url.'/feed.rss', 'RssButton', array('title' => T('RSS feed')))
+               .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'));
 
                // If this category is one level above the max display depth, and it
                // has children, add a replacement string for them.

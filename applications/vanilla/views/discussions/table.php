@@ -136,6 +136,7 @@ echo '</div>';
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
+<div class="DataTableWrap">
 <table class="DataTable DiscussionsTable">
 	<thead>
 		<tr>
@@ -164,6 +165,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 	?>
 	</tbody>
 </table>
+</div>
 <?php
    echo '<div class="P ClearFix">';
    PagerModule::Write($PagerOptions);

@@ -21,7 +21,7 @@ if (C('Vanilla.Categories.ShowTabs')) {
    WriteFilterTabs($this);
 }
 */
-$TableOpen = '<table class="DataTable CategoryTable' . ($DoHeadings ? ' CategoryTableWithHeadings' : '') . '">';
+$TableOpen = '<div class="DataTableWrap"><table class="DataTable CategoryTable' . ($DoHeadings ? ' CategoryTableWithHeadings' : '') . '">';
 
 //if (!$DoHeadings) {
    $TableOpen .= '<thead>
@@ -35,7 +35,7 @@ $TableOpen = '<table class="DataTable CategoryTable' . ($DoHeadings ? ' Category
    <tbody>';
 //}
 $TableClose = '</tbody>
-</table>';
+</table></div>';
 
 if ($DoHeadings)
    $TableClose .= '</div>'; // close out .HeadingGroup

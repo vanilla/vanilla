@@ -145,7 +145,8 @@ foreach ($this->Data('Categories')->Result() as $Category) {
 // the replacement one last time.
 if ($ChildCategories != '')
    $CatList = str_replace('{ChildCategories}', '<span class="ChildCategories">'.Wrap(T('Child Categories:'), 'b').' '.$ChildCategories.'</span>', $CatList);
-
+else
+   $CatList = str_replace('{ChildCategories}', '', $CatList);
 echo $CatList;
 if ($TableIsOpen)
    echo $TableClose;

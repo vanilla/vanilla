@@ -198,7 +198,7 @@ class CategoriesController extends VanillaController {
 				$this->SetJson('MoreRow', $this->Pager->ToString('more'));
 				$this->View = 'discussions';
 			}
-			// Render default view
+			// Render default view.
 			$this->Render();
 		}
    }
@@ -258,7 +258,6 @@ class CategoriesController extends VanillaController {
          $this->AddDefinition('SetClientHour', $ClientHour);
       }
 
-      include_once $this->FetchViewLocation('helper_functions', 'categories');
       $this->Render();
 	}
 
@@ -309,7 +308,7 @@ class CategoriesController extends VanillaController {
       $this->View = 'discussions';
 
       $this->CanonicalUrl(Url('/categories', TRUE));
-      
+      include_once $this->FetchViewLocation('helper_functions', 'discussions');
       $this->Render();
    }
    

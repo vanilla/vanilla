@@ -7,7 +7,7 @@
   <div id="Frame">
 	 <div class="Banner">
 		<ul>
-		  {discussions_link}
+		  {home_link}
 		  {profile_link}
 		  {inbox_link}
 		  {custom_menu}
@@ -18,6 +18,9 @@
 		</ul>
 	 </div>
 	 <div id="Body">
+       <div>
+         {breadcrumbs homelink="0"}
+       </div>
 		<div id="Content">
 		  {asset name="Content"}
 		</div>

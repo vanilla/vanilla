@@ -51,3 +51,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 // These options do not appear in mobile.
 function WriteFilterTabs($Sender) {}
 function WriteOptions($Discussion, &$Sender, &$Session) {}
+
+// Now that we've overrided what we want, include the defaults.
+include_once PATH_APPLICATIONS.'/vanilla/views/discussions/helper_functions.php';
+

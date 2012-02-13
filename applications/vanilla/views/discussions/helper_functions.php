@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+if (!function_exists('WriteDiscussion')):
+   
 function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $CssClass = CssClass($Discussion);
    $DiscussionUrl = $Discussion->Url;
@@ -80,7 +82,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 </li>
 <?php
 }
+endif;
 
+if (!function_exists('WriteMiniPager')):
+   
 function WriteMiniPager($Discussion) {
    if (!property_exists($Discussion, 'CountPages'))
       return;
@@ -102,11 +107,16 @@ function WriteMiniPager($Discussion) {
       echo '</span>';
    }
 }
+endif;
+
+if (!function_exists('WritePagePink')):
 function WritePageLink($Discussion, $PageNumber) {
    echo Anchor($PageNumber, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/p'.$PageNumber);
 }
+endif;
 
-
+if (!function_exists('CssClass')):
+   
 function CssClass($Discussion) {
    static $Alt = FALSE;
    $CssClass = 'Item';
@@ -120,7 +130,10 @@ function CssClass($Discussion) {
    
    return $CssClass;
 }
+endif;
 
+if (!function_exists('NewComments')):
+   
 function NewComments($Discussion) {
    if (!Gdn::Session()->IsValid())
       return '';
@@ -131,6 +144,7 @@ function NewComments($Discussion) {
       return ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
    return '';
 }
+endif;
 
 function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
    if (!$Discussion->$Column)
@@ -151,6 +165,8 @@ function WriteTags($Discussion) {
    Gdn::Controller()->FireEvent('AfterDiscussionLabels');
 }
 
+if (!function_exists('WriteFilterTabs')):
+   
 function WriteFilterTabs($Sender) {
    $Session = Gdn::Session();
    $Title = property_exists($Sender, 'Category') ? GetValue('Name', $Sender->Category, '') : '';
@@ -224,7 +240,11 @@ function WriteFilterTabs($Sender) {
 </div>
    <?php
 }
+endif;
 
+
+if (!function_exists('WriteOptions')):
+   
 /**
  * Render options that the user has for this discussion.
  */
@@ -294,7 +314,10 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       echo '</span>';
    }
 }
+endif;
 
+if (!function_exists('WriteCheckController')):
+   
 function WriteCheckController() {
    $CanEditDiscussions = Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
    if ($CanEditDiscussions) {
@@ -305,3 +328,4 @@ function WriteCheckController() {
    <?php
    }
 }
+endif;

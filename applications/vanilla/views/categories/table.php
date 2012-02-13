@@ -5,7 +5,7 @@
 ?>
 
 <h1 class="HomepageTitle"><?php echo $this->Data('Title'); ?></h1>
-<p class="PageDescription"><?php echo $this->Description(); ?></p>
+<div class="P PageDescription"><?php echo $this->Description(); ?></div>
 
 <?php
 $CatList = '';

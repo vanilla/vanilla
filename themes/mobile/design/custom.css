@@ -15,9 +15,9 @@ a:hover {
 	color: #3B5998;
 }
 #Body {
-	margin: 0;
+	padding: 3px;
 	position: relative;
-	width: 100%;
+	width: auto;
 	clear: left;
 }
 #Head {
@@ -270,8 +270,9 @@ body.Profile .Loading {
 	background-color: #fff;
 	border-bottom: 1px solid #BEC8CC;
 }
-
-
+.DataList .Item {
+   padding: 4px 0;
+}
 
 /*
 div.DiscussionsTabs div.SubTab {
@@ -505,13 +506,6 @@ div.MessageForm,
 #ConversationForm h2 {
 	display: none;
 }
-.NumberedPager,
-#PagerMore,
-#PagerAfter {
-	margin: 0;
-	padding: 3px 0;
-	border-bottom: 1px solid #BEC8CC;
-}
 ul.Discussion,
 body.Discussion #Content {
 	margin-bottom: 0;
@@ -596,4 +590,34 @@ div.FootMenu span {
 .Tabs li a span {
    background: #F8FAFE;
    color: #485F8F;
+}
+
+.RssButton {
+   display: none;
+}
+
+/* Datatable stuff */
+
+.DataTable .BlockColumn {
+   display: none;
+}
+
+.DataTable thead td {
+   font-size: 11px;
+}
+
+td.BigCount {
+   width: 70px;
+}
+
+.CategoryDescription {
+   display: none;
+}
+
+.ChildCategories b {
+   display: none;
+}
+
+.PageDescription {
+   display: none;
 }

@@ -4,7 +4,7 @@
  */
 
 $Session = Gdn::Session();
-include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
+include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
 /**
  * Writes a discussion in table row format.
@@ -127,10 +127,10 @@ if ($this->Data('_PagerUrl')) {
 
 echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 
-echo '<p class="PageDescription">';
+echo '<div class="P PageDescription">';
 echo PagerModule::Write($PagerOptions);
 echo $this->Data('_Description');
-echo '</p>';
+echo '</div>';
 
 
 

@@ -26,6 +26,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
       if (in_array($Sender->Application(), array('vanilla', 'conversations')) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), array('Activity', 'Profile', 'Search')))) {
          Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
       }
+      SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
    }
    
    /**

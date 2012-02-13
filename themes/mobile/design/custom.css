@@ -604,6 +604,10 @@ div.FootMenu span {
 
 .DataTable thead td {
    font-size: 11px;
+   background: #ddd;
+   font-weight: normal;
+   text-transform: uppercase;
+   text-shadow: 0 1px 1px #fff;
 }
 
 td.BigCount {

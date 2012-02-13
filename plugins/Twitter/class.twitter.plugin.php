@@ -175,7 +175,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $this->SetOAuthToken($Data['oauth_token'], $Data['oauth_token_secret'], 'request');
 
             // Redirect to twitter's authorization page.
-            $Url = "http://api.twitter.com/oauth/authorize?oauth_token={$Data['oauth_token']}";
+            $Url = "http://api.twitter.com/oauth/authenticate?oauth_token={$Data['oauth_token']}";
             Redirect($Url);
          }
       }

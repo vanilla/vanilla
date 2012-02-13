@@ -1687,7 +1687,6 @@ div.Popup h2 {
 	margin: 0;
 	color: #fff;
 	background: #38abe3;
-	border-bottom: 1px solid #3DB9E5;
 	padding: 6px 9px 4px;
 }
 a.Close {
@@ -1737,7 +1736,7 @@ div.Popup form p {
 }
 body.Profile.EditMode ul li label,
 div.Popup form ul li label {
-	color:#000;
+/*	color:#000;*/
 	display:block;
 	font-size:14px;
 	font-weight:bold;
@@ -2423,7 +2422,6 @@ body#dashboard_entry_password ul li label.CheckBoxLabel,
 body#dashboard_entry_signin ul li label.CheckBoxLabel,
 body#dashboard_entry_index ul li label.CheckBoxLabel,
 .SignInPopup ul li label.CheckBoxLabel {
-	color: #777;
 	display: inline;
 	font-size: 12px;
 	font-weight: normal;

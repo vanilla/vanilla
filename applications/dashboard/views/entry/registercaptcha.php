@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<div class="FormTitleWrapper">
 <h1><?php echo T("Apply for Membership") ?></h1>
-<div class="Box">
+<div class="FormWrapper">
    <?php
    $TermsOfServiceUrl = Gdn::Config('Garden.TermsOfService', '#');
    $TermsOfServiceText = sprintf(T('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), Url($TermsOfServiceUrl));
@@ -73,4 +74,5 @@
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>
+</div>
 </div>

@@ -5,7 +5,7 @@
    echo $this->Form->Open();
    echo $this->Form->Errors();
 
-   echo '<div>';
+   echo '<div class="P">';
 
    if ($this->Data('EmailConfirmed')) {
       echo T('Your email has been successfully confirmed.');

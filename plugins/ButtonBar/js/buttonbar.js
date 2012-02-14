@@ -267,7 +267,7 @@ jQuery(document).ready(function($) {
          ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
          ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
          ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
-         ButtonBar.BindShortcut(TextArea, 'prompturl', 'ctrl+shift+L');
+         ButtonBar.BindShortcut(TextArea, 'quickurl', 'ctrl+shift+L');
          ButtonBar.BindShortcut(TextArea, 'post', 'tab');
       },
       
@@ -381,7 +381,7 @@ jQuery(document).ready(function($) {
                $(TextArea).insertRoundTag('img',bbcodeOpts);
                break;
 
-            case 'url':
+            case 'quickurl':
                var thisOpts = $.extend(bbcodeOpts,{});
                
                var hasSelection = $(TextArea).hasSelection();
@@ -405,7 +405,7 @@ jQuery(document).ready(function($) {
                $(TextArea).insertRoundTag('spoiler',bbcodeOpts);
                break;
 
-            case 'prompturl':
+            case 'url':
                var thisOpts = $.extend(bbcodeOpts, {});
                
                var NewURL = prompt("Enter your URL:",'http://');
@@ -470,7 +470,7 @@ jQuery(document).ready(function($) {
                $(TextArea).insertRoundTag('img',thisOpts,{src:''});
                break;
 
-            case 'url':
+            case 'quickurl':
                var urlOpts = {};
                var thisOpts = $.extend(htmlOpts, {
                   center: 'href'
@@ -497,7 +497,7 @@ jQuery(document).ready(function($) {
                $(TextArea).insertRoundTag('div',htmlOpts,{'class':'Spoiler'});
                break;
 
-            case 'prompturl':
+            case 'url':
                var urlOpts = {};
                var thisOpts = $.extend(htmlOpts, {});
                
@@ -569,7 +569,7 @@ jQuery(document).ready(function($) {
                $(TextArea).insertRoundTag('',thisOpts);
                break;
 
-            case 'url':
+            case 'quickurl':
                var thisOpts = $.extend(markdownOpts, {
                   opentag:'(',
                   closetag:')'
@@ -605,7 +605,7 @@ jQuery(document).ready(function($) {
                return;
                break;
 
-            case 'prompturl':
+            case 'url':
                var NewURL = prompt("Enter your URL:",'http://');
                var GuessText = NewURL.replace('http://','').replace('www.','');
                

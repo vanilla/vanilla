@@ -33,7 +33,7 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
 ?>
 <div class="Box BoxFilter BoxDiscussionFilter">
    <ul class="PanelInfo">
-      <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Anchor(Sprite('SpDiscussions').T('All Discussions'), 'discussions'); ?></li>
+      <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Theme::Link('forumroot', Sprite('SpDiscussions').T('All Discussions')); ?></li>
       <?php      
       if (C('Vanilla.Categories.ShowTabs')) {
          $CssClass = 'AllCategories';

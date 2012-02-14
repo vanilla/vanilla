@@ -46,7 +46,7 @@ else:
          echo ' <span class="Bullet">•</span> '.Anchor(T('Register'), $Url, 'ApplyButton', array('rel' => 'nofollow')).' ';
    echo '</div>';
       
-   echo '<div class="SignInIcons">';
+   echo ' <div class="SignInIcons">';
    $this->FireEvent('SignInIcons');
    echo '</div>';
    

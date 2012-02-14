@@ -694,7 +694,8 @@ div.Discussion:hover .OptionsTitle:hover,
 	text-decoration: none;
 	padding: 6px;
 }
-.MenuItems li a:hover {
+/* .MenuItems li a:hover { */
+.MenuItems a:hover {
    background: #282828;
 }
 .ToggleFlyout {
@@ -1290,9 +1291,7 @@ body.Profile ul.Activities {
 
 /* ============================================================== MessageList */
 
-.Author .ProfilePhotoMedium {
-   height: 40px;
-   width: 40px;
+.DataList .ProfilePhotoMedium {
    margin: 0 10px 4px 0;
    float: left;
    overflow: hidden;
@@ -1618,12 +1617,16 @@ form.Thumbnail .Warning {
 	position: relative;
    text-align: right; 
 	margin: 0;
-	padding: 6px;
+	/* padding: 6px; */
+	padding: 6px 0;
 }
 .CommentForm .Buttons .Back {
+	float: left;
+	line-height: 2.2;
+	/*
 	left: 6px;
    position: absolute;
-	line-height: 2.2;
+	*/
 }
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,
@@ -1896,7 +1899,7 @@ div.Popup form ul li label.RadioLabel {
 .ItemDiscussion .MItem a {
    font-size: 11px; 
 }
-.ItemDiscussion .Author img {
+.ItemDiscussion .ProfilePhotoMedium {
 	height: 24px;
 	width: 24px;
    margin: 0 5px 5px 0;

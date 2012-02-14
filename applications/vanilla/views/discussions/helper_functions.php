@@ -317,7 +317,6 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
 endif;
 
 if (!function_exists('WriteCheckController')):
-   
 function WriteCheckController() {
    $CanEditDiscussions = Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
    if ($CanEditDiscussions) {

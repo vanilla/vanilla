@@ -133,6 +133,8 @@ div.CommentForm textarea,
 #DiscussionForm textarea {
 	width:98%;
 }
+.DraftButton,
+.PreviewButton,
 input.DraftButton,
 input.PreviewButton {
 	display: none;

@@ -44,7 +44,9 @@ echo '</span>';
          );
          echo $this->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         $AuthenticationUrl = SignInUrl($ReturnUrl);
+         // Must use the "top" url in case the user needs to register, which goes to top.
+         // Javascript will ensure that the target is set properly if they use any in-page popup forms.
+         $AuthenticationUrl = SignInUrl($this->Data('ForeignUrl', $ReturnUrl)); 
          
          if ($AllowSigninPopup) {
             $CssClass = 'SignInPopup Button Stash';

@@ -1,5 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
+if (!function_exists('GetOptions'))
+   include $this->FetchViewLocation('helper_functions', 'categories');
+   
 echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 
 $CatList = '';

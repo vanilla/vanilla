@@ -611,9 +611,8 @@ jQuery(document).ready(function($) {
                
                var CurrentSelectText = GuessText;
                var CurrentSelect = $(TextArea).hasSelection();
-               if (CurrentSelect) {
+               if (CurrentSelect)
                   CurrentSelectText = CurrentSelect.toString();
-               }
                
                var thisOpts = $.extend(markdownOpts, {
                   prefix: '['+CurrentSelectText+']',

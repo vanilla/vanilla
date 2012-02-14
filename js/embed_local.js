@@ -191,7 +191,10 @@ jQuery(document).ready(function($) {
 
          }
       });
-
+      /* Set the target on any in-page sign in forms to the embedded page */
+      $('.SignInPopup [id$=_Target]').livequery(function() {
+         $(this).val(gdn.definition('SelfUrl'));
+      });
    }
    
    var href = window.location.href;

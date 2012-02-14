@@ -140,6 +140,7 @@ $.fn.insertRoundTag = function(tagName, opts, props){
    var prefix = opts.prefix != undefined ? opts.prefix : '';
    var suffix = opts.suffix != undefined ? opts.suffix : '';
    var prepend = opts.prepend != undefined ? opts.prepend : '';
+   var replace = opts.replace != undefined ? opts.replace : false;
    var opener = opts.opener != undefined ? opts.opener : '';
    var closer = opts.closer != undefined ? opts.closer : '';
    var closeslice = opts.closeslice != undefined ? opts.closeslice : '/';
@@ -188,6 +189,10 @@ $.fn.insertRoundTag = function(tagName, opts, props){
       if (selection) {
          strReplace = selection.replace(/\n/g, '\n'+prefix);
       }
+   }
+   
+   if (replace != false) {
+      strReplace = replace;
    }
    
    if (closetype == 'full') {
@@ -402,13 +407,19 @@ jQuery(document).ready(function($) {
 
             case 'prompturl':
                var thisOpts = $.extend(bbcodeOpts, {});
+               
                var NewURL = prompt("Enter your URL:",'http://');
+               var GuessText = NewURL.replace('http://','').replace('www.','');
                thisOpts.shortprop = NewURL;
                
-               var GuessText = NewURL.replace('http://','').replace('www.','');
-               thisOpts.prepend = GuessText;
+               var CurrentSelectText = GuessText;
+               var CurrentSelect = $(TextArea).hasSelection();
+               if (CurrentSelect)
+                  CurrentSelectText = CurrentSelect.toString();
                
-               $(TextArea).insertRoundTag('url',bbcodeOpts,{shortprop:NewURL});
+               thisOpts.replace = CurrentSelectText;
+               
+               $(TextArea).insertRoundTag('url',thisOpts);
                break;
          }
       },
@@ -491,10 +502,16 @@ jQuery(document).ready(function($) {
                var thisOpts = $.extend(htmlOpts, {});
                
                var NewURL = prompt("Enter your URL:",'http://');
+               var GuessText = NewURL.replace('http://','').replace('www.','');
                urlOpts.href = NewURL;
                
-               var GuessText = NewURL.replace('http://','').replace('www.','');
-               thisOpts.prepend = GuessText;
+               var CurrentSelectText = GuessText;
+               
+               var CurrentSelect = $(TextArea).hasSelection();
+               if (CurrentSelect)
+                  CurrentSelectText = CurrentSelect.toString();
+               
+               thisOpts.replace = CurrentSelectText;
                
                $(TextArea).insertRoundTag('a',thisOpts,urlOpts);
                break;
@@ -592,13 +609,19 @@ jQuery(document).ready(function($) {
                var NewURL = prompt("Enter your URL:",'http://');
                var GuessText = NewURL.replace('http://','').replace('www.','');
                
+               var CurrentSelectText = GuessText;
+               var CurrentSelect = $(TextArea).hasSelection();
+               if (CurrentSelect) {
+                  CurrentSelectText = CurrentSelect.toString();
+               }
+               
                var thisOpts = $.extend(markdownOpts, {
-                  prefix: '['+GuessText+']',
+                  prefix: '['+CurrentSelectText+']',
                   opentag:'(',
                   closetag:')',
                   opener:'',
                   closer:'',
-                  prepend: NewURL
+                  replace: NewURL
                });
                $(TextArea).insertRoundTag('',markdownOpts);
                break;

@@ -73,7 +73,7 @@ class EntryController extends Gdn_Controller {
 
       switch (isset($_GET['display'])) {
          case 'popup':
-            $this->MasterView = 'empty';
+            $this->MasterView = 'popup';
             break;
       }
    }
@@ -598,7 +598,7 @@ class EntryController extends Gdn_Controller {
       $Url = Url($this->RedirectTo(), TRUE);
 
       $this->RedirectUrl = $Url;
-      $this->MasterView = 'empty';
+      $this->MasterView = 'popup';
       $this->View = 'redirect';
 
       if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->DeliveryType() != DELIVERY_TYPE_ALL) {

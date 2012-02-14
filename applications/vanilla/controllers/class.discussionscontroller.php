@@ -378,6 +378,8 @@ class DiscussionsController extends VanillaController {
 		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
 		if (!is_array($vanilla_identifier))
 			$vanilla_identifier = array($vanilla_identifier);
+         
+      $vanilla_identifier = array_unique($vanilla_identifier);
 			
 		$CountData = Gdn::SQL()
 			->Select('ForeignID, CountComments')

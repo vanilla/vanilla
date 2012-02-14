@@ -804,7 +804,11 @@ a.Bookmarking:hover {
    padding: 0 0 4px;
    color: #555;
 }
-.MeBox img {
+
+.MeBox, .MeBox-SignIn {
+   margin: 10px 0;
+}
+.MeBox .ProfilePhotoMedium {
 	float: left;	
 }
 .MeBox .WhoIs {

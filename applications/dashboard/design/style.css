@@ -2334,7 +2334,7 @@ body.Entry #Content form {
 }
 body.Entry form ul li label {
 	font-size: 14px;
-	color: #474747;
+	/* color: #474747; */
 	font-weight: bold;
 	padding: 6px 0 0;
 	display: block;
@@ -3155,9 +3155,11 @@ body.embed .Connect h2 {
 	display: none;
 }
 .Embed .MorePager {
-	border-bottom: 1px solid #BEC8CC;
 	padding: 2px 8px 4px;
+/*
+ 	border-bottom: 1px solid #BEC8CC;
 	background: #f2f2f2;
+*/
 }
 /* ============================================================ Regarding */
 

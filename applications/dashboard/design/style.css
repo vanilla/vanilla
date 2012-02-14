@@ -1291,7 +1291,7 @@ body.Profile ul.Activities {
 
 /* ============================================================== MessageList */
 
-.DataList .ProfilePhotoMedium {
+.Author .ProfilePhotoMedium {
    margin: 0 10px 4px 0;
    float: left;
    overflow: hidden;

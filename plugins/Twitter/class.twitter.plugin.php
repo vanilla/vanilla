@@ -114,6 +114,13 @@ class TwitterPlugin extends Gdn_Plugin {
          $Sender->Data['Methods'][] = $TwMethod;
       }
    }
+   
+   public function Base_SignInIcons_Handler($Sender, $Args) {
+      if (!$this->IsConfigured())
+			return;
+			
+		echo "\n".$this->_GetButton();
+	}
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsConfigured())

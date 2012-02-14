@@ -60,7 +60,7 @@ class FacebookPlugin extends Gdn_Plugin {
          $AccessToken = $this->AccessToken();
 
          $ImgSrc = Asset('/plugins/Facebook/design/facebook-login.png');
-         $ImgAlt = T('Login with Facebook');
+         $ImgAlt = T('Sign In with Facebook');
 
 //         if ($AccessToken) {
 //            $SigninHref = $this->RedirectUri();
@@ -81,6 +81,13 @@ class FacebookPlugin extends Gdn_Plugin {
 
          $Sender->Data['Methods'][] = $FbMethod;
       }
+   }
+   
+   public function Base_SignInIcons_Handler($Sender, $Args) {
+      if (!$this->IsConfigured())
+         return;
+		
+		echo "\n".$this->_GetButton();
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
@@ -103,7 +110,7 @@ class FacebookPlugin extends Gdn_Plugin {
 	
 	private function _GetButton() {
       $ImgSrc = Asset('/plugins/Facebook/design/facebook-icon.png');
-      $ImgAlt = T('Login with Facebook');
+      $ImgAlt = T('Sign In with Facebook');
       $SigninHref = $this->AuthorizeUri();
       $PopupSigninHref = $this->AuthorizeUri('display=popup');
       return "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";

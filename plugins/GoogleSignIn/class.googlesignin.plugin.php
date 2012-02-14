@@ -91,6 +91,11 @@ class GoogleSignInPlugin extends Gdn_Plugin {
          $Sender->Data['Methods'][] = $Method;
       }
    }
+   
+   public function Base_SignInIcons_Handler($Sender, $Args) {
+      if (!$this->IsEnabled()) return;
+		echo "\n".$this->_GetButton();
+	}
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsEnabled()) return;

@@ -271,8 +271,8 @@ function GetCommentOptions($Comment) {
    $Sender->EventArguments['Type'] = 'Comment';
    
    // Allow plugins to add options
-	$Sender->EventArguments['CommentOptions'] = &$Options;
-	$Sender->EventArguments['Comment'] = $Comment;
+   $Sender->EventArguments['CommentOptions'] = &$Options;
+   $Sender->EventArguments['Comment'] = $Comment;
    $Sender->FireEvent('CommentOptions');
    
 	return $Options;

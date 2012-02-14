@@ -394,18 +394,10 @@ class DiscussionsController extends VanillaController {
 			foreach ($CountData->Result() as $Row) {
 				$FinalData[$Row->ForeignID] = $Row->CountComments;
 			}
-         // Loop through the data, reducing the comment count by 1 b/c what they really want is a "reply" count.
-         // Also ensure that all of the requested values return a value
+         // Ensure that all of the requested values return a value
          foreach($vanilla_identifier as $id) {
-            if (!array_key_exists($id, $FinalData)) {
+            if (!array_key_exists($id, $FinalData))
                $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
-            } else {
-               $Count = $FinalData[$id];
-               if ($Count > 0)
-                  $Count = $Count - 1; // Reduce the count by 1, but don't go below zero
-                  
-               $FinalData[$id] = $Count;
-            }
          }
 		}
 

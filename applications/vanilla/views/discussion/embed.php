@@ -29,8 +29,9 @@ echo '</span>';
       if (!$AllowSigninPopup)
          $Attributes['target'] = '_parent';
       
+      $ReturnUrl = Gdn::Request()->PathAndQuery();
       if ($Session->IsValid()) {
-         $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl(Gdn::Request()->PathAndQuery());
+         $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
          
          echo Wrap(
             sprintf(
@@ -43,7 +44,7 @@ echo '</span>';
          );
          echo $this->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         $AuthenticationUrl = SignInUrl($this->Data('ForeignUrl', '/'));
+         $AuthenticationUrl = SignInUrl($ReturnUrl);
          
          if ($AllowSigninPopup) {
             $CssClass = 'SignInPopup Button Stash';

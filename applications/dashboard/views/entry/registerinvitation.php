@@ -15,13 +15,13 @@
       <li>
          <?php
             echo $this->Form->Label('Invitation Code', 'InvitationCode');
-            echo $this->Form->TextBox('InvitationCode', array('value' => $this->InvitationCode));
+            echo $this->Form->TextBox('InvitationCode', array('value' => $this->InvitationCode, 'autocorrect' => 'off', 'autocapitalize' => 'off'));
          ?>
       </li>
       <li>
          <?php
             echo $this->Form->Label('Username', 'Name');
-            echo $this->Form->TextBox('Name');
+            echo $this->Form->TextBox('Name', array('autocorrect' => 'off', 'autocapitalize' => 'off'));
             echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.T('Name Unavailable').'</span>';
          ?>
       </li>

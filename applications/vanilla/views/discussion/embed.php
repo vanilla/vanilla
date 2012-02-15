@@ -16,7 +16,7 @@ echo '</span>';
       <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
    </div>
 <?php } else { ?>
-   <h2><?php echo T('Leave Comments'); ?></h2>
+   <h2><?php echo T('Leave a comment'); ?></h2>
    <div class="MessageForm CommentForm EmbedCommentForm">
       <?php
       echo $this->Form->Open();

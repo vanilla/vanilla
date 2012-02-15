@@ -117,6 +117,12 @@ var vanilla_identifier = 'your-content-identifier'; // Required: your unique ide
 
    <pre>&lt;script type="text/javascript">
 var vanilla_forum_url = '<?php echo Url('/', TRUE); ?>'; // Required: the full http url & path to your vanilla forum
+
+/* Optional - You can optionally specify the format of the comment counts. Html is allowed. */
+// var vanilla_comments_none = 'No Comments';
+// var vanilla_comments_singular = '1 Comment';
+// var vanilla_comments_plural = '{num} Comments';
+
 /*** DON'T EDIT BELOW THIS LINE ***/
 (function() {
    var timestamp = new Date().getTime();

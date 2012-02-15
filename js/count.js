@@ -38,6 +38,15 @@ function vanilla_assign_comment_counts(data) {
 }
 
 function vanilla_assign_comment_counts_by_tag(data, tagName) {
+   if (typeof vanilla_comments_none =="undefined")
+      vanilla_comments_none = 'No Comments';
+
+   if (typeof vanilla_comments_singular =="undefined")
+      vanilla_comments_singular = '1 Comment';
+
+   if (typeof vanilla_comments_plural =="undefined")
+      vanilla_comments_plural = '{num} Comments';
+
    var tags = document.getElementsByTagName(tagName);
    for (i = 0; i < tags.length; i++) {
       for (j = 0; j < tags[i].attributes.length; j++) {
@@ -48,9 +57,10 @@ function vanilla_assign_comment_counts_by_tag(data, tagName) {
                count = 0;
                
             if (count == 0)
-               tags[i].innerHTML = 'No Comments';
-            else
-               tags[i].innerHTML = ((count == 1) ? '1 Comment' : count + ' Comments');
+               tags[i].innerHTML = vanilla_comments_none.replace('{num}', count);
+            else {
+               tags[i].innerHTML = ((count == 1) ? vanilla_comments_singular.replace('{num}', count) : vanilla_comments_plural.replace('{num}', count));
+            }
                
             // Add our hashtag to the href so we jump to comments
             var anchorNode = tagName == 'a' ? tags[i] : tags[i].parentNode;

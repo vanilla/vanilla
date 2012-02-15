@@ -184,7 +184,9 @@ class LogModel extends Gdn_Pluggable {
 
       // Deserialize the data.
       foreach ($Result as &$Row) {
-         $Row['Data'] = unserialize($Row['Data']);
+         $Row['Data'] = @unserialize($Row['Data']);
+         if (!$Row['Data'])
+            $Row['Data'] = array();
       }
 
       return $Result;

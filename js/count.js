@@ -53,9 +53,10 @@ function vanilla_assign_comment_counts_by_tag(data, tagName) {
                tags[i].innerHTML = ((count == 1) ? '1 Comment' : count + ' Comments');
                
             // Add our hashtag to the href so we jump to comments
-            if (tagName == 'a') {
-               var href = tags[i].parentNode.href.split('#')[0];
-               tags[i].parentNode.href = href+'#vanilla-comments';
+            var anchorNode = tagName == 'a' ? tags[i] : tags[i].parentNode;
+            if (anchorNode.href) {
+               var href = anchorNode.href.split('#')[0];
+               anchorNode.href = href+'#vanilla-comments';
             }
          }
       }

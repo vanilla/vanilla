@@ -942,7 +942,11 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                      break;
                   }
                   
-                  $User = Gdn::UserModel()->GetID($Value[$i]);
+                  $ID = $Value[$i];
+                  if (is_array($ID)) {
+                     continue;
+                  }
+                  $User = Gdn::UserModel()->GetID($ID);
                   $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
                   
                   if ($i == $Count - 1)

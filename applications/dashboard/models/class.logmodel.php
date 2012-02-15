@@ -156,7 +156,9 @@ class LogModel extends Gdn_Pluggable {
          ->WhereIn('LogID', $IDs)
          ->Get()->ResultArray();
       foreach ($Logs as &$Log) {
-         $Log['Data'] = unserialize($Log['Data']);
+         $Log['Data'] = @unserialize($Log['Data']);
+         if (!is_array($Log['Data']))
+            $Log['Data'] = array();
       }
 
       return $Logs;
@@ -184,7 +186,9 @@ class LogModel extends Gdn_Pluggable {
 
       // Deserialize the data.
       foreach ($Result as &$Row) {
-         $Row['Data'] = unserialize($Row['Data']);
+         $Row['Data'] = @unserialize($Row['Data']);
+         if (!$Row['Data'])
+            $Row['Data'] = array();
       }
 
       return $Result;

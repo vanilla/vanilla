@@ -40,11 +40,11 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       endif;
 
       if ($this->User->InviteUserID > 0) {
-         $Inviter = new stdClass();
-         $Inviter->UserID = $this->User->InviteUserID;
-         $Inviter->Name = $this->User->InviteName;
-         echo '<dt class="Invited">'.T('Invited by').'</dt>
-         <dd class="Invited">'.UserAnchor($Inviter).'</dd>';
+         $Inviter = Gdn::UserModel()->GetID($this->User->InviteUserID);
+         if ($Inviter) {
+            echo '<dt class="Invited">'.T('Invited by').'</dt>
+            <dd class="Invited">'.UserAnchor($Inviter).'</dd>';
+         }
       }
       $this->FireEvent('OnBasicInfo');
       ?>

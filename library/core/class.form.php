@@ -1310,7 +1310,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // Add error class to input element
       if ($ShowErrors) $this->AddErrorClass($Attributes);
       
-      $Return = $MultiLine === TRUE ? '<textarea' : '<input type="text"';
+      $Return = $MultiLine === TRUE ? '<textarea' : '<input type="'.GetValue('type', $Attributes, 'text').'"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       $Return .= $this->_NameAttribute($FieldName, $Attributes);
       $Return .= $MultiLine === TRUE ? '' : $this->_ValueAttribute($FieldName, $Attributes);

@@ -76,7 +76,7 @@ foreach ($this->Data('Categories')->Result() as $Category) {
          $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
       } else if ($DoHeadings && $Category->Depth == 1) {
          
-         $CatList .= '<div class="CategoryGroup">'.
+         $CatList .= '<div id="CategoryGroup-'.$Category->UrlCode.'" class="CategoryGroup">'.
             '<h2>'.$Category->Name.'</h2>'.
             $TableOpen;
          

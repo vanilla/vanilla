@@ -14,14 +14,14 @@
       <li>
          <?php
             echo $this->Form->Label('Email', 'Email');
-            echo $this->Form->TextBox('Email');
+            echo $this->Form->TextBox('Email', array('type' => 'email'));
             echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">'.T('Email Unavailable').'</span>';
          ?>
       </li>
       <li>
          <?php
             echo $this->Form->Label('Username', 'Name');
-            echo $this->Form->TextBox('Name');
+            echo $this->Form->TextBox('Name', array('autocorrect' => 'off', 'autocapitalize' => 'off'));
             echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.T('Name Unavailable').'</span>';
          ?>
       </li>

@@ -338,8 +338,11 @@ class Gdn_Session {
 
             // If the user hasn't been active in the session-time, update their date last active
             $SessionLength = Gdn::Config('Garden.Session.Length', '15 minutes');
-            if (Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago')) {
-               $UserModel->Save(array('UserID' => $this->UserID, 'DateLastActive' => Gdn_Format::ToDateTime()));
+            $IPAddress = Gdn::Request()->IpAddress();
+            if ($this->User->LastIPAddress != $IPAddress || Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago')) {
+               $UserModel->SetField($this->UserID,
+                  array('DateLastActive' => Gdn_Format::ToDateTime(), 
+                      'LastIPAddress' => $IPAddress));
             }
 
          } else {

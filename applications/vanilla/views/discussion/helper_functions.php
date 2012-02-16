@@ -331,16 +331,22 @@ function WriteCommentForm() {
 		?>
 		<div class="Foot Closed">
 			<div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
-			<?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
+			<?php //echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
 		</div>
 		<?php
 	} else if (!$UserCanComment) {
+      if (!Gdn::Session()->IsValid()) {
 		?>
 		<div class="Foot Closed">
-			<div class="Note Closed"><?php echo T('You do not have permission to comment on this discussion.'); ?></div>
-			<?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
+			<div class="Note Closed"><?php 
+            echo FormatString(
+               T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}">Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'), 
+               array('SignInUrl' => SignInUrl(Url('')), 
+                     'RegisterUrl' => RegisterUrl(Url('')))); ?></div>
+			<?php //echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
 		</div>
 		<?php
+      }
 	}
 	if (($Discussion->Closed == '1' && $UserCanClose) || $UserCanComment)
 		echo $Controller->FetchView('comment', 'post');

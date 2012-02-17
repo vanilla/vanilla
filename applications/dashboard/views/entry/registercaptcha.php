@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<div class="FormTitleWrapper">
 <h1><?php echo T("Apply for Membership") ?></h1>
-<div class="Box">
+<div class="FormWrapper">
    <?php
    $TermsOfServiceUrl = Gdn::Config('Garden.TermsOfService', '#');
    $TermsOfServiceText = sprintf(T('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), Url($TermsOfServiceUrl));
@@ -17,14 +18,14 @@
       <li>
          <?php
             echo $this->Form->Label('Email', 'Email');
-            echo $this->Form->TextBox('Email');
+            echo $this->Form->TextBox('Email', array('type' => 'email'));
 				echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">'.T('Email Unavailable').'</span>';
          ?>
       </li>
       <li>
          <?php
             echo $this->Form->Label('Username', 'Name');
-            echo $this->Form->TextBox('Name');
+            echo $this->Form->TextBox('Name', array('autocorrect' => 'off', 'autocapitalize' => 'off'));
             echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.T('Name Unavailable').'</span>';
          ?>
       </li>
@@ -73,4 +74,5 @@
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>
+</div>
 </div>

@@ -245,7 +245,10 @@ class Gdn_Theme {
    public static function Module($Name) {
       try {
          if (!class_exists($Name)) {
-            $Result = "Error: $Name doesn't exist";
+            if (Debug())
+               $Result = "Error: $Name doesn't exist";
+            else
+               $Result = "<!-- Error: $Name doesn't exist -->";
          } else {
                $Module = new $Name(Gdn::Controller(), '');
                $Result = $Module->ToString();

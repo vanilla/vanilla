@@ -1291,7 +1291,7 @@ body.Profile ul.Activities {
 
 /* ============================================================== MessageList */
 
-.DataList .ProfilePhotoMedium {
+.Author .ProfilePhotoMedium {
    margin: 0 10px 4px 0;
    float: left;
    overflow: hidden;
@@ -1607,11 +1607,6 @@ form.Thumbnail .Warning {
 
 
 /* ================================================= CommentForm */
-.CommentForm form {
-	padding: 5px;
-	background: #f7f7f7;
-	background: rgba(0, 0, 0, 0.03);
-}
 .Preview {
 	background: #fff;
    color: #000;
@@ -2090,13 +2085,16 @@ body.Vanilla.Post #Content {
    padding: 6px;
 }
 */
-#ConversationForm form,
-#DiscussionForm form {
+.FormWrapper {
 	background: #f7f7f7;
    background: rgba(0, 0, 0, 0.03);
    margin: 0;
-   padding: 13px 20px 20px;
+   padding: 13px 20px;
 }
+.FormWrapper-Condensed {
+   padding: 5px;
+}
+
 #DiscussionForm textarea {
    width: 100%;
    height: 100px;
@@ -2514,20 +2512,18 @@ body#dashboard_entry_leave p.Leaving {
 }
 
 /* External App Connect Designs */
-.Connect h1,
+/*.Connect h1,
 .Connect h2 {
 	text-align: left;
 }
 .ConnectInfo {
-	margin: 10px 0 0;
+	margin: 10px 0;
 	position: relative;
 }
 .ConnectInfo img {
-	position: absolute;
-	height: 36px;
-	width: 36px;
-	top: 0;
-	left: 0;
+   float: left;
+	height: 40px;
+	width: 40px;
 }
 .ConnectInfo span.Name {
 	padding-left: 46px;
@@ -2536,8 +2532,8 @@ body#dashboard_entry_leave p.Leaving {
 	font-size: 13px;
 	color: #444;
 	display: block;
-}
-.ConnectInfo h3 {
+}*/
+/*.ConnectInfo h3 {
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 15px;
 	font-weight: bold;
@@ -2545,7 +2541,7 @@ body#dashboard_entry_leave p.Leaving {
 	color: #333;
 	padding: 0 0 10px 46px;
 	border: none;
-}
+}*/
 /*.Connect form ul li label,
 .SignInPopup form ul li label,
 body#dashboard_entry_password form ul li label,
@@ -2559,8 +2555,7 @@ body#dashboard_entry_index form ul li label {
 .SignInPopup form ul li#ConnectPassword label {
 	padding: 10px 0 0;
 }
-.Connect .FinePrint,
-.SignInPopup .FinePrint {
+.FinePrint {
 	font-size: 11px;
 	color: #777;
 }
@@ -2571,14 +2566,14 @@ body#dashboard_entry_index input.InputBox,
 .SignInPopup input.InputBox {
 	padding: 3px
 }
-.Connect .ExistingUsername,
+/*.Connect .ExistingUsername,
 .SignInPopup .ExistingUsername {
 	font-weight: bold;
 	line-height: 1;
 	font-size: 13px;
 	color: #000;
 	display: block;
-}
+}*/
 
 
 /* Do not customize these unless you enjoy pain. */
@@ -3235,7 +3230,6 @@ body.embed .Connect h2 {
    width: 40px;
 }
 .ProfilePhotoLarge {
-	height: 200px;
 	width: 200px;
 }
 .PhotoGrid {

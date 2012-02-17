@@ -284,7 +284,9 @@ class UserModel extends Gdn_Model {
       $UserIDs = array();
       foreach ($Data as $Row) {
          foreach ($Columns as $ColumnName) {
-            $UserIDs[GetValue($ColumnName, $Row)] = 1;
+            $ID = GetValue($ColumnName, $Row);
+            if (is_numeric($ID))
+               $UserIDs[$ID] = 1;
          }
       }
       
@@ -304,7 +306,7 @@ class UserModel extends Gdn_Model {
       foreach ($Data as &$Row) {
          foreach ($Prefixes as $Px) {
             $ID = GetValue($Px.'UserID', $Row);
-            if ($ID) {
+            if (is_numeric($ID)) {
                $User = GetValue($ID, $Users, FALSE);
                foreach ($Join as $Column) {
                   $Value = $User[$Column];

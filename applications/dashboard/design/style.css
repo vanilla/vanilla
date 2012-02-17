@@ -179,7 +179,8 @@ textarea.TextBox {
 	width: auto;
 	padding-right: 8px;
 }
-.TextBoxWrapper textarea {
+.TextBoxWrapper textarea,
+.TextBoxWrapper input {
    width: 100%;
 }
 #Popup textarea.TextBox {

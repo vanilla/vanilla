@@ -802,29 +802,30 @@ a.Bookmarking:hover {
    margin-left: 80px;
 }
 
-.MeBox, .MeBox-SignIn {
+.MeBox {
    margin: 10px 0;
 }
 .MeBox .ProfilePhotoMedium {
-	float: left;	
+	float: left;
+   margin-right: 5px;
 }
 .MeBox .WhoIs {
 	min-height: 40px;
-	margin-left: 48px;
 	line-height: 1.3;
 }
 .MeBox .Username {
 	font-weight: bold;
 	vertical-align: top;
+   font-size: 14px;
 }
 .MeMenu {
-   display: block;
+   line-height: 24px;
 }
 .MeMenu a {
-	float: left;
 	padding: 4px 6px;
 	position: relative;
 	line-height: 1;
+   display: inline-block;
 }
 .MeMenu a:hover {
 	background: #eee;

@@ -81,7 +81,7 @@ class DiscussionController extends VanillaController {
       // Setup
       $this->Title($this->Discussion->Name);
 
-      // Actual number of comments, excluding the discussion itself
+      // Actual number of comments, excluding the discussion itself.
       $ActualResponses = $this->Discussion->CountComments - 1;
 
       // If $Offset isn't defined, assume that the user has not clicked to
@@ -794,6 +794,11 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       
       $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
       
+      if (count($this->CommentModel->Where()) > 0)
+         $ActualResponses = FALSE;
+      
+      $this->SetData('_Count', $ActualResponses);
+      
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
 		$this->EventArguments['PagerType'] = 'MorePager';
@@ -807,6 +812,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $ActualResponses,
          'discussion/embed/'.$this->Discussion->DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s'
       );
+      $this->Pager->CurrentRecords = $this->CommentData->NumRows();
       $this->FireEvent('AfterBuildPager');
       
       // Define the form for the comment input

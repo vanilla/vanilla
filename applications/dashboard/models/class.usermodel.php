@@ -2646,6 +2646,7 @@ class UserModel extends Gdn_Model {
             if (strpos($IP, '.') !== FALSE)
                $IP = dechex(ip2long($IP));
          }
+         $Property['AllIPAddresses'] = implode(',', $Property['AllIPAddresses']);
       }
       
 		$this->SQL

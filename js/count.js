@@ -10,7 +10,7 @@
       var timestamp = new Date().getTime();
 
       vanilla_count_script.src = vanilla_forum_url + '/discussions/getcommentcounts.json'
-         +'?time='+timestamp
+         // +'?time='+timestamp
          +'&callback=vanilla_assign_comment_counts'
          +'&vanilla_identifier[]='
          +identifiers.join('&vanilla_identifier[]=');

@@ -1525,7 +1525,6 @@ table.PreferenceGroup tbody td.PrefCheckBox {
 /* About in content area */
 dl.About dt,
 dl.About dd {
-   color: #666;
    padding: 0;
    margin: 0;
    float: none;
@@ -1534,6 +1533,7 @@ dl.About dd {
    display: inline;
 }
 dl.About dt {
+   color: #666;
    background: url('images/profile-sprites.png') 2px -139px no-repeat transparent;
    padding-left: 14px;
 }
@@ -1545,7 +1545,6 @@ dl.About dt.Roles { background-position: 1px -81px; }
 dl.About dt.Posts { background-position: 0 -113px; }
 dl.About dd {
    padding: 0 8px 0 0;
-   color: #333;
 }
 /* ======================================================== Thumbnail Cropper */
 .Popup .CurrentPicture {

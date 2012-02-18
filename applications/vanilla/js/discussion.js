@@ -71,8 +71,9 @@ jQuery(document).ready(function($) {
       postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       postValues += '&Type='+type;
       var discussionID = $(frm).find('[name$=DiscussionID]');
-      var prefix = discussionID.attr('name').replace('DiscussionID', '');
-      discussionID = discussionID.val();
+      discussionID = discussionID.length > 0 ? discussionID.val() : 0;
+      var tKey = $(frm).find('[name$=TransientKey]');
+      var prefix = tKey.attr('name').replace('TransientKey', '');
       // Get the last comment id on the page
       var comments = $('ul.Comments li.ItemComment');
       var lastComment = $(comments).get(comments.length-1);
@@ -83,7 +84,10 @@ jQuery(document).ready(function($) {
          lastCommentID = 0;
          
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
-      var action = $(frm).attr('action') + '/' + discussionID;
+      var action = $(frm).attr('action');
+      if (discussionID > 0)
+         action += '/' + discussionID;
+      
       $(frm).find(':submit').attr('disabled', 'disabled');
       $(parent).find('a.Back').after('<span class="TinyProgress">&#160;</span>');
       // Also add a spinner for comments being edited
@@ -184,6 +188,12 @@ jQuery(document).ready(function($) {
                // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)
                if (gdn.definition('PrependNewComments') != '1') // If prepending the latest comment, don't remove the pager.
                   $('#PagerMore').remove();
+               
+               // Set the discussionid on the form in case the discussion was created by adding the last comment
+               var discussionID = $(frm).find('[name$=DiscussionID]');
+               if (discussionID.length == 0 && json.DiscussionID) {
+                  $(frm).append('<input type="hidden" name="'+prefix+'DiscussionID" value="'+json.DiscussionID+'">');
+               }
 
                // Let listeners know that the comment was added.
                $(document).trigger('CommentAdded');

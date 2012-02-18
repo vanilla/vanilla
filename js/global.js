@@ -920,10 +920,12 @@ jQuery(document).ready(function($) {
 	
 	// When a stash anchor is clicked, look for inputs with values to stash
 	$('a.Stash').click(function() {
-		var comment = $('#Form_Comment textarea').val();
-		var placeholder = $('#Form_Comment textarea').attr('placeholder');
-		if (comment != '' && comment != placeholder)
-			stash('CommentForDiscussionID_' + gdn.definition('DiscussionID'), comment);
+      // Embedded comments
+		var comment = $('#Form_Comment textarea').val(),
+         placeholder = $('#Form_Comment textarea').attr('placeholder'),
+         vanilla_identifier = gdn.definition('vanilla_identifier');
+		if (vanilla_identifier && comment != '' && comment != placeholder)
+			stash('CommentForForeignID_' + vanilla_identifier, comment);
 	});
 });
 

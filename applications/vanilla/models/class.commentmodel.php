@@ -29,6 +29,8 @@ class CommentModel extends VanillaModel {
     */
    protected $_OrderBy = array(array('c.DateInserted', ''));
    
+   protected $_Where = array();
+   
    /**
     * Class constructor. Defines the related database table name.
     * 
@@ -41,7 +43,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
-      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return;
       
       if (count($Result) == 0)
@@ -136,6 +138,7 @@ class CommentModel extends VanillaModel {
       }
       
       $this->OrderBy($this->SQL);
+      $this->Where($this->SQL);
 
       $Result = $this->SQL->Get();
       
@@ -230,7 +233,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function PageWhere($DiscussionID, $Page, $Limit) {
-      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return FALSE;
       
       if ($Limit != C('Vanilla.Comments.PerPage', 30)) {
@@ -383,6 +386,11 @@ class CommentModel extends VanillaModel {
 	 */
    public function GetCount($DiscussionID) {
       $this->FireEvent('BeforeGetCount');
+      
+      if (!empty($this->_Where)) {
+         return FALSE;
+      }
+      
       return $this->SQL->Select('CommentID', 'count', 'CountComments')
          ->From('Comment')
          ->Where('DiscussionID', $DiscussionID)
@@ -1024,5 +1032,17 @@ class CommentModel extends VanillaModel {
       // Clear the page cache.
       $this->RemovePageCache($Comment['DiscussionID']);
       return TRUE;
+   }
+   
+   public function Where($Value = NULL) {
+      if ($Value === NULL)
+         return $this->_Where;
+      elseif (!$Value)
+         $this->_Where = array();
+      elseif (is_a($Value, 'Gdn_SQLDriver')) {
+         if (!empty($this->_Where))
+            $Value->Where($this->_Where);
+      } else
+         $this->_Where = $Value;
    }
 }

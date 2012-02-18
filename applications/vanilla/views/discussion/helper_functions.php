@@ -348,6 +348,7 @@ function WriteCommentForm() {
 		<?php
       }
 	}
-	if (($Discussion->Closed == '1' && $UserCanClose) || $UserCanComment)
+   
+	if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
 		echo $Controller->FetchView('comment', 'post');
 }

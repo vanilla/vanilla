@@ -100,7 +100,7 @@ class PostController extends VanillaController {
       
       // Check permission 
       if (isset($this->Discussion)) {
-         $Foo = 'bar';
+         
          // Permission to edit
          if ($this->Discussion->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
@@ -109,6 +109,10 @@ class PostController extends VanillaController {
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
          $CanEdit = $EditContentTimeout == -1 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout > time();
          if (!$CanEdit)
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
+         
+         // Make sure only moderators can edit closed things
+         if ($this->Discussion->Closed)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
 
          $this->Title(T('Edit Discussion'));
@@ -415,6 +419,10 @@ class PostController extends VanillaController {
          if (!$CanEdit)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
+         // Make sure only moderators can edit closed things
+         if ($Discussion->Closed)
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
+         
       } else if ($Discussion) {
          // Permission to add
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);

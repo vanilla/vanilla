@@ -92,8 +92,6 @@ var vanilla_identifier = 'your-content-identifier'; // Required: your unique ide
 
 /* Optional */
 // var vanilla_url = 'http://yourdomain.com/page-with-comments.html'; // Not required: the full http url & path of the page where this script is embedded.
-// var vanilla_name = 'Title of Page with Comments'; // Not required. We will attempt to crawl the page for this information.
-// var vanilla_body = ''; // Not required. We will attempt to crawl the page for this information.
 // var vanilla_discussion_id = ''; // Not required. You can define this value if you want the comments attached to a particular discussion.
 // var vanilla_category_id = ''; // Not required. You can define this value if you want the discussions generated to be placed in a specific category.
 
@@ -121,7 +119,7 @@ var vanilla_forum_url = '<?php echo Url('/', TRUE); ?>'; // Required: the full h
 /* Optional - You can optionally specify the format of the comment counts. Html is allowed. */
 // var vanilla_comments_none = 'No Comments';
 // var vanilla_comments_singular = '1 Comment';
-// var vanilla_comments_plural = '{num} Comments';
+// var vanilla_comments_plural = '[num] Comments';
 
 /*** DON'T EDIT BELOW THIS LINE ***/
 (function() {

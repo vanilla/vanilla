@@ -123,10 +123,9 @@ var vanilla_forum_url = '<?php echo Url('/', TRUE); ?>'; // Required: the full h
 
 /*** DON'T EDIT BELOW THIS LINE ***/
 (function() {
-   var timestamp = new Date().getTime();
    var vanilla_count = document.createElement('script');
    vanilla_count.type = 'text/javascript';
-   vanilla_count.src = vanilla_forum_url + '/js/count.js?time='+timestamp;
+   vanilla_count.src = vanilla_forum_url + '/js/count.js';
    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_count);
 })();
 &lt;/script>

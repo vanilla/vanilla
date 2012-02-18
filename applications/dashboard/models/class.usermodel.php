@@ -2642,10 +2642,10 @@ class UserModel extends Gdn_Model {
 
       // Convert IP addresses to long.
       if (isset($Property['AllIPAddresses'])) {
-         foreach ($Property['AllIPAddresses'] as &$IP) {
-            if (strpos($IP, '.') !== FALSE)
-               $IP = dechex(ip2long($IP));
-         }
+//         foreach ($Property['AllIPAddresses'] as &$IP) {
+//            if (strpos($IP, '.') !== FALSE)
+//               $IP = dechex(ip2long($IP));
+//         }
          $Property['AllIPAddresses'] = implode(',', $Property['AllIPAddresses']);
       }
       

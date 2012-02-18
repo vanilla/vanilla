@@ -83,6 +83,8 @@ class HTMLawedPlugin extends Gdn_Plugin {
 if (!function_exists('FormatRssCustom')):
    
 function FormatRssHtmlCustom($Html) {
+   require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
+   
    $Config = array(
        'anti_link_spam' => array('`.`', ''),
        'comment' => 1,

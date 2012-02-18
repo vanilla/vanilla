@@ -199,13 +199,14 @@ class Gdn_Session {
       
       $Current = $this->GetCookie('-Vv');
       $Now = time();
-      $Expires = $Now + 1200; // 20 minutes.
+      $TimeToExpire = 1200; // 20 minutes
+      $Expires = $Now + $TimeToExpire;
       
       // Figure out if this is a new visit.
       if ($Current)
-         $NewVisit = FALSE;
-      elseif (Gdn_Format::ToTimeStamp($this->User->DateLastActive) + 1200 > $Expires)
-         $NewVisit = FALSE;
+         $NewVisit = FALSE; // user has cookie, not a new visit.
+      elseif (Gdn_Format::ToTimeStamp($this->User->DateLastActive) + $TimeToExpire > $Now)
+         $NewVisit = FALSE; // user was last active less than 20 minutes ago, not a new visit.
       else
          $NewVisit = TRUE;
       
@@ -318,12 +319,6 @@ class Gdn_Session {
             if ($SetIdentity) {
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
             }
-
-            $Returning = !$this->NewVisit();
-            if ($Returning) {
-               $HourOffset = GetValue('HourOffset', $this->User->Attributes);
-               $UserModel->UpdateLastVisit($this->UserID, $this->User->Attributes, $HourOffset);
-            }
             
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');
@@ -335,15 +330,9 @@ class Gdn_Session {
 
             if ($this->_TransientKey === FALSE)
                $this->_TransientKey = $UserModel->SetTransientKey($this->UserID);
-
-            // If the user hasn't been active in the session-time, update their date last active
-            $SessionLength = Gdn::Config('Garden.Session.Length', '15 minutes');
-            $IPAddress = Gdn::Request()->IpAddress();
-            if ($this->User->LastIPAddress != $IPAddress || Gdn_Format::ToTimestamp($this->User->DateLastActive) < strtotime($SessionLength.' ago')) {
-               $UserModel->SetField($this->UserID,
-                  array('DateLastActive' => Gdn_Format::ToDateTime(), 
-                      'LastIPAddress' => $IPAddress));
-            }
+            
+            // Save any visit-level information.
+            $UserModel->UpdateVisit($this->UserID);
 
          } else {
             $this->UserID = 0;

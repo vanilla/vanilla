@@ -80,7 +80,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             $this->SetIdentity($UserID, $PersistentSession);
 
             // Update some information about the user...
-            $UserModel->UpdateLastVisit($UserID, $UserData->Attributes, $ClientHour);
+            $UserModel->UpdateVisit($UserID, $ClientHour);
             
             Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_SUCCESS);
             $this->FireEvent('Authenticated');

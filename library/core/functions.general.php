@@ -734,10 +734,12 @@ if (!function_exists('FetchPageInfo')) {
          }
          
          // Final: Still nothing? remove limitations
-         foreach($Dom->find('p') as $element) {
-            if (trim($element->plaintext) != '') {
-               $PageInfo['Description'] = $element->plaintext;
-               break;
+         if ($PageInfo['Description'] == '') {
+            foreach($Dom->find('p') as $element) {
+               if (trim($element->plaintext) != '') {
+                  $PageInfo['Description'] = $element->plaintext;
+                  break;
+               }
             }
          }
             

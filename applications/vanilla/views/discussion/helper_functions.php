@@ -264,7 +264,8 @@ function GetCommentOptions($Comment) {
 		$Options['EditComment'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
 
 	// Can the user delete the comment?
-	if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
+	// if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
+   if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
 		$Options['DeleteComment'] = array('Label' => T('Delete'), 'Url' => 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
    
    // DEPRECATED (as of 2.1)
@@ -304,11 +305,16 @@ function WriteCommentOptions($Comment) {
    </span>
    <?php
    if (C('Vanilla.AdminCheckboxes.Use')) {
-      if (!property_exists($Controller, 'CheckedComments'))
-         $Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
+      // Only show the checkbox if the user has permission to affect multiple items
+      $Discussion = Gdn::Controller()->Data('Discussion');
+      $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion);
+      if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID)) {
+         if (!property_exists($Controller, 'CheckedComments'))
+            $Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
 
-      $ItemSelected = InSubArray($Id, $Controller->CheckedComments);
-      echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+         $ItemSelected = InSubArray($Id, $Controller->CheckedComments);
+         echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+      }
    }
 }
 

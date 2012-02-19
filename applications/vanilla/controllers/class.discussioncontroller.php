@@ -794,22 +794,4 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
    }
-   
-   /*
-    Used for debugging FetchPageInfo() (used above when creating a discussion for embedded comments).
-   */
-   public function FetchPage() {
-      if (!C('Debug'))
-         return;
-      
-      $Url = GetIncomingValue('Url', 'http://markosullivan.ca');
-      $PageInfo = FetchPageInfo($Url);
-      if (GetValue('Exception', $PageInfo)) {
-         echo $PageInfo['Exception']->getMessage();
-      } else {
-         decho($PageInfo);
-      }
-         
-      die();
-   }
 }

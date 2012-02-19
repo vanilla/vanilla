@@ -748,7 +748,7 @@ if (!function_exists('FetchPageInfo')) {
             $PageInfo['Images'] = DomGetImages($Dom, $Url);
 
       } catch (Exception $ex) {
-         $PageInfo['Exception'] = $ex;
+         $PageInfo['Exception'] = $ex->getMessage();
       }
       return $PageInfo;
    }

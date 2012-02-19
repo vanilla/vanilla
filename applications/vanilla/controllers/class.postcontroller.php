@@ -359,7 +359,7 @@ class PostController extends VanillaController {
                'Type' => $vanilla_type,
                'Name' => $Title,
                'Body' => $Body,
-               'Format' => C('Garden.InputFormatter', 'Html'),
+               'Format' => 'Html',
                'Attributes' => serialize(array('ForeignUrl' => $vanilla_url))
             )
          );

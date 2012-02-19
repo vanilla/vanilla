@@ -734,10 +734,12 @@ if (!function_exists('FetchPageInfo')) {
          }
          
          // Final: Still nothing? remove limitations
-         foreach($Dom->find('p') as $element) {
-            if (trim($element->plaintext) != '') {
-               $PageInfo['Description'] = $element->plaintext;
-               break;
+         if ($PageInfo['Description'] == '') {
+            foreach($Dom->find('p') as $element) {
+               if (trim($element->plaintext) != '') {
+                  $PageInfo['Description'] = $element->plaintext;
+                  break;
+               }
             }
          }
             
@@ -746,7 +748,7 @@ if (!function_exists('FetchPageInfo')) {
             $PageInfo['Images'] = DomGetImages($Dom, $Url);
 
       } catch (Exception $ex) {
-         $PageInfo['Exception'] = $ex;
+         $PageInfo['Exception'] = $ex->getMessage();
       }
       return $PageInfo;
    }

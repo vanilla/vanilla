@@ -29,8 +29,9 @@ echo '</span>';
       
       $AllowSigninPopup = C('Garden.SignIn.Popup');
       $Attributes = array('tabindex' => '-1');
-      if (!$AllowSigninPopup)
-         $Attributes['target'] = '_parent';
+// Don't force to top!
+//      if (!$AllowSigninPopup)
+//         $Attributes['target'] = '_parent';
       
       $ReturnUrl = Gdn::Request()->PathAndQuery();
       if ($Session->IsValid()) {

@@ -178,6 +178,39 @@ class LogController extends DashboardController {
    }
    
    /**
+    * Access the log history of a specific record
+    * 
+    * @param string $RecordType
+    * @param int $RecordID 
+    */
+   public function Record($RecordType, $RecordID, $Page = '') {
+      $this->Permission('Garden.Moderation.Manage');
+      list($Offset, $Limit) = OffsetLimit($Page, 10);
+      $this->SetData('Title', T('Change Log'));
+
+      $RecordType = ucfirst($RecordType);
+      $Where = array(
+         'Operation'    => array('Edit', 'Delete', 'Ban'),
+         'RecordType'   => $RecordType,
+         'RecordID'     => $RecordID
+      );
+      
+      $RecordCount = $this->LogModel->GetCountWhere($Where);
+      $this->SetData('RecordCount', $RecordCount);
+      if ($Offset >= $RecordCount)
+         $Offset = $RecordCount - $Limit;
+
+      $Log = $this->LogModel->GetWhere($Where, 'LogID', 'Desc', $Offset, $Limit);
+      $this->SetData('Log', $Log);
+
+      if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
+         $this->View = 'Table';
+      
+      $this->AddSideMenu('dashboard/log/edits');
+      $this->Render();
+   }
+   
+   /**
     * Convenience method to call model's FormatContent.
     *
     * @since 2.0.?

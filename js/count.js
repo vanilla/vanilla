@@ -57,9 +57,9 @@ function vanilla_assign_comment_counts_by_tag(data, tagName) {
                count = 0;
                
             if (count == 0)
-               tags[i].innerHTML = vanilla_comments_none.replace('{num}', count);
+               tags[i].innerHTML = vanilla_comments_none.replace('{num}', count).replace('[num]', count);
             else {
-               tags[i].innerHTML = ((count == 1) ? vanilla_comments_singular.replace('{num}', count) : vanilla_comments_plural.replace('{num}', count));
+               tags[i].innerHTML = ((count == 1) ? vanilla_comments_singular.replace('{num}', count).replace('[num]', count) : vanilla_comments_plural.replace('{num}', count).replace('[num]', count));
             }
                
             // Add our hashtag to the href so we jump to comments

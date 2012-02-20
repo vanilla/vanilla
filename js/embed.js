@@ -164,12 +164,8 @@ window.vanilla.embed = function(host) {
       var foreign_type = typeof(vanilla_type) == 'undefined' ? 'page' : vanilla_type;
       // If embedding comments, should the newly created discussion be placed in a specific category?
       var category_id = typeof(vanilla_category_id) == 'undefined' ? '' : vanilla_category_id;
-      // If embedding comments, this value will be used as the newly created discussion title.
-      var foreign_name = typeof(vanilla_name) == 'undefined' ? '' : vanilla_name;
       // If embedding comments, this value will be used to reference the foreign content. Defaults to the url of the page this file is included in.
       var foreign_url = typeof(vanilla_url) == 'undefined' ? document.URL.split('#')[0] : vanilla_url;
-      // If embedding comments, this value will be used as the first comment body related to the discussion.
-      var foreign_body = typeof(vanilla_body) == 'undefined' ? '' : vanilla_body;
       // Are we forcing a locale via Multilingual plugin?
       var embed_locale = typeof(vanilla_embed_locale) == 'undefined' ? '' : vanilla_embed_locale;
       // If path was defined, and we're sitting at app root, use the defined path instead.
@@ -185,9 +181,7 @@ window.vanilla.embed = function(host) {
             +'&vanilla_discussion_id='+encodeURIComponent(discussion_id)
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
             +'&vanilla_type='+encodeURIComponent(foreign_type)
-            +'&vanilla_name='+encodeURIComponent(foreign_name)
             +'&vanilla_url='+encodeURIComponent(foreign_url)
-            +'&vanilla_body='+encodeURIComponent(foreign_body)
             +'&vanilla_category_id='+encodeURIComponent(category_id);
       } else 
          return 'http://' + host + path.replace('?', '&') + '&remote=' + encodeURIComponent(embedUrl) + '&locale=' + encodeURIComponent(embed_locale);

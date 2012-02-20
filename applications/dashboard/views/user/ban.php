@@ -39,7 +39,7 @@ echo '<div class="P">', $this->Form->CheckBox('DeleteContent', T("Also delete th
 
 
 <?php
-echo '<div class="Buttons P">', $this->Form->Button('Ban'), '</div>';
+echo '<div class="Buttons P">', $this->Form->Button(T('Ban.Action', 'Ban')), '</div>';
 echo $this->Form->Close();
 ?>
 </div>

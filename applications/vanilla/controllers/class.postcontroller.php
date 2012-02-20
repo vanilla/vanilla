@@ -100,7 +100,7 @@ class PostController extends VanillaController {
       
       // Check permission 
       if (isset($this->Discussion)) {
-         $Foo = 'bar';
+         
          // Permission to edit
          if ($this->Discussion->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
@@ -109,6 +109,10 @@ class PostController extends VanillaController {
          $EditContentTimeout = C('Garden.EditContentTimeout', -1);
          $CanEdit = $EditContentTimeout == -1 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout > time();
          if (!$CanEdit)
+            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
+         
+         // Make sure only moderators can edit closed things
+         if ($this->Discussion->Closed)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
 
          $this->Title(T('Edit Discussion'));
@@ -291,6 +295,91 @@ class PostController extends VanillaController {
       // Set discussion data
       $this->DiscussionID = $DiscussionID;
       $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      // Is this an embedded comment being posted to a discussion that doesn't exist yet?
+      $vanilla_identifier = $this->Form->GetFormValue('vanilla_identifier', '');
+      $vanilla_type = $this->Form->GetFormValue('vanilla_type', '');
+      $vanilla_url = $this->Form->GetFormValue('vanilla_url', '');
+      $vanilla_category_id = $this->Form->GetFormValue('vanilla_category_id', '');
+      // Add these back to the form
+      // If so, create it!
+      if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
+         // Add these values back to the form if they exist!
+         $this->Form->AddHidden('vanilla_identifier', $vanilla_identifier);
+         $this->Form->AddHidden('vanilla_type', $vanilla_type);
+         $this->Form->AddHidden('vanilla_url', $vanilla_url);
+         $this->Form->AddHidden('vanilla_category_id', $vanilla_category_id);
+         
+         $PageInfo = FetchPageInfo($vanilla_url);
+         $Title = GetValue('Title', $PageInfo, '');
+         if ($Title == '')
+            $Title = T('Undefined discussion subject.');
+         $Description = GetValue('Description', $PageInfo, '');
+         $Images = GetValue('Images', $PageInfo, array());
+         $Body = FormatString(T('EmbededDiscussionFormat'), array(
+             'Title' => $Title,
+             'Excerpt' => $Description,
+             'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
+             'Url' => $vanilla_url
+         ));
+         if ($Body == '')
+            $Body = $vanilla_url;
+         if ($Body == '')
+            $Body = T('Undefined discussion body.');
+            
+         // Validate the CategoryID for inserting
+         if (!is_numeric($vanilla_category_id)) {
+            $vanilla_category_id = C('Vanilla.Embed.DefaultCategoryID', 0);
+            if ($vanilla_category_id <= 0) {
+               // No default category defined, so grab the first non-root category and use that.
+               $vanilla_category_id = $this->DiscussionModel
+                  ->SQL
+                  ->Select('CategoryID')
+                  ->From('Category')
+                  ->Where('CategoryID >', 0)
+                  ->Get()
+                  ->FirstRow()
+                  ->CategoryID;
+               // No categories in the db? default to 0
+               if (!$vanilla_category_id)
+                  $vanilla_category_id = 0;
+            }
+         }
+         
+         $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+         $DiscussionID = $this->DiscussionModel->SQL->Insert(
+            'Discussion',
+            array(
+               'InsertUserID' => $SystemUserID,
+               'DateInserted' => Gdn_Format::ToDateTime(),
+               'UpdateUserID' => $SystemUserID,
+               'DateUpdated' => Gdn_Format::ToDateTime(),
+               'CategoryID' => $vanilla_category_id,
+               'ForeignID' => $vanilla_identifier,
+               'Type' => $vanilla_type,
+               'Name' => $Title,
+               'Body' => $Body,
+               'Format' => 'Html',
+               'Attributes' => serialize(array('ForeignUrl' => $vanilla_url))
+            )
+         );
+         $ValidationResults = $this->DiscussionModel->ValidationResults();
+         if (count($ValidationResults) == 0 && $DiscussionID > 0) {
+            $this->Form->AddHidden('DiscussionID', $DiscussionID); // Put this in the form so reposts won't cause new discussions.
+            $this->Form->SetFormValue('DiscussionID', $DiscussionID); // Put this in the form values so it is used when saving comments.
+            $this->SetJson('DiscussionID', $DiscussionID);
+            $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            // Update the category discussion count
+            if ($vanilla_category_id > 0)
+               $this->DiscussionModel->UpdateDiscussionCount($vanilla_category_id, $DiscussionID);
+
+         }
+      }
+      
+      // If no discussion was found, error out
+      if (!$Discussion)
+         $this->Form->AddError(T('Failed to find discussion for commenting.'));
+      
       $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion);
       
       // Setup head
@@ -310,7 +399,7 @@ class PostController extends VanillaController {
       $this->EventArguments['Editing'] = $Editing;
       
       // If closed, cancel & go to discussion
-      if ($Discussion->Closed == 1 && !$Editing && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
+      if ($Discussion && $Discussion->Closed == 1 && !$Editing && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
          Redirect('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
       
       // Add hidden IDs to form
@@ -319,7 +408,7 @@ class PostController extends VanillaController {
       $this->Form->AddHidden('DraftID', $DraftID, TRUE);
       
       // Check permissions
-      if ($Editing) {
+      if ($Discussion && $Editing) {
          // Permisssion to edit
          if ($this->Comment->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
@@ -330,7 +419,11 @@ class PostController extends VanillaController {
          if (!$CanEdit)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
-      } else {
+         // Make sure only moderators can edit closed things
+         if ($Discussion->Closed)
+            $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
+         
+      } else if ($Discussion) {
          // Permission to add
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }

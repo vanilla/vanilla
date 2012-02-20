@@ -343,7 +343,7 @@ input.Button {
 	background: url('images/sprites.png') -83px -1px no-repeat;
 	padding-left: 24px;
 }*/
-/*.BreadcrumbWrap {
+.BreadcrumbWrap {
 	clear: both;
 	line-height: 2.4;
 	font-size: 12px;
@@ -356,10 +356,12 @@ input.Button {
 	margin: 0 auto;
 	width: 960px;
 }
+/*
 .BreadcrumbWrap.TopBreadcrumb {
 	background: #f7f7f7;
 	background: rgba(0,0,0,0.03);
-}*/
+}
+*/
 #PagerLess {
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;
@@ -1324,6 +1326,13 @@ blockquote {
 .Message small {
 	font-size: 11px;
 	color: #777;
+}
+img.LeftAlign {
+   float: left;
+   margin: 0 10px 5px 0;
+}
+.ClearFix {
+   clear: both;
 }
 code, pre {
    border-radius: 2px;

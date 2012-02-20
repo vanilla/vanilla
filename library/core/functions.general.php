@@ -687,60 +687,118 @@ if (!function_exists('FetchPageInfo')) {
          'Exception' => FALSE
       );
       try {
+         if (!defined('HDOM_TYPE_ELEMENT'))
+            require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
+            
          $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
-         $Dom = new DOMDocument();
-         @$Dom->loadHTML($PageHtml);
-         // Page Title
-         $TitleNodes = $Dom->getElementsByTagName('title');
-         $PageInfo['Title'] = $TitleNodes->length > 0 ? $TitleNodes->item(0)->nodeValue : '';
-         // Page Description
-         $MetaNodes = $Dom->getElementsByTagName('meta');
-         foreach($MetaNodes as $MetaNode) {
-            if (strtolower($MetaNode->getAttribute('name')) == 'description')
-               $PageInfo['Description'] = $MetaNode->getAttribute('content');
+         $Dom = str_get_html($PageHtml);
+         
+         /* Sample Facebook Open Graph code:
+
+<meta property="og:title" content="60 degrees in&nbsp;February" />
+<meta property="og:url" content="http://karinemily.wordpress.com/2012/02/02/60-degrees-in-february/" />
+<meta property="og:description" content="and Philadelphia explodes with babies, puppies, and hipsters." />
+<meta property="og:site_name" content="K a r i &#039; s" />
+<meta property="og:image" content="http://karinemily.files.wordpress.com/2012/02/dsc_0132.jpg?w=300&amp;h=300" />
+<meta property="og:image" content="http://karinemily.files.wordpress.com/2012/02/dsc_0214.jpg?w=300&amp;h=300" />
+<meta property="og:image" content="http://karinemily.files.wordpress.com/2012/02/dsc_0213.jpg?w=300&amp;h=300" />
+<meta property="og:image" content="http://karinemily.files.wordpress.com/2012/02/dsc_0221-version-2.jpg?w=300&amp;h=300" />
+
+          */
+         
+         // FIRST PASS: Look for open graph title, desc, images
+         $PageInfo['Title'] = DomGetContent($Dom, 'meta[property=og:title]');
+         $PageInfo['Description'] = DomGetContent($Dom, 'meta[property=og:description]');
+         foreach ($Dom->find('meta[property=og:image]') as $Image) {
+            if (isset($Image->content))
+               $PageInfo['Images'][] = $Image->content;
          }
-         // Keep looking for page description?
+
+         // SECOND PASS: Look in the page for title, desc, images
+         if ($PageInfo['Title'] == '')
+            $PageInfo['Title'] = $Dom->find('title', 0)->plaintext;
+         
+         if ($PageInfo['Description'] == '')
+            $PageInfo['Description'] = DomGetContent($Dom, 'meta[name=description]');
+
+         // THIRD PASS: Look in the page contents
          if ($PageInfo['Description'] == '') {
-            $PNodes = $Dom->getElementsByTagName('p');
-            foreach($PNodes as $PNode) {
-               $PVal = $PNode->nodeValue;
-               if (strlen($PVal) > 90) {
-                  $PageInfo['Description'] = $PVal;
+            foreach($Dom->find('p') as $element) {
+               if (strlen($element->plaintext) > 150) {
+                  $PageInfo['Description'] = $element->plaintext;
+                  break;
+               }
+            }
+            if (strlen($PageInfo['Description']) > 400)
+               $PageInfo['Description'] = SliceString($PageInfo['Description'], 400);
+         }
+         
+         // Final: Still nothing? remove limitations
+         if ($PageInfo['Description'] == '') {
+            foreach($Dom->find('p') as $element) {
+               if (trim($element->plaintext) != '') {
+                  $PageInfo['Description'] = $element->plaintext;
                   break;
                }
             }
          }
-         if (strlen($PageInfo['Description']) > 400)
-            $PageInfo['Description'] = SliceString($PageInfo['Description'], 400);
             
-         // Page Images (retrieve first 3 if bigger than 100w x 300h)
-         $Images = array();
-         $ImageNodes = $Dom->getElementsByTagName('img');
-         $i = 0;
-         foreach ($ImageNodes as $ImageNode) {
-            $Images[] = AbsoluteSource($ImageNode->getAttribute('src'), $Url);
-         }
+         // Page Images
+         if (count($PageInfo['Images']) == 0)
+            $PageInfo['Images'] = DomGetImages($Dom, $Url);
 
-         // Sort by size, biggest one first
-         $ImageSort = array();
-         // Only look at first 10 images (speed!)
-         $i = 0;
-         foreach ($Images as $Image) {
-            $i++;
-            if ($i > 10)
-               break;
-            
-            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
-            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
-            if (!array_key_exists($Diag, $ImageSort))
-               $ImageSort[$Diag] = $Image;
-         }
-         krsort($ImageSort);
-         $PageInfo['Images'] = array_values($ImageSort);
       } catch (Exception $ex) {
-         $PageInfo['Exception'] = $ex;
+         $PageInfo['Exception'] = $ex->getMessage();
       }
       return $PageInfo;
+   }
+}
+
+if (!function_exists('DomGetContent')) {
+   function DomGetContent($Dom, $Selector, $Default = '') {
+      $Element = $Dom->getElementsByTagName($Selector);
+      return isset($Element->content) ? $Element->content : $Default;
+   }
+}
+
+if (!function_exists('DomGetImages')) {
+   function DomGetImages($Dom, $Url, $MaxImages = 4) {
+      $Images = array();
+      foreach ($Dom->find('img') as $element) {
+         $Images[] = AbsoluteSource($element->src, $Url);
+      }
+
+      // Sort by size, biggest one first
+      $ImageSort = array();
+      // Only look at first 4 images (speed!)
+      $i = 0;
+      foreach ($Images as $Image) {
+         $i++;
+         if ($i > $MaxImages)
+            break;
+
+         try {
+            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
+            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
+            // Require min 100x100 dimension image ($Diag > 141)
+            // Prefer images that are less than 800px wide (banners?)
+            if ($Diag > 141 && $Width < 800) {
+               if (!array_key_exists($Diag, $ImageSort)) {
+                  $ImageSort[$Diag] = array($Image);
+               } else {
+                  $ImageSort[$Diag][] = $Image;
+               }
+            }
+         } catch(Exception $ex) {
+            // do nothing
+         }
+      }
+      krsort($ImageSort);
+      $GoodImages = array();
+      foreach ($ImageSort as $Diag => $Arr) {
+         $GoodImages = array_merge($GoodImages, $Arr);
+      }
+      return $GoodImages;
    }
 }
 

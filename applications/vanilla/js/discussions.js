@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
       });
 
    /* Discussion Checkboxes */
-   $('.ControlOptions .AdminCheck :checkbox').click(function() {
+   $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
          $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').attr('checked', 'checked');
       else

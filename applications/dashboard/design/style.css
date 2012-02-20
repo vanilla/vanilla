@@ -1935,6 +1935,10 @@ div.Popup form ul li label.RadioLabel {
    vertical-align: bottom;
 }
 
+.CheckBoxColumn {
+   width: 24px;
+}
+
 .DataTable .BlockColumn {
    width: 25%;
 }

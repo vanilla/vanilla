@@ -1,5 +1,50 @@
 <?php if (!defined('APPLICATION')) exit();
 
+if (!function_exists('AdminCheck')) {
+   function AdminCheck($Discussion, $Wrap = FALSE) {
+      static $UseAdminChecks = NULL;
+      if ($UseAdminChecks === NULL)
+         $UseAdminChecks = C('Vanilla.AdminCheckboxes.Use') && Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+      
+      static $CanEdits = array(), $Checked = NULL;
+      $Result = '';
+      
+      if ($Discussion) {
+         if (!isset($CanEdits[$Discussion->CategoryID]))
+            $CanEdits[$Discussion->CategoryID] = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID));
+
+
+
+         if ($CanEdits[$Discussion->CategoryID]) {   
+            // Grab the list of currently checked discussions.
+            if ($Checked === NULL) {
+               $Checked = (array)Gdn::Session()->GetAttribute('CheckedDiscussions', array());
+               
+               if (!is_array($Checked))
+                  $Checked = array();
+            }
+            
+            if (in_array($Discussion->DiscussionID, $Checked))
+               $ItemSelected = ' checked="checked"';
+            else
+               $ItemSelected = '';
+            
+            $Result = <<<EOT
+<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="{$Discussion->DiscussionID}" $ItemSelected /></span>
+EOT;
+         }
+      } else {
+         $Result = '<span class="AdminCheck"><input type="checkbox" name="Toggle" /></span>';
+      }
+      
+      if ($Wrap) {
+         $Result = $Wrap[0].$Result.$Wrap[1];
+      }
+      
+      return $Result;
+   }
+}
+
 if (!function_exists('WriteDiscussion')):
    
 function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {

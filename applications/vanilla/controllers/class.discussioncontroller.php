@@ -127,13 +127,28 @@ class DiscussionController extends VanillaController {
       $PageNumber = PageNumber($this->Offset, $Limit);
       $this->SetData('Page', $PageNumber);
       
-      if ($PageNumber == 1)
+      include_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
+      if ($PageNumber == 1) {
          $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format), 160));
-      else {
+         // Add images to head for open graph
+         $Dom = str_get_html(Gdn_Format::To($this->Discussion->Body, $this->Discussion->Format));
+         foreach($Dom->find('img') as $img) {
+            if (isset($img->src))
+               $this->Image($img->src);
+         }
+      } else {
          $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
          
          $FirstComment = $this->Data('Comments')->FirstRow();
-         $this->Description(SliceParagraph(Gdn_Format::PlainText(GetValue('Body', $FirstComment), GetValue('Format', $FirstComment)), 160));         
+         $FirstBody = GetValue('Body', $FirstComment);
+         $FirstFormat = GetValue('Format', $FirstComment);
+         $this->Description(SliceParagraph(Gdn_Format::PlainText($FirstBody, $FirstFormat), 160));         
+         // Add images to head for open graph
+         $Dom = str_get_html(Gdn_Format::To($FirstBody, $FirstFormat));
+         foreach($Dom->find('img') as $img) {
+            if (isset($img->src))
+               $this->Image($img->src);
+         }
       }
 
       // Make sure to set the user's discussion watch records

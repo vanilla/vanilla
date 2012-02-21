@@ -730,7 +730,7 @@ if (!function_exists('FetchPageInfo')) {
                }
             }
             if (strlen($PageInfo['Description']) > 400)
-               $PageInfo['Description'] = SliceString($PageInfo['Description'], 400);
+               $PageInfo['Description'] = SliceParagraph($PageInfo['Description'], 400);
          }
          
          // Final: Still nothing? remove limitations

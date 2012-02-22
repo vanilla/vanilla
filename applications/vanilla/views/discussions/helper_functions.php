@@ -1,10 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('AdminCheck')) {
-   function AdminCheck($Discussion, $Wrap = FALSE) {
+   function AdminCheck($Discussion = NULL, $Wrap = FALSE) {
       static $UseAdminChecks = NULL;
       if ($UseAdminChecks === NULL)
          $UseAdminChecks = C('Vanilla.AdminCheckboxes.Use') && Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+      
+      if (!$UseAdminChecks)
+         return '';
       
       static $CanEdits = array(), $Checked = NULL;
       $Result = '';
@@ -42,6 +45,22 @@ EOT;
       }
       
       return $Result;
+   }
+}
+
+if (!function_exists('BookmarkButton')) {
+   function BookmarkButton($Discussion) {
+      if (!Gdn::Session()->IsValid())
+         return '';
+      
+      // Bookmark link
+      $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+      return Anchor(
+         $Title,
+         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
+         'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+         array('title' => $Title)
+      );
    }
 }
 
@@ -86,11 +105,22 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 
    $Sender->FireEvent('BeforeDiscussionContent');
 
-   WriteOptions($Discussion, $Sender, $Session);
+//   WriteOptions($Discussion, $Sender, $Session);
    ?>
+   <span class="Options">
+      <?php
+      echo OptionsList($Discussion);
+      echo BookmarkButton($Discussion);
+      ?>
+   </span>
    <div class="ItemContent Discussion">
-      <?php echo Anchor($DiscussionName, $DiscussionUrl, 'Title'); ?>
-      <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
+      <div class="Title">
+      <?php 
+         echo AdminCheck($Discussion, array('', ' ')).
+            Anchor($DiscussionName, $DiscussionUrl);
+         $Sender->FireEvent('AfterDiscussionTitle'); 
+      ?>
+      </div>
       <div class="Meta">
          <?php 
          WriteTags($Discussion);
@@ -287,15 +317,13 @@ function WriteFilterTabs($Sender) {
 }
 endif;
 
+if (!function_exists('OptionsList')):
 
-if (!function_exists('WriteOptions')):
+function OptionsList($Discussion) {
+   $Sender = Gdn::Controller();
+   $Session = Gdn::Session();
    
-/**
- * Render options that the user has for this discussion.
- */
-function WriteOptions($Discussion, &$Sender, &$Session) {
    if ($Session->IsValid() && $Sender->ShowOptions) {
-      echo '<span class="Options">';
       $Sender->Options = '';
       
       // Dismiss an announcement
@@ -325,51 +353,46 @@ function WriteOptions($Discussion, &$Sender, &$Session) {
       // Allow plugins to add options
       $Sender->FireEvent('DiscussionOptions');
       
-      // Bookmark link
-      $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
-      echo Anchor(
-         $Title,
-         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
-         'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-         array('title' => $Title)
-      );
-      
       if ($Sender->Options != '') {
-         echo '<span class="ToggleFlyout OptionsMenu">';
-            echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
-            echo '<span class="SpFlyoutHandle"></span>';
-            echo '<ul class="Flyout MenuItems">';
-               echo $Sender->Options;
-            echo '</ul>';
-         echo '</span>';
-      }
-
-      // Admin check.
-      if ($Sender->CanEditDiscussions) {
-         if (!property_exists($Sender, 'CheckedDiscussions')) {
-            $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
-            if (!is_array($Sender->CheckedDiscussions))
-               $Sender->CheckedDiscussions = array();
-         }
-
-         $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
-         echo '<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+         $Result = '<span class="ToggleFlyout OptionsMenu">'.
+            '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>'.
+            '<span class="SpFlyoutHandle"></span>'.
+            '<ul class="Flyout MenuItems">'.
+               $Sender->Options.
+            '</ul>'.
+            '</span>';
       }
       
-      echo '</span>';
+      return $Result;
+     
    }
+   return '';
 }
+
 endif;
 
-if (!function_exists('WriteCheckController')):
-function WriteCheckController() {
-   $CanEditDiscussions = Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
-   if ($CanEditDiscussions) {
-   ?>
-   <span class="Options ControlOptions"><span class="AdminCheck">
-      <input type="checkbox" name="Toggle" />
-   </span></span>
-   <?php
-   }
+
+if (!function_exists('WriteOptions')):
+   
+/**
+ * Render options that the user has for this discussion.
+ */
+function WriteOptions($Discussion) {
+   if (!Gdn::Session()->IsValid() || !Gdn::Controller()->ShowOptions)
+      return;
+   
+   
+   echo '<span class="Options">';
+   
+   // Options list.
+   echo OptionsList($Discussion);
+
+   // Bookmark button.
+   echo BookmarkButton($Discussion);
+
+   // Admin check.
+   echo AdminCheck($Discussion);
+
+   echo '</span>';
 }
 endif;

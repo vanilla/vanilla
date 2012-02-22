@@ -132,25 +132,24 @@ class DiscussionController extends VanillaController {
          $this->Description(SliceParagraph(Gdn_Format::PlainText($this->Discussion->Body, $this->Discussion->Format), 160));
          // Add images to head for open graph
          $Dom = str_get_html(Gdn_Format::To($this->Discussion->Body, $this->Discussion->Format));
-         foreach($Dom->find('img') as $img) {
-            if (isset($img->src))
-               $this->Image($img->src);
-         }
       } else {
          $this->Data['Title'] .= sprintf(T(' - Page %s'), PageNumber($this->Offset, $Limit));
          
          $FirstComment = $this->Data('Comments')->FirstRow();
          $FirstBody = GetValue('Body', $FirstComment);
          $FirstFormat = GetValue('Format', $FirstComment);
-         $this->Description(SliceParagraph(Gdn_Format::PlainText($FirstBody, $FirstFormat), 160));         
+         $this->Description(SliceParagraph(Gdn_Format::PlainText($FirstBody, $FirstFormat), 160));
          // Add images to head for open graph
          $Dom = str_get_html(Gdn_Format::To($FirstBody, $FirstFormat));
+      }
+
+      if ($Dom) {
          foreach($Dom->find('img') as $img) {
             if (isset($img->src))
                $this->Image($img->src);
          }
       }
-
+         
       // Make sure to set the user's discussion watch records
       $this->CommentModel->SetWatch($this->Discussion, $this->CommentData->NumRows(), $this->Offset, $this->Discussion->CountComments);
 

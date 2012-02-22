@@ -1546,6 +1546,20 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
+if (!function_exists('write_ini_file')) {
+   function write_ini_file($File, $Data) {
+      $Flat = array();
+      foreach($Data as $Topic => $Settings) {
+         if (is_array($Settings)) {
+            $Flat[] = "[{$Topic}]";
+               foreach ($Settings as $SettingsKey => $SettingsVal) $Flat[] = "{$SettingsKey} = ".(is_numeric($SettingsVal) ? $SettingsVal : '"'.$SettingsVal.'"');
+         }
+         else $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
+      }
+      Gdn_FileSystem::SaveFile($File, implode("\n", $Flat));
+   }
+}
+
 if (!function_exists('SignInPopup')) {
    /**
     * Returns a boolean value indicating if sign in windows should be "popped"

@@ -124,6 +124,7 @@ function CssClass($Discussion) {
    $CssClass .= $Alt ? ' Alt ' : '';
    $Alt = !$Alt;
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
+   $CssClass .= $Discussion->Closed == '1' ? ' Closed' : '';
    $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
    $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
    $CssClass .= ($Discussion->CountUnreadComments > 0 && Gdn::Session()->IsValid()) ? ' New' : '';

@@ -523,8 +523,8 @@ class UtilityController extends DashboardController {
    /** 
     * Return some meta information about any page on the internet in JSON format.
     */
-   public function FetchPageInfo() {
-      $PageInfo = FetchPageInfo(GetIncomingValue('Url', ''));
+   public function FetchPageInfo($Url = '') {
+      $PageInfo = FetchPageInfo($Url);
       $this->SetData('PageInfo', $PageInfo);
       $this->DeliveryType(DELIVERY_TYPE_DATA);
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);

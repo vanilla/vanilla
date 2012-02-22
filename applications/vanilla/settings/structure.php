@@ -396,11 +396,22 @@ if (!$CountBookmarksExists) {
    )");
 }
 
-$Construct->Table('TagDiscussion')
+$Construct->Table('TagDiscussion');
+$DateInsertedExists = $Construct->ColumnExists('DateInserted');
+
+$Construct
    ->Column('TagID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
+   ->Column('DateInserted', 'datetime', !$DateInsertedExists)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
+
+if (!$DateInsertedExists) {
+   $SQL->Update('TagDiscussion td')
+      ->Join('Discussion d', 'td.DiscussionID = d.DiscussionID')
+      ->Set('td.DateInserted', 'd.DateInserted')
+      ->Put();
+}
 
 $Construct->Table('Tag')
    ->Column('CountDiscussions', 'int', 0)

@@ -51,7 +51,15 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
    <?php echo AdminCheck($Discussion, array('<td class="CheckBoxColumn">', '</td>')); ?>
 	<td class="DiscussionName">
 		<div class="Wrap">
+         <span class="Options">
+            <?php
+            echo OptionsList($Discussion);
+            echo BookmarkButton($Discussion);
+            ?>
+         </span>
 			<?php
+         
+         
 			echo Anchor($DiscussionName, $DiscussionUrl, 'Title').' ';
 			WriteMiniPager($Discussion);
 			echo NewComments($Discussion);

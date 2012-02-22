@@ -19,6 +19,9 @@ jQuery(document).ready(function($) {
             afterPageLoaded: function() { $(document).trigger('DiscussionPagingComplete'); }
          });
       });
+      
+   if ($('.AdminCheck :checkbox').not(':checked').length == 1)
+      $('.AdminCheck [name="Toggle"]').attr('checked', 'checked');
 
    /* Discussion Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {

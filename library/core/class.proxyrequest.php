@@ -104,7 +104,10 @@ class ProxyRequest {
          return $this->ResponseBody;
       }
       
-      $this->ResponseBody = trim($Response);
+      if ($this->Options['TransferMode'] == 'normal')
+         $Response = trim($Response);
+      
+      $this->ResponseBody = $Response;
       
       if ($this->SaveFile) {
          $Success = file_exists($this->SaveFile);
@@ -166,7 +169,8 @@ class ProxyRequest {
       $this->ConnectionMode = '';
       $this->ActionLog = array();
       
-      if (!is_array($Files)) $Files = array();
+      if (is_string($Files)) $Files = array($Files);
+      if (!is_null($Files)) $Files = array();
       if (!is_array($ExtraHeaders)) $ExtraHeaders = array();
 
       // Get the URL
@@ -213,7 +217,7 @@ class ProxyRequest {
             $SendFiles[$File] = $FilePath;
       
       $this->FileTransfer = (bool)sizeof($SendFiles);
-      if ($this->FileTransfer && $RequestMethod == "GET") {
+      if ($this->FileTransfer && $RequestMethod != "PUT") {
          $this->Options['Method'] = 'POST';
          $RequestMethod = GetValue('Method', $Options);
       }
@@ -290,7 +294,8 @@ class ProxyRequest {
       $Query = GetValue('query', $UrlParts, '');
       $this->UseSSL = ($Scheme == 'https') ? TRUE : FALSE;
       
-      $this->Action("Parameters: ".print_r($PostData, true));
+      $this->Action(" transfer mode: {$TransferMode}");
+      
       /*
        * ProxyRequest can masquerade as the current user, so collect and encode
        * their current cookies as the default case is to send them.
@@ -314,6 +319,8 @@ class ProxyRequest {
          @session_write_close();
       
       $Response = '';
+      
+      $this->Action("Parameters: ".print_r($PostData, true));
       
       // We need cURL
       if (!function_exists('curl_init'))
@@ -371,21 +378,35 @@ class ProxyRequest {
          curl_setopt($Handler, CURLOPT_HTTPHEADER, $SendExtraHeaders);
 
       if ($RequestMethod == 'POST') {
-         if ($this->FileTransfer)
+         if ($this->FileTransfer) {
+            $this->Action(" POSTing files");
             foreach ($SendFiles as $File => $FilePath)
                $PostData[$File] = "@{$FilePath}";
-         else
+         } else {
             if ($PreEncodePost)
                $PostData = http_build_query($PostData);
+         }
          
          curl_setopt($Handler, CURLOPT_POST, TRUE);
          curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
+      }
+      
+      // Allow PUT
+      if ($RequestMethod == 'PUT') {
+         if ($this->FileTransfer) {
+            $SendFile = GetValue('0',$SendFiles);
+            $this->Action(" PUTing file: {$SendFile}");
+            
+            curl_setopt($Handler, CURLOPT_PUT, TRUE);
+            curl_setopt($Handler, CURLOPT_INFILE, $SendFile);
+            curl_setopt($Handler, CURLOPT_INFILESIZE, filesize($SendFile));
+         }
       }
 
       // Set URL
       curl_setopt($Handler, CURLOPT_URL, $Url);
       curl_setopt($Handler, CURLOPT_PORT, $Port);
-
+      
       $this->CurlReceive($Handler);
 
       if ($Simulate) return NULL;

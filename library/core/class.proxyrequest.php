@@ -50,6 +50,7 @@ class ProxyRequest {
           'Method'               => 'GET',
           'ConnectTimeout'       => 5,
           'Timeout'              => 5,
+          'TransferMode'         => 'normal',   // or 'binary'
           'SaveAs'               => NULL,
           'Redirects'            => TRUE,
           'SSLNoVerify'          => FALSE,
@@ -70,7 +71,8 @@ class ProxyRequest {
       $Line = explode(':',trim($HeaderString));
       $Key = trim(array_shift($Line));
       $Value = trim(implode(':',$Line));
-      $this->ResponseHeaders[$Key] = $Value;
+      if (!empty($Key))
+         $this->ResponseHeaders[$Key] = $Value;
       return strlen($HeaderString);
    }
    
@@ -181,6 +183,7 @@ class ProxyRequest {
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
       $Timeout = GetValue('Timeout', $Options);
       $SaveAs = GetValue('SaveAs', $Options);
+      $TransferMode = GetValue('TransferMode', $Options);
       $SSLNoVerify = GetValue('SSLNoVerify', $Options);
       $PreEncodePost = GetValue('PreEncodePost', $Options);
       $SendCookies = GetValue('Cookies', $Options);
@@ -323,6 +326,9 @@ class ProxyRequest {
       curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
       curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
       curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
+      
+      if ($TransferMode == 'binary')
+         curl_setopt($Handler, CURLOPT_BINARYTRANSFER, TRUE);
       
       if ($RequestMethod != 'GET' && $RequestMethod != 'POST')
          curl_setopt($Handler, CURLOPT_CUSTOMREQUEST, $RequestMethod);

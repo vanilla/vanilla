@@ -259,7 +259,7 @@ if (!class_exists('HeadModule', FALSE)) {
          return $this->_Tags;
       }
       
-      public function Title($Title = '') {
+      public function Title($Title = '', $NoSubTitle = FALSE) {
          if ($Title != '') {
             // Apply $Title to $this->_Title and return it;
             $this->_Title = $Title;
@@ -268,6 +268,8 @@ if (!class_exists('HeadModule', FALSE)) {
          } else if ($this->_Title != '') {
             // Return $this->_Title if set;
             return $this->_Title;
+         } else if ($NoSubTitle) {
+            return GetValueR('Data.Title', $this->_Sender, '');
          } else {
             $Subtitle = GetValueR('Data._Subtitle', $this->_Sender, C('Garden.Title'));
             
@@ -275,7 +277,7 @@ if (!class_exists('HeadModule', FALSE)) {
             return ConcatSep(' - ', GetValueR('Data.Title', $this->_Sender, ''), $Subtitle);
          }
       }
-
+      
       public static function TagCmp($A, $B) {
          if ($A[self::TAG_KEY] == 'title')
             return -1;
@@ -309,8 +311,35 @@ if (!class_exists('HeadModule', FALSE)) {
             }
          }
          
+         // Include facebook open-graph meta information
+         $SiteName = C('Garden.Title', '');
+         if ($SiteName != '')
+            $this->AddTag('meta', array('property' => 'og:site_name', 'content' => $SiteName));
+         
+         $Title = Gdn_Format::Text($this->Title('', TRUE));
+         if ($Title != '')
+            $this->AddTag('meta', array('property' => 'og:title', 'content' => $Title));
+         
          if ($Description = $this->_Sender->Description()) {
             $this->AddTag('meta', array('name' => 'description', 'content' => $Description));
+            $this->AddTag('meta', array('property' => 'og:description', 'content' => $Description));
+         }
+
+         // Default to the site logo if there were no images provided by the controller.
+         if (count($this->_Sender->Image()) == 0) {
+            $Logo = C('Garden.Logo', '');
+            if ($Logo != '') {
+               // Fix the logo path.
+               if (StringBeginsWith($Logo, 'uploads/'))
+                  $Logo = substr($Logo, strlen('uploads/'));
+
+               $Logo = Gdn_Upload::Url($Logo);
+               $this->AddTag('meta', array('property' => 'og:image', 'content' => $Logo));
+            }
+         } else {
+            foreach ($this->_Sender->Image() as $Img) {
+               $this->AddTag('meta', array('property' => 'og:image', 'content' => $Img));
+            }
          }
 
          $this->FireEvent('BeforeToString');

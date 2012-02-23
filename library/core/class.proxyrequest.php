@@ -324,8 +324,8 @@ class ProxyRequest {
       curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
       curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
       
-      if ($RequestMethod == 'HEAD')
-         curl_setopt($Handler, CURLOPT_CUSTOMREQUEST, 'HEAD');
+      if ($RequestMethod != 'GET' && $RequestMethod != 'POST')
+         curl_setopt($Handler, CURLOPT_CUSTOMREQUEST, $RequestMethod);
 
       if ($CookieJar) {
          curl_setopt($Handler, CURLOPT_COOKIEJAR, $this->CookieJar);

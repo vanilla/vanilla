@@ -747,6 +747,9 @@ a.Bookmarking:hover {
    vertical-align: top;
 	line-height: 1;
 }
+.HomepageTitle .AdminCheck {
+    padding-left: 8px;
+}
 .ControlOptions .AdminCheck {
 	display: block;
 	padding: 6px 8px 0;
@@ -1087,7 +1090,7 @@ a.BigButton:focus {
 	text-indent: 50px;
 }
 
-/* ================================================ DataList (Search Results) */
+/* ================================================ DataList */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
 .SearchForm {
 	background: #f7f7f7;
@@ -1100,9 +1103,6 @@ a.BigButton:focus {
 }
 .Empty {
    margin: 10px 0;
-}
-.PageTitle {
-   padding-right: 8px; /* match .DataList .Item */
 }
 .DataList .Item {
    margin: 0;
@@ -1127,10 +1127,6 @@ a.BigButton:focus {
    display: block;
    font-weight: bold;
    margin: 0;
-}
-.DataList .Title a {
-   font-size: 120%;
-   font-weight: bold;
 }
 .DataList .Meta {
    font-size: 11px;
@@ -1942,6 +1938,10 @@ div.Popup form ul li label.RadioLabel {
 .DataTable thead td {
 	font-weight: bold;
    vertical-align: bottom;
+}
+
+.CheckBoxColumn {
+   width: 24px;
 }
 
 .DataTable .BlockColumn {

@@ -323,6 +323,9 @@ class ProxyRequest {
       curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
       curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
       curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
+      
+      if ($RequestMethod == 'HEAD')
+         curl_setopt($Handler, CURLOPT_CUSTOMREQUEST, 'HEAD');
 
       if ($CookieJar) {
          curl_setopt($Handler, CURLOPT_COOKIEJAR, $this->CookieJar);

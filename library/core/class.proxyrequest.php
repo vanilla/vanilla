@@ -170,7 +170,7 @@ class ProxyRequest {
       $this->ActionLog = array();
       
       if (is_string($Files)) $Files = array($Files);
-      if (!is_null($Files)) $Files = array();
+      if (!is_array($Files)) $Files = array();
       if (!is_array($ExtraHeaders)) $ExtraHeaders = array();
 
       // Get the URL
@@ -374,9 +374,7 @@ class ProxyRequest {
          curl_setopt($Handler, CURLOPT_FILE, $FileHandle);
       }
 
-      if (sizeof($SendExtraHeaders))
-         curl_setopt($Handler, CURLOPT_HTTPHEADER, $SendExtraHeaders);
-
+      // Allow POST
       if ($RequestMethod == 'POST') {
          if ($this->FileTransfer) {
             $this->Action(" POSTing files");
@@ -395,13 +393,20 @@ class ProxyRequest {
       if ($RequestMethod == 'PUT') {
          if ($this->FileTransfer) {
             $SendFile = GetValue('0',$SendFiles);
+            $SendFileSize = filesize($SendFile);
             $this->Action(" PUTing file: {$SendFile}");
             
             curl_setopt($Handler, CURLOPT_PUT, TRUE);
             curl_setopt($Handler, CURLOPT_INFILE, $SendFile);
-            curl_setopt($Handler, CURLOPT_INFILESIZE, filesize($SendFile));
+            curl_setopt($Handler, CURLOPT_INFILESIZE, $SendFileSize);
+            
+            $SendExtraHeaders[] = "Content-Length: {$SendFileSize}";
          }
       }
+      
+      // Any extra needed headers
+      if (sizeof($SendExtraHeaders))
+         curl_setopt($Handler, CURLOPT_HTTPHEADER, $SendExtraHeaders);
 
       // Set URL
       curl_setopt($Handler, CURLOPT_URL, $Url);

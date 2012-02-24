@@ -182,7 +182,7 @@ function WriteMiniPager($Discussion) {
 }
 endif;
 
-if (!function_exists('WritePagePink')):
+if (!function_exists('WritePageLink')):
 function WritePageLink($Discussion, $PageNumber) {
    echo Anchor($PageNumber, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/p'.$PageNumber);
 }

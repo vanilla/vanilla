@@ -40,18 +40,16 @@ function WriteRangeTab($Range, $Sender) {
    <div class="Loading"></div>
 </div>
 <script type="text/javascript">
-   jQuery(document).ready(function($){
-      var GraphPicker = new Picker();
-      GraphPicker.Attach({
-         'Range': $('div.DateRangeTabs input.DateRange'),
-         'Units': '<?php echo $this->Range; ?>',
-         'MaxGraduations': 15,
-         'MaxPageSize': -1,
-         'DateStart': '<?php echo $this->BoundaryStart; ?>',
-         'DateEnd': '<?php echo $this->BoundaryEnd; ?>',
-         'RangeStart': '<?php echo $this->DateStart; ?>',
-         'RangeEnd': '<?php echo $this->DateEnd; ?>' 
-      });
+   var GraphPicker = new Picker();
+   GraphPicker.Attach({
+      'Range': $('div.DateRangeTabs input.DateRange'),
+      'Units': '<?php echo $this->Range; ?>',
+      'MaxGraduations': 15,
+      'MaxPageSize': -1,
+      'DateStart': '<?php echo $this->BoundaryStart; ?>',
+      'DateEnd': '<?php echo $this->BoundaryEnd; ?>',
+      'RangeStart': '<?php echo $this->DateStart; ?>',
+      'RangeEnd': '<?php echo $this->DateEnd; ?>' 
    });
 </script>
 <div class="Column Column1 NewsColumn">

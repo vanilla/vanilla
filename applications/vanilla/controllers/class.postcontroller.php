@@ -307,8 +307,10 @@ class PostController extends VanillaController {
             'ForeignID' => $vanilla_identifier
          ))->FirstRow();
          
-         if ($Discussion)
+         if ($Discussion) {
             $this->DiscussionID = $DiscussionID = $Discussion->DiscussionID;
+            $this->Form->SetFormValue('DiscussionID', $DiscussionID);
+         }
       }
       
       // Add these back to the form

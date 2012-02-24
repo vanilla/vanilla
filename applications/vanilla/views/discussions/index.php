@@ -1,9 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
+include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
-WriteCheckController();
-echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<h1 class="HomepageTitle">'.
+   AdminCheck(NULL, array('', ' ')).
+   $this->Data('Title').
+   '</h1>';
 echo Gdn_Theme::Module('DiscussionFilterModule');
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {

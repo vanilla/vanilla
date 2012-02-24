@@ -19,9 +19,12 @@ jQuery(document).ready(function($) {
             afterPageLoaded: function() { $(document).trigger('DiscussionPagingComplete'); }
          });
       });
+      
+   if ($('.AdminCheck :checkbox').not(':checked').length == 1)
+      $('.AdminCheck [name="Toggle"]').attr('checked', 'checked');
 
    /* Discussion Checkboxes */
-   $('.ControlOptions .AdminCheck :checkbox').click(function() {
+   $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
          $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').attr('checked', 'checked');
       else

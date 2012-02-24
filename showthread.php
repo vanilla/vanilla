@@ -1,5 +1,8 @@
 <?php
-
+/** 
+ * Handles 301 redirecting urls from forums that were imported from phpBB or 
+ * vBulletin into their Vanilla equivalent pages. 
+ */
 $Redirects = array(
    'post'      => 'discussion/comment/%1$d#Comment_%1$d',
    'thread'    => 'discussion/%d/redirect/%s',

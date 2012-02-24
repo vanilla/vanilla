@@ -48,9 +48,18 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 
 ?>
 <tr class="<?php echo $CssClass; ?>">
+   <?php echo AdminCheck($Discussion, array('<td class="CheckBoxColumn">', '</td>')); ?>
 	<td class="DiscussionName">
 		<div class="Wrap">
+         <span class="Options">
+            <?php
+            echo OptionsList($Discussion);
+            echo BookmarkButton($Discussion);
+            ?>
+         </span>
 			<?php
+         
+         
 			echo Anchor($DiscussionName, $DiscussionUrl, 'Title').' ';
 			WriteMiniPager($Discussion);
 			echo NewComments($Discussion);
@@ -140,6 +149,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 <table class="DataTable DiscussionsTable">
 	<thead>
 		<tr>
+         <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn">', '</td>')); ?>
 			<td class="DiscussionName"><?php echo T('Discussion'); ?></td>
 			<td class="BlockColumn BlockColumn-User FirstUser"><?php echo T('Started By'); ?></td>
 			<td class="BigCount CountReplies"><?php echo T('Replies'); ?></td>

@@ -888,6 +888,29 @@ class Gdn_Controller extends Gdn_Pluggable {
       return $this->_Json;
    }
 
+   /** 
+    * Allows images to be specified for the page, to be used by the head module 
+    * to add facebook open graph information.
+    * @param mixed $Img An image or array of image urls.
+    * @return array The array of image urls. 
+    */
+   public function Image($Img = FALSE) {
+      if ($Img) {
+         if (!is_array($Img))
+            $Img = array($Img);
+
+         $CurrentImages = $this->Data('_Images');
+         if (!is_array($CurrentImages))
+            $this->SetData('_Images', $Img);
+         else {
+            $Images = array_unique(array_merge($CurrentImages, $Img));
+            $this->SetData('_Images', $Images);
+         }
+      }
+      $Images = $this->Data('_Images');
+      return is_array($Images) ? $Images : array();
+   }
+
    /**
     * Add an "inform" message to be displayed to the user.
     *

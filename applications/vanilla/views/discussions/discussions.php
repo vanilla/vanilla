@@ -3,7 +3,6 @@ $Session = Gdn::Session();
 if (!function_exists('WriteDiscussion'))
    include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 
-	
 $Alt = '';
 if (property_exists($this, 'AnnounceData') && is_object($this->AnnounceData)) {
 	foreach ($this->AnnounceData->Result() as $Discussion) {

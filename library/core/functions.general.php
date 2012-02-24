@@ -730,7 +730,7 @@ if (!function_exists('FetchPageInfo')) {
                }
             }
             if (strlen($PageInfo['Description']) > 400)
-               $PageInfo['Description'] = SliceString($PageInfo['Description'], 400);
+               $PageInfo['Description'] = SliceParagraph($PageInfo['Description'], 400);
          }
          
          // Final: Still nothing? remove limitations
@@ -1543,6 +1543,20 @@ if (!function_exists('parse_ini_string')) {
          }
       }
       return $Result;
+   }
+}
+
+if (!function_exists('write_ini_file')) {
+   function write_ini_file($File, $Data) {
+      $Flat = array();
+      foreach($Data as $Topic => $Settings) {
+         if (is_array($Settings)) {
+            $Flat[] = "[{$Topic}]";
+               foreach ($Settings as $SettingsKey => $SettingsVal) $Flat[] = "{$SettingsKey} = ".(is_numeric($SettingsVal) ? $SettingsVal : '"'.$SettingsVal.'"');
+         }
+         else $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
+      }
+      Gdn_FileSystem::SaveFile($File, implode("\n", $Flat));
    }
 }
 

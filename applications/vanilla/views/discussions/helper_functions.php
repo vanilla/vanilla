@@ -1,51 +1,51 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('AdminCheck')) {
-   function AdminCheck($Discussion = NULL, $Wrap = FALSE) {
-      static $UseAdminChecks = NULL;
-      if ($UseAdminChecks === NULL)
-         $UseAdminChecks = C('Vanilla.AdminCheckboxes.Use') && Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
-      
-      if (!$UseAdminChecks)
-         return '';
-      
-      static $CanEdits = array(), $Checked = NULL;
-      $Result = '';
-      
-      if ($Discussion) {
-         if (!isset($CanEdits[$Discussion->CategoryID]))
-            $CanEdits[$Discussion->CategoryID] = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID));
+function AdminCheck($Discussion = NULL, $Wrap = FALSE) {
+   static $UseAdminChecks = NULL;
+   if ($UseAdminChecks === NULL)
+      $UseAdminChecks = C('Vanilla.AdminCheckboxes.Use') && Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+
+   if (!$UseAdminChecks)
+      return '';
+
+   static $CanEdits = array(), $Checked = NULL;
+   $Result = '';
+
+   if ($Discussion) {
+      if (!isset($CanEdits[$Discussion->CategoryID]))
+         $CanEdits[$Discussion->CategoryID] = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID));
 
 
 
-         if ($CanEdits[$Discussion->CategoryID]) {   
-            // Grab the list of currently checked discussions.
-            if ($Checked === NULL) {
-               $Checked = (array)Gdn::Session()->GetAttribute('CheckedDiscussions', array());
-               
-               if (!is_array($Checked))
-                  $Checked = array();
-            }
-            
-            if (in_array($Discussion->DiscussionID, $Checked))
-               $ItemSelected = ' checked="checked"';
-            else
-               $ItemSelected = '';
-            
-            $Result = <<<EOT
+      if ($CanEdits[$Discussion->CategoryID]) {   
+         // Grab the list of currently checked discussions.
+         if ($Checked === NULL) {
+            $Checked = (array)Gdn::Session()->GetAttribute('CheckedDiscussions', array());
+
+            if (!is_array($Checked))
+               $Checked = array();
+         }
+
+         if (in_array($Discussion->DiscussionID, $Checked))
+            $ItemSelected = ' checked="checked"';
+         else
+            $ItemSelected = '';
+
+         $Result = <<<EOT
 <span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="{$Discussion->DiscussionID}" $ItemSelected /></span>
 EOT;
-         }
-      } else {
-         $Result = '<span class="AdminCheck"><input type="checkbox" name="Toggle" /></span>';
       }
-      
-      if ($Wrap) {
-         $Result = $Wrap[0].$Result.$Wrap[1];
-      }
-      
-      return $Result;
+   } else {
+      $Result = '<span class="AdminCheck"><input type="checkbox" name="Toggle" /></span>';
    }
+
+   if ($Wrap) {
+      $Result = $Wrap[0].$Result.$Wrap[1];
+   }
+
+   return $Result;
+}
 }
 
 if (!function_exists('BookmarkButton')) {
@@ -65,7 +65,6 @@ if (!function_exists('BookmarkButton')) {
 }
 
 if (!function_exists('WriteDiscussion')):
-   
 function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $CssClass = CssClass($Discussion);
    $DiscussionUrl = $Discussion->Url;
@@ -160,7 +159,6 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
 endif;
 
 if (!function_exists('WriteMiniPager')):
-   
 function WriteMiniPager($Discussion) {
    if (!property_exists($Discussion, 'CountPages'))
       return;
@@ -191,7 +189,6 @@ function WritePageLink($Discussion, $PageNumber) {
 endif;
 
 if (!function_exists('CssClass')):
-   
 function CssClass($Discussion) {
    static $Alt = FALSE;
    $CssClass = 'Item';
@@ -209,7 +206,6 @@ function CssClass($Discussion) {
 endif;
 
 if (!function_exists('NewComments')):
-   
 function NewComments($Discussion) {
    if (!Gdn::Session()->IsValid())
       return '';
@@ -222,27 +218,30 @@ function NewComments($Discussion) {
 }
 endif;
 
+if (!function_exists('Tag')):
 function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
    if (!$Discussion->$Column)
       return '';
-   
+
    if (!$CssClass)
       $CssClass = "Tag-$Code";
-   
+
    return ' <span class="Tag '.$CssClass.'">'.T($Code).'</span> ';
 }
+endif;
 
+if (!function_exists('WriteTags')):
 function WriteTags($Discussion) {
    Gdn::Controller()->FireEvent('BeforeDiscussionMeta');
-         
+
    echo Tag($Discussion, 'Announce', 'Announcement');
    echo Tag($Discussion, 'Closed', 'Closed');
-   
+
    Gdn::Controller()->FireEvent('AfterDiscussionLabels');
 }
+endif;
 
 if (!function_exists('WriteFilterTabs')):
-   
 function WriteFilterTabs($Sender) {
    $Session = Gdn::Session();
    $Title = property_exists($Sender, 'Category') ? GetValue('Name', $Sender->Category, '') : '';
@@ -319,7 +318,6 @@ function WriteFilterTabs($Sender) {
 endif;
 
 if (!function_exists('OptionsList')):
-
 function OptionsList($Discussion) {
    $Sender = Gdn::Controller();
    $Session = Gdn::Session();
@@ -374,7 +372,6 @@ endif;
 
 
 if (!function_exists('WriteOptions')):
-   
 /**
  * Render options that the user has for this discussion.
  */

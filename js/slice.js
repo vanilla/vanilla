@@ -97,7 +97,6 @@ function Gdn_Slice(SliceElement, SliceID) {
       
       var SliceForm = $(Event.target).parents('form').first();
       
-      
       if (this.SliceForm) {
          if ($(SliceForm).attr('jsaction'))
             var SliceURL = $(SliceForm).attr('jsaction');
@@ -219,6 +218,6 @@ function Gdn_Slice(SliceElement, SliceID) {
 
 }
 
-$(document).ready(function(){
+$(document).ready(function($){
    Gdn_Slices.Prepare();
 });

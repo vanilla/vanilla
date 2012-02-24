@@ -1,5 +1,5 @@
 var Gdn_Slices = {}
-$(document).ready(function($){
+jQuery(document).ready(function($){
    var Gdn_Slices = {
 
       Prepare: function() {

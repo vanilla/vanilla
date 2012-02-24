@@ -1,4 +1,4 @@
-$(function() {
+jQuery(document).ready(function($){
    statsUrl = gdn.definition('VanillaStatsUrl', 'http://analytics.vanillaforums.com');
    
    frame = function() {

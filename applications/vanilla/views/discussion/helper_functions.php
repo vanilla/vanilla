@@ -73,21 +73,32 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
          </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
-      <div class="Message">
-			<?php 
-            $Sender->FireEvent('BeforeCommentBody'); 
-			   $Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
-			   $Sender->FireEvent('AfterCommentFormat');
-			   $Object = $Sender->EventArguments['Object'];
-			   echo $Object->FormatBody;
-			?>
-		</div>
-      <?php $Sender->FireEvent('AfterCommentBody'); ?>
+      <div class="Item-Body">
+         <div class="Message">
+            <?php 
+               $Sender->FireEvent('BeforeCommentBody'); 
+               $Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
+               $Sender->FireEvent('AfterCommentFormat');
+               $Object = $Sender->EventArguments['Object'];
+               echo $Object->FormatBody;
+            ?>
+         </div>
+         <?php $Sender->FireEvent('AfterCommentBody'); ?>
+         <?php WriteReactions($Object); ?>
+      </div>
    </div>
 </li>
 <?php
 	$Sender->FireEvent('AfterComment');
 }
+
+if (!function_exists('WriteReactions')):
+
+function WriteReactions($Row, $Type = 'Comment') {
+   // noop
+}
+
+endif;
 
 function WriteOptionList($Object, $Sender, $Session) {
    $EditContentTimeout = C('Garden.EditContentTimeout', -1);

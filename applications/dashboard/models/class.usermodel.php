@@ -1663,6 +1663,8 @@ class UserModel extends Gdn_Model {
       
       // Generate the AllIPs field.
       $AllIPs = GetValue('AllIPAddresses', $User, array());
+      if (is_string($AllIPs))
+         $AllIPs = explode(',', $AllIPs);
       if (!is_array($AllIPs))
          $AllIPs = array();
       if ($IP = GetValue('InsertIPAddress', $User))

@@ -90,10 +90,10 @@ class Gdn_Session {
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User)) {
-         if ($this->User->Admin)
-            return TRUE;
-         elseif ($this->User->Banned || GetValue('Deleted', $this->User))
+         if ($this->User->Banned || GetValue('Deleted', $this->User))
             return FALSE;
+         elseif ($this->User->Admin)
+            return TRUE;
       }
 
       // Allow wildcard permission checks (e.g. 'any' Category)

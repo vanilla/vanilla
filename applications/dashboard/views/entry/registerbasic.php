@@ -14,14 +14,14 @@
       <li>
          <?php
             echo $this->Form->Label('Email', 'Email');
-            echo $this->Form->TextBox('Email', array('type' => 'email'));
+            echo $this->Form->TextBox('Email', array('type' => 'email', 'Wrap' => TRUE));
             echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">'.T('Email Unavailable').'</span>';
          ?>
       </li>
       <li>
          <?php
             echo $this->Form->Label('Username', 'Name');
-            echo $this->Form->TextBox('Name', array('autocorrect' => 'off', 'autocapitalize' => 'off'));
+            echo $this->Form->TextBox('Name', array('Wrap' => TRUE, 'autocorrect' => 'off', 'autocapitalize' => 'off'));
             echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.T('Name Unavailable').'</span>';
          ?>
       </li>
@@ -29,13 +29,13 @@
       <li>
          <?php
             echo $this->Form->Label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password');
+            echo $this->Form->Input('Password', 'password', array('Wrap' => TRUE));
          ?>
       </li>
       <li>
          <?php
             echo $this->Form->Label('Confirm Password', 'PasswordMatch');
-            echo $this->Form->Input('PasswordMatch', 'password');
+            echo $this->Form->Input('PasswordMatch', 'password', array('Wrap' => TRUE));
             echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">'.T("Passwords don't match").'</span>';
          ?>
       </li>
@@ -49,7 +49,7 @@
       <li>
          <?php
             echo $this->Form->Label('Why do you want to join?', 'DiscoveryText');
-            echo $this->Form->TextBox('DiscoveryText', array('MultiLine' => TRUE));
+            echo $this->Form->TextBox('DiscoveryText', array('MultiLine' => TRUE, 'Wrap' => TRUE));
          ?>
       </li>
       <?php endif; ?>

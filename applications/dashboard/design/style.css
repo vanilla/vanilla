@@ -1530,7 +1530,6 @@ table.PreferenceGroup tbody td.PrefCheckBox {
 /* About in content area */
 dl.About dt,
 dl.About dd {
-   color: #666;
    padding: 0;
    margin: 0;
    float: none;
@@ -1539,6 +1538,7 @@ dl.About dd {
    display: inline;
 }
 dl.About dt {
+   color: #666;
    background: url('images/profile-sprites.png') 2px -139px no-repeat transparent;
    padding-left: 14px;
 }
@@ -1550,7 +1550,6 @@ dl.About dt.Roles { background-position: 1px -81px; }
 dl.About dt.Posts { background-position: 0 -113px; }
 dl.About dd {
    padding: 0 8px 0 0;
-   color: #333;
 }
 /* ======================================================== Thumbnail Cropper */
 .Popup .CurrentPicture {
@@ -1678,12 +1677,12 @@ div.Popup .Border {
 div.Popup .Body {
   background: #fff;
 }
-div.Popup .Legal,
+/*div.Popup .Legal,
 div.Popup .Content form {
 	max-height: 440px;
 	overflow: auto;
 	padding: 0 10px 10px;
-}
+}*/
 div.Popup .Loading {
   text-align: center;
 }
@@ -2356,11 +2355,6 @@ body.Entry form ul li label.RadioLabel {
 	font-weight: normal;
    width: auto;
 }
-body.Entry input.DateBox,
-body.Entry input.InputBox,
-body.Entry textarea {
-   width: 310px;
-}
 span.Incorrect {
    display: block;
    color: red;
@@ -2379,12 +2373,6 @@ body#dashboard_entry_signin #Content form {
 	padding: 0;
 	text-align:left;
 }*/
-body#dashboard_entry_password #Content form,
-body#dashboard_entry_signin #Content form,
-body#dashboard_entry_index #Content form,
-.SignInPopup form {
-	width: 270px;
-}
 .SingleEntryMethod {
 	width: 290px;
 	margin: 0 auto;
@@ -2392,34 +2380,19 @@ body#dashboard_entry_index #Content form,
 .MultipleEntryMethods {
 	width: 500px;
 	margin: 0 auto;
+   overflow: hidden;
+}
+.MultipleEntryMethods .MainForm {
+   float: left;
+   width: 285px;
 }
 .MultipleEntryMethods .Methods {
    border-left: solid 1px #BEC8CC;
+	padding: 0 15px 5px;
+	line-height: 1;
+   margin-left: 300px;
 }
-body#dashboard_entry_handshake #Content input.InputBox,
-body#dashboard_entry_signin #Content input.InputBox,
-body#dashboard_entry_index #Content input.InputBox,
-body#dashboard_entry_password #Content input.InputBox,
-.SignInPopup input.DateBox,
-.SignInPopup input.InputBox,
-.SignInPopup textarea {
-   width: 260px;
-	padding: 3px;
-}
-.SignInPopup form ul li label,
-body#dashboard_entry_signin form ul li label,
-body#dashboard_entry_index form ul li label,
-body#dashboard_entry_password form ul li label,
-body#dashboard_entry_handshake form ul li label {
-	font-size: 13px;
-	line-height: 1.5;
-	padding: 0;
-}
-body#dashboard_entry_password #Content form ul li input#Form_Email,
-body#dashboard_entry_signin #Content form ul li input#Form_Email,
-body#dashboard_entry_index #Content form ul li input#Form_Email {
-	margin-bottom: 6px;
-}
+
 body#dashboard_entry_password #Content input.Password,
 body#dashboard_entry_signin #Content input.Password,
 body#dashboard_entry_index #Content input.Password,
@@ -2446,28 +2419,9 @@ body.Entry li.Buttons {
 	text-align: left;
 	padding: 0 0 10px;
 }
-.Entry {
-	position: relative;
-}
-.Methods {
-	text-align: left;
-	position: absolute;
-	top: 33px;
-	bottom: 0;
-	right: 0;
-	padding: 12px 20px 6px;
-	line-height: 1;
-   width: 170px;
-}
-body#dashboard_entry_password .Methods,
-body#dashboard_entry_signin .Methods,
-body#dashboard_entry_index .Methods {
-	padding: 10px 6px 6px;
-	background: none;
-}
+
 .Methods .Method {
-	padding: 10px 0 0;
-	text-align: left;
+   margin: 5px 0;
 }
 
 /* Handshake */
@@ -2569,13 +2523,6 @@ body#dashboard_entry_index form ul li label {
 .FinePrint {
 	font-size: 11px;
 	color: #777;
-}
-body#dashboard_entry_password input.InputBox,
-body#dashboard_entry_signin input.InputBox,
-body#dashboard_entry_index input.InputBox,
-.Connect input.InputBox,
-.SignInPopup input.InputBox {
-	padding: 3px
 }
 /*.Connect .ExistingUsername,
 .SignInPopup .ExistingUsername {
@@ -2955,6 +2902,7 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 	display: inline-block;
 	height: 16px;
 	width: 16px;
+   vertical-align: top;
 }
 
 /* 16px Sprites White */

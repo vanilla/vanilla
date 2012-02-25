@@ -80,6 +80,32 @@ class HTMLawedPlugin extends Gdn_Plugin {
 	}
 }
 
+if (!function_exists('FormatRssCustom')):
+   
+function FormatRssHtmlCustom($Html) {
+   require_once(dirname(__FILE__).'/htmLawed/htmLawed.php');
+   
+   $Config = array(
+       'anti_link_spam' => array('`.`', ''),
+       'comment' => 1,
+       'cdata' => 3,
+       'css_expression' => 1,
+       'deny_attribute' => 'on*,style,class',
+       'elements' => '*-applet-form-input-textarea-iframe-script-style-object-embed-comment-link-listing-meta-noscript-plaintext-xmp',
+       'keep_bad' => 0,
+       'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
+       'valid_xml' => 2,
+       'anti_link_spam' => array('`.`', '')
+      );
+
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+
+      $Result = htmLawed($Html, $Config, $Spec);
+      
+      return $Result;
+}
+endif;
+
 function HTMLawedHookTag($Element, $Attributes) {
    $Attribs = '';
    foreach ($Attributes as $Key => $Value) {

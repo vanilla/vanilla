@@ -301,6 +301,18 @@ class PostController extends VanillaController {
       $vanilla_type = $this->Form->GetFormValue('vanilla_type', '');
       $vanilla_url = $this->Form->GetFormValue('vanilla_url', '');
       $vanilla_category_id = $this->Form->GetFormValue('vanilla_category_id', '');
+      
+      if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
+         $Discussion = $this->DiscussionModel->GetWhere(array(
+            'ForeignID' => $vanilla_identifier
+         ))->FirstRow();
+         
+         if ($Discussion) {
+            $this->DiscussionID = $DiscussionID = $Discussion->DiscussionID;
+            $this->Form->SetFormValue('DiscussionID', $DiscussionID);
+         }
+      }
+      
       // Add these back to the form
       // If so, create it!
       if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {

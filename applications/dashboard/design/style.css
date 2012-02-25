@@ -1969,7 +1969,8 @@ tbody td.BigCount {
    padding: 8px 4px;
 }
 
-.DataTable .Meta {
+.DataTable .Meta,
+.DataTable .MItem {
    font-size: 11px;
 }
 

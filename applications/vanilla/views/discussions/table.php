@@ -61,9 +61,12 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
          
          
 			echo Anchor($DiscussionName, $DiscussionUrl, 'Title').' ';
+			$Sender->FireEvent('AfterDiscussionTitle');
+         
 			WriteMiniPager($Discussion);
 			echo NewComments($Discussion);
-			$Sender->FireEvent('AfterDiscussionTitle');
+         echo CategoryLink($Discussion, ' '.T('in').' ');
+         
 			// Other stuff that was in the standard view that you may want to display:
          echo '<div class="Meta">';
 			WriteTags($Discussion);

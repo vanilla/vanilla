@@ -64,6 +64,22 @@ if (!function_exists('BookmarkButton')) {
    }
 }
 
+if (!function_exists('CategoryLink')):
+   
+function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
+   if (!$Force && Gdn::Controller()->Data('Category')) {
+      return;
+   }
+   
+   $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+   
+   if ($Category) {
+      return Wrap($Prefix.Anchor($Category['Name'], $Category['Url']), 'span', array('class' => 'MItem Category'));
+   }
+}
+
+endif;
+
 if (!function_exists('WriteDiscussion')):
    
 function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {

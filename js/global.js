@@ -388,6 +388,7 @@ jQuery(document).ready(function($) {
                break;
             case 'RemoveClass':
                $target.removeClass(item.Data);
+               break;
             case 'ReplaceWith':
                $target.replaceWith(item.Data);
                break;

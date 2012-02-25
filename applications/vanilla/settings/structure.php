@@ -409,7 +409,7 @@ $Construct
 if (!$DateInsertedExists) {
    $SQL->Update('TagDiscussion td')
       ->Join('Discussion d', 'td.DiscussionID = d.DiscussionID')
-      ->Set('td.DateInserted', 'd.DateInserted')
+      ->Set('td.DateInserted', 'd.DateInserted', FALSE, FALSE)
       ->Put();
 }
 

@@ -376,9 +376,9 @@ function OptionsList($Discussion) {
                $Sender->Options.
             '</ul>'.
             '</span>';
+         
+         return $Result;
       }
-      
-      return $Result;
      
    }
    return '';

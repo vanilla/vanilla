@@ -1692,8 +1692,19 @@ class UserModel extends Gdn_Model {
          }
       }
       
-      if ($Changed)
+      if ($Changed) {
          $this->SetField($UserID, $Fields);
+      }
+      
+      if ($User['LastIPAddress'] != $Fields['LastIPAddress']) {
+         $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+         if (!BanModel::CheckUser($User, NULL, TRUE, $Bans)) {
+            $BanModel = new BanModel();
+            $Ban = array_pop($Bans);
+            $BanModel->SaveUser($User, TRUE, $Ban);
+            $BanModel->SetCounts($Ban);
+         }
+      }
    }
 
    /**

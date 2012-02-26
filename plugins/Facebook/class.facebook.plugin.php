@@ -57,7 +57,7 @@ class FacebookPlugin extends Gdn_Plugin {
          return;
       
       if (isset($Sender->Data['Methods'])) {
-         $AccessToken = $this->AccessToken();
+//         $AccessToken = $this->AccessToken();
 
          $ImgSrc = Asset('/plugins/Facebook/design/facebook-login.png');
          $ImgAlt = T('Sign In with Facebook');
@@ -191,7 +191,7 @@ class FacebookPlugin extends Gdn_Plugin {
          $AccessToken = GetValue('access_token', $Tokens);
          $Expires = GetValue('expires', $Tokens, NULL);
 
-         setcookie('fb_access_token', $AccessToken, time() + $Expires, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
+         setcookie('fb_access_token', $AccessToken, time() + $Expires, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''), NULL, TRUE);
          $NewToken = TRUE;
       }
 

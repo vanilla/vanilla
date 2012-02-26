@@ -621,6 +621,7 @@ class DiscussionModel extends VanillaModel {
       if (!$Data)
          return $Data;
       
+      $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
       $Data->Url = Url('/discussion/'.$Data->DiscussionID.'/'.Gdn_Format::Url($Data->Name), TRUE);
       

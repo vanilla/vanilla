@@ -1258,6 +1258,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Remove[] = 'InsertIPAddress';
             $Remove[] = 'UpdateIPAddress';
             $Remove[] = 'LastIPAddress';
+            $Remove[] = 'AllIPAddresses';
+            $Remove[] = 'Fingerprint';
          }
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }

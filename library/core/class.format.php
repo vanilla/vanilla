@@ -817,6 +817,24 @@ class Gdn_Format {
       $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
       return $Result;
    }
+   
+   /**
+    * Format some text in a way suitable for passing into an rss/atom feed.
+    * @since 2.1
+    * @param string $Text The text to format.
+    * @param string $Format The current format of the text.
+    * @return string
+    */
+   public static function RssHtml($Text, $Format = 'Html') {
+      if (!in_array($Text, array('Html', 'Raw')))
+         $Text = Gdn_Format::To($Text, $Format);
+      
+      if (function_exists('FormatRssHtmlCustom')) {
+         return FormatRssHtmlCustom($Text);
+      } else {
+         return Gdn_Format::Html($Text);
+      }
+   }
 
    public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
       $Regex = "`([<>])`i";

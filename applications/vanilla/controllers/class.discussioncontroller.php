@@ -416,37 +416,33 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID.
     * @param string $TransientKey Single-use hash to prove intent.
     */
-   public function Announce($DiscussionID = '', $TransientKey = '') {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
-      $State = FALSE;
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-
-            $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Discussion));
-
-            $Announce = GetValue('Announce', $Discussion);
-            $this->DiscussionModel->SQL->Cache($CacheKeys);
-            $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)!$Announce);
-         } else {
-            $this->Form->AddError('ErrPermission');
-         }
+   public function Announce($DiscussionID = '', $Target = '') {
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      $this->Permission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      if ($this->Form->IsPostBack()) {
+         // Save the property.
+         $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Discussion));
+         $this->DiscussionModel->SQL->Cache($CacheKeys);
+         $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->GetFormValue('Announce', 0));
+         
+         if ($Target)
+            $this->RedirectUrl = Url($Target);
+      } else {
+         if (!$Discussion->Announce)
+            $Discussion->Announce = 2;
+         $this->Form->SetData($Discussion);
       }
       
-      $Target = $this->Request->Get('Target', 'discussions');
+      $Discussion = (array)$Discussion;
+      $Category = CategoryModel::Categories($Discussion['CategoryID']);
       
-      // Redirect to the front page
-      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect($Target);
-         
-      $this->RedirectUrl = Url($Target);
-      $this->InformMessage(T('Your changes have been saved.'));
+      $this->SetData('Discussion', $Discussion);
+      $this->SetData('Category', $Category);
+      
+      $this->Title(T('Announce'));
       $this->Render();         
    }
 

@@ -34,9 +34,16 @@ if ($Editing)
       $CancelClass = 'MItem Cancel';
    }
 
-   echo ' '.Gdn_Theme::Link('forumroot', $CancelText, NULL, array(
-       'class' => $CancelClass
-   )).' ';
+   echo '<span class="'.$CancelClass.'">';
+   echo Anchor(T('Home'), '/');
+   
+   if ($CategoryID = $this->Data('Discussion.CategoryID')) {
+      $Category = CategoryModel::Categories($CategoryID);
+      if ($Category)
+         echo ' <span class="Bullet">•</span> '.Anchor($Category['Name'], $Category['Url']);
+   }
+   
+   echo '</span>';
    
    $ButtonOptions = array('class' => 'Button CommentButton');
    $ButtonOptions['tabindex'] = 2;

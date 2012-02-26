@@ -64,6 +64,22 @@ if (!function_exists('BookmarkButton')) {
    }
 }
 
+if (!function_exists('CategoryLink')):
+   
+function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
+   if (!$Force && Gdn::Controller()->Data('Category')) {
+      return;
+   }
+   
+   $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+   
+   if ($Category) {
+      return Wrap($Prefix.Anchor($Category['Name'], $Category['Url']), 'span', array('class' => 'MItem Category'));
+   }
+}
+
+endif;
+
 if (!function_exists('WriteDiscussion')):
 function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $CssClass = CssClass($Discussion);
@@ -195,7 +211,7 @@ function CssClass($Discussion) {
    $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
    $CssClass .= $Alt ? ' Alt ' : '';
    $Alt = !$Alt;
-   $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
+   $CssClass .= $Discussion->Announce ? ' Announcement' : '';
    $CssClass .= $Discussion->Closed == '1' ? ' Closed' : '';
    $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
    $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
@@ -335,7 +351,7 @@ function OptionsList($Discussion) {
 
       // Announce discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Announce == '1' ? 'Unannounce' : 'Announce'), 'vanilla/discussion/announce/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'AnnounceDiscussion') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(T('Announce...'), '/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl), 'Popup AnnounceDiscussion') . '</li>';
 
       // Sink discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID))
@@ -360,9 +376,9 @@ function OptionsList($Discussion) {
                $Sender->Options.
             '</ul>'.
             '</span>';
+         
+         return $Result;
       }
-      
-      return $Result;
      
    }
    return '';

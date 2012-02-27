@@ -646,14 +646,13 @@ body #Head h1 {
    position: relative;
 }
 .ToggleFlyout.Open {
-   z-index: 100;
+   z-index: 110; /* above Item:hover */
 }
 .ToggleFlyout .Flyout {
    position: absolute;
    top: 100%;
    left: 0;
    display: none;
-   z-index: 100;
 }
 
 

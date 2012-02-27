@@ -534,8 +534,8 @@ jQuery(document).ready(function($) {
       if (!href)
          return;
       gdn.disable(this);
+      e.stopPropagation();
       
-
       $.ajax({
          type: "POST",
          url: href,
@@ -571,8 +571,17 @@ jQuery(document).ready(function($) {
    $.fn.openToggler = function() {
       var lastOpen = null;
       
-     $(this).click(function() {
+     $(this).click(function(e) {
+        
         var $flyout = $('.Flyout', this);
+        var isHandle = false;
+        
+        if ($(e.target).closest('.Flyout').length == 0) {
+           e.stopPropagation();
+           isHandle = true;
+        } else if ($(e.target).hasClass('Hijack') || $(e.target).closest('a').hasClass('Hijack')) {
+           return;
+        }
 
         // Dynamically fill the flyout.
         var rel = $(this).attr('rel');
@@ -605,6 +614,9 @@ jQuery(document).ready(function($) {
            $flyout.hide()
            $(this).removeClass('Open');
         }
+     
+        if (isHandle)
+           return false;
      });
    }
    $('.ToggleFlyout').openToggler();

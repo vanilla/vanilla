@@ -7,7 +7,7 @@
 	<channel>
       <title><?php echo $this->Head->Title(); ?></title>
       <link><?php echo htmlspecialchars(Url('', TRUE, TRUE)); ?></link>
-      <pubDate><?php echo date(DATE_RFC822); ?></pubDate>
+      <pubDate><?php echo date('r'); ?></pubDate>
       <?php
          $this->RenderAsset('RssHead');
       

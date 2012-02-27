@@ -1021,8 +1021,10 @@ class Gdn_Form extends Gdn_Pluggable {
          $this->AddErrorClass($Attributes);
       
       $Return = '';
-      if (GetValue('Wrap', $Attributes))
+      $Wrap = GetValue('Wrap', $Attributes, FALSE, TRUE);
+      if ($Wrap) {
          $Return .= '<div class="TextBoxWrapper">';
+      }
       
       $Return .= '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
@@ -1044,7 +1046,7 @@ class Gdn_Form extends Gdn_Pluggable {
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
          $Return .= $this->InlineError($FieldName);
       
-      if (GetValue('Wrap', $Attributes))
+      if ($Wrap)
          $Return .= '</div>';
 
       return $Return;
@@ -1318,7 +1320,8 @@ class Gdn_Form extends Gdn_Pluggable {
       if ($ShowErrors) $this->AddErrorClass($Attributes);
       
       $Return = '';
-      if (GetValue('Wrap', $Attributes))
+      $Wrap = GetValue('Wrap', $Attributes, FALSE, TRUE);
+      if ($Wrap)
          $Return .= '<div class="TextBoxWrapper">';
       
       $Return .= $MultiLine === TRUE ? '<textarea' : '<input type="'.GetValue('type', $Attributes, 'text').'"';
@@ -1335,7 +1338,7 @@ class Gdn_Form extends Gdn_Pluggable {
       if ($ShowErrors)  
          $Return .= $this->InlineError($FieldName);
       
-      if (GetValue('Wrap', $Attributes))
+      if ($Wrap)
          $Return .= '</div>';
       
       return $Return;

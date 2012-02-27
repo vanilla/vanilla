@@ -223,7 +223,12 @@ class DiscussionModel extends VanillaModel {
       $Unset = FALSE;
       
       foreach($Result as $Key => &$Discussion) {
-         if ($Discussion->Announce == 1 && $Discussion->Dismissed == 0) {
+         if (isset($this->_AnnouncementIDs)) {
+            if (in_array($Discussion->DiscussionID, $this->_AnnouncementIDs)) {
+               unset($Result[$Key]);
+               $Unset = TRUE;
+            }
+         } elseif ($Discussion->Announce == 1 && $Discussion->Dismissed == 0) {
             // Unset discussions that are announced and not dismissed
             unset($Result[$Key]);
             $Unset = TRUE;
@@ -341,7 +346,7 @@ class DiscussionModel extends VanillaModel {
          ->Cache($CacheKey)
          ->Select('d.DiscussionID')
          ->From('Discussion d')
-         ->Where('d.Announce', '1');
+         ->Where('d.Announce >', '0');
       if (is_array($Wheres) && count($Wheres) > 0)
          $this->SQL->Where($Wheres);
 
@@ -374,6 +379,11 @@ class DiscussionModel extends VanillaModel {
 //         ->Where('d.Announce', '1');
 
       $this->SQL->WhereIn('d.DiscussionID', $AnnouncementIDs);
+      
+      // If we aren't viewing announcements in a category then only show global announcements.
+      if (!$Wheres) {
+         $this->SQL->Where('d.Announce', 1);
+      }
 
       // If we allow users to dismiss discussions, skip ones this user dismissed
       if (C('Vanilla.Discussions.Dismiss', 1) && $UserID) {
@@ -386,6 +396,13 @@ class DiscussionModel extends VanillaModel {
          ->Limit($Limit, $Offset);
 
       $Data = $this->SQL->Get();
+      
+      // Save the announcements that were fetched for later removal.
+      $AnnouncementIDs = array();
+      foreach ($Data as $Row) {
+         $AnnouncementIDs[] = GetValue('DiscussionID', $Row);
+      }
+      $this->_AnnouncementIDs = $AnnouncementIDs;
 			
 		$this->AddDiscussionColumns($Data);
       
@@ -604,6 +621,7 @@ class DiscussionModel extends VanillaModel {
       if (!$Data)
          return $Data;
       
+      $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
       $Data->Url = Url('/discussion/'.$Data->DiscussionID.'/'.Gdn_Format::Url($Data->Name), TRUE);
       

@@ -27,27 +27,6 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-
-   // 2. Announce discussion
-   $('a.AnnounceDiscussion').livequery('click', function() {
-      var btn = this;
-      var row = $(btn).parents('li.Item');
-      $.ajax({
-         type: "POST",
-         url: $(btn).attr('href'),
-         data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
-         dataType: 'json',
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $.popup({}, XMLHttpRequest.responseText);
-         },
-         success: function(json) {
-            gdn.inform(json);
-            if (json.RedirectUrl)
-              setTimeout("document.location='" + json.RedirectUrl + "';", 300);
-         }
-      });
-      return false;
-   });
    
    // 3. Sink discussion
    $('a.SinkDiscussion').popup({

@@ -152,10 +152,13 @@ class BanModel extends Gdn_Model {
     * @param bool $UpdateBlocks
     * @return bool Whether user is banned.
     */
-   public static function CheckUser($User, $Validation = NULL, $UpdateBlocks = FALSE) {
+   public static function CheckUser($User, $Validation = NULL, $UpdateBlocks = FALSE, &$BansFound = NULL) {
       $Bans = self::AllBans();
       $Fields = array('Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress');
       $Banned = array();
+      
+      if (!$BansFound)
+         $BansFound = array();
 
       foreach ($Bans as $Ban) {
          // Convert ban to regex.
@@ -165,6 +168,7 @@ class BanModel extends Gdn_Model {
 
          if (preg_match($Regex, GetValue($Fields[$Ban['BanType']], $User))) {
             $Banned[$Ban['BanType']] = TRUE;
+            $BansFound[] = $Ban;
 
             if ($UpdateBlocks) {
                Gdn::SQL()
@@ -177,8 +181,10 @@ class BanModel extends Gdn_Model {
       }
 
       // Add the validation results.
-      foreach ($Banned as $BanType => $Value) {
-         $Validation->AddValidationResult($BanType, 'ValidateBanned');
+      if ($Validation) {
+         foreach ($Banned as $BanType => $Value) {
+            $Validation->AddValidationResult($BanType, 'ValidateBanned');
+         }
       }
       return count($Banned) == 0;
    }

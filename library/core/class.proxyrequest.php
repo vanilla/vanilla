@@ -396,8 +396,9 @@ class ProxyRequest {
             $SendFileSize = filesize($SendFile);
             $this->Action(" PUTing file: {$SendFile}");
             
+            $SendFileHandle = fopen($SendFile, 'r');
             curl_setopt($Handler, CURLOPT_PUT, TRUE);
-            curl_setopt($Handler, CURLOPT_INFILE, $SendFile);
+            curl_setopt($Handler, CURLOPT_INFILE, $SendFileHandle);
             curl_setopt($Handler, CURLOPT_INFILESIZE, $SendFileSize);
             
             $SendExtraHeaders[] = "Content-Length: {$SendFileSize}";

@@ -692,6 +692,8 @@ if (!function_exists('FetchPageInfo')) {
             
          $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
          $Dom = str_get_html($PageHtml);
+         if (!$Dom)
+            throw new Exception('Failed to load page for parsing.');
          
          /* Sample Facebook Open Graph code:
 
@@ -1553,6 +1555,7 @@ if (!function_exists('write_ini_file')) {
          if (is_array($Settings)) {
             $Flat[] = "[{$Topic}]";
                foreach ($Settings as $SettingsKey => $SettingsVal) $Flat[] = "{$SettingsKey} = ".(is_numeric($SettingsVal) ? $SettingsVal : '"'.$SettingsVal.'"');
+            $Flat[] = "";
          }
          else $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
       }

@@ -284,7 +284,9 @@ class UserModel extends Gdn_Model {
       $UserIDs = array();
       foreach ($Data as $Row) {
          foreach ($Columns as $ColumnName) {
-            $UserIDs[GetValue($ColumnName, $Row)] = 1;
+            $ID = GetValue($ColumnName, $Row);
+            if (is_numeric($ID))
+               $UserIDs[$ID] = 1;
          }
       }
       
@@ -304,7 +306,7 @@ class UserModel extends Gdn_Model {
       foreach ($Data as &$Row) {
          foreach ($Prefixes as $Px) {
             $ID = GetValue($Px.'UserID', $Row);
-            if ($ID) {
+            if (is_numeric($ID)) {
                $User = GetValue($ID, $Users, FALSE);
                foreach ($Join as $Column) {
                   $Value = $User[$Column];
@@ -1624,50 +1626,85 @@ class UserModel extends Gdn_Model {
       $Fields[$this->DateInserted] = $Now;
       $Fields['DateFirstVisit'] = $Now;
       $Fields['DateLastActive'] = $Now;
+      $Fields['InsertIPAddress'] = Gdn::Request()->IpAddress();
+      $Fields['LastIPAddress'] = Gdn::Request()->IpAddress();
    }
 
    /**
-    * Update last visit.
-    *
-    * Regenerates other related user properties.
+    * Updates visit level information such as date last active and the user's ip address.
     *
     * @param int $UserID
-    * @param array $Attributes
     * @param string|int|float $ClientHour
     */
-   function UpdateLastVisit($UserID, $Attributes, $ClientHour='') {
+   function UpdateVisit($UserID, $ClientHour = FALSE) {
       $UserID = (int) $UserID;
       if (!$UserID) {
-         throw new Exception('A valid UserId is required.');
+         throw new Exception('A valid User ID is required.');
       }
-      
-//      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-//      $AllIPs = GetValue('AllIPAddresses', $User, array());
-      $IP = Gdn::Request()->IpAddress();
-//      if (!in_array($IP, $AllIPs)) {
-//         $AllIPs[] = $IP;
-//         SetValue('AllIPAddresses', $User, $AllIPs);
-//      }
       
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-      $Fields = array(
-         'DateLastActive' => Gdn_Format::ToDateTime(),
-         'LastIPAddress' => $IP,
-         'CountVisits' => GetValue('CountVisits', $User, 0) + 1);
-
-      if (isset($Attributes) && is_array($Attributes)) {
-         // Generate a new transient key for the user (used to authenticate postbacks).
-         $Attributes['TransientKey'] = RandomString(12);
-         $Fields['Attributes'] = serialize($Attributes);
+      
+      $Fields = array();
+      
+      if (Gdn_Format::ToTimestamp($User['DateLastActive']) < strtotime('5 minutes ago')) {
+         // We only update the last active date once every 5 minutes to cut down on DB activity.
+         $Fields['DateLastActive'] = Gdn_Format::ToDateTime();
       }
+      
+      // Update session level information if necessary.
+      if ($UserID == Gdn::Session()->UserID) {
+         $IP = Gdn::Request()->IpAddress();
+         $Fields['LastIPAddress'] = $IP;
+         
+         if (Gdn::Session()->NewVisit()) {
+            $Fields['CountVisits'] = GetValue('CountVisits', $User, 0) + 1;
+         }
+      }
+      
+      // Generate the AllIPs field.
+      $AllIPs = GetValue('AllIPAddresses', $User, array());
+      if (is_string($AllIPs)) {
+         $AllIPs = explode(',', $AllIPs);
+         SetValue('AllIPAddresses', $User, $AllIPs);
+      }
+      if (!is_array($AllIPs))
+         $AllIPs = array();
+      if ($IP = GetValue('InsertIPAddress', $User))
+         $AllIPs[] = $IP;
+      if ($IP = GetValue('LastIPAddress', $User))
+         $AllIPs[] = $IP;
+      $AllIPs = array_unique($AllIPs);
+      sort($AllIPs);
+      $Fields['AllIPAddresses'] = $AllIPs;
 
       // Set the hour offset based on the client's clock.
       if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
          $HourOffset = $ClientHour - date('G', time());
-         $this->SQL->Set('HourOffset', $HourOffset);
+         $Fields['HourOffset'] = $HourOffset;
       }
-
-      $this->SQL->Where('UserID', $UserID)->Put();
+      
+      // See if the fields have changed.
+      $Changed = FALSE;
+      foreach ($Fields as $Name => $Value) {
+         if (GetValue($Name, $User) != $Value) {
+            $Changed = TRUE;
+            break;
+         }
+      }
+      
+      if ($Changed) {
+         $this->SetField($UserID, $Fields);
+      }
+      
+      if ($User['LastIPAddress'] != $Fields['LastIPAddress']) {
+         $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+         if (!BanModel::CheckUser($User, NULL, TRUE, $Bans)) {
+            $BanModel = new BanModel();
+            $Ban = array_pop($Bans);
+            $BanModel->SaveUser($User, TRUE, $Ban);
+            $BanModel->SetCounts($Ban);
+         }
+      }
    }
 
    /**
@@ -2280,7 +2317,12 @@ class UserModel extends Gdn_Model {
          SetValue('PhotoUrl', $User, $PhotoUrl);
       }
       if ($v = GetValue('AllIPAddresses', $User)) {
-         SetValue('AllIPAddresses', $User, explode(',', $v));
+         $IPAddresses = explode(',', $v);
+         foreach ($IPAddresses as $i => $IPAddress) {
+            if (strpos($IPAddress, '.') === FALSE)
+               $IPAddresses[$i] = long2ip(hexdec($IPAddress));
+         }
+         SetValue('AllIPAddresses', $User, $IPAddresses);
       }
    }
 
@@ -2610,6 +2652,18 @@ class UserModel extends Gdn_Model {
    }
    
 	public function SetField($RowID, $Property, $Value = FALSE) {
+      if (!is_array($Property))
+         $Property = array($Property => $Value);
+
+      // Convert IP addresses to long.
+      if (isset($Property['AllIPAddresses'])) {
+//         foreach ($Property['AllIPAddresses'] as &$IP) {
+//            if (strpos($IP, '.') !== FALSE)
+//               $IP = dechex(ip2long($IP));
+//         }
+         $Property['AllIPAddresses'] = implode(',', $Property['AllIPAddresses']);
+      }
+      
 		$this->SQL
             ->Update($this->Name)
             ->Set($Property, $Value)

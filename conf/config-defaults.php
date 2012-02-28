@@ -99,7 +99,7 @@ $Configuration['Garden']['Roles']['Manage']                     = TRUE;
 $Configuration['Garden']['VanillaUrl']                          = 'http://vanillaforums.org';
 $Configuration['Garden']['AllowSSL']                            = TRUE;
 $Configuration['Garden']['PrivateCommunity']                    = FALSE;
-$Configuration['Garden']['EditContentTimeout']                  = -1; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds.
+$Configuration['Garden']['EditContentTimeout']                  = 3600; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds. 60 * 60 = 3600 (aka 1hr)
 $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowGuestModule']          = TRUE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;

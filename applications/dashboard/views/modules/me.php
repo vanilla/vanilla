@@ -36,7 +36,7 @@ if ($Session->IsValid()):
    echo '</div>';
    echo '</div>';
 else:
-   echo '<div class="MeBox-SignIn">';
+   echo '<div class="MeBox MeBox-SignIn">';
 
    echo '<div class="SignInLinks">';
 

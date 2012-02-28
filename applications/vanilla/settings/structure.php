@@ -146,7 +146,7 @@ $Construct->PrimaryKey('CommentID')
 	->Column('DeleteUserID', 'int', TRUE)
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
-	->Column('DateInserted', 'datetime', NULL, 'index.1')
+	->Column('DateInserted', 'datetime', NULL, array('index.1', 'index'))
 	->Column('DateDeleted', 'datetime', TRUE)
 	->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
@@ -396,11 +396,22 @@ if (!$CountBookmarksExists) {
    )");
 }
 
-$Construct->Table('TagDiscussion')
+$Construct->Table('TagDiscussion');
+$DateInsertedExists = $Construct->ColumnExists('DateInserted');
+
+$Construct
    ->Column('TagID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
+   ->Column('DateInserted', 'datetime', !$DateInsertedExists)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
+
+if (!$DateInsertedExists) {
+   $SQL->Update('TagDiscussion td')
+      ->Join('Discussion d', 'td.DiscussionID = d.DiscussionID')
+      ->Set('td.DateInserted', 'd.DateInserted')
+      ->Put();
+}
 
 $Construct->Table('Tag')
    ->Column('CountDiscussions', 'int', 0)

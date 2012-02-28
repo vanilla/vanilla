@@ -179,7 +179,8 @@ textarea.TextBox {
 	width: auto;
 	padding-right: 8px;
 }
-.TextBoxWrapper textarea {
+.TextBoxWrapper textarea,
+.TextBoxWrapper input {
    width: 100%;
 }
 #Popup textarea.TextBox {
@@ -342,7 +343,7 @@ input.Button {
 	background: url('images/sprites.png') -83px -1px no-repeat;
 	padding-left: 24px;
 }*/
-/*.BreadcrumbWrap {
+.BreadcrumbWrap {
 	clear: both;
 	line-height: 2.4;
 	font-size: 12px;
@@ -355,10 +356,12 @@ input.Button {
 	margin: 0 auto;
 	width: 960px;
 }
+/*
 .BreadcrumbWrap.TopBreadcrumb {
 	background: #f7f7f7;
 	background: rgba(0,0,0,0.03);
-}*/
+}
+*/
 #PagerLess {
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;
@@ -694,7 +697,8 @@ div.Discussion:hover .OptionsTitle:hover,
 	text-decoration: none;
 	padding: 6px;
 }
-.MenuItems li a:hover {
+/* .MenuItems li a:hover { */
+.MenuItems a:hover {
    background: #282828;
 }
 .ToggleFlyout {
@@ -702,7 +706,7 @@ div.Discussion:hover .OptionsTitle:hover,
    position: relative;
 }
 .ToggleFlyout.Open {
-   z-index: 100;
+   z-index: 110;
 }
 .ToggleFlyout .Flyout {
    position: absolute;
@@ -742,6 +746,9 @@ a.Bookmarking:hover {
 .AdminCheck {
    vertical-align: top;
 	line-height: 1;
+}
+.HomepageTitle .AdminCheck {
+    padding-left: 8px;
 }
 .ControlOptions .AdminCheck {
 	display: block;
@@ -799,35 +806,31 @@ a.Bookmarking:hover {
 	font-size: 12px;
    margin-left: 80px;
 }
-.Box p {
-   font-size: 100%;
-   padding: 0 0 4px;
-   color: #555;
-}
 
-.MeBox, .MeBox-SignIn {
+.MeBox {
    margin: 10px 0;
 }
 .MeBox .ProfilePhotoMedium {
-	float: left;	
+	float: left;
+   margin-right: 5px;
 }
 .MeBox .WhoIs {
 	min-height: 40px;
-	margin-left: 48px;
 	line-height: 1.3;
 }
 .MeBox .Username {
 	font-weight: bold;
 	vertical-align: top;
+   font-size: 14px;
 }
 .MeMenu {
-   display: block;
+   line-height: 24px;
 }
 .MeMenu a {
-	float: left;
 	padding: 4px 6px;
 	position: relative;
 	line-height: 1;
+   display: inline-block;
 }
 .MeMenu a:hover {
 	background: #eee;
@@ -998,7 +1001,7 @@ a.Bookmarking:hover {
 #UserOptions {
 	margin-bottom: 10px;
 }
-a.BigButton {
+.BigButton {
    text-align: center;
    display: block;
    cursor: pointer;
@@ -1021,14 +1024,14 @@ a.BigButton {
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
    }
-a.BigButton:hover {
+.BigButton:hover {
    color: #111;
    border: 1px solid #666;
 	box-shadow: 0px 0px 5px #aaa;
 	-moz-box-shadow: 0px 0px 5px #aaa;
 	-webkit-box-shadow: 0px 0px 5px #aaa;  
 }
-a.BigButton:focus {
+.BigButton:focus {
    background: #eee;
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
@@ -1087,7 +1090,7 @@ a.BigButton:focus {
 	text-indent: 50px;
 }
 
-/* ================================================ DataList (Search Results) */
+/* ================================================ DataList */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
 .SearchForm {
 	background: #f7f7f7;
@@ -1100,9 +1103,6 @@ a.BigButton:focus {
 }
 .Empty {
    margin: 10px 0;
-}
-.PageTitle {
-   padding-right: 8px; /* match .DataList .Item */
 }
 .DataList .Item {
    margin: 0;
@@ -1127,10 +1127,6 @@ a.BigButton:focus {
    display: block;
    font-weight: bold;
    margin: 0;
-}
-.DataList .Title a {
-   font-size: 120%;
-   font-weight: bold;
 }
 .DataList .Meta {
    font-size: 11px;
@@ -1296,8 +1292,6 @@ body.Profile ul.Activities {
 /* ============================================================== MessageList */
 
 .Author .ProfilePhotoMedium {
-   height: 40px;
-   width: 40px;
    margin: 0 10px 4px 0;
    float: left;
    overflow: hidden;
@@ -1328,6 +1322,13 @@ blockquote {
 .Message small {
 	font-size: 11px;
 	color: #777;
+}
+img.LeftAlign {
+   float: left;
+   margin: 0 10px 5px 0;
+}
+.ClearFix {
+   clear: both;
 }
 code, pre {
    border-radius: 2px;
@@ -1529,7 +1530,6 @@ table.PreferenceGroup tbody td.PrefCheckBox {
 /* About in content area */
 dl.About dt,
 dl.About dd {
-   color: #666;
    padding: 0;
    margin: 0;
    float: none;
@@ -1538,6 +1538,7 @@ dl.About dd {
    display: inline;
 }
 dl.About dt {
+   color: #666;
    background: url('images/profile-sprites.png') 2px -139px no-repeat transparent;
    padding-left: 14px;
 }
@@ -1549,7 +1550,6 @@ dl.About dt.Roles { background-position: 1px -81px; }
 dl.About dt.Posts { background-position: 0 -113px; }
 dl.About dd {
    padding: 0 8px 0 0;
-   color: #333;
 }
 /* ======================================================== Thumbnail Cropper */
 .Popup .CurrentPicture {
@@ -1613,11 +1613,6 @@ form.Thumbnail .Warning {
 
 
 /* ================================================= CommentForm */
-.CommentForm form {
-	padding: 5px;
-	background: #f7f7f7;
-	background: rgba(0, 0, 0, 0.03);
-}
 .Preview {
 	background: #fff;
    color: #000;
@@ -1628,12 +1623,16 @@ form.Thumbnail .Warning {
 	position: relative;
    text-align: right; 
 	margin: 0;
-	padding: 6px;
+	/* padding: 6px; */
+	padding: 6px 0;
 }
 .CommentForm .Buttons .Back {
+	float: left;
+	line-height: 2.2;
+	/*
 	left: 6px;
    position: absolute;
-	line-height: 2.2;
+	*/
 }
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,
@@ -1655,6 +1654,7 @@ form.Thumbnail .Warning {
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 5000;
 }
 .MSIE .Overlay {
    background: gray;
@@ -1665,7 +1665,6 @@ div.Popup {
   width: 100%;
   top: 0;
   left: 0;
-  z-index: 5000;
   text-align: center;
 }
 div.Popup .Border {
@@ -1677,41 +1676,31 @@ div.Popup .Border {
 }
 div.Popup .Body {
   background: #fff;
+  padding: 10px;
 }
-div.Popup .Legal,
+/*div.Popup .Legal,
 div.Popup .Content form {
 	max-height: 440px;
 	overflow: auto;
 	padding: 0 10px 10px;
-}
+}*/
 div.Popup .Loading {
   text-align: center;
 }
-div.Popup h1,
-div.Popup h2 {
-	font-size:120%;
-	font-weight:bold;
-	margin: 0;
-	color: #fff;
-	background: #38abe3;
-	padding: 6px 9px 4px;
+div.Popup h1 {
+   margin-top: 0;
 }
 a.Close {
 	position: absolute;
 	top: 16px;
 	right: 20px;
 	line-height: 1;
-	color: #fff;
-	color: rgba(255, 255, 255, 0.9);
+	color: #000;
 	cursor: pointer;
 	font-family: arial;
 	font-size: 22px;
 	font-weight: bold;
 	padding: 0;
-}
-a.Close:hover {
-	color: #fff;
-	color: rgba(255, 255, 255, 1);
 }
 div.Popup .Footer {
 	border: none;
@@ -1906,7 +1895,7 @@ div.Popup form ul li label.RadioLabel {
 .ItemDiscussion .MItem a {
    font-size: 11px; 
 }
-.ItemDiscussion .Author img {
+.ItemDiscussion .ProfilePhotoMedium {
 	height: 24px;
 	width: 24px;
    margin: 0 5px 5px 0;
@@ -1940,6 +1929,10 @@ div.Popup form ul li label.RadioLabel {
    vertical-align: bottom;
 }
 
+.CheckBoxColumn {
+   width: 24px;
+}
+
 .DataTable .BlockColumn {
    width: 25%;
 }
@@ -1966,7 +1959,8 @@ tbody td.BigCount {
    padding: 8px 4px;
 }
 
-.DataTable .Meta {
+.DataTable .Meta,
+.DataTable .MItem {
    font-size: 11px;
 }
 
@@ -2030,9 +2024,12 @@ tr.CategoryHeading td {
 }
 
 /* ================================================================= Comments */
+/*
+This should be handled by a more generic class like #Content if it is really necessary.
 body.Discussion #Content {
    margin-bottom: 20px;
 }
+*/
 
 /* ================================= Conversation, Discussion & Comment Forms */
 .SpNewConversation,
@@ -2092,13 +2089,16 @@ body.Vanilla.Post #Content {
    padding: 6px;
 }
 */
-#ConversationForm form,
-#DiscussionForm form {
+.FormWrapper {
 	background: #f7f7f7;
    background: rgba(0, 0, 0, 0.03);
    margin: 0;
-   padding: 13px 20px 20px;
+   padding: 13px 20px;
 }
+.FormWrapper-Condensed {
+   padding: 5px;
+}
+
 #DiscussionForm textarea {
    width: 100%;
    height: 100px;
@@ -2332,10 +2332,10 @@ body.Entry #Content {
    margin: 0 auto;
    width: 360px;
 }
-body.Entry #Content form {
+/*body.Entry #Content form {
 	text-align: left;
 	padding: 10px;
-}
+}*/
 body.Entry form ul li label {
 	font-size: 14px;
 	/* color: #474747; */
@@ -2349,11 +2349,6 @@ body.Entry form ul li label.RadioLabel {
 	font-weight: normal;
    width: auto;
 }
-body.Entry input.DateBox,
-body.Entry input.InputBox,
-body.Entry textarea {
-   width: 310px;
-}
 span.Incorrect {
    display: block;
    color: red;
@@ -2363,21 +2358,15 @@ body#dashboard_entry_signin #Content,
 body#dashboard_entry_index #Content {
 	width: auto;
 }
-.SignInPopup .Content form {
+/*.SignInPopup .Content form {
 	padding: 0 10px 10px;
-}
-body#dashboard_entry_password #Content form,
+}*/
+/*body#dashboard_entry_password #Content form,
 body#dashboard_entry_index #Content form,
 body#dashboard_entry_signin #Content form {
 	padding: 0;
 	text-align:left;
-}
-body#dashboard_entry_password #Content form,
-body#dashboard_entry_signin #Content form,
-body#dashboard_entry_index #Content form,
-.SignInPopup form {
-	width: 270px;
-}
+}*/
 .SingleEntryMethod {
 	width: 290px;
 	margin: 0 auto;
@@ -2385,34 +2374,19 @@ body#dashboard_entry_index #Content form,
 .MultipleEntryMethods {
 	width: 500px;
 	margin: 0 auto;
+   overflow: hidden;
+}
+.MultipleEntryMethods .MainForm {
+   float: left;
+   width: 285px;
 }
 .MultipleEntryMethods .Methods {
    border-left: solid 1px #BEC8CC;
+	padding: 0 15px 5px;
+	line-height: 1;
+   margin-left: 300px;
 }
-body#dashboard_entry_handshake #Content input.InputBox,
-body#dashboard_entry_signin #Content input.InputBox,
-body#dashboard_entry_index #Content input.InputBox,
-body#dashboard_entry_password #Content input.InputBox,
-.SignInPopup input.DateBox,
-.SignInPopup input.InputBox,
-.SignInPopup textarea {
-   width: 260px;
-	padding: 3px;
-}
-.SignInPopup form ul li label,
-body#dashboard_entry_signin form ul li label,
-body#dashboard_entry_index form ul li label,
-body#dashboard_entry_password form ul li label,
-body#dashboard_entry_handshake form ul li label {
-	font-size: 13px;
-	line-height: 1.5;
-	padding: 0;
-}
-body#dashboard_entry_password #Content form ul li input#Form_Email,
-body#dashboard_entry_signin #Content form ul li input#Form_Email,
-body#dashboard_entry_index #Content form ul li input#Form_Email {
-	margin-bottom: 6px;
-}
+
 body#dashboard_entry_password #Content input.Password,
 body#dashboard_entry_signin #Content input.Password,
 body#dashboard_entry_index #Content input.Password,
@@ -2439,28 +2413,9 @@ body.Entry li.Buttons {
 	text-align: left;
 	padding: 0 0 10px;
 }
-.Entry {
-	position: relative;
-}
-.Methods {
-	text-align: left;
-	position: absolute;
-	top: 33px;
-	bottom: 0;
-	right: 0;
-	padding: 12px 20px 6px;
-	line-height: 1;
-   width: 170px;
-}
-body#dashboard_entry_password .Methods,
-body#dashboard_entry_signin .Methods,
-body#dashboard_entry_index .Methods {
-	padding: 10px 6px 6px;
-	background: none;
-}
+
 .Methods .Method {
-	padding: 10px 0 0;
-	text-align: left;
+   margin: 5px 0;
 }
 
 /* Handshake */
@@ -2516,20 +2471,18 @@ body#dashboard_entry_leave p.Leaving {
 }
 
 /* External App Connect Designs */
-.Connect h1,
+/*.Connect h1,
 .Connect h2 {
 	text-align: left;
 }
 .ConnectInfo {
-	margin: 10px 0 0;
+	margin: 10px 0;
 	position: relative;
 }
 .ConnectInfo img {
-	position: absolute;
-	height: 36px;
-	width: 36px;
-	top: 0;
-	left: 0;
+   float: left;
+	height: 40px;
+	width: 40px;
 }
 .ConnectInfo span.Name {
 	padding-left: 46px;
@@ -2538,8 +2491,8 @@ body#dashboard_entry_leave p.Leaving {
 	font-size: 13px;
 	color: #444;
 	display: block;
-}
-.ConnectInfo h3 {
+}*/
+/*.ConnectInfo h3 {
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 15px;
 	font-weight: bold;
@@ -2547,8 +2500,8 @@ body#dashboard_entry_leave p.Leaving {
 	color: #333;
 	padding: 0 0 10px 46px;
 	border: none;
-}
-.Connect form ul li label,
+}*/
+/*.Connect form ul li label,
 .SignInPopup form ul li label,
 body#dashboard_entry_password form ul li label,
 body#dashboard_entry_signin form ul li label,
@@ -2556,31 +2509,23 @@ body#dashboard_entry_index form ul li label {
 	font-size: 13px;
 	line-height: 1.5;
 	padding: 0;
-}
+}*/
 .Connect form ul li#ConnectPassword label,
 .SignInPopup form ul li#ConnectPassword label {
 	padding: 10px 0 0;
 }
-.Connect .FinePrint,
-.SignInPopup .FinePrint {
+.FinePrint {
 	font-size: 11px;
 	color: #777;
 }
-body#dashboard_entry_password input.InputBox,
-body#dashboard_entry_signin input.InputBox,
-body#dashboard_entry_index input.InputBox,
-.Connect input.InputBox,
-.SignInPopup input.InputBox {
-	padding: 3px
-}
-.Connect .ExistingUsername,
+/*.Connect .ExistingUsername,
 .SignInPopup .ExistingUsername {
 	font-weight: bold;
 	line-height: 1;
 	font-size: 13px;
 	color: #000;
 	display: block;
-}
+}*/
 
 
 /* Do not customize these unless you enjoy pain. */
@@ -2951,6 +2896,7 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 	display: inline-block;
 	height: 16px;
 	width: 16px;
+   vertical-align: top;
 }
 
 /* 16px Sprites White */
@@ -3237,7 +3183,6 @@ body.embed .Connect h2 {
    width: 40px;
 }
 .ProfilePhotoLarge {
-	height: 200px;
 	width: 200px;
 }
 .PhotoGrid {

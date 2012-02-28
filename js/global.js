@@ -542,11 +542,13 @@ jQuery(document).ready(function($) {
    
    var hijackClick = function(e) {   
       var $elem = $(this);
+      var $flyout = $elem.closest('.ToggleFlyout');
       var href = $elem.attr('href');
       if (!href)
          return;
       gdn.disable(this);
-
+      e.stopPropagation();
+      
       $.ajax({
          type: "POST",
          url: href,
@@ -556,6 +558,9 @@ jQuery(document).ready(function($) {
             gdn.enable(this);
             $elem.removeClass('InProgress');
             $elem.attr('href', href);
+            
+            // If we are in a flyout, close it.
+            $flyout.removeClass('Open').find('.Flyout').hide();
          },
          error: function(xhr) {
             gdn.informError(xhr);
@@ -581,8 +586,16 @@ jQuery(document).ready(function($) {
 
    // Activate ToggleFlyout menus
    var lastOpen = null;
-   $(document).delegate('.ToggleFlyout', 'click', function() {
+   $(document).delegate('.ToggleFlyout', 'click', function(e) {        
       var $flyout = $('.Flyout', this);
+        var isHandle = false;
+        
+        if ($(e.target).closest('.Flyout').length == 0) {
+           e.stopPropagation();
+           isHandle = true;
+        } else if ($(e.target).hasClass('Hijack') || $(e.target).closest('a').hasClass('Hijack')) {
+           return;
+        }
       
       // Dynamically fill the flyout.
       var rel = $(this).attr('rel');
@@ -614,13 +627,16 @@ jQuery(document).ready(function($) {
          $flyout.hide();
          $(this).removeClass('Open');
       }
+     
+        if (isHandle)
+           return false;
    });
    
    // Close ToggleFlyout menu even if their links are hijacked
-   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-      $('.ToggleFlyout').removeClass('Open');
-      $('.Flyout').hide();
-   });
+//   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+//      $('.ToggleFlyout').removeClass('Open');
+//      $('.Flyout').hide();
+//   });
    
    // Add a spinner onclick of buttons with this class
    $(document).delegate('input.SpinOnClick', 'click', function() {
@@ -920,10 +936,12 @@ jQuery(document).ready(function($) {
 	
 	// When a stash anchor is clicked, look for inputs with values to stash
 	$('a.Stash').click(function() {
-		var comment = $('#Form_Comment textarea').val();
-		var placeholder = $('#Form_Comment textarea').attr('placeholder');
-		if (comment != '' && comment != placeholder)
-			stash('CommentForDiscussionID_' + gdn.definition('DiscussionID'), comment);
+      // Embedded comments
+		var comment = $('#Form_Comment textarea').val(),
+         placeholder = $('#Form_Comment textarea').attr('placeholder'),
+         vanilla_identifier = gdn.definition('vanilla_identifier');
+		if (vanilla_identifier && comment != '' && comment != placeholder)
+			stash('CommentForForeignID_' + vanilla_identifier, comment);
 	});
 });
 

@@ -38,9 +38,10 @@ echo '<span class="BeforeCommentHeading">';
 $this->FireEvent('CommentHeading');
 echo $this->Pager->ToString('less');
 echo '</span>';
+
+echo '<div class="DataBox DataBox-Comments">';
 if ($this->Data['CommentData']->NumRows() > 0)
 	echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
-
 ?>
 <ul class="MessageList DataList Comments">
 	<?php include $this->FetchViewLocation('comments'); ?>
@@ -53,6 +54,7 @@ if($this->Pager->LastPage()) {
       $this->AddDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
    $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
 }
+echo '</div>';
 
 echo '<div class="P">';
 $this->Pager->Wrapper = '<div %1$s>%2$s</div>';

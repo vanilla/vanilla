@@ -121,17 +121,28 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
-      <div class="Message">
-			<?php 
+      <div class="Item-Body">
+         <div class="Message">
+            <?php 
          echo FormatBody($Comment);
-			?>
-		</div>
-      <?php $Sender->FireEvent('AfterCommentBody'); ?>
+            ?>
+         </div>
+         <?php $Sender->FireEvent('AfterCommentBody'); ?>
+         <?php WriteReactions($Comment); ?>
+      </div>
    </div>
 </li>
 <?php
 	$Sender->FireEvent('AfterComment');
 }
+
+if (!function_exists('WriteReactions')):
+
+function WriteReactions($Row, $Type = 'Comment') {
+   // noop
+}
+
+endif;
 
 /**
  * Get options for the current discussion.
@@ -170,7 +181,7 @@ function GetDiscussionOptions($Discussion = NULL) {
 
    // Can the user announce?
    if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
-      $Options['AnnounceDiscussion'] = array('Label' => T($Discussion->Announce ? 'Unannounce' : 'Announce'), 'Url' => 'vanilla/discussion/announce/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Hijack');
+      $Options['AnnounceDiscussion'] = array('Label' => T('Announce...'), 'Url' => 'vanilla/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Popup');
 
    // Can the user sink?
    if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID))
@@ -264,15 +275,16 @@ function GetCommentOptions($Comment) {
 		$Options['EditComment'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
 
 	// Can the user delete the comment?
-	if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
+	// if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
+   if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
 		$Options['DeleteComment'] = array('Label' => T('Delete'), 'Url' => 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
    
    // DEPRECATED (as of 2.1)
    $Sender->EventArguments['Type'] = 'Comment';
    
    // Allow plugins to add options
-	$Sender->EventArguments['CommentOptions'] = &$Options;
-	$Sender->EventArguments['Comment'] = $Comment;
+   $Sender->EventArguments['CommentOptions'] = &$Options;
+   $Sender->EventArguments['Comment'] = $Comment;
    $Sender->FireEvent('CommentOptions');
    
 	return $Options;
@@ -304,11 +316,16 @@ function WriteCommentOptions($Comment) {
    </span>
    <?php
    if (C('Vanilla.AdminCheckboxes.Use')) {
-      if (!property_exists($Controller, 'CheckedComments'))
-         $Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
+      // Only show the checkbox if the user has permission to affect multiple items
+      $Discussion = Gdn::Controller()->Data('Discussion');
+      $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion);
+      if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID)) {
+         if (!property_exists($Controller, 'CheckedComments'))
+            $Controller->CheckedComments = $Session->GetAttribute('CheckedComments', array());
 
-      $ItemSelected = InSubArray($Id, $Controller->CheckedComments);
-      echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+         $ItemSelected = InSubArray($Id, $Controller->CheckedComments);
+         echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></span>';
+      }
    }
 }
 
@@ -323,18 +340,32 @@ function WriteCommentForm() {
 	
 	$Discussion = $Controller->Data('Discussion');
 	$PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion);
+	$UserCanClose = $Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID);
+	$UserCanComment = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $PermissionCategoryID);
 	
 	// Closed notification
 	if ($Discussion->Closed == '1') {
 		?>
 		<div class="Foot Closed">
 			<div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
-			<?php echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
+			<?php //echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
 		</div>
 		<?php
-	} 
-	
-	// Comment form
-	if (!$Discussion->Closed || $Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
+	} else if (!$UserCanComment) {
+      if (!Gdn::Session()->IsValid()) {
+		?>
+		<div class="Foot Closed">
+			<div class="Note Closed"><?php 
+            echo FormatString(
+               T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}">Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'), 
+               array('SignInUrl' => SignInUrl(Url('')), 
+                     'RegisterUrl' => RegisterUrl(Url('')))); ?></div>
+			<?php //echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
+		</div>
+		<?php
+      }
+	}
+   
+	if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
 		echo $Controller->FetchView('comment', 'post');
 }

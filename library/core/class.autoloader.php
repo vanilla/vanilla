@@ -300,7 +300,8 @@ class Gdn_Autoloader {
       ));
       
       $MapGroupHashes = GetValue($MapGroupIdentifier, self::$MapGroups, array());
-      
+      $PriorityHashes = array();
+      $PriorityHashes = array();
       foreach ($MapGroupHashes as $MapHash => $Trash) {
          $ThisMapType = self::Map($MapHash)->MapType();
          // We're restricting this priority to a certain maptype, so exclude non matchers

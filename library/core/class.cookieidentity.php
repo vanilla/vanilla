@@ -209,7 +209,7 @@ class Gdn_CookieIdentity {
       $CookieContents = implode('|',$Cookie);
 
       // Create the cookie.
-      setcookie($CookieName, $CookieContents, $Expire, $Path, $Domain);
+      setcookie($CookieName, $CookieContents, $Expire, $Path, $Domain, NULL, TRUE);
       $_COOKIE[$CookieName] = $CookieContents;
    }
    

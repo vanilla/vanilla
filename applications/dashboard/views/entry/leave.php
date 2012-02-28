@@ -3,7 +3,7 @@ $Session = Gdn::Session();
 ?>
 <div id="Leave">
    <h1><?php echo T('Sign Out'); ?></h1>
-   <div class="Box">
+   <div class="P">
    <?php if ($this->Leaving) { ?>
       <p class="Leaving"><?php echo T('SigningOut', 'Hang on a sec while we sign you out.'); ?></p>
    <?php } else if ($Session->IsValid()) { ?>

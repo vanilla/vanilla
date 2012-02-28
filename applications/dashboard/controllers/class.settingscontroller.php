@@ -682,6 +682,8 @@ class SettingsController extends DashboardController {
    /**
     * Configuration of registration settings.
     *
+    * Events: BeforeRegistrationUpdate
+    *
     * @since 2.0.0
     * @access public
     * @param string $RedirectUrl Where to send user after registration.
@@ -762,7 +764,7 @@ class SettingsController extends DashboardController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');   
          // if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
          //    $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
-
+         
          if ($this->Form->GetValue('Garden.Registration.ConfirmEmail'))
             $ConfigurationModel->Validation->ApplyRule('Garden.Registration.ConfirmEmailRole', 'Required');
          
@@ -771,6 +773,10 @@ class SettingsController extends DashboardController {
          $InvitationCounts = $this->Form->GetValue('InvitationCount');
          $this->ExistingRoleInvitations = ArrayCombine($InvitationRoleIDs, $InvitationCounts);
          $ConfigurationModel->ForceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
+         
+         // Event hook
+         $this->EventArguments['ConfigurationModel'] = &$ConfigurationModel;
+         $this->FireEvent('BeforeRegistrationUpdate');
          
          // Save!
          if ($this->Form->Save() !== FALSE) {

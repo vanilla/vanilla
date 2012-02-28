@@ -2230,3 +2230,14 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 	width: 341px;
 	background: url('images/welcome-message.png') top left no-repeat transparent;
 }
+
+.Info ul,
+.Info ol {
+   margin: 1em 0 1em 3em;
+}
+.Info ol li {
+  list-style: decimal !important;
+}
+.Info ul li {
+  list-style: disc !important;
+}

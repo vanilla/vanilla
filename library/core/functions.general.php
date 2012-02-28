@@ -692,6 +692,8 @@ if (!function_exists('FetchPageInfo')) {
             
          $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
          $Dom = str_get_html($PageHtml);
+         if (!$Dom)
+            throw new Exception('Failed to load page for parsing.');
          
          /* Sample Facebook Open Graph code:
 

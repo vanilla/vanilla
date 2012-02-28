@@ -370,11 +370,6 @@ class SettingsController extends DashboardController {
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
       
-      // Load the locales for the locale dropdown
-      $Locale = Gdn::Locale();
-      $AvailableLocales = $Locale->GetAvailableLocaleSources();
-      $this->LocaleData = ArrayCombine($AvailableLocales, $AvailableLocales);
-      
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
@@ -385,19 +380,8 @@ class SettingsController extends DashboardController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
          
-         // If changing locale, redefine locale sources:
-         /*
-         $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
-         if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
-            $ApplicationManager = new Gdn_ApplicationManager();
-            $Locale = Gdn::Locale();
-            $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
-         }
-         */
-         
          if ($this->Form->Save() !== FALSE)
             $this->InformMessage(T("Your settings have been saved."));
-
       }
       
       $this->Render();      

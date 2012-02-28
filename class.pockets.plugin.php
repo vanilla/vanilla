@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
-   'Description' => 'Allows site admins to add free-form HTML to various places around the application.',
-   'Version' => '1.0.4b',
+   'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
+   'Version' => '1.0.4',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',

@@ -121,17 +121,28 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          </div>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
-      <div class="Message">
-			<?php 
+      <div class="Item-Body">
+         <div class="Message">
+            <?php 
          echo FormatBody($Comment);
-			?>
-		</div>
-      <?php $Sender->FireEvent('AfterCommentBody'); ?>
+            ?>
+         </div>
+         <?php $Sender->FireEvent('AfterCommentBody'); ?>
+         <?php WriteReactions($Object); ?>
+      </div>
    </div>
 </li>
 <?php
 	$Sender->FireEvent('AfterComment');
 }
+
+if (!function_exists('WriteReactions')):
+
+function WriteReactions($Row, $Type = 'Comment') {
+   // noop
+}
+
+endif;
 
 /**
  * Get options for the current discussion.

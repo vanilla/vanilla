@@ -128,7 +128,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
             ?>
          </div>
          <?php $Sender->FireEvent('AfterCommentBody'); ?>
-         <?php WriteReactions($Object); ?>
+         <?php WriteReactions($Comment); ?>
       </div>
    </div>
 </li>

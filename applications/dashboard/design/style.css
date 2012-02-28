@@ -706,7 +706,7 @@ div.Discussion:hover .OptionsTitle:hover,
    position: relative;
 }
 .ToggleFlyout.Open {
-   z-index: 100;
+   z-index: 110;
 }
 .ToggleFlyout .Flyout {
    position: absolute;

@@ -148,6 +148,14 @@ function WriteReactions($Row, $Type = 'Comment') {
 
 endif;
 
+if (!function_exists('WriteReactions')):
+
+function WriteReactions($Row, $Type = 'Comment') {
+   // noop
+}
+
+endif;
+
 /**
  * Get options for the current discussion.
  *

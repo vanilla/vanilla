@@ -369,7 +369,8 @@ jQuery(document).ready(function($) {
       else
          $('.DataList .AdminCheck :checkbox').removeAttr('checked');
    });
-   $('.AdminCheck :checkbox').click(function() {
+   $('.AdminCheck :checkbox').click(function(e) {
+      e.stopPropagation();
       // retrieve all checked ids
       var checkIDs = $('.DataList .AdminCheck :checkbox');
       var aCheckIDs = new Array();

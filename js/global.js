@@ -587,6 +587,7 @@ jQuery(document).ready(function($) {
    // Activate ToggleFlyout menus
    var lastOpen = null;
    $(document).delegate('.ToggleFlyout', 'click', function(e) {        
+        
       var $flyout = $('.Flyout', this);
         var isHandle = false;
         

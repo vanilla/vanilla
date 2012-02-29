@@ -1326,6 +1326,7 @@ blockquote {
 img.LeftAlign {
    float: left;
    margin: 0 10px 5px 0;
+   max-width: 300px;
 }
 .ClearFix {
    clear: both;

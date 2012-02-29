@@ -20,7 +20,10 @@ echo '<ul class="DataList Activities">';
 $Activities = $this->Data('Activities', array());
 if (count($Activities) > 0) {
    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
-   echo PagerModule::Write(array('CurrentRecords' => count($Activities)));
+   
+   echo '<div class="P">';
+   PagerModule::Write(array('CurrentRecords' => count($Activities)));
+   echo '</div>';
 } else {
    ?>
 <li><div class="Empty"><?php echo T('Not much happening here, yet.'); ?></div></li>

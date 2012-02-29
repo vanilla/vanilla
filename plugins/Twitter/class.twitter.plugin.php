@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter',
-   'Description' => 'This plugin integrates Twitter with Vanilla. <b>You must register your application with Twitter for this plugin to work.</b>',
+   'Description' => 'Users may sign into your site using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>',
    'Version' => '1.0b',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,

@@ -706,7 +706,7 @@ div.Discussion:hover .OptionsTitle:hover,
    position: relative;
 }
 .ToggleFlyout.Open {
-   z-index: 100;
+   z-index: 110;
 }
 .ToggleFlyout .Flyout {
    position: absolute;
@@ -1001,7 +1001,7 @@ a.Bookmarking:hover {
 #UserOptions {
 	margin-bottom: 10px;
 }
-a.BigButton {
+.BigButton {
    text-align: center;
    display: block;
    cursor: pointer;
@@ -1024,14 +1024,14 @@ a.BigButton {
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
    }
-a.BigButton:hover {
+.BigButton:hover {
    color: #111;
    border: 1px solid #666;
 	box-shadow: 0px 0px 5px #aaa;
 	-moz-box-shadow: 0px 0px 5px #aaa;
 	-webkit-box-shadow: 0px 0px 5px #aaa;  
 }
-a.BigButton:focus {
+.BigButton:focus {
    background: #eee;
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
@@ -1326,6 +1326,7 @@ blockquote {
 img.LeftAlign {
    float: left;
    margin: 0 10px 5px 0;
+   max-width: 300px;
 }
 .ClearFix {
    clear: both;
@@ -1676,6 +1677,7 @@ div.Popup .Border {
 }
 div.Popup .Body {
   background: #fff;
+  padding: 10px;
 }
 /*div.Popup .Legal,
 div.Popup .Content form {
@@ -1686,31 +1688,20 @@ div.Popup .Content form {
 div.Popup .Loading {
   text-align: center;
 }
-div.Popup h1,
-div.Popup h2 {
-	font-size:120%;
-	font-weight:bold;
-	margin: 0;
-	color: #fff;
-	background: #38abe3;
-	padding: 6px 9px 4px;
+div.Popup h1 {
+   margin-top: 0;
 }
 a.Close {
 	position: absolute;
 	top: 16px;
 	right: 20px;
 	line-height: 1;
-	color: #fff;
-	color: rgba(255, 255, 255, 0.9);
+	color: #000;
 	cursor: pointer;
 	font-family: arial;
 	font-size: 22px;
 	font-weight: bold;
 	padding: 0;
-}
-a.Close:hover {
-	color: #fff;
-	color: rgba(255, 255, 255, 1);
 }
 div.Popup .Footer {
 	border: none;
@@ -2034,9 +2025,12 @@ tr.CategoryHeading td {
 }
 
 /* ================================================================= Comments */
+/*
+This should be handled by a more generic class like #Content if it is really necessary.
 body.Discussion #Content {
    margin-bottom: 20px;
 }
+*/
 
 /* ================================= Conversation, Discussion & Comment Forms */
 .SpNewConversation,

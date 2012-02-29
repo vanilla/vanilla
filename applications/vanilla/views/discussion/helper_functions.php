@@ -13,6 +13,10 @@ function CssClass($Object, $CurrentOffset = 0) {
    $CssClass = 'Item Item'.$Type;
    $CssClass .= (GetValue('InsertUserID', $Object) == Gdn::Session()->UserID) ? ' Mine' : '';
    
+   if ($_CssClss = GetValue('_CssClass', $Object)) {
+      $CssClass .= ' '.$_CssClss;
+   }
+   
    if ($Type == 'Comment')
       $CssClass .= ($CurrentOffset % 2) ? ' Alt' : '';
    

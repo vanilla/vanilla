@@ -342,6 +342,8 @@ class DiscussionsController extends VanillaController {
 		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
 		if (!is_array($vanilla_identifier))
 			$vanilla_identifier = array($vanilla_identifier);
+         
+      $vanilla_identifier = array_unique($vanilla_identifier);
 			
 		$CountData = Gdn::SQL()
 			->Select('ForeignID, CountComments')
@@ -355,19 +357,21 @@ class DiscussionsController extends VanillaController {
 				$FinalData[$identifier] = 0;
 			}
 		} else {
-			$i = 0;
 			foreach ($CountData->Result() as $Row) {
-				while ($Row->ForeignID != $vanilla_identifier[$i]) {
-					$FinalData[$vanilla_identifier[$i]] = 0;
-					$i++;
-				}
-				$Row->CountComments--;
-				if ($Row->CountComments < 0)
-					$Row->CountComments = 0;
-	
 				$FinalData[$Row->ForeignID] = $Row->CountComments;
-				$i++;
 			}
+         // Ensure that all of the requested values return a value
+         foreach($vanilla_identifier as $id) {
+            if (!array_key_exists($id, $FinalData)) {
+               $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
+            } else {
+               $Count = $FinalData[$id];
+               if ($Count > 0)
+                  $Count = $Count - 1; // Reduce the count by 1, but don't go below zero
+                  
+               $FinalData[$id] = $Count;
+            }
+         }
 		}
 
 		$this->SetData('CountData', $FinalData);

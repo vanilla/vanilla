@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['GoogleSignIn'] = array(
 	'Name' => 'Google Sign In',
-   'Description' => 'This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.',
+   'Description' => 'Allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.',
    'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredPlugins' => array('OpenID' => '0.1a'),

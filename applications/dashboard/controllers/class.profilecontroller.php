@@ -335,9 +335,12 @@ class ProfileController extends Gdn_Controller {
     * @since 2.0.0
     * @access public
     */
-   public function Invitations() {
+   public function Invitations($UserReference = '', $Username = '', $UserID = '') {
       $this->Permission('Garden.SignIn.Allow');
-      $this->GetUserInfo();
+      $this->EditMode(FALSE);
+      $this->GetUserInfo($UserReference, $Username, $UserID);
+      $this->SetTabView('Invitations');
+      
       $InvitationModel = new InvitationModel();
       $this->Form->SetModel($InvitationModel);
       if ($this->Form->AuthenticatedPostBack()) {
@@ -350,8 +353,7 @@ class ProfileController extends Gdn_Controller {
       $Session = Gdn::Session();
       $this->InvitationCount = $this->UserModel->GetInvitationCount($Session->UserID);
       $this->InvitationData = $InvitationModel->GetByUserID($Session->UserID);
-		$this->Title(T('My Invitations'));
-		$this->_SetBreadcrumbs(T('My Invitations'), '/profile/invitations');
+
 		$this->Render();
    }
    
@@ -1026,8 +1028,6 @@ class ProfileController extends Gdn_Controller {
 					$passwordLabel = T('Set A Password');
 				$Module->AddLink('Options', Sprite('SpPassword').$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
 			}
-			if (Gdn::Config('Garden.Registration.Method') == 'Invitation')
-				$Module->AddLink('Options', Sprite('SpInvitations').T('My Invitations'), '/profile/invitations', FALSE, array('class' => 'Popup InvitationsLink'));
 
 			$Module->AddLink('Options', Sprite('SpPreferences').T('Notification Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
 			if ($AllowImages)
@@ -1079,6 +1079,10 @@ class ProfileController extends Gdn_Controller {
                
             $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications', $NotificationsHtml);
          }
+         
+         // Show invitations?
+         if (C('Garden.Registration.Method') == 'Invitation')
+				$this->AddProfileTab(T('Invitations'), 'profile/invitations', 'InvitationsLink');
          
          // Show activity?
          if (C('Garden.Profile.ShowActivities', TRUE))

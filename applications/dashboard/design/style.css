@@ -713,7 +713,6 @@ div.Discussion:hover .OptionsTitle:hover,
    top: 100%;
    right: -10px;
    display: none;
-   z-index: 100;
 	text-align: left;
 }
 .OptionsMenu .Flyout {
@@ -1440,6 +1439,10 @@ body.Profile #Panel {
    float: left;
    width: 250px;
 } */
+
+.Profile #Panel .MeBox.NotMe .MeMenu {
+   display: none;
+}
 .ChangePicture span {
 	position: absolute;
 	background: #333;
@@ -1458,7 +1461,6 @@ body.Profile #Panel {
 	float: right;
 }
 /* Hiding form headings with CSS in case the forms get popped */
-body.Profile.EditMode h2,
 body.Profile.picture .SmallPopup h1 {
 	display: none;
 }

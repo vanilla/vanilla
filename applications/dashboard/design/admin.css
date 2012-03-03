@@ -398,6 +398,16 @@ a.Button {
    color: transparent !important;
    text-shadow: none !important;
 }
+.InProgress {
+   color: transparent !Important;
+   background: url('images/progress_sm.gif') center center no-repeat !important;
+   border-color: transparent !important;
+   -moz-box-shadow: none !important;
+   -webkit-box-shadow: none !important;
+   box-shadow: none !important;
+   color: transparent !important;
+   text-shadow: none !important;
+}
 
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
@@ -2304,4 +2314,14 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 	height: 42px;
 	width: 341px;
 	background: url('images/welcome-message.png') top left no-repeat transparent;
+}
+.Info ul,
+.Info ol {
+   margin: 1em 0 1em 3em;
+}
+.Info ol li {
+  list-style: decimal !important;
+}
+.Info ul li {
+  list-style: disc !important;
 }

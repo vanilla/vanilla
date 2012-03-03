@@ -13,6 +13,10 @@ function CssClass($Object, $CurrentOffset = 0) {
    $CssClass = 'Item Item'.$Type;
    $CssClass .= (GetValue('InsertUserID', $Object) == Gdn::Session()->UserID) ? ' Mine' : '';
    
+   if ($_CssClss = GetValue('_CssClass', $Object)) {
+      $CssClass .= ' '.$_CssClss;
+   }
+   
    if ($Type == 'Comment')
       $CssClass .= ($CurrentOffset % 2) ? ' Alt' : '';
    
@@ -88,54 +92,65 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->FireEvent('BeforeCommentDisplay'); ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
    <div class="Comment">
-      <div class="Meta">
-         <?php $Sender->FireEvent('BeforeCommentMeta'); ?>
-         <span class="Author">
-            <?php
-            echo UserPhoto($Author);
-            echo UserAnchor($Author);
-            ?>
-         </span>
-         <span class="MItem DateCreated">
-            <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
-         </span>
+      <?php $Sender->FireEvent('BeforeCommentMeta'); ?>
+      <span class="Author">
          <?php
-         // Include source if one was set
-         if ($Source = GetValue('Source', $Comment))
-            echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
-         
-         // Add your own options or data as spans with 'MItem' class
-         $Sender->FireEvent('InsideCommentMeta');
-         
-			?>
-         <div class="Options">
-            <?php WriteCommentOptions($Comment); ?>
-         </div>
-         <div class="CommentInfo">
+         echo UserPhoto($Author);
+         echo UserAnchor($Author, 'Username');
+         ?>
+      </span>
+      
+      <div class="Item-BodyWrap">
+         <div class="Meta">
+            <span class="MItem DateCreated">
+               <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
+            </span>
             <?php
-            $Sender->FireEvent('CommentInfo');
-            
-            // Include IP Address if we have permission
-            if ($Session->CheckPermission('Garden.Moderation.Manage')) 
-               echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+            // Include source if one was set
+            if ($Source = GetValue('Source', $Comment))
+               echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
+
+            // Add your own options or data as spans with 'MItem' class
+            $Sender->FireEvent('InsideCommentMeta');
+
             ?>
+            <div class="Options">
+               <?php WriteCommentOptions($Comment); ?>
+            </div>
+            <div class="CommentInfo">
+               <?php
+               $Sender->FireEvent('CommentInfo');
+
+               // Include IP Address if we have permission
+               if ($Session->CheckPermission('Garden.Moderation.Manage')) 
+                  echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+               ?>
+            </div>
+            <?php $Sender->FireEvent('AfterCommentMeta'); ?>
          </div>
-         <?php $Sender->FireEvent('AfterCommentMeta'); ?>
-      </div>
-      <div class="Item-Body">
-         <div class="Message">
-            <?php 
-         echo FormatBody($Comment);
-            ?>
+         <div class="Item-Body">
+            <div class="Message">
+               <?php 
+            echo FormatBody($Comment);
+               ?>
+            </div>
+            <?php $Sender->FireEvent('AfterCommentBody'); ?>
+            <?php WriteReactions($Comment); ?>
          </div>
-         <?php $Sender->FireEvent('AfterCommentBody'); ?>
-         <?php WriteReactions($Comment); ?>
       </div>
    </div>
 </li>
 <?php
 	$Sender->FireEvent('AfterComment');
 }
+
+if (!function_exists('WriteReactions')):
+
+function WriteReactions($Row, $Type = 'Comment') {
+   // noop
+}
+
+endif;
 
 if (!function_exists('WriteReactions')):
 

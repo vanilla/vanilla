@@ -226,7 +226,7 @@ if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
 		// Make sure to fix comma-formatted numbers
       $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
+      return sprintf(T(abs($WorkingNumber) == 1 ? $Singular : $Plural), $Number);
    }
 }
 
@@ -296,7 +296,7 @@ if (!function_exists('UserPhoto')) {
          $User = (object)$User;
       
       $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
-      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoMedium');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhoto ProfilePhotoMedium');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 

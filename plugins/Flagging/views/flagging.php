@@ -60,7 +60,7 @@ if (C('Plugins.Flagging.Enabled')) {
                               <span><?php echo T('FlaggedBy', "Reported by:"); ?> </span>
                               <span><?php echo "<strong>".Anchor($Flag['InsertName'],"profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}")."</strong>{$OtherString} ".T('on').' '.$Flag['DateInserted']; ?></span>
                            </div>
-                           <div class="FlaggedItemComment">"<?php echo $Flag['Comment']; ?>"</div>
+                           <div class="FlaggedItemComment">"<?php echo Gdn_Format::Text($Flag['Comment']); ?>"</div>
                            <div class="FlaggedActions">
                               <?php 
                                  echo $this->Form->Button('Dismiss',array(

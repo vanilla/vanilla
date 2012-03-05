@@ -27,7 +27,7 @@ if ($Thumbnail && !preg_match('`^https?://`i', $Thumbnail))
 $Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));
 ?>
 <div class="SmallPopup">
-<h1><?php echo T('Change My Picture'); ?></h1>
+<h2><?php echo $this->Data('Title'); ?></h2>
 <?php
 echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();

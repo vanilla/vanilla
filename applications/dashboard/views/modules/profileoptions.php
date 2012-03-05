@@ -6,7 +6,7 @@ $Controller = Gdn::Controller();
    <?php
    $Controller->FireEvent('BeforeProfileOptions');
    if ($Controller->EditMode) {
-      echo UserAnchor($Controller->User, 'Button', array('Text' => T('Back to Profile')));
+      echo UserAnchor($Controller->User, 'BackToProfile Button', array('Text' => T('Back to Profile')));
    } else {
       $Session = Gdn::Session();
       
@@ -29,7 +29,3 @@ $Controller = Gdn::Controller();
    $Controller->FireEvent('AfterProfileOptions');
    ?>
 </div>
-<?php
-if ($Controller->EditMode)
-   echo Wrap(sprintf(T('Edit Profile: %s'), htmlentities($Controller->User->Name)), 'h1');
-

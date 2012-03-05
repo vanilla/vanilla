@@ -637,30 +637,30 @@ class Gdn_Format {
       
       $time = $Timestamp;
 
-      define('NOW',        time());
-      define('ONE_MINUTE', 60);
-      define('ONE_HOUR',   3600);
-      define('ONE_DAY',    86400);
-      define('ONE_WEEK',   ONE_DAY*7);
-      define('ONE_MONTH',  ONE_WEEK*4);
-      define('ONE_YEAR',   ONE_MONTH*12);
+      $NOW = time();
+      if (!defined('ONE_MINUTE')) define('ONE_MINUTE', 60);
+      if (!defined('ONE_HOUR')) define('ONE_HOUR',   3600);
+      if (!defined('ONE_DAY')) define('ONE_DAY',    86400);
+      if (!defined('ONE_WEEK')) define('ONE_WEEK',   ONE_DAY*7);
+      if (!defined('ONE_MONTH')) define('ONE_MONTH',  ONE_WEEK*4);
+      if (!defined('ONE_YEAR')) define('ONE_YEAR',   ONE_MONTH*12);
       
-      $SecondsAgo = NOW - $time;
+      $SecondsAgo = $NOW - $time;
 
       // sod = start of day :)
       $sod = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
-      $sod_now = mktime(0, 0, 0, date('m', NOW), date('d', NOW), date('Y', NOW ));
+      $sod_now = mktime(0, 0, 0, date('m', $NOW), date('d', $NOW), date('Y', $NOW ));
 
       // used to convert numbers to strings
       $convert = array(1 => T('a'), 2 => T('two'), 3 => T('three'), 4 => T('four'), 5 => T('five'), 6 => T('six'), 7 => T('seven'), 8 => T('eight'), 9 => T('nine'), 10 => T('ten'), 11 => T('eleven'));
 
       // today
       if ($sod_now == $sod) {
-         if ( $time > NOW-(ONE_MINUTE*3)) {
+         if ( $time > $NOW-(ONE_MINUTE*3)) {
             return T('just now');
-         } else if ($time > NOW-(ONE_MINUTE*7)) {
+         } else if ($time > $NOW-(ONE_MINUTE*7)) {
             return T('a few minutes ago');
-         } else if ($time > NOW-(ONE_HOUR)) {
+         } else if ($time > $NOW-(ONE_HOUR)) {
             if ($MorePrecise) {
                $MinutesAgo = ceil($SecondsAgo / 60);
                return sprintf(T('%s minutes ago'), $MinutesAgo);

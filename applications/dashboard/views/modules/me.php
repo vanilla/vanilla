@@ -1,20 +1,28 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
+$User = $Session->User;
+
+if (property_exists($this->_Sender, 'User'))
+   $User = $this->_Sender->User;
 
 if ($Session->IsValid()):
-   echo '<div class="MeBox">';
+   
+   $NotMe = '';
+   if ($User->UserID != Gdn::Session()->UserID)
+      $NotMe = 'NotMe';
+   
+   echo "<div class=\"MeBox {$NotMe}\">";
 
+   $Name = $User->Name;
 
-   $Name = $Session->User->Name;
-
-   echo UserPhoto($Session->User);
+   echo UserPhoto($User);
    echo '<div class="WhoIs">';
-      echo UserAnchor($Session->User, 'Username');
+      echo UserAnchor($User, 'Username');
       echo '<div class="MeMenu">';
          // Notifications
-         $CountNotifications = $Session->User->CountNotifications;
+         $CountNotifications = $User->CountNotifications;
          $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert">'.$CountNotifications.'</span>' : '';
-         $ProfileSlug = urlencode($Session->User->Name) == $Session->User->Name ? $Session->User->Name : $Session->UserID.'/'.urlencode($Session->User->Name);
+         $ProfileSlug = urlencode($User->Name) == $User->Name ? $User->Name : $UserID.'/'.urlencode($User->Name);
          echo Anchor(Sprite('SpNotifications', 'Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, '/profile/'.$ProfileSlug, array('title' => T('Notifications')));
 
          // Inbox

@@ -294,8 +294,8 @@ class ProfileController extends Gdn_Controller {
          }
       }
       
-		$this->Title(T('Edit My Profile'));
-		$this->_SetBreadcrumbs(T('Edit My Profile'), '/profile/edit');
+		$this->Title(T('Edit Account'));
+		$this->_SetBreadcrumbs(T('Edit Account'), '/profile/edit');
 		$this->Render();
    }
    
@@ -563,7 +563,7 @@ class ProfileController extends Gdn_Controller {
 		if ($this->Form->ErrorCount() > 0)
 			$this->DeliveryType(DELIVERY_TYPE_ALL);
 
-		$this->Title(T('Change My Picture'));
+		$this->Title(T('Change Picture'));
 		$this->_SetBreadcrumbs(T('Change My Picture'), '/profile/picture');
       $this->Render();
    }
@@ -968,6 +968,7 @@ class ProfileController extends Gdn_Controller {
       $SideMenu = new SideMenuModule($this);
       $this->EventArguments['SideMenu'] = &$SideMenu; // Doing this out here for backwards compatibility.
 		if ($this->EditMode) {
+         $this->AddModule('MeModule');
 			$this->BuildEditMenu($SideMenu, $CurrentUrl);
          $this->FireEvent('AfterAddSideMenu');
          $this->AddModule($SideMenu, 'Panel');

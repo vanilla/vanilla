@@ -79,6 +79,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
 		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any') && C('Vanilla.AdminCheckboxes.Use');
    
    // Prep event args
+   $CssClass = CssClass($Comment, $CurrentOffset);
    $Sender->EventArguments['Comment'] = &$Comment;
    $Sender->EventArguments['Author'] = &$Author;
    $Sender->EventArguments['CssClass'] = &$CssClass;
@@ -89,7 +90,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    
    // First comment template event
    $Sender->FireEvent('BeforeCommentDisplay'); ?>
-<li class="<?php echo CssClass($Comment, $CurrentOffset); ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
+<li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
    <div class="Comment">
       <?php $Sender->FireEvent('BeforeCommentMeta'); ?>
       <span class="Author">

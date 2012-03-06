@@ -92,6 +92,9 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->FireEvent('BeforeCommentDisplay'); ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
    <div class="Comment">
+      <div class="Options">
+         <?php WriteCommentOptions($Comment); ?>
+      </div>
       <?php $Sender->FireEvent('BeforeCommentMeta'); ?>
       <span class="Author">
          <?php
@@ -99,35 +102,31 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          echo UserAnchor($Author, 'Username');
          ?>
       </span>
-      
-      <div class="Item-BodyWrap">
-         <div class="Meta">
-            <span class="MItem DateCreated">
-               <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
-            </span>
+      <div class="Meta">
+         <span class="MItem DateCreated">
+            <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
+         </span>
+         <?php
+         // Include source if one was set
+         if ($Source = GetValue('Source', $Comment))
+            echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
+
+         // Add your own options or data as spans with 'MItem' class
+         $Sender->FireEvent('InsideCommentMeta');
+
+         ?>
+         <div class="CommentInfo">
             <?php
-            // Include source if one was set
-            if ($Source = GetValue('Source', $Comment))
-               echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
+            $Sender->FireEvent('CommentInfo');
 
-            // Add your own options or data as spans with 'MItem' class
-            $Sender->FireEvent('InsideCommentMeta');
-
+            // Include IP Address if we have permission
+            if ($Session->CheckPermission('Garden.Moderation.Manage')) 
+               echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
             ?>
-            <div class="Options">
-               <?php WriteCommentOptions($Comment); ?>
-            </div>
-            <div class="CommentInfo">
-               <?php
-               $Sender->FireEvent('CommentInfo');
-
-               // Include IP Address if we have permission
-               if ($Session->CheckPermission('Garden.Moderation.Manage')) 
-                  echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
-               ?>
-            </div>
-            <?php $Sender->FireEvent('AfterCommentMeta'); ?>
          </div>
+         <?php $Sender->FireEvent('AfterCommentMeta'); ?>
+      </div>
+      <div class="Item-BodyWrap">
          <div class="Item-Body">
             <div class="Message">
                <?php 

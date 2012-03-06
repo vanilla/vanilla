@@ -704,14 +704,13 @@ div.Discussion:hover .OptionsTitle:hover,
    position: relative;
 }
 .ToggleFlyout.Open {
-   z-index: 100;
+   z-index: 110; /* above Item:hover */
 }
 .ToggleFlyout .Flyout {
    position: absolute;
    top: 100%;
    right: -10px;
    display: none;
-   z-index: 100;
 	text-align: left;
 }
 .OptionsMenu .Flyout {

@@ -187,17 +187,18 @@ class CategoryModel extends Gdn_Model {
       
       foreach ($Data as &$Row) {
          $Discussion = GetValue($Row['LastDiscussionID'], $Discussions);
+         $NameUrl = 'x';
          if ($Discussion) {
             $Row['LastTitle'] = Gdn_Format::Text($Discussion['Name']);
             $Row['LastUserID'] = $Discussion['InsertUserID'];
             $Row['LastDateInserted'] = $Discussion['DateInserted'];
-            $Row['LastUrl'] = Url("/discussion/{$Discussion['DiscussionID']}/".Gdn_Format::Text($Discussion['Name']), TRUE);
+            $NameUrl = Gdn_Format::Text($Discussion['Name'], TRUE);
+            $Row['LastUrl'] = Url("/discussion/{$Discussion['DiscussionID']}/$NameUrl");
          }
          $Comment = GetValue($Row['LastCommentID'], $Comments);
          if ($Comment) {
             $Row['LastUserID'] = $Comment['InsertUserID'];
             $Row['LastDateInserted'] = $Comment['DateInserted'];
-            $Row['LastUrl'] = Url("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}", TRUE);
          } else {
             $Row['NoComment'] = TRUE;
          }
@@ -703,6 +704,8 @@ class CategoryModel extends Gdn_Model {
    protected static function _MakeTreeChildren($Category, $Categories) {
       $Result = array();
       foreach ($Category['ChildIDs'] as $ID) {
+         if (!isset($Categories[$ID]))
+            continue;
          $Row = $Categories[$ID];
          $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
          $Result[] = $Row;
@@ -1183,7 +1186,7 @@ class CategoryModel extends Gdn_Model {
          } else {
             SetValue('LastUserID', $Category, GetValue('LastCommentUserID', $Category, NULL));
             SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));
-            SetValue('LastUrl', $Category, '/discussion/comment/'.GetValue('LastCommentID', $Category).'#Comment_'.GetValue('LastCommentID', $Category));
+            SetValue('LastUrl', $Category, '/discussion/'.GetValue('LastDiscussionID', $Category).'#Latest');
          }
          
          if ($DateMarkedRead) {

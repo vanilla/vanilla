@@ -20,7 +20,7 @@ if (C('Vanilla.Categories.ShowTabs')) {
 
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    $Alt = FALSE;
-   foreach ($this->CategoryData->Result() as $Category) {
+   foreach ($this->Data('Categories') as $Category) {
       $this->EventArguments['CatList'] = &$CatList;
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;

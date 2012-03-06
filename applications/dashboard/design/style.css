@@ -131,10 +131,10 @@ h2 {
    font-size:120%;
 }
 h3 {
-   font-size:120%;
+   font-size:110%;
 }
 h4 {
-   font-size: 120%;
+   font-size: 110%;
 }
 h5 {
    font-size: 100%;
@@ -786,10 +786,10 @@ a.Bookmarking:hover {
 .Box {
    margin: 10px 0;
 }
-.Box h4 {
+/*.Box h4 {
    font-size: 110%;
    font-weight: bold;
-}
+}*/
 .Box dl {
    overflow: hidden;
 }
@@ -1120,6 +1120,9 @@ a.Bookmarking:hover {
 }
 .DataList .Item .Item {
    border: none;
+}
+.Item h2, .Item h3, .Item h4, .Item h5 {
+   margin: 0;
 }
 .DataList .Title {
    font-size: 14px;

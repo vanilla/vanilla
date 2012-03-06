@@ -31,6 +31,8 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
       if (GetValue('Unfollow', $Category))
          $CssClasses[] = 'Unfollow';
       $CssClasses = implode(' ', $CssClasses);
+      
+      $CategoryID = GetValue('CategoryID', $Category);
 
       if ($Category->CategoryID > 0) {
          // If we are below the max depth, and there are some child categories
@@ -45,7 +47,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                $ChildCategories .= ', ';
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
-            $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category">'.Gdn_Format::Text($Category->Name).'</div>'
                .GetOptions($Category, $this).'
             </li>';
@@ -54,9 +56,11 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $LastComment = UserBuilder($Category, 'Last');
             $AltCss = $Alt ? ' Alt' : '';
             $Alt = !$Alt;
-            $CatList .= '<li class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category '.$CssClasses.'">'
+                  .'<div class="TitleWrap">'
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
+                  .'</div>'
                   .GetOptions($Category, $this)
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
                   .'<div class="Meta">

@@ -241,6 +241,11 @@ input.WideInput {
 	width: auto;
 	padding-right: 8px;
 }
+.TextBoxWrapper textarea,
+.TextBoxWrapper input {
+   width: 100%;
+}
+
 input.SmallInput,
 input.InputBox {
    font-size: 15px;

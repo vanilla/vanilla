@@ -65,9 +65,9 @@ class CategoriesController extends VanillaController {
     * "Table" layout for categories. Mimics more traditional forum category layout.
     */
    public function Table() {
-      if ($this->SyndicationMethod == SYNDICATION_NONE)
+      if ($this->SyndicationMethod == SYNDICATION_NONE) {
          $this->View = 'table';
-      else
+      } else
          $this->View = 'all';
       $this->All();
    }
@@ -211,7 +211,6 @@ class CategoriesController extends VanillaController {
 	 */
 	public function All() {
       // Setup head.
-      $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
       $Title = C('Garden.HomepageTitle');
       if ($Title)
@@ -238,8 +237,8 @@ class CategoriesController extends VanillaController {
       
       
       
-      $this->CategoryData = $this->CategoryModel->GetFull();
-		$this->SetData('Categories', $this->CategoryData);
+      $Categories = $this->CategoryModel->GetFull()->ResultArray();
+		$this->SetData('Categories', $Categories);
       
       // Add modules
       $this->AddModule('NewDiscussionModule');
@@ -258,6 +257,7 @@ class CategoriesController extends VanillaController {
          $this->AddDefinition('SetClientHour', $ClientHour);
       }
 
+      include_once $this->FetchViewLocation('helper_functions', 'categories');
       $this->Render();
 	}
 
@@ -310,6 +310,15 @@ class CategoriesController extends VanillaController {
       $this->CanonicalUrl(Url('/categories', TRUE));
       include_once $this->FetchViewLocation('helper_functions', 'discussions');
       $this->Render();
+   }
+   
+   public function __get($Name) {
+      switch ($Name) {
+         case 'CategoryData':
+            Deprecated('CategoriesController->CategoryData', "CategoriesController->Data('Categories')");
+            $this->CategoryData = new Gdn_DataSet($this->Data('Categories'));
+            return $this->CategoryData;
+      }
    }
    
    /**

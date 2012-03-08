@@ -10,7 +10,7 @@ if ($this->Data !== FALSE) {
 <div class="Box BoxCategories">
    <h4><?php echo Anchor(T('Categories'), 'categories'); ?></h4>
    <ul class="PanelInfo PanelCategories">
-      <li class="ClearFix<?php
+      <?php
       /*
        if (!is_numeric($CategoryID))
          echo ' Active';?>"><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <span class="Aside"><span class="Count"><?php echo Gdn_Format::BigNumber($CountDiscussions, 'html'); ?></span></span></span></li>

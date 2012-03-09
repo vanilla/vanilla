@@ -273,6 +273,7 @@ class CategoriesController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
+      $this->AddJsFile('options.js');
       $Title = C('Garden.HomepageTitle');
       if ($Title)
          $this->Title($Title, '');

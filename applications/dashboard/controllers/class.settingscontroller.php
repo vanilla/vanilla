@@ -977,7 +977,11 @@ class SettingsController extends DashboardController {
             }
          }
       }
-      $this->SetData('AvailableThemes', Gdn::ThemeManager()->AvailableThemes());
+      $Themes = Gdn::ThemeManager()->AvailableThemes();
+      uasort($Themes, array('SettingsController', '_NameSort'));
+//      decho($Themes);
+//      die();
+      $this->SetData('AvailableThemes', $Themes);
       
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
          try {
@@ -999,6 +1003,10 @@ class SettingsController extends DashboardController {
 
       }
       $this->Render();
+   }
+   
+   protected static function _NameSort($A, $B) {
+      return strcasecmp(GetValue('Name', $A), GetValue('Name', $B));
    }
    
    /**

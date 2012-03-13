@@ -11,13 +11,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['OpenID'] = array(
 	'Name' => 'OpenID',
-   'Description' => 'This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.',
-   'Version' => '0.1a',
-   'RequiredApplications' => array('Vanilla' => '2.0.14a'),
+   'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; plugin.',
+   'Version' => '0.2',
+   'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
 	'MobileFriendly' => TRUE,
-   'SettingsUrl' => '/dashboard/plugin/openid',
+//   'SettingsUrl' => '/dashboard/plugin/openid',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -25,6 +25,8 @@ $PluginInfo['OpenID'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
 );
+
+// 0.2 - Remove redundant enable toggle (2012-03-08 Lincoln)
 
 class OpenIDPlugin extends Gdn_Plugin {
    public static $ProviderKey = 'OpenID';
@@ -80,14 +82,14 @@ class OpenIDPlugin extends Gdn_Plugin {
    /**
     * Act as a mini dispatcher for API requests to the plugin app
     */
-   public function PluginController_OpenID_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
-		$this->Dispatch($Sender, $Sender->RequestArgs);
-   }
+//   public function PluginController_OpenID_Create($Sender) {
+//      $Sender->Permission('Garden.Settings.Manage');
+//		$this->Dispatch($Sender, $Sender->RequestArgs);
+//   }
    
-   public function Controller_Toggle($Sender) {
-      $this->AutoToggle($Sender);
-   }
+//   public function Controller_Toggle($Sender) {
+//      $this->AutoToggle($Sender);
+//   }
    
    public function AuthenticationController_Render_Before($Sender, $Args) {
       if (isset($Sender->ChooserList)) {
@@ -184,7 +186,7 @@ class OpenIDPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
-      if (!$this->IsEnabled()) return;
+//      if (!$this->IsEnabled()) return;
       
       if (isset($Sender->Data['Methods'])) {
          $ImgSrc = Asset('/plugins/OpenID/design/openid-signin.png');
@@ -203,12 +205,12 @@ class OpenIDPlugin extends Gdn_Plugin {
    }
    
    public function Base_SignInIcons_Handler($Sender, $Args) {
-      if (!$this->IsEnabled()) return;
+//      if (!$this->IsEnabled()) return;
       echo "\n".$this->_GetButton();
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-      if (!$this->IsEnabled()) return;
+//      if (!$this->IsEnabled()) return;
       echo "\n".$this->_GetButton();
    }
 	
@@ -221,8 +223,8 @@ class OpenIDPlugin extends Gdn_Plugin {
 	}
 	
 	public function Base_BeforeSignInLink_Handler($Sender) {
-      if (!$this->IsEnabled())
-			return;
+//      if (!$this->IsEnabled())
+//			return;
 		
 		// if (!IsMobile())
 		// 	return;

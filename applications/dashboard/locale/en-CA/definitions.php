@@ -164,5 +164,9 @@ $Definition['Warning: This is for advanced users.'] = '<b>Warning</b>: This is f
 $Definition['Activity.Delete'] = '×';
 $Definition['Draft.Delete'] = '×';
 $Definition['ConnectName'] = 'Username';
+$Definition['Start a New Discussion'] = 'New Discussion';
+$Definition['Start a New Conversation'] = 'New Message';
+$Definition['New Conversation'] = 'New Message';
+$Definition['Start Conversation'] = 'Post Message';
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

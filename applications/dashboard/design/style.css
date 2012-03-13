@@ -592,11 +592,13 @@ body #Head h1 {
    color: #fff;
    text-decoration: underline;
 }
+/*
 #Menu .Alert {
 	text-shadow: none;
    background: #f2fcff;
    color: #299fc7;
 }
+*/
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
 .ControlOptions,
@@ -763,7 +765,10 @@ a.Bookmarking:hover {
 #Panel {
    width: 200px;
    float: left;
-   overflow: hidden;
+   
+/*   
+No overflow hidden on main elements. Causes too many bugs!
+overflow: hidden; */
 }
 #Panel > :first-child {
 	margin-top: 0;

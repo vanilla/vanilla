@@ -1680,7 +1680,7 @@ div.Popup .Border {
   margin: 0px auto;
   text-align: left;
   position: relative;
-  max-width: 500px;
+  max-width: 600px;
   display: inline-block;
 }
 div.Popup .Body {
@@ -2339,7 +2339,7 @@ body.Entry #Panel {
 body.Entry #Content {
    float: none;
    margin: 0 auto;
-   width: 360px;
+   max-width: 500px;
 }
 /*body.Entry #Content form {
 	text-align: left;
@@ -2362,11 +2362,11 @@ span.Incorrect {
    display: block;
    color: red;
 }
-body#dashboard_entry_password #Content,
+/*body#dashboard_entry_password #Content,
 body#dashboard_entry_signin #Content,
 body#dashboard_entry_index #Content {
 	width: auto;
-}
+}*/
 /*.SignInPopup .Content form {
 	padding: 0 10px 10px;
 }*/
@@ -2381,9 +2381,9 @@ body#dashboard_entry_signin #Content form {
 	margin: 0 auto;
 }
 .MultipleEntryMethods {
-	width: 500px;
+/*	width: 500px;*/
 	margin: 0 auto;
-   overflow: hidden;
+/*   overflow: hidden;*/
 }
 .MultipleEntryMethods .MainForm {
    float: left;

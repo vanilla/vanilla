@@ -8,8 +8,8 @@ if (!$ModPermission && !$AdminPermission)
    return;
 
 ?>
-<div class="Box BoxFilter BoxActivityFilter">
-   <ul class="PanelInfo">
+<div class="BoxFilter BoxActivityFilter">
+   <ul class="FilterMenu">
       <li <?php if ($Controller->Data('Filter') == 'public') echo 'class="Active"'; ?>>
          <?php
          echo Anchor(Sprite('SpPublicActivities').T('Recent Activity'), '/activity');

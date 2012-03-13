@@ -31,8 +31,8 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
    $MyDrafts .= FilterCountString($CountDrafts);
 }
 ?>
-<div class="Box BoxFilter BoxDiscussionFilter">
-   <ul class="PanelInfo">
+<div class="BoxFilter BoxDiscussionFilter">
+   <ul class="FilterMenu">
       <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::Link('forumroot', Sprite('SpDiscussions').T('All Discussions')); ?></li>
       <?php      
       if (C('Vanilla.Categories.ShowTabs')) {

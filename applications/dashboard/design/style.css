@@ -177,13 +177,15 @@ textarea {
    padding: 3px;
    margin: 0;
    width: 250px;
-	box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset; 
-	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
-	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
 	background: #fff;
 	border: 1px solid #999;
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	padding: 3px;	
+   /*
+	box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset; 
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
+   */
 }
 textarea.TextBox {
    width: 500px;
@@ -230,20 +232,22 @@ a.Button,
    font-size: 11px;
    padding: 4px 6px;
 	background: #f8f8f8;
-	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
-	background:-moz-linear-gradient(top, #ffffff, #cccccc);
-	-pie-background:linear-gradient(top, #ffffff, #cccccc);
-	background:linear-gradient(top, #ffffff, #cccccc);
    color: #02475A;
-	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
+	white-space: nowrap;
+   /*
+	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #cccccc);
+	-pie-background:linear-gradient(top, #ffffff, #cccccc);
+	background:linear-gradient(top, #ffffff, #cccccc);
+   text-shadow: 0 1px 0 #fff;
 	box-shadow: 0px 0px 1px #999;
 	-moz-box-shadow: 0px 0px 1px #999;
 	-webkit-box-shadow: 0px 0px 1px #999;
-	white-space: nowrap;
+   */
 }
 a.Button {
    display: inline-block;
@@ -630,7 +634,9 @@ body #Head h1 {
    padding: 2px 4px;
    font-size: 11px;
    background: #CFECFF; /*#F6F6F6;*/
+   /*
    box-shadow: #ABDAFB 0px 0px 2px 0px;
+   */
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
    border-radius: 1px;
@@ -832,21 +838,29 @@ overflow: hidden; */
    margin-left: 80px;
 }
 
+.UserBox,
 .MeBox {
    margin: 10px 0;
 }
+.UserBox .ProfilePhotoMedium,
 .MeBox .ProfilePhotoMedium {
 	float: left;
    margin-right: 5px;
 }
+.UserBox .WhoIs,
 .MeBox .WhoIs {
 	min-height: 40px;
 	line-height: 1.3;
 }
+.UserBox .Username,
 .MeBox .Username {
 	font-weight: bold;
 	vertical-align: top;
    font-size: 14px;
+}
+.UserBox .Email {
+   white-space: nowrap;
+   overflow: hidden;
 }
 .MeMenu {
    line-height: 24px;
@@ -869,9 +883,11 @@ overflow: hidden; */
 	line-height: 1;
 	padding: 1px;
 	border: 1px solid #d00;
+   /*
 	box-shadow: 0 1px 1px #333;
 	-moz-box-shadow: 0 1px 1px #333;
 	-webkit-box-shadow: 0 1px 1px #333;
+   */
 }
 .MeMenu em {
 	display: none;
@@ -918,11 +934,13 @@ overflow: hidden; */
    padding: 2px 4px;
 }
 */
+#Panel .FilterMenu li,
 .PanelInfo li {
 	border-bottom: 1px solid #ddd;
    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
    padding: 2px 4px;
 }
+#Panel .FilterMenu .Aside,
 .PanelInfo .Aside {
    float: right;
 }
@@ -936,6 +954,7 @@ overflow: hidden; */
 	border-bottom: 0;
 }
 */
+#Panel .FilterMenu,
 .PanelInfo {
 	border-top: 1px solid #ddd;
    border-top: 1px solid rgba(0, 0, 0, 0.1);
@@ -977,16 +996,12 @@ overflow: hidden; */
 	color: #333;
 	padding: 2px 0;
 }
+#Panel .FilterMenu .Active,
 .PanelInfo .Active {
 	background: #f7f7f7;
    background: rgba(0, 0, 0, 0.03);
 	font-weight: bold;
 }
-/*
-.PanelInfo .Active a {
-   color: #1e79a7;
-}
-*/
 .PanelActivity .ShowAll,
 .PanelInfo .ShowAll {
    font-weight: bold;
@@ -994,21 +1009,11 @@ overflow: hidden; */
    text-align: right;
 	background: none;
 }
-/* BoxFilter in the #Content area */
 #Content .BoxFilter {
 	margin: 0 0 6px;
 }
-#Content .BoxFilter .PanelInfo {
-	border: none;
-}
-#Content .PanelInfo .Aside {
-	float: none;
-}
-#Content .BoxFilter .PanelInfo li,
-#Content .BoxFilter .PanelInfo li.Active {
-	padding: 0;
-	border: none;
-	background: none;
+#Content .FilterMenu li,
+#Content .FilterMenu li.Active {
 	display: inline-block;
 }
 #Content .BoxFilter a {
@@ -1035,32 +1040,38 @@ overflow: hidden; */
    font-weight: bold;
    padding: 8px 0;
 	background: #f8f8f8;
-	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
-	background:-moz-linear-gradient(top, #ffffff, #cccccc);
-	-pie-background:linear-gradient(top, #ffffff, #cccccc);
-	background:linear-gradient(top, #ffffff, #cccccc);
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+   /*
+	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #cccccc);
+	-pie-background:linear-gradient(top, #ffffff, #cccccc);
+	background:linear-gradient(top, #ffffff, #cccccc);
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
-   }
+   */
+}
 .BigButton:hover {
    color: #111;
    border: 1px solid #666;
+   /*
 	box-shadow: 0px 0px 5px #aaa;
 	-moz-box-shadow: 0px 0px 5px #aaa;
-	-webkit-box-shadow: 0px 0px 5px #aaa;  
+	-webkit-box-shadow: 0px 0px 5px #aaa;
+   */
 }
 .BigButton:focus {
    background: #eee;
+   /*
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
+   */
 }
 /* Category Depths */
 .PanelCategories .Depth2 { padding-left: 8px; }
@@ -2588,9 +2599,11 @@ body#dashboard_entry_index form ul li label {
    border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
+   /*
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
+   */
 }
 .Errors a {
    color: #fff;
@@ -2606,9 +2619,11 @@ div.Popup .Errors ul {
    border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
+   /*
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
+   */
 	border: 1px solid #a00 !important;
 }
 div.Popup .Errors {
@@ -2628,9 +2643,11 @@ div.Popup .Errors {
    -webkit-border-radius: 2px;
    white-space: pre;
    overflow: auto;
+   /*
 	box-shadow: 0px 0px 2px #333;
 	-moz-box-shadow: 0px 0px 2px #333;
 	-webkit-box-shadow: 0px 0px 2px #333;  
+   */
 }
 .Errors pre,
 .Errors pre * {

@@ -80,6 +80,14 @@ body {
    width: 960px;
    text-align: left;
    margin: 15px auto 0;
+	zoom: 1; /* hasLayout for IE6/7 */
+}
+#Body:after { /* clearfix */
+	visibility: hidden;
+	display: block;
+	content: "";
+	clear: both;
+	height: 0;
 }
 #Content {
    float: right;

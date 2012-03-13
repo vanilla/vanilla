@@ -631,13 +631,16 @@ body #Head h1 {
 .OptionsTitle {
    user-select: none;
    background: url("images/sprites.png") no-repeat 0 0;
-   color: transparent;
+/*   color: transparent;*/
    height: 28px;
    overflow: hidden;
    padding: 0;
    width: 20px;
    display: inline-block;
 	vertical-align: top;
+   line-height: 999px; /* Set it higher than your image height */
+   overflow: hidden; /* Hide the text */
+   font-size: 0; /* FF2 doesn’t like the above */
 }
 div.Discussion:hover .OptionsTitle:hover,
 .Item:hover .OptionsTitle:hover {

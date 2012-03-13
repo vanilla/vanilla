@@ -46,7 +46,7 @@ $this->EventArguments['Type'] = 'Discussion';
       ?>
    </div>
    <?php 
-   $this->FireEvent('AfterDiscussionBody'); 
+   $this->FireEvent('AfterDiscussionBody');
    WriteReactions($Discussion);
    ?>
 </div>

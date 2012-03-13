@@ -497,6 +497,12 @@ class Gdn_Session {
          $Path = C('Garden.Cookie.Path', '/');
          $Domain = C('Garden.Cookie.Domain', '');
          $Expire = 0;
+         
+         // If the domain being set is completely incompatible with the current domain then make the domain work.
+         $CurrentHost = Gdn::Request()->Host();
+         if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
+            $Domain = '';
+         
          setcookie($Name, $SessionID, $Expire, $Path, $Domain);
       }
       return $Session;

@@ -80,6 +80,14 @@ body {
    width: 960px;
    text-align: left;
    margin: 15px auto 0;
+	zoom: 1; /* hasLayout for IE6/7 */
+}
+#Body:after { /* clearfix */
+	visibility: hidden;
+	display: block;
+	content: "";
+	clear: both;
+	height: 0;
 }
 #Content {
    float: right;
@@ -131,10 +139,10 @@ h2 {
    font-size:120%;
 }
 h3 {
-   font-size:120%;
+   font-size:110%;
 }
 h4 {
-   font-size: 120%;
+   font-size: 110%;
 }
 h5 {
    font-size: 100%;
@@ -708,14 +716,13 @@ div.Discussion:hover .OptionsTitle:hover,
    position: relative;
 }
 .ToggleFlyout.Open {
-   z-index: 110;
+   z-index: 110; /* above Item:hover */
 }
 .ToggleFlyout .Flyout {
    position: absolute;
    top: 100%;
    right: -10px;
    display: none;
-   z-index: 100;
 	text-align: left;
 }
 .OptionsMenu .Flyout {
@@ -792,10 +799,10 @@ overflow: hidden; */
 .Box {
    margin: 10px 0;
 }
-.Box h4 {
+/*.Box h4 {
    font-size: 110%;
    font-weight: bold;
-}
+}*/
 .Box dl {
    overflow: hidden;
 }
@@ -1127,6 +1134,9 @@ overflow: hidden; */
 .DataList .Item .Item {
    border: none;
 }
+.Item h2, .Item h3, .Item h4, .Item h5 {
+   margin: 0;
+}
 .DataList .Title {
    font-size: 14px;
    display: block;
@@ -1445,6 +1455,10 @@ body.Profile #Panel {
    float: left;
    width: 250px;
 } */
+
+.Profile #Panel .MeBox.NotMe .MeMenu {
+   display: none;
+}
 .ChangePicture span {
 	position: absolute;
 	background: #333;
@@ -1463,7 +1477,6 @@ body.Profile #Panel {
 	float: right;
 }
 /* Hiding form headings with CSS in case the forms get popped */
-body.Profile.EditMode h2,
 body.Profile.picture .SmallPopup h1 {
 	display: none;
 }

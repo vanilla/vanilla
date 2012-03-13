@@ -1412,16 +1412,24 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
-            if (ArrayHasValue($this->_CssFiles, 'style.css'))
+            if (ArrayHasValue($this->_CssFiles, 'style.css')) {
                $this->AddCssFile('custom.css');
+            
+               // Add the theme option's css file.
+               if ($this->Theme && $this->ThemeOptions) {
+                  $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
+                  if (is_string($Filenames) && $Filenames != '%s')
+                     $this->_CssFiles[] = array('FileName' => ChangeBasename('custom.css', $Filenames), 'AppFolder' => FALSE, 'Options' => FALSE);
+               }
+            }
                
             if (ArrayHasValue($this->_CssFiles, 'admin.css'))
                $this->AddCssFile('customadmin.css');
             
             $this->EventArguments['CssFiles'] = &$this->_CssFiles;
             $this->FireEvent('BeforeAddCss');
-
-            // And now search for/add all css files
+            
+            // And now search for/add all css files.
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
                
@@ -1440,16 +1448,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                   // CSS comes from one of four places:
                   $CssPaths = array();
                   if ($this->Theme) {
-                     // 1. Application-specific css. eg. root/themes/theme_name/app_name/design/
-                     // $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . $AppFolder . DS . 'design' . DS . $CssGlob;
-                     // 2. Theme-wide theme view. eg. root/themes/theme_name/design/
-                     // a) Check to see if a customized version of the css is there.
-                     if ($this->ThemeOptions) {
-                        $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
-                        if (is_string($Filenames) && $Filenames != '%s')
-                           $CssPaths[] = PATH_THEMES.DS.$this->Theme.DS.'design'.DS.ChangeBasename($CssFile, $Filenames);
-                     }
-                     // b) Use the default filename.
+                     // Use the default filename.
                      $CssPaths[] = PATH_THEMES . DS . $this->Theme . DS . 'design' . DS . $CssFile;
                   }
 
@@ -1468,7 +1467,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                   // 4. Garden default. eg. root/applications/dashboard/design/
                   $CssPaths[] = PATH_APPLICATIONS . DS . 'dashboard' . DS . 'design' . DS . $CssFile;
                }
-
+               
                // Find the first file that matches the path.
                $CssPath = FALSE;
                foreach($CssPaths as $Glob) {

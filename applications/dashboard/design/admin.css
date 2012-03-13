@@ -86,6 +86,14 @@ body {
 	background: #fff;
 	float: left;
 	width: 100%;
+	zoom: 1; /* hasLayout for IE6/7 */
+}
+#Body:after { /* clearfix */
+	visibility: hidden;
+	display: block;
+	content: "";
+	clear: both;
+	height: 0;
 }
 #Content {
 	padding: 0 0 20px;
@@ -241,6 +249,11 @@ input.WideInput {
 	width: auto;
 	padding-right: 8px;
 }
+.TextBoxWrapper textarea,
+.TextBoxWrapper input {
+   width: 100%;
+}
+
 input.SmallInput,
 input.InputBox {
    font-size: 15px;
@@ -387,6 +400,16 @@ a.Button {
 	padding: 10px 40px 10px 0 !important;
 	background: url('images/progress_sm.gif') center center no-repeat;
    display: inline !Important;
+}
+.InProgress {
+   color: transparent !Important;
+   background: url('images/progress_sm.gif') center center no-repeat !important;
+   border-color: transparent !important;
+   -moz-box-shadow: none !important;
+   -webkit-box-shadow: none !important;
+   box-shadow: none !important;
+   color: transparent !important;
+   text-shadow: none !important;
 }
 .InProgress {
    color: transparent !Important;
@@ -2304,4 +2327,14 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 	height: 42px;
 	width: 341px;
 	background: url('images/welcome-message.png') top left no-repeat transparent;
+}
+.Info ul,
+.Info ol {
+   margin: 1em 0 1em 3em;
+}
+.Info ol li {
+  list-style: decimal !important;
+}
+.Info ul li {
+  list-style: disc !important;
 }

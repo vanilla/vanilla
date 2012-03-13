@@ -40,16 +40,27 @@ class MessageModel extends Gdn_Model {
          return parent::GetID($MessageID);
    }
    
+   /**
+    * Build the Message's Location property and add it.
+    *
+    * @param mixed $Message Array or object.
+    * @return mixed Array or object given with Location property/key added.
+    */
    public function DefineLocation($Message) {
-      if (is_object($Message)) {
-         if (in_array($Message->Controller, $this->_SpecialLocations)) {
-            $Message->Location = $Message->Controller;
-         } else {
-            $Message->Location = $Message->Application;
-            if (!StringIsNullOrEmpty($Message->Controller)) $Message->Location .= '/'.$Message->Controller;
-            if (!StringIsNullOrEmpty($Message->Method)) $Message->Location .= '/'.$Message->Method;
-         }
+      $Controller = GetValue('Controller', $Message);
+      $Application = GetValue('Application', $Message);
+      $Method = GetValue('Method', $Message);
+      
+      if (in_array($Controller, $this->_SpecialLocations)) {
+         SetValue('Location', $Message, $Controller);
+      } else {
+         SetValue('Location', $Message, $Application);
+         if (!StringIsNullOrEmpty($Controller)) 
+            SetValue('Location', $Message, GetValue('Location', $Message).'/'.$Controller);
+         if (!StringIsNullOrEmpty($Method)) 
+            SetValue('Location', $Message, GetValue('Location', $Message).'/'.$Method);
       }
+      
       return $Message;
    }
    

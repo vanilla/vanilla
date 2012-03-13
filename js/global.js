@@ -587,6 +587,7 @@ jQuery(document).ready(function($) {
    // Activate ToggleFlyout menus
    var lastOpen = null;
    $(document).delegate('.ToggleFlyout', 'click', function(e) {        
+        
       var $flyout = $('.Flyout', this);
         var isHandle = false;
         
@@ -875,7 +876,7 @@ jQuery(document).ready(function($) {
       if (message == '')
          message = 'There was an error performing your request. Please try again.';
       
-      gdn.informMessage('<span class="InformSprite SkullBones Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
+      gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
    }
    
 	// Pick up the inform message stack and display it on page load

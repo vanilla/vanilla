@@ -309,7 +309,7 @@ class PostController extends VanillaController {
          
          if ($Discussion) {
             $this->DiscussionID = $DiscussionID = $Discussion->DiscussionID;
-            $this->Form->SetFormValue('DiscussionID', $DiscussionID);
+            $this->Form->SetValue('DiscussionID', $DiscussionID);
          }
       }
       
@@ -359,21 +359,24 @@ class PostController extends VanillaController {
          }
          
          $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+         $EmbeddedDiscussionData = array(
+            'InsertUserID' => $SystemUserID,
+            'DateInserted' => Gdn_Format::ToDateTime(),
+            'UpdateUserID' => $SystemUserID,
+            'DateUpdated' => Gdn_Format::ToDateTime(),
+            'CategoryID' => $vanilla_category_id,
+            'ForeignID' => $vanilla_identifier,
+            'Type' => $vanilla_type,
+            'Name' => $Title,
+            'Body' => $Body,
+            'Format' => 'Html',
+            'Attributes' => serialize(array('ForeignUrl' => $vanilla_url))
+         );
+         $this->EventArguments['Discussion'] = $EmbeddedDiscussionData;
+         $this->FireEvent('BeforeEmbedDiscussion');
          $DiscussionID = $this->DiscussionModel->SQL->Insert(
             'Discussion',
-            array(
-               'InsertUserID' => $SystemUserID,
-               'DateInserted' => Gdn_Format::ToDateTime(),
-               'UpdateUserID' => $SystemUserID,
-               'DateUpdated' => Gdn_Format::ToDateTime(),
-               'CategoryID' => $vanilla_category_id,
-               'ForeignID' => $vanilla_identifier,
-               'Type' => $vanilla_type,
-               'Name' => $Title,
-               'Body' => $Body,
-               'Format' => 'Html',
-               'Attributes' => serialize(array('ForeignUrl' => $vanilla_url))
-            )
+            $EmbeddedDiscussionData
          );
          $ValidationResults = $this->DiscussionModel->ValidationResults();
          if (count($ValidationResults) == 0 && $DiscussionID > 0) {

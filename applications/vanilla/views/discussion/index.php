@@ -4,7 +4,7 @@ if (!function_exists('WriteComment'))
    include $this->FetchViewLocation('helper_functions', 'discussion');
 
 // Wrap the discussion related content in a div.
-echo '<div class="MessageList Discussion '.CssClass($this->Data('Discussion')).'">';
+echo '<div class="MessageList Discussion">';
 
 // Write the page title.
 echo '<!-- Page Title -->

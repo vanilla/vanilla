@@ -76,10 +76,24 @@ body {
    padding: 0;
    font-size: small;
 }
+/* Begin Site Width Specification */
+.WidthWrapper {
+   width: 960px;
+   margin: 0 auto;
+}
+#Content {
+   float: right;
+   width: 730px;
+   margin: 0 0 40px;
+}
+/* End Site Width */
 #Body {
+   /*
    width: 960px;
    text-align: left;
    margin: 15px auto 0;
+   */
+   margin: 15px 0 0;
 	zoom: 1; /* hasLayout for IE6/7 */
 }
 #Body:after { /* clearfix */
@@ -89,15 +103,9 @@ body {
 	clear: both;
 	height: 0;
 }
-#Content {
-   float: right;
-   width: 730px;
-   margin: 0 0 40px;
-}
 .Hidden {
    display: none;
 }
-
 .ClearFix:after {
 	visibility: hidden;
 	display: block;
@@ -111,7 +119,6 @@ body {
 * html .ClearFix { height: 1%; }
 .ClearFix { display: block; }
 /* End hide from IE-mac */
-
 .nowrap {
    white-space: nowrap;
 }
@@ -361,8 +368,10 @@ input.Button {
 }
 .Breadcrumbs {
 	display: block;
-	margin: 0 auto;
+	/*
+   margin: 0 auto;
 	width: 960px;
+   */
 }
 /*
 .BreadcrumbWrap.TopBreadcrumb {
@@ -547,15 +556,19 @@ body #Head h1 {
 	border: none;
 }
 .Menu {
+   /*
    width: 960px;
    margin: 0 auto;
+   */
    position: relative;
    text-align: left;
    vertical-align: bottom;
 }
 #Menu {
    display: inline-block;
+   /*
    margin-right: 280px;
+   */
    vertical-align: bottom;
 }
 #Menu li {
@@ -1831,12 +1844,14 @@ div.Popup form ul li label.RadioLabel {
 #Foot a:hover {
    color: #aaa;
 }
+/*
 #Foot div {
 	width: 960px;
 	padding: 6px 0;
 	margin: 20px auto 0;
 	text-align: left;
 }
+*/
 
 
 /* ================================ Vanilla ================================= */

@@ -226,8 +226,6 @@ try {
    if (window.location.hash.substr(0, 6) != "#poll:")
       window.vanilla.embed();
 } catch(e) {
-   alert(e);
-   /*
    var error = document.createElement('div');
    error.style.padding = "10px";
    error.style.fontSize = "12px";
@@ -236,6 +234,4 @@ try {
    error.style.color = "#000000";
    error.appendChild(document.createTextNode("Failed to embed Vanilla: " + e));
    (document.getElementById('vanilla-comments')).appendChild(error);
-*/
-
 }

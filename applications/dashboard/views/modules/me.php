@@ -1,20 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $User = $Session->User;
-
-if (property_exists($this->_Sender, 'User'))
-   $User = $this->_Sender->User;
-
 if ($Session->IsValid()):
-   
-   $NotMe = '';
-   if ($User->UserID != Gdn::Session()->UserID)
-      $NotMe = 'NotMe';
-   
-   echo "<div class=\"MeBox {$NotMe}\">";
-
-   $Name = $User->Name;
-
+   echo '<div class="MeBox">';
    echo UserPhoto($User);
    echo '<div class="WhoIs">';
       echo UserAnchor($User, 'Username');
@@ -38,7 +26,7 @@ if ($Session->IsValid()):
             echo Anchor(Sprite('SpDashboard', 'Sprite16').Wrap(T('Dashboard'), 'em'), '/dashboard/settings', array('title' => T('Dashboard')));
 
          // Sign Out
-         // echo Anchor(Sprite('SpSignOut', 'Sprite16').Wrap(T('Sign Out'), 'em'), SignOutUrl(), array('title' => T('Sign Out')));
+         echo Anchor(Sprite('SpSignOut', 'Sprite16').Wrap(T('Sign Out'), 'em'), SignOutUrl(), array('title' => T('Sign Out')));
 
       echo '</div>';
    echo '</div>';

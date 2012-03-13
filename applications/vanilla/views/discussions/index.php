@@ -6,6 +6,11 @@ echo '<h1 class="HomepageTitle">'.
    AdminCheck(NULL, array('', ' ')).
    $this->Data('Title').
    '</h1>';
+
+if ($Description = $this->Description()) {
+   echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
+}
+
 echo Gdn_Theme::Module('DiscussionFilterModule');
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {

@@ -10,7 +10,6 @@
  <div id="Head">
    <div class="Row">
      <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
-     <div class="SiteSearch">{searchbox}</div>
      <ul class="SiteMenu">
       {dashboard_link}
       {discussions_link}
@@ -20,12 +19,16 @@
       {profile_link}
       {signinout_link}
      </ul>
+     <div class="SiteSearch">{searchbox}</div>
    </div>
   </div>
   <div id="Body">
     <div class="Row">
-      <div class="P">{breadcrumbs}</div>
-      <div class="Column PanelColumn" id="Panel">{asset name="Panel"}</div>
+      <div class="BreadcrumbsWrapper P">{breadcrumbs}</div>
+      <div class="Column PanelColumn" id="Panel">
+         {module name="MeModule"}
+         {asset name="Panel"}
+      </div>
       <div class="Column ContentColumn" id="Content">{asset name="Content"}</div>
     </div>
   </div>

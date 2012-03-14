@@ -12,9 +12,9 @@ $Controller = Gdn::Controller();
       
       if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage') && $Controller->User->UserID != $Session->UserID) {
          if ($Controller->User->Banned) {
-            echo ' '.Anchor(T('Unban'), '/user/ban?userid='.$Controller->User->UserID.'&unban=1', 'Button Popup').' ';
+            echo ' '.Anchor(Sprite('SpUnBan').T('Unban'), '/user/ban?userid='.$Controller->User->UserID.'&unban=1', 'NavButton Popup').' ';
          } else {
-            echo ' '.Anchor(T('Ban'), '/user/ban?userid='.$Controller->User->UserID, 'Button Popup').' ';
+            echo ' '.Anchor(Sprite('SpBan').T('Ban'), '/user/ban?userid='.$Controller->User->UserID, 'NavButton Popup').' ';
          }
       }
       

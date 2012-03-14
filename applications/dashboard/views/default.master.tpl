@@ -8,31 +8,33 @@
 
 <div id="Frame">
  <div id="Head">
-   <div class="Banner Menu">
-      <h1><a class="Title" href="{link path="/"}"><span>{logo}</span></a></h1>
-      <ul id="Menu">
-         {dashboard_link}
-         {discussions_link}
-         {activity_link}
-         {inbox_link}
-         {custom_menu}
-         {profile_link}
-         {signinout_link}
-      </ul>
-      <div id="Search">{searchbox}</div>
-    </div>
+   <div class="Row">
+     <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
+     <div class="SiteSearch">{searchbox}</div>
+     <ul class="SiteMenu">
+      {dashboard_link}
+      {discussions_link}
+      {activity_link}
+      {inbox_link}
+      {custom_menu}
+      {profile_link}
+      {signinout_link}
+     </ul>
+   </div>
   </div>
   <div id="Body">
-    <!--<div class="P">{breadcrumbs}</div>-->
-    <div id="Content">
-      {asset name="Content"}
+    <div class="Row">
+      <div class="P">{breadcrumbs}</div>
+      <div class="Column PanelColumn" id="Panel">{asset name="Panel"}</div>
+      <div class="Column ContentColumn" id="Content">{asset name="Content"}</div>
     </div>
-    <div id="Panel">{asset name="Panel"}</div>
   </div>
   <div id="Foot">
-    <div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
-    {asset name="Foot"}
- </div>
+    <div class="Row">
+      <a href="{vanillaurl}" class="PoweredByVanilla">Powered by Vanilla</a>
+      {asset name="Foot"}
+    </div>
+  </div>
 </div>
 {event name="AfterBody"}
 </body>

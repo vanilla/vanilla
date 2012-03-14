@@ -1918,7 +1918,13 @@ class UserModel extends Gdn_Model {
       return TRUE;
    }
    
-   public function Delete($User, $Options = array()) {
+   /**
+    * Delete a single user.
+    *
+    * @param int $UserID
+    * @param array $Options See DeleteContent(), GetDelete()
+    */
+   public function Delete($UserID, $Options = array()) {
       if ($UserID == $this->GetSystemUserID()) {
          $this->Validation->AddValidationResult('', 'You cannot delete the system user.');
          return FALSE;

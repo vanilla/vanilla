@@ -232,8 +232,8 @@ select {
    margin: 0;
    padding: 3px;
    }
-a.Button,
 .Button {
+   display: inline-block;
    cursor: pointer;
    margin: 0;
    font-size: 11px;
@@ -245,7 +245,6 @@ a.Button,
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 	white-space: nowrap;
-   /*
 	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
 	background:-moz-linear-gradient(top, #ffffff, #cccccc);
 	-pie-background:linear-gradient(top, #ffffff, #cccccc);
@@ -254,15 +253,16 @@ a.Button,
 	box-shadow: 0px 0px 1px #999;
 	-moz-box-shadow: 0px 0px 1px #999;
 	-webkit-box-shadow: 0px 0px 1px #999;
-   */
 }
+/*
 a.Button {
    display: inline-block;
    padding: 4px;
    line-height: 100%;
    margin: 3px auto;
 }
-input.Button {
+*/
+form .Button {
 	font-size: 14px;
    font-weight: bold;
 }
@@ -272,6 +272,17 @@ input.Button {
 }
 .Button:focus {
    background: #eee;
+}
+.BigButton {
+   display: block;
+   text-align: center;
+   margin: 0 0 10px;
+   font-size: 15px;
+   font-weight: bold;
+   padding: 8px 0;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
 }
 .Buttons {
    margin-top: 10px;
@@ -530,6 +541,7 @@ a.Small img {
 .SiteMenu {
    display: inline;
    margin: 0 6px;
+   white-space: nowrap;
 }
 .SiteMenu li {
    display: inline;
@@ -541,7 +553,7 @@ a.Small img {
 .SiteMenu a:hover {
    text-decoration: underline;
 }
-.SiteSearch {
+#Head .SiteSearch {
    float: right;
    position: relative;
 }
@@ -887,6 +899,9 @@ overflow: hidden; */
    margin-left: 80px;
 }
 
+.Profile .MeBox {
+   display: none;
+}
 .UserBox,
 .MeBox {
    margin: 10px 0;
@@ -1080,22 +1095,22 @@ overflow: hidden; */
 #UserOptions {
 	margin-bottom: 10px;
 }
+/*
 .BigButton {
-   text-align: center;
    display: block;
-   cursor: pointer;
+   text-align: center;
    margin: 0 0 10px;
    font-size: 15px;
    font-weight: bold;
    padding: 8px 0;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   cursor: pointer;
 	background: #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   /*
 	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
 	background:-moz-linear-gradient(top, #ffffff, #cccccc);
 	-pie-background:linear-gradient(top, #ffffff, #cccccc);
@@ -1103,25 +1118,22 @@ overflow: hidden; */
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
-   */
 }
 .BigButton:hover {
    color: #111;
    border: 1px solid #666;
-   /*
 	box-shadow: 0px 0px 5px #aaa;
 	-moz-box-shadow: 0px 0px 5px #aaa;
 	-webkit-box-shadow: 0px 0px 5px #aaa;
-   */
 }
 .BigButton:focus {
    background: #eee;
-   /*
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
-   */
 }
+*/
+
 /* Category Depths */
 .PanelCategories .Depth2 { padding-left: 8px; }
 .PanelCategories .Depth3 { padding-left: 12px; }
@@ -1529,9 +1541,6 @@ body.Profile #Panel {
    width: 250px;
 } */
 
-.Profile #Panel .MeBox.NotMe .MeMenu {
-   display: none;
-}
 .ChangePicture span {
 	position: absolute;
 	background: #333;
@@ -1801,10 +1810,12 @@ div.Popup .Footer {
 	margin: 0;
 	text-align: right;
 }
+/*
 div.Popup .Footer input.Button {
 	font-size: 11px;
 	margin-right: 2px;
 }
+*/
 div.Popup h3 {
 	font-size: 120%;
 	font-weight: bold;
@@ -1845,10 +1856,12 @@ div.Popup form ul li label.RadioLabel,
 div.Popup form ul li label.CheckBoxLabel {
 	font-weight: normal;
 }
+/*
 div.Profile.EditMode input.Button,
 div.Popup input.Button {
 	margin: 4px 0 2px;
 }
+*/
 body.Profile.EditMode .Warning {
 	margin: 10px 0;
 }
@@ -1906,10 +1919,10 @@ div.Popup form ul li label.RadioLabel {
 }
 .PoweredByVanilla {
    display: inline-block;
-   height: 40px;
-   width: 87px;
-   background: url('images/vanilla-forums-dark-bg-87x40.png') center center no-repeat;
-   background: url('images/vanilla-forums-light-bg-87x40.png') center center no-repeat;
+   height: 33px;
+   width: 70px;
+   background: url('images/vanilla-forums-dark-bg-70x33.png') center center no-repeat;
+   background: url('images/vanilla-forums-light-bg-70x33.png') center center no-repeat;
    line-height: 999px;
    color: transparent;
    overflow: hidden;
@@ -2183,6 +2196,7 @@ body.Vanilla.Post #Panel {
 body.Conversations.add #Content,
 body.Vanilla.Post #Content {
    width: 100%;
+   margin: 0;
 }
 /*
  #DiscussionForm h2 {
@@ -3319,7 +3333,7 @@ body.embed .Connect h2 {
 
 
 /* DEPRECATED: The following CSS has been deprecated in core as of 2.1a10. We
-  are keeping it in for themes that have custom views that depend on it. */ 
+  are keeping it in for themes that have custom views that depend on it. 
 .Tabs,
 .Headings {
 	display: block;
@@ -3412,4 +3426,4 @@ body.embed .Connect h2 {
 	font-size: 11px;
 }
 
-/* END DEPRECATED CSS */
+END DEPRECATED CSS */

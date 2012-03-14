@@ -65,6 +65,17 @@ blockquote, q {
    quotes: "" "";
 }
 
+/* ===================================================================== Grid */
+
+.Row {
+   margin: auto;
+   width: 960px;
+}
+#Body .ContentColumn {
+   margin: 0 0 0 230px
+}
+
+
 /* ============================================== General Styles & Typography */
 body {
    color: #000;
@@ -76,24 +87,20 @@ body {
    padding: 0;
    font-size: small;
 }
-/* Begin Site Width Specification */
-.WidthWrapper {
-   width: 960px;
-   margin: 0 auto;
-}
+   /*
 #Content {
    float: right;
    width: 730px;
    margin: 0 0 40px;
 }
-/* End Site Width */
+   */
 #Body {
    /*
    width: 960px;
    text-align: left;
    margin: 15px auto 0;
-   */
    margin: 15px 0 0;
+   */
 	zoom: 1; /* hasLayout for IE6/7 */
 }
 #Body:after { /* clearfix */
@@ -329,13 +336,16 @@ input.Button {
    padding: 1px .8ex;
 }
 .Alert {
+   font-size: 80%;
    background: #d00;
    color: #fff;
-   padding: 1px 4px;
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   padding: 1px 3px;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   /*
    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+   */
 }
 .Alert a {
    color: #fff;
@@ -367,17 +377,15 @@ input.Button {
 	line-height: 2.4;
 	font-size: 12px;
 }
+/*
 .Crumb {
 	margin: 0 6px;
 }
 .Breadcrumbs {
 	display: block;
-	/*
    margin: 0 auto;
 	width: 960px;
-   */
 }
-/*
 .BreadcrumbWrap.TopBreadcrumb {
 	background: #f7f7f7;
 	background: rgba(0,0,0,0.03);
@@ -506,8 +514,53 @@ a.Small img {
 /* =================================================================== Header */
 #Head {
    background: #38abe3;
-   padding: 0;
+   color: #fff;
+   padding: 16px 3px 3px;
+   margin-bottom: 5px;
 }
+#Head a {
+   color: #fff;
+   font-weight: bold;
+}
+.SiteTitle {
+   font-family: "helvetica neue", helvetica, arial, sans-serif;
+   font-weight: bold;
+   font-size: 24px;
+}
+.SiteMenu {
+   display: inline;
+   margin: 0 6px;
+}
+.SiteMenu li {
+   display: inline;
+}
+.SiteMenu a {
+   font-size: 11px;
+   padding: 6px;
+}
+.SiteMenu a:hover {
+   text-decoration: underline;
+}
+.SiteSearch {
+   float: right;
+   position: relative;
+}
+.SiteSearch .InputBox {
+   border: none;
+	font-size: 11px;
+   width: 200px;
+   padding: 5px;
+}
+.SiteSearch .Button {
+   background: transparent;
+   border: none;
+	font-size: 11px;
+   position: absolute;
+   top: 0;
+   right: 0;
+}
+/*
+
 .Search:after,
 div#Search:after {
    content: ".";
@@ -536,7 +589,7 @@ body #Head h1 {
 }
 #Head form {
    float: right;
-   /* width: 250px; */
+   width: 250px;
    padding: 0;
 }
 #Head form input.InputBox {
@@ -547,32 +600,26 @@ body #Head h1 {
 	margin: 0 6px 0 0;
    color: #969696;
    font-size: 13px;
-   /*
 	background: #fff; 
    -moz-border-radius: 2px;
    -webkit-border: 2px;
    border-bottom: 2px;
 	vertical-align: bottom;
-	*/
 }
 #Head form input.Button {
 	font-size: 11px;
 	border: none;
 }
 .Menu {
-   /*
    width: 960px;
    margin: 0 auto;
-   */
    position: relative;
    text-align: left;
    vertical-align: bottom;
 }
 #Menu {
    display: inline-block;
-   /*
    margin-right: 280px;
-   */
    vertical-align: bottom;
 }
 #Menu li {
@@ -617,7 +664,6 @@ body #Head h1 {
    color: #fff;
    text-decoration: underline;
 }
-/*
 #Menu .Alert {
 	text-shadow: none;
    background: #f2fcff;

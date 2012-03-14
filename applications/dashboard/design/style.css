@@ -1904,6 +1904,17 @@ div.Popup form ul li label.RadioLabel {
 #Foot a:hover {
    color: #aaa;
 }
+.PoweredByVanilla {
+   display: inline-block;
+   height: 40px;
+   width: 87px;
+   background: url('images/vanilla-forums-dark-bg-87x40.png') center center no-repeat;
+   background: url('images/vanilla-forums-light-bg-87x40.png') center center no-repeat;
+   line-height: 999px;
+   color: transparent;
+   overflow: hidden;
+   font-size: 0;
+}
 /*
 #Foot div {
 	width: 960px;

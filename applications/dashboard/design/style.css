@@ -1392,7 +1392,7 @@ body.Post .Popup a.Close {
 	color: #1e79a7;
 }
 .Message {
-   clear: left;
+   /* clear: left; */
    line-height: 140%;
    font-size: 100%;
 	word-wrap: break-word;

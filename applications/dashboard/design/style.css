@@ -1,22 +1,3 @@
-/*
-Welcome to the Generic Style CSS File! Some things you should know:
-
-1. This file is included on all front-end/user-facing pages. Applications can
-   override this file in their own custom files (ie. vanilla.css or
-   conversations.css).
-
-2. This file is broken down into the following sections:
-   + General Styles & Typography
-   + Header
-   + Main Menu
-   + Panels / Sidebars
-   + Activities
-   + Profile Page
-   + Profile Tab Menu
-   + Thumbnail Cropper
-   + Footer
-*/
-
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -75,6 +56,23 @@ blockquote, q {
    margin: 0 0 0 230px
 }
 
+/* ==================== Pages that hide the panel and have full-width content */
+
+body.Entry #Panel,
+body.Conversations.add #Panel,
+body.Vanilla.Post #Panel {
+   display: none;
+}
+body.Conversations.add #Content,
+body.Vanilla.Post #Content {
+   width: 100%;
+   margin: 0;
+}
+body.Entry #Content {
+   float: none;
+   margin: 0 auto;
+   max-width: 500px;
+}
 
 /* ============================================== General Styles & Typography */
 body {
@@ -573,6 +571,9 @@ a.Small img {
    position: absolute;
    top: 0;
    right: 0;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
 }
 /*
 
@@ -2192,6 +2193,7 @@ body.Discussion #Content {
    font-weight: bold;
    color: #666;
 }
+/*
 body.Conversations.add #Panel,
 body.Vanilla.Post #Panel {
    display: none;
@@ -2201,6 +2203,7 @@ body.Vanilla.Post #Content {
    width: 100%;
    margin: 0;
 }
+*/
 /*
  #DiscussionForm h2 {
    border: none;
@@ -2446,6 +2449,7 @@ ul.Tabs li a.EntryTabFor_password {
 
 
 /* ============================================================ Entry Screens */
+/* 
 body.Entry #Panel {
    display: none;
 }
@@ -2454,6 +2458,7 @@ body.Entry #Content {
    margin: 0 auto;
    max-width: 500px;
 }
+*/
 /*body.Entry #Content form {
 	text-align: left;
 	padding: 10px;

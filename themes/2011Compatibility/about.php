@@ -19,7 +19,7 @@ $ThemeInfo['2011Compatibility'] = array(
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
    'Options' => array(
-		'Description' => 'This theme has <font color="red">7 color</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">Theme Options</a>.',
+		'Description' => 'This theme has <font color="red">6 color</font> options.',
       'Styles' => array(
          'Vanilla Terminal' => '%s_terminal',
 			'Vanilla Grey' => '%s_grey',

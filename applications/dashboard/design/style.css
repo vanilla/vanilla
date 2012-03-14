@@ -412,6 +412,9 @@ form .Button {
    margin-bottom: 1px;
 	text-align: left;
 }
+.MorePager {
+   text-align: right;
+}
 .MorePager a.Loading {
 	border: 0 !important;
    padding: 0 20px !important;
@@ -3213,11 +3216,7 @@ body.embed .Connect h2 {
    border: none;
    text-align: right;
 }
-.Embed .MorePager a,
-.Embed .MorePager a:link,
-.Embed .MorePager a:hover,
-.Embed .MorePager a:active,
-.Embed .MorePager a:visited {
+.Embed .MorePager a {
 	background: none;
 	border: none;
 	padding: 0;

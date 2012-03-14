@@ -37,20 +37,15 @@ a:hover {
 	position: relative;
 }
 /* Hide Stuff */
+.DraftButton,
+.PreviewButton,
+input.DraftButton,
+input.PreviewButton,
 .CheckBoxColumn,
 .HomepageTitle,
 #Panel {
 	display: none;
 }
-
-
-/* Popups */
-/*.Popup h1,
-.Popup h2 {
-	background: #3b5998;
-	border: none;
-}
-*/
 a.Close {
 	color: #EDEFF4;
 }
@@ -126,64 +121,15 @@ body.Post a.Close {
 }
 
 /* Activities */
-/*
-form.Activity textarea,
-body.Entry input.DateBox,
-body.Entry input.InputBox,
-body.Entry textarea,
-#ConversationForm textarea.MultiComplete,
-#ConversationForm .TextBox,
-#MessageForm textarea,
-div.Comment div.CommentForm,
-div.Comment div.CommentForm textarea,
-div.CommentForm textarea,
-#DiscussionForm input.InputBox,
-#DiscussionForm textarea {
-	width:98%;
-}
-*/
-.DraftButton,
-.PreviewButton,
-input.DraftButton,
-input.PreviewButton {
-	display: none;
-}
 .Preview .Message,
 ul.MessageList .Message {
 	clear: none;
 }
 
-/* Tabs & Profile */
-/*
-body.Profile #Body {
-	background: #EDEFF4;
-}
-*/
 #Content .BoxProfileFilter {
    display: block;
 }
-/*
-body.Profile #Panel {
-	display: block;
-	float: none;
-	margin: 0;
-}
-.Photo {
-	max-width: 60%;
-	float: left;
-	margin: 6px;
-}
-.User .Photo {
-   max-width: none;
-   float: none;
-   margin: auto;
-}
-div.User {
-	padding: 6px 6px 0 6px;
-}
-*/
 .Photo img {
-	/* width: 100%; */
 	display: block;
 }
 #Status {
@@ -197,76 +143,12 @@ body.Profile #Content {
 	width: auto;
 	margin: 0;
 }
-/*
-.Tabs,
-#UserOptions,
-body.Profile #Panel .Box,
-body.Discussion .HeadingTabs ul {
-	display: none;
-}
-body.Discussion .HeadingTabs {
-	display: block;
-}
-body.Discussion .HeadingTabs .SubTab {
-	line-height: normal;
-	margin: 0;
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-}
-.ProfileTabs {
-	display: block;
-	background: transparent;
-	padding: 6px 0 0;
-	border-bottom: 1px solid #BEC8CC;
-	clear: both;
-}
-.Tabs ul {
-	padding: 0 6px;
-	white-space: nowrap;
-}
-*/
 .MessageForm {
 	padding: 8px 8px 5px;
 }
 .MessageForm .Tabs {
 	padding: 0 8px;
 }
-/*
-.Tabs li a,
-.Tabs li a:link,
-.Tabs li a:hover,
-.Tabs li a:active,
-.Tabs li a:visited {
-	font-size: 11px;
-	line-height: 11px;
-   margin: 0;
-   border: none;
-   border-radius: 3px 3px 0 0;
-   -moz-border-radius: 3px 3px 0 0;
-   -webkit-border-radius: 3px 3px 0 0;
-   background: #D8DFEA;
-   text-decoration: none;
-   padding: 4px 10px 5px;
-	color: #3B5998;
-}
-.Tabs li a:hover {
-   text-decoration: underline;
-}
-a.Active,
-.Tabs li.Active a {
-   background: #fff;
-   margin: 0;
-   border: 1px solid #BEC8CC;
-	border-bottom: none;
-   display: inline-block;
-   font-weight: bold;
-   text-decoration: none;
-   padding: 6px 10px;
-	position: relative;
-	top: 1px;
-}
-*/
 form.Activity {
 	background: #fff;
 	padding-bottom: 10px;
@@ -300,22 +182,6 @@ body.Profile .Loading {
 .DataList .Item {
    padding: 4px 0;
 }
-
-/*
-div.DiscussionsTabs div.SubTab {
-	font-size: 11px;
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	border-top: 1px solid #aaa;
-	background: #f3f3f3;
-	margin:0;
-	padding:4px 8px;
-}
-div.HeadingTabs ul {
-	margin: 8px 0 0;
-}
-*/
 body.Discussion a.Bookmark {
 	display: none;
 }
@@ -334,18 +200,6 @@ body.Discussion a.Bookmark {
 .Pager span {
    margin: 0 6px;
 }
-/*.MorePager a {
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	background: none;
-	border: none;
-	color: #3B5998;
-	line-height: 1;
-	padding: 3px 6px;
-	text-decoration: none;	
-}
-*/
 
 /* Entry Pages */
 body.Entry #Content {
@@ -477,13 +331,6 @@ ul.DataList a.Title {
 	display: inline;
 	margin: 0 10px 0 0;
 }
-/*.Mine {
-	background: #EDEFF4;
-}
-body.Profile ul.Discussions .Mine {
-	background: #fff;
-}
-*/
 ul.DataList span.Counts,
 body.Profile ul.DataList .Mine span.Counts {
 	border-radius: 3px;
@@ -511,40 +358,6 @@ ul.Discussions li img {
 ul.Discussions .ItemContent, ul.Drafts .ItemContent {
 	margin: 0 0 0 4px;
 }
-/*
-div.MessageForm,
-#DiscussionForm,
-#ConversationForm,
-#MessageForm {
-	margin: 0;
-	border:0;
-   padding: 5px;
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	background: #F2F2F2;
-	border-bottom: 1px solid #BEC8CC;
-}
-#DiscussionForm form,
-#ConversationForm form {
-	border: none;
-	background: transparent;
-	padding: 0;
-}
-#DiscussionForm h2,
-#MessageForm h2,
-#ConversationForm h2 {
-	display: none;
-}
-ul.Discussion,
-body.Discussion #Content {
-	margin-bottom: 0;
-}
-.Foot {
-	background: none;
-	border-bottom: 1px solid #BEC8CC;
-}
-*/
 li.Editing {
 	background: #EDEFF4;
 }
@@ -555,20 +368,6 @@ li.Editing {
 }
 
 /* Foot */
-/*
-#Foot {
-	border-bottom: 1px solid #BEC8CC;
-}
-#Foot div {
-	width: auto;
-	margin: 0;
-}
-#Foot {
-	font-size: 11px;
-	margin: 0;
-	background: #f8f8f8;
-}
-*/
 .FootMenu {
 	margin: 10px 0;
 }
@@ -603,56 +402,38 @@ li.Editing {
    background: #3b5998;
    color: #fff;
 }
-
 .Tag {
     background: #EDEFF4;
     color: #485F8F;
     border: solid 1px #A1AABC;
 }
-
 .Mine .Tag {
    background: #F8FAFE;
 }
-
 .Tag a {
     color: #485F8F;
 }
-
 .Tabs li a span {
    background: #F8FAFE;
    color: #485F8F;
 }
-
 .RssButton {
    display: none;
 }
 
 /* Datatable stuff */
-
 .DataTable .BlockColumn {
    display: none;
 }
-/*
-.DataTable thead td {
-   font-size: 11px;
-   background: #ddd;
-   font-weight: normal;
-   text-transform: uppercase;
-   text-shadow: 0 1px 1px #fff;
-}
-*/
 td.BigCount {
    width: 70px;
 }
-
 .CategoryDescription {
    display: none;
 }
-
 .ChildCategories b {
    display: none;
 }
-
 .PageDescription {
    display: none;
 }

@@ -206,7 +206,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
          $this->FireEvent('BeforeBlockDetect');
          
-         $PathRequest = Gdn::Request()->Path();
+         $PathRequest = '/'.ltrim(Gdn::Request()->Path(), '/');
          foreach ($BlockExceptions as $BlockException => $BlockLevel) {
             if (preg_match($BlockException, $PathRequest))
                throw new Exception("Block detected", $BlockLevel);

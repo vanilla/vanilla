@@ -691,7 +691,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $DeliveryPart = array_pop($Parts);
          $MethodPart = implode('.', $Parts);
          
-         if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT))) {
+         if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT, DELIVERY_METHOD_RSS))) {
             return array($MethodPart, strtoupper($DeliveryPart));
          } else {
             return array($Name, $this->_DeliveryMethod);

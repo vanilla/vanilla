@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Flagging'] = array(
    'Name' => 'Flagging',
    'Description' => 'Allows users to report content that violates forum rules.',
-   'Version' => '1.1.0',
+   'Version' => '1.1.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,

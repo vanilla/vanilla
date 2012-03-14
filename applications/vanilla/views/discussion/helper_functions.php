@@ -114,16 +114,13 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          // Add your own options or data as spans with 'MItem' class
          $Sender->FireEvent('InsideCommentMeta');
 
-         ?>
-         <div class="CommentInfo">
-            <?php
-            $Sender->FireEvent('CommentInfo');
+         
+         $Sender->FireEvent('CommentInfo');
 
-            // Include IP Address if we have permission
-            if ($Session->CheckPermission('Garden.Moderation.Manage')) 
-               echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
-            ?>
-         </div>
+         // Include IP Address if we have permission
+         if ($Session->CheckPermission('Garden.Moderation.Manage')) 
+            echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+         ?>
          <?php $Sender->FireEvent('AfterCommentMeta'); ?>
       </div>
       <div class="Item-BodyWrap">

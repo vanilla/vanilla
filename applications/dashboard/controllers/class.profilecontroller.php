@@ -968,7 +968,7 @@ class ProfileController extends Gdn_Controller {
       $SideMenu = new SideMenuModule($this);
       $this->EventArguments['SideMenu'] = &$SideMenu; // Doing this out here for backwards compatibility.
 		if ($this->EditMode) {
-         $this->AddModule('MeModule');
+         $this->AddModule('UserBoxModule');
 			$this->BuildEditMenu($SideMenu, $CurrentUrl);
          $this->FireEvent('AfterAddSideMenu');
          $this->AddModule($SideMenu, 'Panel');

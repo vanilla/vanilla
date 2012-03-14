@@ -65,6 +65,17 @@ blockquote, q {
    quotes: "" "";
 }
 
+/* ===================================================================== Grid */
+
+.Row {
+   margin: auto;
+   width: 960px;
+}
+#Body .ContentColumn {
+   margin: 0 0 0 230px
+}
+
+
 /* ============================================== General Styles & Typography */
 body {
    color: #000;
@@ -76,20 +87,32 @@ body {
    padding: 0;
    font-size: small;
 }
-#Body {
-   width: 960px;
-   text-align: left;
-   margin: 15px auto 0;
-}
+   /*
 #Content {
    float: right;
    width: 730px;
    margin: 0 0 40px;
 }
+   */
+#Body {
+   /*
+   width: 960px;
+   text-align: left;
+   margin: 15px auto 0;
+   margin: 15px 0 0;
+   */
+	zoom: 1; /* hasLayout for IE6/7 */
+}
+#Body:after { /* clearfix */
+	visibility: hidden;
+	display: block;
+	content: "";
+	clear: both;
+	height: 0;
+}
 .Hidden {
    display: none;
 }
-
 .ClearFix:after {
 	visibility: hidden;
 	display: block;
@@ -103,7 +126,6 @@ body {
 * html .ClearFix { height: 1%; }
 .ClearFix { display: block; }
 /* End hide from IE-mac */
-
 .nowrap {
    white-space: nowrap;
 }
@@ -162,13 +184,15 @@ textarea {
    padding: 3px;
    margin: 0;
    width: 250px;
-	box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset; 
-	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
-	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
 	background: #fff;
 	border: 1px solid #999;
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	padding: 3px;	
+   /*
+	box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset; 
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
+   */
 }
 textarea.TextBox {
    width: 500px;
@@ -215,20 +239,22 @@ a.Button,
    font-size: 11px;
    padding: 4px 6px;
 	background: #f8f8f8;
-	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
-	background:-moz-linear-gradient(top, #ffffff, #cccccc);
-	-pie-background:linear-gradient(top, #ffffff, #cccccc);
-	background:linear-gradient(top, #ffffff, #cccccc);
    color: #02475A;
-	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
+	white-space: nowrap;
+   /*
+	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #cccccc);
+	-pie-background:linear-gradient(top, #ffffff, #cccccc);
+	background:linear-gradient(top, #ffffff, #cccccc);
+   text-shadow: 0 1px 0 #fff;
 	box-shadow: 0px 0px 1px #999;
 	-moz-box-shadow: 0px 0px 1px #999;
 	-webkit-box-shadow: 0px 0px 1px #999;
-	white-space: nowrap;
+   */
 }
 a.Button {
    display: inline-block;
@@ -310,13 +336,16 @@ input.Button {
    padding: 1px .8ex;
 }
 .Alert {
+   font-size: 80%;
    background: #d00;
    color: #fff;
-   padding: 1px 4px;
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   padding: 1px 3px;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   /*
    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+   */
 }
 .Alert a {
    color: #fff;
@@ -348,15 +377,15 @@ input.Button {
 	line-height: 2.4;
 	font-size: 12px;
 }
+/*
 .Crumb {
 	margin: 0 6px;
 }
 .Breadcrumbs {
 	display: block;
-	margin: 0 auto;
+   margin: 0 auto;
 	width: 960px;
 }
-/*
 .BreadcrumbWrap.TopBreadcrumb {
 	background: #f7f7f7;
 	background: rgba(0,0,0,0.03);
@@ -485,8 +514,53 @@ a.Small img {
 /* =================================================================== Header */
 #Head {
    background: #38abe3;
-   padding: 0;
+   color: #fff;
+   padding: 16px 3px 3px;
+   margin-bottom: 5px;
 }
+#Head a {
+   color: #fff;
+   font-weight: bold;
+}
+.SiteTitle {
+   font-family: "helvetica neue", helvetica, arial, sans-serif;
+   font-weight: bold;
+   font-size: 24px;
+}
+.SiteMenu {
+   display: inline;
+   margin: 0 6px;
+}
+.SiteMenu li {
+   display: inline;
+}
+.SiteMenu a {
+   font-size: 11px;
+   padding: 6px;
+}
+.SiteMenu a:hover {
+   text-decoration: underline;
+}
+.SiteSearch {
+   float: right;
+   position: relative;
+}
+.SiteSearch .InputBox {
+   border: none;
+	font-size: 11px;
+   width: 200px;
+   padding: 5px;
+}
+.SiteSearch .Button {
+   background: transparent;
+   border: none;
+	font-size: 11px;
+   position: absolute;
+   top: 0;
+   right: 0;
+}
+/*
+
 .Search:after,
 div#Search:after {
    content: ".";
@@ -515,7 +589,7 @@ body #Head h1 {
 }
 #Head form {
    float: right;
-   /* width: 250px; */
+   width: 250px;
    padding: 0;
 }
 #Head form input.InputBox {
@@ -526,13 +600,11 @@ body #Head h1 {
 	margin: 0 6px 0 0;
    color: #969696;
    font-size: 13px;
-   /*
 	background: #fff; 
    -moz-border-radius: 2px;
    -webkit-border: 2px;
    border-bottom: 2px;
 	vertical-align: bottom;
-	*/
 }
 #Head form input.Button {
 	font-size: 11px;
@@ -597,6 +669,7 @@ body #Head h1 {
    background: #f2fcff;
    color: #299fc7;
 }
+*/
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
 .ControlOptions,
@@ -607,7 +680,9 @@ body #Head h1 {
    padding: 2px 4px;
    font-size: 11px;
    background: #CFECFF; /*#F6F6F6;*/
+   /*
    box-shadow: #ABDAFB 0px 0px 2px 0px;
+   */
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
    border-radius: 1px;
@@ -631,13 +706,16 @@ body #Head h1 {
 .OptionsTitle {
    user-select: none;
    background: url("images/sprites.png") no-repeat 0 0;
-   color: transparent;
+/*   color: transparent;*/
    height: 28px;
    overflow: hidden;
    padding: 0;
    width: 20px;
    display: inline-block;
 	vertical-align: top;
+   line-height: 999px; /* Set it higher than your image height */
+   overflow: hidden; /* Hide the text */
+   font-size: 0; /* FF2 doesn’t like the above */
 }
 div.Discussion:hover .OptionsTitle:hover,
 .Item:hover .OptionsTitle:hover {
@@ -762,7 +840,10 @@ a.Bookmarking:hover {
 #Panel {
    width: 200px;
    float: left;
-   overflow: hidden;
+   
+/*   
+No overflow hidden on main elements. Causes too many bugs!
+overflow: hidden; */
 }
 #Panel > :first-child {
 	margin-top: 0;
@@ -806,21 +887,29 @@ a.Bookmarking:hover {
    margin-left: 80px;
 }
 
+.UserBox,
 .MeBox {
    margin: 10px 0;
 }
+.UserBox .ProfilePhotoMedium,
 .MeBox .ProfilePhotoMedium {
 	float: left;
    margin-right: 5px;
 }
+.UserBox .WhoIs,
 .MeBox .WhoIs {
 	min-height: 40px;
 	line-height: 1.3;
 }
+.UserBox .Username,
 .MeBox .Username {
 	font-weight: bold;
 	vertical-align: top;
    font-size: 14px;
+}
+.UserBox .Email {
+   white-space: nowrap;
+   overflow: hidden;
 }
 .MeMenu {
    line-height: 24px;
@@ -843,9 +932,11 @@ a.Bookmarking:hover {
 	line-height: 1;
 	padding: 1px;
 	border: 1px solid #d00;
+   /*
 	box-shadow: 0 1px 1px #333;
 	-moz-box-shadow: 0 1px 1px #333;
 	-webkit-box-shadow: 0 1px 1px #333;
+   */
 }
 .MeMenu em {
 	display: none;
@@ -892,11 +983,13 @@ a.Bookmarking:hover {
    padding: 2px 4px;
 }
 */
+#Panel .FilterMenu li,
 .PanelInfo li {
 	border-bottom: 1px solid #ddd;
    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
    padding: 2px 4px;
 }
+#Panel .FilterMenu .Aside,
 .PanelInfo .Aside {
    float: right;
 }
@@ -910,6 +1003,7 @@ a.Bookmarking:hover {
 	border-bottom: 0;
 }
 */
+#Panel .FilterMenu,
 .PanelInfo {
 	border-top: 1px solid #ddd;
    border-top: 1px solid rgba(0, 0, 0, 0.1);
@@ -951,16 +1045,12 @@ a.Bookmarking:hover {
 	color: #333;
 	padding: 2px 0;
 }
+#Panel .FilterMenu .Active,
 .PanelInfo .Active {
 	background: #f7f7f7;
    background: rgba(0, 0, 0, 0.03);
 	font-weight: bold;
 }
-/*
-.PanelInfo .Active a {
-   color: #1e79a7;
-}
-*/
 .PanelActivity .ShowAll,
 .PanelInfo .ShowAll {
    font-weight: bold;
@@ -968,21 +1058,11 @@ a.Bookmarking:hover {
    text-align: right;
 	background: none;
 }
-/* BoxFilter in the #Content area */
 #Content .BoxFilter {
 	margin: 0 0 6px;
 }
-#Content .BoxFilter .PanelInfo {
-	border: none;
-}
-#Content .PanelInfo .Aside {
-	float: none;
-}
-#Content .BoxFilter .PanelInfo li,
-#Content .BoxFilter .PanelInfo li.Active {
-	padding: 0;
-	border: none;
-	background: none;
+#Content .FilterMenu li,
+#Content .FilterMenu li.Active {
 	display: inline-block;
 }
 #Content .BoxFilter a {
@@ -1009,32 +1089,38 @@ a.Bookmarking:hover {
    font-weight: bold;
    padding: 8px 0;
 	background: #f8f8f8;
-	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
-	background:-moz-linear-gradient(top, #ffffff, #cccccc);
-	-pie-background:linear-gradient(top, #ffffff, #cccccc);
-	background:linear-gradient(top, #ffffff, #cccccc);
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+   /*
+	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #cccccc);
+	-pie-background:linear-gradient(top, #ffffff, #cccccc);
+	background:linear-gradient(top, #ffffff, #cccccc);
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
-   }
+   */
+}
 .BigButton:hover {
    color: #111;
    border: 1px solid #666;
+   /*
 	box-shadow: 0px 0px 5px #aaa;
 	-moz-box-shadow: 0px 0px 5px #aaa;
-	-webkit-box-shadow: 0px 0px 5px #aaa;  
+	-webkit-box-shadow: 0px 0px 5px #aaa;
+   */
 }
 .BigButton:focus {
    background: #eee;
+   /*
 	box-shadow: 0px 0px 2px #999;
 	-moz-box-shadow: 0px 0px 2px #999;
 	-webkit-box-shadow: 0px 0px 2px #999;  
+   */
 }
 /* Category Depths */
 .PanelCategories .Depth2 { padding-left: 8px; }
@@ -1306,7 +1392,7 @@ body.Post .Popup a.Close {
 	color: #1e79a7;
 }
 .Message {
-   clear: left;
+   /* clear: left; */
    line-height: 140%;
    font-size: 100%;
 	word-wrap: break-word;
@@ -1677,7 +1763,7 @@ div.Popup .Border {
   margin: 0px auto;
   text-align: left;
   position: relative;
-  max-width: 500px;
+  max-width: 600px;
   display: inline-block;
 }
 div.Popup .Body {
@@ -1818,12 +1904,14 @@ div.Popup form ul li label.RadioLabel {
 #Foot a:hover {
    color: #aaa;
 }
+/*
 #Foot div {
 	width: 960px;
 	padding: 6px 0;
 	margin: 20px auto 0;
 	text-align: left;
 }
+*/
 
 
 /* ================================ Vanilla ================================= */
@@ -2336,7 +2424,7 @@ body.Entry #Panel {
 body.Entry #Content {
    float: none;
    margin: 0 auto;
-   width: 360px;
+   max-width: 500px;
 }
 /*body.Entry #Content form {
 	text-align: left;
@@ -2359,11 +2447,11 @@ span.Incorrect {
    display: block;
    color: red;
 }
-body#dashboard_entry_password #Content,
+/*body#dashboard_entry_password #Content,
 body#dashboard_entry_signin #Content,
 body#dashboard_entry_index #Content {
 	width: auto;
-}
+}*/
 /*.SignInPopup .Content form {
 	padding: 0 10px 10px;
 }*/
@@ -2378,9 +2466,9 @@ body#dashboard_entry_signin #Content form {
 	margin: 0 auto;
 }
 .MultipleEntryMethods {
-	width: 500px;
+/*	width: 500px;*/
 	margin: 0 auto;
-   overflow: hidden;
+/*   overflow: hidden;*/
 }
 .MultipleEntryMethods .MainForm {
    float: left;
@@ -2560,9 +2648,11 @@ body#dashboard_entry_index form ul li label {
    border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
+   /*
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
+   */
 }
 .Errors a {
    color: #fff;
@@ -2578,9 +2668,11 @@ div.Popup .Errors ul {
    border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
+   /*
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
+   */
 	border: 1px solid #a00 !important;
 }
 div.Popup .Errors {
@@ -2600,9 +2692,11 @@ div.Popup .Errors {
    -webkit-border-radius: 2px;
    white-space: pre;
    overflow: auto;
+   /*
 	box-shadow: 0px 0px 2px #333;
 	-moz-box-shadow: 0px 0px 2px #333;
 	-webkit-box-shadow: 0px 0px 2px #333;  
+   */
 }
 .Errors pre,
 .Errors pre * {

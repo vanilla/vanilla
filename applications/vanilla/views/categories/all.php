@@ -4,12 +4,15 @@ if (!function_exists('GetOptions'))
    include $this->FetchViewLocation('helper_functions', 'categories');
    
 echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+if ($Description = $this->Description()) {
+   echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
+}
 
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
-$this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
+$this->EventArguments['NumRows'] = count($this->Data('Categories'));
 
 if (C('Vanilla.Categories.ShowTabs')) {
 //   $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');
@@ -20,7 +23,9 @@ if (C('Vanilla.Categories.ShowTabs')) {
 
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    $Alt = FALSE;
-   foreach ($this->Data('Categories') as $Category) {
+   foreach ($this->Data('Categories') as $CategoryRow) {
+      $Category = (object)$CategoryRow;
+      
       $this->EventArguments['CatList'] = &$CatList;
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;

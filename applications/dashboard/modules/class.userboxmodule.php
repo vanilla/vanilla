@@ -8,14 +8,14 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-
-/**
- * Render a breadcrumb trail for the user based on the page they are on.
- */
-function smarty_function_breadcrumbs($Params, &$Smarty) {
-   $Breadcrumbs = $Smarty->Controller->Data('Breadcrumbs');
-   if (!is_array($Breadcrumbs))
-      $Breadcrumbs = array();
+class UserBoxModule extends Gdn_Module {
    
-   return Gdn_Theme::Breadcrumbs($Breadcrumbs, GetValue('homelink', $Params, TRUE));
+   public function __construct() {
+      parent::__construct();
+      $this->_ApplicationFolder = 'dashboard';
+   }
+   
+   public function AssetTarget() {
+      return 'Panel';
+   }
 }

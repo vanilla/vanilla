@@ -273,6 +273,7 @@ class CategoriesController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
+      $this->AddJsFile('options.js');
       $Title = C('Garden.HomepageTitle');
       if ($Title)
          $this->Title($Title, '');
@@ -315,8 +316,9 @@ class CategoriesController extends VanillaController {
    public function __get($Name) {
       switch ($Name) {
          case 'CategoryData':
-            Deprecated('CategoriesController->CategoryData', "CategoriesController->Data('Categories')");
-            $this->CategoryData = new Gdn_DataSet($this->Data('Categories'));
+//            Deprecated('CategoriesController->CategoryData', "CategoriesController->Data('Categories')");
+            $this->CategoryData = new Gdn_DataSet($this->Data('Categories'), DATASET_TYPE_ARRAY);
+            $this->CategoryData->DatasetType(DATASET_TYPE_OBJECT);
             return $this->CategoryData;
       }
    }

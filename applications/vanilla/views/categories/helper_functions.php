@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+if (!function_exists('CategoryString')):
+   
 function CategoryString($Rows) {
    $Result = '';
    foreach ($Rows as $Row) {
@@ -9,7 +11,10 @@ function CategoryString($Rows) {
    }
    return $Result;
 }
+endif;
 
+if (!function_exists('CssClass')):
+   
 function CssClass($Row) {
    static $Alt = TRUE;
    
@@ -21,7 +26,10 @@ function CssClass($Row) {
    
    return $Result;
 }
+endif;
 
+
+if (!function_exists('GetOptions')):
 /**
  * Render options that the user has for this discussion.
  */
@@ -58,7 +66,10 @@ function GetOptions($Category, $Sender) {
       return $Result;
    }
 }
+endif;
 
+if (!function_exists('WriteTableHead')):
+   
 function WriteTableHead() {
    ?>
    <tr>
@@ -69,7 +80,10 @@ function WriteTableHead() {
    </tr>
    <?php
 }
+endif;
 
+if (!function_exists('WriteTableRow')):
+   
 function WriteTableRow($Row, $Depth = 1) {
    $Children = $Row['Children'];
    $WriteChildren = FALSE;
@@ -120,6 +134,7 @@ function WriteTableRow($Row, $Depth = 1) {
          <div class="Block Wrap">
             <?php if ($Row['LastTitle']): ?>
             <?php 
+            echo UserPhoto($Row, array('ImageClass' => 'PhotoLink', 'Px' => 'Last'));
             echo Anchor(
                SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
                $Row['LastUrl'],
@@ -148,7 +163,10 @@ function WriteTableRow($Row, $Depth = 1) {
       }
    }
 }
+endif;
 
+if (!function_exists('WriteCategoryTable')):
+   
 function WriteCategoryTable($Categories, $Depth = 1) {
    ?>
    <div class="DataTableWrap">
@@ -169,3 +187,4 @@ function WriteCategoryTable($Categories, $Depth = 1) {
    </div>
    <?php
 }
+endif;

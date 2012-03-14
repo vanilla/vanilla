@@ -1231,7 +1231,7 @@ class CategoryModel extends Gdn_Model {
          if (isset($Data[$ParentID]) && $ParentID != $Key) {
             $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
             $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
-            $Data[$ParentID]['ChildIDs'][] = $Key;
+            array_unshift($Data[$ParentID]['ChildIDs'], $Key);
          }
       }
 	}

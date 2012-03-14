@@ -31,15 +31,15 @@ class Gdn_Theme {
       Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
    }
 
-   public static function Breadcrumbs($Data, $Format = FALSE, $HomeLink = TRUE) {
-      if (!$Format)
-         $Format = '<a href="{Url,html}">{Name,html}</a>';
+   public static function Breadcrumbs($Data, $HomeLink = TRUE) {
+      $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
       
       $Result = '';
       
       if (!is_array($Data))
          $Data = array();
 
+      $Stack = 0;
       if ($HomeLink) {
          $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE));
          if (!is_string($HomeLink))
@@ -47,20 +47,33 @@ class Gdn_Theme {
          
          
          $Result .= '<span class="CrumbLabel HomeCrumb">'.FormatString($Format, $Row).'</span> ';
+         $Stack++;
       }
       
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
 
+      
       foreach ($Data as $Row) {
          if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
             continue; // don't show default route twice.
+         
+         // Add the breadcrumb wrapper.
+         if ($Stack > 0) {
+            $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
+         }
+         $Stack++;
          
          $Row['Url'] = Url($Row['Url']);
          $Label = '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span> ', $Result, $Label);
       }
+      
+      // Close the stack.
+      for (;$Stack > 0; $Stack--) {
+         $Result .= '</span>';
+      }
 
-      $Result ='<span class="Breadcrumbs">'.$Result.'</span>';
+      $Result ='<span class="Breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">'.$Result.'</span>';
       return $Result;
    }
    

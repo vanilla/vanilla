@@ -86,6 +86,14 @@ body {
 	background: #fff;
 	float: left;
 	width: 100%;
+	zoom: 1; /* hasLayout for IE6/7 */
+}
+#Body:after { /* clearfix */
+	visibility: hidden;
+	display: block;
+	content: "";
+	clear: both;
+	height: 0;
 }
 #Content {
 	padding: 0 0 20px;
@@ -241,6 +249,11 @@ input.WideInput {
 	width: auto;
 	padding-right: 8px;
 }
+.TextBoxWrapper textarea,
+.TextBoxWrapper input {
+   width: 100%;
+}
+
 input.SmallInput,
 input.InputBox {
    font-size: 15px;

@@ -164,7 +164,7 @@ class BanModel extends Gdn_Model {
          // Convert ban to regex.
          $Parts = explode('*', $Ban['BanValue']);
          $Parts = array_map('preg_quote', $Parts);
-         $Regex = '`'.implode('.*', $Parts).'`i';
+         $Regex = '`^'.implode('.*', $Parts).'$`i';
 
          if (preg_match($Regex, GetValue($Fields[$Ban['BanType']], $User))) {
             $Banned[$Ban['BanType']] = TRUE;

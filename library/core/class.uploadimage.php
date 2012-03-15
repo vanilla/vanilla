@@ -232,7 +232,7 @@ class Gdn_UploadImage extends Gdn_Upload {
       $Parsed = self::Parse($TargetPath);
       $Sender->EventArguments['Parsed'] =& $Parsed;
       $Sender->Returns = array();
-      Gdn::PluginManager()->CallEventHandlers($Sender, 'Gdn_UploadImage', 'SaveImageAs');
+      Gdn::PluginManager()->CallEventHandlers($Sender, 'Gdn_Upload', 'SaveAs');
       return $Sender->EventArguments['Parsed'];
    }
    

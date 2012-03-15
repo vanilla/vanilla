@@ -37,6 +37,26 @@ class Gdn_UploadImage extends Gdn_Upload {
       parent::Clear();
 		$this->_AllowedFileExtensions = array('jpg','jpeg','gif','png','bmp','ico');
    }
+   
+   /**
+    * Gets the image size of a file.
+    * @param string $Path The path to the file.
+    * @param string $Filename The name of the file.
+    * @return array An array of [width, height, image type].
+    * @since 2.1
+    */
+   public static function ImageSize($Path, $Filename = FALSE) {
+      if (!$Filename)
+         $Filename = $Path;
+      
+      if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), array('gif', 'jpg', 'jpeg', 'png'))) {
+         $ImageSize = @getimagesize($Path);
+         if (!is_array($ImageSize) || !in_array($ImageSize[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG)))
+            return array(0, 0, FALSE);
+         return $ImageSize;
+      }
+      return array(0, 0, FALSE);
+   }
 
    /**
     * Validates the uploaded image. Returns the temporary name of the uploaded file.

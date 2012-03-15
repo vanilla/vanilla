@@ -1,0 +1,49 @@
+body {
+   background: #000;
+   color: #ccc;
+}
+* {
+   border-color: #606060 !important;
+}
+#Head {
+    background: #212121;
+}
+.Reactions a,
+.DataCounts a,
+#Head h1 a span,
+a {
+   color: #A2DC02;
+}
+.Reactions a:hover,
+.DataCounts a:hover,
+a:hover {
+   color: #fff;
+}
+#Menu .Alert {
+   color: #222;
+}
+body.Profile.EditMode #Content form,
+.FormWrapper,
+.Box {
+   background: #272727;
+}
+.PanelInfo .Heading,
+.Box {
+   color: #ccc;
+}
+#Panel .FilterMenu .Active, 
+.PanelInfo .Active {
+    background: none repeat scroll 0 0 rgba(255, 255, 255, 0.1);
+}
+.HasNew {
+   background: #A2DC02;
+}
+.Item:hover {
+   background: #111;
+}
+.CountItem {
+   background: #333;
+}
+.CountItem.Selected {
+   background: #555;
+}

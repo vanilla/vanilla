@@ -1,0 +1,24 @@
+body {
+   background: #fff;
+   color: #000;
+}
+#Head {
+    background: #282828;
+}
+a {
+   color: #282828;
+}
+a:hover {
+   color: #bbb;
+}
+#Menu .Alert {
+   color: #222;
+}
+body.Profile.EditMode #Content form,
+.FormWrapper,
+.Box {
+   background: #ddd;
+}
+.Box {
+   color: #444;
+}

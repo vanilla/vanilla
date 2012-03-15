@@ -80,7 +80,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       $this->EventArguments['Parsed'] = $Parsed;
       $this->EventArguments['Path'] =& $LocalPath;
 
-      $this->FireEvent('CopyLocal');
+      $this->FireAs('Gdn_Upload')->FireEvent('CopyLocal');
       if (!$LocalPath) {
          $LocalPath = PATH_UPLOADS.'/'.$Parsed['Name'];
       }
@@ -99,7 +99,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       $this->EventArguments['Parsed'] =& $Parsed;
       $Handled = FALSE;
       $this->EventArguments['Handled'] =& $Handled;
-      $this->FireEvent('Delete');
+      $this->FireAs('Gdn_Upload')->FireEvent('Delete');
 
       if (!$Handled) {
          $Path = PATH_UPLOADS.'/'.ltrim($Name, '/');
@@ -204,7 +204,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       $this->EventArguments['Parsed'] =& $Parsed;
       $Handled = FALSE;
       $this->EventArguments['Handled'] =& $Handled;
-      $this->FireEvent('SaveAs');
+      $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
 
       // Check to see if the event handled the save.
       if (!$Handled) {

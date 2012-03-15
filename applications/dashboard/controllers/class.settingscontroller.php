@@ -228,9 +228,9 @@ class SettingsController extends DashboardController {
                      $Upload->Delete($Favicon);
 
                   // Resize the to a png.
-                  $ImgUpload->SaveImageAs($TmpFavicon, $ICOName, 16, 16, array('OutputType' => 'ico', 'Crop' => TRUE));
-                  $SaveData['Garden.FavIcon'] = $ICOName;
-                  $this->SetData('Favicon', $ICOName);
+                  $Parts = $ImgUpload->SaveImageAs($TmpFavicon, $ICOName, 16, 16, array('OutputType' => 'ico', 'Crop' => TRUE));
+                  $SaveData['Garden.FavIcon'] = $Parts['SaveName'];
+                  $this->SetData('Favicon', $Parts['SaveName']);
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());

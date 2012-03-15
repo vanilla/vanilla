@@ -209,7 +209,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $PathRequest = Gdn::Request()->Path();
          foreach ($BlockExceptions as $BlockException => $BlockLevel) {
             if (preg_match($BlockException, $PathRequest))
-               throw new Exception("Block detected", $BlockLevel);
+               throw new Exception("Block detected - {$BlockException}", $BlockLevel);
          }
          
          // Never block an admin
@@ -226,7 +226,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          //  NULL = Block for permissions (e.g. PrivateCommunity)
          $CanBlock = $e->getCode();
       }
-   
+      
       // If we're in updatemode and arent explicitly prevented from blocking, block
       if (Gdn::Config('Garden.UpdateMode', FALSE) && $CanBlock > self::BLOCK_NEVER) {
          $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
@@ -310,7 +310,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->Request = $Request;
          $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
          $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
-
+         
          // Set special controller method options for REST APIs.
          $Controller->Initialize();
          

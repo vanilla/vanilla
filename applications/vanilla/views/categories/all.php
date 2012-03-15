@@ -4,12 +4,15 @@ if (!function_exists('GetOptions'))
    include $this->FetchViewLocation('helper_functions', 'categories');
    
 echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+if ($Description = $this->Description()) {
+   echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
+}
 
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
-$this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
+$this->EventArguments['NumRows'] = count($this->Data('Categories'));
 
 if (C('Vanilla.Categories.ShowTabs')) {
 //   $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');
@@ -20,7 +23,9 @@ if (C('Vanilla.Categories.ShowTabs')) {
 
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    $Alt = FALSE;
-   foreach ($this->CategoryData->Result() as $Category) {
+   foreach ($this->Data('Categories') as $CategoryRow) {
+      $Category = (object)$CategoryRow;
+      
       $this->EventArguments['CatList'] = &$CatList;
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;
@@ -31,6 +36,8 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
       if (GetValue('Unfollow', $Category))
          $CssClasses[] = 'Unfollow';
       $CssClasses = implode(' ', $CssClasses);
+      
+      $CategoryID = GetValue('CategoryID', $Category);
 
       if ($Category->CategoryID > 0) {
          // If we are below the max depth, and there are some child categories
@@ -45,7 +52,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                $ChildCategories .= ', ';
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
-            $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category">'.GetOptions($Category, $this).Gdn_Format::Text($Category->Name).'</div>
             </li>';
             $Alt = FALSE;
@@ -53,8 +60,10 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $LastComment = UserBuilder($Category, 'Last');
             $AltCss = $Alt ? ' Alt' : '';
             $Alt = !$Alt;
-            $CatList .= '<li class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category '.$CssClasses.'">'
+                  .'<div class="TitleWrap">'
+                  .'</div>'
                   .GetOptions($Category, $this)
                   .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
                   .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))

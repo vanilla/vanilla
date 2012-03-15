@@ -1,0 +1,27 @@
+/*
+admin.css overwrites
+*/
+
+table.SelectionGrid td.Active {
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:#e2f4ff none repeat scroll 0 0;
+}
+table.SelectionGrid h4 {
+color:#02455B;
+font-size:16px;
+margin-bottom:10px;
+text-shadow:0 1px 0 #FFFFFF;
+}
+table.SelectionGrid dl dt {
+	display: inline;
+   color: #000;
+   border-right: 1px solid #e2f4ff;
+   padding: 4px 6px 4px 0;
+	margin: 0 4px 0 0;
+}
+.CurrentTheme {
+	min-height: 170px;
+	margin-bottom: 20px;
+}

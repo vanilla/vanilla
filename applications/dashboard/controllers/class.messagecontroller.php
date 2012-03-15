@@ -98,6 +98,7 @@ class MessageController extends DashboardController {
       // Set the model on the form.
       $this->Form->SetModel($this->MessageModel);
       $this->Message = $this->MessageModel->GetID($MessageID);
+      $this->Message = $this->MessageModel->DefineLocation($this->Message);
       
       // Make sure the form knows which item we are editing.
       if (is_numeric($MessageID) && $MessageID > 0)

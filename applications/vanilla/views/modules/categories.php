@@ -1,21 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
 $CountDiscussions = 0;
 $CategoryID = isset($this->_Sender->CategoryID) ? $this->_Sender->CategoryID : '';
-
+$OnCategories = strtolower($this->_Sender->ControllerName) == 'categoriescontroller' && !is_numeric($CategoryID);
 if ($this->Data !== FALSE) {
    foreach ($this->Data->Result() as $Category) {
       $CountDiscussions = $CountDiscussions + $Category->CountDiscussions;
    }
    ?>
 <div class="Box BoxCategories">
-   <h4><?php echo Anchor(T('Categories'), 'categories'); ?></h4>
+   <h4><?php echo T('Categories'); ?></h4>
    <ul class="PanelInfo PanelCategories">
-      <li class="ClearFix<?php
-      /*
-       if (!is_numeric($CategoryID))
-         echo ' Active';?>"><span><strong><?php echo Anchor(Gdn_Format::Text(T('All Discussions')), '/discussions'); ?></strong> <span class="Aside"><span class="Count"><?php echo Gdn_Format::BigNumber($CountDiscussions, 'html'); ?></span></span></span></li>
-<?php
-      */
+   <?php
+   echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.Wrap(Anchor(Gdn_Format::Text(T('All Categories')), '/categories'), 'strong')
+      .' <span class="Aside"><span class="Count">'.Gdn_Format::BigNumber($CountDiscussions, 'html').'</span></span></li>';
+
    $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
    $DoHeadings = C('Vanilla.Categories.DoHeadings');
    

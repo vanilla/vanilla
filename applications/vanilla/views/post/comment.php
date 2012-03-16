@@ -27,15 +27,15 @@ if ($Editing)
    $this->FireEvent('AfterBodyField');
    echo "<div class=\"Buttons\">\n";
    $this->FireEvent('BeforeFormButtons');
-   $CancelText = T('Back to Discussions');
+   $CancelText = T('Home');
    $CancelClass = 'Back';
-   if (!$NewOrDraft) {
+   if (!$NewOrDraft || $Editing) {
       $CancelText = T('Cancel');
-      $CancelClass = 'MItem Cancel';
+      $CancelClass = 'Cancel';
    }
 
    echo '<span class="'.$CancelClass.'">';
-   echo Anchor(T('Home'), '/');
+   echo Anchor($CancelText, '/');
    
    if ($CategoryID = $this->Data('Discussion.CategoryID')) {
       $Category = CategoryModel::Categories($CategoryID);

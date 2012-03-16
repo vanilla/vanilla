@@ -7,9 +7,6 @@ jQuery(document).ready(function($) {
          $(this).autogrow();
       });
 
-   // Hijack the "Cancel" button on the comment form
-   var cancelButton = $('a.Cancel');
-      
    // Hide it if they leave the area without typing
    $('div.CommentForm textarea').blur(function(ev) {
       var Comment = $(ev.target).val();
@@ -303,7 +300,7 @@ jQuery(document).ready(function($) {
       return false;
    });
    // Reveal the original message when cancelling an in-place edit.
-   $('.Comment .Cancel').livequery('click', function() {
+   $('.Comment .Cancel a').livequery('click', function() {
       var btn = this;
       $(btn).parents('.Comment').find('div.Message').show();
       $(btn).parents('.CommentForm').remove();

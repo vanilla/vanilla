@@ -544,7 +544,9 @@ class PostController extends VanillaController {
                   if ($Editing) {
                      // Just reload the comment in question
                      $this->Offset = 1;
-                     $this->SetData('CommentData', $this->CommentModel->GetIDData($CommentID), TRUE);
+                     $Comments = $this->CommentModel->GetIDData($CommentID);
+                     $this->SetData('Comments', $Comments);
+                     $this->SetData('CommentData', $Comments, TRUE);
                      // Load the discussion
                      $this->ControllerName = 'discussion';
                      $this->View = 'comments';
@@ -580,7 +582,9 @@ class PostController extends VanillaController {
 //                        // Make sure to load all new comments since the page was last loaded by this user
 //								if ($DisplayNewCommentOnly)
                         $this->Offset = $this->CommentModel->GetOffset($CommentID);
-                        $this->SetData('CommentData', $this->CommentModel->GetIDData($CommentID), TRUE);
+                        $Comments = $this->CommentModel->GetIDData($CommentID);
+                        $this->SetData('Comments', $Comments);
+                        $this->SetData('CommentData', $Comments, TRUE);
 //								else 
 //									$this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
 

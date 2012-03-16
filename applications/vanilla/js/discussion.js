@@ -93,6 +93,10 @@ jQuery(document).ready(function($) {
       // Also add a spinner for comments being edited
       $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       $(frm).triggerHandler('BeforeSubmit', [frm, btn]);
+      if (type != 'Draft')
+         $(':submit', frm).addClass('InProgress');
+      else
+         $('.DraftButton', frm).addClass('InProgress');
       $.ajax({
          type: "POST",
          url: action,
@@ -204,7 +208,8 @@ jQuery(document).ready(function($) {
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.
-            $('span.TinyProgress').remove();
+            $(':submit', frm).removeClass('InProgress');
+            $('.DraftButton', frm).removeClass('InProgress');
             $(frm).find(':submit').removeAttr("disabled");
             if (draft)
                draftSaving--;

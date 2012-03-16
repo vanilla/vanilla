@@ -865,7 +865,15 @@ class UserModel extends Gdn_Model {
    }
    
    public function RemovePicture($UserID) {
-      $this->SetField($UserID, 'Photo', NULL);
+      // Grab the current photo.
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      if ($Photo = $User['Photo']) {
+         $ProfilePhoto = ChangeBasename($Photo, 'p%s');
+         $Upload = new Gdn_Upload();
+         $Upload->Delete($ProfilePhoto);
+         
+         $this->SetField($UserID, 'Photo', NULL);
+      }
    }
 
    public function ProfileCount($User, $Column) {

@@ -8,6 +8,7 @@
  * @param int $CurrentOffset.
  * @return string CSS classes to apply.
  */
+if (!function_exists('CssClass')):
 function CssClass($Object, $CurrentOffset = 0) {
    $Type = (GetValue('CommentID', $Object)) ? 'Comment' : 'Discussion';
    $CssClass = 'Item Item'.$Type;
@@ -22,6 +23,7 @@ function CssClass($Object, $CurrentOffset = 0) {
    
    return $CssClass;
 }
+endif;
 
 /**
  * Format content of comment or discussion.
@@ -32,6 +34,7 @@ function CssClass($Object, $CurrentOffset = 0) {
  * @param DataSet $Object Comment or discussion.
  * @return string Parsed body.
  */
+if (!function_exists('FormatBody')):
 function FormatBody($Object) {
    Gdn::Controller()->FireEvent('BeforeCommentBody'); 
    $Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
@@ -39,10 +42,12 @@ function FormatBody($Object) {
    
    return $Object->FormatBody;
 }
+endif;
 
 /**
  * Output link to (un)boomark a discussion.
  */
+if (!function_exists('WriteBookmarkLink')):
 function WriteBookmarkLink() {
    if (!Gdn::Session()->IsValid())
       return '';
@@ -58,6 +63,7 @@ function WriteBookmarkLink() {
       array('title' => $Title)
    );
 }
+endif;
 
 /**
  * Outputs a formatted comment.
@@ -70,6 +76,7 @@ function WriteBookmarkLink() {
  * @param Gdn_Session $Session.
  * @param int $CurrentOffet How many comments into the discussion we are (for anchors).
  */
+if (!function_exists('WriteComment')):
 function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Author = UserBuilder($Comment, 'Insert');
    $Permalink = GetValue('Url', $Comment, '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID);
@@ -139,29 +146,24 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
 <?php
 	$Sender->FireEvent('AfterComment');
 }
-
-if (!function_exists('WriteReactions')):
-
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-
 endif;
 
 if (!function_exists('WriteReactions')):
-
 function WriteReactions($Row, $Type = 'Comment') {
    // noop
 }
-
 endif;
 
 if (!function_exists('WriteReactions')):
-
 function WriteReactions($Row, $Type = 'Comment') {
    // noop
 }
+endif;
 
+if (!function_exists('WriteReactions')):
+function WriteReactions($Row, $Type = 'Comment') {
+   // noop
+}
 endif;
 
 /**
@@ -171,6 +173,7 @@ endif;
  * @param DataSet $Discussion.
  * @return array $Options Each element must include keys 'Label' and 'Url'.
  */
+if (!function_exists('GetDiscussionOptions')):
 function GetDiscussionOptions($Discussion = NULL) {
    $Options = array();
    
@@ -225,24 +228,28 @@ function GetDiscussionOptions($Discussion = NULL) {
    
    return $Options;
 }
+endif;
 
 /**
  * Output moderation checkbox.
  *
  * @since 2.1
  */
+if (!function_exists('WriteAdminCheck')):
 function WriteAdminCheck($Object = NULL) {
    if (!Gdn::Controller()->CanEditComments || !C('Vanilla.AdminCheckboxes.Use'))
       return;
    
    echo '<span class="AdminCheck"><input type="checkbox" name="Toggle"></span>';
 }
+endif;
 
 /**
  * Output discussion options.
  *
  * @since 2.1
  */
+if (!function_exists('WriteDiscussionOptions')):
 function WriteDiscussionOptions($Discussion = NULL) {
    $Options = GetDiscussionOptions($Discussion);
    
@@ -260,6 +267,7 @@ function WriteDiscussionOptions($Discussion = NULL) {
    </span>
    <?php
 }
+endif;
 
 /**
  * Get comment options.
@@ -268,6 +276,7 @@ function WriteDiscussionOptions($Discussion = NULL) {
  * @param DataSet $Comment.
  * @return array $Options Each element must include keys 'Label' and 'Url'.
  */
+if (!function_exists('GetCommentOptions')):
 function GetCommentOptions($Comment) {
 	$Options = array();
    
@@ -309,13 +318,14 @@ function GetCommentOptions($Comment) {
    
 	return $Options;
 }
-
+endif;
 /**
  * Output comment options.
  *
  * @since 2.1
  * @param DataSet $Comment.
  */
+if (!function_exists('WriteCommentOptions')):
 function WriteCommentOptions($Comment) {
 	$Controller = Gdn::Controller();
 	$Session = Gdn::Session();
@@ -348,12 +358,14 @@ function WriteCommentOptions($Comment) {
       }
    }
 }
+endif;
 
 /**
  * Output comment form.
  *
  * @since 2.1
  */
+if (!function_exists('WriteCommentForm')):
 function WriteCommentForm() {
 	$Session = Gdn::Session();
 	$Controller = Gdn::Controller();
@@ -389,3 +401,4 @@ function WriteCommentForm() {
 	if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
 		echo $Controller->FetchView('comment', 'post');
 }
+endif;

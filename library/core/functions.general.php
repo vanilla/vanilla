@@ -2054,8 +2054,8 @@ if (!function_exists('RemoteIP')) {
 }
 
 if (!function_exists('RemoveFromConfig')) {
-   function RemoveFromConfig($Name) {
-      Gdn::Config()->RemoveFromConfig($Name);
+   function RemoveFromConfig($Name, $Options = array()) {
+      Gdn::Config()->RemoveFromConfig($Name, $Options);
    }
 }
 

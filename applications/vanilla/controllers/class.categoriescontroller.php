@@ -149,8 +149,6 @@ class CategoriesController extends VanillaController {
          $this->View = 'discussions';
       }
 
-      $this->CanonicalUrl(Url('/categories', TRUE));
-
       // Render default view
       $this->Render();
    }

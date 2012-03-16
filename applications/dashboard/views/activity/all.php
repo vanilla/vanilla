@@ -4,7 +4,7 @@
 include_once $this->FetchViewLocation('helper_functions');
 
 // WriteActivityTabs();
-echo Gdn_Theme::Module('ActivityFilterModule');
+// echo Gdn_Theme::Module('ActivityFilterModule');
 
 $this->FireEvent('BeforeStatusForm');
 $Session = Gdn::Session();

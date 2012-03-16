@@ -1759,6 +1759,7 @@ form.Thumbnail .Warning {
 	/* padding: 6px; */
 	padding: 6px 0;
 }
+.CommentForm .Buttons .Cancel,
 .CommentForm .Buttons .Back {
 	float: left;
 	line-height: 2.2;
@@ -1766,6 +1767,9 @@ form.Thumbnail .Warning {
 	left: 6px;
    position: absolute;
 	*/
+}
+.Bullet {
+   font-size: 10px;
 }
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,

@@ -3,13 +3,12 @@
 <head>
   {asset name='Head'}
 </head>
-
 <body id="{$BodyID}" class="{$BodyClass}">
-
 <div id="Frame">
  <div id="Head">
    <div class="Row">
      <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
+     <div class="SiteSearch">{searchbox}</div>
      <ul class="SiteMenu">
       {dashboard_link}
       {discussions_link}
@@ -19,7 +18,6 @@
       {profile_link}
       {signinout_link}
      </ul>
-     <div class="SiteSearch">{searchbox}</div>
    </div>
   </div>
   <div id="Body">

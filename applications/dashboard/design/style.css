@@ -251,6 +251,7 @@ select {
 	box-shadow: 0px 0px 1px #999;
 	-moz-box-shadow: 0px 0px 1px #999;
 	-webkit-box-shadow: 0px 0px 1px #999;
+   line-height: 1;
 }
 /*
 a.Button {
@@ -505,6 +506,21 @@ a.Small img {
    margin: 0 0 10px;
    padding: 10px;
 }
+.DismissMessage.Info {
+   background: #f3f4f8;
+   border: 1px solid #ddd;
+}
+.DismissMessage.Warning {
+   background: #ffebe9;
+   border: 1px solid #FFCCC9;
+}
+.DismissMessage.Box {
+   background: #fff8ce;
+   border: 1px solid #c5bea4;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
 .CasualMessage {
    background: #CFECFF;
    border: 1px solid #ABDAFB;
@@ -528,7 +544,8 @@ a.Small img {
    background: #38abe3;
    color: #fff;
    padding: 16px 3px 3px;
-   margin-bottom: 5px;
+   /* This causes problems in most themes and almost always ends up being overwritten */
+   /* margin-bottom: 5px; */
 }
 #Head a {
    color: #fff;
@@ -538,10 +555,10 @@ a.Small img {
    font-family: "helvetica neue", helvetica, arial, sans-serif;
    font-weight: bold;
    font-size: 24px;
+   margin-right: 6px;
 }
 .SiteMenu {
    display: inline;
-   margin: 0 6px;
    white-space: nowrap;
 }
 .SiteMenu li {
@@ -558,19 +575,24 @@ a.Small img {
    float: right;
    position: relative;
 }
-.SiteSearch .InputBox {
+#Head .SiteSearch .InputBox {
    border: none;
 	font-size: 11px;
-   width: 200px;
-   padding: 5px;
+   width: 175px;
+   padding: 5px 25px 5px 5px;
 }
-.SiteSearch .Button {
-   background: transparent;
+#Head .SiteSearch .Button {
+   background: url('images/sprites.png') 0 -196px no-repeat transparent;
+   height: 16px;
+   width: 16px;
+   overflow: hidden;
+   line-height: 999px;
+   color: transparent;
+   font-size: 0;
    border: none;
-	font-size: 11px;
    position: absolute;
-   top: 0;
-   right: 0;
+   top: 4px;
+   right: 4px;
    box-shadow: none;
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
@@ -902,7 +924,10 @@ overflow: hidden; */
 	font-size: 12px;
    margin-left: 80px;
 }
-
+/* Hiding until we figure out what to do with GuestWelcomeModule */
+.MeBox-SignIn {
+   display: none;
+}
 .Profile .MeBox {
    display: none;
 }
@@ -1562,6 +1587,9 @@ body.Profile #Panel {
 .ProfileOptions {
 	float: right;
 }
+.ProfileOptions a {
+   margin: 0 0 0 6px;
+}
 /* Hiding form headings with CSS in case the forms get popped */
 body.Profile.picture .SmallPopup h1 {
 	display: none;
@@ -1782,6 +1810,7 @@ div.Popup .Border {
 div.Popup .Body {
   background: #fff;
   padding: 10px;
+  float: left; /* Put this here b/c background of form was not descending to bottom of popup. */
 }
 /*div.Popup .Legal,
 div.Popup .Content form {

@@ -63,6 +63,7 @@ class SearchController extends Gdn_Controller {
       $this->AddCssFile('menu.css');
       $this->AddModule('GuestModule');
       parent::Initialize();
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Search'), 'Url' => '/search')));
    }
 	
 	/**

@@ -28,10 +28,12 @@
    width: 24px;
    z-index: 50;
 }
+/** This causes clearing problems when the panel is taller than the content 
 #DiscussionForm .TextBoxWrapper,
 .CommentForm .TextBoxWrapper {
    clear: left;
 }
+*/
 .ButtonBar .ButtonWrap:hover {
    background-color: #f8f8f8;
    cursor: pointer;

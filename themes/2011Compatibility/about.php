@@ -28,5 +28,6 @@ $ThemeInfo['2011Compatibility'] = array(
 			'Vanilla Lemon Sea' => '%s_lemonsea',
          'Vanilla Blue' => '%s'
       ),
-   )
+   ),
+   'Archived' => TRUE
 );

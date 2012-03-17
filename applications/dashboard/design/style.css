@@ -2541,8 +2541,7 @@ body#dashboard_entry_signin #Content form {
    width: 285px;
 }
 .MultipleEntryMethods .Methods {
-   border-left: solid 1px #BEC8CC;
-	padding: 0 15px 5px;
+ 	padding: 0 15px 5px;
 	line-height: 1;
    margin-left: 300px;
 }

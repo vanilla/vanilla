@@ -21,7 +21,7 @@ $Activities = $this->Data('Activities', array());
 if (count($Activities) > 0) {
    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
    
-   echo '<div class="P">';
+   echo '<div class="PagerWrap">';
    PagerModule::Write(array('CurrentRecords' => count($Activities)));
    echo '</div>';
 } else {

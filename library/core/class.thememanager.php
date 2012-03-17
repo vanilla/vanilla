@@ -130,8 +130,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          $SearchThemeInfo = $this->ScanThemeFile($ThemeAboutFile);
          
          // Don't index archived themes.
-         if (GetValue('Archived', $SearchThemeInfo, FALSE))
-            continue;
+//         if (GetValue('Archived', $SearchThemeInfo, FALSE))
+//            continue;
          
          // Add the screenshot.
          if (array_key_exists('screenshot', $ThemeFiles)) {

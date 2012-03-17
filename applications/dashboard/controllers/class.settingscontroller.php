@@ -979,8 +979,17 @@ class SettingsController extends DashboardController {
       }
       $Themes = Gdn::ThemeManager()->AvailableThemes();
       uasort($Themes, array('SettingsController', '_NameSort'));
-//      decho($Themes);
-//      die();
+      
+      // Remove themes that are archived
+      $Remove = array();
+      foreach ($Themes as $Index => $Theme) {
+         $Archived = GetValue('Archived', $Theme);
+         if ($Archived)
+            $Remove[] = $Index;
+      }
+      foreach ($Remove as $Index) {
+         unset($Themes[$Index]);
+      }
       $this->SetData('AvailableThemes', $Themes);
       
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {

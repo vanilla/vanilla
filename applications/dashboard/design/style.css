@@ -1460,6 +1460,9 @@ blockquote {
 	font-size: 11px;
 	color: #777;
 }
+.EmbeddedContent {
+   overflow: hidden;
+}
 img.LeftAlign {
    float: left;
    margin: 0 10px 5px 0;

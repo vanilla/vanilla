@@ -562,6 +562,9 @@ class SettingsController extends DashboardController {
                   $Refresh = TRUE;
                   break;
             }
+            
+            // Set default locale field if just doing enable/disable
+            $this->Form->SetFormValue('Locale', C('Garden.Locale', 'en-CA'));
          } elseif ($this->Form->IsPostBack()) {
             // Save the default locale.
             SaveToConfig('Garden.Locale', $this->Form->GetFormValue('Locale'));

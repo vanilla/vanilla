@@ -8,16 +8,24 @@
   <div class="Top">
     <div class="Row">
       <div class="TopMenu">
-        <a href="#">Home</a>
-        <a href="#">Forum</a>
+        <a href="{link path="/"}">Home</a>
+        <!--
+        You can add more of your top-level navigation links like this:
+
+        <a href="#">Store</a>
         <a href="#">Blog</a>
+        <a href="#">Contact Us</a>
+        -->
       </div>
    </div>
   </div>
   <div class="Banner">
     <div class="Row">
       <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
-      <div class="AdSpace">Advertising Space</div>
+      <!--
+      We've placed this optional advertising space below. Just comment out the line and replace "Advertising Space" with your 728x90 ad banner. 
+      -->
+      <!-- <div class="AdSpace">Advertising Space</div> -->
     </div>
   </div>
   <div id="Head">

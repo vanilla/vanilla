@@ -2580,6 +2580,9 @@ body.Entry li.Buttons {
 .Methods .Method {
    margin: 5px 0;
 }
+.MainForm .InputBox {
+   max-width: 250px;
+}
 
 /* Handshake */
 body#dashboard_entry_handshake #Content {

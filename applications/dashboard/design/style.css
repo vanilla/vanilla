@@ -544,9 +544,12 @@ a.Small img {
 #Head {
    background: #38abe3;
    color: #fff;
-   padding: 16px 3px 3px;
    /* This causes problems in most themes and almost always ends up being overwritten */
    /* margin-bottom: 5px; */
+}
+/* Targetting the padding on head in this way b/c it was causing problems in older themes */
+body > #Frame > .Head {
+   padding: 16px 3px 3px;
 }
 #Head a {
    color: #fff;
@@ -1029,6 +1032,10 @@ overflow: hidden; */
    padding: 2px 4px;
 }
 */
+/* Compatibility for old custom themes that overrode this value */
+#Panel .PanelInfo li {
+   text-align: left;
+}
 #Panel .FilterMenu li,
 .PanelInfo li {
 	border-bottom: 1px solid #ddd;
@@ -2575,6 +2582,9 @@ body.Entry li.Buttons {
 
 .Methods .Method {
    margin: 5px 0;
+}
+.MainForm .InputBox {
+   max-width: 250px;
 }
 
 /* Handshake */

@@ -5,7 +5,7 @@
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
 <div id="Frame">
- <div id="Head">
+ <div class="Head" id="Head">
    <div class="Row">
      <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
      <div class="SiteSearch">{searchbox}</div>

@@ -1029,6 +1029,10 @@ overflow: hidden; */
    padding: 2px 4px;
 }
 */
+/* Compatibility for old custom themes that overrode this value */
+#Panel .PanelInfo li {
+   text-align: left;
+}
 #Panel .FilterMenu li,
 .PanelInfo li {
 	border-bottom: 1px solid #ddd;

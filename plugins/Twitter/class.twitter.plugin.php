@@ -10,8 +10,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Twitter'] = array(
-	'Name' => 'Twitter',
-   'Description' => 'This plugin integrates Twitter with Vanilla. <b>You must register your application with Twitter for this plugin to work.</b>',
+	'Name' => 'Twitter Sign In',
+   'Description' => 'Users may sign into your site using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>',
    'Version' => '1.0b',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
@@ -114,6 +114,13 @@ class TwitterPlugin extends Gdn_Plugin {
          $Sender->Data['Methods'][] = $TwMethod;
       }
    }
+   
+   public function Base_SignInIcons_Handler($Sender, $Args) {
+      if (!$this->IsConfigured())
+			return;
+			
+		echo "\n".$this->_GetButton();
+	}
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsConfigured())
@@ -175,7 +182,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $this->SetOAuthToken($Data['oauth_token'], $Data['oauth_token_secret'], 'request');
 
             // Redirect to twitter's authorization page.
-            $Url = "http://api.twitter.com/oauth/authorize?oauth_token={$Data['oauth_token']}";
+            $Url = "http://api.twitter.com/oauth/authenticate?oauth_token={$Data['oauth_token']}";
             Redirect($Url);
          }
       }

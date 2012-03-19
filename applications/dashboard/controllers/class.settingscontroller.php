@@ -40,6 +40,7 @@ class SettingsController extends DashboardController {
     */
    public function Initialize() {
       parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
@@ -227,9 +228,9 @@ class SettingsController extends DashboardController {
                      $Upload->Delete($Favicon);
 
                   // Resize the to a png.
-                  $ImgUpload->SaveImageAs($TmpFavicon, $ICOName, 16, 16, array('OutputType' => 'ico', 'Crop' => TRUE));
-                  $SaveData['Garden.FavIcon'] = $ICOName;
-                  $this->SetData('Favicon', $ICOName);
+                  $Parts = $ImgUpload->SaveImageAs($TmpFavicon, $ICOName, 16, 16, array('OutputType' => 'ico', 'Crop' => TRUE));
+                  $SaveData['Garden.FavIcon'] = $Parts['SaveName'];
+                  $this->SetData('Favicon', $Parts['SaveName']);
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());
@@ -328,7 +329,14 @@ class SettingsController extends DashboardController {
          Gdn::Router()->DeleteRoute('DefaultController');
          Gdn::Router()->SetRoute('DefaultController', $NewRoute, 'Internal');
          $this->SetData('CurrentTarget', $NewRoute);
-         $this->InformMessage(T("The homepage was saved successfully."));
+         
+         // Save the preferred layout setting
+         SaveToConfig(array(
+            'Vanilla.Discussions.Layout' => GetValue('DiscussionsLayout', $this->Form->FormValues(), ''),
+            'Vanilla.Categories.Layout' => GetValue('CategoriesLayout', $this->Form->FormValues(), '')
+         ));
+         
+         $this->InformMessage(T("Your changes were saved successfully."));
       }
       
       $this->Render();      
@@ -362,11 +370,6 @@ class SettingsController extends DashboardController {
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
       
-      // Load the locales for the locale dropdown
-      $Locale = Gdn::Locale();
-      $AvailableLocales = $Locale->GetAvailableLocaleSources();
-      $this->LocaleData = ArrayCombine($AvailableLocales, $AvailableLocales);
-      
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
@@ -377,19 +380,8 @@ class SettingsController extends DashboardController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
          
-         // If changing locale, redefine locale sources:
-         /*
-         $NewLocale = $this->Form->GetFormValue('Garden.Locale', FALSE);
-         if ($NewLocale !== FALSE && Gdn::Config('Garden.Locale') != $NewLocale) {
-            $ApplicationManager = new Gdn_ApplicationManager();
-            $Locale = Gdn::Locale();
-            $Locale->Set($NewLocale, $ApplicationManager->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
-         }
-         */
-         
          if ($this->Form->Save() !== FALSE)
             $this->InformMessage(T("Your settings have been saved."));
-
       }
       
       $this->Render();      
@@ -570,6 +562,9 @@ class SettingsController extends DashboardController {
                   $Refresh = TRUE;
                   break;
             }
+            
+            // Set default locale field if just doing enable/disable
+            $this->Form->SetFormValue('Locale', C('Garden.Locale', 'en-CA'));
          } elseif ($this->Form->IsPostBack()) {
             // Save the default locale.
             SaveToConfig('Garden.Locale', $this->Form->GetFormValue('Locale'));
@@ -690,6 +685,8 @@ class SettingsController extends DashboardController {
    /**
     * Configuration of registration settings.
     *
+    * Events: BeforeRegistrationUpdate
+    *
     * @since 2.0.0
     * @access public
     * @param string $RedirectUrl Where to send user after registration.
@@ -770,7 +767,7 @@ class SettingsController extends DashboardController {
          $ConfigurationModel->Validation->ApplyRule('Garden.Registration.Method', 'Required');   
          // if($this->Form->GetValue('Garden.Registration.Method') != 'Closed')
          //    $ConfigurationModel->Validation->ApplyRule('Garden.Registration.DefaultRoles', 'RequiredArray');
-
+         
          if ($this->Form->GetValue('Garden.Registration.ConfirmEmail'))
             $ConfigurationModel->Validation->ApplyRule('Garden.Registration.ConfirmEmailRole', 'Required');
          
@@ -779,6 +776,10 @@ class SettingsController extends DashboardController {
          $InvitationCounts = $this->Form->GetValue('InvitationCount');
          $this->ExistingRoleInvitations = ArrayCombine($InvitationRoleIDs, $InvitationCounts);
          $ConfigurationModel->ForceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
+         
+         // Event hook
+         $this->EventArguments['ConfigurationModel'] = &$ConfigurationModel;
+         $this->FireEvent('BeforeRegistrationUpdate');
          
          // Save!
          if ($this->Form->Save() !== FALSE) {
@@ -979,7 +980,20 @@ class SettingsController extends DashboardController {
             }
          }
       }
-      $this->SetData('AvailableThemes', Gdn::ThemeManager()->AvailableThemes());
+      $Themes = Gdn::ThemeManager()->AvailableThemes();
+      uasort($Themes, array('SettingsController', '_NameSort'));
+      
+      // Remove themes that are archived
+      $Remove = array();
+      foreach ($Themes as $Index => $Theme) {
+         $Archived = GetValue('Archived', $Theme);
+         if ($Archived)
+            $Remove[] = $Index;
+      }
+      foreach ($Remove as $Index) {
+         unset($Themes[$Index]);
+      }
+      $this->SetData('AvailableThemes', $Themes);
       
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
          try {
@@ -1001,6 +1015,10 @@ class SettingsController extends DashboardController {
 
       }
       $this->Render();
+   }
+   
+   protected static function _NameSort($A, $B) {
+      return strcasecmp(GetValue('Name', $A), GetValue('Name', $B));
    }
    
    /**

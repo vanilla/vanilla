@@ -5,9 +5,10 @@ $Editing = isset($this->Comment);
 if ($Editing) 
    $this->Form->SetFormValue('Body', $this->Comment->Body);
 ?>
-<div class="MessageForm CommentForm">
+<div class="MessageForm CommentForm FormTitleWrapper">
    <h2><?php echo T($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
    <?php
+   echo '<div class="FormWrapper FormWrapper-Condensed">';
    echo $this->Form->Open();
    echo $this->Form->Errors();
    
@@ -26,16 +27,23 @@ if ($Editing)
    $this->FireEvent('AfterBodyField');
    echo "<div class=\"Buttons\">\n";
    $this->FireEvent('BeforeFormButtons');
-   $CancelText = T('Back to Discussions');
+   $CancelText = T('Home');
    $CancelClass = 'Back';
-   if (!$NewOrDraft) {
+   if (!$NewOrDraft || $Editing) {
       $CancelText = T('Cancel');
-      $CancelClass = 'MItem Cancel';
+      $CancelClass = 'Cancel';
    }
 
-   echo ' '.Gdn_Theme::Link('forumroot', $CancelText, NULL, array(
-       'class' => $CancelClass
-   )).' ';
+   echo '<span class="'.$CancelClass.'">';
+   echo Anchor($CancelText, '/');
+   
+   if ($CategoryID = $this->Data('Discussion.CategoryID')) {
+      $Category = CategoryModel::Categories($CategoryID);
+      if ($Category)
+         echo ' <span class="Bullet">•</span> '.Anchor($Category['Name'], $Category['Url']);
+   }
+   
+   echo '</span>';
    
    $ButtonOptions = array('class' => 'Button CommentButton');
    $ButtonOptions['tabindex'] = 2;
@@ -71,5 +79,6 @@ if ($Editing)
    $this->FireEvent('AfterFormButtons');
    echo "</div>\n";
    echo $this->Form->Close();
+   echo '</div>';
    ?>
 </div>

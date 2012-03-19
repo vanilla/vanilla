@@ -31,34 +31,63 @@ class Gdn_Theme {
       Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
    }
 
-   public static function Breadcrumbs($Data, $Format = '<a href="{Url,html}">{Name,html}</a>', $HomeLink = TRUE) {
+   public static function Breadcrumbs($Data, $HomeLink = TRUE) {
+      $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
+      
       $Result = '';
       
       if (!is_array($Data))
          $Data = array();
 
+      $Stack = 0;
       if ($HomeLink) {
          $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE));
          if (!is_string($HomeLink))
             $Row['Name'] = T('Home');
          
          
-         $Result .= '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
+         $Result .= '<span class="CrumbLabel HomeCrumb">'.FormatString($Format, $Row).'</span> ';
+         $Stack++;
       }
       
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
 
+      
       foreach ($Data as $Row) {
          if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
             continue; // don't show default route twice.
+         
+         // Add the breadcrumb wrapper.
+         if ($Stack > 0) {
+            $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
+         }
+         $Stack++;
          
          $Row['Url'] = Url($Row['Url']);
          $Label = '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span> ', $Result, $Label);
       }
+      
+      // Close the stack.
+      for (;$Stack > 0; $Stack--) {
+         $Result .= '</span>';
+      }
 
-      $Result ='<span class="Breadcrumbs">'.$Result.'</span>';
+      $Result ='<span class="Breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">'.$Result.'</span>';
       return $Result;
+   }
+   
+   /**
+    * Returns whether or not the page is in the current section.
+    * @param string|array $Section 
+    */
+   public static function InSection($Section) {
+      $Section = (array)$Section;
+      foreach ($Section as $Name) {
+         if (isset(self::$_Section[$Name]))
+            return TRUE;
+      }
+      return FALSE;
    }
    
    public static function Link($Path, $Text = FALSE, $Format = NULL, $Options = array()) {
@@ -229,7 +258,10 @@ class Gdn_Theme {
    public static function Module($Name) {
       try {
          if (!class_exists($Name)) {
-            $Result = "Error: $Name doesn't exist";
+            if (Debug())
+               $Result = "Error: $Name doesn't exist";
+            else
+               $Result = "<!-- Error: $Name doesn't exist -->";
          } else {
                $Module = new $Name(Gdn::Controller(), '');
                $Result = $Module->ToString();
@@ -267,6 +299,41 @@ class Gdn_Theme {
       }
       
       return 'unknown';
+   }
+   
+   /**
+    * @var array
+    */
+   protected static $_Section = array();
+   
+   /**
+    * The current section the site is in. This can be one or more values. Think of it like a server-side css-class.
+    * @since 2.1
+    * @param string $Section The name of the section
+    * @param string $Method One of:
+    *  - add
+    *  - remove
+    *  - set
+    *  - get
+    */
+   public static function Section($Section, $Method = 'add') {
+      $Section = array_fill_keys((array)$Section, TRUE);
+      
+      
+      switch (strtolower($Method)) {
+         case 'add':
+            self::$_Section = array_merge(self::$_Section, $Section);
+            break;
+         case 'remove':
+            self::$_Section = array_diff_key(self::$_Section, $Section);
+            break;
+         case 'set':
+            self::$_Section = $Section;
+            break;
+         case 'get':
+         default:
+            return array_keys(self::$_Section);
+      }
    }
 
    public static function Text($Code, $Default) {

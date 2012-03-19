@@ -3,7 +3,8 @@
 <?php
 include_once $this->FetchViewLocation('helper_functions');
 
-WriteActivityTabs();
+// WriteActivityTabs();
+// echo Gdn_Theme::Module('ActivityFilterModule');
 
 $this->FireEvent('BeforeStatusForm');
 $Session = Gdn::Session();
@@ -19,7 +20,10 @@ echo '<ul class="DataList Activities">';
 $Activities = $this->Data('Activities', array());
 if (count($Activities) > 0) {
    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
-   echo PagerModule::Write(array('CurrentRecords' => count($Activities)));
+   
+   echo '<div class="PagerWrap">';
+   PagerModule::Write(array('CurrentRecords' => count($Activities)));
+   echo '</div>';
 } else {
    ?>
 <li><div class="Empty"><?php echo T('Not much happening here, yet.'); ?></div></li>

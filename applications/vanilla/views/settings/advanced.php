@@ -44,7 +44,7 @@ echo $this->Form->Errors();
 			echo Wrap(T('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', array('class' => 'Info'));
       ?>
    </li>
-   <li>
+<!--   <li>
       <?php
          $Options2 = array('0' => T('Never - Users Must Refresh Page'), 
                            '5' => T('Every 5 seconds'),
@@ -55,7 +55,7 @@ echo $this->Form->Errors();
          echo $this->Form->Label('Auto-Fetch New Comments', 'Vanilla.Comments.AutoRefresh');
          echo $this->Form->DropDown('Vanilla.Comments.AutoRefresh', $Options2, $Fields);
       ?>
-   </li>
+   </li>-->
    <li>
       <?php
          echo $this->Form->Label('Archive Discussions', 'Vanilla.Archive.Date');

@@ -146,7 +146,7 @@ $Construct->PrimaryKey('CommentID')
 	->Column('DeleteUserID', 'int', TRUE)
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
-	->Column('DateInserted', 'datetime', NULL, 'index.1')
+	->Column('DateInserted', 'datetime', NULL, array('index.1', 'index'))
 	->Column('DateDeleted', 'datetime', TRUE)
 	->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
@@ -396,11 +396,22 @@ if (!$CountBookmarksExists) {
    )");
 }
 
-$Construct->Table('TagDiscussion')
+$Construct->Table('TagDiscussion');
+$DateInsertedExists = $Construct->ColumnExists('DateInserted');
+
+$Construct
    ->Column('TagID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
+   ->Column('DateInserted', 'datetime', !$DateInsertedExists)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
+
+if (!$DateInsertedExists) {
+   $SQL->Update('TagDiscussion td')
+      ->Join('Discussion d', 'td.DiscussionID = d.DiscussionID')
+      ->Set('td.DateInserted', 'd.DateInserted', FALSE, FALSE)
+      ->Put();
+}
 
 $Construct->Table('Tag')
    ->Column('CountDiscussions', 'int', 0)
@@ -425,3 +436,25 @@ if (!$LastDiscussionIDExists) {
       ->Set('c.LastDiscussionID', 'cm.DiscussionID', FALSE, FALSE)
       ->Put();
 }
+
+// Convert the old advanced notifications to the new format.
+$Sql = "insert ignore {$Px}UserMeta
+(UserID, Name, Value)
+select
+	um.UserID,
+	concat(um.Name, '.', c.CategoryID),
+	'1'
+from {$Px}UserMeta um
+join {$Px}Category c
+	on c.Depth >= 1 and c.Depth <= 2
+left join {$Px}UserCategory uc
+	on um.UserID = uc.UserID and c.CategoryID = uc.CategoryID
+where um.Name in ('Preferences.Email.NewComment', 'Preferences.Email.NewDiscussion')
+	and c.Archived = 0
+	and coalesce(uc.Unfollow, 0) = 0
+	and um.Value = 1";
+$SQL->Query($Sql, 'update');
+	
+$Sql = "delete um.* from {$Px}UserMeta um
+where um.Name in ('Preferences.Email.NewComment', 'Preferences.Email.NewDiscussion')";
+$SQL->Query($Sql, 'update');

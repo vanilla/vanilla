@@ -72,7 +72,7 @@ class ActivityController extends Gdn_Controller {
       $this->AddModule('SignedInModule');
       
       parent::Initialize();
-      
+      Gdn_Theme::Section('ActivityList');
       $this->SetData('Breadcrumbs', array(array('Name' => T('Activity'), 'Url' => '/activity')));
    }
    
@@ -146,6 +146,8 @@ class ActivityController extends Gdn_Controller {
       
       $this->SetData('Filter', strtolower($Filter));
       $this->SetData('Activities', $Activities);
+      
+      $this->AddModule('ActivityFilterModule');
       
       $this->View = 'all';
       $this->Render();
@@ -273,6 +275,10 @@ class ActivityController extends Gdn_Controller {
          $Notify = FALSE;
       }
       
+      if (!$UserID) {
+         $UserID = Gdn::Session()->UserID;
+      }
+      
       switch ($Notify) {
          case 'mods':
             $this->Permission('Garden.Moderation.Manage');
@@ -292,14 +298,16 @@ class ActivityController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
-         if ($UserID && $UserID != Gdn::Session()->UserID) {
+         $Data['Format'] = C('Garden.InputFormatter');
+         if ($UserID != Gdn::Session()->UserID) {
             // This is a wall post.
             $Activity = array(
                 'ActivityType' => 'WallPost',
                 'ActivityUserID' => $UserID,
                 'RegardingUserID' => Gdn::Session()->UserID,
                 'HeadlineFormat' => T('HeadlineFormat.WallPost', '{RegardingUserID,you} &rarr; {ActivityUserID,you}'),
-                'Story' => $Data['Comment']
+                'Story' => $Data['Comment'],
+                'Format' => $Data['Format']
             );
          } else {
             // This is a status update.
@@ -307,6 +315,7 @@ class ActivityController extends Gdn_Controller {
                 'ActivityType' => 'Status',
                 'HeadlineFormat' => T('HeadlineFormat.Status', '{ActivityUserID,user}'),
                 'Story' => $Data['Comment'],
+                'Format' => $Data['Format'],
                 'NotifyUserID' => $NotifyUserID
             );
             $this->SetJson('StatusMessage', Gdn_Format::Display($Data['Comment']));
@@ -320,12 +329,12 @@ class ActivityController extends Gdn_Controller {
          }
          
          if ($Activity) {
-            if (!$UserID && $NotifyUserID == ActivityModel::NOTIFY_PUBLIC)
-               Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', $Activity['Story']);
+            if ($UserID == Gdn::Session()->UserID && $NotifyUserID == ActivityModel::NOTIFY_PUBLIC)
+               Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'About', Gdn_Format::PlainText($Activity['Story'], $Activity['Format']));
             
             $Activities = array($Activity);
-            $this->ActivityModel->CalculateData($Activities);
             ActivityModel::JoinUsers($Activities);
+            $this->ActivityModel->CalculateData($Activities);
          }
       }
 

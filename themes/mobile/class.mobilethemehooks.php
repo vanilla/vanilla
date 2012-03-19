@@ -26,6 +26,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
       if (in_array($Sender->Application(), array('vanilla', 'conversations')) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), array('Activity', 'Profile', 'Search')))) {
          Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
       }
+      SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
    }
    
    /**
@@ -52,6 +53,8 @@ if (typeof(hash) == "undefined") {
     */
    public function CategoriesController_Render_Before($Sender) {
       $this->_AddButton($Sender, 'Discussion');
+		Gdn::Locale()->SetTranslation('Discussions', 'Threads');
+		Gdn::Locale()->SetTranslation('Comments', 'Posts');
    }
    
    public function DiscussionsController_Render_Before($Sender) {
@@ -94,6 +97,12 @@ jQuery(document).ready(function($) {
       }
    }
    
+   // Add the user photo before the user Info on the profile page
+   public function ProfileController_BeforeUserInfo_Handler($Sender) {
+      $UserPhoto = new UserPhotoModule();
+      echo $UserPhoto->ToString();
+   }
+   
    // Change all pagers to be "more" pagers instead of standard numbered pagers
 //   public function DiscussionsController_BeforeBuildPager_Handler($Sender) {
 //      $Sender->EventArguments['PagerType'] = 'MorePager';
@@ -112,9 +121,9 @@ jQuery(document).ready(function($) {
 //      $Sender->Pager->LessCode = 'Older Comments';
 //      $Sender->Pager->MoreCode = 'More Comments';
 //   }
-   
+/*   
    public function DiscussionsController_AfterBuildPager_Handler($Sender) {
       $Sender->Pager->MoreCode = 'More Discussions';
    }
-
+*/
 }

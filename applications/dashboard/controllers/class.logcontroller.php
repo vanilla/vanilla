@@ -99,6 +99,7 @@ class LogController extends DashboardController {
       $this->Permission('Garden.Moderation.Manage');
       // Grab the logs.
       $this->LogModel->Delete($LogIDs);
+      $this->Render('Blank', 'Utility');
    }
    
    /**
@@ -118,13 +119,15 @@ class LogController extends DashboardController {
       if (!is_array($UserIDs))
          $UserIDs = array();
       
-      // Grab the rest of the log entries.
-      $OtherLogIDs = $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserIDs));
-      $OtherLogIDs = ConsolidateArrayValuesByKey($OtherLogIDs, 'LogID');
-      $LogIDs = array_merge($LogIDs, $OtherLogIDs);
-      
-      foreach ($UserIDs as $UserID) {
-         Gdn::UserModel()->Ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => TRUE, 'Log' => TRUE));
+      if (!empty($UserIDs)) {
+         // Grab the rest of the log entries.
+         $OtherLogIDs = $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserIDs));
+         $OtherLogIDs = ConsolidateArrayValuesByKey($OtherLogIDs, 'LogID');
+         $LogIDs = array_merge($LogIDs, $OtherLogIDs);
+
+         foreach ($UserIDs as $UserID) {
+            Gdn::UserModel()->Ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => TRUE, 'Log' => TRUE));
+         }
       }
       
       // Grab the logs.
@@ -147,7 +150,7 @@ class LogController extends DashboardController {
 
       
       $Where = array(
-          'Operation' => array('Edit', 'Delete')//,
+          'Operation' => array('Edit', 'Delete', 'Ban')//,
 //          'RecordType' => array('Discussion', 'Comment', 'Activity')
           );
       
@@ -170,6 +173,39 @@ class LogController extends DashboardController {
       if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
          $this->View = 'Table';
 
+      $this->AddSideMenu('dashboard/log/edits');
+      $this->Render();
+   }
+   
+   /**
+    * Access the log history of a specific record
+    * 
+    * @param string $RecordType
+    * @param int $RecordID 
+    */
+   public function Record($RecordType, $RecordID, $Page = '') {
+      $this->Permission('Garden.Moderation.Manage');
+      list($Offset, $Limit) = OffsetLimit($Page, 10);
+      $this->SetData('Title', T('Change Log'));
+
+      $RecordType = ucfirst($RecordType);
+      $Where = array(
+         'Operation'    => array('Edit', 'Delete', 'Ban'),
+         'RecordType'   => $RecordType,
+         'RecordID'     => $RecordID
+      );
+      
+      $RecordCount = $this->LogModel->GetCountWhere($Where);
+      $this->SetData('RecordCount', $RecordCount);
+      if ($Offset >= $RecordCount)
+         $Offset = $RecordCount - $Limit;
+
+      $Log = $this->LogModel->GetWhere($Where, 'LogID', 'Desc', $Offset, $Limit);
+      $this->SetData('Log', $Log);
+
+      if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
+         $this->View = 'Table';
+      
       $this->AddSideMenu('dashboard/log/edits');
       $this->Render();
    }
@@ -251,6 +287,7 @@ class LogController extends DashboardController {
          $this->Form->AddError($Ex->getMessage());
       }
       $this->LogModel->Recalculate();
+      $this->Render('Blank', 'Utility');
    }
    
    public function NotSpam($LogIDs) {
@@ -273,19 +310,19 @@ class LogController extends DashboardController {
 
       // Grab the logs.
       $Logs = array_merge($Logs, $this->LogModel->GetIDs($LogIDs));
-      try {
+      
+//      try {
          foreach ($Logs as $Log) {
             $this->LogModel->Restore($Log);
          }
-      } catch (Exception $Ex) {
-         $this->Form->AddError($Ex->getMessage());
-      }
+//      } catch (Exception $Ex) {
+//         $this->Form->AddError($Ex->getMessage());
+//      }
       $this->LogModel->Recalculate();
       
       $this->SetData('Complete');
       $this->SetData('Count', count($Logs));
       $this->Render('Blank', 'Utility');
-      
    }
 
    /**

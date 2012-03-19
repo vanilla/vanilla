@@ -5,9 +5,12 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
    $CancelUrl = '/vanilla/discussions/0/'.$this->Category->CategoryID.'/'.Gdn_Format::Url($this->Category->Name);
 
 ?>
-<div id="DiscussionForm">
-   <h1><?php echo $this->Data('Title'); ?></h1>
+<div id="DiscussionForm" class="FormTitleWrapper">
    <?php
+		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+			echo Wrap($this->Data('Title'), 'h1');
+	
+      echo '<div class="FormWrapper">';
       echo $this->Form->Open();
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');
@@ -60,5 +63,6 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo '</div>';
       echo $this->Form->Close();
+      echo '</div>';
    ?>
 </div>

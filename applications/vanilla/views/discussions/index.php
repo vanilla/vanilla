@@ -1,9 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
-echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 $Session = Gdn::Session();
-include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
+include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
-WriteFilterTabs($this);
+echo '<h1 class="HomepageTitle">'.
+   AdminCheck(NULL, array('', ' ')).
+   $this->Data('Title').
+   '</h1>';
+
+if ($Description = $this->Description()) {
+   echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
+}
+// echo Gdn_Theme::Module('DiscussionFilterModule');
+
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
 <ul class="DataList Discussions">
@@ -11,10 +19,12 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </ul>
 <?php
    $PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
-   if ($this->Data('_PagerUrl')) {
+   if ($this->Data('_PagerUrl'))
       $PagerOptions['Url'] = $this->Data('_PagerUrl');
-   }
-   echo PagerModule::Write($PagerOptions);
+   
+   echo '<div class="PagerWrap">';
+   PagerModule::Write($PagerOptions);
+   echo '</div>';
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

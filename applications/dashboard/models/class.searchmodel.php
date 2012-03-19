@@ -128,7 +128,7 @@ class SearchModel extends Gdn_Model {
       
 		foreach ($Result as $Key => $Value) {
 			if (isset($Value['Summary'])) {
-				$Value['Summary'] = Gdn_Format::Text(Gdn_Format::To($Value['Summary'], $Value['Format']));
+				$Value['Summary'] = Condense(Gdn_Format::To($Value['Summary'], $Value['Format']));
 				$Result[$Key] = $Value;
 			}
 		}

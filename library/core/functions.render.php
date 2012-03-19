@@ -22,6 +22,28 @@ if (!function_exists('Alternate')) {
    }
 }
 
+/**
+ * English "plural" formatting for numbers that can get really big.
+ */
+if (!function_exists('BigPlural')) {
+   function BigPlural($Number, $Singular, $Plural = FALSE) {
+      if (!$Plural) {
+         $Plural = $Singular.'s';
+      }
+      $Title = sprintf(T($Number == 1 ? $Singular : $Plural), number_format($Number));
+      
+      return '<span title="'.$Title.'">'.Gdn_Format::BigNumber($Number).'</span>';
+   }
+}
+
+if (!function_exists('Condense')) {
+   function Condense($Html) {
+      $Html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $Html);
+      $Html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $Html);
+      return $Html;
+   }
+}
+
 if (!function_exists('CountString')) {
    function CountString($Number, $Url = '', $Options = array()) {
       if (is_string($Options))
@@ -171,6 +193,18 @@ if (!function_exists('Img')) {
    }
 }
 
+if (!function_exists('InSection')) {
+   /**
+    * Returns whether or not the page is in one of the given section(s).
+    * @since 2.1
+    * @param string|array $Section
+    * @return bool
+    */
+   function InSection($Section) {
+      return Gdn_Theme::InSection($Section);
+   }
+}
+
 if (!function_exists('IPAnchor')) {
    /**
     * Returns an IP address with a link to the user search.
@@ -192,7 +226,7 @@ if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
 		// Make sure to fix comma-formatted numbers
       $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
+      return sprintf(T(abs($WorkingNumber) == 1 ? $Singular : $Plural), $Number);
    }
 }
 
@@ -262,7 +296,7 @@ if (!function_exists('UserPhoto')) {
          $User = (object)$User;
       
       $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
-      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoMedium');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhoto ProfilePhotoMedium');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
@@ -352,4 +386,10 @@ if (!function_exists('SignOutUrl')) {
    function SignOutUrl($Target = '') {
       return '/entry/signout?TransientKey='.urlencode(Gdn::Session()->TransientKey()).($Target ? '&Target='.urlencode($Target) : '');
    }
+}
+
+if (!function_exists('Sprite')) {
+	function Sprite($Name, $Type = 'Sprite') {
+		return '<span class="'.$Type.' '.$Name.'"></span>';
+	}
 }

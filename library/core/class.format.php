@@ -637,30 +637,30 @@ class Gdn_Format {
       
       $time = $Timestamp;
 
-      define('NOW',        time());
-      define('ONE_MINUTE', 60);
-      define('ONE_HOUR',   3600);
-      define('ONE_DAY',    86400);
-      define('ONE_WEEK',   ONE_DAY*7);
-      define('ONE_MONTH',  ONE_WEEK*4);
-      define('ONE_YEAR',   ONE_MONTH*12);
+      $NOW = time();
+      if (!defined('ONE_MINUTE')) define('ONE_MINUTE', 60);
+      if (!defined('ONE_HOUR')) define('ONE_HOUR',   3600);
+      if (!defined('ONE_DAY')) define('ONE_DAY',    86400);
+      if (!defined('ONE_WEEK')) define('ONE_WEEK',   ONE_DAY*7);
+      if (!defined('ONE_MONTH')) define('ONE_MONTH',  ONE_WEEK*4);
+      if (!defined('ONE_YEAR')) define('ONE_YEAR',   ONE_MONTH*12);
       
-      $SecondsAgo = NOW - $time;
+      $SecondsAgo = $NOW - $time;
 
       // sod = start of day :)
       $sod = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
-      $sod_now = mktime(0, 0, 0, date('m', NOW), date('d', NOW), date('Y', NOW ));
+      $sod_now = mktime(0, 0, 0, date('m', $NOW), date('d', $NOW), date('Y', $NOW ));
 
       // used to convert numbers to strings
       $convert = array(1 => T('a'), 2 => T('two'), 3 => T('three'), 4 => T('four'), 5 => T('five'), 6 => T('six'), 7 => T('seven'), 8 => T('eight'), 9 => T('nine'), 10 => T('ten'), 11 => T('eleven'));
 
       // today
       if ($sod_now == $sod) {
-         if ( $time > NOW-(ONE_MINUTE*3)) {
+         if ( $time > $NOW-(ONE_MINUTE*3)) {
             return T('just now');
-         } else if ($time > NOW-(ONE_MINUTE*7)) {
+         } else if ($time > $NOW-(ONE_MINUTE*7)) {
             return T('a few minutes ago');
-         } else if ($time > NOW-(ONE_HOUR)) {
+         } else if ($time > $NOW-(ONE_HOUR)) {
             if ($MorePrecise) {
                $MinutesAgo = ceil($SecondsAgo / 60);
                return sprintf(T('%s minutes ago'), $MinutesAgo);
@@ -817,6 +817,24 @@ class Gdn_Format {
       $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
       return $Result;
    }
+   
+   /**
+    * Format some text in a way suitable for passing into an rss/atom feed.
+    * @since 2.1
+    * @param string $Text The text to format.
+    * @param string $Format The current format of the text.
+    * @return string
+    */
+   public static function RssHtml($Text, $Format = 'Html') {
+      if (!in_array($Text, array('Html', 'Raw')))
+         $Text = Gdn_Format::To($Text, $Format);
+      
+      if (function_exists('FormatRssHtmlCustom')) {
+         return FormatRssHtmlCustom($Text);
+      } else {
+         return Gdn_Format::Html($Text);
+      }
+   }
 
    public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
       $Regex = "`([<>])`i";
@@ -925,11 +943,11 @@ class Gdn_Format {
          return $Matches[0];
       $Url = $Matches[4];
 
-      if ((preg_match('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?v=([^&#]+)(#t=([0-9]+))?`', $Url, $Matches) 
-         || preg_match('`(?:https?)://(www\.)?youtu\.be\/([^&#]+)(#t=([0-9]+))?`', $Url, $Matches)) 
+      if ((preg_match('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches) 
+         || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches)) 
          && C('Garden.Format.YouTube')) {
-         $ID = $Matches[2];
-         $TimeMarker = isset($Matches[3]) ? '&amp;start='.$Matches[4] : '';
+         $ID = $Matches['ID'];
+         $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1$TimeMarker" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
 EOT;
@@ -982,7 +1000,7 @@ EOT;
     * 
     * @return array array(Width, Height)
     */
-   protected static function GetEmbedSize() {
+   public static function GetEmbedSize() {
       $Sizes = array(
          'tiny' => array( 400, 225),
          'small'=> array( 560, 340),

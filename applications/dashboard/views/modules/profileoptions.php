@@ -6,21 +6,26 @@ $Controller = Gdn::Controller();
    <?php
    $Controller->FireEvent('BeforeProfileOptions');
    if ($Controller->EditMode) {
-      echo UserAnchor($Controller->User, 'Button', array('Text' => T('Back to Profile')));
+      echo UserAnchor($Controller->User, 'BackToProfile NavButton', array('Text' => T('Back to Profile')));
    } else {
       $Session = Gdn::Session();
+      
+      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage') && $Controller->User->UserID != $Session->UserID) {
+         if ($Controller->User->Banned) {
+            echo ' '.Anchor(Sprite('SpUnBan').T('Unban'), '/user/ban?userid='.$Controller->User->UserID.'&unban=1', 'NavButton Popup').' ';
+         } else {
+            echo ' '.Anchor(Sprite('SpBan').T('Ban'), '/user/ban?userid='.$Controller->User->UserID, 'NavButton Popup').' ';
+         }
+      }
+      
       if ($Controller->User->UserID != $Session->UserID) {
          if ($Session->CheckPermission('Garden.Users.Edit'))
-            echo Anchor(T('Edit Profile'), '/profile/edit/'.$Controller->User->UserID.'/'.rawurlencode($Controller->User->Name), 'Button');
+            echo ' '.Anchor(Sprite('SpEditProfile').T('Edit Profile'), '/profile/edit/'.$Controller->User->UserID.'/'.rawurlencode($Controller->User->Name), 'NavButton').' ';
       } else {
          if (C('Garden.UserAccount.AllowEdit')) // Don't allow account editing if it is turned off.
-            echo Anchor(T('Edit My Profile'), '/profile/edit', 'Button');
+            echo Anchor(Sprite('SpEditProfile').T('Edit My Profile'), '/profile/edit', 'NavButton');
       }
    }
    $Controller->FireEvent('AfterProfileOptions');
    ?>
 </div>
-<?php
-if ($Controller->EditMode)
-   echo Wrap(sprintf(T('Edit Profile: %s'), htmlentities($Controller->User->Name)), 'h1');
-

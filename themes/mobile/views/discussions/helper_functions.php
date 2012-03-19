@@ -1,46 +1,82 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
-   $CssClass = 'Item';
-   $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
-   $CssClass .= $Alt.' ';
-   $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
-   $CssClass .= $Discussion->Closed == '1' ? ' Closed' : '';
-   $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
-   $CssClass .= ($Discussion->CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
+function WriteDiscussion($Discussion, &$Sender, &$Session) {
+   $CssClass = CssClass($Discussion);
+   $DiscussionUrl = $Discussion->Url;
+   
+   if ($Session->UserID)
+      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch);
+   
+   $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
+   $Sender->EventArguments['CssClass'] = &$CssClass;
+   
+   $First = UserBuilder($Discussion, 'First');
+   $Last = UserBuilder($Discussion, 'Last');
+   $Sender->EventArguments['FirstUser'] = &$First;
+   $Sender->EventArguments['LastUser'] = &$Last;
+   
    $Sender->FireEvent('BeforeDiscussionName');
    
-   $DiscussionName = Gdn_Format::Text($Discussion->Name);
+   $DiscussionName = $Discussion->Name;
    if ($DiscussionName == '')
       $DiscussionName = T('Blank Discussion Topic');
+      
+   $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
 
    static $FirstDiscussion = TRUE;
    if (!$FirstDiscussion)
       $Sender->FireEvent('BetweenDiscussion');
    else
       $FirstDiscussion = FALSE;
+      
+   $Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
-      echo UserPhoto(UserBuilder($Discussion, 'First'));
+      echo UserPhoto($First);
+
+   if (!property_exists($Sender, 'CanEditDiscussions'))
+      $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');
+
+   $Sender->FireEvent('BeforeDiscussionContent');
    ?>
    <div class="ItemContent Discussion">
-      <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
-      <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
+      <div class="Title">
+      <?php 
+         echo Anchor($DiscussionName, $DiscussionUrl);
+         $Sender->FireEvent('AfterDiscussionTitle'); 
+      ?>
+      </div>
       <div class="Meta">
          <span class="Author"><?php echo $Discussion->FirstName; ?></span>
+         <?php WriteTags($Discussion); ?>
+         <span class="MItem CommentCount"><?php 
+            printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
+         ?></span>
          <?php
-            Gdn::Controller()->FireEvent('BeforeDiscussionMeta');
+            echo NewComments($Discussion);
          
-            echo '<span class="MItem '.($Discussion->CountUnreadComments > 0 ? 'Counts NewCounts' : 'Tag').'">'
-               .($Discussion->CountUnreadComments > 0 ? $Discussion->CountUnreadComments.'/' : '')
-               .$Discussion->CountComments
-            .'</span>';
-            if ($Discussion->LastCommentID != '')
-               echo '<span class="MItem LastCommentBy">'.sprintf(T('Latest %1$s'), $Discussion->LastName).'</span> ';
+            $Sender->FireEvent('AfterCountMeta');
+
+            if ($Discussion->LastCommentID != '') {
+               echo ' <span class="MItem LastCommentBy">'.sprintf(T('Most recent by %1$s'), UserAnchor($Last)).'</span> ';
+               echo ' <span class="MItem LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate, 'html').'</span>';
+            } else {
+               echo ' <span class="MItem LastCommentBy">'.sprintf(T('Started by %1$s'), UserAnchor($First)).'</span> ';
+               echo ' <span class="MItem LastCommentDate">'.Gdn_Format::Date($Discussion->FirstDate, 'html');
                
-            echo '<span class="MItem LastCommentDate">'.Gdn_Format::Date($Discussion->LastDate).'</span> ';
+               if ($Source = GetValue('Source', $Discussion)) {
+                  echo ' '.sprintf(T('via %s'), T($Source.' Source', $Source));
+               }
+               
+               echo '</span> ';
+            }
+         
+            if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
+               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
+               
+            $Sender->FireEvent('DiscussionMeta');
          ?>
       </div>
    </div>
@@ -51,3 +87,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 // These options do not appear in mobile.
 function WriteFilterTabs($Sender) {}
 function WriteOptions($Discussion, &$Sender, &$Session) {}
+
+// Now that we've overrided what we want, include the defaults.
+include_once PATH_APPLICATIONS.'/vanilla/views/discussions/helper_functions.php';
+

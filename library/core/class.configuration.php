@@ -22,7 +22,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     *
     * @var array
     */
-   protected $Data = array();
+   public $Data = array();
    
    /**
     * Configuration Source List
@@ -408,15 +408,21 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $ConfigurationSource = Gdn_ConfigurationSource::FromFile($this, $File, $Name);
       if (!$ConfigurationSource) return FALSE;
       
-      $ConfigurationSource->Splitting($this->Splitting);
+      $UseSplitting = $this->Splitting;
+      $ConfigurationSource->Splitting($UseSplitting);
       
       if (!$ConfigurationSource) return FALSE;
       $SourceTag = "file:{$File}";
       $this->Sources[$SourceTag] = $ConfigurationSource;
       
-      self::MergeConfig($this->Data, $ConfigurationSource->Export());
       if ($Dynamic)
          $this->Dynamic = $ConfigurationSource;
+      
+      if (!$UseSplitting) {
+         $this->MassImport($ConfigurationSource->Export());
+      } else {
+         self::MergeConfig($this->Data, $ConfigurationSource->Export());
+      }
    }
    
    /**
@@ -437,14 +443,20 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $ConfigurationSource = Gdn_ConfigurationSource::FromString($this, $String, $Tag, $Name);
       if (!$ConfigurationSource) return FALSE;
       
-      $ConfigurationSource->Splitting($this->Splitting);
+      $UseSplitting = $this->Splitting;
+      $ConfigurationSource->Splitting($UseSplitting);
       
       $SourceTag = "string:{$Tag}";
       $this->Sources[$SourceTag] = $ConfigurationSource;
       
-      self::MergeConfig($this->Data, $ConfigurationSource->Export());
       if ($Dynamic)
          $this->Dynamic = $ConfigurationSource;
+      
+      if (!$UseSplitting) {
+         $this->MassImport($ConfigurationSource->Export());
+      } else {
+         self::MergeConfig($this->Data, $ConfigurationSource->Export());
+      }
    }
 
    /**
@@ -513,7 +525,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
    public function MassImport($Data) {
       if ($this->Splitting) return;
       $this->Data = array_merge($this->Data, $Data);
-      $this->Dynamic->MassImport($Data);
+      
+      if ($this->Dynamic instanceof Gdn_ConfigurationSource)
+         $this->Dynamic->MassImport($Data);
    }
    
    /**

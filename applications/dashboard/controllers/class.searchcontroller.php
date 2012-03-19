@@ -56,12 +56,14 @@ class SearchController extends Gdn_Controller {
       $this->AddJsFile('jquery.form.js');
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('jquery.expander.js');
       $this->AddJsFile('global.js');
       
       $this->AddCssFile('style.css');
       $this->AddCssFile('menu.css');
       $this->AddModule('GuestModule');
       parent::Initialize();
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Search'), 'Url' => '/search')));
    }
 	
 	/**
@@ -75,6 +77,8 @@ class SearchController extends Gdn_Controller {
 		$this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');
 		$this->Title(T('Search'));
+      
+      SaveToConfig('Garden.Format.EmbedSize', '160x90', FALSE);
       
       list($Offset, $Limit) = OffsetLimit($Page, C('Garden.Search.PerPage', 20));
       $this->SetData('_Limit', $Limit);

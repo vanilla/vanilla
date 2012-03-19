@@ -159,6 +159,27 @@ class Gdn_Email extends Gdn_Pluggable {
       }
       return $this;
    }
+   
+   public static function GetTextVersion($Template) {
+      if (stristr($Template, '<!-- //TEXT VERSION FOLLOWS//')) {
+         $EmailParts = explode('<!-- //TEXT VERSION FOLLOWS//', $Template);
+         $TextVersion = array_pop($EmailParts);
+         $TextVersion = trim(strip_tags(preg_replace('/<(head|title|style|script)[^>]*>.*?<\/\\1>/s','',$TextVersion)));
+         return $TextVersion;
+      }
+      return FALSE;
+   }
+   
+   public static function GetHTMLVersion($Template) {
+      if (stristr($Template, '<!-- //TEXT VERSION FOLLOWS//')) {
+         $EmailParts = explode('<!-- //TEXT VERSION FOLLOWS//', $Template);
+         $TextVersion = array_pop($EmailParts);
+         $Message = array_shift($EmailParts);
+         $Message = trim($Message);
+         return $Message;
+      }
+      return $Template;
+   }
 
    /**
     * Sets the mime-type of the email.

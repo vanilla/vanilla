@@ -1,0 +1,29 @@
+body {
+   background: #fff;
+   color: #000;
+}
+#Head {
+    background: #21AFBF;
+    border-bottom: 2px solid #d7f205;
+}
+#Head a {
+   color: #fff;
+}
+#Head h1 a span {
+   color: #d7f205;
+}
+#Menu .Alert {
+   color: #21AFBF;
+   background: #fff;
+}
+a {
+   color: #1B8CA6;
+}
+a:hover {
+   color: #93a601;
+}
+body.Profile.EditMode #Content form,
+.FormWrapper,
+.Box {
+   background: #D6F8FC;
+}

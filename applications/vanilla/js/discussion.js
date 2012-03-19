@@ -7,9 +7,6 @@ jQuery(document).ready(function($) {
          $(this).autogrow();
       });
 
-   // Hijack the "Cancel" button on the comment form
-   var cancelButton = $('a.Cancel');
-      
    // Hide it if they leave the area without typing
    $('div.CommentForm textarea').blur(function(ev) {
       var Comment = $(ev.target).val();
@@ -71,8 +68,9 @@ jQuery(document).ready(function($) {
       postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       postValues += '&Type='+type;
       var discussionID = $(frm).find('[name$=DiscussionID]');
-      var prefix = discussionID.attr('name').replace('DiscussionID', '');
-      discussionID = discussionID.val();
+      discussionID = discussionID.length > 0 ? discussionID.val() : 0;
+      var tKey = $(frm).find('[name$=TransientKey]');
+      var prefix = tKey.attr('name').replace('TransientKey', '');
       // Get the last comment id on the page
       var comments = $('ul.Comments li.ItemComment');
       var lastComment = $(comments).get(comments.length-1);
@@ -83,12 +81,19 @@ jQuery(document).ready(function($) {
          lastCommentID = 0;
          
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
-      var action = $(frm).attr('action') + '/' + discussionID;
+      var action = $(frm).attr('action');
+      if (discussionID > 0)
+         action += '/' + discussionID;
+      
       $(frm).find(':submit').attr('disabled', 'disabled');
       $(parent).find('a.Back').after('<span class="TinyProgress">&#160;</span>');
       // Also add a spinner for comments being edited
       $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       $(frm).triggerHandler('BeforeSubmit', [frm, btn]);
+      if (type != 'Draft')
+         $(':submit', frm).addClass('InProgress');
+      else
+         $('.DraftButton', frm).addClass('InProgress');
       $.ajax({
          type: "POST",
          url: action,
@@ -184,6 +189,12 @@ jQuery(document).ready(function($) {
                // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)
                if (gdn.definition('PrependNewComments') != '1') // If prepending the latest comment, don't remove the pager.
                   $('#PagerMore').remove();
+               
+               // Set the discussionid on the form in case the discussion was created by adding the last comment
+               var discussionID = $(frm).find('[name$=DiscussionID]');
+               if (discussionID.length == 0 && json.DiscussionID) {
+                  $(frm).append('<input type="hidden" name="'+prefix+'DiscussionID" value="'+json.DiscussionID+'">');
+               }
 
                // Let listeners know that the comment was added.
                $(document).trigger('CommentAdded');
@@ -194,7 +205,8 @@ jQuery(document).ready(function($) {
          },
          complete: function(XMLHttpRequest, textStatus) {
             // Remove any spinners, and re-enable buttons.
-            $('span.TinyProgress').remove();
+            $(':submit', frm).removeClass('InProgress');
+            $('.DraftButton', frm).removeClass('InProgress');
             $(frm).find(':submit').removeAttr("disabled");
             if (draft)
                draftSaving--;
@@ -288,7 +300,7 @@ jQuery(document).ready(function($) {
       return false;
    });
    // Reveal the original message when cancelling an in-place edit.
-   $('.Comment .Cancel').livequery('click', function() {
+   $('.Comment .Cancel a').livequery('click', function() {
       var btn = this;
       $(btn).parents('.Comment').find('div.Message').show();
       $(btn).parents('.CommentForm').remove();
@@ -310,47 +322,47 @@ jQuery(document).ready(function($) {
       }
    });
    
-   var gettingNew = 0;
-   var getNew = function() {
-      if (gettingNew > 0) {
-         return;
-      }
-      gettingNew++;
-      
-      discussionID = gdn.definition('DiscussionID', 0);
-      lastCommentID = gdn.definition('LastCommentID', '');
-      if(lastCommentID == '')
-         return;
-
-      $.ajax({
-         type: "POST",
-         url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
-         data: "DeliveryType=ASSET&DeliveryMethod=JSON",
-         dataType: "json",
-         error: function(xhr) {
-            gdn.informError(xhr, true);
-         },
-         success: function(json) {
-            json = $.postParseJson(json);
-
-            if(json.Data && json.LastCommentID) {
-               gdn.definition('LastCommentID', json.LastCommentID, true);
-               $(json.Data).appendTo("ul.Comments")
-                  .effect("highlight", {}, "slow");
-            }
-            gdn.processTargets(json.Targets);
-         },
-         complete: function() {
-            gettingNew--;
-         }
-      });
-   }
-   
-   // Load new comments like a chat.
-   var autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 10) * 1000;
-   if (autoRefresh > 1000) {
-      window.setInterval(getNew, autoRefresh);
-   }
+//   var gettingNew = 0;
+//   var getNew = function() {
+//      if (gettingNew > 0) {
+//         return;
+//      }
+//      gettingNew++;
+//      
+//      discussionID = gdn.definition('DiscussionID', 0);
+//      lastCommentID = gdn.definition('LastCommentID', '');
+//      if(lastCommentID == '')
+//         return;
+//
+//      $.ajax({
+//         type: "POST",
+//         url: gdn.url('/discussion/getnew/' + discussionID + '/' + lastCommentID),
+//         data: "DeliveryType=ASSET&DeliveryMethod=JSON",
+//         dataType: "json",
+//         error: function(xhr) {
+//            gdn.informError(xhr, true);
+//         },
+//         success: function(json) {
+//            json = $.postParseJson(json);
+//
+//            if(json.Data && json.LastCommentID) {
+//               gdn.definition('LastCommentID', json.LastCommentID, true);
+//               $(json.Data).appendTo("ul.Comments")
+//                  .effect("highlight", {}, "slow");
+//            }
+//            gdn.processTargets(json.Targets);
+//         },
+//         complete: function() {
+//            gettingNew--;
+//         }
+//      });
+//   }
+//   
+//   // Load new comments like a chat.
+//   var autoRefresh = gdn.definition('Vanilla_Comments_AutoRefresh', 0) * 1000;
+//   if (autoRefresh > 1000) {
+//      window.setInterval(getNew, autoRefresh);
+//   }
    
    /* Comment Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {
@@ -359,7 +371,8 @@ jQuery(document).ready(function($) {
       else
          $('.DataList .AdminCheck :checkbox').removeAttr('checked');
    });
-   $('.AdminCheck :checkbox').click(function() {
+   $('.AdminCheck :checkbox').click(function(e) {
+      e.stopPropagation();
       // retrieve all checked ids
       var checkIDs = $('.DataList .AdminCheck :checkbox');
       var aCheckIDs = new Array();

@@ -1,4 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
+echo '<h2>'.T('Notifications').'</h2>';
+
 if (count($this->Data('Activities'))) {
    echo '<ul class="DataList Activities Notifications">';
    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));

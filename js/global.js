@@ -271,6 +271,18 @@ jQuery(document).ready(function($) {
    if ($.fn.handleAjaxForm)
       $('.AjaxForm').handleAjaxForm();
    
+   // Make the highlight effect themable.
+   if ($.effects && $.effects.highlight) {
+      $.effects.highlight0 = $.effects.highlight;
+      
+      $.effects.highlight = function(opts) {
+         var color = $('#HighlightColor').css('backgroundColor');
+         if (color)
+            opts.options.color = color;
+         return $.effects.highlight0.call(this, opts);
+		};
+	}
+   
 	// Show hoverhelp on hover
 	$('.HoverHelp').hover(
 		function() {
@@ -358,6 +370,9 @@ jQuery(document).ready(function($) {
          var item = targets[i];
          $target = $(item.Target);
          switch(item.Type) {
+            case 'AddClass':
+               $target.addClass(item.Data);
+               break;
             case 'Ajax':
                $.ajax({
                   type: "POST",
@@ -381,6 +396,9 @@ jQuery(document).ready(function($) {
                break;
             case 'Remove':
                $target.remove();
+               break;
+            case 'RemoveClass':
+               $target.removeClass(item.Data);
                break;
             case 'ReplaceWith':
                $target.replaceWith(item.Data);
@@ -465,14 +483,15 @@ jQuery(document).ready(function($) {
 
    // Fill in placeholders.
    if (!gdn.elementSupports('input', 'placeholder')) {
-      $('input:text').each(function() {
+      $('input:text,textarea').each(function() {
          var $this = $(this);
          var placeholder = $this.attr('placeholder');
          
          if (!$this.val() && placeholder) {
             $this.val(placeholder);
             $this.blur(function() {
-               $this.val(placeholder);
+               if ($this.val() == '')
+                  $this.val(placeholder);
             });
             $this.focus(function() {
                if ($this.val() == placeholder)
@@ -523,11 +542,13 @@ jQuery(document).ready(function($) {
    
    var hijackClick = function(e) {   
       var $elem = $(this);
+      var $flyout = $elem.closest('.ToggleFlyout');
       var href = $elem.attr('href');
       if (!href)
          return;
       gdn.disable(this);
-
+      e.stopPropagation();
+      
       $.ajax({
          type: "POST",
          url: href,
@@ -537,6 +558,9 @@ jQuery(document).ready(function($) {
             gdn.enable(this);
             $elem.removeClass('InProgress');
             $elem.attr('href', href);
+            
+            // If we are in a flyout, close it.
+            $flyout.removeClass('Open').find('.Flyout').hide();
          },
          error: function(xhr) {
             gdn.informError(xhr);
@@ -562,8 +586,17 @@ jQuery(document).ready(function($) {
 
    // Activate ToggleFlyout menus
    var lastOpen = null;
-   $(document).delegate('.ToggleFlyout', 'click', function() {
+   $(document).delegate('.ToggleFlyout', 'click', function(e) {        
+        
       var $flyout = $('.Flyout', this);
+        var isHandle = false;
+        
+        if ($(e.target).closest('.Flyout').length == 0) {
+           e.stopPropagation();
+           isHandle = true;
+        } else if ($(e.target).hasClass('Hijack') || $(e.target).closest('a').hasClass('Hijack')) {
+           return;
+        }
       
       // Dynamically fill the flyout.
       var rel = $(this).attr('rel');
@@ -595,13 +628,16 @@ jQuery(document).ready(function($) {
          $flyout.hide();
          $(this).removeClass('Open');
       }
+     
+        if (isHandle)
+           return false;
    });
    
    // Close ToggleFlyout menu even if their links are hijacked
-   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-      $('.ToggleFlyout').removeClass('Open');
-      $('.Flyout').hide();
-   });
+//   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+//      $('.ToggleFlyout').removeClass('Open');
+//      $('.Flyout').hide();
+//   });
    
    // Add a spinner onclick of buttons with this class
    $(document).delegate('input.SpinOnClick', 'click', function() {
@@ -840,7 +876,7 @@ jQuery(document).ready(function($) {
       if (message == '')
          message = 'There was an error performing your request. Please try again.';
       
-      gdn.informMessage('<span class="InformSprite SkullBones Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
+      gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
    }
    
 	// Pick up the inform message stack and display it on page load
@@ -875,7 +911,7 @@ jQuery(document).ready(function($) {
 	}
    gdn.pingForNotifications = pingForNotifications;
    
-   if (gdn.definition('SignedIn', '0') != '0') {
+   if (gdn.definition('SignedIn', '0') != '0' && gdn.definition('DoInform', '1') != '0') {
       setTimeout(pingForNotifications, 3000);
       setInterval(pingForNotifications, 60000);
    }
@@ -901,9 +937,12 @@ jQuery(document).ready(function($) {
 	
 	// When a stash anchor is clicked, look for inputs with values to stash
 	$('a.Stash').click(function() {
-		var comment = $('#Form_Comment textarea').val();
-		if (comment != '')
-			stash('CommentForDiscussionID_' + gdn.definition('DiscussionID'), comment);
+      // Embedded comments
+		var comment = $('#Form_Comment textarea').val(),
+         placeholder = $('#Form_Comment textarea').attr('placeholder'),
+         vanilla_identifier = gdn.definition('vanilla_identifier');
+		if (vanilla_identifier && comment != '' && comment != placeholder)
+			stash('CommentForForeignID_' + vanilla_identifier, comment);
 	});
 });
 

@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Flagging'] = array(
    'Name' => 'Flagging',
-   'Description' => 'This plugin allows users to report content that violates forum rules.',
-   'Version' => '1.1.0',
+   'Description' => 'Allows users to report content that violates forum rules.',
+   'Version' => '1.1.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,

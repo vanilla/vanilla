@@ -45,6 +45,10 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                }
 
                echo '<div"><span class="Expander">', $this->FormatContent($Row), '</span></div>';
+               
+               // Write the other record counts.
+               
+               echo OtherRecordsMeta($Row['Data']);
 
                echo '<div class="Meta-Container">';
 
@@ -69,16 +73,23 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 
 //                  echo ' ', sprintf(T('%s times'), $Row['CountGroup']);
                }
+               
+               $RecordUser = Gdn::UserModel()->GetID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
 
                if ($Row['RecordName']) {
                   echo ' <span class="Meta">',
                      '<span class="Meta-Label">'.sprintf('%s by', T($RecordLabel)).'</span> ',
-                     UserAnchor($Row, 'Meta-Value', 'Record'),
-                     '</span> ';
+                     UserAnchor($Row, 'Meta-Value', 'Record');
+                  
+                  if ($RecordUser['Banned']) {
+                     echo ' <span class="Tag Tag-Ban">'.T('Banned').'</span>';
+                  }
+                  
+                  echo ' <span class="Count">'.Plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
+                  
+                  
+                  echo '</span> ';
                }
-               
-               // Write the other record counts.
-               echo OtherRecordsMeta($Row['Data']);
 
                // Write custom meta information.
                $CustomMeta = GetValueR('Data._Meta', $Row, FALSE);

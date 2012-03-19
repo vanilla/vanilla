@@ -46,8 +46,14 @@ class UserModel extends Gdn_Model {
       
       $LogID = FALSE;
       if (GetValue('DeleteContent', $Options)) {
+         $Options['Log'] = 'Ban';
          $LogID = $this->DeleteContent($UserID, $Options);
       }
+      
+      if ($LogID) {
+         $this->SaveAttribute($UserID, 'BanLogID', $LogID);
+      }
+      
       if (GetValue('AddActivity', $Options, TRUE)) {
          switch (GetValue('Reason', $Options, '')) {
             case '':
@@ -67,13 +73,75 @@ class UserModel extends Gdn_Model {
          $Activity = array(
              'ActivityType' => 'Ban',
              'NotifyUserID' => ActivityModel::NOTIFY_MODS,
-             'RegardingUserID' => $UserID,
-             'HeadlineFormat' => T('HeadlineFormat.Ban', '{ActivityUserID,you} banned {RegardingUserID,user}.'),
+             'ActivityUserID' => $UserID,
+             'RegardingUserID' => Gdn::Session()->UserID,
+             'HeadlineFormat' => T('HeadlineFormat.Ban', '{RegardingUserID,You} banned {ActivityUserID,you}.'),
              'Story' => $Story,
              'Data' => array('LogID' => $LogID));
          
          $ActivityModel = new ActivityModel();
          $ActivityModel->Save($Activity);
+      }
+   }
+   
+   /**
+    * Unban a user.
+    * @since 2.1
+    * @param int $UserID
+    * @param array $Options 
+    */
+   public function UnBan($UserID, $Options = array()) {
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User)
+         throw NotFoundException();
+      
+      if (!$User['Banned'])
+         throw new Gdn_UserException(T("The user isn't banned."));
+      
+      // Unban the user.
+      $this->SetField($UserID, 'Banned', FALSE);
+      
+      // Restore the user's content.
+      if (GetValue('RestoreContent', $Options)) {
+         $BanLogID = $this->GetAttribute($UserID, 'BanLogID');
+         
+         if ($BanLogID) {
+            $LogModel = new LogModel();
+
+            try {
+               $LogModel->Restore($BanLogID);
+            } catch (Exception $Ex) {
+               if ($Ex->getCode() != 404)
+                  throw $Ex;
+            }
+            $this->SaveAttribute($UserID, 'BanLogID', NULL);
+         }
+      }
+      
+      // Add an activity for the unbanning.
+      if (GetValue('AddActivity', $Options, TRUE)) {
+         $ActivityModel = new ActivityModel();
+         
+         $Story = GetValue('Story', $Options, NULL);
+         
+         // Notify the moderators of the unban.
+         $Activity = array(
+             'ActivityType' => 'Ban',
+             'NotifyUserID' => ActivityModel::NOTIFY_MODS,
+             'ActivityUserID' => $UserID,
+             'RegardingUserID' => Gdn::Session()->UserID,
+             'HeadlineFormat' => T('HeadlineFormat.Unban', '{RegardingUserID,You} unbanned {ActivityUserID,you}.'),
+             'Story' => $Story);
+         
+         $ActivityModel->Queue($Activity);
+         
+         // Notify the user of the unban.
+         $Activity['NotifyUserID'] = $UserID;
+         $Activity['Emailed'] = ActivityModel::SENT_PENDING;
+         $Activity['HeadlineFormat'] = T('HeadlineFormat.Unban.Notification', "You've been unbanned.");
+         $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
+         
+         $ActivityModel->SaveQueue();
       }
    }
 
@@ -216,7 +284,9 @@ class UserModel extends Gdn_Model {
       $UserIDs = array();
       foreach ($Data as $Row) {
          foreach ($Columns as $ColumnName) {
-            $UserIDs[GetValue($ColumnName, $Row)] = 1;
+            $ID = GetValue($ColumnName, $Row);
+            if (is_numeric($ID))
+               $UserIDs[$ID] = 1;
          }
       }
       
@@ -236,7 +306,7 @@ class UserModel extends Gdn_Model {
       foreach ($Data as &$Row) {
          foreach ($Prefixes as $Px) {
             $ID = GetValue($Px.'UserID', $Row);
-            if ($ID) {
+            if (is_numeric($ID)) {
                $User = GetValue($ID, $Users, FALSE);
                foreach ($Join as $Column) {
                   $Value = $User[$Column];
@@ -646,7 +716,7 @@ class UserModel extends Gdn_Model {
          $Sql->Where('u.UserID', $UserID);
 
       if (strpos($Key, '%') !== FALSE)
-         $Sql->Like('u.Name', $Key);
+         $Sql->Like('u.Name', $Key, 'none');
       else
          $Sql->Where('u.Name', $Key);
 
@@ -795,7 +865,15 @@ class UserModel extends Gdn_Model {
    }
    
    public function RemovePicture($UserID) {
-      $this->SetField($UserID, 'Photo', NULL);
+      // Grab the current photo.
+      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      if ($Photo = $User['Photo']) {
+         $ProfilePhoto = ChangeBasename($Photo, 'p%s');
+         $Upload = new Gdn_Upload();
+         $Upload->Delete($ProfilePhoto);
+         
+         $this->SetField($UserID, 'Photo', NULL);
+      }
    }
 
    public function ProfileCount($User, $Column) {
@@ -1556,50 +1634,85 @@ class UserModel extends Gdn_Model {
       $Fields[$this->DateInserted] = $Now;
       $Fields['DateFirstVisit'] = $Now;
       $Fields['DateLastActive'] = $Now;
+      $Fields['InsertIPAddress'] = Gdn::Request()->IpAddress();
+      $Fields['LastIPAddress'] = Gdn::Request()->IpAddress();
    }
 
    /**
-    * Update last visit.
-    *
-    * Regenerates other related user properties.
+    * Updates visit level information such as date last active and the user's ip address.
     *
     * @param int $UserID
-    * @param array $Attributes
     * @param string|int|float $ClientHour
     */
-   function UpdateLastVisit($UserID, $Attributes, $ClientHour='') {
+   function UpdateVisit($UserID, $ClientHour = FALSE) {
       $UserID = (int) $UserID;
       if (!$UserID) {
-         throw new Exception('A valid UserId is required.');
+         throw new Exception('A valid User ID is required.');
       }
-      
-//      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-//      $AllIPs = GetValue('AllIPAddresses', $User, array());
-      $IP = Gdn::Request()->IpAddress();
-//      if (!in_array($IP, $AllIPs)) {
-//         $AllIPs[] = $IP;
-//         SetValue('AllIPAddresses', $User, $AllIPs);
-//      }
       
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-      $Fields = array(
-         'DateLastActive' => Gdn_Format::ToDateTime(),
-         'LastIPAddress' => $IP,
-         'CountVisits' => GetValue('CountVisits', $User, 0) + 1);
-
-      if (isset($Attributes) && is_array($Attributes)) {
-         // Generate a new transient key for the user (used to authenticate postbacks).
-         $Attributes['TransientKey'] = RandomString(12);
-         $Fields['Attributes'] = serialize($Attributes);
+      
+      $Fields = array();
+      
+      if (Gdn_Format::ToTimestamp($User['DateLastActive']) < strtotime('5 minutes ago')) {
+         // We only update the last active date once every 5 minutes to cut down on DB activity.
+         $Fields['DateLastActive'] = Gdn_Format::ToDateTime();
       }
+      
+      // Update session level information if necessary.
+      if ($UserID == Gdn::Session()->UserID) {
+         $IP = Gdn::Request()->IpAddress();
+         $Fields['LastIPAddress'] = $IP;
+         
+         if (Gdn::Session()->NewVisit()) {
+            $Fields['CountVisits'] = GetValue('CountVisits', $User, 0) + 1;
+         }
+      }
+      
+      // Generate the AllIPs field.
+      $AllIPs = GetValue('AllIPAddresses', $User, array());
+      if (is_string($AllIPs)) {
+         $AllIPs = explode(',', $AllIPs);
+         SetValue('AllIPAddresses', $User, $AllIPs);
+      }
+      if (!is_array($AllIPs))
+         $AllIPs = array();
+      if ($IP = GetValue('InsertIPAddress', $User))
+         $AllIPs[] = $IP;
+      if ($IP = GetValue('LastIPAddress', $User))
+         $AllIPs[] = $IP;
+      $AllIPs = array_unique($AllIPs);
+      sort($AllIPs);
+      $Fields['AllIPAddresses'] = $AllIPs;
 
       // Set the hour offset based on the client's clock.
       if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
          $HourOffset = $ClientHour - date('G', time());
-         $this->SQL->Set('HourOffset', $HourOffset);
+         $Fields['HourOffset'] = $HourOffset;
       }
-
-      $this->SQL->Where('UserID', $UserID)->Put();
+      
+      // See if the fields have changed.
+      $Changed = FALSE;
+      foreach ($Fields as $Name => $Value) {
+         if (GetValue($Name, $User) != $Value) {
+            $Changed = TRUE;
+            break;
+         }
+      }
+      
+      if ($Changed) {
+         $this->SetField($UserID, $Fields);
+      }
+      
+      if ($User['LastIPAddress'] != $Fields['LastIPAddress']) {
+         $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+         if (!BanModel::CheckUser($User, NULL, TRUE, $Bans)) {
+            $BanModel = new BanModel();
+            $Ban = array_pop($Bans);
+            $BanModel->SaveUser($User, TRUE, $Ban);
+            $BanModel->SetCounts($Ban);
+         }
+      }
    }
 
    /**
@@ -1711,7 +1824,6 @@ class UserModel extends Gdn_Model {
     * Checks to see if $Username and $Email are already in use by another member.
     */
    public function ValidateUniqueFields($Username, $Email, $UserID = '', $Return = FALSE) {
-      //die(var_dump(array($Username, $Email, $UserID)));
       $Valid = TRUE;
       $Where = array();
       if (is_numeric($UserID))
@@ -1814,13 +1926,25 @@ class UserModel extends Gdn_Model {
       return TRUE;
    }
    
-   public function Delete($User, $Options = array()) {
+   /**
+    * Delete a single user.
+    *
+    * @param int $UserID
+    * @param array $Options See DeleteContent(), GetDelete()
+    */
+   public function Delete($UserID, $Options = array()) {
       if ($UserID == $this->GetSystemUserID()) {
          $this->Validation->AddValidationResult('', 'You cannot delete the system user.');
          return FALSE;
       }
       
       $this->DeleteContent($UserID, $Options);
+      
+      // Remove shared authentications.
+      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Options);
+
+      // Remove role associations.
+      $this->GetDelete('UserRole', array('UserID' => $UserID), $Options);
       
       // Remove the user's information
       $this->SQL->Update('User')
@@ -1859,6 +1983,9 @@ class UserModel extends Gdn_Model {
 
    public function DeleteContent($UserID, $Options = array()) {
       $Log = GetValue('Log', $Options);
+      if ($Log === TRUE)
+         $Log = 'Delete';
+      
       $Result = FALSE;
       $Content = array();
       
@@ -1881,27 +2008,20 @@ class UserModel extends Gdn_Model {
       $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
       
       // Remove invitations
-      $this->SQL->GetDelete('Invitation', array('InsertUserID' => $UserID), $Content);
-      $this->SQL->GetDelete('Invitation', array('AcceptedUserID' => $UserID), $Content);
+      $this->GetDelete('Invitation', array('InsertUserID' => $UserID), $Content);
+      $this->GetDelete('Invitation', array('AcceptedUserID' => $UserID), $Content);
       
       // Remove activities
-      $this->SQL->GetDelete('Activity', array('ActivityUserID' => $UserID), $Content);
-      $this->SQL->GetDelete('Activity', array('RegardingUserID' => $UserID), $Content);
+      $this->GetDelete('Activity', array('InsertUserID' => $UserID), $Content);
       
       // Remove activity comments.
       $this->GetDelete('ActivityComment', array('InsertUserID' => $UserID), $Content);
-      
-      // Remove shared authentications.
-      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Content);
-
-      // Remove role associations.
-      $this->GetDelete('UserRole', array('UserID' => $UserID), $Content);      
       
       if ($Log) {
          $User['_Data'] = $Content;
          unset($Content); // in case data gets copied
          
-         $Result = LogModel::Insert('Delete', 'User', $User, GetValue('LogOptions', $Options, array()));
+         $Result = LogModel::Insert($Log, 'User', $User, GetValue('LogOptions', $Options, array()));
       }
       
       return $Result;
@@ -2211,7 +2331,12 @@ class UserModel extends Gdn_Model {
          SetValue('PhotoUrl', $User, $PhotoUrl);
       }
       if ($v = GetValue('AllIPAddresses', $User)) {
-         SetValue('AllIPAddresses', $User, explode(',', $v));
+         $IPAddresses = explode(',', $v);
+         foreach ($IPAddresses as $i => $IPAddress) {
+            if (strpos($IPAddress, '.') === FALSE)
+               $IPAddresses[$i] = long2ip(hexdec($IPAddress));
+         }
+         SetValue('AllIPAddresses', $User, $IPAddresses);
       }
    }
 
@@ -2541,6 +2666,18 @@ class UserModel extends Gdn_Model {
    }
    
 	public function SetField($RowID, $Property, $Value = FALSE) {
+      if (!is_array($Property))
+         $Property = array($Property => $Value);
+
+      // Convert IP addresses to long.
+      if (isset($Property['AllIPAddresses'])) {
+//         foreach ($Property['AllIPAddresses'] as &$IP) {
+//            if (strpos($IP, '.') !== FALSE)
+//               $IP = dechex(ip2long($IP));
+//         }
+         $Property['AllIPAddresses'] = implode(',', $Property['AllIPAddresses']);
+      }
+      
 		$this->SQL
             ->Update($this->Name)
             ->Set($Property, $Value)

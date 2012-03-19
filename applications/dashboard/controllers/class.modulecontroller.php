@@ -14,7 +14,10 @@ class ModuleController extends Gdn_Controller {
    /**
     * Creates and renders an instance of a module.
     */
-   public function Index($Module, $AppFolder = '') {
+   public function Index($Module, $AppFolder = '', $DeliveryType = '') {
+      if (!$DeliveryType)
+         $this->DeliveryType(DELIVERY_TYPE_VIEW);
+      
       $ModuleClassExists = class_exists($Module);
 
       if ($ModuleClassExists) {

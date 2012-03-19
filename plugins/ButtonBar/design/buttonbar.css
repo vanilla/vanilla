@@ -8,18 +8,13 @@
 #DiscussionForm .ButtonBarMarkupHint {
    margin-top: -6px;
 }
-.ButtonBar {
-   padding: 0 2px 0 0;
-}
 .BarWrap {
-   float: left;
-   width: 100%;
    background: #fafafa;
    border: 1px solid #aaa;
    margin: 0 0 -1px;
+   line-height: 0.1;
 }
 .ButtonBar .ButtonWrap {
-   float: left;
    background-color: white;
    background-position: 50% 50%;
    background-repeat: no-repeat;
@@ -27,6 +22,7 @@
    height: 24px;
    width: 24px;
    z-index: 50;
+   display: inline-block;
 }
 /** This causes clearing problems when the panel is taller than the content 
 #DiscussionForm .TextBoxWrapper,
@@ -38,7 +34,6 @@
    background-color: #f8f8f8;
    cursor: pointer;
 }
-
 .ButtonBar .ButtonWrap span {
    display: none;
 }

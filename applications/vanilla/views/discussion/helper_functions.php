@@ -390,8 +390,8 @@ function WriteCommentForm() {
 			<div class="Note Closed"><?php 
             echo FormatString(
                T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}">Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'), 
-               array('SignInUrl' => SignInUrl(Url('')), 
-                     'RegisterUrl' => RegisterUrl(Url('')))); ?></div>
+               array('SignInUrl' => Url(SignInUrl(Url(''))), 
+                     'RegisterUrl' => Url(RegisterUrl(Url(''))))); ?></div>
 			<?php //echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
 		</div>
 		<?php

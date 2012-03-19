@@ -62,6 +62,8 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
                
                echo '<tr>';
                $Desc = $this->Preferences[$PreferenceGroup][$Name];
+               if (is_array($Desc))
+                  list($Desc, $Location) = $Desc;
                echo Wrap($Desc, 'td', array('class' => 'Description'));
                
                $LastName = '';

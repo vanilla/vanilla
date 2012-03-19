@@ -52,7 +52,7 @@
       <li class="Buttons">
          <?php
             echo $this->Form->Button('Request a new password');
-            echo Wrap(Anchor(T('I remember now!'), '/entry/signin', 'ForgotPassword'), 'div');
+            echo Anchor(T('I remember now!'), '/entry/signin', 'ForgotPassword');
          ?>
       </li>
    </ul>

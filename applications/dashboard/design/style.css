@@ -520,6 +520,7 @@ a.Small img {
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
+   margin: 0 0 10px; /* Make sure that .Box definitions don't override the base DismissMessage margin! */
 }
 .CasualMessage {
    background: #CFECFF;
@@ -596,6 +597,7 @@ a.Small img {
    box-shadow: none;
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
+   padding: 0;
 }
 /*
 
@@ -1941,7 +1943,7 @@ div.Popup form ul li label.RadioLabel {
 #Foot {
    clear: both;
    text-align: center;
-   margin: 2px 0;
+   margin: 20px 0 0;
    padding: 4px 9px;
    font-size: 13px;
    color: #ddd;
@@ -2527,7 +2529,7 @@ body#dashboard_entry_signin #Content form {
 	text-align:left;
 }*/
 .SingleEntryMethod {
-	width: 290px;
+	/* width: 290px; */
 	margin: 0 auto;
 }
 .MultipleEntryMethods {
@@ -2537,7 +2539,6 @@ body#dashboard_entry_signin #Content form {
 }
 .MultipleEntryMethods .MainForm {
    float: left;
-   width: 285px;
 }
 .MultipleEntryMethods .Methods {
  	padding: 0 15px 5px;

@@ -270,6 +270,9 @@ a:hover {
 #Panel .BigButton {
    margin: 20px 0;
 }
+input.Button {
+   padding: 6px 12px;
+}
 .BoxFilter {
    margin: 20px 0;
 }

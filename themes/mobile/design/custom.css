@@ -18,10 +18,12 @@ a:hover {
 	clear: left;
 }
 .BreadcrumbsWrapper {
-   padding: 3px;
-   margin: -3px -3px -1px -3px;
-   background: #eee;
-   border-bottom: 1px solid #ccc;
+   margin: 6px 3px;
+   font-size: 11px;
+   color: #888;
+}
+.Breadcrumbs a {
+   color: #555;
 }
 #Head {
 	background: #3B5998;
@@ -47,7 +49,7 @@ input.PreviewButton,
 	display: none;
 }
 a.Close {
-	color: #EDEFF4;
+	color: #555;
 }
 body.Post a.Close {
 	color: inherit;	
@@ -202,25 +204,6 @@ body.Discussion a.Bookmark {
 }
 
 /* Entry Pages */
-body.Entry #Content {
-	float:none;
-	margin:0 auto;
-	text-align:center;
-	width:auto;
-	background: #EDEFF4;
-}
-body.Entry #Content .Box {
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	background: transparent;
-	border-bottom: none;
-	margin: 0;
-	padding: 10px;
-}
-body.Entry #Content form {
-	padding: 0 6px 6px;
-}
 .MultipleEntryMethods {
 	width: 290px;
 }
@@ -278,26 +261,12 @@ body#dashboard_entry_signin .Methods,
   left: auto;
   overflow: auto; 
 }
-.DismissMessage {
-	color: #000;
-	background: #ffd;
-	border-bottom: 1px solid #ccc;
-	padding:6px 8px;
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	margin: 0;
-}
-.DismissMessage a.Dismiss:hover {
-	color: #000;
-}
 .Warning {
 	background: #d00;
 	border: none;
 	border-bottom: 1px solid #b00;
 	color: #fff;
 	text-shadow: 1px 1px 1px #444;
-   margin: 5px 0;
 }
 .Warning a {
 	color: #fff;

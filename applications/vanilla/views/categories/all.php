@@ -62,12 +62,14 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $Alt = !$Alt;
             $CatList .= '<li id="Category_'.$CategoryID.'" class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category '.$CssClasses.'">'
-                  .'<div class="TitleWrap">'
-                  .'</div>'
                   .GetOptions($Category, $this)
-                  .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
-                  .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
-                  .'<div class="Meta">
+                  .'<div class="TitleWrap">'
+                     .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
+                  .'</div>
+                  <div class="CategoryDescription">'
+                  .$Category->Description
+                  .'</div>
+                  <div class="Meta">
                      <span class="MItem RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>
                      <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
                      <span class="MItem CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';

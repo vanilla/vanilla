@@ -141,7 +141,7 @@ echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 
 echo '<div class="P PageDescription">';
 echo PagerModule::Write($PagerOptions);
-echo $this->Data('_Description');
+echo $this->Data('_Description', '&#160;');
 echo '</div>';
 
 

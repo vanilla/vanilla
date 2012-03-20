@@ -202,6 +202,7 @@ class DiscussionController extends VanillaController {
 			ModerationController::InformCheckedComments($this);
 
       // Add modules
+      $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');

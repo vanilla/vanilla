@@ -145,7 +145,8 @@ class CategoriesController extends VanillaController {
 			$this->SetData('CategoryID', GetValue('CategoryID', $Category), TRUE);
 			
 			// Add modules
-			$this->AddModule('NewDiscussionModule');
+         $this->AddModule('NewDiscussionModule');
+         $this->AddModule('DiscussionFilterModule');
 			$this->AddModule('CategoriesModule');
 			$this->AddModule('BookmarkedModule');
 			

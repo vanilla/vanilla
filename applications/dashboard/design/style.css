@@ -1103,6 +1103,9 @@ overflow: hidden; */
    background: rgba(0, 0, 0, 0.03);
 	font-weight: bold;
 }
+.PanelInfo .Active strong {
+   font-weight: bold;
+}
 .PanelActivity .ShowAll,
 .PanelInfo .ShowAll {
    font-weight: bold;
@@ -1459,6 +1462,9 @@ blockquote {
 .Message small {
 	font-size: 11px;
 	color: #777;
+}
+.EmbeddedContent {
+   overflow: hidden;
 }
 img.LeftAlign {
    float: left;

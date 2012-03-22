@@ -422,9 +422,9 @@ class SettingsController extends DashboardController {
       // Load some data to display on the dashboard
       $this->BuzzData = array();
       // Get the number of users in the database
-      $CountUsers = $UserModel->GetCountLike();
-      $this->AddDefinition('CountUsers', $CountUsers);
-      $this->BuzzData[T('Users')] = number_format($CountUsers);
+      // $CountUsers = $UserModel->GetCountLike();
+      // $this->AddDefinition('CountUsers', $CountUsers);
+      // $this->BuzzData[T('Users')] = number_format($CountUsers);
       // Get the number of new users in the last day
       $this->BuzzData[T('New users in the last day')] = number_format(
          $UserModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day'))))

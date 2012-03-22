@@ -117,15 +117,17 @@ class DiscussionController extends VanillaController {
       if ($this->Offset < 0)
          $this->Offset = 0;
       
-            // Set the canonical url to have the proper page title.
+      // Set the canonical url to have the proper page title.
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
-
+      
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
       
       $PageNumber = PageNumber($this->Offset, $Limit);
       $this->SetData('Page', $PageNumber);
+      $this->_SetOpenGraph();
+      
       
       include_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
       if ($PageNumber == 1) {
@@ -804,5 +806,11 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
+   }
+   
+   protected function _SetOpenGraph() {
+      if (!$this->Head)
+         return;
+      $this->Head->AddTag('meta', array('property' => 'og:type', 'content' => 'article'));
    }
 }

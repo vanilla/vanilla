@@ -1103,6 +1103,9 @@ overflow: hidden; */
    background: rgba(0, 0, 0, 0.03);
 	font-weight: bold;
 }
+.PanelInfo .Active strong {
+   font-weight: bold;
+}
 .PanelActivity .ShowAll,
 .PanelInfo .ShowAll {
    font-weight: bold;

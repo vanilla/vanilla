@@ -423,7 +423,7 @@ class Gdn_Session {
 			return;
 		
       // Grab the user's session
-      $Session = $this->_GetStashSession();
+      $Session = $this->_GetStashSession($Value);
       if (!$Session)
          return;
       
@@ -459,11 +459,16 @@ class Gdn_Session {
 	 * This is a stop-gap solution until full session management for users &
 	 * guests can be imlemented.
 	 */
-   private function _GetStashSession() {
+   private function _GetStashSession($ValueToStash) {
       $CookieName = C('Garden.Cookie.Name', 'Vanilla');
 
       // Grab the entire session record
       $SessionID = GetValue($CookieName.'SessionID', $_COOKIE, '');
+      
+      // If there is no session, and no value for saving, return;
+      if ($SessionID == '' && $ValueToStash == '')
+         return FALSE;
+      
       $Session = Gdn::SQL()
          ->Select()
          ->From('Session')

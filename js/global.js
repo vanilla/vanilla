@@ -238,8 +238,8 @@ jQuery(document).ready(function($) {
       $('a.Popdown').popup({hijackForms: false});
    
    // This turns SignInPopup anchors into in-page popups
-   if ($.fn.popup)
-      $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
+   //if ($.fn.popup)
+      //$('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
    
    if ($.fn.popup)
       $(document).delegate('.PopupClose', 'click', function(event){

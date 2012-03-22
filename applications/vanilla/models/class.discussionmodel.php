@@ -276,7 +276,7 @@ class DiscussionModel extends VanillaModel {
 		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
          $Discussion->Name = Gdn_Format::Text($Discussion->Name);
-         $Discussion->Url = Url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name), TRUE);
+         $Discussion->Url = DiscussionUrl($Discussion);
 
 			if($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';

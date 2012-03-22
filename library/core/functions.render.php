@@ -97,6 +97,19 @@ if (!function_exists('Anchor')) {
    }
 }
 
+if (!function_exists('DiscussionUrl')):
+
+/**
+ * Return a url for a discussion. This function is in here and not functions.general so that plugins can override.
+ * @param object $Discussion
+ * @return string
+ */
+function DiscussionUrl($Discussion) {
+   return Url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name), TRUE);
+}
+   
+endif;
+
 if (!function_exists('FixNl2Br')) {
    /**
     * Removes the break above and below tags that have a natural margin.

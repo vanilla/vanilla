@@ -41,9 +41,8 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
    $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
 	$Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
 
-   $FirstPageUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
-   $LastPageUrl = $FirstPageUrl . '/p'.$Discussion->CountPages.'/#Comment_'.$Discussion->LastCommentID;
-	
+   $FirstPageUrl = DiscussionUrl($Discussion, 1);
+   $LastPageUrl = DiscussionUrl($Discussion, FALSE, '#Item_'.$Discussion->CountCommentWatch);	
 	$Discussion->CountReplies = $Discussion->CountComments - 1;
 
 ?>

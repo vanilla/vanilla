@@ -90,9 +90,10 @@ class DashboardHooks implements Gdn_IPlugin {
       
 		// If there are applicants, alert admins by showing in the main menu
 		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
-			$CountApplicants = Gdn::UserModel()->GetApplicantCount();
-			if ($CountApplicants > 0)
-				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
+			// $CountApplicants = Gdn::UserModel()->GetApplicantCount();
+			// if ($CountApplicants > 0)
+			// $Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
+			$Sender->Menu->AddLink('Applicants', T('Applicants'), '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
 		}
 		
       if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {

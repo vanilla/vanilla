@@ -1211,34 +1211,38 @@ ul.PanelInfo li.Active:hover {
 /* ================================================== Splash Information Page */
 body.Home #Content {
 	margin: 0 auto;
+   border: none;
 }
 #Content .SplashInfo {
 	margin: 80px 0 0 0;
 	border-top: 1px solid #a5d0e7;
 	border-bottom: 1px solid #a5d0e7;
+   box-shadow: inset 0 1px 0 #fff, inset 0 -1px 0 #fff;
 	background: #e2f4ff;
 }
 #Content .SplashInfo h1 {
 	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 	background: transparent;
-	text-align: center;
-	border: none;
-	border-top: 1px solid #fff;
 	color:#02455B;
 	font-size:300%;
 	text-shadow:0 1px 0 #FFFFFF;
-	padding: 10px 0 0;
+	padding: 10px 0 6px;
 	margin: 0;
 	line-height: 1;
 }
 #Content .SplashInfo p {
 	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
-	text-align: center;
-	border-bottom: 1px solid #fff;
 	margin: 0;
 	padding: 0 0 10px;
 	color: #076C8E;
-	font-size: 20px;
+	font-size: 16px;
+   line-height: 1.6;
+}
+#Content .SplashInfo h1,
+#Content .SplashInfo p {
+   width: 960px;
+   margin: 0 auto;
+   border: none;
 }
 
 /* =================================================================== Popups */

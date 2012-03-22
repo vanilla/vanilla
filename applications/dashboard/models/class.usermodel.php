@@ -157,16 +157,23 @@ class UserModel extends Gdn_Model {
       }
 
       // Update the user's roles.
-      $Roles = GetValue('ConfirmedEmailRoles', $Attributes, C('Garden.Registration.DefaultRoles'));
+      $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
+      $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
+      $Roles = GetValue('ConfirmedEmailRoles', $Attributes, $DefaultRoles);
+      if (in_array($ConfirmRoleID, $Roles)) {
+//         throw new Exception('Foo!!!');
+         // The user is reconfirming to the confirm email role. At least set to the default roles.
+         $Roles = $DefaultRoles;
+      }
+      
       $this->EventArguments['ConfirmUserID'] = $UserID;
       $this->EventArguments['ConfirmUserRoles'] = &$Roles;
       $this->FireEvent('BeforeConfirmEmail');
       $this->SaveRoles($UserID, $Roles, FALSE);
       
       // Remove the email confirmation attributes.
-      unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);
-      $this->SaveAttribute($UserID, $Attributes);
-      
+//      unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);
+      $this->SaveAttribute($UserID, array('EmailKey' => NULL, 'ConfirmedEmailRoles' => NULL));
       return TRUE;
    }
 
@@ -998,7 +1005,9 @@ class UserModel extends Gdn_Model {
                   // The confirm email role is set and it exists so go ahead with the email confirmation.
                   $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
                   
-                  if ($RoleIDs)
+                  if (isset($Attributes['ConfirmedEmailRoles']) && !in_array($ConfirmEmailRoleID, $Attributes['ConfirmedEmailRoles']))
+                     $ConfirmedEmailRoles = $Attributes['ConfirmedEmailRoles'];
+                  elseif ($RoleIDs)
                      $ConfirmedEmailRoles = $RoleIDs;
                   else
                      $ConfirmedEmailRoles = ConsolidateArrayValuesByKey($this->GetRoles($UserID), 'RoleID');

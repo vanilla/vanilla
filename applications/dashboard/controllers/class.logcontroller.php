@@ -52,6 +52,8 @@ class LogController extends DashboardController {
       $Users = array();
       foreach ($Logs as $Log) {
          $UserID = $Log['RecordUserID'];
+         if (!$UserID)
+            continue;
          $Users[$UserID] = array('UserID' => $UserID);
       }
       Gdn::UserModel()->JoinUsers($Users, array('UserID'));

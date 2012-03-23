@@ -1710,6 +1710,9 @@ class UserModel extends Gdn_Model {
       }
       
       if ($Changed) {
+         $this->EventArguments['Fields'] =& $Fields;
+         $this->FireEvent('UpdateVisit');
+         
          $this->SetField($UserID, $Fields);
       }
       

@@ -432,6 +432,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     * to be eval()'d.
     * 
     * @param string $String A string containing the php settings array.
+    * @param string $Tag A string descriptor of this config set
     * @param string $Name The name of the variable and initial group settings.
     *   Note: When $Name is 'Configuration' then the data will be set to the root of the config.
     * @param boolean $Dynamic Optional, whether to treat this as the request's "dynamic" config, and
@@ -439,7 +440,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     *   is called after all defaults are loaded.
     * @return boolean
     */
-   public function LoadString($String, $Tag, $Name = 'Configuration', $Dynamic = TRUE) {
+   public function LoadString($String, $Tag, $Name = 'Configuration', $Dynamic = TRUE, $SaveCallback = NULL, $CallbackOptions = NULL) {
       $ConfigurationSource = Gdn_ConfigurationSource::FromString($this, $String, $Tag, $Name);
       if (!$ConfigurationSource) return FALSE;
       
@@ -457,6 +458,10 @@ class Gdn_Configuration extends Gdn_Pluggable {
       } else {
          self::MergeConfig($this->Data, $ConfigurationSource->Export());
       }
+      
+      // Callback for saving
+      if (!is_null($SaveCallback))
+         $ConfigurationSource->AssignCallback($SaveCallback, $CallbackOptions);
    }
 
    /**
@@ -779,6 +784,18 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     */
    protected $Splitting;
    
+   /**
+    * Save callback
+    * @var callback
+    */
+   protected $Callback;
+   
+   /**
+    * Save callback options
+    * @var array
+    */
+   protected $CallbackOptions;
+   
    public function __construct($Configuration, $Type, $Source, $Group, $Settings) {
       parent::__construct();
       
@@ -791,6 +808,23 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $this->Settings = $Settings;
       $this->Dirty = FALSE;
       $this->Splitting = TRUE;
+      
+      $this->Callback = FALSE;
+      $this->CallbackOptions = NULL;
+   }
+   
+   /**
+    * Set a save callback
+    * 
+    * @param callback $Callback
+    * @param array $Options Callback options
+    * @return boolean 
+    */
+   public function AssignCallback($Callback, $Options = NULL) {
+      if (!is_callable($Callback)) return FALSE;
+      
+      $this->Callback = $Callback;
+      $this->CallbackOptions = $Options;
    }
    
    public function Splitting($Splitting = TRUE) {
@@ -1081,7 +1115,31 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $this->EventArguments['ConfigData'] = $this->Settings;
       $this->FireEvent('BeforeSave');
       
-      if ($this->EventArguments['ConfigNoSave']) return NULL;
+      if ($this->EventArguments['ConfigNoSave']) {
+         $this->Dirty = FALSE;
+         return NULL;
+      }
+      
+      // Check for and fire callback if one exists
+      if ($this->Callback && is_callable($this->Callback)) {
+         $CallbackOptions = array();
+         if (!is_array($this->CallbackOptions)) $this->CallbackOptions = array();
+         
+         $CallbackOptions = array_merge($CallbackOptions, $this->CallbackOptions, array(
+            'ConfigDirty'  => $this->Dirty,
+            'ConfigType'   => $this->Type,
+            'ConfigSource' => $this->Source,
+            'ConfigData'   => $this->Settings,
+            'SourceObject' => $this
+         ));
+         
+         $ConfigSaved = call_user_func($this->Callback, $CallbackOptions);
+         
+         if ($ConfigSaved) {
+            $this->Dirty = FALSE;
+            return NULL;
+         }
+      }
       
       switch ($this->Type) {
          case 'file':
@@ -1159,7 +1217,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
          case 'string':
             /**
              * How would these even save? String config data must be handled by 
-             * an event hook, if at all.
+             * an event hook or callback, if at all.
              */
             $this->Dirty = FALSE;
             return TRUE;

@@ -57,7 +57,6 @@ blockquote, q {
 }
 
 /* ==================== Pages that hide the panel and have full-width content */
-
 body.Entry #Panel,
 body.Conversations.add #Panel,
 body.Vanilla.Post #Panel {
@@ -85,20 +84,7 @@ body {
    padding: 0;
    font-size: small;
 }
-   /*
-#Content {
-   float: right;
-   width: 730px;
-   margin: 0 0 40px;
-}
-   */
 #Body {
-   /*
-   width: 960px;
-   text-align: left;
-   margin: 15px auto 0;
-   margin: 15px 0 0;
-   */
 	zoom: 1; /* hasLayout for IE6/7 */
 }
 #Body:after { /* clearfix */
@@ -186,11 +172,6 @@ textarea {
 	border: 1px solid #999;
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	padding: 3px;	
-   /*
-	box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset; 
-	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
-	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2) inset;
-   */
 }
 textarea.TextBox {
    width: 500px;
@@ -253,14 +234,6 @@ select {
 	-webkit-box-shadow: 0px 0px 1px #999;
    line-height: 1;
 }
-/*
-a.Button {
-   display: inline-block;
-   padding: 4px;
-   line-height: 100%;
-   margin: 3px auto;
-}
-*/
 form .Button {
 	font-size: 14px;
    font-weight: bold;
@@ -353,9 +326,6 @@ form .Button {
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
-   /*
-   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
-   */
 }
 .Alert a {
    color: #fff;
@@ -378,29 +348,11 @@ form .Button {
 .Info strong {
 	font-weight: bold;
 }
-/*.HomeCrumb a {
-	background: url('images/sprites.png') -83px -1px no-repeat;
-	padding-left: 24px;
-}*/
 .BreadcrumbWrap {
 	clear: both;
 	line-height: 2.4;
 	font-size: 12px;
 }
-/*
-.Crumb {
-	margin: 0 6px;
-}
-.Breadcrumbs {
-	display: block;
-   margin: 0 auto;
-	width: 960px;
-}
-.BreadcrumbWrap.TopBreadcrumb {
-	background: #f7f7f7;
-	background: rgba(0,0,0,0.03);
-}
-*/
 #PagerLess {
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;
@@ -419,12 +371,6 @@ form .Button {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
-/*
- #PagerMore {
-   margin-bottom: 1px;
-}
-*/
-
 .Pager {
    font-weight: bold;
    float: right;
@@ -544,8 +490,6 @@ a.Small img {
 #Head {
    background: #38abe3;
    color: #fff;
-   /* This causes problems in most themes and almost always ends up being overwritten */
-   /* margin-bottom: 5px; */
 }
 /* Targetting the padding on head in this way b/c it was causing problems in older themes */
 body > #Frame > .Head {
@@ -602,117 +546,6 @@ body > #Frame > .Head {
    -webkit-box-shadow: none;
    padding: 0;
 }
-/*
-
-.Search:after,
-div#Search:after {
-   content: ".";
-   display: block;
-   height: 0;
-   clear: both;
-   visibility: hidden;
-}
-body #Head h1 {
-   display: inline-block;
-   font-weight: bold;
-   margin: 0;
-   padding: 21px 10px 4px 0;
-   border: 0;
-}
-#Head h1 a span {
-   font-size: 24px;
-   color:#fff;
-}
-#Head .Search,
-#Head #Search {
-   position: absolute;
-   right: 0;
-   bottom: 6px;
-   text-align: right;
-}
-#Head form {
-   float: right;
-   width: 250px;
-   padding: 0;
-}
-#Head form input.InputBox {
-	vertical-align: top;
-   width: 200px;
-   border: 0;
-   padding: 4px;
-	margin: 0 6px 0 0;
-   color: #969696;
-   font-size: 13px;
-	background: #fff; 
-   -moz-border-radius: 2px;
-   -webkit-border: 2px;
-   border-bottom: 2px;
-	vertical-align: bottom;
-}
-#Head form input.Button {
-	font-size: 11px;
-	border: none;
-}
-.Menu {
-   width: 960px;
-   margin: 0 auto;
-   position: relative;
-   text-align: left;
-   vertical-align: bottom;
-}
-#Menu {
-   display: inline-block;
-   margin-right: 280px;
-   vertical-align: bottom;
-}
-#Menu li {
-   line-height: 27px;
-   float: left;
-   position: relative;
-   display: block;
-   list-style: none;
-   padding: 0;
-   margin: 0 4px 0 0;
-   font-weight: bold;
-   text-align: left;
-}
-* html #Menu li {
-	display: inline;
-}
-#Menu a {
-   border: 0;
-   text-decoration: none;
-   position: relative;
-	display: block;
-   padding: 0 7px;
-   white-space: nowrap;
-   font-size: 11px;
-   height: 28px;
-}
-* html #Menu a  {
-   display: inline;
-   padding: 6px 10px;
-}
-#Menu li.NonTab,
-#Menu li.NonTab a {
-   font-weight: normal;
-}
-#Menu ul {
-   background: #38abe3;
-}
-#Menu a {
-   color: #fff;
-}
-#Menu a:hover {
-   color: #fff;
-   text-decoration: underline;
-}
-#Menu .Alert {
-	text-shadow: none;
-   background: #f2fcff;
-   color: #299fc7;
-}
-*/
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
 .ControlOptions,
@@ -722,10 +555,7 @@ body #Head h1 {
 .CategoryLink {
    padding: 2px 4px;
    font-size: 11px;
-   background: #CFECFF; /*#F6F6F6;*/
-   /*
-   box-shadow: #ABDAFB 0px 0px 2px 0px;
-   */
+   background: #CFECFF;
    -moz-border-radius: 1px;
    -webkit-border-radius: 1px;
    border-radius: 1px;
@@ -738,18 +568,9 @@ body #Head h1 {
    font-weight: normal;
    line-height: 100%;
 }
-/*
-.Item .OptionsMenu {
-   visibility: hidden;
-}
-.Open.OptionsMenu, .Item:hover .OptionsMenu {
-   visibility: visible;
-}
-*/
 .OptionsTitle {
    user-select: none;
    background: url("images/sprites.png") no-repeat 0 0;
-/*   color: transparent;*/
    height: 28px;
    overflow: hidden;
    padding: 0;
@@ -767,58 +588,23 @@ div.Discussion:hover .OptionsTitle:hover,
 .Open .OptionsTitle {
    background-position: -56px 0 !important;
 }
-/*
-.MenuTitle {
-   color: #000;
-   border: 1px solid #bbb;
-   padding: 4px;
-   border-radius: 2px;
-   user-select: none;
-   background: url('images/buttons.png') right -96px no-repeat;
-   padding-right: 18px;
-   -webkit-user-select: none;
-   -moz-user-select: none;
-   -o-user-select: none;
-   display: inline-block;
-}
-.Open .MenuTitle {
-   color: #fff;
-   background: url("images/buttons.png") no-repeat scroll right -145px #282828;
-   border: 1px solid #282828;
-   -moz-border-radius-bottomleft: 0;
-   -moz-border-radius-bottomright: 0;
-   -webkit-border-bottom-left-radius: 0;
-   -webkit-border-bottom-right-radius: 0;
-   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   border-bottom-left-radius: 0;
-   border-bottom-right-radius: 0;
-}
-*/
 .MenuItems {
    border: 1px solid #282828;
    border-radius:2px;
    -moz-border-radius:2px;
    -webkit-border-radius:2px;
-/*   box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   -moz-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-   -webkit-box-shadow:2px 2px 3px rgba(0,0,0,0.5);
-*/
    background:none repeat scroll 0 0 #444444;
    min-width: 125px;
    line-height: 100%;
    font-size: 11px;
 	color: #fff;
 }
-/*.MenuItems li {
-   padding: 6px !Important;
-}*/
 .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
    color: #fff;
 	display: block;
 	text-decoration: none;
 	padding: 6px;
 }
-/* .MenuItems li a:hover { */
 .MenuItems a:hover {
    background: #282828;
 }
@@ -891,29 +677,9 @@ overflow: hidden; */
 #Panel > :first-child {
 	margin-top: 0;
 }
-/*
-.Box {
-   border-radius: 2px;
-   background: #cfecff;
-   color: #888;
-   padding: 6px 10px;
-   margin: 10px 0;
-}
-.Box h4 {
-   font-size: 110%;
-   color: #1e79a7;
-   font-weight: bold;
-   margin: 0;
-   padding: 0 0 1px;
-}
-*/
 .Box {
    margin: 10px 0;
 }
-/*.Box h4 {
-   font-size: 110%;
-   font-weight: bold;
-}*/
 .Box dl {
    overflow: hidden;
 }
@@ -981,11 +747,6 @@ overflow: hidden; */
 	line-height: 1;
 	padding: 1px;
 	border: 1px solid #d00;
-   /*
-	box-shadow: 0 1px 1px #333;
-	-moz-box-shadow: 0 1px 1px #333;
-	-webkit-box-shadow: 0 1px 1px #333;
-   */
 }
 .MeMenu em {
 	display: none;
@@ -1025,13 +786,6 @@ overflow: hidden; */
 .PanelActivity li .Story {
 	font-size: 85%;
 }
-/*
-.PanelInfo li {
-   background: #e3f4ff;
-   border-bottom: 1px solid #abdafb;
-   padding: 2px 4px;
-}
-*/
 /* Compatibility for old custom themes that overrode this value */
 #Panel .PanelInfo li {
    text-align: left;
@@ -1055,12 +809,6 @@ overflow: hidden; */
    color: #000;
    font-weight: bold;
 }
-/*
-.PanelInfo {
-   border-top: 1px solid #abdafb;
-	border-bottom: 0;
-}
-*/
 .PanelInfo li strong {
    font-weight: normal;
    text-align: left;
@@ -1135,45 +883,6 @@ overflow: hidden; */
 #UserOptions {
 	margin-bottom: 10px;
 }
-/*
-.BigButton {
-   display: block;
-   text-align: center;
-   margin: 0 0 10px;
-   font-size: 15px;
-   font-weight: bold;
-   padding: 8px 0;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   cursor: pointer;
-	background: #f8f8f8;
-   color: #02475A;
-	text-shadow: 0 1px 0 #fff;
-   border: 1px solid #999;
-	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
-	background:-moz-linear-gradient(top, #ffffff, #cccccc);
-	-pie-background:linear-gradient(top, #ffffff, #cccccc);
-	background:linear-gradient(top, #ffffff, #cccccc);
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
-}
-.BigButton:hover {
-   color: #111;
-   border: 1px solid #666;
-	box-shadow: 0px 0px 5px #aaa;
-	-moz-box-shadow: 0px 0px 5px #aaa;
-	-webkit-box-shadow: 0px 0px 5px #aaa;
-}
-.BigButton:focus {
-   background: #eee;
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
-}
-*/
-
 /* Category Depths */
 .PanelCategories .Depth2 { padding-left: 8px; }
 .PanelCategories .Depth3 { padding-left: 12px; }
@@ -1357,12 +1066,6 @@ overflow: hidden; */
 }
 
 /* =============================================================== Activities */
-/* 
-body.Profile ul.Activities {
-   margin-top: 10px;
-   border-top: 1px solid #ddd;
-}
-*/
 .Activities li.HasPhoto .Title {
 	padding: 0;
 }
@@ -1374,24 +1077,10 @@ body.Profile ul.Activities {
 .Activities li.Condensed .Excerpt {
 	color: #000;
 	font-size: 13px;
-	/* padding: 0 0 0 4px; */
 }
 .Activities ul.DataList {
 	margin-left: 50px;
 }
-/*
-.Activities .ItemContent {
-	width: 631px;
-}
-.Activities .HasPhoto .ItemContent {
-	margin-left: 53px;
-	width: 578px;
-}
-.Activities .Item .HasPhoto .ItemContent {
-	width: auto;
-	margin-left: 42px;
-}
-*/
 .Activities .ItemContent {
 	margin: 0 14px 0 53px;
 }
@@ -1444,7 +1133,6 @@ body.Post .Popup a.Close {
 	color: #1e79a7;
 }
 .Message {
-   /* clear: left; */
    line-height: 140%;
    font-size: 100%;
 	word-wrap: break-word;
@@ -1517,31 +1205,6 @@ pre code {
 	margin-bottom: 10px;
 }
 
-/* The "Foot" is at the bottom of the #Content section. Used for more results
-links, sign in buttons, etc 
-.Foot {
-	border-bottom: 1px solid #abdafb;
-   padding: 6px;
-   background: #cfecff;
-   text-align: right;
-   border-bottom-right-radius: 2px;
-   border-bottom-left-radius: 2px;
-   -moz-border-radius-bottomright: 2px;
-   -moz-border-radius-bottomleft: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-   }
-.Foot a.TabLink {
-	margin-left: 10px;
-}
-.Foot .Note {
-	line-height: 2.6;
-	float: left;
-	padding: 0 0 0 8px;
-	font-weight: bold;
-}
-*/
-
 /* =============================================================== Categories */
 .ChildCategories {
 	border-top: 1px dotted #ddd;
@@ -1573,17 +1236,6 @@ links, sign in buttons, etc
 }
 
 /* ============================================================= Profile Page */
-/*body.Profile #Content {
-   width: auto;
-   margin: 0 0 40px 20px;
-   width: 690px;
-	float: right;
-}
-body.Profile #Panel {
-   float: left;
-   width: 250px;
-} */
-
 .ChangePicture span {
 	position: absolute;
 	background: #333;
@@ -1655,24 +1307,6 @@ body.Profile ul.Notifications {
 	margin: 0;
 	padding: 10px 0 4px !important;
 }
-/*
-table.PreferenceGroup thead td {
-	font-weight: bold;
-	border-top: 1px solid #aaa;
-	border-bottom: 1px solid #aaa;
-	padding: 2px 6px;
-}
-table.PreferenceGroup tbody td {
-	border-bottom: 1px solid #eee;
-	padding: 2px 6px;
-}
-table.PreferenceGroup td.Description {
-	font-size: 12px;
-}
-table.PreferenceGroup tbody td.PrefCheckBox {
-	text-align: center;
-}
-*/
 
 /* About in content area */
 dl.About dt,
@@ -1758,7 +1392,6 @@ form.Thumbnail .Warning {
    -webkit-border-radius: 3px;
 }
 
-
 /* ================================================= CommentForm */
 .Preview {
 	background: #fff;
@@ -1770,17 +1403,12 @@ form.Thumbnail .Warning {
 	position: relative;
    text-align: right; 
 	margin: 0;
-	/* padding: 6px; */
 	padding: 6px 0;
 }
 .CommentForm .Buttons .Cancel,
 .CommentForm .Buttons .Back {
 	float: left;
 	line-height: 2.2;
-	/*
-	left: 6px;
-   position: absolute;
-	*/
 }
 .Bullet {
    font-size: 10px;
@@ -1830,12 +1458,6 @@ div.Popup .Body {
   padding: 10px;
   float: left; /* Put this here b/c background of form was not descending to bottom of popup. */
 }
-/*div.Popup .Legal,
-div.Popup .Content form {
-	max-height: 440px;
-	overflow: auto;
-	padding: 0 10px 10px;
-}*/
 div.Popup .Loading {
   text-align: center;
 }
@@ -1861,12 +1483,6 @@ div.Popup .Footer {
 	margin: 0;
 	text-align: right;
 }
-/*
-div.Popup .Footer input.Button {
-	font-size: 11px;
-	margin-right: 2px;
-}
-*/
 div.Popup h3 {
 	font-size: 120%;
 	font-weight: bold;
@@ -1886,7 +1502,6 @@ div.Popup form p {
 }
 body.Profile.EditMode ul li label,
 div.Popup form ul li label {
-/*	color:#000;*/
 	display:block;
 	font-size:14px;
 	font-weight:bold;
@@ -1907,12 +1522,6 @@ div.Popup form ul li label.RadioLabel,
 div.Popup form ul li label.CheckBoxLabel {
 	font-weight: normal;
 }
-/*
-div.Profile.EditMode input.Button,
-div.Popup input.Button {
-	margin: 4px 0 2px;
-}
-*/
 body.Profile.EditMode .Warning {
 	margin: 10px 0;
 }
@@ -1979,15 +1588,6 @@ div.Popup form ul li label.RadioLabel {
    overflow: hidden;
    font-size: 0;
 }
-/*
-#Foot div {
-	width: 960px;
-	padding: 6px 0;
-	margin: 20px auto 0;
-	text-align: left;
-}
-*/
-
 
 /* ================================ Vanilla ================================= */
 
@@ -2048,19 +1648,6 @@ div.Popup form ul li label.RadioLabel {
 .ItemDiscussion .Message {
    margin-top: 20px;
 }
-/*.ItemDiscussion .MItem {
-	margin: 0;
-}
-.ItemDiscussion .MItem a,
-.ItemDiscussion .Author a {
-	color: #888888;
-   font-size: 12px;
-   font-style: italic;
-	font-weight: normal;
-}
-.ItemDiscussion .Author .ProfileLink {
-	display: none;
-}*/
 .ItemDiscussion .MItem a {
    font-size: 11px; 
 }
@@ -2085,54 +1672,44 @@ div.Popup form ul li label.RadioLabel {
 	width: 100%;
    table-layout: fixed;
 }
-
 .DataTable td {
 	padding: 4px;
 	border-bottom: 1px solid #ddd;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 	vertical-align: top;
 }
-
 .DataTable thead td {
 	font-weight: bold;
    vertical-align: bottom;
 }
-
 .CheckBoxColumn {
    width: 24px;
 }
-
 .DataTable .BlockColumn {
    width: 25%;
 }
 tbody .BlockColumn {
    padding: 8px 4px; /* compensate for line-height 1 */
 }
-
 .DataTable .BlockColumn-User {
    width: 15%;
 }
-
 td.BigCount {
    width: 90px;
    text-align: center;
    font-weight: bold;
 }
-
 .DiscussionsTable td.BigCount {
    width: 70px;
 }
-
 tbody td.BigCount {
    font-size: 16px;
    padding: 8px 4px;
 }
-
 .DataTable .Meta,
 .DataTable .MItem {
    font-size: 11px;
 }
-
 .DataTable .Title {
 	font-size: 13px;
 	font-weight: bold;
@@ -2142,7 +1719,6 @@ td.Opts {
 	text-align: right;
    width: 1px;
 }
-
 .MiniPager {
    display: inline-block;
 	margin-left: 3px;
@@ -2166,7 +1742,6 @@ tr.CategoryHeading td {
 .Block {
    line-height: 1;
 }
-
 .BlockTitle {
    display: block;
    font-weight: bold;
@@ -2176,29 +1751,18 @@ tr.CategoryHeading td {
    padding-bottom: 3px;
    font-size: 12px;
 }
-
 .Block .PhotoLink {
 	float: left;
 	margin: 0 5px 0 0;
 }
-
 .Block img {
    height: 24px;
 	width: 24px;
 }
-
 .Block .MItem {
    font-size: 10px;
    margin: 0;
 }
-
-/* ================================================================= Comments */
-/*
-This should be handled by a more generic class like #Content if it is really necessary.
-body.Discussion #Content {
-   margin-bottom: 20px;
-}
-*/
 
 /* ================================= Conversation, Discussion & Comment Forms */
 .SpNewConversation,
@@ -2231,37 +1795,11 @@ body.Discussion #Content {
 	border-bottom: 2px solid #ddd;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
-/* 
-.Editing {
-	background: #E3F4FF;
-}
-*/
 .DiscussionForm label {
    font-size: 14px;
    font-weight: bold;
    color: #666;
 }
-/*
-body.Conversations.add #Panel,
-body.Vanilla.Post #Panel {
-   display: none;
-}
-body.Conversations.add #Content,
-body.Vanilla.Post #Content {
-   width: 100%;
-   margin: 0;
-}
-*/
-/*
- #DiscussionForm h2 {
-   border: none;
-   color: #02475A;
-   font-size: 140%;
-   font-weight: bold;
-   margin: 0;
-   padding: 6px;
-}
-*/
 .FormWrapper {
 	background: #f7f7f7;
    background: rgba(0, 0, 0, 0.03);
@@ -2271,7 +1809,6 @@ body.Vanilla.Post #Content {
 .FormWrapper-Condensed {
    padding: 5px;
 }
-
 .DiscussionForm textarea {
    width: 100%;
    height: 100px;
@@ -2369,27 +1906,6 @@ textarea.MultiComplete {
 }
 
 /* ==================================================== New Conversation Form */
-/*
- #ConversationForm form {
-   border-radius: 2px;
-	-moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   border-radius: 2px;
-	background:none repeat scroll 0 0 #c4e1ff;
-	margin:0;
-	padding:20px;
-	text-align: right;
-}
-#ConversationForm h2 {
-	color:#02475A;
-	font-size:140%;
-	font-weight:bold;
-	margin:0;
-	padding:6px;
-	text-align: left;
-	border: 0;
-}
-*/
 #ConversationForm label {
 	display: block;
 	text-align: left;
@@ -2442,7 +1958,6 @@ body.Conversations a.Cancel {
 	white-space: nowrap;
 	z-index: 2;
 }
-
 
 /* Container */
 .Border {
@@ -2497,20 +2012,6 @@ ul.Tabs li a.EntryTabFor_password {
 
 
 /* ============================================================ Entry Screens */
-/* 
-body.Entry #Panel {
-   display: none;
-}
-body.Entry #Content {
-   float: none;
-   margin: 0 auto;
-   max-width: 500px;
-}
-*/
-/*body.Entry #Content form {
-	text-align: left;
-	padding: 10px;
-}*/
 body.Entry form ul li label {
 	font-size: 14px;
 	/* color: #474747; */
@@ -2528,28 +2029,11 @@ span.Incorrect {
    display: block;
    color: red;
 }
-/*body#dashboard_entry_password #Content,
-body#dashboard_entry_signin #Content,
-body#dashboard_entry_index #Content {
-	width: auto;
-}*/
-/*.SignInPopup .Content form {
-	padding: 0 10px 10px;
-}*/
-/*body#dashboard_entry_password #Content form,
-body#dashboard_entry_index #Content form,
-body#dashboard_entry_signin #Content form {
-	padding: 0;
-	text-align:left;
-}*/
 .SingleEntryMethod {
-	/* width: 290px; */
 	margin: 0 auto;
 }
 .MultipleEntryMethods {
-/*	width: 500px;*/
 	margin: 0 auto;
-/*   overflow: hidden;*/
 }
 .MultipleEntryMethods .MainForm {
    float: left;
@@ -2559,7 +2043,6 @@ body#dashboard_entry_signin #Content form {
 	line-height: 1;
    margin-left: 300px;
 }
-
 body#dashboard_entry_password #Content input.Password,
 body#dashboard_entry_signin #Content input.Password,
 body#dashboard_entry_index #Content input.Password,
@@ -2586,14 +2069,12 @@ body.Entry li.Buttons {
 	text-align: left;
 	padding: 0 0 10px;
 }
-
 .Methods .Method {
    margin: 5px 0;
 }
 .MainForm .InputBox {
    max-width: 250px;
 }
-
 /* Handshake */
 body#dashboard_entry_handshake #Content {
 	width: 720px;
@@ -2634,7 +2115,6 @@ body#dashboard_entry_handshake #Content h2 {
 	text-align: left;
 }
 
-
 /* Leaving Page */
 body#dashboard_entry_leave p {
 	margin: 0;
@@ -2645,47 +2125,6 @@ body#dashboard_entry_leave p.Leaving {
 	margin: 0 0 0 14px;
    padding: 20px 0 20px 50px;
 }
-
-/* External App Connect Designs */
-/*.Connect h1,
-.Connect h2 {
-	text-align: left;
-}
-.ConnectInfo {
-	margin: 10px 0;
-	position: relative;
-}
-.ConnectInfo img {
-   float: left;
-	height: 40px;
-	width: 40px;
-}
-.ConnectInfo span.Name {
-	padding-left: 46px;
-	font-weight: bold;
-	line-height: 1;
-	font-size: 13px;
-	color: #444;
-	display: block;
-}*/
-/*.ConnectInfo h3 {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-	font-size: 15px;
-	font-weight: bold;
-	line-height: 1.6;
-	color: #333;
-	padding: 0 0 10px 46px;
-	border: none;
-}*/
-/*.Connect form ul li label,
-.SignInPopup form ul li label,
-body#dashboard_entry_password form ul li label,
-body#dashboard_entry_signin form ul li label,
-body#dashboard_entry_index form ul li label {
-	font-size: 13px;
-	line-height: 1.5;
-	padding: 0;
-}*/
 .Connect form ul li#ConnectPassword label,
 .SignInPopup form ul li#ConnectPassword label {
 	padding: 10px 0 0;
@@ -2694,15 +2133,6 @@ body#dashboard_entry_index form ul li label {
 	font-size: 11px;
 	color: #777;
 }
-/*.Connect .ExistingUsername,
-.SignInPopup .ExistingUsername {
-	font-weight: bold;
-	line-height: 1;
-	font-size: 13px;
-	color: #000;
-	display: block;
-}*/
-
 
 /* Do not customize these unless you enjoy pain. */
 
@@ -2730,11 +2160,6 @@ body#dashboard_entry_index form ul li label {
    border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
-   /*
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-   */
 }
 .Errors a {
    color: #fff;
@@ -2750,11 +2175,6 @@ div.Popup .Errors ul {
    border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
-   /*
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-   */
 	border: 1px solid #a00 !important;
 }
 div.Popup .Errors {
@@ -2774,11 +2194,6 @@ div.Popup .Errors {
    -webkit-border-radius: 2px;
    white-space: pre;
    overflow: auto;
-   /*
-	box-shadow: 0px 0px 2px #333;
-	-moz-box-shadow: 0px 0px 2px #333;
-	-webkit-box-shadow: 0px 0px 2px #333;  
-   */
 }
 .Errors pre,
 .Errors pre * {
@@ -3223,15 +2638,6 @@ body.embed .Connect h2 {
 	background: #3B5998;
 	border-bottom: 1px solid #2E4778;
 }
-/*
- This is not very friendly for making the comments stay looking like the forum.
-.Embed a {
-	color: #3B5998 !important;
-}
-.Embed a:hover {
-	text-decoration: underline !important;
-}
-*/
 .Embed a.Button,
 .Embed a.Button:hover {
 	color: #333 !important;
@@ -3284,10 +2690,6 @@ body.embed .Connect h2 {
 }
 .Embed .MorePager {
 	padding: 2px 8px 4px;
-/*
- 	border-bottom: 1px solid #BEC8CC;
-	background: #f2f2f2;
-*/
 }
 /* ============================================================ Regarding */
 
@@ -3383,100 +2785,3 @@ body.embed .Connect h2 {
    height: 24px;
    width: 24px;
 }
-
-
-/* DEPRECATED: The following CSS has been deprecated in core as of 2.1a10. We
-  are keeping it in for themes that have custom views that depend on it. 
-.Tabs,
-.Headings {
-	display: block;
-   border-bottom: 1px solid #abdafb;
-   padding: 5px 8px;
-   margin: 0;
-   background: #cfecff;
-   position: relative;
-}
-.MessageForm .Tabs {
-	padding: 0;
-	border: 0;
-	background: none;
-	text-align: left;
-}
-.MessageForm .Tabs ul {
-	display: inline;
-}
-.Tabs li {
-   display: inline;
-   margin: 0;
-}
-.TabLink,
-.TabLink:link,
-.TabLink:hover,
-.TabLink:active,
-.TabLink:visited {
-   margin: 0;
-   border: 1px solid #abdafb;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   background: #bbe2f7;
-   display: inline;
-   font-weight: bold;
-   color: #1e79a7;
-   text-decoration: none;
-   padding: 5px 10px;
-	line-height: 2.6;
-	white-space: nowrap;
-}
-.TabLink:hover {
-   background: #f3fcff;
-}
-.Active .TabLink {
-   background: #fff;
-   color: #474747;
-}
-.Tabs .SubTab {
-	margin: 10px 0 0;
-	padding: 4px 8px;
-	background: #f3fcff;
-   border-radius: 2px;
-   -webkit-border-radius: 2px;
-   -moz-border-radius: 2px;
-}
-.HeadingTabs {
-	padding: 8px 8px 8px 12px;
-}
-.HeadingTabs ul {
-	display: inline;
-	float: right;
-}
-.HeadingTabs .SubTab {
-	font-size: 14px;
-	display: inline;
-	font-weight: bold;
-	background: none;
-	padding: 0;
-	line-height: 2.4;
-}
-.SearchTabs input.InputBox {
-	width: 560px;
-	margin-right: 10px;
-}
-.Headings {
-	position: relative;
-	text-align: left;
-}
-.Headings div {
-	display: inline-block;
-	padding-right: 10px;
-}
-.Headings .ItemHeading {
-	font-size: 14px;
-	font-weight: bold;
-	line-height: 2;
-}
-.Headings .MetaHeading {
-	font-size: 11px;
-}
-
-END DEPRECATED CSS */

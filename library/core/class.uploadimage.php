@@ -256,24 +256,6 @@ class Gdn_UploadImage extends Gdn_Upload {
       return $Sender->EventArguments['Parsed'];
    }
    
-   public function GenerateTargetName($TargetFolder, $Extension = 'jpg', $Chunk = FALSE) {
-      if (!$Extension) {
-         $Extension = trim(pathinfo($this->_UploadedFile['name'], PATHINFO_EXTENSION), '.');
-      }
-
-      do {
-         if ($Chunk) {
-            $Name = RandomString(12);
-            $Subdir = sprintf('%03d', mt_rand(0, 999)).'/';
-         } else {
-            $Name = RandomString(12);
-            $Subdir = '';
-         }
-         $Path = "$TargetFolder/{$Subdir}$Name.$Extension";
-      } while(file_exists($Path));
-      return $Path;
-   }
-   
    public static function ImageIco($GD, $TargetPath) {
       require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.ico.php';
       require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.functions.php';

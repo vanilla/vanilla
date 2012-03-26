@@ -35,6 +35,7 @@ $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.'
 $Definition['ValidateRequired'] = '%s is required.';
 $Definition['ValidateRequiredArray'] = 'You must select at least one %s.';
 $Definition['ValidateEmail'] = '%s does not appear to be valid.';
+$Definition['ValidateFormat'] = 'You are not allowed to post raw html.';
 $Definition['ValidateDate'] = '%s is not a valid date.';
 $Definition['ValidateInteger'] = '%s is not a valid integer.';
 $Definition['ValidateBoolean'] = '%s is not a valid boolean.';

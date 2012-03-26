@@ -262,6 +262,12 @@ if (!function_exists('ValidateEnum')) {
    }
 }
 
+if (!function_exists('ValidateFormat')) {
+   function ValidateFormat($Value) {
+      return strcasecmp($Value, 'Raw') != 0 || Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+   }
+}
+
 if (!function_exists('ValidateOneOrMoreArrayItemRequired')) {
    function ValidateOneOrMoreArrayItemRequired($Value, $Field) {
       return is_array($Value) === TRUE && count($Value) > 0 ? TRUE : FALSE;

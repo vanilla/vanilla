@@ -224,6 +224,26 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
    
+   public function FilterForm($Data) {
+      $Data = parent::FilterForm($Data);
+      $Data = array_diff_key($Data, 
+         array('Admin' => 0, 'Deleted' => 0, 'CountVisits' => 0, 'CountInvitations' => 0, 'CountNotifications' => 0, 'Preferences' => 0, 
+               'Permissions' => 0, 'LastIPAddress' => 0, 'AllIPAddresses' => 0, 'DateFirstVisit' => 0, 'DateLastActive' => 0, 'CountDiscussions' => 0, 'CountComments' => 0,
+               'Score' => 0));
+      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0));
+      }
+      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
+         unset($Data['Name']);
+      }
+      
+//      decho($Data);
+//      die();
+      
+      return $Data;
+      
+   }
+   
    /**
     * A convenience method to be called when inserting users (because users
     * are inserted in various methods depending on registration setups).

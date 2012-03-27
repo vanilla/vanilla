@@ -371,10 +371,12 @@ form .Button {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
+.PagerWrap {
+   overflow: hidden;
+}
 .Pager {
    font-weight: bold;
    float: right;
-   
 }
 .Pager a, .Pager span {
    display: inline-block;

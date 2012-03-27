@@ -112,7 +112,7 @@ class PagerModule extends Gdn_Module {
       $this->Offset = 0;
       $this->Limit = self::$DefaultPageSize;
       $this->TotalRecords = FALSE;
-      $this->Wrapper = '<div %1$s>%2$s</div>';
+      $this->Wrapper = '<div class="PagerWrap"><div %1$s>%2$s</div></div>';
       $this->PagerEmpty = '';
       $this->MoreCode = '»';
       $this->LessCode = '«';

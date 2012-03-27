@@ -295,6 +295,16 @@ class Gdn_Model extends Gdn_Pluggable {
          $this->SQL->NoReset()->Delete($this->Name, $Where, $Limit);
       }
    }
+   
+   /**
+    * Filter out any potentially insecure fields before they go to the database.
+    * @param array $Data 
+    */
+   public function FilterForm($Data) {
+      $Data = array_diff_key($Data, array('Attributes' => 0, 'DateInserted' => 0, 'InsertUserID' => 0, 'InsertIPAddress' => 0,
+            'DateUpdated' => 0, 'UpdateUserID' => 0, 'UpdateIPAddress' => 0));
+      return $Data;
+   }
 
    /**
     * Returns an array with only those keys that are actually in the schema.

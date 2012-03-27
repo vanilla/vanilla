@@ -100,6 +100,8 @@ class Gdn_Smarty {
          $Smarty->cache_dir = PATH_CACHE . DS . 'Smarty' . DS . 'cache';
          $Smarty->compile_dir = PATH_CACHE . DS . 'Smarty' . DS . 'compile';
          $Smarty->plugins_dir[] = PATH_LIBRARY . DS . 'vendors' . DS . 'SmartyPlugins';
+         
+         Gdn::PluginManager()->CallEventHandlers($Smarty, 'Gdn_Smarty', 'Init');
 
          $this->_Smarty = $Smarty;
       }

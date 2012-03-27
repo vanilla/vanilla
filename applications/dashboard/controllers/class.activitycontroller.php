@@ -298,6 +298,7 @@ class ActivityController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
+         $Data = $this->ActivityModel->FilterForm($Data);
          $Data['Format'] = C('Garden.InputFormatter');
          if ($UserID != Gdn::Session()->UserID) {
             // This is a wall post.

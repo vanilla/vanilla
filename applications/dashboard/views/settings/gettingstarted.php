@@ -211,7 +211,7 @@ echo $this->Form->Errors();
          <?php
          $Attribs = array('Multiline' => TRUE, 'class' => 'Message');
          if (!$this->Form->AuthenticatedPostBack())
-            $Attribs['value'] = T("Hi Pal!
+            $Attribs['value'] = T('InvitationMessage',"Hi Pal!
 
 Check out the new community forum I've just set up. It's a great place for us to chat with each other online.
 

@@ -374,6 +374,9 @@ form .Button {
 .PagerWrap {
    overflow: hidden;
 }
+.PageDescription .PagerWrap {
+   overflow: visible;
+}
 .Pager {
    font-weight: bold;
    float: right;
@@ -2637,13 +2640,6 @@ body.embed #Content {
 }
 body.embed .InformMessages {
 	display: none;
-}
-body.embed div.Popup h1,
-body.embed div.Popup h2,
-body.embed .Connect h1,
-body.embed .Connect h2 {
-	background: #3B5998;
-	border-bottom: 1px solid #2E4778;
 }
 .Embed a.Button,
 .Embed a.Button:hover {

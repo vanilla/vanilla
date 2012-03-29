@@ -61,6 +61,7 @@ $Construct
 	->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('Photo', 'varchar(255)', NULL)
    ->Column('Title', 'varchar(100)', NULL)
+   ->Column('Location', 'varchar(100)', NULL)
    ->Column('About', 'text', TRUE)
    ->Column('Email', 'varchar(200)', FALSE, 'index')
    ->Column('ShowEmail', 'tinyint(1)', '0')

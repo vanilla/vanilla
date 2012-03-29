@@ -233,7 +233,7 @@ class SettingsController extends DashboardController {
                   $this->SetData('Favicon', $Parts['SaveName']);
                }
             } catch (Exception $ex) {
-               $this->Form->AddError($ex->getMessage());
+               $this->Form->AddError($ex);
             }
             // If there were no errors, save the path to the logo in the config
             if ($this->Form->ErrorCount() == 0) {

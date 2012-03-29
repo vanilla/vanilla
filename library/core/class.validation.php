@@ -124,6 +124,7 @@ class Gdn_Validation {
       $this->AddRule('PhoneNA', 'function:ValidatePhoneNA');
       $this->AddRule('PhoneInt', 'function:ValidatePhoneInt');
       $this->AddRule('ZipCode', 'function:ValidateZipCode');
+      $this->AddRule('Format', 'function:ValidateFormat');
    }
 
 
@@ -210,6 +211,10 @@ class Gdn_Validation {
                case 'set':
                   $RuleNames[] = 'Enum';
                   break;
+            }
+            
+            if ($Field == 'Format') {
+               $RuleNames[] = 'Format';
             }
          }
          // Assign the rules to the field.

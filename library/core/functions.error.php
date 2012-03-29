@@ -439,6 +439,8 @@ function PermissionException($Permission = NULL) {
    elseif ($Permission == 'Banned')
       $Message = T("You've been banned.");
    else
-      $Message = sprintf(T('You need the %s permission to do that.'), $Permission);
+      $Message = T(
+         "PermissionRequired.$Permission",
+         sprintf(T('You need the %s permission to do that.'), $Permission));
    return new Exception($Message, 401);
 }

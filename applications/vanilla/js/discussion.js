@@ -288,6 +288,7 @@ jQuery(document).ready(function($) {
             },
             complete: function() {
                $(parent).find('span.TinyProgress').remove();
+               $(btn).closest('.Flyout').hide().closest('.ToggleFlyout').removeClass('Open');
             }
          });
       } else {
@@ -304,6 +305,7 @@ jQuery(document).ready(function($) {
       var btn = this;
       $(btn).parents('.Comment').find('div.Message').show();
       $(btn).parents('.CommentForm').remove();
+      return false;
    });
 
    // Delete comment

@@ -22,9 +22,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
    if ($this->Data('_PagerUrl'))
       $PagerOptions['Url'] = $this->Data('_PagerUrl');
    
-   echo '<div class="PagerWrap">';
    PagerModule::Write($PagerOptions);
-   echo '</div>';
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

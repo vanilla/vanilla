@@ -374,6 +374,9 @@ form .Button {
 .PagerWrap {
    overflow: hidden;
 }
+.PageDescription .PagerWrap {
+   overflow: visible;
+}
 .Pager {
    font-weight: bold;
    float: right;

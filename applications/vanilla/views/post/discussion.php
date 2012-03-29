@@ -5,7 +5,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
    $CancelUrl = '/vanilla/discussions/0/'.$this->Category->CategoryID.'/'.Gdn_Format::Url($this->Category->Name);
 
 ?>
-<div id="DiscussionForm" class="FormTitleWrapper">
+<div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
    <?php
 		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
 			echo Wrap($this->Data('Title'), 'h1');

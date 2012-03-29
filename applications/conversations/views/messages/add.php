@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div id="ConversationForm" class="FormTitleWrapper">
+<div id="ConversationForm" class="FormTitleWrapper ConversationForm">
    <?php
    echo Wrap($this->Data('Title'), 'h1');
    

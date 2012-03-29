@@ -1,14 +1,5 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
-
-   // Hijack "clear status" link clicks
-   $('#Status a.Change').live('click', function() {
-      // hijack the request and clear out the status
-      jQuery.get($(this).attr('href') + '?DeliveryType=BOOL');
-      $('#Status').remove();      
-      return false;
-   });
-
    // Set the max chars in the about form.
    $('form.About textarea').setMaxChars(1000);
    

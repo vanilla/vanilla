@@ -179,9 +179,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </table>
 </div>
 <?php
-   echo '<div class="P ClearFix">';
    PagerModule::Write($PagerOptions);
-   echo '</div>';
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

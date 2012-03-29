@@ -209,21 +209,25 @@ class ProfileController extends Gdn_Controller {
     * @since 2.0.0
     * @access public
     * @param mixed $UserID
-    * @param string $TransientKey Unique security identifier.
     */
-   public function Clear($UserID = '', $TransientKey = '') {
+   public function Clear($UserID = '') {
+      if (empty($_POST))
+         throw PermissionException('Javascript');
+      
       $UserID = is_numeric($UserID) ? $UserID : 0;
       $Session = Gdn::Session();
-      if ($Session->IsValid() && $Session->ValidateTransientKey($TransientKey)) {
-         if ($UserID != $Session->UserID && !$Session->CheckPermission('Garden.Users.Edit'))
-            $UserID = 0;
+      if ($UserID != $Session->UserID && !$Session->CheckPermission('Garden.Moderation.Manage'))
+         throw PermissionException('Garden.Moderation.Manage');
 
-         if ($UserID > 0)
-            $this->UserModel->SaveAbout($UserID, '');
-      }
+      if ($UserID > 0)
+         $this->UserModel->SaveAbout($UserID, '');
 
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
          Redirect('/profile');
+      else {
+         $this->JsonTarget('#Status', '', 'Remove');
+         $this->Render('Blank', 'Utility');
+      }
    }
 
    /**

@@ -45,5 +45,5 @@ $Configuration['Vanilla']['Comments']['AutoOffset']            = TRUE;
 $Configuration['Vanilla']['Comment']['ReplaceNewlines']        = TRUE;
 
 // Module visibility
-$Configuration['Vanilla']['Modules']['ShowBookmarkedModule']    = TRUE;
+$Configuration['Vanilla']['Modules']['ShowBookmarkedModule']    = FALSE;
 

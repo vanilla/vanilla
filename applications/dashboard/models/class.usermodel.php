@@ -157,16 +157,23 @@ class UserModel extends Gdn_Model {
       }
 
       // Update the user's roles.
-      $Roles = GetValue('ConfirmedEmailRoles', $Attributes, C('Garden.Registration.DefaultRoles'));
+      $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
+      $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
+      $Roles = GetValue('ConfirmedEmailRoles', $Attributes, $DefaultRoles);
+      if (in_array($ConfirmRoleID, $Roles)) {
+//         throw new Exception('Foo!!!');
+         // The user is reconfirming to the confirm email role. At least set to the default roles.
+         $Roles = $DefaultRoles;
+      }
+      
       $this->EventArguments['ConfirmUserID'] = $UserID;
       $this->EventArguments['ConfirmUserRoles'] = &$Roles;
       $this->FireEvent('BeforeConfirmEmail');
       $this->SaveRoles($UserID, $Roles, FALSE);
       
       // Remove the email confirmation attributes.
-      unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);
-      $this->SaveAttribute($UserID, $Attributes);
-      
+//      unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);
+      $this->SaveAttribute($UserID, array('EmailKey' => NULL, 'ConfirmedEmailRoles' => NULL));
       return TRUE;
    }
 
@@ -215,6 +222,26 @@ class UserModel extends Gdn_Model {
          }
       }
       return $UserID;
+   }
+   
+   public function FilterForm($Data) {
+      $Data = parent::FilterForm($Data);
+      $Data = array_diff_key($Data, 
+         array('Admin' => 0, 'Deleted' => 0, 'CountVisits' => 0, 'CountInvitations' => 0, 'CountNotifications' => 0, 'Preferences' => 0, 
+               'Permissions' => 0, 'LastIPAddress' => 0, 'AllIPAddresses' => 0, 'DateFirstVisit' => 0, 'DateLastActive' => 0, 'CountDiscussions' => 0, 'CountComments' => 0,
+               'Score' => 0));
+      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0));
+      }
+      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
+         unset($Data['Name']);
+      }
+      
+//      decho($Data);
+//      die();
+      
+      return $Data;
+      
    }
    
    /**
@@ -998,7 +1025,9 @@ class UserModel extends Gdn_Model {
                   // The confirm email role is set and it exists so go ahead with the email confirmation.
                   $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
                   
-                  if ($RoleIDs)
+                  if (isset($Attributes['ConfirmedEmailRoles']) && !in_array($ConfirmEmailRoleID, $Attributes['ConfirmedEmailRoles']))
+                     $ConfirmedEmailRoles = $Attributes['ConfirmedEmailRoles'];
+                  elseif ($RoleIDs)
                      $ConfirmedEmailRoles = $RoleIDs;
                   else
                      $ConfirmedEmailRoles = ConsolidateArrayValuesByKey($this->GetRoles($UserID), 'RoleID');
@@ -1701,6 +1730,9 @@ class UserModel extends Gdn_Model {
       }
       
       if ($Changed) {
+         $this->EventArguments['Fields'] =& $Fields;
+         $this->FireEvent('UpdateVisit');
+         
          $this->SetField($UserID, $Fields);
       }
       
@@ -2814,6 +2846,7 @@ class UserModel extends Gdn_Model {
          $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsIncrement));
          Gdn::Cache()->Remove($UserPermissionsKey);
       }
+      unset(self::$UserCache[$UserID]);
       return TRUE;
    }
    

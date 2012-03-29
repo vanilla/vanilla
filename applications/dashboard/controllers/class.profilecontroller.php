@@ -844,12 +844,18 @@ class ProfileController extends Gdn_Controller {
       $Upload = new Gdn_UploadImage();
       $PhotoParsed = Gdn_Upload::Parse($Basename);
       $Source = $Upload->CopyLocal($Basename);
-
+      
       if (!$Source) {
          $this->Form->AddError('You cannot edit the thumbnail of an externally linked profile picture.');
       } else {
          $this->SourceSize = getimagesize($Source);
       }
+      
+      // We actually need to upload a new file to help with cdb ttls.
+      $NewPhoto = $Upload->GenerateTargetName(
+         'userpics', 
+         trim(pathinfo($this->User->Photo, PATHINFO_EXTENSION), '.'),
+         TRUE);
       
       // Add some more hidden form fields for jcrop
       $this->Form->AddHidden('x', '0');
@@ -864,9 +870,18 @@ class ProfileController extends Gdn_Controller {
             // Get the dimensions from the form.
             Gdn_UploadImage::SaveImageAs(
                $Source,
-               ChangeBasename($this->User->Photo, 'n%s'),
+               ChangeBasename($NewPhoto, 'n%s'),
                $this->ThumbSize, $this->ThumbSize,
                array('Crop' => TRUE, 'SourceX' => $this->Form->GetValue('x'), 'SourceY' => $this->Form->GetValue('y'), 'SourceWidth' => $this->Form->GetValue('w'), 'SourceHeight' => $this->Form->GetValue('h')));
+            
+            // Save new profile picture.
+            $Parsed = $Upload->SaveAs($Source, ChangeBasename($NewPhoto, 'p%s'));
+            $UserPhoto = sprintf($Parsed['SaveFormat'], $NewPhoto);
+            // Save the new photo info.
+            Gdn::UserModel()->SetField($this->User->UserID, 'Photo', $UserPhoto);
+            
+            // Remove the old profile picture.
+            @$Upload->Delete($Basename);
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);
          }

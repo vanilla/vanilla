@@ -187,16 +187,23 @@ class Gdn_Upload extends Gdn_Pluggable {
 		return GetValue('extension', $Info, '');
 	}
 
-	public function GenerateTargetName($TargetFolder, $Extension = '') {
-		if ($Extension == '')
-			$Extension = $this->GetUploadedFileExtension();
+   public function GenerateTargetName($TargetFolder, $Extension = 'jpg', $Chunk = FALSE) {
+      if (!$Extension) {
+         $Extension = trim(pathinfo($this->_UploadedFile['name'], PATHINFO_EXTENSION), '.');
+      }
 
-		$Name = RandomString(12);
-		while (file_exists($TargetFolder . DS . $Name . '.' . $Extension)) {
-			$Name = RandomString(12);
-		}
-		return $TargetFolder . DS . $Name . '.' . $Extension;
-	}
+      do {
+         if ($Chunk) {
+            $Name = RandomString(12);
+            $Subdir = sprintf('%03d', mt_rand(0, 999)).'/';
+         } else {
+            $Name = RandomString(12);
+            $Subdir = '';
+         }
+         $Path = "$TargetFolder/{$Subdir}$Name.$Extension";
+      } while(file_exists($Path));
+      return $Path;
+   }
 
 	public function SaveAs($Source, $Target) {
       $this->EventArguments['Path'] = $Source;

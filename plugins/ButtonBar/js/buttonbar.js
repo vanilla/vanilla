@@ -210,7 +210,7 @@ $.fn.insertRoundTag = function(tagName, opts, props){
       else
          strEnd = strEnd + closeslice + closer + suffix;
    }
-   $(this).insertRoundCaret(strStart+prepend, strEnd, strReplace);
+   jQuery(this).insertRoundCaret(strStart+prepend, strEnd, strReplace);
 }
 
 jQuery(document).ready(function($) {

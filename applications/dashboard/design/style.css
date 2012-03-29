@@ -982,6 +982,7 @@ overflow: hidden; */
    font-weight: bold;
    margin: 0;
 }
+.ItemDiscussion .Meta,
 .DataList .Meta {
    font-size: 11px;
    color: #70727c;
@@ -1151,6 +1152,7 @@ blockquote {
    margin: 1em 0;
 	background: #f3f3f3;
    background: rgba(0, 0, 0, 0.05);
+   border-left: 4px solid rgba(0, 0, 0, 0.1);
 }
 .Message small {
 	font-size: 11px;
@@ -1650,6 +1652,7 @@ div.Popup form ul li label.RadioLabel {
 .ItemDiscussion {
    margin-bottom: 20px;
 }
+/*
 .ItemDiscussion .Message {
    margin-top: 20px;
 }
@@ -1661,6 +1664,7 @@ div.Popup form ul li label.RadioLabel {
 	width: 24px;
    margin: 0 5px 5px 0;
 }
+*/
 .ItemDiscussion .Message {
 	margin-bottom: 5px; /* Consistency with when only h1 starts page */
 	font-size: 110%;

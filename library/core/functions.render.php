@@ -364,6 +364,16 @@ if (!function_exists('Wrap')) {
       return '<'.$Tag.$Attributes.'>'.$String.'</'.$Tag.'>';
    }
 }
+
+/**
+ * Wrap the provided string in the specified tag if the string is not empty. ie. WrapIf('This is bold!', 'b');
+ */
+if (!function_exists('WrapIf')) {
+   function WrapIf($String, $Tag = 'span', $Attributes = '') {
+      return (trim($String) == '') ? '' : Wrap($String, $Tag, $Attributes);
+   }
+}
+
 /**
  * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
  */

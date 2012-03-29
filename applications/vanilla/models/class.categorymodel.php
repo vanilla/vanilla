@@ -193,7 +193,7 @@ class CategoryModel extends Gdn_Model {
             $Row['LastUserID'] = $Discussion['InsertUserID'];
             $Row['LastDateInserted'] = $Discussion['DateInserted'];
             $NameUrl = Gdn_Format::Text($Discussion['Name'], TRUE);
-            $Row['LastUrl'] = Url("/discussion/{$Discussion['DiscussionID']}/$NameUrl");
+            $Row['LastUrl'] = DiscussionUrl($Discussion);
          }
          $Comment = GetValue($Row['LastCommentID'], $Comments);
          if ($Comment) {
@@ -1182,11 +1182,22 @@ class CategoryModel extends Gdn_Model {
             
             SetValue('LastUserID', $Category, GetValue('LastDiscussionUserID', $Category, NULL));
             SetValue('LastDateInserted', $Category, GetValue('DateLastDiscussion', $Category, NULL));
-            SetValue('LastUrl', $Category, '/discussion/'.GetValue('LastDiscussionID', $Category).'/'.Gdn_Format::Url(GetValue('LastTitle', $Category)).'/p1');
+            
+            $LastDiscussion = ArrayTranslate($Category, array(
+                'LastDiscussionID' => 'DiscussionID', 
+                'CategoryID' => 'CategoryID',
+                'LastTitle' => 'Name'));
+            
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, 1));
          } else {
+            $LastDiscussion = ArrayTranslate($Category, array(
+                'LastDiscussionID' => 'DiscussionID', 
+                'CategoryID' => 'CategoryID',
+                'LastTitle' => 'Name'));
+            
             SetValue('LastUserID', $Category, GetValue('LastCommentUserID', $Category, NULL));
             SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));
-            SetValue('LastUrl', $Category, '/discussion/'.GetValue('LastDiscussionID', $Category).'#Latest');
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '#Latest'));
          }
          
          if ($DateMarkedRead) {

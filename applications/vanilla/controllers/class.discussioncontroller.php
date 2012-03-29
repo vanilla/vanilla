@@ -118,7 +118,9 @@ class DiscussionController extends VanillaController {
          $this->Offset = 0;
       
       // Set the canonical url to have the proper page title.
-      $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
+      $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, FALSE)));
+      
+//      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
       
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
@@ -166,8 +168,10 @@ class DiscussionController extends VanillaController {
          $this->Offset,
          $Limit,
          $ActualResponses,
-         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s'
+         array('DiscussionUrl')
       );
+      $this->Pager->Record = $this->Discussion;
+      PagerModule::Current($this->Pager);
       $this->FireEvent('AfterBuildPager');
       
       // Define the form for the comment input

@@ -2,10 +2,10 @@
 $Session = Gdn::Session();
 $CancelUrl = '/vanilla/discussions';
 if (C('Vanilla.Categories.Use') && is_object($this->Category))
-   $CancelUrl = '/vanilla/discussions/0/'.$this->Category->CategoryID.'/'.Gdn_Format::Url($this->Category->Name);
+   $CancelUrl = '/vanilla/categories/'.urlencode($this->Category->UrlCode);
 
 ?>
-<div id="DiscussionForm" class="FormTitleWrapper">
+<div id="DiscussionForm" class="DiscussionForm FormTitleWrapper">
    <?php
 		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
 			echo Wrap($this->Data('Title'), 'h1');

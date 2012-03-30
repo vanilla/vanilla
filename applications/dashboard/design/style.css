@@ -1438,6 +1438,7 @@ form.Thumbnail .Warning {
 .MSIE .Overlay {
    background: gray;
    filter: alpha(opacity=0);
+   position: static;
 }
 div.Popup {
   position: absolute;

@@ -2048,6 +2048,7 @@ span.Incorrect {
 }
 .MultipleEntryMethods {
 	margin: 0 auto;
+   overflow: hidden;
 }
 .MultipleEntryMethods .MainForm {
    float: left;

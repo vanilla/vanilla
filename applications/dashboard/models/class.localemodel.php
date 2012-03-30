@@ -22,9 +22,6 @@ class LocaleModel {
          $AvailableLocales = array();
          foreach ($LocaleInfoPaths as $InfoPath) {
             $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
-            // Omit skeleton example
-            if (GetValue('Index', $LocaleInfo) == 'skeleton')
-               continue;
             $AvailableLocales[$LocaleInfo['Index']] = $LocaleInfo;
          }
          $this->_AvailableLocalePacks = $AvailableLocales;
@@ -37,7 +34,7 @@ class LocaleModel {
       $Locales = array_unique(ConsolidateArrayValuesByKey($this->AvailableLocalePacks(), 'Locale'), SORT_STRING);
       asort($Locales);
       $Locales = array_combine($Locales, $Locales);
-
+   
       return $Locales;
    }
 

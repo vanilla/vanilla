@@ -465,59 +465,21 @@ class Gdn_Configuration extends Gdn_Pluggable {
    }
 
    /**
-    * Loads an array of settings into the object with the specified group name.
-    * 
     * DO NOT USE, THIS IS RUBBISH
     * 
     * @deprecated
-    * @param string $Name The name of this group of configuration settings.
-    * <b>Note</b>: When $Name is 'Configuration' then the data will be set to the root of the config.
-    * @param array $Settings The array of settings being loaded.
-    * @param boolean $Overwrite A boolean value indicating if the loaded settings should overwrite the
-    * existing settings in $Group.
-    * @return boolean
     */
    public function LoadArray($Name, $Settings, $Overwrite = FALSE) {
-      if (!is_array($this->Data))
-         $this->Data = array();
-      
-      if ($Name == $this->DefaultGroup)
-         $Name == '';
-         
-      // Find the spot to insert the settings.
-      $Loc = &$this->Find($Name, TRUE);
-      
-      if (is_null($Loc) || $Overwrite === TRUE) {
-         $Loc = $Settings;
-         return TRUE;
-      } else {
-         return FALSE;
-      }
+      throw new Exception("DEPRECATED");
    }
 
    /**
-    * Load and parse a file based config
-    * 
     * DO NOT USE, THIS IS RUBBISH
     * 
     * @deprecated
-    * @param type $Path
-    * @param type $Options
-    * @return array 
     */
    public static function LoadFile($Path, $Options = array()) {
-      if (is_string($Options))
-         $Options = array('VariableName' => $Options);
-
-      $Defaults = array('VariableName' => $this->DefaultGroup);
-      $Options = array_merge($Defaults, $Options);
-      $VariableName = $Options['VariableName'];
-
-      $$VariableName = array();
-      if (file_exists($Path)) {
-         require $Path;
-      }
-      return $$VariableName;
+      throw new Exception("DEPRECATED");
    }
    
    /**
@@ -538,7 +500,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
    /**
     * Merge a newly loaded config into the current active state
     * 
-    * Resursively 
+    * Recursively 
     * 
     * @param array $Data Reference to the current active state
     * @param array $Loaded Reference to the new to-merge data
@@ -551,6 +513,15 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $Data[$Key] = $Value;
          }
       }
+   }
+   
+   /**
+    * Get current dynamic ConfigurationSource
+    * 
+    * @return Gdn_ConfigurationSource
+    */
+   public function Dynamic() {
+      return $this->Dynamic;
    }
 
    /**
@@ -957,6 +928,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       return $this->Settings;
    }
    
+   public function Import($Settings) {
+      $this->Settings = $Settings;
+      $this->Dirty = TRUE;
+   }
+   
    /**
     * Removes the specified key from the config (if it exists).
     * Returns FALSE if the key is not found for removal, TRUE otherwise.
@@ -1106,7 +1082,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
    }
    
    public function Save() {
-      if (!$this->Dirty) return;
+      if (!$this->Dirty) return NULL;
       
       $this->EventArguments['ConfigDirty'] = &$this->Dirty;
       $this->EventArguments['ConfigNoSave'] = FALSE;
@@ -1117,7 +1093,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       
       if ($this->EventArguments['ConfigNoSave']) {
          $this->Dirty = FALSE;
-         return NULL;
+         return TRUE;
       }
       
       // Check for and fire callback if one exists
@@ -1137,7 +1113,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
          
          if ($ConfigSaved) {
             $this->Dirty = FALSE;
-            return NULL;
+            return TRUE;
          }
       }
       
@@ -1220,7 +1196,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
              * an event hook or callback, if at all.
              */
             $this->Dirty = FALSE;
-            return TRUE;
+            return FALSE;
             break;
       }
    }

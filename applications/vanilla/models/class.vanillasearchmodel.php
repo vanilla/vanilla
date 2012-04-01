@@ -70,6 +70,7 @@ class VanillaSearchModel extends Gdn_Model {
 			->Select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
 			->Select('d.DateInserted')
 			->Select('d.InsertUserID as UserID')
+         ->Select("'Discussion'", '', 'RecordType')
 			->From('Discussion d');
 		
 		// Execute query
@@ -106,6 +107,7 @@ class VanillaSearchModel extends Gdn_Model {
 			->Select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
 			->Select('c.DateInserted')
 			->Select('c.InsertUserID as UserID')
+         ->Select("'Comment'", '', 'RecordType')
 			->From('Comment c')
 			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID');
 		

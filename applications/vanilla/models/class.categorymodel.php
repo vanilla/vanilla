@@ -1197,7 +1197,7 @@ class CategoryModel extends Gdn_Model {
             
             SetValue('LastUserID', $Category, GetValue('LastCommentUserID', $Category, NULL));
             SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));
-            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '#Latest'));
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE).'#latest');
          }
          
          if ($DateMarkedRead) {

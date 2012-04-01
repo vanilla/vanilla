@@ -131,6 +131,13 @@ class SearchModel extends Gdn_Model {
 				$Value['Summary'] = Condense(Gdn_Format::To($Value['Summary'], $Value['Format']));
 				$Result[$Key] = $Value;
 			}
+         
+         switch ($Value['RecordType']) {
+            case 'Discussion':
+               $Discussion = ArrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
+               $Result[$Key]['Url'] = DiscussionUrl($Discussion, 1);
+               break;
+         }
 		}
       
 		return $Result;

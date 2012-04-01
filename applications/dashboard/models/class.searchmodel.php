@@ -40,11 +40,18 @@ class SearchModel extends Gdn_Model {
          $Sql->BeginWhereGroup();
 
          $ColumnsArray = explode(',', $Columns);
+         
+         $First = TRUE;
          foreach ($ColumnsArray as $Column) {
             $Column = trim($Column);
 
             $Param = $this->Parameter();
-            $Sql->OrWhere("$Column like $Param", NULL, FALSE, FALSE);
+            if ($First) {
+               $Sql->Where("$Column like $Param", NULL, FALSE, FALSE);
+               $First = FALSE;
+            } else {
+               $Sql->OrWhere("$Column like $Param", NULL, FALSE, FALSE);
+            }
          }
 
          $Sql->EndWhereGroup();

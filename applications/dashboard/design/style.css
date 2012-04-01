@@ -1790,6 +1790,7 @@ tr.CategoryHeading td {
 }
 .FormType li {
 	display: inline-block;
+   white-space: nowrap;
 }
 .FormType li a {
 	margin: 0 6px;
@@ -1800,12 +1801,7 @@ tr.CategoryHeading td {
 	border-bottom: 2px solid #ddd;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
-/* 
-.Editing {
-	background: #E3F4FF;
-}
-*/
-#DiscussionForm label {
+.DiscussionForm label {
    font-size: 14px;
    font-weight: bold;
    color: #666;
@@ -1819,29 +1815,28 @@ tr.CategoryHeading td {
 .FormWrapper-Condensed {
    padding: 5px;
 }
-
-#DiscussionForm textarea {
+.DiscussionForm textarea {
    width: 100%;
    height: 100px;
    min-height: 100px;
    margin: 0 0 6px;
 }
-#DiscussionForm .Category,
-#DiscussionForm input.InputBox {
+.DiscussionForm .Category,
+.DiscussionForm input.InputBox {
    width: 100%;
 	margin-bottom: 10px;
 }
-#DiscussionForm .Category label {
+.DiscussionForm .Category label {
    padding: 0 8px 0 0;
 }
-#DiscussionForm a.Cancel {
+.DiscussionForm a.Cancel {
 	margin-left: 18px;
 }
-#DiscussionForm .PostOptions li {
+.DiscussionForm .PostOptions li {
    display: inline;
    padding: 0 8px 0 0;
 }
-#DiscussionForm .PostOptions label {
+.DiscussionForm .PostOptions label {
    display: inline;
    font-weight: normal;
    font-size: 95%;

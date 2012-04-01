@@ -75,8 +75,6 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 //			if ($Source = GetValue('Source', $Discussion))
 //				echo ' '.sprintf(T('via %s'), T($Source.' Source', $Source));
 //	
-//			if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-//				echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
 			?>
 		</div>
 	</td>

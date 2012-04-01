@@ -36,6 +36,27 @@ if (!function_exists('BigPlural')) {
    }
 }
 
+if (!function_exists('CategoryUrl')):
+
+/**
+ * Return a url for a category. This function is in here and not functions.general so that plugins can override.
+ * @param array $Category
+ * @return string
+ */
+function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+   if (is_string($Category))
+      $Category = CategoryModel::Categories($Category);
+   $Category = (array)$Category;
+   
+   $Result = '/categories/'.rawurlencode($Category['UrlCode']);
+   if ($Page && $Page > 1) {
+         $Result .= '/p'.$Page;
+   }
+   return Url($Result, $WithDomain);
+}
+   
+endif;
+
 if (!function_exists('Condense')) {
    function Condense($Html) {
       $Html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $Html);

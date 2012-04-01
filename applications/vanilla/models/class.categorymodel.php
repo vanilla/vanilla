@@ -1230,7 +1230,7 @@ class CategoryModel extends Gdn_Model {
 		foreach ($Data as &$Category) {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
          $Category['CountAllComments'] = $Category['CountComments'];
-         $Category['Url'] = Url('/categories/'.rawurlencode($Category['UrlCode']), TRUE);
+         $Category['Url'] = CategoryUrl($Category);
          $Category['ChildIDs'] = array();
 		}
       

@@ -104,8 +104,14 @@ if (!function_exists('DiscussionUrl')):
  * @param object $Discussion
  * @return string
  */
-function DiscussionUrl($Discussion) {
-   return Url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name), TRUE);
+function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
+   $Discussion = (object)$Discussion;
+   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+   if ($Page) {
+      if ($Page > 1 || Gdn::Session()->UserID)
+         $Result .= '/p'.$Page;
+   }
+   return Url($Result, $WithDomain);
 }
    
 endif;

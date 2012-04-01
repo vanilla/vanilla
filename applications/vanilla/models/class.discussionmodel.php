@@ -624,7 +624,7 @@ class DiscussionModel extends VanillaModel {
       
       $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
-      $Data->Url = Url('/discussion/'.$Data->DiscussionID.'/'.Gdn_Format::Url($Data->Name), TRUE);
+      $Data->Url = DiscussionUrl($Data);
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);
@@ -888,6 +888,7 @@ class DiscussionModel extends VanillaModel {
 
                if (!$Spam) {
                   $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+                  $Fields['DiscussionID'] = $DiscussionID;
                   
                   // Update the cache.
                   if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
@@ -897,7 +898,7 @@ class DiscussionModel extends VanillaModel {
                          'LastTitle' => Gdn_Format::Text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
                          'LastUserID' => $Fields['InsertUserID'],
                          'LastDateInserted' => $Fields['DateInserted'],
-                         'LastUrl' => '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Fields['Name'])
+                         'LastUrl' => DiscussionUrl($Fields)
                      );
                      CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
                   }
@@ -930,7 +931,7 @@ class DiscussionModel extends VanillaModel {
                    'HeadlineFormat' => $HeadlineFormat,
                    'RecordType' => 'Discussion',
                    'RecordID' => $DiscussionID,
-                   'Route' => "/discussion/$DiscussionID/".Gdn_Format::Url($DiscussionName),
+                   'Route' => DiscussionUrl($Fields),
                    'Data' => array('Name' => $DiscussionName)
                );
                

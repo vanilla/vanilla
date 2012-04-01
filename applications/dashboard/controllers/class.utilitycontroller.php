@@ -357,6 +357,8 @@ class UtilityController extends DashboardController {
       if ($Target = $this->Request->Get('Target')) {
          Redirect($Target);
       }
+      
+      $this->FireEvent('AfterUpdate');
 
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';

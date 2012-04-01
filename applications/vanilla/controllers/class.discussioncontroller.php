@@ -618,7 +618,7 @@ class DiscussionController extends VanillaController {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          
          if ($Comment && $Discussion) {
-            $DefaultTarget = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+            $DefaultTarget = DiscussionUrl($Discussion);
             
             // Make sure comment is this user's or they have Delete permission
             if ($Comment->InsertUserID != $Session->UserID)
@@ -729,7 +729,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
             $this->Offset = 0;
 
          // Set the canonical url to have the proper page title.
-         $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE)), TRUE));
+         $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
 
          // Load the comments
          $CurrentOrderBy = $this->CommentModel->OrderBy();

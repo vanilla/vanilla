@@ -364,6 +364,25 @@ if (!function_exists('Wrap')) {
       return '<'.$Tag.$Attributes.'>'.$String.'</'.$Tag.'>';
    }
 }
+
+if (!function_exists('WrapIf')) {
+   /**
+    * Wrap the provided string if it isn't empty.
+    * 
+    * @param string $String
+    * @param string $Tag
+    * @param array $Attributes
+    * @return string
+    * @since 2.1 
+    */
+   function WrapIf($String, $Tag = 'span', $Attributes = '') {
+      if (empty($String))
+         return '';
+      else
+         return Wrap($String, $Tag, $Attributes);
+   }
+}
+
 /**
  * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
  */

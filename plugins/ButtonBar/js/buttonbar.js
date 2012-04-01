@@ -224,6 +224,8 @@ jQuery(document).ready(function($) {
          var format = $(TextArea).attr('format');
          if (!format)
             format = gdn.definition('InputFormat', 'Html');
+         if (format == 'Raw')
+            format = 'Html';
          
          // Apply the page's InputFormat to this textarea.
          $(TextArea).data('InputFormat', format);

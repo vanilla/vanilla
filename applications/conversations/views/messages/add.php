@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="ConversationForm" class="FormTitleWrapper ConversationForm">
    <?php
-   echo Wrap($this->Data('Title'), 'h1');
+   echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
    
    echo '<div class="FormWrapper">'; 
    echo $this->Form->Open();

@@ -2,7 +2,7 @@
 $Session = Gdn::Session();
 ?>
 <div class="User" itemscope itemtype="http://schema.org/Person">
-   <h1><?php echo $this->User->Name; ?></h1>
+   <h1 class="H"><?php echo $this->User->Name; ?></h1>
    <?php
    if ($this->User->Admin == 2) {
       echo '<div class="Info">', T('This is a system account and does not represent a real person.'), '</div>';

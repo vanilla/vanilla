@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo $this->Participants; ?></h1>
+<h1 class="H"><?php echo $this->Participants; ?></h1>
 <?php
 if ($this->Data('Conversation.Subject') && C('Conversations.Subjects.Visible')) {
    echo '<h2>'.htmlspecialchars($this->Data('Conversation.Subject')).'</h2>';

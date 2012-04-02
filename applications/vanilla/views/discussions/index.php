@@ -2,7 +2,7 @@
 $Session = Gdn::Session();
 include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
-echo '<h1 class="HomepageTitle">'.
+echo '<h1 class="H HomepageTitle">'.
    AdminCheck(NULL, array('', ' ')).
    $this->Data('Title').
    '</h1>';

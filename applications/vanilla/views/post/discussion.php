@@ -8,7 +8,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
    <?php
 		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-			echo Wrap($this->Data('Title'), 'h1');
+			echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
 	
       echo '<div class="FormWrapper">';
       echo $this->Form->Open();

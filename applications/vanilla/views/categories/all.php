@@ -3,7 +3,7 @@
 if (!function_exists('GetOptions'))
    include $this->FetchViewLocation('helper_functions', 'categories');
    
-echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
 if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
 }

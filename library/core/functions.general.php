@@ -176,6 +176,7 @@ if (!function_exists('ArrayTranslate')) {
     * @return array
     */
    function ArrayTranslate($Array, $Mappings) {
+      $Array = (array)$Array;
       $Result = array();
       foreach ($Mappings as $Index => $Value) {
          if (is_numeric($Index)) {

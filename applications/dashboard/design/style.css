@@ -454,7 +454,7 @@ a.Small img {
    border-radius: 1;
    -moz-border-radius: 1;
    -webkit-border-radius: 1;
-   margin: 0 0 10px;
+   margin: 10px 0;
    padding: 10px;
 }
 .DismissMessage.Info {
@@ -1273,15 +1273,18 @@ body.Profile.EditMode #Content form {
 	background: #f3f3f3;
 	background: rgba(0, 0, 0, 0.05);
 }
-
 form.Activity {
    display: block;
-   margin: 10px;
+   margin: 10px 0;
 	text-align: right;
 }
 form.Activity textarea {
    width: 100%;
    margin-bottom: 2px;
+   height: 60px;
+   min-height: 60px;
+}
+.ActivityComments textarea {
    height: 60px;
    min-height: 60px;
 }

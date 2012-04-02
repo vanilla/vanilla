@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1 class="H"><?php echo $this->Data('Title'); ?></h1>
 <?php
 include_once $this->FetchViewLocation('helper_functions');
 

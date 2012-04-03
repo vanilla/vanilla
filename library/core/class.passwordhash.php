@@ -77,6 +77,13 @@ class Gdn_PasswordHash extends PasswordHash {
          case 'django':
             $Result = $this->CheckDjango($Password, $StoredHash);
             break;
+         case 'joomla':
+            $Parts = explode(':', $StoredHash, 2);
+            $Hash = GetValue(0, $Parts);
+            $Salt = GetValue(1, $Parts);
+            $ComputedHash = md5($Password.$Salt);
+            $Result = $ComputedHash == $Hash;
+            break;
          case 'phpbb':
             require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
             $Result = phpbb_check_hash($Password, $StoredHash);

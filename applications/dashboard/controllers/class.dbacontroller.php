@@ -1,0 +1,77 @@
+<?php if (!defined('APPLICATION')) exit();
+
+/**
+ * Contains useful functions for cleaning up the database.
+ *
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.1
+ */
+
+class DbaController extends DashboardController {
+   /// Properties ///
+   
+   /**
+    * @var DBAModel 
+    */
+   public $Model = NULL;
+   
+   
+   /// Methods ///
+   
+   public function __construct() {
+      parent::__construct();
+   }
+   
+   public function Initialize() {
+      parent::Initialize();
+      $this->Model = new DBAModel();
+      
+      $this->AddJsFile('dba.js');
+   }
+   
+   public function Counts($Table = FALSE, $Column = FALSE, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      $this->Permission('Garden.Settings.Manage');
+      
+      if (strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
+         if (!ValidateRequired($Table))
+            throw new Gdn_UserException("Table is required.");
+         if (!ValidateRequired($Column))
+            throw new Gdn_UserException("Column is required.");
+         
+         $Result = $this->Model->Counts($Table, $Column, $From, $To);
+         $Result['Foo'] = 'Bar';
+         $this->SetData('Result', $Result);
+      } else {
+         $this->SetData('Jobs', array());
+         $this->FireEvent('CountJobs');
+      }
+      
+      $this->SetData('Title', T('Recalculate Counts'));
+      $this->AddSideMenu();
+      $this->Render('Job');
+   }
+   
+   public function HtmlEntityDecode($Table, $Column) {
+      $this->Permission('Garden.Settings.Manage');
+      
+//      die($this->Request->RequestMethod());
+      if (strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
+         $Result = $this->Model->HtmlEntityDecode($Table, $Column);
+         $this->SetData('Result', $Result);
+      }
+      
+      $this->SetData('Title', "Decode Html Entities for $Table.$Column");
+      $this->_SetJob($this->Data('Title'));
+      $this->AddSideMenu();
+      $this->Render('Job');
+   }
+   
+   protected function _SetJob($Name) {
+      $Args = array_change_key_case($this->ReflectArgs);
+      $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);
+      $this->Data['Jobs'][$Name] = $Url;
+   }
+}

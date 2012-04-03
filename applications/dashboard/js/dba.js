@@ -37,6 +37,7 @@ jQuery(document).ready(function($) {
          $.ajax({
             url: url,
             type: 'POST',
+            data: {Postback: true },
             success: function(data) {
                var result = data.Result;
                

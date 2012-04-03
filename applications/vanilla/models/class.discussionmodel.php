@@ -71,6 +71,14 @@ class DiscussionModel extends VanillaModel {
                ->Where('d.DiscussionID <=', $To)
                ->Put();
             $Result['Complete'] = $To >= $Max;
+            
+            $Percent = round($To * 100 / $Max);
+            if ($Percent > 100 || $Result['Complete'])
+               $Result['Percent'] = '100%';
+            else
+               $Result['Percent'] = $Percent.'%';
+            
+            
             $From = $To + 1;
             $To = $From + DBAModel::$ChunkSize - 1;
             $Result['Args']['From'] = $From;

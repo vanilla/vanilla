@@ -1,8 +1,14 @@
 jQuery(document).ready(function($) {
+   if (!gdn.definition('Started', false))
+      return;
+   
    var jobs = {};
    
    // Gather up all of the jobs.
    $('.DBA-Job').each(function() {
+      if ($('input:checked', this).length == 0)
+         return;
+      
       jobs[$(this).attr('id')] = {
          rel: $(this).attr('rel'),
          count: 0,
@@ -24,9 +30,14 @@ jQuery(document).ready(function($) {
             url += '&'+$.param(job.args);
          }
          
+         if ($('.TinyProgress', $row).length == 0) {
+            $row.append('<span class="TinyProgress"> </span>');
+         }
+         
          $.ajax({
             url: url,
             type: 'POST',
+            data: {Postback: true },
             success: function(data) {
                var result = data.Result;
                
@@ -39,6 +50,10 @@ jQuery(document).ready(function($) {
                if (result.Count) {
                   jobs[id].count += result.Count;
                   $('.Count', $row).show().text(jobs[id].count);
+               }
+               
+               if (result.Percent) {
+                  $('.Count', $row).show().text(result.Percent);
                }
                
                if (result.Complete) {

@@ -14,6 +14,11 @@ class DbaController extends DashboardController {
    /// Properties ///
    
    /**
+    * @var Gdn_Form 
+    */
+   public $Form = NULL;
+   
+   /**
     * @var DBAModel 
     */
    public $Model = NULL;
@@ -28,6 +33,8 @@ class DbaController extends DashboardController {
    public function Initialize() {
       parent::Initialize();
       $this->Model = new DBAModel();
+      $this->Form = new Gdn_Form();
+      $this->Form->InputPrefix = '';
       
       $this->AddJsFile('dba.js');
    }
@@ -35,7 +42,7 @@ class DbaController extends DashboardController {
    public function Counts($Table = FALSE, $Column = FALSE, $From = FALSE, $To = FALSE, $Max = FALSE) {
       $this->Permission('Garden.Settings.Manage');
       
-      if (strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
+      if ($Table && $Column && strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
          if (!ValidateRequired($Table))
             throw new Gdn_UserException("Table is required.");
          if (!ValidateRequired($Column))

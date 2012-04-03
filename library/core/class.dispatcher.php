@@ -331,6 +331,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $InputArgs = array_merge(array($Controller), $this->_ControllerMethodArgs, array('Sender' => $Controller, 'Args' => $this->_ControllerMethodArgs));
 //            decho(array_keys($InputArgs), 'InputArgs');
             $Args = ReflectArgs($Callback, $InputArgs, $Request->Get());
+            $Controller->ReflectArgs = $Args;
 //            array_shift($Args);
 //            decho($Args, 'Args');
 //            die();
@@ -344,6 +345,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          } elseif (method_exists($Controller, $ControllerMethod)) {
             $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $Request->Get());
             $this->_ControllerMethodArgs = $Args;
+            $Controller->ReflectArgs = $Args;
             
             $this->FireEvent('BeforeControllerMethod');
             try {

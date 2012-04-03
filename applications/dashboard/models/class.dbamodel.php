@@ -91,7 +91,7 @@ class DBAModel extends Gdn_Model {
     * @param array $Column The column to decode.
     * @param int $Limit The number of records to work on.
     */
-   public function HtmlEntityDecode($Table, $Column, $Limit = 1) {
+   public function HtmlEntityDecode($Table, $Column, $Limit = 100) {
       // Construct a model to save the results.
       $Model = $this->CreateModel($Table);
       

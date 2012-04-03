@@ -42,7 +42,6 @@ class DbaController extends DashboardController {
             throw new Gdn_UserException("Column is required.");
          
          $Result = $this->Model->Counts($Table, $Column, $From, $To);
-         $Result['Foo'] = 'Bar';
          $this->SetData('Result', $Result);
       } else {
          $this->SetData('Jobs', array());

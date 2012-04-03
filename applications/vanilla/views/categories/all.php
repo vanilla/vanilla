@@ -45,7 +45,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
          if ($Category->Depth >= $MaxDisplayDepth && $MaxDisplayDepth > 0) {
             if ($ChildCategories != '')
                $ChildCategories .= ', ';
-            $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
+            $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category));
          } else if ($DoHeadings && $Category->Depth == 1) {
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'.GetOptions($Category, $this).Gdn_Format::Text($Category->Name).'</div>
@@ -59,7 +59,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                <div class="ItemContent Category">'
                   .GetOptions($Category, $this)
                   .'<div class="TitleWrap">'
-                     .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
+                     .Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category), 'Title')
                   .'</div>
                   <div class="CategoryDescription">'
                   .$Category->Description

@@ -226,9 +226,9 @@ class PostController extends VanillaController {
                   $this->FireEvent('AfterDiscussionSave');
                   
                   if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                     Redirect('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     Redirect(DiscussionUrl($Discussion));
                   } else {
-                     $this->RedirectUrl = Url('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     $this->RedirectUrl = DiscussionUrl($Discussion, '', TRUE);
                   }
                } else {
                   // If this was a draft save, notify the user about the save
@@ -416,7 +416,7 @@ class PostController extends VanillaController {
       
       // If closed, cancel & go to discussion
       if ($Discussion && $Discussion->Closed == 1 && !$Editing && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
-         Redirect('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+         Redirect(DiscussionUrl($Discussion));
       
       // Add hidden IDs to form
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
@@ -504,7 +504,7 @@ class PostController extends VanillaController {
                   if ($CommentID > 0)
                      Redirect("discussion/comment/$CommentID/#Comment_$CommentID");
                   elseif ($CommentID == SPAM) {
-                     $this->SetData('DiscussionUrl', '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     $this->SetData('DiscussionUrl', DiscussionUrl($Discussion));
                      $this->View = 'Spam';
            
                   }
@@ -554,7 +554,7 @@ class PostController extends VanillaController {
                      $this->View = 'comments';
                      
                      // Also define the discussion url in case this request came from the post screen and needs to be redirected to the discussion
-                     $this->SetJson('DiscussionUrl', Url('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/#Comment_'.$CommentID));
+                     $this->SetJson('DiscussionUrl', DiscussionUrl($this->Discussion).'#Comment_'.$CommentID);
                   } else {
                      // If the comment model isn't sorted by DateInserted or CommentID then we can't do any fancy loading of comments.
                      $OrderBy = GetValueR('0.0', $this->CommentModel->OrderBy());

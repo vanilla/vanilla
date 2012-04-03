@@ -99,6 +99,12 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->FireEvent('BeforeCommentDisplay'); ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
    <div class="Comment">
+      <?php
+      // Write a stub for the latest comment so it's easy to link to it from outside.
+      if ($CurrentOffset == Gdn::Controller()->Data('_LatestItem')) {
+         echo '<span id="latest"></span>';
+      }
+      ?>
       <div class="Options">
          <?php WriteCommentOptions($Comment); ?>
       </div>

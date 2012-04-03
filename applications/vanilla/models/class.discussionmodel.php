@@ -37,6 +37,52 @@ class DiscussionModel extends VanillaModel {
       parent::__construct('Discussion');
    }
    
+   public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      $Result = array('Complete' => TRUE);
+      switch ($Column) {
+         case 'CountComments':
+            $this->Database->Query(DBAModel::GetCountSQL('count', 'Discussion', 'Comment'));
+            break;
+         case 'FirstCommentID':
+            $this->Database->Query(DBAModel::GetCountSQL('min', 'Discussion', 'Comment', $Column));
+            break;
+         case 'LastCommentID':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column));
+            break;
+         case 'DateLastComment':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column, 'DateInserted'));
+            break;
+         case 'LastCommentUserID':
+            if (!$Max) {
+               // Get the range for this update.
+               $DBAModel = new DBAModel();
+               list($Min, $Max) = $DBAModel->PrimaryKeyRange('Discussion');
+               
+               if (!$From) {
+                  $From = $Min;
+                  $To = $Min + DBAModel::$ChunkSize - 1;
+               }
+            }
+            $this->SQL
+               ->Update('Discussion d')
+               ->Join('Comment c', 'c.CommentID = d.LastCommentID')
+               ->Set('d.LastCommentUserID', 'c.InsertUserID', FALSE, FALSE)
+               ->Where('d.DiscussionID >=', $From)
+               ->Where('d.DiscussionID <=', $To)
+               ->Put();
+            $Result['Complete'] = $To >= $Max;
+            $From = $To + 1;
+            $To = $From + DBAModel::$ChunkSize - 1;
+            $Result['Args']['From'] = $From;
+            $Result['Args']['To'] = $To;
+            $Result['Args']['Max'] = $Max;
+            break;
+         default:
+            throw new Gdn_UserException("Unknown column $Column");
+      }
+      return $Result;
+   }
+   
    /**
     * Builds base SQL query for discussion data.
     * 

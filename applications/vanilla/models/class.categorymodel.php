@@ -128,6 +128,35 @@ class CategoryModel extends Gdn_Model {
       Gdn::Cache()->Remove($Key);
    }
    
+   public function Counts($Column) {
+      $Result = array('Complete' => TRUE);
+      switch ($Column) {
+         case 'CountDiscussions':
+            $this->Database->Query(DBAModel::GetCountSQL('count', 'Category', 'Discussion'));
+            break;
+         case 'CountComments':
+            $this->Database->Query(DBAModel::GetCountSQL('sum', 'Category', 'Discussion', $Column, 'CountComments'));
+            break;
+         case 'LastDiscussionID':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Category', 'Discussion'));
+            break;
+         case 'LastCommentID':
+            $Data = $this->SQL
+               ->Select('d.CategoryID')
+               ->Select('c.CommentID', 'max', 'LastCommentID')
+               ->From('Comment c')
+               ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
+               ->GroupBy('d.CategoryID')
+               ->Get()->ResultArray();
+            foreach ($Data as $Row) {
+               $this->SetField($Row['CategoryID'], 'LastCommentID', $Row['LastCommentID']);
+            }
+            break;
+      }
+      self::ClearCache();
+      return $Result;
+   }
+   
    /**
     * 
     * 

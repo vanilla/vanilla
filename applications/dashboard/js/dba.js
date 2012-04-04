@@ -47,9 +47,14 @@ jQuery(document).ready(function($) {
                   $row.addClass('Complete Error');
                }
                
-               if (result.Count) {
+               if (result.Count != undefined) {
                   jobs[id].count += result.Count;
-                  $('.Count', $row).show().text(jobs[id].count);
+                  
+                  var count = jobs[id].count;
+                  if (result.Percent) {
+                     count = count + ' • ' + result.Percent;
+                  }
+                  $('.Count', $row).show().text(count);
                } else if (result.Percent) {
                   $('.Count', $row).show().text(result.Percent);
                }

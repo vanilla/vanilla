@@ -1548,8 +1548,8 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
-if (!function_exists('write_ini_file')) {
-   function write_ini_file($File, $Data) {
+if (!function_exists('write_ini_string')) {
+   function write_ini_string($Data) {
       $Flat = array();
       foreach($Data as $Topic => $Settings) {
          if (is_array($Settings)) {
@@ -1559,7 +1559,14 @@ if (!function_exists('write_ini_file')) {
          }
          else $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
       }
-      Gdn_FileSystem::SaveFile($File, implode("\n", $Flat));
+      return implode("\n", $Flat);
+   }
+}
+
+if (!function_exists('write_ini_file')) {
+   function write_ini_file($File, $Data) {
+      $String = write_ini_string($Data);
+      Gdn_FileSystem::SaveFile($File, $String);
    }
 }
 

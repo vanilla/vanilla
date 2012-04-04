@@ -12,11 +12,9 @@ if (C('Vanilla.Categories.DoHeadings')) {
       ?>
       <div id="CategoryGroup-<?php echo $Category['UrlCode']; ?>" class="CategoryGroup">
          <h2 class="H"><?php echo $Category['Name']; ?></h2>
-         <div class="DataTableWrap">
-            <?php
-            WriteCategoryTable($Category['Children'], 2);
-            ?>
-         </div>
+         <?php
+         WriteCategoryTable($Category['Children'], 2);
+         ?>
       </div>
       <?php
    }

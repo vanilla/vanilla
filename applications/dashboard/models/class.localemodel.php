@@ -34,7 +34,7 @@ class LocaleModel {
       $Locales = array_unique(ConsolidateArrayValuesByKey($this->AvailableLocalePacks(), 'Locale'), SORT_STRING);
       asort($Locales);
       $Locales = array_combine($Locales, $Locales);
-
+   
       return $Locales;
    }
 

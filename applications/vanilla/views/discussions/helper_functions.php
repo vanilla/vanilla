@@ -163,7 +163,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
+               echo Wrap(Anchor($Discussion->Category, CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>

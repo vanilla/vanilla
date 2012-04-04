@@ -37,6 +37,60 @@ class DiscussionModel extends VanillaModel {
       parent::__construct('Discussion');
    }
    
+   public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      $Result = array('Complete' => TRUE);
+      switch ($Column) {
+         case 'CountComments':
+            $this->Database->Query(DBAModel::GetCountSQL('count', 'Discussion', 'Comment'));
+            break;
+         case 'FirstCommentID':
+            $this->Database->Query(DBAModel::GetCountSQL('min', 'Discussion', 'Comment', $Column));
+            break;
+         case 'LastCommentID':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column));
+            break;
+         case 'DateLastComment':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column, 'DateInserted'));
+            break;
+         case 'LastCommentUserID':
+            if (!$Max) {
+               // Get the range for this update.
+               $DBAModel = new DBAModel();
+               list($Min, $Max) = $DBAModel->PrimaryKeyRange('Discussion');
+               
+               if (!$From) {
+                  $From = $Min;
+                  $To = $Min + DBAModel::$ChunkSize - 1;
+               }
+            }
+            $this->SQL
+               ->Update('Discussion d')
+               ->Join('Comment c', 'c.CommentID = d.LastCommentID')
+               ->Set('d.LastCommentUserID', 'c.InsertUserID', FALSE, FALSE)
+               ->Where('d.DiscussionID >=', $From)
+               ->Where('d.DiscussionID <=', $To)
+               ->Put();
+            $Result['Complete'] = $To >= $Max;
+            
+            $Percent = round($To * 100 / $Max);
+            if ($Percent > 100 || $Result['Complete'])
+               $Result['Percent'] = '100%';
+            else
+               $Result['Percent'] = $Percent.'%';
+            
+            
+            $From = $To + 1;
+            $To = $From + DBAModel::$ChunkSize - 1;
+            $Result['Args']['From'] = $From;
+            $Result['Args']['To'] = $To;
+            $Result['Args']['Max'] = $Max;
+            break;
+         default:
+            throw new Gdn_UserException("Unknown column $Column");
+      }
+      return $Result;
+   }
+   
    /**
     * Builds base SQL query for discussion data.
     * 
@@ -623,7 +677,7 @@ class DiscussionModel extends VanillaModel {
       
       $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
-      $Data->Url = Url('/discussion/'.$Data->DiscussionID.'/'.Gdn_Format::Url($Data->Name), TRUE);
+      $Data->Url = DiscussionUrl($Data);
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);
@@ -887,6 +941,7 @@ class DiscussionModel extends VanillaModel {
 
                if (!$Spam) {
                   $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+                  $Fields['DiscussionID'] = $DiscussionID;
                   
                   // Update the cache.
                   if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
@@ -896,7 +951,7 @@ class DiscussionModel extends VanillaModel {
                          'LastTitle' => Gdn_Format::Text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
                          'LastUserID' => $Fields['InsertUserID'],
                          'LastDateInserted' => $Fields['DateInserted'],
-                         'LastUrl' => '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Fields['Name'])
+                         'LastUrl' => DiscussionUrl($Fields)
                      );
                      CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
                   }
@@ -929,7 +984,7 @@ class DiscussionModel extends VanillaModel {
                    'HeadlineFormat' => $HeadlineFormat,
                    'RecordType' => 'Discussion',
                    'RecordID' => $DiscussionID,
-                   'Route' => "/discussion/$DiscussionID/".Gdn_Format::Url($DiscussionName),
+                   'Route' => DiscussionUrl($Fields),
                    'Data' => array('Name' => $DiscussionName)
                );
                

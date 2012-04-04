@@ -31,7 +31,7 @@ $this->EventArguments['Type'] = 'Discussion';
          if (C('Vanilla.Categories.Use')) {
             echo ' <span class="MItem Category">';
             echo ' '.T('in').' ';
-            echo Anchor($this->Data('Discussion.Category'), 'categories/'.$this->Data('Discussion.CategoryUrlCode'));
+            echo Anchor($this->Data('Discussion.Category'), CategoryUrl($this->Data('Discussion.CategoryUrlCode')));
             echo '</span> ';
          }
          ?>

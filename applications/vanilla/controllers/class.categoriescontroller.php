@@ -133,7 +133,6 @@ class CategoriesController extends VanillaController {
 				$this->AddJsFile('discussions.js');
 				$this->AddJsFile('bookmark.js');
 				$this->AddJsFile('options.js');
-				$this->AddJsFile('jquery.gardenmorepager.js');
 				$this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
 			}
 			
@@ -180,13 +179,14 @@ class CategoriesController extends VanillaController {
 				$Offset,
 				$Limit,
 				$CountDiscussions,
-				'categories/'.$CategoryIdentifier.'/%1$s'
+				array('CategoryUrl')
 			);
-			$this->SetData('_PagerUrl', 'categories/'.rawurlencode($CategoryIdentifier).'/{Page}');
+         $this->Pager->Record = $Category;
+         PagerModule::Current($this->Pager);
 			$this->SetData('_Page', $Page);
 	
 			// Set the canonical Url.
-			$this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.GetValue('UrlCode', $Category, $CategoryIdentifier), PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
+			$this->CanonicalUrl(CategoryUrl($Category, PageNumber($Offset, $Limit)));
 			
 			// Change the controller name so that it knows to grab the discussion views
 			$this->ControllerName = 'DiscussionsController';

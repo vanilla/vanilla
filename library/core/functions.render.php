@@ -36,6 +36,27 @@ if (!function_exists('BigPlural')) {
    }
 }
 
+if (!function_exists('CategoryUrl')):
+
+/**
+ * Return a url for a category. This function is in here and not functions.general so that plugins can override.
+ * @param array $Category
+ * @return string
+ */
+function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+   if (is_string($Category))
+      $Category = CategoryModel::Categories($Category);
+   $Category = (array)$Category;
+   
+   $Result = '/categories/'.rawurlencode($Category['UrlCode']);
+   if ($Page && $Page > 1) {
+         $Result .= '/p'.$Page;
+   }
+   return Url($Result, $WithDomain);
+}
+   
+endif;
+
 if (!function_exists('Condense')) {
    function Condense($Html) {
       $Html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $Html);
@@ -104,8 +125,14 @@ if (!function_exists('DiscussionUrl')):
  * @param object $Discussion
  * @return string
  */
-function DiscussionUrl($Discussion) {
-   return Url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name), TRUE);
+function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
+   $Discussion = (object)$Discussion;
+   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+   if ($Page) {
+      if ($Page > 1 || Gdn::Session()->UserID)
+         $Result .= '/p'.$Page;
+   }
+   return Url($Result, $WithDomain);
 }
    
 endif;
@@ -364,6 +391,25 @@ if (!function_exists('Wrap')) {
       return '<'.$Tag.$Attributes.'>'.$String.'</'.$Tag.'>';
    }
 }
+
+if (!function_exists('WrapIf')) {
+   /**
+    * Wrap the provided string if it isn't empty.
+    * 
+    * @param string $String
+    * @param string $Tag
+    * @param array $Attributes
+    * @return string
+    * @since 2.1 
+    */
+   function WrapIf($String, $Tag = 'span', $Attributes = '') {
+      if (empty($String))
+         return '';
+      else
+         return Wrap($String, $Tag, $Attributes);
+   }
+}
+
 /**
  * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
  */

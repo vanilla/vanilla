@@ -759,7 +759,7 @@ class Gdn_Request {
                unset($Query);
          }
       }
-      $Parts[] = trim($Path, '/');
+      $Parts[] = ltrim($Path, '/');
 
       $Result = implode('/', $Parts);
       

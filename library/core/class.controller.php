@@ -130,6 +130,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $RedirectUrl;
+   
+   /**
+    * @var array The arguments passed into the controller mapped to their proper argument names.
+    * @since 2.1
+    */
+   public $ReflectArgs;
 
    /**
     * This is typically an array of arguments passed after the controller

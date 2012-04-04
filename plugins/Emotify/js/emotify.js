@@ -1,4 +1,4 @@
-$(function(){
+jQuery(document).ready(function($) {
   
   // Insert a clickable icon list after the textbox
   $('textarea#Form_Body').livequery(function() {

@@ -31,7 +31,7 @@ jQuery(document).ready(function($) {
          }
          
          if ($('.TinyProgress', $row).length == 0) {
-            $row.append('<span class="TinyProgress"> </span>');
+            $row.append('<span class="TinyProgress">&nbsp;</span>');
          }
          
          $.ajax({
@@ -50,9 +50,7 @@ jQuery(document).ready(function($) {
                if (result.Count) {
                   jobs[id].count += result.Count;
                   $('.Count', $row).show().text(jobs[id].count);
-               }
-               
-               if (result.Percent) {
+               } else if (result.Percent) {
                   $('.Count', $row).show().text(result.Percent);
                }
                

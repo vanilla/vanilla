@@ -216,6 +216,9 @@ class Gdn_Theme {
             }
             break;
       }
+      
+      if ($Text == FALSE)
+         return;
 
       if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions'], FALSE))
          return '';
@@ -236,7 +239,7 @@ class Gdn_Theme {
       $Result = str_replace('%url', $Url, $Result);
       $Result = str_replace('%text', $Text, $Result);
       $Result = str_replace('%class', $Class, $Result);
-
+      
       return $Result;
    }
 

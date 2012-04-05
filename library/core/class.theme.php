@@ -130,12 +130,14 @@ class Gdn_Theme {
          case 'inbox':
             $Path = 'messages/inbox';
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-            if ($Session->IsValid() && !$Text)
+            if (!$Text)
                $Text = T('Inbox');
             if ($Session->IsValid() && $Session->User->CountUnreadConversations) {
                $Class = trim($Class.' HasCount');
                $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
             }
+            if (!$Session->IsValid())
+               $Text = FALSE;
             break;
          case 'forumroot':
             $Route = Gdn::Router()->GetDestination('DefaultForumRoot');

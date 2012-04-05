@@ -130,7 +130,7 @@ class Gdn_Theme {
          case 'inbox':
             $Path = 'messages/inbox';
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-            if (!$Text)
+            if ($Session->IsValid() && !$Text)
                $Text = T('Inbox');
             if ($Session->IsValid() && $Session->User->CountUnreadConversations) {
                $Class = trim($Class.' HasCount');

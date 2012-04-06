@@ -56,7 +56,7 @@ if($this->Pager->LastPage()) {
 }
 echo '</div>';
 
-echo '<div class="P">';
+echo '<div class="P PagerWrap">';
 $this->Pager->Wrapper = '<div %1$s>%2$s</div>';
 echo $this->Pager->ToString('more');
 echo '</div>';

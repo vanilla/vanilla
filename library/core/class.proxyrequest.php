@@ -153,7 +153,7 @@ class ProxyRequest {
     * @param type $ExtraHeaders
     * @return type 
     */
-   public function Request($Options, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
+   public function Request($Options = NULL, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
       
       /*
        * Allow requests that just want to use defaults to provide a string instead
@@ -162,6 +162,9 @@ class ProxyRequest {
       
       if (is_string($Options))
          $Options = array('URL' => $Options);
+      
+      if (is_null($Options))
+         $Options = array();
       
       $this->Options = $Options = array_merge($this->RequestDefaults, $Options);
 

@@ -12,13 +12,13 @@ if ($User->Photo != '') {
       else
          $Img = Img(Gdn_Upload::Url(ChangeBasename($User->Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
          
-      if (Gdn::Session()->UserID == $User->UserID)
-         echo Anchor(Wrap(T('Change Picture')).$Img, '/profile/picture/', 'ChangePicture');
+      if (Gdn::Session()->UserID == $User->UserID || Gdn::Session()->CheckPermission('Garden.Users.Edit'))
+         echo Anchor(Wrap(T('Change Picture')).$Img, '/profile/picture?userid='.$User->UserID, 'ChangePicture');
       else
          echo $Img;
       ?>
    </div>
-<?php } else if ($User->UserID == Gdn::Session()->UserID) { ?>
-   <div class="Photo"><?php echo Anchor(T('Add a Profile Picture'), '/profile/picture/', 'AddPicture BigButton'); ?></div>
+<?php } else if ($User->UserID == Gdn::Session()->UserID || Gdn::Session()->CheckPermission('Garden.Users.Edit')) { ?>
+   <div class="Photo"><?php echo Anchor(T('Add a Profile Picture'), '/profile/picture?userid='.$User->UserID, 'AddPicture BigButton'); ?></div>
 <?php
 }

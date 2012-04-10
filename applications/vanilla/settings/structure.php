@@ -79,8 +79,8 @@ $CountBookmarksExists = $Construct->ColumnExists('CountBookmarks');
 
 $Construct
    ->PrimaryKey('DiscussionID')
-   ->Column('Type', 'varchar(10)', NULL, 'index')
-   ->Column('ForeignID', 'varchar(30)', NULL, 'index') // For relating foreign records to discussions
+   ->Column('Type', 'varchar(10)', TRUE, 'index')
+   ->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')
@@ -96,8 +96,8 @@ $Construct
    ->Column('Closed', 'tinyint(1)', '0')
    ->Column('Announce', 'tinyint(1)', '0')
    ->Column('Sink', 'tinyint(1)', '0')
-   ->Column('DateInserted', 'datetime', NULL)
-   ->Column('DateUpdated', 'datetime')
+   ->Column('DateInserted', 'datetime', FALSE)
+   ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('DateLastComment', 'datetime', NULL, 'index')

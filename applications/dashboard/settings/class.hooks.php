@@ -102,8 +102,27 @@ class DashboardHooks implements Gdn_IPlugin {
       }
 		
       // Allow forum embedding
-      if (C('Garden.Embed.Allow'))
+      if (C('Garden.Embed.Allow')) {
+         // Record the remote url where the forum is being embedded.
+         $RemoteUrl = C('Garden.Embed.RemoteUrl');
+         if (!$RemoteUrl) {
+            $RemoteUrl = GetIncomingValue('remote');
+            if ($RemoteUrl)
+               SaveToConfig('Garden.Embed.RemoteUrl', $RemoteUrl);
+         }
+         if ($RemoteUrl)
+            $Sender->AddDefinition('RemoteUrl', $RemoteUrl);
+
+         // Force embedding?
+         if (!IsSearchEngine() && !IsMobile()) {
+            $Sender->AddDefinition('ForceEmbedForum', C('Garden.Embed.ForceForum') ? '1' : '0');
+            $Sender->AddDefinition('ForceEmbedDashboard', C('Garden.Embed.ForceDashboard') ? '1' : '0');
+         }
+
+         $Sender->AddDefinition('Path', Gdn::Request()->Path());
+         $Sender->AddDefinition('InDashboard', !($Sender->MasterView == 'default' || $Sender->MasterView == '') ? '1' : '0');
          $Sender->AddJsFile('js/embed_local.js');
+      }
          
       // Allow return to mobile site
 		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
@@ -126,9 +145,6 @@ class DashboardHooks implements Gdn_IPlugin {
          $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
 		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
-		// May 18, 2011 - Not quite ready for prime time - mosullivan
-		// $Menu->AddLink('Appearance', T('Embed Vanilla'), 'dashboard/embed', 'Garden.Settings.Manage');
-		
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
@@ -165,4 +181,15 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
 		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
    }
+   
+   /**
+    * Set P3P header because IE won't allow cookies thru the iFrame without it.
+    *
+    * This must be done in the Dispatcher because of PrivateCommunity.
+    * That precludes using Controller->SetHeader.
+    * This is done so comment & forum embedding can work in old IE.
+    */
+   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+      header('P3P: CP="CAO PSA OUR"', TRUE);
+   }   
 }

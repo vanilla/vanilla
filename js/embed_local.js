@@ -21,11 +21,11 @@ jQuery(document).ready(function($) {
    var currentHeight = null,
       minHeight = 100,
       remotePostMessage = function(message, target) {},
-      inIframe = top !== self,
-      inDashboard = gdn.definition('InDashboard', '') != '',
-      embedDashboard = gdn.definition('EmbedDashboard', '') != '',
       remoteUrl = gdn.definition('RemoteUrl', ''),
-      forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
+      inIframe = top !== self,
+      inDashboard = gdn.definition('InDashboard') == '1',
+      forceEmbedDashboard = gdn.definition('ForceEmbedDashboard') == '1',
+      forceEmbedForum = gdn.definition('ForceEmbedForum') == '1',
       pagePath = gdn.definition('Path', ''),
       isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
       webroot = gdn.definition('WebRoot'),
@@ -108,14 +108,18 @@ jQuery(document).ready(function($) {
    }
 
    // If not embedded and we should be, redirect to the embedded version.
-   if (!inIframe && forceRemoteUrl && remoteUrl != '') {
+   if (!inIframe && remoteUrl != '') {
       var path = document.location.toString().substr(webroot.length);
       var hashIndex = path.indexOf('#');
       if (hashIndex > -1)
          path = path.substr(0, hashIndex);
       
-      document.location = remoteUrl + '#' + path;
-   } else if (inIframe && inDashboard && !embedDashboard) {
+      if ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)) 
+         document.location = remoteUrl + '#' + path;
+   }
+   
+   // unembed if in the dashboard, in an iframe, and not forcing dashboard embed   
+   if (inIframe && inDashboard && !forceEmbedDashboard) {
       remotePostMessage('unembed', '*');
    }
 

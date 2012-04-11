@@ -13,17 +13,18 @@ ChangeLog
 1.0.7 - Move P3P header to BeforeDispatch (MLR)
 1.0.8 - ?
 1.0.9 - Move P3P header to AppStartup and use BeforeDispatch as fallback (MLR)
+1.0.10 - Deprecated.
 */
 
 // Define the plugin:
 $PluginInfo['embedvanilla'] = array(
    'Name' => '&lt;Embed&gt; Vanilla',
-   'Description' => "Embed your Vanilla forum within another application like WordPress, Drupal, or a custom website you've created. <b>Only enable this plugin if you are planning to embed your site.</b>",
-   'Version' => '1.0.9',
+   'Description' => "This plugin is deprecated and no longer supported. Use 'Forum Settings' &gt; 'Embed Forum' instead.",
+   'Version' => '1.0.10',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
-	'SettingsUrl' => '/plugin/embed',
+	'SettingsUrl' => '/embed/forum',
 	'MobileFriendly' => TRUE
 );
 

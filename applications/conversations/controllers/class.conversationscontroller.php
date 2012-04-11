@@ -55,7 +55,6 @@ class ConversationsController extends Gdn_Controller {
          $this->AddJsFile('jquery.form.js');
          $this->AddJsFile('jquery.popup.js');
          $this->AddJsFile('jquery.gardenhandleajaxform.js');
-         $this->AddJsFile('jquery.gardenmorepager.js');
          $this->AddJsFile('jquery.autogrow.js');
          $this->AddJsFile('jquery.autocomplete.js');
          $this->AddJsFile('global.js');

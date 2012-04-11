@@ -110,19 +110,9 @@ class EmbedController extends DashboardController {
     * @return boolean 
     */
    private function Toggle($Toggle = '', $TransientKey = '') {
-      if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
-         // Remove the embed vanilla plugin
-         RemoveFromConfig('EnabledPlugins.embedvanilla');
-
-         // Port it's settings over to the new ones
-         SaveToConfig('Garden.Embed.RemoteUrl', C('Plugins.EmbedVanilla.RemoteUrl'));
-         SaveToConfig('Garden.Embed.ForceForum', C('Plugins.EmbedVanilla.ForceRemoteUrl') ? '1' : '0');
-         SaveToConfig('Garden.Embed.ForceDashboard', C('Plugins.EmbedVanilla.EmbedDashboard') ? '1' : '0');
-
-         // 301 it's javascript references to the new ones
-         SaveToConfig('Routes.cGx1Z2lucy9lbWJlZHZhbmlsbGEvbG9jYWwuanM=', array('js/embed_local.js', 'Permanent'));
-         SaveToConfig('Routes.cGx1Z2lucy9lbWJlZHZhbmlsbGEvZW1iZWQuanM=', array('js/embed.js', 'Permanent'));
-         
+      if (array_key_exists('embedvanilla', Gdn::PluginManager()->EnabledPlugins())) {
+         throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
+      } else if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
          // Do the toggle
          SaveToConfig('Garden.Embed.Allow', $Toggle == 'enable' ? TRUE : FALSE);
          return TRUE;

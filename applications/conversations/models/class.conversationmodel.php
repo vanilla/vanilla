@@ -80,26 +80,29 @@ class ConversationModel extends Gdn_Model {
     * @param int $ViewingUserID Unique ID of current user.
     * @param int $Offset Number to skip.
     * @param int $Limit Maximum to return.
-    * @param array $Wheres SQL conditions.
     * @return Gdn_DataSet SQL results.
     */
-   public function Get($ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
+   public function Get($ViewingUserID, $Offset = '0', $Limit = '') {
       if ($Limit == '') 
          $Limit = Gdn::Config('Conversations.Conversations.PerPage', 30);
 
       $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
       
-      $this->ConversationQuery($ViewingUserID);
-      
-      if (is_array($Wheres))
-         $this->SQL->Where($Wheres);
-      
-      $this->FireEvent('BeforeGet');
-      
-      return $this->SQL
+      // Grab the base list of conversations.
+      $Data = $this->SQL
+         ->Select('c.*')
+         ->Select('uc.CountReadMessages')
+         ->Select('uc.LastMessageID', '', 'UserLastMessageID')
+         ->From('UserConversation uc')
+         ->Join('Conversation c', 'uc.ConversationID = c.ConversationID')
+         ->Where('uc.UserID', $ViewingUserID)
+         ->Where('uc.Deleted', 0)
          ->OrderBy('c.DateUpdated', 'desc')
          ->Limit($Limit, $Offset)
-         ->Get();
+         ->Get()->ResultArray();
+      
+      $this->JoinLastMessages($Data);
+      return $Data;
    }
    
    /**
@@ -207,6 +210,39 @@ class ConversationModel extends Gdn_Model {
          ->Join('User u', 'u.UserID = uc.UserID');
       
       Gdn_DataSet::Join($Data, array('alias' => 'uc', 'parent' => 'ConversationID', 'column' => 'Participants', 'UserID', 'u.Name', 'u.Photo'), array('sql' => $this->SQL));
+   }
+   
+   public function JoinLastMessages(&$Data) {
+      // Grab all of the last message IDs.
+      $IDs = array();
+      foreach ($Data as &$Row) {
+         $Row['CountNewMessages'] = $Row['CountMessages'] - $Row['CountReadMessages'];
+         if ($Row['UserLastMessageID'])
+            $Row['LastMessageID'] = $Row['UserLastMessageID'];
+         $IDs[] = $Row['LastMessageID'];
+      }
+      
+      $Messages = $this->SQL->WhereIn('MessageID', $IDs)->Get('ConversationMessage')->ResultArray();
+      $Messages = Gdn_DataSet::Index($Messages, array('MessageID'));
+      
+      foreach ($Data as &$Row) {
+         $ID = $Row['LastMessageID'];
+         if (isset($Messages[$ID])) {
+            $M = $Messages[$ID];
+            $Row['LastUserID'] = $M['InsertUserID'];
+            $Row['DateLastMessage'] = $M['DateInserted'];
+            $Row['LastMessage'] = $M['Body'];
+            $Row['Format'] = $M['Format'];
+            
+         } else {
+            $Row['LastMessageUserID'] = $Row['InsertUserID'];
+            $Row['DateLastMessage'] = $Row['DateInserted'];
+            $Row['LastMessage'] = NULL;
+            $Row['Format'] = NULL;
+         }
+      }
+      
+      Gdn::UserModel()->JoinUsers($Data, array('LastUserID'));
    }
    
    /**

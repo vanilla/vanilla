@@ -3,10 +3,10 @@ $Session = Gdn::Session();
 $Alt = FALSE;
 $SubjectsVisible = C('Conversations.Subjects.Visible');
 
-foreach ($this->ConversationData->Result() as $Conversation) {
+foreach ($this->Data('Conversations') as $Conversation) {
+   $Conversation = (object)$Conversation;
    $Alt = $Alt == TRUE ? FALSE : TRUE;
-   $LastAuthor = UserBuilder($Conversation, 'LastMessage');
-   $LastPhoto = UserPhoto($LastAuthor, 'Photo');
+   $LastPhoto = UserPhoto($Conversation, array('Px' => 'Last'));
    $CssClass = 'Item';
    $CssClass .= $Alt ? ' Alt' : '';
    $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';

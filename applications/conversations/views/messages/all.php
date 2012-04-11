@@ -2,7 +2,7 @@
 ?>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-if ($this->ConversationData->NumRows() > 0) {
+if (count($this->Data('Conversations'))) {
 ?>
 <ul class="Condensed DataList Conversations">
    <?php
@@ -13,8 +13,6 @@ if ($this->ConversationData->NumRows() > 0) {
 <?php
 
 PagerModule::Write();
-
-
 } else {
    echo '<div class="Empty">'.T('You do not have any conversations.').'</div>';
 }

@@ -182,22 +182,18 @@ class MessagesController extends ConversationsController {
       }
       
       // Fetch from model  
-      $ConversationData = $this->ConversationModel->Get(
+      $Data = $this->ConversationModel->Get(
          $UserID,
          $this->Offset,
-         $Limit,
-         $Wheres
+         $Limit
       );
       
       // Join in the participants.
-      $Result = $ConversationData->Result();
-      $this->ConversationModel->JoinParticipants($Result);
-      
-      $this->ConversationData =& $ConversationData;
-      $this->SetData('Conversations', $Result);
+      $this->ConversationModel->JoinParticipants($Data);
+      $this->SetData('Conversations', $Data);
       
       $this->SetData('_Limit', $Limit);
-      $this->SetData('_CurrentRecords', $this->ConversationData->NumRows());
+      $this->SetData('_CurrentRecords', count($Data));
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {

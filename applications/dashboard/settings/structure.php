@@ -187,6 +187,7 @@ $Construct->Table('AnalyticsLocal')
    ->Engine('InnoDB')
    ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')
    ->Column('Views', 'int', NULL)
+   ->Column('CommentViews', 'int', TRUE)
    ->Set(FALSE, FALSE);
 
 // Only Create the permission table if we are using Garden's permission model.

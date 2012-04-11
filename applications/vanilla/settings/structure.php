@@ -143,7 +143,7 @@ else
 $Construct->PrimaryKey('CommentID')
 	->Column('DiscussionID', 'int', FALSE, 'index.1')
    ->Column('Type', 'varchar(10)', TRUE)
-   ->Column('ForeignID', 'varchar(200)', TRUE, 'index') // For relating foreign records to discussions
+   ->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
 	->Column('InsertUserID', 'int', TRUE, 'key')
 	->Column('UpdateUserID', 'int', TRUE)
 	->Column('DeleteUserID', 'int', TRUE)

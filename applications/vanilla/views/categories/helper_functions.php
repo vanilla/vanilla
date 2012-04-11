@@ -16,9 +16,14 @@ endif;
 if (!function_exists('CssClass')):
    
 function CssClass($Row) {
-   static $Alt = TRUE;
+   static $Alt = FALSE;
+   $ClassName = Gdn_Format::AlphaNumeric($Row['UrlCode']);
    
-   $Result = "Item Depth{$Row['Depth']} Category-{$Row['Url']}";
+   $Result = "Item Depth{$Row['Depth']} Category-$ClassName";
+   $Result .= ' '.(GetValue('Read', $Row) ? 'Read' : 'Unread');
+   
+   if (GetValue('Archive', $Row))
+      $Result .= ' Archived';
    
    if ($Alt)
       $Result .= ' Alt';
@@ -26,6 +31,7 @@ function CssClass($Row) {
    
    return $Result;
 }
+
 endif;
 
 

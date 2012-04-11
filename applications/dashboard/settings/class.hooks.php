@@ -28,9 +28,9 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->Theme = $PreviewThemeName;
 				$Sender->InformMessage(
 					sprintf(T('You are previewing the %s theme.'), Wrap($PreviewThemeName, 'em'))
-						.'<div class="PreviewButtons">'
-						.Anchor(T('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->TransientKey(), 'PreviewButton')
-						.' '.Anchor(T('Cancel'), 'settings/cancelpreview/', 'PreviewButton')
+						.'<div class="PreviewThemeButtons">'
+						.Anchor(T('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->TransientKey(), 'PreviewThemeButton')
+						.' '.Anchor(T('Cancel'), 'settings/cancelpreview/', 'PreviewThemeButton')
 						.'</div>',
 					'DoNotDismiss'
 				);

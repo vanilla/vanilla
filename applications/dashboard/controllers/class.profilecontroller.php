@@ -259,14 +259,12 @@ class ProfileController extends Gdn_Controller {
     */
    public function Edit($UserReference = '') {
       $this->Permission('Garden.SignIn.Allow');
-      $this->GetUserInfo($UserReference);
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $Session = Gdn::Session();
-      if ($Session->UserID != $this->User->UserID)
-         $this->Permission('Garden.Users.Edit');
       
       // Decide if they have ability to edit the username
       $this->CanEditUsername = Gdn::Config("Garden.Profile.EditUsernames");
-      $this->CanEditUsername = $this->CanEditUsername | $Session->CheckPermission('Garden.Users.Edit');
+      $this->CanEditUsername = $this->CanEditUsername || $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();
       $User = $UserModel->GetID($this->User->UserID);
@@ -431,6 +429,7 @@ class ProfileController extends Gdn_Controller {
       
       // Get user data and set up form
       $this->GetUserInfo();
+      
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       
@@ -463,7 +462,7 @@ class ProfileController extends Gdn_Controller {
     * @param mixed $UserReference Unique identifier, possible username or ID.
     * @param string $Username.
     */
-   public function Picture($UserReference = '', $Username = '') {
+   public function Picture($UserReference = '', $Username = '', $UserID = '') {
       // Permission checks
       $this->Permission('Garden.Profiles.Edit');
       $Session = Gdn::Session();
@@ -482,8 +481,9 @@ class ProfileController extends Gdn_Controller {
          throw new Exception(sprintf(T("Unable to detect PHP GD installed on this system. Vanilla requires GD version 2 or better.")));
       }
       
-      // Get user data & prep form
-      $this->GetUserInfo($UserReference, $Username);
+      // Get user data & prep form.
+      $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
+      
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       
@@ -561,7 +561,7 @@ class ProfileController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       
       // Get user data
-      $this->GetUserInfo($UserReference, $Username, $UserID);
+      $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
 		$UserPrefs = Gdn_Format::Unserialize($this->User->Preferences);
       if (!is_array($UserPrefs))
          $UserPrefs = array();
@@ -676,7 +676,7 @@ class ProfileController extends Gdn_Controller {
          $this->Form->AddError('You must be authenticated in order to use this form.');
       
       // Get user data & another permission check
-      $this->GetUserInfo($UserReference, $Username);
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $RedirectUrl = 'dashboard/profile/'.$this->ProfileUrl();
       if ($Session->ValidateTransientKey($TransientKey)
          && is_object($this->User)
@@ -747,7 +747,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddJsFile('jquery.jcrop.pack.js');
       $this->AddJsFile('profile.js');
                
-      $this->GetUserInfo($UserReference, $Username);
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
       
       // Permission check (correct user)
       if ($this->User->UserID != $Session->UserID && !$Session->CheckPermission('Garden.Users.Edit'))
@@ -1042,14 +1042,15 @@ class ProfileController extends Gdn_Controller {
     * @param mixed $UserReference Unique identifier, possibly username or ID.
     * @param string $Username.
     * @param int $UserID Unique ID.
+    * @param bool $CheckPermissions Whether or not to check user permissions.
     * @return bool Always true.
     */
-   public function GetUserInfo($UserReference = '', $Username = '', $UserID = '') {
+   public function GetUserInfo($UserReference = '', $Username = '', $UserID = '', $CheckPermissions = FALSE) {
 		if ($this->_UserInfoRetrieved)
 			return;
 		
       if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid())
-         Redirect('dashboard/home/permission');
+         throw PermissionException();
       
 		// If a UserID was provided as a querystring parameter, use it over anything else:
 		if ($UserID) {
@@ -1078,6 +1079,9 @@ class ProfileController extends Gdn_Controller {
 			$this->SetData('Profile', $this->User);
 			$this->SetData('UserRoles', $this->Roles);
       }
+      
+      if ($CheckPermissions && Gdn::Session()->UserID != $this->User->UserID)
+         $this->Permission('Garden.Users.Edit');
       
       // Make sure the userphoto module gets added to the page
       $UserPhotoModule = new UserPhotoModule($this);

@@ -114,12 +114,15 @@ jQuery(document).ready(function($) {
       if (hashIndex > -1)
          path = path.substr(0, hashIndex);
       
-      if ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)) 
+      if ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)) {
+         // alert('redirect: '+remoteUrl + '#' + path); // Debug
          document.location = remoteUrl + '#' + path;
+      }
    }
    
    // unembed if in the dashboard, in an iframe, and not forcing dashboard embed   
    if (inIframe && inDashboard && !forceEmbedDashboard) {
+      // alert('unembed'); // Debug
       remotePostMessage('unembed', '*');
    }
 

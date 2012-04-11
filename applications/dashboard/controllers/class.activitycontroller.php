@@ -254,4 +254,5 @@ class ActivityController extends Gdn_Controller {
       // And render
       $this->Render();
    }   
+         $Data = $this->ActivityModel->FilterForm($Data);
 }

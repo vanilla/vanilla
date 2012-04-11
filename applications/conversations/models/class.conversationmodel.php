@@ -85,7 +85,7 @@ class ConversationModel extends Gdn_Model {
     */
    public function Get($ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
       if ($Limit == '') 
-         $Limit = Gdn::Config('Conversations.Conversations.PerPage', 50);
+         $Limit = Gdn::Config('Conversations.Conversations.PerPage', 30);
 
       $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
       

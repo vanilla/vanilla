@@ -1698,6 +1698,8 @@ class UserModel extends Gdn_Model {
       // Update session level information if necessary.
       if ($UserID == Gdn::Session()->UserID) {
          $IP = Gdn::Request()->IpAddress();
+         if (strpos($IP, '.') === FALSE)
+               $IP = long2ip(hexdec($IP));
          $Fields['LastIPAddress'] = $IP;
          
          if (Gdn::Session()->NewVisit()) {

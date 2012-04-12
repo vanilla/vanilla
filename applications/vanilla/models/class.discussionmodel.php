@@ -339,7 +339,7 @@ class DiscussionModel extends VanillaModel {
 				} else {
 					$Discussion->CountUnreadComments = 0;
 				}
-			} elseif ($Discussion->CountComments == 0 && $Discussion->CountCommentWatch === NULL) {
+			} elseif ($Discussion->CountCommentWatch === NULL) {
             // Allow for discussions to just be new.
             $Discussion->CountUnreadComments = TRUE;
          } else {
@@ -347,7 +347,7 @@ class DiscussionModel extends VanillaModel {
 			}
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
-				$Discussion->CountUnreadComments = 0;
+				$Discussion->CountUnreadComments = TRUE;
 				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate))
 					$Discussion->CountCommentWatch = $Discussion->CountComments;
 			}

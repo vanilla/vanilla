@@ -40,11 +40,18 @@ class SearchModel extends Gdn_Model {
          $Sql->BeginWhereGroup();
 
          $ColumnsArray = explode(',', $Columns);
+         
+         $First = TRUE;
          foreach ($ColumnsArray as $Column) {
             $Column = trim($Column);
 
             $Param = $this->Parameter();
-            $Sql->OrWhere("$Column like $Param", NULL, FALSE, FALSE);
+            if ($First) {
+               $Sql->Where("$Column like $Param", NULL, FALSE, FALSE);
+               $First = FALSE;
+            } else {
+               $Sql->OrWhere("$Column like $Param", NULL, FALSE, FALSE);
+            }
          }
 
          $Sql->EndWhereGroup();
@@ -128,9 +135,16 @@ class SearchModel extends Gdn_Model {
       
 		foreach ($Result as $Key => $Value) {
 			if (isset($Value['Summary'])) {
-				$Value['Summary'] = Gdn_Format::Text(Gdn_Format::To($Value['Summary'], $Value['Format']));
+				$Value['Summary'] = Condense(Gdn_Format::To($Value['Summary'], $Value['Format']));
 				$Result[$Key] = $Value;
 			}
+         
+         switch ($Value['RecordType']) {
+            case 'Discussion':
+               $Discussion = ArrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
+               $Result[$Key]['Url'] = DiscussionUrl($Discussion, 1);
+               break;
+         }
 		}
       
 		return $Result;

@@ -9,7 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 /**
- * Renders a list of users who are taking part in a particular discussion.
+ * Renders information about a user in the user profile (email, join date, visits, etc).
  */
 class UserInfoModule extends Gdn_Module {
    

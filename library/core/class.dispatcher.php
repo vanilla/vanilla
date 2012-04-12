@@ -195,12 +195,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       try {
          $BlockExceptions = array(
-             '/utility(\/.*)?$/'                   => self::BLOCK_NEVER,
-             '/plugin(\/.*)?$/'                    => self::BLOCK_NEVER,
-             '/entry(\/.*)?$/'                     => self::BLOCK_PERMISSION,
-             '/user\/usernameavailable(\/.*)?$/'   => self::BLOCK_PERMISSION,
-             '/user\/emailavailable(\/.*)?$/'      => self::BLOCK_PERMISSION,
-             '/home\/termsofservice(\/.*)?$/'      => self::BLOCK_PERMISSION
+             '/^utility(\/.*)?$/'                   => self::BLOCK_NEVER,
+             '/^plugin(\/.*)?$/'                    => self::BLOCK_NEVER,
+             '/^entry(\/.*)?$/'                     => self::BLOCK_PERMISSION,
+             '/^user\/usernameavailable(\/.*)?$/'   => self::BLOCK_PERMISSION,
+             '/^user\/emailavailable(\/.*)?$/'      => self::BLOCK_PERMISSION,
+             '/^home\/termsofservice(\/.*)?$/'      => self::BLOCK_PERMISSION
          );
          
          $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
@@ -209,7 +209,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $PathRequest = Gdn::Request()->Path();
          foreach ($BlockExceptions as $BlockException => $BlockLevel) {
             if (preg_match($BlockException, $PathRequest))
-               throw new Exception("Block detected", $BlockLevel);
+               throw new Exception("Block detected - {$BlockException}", $BlockLevel);
          }
          
          // Never block an admin
@@ -226,7 +226,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          //  NULL = Block for permissions (e.g. PrivateCommunity)
          $CanBlock = $e->getCode();
       }
-   
+      
       // If we're in updatemode and arent explicitly prevented from blocking, block
       if (Gdn::Config('Garden.UpdateMode', FALSE) && $CanBlock > self::BLOCK_NEVER) {
          $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
@@ -245,6 +245,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ControllerName != '' && class_exists($ControllerName)) {
          // Create it and call the appropriate method/action
          $Controller = new $ControllerName();
+         Gdn::Controller($Controller);
          
          $this->EventArguments['Controller'] =& $Controller;
          $this->FireEvent('AfterControllerCreate');
@@ -309,9 +310,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->Request = $Request;
          $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
          $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
-
+         
          // Set special controller method options for REST APIs.
-         Gdn::Controller($Controller);
          $Controller->Initialize();
          
          $this->EventArguments['Controller'] = &$Controller;
@@ -331,6 +331,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $InputArgs = array_merge(array($Controller), $this->_ControllerMethodArgs, array('Sender' => $Controller, 'Args' => $this->_ControllerMethodArgs));
 //            decho(array_keys($InputArgs), 'InputArgs');
             $Args = ReflectArgs($Callback, $InputArgs, $Request->Get());
+            $Controller->ReflectArgs = $Args;
 //            array_shift($Args);
 //            decho($Args, 'Args');
 //            die();
@@ -344,6 +345,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          } elseif (method_exists($Controller, $ControllerMethod)) {
             $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $Request->Get());
             $this->_ControllerMethodArgs = $Args;
+            $Controller->ReflectArgs = $Args;
             
             $this->FireEvent('BeforeControllerMethod');
             try {
@@ -691,7 +693,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $DeliveryPart = array_pop($Parts);
          $MethodPart = implode('.', $Parts);
          
-         if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT))) {
+         if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT, DELIVERY_METHOD_RSS))) {
             return array($MethodPart, strtoupper($DeliveryPart));
          } else {
             return array($Name, $this->_DeliveryMethod);

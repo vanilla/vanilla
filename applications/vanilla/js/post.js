@@ -80,7 +80,7 @@ jQuery(document).ready(function($) {
    });
    
    // Hijack discussion form button clicks
-   $('#DiscussionForm :submit').click(function() {
+   $('#DiscussionForm :submit').live('click', function() {
       var btn = this;
       var frm = $(btn).parents('form').get(0);
       

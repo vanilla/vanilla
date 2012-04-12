@@ -23,6 +23,10 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 // =============================================================================
 // SECTION 1. STRING SAFETY, PARSING, AND MANIPULATION.
 // =============================================================================
+   
+   public function Backtick($String) {
+      return '`'.trim($String, '`').'`';
+   }
 
    /**
     * Takes a string of SQL and adds backticks if necessary.
@@ -248,7 +252,8 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
       } else {
          if(array_key_exists(0, $Data)) {
             // This is a big insert with a bunch of rows.
-            $Sql .= "\n(".implode(', ', array_keys($Data[0])).') '
+            $Keys = array_keys($Data[0]); $Keys = array_map(array($this, 'Backtick'), $Keys);
+            $Sql .= "\n(".implode(', ', $Keys).') '
                ."\nvalues ";
             
             // Append each insert statement.
@@ -258,7 +263,8 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                $Sql .= "\n('".implode('\', \'', array_values($Data[$i])).'\')';
             }
          } else {
-            $Sql .= "\n(".implode(', ', array_keys($Data)).') '
+            $Keys = array_keys($Data); $Keys = array_map(array($this, 'Backtick'), $Keys);
+            $Sql .= "\n(".implode(', ', $Keys).') '
             ."\nvalues (".implode(', ', array_values($Data)).')';
          }
       }

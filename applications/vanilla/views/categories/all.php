@@ -1,23 +1,31 @@
 <?php if (!defined('APPLICATION')) exit();
-include($this->FetchViewLocation('helper_functions', 'categories'));
 
+if (!function_exists('GetOptions'))
+   include $this->FetchViewLocation('helper_functions', 'categories');
+   
 echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+if ($Description = $this->Description()) {
+   echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
+}
 
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
-$this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
+$this->EventArguments['NumRows'] = count($this->Data('Categories'));
 
-if (C('Vanilla.Categories.ShowTabs')) {
-   $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');
-   include_once $ViewLocation;
-   WriteFilterTabs($this);
-}
+//if (C('Vanilla.Categories.ShowTabs')) {
+////   $ViewLocation = Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'vanilla');
+////   include_once $ViewLocation;
+////   WriteFilterTabs($this);
+//   echo Gdn_Theme::Module('DiscussionFilterModule');
+//}
 
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
    $Alt = FALSE;
-   foreach ($this->CategoryData->Result() as $Category) {
+   foreach ($this->Data('Categories') as $CategoryRow) {
+      $Category = (object)$CategoryRow;
+      
       $this->EventArguments['CatList'] = &$CatList;
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;
@@ -28,6 +36,8 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
       if (GetValue('Unfollow', $Category))
          $CssClasses[] = 'Unfollow';
       $CssClasses = implode(' ', $CssClasses);
+      
+      $CategoryID = GetValue('CategoryID', $Category);
 
       if ($Category->CategoryID > 0) {
          // If we are below the max depth, and there are some child categories
@@ -40,9 +50,9 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
          if ($Category->Depth >= $MaxDisplayDepth && $MaxDisplayDepth > 0) {
             if ($ChildCategories != '')
                $ChildCategories .= ', ';
-            $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
+            $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category));
          } else if ($DoHeadings && $Category->Depth == 1) {
-            $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category">'.GetOptions($Category, $this).Gdn_Format::Text($Category->Name).'</div>
             </li>';
             $Alt = FALSE;
@@ -50,12 +60,16 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $LastComment = UserBuilder($Category, 'Last');
             $AltCss = $Alt ? ' Alt' : '';
             $Alt = !$Alt;
-            $CatList .= '<li class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
                <div class="ItemContent Category '.$CssClasses.'">'
                   .GetOptions($Category, $this)
-                  .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
-                  .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
-                  .'<div class="Meta">
+                  .'<div class="TitleWrap">'
+                     .Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category), 'Title')
+                  .'</div>
+                  <div class="CategoryDescription">'
+                  .$Category->Description
+                  .'</div>
+                  <div class="Meta">
                      <span class="MItem RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>
                      <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
                      <span class="MItem CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';

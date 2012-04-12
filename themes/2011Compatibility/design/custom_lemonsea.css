@@ -1,0 +1,314 @@
+/** Wireframe **/
+
+#Content {
+    float: left;
+    margin: 0 0 40px;
+    width: 680px;
+}
+
+#Panel {
+    float: right;
+    overflow: hidden;
+    width: 250px;
+}
+
+body.Profile #Content {
+   float: right;
+   margin: 0 0 40px;
+   width: 680px;
+}
+
+body.Profile #Panel {
+   float: left;
+   overflow: hidden;
+   width: 250px;
+}
+
+/** Side Panel and Box **/
+.Box {
+   background: #CFECFF;
+   border-radius: 2px;
+   color: #06486A;
+   padding: 6px 10px;
+}
+
+.Box :first-child {
+   margin-top: 0;
+}
+.Box :last-child {
+   margin-bottom: 0;
+}
+
+/** Popup **/
+
+div.Popup h1, div.Popup h2 {
+   background: #38ABE3;
+   color: #fff;
+   margin: -10px -10px 10px;
+   padding: 5px 10px;
+}
+
+a.Close {
+   color: #fff;
+}
+
+/** Misc **/
+.ProfilePhotoLarge {
+    width: 250px;
+}
+
+
+/** CHANGES TO CORE THEME **/
+
+#Content {
+   float: left;
+   width: 690px;
+   margin: 0 0 40px;
+}
+#Body {
+   width: 960px;
+   text-align: left;
+   margin: 15px auto 0;
+}
+.Search:after,
+div#Search:after {
+   content: ".";
+   display: block;
+   height: 0;
+   clear: both;
+   visibility: hidden;
+}
+body #Head h1 {
+   display: inline-block;
+   font-weight: bold;
+   margin: 0;
+   padding: 21px 10px 4px 0;
+   border: 0;
+}
+#Head h1 a span {
+   font-size: 24px;
+   color:#fff;
+}
+#Head .Search,
+#Head #Search {
+   position: absolute;
+   right: 0;
+   bottom: 6px;
+   text-align: right;
+}
+#Head form {
+   float: right;
+   padding: 0;
+}
+#Head form input.InputBox {
+	vertical-align: top;
+   width: 200px;
+   border: 0;
+   padding: 4px;
+	margin: 0 6px 0 0;
+   color: #969696;
+   font-size: 13px;
+	background: #fff; 
+   -moz-border-radius: 2px;
+   -webkit-border: 2px;
+   border-bottom: 2px;
+	vertical-align: bottom;
+}
+#Head form input.Button {
+	font-size: 11px;
+	border: none;
+}
+.Menu {
+   width: 960px;
+   margin: 0 auto;
+   position: relative;
+   text-align: left;
+   vertical-align: bottom;
+}
+#Menu {
+   display: inline-block;
+   margin-right: 280px;
+   vertical-align: bottom;
+}
+#Menu li {
+   line-height: 27px;
+   float: left;
+   position: relative;
+   display: block;
+   list-style: none;
+   padding: 0;
+   margin: 0 4px 0 0;
+   font-weight: bold;
+   text-align: left;
+}
+* html #Menu li {
+	display: inline;
+}
+#Menu a {
+   border: 0;
+   text-decoration: none;
+   position: relative;
+	display: block;
+   padding: 0 7px;
+   white-space: nowrap;
+   font-size: 11px;
+   height: 28px;
+}
+* html #Menu a  {
+   display: inline;
+   padding: 6px 10px;
+}
+#Menu li.NonTab,
+#Menu li.NonTab a {
+   font-weight: normal;
+}
+#Menu ul {
+   background: #38abe3;
+}
+#Menu a {
+   color: #fff;
+}
+#Menu a:hover {
+   color: #fff;
+   text-decoration: underline;
+}
+#Menu .Alert {
+	text-shadow: none;
+   background: #f2fcff;
+   color: #299fc7;
+}
+#Foot div {
+	width: 960px;
+	padding: 6px 0;
+	margin: 20px auto 0;
+	text-align: left;
+}
+
+/* DEPRECATED: The following CSS has been deprecated in core as of 2.1a10. We
+  are keeping it in for themes that have custom views that depend on it. */ 
+.Tabs,
+.Headings {
+	display: block;
+   border-bottom: 1px solid #abdafb;
+   padding: 5px 8px;
+   margin: 0;
+   background: #cfecff;
+   position: relative;
+}
+.MessageForm .Tabs {
+	padding: 0;
+	border: 0;
+	background: none;
+	text-align: left;
+}
+.MessageForm .Tabs ul {
+	display: inline;
+}
+.Tabs li {
+   display: inline;
+   margin: 0;
+}
+.TabLink,
+.TabLink:link,
+.TabLink:hover,
+.TabLink:active,
+.TabLink:visited {
+   margin: 0;
+   border: 1px solid #abdafb;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #bbe2f7;
+   display: inline;
+   font-weight: bold;
+   color: #1e79a7;
+   text-decoration: none;
+   padding: 5px 10px;
+	line-height: 2.6;
+	white-space: nowrap;
+}
+.TabLink:hover {
+   background: #f3fcff;
+}
+.Active .TabLink {
+   background: #fff;
+   color: #474747;
+}
+.Tabs .SubTab {
+	margin: 10px 0 0;
+	padding: 4px 8px;
+	background: #f3fcff;
+   border-radius: 2px;
+   -webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
+}
+.HeadingTabs {
+	padding: 8px 8px 8px 12px;
+}
+.HeadingTabs ul {
+	display: inline;
+	float: right;
+}
+.HeadingTabs .SubTab {
+	font-size: 14px;
+	display: inline;
+	font-weight: bold;
+	background: none;
+	padding: 0;
+	line-height: 2.4;
+}
+.SearchTabs input.InputBox {
+	width: 560px;
+	margin-right: 10px;
+}
+.Headings {
+	position: relative;
+	text-align: left;
+}
+.Headings div {
+	display: inline-block;
+	padding-right: 10px;
+}
+.Headings .ItemHeading {
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 2;
+}
+.Headings .MetaHeading {
+	font-size: 11px;
+}
+
+/* END DEPRECATED CSS */
+
+
+
+
+body {
+   background: #fff;
+   color: #000;
+}
+#Head {
+    background: #21AFBF;
+    border-bottom: 2px solid #d7f205;
+}
+#Head a {
+   color: #fff;
+}
+#Head h1 a span {
+   color: #d7f205;
+}
+#Menu .Alert {
+   color: #21AFBF;
+   background: #fff;
+}
+a {
+   color: #1B8CA6;
+}
+a:hover {
+   color: #93a601;
+}
+body.Profile.EditMode #Content form,
+.FormWrapper,
+.Box {
+   background: #D6F8FC;
+}

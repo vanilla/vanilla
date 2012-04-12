@@ -1,24 +1,50 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo Gdn::Session()->UserID == $this->User->UserID ? T('My Preferences') : T('Edit Preferences'); ?></h2>
+<style>
+   table.PreferenceGroup {
+      width: 500px;
+   }
+   thead td {
+      vertical-align: bottom;
+      text-align: center;
+   }
+   table.PreferenceGroup thead .TopHeading {
+      border-bottom: none;
+   }
+   table.PreferenceGroup thead .BottomHeading {
+      border-top: none;
+   }
+   td.PrefCheckBox {
+      width: 50px;
+		text-align: center;
+   }
+   table.PreferenceGroup tbody tr:hover td {
+      background: #efefef;
+   }
+   .Info {
+      width: 486px;
+   }
+</style>
+<h2><?php echo $this->Data('Title');  ?></h2>
 <div class="Preferences">
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 $this->FireEvent("BeforePreferencesRender");
 foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
-   echo Wrap(T($PreferenceGroup), 'h3');
+   echo Wrap(T($PreferenceGroup == 'Notifications' ? 'General' : $PreferenceGroup), 'h3');
    ?>
    <table class="PreferenceGroup">
       <thead>
          <tr>
          <?php
+         echo Wrap(T('Notification'), 'td', array('style' => 'text-align: left'));
+         
          $CountTypes = 0;
          foreach ($this->PreferenceTypes[$PreferenceGroup] as $PreferenceType) {
             echo Wrap(T($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
             $PreferenceTypeOrder[$PreferenceType] = $CountTypes;
             $CountTypes++;
          }
-         echo Wrap('&nbsp;', 'td');
          ?>
          </tr>
       </thead>
@@ -35,6 +61,11 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
                   continue;
                
                echo '<tr>';
+               $Desc = $this->Preferences[$PreferenceGroup][$Name];
+               if (is_array($Desc))
+                  list($Desc, $Location) = $Desc;
+               echo Wrap($Desc, 'td', array('class' => 'Description'));
+               
                $LastName = '';
                $i = 0;
                foreach ($Names as $Name) {
@@ -57,18 +88,15 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
                   $LastName = $Name;
                   $i++;
                }
-
-               $Desc = $this->Preferences[$PreferenceGroup][$LastName];
-               if (is_array($Desc))
-                  $Desc = $Desc[0];
-               echo Wrap($Desc, 'td', array('class' => 'Description'));
+               
                echo '</tr>';
             }
          ?>
       </tbody>
    </table>
 <?php
-}  
+}
+$this->FireEvent('CustomNotificationPreferneces');
 echo $this->Form->Close(T('Save Preferences'));
 $this->FireEvent("AfterPreferencesRender");
 ?>

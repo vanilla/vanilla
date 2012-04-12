@@ -4,6 +4,11 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
 ?>
 <div class="About P">
    <dl class="About">
+      <?php
+      if ($this->User->Banned) {
+         echo '<dd class="Value"><span class="Tag Tag-Banned">'.T('Banned').'</span></dd>';
+      }
+      ?>
       <dt class="Name"><?php echo T('Username'); ?></dt>
       <dd class="Name" itemprop="name"><?php echo $this->User->Name; ?></dd>
       <?php               
@@ -35,11 +40,11 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       endif;
 
       if ($this->User->InviteUserID > 0) {
-         $Inviter = new stdClass();
-         $Inviter->UserID = $this->User->InviteUserID;
-         $Inviter->Name = $this->User->InviteName;
-         echo '<dt class="Invited">'.T('Invited by').'</dt>
-         <dd class="Invited">'.UserAnchor($Inviter).'</dd>';
+         $Inviter = Gdn::UserModel()->GetID($this->User->InviteUserID);
+         if ($Inviter) {
+            echo '<dt class="Invited">'.T('Invited by').'</dt>
+            <dd class="Invited">'.UserAnchor($Inviter).'</dd>';
+         }
       }
       $this->FireEvent('OnBasicInfo');
       ?>

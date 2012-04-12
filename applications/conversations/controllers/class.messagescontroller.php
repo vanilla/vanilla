@@ -59,6 +59,9 @@ class MessagesController extends ConversationsController {
       parent::Initialize();
       $this->Menu->HighlightRoute('/messages/inbox');
       $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox')));
+//      $this->AddModule('MeModule');
+      $this->AddModule('SignedInModule');
+      $this->AddModule('NewConversationModule');
    }
    
    /**
@@ -97,6 +100,8 @@ class MessagesController extends ConversationsController {
       if ($Target = Gdn::Request()->Get('Target'))
             $this->Form->AddHidden('Target', $Target);
 
+      $this->Title(T('New Conversation'));
+      $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox'), array('Name' => $this->Data('Title'), 'Url' => 'messages/add')));
       $this->Render();      
    }
    
@@ -155,6 +160,7 @@ class MessagesController extends ConversationsController {
    public function All($Page = '') {
       $Session = Gdn::Session();
       $this->Title(T('Inbox'));
+      Gdn_Theme::Section('ConversationList');
 
       list($Offset, $Limit) = OffsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
       
@@ -190,20 +196,8 @@ class MessagesController extends ConversationsController {
       $this->ConversationData =& $ConversationData;
       $this->SetData('Conversations', $Result);
       
-      $CountConversations = $this->ConversationModel->GetCount($Session->UserID, $Wheres);
-      
-      // Build a pager
-      $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-      $this->Pager->MoreCode = 'Older Conversations';
-      $this->Pager->LessCode = 'Newer Conversations';
-      $this->Pager->ClientID = 'Pager';
-      $this->Pager->Configure(
-         $this->Offset,
-         $Limit,
-         $CountConversations,
-         'messages/all/{Page}' //'messages/all/%1$s/%2$s/'
-      );
+      $this->SetData('_Limit', $Limit);
+      $this->SetData('_CurrentRecords', $this->ConversationData->NumRows());
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -213,8 +207,6 @@ class MessagesController extends ConversationsController {
       }
       
       // Build and display page.
-      $this->AddModule('SignedInModule');
-      $this->AddModule('NewConversationModule');
       $this->Render();
    }
    
@@ -254,6 +246,7 @@ class MessagesController extends ConversationsController {
    public function Index($ConversationID = FALSE, $Offset = -1, $Limit = '') {
       $this->Offset = $Offset;
       $Session = Gdn::Session();
+      Gdn_Theme::Section('Conversation');
       
       // Figure out Conversation ID
       if (!is_numeric($ConversationID) || $ConversationID < 0)
@@ -363,7 +356,7 @@ class MessagesController extends ConversationsController {
          $Limit,
          $this->Conversation->CountMessages,
          'messages/'.$ConversationID.'/%1$s/%2$s/'
-      );      
+      );
       
       // Mark the conversation as ready by this user.
       $this->ConversationModel->MarkRead($ConversationID, $Session->UserID);
@@ -376,9 +369,6 @@ class MessagesController extends ConversationsController {
       }
       
       // Add modules.
-      $this->AddModule('SignedInModule');
-      $this->AddModule('NewConversationModule');
-
       $ClearHistoryModule = new ClearHistoryModule($this);
       $ClearHistoryModule->ConversationID($ConversationID);
       $this->AddModule($ClearHistoryModule);

@@ -197,11 +197,15 @@ class ImportModel extends Gdn_Model {
 			$Result = FALSE;
 		} else {
 			$Data = $Data->FirstRow();
+         $HashMethod = GetValue('HashMethod', $Data);
+         if (!$HashMethod)
+            $HashMethod = $this->GetPasswordHashMethod();
+         
 			$PasswordHash = new Gdn_PasswordHash();
-         if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0 || $this->Data('UseCurrentPassword')) {
+         if (strcasecmp($HashMethod, 'reset') == 0 || $this->Data('UseCurrentPassword')) {
             $Result = TRUE;
          } else {
-            $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $this->GetPasswordHashMethod(), GetValue('Name',$Data));
+            $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $HashMethod, GetValue('Name',$Data));
          }
 		}
 		if(!$Result) {
@@ -424,6 +428,17 @@ class ImportModel extends Gdn_Model {
       return $this->Data('GenerateSQL', $Value);
    }
 
+   /**
+    * Return SQL for updating a count.
+    * @param string $Aggregate count, max, min, etc.
+    * @param string $ParentTable The name of the parent table.
+    * @param string $ChildTable The name of the child table
+    * @param type $ParentColumnName
+    * @param string $ChildColumnName
+    * @param string $ParentJoinColumn
+    * @param string $ChildJoinColumn
+    * @return type 
+    */
    public function GetCountSQL(
       $Aggregate, // count, max, min, etc.
       $ParentTable, $ChildTable, 
@@ -1436,6 +1451,7 @@ class ImportModel extends Gdn_Model {
             case 'email':
             case 'confirm email':
             case 'users awaiting email confirmation':
+            case 'pending':
                $RoleDefaults['Garden.Registration.ConfirmEmail'] = TRUE;
                $RoleDefaults['Garden.Registration.ConfirmEmailRole'] = $RoleID;
                break;

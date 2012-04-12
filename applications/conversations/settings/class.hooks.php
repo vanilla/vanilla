@@ -66,18 +66,21 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @access public
     */
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-      // Add a "send X a message" link to the side menu on the profile page
       $Session = Gdn::Session();
-      if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID) {
+      if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID && C('Conversations.Moderation.Allow', FALSE)) {
          $SideMenu = $Sender->EventArguments['SideMenu'];
-         $SideMenu->AddLink('Options', sprintf(T('Send %s a Message'), $Sender->User->Name), '/messages/add/'.$Sender->User->Name, FALSE, array('class' => 'MessageLink'));
-
-         if (C('Conversations.Moderation.Allow', FALSE)) {
-            $SideMenu->AddLink('Options', T('Inbox'), '/messages/inbox?userid='.$Sender->User->UserID, 'Conversations.Moderation.Manage', array('class' => 'InboxLink'));
-         }
-
+         $SideMenu->AddLink('Options', T('Inbox'), '/messages/inbox?userid='.$Sender->User->UserID, 'Conversations.Moderation.Manage', array('class' => 'InboxLink'));
          $Sender->EventArguments['SideMenu'] = $SideMenu;
       }
+   }
+   
+   /**
+    * Add "Message" option to profile options.
+    */
+   public function ProfileController_BeforeProfileOptions_Handler($Sender) {
+      // Add a "send X a message" link to the side menu on the profile page
+      if (!$Sender->EditMode && Gdn::Session()->IsValid() && Gdn::Session()->UserID != $Sender->User->UserID)
+         echo ' '.Anchor(Sprite('SpMessage').T('Message'), '/messages/add/'.$Sender->User->Name, 'NavButton MessageNavButton').' ';
    }
    
    /**
@@ -107,6 +110,13 @@ class ConversationsHooks implements Gdn_IPlugin {
             
          $Sender->Menu->AddLink('Conversations', $Inbox, '/messages/all', FALSE, array('Standard' => TRUE));
       }
+   }
+   
+   /**
+    * Let us add Messages to the Inbox page.
+    */
+   public function Base_AfterGetLocationData_Handler($Sender, $Args) {
+      $Args['ControllerData']['Conversations/messages/inbox'] = T('Inbox Page');
    }
    
    /**

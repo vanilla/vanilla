@@ -10,8 +10,9 @@ window.vanilla.embed = function(host) {
       embedUrl = window.location.href.split('#')[0],
       jsPath = '/plugins/embedvanilla/remote.js',
       currentPath = window.location.hash.substr(1),
-      disablePath = currentPath && currentPath[0] != "/";
-      disablePath |= (window != top);
+      disablePath = false;
+      
+   disablePath |= (window != top);
 
    var optStr = function(name, defaultValue, definedValue) {
       if (window['vanilla_'+name]) {
@@ -25,6 +26,9 @@ window.vanilla.embed = function(host) {
 
    if (!currentPath || disablePath)
       currentPath = "/";
+   
+   if (currentPath.substr(0, 1) != '/')
+      currentPath = '/' + currentPath;
 
    if (window.gadgets)
       embedUrl = '';

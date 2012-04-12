@@ -27,6 +27,7 @@ $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.'
 $Definition['ValidateRequired'] = '%s is required.';
 $Definition['ValidateRequiredArray'] = 'You must select at least one %s.';
 $Definition['ValidateEmail'] = '%s does not appear to be valid.';
+$Definition['ValidateFormat'] = 'You are not allowed to post raw html.';
 $Definition['ValidateDate'] = '%s is not a valid date.';
 $Definition['ValidateInteger'] = '%s is not a valid integer.';
 $Definition['ValidateBoolean'] = '%s is not a valid boolean.';
@@ -45,6 +46,9 @@ $Definition['ValidateBanned'] = 'That %s is not allowed.';
 $Definition['ValidateUrlStringRelaxed'] = '%s can not contain slashes, quotes or tag characters.';
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
+$Definition['PermissionRequired.Garden.Moderation.Manage'] = 'You need to be a moderator to do that.';
+$Definition['PermissionRequired.Garden.Settings.Manage'] = 'You need to be an administrator to do that.';
+$Definition['PermissionRequired.Javascript'] = 'You need to enable javascript to do that.';
 $Definition['ErrorBadInvitationCode'] = 'The invitation code you supplied is not valid.';
 $Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email/username and password you entered.';
 $Definition['User not found.'] = 'Sorry, no account could be found related to the email/username you entered.';
@@ -164,5 +168,9 @@ $Definition['Warning: This is for advanced users.'] = '<b>Warning</b>: This is f
 $Definition['Activity.Delete'] = '×';
 $Definition['Draft.Delete'] = '×';
 $Definition['ConnectName'] = 'Username';
+$Definition['Start a New Discussion'] = 'New Discussion';
+$Definition['Start a New Conversation'] = 'New Message';
+$Definition['New Conversation'] = 'New Message';
+$Definition['Start Conversation'] = 'Post Message';
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

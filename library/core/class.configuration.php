@@ -22,7 +22,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     *
     * @var array
     */
-   protected $Data = array();
+   public $Data = array();
    
    /**
     * Configuration Source List
@@ -88,6 +88,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $this->AutoSave = (boolean)$AutoSave;
    }
    
+   /**
+    * Allow dot-delimited splitting on keys?
+    * 
+    * @param boolean $Splitting 
+    */
    public function Splitting($Splitting = TRUE) {
       $this->Splitting = (boolean)$Splitting;
    }
@@ -403,15 +408,21 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $ConfigurationSource = Gdn_ConfigurationSource::FromFile($this, $File, $Name);
       if (!$ConfigurationSource) return FALSE;
       
-      $ConfigurationSource->Splitting($this->Splitting);
+      $UseSplitting = $this->Splitting;
+      $ConfigurationSource->Splitting($UseSplitting);
       
       if (!$ConfigurationSource) return FALSE;
       $SourceTag = "file:{$File}";
       $this->Sources[$SourceTag] = $ConfigurationSource;
       
-      self::MergeConfig($this->Data, $ConfigurationSource->Export());
       if ($Dynamic)
          $this->Dynamic = $ConfigurationSource;
+      
+      if (!$UseSplitting) {
+         $this->MassImport($ConfigurationSource->Export());
+      } else {
+         self::MergeConfig($this->Data, $ConfigurationSource->Export());
+      }
    }
    
    /**
@@ -421,6 +432,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     * to be eval()'d.
     * 
     * @param string $String A string containing the php settings array.
+    * @param string $Tag A string descriptor of this config set
     * @param string $Name The name of the variable and initial group settings.
     *   Note: When $Name is 'Configuration' then the data will be set to the root of the config.
     * @param boolean $Dynamic Optional, whether to treat this as the request's "dynamic" config, and
@@ -428,80 +440,67 @@ class Gdn_Configuration extends Gdn_Pluggable {
     *   is called after all defaults are loaded.
     * @return boolean
     */
-   public function LoadString($String, $Tag, $Name = 'Configuration', $Dynamic = TRUE) {
+   public function LoadString($String, $Tag, $Name = 'Configuration', $Dynamic = TRUE, $SaveCallback = NULL, $CallbackOptions = NULL) {
       $ConfigurationSource = Gdn_ConfigurationSource::FromString($this, $String, $Tag, $Name);
       if (!$ConfigurationSource) return FALSE;
       
-      $ConfigurationSource->Splitting($this->Splitting);
+      $UseSplitting = $this->Splitting;
+      $ConfigurationSource->Splitting($UseSplitting);
       
       $SourceTag = "string:{$Tag}";
       $this->Sources[$SourceTag] = $ConfigurationSource;
       
-      self::MergeConfig($this->Data, $ConfigurationSource->Export());
       if ($Dynamic)
          $this->Dynamic = $ConfigurationSource;
+      
+      if (!$UseSplitting) {
+         $this->MassImport($ConfigurationSource->Export());
+      } else {
+         self::MergeConfig($this->Data, $ConfigurationSource->Export());
+      }
+      
+      // Callback for saving
+      if (!is_null($SaveCallback))
+         $ConfigurationSource->AssignCallback($SaveCallback, $CallbackOptions);
    }
 
    /**
-    * Loads an array of settings into the object with the specified group name.
-    * 
     * DO NOT USE, THIS IS RUBBISH
     * 
     * @deprecated
-    * @param string $Name The name of this group of configuration settings.
-    * <b>Note</b>: When $Name is 'Configuration' then the data will be set to the root of the config.
-    * @param array $Settings The array of settings being loaded.
-    * @param boolean $Overwrite A boolean value indicating if the loaded settings should overwrite the
-    * existing settings in $Group.
-    * @return boolean
     */
    public function LoadArray($Name, $Settings, $Overwrite = FALSE) {
-      if (!is_array($this->Data))
-         $this->Data = array();
-      
-      if ($Name == $this->DefaultGroup)
-         $Name == '';
-         
-      // Find the spot to insert the settings.
-      $Loc = &$this->Find($Name, TRUE);
-      
-      if (is_null($Loc) || $Overwrite === TRUE) {
-         $Loc = $Settings;
-         return TRUE;
-      } else {
-         return FALSE;
-      }
+      throw new Exception("DEPRECATED");
    }
 
    /**
-    * Load and parse a file based config
-    * 
     * DO NOT USE, THIS IS RUBBISH
     * 
     * @deprecated
-    * @param type $Path
-    * @param type $Options
-    * @return array 
     */
    public static function LoadFile($Path, $Options = array()) {
-      if (is_string($Options))
-         $Options = array('VariableName' => $Options);
-
-      $Defaults = array('VariableName' => $this->DefaultGroup);
-      $Options = array_merge($Defaults, $Options);
-      $VariableName = $Options['VariableName'];
-
-      $$VariableName = array();
-      if (file_exists($Path)) {
-         require $Path;
-      }
-      return $$VariableName;
+      throw new Exception("DEPRECATED");
+   }
+   
+   /**
+    * Import a large pre-formatted set of configs efficiently
+    * 
+    * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
+    * 
+    * @param type $Data 
+    */
+   public function MassImport($Data) {
+      if ($this->Splitting) return;
+      $this->Data = array_merge($this->Data, $Data);
+      
+      if ($this->Dynamic instanceof Gdn_ConfigurationSource)
+         $this->Dynamic->MassImport($Data);
    }
    
    /**
     * Merge a newly loaded config into the current active state
     * 
-    * Resursively 
+    * Recursively 
     * 
     * @param array $Data Reference to the current active state
     * @param array $Loaded Reference to the new to-merge data
@@ -514,6 +513,15 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $Data[$Key] = $Value;
          }
       }
+   }
+   
+   /**
+    * Get current dynamic ConfigurationSource
+    * 
+    * @return Gdn_ConfigurationSource
+    */
+   public function Dynamic() {
+      return $this->Dynamic;
    }
 
    /**
@@ -747,6 +755,18 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     */
    protected $Splitting;
    
+   /**
+    * Save callback
+    * @var callback
+    */
+   protected $Callback;
+   
+   /**
+    * Save callback options
+    * @var array
+    */
+   protected $CallbackOptions;
+   
    public function __construct($Configuration, $Type, $Source, $Group, $Settings) {
       parent::__construct();
       
@@ -759,6 +779,23 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $this->Settings = $Settings;
       $this->Dirty = FALSE;
       $this->Splitting = TRUE;
+      
+      $this->Callback = FALSE;
+      $this->CallbackOptions = NULL;
+   }
+   
+   /**
+    * Set a save callback
+    * 
+    * @param callback $Callback
+    * @param array $Options Callback options
+    * @return boolean 
+    */
+   public function AssignCallback($Callback, $Options = NULL) {
+      if (!is_callable($Callback)) return FALSE;
+      
+      $this->Callback = $Callback;
+      $this->CallbackOptions = $Options;
    }
    
    public function Splitting($Splitting = TRUE) {
@@ -844,16 +881,41 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $$Name = NULL;
       
       // Parse the string
-      $String = str_replace(array('<?php','<?','?>'), '', $String);
-      $Parsed = eval($String);
-      if ($Parsed === FALSE)
-         throw new Exception('Could not parse config string.');
+      if (!empty($String)) {
+         $String = str_replace(array('<?php','<?','?>'), '', $String);
+         $Parsed = eval($String);
+         if ($Parsed === FALSE)
+            throw new Exception('Could not parse config string.');
+      }
       
       // Make sure the config variable is here and is an array.
       if (is_null($$Name) || !is_array($$Name))
          $$Name = array();
       
       return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $$Name);
+   }
+   
+   /**
+    * Import a large pre-formatted set of configs efficiently
+    * 
+    * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
+    * 
+    * @param type $Data 
+    */
+   public function MassImport($Data) {
+      if ($this->Splitting) return;
+      
+      // Only do dirty checks if we aren't already dirty
+      if (!$this->Dirty)
+         $CheckCopy = $this->Settings;
+      
+      $this->Settings = array_merge($this->Settings, $Data);
+      
+      // Only do dirty checks if we aren't already dirty
+      if (!$this->Dirty) {
+         if ($CheckCopy != $this->Settings)
+            $this->Dirty = TRUE;
+      }
    }
    
    public function ToFile($File) {
@@ -864,6 +926,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
    
    public function Export() {
       return $this->Settings;
+   }
+   
+   public function Import($Settings) {
+      $this->Settings = $Settings;
+      $this->Dirty = TRUE;
    }
    
    /**
@@ -1015,7 +1082,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
    }
    
    public function Save() {
-      if (!$this->Dirty) return;
+      if (!$this->Dirty) return NULL;
       
       $this->EventArguments['ConfigDirty'] = &$this->Dirty;
       $this->EventArguments['ConfigNoSave'] = FALSE;
@@ -1024,14 +1091,42 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       $this->EventArguments['ConfigData'] = $this->Settings;
       $this->FireEvent('BeforeSave');
       
-      if ($this->EventArguments['ConfigNoSave']) return NULL;
+      if ($this->EventArguments['ConfigNoSave']) {
+         $this->Dirty = FALSE;
+         return TRUE;
+      }
+      
+      // Check for and fire callback if one exists
+      if ($this->Callback && is_callable($this->Callback)) {
+         $CallbackOptions = array();
+         if (!is_array($this->CallbackOptions)) $this->CallbackOptions = array();
+         
+         $CallbackOptions = array_merge($CallbackOptions, $this->CallbackOptions, array(
+            'ConfigDirty'  => $this->Dirty,
+            'ConfigType'   => $this->Type,
+            'ConfigSource' => $this->Source,
+            'ConfigData'   => $this->Settings,
+            'SourceObject' => $this
+         ));
+         
+         $ConfigSaved = call_user_func($this->Callback, $CallbackOptions);
+         
+         if ($ConfigSaved) {
+            $this->Dirty = FALSE;
+            return TRUE;
+         }
+      }
       
       switch ($this->Type) {
          case 'file':
             if (empty($this->Source))
                trigger_error(ErrorMessage('You must specify a file path to be saved.', 'Configuration', 'Save'), E_USER_ERROR);
 
-            if (!is_writable($this->Source))
+            $CheckWrite = $this->Source;
+            if (!file_exists($CheckWrite))
+               $CheckWrite = dirname ($CheckWrite);
+            
+            if (!is_writable($CheckWrite))
                throw new Exception(sprintf(T("Unable to write to config file '%s' when saving."), $this->Source));
 
             $Group = $this->Group;
@@ -1098,10 +1193,10 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
          case 'string':
             /**
              * How would these even save? String config data must be handled by 
-             * an event hook, if at all.
+             * an event hook or callback, if at all.
              */
             $this->Dirty = FALSE;
-            return TRUE;
+            return FALSE;
             break;
       }
    }

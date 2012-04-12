@@ -113,9 +113,8 @@ class Gdn_Locale extends Gdn_Pluggable {
          $this->LocaleContainer->Load($ConfLocaleOverride, 'Definition', TRUE);
       
       // Import core (static) translations
-      if ($this->DeveloperMode) {
-         $this->DeveloperContainer->SaveToConfig($this->LocaleContainer->Get('.'));
-      }
+      if ($this->DeveloperMode)
+         $this->DeveloperContainer->MassImport($this->LocaleContainer->Get('.'));
       
       // Allow hooking custom definitions
       $this->FireEvent('AfterSet');
@@ -219,8 +218,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       if (!is_array($Code))
          $Code = array($Code => $Translation);
 
-      foreach ($Code as $k => $v)
-         $this->LocaleContainer->SaveToConfig($k, $v, $Save);
+      $this->LocaleContainer->SaveToConfig($Code, NULL, $Save);
    }
 
    /**

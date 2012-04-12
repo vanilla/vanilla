@@ -12,7 +12,7 @@
 $PluginInfo['ButtonBar'] = array(
    'Name' => 'Button Bar',
    'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
-   'Version' => '1.2.2',
+   'Version' => '1.2.4',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 

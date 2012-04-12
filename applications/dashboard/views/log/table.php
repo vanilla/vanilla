@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+include $this->FetchViewLocation('helper_functions');
 
 PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 ?>
@@ -17,6 +18,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
          $RecordLabel = GetValueR('Data.Type', $Row);
          if (!$RecordLabel)
             $RecordLabel = $Row['RecordType'];
+         $RecordLabel = Gdn_Form::LabelCode($RecordLabel);
 
       ?>
       <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
@@ -43,12 +45,17 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                }
 
                echo '<div"><span class="Expander">', $this->FormatContent($Row), '</span></div>';
+               
+               // Write the other record counts.
+               
+               echo OtherRecordsMeta($Row['Data']);
 
                echo '<div class="Meta-Container">';
 
                echo '<span class="Tags">';
                echo '<span class="Tag Tag-'.$Row['Operation'].'">'.T($Row['Operation']).'</span> ';
                echo '<span class="Tag Tag-'.$RecordLabel.'">'.Anchor(T($RecordLabel), $Url).'</span> ';
+               
                echo '</span>';
 
                if ($Row['RecordIPAddress']) {
@@ -66,12 +73,22 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 
 //                  echo ' ', sprintf(T('%s times'), $Row['CountGroup']);
                }
+               
+               $RecordUser = Gdn::UserModel()->GetID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
 
                if ($Row['RecordName']) {
                   echo ' <span class="Meta">',
                      '<span class="Meta-Label">'.sprintf('%s by', T($RecordLabel)).'</span> ',
-                     UserAnchor($Row, 'Meta-Value', 'Record'),
-                     '</span> ';
+                     UserAnchor($Row, 'Meta-Value', 'Record');
+                  
+                  if ($RecordUser['Banned']) {
+                     echo ' <span class="Tag Tag-Ban">'.T('Banned').'</span>';
+                  }
+                  
+                  echo ' <span class="Count">'.Plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
+                  
+                  
+                  echo '</span> ';
                }
 
                // Write custom meta information.
@@ -88,6 +105,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
               
                echo '</div>';
             ?>
+            
          </td>
          <td class="DateCell"><?php
             echo Gdn_Format::Date($Row['DateInserted'], 'html');

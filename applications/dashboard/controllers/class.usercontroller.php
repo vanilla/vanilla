@@ -271,6 +271,61 @@ class UserController extends DashboardController {
       }
       $this->Render();
    }
+   
+   /**
+    * Ban a user and optionally delete their content.
+    * @since 2.1
+    * @param type $UserID 
+    */
+   public function Ban($UserID, $Unban = FALSE) {
+      $this->Permission('Garden.Moderation.Manage');
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User)
+         throw NotFoundException($User);
+      
+//      $this->Form = new Gdn_Form();
+      
+      $UserModel = Gdn::UserModel();
+      
+      if ($this->Form->IsPostBack()) {
+         if ($Unban) {
+            $UserModel->Unban($UserID, array('RestoreContent' => $this->Form->GetFormValue('RestoreContent')));
+         } else {
+            if (!ValidateRequired($this->Form->GetFormValue('Reason'))) {
+               $this->Form->AddError('ValidateRequired', 'Reason');
+            }
+            if ($this->Form->GetFormValue('Reason') == 'Other' && !ValidateRequired($this->Form->GetFormValue('ReasonText'))) {
+               $this->Form->AddError('ValidateRequired', 'Reason Text');
+            }
+
+            if ($this->Form->ErrorCount() == 0) {
+               if ($this->Form->GetFormValue('Reason') == 'Other')
+                  $Reason = $this->Form->GetFormValue('ReasonText');
+               else
+                  $Reason = $this->Form->GetFormValue('Reason');
+
+               $UserModel->Ban($UserID, array('Reason' => $Reason, 'DeleteContent' => $this->Form->GetFormValue('DeleteContent')));
+            }
+         }
+         
+         if ($this->Form->ErrorCount() == 0) {
+            // Redirect after a successful save.
+            if ($this->Request->Get('Target')) {
+                  $this->RedirectUrl = $this->Request->Get('Target');
+               } else {
+                  $this->RedirectUrl = UserUrl($User);
+               }
+         }
+      }
+      
+      $this->SetData('User', $User);
+      $this->AddSideMenu();
+      $this->Title($Unban ? T('Unban User') : T('Ban User'));
+      if ($Unban)
+         $this->View = 'Unban';
+      $this->Render();
+   }
 	
 	/**
     * Page thru user list.

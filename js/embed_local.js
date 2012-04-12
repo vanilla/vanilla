@@ -21,11 +21,11 @@ jQuery(document).ready(function($) {
    var currentHeight = null,
       minHeight = 100,
       remotePostMessage = function(message, target) {},
-      inIframe = top !== self,
-      inDashboard = gdn.definition('InDashboard', '') != '',
-      embedDashboard = gdn.definition('EmbedDashboard', '') != '',
       remoteUrl = gdn.definition('RemoteUrl', ''),
-      forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
+      inIframe = top !== self,
+      inDashboard = gdn.definition('InDashboard') == '1',
+      forceEmbedDashboard = gdn.definition('ForceEmbedDashboard') == '1',
+      forceEmbedForum = gdn.definition('ForceEmbedForum') == '1',
       pagePath = gdn.definition('Path', ''),
       isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
       webroot = gdn.definition('WebRoot'),
@@ -108,14 +108,21 @@ jQuery(document).ready(function($) {
    }
 
    // If not embedded and we should be, redirect to the embedded version.
-   if (!inIframe && forceRemoteUrl && remoteUrl != '') {
+   if (!inIframe && remoteUrl != '') {
       var path = document.location.toString().substr(webroot.length);
       var hashIndex = path.indexOf('#');
       if (hashIndex > -1)
          path = path.substr(0, hashIndex);
       
-      document.location = remoteUrl + '#' + path;
-   } else if (inIframe && inDashboard && !embedDashboard) {
+      if ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)) {
+         // alert('redirect: '+remoteUrl + '#' + path); // Debug
+         document.location = remoteUrl + '#' + path;
+      }
+   }
+   
+   // unembed if in the dashboard, in an iframe, and not forcing dashboard embed   
+   if (inIframe && inDashboard && !forceEmbedDashboard) {
+      // alert('unembed'); // Debug
       remotePostMessage('unembed', '*');
    }
 
@@ -147,15 +154,19 @@ jQuery(document).ready(function($) {
             return;
          
          var isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
-            noTop = $(this).hasClass('SignOut');
-                
+            noTop = $(this).hasClass('SignOut') || $(this).hasClass('NoTop');
+            
          if (isHttp && href.substr(0, webroot.length) != webroot) {
             $(this).attr('target', '_blank');
          } else if (isEmbeddedComments) {
+            // If clicking a pager link, just follow it.
+            if ($(this).parents('.Pager').length > 0)
+               noTop = true;
+            
             // Target the top of the page if clicking an anchor in a list of embedded comments
             if (!noTop)
                $(this).attr('target', '_top');
-               
+                              
             // If clicking a "register" link, change the post-registration target to the page that is currently embedded.
             if ($(this).parents('.CreateAccount').length > 0) {
                // Examine querystring parameters for a target & replace it with the embed page
@@ -171,7 +182,7 @@ jQuery(document).ready(function($) {
                      + encodeURIComponent(gdn.definition('ForeignUrl', ''))
                      + afterTarget);
                }
-            }
+            }            
          } else {
             // Strip the path from the root folder of the app
             var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);
@@ -187,7 +198,10 @@ jQuery(document).ready(function($) {
 
          }
       });
-
+      /* Set the target on any in-page sign in forms to the embedded page */
+      $('.SignInPopup [id$=_Target]').livequery(function() {
+         $(this).val(gdn.definition('SelfUrl'));
+      });
    }
    
    var href = window.location.href;

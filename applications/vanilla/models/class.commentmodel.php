@@ -29,6 +29,8 @@ class CommentModel extends VanillaModel {
     */
    protected $_OrderBy = array(array('c.DateInserted', ''));
    
+   protected $_Where = array();
+   
    /**
     * Class constructor. Defines the related database table name.
     * 
@@ -41,7 +43,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
-      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return;
       
       if (count($Result) == 0)
@@ -136,6 +138,7 @@ class CommentModel extends VanillaModel {
       }
       
       $this->OrderBy($this->SQL);
+      $this->Where($this->SQL);
 
       $Result = $this->SQL->Get();
       
@@ -230,7 +233,7 @@ class CommentModel extends VanillaModel {
    }
    
    public function PageWhere($DiscussionID, $Page, $Limit) {
-      if (!Gdn::Cache()->ActiveEnabled() || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return FALSE;
       
       if ($Limit != C('Vanilla.Comments.PerPage', 30)) {
@@ -383,6 +386,11 @@ class CommentModel extends VanillaModel {
 	 */
    public function GetCount($DiscussionID) {
       $this->FireEvent('BeforeGetCount');
+      
+      if (!empty($this->_Where)) {
+         return FALSE;
+      }
+      
       return $this->SQL->Select('CommentID', 'count', 'CountComments')
          ->From('Comment')
          ->Where('DiscussionID', $DiscussionID)
@@ -740,10 +748,12 @@ class CommentModel extends VanillaModel {
             if (!$UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID))
                continue;
             
+            $HeadlineFormatBak = $Activity['HeadlineFormat'];
             $Activity['HeadlineFormat'] = T('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
             
             $Activity['NotifyUserID'] = $User->UserID;
             $ActivityModel->Queue($Activity, 'Mention');
+            $Activity['HeadlineFormat'] = $HeadlineFormatBak;
          }
          
          // Notify users who have bookmarked the discussion.
@@ -790,26 +800,48 @@ class CommentModel extends VanillaModel {
     * @param array $NotifiedUsers 
     */
    public function RecordAdvancedNotications($ActivityModel, $Activity, $Discussion) {
-      // Grab all of the users that need to be notified.
-      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewComment'))->ResultArray();
+      if (is_numeric($Discussion)) {
+         $Discussion = $this->GetID($Discussion);
+      }
       
-      // Grab all of their follow/unfollow preferences.
-      $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');
       $CategoryID = GetValue('CategoryID', $Discussion);
-      $UserPrefs = $this->SQL
-         ->Select('*')
-         ->From('UserCategory')
-         ->Where('CategoryID', $CategoryID)
-         ->WhereIn('UserID', $UserIDs)
-         ->Get()->ResultArray();
-      $UserPrefs = Gdn_DataSet::Index($UserPrefs, 'UserID');
       
-      foreach ($UserIDs as $UserID) {
-         if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
+      // Figure out the category that governs this notification preference.
+      $i = 0;
+      $Category = CategoryModel::Categories($CategoryID);
+      if (!$Category)
+         return;
+      
+      while ($Category['Depth'] > 2 && $i < 20) {
+         if (!$Category || $Category['Archived'])
+            return;
+         $i++;
+         $Category = CategoryModel::Categories($Category['ParentCategoryID']);
+      } 
+
+      // Grab all of the users that need to be notified.
+      $Data = $this->SQL
+         ->WhereIn('Name', array('Preferences.Email.NewComment.'.$Category['CategoryID'], 'Preferences.Popup.NewComment.'.$Category['CategoryID']))
+         ->Get('UserMeta')->ResultArray();
+      
+      $NotifyUsers = array();
+      foreach ($Data as $Row) {
+         if (!$Row['Value'])
             continue;
          
+         $UserID = $Row['UserID'];
+         $Name = $Row['Name'];
+         if (strpos($Name, '.Email.') !== FALSE) {
+            $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;
+         } elseif (strpos($Name, '.Popup.') !== FALSE) {
+            $NotifyUsers[$UserID]['Notified'] = ActivityModel::SENT_PENDING;
+         }
+      }
+      
+      foreach ($NotifyUsers as $UserID => $Prefs) {
          $Activity['NotifyUserID'] = $UserID;
-         $Activity['Emailed'] = ActivityModel::SENT_PENDING;
+         $Activity['Emailed'] = GetValue('Emailed', $Prefs, FALSE);
+         $Activity['Notified'] = GetValue('Notified', $Prefs, FALSE);
          $ActivityModel->Queue($Activity);
       }
    }
@@ -844,6 +876,8 @@ class CommentModel extends VanillaModel {
          $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
       $DiscussionID = $Discussion['DiscussionID'];
 
+      $this->FireEvent('BeforeUpdateCommentCountQuery');
+      
       $Data = $this->SQL
          ->Select('c.CommentID', 'min', 'FirstCommentID')
          ->Select('c.CommentID', 'max', 'LastCommentID')
@@ -998,5 +1032,17 @@ class CommentModel extends VanillaModel {
       // Clear the page cache.
       $this->RemovePageCache($Comment['DiscussionID']);
       return TRUE;
+   }
+   
+   public function Where($Value = NULL) {
+      if ($Value === NULL)
+         return $this->_Where;
+      elseif (!$Value)
+         $this->_Where = array();
+      elseif (is_a($Value, 'Gdn_SQLDriver')) {
+         if (!empty($this->_Where))
+            $Value->Where($this->_Where);
+      } else
+         $this->_Where = $Value;
    }
 }

@@ -661,12 +661,14 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          if (count($PluginKeyParts) == 2) {
             list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
 
-            if (array_key_exists($EventKey, $Sender->Returns) === FALSE || is_array($Sender->Returns[$EventKey]) === FALSE)
-               $Sender->Returns[$EventKey] = array();
+            if (isset($Sender->Returns)) {
+               if (array_key_exists($EventKey, $Sender->Returns) === FALSE || is_array($Sender->Returns[$EventKey]) === FALSE)
+                  $Sender->Returns[$EventKey] = array();
 
-            $Return = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
-            $Sender->Returns[$EventKey][$PluginKey] = $Return;
-            $Return = TRUE;
+               $Return = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
+               $Sender->Returns[$EventKey][$PluginKey] = $Return;
+               $Return = TRUE;
+            }
          }
       }
       

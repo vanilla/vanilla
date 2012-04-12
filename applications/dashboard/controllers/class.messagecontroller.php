@@ -98,6 +98,7 @@ class MessageController extends DashboardController {
       // Set the model on the form.
       $this->Form->SetModel($this->MessageModel);
       $this->Message = $this->MessageModel->GetID($MessageID);
+      $this->Message = $this->MessageModel->DefineLocation($this->Message);
       
       // Make sure the form knows which item we are editing.
       if (is_numeric($MessageID) && $MessageID > 0)
@@ -131,7 +132,7 @@ class MessageController extends DashboardController {
       $this->AddSideMenu('dashboard/message');
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('jquery.tablednd.js');
-      $this->AddJsFile('jquery.ui.packed.js');
+      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
       $this->AddJsFile('messages.js');
       $this->Title(T('Messages'));
          
@@ -182,6 +183,7 @@ class MessageController extends DashboardController {
       $ControllerData['Dashboard/Profile/Index'] = T('Profile Page');
       $ControllerData['Vanilla/Discussions/Index'] = T('Discussions Page');
       $ControllerData['Vanilla/Discussion/Index'] = T('Comments Page');
+      $ControllerData['Dashboard/Entry/SignIn'] = T('Sign In');
       // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
       // $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
       $this->EventArguments['ControllerData'] = &$ControllerData;

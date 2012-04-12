@@ -176,6 +176,7 @@ if (!function_exists('ArrayTranslate')) {
     * @return array
     */
    function ArrayTranslate($Array, $Mappings) {
+      $Array = (array)$Array;
       $Result = array();
       foreach ($Mappings as $Index => $Value) {
          if (is_numeric($Index)) {
@@ -687,60 +688,120 @@ if (!function_exists('FetchPageInfo')) {
          'Exception' => FALSE
       );
       try {
+         if (!defined('HDOM_TYPE_ELEMENT'))
+            require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
+            
          $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
-         $Dom = new DOMDocument();
-         @$Dom->loadHTML($PageHtml);
-         // Page Title
-         $TitleNodes = $Dom->getElementsByTagName('title');
-         $PageInfo['Title'] = $TitleNodes->length > 0 ? $TitleNodes->item(0)->nodeValue : '';
-         // Page Description
-         $MetaNodes = $Dom->getElementsByTagName('meta');
-         foreach($MetaNodes as $MetaNode) {
-            if (strtolower($MetaNode->getAttribute('name')) == 'description')
-               $PageInfo['Description'] = $MetaNode->getAttribute('content');
+         $Dom = str_get_html($PageHtml);
+         if (!$Dom)
+            throw new Exception('Failed to load page for parsing.');
+         
+         /* Sample Facebook Open Graph code:
+
+<meta property="og:title" content="60 degrees in&nbsp;February" />
+<meta property="og:url" content="http://karinemily.wordpress.com/2012/02/02/60-degrees-in-february/" />
+<meta property="og:description" content="and Philadelphia explodes with babies, puppies, and hipsters." />
+<meta property="og:site_name" content="K a r i &#039; s" />
+<meta property="og:image" content="http://karinemily.files.wordpress.com/2012/02/dsc_0132.jpg?w=300&amp;h=300" />
+<meta property="og:image" content="http://karinemily.files.wordpress.com/2012/02/dsc_0214.jpg?w=300&amp;h=300" />
+<meta property="og:image" content="http://karinemily.files.wordpress.com/2012/02/dsc_0213.jpg?w=300&amp;h=300" />
+<meta property="og:image" content="http://karinemily.files.wordpress.com/2012/02/dsc_0221-version-2.jpg?w=300&amp;h=300" />
+
+          */
+         
+         // FIRST PASS: Look for open graph title, desc, images
+         $PageInfo['Title'] = DomGetContent($Dom, 'meta[property=og:title]');
+         $PageInfo['Description'] = DomGetContent($Dom, 'meta[property=og:description]');
+         foreach ($Dom->find('meta[property=og:image]') as $Image) {
+            if (isset($Image->content))
+               $PageInfo['Images'][] = $Image->content;
          }
-         // Keep looking for page description?
+
+         // SECOND PASS: Look in the page for title, desc, images
+         if ($PageInfo['Title'] == '')
+            $PageInfo['Title'] = $Dom->find('title', 0)->plaintext;
+         
+         if ($PageInfo['Description'] == '')
+            $PageInfo['Description'] = DomGetContent($Dom, 'meta[name=description]');
+
+         // THIRD PASS: Look in the page contents
          if ($PageInfo['Description'] == '') {
-            $PNodes = $Dom->getElementsByTagName('p');
-            foreach($PNodes as $PNode) {
-               $PVal = $PNode->nodeValue;
-               if (strlen($PVal) > 90) {
-                  $PageInfo['Description'] = $PVal;
+            foreach($Dom->find('p') as $element) {
+               if (strlen($element->plaintext) > 150) {
+                  $PageInfo['Description'] = $element->plaintext;
+                  break;
+               }
+            }
+            if (strlen($PageInfo['Description']) > 400)
+               $PageInfo['Description'] = SliceParagraph($PageInfo['Description'], 400);
+         }
+         
+         // Final: Still nothing? remove limitations
+         if ($PageInfo['Description'] == '') {
+            foreach($Dom->find('p') as $element) {
+               if (trim($element->plaintext) != '') {
+                  $PageInfo['Description'] = $element->plaintext;
                   break;
                }
             }
          }
-         if (strlen($PageInfo['Description']) > 400)
-            $PageInfo['Description'] = SliceString($PageInfo['Description'], 400);
             
-         // Page Images (retrieve first 3 if bigger than 100w x 300h)
-         $Images = array();
-         $ImageNodes = $Dom->getElementsByTagName('img');
-         $i = 0;
-         foreach ($ImageNodes as $ImageNode) {
-            $Images[] = AbsoluteSource($ImageNode->getAttribute('src'), $Url);
-         }
+         // Page Images
+         if (count($PageInfo['Images']) == 0)
+            $PageInfo['Images'] = DomGetImages($Dom, $Url);
 
-         // Sort by size, biggest one first
-         $ImageSort = array();
-         // Only look at first 10 images (speed!)
-         $i = 0;
-         foreach ($Images as $Image) {
-            $i++;
-            if ($i > 10)
-               break;
-            
-            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
-            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
-            if (!array_key_exists($Diag, $ImageSort))
-               $ImageSort[$Diag] = $Image;
-         }
-         krsort($ImageSort);
-         $PageInfo['Images'] = array_values($ImageSort);
       } catch (Exception $ex) {
-         $PageInfo['Exception'] = $ex;
+         $PageInfo['Exception'] = $ex->getMessage();
       }
       return $PageInfo;
+   }
+}
+
+if (!function_exists('DomGetContent')) {
+   function DomGetContent($Dom, $Selector, $Default = '') {
+      $Element = $Dom->getElementsByTagName($Selector);
+      return isset($Element->content) ? $Element->content : $Default;
+   }
+}
+
+if (!function_exists('DomGetImages')) {
+   function DomGetImages($Dom, $Url, $MaxImages = 4) {
+      $Images = array();
+      foreach ($Dom->find('img') as $element) {
+         $Images[] = AbsoluteSource($element->src, $Url);
+      }
+
+      // Sort by size, biggest one first
+      $ImageSort = array();
+      // Only look at first 4 images (speed!)
+      $i = 0;
+      foreach ($Images as $Image) {
+         $i++;
+         if ($i > $MaxImages)
+            break;
+
+         try {
+            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
+            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
+            // Require min 100x100 dimension image ($Diag > 141)
+            // Prefer images that are less than 800px wide (banners?)
+            if ($Diag > 141 && $Width < 800) {
+               if (!array_key_exists($Diag, $ImageSort)) {
+                  $ImageSort[$Diag] = array($Image);
+               } else {
+                  $ImageSort[$Diag][] = $Image;
+               }
+            }
+         } catch(Exception $ex) {
+            // do nothing
+         }
+      }
+      krsort($ImageSort);
+      $GoodImages = array();
+      foreach ($ImageSort as $Diag => $Arr) {
+         $GoodImages = array_merge($GoodImages, $Arr);
+      }
+      return $GoodImages;
    }
 }
 
@@ -942,7 +1003,11 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                      break;
                   }
                   
-                  $User = Gdn::UserModel()->GetID($Value[$i]);
+                  $ID = $Value[$i];
+                  if (is_array($ID)) {
+                     continue;
+                  }
+                  $User = Gdn::UserModel()->GetID($ID);
                   $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
                   
                   if ($i == $Count - 1)
@@ -1185,6 +1250,50 @@ if (!function_exists('GetValueR')) {
       return $Value;
    }
 }
+
+if (!function_exists('HtmlEntityDecode')):
+   
+/**
+ * Decode ALL of the entities out of an html string.
+ * 
+ * @param string $string The string to decode.
+ * @param constant $quote_style
+ * @param string $charset
+ * @return string 
+ * @since 2.1
+ */
+function HtmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8") {
+   $string = html_entity_decode($string, $quote_style, $charset);
+   $string = str_ireplace('&apos;', "'", $string);
+   $string = preg_replace_callback('~&#x([0-9a-fA-F]+);~i', "chr_utf8_callback", $string);
+   $string = preg_replace('~&#([0-9]+);~e', 'chr_utf8("\\1")', $string);
+   return $string; 
+}
+
+/** 
+ * Callback helper 
+ */
+
+function chr_utf8_callback($matches) { 
+   return chr_utf8(hexdec($matches[1])); 
+}
+
+/**
+* Multi-byte chr(): Will turn a numeric argument into a UTF-8 string.
+* 
+* @param mixed $num
+* @return string
+*/
+
+function chr_utf8($num) {
+   if ($num < 128) return chr($num);
+   if ($num < 2048) return chr(($num >> 6) + 192) . chr(($num & 63) + 128);
+   if ($num < 65536) return chr(($num >> 12) + 224) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+   if ($num < 2097152) return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+   return '';
+}
+
+endif;
 
 if (!function_exists('ImplodeAssoc')) {
    /**
@@ -1484,6 +1593,28 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
+if (!function_exists('write_ini_string')) {
+   function write_ini_string($Data) {
+      $Flat = array();
+      foreach($Data as $Topic => $Settings) {
+         if (is_array($Settings)) {
+            $Flat[] = "[{$Topic}]";
+               foreach ($Settings as $SettingsKey => $SettingsVal) $Flat[] = "{$SettingsKey} = ".(is_numeric($SettingsVal) ? $SettingsVal : '"'.$SettingsVal.'"');
+            $Flat[] = "";
+         }
+         else $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
+      }
+      return implode("\n", $Flat);
+   }
+}
+
+if (!function_exists('write_ini_file')) {
+   function write_ini_file($File, $Data) {
+      $String = write_ini_string($Data);
+      Gdn_FileSystem::SaveFile($File, $String);
+   }
+}
+
 if (!function_exists('SignInPopup')) {
    /**
     * Returns a boolean value indicating if sign in windows should be "popped"
@@ -1506,6 +1637,48 @@ if (!function_exists('PrefixString')) {
          $String = $Prefix . $String;
       }
       return $String;
+   }
+}
+
+if (!function_exists('PrepareArray')) {
+   /**
+    * Makes sure that the key in question exists and is of the specified type,
+    * by default also an array.
+    * 
+    * @param string $Key Key to prepare
+    * @param array $Array Array to repare
+    * @param string $PrepareType Optional, 
+    */
+   function PrepareArray($Key, &$Array, $PrepareType = 'array') {
+      if (!array_key_exists($Key, $Array))
+         $Array[$Key] = NULL;
+      
+      switch ($PrepareType) {
+         case 'array':
+            if (!is_array($Array[$Key]))
+               $Array[$Key] = array();
+            break;
+            
+         case 'integer':
+            if (!is_integer($Array[$Key]))
+               $Array[$Key] = 0;
+            break;
+            
+         case 'float':
+            if (!is_float($Array[$Key]))
+               $Array[$Key] = 0.0;
+            break;
+            
+         case 'null':
+            if (!is_null($Array[$Key]))
+               $Array[$Key] = NULL;
+            break;
+            
+         case 'string':
+            if (!is_string($Array[$Key]))
+               $Array[$Key] = '';
+            break;
+      }
    }
 }
 
@@ -1933,8 +2106,8 @@ if (!function_exists('RemoteIP')) {
 }
 
 if (!function_exists('RemoveFromConfig')) {
-   function RemoveFromConfig($Name) {
-      Gdn::Config()->RemoveFromConfig($Name);
+   function RemoveFromConfig($Name, $Options = array()) {
+      Gdn::Config()->RemoveFromConfig($Name, $Options);
    }
 }
 

@@ -86,6 +86,14 @@ body {
 	background: #fff;
 	float: left;
 	width: 100%;
+	zoom: 1; /* hasLayout for IE6/7 */
+}
+#Body:after { /* clearfix */
+	visibility: hidden;
+	display: block;
+	content: "";
+	clear: both;
+	height: 0;
 }
 #Content {
 	padding: 0 0 20px;
@@ -150,6 +158,9 @@ hr {
 p {
    margin: .5em 0;
    line-height: 1.4em;
+}
+.P {
+   margin: 5px 0;
 }
 small {
 	font-size: 12px;
@@ -238,6 +249,11 @@ input.WideInput {
 	width: auto;
 	padding-right: 8px;
 }
+.TextBoxWrapper textarea,
+.TextBoxWrapper input {
+   width: 100%;
+}
+
 input.SmallInput,
 input.InputBox {
    font-size: 15px;
@@ -286,6 +302,7 @@ select.Year {
 	text-decoration:none;
 	text-shadow:0 1px 0 #B7F5FD;
    font-weight: normal;
+   display: inline-block;
 }
 .Button {
    box-shadow: 0px 0px 2px #999;
@@ -382,6 +399,27 @@ a.Button {
 .TinyProgress {
 	padding: 10px 40px 10px 0 !important;
 	background: url('images/progress_sm.gif') center center no-repeat;
+   display: inline !Important;
+}
+.InProgress {
+   color: transparent !Important;
+   background: url('images/progress_sm.gif') center center no-repeat !important;
+   border-color: transparent !important;
+   -moz-box-shadow: none !important;
+   -webkit-box-shadow: none !important;
+   box-shadow: none !important;
+   color: transparent !important;
+   text-shadow: none !important;
+}
+.InProgress {
+   color: transparent !Important;
+   background: url('images/progress_sm.gif') center center no-repeat !important;
+   border-color: transparent !important;
+   -moz-box-shadow: none !important;
+   -webkit-box-shadow: none !important;
+   box-shadow: none !important;
+   color: transparent !important;
+   text-shadow: none !important;
 }
 
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
@@ -426,6 +464,24 @@ div.DismissMessage a.Dismiss {
 div.DismissMessage a.Dismiss:hover {
 	color: #ff0084;
 }
+.CasualMessage {
+   background: #CFECFF;
+   border: 1px solid #ABDAFB;
+   color: #1E79A7;
+}
+.InfoMessage {
+   background: #F6F6F6;
+   border: 1px solid #ddd;
+}
+.AlertMessage {
+   background: #fff8ce;
+   border: 1px solid #DEDDAF;
+}
+.WarningMessage {
+   background: #ffebe9;
+   border: 1px solid #FFCCC9;
+}
+
 div.Box {
 	border: 1px solid #a5d0e7;
    background: #d3f0ff;
@@ -1153,36 +1209,31 @@ ul.PanelInfo li.Active:hover {
 
 
 /* ================================================== Splash Information Page */
+body.Home {
+   margin: 0;
+   padding: 80px;
+	background: url('images/eyes.png') 30px 30px no-repeat #fff;   
+}
 body.Home #Content {
 	margin: 0 auto;
-}
-#Content .SplashInfo {
-	margin: 80px 0 0 0;
-	border-top: 1px solid #a5d0e7;
-	border-bottom: 1px solid #a5d0e7;
-	background: #e2f4ff;
+   border: none;
 }
 #Content .SplashInfo h1 {
-	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
-	background: transparent;
-	text-align: center;
-	border: none;
-	border-top: 1px solid #fff;
-	color:#02455B;
+   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+   background: transparent;
+   border: none;
+   font-weight:bold;
+	color:#000;
 	font-size:300%;
-	text-shadow:0 1px 0 #FFFFFF;
-	padding: 10px 0 0;
-	margin: 0;
-	line-height: 1;
+   margin: 20px 0;
+   padding: 0;
+   line-height: 1;
 }
 #Content .SplashInfo p {
-	font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
-	text-align: center;
-	border-bottom: 1px solid #fff;
-	margin: 0;
-	padding: 0 0 10px;
-	color: #076C8E;
-	font-size: 20px;
+	margin: 10px 0;
+	color: #777;
+	font-size: 16px;
+   line-height: 1.6;
 }
 
 /* =================================================================== Popups */
@@ -1195,7 +1246,7 @@ div.Popup div.Messages {
 	margin: 10px 0 !important;
 }
 div.Popup div.Warning {
-	margin: 10px 0 0;
+	margin: 10px 0;
 }
 div.Popup div.Messages ul {
 	display: block;
@@ -1642,6 +1693,14 @@ div.Summary table tbody td {
 	margin: 6px 0 10px;
 }
 
+.Count {
+   background: #02639E;
+   border-radius: 2px;
+   color: #fff;
+   font-size: 11px;
+   padding: 1px 6px !Important;
+}
+
 .Tag {
    background: #555;
    color: #fff;
@@ -1663,7 +1722,7 @@ div.Summary table tbody td {
 .Tag-Edit {
    background-color: #F27527;
 }
-.Tag-Delete {
+.Tag-Delete, .Tag-Ban {
    background-color: #C70028;
 }
 .Tag-Moderate {
@@ -1759,10 +1818,10 @@ div.Summary table tbody td {
 	font-size: 12px;
 }
 /* Homepage Admin */
-.HomeOptions {
+.Homepage {
 	padding: 0 20px;
 }
-.HomeOptions a {
+.Homepage a {
 	color: #777;
 	font-weight: bold;
 	font-size: 12px;
@@ -1773,10 +1832,14 @@ div.Summary table tbody td {
 	padding: 0;
 	line-height: 2.6;
 }
-.HomeOptions a:last-child {
-	margin: 0 0 10px 0;
+.Homepage .Sprite {
+	display: block;
+	height: 124px;
+	width: 180px;
+	background: url('images/homepage-sprites.png') 0 0 no-repeat;
+	border: 1px solid #888;
 }
-.HomeOptions a span {
+.Homepage a .Wrap {
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
@@ -1784,29 +1847,32 @@ div.Summary table tbody td {
 	border: 2px solid #ccc;
 	padding: 6px;
 	margin: 0;
-	height: 122px;
-	width: 180px;
-	background: url('images/homepage-sprites.png') 6px 6px no-repeat transparent;
 	display: block;
 }
-.HomeOptions a.categoriesdiscussions span { background-position: -184px 6px; }
-.HomeOptions a.categoriesall span { background-position: -564px 6px; }
-.HomeOptions a.activity span { background-position: -374px 6px; }
-.HomeOptions a:hover {
+.Homepage .SpDiscussionsTable { background-position: 0 0; }
+.Homepage .SpDiscussions { background-position: -180px 0; }
+.Homepage .SpCategories { background-position: -360px 0; }
+.Homepage .SpCategoriesTable { background-position: 0 -124px; }
+.Homepage .SpCategoriesMixed { background-position: -180px -124px; }
+.Homepage .SpActivity { background-position: -360px -124px; }
+.Homepage a:hover {
 	color: #000;
 }
-.HomeOptions a:hover span {
+.Homepage a:hover .Wrap {
 	background-color: #fafafa;
 	border-color: #aaa;
 }
-.HomeOptions a.Current {
+.Homepage a.Current {
 	color: #000;
 	background: url('images/check.png') 2px 3px no-repeat;
 	text-indent: 36px;
 }
-.HomeOptions a.Current span {
+.Homepage a.Current .Wrap {
    background-color: #D6FFCF;
    border-color: #06A800;
+}
+.LayoutOptions {
+	margin: 20px 0;
 }
 
 ol.Sortable, ol.Sortable ol {
@@ -2256,4 +2322,14 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 	height: 42px;
 	width: 341px;
 	background: url('images/welcome-message.png') top left no-repeat transparent;
+}
+.Info ul,
+.Info ol {
+   margin: 1em 0 1em 3em;
+}
+.Info ol li {
+  list-style: decimal !important;
+}
+.Info ul li {
+  list-style: disc !important;
 }

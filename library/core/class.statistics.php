@@ -120,7 +120,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       if (!is_writable($ConfFile)) {
          // Admins see a helpful notice
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-            $Warning = '<span class="InformSprite Sliders"></span> ';
+            $Warning = Sprite('Sliders', 'InformSprite');
             $Warning .= T('Your config.php file is not writable.<br/> Find out <a href="http://vanillaforums.org/docs/vanillastatistics">how to fix this &raquo;</a>');
             Gdn::Controller()->InformMessage($Warning, array('CssClass' => 'HasSprite'));
          }
@@ -547,7 +547,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          if (Gdn::Get('Garden.Analytics.Notify', FALSE) !== FALSE) {
-            $CallMessage = '<span class="InformSprite Bandaid"></span> ';
+            $CallMessage = Sprite('Bandaid', 'InformSprite');
             $CallMessage .= sprintf(T("There's a problem with Vanilla Analytics that needs your attention.<br/> Handle it <a href=\"%s\">here &raquo;</a>"),Url('dashboard/statistics'));
             Gdn::Controller()->InformMessage($CallMessage,array('CssClass' => 'HasSprite'));
          }
@@ -570,33 +570,26 @@ class Gdn_Statistics extends Gdn_Plugin {
          return $this->Register();
       }
       
-      // Add a pageview entry.
-      $TimeSlot = date('Ymd');
-      $Px = Gdn::Database()->DatabasePrefix;
+      // Store the view, using denormalization if enabled
+      $this->AddView();
       
-      try {
-         Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
-         on duplicate key update Views = Views+1", array(
-            ':TimeSlot'    => $TimeSlot
-         ));
-      } catch(Exception $e) {
-      
-         // If we just tried to run the structure, and failed, don't blindly try again. 
-         // Just disable ourselves quietly.
-         if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE)) {
-            SaveToConfig('Garden.Analytics.Enabled', FALSE);
-            Gdn::Set('Garden.Analytics.AutoStructure', NULL);
-            return;
-         }
-         
-         // If we get here, insert failed. Try proxyconnect to the utility structure
-         Gdn::Set('Garden.Analytics.AutoStructure', TRUE);
-         ProxyRequest(Url('utility/update', TRUE), 0, FALSE);
-      }
-      
-      // If we get here and this is true, we successfully ran the auto structure. Remove config flag.
-      if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE))
-         Gdn::Set('Garden.Analytics.AutoStructure', NULL);
+//      
+//         // If we just tried to run the structure, and failed, don't blindly try again. 
+//         // Just disable ourselves quietly.
+//         if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE)) {
+//            SaveToConfig('Garden.Analytics.Enabled', FALSE);
+//            Gdn::Set('Garden.Analytics.AutoStructure', NULL);
+//            return;
+//         }
+//         
+//         // If we get here, insert failed. Try proxyconnect to the utility structure
+//         Gdn::Set('Garden.Analytics.AutoStructure', TRUE);
+//         ProxyRequest(Url('utility/update', TRUE), 0, FALSE);
+//      }
+//      
+//      // If we get here and this is true, we successfully ran the auto structure. Remove config flag.
+//      if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE))
+//         Gdn::Set('Garden.Analytics.AutoStructure', NULL);
       
       // Fire an event for plugins to track their own stats.
       // TODO: Make this analyze the path and throw a specific event (this event will change in future versions).
@@ -608,6 +601,48 @@ class Gdn_Statistics extends Gdn_Plugin {
       if (empty($LastSentDate) || $LastSentDate < date('Ymd', strtotime('-1 day')))
          return $this->Stats();
    }
+   
+   /**
+	 * Increments view count for the specified discussion.
+	 *
+    * @since 2.1a
+    * @access public
+    */
+	public function AddView() {
+      // Add a pageview entry.
+      $TimeSlot = date('Ymd');
+      $Px = Gdn::Database()->DatabasePrefix;
+      
+      try {
+         if (C('Garden.Analytics.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
+            $CacheKey = "QueryCache.Analytics.CountViews";
+
+            // Increment. If not success, create key.
+            $Incremented = Gdn::Cache()->Increment($CacheKey);
+            if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
+               Gdn::Cache()->Store($CacheKey, 1);
+
+            // Get current cache value
+            $Views = Gdn::Cache()->Get($CacheKey);
+
+            // Every X views, writeback to Discussions
+            if (($Views % C('Garden.Analytics.Views.DenormalizeWriteback', 100)) == 0) {
+               Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
+               on duplicate key update Views = Views+{$Views}", array(
+                  ':TimeSlot'    => $TimeSlot
+               ));
+            }
+         } else {
+            Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
+               on duplicate key update Views = Views+1", array(
+                  ':TimeSlot'    => $TimeSlot
+               ));
+         }
+      } catch (Exception $Ex) {
+         if (Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+            throw $Ex;
+      }
+	}
    
    public static function Time() {
       return time();

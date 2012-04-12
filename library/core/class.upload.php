@@ -80,7 +80,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       $this->EventArguments['Parsed'] = $Parsed;
       $this->EventArguments['Path'] =& $LocalPath;
 
-      $this->FireEvent('CopyLocal');
+      $this->FireAs('Gdn_Upload')->FireEvent('CopyLocal');
       if (!$LocalPath) {
          $LocalPath = PATH_UPLOADS.'/'.$Parsed['Name'];
       }
@@ -99,7 +99,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       $this->EventArguments['Parsed'] =& $Parsed;
       $Handled = FALSE;
       $this->EventArguments['Handled'] =& $Handled;
-      $this->FireEvent('Delete');
+      $this->FireAs('Gdn_Upload')->FireEvent('Delete');
 
       if (!$Handled) {
          $Path = PATH_UPLOADS.'/'.ltrim($Name, '/');
@@ -187,16 +187,23 @@ class Gdn_Upload extends Gdn_Pluggable {
 		return GetValue('extension', $Info, '');
 	}
 
-	public function GenerateTargetName($TargetFolder, $Extension = '') {
-		if ($Extension == '')
-			$Extension = $this->GetUploadedFileExtension();
+   public function GenerateTargetName($TargetFolder, $Extension = 'jpg', $Chunk = FALSE) {
+      if (!$Extension) {
+         $Extension = trim(pathinfo($this->_UploadedFile['name'], PATHINFO_EXTENSION), '.');
+      }
 
-		$Name = RandomString(12);
-		while (file_exists($TargetFolder . DS . $Name . '.' . $Extension)) {
-			$Name = RandomString(12);
-		}
-		return $TargetFolder . DS . $Name . '.' . $Extension;
-	}
+      do {
+         if ($Chunk) {
+            $Name = RandomString(12);
+            $Subdir = sprintf('%03d', mt_rand(0, 999)).'/';
+         } else {
+            $Name = RandomString(12);
+            $Subdir = '';
+         }
+         $Path = "$TargetFolder/{$Subdir}$Name.$Extension";
+      } while(file_exists($Path));
+      return $Path;
+   }
 
 	public function SaveAs($Source, $Target) {
       $this->EventArguments['Path'] = $Source;
@@ -204,7 +211,7 @@ class Gdn_Upload extends Gdn_Pluggable {
       $this->EventArguments['Parsed'] =& $Parsed;
       $Handled = FALSE;
       $this->EventArguments['Handled'] =& $Handled;
-      $this->FireEvent('SaveAs');
+      $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
 
       // Check to see if the event handled the save.
       if (!$Handled) {

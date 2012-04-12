@@ -1,9 +1,9 @@
-<?php if (!defined('APPLICATION')) exit();
-$this->Title(T('Start a New Conversation'));
-?>
-<div id="ConversationForm">
-   <h1><?php echo T('Start a New Conversation'); ?></h1>
+<?php if (!defined('APPLICATION')) exit(); ?>
+<div id="ConversationForm" class="FormTitleWrapper">
    <?php
+   echo Wrap($this->Data('Title'), 'h1');
+   
+   echo '<div class="FormWrapper">'; 
    echo $this->Form->Open();
    echo $this->Form->Errors();
    
@@ -27,5 +27,6 @@ $this->Title(T('Start a New Conversation'));
    echo '</div>';
    
    echo $this->Form->Close('Start Conversation');
+   echo '</div>';
    ?>
 </div>

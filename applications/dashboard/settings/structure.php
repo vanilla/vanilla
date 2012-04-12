@@ -34,18 +34,17 @@ $Construct
    ->Set($Explicit, $Drop);
 
 if (!$RoleTableExists || $Drop) {
-   // Define some roles.
-   // Note that every RoleID must be a power of two so that they can be combined as a bit-mask.
+   // Define default roles
+   // RoleIDs 3, 4, & 8 are referenced in config-defaults.php
    $RoleModel = Gdn::Factory('RoleModel');
    $RoleModel->Database = $Database;
    $RoleModel->SQL = $SQL;
-//   $RoleModel->Define(array('Name' => 'Banned', 'RoleID' => 1, 'Sort' => '1', 'Deletable' => '1', 'CanSession' => '0', 'Description' => 'Banned users are not allowed to participate or sign in.'));
-   $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '2', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
+   $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '1', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
+   $RoleModel->Define(array('Name' => 'Unconfirmed', 'RoleID' => 3, 'Sort' => '2', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Users must confirm their emails before becoming full members. They get assigned to this role.'));
    $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '1', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
    $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
    $RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators have permission to edit most content.'));
    $RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have permission to do anything.'));
-   $RoleModel->Define(array('Name' => 'Confirm Email', 'RoleID' => 3, 'Sort' => '7', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Users must confirm their emails before becoming full members. They get assigned to this role.'));
    unset($RoleModel);
 }
 
@@ -61,10 +60,12 @@ $Construct
    ->Column('Password', 'varbinary(100)') // keep this longer because of some imports.
 	->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('Photo', 'varchar(255)', NULL)
+   ->Column('Title', 'varchar(100)', NULL)
+   ->Column('Location', 'varchar(100)', NULL)
    ->Column('About', 'text', TRUE)
    ->Column('Email', 'varchar(200)', FALSE, 'index')
    ->Column('ShowEmail', 'tinyint(1)', '0')
-   ->Column('Gender', array('m', 'f'), 'm')
+   ->Column('Gender', array('u', 'm', 'f'), 'u')
    ->Column('CountVisits', 'int', '0')
    ->Column('CountInvitations', 'int', '0')
    ->Column('CountNotifications', 'int', NULL)
@@ -86,6 +87,7 @@ $Construct
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
+   ->Column('Verified', 'tinyint(1)', '0') // user if verified as a non-spammer
    ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
@@ -145,7 +147,7 @@ $Construct->Table('UserAuthenticationProvider')
    ->Column('Name', 'varchar(50)', TRUE)
    ->Column('URL', 'varchar(255)', TRUE)
    ->Column('AssociationSecret', 'text', FALSE)
-   ->Column('AssociationHashMethod', 'varchar(20)', FALSE)
+   ->Column('AssociationHashMethod', 'varchar(20)', TRUE)
    ->Column('AuthenticateUrl', 'varchar(255)', TRUE)
    ->Column('RegisterUrl', 'varchar(255)', TRUE)
    ->Column('SignInUrl', 'varchar(255)', TRUE)
@@ -185,6 +187,7 @@ $Construct->Table('AnalyticsLocal')
    ->Engine('InnoDB')
    ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')
    ->Column('Views', 'int', NULL)
+   ->Column('CommentViews', 'int', TRUE)
    ->Set(FALSE, FALSE);
 
 // Only Create the permission table if we are using Garden's permission model.
@@ -364,11 +367,12 @@ $Construct
    ->Column('Photo', 'varchar(255)', TRUE)
    ->Column('HeadlineFormat', 'varchar(255)', TRUE)
    ->Column('Story', 'text', TRUE)
+   ->Column('Format', 'varchar(10)', TRUE)
    ->Column('Route', 'varchar(255)', TRUE)
    ->Column('RecordType', 'varchar(20)', TRUE)
    ->Column('RecordID', 'int', TRUE)
 //   ->Column('CountComments', 'int', '0')
-   ->Column('InsertUserID', 'int', TRUE)
+   ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('DateUpdated', 'datetime', !$DateUpdatedExists, 'index')
@@ -568,8 +572,8 @@ $Construct->Table('Tag')
 
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
-   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Error'))
-   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'Configuration'), FALSE, 'index')
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Ban', 'Error'))
+   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration'), FALSE, 'index')
    ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record

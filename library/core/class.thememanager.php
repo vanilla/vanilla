@@ -59,7 +59,6 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     * a "Folder" definition to the Theme Info Array for each.
     */
    public function AvailableThemes($Force = FALSE) {
-      
       if (is_null($this->ThemeCache) || $Force) {
       
          $this->ThemeCache = array();
@@ -129,6 +128,10 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             
          $ThemeAboutFile = GetValue('about', $ThemeFiles);
          $SearchThemeInfo = $this->ScanThemeFile($ThemeAboutFile);
+         
+         // Don't index archived themes.
+//         if (GetValue('Archived', $SearchThemeInfo, FALSE))
+//            continue;
          
          // Add the screenshot.
          if (array_key_exists('screenshot', $ThemeFiles)) {

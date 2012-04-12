@@ -7,7 +7,7 @@
   <div id="Frame">
 	 <div class="Banner">
 		<ul>
-		  {discussions_link}
+		  {home_link}
 		  {profile_link}
 		  {inbox_link}
 		  {custom_menu}
@@ -18,6 +18,9 @@
 		</ul>
 	 </div>
 	 <div id="Body">
+       <div class="BreadcrumbsWrapper">
+         {breadcrumbs homelink="0"}
+       </div>
 		<div id="Content">
 		  {asset name="Content"}
 		</div>
@@ -32,9 +35,7 @@
 		  {dashboard_link wrap="span"}
 		  {signinout_link wrap="span"}
 		</div>
-		<div>
-		  <a href="{vanillaurl}"><span>Powered by Vanilla</span></a>
-		</div>
+      <a class="PoweredByVanilla" href="{vanillaurl}"><span>Powered by Vanilla</span></a>
 		{asset name="Foot"}
 	 </div>
   </div>

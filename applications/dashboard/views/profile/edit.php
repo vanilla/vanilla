@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo T('Edit My Account'); ?></h2>
+<h2><?php echo $this->Data('Title'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -30,7 +30,7 @@ echo $this->Form->Errors();
    <li class="Gender">
       <?php
          echo $this->Form->Label('Gender', 'Gender');
-         echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'm'))
+         echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
       ?>
    </li>
    <?php

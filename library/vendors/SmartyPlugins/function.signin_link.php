@@ -17,7 +17,7 @@ function smarty_function_signin_link($Params, &$Smarty) {
       return Gdn_Theme::Link(
          'signinout',
          GetValue('text', $Params, ''),
-         GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)),
+         GetValue('format', $Params, Wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $Wrap)),
          $Params
       );
    }

@@ -71,9 +71,17 @@ class Gdn_Format {
          $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
          $GenderSuffixCode = 'Third';
       }
-      
-      $Gender = T($Activity->ActivityGender == 'm' ? 'his' : 'her');
-      $Gender2 = T($Activity->ActivityGender == 'm' ? 'he' : 'she');
+
+      $Gender = T('their'); //TODO: this isn't preferable but I don't know a better option
+      $Gender2 = T('they'); //TODO: this isn't preferable either
+      if ($Activity->ActivityGender == 'm') {
+        $Gender = T('his');
+        $Gender2 = T('he');
+      } else if ($Activity->ActivityGender == 'f') {
+        $Gender = T('her');
+        $Gender2 = T('she');
+      }
+
       if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID)) {
          $Gender = $Gender2 = T('your');
       }
@@ -497,6 +505,52 @@ class Gdn_Format {
    }
    
    /**
+    * Formats a MySql datetime or a unix timestamp for display in the system.
+    * 
+    * @param int $Timestamp
+    * @param string $Format 
+    * @since 2.1
+    */
+   public static function DateFull($Timestamp, $Format = '') {
+      if ($Timestamp === NULL)
+         return T('Null Date', '-');
+
+      // Was a mysqldatetime passed?
+      if (!is_numeric($Timestamp)) {
+         $Timestamp = self::ToTimestamp($Timestamp);
+      }
+         
+      if (!$Timestamp)
+         $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
+      $GmTimestamp = $Timestamp;
+
+      $Now = time();
+      
+      // Alter the timestamp based on the user's hour offset
+      $Session = Gdn::Session();
+      if ($Session->UserID > 0) {
+         $SecondsOffset = ($Session->User->HourOffset * 3600);
+         $Timestamp += $SecondsOffset;
+         $Now += $SecondsOffset;
+      }
+
+      $Html = FALSE;
+      if (strcasecmp($Format, 'html') == 0) {
+         $Format = '';
+         $Html = TRUE;
+      }
+      
+      $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
+
+      $Result = strftime($FullFormat, $Timestamp);
+
+      if ($Html) {
+         $Result = Wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));
+      }
+      return $Result;
+   }
+   
+   /**
     * Format a string from of "Deleted" content (comment, message, etc).
     *
     * @param mixed $Mixed An object, array, or string to be formatted.
@@ -583,30 +637,30 @@ class Gdn_Format {
       
       $time = $Timestamp;
 
-      define('NOW',        time());
-      define('ONE_MINUTE', 60);
-      define('ONE_HOUR',   3600);
-      define('ONE_DAY',    86400);
-      define('ONE_WEEK',   ONE_DAY*7);
-      define('ONE_MONTH',  ONE_WEEK*4);
-      define('ONE_YEAR',   ONE_MONTH*12);
+      $NOW = time();
+      if (!defined('ONE_MINUTE')) define('ONE_MINUTE', 60);
+      if (!defined('ONE_HOUR')) define('ONE_HOUR',   3600);
+      if (!defined('ONE_DAY')) define('ONE_DAY',    86400);
+      if (!defined('ONE_WEEK')) define('ONE_WEEK',   ONE_DAY*7);
+      if (!defined('ONE_MONTH')) define('ONE_MONTH',  ONE_WEEK*4);
+      if (!defined('ONE_YEAR')) define('ONE_YEAR',   ONE_MONTH*12);
       
-      $SecondsAgo = NOW - $time;
+      $SecondsAgo = $NOW - $time;
 
       // sod = start of day :)
       $sod = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
-      $sod_now = mktime(0, 0, 0, date('m', NOW), date('d', NOW), date('Y', NOW ));
+      $sod_now = mktime(0, 0, 0, date('m', $NOW), date('d', $NOW), date('Y', $NOW ));
 
       // used to convert numbers to strings
       $convert = array(1 => T('a'), 2 => T('two'), 3 => T('three'), 4 => T('four'), 5 => T('five'), 6 => T('six'), 7 => T('seven'), 8 => T('eight'), 9 => T('nine'), 10 => T('ten'), 11 => T('eleven'));
 
       // today
       if ($sod_now == $sod) {
-         if ( $time > NOW-(ONE_MINUTE*3)) {
+         if ( $time > $NOW-(ONE_MINUTE*3)) {
             return T('just now');
-         } else if ($time > NOW-(ONE_MINUTE*7)) {
+         } else if ($time > $NOW-(ONE_MINUTE*7)) {
             return T('a few minutes ago');
-         } else if ($time > NOW-(ONE_HOUR)) {
+         } else if ($time > $NOW-(ONE_HOUR)) {
             if ($MorePrecise) {
                $MinutesAgo = ceil($SecondsAgo / 60);
                return sprintf(T('%s minutes ago'), $MinutesAgo);
@@ -763,6 +817,24 @@ class Gdn_Format {
       $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
       return $Result;
    }
+   
+   /**
+    * Format some text in a way suitable for passing into an rss/atom feed.
+    * @since 2.1
+    * @param string $Text The text to format.
+    * @param string $Format The current format of the text.
+    * @return string
+    */
+   public static function RssHtml($Text, $Format = 'Html') {
+      if (!in_array($Text, array('Html', 'Raw')))
+         $Text = Gdn_Format::To($Text, $Format);
+      
+      if (function_exists('FormatRssHtmlCustom')) {
+         return FormatRssHtmlCustom($Text);
+      } else {
+         return Gdn_Format::Html($Text);
+      }
+   }
 
    public static function TagContent($Html, $Callback, $SkipAnchors = TRUE) {
       $Regex = "`([<>])`i";
@@ -871,15 +943,16 @@ class Gdn_Format {
          return $Matches[0];
       $Url = $Matches[4];
 
-      if ((preg_match('`(?:https?|ftp)://www\.youtube\.com\/watch\?v=([^&]+)`', $Url, $Matches) 
-         || preg_match('`(?:https?)://youtu\.be\/([^&]+)`', $Url, $Matches)) 
+      if ((preg_match('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches) 
+         || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches)) 
          && C('Garden.Format.YouTube')) {
-         $ID = $Matches[1];
+         $ID = $Matches['ID'];
+         $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
          $Result = <<<EOT
-<div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
+<div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1$TimeMarker" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
 EOT;
-      } elseif (preg_match('`(?:https?|ftp)://vimeo\.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
-         $ID = $Matches[1];
+      } elseif (preg_match('`(?:https?|ftp)://(www\.)?vimeo\.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
+         $ID = $Matches[2];
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
 EOT;
@@ -927,7 +1000,7 @@ EOT;
     * 
     * @return array array(Width, Height)
     */
-   protected static function GetEmbedSize() {
+   public static function GetEmbedSize() {
       $Sizes = array(
          'tiny' => array( 400, 225),
          'small'=> array( 560, 340),

@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
-   'Description' => 'Allow tagging of discussions.',
-   'Version' => '1.3.2',
+   'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
+   'Version' => '1.3.3',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -27,6 +27,7 @@ v1.2 (2011-10-02 Matt Lincoln Russell lincoln@vanillaforums.com)
 v1.3 (2011-10-21 Lincoln)
 - Removed redundant enable/disable plugin functionality.
 
+   1.3.3 - Fix inline display hook for 2.1a9 (2012-01-15 Lincoln)
 */
 
 class TaggingPlugin extends Gdn_Plugin {
@@ -54,9 +55,9 @@ class TaggingPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Show tags after first comment.
+    * Show tags after discussion body.
     */
-   public function DiscussionController_AfterCommentBody_Handler($Sender) {
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       // Allow disabling of inline tags.
       if (C('Plugins.Tagging.DisableInline', FALSE))
          return;

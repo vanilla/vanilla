@@ -16,9 +16,52 @@ if (!function_exists('Alternate')) {
    function Alternate($Odd = 'Alt', $Even = '', $AttributeName = 'class'){
       static $i = 0;
       $Value = $i++ % 2 ? $Odd : $Even;
-      if($Value != '' && $Even == '')
+      if($Value != '' && $Even == '' && $AttributeName)
          $Value = ' '.$AttributeName.'="'.$Value.'"';
       return $Value;
+   }
+}
+
+/**
+ * English "plural" formatting for numbers that can get really big.
+ */
+if (!function_exists('BigPlural')) {
+   function BigPlural($Number, $Singular, $Plural = FALSE) {
+      if (!$Plural) {
+         $Plural = $Singular.'s';
+      }
+      $Title = sprintf(T($Number == 1 ? $Singular : $Plural), number_format($Number));
+      
+      return '<span title="'.$Title.'">'.Gdn_Format::BigNumber($Number).'</span>';
+   }
+}
+
+if (!function_exists('CategoryUrl')):
+
+/**
+ * Return a url for a category. This function is in here and not functions.general so that plugins can override.
+ * @param array $Category
+ * @return string
+ */
+function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+   if (is_string($Category))
+      $Category = CategoryModel::Categories($Category);
+   $Category = (array)$Category;
+   
+   $Result = '/categories/'.rawurlencode($Category['UrlCode']);
+   if ($Page && $Page > 1) {
+         $Result .= '/p'.$Page;
+   }
+   return Url($Result, $WithDomain);
+}
+   
+endif;
+
+if (!function_exists('Condense')) {
+   function Condense($Html) {
+      $Html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $Html);
+      $Html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $Html);
+      return $Html;
    }
 }
 
@@ -74,6 +117,25 @@ if (!function_exists('Anchor')) {
       return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, 'UTF-8').'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
+
+if (!function_exists('DiscussionUrl')):
+
+/**
+ * Return a url for a discussion. This function is in here and not functions.general so that plugins can override.
+ * @param object $Discussion
+ * @return string
+ */
+function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
+   $Discussion = (object)$Discussion;
+   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+   if ($Page) {
+      if ($Page > 1 || Gdn::Session()->UserID)
+         $Result .= '/p'.$Page;
+   }
+   return Url($Result, $WithDomain);
+}
+   
+endif;
 
 if (!function_exists('FixNl2Br')) {
    /**
@@ -171,6 +233,18 @@ if (!function_exists('Img')) {
    }
 }
 
+if (!function_exists('InSection')) {
+   /**
+    * Returns whether or not the page is in one of the given section(s).
+    * @since 2.1
+    * @param string|array $Section
+    * @return bool
+    */
+   function InSection($Section) {
+      return Gdn_Theme::InSection($Section);
+   }
+}
+
 if (!function_exists('IPAnchor')) {
    /**
     * Returns an IP address with a link to the user search.
@@ -192,7 +266,7 @@ if (!function_exists('Plural')) {
    function Plural($Number, $Singular, $Plural) {
 		// Make sure to fix comma-formatted numbers
       $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T($WorkingNumber == 1 ? $Singular : $Plural), $Number);
+      return sprintf(T(abs($WorkingNumber) == 1 ? $Singular : $Plural), $Number);
    }
 }
 
@@ -215,13 +289,14 @@ if (!function_exists('UserAnchor')) {
       
       $Name = GetValue($Px.'Name', $User, T('Unknown'));
       $UserID = GetValue($Px.'UserID', $User, 0);
+		$Text = GetValue('Text', $Options, htmlspecialchars($Name)); // Allow anchor text to be overridden.
       
       $Attributes = array(
           'class' => $CssClass,
           'rel' => GetValue('Rel', $Options)
           );
 
-      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.htmlspecialchars($Name).'</a>';
+      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
 
@@ -261,7 +336,7 @@ if (!function_exists('UserPhoto')) {
          $User = (object)$User;
       
       $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
-      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoMedium');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhoto ProfilePhotoMedium');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
@@ -316,6 +391,25 @@ if (!function_exists('Wrap')) {
       return '<'.$Tag.$Attributes.'>'.$String.'</'.$Tag.'>';
    }
 }
+
+if (!function_exists('WrapIf')) {
+   /**
+    * Wrap the provided string if it isn't empty.
+    * 
+    * @param string $String
+    * @param string $Tag
+    * @param array $Attributes
+    * @return string
+    * @since 2.1 
+    */
+   function WrapIf($String, $Tag = 'span', $Attributes = '') {
+      if (empty($String))
+         return '';
+      else
+         return Wrap($String, $Tag, $Attributes);
+   }
+}
+
 /**
  * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
  */
@@ -351,4 +445,10 @@ if (!function_exists('SignOutUrl')) {
    function SignOutUrl($Target = '') {
       return '/entry/signout?TransientKey='.urlencode(Gdn::Session()->TransientKey()).($Target ? '&Target='.urlencode($Target) : '');
    }
+}
+
+if (!function_exists('Sprite')) {
+	function Sprite($Name, $Type = 'Sprite') {
+		return '<span class="'.$Type.' '.$Name.'"></span>';
+	}
 }

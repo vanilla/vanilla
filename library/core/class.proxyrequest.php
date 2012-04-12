@@ -14,10 +14,11 @@
 
 class ProxyRequest {
    
-   protected static $ConnectionHandles;
+   protected $CookieJar;
    
    public $MaxReadSize = 4096;
    
+   public $RequestDefaults;
    public $RequestHeaders;
    
    public $ResponseHeaders;
@@ -36,17 +37,46 @@ class ProxyRequest {
    
    protected $Options;
    
-   public function __construct($Loud = FALSE) {
-      self::$ConnectionHandles = array();
-      
+   public function __construct($Loud = FALSE, $RequestDefaults = NULL) {
       $this->Loud = $Loud;
+      
+      $CookieKey = md5(mt_rand(0, 72312189).microtime(true));
+      if (defined('PATH_CACHE')) {
+         $this->CookieJar = CombinePaths(array(PATH_CACHE,"cookiejar.{$CookieKey}"));
+      } else {
+         $this->CookieJar = CombinePaths(array("/tmp","cookiejar.{$CookieKey}"));
+      }
+      
+      if (!is_array($RequestDefaults)) $RequestDefaults = array();
+      $Defaults = array(
+          'URL'                  => NULL,
+          'Host'                 => NULL,
+          'Method'               => 'GET',
+          'ConnectTimeout'       => 5,
+          'Timeout'              => 5,
+          'TransferMode'         => 'normal',   // or 'binary'
+          'SaveAs'               => NULL,
+          'Redirects'            => TRUE,
+          'SSLNoVerify'          => FALSE,
+          'PreEncodePost'        => TRUE,
+          'Cookies'              => TRUE,       // Send my cookies?
+          'CookieJar'            => FALSE,      // Create a cURL CookieJar?
+          'CookieSession'        => FALSE,      // Should old cookies be trashed starting now?
+          'CloseSession'         => TRUE,       // Whether to close the session. Should always do this.
+          'Redirected'           => FALSE,      // Flag. Is this a redirected request?
+          'Debug'                => FALSE,      // Debug output on?
+          'Simulate'             => FALSE       // Don't actually request, just set up
+      );
+      
+      $this->RequestDefaults = array_merge($Defaults, $RequestDefaults);
    }
    
    public function CurlHeader(&$Handler, $HeaderString) {
       $Line = explode(':',trim($HeaderString));
       $Key = trim(array_shift($Line));
       $Value = trim(implode(':',$Line));
-      $this->ResponseHeaders[$Key] = $Value;
+      if (!empty($Key))
+         $this->ResponseHeaders[$Key] = $Value;
       return strlen($HeaderString);
    }
    
@@ -78,7 +108,10 @@ class ProxyRequest {
          return $this->ResponseBody;
       }
       
-      $this->ResponseBody = trim($Response);
+      if ($this->Options['TransferMode'] == 'normal')
+         $Response = trim($Response);
+      
+      $this->ResponseBody = $Response;
       
       if ($this->SaveFile) {
          $Success = file_exists($this->SaveFile);
@@ -120,7 +153,7 @@ class ProxyRequest {
     * @param type $ExtraHeaders
     * @return type 
     */
-   public function Request($Options, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
+   public function Request($Options = NULL, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
       
       /*
        * Allow requests that just want to use defaults to provide a string instead
@@ -129,25 +162,11 @@ class ProxyRequest {
       
       if (is_string($Options))
          $Options = array('URL' => $Options);
-
-      $Defaults = array(
-          'URL'                  => NULL,
-          'Host'                 => NULL,
-          'Method'               => 'GET',
-          'ConnectTimeout'       => 5,
-          'Timeout'              => 5,
-          'SaveAs'               => NULL,
-          'Redirects'            => TRUE,
-          'SSLNoVerify'          => FALSE,
-          'PreEncodePost'        => TRUE,
-          'Cookies'              => TRUE,       // Send cookies?
-          'CloseSession'         => TRUE,       // Whether to close the session. Should always do this.
-          'Redirected'           => FALSE,      // Flag. Is this a redirected request?
-          'Debug'                => FALSE,      // Debug output on?
-          'Simulate'             => FALSE       // Don't actually request, just set up
-      );
       
-      $this->Options = $Options = array_merge($Defaults, $Options);
+      if (is_null($Options))
+         $Options = array();
+      
+      $this->Options = $Options = array_merge($this->RequestDefaults, $Options);
 
       $this->ResponseHeaders = array();
       $this->ResponseStatus = "";
@@ -157,7 +176,7 @@ class ProxyRequest {
       $this->ConnectionMode = '';
       $this->ActionLog = array();
       
-      if (!is_array($QueryParams)) $QueryParams = array();
+      if (is_string($Files)) $Files = array($Files);
       if (!is_array($Files)) $Files = array();
       if (!is_array($ExtraHeaders)) $ExtraHeaders = array();
 
@@ -175,9 +194,12 @@ class ProxyRequest {
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
       $Timeout = GetValue('Timeout', $Options);
       $SaveAs = GetValue('SaveAs', $Options);
+      $TransferMode = GetValue('TransferMode', $Options);
       $SSLNoVerify = GetValue('SSLNoVerify', $Options);
       $PreEncodePost = GetValue('PreEncodePost', $Options);
       $SendCookies = GetValue('Cookies', $Options);
+      $CookieJar = GetValue('CookieJar', $Options);
+      $CookieSession = GetValue('CookieSession', $Options);
       $CloseSesssion = GetValue('CloseSession', $Options);
       $Redirected = GetValue('Redirected', $Options);
       $Debug = GetValue('Debug', $Options, FALSE);
@@ -202,7 +224,7 @@ class ProxyRequest {
             $SendFiles[$File] = $FilePath;
       
       $this->FileTransfer = (bool)sizeof($SendFiles);
-      if ($this->FileTransfer && $RequestMethod == "GET") {
+      if ($this->FileTransfer && $RequestMethod != "PUT") {
          $this->Options['Method'] = 'POST';
          $RequestMethod = GetValue('Method', $Options);
       }
@@ -246,7 +268,7 @@ class ProxyRequest {
          
          case 'GET':
          default:
-            $PostData = http_build_query($PostData);
+            $PostData = is_array($PostData) ? http_build_query($PostData) : $PostData;
             if (strlen($PostData)) {
                if (stristr($RelativeURL, '?'))
                   $Url .= '&';
@@ -279,6 +301,8 @@ class ProxyRequest {
       $Query = GetValue('query', $UrlParts, '');
       $this->UseSSL = ($Scheme == 'https') ? TRUE : FALSE;
       
+      $this->Action(" transfer mode: {$TransferMode}");
+      
       /*
        * ProxyRequest can masquerade as the current user, so collect and encode
        * their current cookies as the default case is to send them.
@@ -303,6 +327,8 @@ class ProxyRequest {
       
       $Response = '';
       
+      $this->Action("Parameters: ".print_r($PostData, true));
+      
       // We need cURL
       if (!function_exists('curl_init'))
          throw new Exception('Encountered an error while making a request to the remote server: Your PHP configuration does not allow cURL requests.');
@@ -314,7 +340,21 @@ class ProxyRequest {
       curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
       curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
       curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
+      
+      if ($TransferMode == 'binary')
+         curl_setopt($Handler, CURLOPT_BINARYTRANSFER, TRUE);
+      
+      if ($RequestMethod != 'GET' && $RequestMethod != 'POST')
+         curl_setopt($Handler, CURLOPT_CUSTOMREQUEST, $RequestMethod);
 
+      if ($CookieJar) {
+         curl_setopt($Handler, CURLOPT_COOKIEJAR, $this->CookieJar);
+         curl_setopt($Handler, CURLOPT_COOKIEFILE, $this->CookieJar);
+      }
+      
+      if ($CookieSession)
+         curl_setopt($Handler, CURLOPT_COOKIESESSION, TRUE);
+      
       if ($FollowRedirects) {
          curl_setopt($Handler, CURLOPT_FOLLOWLOCATION, TRUE);
          curl_setopt($Handler, CURLOPT_AUTOREFERER, TRUE);
@@ -341,25 +381,45 @@ class ProxyRequest {
          curl_setopt($Handler, CURLOPT_FILE, $FileHandle);
       }
 
-      if (sizeof($SendExtraHeaders))
-         curl_setopt($Handler, CURLOPT_HTTPHEADER, $SendExtraHeaders);
-
+      // Allow POST
       if ($RequestMethod == 'POST') {
-         if ($this->FileTransfer)
+         if ($this->FileTransfer) {
+            $this->Action(" POSTing files");
             foreach ($SendFiles as $File => $FilePath)
                $PostData[$File] = "@{$FilePath}";
-         else
+         } else {
             if ($PreEncodePost)
                $PostData = http_build_query($PostData);
+         }
          
          curl_setopt($Handler, CURLOPT_POST, TRUE);
          curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
       }
+      
+      // Allow PUT
+      if ($RequestMethod == 'PUT') {
+         if ($this->FileTransfer) {
+            $SendFile = GetValue('0',$SendFiles);
+            $SendFileSize = filesize($SendFile);
+            $this->Action(" PUTing file: {$SendFile}");
+            $SendFileObject = fopen($SendFile, 'r');
+            
+            curl_setopt($Handler, CURLOPT_PUT, TRUE);
+            curl_setopt($Handler, CURLOPT_INFILE, $SendFileObject);
+            curl_setopt($Handler, CURLOPT_INFILESIZE, $SendFileSize);
+            
+            $SendExtraHeaders[] = "Content-Length: {$SendFileSize}";
+         }
+      }
+      
+      // Any extra needed headers
+      if (sizeof($SendExtraHeaders))
+         curl_setopt($Handler, CURLOPT_HTTPHEADER, $SendExtraHeaders);
 
       // Set URL
       curl_setopt($Handler, CURLOPT_URL, $Url);
       curl_setopt($Handler, CURLOPT_PORT, $Port);
-
+      
       $this->CurlReceive($Handler);
 
       if ($Simulate) return NULL;
@@ -379,4 +439,37 @@ class ProxyRequest {
       
       $this->ActionLog[] = $Message;
    }
+   
+   public function __destruct() {
+      if (file_exists($this->CookieJar))
+         @unlink($this->CookieJar);
+   }
+   
+   public function Clean() {
+      return $this;
+   }
+   
+   /**
+    * Check if the provided response matches the provided response type
+    * 
+    * Class is a string representation of the HTTP status code, with 'x' used
+    * as a wildcard.
+    * 
+    * Class '2xx' = All 200-level responses
+    * Class '30x' = All 300-level responses up to 309
+    * 
+    * @param string $Class 
+    * @return boolean Whether the response matches or not
+    */
+   public function ResponseClass($Class) {
+      $Code = (string)$this->ResponseStatus;
+      if (is_null($Code)) return FALSE;
+      if (strlen($Code) != strlen($Class)) return FALSE;
+      
+      for ($i = 0; $i < strlen($Class); $i++)
+         if ($Class{$i} != 'x' && $Class{$i} != $Code{$i}) return FALSE;
+      
+      return TRUE;
+   }
+   
 }

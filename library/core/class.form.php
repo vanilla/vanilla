@@ -1020,7 +1020,13 @@ class Gdn_Form extends Gdn_Pluggable {
       if ($ShowErrors) 
          $this->AddErrorClass($Attributes);
       
-      $Return = '<input type="' . $Type . '"';
+      $Return = '';
+      $Wrap = GetValue('Wrap', $Attributes, FALSE, TRUE);
+      if ($Wrap) {
+         $Return .= '<div class="TextBoxWrapper">';
+      }
+      
+      $Return .= '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       if ($Type == 'file') $Return .= Attribute('name',
          ArrayValueI('Name', $Attributes, $FieldName));
@@ -1039,6 +1045,9 @@ class Gdn_Form extends Gdn_Pluggable {
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
          $Return .= $this->InlineError($FieldName);
+      
+      if ($Wrap)
+         $Return .= '</div>';
 
       return $Return;
    }
@@ -1108,9 +1117,12 @@ class Gdn_Form extends Gdn_Pluggable {
     *
     * @todo check that missing DataObject parameter
     */
-   public function Open($Attributes = FALSE) {
+   public function Open($Attributes = array()) {
+      if (!is_array($Attributes))
+         $Attributes = array();
+      
       $Return = '<form';
-      if ($this->InputPrefix != '') $Return .= $this->_IDAttribute($this->InputPrefix,
+      if ($this->InputPrefix != '' || array_key_exists('id', $Attributes)) $Return .= $this->_IDAttribute($this->InputPrefix,
          $Attributes);
 
       // Method
@@ -1307,7 +1319,12 @@ class Gdn_Form extends Gdn_Pluggable {
       // Add error class to input element
       if ($ShowErrors) $this->AddErrorClass($Attributes);
       
-      $Return = $MultiLine === TRUE ? '<textarea' : '<input type="text"';
+      $Return = '';
+      $Wrap = GetValue('Wrap', $Attributes, FALSE, TRUE);
+      if ($Wrap)
+         $Return .= '<div class="TextBoxWrapper">';
+      
+      $Return .= $MultiLine === TRUE ? '<textarea' : '<input type="'.GetValue('type', $Attributes, 'text').'"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       $Return .= $this->_NameAttribute($FieldName, $Attributes);
       $Return .= $MultiLine === TRUE ? '' : $this->_ValueAttribute($FieldName, $Attributes);
@@ -1320,6 +1337,9 @@ class Gdn_Form extends Gdn_Pluggable {
       // Append validation error message
       if ($ShowErrors)  
          $Return .= $this->InlineError($FieldName);
+      
+      if ($Wrap)
+         $Return .= '</div>';
       
       return $Return;
    }
@@ -1730,6 +1750,10 @@ class Gdn_Form extends Gdn_Pluggable {
             ErrorMessage(
                "You cannot call the form's save method if a model has not been defined.",
                "Form", "Save"), E_USER_ERROR);
+         
+         $Data = $this->FormValues();
+         if (method_exists($this->_Model, 'FilterForm'))
+            $Data = $this->_Model->FilterForm($this->FormValues());
 
          $Args = array_merge(func_get_args(),
             array(
@@ -1743,7 +1767,7 @@ class Gdn_Form extends Gdn_Pluggable {
                NULL,
                NULL,
                NULL));
-         $SaveResult = $this->_Model->Save($this->FormValues(), $Args[0], $Args[1],
+         $SaveResult = $this->_Model->Save($Data, $Args[0], $Args[1],
             $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7],
             $Args[8], $Args[9]);
          if ($SaveResult === FALSE) {

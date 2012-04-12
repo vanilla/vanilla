@@ -78,6 +78,7 @@ class DraftsController extends VanillaController {
       }
       
       // Add modules
+      $this->AddModule('DiscussionFilterModule');      
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');

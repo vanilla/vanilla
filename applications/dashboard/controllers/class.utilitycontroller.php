@@ -357,6 +357,8 @@ class UtilityController extends DashboardController {
       if ($Target = $this->Request->Get('Target')) {
          Redirect($Target);
       }
+      
+      $this->FireEvent('AfterUpdate');
 
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';
@@ -519,4 +521,15 @@ class UtilityController extends DashboardController {
 		$this->DeliveryType(DELIVERY_TYPE_NONE);
       $this->Render();
 	}
+   
+   /** 
+    * Return some meta information about any page on the internet in JSON format.
+    */
+   public function FetchPageInfo($Url = '') {
+      $PageInfo = FetchPageInfo($Url);
+      $this->SetData('PageInfo', $PageInfo);
+      $this->DeliveryType(DELIVERY_TYPE_DATA);
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->Render();
+   }   
 }

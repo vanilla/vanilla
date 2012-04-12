@@ -158,5 +158,14 @@
     width: 22px;
     overflow: hidden;
     cursor: pointer;
+    position: relative;
 }
 
+.EmoticonBox:hover {
+   width: 42px;
+   height: 32px;
+   margin: -5px -10px;
+   z-index: 10;
+   border-radius: 2px;
+   box-shadow: 0 2px 7px #000;
+}

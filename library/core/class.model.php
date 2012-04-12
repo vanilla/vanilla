@@ -133,6 +133,7 @@ class Gdn_Model extends Gdn_Pluggable {
       $this->SQL = $this->Database->SQL();
       $this->Validation = new Gdn_Validation();
       $this->Name = $Name;
+      $this->PrimaryKey = $Name.'ID';
       parent::__construct();
    }
 
@@ -199,6 +200,24 @@ class Gdn_Model extends Gdn_Pluggable {
          $PrimaryKeyVal = FALSE;
       }
       return $PrimaryKeyVal;
+   }
+   
+   /**
+    * Update a row in the database.
+    * 
+    * @since 2.1
+    * @param int $RowID
+    * @param array|string $Property
+    * @param atom $Value 
+    */
+   public function SetField($RowID, $Property, $Value = FALSE) {
+      if (!is_array($Property))
+         $Property = array($Property => $Value);
+      
+      $this->DefineSchema();      
+      $Set = array_intersect_key($Property, $this->Schema->Fields());
+      
+		$this->SQL->Put($this->Name, $Set, array($this->PrimaryKey => $RowID));
    }
 
 
@@ -278,6 +297,16 @@ class Gdn_Model extends Gdn_Pluggable {
          $Result = $this->SQL->NoReset()->Delete($this->Name, $Where, $Limit);
       }
       return $Result;
+   }
+   
+   /**
+    * Filter out any potentially insecure fields before they go to the database.
+    * @param array $Data 
+    */
+   public function FilterForm($Data) {
+      $Data = array_diff_key($Data, array('Attributes' => 0, 'DateInserted' => 0, 'InsertUserID' => 0, 'InsertIPAddress' => 0,
+            'DateUpdated' => 0, 'UpdateUserID' => 0, 'UpdateIPAddress' => 0));
+      return $Data;
    }
 
    /**

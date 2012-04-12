@@ -10,8 +10,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Facebook'] = array(
-	'Name' => 'Facebook',
-   'Description' => 'This plugin integrates Vanilla with Facebook. <b>You must register your application with Facebook for this plugin to work.</b>',
+	'Name' => 'Facebook Sign In',
+   'Description' => 'Users may sign into your site using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>',	
    'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
@@ -57,10 +57,10 @@ class FacebookPlugin extends Gdn_Plugin {
          return;
       
       if (isset($Sender->Data['Methods'])) {
-         $AccessToken = $this->AccessToken();
+//         $AccessToken = $this->AccessToken();
 
          $ImgSrc = Asset('/plugins/Facebook/design/facebook-login.png');
-         $ImgAlt = T('Login with Facebook');
+         $ImgAlt = T('Sign In with Facebook');
 
 //         if ($AccessToken) {
 //            $SigninHref = $this->RedirectUri();
@@ -81,6 +81,13 @@ class FacebookPlugin extends Gdn_Plugin {
 
          $Sender->Data['Methods'][] = $FbMethod;
       }
+   }
+   
+   public function Base_SignInIcons_Handler($Sender, $Args) {
+      if (!$this->IsConfigured())
+         return;
+		
+		echo "\n".$this->_GetButton();
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
@@ -103,7 +110,7 @@ class FacebookPlugin extends Gdn_Plugin {
 	
 	private function _GetButton() {
       $ImgSrc = Asset('/plugins/Facebook/design/facebook-icon.png');
-      $ImgAlt = T('Login with Facebook');
+      $ImgAlt = T('Sign In with Facebook');
       $SigninHref = $this->AuthorizeUri();
       $PopupSigninHref = $this->AuthorizeUri('display=popup');
       return "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
@@ -184,7 +191,7 @@ class FacebookPlugin extends Gdn_Plugin {
          $AccessToken = GetValue('access_token', $Tokens);
          $Expires = GetValue('expires', $Tokens, NULL);
 
-         setcookie('fb_access_token', $AccessToken, time() + $Expires, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
+         setcookie('fb_access_token', $AccessToken, time() + $Expires, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''), NULL, TRUE);
          $NewToken = TRUE;
       }
 

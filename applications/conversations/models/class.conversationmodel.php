@@ -85,7 +85,7 @@ class ConversationModel extends Gdn_Model {
     */
    public function Get($ViewingUserID, $Offset = '0', $Limit = '', $Wheres = '') {
       if ($Limit == '') 
-         $Limit = Gdn::Config('Conversations.Conversations.PerPage', 50);
+         $Limit = Gdn::Config('Conversations.Conversations.PerPage', 30);
 
       $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
       
@@ -190,7 +190,7 @@ class ConversationModel extends Gdn_Model {
     */
    public function GetRecipients($ConversationID, $IgnoreUserID = '0') {
       return $this->SQL
-         ->Select('uc.UserID, u.Name, u.Email, uc.Deleted')
+         ->Select('uc.UserID, u.Name, u.Email, uc.Deleted, u.Photo')
          ->Select('cm.DateInserted', 'max', 'DateLastActive')
          ->From('UserConversation uc')
          ->Join('User u', 'uc.UserID = u.UserID')
@@ -283,7 +283,7 @@ class ConversationModel extends Gdn_Model {
          // Now that the message & conversation have been inserted, insert all of the recipients
          foreach ($RecipientUserIDs as $UserID) {
             $CountReadMessages = $UserID == $Session->UserID ? 1 : 0;
-            $this->SQL->Insert('UserConversation', array(
+            $this->SQL->Options('Ignore', TRUE)->Insert('UserConversation', array(
                'UserID' => $UserID,
                'ConversationID' => $ConversationID,
                'LastMessageID' => $MessageID,

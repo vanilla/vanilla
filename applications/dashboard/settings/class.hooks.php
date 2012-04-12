@@ -28,9 +28,9 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->Theme = $PreviewThemeName;
 				$Sender->InformMessage(
 					sprintf(T('You are previewing the %s theme.'), Wrap($PreviewThemeName, 'em'))
-						.'<div class="PreviewButtons">'
-						.Anchor(T('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->TransientKey(), 'PreviewButton')
-						.' '.Anchor(T('Cancel'), 'settings/cancelpreview/', 'PreviewButton')
+						.'<div class="PreviewThemeButtons">'
+						.Anchor(T('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->TransientKey(), 'PreviewThemeButton')
+						.' '.Anchor(T('Cancel'), 'settings/cancelpreview/', 'PreviewThemeButton')
 						.'</div>',
 					'DoNotDismiss'
 				);
@@ -69,21 +69,31 @@ class DashboardHooks implements Gdn_IPlugin {
 //		else if (in_array($Sender->MasterView, array('', 'default')))
 		if (in_array($Sender->MasterView, array('', 'default')))
 			$Exceptions[] = '[NonAdmin]';
+      
+      // SignIn popup is a special case
+      $SignInOnly = ($Sender->DeliveryType() == DELIVERY_TYPE_VIEW && $Location == 'Dashboard/entry/signin');
+      if ($SignInOnly)
+         $Exceptions = array();
 			
 		if ($Sender->MasterView != 'admin' && (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache))) {
          $MessageModel = new MessageModel();
          $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
          foreach ($MessageData as $Message) {
             $MessageModule = new MessageModule($Sender, $Message);
-            $Sender->AddModule($MessageModule);
+            if ($SignInOnly) // Insert special messages even in SignIn popup
+               echo $MessageModule;
+            elseif ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
+               $Sender->AddModule($MessageModule);
          }
 			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
       }
+      
 		// If there are applicants, alert admins by showing in the main menu
 		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
-			$CountApplicants = Gdn::UserModel()->GetApplicantCount();
-			if ($CountApplicants > 0)
-				$Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
+			// $CountApplicants = Gdn::UserModel()->GetApplicantCount();
+			// if ($CountApplicants > 0)
+			// $Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
+			$Sender->Menu->AddLink('Applicants', T('Applicants'), '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
 		}
 		
       if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
@@ -92,8 +102,33 @@ class DashboardHooks implements Gdn_IPlugin {
       }
 		
       // Allow forum embedding
-      if (C('Garden.Embed.Allow'))
+      if (C('Garden.Embed.Allow')) {
+         // Record the remote url where the forum is being embedded.
+         $RemoteUrl = C('Garden.Embed.RemoteUrl');
+         if (!$RemoteUrl) {
+            $RemoteUrl = GetIncomingValue('remote');
+            if ($RemoteUrl)
+               SaveToConfig('Garden.Embed.RemoteUrl', $RemoteUrl);
+         }
+         if ($RemoteUrl)
+            $Sender->AddDefinition('RemoteUrl', $RemoteUrl);
+
+         // Force embedding?
+         if (!IsSearchEngine() && !IsMobile()) {
+            $Sender->AddDefinition('ForceEmbedForum', C('Garden.Embed.ForceForum') ? '1' : '0');
+            $Sender->AddDefinition('ForceEmbedDashboard', C('Garden.Embed.ForceDashboard') ? '1' : '0');
+         }
+
+         $Sender->AddDefinition('Path', Gdn::Request()->Path());
+         // $Sender->AddDefinition('MasterView', $Sender->MasterView);
+         $Sender->AddDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
          $Sender->AddJsFile('js/embed_local.js');
+      }
+         
+      // Allow return to mobile site
+		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+		   $Sender->AddAsset('Foot', Wrap(Anchor(T('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
    }
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -111,9 +146,6 @@ class DashboardHooks implements Gdn_IPlugin {
          $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
 		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
-		// May 18, 2011 - Not quite ready for prime time - mosullivan
-		// $Menu->AddLink('Appearance', T('Embed Vanilla'), 'dashboard/embed', 'Garden.Settings.Manage');
-		
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
@@ -128,10 +160,10 @@ class DashboardHooks implements Gdn_IPlugin {
          $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Applicants.Manage');
 
       $Menu->AddItem('Moderation', T('Moderation'), FALSE, array('class' => 'Moderation'));
-      $Menu->AddLink('Moderation', T('Manage Spam').' <span class="Popin" rel="/dashboard/log/count/spam"></span>', 'dashboard/log/spam', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Spam Queue').' <span class="Popin" rel="/dashboard/log/count/spam"></span>', 'dashboard/log/spam', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Moderation Queue').' <span class="Popin" rel="/dashboard/log/count/moderate"></span>', 'dashboard/log/moderation', 'Garden.Moderation.Manage');
-      $Menu->AddLink('Moderation', T('Edit/Delete Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
-      $Menu->AddLink('Moderation', T('Ban List'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Change Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Banning'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
 		
@@ -150,4 +182,15 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
 		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
    }
+   
+   /**
+    * Set P3P header because IE won't allow cookies thru the iFrame without it.
+    *
+    * This must be done in the Dispatcher because of PrivateCommunity.
+    * That precludes using Controller->SetHeader.
+    * This is done so comment & forum embedding can work in old IE.
+    */
+   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+      header('P3P: CP="CAO PSA OUR"', TRUE);
+   }   
 }

@@ -37,6 +37,60 @@ class DiscussionModel extends VanillaModel {
       parent::__construct('Discussion');
    }
    
+   public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      $Result = array('Complete' => TRUE);
+      switch ($Column) {
+         case 'CountComments':
+            $this->Database->Query(DBAModel::GetCountSQL('count', 'Discussion', 'Comment'));
+            break;
+         case 'FirstCommentID':
+            $this->Database->Query(DBAModel::GetCountSQL('min', 'Discussion', 'Comment', $Column));
+            break;
+         case 'LastCommentID':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column));
+            break;
+         case 'DateLastComment':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column, 'DateInserted'));
+            break;
+         case 'LastCommentUserID':
+            if (!$Max) {
+               // Get the range for this update.
+               $DBAModel = new DBAModel();
+               list($Min, $Max) = $DBAModel->PrimaryKeyRange('Discussion');
+               
+               if (!$From) {
+                  $From = $Min;
+                  $To = $Min + DBAModel::$ChunkSize - 1;
+               }
+            }
+            $this->SQL
+               ->Update('Discussion d')
+               ->Join('Comment c', 'c.CommentID = d.LastCommentID')
+               ->Set('d.LastCommentUserID', 'c.InsertUserID', FALSE, FALSE)
+               ->Where('d.DiscussionID >=', $From)
+               ->Where('d.DiscussionID <=', $To)
+               ->Put();
+            $Result['Complete'] = $To >= $Max;
+            
+            $Percent = round($To * 100 / $Max);
+            if ($Percent > 100 || $Result['Complete'])
+               $Result['Percent'] = '100%';
+            else
+               $Result['Percent'] = $Percent.'%';
+            
+            
+            $From = $To + 1;
+            $To = $From + DBAModel::$ChunkSize - 1;
+            $Result['Args']['From'] = $From;
+            $Result['Args']['To'] = $To;
+            $Result['Args']['Max'] = $Max;
+            break;
+         default:
+            throw new Gdn_UserException("Unknown column $Column");
+      }
+      return $Result;
+   }
+   
    /**
     * Builds base SQL query for discussion data.
     * 
@@ -223,7 +277,12 @@ class DiscussionModel extends VanillaModel {
       $Unset = FALSE;
       
       foreach($Result as $Key => &$Discussion) {
-         if ($Discussion->Announce == 1 && $Discussion->Dismissed == 0) {
+         if (isset($this->_AnnouncementIDs)) {
+            if (in_array($Discussion->DiscussionID, $this->_AnnouncementIDs)) {
+               unset($Result[$Key]);
+               $Unset = TRUE;
+            }
+         } elseif ($Discussion->Announce == 1 && $Discussion->Dismissed == 0) {
             // Unset discussions that are announced and not dismissed
             unset($Result[$Key]);
             $Unset = TRUE;
@@ -271,7 +330,7 @@ class DiscussionModel extends VanillaModel {
 		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
          $Discussion->Name = Gdn_Format::Text($Discussion->Name);
-         $Discussion->Url = Url('/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name), TRUE);
+         $Discussion->Url = DiscussionUrl($Discussion);
 
 			if($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';
@@ -350,7 +409,7 @@ class DiscussionModel extends VanillaModel {
          ->Cache($CacheKey)
          ->Select('d.DiscussionID')
          ->From('Discussion d')
-         ->Where('d.Announce', '1');
+         ->Where('d.Announce >', '0');
       if (is_array($Wheres) && count($Wheres) > 0)
          $this->SQL->Where($Wheres);
 
@@ -383,6 +442,11 @@ class DiscussionModel extends VanillaModel {
 //         ->Where('d.Announce', '1');
 
       $this->SQL->WhereIn('d.DiscussionID', $AnnouncementIDs);
+      
+      // If we aren't viewing announcements in a category then only show global announcements.
+      if (!$Wheres) {
+         $this->SQL->Where('d.Announce', 1);
+      }
 
       // If we allow users to dismiss discussions, skip ones this user dismissed
       if (C('Vanilla.Discussions.Dismiss', 1) && $UserID) {
@@ -395,6 +459,13 @@ class DiscussionModel extends VanillaModel {
          ->Limit($Limit, $Offset);
 
       $Data = $this->SQL->Get();
+      
+      // Save the announcements that were fetched for later removal.
+      $AnnouncementIDs = array();
+      foreach ($Data as $Row) {
+         $AnnouncementIDs[] = GetValue('DiscussionID', $Row);
+      }
+      $this->_AnnouncementIDs = $AnnouncementIDs;
 			
 		$this->AddDiscussionColumns($Data);
       
@@ -613,8 +684,9 @@ class DiscussionModel extends VanillaModel {
       if (!$Data)
          return $Data;
       
+      $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
-      $Data->Url = Url('/discussion/'.$Data->DiscussionID.'/'.Gdn_Format::Url($Data->Name), TRUE);
+      $Data->Url = DiscussionUrl($Data);
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);
@@ -878,6 +950,7 @@ class DiscussionModel extends VanillaModel {
 
                if (!$Spam) {
                   $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+                  $Fields['DiscussionID'] = $DiscussionID;
                   
                   // Update the cache.
                   if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
@@ -887,7 +960,7 @@ class DiscussionModel extends VanillaModel {
                          'LastTitle' => Gdn_Format::Text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
                          'LastUserID' => $Fields['InsertUserID'],
                          'LastDateInserted' => $Fields['DateInserted'],
-                         'LastUrl' => '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Fields['Name'])
+                         'LastUrl' => DiscussionUrl($Fields)
                      );
                      CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
                   }
@@ -908,14 +981,19 @@ class DiscussionModel extends VanillaModel {
                $NotifiedUsers = array();
                $UserModel = Gdn::UserModel();
                $ActivityModel = new ActivityModel();
-               $HeadlineFormat = T('HeadlineFormat.Discussion', '{ActivityUserID,user} <a href="{Url,html}">{Data.Name,text}</a>');
+               if (GetValue('Type', $FormPostValues))
+                  $Code = 'HeadlineFormat.Discussion.'.$FormPostValues['Type'];
+               else
+                  $Code = 'HeadlineFormat.Discussion';
+               
+               $HeadlineFormat = T($Code, '{ActivityUserID,user} Started a new discussion. <a href="{Url,html}">{Data.Name,text}</a>');
                $Activity = array(
                    'ActivityType' => 'Discussion',
                    'ActivityUserID' => $Fields['InsertUserID'],
                    'HeadlineFormat' => $HeadlineFormat,
                    'RecordType' => 'Discussion',
                    'RecordID' => $DiscussionID,
-                   'Route' => "/discussion/$DiscussionID/".Gdn_Format::Url($DiscussionName),
+                   'Route' => DiscussionUrl($Fields),
                    'Data' => array('Name' => $DiscussionName)
                );
                
@@ -995,35 +1073,60 @@ class DiscussionModel extends VanillaModel {
       if (is_numeric($Discussion)) {
          $Discussion = $this->GetID($Discussion);
       }
+      
+      $CategoryID = GetValue('CategoryID', $Discussion);
+      
+      // Figure out the category that governs this notification preference.
+      $i = 0;
+      $Category = CategoryModel::Categories($CategoryID);
+      if (!$Category)
+         return;
+      
+      while ($Category['Depth'] > 2 && $i < 20) {
+         if (!$Category || $Category['Archived'])
+            return;
+         $i++;
+         $Category = CategoryModel::Categories($Category['ParentCategoryID']);
+      } 
 
       // Grab all of the users that need to be notified.
-      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
+      $Data = $this->SQL
+         ->WhereIn('Name', array('Preferences.Email.NewDiscussion.'.$Category['CategoryID'], 'Preferences.Popup.NewDiscussion.'.$Category['CategoryID']))
+         ->Get('UserMeta')->ResultArray();
       
-      // Grab all of their follow/unfollow preferences.
-      $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');
-      $CategoryID = $Discussion['CategoryID'];
-      $UserPrefs = $this->SQL
-         ->Select('*')
-         ->From('UserCategory')
-         ->Where('CategoryID', $CategoryID)
-         ->WhereIn('UserID', $UserIDs)
-         ->Get()->ResultArray();
-      $UserPrefs = Gdn_DataSet::Index($UserPrefs, 'UserID');
+//      decho($Data, 'Data');
       
       
-      $Activity['Emailed'] = ActivityModel::SENT_PENDING;
-
+      $NotifyUsers = array();
       foreach ($Data as $Row) {
-         $UserID = $Row['UserID'];
-         if ($UserID == $Discussion['InsertUserID'])
+         if (!$Row['Value'])
             continue;
          
-         if (array_key_exists($UserID, $UserPrefs) && $UserPrefs[$UserID]['Unfollow'])
+         $UserID = $Row['UserID'];
+         $Name = $Row['Name'];
+         if (strpos($Name, '.Email.') !== FALSE) {
+            $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;
+         } elseif (strpos($Name, '.Popup.') !== FALSE) {
+            $NotifyUsers[$UserID]['Notified'] = ActivityModel::SENT_PENDING;
+         }
+      }
+      
+//      decho($NotifyUsers);
+      
+      $InsertUserID = GetValue('InsertUserID', $Discussion);
+      foreach ($NotifyUsers as $UserID => $Prefs) {
+         if ($UserID == $InsertUserID)
             continue;
          
          $Activity['NotifyUserID'] = $UserID;
+         $Activity['Emailed'] = GetValue('Emailed', $Prefs, FALSE);
+         $Activity['Notified'] = GetValue('Notified', $Prefs, FALSE);
          $ActivityModel->Queue($Activity);
+         
+//         decho($Activity, 'die');
       }
+      
+//      die();
    }
    
    /**
@@ -1060,7 +1163,7 @@ class DiscussionModel extends VanillaModel {
             ) d
               on c.CategoryID = d.CategoryID
             set 
-               c.CountDiscussions = coalesce(d.CountDiscussions, 0)
+               c.CountDiscussions = coalesce(d.CountDiscussions, 0),
                c.CountComments = coalesce(d.CountComments, 0)";
 			$Sql = str_replace(':_', $this->Database->DatabasePrefix, $Sql);
 			$this->Database->Query($Sql, $Params, 'DiscussionModel_UpdateDiscussionCount');

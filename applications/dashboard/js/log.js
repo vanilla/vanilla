@@ -13,45 +13,33 @@ jQuery(document).ready(function($) {
       return IDs;
    };
 
-   var handleAction = function(url) {
-      var IDs = getIDs();
+   var afterSuccess = function(data) {
+      // Figure out the IDs that are currently in the view.
+      var rows = [];
+      $('#Log tbody tr').each(function(index, element) {
+         if ($(element).attr('id') == 'SelectAll')
+            return;
+         rows.push($(element).attr('id'));
+      });
+      var rowsSelector = '#'+rows.join(',#');
 
-      $.ajax({
-            type: "GET",
-            url: gdn.url(url+'?logids='+IDs.join(',')),
-            dataType: 'text',
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $.popup({}, XMLHttpRequest.responseText);
-            },
-            success: function(text) {
-               // Figure out the IDs that are currently in the view.
-               var rows = [];
-               $('#Log tbody tr').each(function(index, element) {
-                  if ($(element).attr('id') == 'SelectAll')
-                     return;
-                  rows.push($(element).attr('id'));
-               });
-               var rowsSelector = '#'+rows.join(',#');
+      // Requery the view and put it in the table.
+      $.get(
+         window.location.href,
+         {'DeliveryType': 'VIEW'},
+         function (data) {
+            $('#LogTable').html(data);
+            setExpander();
 
-               // Requery the view and put it in the table.
-               $.get(
-                  window.location.href,
-                  {'DeliveryType': 'VIEW'},
-                  function (data) {
-                     $('#LogTable').html(data);
-                     setExpander();
+            // Highlight the rows that are different.
+            var $foo = $('#Log tbody tr').not(rowsSelector);
 
-                     // Highlight the rows that are different.
-                     var $foo = $('#Log tbody tr').not(rowsSelector);
-
-                     $foo.effect('highlight', {}, 'slow');
-                  });
-
-               // Update the counts in the sidepanel.
-               $('.Popin').popin();
-            }
+            $foo.effect('highlight', {}, 'slow');
          });
-   }
+
+      // Update the counts in the sidepanel.
+      $('.Popin').popin();
+   };
 
    // Restores the
    var restore = function() {
@@ -61,26 +49,49 @@ jQuery(document).ready(function($) {
    var deleteForever = function() {
       handleAction('/dashboard/log/delete');
    };
+   
+   var deleteSpam = function() {
+      handleAction('/dashboard/log/deletespam');
+   };
 
    var setExpander = function() {
       $Expander = $('.Expander');
       $('.Expander').expander({slicePoint: 200, expandText: gdn.definition('ExpandText'), userCollapseText: gdn.definition('CollapseText')});
    };
    setExpander();
-
-   $('tbody .CheckboxCell input').live('click', function(e) {
-      var selected = $(this).attr('checked') == 'checked';
-      $(this).closest('tr').toggleClass('Selected', selected);
+   
+   $(document).delegate('.CheckboxCell', 'click', function(e) {
+      var $checkbox = $('input:checkbox', this);
+      $checkbox.trigger('click', true);
    });
 
-   $('#SelectAll').live('click', function(e) {
+   $(document).delegate('tbody .CheckboxCell input', 'click', function(e, flip) {
+      e.stopPropagation();
+      var $checkbox = $(this);
+      
+      var selected = $checkbox.attr('checked') == 'checked';
+      if (flip)
+         selected = !selected;
+      
+      if (selected)
+         $checkbox.closest('tr').addClass('Selected');
+      else
+         $checkbox.closest('tr').removeClass('Selected');
+   });
+
+   $('#SelectAll').live('click', function(e, flip) {
+      e.stopPropagation();
       var selected = $(this).attr('checked') == 'checked';
-      var table = $(this).closest('table');
+      
+      if (flip)
+         selected = !selected;
+      
+      var table = $(this).closest('table').find('tbody');
       $('input:checkbox', table).attr('checked', selected);
       if (selected)
-         $('tbody tr', table).addClass('Selected', selected);
+         $('tr', table).addClass('Selected', selected);
       else
-         $('tbody tr', table).removeClass('Selected', selected);
+         $('tr', table).removeClass('Selected', selected);
    });
 
    $('.RestoreButton').click(function(e) {
@@ -88,13 +99,14 @@ jQuery(document).ready(function($) {
       currentAction = restore;
 
       // Popup the confirm.
-      var bar = $.popup({}, function(settings) {
-         $.get(
-            gdn.url('/dashboard/log/confirm/restore?logids='+IDs),
-            {'DeliveryType': 'VIEW'},
-            function (data) {
-               $.popup.reveal(settings, data);
-            })
+      var bar = $.popup({ afterSuccess: afterSuccess},
+         function(settings) {
+            $.get(
+               gdn.url('/dashboard/log/confirm/restore?logids='+IDs),
+               {'DeliveryType': 'VIEW'},
+               function (data) {
+                  $.popup.reveal(settings, data);
+               })
          });
       
       return false;
@@ -105,9 +117,26 @@ jQuery(document).ready(function($) {
       currentAction = deleteForever;
 
       // Popup the confirm.
-      var bar = $.popup({}, function(settings) {
+      var bar = $.popup({ afterSuccess: afterSuccess}, function(settings) {
          $.get(
             gdn.url('/dashboard/log/confirm/delete?logids='+IDs),
+            {'DeliveryType': 'VIEW'},
+            function (data) {
+               $.popup.reveal(settings, data);
+            })
+         });
+
+      return false;
+   });
+   
+   $('.SpamButton').click(function(e) {
+      var IDs = getIDs().join(',');
+      currentAction = deleteSpam;
+
+      // Popup the confirm.
+      var bar = $.popup({ afterSuccess: afterSuccess}, function(settings) {
+         $.get(
+            gdn.url('/dashboard/log/confirm/deletespam?logids='+IDs),
             {'DeliveryType': 'VIEW'},
             function (data) {
                $.popup.reveal(settings, data);
@@ -122,7 +151,7 @@ jQuery(document).ready(function($) {
       currentAction = restore;
 
       // Popup the confirm.
-      var bar = $.popup({}, function(settings) {
+      var bar = $.popup({ afterSuccess: afterSuccess}, function(settings) {
          $.get(
             gdn.url('/dashboard/log/confirm/notspam?logids='+IDs),
             {'DeliveryType': 'VIEW'},
@@ -138,13 +167,9 @@ jQuery(document).ready(function($) {
       $.popup.close({});
       return false;
    });
-
-   $('.ConfirmYes').live('click', function() {
-      if ($.isFunction(currentAction)) {
-         currentAction.call();
-      }
-
-      $.popup.close({});
-      return false;
+   
+   $(document).delegate('#Confirm_SelectAll', 'click', function() {
+      var checked = $('#Confirm_SelectAll').attr('checked') == 'checked';
+      $('#ConfirmForm input:checkbox').attr('checked', checked);
    });
 });

@@ -19,17 +19,20 @@ jQuery(document).ready(function($) {
             afterPageLoaded: function() { $(document).trigger('DiscussionPagingComplete'); }
          });
       });
+      
+   if ($('.AdminCheck :checkbox').not(':checked').length == 1)
+      $('.AdminCheck [name="Toggle"]').attr('checked', 'checked');
 
    /* Discussion Checkboxes */
-   $('.DiscussionsTabs .AdminCheck :checkbox').click(function() {
+   $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
-         $('.DataList .AdminCheck :checkbox').attr('checked', 'checked');
+         $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').attr('checked', 'checked');
       else
-         $('.DataList .AdminCheck :checkbox').removeAttr('checked');
+         $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').removeAttr('checked');
    });
    $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids
-      var checkIDs = $('.DataList .AdminCheck :checkbox');
+      var checkIDs = $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox');
       var aCheckIDs = new Array();
       checkIDs.each(function() {
          checkID = $(this);

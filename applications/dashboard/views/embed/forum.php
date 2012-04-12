@@ -2,7 +2,20 @@
 $this->EmbedType = GetValue('0', $this->RequestArgs, 'wordpress');
 $AllowEmbed = C('Garden.Embed.Allow');
 ?>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo Wrap(Anchor(T("Introducing Vanilla Comments"), 'http://vanillaforums.com/blog/news/introducing-vanilla-comments/'), 'li');
+   echo Wrap(Anchor(htmlspecialchars(T("Converting from the <Embed> Vanilla Plugin")), 'http://vanillaforums.com/blog/converting-embed-plugin/'), 'li');
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('Embed Forum'); ?></h1>
+<?php
+echo $this->Form->Open();
+echo $this->Form->Errors();
+?>
 <div class="Info">
    <?php
    echo 'Your entire vanilla forum can be embedded into another page. This is typically done so you can insert your forum into another site with minimal theming effort. The preferred method is to ';
@@ -17,6 +30,9 @@ $AllowEmbed = C('Garden.Embed.Allow');
       echo Wrap("Use the WordPress plugin to embed your forum into a page on your blog, or use the universal code to embed your forum into any page on the web.", 'p');
    ?>
 </div>
+<?php
+echo $this->Form->Close();
+?>
 <div class="Tabs FilterTabs">
    <ul>
       <li<?php echo $this->EmbedType == 'wordpress' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('WordPress Plugin'), 'embed/forum/wordpress'); ?></li>

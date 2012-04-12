@@ -2,7 +2,20 @@
 $this->EmbedType = GetValue('0', $this->RequestArgs, 'wordpress');
 $AllowEmbed = C('Garden.Embed.Allow');
 ?>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo Wrap(Anchor(T("Introducing Vanilla Comments"), 'http://vanillaforums.com/blog/news/introducing-vanilla-comments/'), 'li');
+   echo Wrap(Anchor(htmlspecialchars(T("Converting from the <Embed> Vanilla Plugin")), 'http://vanillaforums.com/blog/converting-embed-plugin/'), 'li');
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('Blog Comments'); ?></h1>
+<?php
+echo $this->Form->Open();
+echo $this->Form->Errors();
+?>
 <div class="Info">
    <?php
    echo T('AboutCommentEmbedding', "Vanilla can be used as a drop-in replacement for your blog's native commenting system. As a matter of fact, it can be used to add comments to any page on the web.");
@@ -16,6 +29,9 @@ $AllowEmbed = C('Garden.Embed.Allow');
       echo Wrap(T("Use the plugin for WordPress or our universal code for any other platform", "Use the WordPress plugin to set up Vanilla Comments on your blog, or use the universal code to set up Vanilla Comments on any other platform."), 'p');
    ?>
 </div>
+<?php
+echo $this->Form->Close();
+?>
 <div class="Tabs FilterTabs">
    <ul>
       <li<?php echo $this->EmbedType == 'wordpress' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('WordPress Plugin'), 'embed/comments/wordpress'); ?></li>

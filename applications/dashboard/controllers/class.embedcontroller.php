@@ -42,30 +42,44 @@ class EmbedController extends DashboardController {
    public function Comments($Toggle = '', $TransientKey = '') {
       $this->Permission('Garden.Settings.Manage');
       
-      if ($this->Toggle($Toggle, $TransientKey))
-         Redirect('embed/comments');
+      try {
+         if ($this->Toggle($Toggle, $TransientKey))
+            Redirect('embed/comments');
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+      }
 
       $this->AddSideMenu('dashboard/embed/comments');
       $this->Permission('Garden.Settings.Manage');
-      $this->Title('Blog Comments');
+      $this->Title(T('Blog Comments'));
       $this->Render();
    }
    
    public function Forum($Toggle = '', $TransientKey = '') {
-      if ($this->Toggle($Toggle, $TransientKey))
-         Redirect('embed/forum');
+      $this->Permission('Garden.Settings.Manage');
+      
+      try {
+         if ($this->Toggle($Toggle, $TransientKey))
+            Redirect('embed/forum');
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+      }
 
       $this->AddSideMenu('dashboard/embed/forum');
-      $this->Permission('Garden.Settings.Manage');
       $this->Title('Embed Forum');
       $this->Render();
    }
    
    public function Advanced($Toggle = '', $TransientKey = '') {
-      if ($this->Toggle($Toggle, $TransientKey))
-         Redirect('embed/advanced');
-      
       $this->Permission('Garden.Settings.Manage');
+      
+      try {
+         if ($this->Toggle($Toggle, $TransientKey))
+            Redirect('embed/advanced');
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+      }
+      
       $this->Title('Advanced Embed Settings');
 
       $this->AddSideMenu('dashboard/embed/advanced');
@@ -110,9 +124,10 @@ class EmbedController extends DashboardController {
     * @return boolean 
     */
    private function Toggle($Toggle = '', $TransientKey = '') {
-      if (array_key_exists('embedvanilla', Gdn::PluginManager()->EnabledPlugins())) {
-         throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
-      } else if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+      if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+         if ($Toggle == 'enable' && array_key_exists('embedvanilla', Gdn::PluginManager()->EnabledPlugins()))
+            throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
+
          // Do the toggle
          SaveToConfig('Garden.Embed.Allow', $Toggle == 'enable' ? TRUE : FALSE);
          return TRUE;

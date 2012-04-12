@@ -328,7 +328,7 @@ class CommentModel extends VanillaModel {
       
       $Session = Gdn::Session();
       if ($Session->UserID > 0) {
-         $CountWatch = $Limit + $Offset + 1; // Include the first comment (in the discussion table) in the count.
+         $CountWatch = $Limit + $Offset;
          if ($CountWatch > $TotalComments) {
             $CountWatch = $TotalComments;
             $NewComment = TRUE;
@@ -396,7 +396,7 @@ class CommentModel extends VanillaModel {
          ->Where('DiscussionID', $DiscussionID)
          ->Get()
          ->FirstRow()
-         ->CountComments + 1; // Add 1 so the comment in the discussion table is counted
+         ->CountComments;
    }
    
    /**
@@ -902,7 +902,7 @@ class CommentModel extends VanillaModel {
             $this->SQL
                ->Set('FirstCommentID', $Data['FirstCommentID'])
                ->Set('LastCommentID', $Data['LastCommentID'])
-               ->Set('CountComments', $Data['CountComments'] + 1)
+               ->Set('CountComments', $Data['CountComments'])
                ->Where('DiscussionID', $DiscussionID)
                ->Put();
 
@@ -918,7 +918,7 @@ class CommentModel extends VanillaModel {
             // Update the discussion with null counts.
             $this->SQL
                ->Update('Discussion')
-               ->Set('CountComments', 1)
+               ->Set('CountComments', 0)
                ->Set('FirstCommentID', NULL)
                ->Set('LastCommentID', NULL)
                ->Set('DateLastComment', 'DateInserted', FALSE, FALSE)

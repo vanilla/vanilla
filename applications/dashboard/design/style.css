@@ -976,6 +976,10 @@ overflow: hidden; */
 .Item h2, .Item h3, .Item h4, .Item h5 {
    margin: 0;
 }
+#latest {
+    float: left;
+    margin: -10px;
+}
 .DataList .Title {
    font-size: 14px;
    display: block;
@@ -1021,6 +1025,19 @@ overflow: hidden; */
 	line-height: 1;
    white-space: nowrap;
 }
+.JustNew {
+    display: none;
+}
+
+.Item.Read {
+    background: #efefef;
+    background: rgba(0, 0, 0, .05);
+}
+
+.Item.Read .Title, .Item.Read .BlockTitle {
+    font-weight: normal;
+}
+
 .Tag a {
    color: #ffffff;
 }

@@ -86,7 +86,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $DiscussionUrl = $Discussion->Url;
    
    if ($Session->UserID)
-      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch);
+      $DiscussionUrl .= '#latest';
    
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
@@ -215,7 +215,13 @@ function CssClass($Discussion) {
    $CssClass .= $Discussion->Closed == '1' ? ' Closed' : '';
    $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
    $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
-   $CssClass .= ($Discussion->CountUnreadComments > 0 && Gdn::Session()->IsValid()) ? ' New' : '';
+   
+   if (Gdn::Session()->IsValid()) {
+      if ($Discussion->CountUnreadComments == 0)
+         $CssClass .= ' Read';
+      else
+         $CssClass .= ' New';
+   }
    
    return $CssClass;
 }
@@ -227,7 +233,7 @@ function NewComments($Discussion) {
       return '';
    
    if ($Discussion->CountUnreadComments === TRUE)
-      return ' <strong class="HasNew">'.T('new discussion', 'new').'</strong>';
+      return ' <strong class="HasNew JustNew">'.T('new discussion', 'new').'</strong>';
    elseif ($Discussion->CountUnreadComments > 0)
       return ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
    return '';

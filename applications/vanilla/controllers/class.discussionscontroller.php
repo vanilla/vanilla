@@ -197,7 +197,6 @@ class DiscussionsController extends VanillaController {
 		$this->AddJsFile('bookmark.js');
 		$this->AddJsFile('discussions.js');
 		$this->AddJsFile('options.js');
-      $this->AddJsFile('jquery.gardenmorepager.js');
 			
 		// Inform moderator of checked comments in this discussion
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());

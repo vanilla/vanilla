@@ -236,7 +236,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $Keys = explode('.', $Name);
       // If splitting is off, HANDLE IT
       if (!$this->Splitting) {
-         $FirstKey = GetValue(0, $Keys);
+//         $FirstKey = GetValue(0, $Keys);
+         $FirstKey = $Keys[0];
          if ($FirstKey == $this->DefaultGroup)
             $Keys = array(array_shift($Keys), implode('.',$Keys));
          else

@@ -82,7 +82,7 @@ class DiscussionController extends VanillaController {
       $this->Title($this->Discussion->Name);
 
       // Actual number of comments, excluding the discussion itself.
-      $ActualResponses = $this->Discussion->CountComments - 1;
+      $ActualResponses = $this->Discussion->CountComments;
 
       // If $Offset isn't defined, assume that the user has not clicked to
       // view a next or previous page, and this is a "view" to be counted.
@@ -92,9 +92,8 @@ class DiscussionController extends VanillaController {
 
       $this->Offset = $Offset;
       if (C('Vanilla.Comments.AutoOffset')) {
-         if ($this->Discussion->CountCommentWatch > 1 && $OffsetProvided == '')
-            $this->AddDefinition('ScrollTo', 'a[name=Item_'.$this->Discussion->CountCommentWatch.']');
-
+//         if ($this->Discussion->CountCommentWatch > 1 && $OffsetProvided == '')
+//            $this->AddDefinition('ScrollTo', 'a[name=Item_'.$this->Discussion->CountCommentWatch.']');
          if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
             // Round down to the appropriate offset based on the user's read comments & comments per page
             $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
@@ -117,7 +116,15 @@ class DiscussionController extends VanillaController {
       if ($this->Offset < 0)
          $this->Offset = 0;
       
-      $this->SetData('_LatestItem', $this->Discussion->CountCommentWatch);
+      
+      $LatestItem = $this->Discussion->CountCommentWatch;
+      if ($LatestItem === NULL) {
+         $LatestItem = 0;
+      } elseif ($LatestItem < $this->Discussion->CountComments) {
+         $LatestItem += 1;
+      }
+      
+      $this->SetData('_LatestItem', $LatestItem);
       
       // Set the canonical url to have the proper page title.
       $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, FALSE)));

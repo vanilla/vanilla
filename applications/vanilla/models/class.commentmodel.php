@@ -918,7 +918,7 @@ class CommentModel extends VanillaModel {
             // Update the discussion with null counts.
             $this->SQL
                ->Update('Discussion')
-               ->Set('CountComments', 1)
+               ->Set('CountComments', 0)
                ->Set('FirstCommentID', NULL)
                ->Set('LastCommentID', NULL)
                ->Set('DateLastComment', 'DateInserted', FALSE, FALSE)

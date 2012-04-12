@@ -732,7 +732,7 @@ class UserModel extends Gdn_Model {
     * @param $Key string relative user meta key.
     * @return array results or $Default
     */
-   public static function GetMeta($UserID, $Key, $Prefix = '') {;
+   public static function GetMeta($UserID, $Key, $Prefix = '', $Default = '') {
       $Sql = Gdn::SQL()
          ->Select('*')
          ->From('UserMeta u');

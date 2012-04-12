@@ -86,7 +86,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $DiscussionUrl = $Discussion->Url;
    
    if ($Session->UserID)
-      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch);
+      $DiscussionUrl .= '#latest';
    
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;

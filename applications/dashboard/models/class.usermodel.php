@@ -85,6 +85,42 @@ class UserModel extends Gdn_Model {
    }
    
    /**
+    * Checks the currently authenticated user's permissions for the specified
+    * permission. Returns a boolean value indicating if the action is
+    * permitted.
+    *
+    * @param mixed $Permission The permission (or array of permissions) to check.
+    * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
+	 * @return boolean
+    */
+   public function CheckPermission($User, $Permission, $Options = array()) {
+      if (is_numeric($User)) {
+         $User = $this->GetID($User);
+      }
+      $User = (object)$User;
+      
+      if ($User->Banned || $User->Deleted)
+         return FALSE;
+      
+      if ($User->Admin)
+         return TRUE;
+      
+      // Grab the permissions for the user.
+      if ($User->UserID == 0)
+         $Permissions = $this->DefinePermissions(0, FALSE);
+      elseif (is_array($User->Permissions))
+         $Permissions = $User->Permissions;
+      else {
+         $Permissions = $this->DefinePermissions($User->UserID, FALSE);
+      }
+      
+      // TODO: Check for junction table permissions.
+      
+      $Result = in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
+      return $Result;
+   }
+   
+   /**
     * Unban a user.
     * @since 2.1
     * @param int $UserID

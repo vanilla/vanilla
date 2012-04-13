@@ -81,7 +81,7 @@ function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
 endif;
 
 if (!function_exists('WriteDiscussion')):
-function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
+function WriteDiscussion($Discussion, &$Sender, &$Session) {
    $CssClass = CssClass($Discussion);
    $DiscussionUrl = $Discussion->Url;
    

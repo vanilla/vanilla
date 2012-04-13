@@ -666,6 +666,7 @@ class CommentModel extends VanillaModel {
     */
    public function Save2($CommentID, $Insert, $CheckExisting = TRUE, $IncUser = FALSE) {
       $Session = Gdn::Session();
+      $UserModel = Gdn::UserModel();
       
       // Load comment data
       $Fields = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
@@ -732,29 +733,6 @@ class CommentModel extends VanillaModel {
              'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
              'Data' => array('Name' => $Discussion->Name)
          );
-
-         // Notify any users who were mentioned in the comment.
-         $Usernames = GetMentions($Fields['Body']);
-         $UserModel = Gdn::UserModel();
-         $NotifiedUsers = array();
-         foreach ($Usernames as $i => $Username) {
-            $User = $UserModel->GetByUsername($Username);
-            if (!$User) {
-               unset($Usernames[$i]);
-               continue;
-            }
-            
-            // Check user can still see the discussion.
-            if (!$UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID))
-               continue;
-            
-            $HeadlineFormatBak = $Activity['HeadlineFormat'];
-            $Activity['HeadlineFormat'] = T('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
-            
-            $Activity['NotifyUserID'] = $User->UserID;
-            $ActivityModel->Queue($Activity, 'Mention');
-            $Activity['HeadlineFormat'] = $HeadlineFormatBak;
-         }
          
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
@@ -776,6 +754,28 @@ class CommentModel extends VanillaModel {
          // Record advanced notifications.
          if ($Discussion !== FALSE) {
             $this->RecordAdvancedNotications($ActivityModel, $Activity, $Discussion);
+         }
+         
+         // Notify any users who were mentioned in the comment.
+         $Usernames = GetMentions($Fields['Body']);
+         $NotifiedUsers = array();
+         foreach ($Usernames as $i => $Username) {
+            $User = $UserModel->GetByUsername($Username);
+            if (!$User) {
+               unset($Usernames[$i]);
+               continue;
+            }
+            
+            // Check user can still see the discussion.
+            if (!$UserModel->GetCategoryViewPermission($User->UserID, $Discussion->CategoryID))
+               continue;
+            
+            $HeadlineFormatBak = $Activity['HeadlineFormat'];
+            $Activity['HeadlineFormat'] = T('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
+            
+            $Activity['NotifyUserID'] = $User->UserID;
+            $ActivityModel->Queue($Activity, 'Mention');
+            $Activity['HeadlineFormat'] = $HeadlineFormatBak;
          }
 
          // Throw an event for users to add their own events.

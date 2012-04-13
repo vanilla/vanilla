@@ -232,10 +232,15 @@ function NewComments($Discussion) {
    if (!Gdn::Session()->IsValid())
       return '';
    
-   if ($Discussion->CountUnreadComments === TRUE)
-      return ' <strong class="HasNew JustNew">'.T('new discussion', 'new').'</strong>';
-   elseif ($Discussion->CountUnreadComments > 0)
-      return ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+   if ($Discussion->CountUnreadComments === TRUE) {
+      $Title = htmlspecialchars(T("You havenn't read this yet."));
+      
+      return ' <strong class="HasNew JustNew" title="'.$Title.'">'.T('new discussion', 'new').'</strong>';
+   } elseif ($Discussion->CountUnreadComments > 0) {
+      $Title = htmlspecialchars(Plural($Discussion->CountUnreadComments, "%s new comment since you last read this.", "%s new comments since you last read this."));
+      
+      return ' <strong class="HasNew" title="'.$Title.'">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+   }
    return '';
 }
 endif;

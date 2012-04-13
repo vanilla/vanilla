@@ -211,6 +211,7 @@ if($PermissionModel instanceof PermissionModel) {
 
 // Define the set of permissions that Garden uses.
 $PermissionModel->Define(array(
+   'Garden.Email.View' => 'Garden.SignIn.Allow',
    'Garden.Email.Manage',
    'Garden.Settings.Manage',
    'Garden.Settings.View',

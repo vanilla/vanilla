@@ -118,7 +118,7 @@ function WriteTableRow($Row, $Depth = 1) {
          <?php if ($WriteChildren === 'list'): ?>
          <div class="ChildCategories">
             <?php
-            echo T('Child Categories').': ';
+            echo Wrap(T('Child Categories').': ', 'b');
             echo CategoryString($Children, $Depth + 1);
             ?>
          </div>

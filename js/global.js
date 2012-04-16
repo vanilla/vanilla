@@ -949,30 +949,49 @@ jQuery(document).ready(function($) {
 // Shrink large images to fit into message space, and pop into new window when clicked.
 // This needs to happen in onload because otherwise the image sizes are not yet known.
 jQuery(window).load(function() {
-   
-   var toggler = function(t_img, t_width) {
-      if (parseInt(t_img.css('width'), 10) > t_width)
-         t_img.css('width',t_width);
-      else
-         t_img.css('width','auto');
-      return false;
-   }
-   
+   /*
+   Adds .naturalWidth() and .naturalHeight() methods to jQuery for retreaving a 
+   normalized naturalWidth and naturalHeight.
+   // Example usage:
+   var 
+   nWidth = $('img#example').naturalWidth(),
+   nHeight = $('img#example').naturalHeight();
+   */
+
+   (function($){
+      var
+      props = ['Width', 'Height'],
+      prop;
+
+      while (prop = props.pop()) {
+         (function (natural, prop) {
+            $.fn[natural] = (natural in new Image()) ? 
+            function () {
+               return this[0][natural];
+            } : 
+            function () {
+               var 
+                  node = this[0],
+                  img,
+                  value;
+
+               if (node.tagName.toLowerCase() === 'img') {
+                  img = new Image();
+                  img.src = node.src,
+                  value = img[prop];
+               }
+               return value;
+            };
+         }('natural' + prop, prop.toLowerCase()));
+      }
+   }(jQuery));
+
    jQuery('div.Message img').each(function(i,img) {
       var img = jQuery(img);
       var container = img.parents('div.Message');
-      if (img.width() > container.width()) {
-         var smwidth = container.width();
-         
-         img.css('width', smwidth).css('cursor', 'pointer');
+      if (img.naturalWidth() > container.width()) {
          img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
-         
-         img.next().click(function() {
-            return toggler(img, smwidth);
-         });
-         img.click(function() {
-            return toggler(img, smwidth);
-         })
+         img.wrap('<a href="'+$(img).attr('src')+'"></a>');
       }
    });
 });

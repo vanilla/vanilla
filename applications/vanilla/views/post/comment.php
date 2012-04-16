@@ -6,7 +6,7 @@ if ($Editing)
    $this->Form->SetFormValue('Body', $this->Comment->Body);
 ?>
 <div class="MessageForm CommentForm FormTitleWrapper">
-   <h2><?php echo T($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
+   <h2 class="H"><?php echo T($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
    <?php
    echo '<div class="FormWrapper FormWrapper-Condensed">';
    echo $this->Form->Open();

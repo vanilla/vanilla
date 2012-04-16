@@ -454,7 +454,7 @@ a.Small img {
    border-radius: 1;
    -moz-border-radius: 1;
    -webkit-border-radius: 1;
-   margin: 0 0 10px;
+   margin: 10px 0;
    padding: 10px;
 }
 .DismissMessage.Info {
@@ -986,6 +986,7 @@ overflow: hidden; */
    font-weight: bold;
    margin: 0;
 }
+.ItemDiscussion .Meta,
 .DataList .Meta {
    font-size: 11px;
    color: #70727c;
@@ -1168,6 +1169,7 @@ blockquote {
    margin: 1em 0;
 	background: #f3f3f3;
    background: rgba(0, 0, 0, 0.05);
+   border-left: 4px solid rgba(0, 0, 0, 0.1);
 }
 .Message small {
 	font-size: 11px;
@@ -1219,6 +1221,9 @@ pre code {
 }
 .Message ul li {
   list-style: disc !important;
+}
+.Message img {
+    max-width: 100%;
 }
 .Message .ImageResized {
 	font-size: 11px;
@@ -1288,15 +1293,18 @@ body.Profile.EditMode #Content form {
 	background: #f3f3f3;
 	background: rgba(0, 0, 0, 0.05);
 }
-
 form.Activity {
    display: block;
-   margin: 10px;
+   margin: 0 0 10px;
 	text-align: right;
 }
 form.Activity textarea {
    width: 100%;
    margin-bottom: 2px;
+   height: 60px;
+   min-height: 60px;
+}
+.ActivityComments textarea {
    height: 60px;
    min-height: 60px;
 }
@@ -1668,6 +1676,7 @@ div.Popup form ul li label.RadioLabel {
 .ItemDiscussion {
    margin-bottom: 20px;
 }
+/*
 .ItemDiscussion .Message {
    margin-top: 20px;
 }
@@ -1679,6 +1688,7 @@ div.Popup form ul li label.RadioLabel {
 	width: 24px;
    margin: 0 5px 5px 0;
 }
+*/
 .ItemDiscussion .Message {
 	margin-bottom: 5px; /* Consistency with when only h1 starts page */
 	font-size: 110%;
@@ -2057,6 +2067,7 @@ span.Incorrect {
 }
 .MultipleEntryMethods {
 	margin: 0 auto;
+   overflow: hidden;
 }
 .MultipleEntryMethods .MainForm {
    float: left;

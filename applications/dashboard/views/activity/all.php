@@ -1,10 +1,8 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<div class="ActivityFormWrap">
+<h1 class="H"><?php echo $this->Data('Title'); ?></h1>
 <?php
 include_once $this->FetchViewLocation('helper_functions');
-
-// WriteActivityTabs();
-// echo Gdn_Theme::Module('ActivityFilterModule');
 
 $this->FireEvent('BeforeStatusForm');
 $Session = Gdn::Session();
@@ -15,6 +13,7 @@ if ($Session->CheckPermission('Garden.Profiles.Edit')) {
    echo $this->Form->Button(T('Share'));
    echo $this->Form->Close();
 }
+echo '</div>';
 echo '<ul class="DataList Activities">';
 
 $Activities = $this->Data('Activities', array());

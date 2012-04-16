@@ -196,20 +196,8 @@ class MessagesController extends ConversationsController {
       $this->ConversationData =& $ConversationData;
       $this->SetData('Conversations', $Result);
       
-      $CountConversations = $this->ConversationModel->GetCount($Session->UserID, $Wheres);
-      
-      // Build a pager
-      $PagerFactory = new Gdn_PagerFactory();
-      $this->Pager = $PagerFactory->GetPager('MorePager', $this);
-      $this->Pager->MoreCode = 'Older Conversations';
-      $this->Pager->LessCode = 'Newer Conversations';
-      $this->Pager->ClientID = 'Pager';
-      $this->Pager->Configure(
-         $this->Offset,
-         $Limit,
-         $CountConversations,
-         'messages/all/{Page}' //'messages/all/%1$s/%2$s/'
-      );
+      $this->SetData('_Limit', $Limit);
+      $this->SetData('_CurrentRecords', $this->ConversationData->NumRows());
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -368,7 +356,7 @@ class MessagesController extends ConversationsController {
          $Limit,
          $this->Conversation->CountMessages,
          'messages/'.$ConversationID.'/%1$s/%2$s/'
-      );      
+      );
       
       // Mark the conversation as ready by this user.
       $this->ConversationModel->MarkRead($ConversationID, $Session->UserID);

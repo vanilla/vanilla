@@ -1077,10 +1077,17 @@ class UserModel extends Gdn_Model {
                         $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
 
                      $ActivityModel = new ActivityModel();
+                     if ($UserID == Gdn::Session()->UserID) {
+                        $HeadlineFormat = T('HeadlineFormat.PictureChange', '{RegardingUserID,You} changed {ActivityUserID,your} profile picture.');
+                     } else {
+                        $HeadlineFormat = T('HeadlineFormat.PictureChange.ForUser', '{RegardingUserID,You} changed the profile picture for {ActivityUserID,user}.');
+                     }
+                     
                      $ActivityModel->Save(array(
                          'ActivityUserID' => $UserID,
+                         'RegardingUserID' => Gdn::Session()->UserID,
                          'ActivityType' => 'PictureChange',
-                         'HeadlineFormat' => T('HeadlineFormat.PictureChange', '{ActivityUserID,You} changed {ActivityUserID,your} profile picture.'),
+                         'HeadlineFormat' => $HeadlineFormat,
                          'Story' => Img($PhotoUrl, array('alt' => T('Thumbnail')))
                          ));
                   }

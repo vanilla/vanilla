@@ -63,7 +63,9 @@ if (typeof(hash) == "undefined") {
          $Sender->Head->AddString('<script type="text/javascript">
 jQuery(document).ready(function($) {
    $("ul.DataList li.Item").click(function() {
-      document.location = $(this).find("a.Title").attr("href");
+      var href = $(this).find(".Title a").attr("href");
+      if (typeof href != "undefined")
+         document.location = href;
    });
 });
 </script>');

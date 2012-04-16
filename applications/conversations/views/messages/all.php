@@ -11,7 +11,10 @@ if ($this->ConversationData->NumRows() > 0) {
    ?>
 </ul>
 <?php
-echo $this->Pager->ToString();
+
+PagerModule::Write();
+
+
 } else {
    echo '<div class="Empty">'.T('You do not have any conversations.').'</div>';
 }

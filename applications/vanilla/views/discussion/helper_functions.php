@@ -124,7 +124,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                ?>
             </span>   
          </div>
-         <div class="Meta CommentMeta">
+         <div class="Meta CommentMeta CommentInfo">
             <span class="MItem DateCreated">
                <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
             </span>

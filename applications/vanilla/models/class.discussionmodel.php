@@ -559,6 +559,7 @@ class DiscussionModel extends VanillaModel {
 	 * @return object SQL result.
 	 */
    public function GetForeignID($ForeignID, $Type = '') {
+      $Hash = strlen($ForeignID) > 32 ? md5($ForeignID) : $ForeignID;
       $Session = Gdn::Session();
       $this->FireEvent('BeforeGetForeignID');
       $this->SQL
@@ -579,7 +580,7 @@ class DiscussionModel extends VanillaModel {
 			->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // Insert user
 			->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left') // Last comment user
-         ->Where('d.ForeignID', $ForeignID);
+         ->Where('d.ForeignID', $Hash);
 		
 		if ($Type != '')
 			$this->SQL->Where('d.Type', $Type);

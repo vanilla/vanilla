@@ -46,7 +46,7 @@ jQuery(document).ready(function($) {
             if (remoteUrl.substr(remoteUrl.length - 1) != '/')
                remoteUrl += '/';
                
-            return remoteUrl + "/poll.html#poll:" + id + ":" + message;
+            return remoteUrl + "poll.html#poll:" + id + ":" + message;
          }
         
          remotePostMessage = function(message, target) {
@@ -148,6 +148,15 @@ jQuery(document).ready(function($) {
       });
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
+   }
+   else return; // Ignore the rest if we're not embedded.
+
+   var path = gdn.definition('Path', '~');
+   if (path != '~') {
+      if (path.length > 0 && path[0] != '/')
+         path = '/'+path;
+      remotePostMessage('location:' + path, '*');
+   } else {
       $('a').live('click', function() {
          var href = $(this).attr('href');
          if (!href)
@@ -204,6 +213,7 @@ jQuery(document).ready(function($) {
       });
    }
    
+   /*
    var href = window.location.href;
    var isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://';
    var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);
@@ -212,4 +222,11 @@ jQuery(document).ready(function($) {
          path = '/'+path;
       remotePostMessage('location:' + path, '*');
    }
+   
+   // Unembed the dashboard.
+   // Note: This must be done AFTER the location is set.
+   if (inIframe && inDashboard && !embedDashboard)
+      remotePostMessage('unembed', '*');
+   
+   */
 });

@@ -125,7 +125,7 @@
    }
 
    /* Don't hide the panel on the profile page */
-   #Body .ContentColumn {
+   body.Profile #Body .ContentColumn {
       padding-top: 0;
    }
    body.Profile .MeBox,

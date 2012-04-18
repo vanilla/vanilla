@@ -129,6 +129,32 @@ class DBAModel extends Gdn_Model {
       return $Result;
    }
    
+   public function ResetBatch($Table, $Key) {
+      $Key = "DBA.Range.$Key";
+      Gdn::Set($Key, NULL);
+   }
+   
+   public function GetBatch($Table, $Key, $Limit = 10000) {
+      $Key = "DBA.Range.$Key";
+      
+      // See if there is already a range.
+      $Current = @unserialize(Gdn::Get($Key,  ''));
+      if (!is_array($Current) || !isset($Current['Min']) || !isset($Current['Max'])) {
+         list($Current['Min'], $Current['Max']) = $this->PrimaryKeyRange($Table);
+      }
+      
+      if (!isset($Current['To'])) {
+         $Current['To'] = $Current['Max'];
+      } else {
+         $Current['To'] -= $Limit - 1;
+      }
+      $Current['From'] = $Current['To'] - $Limit;
+      Gdn::Set($Key, serialize($Current));
+      $Current['Complete'] = $Current['To'] < $Current['Min'];
+      
+      return $Current;
+   }
+   
    /**
     * Return the min and max values of a table's primary key.
     * 

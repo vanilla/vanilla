@@ -13,7 +13,6 @@
 class DBAModel extends Gdn_Model {
    public static $ChunkSize = 10000;
    
-   
    public function Counts($Table, $Column, $From = FALSE, $To = FALSE) {
       $Model = $this->CreateModel($Table);
       
@@ -151,6 +150,16 @@ class DBAModel extends Gdn_Model {
       $Current['From'] = $Current['To'] - $Limit;
       Gdn::Set($Key, serialize($Current));
       $Current['Complete'] = $Current['To'] < $Current['Min'];
+      
+      $Total = $Current['Max'] - $Current['Min'];
+      if ($Total > 0) {
+         $Complete = $Current['Max'] - $Current['From'];
+         
+         $Percent = 100 * $Complete / $Total;
+         if ($Percent > 100)
+            $Percent = 100;
+         $Current['Percent'] = round($Percent).'%';
+      }
       
       return $Current;
    }

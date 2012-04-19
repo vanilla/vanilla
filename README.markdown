@@ -20,4 +20,4 @@ Feature branches are work-in-progress branches that contain large chunks of new 
 
 ## hotfix/x
 
-Hotfixes are branched from master and exist to fix small bugs that are detected in a release after it has been tagged in master. These branches are usually small and concise, and are merged back into *master* and *develop* once they are completed. They should never be new features.
+Hotfixes are branched from master and exist to fix small bugs that are detected in a release after it has been tagged in *master*. These branches are usually small and concise, and are merged back into *master* and *develop* once they are completed. They should never be new features.

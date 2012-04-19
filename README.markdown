@@ -14,6 +14,10 @@ The *master* branch of the vanillaforums repository will always contain our late
 
 All of our unreleased development work ends up in the *develop* branch. Sometimes it is committed directly, other times it comes from merged hotfixes again a release, and other times it comes from a merged feature branch. This branch will always contain the most bleeding edge vanillaforums code, so it sometimes has bugs and unfinished features. Use this at your own risk, and avoid deploying it in production.
 
+## release
+
+When we're getting ready to tag a release as a beta, we'll branch *develop* into *release*. This allows us to feature-freeze the code and more easily commit bug fixes without having to tediously create hotfix branches for every little thing. This code should be of beta or rc quality, for the most part, and is what you should download if you'd like to help us test.
+
 ## feature/x
 
 Feature branches are work-in-progress branches that contain large chunks of new or modified code for a single feature or refactoring task. They are branched to preserve the stability of the *develop* branch during fairly destructive code changes.

@@ -36,7 +36,6 @@ echo '</span>';
       $ReturnUrl = Gdn::Request()->PathAndQuery();
       if ($Session->IsValid()) {
          $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
-         
          echo Wrap(
             sprintf(
                T('Commenting as %1$s (%2$s)'),
@@ -48,10 +47,7 @@ echo '</span>';
          );
          echo $this->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         // Must use the "top" url in case the user needs to register, which goes to top.
-         // Javascript will ensure that the target is set properly if they use any in-page popup forms.
-         $AuthenticationUrl = SignInUrl(GetValue('vanilla_url', $ForeignSource, $ReturnUrl)); 
-         
+         $AuthenticationUrl = SignInUrl($ReturnUrl); 
          if ($AllowSigninPopup) {
             $CssClass = 'SignInPopup Button Stash';
          } else {

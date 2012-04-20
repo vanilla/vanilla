@@ -11,7 +11,7 @@ window.vanilla.embed = function(host) {
       jsPath = '/js/embed.js',
       currentPath = window.location.hash.substr(1),
       disablePath = (window != top);
-
+   
    var optStr = function(name, defaultValue, definedValue) {
       if (window['vanilla_'+name]) {
          if (definedValue == undefined)
@@ -134,7 +134,7 @@ window.vanilla.embed = function(host) {
                currentPath = currentPath.replace('/index.php?p=', ''); // 1
                currentPath = stripParam(currentPath, 'remote='); // 2
                currentPath = stripParam(currentPath, 'locale='); // 3
-               window.location.hash = currentPath; //replace(embedUrl + "#" + currentPath);
+               window.location.hash = currentPath;
             }
          }
       } else if (message[0] == 'unload') {

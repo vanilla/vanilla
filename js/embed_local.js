@@ -12,10 +12,13 @@ jQuery(document).ready(function($) {
     know to increase the page height. So, we need to detect when popups appear
     and increase the page height manually so the container knows to do the same.
    */
-   $('body').bind('popupReveal', function() {
+   popupHeight = function() {
       var height = ($.popup.getPagePosition().top*1) + ($('.Popup').height()*1);
+      setHeight(height); // Set it immediately to prevent content being cut off.
       $('body').css('minHeight', height+'px');
-   });
+   }
+   $('body').bind('popupLoading', popupHeight); // set it when popup loading window appears
+   $('body').bind('popupReveal', popupHeight); // reset it when the final popup is revealed
    
       
    var currentHeight = null,
@@ -30,7 +33,7 @@ jQuery(document).ready(function($) {
       isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
-      
+
    if (inIframe) {
       if ("postMessage" in parent) {
          remotePostMessage = function(message, target) {
@@ -115,31 +118,28 @@ jQuery(document).ready(function($) {
          path = path.substr(0, hashIndex);
       
       if ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)) {
-         // alert('redirect: '+remoteUrl + '#' + path); // Debug
          document.location = remoteUrl + '#' + path;
       }
    }
    
    // unembed if in the dashboard, in an iframe, and not forcing dashboard embed   
    if (inIframe && inDashboard && !forceEmbedDashboard) {
-      // alert('unembed'); // Debug
       remotePostMessage('unembed', '*');
    }
 
    // hijack all anchors to see if they should go to "top" or be within the embed (ie. are they in Vanilla or not?)
    if (inIframe) {
-      setHeight = function() {
-         var newHeight = document.body.offsetHeight;
+      setHeight = function(explicitHeight) {
+         var newHeight = explicitHeight != undefined ? explicitHeight : document.body.offsetHeight;
          if (newHeight < minHeight)
             newHeight = minHeight;
+
          if (newHeight != currentHeight) {
-            currentHeight = newHeight;
-               
+            currentHeight = newHeight;               
             remotePostMessage('height:'+currentHeight, '*');
          }
       }
    
-      setHeight();
       setInterval(setHeight, 300);
     
       // Simulate a page unload when popups are opened (so they are scrolled into view).
@@ -148,15 +148,7 @@ jQuery(document).ready(function($) {
       });
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
-   }
-   else return; // Ignore the rest if we're not embedded.
 
-   var path = gdn.definition('Path', '~');
-   if (path != '~') {
-      if (path.length > 0 && path[0] != '/')
-         path = '/'+path;
-      remotePostMessage('location:' + path, '*');
-   } else {
       $('a').live('click', function() {
          var href = $(this).attr('href');
          if (!href)
@@ -175,10 +167,11 @@ jQuery(document).ready(function($) {
             // Target the top of the page if clicking an anchor in a list of embedded comments
             if (!noTop)
                $(this).attr('target', '_top');
-                              
-            // If clicking a "register" link, change the post-registration target to the page that is currently embedded.
+
+            // Change the post-registration target to the page that is currently embedded.
             if ($(this).parents('.CreateAccount').length > 0) {
-               // Examine querystring parameters for a target & replace it with the embed page
+               // Examine querystring parameters for a target & replace it with the container page
+               $(this).attr('target', '_top');
                var href = $(this).attr('href');
                var targetIndex = href.indexOf('Target=');
                if (targetIndex > 0) {
@@ -188,45 +181,32 @@ jQuery(document).ready(function($) {
                      afterTarget = target.substring(target.indexOf('&'));
                   
                   $(this).attr('href', href.substring(0, targetIndex + 7)
-                     + encodeURIComponent(gdn.definition('ForeignUrl', ''))
+                     + encodeURIComponent(gdn.definition('vanilla_url', ''))
                      + afterTarget);
                }
             }            
+            return;
          } else {
             // Strip the path from the root folder of the app
             var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);
             var hashIndex = path.indexOf('#');
-            var hash = '';
-            if (hashIndex > -1) {
-               hash = path.substr(hashIndex);
+            if (hashIndex > -1)
                path = path.substr(0, hashIndex);
-            }
             
             if (path != '')
                remotePostMessage('location:' + path, '*');
 
          }
       });
-      /* Set the target on any in-page sign in forms to the embedded page */
-      $('.SignInPopup [id$=_Target]').livequery(function() {
-         $(this).val(gdn.definition('SelfUrl'));
-      });
    }
    
-   /*
    var href = window.location.href;
    var isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://';
    var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);
+   // DO NOT set the parent location if this is a page of embedded comments!!
    if (path != '~' && !isEmbeddedComments) {
       if (path.length > 0 && path[0] != '/')
          path = '/'+path;
       remotePostMessage('location:' + path, '*');
    }
-   
-   // Unembed the dashboard.
-   // Note: This must be done AFTER the location is set.
-   if (inIframe && inDashboard && !embedDashboard)
-      remotePostMessage('unembed', '*');
-   
-   */
 });

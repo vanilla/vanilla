@@ -199,6 +199,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     
       $('#'+settings.popupId+' .Content').empty();
       $('#'+settings.popupId+' .Body').children().hide().end().append('<div class="Loading">&#160;</div>');
+      // Trigger an even that plugins can attach to when popups are loading.
+      $('body').trigger('popupLoading');
    }
   
    $.popup.reveal = function(settings, data) {

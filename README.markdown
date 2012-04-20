@@ -12,7 +12,7 @@ The *master* branch of the vanillaforums repository will always contain our late
 
 ## develop
 
-All of our unreleased development work ends up in the *develop* branch. Sometimes it is committed directly, other times it comes from merged hotfixes again a release, and other times it comes from a merged feature branch. This branch will always contain the most bleeding edge vanillaforums code, so it sometimes has bugs and unfinished features. Use this at your own risk, and avoid deploying it in production.
+All of our unreleased development work ends up in the *develop* branch. Sometimes it is committed directly, other times it comes from merged hotfixes against a release, and other times it comes from a merged feature branch. This branch will always contain the most bleeding edge vanillaforums code, so it sometimes has bugs and unfinished features. Use this at your own risk, and avoid deploying it in production.
 
 ## release
 
@@ -24,4 +24,4 @@ Feature branches are work-in-progress branches that contain large chunks of new 
 
 ## hotfix/x
 
-Hotfixes are branched from master and exist to fix small bugs that are detected in a release after it has been tagged in *master*. These branches are usually small and concise, and are merged back into *master* and *develop* once they are completed. They should never be new features.
+Hotfixes are branched from *master* and exist to fix small bugs that are detected in a release after it has been tagged in *master*. These branches are usually small and concise, and are merged back into *master* and *develop* once they are completed. They should never be new features.

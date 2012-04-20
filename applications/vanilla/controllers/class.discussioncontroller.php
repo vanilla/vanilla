@@ -690,6 +690,10 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $Offset = GetIncomingValue('Offset', $Offset);
       $Limit = GetIncomingValue('Limit', $Limit);
       $vanilla_identifier = GetIncomingValue('vanilla_identifier', '');
+      // Only allow vanilla identifiers of 32 chars or less - md5 if larger
+      if (strlen($vanilla_identifier) > 32) {
+         $vanilla_identifier = md5($vanilla_identifier);
+      }
       $vanilla_type = GetIncomingValue('vanilla_type', 'blog');
       $vanilla_url = GetIncomingValue('vanilla_url', '');
       $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
@@ -796,7 +800,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->Form->SetFormValue('Body', $Draft->Body);
       else {
          // Look in the session stash for a comment
-         $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE);
+         $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE); 
          if ($StashComment)
             $this->Form->SetFormValue('Body', $StashComment);
       }

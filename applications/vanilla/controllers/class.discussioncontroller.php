@@ -722,7 +722,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $ActualResponses = $this->Discussion->CountComments - 1;
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
-            $Limit = C('Vanilla.Comments.PerPage', 30);
+            $Limit = C('Garden.Embed.CommentsPerPage', 30);
 
          $OffsetProvided = $Offset != '';
          list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
@@ -743,9 +743,11 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
 
          // Load the comments
+         $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
+         $this->SetData('SortComments', $SortComments);
          $CurrentOrderBy = $this->CommentModel->OrderBy();
          if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
-            $this->CommentModel->OrderBy('c.DateInserted desc'); // allow custom sort
+            $this->CommentModel->OrderBy('c.DateInserted '.$SortComments); // allow custom sort
 
          $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
 
@@ -814,7 +816,9 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->View = 'comments';
       }
       
-      $this->AddDefinition('PrependNewComments', '1');
+      if ($SortComments == 'desc')
+         $this->AddDefinition('PrependNewComments', '1');
+      
       // Report the discussion id so js can use it.      
       if ($Discussion)
          $this->AddDefinition('DiscussionID', $Discussion->DiscussionID);

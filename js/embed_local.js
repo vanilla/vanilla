@@ -186,27 +186,15 @@ jQuery(document).ready(function($) {
                }
             }            
             return;
-         } else {
-            // Strip the path from the root folder of the app
-            var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);
-            var hashIndex = path.indexOf('#');
-            if (hashIndex > -1)
-               path = path.substr(0, hashIndex);
-            
-            if (path != '')
-               remotePostMessage('location:' + path, '*');
-
          }
       });
    }
    
-   var href = window.location.href;
-   var isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://';
-   var path = isHttp ? href.substr(webroot.length) : href.substr(pathroot.length);
    // DO NOT set the parent location if this is a page of embedded comments!!
+   var path = gdn.definition('Path', '~');
    if (path != '~' && !isEmbeddedComments) {
       if (path.length > 0 && path[0] != '/')
          path = '/'+path;
-      remotePostMessage('location:' + path, '*');
+      remotePostMessage('location:' + path, '*');   
    }
 });

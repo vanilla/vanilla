@@ -219,9 +219,9 @@ class Gdn_Theme {
             break;
       }
       
-      if ($Text == FALSE)
-         return;
-
+      if ($Text == FALSE && strpos($Format, '%text') !== FALSE)
+         return '';
+      
       if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions'], FALSE))
          return '';
 

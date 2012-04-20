@@ -2026,7 +2026,7 @@ class UserModel extends Gdn_Model {
       // Remove the user's information
       $this->SQL->Update('User')
          ->Set(array(
-            'Name' => '[Deleted User]',
+            'Name' => T('[Deleted User]'),
             'Photo' => null,
             'Password' => RandomString('10'),
             'About' => '',

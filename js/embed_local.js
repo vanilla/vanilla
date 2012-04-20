@@ -6,21 +6,6 @@ jQuery(document).ready(function($) {
       }
    }
    
-   /*
-    Embedded pages can have very low height settings. As a result, when an
-    absolutely positioned popup appears on the page, iframed content doesn't
-    know to increase the page height. So, we need to detect when popups appear
-    and increase the page height manually so the container knows to do the same.
-   */
-   popupHeight = function() {
-      var height = ($.popup.getPagePosition().top*1) + ($('.Popup').height()*1);
-      setHeight(height); // Set it immediately to prevent content being cut off.
-      $('body').css('minHeight', height+'px');
-   }
-   $('body').bind('popupLoading', popupHeight); // set it when popup loading window appears
-   $('body').bind('popupReveal', popupHeight); // reset it when the final popup is revealed
-   
-      
    var currentHeight = null,
       minHeight = 100,
       remotePostMessage = function(message, target) {},
@@ -33,6 +18,23 @@ jQuery(document).ready(function($) {
       isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
+
+   /*
+    Embedded pages can have very low height settings. As a result, when an
+    absolutely positioned popup appears on the page, iframed content doesn't
+    know to increase the page height. So, we need to detect when popups appear
+    and increase the page height manually so the container knows to do the same.
+   */
+   popupHeight = function() {
+      var height = ($.popup.getPagePosition().top*1) + ($('.Popup').height()*1);
+      if (height > minHeight) {
+         setHeight(height); // Set it immediately to prevent content being cut off.
+         $('body').css('minHeight', height+'px');
+      }
+   }
+   $('body').bind('popupLoading', popupHeight); // set it when popup loading window appears
+   $('body').bind('popupReveal', popupHeight); // reset it when the final popup is revealed
+
 
    if (inIframe) {
       if ("postMessage" in parent) {
@@ -130,11 +132,8 @@ jQuery(document).ready(function($) {
    // hijack all anchors to see if they should go to "top" or be within the embed (ie. are they in Vanilla or not?)
    if (inIframe) {
       setHeight = function(explicitHeight) {
-         var newHeight = explicitHeight != undefined ? explicitHeight : document.body.offsetHeight;
-         if (newHeight < minHeight)
-            newHeight = minHeight;
-
-         if (newHeight != currentHeight) {
+         var newHeight = explicitHeight > 0 ? explicitHeight : document.body.offsetHeight;
+         if (newHeight > minHeight && newHeight != currentHeight) {
             currentHeight = newHeight;               
             remotePostMessage('height:'+currentHeight, '*');
          }

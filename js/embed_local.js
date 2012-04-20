@@ -129,7 +129,6 @@ jQuery(document).ready(function($) {
       remotePostMessage('unembed', '*');
    }
 
-   // hijack all anchors to see if they should go to "top" or be within the embed (ie. are they in Vanilla or not?)
    if (inIframe) {
       setHeight = function(explicitHeight) {
          var newHeight = explicitHeight > 0 ? explicitHeight : document.body.offsetHeight;
@@ -148,6 +147,8 @@ jQuery(document).ready(function($) {
       
       $(window).unload(function() { remotePostMessage('unload', '*'); });
 
+      // hijack all anchors to see if they should go to "top" or be within the 
+      // embed (ie. are they in Vanilla or not?)
       $('a').live('click', function() {
          var href = $(this).attr('href');
          if (!href)

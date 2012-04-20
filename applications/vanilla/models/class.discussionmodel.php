@@ -114,13 +114,9 @@ class DiscussionModel extends VanillaModel {
       
       // Buid main query
       $this->SQL
-         ->Select('d.Type')
+         ->Select('d.*')
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
-			->Select('d.CountBookmarks')
-         
-         ->Select('d.Body') // <-- Need these for rss!
-         ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->From('Discussion d');
@@ -189,8 +185,6 @@ class DiscussionModel extends VanillaModel {
       $Session = Gdn::Session();
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
       $this->DiscussionSummaryQuery($AdditionalFields, FALSE);
-      $this->SQL
-         ->Select('d.*');
          
       if ($UserID > 0) {
          $this->SQL
@@ -339,17 +333,26 @@ class DiscussionModel extends VanillaModel {
 				} else {
 					$Discussion->CountUnreadComments = 0;
 				}
-			} else {
+			} elseif ($Discussion->CountCommentWatch === NULL) {
+            // Allow for discussions to just be new.
+            $Discussion->CountUnreadComments = TRUE;
+         } else {
 				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 			}
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
-				$Discussion->CountUnreadComments = 0;
+				$Discussion->CountUnreadComments = TRUE;
 				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate))
 					$Discussion->CountCommentWatch = $Discussion->CountComments;
 			}
-			$Discussion->CountUnreadComments = is_numeric($Discussion->CountUnreadComments) ? $Discussion->CountUnreadComments : 0;
+         if ($Discussion->CountUnreadComments === NULL)
+            $Discussion->CountUnreadComments = 0;
 			$Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+         
+         if ($Discussion->LastUserID == NULL) {
+            $Discussion->LastUserID = $Discussion->InsertUserID;
+            $Discussion->LastDate = $Discussion->DateInserted;
+         }
 		}
 	}
 	
@@ -412,8 +415,6 @@ class DiscussionModel extends VanillaModel {
          return new Gdn_DataSet();
 
       $this->DiscussionSummaryQuery(array(), FALSE);
-      $this->SQL
-         ->Select('d.*');
 
       if ($UserID) {
          $this->SQL->Select('w.UserID', '', 'WatchUserID')

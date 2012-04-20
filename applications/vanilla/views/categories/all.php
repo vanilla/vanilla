@@ -3,7 +3,7 @@
 if (!function_exists('GetOptions'))
    include $this->FetchViewLocation('helper_functions', 'categories');
    
-echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
 if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
 }
@@ -30,12 +30,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;
       $this->FireEvent('BeforeCategoryItem');
-      $CssClasses = array(GetValue('Read', $Category) ? 'Read' : 'Unread');
-      if (GetValue('Archive', $Category))
-         $CssClasses[] = 'Archive';
-      if (GetValue('Unfollow', $Category))
-         $CssClasses[] = 'Unfollow';
-      $CssClasses = implode(' ', $CssClasses);
+      $CssClass = CssClass($CategoryRow);
       
       $CategoryID = GetValue('CategoryID', $Category);
 
@@ -52,7 +47,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                $ChildCategories .= ', ';
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category));
          } else if ($DoHeadings && $Category->Depth == 1) {
-            $CatList .= '<li id="Category_'.$CategoryID.'" class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.' '.$CssClasses.'">
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'.GetOptions($Category, $this).Gdn_Format::Text($Category->Name).'</div>
             </li>';
             $Alt = FALSE;
@@ -60,8 +55,8 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $LastComment = UserBuilder($Category, 'Last');
             $AltCss = $Alt ? ' Alt' : '';
             $Alt = !$Alt;
-            $CatList .= '<li id="Category_'.$CategoryID.'" class="Item Depth'.$Category->Depth.$AltCss.' Category-'.$Category->UrlCode.' '.$CssClasses.'">
-               <div class="ItemContent Category '.$CssClasses.'">'
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
+               <div class="ItemContent Category">'
                   .GetOptions($Category, $this)
                   .'<div class="TitleWrap">'
                      .Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category), 'Title')

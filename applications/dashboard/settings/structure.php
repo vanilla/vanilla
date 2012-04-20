@@ -211,6 +211,7 @@ if($PermissionModel instanceof PermissionModel) {
 
 // Define the set of permissions that Garden uses.
 $PermissionModel->Define(array(
+   'Garden.Email.View' => 'Garden.SignIn.Allow',
    'Garden.Email.Manage',
    'Garden.Settings.Manage',
    'Garden.Settings.View',
@@ -239,7 +240,7 @@ if (!$PermissionTableExists) {
 
    // Set initial guest permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 2,
+      'Role' => 'Guest',
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 0
@@ -247,44 +248,48 @@ if (!$PermissionTableExists) {
 
    // Set initial confirm email permissions.
    $PermissionModel->Save(array(
-       'RoleID' => 3,
+       'Role' => 'Unconfirmed',
        'Garden.Signin.Allow' => 1,
        'Garden.Activity.View' => 1,
        'Garden.Profiles.View' => 1,
-       'Garden.Profiles.Edit' => 0
+       'Garden.Profiles.Edit' => 0,
+       'Garden.Email.View' => 1
        ));
 
    // Set initial applicant permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 4,
+      'Role' => 'Applicant',
       'Garden.Signin.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 0
+      'Garden.Profiles.Edit' => 0,
+      'Garden.Email.View' => 1
       ));
 
    // Set initial member permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 8,
+      'Role' => 'Member',
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 1
+      'Garden.Profiles.Edit' => 1,
+      'Garden.Email.View' => 1
       ));
 
    // Set initial moderator permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 32,
+      'Role' => 'Moderator',
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Moderation.Manage' => 1,
       'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 1
+      'Garden.Profiles.Edit' => 1,
+      'Garden.Email.View' => 1
       ));
 
    // Set initial admininstrator permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 16,
+      'Role' => 'Administrator',
       'Garden.Settings.Manage' => 1,
       'Garden.Routes.Manage' => 1,
       'Garden.Applications.Manage' => 1,
@@ -302,7 +307,8 @@ if (!$PermissionTableExists) {
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 1,
-      'Garden.AdvancedNotifications.Allow' => 1
+      'Garden.AdvancedNotifications.Allow' => 1,
+      'Garden.Email.View' => 1
       ));
 }
 $PermissionModel->ClearPermissions();

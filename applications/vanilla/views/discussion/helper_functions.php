@@ -78,7 +78,7 @@ endif;
  */
 if (!function_exists('WriteComment')):
 function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
-   $Author = UserBuilder($Comment, 'Insert');
+   $Author = Gdn::UserModel()->GetID($Comment->InsertUserID); //UserBuilder($Comment, 'Insert');
    $Permalink = GetValue('Url', $Comment, '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID);
 
    // Set CanEditComments (whether to show checkboxes)
@@ -109,32 +109,40 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          <?php WriteCommentOptions($Comment); ?>
       </div>
       <?php $Sender->FireEvent('BeforeCommentMeta'); ?>
-      <span class="Author">
-         <?php
-         echo UserPhoto($Author);
-         echo UserAnchor($Author, 'Username');
-         ?>
-      </span>
-      <div class="Meta">
-         <span class="MItem DateCreated">
-            <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
-         </span>
-         <?php
-         // Include source if one was set
-         if ($Source = GetValue('Source', $Comment))
-            echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
+      <div class="Item-Header CommentHeader">
+         <div class="AuthorWrap">
+            <span class="Author">
+               <?php
+               echo UserPhoto($Author);
+               echo UserAnchor($Author, 'Username');
+               ?>
+            </span>
+            <span class="AuthorInfo">
+               <?php
+               echo WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
+               $Sender->FireEvent('AuthorInfo'); 
+               ?>
+            </span>   
+         </div>
+         <div class="Meta CommentMeta CommentInfo">
+            <span class="MItem DateCreated">
+               <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
+            </span>
+            <?php
+            // Include source if one was set
+            if ($Source = GetValue('Source', $Comment))
+               echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
 
-         // Add your own options or data as spans with 'MItem' class
-         $Sender->FireEvent('InsideCommentMeta');
+            $Sender->FireEvent('CommentInfo');
+            $Sender->FireEvent('InsideCommentMeta'); // DEPRECATED
+            $Sender->FireEvent('AfterCommentMeta'); // DEPRECATED
 
-         
-         $Sender->FireEvent('CommentInfo');
+            // Include IP Address if we have permission
+            if ($Session->CheckPermission('Garden.Moderation.Manage')) 
+               echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
 
-         // Include IP Address if we have permission
-         if ($Session->CheckPermission('Garden.Moderation.Manage')) 
-            echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
-         ?>
-         <?php $Sender->FireEvent('AfterCommentMeta'); ?>
+            ?>
+         </div>
       </div>
       <div class="Item-BodyWrap">
          <div class="Item-Body">

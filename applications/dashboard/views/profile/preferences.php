@@ -24,7 +24,7 @@
       width: 486px;
    }
 </style>
-<h2><?php echo $this->Data('Title');  ?></h2>
+<h2 class="H"><?php echo $this->Data('Title');  ?></h2>
 <div class="Preferences">
 <?php
 echo $this->Form->Open();

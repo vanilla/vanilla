@@ -49,9 +49,23 @@ class Gdn_Smarty {
       if($Session->IsValid()) {
          $User = array(
             'Name' => $Session->User->Name,
+            'Photo' => '',
             'CountNotifications' => (int)GetValue('CountNotifications', $Session->User->CountNotifications, 0),
             'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
             'SignedIn' => TRUE);
+         
+         $Photo = $Session->User->Photo;
+         if ($Photo) {
+            if (!preg_match('`^https?://`i', $Photo)) {
+               $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+            }
+         } else {
+            if (function_exists('UserPhotoDefaultUrl'))
+               $Photo = UserPhotoDefaultUrl($Session->User);
+            else
+               $Photo = Asset('/applications/dashboard/design/defaulticon.png', TRUE);
+         }
+         $User['Photo'] = $Photo;
       } else {
          $User = FALSE; /*array(
             'Name' => '',

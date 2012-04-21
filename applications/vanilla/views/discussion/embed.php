@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
-$Discussion = property_exists($this, 'Discussion') ? $this->Discussion : FALSE;
+$Discussion = $this->Data('Discussion');
 $ForeignSource = $this->Data('ForeignSource');
+$SortComments = $this->Data('SortComments');
 $HasCommentData = property_exists($this, 'CommentData');
 $Session = Gdn::Session();
 if (!function_exists('WriteComment'))
@@ -12,55 +13,12 @@ if (!function_exists('WriteComment'))
 echo '<span class="BeforeCommentHeading">';
 $this->FireEvent('CommentHeading');
 echo '</span>';
+
+if ($SortComments == 'desc')
+   WriteEmbedCommentForm();
+else
+   echo Wrap(T('Comments'), 'h2');
 ?>
-   
-<?php if ($Discussion && $Discussion->Closed == '1') { ?>
-   <div class="Foot Closed">
-      <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
-   </div>
-<?php } else { ?>
-   <h2><?php echo T('Leave a comment'); ?></h2>
-   <div class="MessageForm CommentForm EmbedCommentForm">
-      <?php
-      echo $this->Form->Open();
-      echo $this->Form->Errors();
-      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
-      echo "<div class=\"Buttons\">\n";
-      
-      $AllowSigninPopup = C('Garden.SignIn.Popup');
-      $Attributes = array('tabindex' => '-1');
-// Don't force to top!
-//      if (!$AllowSigninPopup)
-//         $Attributes['target'] = '_parent';
-      
-      $ReturnUrl = Gdn::Request()->PathAndQuery();
-      if ($Session->IsValid()) {
-         $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
-         echo Wrap(
-            sprintf(
-               T('Commenting as %1$s (%2$s)'),
-               Gdn_Format::Text($Session->User->Name),
-               Anchor(T('Sign Out'), $AuthenticationUrl, 'SignOut', $Attributes)
-            ),
-            'div',
-            array('class' => 'Author')
-         );
-         echo $this->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
-      } else {
-         $AuthenticationUrl = SignInUrl($ReturnUrl); 
-         if ($AllowSigninPopup) {
-            $CssClass = 'SignInPopup Button Stash';
-         } else {
-            $CssClass = 'Button Stash';
-         }
-         
-         echo Anchor(T('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);
-      }
-      echo "</div>\n";
-      echo $this->Form->Close();
-      ?>
-   </div>
-<?php } ?>
 <ul class="DataList MessageList Comments">
    <?php
    if ($HasCommentData) {
@@ -83,7 +41,19 @@ if ($HasCommentData) {
          $this->AddDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
       $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
    }
-   echo $this->Pager->ToString('more');
+   
+   // Send the user to the discussion in the forum when paging
+   if (C('Garden.Embed.PageToForum')) {
+      $DiscussionUrl = DiscussionUrl($Discussion).'#latest';
+      echo '<div class="Foot">';
+      echo Anchor(T('More Comments'), $DiscussionUrl);
+      echo '</div>';
+   } else 
+      echo $this->Pager->ToString('more');
 }
+
+if ($SortComments != 'desc')
+   WriteEmbedCommentForm();
+
 ?>
 </div>

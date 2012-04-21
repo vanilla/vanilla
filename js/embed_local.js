@@ -17,8 +17,10 @@ jQuery(document).ready(function($) {
       pagePath = gdn.definition('Path', ''),
       isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
       webroot = gdn.definition('WebRoot'),
-      pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
-
+      path = gdn.definition('Path', '~');
+      if (path.length > 0 && path[0] != '/')
+         path = '/'+path;
+      
    /*
     Embedded pages can have very low height settings. As a result, when an
     absolutely positioned popup appears on the page, iframed content doesn't
@@ -113,23 +115,18 @@ jQuery(document).ready(function($) {
    }
 
    // If not embedded and we should be, redirect to the embedded version.
-   if (!inIframe && remoteUrl != '') {
-      var path = document.location.toString().substr(webroot.length);
-      var hashIndex = path.indexOf('#');
-      if (hashIndex > -1)
-         path = path.substr(0, hashIndex);
-      
-      if ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)) {
-         document.location = remoteUrl + '#' + path;
-      }
-   }
+   if (!inIframe && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
+      document.location = remoteUrl + '#' + path;
    
-   // unembed if in the dashboard, in an iframe, and not forcing dashboard embed   
-   if (inIframe && inDashboard && !forceEmbedDashboard) {
-      remotePostMessage('unembed', '*');
-   }
-
    if (inIframe) {
+      // DO NOT set the parent location if this is a page of embedded comments!!
+      if (path != '~' && !isEmbeddedComments)
+         remotePostMessage('location:' + path, '*');   
+
+      // Unembed if in the dashboard, in an iframe, and not forcing dashboard embed   
+      if (inDashboard && !forceEmbedDashboard)
+         remotePostMessage('unembed', '*');
+
       setHeight = function(explicitHeight) {
          var newHeight = explicitHeight > 0 ? explicitHeight : document.body.offsetHeight;
          if (newHeight > minHeight && newHeight != currentHeight) {
@@ -188,13 +185,5 @@ jQuery(document).ready(function($) {
             return;
          }
       });
-   }
-   
-   // DO NOT set the parent location if this is a page of embedded comments!!
-   var path = gdn.definition('Path', '~');
-   if (path != '~' && !isEmbeddedComments) {
-      if (path.length > 0 && path[0] != '/')
-         path = '/'+path;
-      remotePostMessage('location:' + path, '*');   
    }
 });

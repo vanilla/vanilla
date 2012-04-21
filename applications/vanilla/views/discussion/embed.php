@@ -16,7 +16,7 @@ echo '</span>';
 
 if ($SortComments == 'desc')
    WriteEmbedCommentForm();
-else
+else if ($HasCommentData && $this->CommentData->NumRows() > 0)
    echo Wrap(T('Comments'), 'h2');
 ?>
 <ul class="DataList MessageList Comments">
@@ -43,9 +43,9 @@ if ($HasCommentData) {
    }
    
    // Send the user to the discussion in the forum when paging
-   if (C('Garden.Embed.PageToForum')) {
+   if (C('Garden.Embed.PageToForum') && $this->Pager->HasMorePages()) {
       $DiscussionUrl = DiscussionUrl($Discussion).'#latest';
-      echo '<div class="Foot">';
+      echo '<div class="PageToForum Foot">';
       echo Anchor(T('More Comments'), $DiscussionUrl);
       echo '</div>';
    } else 

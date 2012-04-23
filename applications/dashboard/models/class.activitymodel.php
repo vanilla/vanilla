@@ -915,7 +915,7 @@ class ActivityModel extends Gdn_Model {
 
                try {
                   // Only send if the user is not banned
-                  $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_OBJECT);
+                  $User = Gdn::UserModel()->GetID($UserID);
                   if (!GetValue('Banned', $User))
                      $Email->Send();
                   

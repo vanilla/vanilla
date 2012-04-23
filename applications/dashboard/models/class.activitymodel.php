@@ -721,7 +721,10 @@ class ActivityModel extends Gdn_Model {
             $this->EventArguments = $Notification;
             $this->FireEvent('BeforeSendNotification');
             try {
-               $Email->Send();
+               // Only send if the user is not banned
+               if (!GetValue('Banned', $User))
+                  $Email->Send();
+               
                $Emailed = self::SENT_OK;
             } catch (phpmailerException $pex) {
                if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
@@ -802,7 +805,10 @@ class ActivityModel extends Gdn_Model {
       
       // Send the email.
       try {
-         $Email->Send();
+         // Only send if the user is not banned
+         if (!GetValue('Banned', $User))
+            $Email->Send();
+         
          $Emailed = self::SENT_OK;
          
          // Delete the activity now that it has been emailed.
@@ -906,17 +912,21 @@ class ActivityModel extends Gdn_Model {
             if (is_object($Email)) {
                $this->EventArguments = $Notification;
                $this->FireEvent('BeforeSendNotification');
-            
+
                try {
-                  $Email->Send();
-                  $Emailed = 2;
+                  // Only send if the user is not banned
+                  $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_OBJECT);
+                  if (!GetValue('Banned', $User))
+                     $Email->Send();
+                  
+                  $Emailed = self::SENT_OK;
                } catch (phpmailerException $pex) {
                   if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
-                     $Emailed = 4;
+                     $Emailed = self::SENT_FAIL;
                   else
-                     $Emailed = 5;
+                     $Emailed = self::SENT_ERROR;
                } catch(Exception $Ex) {
-                  $Emailed = 4;
+                  $Emailed = self::SENT_FAIL;
                }
                
                try {

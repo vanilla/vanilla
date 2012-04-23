@@ -945,8 +945,8 @@ jQuery(document).ready(function($) {
 			stash('CommentForForeignID_' + vanilla_identifier, comment);
 	});
    
-   String.addCommas = function(nStr) {
-      nStr += '';
+   String.prototype.addCommas = function() {
+      nStr = this;
       x = nStr.split('.');
       x1 = x[0];
       x2 = x.length > 1 ? '.' + x[1] : '';

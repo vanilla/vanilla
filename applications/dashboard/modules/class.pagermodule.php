@@ -440,4 +440,11 @@ class PagerModule extends Gdn_Module {
    private function _GetCssClass($ThisPage, $HighlightPage) {
       return $ThisPage == $HighlightPage ? 'Highlight' : FALSE;
    }
+   
+   /** 
+    * Are there more pages after the current one?
+    */
+   public function HasMorePages() {
+      return $this->TotalRecords > $this->Offset + $this->Limit;
+   }
 }

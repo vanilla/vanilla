@@ -298,10 +298,16 @@ class PostController extends VanillaController {
       $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       
       // Is this an embedded comment being posted to a discussion that doesn't exist yet?
-      $vanilla_identifier = $this->Form->GetFormValue('vanilla_identifier', '');
       $vanilla_type = $this->Form->GetFormValue('vanilla_type', '');
       $vanilla_url = $this->Form->GetFormValue('vanilla_url', '');
       $vanilla_category_id = $this->Form->GetFormValue('vanilla_category_id', '');
+      $Attributes = array('ForeignUrl' => $vanilla_url);
+      $vanilla_identifier = $this->Form->GetFormValue('vanilla_identifier', '');
+      // Only allow vanilla identifiers of 32 chars or less - md5 if larger
+      if (strlen($vanilla_identifier) > 32) {
+         $Attributes['vanilla_identifier'] = $vanilla_identifier;
+         $vanilla_identifier = md5($vanilla_identifier);
+      }
       
       if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
          $Discussion = $this->DiscussionModel->GetWhere(array(
@@ -371,7 +377,7 @@ class PostController extends VanillaController {
             'Name' => $Title,
             'Body' => $Body,
             'Format' => 'Html',
-            'Attributes' => serialize(array('ForeignUrl' => $vanilla_url))
+            'Attributes' => serialize($Attributes)
          );
          $this->EventArguments['Discussion'] = $EmbeddedDiscussionData;
          $this->FireEvent('BeforeEmbedDiscussion');

@@ -416,3 +416,57 @@ function WriteCommentForm() {
 		echo $Controller->FetchView('comment', 'post');
 }
 endif;
+
+if (!function_exists('WriteEmbedCommentForm')):
+function WriteEmbedCommentForm() {
+ 	$Session = Gdn::Session();
+	$Controller = Gdn::Controller();
+	$Discussion = $Controller->Data('Discussion');
+
+   if ($Discussion && $Discussion->Closed == '1') { 
+   ?>
+   <div class="Foot Closed">
+      <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
+   </div>
+   <?php } else { ?>
+   <h2><?php echo T('Leave a comment'); ?></h2>
+   <div class="MessageForm CommentForm EmbedCommentForm">
+      <?php
+      echo $Controller->Form->Open();
+      echo $Controller->Form->Errors();
+      echo Wrap($Controller->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
+      echo "<div class=\"Buttons\">\n";
+      
+      $AllowSigninPopup = C('Garden.SignIn.Popup');
+      $Attributes = array('tabindex' => '-1');
+      $ReturnUrl = Gdn::Request()->PathAndQuery();
+      if ($Session->IsValid()) {
+         $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
+         echo Wrap(
+            sprintf(
+               T('Commenting as %1$s (%2$s)'),
+               Gdn_Format::Text($Session->User->Name),
+               Anchor(T('Sign Out'), $AuthenticationUrl, 'SignOut', $Attributes)
+            ),
+            'div',
+            array('class' => 'Author')
+         );
+         echo $Controller->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
+      } else {
+         $AuthenticationUrl = SignInUrl($ReturnUrl); 
+         if ($AllowSigninPopup) {
+            $CssClass = 'SignInPopup Button Stash';
+         } else {
+            $CssClass = 'Button Stash';
+         }
+         
+         echo Anchor(T('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);
+      }
+      echo "</div>\n";
+      echo $Controller->Form->Close();
+      ?>
+   </div>
+   <?php
+   }
+}
+endif;

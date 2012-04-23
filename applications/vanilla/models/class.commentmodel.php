@@ -672,7 +672,10 @@ class CommentModel extends VanillaModel {
       $Fields = $this->GetID($CommentID, DATASET_TYPE_ARRAY);
       
       // Clear any session stashes related to this discussion
-      $Session->Stash('CommentForDiscussionID_'.GetValue('DiscussionID', $Fields));
+      $DiscussionModel = new DiscussionModel();
+      $DiscussionID = GetValue('DiscussionID', $Fields);
+      $Discussion = $DiscussionModel->GetID($DiscussionID);
+      $Session->Stash('CommentForForeignID_'.GetValue('ForeignID', $Discussion));
 
       // Make a quick check so that only the user making the comment can make the notification.
       // This check may be used in the future so should not be depended on later in the method.
@@ -686,10 +689,6 @@ class CommentModel extends VanillaModel {
       $this->UpdateUser($Session->UserID, $IncUser && $Insert);
 
       if ($Insert) {
-			$DiscussionModel = new DiscussionModel();
-			$DiscussionID = GetValue('DiscussionID', $Fields);
-			$Discussion = $DiscussionModel->GetID($DiscussionID);
-			
 			// UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
 			if ($Discussion->CategoryID > 0) {
 				$CountComments = $this->SQL

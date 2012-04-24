@@ -13,7 +13,6 @@ if (!function_exists('WriteComment'))
 echo '<span class="BeforeCommentHeading">';
 $this->FireEvent('CommentHeading');
 echo '</span>';
-         $AuthenticationUrl = SignOutUrl($ReturnUrl);
 
 if ($SortComments == 'desc')
    WriteEmbedCommentForm();

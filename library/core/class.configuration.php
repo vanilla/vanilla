@@ -891,6 +891,14 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     * @return Gdn_ConfigurationSource 
     */
    public static function FromString($Parent, $String, $Tag, $Name = 'Configuration') {
+      $ConfigurationData = self::ParseString($String, $Name);
+      if ($ConfigurationData === FALSE)
+         throw new Exception('Could not parse config string.');
+      
+      return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $ConfigurationData);
+   }
+   
+   public static function ParseString($String, $Name) {
       // Define the variable properly.
       $$Name = NULL;
       
@@ -899,14 +907,14 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
          $String = str_replace(array('<?php','<?','?>'), '', $String);
          $Parsed = eval($String);
          if ($Parsed === FALSE)
-            throw new Exception('Could not parse config string.');
+            return FALSE;
       }
       
       // Make sure the config variable is here and is an array.
       if (is_null($$Name) || !is_array($$Name))
          $$Name = array();
       
-      return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $$Name);
+      return $$Name;
    }
    
    /**

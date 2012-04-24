@@ -34,11 +34,11 @@ jQuery(document).ready(function($) {
          $('body').css('minHeight', height+'px');
       }
    }
-   $('body').bind('popupLoading', popupHeight); // set it when popup loading window appears
-   $('body').bind('popupReveal', popupHeight); // reset it when the final popup is revealed
-
 
    if (inIframe) {
+      $('body').bind('popupLoading', popupHeight); // set it when popup loading window appears
+      $('body').bind('popupReveal', popupHeight); // reset it when the final popup is revealed
+      
       if ("postMessage" in parent) {
          remotePostMessage = function(message, target) {
             return parent.postMessage(message, target);

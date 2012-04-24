@@ -178,6 +178,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $Defaults = array(
          'VariableName' => 'Configuration',
          'WrapPHP'      => TRUE,
+         'SafePHP'      => TRUE,
          'Headings'     => TRUE,
          'ByLine'       => TRUE,
          'FormatStyle'  => 'Array'
@@ -185,30 +186,28 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $Options = array_merge($Defaults, $Options);
       $VariableName = GetValue('VariableName', $Options);
       $WrapPHP = GetValue('WrapPHP', $Options, TRUE);
+      $SafePHP = GetValue('SafePHP', $Options, TRUE);
       $ByLine = GetValue('ByLine', $Options, FALSE);
       $Headings = GetValue('Headings', $Options, TRUE);
       $FormatStyle = GetValue('FormatStyle', $Options);
       $Formatter = "Format{$FormatStyle}Assignment";
       
-      if ($FormatStyle == 'Dotted') {
-         $Headings = FALSE;
-         $WrapPHP = FALSE;
-         $ByLine = FALSE;
-      }
-      
       $FirstLine = '';
       $Lines = array();
       if ($WrapPHP)
          $FirstLine .= "<?php ";
-      $FirstLine .= "if (!defined('APPLICATION')) exit();";
-      $Lines[] = $FirstLine;
+      if ($SafePHP)
+         $FirstLine .= "if (!defined('APPLICATION')) exit();";
+      
+      if (!empty($FirstLine))
+         $Lines[] = $FirstLine;
       
       if (!is_array($Data))
          return $Lines[0];
 
       $LastKey = FALSE;
       foreach ($Data as $Key => $Value) {
-         if ($Options['Headings'] && $LastKey != $Key && is_array($Value)) {
+         if ($Headings && $LastKey != $Key && is_array($Value)) {
             $Lines[] = '';
             $Lines[] = '// '.$Key;
             $LastKey = $Key;

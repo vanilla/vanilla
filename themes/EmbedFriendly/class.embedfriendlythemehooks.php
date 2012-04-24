@@ -11,15 +11,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
 	
    public function Setup() {
+      /*
 		// Set the order for the modules (make sure new discussion module is before content).
 		SaveToConfig('Modules.Vanilla.Content', array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'Content', 'Ads'));
 		SaveToConfig('Modules.Conversations.Content', array('MessageModule', 'Notices', 'NewConversationModule', 'NewDiscussionModule', 'Content', 'Ads'));
+      */
    }
 
    public function OnDisable() {
       return TRUE;
    }
-	
+	/*
 	public function SettingsController_AfterCurrentTheme_Handler($Sender) {
 		$SingleColumn = C('Themes.EmbedFriendly.SingleColumn');
 		echo Wrap(
@@ -94,5 +96,5 @@ class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
 		if (C('Themes.EmbedFriendly.SingleColumn'))
 			$Sender->AddModule($ModuleName, 'Content');
 	}
-   
+   */
 }

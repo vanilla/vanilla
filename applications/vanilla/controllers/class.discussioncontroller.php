@@ -690,6 +690,10 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $Offset = GetIncomingValue('Offset', $Offset);
       $Limit = GetIncomingValue('Limit', $Limit);
       $vanilla_identifier = GetIncomingValue('vanilla_identifier', '');
+      // Only allow vanilla identifiers of 32 chars or less - md5 if larger
+      if (strlen($vanilla_identifier) > 32) {
+         $vanilla_identifier = md5($vanilla_identifier);
+      }
       $vanilla_type = GetIncomingValue('vanilla_type', 'blog');
       $vanilla_url = GetIncomingValue('vanilla_url', '');
       $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
@@ -718,7 +722,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $ActualResponses = $this->Discussion->CountComments - 1;
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
-            $Limit = C('Vanilla.Comments.PerPage', 30);
+            $Limit = C('Garden.Embed.CommentsPerPage', 30);
 
          $OffsetProvided = $Offset != '';
          list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
@@ -739,9 +743,11 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
 
          // Load the comments
+         $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
+         $this->SetData('SortComments', $SortComments);
          $CurrentOrderBy = $this->CommentModel->OrderBy();
          if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
-            $this->CommentModel->OrderBy('c.DateInserted desc'); // allow custom sort
+            $this->CommentModel->OrderBy('c.DateInserted '.$SortComments); // allow custom sort
 
          $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
 
@@ -796,7 +802,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->Form->SetFormValue('Body', $Draft->Body);
       else {
          // Look in the session stash for a comment
-         $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE);
+         $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE); 
          if ($StashComment)
             $this->Form->SetFormValue('Body', $StashComment);
       }
@@ -810,7 +816,9 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->View = 'comments';
       }
       
-      $this->AddDefinition('PrependNewComments', '1');
+      if ($SortComments == 'desc')
+         $this->AddDefinition('PrependNewComments', '1');
+      
       // Report the discussion id so js can use it.      
       if ($Discussion)
          $this->AddDefinition('DiscussionID', $Discussion->DiscussionID);

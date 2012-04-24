@@ -50,7 +50,20 @@ class EmbedController extends DashboardController {
       }
 
       $this->AddSideMenu('dashboard/embed/comments');
-      $this->Permission('Garden.Settings.Manage');
+      $this->Form = new Gdn_Form();
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array('Garden.Embed.CommentsPerPage', 'Garden.Embed.SortComments', 'Garden.Embed.PageToForum'));
+      
+      $this->Form->SetModel($ConfigurationModel);
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $this->Form->SetData($ConfigurationModel->Data);
+      } else {
+         if ($this->Form->Save() !== FALSE)
+            $this->InformMessage(T("Your settings have been saved."));
+      }
+      
       $this->Title(T('Blog Comments'));
       $this->Render();
    }

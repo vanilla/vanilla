@@ -99,11 +99,6 @@ jQuery(document).ready(function($) {
       ).autogrow();
    });
    
-   // Set up paging
-   $('.MorePager').morepager({
-      pageContainerSelector: 'ul.Conversations, ul.Conversation'
-   });
-   
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;
       $(btn).hide();

@@ -10,9 +10,8 @@ window.vanilla.embed = function(host) {
       embedUrl = window.location.href.split('#')[0],
       jsPath = '/js/embed.js',
       currentPath = window.location.hash.substr(1),
-      disablePath = currentPath && currentPath[0] != "/";
-      disablePath |= (window != top);
-
+      disablePath = (window != top);
+   
    var optStr = function(name, defaultValue, definedValue) {
       if (window['vanilla_'+name]) {
          if (definedValue == undefined)
@@ -25,6 +24,9 @@ window.vanilla.embed = function(host) {
 
    if (!currentPath || disablePath)
       currentPath = "/";
+   
+   if (currentPath.substr(0, 1) != '/')
+      currentPath = '/' + currentPath;
 
    if (window.gadgets)
       embedUrl = '';
@@ -102,6 +104,22 @@ window.vanilla.embed = function(host) {
       }
    }
 
+   // Strip param out of str if it exists
+   stripParam = function(str, param) {
+      var pIndex = str.indexOf(param);
+      if (pIndex > -1) {
+         var pStr = str.substr(pIndex);
+         var tIndex = pStr.indexOf('&');
+         var trail = tIndex > -1 ? pStr.substr(tIndex+1) : '';
+         var pre = currentPath.substr(pIndex-1, 1);
+         if (pre == '&' || pre == '?')
+            pIndex--;
+
+         return str.substr(0, pIndex) + (trail.length > 0 ? pre : '') + trail;
+      }
+      return str;
+   }
+
    processMessage = function(message) {
       if (message[0] == 'height') {
          setHeight(message[1]);
@@ -112,7 +130,11 @@ window.vanilla.embed = function(host) {
             currentPath = window.location.hash.substr(1);
             if (currentPath != message[1]) {
                currentPath = message[1];
-               window.location.hash = currentPath; //replace(embedUrl + "#" + currentPath);
+               // Strip off the values that this script added
+               currentPath = currentPath.replace('/index.php?p=', ''); // 1
+               currentPath = stripParam(currentPath, 'remote='); // 2
+               currentPath = stripParam(currentPath, 'locale='); // 3
+               window.location.hash = currentPath;
             }
          }
       } else if (message[0] == 'unload') {
@@ -189,7 +211,14 @@ window.vanilla.embed = function(host) {
             +'&vanilla_type='+encodeURIComponent(foreign_type)
             +'&vanilla_url='+encodeURIComponent(foreign_url)
             +'&vanilla_category_id='+encodeURIComponent(category_id);
-      } else 
+      }
+      var returnUrl = 'http://' 
+         +host.replace('?', '&')
+         +path.replace('?', '&') 
+         +'&remote=' 
+         +encodeURIComponent(embedUrl) 
+         +'&locale=' 
+         +encodeURIComponent(embed_locale);
          result = 'http://' + host + path.replace('?', '&') + '&remote=' + encodeURIComponent(embedUrl) + '&locale=' + encodeURIComponent(embed_locale);
    
       if (window.vanilla_sso) {
@@ -197,6 +226,7 @@ window.vanilla.embed = function(host) {
       }
        
       return result;
+      return returnUrl.replace('&', '?'); // Replace the first occurrence of amp with question.
    }
    var vanillaIframe = document.createElement('iframe');
    vanillaIframe.id = "vanilla"+id;

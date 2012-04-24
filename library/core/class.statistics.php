@@ -701,6 +701,23 @@ class Gdn_Statistics extends Gdn_Plugin {
       return $DateRaw;
    }
    
+   public static function TimeFromExtendedTimeSlot($TimeSlot) {
+      if ($TimeSlot == '00000000')
+         return 0;
+      
+      $Year = substr($TimeSlot,0,4);
+      $Month = substr($TimeSlot,4,2);
+      $Day = (int)substr($TimeSlot,6,2);
+      if ($Day == 0) $Day = 1;
+      $Hour = (int)substr($TimeSlot,8,2);
+      $DateRaw = mktime($Hour, 0, 0, $Month, $Day, $Year);
+      
+      if ($DateRaw === FALSE)
+         throw new Exception("Invalid timeslot '{$TimeSlot}', unable to convert to epoch");
+      
+      return $DateRaw;
+   }
+   
    public function ValidateCredentials() {
       $Request = array();
       $this->BasicParameters($Request);

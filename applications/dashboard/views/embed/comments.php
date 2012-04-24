@@ -36,6 +36,7 @@ echo $this->Form->Close();
    <ul>
       <li<?php echo $this->EmbedType == 'wordpress' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('WordPress Plugin'), 'embed/comments/wordpress'); ?></li>
       <li<?php echo $this->EmbedType == 'universal' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Universal Code'), 'embed/comments/universal'); ?></li>
+      <li<?php echo $this->EmbedType == 'settings' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Comment Settings'), 'embed/comments/settings'); ?></li>
       <li<?php echo $this->EmbedType == 'advanced' ? ' class="Active"' : ''; ?>><?php echo Anchor(T('Advanced Settings'), 'embed/advanced'); ?></li>
    </ul>
 </div>
@@ -50,7 +51,49 @@ echo $this->Form->Close();
       <h2>Not Using WordPress?</h2>
       <p>If you are not using WordPress, you can <?php echo Anchor('use the universal code', 'embed/comments/universal'); ?> for embedding Vanilla Comments.</p>
    </div>
-<?php } else { ?>
+<?php } else if ($this->EmbedType == 'settings') { ?>
+   <style type="text/css">
+.WarningMessage {
+    padding: 8px 10px;
+    max-width: 500px;
+}
+   </style>
+   <h1><?php echo T('Comment Settings'); ?></h1>
+<?php
+echo $this->Form->Open();
+echo $this->Form->Errors();
+?>
+<ul>
+   <li>
+      <?php
+         $Options = array('10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100');
+         $Fields = array('TextField' => 'Code', 'ValueField' => 'Code');
+         echo $this->Form->Label('Comments per Page', 'Garden.Embed.CommentsPerPage');
+         echo $this->Form->DropDown('Garden.Embed.CommentsPerPage', $Options, $Fields);
+      ?>
+   </li>
+   <li>
+      <?php
+         $Options = array('desc' => 'Most recent first / comment form at top of list', 'asc' => 'Most recent last / comment form at bottom of list');
+         $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
+         echo $this->Form->Label('Sort blog comments in the following order:', 'Garden.Embed.SortComments');
+         echo $this->Form->DropDown('Garden.Embed.SortComments', $Options, $Fields);
+      ?>
+   </li>
+   <li>
+      <p class="WarningMessage">
+         <?php
+            echo $this->Form->CheckBox('Garden.Embed.PageToForum', "Send users to forum after the first page of comments.");
+         ?>
+         <strong>Recommended:</strong> When there is more than one page of comments on a blog post, send users to the forum when they click to see another page of comments. This is a great way of driving users into your community.
+      </p>
+   </li>
+</ul>
+<?php 
+echo $this->Form->Close('Save');
+      
+} else { 
+?>
    <style type="text/css">
 .CopyBox {
     font-family: 'Inconsolata', Courier, monospace;

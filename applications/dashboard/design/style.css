@@ -2071,6 +2071,8 @@ span.Incorrect {
 }
 .MultipleEntryMethods .MainForm {
    float: left;
+   /* Fix mainform from shoving the other entry methods down when an error occurs during login */
+   width: 300px;
 }
 .MultipleEntryMethods .Methods {
  	padding: 0 15px 5px;

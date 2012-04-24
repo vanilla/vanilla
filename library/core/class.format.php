@@ -152,12 +152,31 @@ class Gdn_Format {
       .'/'.$GenderSuffix.($GenderSuffixCode)
       */
 
-      $FullHeadline = T("Activity.{$Activity->ActivityType}.FullHeadline", T($Activity->FullHeadline));
-      $ProfileHeadline = T("Activity.{$Activity->ActivityType}.ProfileHeadline", T($Activity->ProfileHeadline));
+      $FullHeadline = self::GetActivityHeadline($Activity, $ViewingUserID, $ProfileUserID, "FullHeadline", T($Activity->FullHeadline)); 
+      $ProfileHeadline = self::GetActivityHeadline($Activity, $ViewingUserID, $ProfileUserID, "ProfileHeadline", T($Activity->ProfileHeadline));
       $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' || !$ProfileHeadline ? $FullHeadline : $ProfileHeadline);
       
       return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix, $RegardingWallLink, $ActivityRouteLink);
    }
+
+    // Translation : Activity based on User
+    static function GetActivityHeadline($Activity, $ViewingUserID, $ProfileUserID, $Headline, $Default) 
+{     if ($ViewingUserID == $Activity->ActivityUserID)
+  { // activity from current user
+    $From = "You";
+    $To = ($ViewingUserID == $Activity->RegardingUserID ? "You" : ($ProfileUserID == $Activity->RegardingUserID ? 'He' : 'Somebody'));
+  } else if ($ProfileUserID == $Activity->ActivityUserID)
+  { $From = "He";
+    $To = ($ViewingUserID == $Activity->RegardingUserID ? "You" : "Somebody");
+  } else
+  { $From = "Somebody";
+    $To = ($ViewingUserID == $Activity->RegardingUserID ? "You" : "Somebody");
+  }
+  return
+      T("Activity.{$Activity->ActivityType}.$Headline.$From.$To",
+        T("Activity.{$Activity->ActivityType}.$Headline.$From",
+          T("Activity.{$Activity->ActivityType}.$Headline", $Default)));
+}
 
    /**
     * Removes all non-alpha-numeric characters (except for _ and -) from

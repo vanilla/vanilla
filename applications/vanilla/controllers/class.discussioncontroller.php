@@ -668,7 +668,8 @@ class DiscussionController extends VanillaController {
       $this->AddDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
       $this->AddDefinition('SelfUrl', Gdn::Request()->PathAndQuery());
       $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
-      $this->Theme = 'default'; // Force the default theme on embedded comments
+      $this->Theme = C('Garden.CommentsTheme', C('Garden.Theme', 'default'));
+      //
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)
          $this->Head->AddString('<style type="text/css">

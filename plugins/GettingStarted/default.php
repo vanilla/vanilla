@@ -54,8 +54,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
       </li>
       <li class="Two'.(C('Plugins.GettingStarted.Discussions', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor("Where is your Community Forum?", '/').'</strong>
-         <p>'.T('Access your community forum by clicking the "Visit Site" link on the
-         top-left of this page, or by ').Anchor(T('clicking here'), '/').T('. The community forum is what all of your users &amp; customers will see when they visit ').Anchor(Gdn::Request()->Url('/', TRUE), Gdn::Request()->Url('/', TRUE)).'.</p>
+         <p>'.T('Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by ').Anchor(T('clicking here'), '/').T('. The community forum is what all of your users &amp; customers will see when they visit ').Anchor(Gdn::Request()->Url('/', TRUE), Gdn::Request()->Url('/', TRUE)).'.</p>
       </li>
       <li class="Three'.(C('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor(T('Organize your Categories'), 'vanilla/settings/managecategories').'</strong>
@@ -63,8 +62,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
       </li>
       <li class="Four'.(C('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor(T('Customize your Public Profile'), 'profile').'</strong>
-         <p>'.T('Everyone who signs up for your community gets a public profile page where they can upload a picture of themselves, manage their profile
-         settings, and track cool things going on in the community. You should ').Anchor(T('customize your profile now'), 'profile').'.</p>
+         <p>'.T('Everyone who signs up for your community gets a public profile page where they can upload a picture of themselves, manage their profile settings, and track cool things going on in the community. You should ').Anchor(T('customize your profile now'), 'profile').'.</p>
       </li>
       <li class="Five'.(C('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor(T('Start your First Discussion'), 'post/discussion').'</strong>

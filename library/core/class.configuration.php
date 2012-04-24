@@ -179,12 +179,15 @@ class Gdn_Configuration extends Gdn_Pluggable {
          'VariableName' => 'Configuration',
          'WrapPHP'      => TRUE,
          'Headings'     => TRUE,
-         'ByLine'       => TRUE
+         'ByLine'       => TRUE,
+         'FormatStyle'  => 'Array'
       );
       $Options = array_merge($Defaults, $Options);
       $VariableName = GetValue('VariableName', $Options);
       $WrapPHP = GetValue('WrapPHP', $Options, TRUE);
       $ByLine = GetValue('ByLine', $Options, FALSE);
+      $FormatStyle = GetValue('FormatStyle', $Options);
+      $Formatter = "Format{$FormatStyle}Assignment";
       
       $FirstLine = '';
       $Lines = array();
@@ -204,8 +207,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $LastKey = $Key;
          }
 
-         $Prefix = '$'.$VariableName."[".var_export($Key, TRUE)."]";
-         FormatArrayAssignment($Lines, $Prefix, $Value);
+         if ($FormatStyle == 'Array')
+            $Prefix = '$'.$VariableName."[".var_export($Key, TRUE)."]";
+         if ($FormatStyle == 'Dotted')
+            $Prefix = var_export($Key, TRUE);
+         
+         $Formatter($Lines, $Prefix, $Value);
       }
 
       if ($ByLine) {

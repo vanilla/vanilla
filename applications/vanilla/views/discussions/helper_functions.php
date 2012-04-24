@@ -217,7 +217,7 @@ function CssClass($Discussion) {
    $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
    
    if (Gdn::Session()->IsValid()) {
-      if ($Discussion->CountUnreadComments == 0)
+      if ($Discussion->CountUnreadComments <= 0)
          $CssClass .= ' Read';
       else
          $CssClass .= ' New';

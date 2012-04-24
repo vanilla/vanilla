@@ -347,7 +347,11 @@ class DiscussionModel extends VanillaModel {
 			}
          if ($Discussion->CountUnreadComments === NULL)
             $Discussion->CountUnreadComments = 0;
-			$Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+			elseif ($Discussion->CountUnreadComments < 0)
+            $Discussion->CountUnreadComments = 0;
+         
+         
+         $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
          
          if ($Discussion->LastUserID == NULL) {
             $Discussion->LastUserID = $Discussion->InsertUserID;

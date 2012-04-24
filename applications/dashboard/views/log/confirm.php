@@ -36,7 +36,7 @@
             break;
          case 'restore':
             echo '<p>',
-               T('Restoring your selection removes the items from this list.', 'When you restore your selectection the items are removed from this list and put back into the site.'),
+               T('Restoring your selection removes the items from this list.', 'When you restore your selection the items are removed from this list and put back into the site.'),
                '</p>';
 
             $AfterHtml = '<p>'.

@@ -1103,6 +1103,34 @@ if (!function_exists('FormatArrayAssignment')) {
    }
 }
 
+// Formats values to be saved in dotted notation
+if (!function_exists('FormatDottedAssignment')) {
+   function FormatDottedAssignment(&$Array, $Prefix, $Value) {
+      if (is_array($Value)) {
+         // If $Value doesn't contain a key of "0" OR it does and it's value IS
+         // an array, this should be treated as an associative array.
+         $IsAssociativeArray = array_key_exists(0, $Value) === FALSE || is_array($Value[0]) === TRUE ? TRUE : FALSE;
+         if ($IsAssociativeArray === TRUE) {
+            foreach ($Value as $k => $v) {
+               FormatArrayAssignment($Array, "{$Prefix}.{$k}", $v);
+            }
+         } else {
+            // If $Value is not an associative array, just write it like a simple array definition.
+            $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
+            $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
+         }
+      } elseif (is_int($Value)) {
+			$Array[] = $Prefix .= ' = '.$Value.';';
+		} elseif (is_bool($Value)) {
+         $Array[] = $Prefix .= ' = '.($Value ? 'TRUE' : 'FALSE').';';
+      } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
+         $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
+      } else {
+         $Array[] = $Prefix .= ' = '.var_export($Value, TRUE).';';
+      }
+   }
+}
+
 if (!function_exists('getallheaders')) {
    /**
     * If PHP isn't running as an apache module, getallheaders doesn't exist in

@@ -1,8 +1,13 @@
 <div class="Trace">
    <style>
+      .Trace {
+         width: 100%;
+      }
+      
       .Trace table {
          width: 100%;
          border-collapse: collapse;
+         table-layout: fixed;
       }
       
       .Trace td {
@@ -13,6 +18,7 @@
       
       .Trace pre {
          margin: 0;
+         overflow-x: scroll;
       }
       
       .Trace .TagColumn {
@@ -59,7 +65,13 @@
          <?php
          if (is_string($Message))
             echo htmlspecialchars($Message);
-         else
+         elseif (is_a($Message, 'Exception')) {
+            echo '<pre>';
+            echo htmlspecialchars($Message->getMessage());
+            echo "\n\n";
+            echo htmlspecialchars($Message->getTraceAsString());
+            echo '</pre>';
+         } else
             echo "<pre><b>$Var:</b> ".htmlspecialchars(print_r($Message, TRUE)).'</pre>';
          ?>
       </td>

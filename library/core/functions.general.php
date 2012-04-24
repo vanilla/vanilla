@@ -1123,7 +1123,7 @@ if (!function_exists('FormatDottedAssignment')) {
       } else {
          $Prefix .= "']";
          if (is_int($Value)) {
-            $Array[] = $Prefix .= ' = '.$Value;
+            $Array[] = $Prefix .= ' = '.$Value.';';
          } elseif (is_bool($Value)) {
             $Array[] = $Prefix .= ' = '.($Value ? 'TRUE' : 'FALSE').';';
          } elseif (in_array($Value, array('TRUE', 'FALSE'))) {

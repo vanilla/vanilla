@@ -444,7 +444,7 @@ function WriteEmbedCommentForm() {
          $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
          echo Wrap(
             sprintf(
-               T('Commenting as %1$s (%2$s)'),
+               T('Commenting as %1$s (%2$s)', 'Commenting as %1$s <span class="SignOutWrap">(%2$s)</span>'),
                Gdn_Format::Text($Session->User->Name),
                Anchor(T('Sign Out'), $AuthenticationUrl, 'SignOut', $Attributes)
             ),

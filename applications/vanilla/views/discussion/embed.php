@@ -35,7 +35,7 @@ echo '</span>';
       
       $ReturnUrl = Gdn::Request()->PathAndQuery();
       if ($Session->IsValid()) {
-         $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
+         $AuthenticationUrl = SignOutUrl($ReturnUrl);
          
          echo Wrap(
             sprintf(

@@ -211,15 +211,15 @@ window.vanilla.embed = function(host) {
             +'&vanilla_type='+encodeURIComponent(foreign_type)
             +'&vanilla_url='+encodeURIComponent(foreign_url)
             +'&vanilla_category_id='+encodeURIComponent(category_id);
+      } else {
+         result = 'http://' 
+            +host.replace('?', '&')
+            +path.replace('?', '&') 
+            +'&remote=' 
+            +encodeURIComponent(embedUrl) 
+            +'&locale=' 
+            +encodeURIComponent(embed_locale);
       }
-      var returnUrl = 'http://' 
-         +host.replace('?', '&')
-         +path.replace('?', '&') 
-         +'&remote=' 
-         +encodeURIComponent(embedUrl) 
-         +'&locale=' 
-         +encodeURIComponent(embed_locale);
-         result = 'http://' + host + path.replace('?', '&') + '&remote=' + encodeURIComponent(embedUrl) + '&locale=' + encodeURIComponent(embed_locale);
    
       if (window.vanilla_sso) {
          result += '&sso='+encodeURIComponent(vanilla_sso);

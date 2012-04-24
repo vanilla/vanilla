@@ -1112,21 +1112,25 @@ if (!function_exists('FormatDottedAssignment')) {
          $IsAssociativeArray = array_key_exists(0, $Value) === FALSE || is_array($Value[0]) === TRUE ? TRUE : FALSE;
          if ($IsAssociativeArray === TRUE) {
             foreach ($Value as $k => $v) {
-               FormatArrayAssignment($Array, "{$Prefix}.{$k}", $v);
+               FormatDottedAssignment($Array, "{$Prefix}.{$k}", $v);
             }
          } else {
             // If $Value is not an associative array, just write it like a simple array definition.
             $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
+            $Prefix .= "']";
             $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
          }
-      } elseif (is_int($Value)) {
-			$Array[] = $Prefix .= ' = '.$Value.';';
-		} elseif (is_bool($Value)) {
-         $Array[] = $Prefix .= ' = '.($Value ? 'TRUE' : 'FALSE').';';
-      } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
-         $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
       } else {
-         $Array[] = $Prefix .= ' = '.var_export($Value, TRUE).';';
+         $Prefix .= "']";
+         if (is_int($Value)) {
+            $Array[] = $Prefix .= ' = '.$Value;
+         } elseif (is_bool($Value)) {
+            $Array[] = $Prefix .= ' = '.($Value ? 'TRUE' : 'FALSE').';';
+         } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
+            $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
+         } else {
+            $Array[] = $Prefix .= ' = '.var_export($Value, TRUE).';';
+         }
       }
    }
 }

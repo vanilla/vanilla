@@ -447,6 +447,16 @@ if (!function_exists('SignInUrl')) {
 
 if (!function_exists('SignOutUrl')) {
    function SignOutUrl($Target = '') {
+      if ($Target) {
+         // Strip out the SSO from the target so that the user isn't signed back in again.
+         $Parts = explode('?', $Target, 2);
+         if (isset($Parts[1])) {
+            parse_str($Parts[1], $Query);
+            unset($Query['sso']);
+            $Target = $Parts[0].'?'.http_build_query($Query);
+         }
+      }
+      
       return '/entry/signout?TransientKey='.urlencode(Gdn::Session()->TransientKey()).($Target ? '&Target='.urlencode($Target) : '');
    }
 }

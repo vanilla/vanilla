@@ -46,7 +46,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
          $Session = Gdn::Session();
          $WelcomeMessage = '<div class="GettingStarted">'
             .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
-   ."<h1>Here's how to get started:</h1>"
+   ."<h1>".T("Here's how to get started:")."</h1>"
    .'<ul>
       <li class="One'.(C('Plugins.GettingStarted.Dashboard', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor('Welcome to your Dashboard', 'settings').'</strong>

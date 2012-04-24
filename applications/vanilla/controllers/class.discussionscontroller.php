@@ -401,8 +401,6 @@ class DiscussionsController extends VanillaController {
                $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
             } else {
                $Count = $FinalData[$id];
-               if ($Count > 0)
-                  $Count = $Count - 1; // Reduce the count by 1, but don't go below zero
                   
                $FinalData[$id] = $Count;
             }

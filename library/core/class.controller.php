@@ -1177,6 +1177,10 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
+         
+         if (Debug()) {
+            $this->AddModule('TraceModule');
+         }
 
          // Render
          if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {

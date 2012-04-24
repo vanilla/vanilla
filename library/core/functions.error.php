@@ -31,6 +31,11 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    // Ignore errors that are below the current error reporting level.
    if (($ErrorReporting & $ErrorNumber) != $ErrorNumber)
       return FALSE;
+   
+   if (($ErrorNumber & E_NOTICE) == E_NOTICE & function_exists('Trace')) {
+      Trace("$Message in $File on line $Line.", TRACE_NOTICE);
+      return FALSE;
+   }
 
    $Backtrace = debug_backtrace();
    throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments, $Backtrace);

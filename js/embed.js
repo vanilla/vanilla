@@ -203,21 +203,29 @@ window.vanilla.embed = function(host) {
       if (discussion_id != '' || foreign_id != '')
          embed_type = 'comments';
          
+      var result = '';
       if (embed_type == 'comments') {
-         return 'http://' + host + '/vanilla/discussion/embed/'
+         result = 'http://' + host + '/vanilla/discussion/embed/'
             +'&vanilla_discussion_id='+encodeURIComponent(discussion_id)
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
             +'&vanilla_type='+encodeURIComponent(foreign_type)
             +'&vanilla_url='+encodeURIComponent(foreign_url)
             +'&vanilla_category_id='+encodeURIComponent(category_id);
+      } else {
+         result = 'http://' 
+            +host.replace('?', '&')
+            +path.replace('?', '&') 
+            +'&remote=' 
+            +encodeURIComponent(embedUrl) 
+            +'&locale=' 
+            +encodeURIComponent(embed_locale);
       }
-      var returnUrl = 'http://' 
-         +host.replace('?', '&')
-         +path.replace('?', '&') 
-         +'&remote=' 
-         +encodeURIComponent(embedUrl) 
-         +'&locale=' 
-         +encodeURIComponent(embed_locale);
+   
+      if (window.vanilla_sso) {
+         result += '&sso='+encodeURIComponent(vanilla_sso);
+      }
+       
+      return result;
       return returnUrl.replace('&', '?'); // Replace the first occurrence of amp with question.
    }
    var vanillaIframe = document.createElement('iframe');

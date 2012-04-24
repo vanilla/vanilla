@@ -144,7 +144,7 @@ if ($AddonUrl != '')
                   echo '</h4>';
                   
                   if ($PreviewUrl !== FALSE) {
-                     echo Anchor(Img($PreviewUrl, array('alt' => $this->Data('EnabledThemeName'), 'height' => '112', 'width' => '150')),
+                     echo Anchor(Img($PreviewUrl, array('alt' => $ScreenName, 'height' => '112', 'width' => '150')),
                         'dashboard/settings/previewtheme/'.$ThemeName,
                         '',
                         array('target' => '_top')

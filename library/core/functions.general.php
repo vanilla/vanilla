@@ -2504,6 +2504,17 @@ if (!function_exists('TouchValue')) {
 	}
 }
 
+if (!function_exists('Trace')) {
+   function Trace($Value = NULL, $Type = TRACE_INFO) {
+      static $Traces = array();
+      
+      if ($Value === NULL)
+         return $Traces;
+      
+      $Traces[] = array($Value, $Type);
+   }
+}
+
 if (!function_exists('TrueStripSlashes')) {
    if(get_magic_quotes_gpc()) {
       function TrueStripSlashes($String) {

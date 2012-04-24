@@ -23,6 +23,9 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
    }
    
    protected static function _Calcualate(&$Row) {
+      if (!$Row)
+         return;
+      
       $Attributes = @unserialize($Row['Attributes']);
       if (is_array($Attributes))
          $Row = array_merge($Attributes, $Row);

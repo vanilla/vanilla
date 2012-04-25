@@ -445,6 +445,18 @@ class ProfileController extends Gdn_Controller {
    public function Password() {
       $this->Permission('Garden.SignIn.Allow');
       
+      // Don't allow password editing if using SSO Connect ONLY. 
+      // This is for security. We encountered the case where a customer charges 
+      // for membership using their external application and use SSO to let 
+      // their customers into Vanilla. If you allow those people to change their 
+      // password in Vanilla, they will then be able to log into Vanilla using 
+      // Vanilla's login form regardless of the state of their membership in the 
+      // external app.
+      if (C('Garden.Registration.Method') == 'Connect') {
+         Gdn::Dispatcher()->Dispatch('DefaultPermission');
+         exit();
+      }
+      
       // Get user data and set up form
       $this->GetUserInfo();
       
@@ -1039,7 +1051,14 @@ class ProfileController extends Gdn_Controller {
 		} else {
 			// Add profile options for the profile owner
 			// Don't allow account editing if it has been turned off.
-			if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
+         // Don't allow password editing if using SSO Connect ONLY. 
+         // This is for security. We encountered the case where a customer charges 
+         // for membership using their external application and use SSO to let 
+         // their customers into Vanilla. If you allow those people to change their 
+         // password in Vanilla, they will then be able to log into Vanilla using 
+         // Vanilla's login form regardless of the state of their membership in the 
+         // external app.
+			if (Gdn::Config('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
 				$Module->AddLink('Options', Sprite('SpEdit').T('Edit My Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
 					
 				// No password may have been set if they have only signed in with a connect plugin

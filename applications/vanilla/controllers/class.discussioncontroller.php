@@ -706,6 +706,9 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       );
       $this->SetData('ForeignSource', $ForeignSource);
       
+      $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
+      $this->SetData('SortComments', $SortComments);
+      
       // Retrieve the discussion record.
       $Discussion = FALSE;
       if ($DiscussionID > 0) {
@@ -743,15 +746,13 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          // Set the canonical url to have the proper page title.
          $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
 
-         // Load the comments
-         $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
-         $this->SetData('SortComments', $SortComments);
+         // Load the comments.
          $CurrentOrderBy = $this->CommentModel->OrderBy();
          if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
             $this->CommentModel->OrderBy('c.DateInserted '.$SortComments); // allow custom sort
 
          $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
-
+         
          if (count($this->CommentModel->Where()) > 0)
             $ActualResponses = FALSE;
 

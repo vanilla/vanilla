@@ -184,7 +184,7 @@ var vanilla_forum_url = '<?php echo Url('/', TRUE); ?>'; // The full http url & 
    <p class="WarningMessage">&uarr; Copy &amp; paste this code at the bottom of the page right before the closing &lt;/body> tag.</p>
    <p>&nbsp;</p>
    <p><strong>One more thing!</strong></p>
-   <p>You need to tell Vanilla where to place the comment counts are located in your page. To achieve this, add a <strong>vanilla-identifier</strong> attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when embedding the comments into the page.</p>
+   <p>You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a <strong>vanilla-identifier</strong> attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when embedding the comments into the page.</p>
    <div class="CopyBox">&lt;a href="http://yourdomain.com/path/to/page/with/comments/#vanilla_comments" <strong>vanilla-identifier="embed-test"</strong>>Comments&lt;/a></div>
    
    <p>Vanilla will then replace the content of the anchor (in this case, the word "Comments") with the number of comments on the page in question.</p>

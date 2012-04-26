@@ -45,8 +45,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       try {
          $ProxyRequest = new ProxyRequest(FALSE, array(
             'Method'    => $RequestMethod,
-            'Timeout'   => 10,
-            'Debug'     => TRUE
+            'Timeout'   => 10
          ));
          $Response = $ProxyRequest->Request(array(
             'Url'       => $FinalURL

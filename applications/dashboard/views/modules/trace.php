@@ -18,7 +18,7 @@
       
       .Trace pre {
          margin: 0;
-         overflow-x: scroll;
+         overflow: auto;
       }
       
       .Trace .TagColumn {

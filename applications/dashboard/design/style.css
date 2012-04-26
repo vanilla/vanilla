@@ -2656,9 +2656,9 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 
 
 /* ============================= Embedded Discussion & Comment Customizations */
-body.embed {
+/*body.embed {
 	text-align: left;
-}
+}*/
 body.embed #Content {
    float: none;
    margin: 0;
@@ -2667,12 +2667,12 @@ body.embed #Content {
 body.embed .InformMessages {
 	display: none;
 }
-.Embed a.Button,
+/*.Embed a.Button,
 .Embed a.Button:hover {
 	color: #333 !important;
 	text-decoration: none !important;
 	font-weight: bold;
-}
+}*/
 .EmbedCommentForm {
 	padding: 0;
    border-top: 1px solid #ffffff;

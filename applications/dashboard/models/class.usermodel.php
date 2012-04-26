@@ -280,11 +280,11 @@ class UserModel extends Gdn_Model {
    
    /**
     *
-    * @param type $CurrentUser
+    * @param array $CurrentUser
     * @param array $NewUser 
     * @since 2.1
     */
-   protected function SynchUser($CurrentUser, $NewUser) {
+   public function SynchUser($CurrentUser, $NewUser) {
       if (is_numeric($CurrentUser)) {
          $CurrentUser = $this->GetID($CurrentUser, DATASET_TYPE_ARRAY);
       }
@@ -295,9 +295,32 @@ class UserModel extends Gdn_Model {
          unset($NewUser['Photo']);
       }
       
+      if (C('Garden.SSO.SynchRoles')) {
+         // Translate the role names to IDs.
+         
+         $Roles = GetValue('Roles', $NewUser);
+         if (is_string($Roles))
+            $Roles = explode(',', $Roles);
+         $Roles = array_map('trim', $Roles);
+         $Roles = array_map('strtolower', $Roles);
+         
+         $AllRoles = RoleModel::Roles();
+         $RoleIDs = array();
+         foreach ($AllRoles as $RoleID => $Role) {
+            $Name = strtolower($Role['Name']);
+            if (in_array($Name, $Roles)) {
+               $RoleIDs[] = $RoleID;
+            }
+         }
+         $NewUser['RoleIDs'] = $RoleIDs;
+      } else {
+         unset($NewUser['Roles']);
+         unset($NewUser['RoleIDs']);
+      }
+      
       // Save the user information.
       $NewUser['UserID'] = $CurrentUser['UserID'];
-      $this->Save($NewUser, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
+      $this->Save($NewUser, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => isset($NewUser['RoleIDs'])));
    }
 
    /** Connect a user with a foreign authentication system.
@@ -330,7 +353,7 @@ class UserModel extends Gdn_Model {
          // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
          
          // Check to auto-connect based on email address.
-         if (C('Garden.Registration.AutoConnect') && isset($UserData['Email'])) {
+         if (C('Garden.SSO.AutoConnect', C('Garden.Registration.AutoConnect')) && isset($UserData['Email'])) {
             $User = (array)$this->GetByEmail($UserData['Email']);
             if ($User) {
                // Save the user.

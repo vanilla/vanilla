@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class TraceModule {//extends Gdn_DataModule {
+class TraceModule extends Gdn_Module {
    
    public function __construct() {
       parent::__construct();

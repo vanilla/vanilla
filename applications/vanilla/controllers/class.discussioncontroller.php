@@ -162,7 +162,7 @@ class DiscussionController extends VanillaController {
       }
          
       // Make sure to set the user's discussion watch records
-      $this->CommentModel->SetWatch($this->Discussion, $this->CommentData->NumRows(), $this->Offset, $this->Discussion->CountComments);
+      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -668,7 +668,8 @@ class DiscussionController extends VanillaController {
       $this->AddDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
       $this->AddDefinition('SelfUrl', Gdn::Request()->PathAndQuery());
       $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
-      $this->Theme = 'default'; // Force the default theme on embedded comments
+      $this->Theme = C('Garden.CommentsTheme', C('Garden.Theme', 'default'));
+      //
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)
          $this->Head->AddString('<style type="text/css">
@@ -704,6 +705,9 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          'vanilla_category_id' => $vanilla_category_id
       );
       $this->SetData('ForeignSource', $ForeignSource);
+      
+      $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
+      $this->SetData('SortComments', $SortComments);
       
       // Retrieve the discussion record.
       $Discussion = FALSE;
@@ -742,15 +746,13 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          // Set the canonical url to have the proper page title.
          $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
 
-         // Load the comments
-         $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
-         $this->SetData('SortComments', $SortComments);
+         // Load the comments.
          $CurrentOrderBy = $this->CommentModel->OrderBy();
          if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
             $this->CommentModel->OrderBy('c.DateInserted '.$SortComments); // allow custom sort
 
          $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
-
+         
          if (count($this->CommentModel->Where()) > 0)
             $ActualResponses = FALSE;
 

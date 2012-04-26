@@ -341,13 +341,19 @@ class DiscussionModel extends VanillaModel {
 			}
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
-				$Discussion->CountUnreadComments = TRUE;
-				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate))
+            $Discussion->CountUnreadComments = TRUE;
+				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate)) {
 					$Discussion->CountCommentWatch = $Discussion->CountComments;
+               $Discussion->CountUnreadComments = 0;
+            }
 			}
          if ($Discussion->CountUnreadComments === NULL)
             $Discussion->CountUnreadComments = 0;
-			$Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+			elseif ($Discussion->CountUnreadComments < 0)
+            $Discussion->CountUnreadComments = 0;
+         
+         
+         $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
          
          if ($Discussion->LastUserID == NULL) {
             $Discussion->LastUserID = $Discussion->InsertUserID;

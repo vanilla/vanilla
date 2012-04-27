@@ -49,7 +49,7 @@ class Gdn_Smarty {
       if($Session->IsValid()) {
          $User = array(
             'Name' => $Session->User->Name,
-            'CountNotifications' => (int)GetValue('CountNotifications', $Session->User->CountNotifications, 0),
+            'CountNotifications' => (int)GetValue('CountNotifications', $Session->User, 0),
             'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
             'SignedIn' => TRUE);
       } else {

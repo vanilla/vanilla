@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('APPLICATION'))
-   exit();
+<?php if (!defined('APPLICATION')) exit();
 
 /**
  * Analytics system
@@ -25,44 +22,50 @@ class Gdn_Statistics extends Gdn_Plugin {
    }
 
    public function Analytics($Method, $RequestParameters, $Callback = FALSE) {
-
-      $AnalyticsServer = C('Garden.Analytics.Remote', 'http://analytics.vanillaforums.com');
-
-      $FullMethod = explode('/', $Method);
+      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+      $FullMethod = explode('/',$Method);
       if (sizeof($FullMethod) < 2)
          array_unshift($FullMethod, "analytics");
-
+      
       list($ApiController, $ApiMethod) = $FullMethod;
       $ApiController = strtolower($ApiController);
-      $ApiMethod = StringEndsWith(strtolower($ApiMethod), '.json', TRUE, TRUE) . '.json';
-
+      $ApiMethod = StringEndsWith(strtolower($ApiMethod), '.json', TRUE, TRUE).'.json';
+      
       $FinalURL = CombinePaths(array(
-          $AnalyticsServer,
-          $ApiController,
-          $ApiMethod
-              ));
-
+         $AnalyticsServer,
+         $ApiController,
+         $ApiMethod
+      ));
+      
       // Sign request
       $this->Sign($RequestParameters, TRUE);
-
-      $FinalURL .= '?' . http_build_query($RequestParameters);
+      $RequestMethod = GetValue('RequestMethod', $RequestParameters, 'GET');
+      unset($RequestParameters['RequestMethod']);
+      
       try {
-         $Response = ProxyRequest($FinalURL, 10, TRUE);
+         $ProxyRequest = new ProxyRequest(FALSE, array(
+            'Method'    => $RequestMethod,
+            'Timeout'   => 10
+         ));
+         $Response = $ProxyRequest->Request(array(
+            'Url'       => $FinalURL
+         ), $RequestParameters);
       } catch (Exception $e) {
          $Response = FALSE;
       }
+      
       if ($Response !== FALSE) {
          $JsonResponse = json_decode($Response);
          if ($JsonResponse !== FALSE)
-            $JsonResponse = (array) GetValue('Analytics', $JsonResponse, FALSE);
-
+            $JsonResponse = (array)GetValue('Analytics', $JsonResponse, FALSE);
+         
          // If we received a reply, parse it
          if ($JsonResponse !== FALSE) {
             $this->ParseAnalyticsResponse($JsonResponse, $Response, $Callback);
             return $JsonResponse;
          }
       }
-
+      
       return FALSE;
    }
 
@@ -89,11 +92,11 @@ class Gdn_Statistics extends Gdn_Plugin {
     */
    public function BasicParameters(&$Request) {
       $Request = array_merge($Request, array(
-          'ServerHostname' => Url('/', TRUE),
-          'ServerType' => Gdn::Request()->GetValue('SERVER_SOFTWARE'),
-          'PHPVersion' => phpversion(),
-          'VanillaVersion' => APPLICATION_VERSION
-              ));
+         'ServerHostname' => Url('/', TRUE),
+         'ServerType' => Gdn::Request()->GetValue('SERVER_SOFTWARE'),
+         'PHPVersion' => phpversion(),
+         'VanillaVersion' => APPLICATION_VERSION
+      ));
    }
 
    /**
@@ -169,10 +172,10 @@ class Gdn_Statistics extends Gdn_Plugin {
 
       // Private subnets
       foreach (array(
-  '127.0.0.1/0',
-  '10.0.0.0/8',
-  '172.16.0.0/12',
-  '192.168.0.0/16') as $LocalCIDR) {
+         '127.0.0.1/0',
+         '10.0.0.0/8',
+         '172.16.0.0/12',
+         '192.168.0.0/16') as $LocalCIDR) {
          if (self::CIDRCheck($ServerAddress, $LocalCIDR))
             return TRUE;
       }
@@ -349,8 +352,8 @@ class Gdn_Statistics extends Gdn_Plugin {
       $Request = array();
       $this->BasicParameters($Request);
       $this->Analytics('Register', $Request, array(
-          'Success' => 'DoneRegister',
-          'Failure' => 'AnalyticsFailed'
+         'Success' => 'DoneRegister',
+         'Failure' => 'AnalyticsFailed'
       ));
    }
 
@@ -397,11 +400,11 @@ class Gdn_Statistics extends Gdn_Plugin {
       $SignatureArray['RequestTime'] = $RequestTime;
 
       $SignData = array_intersect_key($SignatureArray, array_fill_keys(array(
-                  'VanillaID',
-                  'Secret',
-                  'RequestTime',
-                  'TimeSlot'
-                      ), NULL));
+         'VanillaID',
+         'Secret',
+         'RequestTime',
+         'TimeSlot'
+      ), NULL));
 
       // ksort the array to preserve a known order
       $SignData = array_change_key_case($SignData, CASE_LOWER);
@@ -487,11 +490,11 @@ class Gdn_Statistics extends Gdn_Plugin {
          $NumViews = GetValue('Views', $NumViews, NULL);
 
          $DetectActiveInterval = array_sum(array(
-             $NumComments,
-             $NumDiscussions,
-             $NumUsers,
-             $NumViews
-                 ));
+            $NumComments,
+            $NumDiscussions,
+            $NumUsers,
+            $NumViews
+         ));
 
          $StatsDate = strtotime('+1 day', $StatsDate);
          $MaxIterations--;
@@ -505,18 +508,18 @@ class Gdn_Statistics extends Gdn_Plugin {
 
       // Assemble Stats
       $Request = array_merge($Request, array(
-          'VanillaID' => $VanillaID,
-          'TimeSlot' => $TimeSlot,
-          'CountComments' => $NumComments,
-          'CountDiscussions' => $NumDiscussions,
-          'CountUsers' => $NumUsers,
-          'CountViews' => $NumViews
-              ));
+         'VanillaID' => $VanillaID,
+         'TimeSlot' => $TimeSlot,
+         'CountComments' => $NumComments,
+         'CountDiscussions' => $NumDiscussions,
+         'CountUsers' => $NumUsers,
+         'CountViews' => $NumViews
+      ));
 
       // Send stats to remote server
       $this->Analytics('Stats', $Request, array(
-          'Success' => 'DoneStats',
-          'Failure' => 'AnalyticsFailed'
+         'Success' => 'DoneStats',
+         'Failure' => 'AnalyticsFailed'
       ));
    }
 
@@ -587,23 +590,6 @@ class Gdn_Statistics extends Gdn_Plugin {
       // Store the view, using denormalization if enabled
       $this->AddView();
 
-//      
-//         // If we just tried to run the structure, and failed, don't blindly try again. 
-//         // Just disable ourselves quietly.
-//         if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE)) {
-//            SaveToConfig('Garden.Analytics.Enabled', FALSE);
-//            Gdn::Set('Garden.Analytics.AutoStructure', NULL);
-//            return;
-//         }
-//         
-//         // If we get here, insert failed. Try proxyconnect to the utility structure
-//         Gdn::Set('Garden.Analytics.AutoStructure', TRUE);
-//         ProxyRequest(Url('utility/update', TRUE), 0, FALSE);
-//      }
-//      
-//      // If we get here and this is true, we successfully ran the auto structure. Remove config flag.
-//      if (Gdn::Get('Garden.Analytics.AutoStructure', FALSE))
-//         Gdn::Set('Garden.Analytics.AutoStructure', NULL);
       // Fire an event for plugins to track their own stats.
       // TODO: Make this analyze the path and throw a specific event (this event will change in future versions).
       $this->EventArguments['Path'] = Gdn::Request()->Post('Path');
@@ -642,7 +628,7 @@ class Gdn_Statistics extends Gdn_Plugin {
             if (($Views % C('Garden.Analytics.Views.DenormalizeWriteback', 100)) == 0) {
                Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
                on duplicate key update Views = Views+{$Views}", array(
-                   ':TimeSlot' => $TimeSlot
+                  ':TimeSlot' => $TimeSlot
                ));
                
                // ... and get rid of those views from the key
@@ -651,7 +637,7 @@ class Gdn_Statistics extends Gdn_Plugin {
          } else {
             Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
                on duplicate key update Views = Views+1", array(
-                ':TimeSlot' => $TimeSlot
+               ':TimeSlot' => $TimeSlot
             ));
          }
       } catch (Exception $Ex) {
@@ -747,8 +733,8 @@ class Gdn_Statistics extends Gdn_Plugin {
          return FALSE;
 
       $Request = array_merge($Request, array(
-          'VanillaID' => $VanillaID
-              ));
+         'VanillaID' => $VanillaID
+      ));
 
       $Response = $this->Analytics('Verify', $Request, FALSE);
       $Status = GetValue('Status', $Response, 404);
@@ -805,11 +791,11 @@ class Gdn_Statistics extends Gdn_Plugin {
       $Request['Secret'] = $VanillaSecret;
 
       $SignData = array_intersect_key($Request, array_fill_keys(array(
-                  'VanillaID',
-                  'Secret',
-                  'RequestTime',
-                  'TimeSlot'
-                      ), NULL));
+         'VanillaID',
+         'Secret',
+         'RequestTime',
+         'TimeSlot'
+      ), NULL));
 
       // ksort the array to preserve a known order
       $SignData = array_change_key_case($SignData, CASE_LOWER);

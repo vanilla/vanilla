@@ -12,6 +12,7 @@ echo '<!-- Page Title -->
 
 echo '<div class="Options">';
 
+$this->FireEvent('BeforeDiscussionOptions');
 WriteBookmarkLink();
 WriteDiscussionOptions();
 WriteAdminCheck();

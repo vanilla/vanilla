@@ -225,8 +225,7 @@ window.vanilla.embed = function(host) {
          result += '&sso='+encodeURIComponent(vanilla_sso);
       }
        
-      return result;
-      return returnUrl.replace('&', '?'); // Replace the first occurrence of amp with question.
+      return result.replace('&', '?'); // Replace the first occurrence of amp with question.
    }
    var vanillaIframe = document.createElement('iframe');
    vanillaIframe.id = "vanilla"+id;

@@ -3,6 +3,8 @@ $SubjectsVisible = C('Conversations.Subjects.Visible');
 ?>
 <div id="InboxModule" class="Box BoxInbox">
    <h4><?php echo T('Inbox'); ?></h4>
+   <?php if (count($this->Data('Conversations')) > 0): ?>
+   
    <ul id="" class="DataList Conversations PanelInfo">
       <?php foreach ($this->Data('Conversations') as $Row): ?>
       <li id="Conversation_<?php echo $Row['ConversationID']; ?>" class="Item">
@@ -52,8 +54,21 @@ $SubjectsVisible = C('Conversations.Subjects.Visible');
          </div>
       </li>
       <?php endforeach; ?>
-      <li class="ShowAll">
-         <?php echo Anchor(T('Full Inbox'), '/messages/inbox'); ?>
-      </li>
-   </ul>
+   </ul>   
+   <div class="P PagerContainer">
+      <?php
+      echo Anchor(Sprite('SpNewConversation').T('New Message'), '/messages/add');
+      ?>
+      <span class="Pager"><?php echo Anchor(T('More…'), '/messages/inbox'); ?></span>
+   </div>
+   <?php else: ?>
+      <?php
+      echo Wrap(T('Your private conversations with other members.'), 'div', array('class' => 'P'));
+      ?>
+      <div class="P PagerContainer">
+         <?php
+         echo Anchor(Sprite('SpNewConversation').T('New Message'), '/messages/add');
+         ?>
+      </div>
+   <?php endif; ?>
 </div>

@@ -1,5 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 $User = GetValue('User', Gdn::Controller());
+if (!$User && Gdn::Session()->IsValid()) {
+   $User = Gdn::Session()->User;
+}
+
 if (!$User)
    return;
 

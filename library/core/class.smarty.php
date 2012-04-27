@@ -45,7 +45,7 @@ class Gdn_Smarty {
          $User = array(
             'Name' => $Session->User->Name,
             'Photo' => '',
-            'CountNotifications' => (int)GetValue('CountNotifications', $Session->User->CountNotifications, 0),
+            'CountNotifications' => (int)GetValue('CountNotifications', $Session->User, 0),
             'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
             'SignedIn' => TRUE);
          
@@ -77,8 +77,16 @@ class Gdn_Smarty {
             $Controller->Data[$Key] = (array)$Value;
          }
       }
+      
+      $BodyClass = GetValue('CssClass', $Controller->Data, '', TRUE);
+      $Sections = Gdn_Theme::Section(NULL, 'get');
+      if (is_array($Sections)) {
+         foreach ($Sections as $Section) {
+            $BodyClass .= ' Section-'.$Section;
+         }
+      }
      
-      $Controller->Data['BodyClass'] = GetValue('CssClass', $Controller->Data, '', TRUE);
+      $Controller->Data['BodyClass'] = $BodyClass;
 
       $Smarty->assign('Assets', (array)$Controller->Assets);
       $Smarty->assign('Path', Gdn::Request()->Path());

@@ -12,10 +12,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders recently active bookmarked discussions
  */
 class BookmarkedModule extends Gdn_Module {
+   public $Limit = 10;
    
-   public function GetData($Limit = 10) {
+   public function __construct() {
+      parent::__construct();
+      $this->_ApplicationFolder = 'vanilla';
+   }
+   
+   public function GetData() {
       $this->Data = FALSE;
-      $this->Limit = $Limit;
       if (Gdn::Session()->IsValid() && C('Vanilla.Modules.ShowBookmarkedModule', TRUE)) {
          $BookmarkIDs = Gdn::SQL()
             ->Select('DiscussionID')

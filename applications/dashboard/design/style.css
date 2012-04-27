@@ -1812,6 +1812,28 @@ tr.CategoryHeading td {
 .SpNewConversation { background-position: -64px -68px; }
 .SpAskQuestion { background-position: -48px -68px; }
 .SpNewPoll { background-position: -32px -68px; }
+
+.SpAdd,
+.SpDelete {
+   position: relative;
+}
+
+.SpAdd:after, .SpDelete:after {
+   display: block;
+   position: absolute;
+   content: ' ';
+   overflow: hidden;
+   background: url('images/sprites.png') -72px -38px no-repeat;
+   height: 7px;
+   width: 7px;
+   right: -1px;
+   bottom: -1px;
+}
+
+.SpDelete:after {
+   background-position: -79px -38px;
+}
+
 .FormType {
 	margin: 0 0 10px;
 }

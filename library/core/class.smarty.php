@@ -49,9 +49,22 @@ class Gdn_Smarty {
       if($Session->IsValid()) {
          $User = array(
             'Name' => $Session->User->Name,
-            'CountNotifications' => (int)GetValue('CountNotifications', $Session->User->CountNotifications, 0),
+            'CountNotifications' => (int)GetValue('CountNotifications', $Session->User, 0),
             'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
             'SignedIn' => TRUE);
+         
+         $Photo = $Session->User->Photo;
+         if ($Photo) {
+            if (!preg_match('`^https?://`i', $Photo)) {
+               $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+            }
+         } else {
+            if (function_exists('UserPhotoDefaultUrl'))
+               $Photo = UserPhotoDefaultUrl($Session->User);
+            else
+               $Photo = Asset('/applications/dashboard/design/defaulticon.png', TRUE);
+         }
+         $User['Photo'] = $Photo;
       } else {
          $User = FALSE; /*array(
             'Name' => '',
@@ -68,8 +81,16 @@ class Gdn_Smarty {
             $Controller->Data[$Key] = (array)$Value;
          }
       }
+      
+      $BodyClass = GetValue('CssClass', $Controller->Data, '', TRUE);
+      $Sections = Gdn_Theme::Section(NULL, 'get');
+      if (is_array($Sections)) {
+         foreach ($Sections as $Section) {
+            $BodyClass .= ' Section-'.$Section;
+         }
+      }
      
-      $Controller->Data['BodyClass'] = GetValue('CssClass', $Controller->Data, '', TRUE);
+      $Controller->Data['BodyClass'] = $BodyClass;
 
       $Smarty->assign('Assets', (array)$Controller->Assets);
       $Smarty->assign('Path', Gdn::Request()->Path());

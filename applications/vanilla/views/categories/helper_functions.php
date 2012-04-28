@@ -39,9 +39,12 @@ if (!function_exists('GetOptions')):
 /**
  * Render options that the user has for this discussion.
  */
-function GetOptions($Category, $Sender) {
+function GetOptions($Category, $Sender = NULL) {
    if (!Gdn::Session()->IsValid())
       return;
+   
+   if (!$Sender)
+      $Sender = Gdn::Controller();
    
    $Result = '';
    $Options = '';

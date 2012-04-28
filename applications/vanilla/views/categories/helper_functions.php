@@ -74,6 +74,116 @@ function GetOptions($Category, $Sender) {
 }
 endif;
 
+if (!function_exists('MostRecentString')):
+   function MostRecentString($Row) {
+      if (!$Row['LastTitle'])
+         return '';
+   
+      $R = '';
+   
+      $R .= '<span class="MostRecent">';
+      $R .= '<span class="MLabel">'.T('Most recent:').'</span> ';
+      $R .= Anchor(
+         SliceString(Gdn_Format::Text($Row['LastTitle']), 30),
+         $Row['LastUrl'],
+         'LatestPostTitle');
+
+      if (GetValue('LastName', $Row)) {
+         $R .= ' ';
+
+         $R .= '<span class="MostRecentBy">'.T('by').' ';
+         $R .= UserAnchor($Row, 'UserLink', 'Last');
+         $R .= '</span>';
+      }
+
+      if (GetValue('LastDateInserted', $Row)) {
+         $R .= ' ';
+
+         $R .= '<span class="MostRecentOn">';
+         $R .= T('on').' ';
+         $R .= Anchor(
+            Gdn_Format::Date($Row['LastDateInserted'], 'html'),
+            $Row['LastUrl'],
+            'CommentDate');
+         $R .= '</span>';
+      }
+      
+      $R .= '</span>';
+      
+      return $R;
+   }
+endif;
+
+if (!function_exists('WriteListItem')):
+   
+function WriteListItem($Row, $Depth = 1) {
+   $Children = $Row['Children'];
+   $WriteChildren = FALSE;
+   if (!empty($Children)) {
+      if (($Depth + 1) >= C('Vanilla.Categories.MaxDisplayDepth')) {
+         $WriteChildren = 'list';
+      } else {
+         $WriteChildren = 'items';
+      }
+   }
+   
+   $H = 'h'.($Depth + 1);
+   ?>
+   <li id="Category_<?php echo $Row['CategoryID']; ?>" class="<?php echo CssClass($Row); ?>">
+      <div class="ItemContent Category">
+         <?php echo GetOptions($Row); ?>
+         
+         <?php echo Wrap(Anchor($Row['Name'], $Row['Url'], 'Title'), $H, array('class' => 'CategoryName TitleWrap')); ?>
+         
+         <div class="CategoryDescription">
+            <?php echo $Row['Description']; ?>
+         </div>
+         
+         <?php if ($WriteChildren === 'list'): ?>
+         <div class="ChildCategories">
+            <?php
+            echo Wrap(T('Child Categories').': ', 'b');
+            echo CategoryString($Children, $Depth + 1);
+            ?>
+         </div>
+         <?php endif; ?>
+         
+         <div class="Meta">
+            <span class="MItem RSS"><?php
+               echo Anchor(' ', '/categories/'.rawurlencode($Row['UrlCode']).'/feed.rss', 'SpRSS');
+            ?></span>
+            
+            <span class="MItem MItem-Count DiscussionCount"><?php
+               echo Plural(
+                  $Row['CountDiscussions'],
+                  '%s discussion',
+                  '%s discussions',
+                  Gdn_Format::BigNumber($Row['CountDiscussions'], 'html'));
+            ?></span>
+            
+            <span class="MItem MItem-Count CommentCount"><?php
+               echo Plural(
+                  $Row['CountDiscussions'],
+                  '%s comment',
+                  '%s comments',
+                  Gdn_Format::BigNumber($Row['CountComments'], 'html'));
+            ?></span>
+            
+            <span class="MItem LastestPost LastDiscussionTitle"><?php
+               echo MostRecentString($Row);
+            ?></span>
+         </div>
+      </div>
+   </li>
+   <?php
+   if ($WriteChildren === 'items') {
+      foreach ($Children as $ChildRow) {
+         WriteListItem($ChildRow, $Depth + 1);
+      }
+   }
+}
+endif;
+
 if (!function_exists('WriteTableHead')):
    
 function WriteTableHead() {
@@ -168,6 +278,23 @@ function WriteTableRow($Row, $Depth = 1) {
          WriteTableRow($ChildRow, $Depth + 1);
       }
    }
+}
+endif;
+
+if (!function_exists('WriteCategoryList')):
+   
+function WriteCategoryList($Categories, $Depth = 1) {
+   ?>
+   <div class="DataListWrap">
+   <ul class="DataList CategoryList">
+      <?php
+      foreach ($Categories as $Category) {
+         WriteListItem($Category, $Depth);
+      }
+      ?>
+   </ul>
+   </div>
+   <?php
 }
 endif;
 

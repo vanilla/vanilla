@@ -597,6 +597,7 @@ jQuery(document).ready(function($) {
         } else if ($(e.target).hasClass('Hijack') || $(e.target).closest('a').hasClass('Hijack')) {
            return;
         }
+        e.stopPropagation();
       
       // Dynamically fill the flyout.
       var rel = $(this).attr('rel');
@@ -638,6 +639,13 @@ jQuery(document).ready(function($) {
 //      $('.ToggleFlyout').removeClass('Open');
 //      $('.Flyout').hide();
 //   });
+
+   $(document).delegate('#Body', 'click', function() {
+      if (lastOpen) {
+         $('.Flyout', lastOpen).hide();
+         $(lastOpen).removeClass('Open');
+      }
+   });
    
    // Add a spinner onclick of buttons with this class
    $(document).delegate('input.SpinOnClick', 'click', function() {

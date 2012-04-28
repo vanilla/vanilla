@@ -1087,6 +1087,20 @@ overflow: hidden; */
 .Condensed .Excerpt {
 	display: inline;
 }
+/* /me actions */
+.MeAction .AuthorAction {
+   display: inline;
+   margin: 0 6px;
+   font-size: 15px;
+   font-weight: bold;
+}
+.MeAction .Item-Header {
+   margin-bottom: 8px;
+}
+.MeAction .Message {
+   display: none;
+}
+
 
 /* =============================================================== Activities */
 .Activities li.HasPhoto .Title {

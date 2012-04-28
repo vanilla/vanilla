@@ -13,6 +13,7 @@ function CssClass($Object, $CurrentOffset = 0) {
    $Type = (GetValue('CommentID', $Object)) ? 'Comment' : 'Discussion';
    $CssClass = 'Item Item'.$Type;
    $CssClass .= (GetValue('InsertUserID', $Object) == Gdn::Session()->UserID) ? ' Mine' : '';
+   $CssClass .= IsMeAction($Object) ? ' MeAction' : '';
    
    if ($_CssClss = GetValue('_CssClass', $Object)) {
       $CssClass .= ' '.$_CssClss;
@@ -115,6 +116,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                <?php
                echo UserPhoto($Author);
                echo UserAnchor($Author, 'Username');
+               echo FormatMeAction($Comment);
                ?>
             </span>
             <span class="AuthorInfo">
@@ -148,7 +150,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          <div class="Item-Body">
             <div class="Message">
                <?php 
-            echo FormatBody($Comment);
+                  echo FormatBody($Comment);
                ?>
             </div>
             <?php $Sender->FireEvent('AfterCommentBody'); ?>
@@ -470,3 +472,24 @@ function WriteEmbedCommentForm() {
    }
 }
 endif;
+
+if (!function_exists('IsMeAction')):
+   function IsMeAction($Comment) {
+      return strpos(trim($Comment->Body), '/me ') === 0;
+   }
+endif; 
+
+if (!function_exists('FormatMeAction')):
+   function FormatMeAction($Comment) {
+      if (!IsMeAction($Comment))
+         return;
+      
+      // Maxlength (don't let people blow up the forum
+      $Maxlength = 100;
+      $Body = Gdn_Format::PlainText(substr($Comment->Body, 4));
+      if (strlen($Body) > $Maxlength)
+         $Body = substr($Body, 0, $Maxlength).'...';
+      
+      return '<div class="AuthorAction">'.$Body.'</div>';
+   }
+endif; 

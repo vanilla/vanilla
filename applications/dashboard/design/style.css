@@ -1622,19 +1622,6 @@ div.Popup form ul li label.RadioLabel {
 
 /* ================================ Vanilla ================================= */
 
-#Panel ul.Discussions {
-   border: 0;
-}
-.PanelDiscussions li {
-   text-align: left;
-}
-.PanelDiscussions li a {
-   float: none;
-}
-.PanelDiscussions li strong {
-   display: block;
-   line-height: 1.5;
-}
 
 /* ============================================================== Discussions */
 

@@ -1799,6 +1799,14 @@ tr.CategoryHeading td {
 .SpNewConversation { background-position: -64px -68px; }
 .SpAskQuestion { background-position: -48px -68px; }
 .SpNewPoll { background-position: -32px -68px; }
+.SpRSS {
+   background: url("images/sprites.png") no-repeat -27px -46px transparent;
+   display: inline-block;
+   height: 14px;
+   vertical-align: middle;
+   width: 14px;
+}
+
 
 .SpAdd,
 .SpDelete {

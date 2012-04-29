@@ -267,10 +267,12 @@ if (!function_exists('IPAnchor')) {
  * /applications/garden/locale/en-US/definitions.php.
  */
 if (!function_exists('Plural')) {
-   function Plural($Number, $Singular, $Plural) {
+   function Plural($Number, $Singular, $Plural, $FormattedNumber = FALSE) {
 		// Make sure to fix comma-formatted numbers
       $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T(abs($WorkingNumber) == 1 ? $Singular : $Plural), $Number);
+      if ($FormattedNumber === FALSE)
+         $FormattedNumber = $Number;
+      return sprintf(T(abs($WorkingNumber) == 1 ? $Singular : $Plural), $FormattedNumber);
    }
 }
 

@@ -37,6 +37,12 @@ class Gdn_Statistics extends Gdn_Plugin {
          $ApiMethod
       ));
       
+      // Allow hooking of analytics events
+      $this->EventArguments['AnalyticsMethod'] = &$Method;
+      $this->EventArguments['AnalyticsArgs'] = &$RequestParameters;
+      $this->EventArguments['AnalyticsUrl'] = &$FinalURL;
+      $this->FireEvent('SendAnalytics');
+      
       // Sign request
       $this->Sign($RequestParameters, TRUE);
       $RequestMethod = GetValue('RequestMethod', $RequestParameters, 'GET');
@@ -358,10 +364,10 @@ class Gdn_Statistics extends Gdn_Plugin {
    }
 
    public function SettingsController_AnalyticsTick_Create($Sender) {
-      Gdn::Statistics()->Tick();
-      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
-
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      Gdn::Statistics()->Tick();
       $this->FireEvent("AnalyticsTick");
 
       $Sender->Render('tick', 'statistics', 'dashboard');
@@ -560,7 +566,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       // If we're local and not allowed, or just directly disabled, gtfo
       if (!self::CheckIsEnabled())
          return;
-
+      
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          if (Gdn::Get('Garden.Analytics.Notify', FALSE) !== FALSE) {
             $CallMessage = Sprite('Bandaid', 'InformSprite');
@@ -573,9 +579,9 @@ class Gdn_Statistics extends Gdn_Plugin {
       $ConfFile = PATH_CONF . '/config.php';
       if (!is_writable($ConfFile))
          return;
-
+      
       $InstallationID = Gdn::InstallationID();
-
+      
       // Check if we're registered with the central server already. If not, this request is 
       // hijacked and used to perform that task instead of sending stats or recording a tick.
       if (is_null($InstallationID)) {
@@ -586,10 +592,10 @@ class Gdn_Statistics extends Gdn_Plugin {
 
          return $this->Register();
       }
-
+      
       // Store the view, using denormalization if enabled
       $this->AddView();
-
+      
       // Fire an event for plugins to track their own stats.
       // TODO: Make this analyze the path and throw a specific event (this event will change in future versions).
       $this->EventArguments['Path'] = Gdn::Request()->Post('Path');

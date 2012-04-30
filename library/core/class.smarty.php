@@ -56,7 +56,7 @@ class Gdn_Smarty {
             }
          } else {
             if (function_exists('UserPhotoDefaultUrl'))
-               $Photo = UserPhotoDefaultUrl($Session->User);
+               $Photo = UserPhotoDefaultUrl($Session->User, 'ProfilePhoto');
             else
                $Photo = Asset('/applications/dashboard/design/defaulticon.png', TRUE);
          }

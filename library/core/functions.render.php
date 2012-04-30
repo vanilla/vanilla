@@ -348,7 +348,7 @@ if (!function_exists('UserPhoto')) {
 
       $Photo = $User->Photo;
       if (!$Photo && function_exists('UserPhotoDefaultUrl'))
-         $Photo = UserPhotoDefaultUrl($User);
+         $Photo = UserPhotoDefaultUrl($User, $ImgClass);
 
       if ($Photo) {
          if (!preg_match('`^https?://`i', $Photo)) {

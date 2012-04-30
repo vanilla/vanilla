@@ -174,6 +174,37 @@ class RoleModel extends Gdn_Model {
       return $this->SQL->Get();
    }
    
+   /**
+    *
+    * @param array|string $Names 
+    */
+   public static function GetByName($Names, &$Missing = NULL) {
+      if (is_string($Names)) {
+         $Names = explode(',', $Names);
+         $Names = array_map('trim', $Names);
+      }
+      
+      // Make a lookup array of the names.
+      $Names = array_unique($Names);
+      $Names = array_combine($Names, $Names);
+      $Names = array_change_key_case($Names);
+      
+      $Roles = RoleModel::Roles();
+      $Result = array();
+      foreach ($Roles as $RoleID => $Role) {
+         $Name = strtolower($Role['Name']);
+         
+         if (isset($Names[$Name])) {
+            $Result[$RoleID] = $Role;
+            unset($Names[$Name]);
+         }
+      }
+      
+      $Missing = array_values($Names);
+      
+      return $Result;
+   }
+   
    public static function Roles($RoleID = NULL, $Force = FALSE) {
       if (self::$Roles == NULL) {
          $Key = 'Roles';

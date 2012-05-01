@@ -25,6 +25,8 @@ class UserMetaModel extends Gdn_Model {
       
       self::$MemoryCache = array();
       parent::__construct('UserMeta');
+      $this->SQL = clone Gdn::SQL();
+      $this->SQL->Reset();
    }
    
    /**

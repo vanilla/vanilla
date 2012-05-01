@@ -3,6 +3,8 @@ require_once $this->FetchViewLocation('helper_functions');
 ?>
 <div id="Bookmarks" class="Box BoxBookmarks">
    <h4><?php echo T('Bookmarked Discussions'); ?></h4>
+   <?php if (count($this->Data->Result()) > 0): ?>
+   
    <ul id="Bookmark_List" class="PanelInfo PanelDiscussions">
       <?php
       foreach ($this->Data->Result() as $Discussion) {
@@ -13,4 +15,12 @@ require_once $this->FetchViewLocation('helper_functions');
       <li class="ShowAll"><?php echo Anchor(T('All Bookmarks'), 'discussions/bookmarked'); ?></li>
       <?php } ?>
    </ul>
+   
+   <?php else: ?>
+      <?php
+         echo sprintf(
+            T('Click the %s beside discussions to bookmark them.'),
+            '<a href="javascript: void(0);" class="Bookmark"> </a>');
+      ?>
+   <?php endif; ?>
 </div>

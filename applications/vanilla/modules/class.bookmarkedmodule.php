@@ -14,6 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class BookmarkedModule extends Gdn_Module {
    public $Limit = 10;
    public $Help = FALSE;
+   public $ListID = 'Bookmark_List';
    
    public function __construct() {
       parent::__construct();

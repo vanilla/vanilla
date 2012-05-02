@@ -5,7 +5,7 @@ require_once $this->FetchViewLocation('helper_functions');
    <h4><?php echo T('Bookmarked Discussions'); ?></h4>
    <?php if (count($this->Data->Result()) > 0): ?>
    
-   <ul id="Bookmark_List" class="PanelInfo PanelDiscussions">
+   <ul id="<?php echo $this->ListID; ?>" class="PanelInfo PanelDiscussions">
       <?php
       foreach ($this->Data->Result() as $Discussion) {
          WriteModuleDiscussion($Discussion);

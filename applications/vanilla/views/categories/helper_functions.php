@@ -16,6 +16,8 @@ endif;
 if (!function_exists('CssClass')):
    
 function CssClass($Row) {
+   $Row = (array)$Row;
+   
    static $Alt = FALSE;
    $ClassName = Gdn_Format::AlphaNumeric($Row['UrlCode']);
    

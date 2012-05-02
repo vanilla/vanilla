@@ -13,6 +13,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class BookmarkedModule extends Gdn_Module {
    public $Limit = 10;
+   public $Help = FALSE;
+   public $ListID = 'Bookmark_List';
    
    public function __construct() {
       parent::__construct();
@@ -42,7 +44,7 @@ class BookmarkedModule extends Gdn_Module {
                array( 'w.Bookmarked' => '1' )
             );
          } else {
-            $this->Data = FALSE;
+            $this->Data = new Gdn_DataSet();
          }
       }
    }
@@ -55,7 +57,7 @@ class BookmarkedModule extends Gdn_Module {
       if (!isset($this->Data))
          $this->GetData();
       
-      if (is_object($this->Data) && $this->Data->NumRows() > 0)
+      if (is_object($this->Data) && ($this->Data->NumRows() > 0 || $this->Help))
          return parent::ToString();
       
       return '';

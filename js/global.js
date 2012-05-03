@@ -530,7 +530,7 @@ jQuery(document).ready(function($) {
                $elem.html(data);
             },
             complete: function() {
-               $elem.removeClass('Progress TinyProgress');
+               $elem.removeClass('Progress TinyProgress InProgress');
                if (settings.complete != undefined) {
                   settings.complete($elem);
                }

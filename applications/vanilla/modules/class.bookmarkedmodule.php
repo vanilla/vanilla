@@ -19,11 +19,12 @@ class BookmarkedModule extends Gdn_Module {
    public function __construct() {
       parent::__construct();
       $this->_ApplicationFolder = 'vanilla';
+      $this->Visible = C('Vanilla.Modules.ShowBookmarkedModule', TRUE);
    }
    
    public function GetData() {
       $this->Data = FALSE;
-      if (Gdn::Session()->IsValid() && C('Vanilla.Modules.ShowBookmarkedModule', TRUE)) {
+      if (Gdn::Session()->IsValid()) {
          $BookmarkIDs = Gdn::SQL()
             ->Select('DiscussionID')
             ->From('UserDiscussion')
@@ -44,6 +45,7 @@ class BookmarkedModule extends Gdn_Module {
                array( 'w.Bookmarked' => '1' )
             );
          } else {
+            
             $this->Data = new Gdn_DataSet();
          }
       }

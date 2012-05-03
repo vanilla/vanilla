@@ -263,16 +263,13 @@ class Gdn_Theme {
             else
                $Result = "<!-- Error: $Name doesn't exist -->";
          } else {
-               $Bak =  C('Vanilla.Modules.ShowBookmarkedModule', TRUE);
-               SaveToConfig('Vanilla.Modules.ShowBookmarkedModule', TRUE, FALSE);
-            
                $Module = new $Name(Gdn::Controller(), '');
+               $Module->Visible = TRUE;
                foreach ($Properties as $Name => $Value) {
                   $Module->$Name = $Value;
                }
                
                $Result = $Module->ToString();
-               SaveToConfig('Vanilla.Modules.ShowBookmarkedModule', $Bak, FALSE);
          }
       } catch (Exception $Ex) {
          if (Debug())

@@ -38,6 +38,7 @@ class ModuleController extends Gdn_Controller {
 
 
             $ModuleInstance = new $Module($this);
+            $ModuleInstance->Visible = TRUE;
             $this->SetData('_Module', $ModuleInstance);
             $this->Render('Index', FALSE, 'dashboard');
             return;

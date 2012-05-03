@@ -509,10 +509,16 @@ class DiscussionModel extends VanillaModel {
       if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
          // Grab the counts from the faster category cache.
          if (isset($Wheres['d.CategoryID'])) {
-            if (is_array($Perms) && !in_array($Wheres['d.CategoryID'], $Perms)) {
+            $CategoryIDs = (array)$Wheres['d.CategoryID'];
+            if ($Perms === FALSE)
+               $CategoryIDs = array();
+            elseif (is_array($Perms))
+               $CategoryIDs = array_intersect($CategoryIDs, $Perms);
+            
+            if (count($CategoryIDs) == 0) {
                return 0;
             } else {
-               $Perms = array($Wheres['d.CategoryID']);
+               $Perms = $CategoryIDs;
             }
          }
          

@@ -385,6 +385,9 @@ class UtilityController extends DashboardController {
       $this->SetData('Success', TRUE);
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';
+      
+      $this->FireEvent('Alive');
+      
       $this->Render();
    }
    

@@ -39,6 +39,14 @@ class ModuleController extends Gdn_Controller {
 
             $ModuleInstance = new $Module($this);
             $ModuleInstance->Visible = TRUE;
+            
+            $WhiteList = array('Limit', 'Help');
+            foreach ($this->Request->Get() as $Key => $Value) {
+               if (in_array($Key, $WhiteList)) {
+                  $ModuleInstance->$Key = $Value;
+               }
+            }
+            
             $this->SetData('_Module', $ModuleInstance);
             $this->Render('Index', FALSE, 'dashboard');
             return;

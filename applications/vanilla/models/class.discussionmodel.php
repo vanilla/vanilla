@@ -1373,6 +1373,7 @@ class DiscussionModel extends VanillaModel {
                'DiscussionID' => $DiscussionID,
                'Bookmarked' => $State
             ));
+         $Discussion->Bookmarked = TRUE;
       } else {
          $State = ($Discussion->Bookmarked == '1' ? '0' : '1');
          $this->SQL
@@ -1381,6 +1382,7 @@ class DiscussionModel extends VanillaModel {
             ->Where('UserID', $UserID)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
+         $Discussion->Bookmarked = $State;
       }
 		
 		// Update the cached bookmark count on the discussion

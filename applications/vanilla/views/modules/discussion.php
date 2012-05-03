@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 // An individual discussion record for all panel modules to use when rendering a discussion list.
 if (!isset($this->Prefix)) {
-   $this->Prefix = 'Bookmak';
+   $this->Prefix = 'Bookmark';
 }
 
 if (!function_exists('WriteModuleDiscussion')) {

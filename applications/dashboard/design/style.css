@@ -806,6 +806,23 @@ overflow: hidden; */
 	border-top: 1px solid #ddd;
    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
+
+/** Make standard items a bit more condensed when in the panel. **/
+
+.PanelColumn .Item {
+    padding: 2px;   
+}
+
+.PanelColumn .Item .Title {
+    font-size: 13px;
+    font-weight: normal;
+}
+
+.PanelColumn .Options {
+    display: none;
+}
+
+
 #Panel .FilterMenu .Aside,
 .PanelInfo .Aside {
    float: right;

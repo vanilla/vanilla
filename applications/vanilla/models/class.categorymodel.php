@@ -969,6 +969,7 @@ class CategoryModel extends Gdn_Model {
             $AllowDiscussions = $OldCategory->AllowDiscussions; // Force the allowdiscussions property
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
             $this->Update($Fields, array('CategoryID' => $CategoryID));
+          
             $this->SetCache($CategoryID, $Fields);
          } else {
             $CategoryID = $this->Insert($Fields);
@@ -986,7 +987,7 @@ class CategoryModel extends Gdn_Model {
             if ($CustomPermissions) {
                $PermissionModel = Gdn::PermissionModel();
                $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
-            $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
+               $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
 
                if (!$Insert) {
                   // Figure out my last permission and tree info.
@@ -999,6 +1000,8 @@ class CategoryModel extends Gdn_Model {
                   $this->SQL->Put('Category',
                      array('PermissionCategoryID' => $CategoryID),
                      array('TreeLeft >' => $Data['TreeLeft'], 'TreeRight <' => $Data['TreeRight'], 'PermissionCategoryID' => $Data['PermissionCategoryID']));
+                  
+                  self::ClearCache();
                }
             } elseif (!$Insert) {
                // Figure out my parent's permission.
@@ -1014,6 +1017,8 @@ class CategoryModel extends Gdn_Model {
                   $this->SQL->Put('Category',
                      array('PermissionCategoryID' => $NewPermissionID),
                      array('PermissionCategoryID' => $CategoryID));
+                  
+                  self::ClearCache();
                }
 
                // Delete my custom permissions.

@@ -711,6 +711,8 @@ if (!function_exists('FetchPageInfo')) {
          
          // FIRST PASS: Look for open graph title, desc, images
          $PageInfo['Title'] = DomGetContent($Dom, 'meta[property=og:title]');
+         
+         Trace('Getting og:description');
          $PageInfo['Description'] = DomGetContent($Dom, 'meta[property=og:description]');
          foreach ($Dom->find('meta[property=og:image]') as $Image) {
             if (isset($Image->content))
@@ -721,12 +723,16 @@ if (!function_exists('FetchPageInfo')) {
          if ($PageInfo['Title'] == '')
             $PageInfo['Title'] = $Dom->find('title', 0)->plaintext;
          
-         if ($PageInfo['Description'] == '')
+         if ($PageInfo['Description'] == '') {
+            Trace('Getting meta description');
             $PageInfo['Description'] = DomGetContent($Dom, 'meta[name=description]');
+         }
 
          // THIRD PASS: Look in the page contents
          if ($PageInfo['Description'] == '') {
             foreach($Dom->find('p') as $element) {
+               Trace('Looking at p for description.');
+               
                if (strlen($element->plaintext) > 150) {
                   $PageInfo['Description'] = $element->plaintext;
                   break;
@@ -739,6 +745,7 @@ if (!function_exists('FetchPageInfo')) {
          // Final: Still nothing? remove limitations
          if ($PageInfo['Description'] == '') {
             foreach($Dom->find('p') as $element) {
+               Trace('Looking at p for description (no restrictions)');
                if (trim($element->plaintext) != '') {
                   $PageInfo['Description'] = $element->plaintext;
                   break;
@@ -747,8 +754,13 @@ if (!function_exists('FetchPageInfo')) {
          }
             
          // Page Images
-         if (count($PageInfo['Images']) == 0)
-            $PageInfo['Images'] = DomGetImages($Dom, $Url);
+         if (count($PageInfo['Images']) == 0) {
+            $Images = DomGetImages($Dom, $Url);
+            $PageInfo['Images'] = array_values($Images);
+         }
+         
+         $PageInfo['Title'] = HtmlEntityDecode($PageInfo['Title']);
+         $PageInfo['Description'] = HtmlEntityDecode($PageInfo['Description']);
 
       } catch (Exception $ex) {
          $PageInfo['Exception'] = $ex->getMessage();
@@ -768,34 +780,63 @@ if (!function_exists('DomGetImages')) {
    function DomGetImages($Dom, $Url, $MaxImages = 4) {
       $Images = array();
       foreach ($Dom->find('img') as $element) {
-         $Images[] = AbsoluteSource($element->src, $Url);
+         $Images[] = array('Src' => AbsoluteSource($element->src, $Url), 'Width' => $element->width, 'Height' => $element->height);
       }
+      
+//      Gdn::Controller()->Data['AllImages'] = $Images;
 
       // Sort by size, biggest one first
       $ImageSort = array();
       // Only look at first 4 images (speed!)
       $i = 0;
-      foreach ($Images as $Image) {
-         $i++;
-         if ($i > $MaxImages)
-            break;
-
+      foreach ($Images as $ImageInfo) {
+         $Image = $ImageInfo['Src'];
+         
+         if (strpos($Image, 'doubleclick.') != FALSE)
+            continue;
+         
          try {
-            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
-            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
-            // Require min 100x100 dimension image ($Diag > 141)
-            // Prefer images that are less than 800px wide (banners?)
-            if ($Diag > 141 && $Width < 800) {
-               if (!array_key_exists($Diag, $ImageSort)) {
-                  $ImageSort[$Diag] = array($Image);
-               } else {
-                  $ImageSort[$Diag][] = $Image;
-               }
+            if ($ImageInfo['Height'] && $ImageInfo['Width']) {
+               $Height = $ImageInfo['Height'];
+               $Width = $ImageInfo['Width'];
+            } else {
+               list($Width, $Height) = getimagesize($Image);
             }
+            
+            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
+            
+//            Gdn::Controller()->Data['Foo'][] = array($Image, $Width, $Height, $Diag);
+            
+            if (!$Width || !$Height)
+               continue;
+            
+            // Require min 100x100 dimension image.
+            if ($Width < 100 && $Height < 100)
+               continue;
+            
+            // Don't take a banner-shaped image.
+            if ($Height * 5 < $Width)
+               continue;
+            
+            // Prefer images that are less than 800px wide (banners?)
+//            if ($Diag > 141 && $Width < 800) { }
+               
+            if (!array_key_exists($Diag, $ImageSort)) {
+               $ImageSort[$Diag] = array($Image);
+            } else {
+               $ImageSort[$Diag][] = $Image;
+            }
+            
+            
+            $i++;
+
+            if ($i > $MaxImages)
+               break;
          } catch(Exception $ex) {
             // do nothing
          }
       }
+      
       krsort($ImageSort);
       $GoodImages = array();
       foreach ($ImageSort as $Diag => $Arr) {
@@ -2045,6 +2086,11 @@ if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
       if (!$Destination)
          $Destination = Url('');
+      
+      if (Debug() && $Trace == Trace()) {
+         Trace("Redirecting to $Destination");
+         return;
+      }
          
       // Close any db connections before exit
       $Database = Gdn::Database();

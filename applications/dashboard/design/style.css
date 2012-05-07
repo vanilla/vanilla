@@ -1209,6 +1209,8 @@ blockquote {
 .EmbeddedContent {
    overflow: hidden;
 }
+
+.Message img.LeftAlign,
 img.LeftAlign {
    float: left;
    margin: 0 10px 5px 0;
@@ -1819,7 +1821,8 @@ tr.CategoryHeading td {
 .SpNewConversation,
 .SpAskQuestion,
 .SpNewPoll,
-.SpNewDiscussion {
+.SpNewDiscussion,
+.SpWarn {
 	display: inline-block;
 	height: 16px;
 	width: 16px;
@@ -1836,6 +1839,11 @@ tr.CategoryHeading td {
    height: 14px;
    vertical-align: middle;
    width: 14px;
+}
+
+.SpWarn {
+   background-position: -96px -84px;
+   width: 18px;
 }
 
 

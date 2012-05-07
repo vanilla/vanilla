@@ -15,14 +15,18 @@
  */
 class Gdn_Statistics extends Gdn_Plugin {
 
-   public static $Increments = array('d' => 'days', 'w' => 'weeks', 'm' => 'months', 'y' => 'years');
+   protected $AnalyticsServer;
+   public static $Increments = array('h' => 'hours', 'd' => 'days', 'w' => 'weeks', 'm' => 'months', 'y' => 'years');
 
    public function __construct() {
       parent::__construct();
+      
+      $AnalyticsServer = C('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
+      $AnalyticsServer = str_replace(array('http://', 'https://'), '', $AnalyticsServer);
+      $this->AnalyticsServer = $AnalyticsServer;
    }
 
-   public function Analytics($Method, $RequestParameters, $Callback = FALSE) {
-      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+   public function Analytics($Method, $RequestParameters, $Callback = FALSE, $ParseResponse = TRUE) {
       $FullMethod = explode('/',$Method);
       if (sizeof($FullMethod) < 2)
          array_unshift($FullMethod, "analytics");
@@ -31,8 +35,8 @@ class Gdn_Statistics extends Gdn_Plugin {
       $ApiController = strtolower($ApiController);
       $ApiMethod = StringEndsWith(strtolower($ApiMethod), '.json', TRUE, TRUE).'.json';
       
-      $FinalURL = CombinePaths(array(
-         $AnalyticsServer,
+      $FinalURL = 'http://'.CombinePaths(array(
+         $this->AnalyticsServer,
          $ApiController,
          $ApiMethod
       ));
@@ -51,7 +55,8 @@ class Gdn_Statistics extends Gdn_Plugin {
       try {
          $ProxyRequest = new ProxyRequest(FALSE, array(
             'Method'    => $RequestMethod,
-            'Timeout'   => 10
+            'Timeout'   => 10,
+            'Cookies'   => FALSE
          ));
          $Response = $ProxyRequest->Request(array(
             'Url'       => $FinalURL
@@ -61,20 +66,32 @@ class Gdn_Statistics extends Gdn_Plugin {
       }
       
       if ($Response !== FALSE) {
-         $JsonResponse = json_decode($Response);
-         if ($JsonResponse !== FALSE)
-            $JsonResponse = (array)GetValue('Analytics', $JsonResponse, FALSE);
+         $JsonResponse = json_decode($Response, TRUE);         
          
-         // If we received a reply, parse it
          if ($JsonResponse !== FALSE) {
-            $this->ParseAnalyticsResponse($JsonResponse, $Response, $Callback);
-            return $JsonResponse;
+            if ($ParseResponse) {
+               $AnalyticsJsonResponse = (array)GetValue('Analytics', $JsonResponse, FALSE);
+               // If we received a reply, parse it
+               if ($AnalyticsJsonResponse !== FALSE) {
+                  $this->ParseAnalyticsResponse($AnalyticsJsonResponse, $Response, $Callback);
+                  return $AnalyticsJsonResponse;
+               }
+            } else {
+               return $JsonResponse;
+            }
          }
+         
+         return $Response;
       }
       
       return FALSE;
    }
-
+   
+   public function Api($Method, $Parameters) {
+      $ApiResponse = $this->Analytics($Method, $Parameters, FALSE, FALSE);
+      return $ApiResponse;
+   }
+   
    protected function AnalyticsFailed($JsonResponse) {
       self::Throttled(TRUE);
 
@@ -389,6 +406,8 @@ class Gdn_Statistics extends Gdn_Plugin {
       $VanillaID = GetValue('VanillaID', $Request, FALSE);
       if (empty($VanillaID))
          return FALSE;
+      
+      if ($VanillaID != Gdn::InstallationID()) return FALSE;
 
       // We're going to work on a copy for now
       $SignatureArray = $Request;

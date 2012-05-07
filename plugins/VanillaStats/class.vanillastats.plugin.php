@@ -72,9 +72,13 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     * dashboard application to render new statistics.
     */
    public function StatsDashboard($Sender) {
+      $StatsUrl = $this->AnalyticsServer;
+      if (!StringBeginsWith($StatsUrl, 'http:'))
+         $StatsUrl = "http://{$StatsUrl}";
+      
       // Tell the page where to find the Vanilla Analytics provider
-      $Sender->AddDefinition('VanillaStatsUrl', $this->AnalyticsServer);
-      $Sender->SetData('VanillaStatsUrl', $this->AnalyticsServer);
+      $Sender->AddDefinition('VanillaStatsUrl', $StatsUrl);
+      $Sender->SetData('VanillaStatsUrl', $StatsUrl);
       
       // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');

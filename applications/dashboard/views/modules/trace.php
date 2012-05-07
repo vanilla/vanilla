@@ -72,7 +72,7 @@
             echo htmlspecialchars($Message->getTraceAsString());
             echo '</pre>';
          } else
-            echo "<pre><b>$Var:</b> ".htmlspecialchars(print_r($Message, TRUE)).'</pre>';
+            echo "<pre><b>$Var:</b> ".htmlspecialchars(var_export($Message, TRUE)).'</pre>';
          ?>
       </td>
    </tr>

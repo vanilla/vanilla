@@ -2087,7 +2087,7 @@ if (!function_exists('Redirect')) {
       if (!$Destination)
          $Destination = Url('');
       
-      if (Debug() && $Trace == Trace()) {
+      if (Debug() && $Trace = Trace()) {
          Trace("Redirecting to $Destination");
          return;
       }

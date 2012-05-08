@@ -346,8 +346,9 @@ class PostController extends VanillaController {
          if ($Body == '')
             $Body = T('Undefined discussion body.');
             
-         // Validate the CategoryID for inserting
-         if (!is_numeric($vanilla_category_id)) {
+         // Validate the CategoryID for inserting.
+         $Category = CategoryModel::Categories($vanilla_category_id);
+         if (!$Category) {
             $vanilla_category_id = C('Vanilla.Embed.DefaultCategoryID', 0);
             if ($vanilla_category_id <= 0) {
                // No default category defined, so grab the first non-root category and use that.
@@ -363,6 +364,8 @@ class PostController extends VanillaController {
                if (!$vanilla_category_id)
                   $vanilla_category_id = 0;
             }
+         } else {
+            $vanilla_category_id = $Category['CategoryID'];
          }
          
          $SystemUserID = Gdn::UserModel()->GetSystemUserID();

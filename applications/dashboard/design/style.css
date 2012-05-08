@@ -806,6 +806,23 @@ overflow: hidden; */
 	border-top: 1px solid #ddd;
    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
+
+/** Make standard items a bit more condensed when in the panel. **/
+
+.PanelColumn .Item {
+    padding: 2px;   
+}
+
+.PanelColumn .Item .Title {
+    font-size: 13px;
+    font-weight: normal;
+}
+
+.PanelColumn .Options {
+    display: none;
+}
+
+
 #Panel .FilterMenu .Aside,
 .PanelInfo .Aside {
    float: right;
@@ -1192,6 +1209,8 @@ blockquote {
 .EmbeddedContent {
    overflow: hidden;
 }
+
+.Message img.LeftAlign,
 img.LeftAlign {
    float: left;
    margin: 0 10px 5px 0;
@@ -1802,7 +1821,8 @@ tr.CategoryHeading td {
 .SpNewConversation,
 .SpAskQuestion,
 .SpNewPoll,
-.SpNewDiscussion {
+.SpNewDiscussion,
+.SpWarn {
 	display: inline-block;
 	height: 16px;
 	width: 16px;
@@ -1819,6 +1839,11 @@ tr.CategoryHeading td {
    height: 14px;
    vertical-align: middle;
    width: 14px;
+}
+
+.SpWarn {
+   background-position: -96px -84px;
+   width: 18px;
 }
 
 

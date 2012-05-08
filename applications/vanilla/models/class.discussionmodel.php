@@ -546,6 +546,42 @@ class DiscussionModel extends VanillaModel {
       
       return self::$_CategoryPermissions;
    }
+   
+   public function FetchPageInfo($Url) {
+      $PageInfo = FetchPageInfo($Url);
+      
+      $Title = GetValue('Title', $PageInfo, '');
+      if ($Title == '')
+         $Title = FormatString(T('Undefined discussion subject.'), array('Url' => $Url));
+      else {
+         if ($Strip = C('Vanilla.Embed.StripPrefix'))
+            $Title = StringBeginsWith($Title, $Strip, TRUE, TRUE);
+         
+         if ($Strip = C('Vanilla.Embed.StripSuffix'))
+            $Title = StringEndsWith($Title, $Strip, TRUE, TRUE);
+      }
+      $Title = trim($Title);
+      
+      $Description = GetValue('Description', $PageInfo, '');
+      $Images = GetValue('Images', $PageInfo, array());
+      $Body = FormatString(T('EmbeddedDiscussionFormat'), array(
+          'Title' => $Title,
+          'Excerpt' => $Description,
+          'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
+          'Url' => $Url
+      ));
+      if ($Body == '')
+         $Body = $ForeignUrl;
+      if ($Body == '')
+         $Body = FormatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
+      
+      $Result = array(
+          'Name' => $Title,
+          'Body' => $Body,
+          'Format' => 'Html');
+          
+      return $Result;
+   }
 
    /**
     * Count how many discussions match the given criteria.
@@ -1373,6 +1409,7 @@ class DiscussionModel extends VanillaModel {
                'DiscussionID' => $DiscussionID,
                'Bookmarked' => $State
             ));
+         $Discussion->Bookmarked = TRUE;
       } else {
          $State = ($Discussion->Bookmarked == '1' ? '0' : '1');
          $this->SQL
@@ -1381,6 +1418,7 @@ class DiscussionModel extends VanillaModel {
             ->Where('UserID', $UserID)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
+         $Discussion->Bookmarked = $State;
       }
 		
 		// Update the cached bookmark count on the discussion

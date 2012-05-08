@@ -12,9 +12,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the 5 most recent activities for use in a side panel.
  */
 class RecentActivityModule extends Gdn_Module {
-   
+   public $ActivityData = FALSE;
    public $ActivityModuleTitle = '';
-   public function GetData($Limit = 5) {
+   public $Limit = 5;
+   
+   public function GetData($Limit = FALSE) {
+      if (!$Limit)
+         $Limit = $this->Limit;
+      
       $ActivityModel = new ActivityModel();
       $Data = $ActivityModel->GetWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), 0, $Limit);
       $this->ActivityData = $Data;

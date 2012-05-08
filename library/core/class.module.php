@@ -52,6 +52,8 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     * @var string
     */
    protected $_ThemeFolder;
+   
+   public $Visible = TRUE;
 
 
    /**
@@ -205,7 +207,8 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     * @return string
     */
    public function ToString() {
-      return $this->FetchView();
+      if ($this->Visible)
+         return $this->FetchView();
    }
 
    /**

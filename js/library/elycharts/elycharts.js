@@ -301,7 +301,7 @@ $.elycharts.templates = {
       // Compatta il numero mostrato nella label usando i suffissi specificati per migliaia, milioni...
       //labelsCompactUnits : ['k', 'M'],
       // Permette di specificare una funzione esterna che si occupa di formattare (o in generale trasformare) la label
-      //labelsFormatHandler : function (label) { return label },
+      //labelsFormatHandler : function (label,i) { return label },
       // Salta le prime N label
       //labelsSkip : 0, 
       // Force alignment for the label. Auto will automatically center it for x axis (also considering labelsRotate), "end" for l axis, "start" for the right axis.
@@ -3381,7 +3381,7 @@ $.elycharts.line = {
               val = labels[i];
               
               if (axis.x.props.labelsFormatHandler)
-                val = axis.x.props.labelsFormatHandler(val);
+                val = axis.x.props.labelsFormatHandler(val, i);
               txt = (axis.x.props.prefix ? axis.x.props.prefix : "") + val + (axis.x.props.suffix ? axis.x.props.suffix : "");
 
               labx = opt.margins[3] + i * (labelsCenter ? deltaBarX : deltaX) + (axis.x.props.labelsMargin ? axis.x.props.labelsMargin : 0);
@@ -3527,7 +3527,7 @@ $.elycharts.line = {
               val = Math.round(val / axis[j].normalizationBase) / ( 1 / axis[j].normalizationBase );
 
             if (axis[j].props.labelsFormatHandler)
-              val = axis[j].props.labelsFormatHandler(val);
+              val = axis[j].props.labelsFormatHandler(val, i);
             if (axis[j].props.labelsCompactUnits)
               val = common.compactUnits(val, axis[j].props.labelsCompactUnits);
             txt = (axis[j].props.prefix ? axis[j].props.prefix : "") + val + (axis[j].props.suffix ? axis[j].props.suffix : "");

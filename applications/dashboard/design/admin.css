@@ -1632,6 +1632,14 @@ li.RolePermissions table.CheckBoxGrid tbody tr th a span.Parent {
 	display:inline;
 }
 
+li.RolePermissions table.CheckBoxGrid tbody tr th a {
+	white-space:nowrap;
+}
+
+li.RolePermissions table.CheckBoxGrid tbody tr th a span.Parent {
+	display:inline;
+}
+
 /* Summary Tables */
 div.Summary {
    clear: left;

@@ -66,11 +66,10 @@ if (!function_exists('BookmarkButton')) {
 
 if (!function_exists('CategoryLink')):
    
-function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
-   if (!$Force && Gdn::Controller()->Data('Category')) {
-      return;
-   }
-   
+function CategoryLink($Discussion, $Prefix = ' ') {
+//   if (!$Force && Gdn::Controller()->Data('Category')) {
+//      return;
+//   }
    $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
    
    if ($Category) {

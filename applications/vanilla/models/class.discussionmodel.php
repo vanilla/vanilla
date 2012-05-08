@@ -399,21 +399,14 @@ class DiscussionModel extends VanillaModel {
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
 
       // Get the discussion IDs of the announcements.
-      $CacheKey = FALSE;
-      if (!$Wheres)
-         $CacheKey = 'Announcements';
-      elseif (is_array($Wheres) && isset($Wheres['d.CategoryID'])) {
-         $CacheKey = 'Announcements_'.$Wheres['d.CategoryID'];
-      }
-      $this->SQL
+      $CacheKey = 'Announcements';
+      
+      $AnnouncementIDs = $this->SQL
          ->Cache($CacheKey)
          ->Select('d.DiscussionID')
          ->From('Discussion d')
-         ->Where('d.Announce >', '0');
-      if (is_array($Wheres) && count($Wheres) > 0)
-         $this->SQL->Where($Wheres);
+         ->Where('d.Announce >', '0')->Get()->ResultArray();
 
-      $AnnouncementIDs = $this->SQL->Get()->ResultArray();
       $AnnouncementIDs = ConsolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
 
       // Short circuit querying when there are no announcements.
@@ -421,6 +414,9 @@ class DiscussionModel extends VanillaModel {
          return new Gdn_DataSet();
 
       $this->DiscussionSummaryQuery(array(), FALSE);
+      
+      if (!empty($Wheres))
+         $this->SQL->Where($Wheres);
 
       if ($UserID) {
          $this->SQL->Select('w.UserID', '', 'WatchUserID')
@@ -444,6 +440,8 @@ class DiscussionModel extends VanillaModel {
       // If we aren't viewing announcements in a category then only show global announcements.
       if (!$Wheres) {
          $this->SQL->Where('d.Announce', 1);
+      } else {
+         $this->SQL->Where('d.Announce >', 0);
       }
 
       // If we allow users to dismiss discussions, skip ones this user dismissed
@@ -606,10 +604,16 @@ class DiscussionModel extends VanillaModel {
       if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
          // Grab the counts from the faster category cache.
          if (isset($Wheres['d.CategoryID'])) {
-            if (is_array($Perms) && !in_array($Wheres['d.CategoryID'], $Perms)) {
+            $CategoryIDs = (array)$Wheres['d.CategoryID'];
+            if ($Perms === FALSE)
+               $CategoryIDs = array();
+            elseif (is_array($Perms))
+               $CategoryIDs = array_intersect($CategoryIDs, $Perms);
+            
+            if (count($CategoryIDs) == 0) {
                return 0;
             } else {
-               $Perms = array($Wheres['d.CategoryID']);
+               $Perms = $CategoryIDs;
             }
          }
          
@@ -953,7 +957,7 @@ class DiscussionModel extends VanillaModel {
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Fields));
+                  $CacheKeys = array('Announcements');
 
                   $Announce = GetValue('Announce', $Discussion);
                   $this->SQL->Cache($CacheKeys);
@@ -977,7 +981,7 @@ class DiscussionModel extends VanillaModel {
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Fields));
+                  $CacheKeys = array('Announcements');
 
                   $Announce = GetValue('Announce', $Discussion);
                   $this->SQL->Cache($CacheKeys);

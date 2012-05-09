@@ -1692,7 +1692,7 @@ div.Popup form ul li label.RadioLabel {
 .Tag.Category a {
    color: #000;
 }
-.Tag-Banned {
+.Tag.Tag-Banned {
    background-color: #C70028;
 }
 .Discussion .PageTitle h1 {

@@ -259,6 +259,12 @@ form .Button {
 .Buttons {
    margin-top: 10px;
 }
+.Buttons-Confirm {
+   text-align: center;
+}
+.Buttons-Confirm .Button {
+   min-width: 65px;
+}
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -1313,7 +1319,7 @@ pre code {
 .ProfileOptions {
 	float: right;
 }
-.ProfileOptions a {
+.ProfileOptions .NavButton {
    margin: 0 0 0 6px;
 }
 /* Hiding form headings with CSS in case the forms get popped */

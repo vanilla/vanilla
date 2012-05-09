@@ -204,29 +204,6 @@ function WritePageLink($Discussion, $PageNumber) {
 }
 endif;
 
-if (!function_exists('CssClass')):
-function CssClass($Discussion) {
-   static $Alt = FALSE;
-   $CssClass = 'Item';
-   $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
-   $CssClass .= $Alt ? ' Alt ' : '';
-   $Alt = !$Alt;
-   $CssClass .= $Discussion->Announce ? ' Announcement' : '';
-   $CssClass .= $Discussion->Closed == '1' ? ' Closed' : '';
-   $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
-   $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
-   
-   if (Gdn::Session()->IsValid()) {
-      if ($Discussion->CountUnreadComments <= 0)
-         $CssClass .= ' Read';
-      else
-         $CssClass .= ' New';
-   }
-   
-   return $CssClass;
-}
-endif;
-
 if (!function_exists('NewComments')):
 function NewComments($Discussion) {
    if (!Gdn::Session()->IsValid())

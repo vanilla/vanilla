@@ -1,32 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * Apply correct classes to the item.
- *
- * @since 2.1
- * @param DataSet $Object Comment or discussion.
- * @param int $CurrentOffset.
- * @return string CSS classes to apply.
- */
-if (!function_exists('CssClass')):
-function CssClass($Object, $CurrentOffset = 0) {
-   $Type = (GetValue('CommentID', $Object)) ? 'Comment' : 'Discussion';
-   $CssClass = 'Item Item'.$Type;
-   $CssClass .= (GetValue('InsertUserID', $Object) == Gdn::Session()->UserID) ? ' Mine' : '';
-   $CssClass .= IsMeAction($Object) ? ' MeAction' : '';
-   
-   if ($_CssClss = GetValue('_CssClass', $Object)) {
-      $CssClass .= ' '.$_CssClss;
-   }
-   
-   if ($Type == 'Comment')
-      $CssClass .= ($CurrentOffset % 2) ? ' Alt' : '';
-   
-   return $CssClass;
-}
-endif;
-
-/**
  * Format content of comment or discussion.
  *
  * Event argument for $Object will be 'Comment' or 'Discussion'.

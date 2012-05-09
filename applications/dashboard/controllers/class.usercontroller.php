@@ -684,4 +684,24 @@ class UserController extends DashboardController {
       $this->Render();
    }
    
+   public function Verify($UserID, $Verified) {
+      $this->Permission('Garden.Moderation.Manage');
+      
+      if (!$this->Request->IsPostBack()) {
+         throw PermissionException('Javascript');
+      }
+      
+      // First, set the field value.
+      Gdn::UserModel()->SetField($UserID, 'Verified', $Verified);
+      
+      $User = Gdn::UserModel()->GetID($UserID);
+      if (!$User)
+         throw NotFoundException('User');
+      
+      // Send back the verified button.
+      require_once $this->FetchViewLocation('helper_functions', 'Profile', 'Dashboard');
+      $this->JsonTarget('.User-Verified', UserVerified($User), 'ReplaceWith');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
+   }
 }

@@ -312,10 +312,10 @@ class UserController extends DashboardController {
          if ($this->Form->ErrorCount() == 0) {
             // Redirect after a successful save.
             if ($this->Request->Get('Target')) {
-                  $this->RedirectUrl = $this->Request->Get('Target');
-               } else {
-                  $this->RedirectUrl = UserUrl($User);
-               }
+               $this->RedirectUrl = $this->Request->Get('Target');
+            } else {
+               $this->RedirectUrl = UserUrl($User);
+            }
          }
       }
       
@@ -422,6 +422,29 @@ class UserController extends DashboardController {
       } catch (Exception $Ex) {
          $this->Form->AddError($Ex);
       }
+      $this->Render();
+   }
+   
+   public function DeleteContent($UserID) {
+      $this->Permission('Garden.Moderation.Manage');
+      
+      $User = Gdn::UserModel()->GetID($UserID);
+      if (!$User)
+         throw NotFoundException('User');
+      
+      if ($this->Request->IsPostBack()) {
+         Gdn::UserModel()->DeleteContent($UserID, array('Log' => TRUE));
+
+         if ($this->Request->Get('Target')) {
+            $this->RedirectUrl = $this->Request->Get('Target');
+         } else {
+            $this->RedirectUrl = UserUrl($User);
+         }
+      } else {
+         $this->SetData('Title', T('Are you sure you want to do this?'));
+      }
+      
+      $this->SetData('User', $User);
       $this->Render();
    }
    

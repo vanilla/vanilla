@@ -635,10 +635,10 @@ jQuery(document).ready(function($) {
    });
    
    // Close ToggleFlyout menu even if their links are hijacked
-//   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-//      $('.ToggleFlyout').removeClass('Open');
-//      $('.Flyout').hide();
-//   });
+   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+      $('.ToggleFlyout').removeClass('Open');
+      $('.Flyout').hide();
+   });
 
    $(document).delegate('#Body', 'click', function() {
       if (lastOpen) {

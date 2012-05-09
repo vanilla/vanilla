@@ -51,6 +51,11 @@ class DiscussionModel extends VanillaModel {
             break;
          case 'DateLastComment':
             $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column, 'DateInserted'));
+            $this->SQL
+               ->Update('Discussion')
+               ->Set('DateLastComment', 'DateInserted', FALSE, FALSE)
+               ->Where('DateLastComment', NULL)
+               ->Put();
             break;
          case 'LastCommentUserID':
             if (!$Max) {

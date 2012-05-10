@@ -453,7 +453,7 @@ endif;
 
 if (!function_exists('IsMeAction')):
    function IsMeAction($Comment) {
-      return strpos(trim($Comment->Body), '/me ') === 0;
+      return strpos(trim(GetValue('Body', $Comment)), '/me ') === 0;
    }
 endif; 
 

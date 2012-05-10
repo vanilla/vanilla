@@ -129,19 +129,35 @@ class CommentModel extends VanillaModel {
       $this->EventArguments['Offset'] =& $Offset;
       $this->FireEvent('BeforeGet');
       
-      $this->SQL
-         ->Where('c.DiscussionID', $DiscussionID);
-      
       $Page = PageNumber($Offset, $Limit);
       $PageWhere = $this->PageWhere($DiscussionID, $Page, $Limit);
       
       if ($PageWhere) {
+         $this->SQL
+            ->Where('c.DiscussionID', $DiscussionID);
+         
          $this->SQL->Where($PageWhere)->Limit($Limit + 10);
+         $this->OrderBy($this->SQL);
       } else {
-         $this->SQL->Limit($Limit, $Offset);
+         // Do an inner-query to force late-loading of comments.
+         $Sql2 = clone $this->SQL;
+         $Sql2->Reset();
+         $Sql2->Select('CommentID')
+            ->From('Comment c')
+            ->Where('c.DiscussionID', $DiscussionID, TRUE, FALSE)
+            ->Limit($Limit, $Offset);
+         $this->OrderBy($Sql2);
+         $Select = $Sql2->GetSelect();
+         
+         $Px = $this->SQL->Database->DatabasePrefix;
+         $this->SQL->Database->DatabasePrefix = '';
+         
+         $this->SQL->Join("($Select) c2", "c.CommentID = c2.CommentID");
+         $this->SQL->Database->DatabasePrefix = $Px;
+         
+//         $this->SQL->Limit($Limit, $Offset);
       }
       
-      $this->OrderBy($this->SQL);
       $this->Where($this->SQL);
 
       $Result = $this->SQL->Get();

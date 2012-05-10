@@ -85,6 +85,65 @@ if (!function_exists('CountString')) {
    }
 }
 
+if (!function_exists('CssClass')):
+   
+/** 
+ * Add CSS class names to a row depending on other elements/values in that row. 
+ * Used by category, discussion, and comment lists.
+ * 
+ * @staticvar boolean $Alt
+ * @param type $Row
+ * @return string The CSS classes to be inserted into the row.
+ */
+function CssClass($Row) {
+   static $Alt = FALSE;
+   $Row = (array)$Row;
+   $CssClass = 'Item';
+   $Session = Gdn::Session();
+
+   // Alt rows
+      if ($Alt)
+         $CssClass .= ' Alt';
+      $Alt = !$Alt;
+      
+   // Read/Unread
+      $CssClass .= ' '.(GetValue('Read', $Row) ? 'Read' : 'Unread');
+   
+   // Category list classes
+      if (array_key_exists('UrlCode', $Row))
+         $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
+   
+      if (array_key_exists('Depth', $Row))
+         $CssClass .= ' Depth-'.$Row['Depth'];
+      
+      if (array_key_exists('Archive', $Row))
+         $CssClass .= ' Archived';
+      
+   // Discussion list classes
+      $CssClass .= GetValue('Bookmarked', $Row) == '1' ? ' Bookmarked' : '';
+      $CssClass .= GetValue('Announce', $Row) ? ' Announcement' : '';
+      $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
+      $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
+      if (array_key_exists('CountUnreadComments', $Row))
+         $CssClass .= $Session->IsValid() && $Row['CountUnreadComments'] <= 0 ? ' Read' : ' New';
+      
+   // Comment list classes
+      if (array_key_exists('CommentID', $Row))
+          $CssClass .= ' ItemComment';
+      
+      if (array_key_exists('DiscussionID', $Row))
+          $CssClass .= ' ItemDiscussion';
+      
+      if (function_exists('IsMeAction'))
+         $CssClass .= IsMeAction($Row) ? ' MeAction' : '';
+      
+      if ($_CssClss = GetValue('_CssClass', $Row))
+         $CssClass .= ' '.$_CssClss;
+      
+   return $CssClass;
+}
+endif;
+
 /**
  * Writes an anchor tag
  */

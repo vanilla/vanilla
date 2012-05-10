@@ -13,30 +13,6 @@ function CategoryString($Rows) {
 }
 endif;
 
-if (!function_exists('CssClass')):
-   
-function CssClass($Row) {
-   $Row = (array)$Row;
-   
-   static $Alt = FALSE;
-   $ClassName = Gdn_Format::AlphaNumeric($Row['UrlCode']);
-   
-   $Result = "Item Depth{$Row['Depth']} Category-$ClassName";
-   $Result .= ' '.(GetValue('Read', $Row) ? 'Read' : 'Unread');
-   
-   if (GetValue('Archive', $Row))
-      $Result .= ' Archived';
-   
-   if ($Alt)
-      $Result .= ' Alt';
-   $Alt = !$Alt;
-   
-   return $Result;
-}
-
-endif;
-
-
 if (!function_exists('GetOptions')):
 /**
  * Render options that the user has for this discussion.

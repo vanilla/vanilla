@@ -452,8 +452,12 @@ function WriteEmbedCommentForm() {
 endif;
 
 if (!function_exists('IsMeAction')):
-   function IsMeAction($Comment) {
-      return strpos(trim(GetValue('Body', $Comment)), '/me ') === 0;
+   function IsMeAction($Row) {
+      $Row = (array)$Row;
+      if (!array_key_exists('Body', $Row))
+         return FALSE;
+      
+      return strpos(trim($Row['Body']), '/me ') === 0;
    }
 endif; 
 

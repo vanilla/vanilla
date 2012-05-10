@@ -631,22 +631,22 @@ class Gdn_Statistics extends Gdn_Plugin {
       // Add a pageview entry.
       $TimeSlot = date('Ymd');
       $Px = Gdn::Database()->DatabasePrefix;
-
+      
       try {
          if (C('Garden.Analytics.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
             $CacheKey = "QueryCache.Analytics.CountViews";
-
+            
             // Increment. If not success, create key.
             $Incremented = Gdn::Cache()->Increment($CacheKey);
             if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
                Gdn::Cache()->Store($CacheKey, 1);
-
+            
             // Get current cache value
             $Views = Gdn::Cache()->Get($CacheKey);
-
+            
             // Every X views, writeback to Discussions
             if (($Views % C('Garden.Analytics.Views.DenormalizeWriteback', 100)) == 0) {
-               Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
+               Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, {$Views})
                on duplicate key update Views = Views+{$Views}", array(
                    ':TimeSlot' => $TimeSlot
                ));

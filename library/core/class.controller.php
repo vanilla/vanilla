@@ -564,11 +564,12 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       $ReflectArgs = array();
       $OReflectArgs = GetValue('ReflectArgs', $this);
-      foreach ($OReflectArgs as $ArgName => $ArgParam) {
-         if (is_array($ArgParam) || is_object($ArgParam))
-            continue;
-         $ReflectArgs[$ArgName] = $ArgParam;
-      }
+      if (is_array($OReflectArgs))
+         foreach ($OReflectArgs as $ArgName => $ArgParam) {
+            if (is_array($ArgParam) || is_object($ArgParam))
+               continue;
+            $ReflectArgs[$ArgName] = $ArgParam;
+         }
       
       if (!array_key_exists('ResolvedArgs', $this->_Definitions))
          $this->_Definitions['ResolvedArgs'] = json_encode($ReflectArgs);

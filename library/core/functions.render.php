@@ -452,8 +452,12 @@ if (!function_exists('Wrap')) {
 		
       if (is_array($Attributes))
          $Attributes = Attribute($Attributes);
-         
-      return '<'.$Tag.$Attributes.'>'.$String.'</'.$Tag.'>';
+      
+      // Strip the first part of the tag as the closing tag - this allows us to 
+      // easily throw 'span class="something"' into the $Tag field.
+      $Space = strpos($Tag, ' ');
+      $ClosingTag = $Space ? substr($Tag, 0, $Space) : $Tag;         
+      return '<'.$Tag.$Attributes.'>'.$String.'</'.$ClosingTag.'>';
    }
 }
 

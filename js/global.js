@@ -134,7 +134,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 		
-	gdn = { focused: true };
+	gdn = {focused: true};
 	gdn.Libraries = {};
    
    $(window).blur(function() {
@@ -214,8 +214,8 @@ jQuery(document).ready(function($) {
          return;
       }
 
-      var width = $this.attr('popupWidth'); width = width ? width : 960;
-      var height = $this.attr('popupHeight'); height = height ? height : 600;
+      var width = $this.attr('popupWidth');width = width ? width : 960;
+      var height = $this.attr('popupHeight');height = height ? height : 600;
       var left = (screen.width - width) / 2;
       var top = (screen.height - height) / 2;
 
@@ -681,7 +681,11 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          type: 'post',
          url: StatsURL,
-         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path')},
+         data: {
+            'TransientKey': gdn.definition('TransientKey'), 
+            'Path': gdn.definition('Path'),
+            'ResolvedPath': gdn.definition('ResolvedPath')
+         },
          success: function(json) {
             gdn.inform(json);
          }

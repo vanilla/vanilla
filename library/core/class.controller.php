@@ -563,7 +563,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions['ResolvedPath'] = strtolower(CombinePaths(array(Gdn::Dispatcher()->Application(), Gdn::Dispatcher()->ControllerName, Gdn::Dispatcher()->ControllerMethod)));
       
       if (!array_key_exists('ResolvedArgs', $this->_Definitions))
-         $this->_Definitions['ResolvedArgs'] = json_encode($this->ReflectArgs);
+         $this->_Definitions['ResolvedArgs'] = json_encode(GetValue('ReflectArgs', $this));
 
       if (!array_key_exists('SignedIn', $this->_Definitions)) {
          if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {

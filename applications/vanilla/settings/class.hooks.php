@@ -513,9 +513,10 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
-      $Path = GetValue('Path', $Args);
-      $Args = GetValue('Args', $Args);
-      $ResolvedPath = GetValue('ResolvedPath', $Args);
+      $Path = Gdn::Request()->Post('Path');
+      $Args = Gdn::Request()->Post('Args');
+      $ResolvedPath = Gdn::Request()->Post('ResolvedPath');
+      
       $DiscussionID = NULL;
       
       // Comment permalink
@@ -546,6 +547,7 @@ class VanillaHooks implements Gdn_IPlugin {
       }
       
       if (!empty($DiscussionID)) {
+         Trace("Incrementing views for discussion {$DiscussionID}");
          $DiscussionModel = new DiscussionModel();
          $Discussion = $DiscussionModel->GetID($DiscussionID);
          $DiscussionModel->AddView($DiscussionID, GetValue('CountViews', $Discussion));

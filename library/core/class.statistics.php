@@ -366,6 +366,9 @@ class Gdn_Statistics extends Gdn_Plugin {
       
       Gdn::Statistics()->Tick();
       $this->FireEvent("AnalyticsTick");
+      
+      if (Debug())
+         $Sender->SetData('Trace', Trace());
 
       $Sender->Render('tick', 'statistics', 'dashboard');
    }

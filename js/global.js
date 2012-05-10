@@ -676,7 +676,9 @@ jQuery(document).ready(function($) {
          data: {
             'TransientKey': gdn.definition('TransientKey'), 
             'Path': gdn.definition('Path'),
-            'ResolvedPath': gdn.definition('ResolvedPath')
+            'Args': gdn.definition('Args'),
+            'ResolvedPath': gdn.definition('ResolvedPath'),
+            'ResolvedArgs': gdn.definition('ResolvedArgs')
          },
          success: function(json) {
             gdn.inform(json);

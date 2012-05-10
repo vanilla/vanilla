@@ -493,13 +493,31 @@ class VanillaHooks implements Gdn_IPlugin {
    
    public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
       $Path = GetValue('Path', $Args);
-      if (preg_match('`discussion\/(\d+)`i', $Path, $Matches)) {
-         $DiscussionID = $Matches[1];
-      } elseif(preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches)) {
+      $Args = GetValue('Args', $Args);
+      $ResolvedPath = GetValue('ResolvedPath', $Args);
+      
+      // Comment permalink
+      if ($ResolvedPath == 'vanilla/discussion/comment') {
+         preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches);
+         
          $CommentID = $Matches[1];
          $CommentModel = new CommentModel();
          $Comment = $CommentModel->GetID($CommentID);
          $DiscussionID = GetValue('DiscussionID', $Comment);
+      } 
+      
+      // Discussion link
+      elseif ($ResolvedPath == 'vanilla/discussion/index') {
+         preg_match('`discussion\/(\d+)`i', $Path, $Matches);
+         
+         $DiscussionID = $Matches[1];
+      } 
+      
+      // Embedded discussion
+      elseif ($ResolvedPath == 'vanilla/discussion/embed') {
+         preg_match('`vanilla_discussion_id=(\d+)`i', $Args, $Matches);
+         
+         $DiscussionID = $Matches[1];
       }
       
       if (isset($DiscussionID)) {

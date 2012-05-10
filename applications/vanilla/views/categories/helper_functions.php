@@ -16,6 +16,8 @@ endif;
 if (!function_exists('CssClass')):
    
 function CssClass($Row) {
+   $Row = (array)$Row;
+   
    static $Alt = FALSE;
    $ClassName = Gdn_Format::AlphaNumeric($Row['UrlCode']);
    
@@ -87,7 +89,7 @@ if (!function_exists('MostRecentString')):
       $R .= '<span class="MostRecent">';
       $R .= '<span class="MLabel">'.T('Most recent:').'</span> ';
       $R .= Anchor(
-         SliceString(Gdn_Format::Text($Row['LastTitle']), 30),
+         SliceString(Gdn_Format::Text($Row['LastTitle']), 150),
          $Row['LastUrl'],
          'LatestPostTitle');
 

@@ -125,6 +125,14 @@ class CategoriesController extends VanillaController {
 			$this->SetData('Breadcrumbs', array_merge(array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category))));
 			
 			$this->SetData('Category', $Category, TRUE);
+         
+         // Load the subtree.
+         if (C('Vanilla.ExpandCategories', TRUE))
+            $Categories = CategoryModel::GetSubtree($CategoryIdentifier);
+         else
+            $Categories = array($Category);
+         
+         $this->SetData('Categories', $Categories);
 	
 			// Setup head
 			$this->AddCssFile('vanilla.css');
@@ -151,7 +159,9 @@ class CategoriesController extends VanillaController {
 			
 			// Get a DiscussionModel
 			$DiscussionModel = new DiscussionModel();
-			$Wheres = array('d.CategoryID' => $this->CategoryID);
+         $CategoryIDs = ConsolidateArrayValuesByKey($this->Data('Categories'), 'CategoryID');
+			$Wheres = array('d.CategoryID' => $CategoryIDs);
+         $this->SetData('_ShowCategoryLink', count($CategoryIDs) > 1);
 			
 			// Check permission
 			$this->Permission('Vanilla.Discussions.View', TRUE, 'Category', GetValue('PermissionCategoryID', $Category));

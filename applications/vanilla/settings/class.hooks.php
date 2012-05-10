@@ -547,7 +547,6 @@ class VanillaHooks implements Gdn_IPlugin {
       }
       
       if (!empty($DiscussionID)) {
-         Trace("Incrementing views for discussion {$DiscussionID}");
          $DiscussionModel = new DiscussionModel();
          $Discussion = $DiscussionModel->GetID($DiscussionID);
          $DiscussionModel->AddView($DiscussionID, GetValue('CountViews', $Discussion));

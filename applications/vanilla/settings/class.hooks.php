@@ -516,32 +516,36 @@ class VanillaHooks implements Gdn_IPlugin {
       $Path = GetValue('Path', $Args);
       $Args = GetValue('Args', $Args);
       $ResolvedPath = GetValue('ResolvedPath', $Args);
+      $DiscussionID = NULL;
       
       // Comment permalink
       if ($ResolvedPath == 'vanilla/discussion/comment') {
-         preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches);
+         $Matched = preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches);
          
-         $CommentID = $Matches[1];
-         $CommentModel = new CommentModel();
-         $Comment = $CommentModel->GetID($CommentID);
-         $DiscussionID = GetValue('DiscussionID', $Comment);
+         if ($Matched) {
+            $CommentID = $Matches[1];
+            $CommentModel = new CommentModel();
+            $Comment = $CommentModel->GetID($CommentID);
+            $DiscussionID = GetValue('DiscussionID', $Comment);
+         }
       } 
       
       // Discussion link
       elseif ($ResolvedPath == 'vanilla/discussion/index') {
-         preg_match('`discussion\/(\d+)`i', $Path, $Matches);
+         $Matched = preg_match('`discussion\/(\d+)`i', $Path, $Matches);
          
-         $DiscussionID = $Matches[1];
+         if ($Matched)
+            $DiscussionID = $Matches[1];
       } 
       
       // Embedded discussion
       elseif ($ResolvedPath == 'vanilla/discussion/embed') {
-         preg_match('`vanilla_discussion_id=(\d+)`i', $Args, $Matches);
-         
-         $DiscussionID = $Matches[1];
+         $Matched = preg_match('`vanilla_discussion_id=(\d+)`i', $Args, $Matches);
+         if ($Matched)
+            $DiscussionID = $Matches[1];
       }
       
-      if (isset($DiscussionID)) {
+      if (!empty($DiscussionID)) {
          $DiscussionModel = new DiscussionModel();
          $Discussion = $DiscussionModel->GetID($DiscussionID);
          $DiscussionModel->AddView($DiscussionID, GetValue('CountViews', $Discussion));

@@ -381,10 +381,13 @@ class Gdn_Controller extends Gdn_Pluggable {
       } else if ($AssetName == '') {
          $this->Assets[$AssetContainer][] = $Asset;
       } else {
-         if (isset($this->Assets[$AssetContainer][$AssetName]))
+         if (isset($this->Assets[$AssetContainer][$AssetName])) {
+            if (!is_string($Asset))
+               $Asset = $Asset->ToString();
             $this->Assets[$AssetContainer][$AssetName] .= $Asset;
-         else
+         } else {
             $this->Assets[$AssetContainer][$AssetName] = $Asset;
+         }
       }
    }
 

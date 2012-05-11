@@ -1216,7 +1216,7 @@ overflow: hidden; */
 .Item.Read .Title, .Item.Read .BlockTitle {
     font-weight: normal;
 }
-.Checked {
+.Item.Checked {
     background: #ffc;
 }
 /*

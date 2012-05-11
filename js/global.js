@@ -11,6 +11,17 @@ jQuery(document).ready(function($) {
    $('input:hidden[name$=ClientHour]').livequery(function() {
       $(this).val(clientDate);
    });
+   
+   // Add "checked" class to item rows if checkboxes are checked within.
+   checkItems = function() {
+      var container = $(this).parents('.Item');
+      if ($(this).attr('checked') == 'checked')
+         $(container).addClass('Checked');
+      else
+         $(container).removeClass('Checked');
+   }
+   $('.Item :checkbox').each(checkItems);
+   $('.Item :checkbox').change(checkItems);
 
    // Ajax/Save the ClientHour if it is different from the value in the db.
    $('input:hidden[id$=SetClientHour]').livequery(function() {

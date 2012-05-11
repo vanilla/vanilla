@@ -369,9 +369,9 @@ jQuery(document).ready(function($) {
    /* Comment Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
-         $('.DataList .AdminCheck :checkbox').attr('checked', 'checked');
+         $('.DataList .AdminCheck :checkbox').attr('checked', 'checked').change();
       else
-         $('.DataList .AdminCheck :checkbox').removeAttr('checked');
+         $('.DataList .AdminCheck :checkbox').removeAttr('checked').change();
    });
    $('.AdminCheck :checkbox').click(function(e) {
       e.stopPropagation();

@@ -12,12 +12,14 @@ class TraceModule extends Gdn_Module {
    }
    
    public function ToString() {
-      $Traces = Trace();
-      if (!$Traces)
-         return;
+      try {
+         $Traces = Trace();
+         if (!$Traces)
+            return '';
+
+         $this->SetData('Traces', $Traces);
       
-      $this->SetData('Traces', $Traces);
-      
-      return $this->FetchView();
+         return $this->FetchView();
+      } catch (Exception $Ex) { return $Ex->getMessage(); }
    }
 }

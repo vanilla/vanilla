@@ -47,7 +47,7 @@ echo $this->Form->Errors();
                <td><?php
                echo $Picture;
                if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-                  echo Wrap(Anchor(T('Remove Picture'), '/profile/removepicture/'.rawurldecode($this->User->Name).'/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Button PopConfirm'), 'p');
+                  echo Wrap(Anchor(T('Remove Picture'), '/profile/removepicture/'.rawurldecode($this->User->Name).'/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Button Danger PopConfirm'), 'p');
                ?>
                </td>
                <td><?php

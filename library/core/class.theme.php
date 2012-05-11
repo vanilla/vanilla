@@ -260,7 +260,7 @@ class Gdn_Theme {
       echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
    }
 
-   public static function Module($Name) {
+   public static function Module($Name, $Properties = array()) {
       try {
          if (!class_exists($Name)) {
             if (Debug())
@@ -269,8 +269,12 @@ class Gdn_Theme {
                $Result = "<!-- Error: $Name doesn't exist -->";
          } else {
                $Module = new $Name(Gdn::Controller(), '');
+               $Module->Visible = TRUE;
+               foreach ($Properties as $Name => $Value) {
+                  $Module->$Name = $Value;
+               }
+               
                $Result = $Module->ToString();
-
          }
       } catch (Exception $Ex) {
          if (Debug())

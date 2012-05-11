@@ -66,11 +66,10 @@ if (!function_exists('BookmarkButton')) {
 
 if (!function_exists('CategoryLink')):
    
-function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
-   if (!$Force && Gdn::Controller()->Data('Category')) {
-      return;
-   }
-   
+function CategoryLink($Discussion, $Prefix = ' ') {
+//   if (!$Force && Gdn::Controller()->Data('Category')) {
+//      return;
+//   }
    $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
    
    if ($Category) {
@@ -201,29 +200,6 @@ endif;
 if (!function_exists('WritePageLink')):
 function WritePageLink($Discussion, $PageNumber) {
    echo Anchor($PageNumber, DiscussionUrl($Discussion, $PageNumber));
-}
-endif;
-
-if (!function_exists('CssClass')):
-function CssClass($Discussion) {
-   static $Alt = FALSE;
-   $CssClass = 'Item';
-   $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
-   $CssClass .= $Alt ? ' Alt ' : '';
-   $Alt = !$Alt;
-   $CssClass .= $Discussion->Announce ? ' Announcement' : '';
-   $CssClass .= $Discussion->Closed == '1' ? ' Closed' : '';
-   $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
-   $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
-   
-   if (Gdn::Session()->IsValid()) {
-      if ($Discussion->CountUnreadComments <= 0)
-         $CssClass .= ' Read';
-      else
-         $CssClass .= ' New';
-   }
-   
-   return $CssClass;
 }
 endif;
 

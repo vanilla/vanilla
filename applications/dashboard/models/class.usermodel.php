@@ -1319,6 +1319,7 @@ class UserModel extends Gdn_Model {
             $UserID = FALSE;
          }
       } else {
+//         decho($this->Validation->ResultsText());
          $UserID = FALSE;
       }
       
@@ -1756,6 +1757,10 @@ class UserModel extends Gdn_Model {
       $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
       if (!is_array($RoleIDs) || count($RoleIDs) == 0)
          throw new Exception(T('The default role has not been configured.'), 400);
+      
+      if (GetValue('SaveRoles', $Options)) {
+         $RoleIDs = GetValue('RoleID', $FormPostValues);
+      }
 
       $UserID = FALSE;
 

@@ -341,13 +341,14 @@ class Gdn_Format {
 				$Result = substr($Result, 0, -2);
 				
 			$Result .= $Suffix;
-         if ($Format == 'html')
-            $Result = Wrap($Result, 'span', array('title' => number_format($Number)));
-
-         return $Result;
       } else {
-         return $Number;
+         $Result = $Number;
       }
+      
+      if ($Format == 'html')
+         $Result = Wrap($Result, 'span', array('title' => number_format($Number)));
+      
+      return $Result;
    }
 
    /** Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.

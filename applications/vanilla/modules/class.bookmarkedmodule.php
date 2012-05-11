@@ -12,11 +12,19 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders recently active bookmarked discussions
  */
 class BookmarkedModule extends Gdn_Module {
+   public $Limit = 10;
+   public $Help = FALSE;
+   public $ListID = 'Bookmark_List';
    
-   public function GetData($Limit = 10) {
+   public function __construct() {
+      parent::__construct();
+      $this->_ApplicationFolder = 'vanilla';
+      $this->Visible = C('Vanilla.Modules.ShowBookmarkedModule', TRUE);
+   }
+   
+   public function GetData() {
       $this->Data = FALSE;
-      $this->Limit = $Limit;
-      if (Gdn::Session()->IsValid() && C('Vanilla.Modules.ShowBookmarkedModule', TRUE)) {
+      if (Gdn::Session()->IsValid()) {
          $BookmarkIDs = Gdn::SQL()
             ->Select('DiscussionID')
             ->From('UserDiscussion')
@@ -37,7 +45,8 @@ class BookmarkedModule extends Gdn_Module {
                array( 'w.Bookmarked' => '1' )
             );
          } else {
-            $this->Data = FALSE;
+            
+            $this->Data = new Gdn_DataSet();
          }
       }
    }
@@ -50,7 +59,7 @@ class BookmarkedModule extends Gdn_Module {
       if (!isset($this->Data))
          $this->GetData();
       
-      if (is_object($this->Data) && $this->Data->NumRows() > 0)
+      if (is_object($this->Data) && ($this->Data->NumRows() > 0 || $this->Help))
          return parent::ToString();
       
       return '';

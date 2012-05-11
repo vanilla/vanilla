@@ -69,9 +69,13 @@ class CommentModel extends VanillaModel {
          $New[] = GetValueR(($Limit - 1).'.DateInserted', $Result);
       
       if ($Curr != $New) {
+         Trace('CommentModel->CachePageWhere()');
+         
          $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
          Gdn::Cache()->Store($CacheKey, $New, array(Gdn_Cache::FEATURE_EXPIRY => 86400));
-         Gdn::Controller()->SetData('_PageCacheStore', array($CacheKey, $New));
+         
+         Trace($New, $CacheKey);
+//         Gdn::Controller()->SetData('_PageCacheStore', array($CacheKey, $New));
       }
    }
    
@@ -242,7 +246,9 @@ class CommentModel extends VanillaModel {
       
       $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
       $Value = Gdn::Cache()->Get($CacheKey);
-      Gdn::Controller()->SetData('_PageCache', array($CacheKey, $Value));
+      Trace('CommentModel->PageWhere()');
+      Trace($Value, $CacheKey);
+//      Gdn::Controller()->SetData('_PageCache', array($CacheKey, $Value));
       if ($Value === FALSE) {
          return FALSE;
       } elseif (is_array($Value)) {

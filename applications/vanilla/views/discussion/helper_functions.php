@@ -1,32 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * Apply correct classes to the item.
- *
- * @since 2.1
- * @param DataSet $Object Comment or discussion.
- * @param int $CurrentOffset.
- * @return string CSS classes to apply.
- */
-if (!function_exists('CssClass')):
-function CssClass($Object, $CurrentOffset = 0) {
-   $Type = (GetValue('CommentID', $Object)) ? 'Comment' : 'Discussion';
-   $CssClass = 'Item Item'.$Type;
-   $CssClass .= (GetValue('InsertUserID', $Object) == Gdn::Session()->UserID) ? ' Mine' : '';
-   $CssClass .= IsMeAction($Object) ? ' MeAction' : '';
-   
-   if ($_CssClss = GetValue('_CssClass', $Object)) {
-      $CssClass .= ' '.$_CssClss;
-   }
-   
-   if ($Type == 'Comment')
-      $CssClass .= ($CurrentOffset % 2) ? ' Alt' : '';
-   
-   return $CssClass;
-}
-endif;
-
-/**
  * Format content of comment or discussion.
  *
  * Event argument for $Object will be 'Comment' or 'Discussion'.
@@ -229,6 +203,10 @@ function GetDiscussionOptions($Discussion = NULL) {
    // Can the user close?
    if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
       $Options['CloseDiscussion'] = array('Label' => T($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Hijack');
+   
+   if ($CanEdit && GetValueR('Attributes.ForeignUrl', $Discussion)) {
+      $Options['RefetchPage'] = array('Label' => T('Refetch Page'), 'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID, 'Class' => 'Hijack');
+   }
 
    // Can the user delete?
    if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID))
@@ -474,8 +452,12 @@ function WriteEmbedCommentForm() {
 endif;
 
 if (!function_exists('IsMeAction')):
-   function IsMeAction($Comment) {
-      return strpos(trim($Comment->Body), '/me ') === 0;
+   function IsMeAction($Row) {
+      $Row = (array)$Row;
+      if (!array_key_exists('Body', $Row))
+         return FALSE;
+      
+      return strpos(trim($Row['Body']), '/me ') === 0;
    }
 endif; 
 

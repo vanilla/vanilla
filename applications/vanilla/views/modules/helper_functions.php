@@ -1,19 +1,24 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteModuleDiscussion($Discussion) {
+function WriteModuleDiscussion($Discussion, $Px = 'Bookmark') {
 ?>
-<li id="<?php echo 'Bookmark_'.$Discussion->DiscussionID; ?>">
-   <strong><?php
-      echo Anchor(Gdn_Format::Text($Discussion->Name, FALSE), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
-   ?></strong>
+<li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
+   <span class="Options">
+      <?php
+//      echo OptionsList($Discussion);
+      echo BookmarkButton($Discussion);
+      ?>
+   </span>
+   <div class="Title"><?php
+      echo Anchor(Gdn_Format::Text($Discussion->Name, FALSE), DiscussionUrl($Discussion).($Discussion->CountCommentWatch > 0 ? '#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+   ?></div>
    <div class="Meta">
       <?php   
          $Last = new stdClass();
          $Last->UserID = $Discussion->LastUserID;
          $Last->Name = $Discussion->LastName;
          
-         if ($Discussion->CountUnreadComments > 0 || $Discussion->CountUnreadComments === '')
-            echo '<span class="MItem HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new').'</span> ';
+         echo NewComments($Discussion);
          
          echo '<span class="MItem">'.Gdn_Format::Date($Discussion->LastDate, 'html').UserAnchor($Last).'</span>';         
       ?>

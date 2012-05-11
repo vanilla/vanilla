@@ -575,7 +575,7 @@ class Gdn_Validation {
     *
     * @param string $FieldName The name of the form field that has the error.
     * @param string $ErrorCode The translation code of the error.
-    *    Codes thst begin with an '@' symbol are treated as literals and not translated.
+    *    Codes that begin with an '@' symbol are treated as literals and not translated.
     */
    public function AddValidationResult($FieldName, $ErrorCode = '') {
       if (!is_array($this->_ValidationResults))

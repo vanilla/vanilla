@@ -39,6 +39,11 @@ class DiscussionController extends VanillaController {
    public $CategoryID;
    
    /**
+    * @var DiscussionModel 
+    */
+   public $DiscussionModel;
+   
+   /**
     * Default single discussion display.
     * 
     * @since 2.0.0
@@ -128,6 +133,8 @@ class DiscussionController extends VanillaController {
       
       // Set the canonical url to have the proper page title.
       $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, FALSE)));
+      
+//      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
       
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
@@ -827,6 +834,47 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
+   }
+   
+   /**
+    * Re-fetch a discussion's content based on its foreign url.
+    * @param type $DiscussionID 
+    */
+   public function RefetchPageInfo($DiscussionID) {
+      // Make sure we are posting back.
+      if (count($this->Request->Post()) == 0)
+         throw PermissionException('Javascript');
+      
+      // Grab the discussion.
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      // Make sure the user has permission to edit this discussion.
+      $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      $ForeignUrl = GetValueR('Attributes.ForeignUrl', $Discussion);
+      if (!$ForeignUrl) {
+         throw new Gdn_UserException(T("This discussion isn't associated with a url."));
+      }
+      
+      $Stub = $this->DiscussionModel->FetchPageInfo($ForeignUrl);
+//      decho($Stub);
+//      die();
+      
+      // Save the stub.
+      $this->DiscussionModel->SetField($DiscussionID, (array)$Stub);
+      
+      // Send some of the stuff back.
+      if (isset($Stub['Name']))
+         $this->JsonTarget('.PageTitle h1', Gdn_Format::Text($Stub['Name']));
+      if (isset($Stub['Body']))
+         $this->JsonTarget("#Discussion_$DiscussionID .Message", Gdn_Format::To($Stub['Body'], $Stub['Format']));
+      
+      $this->InformMessage('The page was successfully fetched.');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
    protected function _SetOpenGraph() {

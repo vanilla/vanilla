@@ -11,6 +11,17 @@ jQuery(document).ready(function($) {
    $('input:hidden[name$=ClientHour]').livequery(function() {
       $(this).val(clientDate);
    });
+   
+   // Add "checked" class to item rows if checkboxes are checked within.
+   checkItems = function() {
+      var container = $(this).parents('.Item');
+      if ($(this).attr('checked') == 'checked')
+         $(container).addClass('Checked');
+      else
+         $(container).removeClass('Checked');
+   }
+   $('.Item :checkbox').each(checkItems);
+   $('.Item :checkbox').change(checkItems);
 
    // Ajax/Save the ClientHour if it is different from the value in the db.
    $('input:hidden[id$=SetClientHour]').livequery(function() {
@@ -134,7 +145,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 		
-	gdn = { focused: true };
+	gdn = {focused: true};
 	gdn.Libraries = {};
    
    $(window).blur(function() {
@@ -214,8 +225,8 @@ jQuery(document).ready(function($) {
          return;
       }
 
-      var width = $this.attr('popupWidth'); width = width ? width : 960;
-      var height = $this.attr('popupHeight'); height = height ? height : 600;
+      var width = $this.attr('popupWidth');width = width ? width : 960;
+      var height = $this.attr('popupHeight');height = height ? height : 600;
       var left = (screen.width - width) / 2;
       var top = (screen.height - height) / 2;
 
@@ -530,7 +541,7 @@ jQuery(document).ready(function($) {
                $elem.html(data);
             },
             complete: function() {
-               $elem.removeClass('Progress TinyProgress');
+               $elem.removeClass('Progress TinyProgress InProgress');
                if (settings.complete != undefined) {
                   settings.complete($elem);
                }
@@ -597,6 +608,7 @@ jQuery(document).ready(function($) {
         } else if ($(e.target).hasClass('Hijack') || $(e.target).closest('a').hasClass('Hijack')) {
            return;
         }
+        e.stopPropagation();
       
       // Dynamically fill the flyout.
       var rel = $(this).attr('rel');
@@ -634,10 +646,17 @@ jQuery(document).ready(function($) {
    });
    
    // Close ToggleFlyout menu even if their links are hijacked
-//   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-//      $('.ToggleFlyout').removeClass('Open');
-//      $('.Flyout').hide();
-//   });
+   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+      $('.ToggleFlyout').removeClass('Open');
+      $('.Flyout').hide();
+   });
+
+   $(document).delegate('#Body', 'click', function() {
+      if (lastOpen) {
+         $('.Flyout', lastOpen).hide();
+         $(lastOpen).removeClass('Open');
+      }
+   });
    
    // Add a spinner onclick of buttons with this class
    $(document).delegate('input.SpinOnClick', 'click', function() {
@@ -673,7 +692,13 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          type: 'post',
          url: StatsURL,
-         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path')},
+         data: {
+            'TransientKey': gdn.definition('TransientKey'), 
+            'Path': gdn.definition('Path'),
+            'Args': gdn.definition('Args'),
+            'ResolvedPath': gdn.definition('ResolvedPath'),
+            'ResolvedArgs': gdn.definition('ResolvedArgs')
+         },
          success: function(json) {
             gdn.inform(json);
          }
@@ -956,6 +981,18 @@ jQuery(document).ready(function($) {
       }
       return x1 + x2;
    }
+   
+   Array.prototype.sum = function(){
+      for(var i=0,sum=0;i<this.length;sum+=this[i++]);
+      return sum;
+   }
+   Array.prototype.max = function(){
+      return Math.max.apply({},this)
+   }
+   Array.prototype.min = function(){
+      return Math.min.apply({},this)
+   }
+   
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.

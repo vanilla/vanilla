@@ -20,6 +20,7 @@ $Controller = Gdn::Controller();
    }
    $Controller->FireEvent('AfterProfileOptions');
    
+   $this->EventArguments['UserID'] = $Controller->User->UserID;
    $this->FireEvent('AdvancedProfileOptions');
    $Advanced = $this->Data('Advanced');
    if (!empty($Advanced)) {

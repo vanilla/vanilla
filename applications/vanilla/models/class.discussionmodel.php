@@ -891,7 +891,7 @@ class DiscussionModel extends VanillaModel {
       // Define the primary key in this model's table.
       $this->DefineSchema();
       
-      // Add & apply any extra validation rules:      
+      // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Body', 'Required');
       $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
@@ -941,7 +941,15 @@ class DiscussionModel extends VanillaModel {
 		$this->FireEvent('BeforeSaveDiscussion');
          
       // Validate the form posted values
-      if ($this->Validate($FormPostValues, $Insert)) {
+      $this->Validate($FormPostValues, $Insert);
+      $ValidationResults = $this->ValidationResults();
+      
+      // If the body is not required, remove it's validation errors.
+      $BodyRequired = C('Vanilla.DiscussionBody.Required', TRUE);
+      if (!$BodyRequired && array_key_exists('Body', $ValidationResults))
+         unset($ValidationResults['Body']);
+      
+      if (count($ValidationResults) == 0) {
          // If the post is new and it validates, make sure the user isn't spamming
          if (!$Insert || !$this->CheckForSpam('Discussion')) {
             // Get all fields on the form that relate to the schema

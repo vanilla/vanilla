@@ -14,10 +14,6 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo $this->Form->Open();
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');
-		echo '<div class="P">';
-			echo $this->Form->Label('Discussion Title', 'Name');
-			echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
-		echo '</div>';
 
       if ($this->ShowCategorySelector === TRUE) {
 			echo '<div class="P">';
@@ -28,6 +24,11 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 			echo '</div>';
       }
       
+      echo '<div class="P">';
+			echo $this->Form->Label('Discussion Title', 'Name');
+			echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
+		echo '</div>';
+
       $this->FireEvent('BeforeBodyInput');
 		echo '<div class="P">';
 	      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'format' => $this->Data('Discussion.Format'))), 'div', array('class' => 'TextBoxWrapper'));

@@ -815,7 +815,7 @@ if (!function_exists('DomGetImages')) {
                continue;
             
             // Don't take a banner-shaped image.
-            if ($Height * 5 < $Width)
+            if ($Height * 4 < $Width)
                continue;
             
             // Prefer images that are less than 800px wide (banners?)

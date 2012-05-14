@@ -17,8 +17,8 @@
  * Html:
  * <div class="Options">
  *    <div class="Option">
- *       <input class="OptionInput1" type="text" name="input1[]" placeholder="Add option 1..." />
- *       <input class="OptionInput2" type="text" name="input2[]" placeholder="Add option 2..." />
+ *       <input class="OptionInput1 NoIE" type="text" name="input1[]" placeholder="Add option 1..." />
+ *       <input class="OptionInput2 NoIE" type="text" name="input2[]" placeholder="Add option 2..." />
  *    </div>
  * </div>
  * <a href="#" class="AddOption">Add another option...</a>
@@ -36,14 +36,27 @@ jQuery(document).ready(function($) {
          minItems:            2, // The minimum number of template copies to display
          maxItems:            10, // The maximum number of template copies to display (0 is infinite)
          hideButtonAfterMax:  true, // Hide the add button after you hit the max # of items
-         autoAdd:             true // Automatically add another when tabbing away from the last input in the last row
+         autoAdd:             true, // Automatically add another when tabbing away from the last input in the last row
+         curLength:           0
       }      
       settings = $.extend({}, settings, options);
       var btn = $(settings.addButton),
          tpl = this;
+         
+      // If more than one match was found, use the first one.
+      if (tpl.length > 1) {
+         // Make sure to add a new row on blur of the last row.
+         if (tpl.length <= settings.maxItems) {
+            var last = $(tpl[tpl.length-1]);
+            var textbox = $(last).is('input,textarea') ? last : last.find('input,textarea').last();
+            $(textbox).addClass('DuplicateAutoAddOnBlur');
+         }
+         
+         tpl = $(tpl[0]); // Use the first one as the template.
+      }
 
       // Don't do anything unless the required elements are present.
-      if (btn.length != 1 || tpl.length != 1 || settings.minItems > settings.maxItems)
+      if (btn.length != 1 || !tpl || settings.minItems > settings.maxItems)
          return;
 
       // Get the container
@@ -54,20 +67,24 @@ jQuery(document).ready(function($) {
          tpl.hide();
 
       // Add an item on button click   
-      var length = 0, noFocus = false;
+      var noFocus = false;
+      settings.curLength = container.children().length;
+      if (settings.hideTemplate)
+         settings.curLength = settings.curLength - 1;
+      
       btn.live('click', function() {
          // Don't add more than we're allowed
-         if (length >= settings.maxItems)
+         if (settings.curLength >= settings.maxItems)
             return false;
          
          container.append(tpl.clone().show());
-         length++;
+         settings.curLength++;
 
          // Hide the button when we've reached our limit.
-         if (length >= settings.maxItems && settings.hideButtonAfterMax)
+         if (settings.curLength >= settings.maxItems && settings.hideButtonAfterMax)
             btn.hide();
          
-         var lastItem = container.find($(tpl).selector).last(),
+         var lastItem = container.children().last(),
             textbox = null;
             
          // Focus on the first input in the newly added clone
@@ -77,7 +94,7 @@ jQuery(document).ready(function($) {
          }
          
          // Identify the last element in the row so it can be duplicated on blur.
-         if (settings.autoAdd && length < settings.maxItems) {
+         if (settings.autoAdd && settings.curLength < settings.maxItems) {
             // Remove the class from previously added rows
             $('.DuplicateAutoAddOnBlur').removeClass('DuplicateAutoAddOnBlur'); 
             // Add the class to this row
@@ -89,12 +106,13 @@ jQuery(document).ready(function($) {
       });
       // Add a new row when the last input in the last row is blurred.
       $('.DuplicateAutoAddOnBlur').live('blur', function() {
-         btn.click();
+         if ($(this).val() != '')
+            btn.click();
       });
 
       // Add the minimum number of items
       if (settings.minItems > 0)
-         for (i = 0; i < settings.minItems; i++) {
+         while (settings.curLength < settings.minItems) {
             noFocus = true;
             btn.click();
          }

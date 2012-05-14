@@ -144,6 +144,10 @@ class CategoryModel extends Gdn_Model {
             $Data = $this->SQL
                ->Select('d.CategoryID')
                ->Select('c.CommentID', 'max', 'LastCommentID')
+               ->Select('d.DiscussionID', 'max', 'LastDiscussionID')
+               ->Select('c.DateInserted', 'max', 'DateLastComment')
+               ->Select('d.DateInserted', 'max', 'DateLastDiscussion')
+         
                ->From('Comment c')
                ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
                ->GroupBy('d.CategoryID')
@@ -152,7 +156,7 @@ class CategoryModel extends Gdn_Model {
             // Now we have to grab the discussions associated with these comments.
             $CommentIDs = ConsolidateArrayValuesByKey($Data, 'LastCommentID');
             
-            // Grab the discussions.
+            // Grab the discussions for the comments.
             $this->SQL
                ->Select('c.CommentID, c.DiscussionID')
                ->From('Comment c')
@@ -167,12 +171,15 @@ class CategoryModel extends Gdn_Model {
                $CommentID = $Row['LastCommentID'];
                $DiscussionID = GetValueR("$CommentID.DiscussionID", $Discussions, NULL);
                
+               $DateLastComment = Gdn_Format::ToTimestamp($Row['DateLastComment']);
+               $DateLastDiscussion = Gdn_Format::ToTimestamp($Row['DateLastDiscussion']);
+               
                $Set = array('LastCommentID' => $CommentID);
                
                if ($DiscussionID) {
                   $LastDiscussionID = GetValue('LastDiscussionID', $Category);
                   
-                  if ($DiscussionID > $LastDiscussionID) {
+                  if ($DateLastDiscussion > $DateLastComment) {
                      // The most recent discussion is from this comment.
                      $Set['LastDiscussionID'] = $DiscussionID;
                   } else {

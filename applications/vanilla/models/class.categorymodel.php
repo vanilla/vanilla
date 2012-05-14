@@ -179,7 +179,7 @@ class CategoryModel extends Gdn_Model {
                if ($DiscussionID) {
                   $LastDiscussionID = GetValue('LastDiscussionID', $Category);
                   
-                  if ($DateLastDiscussion > $DateLastComment) {
+                  if ($DateLastComment >= $DateLastDiscussion) {
                      // The most recent discussion is from this comment.
                      $Set['LastDiscussionID'] = $DiscussionID;
                   } else {

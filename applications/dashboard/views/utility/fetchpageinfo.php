@@ -38,7 +38,7 @@ if (count($Images) > 1) {
    
    array_shift($Images);
    foreach ($Images as $Src) {
-      
+      echo Img($Src);
    }  
 }
 

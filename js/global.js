@@ -494,7 +494,7 @@ jQuery(document).ready(function($) {
 
    // Fill in placeholders.
    if (!gdn.elementSupports('input', 'placeholder')) {
-      $('input:text,textarea').each(function() {
+      $('input:text,textarea').not('.NoIE').each(function() {
          var $this = $(this);
          var placeholder = $this.attr('placeholder');
          

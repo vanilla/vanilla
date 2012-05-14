@@ -235,7 +235,8 @@ function WriteTableRow($Row, $Depth = 1) {
             echo Anchor(
                SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
                $Row['LastUrl'],
-               'BlockTitle LatestPostTitle');
+               'BlockTitle LatestPostTitle',
+               array('title' => html_entity_decode($Row['LastTitle'])));
             ?>
             <div class="Meta">
                <?php

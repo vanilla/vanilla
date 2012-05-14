@@ -17,8 +17,8 @@
  * Html:
  * <div class="Options">
  *    <div class="Option">
- *       <input class="OptionInput1" type="text" name="input1[]" placeholder="Add option 1..." />
- *       <input class="OptionInput2" type="text" name="input2[]" placeholder="Add option 2..." />
+ *       <input class="OptionInput1 NoIE" type="text" name="input1[]" placeholder="Add option 1..." />
+ *       <input class="OptionInput2 NoIE" type="text" name="input2[]" placeholder="Add option 2..." />
  *    </div>
  * </div>
  * <a href="#" class="AddOption">Add another option...</a>
@@ -73,7 +73,6 @@ jQuery(document).ready(function($) {
          settings.curLength = settings.curLength - 1;
       
       btn.live('click', function() {
-         console.log(settings.curLength, 'curlen');
          // Don't add more than we're allowed
          if (settings.curLength >= settings.maxItems)
             return false;
@@ -96,7 +95,6 @@ jQuery(document).ready(function($) {
          
          // Identify the last element in the row so it can be duplicated on blur.
          if (settings.autoAdd && settings.curLength < settings.maxItems) {
-            console.log('add class');
             // Remove the class from previously added rows
             $('.DuplicateAutoAddOnBlur').removeClass('DuplicateAutoAddOnBlur'); 
             // Add the class to this row
@@ -108,7 +106,6 @@ jQuery(document).ready(function($) {
       });
       // Add a new row when the last input in the last row is blurred.
       $('.DuplicateAutoAddOnBlur').live('blur', function() {
-         console.log('add on blur');
          if ($(this).val() != '')
             btn.click();
       });
@@ -116,7 +113,6 @@ jQuery(document).ready(function($) {
       // Add the minimum number of items
       if (settings.minItems > 0)
          while (settings.curLength < settings.minItems) {
-            console.log(settings.minItems, 'minItems');
             noFocus = true;
             btn.click();
          }

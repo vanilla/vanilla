@@ -144,12 +144,55 @@ class CategoryModel extends Gdn_Model {
             $Data = $this->SQL
                ->Select('d.CategoryID')
                ->Select('c.CommentID', 'max', 'LastCommentID')
+               ->Select('d.DiscussionID', 'max', 'LastDiscussionID')
+               ->Select('c.DateInserted', 'max', 'DateLastComment')
+               ->Select('d.DateInserted', 'max', 'DateLastDiscussion')
+         
                ->From('Comment c')
                ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
                ->GroupBy('d.CategoryID')
                ->Get()->ResultArray();
+            
+            // Now we have to grab the discussions associated with these comments.
+            $CommentIDs = ConsolidateArrayValuesByKey($Data, 'LastCommentID');
+            
+            // Grab the discussions for the comments.
+            $this->SQL
+               ->Select('c.CommentID, c.DiscussionID')
+               ->From('Comment c')
+               ->WhereIn('c.CommentID', $CommentIDs);
+            
+            $Discussions =  $this->SQL->Get()->ResultArray();
+            $Discussions = Gdn_DataSet::Index($Discussions, array('CommentID'));
+            
             foreach ($Data as $Row) {
-               $this->SetField($Row['CategoryID'], 'LastCommentID', $Row['LastCommentID']);
+               $CategoryID = (int)$Row['CategoryID'];
+               $Category = CategoryModel::Categories($CategoryID);
+               $CommentID = $Row['LastCommentID'];
+               $DiscussionID = GetValueR("$CommentID.DiscussionID", $Discussions, NULL);
+               
+               $DateLastComment = Gdn_Format::ToTimestamp($Row['DateLastComment']);
+               $DateLastDiscussion = Gdn_Format::ToTimestamp($Row['DateLastDiscussion']);
+               
+               $Set = array('LastCommentID' => $CommentID);
+               
+               if ($DiscussionID) {
+                  $LastDiscussionID = GetValue('LastDiscussionID', $Category);
+                  
+                  if ($DateLastDiscussion > $DateLastComment) {
+                     // The most recent discussion is from this comment.
+                     $Set['LastDiscussionID'] = $DiscussionID;
+                  } else {
+                     // The most recent discussion has no comments.
+                     $Set['LastCommentID'] = NULL;
+                  }
+               } else {
+                  // Something went wrong.
+                  $Set['LastCommentID'] = NULL;
+                  $Set['LastDiscussionID'] = NULL;
+               }
+               
+               $this->SetField($CategoryID, $Set);
             }
             break;
       }

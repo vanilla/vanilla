@@ -47,7 +47,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                $ChildCategories .= ', ';
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category));
          } else if ($DoHeadings && $Category->Depth == 1) {
-            $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
+            $CatList .= '<li id="Category_'.$CategoryID.'" class="CategoryHeading '.$CssClass.'">
                <div class="ItemContent Category">'.GetOptions($Category, $this).Gdn_Format::Text($Category->Name).'</div>
             </li>';
             $Alt = FALSE;

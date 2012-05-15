@@ -613,7 +613,11 @@ class Gdn_Statistics extends Gdn_Plugin {
       }
       
       // Store the view, using denormalization if enabled
-      $this->AddView();
+      $ViewType = 'normal';
+      if (preg_match('`discussion/embed`', Gdn::Request()->Post('ResolvedPath', '')))
+         $ViewType = 'embed';
+      
+      $this->AddView($ViewType);
       
       // Fire an event for plugins to track their own stats.
       // TODO: Make this analyze the path and throw a specific event (this event will change in future versions).
@@ -627,15 +631,18 @@ class Gdn_Statistics extends Gdn_Plugin {
    }
 
    /**
-    * Increments view count for the specified discussion.
+    * Increments overall pageview view count
     *
     * @since 2.1a
     * @access public
     */
-   public function AddView() {
+   public function AddView($ViewType = 'normal') {
       // Add a pageview entry.
       $TimeSlot = date('Ymd');
       $Px = Gdn::Database()->DatabasePrefix;
+      
+      $Views = 1;
+      $EmbedViews = 0;
       
       try {
          if (C('Garden.Analytics.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
@@ -649,21 +656,60 @@ class Gdn_Statistics extends Gdn_Plugin {
             // Get current cache value
             $Views = Gdn::Cache()->Get($CacheKey);
             
-            // Every X views, writeback to Discussions
-            if (($Views % C('Garden.Analytics.Views.DenormalizeWriteback', 100)) == 0) {
+            if ($ViewType == 'embed') {
+               $EmbedCacheKey = "QueryCache.Analytics.CountEmbedViews";
+
+               // Increment. If not success, create key.
+               $EmbedIncremented = Gdn::Cache()->Increment($EmbedCacheKey);
+               if ($EmbedIncremented === Gdn_Cache::CACHEOP_FAILURE)
+                  Gdn::Cache()->Store($EmbedCacheKey, 1);
+
+               // Get current cache value
+               $EmbedViews = Gdn::Cache()->Get($EmbedCacheKey);
+            }
+            
+            // Every X views, writeback to AnalyticsLocal
+            $DenormalizeWriteback = C('Garden.Analytics.Views.DenormalizeWriteback', 10);
+            $DenormalizeWriteback = 10;
+            if (($Views % $DenormalizeWriteback) == 0) {
+               Gdn::Controller()->SetData('WritebackViews', $Views);
+               Gdn::Controller()->SetData('WritebackEmbed', $EmbedViews);
                Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, {$Views})
-               on duplicate key update Views = Views+{$Views}", array(
+               on duplicate key update 
+                  Views = Views+{$Views}", 
+               array(
                   ':TimeSlot' => $TimeSlot
                ));
+                  
+//               Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$Views}, {$EmbedViews})
+//               on duplicate key update 
+//                  Views = Views+{$Views}, 
+//                  EmbedViews = EmbedViews+{$EmbedViews}", 
+//               array(
+//                  ':TimeSlot' => $TimeSlot
+//               ));
                
-               // ... and get rid of those views from the key
-               Gdn::Cache()->Decrement($CacheKey, $Views);
+               // ... and get rid of those views from the keys
+               
+               if ($Views)
+                  Gdn::Cache()->Decrement($CacheKey, $Views);
+               
+               if ($EmbedViews)
+                  Gdn::Cache()->Decrement($EmbedCacheKey, $EmbedViews);
             }
          } else {
-            Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, 1)
-               on duplicate key update Views = Views+1", array(
+            $ExtraViews = 1;
+            $ExtraEmbedViews = ($ViewType == 'embed') ? 1 : 0;
+            
+            Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, {$ExtraViews})
+               on duplicate key update Views = Views+{$ExtraViews}", array(
                ':TimeSlot' => $TimeSlot
             ));
+            
+//            Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$ExtraViews}, {$ExtraEmbedViews})
+//               on duplicate key update Views = Views+{$ExtraViews}, EmbedViews = EmbedViews+{$ExtraEmbedViews}", array(
+//               ':TimeSlot' => $TimeSlot
+//            ));
          }
       } catch (Exception $Ex) {
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage'))

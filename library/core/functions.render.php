@@ -130,8 +130,7 @@ function CssClass($Row) {
    // Comment list classes
       if (array_key_exists('CommentID', $Row))
           $CssClass .= ' ItemComment';
-      
-      if (array_key_exists('DiscussionID', $Row))
+      else if (array_key_exists('DiscussionID', $Row))
           $CssClass .= ' ItemDiscussion';
       
       if (function_exists('IsMeAction'))

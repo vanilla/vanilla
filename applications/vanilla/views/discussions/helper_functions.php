@@ -209,7 +209,7 @@ function NewComments($Discussion) {
       return '';
    
    if ($Discussion->CountUnreadComments === TRUE) {
-      $Title = htmlspecialchars(T("You havenn't read this yet."));
+      $Title = htmlspecialchars(T("You haven't read this yet."));
       
       return ' <strong class="HasNew JustNew" title="'.$Title.'">'.T('new discussion', 'new').'</strong>';
    } elseif ($Discussion->CountUnreadComments > 0) {

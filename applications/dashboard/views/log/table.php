@@ -97,7 +97,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                   foreach ($CustomMeta as $Key => $Value) {
                      echo ' <span class="Meta">',
                         '<span class="Meta-Label">'.T($Key).'</span> ',
-                        Wrap(htmlspecialchars($Value), 'span', array('class' => 'Meta-Value')),
+                        Wrap(Gdn_Format::Html($Value), 'span', array('class' => 'Meta-Value')),
                         '</span>';
 
                   }

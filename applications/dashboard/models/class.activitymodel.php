@@ -875,6 +875,16 @@ class ActivityModel extends Gdn_Model {
       $this->Validation->ApplyRule('InsertUserID', 'Required');
       
       if ($this->Validate($Comment)) {
+         $Activity = $this->GetID($Comment['ActivityID'], DATASET_TYPE_ARRAY);
+         Gdn::Controller()->Json('Activity', $CommentActivityID);
+         
+         $_ActivityID = $Comment['ActivityID'];
+         // Check to see if this is a shared activity/notification.
+         if ($CommentActivityID = GetValue('CommentActivityID', $Activity['Data'])) {
+            Gdn::Controller()->Json('CommentActivityID', $CommentActivityID);
+            $Comment['ActivityID'] = $CommentActivityID;
+         }
+         
          // Check for spam.
          $Spam = SpamModel::IsSpam('ActivityComment', $Comment);
          if ($Spam)
@@ -884,9 +894,11 @@ class ActivityModel extends Gdn_Model {
          
          if ($ID) {
             // Check to see if this comment bumps the activity.
-            $Activity = $this->GetID($Comment['ActivityID'], DATASET_TYPE_ARRAY);
             if ($Activity && GetValue('Bump', $Activity['Data'])) {
                $this->SQL->Put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $Activity['ActivityID']));
+               if ($_ActivityID != $Comment['ActivityID']) {
+                  $this->SQL->Put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $_ActivityID));
+               }
             }
          }
          
@@ -1056,11 +1068,15 @@ class ActivityModel extends Gdn_Model {
    }
    
    public function Save($Data, $Preference = FALSE, $Options = array()) {
+      Trace('ActivityModel->Save()');
       $Activity = $Data;
       $this->_Touch($Activity);
       
-      if ($Activity['ActivityUserID'] == $Activity['NotifyUserID'] && !GetValue('Force', $Options))
+      if ($Activity['ActivityUserID'] == $Activity['NotifyUserID'] && !GetValue('Force', $Options)) {
+         Trace('Skipping activity because it would notify the user of something they did.');
+         
          return; // don't notify users of something they did.
+      }
       
       // Check the user's preference.
       if ($Preference) {
@@ -1072,16 +1088,30 @@ class ActivityModel extends Gdn_Model {
             $Activity['Emailed'] = self::SENT_PENDING;
          
          if (!$Activity['Notified'] && !$Activity['Emailed'] && !GetValue('Force', $Options)) {
+            Trace("Skipping activity because the user has no preference set.");
             return;
          }
       }
       
       $ActivityType = self::GetActivityType($Activity['ActivityType']);
-      $Activity['ActivityTypeID'] = ArrayValue('ActivityTypeID', $ActivityType);
+      $ActivityTypeID = ArrayValue('ActivityTypeID', $ActivityType);
+      if (!$ActivityTypeID) {
+         Trace("There is no $ActivityType activity type.", TRACE_WARNING);
+         $ActivityType = self::GetActivityType('Default');
+         $ActivityTypeID = ArrayValue('ActivityTypeID', $ActivityType);
+      }
+      
+      $Activity['ActivityTypeID'] = $ActivityTypeID;
       
       $NotificationInc = 0;
       if ($Activity['NotifyUserID'] > 0 && $Activity['Notified'])
          $NotificationInc = 1;
+      
+      // Check to see if we are sharing this activity with another one.
+      if ($CommentActivityID = GetValue('CommentActivityID', $Activity['Data'])) {
+         $CommentActivity = $this->GetID($CommentActivityID);
+         $Activity['Data']['CommentNotifyUserID'] = $CommentActivity['NotifyUserID'];
+      }
       
       if ($GroupBy = GetValue('GroupBy', $Options)) {
          $GroupBy = (array)$GroupBy;
@@ -1142,6 +1172,12 @@ class ActivityModel extends Gdn_Model {
          $Activity['ActivityID'] = $ActivityID;
       }
       $Activity['Data'] = $ActivityData;
+      
+      if (isset($CommentActivity)) {
+         $CommentActivity['Data']['SharedActivityID'] = $Activity['ActivityID'];
+         $CommentActivity['Data']['SharedNotifyUserID'] = $Activity['NotifyUserID'];
+         $this->SetField($CommentActivity['ActivityID'], 'Data', $CommentActivity['Data']);
+      }
       
       if ($NotificationInc > 0) {
          $CountNotifications =  Gdn::UserModel()->GetID($Activity['NotifyUserID'])->CountNotifications + $NotificationInc;

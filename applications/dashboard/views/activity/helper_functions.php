@@ -10,7 +10,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
       Img($Activity->Photo, array('class' => 'ProfilePhotoMedium')),
       $Activity->PhotoUrl, 'Photo');
    
-   $CssClass = 'Item Activity '.$ActivityType;
+   $CssClass = 'Item Activity Activity-'.$ActivityType;
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
    

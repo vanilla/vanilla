@@ -14,7 +14,7 @@ echo '<div class="P">', $this->Form->Radio('Announce', T("Don't announce."), arr
 
 echo '<div class="Buttons Buttons-Confirm">';
 echo $this->Form->Button('OK');
-echo $this->Form->Button('Cancel', array('class' => 'Button Close'));
+echo $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close'));
 echo '<div>';
 echo $this->Form->Close();
 ?>

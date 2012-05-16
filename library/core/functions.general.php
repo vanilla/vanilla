@@ -1048,14 +1048,22 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                   if (is_array($ID)) {
                      continue;
                   }
-                  $User = Gdn::UserModel()->GetID($ID);
-                  $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
                   
                   if ($i == $Count - 1)
                      $Result .= ' '.T('sep and', 'and').' ';
                   elseif ($i > 0)
                      $Result .= ', ';
-                  $Result .= UserAnchor($User);
+                  
+                  $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
+                  if (isset($Special[$ID])) {
+                     $Result .= $Special[$ID];
+                  } else {
+                     $User = Gdn::UserModel()->GetID($ID);
+                     $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+
+
+                     $Result .= UserAnchor($User);
+                  }
                }
             } else {
                $User = Gdn::UserModel()->GetID($Value);

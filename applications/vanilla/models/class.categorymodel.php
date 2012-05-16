@@ -1221,7 +1221,7 @@ class CategoryModel extends Gdn_Model {
                 'CategoryID' => 'CategoryID',
                 'LastTitle' => 'Name'));
             
-            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, 1));
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion).'#latest');
          } else {
             $LastDiscussion = ArrayTranslate($Category, array(
                 'LastDiscussionID' => 'DiscussionID', 

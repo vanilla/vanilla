@@ -720,7 +720,7 @@ class CommentModel extends VanillaModel {
                    'LastTitle' => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
                    'LastUserID' => $Fields['InsertUserID'],
                    'LastDateInserted' => $Fields['DateInserted'],
-                   'LastUrl' => "/discussion/comment/$CommentID#Comment_$CommentID"
+                   'LastUrl' => DiscussionUrl($Discussion).'#latest'
                );
                CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
             }

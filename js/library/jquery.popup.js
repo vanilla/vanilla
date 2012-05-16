@@ -272,6 +272,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                }
             },
             error: function(xhr) {
+               $('.InProgress', this).removeClass('InProgress');
                gdn.informError(xhr);
             }
          });

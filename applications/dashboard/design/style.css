@@ -1242,8 +1242,8 @@ overflow: hidden; */
 .Tag a {
    color: #ffffff;
 }
-.DataList a.Delete,
-.DataList a.Delete:hover {
+
+.DataList a.Delete {
    border-radius: 0;
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
@@ -1257,13 +1257,19 @@ overflow: hidden; */
    font-size:16px;
    font-weight:bold;
 	line-height: 1;
+   visibility: hidden;
 }
 .DataList a.Delete:hover {
    text-decoration: none;
    border: none;
    background: #333;
    color: #fff;
+   visibility: visible;
 }
+.Item:hover a.Delete {
+   visibility: visible;
+}
+
 /* Condensed datalists make the main link & excerpt inline. */
 .DataList .Unfollow {
    background: #eee;
@@ -1328,7 +1334,7 @@ overflow: hidden; */
 	margin-left: 50px;
 }
 .Activities .ItemContent {
-	margin: 0 14px 0 53px;
+	margin: 0 0 0 53px;
 }
 .Activities .ActivityComments .ItemContent {
 	margin: 0 0 0 42px;

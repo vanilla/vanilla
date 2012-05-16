@@ -136,7 +136,7 @@ class CategoriesController extends VanillaController {
 	
 			// Setup head
 			$this->AddCssFile('vanilla.css');
-			$this->Menu->HighlightRoute('/discussions');      
+			$this->Menu->HighlightRoute('/discussions');
 			if ($this->Head) {
 				$this->AddJsFile('discussions.js');
 				$this->AddJsFile('bookmark.js');
@@ -149,7 +149,8 @@ class CategoriesController extends VanillaController {
 			$this->Description(GetValue('Description', $Category), TRUE);
 			
 			// Set CategoryID
-			$this->SetData('CategoryID', GetValue('CategoryID', $Category), TRUE);
+         $CategoryID = GetValue('CategoryID', $Category);
+			$this->SetData('CategoryID', $CategoryID, TRUE);
 			
 			// Add modules
          $this->AddModule('NewDiscussionModule');
@@ -177,9 +178,14 @@ class CategoriesController extends VanillaController {
 			$CountDiscussions = $DiscussionModel->GetCount($Wheres);
 			$this->SetData('CountDiscussions', $CountDiscussions);
 			$this->SetData('_Limit', $Limit);
+         
+         // We don't wan't child categories in announcements.
+         $Wheres['d.CategoryID'] = $CategoryID;
 			$AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
 			$this->SetData('AnnounceData', $AnnounceData, TRUE);
-			$this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->Get($Offset, $Limit, $Wheres));
+         $Wheres['d.CategoryID'] = $CategoryIDs;
+         
+         $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->Get($Offset, $Limit, $Wheres));
 	
 			// Build a pager
 			$PagerFactory = new Gdn_PagerFactory();

@@ -9,7 +9,7 @@ if (!$User)
 
 if ($User->Photo != '') {
 ?>
-   <div class="Photo">
+   <div class="Photo <?php echo GetValue('_CssClass', $User); ?>">
       <?php
       if (StringBeginsWith($User->Photo, 'http'))
          $Img = Img($User->Photo, array('class' => 'ProfilePhotoLarge'));

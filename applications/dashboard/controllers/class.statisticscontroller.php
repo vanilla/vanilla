@@ -60,7 +60,7 @@ class StatisticsController extends DashboardController {
             Gdn::Statistics()->Register();
          }
          
-         if ($Flow && $this->Form->GetFormValue('SaveIdentity')) {
+         if ($Flow && $this->Form->GetFormValue('Save')) {
             Gdn::InstallationID($this->Form->GetFormValue('InstallationID'));
             Gdn::InstallationSecret($this->Form->GetFormValue('InstallationSecret'));
             $this->InformMessage(T("Your settings have been saved."));

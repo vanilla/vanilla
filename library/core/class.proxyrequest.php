@@ -265,6 +265,7 @@ class ProxyRequest {
       
       $RequestMethod = strtoupper($RequestMethod);
       switch ($RequestMethod) {
+         case 'PUT':
          case 'POST':
             break;
          

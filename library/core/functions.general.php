@@ -999,6 +999,16 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                }
             }
             break;
+         case 'plural':
+            if(!is_numeric($Value)) {
+               $Result = $Value;
+            } else {
+               if (!$SubFormat)
+                  $SubFormat = "%s $Field";
+               
+               $Result = Plural($Value, rtrim($SubFormat, 's'), rtrim($SubFormat, 's').'s');
+            }
+            break;
          case 'rawurlencode':
             $Result = rawurlencode($Value);
             break;

@@ -20,6 +20,7 @@ class ProxyRequest {
    
    public $RequestDefaults;
    public $RequestHeaders;
+   public $RequestBody;
    
    public $ResponseHeaders;
    public $ResponseStatus;
@@ -171,6 +172,7 @@ class ProxyRequest {
       $this->ResponseHeaders = array();
       $this->ResponseStatus = "";
       $this->ResponseBody = "";
+      $this->RequestBody = "";
       $this->ContentLength = 0;
       $this->ContentType = '';
       $this->ConnectionMode = '';
@@ -388,12 +390,14 @@ class ProxyRequest {
             foreach ($SendFiles as $File => $FilePath)
                $PostData[$File] = "@{$FilePath}";
          } else {
-            if ($PreEncodePost)
+            if ($PreEncodePost && is_array($PostData))
                $PostData = http_build_query($PostData);
          }
          
          curl_setopt($Handler, CURLOPT_POST, TRUE);
          curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
+         
+         $this->RequestBody = $PostData;
       }
       
       // Allow PUT

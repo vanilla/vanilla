@@ -1536,7 +1536,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Cdns = array();
             if (Gdn::Request()->Scheme() != 'https') {
                $Cdns = array(
-                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js'
+                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
                   );
             }
             

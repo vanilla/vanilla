@@ -427,6 +427,8 @@ class ProxyRequest {
                $TempPostData = http_build_str($PostData);
                $SendExtraHeaders['Content-Length'] = strlen($TempPostData);
             }
+            
+            $this->RequestBody = $PostData;
          }
       }
       

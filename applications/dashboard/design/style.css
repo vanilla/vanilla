@@ -3065,7 +3065,3 @@ body.embed .InformMessages {
    height: 24px;
    width: 24px;
 }
-/* Important: ensures margins are respected on embedded comments. */
-.VanillaEmbedWrapper {
-   padding: 1px 0;
-}

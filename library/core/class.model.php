@@ -217,7 +217,7 @@ class Gdn_Model extends Gdn_Pluggable {
       $this->DefineSchema();      
       $Set = array_intersect_key($Property, $this->Schema->Fields());
       
-		$this->SQL->Put($this->Name, $Set, array($this->PrimaryKey => $RowID));
+      $this->Update($Set, array($this->PrimaryKey => $RowID));
    }
 
 
@@ -238,6 +238,9 @@ class Gdn_Model extends Gdn_Pluggable {
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {
+            if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
+               $Value = empty($Value) ? NULL : serialize($Value);
+            
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 
@@ -272,6 +275,9 @@ class Gdn_Model extends Gdn_Pluggable {
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {
+            if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
+               $Value = empty($Value) ? NULL : serialize($Value);
+            
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 
@@ -366,7 +372,30 @@ class Gdn_Model extends Gdn_Pluggable {
     * @return Gdn_DataSet
     */
    public function GetID($ID, $DatasetType = FALSE) {
-      $Result = $this->GetWhere(array("{$this->Name}ID" => $ID))->FirstRow($DatasetType);
+      $Result = $this->GetWhere(array($this->PrimaryKey => $ID))->FirstRow($DatasetType);
+      
+      $Fields = array('Attributes', 'Data');
+      
+      foreach ($Fields as $Field) {
+         if (is_array($Result)) {
+            if (isset($Result[$Field]) && is_string($Result[$Field])) {
+               $Val = unserialize($Result[$Field]);
+               if ($Val)
+                  $Result[$Field] = $Val; 
+               else
+                  $Result[$Field] = $Val;
+            }               
+         } elseif (is_object($Result)) {
+            if (isset($Result->$Field) && is_string($Result->$Field)) {
+               $Val = unserialize($Result->$Field);
+               if ($Val)
+                  $Result->$Field = $Val;
+               else
+                  $Result->$Field = NULL;
+            }
+         }
+      }
+      
       return $Result;
    }
 

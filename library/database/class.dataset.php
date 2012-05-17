@@ -534,6 +534,38 @@ class Gdn_DataSet implements IteratorAggregate {
       else
          $this->_PDOStatement = $PDOStatement;
    }
+   
+   /**
+    * Unserialize the fields in the dataset.
+    * @param array $Fields 
+    * @since 2.1
+    */
+   public function Unserialize($Fields = array('Attributes', 'Data')) {
+      $Result =& $this->Result();
+      $First = TRUE;
+      
+      foreach ($Result as $Row) {
+         if ($First) {
+            // Check which fields are in the dataset.
+            foreach ($Fields as $Index => $Field) {
+               if (GetValue($Field, $Row, FALSE) === FALSE) {
+                  unset($Fields[$Index]);
+               }
+            }
+            $First = FALSE;
+         }
+         
+         foreach ($Fields as $Field) {
+            if (is_object($Row)) {
+               if (is_string($Row->$Field))
+                  $Row->$Field = @unserialize($Row->$Field);
+            } else {
+               if (is_string($Row[$Field]))
+                  $Row[$Field] = @unserialize($Row[$Field]);
+            }
+         }
+      }
+   }
 
    /**
     * Advances to the next row and returns the value rom a column.

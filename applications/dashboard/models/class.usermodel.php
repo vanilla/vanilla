@@ -2528,7 +2528,8 @@ class UserModel extends Gdn_Model {
 
    public function SetCalculatedFields(&$User) {
       if ($v = GetValue('Attributes', $User))
-         SetValue('Attributes', $User, @unserialize($v));
+         if (is_string($v))
+            SetValue('Attributes', $User, @unserialize($v));
       if ($v = GetValue('Permissions', $User))
          SetValue('Permissions', $User, @unserialize($v));
       if ($v = GetValue('Preferences', $User))
@@ -2550,6 +2551,14 @@ class UserModel extends Gdn_Model {
          }
          SetValue('AllIPAddresses', $User, $IPAddresses);
       }
+      
+      TouchValue('_CssClass', $User, '');
+      if ($v = GetValue('Banned', $User)) {
+         SetValue('_CssClass', $User, 'Banned');
+      }
+      
+      $this->EventArguments['User'] =& $User;
+      $this->FireEvent('SetCalculatedFields');
    }
 
    public static function SetMeta($UserID, $Meta, $Prefix = '') {

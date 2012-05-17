@@ -246,21 +246,8 @@ window.vanilla.embed = function(host) {
    if (!container)
       document.write('<div id="vanilla-comments"></div>');
    container = document.getElementById('vanilla-comments');
-   if (container) {
-      // If jQuery is present in the page, include our defer-until-visible script
-      if (typeof jQuery != 'undefined') {
-         jQuery(document).ready(function($) {
-            $.getScript('http://cdn.vanillaforums.com/js/jquery.appear.js', function() {
-               if ($.fn.appear)
-                  $('#vanilla-comments').appear(function() {container.appendChild(vanillaIframe);});
-               else
-                  container.appendChild(vanillaIframe); // fallback
-            });
-         });
-      } else {
-         container.appendChild(vanillaIframe); // fallback: just load it
-      }
-   }
+   if (container)
+      container.appendChild(vanillaIframe);
 
    // Include our embed css into the page
    var vanilla_embed_css = document.createElement('link');
@@ -268,6 +255,7 @@ window.vanilla.embed = function(host) {
    vanilla_embed_css.type = 'text/css';
    vanilla_embed_css.href = host_base_url + (host_base_url.substring(host_base_url.length-1) == '/' ? '' : '/') +'applications/dashboard/design/embed.css';
    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_embed_css);
+   
    return this;
 };
 try {

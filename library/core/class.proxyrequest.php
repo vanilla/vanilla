@@ -21,6 +21,7 @@ class ProxyRequest {
    public $RequestDefaults;
    public $RequestHeaders;
    public $RequestBody;
+   public $ParsedBody;
    
    public $ResponseHeaders;
    public $ResponseStatus;
@@ -397,6 +398,9 @@ class ProxyRequest {
          curl_setopt($Handler, CURLOPT_POST, TRUE);
          curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
          
+         if (!is_array($PostData) && !is_object($PostData))
+            $SendExtraHeaders['Content-Length'] = strlen($PostData);
+            
          $this->RequestBody = $PostData;
       }
       

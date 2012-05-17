@@ -105,7 +105,7 @@ $Construct
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
    ->Column('RegardingID', 'int(11)', TRUE, 'index')
-   ->Column('Source', 'varchar(20)', TRUE)
+   //->Column('Source', 'varchar(20)', TRUE)
    ->Set($Explicit, $Drop);
 
 if ($DiscussionExists && !$FirstCommentIDExists) {
@@ -142,8 +142,8 @@ else
 
 $Construct->PrimaryKey('CommentID')
 	->Column('DiscussionID', 'int', FALSE, 'index.1')
-   ->Column('Type', 'varchar(10)', TRUE)
-   ->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
+   //->Column('Type', 'varchar(10)', TRUE)
+   //->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
 	->Column('InsertUserID', 'int', TRUE, 'key')
 	->Column('UpdateUserID', 'int', TRUE)
 	->Column('DeleteUserID', 'int', TRUE)
@@ -157,7 +157,7 @@ $Construct->PrimaryKey('CommentID')
 	->Column('Flag', 'tinyint', 0)
 	->Column('Score', 'float', NULL)
 	->Column('Attributes', 'text', TRUE)
-   ->Column('Source', 'varchar(20)', TRUE)
+   //->Column('Source', 'varchar(20)', TRUE)
 	->Set($Explicit, $Drop);
 
 if (isset($CommentIndexes['FK_Comment_DiscussionID'])) {
@@ -440,25 +440,3 @@ if (!$LastDiscussionIDExists) {
       ->Set('c.LastDiscussionID', 'cm.DiscussionID', FALSE, FALSE)
       ->Put();
 }
-
-// Convert the old advanced notifications to the new format.
-$Sql = "insert ignore {$Px}UserMeta
-(UserID, Name, Value)
-select
-	um.UserID,
-	concat(um.Name, '.', c.CategoryID),
-	'1'
-from {$Px}UserMeta um
-join {$Px}Category c
-	on c.Depth >= 1 and c.Depth <= 2
-left join {$Px}UserCategory uc
-	on um.UserID = uc.UserID and c.CategoryID = uc.CategoryID
-where um.Name in ('Preferences.Email.NewComment', 'Preferences.Email.NewDiscussion')
-	and c.Archived = 0
-	and coalesce(uc.Unfollow, 0) = 0
-	and um.Value = 1";
-$SQL->Query($Sql, 'update');
-	
-$Sql = "delete um.* from {$Px}UserMeta um
-where um.Name in ('Preferences.Email.NewComment', 'Preferences.Email.NewDiscussion')";
-$SQL->Query($Sql, 'update');

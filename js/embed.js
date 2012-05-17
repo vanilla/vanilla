@@ -203,22 +203,29 @@ window.vanilla.embed = function(host) {
       if (discussion_id != '' || foreign_id != '')
          embed_type = 'comments';
          
+      var result = '';
       if (embed_type == 'comments') {
-         return 'http://' + host + '/vanilla/discussion/embed/'
+         result = 'http://' + host + '/vanilla/discussion/embed/'
             +'&vanilla_discussion_id='+encodeURIComponent(discussion_id)
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
             +'&vanilla_type='+encodeURIComponent(foreign_type)
             +'&vanilla_url='+encodeURIComponent(foreign_url)
             +'&vanilla_category_id='+encodeURIComponent(category_id);
+      } else {
+         result = 'http://' 
+            +host.replace('?', '&')
+            +path.replace('?', '&') 
+            +'&remote=' 
+            +encodeURIComponent(embedUrl) 
+            +'&locale=' 
+            +encodeURIComponent(embed_locale);
       }
-      var returnUrl = 'http://' 
-         +host.replace('?', '&')
-         +path.replace('?', '&') 
-         +'&remote=' 
-         +encodeURIComponent(embedUrl) 
-         +'&locale=' 
-         +encodeURIComponent(embed_locale);
-      return returnUrl.replace('&', '?'); // Replace the first occurrence of amp with question.
+   
+      if (window.vanilla_sso) {
+         result += '&sso='+encodeURIComponent(vanilla_sso);
+      }
+       
+      return result.replace('&', '?'); // Replace the first occurrence of amp with question.
    }
    var vanillaIframe = document.createElement('iframe');
    vanillaIframe.id = "vanilla"+id;
@@ -239,8 +246,22 @@ window.vanilla.embed = function(host) {
    if (!container)
       document.write('<div id="vanilla-comments"></div>');
    container = document.getElementById('vanilla-comments');
-   if (container)
-      container.appendChild(vanillaIframe);
+   if (container) {
+      // If jQuery is present in the page, include our defer-until-visible script
+      if (typeof jQuery != 'undefined') {
+         var vanillaLazyLoad = document.createElement('script');
+         vanillaLazyLoad.type = 'text/javascript';
+         vanillaLazyLoad.src = vanilla_forum_url + '/js/library/jquery.appear.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanillaLazyLoad);
+         jQuery(document).ready(function($) {
+            $('#vanilla-comments').appear(function() {
+               container.appendChild(vanillaIframe);
+            });
+         });
+      } else {
+         container.appendChild(vanillaIframe); // fallback: just load it
+      }
+   }
 
    // Include our embed css into the page
    var vanilla_embed_css = document.createElement('link');
@@ -248,7 +269,6 @@ window.vanilla.embed = function(host) {
    vanilla_embed_css.type = 'text/css';
    vanilla_embed_css.href = host_base_url + (host_base_url.substring(host_base_url.length-1) == '/' ? '' : '/') +'applications/dashboard/design/embed.css';
    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_embed_css);
-   
    return this;
 };
 try {

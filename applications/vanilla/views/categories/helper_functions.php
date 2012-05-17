@@ -13,40 +13,16 @@ function CategoryString($Rows) {
 }
 endif;
 
-if (!function_exists('CssClass')):
-   
-function CssClass($Row) {
-   $Row = (array)$Row;
-   
-   static $Alt = FALSE;
-   $ClassName = Gdn_Format::AlphaNumeric($Row['UrlCode']);
-   
-   $Result = "Item Depth{$Row['Depth']} Category-$ClassName";
-   $Result .= ' '.(GetValue('Read', $Row) ? 'Read' : 'Unread');
-   
-   if (GetValue('Archive', $Row))
-      $Result .= ' Archived';
-   
-   if ($Alt)
-      $Result .= ' Alt';
-   $Alt = !$Alt;
-   
-   return $Result;
-}
-
-endif;
-
-
 if (!function_exists('GetOptions')):
 /**
  * Render options that the user has for this discussion.
  */
-function GetOptions($Category, $Sender = NULL) {
+function GetOptions($Category) {
    if (!Gdn::Session()->IsValid())
       return;
    
-   if (!$Sender)
-      $Sender = Gdn::Controller();
+   $Sender = Gdn::Controller();
+   
    
    $Result = '';
    $Options = '';
@@ -90,7 +66,7 @@ if (!function_exists('MostRecentString')):
       $R .= '<span class="MLabel">'.T('Most recent:').'</span> ';
       $R .= Anchor(
          SliceString(Gdn_Format::Text($Row['LastTitle']), 150),
-         $Row['LastUrl'],
+         $Row['LastUrl'].'#latest',
          'LatestPostTitle');
 
       if (GetValue('LastName', $Row)) {
@@ -231,7 +207,7 @@ function WriteTableRow($Row, $Depth = 1) {
          <?php if ($WriteChildren === 'list'): ?>
          <div class="ChildCategories">
             <?php
-            echo T('Child Categories').': ';
+            echo Wrap(T('Child Categories').': ', 'b');
             echo CategoryString($Children, $Depth + 1);
             ?>
          </div>
@@ -258,7 +234,7 @@ function WriteTableRow($Row, $Depth = 1) {
             echo UserPhoto($Row, array('ImageClass' => 'PhotoLink', 'Px' => 'Last'));
             echo Anchor(
                SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
-               $Row['LastUrl'],
+               $Row['LastUrl'].'#latest',
                'BlockTitle LatestPostTitle');
             ?>
             <div class="Meta">

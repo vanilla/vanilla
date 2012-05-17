@@ -26,6 +26,12 @@ class Gdn_Email extends Gdn_Pluggable {
     * @var boolean
     */
    private $_IsToSet;
+   
+   /**
+    *
+    * @var array Recipients that were skipped because they lack permission.
+    */
+   public $Skipped = array();
 
    /**
     * Constructor
@@ -84,6 +90,7 @@ class Gdn_Email extends Gdn_Pluggable {
       $this->_IsToSet = FALSE;
       $this->MimeType(Gdn::Config('Garden.Email.MimeType', 'text/plain'));
       $this->_MasterView = 'email.master';
+      $this->Skipped = array();
       return $this;
    }
 
@@ -224,13 +231,18 @@ class Gdn_Email extends Gdn_Pluggable {
          $this->EventArguments['EventName'] = $EventName;
          $this->FireEvent('SendMail');
       }
+      
+      if (!empty($this->Skipped) && $this->PhpMailer->CountRecipients() == 0) {
+         // We've skipped all recipients.
+         return TRUE;
+      }
 
       $this->PhpMailer->ThrowExceptions(TRUE);
       if (!$this->PhpMailer->Send()) {
          throw new Exception($this->PhpMailer->ErrorInfo);
       }
       
-      return true;
+      return TRUE;
    }
    
    /**
@@ -274,9 +286,23 @@ class Gdn_Email extends Gdn_Pluggable {
             $this->Cc($RecipientEmail, $RecipientName);
          return $this;
          
-      } elseif ($RecipientEmail instanceof stdClass) {
-         $RecipientName = GetValue('Name', $RecipientEmail);
-         $RecipientEmail = GetValue('Email', $RecipientEmail);
+      } elseif ((is_object($RecipientEmail) && property_exists($RecipientEmail, 'Email'))
+         || (is_array($RecipientEmail) && isset($RecipientEmail['Email']))) {
+         
+         $User = $RecipientEmail;
+         $RecipientName = GetValue('Name', $User);
+         $RecipientEmail = GetValue('Email', $User);
+         $UserID = GetValue('UserID', $User, FALSE);
+         
+         if ($UserID !== FALSE) {
+            // Check to make sure the user can receive email.
+            if (!Gdn::UserModel()->CheckPermission($UserID, 'Garden.Email.View')) {
+               $this->Skipped[] = $User;
+               
+               return $this;
+            }
+         }
+         
          return $this->To($RecipientEmail, $RecipientName);
       
       } elseif ($RecipientEmail instanceof Gdn_DataSet) {

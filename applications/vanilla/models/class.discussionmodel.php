@@ -37,6 +37,65 @@ class DiscussionModel extends VanillaModel {
       parent::__construct('Discussion');
    }
    
+   public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      $Result = array('Complete' => TRUE);
+      switch ($Column) {
+         case 'CountComments':
+            $this->Database->Query(DBAModel::GetCountSQL('count', 'Discussion', 'Comment'));
+            break;
+         case 'FirstCommentID':
+            $this->Database->Query(DBAModel::GetCountSQL('min', 'Discussion', 'Comment', $Column));
+            break;
+         case 'LastCommentID':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column));
+            break;
+         case 'DateLastComment':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column, 'DateInserted'));
+            $this->SQL
+               ->Update('Discussion')
+               ->Set('DateLastComment', 'DateInserted', FALSE, FALSE)
+               ->Where('DateLastComment', NULL)
+               ->Put();
+            break;
+         case 'LastCommentUserID':
+            if (!$Max) {
+               // Get the range for this update.
+               $DBAModel = new DBAModel();
+               list($Min, $Max) = $DBAModel->PrimaryKeyRange('Discussion');
+               
+               if (!$From) {
+                  $From = $Min;
+                  $To = $Min + DBAModel::$ChunkSize - 1;
+               }
+            }
+            $this->SQL
+               ->Update('Discussion d')
+               ->Join('Comment c', 'c.CommentID = d.LastCommentID')
+               ->Set('d.LastCommentUserID', 'c.InsertUserID', FALSE, FALSE)
+               ->Where('d.DiscussionID >=', $From)
+               ->Where('d.DiscussionID <=', $To)
+               ->Put();
+            $Result['Complete'] = $To >= $Max;
+            
+            $Percent = round($To * 100 / $Max);
+            if ($Percent > 100 || $Result['Complete'])
+               $Result['Percent'] = '100%';
+            else
+               $Result['Percent'] = $Percent.'%';
+            
+            
+            $From = $To + 1;
+            $To = $From + DBAModel::$ChunkSize - 1;
+            $Result['Args']['From'] = $From;
+            $Result['Args']['To'] = $To;
+            $Result['Args']['Max'] = $Max;
+            break;
+         default:
+            throw new Gdn_UserException("Unknown column $Column");
+      }
+      return $Result;
+   }
+   
    /**
     * Builds base SQL query for discussion data.
     * 
@@ -60,13 +119,9 @@ class DiscussionModel extends VanillaModel {
       
       // Buid main query
       $this->SQL
-         ->Select('d.Type')
+         ->Select('d.*')
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
-			->Select('d.CountBookmarks')
-         
-         ->Select('d.Body') // <-- Need these for rss!
-         ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->From('Discussion d');
@@ -135,8 +190,6 @@ class DiscussionModel extends VanillaModel {
       $Session = Gdn::Session();
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
       $this->DiscussionSummaryQuery($AdditionalFields, FALSE);
-      $this->SQL
-         ->Select('d.*');
          
       if ($UserID > 0) {
          $this->SQL
@@ -285,17 +338,32 @@ class DiscussionModel extends VanillaModel {
 				} else {
 					$Discussion->CountUnreadComments = 0;
 				}
-			} else {
+			} elseif ($Discussion->CountCommentWatch === NULL) {
+            // Allow for discussions to just be new.
+            $Discussion->CountUnreadComments = TRUE;
+         } else {
 				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 			}
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
-				$Discussion->CountUnreadComments = 0;
-				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate))
+            $Discussion->CountUnreadComments = TRUE;
+				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate)) {
 					$Discussion->CountCommentWatch = $Discussion->CountComments;
+               $Discussion->CountUnreadComments = 0;
+            }
 			}
-			$Discussion->CountUnreadComments = is_numeric($Discussion->CountUnreadComments) ? $Discussion->CountUnreadComments : 0;
-			$Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+         if ($Discussion->CountUnreadComments === NULL)
+            $Discussion->CountUnreadComments = 0;
+			elseif ($Discussion->CountUnreadComments < 0)
+            $Discussion->CountUnreadComments = 0;
+         
+         
+         $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+         
+         if ($Discussion->LastUserID == NULL) {
+            $Discussion->LastUserID = $Discussion->InsertUserID;
+            $Discussion->LastDate = $Discussion->DateInserted;
+         }
 		}
 	}
 	
@@ -351,8 +419,6 @@ class DiscussionModel extends VanillaModel {
          return new Gdn_DataSet();
 
       $this->DiscussionSummaryQuery(array(), FALSE);
-      $this->SQL
-         ->Select('d.*');
       
       if (!empty($Wheres))
          $this->SQL->Where($Wheres);
@@ -482,6 +548,42 @@ class DiscussionModel extends VanillaModel {
       }
       
       return self::$_CategoryPermissions;
+   }
+   
+   public function FetchPageInfo($Url) {
+      $PageInfo = FetchPageInfo($Url);
+      
+      $Title = GetValue('Title', $PageInfo, '');
+      if ($Title == '')
+         $Title = FormatString(T('Undefined discussion subject.'), array('Url' => $Url));
+      else {
+         if ($Strip = C('Vanilla.Embed.StripPrefix'))
+            $Title = StringBeginsWith($Title, $Strip, TRUE, TRUE);
+         
+         if ($Strip = C('Vanilla.Embed.StripSuffix'))
+            $Title = StringEndsWith($Title, $Strip, TRUE, TRUE);
+      }
+      $Title = trim($Title);
+      
+      $Description = GetValue('Description', $PageInfo, '');
+      $Images = GetValue('Images', $PageInfo, array());
+      $Body = FormatString(T('EmbeddedDiscussionFormat'), array(
+          'Title' => $Title,
+          'Excerpt' => $Description,
+          'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
+          'Url' => $Url
+      ));
+      if ($Body == '')
+         $Body = $ForeignUrl;
+      if ($Body == '')
+         $Body = FormatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
+      
+      $Result = array(
+          'Name' => $Title,
+          'Body' => $Body,
+          'Format' => 'Html');
+          
+      return $Result;
    }
 
    /**
@@ -789,7 +891,7 @@ class DiscussionModel extends VanillaModel {
       // Define the primary key in this model's table.
       $this->DefineSchema();
       
-      // Add & apply any extra validation rules:      
+      // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Body', 'Required');
       $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
@@ -839,7 +941,15 @@ class DiscussionModel extends VanillaModel {
 		$this->FireEvent('BeforeSaveDiscussion');
          
       // Validate the form posted values
-      if ($this->Validate($FormPostValues, $Insert)) {
+      $this->Validate($FormPostValues, $Insert);
+      $ValidationResults = $this->ValidationResults();
+      
+      // If the body is not required, remove it's validation errors.
+      $BodyRequired = C('Vanilla.DiscussionBody.Required', TRUE);
+      if (!$BodyRequired && array_key_exists('Body', $ValidationResults))
+         unset($ValidationResults['Body']);
+      
+      if (count($ValidationResults) == 0) {
          // If the post is new and it validates, make sure the user isn't spamming
          if (!$Insert || !$this->CheckForSpam('Discussion')) {
             // Get all fields on the form that relate to the schema

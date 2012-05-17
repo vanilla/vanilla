@@ -215,36 +215,193 @@ select {
    display: inline-block;
    cursor: pointer;
    margin: 0;
-   font-size: 11px;
+   font-size: 12px;
+   line-height: 1;
+   font-weight: bold;
    padding: 4px 6px;
 	background: #f8f8f8;
-   color: #02475A;
    border: 1px solid #999;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 	white-space: nowrap;
-	background:-webkit-gradient(linear, center bottom, center top, from(#cccccc), to(#ffffff));
-	background:-moz-linear-gradient(top, #ffffff, #cccccc);
-	-pie-background:linear-gradient(top, #ffffff, #cccccc);
-	background:linear-gradient(top, #ffffff, #cccccc);
+   background-image: linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -o-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -moz-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -webkit-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -ms-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #CCCCCC),
+      color-stop(1, #FAFAFA)
+   );
    text-shadow: 0 1px 0 #fff;
-	box-shadow: 0px 0px 1px #999;
-	-moz-box-shadow: 0px 0px 1px #999;
-	-webkit-box-shadow: 0px 0px 1px #999;
-   line-height: 1;
-}
-form .Button {
-	font-size: 14px;
-   font-weight: bold;
+   box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px #bbb;
+   -moz-box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px #bbb;
+   -webkit-box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px #bbb;
+   border-color: #999;
+   color: #333;
 }
 .Button:hover {
    color: #111;
-   border: 1px solid #666;
+   border-color: #666;
 }
-.Button:focus {
-   background: #eee;
+.Button:focus,
+.Button:active {
+   border-color: #aaa;
+   background: #f7f7f7;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
 }
+/* Danger (red) Button */
+.Button.Danger {
+   background-image: linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -o-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -moz-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -webkit-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -ms-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #cc0000),
+      color-stop(1, #ff3333)
+   );   
+   text-shadow: 0 -1px 0 #880000;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
+   border-color: #cc0000;
+   color: #fff;
+}
+.Button.Danger:hover,
+.Button.Danger:focus,
+.Button.Danger:active {
+   color: #fff;
+   border-color: #aa0000;
+}
+.Button.Danger:focus,
+.Button.Danger:active {
+   background: #cc0000;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+/* Warning (yellow) Button */
+.Button.Warning {
+   padding: 4px 6px !important;
+   margin: 0 !important;
+   border-width: 1px !important;   
+   background-image: linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -o-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -moz-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -webkit-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -ms-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #F89406),
+      color-stop(1, #FBB450)
+   );   
+   text-shadow: 0 -1px 0 #ba6d00;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   border-color: #ba6d00;
+   color: #fff;
+}
+.Button.Warning:hover,
+.Button.Warning:focus,
+.Button.Warning:active {
+   color: #fff;
+   border-color: #996600;
+}
+.Button.Warning:focus,
+.Button.Warning:active {
+   background: #F89406;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+/* Action (blue) Button */
+.Button.Action {
+   padding: 4px 6px !important;
+   margin: 0 !important;
+   border-width: 1px !important;   
+   background-image: linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -o-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -moz-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -webkit-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -ms-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #0055cc),
+      color-stop(1, #0088cc)
+   );   
+   text-shadow: 0 -1px 0 #0011cc;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   border-color: #0022cc;
+   color: #fff;
+}
+.Button.Action:hover,
+.Button.Action:focus,
+.Button.Action:active {
+   color: #fff;
+   border-color: #0000aa;
+}
+.Button.Action:focus,
+.Button.Action:active {
+   background: #0055cc;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+/* Success (green) Button */
+.Button.Success {
+   padding: 4px 6px !important;
+   margin: 0 !important;
+   border-width: 1px !important;   
+   background-image: linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -o-linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -moz-linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -webkit-linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -ms-linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #006600),
+      color-stop(1, #009900)
+   );   
+   text-shadow: 0 -1px 0 #002200;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   border-color: #004400;
+   color: #fff;
+}
+.Button.Success:hover,
+.Button.Success:focus,
+.Button.Success:active {
+   color: #fff;
+   border-color: #002200;
+}
+.Button.Success:focus,
+.Button.Success:active {
+   background: #006600;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+
 .BigButton {
    display: block;
    text-align: center;
@@ -252,12 +409,18 @@ form .Button {
    font-size: 15px;
    font-weight: bold;
    padding: 8px 0;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
 }
 .Buttons {
    margin-top: 10px;
+}
+.Buttons-Confirm {
+   text-align: center;
+}
+.Buttons-Confirm .Button {
+   min-width: 65px;
 }
 .Loading {
    height: 100px;
@@ -371,10 +534,15 @@ form .Button {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
+.PagerWrap {
+   overflow: hidden;
+}
+.PageDescription .PagerWrap {
+   overflow: visible;
+}
 .Pager {
    font-weight: bold;
    float: right;
-   
 }
 .Pager a, .Pager span {
    display: inline-block;
@@ -449,7 +617,7 @@ a.Small img {
    border-radius: 1;
    -moz-border-radius: 1;
    -webkit-border-radius: 1;
-   margin: 0 0 10px;
+   margin: 10px 0;
    padding: 10px;
 }
 .DismissMessage.Info {
@@ -988,12 +1156,17 @@ overflow: hidden; */
 .Item h2, .Item h3, .Item h4, .Item h5 {
    margin: 0;
 }
+#latest {
+    float: left;
+    margin: -10px;
+}
 .DataList .Title {
    font-size: 14px;
    display: block;
    font-weight: bold;
    margin: 0;
 }
+.ItemDiscussion .Meta,
 .DataList .Meta {
    font-size: 11px;
    color: #70727c;
@@ -1033,6 +1206,39 @@ overflow: hidden; */
 	line-height: 1;
    white-space: nowrap;
 }
+.JustNew {
+    display: none;
+}
+.Item.Read {
+    background: #f7f7f7;
+    background: rgba(0, 0, 0, .03);
+}
+.Item.Read .Title, .Item.Read .BlockTitle {
+    font-weight: normal;
+}
+.Item.Checked {
+    background: #ffc;
+}
+/*
+.Read {
+    background: transparent;
+}
+.Read > * {
+    opacity: 0.4;
+}
+.Read:hover > * {
+    opacity: 1;
+}
+.Checked {
+    background: #ffc;
+    opacity: 1;
+}
+.Checked > *,
+.Read:hover > * {
+    opacity: 1;
+}
+*/
+
 .Tag a {
    color: #ffffff;
 }
@@ -1081,6 +1287,29 @@ overflow: hidden; */
 .Condensed .Excerpt {
 	display: inline;
 }
+/* /me actions */
+.MeAction .AuthorAction {
+   display: inline;
+   margin: 0 6px;
+   font-size: 15px;
+   font-weight: bold;
+}
+.MeAction .Item-Header {
+   margin-bottom: 8px;
+}
+.MeAction .Message {
+   display: none;
+}
+.Hero {
+    background: #f7f7f7;
+    background: rgba(0, 0, 0, .03);
+    padding: 20px;
+    margin: 10px 0 20px;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+}
+
 
 /* =============================================================== Activities */
 .Activities li.HasPhoto .Title {
@@ -1163,6 +1392,7 @@ blockquote {
    margin: 1em 0;
 	background: #f3f3f3;
    background: rgba(0, 0, 0, 0.05);
+   border-left: 4px solid rgba(0, 0, 0, 0.1);
 }
 .Message small {
 	font-size: 11px;
@@ -1171,6 +1401,8 @@ blockquote {
 .EmbeddedContent {
    overflow: hidden;
 }
+
+.Message img.LeftAlign,
 img.LeftAlign {
    float: left;
    margin: 0 10px 5px 0;
@@ -1214,6 +1446,9 @@ pre code {
 }
 .Message ul li {
   list-style: disc !important;
+}
+.Message img {
+    max-width: 100%;
 }
 .Message .ImageResized {
 	font-size: 11px;
@@ -1270,7 +1505,7 @@ pre code {
 .ProfileOptions {
 	float: right;
 }
-.ProfileOptions a {
+.ProfileOptions .NavButton {
    margin: 0 0 0 6px;
 }
 /* Hiding form headings with CSS in case the forms get popped */
@@ -1283,15 +1518,18 @@ body.Profile.EditMode #Content form {
 	background: #f3f3f3;
 	background: rgba(0, 0, 0, 0.05);
 }
-
 form.Activity {
    display: block;
-   margin: 10px;
+   margin: 0 0 10px;
 	text-align: right;
 }
 form.Activity textarea {
    width: 100%;
    margin-bottom: 2px;
+   height: 60px;
+   min-height: 60px;
+}
+.ActivityComments textarea {
    height: 60px;
    min-height: 60px;
 }
@@ -1609,19 +1847,6 @@ div.Popup form ul li label.RadioLabel {
 
 /* ================================ Vanilla ================================= */
 
-#Panel ul.Discussions {
-   border: 0;
-}
-.PanelDiscussions li {
-   text-align: left;
-}
-.PanelDiscussions li a {
-   float: none;
-}
-.PanelDiscussions li strong {
-   display: block;
-   line-height: 1.5;
-}
 
 /* ============================================================== Discussions */
 
@@ -1634,11 +1859,14 @@ div.Popup form ul li label.RadioLabel {
 */
 .Tag {
    background: #777777;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   border-radius: 2px;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
    color: #FFFFFF;
    padding: 1px 4px;
+   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+   font-weight: bold;
+   line-height: 14px;
 }
 .Tag a {
    color: #FFFFFF;
@@ -1653,7 +1881,7 @@ div.Popup form ul li label.RadioLabel {
 .Tag.Category a {
    color: #000;
 }
-.Tag-Banned {
+.Tag.Tag-Banned {
    background-color: #C70028;
 }
 .Discussion .PageTitle h1 {
@@ -1663,6 +1891,7 @@ div.Popup form ul li label.RadioLabel {
 .ItemDiscussion {
    margin-bottom: 20px;
 }
+/*
 .ItemDiscussion .Message {
    margin-top: 20px;
 }
@@ -1674,6 +1903,7 @@ div.Popup form ul li label.RadioLabel {
 	width: 24px;
    margin: 0 5px 5px 0;
 }
+*/
 .ItemDiscussion .Message {
 	margin-bottom: 5px; /* Consistency with when only h1 starts page */
 	font-size: 110%;
@@ -1786,7 +2016,8 @@ tr.CategoryHeading td {
 .SpNewConversation,
 .SpAskQuestion,
 .SpNewPoll,
-.SpNewDiscussion {
+.SpNewDiscussion,
+.SpWarn {
 	display: inline-block;
 	height: 16px;
 	width: 16px;
@@ -1803,6 +2034,33 @@ tr.CategoryHeading td {
    height: 14px;
    vertical-align: middle;
    width: 14px;
+}
+
+.SpWarn {
+   background-position: -96px -84px;
+   width: 18px;
+}
+
+
+.SpAdd,
+.SpDelete {
+   position: relative;
+}
+
+.SpAdd:after, .SpDelete:after {
+   display: block;
+   position: absolute;
+   content: ' ';
+   overflow: hidden;
+   background: url('images/sprites.png') -72px -38px no-repeat;
+   height: 7px;
+   width: 7px;
+   right: -1px;
+   bottom: -1px;
+}
+
+.SpDelete:after {
+   background-position: -79px -38px;
 }
 
 .FormType {
@@ -2060,6 +2318,7 @@ span.Incorrect {
 }
 .MultipleEntryMethods {
 	margin: 0 auto;
+   overflow: hidden;
 }
 .MultipleEntryMethods .MainForm {
    float: left;
@@ -2648,9 +2907,9 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 
 
 /* ============================= Embedded Discussion & Comment Customizations */
-body.embed {
+/*body.embed {
 	text-align: left;
-}
+}*/
 body.embed #Content {
    float: none;
    margin: 0;
@@ -2659,12 +2918,12 @@ body.embed #Content {
 body.embed .InformMessages {
 	display: none;
 }
-.Embed a.Button,
+/*.Embed a.Button,
 .Embed a.Button:hover {
 	color: #333 !important;
 	text-decoration: none !important;
 	font-weight: bold;
-}
+}*/
 .EmbedCommentForm {
 	padding: 0;
    border-top: 1px solid #ffffff;
@@ -2805,4 +3064,8 @@ body.embed .InformMessages {
    vertical-align: text-bottom;
    height: 24px;
    width: 24px;
+}
+/* Important: ensures margins are respected on embedded comments. */
+.VanillaEmbedWrapper {
+   padding: 1px 0;
 }

@@ -23,7 +23,7 @@ if (CheckPermission('Plugins.ProfileExtender.Add')) : ?>
 
    <li>
    	<label><?php echo T('Custom Information'); ?></label>
-   	<div><?php echo T('Use these fields to create custom profile information. You can enter things like "Relationship Status", "Skype", or "Favorite Dinosaur". Be creative!'); ?></div>
+   	<div><?php echo T('ProfileFieldsCustomDescription', 'Use these fields to create custom profile information. You can enter things like "Relationship Status", "Skype", or "Favorite Dinosaur". Be creative!'); ?></div>
    	<div class="ProfileLabelContainer"><?php echo T('Label'); ?></div>
    	<div class="ProfileValueContainer"><?php echo T('Value'); ?></div>
    	<script type="text/javascript">

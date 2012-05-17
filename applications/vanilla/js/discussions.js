@@ -21,14 +21,14 @@ jQuery(document).ready(function($) {
       });
       
    if ($('.AdminCheck :checkbox').not(':checked').length == 1)
-      $('.AdminCheck [name="Toggle"]').attr('checked', 'checked');
+      $('.AdminCheck [name="Toggle"]').attr('checked', 'checked').change();
 
    /* Discussion Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
-         $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').attr('checked', 'checked');
+         $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').attr('checked', 'checked').change();
       else
-         $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').removeAttr('checked');
+         $('.DataList .AdminCheck :checkbox, tbody .AdminCheck :checkbox').removeAttr('checked').change();
    });
    $('.AdminCheck :checkbox').click(function() {
       // retrieve all checked ids

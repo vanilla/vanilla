@@ -22,7 +22,7 @@ if ($Session->IsValid()):
          echo Anchor(Sprite('SpBookmarks', 'Sprite16').Wrap(T('Bookmarks'), 'em'), '/discussions/bookmarked', array('title' => T('Bookmarks')));
 
          // Dashboard
-         if ($Session->CheckPermission('Garden.Settings.Manage'))
+         if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage'))
             echo Anchor(Sprite('SpDashboard', 'Sprite16').Wrap(T('Dashboard'), 'em'), '/dashboard/settings', array('title' => T('Dashboard')));
 
          // Sign Out

@@ -229,4 +229,12 @@ class MorePagerModule extends Gdn_Module {
       else
          return sprintf($this->Wrapper, Attribute(array('id' => $ClientID, 'class' => $this->CssClass)), $Pager);
    }
+   
+   /** 
+    * Are there more pages after the current one?
+    */
+   public function HasMorePages() {
+      return $this->TotalRecords > $this->Offset + $this->Limit;
+   }
+   
 }

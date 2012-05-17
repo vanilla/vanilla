@@ -31,6 +31,11 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    // Ignore errors that are below the current error reporting level.
    if (($ErrorReporting & $ErrorNumber) != $ErrorNumber)
       return FALSE;
+   
+   if (($ErrorNumber & E_NOTICE) == E_NOTICE & function_exists('Trace')) {
+      Trace("$Message in $File on line $Line.", TRACE_NOTICE);
+      return FALSE;
+   }
 
    $Backtrace = debug_backtrace();
    throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments, $Backtrace);
@@ -439,6 +444,8 @@ function PermissionException($Permission = NULL) {
    elseif ($Permission == 'Banned')
       $Message = T("You've been banned.");
    else
-      $Message = sprintf(T('You need the %s permission to do that.'), $Permission);
+      $Message = T(
+         "PermissionRequired.$Permission",
+         sprintf(T('You need the %s permission to do that.'), $Permission));
    return new Exception($Message, 401);
 }

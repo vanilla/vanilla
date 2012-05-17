@@ -30,6 +30,27 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class VanillaHooks implements Gdn_IPlugin {
+   
+   /**
+    *
+    * @param DbaController $Sender 
+    */
+   public function DbaController_CountJobs_Handler($Sender) {
+      $Counts = array(
+          'Discussion' => array('CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'),
+          'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID')
+      );
+      
+      foreach ($Counts as $Table => $Columns) {
+         foreach ($Columns as $Column) {
+            $Name = "Recalculate $Table.$Column";
+            $Url = "/dba/counts.json?".http_build_query(array('table' => $Table, 'column' => $Column));
+            
+            $Sender->Data['Jobs'][$Name] = $Url;
+         }
+      }
+   }
+   
    /**
     * Delete all of the Vanilla related information for a specific user.
     * @param int $UserID The ID of the user to delete.
@@ -492,17 +513,40 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
-      $Path = GetValue('Path', $Args);
-      if (preg_match('`discussion\/(\d+)`i', $Path, $Matches)) {
-         $DiscussionID = $Matches[1];
-      } elseif(preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches)) {
-         $CommentID = $Matches[1];
-         $CommentModel = new CommentModel();
-         $Comment = $CommentModel->GetID($CommentID);
-         $DiscussionID = GetValue('DiscussionID', $Comment);
+      $Path = Gdn::Request()->Post('Path');
+      $Args = Gdn::Request()->Post('Args');
+      $ResolvedPath = Gdn::Request()->Post('ResolvedPath');
+      
+      $DiscussionID = NULL;
+      
+      // Comment permalink
+      if ($ResolvedPath == 'vanilla/discussion/comment') {
+         $Matched = preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches);
+         
+         if ($Matched) {
+            $CommentID = $Matches[1];
+            $CommentModel = new CommentModel();
+            $Comment = $CommentModel->GetID($CommentID);
+            $DiscussionID = GetValue('DiscussionID', $Comment);
+         }
+      } 
+      
+      // Discussion link
+      elseif ($ResolvedPath == 'vanilla/discussion/index') {
+         $Matched = preg_match('`discussion\/(\d+)`i', $Path, $Matches);
+         
+         if ($Matched)
+            $DiscussionID = $Matches[1];
+      } 
+      
+      // Embedded discussion
+      elseif ($ResolvedPath == 'vanilla/discussion/embed') {
+         $Matched = preg_match('`vanilla_discussion_id=(\d+)`i', $Args, $Matches);
+         if ($Matched)
+            $DiscussionID = $Matches[1];
       }
       
-      if (isset($DiscussionID)) {
+      if (!empty($DiscussionID)) {
          $DiscussionModel = new DiscussionModel();
          $Discussion = $DiscussionModel->GetID($DiscussionID);
          $DiscussionModel->AddView($DiscussionID, GetValue('CountViews', $Discussion));

@@ -34,7 +34,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     * 
     * @var array
     */
-   protected $_Data = array();
+   public $Data = array();
 
 
    /**
@@ -91,9 +91,9 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
    
    public function Data($Name = NULL, $Default = '') {
       if ($Name == NULL)
-         $Result = $this->_Data;
+         $Result = $this->Data;
       else
-         $Result = GetValueR($Name, $this->_Data, $Default);
+         $Result = GetValueR($Name, $this->Data, $Default);
       return $Result;
    }
 
@@ -196,7 +196,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
    }
    
    public function SetData($Name, $Value) {
-      $this->_Data[$Name] = $Value;
+      $this->Data[$Name] = $Value;
    }
 
    /**

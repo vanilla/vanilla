@@ -357,6 +357,8 @@ class UtilityController extends DashboardController {
       if ($Target = $this->Request->Get('Target')) {
          Redirect($Target);
       }
+      
+      $this->FireEvent('AfterUpdate');
 
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';
@@ -383,6 +385,9 @@ class UtilityController extends DashboardController {
       $this->SetData('Success', TRUE);
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';
+      
+      $this->FireEvent('Alive');
+      
       $this->Render();
    }
    
@@ -526,8 +531,10 @@ class UtilityController extends DashboardController {
    public function FetchPageInfo($Url = '') {
       $PageInfo = FetchPageInfo($Url);
       $this->SetData('PageInfo', $PageInfo);
-      $this->DeliveryType(DELIVERY_TYPE_DATA);
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->MasterView = 'default';
+      $this->RemoveCssFile('admin.css');
+      $this->AddCssFile('style.css');
+      $this->SetData('_NoPanel', TRUE);
       $this->Render();
    }   
 }

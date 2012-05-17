@@ -360,6 +360,8 @@ class Gdn_Session {
          $Name = array($Name => $Value);
 
       foreach($Name as $Key => $Val) {
+         if ($Val === NULL)
+            unset($this->_Attributes[$Key]);
          $this->_Attributes[$Key] = $Val;
       }
    }

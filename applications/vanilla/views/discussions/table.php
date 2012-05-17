@@ -17,7 +17,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
    $DiscussionUrl = $Discussion->Url;
    
    if ($Session->UserID)
-      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch);
+      $DiscussionUrl .= '#latest';
    
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
@@ -42,9 +42,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 	$Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
 
    $FirstPageUrl = DiscussionUrl($Discussion, 1);
-   $LastPageUrl = DiscussionUrl($Discussion, FALSE, '#Item_'.$Discussion->CountCommentWatch);	
-	$Discussion->CountReplies = $Discussion->CountComments - 1;
-
+   $LastPageUrl = DiscussionUrl($Discussion, FALSE).'#latest';
 ?>
 <tr class="<?php echo $CssClass; ?>">
    <?php echo AdminCheck($Discussion, array('<td class="CheckBoxColumn">', '</td>')); ?>
@@ -95,7 +93,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 		// echo number_format($Discussion->CountComments);
 		
 		// Round Number
-		echo BigPlural($Discussion->CountReplies, '%s comment');
+		echo BigPlural($Discussion->CountComments, '%s comment');
 		?>
 	</td>
 	<td class="BigCount CountViews">
@@ -135,11 +133,11 @@ if ($this->Data('_PagerUrl')) {
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 }
 
-echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
 
 echo '<div class="P PageDescription">';
 echo PagerModule::Write($PagerOptions);
-echo $this->Data('_Description');
+echo $this->Data('_Description', '&#160;');
 echo '</div>';
 
 
@@ -178,9 +176,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </table>
 </div>
 <?php
-   echo '<div class="P ClearFix">';
    PagerModule::Write($PagerOptions);
-   echo '</div>';
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

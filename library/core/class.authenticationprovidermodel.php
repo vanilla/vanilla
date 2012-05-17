@@ -22,7 +22,10 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       $this->PrimaryKey = self::COLUMN_KEY;
    }
    
-   protected static function _Calcualate(&$Row) {
+   protected static function _Calculate(&$Row) {
+      if (!$Row)
+         return;
+      
       $Attributes = @unserialize($Row['Attributes']);
       if (is_array($Attributes))
          $Row = array_merge($Attributes, $Row);
@@ -37,7 +40,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
       
-      self::_Calcualate($ProviderData);
+      self::_Calculate($ProviderData);
          
       return $ProviderData;
    }
@@ -50,7 +53,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
          
-      self::_Calcualate($ProviderData);
+      self::_Calculate($ProviderData);
          
       return $ProviderData;
    }
@@ -67,7 +70,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       $ProviderData = $ProviderQuery->Get();
       if ($ProviderData->NumRows()) {
          $Result = $ProviderData->FirstRow(DATASET_TYPE_ARRAY);
-         self::_Calcualate($Result);
+         self::_Calculate($Result);
          return $Result;
       }
          

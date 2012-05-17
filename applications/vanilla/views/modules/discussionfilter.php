@@ -33,7 +33,8 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
 ?>
 <div class="BoxFilter BoxDiscussionFilter">
    <ul class="FilterMenu">
-      <?php      
+      <?php
+      $Controller->FireEvent('BeforeDiscussionFilters');     
 //      if (C('Vanilla.Categories.ShowTabs')) {
          $CssClass = 'AllCategories';
          if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), array('index', 'all'))) {

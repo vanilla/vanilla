@@ -10,14 +10,6 @@ $Controller = Gdn::Controller();
    } else {
       $Session = Gdn::Session();
       
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage') && $Controller->User->UserID != $Session->UserID) {
-         if ($Controller->User->Banned) {
-            echo ' '.Anchor(Sprite('SpUnBan').T('Unban'), '/user/ban?userid='.$Controller->User->UserID.'&unban=1', 'NavButton Popup').' ';
-         } else {
-            echo ' '.Anchor(Sprite('SpBan').T('Ban'), '/user/ban?userid='.$Controller->User->UserID, 'NavButton Popup').' ';
-         }
-      }
-      
       if ($Controller->User->UserID != $Session->UserID) {
          if ($Session->CheckPermission('Garden.Users.Edit'))
             echo ' '.Anchor(Sprite('SpEditProfile').T('Edit Profile'), '/profile/edit/'.$Controller->User->UserID.'/'.rawurlencode($Controller->User->Name), 'NavButton').' ';
@@ -27,5 +19,21 @@ $Controller = Gdn::Controller();
       }
    }
    $Controller->FireEvent('AfterProfileOptions');
+   
+   $this->FireEvent('AdvancedProfileOptions');
+   $Advanced = $this->Data('Advanced');
+   if (!empty($Advanced)) {
+      ?>
+      <span class="ToggleFlyout OptionsMenu">
+         <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
+         <span class="SpFlyoutHandle"></span>
+         <ul class="Flyout MenuItems" style="display: none;">
+         <?php foreach ($Advanced as $Code => $Options) : ?>
+            <li><?php echo Anchor($Options['Label'], $Options['Url'], GetValue('Class', $Options, $Code)); ?></li>
+         <?php endforeach; ?>
+         </ul>
+      </span>
+      <?php
+   }
    ?>
 </div>

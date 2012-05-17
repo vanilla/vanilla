@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
+echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
 $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
 ?>
 <div class="Categories">
@@ -13,7 +13,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       if ($this->DiscussionData->NumRows() > 0) : ?>
       
    <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
-      <?php echo Wrap(Anchor($Category->Name, '/categories/'.$Category->UrlCode), 'h2'); ?>
+      <?php echo Wrap(Anchor($Category->Name, '/categories/'.$Category->UrlCode), 'h2', array('class' => 'H')); ?>
       
       <ul class="DataList Discussions">
          <?php include($this->FetchViewLocation('discussions', 'discussions')); ?>

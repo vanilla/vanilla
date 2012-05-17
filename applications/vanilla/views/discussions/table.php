@@ -134,11 +134,10 @@ if ($this->Data('_PagerUrl')) {
 }
 
 echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
-
 echo '<div class="P PageDescription">';
-echo PagerModule::Write($PagerOptions);
 echo $this->Data('_Description', '&#160;');
 echo '</div>';
+echo PagerModule::Write($PagerOptions);
 
 
 

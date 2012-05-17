@@ -399,8 +399,18 @@ if (!function_exists('UserPhoto')) {
       else
          $User = (object)$User;
       
-      $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
+      $LinkClass = GetValue('LinkClass', $Options, 'PhotoLink');
       $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhoto ProfilePhotoMedium');
+      
+      $Size = GetValue('Size', $Options);
+      if ($Size) {
+         $LinkClass .= ' PhotoLink-'.$Size;
+      }
+      
+      $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User));
+      $UserCssClass = GetValue('_CssClass', $FullUser);
+      if ($UserCssClass)
+         $LinkClass .= ' '.$UserCssClass;
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 

@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
    $('form.Activity textarea').setMaxChars(1000);
    
    // Hide activity deletes and hijack their clicks to confirm
-   $('ul.Activities a.Delete, ul.Activities a.DeleteComment').popup({
+   $('li.Activity a.Delete, ul.Activities a.DeleteComment').popup({
       confirm: true,
       followConfirm: false,
       afterConfirm: function(json, sender) {

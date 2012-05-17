@@ -1872,6 +1872,10 @@ class PHPMailer {
   public function ClearReplyTos() {
     $this->ReplyTo = array();
   }
+  
+  public function CountRecipients() {
+     return count($this->to) + count($this->cc) + count($this->bcc);
+  }
 
   /**
    * Clears all recipients assigned in the TO, CC and BCC

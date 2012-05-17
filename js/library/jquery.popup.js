@@ -239,6 +239,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     
       $('#'+settings.popupId+' .Loading').remove();
       $('#'+settings.popupId+' .Body').children().fadeIn('normal');
+      
+      $('#'+settings.popupId+' .Close').unbind().click(function() {
+         return $.popup.close(settings);
+      });
 
       settings.afterLoad();
     
@@ -268,6 +272,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                }
             },
             error: function(xhr) {
+               $('.InProgress', this).removeClass('InProgress');
                gdn.informError(xhr);
             }
          });
@@ -314,8 +319,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       mouseoverClass:   'Popable',    // CssClass to be applied to a popup link when hovering
       onSave:           function(settings) {
          if (settings.sender) {
-            $('#'+settings.popupId+' .Button:last').attr('disabled', true);
-            $('#'+settings.popupId+' .Button:last').after('<span class="Progress">&#160;</span>');
+            $('#'+settings.popupId+' .Button:submit').attr('disabled', true).addClass('InProgress');
          }
       },
       onLoad:           function(settings) {

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo '<h2>'.T('Activity').'</h2>';
+echo '<h2 class="H">'.T('Activity').'</h2>';
 
 $Session = Gdn::Session();
 if ($Session->IsValid() && CheckPermission('Garden.Profiles.Edit')) {

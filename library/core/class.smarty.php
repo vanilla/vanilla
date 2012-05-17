@@ -24,13 +24,8 @@ class Gdn_Smarty {
 
    /// Methods ///
 
-   /**
-    * Render the given view.
-    *
-    * @param string $Path The path to the view's file.
-    * @param Controller $Controller The controller that is rendering the view.
-    */
-   public function Render($Path, $Controller) {
+   
+   public function Init($Path, $Controller) {
       $Smarty = $this->Smarty();
 
       // Get a friendly name for the controller.
@@ -49,6 +44,7 @@ class Gdn_Smarty {
       if($Session->IsValid()) {
          $User = array(
             'Name' => $Session->User->Name,
+            'Photo' => '',
             'CountNotifications' => (int)GetValue('CountNotifications', $Session->User, 0),
             'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
             'SignedIn' => TRUE);
@@ -60,7 +56,7 @@ class Gdn_Smarty {
             }
          } else {
             if (function_exists('UserPhotoDefaultUrl'))
-               $Photo = UserPhotoDefaultUrl($Session->User);
+               $Photo = UserPhotoDefaultUrl($Session->User, 'ProfilePhoto');
             elseif ($ConfigPhoto = C('Garden.DefaultAvatar'))
                $Photo = Gdn_Upload::Url($ConfigPhoto);
             else
@@ -105,7 +101,17 @@ class Gdn_Smarty {
       $Smarty->security_settings['IF_FUNCS'] = array_merge($Smarty->security_settings['IF_FUNCS'],
          array('CheckPermission', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url', 'InSection'));
       $Smarty->secure_dir = array($Path);
-      
+   }   
+   
+   /**
+    * Render the given view.
+    *
+    * @param string $Path The path to the view's file.
+    * @param Controller $Controller The controller that is rendering the view.
+    */
+   public function Render($Path, $Controller) {
+      $Smarty = $this->Smarty();
+      $this->Init($Path, $Controller);
       $CompileID = $Smarty->compile_id;
       if (defined('CLIENT_NAME'))
          $CompileID = CLIENT_NAME;
@@ -123,9 +129,35 @@ class Gdn_Smarty {
          $Smarty->cache_dir = PATH_CACHE . DS . 'Smarty' . DS . 'cache';
          $Smarty->compile_dir = PATH_CACHE . DS . 'Smarty' . DS . 'compile';
          $Smarty->plugins_dir[] = PATH_LIBRARY . DS . 'vendors' . DS . 'SmartyPlugins';
-
+         
+//         Gdn::PluginManager()->Trace = TRUE;
+         Gdn::PluginManager()->CallEventHandlers($Smarty, 'Gdn_Smarty', 'Init');
+         
          $this->_Smarty = $Smarty;
       }
       return $this->_Smarty;
+   }
+   
+   /** 
+    * See if the provided template causes any errors. 
+    * @param type $Path Path of template file to test.
+    * @return boolean TRUE if template loads successfully.
+    */
+   public function TestTemplate($Path) {
+      $Smarty = $this->Smarty();
+      $this->Init($Path, Gdn::Controller());
+      $CompileID = $Smarty->compile_id;
+      if (defined('CLIENT_NAME'))
+         $CompileID = CLIENT_NAME;
+
+      $Return = TRUE;
+      try {
+         $Result = $Smarty->fetch($Path, NULL, $CompileID);
+         // echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
+         $Return = ($Result == '' || strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<h1>Something has gone wrong.</h1>') > 0) ? FALSE : TRUE;
+      } catch(Exception $ex) {
+         $Return = FALSE;
+      }
+      return $Return;
    }
 }

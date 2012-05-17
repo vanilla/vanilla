@@ -28,6 +28,7 @@ class ConversationMessageModel extends Gdn_Model {
     */
    public function __construct() {
       parent::__construct('ConversationMessage');
+      $this->PrimaryKey = 'MessageID';
    }
    
    /**

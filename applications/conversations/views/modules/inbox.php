@@ -57,7 +57,7 @@ $SubjectsVisible = C('Conversations.Subjects.Visible');
    </ul>   
    <div class="P PagerContainer">
       <?php
-      echo Anchor(Sprite('SpNewConversation').T('New Message'), '/messages/add');
+      echo Anchor(Sprite('SpNewConversation SpAdd').T('New Message'), '/messages/add');
       ?>
       <span class="Pager"><?php echo Anchor(T('More…'), '/messages/inbox'); ?></span>
    </div>
@@ -67,7 +67,7 @@ $SubjectsVisible = C('Conversations.Subjects.Visible');
       ?>
       <div class="P PagerContainer">
          <?php
-         echo Anchor(Sprite('SpNewConversation').T('New Message'), '/messages/add');
+         echo Anchor(Sprite('SpNewConversation SpAdd').T('New Message'), '/messages/add');
          ?>
       </div>
    <?php endif; ?>

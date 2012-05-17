@@ -221,12 +221,14 @@ class Gdn_Autoloader {
    
    public static function GetContextType($MapHash) {
       $Matched = preg_match('/^context:(\d+)_.*/', $MapHash, $Matches);
-      if ($Matched)
-         $ContextIdentifier = GetValue(1, $Matches);
+      if ($Matched && isset($Matches[1]))
+         $ContextIdentifier = $Matches[1];
       else
          return FALSE;
-         
-      return GetValue($ContextIdentifier, self::$ContextOrder, FALSE);
+      
+      if (isset($ContextIdentifier, self::$ContextOrder))
+         return self::$ContextOrder[$ContextIdentifier];
+      return FALSE;
    }
    
    public static function GetMapType($ClassName) {
@@ -244,7 +246,6 @@ class Gdn_Autoloader {
    }
    
    public static function Lookup($ClassName, $Options = array()) {
-      
       if (!preg_match("/^[a-zA-Z0-9_\x7f-\xff]*$/", $ClassName))
          return;
       
@@ -259,9 +260,9 @@ class Gdn_Autoloader {
       $File = self::DoLookup($ClassName, $MapType);
       
       if ($File !== FALSE) {
-         if (!GetValue("Quiet", $Options) === TRUE)
+         if (!isset($Options['Quiet']) || !$Options['Quiet'])
             include_once($File);
-      }         
+      }
       return $File;
    }
    
@@ -622,11 +623,11 @@ class Gdn_Autoloader_Map {
    }
    
    public function ContextType() {
-      return GetValue('contexttype', $this->MapInfo);
+      return $this->MapInfo['contexttype']; //GetValue('contexttype', $this->MapInfo);
    }
    
    public function Extension() {
-      return GetValue('extension', $this->MapInfo);
+      return $this->MapInfo['extension']; //GetValue('extension', $this->MapInfo);
    }
    
    protected function FindFile($Path, $SearchFiles, $Recursive) {
@@ -704,16 +705,16 @@ class Gdn_Autoloader_Map {
    }
    
    public function Lookup($ClassName, $MapOnly = TRUE) {
-      $MapName = GetValue('name', $this->MapInfo);
+      $MapName = $this->MapInfo['name']; //GetValue('name', $this->MapInfo);
       
       // Lazyload cache data
       if (is_null($this->Map)) {
          $this->Map = array();
-         $OnDiskMapFile = GetValue('ondisk', $this->MapInfo);
+         $OnDiskMapFile = $this->MapInfo['ondisk']; //GetValue('ondisk', $this->MapInfo);
          
          // Loading cache data from disk
          if (file_exists($OnDiskMapFile)) {
-            $Structure = GetValue('structure', $this->MapInfo);
+            $Structure = $this->MapInfo['structure']; //GetValue('structure', $this->MapInfo);
             $MapContents = parse_ini_file($OnDiskMapFile, TRUE);
             
             try {
@@ -890,7 +891,7 @@ class Gdn_Autoloader_Map {
    }
    
    public function MapType() {
-      return GetValue('maptype', $this->MapInfo);
+      return $this->MapInfo['maptype']; //GetValue('maptype', $this->MapInfo);
    }
    
    public function Shutdown() {

@@ -85,6 +85,42 @@ class UserModel extends Gdn_Model {
    }
    
    /**
+    * Checks the currently authenticated user's permissions for the specified
+    * permission. Returns a boolean value indicating if the action is
+    * permitted.
+    *
+    * @param mixed $Permission The permission (or array of permissions) to check.
+    * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
+	 * @return boolean
+    */
+   public function CheckPermission($User, $Permission, $Options = array()) {
+      if (is_numeric($User)) {
+         $User = $this->GetID($User);
+      }
+      $User = (object)$User;
+      
+      if ($User->Banned || $User->Deleted)
+         return FALSE;
+      
+      if ($User->Admin)
+         return TRUE;
+      
+      // Grab the permissions for the user.
+      if ($User->UserID == 0)
+         $Permissions = $this->DefinePermissions(0, FALSE);
+      elseif (is_array($User->Permissions))
+         $Permissions = $User->Permissions;
+      else {
+         $Permissions = $this->DefinePermissions($User->UserID, FALSE);
+      }
+      
+      // TODO: Check for junction table permissions.
+      
+      $Result = in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
+      return $Result;
+   }
+   
+   /**
     * Unban a user.
     * @since 2.1
     * @param int $UserID
@@ -176,6 +212,116 @@ class UserModel extends Gdn_Model {
       $this->SaveAttribute($UserID, array('EmailKey' => NULL, 'ConfirmedEmailRoles' => NULL));
       return TRUE;
    }
+   
+   public function SSO($String) {
+      if (!$String)
+         return;
+      
+      $Parts = explode(' ', $String);
+      
+      $String = $Parts[0];
+      $Data = json_decode(base64_decode($String), TRUE);
+      $Errors = 0;
+      
+      if (!isset($Parts[1])) {
+         Trace('Missing SSO signature', TRACE_ERROR);
+         $Errors++;
+      }
+      if (!isset($Parts[2])) {
+         Trace('Missing SSO timestamp', TRACE_ERROR);
+         $Errors++;
+      }
+      if ($Errors)
+         return;
+      
+      $Signature = $Parts[1];
+      $Timestamp = $Parts[2];
+      $HashMethod = GetValue(3, $Parts, 'hmacsha1');
+      $ClientID = GetValue('client_id', $Data);
+      if (!$ClientID) {
+         Trace('Missing SSO client_id', TRACE_ERROR);
+         return;
+      }
+      
+      $Provider = Gdn_AuthenticationProviderModel::GetProviderByKey($ClientID);
+      
+      if (!$Provider) {
+         Trace("Unknown SSO Provider: $ClientID", TRACE_ERROR);
+         return;
+      }
+      
+      $Secret = $Provider['AssociationSecret'];
+      
+      // Check the signature.
+      switch ($HashMethod) {
+         case 'hmacsha1':
+            $CalcSignature = hash_hmac('sha1', "$String $Timestamp", $Secret);
+            break;
+         case 'md5':
+            $CalcSignature = md5("$String $Timestamp".$Secret);
+            break;
+         default:
+            Trace("Invalid SSO hash method $HashMethod.", TRACE_ERROR);
+            return;
+      }
+      if ($CalcSignature != $Signature) {
+         Trace("Invalid SSO signature.", TRACE_ERROR);
+         return;
+      }
+      
+      $UniqueID = $Data['uniqueid'];
+      $User = ArrayTranslate($Data, array('name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo'));
+      
+      Trace($User, 'SSO User');
+      
+      $UserID = Gdn::UserModel()->Connect($UniqueID, $ClientID, $User);
+      return $UserID;
+   }
+   
+   /**
+    *
+    * @param array $CurrentUser
+    * @param array $NewUser 
+    * @since 2.1
+    */
+   public function SynchUser($CurrentUser, $NewUser) {
+      if (is_numeric($CurrentUser)) {
+         $CurrentUser = $this->GetID($CurrentUser, DATASET_TYPE_ARRAY);
+      }
+      
+      // Don't synch the user photo if they've uploaded one already.
+      $Photo = GetValue('Photo', $NewUser);
+      if (!GetValue('Photo', $CurrentUser) || !is_string($Photo) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+         unset($NewUser['Photo']);
+      }
+      
+      if (C('Garden.SSO.SynchRoles')) {
+         // Translate the role names to IDs.
+         
+         $Roles = GetValue('Roles', $NewUser);
+         if (is_string($Roles))
+            $Roles = explode(',', $Roles);
+         $Roles = array_map('trim', $Roles);
+         $Roles = array_map('strtolower', $Roles);
+         
+         $AllRoles = RoleModel::Roles();
+         $RoleIDs = array();
+         foreach ($AllRoles as $RoleID => $Role) {
+            $Name = strtolower($Role['Name']);
+            if (in_array($Name, $Roles)) {
+               $RoleIDs[] = $RoleID;
+            }
+         }
+         $NewUser['RoleIDs'] = $RoleIDs;
+      } else {
+         unset($NewUser['Roles']);
+         unset($NewUser['RoleIDs']);
+      }
+      
+      // Save the user information.
+      $NewUser['UserID'] = $CurrentUser['UserID'];
+      $this->Save($NewUser, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => isset($NewUser['RoleIDs'])));
+   }
 
    /** Connect a user with a foreign authentication system.
     *
@@ -185,6 +331,9 @@ class UserModel extends Gdn_Model {
     * @return int The new/existing user ID.
     */
    public function Connect($UniqueID, $ProviderKey, $UserData) {
+      Trace('UserModel->Connect()');
+      
+      $UserID = FALSE;
       if (!isset($UserData['UserID'])) {
          // Check to see if the user already exists.
          $Auth = $this->GetAuthentication($UniqueID, $ProviderKey);
@@ -194,22 +343,45 @@ class UserModel extends Gdn_Model {
             $UserData['UserID'] = $UserID;
       }
       
-      if (isset($UserID)) {
+      $UserInserted = FALSE;
+      
+      if ($UserID) {
          // Save the user.
-         $this->Save($UserData, array('NoConfirmEmail' => TRUE));
+         $this->SynchUser($UserID, $UserData);
+         return $UserID;
       } else {
-         // Create a new user.
-         $UserID = $this->InsertForBasic($UserData, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE));
+         // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
+         
+         // Check to auto-connect based on email address.
+         if (C('Garden.SSO.AutoConnect', C('Garden.Registration.AutoConnect')) && isset($UserData['Email'])) {
+            $User = (array)$this->GetByEmail($UserData['Email']);
+            if ($User) {
+               // Save the user.
+               $this->SynchUser($User, $UserData);
+               $UserID = $User['UserID'];
+            }
+         }
+         
+         if (!$UserID) {
+            // Create a new user.
+//            $UserID = $this->InsertForBasic($UserData, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserData['Password'] = md5(microtime());
+            $UserData['HashMethod'] = 'Random';
+            
+            Trace($UserData, 'Registering User');
+            $UserID = $this->Register($UserData, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserInserted = TRUE;
+         }
          
          if ($UserID) {
             // Save the authentication.
             $this->SaveAuthentication(array(
-                'ForeignUserKey' => $UniqueID, 
-                'ProviderKey' => $ProviderKey, 
+                'UniqueID' => $UniqueID, 
+                'Provider' => $ProviderKey, 
                 'UserID' => $UserID
             ));
             
-            if (C('Garden.Registration.SendConnectEmail', TRUE)) {
+            if ($UserInserted && C('Garden.Registration.SendConnectEmail', TRUE)) {
                $Provider = $this->SQL->GetWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->FirstRow(DATASET_TYPE_ARRAY);
                if ($Provider) {
                   try {
@@ -221,6 +393,7 @@ class UserModel extends Gdn_Model {
             }
          }
       }
+      
       return $UserID;
    }
    
@@ -729,7 +902,7 @@ class UserModel extends Gdn_Model {
     * @param $Key string relative user meta key.
     * @return array results or $Default
     */
-   public static function GetMeta($UserID, $Key, $Prefix = '') {;
+   public static function GetMeta($UserID, $Key, $Prefix = '', $Default = '') {
       $Sql = Gdn::SQL()
          ->Select('*')
          ->From('UserMeta u');
@@ -942,12 +1115,13 @@ class UserModel extends Gdn_Model {
     * Generic save procedure.
     */
    public function Save($FormPostValues, $Settings = FALSE) {
-      
       // See if the user's related roles should be saved or not.
       $SaveRoles = GetValue('SaveRoles', $Settings);
 
       // Define the primary key in this model's table.
       $this->DefineSchema();
+      
+      
 
       // Custom Rule: This will make sure that at least one role was selected if saving roles for this user.
       if ($SaveRoles) {
@@ -1608,7 +1782,6 @@ class UserModel extends Gdn_Model {
       $this->AddInsertFields($FormPostValues);
 
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
-
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
          $Username = ArrayValue('Name', $Fields);
          $Email = ArrayValue('Email', $Fields);
@@ -1700,6 +1873,8 @@ class UserModel extends Gdn_Model {
       // Update session level information if necessary.
       if ($UserID == Gdn::Session()->UserID) {
          $IP = Gdn::Request()->IpAddress();
+         if (strpos($IP, '.') === FALSE)
+               $IP = long2ip(hexdec($IP));
          $Fields['LastIPAddress'] = $IP;
          
          if (Gdn::Session()->NewVisit()) {
@@ -1990,7 +2165,7 @@ class UserModel extends Gdn_Model {
       // Remove the user's information
       $this->SQL->Update('User')
          ->Set(array(
-            'Name' => '[Deleted User]',
+            'Name' => T('[Deleted User]'),
             'Photo' => null,
             'Password' => RandomString('10'),
             'About' => '',

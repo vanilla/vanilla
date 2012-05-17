@@ -82,3 +82,71 @@
 	font-size: 11px;
 	border: none;
 }
+
+
+/* If window is less than 800px wide, hide the panel for all pages except profile. */
+@media screen and (max-width: 799px) {
+   /* Hide the "started by" column of the discussions table. */
+   body.Discussions .DataTable .FirstUser { display: none; }
+   
+   /* Hide the panel on non-profile pages. */
+   #Body .Row {
+      position: relative;
+   }
+   #Body .ContentColumn {
+      padding-top: 50px;
+   }
+   .MeBox,
+   .BigButton {
+      visibility: visible;
+      position: absolute;
+      top: 0;
+      width: 120px;
+   }
+   .BigButton {
+      right: 0;
+      padding: 8px 20px;
+   }
+   .MeBox {
+      left: 0;
+      width: 200px;
+   }
+   #Panel {
+      overflow: visible;
+      visibility: hidden;
+      position: absolute;
+      left: 0;
+      right: 2px; /* Don't know why this is adding some extra padding */
+      width: auto;
+      display: block;
+   }
+   .Column.ContentColumn {
+      margin: 0 !important;
+   }
+
+   /* Don't hide the panel on the profile page */
+   body.Profile #Body .ContentColumn {
+      padding-top: 0;
+   }
+   body.Profile .MeBox,
+   body.Profile .BigButton {
+      visibility: visible;
+      position: relative;
+      top: auto;
+      right: auto;
+      width: auto;
+   }
+   body.Profile .MeBox {
+      width: auto;
+      right: auto;
+   }
+   body.Profile #Panel {
+      visibility: visible;
+      position: relative;
+      right: auto;
+      width: 200px;
+   }
+   body.Profile .Column.ContentColumn {
+      margin: 0 220px 0 0 !important;
+   }
+}

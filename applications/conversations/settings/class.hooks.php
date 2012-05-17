@@ -21,6 +21,26 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class ConversationsHooks implements Gdn_IPlugin {
    
+   /**
+    *
+    * @param DbaController $Sender 
+    */
+   public function DbaController_CountJobs_Handler($Sender) {
+      $Counts = array(
+          'Conversation' => array('CountMessages', 'FirstMessageID', 'LastMessageID', 'DateUpdated', 'UpdateUserID')
+//          'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID')
+      );
+      
+      foreach ($Counts as $Table => $Columns) {
+         foreach ($Columns as $Column) {
+            $Name = "Recalculate $Table.$Column";
+            $Url = "/dba/counts.json?".http_build_query(array('table' => $Table, 'column' => $Column));
+            
+            $Sender->Data['Jobs'][$Name] = $Url;
+         }
+      }
+   }
+   
    public function UserModel_SessionQuery_Handler($Sender) {
       // Add some extra fields to the session query
       //$Sender->SQL->Select('u.CountUnreadConversations');

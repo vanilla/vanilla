@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo T('Change My Password'); ?></h2>
+<h2 class="H"><?php echo T('Change My Password'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();

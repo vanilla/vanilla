@@ -130,6 +130,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $RedirectUrl;
+   
+   /**
+    * @var array The arguments passed into the controller mapped to their proper argument names.
+    * @since 2.1
+    */
+   public $ReflectArgs;
 
    /**
     * This is typically an array of arguments passed after the controller
@@ -375,10 +381,13 @@ class Gdn_Controller extends Gdn_Pluggable {
       } else if ($AssetName == '') {
          $this->Assets[$AssetContainer][] = $Asset;
       } else {
-         if (isset($this->Assets[$AssetContainer][$AssetName]))
+         if (isset($this->Assets[$AssetContainer][$AssetName])) {
+            if (!is_string($Asset))
+               $Asset = $Asset->ToString();
             $this->Assets[$AssetContainer][$AssetName] .= $Asset;
-         else
+         } else {
             $this->Assets[$AssetContainer][$AssetName] = $Asset;
+         }
       }
    }
 
@@ -764,25 +773,31 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Views come from one of four places:
          $ViewPaths = array();
-
-         foreach ($SubPaths as $SubPath) {
-            // 1. An explicitly defined path to a view
-            if (strpos($View, DS) !== FALSE)
-               $ViewPaths[] = $View;
-
-            if ($this->Theme) {
-               // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
+         
+         // 1. An explicitly defined path to a view
+         if (strpos($View, DS) !== FALSE)
+            $ViewPaths[] = $View;
+         
+         if ($this->Theme) {
+            // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
+            foreach ($SubPaths as $SubPath) {
                $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$ApplicationFolder/$SubPath.*";
                // $ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
-
-               // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
+            }
+            
+            // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
+            foreach ($SubPaths as $SubPath) {
                $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$SubPath.*";
                //$ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
             }
-            // 4. Application/plugin default. eg. /path/to/application/app_name/views/controller_name/
+         }
+         
+         // 4. Application/plugin default. eg. /path/to/application/app_name/views/controller_name/
+         foreach ($SubPaths as $SubPath) {
             $ViewPaths[] = "$BasePath/$ApplicationFolder/$SubPath.*";
             //$ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
          }
+                  
          // Find the first file that matches the path.
          $ViewPath = FALSE;
          foreach($ViewPaths as $Glob) {
@@ -1183,6 +1198,10 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
+         
+         if (Debug()) {
+            $this->AddModule('TraceModule');
+         }
 
          // Render
          if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {

@@ -118,7 +118,7 @@ class PagerModule extends Gdn_Module {
       $this->Offset = 0;
       $this->Limit = self::$DefaultPageSize;
       $this->TotalRecords = FALSE;
-      $this->Wrapper = '<div %1$s>%2$s</div>';
+      $this->Wrapper = '<div class="PagerWrap"><div %1$s>%2$s</div></div>';
       $this->PagerEmpty = '';
       $this->MoreCode = '»';
       $this->LessCode = '«';
@@ -439,5 +439,12 @@ class PagerModule extends Gdn_Module {
    
    private function _GetCssClass($ThisPage, $HighlightPage) {
       return $ThisPage == $HighlightPage ? 'Highlight' : FALSE;
+   }
+   
+   /** 
+    * Are there more pages after the current one?
+    */
+   public function HasMorePages() {
+      return $this->TotalRecords > $this->Offset + $this->Limit;
    }
 }

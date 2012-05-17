@@ -251,7 +251,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $HasValue = ($Value !== array(FALSE) && $Value !== array('')) ? TRUE : FALSE;
       
       // Start with null option?
-      $IncludeNull = GetValue('IncludeNull', $Options);
+      $IncludeNull = GetValue('IncludeNull', $Options) || !$HasValue;
       if ($IncludeNull === TRUE)
          $Return .= '<option value=""></option>';
          

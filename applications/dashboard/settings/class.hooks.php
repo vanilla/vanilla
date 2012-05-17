@@ -134,7 +134,7 @@ class DashboardHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
-      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.Manage');
+      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Moderation.Manage');
 		$Menu->AddLink('Dashboard', T('Getting Started'), '/dashboard/settings/gettingstarted', 'Garden.Settings.Manage');
 		$Menu->AddLink('Dashboard', T('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.Manage');
 
@@ -192,5 +192,22 @@ class DashboardHooks implements Gdn_IPlugin {
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       header('P3P: CP="CAO PSA OUR"', TRUE);
+      
+      if (!Gdn::Session()->IsValid() && $SSO = Gdn::Request()->Get('sso')) {
+         SaveToConfig('Garden.Registration.SendConnectEmail', FALSE, FALSE);
+         
+         try {
+            $UserID = Gdn::UserModel()->SSO($SSO);
+         } catch (Exception $Ex) {
+            Trace($Ex, TRACE_ERROR);
+         }
+         
+         if ($UserID) {
+            Gdn::Session()->Start($UserID, TRUE, TRUE);
+         } else {
+            // There was some sort of error. Let's print that out.
+            Trace(Gdn::UserModel()->Validation->ResultsText(), TRACE_WARNING);
+         }
+      }
    }   
 }

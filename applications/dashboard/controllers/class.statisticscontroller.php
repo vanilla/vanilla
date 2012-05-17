@@ -54,14 +54,10 @@ class StatisticsController extends DashboardController {
       $this->EnableSlicing($this);
       
       if ($this->Form->IsPostBack()) {
-         
          $Flow = TRUE;
          
-         if ($Flow && $this->Form->GetFormValue('ClearCredentials')) {
-            Gdn::InstallationID(FALSE);
-            Gdn::InstallationSecret(FALSE);
-            Gdn::Statistics()->Tick();
-            $Flow = FALSE;
+         if ($Flow && $this->Form->GetFormValue('Reregister')) {
+            Gdn::Statistics()->Register();
          }
          
          if ($Flow && $this->Form->GetFormValue('SaveIdentity')) {
@@ -78,10 +74,12 @@ class StatisticsController extends DashboardController {
             SaveToConfig('Garden.Analytics.Enabled', TRUE);
          }
          
-         if ($Flow && $this->Form->GetFormValue('Reregister')) {
-            Gdn::Statistics()->Register();
+         if ($Flow && $this->Form->GetFormValue('ClearCredentials')) {
+            Gdn::InstallationID(FALSE);
+            Gdn::InstallationSecret(FALSE);
+            Gdn::Statistics()->Tick();
+            $Flow = FALSE;
          }
-         
       }
       
       $AnalyticsEnabled = Gdn_Statistics::CheckIsEnabled();

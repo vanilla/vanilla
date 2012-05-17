@@ -311,18 +311,24 @@ if (!class_exists('HeadModule', FALSE)) {
             }
          }
          
-         // Include facebook open-graph meta information
+         // Include facebook open-graph meta information.
+         if ($FbAppID = C('Plugins.Facebook.ApplicationID')) {
+            $this->AddTag('meta', array('property' => 'fb:app_id', 'content' => $FbAppID));
+         }
+         
          $SiteName = C('Garden.Title', '');
          if ($SiteName != '')
             $this->AddTag('meta', array('property' => 'og:site_name', 'content' => $SiteName));
          
          $Title = Gdn_Format::Text($this->Title('', TRUE));
          if ($Title != '')
-            $this->AddTag('meta', array('property' => 'og:title', 'content' => $Title));
+            $this->AddTag('meta', array('property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
+         
+         if (isset($CanonicalUrl))
+            $this->AddTag('meta', array('property' => 'og:url', 'conent' => $CanonicalUrl));
          
          if ($Description = $this->_Sender->Description()) {
-            $this->AddTag('meta', array('name' => 'description', 'content' => $Description));
-            $this->AddTag('meta', array('property' => 'og:description', 'content' => $Description));
+            $this->AddTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
          }
 
          // Default to the site logo if there were no images provided by the controller.
@@ -334,11 +340,11 @@ if (!class_exists('HeadModule', FALSE)) {
                   $Logo = substr($Logo, strlen('uploads/'));
 
                $Logo = Gdn_Upload::Url($Logo);
-               $this->AddTag('meta', array('property' => 'og:image', 'content' => $Logo));
+               $this->AddTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Logo));
             }
          } else {
             foreach ($this->_Sender->Image() as $Img) {
-               $this->AddTag('meta', array('property' => 'og:image', 'content' => $Img));
+               $this->AddTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Img));
             }
          }
 

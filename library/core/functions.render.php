@@ -441,12 +441,15 @@ if (!function_exists('UserUrl')) {
     * @param string $Px The prefix to apply before fieldnames. @since 2.1
     * @return string The url suitable to be passed into the Url() function.
     */
-   function UserUrl($User, $Px = '') {
+   function UserUrl($User, $Px = '', $Method = '') {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      return '/profile/'.($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').rawurlencode(GetValue($Px.'Name', $User));
+      return '/profile/'.
+         ($Method ? trim($Method, '/').'/' : '').
+         ($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').
+         rawurlencode(GetValue($Px.'Name', $User));
    }
 }
 

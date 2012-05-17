@@ -128,7 +128,7 @@ jQuery(document).ready(function($) {
          remotePostMessage('unembed', '*');
 
       setHeight = function(explicitHeight) {
-         var newHeight = explicitHeight > 0 ? explicitHeight : $(document).height();
+         var newHeight = explicitHeight > 0 ? explicitHeight : document.body.offsetHeight;
          if (newHeight > minHeight && newHeight != currentHeight) {
             currentHeight = newHeight;               
             remotePostMessage('height:'+currentHeight, '*');

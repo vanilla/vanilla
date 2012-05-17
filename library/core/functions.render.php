@@ -106,9 +106,6 @@ function CssClass($Row) {
          $CssClass .= ' Alt';
       $Alt = !$Alt;
       
-   // Read/Unread
-      $CssClass .= ' '.(GetValue('Read', $Row) ? 'Read' : 'Unread');
-   
    // Category list classes
       if (array_key_exists('UrlCode', $Row))
          $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
@@ -124,9 +121,20 @@ function CssClass($Row) {
       $CssClass .= GetValue('Announce', $Row) ? ' Announcement' : '';
       $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
       $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
-      if (array_key_exists('CountUnreadComments', $Row))
-         $CssClass .= $Session->IsValid() && $Row['CountUnreadComments'] <= 0 ? ' Read' : ' New';
-      
+      if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {
+         $CountUnreadComments = $Row['CountUnreadComments'];
+         if ($CountUnreadComments === TRUE) {
+            $CssClass .= ' New';
+         } elseif ($CountUnreadComments == 0) {
+            $CssClass .= ' Read';
+         } else {
+            $CssClass .= ' Unread';
+         }
+      } elseif (($IsRead = GetValue('Read', $Row, NULL)) !== NULL) {
+         // Category list
+         $CssClass .= $IsRead ? ' Read' : ' Unread';
+      }
+         
    // Comment list classes
       if (array_key_exists('CommentID', $Row))
           $CssClass .= ' ItemComment';
@@ -138,8 +146,8 @@ function CssClass($Row) {
       
       if ($_CssClss = GetValue('_CssClass', $Row))
          $CssClass .= ' '.$_CssClss;
-      
-   return $CssClass;
+
+   return trim($CssClass);
 }
 endif;
 

@@ -46,7 +46,7 @@ class BookmarkedModule extends Gdn_Module {
             $this->SetData('Bookmarks', $Bookmarks);
          } else {
             
-            $this->SetData('Bookmarks', Gdn_DataSet());
+            $this->SetData('Bookmarks', new Gdn_DataSet());
          }
       }
    }

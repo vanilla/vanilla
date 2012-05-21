@@ -295,7 +295,7 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
       if(is_numeric($Where))
-         $Where = array($this->Name.'ID' => $Where);
+         $Where = array($this->PrimaryKey => $Where);
 
       if($ResetData) {
          $Result = $this->SQL->Delete($this->Name, $Where, $Limit);

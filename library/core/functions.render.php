@@ -111,7 +111,7 @@ function CssClass($Row) {
          $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
    
       if (array_key_exists('Depth', $Row))
-         $CssClass .= ' Depth-'.$Row['Depth'];
+         $CssClass .= " Depth{$Row['Depth']} Depth-{$Row['Depth']}";
       
       if (array_key_exists('Archive', $Row))
          $CssClass .= ' Archived';

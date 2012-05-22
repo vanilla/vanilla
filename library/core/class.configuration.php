@@ -904,7 +904,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       
       // Parse the string
       if (!empty($String)) {
-         $String = str_replace(array('<?php','<?','?>'), '', $String);
+         $String = trim(str_replace(array('<?php','<?','?>'), '', $String));
          $Parsed = eval($String);
          if ($Parsed === FALSE)
             return FALSE;

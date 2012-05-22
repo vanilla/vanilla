@@ -51,13 +51,17 @@ if (typeof(hash) == "undefined") {
    /**
     * Add new discussion & conversation buttons to various pages.
     */
-   public function CategoriesController_Render_Before($Sender) {
+   public function CategoriesController_Render_Before($Sender) {      
       $this->_AddButton($Sender, 'Discussion');
-		Gdn::Locale()->SetTranslation('Discussions', 'Threads');
-		Gdn::Locale()->SetTranslation('Comments', 'Posts');
+      
+      // Remove options dropdown from discussions lists
+      $Sender->ShowOptions = FALSE;
    }
    
    public function DiscussionsController_Render_Before($Sender) {
+      // Remove options dropdown from discussions lists
+      $Sender->ShowOptions = FALSE;
+      
       // Make sure that discussion clicks (anywhere in a discussion row) take the user to the discussion.
       if (property_exists($Sender, 'Head') && is_object($Sender->Head)) {
          $Sender->Head->AddString('<script type="text/javascript">

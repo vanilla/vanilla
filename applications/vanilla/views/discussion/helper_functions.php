@@ -251,7 +251,7 @@ function WriteDiscussionOptions($Discussion = NULL) {
    $Options = GetDiscussionOptions($Discussion);
    
    if (empty($Options))
-      return;
+      return; 
    ?>
    <span class="ToggleFlyout OptionsMenu">
       <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>

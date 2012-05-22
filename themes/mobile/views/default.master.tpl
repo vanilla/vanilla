@@ -27,10 +27,6 @@
 	 </div>
 	 <div id="Foot">
 		<div class="FootMenu">
-		  <!--
-		  <span>Mobile</span>
-		  <span><a href="#">Desktop</a></span>
-		  -->
         {nomobile_link wrap="span"}
 		  {dashboard_link wrap="span"}
 		  {signinout_link wrap="span"}

@@ -245,24 +245,27 @@ window.vanilla.embed = function(host) {
    // Couldn't find the container, so dump it out and try again.
    if (!container)
       document.write('<div id="vanilla-comments"></div>');
+   
    container = document.getElementById('vanilla-comments');
    if (container) {
+      var fallback = true;
       // If jQuery is present in the page, include our defer-until-visible script
-      if (typeof jQuery != 'undefined') {
-         var vanillaLazyLoad = document.createElement('script');
-         vanillaLazyLoad.type = 'text/javascript';
-         vanillaLazyLoad.src = vanilla_forum_url + '/js/library/jquery.appear.js';
-         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanillaLazyLoad);
+      if (typeof jQuery != 'undefined')
          jQuery(document).ready(function($) {
-            $('#vanilla-comments').appear(function() {
-               container.appendChild(vanillaIframe);
+            $.getScript('http://cdn.vanillaforums.com/js/jquery.appear.js', function() {
+               if ($.fn.appear) {
+                  $('#vanilla-comments').appear(function() {
+                     container.appendChild(vanillaIframe);
+                  });
+                  fallback = false;
+               }
             });
          });
-      } else {
-         container.appendChild(vanillaIframe); // fallback: just load it
-      }
-   }
 
+      if (fallback)
+         container.appendChild(vanillaIframe);
+   }
+   
    // Include our embed css into the page
    var vanilla_embed_css = document.createElement('link');
    vanilla_embed_css.rel = 'stylesheet';

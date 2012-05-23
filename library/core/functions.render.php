@@ -357,7 +357,7 @@ if (!function_exists('UserAnchor')) {
       } elseif (is_string($Options))
          $Options = array('Px' => $Options);
       
-      $Px = GetValue('Px', $Options);
+      $Px = GetValue('Px', $Options, '');
       
       $Name = GetValue($Px.'Name', $User, T('Unknown'));
       $UserID = GetValue($Px.'UserID', $User, 0);
@@ -367,8 +367,8 @@ if (!function_exists('UserAnchor')) {
           'class' => $CssClass,
           'rel' => GetValue('Rel', $Options)
           );
-
-      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.$Text.'</a>';
+      $UserUrl = UserUrl($User,$Px);
+      return '<a href="'.htmlspecialchars(Url($UserUrl)).'"'.Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
 
@@ -447,6 +447,7 @@ if (!function_exists('UserUrl')) {
     * Return the url for a user.
     * @param array|object $User The user to get the url for.
     * @param string $Px The prefix to apply before fieldnames. @since 2.1
+    * @param string $Method Optional. ProfileController method to target.
     * @return string The url suitable to be passed into the Url() function.
     */
    function UserUrl($User, $Px = '', $Method = '') {
@@ -454,10 +455,13 @@ if (!function_exists('UserUrl')) {
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
+      $UserName = GetValue($Px.'Name', $User);
+      $UserName = preg_replace('/([\?&]+)/', '', $UserName);
+      
       return '/profile/'.
          ($Method ? trim($Method, '/').'/' : '').
          ($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').
-         rawurlencode(GetValue($Px.'Name', $User));
+         rawurlencode($UserName);
    }
 }
 

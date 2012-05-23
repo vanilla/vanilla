@@ -297,7 +297,9 @@ abstract class Gdn_SQLDriver {
       }
       
       if(is_array($Value)) {
-         Deprecated('Gdn_SQL->ConditionExpr(VALUE, ARRAY)', 'Gdn_SQL->ConditionExpr(VALUE, VALUE)');
+         //$ValueStr = var_export($Value, TRUE);
+         $ValueStr = 'ARRAY';
+         Deprecated("Gdn_SQL->ConditionExpr(VALUE, {$ValueStr})", 'Gdn_SQL->ConditionExpr(VALUE, VALUE)');
          
          if ($EscapeValueSql)
             throw new Gdn_UserException('Invalid function call.');

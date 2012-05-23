@@ -67,8 +67,8 @@ class Gdn_Format {
       if ($ProfileUserID != $Activity->ActivityUserID) {
          // If we're not looking at the activity user's profile, link the name
          $ActivityNameD = urlencode($Activity->ActivityName);
-         $ActivityName = Anchor($ActivityName, '/profile/' . $Activity->ActivityUserID . '/' . $ActivityNameD);
-         $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
+         $ActivityName = Anchor($ActivityName, UserUrl($Activity, 'Activity'));
+         $ActivityNameP = Anchor($ActivityNameP, UserUrl($Activity, 'Activity'));
          $GenderSuffixCode = 'Third';
       }
 
@@ -110,12 +110,12 @@ class Gdn_Format {
          // If there is a regarding user and we're not looking at his/her profile, link the name.
          $RegardingNameD = urlencode($Activity->RegardingName);
          if (!$IsYou) {
-            $RegardingName = Anchor($RegardingName, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
-            $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
+            $RegardingName = Anchor($RegardingName, UserUrl($Activity, 'Regarding'));
+            $RegardingNameP = Anchor($RegardingNameP, UserUrl($Activity, 'Regarding'));
             $GenderSuffixCode = 'Third';
             $GenderSuffixGender = $Activity->RegardingGender;
          }
-         $RegardingWallActivityPath = '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD;
+         $RegardingWallActivityPath = UserUrl($Activity, 'Regarding');
          $RegardingWallLink = Url($RegardingWallActivityPath);
          $RegardingWall = Anchor(T('wall'), $RegardingWallActivityPath);
       }

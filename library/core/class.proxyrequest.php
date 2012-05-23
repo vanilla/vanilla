@@ -21,7 +21,6 @@ class ProxyRequest {
    public $RequestDefaults;
    public $RequestHeaders;
    public $RequestBody;
-   public $ParsedBody;
    
    public $ResponseHeaders;
    public $ResponseStatus;
@@ -266,6 +265,7 @@ class ProxyRequest {
       
       $RequestMethod = strtoupper($RequestMethod);
       switch ($RequestMethod) {
+         case 'PUT':
          case 'POST':
             break;
          
@@ -417,6 +417,18 @@ class ProxyRequest {
             curl_setopt($Handler, CURLOPT_INFILESIZE, $SendFileSize);
             
             $SendExtraHeaders[] = "Content-Length: {$SendFileSize}";
+         } else {
+            curl_setopt($Handler, CURLOPT_CUSTOMREQUEST, 'PUT');
+            curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
+         
+            if (!is_array($PostData) && !is_object($PostData))
+               $SendExtraHeaders['Content-Length'] = strlen($PostData);
+            else {
+               $TempPostData = http_build_str($PostData);
+               $SendExtraHeaders['Content-Length'] = strlen($TempPostData);
+            }
+            
+            $this->RequestBody = $PostData;
          }
       }
       

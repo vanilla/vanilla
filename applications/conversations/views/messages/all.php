@@ -4,7 +4,7 @@
 <?php
 
 // Pager setup
-$PagerOptions = array('RecordCount' => $this->Data('CountConversations'), 'CurrentRecords' => $this->Data('Conversations')->NumRows());
+$PagerOptions = array('CurrentRecords' => $this->Data('Conversations')->NumRows());
 if ($this->Data('_PagerUrl'))
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 

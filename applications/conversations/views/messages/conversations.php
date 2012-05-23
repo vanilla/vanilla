@@ -3,7 +3,7 @@ $Session = Gdn::Session();
 $Alt = FALSE;
 $SubjectsVisible = C('Conversations.Subjects.Visible');
 
-foreach ($this->ConversationData->Result() as $Conversation) {
+foreach ($this->Data('Conversations')->Result() as $Conversation) {
    $Alt = $Alt == TRUE ? FALSE : TRUE;
    $LastAuthor = UserBuilder($Conversation, 'LastMessage');
    $LastPhoto = UserPhoto($LastAuthor, 'Photo');

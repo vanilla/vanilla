@@ -175,7 +175,7 @@ class Gdn_UploadImage extends Gdn_Upload {
                
                // And set the original y position to the cropped start point.
                if (!isset($Options['SourceY']))
-                  $YCoord = round(($HeightSource - $NewHeightSource) / 2);
+                  $YCoord = 0; // crop to top because most portraits show the face at the top.
                $HeightSource = $NewHeightSource;
             }
          }

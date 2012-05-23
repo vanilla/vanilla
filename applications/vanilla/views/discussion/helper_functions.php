@@ -385,10 +385,16 @@ function WriteCommentForm() {
 		?>
 		<div class="Foot Closed">
 			<div class="Note Closed"><?php 
+			   $Popup =  (C('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
             echo FormatString(
-               T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}">Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'), 
-               array('SignInUrl' => Url(SignInUrl(Url(''))), 
-                     'RegisterUrl' => Url(RegisterUrl(Url(''))))); ?></div>
+               T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'), 
+               array(
+                  'SignInUrl' => Url(SignInUrl(Url(''))),
+                  'RegisterUrl' => Url(RegisterUrl(Url(''))),
+                  'Popup' => $Popup
+               )
+            ); ?>
+         </div>
 			<?php //echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
 		</div>
 		<?php

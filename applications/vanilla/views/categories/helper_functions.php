@@ -231,7 +231,7 @@ function WriteTableRow($Row, $Depth = 1) {
          <div class="Block Wrap">
             <?php if ($Row['LastTitle']): ?>
             <?php 
-            echo UserPhoto($Row, array('ImageClass' => 'PhotoLink', 'Px' => 'Last'));
+            echo UserPhoto($Row, array('Size' => 'Small', 'Px' => 'Last'));
             echo Anchor(
                SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
                $Row['LastUrl'].'#latest',

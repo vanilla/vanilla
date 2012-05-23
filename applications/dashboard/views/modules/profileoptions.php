@@ -12,7 +12,7 @@ $Controller = Gdn::Controller();
       
       if ($Controller->User->UserID != $Session->UserID) {
          if ($Session->CheckPermission('Garden.Users.Edit'))
-            echo ' '.Anchor(Sprite('SpEditProfile').T('Edit Profile'), '/profile/edit/'.$Controller->User->UserID.'/'.rawurlencode($Controller->User->Name), 'NavButton').' ';
+            echo ' '.Anchor(Sprite('SpEditProfile').T('Edit Profile'), UserUrl($Controller->User, '', 'edit'), 'NavButton').' ';
       } else {
          if (C('Garden.UserAccount.AllowEdit')) // Don't allow account editing if it is turned off.
             echo Anchor(Sprite('SpEditProfile').T('Edit My Profile'), '/profile/edit', 'NavButton');

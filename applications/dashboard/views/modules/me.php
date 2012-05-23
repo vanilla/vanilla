@@ -10,8 +10,7 @@ if ($Session->IsValid()):
          // Notifications
          $CountNotifications = $User->CountNotifications;
          $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert">'.$CountNotifications.'</span>' : '';
-         $ProfileSlug = urlencode($User->Name) == $User->Name ? $User->Name : $UserID.'/'.urlencode($User->Name);
-         echo Anchor(Sprite('SpNotifications', 'Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, '/profile/'.$ProfileSlug, array('title' => T('Notifications')));
+         echo Anchor(Sprite('SpNotifications', 'Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), array('title' => T('Notifications')));
 
          // Inbox
          $CountInbox = GetValue('CountUnreadConversations', Gdn::Session()->User);

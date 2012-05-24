@@ -128,9 +128,12 @@ jQuery(document).ready(function($) {
          remotePostMessage('unembed', '*');
 
       // Wrap the entire page in a container so inner margins are respected when calculating height.
-      $('body > :first-child').wrap('<div class="VanillaEmbedWrapper" />');
+//      $('body > :first-child').wrap('<div class="VanillaEmbedWrapper" />');
       setHeight = function(explicitHeight) {
          getStyle = function(el, name) {
+            if (!el)
+               return 0;
+            
             if (el.style && el.style[name])
                return el.style[name];
             else if (el.currentStyle)

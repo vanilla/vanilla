@@ -131,7 +131,7 @@ jQuery(document).ready(function($) {
       $('body > :first-child').wrap('<div class="VanillaEmbedWrapper" />');
       setHeight = function(explicitHeight) {
          getStyle = function(el, name) {
-            if (el.style[name])
+            if (el.style && el.style[name])
                return el.style[name];
             else if (el.currentStyle)
                return el.currentStyle[name];

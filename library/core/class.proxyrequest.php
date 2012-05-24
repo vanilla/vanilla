@@ -21,6 +21,7 @@ class ProxyRequest {
    public $RequestDefaults;
    public $RequestHeaders;
    public $RequestBody;
+   public $ParsedBody;
    
    public $ResponseHeaders;
    public $ResponseStatus;

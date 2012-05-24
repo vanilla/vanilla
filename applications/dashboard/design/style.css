@@ -1682,6 +1682,19 @@ form.Thumbnail .Warning {
 .CommentForm .DraftButton {
 	margin: 0 6px;
 }
+.Form-Header .Username {
+    display: none;
+}
+.Form-Header .Author .ProfilePhotoMedium {
+    margin: 10px;
+}
+.CommentForm .FormWrapper {
+    padding: 10px 10px 10px 60px;
+}
+.CommentForm textarea.TextBox {
+    min-height: 50px;
+    height: 50px;
+}
 
 /* =================================================================== Popups */
 .Popup .Info {

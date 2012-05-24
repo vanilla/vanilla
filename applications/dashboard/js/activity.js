@@ -120,8 +120,7 @@ jQuery(document).ready(function($) {
       var inp = $(frm).find('textarea');
       // Only submit the form if the textarea isn't empty
       if ($(inp).val() != '') {
-         $('span.Progress').remove();
-         $(but).before('<span class="Progress">&#160;</span>');
+         gdn.disable(but);
          var postValues = $(frm).serialize();
          postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON';
          $.ajax({
@@ -130,7 +129,7 @@ jQuery(document).ready(function($) {
             data: postValues,
             dataType: 'json',
             complete: function() {
-               $('span.Progress').remove();
+               gdn.enable(but);
             },
             error: function(xhr) {
                gdn.informError(xhr);

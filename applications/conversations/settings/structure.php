@@ -71,7 +71,7 @@ $Construct->Table('ConversationMessage')
    ->Column('ConversationID', 'int', FALSE, 'key')
    ->Column('Body', 'text')
    ->Column('Format', 'varchar(20)', NULL)
-   ->Column('InsertUserID', 'int', NULL)
+   ->Column('InsertUserID', 'int', NULL, 'index')
    ->Column('DateInserted', 'datetime', FALSE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Set($Explicit, $Drop);

@@ -78,10 +78,18 @@ echo $Form->Errors();
          echo $Form->Label('Conditions', '');
          echo '<div class="Info2">', T('Limit the pocket to one or more roles or permissions.'), '</div>';
          $this->ConditionModule->Render();
-         echo '<div class="Info2">', T('Limit the display of this plugin to "mobile only".'), '</div>';
+         
+         echo '<div class="Info2">', T('Limit the display of this pocket to "mobile only".'), '</div>';
          echo $Form->CheckBox("MobileOnly", T("Only display on mobile browsers."));
-         echo '<div class="Info2">', T('Limit the display of this plugin for mobile devices.'), '</div>';
+         
+         echo '<div class="Info2">', T('Limit the display of this pocket for mobile devices.'), '</div>';
          echo $Form->CheckBox("MobileNever", T("Never display on mobile browsers."));
+         
+         echo '<div class="Info2">', T('Limit the display of this pocket for embedded comments.'), '</div>';
+         echo $Form->CheckBox("EmbeddedNever", T("Don't display for embedded comments."));
+         
+         echo '<div class="Info2">', T("Most pockets shouldn't be displayed in the dashboard."), '</div>';
+         echo $Form->CheckBox("ShowInDashboard", T("Display in dashboard. (not recommended)"));
       ?>
    </li>
    <li>

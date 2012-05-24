@@ -1,12 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
+if (!defined('APPLICATION'))
+   exit();
 /*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+  Copyright 2008, 2009 Vanilla Forums Inc.
+  This file is part of Garden.
+  Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+  Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
+  Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+ */
 
 class Pocket {
    const ENABLED = 0;
@@ -43,14 +46,17 @@ class Pocket {
 
    /** $var array The repeat frequency. */
    public $RepeatFrequency = array(1);
-   
+
    /** $var array The repeat frequency. */
    public $MobileOnly = FALSE;
-   
+
    /** $var array The repeat frequency. */
    public $MobileNever = FALSE;
+
+   /** $var bool Whether to disable the pocket for embedded comments. * */
+   public $EmbeddedNever = FALSE;
    
-   
+   public $ShowInDashboard = FALSE;
 
    public function __construct($Location = '') {
       $this->Location = $Location;
@@ -62,10 +68,17 @@ class Pocket {
     *  @return bool
     */
    public function CanRender($Data) {
-   	  $IsMobile = IsMobile();
-   	  if (($this->MobileOnly && !$IsMobile) || ($this->MobileNever && $IsMobile)) {
-   	  	 return FALSE;
-   	  }
+      if (!$this->ShowInDashboard && InSection('Dashboard')) {
+         return FALSE;
+      }
+      
+      $IsMobile = IsMobile();
+      if (($this->MobileOnly && !$IsMobile) || ($this->MobileNever && $IsMobile)) {
+         return FALSE;
+      }
+
+      if ($this->EmbeddedNever && strcasecmp(Gdn::Controller()->RequestMethod, 'embed') == 0)
+         return FALSE;
 
       // Check to see if the pocket is enabled.
       switch ($this->Disabled) {
@@ -97,15 +110,16 @@ class Pocket {
                return FALSE;
             break;
          case Pocket::REPEAT_EVERY:
-            $Frequency = (array)$this->RepeatFrequency;
+            $Frequency = (array) $this->RepeatFrequency;
             $Every = GetValue(0, $Frequency, 1);
-            if ($Every < 1) $Every = 1;
+            if ($Every < 1)
+               $Every = 1;
             $Begin = GetValue(1, $Frequency, 1);
             if (($Count % $Every) != ($Begin % $Every))
                return FALSE;
             break;
          case Pocket::REPEAT_INDEX:
-            if (!in_array($Count, (array)$this->RepeatFrequency))
+            if (!in_array($Count, (array) $this->RepeatFrequency))
                return FALSE;
             break;
       }
@@ -127,6 +141,8 @@ class Pocket {
       $this->Page = $Data['Page'];
       $this->MobileOnly = $Data['MobileOnly'];
       $this->MobileNever = $Data['MobileNever'];
+      $this->EmbeddedNever = $Data['EmbeddedNever'];
+      $this->ShowInDashboard = $Data['ShowInDashboard'];
 
       // parse the frequency.
       $Repeat = $Data['Repeat'];
@@ -198,4 +214,5 @@ class Pocket {
    public function ToString($Data = NULL) {
       return Gdn_Format::To($this->Body, $this->Format);
    }
+
 }

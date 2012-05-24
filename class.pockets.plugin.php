@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
-   'Version' => '1.0.4',
+   'Version' => '1.0.5',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -426,6 +426,8 @@ class PocketsPlugin extends Gdn_Plugin {
          ->Column('Attributes', 'text', NULL)
          ->Column('MobileOnly', 'tinyint', '0')
          ->Column('MobileNever', 'tinyint', '0')
+         ->Column('EmbeddedNever', 'tinyint', '0')
+         ->Column('ShowInDashboard', 'tinyint', '0')
          ->Set($Explicit, $Drop);
    }
 

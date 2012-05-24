@@ -197,26 +197,14 @@ class MessagesController extends ConversationsController {
       $this->SetData('Conversations', $ConversationData);
       
       // Get Conversations Count
-      $CountConversations = $this->ConversationModel->GetCount($UserID);
-      $this->SetData('CountConversations', $CountConversations);
+      //$CountConversations = $this->ConversationModel->GetCount($UserID);
+      //$this->SetData('CountConversations', $CountConversations);
       
-      // Build a pager
-      $PagerFactory = new Gdn_PagerFactory();
-		$this->EventArguments['PagerType'] = 'Pager';
-		$this->FireEvent('BeforeBuildPager');
-      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
-      $this->Pager->ClientID = 'Pager';
-      $this->Pager->Configure(
-         $Page,
-         $Limit,
-         $CountConversations,
-         'messages/all/%1$s'
-      );
+      // Build the pager
       if (!$this->Data('_PagerUrl'))
          $this->SetData('_PagerUrl', 'messages/all/{Page}');
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
-		$this->FireEvent('AfterBuildPager');
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {

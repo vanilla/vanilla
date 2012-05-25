@@ -216,6 +216,7 @@ class CategoriesController extends VanillaController {
 				$this->View = 'discussions';
 			}
 			// Render default view.
+         $this->FireEvent('BeforeCategoriesRender');
 			$this->Render();
 		}
    }

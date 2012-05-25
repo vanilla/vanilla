@@ -14,13 +14,11 @@ jQuery(document).ready(function($) {
       inDashboard = gdn.definition('InDashboard') == '1',
       forceEmbedDashboard = gdn.definition('ForceEmbedDashboard') == '1',
       forceEmbedForum = gdn.definition('ForceEmbedForum') == '1',
-      pagePath = gdn.definition('Path', ''),
-      isEmbeddedComments = pagePath.substring(0, 24) == 'vanilla/discussion/embed',
+      isEmbeddedComments = gdn.definition('Embedded', '') != '',
       webroot = gdn.definition('WebRoot'),
       path = gdn.definition('Path', '~');
       if (path.length > 0 && path[0] != '/')
-         path = '/'+path;
-      
+         path = '/'+path; 
    /*
     Embedded pages can have very low height settings. As a result, when an
     absolutely positioned popup appears on the page, iframed content doesn't
@@ -127,30 +125,8 @@ jQuery(document).ready(function($) {
       if (inDashboard && !forceEmbedDashboard)
          remotePostMessage('unembed', '*');
 
-      // Wrap the entire page in a container so inner margins are respected when calculating height.
-//      $('body > :first-child').wrap('<div class="VanillaEmbedWrapper" />');
       setHeight = function(explicitHeight) {
-         getStyle = function(el, name) {
-            if (!el)
-               return 0;
-            
-            if (el.style && el.style[name])
-               return el.style[name];
-            else if (el.currentStyle)
-               return el.currentStyle[name];
-            else if (document.defaultView && document.defaultView.getComputedStyle) {
-               name = name.replace(/([A-Z])/g, "-$1");
-               name = name.toLowerCase();
-               s = document.defaultView.getComputedStyle(el, "");
-               return s && s.getPropertyValue(name);
-            } else
-               return 0;
-         }
-         // Include body top/bottom margin when calculating height.
-         var m = parseInt(getStyle(document.body, 'marginTop')) + parseInt(getStyle(document.body, 'marginBottom')),
-            h = document.body.offsetHeight;
-
-         var newHeight = explicitHeight > 0 ? explicitHeight : (h*1 + m*1);
+         var newHeight = explicitHeight > 0 ? explicitHeight : document.body.offsetHeight;
          if (newHeight > minHeight && newHeight != currentHeight) {
             currentHeight = newHeight;               
             remotePostMessage('height:'+currentHeight, '*');

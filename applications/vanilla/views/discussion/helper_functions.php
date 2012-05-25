@@ -53,6 +53,9 @@ endif;
  */
 if (!function_exists('WriteComment')):
 function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
+   static $UserPhotoFirst = NULL;
+   if ($UserPhotoFirst === NULL)
+      $UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
    $Author = Gdn::UserModel()->GetID($Comment->InsertUserID); //UserBuilder($Comment, 'Insert');
    $Permalink = GetValue('Url', $Comment, '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID);
 
@@ -88,8 +91,13 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          <div class="AuthorWrap">
             <span class="Author">
                <?php
-               echo UserPhoto($Author);
-               echo UserAnchor($Author, 'Username');
+               if ($UserPhotoFirst) {
+                  echo UserPhoto($Author);
+                  echo UserAnchor($Author, 'Username');
+               } else {
+                  echo UserAnchor($Author, 'Username');
+                  echo UserPhoto($Author);
+               }
                echo FormatMeAction($Comment);
                ?>
             </span>

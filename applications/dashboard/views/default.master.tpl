@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  {asset name='Head'}
+  {asset name="Head"}
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
    <div id="Frame">

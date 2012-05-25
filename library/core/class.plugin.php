@@ -21,6 +21,10 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
    public function __construct() {
       parent::__construct();
    }
+   
+   public static function Instance() {
+      return Gdn::PluginManager()->GetPluginInstance(get_called_class(), Gdn_PluginManager::ACCESS_CLASSNAME);
+   }
 
    public function GetPluginName() {
       return GetValue('Name', Gdn::PluginManager()->GetPluginInfo(get_class($this), Gdn_PluginManager::ACCESS_CLASSNAME));

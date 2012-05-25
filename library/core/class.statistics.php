@@ -17,6 +17,8 @@ class Gdn_Statistics extends Gdn_Plugin {
 
    protected $AnalyticsServer;
    public static $Increments = array('h' => 'hours', 'd' => 'days', 'w' => 'weeks', 'm' => 'months', 'y' => 'years');
+   
+   protected $TickExtra;
 
    public function __construct() {
       parent::__construct();
@@ -24,6 +26,8 @@ class Gdn_Statistics extends Gdn_Plugin {
       $AnalyticsServer = C('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
       $AnalyticsServer = str_replace(array('http://', 'https://'), '', $AnalyticsServer);
       $this->AnalyticsServer = $AnalyticsServer;
+      
+      $this->TickExtra = array();
    }
 
    public function Analytics($Method, $RequestParameters, $Callback = FALSE, $ParseResponse = TRUE) {
@@ -102,8 +106,9 @@ class Gdn_Statistics extends Gdn_Plugin {
 
    public function Base_Render_Before($Sender) {
       // If this is a full page request, trigger stats environment check
-      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $this->Check();
+      }
    }
 
    /**
@@ -158,6 +163,18 @@ class Gdn_Statistics extends Gdn_Plugin {
 
       // At this point there is nothing preventing stats from working, so queue a tick.
       Gdn::Controller()->AddDefinition('AnalyticsTask', 'tick');
+      Gdn::Controller()->AddDefinition('TickExtra', $this->GetEncodedTickExtra());
+   }
+   
+   public function AddExtra($Name, $Value) {
+      $this->TickExtra[$Name] = $Value;
+   }
+   
+   public function GetEncodedTickExtra() {
+      if (!sizeof($this->TickExtra))
+         return NULL;
+      
+      return @json_encode($this->TickExtra);
    }
 
    public static function CheckIsAllowed() {

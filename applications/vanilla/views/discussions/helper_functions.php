@@ -227,7 +227,7 @@ function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
    
    if (is_numeric($Discussion->$Column) && !$Discussion->$Column)
       return '';
-   if (strcasecmp($Discussion->$Column, $Code) != 0)
+   if (!is_numeric($Discussion->$Column) && strcasecmp($Discussion->$Column, $Code) != 0)
       return;
 
    if (!$CssClass)

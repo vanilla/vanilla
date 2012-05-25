@@ -22,6 +22,14 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       parent::__construct();
    }
    
+   /**
+    * Get an instance of the calling class
+    * 
+    * WARNING: This method uses Late Static Binding and therefore requires 
+    * PHP 5.3+
+    * 
+    * @return Gdn_Plugin
+    */
    public static function Instance() {
       return Gdn::PluginManager()->GetPluginInstance(get_called_class(), Gdn_PluginManager::ACCESS_CLASSNAME);
    }

@@ -332,9 +332,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 //            decho(array_keys($InputArgs), 'InputArgs');
             $Args = ReflectArgs($Callback, $InputArgs, $Request->Get());
             $Controller->ReflectArgs = $Args;
-//            array_shift($Args);
-//            decho($Args, 'Args');
-//            die();
             
             $this->FireEvent('BeforeControllerMethod');
             try {

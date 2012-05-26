@@ -66,7 +66,7 @@ if (!function_exists('MostRecentString')):
       $R .= '<span class="MLabel">'.T('Most recent:').'</span> ';
       $R .= Anchor(
          SliceString(Gdn_Format::Text($Row['LastTitle']), 150),
-         $Row['LastUrl'].'#latest',
+         $Row['LastUrl'],
          'LatestPostTitle');
 
       if (GetValue('LastName', $Row)) {
@@ -234,7 +234,7 @@ function WriteTableRow($Row, $Depth = 1) {
             echo UserPhoto($Row, array('Size' => 'Small', 'Px' => 'Last'));
             echo Anchor(
                SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
-               $Row['LastUrl'].'#latest',
+               $Row['LastUrl'],
                'BlockTitle LatestPostTitle',
                array('title' => html_entity_decode($Row['LastTitle'])));
             ?>

@@ -1685,8 +1685,8 @@ form.Thumbnail .Warning {
 .Form-Header .Username {
     display: none;
 }
-.Form-Header .Author .ProfilePhotoMedium {
-    margin: 10px;
+.Form-Header .Author .PhotoWrap {
+    margin: 10px 0 0 10px;
 }
 .CommentForm .FormWrapper {
     padding: 10px 10px 10px 60px;

@@ -524,19 +524,14 @@ class Gdn_Statistics extends Gdn_Plugin {
                          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
          $NumUsers = GetValue('Hits', $NumUsers, NULL);
 
-         $NumViews = Gdn::SQL()
-                         ->Select('Views')
+         $NumViewsData = Gdn::SQL()
+                         ->Select('Views, EmbedViews')
                          ->From('AnalyticsLocal')
                          ->Where('TimeSlot', $TimeSlot)
                          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-         $NumViews = GetValue('Views', $NumViews, NULL);
          
-         $NumEmbedViews = Gdn::SQL()
-                         ->Select('EmbedViews')
-                         ->From('AnalyticsLocal')
-                         ->Where('TimeSlot', $TimeSlot)
-                         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-         $NumEmbedViews = GetValue('EmbedViews', $NumEmbedViews, NULL);
+         $NumViews = GetValue('Views', $NumViewsData, NULL);
+         $NumEmbedViews = GetValue('EmbedViews', $NumViewsData, NULL);
 
          $DetectActiveInterval = array_sum(array(
             $NumComments,

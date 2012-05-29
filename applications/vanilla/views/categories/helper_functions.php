@@ -216,14 +216,16 @@ function WriteTableRow($Row, $Depth = 1) {
       <td class="BigCount CountDiscussions">
          <div class="Wrap">
             <?php
-            echo BigPlural($Row['CountDiscussions'], '%s discussion');
+//            echo "({$Row['CountDiscussions']})";
+            echo BigPlural($Row['CountAllDiscussions'], '%s discussion');
             ?>
          </div>
       </td>
       <td class="BigCount CountComments">
          <div class="Wrap">
             <?php
-            echo BigPlural($Row['CountComments'], '%s discussion');
+//            echo "({$Row['CountComments']})";
+            echo BigPlural($Row['CountAllComments'], '%s discussion');
             ?>
          </div>
       </td>

@@ -530,12 +530,20 @@ class Gdn_Statistics extends Gdn_Plugin {
                          ->Where('TimeSlot', $TimeSlot)
                          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
          $NumViews = GetValue('Views', $NumViews, NULL);
+         
+         $NumEmbedViews = Gdn::SQL()
+                         ->Select('EmbedViews')
+                         ->From('AnalyticsLocal')
+                         ->Where('TimeSlot', $TimeSlot)
+                         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+         $NumEmbedViews = GetValue('EmbedViews', $NumEmbedViews, NULL);
 
          $DetectActiveInterval = array_sum(array(
             $NumComments,
             $NumDiscussions,
             $NumUsers,
-            $NumViews
+            $NumViews,
+            $NumEmbedViews,
          ));
 
          $StatsDate = strtotime('+1 day', $StatsDate);
@@ -555,7 +563,8 @@ class Gdn_Statistics extends Gdn_Plugin {
          'CountComments' => $NumComments,
          'CountDiscussions' => $NumDiscussions,
          'CountUsers' => $NumUsers,
-         'CountViews' => $NumViews
+         'CountViews' => $NumViews,
+         'CountEmbedViews' => $NumEmbedViews
       ));
 
       // Send stats to remote server

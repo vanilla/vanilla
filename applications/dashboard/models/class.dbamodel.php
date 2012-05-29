@@ -133,13 +133,17 @@ class DBAModel extends Gdn_Model {
       Gdn::Set($Key, NULL);
    }
    
-   public function GetBatch($Table, $Key, $Limit = 10000) {
+   public function GetBatch($Table, $Key, $Limit = 10000, $Max = FALSE) {
       $Key = "DBA.Range.$Key";
       
       // See if there is already a range.
       $Current = @unserialize(Gdn::Get($Key,  ''));
       if (!is_array($Current) || !isset($Current['Min']) || !isset($Current['Max'])) {
          list($Current['Min'], $Current['Max']) = $this->PrimaryKeyRange($Table);
+         
+         if ($Max && $Current['Max'] > $Max) {
+            $Current['Max'] = $Max;
+         }
       }
       
       if (!isset($Current['To'])) {

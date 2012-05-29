@@ -538,7 +538,7 @@ class Gdn_Statistics extends Gdn_Plugin {
             $NumDiscussions,
             $NumUsers,
             $NumViews,
-            $NumEmbedViews,
+            $NumEmbedViews
          ));
 
          $StatsDate = strtotime('+1 day', $StatsDate);

@@ -24,7 +24,14 @@ class Gdn_Format {
 	* The default setting is true, meaning all links will contain
 	* the rel="nofollow" attribute.   
     */
-	public static $DisplayNoFollow = true;
+	public static $DisplayNoFollow = TRUE;
+   
+   /**
+    * 
+    * @var bool Whether or not to replace plain text links with anchors. 
+    * @since 2.1
+    */
+   public static $FormatLinks = TRUE;
 
    /**
     * The ActivityType table has some special sprintf search/replace values in the
@@ -957,8 +964,10 @@ EOT;
          $Result = <<<EOT
 <div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
 EOT;
+      } elseif (!self::$FormatLinks) {
+         $Result = $Url;
       } else {
-         $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
+         
 
          // Strip punctuation off of the end of the url.
          $Punc = '';
@@ -973,6 +982,8 @@ EOT;
             $Text = rawurldecode($Text);
             $Text = htmlspecialchars($Text, ENT_QUOTES, C('Garden.Charset', ''));
          }
+         
+         $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
 
          $Result = <<<EOT
 <a href="$Url" target="_blank"$nofollow>$Text</a>$Punc

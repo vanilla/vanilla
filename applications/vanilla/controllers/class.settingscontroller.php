@@ -168,7 +168,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function FloodControl() {
       // Check permission
-      $this->Permission('Vanilla.Spam.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Display options
       $this->Title(T('Flood Control'));

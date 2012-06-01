@@ -20,6 +20,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Dashboard
  */
 class ImportController extends DashboardController {
+   public function Initialize() {
+      parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
+   }
+   
    /**
     * Export core Vanilla and Conversations tables.
     *

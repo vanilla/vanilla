@@ -426,7 +426,7 @@ if (!function_exists('UserPhoto')) {
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
       $Photo = $User->Photo;
-      $Title = htmlspecialchars($User->Name);
+      $Title = htmlspecialchars(GetValue('Title', $Options, $User->Name));
       
       if ($FullUser['Banned']) {
          $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';

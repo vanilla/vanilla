@@ -91,7 +91,7 @@ $this->FireEvent('BeforeCommentForm');
                $this->FireEvent('AfterFormButtons');
                echo "</div>\n";
                echo $this->Form->Close();
-               echo '</div>';
+//               echo '</div>';
                ?>
             </div>
          </div>

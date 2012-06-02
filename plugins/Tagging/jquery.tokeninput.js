@@ -178,7 +178,7 @@ $.TokenList = function (input, settings) {
                 case KEY.TAB:
                 case KEY.RETURN:
                 case KEY.COMMA:
-                case KEY.SPACE:
+//                case KEY.SPACE:
                   if (selected_dropdown_item) {
                     add_token($(selected_dropdown_item));
                   } else {
@@ -283,6 +283,9 @@ $.TokenList = function (input, settings) {
         li_data = hidden_input.val().split(' '); // settings.prePopulate;
         if(li_data && li_data.length) {
             for(var i in li_data) {
+               if (!li_data.hasOwnProperty(i))
+                  continue;
+               
                 if (li_data[i].trim() != '') {
                     token_count++;
                     var this_token = $("<li><p>"+li_data[i]+"</p> </li>")

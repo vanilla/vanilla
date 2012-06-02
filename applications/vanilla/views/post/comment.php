@@ -2,8 +2,6 @@
 $Session = Gdn::Session();
 $NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID') ? TRUE : FALSE;
 $Editing = isset($this->Comment);
-if ($Editing) 
-   $this->Form->SetFormValue('Body', $this->Comment->Body);
 
 $this->EventArguments['FormCssClass'] = 'MessageForm CommentForm FormTitleWrapper';
 $this->FireEvent('BeforeCommentForm');
@@ -32,10 +30,11 @@ $this->FireEvent('BeforeCommentForm');
                <?php
                echo $this->Form->Open();
                echo $this->Form->Errors();
-               $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
-               $CommentOptions['tabindex'] = 1;
+//               $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
                $this->FireEvent('BeforeBodyField');
-               echo Wrap($this->Form->TextBox('Body', $CommentOptions), 'div', array('class' => 'TextBoxWrapper'));
+               
+               echo $this->Form->BodyBox('Body', array('Table' => 'Comment', 'tabindex' => 1));
+               
                $this->FireEvent('AfterBodyField');
                echo "<div class=\"Buttons\">\n";
                $this->FireEvent('BeforeFormButtons');

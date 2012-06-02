@@ -137,6 +137,20 @@ class Gdn_Form extends Gdn_Pluggable {
          $Attributes['class'] = $this->ErrorClass;
    }
    
+   public function BodyBox($Column = 'Body', $Attributes = array()) {
+      TouchValue('MultiLine', $Attributes, TRUE);
+      TouchValue('format', $Attributes, $this->GetValue('Format', C('Garden.InputFormatter')));
+      TouchValue('Wrap', $Attributes, TRUE);
+      
+      $this->SetValue('Format', $Attributes['format']);
+      
+      $this->EventArguments['Table'] = GetValue('Table', $Attributes);
+      
+      $this->FireEvent('BeforeBodyBox');
+      
+      return $this->TextBox($Column, $Attributes).$this->Hidden('Format');
+   }
+   
    /**
     * Returns XHTML for a button.
     *

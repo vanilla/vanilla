@@ -291,16 +291,25 @@ class UserModel extends Gdn_Model {
       
       // Don't synch the user photo if they've uploaded one already.
       $Photo = GetValue('Photo', $NewUser);
-      if (!GetValue('Photo', $CurrentUser) || !is_string($Photo) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+      $CurrentPhoto = GetValue('Photo', $CurrentUser);
+      if (FALSE
+         || ($CurrentPhoto && !StringBeginsWith($CurrentPhoto, 'http')) 
+         || !is_string($Photo) 
+         || ($Photo && !StringBeginsWith($Photo, 'http')) 
+         || strpos($Photo, '.gravatar.') !== FALSE
+         || StringBeginsWith($Photo, Url('/', TRUE))) {
          unset($NewUser['Photo']);
+         Trace('Not setting photo.');
       }
       
       if (C('Garden.SSO.SynchRoles')) {
          // Translate the role names to IDs.
          
-         $Roles = GetValue('Roles', $NewUser);
+         $Roles = GetValue('Roles', $NewUser, '');
          if (is_string($Roles))
             $Roles = explode(',', $Roles);
+         else
+            $Roles = array();
          $Roles = array_map('trim', $Roles);
          $Roles = array_map('strtolower', $Roles);
          
@@ -312,15 +321,22 @@ class UserModel extends Gdn_Model {
                $RoleIDs[] = $RoleID;
             }
          }
-         $NewUser['RoleIDs'] = $RoleIDs;
+         if (empty($RoleIDs)) {
+            $RoleIDs = $this->NewUserRoleIDs();
+         }
+         $NewUser['RoleID'] = $RoleIDs;
       } else {
          unset($NewUser['Roles']);
-         unset($NewUser['RoleIDs']);
+         unset($NewUser['RoleID']);
       }
       
       // Save the user information.
       $NewUser['UserID'] = $CurrentUser['UserID'];
-      $this->Save($NewUser, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => isset($NewUser['RoleIDs'])));
+      Trace($NewUser);
+      
+      $Result = $this->Save($NewUser, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => isset($NewUser['RoleID'])));
+      if (!$Result)
+         Trace($this->Validation->ResultsText());
    }
 
    /** Connect a user with a foreign authentication system.
@@ -2831,6 +2847,8 @@ class UserModel extends Gdn_Model {
          break;
       }
       
+      if (empty($RoleID))
+         Trace("You don't have any default roles defined.", TRACE_WARNING);
       return $RoleID;
    }
    

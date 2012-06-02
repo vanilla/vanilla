@@ -51,6 +51,7 @@ li.token-input-token p {
     padding: 0;
     margin: 0;
     line-height: 1.4;
+    vertical-align: middle;
 }
 li.token-input-token span {
     color: #a6b3cf;

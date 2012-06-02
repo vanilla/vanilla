@@ -196,6 +196,7 @@ class DashboardHooks implements Gdn_IPlugin {
       if (!Gdn::Session()->IsValid() && $SSO = Gdn::Request()->Get('sso')) {
          SaveToConfig('Garden.Registration.SendConnectEmail', FALSE, FALSE);
          
+         $UserID = FALSE;
          try {
             $UserID = Gdn::UserModel()->SSO($SSO);
          } catch (Exception $Ex) {

@@ -66,7 +66,7 @@ if (!function_exists('MostRecentString')):
       $R .= '<span class="MLabel">'.T('Most recent:').'</span> ';
       $R .= Anchor(
          SliceString(Gdn_Format::Text($Row['LastTitle']), 150),
-         $Row['LastUrl'].'#latest',
+         $Row['LastUrl'],
          'LatestPostTitle');
 
       if (GetValue('LastName', $Row)) {
@@ -216,14 +216,16 @@ function WriteTableRow($Row, $Depth = 1) {
       <td class="BigCount CountDiscussions">
          <div class="Wrap">
             <?php
-            echo BigPlural($Row['CountDiscussions'], '%s discussion');
+//            echo "({$Row['CountDiscussions']})";
+            echo BigPlural($Row['CountAllDiscussions'], '%s discussion');
             ?>
          </div>
       </td>
       <td class="BigCount CountComments">
          <div class="Wrap">
             <?php
-            echo BigPlural($Row['CountComments'], '%s discussion');
+//            echo "({$Row['CountComments']})";
+            echo BigPlural($Row['CountAllComments'], '%s discussion');
             ?>
          </div>
       </td>
@@ -231,10 +233,10 @@ function WriteTableRow($Row, $Depth = 1) {
          <div class="Block Wrap">
             <?php if ($Row['LastTitle']): ?>
             <?php 
-            echo UserPhoto($Row, array('ImageClass' => 'PhotoLink', 'Px' => 'Last'));
+            echo UserPhoto($Row, array('Size' => 'Small', 'Px' => 'Last'));
             echo Anchor(
                SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
-               $Row['LastUrl'].'#latest',
+               $Row['LastUrl'],
                'BlockTitle LatestPostTitle',
                array('title' => html_entity_decode($Row['LastTitle'])));
             ?>

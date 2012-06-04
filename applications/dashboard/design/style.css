@@ -874,8 +874,8 @@ overflow: hidden; */
 .MeBox {
    margin: 10px 0;
 }
-.UserBox .ProfilePhotoMedium,
-.MeBox .ProfilePhotoMedium {
+.UserBox .PhotoWrap,
+.MeBox .PhotoWrap {
 	float: left;
    margin-right: 5px;
 }
@@ -1048,6 +1048,9 @@ overflow: hidden; */
 }
 #Content .BoxFilter {
 	margin: 0 0 6px;
+}
+#Panel .BoxFilter {
+   margin: 10px 0;
 }
 #Content .FilterMenu li,
 #Content .FilterMenu li.Active {
@@ -1372,10 +1375,10 @@ overflow: hidden; */
 
 /* ============================================================== MessageList */
 
-.Author .ProfilePhotoMedium {
+.Author .PhotoWrap {
    margin: 0 10px 4px 0;
    float: left;
-   overflow: hidden;
+/*   overflow: hidden;*/
 }
 .Popup .Preview {
 	padding: 8px;
@@ -1678,6 +1681,19 @@ form.Thumbnail .Warning {
 .CommentForm .PreviewButton,
 .CommentForm .DraftButton {
 	margin: 0 6px;
+}
+.Form-Header .Username {
+    display: none;
+}
+.Form-Header .Author .PhotoWrap {
+    margin: 10px 0 0 10px;
+}
+.CommentForm .FormWrapper {
+    padding: 10px 10px 10px 60px;
+}
+.CommentForm textarea.TextBox {
+    min-height: 50px;
+    height: 50px;
 }
 
 /* =================================================================== Popups */
@@ -2005,14 +2021,14 @@ tr.CategoryHeading td {
    padding-bottom: 3px;
    font-size: 12px;
 }
-.Block .PhotoLink {
+.Block .PhotoWrap {
 	float: left;
 	margin: 0 5px 0 0;
 }
-.Block img {
+/*.Block img {
    height: 24px;
 	width: 24px;
-}
+}*/
 .Block .MItem {
    font-size: 10px;
    margin: 0;
@@ -3039,6 +3055,16 @@ body.embed .InformMessages {
    font-size: 10px;
    text-transform: uppercase;
 }
+
+.PhotoWrap {
+   position: relative;
+   line-height: 1;
+}
+.ProfilePhoto {
+   height: 40px;
+   width: 40px;
+   vertical-align: bottom;
+}
 .ProfilePhotoSmall {
    height: 24px;
    width: 24px;
@@ -3070,8 +3096,4 @@ body.embed .InformMessages {
    vertical-align: text-bottom;
    height: 24px;
    width: 24px;
-}
-/* Important: ensures margins are respected on embedded comments. */
-.VanillaEmbedWrapper {
-   padding: 1px 0;
 }

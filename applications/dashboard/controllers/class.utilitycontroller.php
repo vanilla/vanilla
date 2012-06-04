@@ -25,6 +25,11 @@ class UtilityController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
    
+   public function Initialize() {
+      parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
+   }
+   
    /**
     * Call a method on the given model.
     */

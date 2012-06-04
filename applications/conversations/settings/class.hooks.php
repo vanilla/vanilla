@@ -80,7 +80,7 @@ class ConversationsHooks implements Gdn_IPlugin {
    }
    
    /**
-    * Add 'Inbox' and 'Send Message' to profile menu.
+    * Add 'Inbox' to profile menu.
     *
     * @since 2.0.0
     * @access public
@@ -91,6 +91,36 @@ class ConversationsHooks implements Gdn_IPlugin {
          $SideMenu = $Sender->EventArguments['SideMenu'];
          $SideMenu->AddLink('Options', T('Inbox'), '/messages/inbox?userid='.$Sender->User->UserID, 'Conversations.Moderation.Manage', array('class' => 'InboxLink'));
          $Sender->EventArguments['SideMenu'] = $SideMenu;
+      }
+   }
+   
+   /**
+    * Add 'Inbox' to profile menu.
+    *
+    * @since 2.0.0
+    * @access public
+    */
+   public function ProfileController_AddProfileTabs_Handler($Sender) {
+      if (Gdn::Session()->IsValid()) {
+         $Inbox = T('Inbox');
+         $InboxHtml = Sprite('SpInbox').$Inbox;
+         $InboxLink = '/messages/all';
+         
+         if (Gdn::Session()->UserID != $Sender->User->UserID) {
+            if (C('Conversations.Moderation.Allow', FALSE) && Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
+               $CountUnread = $Sender->User->CountUnreadConversations;
+               $InboxLink .= "?userid={$Sender->User->UserID}";
+            } else {
+               return;
+            }
+         } else {
+            // Nothing
+            $CountUnread = Gdn::Session()->User->CountUnreadConversations;
+         }
+         
+         if (is_numeric($CountUnread) && $CountUnread > 0)
+            $InboxHtml .= ' <span class="Aside"><span class="Count">'.$CountUnread.'</span></span>';
+         $Sender->AddProfileTab($Inbox, $InboxLink, 'Inbox', $InboxHtml);
       }
    }
    

@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); 
+$UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
 
 $Discussion = $this->Data('Discussion');
 $Author = Gdn::UserModel()->GetID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
@@ -17,8 +18,13 @@ $this->EventArguments['Type'] = 'Discussion';
       <div class="AuthorWrap">
          <span class="Author">
             <?php
-            echo UserPhoto($Author);
-            echo UserAnchor($Author);
+            if ($UserPhotoFirst) {
+               echo UserPhoto($Author);
+               echo UserAnchor($Author);
+            } else {
+               echo UserAnchor($Author);
+               echo UserPhoto($Author);
+            }
             ?>
          </span>
          <span class="AuthorInfo">

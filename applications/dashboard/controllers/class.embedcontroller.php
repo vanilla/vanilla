@@ -33,6 +33,11 @@ class EmbedController extends DashboardController {
       Redirect('embed/comments');
    }
    
+   public function Initialize() {
+      parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
+   }
+   
    /**
     * Display the embedded forum.
     * 

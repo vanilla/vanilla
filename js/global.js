@@ -688,17 +688,22 @@ jQuery(document).ready(function($) {
    gdn.stats = function() {
       // Call directly back to the deployment and invoke the stats handler
       var StatsURL = gdn.url('settings/analyticstick.json');
-      jQuery.ajax({
-         dataType: 'json',
-         type: 'post',
-         url: StatsURL,
-         data: {
+      var SendData = {
             'TransientKey': gdn.definition('TransientKey'), 
             'Path': gdn.definition('Path'),
             'Args': gdn.definition('Args'),
             'ResolvedPath': gdn.definition('ResolvedPath'),
             'ResolvedArgs': gdn.definition('ResolvedArgs')
-         },
+         };
+         
+      if (gdn.definition('TickExtra', null) != null)
+         SendData.TickExtra = gdn.definition('TickExtra');
+      
+      jQuery.ajax({
+         dataType: 'json',
+         type: 'post',
+         url: StatsURL,
+         data: SendData,
          success: function(json) {
             gdn.inform(json);
          }
@@ -1044,3 +1049,9 @@ jQuery(window).load(function() {
       }
    });
 });
+
+if(typeof String.prototype.trim !== 'function') {
+  String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g, ''); 
+  }
+}

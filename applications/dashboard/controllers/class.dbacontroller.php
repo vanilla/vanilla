@@ -32,6 +32,7 @@ class DbaController extends DashboardController {
    
    public function Initialize() {
       parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
       $this->Model = new DBAModel();
       $this->Form = new Gdn_Form();
       $this->Form->InputPrefix = '';

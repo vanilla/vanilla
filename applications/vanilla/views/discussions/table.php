@@ -79,7 +79,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 	<td class="BlockColumn BlockColumn-User FirstUser">
 		<div class="Block Wrap">
 			<?php
-				echo UserPhoto($First, 'PhotoLink');
+				echo UserPhoto($First, array('Size' => 'Small'));
 				echo UserAnchor($First, 'UserLink BlockTitle');
             echo '<div class="Meta">';
 				echo Anchor(Gdn_Format::Date($Discussion->FirstDate, 'html'), $FirstPageUrl, 'CommentDate MItem');
@@ -109,7 +109,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 		<div class="Block Wrap">
 			<?php
 			if ($Last) {
-				echo UserPhoto($Last, 'PhotoLink');
+				echo UserPhoto($Last, array('Size' => 'Small'));
 				echo UserAnchor($Last, 'UserLink BlockTitle');
             echo '<div class="Meta">';
 				echo Anchor(Gdn_Format::Date($Discussion->LastDate, 'html'), $LastPageUrl, 'CommentDate MItem');

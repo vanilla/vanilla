@@ -1716,6 +1716,85 @@ if (!function_exists('SignInPopup')) {
    }
 }
 
+if (!function_exists('ParseUrl')) {
+   // 
+   /** 
+    * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
+    * @param string $Url The url to parse. 
+    * @param constant Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH, PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
+    */
+   function ParseUrl($Url, $Component = -1) {
+      // Retrieve all the parts
+      $PHP_URL_SCHEME = @parse_url($Url, PHP_URL_SCHEME);
+      $PHP_URL_HOST = @parse_url($Url, PHP_URL_HOST);
+      $PHP_URL_PORT = @parse_url($Url, PHP_URL_PORT);
+      $PHP_URL_USER = @parse_url($Url, PHP_URL_USER);
+      $PHP_URL_PASS = @parse_url($Url, PHP_URL_PASS);
+      $PHP_URL_PATH = @parse_url($Url, PHP_URL_PATH);
+      $PHP_URL_QUERY = @parse_url($Url, PHP_URL_QUERY);
+      $PHP_URL_FRAGMENT = @parse_url($Url, PHP_URL_FRAGMENT);
+
+      // Build a cleaned up array to return
+      $Parts = array(
+         'scheme' => $PHP_URL_SCHEME == NULL ? 'http' : $PHP_URL_SCHEME,
+         'host' => $PHP_URL_HOST == NULL ? '' : $PHP_URL_HOST,
+         'port' => $PHP_URL_PORT == NULL ? $PHP_URL_SCHEME == 'https' ? '443' : '80' : $PHP_URL_PORT,
+         'user' => $PHP_URL_USER == NULL ? '' : $PHP_URL_USER,
+         'pass' => $PHP_URL_PASS == NULL ? '' : $PHP_URL_PASS,
+         'path' => $PHP_URL_PATH == NULL ? '' : $PHP_URL_PATH,
+         'query' => $PHP_URL_QUERY == NULL ? '' : $PHP_URL_QUERY,
+         'fragment' => $PHP_URL_FRAGMENT == NULL ? '' : $PHP_URL_FRAGMENT
+      );
+      
+      // Return
+      switch ($Component) {
+         case PHP_URL_SCHEME: return $Parts['scheme'];
+         case PHP_URL_HOST: return $Parts['host'];
+         case PHP_URL_PORT: return $Parts['port'];
+         case PHP_URL_USER: return $Parts['user'];
+         case PHP_URL_PASS: return $Parts['pass'];
+         case PHP_URL_PATH: return $Parts['path'];
+         case PHP_URL_QUERY: return $Parts['query'];
+         case PHP_URL_FRAGMENT: return $Parts['fragment'];
+         default: return $Parts;
+      }
+   }
+}
+if (!function_exists('BuildUrl')) {
+   // 
+   /** 
+    * Complementary to ParseUrl, this function puts the pieces back together and returns a valid url.
+    * @param array ParseUrl array to build. 
+    */
+   function BuildUrl($Parts) {
+      // Full format: http://user:pass@hostname:port/path?querystring#fragment
+      $Return = $Parts['scheme'].'://';
+      if ($Parts['user'] != '' || $Parts['pass'] != '')
+         $Return .= $Parts['user'].':'.$Parts['pass'].'@';
+
+      $Return .= $Parts['host'];
+      // Custom port?
+      if ($Parts['port'] == '443' && $Parts['scheme'] == 'https') {
+      } elseif ($Parts['port'] == '80' && $Parts['scheme'] == 'http') {
+      } elseif ($Parts['port'] != '') {
+         $Return .= ':'.$Parts['port'];
+      }
+      
+      if ($Parts['path'] != '') {
+         if (substr($Parts['path'], 0, 1) != '/')
+            $Return .= '/';
+         $Return .= $Parts['path'];
+      }
+      if ($Parts['query'] != '') 
+         $Return .= '?'.$Parts['query'];
+      
+      if ($Parts['fragment'] != '') 
+         $Return .= '#'.$Parts['fragment'];
+      
+      return $Return;
+   }
+}
+
 if (!function_exists('PrefixString')) {
    /**
     * Takes a string, and prefixes it with $Prefix unless it is already prefixed that way.

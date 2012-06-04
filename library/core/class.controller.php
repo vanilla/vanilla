@@ -132,6 +132,12 @@ class Gdn_Controller extends Gdn_Pluggable {
    public $RedirectUrl;
    
    /**
+    * @var string Fully resolved path to the application/controller/method
+    * @since 2.1
+    */
+   public $ResolvedPath;
+   
+   /**
     * @var array The arguments passed into the controller mapped to their proper argument names.
     * @since 2.1
     */
@@ -569,19 +575,19 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions['Args'] = http_build_query (Gdn::Request()->Get());
       
       if (!array_key_exists('ResolvedPath', $this->_Definitions))
-         $this->_Definitions['ResolvedPath'] = strtolower(CombinePaths(array(Gdn::Dispatcher()->Application(), Gdn::Dispatcher()->ControllerName, Gdn::Dispatcher()->ControllerMethod)));
+         $this->_Definitions['ResolvedPath'] = $this->ResolvedPath;
       
-      $ReflectArgs = array();
-      $OReflectArgs = GetValue('ReflectArgs', $this);
-      if (is_array($OReflectArgs))
-         foreach ($OReflectArgs as $ArgName => $ArgParam) {
-            if (is_array($ArgParam) || is_object($ArgParam))
-               continue;
-            $ReflectArgs[$ArgName] = $ArgParam;
-         }
-      
-      if (!array_key_exists('ResolvedArgs', $this->_Definitions))
-         $this->_Definitions['ResolvedArgs'] = json_encode($ReflectArgs);
+      if (!array_key_exists('ResolvedArgs', $this->_Definitions)) {
+         if (sizeof($this->ReflectArgs) && (
+                 (isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof Gdn_Pluggable) ||
+                 (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable)
+               ))
+            $ReflectArgs = json_encode(array_slice($this->ReflectArgs, 1));
+         else
+            $ReflectArgs = json_encode($this->ReflectArgs);
+         
+         $this->_Definitions['ResolvedArgs'] = $ReflectArgs;
+      }
 
       if (!array_key_exists('SignedIn', $this->_Definitions)) {
          if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
@@ -977,6 +983,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       if (is_object($this->Menu))
          $this->Menu->Sort = Gdn::Config('Garden.Menu.Sort');
+      
+      $ResolvedPath = strtolower(CombinePaths(array(Gdn::Dispatcher()->Application(), Gdn::Dispatcher()->ControllerName, Gdn::Dispatcher()->ControllerMethod)));
+      $this->ResolvedPath = $ResolvedPath;
    }
    
    public function JsFiles() {
@@ -1536,7 +1545,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Cdns = array();
             if (Gdn::Request()->Scheme() != 'https') {
                $Cdns = array(
-                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js'
+                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
                   );
             }
             

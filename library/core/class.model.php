@@ -216,8 +216,21 @@ class Gdn_Model extends Gdn_Pluggable {
       
       $this->DefineSchema();      
       $Set = array_intersect_key($Property, $this->Schema->Fields());
-      
-      $this->Update($Set, array($this->PrimaryKey => $RowID));
+      self::SerializeRow($Set);
+      $this->SQL->Put($this->Name, $Set, array($this->PrimaryKey => $RowID));
+   }
+   
+   /**
+    * Serialize Attributes and Data columns in a row.
+    * 
+    * @param array $Row
+    * @since 2.1 
+    */
+   public static function SerializeRow(&$Row) {
+      foreach ($Row as $Name => &$Value) {
+         if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
+            $Value = empty($Value) ? NULL : serialize($Value);
+      }
    }
 
 

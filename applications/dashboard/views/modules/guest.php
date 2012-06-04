@@ -11,7 +11,7 @@
       echo Anchor(T('Sign In'), SignInUrl($this->_Sender->SelfUrl), 'Button'.(SignInPopup() ? ' SignInPopup' : ''), array('rel' => 'nofollow'));
       $Url = RegisterUrl($this->_Sender->SelfUrl);
       if(!empty($Url))
-         echo ' '.Anchor(T('Apply for Membership'), $Url, 'Button ApplyButton', array('rel' => 'nofollow'));
+         echo ' '.Anchor(T('Register', T('Apply for Membership', 'Register')), $Url, 'Button ApplyButton', array('rel' => 'nofollow'));
 
       echo '</div>';
    }

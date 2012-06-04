@@ -223,8 +223,12 @@ endif;
 
 if (!function_exists('Tag')):
 function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
-   if (!$Discussion->$Column)
+   $Discussion = (object)$Discussion;
+   
+   if (is_numeric($Discussion->$Column) && !$Discussion->$Column)
       return '';
+   if (!is_numeric($Discussion->$Column) && strcasecmp($Discussion->$Column, $Code) != 0)
+      return;
 
    if (!$CssClass)
       $CssClass = "Tag-$Code";

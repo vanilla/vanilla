@@ -225,7 +225,7 @@ function WriteTableRow($Row, $Depth = 1) {
          <div class="Wrap">
             <?php
 //            echo "({$Row['CountComments']})";
-            echo BigPlural($Row['CountAllComments'], '%s discussion');
+            echo BigPlural($Row['CountAllComments'], '%s comment');
             ?>
          </div>
       </td>

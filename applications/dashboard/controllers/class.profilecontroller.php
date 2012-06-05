@@ -218,7 +218,18 @@ class ProfileController extends Gdn_Controller {
       
       // Decide if they have ability to edit the username
       $this->CanEditUsername = C("Garden.Profile.EditUsernames");
-      $this->CanEditUsername = $this->CanEditUsername || $Session->CheckPermission('Garden.Users.Edit');
+      
+      if ($this->CanEditUsername < 0)
+         $this->CanEditUsername = FALSE;
+      else
+         $this->CanEditUsername = $this->CanEditUsername || $Session->CheckPermission('Garden.Users.Edit');
+      
+      $this->CanEditEmail = C('Garden.Profile.EditEmails', TRUE);
+      
+      if ($this->CanEditEmail < 0)
+         $this->CanEditEmail = FALSE;
+      else
+         $this->CanEditEmail = $this->CanEditEmail || $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();
       $User = $UserModel->GetID($this->User->UserID);
@@ -243,10 +254,14 @@ class ProfileController extends Gdn_Controller {
             $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
             $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
          }
+         
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->GetID($this->User->UserID);
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
          }
+         
+         if (!$this->CanEditEmail)
+            $this->Form->SetFormValue("Email", $User->Email);
       }
       
 		$this->Title(T('Edit Account'));

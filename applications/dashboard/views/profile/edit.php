@@ -21,9 +21,9 @@ echo $this->Form->Errors();
          echo $this->Form->Label('Email', 'Email');
          
          if (!$this->CanEditEmail) {
-            $Attributes['disabled'] = 'disabled';
+            $Attributes2['disabled'] = 'disabled';
          }
-         echo $this->Form->TextBox('Email', $Attributes);
+         echo $this->Form->TextBox('Email', $Attributes2);
       ?>
    </li>
    <li>

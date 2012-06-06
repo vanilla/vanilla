@@ -687,6 +687,8 @@ class Gdn_Statistics extends Gdn_Plugin {
 
                // Get current cache value
                $EmbedViews = Gdn::Cache()->Get($EmbedCacheKey);
+               
+               Gdn::Controller()->SetData('EV', $EmbedViews);
             }
             
             // Every X views, writeback to AnalyticsLocal
@@ -697,8 +699,8 @@ class Gdn_Statistics extends Gdn_Plugin {
                   
                Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$Views}, {$EmbedViews})
                on duplicate key update 
-                  Views = Views+{$Views}, 
-                  EmbedViews = EmbedViews+{$EmbedViews}", 
+                  Views = COALESCE(Views, 0)+{$Views}, 
+                  EmbedViews = COALESCE(EmbedViews, 0)+{$EmbedViews}", 
                array(
                   ':TimeSlot' => $TimeSlot
                ));
@@ -716,7 +718,10 @@ class Gdn_Statistics extends Gdn_Plugin {
             $ExtraEmbedViews = ($ViewType == 'embed') ? 1 : 0;
             
             Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$ExtraViews}, {$ExtraEmbedViews})
-               on duplicate key update Views = Views+{$ExtraViews}, EmbedViews = EmbedViews+{$ExtraEmbedViews}", array(
+               on duplicate key update 
+                  Views = COALESCE(Views, 0)+{$ExtraViews}, 
+                  EmbedViews = COALESCE(EmbedViews, 0)+{$ExtraEmbedViews}", 
+            array(
                ':TimeSlot' => $TimeSlot
             ));
          }

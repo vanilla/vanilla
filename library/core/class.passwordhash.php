@@ -90,6 +90,13 @@ class Gdn_PasswordHash extends PasswordHash {
             $ComputedHash = md5($Password.$Salt);
             $Result = $ComputedHash == $Hash;
             break;
+         case 'mybb':
+            $Parts = explode(':', $StoredHash, 2);
+            $Hash = GetValue(0, $Parts);
+            $Salt = GetValue(1, $Parts);
+            $ComputedHash = md5(md5($Salt).$Password);
+            $Result = $ComputedHash == $Hash;
+            break;
          case 'phpbb':
             require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
             $Result = phpbb_check_hash($Password, $StoredHash);

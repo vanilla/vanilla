@@ -687,8 +687,6 @@ class Gdn_Statistics extends Gdn_Plugin {
 
                // Get current cache value
                $EmbedViews = Gdn::Cache()->Get($EmbedCacheKey);
-               
-               Gdn::Controller()->SetData('EV', $EmbedViews);
             }
             
             // Every X views, writeback to AnalyticsLocal

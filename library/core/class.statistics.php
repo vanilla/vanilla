@@ -17,6 +17,8 @@ class Gdn_Statistics extends Gdn_Plugin {
 
    protected $AnalyticsServer;
    public static $Increments = array('h' => 'hours', 'd' => 'days', 'w' => 'weeks', 'm' => 'months', 'y' => 'years');
+   
+   protected $TickExtra;
 
    public function __construct() {
       parent::__construct();
@@ -24,6 +26,8 @@ class Gdn_Statistics extends Gdn_Plugin {
       $AnalyticsServer = C('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
       $AnalyticsServer = str_replace(array('http://', 'https://'), '', $AnalyticsServer);
       $this->AnalyticsServer = $AnalyticsServer;
+      
+      $this->TickExtra = array();
    }
 
    public function Analytics($Method, $RequestParameters, $Callback = FALSE, $ParseResponse = TRUE) {
@@ -102,8 +106,9 @@ class Gdn_Statistics extends Gdn_Plugin {
 
    public function Base_Render_Before($Sender) {
       // If this is a full page request, trigger stats environment check
-      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $this->Check();
+      }
    }
 
    /**
@@ -158,6 +163,18 @@ class Gdn_Statistics extends Gdn_Plugin {
 
       // At this point there is nothing preventing stats from working, so queue a tick.
       Gdn::Controller()->AddDefinition('AnalyticsTask', 'tick');
+      Gdn::Controller()->AddDefinition('TickExtra', $this->GetEncodedTickExtra());
+   }
+   
+   public function AddExtra($Name, $Value) {
+      $this->TickExtra[$Name] = $Value;
+   }
+   
+   public function GetEncodedTickExtra() {
+      if (!sizeof($this->TickExtra))
+         return NULL;
+      
+      return @json_encode($this->TickExtra);
    }
 
    public static function CheckIsAllowed() {
@@ -674,24 +691,17 @@ class Gdn_Statistics extends Gdn_Plugin {
             
             // Every X views, writeback to AnalyticsLocal
             $DenormalizeWriteback = C('Garden.Analytics.Views.DenormalizeWriteback', 10);
-            $DenormalizeWriteback = 10;
             if (($Views % $DenormalizeWriteback) == 0) {
                Gdn::Controller()->SetData('WritebackViews', $Views);
                Gdn::Controller()->SetData('WritebackEmbed', $EmbedViews);
-               Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, {$Views})
+                  
+               Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$Views}, {$EmbedViews})
                on duplicate key update 
-                  Views = Views+{$Views}", 
+                  Views = COALESCE(Views, 0)+{$Views}, 
+                  EmbedViews = COALESCE(EmbedViews, 0)+{$EmbedViews}", 
                array(
                   ':TimeSlot' => $TimeSlot
                ));
-                  
-//               Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$Views}, {$EmbedViews})
-//               on duplicate key update 
-//                  Views = Views+{$Views}, 
-//                  EmbedViews = EmbedViews+{$EmbedViews}", 
-//               array(
-//                  ':TimeSlot' => $TimeSlot
-//               ));
                
                // ... and get rid of those views from the keys
                
@@ -705,15 +715,13 @@ class Gdn_Statistics extends Gdn_Plugin {
             $ExtraViews = 1;
             $ExtraEmbedViews = ($ViewType == 'embed') ? 1 : 0;
             
-            Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views) values (:TimeSlot, {$ExtraViews})
-               on duplicate key update Views = Views+{$ExtraViews}", array(
+            Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$ExtraViews}, {$ExtraEmbedViews})
+               on duplicate key update 
+                  Views = COALESCE(Views, 0)+{$ExtraViews}, 
+                  EmbedViews = COALESCE(EmbedViews, 0)+{$ExtraEmbedViews}", 
+            array(
                ':TimeSlot' => $TimeSlot
             ));
-            
-//            Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$ExtraViews}, {$ExtraEmbedViews})
-//               on duplicate key update Views = Views+{$ExtraViews}, EmbedViews = EmbedViews+{$ExtraEmbedViews}", array(
-//               ':TimeSlot' => $TimeSlot
-//            ));
          }
       } catch (Exception $Ex) {
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage'))

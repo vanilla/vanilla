@@ -283,6 +283,9 @@ $.TokenList = function (input, settings) {
         li_data = hidden_input.val().split(' '); // settings.prePopulate;
         if(li_data && li_data.length) {
             for(var i in li_data) {
+               if (!li_data.hasOwnProperty(i))
+                  continue;
+
                 if (li_data[i].trim() != '') {
                     token_count++;
                     var this_token = $("<li><p>"+li_data[i]+"</p> </li>")

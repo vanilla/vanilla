@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.3.3',
+   'Version' => '1.3.4',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -391,7 +391,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add the tag input to the discussion form.
     * @param Gdn_Controller $Sender
     */
-   public function PostController_BeforeFormButtons_Handler($Sender) {
+   public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
       if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
          $Discussion = GetValue('Discussion', $Sender->EventArguments);
          if ($Discussion && !$Sender->Form->IsPostBack()) {
@@ -408,8 +408,10 @@ class TaggingPlugin extends Gdn_Plugin {
             $Sender->Form->SetValue('Tags', implode(' ', $Tags));
          }
          
+         echo '<div class="Form-Tags P">';
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
+         echo '</div>';
       }
    }
    

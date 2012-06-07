@@ -90,7 +90,7 @@ $Construct
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
    ->Column('Tags', 'varchar(255)', NULL)
-   ->Column('CountComments', 'int', '1')
+   ->Column('CountComments', 'int', '0')
    ->Column('CountBookmarks', 'int', NULL)
    ->Column('CountViews', 'int', '1')
    ->Column('Closed', 'tinyint(1)', '0')
@@ -246,8 +246,7 @@ $PermissionModel->SQL = $SQL;
 // Define some global vanilla permissions.
 $PermissionModel->Define(array(
 	'Vanilla.Settings.Manage',
-	'Vanilla.Categories.Manage',
-	'Vanilla.Spam.Manage'
+	'Vanilla.Categories.Manage'
 	));
 
 // Define some permissions for the Vanilla categories.
@@ -266,6 +265,8 @@ $PermissionModel->Define(array(
 	'Category',
 	'PermissionCategoryID'
 	);
+
+$PermissionModel->Undefine('Vanilla.Spam.Manage');
 
 if ($RootCategoryInserted) {
    // Get the root category so we can assign permissions to it.
@@ -310,8 +311,7 @@ if ($RootCategoryInserted) {
    // Set the initial moderator permissions.
    $PermissionModel->Save(array(
       'Role' => 'Moderator',
-      'Vanilla.Categories.Manage' => 1,
-      'Vanilla.Spam.Manage' => 1,
+      'Vanilla.Categories.Manage' => 1
       ), TRUE);
    
    $PermissionModel->Save(array(
@@ -335,8 +335,7 @@ if ($RootCategoryInserted) {
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
       'Vanilla.Settings.Manage' => 1,
-      'Vanilla.Categories.Manage' => 1,
-      'Vanilla.Spam.Manage' => 1,
+      'Vanilla.Categories.Manage' => 1
       ), TRUE);
    
    $PermissionModel->Save(array(

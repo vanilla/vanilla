@@ -1213,8 +1213,7 @@ overflow: hidden; */
     display: none;
 }
 .Item.Read {
-    background: #f7f7f7;
-    background: rgba(0, 0, 0, .03);
+    background: #F3F3F3;
 }
 .Item.Read .Title, .Item.Read .BlockTitle {
     font-weight: normal;
@@ -1397,6 +1396,10 @@ body.Post .Popup a.Close {
    margin: 10px 0;
 }
 blockquote {
+   margin: 1em 0 1em 40px;
+}
+
+blockquote.Quote, blockQuote.UserQuote {
    padding: 1ex 16px;
    margin: 1em 0;
 	background: #f3f3f3;

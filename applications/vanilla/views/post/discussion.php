@@ -31,7 +31,9 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 
       $this->FireEvent('BeforeBodyInput');
 		echo '<div class="P">';
-	      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'format' => $this->Data('Discussion.Format'))), 'div', array('class' => 'TextBoxWrapper'));
+         echo $this->Form->BodyBox('Body', array('Table' => 'Discussion'));
+      
+//	      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'format' => $this->Data('Discussion.Format'))), 'div', array('class' => 'TextBoxWrapper'));
 		echo '</div>';
 
       $Options = '';
@@ -52,6 +54,8 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 	         echo '<ul class="List Inline PostOptions">' . $Options .'</ul>';
 			echo '</div>';
       }
+      
+      $this->FireEvent('AfterDiscussionFormOptions');
 
       echo '<div class="Buttons">';
       $this->FireEvent('BeforeFormButtons');
@@ -63,6 +67,9 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       $this->FireEvent('AfterFormButtons');
       echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo '</div>';
+      
+      
+      
       echo $this->Form->Close();
       echo '</div>';
    ?>

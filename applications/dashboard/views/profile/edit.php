@@ -19,7 +19,11 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Email', 'Email');
-         echo $this->Form->TextBox('Email');
+         
+         if (!$this->CanEditEmail) {
+            $Attributes2['disabled'] = 'disabled';
+         }
+         echo $this->Form->TextBox('Email', $Attributes2);
       ?>
    </li>
    <li>

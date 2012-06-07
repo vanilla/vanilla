@@ -1399,4 +1399,26 @@ EOT;
       }
    }
    
+   public static function Wysiwyg($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'Html');
+      } else {
+         // The text contains html and must be purified.
+         $Formatter = Gdn::Factory('HtmlFormatter');
+         if(is_null($Formatter)) {
+            // If there is no HtmlFormatter then make sure that script injections won't work.
+            return self::Display($Mixed);
+         }
+         
+         // Links
+         $Mixed = Gdn_Format::Links($Mixed);
+         // Mentions & Hashes
+         $Mixed = Gdn_Format::Mentions($Mixed);
+
+         $Result = $Formatter->Format($Mixed);
+         
+         return $Result;
+      }
+   }
+   
 }

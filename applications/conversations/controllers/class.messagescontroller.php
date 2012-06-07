@@ -95,7 +95,7 @@ class MessagesController extends ConversationsController {
          }
       } else {
          if ($Recipient != '')
-            $this->Form->SetFormValue('To', $Recipient);
+            $this->Form->SetValue('To', $Recipient);
       }
       if ($Target = Gdn::Request()->Get('Target'))
             $this->Form->AddHidden('Target', $Target);

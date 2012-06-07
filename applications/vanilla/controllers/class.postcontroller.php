@@ -453,10 +453,13 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if (!$this->Form->AuthenticatedPostBack()) {
          // Form was validly submitted
-         if (isset($this->Comment))
-            $this->Form->SetData($this->Comment);
+         if (isset($this->Comment)) {
+//            decho($this->Comment, 'Comment');
+//            die();
+            $this->Form->SetData((array)$this->Comment);
+         }
             
       } else {
          // Save as a draft?

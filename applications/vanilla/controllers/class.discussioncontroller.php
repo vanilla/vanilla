@@ -205,8 +205,10 @@ class DiscussionController extends VanillaController {
          $DraftModel = new DraftModel();
          $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
          $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
-         if ($Draft)
-            $this->Form->SetFormValue('Body', $Draft->Body);
+         if ($Draft && !$this->Form->IsPostBack()) {
+            $this->Form->SetValue('Body', $Draft->Body);
+            $this->Form->SetValue('Format', $Draft->Format);
+         }
       }
       
       // Deliver JSON data if necessary

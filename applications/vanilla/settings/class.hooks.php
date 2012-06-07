@@ -508,7 +508,6 @@ class VanillaHooks implements Gdn_IPlugin {
       if (isset($Sender->RequiredAdminPermissions)) {
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Settings.Manage';
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Categories.Manage';
-         $Sender->RequiredAdminPermissions[] = 'Vanilla.Spam.Manage';
       }
    }
    
@@ -563,7 +562,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Moderation', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Vanilla.Spam.Manage');
+      $Menu->AddLink('Moderation', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage');
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
       $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
       $Menu->AddLink('Forum', T('Blog Comments'), 'dashboard/embed/comments', 'Garden.Settings.Manage');

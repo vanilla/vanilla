@@ -1,6 +1,6 @@
 # Vanilla Forums
 
-**Welcome!** Vanilla was born out of the desire to create flexible, customizable, and downright entertaining community solutions. Vanilla has been used to power over 400,000 community forums around the world and we couldn't be happier that you've decided to use Vanilla to grow yours.
+**Welcome!** Vanilla was born out of the desire to create flexible, customizable, and downright entertaining community solutions. Vanilla has been used to power over 500,000 community forums around the world and we couldn't be happier that you've decided to use Vanilla to grow yours.
 
 # Source Control Ideology
 

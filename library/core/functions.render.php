@@ -168,7 +168,7 @@ if (!function_exists('Anchor')) {
       if (!is_array($Attributes))
          $Attributes = array();
       
-      $SSL = FALSE;
+      $SSL = NULL;
       if (isset($Attributes['SSL'])) {
          $SSL = $Attributes['SSL'];
          unset($Attributes['SSL']);

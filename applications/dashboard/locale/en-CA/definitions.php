@@ -22,6 +22,8 @@ if (!function_exists('FormatPossessive')) {
 $Definition['Locale'] = 'en-CA';
 $Definition['_Locale'] = 'Locale';
 
+$Definition['Apply for Membership'] = 'Register';
+
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
 $Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';
 $Definition['ValidateRequired'] = '%s is required.';

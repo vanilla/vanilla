@@ -420,8 +420,8 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function PostController_Render_Before($Sender) {
       $Sender->AddCSSFile('plugins/Tagging/design/token-input.css');
-      $Sender->AddJsFile('plugins/Tagging/jquery.tokeninput.js');
-      $Sender->AddJsFile($this->GetResource('tagging.js', FALSE,FALSE));
+      $Sender->AddJsFile('plugins/Tagging/js/jquery.tokeninput.vanilla.js');
+      $Sender->AddJsFile($this->GetResource('js/tagging.js', FALSE,FALSE));
       $Sender->Head->AddString('<script type="text/javascript">
    jQuery(document).ready(function($) {
       $("#Form_Tags").tokenInput("'.Gdn::Request()->Url('plugin/tagsearch').'", {
@@ -503,7 +503,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Title('Tagging');
       $Sender->AddSideMenu('settings/tagging');
       $Sender->AddCSSFile('plugins/Tagging/design/tagadmin.css');
-      $Sender->AddJSFile('plugins/Tagging/admin.js');
+      $Sender->AddJSFile('plugins/Tagging/js/admin.js');
       $SQL = Gdn::SQL();
       
       $Sender->Form->Method = 'get';

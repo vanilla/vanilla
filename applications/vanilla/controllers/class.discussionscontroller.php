@@ -379,33 +379,49 @@ class DiscussionsController extends VanillaController {
 			$vanilla_identifier = array($vanilla_identifier);
          
       $vanilla_identifier = array_unique($vanilla_identifier);
-			
-		$CountData = Gdn::SQL()
-			->Select('ForeignID, CountComments')
-			->From('Discussion')
-			->WhereIn('ForeignID', $vanilla_identifier)
-			->Get();
+      
+      $FinalData = array(); $Misses = array();
+      $CacheKey = 'embed.comments.count.%d';
+      foreach ($vanilla_identifier as $ForeignID) {
+         $RealCacheKey = sprintf($CacheKey, $ForeignID);
+         $Comments = Gdn::Cache()->Get($RealCacheKey);
+         if ($Comments !== Gdn_Cache::CACHEOP_FAILURE)
+            $FinalData[$ForeignID] = $Comments;
+         else
+            $Misses[] = $ForeignID;
+      }
+      
+      if (sizeof($Misses)) {
+         $CountData = Gdn::SQL()
+            ->Select('ForeignID, CountComments')
+            ->From('Discussion')
+            ->WhereIn('ForeignID', $Misses)
+            ->Get();
 		
-		$FinalData = array();
-		if ($CountData->NumRows() == 0) {
-			foreach ($vanilla_identifier as $identifier) {
-				$FinalData[$identifier] = 0;
-			}
-		} else {
-			foreach ($CountData->Result() as $Row) {
-				$FinalData[$Row->ForeignID] = $Row->CountComments;
-			}
-         // Ensure that all of the requested values return a value
-         foreach($vanilla_identifier as $id) {
-            if (!array_key_exists($id, $FinalData)) {
-               $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
-            } else {
-               $Count = $FinalData[$id];
-                  
-               $FinalData[$id] = $Count;
+         if ($CountData->NumRows() == 0) {
+            foreach ($vanilla_identifier as $identifier) {
+               $FinalData[$identifier] = 0;
+            }
+         } else {
+            foreach ($CountData->Result() as $Row) {
+               $FinalData[$Row->ForeignID] = $Row->CountComments;
+            }
+            // Ensure that all of the requested values return a value
+            foreach($vanilla_identifier as $id) {
+               if (!array_key_exists($id, $FinalData))
+                  $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
             }
          }
-		}
+         
+         foreach ($Misses as $MissedID) {
+            $MissedCommentCount = GetValue($MissedID, $FinalData, 0);
+            $RealCacheKey = sprintf($CacheKey, $MissedID);
+            Gdn::Cache()->Store($RealCacheKey, $MissedCommentCount, array(
+               Gdn_Cache::FEATURE_EXPIRY     => 60
+            ));
+         }
+         
+      }
 
 		$this->SetData('CountData', $FinalData);
 		$this->DeliveryMethod = DELIVERY_METHOD_JSON;

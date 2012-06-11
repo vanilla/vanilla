@@ -29,7 +29,7 @@ var DEFAULT_SETTINGS = {
 
 	// Tokenization settings
     tokenLimit: null,
-    tokenDelimiter: ",",
+    tokenDelimiter: " ", // VANILLA (use space, not comma)
     preventDuplicates: false,
 
 	// Output settings
@@ -134,6 +134,13 @@ $.TokenList = function (input, url_or_data, settings) {
     //
     // Initialization
     //
+    
+    // VANILLA
+    $(input).bind('BeforeSubmit', function(e, frm){
+      var val = $(input_box).val();
+      if (val.length)
+         add_blank_token(val);
+    });
 
     // Configure the data source
     if($.type(url_or_data) === "string" || $.type(url_or_data) === "function") {
@@ -169,7 +176,9 @@ $.TokenList = function (input, url_or_data, settings) {
     } else {
         settings.classes = DEFAULT_CLASSES;
     }
-
+    
+    // VANILLA
+    var cancel_request = false;
 
     // Save the tokens
     var saved_tokens = [];
@@ -267,9 +276,17 @@ $.TokenList = function (input, url_or_data, settings) {
                 case KEY.ENTER:
                 case KEY.NUMPAD_ENTER:
                 case KEY.COMMA:
+                case KEY.SPACE: // VANILLA (space case)
                   if(selected_dropdown_item) {
                     add_token($(selected_dropdown_item).data("tokeninput"));
                     hidden_input.change();
+                    return false;
+                  }
+                  // VANILLA
+                  else {
+                    var val = $(input_box).val();
+                    add_blank_token(val);
+                    cancel_request = true;
                     return false;
                   }
                   break;
@@ -484,6 +501,27 @@ $.TokenList = function (input, url_or_data, settings) {
 
         return this_token;
     }
+    
+    // VANILLA
+    // Add ability to create tokens on the fly
+    function add_blank_token(name) {
+        // Build our token item from scratch
+        if (name.trim() == '')
+            return;
+        var item = {"id": name, "name": name};
+        
+        // Insert the new tokens
+        if(settings.tokenLimit == null || token_count < settings.tokenLimit) {
+            insert_token(item);
+            checkTokenLimit();
+        }
+        
+        // Clear input box
+        input_box.val("").focus();
+        
+        // Don't show the help dropdown, they've got the idea
+        hide_dropdown();
+    }
 
     // Add a token to the token list based on user input
     function add_token (item) {
@@ -663,7 +701,7 @@ $.TokenList = function (input, url_or_data, settings) {
 
     // Populate the results dropdown with some results
     function populate_dropdown (query, results) {
-        if(results && results.length) {
+        if(results && results.length && !cancel_request) { // VANILLA: && !cancel_request
             dropdown.empty();
             var dropdown_ul = $("<ul>")
                 .appendTo(dropdown)
@@ -704,11 +742,14 @@ $.TokenList = function (input, url_or_data, settings) {
             } else {
                 dropdown_ul.show();
             }
-        } else {
+        } else if (!cancel_request) { // VANILLA: if (!cancel_request)
             if(settings.noResultsText) {
                 dropdown.html("<p>"+settings.noResultsText+"</p>");
                 show_dropdown();
             }
+        } else { // VANILLA
+           cancel_request = false;
+           hide_dropdown();
         }
     }
 

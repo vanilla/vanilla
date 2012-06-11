@@ -245,6 +245,7 @@ window.vanilla.embed = function(host) {
    // Couldn't find the container, so dump it out and try again.
    if (!container)
       document.write('<div id="vanilla-comments"></div>');
+   container = document.getElementById('vanilla-comments');
    
    if (container) {
       // If jQuery is present in the page, include our defer-until-visible script

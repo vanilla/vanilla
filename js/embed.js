@@ -243,6 +243,9 @@ window.vanilla.embed = function(host) {
    vanillaIframe.style.display = "block";
    var container = document.getElementById('vanilla-comments');
    // Couldn't find the container, so dump it out and try again.
+   if (!container)
+      document.write('<div id="vanilla-comments"></div>');
+   
    if (container) {
       // If jQuery is present in the page, include our defer-until-visible script
       if (typeof jQuery != 'undefined') {

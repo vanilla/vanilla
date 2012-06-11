@@ -1106,6 +1106,22 @@ overflow: hidden; */
 .CategoryListWithHeadings .Depth10 { padding-left: 200px !important; }
 .CategoryListWithHeadings .Depth11 { padding-left: 225px !important; }
 .CategoryListWithHeadings .Depth12 { padding-left: 250px !important; }
+
+.ChildCategoryList {
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.ChildCategoryList li {
+    float: left;
+    width: 50%;
+    padding: 0;
+}
+
+.ChildCategoryList .ItemContent {
+    padding: 8px 0 0;
+}
+
 .Box.RecentUsers {
 	float: left;
 }
@@ -1149,9 +1165,6 @@ overflow: hidden; */
 .DataList .Item:first-child {
 	border-top: 1px solid #ddd;
 	border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-.Discussions .Item {
-   padding: 8px 4px 4px;
 }
 .DataList .Item .Item {
    border: none;

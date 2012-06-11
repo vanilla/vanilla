@@ -762,11 +762,21 @@ class CategoryModel extends Gdn_Model {
    public static function MakeTree($Categories) {
       $Result = array();
       
-      foreach ($Categories as $Category) {
-         if ($Category['Depth'] == 1) {
-            $Row = $Category;
-            $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
-            $Result[] = $Row;
+      $Categories = (array)$Categories;
+      
+      if (isset($Categories['Name'])) {
+         // Make the tree out of this category as a subtree.
+         $Row = $Categories;
+         $Row['Children'] = self::_MakeTreeChildren($Row, self::Categories());
+         $Result[] = $Row;
+      } else {
+         // Make a tree out of all categories.
+         foreach ($Categories as $Category) {
+            if ($Category['Depth'] == 1) {
+               $Row = $Category;
+               $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
+               $Result[] = $Row;
+            }
          }
       }
       return $Result;

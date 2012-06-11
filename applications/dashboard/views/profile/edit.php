@@ -20,6 +20,7 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Email', 'Email');
          
+         $Attributes2 = array();
          if (!$this->CanEditEmail) {
             $Attributes2['disabled'] = 'disabled';
          }

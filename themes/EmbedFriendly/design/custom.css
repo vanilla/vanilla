@@ -99,16 +99,14 @@
    .MeBox,
    .BigButton {
       visibility: visible;
-      position: absolute;
-      top: 0;
+      position: relative;
       width: 120px;
+      display: inline-block;
    }
    .BigButton {
-      right: 0;
       padding: 8px 20px;
    }
    .MeBox {
-      left: 0;
       width: 200px;
    }
    #Panel {

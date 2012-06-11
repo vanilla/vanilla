@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.3.4',
+   'Version' => '1.4',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -28,6 +28,9 @@ v1.3 (2011-10-21 Lincoln)
 - Removed redundant enable/disable plugin functionality.
 
    1.3.3 - Fix inline display hook for 2.1a9 (2012-01-15 Lincoln)
+   
+v1.4 (2012-06-11 Lincoln)
+- Upgraded tokenizer to 1.6, re-customized it, and moved js files to /js folder.
 */
 
 class TaggingPlugin extends Gdn_Plugin {

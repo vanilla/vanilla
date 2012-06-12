@@ -464,6 +464,10 @@ $.TokenList = function (input, url_or_data, settings) {
 
     // Inner function to a token to the list
     function insert_token(item) {
+        // VANILLA: convert string to token
+        if($.type(item) === "string")
+          item = {"id": item, "name": item};
+        
         var this_token = settings.tokenFormatter(item);
         this_token = $(this_token)
           .addClass(settings.classes.token)
@@ -504,12 +508,11 @@ $.TokenList = function (input, url_or_data, settings) {
     
     // VANILLA
     // Add ability to create tokens on the fly
-    function add_blank_token(name) {
+    function add_blank_token(item) {
         // Build our token item from scratch
-        if (name.trim() == '')
+        if (item.trim() == '')
             return;
-        var item = {"id": name, "name": name};
-        
+                
         // Insert the new tokens
         if(settings.tokenLimit == null || token_count < settings.tokenLimit) {
             insert_token(item);

@@ -395,22 +395,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
-         $Discussion = GetValue('Discussion', $Sender->EventArguments);
-         if ($Discussion && !$Sender->Form->IsPostBack()) {
-            // Load the existing tags.
-            $Tags = Gdn::SQL()
-               ->Select('t.*')
-               ->From('TagDiscussion td')
-               ->Join('Tag t', 'td.TagID = t.TagID')
-               ->Where('td.DiscussionID', GetValue('DiscussionID', $Discussion))
-               ->Where("coalesce(t.Type, '')", '')
-               ->Get()->ResultArray();
-            
-            $Tags = ConsolidateArrayValuesByKey($Tags, 'Name');
-            $Sender->Form->SetValue('Tags', implode(' ', $Tags));
-         }
-         
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {         
          echo '<div class="Form-Tags P">';
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
@@ -433,6 +418,7 @@ class TaggingPlugin extends Gdn_Plugin {
          searchDelay: 300,
          minChars: 1,
          maxLength: 25,
+         prePopulate: $("#Form_Tags").val().split(" "),
          onFocus: function() { $(".Help").hide(); $(".HelpTags").show(); }
      });
    });

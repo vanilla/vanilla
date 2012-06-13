@@ -412,13 +412,16 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddJsFile($this->GetResource('js/tagging.js', FALSE,FALSE));
       $Sender->Head->AddString('<script type="text/javascript">
    jQuery(document).ready(function($) {
+      var tags = $("#Form_Tags").val();
+      if (tags && tags.length)
+         tags = tags.split(" ");
       $("#Form_Tags").tokenInput("'.Gdn::Request()->Url('plugin/tagsearch').'", {
          hintText: "Start to type...",
          searchingText: "Searching...",
          searchDelay: 300,
          minChars: 1,
          maxLength: 25,
-         prePopulate: $("#Form_Tags").val().split(" "),
+         prePopulate: tags,
          onFocus: function() { $(".Help").hide(); $(".HelpTags").show(); }
      });
    });

@@ -250,13 +250,11 @@ window.vanilla.embed = function(host) {
    if (container) {
       // If jQuery is present in the page, include our defer-until-visible script
       if (typeof jQuery != 'undefined') {
-         jQuery(document).ready(function($) {
-            $.getScript('http://cdn.vanillaforums.com/js/jquery.appear.js', function() {
-               if ($.fn.appear)
-                  $('#vanilla-comments').appear(function() {container.appendChild(vanillaIframe);});
-               else
-                  container.appendChild(vanillaIframe); // fallback
-            });
+         jQuery.getScript('http://cdn.vanillaforums.com/js/jquery.appear.js', function() {
+            if (jQuery.fn.appear)
+               jQuery('#vanilla-comments').appear(function() {container.appendChild(vanillaIframe);});
+            else
+               container.appendChild(vanillaIframe); // fallback
          });
       } else {
          container.appendChild(vanillaIframe); // fallback: just load it

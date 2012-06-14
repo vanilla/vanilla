@@ -382,7 +382,7 @@ class DiscussionsController extends VanillaController {
       
       $FinalData = array_fill_keys($vanilla_identifier, 0);
       $Misses = array();
-      $CacheKey = 'embed.comments.count.%d';
+      $CacheKey = 'embed.comments.count.%s';
       foreach ($vanilla_identifier as $ForeignID) {
          $RealCacheKey = sprintf($CacheKey, $ForeignID);
          $Comments = Gdn::Cache()->Get($RealCacheKey);

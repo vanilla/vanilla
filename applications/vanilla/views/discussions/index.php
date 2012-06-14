@@ -10,7 +10,13 @@ echo '<h1 class="H HomepageTitle">'.
 if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
 }
-// echo Gdn_Theme::Module('DiscussionFilterModule');
+
+include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
+
+$PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
+if ($this->Data('_PagerUrl'))
+   $PagerOptions['Url'] = $this->Data('_PagerUrl');
+echo PagerModule::Write($PagerOptions);
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
@@ -18,9 +24,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>
 <?php
-   $PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
-   if ($this->Data('_PagerUrl'))
-      $PagerOptions['Url'] = $this->Data('_PagerUrl');
+   
    
    PagerModule::Write($PagerOptions);
 } else {

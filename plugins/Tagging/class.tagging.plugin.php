@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.3.4',
+   'Version' => '1.4',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -28,6 +28,9 @@ v1.3 (2011-10-21 Lincoln)
 - Removed redundant enable/disable plugin functionality.
 
    1.3.3 - Fix inline display hook for 2.1a9 (2012-01-15 Lincoln)
+   
+v1.4 (2012-06-11 Lincoln)
+- Upgraded tokenizer to 1.6, re-customized it, and moved js files to /js folder.
 */
 
 class TaggingPlugin extends Gdn_Plugin {
@@ -392,22 +395,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
-         $Discussion = GetValue('Discussion', $Sender->EventArguments);
-         if ($Discussion && !$Sender->Form->IsPostBack()) {
-            // Load the existing tags.
-            $Tags = Gdn::SQL()
-               ->Select('t.*')
-               ->From('TagDiscussion td')
-               ->Join('Tag t', 'td.TagID = t.TagID')
-               ->Where('td.DiscussionID', GetValue('DiscussionID', $Discussion))
-               ->Where("coalesce(t.Type, '')", '')
-               ->Get()->ResultArray();
-            
-            $Tags = ConsolidateArrayValuesByKey($Tags, 'Name');
-            $Sender->Form->SetValue('Tags', implode(' ', $Tags));
-         }
-         
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {         
          echo '<div class="Form-Tags P">';
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
@@ -420,16 +408,20 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function PostController_Render_Before($Sender) {
       $Sender->AddCSSFile('plugins/Tagging/design/token-input.css');
-      $Sender->AddJsFile('plugins/Tagging/jquery.tokeninput.js');
-      $Sender->AddJsFile($this->GetResource('tagging.js', FALSE,FALSE));
+      $Sender->AddJsFile('plugins/Tagging/js/jquery.tokeninput.vanilla.js');
+      $Sender->AddJsFile($this->GetResource('js/tagging.js', FALSE,FALSE));
       $Sender->Head->AddString('<script type="text/javascript">
    jQuery(document).ready(function($) {
+      var tags = $("#Form_Tags").val();
+      if (tags && tags.length)
+         tags = tags.split(" ");
       $("#Form_Tags").tokenInput("'.Gdn::Request()->Url('plugin/tagsearch').'", {
          hintText: "Start to type...",
          searchingText: "Searching...",
          searchDelay: 300,
          minChars: 1,
          maxLength: 25,
+         prePopulate: tags,
          onFocus: function() { $(".Help").hide(); $(".HelpTags").show(); }
      });
    });
@@ -503,7 +495,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Title('Tagging');
       $Sender->AddSideMenu('settings/tagging');
       $Sender->AddCSSFile('plugins/Tagging/design/tagadmin.css');
-      $Sender->AddJSFile('plugins/Tagging/admin.js');
+      $Sender->AddJSFile('plugins/Tagging/js/admin.js');
       $SQL = Gdn::SQL();
       
       $Sender->Form->Method = 'get';

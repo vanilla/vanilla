@@ -481,8 +481,9 @@ class DiscussionsController extends VanillaController {
          
       $vanilla_identifier = array_unique($vanilla_identifier);
       
-      $FinalData = array(); $Misses = array();
-      $CacheKey = 'embed.comments.count.%d';
+      $FinalData = array_fill_keys($vanilla_identifier, 0);
+      $Misses = array();
+      $CacheKey = 'embed.comments.count.%s';
       foreach ($vanilla_identifier as $ForeignID) {
          $RealCacheKey = sprintf($CacheKey, $ForeignID);
          $Comments = Gdn::Cache()->Get($RealCacheKey);
@@ -496,34 +497,20 @@ class DiscussionsController extends VanillaController {
          $CountData = Gdn::SQL()
             ->Select('ForeignID, CountComments')
             ->From('Discussion')
+            ->Where('Type', 'page')
             ->WhereIn('ForeignID', $Misses)
-            ->Get();
-		
-         if ($CountData->NumRows() == 0) {
-            foreach ($vanilla_identifier as $identifier) {
-               $FinalData[$identifier] = 0;
-            }
-         } else {
-            foreach ($CountData->Result() as $Row) {
-               $FinalData[$Row->ForeignID] = $Row->CountComments;
-            }
-            // Ensure that all of the requested values return a value
-            foreach($vanilla_identifier as $id) {
-               if (!array_key_exists($id, $FinalData))
-                  $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
-            }
-         }
+            ->Get()->ResultArray();
          
-         foreach ($Misses as $MissedID) {
-            $MissedCommentCount = GetValue($MissedID, $FinalData, 0);
-            $RealCacheKey = sprintf($CacheKey, $MissedID);
-            Gdn::Cache()->Store($RealCacheKey, $MissedCommentCount, array(
+         foreach ($CountData as $Row) {
+            $FinalData[$Row['ForeignID']] = $Row['CountComments'];
+            $RealCacheKey = sprintf($CacheKey, $Row['ForeignID']);
+            Gdn::Cache()->Store($RealCacheKey, $Row['CountComments'], array(
                Gdn_Cache::FEATURE_EXPIRY     => 60
             ));
-         }
-         
+            
+         }         
       }
-
+      
 		$this->SetData('CountData', $FinalData);
 		$this->DeliveryMethod = DELIVERY_METHOD_JSON;
 		$this->DeliveryType = DELIVERY_TYPE_DATA;

@@ -1450,7 +1450,7 @@ class ImportModel extends Gdn_Model {
          
          if (preg_match('`anonymous`', $Name))
             $Name = 'guest';
-         elseif (preg_match('admin', $Name))
+         elseif (preg_match('`admin`', $Name))
             $Name = 'administrator';
          
          switch (strtolower($Name)) {

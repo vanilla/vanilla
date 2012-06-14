@@ -731,6 +731,7 @@ class DiscussionModel extends VanillaModel {
       $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
       $Data->Url = DiscussionUrl($Data);
+      $Data->Tags = Gdn_Format::Text($Data->Tags);
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);

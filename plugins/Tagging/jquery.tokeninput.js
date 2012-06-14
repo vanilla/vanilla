@@ -74,7 +74,8 @@ $.TokenList = function (input, settings) {
         RIGHT: 39,
         DOWN: 40,
         COMMA: 188,
-        SPACE: 32
+        SPACE: 32,
+        QUOTE: 222
     };
     
     $(input).bind('BeforeSubmit', function(e, frm){
@@ -175,23 +176,31 @@ $.TokenList = function (input, settings) {
                     }
                     break;
 
+                case KEY.ESC:
+                  hide_dropdown();
+                  return true;
+
                 case KEY.TAB:
                 case KEY.RETURN:
                 case KEY.COMMA:
                 case KEY.SPACE:
-                  if (selected_dropdown_item) {
-                    add_token($(selected_dropdown_item));
-                  } else {
-                    var val = $(input_box).val();
-                    add_blank_token(val, val);
-                    cancel_request = true;
-                  }
-                  return false;
-                  break;
-
-                case KEY.ESC:
-                  hide_dropdown();
-                  return true;
+                case KEY.QUOTE:
+                  var val = $(input_box).val();
+                  if((val.charAt(0) != '"' && event.keyCode != KEY.QUOTE) ||
+                     (val.charAt(0) == '"' && event.keyCode == KEY.QUOTE)) {
+                      if(event.keyCode == KEY.QUOTE) { // close quotation marks
+                        val=val.replace('"', ''); // remove quotation marks
+                        val=val.replace(' ', ' '); // replace space with nonbr space
+                      }
+                      if (selected_dropdown_item) {
+                        add_token($(selected_dropdown_item));
+                      } else {
+                        add_blank_token(val, val);
+                        cancel_request = true;
+                      }
+                      return false;
+                      break;
+                  } // on appropriate quotation mark combo pass to default
 
                 default:
                     if(is_printable_character(event.keyCode)) {

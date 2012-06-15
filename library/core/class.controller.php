@@ -1459,34 +1459,40 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
             if (ArrayHasValue($this->_CssFiles, 'style.css')) {
-               $this->AddCssFile('custom.css');
-            
-               // Add the theme option's css file.
-               if ($this->Theme && $this->ThemeOptions) {
-                  $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
-                  if (is_string($Filenames) && $Filenames != '%s')
-                     $this->_CssFiles[] = array('FileName' => ChangeBasename('custom.css', $Filenames), 'AppFolder' => FALSE, 'Options' => FALSE);
-               }
-            }
-               
-            if (ArrayHasValue($this->_CssFiles, 'admin.css'))
+//               $this->AddCssFile('custom.css');
+//            
+//               // Add the theme option's css file.
+//               if ($this->Theme && $this->ThemeOptions) {
+//                  $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
+//                  if (is_string($Filenames) && $Filenames != '%s')
+//                     $this->_CssFiles[] = array('FileName' => ChangeBasename('custom.css', $Filenames), 'AppFolder' => FALSE, 'Options' => FALSE);
+//               }
+            } elseif (ArrayHasValue($this->_CssFiles, 'admin.css')) {
                $this->AddCssFile('customadmin.css');
+            }
             
             $this->EventArguments['CssFiles'] = &$this->_CssFiles;
             $this->FireEvent('BeforeAddCss');
+            
+            $ETag = AssetModel::ETag();
             
             // And now search for/add all css files.
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
                
+               if ($CssFile == 'style.css') {
+                  $CssFile = Url("/utility/css/style/style-$ETag.css", TRUE);
+                  $CssInfo['AddVersion'] = FALSE;
+               }
+               
                if (StringBeginsWith($CssFile, 'http')) {
-                  $this->Head->AddCss($CssFile, 'all', TRUE, $CssInfo['Options']);
+                  $this->Head->AddCss($CssFile, 'all', GetValue('AddVersion', $CssInfo, TRUE), $CssInfo['Options']);
                   continue;
                } elseif(strpos($CssFile, '/') !== FALSE) {
                   // A direct path to the file was given.
                   $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
                } else {
-                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
+//                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
                   $AppFolder = $CssInfo['AppFolder'];
                   if ($AppFolder == '')
                      $AppFolder = $this->ApplicationFolder;

@@ -135,7 +135,11 @@ class OpenIDPlugin extends Gdn_Plugin {
          $Form->SetFormValue('Provider', self::$ProviderKey);
          $Form->SetFormValue('ProviderName', 'OpenID');
          $Form->SetFormValue('FullName', GetValue('namePerson/first', $Attr).' '.GetValue('namePerson/last', $Attr));
-         $Form->SetFormValue('Email', GetValue('contact/email', $Attr));
+         
+         if ($Email = GetValue('contact/email', $Attr)) {
+            $Form->SetFormValue('Email', $Email);
+         }
+         
          $Sender->SetData('Verified', TRUE);
          $Session->Stash('OpenID', $OpenID);
       }

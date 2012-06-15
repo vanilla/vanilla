@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['Embed Friendly'] = array(
    'Name' => 'Embed-Friendly',
    'Description' => "A fluid theme that fits into any width. Use it for embedding Vanilla into other website pages.",
-   'Version' => '2.0',
+   'Version' => '3.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'

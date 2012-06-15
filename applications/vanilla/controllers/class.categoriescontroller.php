@@ -125,15 +125,22 @@ class CategoriesController extends VanillaController {
 			$this->SetData('Breadcrumbs', array_merge(array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category))));
 			
 			$this->SetData('Category', $Category, TRUE);
+         
+         // Load the subtree.
+         if (C('Vanilla.ExpandCategories', TRUE))
+            $Categories = CategoryModel::GetSubtree($CategoryIdentifier);
+         else
+            $Categories = array($Category);
+         
+         $this->SetData('Categories', $Categories);
 	
 			// Setup head
 			$this->AddCssFile('vanilla.css');
-			$this->Menu->HighlightRoute('/discussions');      
+			$this->Menu->HighlightRoute('/discussions');
 			if ($this->Head) {
 				$this->AddJsFile('discussions.js');
 				$this->AddJsFile('bookmark.js');
 				$this->AddJsFile('options.js');
-				$this->AddJsFile('jquery.gardenmorepager.js');
 				$this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
 			}
 			
@@ -142,7 +149,8 @@ class CategoriesController extends VanillaController {
 			$this->Description(GetValue('Description', $Category), TRUE);
 			
 			// Set CategoryID
-			$this->SetData('CategoryID', GetValue('CategoryID', $Category), TRUE);
+         $CategoryID = GetValue('CategoryID', $Category);
+			$this->SetData('CategoryID', $CategoryID, TRUE);
 			
 			// Add modules
          $this->AddModule('NewDiscussionModule');
@@ -152,7 +160,9 @@ class CategoriesController extends VanillaController {
 			
 			// Get a DiscussionModel
 			$DiscussionModel = new DiscussionModel();
-			$Wheres = array('d.CategoryID' => $this->CategoryID);
+         $CategoryIDs = ConsolidateArrayValuesByKey($this->Data('Categories'), 'CategoryID');
+			$Wheres = array('d.CategoryID' => $CategoryIDs);
+         $this->SetData('_ShowCategoryLink', count($CategoryIDs) > 1);
 			
 			// Check permission
 			$this->Permission('Vanilla.Discussions.View', TRUE, 'Category', GetValue('PermissionCategoryID', $Category));
@@ -168,9 +178,14 @@ class CategoriesController extends VanillaController {
 			$CountDiscussions = $DiscussionModel->GetCount($Wheres);
 			$this->SetData('CountDiscussions', $CountDiscussions);
 			$this->SetData('_Limit', $Limit);
+         
+         // We don't wan't child categories in announcements.
+         $Wheres['d.CategoryID'] = $CategoryID;
 			$AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
 			$this->SetData('AnnounceData', $AnnounceData, TRUE);
-			$this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->Get($Offset, $Limit, $Wheres));
+         $Wheres['d.CategoryID'] = $CategoryIDs;
+         
+         $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->Get($Offset, $Limit, $Wheres));
 	
 			// Build a pager
 			$PagerFactory = new Gdn_PagerFactory();
@@ -180,13 +195,14 @@ class CategoriesController extends VanillaController {
 				$Offset,
 				$Limit,
 				$CountDiscussions,
-				'categories/'.$CategoryIdentifier.'/%1$s'
+				array('CategoryUrl')
 			);
-			$this->SetData('_PagerUrl', 'categories/'.rawurlencode($CategoryIdentifier).'/{Page}');
+         $this->Pager->Record = $Category;
+         PagerModule::Current($this->Pager);
 			$this->SetData('_Page', $Page);
 	
 			// Set the canonical Url.
-			$this->CanonicalUrl(Url(ConcatSep('/', 'categories/'.GetValue('UrlCode', $Category, $CategoryIdentifier), PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
+			$this->CanonicalUrl(CategoryUrl($Category, PageNumber($Offset, $Limit)));
 			
 			// Change the controller name so that it knows to grab the discussion views
 			$this->ControllerName = 'DiscussionsController';

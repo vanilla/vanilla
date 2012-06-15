@@ -46,6 +46,9 @@ $Definition['ValidateBanned'] = 'That %s is not allowed.';
 $Definition['ValidateUrlStringRelaxed'] = '%s can not contain slashes, quotes or tag characters.';
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
+$Definition['PermissionRequired.Garden.Moderation.Manage'] = 'You need to be a moderator to do that.';
+$Definition['PermissionRequired.Garden.Settings.Manage'] = 'You need to be an administrator to do that.';
+$Definition['PermissionRequired.Javascript'] = 'You need to enable javascript to do that.';
 $Definition['ErrorBadInvitationCode'] = 'The invitation code you supplied is not valid.';
 $Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email/username and password you entered.';
 $Definition['User not found.'] = 'Sorry, no account could be found related to the email/username you entered.';
@@ -169,5 +172,9 @@ $Definition['Start a New Discussion'] = 'New Discussion';
 $Definition['Start a New Conversation'] = 'New Message';
 $Definition['New Conversation'] = 'New Message';
 $Definition['Start Conversation'] = 'Post Message';
+$Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
+<p>{Excerpt}</p>
+<p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
+
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

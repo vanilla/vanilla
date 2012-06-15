@@ -295,7 +295,13 @@ abstract class Gdn_SQLDriver {
       if($EscapeFieldSql === FALSE) {
          $Field = '@' . $Field;
       }
+      
       if(is_array($Value)) {
+         Deprecated('Gdn_SQL->ConditionExpr(VALUE, ARRAY)', 'Gdn_SQL->ConditionExpr(VALUE, VALUE)');
+         
+         if ($EscapeValueSql)
+            throw new Gdn_UserException('Invalid function call.');
+         
          $FunctionCall = array_keys($Value);
          $FunctionCall = $FunctionCall[0];
          $FunctionArg = $Value[$FunctionCall];

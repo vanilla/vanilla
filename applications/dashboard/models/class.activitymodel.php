@@ -706,7 +706,7 @@ class ActivityModel extends Gdn_Model {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
-            $Email->To($User->Email, $User->Name);
+            $Email->To($User);
             //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
             
             $Message = sprintf(
@@ -721,7 +721,10 @@ class ActivityModel extends Gdn_Model {
             $this->EventArguments = $Notification;
             $this->FireEvent('BeforeSendNotification');
             try {
-               $Email->Send();
+               // Only send if the user is not banned
+               if (!GetValue('Banned', $User))
+                  $Email->Send();
+               
                $Emailed = self::SENT_OK;
             } catch (phpmailerException $pex) {
                if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
@@ -780,7 +783,7 @@ class ActivityModel extends Gdn_Model {
       // Build the email to send.
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%1$s] %2$s'), C('Garden.Title'), Gdn_Format::PlainText($Activity['Headline'])));
-      $Email->To($User['Email'], $User['Name']);
+      $Email->To($User);
       
       $Url = ExternalUrl($Activity['Route'] == '' ? '/' : $Activity['Route']);
       
@@ -802,7 +805,10 @@ class ActivityModel extends Gdn_Model {
       
       // Send the email.
       try {
-         $Email->Send();
+         // Only send if the user is not banned
+         if (!GetValue('Banned', $User))
+            $Email->Send();
+         
          $Emailed = self::SENT_OK;
          
          // Delete the activity now that it has been emailed.
@@ -906,17 +912,21 @@ class ActivityModel extends Gdn_Model {
             if (is_object($Email)) {
                $this->EventArguments = $Notification;
                $this->FireEvent('BeforeSendNotification');
-            
+
                try {
-                  $Email->Send();
-                  $Emailed = 2;
+                  // Only send if the user is not banned
+                  $User = Gdn::UserModel()->GetID($UserID);
+                  if (!GetValue('Banned', $User))
+                     $Email->Send();
+                  
+                  $Emailed = self::SENT_OK;
                } catch (phpmailerException $pex) {
                   if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
-                     $Emailed = 4;
+                     $Emailed = self::SENT_FAIL;
                   else
-                     $Emailed = 5;
+                     $Emailed = self::SENT_ERROR;
                } catch(Exception $Ex) {
-                  $Emailed = 4;
+                  $Emailed = self::SENT_FAIL;
                }
                
                try {
@@ -982,7 +992,7 @@ class ActivityModel extends Gdn_Model {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
-            $Email->To($User->Email, $User->Name);
+            $Email->To($User);
             $Message = sprintf(
                   $Story == '' ? T('EmailNotification', "%1\$s\n\n%2\$s") : T('EmailStoryNotification', "%3\$s\n\n%2\$s"),
                   $ActivityHeadline,

@@ -181,6 +181,107 @@ class DiscussionsController extends VanillaController {
       $this->Render();
    }
    
+   public function Unread($Page = '0') {
+      if (!Gdn::Session()->IsValid())
+         Redirect('/discussions/index', 302);
+      
+      // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
+      $Layout = C('Vanilla.Discussions.Layout');
+      switch($Layout) {
+         case 'table':
+            if ($this->SyndicationMethod == SYNDICATION_NONE)
+               $this->View = 'table';
+            break;
+         default:
+            // $this->View = 'index';
+            break;
+      }
+      Gdn_Theme::Section('DiscussionList');
+      
+      // Determine offset from $Page
+      list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', 'unread', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
+      
+      // Validate $Page
+      if (!is_numeric($Page) || $Page < 0)
+         $Page = 0;
+      
+      // Setup head.
+      if (!$this->Data('Title')) {
+         $Title = C('Garden.HomepageTitle');
+         if ($Title)
+            $this->Title($Title, '');
+         else
+            $this->Title(T('Unread Discussions'));
+      }
+      if (!$this->Description())
+         $this->Description(C('Garden.Description', NULL));
+      if ($this->Head)
+         $this->Head->AddRss(Url('/discussions/unread/feed.rss', TRUE), $this->Head->Title());
+      
+      // Add modules
+      $this->AddModule('DiscussionFilterModule');
+      $this->AddModule('NewDiscussionModule');
+      $this->AddModule('CategoriesModule');
+      $this->AddModule('BookmarkedModule');
+      $this->SetData('Breadcrumbs', array(
+          array('Name' => T('Discussions'), 'Url' => '/discussions'),
+          array('Name' => T('Unread'), 'Url' => '/discussions/unread')
+      ));
+      
+      
+      // Set criteria & get discussions data
+      $this->SetData('Category', FALSE, TRUE);
+      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel->Watching = TRUE;
+      
+      // Get Discussion Count
+      $CountDiscussions = $DiscussionModel->GetUnreadCount();
+      $this->SetData('CountDiscussions', $CountDiscussions);
+      
+      // Get Discussions
+      $this->DiscussionData = $DiscussionModel->GetUnread($Page, $Limit);
+      
+      $this->SetData('Discussions', $this->DiscussionData, TRUE);
+      $this->SetJson('Loading', $Page . ' to ' . $Limit);
+
+      // Build a pager
+      $PagerFactory = new Gdn_PagerFactory();
+		$this->EventArguments['PagerType'] = 'Pager';
+		$this->FireEvent('BeforeBuildPager');
+      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+      $this->Pager->ClientID = 'Pager';
+      $this->Pager->Configure(
+         $Page,
+         $Limit,
+         $CountDiscussions,
+         'discussions/unread/%1$s'
+      );
+      if (!$this->Data('_PagerUrl'))
+         $this->SetData('_PagerUrl', 'discussions/unread/{Page}');
+      $this->SetData('_Page', $Page);
+      $this->SetData('_Limit', $Limit);
+		$this->FireEvent('AfterBuildPager');
+      
+      // Deliver JSON data if necessary
+      if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+         $this->SetJson('LessRow', $this->Pager->ToString('less'));
+         $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+         $this->View = 'discussions';
+      }
+      
+      // Set a definition of the user's current timezone from the db. jQuery
+      // will pick this up, compare to the browser, and update the user's
+      // timezone if necessary.
+      $CurrentUser = Gdn::Session()->User;
+      if (is_object($CurrentUser)) {
+         $ClientHour = $CurrentUser->HourOffset + date('G', time());
+         $this->AddDefinition('SetClientHour', $ClientHour);
+      }
+      
+      $this->Render();
+   }
+   
    /**
     * Highlight route and include JS, CSS, and modules used by all methods.
     *
@@ -197,7 +298,6 @@ class DiscussionsController extends VanillaController {
 		$this->AddJsFile('bookmark.js');
 		$this->AddJsFile('discussions.js');
 		$this->AddJsFile('options.js');
-      $this->AddJsFile('jquery.gardenmorepager.js');
 			
 		// Inform moderator of checked comments in this discussion
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
@@ -380,35 +480,49 @@ class DiscussionsController extends VanillaController {
 			$vanilla_identifier = array($vanilla_identifier);
          
       $vanilla_identifier = array_unique($vanilla_identifier);
-			
-		$CountData = Gdn::SQL()
-			->Select('ForeignID, CountComments')
-			->From('Discussion')
-			->WhereIn('ForeignID', $vanilla_identifier)
-			->Get();
+      
+      $FinalData = array(); $Misses = array();
+      $CacheKey = 'embed.comments.count.%d';
+      foreach ($vanilla_identifier as $ForeignID) {
+         $RealCacheKey = sprintf($CacheKey, $ForeignID);
+         $Comments = Gdn::Cache()->Get($RealCacheKey);
+         if ($Comments !== Gdn_Cache::CACHEOP_FAILURE)
+            $FinalData[$ForeignID] = $Comments;
+         else
+            $Misses[] = $ForeignID;
+      }
+      
+      if (sizeof($Misses)) {
+         $CountData = Gdn::SQL()
+            ->Select('ForeignID, CountComments')
+            ->From('Discussion')
+            ->WhereIn('ForeignID', $Misses)
+            ->Get();
 		
-		$FinalData = array();
-		if ($CountData->NumRows() == 0) {
-			foreach ($vanilla_identifier as $identifier) {
-				$FinalData[$identifier] = 0;
-			}
-		} else {
-			foreach ($CountData->Result() as $Row) {
-				$FinalData[$Row->ForeignID] = $Row->CountComments;
-			}
-         // Ensure that all of the requested values return a value
-         foreach($vanilla_identifier as $id) {
-            if (!array_key_exists($id, $FinalData)) {
-               $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
-            } else {
-               $Count = $FinalData[$id];
-               if ($Count > 0)
-                  $Count = $Count - 1; // Reduce the count by 1, but don't go below zero
-                  
-               $FinalData[$id] = $Count;
+         if ($CountData->NumRows() == 0) {
+            foreach ($vanilla_identifier as $identifier) {
+               $FinalData[$identifier] = 0;
+            }
+         } else {
+            foreach ($CountData->Result() as $Row) {
+               $FinalData[$Row->ForeignID] = $Row->CountComments;
+            }
+            // Ensure that all of the requested values return a value
+            foreach($vanilla_identifier as $id) {
+               if (!array_key_exists($id, $FinalData))
+                  $FinalData[$id] = 0; // Set a value of 0 if nothing was returned
             }
          }
-		}
+         
+         foreach ($Misses as $MissedID) {
+            $MissedCommentCount = GetValue($MissedID, $FinalData, 0);
+            $RealCacheKey = sprintf($CacheKey, $MissedID);
+            Gdn::Cache()->Store($RealCacheKey, $MissedCommentCount, array(
+               Gdn_Cache::FEATURE_EXPIRY     => 60
+            ));
+         }
+         
+      }
 
 		$this->SetData('CountData', $FinalData);
 		$this->DeliveryMethod = DELIVERY_METHOD_JSON;

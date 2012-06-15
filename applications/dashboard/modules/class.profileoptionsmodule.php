@@ -18,6 +18,27 @@ class ProfileOptionsModule extends Gdn_Module {
    }
 
    public function ToString() {
+      $Controller = Gdn::Controller();
+      $Session = Gdn::Session();
+      $UserID = $Controller->User->UserID;
+      
+      // Add some advanced options.
+      $this->SetData('Advanced', array());
+      
+      if ($Session->CheckPermission('Garden.Moderation.Manage') && $Controller->User->UserID != $Session->UserID) {
+         
+         // Ban/Unban
+         if ($Controller->User->Banned) {
+            $this->Data['Advanced']['BanUnban'] = array('Label' => T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'Class' => 'Popup');
+         } else {
+            $this->Data['Advanced']['BanUnban'] = array('Label' => T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'Class' => 'Popup');
+         }
+         
+         // Delete content.
+         if ($Controller->User->Banned) {
+            $this->Data['Advanced']['DeleteContent'] = array('Label' => T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'Class' => 'Popup');
+         }
+      }
       return parent::ToString();
    }
 }

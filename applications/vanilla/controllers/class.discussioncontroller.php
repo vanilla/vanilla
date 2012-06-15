@@ -39,6 +39,11 @@ class DiscussionController extends VanillaController {
    public $CategoryID;
    
    /**
+    * @var DiscussionModel 
+    */
+   public $DiscussionModel;
+   
+   /**
     * Default single discussion display.
     * 
     * @since 2.0.0
@@ -82,7 +87,7 @@ class DiscussionController extends VanillaController {
       $this->Title($this->Discussion->Name);
 
       // Actual number of comments, excluding the discussion itself.
-      $ActualResponses = $this->Discussion->CountComments - 1;
+      $ActualResponses = $this->Discussion->CountComments;
 
       // If $Offset isn't defined, assume that the user has not clicked to
       // view a next or previous page, and this is a "view" to be counted.
@@ -92,9 +97,8 @@ class DiscussionController extends VanillaController {
 
       $this->Offset = $Offset;
       if (C('Vanilla.Comments.AutoOffset')) {
-         if ($this->Discussion->CountCommentWatch > 1 && $OffsetProvided == '')
-            $this->AddDefinition('ScrollTo', 'a[name=Item_'.$this->Discussion->CountCommentWatch.']');
-
+//         if ($this->Discussion->CountCommentWatch > 1 && $OffsetProvided == '')
+//            $this->AddDefinition('ScrollTo', 'a[name=Item_'.$this->Discussion->CountCommentWatch.']');
          if (!is_numeric($this->Offset) || $this->Offset < 0 || !$OffsetProvided) {
             // Round down to the appropriate offset based on the user's read comments & comments per page
             $CountCommentWatch = $this->Discussion->CountCommentWatch > 0 ? $this->Discussion->CountCommentWatch : 0;
@@ -117,15 +121,29 @@ class DiscussionController extends VanillaController {
       if ($this->Offset < 0)
          $this->Offset = 0;
       
-            // Set the canonical url to have the proper page title.
-      $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
-
+      
+      $LatestItem = $this->Discussion->CountCommentWatch;
+      if ($LatestItem === NULL) {
+         $LatestItem = 0;
+      } elseif ($LatestItem < $this->Discussion->CountComments) {
+         $LatestItem += 1;
+      }
+      
+      $this->SetData('_LatestItem', $LatestItem);
+      
+      // Set the canonical url to have the proper page title.
+      $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, FALSE)));
+      
+//      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
+      
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
       
       $PageNumber = PageNumber($this->Offset, $Limit);
       $this->SetData('Page', $PageNumber);
+      $this->_SetOpenGraph();
+      
       
       include_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
       if ($PageNumber == 1) {
@@ -151,7 +169,7 @@ class DiscussionController extends VanillaController {
       }
          
       // Make sure to set the user's discussion watch records
-      $this->CommentModel->SetWatch($this->Discussion, $this->CommentData->NumRows(), $this->Offset, $this->Discussion->CountComments);
+      $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -164,8 +182,10 @@ class DiscussionController extends VanillaController {
          $this->Offset,
          $Limit,
          $ActualResponses,
-         'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s'
+         array('DiscussionUrl')
       );
+      $this->Pager->Record = $this->Discussion;
+      PagerModule::Current($this->Pager);
       $this->FireEvent('AfterBuildPager');
       
       // Define the form for the comment input
@@ -612,7 +632,7 @@ class DiscussionController extends VanillaController {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
          
          if ($Comment && $Discussion) {
-            $DefaultTarget = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+            $DefaultTarget = DiscussionUrl($Discussion);
             
             // Make sure comment is this user's or they have Delete permission
             if ($Comment->InsertUserID != $Session->UserID)
@@ -654,8 +674,10 @@ class DiscussionController extends VanillaController {
       $this->Title(T('Comments'));
       $this->AddDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
       $this->AddDefinition('SelfUrl', Gdn::Request()->PathAndQuery());
+      $this->AddDefinition('Embedded', TRUE);
       $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
-      $this->Theme = 'default'; // Force the default theme on embedded comments
+      $this->Theme = C('Garden.CommentsTheme', C('Garden.Theme', 'default'));
+      //
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)
          $this->Head->AddString('<style type="text/css">
@@ -692,6 +714,9 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       );
       $this->SetData('ForeignSource', $ForeignSource);
       
+      $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
+      $this->SetData('SortComments', $SortComments);
+      
       // Retrieve the discussion record.
       $Discussion = FALSE;
       if ($DiscussionID > 0) {
@@ -709,7 +734,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $ActualResponses = $this->Discussion->CountComments - 1;
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
-            $Limit = C('Vanilla.Comments.PerPage', 30);
+            $Limit = C('Garden.Embed.CommentsPerPage', 30);
 
          $OffsetProvided = $Offset != '';
          list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
@@ -727,15 +752,15 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
             $this->Offset = 0;
 
          // Set the canonical url to have the proper page title.
-         $this->CanonicalUrl(Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE)), TRUE));
+         $this->CanonicalUrl(DiscussionUrl($Discussion, PageNumber($this->Offset, $Limit)));
 
-         // Load the comments
+         // Load the comments.
          $CurrentOrderBy = $this->CommentModel->OrderBy();
          if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
-            $this->CommentModel->OrderBy('c.DateInserted desc'); // allow custom sort
+            $this->CommentModel->OrderBy('c.DateInserted '.$SortComments); // allow custom sort
 
          $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
-
+         
          if (count($this->CommentModel->Where()) > 0)
             $ActualResponses = FALSE;
 
@@ -801,12 +826,61 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->View = 'comments';
       }
       
-      $this->AddDefinition('PrependNewComments', '1');
+      if ($SortComments == 'desc')
+         $this->AddDefinition('PrependNewComments', '1');
+      
       // Report the discussion id so js can use it.      
       if ($Discussion)
          $this->AddDefinition('DiscussionID', $Discussion->DiscussionID);
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
+   }
+   
+   /**
+    * Re-fetch a discussion's content based on its foreign url.
+    * @param type $DiscussionID 
+    */
+   public function RefetchPageInfo($DiscussionID) {
+      // Make sure we are posting back.
+      if (count($this->Request->Post()) == 0)
+         throw PermissionException('Javascript');
+      
+      // Grab the discussion.
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      // Make sure the user has permission to edit this discussion.
+      $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      $ForeignUrl = GetValueR('Attributes.ForeignUrl', $Discussion);
+      if (!$ForeignUrl) {
+         throw new Gdn_UserException(T("This discussion isn't associated with a url."));
+      }
+      
+      $Stub = $this->DiscussionModel->FetchPageInfo($ForeignUrl);
+//      decho($Stub);
+//      die();
+      
+      // Save the stub.
+      $this->DiscussionModel->SetField($DiscussionID, (array)$Stub);
+      
+      // Send some of the stuff back.
+      if (isset($Stub['Name']))
+         $this->JsonTarget('.PageTitle h1', Gdn_Format::Text($Stub['Name']));
+      if (isset($Stub['Body']))
+         $this->JsonTarget("#Discussion_$DiscussionID .Message", Gdn_Format::To($Stub['Body'], $Stub['Format']));
+      
+      $this->InformMessage('The page was successfully fetched.');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
+   }
+   
+   protected function _SetOpenGraph() {
+      if (!$this->Head)
+         return;
+      $this->Head->AddTag('meta', array('property' => 'og:type', 'content' => 'article'));
    }
 }

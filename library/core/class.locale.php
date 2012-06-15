@@ -37,22 +37,11 @@ class Gdn_Locale extends Gdn_Pluggable {
     */
    public $DeveloperContainer = NULL;
    
+   public $SavedDeveloperCalls = 0;
+   
    public function __construct($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
       parent::__construct();
       $this->ClassName = 'Gdn_Locale';
-      
-      // Prepare developer mode if needed
-      $this->DeveloperMode = C('Garden.Locales.DeveloperMode', FALSE);
-      if ($this->DeveloperMode) {
-         $this->DeveloperContainer = new Gdn_Configuration();
-         $this->DeveloperContainer->Splitting(FALSE);
-         $this->DeveloperContainer->Caching(FALSE);
-         
-         $DeveloperCodeFile = PATH_CACHE."/locale-developer.php";
-         if (!file_exists($DeveloperCodeFile))
-            touch($DeveloperCodeFile);
-         $this->DeveloperContainer->Load($DeveloperCodeFile, 'Definition', TRUE);
-      }
       
       $this->Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
    }
@@ -91,10 +80,10 @@ class Gdn_Locale extends Gdn_Pluggable {
     *  automatically force a remapping.
     */
    public function Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
-      
       // Get locale sources
       $this->Locale = $LocaleName;
       $LocaleSources = $this->GetLocaleSources($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+      
       if (!is_array($LocaleSources))
          $LocaleSources = array();
       
@@ -111,6 +100,20 @@ class Gdn_Locale extends Gdn_Pluggable {
       // Also load any custom defined definitions from the conf directory
       if (file_exists($ConfLocaleOverride))
          $this->LocaleContainer->Load($ConfLocaleOverride, 'Definition', TRUE);
+      
+      // Prepare developer mode if needed
+      $this->DeveloperMode = C('Garden.Locales.DeveloperMode', FALSE);
+      if ($this->DeveloperMode) {
+         $this->DeveloperContainer = new Gdn_Configuration();
+         $this->DeveloperContainer->Splitting(FALSE);
+         $this->DeveloperContainer->Caching(FALSE);
+         
+         $DeveloperCodeFile = PATH_CACHE."/locale-developer-{$LocaleName}.php";
+         if (!file_exists($DeveloperCodeFile))
+            touch($DeveloperCodeFile);
+         
+         $this->DeveloperContainer->Load($DeveloperCodeFile, 'Definition', TRUE);
+      }
       
       // Import core (static) translations
       if ($this->DeveloperMode)
@@ -230,7 +233,6 @@ class Gdn_Locale extends Gdn_Pluggable {
     * @return string
     */
    public function Translate($Code, $Default = FALSE) {
-      
       if ($Default === FALSE)
          $Default = $Code;
 
@@ -245,7 +247,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       if ($this->DeveloperMode && $Translation == $Default) {
          $DevKnows = $this->DeveloperContainer->Get($Code, FALSE);
          if ($DevKnows === FALSE)
-            $this->DeveloperContainer->SaveToConfig($Code, $Translation);
+            $this->DeveloperContainer->SaveToConfig($Code, $Default);
       }
       
       return $Translation;
@@ -255,7 +257,6 @@ class Gdn_Locale extends Gdn_Pluggable {
     *  Clears out the currently loaded locale settings.
     */
    public function Unload() {
-      
       // If we're unloading, don't save first
       if ($this->LocaleContainer instanceof Gdn_Configuration)
          $this->LocaleContainer->AutoSave(FALSE);
@@ -302,4 +303,5 @@ class Gdn_Locale extends Gdn_Pluggable {
       
       return $this->DeveloperContainer->Get('.');
    }
+   
 }

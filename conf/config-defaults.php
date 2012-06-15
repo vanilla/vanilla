@@ -104,6 +104,10 @@ $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowGuestModule']          = TRUE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
 $Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
+$Configuration['Garden']['Embed']['CommentsPerPage']            = 50;
+$Configuration['Garden']['Embed']['SortComments']               = 'desc';
+$Configuration['Garden']['Embed']['PageToForum']                = TRUE;
+
 
 // Formatting
 $Configuration['Garden']['Format']['Mentions']                  = TRUE;

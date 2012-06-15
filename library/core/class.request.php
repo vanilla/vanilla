@@ -274,6 +274,10 @@ class Gdn_Request {
    public function IpAddress() {
       return $this->GetValue('REMOTE_ADDR');
    }
+   
+   public function IsPostBack() {
+      return strcasecmp($this->RequestMethod(), 'post') == 0;
+   }
 
    /**
     * Gets/Sets the scheme from the current url. e.g. "http" in
@@ -759,7 +763,7 @@ class Gdn_Request {
                unset($Query);
          }
       }
-      $Parts[] = trim($Path, '/');
+      $Parts[] = ltrim($Path, '/');
 
       $Result = implode('/', $Parts);
       

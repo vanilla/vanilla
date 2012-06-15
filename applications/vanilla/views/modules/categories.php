@@ -12,7 +12,7 @@ if ($this->Data !== FALSE) {
    <ul class="PanelInfo PanelCategories">
    <?php
    echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.Wrap(Anchor(Gdn_Format::Text(T('All Categories')), '/categories'), 'strong')
-      .' <span class="Aside"><span class="Count">'.Gdn_Format::BigNumber($CountDiscussions, 'html').'</span></span></li>';
+      .' <span class="Aside"><span class="Count">'.BigPlural($CountDiscussions, '%s discussion').'</span></span></li>';
 
    $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
    $DoHeadings = C('Vanilla.Categories.DoHeadings');
@@ -31,8 +31,8 @@ if ($this->Data !== FALSE) {
       if ($DoHeadings && $Category->Depth == 1) {
          echo Gdn_Format::Text($Category->Name);
       } else {
-         echo Wrap(Anchor(Gdn_Format::Text($Category->Name), '/categories/'.rawurlencode($Category->UrlCode)), 'strong')
-            .' <span class="Aside"><span class="Count">'.number_format($Category->CountAllDiscussions).'</span></span>';
+         echo Wrap(Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category)), 'strong')
+            .' <span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
       }
       echo "</li>\n";
    }

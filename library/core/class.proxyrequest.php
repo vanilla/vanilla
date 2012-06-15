@@ -20,6 +20,8 @@ class ProxyRequest {
    
    public $RequestDefaults;
    public $RequestHeaders;
+   public $RequestBody;
+   public $ParsedBody;
    
    public $ResponseHeaders;
    public $ResponseStatus;
@@ -153,7 +155,7 @@ class ProxyRequest {
     * @param type $ExtraHeaders
     * @return type 
     */
-   public function Request($Options, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
+   public function Request($Options = NULL, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
       
       /*
        * Allow requests that just want to use defaults to provide a string instead
@@ -163,11 +165,15 @@ class ProxyRequest {
       if (is_string($Options))
          $Options = array('URL' => $Options);
       
+      if (is_null($Options))
+         $Options = array();
+      
       $this->Options = $Options = array_merge($this->RequestDefaults, $Options);
 
       $this->ResponseHeaders = array();
       $this->ResponseStatus = "";
       $this->ResponseBody = "";
+      $this->RequestBody = "";
       $this->ContentLength = 0;
       $this->ContentType = '';
       $this->ConnectionMode = '';
@@ -385,12 +391,17 @@ class ProxyRequest {
             foreach ($SendFiles as $File => $FilePath)
                $PostData[$File] = "@{$FilePath}";
          } else {
-            if ($PreEncodePost)
+            if ($PreEncodePost && is_array($PostData))
                $PostData = http_build_query($PostData);
          }
          
          curl_setopt($Handler, CURLOPT_POST, TRUE);
          curl_setopt($Handler, CURLOPT_POSTFIELDS, $PostData);
+         
+         if (!is_array($PostData) && !is_object($PostData))
+            $SendExtraHeaders['Content-Length'] = strlen($PostData);
+            
+         $this->RequestBody = $PostData;
       }
       
       // Allow PUT

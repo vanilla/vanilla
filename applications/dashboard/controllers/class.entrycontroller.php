@@ -335,6 +335,25 @@ class EntryController extends Gdn_Controller {
       // Check to see if there is an existing user associated with the information above.
       $Auth = $UserModel->GetAuthentication($this->Form->GetFormValue('UniqueID'), $this->Form->GetFormValue('Provider'));
       $UserID = GetValue('UserID', $Auth);
+      
+      // Check to synchronise roles upon connecting.
+      if (C('Garden.SSO.SynchRoles')) {
+         $SaveRoles = TRUE;
+         
+         // Translate the role names to IDs.
+         $Roles = $this->Form->GetFormValue('Roles');
+         $Roles = RoleModel::GetByName($Roles);
+         $RoleIDs = array_keys($Roles);
+         
+         if (empty($RoleIDs)) {
+            // The user must have at least one role. This protects that.
+            $RoleIDs = $this->UserModel->NewUserRoleIDs();
+         }
+         
+         $this->Form->SetFormValue('RoleID', $RoleIDs);
+      } else {
+         $SaveRoles = FALSE;
+      }
 
       if ($UserID) {
          // The user is already connected.
@@ -351,7 +370,7 @@ class EntryController extends Gdn_Controller {
             }
 
             // Synchronize the user's data.
-            $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
+            $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => $SaveRoles));
          }
          
          // Always save the attributes because they may contain authorization information.
@@ -394,7 +413,7 @@ class EntryController extends Gdn_Controller {
                      if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
                         unset($Data['Photo']);
                      }
-                     $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
+                     $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => $SaveRoles));
                   }
                   
                   if ($Attributes = $this->Form->GetFormValue('Attributes')) {
@@ -464,7 +483,7 @@ class EntryController extends Gdn_Controller {
             $User['Attributes'] = $this->Form->GetFormValue('Attributes', NULL);
             $User['Email'] = $this->Form->GetFormValue('ConnectEmail', $this->Form->GetFormValue('Email', NULL));
 
-            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
@@ -554,7 +573,7 @@ class EntryController extends Gdn_Controller {
             $User['Name'] = $User['ConnectName'];
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 

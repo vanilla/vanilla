@@ -3,6 +3,9 @@
 /**
  * Application Gateway
  *
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
@@ -10,7 +13,7 @@
  */
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.1a12');
+define('APPLICATION_VERSION', '2.1a19');
 
 // Report and track all errors.
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);

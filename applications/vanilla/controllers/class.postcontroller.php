@@ -226,9 +226,9 @@ class PostController extends VanillaController {
                   $this->FireEvent('AfterDiscussionSave');
                   
                   if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                     Redirect('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     Redirect(DiscussionUrl($Discussion));
                   } else {
-                     $this->RedirectUrl = Url('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     $this->RedirectUrl = DiscussionUrl($Discussion, '', TRUE);
                   }
                } else {
                   // If this was a draft save, notify the user about the save
@@ -346,8 +346,9 @@ class PostController extends VanillaController {
          if ($Body == '')
             $Body = T('Undefined discussion body.');
             
-         // Validate the CategoryID for inserting
-         if (!is_numeric($vanilla_category_id)) {
+         // Validate the CategoryID for inserting.
+         $Category = CategoryModel::Categories($vanilla_category_id);
+         if (!$Category) {
             $vanilla_category_id = C('Vanilla.Embed.DefaultCategoryID', 0);
             if ($vanilla_category_id <= 0) {
                // No default category defined, so grab the first non-root category and use that.
@@ -363,6 +364,8 @@ class PostController extends VanillaController {
                if (!$vanilla_category_id)
                   $vanilla_category_id = 0;
             }
+         } else {
+            $vanilla_category_id = $Category['CategoryID'];
          }
          
          $SystemUserID = Gdn::UserModel()->GetSystemUserID();
@@ -422,7 +425,7 @@ class PostController extends VanillaController {
       
       // If closed, cancel & go to discussion
       if ($Discussion && $Discussion->Closed == 1 && !$Editing && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
-         Redirect('discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+         Redirect(DiscussionUrl($Discussion));
       
       // Add hidden IDs to form
       $this->Form->AddHidden('DiscussionID', $DiscussionID);
@@ -479,7 +482,7 @@ class PostController extends VanillaController {
                if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
                   $this->CommentModel->Save2($CommentID, $Inserted, TRUE, TRUE);
                } else {
-                  $this->JsonTarget('', Url("/vanilla/post/comment2/$CommentID/$Inserted"), 'Ajax');
+                  $this->JsonTarget('', Url("/vanilla/post/comment2.json?commentid=$CommentID&inserted=$Inserted"), 'Ajax');
                }
 
                // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
@@ -510,7 +513,7 @@ class PostController extends VanillaController {
                   if ($CommentID > 0)
                      Redirect("discussion/comment/$CommentID/#Comment_$CommentID");
                   elseif ($CommentID == SPAM) {
-                     $this->SetData('DiscussionUrl', '/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($Discussion->Name));
+                     $this->SetData('DiscussionUrl', DiscussionUrl($Discussion));
                      $this->View = 'Spam';
            
                   }
@@ -560,7 +563,7 @@ class PostController extends VanillaController {
                      $this->View = 'comments';
                      
                      // Also define the discussion url in case this request came from the post screen and needs to be redirected to the discussion
-                     $this->SetJson('DiscussionUrl', Url('/discussion/'.$DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/#Comment_'.$CommentID));
+                     $this->SetJson('DiscussionUrl', DiscussionUrl($this->Discussion).'#Comment_'.$CommentID);
                   } else {
                      // If the comment model isn't sorted by DateInserted or CommentID then we can't do any fancy loading of comments.
                      $OrderBy = GetValueR('0.0', $this->CommentModel->OrderBy());
@@ -646,6 +649,7 @@ class PostController extends VanillaController {
     */
    public function Comment2($CommentID, $Inserted = FALSE) {
       $this->CommentModel->Save2($CommentID, $Inserted);
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
    /**

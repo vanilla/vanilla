@@ -47,6 +47,11 @@ define('SYNDICATION_NONE', 'NONE');
 define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
 
+define('TRACE_INFO', 'Info');
+define('TRACE_ERROR', 'Error');
+define('TRACE_WARNING', 'Warning');
+define('TRACE_NOTICE', 'Notice');
+
 // Environment
 define('ENVIRONMENT_PHP_VERSION','5.2.0');
 

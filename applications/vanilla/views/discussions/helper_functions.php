@@ -66,11 +66,10 @@ if (!function_exists('BookmarkButton')) {
 
 if (!function_exists('CategoryLink')):
    
-function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
-   if (!$Force && Gdn::Controller()->Data('Category')) {
-      return;
-   }
-   
+function CategoryLink($Discussion, $Prefix = ' ') {
+//   if (!$Force && Gdn::Controller()->Data('Category')) {
+//      return;
+//   }
    $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
    
    if ($Category) {
@@ -81,12 +80,12 @@ function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
 endif;
 
 if (!function_exists('WriteDiscussion')):
-function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
+function WriteDiscussion($Discussion, &$Sender, &$Session) {
    $CssClass = CssClass($Discussion);
    $DiscussionUrl = $Discussion->Url;
    
    if ($Session->UserID)
-      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch);
+      $DiscussionUrl .= '#latest';
    
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
@@ -163,7 +162,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
             }
          
             if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo Wrap(Anchor($Discussion->Category, '/categories/'.rawurlencode($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
+               echo Wrap(Anchor($Discussion->Category, CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>
@@ -200,24 +199,7 @@ endif;
 
 if (!function_exists('WritePageLink')):
 function WritePageLink($Discussion, $PageNumber) {
-   echo Anchor($PageNumber, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/p'.$PageNumber);
-}
-endif;
-
-if (!function_exists('CssClass')):
-function CssClass($Discussion) {
-   static $Alt = FALSE;
-   $CssClass = 'Item';
-   $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
-   $CssClass .= $Alt ? ' Alt ' : '';
-   $Alt = !$Alt;
-   $CssClass .= $Discussion->Announce ? ' Announcement' : '';
-   $CssClass .= $Discussion->Closed == '1' ? ' Closed' : '';
-   $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
-   $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
-   $CssClass .= ($Discussion->CountUnreadComments > 0 && Gdn::Session()->IsValid()) ? ' New' : '';
-   
-   return $CssClass;
+   echo Anchor($PageNumber, DiscussionUrl($Discussion, $PageNumber));
 }
 endif;
 
@@ -226,10 +208,15 @@ function NewComments($Discussion) {
    if (!Gdn::Session()->IsValid())
       return '';
    
-   if ($Discussion->CountUnreadComments === TRUE)
-      return ' <strong class="HasNew">'.T('new discussion', 'new').'</strong>';
-   elseif ($Discussion->CountUnreadComments > 0)
-      return ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+   if ($Discussion->CountUnreadComments === TRUE) {
+      $Title = htmlspecialchars(T("You haven't read this yet."));
+      
+      return ' <strong class="HasNew JustNew" title="'.$Title.'">'.T('new discussion', 'new').'</strong>';
+   } elseif ($Discussion->CountUnreadComments > 0) {
+      $Title = htmlspecialchars(Plural($Discussion->CountUnreadComments, "%s new comment since you last read this.", "%s new comments since you last read this."));
+      
+      return ' <strong class="HasNew" title="'.$Title.'">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+   }
    return '';
 }
 endif;

@@ -36,6 +36,27 @@ if (!function_exists('BigPlural')) {
    }
 }
 
+if (!function_exists('CategoryUrl')):
+
+/**
+ * Return a url for a category. This function is in here and not functions.general so that plugins can override.
+ * @param array $Category
+ * @return string
+ */
+function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+   if (is_string($Category))
+      $Category = CategoryModel::Categories($Category);
+   $Category = (array)$Category;
+   
+   $Result = '/categories/'.rawurlencode($Category['UrlCode']);
+   if ($Page && $Page > 1) {
+         $Result .= '/p'.$Page;
+   }
+   return Url($Result, $WithDomain);
+}
+   
+endif;
+
 if (!function_exists('Condense')) {
    function Condense($Html) {
       $Html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $Html);
@@ -64,6 +85,72 @@ if (!function_exists('CountString')) {
    }
 }
 
+if (!function_exists('CssClass')):
+   
+/** 
+ * Add CSS class names to a row depending on other elements/values in that row. 
+ * Used by category, discussion, and comment lists.
+ * 
+ * @staticvar boolean $Alt
+ * @param type $Row
+ * @return string The CSS classes to be inserted into the row.
+ */
+function CssClass($Row) {
+   static $Alt = FALSE;
+   $Row = (array)$Row;
+   $CssClass = 'Item';
+   $Session = Gdn::Session();
+
+   // Alt rows
+      if ($Alt)
+         $CssClass .= ' Alt';
+      $Alt = !$Alt;
+      
+   // Category list classes
+      if (array_key_exists('UrlCode', $Row))
+         $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
+   
+      if (array_key_exists('Depth', $Row))
+         $CssClass .= " Depth{$Row['Depth']} Depth-{$Row['Depth']}";
+      
+      if (array_key_exists('Archive', $Row))
+         $CssClass .= ' Archived';
+      
+   // Discussion list classes
+      $CssClass .= GetValue('Bookmarked', $Row) == '1' ? ' Bookmarked' : '';
+      $CssClass .= GetValue('Announce', $Row) ? ' Announcement' : '';
+      $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
+      $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
+      if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {
+         $CountUnreadComments = $Row['CountUnreadComments'];
+         if ($CountUnreadComments === TRUE) {
+            $CssClass .= ' New';
+         } elseif ($CountUnreadComments == 0) {
+            $CssClass .= ' Read';
+         } else {
+            $CssClass .= ' Unread';
+         }
+      } elseif (($IsRead = GetValue('Read', $Row, NULL)) !== NULL) {
+         // Category list
+         $CssClass .= $IsRead ? ' Read' : ' Unread';
+      }
+         
+   // Comment list classes
+      if (array_key_exists('CommentID', $Row))
+          $CssClass .= ' ItemComment';
+      else if (array_key_exists('DiscussionID', $Row))
+          $CssClass .= ' ItemDiscussion';
+      
+      if (function_exists('IsMeAction'))
+         $CssClass .= IsMeAction($Row) ? ' MeAction' : '';
+      
+      if ($_CssClss = GetValue('_CssClass', $Row))
+         $CssClass .= ' '.$_CssClss;
+
+   return trim($CssClass);
+}
+endif;
+
 /**
  * Writes an anchor tag
  */
@@ -71,23 +158,27 @@ if (!function_exists('Anchor')) {
    /**
     * Builds and returns an anchor tag.
     */
-   function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = '', $ForceAnchor = FALSE) {
+   function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = FALSE) {
       if (!is_array($CssClass) && $CssClass != '')
          $CssClass = array('class' => $CssClass);
 
       if ($Destination == '' && $ForceAnchor === FALSE)
          return $Text;
       
-      if ($Attributes == '')
+      if (!is_array($Attributes))
          $Attributes = array();
-			
-		$SSL = GetValue('SSL', $Attributes, NULL);
-		if ($SSL)
-			unset($Attributes['SSL']);
+      
+      $SSL = NULL;
+      if (isset($Attributes['SSL'])) {
+         $SSL = $Attributes['SSL'];
+         unset($Attributes['SSL']);
+      }
 		
-		$WithDomain = GetValue('WithDomain', $Attributes, FALSE);
-		if ($WithDomain)
+		$WithDomain = FALSE;
+      if (isset($Attributes['WithDomain'])) {
+         $WithDomain = $Attributes['WithDomain'];
 			unset($Attributes['WithDomain']);
+      }
 
       $Prefix = substr($Destination, 0, 7);
       if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
@@ -242,10 +333,12 @@ if (!function_exists('IPAnchor')) {
  * /applications/garden/locale/en-US/definitions.php.
  */
 if (!function_exists('Plural')) {
-   function Plural($Number, $Singular, $Plural) {
+   function Plural($Number, $Singular, $Plural, $FormattedNumber = FALSE) {
 		// Make sure to fix comma-formatted numbers
       $WorkingNumber = str_replace(',', '', $Number);
-      return sprintf(T(abs($WorkingNumber) == 1 ? $Singular : $Plural), $Number);
+      if ($FormattedNumber === FALSE)
+         $FormattedNumber = $Number;
+      return sprintf(T(abs($WorkingNumber) == 1 ? $Singular : $Plural), $FormattedNumber);
    }
 }
 
@@ -321,7 +414,7 @@ if (!function_exists('UserPhoto')) {
 
       $Photo = $User->Photo;
       if (!$Photo && function_exists('UserPhotoDefaultUrl'))
-         $Photo = UserPhotoDefaultUrl($User);
+         $Photo = UserPhotoDefaultUrl($User, $ImgClass);
 
       if ($Photo) {
          if (!preg_match('`^https?://`i', $Photo)) {
@@ -366,10 +459,33 @@ if (!function_exists('Wrap')) {
 		
       if (is_array($Attributes))
          $Attributes = Attribute($Attributes);
-         
-      return '<'.$Tag.$Attributes.'>'.$String.'</'.$Tag.'>';
+      
+      // Strip the first part of the tag as the closing tag - this allows us to 
+      // easily throw 'span class="something"' into the $Tag field.
+      $Space = strpos($Tag, ' ');
+      $ClosingTag = $Space ? substr($Tag, 0, $Space) : $Tag;         
+      return '<'.$Tag.$Attributes.'>'.$String.'</'.$ClosingTag.'>';
    }
 }
+
+if (!function_exists('WrapIf')) {
+   /**
+    * Wrap the provided string if it isn't empty.
+    * 
+    * @param string $String
+    * @param string $Tag
+    * @param array $Attributes
+    * @return string
+    * @since 2.1 
+    */
+   function WrapIf($String, $Tag = 'span', $Attributes = '') {
+      if (empty($String))
+         return '';
+      else
+         return Wrap($String, $Tag, $Attributes);
+   }
+}
+
 /**
  * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
  */
@@ -403,6 +519,16 @@ if (!function_exists('SignInUrl')) {
 
 if (!function_exists('SignOutUrl')) {
    function SignOutUrl($Target = '') {
+      if ($Target) {
+         // Strip out the SSO from the target so that the user isn't signed back in again.
+         $Parts = explode('?', $Target, 2);
+         if (isset($Parts[1])) {
+            parse_str($Parts[1], $Query);
+            unset($Query['sso']);
+            $Target = $Parts[0].'?'.http_build_query($Query);
+         }
+      }
+      
       return '/entry/signout?TransientKey='.urlencode(Gdn::Session()->TransientKey()).($Target ? '&Target='.urlencode($Target) : '');
    }
 }

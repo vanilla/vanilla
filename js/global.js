@@ -11,6 +11,17 @@ jQuery(document).ready(function($) {
    $('input:hidden[name$=ClientHour]').livequery(function() {
       $(this).val(clientDate);
    });
+   
+   // Add "checked" class to item rows if checkboxes are checked within.
+   checkItems = function() {
+      var container = $(this).parents('.Item');
+      if ($(this).attr('checked') == 'checked')
+         $(container).addClass('Checked');
+      else
+         $(container).removeClass('Checked');
+   }
+   $('.Item :checkbox').each(checkItems);
+   $('.Item :checkbox').change(checkItems);
 
    // Ajax/Save the ClientHour if it is different from the value in the db.
    $('input:hidden[id$=SetClientHour]').livequery(function() {
@@ -134,7 +145,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 		
-	gdn = { focused: true };
+	gdn = {focused: true};
 	gdn.Libraries = {};
    
    $(window).blur(function() {
@@ -214,8 +225,8 @@ jQuery(document).ready(function($) {
          return;
       }
 
-      var width = $this.attr('popupWidth'); width = width ? width : 960;
-      var height = $this.attr('popupHeight'); height = height ? height : 600;
+      var width = $this.attr('popupWidth');width = width ? width : 960;
+      var height = $this.attr('popupHeight');height = height ? height : 600;
       var left = (screen.width - width) / 2;
       var top = (screen.height - height) / 2;
 
@@ -483,7 +494,7 @@ jQuery(document).ready(function($) {
 
    // Fill in placeholders.
    if (!gdn.elementSupports('input', 'placeholder')) {
-      $('input:text,textarea').each(function() {
+      $('input:text,textarea').not('.NoIE').each(function() {
          var $this = $(this);
          var placeholder = $this.attr('placeholder');
          
@@ -530,7 +541,7 @@ jQuery(document).ready(function($) {
                $elem.html(data);
             },
             complete: function() {
-               $elem.removeClass('Progress TinyProgress');
+               $elem.removeClass('Progress TinyProgress InProgress');
                if (settings.complete != undefined) {
                   settings.complete($elem);
                }
@@ -597,6 +608,7 @@ jQuery(document).ready(function($) {
         } else if ($(e.target).hasClass('Hijack') || $(e.target).closest('a').hasClass('Hijack')) {
            return;
         }
+        e.stopPropagation();
       
       // Dynamically fill the flyout.
       var rel = $(this).attr('rel');
@@ -634,10 +646,17 @@ jQuery(document).ready(function($) {
    });
    
    // Close ToggleFlyout menu even if their links are hijacked
-//   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-//      $('.ToggleFlyout').removeClass('Open');
-//      $('.Flyout').hide();
-//   });
+   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+      $('.ToggleFlyout').removeClass('Open');
+      $('.Flyout').hide();
+   });
+
+   $(document).delegate('#Body', 'click', function() {
+      if (lastOpen) {
+         $('.Flyout', lastOpen).hide();
+         $(lastOpen).removeClass('Open');
+      }
+   });
    
    // Add a spinner onclick of buttons with this class
    $(document).delegate('input.SpinOnClick', 'click', function() {
@@ -669,11 +688,22 @@ jQuery(document).ready(function($) {
    gdn.stats = function() {
       // Call directly back to the deployment and invoke the stats handler
       var StatsURL = gdn.url('settings/analyticstick.json');
+      var SendData = {
+            'TransientKey': gdn.definition('TransientKey'), 
+            'Path': gdn.definition('Path'),
+            'Args': gdn.definition('Args'),
+            'ResolvedPath': gdn.definition('ResolvedPath'),
+            'ResolvedArgs': gdn.definition('ResolvedArgs')
+         };
+         
+      if (gdn.definition('TickExtra', null) != null)
+         SendData.TickExtra = gdn.definition('TickExtra');
+      
       jQuery.ajax({
          dataType: 'json',
          type: 'post',
          url: StatsURL,
-         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path')},
+         data: SendData,
          success: function(json) {
             gdn.inform(json);
          }
@@ -944,35 +974,84 @@ jQuery(document).ready(function($) {
 		if (vanilla_identifier && comment != '' && comment != placeholder)
 			stash('CommentForForeignID_' + vanilla_identifier, comment);
 	});
+   
+   String.prototype.addCommas = function() {
+      nStr = this;
+      x = nStr.split('.');
+      x1 = x[0];
+      x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+   }
+   
+   Array.prototype.sum = function(){
+      for(var i=0,sum=0;i<this.length;sum+=this[i++]);
+      return sum;
+   }
+   Array.prototype.max = function(){
+      return Math.max.apply({},this)
+   }
+   Array.prototype.min = function(){
+      return Math.min.apply({},this)
+   }
+   
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.
 // This needs to happen in onload because otherwise the image sizes are not yet known.
 jQuery(window).load(function() {
-   
-   var toggler = function(t_img, t_width) {
-      if (parseInt(t_img.css('width'), 10) > t_width)
-         t_img.css('width',t_width);
-      else
-         t_img.css('width','auto');
-      return false;
-   }
-   
+   /*
+   Adds .naturalWidth() and .naturalHeight() methods to jQuery for retreaving a 
+   normalized naturalWidth and naturalHeight.
+   // Example usage:
+   var 
+   nWidth = $('img#example').naturalWidth(),
+   nHeight = $('img#example').naturalHeight();
+   */
+
+   (function($){
+      var
+      props = ['Width', 'Height'],
+      prop;
+
+      while (prop = props.pop()) {
+         (function (natural, prop) {
+            $.fn[natural] = (natural in new Image()) ? 
+            function () {
+               return this[0][natural];
+            } : 
+            function () {
+               var 
+                  node = this[0],
+                  img,
+                  value;
+
+               if (node.tagName.toLowerCase() === 'img') {
+                  img = new Image();
+                  img.src = node.src,
+                  value = img[prop];
+               }
+               return value;
+            };
+         }('natural' + prop, prop.toLowerCase()));
+      }
+   }(jQuery));
+
    jQuery('div.Message img').each(function(i,img) {
       var img = jQuery(img);
       var container = img.parents('div.Message');
-      if (img.width() > container.width()) {
-         var smwidth = container.width();
-         
-         img.css('width', smwidth).css('cursor', 'pointer');
+      if (img.naturalWidth() > container.width()) {
          img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
-         
-         img.next().click(function() {
-            return toggler(img, smwidth);
-         });
-         img.click(function() {
-            return toggler(img, smwidth);
-         })
+         img.wrap('<a href="'+$(img).attr('src')+'"></a>');
       }
    });
 });
+
+if(typeof String.prototype.trim !== 'function') {
+  String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g, ''); 
+  }
+}

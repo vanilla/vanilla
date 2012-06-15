@@ -245,6 +245,21 @@ class Gdn_Factory {
          unset($this->_Objects[$Alias]);
    }
    
+   /**
+    * Clean up the factory's objects
+    * 
+    * Also calls 'Cleanup' on compatible instances.
+    */
+   public function Cleanup() {
+      foreach ($this->_Objects as $FactoryInstanceName => &$FactoryInstance) {
+         if (gettype($FactoryInstance) == 'object' && method_exists($FactoryInstance, 'Cleanup')) {
+            $FactoryInstance->Cleanup();
+         }
+         
+         unset($FactoryInstance);
+      }
+   }
+   
    /** 
     * Uninstall a dependency definition.
     * 

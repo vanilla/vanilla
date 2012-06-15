@@ -256,9 +256,14 @@ class Gdn_Factory {
     */
    public function Cleanup() {
       foreach ($this->_Objects as $FactoryInstanceName => &$FactoryInstance) {
-         if (gettype($FactoryInstance) == 'object' && method_exists($FactoryInstance, 'Cleanup')) {
-            $FactoryInstance->Cleanup();
-         }
+         if (!is_array($FactoryInstance)) continue;
+         $FactoryType = $FactoryInstance['FactoryType'];
+         
+         if (!array_key_exists($FactoryType, $FactoryInstance)) continue;
+         $FactoryObject = &$FactoryInstance[$FactoryType];
+         
+         if (method_exists($FactoryObject, 'Cleanup'))
+            $FactoryObject->Cleanup();
          
          unset($FactoryInstance);
       }

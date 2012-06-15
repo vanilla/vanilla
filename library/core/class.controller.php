@@ -831,8 +831,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * Cleanup any remaining resources for this controller.
     */
    public function Finalize() {
-      $Database = Gdn::Database();
-      $Database->CloseConnection();
+      $this->FireEvent('Finalize');
    }
 
    /**

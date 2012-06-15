@@ -21,6 +21,10 @@ class Gdn_Factory {
    /** @var array The property dependancies for the factory. */
    protected $_Dependencies = array();
    
+   public function __construct() {
+      register_shutdown_function(array($this, 'Cleanup'));
+   }
+   
    /**
     * Checks whether or not a factory alias exists.
     * 

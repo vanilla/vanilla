@@ -480,7 +480,7 @@ class Gdn {
    /**
     * Get the plugin manager for the application.
     *
-    * @return Gdn_PluginManager
+    * @return Gdn_ThemeManager
     */
    public static function ThemeManager() {
       return self::Factory(self::AliasThemeManager);

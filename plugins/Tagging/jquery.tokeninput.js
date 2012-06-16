@@ -190,7 +190,7 @@ $.TokenList = function (input, settings) {
                      (val.charAt(0) == '"' && event.keyCode == KEY.QUOTE)) {
                       if(event.keyCode == KEY.QUOTE) { // close quotation marks
                         val=val.replace('"', ''); // remove quotation marks
-                        val=val.replace(' ', ' '); // replace space with nonbr space
+                        val=val.replace(' ', ' '); // replace space with nonbr space
                       }
                       if (selected_dropdown_item) {
                         add_token($(selected_dropdown_item));
@@ -563,6 +563,8 @@ $.TokenList = function (input, settings) {
     // than settings.minChars
     function do_search(immediate) {
         var query = input_box.val().toLowerCase();
+        if (query.charAt(0) == '"')
+            query = query.substr(1);
 
         if (query && query.length) {
             if(selected_token) {

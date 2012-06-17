@@ -74,8 +74,8 @@ class Minify_CSS_UriRewriter {
         $css = self::_trimUrls($css);
         
         // rewrite
-        $css = preg_replace_callback('/@import\\s+([\'"])(.*?)[\'"]/'
-            ,array(self::$className, '_processUriCB'), $css);
+        $css = preg_replace_callback('/@import\s+(?:url)(.+);/'
+            ,array(self::$className, '_processImportUriCB'), $css);
         $css = preg_replace_callback('/url\\(\\s*([^\\)\\s]+)\\s*\\)/'
             ,array(self::$className, '_processUriCB'), $css);
 
@@ -138,6 +138,46 @@ class Minify_CSS_UriRewriter {
             \\s*
             \\)         # )
         /x', 'url($1)', $css);
+    }
+    
+        private static function _processImportUriCB($m)
+    {
+       $uri = trim($m[1], '()"\' ');
+       
+//       decho(self::$_currentDir, 'currentDir');
+//       decho(self::$_docRoot, 'docRoot');
+       
+       // We want to grab the import.
+       if (strpos($uri, '//') !== false) {
+          $path = $uri;
+       } elseif ($uri[0] == '/') {
+          $path = self::_realpath(self::$_docRoot, $uri);
+       } else {
+          $path = realpath2(self::$_currentDir.'/'.trim($uri, '/\\'));
+          
+          if (substr_compare(self::$_docRoot, $path, 0, strlen($path)) != 0) {
+            return "/* Error: $uri isn't in the webroot. */\n";
+          } elseif (substr_compare($path, '.css', -4, 4, true) != 0) {
+             return "/* Error: $uri must end in .css. */\n";
+          }
+       }
+       $css = file_get_contents($path);
+       // Not so fast, we've got to rewrite this file too. What's more, the current dir and path are different.
+       $currentDirBak = self::$_currentDir;
+       $newCurrentDir = realpath2($currentDirBak.realpath2(dirname($uri)));
+       
+//       echo "
+//       currentDir: $currentDir,
+//       newCurrentDir: $newCurrentDir,
+//       docRoot: $docRoot
+//       uri:$uri\n";
+       
+       $css = self::rewrite($css, $newCurrentDir, self::$_docRoot);
+       
+       self::$_currentDir = $currentDirBak;
+       
+       return "/* @include url('$uri'); */\n".
+         $css;
     }
     
     private static function _processUriCB($m)

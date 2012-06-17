@@ -614,10 +614,10 @@ class Gdn_Format {
       $Result = '';
       foreach ($Chunks as $i => $Chunk) {
          if ($i >= $St && $i <= $End) {
-            $Result .= '<span style="display:none">'.str_rot13($Chunk).'</span>';
+            $Result .= '<span style="display:inline;display:none">'.str_rot13($Chunk).'</span>';
          }
          
-         $Result .= '<span style="dizplay:none">'.$Chunk.'</span>';
+         $Result .= '<span style="display:none;display:inline">'.$Chunk.'</span>';
       }
       
       return '<span class="Email">'.$Result.'</span>';

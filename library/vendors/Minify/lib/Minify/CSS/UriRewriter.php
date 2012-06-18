@@ -308,3 +308,29 @@ class Minify_CSS_UriRewriter {
         return rtrim($path, '/\\');
     }
 }
+
+/**
+ * A function similar to realpath, but it doesn't follow symlinks.
+ * @param string $path The path to the file.
+ * @return string
+ */
+function realpath2($path) {
+   $parts = explode('/', str_replace('\\', '/', $path));
+   $result = array();
+
+   foreach ($parts as $part) {
+      if (!$part || $part == '.')
+         continue;
+      if ($part == '..')
+         array_pop($result);
+      else
+         $result[] = $part;
+   }
+   $result = '/'.implode('/', $result);
+
+   // Do a sanity check.
+   if (realpath($result) != realpath($path))
+      $result = realpath($path);
+
+   return $result;
+}

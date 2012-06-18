@@ -14,10 +14,9 @@
  */
 
 class AssetModel extends Gdn_Model {
-   
    protected $_CssFiles = array();
    
-   public function AddCssFile($Filename, $Folder) {
+   public function AddCssFile($Filename, $Folder = FALSE) {
       $this->_CssFiles[] = array($Filename, $Folder);
    }
    
@@ -45,31 +44,7 @@ class AssetModel extends Gdn_Model {
       }
       
       header("Cache-Control:public, max-age=14400");
-      
-      /* CF-Cache-Status:HIT
-      Cache-Control:public, max-age=14400
-      Connection:keep-alive
-      Date:Thu, 14 Jun 2012 22:32:14 GMT
-      ETag:"220d5edb-800d-4a85fa1b202c0"
-      Expires:Fri, 15 Jun 2012 02:32:14 GMT
-      Last-Modified:Mon, 18 Jul 2011 22:36:35 GMT
-      Server:cloudflare-nginx
-      Vary:Accept-Encoding */
-      
-      // Gather all of the css paths.
-      $this->_CssFiles = array(
-         array('style.css', 'dashboard'),
-         array('custom.css'));
-      
-      if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
-         $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
-         if (is_string($Filenames) && $Filenames != '%s')
-            $Paths[] = array(ChangeBasename('custom.css', $Filenames));
-      }
-      
-      // Throw an event so that plugins can add their css too.
-      $this->FireEvent($Basename.'Css');
-      
+            
       // Include minify...
       set_include_path(PATH_LIBRARY."/vendors/Minify/lib".PATH_SEPARATOR.get_include_path());
       require_once PATH_LIBRARY."/vendors/Minify/lib/Minify/CSS.php";
@@ -78,22 +53,21 @@ class AssetModel extends Gdn_Model {
       header("ETag: $CurrentETag");
       echo "/* CSS generated for etag: $CurrentETag.\n *\n";
       
+      
+      $Paths = $this->GetCssFiles($Basename, $NotFound);
+      
       // First, do a pass through the files to generate some information.
-      $LastModified = 0;
-      $Paths = array();
-      foreach ($this->_CssFiles as $Info) {
-         $Filename = $Info[0];
-         $Folder = GetValue(1, $Info);
+      foreach ($Paths as $Info) {
+         list($Path, $UrlPath) = $Info;
          
-         list($Path, $UrlPath) = self::CssPath($Filename, $Folder);
-         if ($Path) {
-            echo " * $UrlPath\n";
-            $Filetime = filemtime($Path);
-            $LastModified = max($LastModified, $Filetime);
-            $Paths[] = array($Path, $UrlPath);
-         } else {
-            echo " * $Folder/$Filename NOT FOUND\n";
-         }
+         echo " * $UrlPath\n";
+      }
+      
+      // Echo the paths that weren't found to help debugging.
+      foreach ($NotFound as $Info) {
+         list($Filename, $Folder) = $Info;
+         
+         echo " * $Folder/$Filename NOT FOUND.\n";
       }
       
       echo " */\n\n";
@@ -106,9 +80,9 @@ class AssetModel extends Gdn_Model {
          $Css = file_get_contents($Path);
          $Css = Minify_CSS::minify($Css, array(
                'preserveComments' => TRUE,
-               'prependRelativePath' => $Folder,
+               'prependRelativePath' => $UrlPath,
                'currentDir' => dirname($Path),
-               'minify' => FALSE
+               'minify' => TRUE
          ));
          echo $Css;
 
@@ -116,14 +90,78 @@ class AssetModel extends Gdn_Model {
       }
    }
    
+   public function GetCssFiles($Basename, &$NotFound) {
+      $NotFound = array();
+      
+      // Gather all of the css paths.
+      switch ($Basename) {
+         case 'Style':
+            $this->_CssFiles = array(
+               array('style.css', 'dashboard'));
+            break;
+         case 'Admin':
+            $this->_CssFiles = array(
+                array('admin.css'));
+            break;
+         default:
+            $this->_CssFiles = array();
+      }
+      
+            // Throw an event so that plugins can add their css too.
+      $this->FireEvent($Basename.'Css');
+      
+      // Include theme customizations last so that they override everything else.
+      switch ($Basename) {
+         case 'Style':
+            $this->AddCssFile('custom.css');
+            
+            if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
+               $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
+               if (is_string($Filenames) && $Filenames != '%s')
+                  $this->AddCssFile(array(ChangeBasename('custom.css', $Filenames)));
+            }
+            
+            break;
+         case 'Admin':
+            $this->AddCssFile('customadmin.css');
+            break;
+      }
+      
+      // Hunt the css files down.
+      $Paths = array();
+      foreach ($this->_CssFiles as $Info) {
+         $Filename = $Info[0];
+         $Folder = GetValue(1, $Info);
+         
+         list($Path, $UrlPath) = self::CssPath($Filename, $Folder);
+         if ($Path) {
+            $Paths[] = array($Path, $UrlPath);
+         } else {
+            $NotFound = array($Filename, $Folder);
+         }
+      }
+      
+      return $Paths;
+   }
+   
    public static function CssPath($Filename, $Folder) {
-      // 1. Check the theme.
+      // 1. Check for a fill path.
+      if (strpos($Filename, '/') !== FALSE) {
+         $Filename = '/'.ltrim($Filename, '/');
+         $Path = PATH_ROOT.$Filename;
+         if (file_exists($Path))
+            return array($Path, $Filename);
+         else
+            return FALSE;
+      }
+      
+      // 2. Check the theme.
       if ($Theme = Gdn::Controller()->Theme) {
          $Paths[] = array(PATH_THEMES."/$Theme/design/$Filename", "/themes/$Theme/design/$Filename");
       }
       
       if ($Folder) {
-         // 2. Check a plugin or application.
+         // 3. Check a plugin or application.
          if (StringBeginsWith($Folder, 'plugins/')) {
             $Folder = substr($Folder, strlen('plugins/'));
             $Paths[] = array(PATH_PLUGINS."/$Folder/design/$Filename", "/plugins/$Folder/design/$Filename");
@@ -131,11 +169,11 @@ class AssetModel extends Gdn_Model {
          } else {
             $Paths[] = array(PATH_APPLICATIONS."/$Folder/design/$Filename", "/applications/$Folder/design/$Filename");
          }
-
-         // 3. Check the default.
-         if ($Folder != 'dashboard')
-            $Paths[] = array(PATH_APPLICATIONS.'/dashboard/design/$Filename', "/applications/dashboard/design/$Filename");
       }
+      
+      // 4. Check the default.
+      if ($Folder != 'dashboard')
+         $Paths[] = array(PATH_APPLICATIONS.'/dashboard/design/$Filename', "/applications/dashboard/design/$Filename");
       
       foreach ($Paths as $Info) {
          if (file_exists($Info[0]))
@@ -177,30 +215,4 @@ class AssetModel extends Gdn_Model {
 //      die();
       return $Result;
    }
-}
-
-/**
- * A function similar to realpath, but it doesn't follow symlinks.
- * @param string $path The path to the file.
- * @return string
- */
-function realpath2($path) {
-   $parts = explode('/', str_replace('\\', '/', $path));
-   $result = array();
-
-   foreach ($parts as $part) {
-      if (!$part || $part == '.')
-         continue;
-      if ($part == '..')
-         array_pop($result);
-      else
-         $result[] = $part;
-   }
-   $result = '/'.implode('/', $result);
-
-   // Do a sanity check.
-   if (realpath($result) != realpath($path))
-      $result = realpath($path);
-
-   return $result;
 }

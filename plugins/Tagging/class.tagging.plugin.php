@@ -53,8 +53,8 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Display the tag module in a discussion.
     */
-   public function DiscussionController_Render_Before($Sender) {
-      $Sender->AddCSSFile('plugins/Tagging/design/tag.css');
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCSSFile('tag.css', 'plugins/Tagging');
    }
    
    /**
@@ -538,7 +538,6 @@ class TaggingPlugin extends Gdn_Plugin {
     * Adds the tag module to the page.
     */
    private function _AddTagModule($Sender) {
-      $Sender->AddCSSFile('plugins/Tagging/design/tag.css');
       $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
       include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
       $TagModule = new TagModule($Sender);

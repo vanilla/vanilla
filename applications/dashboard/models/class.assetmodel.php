@@ -25,7 +25,7 @@ class AssetModel extends Gdn_Model {
       
       header_remove('Set-Cookie');
       header("Content-Type: text/css");
-      if (!in_array($Basename, array('Style'))) {
+      if (!in_array($Basename, array('Style', 'Admin'))) {
          header("HTTP/1.0 404", TRUE, 404);
          
          echo "/* Could not find $Basename/$Revision */";
@@ -101,13 +101,13 @@ class AssetModel extends Gdn_Model {
             break;
          case 'Admin':
             $this->_CssFiles = array(
-                array('admin.css'));
+                array('admin.css', 'dashboard'));
             break;
          default:
             $this->_CssFiles = array();
       }
       
-            // Throw an event so that plugins can add their css too.
+      // Throw an event so that plugins can add their css too.
       $this->FireEvent($Basename.'Css');
       
       // Include theme customizations last so that they override everything else.
@@ -137,7 +137,7 @@ class AssetModel extends Gdn_Model {
          if ($Path) {
             $Paths[] = array($Path, $UrlPath);
          } else {
-            $NotFound = array($Filename, $Folder);
+            $NotFound[] = array($Filename, $Folder);
          }
       }
       

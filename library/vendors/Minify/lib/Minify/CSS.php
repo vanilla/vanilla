@@ -42,16 +42,32 @@ class Minify_CSS {
      * paths need to be normalized for this to work, use "//" to substitute 
      * the doc root in the link paths (the array keys). E.g.:
      * 
-     * 'minify': (default true) Whether or not to minify. Useful for debugging relative paths.
      * <code>
      * array('//symlink' => '/real/target/path') // unix
      * array('//static' => 'D:\\staticStorage')  // Windows
      * </code>
      * 
+     * 'minify': (default true) Whether or not to minify. Useful for debugging relative paths.
+     * 
      * @return string
      */
     public static function minify($css, $options = array()) 
     {
+        require_once 'Minify/CSS/UriRewriter.php';
+        if (isset($options['currentDir'])) {
+            $css = Minify_CSS_UriRewriter::rewrite(
+                $css
+                ,$options['currentDir']
+                ,isset($options['docRoot']) ? $options['docRoot'] : $_SERVER['DOCUMENT_ROOT']
+                ,isset($options['symlinks']) ? $options['symlinks'] : array()
+            );  
+        } elseif (isset($options['prependRelativePath'])) {
+            $css = Minify_CSS_UriRewriter::prepend(
+                $css
+                ,$options['prependRelativePath']
+            );
+        }
+       
         require_once 'Minify/CSS/Compressor.php';
         
         if (!isset($options['minify']) || $options['minify']) {
@@ -68,22 +84,6 @@ class Minify_CSS {
             }
         }
         
-        if (! isset($options['currentDir']) && ! isset($options['prependRelativePath'])) {
-            return $css;
-        }
-        require_once 'Minify/CSS/UriRewriter.php';
-        if (isset($options['currentDir'])) {
-            return Minify_CSS_UriRewriter::rewrite(
-                $css
-                ,$options['currentDir']
-                ,isset($options['docRoot']) ? $options['docRoot'] : $_SERVER['DOCUMENT_ROOT']
-                ,isset($options['symlinks']) ? $options['symlinks'] : array()
-            );  
-        } else {
-            return Minify_CSS_UriRewriter::prepend(
-                $css
-                ,$options['prependRelativePath']
-            );
-        }
+        return $css;
     }
 }

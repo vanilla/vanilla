@@ -1458,7 +1458,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
-            if (ArrayHasValue($this->_CssFiles, 'style.css')) {
+//            if (ArrayHasValue($this->_CssFiles, 'style.css')) {
 //               $this->AddCssFile('custom.css');
 //            
 //               // Add the theme option's css file.
@@ -1467,9 +1467,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 //                  if (is_string($Filenames) && $Filenames != '%s')
 //                     $this->_CssFiles[] = array('FileName' => ChangeBasename('custom.css', $Filenames), 'AppFolder' => FALSE, 'Options' => FALSE);
 //               }
-            } elseif (ArrayHasValue($this->_CssFiles, 'admin.css')) {
-               $this->AddCssFile('customadmin.css');
-            }
+//            } elseif (ArrayHasValue($this->_CssFiles, 'admin.css')) {
+//               $this->AddCssFile('customadmin.css');
+//            }
             
             $this->EventArguments['CssFiles'] = &$this->_CssFiles;
             $this->FireEvent('BeforeAddCss');
@@ -1482,6 +1482,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                
                if ($CssFile == 'style.css') {
                   $CssFile = Url("/utility/css/style/style-$ETag.css", TRUE);
+                  $CssInfo['AddVersion'] = FALSE;
+               } elseif ($CssFile == 'admin.css') {
+                  $CssFile = Url("/utility/css/admin/admin-$ETag.css", TRUE);
                   $CssInfo['AddVersion'] = FALSE;
                }
                

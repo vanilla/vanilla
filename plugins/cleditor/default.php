@@ -53,7 +53,7 @@ v1.1.1 28SEPT2011 - Linc
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -75,6 +75,10 @@ class cleditorPlugin extends Gdn_Plugin {
 //	public function DiscussionController_Render_Before($Sender) {
 //		$this->_AddCLEditor($Sender);
 //	}
+   
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor');
+   }
    
    /**
     *
@@ -106,8 +110,7 @@ class cleditorPlugin extends Gdn_Plugin {
 		// Add the CLEditor to the form
 		$Options = array('ie' => 'gt IE 6', 'notie' => TRUE); // Exclude IE6
 		$Sender->RemoveJsFile('jquery.autogrow.js');
-		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor', $Options);
-		$Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor', $Options);
+		$Sender->AddJsFile('jquery.cleditor.js', 'plugins/cleditor', $Options);
       
       $CssPath = Asset('/plugins/cleditor/design/cleditor.css');
       

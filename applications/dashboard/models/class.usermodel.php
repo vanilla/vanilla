@@ -787,6 +787,9 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetID($ID, $DatasetType = DATASET_TYPE_OBJECT) {
+      if (!$ID)
+         return FALSE;
+      
       // Check page cache, then memcached
       $User = $this->GetUserFromCache($ID, 'userid');
       

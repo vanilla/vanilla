@@ -204,6 +204,7 @@ window.vanilla.embed = function(host) {
          embed_type = 'comments';
          
       var result = '';
+      
       if (embed_type == 'comments') {
          result = 'http://' + host + '/vanilla/discussion/embed/'
             +'&vanilla_discussion_id='+encodeURIComponent(discussion_id)
@@ -213,8 +214,8 @@ window.vanilla.embed = function(host) {
             +'&vanilla_category_id='+encodeURIComponent(category_id);
       } else {
          result = 'http://' 
-            +host.replace('?', '&')
-            +path.replace('?', '&') 
+            +host
+            +path
             +'&remote=' 
             +encodeURIComponent(embedUrl) 
             +'&locale=' 
@@ -225,7 +226,7 @@ window.vanilla.embed = function(host) {
          result += '&sso='+encodeURIComponent(vanilla_sso);
       }
        
-      return result.replace('&', '?'); // Replace the first occurrence of amp with question.
+      return result.replace(/\?/g, '&').replace('&', '?'); // Replace the first occurrence of amp with question.
    }
    var vanillaIframe = document.createElement('iframe');
    vanillaIframe.id = "vanilla"+id;
@@ -240,7 +241,14 @@ window.vanilla.embed = function(host) {
    vanillaIframe.style.width = "100%";
    vanillaIframe.style.height = "300px";
    vanillaIframe.style.border = "0";
-   vanillaIframe.style.display = "block";
+   vanillaIframe.style.display = "none";
+   
+   
+   var img = document.createElement('div');
+   img.className = 'vn-loading';
+   img.style.textAlign = 'center';
+   img.innerHTML = '<img src="http://cdn.vanillaforums.com/images/progress.gif" />';
+   
    var container = document.getElementById('vanilla-comments');
    // Couldn't find the container, so dump it out and try again.
    if (!container)
@@ -248,14 +256,35 @@ window.vanilla.embed = function(host) {
    container = document.getElementById('vanilla-comments');
    
    if (container) {
+      var loaded = function() {
+         container.removeChild(img);
+         vanillaIframe.style.display = "block";
+      }
+      
+      if(vanillaIframe.addEventListener)
+         vanillaIframe.addEventListener('load', loaded, true);
+      else if(vanillaIframe.attachEvent)
+         vanillaIframe.attachEvent('onload', loaded);
+      else
+         setTimeout(2000, loaded);
+      
+      container.appendChild(img);
+      
       // If jQuery is present in the page, include our defer-until-visible script
       if (typeof jQuery != 'undefined') {
-         jQuery.getScript('http://cdn.vanillaforums.com/js/jquery.appear.js', function() {
-            if (jQuery.fn.appear)
-               jQuery('#vanilla-comments').appear(function() {container.appendChild(vanillaIframe);});
-            else
-               container.appendChild(vanillaIframe); // fallback
-         });
+         jQuery.ajax({
+            url: 'http://cdn.vanillaforums.com/js/jquery.appear.js',
+            dataType: 'script',
+            cache: true,
+            success: function() {
+//               setTimeout(function() {
+                  
+               if (jQuery.fn.appear)
+                  jQuery('#vanilla-comments').appear(function() {container.appendChild(vanillaIframe);});
+               else
+                  container.appendChild(vanillaIframe); // fallback
+//               }, 10000);
+            }});
       } else {
          container.appendChild(vanillaIframe); // fallback: just load it
       }

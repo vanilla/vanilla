@@ -845,7 +845,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
     */
    public function RefetchPageInfo($DiscussionID) {
       // Make sure we are posting back.
-      if (count($this->Request->Post()) == 0)
+      if (!$this->Request->IsPostBack())
          throw PermissionException('Javascript');
       
       // Grab the discussion.

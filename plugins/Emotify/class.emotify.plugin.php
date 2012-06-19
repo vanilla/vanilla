@@ -3,7 +3,7 @@
 $PluginInfo['Emotify'] = array(
 	'Name' => 'Emotify :)',
 	'Description' => 'Replaces <a href="http://en.wikipedia.org/wiki/Emoticon">emoticons</a> (smilies) with friendly pictures.',
-	'Version' 	=>	 '2.0.3',
+	'Version' 	=>	 '2.0.4',
 	'MobileFriendly' => TRUE,
 	'Author' 	=>	 "Mark O'Sullivan",
 	'AuthorEmail' => 'mark@vanillaforums.com',
@@ -19,6 +19,10 @@ $PluginInfo['Emotify'] = array(
  */
 
 class EmotifyPlugin implements Gdn_IPlugin {
+   
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
+   }
 	
 	/**
 	 * Replace emoticons in comments.
@@ -237,8 +241,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	 * Prepare a page to be emotified.
 	 */
 	private function _EmotifySetup($Sender) {
-		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');   
-      $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
+		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');  
 		// Deliver the emoticons to the page.
       $Emoticons = array();
       foreach ($this->GetEmoticons() as $i => $gif) {

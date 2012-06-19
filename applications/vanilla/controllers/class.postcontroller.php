@@ -303,6 +303,7 @@ class PostController extends VanillaController {
       $vanilla_category_id = $this->Form->GetFormValue('vanilla_category_id', '');
       $Attributes = array('ForeignUrl' => $vanilla_url);
       $vanilla_identifier = $this->Form->GetFormValue('vanilla_identifier', '');
+      
       // Only allow vanilla identifiers of 32 chars or less - md5 if larger
       if (strlen($vanilla_identifier) > 32) {
          $Attributes['vanilla_identifier'] = $vanilla_identifier;
@@ -310,9 +311,7 @@ class PostController extends VanillaController {
       }
       
       if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
-         $Discussion = $this->DiscussionModel->GetWhere(array(
-            'ForeignID' => $vanilla_identifier
-         ))->FirstRow();
+         $Discussion = $Discussion = $this->DiscussionModel->GetForeignID($vanilla_identifier, $vanilla_type);
          
          if ($Discussion) {
             $this->DiscussionID = $DiscussionID = $Discussion->DiscussionID;

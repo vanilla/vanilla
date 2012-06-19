@@ -1032,7 +1032,7 @@ class CommentModel extends VanillaModel {
 
       // Log the deletion.
       $Log = GetValue('Log', $Options, 'Delete');
-      LogModel::Insert($Log, 'Comment', $Comment);
+      LogModel::Insert($Log, 'Comment', $Comment, GetValue('LogOptions', $Options, array()));
 
       // Delete the comment.
       $this->SQL->Delete('Comment', array('CommentID' => $CommentID));

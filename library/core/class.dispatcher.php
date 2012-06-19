@@ -135,12 +135,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    }
    
    public function Cleanup() {
-      // Destruct the db connection;
-      $Database = Gdn::Database();
-      if($Database != null)
-         $Database->CloseConnection();
+      $this->FireEvent('Cleanup');
    }
-
 
    /**
     * Return the properly formatted controller class name.

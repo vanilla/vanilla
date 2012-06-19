@@ -57,7 +57,6 @@ $Dispatcher->PassProperty('EnabledApplications', $EnabledApplications);
 // 4. Process the request.
 $Dispatcher->Start();
 $Dispatcher->Dispatch();
-$Dispatcher->Cleanup();
 
 // 5. Finish profiling and save results to disk, if requested
 if (defined('PROFILER') && PROFILER) {

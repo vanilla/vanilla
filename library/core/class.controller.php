@@ -831,8 +831,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * Cleanup any remaining resources for this controller.
     */
    public function Finalize() {
-      $Database = Gdn::Database();
-      $Database->CloseConnection();
+      $this->FireEvent('Finalize');
    }
 
    /**
@@ -1170,7 +1169,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
-         $this->RenderData();
+         $ExitRender = $this->RenderData();
+         if ($ExitRender) return;
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1326,23 +1326,26 @@ class Gdn_Controller extends Gdn_Pluggable {
             header('Content-Type: text/xml', TRUE);
             echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
             $this->_RenderXml($Data);
-            exit();
+            return TRUE;
             break;
          case DELIVERY_METHOD_PLAIN:
-            exit();
+            return TRUE;
             break;
          case DELIVERY_METHOD_JSON:
          default:
             header('Content-Type: application/json', TRUE);
             if ($Callback = $this->Request->Get('callback', FALSE)) {
                // This is a jsonp request.
-               exit($Callback.'('.json_encode($Data).');');
+               echo $Callback.'('.json_encode($Data).');';
+               return TRUE;
             } else {
                // This is a regular json request.
-               exit(json_encode($Data));
+               echo json_encode($Data);
+               return TRUE;
             }
             break;
       }
+      return FALSE;
    }
 
    /**

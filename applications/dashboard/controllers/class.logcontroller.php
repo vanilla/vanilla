@@ -111,8 +111,8 @@ class LogController extends DashboardController {
    public function DeleteSpam($LogIDs) {
       $this->Permission('Garden.Moderation.Manage');
       
-      if (!$this->Form->IsPostBack())
-         return;
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
       
       $LogIDs = explode(',', $LogIDs);
       
@@ -304,8 +304,8 @@ class LogController extends DashboardController {
    public function NotSpam($LogIDs) {
       $this->Permission('Garden.Moderation.Manage');
       
-      if (!$this->Form->IsPostBack())
-         return;
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
       
       $Logs = array();
       

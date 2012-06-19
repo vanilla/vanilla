@@ -1538,21 +1538,20 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
-	public function AddView($DiscussionID, $Views = 0) {
-      $Views++;
+	public function AddView($DiscussionID) {
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $CacheKey = "QueryCache.Discussion.{$DiscussionID}.CountViews";
          
          // Increment. If not success, create key.
-         $Incremented = Gdn::Cache()->Increment($CacheKey);
-         if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
+         $Views = Gdn::Cache()->Increment($CacheKey);
+         if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
+            $Views = $this->GetWhere(array('DiscussionID' => $DiscussionID))->Value('CountViews', 0);
             Gdn::Cache()->Store($CacheKey, $Views);
+         }
          
          // Every X views, writeback to Discussions
-         if (($Views % C('Vanilla.Views.DenormalizeWriteback',100)) == 0) {
-            Gdn::Database()->Query("UPDATE {$this->Database->DatabasePrefix}Discussion 
-            SET CountViews={$Views}
-            WHERE DiscussionID={$DiscussionID}");
+         if (($Views % C('Vanilla.Views.DenormalizeWriteback', 100)) == 0) {
+            $this->SetField($DiscussionID, 'CountViews', $Views);
          }
       } else {
          $this->SQL

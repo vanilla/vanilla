@@ -48,12 +48,21 @@ class AssetModel extends Gdn_Model {
       
       header("Cache-Control:public, max-age=14400");
             
+      $CurrentETag = self::ETag();
+      header("ETag: $CurrentETag");
+      
+      $CachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.strtolower($Basename)."-$CurrentETag.css";
+      
+      if (file_exists($CachePath)) {
+         readfile($CachePath);
+         die();
+      }
+      
       // Include minify...
       set_include_path(PATH_LIBRARY."/vendors/Minify/lib".PATH_SEPARATOR.get_include_path());
       require_once PATH_LIBRARY."/vendors/Minify/lib/Minify/CSS.php";
       
-      $CurrentETag = self::ETag();
-      header("ETag: $CurrentETag");
+      ob_start();
       echo "/* CSS generated for etag: $CurrentETag.\n *\n";
       
       $Paths = $this->GetCssFiles($Basename, $ETag, $NotFound);
@@ -94,6 +103,12 @@ class AssetModel extends Gdn_Model {
 
          echo "\n\n";
       }
+
+      // Create a cached copy of the file.
+      $Css = ob_get_flush();
+      if (!file_exists(dirname($CachePath)))
+         mkdir(dirname($CachePath), 0775, TRUE);
+      file_put_contents($CachePath, $Css);
    }
    
    public function GetCssFiles($Basename, $ETag, &$NotFound) {

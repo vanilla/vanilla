@@ -16,11 +16,14 @@
 class AssetModel extends Gdn_Model {
    protected $_CssFiles = array();
    
-   public function AddCssFile($Filename, $Folder = FALSE) {
-      $this->_CssFiles[] = array($Filename, $Folder);
+   public function AddCssFile($Filename, $Folder = FALSE, $Options = FALSE) {
+      if (is_string($Options)) {
+         $Options = array('Css' => $Options);
+      }
+      $this->_CssFiles[] = array($Filename, $Folder, $Options);
    }
    
-   public function ServeCss($Basename, $Revision) {
+   public function ServeCss($Basename, $ETag) {
       $Basename = ucfirst($Basename);
       
       header_remove('Set-Cookie');
@@ -28,16 +31,16 @@ class AssetModel extends Gdn_Model {
       if (!in_array($Basename, array('Style', 'Admin'))) {
          header("HTTP/1.0 404", TRUE, 404);
          
-         echo "/* Could not find $Basename/$Revision */";
+         echo "/* Could not find $Basename/$ETag */";
          die();
       }
       
-      $ETags = GetValue('HTTP_IF_NONE_MATCH', $_SERVER);
+      $RequestETags = GetValue('HTTP_IF_NONE_MATCH', $_SERVER);
       if (get_magic_quotes_gpc())
-         $ETags = stripslashes($ETags);
-      $ETags = explode(',', $ETags);
-      foreach ($ETags as $eTag) {
-         if ($eTag == $Revision) {
+         $RequestETags = stripslashes($RequestETags);
+      $RequestETags = explode(',', $RequestETags);
+      foreach ($RequestETags as $RequestETags) {
+         if ($RequestETags == $ETag) {
             header("HTTP/1.0 304", TRUE, 304);
             die();
          }
@@ -53,8 +56,7 @@ class AssetModel extends Gdn_Model {
       header("ETag: $CurrentETag");
       echo "/* CSS generated for etag: $CurrentETag.\n *\n";
       
-      
-      $Paths = $this->GetCssFiles($Basename, $NotFound);
+      $Paths = $this->GetCssFiles($Basename, $ETag, $NotFound);
       
       // First, do a pass through the files to generate some information.
       foreach ($Paths as $Info) {
@@ -74,10 +76,14 @@ class AssetModel extends Gdn_Model {
       
       // Now that we have all of the paths we want to serve them.
       foreach ($Paths as $Info) {
-         list($Path, $UrlPath) = $Info;
+         list($Path, $UrlPath, $Options) = $Info;
          echo "/* File: $UrlPath */\n";
 
-         $Css = file_get_contents($Path);
+         $Css = GetValue('Css', $Options);
+         if (!$Css) {
+            $Css = file_get_contents($Path);
+         }
+         
          $Css = Minify_CSS::minify($Css, array(
                'preserveComments' => TRUE,
                'prependRelativePath' => $UrlPath,
@@ -90,40 +96,41 @@ class AssetModel extends Gdn_Model {
       }
    }
    
-   public function GetCssFiles($Basename, &$NotFound) {
+   public function GetCssFiles($Basename, $ETag, &$NotFound) {
       $NotFound = array();
       
       // Gather all of the css paths.
       switch ($Basename) {
          case 'Style':
             $this->_CssFiles = array(
-               array('style.css', 'dashboard'));
+               array('style.css', 'dashboard', array('Sort' => -10)));
             break;
          case 'Admin':
             $this->_CssFiles = array(
-                array('admin.css', 'dashboard'));
+                array('admin.css', 'dashboard', array('Sort' => -10)));
             break;
          default:
             $this->_CssFiles = array();
       }
       
       // Throw an event so that plugins can add their css too.
+      $this->EventArguments['ETag'] = $ETag;
       $this->FireEvent($Basename.'Css');
       
       // Include theme customizations last so that they override everything else.
       switch ($Basename) {
          case 'Style':
-            $this->AddCssFile('custom.css');
+            $this->AddCssFile('custom.css', FALSE, array('Sort' => 10));
             
             if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
                $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
                if (is_string($Filenames) && $Filenames != '%s')
-                  $this->AddCssFile(array(ChangeBasename('custom.css', $Filenames)));
+                  $this->AddCssFile(array(ChangeBasename('custom.css', $Filenames, array('Sort' => 11))));
             }
             
             break;
          case 'Admin':
-            $this->AddCssFile('customadmin.css');
+            $this->AddCssFile('customadmin.css', FALSE, array('Sort' => 10));
             break;
       }
       
@@ -132,16 +139,37 @@ class AssetModel extends Gdn_Model {
       foreach ($this->_CssFiles as $Info) {
          $Filename = $Info[0];
          $Folder = GetValue(1, $Info);
+         $Options = GetValue(2, $Info);
+         $Css = GetValue('Css', $Options);
          
-         list($Path, $UrlPath) = self::CssPath($Filename, $Folder);
-         if ($Path) {
-            $Paths[] = array($Path, $UrlPath);
+         if ($Css) {
+            // Add some literal Css.
+            $Paths[] = array(FALSE, $Folder, $Options);
          } else {
-            $NotFound[] = array($Filename, $Folder);
+            list($Path, $UrlPath) = self::CssPath($Filename, $Folder);
+            if ($Path) {
+               $Paths[] = array($Path, $UrlPath, $Options);
+            } else {
+               $NotFound[] = array($Filename, $Folder, $Options);
+            }
          }
       }
       
+      // Sort the paths.
+      usort($Paths, array('AssetModel', '_ComparePath'));
+      
       return $Paths;
+   }
+   
+   protected function _ComparePath($A, $B) {
+      $SortA = GetValue('Sort', $A[2], 0);
+      $SortB = GetValue('Sort', $B[2], 0);
+      
+      if ($SortA == $SortB)
+         return 0;
+      if ($SortA > $SortB)
+         return 1;
+      return -1;
    }
    
    public static function CssPath($Filename, $Folder) {
@@ -207,10 +235,15 @@ class AssetModel extends Gdn_Model {
 //         die();
       }
       
-      // TODO: Add an event for plugins to add stuff to the e-tag.
+      Gdn::PluginManager()->EventArguments['ETagData'] =& $Data;
+      
+      $Suffix = '';
+      Gdn::PluginManager()->EventArguments['Suffix'] =& $Suffix;
+      Gdn::PluginManager()->FireAs('AssetModel')->FireEvent('GenerateETag');
+      unset(Gdn::PluginManager()->EventArguments['ETagData']);
       
       ksort($Data);
-      $Result = substr(md5(implode(',', array_keys($Data))), 0, 8);
+      $Result = substr(md5(implode(',', array_keys($Data))), 0, 8).$Suffix;
 //      decho($Data);
 //      die();
       return $Result;

@@ -1538,21 +1538,20 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
-	public function AddView($DiscussionID, $Views = 0) {
-      $Views++;
+	public function AddView($DiscussionID) {
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $CacheKey = "QueryCache.Discussion.{$DiscussionID}.CountViews";
          
          // Increment. If not success, create key.
-         $Incremented = Gdn::Cache()->Increment($CacheKey);
-         if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
+         $Views = Gdn::Cache()->Increment($CacheKey);
+         if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
+            $Views = $this->GetWhere(array('DiscussionID' => $DiscussionID))->Value('CountViews', 0);
             Gdn::Cache()->Store($CacheKey, $Views);
+         }
          
          // Every X views, writeback to Discussions
-         if (($Views % C('Vanilla.Views.DenormalizeWriteback',100)) == 0) {
-            Gdn::Database()->Query("UPDATE {$this->Database->DatabasePrefix}Discussion 
-            SET CountViews={$Views}
-            WHERE DiscussionID={$DiscussionID}");
+         if (($Views % C('Vanilla.Views.DenormalizeWriteback', 100)) == 0) {
+            $this->SetField($DiscussionID, 'CountViews', $Views);
          }
       } else {
          $this->SQL
@@ -1717,13 +1716,22 @@ class DiscussionModel extends VanillaModel {
          $Log = 'Delete';
       
       LogModel::BeginTransaction();
-      LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
       
       // Log all of the comment deletes.
       $Comments = $this->SQL->GetWhere('Comment', array('DiscussionID' => $DiscussionID))->ResultArray();
-      foreach ($Comments as $Comment) {
-         LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
+      
+      if (count($Comments) > 0 && count($Comments) < 50) {
+         // A smaller number of comments should just be stored with the record.
+         $Data['_Data']['Comment'] = $Comments;
+         LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
+      } else {
+         LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
+         foreach ($Comments as $Comment) {
+            LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
+         }
       }
+
+      LogModel::EndTransaction();
       
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));

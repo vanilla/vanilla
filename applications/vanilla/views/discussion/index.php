@@ -27,6 +27,8 @@ echo "</div>\n\n";
 if ($this->Data('Page') == 1) {
    include $this->FetchViewLocation('discussion', 'discussion');
    echo '</div>'; // close discussion wrap
+   
+   $this->FireEvent('AfterDiscussion');
 } else {
    echo '</div>'; // close discussion wrap
 }
@@ -48,7 +50,7 @@ if ($this->Data['CommentData']->NumRows() > 0)
 	<?php include $this->FetchViewLocation('comments'); ?>
 </ul>
 <?php
-$this->FireEvent('AfterDiscussion');
+$this->FireEvent('AfterComments');
 if($this->Pager->LastPage()) {
    $LastCommentID = $this->AddDefinition('LastCommentID');
    if(!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)

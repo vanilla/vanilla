@@ -473,7 +473,7 @@ jQuery(document).ready(function($) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
 
-      var urlFormat = gdn.definition("UrlFormat", "");
+      var urlFormat = gdn.definition("UrlFormat", "/{Path}");
       
       if (path.substr(0, 1) == "/")
          path = path.substr(1);

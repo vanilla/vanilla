@@ -76,7 +76,7 @@
             break;
       }
       
-      if ($ShowUsers) {
+      if ($ShowUsers && sizeof($this->Data('Users'))) {
          echo '<div class="ExtraAction">';
             echo '<div class="ExtraActionTitle">'.$UsersHtml.'</div>';
             if (count($this->Data('Users')) > 1) {

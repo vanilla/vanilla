@@ -1716,13 +1716,22 @@ class DiscussionModel extends VanillaModel {
          $Log = 'Delete';
       
       LogModel::BeginTransaction();
-      LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
       
       // Log all of the comment deletes.
       $Comments = $this->SQL->GetWhere('Comment', array('DiscussionID' => $DiscussionID))->ResultArray();
-      foreach ($Comments as $Comment) {
-         LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
+      
+      if (count($Comments) > 0 && count($Comments) < 50) {
+         // A smaller number of comments should just be stored with the record.
+         $Data['_Data']['Comment'] = $Comments;
+         LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
+      } else {
+         LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
+         foreach ($Comments as $Comment) {
+            LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
+         }
       }
+
+      LogModel::EndTransaction();
       
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));

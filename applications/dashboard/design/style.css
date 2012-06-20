@@ -1147,10 +1147,6 @@ overflow: hidden; */
 	border-bottom: 1px solid #ddd;
    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
-.DataList .Item:first-child {
-	border-top: 1px solid #ddd;
-	border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
 .DataList .Item .Item {
    border: none;
 }

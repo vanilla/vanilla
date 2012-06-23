@@ -48,7 +48,7 @@
       <?php $this->FireEvent('RegisterFormBeforeTerms'); ?>
       <li>
          <?php
-            echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));
+            echo $this->Form->CheckBox('TermsOfService', '@'.$TermsOfServiceText, array('value' => '1'));
             echo $this->Form->CheckBox('RememberMe', T('Remember me on this computer'), array('value' => '1'));
          ?>
       </li>

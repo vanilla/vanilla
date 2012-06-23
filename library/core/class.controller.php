@@ -747,6 +747,8 @@ class Gdn_Controller extends Gdn_Pluggable {
          $View .= '_atom';
       else if ($this->SyndicationMethod == SYNDICATION_RSS)
          $View .= '_rss';
+      
+      $ViewPath2 = ViewLocation($View, $ControllerName, $ApplicationFolder);
 
       $LocationName = ConcatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
       $ViewPath = ArrayValue($LocationName, $this->_ViewLocations, FALSE);
@@ -822,6 +824,10 @@ class Gdn_Controller extends Gdn_Pluggable {
          Gdn::Dispatcher()->PassData('ViewPaths', $ViewPaths);
          throw NotFoundException('View');
 //         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+      }
+      
+      if ($ViewPath2 != $ViewPath) {
+         Trace("View paths do not match: $ViewPath != $ViewPath2", TRACE_WARNING);
       }
 
       return $ViewPath;
@@ -1640,6 +1646,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       // Master views come from one of four places:
       $MasterViewPaths = array();
+      
+      $MasterViewPath2 = ViewLocation($this->MasterView().'.master', '', $this->ApplicationFolder);
+      
       if(strpos($this->MasterView, '/') !== FALSE) {
          $MasterViewPaths[] = CombinePaths(array(PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*'));
       } else {
@@ -1664,6 +1673,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          }
       }
+      
+      if ($MasterViewPath != $MasterViewPath2)
+         Trace("Master views differing: $MasterViewPath != $MasterViewPath2", TRACE_WARNING);
       
       $this->EventArguments['MasterViewPath'] = &$MasterViewPath;
       $this->FireEvent('BeforeFetchMaster');

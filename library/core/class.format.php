@@ -604,7 +604,7 @@ class Gdn_Format {
     * @return string
     */
    public static function Email($Email) {
-      $Max = min(3, floor(strlen($Email) / 2));
+      $Max = max(3, floor(strlen($Email) / 2));
       $Chunks = str_split($Email, mt_rand(3, $Max));
       $Chunks = array_map('htmlentities', $Chunks);
       

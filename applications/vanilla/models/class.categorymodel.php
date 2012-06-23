@@ -772,7 +772,7 @@ class CategoryModel extends Gdn_Model {
       } else {
          // Make a tree out of all categories.
          foreach ($Categories as $Category) {
-            if ($Category['Depth'] == 1) {
+            if (isset($Category['Depth']) && $Category['Depth'] == 1) {
                $Row = $Category;
                $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
                $Result[] = $Row;

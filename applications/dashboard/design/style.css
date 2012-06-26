@@ -687,17 +687,17 @@ body > #Frame > .Head {
 .SiteMenu a:hover {
    text-decoration: underline;
 }
-#Head .SiteSearch {
-   float: right;
+
+.SiteSearch {
    position: relative;
 }
-#Head .SiteSearch .InputBox {
-   border: none;
-	font-size: 11px;
-   width: 175px;
+
+.SiteSearch .InputBox {
    padding: 5px 25px 5px 5px;
+	font-size: 11px;
 }
-#Head .SiteSearch .Button {
+
+.SiteSearch .Button {
    background: url('images/sprites.png') 0 -196px no-repeat transparent;
    height: 16px;
    width: 16px;
@@ -713,6 +713,15 @@ body > #Frame > .Head {
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
    padding: 0;
+}
+
+#Head .SiteSearch {
+   float: right;
+}
+#Head .SiteSearch .InputBox {
+   border: none;
+   width: 175px;
+   
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */

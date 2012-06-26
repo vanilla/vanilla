@@ -923,10 +923,23 @@ overflow: hidden; */
 	font-size: 9px;
 	line-height: 1;
 	padding: 1px;
-	border: 1px solid #d00;
 }
 .MeMenu em {
 	display: none;
+}
+
+.MeBox.Inline,
+.MeBox.Inline .WhoIs,
+.MeBox.Inline .MeMenu {
+    display: inline;
+    line-height: 24px;
+}
+.MeBox.Inline .PhotoWrap {
+    float: none;
+}
+.MeBox.Inline .ProfilePhoto {
+    height: 24px;
+    width: 24px;
 }
 
 .PanelActivity {

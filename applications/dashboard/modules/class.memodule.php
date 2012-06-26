@@ -10,6 +10,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class MeModule extends Gdn_Module {
    
+   public $Inline = FALSE;
+   
    public function __construct() {
       parent::__construct();
       $this->_ApplicationFolder = 'dashboard';

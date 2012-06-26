@@ -32,7 +32,7 @@ if (!function_exists('BigPlural')) {
       }
       $Title = sprintf(T($Number == 1 ? $Singular : $Plural), number_format($Number));
       
-      return '<span title="'.$Title.'">'.Gdn_Format::BigNumber($Number).'</span>';
+      return '<span title="'.$Title.'" class="Number">'.Gdn_Format::BigNumber($Number).'</span>';
    }
 }
 

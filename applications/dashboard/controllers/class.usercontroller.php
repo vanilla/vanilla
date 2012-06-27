@@ -100,10 +100,11 @@ class UserController extends DashboardController {
 
       // Get user list
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
+      $this->SetData('Users', $this->UserData);
       RoleModel::SetUserRoles($this->UserData->Result());
       
       // Deliver json data if necessary
-      if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+      if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'users';

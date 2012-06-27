@@ -404,3 +404,11 @@ td.BigCount {
 .PageDescription {
    display: none;
 }
+
+.CommentFormWrap .Author {
+    display: none;
+}
+
+.CommentForm .FormWrapper {
+    padding: 10px;
+}

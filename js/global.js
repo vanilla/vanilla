@@ -614,15 +614,17 @@ jQuery(document).ready(function($) {
       var rel = $(this).attr('rel');
       if (rel) {
          $(this).attr('rel', '');
-         $flyout.addClass('Progress');
+         $flyout.html('<div class="InProgress" style="height: 30px"></div>');
+         
          $.ajax({
             url: gdn.url(rel),
             data: {DeliveryType: 'VIEW'},
             success: function(data) {
                $flyout.html(data);
             },
-            complete: function() {
-               $flyout.removeClass('Progress');
+            error: function(xhr) {
+               $flyout.html('');
+               gdn.informError(xhr, true);
             }
          });
       }
@@ -647,6 +649,9 @@ jQuery(document).ready(function($) {
    
    // Close ToggleFlyout menu even if their links are hijacked
    $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+      if ($(this).hasClass('FlyoutButton'))
+         return;
+      
       $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
       $('.Flyout').hide();
    });

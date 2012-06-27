@@ -486,9 +486,9 @@ select {
    background: #d00;
    color: #fff;
    padding: 1px 3px;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
+   border-radius: .5ex;
+   -moz-border-radius: .5ex;
+   -webkit-border-radius: .5ex;
 }
 .Alert a {
    color: #fff;
@@ -971,13 +971,21 @@ overflow: hidden; */
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
+	position: relative;
+	line-height: 1;
+   display: inline-block;
+}
+.MeButton:hover {
+	background: #eee;
+	background: rgba(0,0,0,0.07);
+}
 .MeMenu .Alert {
 	position: absolute;
 	top: -2px;
-	right: -3px;
+	right: -1px;
 	font-size: 9px;
 	line-height: 1;
-	padding: 1px;
+	padding: 2px;
 }
 .MeMenu em {
 	display: none;
@@ -1313,6 +1321,11 @@ overflow: hidden; */
 }
 .Item.Checked {
     background: #ffc;
+}
+
+.Item.Open {
+   z-index: 90;
+   opacity: 1;
 }
 /*
 .Read {

@@ -2,8 +2,8 @@
 $Session = Gdn::Session();
 $User = $Session->User;
 $CssClass = '';
-if ($this->Inline)
-   $CssClass .= ' Inline';
+if ($this->CssClass)
+   $CssClass .= ' '.$this->CssClass;
 
 
 if ($Session->IsValid()):

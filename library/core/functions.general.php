@@ -1042,7 +1042,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = array_shift($Value);
             
             if (is_array($Value)) {
-               $Max = C('Garden.FormatUsername.Max', 10);
+               $Max = C('Garden.FormatUsername.Max', 5);
                
                $Count = count($Value);
                $Result = '';

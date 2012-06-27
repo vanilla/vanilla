@@ -786,7 +786,6 @@ div.Discussion:hover .OptionsTitle:hover,
    background: #282828;
 }
 .ToggleFlyout {
-   cursor: pointer;
    position: relative;
 }
 .ToggleFlyout.Open {
@@ -802,6 +801,61 @@ div.Discussion:hover .OptionsTitle:hover,
 .OptionsMenu .Flyout {
    top: 21px;
 }
+
+.Flyout .Author .PhotoWrap {
+    margin: 0;
+}
+
+.FlyoutMenu {
+    width: 300px;
+    background: #fff;
+    color: #000;
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,.7);
+    border: solid 1px #bbb;
+}
+
+.FlyoutButton {
+   cursor: pointer;
+}
+
+.Open .FlyoutButton {
+    background: #fff;
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,.7);
+    border: solid 1px #bbb;
+}
+
+.Open .FlyoutButton:after {
+    content: "";
+    position: absolute;
+    background: #fff;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    right: 0;
+    z-index: 101;
+}
+
+.Flyout .ItemContent {
+    margin: 0 0 0 48px;
+    line-height: 1.4;
+}
+
+.FlyoutLeft .Flyout {
+    right: inherit;
+}
+
+.MeBox .Flyout {
+    right: inherit;
+    left: -1em;
+}
+
+.MeBox.FlyoutRight .Flyout {
+    left: inherit;
+    right: -1em;
+}
+
 a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
@@ -1172,6 +1226,12 @@ overflow: hidden; */
 .DataList .Item .Item {
    border: none;
 }
+
+.Flyout .Item {
+    overflow: hidden;
+    padding: 4px;
+}
+
 .Item h2, .Item h3, .Item h4, .Item h5 {
    margin: 0;
 }

@@ -379,6 +379,20 @@ class DiscussionsController extends VanillaController {
       $this->Render('index');
    }
    
+   public function BookmarkedPopin() {
+      $this->Permission('Garden.SignIn.Allow');
+      
+      $DiscussionModel = new DiscussionModel();
+      $Wheres = array(
+         'w.Bookmarked' => '1', 
+         'w.UserID' => Gdn::Session()->UserID
+      );
+      
+      $Discussions = $DiscussionModel->Get(0, 5, $Wheres);
+      $this->SetData('Discussions', $Discussions);
+      $this->Render('Popin');
+   }
+   
    /**
     * Display discussions started by the user.
     * 

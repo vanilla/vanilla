@@ -678,8 +678,8 @@ class DiscussionController extends VanillaController {
       $this->AddDefinition('SelfUrl', Gdn::Request()->PathAndQuery());
       $this->AddDefinition('Embedded', TRUE);
       $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
-      $this->Theme = C('Garden.CommentsTheme', C('Garden.Theme', 'default'));
-      //
+      $this->Theme = C('Garden.CommentsTheme', $this->Theme);
+
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)
          $this->Head->AddString('<style type="text/css">

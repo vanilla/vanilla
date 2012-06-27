@@ -960,13 +960,14 @@ overflow: hidden; */
 .MeMenu {
    line-height: 24px;
 }
-.MeMenu a {
-	padding: 4px 6px;
+.MeButton {
+	padding: 3px 5px;
+   border: solid 1px transparent;
 	position: relative;
 	line-height: 1;
    display: inline-block;
 }
-.MeMenu a:hover {
+.MeButton:hover {
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
@@ -982,18 +983,25 @@ overflow: hidden; */
 	display: none;
 }
 
+.MeBox .Flyout {
+   top: 20px;
+}
+
 .MeBox.Inline,
 .MeBox.Inline .WhoIs,
 .MeBox.Inline .MeMenu {
     display: inline;
     line-height: 24px;
 }
-.MeBox.Inline .PhotoWrap {
+.MeBox.Inline > .PhotoWrap {
     float: none;
 }
-.MeBox.Inline .ProfilePhoto {
+.MeBox.Inline > .PhotoWrap .ProfilePhoto {
     height: 24px;
     width: 24px;
+}
+.MeBox.Inline .Username {
+   margin-right: 4px;
 }
 
 .PanelActivity {

@@ -1246,6 +1246,11 @@ overflow: hidden; */
 .Item.Checked {
     background: #ffc;
 }
+
+.Item.Open {
+   z-index: 90;
+   opacity: 1;
+}
 /*
 .Read {
     background: transparent;

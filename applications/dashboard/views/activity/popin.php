@@ -5,9 +5,13 @@ if (count($this->Data('Activities'))):
       <?php foreach ($this->Data('Activities') as $Activity): ?>
       <li class="Item">
          <?php
-         $PhotoAnchor = Anchor(
-            Img($Activity['Photo'], array('class' => 'ProfilePhoto PhotoWrapMedium')),
-            $Activity['PhotoUrl'], 'PhotoWrap PhotoWrapMedium');
+         if ($Activity['Photo']) {
+            $PhotoAnchor = Anchor(
+               Img($Activity['Photo'], array('class' => 'ProfilePhoto PhotoWrapMedium')),
+               $Activity['PhotoUrl'], 'PhotoWrap PhotoWrapMedium');
+         } else {
+            $PhotoAnchor = '';
+         }
          ?>
          <div class="Author Photo"><?php echo $PhotoAnchor; ?></div>
          <div class="ItemContent Activity">

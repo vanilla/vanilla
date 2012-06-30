@@ -27,7 +27,7 @@
 //      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
    echo '</div>';
    
-   echo $this->Form->Close('Start Conversation');
+   echo $this->Form->Close('Start Conversation', '', array('class' => 'Button Success'));
    echo '</div>';
    ?>
 </div>

@@ -447,7 +447,7 @@ class LogModel extends Gdn_Pluggable {
       $this->_RestoreOne($Log, $DeleteLog);
       // Check for a transaction.
       if ($TransactionID = $Log['TransactionLogID']) {
-         $Logs = $this->GetWhere(array('TransactionLogID' => $TransactionID));
+         $Logs = $this->GetWhere(array('TransactionLogID' => $TransactionID), '', 'asc', 0, 200);
          foreach ($Logs as $LogRow) {
             if ($LogRow['LogID'] == $Log['LogID'])
                continue;

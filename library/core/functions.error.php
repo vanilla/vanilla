@@ -32,12 +32,24 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    if (($ErrorReporting & $ErrorNumber) != $ErrorNumber)
       return FALSE;
    
-   if (($ErrorNumber & E_NOTICE) == E_NOTICE & function_exists('Trace')) {
-      Trace("$Message in $File on line $Line.", TRACE_NOTICE);
+   $Backtrace = debug_backtrace();
+   
+   if (($ErrorNumber & (E_NOTICE | E_USER_NOTICE)) > 0 & function_exists('Trace')) {
+      $Tr = '';
+      $i = 0;
+      foreach ($Backtrace as $Info) {
+         if (!isset($Info['file']))
+            continue;
+         
+         $Tr .= "\n{$Info['file']} line {$Info['line']}.";
+         if ($i > 2)
+            break;
+         $i++;
+      }
+      Trace("$Message{$Tr}", TRACE_NOTICE);
       return FALSE;
    }
-
-   $Backtrace = debug_backtrace();
+   
    throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments, $Backtrace);
 }
 

@@ -36,9 +36,9 @@ abstract class Gdn_Cache {
    
    // Allows items to be internally compressed/decompressed
    const FEATURE_COMPRESS     = 'f_compress';
-   // Allows items to autoexpire
+   // Allows items to autoexpire (seconds)
    const FEATURE_EXPIRY       = 'f_expiry';
-   // Allows set/get timeouts
+   // Allows set/get timeouts (seconds)
    const FEATURE_TIMEOUT      = 'f_timeout';
    // Allows disabling usage of key prefix
    const FEATURE_NOPREFIX     = 'f_noprefix';

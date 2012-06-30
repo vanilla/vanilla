@@ -264,6 +264,109 @@ class DiscussionModel extends VanillaModel {
    }
    
    /**
+    * Gets the data for multiple unread discussions based on the given criteria.
+    * 
+    * Sorts results based on config options Vanilla.Discussions.SortField
+    * and Vanilla.Discussions.SortDirection.
+    * Events: BeforeGet, AfterAddColumns.
+    * 
+    * @since 2.0.0
+    * @access public
+    *
+    * @param int $Offset Number of discussions to skip.
+    * @param int $Limit Max number of discussions to return.
+    * @param array $Wheres SQL conditions.
+    * @param array $AdditionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
+    * @return Gdn_DataSet SQL result.
+    */
+   public function GetUnread($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = NULL) {
+      if ($Limit == '') 
+         $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
+
+      $Offset = !is_numeric($Offset) || $Offset < 0 ? 0 : $Offset;
+      
+      $Session = Gdn::Session();
+      $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
+      $this->DiscussionSummaryQuery($AdditionalFields, FALSE);
+         
+      if ($UserID > 0) {
+         $this->SQL
+            ->Select('w.UserID', '', 'WatchUserID')
+            ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+            ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
+            //->BeginWhereGroup()
+            //->Where('w.DateLastViewed', NULL)
+            //->OrWhere('d.DateLastComment >', 'w.DateLastViewed')
+            //->EndWhereGroup()
+            ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE);
+      } else {
+			$this->SQL
+				->Select('0', '', 'WatchUserID')
+				->Select('now()', '', 'DateLastViewed')
+				->Select('0', '', 'Dismissed')
+				->Select('0', '', 'Bookmarked')
+				->Select('0', '', 'CountCommentWatch')
+				->Select('d.Announce','','IsAnnounce');
+      }
+		
+		$this->AddArchiveWhere($this->SQL);
+      
+      
+      $this->SQL->Limit($Limit, $Offset);
+      
+      $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
+		$this->EventArguments['Wheres'] = &$Wheres;
+		$this->FireEvent('BeforeGetUnread'); // @see 'BeforeGetCount' for consistency in results vs. counts
+      
+      $IncludeAnnouncements = FALSE;
+      if (strtolower(GetValue('Announce', $Wheres)) == 'all') {
+         $IncludeAnnouncements = TRUE;
+         unset($Wheres['Announce']);
+      }
+
+      if (is_array($Wheres))
+         $this->SQL->Where($Wheres);
+      
+		// Get sorting options from config
+		$SortField = $this->EventArguments['SortField'];
+		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
+			$SortField = 'd.DateLastComment';
+		
+		$SortDirection = $this->EventArguments['SortDirection'];
+		if ($SortDirection != 'asc')
+			$SortDirection = 'desc';
+			
+		$this->SQL->OrderBy($SortField, $SortDirection);
+      
+      // Set range and fetch
+      $Data = $this->SQL->Get();
+         
+      // If not looking at discussions filtered by bookmarks or user, filter announcements out.
+      if (!$IncludeAnnouncements) {
+         if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
+            $this->RemoveAnnouncements($Data);
+      }
+		
+		// Change discussions returned based on additional criteria	
+		$this->AddDiscussionColumns($Data);
+      
+      // Join in the users.
+      Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
+      CategoryModel::JoinCategories($Data);
+		
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
+      
+		// Prep and fire event
+		$this->EventArguments['Data'] = $Data;
+		$this->FireEvent('AfterAddColumns');
+		
+		return $Data;
+   }
+   
+   /**
     * Removes undismissed announcements from the data.
     *
     * @since 2.0.0
@@ -654,6 +757,80 @@ class DiscussionModel extends VanillaModel {
       
       return $Result;
    }
+   
+   /**
+    * Count how many discussions match the given criteria.
+    * 
+    * @since 2.0.0
+    * @access public
+    * 
+	 * @param array $Wheres SQL conditions.
+	 * @param bool $ForceNoAnnouncements Not used.
+	 * @return int Number of discussions.
+	 */
+   public function GetUnreadCount($Wheres = '', $ForceNoAnnouncements = FALSE) {
+      if (is_array($Wheres) && count($Wheres) == 0)
+         $Wheres = '';
+      
+      // Check permission and limit to categories as necessary
+      if ($this->Watching)
+         $Perms = CategoryModel::CategoryWatch();
+      else
+         $Perms = self::CategoryPermissions();
+      
+      if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
+         // Grab the counts from the faster category cache.
+         if (isset($Wheres['d.CategoryID'])) {
+            $CategoryIDs = (array)$Wheres['d.CategoryID'];
+            if ($Perms === FALSE)
+               $CategoryIDs = array();
+            elseif (is_array($Perms))
+               $CategoryIDs = array_intersect($CategoryIDs, $Perms);
+            
+            if (count($CategoryIDs) == 0) {
+               return 0;
+            } else {
+               $Perms = $CategoryIDs;
+            }
+         }
+         
+         $Categories = CategoryModel::Categories();
+         $Count = 0;
+         
+         foreach ($Categories as $Cat) {
+            if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms))
+               continue;
+            $Count += (int)$Cat['CountDiscussions'];
+         }
+         return $Count;
+      }
+      
+      if ($Perms !== TRUE) {
+         $this->SQL->WhereIn('c.CategoryID', $Perms);
+      }
+      
+      $this->EventArguments['Wheres'] = &$Wheres;
+		$this->FireEvent('BeforeGetUnreadCount'); // @see 'BeforeGet' for consistency in count vs. results
+         
+      $this->SQL
+         ->Select('d.DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion d')
+         ->Join('Category c', 'd.CategoryID = c.CategoryID')
+         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.Gdn::Session()->UserID, 'left')
+         //->BeginWhereGroup()
+         //->Where('w.DateLastViewed', NULL)
+         //->OrWhere('d.DateLastComment >', 'w.DateLastViewed')
+         //->EndWhereGroup()
+         ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE)
+         ->Where($Wheres);
+      
+      $Result = $this->SQL
+         ->Get()
+         ->FirstRow()
+         ->CountDiscussions;
+      
+      return $Result;
+   }
 
    /**
     * Get data for a single discussion by ForeignID.
@@ -731,6 +908,7 @@ class DiscussionModel extends VanillaModel {
       $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
       $Data->Url = DiscussionUrl($Data);
+      $Data->Tags = Gdn_Format::Text($Data->Tags);
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);
@@ -1360,21 +1538,20 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
-	public function AddView($DiscussionID, $Views = 0) {
-      $Views++;
+	public function AddView($DiscussionID) {
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $CacheKey = "QueryCache.Discussion.{$DiscussionID}.CountViews";
          
          // Increment. If not success, create key.
-         $Incremented = Gdn::Cache()->Increment($CacheKey);
-         if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
+         $Views = Gdn::Cache()->Increment($CacheKey);
+         if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
+            $Views = $this->GetWhere(array('DiscussionID' => $DiscussionID))->Value('CountViews', 0);
             Gdn::Cache()->Store($CacheKey, $Views);
+         }
          
          // Every X views, writeback to Discussions
-         if (($Views % C('Vanilla.Views.DenormalizeWriteback',100)) == 0) {
-            Gdn::Database()->Query("UPDATE {$this->Database->DatabasePrefix}Discussion 
-            SET CountViews={$Views}
-            WHERE DiscussionID={$DiscussionID}");
+         if (($Views % C('Vanilla.Views.DenormalizeWriteback', 100)) == 0) {
+            $this->SetField($DiscussionID, 'CountViews', $Views);
          }
       } else {
          $this->SQL
@@ -1539,13 +1716,22 @@ class DiscussionModel extends VanillaModel {
          $Log = 'Delete';
       
       LogModel::BeginTransaction();
-      LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
       
       // Log all of the comment deletes.
       $Comments = $this->SQL->GetWhere('Comment', array('DiscussionID' => $DiscussionID))->ResultArray();
-      foreach ($Comments as $Comment) {
-         LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
+      
+      if (count($Comments) > 0 && count($Comments) < 50) {
+         // A smaller number of comments should just be stored with the record.
+         $Data['_Data']['Comment'] = $Comments;
+         LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
+      } else {
+         LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
+         foreach ($Comments as $Comment) {
+            LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
+         }
       }
+
+      LogModel::EndTransaction();
       
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));

@@ -127,7 +127,7 @@ class CategoriesController extends VanillaController {
 			$this->SetData('Category', $Category, TRUE);
          
          // Load the subtree.
-         if (C('Vanilla.ExpandCategories', TRUE))
+         if (C('Vanilla.ExpandCategories'))
             $Categories = CategoryModel::GetSubtree($CategoryIdentifier);
          else
             $Categories = array($Category);

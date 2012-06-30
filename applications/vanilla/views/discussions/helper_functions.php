@@ -139,8 +139,17 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          <?php 
          WriteTags($Discussion);
          ?>
-         <span class="MItem CommentCount"><?php 
-            printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
+         <span class="MItem MCount ViewCount"><?php
+//            echo BigPlural($Discussion->CountComments, '%s comment');
+            printf(Plural($Discussion->CountViews, 
+               '%s view', '%s views',
+               BigPlural($Discussion->CountViews, '%s view')));
+         ?></span>
+         <span class="MItem MCount CommentCount"><?php
+//            echo BigPlural($Discussion->CountComments, '%s comment');
+            printf(Plural($Discussion->CountComments, 
+               '%s comment', '%s comments',
+               BigPlural($Discussion->CountComments, '%s comment')));
          ?></span>
          <?php
             echo NewComments($Discussion);
@@ -215,7 +224,7 @@ function NewComments($Discussion) {
    } elseif ($Discussion->CountUnreadComments > 0) {
       $Title = htmlspecialchars(Plural($Discussion->CountUnreadComments, "%s new comment since you last read this.", "%s new comments since you last read this."));
       
-      return ' <strong class="HasNew" title="'.$Title.'">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+      return ' <strong class="HasNew" title="'.$Title.'">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural', BigPlural($Discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong>';
    }
    return '';
 }

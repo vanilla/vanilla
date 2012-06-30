@@ -21,6 +21,10 @@ class Gdn_Factory {
    /** @var array The property dependancies for the factory. */
    protected $_Dependencies = array();
    
+   public function __construct() {
+      register_shutdown_function(array($this, 'Cleanup'));
+   }
+   
    /**
     * Checks whether or not a factory alias exists.
     * 
@@ -243,6 +247,26 @@ class Gdn_Factory {
    public function Uninstall($Alias) {
       if(array_key_exists($Alias, $this->_Objects))
          unset($this->_Objects[$Alias]);
+   }
+   
+   /**
+    * Clean up the factory's objects
+    * 
+    * Also calls 'Cleanup' on compatible instances.
+    */
+   public function Cleanup() {
+      foreach ($this->_Objects as $FactoryInstanceName => &$FactoryInstance) {
+         if (!is_array($FactoryInstance)) continue;
+         $FactoryType = $FactoryInstance['FactoryType'];
+         
+         if (!array_key_exists($FactoryType, $FactoryInstance)) continue;
+         $FactoryObject = &$FactoryInstance[$FactoryType];
+         
+         if (method_exists($FactoryObject, 'Cleanup'))
+            $FactoryObject->Cleanup();
+         
+         unset($FactoryInstance);
+      }
    }
    
    /** 

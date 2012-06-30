@@ -481,7 +481,7 @@ jQuery(document).ready(function($) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
 
-      var urlFormat = gdn.definition("UrlFormat", "");
+      var urlFormat = gdn.definition("UrlFormat", "/{Path}");
       
       if (path.substr(0, 1) == "/")
          path = path.substr(1);
@@ -630,15 +630,15 @@ jQuery(document).ready(function($) {
       if ($flyout.css('display') == 'none') {
          if (lastOpen != null) {
             $('.Flyout', lastOpen).hide();
-            $(lastOpen).removeClass('Open');
+            $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
          }
         
-         $(this).addClass('Open');
+         $(this).addClass('Open').closest('.Item').addClass('Open');
          $flyout.show();
          lastOpen = this;
       } else {
          $flyout.hide();
-         $(this).removeClass('Open');
+         $(this).removeClass('Open').closest('.Item').removeClass('Open');
       }
      
         if (isHandle)
@@ -647,14 +647,14 @@ jQuery(document).ready(function($) {
    
    // Close ToggleFlyout menu even if their links are hijacked
    $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-      $('.ToggleFlyout').removeClass('Open');
+      $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
       $('.Flyout').hide();
    });
 
    $(document).delegate('#Body', 'click', function() {
       if (lastOpen) {
          $('.Flyout', lastOpen).hide();
-         $(lastOpen).removeClass('Open');
+         $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
       }
    });
    

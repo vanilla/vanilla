@@ -134,12 +134,16 @@ if ($this->Data('_PagerUrl')) {
 }
 
 echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
-echo '<div class="P PageDescription">';
-echo $this->Data('_Description', '&#160;');
-echo '</div>';
+
+if ($Description = $this->Data('_Description')) {
+   echo '<div class="P PageDescription">';
+   echo $this->Data('_Description', '&#160;');
+   echo '</div>';
+}
+
+include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
+
 echo PagerModule::Write($PagerOptions);
-
-
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>

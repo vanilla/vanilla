@@ -1,8 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $User = $Session->User;
+$CssClass = '';
+if ($this->CssClass)
+   $CssClass .= ' '.$this->CssClass;
+
+
 if ($Session->IsValid()):
-   echo '<div class="MeBox">';
+   echo '<div class="MeBox'.$CssClass.'">';
    echo UserPhoto($User);
    echo '<div class="WhoIs">';
       echo UserAnchor($User, 'Username');
@@ -31,7 +36,7 @@ if ($Session->IsValid()):
    echo '</div>';
    echo '</div>';
 else:
-   echo '<div class="MeBox MeBox-SignIn">';
+   echo '<div class="MeBox MeBox-SignIn'.$CssClass.'">';
 
    echo '<div class="SignInLinks">';
 

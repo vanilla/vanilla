@@ -542,17 +542,17 @@ body > #Frame > .Head {
 .SiteMenu a:hover {
    text-decoration: underline;
 }
-#Head .SiteSearch {
-   float: right;
+
+.SiteSearch {
    position: relative;
 }
-#Head .SiteSearch .InputBox {
-   border: none;
-	font-size: 11px;
-   width: 175px;
+
+.SiteSearch .InputBox {
    padding: 5px 25px 5px 5px;
+	font-size: 11px;
 }
-#Head .SiteSearch .Button {
+
+.SiteSearch .Button {
    background: url('images/sprites.png') 0 -196px no-repeat transparent;
    height: 16px;
    width: 16px;
@@ -568,6 +568,15 @@ body > #Frame > .Head {
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
    padding: 0;
+}
+
+#Head .SiteSearch {
+   float: right;
+}
+#Head .SiteSearch .InputBox {
+   border: none;
+   width: 175px;
+   
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
@@ -769,10 +778,23 @@ overflow: hidden; */
 	font-size: 9px;
 	line-height: 1;
 	padding: 1px;
-	border: 1px solid #d00;
 }
 .MeMenu em {
 	display: none;
+}
+
+.MeBox.Inline,
+.MeBox.Inline .WhoIs,
+.MeBox.Inline .MeMenu {
+    display: inline;
+    line-height: 24px;
+}
+.MeBox.Inline .PhotoWrap {
+    float: none;
+}
+.MeBox.Inline .ProfilePhoto {
+    height: 24px;
+    width: 24px;
 }
 
 .PanelActivity {
@@ -961,6 +983,7 @@ overflow: hidden; */
 .CategoryListWithHeadings .Depth10 { padding-left: 200px !important; }
 .CategoryListWithHeadings .Depth11 { padding-left: 225px !important; }
 .CategoryListWithHeadings .Depth12 { padding-left: 250px !important; }
+
 .Box.RecentUsers {
 	float: left;
 }
@@ -1000,13 +1023,6 @@ overflow: hidden; */
 	position: relative;
 	border-bottom: 1px solid #ddd;
    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-.DataList .Item:first-child {
-	border-top: 1px solid #ddd;
-	border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-.Discussions .Item {
-   padding: 8px 4px 4px;
 }
 .DataList .Item .Item {
    border: none;
@@ -1180,6 +1196,24 @@ li.Item.Read:hover {
     -webkit-border-radius: 6px;
 }
 
+.ChildCategoryList {
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.ChildCategoryList .Item {
+    float: left;
+    width: 50%;
+    padding: 0;
+}
+
+.ChildCategoryList .Item:nth-child(odd) {
+   clear: left;
+}
+
+.ChildCategoryList .ItemContent {
+    padding: 8px 0 0;
+}
 
 /* =============================================================== Activities */
 .Activities li.HasPhoto .Title {
@@ -1362,20 +1396,27 @@ pre code {
 }
 
 /* ============================================================= Profile Page */
-.ChangePicture span {
+a.ChangePicture {
 	position: absolute;
 	background: #333;
+   background: rgba(0,0,0,.7);
 	color: #fff;
 	font-size: 11px;
-	padding: 1px 6px;
+	padding: 10px 0;
+   width: 100%;
 	display: none;
+   text-align: center;
 }
-.ChangePicture:hover span {
+
+.PhotoWrap:hover a.ChangePicture {
 	display: block;
 }
-.ChangePicture span:hover {
-	text-decoration: underline;
+
+a.ChangePicuture:hover {
+   color: #fff;
+   text-decoration: underline;
 }
+
 .ProfileOptions {
 	float: right;
 }

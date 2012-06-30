@@ -255,7 +255,7 @@ class Gdn_Request {
          if (is_array($Val) || is_object($Val))
             return $Val;
          else
-            return filter_var($Val, FILTER_SANITIZE_STRING);
+            return $Val;
       }
       return $Default;
    }

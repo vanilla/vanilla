@@ -308,10 +308,10 @@ if (!class_exists('HeadModule', FALSE)) {
                $CanonicalUrl = Gdn::Router()->ReverseRoute($CanonicalUrl);
             
             $this->_Sender->CanonicalUrl($CanonicalUrl);
-            $CurrentUrl = Url('', TRUE);
-            if ($CurrentUrl != $CanonicalUrl) {
+//            $CurrentUrl = Url('', TRUE);
+//            if ($CurrentUrl != $CanonicalUrl) {
                $this->AddTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
-            }
+//            }
          }
          
          // Include facebook open-graph meta information.

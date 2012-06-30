@@ -19,5 +19,6 @@ if (count($this->Buttons) == 0) {
       echo '</ul>';
    echo '</div>';
 }
+Gdn::Controller()->FireEvent('AfterNewDiscussionButton');
 
 echo '</div>';

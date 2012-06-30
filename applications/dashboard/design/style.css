@@ -248,6 +248,7 @@ select {
    color: #111;
    border-color: #666;
 }
+.ButtonGroup.Open .Button.Handle,
 .Button:focus,
 .Button:active {
    border-color: #aaa;
@@ -263,9 +264,6 @@ select {
    font-size: 15px;
    font-weight: bold;
    padding: 8px 0;
-   border-radius: 4px;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
 }
 .Buttons {
    margin-top: 10px;
@@ -276,6 +274,57 @@ select {
 .Buttons-Confirm .Button {
    min-width: 65px;
 }
+
+/* Split Button Dropdown */
+.ButtonGroup > .Button:first-child {
+    border-radius: 2px 0 0 2px;
+}
+.Button.Handle {
+    border-radius: 0 2px 2px 0;
+    font-size: 12px;
+    line-height: 1;
+    border-left: 0;
+}
+.Button.Handle .Sprite {
+    display: inline-block;
+    border-style: solid;
+    border-width: 4px;
+    border-color: #000 transparent transparent transparent;
+    position: relative;
+    top: 2px;
+}
+.ButtonGroup.Big .Button.Handle .Sprite {
+   top: 0;
+}
+.ButtonGroup {
+    position: relative;
+}
+.ButtonGroup .Dropdown {
+    display: none;
+    font-size: 12px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 1px;
+}
+.ButtonGroup.Open .Dropdown {
+   display: block;
+}
+.ButtonGroup.Big .Button {
+   font-size: 15px;
+   padding: 8px;
+   text-align: center;
+}
+.ButtonGroup.Big {
+    display: block;
+    white-space: nowrap;
+}
+.ButtonGroup.Big > .Button:first-child {
+    width: 78%;
+}
+
+
+
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -621,24 +670,33 @@ div.Discussion:hover .OptionsTitle:hover,
    background-position: -56px 0 !important;
 }
 .MenuItems {
-   border: 1px solid #282828;
-   border-radius:2px;
-   -moz-border-radius:2px;
-   -webkit-border-radius:2px;
-   background:none repeat scroll 0 0 #444444;
    min-width: 125px;
    line-height: 100%;
    font-size: 11px;
 	color: #fff;
+   border: 1px solid #999;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #fff;
+   padding: 5px 0;
+   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
-   color: #fff;
 	display: block;
 	text-decoration: none;
-	padding: 6px;
+   white-space: nowrap;
+   color: #333;
+   padding: 3px 10px;
+   line-height: 18px;
 }
 .MenuItems a:hover {
    background: #282828;
+   color: #ffffff;
+   text-decoration: none;
+   background-color: #004D9F;
 }
 .ToggleFlyout {
    cursor: pointer;

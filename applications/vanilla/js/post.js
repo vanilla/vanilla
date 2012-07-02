@@ -23,8 +23,7 @@ jQuery(document).ready(function($) {
       postValues += '&'+btn.name+'='+btn.value;
       var discussionID = $(frm).find('[name$=DiscussionID]').val();
       var action = $(frm).attr('action') + '/' + discussionID;
-      $(frm).find(':submit:last').after('<span class="Progress">&#160;</span>');
-      $(frm).find(':submit').attr('disabled', 'disabled');
+      gdn.disable(btn);
       
       $.ajax({
          type: "POST",
@@ -70,9 +69,7 @@ jQuery(document).ready(function($) {
             gdn.inform(json);
          },
          complete: function(XMLHttpRequest, textStatus) {
-            // Remove any spinners, and re-enable buttons.
-            $('span.Progress').remove();
-            $(frm).find(':submit').removeAttr("disabled");
+            gdn.enable(btn);
          }
       });
       $(frm).triggerHandler('submit');
@@ -95,9 +92,7 @@ jQuery(document).ready(function($) {
       var postValues = $(frm).serialize();
       postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       postValues += '&'+btn.name+'='+btn.value;
-      // Add a spinner and disable the buttons
-      $(frm).find(':submit:last').after('<span class="Progress">&#160;</span>');
-      $(frm).find(':submit').attr('disabled', 'disabled');      
+      gdn.disable(btn);
       
       $.ajax({
          type: "POST",
@@ -143,9 +138,7 @@ jQuery(document).ready(function($) {
             gdn.inform(json);
          },
          complete: function(XMLHttpRequest, textStatus) {
-            // Remove any spinners, and re-enable buttons.
-            $('span.Progress').remove();
-            $(frm).find(':submit').removeAttr("disabled");
+            gdn.enable(btn);
          }
       });
       $(frm).triggerHandler('submit');

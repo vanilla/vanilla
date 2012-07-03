@@ -410,6 +410,7 @@ class ProfileController extends Gdn_Controller {
       $this->ActivityModel = new ActivityModel();
       $Activities = $this->ActivityModel->GetNotifications(Gdn::Session()->UserID, 0, 5)->ResultArray();
       $this->SetData('Activities', $Activities);
+      $this->SetData('Title', T('Notifications'));
       $this->Render('Popin', 'Activity', 'Dashboard');
    }
    

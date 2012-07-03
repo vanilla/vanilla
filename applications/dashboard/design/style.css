@@ -786,7 +786,6 @@ div.Discussion:hover .OptionsTitle:hover,
    background: #282828;
 }
 .ToggleFlyout {
-   cursor: pointer;
    position: relative;
 }
 .ToggleFlyout.Open {
@@ -802,6 +801,60 @@ div.Discussion:hover .OptionsTitle:hover,
 .OptionsMenu .Flyout {
    top: 21px;
 }
+
+.Flyout .Author .PhotoWrap {
+    margin: 0;
+}
+
+.FlyoutMenu {
+    width: 300px;
+    background: #fff;
+    color: #000;
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,.7);
+    border: solid 1px #bbb;
+}
+
+.FlyoutMenu a {
+   color: #00419b;
+}
+
+.FlyoutButton {
+   cursor: pointer;
+}
+
+.Open .FlyoutButton {
+    background: #fff;
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,.7);
+    border: solid 1px #bbb;
+}
+
+.Open .FlyoutButton:after {
+    content: "";
+    position: absolute;
+    background: #fff;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    right: 0;
+    z-index: 101;
+}
+
+.FlyoutLeft .Flyout {
+    right: inherit;
+}
+
+.MeBox .Flyout {
+    right: inherit;
+    left: -1em;
+}
+
+.MeBox.FlyoutRight .Flyout {
+    left: inherit;
+    right: -1em;
+}
+
 a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
@@ -917,13 +970,11 @@ overflow: hidden; */
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
-.MeMenu a {
-	padding: 4px 6px;
 	position: relative;
 	line-height: 1;
    display: inline-block;
 }
-.MeMenu a:hover {
+.MeButton:hover {
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
@@ -939,18 +990,25 @@ overflow: hidden; */
 	display: none;
 }
 
+.MeBox .Flyout {
+   top: 20px;
+}
+
 .MeBox.Inline,
 .MeBox.Inline .WhoIs,
 .MeBox.Inline .MeMenu {
     display: inline;
     line-height: 24px;
 }
-.MeBox.Inline .PhotoWrap {
+.MeBox.Inline > .PhotoWrap {
     float: none;
 }
-.MeBox.Inline .ProfilePhoto {
+.MeBox.Inline > .PhotoWrap .ProfilePhoto {
     height: 24px;
     width: 24px;
+}
+.MeBox.Inline .Username {
+   margin-right: 4px;
 }
 
 .PanelActivity {
@@ -1198,6 +1256,7 @@ overflow: hidden; */
 .DataList .Item .Item {
    border: none;
 }
+
 .Item h2, .Item h3, .Item h4, .Item h5 {
    margin: 0;
 }
@@ -1347,6 +1406,25 @@ overflow: hidden; */
 .Condensed .Excerpt {
 	display: inline;
 }
+
+.PopList .Item {
+   padding: 4px;
+   position: relative;
+   overflow: hidden;
+   border-bottom: 1px solid #ddd;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.PopList .ItemContent {
+    margin: 0 0 0 48px;
+    line-height: 1.4;
+}
+
+.PopList .Meta {
+   color: #777;
+   font-size: 80%;
+}
+
 /* /me actions */
 .MeAction .AuthorAction {
    display: inline;

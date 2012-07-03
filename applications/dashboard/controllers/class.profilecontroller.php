@@ -370,6 +370,7 @@ class ProfileController extends Gdn_Controller {
       
       // Drop notification count back to zero.
       Gdn::UserModel()->SetField($Session->UserID, 'CountNotifications', '0');
+      // TODO: Mark notificatons read.
       
       // Get notifications data
       $this->ActivityModel = new ActivityModel();
@@ -401,7 +402,17 @@ class ProfileController extends Gdn_Controller {
 			}
 		}
 		$this->Render();
-   }   
+   }
+   
+   public function NotificationsPopin() {
+      $this->Permission('Garden.SignIn.Allow');
+      
+      $this->ActivityModel = new ActivityModel();
+      $Activities = $this->ActivityModel->GetNotifications(Gdn::Session()->UserID, 0, 5)->ResultArray();
+      $this->SetData('Activities', $Activities);
+      $this->SetData('Title', T('Notifications'));
+      $this->Render('Popin', 'Activity', 'Dashboard');
+   }
    
    /**
     * Set new password for current user.
@@ -701,6 +712,7 @@ class ProfileController extends Gdn_Controller {
       $this->_SetBreadcrumbs($this->Data('Title'), $this->CanonicalUrl());
       $this->Render();
    }
+   
    /**
     * Remove the user's photo.
     *

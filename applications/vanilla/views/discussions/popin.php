@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 if (count($this->Data('Discussions'))):
 ?>
-   <ul class="DataList Popin">
+   <ul class="PopList Popin">
       <?php 
       foreach ($this->Data('Discussions') as $Row):
       ?>

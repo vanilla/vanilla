@@ -815,6 +815,10 @@ div.Discussion:hover .OptionsTitle:hover,
     border: solid 1px #bbb;
 }
 
+.FlyoutMenu a {
+   color: #00419b;
+}
+
 .FlyoutButton {
    cursor: pointer;
 }
@@ -835,11 +839,6 @@ div.Discussion:hover .OptionsTitle:hover,
     bottom: -2px;
     right: 0;
     z-index: 101;
-}
-
-.Flyout .ItemContent {
-    margin: 0 0 0 48px;
-    line-height: 1.4;
 }
 
 .FlyoutLeft .Flyout {
@@ -1243,11 +1242,6 @@ overflow: hidden; */
    border: none;
 }
 
-.Flyout .Item {
-    overflow: hidden;
-    padding: 4px;
-}
-
 .Item h2, .Item h3, .Item h4, .Item h5 {
    margin: 0;
 }
@@ -1397,6 +1391,25 @@ overflow: hidden; */
 .Condensed .Excerpt {
 	display: inline;
 }
+
+.PopList .Item {
+   padding: 4px;
+   position: relative;
+   overflow: hidden;
+   border-bottom: 1px solid #ddd;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.PopList .ItemContent {
+    margin: 0 0 0 48px;
+    line-height: 1.4;
+}
+
+.PopList .Meta {
+   color: #777;
+   font-size: 80%;
+}
+
 /* /me actions */
 .MeAction .AuthorAction {
    display: inline;

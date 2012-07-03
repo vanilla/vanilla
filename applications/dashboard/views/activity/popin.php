@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 if (count($this->Data('Activities'))):
 ?>
-   <ul class="DataList Activities Notifications">
+   <ul class="PopList Activities">
       <?php foreach ($this->Data('Activities') as $Activity): ?>
       <li class="Item">
          <?php

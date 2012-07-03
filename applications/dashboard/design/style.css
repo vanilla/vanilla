@@ -924,6 +924,14 @@ overflow: hidden; */
    margin-right: 4px;
 }
 
+.MeBox-SignIn.Inline * {
+    display: inline;
+}
+
+.MeBox.Inline .SignInIcons img {
+    vertical-align: top;
+}
+
 .PanelActivity {
    border-top: 1px solid #abdafb;
 	border-bottom: 0;

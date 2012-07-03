@@ -84,7 +84,6 @@ jQuery(document).ready(function($) {
       // Handler before submitting
       $(frm).triggerHandler('BeforeDiscussionSubmit', [frm, btn]);
       
-      var textbox = $(frm).find('textarea');
       var inpDiscussionID = $(frm).find(':hidden[name$=DiscussionID]');
       var inpDraftID = $(frm).find(':hidden[name$=DraftID]');
       var preview = $(btn).attr('name') == $('#Form_Preview').attr('name') ? true : false;

@@ -47,7 +47,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *    If a model is assigned, the model name is used instead.
     * @access public
     */
-   public $InputPrefix = 'Form';
+   public $InputPrefix = '';
 
    /**
     * @var string Form submit method. Options are 'post' or 'get'.
@@ -1132,6 +1132,9 @@ class Gdn_Form extends Gdn_Pluggable {
     * @todo check that missing DataObject parameter
     */
    public function Open($Attributes = array()) {
+      if ($this->InputPrefix)
+         Trace($this->InputPrefix, 'InputPrefix');
+      
       if (!is_array($Attributes))
          $Attributes = array();
       
@@ -1448,7 +1451,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // forms sent with "get" method do not require authentication.
       //   return TRUE;
       //} else {
-      $KeyName = $this->InputPrefix . '/TransientKey';
+      $KeyName = $this->EscapeFieldName('TransientKey');
       $PostBackKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST, $KeyName, FALSE);
       
       // DEBUG:
@@ -1731,9 +1734,16 @@ class Gdn_Form extends Gdn_Pluggable {
       return count($_POST) > 0 ? TRUE : FALSE;
       
       2009-03-31 - switching back to "get" dictating a postback
+      
+      2012-06-27 - Using the request method to determine a postback.
       */
-      $FormCollection = $this->Method == 'get' ? $_GET : $_POST;
-      return count($FormCollection) > 0 || (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+      
+      switch (strtolower($this->Method)) {
+         case 'get':
+            return count($_GET) > 0 || (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+         default:
+            return Gdn::Request()->IsPostBack();
+      }
    }
 
    /**
@@ -1842,7 +1852,9 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    public function SetModel($Model, $DataSet = FALSE) {
       $this->_Model = $Model;
-      $this->InputPrefix = $this->_Model->Name;
+      
+      if ($this->InputPrefix)
+         $this->InputPrefix = $this->_Model->Name;
       if ($DataSet !== FALSE) $this->SetData($DataSet);
    }
    

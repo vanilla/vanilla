@@ -1218,15 +1218,30 @@ overflow: hidden; */
 
 /* ================================================ DataList */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
+
 .SearchForm {
-	background: #f7f7f7;
-	background: rgba(0, 0, 0, 0.03);
-	padding: 10px;
+   margin: 20px auto;
 }
-.SearchForm input.InputBox {
-	width: 560px;
-	margin-right: 10px;
+
+.SearchForm .InputBox {
+   width: 100%;
+   box-sizing: border-box;
+   font-size: 14px;
+   padding: 6px 25px 6px 8px;
+   border-radius: .35ex;
+   border: solid 1px #bbb;
 }
+
+.SearchForm .SiteSearch {
+   max-width: 600px;
+   margin: 0 auto;
+}
+
+.SearchForm .SiteSearch .Button {
+   top: 8px;
+   right: 6px;
+}
+
 .Empty {
    margin: 10px 0;
 }

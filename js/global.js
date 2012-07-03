@@ -595,7 +595,22 @@ jQuery(document).ready(function($) {
    };
    $(document).delegate('.Hijack', 'click', hijackClick);
 
-   // Activate ToggleFlyout menus
+
+
+   // Activate ToggleFlyout and ButtonGroup menus
+   $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
+      var buttonGroup = $(this).parents('.ButtonGroup');
+      if (buttonGroup.hasClass('Open')) {
+         // Close
+         $('.ButtonGroup').removeClass('Open');
+      } else {
+         // Close all other open button groups
+         $('.ButtonGroup').removeClass('Open');
+         // Open this one
+         buttonGroup.addClass('Open');
+      }
+      return false;
+   });
    var lastOpen = null;
    $(document).delegate('.ToggleFlyout', 'click', function(e) {        
         
@@ -661,6 +676,7 @@ jQuery(document).ready(function($) {
          $('.Flyout', lastOpen).hide();
          $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
       }
+      $('.ButtonGroup').removeClass('Open');
    });
    
    // Add a spinner onclick of buttons with this class

@@ -30,7 +30,7 @@ $this->FireEvent('BeforeMessageForm');
 //               echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'TextBox')), 'div', array('class' => 'TextBoxWrapper'));
                echo $this->Form->BodyBox('Body', array('Table' => 'ConversationMessage'));
                echo '<div class="Buttons">',
-                  $this->Form->Button('Send Message'),
+                  $this->Form->Button('Send Message', array('class' => 'Button Success')),
                   '</div>';
                echo $this->Form->Close();
                ?>

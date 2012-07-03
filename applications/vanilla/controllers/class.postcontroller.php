@@ -95,8 +95,7 @@ class PostController extends VanillaController {
       else
          $this->Category = NULL;
 
-      if ($UseCategories)
-			$CategoryData = CategoryModel::Categories();
+      $CategoryData = $UseCategories ? CategoryModel::Categories() : FALSE;
       
       // Check permission 
       if (isset($this->Discussion)) {
@@ -144,8 +143,8 @@ class PostController extends VanillaController {
          $Draft = $this->Form->ButtonExists('Save Draft') ? TRUE : FALSE;
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
-            if (!is_object($this->Category) && isset($FormValues['CategoryID']))
-               $this->Category = $CategoryData[$FormValues['CategoryID']];
+            if (!is_object($this->Category) && is_array($CategoryData) && isset($FormValues['CategoryID']))
+               $this->Category = GetValue($FormValues['CategoryID'], $CategoryData);
 
             if (is_object($this->Category)) {
                // Check category permissions.

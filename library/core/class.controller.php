@@ -1299,13 +1299,15 @@ class Gdn_Controller extends Gdn_Pluggable {
       $CleanOutut = C('Api.Clean', TRUE);
       if ($CleanOutut) {
          // Remove values that should not be transmitted via api
-         $Remove = array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions', 'Attributes');
+         $Remove = array('Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes');
          if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             $Remove[] = 'InsertIPAddress';
             $Remove[] = 'UpdateIPAddress';
             $Remove[] = 'LastIPAddress';
             $Remove[] = 'AllIPAddresses';
             $Remove[] = 'Fingerprint';
+            $Remove[] = 'Email';
+            $Remove[] = 'DateOfBirth';
          }
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }

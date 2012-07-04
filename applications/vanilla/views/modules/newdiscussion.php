@@ -10,7 +10,7 @@ if (count($this->Buttons) == 0) {
 } else {
    echo '<div class="ButtonGroup Action Big">';
       echo Anchor($Text, $Url, 'Button');
-      echo Anchor(Sprite('SpDropDownHandle'), '#', 'Button Handle');
+      echo Anchor(Sprite('SpDropdownHandle'), '#', 'Button Handle');
       echo '<ul class="Dropdown MenuItems">';
          echo Wrap(Anchor($Text, $Url), 'li');
          foreach ($this->Buttons as $Button) {

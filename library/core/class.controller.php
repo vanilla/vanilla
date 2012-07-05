@@ -1280,7 +1280,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Remove standard and "protected" data from the top level.
          foreach ($this->Data as $Key => $Value) {
-            if ($Key && in_array($Key, array('Title')))
+            if ($Key && in_array($Key, array('Title', 'Breadcrumbs')))
                continue;
             if (isset($Key[0]) && $Key[0] === '_')
                continue; // protected

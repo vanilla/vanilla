@@ -25,9 +25,9 @@ if ($Photo) {
          $Img = Img(Gdn_Upload::Url(ChangeBasename($Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
          
       if (!$User->Banned && (Gdn::Session()->UserID == $User->UserID || Gdn::Session()->CheckPermission('Garden.Users.Edit')))
-         echo Anchor(Wrap(T('Change Picture')).$Img, '/profile/picture?userid='.$User->UserID, 'ChangePicture');
-      else
-         echo $Img;
+         echo Anchor(Wrap(T('Change Picture')), '/profile/picture?userid='.$User->UserID, 'ChangePicture');
+      
+      echo $Img;
       ?>
    </div>
 <?php } else if ($User->UserID == Gdn::Session()->UserID || Gdn::Session()->CheckPermission('Garden.Users.Edit')) { ?>

@@ -100,10 +100,11 @@ class UserController extends DashboardController {
 
       // Get user list
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
+      $this->SetData('Users', $this->UserData);
       RoleModel::SetUserRoles($this->UserData->Result());
       
       // Deliver json data if necessary
-      if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+      if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'users';
@@ -187,15 +188,8 @@ class UserController extends DashboardController {
     */
    public function ApplicantCount() {
       $this->Permission('Garden.Applicants.Manage');
-
-      $Count = Gdn::SQL()
-         ->Select('u.UserID', 'count', 'UserCount')
-         ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID',  C('Garden.Registration.ApplicantRoleID', 0))
-         ->Where('u.Deleted', '0')
-         ->Get()->Value('UserCount', 0);
-
+      $RoleModel = new RoleModel();
+      $Count = $RoleModel->GetApplicantCount();
       if ($Count > 0)
          echo '<span class="Alert">', $Count, '</span>';
    }

@@ -248,6 +248,7 @@ select {
    color: #111;
    border-color: #666;
 }
+.ButtonGroup.Open .Button.Handle,
 .Button:focus,
 .Button:active {
    border-color: #aaa;
@@ -256,152 +257,6 @@ select {
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
 }
-/* Danger (red) Button */
-.Button.Danger {
-   background-image: linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
-   background-image: -o-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
-   background-image: -moz-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
-   background-image: -webkit-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
-   background-image: -ms-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
-   background-image: -webkit-gradient(
-      linear,
-      left bottom,
-      left top,
-      color-stop(0, #cc0000),
-      color-stop(1, #ff3333)
-   );   
-   text-shadow: 0 -1px 0 #880000;
-   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
-   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
-   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
-   border-color: #cc0000;
-   color: #fff;
-}
-.Button.Danger:hover,
-.Button.Danger:focus,
-.Button.Danger:active {
-   color: #fff;
-   border-color: #aa0000;
-}
-.Button.Danger:focus,
-.Button.Danger:active {
-   background: #cc0000;
-   box-shadow: none;
-   -moz-box-shadow: none;
-   -webkit-box-shadow: none;
-}
-/* Warning (yellow) Button */
-.Button.Warning {
-   padding: 4px 6px !important;
-   margin: 0 !important;
-   border-width: 1px !important;   
-   background-image: linear-gradient(bottom, #F89406 0%, #FBB450 100%);
-   background-image: -o-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
-   background-image: -moz-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
-   background-image: -webkit-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
-   background-image: -ms-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
-   background-image: -webkit-gradient(
-      linear,
-      left bottom,
-      left top,
-      color-stop(0, #F89406),
-      color-stop(1, #FBB450)
-   );   
-   text-shadow: 0 -1px 0 #ba6d00;
-   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   border-color: #ba6d00;
-   color: #fff;
-}
-.Button.Warning:hover,
-.Button.Warning:focus,
-.Button.Warning:active {
-   color: #fff;
-   border-color: #996600;
-}
-.Button.Warning:focus,
-.Button.Warning:active {
-   background: #F89406;
-   box-shadow: none;
-   -moz-box-shadow: none;
-   -webkit-box-shadow: none;
-}
-/* Action (blue) Button */
-.Button.Action {
-   padding: 4px 6px !important;
-   margin: 0 !important;
-   border-width: 1px !important;   
-   background-image: linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
-   background-image: -o-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
-   background-image: -moz-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
-   background-image: -webkit-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
-   background-image: -ms-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
-   background-image: -webkit-gradient(
-      linear,
-      left bottom,
-      left top,
-      color-stop(0, #0055cc),
-      color-stop(1, #0088cc)
-   );   
-   text-shadow: 0 -1px 0 #0011cc;
-   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   border-color: #0022cc;
-   color: #fff;
-}
-.Button.Action:hover,
-.Button.Action:focus,
-.Button.Action:active {
-   color: #fff;
-   border-color: #0000aa;
-}
-.Button.Action:focus,
-.Button.Action:active {
-   background: #0055cc;
-   box-shadow: none;
-   -moz-box-shadow: none;
-   -webkit-box-shadow: none;
-}
-/* Success (green) Button */
-.Button.Success {
-   padding: 4px 6px !important;
-   margin: 0 !important;
-   border-width: 1px !important;   
-   background-image: linear-gradient(bottom, #006600 0%, #009900 100%);
-   background-image: -o-linear-gradient(bottom, #006600 0%, #009900 100%);
-   background-image: -moz-linear-gradient(bottom, #006600 0%, #009900 100%);
-   background-image: -webkit-linear-gradient(bottom, #006600 0%, #009900 100%);
-   background-image: -ms-linear-gradient(bottom, #006600 0%, #009900 100%);
-   background-image: -webkit-gradient(
-      linear,
-      left bottom,
-      left top,
-      color-stop(0, #006600),
-      color-stop(1, #009900)
-   );   
-   text-shadow: 0 -1px 0 #002200;
-   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-   border-color: #004400;
-   color: #fff;
-}
-.Button.Success:hover,
-.Button.Success:focus,
-.Button.Success:active {
-   color: #fff;
-   border-color: #002200;
-}
-.Button.Success:focus,
-.Button.Success:active {
-   background: #006600;
-   box-shadow: none;
-   -moz-box-shadow: none;
-   -webkit-box-shadow: none;
-}
-
 .BigButton {
    display: block;
    text-align: center;
@@ -409,9 +264,6 @@ select {
    font-size: 15px;
    font-weight: bold;
    padding: 8px 0;
-   border-radius: 4px;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
 }
 .Buttons {
    margin-top: 10px;
@@ -422,6 +274,113 @@ select {
 .Buttons-Confirm .Button {
    min-width: 65px;
 }
+
+.NavButton:hover,
+.NavButton {
+   color: #333;
+   text-shadow: 0 0 1px #fff;
+   display: inline-block;
+   cursor: pointer;
+   font-size: 13px;
+   line-height: 16px;
+   font-weight: bold;
+   padding: 5px 8px;
+	background: #fafafa;
+   border: 1px solid #999;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	white-space: nowrap;
+   background: #fdfdfd;
+   background-image: linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -o-linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -moz-linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -webkit-linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -ms-linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, rgb(240,240,240)),
+      color-stop(0.31, rgb(255,255,255))
+   );
+   box-shadow: 0 1px 1px #ddd;
+}
+.ButtonGroup.Open .NavButton.Handle,
+.NavButton:active,
+.NavButton:focus {
+   background: #eee;
+}
+
+/* Split Button Dropdown */
+.ButtonGroup > .NavButton:first-child,
+.ButtonGroup > .Button:first-child {
+    border-radius: 2px 0 0 2px;
+}
+.Button.Handle {
+    border-radius: 0 2px 2px 0;
+    font-size: 12px;
+    line-height: 1;
+    border-left: 0;
+}
+.NavButton.Handle {
+    border-radius: 0 2px 2px 0;
+    border-left: 0;
+    margin: 0;
+}
+.NavButton.Handle .Sprite,
+.Button.Handle .Sprite {
+    display: inline-block;
+    border-style: solid;
+    border-width: 4px;
+    border-color: #000 transparent transparent transparent;
+    position: relative;
+    top: 2px;
+}
+.ButtonGroup.Big .NavButton.Handle .Sprite,
+.ButtonGroup.Big .Button.Handle .Sprite {
+   top: 0;
+}
+.ButtonGroup {
+    position: relative;
+    display: inline-block;
+}
+.ButtonGroup .Dropdown {
+    display: none;
+    font-size: 12px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 1px;
+    z-index: 100;
+}
+#Panel .ButtonGroup .Dropdown {
+   right: 0;
+}
+.ProfileOptions .ButtonGroup .Dropdown {
+   left: auto;
+   right: 0;
+}
+.ButtonGroup.Open .Dropdown {
+   display: block;
+}
+.ButtonGroup.Big .NavButton,
+.ButtonGroup.Big .Button {
+   font-size: 15px;
+   padding: 8px;
+   text-align: center;
+}
+.ButtonGroup.Big {
+    display: block;
+    white-space: nowrap;
+}
+#Panel .ButtonGroup.Big > .NavButton:first-child,
+#Panel .ButtonGroup.Big > .Button:first-child {
+    width: 78%;
+}
+
+
+
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -459,7 +418,8 @@ select {
 }
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message
    strings & imply importance. */
-.Warning {
+span.Warning,
+div.Warning {
    background: #fee;
    border: 2px solid #fbb;
    color: #d00;
@@ -486,9 +446,9 @@ select {
    background: #d00;
    color: #fff;
    padding: 1px 3px;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
+   border-radius: .5ex;
+   -moz-border-radius: .5ex;
+   -webkit-border-radius: .5ex;
 }
 .Alert a {
    color: #fff;
@@ -687,17 +647,17 @@ body > #Frame > .Head {
 .SiteMenu a:hover {
    text-decoration: underline;
 }
-#Head .SiteSearch {
-   float: right;
+
+.SiteSearch {
    position: relative;
 }
-#Head .SiteSearch .InputBox {
-   border: none;
-	font-size: 11px;
-   width: 175px;
+
+.SiteSearch .InputBox {
    padding: 5px 25px 5px 5px;
+	font-size: 11px;
 }
-#Head .SiteSearch .Button {
+
+.SiteSearch .Button {
    background: url('images/sprites.png') 0 -196px no-repeat transparent;
    height: 16px;
    width: 16px;
@@ -713,6 +673,15 @@ body > #Frame > .Head {
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
    padding: 0;
+}
+
+#Head .SiteSearch {
+   float: right;
+}
+#Head .SiteSearch .InputBox {
+   border: none;
+   width: 175px;
+   
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
@@ -757,27 +726,42 @@ div.Discussion:hover .OptionsTitle:hover,
    background-position: -56px 0 !important;
 }
 .MenuItems {
-   border: 1px solid #282828;
-   border-radius:2px;
-   -moz-border-radius:2px;
-   -webkit-border-radius:2px;
-   background:none repeat scroll 0 0 #444444;
-   min-width: 125px;
    line-height: 100%;
    font-size: 11px;
-	color: #fff;
+   border: 1px solid #999;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #fff;
+   padding: 5px 0;
+   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
-   color: #fff;
 	display: block;
 	text-decoration: none;
-	padding: 6px;
+   white-space: nowrap;
+   color: #333;
+   padding: 3px 15px;
+   line-height: 18px;
 }
 .MenuItems a:hover {
    background: #282828;
+   color: #ffffff;
+   text-decoration: none;
+   background-color: #004D9F;
+}
+.MenuItems li > strong {
+   font-size: 12px;
+   padding: 3px 10px;
+   line-height: 18px;
+}
+.MenuItems hr {
+    border: 0;
+    border-bottom: 1px solid #ddd;
 }
 .ToggleFlyout {
-   cursor: pointer;
    position: relative;
 }
 .ToggleFlyout.Open {
@@ -793,6 +777,66 @@ div.Discussion:hover .OptionsTitle:hover,
 .OptionsMenu .Flyout {
    top: 21px;
 }
+
+.Flyout .Author .PhotoWrap {
+    margin: 0;
+}
+
+.FlyoutMenu {
+   width: 300px;
+   background: #fff;
+   color: #000;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   border: solid 1px #999;
+}
+
+.FlyoutMenu a {
+   color: #00419b;
+}
+
+.FlyoutButton {
+   cursor: pointer;
+}
+
+.Open .FlyoutButton {
+   background: #fff;
+   border-radius: 0;
+   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   border: solid 1px #999;
+}
+
+.Open .FlyoutButton:after {
+    content: "";
+    position: absolute;
+    background: #fff;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    right: 0;
+    z-index: 101;
+}
+
+.FlyoutLeft .Flyout {
+    right: inherit;
+}
+
+.MeBox .Flyout {
+    right: inherit;
+    left: -1em;
+}
+
+.MeBox.FlyoutRight .Flyout {
+    left: inherit;
+    right: -1em;
+}
+
 a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
@@ -840,10 +884,11 @@ a.Bookmarking:hover {
    
 /*   
 No overflow hidden on main elements. Causes too many bugs!
-overflow: hidden; */
+overflow: hidden; 
 }
 #Panel > :first-child {
 	margin-top: 0;
+*/
 }
 .Box {
    margin: 10px 0;
@@ -897,27 +942,71 @@ overflow: hidden; */
 .MeMenu {
    line-height: 24px;
 }
-.MeMenu a {
-	padding: 4px 6px;
+.MeButton {
+	padding: 3px 5px;
+   border: solid 1px transparent;
 	position: relative;
 	line-height: 1;
    display: inline-block;
 }
-.MeMenu a:hover {
+.MeButton:hover {
+	background: #eee;
+	background: rgba(0,0,0,0.07);
+}
+	position: relative;
+	line-height: 1;
+   display: inline-block;
+}
+.MeButton:hover {
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
 .MeMenu .Alert {
 	position: absolute;
 	top: -2px;
-	right: -3px;
+	right: -1px;
 	font-size: 9px;
 	line-height: 1;
-	padding: 1px;
-	border: 1px solid #d00;
+	padding: 2px;
+}
+.MeMenu .Flyout .Alert {
+    position: relative;
+    top: auto;
+    right: auto;
+    padding: 1px 2px;
+    margin: 0 0 0 6px;
 }
 .MeMenu em {
 	display: none;
+}
+
+.MeBox .Flyout {
+   top: 20px;
+}
+
+.MeBox.Inline,
+.MeBox.Inline .WhoIs,
+.MeBox.Inline .MeMenu {
+    display: inline;
+    line-height: 24px;
+}
+.MeBox.Inline > .PhotoWrap {
+    float: none;
+}
+.MeBox.Inline > .PhotoWrap .ProfilePhoto {
+    height: 24px;
+    width: 24px;
+}
+.MeBox.Inline .Username {
+   margin-right: 4px;
+}
+
+.MeBox-SignIn.Inline * {
+    display: inline;
+}
+
+.MeBox.Inline .SignInIcons img {
+    vertical-align: top;
 }
 
 .PanelActivity {
@@ -1125,17 +1214,43 @@ overflow: hidden; */
 	text-indent: 50px;
 }
 
+/* Page Controls (new discussion button, pagers, etc) */
+#Content .BoxNewDiscussion {
+    margin: 0 0 6px 0;
+    float: left;
+    /* display: none; /* display: block to reveal this */
+}
+.PageControls {
+    margin: 10px 0;
+}
+
+
 /* ================================================ DataList */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
+
 .SearchForm {
-	background: #f7f7f7;
-	background: rgba(0, 0, 0, 0.03);
-	padding: 10px;
+   margin: 20px auto;
 }
-.SearchForm input.InputBox {
-	width: 560px;
-	margin-right: 10px;
+
+.SearchForm .InputBox {
+   width: 100%;
+   box-sizing: border-box;
+   font-size: 14px;
+   padding: 6px 25px 6px 8px;
+   border-radius: .35ex;
+   border: solid 1px #bbb;
 }
+
+.SearchForm .SiteSearch {
+   max-width: 600px;
+   margin: 0 auto;
+}
+
+.SearchForm .SiteSearch .Button {
+   top: 8px;
+   right: 6px;
+}
+
 .Empty {
    margin: 10px 0;
 }
@@ -1147,13 +1262,10 @@ overflow: hidden; */
 	border-bottom: 1px solid #ddd;
    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
-.DataList .Item:first-child {
-	border-top: 1px solid #ddd;
-	border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
 .DataList .Item .Item {
    border: none;
 }
+
 .Item h2, .Item h3, .Item h4, .Item h5 {
    margin: 0;
 }
@@ -1228,6 +1340,11 @@ overflow: hidden; */
 .Item.Checked {
     background: #ffc;
 }
+
+.Item.Open {
+   z-index: 90;
+   opacity: 1;
+}
 /*
 .Read {
     background: transparent;
@@ -1298,6 +1415,47 @@ overflow: hidden; */
 .Condensed .Excerpt {
 	display: inline;
 }
+
+.PopList .Item {
+   padding: 4px;
+   position: relative;
+   overflow: hidden;
+   border-bottom: 1px solid #ddd;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.PopList .ItemContent {
+    margin: 0 0 0 48px;
+    line-height: 1.4;
+}
+
+.PopList .Meta {
+   color: #777;
+   font-size: 80%;
+}
+.PopList .Center {
+    padding: 0;
+}
+.PopList .Center a {
+    display: block;
+    padding: 4px 0;
+}
+.PopList .Item:hover {
+    background: rgba(0,0,0,0.03);
+}
+.PopList .Item.Title:hover {
+   background: inherit;
+}
+.PopList .Item.Title {
+    font-size: 12px;
+    padding: 2px 4px;
+}
+.PopList .Item.Title a {
+    float: right;
+    font-size: 11px;
+}
+
+
 /* /me actions */
 .MeAction .AuthorAction {
    display: inline;
@@ -1521,25 +1679,31 @@ pre code {
 }
 
 /* ============================================================= Profile Page */
-.ChangePicture span {
+a.ChangePicture {
 	position: absolute;
 	background: #333;
+   background: rgba(0,0,0,.7);
 	color: #fff;
 	font-size: 11px;
-	padding: 1px 6px;
+	padding: 10px 0;
+   width: 100%;
 	display: none;
+   text-align: center;
 }
-.ChangePicture:hover span {
+
+.PhotoWrap:hover a.ChangePicture {
 	display: block;
 }
-.ChangePicture span:hover {
-	text-decoration: underline;
+
+a.ChangePicuture:hover {
+   color: #fff;
+   text-decoration: underline;
 }
+
 .ProfileOptions {
 	float: right;
-}
-.ProfileOptions .NavButton {
-   margin: 0 0 0 6px;
+    position: relative;
+    top: -6px;
 }
 /* Hiding form headings with CSS in case the forms get popped */
 body.Profile.picture .SmallPopup h1 {
@@ -1718,6 +1882,12 @@ form.Thumbnail .Warning {
 .CommentForm textarea.TextBox {
     min-height: 50px;
     height: 50px;
+}
+.Item.Editing .CommentForm > h2.H {
+   display: none;
+}
+.Item.Editing .CommentForm {
+   margin: 10px 0;
 }
 
 /* =================================================================== Popups */

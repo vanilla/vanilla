@@ -18,25 +18,34 @@ class ProfileOptionsModule extends Gdn_Module {
    }
 
    public function ToString() {
-      $Controller = Gdn::Controller();
       $Session = Gdn::Session();
+      $Controller = Gdn::Controller();
       $UserID = $Controller->User->UserID;
-      
-      // Add some advanced options.
-      $this->SetData('Advanced', array());
-      
-      if ($Session->CheckPermission('Garden.Moderation.Manage') && $Controller->User->UserID != $Session->UserID) {
-         
-         // Ban/Unban
-         if ($Controller->User->Banned) {
-            $this->Data['Advanced']['BanUnban'] = array('Label' => T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'Class' => 'Popup');
-         } else {
-            $this->Data['Advanced']['BanUnban'] = array('Label' => T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'Class' => 'Popup');
+      $MemberOptions = array();
+      $ProfileOptions = array();
+      $Controller->EventArguments['UserID'] = $UserID;
+      $Controller->EventArguments['ProfileOptions'] = &$ProfileOptions;
+      $Controller->EventArguments['MemberOptions'] = &$MemberOptions;
+      if ($Controller->EditMode) {
+         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
+      } else {
+         if ($Controller->User->UserID != $Session->UserID) {
+            if ($Session->CheckPermission('Garden.Users.Edit'))
+               $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
+         } else if (C('Garden.UserAccount.AllowEdit')) {
+            $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').T('Edit Profile'), 'Url' => '/profile/edit');
          }
-         
-         // Delete content.
-         if ($Controller->User->Banned) {
-            $this->Data['Advanced']['DeleteContent'] = array('Label' => T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'Class' => 'Popup');
+         if ($Session->CheckPermission('Garden.Moderation.Manage') && $UserID != $Session->UserID) {
+            // Ban/Unban
+            if ($Controller->User->Banned) {
+               $ProfileOptions[] = array('Text' => T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
+            } else {
+               $ProfileOptions[] = array('Text' => T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');
+            }
+
+            // Delete content.
+            if ($Controller->User->Banned)
+               $ProfileOptions[] = array('Text' => T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
          }
       }
       return parent::ToString();

@@ -1,0 +1,81 @@
+/* Sprites */
+.SpDashboard,
+.SpWarnings,
+.SpPublicActivities,
+.SpModeratorActivities,
+.SpAdminActivities,
+.SpUnansweredQuestions,
+.NavButton.BackToProfile:before,
+.PanelInfo a[href*='profile/quotes']:before,
+.PanelInfo a[href*='profile/signature']:before,
+.SpThumbnail,
+.SpPicture,
+.SpPreferences,
+.SpPassword,
+.SpEdit,
+.FilterMenu .Infractions:before,
+.SpActivity,
+.SpAllCategories,
+.SpMyDrafts,
+.SpDashboard,
+.SpBookmarks,
+.SpInbox,
+.SpNotifications,
+.SpEditProfile,
+.SpMessage,
+.SpMyDiscussions,
+.SpDiscussions,
+.SpComments {
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    background: url('http://cdn.vanillaforums.com/images/famfamfam.png') 0 0 no-repeat transparent;
+    background-position: 16px 16px;
+    vertical-align: top;
+    margin: 2px 4px 0 0;
+}
+.NavButton > .Sprite {
+   margin: 0 4px 0 0;
+}
+.NavButton.Handle .Sprite {
+   margin: 0;
+}
+.NavButton.ButtonGroup .SpDropdownHandle {
+   margin: 0;
+}
+.MeBox .Sprite16 {
+   margin: 0;
+}
+.SpPublicActivities { background-position: -16px -288px; }
+.SpModeratorActivities { background-position: -32px -288px; }
+.SpAdminActivities { background-position: -80px -288px; }
+.SpUnansweredQuestions { background-position: -96px -272px; } 
+.SpThumbnail { background-position: -128px -49px; } 
+.SpPicture { background-position: -32px -176px; } 
+.SpPreferences { background-position: -64px -319px; } 
+.SpPassword { background-position: 0 -192px; } 
+.SpAllCategories { background-position: 0 -304px; } 
+.SpMyDrafts { background-position: -113px -144px; } 
+.SpEdit { background-position: 0 -160px; }
+.SpEditProfile { background-position: -49px -257px; }
+.SpMessage { background-position: -16px -16px; }
+.SpComments { background-position: -48px -16px; }
+.SpMyDiscussions { background-position: -80px -240px; }
+.SpDiscussions { background-position: 0 -16px; }
+.SpActivity { background-position: -96px -288px; }
+.SpInbox { background-position: -48px -320px; }
+.SpBookmarks { background-position: 0 -272px; }
+.SpNotifications { background-position: -32px -272px; }
+.FilterMenu .Infractions:before { background-position: -48px -273px; }
+.PanelInfo a[href*='profile/quotes']:before { background-position: -32px -16px; }
+.PanelInfo a[href*='profile/signature']:before { background-position: -64px -240px; }
+.NavButton.BackToProfile:before { background-position: -48px -240px; }
+.SpDashboard { background-position: 0 0; }
+
+
+.NavButton.BackToProfile:before,
+.PanelInfo a[href*='profile/quotes']:before,
+.PanelInfo a[href*='profile/signature']:before,
+.FilterMenu .Infractions:before {
+   content: '';
+}

@@ -42,4 +42,4 @@ echo $this->Form->Errors();
       $this->FireEvent('EditMyAccountAfter');
    ?>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Success'));

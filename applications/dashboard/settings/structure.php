@@ -651,3 +651,8 @@ $Construct
    ->Column('ThumbPath', 'varchar(255)', NULL)
    
    ->Set(FALSE, FALSE);
+
+// Make sure the smarty folders exist.
+if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');
+if (!file_exists(PATH_CACHE.'/Smarty/cache')) @mkdir(PATH_CACHE.'/Smarty/cache');
+if (!file_exists(PATH_CACHE.'/Smarty/compile')) @mkdir(PATH_CACHE.'/Smarty/compile');

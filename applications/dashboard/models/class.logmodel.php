@@ -208,6 +208,30 @@ class LogModel extends Gdn_Pluggable {
 
       return $Result;
    }
+   
+   /** 
+    * Wrapper for GetCountWhere that takes care of caching specific operation counts.
+    * @param string $Operation Comma-delimited list of operation types to get (sum of) counts for.
+    */
+   public function GetOperationCount($Operation) {
+      if ($Operation == 'edits')
+         $Operation = array('edit', 'delete');
+      else
+         $Operation = explode(',', $Operation);
+      
+      sort($Operation);
+      array_map('ucfirst', $Operation);
+      $CacheKey = 'Moderation.LogCount.'.implode('.', $Operation);
+      $Count = Gdn::Cache()->Get($CacheKey);
+      if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
+         $Count = $this->GetCountWhere(array('Operation' => $Operation));
+         Gdn::Cache()->Store($CacheKey, $Count, array(
+            Gdn_Cache::FEATURE_EXPIRY  => 300 // 5 minutes
+         ));
+      }
+      return $Count;
+   }   
+   
 
    /**
     * Log an operation into the log table.
@@ -447,7 +471,7 @@ class LogModel extends Gdn_Pluggable {
       $this->_RestoreOne($Log, $DeleteLog);
       // Check for a transaction.
       if ($TransactionID = $Log['TransactionLogID']) {
-         $Logs = $this->GetWhere(array('TransactionLogID' => $TransactionID));
+         $Logs = $this->GetWhere(array('TransactionLogID' => $TransactionID), '', 'asc', 0, 200);
          foreach ($Logs as $LogRow) {
             if ($LogRow['LogID'] == $Log['LogID'])
                continue;

@@ -481,7 +481,7 @@ jQuery(document).ready(function($) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
 
-      var urlFormat = gdn.definition("UrlFormat", "");
+      var urlFormat = gdn.definition("UrlFormat", "/{Path}");
       
       if (path.substr(0, 1) == "/")
          path = path.substr(1);
@@ -595,7 +595,22 @@ jQuery(document).ready(function($) {
    };
    $(document).delegate('.Hijack', 'click', hijackClick);
 
-   // Activate ToggleFlyout menus
+
+
+   // Activate ToggleFlyout and ButtonGroup menus
+   $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
+      var buttonGroup = $(this).parents('.ButtonGroup');
+      if (buttonGroup.hasClass('Open')) {
+         // Close
+         $('.ButtonGroup').removeClass('Open');
+      } else {
+         // Close all other open button groups
+         $('.ButtonGroup').removeClass('Open');
+         // Open this one
+         buttonGroup.addClass('Open');
+      }
+      return false;
+   });
    var lastOpen = null;
    $(document).delegate('.ToggleFlyout', 'click', function(e) {        
         
@@ -614,15 +629,17 @@ jQuery(document).ready(function($) {
       var rel = $(this).attr('rel');
       if (rel) {
          $(this).attr('rel', '');
-         $flyout.addClass('Progress');
+         $flyout.html('<div class="InProgress" style="height: 30px"></div>');
+         
          $.ajax({
             url: gdn.url(rel),
             data: {DeliveryType: 'VIEW'},
             success: function(data) {
                $flyout.html(data);
             },
-            complete: function() {
-               $flyout.removeClass('Progress');
+            error: function(xhr) {
+               $flyout.html('');
+               gdn.informError(xhr, true);
             }
          });
       }
@@ -630,15 +647,15 @@ jQuery(document).ready(function($) {
       if ($flyout.css('display') == 'none') {
          if (lastOpen != null) {
             $('.Flyout', lastOpen).hide();
-            $(lastOpen).removeClass('Open');
+            $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
          }
         
-         $(this).addClass('Open');
+         $(this).addClass('Open').closest('.Item').addClass('Open');
          $flyout.show();
          lastOpen = this;
       } else {
          $flyout.hide();
-         $(this).removeClass('Open');
+         $(this).removeClass('Open').closest('.Item').removeClass('Open');
       }
      
         if (isHandle)
@@ -647,15 +664,19 @@ jQuery(document).ready(function($) {
    
    // Close ToggleFlyout menu even if their links are hijacked
    $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-      $('.ToggleFlyout').removeClass('Open');
+      if ($(this).hasClass('FlyoutButton'))
+         return;
+      
+      $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
       $('.Flyout').hide();
    });
 
    $(document).delegate('#Body', 'click', function() {
       if (lastOpen) {
          $('.Flyout', lastOpen).hide();
-         $(lastOpen).removeClass('Open');
+         $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
       }
+      $('.ButtonGroup').removeClass('Open');
    });
    
    // Add a spinner onclick of buttons with this class

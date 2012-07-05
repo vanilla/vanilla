@@ -352,6 +352,7 @@ select {
     top: 100%;
     left: 0;
     margin-top: 1px;
+    z-index: 100;
 }
 #Panel .ButtonGroup .Dropdown {
    right: 0;
@@ -373,8 +374,8 @@ select {
     display: block;
     white-space: nowrap;
 }
-.ButtonGroup.Big > .NavButton:first-child,
-.ButtonGroup.Big > .Button:first-child {
+#Panel .ButtonGroup.Big > .NavButton:first-child,
+#Panel .ButtonGroup.Big > .Button:first-child {
     width: 78%;
 }
 
@@ -883,10 +884,11 @@ a.Bookmarking:hover {
    
 /*   
 No overflow hidden on main elements. Causes too many bugs!
-overflow: hidden; */
+overflow: hidden; 
 }
 #Panel > :first-child {
 	margin-top: 0;
+*/
 }
 .Box {
    margin: 10px 0;
@@ -1211,6 +1213,17 @@ overflow: hidden; */
 	color: #c4cde0;
 	text-indent: 50px;
 }
+
+/* Page Controls (new discussion button, pagers, etc) */
+#Content .BoxNewDiscussion {
+    margin: 0 0 6px 0;
+    float: left;
+    /* display: none; /* display: block to reveal this */
+}
+.PageControls {
+    margin: 10px 0;
+}
+
 
 /* ================================================ DataList */
 /* Note: DataList is used in search results, vanilla discussions & drafts */

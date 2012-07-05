@@ -10,7 +10,7 @@ if (count($this->Buttons) == 0) {
 } else {
    // Make the core button action be the first item in the button group.
    array_unshift($this->Buttons, array('Text' => $Text, 'Url' => $Url));
-   echo ButtonGroup($this->Buttons, 'Button Action Big');
+   echo ButtonGroup($this->Buttons, $this->CssClass);
 }
 Gdn::Controller()->FireEvent('AfterNewDiscussionButton');
 

@@ -276,13 +276,13 @@ class ProfileController extends Gdn_Controller {
     *
     * @since 2.0.0
     * @access public
-    * @param mixed $UserReference Unique identifier, possible ID or username.
+    * @param mixed $User Unique identifier, possible ID or username.
     * @param string $Username.
     * @param int $UserID Unique ID.
     */
-   public function Index($UserReference = '', $Username = '', $UserID = '', $Page = FALSE) {
+   public function Index($User = '', $Username = '', $UserID = '', $Page = FALSE) {
 		$this->EditMode(FALSE);
-      $this->GetUserInfo($UserReference, $Username, $UserID);
+      $this->GetUserInfo($User, $Username, $UserID);
 		
       if ($this->User->Admin == 2 && $this->Head) {
          // Don't index internal accounts. This is in part to prevent vendors from getting endless Google alerts.
@@ -293,7 +293,7 @@ class ProfileController extends Gdn_Controller {
 		if ($this->User->UserID == Gdn::Session()->UserID)
 			return $this->Notifications($Page);
 		elseif (C('Garden.Profile.ShowActivities', TRUE))
-			return $this->Activity($UserReference, $Username, $UserID);
+			return $this->Activity($User, $Username, $UserID);
       else
          return Gdn::Dispatcher()->Dispatch(UserUrl($this->User, '', 'discussions'));
    }
@@ -1155,7 +1155,7 @@ class ProfileController extends Gdn_Controller {
     *
     * @since 2.0.0
     * @access public
-    * @param mixed $UserReference Unique identifier, possibly username or ID.
+    * @param mixed $User Unique identifier, possibly username or ID.
     * @param string $Username.
     * @param int $UserID Unique ID.
     * @param bool $CheckPermissions Whether or not to check user permissions.
@@ -1176,15 +1176,18 @@ class ProfileController extends Gdn_Controller {
 		   
       $this->Roles = array();
       if ($UserReference == '') {
-         $this->User = $this->UserModel->GetID(Gdn::Session()->UserID);
-      } else if (is_numeric($UserReference) && $Username != '') {
+         if ($Username) {
+            $this->User = $this->UserModel->GetByUsername($Username);
+         } else
+            $this->User = $this->UserModel->GetID(Gdn::Session()->UserID);
+      } elseif (is_numeric($UserReference) && $Username != '') {
          $this->User = $this->UserModel->GetID($UserReference);
       } else {
          $this->User = $this->UserModel->GetByUsername($UserReference);
       }
          
       if ($this->User === FALSE) {
-         throw NotFoundException();
+         throw NotFoundException('User');
       } else if ($this->User->Deleted == 1) {
          Redirect('dashboard/home/deleted');
       } else {

@@ -178,8 +178,11 @@ class PostController extends VanillaController {
                } else {
                   $DiscussionID = $this->DiscussionModel->Save($FormValues, $this->CommentModel);
                   $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
-                  if ($DiscussionID > 0 && $DraftID > 0)
+                  
+                  if ($DiscussionID > 0) {
+                     if ($DraftID > 0)
                      $this->DraftModel->Delete($DraftID);
+                  }
                   if ($DiscussionID == SPAM) {
                      $this->StatusMessage = T('Your post has been flagged for moderation.');
                      $this->Render('Spam');
@@ -221,6 +224,7 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new discussion
                   $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  $this->SetData('Discussion', $Discussion);
                   $this->EventArguments['Discussion'] = $Discussion;
                   $this->FireEvent('AfterDiscussionSave');
                   

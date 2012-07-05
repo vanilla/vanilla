@@ -1595,23 +1595,13 @@ class Gdn_Form extends Gdn_Pluggable {
          $Collection = $this->Method == 'get' ? $_GET : $_POST;
          $InputType = $this->Method == 'get' ? INPUT_GET : INPUT_POST;
          
+         
+         
          foreach($Collection as $Field => $Value) {
             $FieldName = substr($Field, $TableNameLength);
             $FieldName = $this->_UnescapeString($FieldName);
             if (substr($Field, 0, $TableNameLength) == $TableName) {
-               if (is_array($Value)) {
-                  $this->_FormValues[$FieldName] = filter_input(
-                     $InputType,
-                     $Field,
-                     FILTER_DEFAULT,
-                     FILTER_REQUIRE_ARRAY
-                  );
-               } else {
-                  $this->_FormValues[$FieldName] = filter_input(
-                     $InputType,
-                     $Field
-                  );
-               }
+               $this->_FormValues[$FieldName] = $Value;
             }
          }
          
@@ -1674,7 +1664,7 @@ class Gdn_Form extends Gdn_Pluggable {
             }
          }
       }
-
+      
       // print_r($this->_FormValues);
       return $this->_FormValues;
    }

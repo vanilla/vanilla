@@ -13,6 +13,8 @@ class NewDiscussionModule extends Gdn_Module {
       return 'Panel';
    }
    
+   public $CssClass = 'Button Action Big';
+   
    public function ToString() {
       Gdn::Controller()->EventArguments['NewDiscussionModule'] = &$this;
       Gdn::Controller()->FireEvent('BeforeNewDiscussionButton');

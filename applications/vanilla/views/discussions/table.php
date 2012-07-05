@@ -143,7 +143,10 @@ if ($Description = $this->Data('_Description')) {
 
 include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
-echo PagerModule::Write($PagerOptions);
+echo '<div class="PageControls Top">';
+   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+   echo PagerModule::Write($PagerOptions);
+echo '</div>';
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
@@ -179,7 +182,12 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </table>
 </div>
 <?php
-   PagerModule::Write($PagerOptions);
+
+   echo '<div class="PageControls Bottom">';
+      echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+      PagerModule::Write($PagerOptions);
+   echo '</div>';
+   
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

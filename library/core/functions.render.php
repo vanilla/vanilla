@@ -36,6 +36,32 @@ if (!function_exists('BigPlural')) {
    }
 }
 
+if (!function_exists('ButtonGroup')):
+   function ButtonGroup($Links, $CssClass = 'Button') {
+      if (!is_array($Links) || count($Links) < 1)
+         return;
+      
+      $Text = $Links[0]['Text'];
+      $Url = $Links[0]['Url'];
+      if (count($Links) < 2) {
+         echo Anchor($Text, $Url, $CssClass);
+      } else {
+         // NavButton or Button?
+         $ButtonCss = strpos($CssClass, 'NavButton') !== FALSE ? 'NavButton' : 'Button';
+         // Strip "Button" or "NavButton" off the group class.
+         echo '<div class="ButtonGroup '.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
+            echo Anchor($Text, $Url, $ButtonCss);
+            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonCss.' Handle');
+            echo '<ul class="Dropdown MenuItems">';
+               foreach ($Links as $Link) {
+                  echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
+               }
+            echo '</ul>';
+         echo '</div>';
+      }
+   }
+endif; 
+
 if (!function_exists('CategoryUrl')):
 
 /**

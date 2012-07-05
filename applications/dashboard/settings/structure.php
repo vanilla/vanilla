@@ -535,7 +535,7 @@ if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
 
-// This is a fix for erroneos unique constraint.
+// This is a fix for erroneous unique constraint.
 if ($Construct->TableExists('Tag')) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;

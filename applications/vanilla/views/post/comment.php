@@ -56,7 +56,7 @@ $this->FireEvent('BeforeCommentForm');
 
                echo '</span>';
 
-               $ButtonOptions = array('class' => 'Button Success CommentButton');
+               $ButtonOptions = array('class' => 'Button Primary Success CommentButton');
                $ButtonOptions['tabindex'] = 2;
                /*
                Caused non-root users to not be able to add comments. Must take categories

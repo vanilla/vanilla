@@ -20,9 +20,9 @@ ul.token-input-list-focus,
 ul.token-input-list-focus input {
     background: #ffe;
 }
-#DiscussionForm input.Button {
+/*#DiscussionForm input.Button {
     margin-top: 20px;
-}
+}*/
 ul.token-input-list li input {
     border: 0;
     width: 100px;

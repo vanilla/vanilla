@@ -399,9 +399,9 @@ class VanillaHooks implements Gdn_IPlugin {
       
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $CommentModel = new CommentModel();
-      $Sender->CommentData = $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
-      $CountComments = $Offset + $Sender->CommentData->NumRows();
-      if ($Sender->CommentData->NumRows() == $Limit)
+      $Comments = $Sender->SetData('Comments', $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset));
+      $CountComments = $Offset + $Comments->NumRows();
+      if ($Comments->NumRows() == $Limit)
          $CountComments = $Offset + $Limit + 1;
       
       // Build a pager

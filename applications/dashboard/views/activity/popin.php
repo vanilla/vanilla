@@ -2,6 +2,10 @@
 if (count($this->Data('Activities'))):
 ?>
    <ul class="PopList Activities">
+      <li class="Item Title"><?php 
+         echo Anchor(T('Notification Preferences'), 'profile/preferences');
+         echo Wrap(T('Notifications'), 'strong'); 
+      ?></li>
       <?php foreach ($this->Data('Activities') as $Activity): ?>
       <li class="Item">
          <?php
@@ -24,7 +28,7 @@ if (count($this->Data('Activities'))):
       <?php endforeach; ?>
       <li class="Item Center">
          <?php
-         echo Anchor(sprintf(T('All %s'), T('Notifictions')), '/profile/notifications'); 
+         echo Anchor(sprintf(T('All %s'), T('Notifications')), '/profile/notifications'); 
          ?>
       </li>
    </ul>

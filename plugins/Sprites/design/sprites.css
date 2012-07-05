@@ -1,4 +1,6 @@
 /* Sprites */
+.SpDashboard,
+.SpWarnings,
 .SpPublicActivities,
 .SpModeratorActivities,
 .SpAdminActivities,
@@ -28,8 +30,21 @@
     height: 16px;
     width: 16px;
     background: url('http://cdn.vanillaforums.com/images/famfamfam.png') 0 0 no-repeat transparent;
+    background-position: 16px 16px;
     vertical-align: top;
     margin: 2px 4px 0 0;
+}
+.NavButton > .Sprite {
+   margin: 0 4px 0 0;
+}
+.NavButton.Handle .Sprite {
+   margin: 0;
+}
+.NavButton.ButtonGroup .SpDropdownHandle {
+   margin: 0;
+}
+.MeBox .Sprite16 {
+   margin: 0;
 }
 .SpPublicActivities { background-position: -16px -288px; }
 .SpModeratorActivities { background-position: -32px -288px; }
@@ -42,7 +57,7 @@
 .SpAllCategories { background-position: 0 -304px; } 
 .SpMyDrafts { background-position: -113px -144px; } 
 .SpEdit { background-position: 0 -160px; }
-.SpEditProfile { background-position: -49px -256px; }
+.SpEditProfile { background-position: -49px -257px; }
 .SpMessage { background-position: -16px -16px; }
 .SpComments { background-position: -48px -16px; }
 .SpMyDiscussions { background-position: -80px -240px; }
@@ -55,6 +70,7 @@
 .PanelInfo a[href*='profile/quotes']:before { background-position: -32px -16px; }
 .PanelInfo a[href*='profile/signature']:before { background-position: -64px -240px; }
 .NavButton.BackToProfile:before { background-position: -48px -240px; }
+.SpDashboard { background-position: 0 0; }
 
 
 .NavButton.BackToProfile:before,

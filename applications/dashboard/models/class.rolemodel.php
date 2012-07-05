@@ -151,6 +151,25 @@ class RoleModel extends Gdn_Model {
       }
    }
    
+   public function GetApplicantCount() {
+      $CacheKey = 'Moderation.ApplicantCount';
+      $Count = Gdn::Cache()->Get($CacheKey);
+      if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
+         $Count = Gdn::SQL()
+            ->Select('u.UserID', 'count', 'UserCount')
+            ->From('User u')
+            ->Join('UserRole ur', 'u.UserID = ur.UserID')
+            ->Where('ur.RoleID',  C('Garden.Registration.ApplicantRoleID', 0))
+            ->Where('u.Deleted', '0')
+            ->Get()->Value('UserCount', 0);    
+         
+         Gdn::Cache()->Store($CacheKey, $Count, array(
+            Gdn_Cache::FEATURE_EXPIRY  => 300 // 5 minutes
+         ));
+      }
+      return $Count;
+   }
+   
    /**
     * Retrieves all roles with the specified permission(s).
     *

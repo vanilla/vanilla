@@ -127,11 +127,15 @@ class ConversationsHooks implements Gdn_IPlugin {
    /**
     * Add "Message" option to profile options.
     */
-   public function ProfileController_BeforeProfileOptions_Handler($Sender) {
-      // Add a "send X a message" link to the side menu on the profile page
+   public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
       if (!$Sender->EditMode && Gdn::Session()->IsValid() && Gdn::Session()->UserID != $Sender->User->UserID)
-         echo ' '.Anchor(Sprite('SpMessage').T('Message'), '/messages/add/'.$Sender->User->Name, 'NavButton MessageNavButton').' ';
-   }
+         $Sender->EventArguments['MemberOptions'][] = array(
+            'Text' => Sprite('SpMessage').T('Message'),
+            'Url' => '/messages/add/'.$Sender->User->Name,
+            'CssClass' => 'MessageUser'
+         );
+   }   
+   
    
    /**
     * Additional options for the Preferences screen.

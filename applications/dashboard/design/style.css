@@ -275,7 +275,45 @@ select {
    min-width: 65px;
 }
 
+.NavButton:hover,
+.NavButton {
+   color: #333;
+   text-shadow: 0 0 1px #fff;
+   display: inline-block;
+   cursor: pointer;
+   font-size: 13px;
+   line-height: 16px;
+   font-weight: bold;
+   padding: 5px 8px;
+	background: #fafafa;
+   border: 1px solid #999;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	white-space: nowrap;
+   background: #fdfdfd;
+   background-image: linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -o-linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -moz-linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -webkit-linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -ms-linear-gradient(bottom, rgb(240,240,240) 0%, rgb(255,255,255) 31%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, rgb(240,240,240)),
+      color-stop(0.31, rgb(255,255,255))
+   );
+   box-shadow: 0 1px 1px #ddd;
+}
+.ButtonGroup.Open .NavButton.Handle,
+.NavButton:active,
+.NavButton:focus {
+   background: #eee;
+}
+
 /* Split Button Dropdown */
+.ButtonGroup > .NavButton:first-child,
 .ButtonGroup > .Button:first-child {
     border-radius: 2px 0 0 2px;
 }
@@ -285,6 +323,12 @@ select {
     line-height: 1;
     border-left: 0;
 }
+.NavButton.Handle {
+    border-radius: 0 2px 2px 0;
+    border-left: 0;
+    margin: 0;
+}
+.NavButton.Handle .Sprite,
 .Button.Handle .Sprite {
     display: inline-block;
     border-style: solid;
@@ -293,11 +337,13 @@ select {
     position: relative;
     top: 2px;
 }
+.ButtonGroup.Big .NavButton.Handle .Sprite,
 .ButtonGroup.Big .Button.Handle .Sprite {
    top: 0;
 }
 .ButtonGroup {
     position: relative;
+    display: inline-block;
 }
 .ButtonGroup .Dropdown {
     display: none;
@@ -307,9 +353,17 @@ select {
     left: 0;
     margin-top: 1px;
 }
+#Panel .ButtonGroup .Dropdown {
+   right: 0;
+}
+.ProfileOptions .ButtonGroup .Dropdown {
+   left: auto;
+   right: 0;
+}
 .ButtonGroup.Open .Dropdown {
    display: block;
 }
+.ButtonGroup.Big .NavButton,
 .ButtonGroup.Big .Button {
    font-size: 15px;
    padding: 8px;
@@ -319,6 +373,7 @@ select {
     display: block;
     white-space: nowrap;
 }
+.ButtonGroup.Big > .NavButton:first-child,
 .ButtonGroup.Big > .Button:first-child {
     width: 78%;
 }
@@ -670,14 +725,12 @@ div.Discussion:hover .OptionsTitle:hover,
    background-position: -56px 0 !important;
 }
 .MenuItems {
-   min-width: 125px;
    line-height: 100%;
    font-size: 11px;
-	color: #fff;
    border: 1px solid #999;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
    background: #fff;
    padding: 5px 0;
    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
@@ -689,7 +742,7 @@ div.Discussion:hover .OptionsTitle:hover,
 	text-decoration: none;
    white-space: nowrap;
    color: #333;
-   padding: 3px 10px;
+   padding: 3px 15px;
    line-height: 18px;
 }
 .MenuItems a:hover {
@@ -697,6 +750,15 @@ div.Discussion:hover .OptionsTitle:hover,
    color: #ffffff;
    text-decoration: none;
    background-color: #004D9F;
+}
+.MenuItems li > strong {
+   font-size: 12px;
+   padding: 3px 10px;
+   line-height: 18px;
+}
+.MenuItems hr {
+    border: 0;
+    border-bottom: 1px solid #ddd;
 }
 .ToggleFlyout {
    position: relative;
@@ -720,12 +782,16 @@ div.Discussion:hover .OptionsTitle:hover,
 }
 
 .FlyoutMenu {
-    width: 300px;
-    background: #fff;
-    color: #000;
-    border-radius: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,.7);
-    border: solid 1px #bbb;
+   width: 300px;
+   background: #fff;
+   color: #000;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   border: solid 1px #999;
 }
 
 .FlyoutMenu a {
@@ -737,10 +803,12 @@ div.Discussion:hover .OptionsTitle:hover,
 }
 
 .Open .FlyoutButton {
-    background: #fff;
-    border-radius: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,.7);
-    border: solid 1px #bbb;
+   background: #fff;
+   border-radius: 0;
+   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+   border: solid 1px #999;
 }
 
 .Open .FlyoutButton:after {
@@ -898,6 +966,13 @@ overflow: hidden; */
 	font-size: 9px;
 	line-height: 1;
 	padding: 2px;
+}
+.MeMenu .Flyout .Alert {
+    position: relative;
+    top: auto;
+    right: auto;
+    padding: 1px 2px;
+    margin: 0 0 0 6px;
 }
 .MeMenu em {
 	display: none;
@@ -1345,6 +1420,28 @@ overflow: hidden; */
    color: #777;
    font-size: 80%;
 }
+.PopList .Center {
+    padding: 0;
+}
+.PopList .Center a {
+    display: block;
+    padding: 4px 0;
+}
+.PopList .Item:hover {
+    background: rgba(0,0,0,0.03);
+}
+.PopList .Item.Title:hover {
+   background: inherit;
+}
+.PopList .Item.Title {
+    font-size: 12px;
+    padding: 2px 4px;
+}
+.PopList .Item.Title a {
+    float: right;
+    font-size: 11px;
+}
+
 
 /* /me actions */
 .MeAction .AuthorAction {
@@ -1592,9 +1689,8 @@ a.ChangePicuture:hover {
 
 .ProfileOptions {
 	float: right;
-}
-.ProfileOptions .NavButton {
-   margin: 0 0 0 6px;
+    position: relative;
+    top: -6px;
 }
 /* Hiding form headings with CSS in case the forms get popped */
 body.Profile.picture .SmallPopup h1 {

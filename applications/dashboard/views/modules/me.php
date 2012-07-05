@@ -5,6 +5,17 @@ $CssClass = '';
 if ($this->CssClass)
    $CssClass .= ' '.$this->CssClass;
 
+$DashboardCount = 0;
+if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {
+   // Applicant Count
+   $RoleModel = new RoleModel();
+   $ApplicantCount = $RoleModel->GetApplicantCount();
+   // Spam & Moderation Queue
+   $LogModel = new LogModel();
+   $SpamCount = $LogModel->GetOperationCount('spam');
+   $ModerationCount = $LogModel->GetOperationCount('moderate');
+   $DashboardCount = $ApplicantCount + $SpamCount + $ModerationCount;
+}
 
 if ($Session->IsValid()):
    echo '<div class="MeBox'.$CssClass.'">';
@@ -32,12 +43,33 @@ if ($Session->IsValid()):
          echo Anchor(Sprite('SpBookmarks', 'Sprite16').Wrap(T('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', array('title' => T('Bookmarks')));
          echo '<div class="Flyout FlyoutMenu"></div></span>';
          
-         // Dashboard
-         if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage'))
-            echo Anchor(Sprite('SpDashboard', 'Sprite16').Wrap(T('Dashboard'), 'em'), '/dashboard/settings', 'MeButton', array('title' => T('Dashboard')));
+         // Profile Settings & Logout
+         echo '<span class="ToggleFlyout">';
+         $CDashboard = $DashboardCount > 0 ? Wrap($DashboardCount, 'span class="Alert"') : '';
+         echo Anchor(Sprite('SpDashboard', 'Sprite16').Wrap(T('Account Options'), 'em').$CDashboard, '/profile/edit', 'MeButton FlyoutButton', array('title' => T('Account Options')));
+         echo '<div class="Flyout MenuItems">';
+            echo '<ul>';
+               // echo Wrap(Wrap(T('My Account'), 'strong'), 'li');
+               // echo Wrap('<hr />', 'li');
+               echo Wrap(Anchor(T('Edit Profile'), 'profile/edit'), 'li');
+               
+               if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {
+                  echo Wrap('<hr />', 'li');
+                  $CApplicant = $ApplicantCount > 0 ? Wrap($ApplicantCount, 'span class="Alert"') : '';
+                  $CSpam = $SpamCount > 0 ? Wrap($SpamCount, 'span class="Alert"') : '';
+                  $CModeration = $ModerationCount > 0 ? Wrap($ModerationCount, 'span class="Alert"') : '';
+                  echo Wrap(Anchor(T('Applicants').$CApplicant, '/dashboard/user/applicants'), 'li');
+                  echo Wrap(Anchor(T('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li');
+                  echo Wrap(Anchor(T('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li');
+                  echo Wrap(Anchor(T('Dashboard'), '/dashboard/settings'), 'li');
+               }
+               echo Wrap('<hr />', 'li');
+               echo Wrap(Anchor(T('Sign Out'), SignOutUrl()), 'li');
+         echo '</div>';
+         echo '</span>';
 
          // Sign Out
-         echo Anchor(Sprite('SpSignOut', 'Sprite16').Wrap(T('Sign Out'), 'em'), SignOutUrl(), 'MeButton', array('title' => T('Sign Out')));
+         // echo Anchor(Sprite('SpSignOut', 'Sprite16').Wrap(T('Sign Out'), 'em'), SignOutUrl(), 'MeButton', array('title' => T('Sign Out')));
 
       echo '</div>';
    echo '</div>';

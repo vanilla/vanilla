@@ -2,6 +2,9 @@
 if (count($this->Data('Discussions'))):
 ?>
    <ul class="PopList Popin">
+      <li class="Item Title">
+         <?php echo Wrap(T('Bookmarks'), 'strong'); ?>
+      </li>
       <?php 
       foreach ($this->Data('Discussions') as $Row):
       ?>

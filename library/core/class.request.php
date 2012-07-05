@@ -669,6 +669,10 @@ class Gdn_Request {
       $this->_RequestArguments[$ParamsType] = $ArgumentData;
    }
    
+   public function SetRequestArguments($ParamsType, $ParamsData) {
+      $this->_RequestArguments[$ParamsType] = $ParamsData;
+   }
+   
    public function SetValueOn($ParamType, $ParamName, $ParamValue) {
       if (!isset($this->_RequestArguments[$ParamType]))
          $this->_RequestArguments[$ParamType] = array();

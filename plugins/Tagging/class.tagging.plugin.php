@@ -184,8 +184,14 @@ class TaggingPlugin extends Gdn_Plugin {
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
       $IsInsert = GetValue('Insert', $Sender->EventArguments);
-      $FormTags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
+      $RawFormTags = GetValue('Tags', $FormPostValues, '');
+      $FormTags = trim(strtolower($RawFormTags));
       $FormTags = TagModel::SplitTags($FormTags);
+      
+      // Resave the Discussion's Tags field as serialized
+      $SerializedTags = Gdn_Format::Serialize(explode(',',$RawFormTags));
+      $Sender->SQL->Update('Discussion')->Set('Tags', $SerializedTags)->Where('DiscussionID', $DiscussionID)->Put();
+      
       // Find out which of these tags is not yet in the tag table
       $ExistingTagData = $Sender->SQL->Select('TagID, Name')->From('Tag')->WhereIn('Name', $FormTags)->Get();
       $NewTags = $FormTags;
@@ -264,8 +270,8 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Validate tags when saving a discussion.
     */
-   public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
-      $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
+   public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
+      $FormPostValues = GetValue('FormPostValues', $Args, array());
       $TagsString = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
       $NumTagsMax = C('Plugin.Tagging.Max', 5);
       // Tags can only contain unicode and the following ASCII: a-z 0-9 + # _ .
@@ -274,9 +280,11 @@ class TaggingPlugin extends Gdn_Plugin {
       } else {
          $Tags = TagModel::SplitTags($TagsString);
          if (!TagModel::ValidateTags($Tags)) {
-            $Sender->Validation->AddValidationResult('Tags', '@'.T('ValidateTag', 'Tags cannot contain spaces.'));
+            $Sender->Validation->AddValidationResult('Tags', '@'.T('ValidateTag', 'Tags cannot contain commas.'));
          } elseif (count($Tags) > $NumTagsMax) {
             $Sender->Validation->AddValidationResult('Tags', '@'.sprintf(T('You can only specify up to %s tags.'), $NumTagsMax));
+         } else {
+            
          }
       }
    }
@@ -414,7 +422,7 @@ class TaggingPlugin extends Gdn_Plugin {
    jQuery(document).ready(function($) {
       var tags = $("#Form_Tags").val();
       if (tags && tags.length)
-         tags = tags.split(" ");
+         tags = tags.split(",");
       $("#Form_Tags").tokenInput("'.Gdn::Request()->Url('plugin/tagsearch').'", {
          hintText: "Start to type...",
          searchingText: "Searching...",
@@ -451,7 +459,7 @@ class TaggingPlugin extends Gdn_Plugin {
          // Make sure the tag is valid
          $Tag = $Sender->Form->GetFormValue('Name');
          if (!TagModel::ValidateTag($Tag))
-            $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain spaces.'));
+            $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain commas.'));
          
          // Make sure that the tag name is not already in use.
          if ($TagModel->GetWhere(array('TagID <>' => $TagID, 'Name' => $Tag))->NumRows() > 0) {

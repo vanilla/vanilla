@@ -1093,10 +1093,12 @@ overflow: hidden;
 .PanelInfo .Meta {
    font-size: 11px;
 }
+/*
 .PanelInfo .Meta span,
 .PanelInfo .Meta strong {
    margin-right: 8px;
 }
+*/
 .PanelInfo .Meta span a {
    margin-left: 8px;
 }

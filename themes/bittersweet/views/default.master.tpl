@@ -8,7 +8,7 @@
   <div class="Top">
     <div class="Row">
       <div class="TopMenu">
-        <a href="{link path="/"}">Home</a>
+        {home_link}
         <!--
         You can add more of your top-level navigation links like this:
 

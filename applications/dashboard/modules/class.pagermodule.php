@@ -392,7 +392,8 @@ class PagerModule extends Gdn_Module {
          }
       }
       $Pager = self::$_CurrentPager;
-
+      
+      $Pager->Wrapper = GetValue('Wrapper', $Options, $Pager->Wrapper);
 		$Pager->MoreCode = GetValue('MoreCode', $Options, $Pager->MoreCode);
 		$Pager->LessCode = GetValue('LessCode', $Options, $Pager->LessCode);
 		

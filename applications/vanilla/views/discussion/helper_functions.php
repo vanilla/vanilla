@@ -148,19 +148,7 @@ endif;
 
 if (!function_exists('WriteReactions')):
 function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-endif;
-
-if (!function_exists('WriteReactions')):
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-endif;
-
-if (!function_exists('WriteReactions')):
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
+   Gdn::Controller()->FireEvent('AfterReactions');
 }
 endif;
 

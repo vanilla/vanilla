@@ -46,9 +46,12 @@ class Gdn_Locale extends Gdn_Pluggable {
       $this->Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
    }
    
+   /**
+    * Reload the locale system 
+    */
    public function Refresh() {
       $LocalName = $this->Current();
-
+      
       $ApplicationWhiteList = Gdn::ApplicationManager()->EnabledApplicationFolders();
       $PluginWhiteList = Gdn::PluginManager()->EnabledPluginFolders();
 
@@ -94,12 +97,12 @@ class Gdn_Locale extends Gdn_Pluggable {
       $Count = count($LocaleSources);
       for ($i = 0; $i < $Count; ++$i) {
          if ($ConfLocaleOverride != $LocaleSources[$i] && file_exists($LocaleSources[$i])) // Don't double include the conf override file... and make sure it comes last
-            $this->LocaleContainer->Load($LocaleSources[$i], 'Definition', FALSE);
+            $this->Load($LocaleSources[$i], FALSE);
       }
 
       // Also load any custom defined definitions from the conf directory
       if (file_exists($ConfLocaleOverride))
-         $this->LocaleContainer->Load($ConfLocaleOverride, 'Definition', TRUE);
+         $this->Load($ConfLocaleOverride, TRUE);
       
       // Prepare developer mode if needed
       $this->DeveloperMode = C('Garden.Locales.DeveloperMode', FALSE);
@@ -203,8 +206,8 @@ class Gdn_Locale extends Gdn_Pluggable {
     *
     * @param string $Path The path to the locale.
     */
-   public function Load($Path) {
-      $this->LocaleContainer->Load($Path, 'Definition');
+   public function Load($Path, $Dynamic = TRUE) {
+      $this->LocaleContainer->Load($Path, 'Definition', $Dynamic);
    }
 
    /**

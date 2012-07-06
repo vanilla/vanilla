@@ -34,10 +34,10 @@ table {
    border-collapse: separate;
    border-spacing: 0;
 }
-caption, th, td {
+/*caption, th, td {
    text-align: left;
    font-weight: normal;
-}
+}*/
 blockquote:before, blockquote:after,
 q:before, q:after {
    content: "";
@@ -772,7 +772,6 @@ div.Discussion:hover .OptionsTitle:hover,
    top: 100%;
    right: -10px;
    display: none;
-	text-align: left;
 }
 .OptionsMenu .Flyout {
    top: 21px;

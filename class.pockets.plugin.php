@@ -12,13 +12,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
-   'Version' => '1.0.5',
+   'Version' => '1.0.6',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
    'RequiredApplications' => array('Vanilla' => '2.0.2a'),
    'RegisterPermissions' => array('Plugins.Pockets.Manage'),
-   'SettingsUrl' => '/dashboard/plugin/pockets',
+   'SettingsUrl' => '/settings/pockets',
    'SettingsPermission' => 'Plugins.Pockets.Manage',
    'MobileFriendly' => TRUE,
    'HasLocale' => TRUE
@@ -67,7 +67,7 @@ class PocketsPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Appearance', T('Appearance'));
-      $Menu->AddLink('Appearance', T('Pockets'), 'plugin/pockets', 'Plugins.Pockets.Manage');
+      $Menu->AddLink('Appearance', T('Pockets'), 'settings/pockets', 'Plugins.Pockets.Manage');
    }
 
    public function Base_BeforeRenderAsset_Handler($Sender) {
@@ -109,9 +109,9 @@ class PocketsPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $Sender.
     */
-   public function PluginController_Pockets_Create($Sender, $Args = array()) {
+   public function SettingsController_Pockets_Create($Sender, $Args = array()) {
       $Sender->Permission('Plugins.Pockets.Manage');
-      $Sender->AddSideMenu('plugin/pockets');
+      $Sender->AddSideMenu('settings/pockets');
       $Sender->AddJsFile('plugins/Pockets/pockets.js');
 
       $Page = GetValue(0, $Args);
@@ -227,7 +227,7 @@ class PocketsPlugin extends Gdn_Plugin {
          $Saved = $Form->Save();
          if ($Saved) {
             $Sender->StatusMessage = T('Your changes have been saved.');
-            $Sender->RedirectUrl = Url('plugin/pockets');
+            $Sender->RedirectUrl = Url('settings/pockets');
          }
       } else {
          if ($PocketID !== FALSE) {
@@ -273,7 +273,7 @@ class PocketsPlugin extends Gdn_Plugin {
       if ($Form->AuthenticatedPostBack()) {
          Gdn::SQL()->Delete('Pocket', array('PocketID' => $PocketID));
          $Sender->StatusMessage = sprintf(T('The %s has been deleted.'), strtolower(T('Pocket')));
-         $Sender->RedirectUrl = Url('plugin/pockets');
+         $Sender->RedirectUrl = Url('settings/pockets');
       }
 
       $Sender->Form = $Form;

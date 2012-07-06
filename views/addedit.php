@@ -110,6 +110,6 @@ echo $Form->Errors();
 </ul>
 <?php
 echo $Form->Button('Save'),
-   '&nbsp;&nbsp;&nbsp;&nbsp;', Anchor(T('Cancel'), '/plugin/pockets', 'Cancel'), ' ',
+   '&nbsp;&nbsp;&nbsp;&nbsp;', Anchor(T('Cancel'), '/settings/pockets', 'Cancel'), ' ',
    $Form->Close();
 ?>

@@ -8,15 +8,15 @@ echo Wrap($this->Data('Title'), 'h1');
    <tr>
       <td width="200"><?php
       if (C('Plugins.Pockets.ShowLocations')) {
-         echo Anchor(T('Hide Pocket Locations'), '/dashboard/plugin/pockets/hidelocations', 'SmallButton');
+         echo Anchor(T('Hide Pocket Locations'), '/settings/pockets/hidelocations', 'SmallButton');
       } else {
-         echo Anchor(T('Show Pocket Locations'), '/dashboard/plugin/pockets/showlocations', 'SmallButton');
+         echo Anchor(T('Show Pocket Locations'), '/settings/pockets/showlocations', 'SmallButton');
       }
       ?></td>
       <td><?php echo T('This option shows/hides the locations where pockets can go.', 'This option shows/hides the locations where pockets can go, but only for users that have permission to add/edit pockets. Try showing the locations and then visit your site.'); ?></td>
    </tr>
    <tr>
-      <td><?php echo Anchor(sprintf(T('Add %s'), T('Pocket')), 'plugin/pockets/add', 'SmallButton'); ?></td>
+      <td><?php echo Anchor(sprintf(T('Add %s'), T('Pocket')), 'settings/pockets/add', 'SmallButton'); ?></td>
       <td><?php echo T('Add a new Pocket to your site.'); ?></td>
    </tr>
 </table></div>
@@ -40,9 +40,9 @@ echo Wrap($this->Data('Title'), 'h1');
          echo '<td>',
             '<strong>', htmlspecialchars($PocketRow['Name']), '</strong>',
             '<div>',
-            Anchor('Edit', "/plugin/pockets/edit/{$PocketRow['PocketID']}"),
+            Anchor('Edit', "/settings/pockets/edit/{$PocketRow['PocketID']}"),
             ' <span>|</span> ',
-            Anchor('Delete', "/plugin/pockets/delete/{$PocketRow['PocketID']}", 'Popup'),
+            Anchor('Delete', "/settings/pockets/delete/{$PocketRow['PocketID']}", 'Popup'),
             '</div>',
             '</td>';
 

@@ -36,6 +36,12 @@ if (!function_exists('BigPlural')) {
    }
 }
 
+if (!function_exists('Bullet')):
+   function Bullet() {
+      return '<span class="Bullet">&bull;</span>';
+   }
+endif;
+
 if (!function_exists('ButtonGroup')):
    function ButtonGroup($Links, $CssClass = 'Button') {
       if (!is_array($Links) || count($Links) < 1)

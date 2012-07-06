@@ -55,9 +55,9 @@ if ($Session->IsValid()):
                
                if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {
                   echo Wrap('<hr />', 'li');
-                  $CApplicant = $ApplicantCount > 0 ? Wrap($ApplicantCount, 'span class="Alert"') : '';
-                  $CSpam = $SpamCount > 0 ? Wrap($SpamCount, 'span class="Alert"') : '';
-                  $CModeration = $ModerationCount > 0 ? Wrap($ModerationCount, 'span class="Alert"') : '';
+                  $CApplicant = $ApplicantCount > 0 ? ' '.Wrap($ApplicantCount, 'span class="Alert"') : '';
+                  $CSpam = $SpamCount > 0 ? ' '.Wrap($SpamCount, 'span class="Alert"') : '';
+                  $CModeration = $ModerationCount > 0 ? ' '.Wrap($ModerationCount, 'span class="Alert"') : '';
                   echo Wrap(Anchor(T('Applicants').$CApplicant, '/dashboard/user/applicants'), 'li');
                   echo Wrap(Anchor(T('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li');
                   echo Wrap(Anchor(T('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li');

@@ -952,15 +952,11 @@ overflow: hidden;
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
-	position: relative;
-	line-height: 1;
-   display: inline-block;
-}
 .MeButton:hover {
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
-.MeMenu .Alert {
+.MeButton .Alert {
 	position: absolute;
 	top: -2px;
 	right: -1px;
@@ -968,13 +964,10 @@ overflow: hidden;
 	line-height: 1;
 	padding: 2px;
 }
-.MeMenu .Flyout .Alert {
-    position: relative;
-    top: auto;
-    right: auto;
-    padding: 1px 2px;
-    margin: 0 0 0 6px;
+.Open .MeButton .Alert {
+   display: none;
 }
+
 .MeMenu em {
 	display: none;
 }

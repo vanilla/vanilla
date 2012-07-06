@@ -205,8 +205,9 @@ class Gdn_Locale extends Gdn_Pluggable {
     * Load a locale definition file.
     *
     * @param string $Path The path to the locale.
+    * @param boolean $Dynamic Whether this locale file should be the dynamic one.
     */
-   public function Load($Path, $Dynamic = TRUE) {
+   public function Load($Path, $Dynamic = FALSE) {
       $this->LocaleContainer->Load($Path, 'Definition', $Dynamic);
    }
 

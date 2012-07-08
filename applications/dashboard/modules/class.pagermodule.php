@@ -367,7 +367,7 @@ class PagerModule extends Gdn_Module {
       
       if ($HasNext) {
          $PageParam = 'p'.($CurrentPage + 1);
-         $Pager = ConcatSep(' ', $Pager, Anchor('Next', $this->PageUrl($CurrentPage + 1), 'Next', array('rel' => 'next')));
+         $Pager = ConcatSep(' ', $Pager, Anchor(T('Next'), $this->PageUrl($CurrentPage + 1), 'Next', array('rel' => 'next')));
       }
       
       $ClientID = $this->ClientID;

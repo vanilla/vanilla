@@ -34,10 +34,10 @@ table {
    border-collapse: separate;
    border-spacing: 0;
 }
-caption, th, td {
+/*caption, th, td {
    text-align: left;
    font-weight: normal;
-}
+}*/
 blockquote:before, blockquote:after,
 q:before, q:after {
    content: "";
@@ -772,7 +772,6 @@ div.Discussion:hover .OptionsTitle:hover,
    top: 100%;
    /* right: -10px; This causes text overflows when flyout items are long */
    display: none;
-	text-align: left;
 }
 .OptionsMenu .Flyout {
    top: 21px;
@@ -953,15 +952,11 @@ overflow: hidden;
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
-	position: relative;
-	line-height: 1;
-   display: inline-block;
-}
 .MeButton:hover {
 	background: #eee;
 	background: rgba(0,0,0,0.07);
 }
-.MeMenu .Alert {
+.MeButton .Alert {
 	position: absolute;
 	top: -2px;
 	right: -1px;
@@ -969,13 +964,7 @@ overflow: hidden;
 	line-height: 1;
 	padding: 2px;
 }
-.MeMenu .Flyout .Alert {
-    position: relative;
-    top: auto;
-    right: auto;
-    padding: 1px 2px;
-    margin: 0 0 0 6px;
-}
+
 .MeMenu em {
 	display: none;
 }

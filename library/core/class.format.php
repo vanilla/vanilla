@@ -1104,7 +1104,7 @@ EOT;
          if(C('Garden.Format.MeActions')) {
             $Mixed = preg_replace(
                '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
-               '\1'.Wrap(Wrap('\2', 'span', array('class' => 'MeName')).'\3', 'span', array('class' => 'MeAction')),
+               '\1'.Wrap(Wrap('\2', 'span', array('class' => 'MeActionName')).'\3', 'span', array('class' => 'AuthorAction')),
                $Mixed
             );
          }

@@ -490,10 +490,6 @@ class SettingsController extends Gdn_Controller {
       // Check permission
       $this->Permission('Vanilla.Categories.Manage');
       
-      decho($this->DeliveryMethod(), 'DM');
-      decho($this->DeliveryType(), 'DT');
-      die();
-      
       // Set delivery type to true/false
 		$TransientKey = GetIncomingValue('TransientKey');
       if (Gdn::Request()->IsPostBack()) {

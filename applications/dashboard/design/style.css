@@ -964,9 +964,6 @@ overflow: hidden;
 	line-height: 1;
 	padding: 2px;
 }
-.Open .MeButton .Alert {
-   display: none;
-}
 
 .MeMenu em {
 	display: none;

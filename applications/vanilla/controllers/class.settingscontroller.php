@@ -492,7 +492,7 @@ class SettingsController extends Gdn_Controller {
       
       // Set delivery type to true/false
 		$TransientKey = GetIncomingValue('TransientKey');
-      if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
+      if (Gdn::Request()->IsPostBack()) {
 			$TreeArray = GetValue('TreeArray', $_POST);
 			$Saves = $this->CategoryModel->SaveTree($TreeArray);
          $this->SetData('Result', TRUE);

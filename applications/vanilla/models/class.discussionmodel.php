@@ -1085,6 +1085,10 @@ class DiscussionModel extends VanillaModel {
          $DiscussionID = $this->SQL->GetWhere('Discussion', ArrayTranslate($FormPostValues, array('Source', 'SourceID')))->Value('DiscussionID');
          if ($DiscussionID)
             $FormPostValues['DiscussionID'] = $DiscussionID;
+      } elseif (GetValue('ForeignID', $FormPostValues)) {
+         $DiscussionID = $this->SQL->GetWhere('Discussion', array('ForeignID' => $FormPostValues['ForeignID']))->Value('DiscussionID');
+         if ($DiscussionID)
+            $FormPostValues['DiscussionID'] = $DiscussionID;
       }
       
       $Insert = $DiscussionID == '' ? TRUE : FALSE;
@@ -1093,8 +1097,9 @@ class DiscussionModel extends VanillaModel {
       if ($Insert) {
          unset($FormPostValues['DiscussionID']);
          // If no categoryid is defined, grab the first available.
-         if (ArrayValue('CategoryID', $FormPostValues) === FALSE)
-            $FormPostValues['CategoryID'] = $this->SQL->Get('Category', 'CategoryID', '', 1)->FirstRow()->CategoryID;
+         if (!GetValue('CategoryID', $FormPostValues) && !C('Vanilla.Categories.Use')) {
+            $FormPostValues['CategoryID'] = GetValue('CategoryID', CategoryModel::DefaultCategory(), -1);
+         }
             
          $this->AddInsertFields($FormPostValues);
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;

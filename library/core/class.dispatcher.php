@@ -329,8 +329,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Args = ReflectArgs($Callback, $InputArgs, $Request->Get());
             $Controller->ReflectArgs = $Args;
             
-            $this->FireEvent('BeforeControllerMethod');
             try {
+               $this->FireEvent('BeforeControllerMethod');
                call_user_func_array($Callback, $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
@@ -340,8 +340,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->_ControllerMethodArgs = $Args;
             $Controller->ReflectArgs = $Args;
             
-            $this->FireEvent('BeforeControllerMethod');
             try {
+               $this->FireEvent('BeforeControllerMethod');
                call_user_func_array(array($Controller, $ControllerMethod), $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);

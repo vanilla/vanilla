@@ -43,6 +43,17 @@ class DiscussionController extends VanillaController {
     */
    public $DiscussionModel;
    
+   
+   public function __get($Name) {
+      switch ($Name) {
+         case 'CommentData':
+            Deprecated('DiscussionController->CommentData', "DiscussionController->Data('Comments')");
+            return $this->Data('Comments');
+            break;
+      }
+      throw new Exception("DiscussionController->$Name not found.", 400);
+   }
+   
    /**
     * Default single discussion display.
     * 
@@ -137,8 +148,7 @@ class DiscussionController extends VanillaController {
 //      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
       
       // Load the comments
-      $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
-      $this->SetData('Comments', $this->CommentData);
+      $this->SetData('Comments', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset));
       
       $PageNumber = PageNumber($this->Offset, $Limit);
       $this->SetData('Page', $PageNumber);
@@ -255,12 +265,12 @@ class DiscussionController extends VanillaController {
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       
       // Get the comments.
-      $this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
+      $Comments = $this->CommentModel->GetNew($DiscussionID, $LastCommentID)->Result();
+      $this->SetData('Comments', $Comments, TRUE);
       
       // Set the data.
-      $CommentData = $this->CommentData->Result();
-      if(count($CommentData) > 0) {
-         $LastComment = $CommentData[count($CommentData) - 1];
+      if(count($Comments) > 0) {
+         $LastComment = $Comments[count($Comments) - 1];
          // Mark the comment read.
          $this->SetData('Offset', $this->Discussion->CountComments, TRUE);
          $this->CommentModel->SetWatch($this->Discussion, $this->Discussion->CountComments, $this->Discussion->CountComments, $this->Discussion->CountComments);
@@ -761,7 +771,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
             $this->CommentModel->OrderBy('c.DateInserted '.$SortComments); // allow custom sort
 
-         $this->SetData('CommentData', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
+         $this->SetData('Comments', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
          
          if (count($this->CommentModel->Where()) > 0)
             $ActualResponses = FALSE;
@@ -781,7 +791,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
             $ActualResponses,
             'discussion/embed/'.$this->Discussion->DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s'
          );
-         $this->Pager->CurrentRecords = $this->CommentData->NumRows();
+         $this->Pager->CurrentRecords = $this->Comments->NumRows();
          $this->FireEvent('AfterBuildPager');
       }
       

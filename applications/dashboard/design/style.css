@@ -1445,6 +1445,10 @@ overflow: hidden;
     font-size: 11px;
 }
 
+.PopList .Empty {
+   border: none;
+}
+
 
 /* /me actions */
 .MeAction .AuthorAction {

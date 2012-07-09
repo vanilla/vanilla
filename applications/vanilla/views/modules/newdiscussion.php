@@ -3,8 +3,8 @@ echo '<div class="BoxButtons BoxNewDiscussion">';
 
 $Text = T('Start a New Discussion');
 $Url = '/post/discussion'.(array_key_exists('CategoryID', $Data) ? '/'.$Data['CategoryID'] : '');
-$Css = 'Button Primary Action BigButton NewDiscussion';
-
+$Css = 'Button Primary Action NewDiscussion';
+$Css .= strpos($this->CssClass, 'Big') !== FALSE ? ' BigButton' : '';
 if (count($this->Buttons) == 0) {
    echo Anchor($Text, $Url, $Css);
 } else {

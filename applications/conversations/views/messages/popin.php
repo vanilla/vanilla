@@ -4,7 +4,7 @@ if (count($this->Data('Conversations'))):
    <ul class="PopList Conversations">
       <li class="Item Title">
          <?php 
-         echo Anchor(T('Send a New Message'), 'messages/add');
+         echo Anchor(T('New Message'), 'messages/add');
          echo Wrap(T('Inbox'), 'strong'); 
          ?>
       </li>

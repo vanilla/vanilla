@@ -1,9 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) exit(); ?>
+<ul class="PopList Popin">
+<?php
 if (count($this->Data('Discussions'))):
 ?>
-   <ul class="PopList Popin">
       <li class="Item Title">
-         <?php echo Wrap(T('Bookmarks'), 'strong'); ?>
+         <?php echo Wrap($this->Data('Title'), 'strong'); ?>
       </li>
       <?php 
       foreach ($this->Data('Discussions') as $Row):
@@ -33,7 +34,7 @@ if (count($this->Data('Discussions'))):
          echo Anchor(sprintf(T('All %s'), T('Bookmarks')), '/discussions/bookmarks'); 
          ?>
       </li>
-   </ul>
 <?php else: ?>
-<div class="Empty"><?php echo sprintf(T('You do not have any %s yet.'), T('bookmarks')); ?></div>
+<ul class="Item Empty Center"><?php echo sprintf(T('You do not have any %s yet.'), T('bookmarks')); ?></ul>
 <?php endif; ?>
+</ul>

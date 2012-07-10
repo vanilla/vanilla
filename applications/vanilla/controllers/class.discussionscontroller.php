@@ -388,7 +388,8 @@ class DiscussionsController extends VanillaController {
          'w.UserID' => Gdn::Session()->UserID
       );
       
-      $Discussions = $DiscussionModel->Get(0, 5, $Wheres);
+      $Discussions = $DiscussionModel->Get(0, 5, $Wheres)->Result();
+      $this->SetData('Title', T('Bookmarks'));
       $this->SetData('Discussions', $Discussions);
       $this->Render('Popin');
    }

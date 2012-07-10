@@ -183,7 +183,7 @@ class BanModel extends Gdn_Model {
       // Add the validation results.
       if ($Validation) {
          foreach ($Banned as $BanType => $Value) {
-            $Validation->AddValidationResult($BanType, 'ValidateBanned');
+            $Validation->AddValidationResult(Gdn_Form::LabelCode($BanType), 'ValidateBanned');
          }
       }
       return count($Banned) == 0;

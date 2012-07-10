@@ -123,7 +123,7 @@ class PostController extends VanillaController {
       
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if ($this->Form->IsPostBack() == FALSE) {
          // Prep form with current data for editing
          if (isset($this->Discussion)) {
             $this->Form->SetData($this->Discussion);
@@ -178,8 +178,11 @@ class PostController extends VanillaController {
                } else {
                   $DiscussionID = $this->DiscussionModel->Save($FormValues, $this->CommentModel);
                   $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
-                  if ($DiscussionID > 0 && $DraftID > 0)
+                  
+                  if ($DiscussionID > 0) {
+                     if ($DraftID > 0)
                      $this->DraftModel->Delete($DraftID);
+                  }
                   if ($DiscussionID == SPAM) {
                      $this->StatusMessage = T('Your post has been flagged for moderation.');
                      $this->Render('Spam');
@@ -221,6 +224,7 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new discussion
                   $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  $this->SetData('Discussion', $Discussion);
                   $this->EventArguments['Discussion'] = $Discussion;
                   $this->FireEvent('AfterDiscussionSave');
                   
@@ -451,7 +455,7 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
-      if (!$this->Form->AuthenticatedPostBack()) {
+      if (!$this->Form->IsPostBack()) {
          // Form was validly submitted
          if (isset($this->Comment)) {
 //            decho($this->Comment, 'Comment');
@@ -463,6 +467,7 @@ class PostController extends VanillaController {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
+         
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);
          

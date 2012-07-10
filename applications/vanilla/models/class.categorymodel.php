@@ -200,6 +200,13 @@ class CategoryModel extends Gdn_Model {
       return $Result;
    }
    
+   public static function DefaultCategory() {
+      foreach (self::Categories() as $Category) {
+         if ($Category['CategoryID'] > 0)
+            return $Category;
+      }
+   }
+   
    /**
     * 
     * 

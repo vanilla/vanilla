@@ -708,7 +708,7 @@ body > #Frame > .Head {
 .OptionsTitle {
    user-select: none;
    background: url("images/sprites.png") no-repeat 0 0;
-   height: 28px;
+   height: 20px;
    overflow: hidden;
    padding: 0;
    width: 20px;
@@ -717,13 +717,32 @@ body > #Frame > .Head {
    line-height: 999px; /* Set it higher than your image height */
    overflow: hidden; /* Hide the text */
    font-size: 0; /* FF2 doesn’t like the above */
+   cursor: pointer;
 }
 div.Discussion:hover .OptionsTitle:hover,
 .Item:hover .OptionsTitle:hover {
    background-position: -28px 0;
 }
-.Open .OptionsTitle {
+.Open > .OptionsTitle {
    background-position: -56px 0 !important;
+}
+.Flyout:before,
+.Flyout:after {
+   border-bottom: 7px solid #444444;
+   border-left: 7px solid transparent;
+   border-right: 7px solid transparent;
+   content: "";
+   left: 9px;
+   position: absolute;
+   top: -7px;
+}
+.Flyout:after {
+   border-bottom: 7px solid #fff;
+   top: -6px;
+}
+.MeBox .Flyout:before,
+.MeBox .Flyout:after {
+   display: none;
 }
 .MenuItems {
    line-height: 100%;
@@ -775,6 +794,7 @@ div.Discussion:hover .OptionsTitle:hover,
 }
 .OptionsMenu .Flyout {
    top: 21px;
+   left: -7px;
 }
 
 .Flyout .Author .PhotoWrap {
@@ -810,8 +830,7 @@ div.Discussion:hover .OptionsTitle:hover,
    -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
    border: solid 1px #999;
 }
-
-.Open .FlyoutButton:after {
+.MeBox .Open .FlyoutButton:after {
     content: "";
     position: absolute;
     background: #fff;
@@ -970,7 +989,7 @@ overflow: hidden;
 }
 
 .MeBox .Flyout {
-   top: 20px;
+   top: 18px;
 }
 
 .MeBox.Inline,
@@ -2251,7 +2270,7 @@ tr.CategoryHeading td {
    width: 18px;
 }
 
-
+/*
 .SpAdd,
 .SpDelete {
    position: relative;
@@ -2272,7 +2291,7 @@ tr.CategoryHeading td {
 .SpDelete:after {
    background-position: -79px -38px;
 }
-
+*/
 .FormType {
 	margin: 0 0 10px;
 }

@@ -1864,12 +1864,14 @@ form.Thumbnail .Warning {
 	padding: 4px;
    min-height: 100px;
 }
+.EditCommentForm .Buttons,
 .CommentForm .Buttons {
 	position: relative;
    text-align: right; 
 	margin: 0;
 	padding: 6px 0;
 }
+.EditCommentForm .Buttons .Cancel,
 .CommentForm .Buttons .Cancel,
 .CommentForm .Buttons .Back {
 	float: left;
@@ -1889,17 +1891,18 @@ form.Thumbnail .Warning {
 .Form-Header .Author .PhotoWrap {
     margin: 10px 0 0 10px;
 }
+.EditCommentForm .FormWrapper {
+   padding: 10px;
+}
 .CommentForm .FormWrapper {
     padding: 10px 10px 10px 60px;
 }
+.EditCommentForm textarea.TextBox,
 .CommentForm textarea.TextBox {
     min-height: 50px;
     height: 50px;
 }
-.Item.Editing .CommentForm > h2.H {
-   display: none;
-}
-.Item.Editing .CommentForm {
+.EditCommentForm {
    margin: 10px 0;
 }
 

@@ -451,6 +451,8 @@ class Gdn_Format {
     * @return string
     */
    public static function Date($Timestamp = '', $Format = '') {
+      static $GuestHourOffset;
+      
       if ($Timestamp === NULL)
          return T('Null Date', '-');
 
@@ -467,8 +469,24 @@ class Gdn_Format {
       
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();
+      $HourOffset = 0;
+      
       if ($Session->UserID > 0) {
-         $SecondsOffset = ($Session->User->HourOffset * 3600);
+         $HourOffset = $Session->User->HourOffset;
+      } elseif (class_exists('DateTimeZone')) {
+         if (!isset($GuestHourOffset)) {
+            $GuestTimeZone = C('Garden.GuestTimeZone');
+            if ($GuestTimeZone) {
+               $TimeZone = new DateTimeZone($GuestTimeZone);
+               $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+               $GuestHourOffset = floor($Offset / 3600);
+            }
+         }
+         $HourOffset = $GuestHourOffset;
+      }
+      
+      if ($HourOffset <> 0) {
+         $SecondsOffset = $HourOffset * 3600;
          $Timestamp += $SecondsOffset;
          $Now += $SecondsOffset;
       }

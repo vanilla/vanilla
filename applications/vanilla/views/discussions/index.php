@@ -14,7 +14,7 @@ if ($Description = $this->Description()) {
 include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
 
-$PagerOptions = array('Wrapper' => '<div %1$s>%2$s</div>', 'RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
+$PagerOptions = array('Wrapper' => '<span class="PagerNub">&#160;</span><div %1$s>%2$s</div>', 'RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
 if ($this->Data('_PagerUrl'))
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 

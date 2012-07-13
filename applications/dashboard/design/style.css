@@ -511,6 +511,14 @@ div.Warning {
 .Pager .Highlight {
 	color: #000;
 }
+
+.PagerNub {
+    overflow: hidden;
+    display: inline-block;
+    width: 1px;
+    margin-right: -1px;
+}
+
 /* Small UserPhoto() images */
 a.Small:hover {
 	text-decoration: none;

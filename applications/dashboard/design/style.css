@@ -378,9 +378,6 @@ select {
 #Panel .ButtonGroup.Big > .Button:first-child {
     width: 78%;
 }
-
-
-
 .Loading {
    height: 100px;
    padding: 0 20px;
@@ -708,7 +705,7 @@ body > #Frame > .Head {
 .OptionsTitle {
    user-select: none;
    background: url("images/sprites.png") no-repeat 0 0;
-   height: 28px;
+   height: 20px;
    overflow: hidden;
    padding: 0;
    width: 20px;
@@ -717,13 +714,28 @@ body > #Frame > .Head {
    line-height: 999px; /* Set it higher than your image height */
    overflow: hidden; /* Hide the text */
    font-size: 0; /* FF2 doesn’t like the above */
+   cursor: pointer;
 }
 div.Discussion:hover .OptionsTitle:hover,
 .Item:hover .OptionsTitle:hover {
    background-position: -28px 0;
 }
-.Open .OptionsTitle {
+.Open > .OptionsTitle {
    background-position: -56px 0 !important;
+}
+.Flyout:before,
+.Flyout:after {
+   border-bottom: 7px solid #444444;
+   border-left: 7px solid transparent;
+   border-right: 7px solid transparent;
+   content: "";
+   left: 9px;
+   position: absolute;
+   top: -7px;
+}
+.Flyout:after {
+   border-bottom: 7px solid #fff;
+   top: -6px;
 }
 .MenuItems {
    line-height: 100%;
@@ -775,12 +787,11 @@ div.Discussion:hover .OptionsTitle:hover,
 }
 .OptionsMenu .Flyout {
    top: 21px;
+   left: -7px;
 }
-
 .Flyout .Author .PhotoWrap {
     margin: 0;
 }
-
 .FlyoutMenu {
    width: 300px;
    background: #fff;
@@ -793,49 +804,29 @@ div.Discussion:hover .OptionsTitle:hover,
    -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
    border: solid 1px #999;
 }
-
 .FlyoutMenu a {
    color: #00419b;
 }
-
 .FlyoutButton {
    cursor: pointer;
 }
-
-.Open .FlyoutButton {
-   background: #fff;
-   border-radius: 0;
-   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-   -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-   border: solid 1px #999;
-}
-
-.Open .FlyoutButton:after {
-    content: "";
-    position: absolute;
-    background: #fff;
-    width: 100%;
-    height: 2px;
-    bottom: -2px;
-    right: 0;
-    z-index: 101;
-}
-
 .FlyoutLeft .Flyout {
     right: inherit;
 }
-
 .MeBox .Flyout {
     right: inherit;
-    left: -1em;
+    left: -4px;
+    top: 150%;
 }
-
 .MeBox.FlyoutRight .Flyout {
     left: inherit;
-    right: -1em;
+    right: -4px;
 }
-
+.MeBox.FlyoutRight .Flyout:before,
+.MeBox.FlyoutRight .Flyout:after {
+   left: auto;
+   right: 9px;
+}
 a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
@@ -964,15 +955,9 @@ overflow: hidden;
 	line-height: 1;
 	padding: 2px;
 }
-
 .MeMenu em {
 	display: none;
 }
-
-.MeBox .Flyout {
-   top: 20px;
-}
-
 .MeBox.Inline,
 .MeBox.Inline .WhoIs,
 .MeBox.Inline .MeMenu {
@@ -1211,7 +1196,6 @@ overflow: hidden;
 }
 .PageControls {
     margin: 10px 0;
-    overflow: auto;
 }
 
 
@@ -1233,7 +1217,7 @@ overflow: hidden;
 
 .SearchForm .SiteSearch {
    max-width: 600px;
-   margin: 0 auto;
+   margin: 0;
 }
 
 .SearchForm .SiteSearch .Button {
@@ -1743,6 +1727,7 @@ table.PreferenceGroup td,
 table.PreferenceGroup th,
 #Form_Invitation table th {
    font-weight: bold;
+   text-align: left;
 }
 body.Profile ul.Notifications {
 	border-top: 0;
@@ -1845,12 +1830,14 @@ form.Thumbnail .Warning {
 	padding: 4px;
    min-height: 100px;
 }
+.EditCommentForm .Buttons,
 .CommentForm .Buttons {
 	position: relative;
    text-align: right; 
 	margin: 0;
 	padding: 6px 0;
 }
+.EditCommentForm .Buttons .Cancel,
 .CommentForm .Buttons .Cancel,
 .CommentForm .Buttons .Back {
 	float: left;
@@ -1870,17 +1857,18 @@ form.Thumbnail .Warning {
 .Form-Header .Author .PhotoWrap {
     margin: 10px 0 0 10px;
 }
+.EditCommentForm .FormWrapper {
+   padding: 10px;
+}
 .CommentForm .FormWrapper {
     padding: 10px 10px 10px 60px;
 }
+.EditCommentForm textarea.TextBox,
 .CommentForm textarea.TextBox {
     min-height: 50px;
     height: 50px;
 }
-.Item.Editing .CommentForm > h2.H {
-   display: none;
-}
-.Item.Editing .CommentForm {
+.EditCommentForm {
    margin: 10px 0;
 }
 
@@ -2251,7 +2239,7 @@ tr.CategoryHeading td {
    width: 18px;
 }
 
-
+/*
 .SpAdd,
 .SpDelete {
    position: relative;
@@ -2272,7 +2260,7 @@ tr.CategoryHeading td {
 .SpDelete:after {
    background-position: -79px -38px;
 }
-
+*/
 .FormType {
 	margin: 0 0 10px;
 }

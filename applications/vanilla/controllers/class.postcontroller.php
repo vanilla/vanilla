@@ -322,7 +322,6 @@ class PostController extends VanillaController {
          }
       }
       
-      // Add these back to the form
       // If so, create it!
       if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
          // Add these values back to the form if they exist!
@@ -458,8 +457,6 @@ class PostController extends VanillaController {
       if (!$this->Form->IsPostBack()) {
          // Form was validly submitted
          if (isset($this->Comment)) {
-//            decho($this->Comment, 'Comment');
-//            die();
             $this->Form->SetData((array)$this->Comment);
          }
             
@@ -677,7 +674,7 @@ class PostController extends VanillaController {
          $this->Form->SetModel($this->DraftModel);
          $this->Comment = $this->DraftModel->GetID($DraftID);
       }
-      $this->View = 'Comment';
+      $this->View = 'editcomment';
       $this->Comment($this->Comment->DiscussionID);
    }
    

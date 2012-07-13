@@ -15,7 +15,7 @@
       </li>
       <li class="Buttons">
          <?php
-            echo $this->Form->Button('Request a new password');
+            echo $this->Form->Button('Request a new password', array('class' => 'Button Primary'));
             echo Anchor(T('I remember now!'), '/entry/signin', 'ForgotPassword');
          ?>
       </li>

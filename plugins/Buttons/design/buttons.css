@@ -92,6 +92,8 @@ div.ButtonGroup.Warning {
    -webkit-box-shadow: none;
 }
 /* Action (blue) Button */
+.ButtonGroup.Primary .Button,
+.Button.Primary,
 .ButtonGroup.Action .Button,
 .Button.Action {
    background: #0055cc;
@@ -115,6 +117,14 @@ div.ButtonGroup.Warning {
    border-color: #0022cc;
    color: #fff;
 }
+
+.ButtonGroup.Primary.Open .Button.Handle,
+.ButtonGroup.Primary .Button:hover,
+.ButtonGroup.Primary .Button:focus,
+.ButtonGroup.Primary .Button:active,
+.Button.Primary:hover,
+.Button.Primary:focus,
+.Button.Primary:active,
 .ButtonGroup.Action.Open .Button.Handle,
 .ButtonGroup.Action .Button:hover,
 .ButtonGroup.Action .Button:focus,
@@ -125,6 +135,11 @@ div.ButtonGroup.Warning {
    color: #fff;
    border-color: #0000aa;
 }
+.ButtonGroup.Primary.Open .Button.Handle,
+.ButtonGroup.Primary .Button:focus,
+.ButtonGroup.Primary .Button:active,
+.Button.Primary:focus,
+.Button.Primary:active,
 .ButtonGroup.Action.Open .Button.Handle,
 .ButtonGroup.Action .Button:focus,
 .ButtonGroup.Action .Button:active,

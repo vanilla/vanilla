@@ -31,7 +31,7 @@ if (count($this->Data('Discussions'))):
       <?php endforeach; ?>
       <li class="Item Center">
          <?php
-         echo Anchor(sprintf(T('All %s'), T('Bookmarks')), '/discussions/bookmarks'); 
+         echo Anchor(sprintf(T('All %s'), T('Bookmarks')), '/discussions/bookmarked'); 
          ?>
       </li>
 <?php else: ?>

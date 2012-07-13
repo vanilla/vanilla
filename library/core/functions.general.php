@@ -1561,6 +1561,20 @@ if (!function_exists('IsWritable')) {
    }
 }
 
+if (!function_exists('MarkString')):
+   /**
+    * Wrap occurences of $Needle in $Haystack with <mark> tags. Explodes $Needle 
+    * on spaces. Returns $Haystack with replacements.
+    */   
+   function MarkString($Needle, $Haystack) {
+      $Needle = explode(' ', $Needle);
+      foreach ($Needle as $n) {
+         $Haystack = preg_replace('#(?!<.*?)('.preg_quote($n).')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
+      }
+      return $Haystack;
+   }
+endif;
+
 if (!function_exists('MergeArrays')) {
    /**
     * Merge two associative arrays into a single array.

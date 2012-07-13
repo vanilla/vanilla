@@ -1,4 +1,4 @@
-/* Sprites */
+/* Sprites
 .SpDashboard,
 .SpWarnings,
 .SpPublicActivities,
@@ -78,4 +78,135 @@
 .PanelInfo a[href*='profile/signature']:before,
 .FilterMenu .Infractions:before {
    content: '';
+}
+
+*/
+.SpWhosOnline,
+.SpDelete,
+.SpBan,
+.SpWarn,
+.SpWarnings,
+.SpDashboard,
+.SpWarnings,
+.SpActivity,
+.SpPublicActivities,
+.SpModeratorActivities,
+.SpAdminActivities,
+.SpUnansweredQuestions,
+.SpQuote,
+.SpSignatures,
+.SpThumbnail,
+.SpPicture,
+.SpPreferences,
+.SpPassword,
+.SpEdit,
+.SpInfraction,
+.SpActivity,
+.SpAllCategories,
+.SpMyDrafts,
+.SpDashboard,
+.SpBookmarks,
+.SpInbox,
+.SpNotifications,
+.SpEditProfile,
+.SpMessage,
+.SpMyDiscussions,
+.SpDiscussions,
+.SpComments {
+    display: inline-block;
+    height: 14px;
+    width: 14px;
+    background: url('http://cdn.vanillaforums.com/images/sprites-14-000000.png') 0 0 no-repeat transparent;
+    background-position: 14px 14px;
+    vertical-align: top;
+    margin: 4px 4px 0 0;
+}
+.MenuItems .Sprite,
+.NavButton > .Sprite {
+   margin: 1px 4px 0 0;
+}
+.NavButton.Handle .Sprite {
+   margin: 0;
+}
+.NavButton.ButtonGroup .SpDropdownHandle {
+   margin: 0;
+}
+.MeBox .Sprite16 {
+   margin: 0;
+}
+.SpActivity,
+.SpPublicActivities { background-position: -216px -95px; }
+.SpModeratorActivities { background-position: -287px -48px; }
+.SpAdminActivities { background-position: -262px -47px; }
+.SpUnansweredQuestions { background-position: -96px -272px; } 
+.SpThumbnail { background-position: -240px -95px; } 
+.SpPicture { background-position: -263px -23px; } 
+.SpPassword { background-position: -311px -95px; } 
+.SpAllCategories { background-position: -144px -72px; } 
+.SpMyDrafts { background-position: -264px -72px; } 
+.SpEdit { background-position: -143px -46px; }
+.SpEditProfile { background-position: -239px -23px; }
+.SpComments { background-position: -168px -72px; }
+.SpMyDiscussions { background-position: -336px -24px; }
+.SpDiscussions { background-position: -240px -72px; }
+.SpMessage { background-position: -93px -95px; }
+.SpInbox { background-position: -93px -96px; }
+.SpBookmarks { background-position: -71px -72px; }
+.SpPreferences,
+.SpNotifications { background-position: -168px -95px; }
+.SpQuote { background-position: -311px 0; }
+.SpSignatures { background-position: -143px -95px; }
+.SpDashboard { background-position: -215px -48px; }
+.SpInfraction, 
+.SpWarn,
+.SpWarnings { background-position: -94px -46px; }
+.SpBan { background-position: -311px -23px; }
+.SpDelete { background-position: -335px 1px; }
+.SpWhosOnline { background-position: -287px -23px; }
+
+
+
+
+/* === Reactions === */
+
+
+
+.Reactions .ReactSprite {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  *margin-right: .3em;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url("http://cdn.vanillaforums.com/images/sprites-14-000000.png");
+  background-position: 14px 14px;
+  background-repeat: no-repeat;
+}
+
+.Reactions .InProgress .ReactSprite {
+   background-image: none !important;
+}
+.Reactions .ReactAwesome { background-position: -263px 0; }
+.Reactions .ReactFlag { background-position: -48px -46px; }
+.Reactions .ReactInsightful { background-position: -143px 0; }
+.Reactions .ReactOffTopic { background-position: -167px 0; }
+.Reactions .ReactAbuse { background-position: 0 -46px; }
+.Reactions .ReactSpam { background-position: -119px 0; }
+.Reactions .ReactTroll { background-position: -95px 0; }
+.Reactions .ReactPromote { background-position: -44px -23px; }
+.Reactions .ReactDisagree { background-position: -22px 1px; }
+.Reactions .ReactAgree { background-position: 2px 1px; }
+.Reactions .ReactDislike { background-position: -22px -22px; }
+.Reactions .ReactLike { background-position: 2px -25px; }
+.Reactions .ReactDown { background-position: -214px -23px; }
+.Reactions .ReactUp { background-position: -189px -24px; }
+.Reactions .ReactWTF { background-position: -70px 1px; }
+.Reactions .ReactLOL { background-position: -46px 1px; }
+.Reactions .ReactQuote { background-position: -310px 0; }
+.Reactions .ReactInfraction { background-position: -94px -46px; }
+
+/* Switch to the white icons when hovering over a menuitem sprite */
+.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .Sprite {
+   background-image: url('http://cdn.vanillaforums.com/images/sprites-14-ffffff.png');
 }

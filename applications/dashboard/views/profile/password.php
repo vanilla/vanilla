@@ -27,4 +27,4 @@ echo $this->Form->Errors();
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Change Password', '', array('class' => 'Button Success'));
+<?php echo $this->Form->Close('Change Password', '', array('class' => 'Button Primary'));

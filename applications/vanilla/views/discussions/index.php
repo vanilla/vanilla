@@ -19,7 +19,7 @@ if ($this->Data('_PagerUrl'))
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 
 echo '<div class="PageControls Top">';
-   echo PagerModule::Write($PagerOptions);
+   PagerModule::Write($PagerOptions);
    echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
 echo '</div>';
 

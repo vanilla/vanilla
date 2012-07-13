@@ -25,7 +25,7 @@
       </li>
       <li class="Buttons">
          <?php
-            echo $this->Form->Button('Save your password');
+            echo $this->Form->Button('Save your password', array('class' => 'Button Primary'));
          ?>
       </li>
    </ul>

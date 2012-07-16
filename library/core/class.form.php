@@ -1745,7 +1745,12 @@ class Gdn_Form extends Gdn_Pluggable {
     * @return boolean
     */
    public function IsMyPostBack() {
-      return (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+      switch (strtolower($this->Method)) {
+         case 'get':
+            return count($_GET) > 0 || (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+         default:
+            return Gdn::Request()->IsPostBack();
+      }
    }
    
    /**

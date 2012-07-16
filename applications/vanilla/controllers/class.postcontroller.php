@@ -560,7 +560,6 @@ class PostController extends VanillaController {
                      $this->Offset = 1;
                      $Comments = $this->CommentModel->GetIDData($CommentID);
                      $this->SetData('Comments', $Comments);
-                     $this->SetData('CommentData', $Comments, TRUE);
                      // Load the discussion
                      $this->ControllerName = 'discussion';
                      $this->View = 'comments';
@@ -591,16 +590,12 @@ class PostController extends VanillaController {
 //                     if ($Redirect) {
 //                        // The user posted a comment on a page other than the last one, so just redirect to the last page.
 //                        $this->RedirectUrl = Gdn::Request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);
-//                        $this->CommentData = NULL;
 //                     } else {
 //                        // Make sure to load all new comments since the page was last loaded by this user
 //								if ($DisplayNewCommentOnly)
                         $this->Offset = $this->CommentModel->GetOffset($CommentID);
                         $Comments = $this->CommentModel->GetIDData($CommentID);
                         $this->SetData('Comments', $Comments);
-                        $this->SetData('CommentData', $Comments, TRUE);
-//								else 
-//									$this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
 
                         $this->SetData('NewComments', TRUE);
                         
@@ -611,7 +606,7 @@ class PostController extends VanillaController {
                      
                      // Make sure to set the user's discussion watch records
                      $CountComments = $this->CommentModel->GetCount($DiscussionID);
-                     $Limit = is_object($this->CommentData) ? $this->CommentData->NumRows() : $Discussion->CountComments;
+                     $Limit = is_object($this->Data('Comments')) ? $this->Data('Comments')->NumRows() : $Discussion->CountComments;
                      $Offset = $CountComments - $Limit;
                      $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);
                   }
@@ -636,8 +631,23 @@ class PostController extends VanillaController {
          
       $this->FireEvent('BeforeCommentRender');
       
-      // Render default view
-      $this->Render();
+      if ($this->DeliveryType() == DELIVERY_TYPE_DATA) {
+         $Comment = $this->Data('Comments')->FirstRow(DATASET_TYPE_ARRAY);
+         if ($Comment) {
+            $Photo = $Comment['InsertPhoto'];
+            
+            if (strpos($Photo, '//') === FALSE) {
+               $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+            }
+            
+            $Comment['InsertPhoto'] = $Photo;
+         }
+         $this->Data = array('Comment' => $Comment);
+         $this->RenderData($this->Data);
+      } else {
+         // Render default view.
+         $this->Render();
+      }
    }
    
    /**

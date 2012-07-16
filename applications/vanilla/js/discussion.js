@@ -82,10 +82,14 @@ jQuery(document).ready(function($) {
          
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action');
-      if (action.indexOf('?'))
+      if (action.indexOf('?') >= 0)
          action = action.substr(0, action.indexOf('?'));
-      if (discussionID > 0)
-         action += '/' + discussionID;
+      if (discussionID > 0) {
+         if (action.substr(-1,1) != '/')
+            action += '/';
+         
+         action += discussionID;
+      }
       
       $(frm).find(':submit').attr('disabled', 'disabled');
       $(parent).find('a.Back').after('<span class="TinyProgress">&#160;</span>');
@@ -287,6 +291,7 @@ jQuery(document).ready(function($) {
                
                $(msg).after(json.Data);
                $(msg).hide();
+               $(document).trigger('EditCommentFormLoaded', [container]);
             },
             complete: function() {
                $(parent).find('span.TinyProgress').remove();
@@ -294,7 +299,7 @@ jQuery(document).ready(function($) {
             }
          });
       } else {
-         $(parent).find('div.CommentForm').remove();
+         $(parent).find('div.EditCommentForm').remove();
          $(parent).find('span.TinyProgress').remove();
          $(msg).show();
       }

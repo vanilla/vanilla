@@ -247,15 +247,19 @@ class SettingsController extends Gdn_Controller {
       
       $this->FireEvent('AddEditCategory');
       
-      if ($this->Form->AuthenticatedPostBack() == FALSE) {
+      if ($this->Form->IsPostBack() == FALSE) {
 			$this->Form->AddHidden('CodeIsDefined', '0');
       } else {
 			// Form was validly submitted
 			$IsParent = $this->Form->GetFormValue('IsParent', '0');
 			$this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
          $CategoryID = $this->Form->Save();
-         if ($CategoryID) {               
-				Redirect('vanilla/settings/managecategories');
+         if ($CategoryID) {
+            $Category = CategoryModel::Categories($CategoryID);
+            $this->SetData('Category', $Category);
+            
+            if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+               Redirect('vanilla/settings/managecategories');
          } else {
 				unset($CategoryID);
 			}
@@ -264,7 +268,9 @@ class SettingsController extends Gdn_Controller {
 		$Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
 		$Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
 	
-      $this->SetData('PermissionData', $Permissions, TRUE);
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
+         $this->SetData('PermissionData', $Permissions, TRUE);
+      }
       
       // Render default view
       $this->Render();      
@@ -377,6 +383,11 @@ class SettingsController extends Gdn_Controller {
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       
+      if (!$CategoryID && $this->Form->IsPostBack()) {
+         if ($ID = $this->Form->GetFormValue('CategoryID'))
+            $CategoryID = $ID;
+      }
+      
       // Get category data
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
@@ -397,17 +408,24 @@ class SettingsController extends Gdn_Controller {
       
       $this->FireEvent('AddEditCategory');
       
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->SetData($this->Category);
       } else {
-         if ($this->Form->Save())
-				Redirect('vanilla/settings/managecategories');
+         if ($this->Form->Save()) {
+            $Category = CategoryModel::Categories($CategoryID);
+            $this->SetData('Category', $Category);
+            
+            if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+               Redirect('vanilla/settings/managecategories');
+         }
       }
        
       // Get all of the currently selected role/permission combinations for this junction.
       $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
       $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
-      $this->SetData('PermissionData', $Permissions, TRUE);
+      
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+         $this->SetData('PermissionData', $Permissions, TRUE);
       
       // Render default view
       $this->Render();

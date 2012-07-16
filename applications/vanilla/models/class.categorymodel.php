@@ -481,8 +481,8 @@ class CategoryModel extends Gdn_Model {
     * @param int $CategoryID Unique ID of category we're getting data for.
     * @return object SQL results.
     */
-   public function GetID($CategoryID) {
-      return $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow();
+   public function GetID($CategoryID, $DatasetType = DATASET_TYPE_OBJECT) {
+      return $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow($DatasetType);
    }
 
    /**
@@ -1058,12 +1058,17 @@ class CategoryModel extends Gdn_Model {
          $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
          if ($Insert === FALSE) {
-            $OldCategory = $this->GetID($CategoryID);
-            $AllowDiscussions = $OldCategory->AllowDiscussions; // Force the allowdiscussions property
+            $OldCategory = $this->GetID($CategoryID, DATASET_TYPE_ARRAY);
+            $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
             $this->Update($Fields, array('CategoryID' => $CategoryID));
-          
-            $this->SetCache($CategoryID, $Fields);
+            
+            // Check for a change in the parent category.
+            if (isset($Fields['ParentCategoryID']) && $OldCategory['ParentCategoryID'] != $Fields['ParentCategoryID']) {
+               $this->RebuildTree();
+            } else {
+               $this->SetCache($CategoryID, $Fields);
+            }
          } else {
             $CategoryID = $this->Insert($Fields);
 

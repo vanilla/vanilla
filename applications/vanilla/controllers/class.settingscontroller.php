@@ -491,11 +491,12 @@ class SettingsController extends Gdn_Controller {
       $this->Permission('Vanilla.Categories.Manage');
       
       // Set delivery type to true/false
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
 		$TransientKey = GetIncomingValue('TransientKey');
-      if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
+      if (Gdn::Request()->IsPostBack()) {
 			$TreeArray = GetValue('TreeArray', $_POST);
-			$this->CategoryModel->SaveTree($TreeArray);
+			$Saves = $this->CategoryModel->SaveTree($TreeArray);
+         $this->SetData('Result', TRUE);
+         $this->SetData('Saves', $Saves);
 		}
          
       // Renders true/false rather than template  

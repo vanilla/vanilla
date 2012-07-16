@@ -78,6 +78,7 @@ class Gdn_Request {
     *  - HOST     -> HTTP_HOST
     *  - METHOD   -> REQUEST_METHOD
     *  - FOLDER   -> none. this is extracted from SCRIPT_NAME and only available after _ParseRequest()
+    *  - SCHEME   -> none. this is derived from 'HTTPS' and 'X-Forwarded-Proto'
     *
     * @param $Key Key to retrieve or set.
     * @param $Value Value of $Key key to set.
@@ -305,7 +306,14 @@ class Gdn_Request {
 
       $this->RequestHost(     isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? ArrayValue('HTTP_X_FORWARDED_HOST',$_SERVER) : (isset($_SERVER['HTTP_HOST']) ? ArrayValue('HTTP_HOST',$_SERVER) : ArrayValue('SERVER_NAME',$_SERVER)));
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? ArrayValue('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
-      $this->RequestScheme(   (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http');
+      
+      $Scheme = 'http';
+      // Webserver-originated SSL
+      if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') $Scheme = 'https';
+      // Loadbalancer-originated (and terminated) SSL
+      if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') $Scheme = 'http';
+      
+      $this->RequestScheme($Scheme);
       
       if (is_array($_GET)) {
          $Get = FALSE;

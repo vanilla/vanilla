@@ -309,9 +309,9 @@ class Gdn_Request {
       
       $Scheme = 'http';
       // Webserver-originated SSL
-      if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') $Scheme = 'https';
+      if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') $Scheme = 'https';
       // Loadbalancer-originated (and terminated) SSL
-      if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') $Scheme = 'http';
+      if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https') $Scheme = 'http';
       
       $this->RequestScheme($Scheme);
       

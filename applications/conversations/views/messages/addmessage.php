@@ -25,7 +25,7 @@ $this->FireEvent('BeforeMessageForm');
          <div class="Form-Body">
             <div class="FormWrapper FormWrapper-Condensed">
                <?php
-               echo $this->Form->Open(array('action' => Url('/messages/addmessage/')));
+               echo $this->Form->Open(array('id' => 'Form_ConversationMessage', 'action' => Url('/messages/addmessage/')));
                echo $this->Form->Errors();
 //               echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'TextBox')), 'div', array('class' => 'TextBoxWrapper'));
                echo $this->Form->BodyBox('Body', array('Table' => 'ConversationMessage'));

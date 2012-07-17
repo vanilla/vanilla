@@ -116,7 +116,7 @@
     display: inline-block;
     height: 14px;
     width: 14px;
-    background: url('http://cdn.vanillaforums.com/images/sprites-14-000000.png') 0 0 no-repeat transparent;
+    background: url('http://cdn.vanillaforums.com/images/sprites-14-000.png') 0 0 no-repeat transparent;
     background-position: 14px 14px;
     vertical-align: top;
     margin: 4px 4px 0 0;
@@ -135,31 +135,31 @@
    margin: 0;
 }
 .SpActivity,
-.SpPublicActivities { background-position: -216px -95px; }
-.SpModeratorActivities { background-position: -287px -48px; }
-.SpAdminActivities { background-position: -262px -47px; }
-.SpUnansweredQuestions { background-position: -96px -272px; } 
-.SpThumbnail { background-position: -240px -95px; } 
-.SpPicture { background-position: -263px -23px; } 
-.SpPassword { background-position: -311px -95px; } 
-.SpAllCategories { background-position: -144px -72px; } 
-.SpMyDrafts { background-position: -264px -72px; } 
-.SpEdit { background-position: -143px -46px; }
-.SpEditProfile { background-position: -239px -23px; }
-.SpComments { background-position: -168px -72px; }
-.SpMyDiscussions { background-position: -336px -24px; }
-.SpDiscussions { background-position: -240px -72px; }
-.SpMessage { background-position: -93px -95px; }
-.SpInbox { background-position: -93px -96px; }
-.SpBookmarks { background-position: -71px -72px; }
+.SpPublicActivities { background-position: -222px -106px; }
+.SpModeratorActivities { background-position: -293px -54px; }
+.SpAdminActivities { background-position: -268px -53px; }
+.SpUnansweredQuestions { background-position: -102px -278px; } 
+.SpThumbnail { background-position: -246px -101px; } 
+.SpPicture { background-position: -269px -29px; } 
+.SpPassword { background-position: -317px -101px; } 
+.SpAllCategories { background-position: -150px -78px; } 
+.SpMyDrafts { background-position: -270px -78px; } 
+.SpEdit { background-position: -149px -52px; }
+.SpEditProfile { background-position: -245px -29px; }
+.SpComments { background-position: -174px -78px; }
+.SpMyDiscussions { background-position: -342px -30px; }
+.SpDiscussions { background-position: -246px -78px; }
+.SpMessage { background-position: -99px -101px; }
+.SpInbox { background-position: -99px -102px; }
+.SpBookmarks { background-position: -77px -78px; }
 .SpPreferences,
-.SpNotifications { background-position: -168px -95px; }
-.SpQuote { background-position: -311px 0; }
-.SpSignatures { background-position: -143px -95px; }
-.SpDashboard { background-position: -215px -48px; }
+.SpNotifications { background-position: -174px -101px; }
+.SpQuote { background-position: -317px -6px; }
+.SpSignatures { background-position: -149px -101px; }
+.SpDashboard { background-position: -221px -54px; }
 .SpInfraction, 
 .SpWarn,
-.SpWarnings { background-position: -94px -46px; }
-.SpBan { background-position: -311px -23px; }
-.SpDelete { background-position: -335px 1px; }
-.SpWhosOnline { background-position: -287px -23px; }
+.SpWarnings { background-position: -100px -52px; }
+.SpBan { background-position: -317px -29px; }
+.SpDelete { background-position: -341px -5px; }
+.SpWhosOnline { background-position: -293px -29px; }

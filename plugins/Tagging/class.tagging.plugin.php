@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.4',
+   'Version' => '1.4.1',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -67,6 +67,10 @@ class TaggingPlugin extends Gdn_Plugin {
       
       if (!property_exists($Sender->EventArguments['Object'], 'CommentID')) {
          $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
+         
+         if (!$DiscussionID)
+            return;
+         
          include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
          $TagModule = new TagModule($Sender);
          $TagModule->GetData($DiscussionID);

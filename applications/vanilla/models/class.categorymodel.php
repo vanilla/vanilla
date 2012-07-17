@@ -481,8 +481,8 @@ class CategoryModel extends Gdn_Model {
     * @param int $CategoryID Unique ID of category we're getting data for.
     * @return object SQL results.
     */
-   public function GetID($CategoryID) {
-      return $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow();
+   public function GetID($CategoryID, $DatasetType = DATASET_TYPE_OBJECT) {
+      return $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow($DatasetType);
    }
 
    /**
@@ -937,6 +937,7 @@ class CategoryModel extends Gdn_Model {
 
       // The tree must be walked in order for the permissions to save properly.
       usort($TreeArray, array('CategoryModel', '_TreeSort'));
+      $Saves = array();
       
       foreach($TreeArray as $I => $Node) {
          $CategoryID = GetValue('item_id', $Node);
@@ -964,22 +965,26 @@ class CategoryModel extends Gdn_Model {
          // Only update if the tree doesn't match the database.
          $Row = $PermTree[$CategoryID];
          if ($Node['left'] != $Row['TreeLeft'] || $Node['right'] != $Row['TreeRight'] || $Node['depth'] != $Row['Depth'] || $ParentCategoryID != $Row['ParentCategoryID'] || $Node['left'] != $Row['Sort'] || $PermCatChanged) {
-            
-            $this->SQL->Update(
-               'Category',
-               array(
+            $Set = array(
                   'TreeLeft' => $Node['left'],
                   'TreeRight' => $Node['right'],
                   'Depth' => $Node['depth'],
                   'Sort' => $Node['left'],
                   'ParentCategoryID' => $ParentCategoryID,
                   'PermissionCategoryID' => $PermissionCategoryID
-               ),
+               );
+            
+            $this->SQL->Update(
+               'Category',
+               $Set,
                array('CategoryID' => $CategoryID)
             )->Put();
+            
+            $Saves[] = array_merge(array('CategoryID' => $CategoryID), $Set);
          }
       }
       self::ClearCache();
+      return $Saves;
    }
    
    /**
@@ -1053,12 +1058,17 @@ class CategoryModel extends Gdn_Model {
          $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
          if ($Insert === FALSE) {
-            $OldCategory = $this->GetID($CategoryID);
-            $AllowDiscussions = $OldCategory->AllowDiscussions; // Force the allowdiscussions property
+            $OldCategory = $this->GetID($CategoryID, DATASET_TYPE_ARRAY);
+            $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
             $this->Update($Fields, array('CategoryID' => $CategoryID));
-          
-            $this->SetCache($CategoryID, $Fields);
+            
+            // Check for a change in the parent category.
+            if (isset($Fields['ParentCategoryID']) && $OldCategory['ParentCategoryID'] != $Fields['ParentCategoryID']) {
+               $this->RebuildTree();
+            } else {
+               $this->SetCache($CategoryID, $Fields);
+            }
          } else {
             $CategoryID = $this->Insert($Fields);
 

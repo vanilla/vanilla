@@ -9,3 +9,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 $Definition['RecipientUserID'] = 'recipient';
+
+
+// Deprecated Translations
+$Definition['Start a New Conversation'] = 'New Message';
+$Definition['New Conversation'] = 'New Message';
+$Definition['Start Conversation'] = 'Post Message';
+

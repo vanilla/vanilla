@@ -1132,8 +1132,8 @@ class Gdn_Form extends Gdn_Pluggable {
     * @todo check that missing DataObject parameter
     */
    public function Open($Attributes = array()) {
-      if ($this->InputPrefix)
-         Trace($this->InputPrefix, 'InputPrefix');
+//      if ($this->InputPrefix)
+//         Trace($this->InputPrefix, 'InputPrefix');
       
       if (!is_array($Attributes))
          $Attributes = array();

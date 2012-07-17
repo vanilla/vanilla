@@ -71,14 +71,13 @@ jQuery(document).ready(function($) {
          toleranceElement: '> div',
          update: function() {
             $.post(
-               gdn.url('/vanilla/settings/sortcategories/'),
+               gdn.url('/vanilla/settings/sortcategories.json'),
                {
                   'TreeArray': $('ol.Sortable').nestedSortable('toArray', {startDepthCount: 0}),
-                  'DeliveryType': 'VIEW',
                   'TransientKey': gdn.definition('TransientKey')
                },
                function(response) {
-                  if (response != 'TRUE') {
+                  if (!response || !response.Result) {
                      alert("Oops - Didn't save order properly");
                   }
                }

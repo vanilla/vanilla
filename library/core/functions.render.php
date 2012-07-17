@@ -479,8 +479,9 @@ if (!function_exists('UserPhoto')) {
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
-      $Photo = $User->Photo;
-      $Title = htmlspecialchars(GetValue('Title', $Options, $User->Name));
+      $Photo = GetValue('Photo', $User);
+      $Name = GetValue('Name', $User);
+      $Title = htmlspecialchars(GetValue('Title', $Options, $Name));
       
       if ($FullUser['Banned']) {
          $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
@@ -498,7 +499,7 @@ if (!function_exists('UserPhoto')) {
          }
          $Href = Url(UserUrl($User));
          return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-            .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
+            .Img($PhotoUrl, array('alt' => htmlspecialchars($Name), 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';

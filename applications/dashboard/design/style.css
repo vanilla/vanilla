@@ -1335,7 +1335,7 @@ overflow: hidden;
 }
 
 .Item.Open {
-   z-index: 90;
+   z-index: 200;
    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)" !Important;
    filter: alpha(opacity=100) !Important;
    opacity: 1 !Important;

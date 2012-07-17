@@ -141,8 +141,8 @@ class Pocket {
       $this->Page = $Data['Page'];
       $this->MobileOnly = $Data['MobileOnly'];
       $this->MobileNever = $Data['MobileNever'];
-      $this->EmbeddedNever = $Data['EmbeddedNever'];
-      $this->ShowInDashboard = $Data['ShowInDashboard'];
+      $this->EmbeddedNever = GetValue('EmbeddedNever', $Data);
+      $this->ShowInDashboard = GetValue('ShowInDashboard', $Data);
 
       // parse the frequency.
       $Repeat = $Data['Repeat'];

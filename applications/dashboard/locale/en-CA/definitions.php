@@ -170,10 +170,6 @@ $Definition['Warning: This is for advanced users.'] = '<b>Warning</b>: This is f
 $Definition['Activity.Delete'] = '×';
 $Definition['Draft.Delete'] = '×';
 $Definition['ConnectName'] = 'Username';
-$Definition['Start a New Discussion'] = 'New Discussion';
-$Definition['Start a New Conversation'] = 'New Message';
-$Definition['New Conversation'] = 'New Message';
-$Definition['Start Conversation'] = 'Post Message';
 $Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
 <p>{Excerpt}</p>
 <p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';

@@ -148,7 +148,9 @@ endif;
 
 if (!function_exists('WriteReactions')):
 function WriteReactions($Row, $Type = 'Comment') {
-   Gdn::Controller()->FireEvent('AfterReactions');
+   echo '<div class="Reactions">';
+      Gdn::Controller()->FireEvent('AfterReactions');
+   echo '</div>';
 }
 endif;
 

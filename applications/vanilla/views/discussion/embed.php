@@ -2,7 +2,8 @@
 $Discussion = $this->Data('Discussion');
 $ForeignSource = $this->Data('ForeignSource');
 $SortComments = $this->Data('SortComments');
-$HasCommentData = property_exists($this, 'CommentData');
+$Comments = $this->Data('Comments', FALSE);
+$HasCommentData = $Comments !== FALSE;
 $Session = Gdn::Session();
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
@@ -16,7 +17,7 @@ echo '</span>';
 
 if ($SortComments == 'desc')
    WriteEmbedCommentForm();
-else if ($HasCommentData && $this->CommentData->NumRows() > 0)
+else if ($HasCommentData && $Comments->NumRows() > 0)
    echo Wrap(T('Comments'), 'h2');
 ?>
 <ul class="DataList MessageList Comments">
@@ -24,8 +25,7 @@ else if ($HasCommentData && $this->CommentData->NumRows() > 0)
    if ($HasCommentData) {
       $this->FireEvent('BeforeCommentsRender');
       $CurrentOffset = $this->Offset;
-      $CommentData = $this->CommentData->Result();
-      foreach ($CommentData as $Comment) {
+      foreach ($Comments as $Comment) {
          ++$CurrentOffset;
          $this->CurrentComment = $Comment;
          WriteComment($Comment, $this, $Session, $CurrentOffset);

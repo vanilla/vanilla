@@ -1250,10 +1250,10 @@ overflow: hidden;
 .DataList .Item {
    margin: 0;
    padding: 8px;
-   border: 0;
+   border: 0px solid #ddd;
+   border: 0px solid rgba(0, 0, 0, 0.1);
+	border-bottom-width: 1px;
 	position: relative;
-	border-bottom: 1px solid #ddd;
-   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 .DataList .Item .Item {
    border: none;

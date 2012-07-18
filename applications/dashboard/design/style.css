@@ -2821,6 +2821,10 @@ only screen and (max-device-width: 480px) {
       color: #fff;
       display: block;
    }
+   
+   .Item .OptionsTitle {
+      visibility: visible;
+   }
 }
 
 /* Small screens */

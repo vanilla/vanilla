@@ -747,7 +747,7 @@ div.Discussion:hover .OptionsTitle:hover,
    border-left: 7px solid transparent;
    border-right: 7px solid transparent;
    content: "";
-   right: 14px;
+   left: 9px;
    position: absolute;
    top: -7px;
 }
@@ -755,6 +755,12 @@ div.Discussion:hover .OptionsTitle:hover,
    border-bottom: 7px solid #fff;
    top: -6px;
 }
+.OptionsMenu .Flyout:before,
+.OptionsMenu .Flyout:after {
+   left: inherit;
+   right: 14px;
+}
+
 .MenuItems {
    line-height: 100%;
    font-size: 11px;
@@ -1335,7 +1341,7 @@ overflow: hidden;
 }
 
 .Item.Open {
-   z-index: 90;
+   z-index: 200;
    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)" !Important;
    filter: alpha(opacity=100) !Important;
    opacity: 1 !Important;
@@ -1864,7 +1870,7 @@ form.Thumbnail .Warning {
 	float: left;
 	line-height: 2.2;
 }
-.Bullet {
+.Reactions .Bullet {
    font-size: 10px;
 }
 .CommentForm .WriteButton,
@@ -2108,7 +2114,8 @@ div.Popup form ul li label.RadioLabel {
 	line-height: 1.2;
 }
 .ItemDiscussion {
-   margin-bottom: 20px;
+   margin-bottom: 12px;
+   padding: 8px;
 }
 /*
 .ItemDiscussion .Message {
@@ -2257,6 +2264,7 @@ tr.CategoryHeading td {
 
 .SpWarn {
    background-position: -96px -84px;
+   background-image: url('images/sprites.png') !important;
    width: 18px;
 }
 
@@ -3354,4 +3362,9 @@ body.embed .InformMessages {
 /* Switch to bordered icons for user reaction overlays */
 .UserReactionWrap .ReactSprite {
    background-image: url('http://cdn.vanillaforums.com/images/sprites-14-000-bordered.png');
+}
+
+.ActionBlock {
+    margin: 15px 0 5px;
+    font-style: italic;
 }

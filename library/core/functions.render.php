@@ -43,12 +43,34 @@ if (!function_exists('Bullet')):
 endif;
 
 if (!function_exists('ButtonGroup')):
-   function ButtonGroup($Links, $CssClass = 'Button') {
+   /**
+    *
+    * @param array $Links An array of arrays with the following keys:
+    *  - Text: The text of the link.
+    *  - Url: The url of the link.
+    * @param string $CssClass The css class of the link.
+    * @param string|false $Default The url of the default link.
+    * @since 2.1
+    */
+   function ButtonGroup($Links, $CssClass = 'Button', $Default = FALSE) {
       if (!is_array($Links) || count($Links) < 1)
          return;
       
       $Text = $Links[0]['Text'];
       $Url = $Links[0]['Url'];
+      
+      if ($Default) {
+         // Find the default button. 
+         $Default = ltrim($Default, '/');
+         foreach ($Links as $Link) {
+            if (StringBeginsWith(ltrim($Link['Url'], '/') , $Default)) {
+               $Text = $Link['Text'];
+               $Url = $Link['Url'];
+               break;
+            }
+         }
+      }
+      
       if (count($Links) < 2) {
          echo Anchor($Text, $Url, $CssClass);
       } else {
@@ -457,8 +479,9 @@ if (!function_exists('UserPhoto')) {
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
-      $Photo = $User->Photo;
-      $Title = htmlspecialchars(GetValue('Title', $Options, $User->Name));
+      $Photo = GetValue('Photo', $User);
+      $Name = GetValue('Name', $User);
+      $Title = htmlspecialchars(GetValue('Title', $Options, $Name));
       
       if ($FullUser['Banned']) {
          $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
@@ -476,7 +499,7 @@ if (!function_exists('UserPhoto')) {
          }
          $Href = Url(UserUrl($User));
          return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-            .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
+            .Img($PhotoUrl, array('alt' => htmlspecialchars($Name), 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';

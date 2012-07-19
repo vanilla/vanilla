@@ -1297,6 +1297,9 @@ overflow: hidden;
 .CommentInfo {
    line-height: 1.5; 
 }
+.Item .AuthorInfo {
+   font-size: 11px;
+}
 .DataList .Excerpt {
    font-size: 12px;
 	line-height: 1.4;

@@ -766,6 +766,8 @@ class EntryController extends Gdn_Controller {
                      if ($HourOffset != Gdn::Session()->User->HourOffset) {
                         Gdn::UserModel()->SetProperty(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
                      }
+                     
+                     Gdn::UserModel()->FireEvent('AfterSignIn');
 
                      $this->_SetRedirect();
                   }

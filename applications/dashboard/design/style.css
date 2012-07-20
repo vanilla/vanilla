@@ -378,6 +378,13 @@ select {
 #Panel .ButtonGroup.Big > .Button:first-child {
     width: 78%;
 }
+
+.Gloss {
+   font-size: 80%;
+   font-weight: normal;
+   color: #666;
+}
+
 .Loading {
    height: 100px;
    padding: 0 20px;

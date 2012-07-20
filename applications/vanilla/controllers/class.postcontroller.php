@@ -336,11 +336,18 @@ class PostController extends VanillaController {
             $Title = T('Undefined discussion subject.');
          $Description = GetValue('Description', $PageInfo, '');
          $Images = GetValue('Images', $PageInfo, array());
-         $Body = FormatString(T('EmbededDiscussionFormat'), array(
+         $LinkText = T('EmbededDiscussionLinkText', 'Read the full story here');
+         $Body = FormatString('
+         <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
+            <p>{Excerpt}</p>
+            <p><a href="{Url}">{LinkText}</a></p>
+            <div class="ClearFix"></div>
+         </div>', array(
              'Title' => $Title,
              'Excerpt' => $Description,
              'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
-             'Url' => $vanilla_url
+             'Url' => $vanilla_url,
+             'LinkText' => $LinkText
          ));
          if ($Body == '')
             $Body = $vanilla_url;

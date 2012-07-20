@@ -226,8 +226,14 @@ class Gdn_Session {
 
 	public function SetPermission($PermissionName, $Value = NULL) {
 		if (is_string($PermissionName)) {
-			if ($Value === NULL) $this->_Permissions[] = $PermissionName;
-			elseif (is_array($Value)) $this->_Permissions[$PermissionName] = $Value;
+			if ($Value === NULL || $Value === TRUE) 
+            $this->_Permissions[] = $PermissionName;
+         elseif ($Value === FALSE) {
+            $Index = array_search($PermissionName, $this->_Permissions);
+            if ($Index !== FALSE)
+               unset($this->_Permissions[$Index]);
+			} elseif (is_array($Value)) 
+            $this->_Permissions[$PermissionName] = $Value;
 		} elseif (is_array($PermissionName)) {
 			if (array_key_exists(0, $PermissionName))
 				foreach ($PermissionName as $Name) $this->SetPermission($Name);

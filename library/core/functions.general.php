@@ -941,7 +941,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    $Field = trim($Parts[0]);
    $Format = trim(GetValue(1, $Parts, ''));
    $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
-   $FomatArgs = GetValue(3, $Parts, '');
+   $FormatArgs = GetValue(3, $Parts, '');
 
    if (in_array($Format, array('currency', 'integer', 'percent'))) {
       $FormatArgs = $SubFormat;
@@ -1000,13 +1000,20 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             }
             break;
          case 'plural':
+            if (is_array($Value))
+               $Value = count($Value);
+            elseif (StringEndsWith($Field, 'UserID', TRUE))
+               $Value = 1;
+            
             if(!is_numeric($Value)) {
                $Result = $Value;
             } else {
                if (!$SubFormat)
-                  $SubFormat = "%s $Field";
+                  $SubFormat = rtrim("%s $Field", 's');
+               if (!$FormatArgs)
+                  $FormatArgs = $SubFormat.'s';
                
-               $Result = Plural($Value, rtrim($SubFormat, 's'), rtrim($SubFormat, 's').'s');
+               $Result = Plural($Value, $SubFormat, $FormatArgs);
             }
             break;
          case 'rawurlencode':

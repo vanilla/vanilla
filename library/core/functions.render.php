@@ -200,6 +200,14 @@ function CssClass($Row) {
       
       if ($_CssClss = GetValue('_CssClass', $Row))
          $CssClass .= ' '.$_CssClss;
+      
+      // Insert User classes.
+      if ($UserID = GetValue('InsertUserID', $Row)) {
+         $User = Gdn::UserModel()->GetID($UserID);
+         if ($_CssClss = GetValue('_CssClass', $User)) {
+            $CssClass .= ' '.$_CssClss;
+         }
+      }
 
    return trim($CssClass);
 }

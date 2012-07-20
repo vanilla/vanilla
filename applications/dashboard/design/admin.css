@@ -22,6 +22,12 @@ Welcome to the Admin CSS File! Some things you should know:
    + Themes
    + Footer
 */
+.Buttons-Confirm {
+   text-align: center;
+}
+.Buttons-Confirm .Button {
+   min-width: 65px;
+}
    
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,

@@ -103,7 +103,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
             </span>
             <span class="AuthorInfo">
                <?php
-               echo WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
+               echo ' '.WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
                $Sender->FireEvent('AuthorInfo'); 
                ?>
             </span>   

@@ -422,6 +422,9 @@ class UserModel extends Gdn_Model {
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0));
       }
+      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         unset($Data['RankID']);
+      }
       if (!Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
          unset($Data['Name']);
       }

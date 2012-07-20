@@ -38,6 +38,16 @@ echo $this->Form->Errors();
          echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
       ?>
    </li>
+   
+   <?php if (C('Garden.Profile.Titles', FALSE)): ?>
+   <li class="User-Title">
+      <?php
+         echo $this->Form->Label('Title', 'Title');
+         echo $this->Form->TextBox('Title');
+      ?>
+   </li>
+   <?php endif; ?>
+   
    <?php
       $this->FireEvent('EditMyAccountAfter');
    ?>

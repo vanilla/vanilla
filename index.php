@@ -24,7 +24,7 @@ ob_start();
 
 // 1. Define the constants we need to get going.
 define('DS', '/');
-define('PATH_ROOT', dirname(__FILE__));
+define('PATH_ROOT', getcwd());
 
 // 2. Include the bootstrap to configure the framework.
 require_once(PATH_ROOT.'/bootstrap.php');

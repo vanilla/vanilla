@@ -325,7 +325,7 @@ class TaggingPlugin extends Gdn_Plugin {
       if ($Query) {
          $Test = Gdn::SQL()->Limit(1)->Get('Tag')->FirstRow(DATASET_TYPE_ARRAY);
          if (isset($Test['Type'])) {
-            Gdn::SQL()->Where('Type', ''); // other uis can set a different type
+            Gdn::SQL()->Where('Type is null'); // other uis can set a different type
          }
          
          $TagData = Gdn::SQL()->Select('TagID, Name')->From('Tag')->Like('Name', $Query)->Limit(20)->Get();

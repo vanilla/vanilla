@@ -5,6 +5,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
    
 ?>
 <div class="About P">
+   <h2 class="H"><?php echo T('About'); ?></h2>
    <dl class="About">
       <?php
       if ($this->User->Banned) {

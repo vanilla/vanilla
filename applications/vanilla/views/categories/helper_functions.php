@@ -197,9 +197,11 @@ function WriteTableRow($Row, $Depth = 1) {
    <tr class="<?php echo CssClass($Row); ?>">
       <td class="CategoryName">
          <?php 
-         echo Wrap(
-            Anchor($Row['Name'], $Row['Url']),
-            $H);
+            echo "<{$H}>";
+            echo Anchor($Row['Name'], $Row['Url']);
+            Gdn::Controller()->EventArguments['Category'] = $Row;
+            Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
+            echo "</{$H}>";
          ?>
          <div class="CategoryDescription">
             <?php echo $Row['Description']; ?>

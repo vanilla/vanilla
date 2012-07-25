@@ -77,6 +77,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->FireEvent('BeforeCommentDisplay'); ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
    <div class="Comment">
+      
       <?php
       // Write a stub for the latest comment so it's easy to link to it from outside.
       if ($CurrentOffset == Gdn::Controller()->Data('_LatestItem')) {
@@ -99,6 +100,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                   echo UserPhoto($Author);
                }
                echo FormatMeAction($Comment);
+               $Sender->FireEvent('AuthorPhoto'); 
                ?>
             </span>
             <span class="AuthorInfo">

@@ -315,13 +315,15 @@ select {
 /* Split Button Dropdown */
 .ButtonGroup > .NavButton:first-child,
 .ButtonGroup > .Button:first-child {
-    border-radius: 2px 0 0 2px;
+   border-top-right-radius: 0;
+   border-bottom-right-radius: 0;
 }
 .Button.Handle {
-    border-radius: 0 2px 2px 0;
-    font-size: 12px;
-    line-height: 1;
-    border-left: 0;
+   border-top-left-radius: 0;
+   border-bottom-left-radius: 0;
+   font-size: 12px;
+   line-height: 1;
+   border-left: 0;
 }
 .NavButton.Handle {
     border-radius: 0 2px 2px 0;
@@ -1765,10 +1767,6 @@ table.PreferenceGroup th,
 #Form_Invitation table th {
    font-weight: bold;
    text-align: left;
-}
-body.Profile ul.Notifications {
-	border-top: 0;
-	margin-top: 0;
 }
 /* Preferences Form */
 .Preferences h3 {

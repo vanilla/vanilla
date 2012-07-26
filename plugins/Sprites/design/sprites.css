@@ -81,6 +81,7 @@
 }
 
 */
+.SpIgnoreList,
 .SpWhosOnline,
 .SpDelete,
 .SpBan,
@@ -161,5 +162,6 @@
 .SpWarn,
 .SpWarnings { background-position: -100px -52px; }
 .SpBan { background-position: -317px -29px; }
+.SpIgnoreList,
 .SpDelete { background-position: -341px -5px; }
 .SpWhosOnline { background-position: -293px -29px; }

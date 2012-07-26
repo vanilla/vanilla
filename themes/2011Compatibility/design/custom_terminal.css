@@ -309,7 +309,8 @@ a:hover {
 }
 body.Profile.EditMode #Content form,
 .FormWrapper,
-.Box {
+.Box,
+.Item.Read {
    background: #272727;
 }
 .PanelInfo .Heading,

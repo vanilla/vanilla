@@ -405,6 +405,9 @@ jQuery(document).ready(function($) {
             case 'Redirect':
                window.location.replace(item.Data);
                break;
+            case 'Refresh':
+               window.location.reload();
+               break;
             case 'Remove':
                $target.remove();
                break;

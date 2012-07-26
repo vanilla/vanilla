@@ -328,7 +328,7 @@ if (!class_exists('HeadModule', FALSE)) {
             $this->AddTag('meta', array('property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
          
          if (isset($CanonicalUrl))
-            $this->AddTag('meta', array('property' => 'og:url', 'conent' => $CanonicalUrl));
+            $this->AddTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
          
          if ($Description = $this->_Sender->Description()) {
             $this->AddTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));

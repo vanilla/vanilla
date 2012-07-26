@@ -1268,7 +1268,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $LiClose = '</li>';
       } else {
          $LiOpen = '';
-         $LiClose = '';
+         $LiClose = ' ';
       }
       
       // Show inline errors?

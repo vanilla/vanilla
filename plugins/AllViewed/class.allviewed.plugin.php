@@ -52,7 +52,7 @@ class AllViewedPlugin extends Gdn_Plugin {
          
 			$CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
 			if ($CategoryID > 0)
-            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed?categoryid={$CategoryID}"), 'li');
+            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li');
 		}
 	}
 	
@@ -62,24 +62,25 @@ class AllViewedPlugin extends Gdn_Plugin {
 	 * @since 2.0
 	 * @access private
 	 */
-	private function markCategoryRead($CategoryModel, $CategoryID) {
+	private function MarkCategoryRead($CategoryModel, $CategoryID) {
 		$CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
 	}
 
 	/**
 	 * Allows user to mark all discussions in a specified category as viewed.
 	 *
+    * @param DiscussionsController $Sender
 	 * @since 1.0
 	 * @access public
 	 */
-	public function DiscussionsController_MarkCategoryViewed_Create($Sender) {
-		$CategoryID = $_GET['categoryid'];
+	public function DiscussionsController_MarkCategoryViewed_Create($Sender, $CategoryID) {
 		if (strlen($CategoryID) > 0 && (int)$CategoryID > 0) {
-			$CategoryModel = new CategoryModel();
-			$this->markCategoryRead($CategoryModel, $CategoryID);
-			$this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array($CategoryID));
+         $CategoryModel = new CategoryModel();
+			$this->MarkCategoryRead($CategoryModel, $CategoryID);
+			$this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array($CategoryID));
 		}
-		Redirect($_SERVER["HTTP_REFERER"]);
+      
+		Redirect(Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER'));
 	}
 
 	/**
@@ -88,12 +89,12 @@ class AllViewedPlugin extends Gdn_Plugin {
 	 * @since 2.0
 	 * @access private
 	 */
-	private function recursiveMarkCategoryRead($CategoryModel, $UnprocessedCategories, $ParentIDs) {
+	private function RecursiveMarkCategoryRead($CategoryModel, $UnprocessedCategories, $ParentIDs) {
 		$CurrentUnprocessedCategories = array();
 		$CurrentParentIDs = $ParentIDs;
 		foreach ($UnprocessedCategories as $Category) {
 			if (in_array($Category["ParentCategoryID"], $ParentIDs)) {
-				$this->markCategoryRead($CategoryModel, $Category["CategoryID"]);
+				$this->MarkCategoryRead($CategoryModel, $Category["CategoryID"]);
 				// Don't add duplicate ParentIDs
 				if (!in_array($Category["CategoryID"], $CurrentParentIDs)) {
 					$CurrentParentIDs[] = $Category["CategoryID"];
@@ -104,7 +105,7 @@ class AllViewedPlugin extends Gdn_Plugin {
 			}
 		}
 		// Base case: if we have not found any new parent ids, we don't need to recurse
-		if (count($ParentIDs) != count(CurrentParentIDs)) {
+		if (count($ParentIDs) != count($CurrentParentIDs)) {
 			$this->RecursiveMarkCategoryRead($CategoryModel, $CurrentUnprocessedCategories, $CurrentParentIDs);
 		}
 	}
@@ -117,8 +118,8 @@ class AllViewedPlugin extends Gdn_Plugin {
 	 */
 	public function DiscussionsController_MarkAllViewed_Create($Sender) {
 		$CategoryModel = new CategoryModel();
-		$this->markCategoryRead($CategoryModel, -1);
-		$this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array(-1));
+		$this->MarkCategoryRead($CategoryModel, -1);
+		$this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array(-1));
 		Redirect($_SERVER["HTTP_REFERER"]);
 	}
 
@@ -151,7 +152,7 @@ class AllViewedPlugin extends Gdn_Plugin {
 	 * @since 2.0
 	 * @access private
 	 */
-	private function checkDiscussionDate($Discussion, $DateAllViewed) {
+	private function CheckDiscussionDate($Discussion, $DateAllViewed) {
 		if (Gdn_Format::ToTimestamp($Discussion->DateInserted) > $DateAllViewed) {
 			// Discussion is newer than DateAllViewed
 			return;
@@ -186,7 +187,7 @@ class AllViewedPlugin extends Gdn_Plugin {
 			$CategoryModel = CategoryModel::Categories($Discussion->CategoryID);
 			$CategoryLastDate = Gdn_Format::ToTimestamp($CategoryModel["DateMarkedRead"]);
 			if ($CategoryLastDate != 0) {
-				$this->checkDiscussionDate($Discussion, $CategoryLastDate);
+				$this->CheckDiscussionDate($Discussion, $CategoryLastDate);
 			}
 		}
 	}

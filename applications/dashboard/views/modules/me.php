@@ -63,6 +63,8 @@ if ($Session->IsValid()):
                   echo Wrap(Anchor(T('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li');
                   echo Wrap(Anchor(T('Dashboard'), '/dashboard/settings'), 'li');
                }
+               
+               $this->FireEvent('FlyoutMenu');
                echo Wrap('<hr />', 'li');
                echo Wrap(Anchor(T('Sign Out'), SignOutUrl()), 'li');
          echo '</div>';

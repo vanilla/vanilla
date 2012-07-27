@@ -264,8 +264,8 @@ class ProfileController extends Gdn_Controller {
             $this->Form->SetFormValue("Email", $User->Email);
       }
       
-      $this->Title(T('Edit Account'));
-      $this->_SetBreadcrumbs(T('Edit Account'), '/profile/edit');
+      $this->Title(T('Edit Profile'));
+      $this->_SetBreadcrumbs(T('Edit Profile'), '/profile/edit');
       $this->Render();
    }
    
@@ -1018,7 +1018,7 @@ class ProfileController extends Gdn_Controller {
 //              $this->AddJsFile('jquery.gardenmorepager.js');
            $this->AddJsFile('user.js');
          }
-         
+         $Module->AddLink('Options', Sprite('SpEdit').T('Edit Profile'), UserUrl($this->User, '', 'edit'), FALSE, array('class' => 'Popup EditAccountLink'));
          $Module->AddLink('Options', Sprite('SpEdit').T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
          $Module->AddLink('Options', Sprite('SpDelete').T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
          if ($this->User->Photo != '' && $AllowImages)
@@ -1042,7 +1042,7 @@ class ProfileController extends Gdn_Controller {
          // Vanilla's login form regardless of the state of their membership in the 
          // external app.
          if (Gdn::Config('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
-            $Module->AddLink('Options', Sprite('SpEdit').T('Edit My Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+            $Module->AddLink('Options', Sprite('SpEdit').T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
                
             // No password may have been set if they have only signed in with a connect plugin
             $passwordLabel = T('Change My Password');

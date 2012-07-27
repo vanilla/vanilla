@@ -1227,9 +1227,9 @@ overflow: hidden;
     display: none; /* display: block to reveal this */
 }
 .PageControls {
-    margin: 10px 0;
+    margin: 5px 0;
+    min-height: 24px;
 }
-
 
 /* ================================================ DataList */
 /* Note: DataList is used in search results, vanilla discussions & drafts */
@@ -1352,9 +1352,9 @@ overflow: hidden;
 
 .Item.Open {
    z-index: 200;
-   -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)" !Important;
-   filter: alpha(opacity=100) !Important;
-   opacity: 1 !Important;
+   -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(enabled=false)" !important;
+   filter: alpha(enabled=false) !important;
+   opacity: 1 !important;
 }
 /*
 .Read {

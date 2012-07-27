@@ -16,7 +16,7 @@ $PluginInfo['Pockets'] = array(
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-   'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+   'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RegisterPermissions' => array('Plugins.Pockets.Manage'),
    'SettingsUrl' => '/settings/pockets',
    'SettingsPermission' => 'Plugins.Pockets.Manage',

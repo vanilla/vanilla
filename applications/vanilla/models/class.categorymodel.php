@@ -344,8 +344,8 @@ class CategoryModel extends Gdn_Model {
             if ($DoHeadings && $Category['Depth'] <= 1) {
                $Categories[$ID]['Read'] = FALSE;
             } elseif ($DateMarkedRead) {
-               if (GetValue('DateLastComment', $Category))
-                  $Categories[$ID]['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['DateLastComment']);
+               if (GetValue('DateLastInserted', $Category))
+                  $Categories[$ID]['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['DateLastInserted']);
                else
                   $Categories[$ID]['Read'] = TRUE;
             } else {

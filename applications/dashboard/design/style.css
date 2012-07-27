@@ -548,39 +548,25 @@ a.Small img {
 .DismissMessage a.Dismiss {
 	font-family: arial;
    position: absolute;
-	font-size: 22px;
+	font-size:16px;
 	font-weight: bold;
    line-height: 1;
-   color: #999;
-	top: 3px;
-	right: 5px;
-}
-.DismissMessage a.Dismiss,
-.DismissMessage a.Dismiss:hover {
-   border-radius: 0;
-   -moz-border-radius: 0;
-   -webkit-border-radius: 0;
    color: #777;
-   display: block;
-   height:14px;
-   margin:0;
-   padding:1px 3px 2px 4px;
-   width:auto;
-   font-family:arial;
-   font-size:16px;
-   font-weight:bold;
-   right: -1px;
-   top: -1px;
-}
-.DismissMessage strong,
-.DismissMessage b {
-	font-weight: bold;
+	top: -1px;
+	right: -1px;
+   padding:1px 3px;
+   text-decoration: none;
 }
 .DismissMessage a.Dismiss:hover {
-   text-decoration: none;
    border: none;
    background: #333;
    color: #fff;
+}
+
+
+.DismissMessage strong,
+.DismissMessage b {
+	font-weight: bold;
 }
 .DismissMessage {
 	font-size: 13px;
@@ -1616,6 +1602,24 @@ img.LeftAlign {
    margin: 0 10px 5px 0;
    max-width: 300px;
 }
+
+.Message dt {
+    font-weight: bold;
+    margin: 10px 0 4px;
+}
+
+.Message dd {
+    margin-left: 30px;
+}
+
+.Message dd > p {
+    margin-top: 4px;
+}
+
+.Message li {
+    margin: 5px 0;
+}
+
 .ClearFix {
    clear: both;
 }
@@ -1911,10 +1915,6 @@ form.Thumbnail .Warning {
 /* =================================================================== Popups */
 .Popup .Info {
 	margin-top: 10px;
-}
-.Popup .Loading {
-   display: block;
-	width: 200px;
 }
 .Overlay {
   position: absolute;

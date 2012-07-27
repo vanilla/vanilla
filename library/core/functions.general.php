@@ -1038,6 +1038,32 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
          case 'urlencode':
             $Result = urlencode($Value);
             break;
+         case 'gender':
+            // Format in the form of FieldName,gender,male,female,unknown
+            
+            if (is_array($Value) && count($Value) == 1)
+               $Value = array_shift($Value);
+            
+            $Gender = 'u';
+            
+            if (!is_array($Value)) {
+               $User = Gdn::UserModel()->GetID($Value);
+               if ($User)
+                  $Gender = $User->Gender;
+            }
+            
+            switch($Gender) {
+               case 'm':
+                  $Result = $SubFormat;
+                  break;
+               case 'f':
+                  $Result = $FormatArgs;
+                  break;
+               default:
+                  $Result = GetValue(4, $Parts);
+            }
+            
+            break;
          case 'user':
          case 'you':
          case 'his':

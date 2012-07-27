@@ -290,9 +290,10 @@ class ProfileController extends Gdn_Controller {
          $this->Head->AddTag('meta', array('name' => 'googlebot', 'content' => 'noindex'));
       }
 
-      if ($this->User->UserID == Gdn::Session()->UserID)
-         return $this->Notifications($Page);
-      elseif (C('Garden.Profile.ShowActivities', TRUE))
+      // if ($this->User->UserID == Gdn::Session()->UserID)
+      //    return $this->Notifications($Page);
+      // elseif (C('Garden.Profile.ShowActivities', TRUE))
+      if (C('Garden.Profile.ShowActivities', TRUE))
          return $this->Activity($User, $Username, $UserID);
       else
          return Gdn::Dispatcher()->Dispatch(UserUrl($this->User, '', 'discussions'));
@@ -1090,6 +1091,10 @@ class ProfileController extends Gdn_Controller {
          if ($this->User->UserID != $Session->UserID)
             $ActivityUrl = UserUrl($this->User, '', 'activity');
          
+         // Show activity?
+         if (C('Garden.Profile.ShowActivities', TRUE))
+            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity', Sprite('SpActivity').T('Activity'));
+            
          // Show notifications?
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = T('Notifications');
@@ -1105,10 +1110,6 @@ class ProfileController extends Gdn_Controller {
          if (C('Garden.Registration.Method') == 'Invitation')
             $this->AddProfileTab(T('Invitations'), 'profile/invitations', 'InvitationsLink');
          
-         // Show activity?
-         if (C('Garden.Profile.ShowActivities', TRUE))
-            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity', Sprite('SpActivity').T('Activity'));
-            
          $this->FireEvent('AddProfileTabs');
       }
       

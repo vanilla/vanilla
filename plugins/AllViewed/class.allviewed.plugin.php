@@ -38,19 +38,21 @@ $PluginInfo['AllViewed'] = array(
  * @package AllViewed
  */
 class AllViewedPlugin extends Gdn_Plugin {
+   
 	/**
 	 * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to main menu.
 	 *
 	 * @since 1.0
 	 * @access public
 	 */
-	public function Base_Render_Before($Sender) {
+	public function MeModule_FlyoutMenu_Handler($Sender) {
 		// Add "Mark All Viewed" to menu
-		if ($Sender->Menu && Gdn::Session()->IsValid() && C('Plugins.AllViewed.ShowInMenu', TRUE)) {
-			$Sender->Menu->AddLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
-			$CategoryID = (int)(empty($Sender->CategoryID) ? 0 : $Sender->CategoryID);
+		if (Gdn::Session()->IsValid() && C('Plugins.AllViewed.ShowInMenu', TRUE)) {
+         echo Wrap(Anchor(T('Mark All Viewed'), '/discussions/markallviewed'), 'li');
+         
+			$CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
 			if ($CategoryID > 0)
-				$Sender->Menu->AddLink('AllViewed', T('Mark Category Viewed'), '/discussions/markcategoryviewed?categoryid=' . $CategoryID);
+            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed?categoryid={$CategoryID}"), 'li');
 		}
 	}
 	

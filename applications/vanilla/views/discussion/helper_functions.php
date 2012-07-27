@@ -135,8 +135,10 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                   echo FormatBody($Comment);
                ?>
             </div>
-            <?php $Sender->FireEvent('AfterCommentBody'); ?>
-            <?php WriteReactions($Comment); ?>
+            <?php 
+            $Sender->FireEvent('AfterCommentBody');
+            WriteReactions($Comment); 
+            ?>
          </div>
       </div>
    </div>

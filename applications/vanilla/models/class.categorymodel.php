@@ -1186,6 +1186,7 @@ class CategoryModel extends Gdn_Model {
       $Categories[$ID] = $Category;
       self::CalculateData($Categories);
       Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+      self::$Categories = $Categories;
    }
    
    public function SetField($ID, $Property, $Value = FALSE) {

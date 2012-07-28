@@ -15,7 +15,7 @@ endif;
 
 if (!function_exists('GetOptions')):
 /**
- * Render options that the user has for this discussion.
+ * Render options that the user has for this category.
  */
 function GetOptions($Category) {
    if (!Gdn::Session()->IsValid())
@@ -41,7 +41,7 @@ function GetOptions($Category) {
       $Options .= '<li>'.Anchor(T('Hide'), "/vanilla/category/follow?categoryid=$CategoryID&value=0&tkey=$TKey").'</li>';
 
    // Allow plugins to add options
-   $Sender->FireEvent('DiscussionOptions');
+   $Sender->FireEvent('CategoryOptions');
 
    if ($Options != '') {
          $Result .= '<span class="ToggleFlyout OptionsMenu">';
@@ -197,6 +197,7 @@ function WriteTableRow($Row, $Depth = 1) {
    <tr class="<?php echo CssClass($Row); ?>">
       <td class="CategoryName">
          <?php 
+            echo GetOptions($Row);
             echo "<{$H}>";
             echo Anchor($Row['Name'], $Row['Url']);
             Gdn::Controller()->EventArguments['Category'] = $Row;

@@ -45,7 +45,9 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
-       'valid_xml' => 2
+       'valid_xhtml' => 0,
+       'direct_list_nest' => 1,
+       'balance' => 1
       );
       // We check the flag within Gdn_Format to see
       // if htmLawed should place rel="nofollow" links
@@ -65,8 +67,8 @@ class HTMLawedPlugin extends Gdn_Plugin {
          // Deny all class and style attributes.
          // A lot of damage can be done by hackers with these attributes.
          $Config['deny_attribute'] .= ',style';
-      } else {
-         $Config['hook_tag'] = 'HTMLawedHookTag';
+//      } else {
+//         $Config['hook_tag'] = 'HTMLawedHookTag';
       }
 
       $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
@@ -106,7 +108,12 @@ function FormatRssHtmlCustom($Html) {
 }
 endif;
 
-function HTMLawedHookTag($Element, $Attributes) {
+function HTMLawedHookTag($Element, $Attributes = 0) {
+   // If second argument is not received, it means a closing tag is being handled 
+   if($Attributes === 0){ 
+      return "</$Element>"; 
+   }
+   
    $Attribs = '';
    foreach ($Attributes as $Key => $Value) {
       if (strcasecmp($Key, 'style') == 0) {
@@ -116,5 +123,8 @@ function HTMLawedHookTag($Element, $Attributes) {
 
       $Attribs .= " {$Key}=\"{$Value}\"";
    }
-   return "<{$Element}{$Attribs}>";
+   
+   static $empty_elements = array('area'=>1, 'br'=>1, 'col'=>1, 'embed'=>1, 'hr'=>1, 'img'=>1, 'input'=>1, 'isindex'=>1, 'param'=>1); 
+   
+   return "<{$Element}{$Attribs}". (isset($empty_elements[$Element]) ? ' /' : ''). '>';
 }

@@ -1,8 +1,8 @@
 /*
-htmLawed_TESTCASE.txt, 17 May 2010
-htmLawed 1.1.9.3, 17 May 2010
+htmLawed_TESTCASE.txt, 22 July 2012
+htmLawed 1.1.13, 22 July 2012
 Copyright Santosh Patnaik
-LGPL v3 license
+Dual licensed with LGPL 3 and GPL 2+
 A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed
 */
 
@@ -27,6 +27,7 @@ character encoding to Unicode/UTF-8
 <strong>Duplicated:</strong> <a id="id5" id="id6">a</a><br />
 <strong>Deprecated:</strong> <a id="id7" target="self" name="n">a</a>, <hr noshade="noshade" /><br />
 <strong>Casing:</strong> <a HREF=""></a><br />
+<strong>Custom:</strong> <img alt="image" my:data="portrait" /><br />
 <strong>Admin-restricted?:</strong> <a href="x" onclick="alert();"></a>
 
 <h6>Attribute values</h6>
@@ -236,6 +237,11 @@ Invalid:</strong> <em <!-- check -->>comment in tag content</em>, <!--check-->
  <li>l3</li>
  <li>l4<ol><li>lo3</li><li>lo4<ol><li>lo5</li></ol></li></ol></li>
 </ul><br />
+<strong>Nested, directly</strong>: <ul>
+ <li>l1</li>
+ <ol>l2</ol>
+ <li>l3</li>
+</ul><br />
 <strong>Nested, close-tags omitted</strong>: <ul>
  <li>l1</li>
  <li>l2<ol><li>lo1<li>lo2</ol>
@@ -253,6 +259,19 @@ Invalid:</strong> <em <!-- check -->>comment in tag content</em>, <!--check-->
 			</form>
 		</li></ul>
 </td></tr></table></li></ol>
+
+<h6>Microdata</h6>
+
+<div itemscope itemtype="http://data-vocabulary.org/Person"> 
+I am <span itemprop="name">X</span> but people call me <span itemprop="nickname">Y</span>. 
+Find me at <a href="http://www.xy.com" itemprop="url">www.xy.com</a>
+</div>
+
+<h6>Microsoft Word</h6>
+
+<strong>Proprietary tag</strong>: <p class=3DMsoNormal><o:p>&nbsp;</o:p></p><br />
+<strong>XML declaration</strong>: <?xml:namespace prefix = o ns = "urn:schemas-microsoft-com:office:office" /><br />
+<strong>XML-invalid character code-point (may not replicate)</strong>: <p class=3DMsoNormal>“Where is he?” asked both Mary – the one so lovely – and Jane.</p>
 
 <h6>Non-English text-1</h6>
 
@@ -332,6 +351,7 @@ na Alemanha.
 <strong>Relative and absolute:</strong> <a href="mailto:x"></a>, <a href="http://a.com/b/c/d.f"></a>, <a href="./../d.f"></a>, <a href="./d.f"></a>, <a href="d.f"></a>, <a href="#s"></a>, <a href="./../../d.f#s"></a><br />
 (try base URL value of 'http://a.com/b/')<br />
 <strong>CSS URLs:</strong> <div style="background-image: url('a.gif');"></div>, <div style="background-image: URL(&quot;a.gif&quot;);"></div>, <div style="background-image: url('http://a.com/a.gif');"></div>, <div style="background-image: url('./../a.gif');"></div>, <div style="background-image: &#117;r&#x6C;('js&#58;xss'&#x29;"></div><br />
+<strong>Double URLs:</strong> <a style="behaviour: url(foo) url(http://example.com/xss.htc)">b</a><br />
 <strong>Anti-spam:</strong> (try regex for 'http://a.com', etc.) <a href="mailto:x@y.com"></a>, <a href="http://a.com/b@d.f"></a>, <a href="a.com/d.f" rel="nofollow"></a>, <a href="a.com/d.f" rel="1, 2"></a>, <a href="a.com/d.f"></a>, <a href="b.com/d.f"></a>, <a href="c.com/d.f">, <a href="denied:http://c.com/d.f"></a><br />
 
 <h6>XSS</h6>
@@ -381,3 +401,14 @@ script:eval(document.all.mycode.expr)')">hi</a><br />
 3 < 4 <br />
 3 > 4 <br />
   > 3 <br />
+<._.> hi! <br />
+<<< ALERT >>> <br />
+if(13<age AND 21>age){say 'teen'} <br />
+age >51 and a smoking history of >51 pack-years <b>was</b> <br />
+age > 51 and a smoking history of >51 pack-years <b>was</b> <br />
+age <51 and a smoking history of <51 pack-years <b>was</b> <br />
+age < 51 and a smoking history of < 51 pack-years <b>was</b> <br />
+<b>age >51 and a smoking history of >51 pack-years</b> <br />
+<b>age > 51 and a smoking history of >51 pack-years</b> <br />
+<b>age <51 and a smoking history of <51 pack-years</b> <br />
+<b>age < 51 and a smoking history of < 51 pack-years</b> <br />

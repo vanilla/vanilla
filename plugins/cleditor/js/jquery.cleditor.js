@@ -93,7 +93,8 @@ jQuery(document).ready(function($) {
       "paste,,|" +
       "pastetext,Paste as Text,inserthtml,|" +
       "print,,|" +
-      "source,Show Source"
+      "source,Show Source|" +
+      "fullscreen,Expand,fullscreen"
     },
 
     // imagesPath - returns the path to the images folder
@@ -248,6 +249,10 @@ jQuery(document).ready(function($) {
         
         // Get the button definition
         var button = buttons[buttonName];
+        
+        if (button == undefined) {
+           alert(buttonName);
+        }
 
         // Add a new button to the group
         var $buttonDiv = $(DIV_TAG)
@@ -399,6 +404,20 @@ jQuery(document).ready(function($) {
       // IE requires the timeout
       setTimeout(function() {refreshButtons(editor);}, 100);
 
+    }
+    
+    else if (buttonName == "fullscreen") {
+       if (editor.originalHeight == undefined) {
+          editor.originalHeight = editor.$area.height();
+       }
+       var newHeight = 800;
+       
+       if (editor.$area.height() >= newHeight - 10) {
+          newHeight = editor.originalHeight;
+       }
+       
+       editor.$frame.height(newHeight);
+       editor.$area.height(newHeight);
     }
 
     // Check for rich text mode
@@ -954,7 +973,9 @@ jQuery(document).ready(function($) {
         if (enabled === undefined)
           enabled = true;
       }
-      else if (((inSourceMode || iOS) && button.name != "source") ||
+      else if (button.name == "fullscreen")
+         enabled = true;
+      else if (((inSourceMode || iOS) && (button.name != "source" && button.name != "fullscreen")) ||
       (ie && (command == "undo" || command == "redo")))
         enabled = false;
       else if (command && command != "print") {

@@ -53,7 +53,7 @@ v1.1.1 28SEPT2011 - Linc
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.2.2',
+   'Version' => '1.2.3',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -126,10 +126,10 @@ a.PreviewButton {
 			var frm = $(this).parents("div.CommentForm");
 			ed = jQuery(this).cleditor({
             width:"100%", height:"100%",
-            controls: "bold italic underline strikethrough | font size " +
+            controls: "bold italic strikethrough | font size " +
                     "style | color highlight removeformat | bullets numbering | outdent indent | " +
                     "alignleft center alignright | undo redo | " +
-                    "image link unlink | cut copy paste pastetext | source",
+                    "image link unlink | source fullscreen",
             docCSSFile: "$CssPath"
          })[0];
 			this.editor = ed; // Support other plugins!

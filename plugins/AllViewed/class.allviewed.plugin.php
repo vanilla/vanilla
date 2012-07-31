@@ -38,21 +38,34 @@ $PluginInfo['AllViewed'] = array(
  * @package AllViewed
  */
 class AllViewedPlugin extends Gdn_Plugin {
+   /**
+    * Adds "Mark All Viewed" to main menu.
+    *
+    * @since 1.0
+    * @access public
+    */
+   public function Base_Render_Before($Sender) {
+      // Add "Mark All Viewed" to main menu
+      if ($Sender->Menu && Gdn::Session()->IsValid()) {
+         if (C('Plugins.AllViewed.ShowInMenu', TRUE))
+            $Sender->Menu->AddLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
+      }
+   }
    
 	/**
-	 * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to main menu.
+	 * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to MeModule menu.
 	 *
-	 * @since 1.0
+	 * @since 2.0
 	 * @access public
 	 */
 	public function MeModule_FlyoutMenu_Handler($Sender) {
 		// Add "Mark All Viewed" to menu
-		if (Gdn::Session()->IsValid() && C('Plugins.AllViewed.ShowInMenu', TRUE)) {
-         echo Wrap(Anchor(T('Mark All Viewed'), '/discussions/markallviewed'), 'li');
+		if (Gdn::Session()->IsValid()) {
+         echo Wrap(Anchor(T('Mark All Viewed'), '/discussions/markallviewed'), 'li', array('class' => 'MarkAllViewed'));
          
 			$CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
 			if ($CategoryID > 0)
-            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li');
+            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
 		}
 	}
 	

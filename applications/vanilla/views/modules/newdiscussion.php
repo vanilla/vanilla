@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 echo '<div class="BoxButtons BoxNewDiscussion">';
-
 $Text = T('Start a New Discussion', 'New Discussion');
-$Url = '/post/discussion'.(array_key_exists('CategoryID', $Data) ? '/'.$Data['CategoryID'] : '');
+$UrlCode = GetValue('UrlCode', GetValue('Category', $Data), '');
+$Url = '/post/discussion/'.$UrlCode;
 $Css = 'Button Primary Action NewDiscussion';
 $Css .= strpos($this->CssClass, 'Big') !== FALSE ? ' BigButton' : '';
 if (count($this->Buttons) == 0) {

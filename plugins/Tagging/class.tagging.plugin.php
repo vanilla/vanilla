@@ -139,7 +139,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $DiscussionModel = new DiscussionModel();
       $this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
-      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
+      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
       
       $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);
       $Sender->SetJson('Loading', $Offset . ' to ' . $Limit);
@@ -325,7 +325,7 @@ class TaggingPlugin extends Gdn_Plugin {
       if ($Query) {
          $Test = Gdn::SQL()->Limit(1)->Get('Tag')->FirstRow(DATASET_TYPE_ARRAY);
          if (isset($Test['Type'])) {
-            Gdn::SQL()->Where('Type is null'); // other uis can set a different type
+            Gdn::SQL()->Where("nullif(Type, '') is null"); // Other UIs can set a different type
          }
          
          $TagData = Gdn::SQL()->Select('TagID, Name')->From('Tag')->Like('Name', $Query)->Limit(20)->Get();

@@ -344,8 +344,8 @@ class CategoryModel extends Gdn_Model {
             if ($DoHeadings && $Category['Depth'] <= 1) {
                $Categories[$ID]['Read'] = FALSE;
             } elseif ($DateMarkedRead) {
-               if (GetValue('DateLastComment', $Category))
-                  $Categories[$ID]['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['DateLastComment']);
+               if (GetValue('LastDateInserted', $Category))
+                  $Categories[$ID]['Read'] = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($Category['LastDateInserted']);
                else
                   $Categories[$ID]['Read'] = TRUE;
             } else {
@@ -1186,6 +1186,7 @@ class CategoryModel extends Gdn_Model {
       $Categories[$ID] = $Category;
       self::CalculateData($Categories);
       Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+      self::$Categories = $Categories;
    }
    
    public function SetField($ID, $Property, $Value = FALSE) {

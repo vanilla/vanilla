@@ -412,7 +412,7 @@ jQuery(document).ready(function($) {
         if (popupName == "url") {
 
           // Check for selection before showing the link url popup
-          if (buttonName == "link" && selectedText(editor) === "") {
+          if (buttonName == "link" && selectedHTML(editor) === "") {
             showMessage(editor, "A selection is required when inserting a link.", buttonDiv);
             return false;
           }
@@ -429,7 +429,7 @@ jQuery(document).ready(function($) {
                 execCommand(editor, data.command, url, null, data.button);
 
               // Reset the text, hide the popup and set focus
-              $text.val("http://");
+              $text.val("");
               hidePopups();
               focus(editor);
 
@@ -636,7 +636,7 @@ jQuery(document).ready(function($) {
 
     // URL
     else if (popupName == "url") {
-      $popup.html('Enter URL:<br><input type=text value="http://" size=35><br><input type=button value="Submit">');
+      $popup.html('Enter URL:<br><input type=text placeholder="http://" value="" size=35><br><input type=button value="Submit">');
       popupTypeClass = PROMPT_CLASS;
     }
 
@@ -1013,7 +1013,7 @@ jQuery(document).ready(function($) {
     if (ie) return getRange(editor).text;
     return getSelection(editor).toString();
   }
-
+  
   // showMessage - alert replacement
   function showMessage(editor, message, button) {
     var popup = createPopup("msg", editor.options, MSG_CLASS);

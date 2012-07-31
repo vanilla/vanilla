@@ -64,7 +64,7 @@ body.Vanilla.Post #Panel {
 }
 body.Conversations.add #Content,
 body.Vanilla.Post #Content {
-   width: 100%;
+   width: auto;
    margin: 0;
 }
 body.Entry #Content {

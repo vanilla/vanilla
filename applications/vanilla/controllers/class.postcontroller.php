@@ -72,11 +72,11 @@ class PostController extends VanillaController {
     * 
     * @param int $CategoryID Unique ID of the category to add the discussion to.
     */
-   public function Discussion($CategoryID = '') {
+   public function Discussion($CategoryUrlCode = '') {
       // Override CategoryID if categories are disabled
       $UseCategories = $this->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
       if (!$UseCategories) 
-         $CategoryID = 0;
+         $CategoryUrlCode = '';
          
       // Setup head
       $this->AddJsFile('jquery.autogrow.js');
@@ -88,12 +88,20 @@ class PostController extends VanillaController {
       // Set discussion, draft, and category data
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
-      $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
-      $Category = CategoryModel::Categories($this->CategoryID);
+      if (isset($this->Discussion)) {
+         $this->CategoryID = $this->Discussion->CategoryID;
+         $Category = CategoryModel::Categories($this->CategoryID);
+      } else if ($CategoryUrlCode != '') {
+         $CategoryModel = new CategoryModel();
+         $Category = $CategoryModel->GetByCode($CategoryUrlCode);
+         $this->CategoryID = $Category->CategoryID;
+      }
       if ($Category)
          $this->Category = (object)$Category;
-      else
+      else {
+         $this->CategoryID = 0;
          $this->Category = NULL;
+      }
 
       $CategoryData = $UseCategories ? CategoryModel::Categories() : FALSE;
       
@@ -156,8 +164,8 @@ class PostController extends VanillaController {
 
                if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
-
-               if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               
+               if (!isset($this->Discussion) && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
             }
 

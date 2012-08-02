@@ -52,7 +52,7 @@
                                     $OtherString = '';
                               ?>
                               <span><?php echo T('FlaggedBy', "Reported by:"); ?> </span>
-                              <span><?php echo "<strong>".Anchor($Flag['InsertName'],"profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}")."</strong>{$OtherString} ".T('on').' '.$Flag['DateInserted']; ?></span>
+                              <span><?php printf(T('<strong>%s</strong>%s on %s'), Anchor($Flag['InsertName'],"profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}"), $OtherString, $Flag['DateInserted']); ?></span>
                            </div>
                            <div class="FlaggedItemComment">"<?php echo Gdn_Format::Text($Flag['Comment']); ?>"</div>
                            <div class="FlaggedActions">

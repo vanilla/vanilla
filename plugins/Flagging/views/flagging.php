@@ -47,7 +47,7 @@
                            <div class="FlaggedItemInfo">
                               <?php
                                  if ($NumComplaintsInThread > 1)
-                                    $OtherString = T(' and').' '.($NumComplaintsInThread-1).' '.T(Plural($NumComplaintsInThread-1, 'other', 'others')).' '.T('person');
+                                    $OtherString = T(' and').' '.($NumComplaintsInThread-1).' '.T(Plural($NumComplaintsInThread-1, 'other', 'others'));
                                  else
                                     $OtherString = '';
                               ?>

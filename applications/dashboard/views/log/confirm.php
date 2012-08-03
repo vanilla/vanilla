@@ -57,8 +57,18 @@
             $AfterHtml = Plural($ItemCount, T('Are you sure you want to delete 1 item forever?'), T('Are you sure you want to delete %s items forever?'));
             break;
          case 'restore':
+<<<<<<< HEAD
+            echo '<p>',
+               T('Restoring your selection removes the items from this list.', 'When you restore your selection the items are removed from this list and put back into the site.'),
+               '</p>';
+
+            $AfterHtml = '<p>'.
+               Plural($ItemCount, T('Are you sure you want to restore 1 item?'), T('Are you sure you want to restore %s items?')).
+               '</p>';
+=======
             echo Wrap(T('Restoring your selection removes the items from this list.', 'When you restore, the items are removed from this list and put back into the site.'), 'p');
             $AfterHtml = Plural($ItemCount, T('Are you sure you want to restore 1 item?'), T('Are you sure you want to restore %s items?'));
+>>>>>>> 3f475840b18192a6128043872db1337b268d3d38
             break;
          case 'deletespam':
             echo Wrap(T('Marking as spam cannot be undone.', 'Marking something as SPAM will cause it to be deleted forever. Deleting is a good way to keep your forum clean.'), 'p');

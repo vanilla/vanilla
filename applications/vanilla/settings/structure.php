@@ -44,6 +44,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('DateUpdated', 'datetime')
    ->Column('LastCommentID', 'int', NULL)
    ->Column('LastDiscussionID', 'int', NULL)
+   ->Column('LastDateInserted', 'datetime', NULL)
    ->Set($Explicit, $Drop);
 
 $RootCategoryInserted = FALSE;

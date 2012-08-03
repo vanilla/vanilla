@@ -1279,13 +1279,12 @@ class CategoryModel extends Gdn_Model {
          
          // Set appropriate Last* columns.
          SetValue('LastTitle', $Category, GetValue('LastDiscussionTitle', $Category, NULL));
+         $LastDateInserted = GetValue('LastDateInserted', $Category, NULL);
          
          if (GetValue('LastCommentUserID', $Category) == NULL) {
             SetValue('LastCommentUserID', $Category, GetValue('LastDiscussionUserID', $Category, NULL));
             SetValue('DateLastComment', $Category, GetValue('DateLastDiscussion', $Category, NULL));
-            
             SetValue('LastUserID', $Category, GetValue('LastDiscussionUserID', $Category, NULL));
-            SetValue('LastDateInserted', $Category, GetValue('DateLastDiscussion', $Category, NULL));
             
             $LastDiscussion = ArrayTranslate($Category, array(
                 'LastDiscussionID' => 'DiscussionID', 
@@ -1293,19 +1292,25 @@ class CategoryModel extends Gdn_Model {
                 'LastTitle' => 'Name'));
             
             SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion).'#latest');
+            
+            if (is_null($LastDateInserted))
+               SetValue('LastDateInserted', $Category, GetValue('DateLastDiscussion', $Category, NULL));
          } else {
             $LastDiscussion = ArrayTranslate($Category, array(
-                'LastDiscussionID' => 'DiscussionID', 
-                'CategoryID' => 'CategoryID',
-                'LastTitle' => 'Name'));
+               'LastDiscussionID' => 'DiscussionID', 
+               'CategoryID' => 'CategoryID',
+               'LastTitle' => 'Name'
+            ));
             
             SetValue('LastUserID', $Category, GetValue('LastCommentUserID', $Category, NULL));
-            SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));
             SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE).'#latest');
+            
+            if (is_null($LastDateInserted))
+               SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));
          }
          
+         $LastDateInserted = GetValue('LastDateInserted', $Category, NULL);
          if ($DateMarkedRead) {
-            $LastDateInserted = GetValue('LastDateInserted', $Category);
             if ($LastDateInserted)
                $Category->Read = Gdn_Format::ToTimestamp($DateMarkedRead) >= Gdn_Format::ToTimestamp($LastDateInserted);
             else

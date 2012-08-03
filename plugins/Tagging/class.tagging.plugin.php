@@ -139,7 +139,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $DiscussionModel = new DiscussionModel();
       $this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
-      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
+      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
       
       $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);
       $Sender->SetJson('Loading', $Offset . ' to ' . $Limit);

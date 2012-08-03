@@ -64,7 +64,7 @@ body.Vanilla.Post #Panel {
 }
 body.Conversations.add #Content,
 body.Vanilla.Post #Content {
-   width: 100%;
+   width: auto;
    margin: 0;
 }
 body.Entry #Content {
@@ -2373,7 +2373,7 @@ textarea.MultiComplete {
 }
 .ac_results {
    padding: 0;
-   border: 1px solid #bbb;
+   border: 1px solid #d7d8da;
    border-top: 0;
    background-color: white;
    overflow: hidden;
@@ -2403,7 +2403,7 @@ textarea.MultiComplete {
    */
    line-height: 16px;
    overflow: hidden;
-   border-bottom: 1px solid #bbb;
+   border-bottom: 1px solid #d7d8da;
    text-align: left;
 }
 .ac_lastitem {
@@ -2411,14 +2411,14 @@ textarea.MultiComplete {
 }
 .ac_results strong {
    font-weight: bold;
-   background: #daf4fd;
+   background: #c7e2ff;
 }
 .ac_over strong {
    font-weight: bold;
-   background: #2ab0de;
+   background: #216ebf;
 }
 .ac_over {
-   background: #44c7f4;
+   background: #004D9F;
    color: #fff;
 }
 .AddPeople h4 {

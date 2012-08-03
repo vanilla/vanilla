@@ -26,7 +26,7 @@
 .SiteTitle { display: none; }
 
 /* Panel on the right */
-#Panel { float: right; overflow: hidden;}
+#Panel { float: right; }
 #Body .ContentColumn { margin: 0 230px 0 0; }
 #Panel input.InputBox {
    width: 192px;

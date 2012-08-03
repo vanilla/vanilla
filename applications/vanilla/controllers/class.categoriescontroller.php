@@ -207,7 +207,7 @@ class CategoriesController extends VanillaController {
          // Change the controller name so that it knows to grab the discussion views
          $this->ControllerName = 'DiscussionsController';
          // Pick up the discussions class
-         $this->CssClass = 'Discussions';
+         $this->CssClass = 'Discussions Category-'.GetValue('UrlCode', $Category);
          
          // Deliver JSON data if necessary
          if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {

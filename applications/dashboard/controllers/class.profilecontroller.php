@@ -21,7 +21,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class ProfileController extends Gdn_Controller {
    /** @var array Models to automatically instantiate. */
-   public $Uses = array('Form', 'UserModel');
+   public $Uses = array('Form', 'UserModel', 'RoleModel');
    
    /** @var object User data to use in building profile. */
    public $User;

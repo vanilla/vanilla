@@ -629,6 +629,10 @@ class UserController extends DashboardController {
                $Email = new Gdn_Email();
                $Result = $UserModel->$Action($UserID, $Email);
                
+               // Re-calculate applicant count
+               $RoleModel = new RoleModel();
+               $RoleModel->GetApplicantCount(TRUE);
+               
                $this->FireEvent("After{$Action}User");
             } catch(Exception $ex) {
                $Result = FALSE;

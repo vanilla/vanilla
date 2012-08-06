@@ -4,11 +4,9 @@ $Flag = $this->Data['Plugin.Flagging.Data'];
 $Report = $this->Data['Plugin.Flagging.Report'];
 $Reason = $this->Data['Plugin.Flagging.Reason'];
 
-echo Anchor($Flag['UserName'], '/profile/'.$Flag['UserID'].'/'.$Flag['UserName']) . ' '. T('reported'); 
+printf(T('%s reported%s <strong>%s</strong>'), Anchor($Flag['UserName'], '/profile/'.$Flag['UserID'].'/'.$Flag['UserName']), ($Flag['Context'] == 'comment') ? T(' a comment in') : null, Anchor($Report['DiscussionName'], $Flag['URL'])); 
 
-if ($Flag['Context'] == 'comment') 
-   echo ' ' . T('a comment in');
-?> <strong><?php echo Anchor($Report['DiscussionName'], $Flag['URL']); ?></strong>
+?>
    
 <?php echo T('Reason'); ?>:
    <blockquote rel="<?php echo $Flag['UserName']; ?>"><?php echo $Reason; ?></blockquote>

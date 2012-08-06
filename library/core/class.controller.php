@@ -1424,7 +1424,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SendHeaders();
 
       $Code = $Ex->getCode();
-      $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage());
+      $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
       
       if (Debug() && !is_a($Ex, 'Gdn_UserException'))
          $Data['Trace'] = $Ex->getTraceAsString();
@@ -1452,7 +1452,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
             array_map('htmlspecialchars', $Data);
-            exit("<Exception><Code>{$Data['Code']}</Code><Message>{$Data['Exception']}</Message></Exception>");
+            exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
             break;
          default:
             header('Content-Type: text/plain', TRUE);

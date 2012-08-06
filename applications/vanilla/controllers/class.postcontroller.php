@@ -88,6 +88,7 @@ class PostController extends VanillaController {
       // Set discussion, draft, and category data
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
+      $Category = FALSE;
       if (isset($this->Discussion)) {
          $this->CategoryID = $this->Discussion->CategoryID;
          $Category = CategoryModel::Categories($this->CategoryID);

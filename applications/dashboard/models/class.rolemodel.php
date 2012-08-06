@@ -151,8 +151,12 @@ class RoleModel extends Gdn_Model {
       }
    }
    
-   public function GetApplicantCount() {
+   public function GetApplicantCount($Force = FALSE) {
       $CacheKey = 'Moderation.ApplicantCount';
+      
+      if ($Force)
+         Gdn::Cache()->Remove($CacheKey);
+      
       $Count = Gdn::Cache()->Get($CacheKey);
       if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
          $Count = Gdn::SQL()

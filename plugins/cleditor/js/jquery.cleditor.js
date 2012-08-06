@@ -410,9 +410,16 @@ jQuery(document).ready(function($) {
        if (editor.originalHeight == undefined) {
           editor.originalHeight = editor.$area.height();
        }
-       var newHeight = 800;
        
-       if (editor.$area.height() >= newHeight - 10) {
+       if (editor.expandedHeight == undefined) {
+          editor.expandedHeight = editor.originalHeight * 2;
+          if(editor.expandedHeight < 800)
+             editor.expandedHeight = 800;
+       }
+       
+       var newHeight = editor.expandedHeight;
+       
+       if (editor.$area.outerHeight() >= newHeight - 50) {
           newHeight = editor.originalHeight;
        }
        

@@ -14,6 +14,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @see T()
  */
-function smarty_modifier_translate($Code, $Default = '') {
+function smarty_modifier_translate($Code, $Default = FALSE) {
+   if ($Default === FALSE)
+      $Default = $Code;
+   
 	return T($Code, $Default);	
 }

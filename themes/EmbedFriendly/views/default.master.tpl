@@ -25,7 +25,7 @@
     <div class="Row">
       <div class="BreadcrumbsWrapper P">{breadcrumbs}</div>
       <div class="Column PanelColumn" id="Panel">
-         {module name="MeModule"}
+         {module name="MeModule" CssClass="FlyoutRight"}
          {asset name="Panel"}
          <div class="SiteSearch">{searchbox}</div>
       </div>

@@ -1413,7 +1413,7 @@ class DiscussionModel extends VanillaModel {
             $CacheAmendment = array_merge($CacheAmendment, array(
                'LastDiscussionID'   => $DiscussionID,
                'LastCommentID'      => NULL,
-               'LastDateInsered'    => GetValue('DateInserted', $Discussion)
+               'LastDateInserted'   => GetValue('DateInserted', $Discussion)
             ));
          }
          

@@ -109,8 +109,8 @@ class CategoryModel extends Gdn_Model {
             Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
          }
          
+         self::JoinUserData($Categories, TRUE);
          self::$Categories = $Categories;
-         self::JoinUserData(self::$Categories, TRUE);
          
       }
       
@@ -236,6 +236,31 @@ class CategoryModel extends Gdn_Model {
                }
                
                $this->SetField($CategoryID, $Set);
+            }
+            break;
+         case 'LastDateInserted':
+            $Categories = $this->SQL
+               ->Select('ca.CategoryID')
+               ->Select('d.DateInserted', '', 'DateLastDiscussion')
+               ->Select('c.DateInserted', '', 'DateLastComment')
+         
+               ->From('Category ca')
+               ->Join('Discussion d', 'd.DiscussionID = ca.LastDiscussionID')
+               ->Join('Comment c', 'c.CommentID = ca.LastCommentID')
+               ->Get()->ResultArray();
+            
+            foreach ($Categories as $Category) {
+               $DateLastDiscussion = GetValue('DateLastDiscussion', $Category);
+               $DateLastComment = GetValue('DateLastComment', $Category);
+               
+               $MaxDate = $DateLastComment;
+               if (is_null($DateLastComment) || $DateLastDiscussion > $MaxDate)
+                  $MaxDate = $DateLastDiscussion;
+               
+               if (is_null($MaxDate)) continue;
+               
+               $CategoryID = (int)$Category['CategoryID'];
+               $this->SetField($CategoryID, 'LastDateInserted', $MaxDate);
             }
             break;
       }

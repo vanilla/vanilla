@@ -132,10 +132,19 @@ class Gdn_PasswordHash extends PasswordHash {
             $VbHash = md5(md5($Password).$Salt);
             $Result = $VbHash == $VbStoredHash;
             break;
+         case 'wordpress':
+            $Result = $this->CheckWordpress($Password, $StoredHash);
+            break;
          case 'vanilla':
          default:
             $Result = $this->CheckVanilla($Password, $StoredHash);
       }
+      return $Result;
+   }
+
+   protected function CheckWordpress($Password, $StoredHash) {
+      $Hasher = new PasswordHash(8, TRUE);
+      $Result = $Hasher->CheckPassword($Password, $StoredHash);
       return $Result;
    }
    

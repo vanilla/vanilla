@@ -38,6 +38,7 @@ $PluginInfo['AllViewed'] = array(
  * @package AllViewed
  */
 class AllViewedPlugin extends Gdn_Plugin {
+   
    /**
     * Adds "Mark All Viewed" to main menu.
     *
@@ -51,7 +52,7 @@ class AllViewedPlugin extends Gdn_Plugin {
             $Sender->Menu->AddLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
       }
    }
-   
+
 	/**
 	 * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to MeModule menu.
 	 *
@@ -68,7 +69,7 @@ class AllViewedPlugin extends Gdn_Plugin {
             echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
 		}
 	}
-	
+   
 	/**
 	 * Helper function that actually sets the DateMarkedRead column in UserCategory 
 	 *

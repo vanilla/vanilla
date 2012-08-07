@@ -398,10 +398,9 @@ class MessagesController extends ConversationsController {
       );
       
       // Join in the participants.
-      $Result =& $Conversations->ResultArray();
-      $this->ConversationModel->JoinParticipants($Result);
+      $this->ConversationModel->JoinParticipants($Conversations);
       
-      $this->SetData('Conversations', $Result);
+      $this->SetData('Conversations', $Conversations);
       $this->Render();
    }
    

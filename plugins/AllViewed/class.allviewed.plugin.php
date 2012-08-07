@@ -38,6 +38,7 @@ $PluginInfo['AllViewed'] = array(
  * @package AllViewed
  */
 class AllViewedPlugin extends Gdn_Plugin {
+   
    /**
     * Adds "Mark All Viewed" to main menu.
     *
@@ -51,96 +52,24 @@ class AllViewedPlugin extends Gdn_Plugin {
             $Sender->Menu->AddLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
       }
    }
+
+	/**
+	 * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to MeModule menu.
+	 *
+	 * @since 2.0
+	 * @access public
+	 */
+	public function MeModule_FlyoutMenu_Handler($Sender) {
+		// Add "Mark All Viewed" to menu
+		if (Gdn::Session()->IsValid()) {
+         echo Wrap(Anchor(T('Mark All Viewed'), '/discussions/markallviewed'), 'li', array('class' => 'MarkAllViewed'));
+         
+			$CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
+			if ($CategoryID > 0)
+            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
+		}
+	}
    
-	/**
-	 * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to MeModule menu.
-	 *
-	 * @since 2.0
-	 * @access public
-	 */
-	public function MeModule_FlyoutMenu_Handler($Sender) {
-		// Add "Mark All Viewed" to menu
-		if (Gdn::Session()->IsValid()) {
-         echo Wrap(Anchor(T('Mark All Viewed'), '/discussions/markallviewed'), 'li', array('class' => 'MarkAllViewed'));
-         
-			$CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
-			if ($CategoryID > 0)
-            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
-		}
-	}
-	
-	/**
-	 * Helper function that actually sets the DateMarkedRead column in UserCategory 
-	 *
-	 * @since 2.0
-	 * @access private
-	 */
-	private function MarkCategoryRead($CategoryModel, $CategoryID) {
-		$CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
-	}
-
-	/**
-	 * Allows user to mark all discussions in a specified category as viewed.
-	 *
-    * @param DiscussionsController $Sender
-    * @param integer $CategoryID
-	 * @since 1.0
-	 * @access public
-	 */
-	public function DiscussionsController_MarkCategoryViewed_Create($Sender, $CategoryID) {
-		if (strlen($CategoryID) > 0 && (int)$CategoryID > 0) {
-         $CategoryModel = new CategoryModel();
-			$this->MarkCategoryRead($CategoryModel, $CategoryID);
-			$this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array($CategoryID));
-		}
-      
-		Redirect(Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER'));
-	}
-
-	/**
-	 * Helper function to recursively mark categories as read based on a Category's ParentID.
-	 *
-	 * @since 2.0
-	 * @access private
-	 */
-	private function RecursiveMarkCategoryRead($CategoryModel, $UnprocessedCategories, $ParentIDs) {
-		$CurrentUnprocessedCategories = array();
-		$CurrentParentIDs = $ParentIDs;
-		foreach ($UnprocessedCategories as $Category) {
-			if (in_array($Category["ParentCategoryID"], $ParentIDs)) {
-				$this->MarkCategoryRead($CategoryModel, $Category["CategoryID"]);
-				// Don't add duplicate ParentIDs
-				if (!in_array($Category["CategoryID"], $CurrentParentIDs)) {
-					$CurrentParentIDs[] = $Category["CategoryID"];
-				}
-			} else {
-				// This keeps track of categories that we still need to check on recurse
-				$CurrentUnprocessedCategories[] = $Category;
-			}
-		}
-		// Base case: if we have not found any new parent ids, we don't need to recurse
-		if (count($ParentIDs) != count($CurrentParentIDs)) {
-			$this->RecursiveMarkCategoryRead($CategoryModel, $CurrentUnprocessedCategories, $CurrentParentIDs);
-		}
-	}
-
-	/**
-	 * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to MeModule menu.
-	 *
-	 * @since 2.0
-	 * @access public
-	 */
-	public function MeModule_FlyoutMenu_Handler($Sender) {
-		// Add "Mark All Viewed" to menu
-		if (Gdn::Session()->IsValid()) {
-         echo Wrap(Anchor(T('Mark All Viewed'), '/discussions/markallviewed'), 'li', array('class' => 'MarkAllViewed'));
-         
-			$CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
-			if ($CategoryID > 0)
-            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
-		}
-	}
-	
 	/**
 	 * Helper function that actually sets the DateMarkedRead column in UserCategory 
 	 *

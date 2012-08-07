@@ -19,6 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @return The text.
  */
 function smarty_function_t($Params, &$Smarty) {
-   $Result = T(GetValue('c', $Params, ''), GetValue('d', $Params, ''));
+   $Code = GetValue('c', $Params, '');
+   $Result = T($Code, GetValue('d', $Params, $Code));
 	return $Result;
 }

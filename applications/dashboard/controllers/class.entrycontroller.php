@@ -383,13 +383,17 @@ class EntryController extends Gdn_Controller {
 //         $this->_SetRedirect(TRUE);
          $this->_SetRedirect($this->Request->Get('display') == 'popup');
       } elseif ($this->Form->GetFormValue('Name') || $this->Form->GetFormValue('Email')) {
+         $NameUnique = C('Garden.Registration.NameUnique', TRUE);
+         $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
+         $AutoConnect = C('Garden.Registration.AutoConnect');
+         
          // Get the existing users that match the name or email of the connection.
          $Search = FALSE;
-         if ($this->Form->GetFormValue('Name')) {
+         if ($this->Form->GetFormValue('Name') && $NameUnique) {
             $UserModel->SQL->OrWhere('Name', $this->Form->GetFormValue('Name'));
             $Search = TRUE;
          }
-         if ($this->Form->GetFormValue('Email')) {
+         if ($this->Form->GetFormValue('Email') && ($EmailUnique || $AutoConnect)) {
             $UserModel->SQL->OrWhere('Email', $this->Form->GetFormValue('Email'));
             $Search = TRUE;
          }
@@ -400,7 +404,7 @@ class EntryController extends Gdn_Controller {
             $ExistingUsers = array();
          
          // Check to automatically link the user.
-         if (C('Garden.Registration.AutoConnect') && count($ExistingUsers) > 0) {
+         if ($AutoConnect && count($ExistingUsers) > 0) {
             foreach ($ExistingUsers as $Row) {
                if ($this->Form->GetFormValue('Email') == $Row['Email']) {
                   $UserID = $Row['UserID'];
@@ -435,9 +439,7 @@ class EntryController extends Gdn_Controller {
                }
             }
          }
-
-         $NameUnique = C('Garden.Registration.NameUnique', TRUE);
-         $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
+         
          $CurrentUserID = Gdn::Session()->UserID;
 
          // Massage the existing users.

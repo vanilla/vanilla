@@ -36,6 +36,7 @@ class StatisticsController extends DashboardController {
     */
    public function Initialize() {
       parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
@@ -54,17 +55,13 @@ class StatisticsController extends DashboardController {
       $this->EnableSlicing($this);
       
       if ($this->Form->IsPostBack()) {
-         
          $Flow = TRUE;
          
-         if ($Flow && $this->Form->GetFormValue('ClearCredentials')) {
-            Gdn::InstallationID(FALSE);
-            Gdn::InstallationSecret(FALSE);
-            Gdn::Statistics()->Tick();
-            $Flow = FALSE;
+         if ($Flow && $this->Form->GetFormValue('Reregister')) {
+            Gdn::Statistics()->Register();
          }
          
-         if ($Flow && $this->Form->GetFormValue('SaveIdentity')) {
+         if ($Flow && $this->Form->GetFormValue('Save')) {
             Gdn::InstallationID($this->Form->GetFormValue('InstallationID'));
             Gdn::InstallationSecret($this->Form->GetFormValue('InstallationSecret'));
             $this->InformMessage(T("Your settings have been saved."));
@@ -78,10 +75,12 @@ class StatisticsController extends DashboardController {
             SaveToConfig('Garden.Analytics.Enabled', TRUE);
          }
          
-         if ($Flow && $this->Form->GetFormValue('Reregister')) {
-            Gdn::Statistics()->Register();
+         if ($Flow && $this->Form->GetFormValue('ClearCredentials')) {
+            Gdn::InstallationID(FALSE);
+            Gdn::InstallationSecret(FALSE);
+            Gdn::Statistics()->Tick();
+            $Flow = FALSE;
          }
-         
       }
       
       $AnalyticsEnabled = Gdn_Statistics::CheckIsEnabled();

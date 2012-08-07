@@ -774,6 +774,18 @@ class PermissionModel extends Gdn_Model {
       return $Result;
    }
    
+   public function Undefine($Names) {
+      $Names = (array)$Names;
+      $St = $this->Database->Structure();
+      $St->Table('Permission');
+      
+      foreach ($Names as $Name) {
+         if ($St->ColumnExists($Name))
+            $St->DropColumn($Name);
+      }
+      $St->Reset();
+   }
+   
    protected function _UnpivotPermissionsRow($Row, &$Result, $IncludeRole = FALSE) {
       $GlobalName = ArrayValue('Name', $Row);
       

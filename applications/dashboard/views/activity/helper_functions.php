@@ -7,10 +7,10 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    $ActivityType = $ActivityType[0];
    $Author = UserBuilder($Activity, 'Activity');
    $PhotoAnchor = Anchor(
-      Img($Activity->Photo, array('class' => 'ProfilePhotoMedium')),
-      $Activity->PhotoUrl, 'Photo');
+      Img($Activity->Photo, array('class' => 'ProfilePhoto ProfilePhotoMedium')),
+      $Activity->PhotoUrl, 'PhotoWrap');
    
-   $CssClass = 'Item Activity '.$ActivityType;
+   $CssClass = 'Item Activity Activity-'.$ActivityType;
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
    
@@ -67,10 +67,27 @@ function WriteActivity($Activity, &$Sender, &$Session) {
       <div class="Meta">
          <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateUpdated); ?></span>
          <?php
-         $AllowComments = $Activity->NotifyUserID < 0;
+         $SharedString = FALSE;
+         $ID = GetValue('SharedNotifyUserID', $Activity->Data);
+         if (!$ID)
+            $ID = GetValue('CommentNotifyUserID', $Activity->Data);
+         
+         if ($ID)
+            $SharedString = FormatString(T('Comments are between {UserID,you}.'), array('UserID' => array($Activity->NotifyUserID, $ID))); 
+         
+         $AllowComments = $Activity->NotifyUserID < 0 || $SharedString;
+         
+         
          
          if ($AllowComments && $Session->CheckPermission('Garden.Profiles.Edit'))
-            echo '<span class="MItem AddComment">'.Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption').'</span>';
+            echo '<span class="MItem AddComment">'
+               .Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption');
+         
+            if ($SharedString) {
+               echo ' <span class="MItem"><i>'.$SharedString.'</i></span>';
+            }
+         
+            echo '</span>';
          
          $Sender->FireEvent('AfterMeta');
          ?>

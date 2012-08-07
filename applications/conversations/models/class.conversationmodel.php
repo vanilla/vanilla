@@ -69,6 +69,34 @@ class ConversationModel extends Gdn_Model {
       }
    }
    
+   public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      $Result = array('Complete' => TRUE);
+      switch ($Column) {
+         case 'CountMessages':
+            $this->Database->Query(DBAModel::GetCountSQL('count', 'Conversation', 'ConversationMessage', $Column, 'MessageID'));
+            break;
+         case 'FirstMessageID':
+            $this->Database->Query(DBAModel::GetCountSQL('min', 'Conversation', 'ConversationMessage', $Column, 'MessageID'));
+            break;
+         case 'LastMessageID':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Conversation', 'ConversationMessage', $Column, 'MessageID'));
+            break;
+         case 'DateUpdated':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Conversation', 'ConversationMessage', $Column, 'DateInserted'));
+            break;
+         case 'UpdateUserID':
+            $this->SQL
+               ->Update('Conversation c')
+               ->Join('ConversationMessage m', 'c.LastMessageID = m.MessageID')
+               ->Set('c.UpdateUserID', 'm.InsertUserID', FALSE, FALSE)
+               ->Put();
+            break;
+         default:
+            throw new Gdn_UserException("Unknown column $Column");
+      }
+      return $Result;
+   }
+   
    /**
     * Get list of conversations.
     * 

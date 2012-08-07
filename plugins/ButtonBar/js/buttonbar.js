@@ -380,7 +380,12 @@ jQuery(document).ready(function($) {
                break;
 
             case 'image':
-               $(TextArea).insertRoundTag('img',bbcodeOpts);
+               var thisOpts = $.extend(bbcodeOpts,{});
+               
+               NewURL = prompt("Enter image URL:");
+               thisOpts.replace = NewURL; 
+                           
+               $(TextArea).insertRoundTag('img',thisOpts);
                break;
 
             case 'quickurl':
@@ -465,11 +470,15 @@ jQuery(document).ready(function($) {
                break;
 
             case 'image':
+               var urlOpts = {};
                var thisOpts = $.extend(htmlOpts, {
-                  center: 'src',
                   closetype: 'short'
                });
-               $(TextArea).insertRoundTag('img',thisOpts,{src:''});
+               
+               NewURL = prompt("Enter image URL:");
+               urlOpts.src = NewURL;         
+               
+               $(TextArea).insertRoundTag('img',thisOpts,urlOpts);
                break;
 
             case 'quickurl':
@@ -568,6 +577,8 @@ jQuery(document).ready(function($) {
                   opener:'',
                   closer:''
                });
+               var NewURL = prompt("Enter image URL:",'');
+               thisOpts.prepend = NewURL;
                $(TextArea).insertRoundTag('',thisOpts);
                break;
 

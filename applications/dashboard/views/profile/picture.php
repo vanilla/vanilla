@@ -27,7 +27,7 @@ if ($Thumbnail && !preg_match('`^https?://`i', $Thumbnail))
 $Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));
 ?>
 <div class="SmallPopup">
-<h2><?php echo $this->Data('Title'); ?></h2>
+<h2 class="H"><?php echo $this->Data('Title'); ?></h2>
 <?php
 echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
@@ -47,12 +47,12 @@ echo $this->Form->Errors();
                <td><?php
                echo $Picture;
                if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-                  echo Wrap(Anchor(T('Remove Picture'), '/profile/removepicture/'.rawurldecode($this->User->Name).'/'.$this->User->UserID.'/'.$Session->TransientKey(), 'Button PopConfirm'), 'p');
+                  echo Wrap(Anchor(T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'), $Session->TransientKey())), 'Button Danger PopConfirm'), 'p');
                ?>
                </td>
                <td><?php
                echo $Thumbnail;
-               echo Wrap(Anchor(T('Edit Thumbnail'), '/profile/thumbnail/'.$this->ProfileUrl(), 'Button'), 'p');
+               echo Wrap(Anchor(T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'Button'), 'p');
                }
                ?>
                </td>
@@ -67,5 +67,5 @@ echo $this->Form->Errors();
    </li>
 </ul>
 <div class="Warning"><?php echo T('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
-<?php echo $this->Form->Close('Upload'); ?>
+<?php echo $this->Form->Close('Upload', '', array('class' => 'Button Primary')); ?>
 </div>

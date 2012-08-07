@@ -1445,7 +1445,13 @@ class ImportModel extends Gdn_Model {
             $Name = $Row['_Default'];
          else
             $Name = GetValue('Name', $Row);
+         
          $RoleID = $Row['RoleID'];
+         
+         if (preg_match('`anonymous`', $Name))
+            $Name = 'guest';
+         elseif (preg_match('`admin`', $Name))
+            $Name = 'administrator';
          
          switch (strtolower($Name)) {
             case 'email':
@@ -1529,15 +1535,13 @@ class ImportModel extends Gdn_Model {
       // Define the necessary SQL.
       $Sqls = array();
 
-      if(!$this->ImportExists('Discussion', 'CountComments'))
-         $Sqls['Discussion.CountComments'] = $this->GetCountSQL('count', 'Discussion', 'Comment');
       if(!$this->ImportExists('Discussion', 'LastCommentID'))
          $Sqls['Discussion.LastCommentID'] = $this->GetCountSQL('max', 'Discussion', 'Comment');
       if(!$this->ImportExists('Discussion', 'DateLastComment')) {
          $Sqls['Discussion.DateLastComment'] = "update :_Discussion d
-         join :_Comment c
+         left join :_Comment c
             on d.LastCommentID = c.CommentID
-         set d.DateLastComment = c.DateInserted";
+         set d.DateLastComment = coalesce(c.DateInserted, d.DateInserted)";
       }
       if (!$this->ImportExists('Discussion', 'CountBookmarks')) {
          $Sqls['Discussion.CountBookmarks'] = "update :_Discussion d
@@ -1579,6 +1583,9 @@ class ImportModel extends Gdn_Model {
          inner join :_Discussion d
            on d.FirstCommentID = c.CommentID";
       }
+      
+      if(!$this->ImportExists('Discussion', 'CountComments'))
+         $Sqls['Discussion.CountComments'] = $this->GetCountSQL('count', 'Discussion', 'Comment');
 
       if ($this->ImportExists('UserDiscussion') && !$this->ImportExists('UserDiscussion', 'CountComments') && $this->ImportExists('UserDiscussion', 'DateLastViewed')) {
          $Sqls['UserDiscussuion.CountComments'] = "update :_UserDiscussion ud
@@ -1675,11 +1682,6 @@ class ImportModel extends Gdn_Model {
       // The updates start here.
 		$CurrentSubstep = GetValue('CurrentSubstep', $this->Data, 0);
 
-      if($CurrentSubstep == 0) {
-         // Add the FirstCommentID to the discussion table.
-         Gdn::Structure()->Table('Discussion')->Column('FirstCommentID', 'int', NULL, 'index')->Set(FALSE, FALSE);
-      }
-
 //      $Sqls2 = array();
 //      $i = 1;
 //      foreach ($Sqls as $Name => $Sql) {
@@ -1704,8 +1706,6 @@ class ImportModel extends Gdn_Model {
 		if(isset($this->Data['CurrentSubstep']))
 			unset($this->Data['CurrentSubstep']);
 
-		// Remove the FirstCommentID from the discussion table.
-		Gdn::Structure()->Table('Discussion')->DropColumn('FirstCommentID');
 		$this->Data['CurrentStepMessage'] = '';
 
       // Update the url codes of categories.
@@ -1714,7 +1714,7 @@ class ImportModel extends Gdn_Model {
          $TakenCodes = array();
          
          foreach ($Categories as $Category) {
-            $UrlCode = Gdn_Format::Url($Category['Name']);
+            $UrlCode = urldecode(Gdn_Format::Url($Category['Name']));
             if (strlen($UrlCode) > 50)
                $UrlCode = $Category['CategoryID'];
             

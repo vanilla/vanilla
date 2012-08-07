@@ -27,7 +27,7 @@ class GravatarPlugin extends Gdn_Plugin {
             .'gravatar_id='.md5(strtolower($Email))
             .'&amp;size='.C('Garden.Profile.MaxWidth', 200);
 
-         if (C('Plugins.Gravatar.UseVanillicon', FALSE))
+         if (C('Plugins.Gravatar.UseVanillicon', TRUE))
             $Url .= '&amp;default='.urlencode(Asset('http://vanillicon.com/'.md5($Email).'_200.png'));
          else
             $Url .= '&amp;default='.urlencode(Asset(C('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default_250.png'), TRUE));
@@ -48,7 +48,7 @@ if (!function_exists('UserPhotoDefaultUrl')) {
          .'gravatar_id='.md5(strtolower($Email))
          .'&amp;size='.C('Garden.Thumbnail.Width', 50);
          
-      if (C('Plugins.Gravatar.UseVanillicon', FALSE))
+      if (C('Plugins.Gravatar.UseVanillicon', TRUE))
          $Url .= '&amp;default='.urlencode(Asset('http://vanillicon.com/'.md5($Email).'.png'));
       else
          $Url .= '&amp;default='.urlencode(Asset(C('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.png'), TRUE));

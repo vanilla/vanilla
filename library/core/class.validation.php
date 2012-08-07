@@ -575,7 +575,7 @@ class Gdn_Validation {
     *
     * @param string $FieldName The name of the form field that has the error.
     * @param string $ErrorCode The translation code of the error.
-    *    Codes thst begin with an '@' symbol are treated as literals and not translated.
+    *    Codes that begin with an '@' symbol are treated as literals and not translated.
     */
    public function AddValidationResult($FieldName, $ErrorCode = '') {
       if (!is_array($this->_ValidationResults))
@@ -606,8 +606,12 @@ class Gdn_Validation {
    }
    
    public function ResultsText() {
+      return self::ResultsAsText($this->Results());
+   }
+   
+   public static function ResultsAsText($Results) {
       $Errors = array();
-      foreach ($this->Results() as $Name => $Value) {
+      foreach ($Results as $Name => $Value) {
          if (is_array($Value)) {
             foreach ($Value as $Code) {
                $Errors[] = trim(sprintf(T($Code), T($Name)), '.');

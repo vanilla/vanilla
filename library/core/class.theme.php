@@ -39,37 +39,37 @@ class Gdn_Theme {
       if (!is_array($Data))
          $Data = array();
 
-      $Stack = 0;
+      
       if ($HomeLink) {
-         $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE));
+         $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE), 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
             $Row['Name'] = T('Home');
          
-         
-         $Result .= '<span class="CrumbLabel HomeCrumb">'.FormatString($Format, $Row).'</span> ';
-         $Stack++;
+         array_unshift($Data, $Row);
       }
       
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
 
-      
+      $Count = 0;
       foreach ($Data as $Row) {
          if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
             continue; // don't show default route twice.
          
          // Add the breadcrumb wrapper.
-         if ($Stack > 0) {
+         if ($Count > 0) {
             $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
          }
-         $Stack++;
          
          $Row['Url'] = Url($Row['Url']);
-         $Label = '<span class="CrumbLabel">'.FormatString($Format, $Row).'</span> ';
-         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '&raquo;').'</span> ', $Result, $Label);
+         $CssClass = GetValue('CssClass', $Row, 'CrumbLabel');
+         $Label = '<span class="'.$CssClass.'">'.FormatString($Format, $Row).'</span> ';
+         $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
+         
+         $Count++;
       }
       
       // Close the stack.
-      for (;$Stack > 0; $Stack--) {
+      for ($Count--;$Count > 0; $Count--) {
          $Result .= '</span>';
       }
 
@@ -136,6 +136,8 @@ class Gdn_Theme {
                $Class = trim($Class.' HasCount');
                $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
             }
+            if (!$Session->IsValid())
+               $Text = FALSE;
             break;
          case 'forumroot':
             $Route = Gdn::Router()->GetDestination('DefaultForumRoot');
@@ -216,7 +218,10 @@ class Gdn_Theme {
             }
             break;
       }
-
+      
+      if ($Text == FALSE && strpos($Format, '%text') !== FALSE)
+         return '';
+      
       if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions'], FALSE))
          return '';
 
@@ -236,7 +241,7 @@ class Gdn_Theme {
       $Result = str_replace('%url', $Url, $Result);
       $Result = str_replace('%text', $Text, $Result);
       $Result = str_replace('%class', $Class, $Result);
-
+      
       return $Result;
    }
 
@@ -255,7 +260,7 @@ class Gdn_Theme {
       echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
    }
 
-   public static function Module($Name) {
+   public static function Module($Name, $Properties = array()) {
       try {
          if (!class_exists($Name)) {
             if (Debug())
@@ -264,8 +269,12 @@ class Gdn_Theme {
                $Result = "<!-- Error: $Name doesn't exist -->";
          } else {
                $Module = new $Name(Gdn::Controller(), '');
+               $Module->Visible = TRUE;
+               foreach ($Properties as $Name => $Value) {
+                  $Module->$Name = $Value;
+               }
+               
                $Result = $Module->ToString();
-
          }
       } catch (Exception $Ex) {
          if (Debug())

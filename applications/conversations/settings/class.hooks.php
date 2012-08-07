@@ -21,6 +21,26 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class ConversationsHooks implements Gdn_IPlugin {
    
+   /**
+    *
+    * @param DbaController $Sender 
+    */
+   public function DbaController_CountJobs_Handler($Sender) {
+      $Counts = array(
+          'Conversation' => array('CountMessages', 'FirstMessageID', 'LastMessageID', 'DateUpdated', 'UpdateUserID')
+//          'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID')
+      );
+      
+      foreach ($Counts as $Table => $Columns) {
+         foreach ($Columns as $Column) {
+            $Name = "Recalculate $Table.$Column";
+            $Url = "/dba/counts.json?".http_build_query(array('table' => $Table, 'column' => $Column));
+            
+            $Sender->Data['Jobs'][$Name] = $Url;
+         }
+      }
+   }
+   
    public function UserModel_SessionQuery_Handler($Sender) {
       // Add some extra fields to the session query
       //$Sender->SQL->Select('u.CountUnreadConversations');
@@ -60,7 +80,7 @@ class ConversationsHooks implements Gdn_IPlugin {
    }
    
    /**
-    * Add 'Inbox' and 'Send Message' to profile menu.
+    * Add 'Inbox' to profile menu.
     *
     * @since 2.0.0
     * @access public
@@ -75,13 +95,47 @@ class ConversationsHooks implements Gdn_IPlugin {
    }
    
    /**
+    * Add 'Inbox' to profile menu.
+    *
+    * @since 2.0.0
+    * @access public
+    */
+   public function ProfileController_AddProfileTabs_Handler($Sender) {
+      if (Gdn::Session()->IsValid()) {
+         $Inbox = T('Inbox');
+         $InboxHtml = Sprite('SpInbox').$Inbox;
+         $InboxLink = '/messages/all';
+         
+         if (Gdn::Session()->UserID != $Sender->User->UserID) {
+            if (C('Conversations.Moderation.Allow', FALSE) && Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
+               $CountUnread = $Sender->User->CountUnreadConversations;
+               $InboxLink .= "?userid={$Sender->User->UserID}";
+            } else {
+               return;
+            }
+         } else {
+            // Nothing
+            $CountUnread = Gdn::Session()->User->CountUnreadConversations;
+         }
+         
+         if (is_numeric($CountUnread) && $CountUnread > 0)
+            $InboxHtml .= ' <span class="Aside"><span class="Count">'.$CountUnread.'</span></span>';
+         $Sender->AddProfileTab($Inbox, $InboxLink, 'Inbox', $InboxHtml);
+      }
+   }
+   
+   /**
     * Add "Message" option to profile options.
     */
-   public function ProfileController_BeforeProfileOptions_Handler($Sender) {
-      // Add a "send X a message" link to the side menu on the profile page
+   public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
       if (!$Sender->EditMode && Gdn::Session()->IsValid() && Gdn::Session()->UserID != $Sender->User->UserID)
-         echo ' '.Anchor(Sprite('SpMessage').T('Message'), '/messages/add/'.$Sender->User->Name, 'NavButton MessageNavButton').' ';
-   }
+         $Sender->EventArguments['MemberOptions'][] = array(
+            'Text' => Sprite('SpMessage').T('Message'),
+            'Url' => '/messages/add/'.$Sender->User->Name,
+            'CssClass' => 'MessageUser'
+         );
+   }   
+   
    
    /**
     * Additional options for the Preferences screen.

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-foreach ($this->CommentData->Result() as $Comment) {
+foreach ($this->Data('Comments') as $Comment) {
 	$Permalink = '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID;
 	$User = UserBuilder($Comment, 'Insert');
 	$this->EventArguments['User'] = $User;

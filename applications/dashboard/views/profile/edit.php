@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo $this->Data('Title'); ?></h2>
+<h2 class="H"><?php echo $this->Data('Title'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -19,7 +19,12 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Email', 'Email');
-         echo $this->Form->TextBox('Email');
+         
+         $Attributes2 = array();
+         if (!$this->CanEditEmail) {
+            $Attributes2['disabled'] = 'disabled';
+         }
+         echo $this->Form->TextBox('Email', $Attributes2);
       ?>
    </li>
    <li>
@@ -33,8 +38,18 @@ echo $this->Form->Errors();
          echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
       ?>
    </li>
+   
+   <?php if (C('Garden.Profile.Titles', FALSE)): ?>
+   <li class="User-Title">
+      <?php
+         echo $this->Form->Label('Title', 'Title');
+         echo $this->Form->TextBox('Title');
+      ?>
+   </li>
+   <?php endif; ?>
+   
    <?php
       $this->FireEvent('EditMyAccountAfter');
    ?>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary'));

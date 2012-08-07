@@ -335,6 +335,25 @@ class EntryController extends Gdn_Controller {
       // Check to see if there is an existing user associated with the information above.
       $Auth = $UserModel->GetAuthentication($this->Form->GetFormValue('UniqueID'), $this->Form->GetFormValue('Provider'));
       $UserID = GetValue('UserID', $Auth);
+      
+      // Check to synchronise roles upon connecting.
+      if (C('Garden.SSO.SynchRoles')) {
+         $SaveRoles = TRUE;
+         
+         // Translate the role names to IDs.
+         $Roles = $this->Form->GetFormValue('Roles');
+         $Roles = RoleModel::GetByName($Roles);
+         $RoleIDs = array_keys($Roles);
+         
+         if (empty($RoleIDs)) {
+            // The user must have at least one role. This protects that.
+            $RoleIDs = $this->UserModel->NewUserRoleIDs();
+         }
+         
+         $this->Form->SetFormValue('RoleID', $RoleIDs);
+      } else {
+         $SaveRoles = FALSE;
+      }
 
       if ($UserID) {
          // The user is already connected.
@@ -351,7 +370,7 @@ class EntryController extends Gdn_Controller {
             }
 
             // Synchronize the user's data.
-            $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
+            $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => $SaveRoles));
          }
          
          // Always save the attributes because they may contain authorization information.
@@ -364,13 +383,17 @@ class EntryController extends Gdn_Controller {
 //         $this->_SetRedirect(TRUE);
          $this->_SetRedirect($this->Request->Get('display') == 'popup');
       } elseif ($this->Form->GetFormValue('Name') || $this->Form->GetFormValue('Email')) {
+         $NameUnique = C('Garden.Registration.NameUnique', TRUE);
+         $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
+         $AutoConnect = C('Garden.Registration.AutoConnect');
+         
          // Get the existing users that match the name or email of the connection.
          $Search = FALSE;
-         if ($this->Form->GetFormValue('Name')) {
+         if ($this->Form->GetFormValue('Name') && $NameUnique) {
             $UserModel->SQL->OrWhere('Name', $this->Form->GetFormValue('Name'));
             $Search = TRUE;
          }
-         if ($this->Form->GetFormValue('Email')) {
+         if ($this->Form->GetFormValue('Email') && ($EmailUnique || $AutoConnect)) {
             $UserModel->SQL->OrWhere('Email', $this->Form->GetFormValue('Email'));
             $Search = TRUE;
          }
@@ -381,7 +404,7 @@ class EntryController extends Gdn_Controller {
             $ExistingUsers = array();
          
          // Check to automatically link the user.
-         if (C('Garden.Registration.AutoConnect') && count($ExistingUsers) > 0) {
+         if ($AutoConnect && count($ExistingUsers) > 0) {
             foreach ($ExistingUsers as $Row) {
                if ($this->Form->GetFormValue('Email') == $Row['Email']) {
                   $UserID = $Row['UserID'];
@@ -394,7 +417,7 @@ class EntryController extends Gdn_Controller {
                      if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
                         unset($Data['Photo']);
                      }
-                     $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE));
+                     $UserModel->Save($Data, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => $SaveRoles));
                   }
                   
                   if ($Attributes = $this->Form->GetFormValue('Attributes')) {
@@ -416,9 +439,7 @@ class EntryController extends Gdn_Controller {
                }
             }
          }
-
-         $NameUnique = C('Garden.Registration.NameUnique', TRUE);
-         $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
+         
          $CurrentUserID = Gdn::Session()->UserID;
 
          // Massage the existing users.
@@ -464,7 +485,7 @@ class EntryController extends Gdn_Controller {
             $User['Attributes'] = $this->Form->GetFormValue('Attributes', NULL);
             $User['Email'] = $this->Form->GetFormValue('ConnectEmail', $this->Form->GetFormValue('Email', NULL));
 
-            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
@@ -554,7 +575,7 @@ class EntryController extends Gdn_Controller {
             $User['Name'] = $User['ConnectName'];
             $User['Password'] = RandomString(50); // some password is required
             $User['HashMethod'] = 'Random';
-            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 
@@ -747,6 +768,8 @@ class EntryController extends Gdn_Controller {
                      if ($HourOffset != Gdn::Session()->User->HourOffset) {
                         Gdn::UserModel()->SetProperty(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
                      }
+                     
+                     Gdn::UserModel()->FireEvent('AfterSignIn');
 
                      $this->_SetRedirect();
                   }

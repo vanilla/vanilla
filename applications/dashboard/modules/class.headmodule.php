@@ -303,12 +303,15 @@ if (!class_exists('HeadModule', FALSE)) {
          // Add the canonical Url if necessary.
          if (method_exists($this->_Sender, 'CanonicalUrl') && !C('Garden.Modules.NoCanonicalUrl', FALSE)) {
             $CanonicalUrl = $this->_Sender->CanonicalUrl();
-            $CanonicalUrl = Gdn::Router()->ReverseRoute($CanonicalUrl);
+            
+            if (!preg_match('`^https?://`', $CanonicalUrl))
+               $CanonicalUrl = Gdn::Router()->ReverseRoute($CanonicalUrl);
+            
             $this->_Sender->CanonicalUrl($CanonicalUrl);
-            $CurrentUrl = Url('', TRUE);
-            if ($CurrentUrl != $CanonicalUrl) {
+//            $CurrentUrl = Url('', TRUE);
+//            if ($CurrentUrl != $CanonicalUrl) {
                $this->AddTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
-            }
+//            }
          }
          
          // Include facebook open-graph meta information.
@@ -325,7 +328,7 @@ if (!class_exists('HeadModule', FALSE)) {
             $this->AddTag('meta', array('property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
          
          if (isset($CanonicalUrl))
-            $this->AddTag('meta', array('property' => 'og:url', 'conent' => $CanonicalUrl));
+            $this->AddTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
          
          if ($Description = $this->_Sender->Description()) {
             $this->AddTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));

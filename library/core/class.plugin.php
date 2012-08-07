@@ -16,8 +16,22 @@
 
 abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
    
+   protected $Sender;
+   
    public function __construct() {
       parent::__construct();
+   }
+   
+   /**
+    * Get an instance of the calling class
+    * 
+    * WARNING: This method uses Late Static Binding and therefore requires 
+    * PHP 5.3+
+    * 
+    * @return Gdn_Plugin
+    */
+   public static function Instance() {
+      return Gdn::PluginManager()->GetPluginInstance(get_called_class(), Gdn_PluginManager::ACCESS_CLASSNAME);
    }
 
    public function GetPluginName() {
@@ -231,6 +245,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
    }
    
    public function Dispatch($Sender, $RequestArgs = array()) {
+      $this->Sender = $Sender;
       $Sender->Form = new Gdn_Form();
       
       $ControllerMethod = 'Controller_Index';
@@ -250,6 +265,19 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
          $PluginName = get_class($this);
          throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");
       }
+   }
+   
+   /**
+    * Passthru render request to sender
+    * 
+    * This render method automatically adds the correct ApplicationFolder parameter
+    * so that $Sender->Render() will first check the plugin's views/ folder.
+    * 
+    * @param string $ViewName 
+    */
+   public function Render($ViewName) {
+      $PluginFolder = $this->GetPluginFolder(FALSE);
+      $this->Sender->Render($ViewName, '', $PluginFolder);
    }
    
    public function UserMetaModel() {

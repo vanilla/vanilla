@@ -34,9 +34,9 @@ jQuery(document).ready(function($) {
    
    // Hijack comment form button clicks.
    var draftSaving = 0;
-   $('div.CommentForm :submit, a.PreviewButton, a.DraftButton').livequery('click', function() {
+   $('.EditCommentForm :submit, div.CommentForm :submit, a.PreviewButton, a.DraftButton').livequery('click', function() {
       var btn = this;
-      var parent = $(btn).parents('div.CommentForm');
+      var parent = $(btn).parents('div.CommentForm, div.EditCommentForm');
       var frm = $(parent).find('form');
       var textbox = $(frm).find('textarea');
       var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
@@ -82,13 +82,19 @@ jQuery(document).ready(function($) {
          
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action');
-      if (discussionID > 0)
-         action += '/' + discussionID;
+      if (action.indexOf('?') >= 0)
+         action = action.substr(0, action.indexOf('?'));
+      if (discussionID > 0) {
+         if (action.substr(-1,1) != '/')
+            action += '/';
+         
+         action += discussionID;
+      }
       
       $(frm).find(':submit').attr('disabled', 'disabled');
       $(parent).find('a.Back').after('<span class="TinyProgress">&#160;</span>');
       // Also add a spinner for comments being edited
-      $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
+      // $(btn).parents('div.Comment').find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       $(frm).triggerHandler('BeforeSubmit', [frm, btn]);
       if (type != 'Draft')
          $(':submit', frm).addClass('InProgress');
@@ -163,7 +169,7 @@ jQuery(document).ready(function($) {
             } else if (!draft) {
                // Clean up the form
                if (processedTargets)
-                  btn = $('div.CommentForm :submit');
+                  btn = $('div.CommentForm :submit, div.EditCommentForm :submit');
 
                resetCommentForm(btn);
                clearCommentForm(btn);
@@ -217,7 +223,7 @@ jQuery(document).ready(function($) {
    });
    
    function resetCommentForm(sender) {
-      var parent = $(sender).parents('.CommentForm');
+      var parent = $(sender).parents('.CommentForm, .EditCommentForm');
       $(parent).find('.Preview').remove();
       $(parent).find('.TextBoxWrapper').show();
       $('.TinyProgress').remove();
@@ -228,7 +234,7 @@ jQuery(document).ready(function($) {
       var container = $(sender).parents('li.Editing');
       $(container).removeClass('Editing');
       $('div.Popup,.Overlay').remove();
-      var frm = $(sender).parents('div.CommentForm');
+      var frm = $(sender).parents('div.CommentForm, .EditCommentForm');
       frm.find('textarea').val('');
       frm.find('input:hidden[name$=CommentID]').val('');
       // Erase any drafts
@@ -273,7 +279,7 @@ jQuery(document).ready(function($) {
       $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       if ($(msg).is(':visible')) {
          $.ajax({
-            type: "POST",
+            type: "GET",
             url: $(btn).attr('href'),
             data: 'DeliveryType=VIEW&DeliveryMethod=JSON',
             dataType: 'json',
@@ -285,6 +291,7 @@ jQuery(document).ready(function($) {
                
                $(msg).after(json.Data);
                $(msg).hide();
+               $(document).trigger('EditCommentFormLoaded', [container]);
             },
             complete: function() {
                $(parent).find('span.TinyProgress').remove();
@@ -292,7 +299,7 @@ jQuery(document).ready(function($) {
             }
          });
       } else {
-         $(parent).find('div.CommentForm').remove();
+         $(parent).find('div.EditCommentForm').remove();
          $(parent).find('span.TinyProgress').remove();
          $(msg).show();
       }
@@ -304,7 +311,7 @@ jQuery(document).ready(function($) {
    $('.Comment .Cancel a').livequery('click', function() {
       var btn = this;
       $(btn).parents('.Comment').find('div.Message').show();
-      $(btn).parents('.CommentForm').remove();
+      $(btn).parents('.CommentForm, .EditCommentForm').remove();
       return false;
    });
 
@@ -369,9 +376,9 @@ jQuery(document).ready(function($) {
    /* Comment Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {
       if ($(this).attr('checked'))
-         $('.DataList .AdminCheck :checkbox').attr('checked', 'checked');
+         $('.DataList .AdminCheck :checkbox').attr('checked', 'checked').change();
       else
-         $('.DataList .AdminCheck :checkbox').removeAttr('checked');
+         $('.DataList .AdminCheck :checkbox').removeAttr('checked').change();
    });
    $('.AdminCheck :checkbox').click(function(e) {
       e.stopPropagation();

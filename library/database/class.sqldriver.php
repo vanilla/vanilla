@@ -295,7 +295,15 @@ abstract class Gdn_SQLDriver {
       if($EscapeFieldSql === FALSE) {
          $Field = '@' . $Field;
       }
+      
       if(is_array($Value)) {
+         //$ValueStr = var_export($Value, TRUE);
+         $ValueStr = 'ARRAY';
+         Deprecated("Gdn_SQL->ConditionExpr(VALUE, {$ValueStr})", 'Gdn_SQL->ConditionExpr(VALUE, VALUE)');
+         
+         if ($EscapeValueSql)
+            throw new Gdn_UserException('Invalid function call.');
+         
          $FunctionCall = array_keys($Value);
          $FunctionCall = $FunctionCall[0];
          $FunctionArg = $Value[$FunctionCall];
@@ -895,10 +903,10 @@ abstract class Gdn_SQLDriver {
     * @param string $OrderFields A string of fields to be ordered.
     * @param string $OrderDirection The direction of the sort.
     * @param int    $Limit The number of records to limit the query to.
-    * @param int    $PageNumber The offset where the query results should begin.
+    * @param int    $Offset The offset where the query results should begin.
     * @return Gdn_DataSet The data returned by the query.
     */
-   public function GetWhere($Table = '', $Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $PageNumber = FALSE) {
+   public function GetWhere($Table = '', $Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = 0) {
       if ($Table != '') {
          //$this->MapAliases($Table);
          $this->From($Table);
@@ -909,14 +917,9 @@ abstract class Gdn_SQLDriver {
 
       if ($OrderFields != '')
          $this->OrderBy($OrderFields, $OrderDirection);
-
-      if ($Limit !== FALSE) {
-         if ($PageNumber == FALSE || $PageNumber < 1)
-            $PageNumber = 1;
-
-         $Offset = ($PageNumber - 1) * $Limit;
+      
+      if ($Limit !== FALSE)
          $this->Limit($Limit, $Offset);
-      }
 
       $Result = $this->Query($this->GetSelect());
       
@@ -1151,9 +1154,9 @@ abstract class Gdn_SQLDriver {
 
                // We are assuming here that if the existing record doesn't contain the column then it's just been added.
                if (preg_match('/^`(.+)`$/', $Value, $Matches)) {
-                  if (!isset($Row[$Key]) || $Row[$Key] != $Row[$Matches[1]])
+                  if (!array_key_exists($Key, $Row) || $Row[$Key] != $Row[$Matches[1]])
                      $this->Set('`'.$Key.'`', $Value, FALSE);
-               } elseif (!isset($Row[$Key]) || $Row[$Key] != $Value) {
+               } elseif (!array_key_exists($Key, $Row) || $Row[$Key] != $Value) {
                   $this->Set('`'.$Key.'`', $Value);
                }
                

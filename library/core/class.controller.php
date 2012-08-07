@@ -132,6 +132,12 @@ class Gdn_Controller extends Gdn_Pluggable {
    public $RedirectUrl;
    
    /**
+    * @var string Fully resolved path to the application/controller/method
+    * @since 2.1
+    */
+   public $ResolvedPath;
+   
+   /**
     * @var array The arguments passed into the controller mapped to their proper argument names.
     * @since 2.1
     */
@@ -347,7 +353,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_FormSaved = '';
       $this->_Json = array();
       $this->_Headers = array(
-         'Cache-Control' => '	private, no-cache, no-store, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1 
+         'Cache-Control' => '	private, no-cache, no-store, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1 
          'Expires' =>  'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
          'Pragma' => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
          'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
@@ -381,10 +387,13 @@ class Gdn_Controller extends Gdn_Pluggable {
       } else if ($AssetName == '') {
          $this->Assets[$AssetContainer][] = $Asset;
       } else {
-         if (isset($this->Assets[$AssetContainer][$AssetName]))
+         if (isset($this->Assets[$AssetContainer][$AssetName])) {
+            if (!is_string($Asset))
+               $Asset = $Asset->ToString();
             $this->Assets[$AssetContainer][$AssetName] .= $Asset;
-         else
+         } else {
             $this->Assets[$AssetContainer][$AssetName] = $Asset;
+         }
       }
    }
 
@@ -561,6 +570,24 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (!array_key_exists('Path', $this->_Definitions))
          $this->_Definitions['Path'] = Gdn::Request()->Path();
+      
+      if (!array_key_exists('Args', $this->_Definitions))
+         $this->_Definitions['Args'] = http_build_query (Gdn::Request()->Get());
+      
+      if (!array_key_exists('ResolvedPath', $this->_Definitions))
+         $this->_Definitions['ResolvedPath'] = $this->ResolvedPath;
+      
+      if (!array_key_exists('ResolvedArgs', $this->_Definitions)) {
+         if (sizeof($this->ReflectArgs) && (
+                 (isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof Gdn_Pluggable) ||
+                 (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable)
+               ))
+            $ReflectArgs = json_encode(array_slice($this->ReflectArgs, 1));
+         else
+            $ReflectArgs = json_encode($this->ReflectArgs);
+         
+         $this->_Definitions['ResolvedArgs'] = $ReflectArgs;
+      }
 
       if (!array_key_exists('SignedIn', $this->_Definitions)) {
          if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
@@ -752,25 +779,31 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Views come from one of four places:
          $ViewPaths = array();
-
-         foreach ($SubPaths as $SubPath) {
-            // 1. An explicitly defined path to a view
-            if (strpos($View, DS) !== FALSE)
-               $ViewPaths[] = $View;
-
-            if ($this->Theme) {
-               // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
+         
+         // 1. An explicitly defined path to a view
+         if (strpos($View, DS) !== FALSE)
+            $ViewPaths[] = $View;
+         
+         if ($this->Theme) {
+            // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
+            foreach ($SubPaths as $SubPath) {
                $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$ApplicationFolder/$SubPath.*";
                // $ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
-
-               // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
+            }
+            
+            // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
+            foreach ($SubPaths as $SubPath) {
                $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$SubPath.*";
                //$ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
             }
-            // 4. Application/plugin default. eg. /path/to/application/app_name/views/controller_name/
+         }
+         
+         // 4. Application/plugin default. eg. /path/to/application/app_name/views/controller_name/
+         foreach ($SubPaths as $SubPath) {
             $ViewPaths[] = "$BasePath/$ApplicationFolder/$SubPath.*";
             //$ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
          }
+                  
          // Find the first file that matches the path.
          $ViewPath = FALSE;
          foreach($ViewPaths as $Glob) {
@@ -798,8 +831,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * Cleanup any remaining resources for this controller.
     */
    public function Finalize() {
-      $Database = Gdn::Database();
-      $Database->CloseConnection();
+      $this->FireEvent('Finalize');
    }
 
    /**
@@ -950,6 +982,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       if (is_object($this->Menu))
          $this->Menu->Sort = Gdn::Config('Garden.Menu.Sort');
+      
+      $ResolvedPath = strtolower(CombinePaths(array(Gdn::Dispatcher()->Application(), Gdn::Dispatcher()->ControllerName, Gdn::Dispatcher()->ControllerMethod)));
+      $this->ResolvedPath = $ResolvedPath;
    }
    
    public function JsFiles() {
@@ -1134,7 +1169,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
-         $this->RenderData();
+         $ExitRender = $this->RenderData();
+         if ($ExitRender) return;
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1171,6 +1207,10 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
+         
+         if (Debug()) {
+            $this->AddModule('TraceModule');
+         }
 
          // Render
          if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
@@ -1240,7 +1280,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Remove standard and "protected" data from the top level.
          foreach ($this->Data as $Key => $Value) {
-            if ($Key && in_array($Key, array('Title')))
+            if ($Key && in_array($Key, array('Title', 'Breadcrumbs')))
                continue;
             if (isset($Key[0]) && $Key[0] === '_')
                continue; // protected
@@ -1259,19 +1299,30 @@ class Gdn_Controller extends Gdn_Pluggable {
       $CleanOutut = C('Api.Clean', TRUE);
       if ($CleanOutut) {
          // Remove values that should not be transmitted via api
-         $Remove = array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions', 'Attributes');
+         $Remove = array('Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes');
          if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             $Remove[] = 'InsertIPAddress';
             $Remove[] = 'UpdateIPAddress';
             $Remove[] = 'LastIPAddress';
             $Remove[] = 'AllIPAddresses';
             $Remove[] = 'Fingerprint';
+            $Remove[] = 'Email';
+            $Remove[] = 'DateOfBirth';
          }
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }
       
       // Make sure the database connection is closed before exiting.
       $this->Finalize();
+      
+      // Add error information from the form.
+      if (isset($this->Form) && sizeof($this->Form->ValidationResults())) {
+         $this->StatusCode(400);
+         $Data['Code'] = 400;
+         $Data['Exception'] = Gdn_Validation::ResultsAsText($this->Form->ValidationResults());
+      }
+      
+      
       $this->SendHeaders();
 
       // Check for a special view.
@@ -1280,29 +1331,32 @@ class Gdn_Controller extends Gdn_Pluggable {
          include $ViewLocation;
          return;
       }
-
+      
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
             echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
             $this->_RenderXml($Data);
-            exit();
+            return TRUE;
             break;
          case DELIVERY_METHOD_PLAIN:
-            exit();
+            return TRUE;
             break;
          case DELIVERY_METHOD_JSON:
          default:
             header('Content-Type: application/json', TRUE);
             if ($Callback = $this->Request->Get('callback', FALSE)) {
                // This is a jsonp request.
-               exit($Callback.'('.json_encode($Data).');');
+               echo $Callback.'('.json_encode($Data).');';
+               return TRUE;
             } else {
                // This is a regular json request.
-               exit(json_encode($Data));
+               echo json_encode($Data);
+               return TRUE;
             }
             break;
       }
+      return FALSE;
    }
 
    /**
@@ -1370,17 +1424,17 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SendHeaders();
 
       $Code = $Ex->getCode();
+      $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
+      
       if (Debug() && !is_a($Ex, 'Gdn_UserException'))
-         $Message = $Ex->getMessage()."\n\n".$Ex->getTraceAsString();
-      else
-         $Message = $Ex->getMessage();
+         $Data['Trace'] = $Ex->getTraceAsString();
 
       if ($Code >= 100 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);
       else
          header('HTTP/1.0 500', TRUE, 500);
 
-      $Data = array('Code' => $Code, 'Exception' => $Message);
+      
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
             header('Content-Type: application/json', TRUE);
@@ -1398,7 +1452,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
             array_map('htmlspecialchars', $Data);
-            exit("<Exception><Code>{$Data['Code']}</Code><Message>{$Data['Exception']}</Message></Exception>");
+            exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
             break;
          default:
             header('Content-Type: text/plain', TRUE);
@@ -1505,7 +1559,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Cdns = array();
             if (Gdn::Request()->Scheme() != 'https') {
                $Cdns = array(
-                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js'
+                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
                   );
             }
             

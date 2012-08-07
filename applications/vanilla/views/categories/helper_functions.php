@@ -13,35 +13,16 @@ function CategoryString($Rows) {
 }
 endif;
 
-if (!function_exists('CssClass')):
-   
-function CssClass($Row) {
-   static $Alt = FALSE;
-   $ClassName = Gdn_Format::AlphaNumeric($Row['UrlCode']);
-   
-   $Result = "Item Depth{$Row['Depth']} Category-$ClassName";
-   $Result .= ' '.(GetValue('Read', $Row) ? 'Read' : 'Unread');
-   
-   if (GetValue('Archive', $Row))
-      $Result .= ' Archived';
-   
-   if ($Alt)
-      $Result .= ' Alt';
-   $Alt = !$Alt;
-   
-   return $Result;
-}
-
-endif;
-
-
 if (!function_exists('GetOptions')):
 /**
- * Render options that the user has for this discussion.
+ * Render options that the user has for this category.
  */
-function GetOptions($Category, $Sender) {
+function GetOptions($Category) {
    if (!Gdn::Session()->IsValid())
       return;
+   
+   $Sender = Gdn::Controller();
+   
    
    $Result = '';
    $Options = '';
@@ -60,7 +41,7 @@ function GetOptions($Category, $Sender) {
       $Options .= '<li>'.Anchor(T('Hide'), "/vanilla/category/follow?categoryid=$CategoryID&value=0&tkey=$TKey").'</li>';
 
    // Allow plugins to add options
-   $Sender->FireEvent('DiscussionOptions');
+   $Sender->FireEvent('CategoryOptions');
 
    if ($Options != '') {
          $Result .= '<span class="ToggleFlyout OptionsMenu">';
@@ -70,6 +51,116 @@ function GetOptions($Category, $Sender) {
          $Result .= '</span>';
       $Result .= '</div>';
       return $Result;
+   }
+}
+endif;
+
+if (!function_exists('MostRecentString')):
+   function MostRecentString($Row) {
+      if (!$Row['LastTitle'])
+         return '';
+   
+      $R = '';
+   
+      $R .= '<span class="MostRecent">';
+      $R .= '<span class="MLabel">'.T('Most recent:').'</span> ';
+      $R .= Anchor(
+         SliceString(Gdn_Format::Text($Row['LastTitle']), 150),
+         $Row['LastUrl'],
+         'LatestPostTitle');
+
+      if (GetValue('LastName', $Row)) {
+         $R .= ' ';
+
+         $R .= '<span class="MostRecentBy">'.T('by').' ';
+         $R .= UserAnchor($Row, 'UserLink', 'Last');
+         $R .= '</span>';
+      }
+
+      if (GetValue('LastDateInserted', $Row)) {
+         $R .= ' ';
+
+         $R .= '<span class="MostRecentOn">';
+         $R .= T('on').' ';
+         $R .= Anchor(
+            Gdn_Format::Date($Row['LastDateInserted'], 'html'),
+            $Row['LastUrl'],
+            'CommentDate');
+         $R .= '</span>';
+      }
+      
+      $R .= '</span>';
+      
+      return $R;
+   }
+endif;
+
+if (!function_exists('WriteListItem')):
+   
+function WriteListItem($Row, $Depth = 1) {
+   $Children = $Row['Children'];
+   $WriteChildren = FALSE;
+   if (!empty($Children)) {
+      if (($Depth + 1) >= C('Vanilla.Categories.MaxDisplayDepth')) {
+         $WriteChildren = 'list';
+      } else {
+         $WriteChildren = 'items';
+      }
+   }
+   
+   $H = 'h'.($Depth + 1);
+   ?>
+   <li id="Category_<?php echo $Row['CategoryID']; ?>" class="<?php echo CssClass($Row); ?>">
+      <div class="ItemContent Category">
+         <?php echo GetOptions($Row); ?>
+         
+         <?php echo Wrap(Anchor($Row['Name'], $Row['Url'], 'Title'), $H, array('class' => 'CategoryName TitleWrap')); ?>
+         
+         <div class="CategoryDescription">
+            <?php echo $Row['Description']; ?>
+         </div>
+         
+         <?php if ($WriteChildren === 'list'): ?>
+         <div class="ChildCategories">
+            <?php
+            echo Wrap(T('Child Categories').': ', 'b');
+            echo CategoryString($Children, $Depth + 1);
+            ?>
+         </div>
+         <?php endif; ?>
+         
+         <div class="Meta">
+            <span class="MItem RSS"><?php
+               echo Anchor(' ', '/categories/'.rawurlencode($Row['UrlCode']).'/feed.rss', 'SpRSS');
+            ?></span>
+            
+            <span class="MItem MItem-Count DiscussionCount"><?php
+               echo Plural(
+                  $Row['CountDiscussions'],
+                  '%s discussion',
+                  '%s discussions',
+                  Gdn_Format::BigNumber($Row['CountDiscussions'], 'html'));
+            ?></span>
+            
+            <span class="MItem MItem-Count CommentCount"><?php
+               echo Plural(
+                  $Row['CountDiscussions'],
+                  '%s comment',
+                  '%s comments',
+                  Gdn_Format::BigNumber($Row['CountComments'], 'html'));
+            ?></span>
+            
+            <span class="MItem LastestPost LastDiscussionTitle"><?php
+               echo MostRecentString($Row);
+            ?></span>
+         </div>
+      </div>
+   </li>
+   <?php
+   if ($WriteChildren === 'items') {
+      foreach ($Children as $ChildRow) {
+         WriteListItem($ChildRow, $Depth + 1);
+      }
    }
 }
 endif;
@@ -106,9 +197,12 @@ function WriteTableRow($Row, $Depth = 1) {
    <tr class="<?php echo CssClass($Row); ?>">
       <td class="CategoryName">
          <?php 
-         echo Wrap(
-            Anchor($Row['Name'], $Row['Url']),
-            $H);
+            echo GetOptions($Row);
+            echo "<{$H}>";
+            echo Anchor($Row['Name'], $Row['Url']);
+            Gdn::Controller()->EventArguments['Category'] = $Row;
+            Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
+            echo "</{$H}>";
          ?>
          <div class="CategoryDescription">
             <?php echo $Row['Description']; ?>
@@ -116,7 +210,7 @@ function WriteTableRow($Row, $Depth = 1) {
          <?php if ($WriteChildren === 'list'): ?>
          <div class="ChildCategories">
             <?php
-            echo T('Child Categories').': ';
+            echo Wrap(T('Child Categories').': ', 'b');
             echo CategoryString($Children, $Depth + 1);
             ?>
          </div>
@@ -125,14 +219,16 @@ function WriteTableRow($Row, $Depth = 1) {
       <td class="BigCount CountDiscussions">
          <div class="Wrap">
             <?php
-            echo BigPlural($Row['CountDiscussions'], '%s discussion');
+//            echo "({$Row['CountDiscussions']})";
+            echo BigPlural($Row['CountAllDiscussions'], '%s discussion');
             ?>
          </div>
       </td>
       <td class="BigCount CountComments">
          <div class="Wrap">
             <?php
-            echo BigPlural($Row['CountComments'], '%s discussion');
+//            echo "({$Row['CountComments']})";
+            echo BigPlural($Row['CountAllComments'], '%s comment');
             ?>
          </div>
       </td>
@@ -140,11 +236,12 @@ function WriteTableRow($Row, $Depth = 1) {
          <div class="Block Wrap">
             <?php if ($Row['LastTitle']): ?>
             <?php 
-            echo UserPhoto($Row, array('ImageClass' => 'PhotoLink', 'Px' => 'Last'));
+            echo UserPhoto($Row, array('Size' => 'Small', 'Px' => 'Last'));
             echo Anchor(
                SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
                $Row['LastUrl'],
-               'BlockTitle LatestPostTitle');
+               'BlockTitle LatestPostTitle',
+               array('title' => html_entity_decode($Row['LastTitle'])));
             ?>
             <div class="Meta">
                <?php
@@ -168,6 +265,23 @@ function WriteTableRow($Row, $Depth = 1) {
          WriteTableRow($ChildRow, $Depth + 1);
       }
    }
+}
+endif;
+
+if (!function_exists('WriteCategoryList')):
+   
+function WriteCategoryList($Categories, $Depth = 1) {
+   ?>
+   <div class="DataListWrap">
+   <ul class="DataList CategoryList">
+      <?php
+      foreach ($Categories as $Category) {
+         WriteListItem($Category, $Depth);
+      }
+      ?>
+   </ul>
+   </div>
+   <?php
 }
 endif;
 

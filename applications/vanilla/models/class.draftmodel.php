@@ -38,7 +38,7 @@ class DraftModel extends VanillaModel {
     */
    public function DraftQuery() {
       $this->SQL
-         ->Select()
+         ->Select('d.*')
          ->From('Draft d');
    }
    
@@ -63,7 +63,6 @@ class DraftModel extends VanillaModel {
          
       $this->DraftQuery();
       $this->SQL
-         ->Select('d.DateInserted, d.Body')
          ->Select('d.Name, di.Name', 'coalesce', 'Name')
          ->Join('Discussion di', 'd.discussionID = di.DiscussionID', 'left')
          ->Where('d.InsertUserID', $UserID)

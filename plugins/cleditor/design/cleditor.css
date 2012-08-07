@@ -1,0 +1,21 @@
+body {
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   font-size: 75%;
+   line-height: 1.7em;
+}
+
+blockquote.Quote, blockQuote.UserQuote {
+   padding: 1ex 16px;
+   margin: 1em 0;
+	background: #f3f3f3;
+   background: rgba(0, 0, 0, 0.05);
+   border-left: 4px solid rgba(0, 0, 0, 0.1);
+}
+
+.QuoteAuthor {
+   margin-bottom: 10px;
+}
+
+.Spoiler {
+   background: #ff0;
+}

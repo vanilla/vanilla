@@ -31,7 +31,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    protected $PluginCache = NULL;
    protected $PluginsByClass = NULL;
    protected $PluginFoldersByPath = NULL;
-
+   
    /**
     * A simple list of enabled plugins
     */
@@ -70,6 +70,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    protected $Instances = array();
 
    protected $Started = FALSE;
+   
+   /**
+    *
+    * @var bool Whether or not to trace some event information
+    * @since 2.1 
+    */
+   public $Trace = FALSE;
 
    public function __construct() {
       parent::__construct();
@@ -622,8 +629,14 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       return $Return;
    }
+   
+   public function Trace($Message, $Type = TRACE_INFO) {
+      if ($this->Trace)
+         Trace($Message, $Type);
+   }
 
    public function CallEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType, $Options = array()) {
+      $this->Trace("CallEventHandler $EventClassName $EventName $EventHandlerType");
       $Return = FALSE;
 
       // Backwards compatible for event key.
@@ -635,7 +648,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
 
       $EventKey = strtolower($EventClassName.'_'.$EventName.'_'.$EventHandlerType);
-      
       if (!array_key_exists($EventKey, $this->_EventHandlerCollection))
          return FALSE;
       
@@ -655,19 +667,25 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $Sender->EventArguments['WildEventStack'] = $EventCaller;
       }
       
+      $this->Trace($this->_EventHandlerCollection[$EventKey], 'Event Handlers');
+      
       // Loop through the handlers and execute them
       foreach ($this->_EventHandlerCollection[$EventKey] as $PluginKey) {
          $PluginKeyParts = explode('.', $PluginKey);
          if (count($PluginKeyParts) == 2) {
             list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
 
+            
             if (isset($Sender->Returns)) {
                if (array_key_exists($EventKey, $Sender->Returns) === FALSE || is_array($Sender->Returns[$EventKey]) === FALSE)
                   $Sender->Returns[$EventKey] = array();
 
                $Return = $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
+               
                $Sender->Returns[$EventKey][$PluginKey] = $Return;
                $Return = TRUE;
+            } else {
+               $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, array(), $PassedEventKey);
             }
          }
       }

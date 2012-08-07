@@ -228,7 +228,7 @@ class ActivityController extends Gdn_Controller {
       $NewActivityID = 0;
       
       // Form submitted
-      if ($this->Form->AuthenticatedPostBack()) {
+      if ($this->Form->IsPostBack()) {
          $Body = $this->Form->GetValue('Body', '');
          $ActivityID = $this->Form->GetValue('ActivityID', '');
          if (is_numeric($ActivityID) && $ActivityID > 0) {
@@ -246,8 +246,11 @@ class ActivityController extends Gdn_Controller {
             }
             
             $this->Form->SetValidationResults($this->ActivityModel->ValidationResults());
-            if ($this->Form->ErrorCount() > 0)
+            if ($this->Form->ErrorCount() > 0) {
+               throw new Exception($this->ActivityModel->Validation->ResultsText());
+               
                $this->ErrorMessage($this->Form->Errors());
+            }
          }
       }
       

@@ -233,7 +233,8 @@ class FacebookPlugin extends Gdn_Plugin {
       
       // Save some original data in the attributes of the connection for later API calls.
       $Attributes = array(
-          'Facebook.Profile' => $Profile
+          'Facebook.Profile' => $Profile,
+          'Facebook.Token' => $AccessToken
       );
       $Form->SetFormValue('Attributes', $Attributes);
       
@@ -255,13 +256,15 @@ class FacebookPlugin extends Gdn_Plugin {
 
    public function AuthorizeUri($Query = FALSE) {
       $AppID = C('Plugins.Facebook.ApplicationID');
+      $FBScope = C('Plugins.Facebook.Scope', Array('email','publish_stream'));
 
       $RedirectUri = $this->RedirectUri();
       if ($Query)
          $RedirectUri .= '&'.$Query;
       $RedirectUri = urlencode($RedirectUri);
 
-      $SigninHref = "https://graph.facebook.com/oauth/authorize?client_id=$AppID&redirect_uri=$RedirectUri&scope=email,publish_stream";
+      $Scopes = implode(',', $FBScope);
+      $SigninHref = "https://graph.facebook.com/oauth/authorize?client_id=$AppID&redirect_uri=$RedirectUri&scope=$Scopes";
       if ($Query)
          $SigninHref .= '&'.$Query;
       return $SigninHref;

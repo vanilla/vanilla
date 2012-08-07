@@ -1,3 +1,7 @@
+body {
+   -webkit-text-size-adjust: 100%;
+}
+
 h1, h2, h3, h4, h5, h6 {
 	color:#1C2A47;
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
@@ -174,9 +178,6 @@ ul.Activities .Excerpt a,
 ul.Activities .Meta a {
 	color: #3B5998;
 }
-ul.DataList .OptionButton {
-	display: none;
-}
 body.Profile .Loading {
 	background-color: #fff;
 	border-bottom: 1px solid #BEC8CC;
@@ -288,9 +289,6 @@ ul.Discussions {
 }
 ul.Discussions .Meta span.Author {
 	font-weight: bold;
-}
-ul.DataList .Options {
-	display: none;
 }
 .MItem {
     margin-left: 4px;
@@ -405,4 +403,11 @@ td.BigCount {
 }
 .PageDescription {
    display: none;
+}
+
+.CommentFormWrap .Author {
+    display: none;
+}
+.CommentForm .FormWrapper {
+    padding: 10px;
 }

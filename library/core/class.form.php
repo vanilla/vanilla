@@ -47,7 +47,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *    If a model is assigned, the model name is used instead.
     * @access public
     */
-   public $InputPrefix = 'Form';
+   public $InputPrefix = '';
 
    /**
     * @var string Form submit method. Options are 'post' or 'get'.
@@ -135,6 +135,20 @@ class Gdn_Form extends Gdn_Pluggable {
          $Attributes['class'] .= ' '.$this->ErrorClass;
       else
          $Attributes['class'] = $this->ErrorClass;
+   }
+   
+   public function BodyBox($Column = 'Body', $Attributes = array()) {
+      TouchValue('MultiLine', $Attributes, TRUE);
+      TouchValue('format', $Attributes, $this->GetValue('Format', C('Garden.InputFormatter')));
+      TouchValue('Wrap', $Attributes, TRUE);
+      
+      $this->SetValue('Format', $Attributes['format']);
+      
+      $this->EventArguments['Table'] = GetValue('Table', $Attributes);
+      
+      $this->FireEvent('BeforeBodyBox');
+      
+      return $this->TextBox($Column, $Attributes).$this->Hidden('Format');
    }
    
    /**
@@ -251,7 +265,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $HasValue = ($Value !== array(FALSE) && $Value !== array('')) ? TRUE : FALSE;
       
       // Start with null option?
-      $IncludeNull = GetValue('IncludeNull', $Options);
+      $IncludeNull = GetValue('IncludeNull', $Options) || !$HasValue;
       if ($IncludeNull === TRUE)
          $Return .= '<option value=""></option>';
          
@@ -1118,6 +1132,9 @@ class Gdn_Form extends Gdn_Pluggable {
     * @todo check that missing DataObject parameter
     */
    public function Open($Attributes = array()) {
+//      if ($this->InputPrefix)
+//         Trace($this->InputPrefix, 'InputPrefix');
+      
       if (!is_array($Attributes))
          $Attributes = array();
       
@@ -1251,7 +1268,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $LiClose = '</li>';
       } else {
          $LiOpen = '';
-         $LiClose = '';
+         $LiClose = ' ';
       }
       
       // Show inline errors?
@@ -1434,7 +1451,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // forms sent with "get" method do not require authentication.
       //   return TRUE;
       //} else {
-      $KeyName = $this->InputPrefix . '/TransientKey';
+      $KeyName = $this->EscapeFieldName('TransientKey');
       $PostBackKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST, $KeyName, FALSE);
       
       // DEBUG:
@@ -1568,6 +1585,8 @@ class Gdn_Form extends Gdn_Pluggable {
          $this->_FormValues = $NewValue;
          return;
       }
+      
+      $MagicQuotes = get_magic_quotes_gpc();
 
       if (!is_array($this->_FormValues)) {
          $TableName = $this->InputPrefix;
@@ -1578,23 +1597,23 @@ class Gdn_Form extends Gdn_Pluggable {
          $Collection = $this->Method == 'get' ? $_GET : $_POST;
          $InputType = $this->Method == 'get' ? INPUT_GET : INPUT_POST;
          
+         
+         
          foreach($Collection as $Field => $Value) {
             $FieldName = substr($Field, $TableNameLength);
             $FieldName = $this->_UnescapeString($FieldName);
             if (substr($Field, 0, $TableNameLength) == $TableName) {
-               if (is_array($Value)) {
-                  $this->_FormValues[$FieldName] = filter_input(
-                     $InputType,
-                     $Field,
-                     FILTER_DEFAULT,
-                     FILTER_REQUIRE_ARRAY
-                  );
-               } else {
-                  $this->_FormValues[$FieldName] = filter_input(
-                     $InputType,
-                     $Field
-                  );
+               if ($MagicQuotes) {
+                  if (is_array($Value)) {
+                     foreach ($Value as $i => $v) {
+                        $Value[$i] = stripcslashes($v);
+                     }
+                  } else {
+                     $Value = stripcslashes($Value);
+                  }
                }
+               
+               $this->_FormValues[$FieldName] = $Value;
             }
          }
          
@@ -1657,7 +1676,7 @@ class Gdn_Form extends Gdn_Pluggable {
             }
          }
       }
-
+      
       // print_r($this->_FormValues);
       return $this->_FormValues;
    }
@@ -1717,9 +1736,16 @@ class Gdn_Form extends Gdn_Pluggable {
       return count($_POST) > 0 ? TRUE : FALSE;
       
       2009-03-31 - switching back to "get" dictating a postback
+      
+      2012-06-27 - Using the request method to determine a postback.
       */
-      $FormCollection = $this->Method == 'get' ? $_GET : $_POST;
-      return count($FormCollection) > 0 || (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+      
+      switch (strtolower($this->Method)) {
+         case 'get':
+            return count($_GET) > 0 || (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+         default:
+            return Gdn::Request()->IsPostBack();
+      }
    }
 
    /**
@@ -1731,7 +1757,12 @@ class Gdn_Form extends Gdn_Pluggable {
     * @return boolean
     */
    public function IsMyPostBack() {
-      return (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+      switch (strtolower($this->Method)) {
+         case 'get':
+            return count($_GET) > 0 || (is_array($this->FormValues()) && count($this->FormValues()) > 0) ? TRUE : FALSE;
+         default:
+            return Gdn::Request()->IsPostBack();
+      }
    }
    
    /**
@@ -1828,7 +1859,9 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    public function SetModel($Model, $DataSet = FALSE) {
       $this->_Model = $Model;
-      $this->InputPrefix = $this->_Model->Name;
+      
+      if ($this->InputPrefix)
+         $this->InputPrefix = $this->_Model->Name;
       if ($DataSet !== FALSE) $this->SetData($DataSet);
    }
    

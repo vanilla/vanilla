@@ -29,8 +29,8 @@ class SettingsController extends Gdn_Controller {
     * @var array
     */
    public $Uses = array('Database', 'Form', 'CategoryModel');
-	
-	/**
+   
+   /**
     * Advanced settings.
     *
     * Allows setting configuration values via form elements.
@@ -38,21 +38,21 @@ class SettingsController extends Gdn_Controller {
     * @since 2.0.0
     * @access public
     */
-	public function Advanced() {
-	   // Check permission
+   public function Advanced() {
+      // Check permission
       $this->Permission('Vanilla.Settings.Manage');
-		
-		// Load up config options we'll be setting
-		$Validation = new Gdn_Validation();
+      
+      // Load up config options we'll be setting
+      $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
          'Vanilla.Discussions.PerPage',
          'Vanilla.Comments.AutoRefresh',
          'Vanilla.Comments.PerPage',
          'Vanilla.Archive.Date',
-			'Vanilla.Archive.Exclude',
-			'Garden.EditContentTimeout',
-			'Vanilla.AdminCheckboxes.Use'
+         'Vanilla.Archive.Exclude',
+         'Garden.EditContentTimeout',
+         'Vanilla.AdminCheckboxes.Use'
       ));
       
       // Set the model on the form.
@@ -62,7 +62,7 @@ class SettingsController extends Gdn_Controller {
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
          $this->Form->SetData($ConfigurationModel->Data);
-		} else {
+      } else {
          // Define some validation rules for the fields being saved
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.PerPage', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussions.PerPage', 'Integer');
@@ -70,34 +70,34 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.PerPage', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
-			$ConfigurationModel->Validation->ApplyRule('Garden.EditContentTimeout', 'Integer');
-			
-			// Grab old config values to check for an update.
-			$ArchiveDateBak = Gdn::Config('Vanilla.Archive.Date');
-			$ArchiveExcludeBak = (bool)Gdn::Config('Vanilla.Archive.Exclude');
-			
-			// Save new settings
-			$Saved = $this->Form->Save();
-			if($Saved) {
-				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
-				$ArchiveExclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
-				
-				if($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
-					$DiscussionModel = new DiscussionModel();
-					$DiscussionModel->UpdateDiscussionCount('All');
-				}
+         $ConfigurationModel->Validation->ApplyRule('Garden.EditContentTimeout', 'Integer');
+         
+         // Grab old config values to check for an update.
+         $ArchiveDateBak = Gdn::Config('Vanilla.Archive.Date');
+         $ArchiveExcludeBak = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+         
+         // Save new settings
+         $Saved = $this->Form->Save();
+         if($Saved) {
+            $ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
+            $ArchiveExclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
+            
+            if($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
+               $DiscussionModel = new DiscussionModel();
+               $DiscussionModel->UpdateDiscussionCount('All');
+            }
             $this->InformMessage(T("Your changes have been saved."));
-			}
-		}
-		
+         }
+      }
+      
       $this->AddSideMenu('vanilla/settings/advanced');
       $this->AddJsFile('settings.js');
       $this->Title(T('Advanced Forum Settings'));
-		
-		// Render default view (settings/advanced.php)
-		$this->Render();
-	}
-	
+      
+      // Render default view (settings/advanced.php)
+      $this->Render();
+   }
+   
    /**
     * Alias for ManageCategories method.
     * 
@@ -153,7 +153,7 @@ class SettingsController extends Gdn_Controller {
          $SideMenu = new SideMenuModule($this);
          $SideMenu->HtmlId = '';
          $SideMenu->HighlightRoute($CurrentUrl);
-			$SideMenu->Sort = C('Garden.DashboardMenu.Sort');
+         $SideMenu->Sort = C('Garden.DashboardMenu.Sort');
          $this->EventArguments['SideMenu'] = &$SideMenu;
          $this->FireEvent('GetAppSettingsMenuItems');
          $this->AddModule($SideMenu, 'Panel');
@@ -168,7 +168,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function FloodControl() {
       // Check permission
-      $this->Permission('Vanilla.Spam.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Display options
       $this->Title(T('Flood Control'));
@@ -247,24 +247,30 @@ class SettingsController extends Gdn_Controller {
       
       $this->FireEvent('AddEditCategory');
       
-      if ($this->Form->AuthenticatedPostBack() == FALSE) {
-			$this->Form->AddHidden('CodeIsDefined', '0');
+      if ($this->Form->IsPostBack() == FALSE) {
+         $this->Form->AddHidden('CodeIsDefined', '0');
       } else {
-			// Form was validly submitted
-			$IsParent = $this->Form->GetFormValue('IsParent', '0');
-			$this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
+         // Form was validly submitted
+         $IsParent = $this->Form->GetFormValue('IsParent', '0');
+         $this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
          $CategoryID = $this->Form->Save();
-         if ($CategoryID) {               
-				Redirect('vanilla/settings/managecategories');
+         if ($CategoryID) {
+            $Category = CategoryModel::Categories($CategoryID);
+            $this->SetData('Category', $Category);
+            
+            if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+               Redirect('vanilla/settings/managecategories');
          } else {
-				unset($CategoryID);
-			}
+            unset($CategoryID);
+         }
       }
-		// Get all of the currently selected role/permission combinations for this junction.
-		$Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
-		$Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
-	
-      $this->SetData('PermissionData', $Permissions, TRUE);
+      // Get all of the currently selected role/permission combinations for this junction.
+      $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
+      $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
+   
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
+         $this->SetData('PermissionData', $Permissions, TRUE);
+      }
       
       // Render default view
       $this->Render();      
@@ -302,7 +308,7 @@ class SettingsController extends Gdn_Controller {
             array(
                'CategoryID <>' => $CategoryID,
                'AllowDiscussions' => $this->Category->AllowDiscussions, // Don't allow a category with discussion to be the replacement for one without discussions (or vice versa)
-					'CategoryID >' => 0
+               'CategoryID >' => 0
             ),
             'Sort'
          );
@@ -332,14 +338,14 @@ class SettingsController extends Gdn_Controller {
             // 3. The category being deleted does not allow discussions, and it
             // does contain other categories, and there are replacement parent
             // categories available, and one is not selected.
-				/*
+            /*
             if ($this->Category->AllowDiscussions == '0'
                && $this->OtherCategories->NumRows() > 0
                && !$ReplacementCategory) {
                if ($this->CategoryModel->GetWhere(array('ParentCategoryID' => $CategoryID))->NumRows() > 0)
                   $this->Form->AddError('You must select a replacement category in order to remove this category.');
             }
-				*/
+            */
             
             if ($this->Form->ErrorCount() == 0) {
                // Go ahead and delete the category
@@ -377,6 +383,11 @@ class SettingsController extends Gdn_Controller {
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
       
+      if (!$CategoryID && $this->Form->IsPostBack()) {
+         if ($ID = $this->Form->GetFormValue('CategoryID'))
+            $CategoryID = $ID;
+      }
+      
       // Get category data
       $this->Category = $this->CategoryModel->GetID($CategoryID);
       $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
@@ -397,17 +408,24 @@ class SettingsController extends Gdn_Controller {
       
       $this->FireEvent('AddEditCategory');
       
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->SetData($this->Category);
       } else {
-         if ($this->Form->Save())
-				Redirect('vanilla/settings/managecategories');
+         if ($this->Form->Save()) {
+            $Category = CategoryModel::Categories($CategoryID);
+            $this->SetData('Category', $Category);
+            
+            if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+               Redirect('vanilla/settings/managecategories');
+         }
       }
        
       // Get all of the currently selected role/permission combinations for this junction.
       $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
       $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
-      $this->SetData('PermissionData', $Permissions, TRUE);
+      
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+         $this->SetData('PermissionData', $Permissions, TRUE);
       
       // Render default view
       $this->Render();
@@ -433,7 +451,7 @@ class SettingsController extends Gdn_Controller {
       
       // Get category data
       $this->SetData('CategoryData', $this->CategoryModel->GetAll('TreeLeft'), TRUE);
-		
+      
       // Enable/Disable Categories
       if (Gdn::Session()->ValidateTransientKey(GetValue(1, $this->RequestArgs))) {
          $Toggle = GetValue(0, $this->RequestArgs, '');
@@ -444,8 +462,8 @@ class SettingsController extends Gdn_Controller {
          }
          Redirect('vanilla/settings/managecategories');
       }
-		
-		// Setup & save forms
+      
+      // Setup & save forms
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
@@ -457,13 +475,13 @@ class SettingsController extends Gdn_Controller {
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
       
-		// Define MaxDepthOptions
+      // Define MaxDepthOptions
       $DepthData = array();
       $DepthData['2'] = sprintf(T('more than %s deep'), Plural(1, '%s level', '%s levels'));
       $DepthData['3'] = sprintf(T('more than %s deep'), Plural(2, '%s level', '%s levels'));
       $DepthData['4'] = sprintf(T('more than %s deep'), Plural(3, '%s level', '%s levels')) ;
       $DepthData['0'] = T('never');
-		$this->SetData('MaxDepthData', $DepthData);
+      $this->SetData('MaxDepthData', $DepthData);
       
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
@@ -472,7 +490,7 @@ class SettingsController extends Gdn_Controller {
       } else {
          if ($this->Form->Save() !== FALSE)
             $this->InformMessage(T("Your settings have been saved."));
-		}
+      }
       
       // Render default view
       $this->Render();
@@ -491,12 +509,13 @@ class SettingsController extends Gdn_Controller {
       $this->Permission('Vanilla.Categories.Manage');
       
       // Set delivery type to true/false
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-		$TransientKey = GetIncomingValue('TransientKey');
-      if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
-			$TreeArray = GetValue('TreeArray', $_POST);
-			$this->CategoryModel->SaveTree($TreeArray);
-		}
+      $TransientKey = GetIncomingValue('TransientKey');
+      if (Gdn::Request()->IsPostBack()) {
+         $TreeArray = GetValue('TreeArray', $_POST);
+         $Saves = $this->CategoryModel->SaveTree($TreeArray);
+         $this->SetData('Result', TRUE);
+         $this->SetData('Saves', $Saves);
+      }
          
       // Renders true/false rather than template  
       $this->Render();

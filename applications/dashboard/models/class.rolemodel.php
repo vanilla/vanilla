@@ -151,6 +151,29 @@ class RoleModel extends Gdn_Model {
       }
    }
    
+   public function GetApplicantCount($Force = FALSE) {
+      $CacheKey = 'Moderation.ApplicantCount';
+      
+      if ($Force)
+         Gdn::Cache()->Remove($CacheKey);
+      
+      $Count = Gdn::Cache()->Get($CacheKey);
+      if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
+         $Count = Gdn::SQL()
+            ->Select('u.UserID', 'count', 'UserCount')
+            ->From('User u')
+            ->Join('UserRole ur', 'u.UserID = ur.UserID')
+            ->Where('ur.RoleID',  C('Garden.Registration.ApplicantRoleID', 0))
+            ->Where('u.Deleted', '0')
+            ->Get()->Value('UserCount', 0);    
+         
+         Gdn::Cache()->Store($CacheKey, $Count, array(
+            Gdn_Cache::FEATURE_EXPIRY  => 300 // 5 minutes
+         ));
+      }
+      return $Count;
+   }
+   
    /**
     * Retrieves all roles with the specified permission(s).
     *
@@ -172,6 +195,37 @@ class RoleModel extends Gdn_Model {
       }
       $this->SQL->EndWhereGroup();
       return $this->SQL->Get();
+   }
+   
+   /**
+    *
+    * @param array|string $Names 
+    */
+   public static function GetByName($Names, &$Missing = NULL) {
+      if (is_string($Names)) {
+         $Names = explode(',', $Names);
+         $Names = array_map('trim', $Names);
+      }
+      
+      // Make a lookup array of the names.
+      $Names = array_unique($Names);
+      $Names = array_combine($Names, $Names);
+      $Names = array_change_key_case($Names);
+      
+      $Roles = RoleModel::Roles();
+      $Result = array();
+      foreach ($Roles as $RoleID => $Role) {
+         $Name = strtolower($Role['Name']);
+         
+         if (isset($Names[$Name])) {
+            $Result[$RoleID] = $Role;
+            unset($Names[$Name]);
+         }
+      }
+      
+      $Missing = array_values($Names);
+      
+      return $Result;
    }
    
    public static function Roles($RoleID = NULL, $Force = FALSE) {

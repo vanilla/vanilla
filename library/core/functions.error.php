@@ -31,8 +31,25 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    // Ignore errors that are below the current error reporting level.
    if (($ErrorReporting & $ErrorNumber) != $ErrorNumber)
       return FALSE;
-
+   
    $Backtrace = debug_backtrace();
+   
+   if (($ErrorNumber & (E_NOTICE | E_USER_NOTICE)) > 0 & function_exists('Trace')) {
+      $Tr = '';
+      $i = 0;
+      foreach ($Backtrace as $Info) {
+         if (!isset($Info['file']))
+            continue;
+         
+         $Tr .= "\n{$Info['file']} line {$Info['line']}.";
+         if ($i > 2)
+            break;
+         $i++;
+      }
+      Trace("$Message{$Tr}", TRACE_NOTICE);
+      return FALSE;
+   }
+   
    throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments, $Backtrace);
 }
 
@@ -308,6 +325,8 @@ if (!function_exists('LogException')) {
       if (!Gdn::Config('Garden.Errors.LogEnabled', FALSE))
          return;
       
+      if ($Ex instanceof Gdn_UserException) return;
+      
       try {
          $Px = Gdn::Request()->Host().' Garden ';
       } catch (Exception $Ex) {
@@ -336,8 +355,7 @@ if (!function_exists('LogException')) {
 if (!function_exists('LogMessage')) {
    /**
     * Logs errors to a file. This function does not throw errors because it is
-    * a last-ditch effort after errors have already
-    * been rendered.
+    * a last-ditch effort after errors have already been rendered.
     *
     * @param string The file to save the error log in.
     * @param int The line number that encountered the error.
@@ -442,5 +460,5 @@ function PermissionException($Permission = NULL) {
       $Message = T(
          "PermissionRequired.$Permission",
          sprintf(T('You need the %s permission to do that.'), $Permission));
-   return new Exception($Message, 401);
+   return new Gdn_UserException($Message, 401);
 }

@@ -111,8 +111,8 @@ class LogController extends DashboardController {
    public function DeleteSpam($LogIDs) {
       $this->Permission('Garden.Moderation.Manage');
       
-      if (!$this->Form->IsPostBack())
-         return;
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
       
       $LogIDs = explode(',', $LogIDs);
       
@@ -145,23 +145,31 @@ class LogController extends DashboardController {
     *
     * @param int $Page Page number.
     */
-   public function Edits($Type = '', $Page = '') {
+   public function Edits($Type = '', $Page = '', $Op = FALSE) {
       $this->Permission('Garden.Moderation.Manage');
       list($Offset, $Limit) = OffsetLimit($Page, 10);
       $this->SetData('Title', T('Change Log'));
 
+      $Operations = array('Edit', 'Delete', 'Ban');
+      if ($Op && in_array(ucfirst($Op), $Operations))
+         $Operations = ucfirst($Op);
       
       $Where = array(
-          'Operation' => array('Edit', 'Delete', 'Ban')//,
+          'Operation' => $Operations//,
 //          'RecordType' => array('Discussion', 'Comment', 'Activity')
           );
+      
+      $AllowedTypes = array('Discussion', 'Comment', 'Activity', 'User');
       
       $Type = strtolower($Type);
       if ($Type == 'configuration') {
          $this->Permission('Garden.Settings.Manage');
          $Where['RecordType'] = array('Configuration');
       } else {
-         $Where['RecordType'] = array('Discussion', 'Comment', 'Activity', 'User');
+         if (in_array(ucfirst($Type), $AllowedTypes))
+            $Where['RecordType'] = ucfirst($Type);
+         else
+            $Where['RecordType'] = $AllowedTypes;
       }
       
       $RecordCount = $this->LogModel->GetCountWhere($Where);
@@ -232,6 +240,7 @@ class LogController extends DashboardController {
     */
    public function Initialize() {
       parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
       $this->AddJsFile('log.js');
       $this->AddJsFile('jquery.expander.js');
       $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
@@ -295,8 +304,8 @@ class LogController extends DashboardController {
    public function NotSpam($LogIDs) {
       $this->Permission('Garden.Moderation.Manage');
       
-      if (!$this->Form->IsPostBack())
-         return;
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
       
       $Logs = array();
       

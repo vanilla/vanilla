@@ -706,7 +706,7 @@ class ActivityModel extends Gdn_Model {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
-            $Email->To($User->Email, $User->Name);
+            $Email->To($User);
             //$Email->From(Gdn::Config('Garden.SupportEmail'), Gdn::Config('Garden.SupportName'));
             
             $Message = sprintf(
@@ -721,7 +721,10 @@ class ActivityModel extends Gdn_Model {
             $this->EventArguments = $Notification;
             $this->FireEvent('BeforeSendNotification');
             try {
-               $Email->Send();
+               // Only send if the user is not banned
+               if (!GetValue('Banned', $User))
+                  $Email->Send();
+               
                $Emailed = self::SENT_OK;
             } catch (phpmailerException $pex) {
                if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
@@ -780,7 +783,7 @@ class ActivityModel extends Gdn_Model {
       // Build the email to send.
       $Email = new Gdn_Email();
       $Email->Subject(sprintf(T('[%1$s] %2$s'), C('Garden.Title'), Gdn_Format::PlainText($Activity['Headline'])));
-      $Email->To($User['Email'], $User['Name']);
+      $Email->To($User);
       
       $Url = ExternalUrl($Activity['Route'] == '' ? '/' : $Activity['Route']);
       
@@ -802,7 +805,10 @@ class ActivityModel extends Gdn_Model {
       
       // Send the email.
       try {
-         $Email->Send();
+         // Only send if the user is not banned
+         if (!GetValue('Banned', $User))
+            $Email->Send();
+         
          $Emailed = self::SENT_OK;
          
          // Delete the activity now that it has been emailed.
@@ -869,6 +875,16 @@ class ActivityModel extends Gdn_Model {
       $this->Validation->ApplyRule('InsertUserID', 'Required');
       
       if ($this->Validate($Comment)) {
+         $Activity = $this->GetID($Comment['ActivityID'], DATASET_TYPE_ARRAY);
+         Gdn::Controller()->Json('Activity', $CommentActivityID);
+         
+         $_ActivityID = $Comment['ActivityID'];
+         // Check to see if this is a shared activity/notification.
+         if ($CommentActivityID = GetValue('CommentActivityID', $Activity['Data'])) {
+            Gdn::Controller()->Json('CommentActivityID', $CommentActivityID);
+            $Comment['ActivityID'] = $CommentActivityID;
+         }
+         
          // Check for spam.
          $Spam = SpamModel::IsSpam('ActivityComment', $Comment);
          if ($Spam)
@@ -878,9 +894,11 @@ class ActivityModel extends Gdn_Model {
          
          if ($ID) {
             // Check to see if this comment bumps the activity.
-            $Activity = $this->GetID($Comment['ActivityID'], DATASET_TYPE_ARRAY);
             if ($Activity && GetValue('Bump', $Activity['Data'])) {
                $this->SQL->Put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $Activity['ActivityID']));
+               if ($_ActivityID != $Comment['ActivityID']) {
+                  $this->SQL->Put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $_ActivityID));
+               }
             }
          }
          
@@ -906,17 +924,21 @@ class ActivityModel extends Gdn_Model {
             if (is_object($Email)) {
                $this->EventArguments = $Notification;
                $this->FireEvent('BeforeSendNotification');
-            
+
                try {
-                  $Email->Send();
-                  $Emailed = 2;
+                  // Only send if the user is not banned
+                  $User = Gdn::UserModel()->GetID($UserID);
+                  if (!GetValue('Banned', $User))
+                     $Email->Send();
+                  
+                  $Emailed = self::SENT_OK;
                } catch (phpmailerException $pex) {
                   if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
-                     $Emailed = 4;
+                     $Emailed = self::SENT_FAIL;
                   else
-                     $Emailed = 5;
+                     $Emailed = self::SENT_ERROR;
                } catch(Exception $Ex) {
-                  $Emailed = 4;
+                  $Emailed = self::SENT_FAIL;
                }
                
                try {
@@ -982,7 +1004,7 @@ class ActivityModel extends Gdn_Model {
             $ActivityHeadline = Gdn_Format::Text(Gdn_Format::ActivityHeadline($Activity, $Activity->ActivityUserID, $Activity->RegardingUserID), FALSE);
             $Email = new Gdn_Email();
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $ActivityHeadline));
-            $Email->To($User->Email, $User->Name);
+            $Email->To($User);
             $Message = sprintf(
                   $Story == '' ? T('EmailNotification', "%1\$s\n\n%2\$s") : T('EmailStoryNotification', "%3\$s\n\n%2\$s"),
                   $ActivityHeadline,
@@ -1046,11 +1068,15 @@ class ActivityModel extends Gdn_Model {
    }
    
    public function Save($Data, $Preference = FALSE, $Options = array()) {
+      Trace('ActivityModel->Save()');
       $Activity = $Data;
       $this->_Touch($Activity);
       
-      if ($Activity['ActivityUserID'] == $Activity['NotifyUserID'] && !GetValue('Force', $Options))
+      if ($Activity['ActivityUserID'] == $Activity['NotifyUserID'] && !GetValue('Force', $Options)) {
+         Trace('Skipping activity because it would notify the user of something they did.');
+         
          return; // don't notify users of something they did.
+      }
       
       // Check the user's preference.
       if ($Preference) {
@@ -1062,16 +1088,30 @@ class ActivityModel extends Gdn_Model {
             $Activity['Emailed'] = self::SENT_PENDING;
          
          if (!$Activity['Notified'] && !$Activity['Emailed'] && !GetValue('Force', $Options)) {
+            Trace("Skipping activity because the user has no preference set.");
             return;
          }
       }
       
       $ActivityType = self::GetActivityType($Activity['ActivityType']);
-      $Activity['ActivityTypeID'] = ArrayValue('ActivityTypeID', $ActivityType);
+      $ActivityTypeID = ArrayValue('ActivityTypeID', $ActivityType);
+      if (!$ActivityTypeID) {
+         Trace("There is no $ActivityType activity type.", TRACE_WARNING);
+         $ActivityType = self::GetActivityType('Default');
+         $ActivityTypeID = ArrayValue('ActivityTypeID', $ActivityType);
+      }
+      
+      $Activity['ActivityTypeID'] = $ActivityTypeID;
       
       $NotificationInc = 0;
       if ($Activity['NotifyUserID'] > 0 && $Activity['Notified'])
          $NotificationInc = 1;
+      
+      // Check to see if we are sharing this activity with another one.
+      if ($CommentActivityID = GetValue('CommentActivityID', $Activity['Data'])) {
+         $CommentActivity = $this->GetID($CommentActivityID);
+         $Activity['Data']['CommentNotifyUserID'] = $CommentActivity['NotifyUserID'];
+      }
       
       if ($GroupBy = GetValue('GroupBy', $Options)) {
          $GroupBy = (array)$GroupBy;
@@ -1133,12 +1173,33 @@ class ActivityModel extends Gdn_Model {
       }
       $Activity['Data'] = $ActivityData;
       
+      if (isset($CommentActivity)) {
+         $CommentActivity['Data']['SharedActivityID'] = $Activity['ActivityID'];
+         $CommentActivity['Data']['SharedNotifyUserID'] = $Activity['NotifyUserID'];
+         $this->SetField($CommentActivity['ActivityID'], 'Data', $CommentActivity['Data']);
+      }
+      
       if ($NotificationInc > 0) {
          $CountNotifications =  Gdn::UserModel()->GetID($Activity['NotifyUserID'])->CountNotifications + $NotificationInc;
          Gdn::UserModel()->SetField($Activity['NotifyUserID'], 'CountNotifications', $CountNotifications);
       }
       
       return $Activity;
+   }
+   
+   public function MarkRead($UserID) {
+      // Mark all of a user's unread activities read.
+      $this->SQL->Put(
+         'Activity',
+         array('Notified' => self::SENT_OK, 'Emailed' => self::SENT_OK),
+         array('NotifyUserID' => $UserID, 'Notified' => self::SENT_PENDING));
+      
+      $this->SQL->Put(
+         'Activity',
+         array('Emailed' => self::SENT_OK),
+         array('NotifyUserID' => $UserID, 'Emailed' => self::SENT_PENDING));
+      
+      Gdn::UserModel()->SetField($UserID, 'CountNotifications', 0);
    }
    
    public function MergeActivities($OldActivity, $NewActivity, $Options = array()) {

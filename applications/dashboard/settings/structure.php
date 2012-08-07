@@ -187,7 +187,7 @@ $Construct->Table('AnalyticsLocal')
    ->Engine('InnoDB')
    ->Column('TimeSlot', 'varchar(8)', FALSE, 'unique')
    ->Column('Views', 'int', NULL)
-   ->Column('CommentViews', 'int', TRUE)
+   ->Column('EmbedViews', 'int', TRUE)
    ->Set(FALSE, FALSE);
 
 // Only Create the permission table if we are using Garden's permission model.
@@ -211,6 +211,7 @@ if($PermissionModel instanceof PermissionModel) {
 
 // Define the set of permissions that Garden uses.
 $PermissionModel->Define(array(
+   'Garden.Email.View' => 'Garden.SignIn.Allow',
    'Garden.Email.Manage',
    'Garden.Settings.Manage',
    'Garden.Settings.View',
@@ -239,7 +240,7 @@ if (!$PermissionTableExists) {
 
    // Set initial guest permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 2,
+      'Role' => 'Guest',
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 0
@@ -247,44 +248,48 @@ if (!$PermissionTableExists) {
 
    // Set initial confirm email permissions.
    $PermissionModel->Save(array(
-       'RoleID' => 3,
+       'Role' => 'Unconfirmed',
        'Garden.Signin.Allow' => 1,
        'Garden.Activity.View' => 1,
        'Garden.Profiles.View' => 1,
-       'Garden.Profiles.Edit' => 0
+       'Garden.Profiles.Edit' => 0,
+       'Garden.Email.View' => 1
        ));
 
    // Set initial applicant permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 4,
+      'Role' => 'Applicant',
       'Garden.Signin.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 0
+      'Garden.Profiles.Edit' => 0,
+      'Garden.Email.View' => 1
       ));
 
    // Set initial member permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 8,
+      'Role' => 'Member',
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 1
+      'Garden.Profiles.Edit' => 1,
+      'Garden.Email.View' => 1
       ));
 
    // Set initial moderator permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 32,
+      'Role' => 'Moderator',
       'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Moderation.Manage' => 1,
       'Garden.Profiles.View' => 1,
-      'Garden.Profiles.Edit' => 1
+      'Garden.Profiles.Edit' => 1,
+      'Garden.Email.View' => 1
       ));
 
    // Set initial admininstrator permissions.
    $PermissionModel->Save(array(
-      'RoleID' => 16,
+      'Role' => 'Administrator',
       'Garden.Settings.Manage' => 1,
       'Garden.Routes.Manage' => 1,
       'Garden.Applications.Manage' => 1,
@@ -302,7 +307,8 @@ if (!$PermissionTableExists) {
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 1,
-      'Garden.AdvancedNotifications.Allow' => 1
+      'Garden.AdvancedNotifications.Allow' => 1,
+      'Garden.Email.View' => 1
       ));
 }
 $PermissionModel->ClearPermissions();
@@ -529,7 +535,7 @@ if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
 
-// This is a fix for erroneos unique constraint.
+// This is a fix for erroneous unique constraint.
 if ($Construct->TableExists('Tag')) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
@@ -585,7 +591,7 @@ $Construct->Table('Log')
    ->Column('OtherUserIDs', 'varchar(255)', NULL)
    ->Column('DateUpdated', 'datetime', NULL)
    ->Column('ParentRecordID', 'int', NULL, 'index')
-   ->Column('Data', 'text', NULL) // the data from the record.
+   ->Column('Data', 'mediumtext', NULL) // the data from the record.
    ->Column('CountGroup', 'int', NULL)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
@@ -623,3 +629,30 @@ $Construct->Table('Spammer')
    ->Column('CountSpam', 'usmallint', 0)
    ->Column('CountDeletedSpam', 'usmallint', 0)
    ->Set($Explicit, $Drop);
+
+$Construct
+   ->Table('Media')
+   ->PrimaryKey('MediaID')
+   ->Column('Name', 'varchar(255)')
+   ->Column('Path', 'varchar(255)')
+   ->Column('Type', 'varchar(128)')
+   ->Column('Size', 'int(11)')
+   
+   ->Column('InsertUserID', 'int(11)')
+   ->Column('DateInserted', 'datetime')
+   ->Column('ForeignID', 'int(11)', TRUE)
+   ->Column('ForeignTable', 'varchar(24)', TRUE)
+
+   ->Column('ImageWidth', 'usmallint', NULL)
+   ->Column('ImageHeight', 'usmallint', NULL)
+//   ->Column('StorageMethod', 'varchar(24)')
+   ->Column('ThumbWidth', 'usmallint', NULL)
+   ->Column('ThumbHeight', 'usmallint', NULL)
+   ->Column('ThumbPath', 'varchar(255)', NULL)
+   
+   ->Set(FALSE, FALSE);
+
+// Make sure the smarty folders exist.
+if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');
+if (!file_exists(PATH_CACHE.'/Smarty/cache')) @mkdir(PATH_CACHE.'/Smarty/cache');
+if (!file_exists(PATH_CACHE.'/Smarty/compile')) @mkdir(PATH_CACHE.'/Smarty/compile');

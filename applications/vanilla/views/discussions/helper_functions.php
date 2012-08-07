@@ -66,11 +66,10 @@ if (!function_exists('BookmarkButton')) {
 
 if (!function_exists('CategoryLink')):
    
-function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
-   if (!$Force && Gdn::Controller()->Data('Category')) {
-      return;
-   }
-   
+function CategoryLink($Discussion, $Prefix = ' ') {
+//   if (!$Force && Gdn::Controller()->Data('Category')) {
+//      return;
+//   }
    $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
    
    if ($Category) {
@@ -81,12 +80,12 @@ function CategoryLink($Discussion, $Prefix = ' ', $Force = FALSE) {
 endif;
 
 if (!function_exists('WriteDiscussion')):
-function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
+function WriteDiscussion($Discussion, &$Sender, &$Session) {
    $CssClass = CssClass($Discussion);
    $DiscussionUrl = $Discussion->Url;
    
    if ($Session->UserID)
-      $DiscussionUrl .= '#Item_'.($Discussion->CountCommentWatch);
+      $DiscussionUrl .= '#latest';
    
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
@@ -140,8 +139,17 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
          <?php 
          WriteTags($Discussion);
          ?>
-         <span class="MItem CommentCount"><?php 
-            printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
+         <span class="MItem MCount ViewCount"><?php
+//            echo BigPlural($Discussion->CountComments, '%s comment');
+            printf(Plural($Discussion->CountViews, 
+               '%s view', '%s views',
+               BigPlural($Discussion->CountViews, '%s view')));
+         ?></span>
+         <span class="MItem MCount CommentCount"><?php
+//            echo BigPlural($Discussion->CountComments, '%s comment');
+            printf(Plural($Discussion->CountComments, 
+               '%s comment', '%s comments',
+               BigPlural($Discussion->CountComments, '%s comment')));
          ?></span>
          <?php
             echo NewComments($Discussion);
@@ -204,40 +212,32 @@ function WritePageLink($Discussion, $PageNumber) {
 }
 endif;
 
-if (!function_exists('CssClass')):
-function CssClass($Discussion) {
-   static $Alt = FALSE;
-   $CssClass = 'Item';
-   $CssClass .= $Discussion->Bookmarked == '1' ? ' Bookmarked' : '';
-   $CssClass .= $Alt ? ' Alt ' : '';
-   $Alt = !$Alt;
-   $CssClass .= $Discussion->Announce ? ' Announcement' : '';
-   $CssClass .= $Discussion->Closed == '1' ? ' Closed' : '';
-   $CssClass .= $Discussion->Dismissed == '1' ? ' Dismissed' : '';
-   $CssClass .= $Discussion->InsertUserID == Gdn::Session()->UserID ? ' Mine' : '';
-   $CssClass .= ($Discussion->CountUnreadComments > 0 && Gdn::Session()->IsValid()) ? ' New' : '';
-   
-   return $CssClass;
-}
-endif;
-
 if (!function_exists('NewComments')):
 function NewComments($Discussion) {
    if (!Gdn::Session()->IsValid())
       return '';
    
-   if ($Discussion->CountUnreadComments === TRUE)
-      return ' <strong class="HasNew">'.T('new discussion', 'new').'</strong>';
-   elseif ($Discussion->CountUnreadComments > 0)
-      return ' <strong class="HasNew">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+   if ($Discussion->CountUnreadComments === TRUE) {
+      $Title = htmlspecialchars(T("You haven't read this yet."));
+      
+      return ' <strong class="HasNew JustNew" title="'.$Title.'">'.T('new discussion', 'new').'</strong>';
+   } elseif ($Discussion->CountUnreadComments > 0) {
+      $Title = htmlspecialchars(Plural($Discussion->CountUnreadComments, "%s new comment since you last read this.", "%s new comments since you last read this."));
+      
+      return ' <strong class="HasNew" title="'.$Title.'">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural', BigPlural($Discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong>';
+   }
    return '';
 }
 endif;
 
 if (!function_exists('Tag')):
 function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
-   if (!$Discussion->$Column)
+   $Discussion = (object)$Discussion;
+   
+   if (is_numeric($Discussion->$Column) && !$Discussion->$Column)
       return '';
+   if (!is_numeric($Discussion->$Column) && strcasecmp($Discussion->$Column, $Code) != 0)
+      return;
 
    if (!$CssClass)
       $CssClass = "Tag-$Code";

@@ -95,7 +95,7 @@ class MessagesController extends ConversationsController {
          }
       } else {
          if ($Recipient != '')
-            $this->Form->SetFormValue('To', $Recipient);
+            $this->Form->SetValue('To', $Recipient);
       }
       if ($Target = Gdn::Request()->Get('Target'))
             $this->Form->AddHidden('Target', $Target);
@@ -192,11 +192,19 @@ class MessagesController extends ConversationsController {
       $this->ConversationModel->JoinParticipants($Data);
       $this->SetData('Conversations', $Data);
       
+      // Get Conversations Count
+      //$CountConversations = $this->ConversationModel->GetCount($UserID);
+      //$this->SetData('CountConversations', $CountConversations);
+      
+      // Build the pager
+      if (!$this->Data('_PagerUrl'))
+         $this->SetData('_PagerUrl', 'messages/all/{Page}');
+      $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
       $this->SetData('_CurrentRecords', count($Data));
       
       // Deliver json data if necessary
-      if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+      if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'conversations';
@@ -376,6 +384,24 @@ class MessagesController extends ConversationsController {
       $this->AddModule('AddPeopleModule');
       
       // Render view
+      $this->Render();
+   }
+   
+   public function Popin() {
+      $this->Permission('Garden.SignIn.Allow');
+      
+      // Fetch from model  
+      $Conversations = $this->ConversationModel->Get(
+         Gdn::Session()->UserID,
+         0,
+         5
+      );
+      
+      // Join in the participants.
+      $Result =& $Conversations->ResultArray();
+      $this->ConversationModel->JoinParticipants($Result);
+      
+      $this->SetData('Conversations', $Result);
       $this->Render();
    }
    

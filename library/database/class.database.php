@@ -103,6 +103,14 @@ class Gdn_Database {
    }
    
    /**
+    * Hook for cleanup via Gdn_Factory 
+    * 
+    */
+   public function Cleanup() {
+      $this->CloseConnection();
+   }
+   
+   /**
     * Commit a transaction on the database.
     */
    public function CommitTransaction() {

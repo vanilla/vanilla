@@ -29,26 +29,83 @@ class EmbedController extends DashboardController {
     */
    public $Uses = array('Database', 'Form');
    
+   public function Index() {
+      Redirect('embed/comments');
+   }
+   
+   public function Initialize() {
+      parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
+   }
+   
    /**
     * Display the embedded forum.
     * 
     * @since 2.0.18
     * @access public
     */
-   public function Index($Toggle = '', $TransientKey = '') {
+   public function Comments($Toggle = '', $TransientKey = '') {
       $this->Permission('Garden.Settings.Manage');
       
-      if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
-         SaveToConfig('Garden.Embed.Allow', $Toggle == 'enable' ? TRUE : FALSE);
-         Redirect('embed');
+      try {
+         if ($this->Toggle($Toggle, $TransientKey))
+            Redirect('embed/comments');
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
       }
-      $this->AddSideMenu('dashboard/embed');
-      $this->Title('Embed Vanilla');
+
+      $this->AddSideMenu('dashboard/embed/comments');
+      $this->Form = new Gdn_Form();
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array('Garden.Embed.CommentsPerPage', 'Garden.Embed.SortComments', 'Garden.Embed.PageToForum'));
+      
+      $this->Form->SetModel($ConfigurationModel);
+      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $this->Form->SetData($ConfigurationModel->Data);
+      } else {
+         if ($this->Form->Save() !== FALSE)
+            $this->InformMessage(T("Your settings have been saved."));
+      }
+      
+      $this->Title(T('Blog Comments'));
+      $this->Render();
+   }
+   
+   public function Forum($Toggle = '', $TransientKey = '') {
+      $this->Permission('Garden.Settings.Manage');
+      
+      try {
+         if ($this->Toggle($Toggle, $TransientKey))
+            Redirect('embed/forum');
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+      }
+
+      $this->AddSideMenu('dashboard/embed/forum');
+      $this->Title('Embed Forum');
+      $this->Render();
+   }
+   
+   public function Advanced($Toggle = '', $TransientKey = '') {
+      $this->Permission('Garden.Settings.Manage');
+      
+      try {
+         if ($this->Toggle($Toggle, $TransientKey))
+            Redirect('embed/advanced');
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+      }
+      
+      $this->Title('Advanced Embed Settings');
+
+      $this->AddSideMenu('dashboard/embed/advanced');
       $this->Form = new Gdn_Form();
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Garden.TrustedDomains'));
+      $ConfigurationModel->SetField(array('Garden.TrustedDomains', 'Garden.Embed.RemoteUrl', 'Garden.Embed.ForceDashboard', 'Garden.Embed.ForceForum'));
       
       $this->Form->SetModel($ConfigurationModel);
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
@@ -74,8 +131,28 @@ class EmbedController extends DashboardController {
          $this->Form->SetFormValue('Garden.TrustedDomains', implode("\n", $TrustedDomains));
       }
       
+      $this->Permission('Garden.Settings.Manage');
       $this->Render();
    }
+   
+   /** 
+    * Handle toggling this version of embedding on and off. Take care of disabling the other version of embed (the old plugin).
+    * @param type $Toggle
+    * @param type $TransientKey
+    * @return boolean 
+    */
+   private function Toggle($Toggle = '', $TransientKey = '') {
+      if (in_array($Toggle, array('enable', 'disable')) && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+         if ($Toggle == 'enable' && array_key_exists('embedvanilla', Gdn::PluginManager()->EnabledPlugins()))
+            throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
+
+         // Do the toggle
+         SaveToConfig('Garden.Embed.Allow', $Toggle == 'enable' ? TRUE : FALSE);
+         return TRUE;
+      }
+      return FALSE;      
+   }
+   
    
    /**
     * Allow for a custom embed theme.

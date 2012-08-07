@@ -24,7 +24,7 @@
       width: 486px;
    }
 </style>
-<h2><?php echo $this->Data('Title');  ?></h2>
+<h2 class="H"><?php echo $this->Data('Title');  ?></h2>
 <div class="Preferences">
 <?php
 echo $this->Form->Open();
@@ -97,7 +97,7 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
 <?php
 }
 $this->FireEvent('CustomNotificationPreferneces');
-echo $this->Form->Close(T('Save Preferences'));
+echo $this->Form->Close('Save Preferences', '', array('class' => 'Button Primary'));
 $this->FireEvent("AfterPreferencesRender");
 ?>
 </div>

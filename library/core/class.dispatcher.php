@@ -135,12 +135,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    }
    
    public function Cleanup() {
-      // Destruct the db connection;
-      $Database = Gdn::Database();
-      if($Database != null)
-         $Database->CloseConnection();
+      $this->FireEvent('Cleanup');
    }
-
 
    /**
     * Return the properly formatted controller class name.
@@ -197,6 +193,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $BlockExceptions = array(
              '/^utility(\/.*)?$/'                   => self::BLOCK_NEVER,
              '/^plugin(\/.*)?$/'                    => self::BLOCK_NEVER,
+             '/^sso(\/.*)?$/'                       => self::BLOCK_NEVER,
              '/^entry(\/.*)?$/'                     => self::BLOCK_PERMISSION,
              '/^user\/usernameavailable(\/.*)?$/'   => self::BLOCK_PERMISSION,
              '/^user\/emailavailable(\/.*)?$/'      => self::BLOCK_PERMISSION,
@@ -332,12 +329,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 //            decho(array_keys($InputArgs), 'InputArgs');
             $Args = ReflectArgs($Callback, $InputArgs, $Request->Get());
             $Controller->ReflectArgs = $Args;
-//            array_shift($Args);
-//            decho($Args, 'Args');
-//            die();
             
-            $this->FireEvent('BeforeControllerMethod');
             try {
+               $this->FireEvent('BeforeControllerMethod');
                call_user_func_array($Callback, $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
@@ -347,8 +341,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->_ControllerMethodArgs = $Args;
             $Controller->ReflectArgs = $Args;
             
-            $this->FireEvent('BeforeControllerMethod');
             try {
+               $this->FireEvent('BeforeControllerMethod');
                call_user_func_array(array($Controller, $ControllerMethod), $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);

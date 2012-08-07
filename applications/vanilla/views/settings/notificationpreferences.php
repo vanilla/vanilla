@@ -9,11 +9,12 @@
    <thead>
       <tr>
          
-         <td rowspan="2" style="text-align: left;"><?php echo T('Category'); ?></td>
+         <td style="border: none;">&nbsp;</td>
          <td class="TopHeading" colspan="2"><?php echo T('Discussions'); ?></td>
          <td class="TopHeading" colspan="2"><?php echo T('Comments'); ?></td>
       </tr>
       <tr>
+         <td style="text-align: left;"><?php echo T('Category'); ?></td>
          <td class="PrefCheckBox BottomHeading"><?php echo T('Email'); ?></td>
          <td class="PrefCheckBox BottomHeading"><?php echo T('Popup'); ?></td>
          <td class="PrefCheckBox BottomHeading"><?php echo T('Email'); ?></td>

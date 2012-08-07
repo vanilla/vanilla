@@ -178,34 +178,47 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $Defaults = array(
          'VariableName' => 'Configuration',
          'WrapPHP'      => TRUE,
+         'SafePHP'      => TRUE,
          'Headings'     => TRUE,
-         'ByLine'       => TRUE
+         'ByLine'       => TRUE,
+         'FormatStyle'  => 'Array'
       );
       $Options = array_merge($Defaults, $Options);
       $VariableName = GetValue('VariableName', $Options);
       $WrapPHP = GetValue('WrapPHP', $Options, TRUE);
+      $SafePHP = GetValue('SafePHP', $Options, TRUE);
       $ByLine = GetValue('ByLine', $Options, FALSE);
+      $Headings = GetValue('Headings', $Options, TRUE);
+      $FormatStyle = GetValue('FormatStyle', $Options);
+      $Formatter = "Format{$FormatStyle}Assignment";
       
       $FirstLine = '';
       $Lines = array();
       if ($WrapPHP)
          $FirstLine .= "<?php ";
-      $FirstLine .= "if (!defined('APPLICATION')) exit();";
-      $Lines[] = $FirstLine;
+      if ($SafePHP)
+         $FirstLine .= "if (!defined('APPLICATION')) exit();";
+      
+      if (!empty($FirstLine))
+         $Lines[] = $FirstLine;
       
       if (!is_array($Data))
          return $Lines[0];
 
       $LastKey = FALSE;
       foreach ($Data as $Key => $Value) {
-         if ($Options['Headings'] && $LastKey != $Key && is_array($Value)) {
+         if ($Headings && $LastKey != $Key && is_array($Value)) {
             $Lines[] = '';
             $Lines[] = '// '.$Key;
             $LastKey = $Key;
          }
 
-         $Prefix = '$'.$VariableName."[".var_export($Key, TRUE)."]";
-         FormatArrayAssignment($Lines, $Prefix, $Value);
+         if ($FormatStyle == 'Array')
+            $Prefix = '$'.$VariableName."[".var_export($Key, TRUE)."]";
+         if ($FormatStyle == 'Dotted')
+            $Prefix = '$'.$VariableName."['".trim(var_export($Key, TRUE), "'");
+         
+         $Formatter($Lines, $Prefix, $Value);
       }
 
       if ($ByLine) {
@@ -236,7 +249,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
       $Keys = explode('.', $Name);
       // If splitting is off, HANDLE IT
       if (!$this->Splitting) {
-         $FirstKey = GetValue(0, $Keys);
+//         $FirstKey = GetValue(0, $Keys);
+         $FirstKey = $Keys[0];
          if ($FirstKey == $this->DefaultGroup)
             $Keys = array(array_shift($Keys), implode('.',$Keys));
          else
@@ -877,22 +891,30 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     * @return Gdn_ConfigurationSource 
     */
    public static function FromString($Parent, $String, $Tag, $Name = 'Configuration') {
+      $ConfigurationData = self::ParseString($String, $Name);
+      if ($ConfigurationData === FALSE)
+         throw new Exception('Could not parse config string.');
+      
+      return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $ConfigurationData);
+   }
+   
+   public static function ParseString($String, $Name) {
       // Define the variable properly.
       $$Name = NULL;
       
       // Parse the string
       if (!empty($String)) {
-         $String = str_replace(array('<?php','<?','?>'), '', $String);
+         $String = trim(str_replace(array('<?php','<?','?>'), '', $String));
          $Parsed = eval($String);
          if ($Parsed === FALSE)
-            throw new Exception('Could not parse config string.');
+            return FALSE;
       }
       
       // Make sure the config variable is here and is an array.
       if (is_null($$Name) || !is_array($$Name))
          $$Name = array();
       
-      return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $$Name);
+      return $$Name;
    }
    
    /**

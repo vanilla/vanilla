@@ -216,8 +216,21 @@ class Gdn_Model extends Gdn_Pluggable {
       
       $this->DefineSchema();      
       $Set = array_intersect_key($Property, $this->Schema->Fields());
-      
-		$this->SQL->Put($this->Name, $Set, array($this->PrimaryKey => $RowID));
+      self::SerializeRow($Set);
+      $this->SQL->Put($this->Name, $Set, array($this->PrimaryKey => $RowID));
+   }
+   
+   /**
+    * Serialize Attributes and Data columns in a row.
+    * 
+    * @param array $Row
+    * @since 2.1 
+    */
+   public static function SerializeRow(&$Row) {
+      foreach ($Row as $Name => &$Value) {
+         if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
+            $Value = empty($Value) ? NULL : serialize($Value);
+      }
    }
 
 
@@ -238,6 +251,9 @@ class Gdn_Model extends Gdn_Pluggable {
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {
+            if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
+               $Value = empty($Value) ? NULL : serialize($Value);
+            
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 
@@ -272,6 +288,9 @@ class Gdn_Model extends Gdn_Pluggable {
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {
+            if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
+               $Value = empty($Value) ? NULL : serialize($Value);
+            
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 
@@ -289,7 +308,7 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
       if(is_numeric($Where))
-         $Where = array($this->Name.'ID' => $Where);
+         $Where = array($this->PrimaryKey => $Where);
 
       if($ResetData) {
          $Result = $this->SQL->Delete($this->Name, $Where, $Limit);
@@ -366,7 +385,30 @@ class Gdn_Model extends Gdn_Pluggable {
     * @return Gdn_DataSet
     */
    public function GetID($ID, $DatasetType = FALSE) {
-      $Result = $this->GetWhere(array("{$this->Name}ID" => $ID))->FirstRow($DatasetType);
+      $Result = $this->GetWhere(array($this->PrimaryKey => $ID))->FirstRow($DatasetType);
+      
+      $Fields = array('Attributes', 'Data');
+      
+      foreach ($Fields as $Field) {
+         if (is_array($Result)) {
+            if (isset($Result[$Field]) && is_string($Result[$Field])) {
+               $Val = unserialize($Result[$Field]);
+               if ($Val)
+                  $Result[$Field] = $Val; 
+               else
+                  $Result[$Field] = $Val;
+            }               
+         } elseif (is_object($Result)) {
+            if (isset($Result->$Field) && is_string($Result->$Field)) {
+               $Val = unserialize($Result->$Field);
+               if ($Val)
+                  $Result->$Field = $Val;
+               else
+                  $Result->$Field = NULL;
+            }
+         }
+      }
+      
       return $Result;
    }
 
@@ -385,7 +427,6 @@ class Gdn_Model extends Gdn_Pluggable {
       
       return $this->SQL->GetWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
    }
-
 
    /**
     * Returns the $this->Validation->ValidationResults() array.
@@ -510,5 +551,48 @@ class Gdn_Model extends Gdn_Pluggable {
             ->Put();
 		return $Value;
    }
+   
+   /**
+    * Get something from $Record['Attributes'] by dot-formatted key
+    * 
+    * Pass record byref
+    * 
+    * @param array $Record
+    * @param string $Attribute
+    * @param mixed $Default Optional.
+    * @return mixed
+    */
+   public static function GetRecordAttribute(&$Record, $Attribute, $Default = NULL) {
+      $RV = "Attributes.{$Attribute}";
+      return GetValueR($RV, $Record, $Default);
+   }
+   
+   /**
+    * Set something on $Record['Attributes'] by dot-formatted key
+    * 
+    * Pass record byref
+    * 
+    * @param array $Record
+    * @param string $Attribute
+    * @param mixed $Value
+    * @return mixed 
+    */
+   public static function SetRecordAttribute(&$Record, $Attribute, $Value) {
+      if (!array_key_exists('Attributes', $Record))
+         $Record['Attributes'] = array();
+      
+      if (!is_array($Record['Attributes'])) return NULL;
+      
+      $Work = &$Record['Attributes'];
+      $Parts = explode('.', $Attribute);
+      while ($Part = array_shift($Parts)) {
+         $SetValue = sizeof($Parts) ? array() : $Value;
+         $Work[$Part] = $SetValue;
+         $Work = &$Work[$Part];
+      }
+      
+      return $Value;
+   }
+   
 }
 

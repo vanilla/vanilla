@@ -1,9 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 
+// 2.0.4 - mosullivan:
+// Removed deprecated function call. 
+// Corrected css reference. 
+// Fixed a bug that caused emoticons to not open the dropdown when editing.
+// Cleaned up plugin to reference itself properly, allowing for multiple emotify's on a single page to work together.
 $PluginInfo['Emotify'] = array(
 	'Name' => 'Emotify :)',
 	'Description' => 'Replaces <a href="http://en.wikipedia.org/wiki/Emoticon">emoticons</a> (smilies) with friendly pictures.',
-	'Version' 	=>	 '2.0.3',
+	'Version' 	=>	 '2.0.4',
 	'MobileFriendly' => TRUE,
 	'Author' 	=>	 "Mark O'Sullivan",
 	'AuthorEmail' => 'mark@vanillaforums.com',

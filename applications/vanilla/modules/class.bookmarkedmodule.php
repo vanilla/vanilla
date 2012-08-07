@@ -12,11 +12,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders recently active bookmarked discussions
  */
 class BookmarkedModule extends Gdn_Module {
+   public $Limit = 10;
+   public $Help = FALSE;
+   public $ListID = 'Bookmark_List';
    
-   public function GetData($Limit = 10) {
-      $this->Data = FALSE;
-      $this->Limit = $Limit;
-      if (Gdn::Session()->IsValid() && C('Vanilla.Modules.ShowBookmarkedModule', TRUE)) {
+   public function __construct() {
+      parent::__construct();
+      $this->_ApplicationFolder = 'vanilla';
+      $this->Visible = C('Vanilla.Modules.ShowBookmarkedModule', TRUE);
+   }
+   
+   public function GetData() {
+      if (Gdn::Session()->IsValid()) {
          $BookmarkIDs = Gdn::SQL()
             ->Select('DiscussionID')
             ->From('UserDiscussion')
@@ -31,13 +38,15 @@ class BookmarkedModule extends Gdn_Module {
 
             $DiscussionModel->SQL->WhereIn('d.DiscussionID', $BookmarkIDs);
             
-            $this->Data = $DiscussionModel->Get(
+            $Bookmarks = $DiscussionModel->Get(
                0,
                $this->Limit,
                array( 'w.Bookmarked' => '1' )
             );
+            $this->SetData('Bookmarks', $Bookmarks);
          } else {
-            $this->Data = FALSE;
+            
+            $this->SetData('Bookmarks', new Gdn_DataSet());
          }
       }
    }
@@ -47,10 +56,12 @@ class BookmarkedModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (!isset($this->Data))
+      if (!$this->Data('Bookmarks'))
          $this->GetData();
       
-      if (is_object($this->Data) && $this->Data->NumRows() > 0)
+      $Bookmarks = $this->Data('Bookmarks');
+      
+      if (is_object($Bookmarks) && ($Bookmarks->NumRows() > 0 || $this->Help))
          return parent::ToString();
       
       return '';

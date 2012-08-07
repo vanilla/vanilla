@@ -31,6 +31,7 @@ class UserController extends DashboardController {
     */
    public function Initialize() {
       parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
@@ -99,10 +100,11 @@ class UserController extends DashboardController {
 
       // Get user list
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
+      $this->SetData('Users', $this->UserData);
       RoleModel::SetUserRoles($this->UserData->Result());
       
       // Deliver json data if necessary
-      if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+      if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'users';
@@ -186,15 +188,8 @@ class UserController extends DashboardController {
     */
    public function ApplicantCount() {
       $this->Permission('Garden.Applicants.Manage');
-
-      $Count = Gdn::SQL()
-         ->Select('u.UserID', 'count', 'UserCount')
-         ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID',  C('Garden.Registration.ApplicantRoleID', 0))
-         ->Where('u.Deleted', '0')
-         ->Get()->Value('UserCount', 0);
-
+      $RoleModel = new RoleModel();
+      $Count = $RoleModel->GetApplicantCount();
       if ($Count > 0)
          echo '<span class="Alert">', $Count, '</span>';
    }
@@ -312,10 +307,10 @@ class UserController extends DashboardController {
          if ($this->Form->ErrorCount() == 0) {
             // Redirect after a successful save.
             if ($this->Request->Get('Target')) {
-                  $this->RedirectUrl = $this->Request->Get('Target');
-               } else {
-                  $this->RedirectUrl = UserUrl($User);
-               }
+               $this->RedirectUrl = $this->Request->Get('Target');
+            } else {
+               $this->RedirectUrl = UserUrl($User);
+            }
          }
       }
       
@@ -422,6 +417,29 @@ class UserController extends DashboardController {
       } catch (Exception $Ex) {
          $this->Form->AddError($Ex);
       }
+      $this->Render();
+   }
+   
+   public function DeleteContent($UserID) {
+      $this->Permission('Garden.Moderation.Manage');
+      
+      $User = Gdn::UserModel()->GetID($UserID);
+      if (!$User)
+         throw NotFoundException('User');
+      
+      if ($this->Request->IsPostBack()) {
+         Gdn::UserModel()->DeleteContent($UserID, array('Log' => TRUE));
+
+         if ($this->Request->Get('Target')) {
+            $this->RedirectUrl = $this->Request->Get('Target');
+         } else {
+            $this->RedirectUrl = UserUrl($User);
+         }
+      } else {
+         $this->SetData('Title', T('Are you sure you want to do this?'));
+      }
+      
+      $this->SetData('User', $User);
       $this->Render();
    }
    
@@ -611,6 +629,10 @@ class UserController extends DashboardController {
                $Email = new Gdn_Email();
                $Result = $UserModel->$Action($UserID, $Email);
                
+               // Re-calculate applicant count
+               $RoleModel = new RoleModel();
+               $RoleModel->GetApplicantCount(TRUE);
+               
                $this->FireEvent("After{$Action}User");
             } catch(Exception $ex) {
                $Result = FALSE;
@@ -684,4 +706,24 @@ class UserController extends DashboardController {
       $this->Render();
    }
    
+   public function Verify($UserID, $Verified) {
+      $this->Permission('Garden.Moderation.Manage');
+      
+      if (!$this->Request->IsPostBack()) {
+         throw PermissionException('Javascript');
+      }
+      
+      // First, set the field value.
+      Gdn::UserModel()->SetField($UserID, 'Verified', $Verified);
+      
+      $User = Gdn::UserModel()->GetID($UserID);
+      if (!$User)
+         throw NotFoundException('User');
+      
+      // Send back the verified button.
+      require_once $this->FetchViewLocation('helper_functions', 'Profile', 'Dashboard');
+      $this->JsonTarget('.User-Verified', UserVerified($User), 'ReplaceWith');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
+   }
 }

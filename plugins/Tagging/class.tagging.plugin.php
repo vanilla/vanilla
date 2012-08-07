@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.3.3',
+   'Version' => '1.4.2',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -28,6 +28,9 @@ v1.3 (2011-10-21 Lincoln)
 - Removed redundant enable/disable plugin functionality.
 
    1.3.3 - Fix inline display hook for 2.1a9 (2012-01-15 Lincoln)
+   
+v1.4 (2012-06-11 Lincoln)
+- Upgraded tokenizer to 1.6, re-customized it, and moved js files to /js folder.
 */
 
 class TaggingPlugin extends Gdn_Plugin {
@@ -64,6 +67,10 @@ class TaggingPlugin extends Gdn_Plugin {
       
       if (!property_exists($Sender->EventArguments['Object'], 'CommentID')) {
          $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
+         
+         if (!$DiscussionID)
+            return;
+         
          include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
          $TagModule = new TagModule($Sender);
          $TagModule->GetData($DiscussionID);
@@ -132,7 +139,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $DiscussionModel = new DiscussionModel();
       $this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
-      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
+      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
       
       $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);
       $Sender->SetJson('Loading', $Offset . ' to ' . $Limit);
@@ -181,8 +188,14 @@ class TaggingPlugin extends Gdn_Plugin {
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
       $IsInsert = GetValue('Insert', $Sender->EventArguments);
-      $FormTags = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
+      $RawFormTags = GetValue('Tags', $FormPostValues, '');
+      $FormTags = trim(strtolower($RawFormTags));
       $FormTags = TagModel::SplitTags($FormTags);
+      
+      // Resave the Discussion's Tags field as serialized
+      $SerializedTags = Gdn_Format::Serialize(explode(',',$RawFormTags));
+      $Sender->SQL->Update('Discussion')->Set('Tags', $SerializedTags)->Where('DiscussionID', $DiscussionID)->Put();
+      
       // Find out which of these tags is not yet in the tag table
       $ExistingTagData = $Sender->SQL->Select('TagID, Name')->From('Tag')->WhereIn('Name', $FormTags)->Get();
       $NewTags = $FormTags;
@@ -261,8 +274,8 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Validate tags when saving a discussion.
     */
-   public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
-      $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
+   public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
+      $FormPostValues = GetValue('FormPostValues', $Args, array());
       $TagsString = trim(strtolower(GetValue('Tags', $FormPostValues, '')));
       $NumTagsMax = C('Plugin.Tagging.Max', 5);
       // Tags can only contain unicode and the following ASCII: a-z 0-9 + # _ .
@@ -271,9 +284,11 @@ class TaggingPlugin extends Gdn_Plugin {
       } else {
          $Tags = TagModel::SplitTags($TagsString);
          if (!TagModel::ValidateTags($Tags)) {
-            $Sender->Validation->AddValidationResult('Tags', '@'.T('ValidateTag', 'Tags cannot contain spaces.'));
+            $Sender->Validation->AddValidationResult('Tags', '@'.T('ValidateTag', 'Tags cannot contain commas.'));
          } elseif (count($Tags) > $NumTagsMax) {
             $Sender->Validation->AddValidationResult('Tags', '@'.sprintf(T('You can only specify up to %s tags.'), $NumTagsMax));
+         } else {
+            
          }
       }
    }
@@ -310,7 +325,7 @@ class TaggingPlugin extends Gdn_Plugin {
       if ($Query) {
          $Test = Gdn::SQL()->Limit(1)->Get('Tag')->FirstRow(DATASET_TYPE_ARRAY);
          if (isset($Test['Type'])) {
-            Gdn::SQL()->Where('Type', ''); // other uis can set a different type
+            Gdn::SQL()->Where("nullif(Type, '') is null"); // Other UIs can set a different type
          }
          
          $TagData = Gdn::SQL()->Select('TagID, Name')->From('Tag')->Like('Name', $Query)->Limit(20)->Get();
@@ -391,25 +406,12 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add the tag input to the discussion form.
     * @param Gdn_Controller $Sender
     */
-   public function PostController_BeforeFormButtons_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {
-         $Discussion = GetValue('Discussion', $Sender->EventArguments);
-         if ($Discussion && !$Sender->Form->IsPostBack()) {
-            // Load the existing tags.
-            $Tags = Gdn::SQL()
-               ->Select('t.*')
-               ->From('TagDiscussion td')
-               ->Join('Tag t', 'td.TagID = t.TagID')
-               ->Where('td.DiscussionID', GetValue('DiscussionID', $Discussion))
-               ->Where("coalesce(t.Type, '')", '')
-               ->Get()->ResultArray();
-            
-            $Tags = ConsolidateArrayValuesByKey($Tags, 'Name');
-            $Sender->Form->SetValue('Tags', implode(' ', $Tags));
-         }
-         
+   public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {         
+         echo '<div class="Form-Tags P">';
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
+         echo '</div>';
       }
    }
    
@@ -418,16 +420,20 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function PostController_Render_Before($Sender) {
       $Sender->AddCSSFile('plugins/Tagging/design/token-input.css');
-      $Sender->AddJsFile('plugins/Tagging/jquery.tokeninput.js');
-      $Sender->AddJsFile($this->GetResource('tagging.js', FALSE,FALSE));
+      $Sender->AddJsFile('plugins/Tagging/js/jquery.tokeninput.vanilla.js');
+      $Sender->AddJsFile($this->GetResource('js/tagging.js', FALSE,FALSE));
       $Sender->Head->AddString('<script type="text/javascript">
    jQuery(document).ready(function($) {
+      var tags = $("#Form_Tags").val();
+      if (tags && tags.length)
+         tags = tags.split(",");
       $("#Form_Tags").tokenInput("'.Gdn::Request()->Url('plugin/tagsearch').'", {
          hintText: "Start to type...",
          searchingText: "Searching...",
          searchDelay: 300,
          minChars: 1,
          maxLength: 25,
+         prePopulate: tags,
          onFocus: function() { $(".Help").hide(); $(".HelpTags").show(); }
      });
    });
@@ -457,7 +463,7 @@ class TaggingPlugin extends Gdn_Plugin {
          // Make sure the tag is valid
          $Tag = $Sender->Form->GetFormValue('Name');
          if (!TagModel::ValidateTag($Tag))
-            $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain spaces.'));
+            $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain commas.'));
          
          // Make sure that the tag name is not already in use.
          if ($TagModel->GetWhere(array('TagID <>' => $TagID, 'Name' => $Tag))->NumRows() > 0) {
@@ -501,7 +507,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Title('Tagging');
       $Sender->AddSideMenu('settings/tagging');
       $Sender->AddCSSFile('plugins/Tagging/design/tagadmin.css');
-      $Sender->AddJSFile('plugins/Tagging/admin.js');
+      $Sender->AddJSFile('plugins/Tagging/js/admin.js');
       $SQL = Gdn::SQL();
       
       $Sender->Form->Method = 'get';

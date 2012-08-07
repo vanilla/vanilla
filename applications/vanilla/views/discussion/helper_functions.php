@@ -1,31 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * Apply correct classes to the item.
- *
- * @since 2.1
- * @param DataSet $Object Comment or discussion.
- * @param int $CurrentOffset.
- * @return string CSS classes to apply.
- */
-if (!function_exists('CssClass')):
-function CssClass($Object, $CurrentOffset = 0) {
-   $Type = (GetValue('CommentID', $Object)) ? 'Comment' : 'Discussion';
-   $CssClass = 'Item Item'.$Type;
-   $CssClass .= (GetValue('InsertUserID', $Object) == Gdn::Session()->UserID) ? ' Mine' : '';
-   
-   if ($_CssClss = GetValue('_CssClass', $Object)) {
-      $CssClass .= ' '.$_CssClss;
-   }
-   
-   if ($Type == 'Comment')
-      $CssClass .= ($CurrentOffset % 2) ? ' Alt' : '';
-   
-   return $CssClass;
-}
-endif;
-
-/**
  * Format content of comment or discussion.
  *
  * Event argument for $Object will be 'Comment' or 'Discussion'.
@@ -78,7 +53,10 @@ endif;
  */
 if (!function_exists('WriteComment')):
 function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
-   $Author = UserBuilder($Comment, 'Insert');
+   static $UserPhotoFirst = NULL;
+   if ($UserPhotoFirst === NULL)
+      $UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
+   $Author = Gdn::UserModel()->GetID($Comment->InsertUserID); //UserBuilder($Comment, 'Insert');
    $Permalink = GetValue('Url', $Comment, '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID);
 
    // Set CanEditComments (whether to show checkboxes)
@@ -99,6 +77,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->FireEvent('BeforeCommentDisplay'); ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
    <div class="Comment">
+      
       <?php
       // Write a stub for the latest comment so it's easy to link to it from outside.
       if ($CurrentOffset == Gdn::Controller()->Data('_LatestItem')) {
@@ -109,42 +88,59 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          <?php WriteCommentOptions($Comment); ?>
       </div>
       <?php $Sender->FireEvent('BeforeCommentMeta'); ?>
-      <span class="Author">
-         <?php
-         echo UserPhoto($Author);
-         echo UserAnchor($Author, 'Username');
-         ?>
-      </span>
-      <div class="Meta">
-         <span class="MItem DateCreated">
-            <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
-         </span>
-         <?php
-         // Include source if one was set
-         if ($Source = GetValue('Source', $Comment))
-            echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
+      <div class="Item-Header CommentHeader">
+         <div class="AuthorWrap">
+            <span class="Author">
+               <?php
+               if ($UserPhotoFirst) {
+                  echo UserPhoto($Author);
+                  echo UserAnchor($Author, 'Username');
+               } else {
+                  echo UserAnchor($Author, 'Username');
+                  echo UserPhoto($Author);
+               }
+               echo FormatMeAction($Comment);
+               $Sender->FireEvent('AuthorPhoto'); 
+               ?>
+            </span>
+            <span class="AuthorInfo">
+               <?php
+               echo ' '.WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
+               $Sender->FireEvent('AuthorInfo'); 
+               ?>
+            </span>   
+         </div>
+         <div class="Meta CommentMeta CommentInfo">
+            <span class="MItem DateCreated">
+               <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
+            </span>
+            <?php
+            // Include source if one was set
+            if ($Source = GetValue('Source', $Comment))
+               echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
 
-         // Add your own options or data as spans with 'MItem' class
-         $Sender->FireEvent('InsideCommentMeta');
+            $Sender->FireEvent('CommentInfo');
+            $Sender->FireEvent('InsideCommentMeta'); // DEPRECATED
+            $Sender->FireEvent('AfterCommentMeta'); // DEPRECATED
 
-         
-         $Sender->FireEvent('CommentInfo');
+            // Include IP Address if we have permission
+            if ($Session->CheckPermission('Garden.Moderation.Manage')) 
+               echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
 
-         // Include IP Address if we have permission
-         if ($Session->CheckPermission('Garden.Moderation.Manage')) 
-            echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
-         ?>
-         <?php $Sender->FireEvent('AfterCommentMeta'); ?>
+            ?>
+         </div>
       </div>
       <div class="Item-BodyWrap">
          <div class="Item-Body">
             <div class="Message">
                <?php 
-            echo FormatBody($Comment);
+                  echo FormatBody($Comment);
                ?>
             </div>
-            <?php $Sender->FireEvent('AfterCommentBody'); ?>
-            <?php WriteReactions($Comment); ?>
+            <?php 
+            $Sender->FireEvent('AfterCommentBody');
+            WriteReactions($Comment); 
+            ?>
          </div>
       </div>
    </div>
@@ -156,19 +152,9 @@ endif;
 
 if (!function_exists('WriteReactions')):
 function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-endif;
-
-if (!function_exists('WriteReactions')):
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-endif;
-
-if (!function_exists('WriteReactions')):
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
+   echo '<div class="Reactions">';
+      Gdn::Controller()->FireEvent('AfterReactions');
+   echo '</div>';
 }
 endif;
 
@@ -197,7 +183,10 @@ function GetDiscussionOptions($Discussion = NULL) {
    // Determine if we still have time to edit
    $EditContentTimeout = C('Garden.EditContentTimeout', -1);
 	$CanEdit = $EditContentTimeout == -1 || strtotime($Discussion->DateInserted) + $EditContentTimeout > time();
+   $CanEdit = ($CanEdit && $Session->UserID == $Discussion->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID);
+   
 	$TimeLeft = '';
+   
 	if ($CanEdit && $EditContentTimeout > 0 && !$Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID)) {
 		$TimeLeft = strtotime($Discussion->DateInserted) + $EditContentTimeout - time();
 		$TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::Seconds($TimeLeft).')' : '';
@@ -205,7 +194,7 @@ function GetDiscussionOptions($Discussion = NULL) {
 	
 	// Build the $Options array based on current user's permission.
    // Can the user edit the discussion?
-   if (($CanEdit && $Session->UserID == $Discussion->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID))
+   if ($CanEdit)
       $Options['EditDiscussion'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editdiscussion/'.$Discussion->DiscussionID);
 
    // Can the user announce?
@@ -219,6 +208,10 @@ function GetDiscussionOptions($Discussion = NULL) {
    // Can the user close?
    if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
       $Options['CloseDiscussion'] = array('Label' => T($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Hijack');
+   
+   if ($CanEdit && GetValueR('Attributes.ForeignUrl', $Discussion)) {
+      $Options['RefetchPage'] = array('Label' => T('Refetch Page'), 'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID, 'Class' => 'Hijack');
+   }
 
    // Can the user delete?
    if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID))
@@ -260,7 +253,7 @@ function WriteDiscussionOptions($Discussion = NULL) {
    $Options = GetDiscussionOptions($Discussion);
    
    if (empty($Options))
-      return;
+      return; 
    ?>
    <span class="ToggleFlyout OptionsMenu">
       <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
@@ -394,10 +387,16 @@ function WriteCommentForm() {
 		?>
 		<div class="Foot Closed">
 			<div class="Note Closed"><?php 
+			   $Popup =  (C('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
             echo FormatString(
-               T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}">Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'), 
-               array('SignInUrl' => Url(SignInUrl(Url(''))), 
-                     'RegisterUrl' => Url(RegisterUrl(Url(''))))); ?></div>
+               T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'), 
+               array(
+                  'SignInUrl' => Url(SignInUrl(Url(''))),
+                  'RegisterUrl' => Url(RegisterUrl(Url(''))),
+                  'Popup' => $Popup
+               )
+            ); ?>
+         </div>
 			<?php //echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
 		</div>
 		<?php
@@ -408,3 +407,82 @@ function WriteCommentForm() {
 		echo $Controller->FetchView('comment', 'post');
 }
 endif;
+
+if (!function_exists('WriteEmbedCommentForm')):
+function WriteEmbedCommentForm() {
+ 	$Session = Gdn::Session();
+	$Controller = Gdn::Controller();
+	$Discussion = $Controller->Data('Discussion');
+
+   if ($Discussion && $Discussion->Closed == '1') { 
+   ?>
+   <div class="Foot Closed">
+      <div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
+   </div>
+   <?php } else { ?>
+   <h2><?php echo T('Leave a comment'); ?></h2>
+   <div class="MessageForm CommentForm EmbedCommentForm">
+      <?php
+      echo $Controller->Form->Open();
+      echo $Controller->Form->Errors();
+      echo Wrap($Controller->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
+      echo "<div class=\"Buttons\">\n";
+      
+      $AllowSigninPopup = C('Garden.SignIn.Popup');
+      $Attributes = array('tabindex' => '-1');
+      $ReturnUrl = Gdn::Request()->PathAndQuery();
+      if ($Session->IsValid()) {
+         $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
+         echo Wrap(
+            sprintf(
+               T('Commenting as %1$s (%2$s)', 'Commenting as %1$s <span class="SignOutWrap">(%2$s)</span>'),
+               Gdn_Format::Text($Session->User->Name),
+               Anchor(T('Sign Out'), $AuthenticationUrl, 'SignOut', $Attributes)
+            ),
+            'div',
+            array('class' => 'Author')
+         );
+         echo $Controller->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
+      } else {
+         $AuthenticationUrl = SignInUrl($ReturnUrl); 
+         if ($AllowSigninPopup) {
+            $CssClass = 'SignInPopup Button Stash';
+         } else {
+            $CssClass = 'Button Stash';
+         }
+         
+         echo Anchor(T('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);
+      }
+      echo "</div>\n";
+      echo $Controller->Form->Close();
+      ?>
+   </div>
+   <?php
+   }
+}
+endif;
+
+if (!function_exists('IsMeAction')):
+   function IsMeAction($Row) {
+      $Row = (array)$Row;
+      if (!array_key_exists('Body', $Row))
+         return FALSE;
+      
+      return strpos(trim($Row['Body']), '/me ') === 0;
+   }
+endif; 
+
+if (!function_exists('FormatMeAction')):
+   function FormatMeAction($Comment) {
+      if (!IsMeAction($Comment))
+         return;
+      
+      // Maxlength (don't let people blow up the forum)
+      $Maxlength = C('Vanilla.MeAction.MaxLength', 100);
+      $Body = Gdn_Format::PlainText(substr($Comment->Body, 4));
+      if (strlen($Body) > $Maxlength)
+         $Body = substr($Body, 0, $Maxlength).'...';
+      
+      return '<div class="AuthorAction">'.$Body.'</div>';
+   }
+endif; 

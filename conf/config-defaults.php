@@ -62,7 +62,7 @@ $Configuration['Garden']['Registration']['InviteExpiration']    = '-1 week'; // 
 $Configuration['Garden']['Registration']['InviteRoles']         = 'FALSE';
 $Configuration['Garden']['Registration']['ConfirmEmail']        = FALSE;
 $Configuration['Garden']['Registration']['ConfirmEmailRole']    = 3;
-$Configuration['Garden']['TermsOfService']                      = '/dashboard/home/termsofservice'; // The url to the terms of service.
+$Configuration['Garden']['TermsOfService']                      = '/home/termsofservice'; // The url to the terms of service.
 $Configuration['Garden']['Email']['UseSmtp']                    = FALSE;
 $Configuration['Garden']['Email']['SmtpHost']                   = '';
 $Configuration['Garden']['Email']['SmtpUser']                   = '';
@@ -104,6 +104,10 @@ $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowGuestModule']          = TRUE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;
 $Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
+$Configuration['Garden']['Embed']['CommentsPerPage']            = 50;
+$Configuration['Garden']['Embed']['SortComments']               = 'desc';
+$Configuration['Garden']['Embed']['PageToForum']                = TRUE;
+
 
 // Formatting
 $Configuration['Garden']['Format']['Mentions']                  = TRUE;

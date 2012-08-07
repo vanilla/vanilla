@@ -65,12 +65,12 @@
       <?php $this->FireEvent('RegisterFormBeforeTerms'); ?>
       <li>
          <?php
-            echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));
+            echo $this->Form->CheckBox('TermsOfService', '@'.$TermsOfServiceText, array('value' => '1'));
             echo $this->Form->CheckBox('RememberMe', T('Remember me on this computer'), array('value' => '1'));
          ?>
       </li>
       <li class="Buttons">
-         <?php echo $this->Form->Button('Sign Up'); ?>
+         <?php echo $this->Form->Button('Sign Up', array('class' => 'Button Primary')); ?>
       </li>
    </ul>
    <?php echo $this->Form->Close(); ?>

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo '<h2>'.T('Edit My Thumbnail').'</h2>';
+echo '<h2 class="H">'.T('Edit My Thumbnail').'</h2>';
 echo $this->Form->Errors();
 echo $this->Form->Open(array('class' => 'Thumbnail'));
 ?>
@@ -28,4 +28,4 @@ echo $this->Form->Open(array('class' => 'Thumbnail'));
    </tbody>
 </table>
 
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary'));

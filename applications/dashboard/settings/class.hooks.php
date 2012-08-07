@@ -28,9 +28,9 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->Theme = $PreviewThemeName;
 				$Sender->InformMessage(
 					sprintf(T('You are previewing the %s theme.'), Wrap($PreviewThemeName, 'em'))
-						.'<div class="PreviewButtons">'
-						.Anchor(T('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->TransientKey(), 'PreviewButton')
-						.' '.Anchor(T('Cancel'), 'settings/cancelpreview/', 'PreviewButton')
+						.'<div class="PreviewThemeButtons">'
+						.Anchor(T('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->TransientKey(), 'PreviewThemeButton')
+						.' '.Anchor(T('Cancel'), 'settings/cancelpreview/', 'PreviewThemeButton')
 						.'</div>',
 					'DoNotDismiss'
 				);
@@ -88,13 +88,14 @@ class DashboardHooks implements Gdn_IPlugin {
 			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
       }
       
+      // 2012-07-18 - This is handled by the mebox now.
 		// If there are applicants, alert admins by showing in the main menu
-		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
+		// if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
 			// $CountApplicants = Gdn::UserModel()->GetApplicantCount();
 			// if ($CountApplicants > 0)
 			// $Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
-			$Sender->Menu->AddLink('Applicants', T('Applicants'), '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
-		}
+			// $Sender->Menu->AddLink('Applicants', T('Applicants'), '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
+		// }
 		
       if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Gdn_Statistics = Gdn::Factory('Statistics');
@@ -102,8 +103,28 @@ class DashboardHooks implements Gdn_IPlugin {
       }
 		
       // Allow forum embedding
-      if (C('Garden.Embed.Allow'))
+      if (C('Garden.Embed.Allow')) {
+         // Record the remote url where the forum is being embedded.
+         $RemoteUrl = C('Garden.Embed.RemoteUrl');
+         if (!$RemoteUrl) {
+            $RemoteUrl = GetIncomingValue('remote');
+            if ($RemoteUrl)
+               SaveToConfig('Garden.Embed.RemoteUrl', $RemoteUrl);
+         }
+         if ($RemoteUrl)
+            $Sender->AddDefinition('RemoteUrl', $RemoteUrl);
+
+         // Force embedding?
+         if (!IsSearchEngine() && !IsMobile()) {
+            $Sender->AddDefinition('ForceEmbedForum', C('Garden.Embed.ForceForum') ? '1' : '0');
+            $Sender->AddDefinition('ForceEmbedDashboard', C('Garden.Embed.ForceDashboard') ? '1' : '0');
+         }
+
+         $Sender->AddDefinition('Path', Gdn::Request()->Path());
+         // $Sender->AddDefinition('MasterView', $Sender->MasterView);
+         $Sender->AddDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
          $Sender->AddJsFile('js/embed_local.js');
+      }
          
       // Allow return to mobile site
 		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
@@ -114,7 +135,7 @@ class DashboardHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
-      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.Manage');
+      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Moderation.Manage');
 		$Menu->AddLink('Dashboard', T('Getting Started'), '/dashboard/settings/gettingstarted', 'Garden.Settings.Manage');
 		$Menu->AddLink('Dashboard', T('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.Manage');
 
@@ -126,9 +147,6 @@ class DashboardHooks implements Gdn_IPlugin {
          $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
 		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
-		// May 18, 2011 - Not quite ready for prime time - mosullivan
-		// $Menu->AddLink('Appearance', T('Embed Vanilla'), 'dashboard/embed', 'Garden.Settings.Manage');
-		
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
@@ -165,4 +183,33 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
 		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
    }
+   
+   /**
+    * Set P3P header because IE won't allow cookies thru the iFrame without it.
+    *
+    * This must be done in the Dispatcher because of PrivateCommunity.
+    * That precludes using Controller->SetHeader.
+    * This is done so comment & forum embedding can work in old IE.
+    */
+   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+      header('P3P: CP="CAO PSA OUR"', TRUE);
+      
+      if (!Gdn::Session()->IsValid() && $SSO = Gdn::Request()->Get('sso')) {
+         SaveToConfig('Garden.Registration.SendConnectEmail', FALSE, FALSE);
+         
+         $UserID = FALSE;
+         try {
+            $UserID = Gdn::UserModel()->SSO($SSO);
+         } catch (Exception $Ex) {
+            Trace($Ex, TRACE_ERROR);
+         }
+         
+         if ($UserID) {
+            Gdn::Session()->Start($UserID, TRUE, TRUE);
+         } else {
+            // There was some sort of error. Let's print that out.
+            Trace(Gdn::UserModel()->Validation->ResultsText(), TRACE_WARNING);
+         }
+      }
+   }   
 }

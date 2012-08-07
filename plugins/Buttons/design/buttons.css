@@ -1,0 +1,214 @@
+/* Danger (red) Button */
+.ButtonGroup.Danger .Button,
+.Button.Danger {
+   background: #cc0000;
+   background-image: linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -o-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -moz-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -webkit-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -ms-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #cc0000),
+      color-stop(1, #ff3333)
+   );   
+   text-shadow: 0 -1px 0 #880000;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.3);
+   border-color: #cc0000;
+   color: #fff;
+}
+.ButtonGroup.Danger.Open .Button.Handle,
+.ButtonGroup.Danger .Button:hover,
+.ButtonGroup.Danger .Button:focus,
+.ButtonGroup.Danger .Button:active,
+.Button.Danger:hover,
+.Button.Danger:focus,
+.Button.Danger:active {
+   color: #fff;
+   border-color: #aa0000;
+}
+.ButtonGroup.Danger.Open .Button.Handle,
+.ButtonGroup.Danger .Button:focus,
+.ButtonGroup.Danger .Button:active,
+.Button.Danger:focus,
+.Button.Danger:active {
+   background: #cc0000;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+/* Warning (yellow) Button */
+.ButtonGroup.Warning .Button,
+.Button.Warning {
+   background: #F89406;
+   border-width: 1px !important;   
+   background-image: linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -o-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -moz-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -webkit-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -ms-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #F89406),
+      color-stop(1, #FBB450)
+   );   
+   text-shadow: 0 -1px 0 #ba6d00;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   border-color: #ba6d00;
+   color: #fff;
+}
+/* Some fixes for the div.Warning "warning container" in style.css */
+div.ButtonGroup.Warning {
+   border: none;
+   padding: 0;
+   
+}
+.ButtonGroup.Warning.Open .Button.Handle,
+.ButtonGroup.Warning .Button:hover,
+.ButtonGroup.Warning .Button:focus,
+.ButtonGroup.Warning .Button:active,
+.Button.Warning:hover,
+.Button.Warning:focus,
+.Button.Warning:active {
+   color: #fff;
+   border-color: #996600;
+}
+.ButtonGroup.Warning.Open .Button.Handle,
+.ButtonGroup.Warning .Button:focus,
+.ButtonGroup.Warning .Button:active,
+.Button.Warning:focus,
+.Button.Warning:active {
+   background: #F89406;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+/* Action (blue) Button */
+.ButtonGroup.Primary .Button,
+.Button.Primary,
+.ButtonGroup.Action .Button,
+.Button.Action {
+   background: #0055cc;
+   border-width: 1px !important;   
+   background-image: linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -o-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -moz-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -webkit-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -ms-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #0055cc),
+      color-stop(1, #0088cc)
+   );   
+   text-shadow: 0 -1px 0 #0011cc;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   border-color: #0022cc;
+   color: #fff;
+}
+
+.ButtonGroup.Primary.Open .Button.Handle,
+.ButtonGroup.Primary .Button:hover,
+.ButtonGroup.Primary .Button:focus,
+.ButtonGroup.Primary .Button:active,
+.Button.Primary:hover,
+.Button.Primary:focus,
+.Button.Primary:active,
+.ButtonGroup.Action.Open .Button.Handle,
+.ButtonGroup.Action .Button:hover,
+.ButtonGroup.Action .Button:focus,
+.ButtonGroup.Action .Button:active,
+.Button.Action:hover,
+.Button.Action:focus,
+.Button.Action:active {
+   color: #fff;
+   border-color: #0000aa;
+}
+.ButtonGroup.Primary.Open .Button.Handle,
+.ButtonGroup.Primary .Button:focus,
+.ButtonGroup.Primary .Button:active,
+.Button.Primary:focus,
+.Button.Primary:active,
+.ButtonGroup.Action.Open .Button.Handle,
+.ButtonGroup.Action .Button:focus,
+.ButtonGroup.Action .Button:active,
+.Button.Action:focus,
+.Button.Action:active {
+   background: #0055cc;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+/* Success (green) Button */
+.ButtonGroup.Success .Button,
+.Button.Success {
+   background: #006600;
+   border-width: 1px !important;   
+   background-image: linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -o-linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -moz-linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -webkit-linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -ms-linear-gradient(bottom, #006600 0%, #009900 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #006600),
+      color-stop(1, #009900)
+   );   
+   text-shadow: 0 -1px 0 #002200;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
+   border-color: #004400;
+   color: #fff;
+}
+.ButtonGroup.Success.Open .Button.Handle,
+.ButtonGroup.Success .Button:hover,
+.ButtonGroup.Success .Button:focus,
+.ButtonGroup.Success .Button:active,
+.Button.Success:hover,
+.Button.Success:focus,
+.Button.Success:active {
+   color: #fff;
+   border-color: #002200;
+}
+.ButtonGroup.Success.Open .Button.Handle,
+.ButtonGroup.Success .Button:focus,
+.ButtonGroup.Success .Button:active,
+.Button.Success:focus,
+.Button.Success:active {
+   background: #006600;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+.Cancel a,
+a.Cancel {
+   color: #999;
+}
+.Cancel a:hover,
+a.Cancel:hover {
+   color: #a00;
+}
+
+.ButtonGroup.Danger .Button.Handle .Sprite,
+.ButtonGroup.Warning .Button.Handle .Sprite,
+.ButtonGroup.Success .Button.Handle .Sprite,
+.ButtonGroup.Action .Button.Handle .Sprite {
+    border-color: rgba(255,255,255,0.8) transparent transparent transparent;
+}
+.ButtonGroup.Open .Button.Handle .Sprite {
+    border-color: #fff transparent transparent transparent;
+}

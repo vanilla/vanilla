@@ -617,7 +617,7 @@ if (!function_exists('Debug')) {
       
       $Debug = $Value;
       if ($Debug)
-         error_reporting(E_ALL);
+         error_reporting(E_ALL & ~E_STRICT);
       else
          error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
    }
@@ -711,6 +711,8 @@ if (!function_exists('FetchPageInfo')) {
          
          // FIRST PASS: Look for open graph title, desc, images
          $PageInfo['Title'] = DomGetContent($Dom, 'meta[property=og:title]');
+         
+         Trace('Getting og:description');
          $PageInfo['Description'] = DomGetContent($Dom, 'meta[property=og:description]');
          foreach ($Dom->find('meta[property=og:image]') as $Image) {
             if (isset($Image->content))
@@ -721,12 +723,16 @@ if (!function_exists('FetchPageInfo')) {
          if ($PageInfo['Title'] == '')
             $PageInfo['Title'] = $Dom->find('title', 0)->plaintext;
          
-         if ($PageInfo['Description'] == '')
+         if ($PageInfo['Description'] == '') {
+            Trace('Getting meta description');
             $PageInfo['Description'] = DomGetContent($Dom, 'meta[name=description]');
+         }
 
          // THIRD PASS: Look in the page contents
          if ($PageInfo['Description'] == '') {
             foreach($Dom->find('p') as $element) {
+               Trace('Looking at p for description.');
+               
                if (strlen($element->plaintext) > 150) {
                   $PageInfo['Description'] = $element->plaintext;
                   break;
@@ -739,6 +745,7 @@ if (!function_exists('FetchPageInfo')) {
          // Final: Still nothing? remove limitations
          if ($PageInfo['Description'] == '') {
             foreach($Dom->find('p') as $element) {
+               Trace('Looking at p for description (no restrictions)');
                if (trim($element->plaintext) != '') {
                   $PageInfo['Description'] = $element->plaintext;
                   break;
@@ -747,8 +754,13 @@ if (!function_exists('FetchPageInfo')) {
          }
             
          // Page Images
-         if (count($PageInfo['Images']) == 0)
-            $PageInfo['Images'] = DomGetImages($Dom, $Url);
+         if (count($PageInfo['Images']) == 0) {
+            $Images = DomGetImages($Dom, $Url);
+            $PageInfo['Images'] = array_values($Images);
+         }
+         
+         $PageInfo['Title'] = HtmlEntityDecode($PageInfo['Title']);
+         $PageInfo['Description'] = HtmlEntityDecode($PageInfo['Description']);
 
       } catch (Exception $ex) {
          $PageInfo['Exception'] = $ex->getMessage();
@@ -768,34 +780,63 @@ if (!function_exists('DomGetImages')) {
    function DomGetImages($Dom, $Url, $MaxImages = 4) {
       $Images = array();
       foreach ($Dom->find('img') as $element) {
-         $Images[] = AbsoluteSource($element->src, $Url);
+         $Images[] = array('Src' => AbsoluteSource($element->src, $Url), 'Width' => $element->width, 'Height' => $element->height);
       }
+      
+//      Gdn::Controller()->Data['AllImages'] = $Images;
 
       // Sort by size, biggest one first
       $ImageSort = array();
       // Only look at first 4 images (speed!)
       $i = 0;
-      foreach ($Images as $Image) {
-         $i++;
-         if ($i > $MaxImages)
-            break;
-
+      foreach ($Images as $ImageInfo) {
+         $Image = $ImageInfo['Src'];
+         
+         if (strpos($Image, 'doubleclick.') != FALSE)
+            continue;
+         
          try {
-            list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
-            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
-            // Require min 100x100 dimension image ($Diag > 141)
-            // Prefer images that are less than 800px wide (banners?)
-            if ($Diag > 141 && $Width < 800) {
-               if (!array_key_exists($Diag, $ImageSort)) {
-                  $ImageSort[$Diag] = array($Image);
-               } else {
-                  $ImageSort[$Diag][] = $Image;
-               }
+            if ($ImageInfo['Height'] && $ImageInfo['Width']) {
+               $Height = $ImageInfo['Height'];
+               $Width = $ImageInfo['Width'];
+            } else {
+               list($Width, $Height) = getimagesize($Image);
             }
+            
+            $Diag = (int)floor(sqrt(($Width*$Width) + ($Height*$Height)));
+            
+//            Gdn::Controller()->Data['Foo'][] = array($Image, $Width, $Height, $Diag);
+            
+            if (!$Width || !$Height)
+               continue;
+            
+            // Require min 100x100 dimension image.
+            if ($Width < 100 && $Height < 100)
+               continue;
+            
+            // Don't take a banner-shaped image.
+            if ($Height * 4 < $Width)
+               continue;
+            
+            // Prefer images that are less than 800px wide (banners?)
+//            if ($Diag > 141 && $Width < 800) { }
+               
+            if (!array_key_exists($Diag, $ImageSort)) {
+               $ImageSort[$Diag] = array($Image);
+            } else {
+               $ImageSort[$Diag][] = $Image;
+            }
+            
+            
+            $i++;
+
+            if ($i > $MaxImages)
+               break;
          } catch(Exception $ex) {
             // do nothing
          }
       }
+      
       krsort($ImageSort);
       $GoodImages = array();
       foreach ($ImageSort as $Diag => $Arr) {
@@ -900,7 +941,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    $Field = trim($Parts[0]);
    $Format = trim(GetValue(1, $Parts, ''));
    $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
-   $FomatArgs = GetValue(3, $Parts, '');
+   $FormatArgs = GetValue(3, $Parts, '');
 
    if (in_array($Format, array('currency', 'integer', 'percent'))) {
       $FormatArgs = $SubFormat;
@@ -958,6 +999,23 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                }
             }
             break;
+         case 'plural':
+            if (is_array($Value))
+               $Value = count($Value);
+            elseif (StringEndsWith($Field, 'UserID', TRUE))
+               $Value = 1;
+            
+            if(!is_numeric($Value)) {
+               $Result = $Value;
+            } else {
+               if (!$SubFormat)
+                  $SubFormat = rtrim("%s $Field", 's');
+               if (!$FormatArgs)
+                  $FormatArgs = $SubFormat.'s';
+               
+               $Result = Plural($Value, $SubFormat, $FormatArgs);
+            }
+            break;
          case 'rawurlencode':
             $Result = rawurlencode($Value);
             break;
@@ -980,6 +1038,32 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
          case 'urlencode':
             $Result = urlencode($Value);
             break;
+         case 'gender':
+            // Format in the form of FieldName,gender,male,female,unknown
+            
+            if (is_array($Value) && count($Value) == 1)
+               $Value = array_shift($Value);
+            
+            $Gender = 'u';
+            
+            if (!is_array($Value)) {
+               $User = Gdn::UserModel()->GetID($Value);
+               if ($User)
+                  $Gender = $User->Gender;
+            }
+            
+            switch($Gender) {
+               case 'm':
+                  $Result = $SubFormat;
+                  break;
+               case 'f':
+                  $Result = $FormatArgs;
+                  break;
+               default:
+                  $Result = GetValue(4, $Parts);
+            }
+            
+            break;
          case 'user':
          case 'you':
          case 'his':
@@ -991,7 +1075,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = array_shift($Value);
             
             if (is_array($Value)) {
-               $Max = C('Garden.FormatUsername.Max', 10);
+               $Max = C('Garden.FormatUsername.Max', 5);
                
                $Count = count($Value);
                $Result = '';
@@ -1007,14 +1091,22 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                   if (is_array($ID)) {
                      continue;
                   }
-                  $User = Gdn::UserModel()->GetID($ID);
-                  $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
                   
                   if ($i == $Count - 1)
                      $Result .= ' '.T('sep and', 'and').' ';
                   elseif ($i > 0)
                      $Result .= ', ';
-                  $Result .= UserAnchor($User);
+                  
+                  $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
+                  if (isset($Special[$ID])) {
+                     $Result .= $Special[$ID];
+                  } else {
+                     $User = Gdn::UserModel()->GetID($ID);
+                     $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+
+
+                     $Result .= UserAnchor($User);
+                  }
                }
             } else {
                $User = Gdn::UserModel()->GetID($Value);
@@ -1099,6 +1191,38 @@ if (!function_exists('FormatArrayAssignment')) {
          $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
       } else {
          $Array[] = $Prefix .= ' = '.var_export($Value, TRUE).';';
+      }
+   }
+}
+
+// Formats values to be saved in dotted notation
+if (!function_exists('FormatDottedAssignment')) {
+   function FormatDottedAssignment(&$Array, $Prefix, $Value) {
+      if (is_array($Value)) {
+         // If $Value doesn't contain a key of "0" OR it does and it's value IS
+         // an array, this should be treated as an associative array.
+         $IsAssociativeArray = array_key_exists(0, $Value) === FALSE || is_array($Value[0]) === TRUE ? TRUE : FALSE;
+         if ($IsAssociativeArray === TRUE) {
+            foreach ($Value as $k => $v) {
+               FormatDottedAssignment($Array, "{$Prefix}.{$k}", $v);
+            }
+         } else {
+            // If $Value is not an associative array, just write it like a simple array definition.
+            $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
+            $Prefix .= "']";
+            $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
+         }
+      } else {
+         $Prefix .= "']";
+         if (is_int($Value)) {
+            $Array[] = $Prefix .= ' = '.$Value.';';
+         } elseif (is_bool($Value)) {
+            $Array[] = $Prefix .= ' = '.($Value ? 'TRUE' : 'FALSE').';';
+         } elseif (in_array($Value, array('TRUE', 'FALSE'))) {
+            $Array[] = $Prefix .= ' = '.($Value == 'TRUE' ? 'TRUE' : 'FALSE').';';
+         } else {
+            $Array[] = $Prefix .= ' = '.var_export($Value, TRUE).';';
+         }
       }
    }
 }
@@ -1357,7 +1481,7 @@ if (!function_exists('IsMobile')) {
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos)/i', $UserAgent))
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos|playbook)/i', $UserAgent))
          $Mobile++;
  
       if(
@@ -1469,6 +1593,20 @@ if (!function_exists('IsWritable')) {
       return TRUE;
    }
 }
+
+if (!function_exists('MarkString')):
+   /**
+    * Wrap occurences of $Needle in $Haystack with <mark> tags. Explodes $Needle 
+    * on spaces. Returns $Haystack with replacements.
+    */   
+   function MarkString($Needle, $Haystack) {
+      $Needle = explode(' ', $Needle);
+      foreach ($Needle as $n) {
+         $Haystack = preg_replace('#(?!<.*?)('.preg_quote($n).')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
+      }
+      return $Haystack;
+   }
+endif;
 
 if (!function_exists('MergeArrays')) {
    /**
@@ -1593,8 +1731,8 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
-if (!function_exists('write_ini_file')) {
-   function write_ini_file($File, $Data) {
+if (!function_exists('write_ini_string')) {
+   function write_ini_string($Data) {
       $Flat = array();
       foreach($Data as $Topic => $Settings) {
          if (is_array($Settings)) {
@@ -1604,7 +1742,14 @@ if (!function_exists('write_ini_file')) {
          }
          else $Flat[] = "{$Topic} = ".(is_numeric($Settings) ? $Settings : '"'.$Settings.'"');
       }
-      Gdn_FileSystem::SaveFile($File, implode("\n", $Flat));
+      return implode("\n", $Flat);
+   }
+}
+
+if (!function_exists('write_ini_file')) {
+   function write_ini_file($File, $Data) {
+      $String = write_ini_string($Data);
+      Gdn_FileSystem::SaveFile($File, $String);
    }
 }
 
@@ -1615,6 +1760,85 @@ if (!function_exists('SignInPopup')) {
     */
    function SignInPopup() {
       return C('Garden.SignIn.Popup') && !IsMobile();
+   }
+}
+
+if (!function_exists('ParseUrl')) {
+   // 
+   /** 
+    * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
+    * @param string $Url The url to parse. 
+    * @param constant Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH, PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
+    */
+   function ParseUrl($Url, $Component = -1) {
+      // Retrieve all the parts
+      $PHP_URL_SCHEME = @parse_url($Url, PHP_URL_SCHEME);
+      $PHP_URL_HOST = @parse_url($Url, PHP_URL_HOST);
+      $PHP_URL_PORT = @parse_url($Url, PHP_URL_PORT);
+      $PHP_URL_USER = @parse_url($Url, PHP_URL_USER);
+      $PHP_URL_PASS = @parse_url($Url, PHP_URL_PASS);
+      $PHP_URL_PATH = @parse_url($Url, PHP_URL_PATH);
+      $PHP_URL_QUERY = @parse_url($Url, PHP_URL_QUERY);
+      $PHP_URL_FRAGMENT = @parse_url($Url, PHP_URL_FRAGMENT);
+
+      // Build a cleaned up array to return
+      $Parts = array(
+         'scheme' => $PHP_URL_SCHEME == NULL ? 'http' : $PHP_URL_SCHEME,
+         'host' => $PHP_URL_HOST == NULL ? '' : $PHP_URL_HOST,
+         'port' => $PHP_URL_PORT == NULL ? $PHP_URL_SCHEME == 'https' ? '443' : '80' : $PHP_URL_PORT,
+         'user' => $PHP_URL_USER == NULL ? '' : $PHP_URL_USER,
+         'pass' => $PHP_URL_PASS == NULL ? '' : $PHP_URL_PASS,
+         'path' => $PHP_URL_PATH == NULL ? '' : $PHP_URL_PATH,
+         'query' => $PHP_URL_QUERY == NULL ? '' : $PHP_URL_QUERY,
+         'fragment' => $PHP_URL_FRAGMENT == NULL ? '' : $PHP_URL_FRAGMENT
+      );
+      
+      // Return
+      switch ($Component) {
+         case PHP_URL_SCHEME: return $Parts['scheme'];
+         case PHP_URL_HOST: return $Parts['host'];
+         case PHP_URL_PORT: return $Parts['port'];
+         case PHP_URL_USER: return $Parts['user'];
+         case PHP_URL_PASS: return $Parts['pass'];
+         case PHP_URL_PATH: return $Parts['path'];
+         case PHP_URL_QUERY: return $Parts['query'];
+         case PHP_URL_FRAGMENT: return $Parts['fragment'];
+         default: return $Parts;
+      }
+   }
+}
+if (!function_exists('BuildUrl')) {
+   // 
+   /** 
+    * Complementary to ParseUrl, this function puts the pieces back together and returns a valid url.
+    * @param array ParseUrl array to build. 
+    */
+   function BuildUrl($Parts) {
+      // Full format: http://user:pass@hostname:port/path?querystring#fragment
+      $Return = $Parts['scheme'].'://';
+      if ($Parts['user'] != '' || $Parts['pass'] != '')
+         $Return .= $Parts['user'].':'.$Parts['pass'].'@';
+
+      $Return .= $Parts['host'];
+      // Custom port?
+      if ($Parts['port'] == '443' && $Parts['scheme'] == 'https') {
+      } elseif ($Parts['port'] == '80' && $Parts['scheme'] == 'http') {
+      } elseif ($Parts['port'] != '') {
+         $Return .= ':'.$Parts['port'];
+      }
+      
+      if ($Parts['path'] != '') {
+         if (substr($Parts['path'], 0, 1) != '/')
+            $Return .= '/';
+         $Return .= $Parts['path'];
+      }
+      if ($Parts['query'] != '') 
+         $Return .= '?'.$Parts['query'];
+      
+      if ($Parts['fragment'] != '') 
+         $Return .= '#'.$Parts['fragment'];
+      
+      return $Return;
    }
 }
 
@@ -2006,6 +2230,11 @@ if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
       if (!$Destination)
          $Destination = Url('');
+      
+//      if (Debug() && $Trace = Trace()) {
+//         Trace("Redirecting to $Destination");
+//         return;
+//      }
          
       // Close any db connections before exit
       $Database = Gdn::Database();
@@ -2495,6 +2724,17 @@ if (!function_exists('TouchValue')) {
 
       return GetValue($Key, $Collection);
 	}
+}
+
+if (!function_exists('Trace')) {
+   function Trace($Value = NULL, $Type = TRACE_INFO) {
+      static $Traces = array();
+      
+      if ($Value === NULL)
+         return $Traces;
+      
+      $Traces[] = array($Value, $Type);
+   }
 }
 
 if (!function_exists('TrueStripSlashes')) {

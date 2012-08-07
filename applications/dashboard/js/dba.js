@@ -25,7 +25,7 @@ jQuery(document).ready(function($) {
          if (job.complete)
             continue;
          
-         var url = job.rel;
+         var url = gdn.url(job.rel);
          if (job.args) {
             url += '&'+$.param(job.args);
          }

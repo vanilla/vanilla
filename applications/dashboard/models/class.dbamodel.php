@@ -13,7 +13,6 @@
 class DBAModel extends Gdn_Model {
    public static $ChunkSize = 10000;
    
-   
    public function Counts($Table, $Column, $From = FALSE, $To = FALSE) {
       $Model = $this->CreateModel($Table);
       
@@ -127,6 +126,46 @@ class DBAModel extends Gdn_Model {
       $Result['Complete'] = $Result['Count'] < $Limit;
       
       return $Result;
+   }
+   
+   public function ResetBatch($Table, $Key) {
+      $Key = "DBA.Range.$Key";
+      Gdn::Set($Key, NULL);
+   }
+   
+   public function GetBatch($Table, $Key, $Limit = 10000, $Max = FALSE) {
+      $Key = "DBA.Range.$Key";
+      
+      // See if there is already a range.
+      $Current = @unserialize(Gdn::Get($Key,  ''));
+      if (!is_array($Current) || !isset($Current['Min']) || !isset($Current['Max'])) {
+         list($Current['Min'], $Current['Max']) = $this->PrimaryKeyRange($Table);
+         
+         if ($Max && $Current['Max'] > $Max) {
+            $Current['Max'] = $Max;
+         }
+      }
+      
+      if (!isset($Current['To'])) {
+         $Current['To'] = $Current['Max'];
+      } else {
+         $Current['To'] -= $Limit - 1;
+      }
+      $Current['From'] = $Current['To'] - $Limit;
+      Gdn::Set($Key, serialize($Current));
+      $Current['Complete'] = $Current['To'] < $Current['Min'];
+      
+      $Total = $Current['Max'] - $Current['Min'];
+      if ($Total > 0) {
+         $Complete = $Current['Max'] - $Current['From'];
+         
+         $Percent = 100 * $Complete / $Total;
+         if ($Percent > 100)
+            $Percent = 100;
+         $Current['Percent'] = round($Percent).'%';
+      }
+      
+      return $Current;
    }
    
    /**

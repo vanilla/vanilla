@@ -22,7 +22,7 @@
       </li>
       <li class="Buttons">
          <?php
-            echo $this->Form->Button('Sign In');
+            echo $this->Form->Button('Sign In', array('class' => 'Button Primary'));
             echo $this->Form->CheckBox('RememberMe', T('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
          ?>
       </li>
@@ -51,7 +51,7 @@
       </li>
       <li class="Buttons">
          <?php
-            echo $this->Form->Button('Request a new password');
+            echo $this->Form->Button('Request a new password', array('class' => 'Button Primary'));
             echo Anchor(T('I remember now!'), '/entry/signin', 'ForgotPassword');
          ?>
       </li>

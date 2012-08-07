@@ -162,7 +162,7 @@ class BanModel extends Gdn_Model {
 
       foreach ($Bans as $Ban) {
          // Convert ban to regex.
-         $Parts = explode('*', $Ban['BanValue']);
+         $Parts = explode('*', str_replace('%', '*', $Ban['BanValue']));
          $Parts = array_map('preg_quote', $Parts);
          $Regex = '`^'.implode('.*', $Parts).'$`i';
 
@@ -183,7 +183,7 @@ class BanModel extends Gdn_Model {
       // Add the validation results.
       if ($Validation) {
          foreach ($Banned as $BanType => $Value) {
-            $Validation->AddValidationResult($BanType, 'ValidateBanned');
+            $Validation->AddValidationResult(Gdn_Form::LabelCode($BanType), 'ValidateBanned');
          }
       }
       return count($Banned) == 0;

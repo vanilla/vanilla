@@ -1,3 +1,6 @@
+<?php if (!defined('APPLICATION')) exit();
+$SearchTerm = GetValue('SearchTerm', $this);
+?>
 <ul class="DataList SearchResults">
 <?php
 if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
@@ -10,7 +13,10 @@ if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 		<div class="ItemContent">
 			<?php echo Anchor(Gdn_Format::Text($Row->Title), $Row->Url, 'Title'); ?>
 			<div class="Message Excerpt"><?php
-				echo $Row->Summary;
+            if ($SearchTerm)
+               echo MarkString($SearchTerm, $Row->Summary);
+            else
+               echo $Row->Summary;
 			?></div>
 			<div class="Meta">
 				<span class="MItem"><?php echo UserPhoto($Row, array('ImageClass' => 'ProfilePhotoSmall')).' '.UserAnchor($Row); ?></span>

@@ -319,6 +319,18 @@ class DiscussionsController extends VanillaController {
     */
    public function Bookmarked($Page = '0') {
       $this->Permission('Garden.SignIn.Allow');
+
+      // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
+      $Layout = C('Vanilla.Discussions.Layout');
+      switch($Layout) {
+         case 'table':
+            if ($this->SyndicationMethod == SYNDICATION_NONE)
+               $this->View = 'table';
+            break;
+         default:
+            $this->View = 'index';
+            break;
+      }
       
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
@@ -376,7 +388,7 @@ class DiscussionsController extends VanillaController {
       // Render default view (discussions/bookmarked.php)
       $this->SetData('Title', T('My Bookmarks'));
 		$this->SetData('Breadcrumbs', array(array('Name' => T('My Bookmarks'), 'Url' => '/discussions/bookmarked')));
-      $this->Render('index');
+      $this->Render();
    }
    
    public function BookmarkedPopin() {
@@ -388,7 +400,8 @@ class DiscussionsController extends VanillaController {
          'w.UserID' => Gdn::Session()->UserID
       );
       
-      $Discussions = $DiscussionModel->Get(0, 5, $Wheres);
+      $Discussions = $DiscussionModel->Get(0, 5, $Wheres)->Result();
+      $this->SetData('Title', T('Bookmarks'));
       $this->SetData('Discussions', $Discussions);
       $this->Render('Popin');
    }

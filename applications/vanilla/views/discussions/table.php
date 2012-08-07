@@ -128,7 +128,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
  * Render the page.
  */
 
-$PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
+$PagerOptions = array('Wrapper' => '<div %1$s>%2$s</div>', 'RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
 if ($this->Data('_PagerUrl')) {
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 }
@@ -143,7 +143,10 @@ if ($Description = $this->Data('_Description')) {
 
 include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
-echo PagerModule::Write($PagerOptions);
+echo '<div class="PageControls Top">';
+   PagerModule::Write($PagerOptions);
+   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+echo '</div>';
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
@@ -179,7 +182,12 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </table>
 </div>
 <?php
-   PagerModule::Write($PagerOptions);
+
+   echo '<div class="PageControls Bottom">';
+      PagerModule::Write($PagerOptions);
+      echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+   echo '</div>';
+   
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

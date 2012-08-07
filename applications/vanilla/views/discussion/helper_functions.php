@@ -77,6 +77,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->FireEvent('BeforeCommentDisplay'); ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
    <div class="Comment">
+      
       <?php
       // Write a stub for the latest comment so it's easy to link to it from outside.
       if ($CurrentOffset == Gdn::Controller()->Data('_LatestItem')) {
@@ -99,11 +100,12 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                   echo UserPhoto($Author);
                }
                echo FormatMeAction($Comment);
+               $Sender->FireEvent('AuthorPhoto'); 
                ?>
             </span>
             <span class="AuthorInfo">
                <?php
-               echo WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
+               echo ' '.WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
                $Sender->FireEvent('AuthorInfo'); 
                ?>
             </span>   
@@ -135,8 +137,10 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                   echo FormatBody($Comment);
                ?>
             </div>
-            <?php $Sender->FireEvent('AfterCommentBody'); ?>
-            <?php WriteReactions($Comment); ?>
+            <?php 
+            $Sender->FireEvent('AfterCommentBody');
+            WriteReactions($Comment); 
+            ?>
          </div>
       </div>
    </div>
@@ -148,19 +152,9 @@ endif;
 
 if (!function_exists('WriteReactions')):
 function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-endif;
-
-if (!function_exists('WriteReactions')):
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-endif;
-
-if (!function_exists('WriteReactions')):
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
+   echo '<div class="Reactions">';
+      Gdn::Controller()->FireEvent('AfterReactions');
+   echo '</div>';
 }
 endif;
 
@@ -483,8 +477,8 @@ if (!function_exists('FormatMeAction')):
       if (!IsMeAction($Comment))
          return;
       
-      // Maxlength (don't let people blow up the forum
-      $Maxlength = 100;
+      // Maxlength (don't let people blow up the forum)
+      $Maxlength = C('Vanilla.MeAction.MaxLength', 100);
       $Body = Gdn_Format::PlainText(substr($Comment->Body, 4));
       if (strlen($Body) > $Maxlength)
          $Body = substr($Body, 0, $Maxlength).'...';

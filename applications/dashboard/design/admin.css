@@ -22,6 +22,12 @@ Welcome to the Admin CSS File! Some things you should know:
    + Themes
    + Footer
 */
+.Buttons-Confirm {
+   text-align: center;
+}
+.Buttons-Confirm .Button {
+   min-width: 65px;
+}
    
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
@@ -420,6 +426,14 @@ a.Button {
    box-shadow: none !important;
    color: transparent !important;
    text-shadow: none !important;
+}
+
+div.Padded {
+   font-size: 14px;
+   position: relative;
+   margin: 10px;
+   padding: 10px;
+   line-height: 1.4;
 }
 
 /* Note: Warning, Alert & Info are simple boxes that can be used to wrap message

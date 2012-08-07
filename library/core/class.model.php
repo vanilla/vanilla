@@ -428,7 +428,6 @@ class Gdn_Model extends Gdn_Pluggable {
       return $this->SQL->GetWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
    }
 
-
    /**
     * Returns the $this->Validation->ValidationResults() array.
     *
@@ -552,5 +551,48 @@ class Gdn_Model extends Gdn_Pluggable {
             ->Put();
 		return $Value;
    }
+   
+   /**
+    * Get something from $Record['Attributes'] by dot-formatted key
+    * 
+    * Pass record byref
+    * 
+    * @param array $Record
+    * @param string $Attribute
+    * @param mixed $Default Optional.
+    * @return mixed
+    */
+   public static function GetRecordAttribute(&$Record, $Attribute, $Default = NULL) {
+      $RV = "Attributes.{$Attribute}";
+      return GetValueR($RV, $Record, $Default);
+   }
+   
+   /**
+    * Set something on $Record['Attributes'] by dot-formatted key
+    * 
+    * Pass record byref
+    * 
+    * @param array $Record
+    * @param string $Attribute
+    * @param mixed $Value
+    * @return mixed 
+    */
+   public static function SetRecordAttribute(&$Record, $Attribute, $Value) {
+      if (!array_key_exists('Attributes', $Record))
+         $Record['Attributes'] = array();
+      
+      if (!is_array($Record['Attributes'])) return NULL;
+      
+      $Work = &$Record['Attributes'];
+      $Parts = explode('.', $Attribute);
+      while ($Part = array_shift($Parts)) {
+         $SetValue = sizeof($Parts) ? array() : $Value;
+         $Work[$Part] = $SetValue;
+         $Work = &$Work[$Part];
+      }
+      
+      return $Value;
+   }
+   
 }
 

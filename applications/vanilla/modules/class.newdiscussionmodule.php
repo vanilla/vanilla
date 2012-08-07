@@ -13,14 +13,23 @@ class NewDiscussionModule extends Gdn_Module {
       return 'Panel';
    }
    
+   public $DefaultButton;
+   
+   public $CssClass = 'Button Action Big Primary';
+   
+   public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+      parent::__construct($Sender, $ApplicationFolder);
+      $this->DefaultButton = C('Vanilla.DefaultNewButton', FALSE);
+   }
+   
    public function ToString() {
       Gdn::Controller()->EventArguments['NewDiscussionModule'] = &$this;
       Gdn::Controller()->FireEvent('BeforeNewDiscussionButton');
       $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', 'any');
-      if ($HasPermission)
-         return parent::ToString();
-
-      return '';
+      if (!$HasPermission)
+         return '';
+      
+      return parent::ToString();
    }
    
    public $Buttons = array();

@@ -45,6 +45,7 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
 //      }
       ?>
       <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::Link('forumroot', Sprite('SpDiscussions').T('Recent Discussions')); ?></li>
+      <li class="Activities"><?php echo Gdn_Theme::Link('activity', Sprite('SpActivity').T('Activity')); ?></li>
       <?php if ($CountBookmarks > 0 || $Controller->RequestMethod == 'bookmarked') { ?>
       <li class="MyBookmarks<?php echo $Controller->RequestMethod == 'bookmarked' ? ' Active' : ''; ?>"><?php echo Anchor(Sprite('SpBookmarks').$Bookmarked, '/discussions/bookmarked'); ?></li>
       <?php

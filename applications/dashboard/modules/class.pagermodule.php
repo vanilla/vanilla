@@ -367,7 +367,7 @@ class PagerModule extends Gdn_Module {
       
       if ($HasNext) {
          $PageParam = 'p'.($CurrentPage + 1);
-         $Pager = ConcatSep(' ', $Pager, Anchor('Next', $this->PageUrl($CurrentPage + 1), 'Next', array('rel' => 'next')));
+         $Pager = ConcatSep(' ', $Pager, Anchor(T('Next'), $this->PageUrl($CurrentPage + 1), 'Next', array('rel' => 'next')));
       }
       
       $ClientID = $this->ClientID;
@@ -392,7 +392,8 @@ class PagerModule extends Gdn_Module {
          }
       }
       $Pager = self::$_CurrentPager;
-
+      
+      $Pager->Wrapper = GetValue('Wrapper', $Options, $Pager->Wrapper);
 		$Pager->MoreCode = GetValue('MoreCode', $Options, $Pager->MoreCode);
 		$Pager->LessCode = GetValue('LessCode', $Options, $Pager->LessCode);
 		

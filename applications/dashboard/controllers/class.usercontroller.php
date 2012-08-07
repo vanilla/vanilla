@@ -188,15 +188,8 @@ class UserController extends DashboardController {
     */
    public function ApplicantCount() {
       $this->Permission('Garden.Applicants.Manage');
-
-      $Count = Gdn::SQL()
-         ->Select('u.UserID', 'count', 'UserCount')
-         ->From('User u')
-         ->Join('UserRole ur', 'u.UserID = ur.UserID')
-         ->Where('ur.RoleID',  C('Garden.Registration.ApplicantRoleID', 0))
-         ->Where('u.Deleted', '0')
-         ->Get()->Value('UserCount', 0);
-
+      $RoleModel = new RoleModel();
+      $Count = $RoleModel->GetApplicantCount();
       if ($Count > 0)
          echo '<span class="Alert">', $Count, '</span>';
    }
@@ -635,6 +628,10 @@ class UserController extends DashboardController {
                
                $Email = new Gdn_Email();
                $Result = $UserModel->$Action($UserID, $Email);
+               
+               // Re-calculate applicant count
+               $RoleModel = new RoleModel();
+               $RoleModel->GetApplicantCount(TRUE);
                
                $this->FireEvent("After{$Action}User");
             } catch(Exception $ex) {

@@ -88,13 +88,14 @@ class DashboardHooks implements Gdn_IPlugin {
 			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
       }
       
+      // 2012-07-18 - This is handled by the mebox now.
 		// If there are applicants, alert admins by showing in the main menu
-		if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
+		// if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
 			// $CountApplicants = Gdn::UserModel()->GetApplicantCount();
 			// if ($CountApplicants > 0)
 			// $Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
-			$Sender->Menu->AddLink('Applicants', T('Applicants'), '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
-		}
+			// $Sender->Menu->AddLink('Applicants', T('Applicants'), '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
+		// }
 		
       if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Gdn_Statistics = Gdn::Factory('Statistics');

@@ -1,6 +1,7 @@
 /* Danger (red) Button */
 .ButtonGroup.Danger .Button,
 .Button.Danger {
+   background: #cc0000;
    background-image: linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
    background-image: -o-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
    background-image: -moz-linear-gradient(bottom, #cc0000 0%, #ff3333 100%);
@@ -43,6 +44,7 @@
 /* Warning (yellow) Button */
 .ButtonGroup.Warning .Button,
 .Button.Warning {
+   background: #F89406;
    border-width: 1px !important;   
    background-image: linear-gradient(bottom, #F89406 0%, #FBB450 100%);
    background-image: -o-linear-gradient(bottom, #F89406 0%, #FBB450 100%);
@@ -90,8 +92,11 @@ div.ButtonGroup.Warning {
    -webkit-box-shadow: none;
 }
 /* Action (blue) Button */
+.ButtonGroup.Primary .Button,
+.Button.Primary,
 .ButtonGroup.Action .Button,
 .Button.Action {
+   background: #0055cc;
    border-width: 1px !important;   
    background-image: linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
    background-image: -o-linear-gradient(bottom, #0055cc 0%, #0088cc 100%);
@@ -112,6 +117,14 @@ div.ButtonGroup.Warning {
    border-color: #0022cc;
    color: #fff;
 }
+
+.ButtonGroup.Primary.Open .Button.Handle,
+.ButtonGroup.Primary .Button:hover,
+.ButtonGroup.Primary .Button:focus,
+.ButtonGroup.Primary .Button:active,
+.Button.Primary:hover,
+.Button.Primary:focus,
+.Button.Primary:active,
 .ButtonGroup.Action.Open .Button.Handle,
 .ButtonGroup.Action .Button:hover,
 .ButtonGroup.Action .Button:focus,
@@ -122,6 +135,11 @@ div.ButtonGroup.Warning {
    color: #fff;
    border-color: #0000aa;
 }
+.ButtonGroup.Primary.Open .Button.Handle,
+.ButtonGroup.Primary .Button:focus,
+.ButtonGroup.Primary .Button:active,
+.Button.Primary:focus,
+.Button.Primary:active,
 .ButtonGroup.Action.Open .Button.Handle,
 .ButtonGroup.Action .Button:focus,
 .ButtonGroup.Action .Button:active,
@@ -135,6 +153,7 @@ div.ButtonGroup.Warning {
 /* Success (green) Button */
 .ButtonGroup.Success .Button,
 .Button.Success {
+   background: #006600;
    border-width: 1px !important;   
    background-image: linear-gradient(bottom, #006600 0%, #009900 100%);
    background-image: -o-linear-gradient(bottom, #006600 0%, #009900 100%);

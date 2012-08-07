@@ -61,19 +61,18 @@ jQuery(document).ready(function($) {
    // Handle heading clicks on preferences form
    $('table.PreferenceGroup thead .PrefCheckBox').each(function() {
       var cell = this;
-      var columnIndex = $(cell)[0].cellIndex;
       $(cell).css('cursor', 'pointer');
       cell.onclick = function() {
+        var columnIndex = $(this)[0].cellIndex;
         var rows = $(this).parents('table').find('tbody tr');
         var checkbox = false;
-        var state = false;
+        var state = -1;
         for (i = 0; i < rows.length; i++) {
           checkbox = $(rows[i]).find('td:eq(' + (columnIndex) + ') :checkbox');
-          if (checkbox) {
-            if (i == 0)
+          if ($(checkbox).is(':checkbox')) {
+            if (state == -1)
                state = $(checkbox).attr('checked');
                
-            // alert($(checkbox).attr('id')+' '+state);
             if (state) {
               checkbox.removeAttr('checked');
             } else {
@@ -86,7 +85,7 @@ jQuery(document).ready(function($) {
    });
 
    // Handle description clicks on preferences form
-   $('table.PreferenceGroup tbody .Description').each(function() {
+   $('table.PreferenceGroup tbody .Description, table.PreferenceGroup tbody .Depth_2').each(function() {
       var cell = this;
       var columnIndex = $(cell)[0].cellIndex;
       $(cell).css('cursor', 'pointer');

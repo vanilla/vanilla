@@ -908,7 +908,7 @@ class DiscussionModel extends VanillaModel {
       $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
       $Data->Url = DiscussionUrl($Data);
-      $Data->Tags = Gdn_Format::Text($Data->Tags);
+      $Data->Tags = $this->FormatTags($Data->Tags);
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);
@@ -1085,6 +1085,10 @@ class DiscussionModel extends VanillaModel {
          $DiscussionID = $this->SQL->GetWhere('Discussion', ArrayTranslate($FormPostValues, array('Source', 'SourceID')))->Value('DiscussionID');
          if ($DiscussionID)
             $FormPostValues['DiscussionID'] = $DiscussionID;
+      } elseif (GetValue('ForeignID', $FormPostValues)) {
+         $DiscussionID = $this->SQL->GetWhere('Discussion', array('ForeignID' => $FormPostValues['ForeignID']))->Value('DiscussionID');
+         if ($DiscussionID)
+            $FormPostValues['DiscussionID'] = $DiscussionID;
       }
       
       $Insert = $DiscussionID == '' ? TRUE : FALSE;
@@ -1093,8 +1097,9 @@ class DiscussionModel extends VanillaModel {
       if ($Insert) {
          unset($FormPostValues['DiscussionID']);
          // If no categoryid is defined, grab the first available.
-         if (ArrayValue('CategoryID', $FormPostValues) === FALSE)
-            $FormPostValues['CategoryID'] = $this->SQL->Get('Category', 'CategoryID', '', 1)->FirstRow()->CategoryID;
+         if (!GetValue('CategoryID', $FormPostValues) && !C('Vanilla.Categories.Use')) {
+            $FormPostValues['CategoryID'] = GetValue('CategoryID', CategoryModel::DefaultCategory(), -1);
+         }
             
          $this->AddInsertFields($FormPostValues);
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
@@ -1759,5 +1764,33 @@ class DiscussionModel extends VanillaModel {
 		}
 			
       return TRUE;
+   }
+   
+   /**
+	 * Convert tags from stored format to user-presentable format.
+	 *
+    * @since 2.1
+    * @access protected
+    *
+    * @param string Serialized array.
+    * @return string Comma-separated tags.
+    */
+   protected function FormatTags($Tags) {
+      // Don't bother if there aren't any tags
+      if (!$Tags)
+         return '';
+      
+      // Get the array
+      $TagsArray = Gdn_Format::Unserialize($Tags);     
+      
+      // Compensate for deprecated space-separated format 
+      if (is_string($TagsArray) && $TagsArray == $Tags)
+         $TagsArray = explode(' ', $Tags);
+      
+      // Safe format
+      $TagsArray = Gdn_Format::Text($TagsArray);
+      
+      // Send back an comma-separated string
+      return implode(',', $TagsArray);
    }
 }

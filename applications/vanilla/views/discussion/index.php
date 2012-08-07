@@ -43,8 +43,8 @@ echo $this->Pager->ToString('less');
 echo '</span>';
 
 echo '<div class="DataBox DataBox-Comments">';
-if ($this->Data['CommentData']->NumRows() > 0)
-	echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
+if ($this->Data('Comments')->NumRows() > 0)
+	echo '<h2 class="CommentHeading">'.$this->Data('_CommentsHeader', T('Comments')).'</h2>';
 ?>
 <ul class="MessageList DataList Comments">
 	<?php include $this->FetchViewLocation('comments'); ?>

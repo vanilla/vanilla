@@ -97,7 +97,7 @@ foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
 <?php
 }
 $this->FireEvent('CustomNotificationPreferneces');
-echo $this->Form->Close('Save Preferences', '', array('class' => 'Button Success'));
+echo $this->Form->Close('Save Preferences', '', array('class' => 'Button Primary'));
 $this->FireEvent("AfterPreferencesRender");
 ?>
 </div>

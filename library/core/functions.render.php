@@ -36,6 +36,66 @@ if (!function_exists('BigPlural')) {
    }
 }
 
+if (!function_exists('Bullet')):
+   function Bullet() {
+      return '<span class="Bullet">&bull;</span>';
+   }
+endif;
+
+if (!function_exists('ButtonGroup')):
+   /**
+    *
+    * @param array $Links An array of arrays with the following keys:
+    *  - Text: The text of the link.
+    *  - Url: The url of the link.
+    * @param string|array $CssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
+    * @param string|false $Default The url of the default link.
+    * @since 2.1
+    */
+   function ButtonGroup($Links, $CssClass = 'Button', $Default = FALSE) {
+      if (!is_array($Links) || count($Links) < 1)
+         return;
+      
+      $Text = $Links[0]['Text'];
+      $Url = $Links[0]['Url'];
+      
+      $ButtonClass = '';
+      if (is_array($CssClass))
+         list($CssClass, $ButtonClass) = $CssClass;
+      
+      if ($Default) {
+         // Find the default button. 
+         $Default = ltrim($Default, '/');
+         foreach ($Links as $Link) {
+            if (StringBeginsWith(ltrim($Link['Url'], '/') , $Default)) {
+               $Text = $Link['Text'];
+               $Url = $Link['Url'];
+               break;
+            }
+         }
+      }
+      
+      if (count($Links) < 2) {
+         echo Anchor($Text, $Url, $CssClass);
+      } else {
+         // NavButton or Button?
+         $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== FALSE ? 'NavButton' : 'Button');
+         if (strpos($CssClass, 'Primary') !== FALSE)
+            $ButtonClass .= ' Primary';
+         // Strip "Button" or "NavButton" off the group class.
+         echo '<div class="ButtonGroup '.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
+            echo Anchor($Text, $Url, $ButtonClass);
+            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+            echo '<ul class="Dropdown MenuItems">';
+               foreach ($Links as $Link) {
+                  echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
+               }
+            echo '</ul>';
+         echo '</div>';
+      }
+   }
+endif; 
+
 if (!function_exists('CategoryUrl')):
 
 /**
@@ -146,6 +206,14 @@ function CssClass($Row) {
       
       if ($_CssClss = GetValue('_CssClass', $Row))
          $CssClass .= ' '.$_CssClss;
+      
+      // Insert User classes.
+      if ($UserID = GetValue('InsertUserID', $Row)) {
+         $User = Gdn::UserModel()->GetID($UserID);
+         if ($_CssClss = GetValue('_CssClass', $User)) {
+            $CssClass .= ' '.$_CssClss;
+         }
+      }
 
    return trim($CssClass);
 }
@@ -425,8 +493,9 @@ if (!function_exists('UserPhoto')) {
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
-      $Photo = $User->Photo;
-      $Title = htmlspecialchars(GetValue('Title', $Options, $User->Name));
+      $Photo = GetValue('Photo', $User);
+      $Name = GetValue('Name', $User);
+      $Title = htmlspecialchars(GetValue('Title', $Options, $Name));
       
       if ($FullUser['Banned']) {
          $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
@@ -444,7 +513,7 @@ if (!function_exists('UserPhoto')) {
          }
          $Href = Url(UserUrl($User));
          return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-            .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
+            .Img($PhotoUrl, array('alt' => htmlspecialchars($Name), 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';

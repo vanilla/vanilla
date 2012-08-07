@@ -606,8 +606,12 @@ class Gdn_Validation {
    }
    
    public function ResultsText() {
+      return self::ResultsAsText($this->Results());
+   }
+   
+   public static function ResultsAsText($Results) {
       $Errors = array();
-      foreach ($this->Results() as $Name => $Value) {
+      foreach ($Results as $Name => $Value) {
          if (is_array($Value)) {
             foreach ($Value as $Code) {
                $Errors[] = trim(sprintf(T($Code), T($Name)), '.');

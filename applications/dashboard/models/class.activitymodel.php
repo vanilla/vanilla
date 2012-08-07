@@ -1188,7 +1188,7 @@ class ActivityModel extends Gdn_Model {
    }
    
    public function MarkRead($UserID) {
-      // Mark all of a user's undread activities read.
+      // Mark all of a user's unread activities read.
       $this->SQL->Put(
          'Activity',
          array('Notified' => self::SENT_OK, 'Emailed' => self::SENT_OK),

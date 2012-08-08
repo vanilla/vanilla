@@ -81,9 +81,9 @@ class CategoryModel extends Gdn_Model {
       
       if (self::$Categories == NULL) {
          // Try and get the categories from the cache.
-         $Categories = Gdn::Cache()->Get(self::CACHE_KEY);
+         self::$Categories = Gdn::Cache()->Get(self::CACHE_KEY);
          
-         if (!$Categories) {
+         if (!self::$Categories) {
             $Sql = Gdn::SQL();
             $Sql = clone $Sql;
             $Sql->Reset();
@@ -95,14 +95,12 @@ class CategoryModel extends Gdn_Model {
                ->Join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
                ->OrderBy('c.TreeLeft');
 
-            $Categories = array_merge(array(), $Sql->Get()->ResultArray());
-            $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
-            self::BuildCache($Categories);
+            self::$Categories = array_merge(array(), $Sql->Get()->ResultArray());
+            self::$Categories = Gdn_DataSet::Index(self::$Categories, 'CategoryID');
+            self::BuildCache();
          }
          
-         self::JoinUserData($Categories, TRUE);
-         self::$Categories = $Categories;
-         unset($Categories);
+         self::JoinUserData(self::$Categories, TRUE);
          
       }
       
@@ -131,10 +129,10 @@ class CategoryModel extends Gdn_Model {
     * 
     * @param array $Categories
     */
-   public static function BuildCache(&$Categories) {
-      self::CalculateData($Categories);
-      self::JoinRecentPosts($Categories);
-      Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+   protected static function BuildCache() {
+      self::CalculateData(self::$Categories);
+      self::JoinRecentPosts(self::$Categories);
+      Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
    }
    
    /**
@@ -427,7 +425,7 @@ class CategoryModel extends Gdn_Model {
                $Categories[$ID]['Read'] = FALSE;
             }
          }
-            
+         
       }
       
       // Add permissions.
@@ -1259,10 +1257,10 @@ class CategoryModel extends Gdn_Model {
       $Category = array_merge($Category, $Data);
       $Categories[$ID] = $Category;
       
-      self::BuildCache($Categories);
-      self::JoinUserData($Categories, TRUE);
       self::$Categories = $Categories;
       unset($Categories);
+      self::BuildCache();
+      self::JoinUserData(self::$Categories, TRUE);
    }
    
    public function SetField($ID, $Property, $Value = FALSE) {

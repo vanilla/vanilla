@@ -25,12 +25,6 @@ class CategoryModel extends Gdn_Model {
    public $Watching = FALSE;
    
    /**
-    * Pure Category data, including CalculateData and JoinRecentPosts
-    * @var array
-    */
-   public static $PureCategories = NULL;
-   
-   /**
     * Merged Category data, including Pure + UserCategory
     * 
     * @var array
@@ -103,13 +97,11 @@ class CategoryModel extends Gdn_Model {
 
             $Categories = array_merge(array(), $Sql->Get()->ResultArray());
             $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
-            self::CalculateData($Categories);
-            self::JoinRecentPosts($Categories);
-      
-            Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+            self::BuildCache($Categories);
+         } else {
+            self::JoinUserData($Categories, TRUE);
          }
          
-         self::JoinUserData($Categories, TRUE);
          self::$Categories = $Categories;
          
       }
@@ -132,6 +124,19 @@ class CategoryModel extends Gdn_Model {
          $Result = self::$Categories;
          return $Result;
       }
+   }
+   
+   /**
+    * Build and augment the category cache
+    * 
+    * @param array $Categories
+    */
+   public static function BuildCache(&$Categories) {
+      self::CalculateData($Categories);
+      self::JoinRecentPosts($Categories);
+      Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+      
+      self::JoinUserData($Categories, TRUE);
    }
    
    /**
@@ -1228,7 +1233,7 @@ class CategoryModel extends Gdn_Model {
    }
    
    /**
-    * Grab the categories from the cache.
+    * Grab and update the category cache
     * 
     * @since 2.0.18
     * @access public
@@ -1255,9 +1260,9 @@ class CategoryModel extends Gdn_Model {
       $Category = $Categories[$ID];
       $Category = array_merge($Category, $Data);
       $Categories[$ID] = $Category;
-      self::CalculateData($Categories);
-      Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
-//      self::$Categories = $Categories;
+      
+      self::BuildCache($Categories);
+      self::$Categories = $Categories;
    }
    
    public function SetField($ID, $Property, $Value = FALSE) {

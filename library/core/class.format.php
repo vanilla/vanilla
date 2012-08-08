@@ -1427,8 +1427,14 @@ EOT;
    }
    
    public static function Wysiwyg($Mixed) {
+      static $CustomFormatter;
+      if (!isset($CustomFormatter))
+         $CustomFormatter = C('Garden.Format.WysiwygFunction', FALSE);
+      
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
+      } elseif ($CustomFormatter) {
+         return $CustomFormatter($Mixed);
       } else {
          // The text contains html and must be purified.
          $Formatter = Gdn::Factory('HtmlFormatter');

@@ -249,12 +249,6 @@ class CategoriesController extends VanillaController {
       $CategoryModel = new CategoryModel();
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
       
-//      $Categories = CategoryModel::Categories();
-//      CategoryModel::JoinRecentPosts($Categories);
-//      $this->SetData('Categories2', $Categories);
-      
-      
-      
       $Categories = $this->CategoryModel->GetFull()->ResultArray();
       $this->SetData('Categories', $Categories);
       

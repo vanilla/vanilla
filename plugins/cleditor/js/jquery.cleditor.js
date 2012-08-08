@@ -93,7 +93,8 @@ jQuery(document).ready(function($) {
       "paste,,|" +
       "pastetext,Paste as Text,inserthtml,|" +
       "print,,|" +
-      "source,Show Source"
+      "source,Show Source|" +
+      "fullscreen,Expand,fullscreen"
     },
 
     // imagesPath - returns the path to the images folder
@@ -248,6 +249,10 @@ jQuery(document).ready(function($) {
         
         // Get the button definition
         var button = buttons[buttonName];
+        
+        if (button == undefined) {
+           alert(buttonName);
+        }
 
         // Add a new button to the group
         var $buttonDiv = $(DIV_TAG)
@@ -400,6 +405,27 @@ jQuery(document).ready(function($) {
       setTimeout(function() {refreshButtons(editor);}, 100);
 
     }
+    
+    else if (buttonName == "fullscreen") {
+       if (editor.originalHeight == undefined) {
+          editor.originalHeight = editor.$area.height();
+       }
+       
+       if (editor.expandedHeight == undefined) {
+          editor.expandedHeight = editor.originalHeight * 2;
+          if(editor.expandedHeight < 800)
+             editor.expandedHeight = 800;
+       }
+       
+       var newHeight = editor.expandedHeight;
+       
+       if (editor.$area.outerHeight() >= newHeight - 50) {
+          newHeight = editor.originalHeight;
+       }
+       
+       editor.$frame.height(newHeight);
+       editor.$area.height(newHeight);
+    }
 
     // Check for rich text mode
     else if (!sourceMode(editor)) {
@@ -412,7 +438,7 @@ jQuery(document).ready(function($) {
         if (popupName == "url") {
 
           // Check for selection before showing the link url popup
-          if (buttonName == "link" && selectedText(editor) === "") {
+          if (buttonName == "link" && selectedHTML(editor) === "") {
             showMessage(editor, "A selection is required when inserting a link.", buttonDiv);
             return false;
           }
@@ -429,7 +455,7 @@ jQuery(document).ready(function($) {
                 execCommand(editor, data.command, url, null, data.button);
 
               // Reset the text, hide the popup and set focus
-              $text.val("http://");
+              $text.val("");
               hidePopups();
               focus(editor);
 
@@ -636,7 +662,7 @@ jQuery(document).ready(function($) {
 
     // URL
     else if (popupName == "url") {
-      $popup.html('Enter URL:<br><input type=text value="http://" size=35><br><input type=button value="Submit">');
+      $popup.html('Enter URL:<br><input type=text placeholder="http://" value="" size=35><br><input type=button value="Submit">');
       popupTypeClass = PROMPT_CLASS;
     }
 
@@ -954,7 +980,9 @@ jQuery(document).ready(function($) {
         if (enabled === undefined)
           enabled = true;
       }
-      else if (((inSourceMode || iOS) && button.name != "source") ||
+      else if (button.name == "fullscreen")
+         enabled = true;
+      else if (((inSourceMode || iOS) && (button.name != "source" && button.name != "fullscreen")) ||
       (ie && (command == "undo" || command == "redo")))
         enabled = false;
       else if (command && command != "print") {
@@ -1013,7 +1041,7 @@ jQuery(document).ready(function($) {
     if (ie) return getRange(editor).text;
     return getSelection(editor).toString();
   }
-
+  
   // showMessage - alert replacement
   function showMessage(editor, message, button) {
     var popup = createPopup("msg", editor.options, MSG_CLASS);

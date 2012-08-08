@@ -38,6 +38,7 @@ $PluginInfo['AllViewed'] = array(
  * @package AllViewed
  */
 class AllViewedPlugin extends Gdn_Plugin {
+   
    /**
     * Adds "Mark All Viewed" to main menu.
     *
@@ -68,7 +69,7 @@ class AllViewedPlugin extends Gdn_Plugin {
             echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
 		}
 	}
-	
+   
 	/**
 	 * Helper function that actually sets the DateMarkedRead column in UserCategory 
 	 *
@@ -83,7 +84,6 @@ class AllViewedPlugin extends Gdn_Plugin {
 	 * Allows user to mark all discussions in a specified category as viewed.
 	 *
     * @param DiscussionsController $Sender
-    * @param integer $CategoryID
 	 * @since 1.0
 	 * @access public
 	 */
@@ -134,7 +134,7 @@ class AllViewedPlugin extends Gdn_Plugin {
 		$CategoryModel = new CategoryModel();
 		$this->MarkCategoryRead($CategoryModel, -1);
 		$this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array(-1));
-		Redirect(Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER'));
+		Redirect($_SERVER["HTTP_REFERER"]);
 	}
 
 	/**

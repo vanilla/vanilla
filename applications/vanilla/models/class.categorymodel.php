@@ -98,11 +98,11 @@ class CategoryModel extends Gdn_Model {
             $Categories = array_merge(array(), $Sql->Get()->ResultArray());
             $Categories = Gdn_DataSet::Index($Categories, 'CategoryID');
             self::BuildCache($Categories);
-         } else {
-            self::JoinUserData($Categories, TRUE);
          }
          
+         self::JoinUserData($Categories, TRUE);
          self::$Categories = $Categories;
+         unset($Categories);
          
       }
       
@@ -135,8 +135,6 @@ class CategoryModel extends Gdn_Model {
       self::CalculateData($Categories);
       self::JoinRecentPosts($Categories);
       Gdn::Cache()->Store(self::CACHE_KEY, $Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
-      
-      self::JoinUserData($Categories, TRUE);
    }
    
    /**
@@ -1247,7 +1245,7 @@ class CategoryModel extends Gdn_Model {
       if (!$Categories)
          return;
       
-      if (!$ID) {
+      if (!$ID || !is_array($Categories)) {
          Gdn::Cache()->Remove(self::CACHE_KEY);
          return;
       }
@@ -1262,7 +1260,9 @@ class CategoryModel extends Gdn_Model {
       $Categories[$ID] = $Category;
       
       self::BuildCache($Categories);
+      self::JoinUserData($Categories, TRUE);
       self::$Categories = $Categories;
+      unset($Categories);
    }
    
    public function SetField($ID, $Property, $Value = FALSE) {

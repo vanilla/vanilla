@@ -1164,8 +1164,8 @@ class DiscussionModel extends VanillaModel {
                SetValue('DiscussionID', $Fields, $DiscussionID);
                LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
                
-               if ($Stored['CategoryID'] != $Fields['CategoryID']) 
-                  $StoredCategoryID = $Stored['CategoryID'];
+               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) 
+                  $StoredCategoryID = GetValue('CategoryID', $Stored);
                
             } else {
                // Inserting.

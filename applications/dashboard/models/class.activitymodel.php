@@ -1191,15 +1191,12 @@ class ActivityModel extends Gdn_Model {
       // Mark all of a user's unread activities read.
       $this->SQL->Put(
          'Activity',
-         array('Notified' => self::SENT_OK, 'Emailed' => self::SENT_OK),
+         array('Notified' => self::SENT_OK),
          array('NotifyUserID' => $UserID, 'Notified' => self::SENT_PENDING));
       
-      $this->SQL->Put(
-         'Activity',
-         array('Emailed' => self::SENT_OK),
-         array('NotifyUserID' => $UserID, 'Emailed' => self::SENT_PENDING));
-      
-      Gdn::UserModel()->SetField($UserID, 'CountNotifications', 0);
+      $User = Gdn::UserModel()->GetID($UserID);
+      if (GetValue('CountNotifications', $User) != 0)
+         Gdn::UserModel()->SetField($UserID, 'CountNotifications', 0);
    }
    
    public function MergeActivities($OldActivity, $NewActivity, $Options = array()) {

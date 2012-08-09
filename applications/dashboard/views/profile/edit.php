@@ -48,6 +48,15 @@ echo $this->Form->Errors();
    </li>
    <?php endif; ?>
    
+   <?php if (C('Garden.Profile.Locations', FALSE)): ?>
+   <li class="User-Location">
+      <?php
+         echo $this->Form->Label('Location', 'Location');
+         echo $this->Form->TextBox('Location');
+      ?>
+   </li>
+   <?php endif; ?>
+   
    <?php
       $this->FireEvent('EditMyAccountAfter');
    ?>

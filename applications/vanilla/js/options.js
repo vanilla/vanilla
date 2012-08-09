@@ -61,19 +61,19 @@ jQuery(document).ready(function($) {
 //   });
 
    // 5. Delete discussion
-   $('a.DeleteDiscussion, a.DeleteDraft').popup({
-      confirm: true,
-      followConfirm: false,
-      deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
-      afterConfirm: function(json, sender) {
-         var row = $(sender).parents('li.Item');
-         if (json.ErrorMessage) {
-            $.popup({}, json.ErrorMessage);
-         } else {
-            // Remove the affected row
-            $(row).slideUp('fast', function() { $(this).remove(); });
-         }
-      }
-   });
+//   $('a.DeleteDiscussion').popup({
+//      confirm: true,
+//      followConfirm: false,
+//      deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
+//      afterConfirm: function(json, sender) {
+//         var row = $(sender).parents('li.Item');
+//         if (json.ErrorMessage) {
+//            $.popup({}, json.ErrorMessage);
+//         } else {
+//            // Remove the affected row
+//            $(row).slideUp('fast', function() { $(this).remove(); });
+//         }
+//      }
+//   });
 
 });

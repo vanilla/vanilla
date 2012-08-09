@@ -218,9 +218,12 @@ function GetDiscussionOptions($Discussion = NULL) {
    }
 
    // Can the user delete?
-   if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID))
-      $Options['DeleteDiscussion'] = array('Label' => T('Delete Discussion'), 'Url' => 'vanilla/discussion/delete/'.$Discussion->DiscussionID.'/'.$Session->TransientKey());
-   
+   if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID)) {
+      $Category = CategoryModel::Categories($CategoryID);
+      
+      $Options['DeleteDiscussion'] = array('Label' => T('Delete Discussion'), 'Url' => '/discussion/delete?discussionid='.$Discussion->DiscussionID.'&target='.urlencode(CategoryUrl($Category)), 'Class' => 'Popup');
+   }
+      
    // DEPRECATED (as of 2.1)
    $Sender->EventArguments['Type'] = 'Discussion';
    

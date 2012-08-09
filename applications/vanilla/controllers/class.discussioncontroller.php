@@ -596,38 +596,31 @@ class DiscussionController extends VanillaController {
     * @access public
     *
     * @param int $DiscussionID Unique discussion ID.
-    * @param string $TransientKey Single-use hash to prove intent.
     */
-   public function Delete($DiscussionID = '', $TransientKey = '') {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
+   public function Delete($DiscussionID, $Target = '') {
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       
-      $SuccessTarget = Url('/'.ltrim(GetIncomingValue('Target', '/'),'/'));
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-            if (!$this->DiscussionModel->Delete($DiscussionID))
-               $this->Form->AddError('Failed to delete discussion');
-         } else {
-            $this->Form->AddError('ErrPermission');
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      $this->Permission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      if ($this->Form->IsPostBack()) {
+         if (!$this->DiscussionModel->Delete($DiscussionID))
+            $this->Form->AddError('Failed to delete discussion');
+         
+         if ($this->Form->ErrorCount() == 0) {
+            if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+               Redirect($Target);
+
+            if ($Target)
+               $this->RedirectUrl = Url($Target);
+            
+            $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", NULL, 'SlideUp');
          }
-      } else {
-         $this->Form->AddError('ErrPermission');
       }
       
-      // Redirect
-      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect($SuccessTarget);
-         
-      if ($this->Form->ErrorCount() > 0)
-         $this->SetJson('ErrorMessage', $this->Form->Errors());
-         
-      $this->RedirectUrl = $SuccessTarget;
+      $this->SetData('Title', T('Delete Discussion'));
       $this->Render();         
    }
 

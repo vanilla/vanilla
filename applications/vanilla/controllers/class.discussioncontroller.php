@@ -375,37 +375,33 @@ class DiscussionController extends VanillaController {
     * @access public
     *
     * @param int $DiscussionID Unique discussion ID.
-    * @param string $TransientKey Single-use hash to prove intent.
     */
-   public function Bookmark($DiscussionID = '', $TransientKey = '') {
+   public function Bookmark($DiscussionID) {
+      // Make sure we are posting back.
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
       $Session = Gdn::Session();
-      $State = FALSE;
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      )
-      $Discussion = NULL;
+      
+      if ($Session->UserID == 0)
+         throw PermissionException('SignedIn');
+      
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
       $State = $this->DiscussionModel->BookmarkDiscussion($DiscussionID, $Session->UserID, $Discussion);
 
       // Update the user's bookmark count
       $CountBookmarks = $this->DiscussionModel->SetUserBookmarkCount($Session->UserID);
       
-      // Redirect back where the user came from if necessary
-      if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
-         $Target = GetIncomingValue('Target', 'discussions/bookmarked');
-         Redirect($Target);
-      }
-      
-      $this->SetJson('State', $State);
-      $this->SetJson('CountBookmarks', $CountBookmarks);
-      $this->SetJson('CountDiscussionBookmarks', GetValue('CountDiscussionBookmarks', $this->DiscussionModel));
-      $this->SetJson('ButtonLink', T($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
-      $this->SetJson('AnchorTitle', T($State ? 'Unbookmark' : 'Bookmark'));
-      $this->SetJson('MenuText', T('My Bookmarks'));
-      
-      $Targets = array();
+      // Return the appropriate bookmark.
+      require_once $this->FetchViewLocation('helper_functions', 'Discussions');
+      $Html = BookmarkButton($Discussion);
+      $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Bookmark,.Section-Discussion .PageTitle .Bookmark", $Html, 'ReplaceWith');
+
+      // Add the bookmark to the bookmarks module.
       if($State) {
          // Grab the individual bookmark and send it to the client.
          $Bookmarks = new BookmarkedModule($this);
@@ -424,18 +420,18 @@ class DiscussionController extends VanillaController {
             include($Loc);
             $Data = ob_get_clean();
          }
-         $Targets[] = array('Target' => $Target, 'Type' => $Type, 'Data' => $Data);
+         
+         $this->JsonTarget($Target, $Data, $Type);
       } else {
          // Send command to remove bookmark html.
          if($CountBookmarks == 0) {
-            $Targets[] = array('Target' => '#Bookmarks', 'Type' => 'Remove');
+            $this->JsonTarget('#Bookmarks', NULL, 'Remove');
          } else {
-            $Targets[] = array('Target' => '#Bookmark_'.$DiscussionID, 'Type' => 'Remove');
+            $this->JsonTarget('#Bookmark_'.$DiscussionID, NULL, 'Remove');
          }
       }
-      $this->SetJson('Targets', $Targets);
       
-      $this->Render();         
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
    /**

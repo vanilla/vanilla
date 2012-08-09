@@ -57,8 +57,8 @@ if (!function_exists('BookmarkButton')) {
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       return Anchor(
          $Title,
-         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
-         'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey(),
+         'Hijack Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
    }

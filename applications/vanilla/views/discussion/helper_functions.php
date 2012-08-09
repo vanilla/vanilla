@@ -34,7 +34,7 @@ function WriteBookmarkLink() {
    echo Anchor(
       $Title,
       '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
-      'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+      'Hijack Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
       array('title' => $Title)
    );
 }

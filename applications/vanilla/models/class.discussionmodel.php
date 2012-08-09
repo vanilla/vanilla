@@ -1148,7 +1148,7 @@ class DiscussionModel extends VanillaModel {
             
             if ($DiscussionID > 0) {
                // Updating
-               $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+               $Stored = (array)$this->GetID($DiscussionID);
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {

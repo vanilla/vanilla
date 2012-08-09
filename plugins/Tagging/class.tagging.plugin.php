@@ -116,7 +116,6 @@ class TaggingPlugin extends Gdn_Plugin {
 
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
-         $Sender->AddJsFile('bookmark.js');
          $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
       }
       

@@ -415,7 +415,7 @@ class CommentModel extends VanillaModel {
                $DateMarkedRead = GetValue('DateMarkedRead', $Category);
                if ($DateMarkedRead) {
                   
-                  // Find all discussions made after DateMarkedRead
+                  // Find all discussions with content from after DateMarkedRead
                   $DiscussionModel = new DiscussionModel();
                   $Discussions = $DiscussionModel->Get(0, FALSE, array(
                      'DateLastComment>' => $DateMarkedRead

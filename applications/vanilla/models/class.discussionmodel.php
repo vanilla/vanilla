@@ -431,6 +431,9 @@ class DiscussionModel extends VanillaModel {
 		$ArchiveTimestamp = Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
 		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
+         $CategoryID = $Discussion->CategoryID;
+         $Category = CategoryModel::Categories($CategoryID);
+         
          $Discussion->Name = Gdn_Format::Text($Discussion->Name);
          $Discussion->Url = DiscussionUrl($Discussion);
 
@@ -449,6 +452,8 @@ class DiscussionModel extends VanillaModel {
 			}
          
          $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
+         if ($Category)
+            $Discussion->Read |= $Category['DateMarkedRead'] > $Discussion->DateLastComment;
          
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {

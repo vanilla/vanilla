@@ -66,7 +66,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
             echo CategoryLink($Discussion, ' '.T('in').' ');
          
 			// Other stuff that was in the standard view that you may want to display:
-         echo '<div class="Meta">';
+         echo '<div class="Meta Meta-Discussion">';
 			WriteTags($Discussion);
          echo '</div>';
 			

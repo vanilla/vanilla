@@ -135,7 +135,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          $Sender->FireEvent('AfterDiscussionTitle'); 
       ?>
       </div>
-      <div class="Meta">
+      <div class="Meta Meta-Discussion">
          <?php 
          WriteTags($Discussion);
          ?>
@@ -360,8 +360,10 @@ function OptionsList($Discussion) {
       }
 
       // Close discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</li>';
+      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
+         $NewClosed = (int)!$Discussion->Closed;
+         $Sender->Options .= '<li>'.Anchor(T($Discussion->Closed == '1' ? 'Reopen' : 'Close'), "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'CloseDiscussion Hijack') . '</li>';
+      }
       
       // Delete discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID))

@@ -45,20 +45,20 @@ jQuery(document).ready(function($) {
 //   });
 
    // 4. Close discussion
-   $('a.CloseDiscussion').popup({
-      confirm: true,
-      followConfirm: false,
-      afterConfirm: function(json, sender) {
-         var row = $(sender).parents('li.Item');
-         if (json.State)
-            $(row).addClass('Close');
-         else
-            $(row).removeClass('Close');
-            
-         if (json.LinkText)
-            $(sender).text(json.LinkText);            
-      }
-   });
+//   $('a.CloseDiscussion').popup({
+//      confirm: true,
+//      followConfirm: false,
+//      afterConfirm: function(json, sender) {
+//         var row = $(sender).parents('li.Item');
+//         if (json.State)
+//            $(row).addClass('Close');
+//         else
+//            $(row).removeClass('Close');
+//            
+//         if (json.LinkText)
+//            $(sender).text(json.LinkText);            
+//      }
+//   });
 
    // 5. Delete discussion
    $('a.DeleteDiscussion, a.DeleteDraft').popup({

@@ -482,6 +482,15 @@ class DiscussionController extends VanillaController {
       $this->Title(T('Announce'));
       $this->Render();         
    }
+   
+   protected function SendOptions($Discussion) {
+      require_once $this->FetchViewLocation('helper_functions', 'Discussion');
+      ob_start();
+      WriteDiscussionOptions($Discussion);
+      $Options = ob_get_clean();
+      
+      $this->JsonTarget("#Discussion_{$Discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", $Options, 'ReplaceWith');
+   }
 
    /**
     * Allows user to sink or unsink a discussion.
@@ -496,7 +505,7 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID.
     * @param bool $Sink Whether or not to unsink the discussion.
     */
-   public function Sink($DiscussionID = '', $Sink = TRUE, $From = 'LIST') {
+   public function Sink($DiscussionID = '', $Sink = TRUE, $From = 'list') {
       // Make sure we are posting back.
       if (!$this->Request->IsPostBack())
          throw PermissionException('Javascript');
@@ -518,12 +527,7 @@ class DiscussionController extends VanillaController {
          Redirect($Target);
       }
       
-      require_once $this->FetchViewLocation('helper_functions', 'Discussion');
-      ob_start();
-      WriteDiscussionOptions($Discussion);
-      $Options = ob_get_clean();
-      
-      $this->JsonTarget("#Discussion_$DiscussionID .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", $Options, 'ReplaceWith');
+      $this->SendOptions($Discussion);
       
       $this->JsonTarget("#Discussion_$DiscussionID", NULL, 'Highlight');
       $this->JsonTarget(".Discussion #Item_0", NULL, 'Highlight');
@@ -542,28 +546,23 @@ class DiscussionController extends VanillaController {
     * @access public
     *
     * @param int $DiscussionID Unique discussion ID.
-    * @param string $TransientKey Single-use hash to prove intent.
+    * @param bool $Close Whether or not to close the discussion.
     */
-   public function Close($DiscussionID = '', $TransientKey = '') {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
-      $State = '1';
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-               $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Closed');
-            } else {
-               $State = $Discussion->Closed;
-               $this->Form->AddError('ErrPermission');
-            }
-         }
-      }
+   public function Close($DiscussionID = '', $Close = TRUE, $From = 'list') {
+      // Make sure we are posting back.
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      $this->Permission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      // Sink the discussion.
+      $this->DiscussionModel->SetField($DiscussionID, 'Closed', $Close);
+      $Discussion->Closed = $Close;
       
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
@@ -571,11 +570,21 @@ class DiscussionController extends VanillaController {
          Redirect($Target);
       }
       
-      $State = $State == '1' ? TRUE : FALSE;   
-      $this->SetJson('State', $State);
-      $this->SetJson('LinkText', T($State ? 'Reopen' : 'Close'));         
-      $this->InformMessage(T('Your changes have been saved.'));
-      $this->Render();         
+      $this->SendOptions($Discussion);
+      
+      if ($Close) {
+         require_once $this->FetchViewLocation('helper_functions', 'Discussions');
+         $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Meta-Discussion", Tag($Discussion, 'Closed', 'Closed'), 'Prepend');
+         $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'AddClass');
+      } else {
+         $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Tag-Closed", NULL, 'Remove');
+         $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'RemoveClass');
+      }
+      
+      $this->JsonTarget("#Discussion_$DiscussionID", NULL, 'Highlight');
+      $this->JsonTarget(".Discussion #Item_0", NULL, 'Highlight');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
    /**

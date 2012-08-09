@@ -209,8 +209,8 @@ class DiscussionModel extends VanillaModel {
 		
 		$this->AddArchiveWhere($this->SQL);
       
-      
-      $this->SQL->Limit($Limit, $Offset);
+      if ($Offset !== FALSE && $Limit !== FALSE)
+         $this->SQL->Limit($Limit, $Offset);
       
       $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
@@ -447,6 +447,9 @@ class DiscussionModel extends VanillaModel {
          } else {
 				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 			}
+         
+         $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
+         
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
             $Discussion->CountUnreadComments = TRUE;

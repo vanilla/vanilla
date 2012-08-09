@@ -346,22 +346,29 @@ class CommentModel extends VanillaModel {
     * @param int $TotalComments Total in entire discussion (hard limit).
 	 */
    public function SetWatch($Discussion, $Limit, $Offset, $TotalComments) {
-      $NewComment = FALSE;
+      
+      $NewComments = FALSE;
       
       $Session = Gdn::Session();
       if ($Session->UserID > 0) {
-         $CountWatch = $Limit + $Offset;
-         if ($CountWatch > $TotalComments) {
+         
+         // Max comments we could have seen
+         $CountWatch = $Limit * ($Offset + 1);
+         if ($CountWatch > $TotalComments)
             $CountWatch = $TotalComments;
-            $NewComment = TRUE;
-         }
-            
+         
+         // This dicussion looks familiar...
          if (is_numeric($Discussion->CountCommentWatch)) {
+            
             if (isset($Discussion->DateLastViewed))
-               $NewComment |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
+               $NewComments |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
+            
+            if ($TotalComments > $Discussion->CountCommentWatch)
+               $NewComments |= TRUE;
 
             // Update the watch data.
-				if ($NewComment || ($CountWatch > $Discussion->CountCommentWatch)) {
+				if ($NewComments) {
+               
 					// Only update the watch if there are new comments.
 					$this->SQL->Put(
 						'UserDiscussion',
@@ -375,10 +382,14 @@ class CommentModel extends VanillaModel {
 						)
 					);
 				}
+            
          } else {
 				// Make sure the discussion isn't archived.
-				$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
-				if(!$ArchiveDate || (Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($ArchiveDate))) {
+				$ArchiveDate = C('Vanilla.Archive.Date', FALSE);
+				if (!$ArchiveDate || (Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($ArchiveDate))) {
+               
+               $NewComments = TRUE;
+               
 					// Insert watch data.
                $this->SQL->Options('Ignore', TRUE);
 					$this->SQL->Insert(
@@ -392,6 +403,44 @@ class CommentModel extends VanillaModel {
 					);
 				}
 			}
+         
+         // If this discussion is in a category that has been marked read, 
+         // check if reading this thread causes it to be completely read again
+         $CategoryID = GetValue('CategoryID', $Discussion);
+         if ($CategoryID) {
+            
+            $Category = CategoryModel::Categories($CategoryID);
+            if ($Category) {
+               
+               $DateMarkedRead = GetValue('DateMarkedRead', $Category);
+               if ($DateMarkedRead) {
+                  
+                  // Find all discussions made after DateMarkedRead
+                  $DiscussionModel = new DiscussionModel();
+                  $Discussions = $DiscussionModel->Get(0, FALSE, array(
+                     'DateLastComment>' => $DateMarkedRead
+                  ));
+                  unset($DiscussionModel);
+                  
+                  // Loop over these and see if any are still unread
+                  $MarkAsRead = TRUE;
+                  while ($Discussion = $Discussions->NextRow(DATASET_TYPE_ARRAY)) {
+                     if ($Discussion['Read']) continue;
+                     $MarkAsRead = FALSE;
+                     break;
+                  }
+                  
+                  // Mark this category read if all the new content is read
+                  if ($MarkAsRead) {
+                     $CategoryModel = new CategoryModel();
+                     $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
+                     unset($CategoryModel);
+                  }
+                  
+               }
+            }
+         }
+         
 		}
    }
 

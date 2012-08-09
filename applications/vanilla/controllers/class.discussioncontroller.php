@@ -340,26 +340,30 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID.
     * @param string $TransientKey Single-use hash to prove intent.
     */
-   public function DismissAnnouncement($DiscussionID = '', $TransientKey = '') {
+   public function DismissAnnouncement($DiscussionID = '') {
       // Confirm announcements may be dismissed
       if (!C('Vanilla.Discussions.Dismiss', 1)) {
          throw PermissionException('Vanilla.Discussions.Dismiss');
       }
-
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
+      
+      // Make sure we are posting back.
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
       $Session = Gdn::Session();
       if (
          is_numeric($DiscussionID)
          && $DiscussionID > 0
          && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
       ) $this->DiscussionModel->DismissAnnouncement($DiscussionID, $Session->UserID);
 
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
          Redirect('discussions');
-
-      $this->Render();         
+      
+      $this->JsonTarget("#Discussion_$DiscussionID", NULL, 'SlideUp');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
    /**
@@ -490,40 +494,41 @@ class DiscussionController extends VanillaController {
     * @access public
     *
     * @param int $DiscussionID Unique discussion ID.
-    * @param string $TransientKey Single-use hash to prove intent.
+    * @param bool $Sink Whether or not to unsink the discussion.
     */
-   public function Sink($DiscussionID = '', $TransientKey = '') {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
-      $State = '1';
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-               $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Sink');
-            } else {
-               $State = $Discussion->Sink;
-               $this->Form->AddError('ErrPermission');
-            }
-         }
-      }
+   public function Sink($DiscussionID = '', $Sink = TRUE, $From = 'LIST') {
+      // Make sure we are posting back.
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      $this->Permission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      // Sink the discussion.
+      $this->DiscussionModel->SetField($DiscussionID, 'Sink', $Sink);
+      $Discussion->Sink = $Sink;
       
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
          $Target = GetIncomingValue('Target', 'discussions');
          Redirect($Target);
       }
-         
-      $State = $State == '1' ? TRUE : FALSE;   
-      $this->SetJson('State', $State);
-      $this->SetJson('LinkText', T($State ? 'Unsink' : 'Sink'));         
-      $this->InformMessage(T('Your changes have been saved.'));
-      $this->Render();         
+      
+      require_once $this->FetchViewLocation('helper_functions', 'Discussion');
+      ob_start();
+      WriteDiscussionOptions($Discussion);
+      $Options = ob_get_clean();
+      
+      $this->JsonTarget("#Discussion_$DiscussionID .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", $Options, 'ReplaceWith');
+      
+      $this->JsonTarget("#Discussion_$DiscussionID", NULL, 'Highlight');
+      $this->JsonTarget(".Discussion #Item_0", NULL, 'Highlight');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
    /**

@@ -399,6 +399,9 @@ jQuery(document).ready(function($) {
             case 'After':
                $target.after(item.Data);
                break;
+            case 'Highlight':
+               $target.effect("highlight", {}, "slow");
+               break;
             case 'Prepend':
                $target.prepend(item.Data);
                break;

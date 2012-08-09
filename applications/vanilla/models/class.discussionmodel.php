@@ -1166,11 +1166,11 @@ class DiscussionModel extends VanillaModel {
 
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
 
-               $Fields['DiscussionID'] = $DiscussionID;
+               SetValue('DiscussionID', $Fields, $DiscussionID);
                LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
                
-               if ($Stored['CategoryID'] != $Fields['CategoryID']) 
-                  $StoredCategoryID = $Stored['CategoryID'];
+               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) 
+                  $StoredCategoryID = GetValue('CategoryID', $Stored);
                
             } else {
                // Inserting.

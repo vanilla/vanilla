@@ -297,7 +297,6 @@ class DiscussionsController extends VanillaController {
       $this->AddCssFile('vanilla.css');
 		$this->AddJsFile('bookmark.js');
 		$this->AddJsFile('discussions.js');
-		$this->AddJsFile('options.js');
 			
 		// Inform moderator of checked comments in this discussion
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());

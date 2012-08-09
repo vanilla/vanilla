@@ -68,7 +68,6 @@ class DiscussionController extends VanillaController {
       // Setup head
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.autogrow.js');
-      $this->AddJsFile('options.js');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussion.js');
       $this->AddJsFile('autosave.js');
@@ -707,7 +706,6 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('jquery.autogrow.js');
-      $this->AddJsFile('options.js');
       $this->AddJsFile('discussion.js');
       $this->RemoveJsFile('autosave.js');
       $this->MasterView = 'empty';

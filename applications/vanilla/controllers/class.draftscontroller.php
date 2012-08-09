@@ -43,7 +43,6 @@ class DraftsController extends VanillaController {
       $this->AddCssFile('vanilla.css');
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('discussions.js');
-      $this->AddJsFile('options.js');
       $this->Title(T('My Drafts'));
       
       // Validate $Offset

@@ -140,7 +140,6 @@ class CategoriesController extends VanillaController {
          if ($this->Head) {
             $this->AddJsFile('discussions.js');
             $this->AddJsFile('bookmark.js');
-            $this->AddJsFile('options.js');
             $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
          }
          
@@ -285,7 +284,6 @@ class CategoriesController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussions.js');
-      $this->AddJsFile('options.js');
       $Title = C('Garden.HomepageTitle');
       if ($Title)
          $this->Title($Title, '');

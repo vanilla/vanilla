@@ -404,6 +404,11 @@ class CommentModel extends VanillaModel {
 				}
 			}
          
+         /**
+          * Fuzzy way of trying to automatically mark a cateogyr read again
+          * if the user reads all the comments on the first few pages.
+          */
+         
          // If this discussion is in a category that has been marked read, 
          // check if reading this thread causes it to be completely read again
          $CategoryID = GetValue('CategoryID', $Discussion);
@@ -415,28 +420,37 @@ class CommentModel extends VanillaModel {
                $DateMarkedRead = GetValue('DateMarkedRead', $Category);
                if ($DateMarkedRead) {
                   
+                  // Fuzzy way of looking back about 2 pages into the past
+                  $LookBackCount = C('Vanilla.Discussions.PerPage', 50) * 2;
+                  
                   // Find all discussions with content from after DateMarkedRead
                   $DiscussionModel = new DiscussionModel();
-                  $Discussions = $DiscussionModel->Get(0, FALSE, array(
+                  $Discussions = $DiscussionModel->Get(0, 101, array(
                      'DateLastComment>' => $DateMarkedRead
                   ));
                   unset($DiscussionModel);
                   
-                  // Loop over these and see if any are still unread
-                  $MarkAsRead = TRUE;
-                  while ($Discussion = $Discussions->NextRow(DATASET_TYPE_ARRAY)) {
-                     if ($Discussion['Read']) continue;
-                     $MarkAsRead = FALSE;
-                     break;
-                  }
+                  // Abort if we get back as many as we asked for, meaning a 
+                  // lot has happened.
+                  $NumDiscussions = $Discussions->NumRows();
+                  if ($NumDiscussions <= $LookBackCount) {
                   
-                  // Mark this category read if all the new content is read
-                  if ($MarkAsRead) {
-                     $CategoryModel = new CategoryModel();
-                     $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
-                     unset($CategoryModel);
+                     // Loop over these and see if any are still unread
+                     $MarkAsRead = TRUE;
+                     while ($Discussion = $Discussions->NextRow(DATASET_TYPE_ARRAY)) {
+                        if ($Discussion['Read']) continue;
+                        $MarkAsRead = FALSE;
+                        break;
+                     }
+
+                     // Mark this category read if all the new content is read
+                     if ($MarkAsRead) {
+                        $CategoryModel = new CategoryModel();
+                        $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
+                        unset($CategoryModel);
+                     }
+                     
                   }
-                  
                }
             }
          }

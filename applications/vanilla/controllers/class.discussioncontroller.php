@@ -398,7 +398,8 @@ class DiscussionController extends VanillaController {
       // Return the appropriate bookmark.
       require_once $this->FetchViewLocation('helper_functions', 'Discussions');
       $Html = BookmarkButton($Discussion);
-      $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Bookmark,.Section-Discussion .PageTitle .Bookmark", $Html, 'ReplaceWith');
+//      $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Bookmark,.Section-Discussion .PageTitle .Bookmark", $Html, 'ReplaceWith');
+      $this->JsonTarget("!element", $Html, 'ReplaceWith');
 
       // Add the bookmark to the bookmarks module.
       if($State) {

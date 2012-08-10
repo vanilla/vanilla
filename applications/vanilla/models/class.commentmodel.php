@@ -426,7 +426,8 @@ class CommentModel extends VanillaModel {
                   // Find all discussions with content from after DateMarkedRead
                   $DiscussionModel = new DiscussionModel();
                   $Discussions = $DiscussionModel->Get(0, 101, array(
-                     'DateLastComment>' => $DateMarkedRead
+                     'CategoryID'         => $CategoryID,
+                     'DateLastComment>'   => $DateMarkedRead
                   ));
                   unset($DiscussionModel);
                   

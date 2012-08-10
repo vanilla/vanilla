@@ -109,6 +109,7 @@ class LogModel extends Gdn_Pluggable {
    }
 
    public function FormatKey($Key, $Data) {
+      if (!is_array($Data)) $Data = (array)$Data;
       if (isset($Data['_New']) && isset($Data['_New'][$Key])) {
          $Old = htmlspecialchars(GetValue($Key, $Data, ''));
          $New = htmlspecialchars($Data['_New'][$Key]);

@@ -146,7 +146,7 @@ class LocaleModel {
    }
 
    /**
-    * Enable a locale pack without installing it to the config or mappings.
+    * Temporarily enable a locale pack without installing it
     *
     * @param string $LocaleKey The key of the folder.
     */
@@ -156,9 +156,14 @@ class LocaleModel {
          throw NotFoundException('Locale');
 
       // Grab all of the definition files from the locale.
-      $Paths = SafeGlob(PATH_ROOT."/locales/$LocaleKey/*.php");
+      $Paths = SafeGlob(PATH_ROOT."/locales/{$LocaleKey}/*.php");
+      
+      // Unload the dynamic config
+      Gdn::Locale()->Unload();
+      
+      // Load each locale file, checking for errors
       foreach ($Paths as $Path) {
-         Gdn::Locale()->Load($Path);
+         Gdn::Locale()->Load($Path, FALSE);
       }
    }
 

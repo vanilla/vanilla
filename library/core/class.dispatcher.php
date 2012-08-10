@@ -193,6 +193,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $BlockExceptions = array(
              '/^utility(\/.*)?$/'                   => self::BLOCK_NEVER,
              '/^plugin(\/.*)?$/'                    => self::BLOCK_NEVER,
+             '/^sso(\/.*)?$/'                       => self::BLOCK_NEVER,
              '/^entry(\/.*)?$/'                     => self::BLOCK_PERMISSION,
              '/^user\/usernameavailable(\/.*)?$/'   => self::BLOCK_PERMISSION,
              '/^user\/emailavailable(\/.*)?$/'      => self::BLOCK_PERMISSION,
@@ -329,8 +330,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Args = ReflectArgs($Callback, $InputArgs, $Request->Get());
             $Controller->ReflectArgs = $Args;
             
-            $this->FireEvent('BeforeControllerMethod');
             try {
+               $this->FireEvent('BeforeControllerMethod');
                call_user_func_array($Callback, $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
@@ -340,8 +341,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->_ControllerMethodArgs = $Args;
             $Controller->ReflectArgs = $Args;
             
-            $this->FireEvent('BeforeControllerMethod');
             try {
+               $this->FireEvent('BeforeControllerMethod');
                call_user_func_array(array($Controller, $ControllerMethod), $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);

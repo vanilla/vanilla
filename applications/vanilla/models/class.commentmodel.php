@@ -723,20 +723,19 @@ class CommentModel extends VanillaModel {
             
             $CategoryModel = new CategoryModel();
             
-            $CategoryModel->SetField($Discussion->CategoryID,
-               array('LastDiscussionID' => $Discussion->DiscussionID,
-                  'LastCommentID' => $Discussion->LastCommentID,
-                  'CountComments' => $CountComments));
+            $CategoryModel->SetField($Discussion->CategoryID, array(
+               'LastDiscussionID'   => $DiscussionID,
+               'LastCommentID'      => $CommentID,
+               'CountComments'      => $CountComments,
+               'LastDateInserted'   => $Fields['DateInserted']
+            ));
             
             // Update the cache.
             if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
                $CategoryCache = array(
-                   'LastDiscussionID' => $DiscussionID,
-                   'LastCommentID' => $CommentID,
-                   'LastTitle' => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
-                   'LastUserID' => $Fields['InsertUserID'],
-                   'LastDateInserted' => $Fields['DateInserted'],
-                   'LastUrl' => DiscussionUrl($Discussion).'#latest'
+                   'LastTitle'         => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
+                   'LastUserID'        => $Fields['InsertUserID'],
+                   'LastUrl'           => DiscussionUrl($Discussion).'#latest'
                );
                CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
             }

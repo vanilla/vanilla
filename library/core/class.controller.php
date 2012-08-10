@@ -353,7 +353,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_FormSaved = '';
       $this->_Json = array();
       $this->_Headers = array(
-         'Cache-Control' => '	private, no-cache, no-store, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1 
+         'Cache-Control' => '	private, no-cache, no-store, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1 
          'Expires' =>  'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
          'Pragma' => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
          'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
@@ -1286,7 +1286,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Remove standard and "protected" data from the top level.
          foreach ($this->Data as $Key => $Value) {
-            if ($Key && in_array($Key, array('Title')))
+            if ($Key && in_array($Key, array('Title', 'Breadcrumbs')))
                continue;
             if (isset($Key[0]) && $Key[0] === '_')
                continue; // protected
@@ -1305,19 +1305,30 @@ class Gdn_Controller extends Gdn_Pluggable {
       $CleanOutut = C('Api.Clean', TRUE);
       if ($CleanOutut) {
          // Remove values that should not be transmitted via api
-         $Remove = array('Email', 'Password', 'HashMethod', 'DateOfBirth', 'TransientKey', 'Permissions', 'Attributes');
+         $Remove = array('Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes');
          if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             $Remove[] = 'InsertIPAddress';
             $Remove[] = 'UpdateIPAddress';
             $Remove[] = 'LastIPAddress';
             $Remove[] = 'AllIPAddresses';
             $Remove[] = 'Fingerprint';
+            $Remove[] = 'Email';
+            $Remove[] = 'DateOfBirth';
          }
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }
       
       // Make sure the database connection is closed before exiting.
       $this->Finalize();
+      
+      // Add error information from the form.
+      if (isset($this->Form) && sizeof($this->Form->ValidationResults())) {
+         $this->StatusCode(400);
+         $Data['Code'] = 400;
+         $Data['Exception'] = Gdn_Validation::ResultsAsText($this->Form->ValidationResults());
+      }
+      
+      
       $this->SendHeaders();
 
       // Check for a special view.
@@ -1326,7 +1337,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          include $ViewLocation;
          return;
       }
-
+      
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
@@ -1419,17 +1430,17 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->SendHeaders();
 
       $Code = $Ex->getCode();
+      $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
+      
       if (Debug() && !is_a($Ex, 'Gdn_UserException'))
-         $Message = $Ex->getMessage()."\n\n".$Ex->getTraceAsString();
-      else
-         $Message = $Ex->getMessage();
+         $Data['Trace'] = $Ex->getTraceAsString();
 
       if ($Code >= 100 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);
       else
          header('HTTP/1.0 500', TRUE, 500);
 
-      $Data = array('Code' => $Code, 'Exception' => $Message);
+      
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
             header('Content-Type: application/json', TRUE);
@@ -1447,7 +1458,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
             array_map('htmlspecialchars', $Data);
-            exit("<Exception><Code>{$Data['Code']}</Code><Message>{$Data['Exception']}</Message></Exception>");
+            exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
             break;
          default:
             header('Content-Type: text/plain', TRUE);

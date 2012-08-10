@@ -571,7 +571,8 @@ class Markdown_Parser {
 		
 		"doLists"           => 40,
 		"doCodeBlocks"      => 50,
-		"doBlockQuotes"     => 60,
+      "doSpoilers"         => 70,
+		"doBlockQuotes"     => 80
 		);
 
 	function runBlockGamut($text) {
@@ -1329,9 +1330,44 @@ class Markdown_Parser {
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx', 
 			array(&$this, '_doBlockQuotes_callback2'), $bq);
 
-		return "\n". $this->hashBlock("<blockquote>\n$bq\n</blockquote>")."\n\n";
+		return "\n". $this->hashBlock("<blockquote class=\"Quote\">\n$bq\n</blockquote>")."\n\n";
 	}
 	function _doBlockQuotes_callback2($matches) {
+		$pre = $matches[1];
+		$pre = preg_replace('/^  /m', '', $pre);
+		return $pre;
+	}
+   
+   function doSpoilers($text) {
+		$text = preg_replace_callback('/
+			  (								# Wrap whole match in $1
+				(?>
+				  ^[ ]*>![ ]?			# ">" at the start of a line
+					.+\n					# rest of the first line
+				  (.+\n)*					# subsequent consecutive lines
+				  \n*						# blanks
+				)+
+			  )
+			/xm',
+			array(&$this, '_doSpoilers_callback'), $text);
+
+		return $text;
+	}
+	function _doSpoilers_callback($matches) {
+		$bq = $matches[1];
+		# trim one level of quoting - trim whitespace-only lines
+		$bq = preg_replace('/^[ ]*>![ ]?|^[ ]+$/m', '', $bq);
+		$bq = $this->runBlockGamut($bq);		# recurse
+
+		$bq = preg_replace('/^/m', "  ", $bq);
+		# These leading spaces cause problem with <pre> content, 
+		# so we need to fix that:
+		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx', 
+			array(&$this, '_doSpoilers_callback2'), $bq);
+
+		return "\n". $this->hashBlock("<blockquote class=\"Spoiler\">\n$bq\n</blockquote>")."\n\n";
+	}
+	function _doSpoilers_callback2($matches) {
 		$pre = $matches[1];
 		$pre = preg_replace('/^  /m', '', $pre);
 		return $pre;

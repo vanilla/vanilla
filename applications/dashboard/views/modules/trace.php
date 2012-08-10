@@ -64,9 +64,12 @@
       </td>
       <td>
          <?php
-         if (is_string($Message))
+         if (is_string($Message)) {
+            if ($Var != 'Debug')
+               echo '<b>'.htmlspecialchars($Var).'</b>: ';
+            
             echo nl2br(htmlspecialchars($Message));
-         elseif (is_a($Message, 'Exception')) {
+         } elseif (is_a($Message, 'Exception')) {
             echo '<pre>';
             echo htmlspecialchars($Message->getMessage());
             echo "\n\n";

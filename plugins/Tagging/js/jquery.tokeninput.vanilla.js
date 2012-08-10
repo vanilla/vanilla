@@ -29,7 +29,7 @@ var DEFAULT_SETTINGS = {
 
 	// Tokenization settings
     tokenLimit: null,
-    tokenDelimiter: " ", // VANILLA (use space, not comma)
+    tokenDelimiter: ",",
     preventDuplicates: false,
 
 	// Output settings
@@ -276,7 +276,6 @@ $.TokenList = function (input, url_or_data, settings) {
                 case KEY.ENTER:
                 case KEY.NUMPAD_ENTER:
                 case KEY.COMMA:
-                case KEY.SPACE: // VANILLA (space case)
                   if(selected_dropdown_item) {
                     add_token($(selected_dropdown_item).data("tokeninput"));
                     hidden_input.change();

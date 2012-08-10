@@ -175,12 +175,12 @@ jQuery(document).ready(function($) {
       return def;
    }
    
-   gdn.disable = function(e) {
+   gdn.disable = function(e, progressClass) {
       var href = $(e).attr('href');
       if (href) {
          $.data(e, 'hrefBak', href);
       }
-      $(e).addClass('InProgress').removeAttr('href').attr('disabled', true);
+      $(e).addClass(progressClass ? progressClass : 'InProgress').removeAttr('href').attr('disabled', true);
    }
    
    gdn.enable = function(e) {
@@ -366,12 +366,30 @@ jQuery(document).ready(function($) {
       return path1 + '/' + path2;
    };
 
-   gdn.processTargets = function(targets) {
+   gdn.processTargets = function(targets, $elem, $parent) {
       if(!targets || !targets.length)
          return;
+      
+      var tar = function(q) {
+         switch (q) {
+            case '!element':
+               return $elem;
+            case '!parent':
+               return $parent;
+            default:
+               return q;
+         }
+      }
+      
       for(i = 0; i < targets.length; i++) {
          var item = targets[i];
-         $target = $(item.Target);
+         
+         if (jQuery.isArray(item.Target)) {
+            $target = $(tar(item.Target[0]), tar(item.Target[1]));
+         } else {
+            $target = $(tar(item.Target));
+         }
+         
          switch(item.Type) {
             case 'AddClass':
                $target.addClass(item.Data);
@@ -391,11 +409,17 @@ jQuery(document).ready(function($) {
             case 'After':
                $target.after(item.Data);
                break;
+            case 'Highlight':
+               $target.effect("highlight", {}, "slow");
+               break;
             case 'Prepend':
                $target.prepend(item.Data);
                break;
             case 'Redirect':
                window.location.replace(item.Data);
+               break;
+            case 'Refresh':
+               window.location.reload();
                break;
             case 'Remove':
                $target.remove();
@@ -545,11 +569,14 @@ jQuery(document).ready(function($) {
    
    var hijackClick = function(e) {   
       var $elem = $(this);
+      var $parent = $(this).closest('.Item');
       var $flyout = $elem.closest('.ToggleFlyout');
       var href = $elem.attr('href');
+      var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
+      
       if (!href)
          return;
-      gdn.disable(this);
+      gdn.disable(this, progressClass);
       e.stopPropagation();
       
       $.ajax({
@@ -559,7 +586,7 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          complete: function() {
             gdn.enable(this);
-            $elem.removeClass('InProgress');
+            $elem.removeClass(progressClass);
             $elem.attr('href', href);
             
             // If we are in a flyout, close it.
@@ -572,7 +599,7 @@ jQuery(document).ready(function($) {
             if (json == null) json = {};
             
             var informed = gdn.inform(json);
-            gdn.processTargets(json.Targets);
+            gdn.processTargets(json.Targets, $elem, $parent);
             // If there is a redirect url, go to it.
             if (json.RedirectUrl) {
                setTimeout(function() {
@@ -587,7 +614,22 @@ jQuery(document).ready(function($) {
    };
    $(document).delegate('.Hijack', 'click', hijackClick);
 
-   // Activate ToggleFlyout menus
+
+
+   // Activate ToggleFlyout and ButtonGroup menus
+   $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
+      var buttonGroup = $(this).parents('.ButtonGroup');
+      if (buttonGroup.hasClass('Open')) {
+         // Close
+         $('.ButtonGroup').removeClass('Open');
+      } else {
+         // Close all other open button groups
+         $('.ButtonGroup').removeClass('Open');
+         // Open this one
+         buttonGroup.addClass('Open');
+      }
+      return false;
+   });
    var lastOpen = null;
    $(document).delegate('.ToggleFlyout', 'click', function(e) {        
         
@@ -606,15 +648,17 @@ jQuery(document).ready(function($) {
       var rel = $(this).attr('rel');
       if (rel) {
          $(this).attr('rel', '');
-         $flyout.addClass('Progress');
+         $flyout.html('<div class="InProgress" style="height: 30px"></div>');
+         
          $.ajax({
             url: gdn.url(rel),
             data: {DeliveryType: 'VIEW'},
             success: function(data) {
                $flyout.html(data);
             },
-            complete: function() {
-               $flyout.removeClass('Progress');
+            error: function(xhr) {
+               $flyout.html('');
+               gdn.informError(xhr, true);
             }
          });
       }
@@ -639,6 +683,9 @@ jQuery(document).ready(function($) {
    
    // Close ToggleFlyout menu even if their links are hijacked
    $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+      if ($(this).hasClass('FlyoutButton'))
+         return;
+      
       $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
       $('.Flyout').hide();
    });
@@ -648,6 +695,7 @@ jQuery(document).ready(function($) {
          $('.Flyout', lastOpen).hide();
          $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
       }
+      $('.ButtonGroup').removeClass('Open');
    });
    
    // Add a spinner onclick of buttons with this class
@@ -1034,8 +1082,8 @@ jQuery(window).load(function() {
 
    jQuery('div.Message img').each(function(i,img) {
       var img = jQuery(img);
-      var container = img.parents('div.Message');
-      if (img.naturalWidth() > container.width()) {
+      var container = img.closest('div.Message');
+      if (img.naturalWidth() > container.width() && container.width() > 0) {
          img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
          img.wrap('<a href="'+$(img).attr('src')+'"></a>');
       }

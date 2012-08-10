@@ -72,11 +72,11 @@ class PostController extends VanillaController {
     * 
     * @param int $CategoryID Unique ID of the category to add the discussion to.
     */
-   public function Discussion($CategoryID = '') {
+   public function Discussion($CategoryUrlCode = '') {
       // Override CategoryID if categories are disabled
       $UseCategories = $this->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
       if (!$UseCategories) 
-         $CategoryID = 0;
+         $CategoryUrlCode = '';
          
       // Setup head
       $this->AddJsFile('jquery.autogrow.js');
@@ -88,15 +88,23 @@ class PostController extends VanillaController {
       // Set discussion, draft, and category data
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;
-      $this->CategoryID = isset($this->Discussion) ? $this->Discussion->CategoryID : $CategoryID;
-      $Category = CategoryModel::Categories($this->CategoryID);
+      $Category = FALSE;
+      if (isset($this->Discussion)) {
+         $this->CategoryID = $this->Discussion->CategoryID;
+         $Category = CategoryModel::Categories($this->CategoryID);
+      } else if ($CategoryUrlCode != '') {
+         $CategoryModel = new CategoryModel();
+         $Category = $CategoryModel->GetByCode($CategoryUrlCode);
+         $this->CategoryID = $Category->CategoryID;
+      }
       if ($Category)
          $this->Category = (object)$Category;
-      else
+      else {
+         $this->CategoryID = 0;
          $this->Category = NULL;
+      }
 
-      if ($UseCategories)
-			$CategoryData = CategoryModel::Categories();
+      $CategoryData = $UseCategories ? CategoryModel::Categories() : FALSE;
       
       // Check permission 
       if (isset($this->Discussion)) {
@@ -124,7 +132,7 @@ class PostController extends VanillaController {
       
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if ($this->Form->IsPostBack() == FALSE) {
          // Prep form with current data for editing
          if (isset($this->Discussion)) {
             $this->Form->SetData($this->Discussion);
@@ -144,8 +152,8 @@ class PostController extends VanillaController {
          $Draft = $this->Form->ButtonExists('Save Draft') ? TRUE : FALSE;
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
-            if (!is_object($this->Category) && isset($FormValues['CategoryID']))
-               $this->Category = $CategoryData[$FormValues['CategoryID']];
+            if (!is_object($this->Category) && is_array($CategoryData) && isset($FormValues['CategoryID']))
+               $this->Category = GetValue($FormValues['CategoryID'], $CategoryData);
 
             if (is_object($this->Category)) {
                // Check category permissions.
@@ -157,8 +165,8 @@ class PostController extends VanillaController {
 
                if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
-
-               if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               
+               if (!isset($this->Discussion) && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
             }
 
@@ -179,8 +187,11 @@ class PostController extends VanillaController {
                } else {
                   $DiscussionID = $this->DiscussionModel->Save($FormValues, $this->CommentModel);
                   $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
-                  if ($DiscussionID > 0 && $DraftID > 0)
+                  
+                  if ($DiscussionID > 0) {
+                     if ($DraftID > 0)
                      $this->DraftModel->Delete($DraftID);
+                  }
                   if ($DiscussionID == SPAM) {
                      $this->StatusMessage = T('Your post has been flagged for moderation.');
                      $this->Render('Spam');
@@ -222,6 +233,7 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new discussion
                   $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  $this->SetData('Discussion', $Discussion);
                   $this->EventArguments['Discussion'] = $Discussion;
                   $this->FireEvent('AfterDiscussionSave');
                   
@@ -244,7 +256,13 @@ class PostController extends VanillaController {
       
       $this->FireEvent('BeforeDiscussionRender');
       
-		$this->SetData('Breadcrumbs', array(array('Name' => $this->Data('Title'), 'Url' => '/post/discussion')));
+      if ($this->CategoryID)
+         $Breacrumbs = CategoryModel::GetAncestors($this->CategoryID);
+      else
+         $Breacrumbs = array();
+      $Breacrumbs[] = array('Name' => $this->Data('Title'), 'Url' => '/post/discussion');
+      
+		$this->SetData('Breadcrumbs', $Breacrumbs);
 
       // Render view (posts/discussion.php or post/preview.php)
 		$this->Render();
@@ -319,7 +337,6 @@ class PostController extends VanillaController {
          }
       }
       
-      // Add these back to the form
       // If so, create it!
       if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
          // Add these values back to the form if they exist!
@@ -334,11 +351,18 @@ class PostController extends VanillaController {
             $Title = T('Undefined discussion subject.');
          $Description = GetValue('Description', $PageInfo, '');
          $Images = GetValue('Images', $PageInfo, array());
-         $Body = FormatString(T('EmbededDiscussionFormat'), array(
+         $LinkText = T('EmbededDiscussionLinkText', 'Read the full story here');
+         $Body = FormatString('
+         <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
+            <p>{Excerpt}</p>
+            <p><a href="{Url}">{LinkText}</a></p>
+            <div class="ClearFix"></div>
+         </div>', array(
              'Title' => $Title,
              'Excerpt' => $Description,
              'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
-             'Url' => $vanilla_url
+             'Url' => $vanilla_url,
+             'LinkText' => $LinkText
          ));
          if ($Body == '')
             $Body = $vanilla_url;
@@ -452,11 +476,9 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
-      if (!$this->Form->AuthenticatedPostBack()) {
+      if (!$this->Form->IsPostBack()) {
          // Form was validly submitted
          if (isset($this->Comment)) {
-//            decho($this->Comment, 'Comment');
-//            die();
             $this->Form->SetData((array)$this->Comment);
          }
             
@@ -464,6 +486,7 @@ class PostController extends VanillaController {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
+         
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);
          
@@ -559,7 +582,6 @@ class PostController extends VanillaController {
                      $this->Offset = 1;
                      $Comments = $this->CommentModel->GetIDData($CommentID);
                      $this->SetData('Comments', $Comments);
-                     $this->SetData('CommentData', $Comments, TRUE);
                      // Load the discussion
                      $this->ControllerName = 'discussion';
                      $this->View = 'comments';
@@ -590,16 +612,12 @@ class PostController extends VanillaController {
 //                     if ($Redirect) {
 //                        // The user posted a comment on a page other than the last one, so just redirect to the last page.
 //                        $this->RedirectUrl = Gdn::Request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);
-//                        $this->CommentData = NULL;
 //                     } else {
 //                        // Make sure to load all new comments since the page was last loaded by this user
 //								if ($DisplayNewCommentOnly)
                         $this->Offset = $this->CommentModel->GetOffset($CommentID);
                         $Comments = $this->CommentModel->GetIDData($CommentID);
                         $this->SetData('Comments', $Comments);
-                        $this->SetData('CommentData', $Comments, TRUE);
-//								else 
-//									$this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
 
                         $this->SetData('NewComments', TRUE);
                         
@@ -610,7 +628,7 @@ class PostController extends VanillaController {
                      
                      // Make sure to set the user's discussion watch records
                      $CountComments = $this->CommentModel->GetCount($DiscussionID);
-                     $Limit = is_object($this->CommentData) ? $this->CommentData->NumRows() : $Discussion->CountComments;
+                     $Limit = is_object($this->Data('Comments')) ? $this->Data('Comments')->NumRows() : $Discussion->CountComments;
                      $Offset = $CountComments - $Limit;
                      $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);
                   }
@@ -635,8 +653,23 @@ class PostController extends VanillaController {
          
       $this->FireEvent('BeforeCommentRender');
       
-      // Render default view
-      $this->Render();
+      if ($this->DeliveryType() == DELIVERY_TYPE_DATA) {
+         $Comment = $this->Data('Comments')->FirstRow(DATASET_TYPE_ARRAY);
+         if ($Comment) {
+            $Photo = $Comment['InsertPhoto'];
+            
+            if (strpos($Photo, '//') === FALSE) {
+               $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+            }
+            
+            $Comment['InsertPhoto'] = $Photo;
+         }
+         $this->Data = array('Comment' => $Comment);
+         $this->RenderData($this->Data);
+      } else {
+         // Render default view.
+         $this->Render();
+      }
    }
    
    /**
@@ -673,7 +706,7 @@ class PostController extends VanillaController {
          $this->Form->SetModel($this->DraftModel);
          $this->Comment = $this->DraftModel->GetID($DraftID);
       }
-      $this->View = 'Comment';
+      $this->View = 'editcomment';
       $this->Comment($this->Comment->DiscussionID);
    }
    

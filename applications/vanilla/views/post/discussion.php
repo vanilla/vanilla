@@ -59,7 +59,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 
       echo '<div class="Buttons">';
       $this->FireEvent('BeforeFormButtons');
-      echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'Button DiscussionButton'));
+      echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'Button Primary DiscussionButton'));
       if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
          echo $this->Form->Button('Save Draft', array('class' => 'Button DraftButton'));
       }

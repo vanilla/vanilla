@@ -260,6 +260,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             success: function(json) {
                json = $.postParseJson(json);
                gdn.inform(json);
+               gdn.processTargets(json.Targets);
 
                if (json.FormSaved == true) {
                   if (json.RedirectUrl)

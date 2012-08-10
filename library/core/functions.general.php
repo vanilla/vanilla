@@ -617,7 +617,7 @@ if (!function_exists('Debug')) {
       
       $Debug = $Value;
       if ($Debug)
-         error_reporting(E_ALL);
+         error_reporting(E_ALL & ~E_STRICT);
       else
          error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
    }
@@ -941,7 +941,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    $Field = trim($Parts[0]);
    $Format = trim(GetValue(1, $Parts, ''));
    $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
-   $FomatArgs = GetValue(3, $Parts, '');
+   $FormatArgs = GetValue(3, $Parts, '');
 
    if (in_array($Format, array('currency', 'integer', 'percent'))) {
       $FormatArgs = $SubFormat;
@@ -1000,13 +1000,20 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             }
             break;
          case 'plural':
+            if (is_array($Value))
+               $Value = count($Value);
+            elseif (StringEndsWith($Field, 'UserID', TRUE))
+               $Value = 1;
+            
             if(!is_numeric($Value)) {
                $Result = $Value;
             } else {
                if (!$SubFormat)
-                  $SubFormat = "%s $Field";
+                  $SubFormat = rtrim("%s $Field", 's');
+               if (!$FormatArgs)
+                  $FormatArgs = $SubFormat.'s';
                
-               $Result = Plural($Value, rtrim($SubFormat, 's'), rtrim($SubFormat, 's').'s');
+               $Result = Plural($Value, $SubFormat, $FormatArgs);
             }
             break;
          case 'rawurlencode':
@@ -1031,6 +1038,32 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
          case 'urlencode':
             $Result = urlencode($Value);
             break;
+         case 'gender':
+            // Format in the form of FieldName,gender,male,female,unknown
+            
+            if (is_array($Value) && count($Value) == 1)
+               $Value = array_shift($Value);
+            
+            $Gender = 'u';
+            
+            if (!is_array($Value)) {
+               $User = Gdn::UserModel()->GetID($Value);
+               if ($User)
+                  $Gender = $User->Gender;
+            }
+            
+            switch($Gender) {
+               case 'm':
+                  $Result = $SubFormat;
+                  break;
+               case 'f':
+                  $Result = $FormatArgs;
+                  break;
+               default:
+                  $Result = GetValue(4, $Parts);
+            }
+            
+            break;
          case 'user':
          case 'you':
          case 'his':
@@ -1042,7 +1075,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = array_shift($Value);
             
             if (is_array($Value)) {
-               $Max = C('Garden.FormatUsername.Max', 10);
+               $Max = C('Garden.FormatUsername.Max', 5);
                
                $Count = count($Value);
                $Result = '';
@@ -1448,7 +1481,7 @@ if (!function_exists('IsMobile')) {
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos)/i', $UserAgent))
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos|playbook)/i', $UserAgent))
          $Mobile++;
  
       if(
@@ -1560,6 +1593,20 @@ if (!function_exists('IsWritable')) {
       return TRUE;
    }
 }
+
+if (!function_exists('MarkString')):
+   /**
+    * Wrap occurences of $Needle in $Haystack with <mark> tags. Explodes $Needle 
+    * on spaces. Returns $Haystack with replacements.
+    */   
+   function MarkString($Needle, $Haystack) {
+      $Needle = explode(' ', $Needle);
+      foreach ($Needle as $n) {
+         $Haystack = preg_replace('#(?!<.*?)('.preg_quote($n).')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
+      }
+      return $Haystack;
+   }
+endif;
 
 if (!function_exists('MergeArrays')) {
    /**
@@ -2184,10 +2231,10 @@ if (!function_exists('Redirect')) {
       if (!$Destination)
          $Destination = Url('');
       
-      if (Debug() && $Trace = Trace()) {
-         Trace("Redirecting to $Destination");
-         return;
-      }
+//      if (Debug() && $Trace = Trace()) {
+//         Trace("Redirecting to $Destination");
+//         return;
+//      }
          
       // Close any db connections before exit
       $Database = Gdn::Database();

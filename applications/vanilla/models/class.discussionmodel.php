@@ -908,7 +908,7 @@ class DiscussionModel extends VanillaModel {
       $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
       $Data->Url = DiscussionUrl($Data);
-      $Data->Tags = Gdn_Format::Text($Data->Tags);
+      $Data->Tags = $this->FormatTags($Data->Tags);
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);
@@ -1085,6 +1085,10 @@ class DiscussionModel extends VanillaModel {
          $DiscussionID = $this->SQL->GetWhere('Discussion', ArrayTranslate($FormPostValues, array('Source', 'SourceID')))->Value('DiscussionID');
          if ($DiscussionID)
             $FormPostValues['DiscussionID'] = $DiscussionID;
+      } elseif (GetValue('ForeignID', $FormPostValues)) {
+         $DiscussionID = $this->SQL->GetWhere('Discussion', array('ForeignID' => $FormPostValues['ForeignID']))->Value('DiscussionID');
+         if ($DiscussionID)
+            $FormPostValues['DiscussionID'] = $DiscussionID;
       }
       
       $Insert = $DiscussionID == '' ? TRUE : FALSE;
@@ -1093,8 +1097,9 @@ class DiscussionModel extends VanillaModel {
       if ($Insert) {
          unset($FormPostValues['DiscussionID']);
          // If no categoryid is defined, grab the first available.
-         if (ArrayValue('CategoryID', $FormPostValues) === FALSE)
-            $FormPostValues['CategoryID'] = $this->SQL->Get('Category', 'CategoryID', '', 1)->FirstRow()->CategoryID;
+         if (!GetValue('CategoryID', $FormPostValues) && !C('Vanilla.Categories.Use')) {
+            $FormPostValues['CategoryID'] = GetValue('CategoryID', CategoryModel::DefaultCategory(), -1);
+         }
             
          $this->AddInsertFields($FormPostValues);
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
@@ -1139,29 +1144,26 @@ class DiscussionModel extends VanillaModel {
             // Remove the primary key from the fields for saving
             $Fields = RemoveKeyFromArray($Fields, 'DiscussionID');
             
-            $Discussion = FALSE;
             $StoredCategoryID = FALSE;
             
             if ($DiscussionID > 0) {
                // Updating
-               $Stored = $this->GetID($DiscussionID);
+               $Stored = (array)$this->GetID($DiscussionID);
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
                   $CacheKeys = array('Announcements');
-
-                  $Announce = GetValue('Announce', $Discussion);
                   $this->SQL->Cache($CacheKeys);
                }
 
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
 
                $Fields['DiscussionID'] = $DiscussionID;
-               LogModel::LogChange('Edit', 'Discussion', (array)$Fields, (array)$Stored);
+               LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
                
-
-               if($Stored->CategoryID != $Fields['CategoryID']) 
-                  $StoredCategoryID = $Stored->CategoryID;
+               if ($Stored['CategoryID'] != $Fields['CategoryID']) 
+                  $StoredCategoryID = $Stored['CategoryID'];
+               
             } else {
                // Inserting.
                if (!GetValue('Format', $Fields))
@@ -1173,8 +1175,6 @@ class DiscussionModel extends VanillaModel {
                // Clear the cache if necessary.
                if (GetValue('Announce', $Fields)) {
                   $CacheKeys = array('Announcements');
-
-                  $Announce = GetValue('Announce', $Discussion);
                   $this->SQL->Cache($CacheKeys);
                }
 
@@ -1205,8 +1205,6 @@ class DiscussionModel extends VanillaModel {
                // Notify users of mentions.
 					$DiscussionName = ArrayValue('Name', $Fields, '');
                $Story = ArrayValue('Body', $Fields, '');
-               
-               
                
                $NotifiedUsers = array();
                $UserModel = Gdn::UserModel();
@@ -1267,18 +1265,12 @@ class DiscussionModel extends VanillaModel {
             }
             
             // Get CategoryID of this discussion
-            $Data = $this->SQL
-               ->Select('CategoryID')
-               ->From('Discussion')
-               ->Where('DiscussionID', $DiscussionID)
-               ->Get();
             
-            $CategoryID = FALSE;
-            if ($Data->NumRows() > 0)
-               $CategoryID = $Data->FirstRow()->CategoryID;
+            $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+            $CategoryID = GetValue('CategoryID', $Discussion, FALSE);
             
             // Update discussion counter for affected categories
-            $this->UpdateDiscussionCount($CategoryID, ($Insert ? $DiscussionID : FALSE));
+            $this->UpdateDiscussionCount($CategoryID, $Insert ? $Discussion : FALSE);
             if ($StoredCategoryID)
                $this->UpdateDiscussionCount($StoredCategoryID);
 				
@@ -1368,8 +1360,9 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $CategoryID Unique ID of category we are updating.
     */
-   public function UpdateDiscussionCount($CategoryID, $DiscussionID = FALSE) {
-		if(strcasecmp($CategoryID, 'All') == 0) {
+   public function UpdateDiscussionCount($CategoryID, $Discussion = FALSE) {
+      $DiscussionID = GetValue('DiscussionID', $Discussion, FALSE);
+		if (strcasecmp($CategoryID, 'All') == 0) {
 			$Exclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
 			$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
 			$Params = array();
@@ -1411,16 +1404,21 @@ class DiscussionModel extends VanillaModel {
          $CountDiscussions = (int)GetValue('CountDiscussions', $Data, 0);
          $CountComments = (int)GetValue('CountComments', $Data, 0);
          
+         $CacheAmendment = array(
+            'CountDiscussions'      => $CountDiscussions,
+            'CountComments'         => $CountComments
+         );
+         
          if ($DiscussionID) {
-            $this->SQL
-               ->Set('LastDiscussionID', $DiscussionID)
-               ->Set('LastCommentID', NULL);
+            $CacheAmendment = array_merge($CacheAmendment, array(
+               'LastDiscussionID'   => $DiscussionID,
+               'LastCommentID'      => NULL,
+               'LastDateInsered'    => GetValue('DateInserted', $Discussion)
+            ));
          }
          
          $CategoryModel = new CategoryModel();
-         $CategoryModel->SetField($CategoryID,
-            array('CountDiscussions' => $CountDiscussions,
-               'CountComments' => $CountComments));
+         $CategoryModel->SetField($CategoryID, $CacheAmendment);
       }
    }
 	
@@ -1759,5 +1757,33 @@ class DiscussionModel extends VanillaModel {
 		}
 			
       return TRUE;
+   }
+   
+   /**
+	 * Convert tags from stored format to user-presentable format.
+	 *
+    * @since 2.1
+    * @access protected
+    *
+    * @param string Serialized array.
+    * @return string Comma-separated tags.
+    */
+   protected function FormatTags($Tags) {
+      // Don't bother if there aren't any tags
+      if (!$Tags)
+         return '';
+      
+      // Get the array
+      $TagsArray = Gdn_Format::Unserialize($Tags);     
+      
+      // Compensate for deprecated space-separated format 
+      if (is_string($TagsArray) && $TagsArray == $Tags)
+         $TagsArray = explode(' ', $Tags);
+      
+      // Safe format
+      $TagsArray = Gdn_Format::Text($TagsArray);
+      
+      // Send back an comma-separated string
+      return implode(',', $TagsArray);
    }
 }

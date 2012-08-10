@@ -78,6 +78,7 @@ class Gdn_Request {
     *  - HOST     -> HTTP_HOST
     *  - METHOD   -> REQUEST_METHOD
     *  - FOLDER   -> none. this is extracted from SCRIPT_NAME and only available after _ParseRequest()
+    *  - SCHEME   -> none. this is derived from 'HTTPS' and 'X-Forwarded-Proto'
     *
     * @param $Key Key to retrieve or set.
     * @param $Value Value of $Key key to set.
@@ -272,7 +273,7 @@ class Gdn_Request {
    }
 
    public function IpAddress() {
-      return $this->GetValue('REMOTE_ADDR');
+      return $this->RequestAddress();
    }
    
    public function IsPostBack() {
@@ -303,9 +304,17 @@ class Gdn_Request {
       $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
       $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.StripWebRoot', FALSE));
 
-      $this->RequestHost(     isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? ArrayValue('HTTP_X_FORWARDED_HOST',$_SERVER) : (isset($_SERVER['HTTP_HOST']) ? ArrayValue('HTTP_HOST',$_SERVER) : ArrayValue('SERVER_NAME',$_SERVER)));
-      $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? ArrayValue('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
-      $this->RequestScheme(   (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http');
+      $this->RequestHost(     isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? GetValue('HTTP_X_FORWARDED_HOST',$_SERVER) : (isset($_SERVER['HTTP_HOST']) ? GetValue('HTTP_HOST',$_SERVER) : GetValue('SERVER_NAME',$_SERVER)));
+      $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? GetValue('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
+      $this->RequestAddress(     isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? GetValue('HTTP_X_FORWARDED_FOR',$_SERVER) : $_SERVER['REMOTE_ADDR']);
+      
+      $Scheme = 'http';
+      // Webserver-originated SSL
+      if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') $Scheme = 'https';
+      // Loadbalancer-originated (and terminated) SSL
+      if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https') $Scheme = 'https';
+      
+      $this->RequestScheme($Scheme);
       
       if (is_array($_GET)) {
          $Get = FALSE;
@@ -441,7 +450,7 @@ class Gdn_Request {
       // Attempt to get the webroot from the server
       $WebRoot = FALSE;
       if (!$WebRoot) {
-         $WebRoot = explode('/', ArrayValue('PHP_SELF', $_SERVER, ''));
+         $WebRoot = explode('/', GetValue('PHP_SELF', $_SERVER, ''));
 
          // Look for index.php to figure out where the web root is.
          $Key = array_search('index.php', $WebRoot);
@@ -667,6 +676,10 @@ class Gdn_Request {
       
       }
       $this->_RequestArguments[$ParamsType] = $ArgumentData;
+   }
+   
+   public function SetRequestArguments($ParamsType, $ParamsData) {
+      $this->_RequestArguments[$ParamsType] = $ParamsData;
    }
    
    public function SetValueOn($ParamType, $ParamName, $ParamValue) {

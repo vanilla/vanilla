@@ -84,7 +84,7 @@ Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 // PluginManager
 Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 
-// Load the configurations for the installed items.
+// Load the configurations for enabled Applications
 foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder)
    Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
    
@@ -194,14 +194,8 @@ Gdn_Autoloader::Attach(Gdn_Autoloader::CONTEXT_PLUGIN);
  * the locale management system.
  */
 
-// Set the locale in PHP
-$Codeset = C('Garden.LocaleCodeset', 'UTF8');
-$CurrentLocale = C('Garden.Locale', 'en-CA');
-$SetLocale = str_replace('-', '_', $CurrentLocale).'.'.$Codeset;
-setlocale(LC_ALL, $SetLocale);
-
 // Load the Garden locale system
-$Gdn_Locale = new Gdn_Locale($CurrentLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
+$Gdn_Locale = new Gdn_Locale(C('Garden.Locale', 'en-CA'), Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
 Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $Gdn_Locale);
 unset($Gdn_Locale);
 

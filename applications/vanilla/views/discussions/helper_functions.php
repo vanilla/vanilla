@@ -57,8 +57,8 @@ if (!function_exists('BookmarkButton')) {
       $Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
       return Anchor(
          $Title,
-         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
-         'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey(),
+         'Hijack Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
          array('title' => $Title)
       );
    }
@@ -112,7 +112,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
       
    $Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
 ?>
-<li class="<?php echo $CssClass; ?>">
+<li id="Discussion_<?php echo $Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
    <?php
    if (!property_exists($Sender, 'CanEditDiscussions'))
       $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');
@@ -135,12 +135,21 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          $Sender->FireEvent('AfterDiscussionTitle'); 
       ?>
       </div>
-      <div class="Meta">
+      <div class="Meta Meta-Discussion">
          <?php 
          WriteTags($Discussion);
          ?>
-         <span class="MItem CommentCount"><?php 
-            printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
+         <span class="MItem MCount ViewCount"><?php
+//            echo BigPlural($Discussion->CountComments, '%s comment');
+            printf(Plural($Discussion->CountViews, 
+               '%s view', '%s views',
+               BigPlural($Discussion->CountViews, '%s view')));
+         ?></span>
+         <span class="MItem MCount CommentCount"><?php
+//            echo BigPlural($Discussion->CountComments, '%s comment');
+            printf(Plural($Discussion->CountComments, 
+               '%s comment', '%s comments',
+               BigPlural($Discussion->CountComments, '%s comment')));
          ?></span>
          <?php
             echo NewComments($Discussion);
@@ -215,7 +224,7 @@ function NewComments($Discussion) {
    } elseif ($Discussion->CountUnreadComments > 0) {
       $Title = htmlspecialchars(Plural($Discussion->CountUnreadComments, "%s new comment since you last read this.", "%s new comments since you last read this."));
       
-      return ' <strong class="HasNew" title="'.$Title.'">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural').'</strong>';
+      return ' <strong class="HasNew" title="'.$Title.'">'.Plural($Discussion->CountUnreadComments, '%s new', '%s new plural', BigPlural($Discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong>';
    }
    return '';
 }
@@ -334,7 +343,7 @@ function OptionsList($Discussion) {
       
       // Dismiss an announcement
       if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
-         $Sender->Options .= '<li>'.Anchor(T('Dismiss'), 'vanilla/discussion/dismissannouncement/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'DismissAnnouncement') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(T('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack') . '</li>';
       
       // Edit discussion
       if ($Discussion->FirstUserID == $Session->UserID || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
@@ -345,16 +354,20 @@ function OptionsList($Discussion) {
          $Sender->Options .= '<li>'.Anchor(T('Announce...'), '/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl), 'Popup AnnounceDiscussion') . '</li>';
 
       // Sink discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Sink == '1' ? 'Unsink' : 'Sink'), 'vanilla/discussion/sink/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'SinkDiscussion') . '</li>';
+      if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
+         $NewSink = (int)!$Discussion->Sink;
+         $Sender->Options .= '<li>'.Anchor(T($Discussion->Sink == '1' ? 'Unsink' : 'Sink'), "vanilla/discussion/sink?discussionid={$Discussion->DiscussionID}&sink={$NewSink}", 'SinkDiscussion Hijack') . '</li>';
+      }
 
       // Close discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Closed == '1' ? 'Reopen' : 'Close'), 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'CloseDiscussion') . '</li>';
+      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
+         $NewClosed = (int)!$Discussion->Closed;
+         $Sender->Options .= '<li>'.Anchor(T($Discussion->Closed == '1' ? 'Reopen' : 'Close'), "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'CloseDiscussion Hijack') . '</li>';
+      }
       
       // Delete discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T('Delete'), 'vanilla/discussion/delete/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'DeleteDiscussion') . '</li>';
+         $Sender->Options .= '<li>'.Anchor(T('Delete'), '/discussion/delete?discussionid='.$Discussion->DiscussionID, 'DeleteDiscussion Popup') . '</li>';
       
       // Allow plugins to add options
       $Sender->FireEvent('DiscussionOptions');

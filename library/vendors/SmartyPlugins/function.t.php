@@ -18,7 +18,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @param Smarty The smarty object rendering the template.
  * @return The text.
  */
-function smarty_function_text($Params, &$Smarty) {
-   $Result = T(GetValue('c', $Params, ''), GetValue('d', $Params, ''));
+function smarty_function_t($Params, &$Smarty) {
+   $Code = GetValue('c', $Params, '');
+   $Result = T($Code, GetValue('d', $Params, $Code));
 	return $Result;
 }

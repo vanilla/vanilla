@@ -53,7 +53,7 @@ v1.1.1 28SEPT2011 - Linc
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.2.1',
+   'Version' => '1.2.4',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -75,10 +75,6 @@ class cleditorPlugin extends Gdn_Plugin {
 //	public function DiscussionController_Render_Before($Sender) {
 //		$this->_AddCLEditor($Sender);
 //	}
-   
-   public function AssetModel_StyleCss_Handler($Sender) {
-      $Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor');
-   }
    
    /**
     *
@@ -110,7 +106,8 @@ class cleditorPlugin extends Gdn_Plugin {
 		// Add the CLEditor to the form
 		$Options = array('ie' => 'gt IE 6', 'notie' => TRUE); // Exclude IE6
 		$Sender->RemoveJsFile('jquery.autogrow.js');
-		$Sender->AddJsFile('jquery.cleditor.js', 'plugins/cleditor', $Options);
+		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor', $Options);
+		$Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor', $Options);
       
       $CssPath = Asset('/plugins/cleditor/design/cleditor.css');
       
@@ -129,10 +126,10 @@ a.PreviewButton {
 			var frm = $(this).parents("div.CommentForm");
 			ed = jQuery(this).cleditor({
             width:"100%", height:"100%",
-            controls: "bold italic underline strikethrough | font size " +
+            controls: "bold italic strikethrough | font size " +
                     "style | color highlight removeformat | bullets numbering | outdent indent | " +
                     "alignleft center alignright | undo redo | " +
-                    "image link unlink | cut copy paste pastetext | source",
+                    "image link unlink | source fullscreen",
             docCSSFile: "$CssPath"
          })[0];
 			this.editor = ed; // Support other plugins!

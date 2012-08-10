@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 echo '<h2 class="H">'.T('Comments').'</h2>';
-if (is_object($this->CommentData) && $this->CommentData->NumRows() > 0) {
+if (sizeof($this->Data('Comments'))) {
    echo '<ul class="DataList SearchResults">';
    echo $this->FetchView('profilecomments', 'Discussion', 'Vanilla');
    echo '</ul>';

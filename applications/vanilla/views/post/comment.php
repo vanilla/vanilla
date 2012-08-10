@@ -56,7 +56,7 @@ $this->FireEvent('BeforeCommentForm');
 
                echo '</span>';
 
-               $ButtonOptions = array('class' => 'Button CommentButton');
+               $ButtonOptions = array('class' => 'Button Primary CommentButton');
                $ButtonOptions['tabindex'] = 2;
                /*
                Caused non-root users to not be able to add comments. Must take categories
@@ -80,7 +80,7 @@ $this->FireEvent('BeforeCommentForm');
                      $Attributes['target'] = '_parent';
 
                   $AuthenticationUrl = SignInUrl($this->Data('ForeignUrl', '/'));
-                  $CssClass = 'Button Stash';
+                  $CssClass = 'Button Primary Stash';
                   if ($AllowSigninPopup)
                      $CssClass .= ' SignInPopup';
 

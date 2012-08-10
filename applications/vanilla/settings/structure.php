@@ -44,6 +44,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('DateUpdated', 'datetime')
    ->Column('LastCommentID', 'int', NULL)
    ->Column('LastDiscussionID', 'int', NULL)
+   ->Column('LastDateInserted', 'datetime', NULL)
    ->Set($Explicit, $Drop);
 
 $RootCategoryInserted = FALSE;
@@ -96,7 +97,7 @@ $Construct
    ->Column('Closed', 'tinyint(1)', '0')
    ->Column('Announce', 'tinyint(1)', '0')
    ->Column('Sink', 'tinyint(1)', '0')
-   ->Column('DateInserted', 'datetime', FALSE)
+   ->Column('DateInserted', 'datetime', FALSE, 'index')
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)

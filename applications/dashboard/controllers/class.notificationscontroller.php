@@ -70,7 +70,15 @@ class NotificationsController extends Gdn_Controller {
       
       $ActivityModel = new ActivityModel();
       // Get five pending notifications.
-      $Activities = $ActivityModel->GetWhere(array('NotifyUserID' => Gdn::Session()->UserID, 'Notified' => ActivityModel::SENT_PENDING), 0, 5)->ResultArray();
+      $Where = array(
+          'NotifyUserID' => Gdn::Session()->UserID, 
+          'Notified' => ActivityModel::SENT_PENDING);
+      
+      // If we're in the middle of a visit only get very recent notifications.
+      $Where['DateUpdated >'] = Gdn_Format::ToDateTime(strtotime('-5 minutes'));
+      
+      $Activities = $ActivityModel->GetWhere($Where, 0, 5)->ResultArray();
+      
       $ActivityIDs = ConsolidateArrayValuesByKey($Activities, 'ActivityID');
       $ActivityModel->SetNotified($ActivityIDs);
       

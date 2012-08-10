@@ -67,5 +67,5 @@ echo $this->Form->Errors();
    </li>
 </ul>
 <div class="Warning"><?php echo T('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
-<?php echo $this->Form->Close('Upload'); ?>
+<?php echo $this->Form->Close('Upload', '', array('class' => 'Button Primary')); ?>
 </div>

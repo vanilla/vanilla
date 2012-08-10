@@ -1,2 +1,2 @@
 <?php if (!defined('APPLICATION')) exit();
-echo Anchor(T('Start a New Conversation'), '/messages/add', 'Button BigButton NewConversation');
+echo Anchor(T('New Message'), '/messages/add', 'Button BigButton NewConversation Primary');

@@ -422,6 +422,9 @@ class UserModel extends Gdn_Model {
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0));
       }
+      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         unset($Data['RankID']);
+      }
       if (!Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
          unset($Data['Name']);
       }
@@ -1548,11 +1551,24 @@ class UserModel extends Gdn_Model {
       if ($ApplicantRoleID != 0)
          $this->SQL->Where('ur.RoleID is null');
 
-      return $this->SQL
+      $Data = $this->SQL
          ->Where('u.Deleted', 0)
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
+      
+      $Result =& $Data->Result();
+      
+      foreach ($Result as &$Row) {
+         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+            $Row->Photo = Gdn_Upload::Url($Row->Photo);
+         }
+         
+         $Row->Attributes = @unserialize($Row->Preferences);
+         $Row->Preferences = @unserialize($Row->Preferences);
+      }
+      
+      return $Data;
    }
 
    public function SearchCount($Keywords = FALSE) {

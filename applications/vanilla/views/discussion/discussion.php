@@ -31,6 +31,7 @@ $this->EventArguments['Type'] = 'Discussion';
             <span class="AuthorInfo">
                <?php
                echo WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
+               echo WrapIf(htmlspecialchars(GetValue('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
                $this->FireEvent('AuthorInfo'); 
                ?>
             </span>

@@ -1223,15 +1223,23 @@ class DiscussionModel extends VanillaModel {
                   $Code = 'HeadlineFormat.Discussion';
                
                $HeadlineFormat = T($Code, '{ActivityUserID,user} Started a new discussion. <a href="{Url,html}">{Data.Name,text}</a>');
+               $Category = CategoryModel::Categories(GetValue('CategoryID', $Fields));
                $Activity = array(
-                   'ActivityType' => 'Discussion',
-                   'ActivityUserID' => $Fields['InsertUserID'],
-                   'HeadlineFormat' => $HeadlineFormat,
-                   'RecordType' => 'Discussion',
-                   'RecordID' => $DiscussionID,
-                   'Route' => DiscussionUrl($Fields),
-                   'Data' => array('Name' => $DiscussionName)
+                  'ActivityType' => 'Discussion',
+                  'ActivityUserID' => $Fields['InsertUserID'],
+                  'HeadlineFormat' => $HeadlineFormat,
+                  'RecordType' => 'Discussion',
+                  'RecordID' => $DiscussionID,
+                  'Route' => DiscussionUrl($Fields),
+                  'Data' => array(
+                     'Name' => $DiscussionName,
+                     'Category' => GetValue('Name', $Category)
+                  )
                );
+               
+               // Allow simple fulltext notifications
+               if (C('Vanilla.Activity.ShowDiscussionBody', FALSE))
+                  $Activity['Story'] = $Story;
                
                // Notify all of the users that were mentioned in the discussion.
                $Usernames = array_merge(GetMentions($DiscussionName), GetMentions($Story));

@@ -1222,7 +1222,7 @@ class DiscussionModel extends VanillaModel {
                else
                   $Code = 'HeadlineFormat.Discussion';
                
-               $HeadlineFormat = T($Code, '{ActivityUserID,user} Started a new discussion. <a href="{Url,html}">{Data.Name,text}</a>');
+               $HeadlineFormat = T($Code, '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>');
                $Category = CategoryModel::Categories(GetValue('CategoryID', $Fields));
                $Activity = array(
                   'ActivityType' => 'Discussion',

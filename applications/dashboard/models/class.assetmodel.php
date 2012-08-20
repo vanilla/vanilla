@@ -138,9 +138,9 @@ class AssetModel extends Gdn_Model {
             $this->AddCssFile('custom.css', FALSE, array('Sort' => 10));
             
             if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
-               $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
+               $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
                if (is_string($Filenames) && $Filenames != '%s')
-                  $this->AddCssFile(array(ChangeBasename('custom.css', $Filenames, array('Sort' => 11))));
+                  $this->AddCssFile(ChangeBasename('custom.css', $Filenames), FALSE, array('Sort' => 11));
             }
             
             break;

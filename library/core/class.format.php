@@ -1115,13 +1115,6 @@ EOT;
             );
          }
          
-         // This one handles all other mentions
-//         $Mixed = preg_replace(
-//            '/([\s]+)(@([\d\w_]{1,20}))/si',
-//            '\\1'.Anchor('\\2', '/profile/\\3'),
-//            $Mixed
-//         );
-         
          // Handle #hashtag searches
 			if(C('Garden.Format.Hashtags')) {
 				$Mixed = preg_replace(
@@ -1140,11 +1133,6 @@ EOT;
             );
          }
          
-//         $Mixed = preg_replace(
-//            '/([\s]+)(#([\d\w_]+))/si',
-//            '\\1'.Anchor('\\2', '/search?Search=%23\\3'),
-//            $Mixed
-//         );
          return $Mixed;
       }
    }

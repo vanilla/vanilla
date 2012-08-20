@@ -145,7 +145,7 @@ include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
 echo '<div class="PageControls Top">';
    PagerModule::Write($PagerOptions);
-   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary'));
 echo '</div>';
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
@@ -185,7 +185,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 
    echo '<div class="PageControls Bottom">';
       PagerModule::Write($PagerOptions);
-      echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+      echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary'));
    echo '</div>';
    
 } else {

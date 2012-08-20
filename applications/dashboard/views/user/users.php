@@ -24,7 +24,7 @@ foreach ($this->UserData->Result() as $User) {
          }
 
          foreach ($Roles as $RoleID => $RoleName) {
-            $Query = http_build_query(array('Form/Keywords' => $RoleName));
+            $Query = http_build_query(array('Keywords' => $RoleName));
             $RolesString = ConcatSep(', ', $RolesString, '<a href="'.Url('/user/browse?'.$Query).'">'.htmlspecialchars($RoleName).'</a>');
          }
          echo $RolesString;

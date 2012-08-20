@@ -214,7 +214,7 @@ class ProfileController extends Gdn_Controller {
    public function Edit($UserReference = '', $Username = '') {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username, '', TRUE);
-      $Session = Gdn::Session();
+      $UserID = GetValueR('User.UserID', $this);
       
       // Decide if they have ability to edit the username
       $this->CanEditUsername = C("Garden.Profile.EditUsernames");
@@ -222,19 +222,18 @@ class ProfileController extends Gdn_Controller {
       if ($this->CanEditUsername < 0)
          $this->CanEditUsername = FALSE;
       else
-         $this->CanEditUsername = $this->CanEditUsername || $Session->CheckPermission('Garden.Users.Edit');
+         $this->CanEditUsername = $this->CanEditUsername || Gdn::Session()->CheckPermission('Garden.Users.Edit');
       
       $this->CanEditEmail = C('Garden.Profile.EditEmails', TRUE);
       
       if ($this->CanEditEmail < 0)
          $this->CanEditEmail = FALSE;
       else
-         $this->CanEditEmail = $this->CanEditEmail || $Session->CheckPermission('Garden.Users.Edit');
+         $this->CanEditEmail = $this->CanEditEmail || Gdn::Session()->CheckPermission('Garden.Users.Edit');
          
-      $UserModel = Gdn::UserModel();
-      $User = $UserModel->GetID($this->User->UserID);
-      $this->Form->SetModel($UserModel);
-      $this->Form->AddHidden('UserID', $this->User->UserID);
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      $this->Form->SetModel(Gdn::UserModel());
+      $this->Form->AddHidden('UserID', $UserID);
       
       // Define gender dropdown options
       $this->GenderOptions = array(
@@ -243,25 +242,31 @@ class ProfileController extends Gdn_Controller {
          'f' => T('Female')
       );
       
+      $this->SetData('User', $User);
+      $this->Form->SetData($User);
+      
+      $this->FireEvent('BeforeEdit');
+      
       // If seeing the form for the first time...
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Get the user data for the requested $UserID and put it into the form.
-         $this->Form->SetData($this->User);
-      } else {
+      if ($this->Form->IsPostBack()) {
+         
          if (!$this->CanEditUsername)
-            $this->Form->SetFormValue("Name", $User->Name);
+            $this->Form->SetFormValue("Name", $User['Name']);
          else {
             $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
-            $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
+            Gdn::UserModel()->Validation->ApplyRule('Name', 'Username', $UsernameError);
          }
          
          if ($this->Form->Save() !== FALSE) {
-            $User = $UserModel->GetID($this->User->UserID);
+            $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+            $this->SetData('User', $User);
+            
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
          }
          
          if (!$this->CanEditEmail)
-            $this->Form->SetFormValue("Email", $User->Email);
+            $this->Form->SetFormValue("Email", $User['Email']);
+         
       }
       
       $this->Title(T('Edit Profile'));

@@ -1686,7 +1686,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       if ($MasterViewPath != $MasterViewPath2)
-         Trace("Master views differing: $MasterViewPath != $MasterViewPath2", TRACE_WARNING);
+         Trace("Master views differ. Controller: $MasterViewPath, ViewLocation(): $MasterViewPath2", TRACE_WARNING);
       
       $this->EventArguments['MasterViewPath'] = &$MasterViewPath;
       $this->FireEvent('BeforeFetchMaster');

@@ -294,7 +294,8 @@ class EntryController extends Gdn_Controller {
       // The different providers can check to see if they are being used and modify the data array accordingly.
       $this->EventArguments = array($Method);
       
-      // Fire ConnectData event & error handling
+      // Fire ConnectData event & error handling.
+      $CurrentData = $this->Form->FormValues();
       try {
          $this->FireEvent('ConnectData');
       } catch (Gdn_UserException $Ex) {
@@ -308,9 +309,13 @@ class EntryController extends Gdn_Controller {
          return $this->Render('ConnectError');
       }
       
-      if (!$this->Form->GetFormValue('Email')) {
+      if (!$this->Form->GetFormValue('Email') || $this->Form->GetFormValue('EmailVisible')) {
          $this->Form->SetFormValue('EmailVisible', TRUE);
          $this->Form->AddHidden('EmailVisible', TRUE);
+         
+         if ($IsPostBack) {
+            $this->Form->SetFormValue('Email', GetValue('Email', $CurrentData));
+         }
       }
 
       $FormData = $this->Form->FormValues(); // debug

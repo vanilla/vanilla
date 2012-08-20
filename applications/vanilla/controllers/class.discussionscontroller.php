@@ -138,9 +138,6 @@ class DiscussionsController extends VanillaController {
       // Get Discussions
       $this->DiscussionData = $DiscussionModel->Get($Page, $Limit);
       
-//      var_dump($this->DiscussionData);
-//      die();
-      
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Page . ' to ' . $Limit);
 

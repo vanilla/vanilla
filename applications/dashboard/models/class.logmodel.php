@@ -109,6 +109,7 @@ class LogModel extends Gdn_Pluggable {
    }
 
    public function FormatKey($Key, $Data) {
+      if (!is_array($Data)) $Data = (array)$Data;
       if (isset($Data['_New']) && isset($Data['_New'][$Key])) {
          $Old = htmlspecialchars(GetValue($Key, $Data, ''));
          $New = htmlspecialchars($Data['_New'][$Key]);
@@ -405,21 +406,22 @@ class LogModel extends Gdn_Pluggable {
       // Grab the record from the DB.
       if ($OldData === NULL) {
          $OldData = Gdn::SQL()->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->ResultArray();
-      } elseif (!isset($OldData[0]))
+      } elseif (!is_array($OldData))
          $OldData = array($OldData);
 
       foreach ($OldData as $Row) {
          
          // Don't log the change if it's right after an insert.
-         if (isset($Row['DateInserted']) && (time() - Gdn_Format::ToTimestamp($Row['DateInserted'])) < C('Garden.Log.FloodControl', 20) * 60)
+         if (GetValue('DateInserted', $Row) && (time() - Gdn_Format::ToTimestamp(GetValue('DateInserted', $Row))) < C('Garden.Log.FloodControl', 20) * 60)
             continue;
 
-         $Row['_New'] = $NewData;
+         SetValue('_New', $Row, $NewData);
          self::Insert($Operation, $RecordType, $Row);
       }
    }
 
    protected static function _LogValue($Data, $LogKey, $BakKey1 = '', $BakKey2 = '') {
+      $Data = (array)$Data;
       if (isset($Data[$LogKey]) && $LogKey != $BakKey1) {
          $Result = $Data[$LogKey];
          unset($Data[$LogKey]);

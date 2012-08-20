@@ -19,6 +19,7 @@ class NewDiscussionModule extends Gdn_Module {
    
    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
       parent::__construct($Sender, $ApplicationFolder);
+      // Customize main button by setting Vanilla.DefaultNewButton to URL code. Example: "post/question"
       $this->DefaultButton = C('Vanilla.DefaultNewButton', FALSE);
    }
    

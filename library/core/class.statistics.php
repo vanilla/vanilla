@@ -787,17 +787,33 @@ class Gdn_Statistics extends Gdn_Plugin {
       return $DateRaw;
    }
 
-   public static function TimeFromExtendedTimeSlot($TimeSlot) {
+   public static function TimeFromExtendedTimeSlot($TimeSlot, $Resolution = 'auto') {
       if ($TimeSlot == '00000000')
          return 0;
 
-      $Year = substr($TimeSlot, 0, 4);
-      $Month = substr($TimeSlot, 4, 2);
-      $Day = (int) substr($TimeSlot, 6, 2);
-      if ($Day == 0)
-         $Day = 1;
-      $Hour = (int) substr($TimeSlot, 8, 2);
-      $DateRaw = mktime($Hour, 0, 0, $Month, $Day, $Year);
+      list($Year, $Month, $Day, $Hour, $Minute) = array(1, 1, 1, 0, 0);
+      if ($Resolution == 'auto')
+         $TimeslotLength = strlen($TimeSlot);
+      else
+         $TimeslotLength = $Resolution;
+      
+      if ($TimeslotLength >= 4)
+         $Year = substr($TimeSlot, 0, 4);
+      
+      if ($TimeslotLength >= 6)
+         $Month = substr($TimeSlot, 4, 2);
+      
+      if ($TimeslotLength >= 8)
+         $Day = (int) substr($TimeSlot, 6, 2);
+      if ($Day == 0) $Day = 1;
+      
+      if ($TimeslotLength >= 10)
+         $Hour = (int) substr($TimeSlot, 8, 2);
+      
+      if ($TimeslotLength >= 12)
+         $Minute = (int) substr($TimeSlot, 10, 2);
+      
+      $DateRaw = mktime($Hour, $Minute, 0, $Month, $Day, $Year);
 
       if ($DateRaw === FALSE)
          throw new Exception("Invalid timeslot '{$TimeSlot}', unable to convert to epoch");

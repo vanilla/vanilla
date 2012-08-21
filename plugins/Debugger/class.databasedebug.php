@@ -53,7 +53,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 		} elseif(is_string($Expr)) {
 			return '\''.str_replace('\'', '\\\'', $Expr).'\'';
 		} elseif(is_object($Expr)) {
-			return '?OBJECT?';
+			return 'Object:'.get_class($Expr);
 		} else {
 			return $Expr;
 		}

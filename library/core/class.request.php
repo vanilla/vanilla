@@ -306,7 +306,13 @@ class Gdn_Request {
 
       $this->RequestHost(     isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? GetValue('HTTP_X_FORWARDED_HOST',$_SERVER) : (isset($_SERVER['HTTP_HOST']) ? GetValue('HTTP_HOST',$_SERVER) : GetValue('SERVER_NAME',$_SERVER)));
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? GetValue('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
-      $this->RequestAddress(     isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? GetValue('HTTP_X_FORWARDED_FOR',$_SERVER) : $_SERVER['REMOTE_ADDR']);
+      
+      $IP = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? GetValue('HTTP_X_FORWARDED_FOR',$_SERVER) : $_SERVER['REMOTE_ADDR'];
+      if (strpos($IP, ',') !== FALSE) {
+         $IP = substr($IP, 0, strpos($IP, ','));
+      }
+      
+      $this->RequestAddress($IP);
       
       $Scheme = 'http';
       // Webserver-originated SSL

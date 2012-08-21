@@ -808,15 +808,23 @@ class CommentModel extends VanillaModel {
 			// Prepare the notification queue.
          $ActivityModel = new ActivityModel();
          $HeadlineFormat = T('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
+         $Category = CategoryModel::Categories($Discussion->CategoryID);
          $Activity = array(
-             'ActivityType' => 'Comment',
-             'ActivityUserID' => $Fields['InsertUserID'],
-             'HeadlineFormat' => $HeadlineFormat,
-             'RecordType' => 'Comment',
-             'RecordID' => $CommentID,
-             'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
-             'Data' => array('Name' => $Discussion->Name)
+            'ActivityType' => 'Comment',
+            'ActivityUserID' => $Fields['InsertUserID'],
+            'HeadlineFormat' => $HeadlineFormat,
+            'RecordType' => 'Comment',
+            'RecordID' => $CommentID,
+            'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
+            'Data' => array(
+               'Name' => $Discussion->Name,
+               'Category' => GetValue('Name', $Category)
+            )
          );
+         
+         // Allow simple fulltext notifications
+         if (C('Vanilla.Activity.ShowCommentBody', FALSE))
+            $Activity['Story'] = GetValue('Body', $Fields);
          
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);

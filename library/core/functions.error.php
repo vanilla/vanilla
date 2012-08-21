@@ -73,8 +73,12 @@ function Gdn_ExceptionHandler($Exception) {
       // Clean the output buffer in case an error was encountered in-page.
       @ob_end_clean();
       // prevent headers already sent error
-      if(!headers_sent()) {
-         header("HTTP/1.0 500", TRUE, 500);
+      if (!headers_sent()) {
+         if ($ErrorNumber >= 100 && $ErrorNumber < 600)
+            header("HTTP/1.0 $ErrorNumber", TRUE, $ErrorNumber);
+         else
+            header('HTTP/1.0 500', TRUE, 500);
+         
          header('Content-Type: text/html; charset=utf-8');
       }
       

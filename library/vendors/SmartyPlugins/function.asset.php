@@ -38,9 +38,14 @@ function smarty_function_asset($Params, &$Smarty) {
    $Result .= ob_get_clean();
 
    $Asset = $Controller->GetAsset($Name);
-   if (!is_string($Asset)) {
+   
+   if (is_object($Asset)) {
       $Asset->AssetName = $Name;
-      $Asset = $Asset->ToString();
+      
+      if (GetValue('Visible', $Asset, TRUE))
+         $Asset = $Asset->ToString();
+      else
+         $Asset = '';
    }
 
    if (!empty($Tag)) {

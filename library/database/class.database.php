@@ -55,8 +55,15 @@ class Gdn_Database {
             // We only throw exceptions during connect
             $this->_Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
          } catch (Exception $ex) {
+            $Timeout = FALSE;
             if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage()))
-               throw new Exception('Timeout while connecting to the database', 504);
+               $Timeout = TRUE;
+            if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage()))
+               $Timeout = TRUE;
+                    
+            if ($Timeout)
+               throw new Exception(ErrorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
+            
             trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
          }
       }

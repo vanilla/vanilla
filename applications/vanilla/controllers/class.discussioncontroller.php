@@ -68,8 +68,6 @@ class DiscussionController extends VanillaController {
       // Setup head
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.autogrow.js');
-      $this->AddJsFile('options.js');
-      $this->AddJsFile('bookmark.js');
       $this->AddJsFile('discussion.js');
       $this->AddJsFile('autosave.js');
       Gdn_Theme::Section('Discussion');
@@ -340,26 +338,30 @@ class DiscussionController extends VanillaController {
     * @param int $DiscussionID Unique discussion ID.
     * @param string $TransientKey Single-use hash to prove intent.
     */
-   public function DismissAnnouncement($DiscussionID = '', $TransientKey = '') {
+   public function DismissAnnouncement($DiscussionID = '') {
       // Confirm announcements may be dismissed
       if (!C('Vanilla.Discussions.Dismiss', 1)) {
          throw PermissionException('Vanilla.Discussions.Dismiss');
       }
-
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
+      
+      // Make sure we are posting back.
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
       $Session = Gdn::Session();
       if (
          is_numeric($DiscussionID)
          && $DiscussionID > 0
          && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
       ) $this->DiscussionModel->DismissAnnouncement($DiscussionID, $Session->UserID);
 
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
          Redirect('discussions');
-
-      $this->Render();         
+      
+      $this->JsonTarget("#Discussion_$DiscussionID", NULL, 'SlideUp');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
    /**
@@ -372,37 +374,34 @@ class DiscussionController extends VanillaController {
     * @access public
     *
     * @param int $DiscussionID Unique discussion ID.
-    * @param string $TransientKey Single-use hash to prove intent.
     */
-   public function Bookmark($DiscussionID = '', $TransientKey = '') {
+   public function Bookmark($DiscussionID) {
+      // Make sure we are posting back.
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
       $Session = Gdn::Session();
-      $State = FALSE;
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      )
-      $Discussion = NULL;
+      
+      if ($Session->UserID == 0)
+         throw PermissionException('SignedIn');
+      
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
       $State = $this->DiscussionModel->BookmarkDiscussion($DiscussionID, $Session->UserID, $Discussion);
 
       // Update the user's bookmark count
       $CountBookmarks = $this->DiscussionModel->SetUserBookmarkCount($Session->UserID);
       
-      // Redirect back where the user came from if necessary
-      if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
-         $Target = GetIncomingValue('Target', 'discussions/bookmarked');
-         Redirect($Target);
-      }
-      
-      $this->SetJson('State', $State);
-      $this->SetJson('CountBookmarks', $CountBookmarks);
-      $this->SetJson('CountDiscussionBookmarks', GetValue('CountDiscussionBookmarks', $this->DiscussionModel));
-      $this->SetJson('ButtonLink', T($State ? 'Unbookmark this Discussion' : 'Bookmark this Discussion'));
-      $this->SetJson('AnchorTitle', T($State ? 'Unbookmark' : 'Bookmark'));
-      $this->SetJson('MenuText', T('My Bookmarks'));
-      
-      $Targets = array();
+      // Return the appropriate bookmark.
+      require_once $this->FetchViewLocation('helper_functions', 'Discussions');
+      $Html = BookmarkButton($Discussion);
+//      $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Bookmark,.Section-Discussion .PageTitle .Bookmark", $Html, 'ReplaceWith');
+      $this->JsonTarget("!element", $Html, 'ReplaceWith');
+
+      // Add the bookmark to the bookmarks module.
       if($State) {
          // Grab the individual bookmark and send it to the client.
          $Bookmarks = new BookmarkedModule($this);
@@ -421,18 +420,18 @@ class DiscussionController extends VanillaController {
             include($Loc);
             $Data = ob_get_clean();
          }
-         $Targets[] = array('Target' => $Target, 'Type' => $Type, 'Data' => $Data);
+         
+         $this->JsonTarget($Target, $Data, $Type);
       } else {
          // Send command to remove bookmark html.
          if($CountBookmarks == 0) {
-            $Targets[] = array('Target' => '#Bookmarks', 'Type' => 'Remove');
+            $this->JsonTarget('#Bookmarks', NULL, 'Remove');
          } else {
-            $Targets[] = array('Target' => '#Bookmark_'.$DiscussionID, 'Type' => 'Remove');
+            $this->JsonTarget('#Bookmark_'.$DiscussionID, NULL, 'Remove');
          }
       }
-      $this->SetJson('Targets', $Targets);
       
-      $this->Render();         
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
    /**
@@ -478,6 +477,15 @@ class DiscussionController extends VanillaController {
       $this->Title(T('Announce'));
       $this->Render();         
    }
+   
+   protected function SendOptions($Discussion) {
+      require_once $this->FetchViewLocation('helper_functions', 'Discussion');
+      ob_start();
+      WriteDiscussionOptions($Discussion);
+      $Options = ob_get_clean();
+      
+      $this->JsonTarget("#Discussion_{$Discussion->DiscussionID} .OptionsMenu,.Section-Discussion .Discussion .OptionsMenu", $Options, 'ReplaceWith');
+   }
 
    /**
     * Allows user to sink or unsink a discussion.
@@ -490,40 +498,36 @@ class DiscussionController extends VanillaController {
     * @access public
     *
     * @param int $DiscussionID Unique discussion ID.
-    * @param string $TransientKey Single-use hash to prove intent.
+    * @param bool $Sink Whether or not to unsink the discussion.
     */
-   public function Sink($DiscussionID = '', $TransientKey = '') {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
-      $State = '1';
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-               $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Sink');
-            } else {
-               $State = $Discussion->Sink;
-               $this->Form->AddError('ErrPermission');
-            }
-         }
-      }
+   public function Sink($DiscussionID = '', $Sink = TRUE, $From = 'list') {
+      // Make sure we are posting back.
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      $this->Permission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      // Sink the discussion.
+      $this->DiscussionModel->SetField($DiscussionID, 'Sink', $Sink);
+      $Discussion->Sink = $Sink;
       
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
          $Target = GetIncomingValue('Target', 'discussions');
          Redirect($Target);
       }
-         
-      $State = $State == '1' ? TRUE : FALSE;   
-      $this->SetJson('State', $State);
-      $this->SetJson('LinkText', T($State ? 'Unsink' : 'Sink'));         
-      $this->InformMessage(T('Your changes have been saved.'));
-      $this->Render();         
+      
+      $this->SendOptions($Discussion);
+      
+      $this->JsonTarget("#Discussion_$DiscussionID", NULL, 'Highlight');
+      $this->JsonTarget(".Discussion #Item_0", NULL, 'Highlight');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
    /**
@@ -537,28 +541,23 @@ class DiscussionController extends VanillaController {
     * @access public
     *
     * @param int $DiscussionID Unique discussion ID.
-    * @param string $TransientKey Single-use hash to prove intent.
+    * @param bool $Close Whether or not to close the discussion.
     */
-   public function Close($DiscussionID = '', $TransientKey = '') {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
-      $State = '1';
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion) {
-            if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-               $State = $this->DiscussionModel->SetProperty($DiscussionID, 'Closed');
-            } else {
-               $State = $Discussion->Closed;
-               $this->Form->AddError('ErrPermission');
-            }
-         }
-      }
+   public function Close($DiscussionID = '', $Close = TRUE, $From = 'list') {
+      // Make sure we are posting back.
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      $this->Permission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      // Sink the discussion.
+      $this->DiscussionModel->SetField($DiscussionID, 'Closed', $Close);
+      $Discussion->Closed = $Close;
       
       // Redirect to the front page
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
@@ -566,11 +565,21 @@ class DiscussionController extends VanillaController {
          Redirect($Target);
       }
       
-      $State = $State == '1' ? TRUE : FALSE;   
-      $this->SetJson('State', $State);
-      $this->SetJson('LinkText', T($State ? 'Reopen' : 'Close'));         
-      $this->InformMessage(T('Your changes have been saved.'));
-      $this->Render();         
+      $this->SendOptions($Discussion);
+      
+      if ($Close) {
+         require_once $this->FetchViewLocation('helper_functions', 'Discussions');
+         $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Meta-Discussion", Tag($Discussion, 'Closed', 'Closed'), 'Prepend');
+         $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'AddClass');
+      } else {
+         $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Tag-Closed", NULL, 'Remove');
+         $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'RemoveClass');
+      }
+      
+      $this->JsonTarget("#Discussion_$DiscussionID", NULL, 'Highlight');
+      $this->JsonTarget(".Discussion #Item_0", NULL, 'Highlight');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
    /**
@@ -582,38 +591,31 @@ class DiscussionController extends VanillaController {
     * @access public
     *
     * @param int $DiscussionID Unique discussion ID.
-    * @param string $TransientKey Single-use hash to prove intent.
     */
-   public function Delete($DiscussionID = '', $TransientKey = '') {
-      $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
+   public function Delete($DiscussionID, $Target = '') {
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       
-      $SuccessTarget = Url('/'.ltrim(GetIncomingValue('Target', '/'),'/'));
-      if (
-         is_numeric($DiscussionID)
-         && $DiscussionID > 0
-         && $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-         if ($Discussion && $Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-            if (!$this->DiscussionModel->Delete($DiscussionID))
-               $this->Form->AddError('Failed to delete discussion');
-         } else {
-            $this->Form->AddError('ErrPermission');
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      $this->Permission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
+      
+      if ($this->Form->IsPostBack()) {
+         if (!$this->DiscussionModel->Delete($DiscussionID))
+            $this->Form->AddError('Failed to delete discussion');
+         
+         if ($this->Form->ErrorCount() == 0) {
+            if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
+               Redirect($Target);
+
+            if ($Target)
+               $this->RedirectUrl = Url($Target);
+            
+            $this->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", NULL, 'SlideUp');
          }
-      } else {
-         $this->Form->AddError('ErrPermission');
       }
       
-      // Redirect
-      if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         Redirect($SuccessTarget);
-         
-      if ($this->Form->ErrorCount() > 0)
-         $this->SetJson('ErrorMessage', $this->Form->Errors());
-         
-      $this->RedirectUrl = $SuccessTarget;
+      $this->SetData('Title', T('Delete Discussion'));
       $this->Render();         
    }
 
@@ -700,7 +702,6 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('jquery.autogrow.js');
-      $this->AddJsFile('options.js');
       $this->AddJsFile('discussion.js');
       $this->RemoveJsFile('autosave.js');
       $this->MasterView = 'empty';

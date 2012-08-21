@@ -75,7 +75,7 @@ class NotificationsController extends Gdn_Controller {
           'Notified' => ActivityModel::SENT_PENDING);
       
       // If we're in the middle of a visit only get very recent notifications.
-      $Where['DateInserted >'] = Gdn_Format::ToDateTime(strtotime('-5 minutes'));
+      $Where['DateUpdated >'] = Gdn_Format::ToDateTime(strtotime('-5 minutes'));
       
       $Activities = $ActivityModel->GetWhere($Where, 0, 5)->ResultArray();
       

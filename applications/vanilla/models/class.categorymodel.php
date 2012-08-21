@@ -55,7 +55,7 @@ class CategoryModel extends Gdn_Model {
       $Watch = array();
       
       foreach ($Categories as $CategoryID => $Category) {
-         if ($Category['PermsDiscussionsView'] && $Category['Following']) {
+         if ($Category['PermsDiscussionsView'] && $Category['Following'] && !GetValue('HideAllDiscussions', $Category)) {
             $Watch[] = $CategoryID;
          }
       }

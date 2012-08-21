@@ -53,7 +53,7 @@ window.vanilla.embed = function(host) {
       onMessage = function(e) {
          var message = e.data.split(':');
          var frame = document.getElementById('vanilla'+id);
-         if (frame.contentWindow != e.source)
+         if (!frame || frame.contentWindow != e.source)
             return;
          processMessage(message);
       }
@@ -195,6 +195,9 @@ window.vanilla.embed = function(host) {
       var foreign_url = typeof(vanilla_url) == 'undefined' ? document.URL.split('#')[0] : vanilla_url;
       // Are we forcing a locale via Multilingual plugin?
       var embed_locale = typeof(vanilla_embed_locale) == 'undefined' ? '' : vanilla_embed_locale;
+      if (typeof(vanilla_lazy_load) == 'undefined')
+         vanilla_lazy_load = true;
+      
       // If path was defined, and we're sitting at app root, use the defined path instead.
       if (typeof(vanilla_path) != 'undefined' && path == '/')
          path = vanilla_path;
@@ -237,11 +240,17 @@ window.vanilla.embed = function(host) {
    vanillaIframe.allowTransparency = true;
    vanillaIframe.border = "0";
    vanillaIframe.width = "100%";
-   vanillaIframe.height = "300";
    vanillaIframe.style.width = "100%";
-   vanillaIframe.style.height = "300px";
    vanillaIframe.style.border = "0";
-   vanillaIframe.style.display = "none";
+   vanillaIframe.style.display = "block"; // must be block
+   
+   if (window.postMessage) {
+      vanillaIframe.height = "0";
+      vanillaIframe.style.height = "0";
+   } else {
+      vanillaIframe.height = "300";
+      vanillaIframe.style.height = "300px";
+   }
    
    
    var img = document.createElement('div');
@@ -258,7 +267,6 @@ window.vanilla.embed = function(host) {
    if (container) {
       var loaded = function() {
          container.removeChild(img);
-         vanillaIframe.style.display = "block";
       }
       
       if(vanillaIframe.addEventListener)
@@ -271,7 +279,7 @@ window.vanilla.embed = function(host) {
       container.appendChild(img);
       
       // If jQuery is present in the page, include our defer-until-visible script
-      if (typeof jQuery != 'undefined') {
+      if (vanilla_lazy_load && typeof jQuery != 'undefined') {
          jQuery.ajax({
             url: 'http://cdn.vanillaforums.com/js/jquery.appear.js',
             dataType: 'script',

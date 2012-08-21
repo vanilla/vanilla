@@ -34,7 +34,7 @@ function WriteBookmarkLink() {
    echo Anchor(
       $Title,
       '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
-      'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+      'Hijack Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
       array('title' => $Title)
    );
 }
@@ -179,7 +179,7 @@ function GetDiscussionOptions($Discussion = NULL) {
 	$CategoryID = GetValue('CategoryID', $Discussion);
 	if(!$CategoryID && property_exists($Sender, 'Discussion'))
 		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
-   $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion, GetValue('PermissionCategoryID', $Sender->Discussion));
+   $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion, GetValue('PermissionCategoryID', $Discussion));
    
    // Determine if we still have time to edit
    $EditContentTimeout = C('Garden.EditContentTimeout', -1);
@@ -203,21 +203,28 @@ function GetDiscussionOptions($Discussion = NULL) {
       $Options['AnnounceDiscussion'] = array('Label' => T('Announce...'), 'Url' => 'vanilla/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Popup');
 
    // Can the user sink?
-   if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID))
-      $Options['SinkDiscussion'] = array('Label' => T($Discussion->Sink ? 'Unsink' : 'Sink'), 'Url' => 'vanilla/discussion/sink/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Hijack');
+   if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID)) {
+      $NewSink = (int)!$Discussion->Sink;
+      $Options['SinkDiscussion'] = array('Label' => T($Discussion->Sink ? 'Unsink' : 'Sink'), 'Url' => "/discussion/sink?discussionid={$Discussion->DiscussionID}&sink=$NewSink", 'Class' => 'Hijack');
+   }
 
    // Can the user close?
-   if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
-      $Options['CloseDiscussion'] = array('Label' => T($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Hijack');
-   
+   if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID)) {
+      $NewClosed = (int)!$Discussion->Closed;
+      $Options['CloseDiscussion'] = array('Label' => T($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'Class' => 'Hijack');
+   }
+      
    if ($CanEdit && GetValueR('Attributes.ForeignUrl', $Discussion)) {
       $Options['RefetchPage'] = array('Label' => T('Refetch Page'), 'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID, 'Class' => 'Hijack');
    }
 
    // Can the user delete?
-   if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID))
-      $Options['DeleteDiscussion'] = array('Label' => T('Delete Discussion'), 'Url' => 'vanilla/discussion/delete/'.$Discussion->DiscussionID.'/'.$Session->TransientKey());
-   
+   if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID)) {
+      $Category = CategoryModel::Categories($CategoryID);
+      
+      $Options['DeleteDiscussion'] = array('Label' => T('Delete Discussion'), 'Url' => '/discussion/delete?discussionid='.$Discussion->DiscussionID.'&target='.urlencode(CategoryUrl($Category)), 'Class' => 'Popup');
+   }
+      
    // DEPRECATED (as of 2.1)
    $Sender->EventArguments['Type'] = 'Discussion';
    

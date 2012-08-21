@@ -367,7 +367,7 @@ else
 $Construct
 	->PrimaryKey('ActivityID')
    ->Column('ActivityTypeID', 'int')
-   ->Column('NotifyUserID', 'int', 0, 'index.Notify') // user being notified or -1: public, -2 mods, -3 admins
+   ->Column('NotifyUserID', 'int', 0, array('index.Notify', 'index.NotifyDate')) // user being notified or -1: public, -2 mods, -3 admins
    ->Column('ActivityUserID', 'int', TRUE, 'key')
    ->Column('RegardingUserID', 'int', TRUE) // deprecated?
    ->Column('Photo', 'varchar(255)', TRUE)
@@ -381,7 +381,7 @@ $Construct
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-   ->Column('DateUpdated', 'datetime', !$DateUpdatedExists, 'index')
+   ->Column('DateUpdated', 'datetime', !$DateUpdatedExists, array('index', 'index.NotifyDate'))
    ->Column('Notified', 'tinyint(1)', 0, 'index.Notify')
    ->Column('Emailed', 'tinyint(1)', 0)
    ->Column('Data', 'text', TRUE)

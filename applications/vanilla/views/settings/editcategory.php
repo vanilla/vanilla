@@ -39,6 +39,11 @@ echo $this->Form->Errors();
    ?>
    <li>
       <?php
+      echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
+      ?>
+   </li>
+   <li>
+      <?php
       echo $this->Form->CheckBox('Archived', 'This category is archived.');
       ?>
    </li>

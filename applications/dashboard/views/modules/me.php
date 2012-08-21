@@ -6,15 +6,18 @@ if ($this->CssClass)
    $CssClass .= ' '.$this->CssClass;
 
 $DashboardCount = 0;
+// Spam & Moderation Queue
 if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {
-   // Applicant Count
-   $RoleModel = new RoleModel();
-   $ApplicantCount = $RoleModel->GetApplicantCount();
-   // Spam & Moderation Queue
    $LogModel = new LogModel();
    $SpamCount = $LogModel->GetOperationCount('spam');
    $ModerationCount = $LogModel->GetOperationCount('moderate');
-   $DashboardCount = $ApplicantCount + $SpamCount + $ModerationCount;
+   $DashboardCount += $SpamCount + $ModerationCount;
+}
+// Applicant Count
+if ($Session->CheckPermission('Garden.Applicants.Manage')) {
+   $RoleModel = new RoleModel();
+   $ApplicantCount = $RoleModel->GetApplicantCount();
+   $DashboardCount += $ApplicantCount;
 }
 
 if ($Session->IsValid()):

@@ -175,12 +175,12 @@ jQuery(document).ready(function($) {
       return def;
    }
    
-   gdn.disable = function(e) {
+   gdn.disable = function(e, progressClass) {
       var href = $(e).attr('href');
       if (href) {
          $.data(e, 'hrefBak', href);
       }
-      $(e).addClass('InProgress').removeAttr('href').attr('disabled', true);
+      $(e).addClass(progressClass ? progressClass : 'InProgress').removeAttr('href').attr('disabled', true);
    }
    
    gdn.enable = function(e) {
@@ -374,12 +374,30 @@ jQuery(document).ready(function($) {
       return path1 + '/' + path2;
    };
 
-   gdn.processTargets = function(targets) {
+   gdn.processTargets = function(targets, $elem, $parent) {
       if(!targets || !targets.length)
          return;
+      
+      var tar = function(q) {
+         switch (q) {
+            case '!element':
+               return $elem;
+            case '!parent':
+               return $parent;
+            default:
+               return q;
+         }
+      }
+      
       for(i = 0; i < targets.length; i++) {
          var item = targets[i];
-         $target = $(item.Target);
+         
+         if (jQuery.isArray(item.Target)) {
+            $target = $(tar(item.Target[0]), tar(item.Target[1]));
+         } else {
+            $target = $(tar(item.Target));
+         }
+         
          switch(item.Type) {
             case 'AddClass':
                $target.addClass(item.Data);
@@ -398,6 +416,9 @@ jQuery(document).ready(function($) {
                break;
             case 'After':
                $target.after(item.Data);
+               break;
+            case 'Highlight':
+               $target.effect("highlight", {}, "slow");
                break;
             case 'Prepend':
                $target.prepend(item.Data);
@@ -556,11 +577,14 @@ jQuery(document).ready(function($) {
    
    var hijackClick = function(e) {   
       var $elem = $(this);
+      var $parent = $(this).closest('.Item');
       var $flyout = $elem.closest('.ToggleFlyout');
       var href = $elem.attr('href');
+      var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
+      
       if (!href)
          return;
-      gdn.disable(this);
+      gdn.disable(this, progressClass);
       e.stopPropagation();
       
       $.ajax({
@@ -570,7 +594,7 @@ jQuery(document).ready(function($) {
          dataType: 'json',
          complete: function() {
             gdn.enable(this);
-            $elem.removeClass('InProgress');
+            $elem.removeClass(progressClass);
             $elem.attr('href', href);
             
             // If we are in a flyout, close it.
@@ -583,7 +607,7 @@ jQuery(document).ready(function($) {
             if (json == null) json = {};
             
             var informed = gdn.inform(json);
-            gdn.processTargets(json.Targets);
+            gdn.processTargets(json.Targets, $elem, $parent);
             // If there is a redirect url, go to it.
             if (json.RedirectUrl) {
                setTimeout(function() {
@@ -1066,8 +1090,8 @@ jQuery(window).load(function() {
 
    jQuery('div.Message img').each(function(i,img) {
       var img = jQuery(img);
-      var container = img.parents('div.Message');
-      if (img.naturalWidth() > container.width()) {
+      var container = img.closest('div.Message');
+      if (img.naturalWidth() > container.width() && container.width() > 0) {
          img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
          img.wrap('<a href="'+$(img).attr('src')+'"></a>');
       }

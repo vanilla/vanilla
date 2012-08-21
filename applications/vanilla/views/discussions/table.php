@@ -44,7 +44,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
    $FirstPageUrl = DiscussionUrl($Discussion, 1);
    $LastPageUrl = DiscussionUrl($Discussion, FALSE).'#latest';
 ?>
-<tr class="<?php echo $CssClass; ?>">
+<tr id="Discussion_<?php echo $Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
    <?php echo AdminCheck($Discussion, array('<td class="CheckBoxColumn">', '</td>')); ?>
 	<td class="DiscussionName">
 		<div class="Wrap">
@@ -66,7 +66,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
             echo CategoryLink($Discussion, ' '.T('in').' ');
          
 			// Other stuff that was in the standard view that you may want to display:
-         echo '<div class="Meta">';
+         echo '<div class="Meta Meta-Discussion">';
 			WriteTags($Discussion);
          echo '</div>';
 			
@@ -145,7 +145,7 @@ include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
 echo '<div class="PageControls Top">';
    PagerModule::Write($PagerOptions);
-   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary'));
 echo '</div>';
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
@@ -185,7 +185,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 
    echo '<div class="PageControls Bottom">';
       PagerModule::Write($PagerOptions);
-      echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+      echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary'));
    echo '</div>';
    
 } else {

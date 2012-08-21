@@ -413,8 +413,13 @@ class ProfileController extends Gdn_Controller {
    public function NotificationsPopin() {
       $this->Permission('Garden.SignIn.Allow');
       
+      $Where = array(
+          'NotifyUserID' => Gdn::Session()->UserID,
+          'DateUpdated >=' => Gdn_Format::ToDateTime(strtotime('-2 weeks'))
+      );
+      
       $this->ActivityModel = new ActivityModel();
-      $Activities = $this->ActivityModel->GetNotifications(Gdn::Session()->UserID, 0, 5)->ResultArray();
+      $Activities = $this->ActivityModel->GetWhere($Where, 0, 5)->ResultArray();
       $this->SetData('Activities', $Activities);
       $this->ActivityModel->MarkRead(Gdn::Session()->UserID);
       

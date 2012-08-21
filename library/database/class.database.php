@@ -52,6 +52,8 @@ class Gdn_Database {
             if($this->ConnectionOptions[1002])
                $this->Query($this->ConnectionOptions[1002]);
          } catch (Exception $ex) {
+            if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage()))
+               throw new Exception('Timeout while connecting to the database', 504);
             trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
          }
       }

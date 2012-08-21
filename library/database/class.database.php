@@ -303,7 +303,11 @@ class Gdn_Database {
       
       if (isset($StoreCacheKey)) {
          if ($CacheOperation == 'get')
-            Gdn::Cache()->Store($StoreCacheKey, (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->ResultArray() : $this->_CurrentResultSet));
+            Gdn::Cache()->Store(
+               $StoreCacheKey, 
+               (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->ResultArray() : $this->_CurrentResultSet),
+               GetValue('CacheOptions', $Options, array())
+               );
       }
       
       return $this->_CurrentResultSet;

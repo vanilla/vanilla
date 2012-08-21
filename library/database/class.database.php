@@ -51,6 +51,9 @@ class Gdn_Database {
             $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
             if($this->ConnectionOptions[1002])
                $this->Query($this->ConnectionOptions[1002]);
+            
+            // We only throw exceptions during connect
+            $this->_Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
          } catch (Exception $ex) {
             if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage()))
                throw new Exception('Timeout while connecting to the database', 504);

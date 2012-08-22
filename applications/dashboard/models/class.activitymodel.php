@@ -503,7 +503,7 @@ class ActivityModel extends Gdn_Model {
          return $Result;
       }
       
-      $ConfigPreference = C('Preferences.Email.'.$ActivityType, '0');
+      $ConfigPreference = C('Preferences.'.$Type.'.'.$ActivityType, '0');
       if ($ConfigPreference !== FALSE)
          $Preference = ArrayValue($Type.'.'.$ActivityType, $Preferences, $ConfigPreference);
       else

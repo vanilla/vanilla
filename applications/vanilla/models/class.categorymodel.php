@@ -322,14 +322,18 @@ class CategoryModel extends Gdn_Model {
          $Joined = TRUE;
       }
       
+      // Create a fresh copy of the Sql object so as not to pollute.
+      $Sql = clone Gdn::SQL();
+      $Sql->Reset();
+      
       // Grab the discussions.
       if (count($DiscussionIDs) > 0) {
-         $Discussions = Gdn::SQL()->WhereIn('DiscussionID', $DiscussionIDs)->Get('Discussion')->ResultArray();
+         $Discussions = $Sql->WhereIn('DiscussionID', $DiscussionIDs)->Get('Discussion')->ResultArray();
          $Discussions = Gdn_DataSet::Index($Discussions, array('DiscussionID'));
       }
       
       if (count($CommentIDs) > 0) {
-         $Comments = Gdn::SQL()->WhereIn('CommentID', $CommentIDs)->Get('Comment')->ResultArray();
+         $Comments = $Sql->WhereIn('CommentID', $CommentIDs)->Get('Comment')->ResultArray();
          $Comments = Gdn_DataSet::Index($Comments, array('CommentID'));
       }
       

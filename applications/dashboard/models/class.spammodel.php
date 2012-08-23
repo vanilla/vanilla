@@ -7,6 +7,8 @@
 class SpamModel extends Gdn_Pluggable {
    /// PROPERTIES ///
    protected static $_Instance;
+   
+   public static $Disabled = FALSE;
 
 
    /// METHODS ///
@@ -29,6 +31,9 @@ class SpamModel extends Gdn_Pluggable {
     *  - Log: Log the record if it is found to be spam.
     */
    public static function IsSpam($RecordType, $Data, $Options = array()) {
+      if (self::$Disabled)
+         return FALSE;
+      
       // Set some information about the user in the data.
       if ($RecordType == 'Registration') {
          TouchValue('Username', $Data, $Data['Name']);

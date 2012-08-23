@@ -2169,7 +2169,11 @@ if (!function_exists('ProxyRequest')) {
        * - pop the first (only) element off it... 
        * - return that.
        */
-      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      $Status = trim($Status);
+      $Status = explode(' ',$Status);
+      $Status = array_slice($Status,1,1);
+      $Status = array_pop($Status);
+      $ResponseHeaders['StatusCode'] = $Status;
       foreach ($ResponseHeaderLines as $Line) {
          $Line = explode(':',trim($Line));
          $Key = trim(array_shift($Line));

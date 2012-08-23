@@ -382,27 +382,20 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param ProfileController $Sender ProfileController.
 	 */
-   public function ProfileController_Comments_Create($Sender) {
+   public function ProfileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '') {
 		$Sender->EditMode(FALSE);
 		$View = $Sender->View;
-      $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
-		$Username = ArrayValue(1, $Sender->RequestArgs, '');
-      $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username);
       $Sender->_SetBreadcrumbs(T('Comments'), '/profile/comments');
       $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
       
-      // Load the data for the requested tab.
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
+      $PageSize = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      list($Offset, $Limit) = OffsetLimit($Page, $PageSize);
       
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $CommentModel = new CommentModel();
-      $Comments = $Sender->SetData('Comments', $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset));
-      $CountComments = $Offset + $Comments->NumRows();
-      if ($Comments->NumRows() == $Limit)
-         $CountComments = $Offset + $Limit + 1;
+      $Comments = $CommentModel->GetByUser2($Sender->User->UserID, $Limit, $Offset, $Sender->Request->Get('lid'));
+      $TotalRecords = $Offset + $CommentModel->LastCommentCount + 1;
       
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -413,8 +406,8 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->Pager->Configure(
          $Offset,
          $Limit,
-         $CountComments,
-         'profile/comments/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
+         $TotalRecords,
+         UserUrl($Sender->User, '', 'comments').'/{Page}' //?lid='.$CommentModel->LastCommentID
       );
       
       // Deliver JSON data if necessary
@@ -423,7 +416,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
          $Sender->View = 'profilecomments';
       }
-		$Sender->Offset = $Offset;
+		$Sender->SetData('Comments', $Comments);
       
       // Set the HandlerType back to normal on the profilecontroller so that it fetches it's own views
       $Sender->HandlerType = HANDLER_TYPE_NORMAL;
@@ -445,30 +438,23 @@ class VanillaHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @package Vanilla
 	 *
-	 * @param object $Sender ProfileController.
+	 * @param ProfileController $Sender ProfileController.
 	 */
-   public function ProfileController_Discussions_Create($Sender) {
+   public function ProfileController_Discussions_Create($Sender, $UserReference = '', $Username = '', $Page = '') {
 		$Sender->EditMode(FALSE);
 		
-      $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
-		$Username = ArrayValue(1, $Sender->RequestArgs, '');
-      $Offset = ArrayValue(2, $Sender->RequestArgs, 0);
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username);
       $Sender->_SetBreadcrumbs(T('Discussions'), '/profile/discussions');
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
 		$Sender->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
       
-      // Load the data for the requested tab.
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
+      list($Offset, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
       
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $DiscussionModel = new DiscussionModel();
-      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('d.InsertUserID' => $Sender->User->UserID));
-      $CountDiscussions = $Offset + $Sender->DiscussionData->NumRows();
-      if ($Sender->DiscussionData->NumRows() == $Limit)
-         $CountDiscussions = $Offset + $Limit + 1;
+      $Discussions = $DiscussionModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
+      $CountDiscussions = $Offset + $DiscussionModel->LastDiscussionCount + 1;
+      $Sender->DiscussionData = $Discussions;
       
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -480,7 +466,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset,
          $Limit,
          $CountDiscussions,
-         'profile/discussions/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'/%1$s/'
+         UserUrl($Sender->User, '', 'discussions').'/{Page}'
       );
       
       // Deliver JSON data if necessary
@@ -497,6 +483,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->ShowOptions = FALSE;
       
       if ($Sender->Head) {
+         // These pages offer only duplicate content to search engines and are a bit slow.
          $Sender->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
       }
       

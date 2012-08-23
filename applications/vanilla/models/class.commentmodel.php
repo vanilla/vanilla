@@ -212,6 +212,78 @@ class CommentModel extends VanillaModel {
       return $Data;
       
    }
+   
+   /**
+    * 
+    * Get comments for a user. This is an optimized version of CommentModel->GetByUser().
+    * 
+    * @since 2.1
+    * @access public
+    * 
+    * @param int $UserID Which user to get comments for.
+    * @param int $Limit Max number to get.
+    * @param int $Offset Number to skip.
+    * @param int $LastCommentID A hint for quicker paging.
+    * @return Gdn_DataSet SQL results.
+    */
+   public function GetByUser2($UserID, $Limit, $Offset, $LastCommentID = FALSE) {
+      $Perms = DiscussionModel::CategoryPermissions();
+      
+      if (is_array($Perms) && empty($Perms)) {
+         return new Gdn_DataSet(array());
+      }
+      
+      // The point of this query is to select from one comment table, but filter and sort on another.
+      // This puts the paging into an index scan rather than a table scan.
+      $this->SQL
+         ->Select('c2.*')
+         ->Select('d.Name', '', 'DiscussionName')
+         ->Select('d.CategoryID')
+         ->From('Comment c')
+         ->Join('Comment c2', 'c.CommentID = c2.CommentID')
+         ->Join('Discussion d', 'c2.DiscussionID = d.DiscussionID')
+         ->Where('c.InsertUserID', $UserID)
+         ->OrderBy('c.CommentID', 'desc');
+      
+      if ($LastCommentID) {
+         // The last comment id from the last page was given and can be used as a hint to speed up the query.
+         $this->SQL
+            ->Where('c.CommentID <', $LastCommentID)
+            ->Limit($Limit);
+      } else {
+         $this->SQL->Limit($Limit, $Offset);
+      }
+      
+      $Data = $this->SQL->Get();
+      
+      
+      $Result =& $Data->Result();
+      $this->LastCommentCount = $Data->NumRows();
+      $this->LastCommentID = $Result[count($Result) - 1]->CommentID;
+      
+      // Now that we have th comments we can filter out the ones we don't have permission to.
+      if ($Perms !== TRUE) {
+         $Remove = array();
+         
+         foreach ($Data->Result() as $Index => $Row) {
+            if (!in_array($Row->CategoryID, $Perms))
+               $Remove[] = $Index;
+         }
+      
+         if (count($Remove) > 0) {
+
+            foreach ($Remove as $Index) {
+               unset($Result[$Index]);
+            }
+
+            $Result = array_values($Result);
+         }
+      }
+
+      Gdn::UserModel()->JoinUsers($Data, array('InsertUserID', 'UpdateUserID'));
+      
+      return $Data;
+   }
   
    /** 
     * Set the order of the comments or return current order. 

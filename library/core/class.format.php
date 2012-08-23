@@ -815,6 +815,23 @@ class Gdn_Format {
    }
    
    /**
+    * Format a serialized string of image properties as html.
+    * @param string $Body a serialized array of image properties (Image, Thumbnail, Caption)
+    */
+   public static function Image($Body) {
+      $Image = unserialize($Body);
+      if (!$Image) 
+         return Format::PlainText($Body);
+      
+      $Url = GetValue('Image', $Image);
+      $Caption = GetValue('Caption', $Image);
+      return Wrap(
+         Img($Url).Wrap($Caption, 'div class="Caption"'), 
+         'div class="Image"'
+      ); 
+   }
+   
+   /**
     * Format a string as plain text.
     * @param string $Body The text to format.
     * @param string $Format The current format of the text.
@@ -975,12 +992,15 @@ class Gdn_Format {
          $ID = $Matches['ID'];
          $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
          $Result = <<<EOT
-<div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1$TimeMarker" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
+<div class="Video YouTube" id="youtube-$ID">
+   <div class="VideoPreview"><a href="http://youtube.com/watch?v=$ID"><img src="http://img.youtube.com/vi/$ID/0.jpg" width="$Width" height="$Height" border="0" /></a></div>
+   <div class="VideoPlayer"></div>
+</div>
 EOT;
       } elseif (preg_match('`(?:https?|ftp)://(www\.)?vimeo\.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[2];
          $Result = <<<EOT
-<div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
+<div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
 EOT;
       } elseif (!self::$FormatLinks) {
          $Result = $Url;

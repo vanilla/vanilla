@@ -490,7 +490,9 @@ class EntryController extends Gdn_Controller {
             $User['Attributes'] = $this->Form->GetFormValue('Attributes', NULL);
             $User['Email'] = $this->Form->GetFormValue('ConnectEmail', $this->Form->GetFormValue('Email', NULL));
 
-            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
+//            $UserID = $UserModel->InsertForBasic($User, FALSE, array('ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
+            $UserID = $UserModel->Register($User, array('CheckCaptcha' => FALSE, 'ValidateEmail' => FALSE, 'NoConfirmEmail' => TRUE, 'SaveRoles' => $SaveRoles));
+            
             $User['UserID'] = $UserID;
             $this->Form->SetValidationResults($UserModel->ValidationResults());
 

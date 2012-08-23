@@ -251,6 +251,9 @@ class Gdn_Session {
     * @return mixed
     */
    public function GetPreference($PreferenceName, $DefaultValue = FALSE) {
+      // WARNING: THIS DOES NOT CHECK THE DEFAULT CONFIG-DEFINED SETTINGS. 
+      // IF A USER HAS NEVER SAVED THEIR PREFERENCES, THIS WILL RETURN 
+      // INCORRECT VALUES.
       return ArrayValue($PreferenceName, $this->_Preferences, $DefaultValue);
    }
 

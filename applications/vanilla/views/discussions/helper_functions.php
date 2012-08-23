@@ -140,16 +140,19 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          WriteTags($Discussion);
          ?>
          <span class="MItem MCount ViewCount"><?php
-//            echo BigPlural($Discussion->CountComments, '%s comment');
             printf(Plural($Discussion->CountViews, 
                '%s view', '%s views',
                BigPlural($Discussion->CountViews, '%s view')));
          ?></span>
          <span class="MItem MCount CommentCount"><?php
-//            echo BigPlural($Discussion->CountComments, '%s comment');
             printf(Plural($Discussion->CountComments, 
                '%s comment', '%s comments',
                BigPlural($Discussion->CountComments, '%s comment')));
+         ?></span>
+         <span class="MItem MCount DiscussionScore Hidden"><?php
+            printf(Plural($Discussion->Score, 
+               '%s votes', '%s votes',
+               BigPlural($Discussion->Score, '%s votes')));
          ?></span>
          <?php
             echo NewComments($Discussion);

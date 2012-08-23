@@ -1085,6 +1085,14 @@ class DiscussionModel extends VanillaModel {
          $this->Validation->ApplyRule('Body', 'Length');
       }      
       
+      // Validate category permissions.
+      $CategoryID = GetValue('CategoryID', $FormPostValues);
+      if ($CategoryID > 0) {
+         $Category = CategoryModel::Categories($CategoryID);
+         if ($Category && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', GetValue('PermissionCategoryID', $Category)))
+            $this->Validation->AddValidationResult('CategoryID', 'You do not have permission to post in this category');
+      }
+      
       // Get the DiscussionID from the form so we know if we are inserting or updating.
       $DiscussionID = ArrayValue('DiscussionID', $FormPostValues, '');
       

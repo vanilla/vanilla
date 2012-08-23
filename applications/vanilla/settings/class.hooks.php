@@ -380,7 +380,7 @@ class VanillaHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @package Vanilla
 	 *
-	 * @param object $Sender ProfileController.
+	 * @param ProfileController $Sender ProfileController.
 	 */
    public function ProfileController_Comments_Create($Sender) {
 		$Sender->EditMode(FALSE);
@@ -430,6 +430,10 @@ class VanillaHooks implements Gdn_IPlugin {
       
       // Do not show discussion options
       $Sender->ShowOptions = FALSE;
+      
+      if ($Sender->Head) {
+         $Sender->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
+      }
       
       // Render the ProfileController
       $Sender->Render();
@@ -491,6 +495,10 @@ class VanillaHooks implements Gdn_IPlugin {
       
       // Do not show discussion options
       $Sender->ShowOptions = FALSE;
+      
+      if ($Sender->Head) {
+         $Sender->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
+      }
       
       // Render the ProfileController
       $Sender->Render();

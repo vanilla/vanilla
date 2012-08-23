@@ -149,7 +149,9 @@ a {
    text-decoration: none;
    color: #1e79a7;
 }
-a:hover {
+a:hover,
+a.TextColor:hover,
+a:hover .TextColor {
    color: #ff0084;
 }
 a.TextColor, a .TextColor {

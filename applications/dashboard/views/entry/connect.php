@@ -19,8 +19,11 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 		?>
 		<div class="MeBox">
 			<?php
-			if ($ConnectPhoto)
-				echo Img($ConnectPhoto, array('alt' => T('Profile Picture'), 'class' => 'ProfilePhotoMedium'));
+			if ($ConnectPhoto) {
+				echo '<span class="PhotoWrap">',
+               Img($ConnectPhoto, array('alt' => T('Profile Picture'), 'class' => 'ProfilePhoto')),
+               '</span>';
+         }
 	
          echo '<div class="WhoIs">';
 			if ($ConnectName && $ConnectSource) {
@@ -101,7 +104,7 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 			</ul>
 	
 		<?php
-		echo '<div class="Buttons">', Wrap($this->Form->Button('Connect'), 'div', array('class' => 'ButtonContainer')), '</div>';
+		echo '<div class="Buttons">', Wrap($this->Form->Button('Connect', array('class' => 'Button Primary')), 'div', array('class' => 'ButtonContainer')), '</div>';
 	
 		endif;
 		

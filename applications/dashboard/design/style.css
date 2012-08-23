@@ -152,6 +152,9 @@ a {
 a:hover {
    color: #ff0084;
 }
+a.TextColor, a .TextColor {
+   color: black;
+}
 img.Thumbnail {
 	max-height: 300px;
 	max-width: 100px;

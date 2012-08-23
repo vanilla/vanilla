@@ -248,6 +248,24 @@ select {
    color: #111;
    border-color: #666;
 }
+.NavLabel {
+   font-weight: bold;
+   margin-right: 4px;
+}
+.NavBar > .Button {
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   border-right-width: 0;
+}
+.NavBar > .Button:first-child {
+   border-radius: 2px 0 0 2px;
+}
+.NavBar > .Button:last-child {
+   border-radius: 0 2px 2px 0;
+   border-right-width: 1px;
+}
+.Button.Active,
 .ButtonGroup.Open .Button.Handle,
 .Button:focus,
 .Button:active {
@@ -3405,6 +3423,7 @@ body.embed .InformMessages {
 .Video.YouTube .VideoPreview {
     cursor: pointer;
     position: relative;
+    display: inline-block;
 }
 .Video.YouTube .VideoPreview:after {
     background: url('http://cdn.vanillaforums.com/images/youtube-overlay-button.png') 0 -44px no-repeat transparent;

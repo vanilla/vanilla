@@ -3,19 +3,32 @@ $Session = Gdn::Session();
 $Alt = FALSE;
 $SubjectsVisible = C('Conversations.Subjects.Visible');
 
-foreach ($this->Data('Conversations')->Result() as $Conversation) {
+foreach ($this->Data('Conversations') as $Conversation) {
+   $Conversation = (object)$Conversation;
    $Alt = $Alt == TRUE ? FALSE : TRUE;
-   $LastAuthor = UserBuilder($Conversation, 'LastMessage');
-   $LastPhoto = UserPhoto($LastAuthor, 'Photo');
+   
+   
+   // Figure out the last photo.
+   $LastPhoto = '';
+   foreach ($Conversation->Participants as $User) {
+      if ($User['UserID'] == $Conversation->LastInsertUserID) {
+         $LastPhoto = UserPhoto($User);
+         if ($LastPhoto)
+            break;
+      } elseif (!$LastPhoto) {
+         $LastPhoto = UserPhoto($User);
+      }
+   }
+   
    $CssClass = 'Item';
    $CssClass .= $Alt ? ' Alt' : '';
    $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';
    $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
-   if ($Conversation->Format == 'Text')
-      $Message = (SliceString(Gdn_Format::To($Conversation->LastMessage, $Conversation->Format), 100));
+   if ($Conversation->LastFormat == 'Text')
+      $Message = (SliceString(Gdn_Format::To($Conversation->LastBody, $Conversation->LastFormat), 100));
    else
-      $Message = (SliceString(Gdn_Format::Text(Gdn_Format::To($Conversation->LastMessage, $Conversation->Format), FALSE), 100));
+      $Message = (SliceString(Gdn_Format::Text(Gdn_Format::To($Conversation->LastBody, $Conversation->LastFormat), FALSE), 100));
 
    if (StringIsNullOrEmpty(trim($Message)))
       $Message = T('Blank Message');
@@ -26,11 +39,8 @@ foreach ($this->Data('Conversations')->Result() as $Conversation) {
 <li class="<?php echo $CssClass; ?>">
    <?php
    $Names = '';
-   $PhotoUser = NULL;
    foreach ($Conversation->Participants as $User) {
       $Names = ConcatSep(', ', $Names, FormatUsername($User, 'You'));
-      if (!$PhotoUser && GetValue('Photo', $User))
-         $PhotoUser = $User;
    }
    ?>
    <div class="ItemContent Conversation">
@@ -40,8 +50,8 @@ foreach ($this->Data('Conversations')->Result() as $Conversation) {
       if ($Names) {
          echo '<h3 class="Users">';
          
-         if ($PhotoUser) {
-            echo '<div class="Author Photo">'.UserPhoto($PhotoUser).'</div>';
+         if ($LastPhoto) {
+            echo '<div class="Author Photo">'.$LastPhoto.'</div>';
          }
 
          echo Anchor(htmlspecialchars($Names), $Url), '</h3>';
@@ -61,7 +71,7 @@ foreach ($this->Data('Conversations')->Result() as $Conversation) {
             echo ' <strong class="HasNew"> '.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';
          }
          
-         echo ' <span class="MItem">'.Gdn_Format::Date($Conversation->DateLastMessage).'</span> ';
+         echo ' <span class="MItem">'.Gdn_Format::Date($Conversation->LastDateInserted).'</span> ';
          ?>
       </div>
    </div>

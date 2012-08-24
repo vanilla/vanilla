@@ -4,27 +4,25 @@
 <?php
 
 // Pager setup
-$PagerOptions = array('CurrentRecords' => $this->Data('Conversations')->NumRows());
+$PagerOptions = array('CurrentRecords' => count($this->Data('Conversations')));
 if ($this->Data('_PagerUrl'))
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 
 // Pre Pager
 PagerModule::Write($PagerOptions);
-
-if ($this->Data('Conversations')->NumRows() > 0): ?>
-   <ul class="Condensed DataList Conversations">
-      <?php
-      $ViewLocation = $this->FetchViewLocation('conversations');
-      include($ViewLocation);
-      ?>
-   </ul>
+?>
+<ul class="Condensed DataList Conversations">
 <?php
-
+if (count($this->Data('Conversations') > 0)):
+   $ViewLocation = $this->FetchViewLocation('conversations');
+   include $ViewLocation;
 else:
-   
-   echo '<div class="Empty">'.T('You do not have any conversations.').'</div>';
-
+   ?>
+   <li class="Item Empty Center"><?php echo sprintf(T('You do not have any %s yet.'), T('messages')); ?></li>
+   <?php
 endif;
-
+?>
+</ul>
+<?php
 // Post Pager
 PagerModule::Write($PagerOptions);

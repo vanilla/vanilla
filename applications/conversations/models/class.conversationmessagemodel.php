@@ -203,12 +203,15 @@ class ConversationMessageModel extends Gdn_Model {
             list($CountMessages, $LastMessageID) = array_values($SQLR);
          } else { return; }
          
-         // Update the conversation's DateUpdated field
+         // Update the conversation's DateUpdated field.
+         $DateUpdated = Gdn_Format::ToDateTime();
+         
          $this->SQL
             ->Update('Conversation c')
-            ->History()
             ->Set('CountMessages', $CountMessages)
             ->Set('LastMessageID', $LastMessageID)
+            ->Set('UpdateUserID', Gdn::Session()->UserID)
+            ->Set('DateUpdated', $DateUpdated)
             ->Where('ConversationID', $ConversationID)
             ->Put();
 
@@ -216,6 +219,7 @@ class ConversationMessageModel extends Gdn_Model {
          $this->SQL
             ->Update('UserConversation uc')
             ->Set('uc.LastMessageID', $MessageID)
+            ->Set('uc.DateConversationUpdated', $DateUpdated)
             ->Where('uc.ConversationID', $ConversationID)
             ->Where('uc.Deleted', '0')
             ->Where('uc.CountReadMessages', $CountMessages - 1)
@@ -227,6 +231,7 @@ class ConversationMessageModel extends Gdn_Model {
             ->Update('UserConversation uc')
             ->Set('uc.CountReadMessages', $CountMessages)
             ->Set('Deleted', 0)
+            ->Set('uc.DateConversationUpdated', $DateUpdated)
             ->Where('ConversationID', $ConversationID)
             ->Where('UserID', $Session->UserID)
             ->Put();

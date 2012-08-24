@@ -131,6 +131,57 @@ class ConversationModel extends Gdn_Model {
    }
    
    /**
+    * Get a list of conversaitons for a user's inbox. This is an optimized version of ConversationModel::Get().
+    * 
+    * @param int $UserID
+    * @param int $Offset Number to skip.
+    * @param int $Limit Maximum to return.
+    */
+   public function Get2($UserID, $Offset = 0, $Limit = FALSE) {
+      if (!$Limit) 
+         $Limit = C('Conversations.Conversations.PerPage', 30);
+      
+      // The self join is intentional in order to force the query to us an index-scan instead of a table-scan.
+      $Data = $this->SQL
+         ->Select('c.*')
+         ->Select('uc2.DateLastViewed')
+         ->Select('uc2.CountReadMessages')
+         ->Select('uc2.LastMessageID', '', 'UserLastMessageID')
+         ->From('UserConversation uc')
+         ->Join('UserConversation uc2', 'uc.ConversationID = uc2.ConversationID and uc.UserID = uc2.UserID')
+         ->Join('Conversation c', 'c.ConversationID = uc2.ConversationID')
+         ->Where('uc.UserID', $UserID)
+         ->Where('uc.Deleted', 0)
+         ->OrderBy('uc.DateConversationUpdated', 'desc')
+         ->Get();
+      
+      $Data->DatasetType(DATASET_TYPE_ARRAY);
+      $Result =& $Data->Result();
+      
+      // Add some calculated fields.
+      foreach ($Result as &$Row) {
+         if ($Row['UserLastMessageID'])
+            $Row['LastMessageID'] = $Row['UserLastMessageID'];
+         $Row['CountNewMessages'] = $Row['CountMessages'] - $Row['CountReadMessages'];
+         unset($Row['UserLastMessageID']);
+      }
+      
+      // Join the participants.
+      $this->JoinParticipants($Result);
+      
+      // Join in the last message.
+      Gdn_DataSet::Join($Result, 
+         array(
+             'table' => 'ConversationMessage',
+             'prefix' => 'Last',
+             'parent' => 'LastMessageID', 
+             'child' => 'MessageID', 
+             'InsertUserID', 'DateInserted', 'Body', 'Format'));
+      
+      return $Data;
+   }
+   
+   /**
     * Get number of conversations involving current user.
     * 
     * @since 2.0.0

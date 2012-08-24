@@ -153,6 +153,7 @@ class ConversationModel extends Gdn_Model {
          ->Where('uc.UserID', $UserID)
          ->Where('uc.Deleted', 0)
          ->OrderBy('uc.DateConversationUpdated', 'desc')
+         ->Limit($Limit, $Offset)
          ->Get();
       
       $Data->DatasetType(DATASET_TYPE_ARRAY);

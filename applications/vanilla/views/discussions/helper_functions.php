@@ -150,9 +150,11 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
                BigPlural($Discussion->CountComments, '%s comment')));
          ?></span>
          <span class="MItem MCount DiscussionScore Hidden"><?php
-            printf(Plural($Discussion->Score, 
-               '%s votes', '%s votes',
-               BigPlural($Discussion->Score, '%s votes')));
+         $Score = $Discussion->Score;
+         if ($Score == '') $Score = 0;
+         printf(Plural($Score, 
+            '%s point', '%s points',
+            BigPlural($Score, '%s point')));
          ?></span>
          <?php
             echo NewComments($Discussion);

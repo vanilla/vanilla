@@ -676,7 +676,11 @@ class DiscussionModel extends VanillaModel {
       
       $Result =& $Data->Result();
       $this->LastDiscussionCount = $Data->NumRows();
-      $this->LastDiscussionID = $Result[count($Result) - 1]->DiscussionID;
+      
+      if (count($Result) > 0)
+         $this->LastDiscussionID = $Result[count($Result) - 1]->DiscussionID;
+      else
+         $this->LastDiscussionID = NULL;
       
       // Now that we have th comments we can filter out the ones we don't have permission to.
       if ($Perms !== TRUE) {

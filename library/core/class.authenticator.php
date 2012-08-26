@@ -186,6 +186,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
             ->Join('UserAuthentication ua', 'ua.ForeignUserKey = uat.ForeignUserKey')
             ->Where('ua.UserID', $UserID)
             ->Where('ua.ProviderKey', $Provider['AuthenticationKey'])
+            ->Limit(1)
             ->Get();
             
          if ($UserAuthenticationData->NumRows())

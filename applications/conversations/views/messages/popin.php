@@ -27,12 +27,12 @@ if (count($this->Data('Conversations'))):
    if (!isset($PhotoUser))
       $PhotoUser = UserBuilder($Row, 'LastMessage');
    ?>
-   <li class="Item">
+   <li class="Item" rel="<?php echo Url("/messages/{$Row['ConversationID']}#latest"); ?>">
       <div class="Author Photo"><?php echo UserPhoto($PhotoUser); ?></div>
       <div class="ItemContent">
          <b class="Subject"><?php echo Anchor($Subject, "/messages/{$Row['ConversationID']}#latest"); ?></b>
          <?php
-         $Excerpt = SliceString(Gdn_Format::PlainText($Row['LastMessage']), 80);
+         $Excerpt = SliceString(Gdn_Format::PlainText($Row['LastBody'], $Row['LastFormat']), 80);
          echo Wrap(nl2br($Excerpt), 'div', array('class' => 'Excerpt'));
          ?>
          <div class="Meta">
@@ -43,7 +43,7 @@ if (count($this->Data('Conversations'))):
                echo ' <strong class="HasNew"> '.Plural($Row['CountNewMessages'], '%s new', '%s new').'</strong> ';
             }
 
-            echo ' <span class="MItem">'.Gdn_Format::Date($Row['DateLastMessage']).'</span> ';
+            echo ' <span class="MItem">'.Gdn_Format::Date($Row['LastDateInserted']).'</span> ';
             ?>
          </div>
       </div>

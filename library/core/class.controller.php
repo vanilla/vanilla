@@ -88,7 +88,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    /**
     * The Head module that this controller should use to add CSS files.
     *
-    * @var object
+    * @var HeadModule
     */
    public $Head;
 

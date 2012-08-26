@@ -167,30 +167,16 @@ class MessagesController extends ConversationsController {
       // Calculate offset
       $this->Offset = $Offset;
       
-      // Limit to bookmarks?   
-      $Wheres = array();
-      if ($this->Request->Get('Bookmarked'))
-         $Wheres['Bookmarked'] = '1';
-
       $UserID = $this->Request->Get('userid', Gdn::Session()->UserID);
       if ($UserID != Gdn::Session()->UserID) {
          if (!C('Conversations.Moderation.Allow', FALSE)) {
-            Gdn::Dispatcher()->Dispatch('DefaultPermission');
-            exit();
+            throw PermissionException();
          }
          $this->Permission('Conversations.Moderation.Manage');
       }
       
-      // Fetch from model  
-      $Data = $this->ConversationModel->Get(
-         $UserID,
-         $this->Offset,
-         $Limit
-      );
-      
-      // Join in the participants.
-      $this->ConversationModel->JoinParticipants($Data);
-      $this->SetData('Conversations', $Data);
+      $Conversations = $this->ConversationModel->Get2($UserID, $Offset, $Limit);
+      $this->SetData('Conversations', $Conversations->ResultArray());
       
       // Get Conversations Count
       //$CountConversations = $this->ConversationModel->GetCount($UserID);
@@ -391,16 +377,14 @@ class MessagesController extends ConversationsController {
       $this->Permission('Garden.SignIn.Allow');
       
       // Fetch from model  
-      $Conversations = $this->ConversationModel->Get(
+      $Conversations = $this->ConversationModel->Get2(
          Gdn::Session()->UserID,
          0,
          5
       );
       
       // Join in the participants.
-      $this->ConversationModel->JoinParticipants($Conversations);
-      
-      $this->SetData('Conversations', $Conversations);
+      $this->SetData('Conversations', $Conversations->ResultArray());
       $this->Render();
    }
    

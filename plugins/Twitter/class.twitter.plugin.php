@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Sign In',
    'Description' => 'Users may sign into your site using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>',
-   'Version' => '1.0b',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -215,7 +215,7 @@ class TwitterPlugin extends Gdn_Plugin {
          $AccessToken = $this->GetOAuthToken($AccessToken);
          $this->AccessToken($AccessToken);
       }
-
+      
       // Get the access token.
       if ($RequestToken && !$AccessToken) {
          // Get the request secret.
@@ -283,6 +283,7 @@ class TwitterPlugin extends Gdn_Plugin {
       $Form->SetFormValue('UniqueID', $ID);
       $Form->SetFormValue('Provider', self::$ProviderKey);
       $Form->SetFormValue('ProviderName', 'Twitter');
+      $Form->SetValue('ConnectName', GetValue('screen_name', $Profile));
       $Form->SetFormValue('Name', GetValue('screen_name', $Profile));
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
       $Form->SetFormValue('Photo', GetValue('profile_image_url', $Profile));

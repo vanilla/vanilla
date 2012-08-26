@@ -1050,7 +1050,10 @@ class UserModel extends Gdn_Model {
          $this->Validation->AddValidationResult('Name', 'You are already registered.');
 
       // Check for banning first.
-      $Valid = BanModel::CheckUser($FormPostValues, $this->Validation, TRUE);
+      $Valid = BanModel::CheckUser($FormPostValues, NULL, TRUE);
+      if (!$Valid) {
+         $this->Validation->AddValidationResult('UserID', 'Sorry, permission denied.');
+      }
 
       // Throw an event to allow plugins to block the registration.
       unset($this->EventArguments['User']);

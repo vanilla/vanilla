@@ -613,6 +613,106 @@ class DiscussionModel extends VanillaModel {
    }
    
    /**
+    * 
+    * Get discussions for a user.
+    * 
+    * @since 2.1
+    * @access public
+    * 
+    * @param int $UserID Which user to get discussions for.
+    * @param int $Limit Max number to get.
+    * @param int $Offset Number to skip.
+    * @param int $LastDiscussionID A hint for quicker paging.
+    * @return Gdn_DataSet SQL results.
+    */
+   public function GetByUser($UserID, $Limit, $Offset, $LastDiscussionID = FALSE) {
+      $Perms = DiscussionModel::CategoryPermissions();
+      
+      if (is_array($Perms) && empty($Perms)) {
+         return new Gdn_DataSet(array());
+      }
+      
+      // The point of this query is to select from one comment table, but filter and sort on another.
+      // This puts the paging into an index scan rather than a table scan.
+      $this->SQL
+         ->Select('d2.*')
+         ->Select('d2.InsertUserID', '', 'FirstUserID')
+         ->Select('d2.DateInserted', '', 'FirstDate')
+         ->Select('d2.DateLastComment', '', 'LastDate')
+         ->Select('d2.LastCommentUserID', '', 'LastUserID')
+         ->From('Discussion d')
+         ->Join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
+         ->Where('d.InsertUserID', $UserID)
+         ->OrderBy('d.DiscussionID', 'desc');
+      
+      // Join in the watch data.
+      if ($UserID > 0) {
+         $this->SQL
+            ->Select('w.UserID', '', 'WatchUserID')
+            ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+            ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
+      } else {
+			$this->SQL
+				->Select('0', '', 'WatchUserID')
+				->Select('now()', '', 'DateLastViewed')
+				->Select('0', '', 'Dismissed')
+				->Select('0', '', 'Bookmarked')
+				->Select('0', '', 'CountCommentWatch')
+				->Select('d.Announce','','IsAnnounce');
+      }
+      
+      if ($LastDiscussionID) {
+         // The last comment id from the last page was given and can be used as a hint to speed up the query.
+         $this->SQL
+            ->Where('d.DiscussionID <', $LastDiscussionID)
+            ->Limit($Limit);
+      } else {
+         $this->SQL->Limit($Limit, $Offset);
+      }
+      
+      $Data = $this->SQL->Get();
+      
+      
+      $Result =& $Data->Result();
+      $this->LastDiscussionCount = $Data->NumRows();
+      
+      if (count($Result) > 0)
+         $this->LastDiscussionID = $Result[count($Result) - 1]->DiscussionID;
+      else
+         $this->LastDiscussionID = NULL;
+      
+      // Now that we have th comments we can filter out the ones we don't have permission to.
+      if ($Perms !== TRUE) {
+         $Remove = array();
+         
+         foreach ($Data->Result() as $Index => $Row) {
+            if (!in_array($Row->CategoryID, $Perms))
+               $Remove[] = $Index;
+         }
+      
+         if (count($Remove) > 0) {
+            foreach ($Remove as $Index) {
+               unset($Result[$Index]);
+            }
+            $Result = array_values($Result);
+         }
+      }
+
+      // Change discussions returned based on additional criteria	
+		$this->AddDiscussionColumns($Data);
+      
+      // Join in the users.
+      Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
+      CategoryModel::JoinCategories($Data);
+		
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
+      
+      return $Data;
+   }
+   
+   /**
     * Identify current user's category permissions and set as local array.
     * 
     * @since 2.0.0

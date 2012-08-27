@@ -436,6 +436,23 @@ class DiscussionModel extends VanillaModel {
          
          $Discussion->Name = Gdn_Format::Text($Discussion->Name);
          $Discussion->Url = DiscussionUrl($Discussion);
+         
+         // Add some legacy calculated columns.
+         if (!property_exists($Discussion, 'FirstUserID')) {
+            $Discussion->FirstUserID = $Discussion->InsertUserID;
+            $Discussion->FirstDate = $Discussion->DateInserted;
+            $Discussion->LastUserID = $Discussion->LastCommentUserID;
+            $Discussion->LastDate = $Discussion->DateLastComment;
+         }
+         
+         // Add the columns from UserDiscussion if they don't exist.
+         if (!property_exists($Discussion, 'WatchUserID')) {
+            $Discussion->WatchUserID = NULL;
+            $Discussion->DateLastViewed = NULL;
+            $Discussion->Dismissed = 0;
+            $Discussion->Bookmarked = 0;
+            $Discussion->CountCommentWatch = 0;
+         }
 
 			if($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';

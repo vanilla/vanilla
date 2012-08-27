@@ -65,7 +65,7 @@ $Construct
    ->Column('DateConversationUpdated', 'datetime', TRUE, 'index.Inbox') // For speeding up queries.
    ->Set($Explicit, $Drop);
 
-if (TRUE || !$DateConversationUpdatedExists) {
+if (!$DateConversationUpdatedExists) {
    $SQL->Update('UserConversation uc')
       ->Join('Conversation c', 'uc.ConversationID = c.ConversationID')
       ->Set('DateConversationUpdated', 'c.DateUpdated', FALSE)

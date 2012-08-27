@@ -79,7 +79,7 @@ class DiscussionsController extends VanillaController {
     * 
     * @param int $Page Multiplied by PerPage option to determine offset.
     */
-   public function Index($Page = '0') {
+   public function Index($Page = FALSE) {
       // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
       $Layout = C('Vanilla.Discussions.Layout');
       switch($Layout) {
@@ -94,12 +94,9 @@ class DiscussionsController extends VanillaController {
       Gdn_Theme::Section('DiscussionList');
       
       // Determine offset from $Page
-      list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
-      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
-      
-      // Validate $Page
-      if (!is_numeric($Page) || $Page < 0)
-         $Page = 0;
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $Page = PageNumber($Offset, $Limit);
+      $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
       
       // Setup head.
       if (!$this->Data('Title')) {
@@ -132,14 +129,14 @@ class DiscussionsController extends VanillaController {
       $this->SetData('CountDiscussions', $CountDiscussions);
       
       // Get Announcements
-      $this->AnnounceData = $Page == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
+      $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
 		$this->SetData('Announcements', $this->AnnounceData !== FALSE ? $this->AnnounceData : array(), TRUE);
       
       // Get Discussions
-      $this->DiscussionData = $DiscussionModel->Get($Page, $Limit);
+      $this->DiscussionData = $DiscussionModel->GetWhere(FALSE, $Offset, $Limit);
       
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
-      $this->SetJson('Loading', $Page . ' to ' . $Limit);
+      $this->SetJson('Loading', $Offset . ' to ' . $Limit);
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -148,7 +145,7 @@ class DiscussionsController extends VanillaController {
       $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
-         $Page,
+         $Offset,
          $Limit,
          $CountDiscussions,
          'discussions/%1$s'

@@ -191,6 +191,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          ?>
       </div>
    </div>
+   <?php $Sender->FireEvent('AfterDiscussionContent'); ?>
 </li>
 <?php
 }

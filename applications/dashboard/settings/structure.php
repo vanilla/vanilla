@@ -367,8 +367,8 @@ else
 $Construct
 	->PrimaryKey('ActivityID')
    ->Column('ActivityTypeID', 'int')
-   ->Column('NotifyUserID', 'int', 0, 'index.Notify') // user being notified or -1: public, -2 mods, -3 admins
-   ->Column('ActivityUserID', 'int', TRUE, 'key')
+   ->Column('NotifyUserID', 'int', 0, array('index.Notify', 'index.Recent', 'index.Feed')) // user being notified or -1: public, -2 mods, -3 admins
+   ->Column('ActivityUserID', 'int', TRUE, 'index.Feed')
    ->Column('RegardingUserID', 'int', TRUE) // deprecated?
    ->Column('Photo', 'varchar(255)', TRUE)
    ->Column('HeadlineFormat', 'varchar(255)', TRUE)
@@ -381,7 +381,7 @@ $Construct
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-   ->Column('DateUpdated', 'datetime', !$DateUpdatedExists, 'index')
+   ->Column('DateUpdated', 'datetime', !$DateUpdatedExists, array('index', 'index.Recent', 'index.Feed'))
    ->Column('Notified', 'tinyint(1)', 0, 'index.Notify')
    ->Column('Emailed', 'tinyint(1)', 0)
    ->Column('Data', 'text', TRUE)
@@ -389,6 +389,14 @@ $Construct
 
 if (isset($ActivityIndexes['IX_Activity_NotifyUserID'])) {
    $Construct->Query("drop index IX_Activity_NotifyUserID on {$Px}Activity");
+}
+
+if (isset($ActivityIndexes['FK_Activity_ActivityUserID'])) {
+   $Construct->Query("drop index FK_Activity_ActivityUserID on {$Px}Activity");
+}
+
+if (isset($ActivityIndexes['FK_Activity_RegardingUserID'])) {
+   $Construct->Query("drop index FK_Activity_RegardingUserID on {$Px}Activity");
 }
 
 if (!$EmailedExists) {

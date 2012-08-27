@@ -263,9 +263,12 @@ class DiscussionModel extends VanillaModel {
 		return $Data;
    }
    
-   public function GetWhere($Where = FALSE, $Offset = 0, $Limit = FALSE) {
+   public function GetWhere($Where = array(), $Offset = 0, $Limit = FALSE) {
       if (!$Limit) 
          $Limit = C('Vanilla.Discussions.PerPage', 30);
+      
+      if (!is_array($Where))
+         $Where = array();
       
       $Sql = $this->SQL;
       

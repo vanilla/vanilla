@@ -215,7 +215,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *   ------------------------------------------------------------------------
     *   Value         The ID of the category that    FALSE
     *                 is selected.
-    *   IncludeNull   Include a blank row?           FALSE
+    *   IncludeNull   Include a blank row?           TRUE
     *   CategoryData  Custom set of categories to    CategoryModel::Categories()
     *                 display.
     *
@@ -267,7 +267,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // Start with null option?
       $IncludeNull = GetValue('IncludeNull', $Options) || !$HasValue;
       if ($IncludeNull === TRUE)
-         $Return .= '<option value=""></option>';
+         $Return .= '<option value="">'.T('Select a category...').'</option>';
          
       // Show root categories as headings (ie. you can't post in them)?
       $DoHeadings = C('Vanilla.Categories.DoHeadings');

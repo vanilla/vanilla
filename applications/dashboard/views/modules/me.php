@@ -32,6 +32,7 @@ if ($Session->IsValid()):
          
          echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
          echo Anchor(Sprite('SpNotifications', 'Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton', array('title' => T('Notifications')));
+         echo Sprite('SpFlyoutHandle');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
          
          // Inbox
@@ -39,17 +40,20 @@ if ($Session->IsValid()):
          $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
          echo '<span class="ToggleFlyout" rel="/messages/popin">';
          echo Anchor(Sprite('SpInbox', 'Sprite16').Wrap(T('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', array('title' => T('Inbox')));
+         echo Sprite('SpFlyoutHandle');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
          
          // Bookmarks
          echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
          echo Anchor(Sprite('SpBookmarks', 'Sprite16').Wrap(T('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', array('title' => T('Bookmarks')));
+         echo Sprite('SpFlyoutHandle');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
          
          // Profile Settings & Logout
          echo '<span class="ToggleFlyout">';
          $CDashboard = $DashboardCount > 0 ? Wrap($DashboardCount, 'span class="Alert"') : '';
          echo Anchor(Sprite('SpDashboard', 'Sprite16').Wrap(T('Account Options'), 'em').$CDashboard, '/profile/edit', 'MeButton FlyoutButton', array('title' => T('Account Options')));
+         echo Sprite('SpFlyoutHandle');
          echo '<div class="Flyout MenuItems">';
             echo '<ul>';
                // echo Wrap(Wrap(T('My Account'), 'strong'), 'li');

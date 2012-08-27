@@ -262,17 +262,16 @@ function WriteDiscussionOptions($Discussion = NULL) {
    
    if (empty($Options))
       return; 
-   ?>
-   <span class="ToggleFlyout OptionsMenu">
-      <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
-		<span class="SpFlyoutHandle"></span>
-      <ul class="Flyout MenuItems" style="display: none;">
-      <?php foreach ($Options as $Code => $Option) : ?>
-			<li><?php echo Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)); ?></li>
-		<?php endforeach; ?>
-      </ul>
-   </span>
-   <?php
+
+   echo ' <span class="ToggleFlyout OptionsMenu">';
+      echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
+		echo Sprite('SpFlyoutHandle'); 
+      echo '<ul class="Flyout MenuItems" style="display: none;">';
+      foreach ($Options as $Code => $Option):
+			echo Wrap(Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)), 'li');
+		endforeach;
+      echo '</ul>';
+   echo '</span>';
 }
 endif;
 
@@ -341,17 +340,16 @@ function WriteCommentOptions($Comment) {
 	$Options = GetCommentOptions($Comment);
 	if (empty($Options))
 		return;
-   ?>
-   <span class="ToggleFlyout OptionsMenu">
-      <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
-		<span class="SpFlyoutHandle"></span>
-      <ul class="Flyout MenuItems">
-      <?php foreach ($Options as $Code => $Option) : ?>
-         <li><?php echo Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)); ?></li>
-      <?php endforeach; ?>
-      </ul>
-   </span>
-   <?php
+
+   echo '<span class="ToggleFlyout OptionsMenu">';
+      echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
+		echo Sprite('SpFlyoutHandle'); 
+      echo '<ul class="Flyout MenuItems">';
+      foreach ($Options as $Code => $Option):
+         echo Wrap(Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)), 'li');
+      endforeach;
+      echo '</ul>';
+   echo '</span>';
    if (C('Vanilla.AdminCheckboxes.Use')) {
       // Only show the checkbox if the user has permission to affect multiple items
       $Discussion = Gdn::Controller()->Data('Discussion');

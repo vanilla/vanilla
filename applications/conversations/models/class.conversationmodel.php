@@ -367,7 +367,8 @@ class ConversationModel extends Gdn_Model {
                'UserID' => $UserID,
                'ConversationID' => $ConversationID,
                'LastMessageID' => $MessageID,
-               'CountReadMessages' => $CountReadMessages
+               'CountReadMessages' => $CountReadMessages,
+               'DateConversationUpdated' => $FormPostValues['DateUpdated']
             ));
          }
          

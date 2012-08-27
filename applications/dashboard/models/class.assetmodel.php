@@ -111,7 +111,7 @@ class AssetModel extends Gdn_Model {
       file_put_contents($CachePath, $Css);
    }
    
-   public function GetCssFiles($Basename, $ETag, &$NotFound) {
+   public function GetCssFiles($Basename, $ETag, &$NotFound = NULL) {
       $NotFound = array();
       
       // Gather all of the css paths.

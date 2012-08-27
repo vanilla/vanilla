@@ -1495,17 +1495,28 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->FireEvent('BeforeAddCss');
             
             $ETag = AssetModel::ETag();
+            $DebugAssets = C('DebugAssets');
             
             // And now search for/add all css files.
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
                
-               if ($CssFile == 'style.css') {
-                  $CssFile = Url("/utility/css/style/style-$ETag.css", TRUE);
-                  $CssInfo['AddVersion'] = FALSE;
-               } elseif ($CssFile == 'admin.css') {
-                  $CssFile = Url("/utility/css/admin/admin-$ETag.css", TRUE);
-                  $CssInfo['AddVersion'] = FALSE;
+               // style.css and admin.css deserve some custom processing.
+               if (in_array($CssFile, array('style.css', 'admin.css'))) {
+                  if ($DebugAssets) {
+                     // Grab all of the css files from the asset model.
+                     $AssetModel = new AssetModel();
+                     $CssFiles = $AssetModel->GetCssFiles(ucfirst(substr($CssFile, 0, -4)), $ETag);
+
+                     foreach ($CssFiles as $Info) {
+                        $this->Head->AddCss($Info[1], 'all', TRUE, $CssInfo);
+                     }
+                  } else {
+                     $Basename = substr($CssFile, 0, -4);
+                     
+                     $this->Head->AddCss(Url("/utility/css/$Basename/$Basename-$ETag.css", FALSE), 'all', FALSE, $CssInfo['Options']);
+                  }
+                  continue;
                }
                
                if (StringBeginsWith($CssFile, 'http')) {

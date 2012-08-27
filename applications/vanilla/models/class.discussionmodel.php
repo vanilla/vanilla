@@ -263,6 +263,84 @@ class DiscussionModel extends VanillaModel {
 		return $Data;
    }
    
+   public function GetWhere($Where = FALSE, $Offset = 0, $Limit = FALSE) {
+      if (!$Limit) 
+         $Limit = C('Vanilla.Discussions.PerPage', 30);
+      
+      $Sql = $this->SQL;
+      
+      // Build up the base query. Self-join for optimization.
+      $Sql->Select('d2.*')
+         ->From('Discussion d')
+         ->Join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
+         ->OrderBy('d.DateLastComment', 'desc')
+         ->Limit($Limit, $Offset);
+      
+      if ($this->Watching && !isset($Where['d.CategoryID'])) {
+         $Where['d.CategoryID'] = CategoryModel::CategoryWatch();
+      }
+      
+      // Verify permissions (restricting by category if necessary)
+      $Perms = self::CategoryPermissions();
+      
+      if($Perms !== TRUE) {
+         if (isset($Where['d.CategoryID'])) {
+            $Where['d.CategorID'] = array_intersect((array)$Where['d.CategorID'], $Perms);
+         } else {
+            $Where['d.CategoryID'] = $Perms;
+         }
+      }
+      
+      // Check to see whether or not we are removing announcements.
+      if (strtolower(GetValue('Announce', $Where)) ==  'all') {
+         $RemoveAnnouncements = FALSE;
+         unset($Where['Announce']);
+      } else {
+         $RemoveAnnouncements = TRUE;
+      }
+      
+      $this->EventArguments['Wheres'] =& $Where;
+      $this->FireEvent('BeforeGet');
+      
+      // Make sure there aren't any ambiguous discussion references.
+      foreach ($Where as $Key => $Value) {
+         if (strpos($Key, '.') === FALSE) {
+            $Where['d.'.$Key] = $Value;
+            unset($Where[$Key]);
+         }
+      }
+      
+      $Sql->Where($Where);
+      
+      // Add the UserDiscussion query.
+      if (($UserID = Gdn::Session()->UserID) > 0) {
+         $Sql
+            ->Join('UserDiscussion w', "w.DiscussionID = d2.DiscussionID and w.UserID = $UserID", 'left')
+            ->Select('w.UserID', '', 'WatchUserID')
+            ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+            ->Select('w.CountComments', '', 'CountCommentWatch');
+      }
+      
+      $Data = $Sql->Get();
+      $Result =& $Data->Result();
+      
+      // Change discussions returned based on additional criteria	
+		$this->AddDiscussionColumns($Data);
+      
+      // If not looking at discussions filtered by bookmarks or user, filter announcements out.
+      if ($RemoveAnnouncements && !isset($Where['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
+         $this->RemoveAnnouncements($Data);
+      
+      // Join in the users.
+      Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
+      CategoryModel::JoinCategories($Data);
+		
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
+      
+      return $Data;
+   }
+   
    /**
     * Gets the data for multiple unread discussions based on the given criteria.
     * 

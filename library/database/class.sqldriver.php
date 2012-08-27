@@ -1950,7 +1950,7 @@ abstract class Gdn_SQLDriver {
          $Field = array($Field => $Value);
 
       foreach ($Field as $SubField => $SubValue) {
-         if(is_array($SubValue) && isset($SubValue[0])) {
+         if(is_array($SubValue) && (isset($SubValue[0]) || count($SubValue) == 0)) {
             if (count($SubValue) == 1)
                $this->Where($SubField, $SubValue[0]);
             else

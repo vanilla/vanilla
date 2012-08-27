@@ -187,7 +187,7 @@ class MessagesController extends ConversationsController {
          $this->SetData('_PagerUrl', 'messages/all/{Page}');
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
-      $this->SetData('_CurrentRecords', count($Data));
+      $this->SetData('_CurrentRecords', count($Conversations->ResultArray()));
       
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {

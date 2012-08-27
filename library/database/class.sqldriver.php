@@ -1943,7 +1943,10 @@ abstract class Gdn_SQLDriver {
 
       foreach ($Field as $SubField => $SubValue) {
          if(is_array($SubValue) && isset($SubValue[0])) {
-            $this->WhereIn($SubField, $SubValue);
+            if (count($SubValue) == 1)
+               $this->Where($SubField, $SubValue[0]);
+            else
+               $this->WhereIn($SubField, $SubValue);
       	} else {
             $WhereExpr = $this->ConditionExpr($SubField, $SubValue, $EscapeFieldSql, $EscapeValueSql);
             if(strlen($WhereExpr) > 0) {

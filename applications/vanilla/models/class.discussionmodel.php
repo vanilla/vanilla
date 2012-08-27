@@ -263,9 +263,12 @@ class DiscussionModel extends VanillaModel {
 		return $Data;
    }
    
-   public function GetWhere($Where = FALSE, $Offset = 0, $Limit = FALSE) {
+   public function GetWhere($Where = array(), $Offset = 0, $Limit = FALSE) {
       if (!$Limit) 
          $Limit = C('Vanilla.Discussions.PerPage', 30);
+      
+      if (!is_array($Where))
+         $Where = array();
       
       $Sql = $this->SQL;
       
@@ -277,8 +280,13 @@ class DiscussionModel extends VanillaModel {
          ->Limit($Limit, $Offset);
       
       if ($this->Watching && !isset($Where['d.CategoryID'])) {
-         $Where['d.CategoryID'] = CategoryModel::CategoryWatch();
+         $Watch = CategoryModel::CategoryWatch();
+         if ($Watch !== TRUE)
+            $Where['d.CategoryID'] = $Watch;
       }
+      
+      $this->EventArguments['Wheres'] =& $Where;
+      $this->FireEvent('BeforeGet');
       
       // Verify permissions (restricting by category if necessary)
       $Perms = self::CategoryPermissions();
@@ -295,12 +303,12 @@ class DiscussionModel extends VanillaModel {
       if (strtolower(GetValue('Announce', $Where)) ==  'all') {
          $RemoveAnnouncements = FALSE;
          unset($Where['Announce']);
+      } elseif (strtolower(GetValue('d.Announce', $Where)) ==  'all') {
+         $RemoveAnnouncements = FALSE;
+         unset($Where['d.Announce']);
       } else {
          $RemoveAnnouncements = TRUE;
       }
-      
-      $this->EventArguments['Wheres'] =& $Where;
-      $this->FireEvent('BeforeGet');
       
       // Make sure there aren't any ambiguous discussion references.
       foreach ($Where as $Key => $Value) {

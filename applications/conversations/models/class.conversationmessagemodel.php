@@ -225,6 +225,16 @@ class ConversationMessageModel extends Gdn_Model {
             ->Where('uc.CountReadMessages', $CountMessages - 1)
             ->Where('uc.UserID <>', $Session->UserID)
             ->Put();
+         
+         // Update the date updated of the users that were not up-to-date.
+         $this->SQL
+            ->Update('UserConversation uc')
+            ->Set('uc.DateConversationUpdated', $DateUpdated)
+            ->Where('uc.ConversationID', $ConversationID)
+            ->Where('uc.Deleted', '0')
+            ->Where('uc.CountReadMessages <>', $CountMessages - 1)
+            ->Where('uc.UserID <>', $Session->UserID)
+            ->Put();
 
          // Update the sending user.
          $this->SQL

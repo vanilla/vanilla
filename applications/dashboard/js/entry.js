@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
             url: checkUrl,
             data: { email: email },
             dataType: 'text',
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
+            error: function(xhr) {
                gdn.informError(xhr, true);
             },
             success: function(text) {
@@ -61,8 +61,8 @@ jQuery(document).ready(function($) {
                type: "GET",
                url: checkUrl,
                dataType: 'text',
-               error: function(XMLHttpRequest, textStatus, errorThrown) {
-                  $.popup({}, XMLHttpRequest.responseText);
+               error: function(xhr) {
+                  gdn.informError(xhr, true)
                },
                success: function(text) {
                   if (text == 'TRUE')

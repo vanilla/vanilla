@@ -41,6 +41,26 @@ jQuery(document).ready(function($) {
       return false;
    });
    
+   // Reveal youtube player when preview clicked.
+   $('.Video.YouTube .VideoPreview').click(function() {
+      var preview = this;
+      var $container = $(preview).parents('.Video.YouTube');
+      var $player = $container.find('.VideoPlayer');
+      var width = $(preview).width(), height = $(preview).height(), videoid = $container.attr('id').replace('youtube-', '');
+
+      $(preview).find('a').click(function() { return false; });
+      $(preview).hide();
+      $player.html('<object width="'+width+'" height="'+height+'">'
+         + '<param name="movie" value="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1"></param>'
+         + '<param name="allowFullScreen" value="true"></param>'
+         + '<param name="allowscriptaccess" value="always"></param>'
+         + '<embed src="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+width+'" height="'+height+'"></embed>'
+         + '</object>');
+      $player.show();
+      
+      return false;
+   });
+   
    if ($.fn.autogrow)
       $('textarea.Autogrow').livequery(function() {
          $(this).autogrow();

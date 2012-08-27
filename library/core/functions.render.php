@@ -371,6 +371,27 @@ if (!function_exists('Img')) {
    }
 }
 
+if (!function_exists('InCategory')) {
+   /**
+    * Returns whether or not the page is in a given category.
+    * 
+    * @param string $Category The url code of the category.
+    * @return boolean
+    * @since 2.1
+    */
+   function InCategory($Category) {
+      $Breadcrumbs = (array)Gdn::Controller()->Data('Breadcrumbs', array());
+      
+      foreach ($Breadcrumbs as $Breadcrumb) {
+         if (isset($Breadcrumb['CategoryID']) && strcasecmp($Breadcrumb['UrlCode'], $Category) == 0) {
+            return TRUE;
+         }
+      }
+      
+      return FALSE;
+   }
+}
+
 if (!function_exists('InSection')) {
    /**
     * Returns whether or not the page is in one of the given section(s).

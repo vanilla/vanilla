@@ -1039,7 +1039,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             $Result = urlencode($Value);
             break;
          case 'gender':
-            // Format in the form of FieldName,gender,male,female,unknown
+            // Format in the form of FieldName,gender,male,female,unknown[,plural]
             
             if (is_array($Value) && count($Value) == 1)
                $Value = array_shift($Value);
@@ -1050,6 +1050,8 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $User = Gdn::UserModel()->GetID($Value);
                if ($User)
                   $Gender = $User->Gender;
+            } else {
+               $Gender = 'p';
             }
             
             switch($Gender) {
@@ -1059,6 +1061,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                case 'f':
                   $Result = $FormatArgs;
                   break;
+               case 'p':
+                  $Result = GetValue(5, $Parts, GetValue(4, $Parts));
+               case 'u':
                default:
                   $Result = GetValue(4, $Parts);
             }
@@ -2169,7 +2174,11 @@ if (!function_exists('ProxyRequest')) {
        * - pop the first (only) element off it... 
        * - return that.
        */
-      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      $Status = trim($Status);
+      $Status = explode(' ',$Status);
+      $Status = array_slice($Status,1,1);
+      $Status = array_pop($Status);
+      $ResponseHeaders['StatusCode'] = $Status;
       foreach ($ResponseHeaderLines as $Line) {
          $Line = explode(':',trim($Line));
          $Key = trim(array_shift($Line));

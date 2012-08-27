@@ -57,6 +57,7 @@ abstract class Gdn_SQLDriver {
     */
    protected $_CacheKey = NULL;
    protected $_CacheOperation = NULL;
+   protected $_CacheOptions = NULL;
    
    /**
     * An associative array of information about the database to which the
@@ -366,13 +367,15 @@ abstract class Gdn_SQLDriver {
     * Set the cache key for this transaction
     * 
     * @param string|array $Key The cache key (or array of keys) that this query will save into.
+    * @param string $Operation The cache operation as a hint to the db.
+    * @param array $Options The cache options as passed into Gdn_Cache::Store().
     * @return Gdn_SQLDriver $this
     */
-   public function Cache($Key, $Operation = NULL, $Backing = NULL) {
+   public function Cache($Key, $Operation = NULL, $Options = NULL) {
       if (!$Key) {
          $this->_CacheKey = NULL;
          $this->_CacheOperation = NULL;
-         $this->_CacheBacking = NULL;
+         $this->_CacheOptions = NULL;
 
          return $this;
       }
@@ -382,8 +385,8 @@ abstract class Gdn_SQLDriver {
       if (!is_null($Operation))
          $this->_CacheOperation = $Operation;
       
-      if (!is_null($Backing))
-         $this->_CacheBacking = $Backing;
+      if (!is_null($Options))
+         $this->_CacheOptions = $Options;
 
       return $this;
    }
@@ -1629,6 +1632,10 @@ abstract class Gdn_SQLDriver {
       if (!is_null($this->_CacheKey))
          $QueryOptions['CacheOperation'] = $this->_CacheOperation;
       
+      if (!is_null($this->_CacheOptions)) {
+         $QueryOptions['CacheOptions'] = $this->_CacheOptions;
+      }
+      
       try {
          if ($this->CaptureModifications && strtolower($Type) != 'select') {
             if(!property_exists($this->Database, 'CapturedSql'))
@@ -1683,6 +1690,7 @@ abstract class Gdn_SQLDriver {
       
       $this->_CacheKey        = NULL;
       $this->_CacheOperation  = NULL;
+      $this->_CacheOptions    = NULL;
       $this->_Distinct        = FALSE;
       $this->_Limit           = FALSE;
       $this->_Offset          = FALSE;
@@ -1943,7 +1951,10 @@ abstract class Gdn_SQLDriver {
 
       foreach ($Field as $SubField => $SubValue) {
          if(is_array($SubValue) && isset($SubValue[0])) {
-            $this->WhereIn($SubField, $SubValue);
+            if (count($SubValue) == 1)
+               $this->Where($SubField, $SubValue[0]);
+            else
+               $this->WhereIn($SubField, $SubValue);
       	} else {
             $WhereExpr = $this->ConditionExpr($SubField, $SubValue, $EscapeFieldSql, $EscapeValueSql);
             if(strlen($WhereExpr) > 0) {

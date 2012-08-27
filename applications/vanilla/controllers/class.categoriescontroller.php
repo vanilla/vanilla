@@ -183,7 +183,7 @@ class CategoriesController extends VanillaController {
          $this->SetData('AnnounceData', $AnnounceData, TRUE);
          $Wheres['d.CategoryID'] = $CategoryIDs;
          
-         $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->Get($Offset, $Limit, $Wheres));
+         $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->GetWhere($Wheres, $Offset, $Limit));
    
          // Build a pager
          $PagerFactory = new Gdn_PagerFactory();

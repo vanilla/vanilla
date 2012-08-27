@@ -149,8 +149,13 @@ a {
    text-decoration: none;
    color: #1e79a7;
 }
-a:hover {
+a:hover,
+a.TextColor:hover,
+a:hover .TextColor {
    color: #ff0084;
+}
+a.TextColor, a .TextColor {
+   color: black;
 }
 img.Thumbnail {
 	max-height: 300px;
@@ -248,6 +253,24 @@ select {
    color: #111;
    border-color: #666;
 }
+.NavLabel {
+   font-weight: bold;
+   margin-right: 4px;
+}
+.NavBar > .Button {
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   border-right-width: 0;
+}
+.NavBar > .Button:first-child {
+   border-radius: 2px 0 0 2px;
+}
+.NavBar > .Button:last-child {
+   border-radius: 0 2px 2px 0;
+   border-right-width: 1px;
+}
+.Button.Active,
 .ButtonGroup.Open .Button.Handle,
 .Button:focus,
 .Button:active {
@@ -256,6 +279,23 @@ select {
    box-shadow: none;
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
+}
+.Button.FileInput > input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  border: solid transparent;
+  border-width: 0 0 100px 200px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  -moz-transform: translate(-300px, 0) scale(4);
+  direction: ltr;
+  cursor: pointer;
+}
+.Button.FileInput {
+   position: relative;
+   overflow: hidden;
 }
 .BigButton {
    display: block;
@@ -735,7 +775,6 @@ div.Discussion:hover .OptionsTitle:hover,
 .Item:hover .OptionsTitle, .Item.Open .OptionsTitle {
    visibility: visible;
 }
-
 .Flyout:before,
 .Flyout:after {
    border-bottom: 7px solid #444444;
@@ -3346,6 +3385,7 @@ body.embed .InformMessages {
 .InProgress .ReactSprite {
    background-image: none !important;
 }
+.ReactEverything { background-position: -197px -53px; }
 .ReactAwesome { background-position: -269px -6px; }
 .ReactFlag { background-position: -54px -52px; }
 .ReactInsightful { background-position: -149px -6px; }
@@ -3376,8 +3416,32 @@ body.embed .InformMessages {
 .UserReactionWrap .ReactSprite {
    background-image: url('http://cdn.vanillaforums.com/images/sprites-14-000-bordered.png');
 }
-
 .ActionBlock {
     margin: 15px 0 5px;
     font-style: italic;
+}
+
+/* Embedded Video Preview Hide/Reveal */
+.Video.YouTube .VideoPlayer {
+    display: none;
+}
+.Video.YouTube .VideoPreview {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+}
+.Video.YouTube .VideoPreview:after {
+    background: url('http://cdn.vanillaforums.com/images/youtube-overlay-button.png') 0 -44px no-repeat transparent;
+    position: absolute;
+    display: block;
+    content: '';
+    top: 50%;
+    left: 50%;
+    margin-left: -30px;
+    margin-top: -22px;
+    height: 44px;
+    width: 60px;
+}
+.Video.YouTube .VideoPreview:hover:after {
+    background-position: 0 0;
 }

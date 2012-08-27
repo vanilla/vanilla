@@ -29,6 +29,9 @@ class Gdn_ModuleCollection extends Gdn_Module {
                $RenderedCount++;
             }
          } elseif ($Item instanceof Gdn_IModule) {
+            if (!GetValue('Visible', $Item, TRUE))
+               continue;
+            
             $LengthBefore = ob_get_length();
             $Item->Render();
             $LengthAfter = ob_get_length();

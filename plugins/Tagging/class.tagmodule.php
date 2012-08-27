@@ -21,6 +21,10 @@ class TagModule extends Gdn_Module {
    
    public function GetData($DiscussionID = '') {
       $SQL = Gdn::SQL();
+      
+      if (!$DiscussionID)
+         $SQL->Cache('TagModule', 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+      
       if (is_numeric($DiscussionID) && $DiscussionID > 0) {
          $this->_DiscussionID = $DiscussionID;
          $SQL->Join('TagDiscussion td', 't.TagID = td.TagID')
@@ -35,6 +39,8 @@ class TagModule extends Gdn_Module {
          ->OrderBy('t.CountDiscussions', 'desc')
          ->Limit(25)
          ->Get();
+      
+      $this->_TagData->DatasetType(DATASET_TYPE_ARRAY);
    }
 
    public function AssetTarget() {
@@ -51,14 +57,14 @@ class TagModule extends Gdn_Module {
          <?php echo T('Tagged'); ?>:
          <ul>
          <?php
-         foreach ($this->_TagData->Result() as $Tag) {
-            if ($Tag->Name != '') {
+         foreach ($this->_TagData->ResultArray() as $Tag) {
+            if ($Tag['Name'] != '') {
          ?>
             <li><?php 
-               if (urlencode($Tag->Name) == $Tag->Name) {
-                  echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged/'.urlencode($Tag->Name));
+               if (rawurlencode($Tag['Name']) == $Tag['Name']) {
+                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged/'.rawurlencode($Tag['Name']));
                } else {
-                  echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged?Tag='.urlencode($Tag->Name));
+                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged?Tag='.urlencode($Tag['Name']));
                }
             ?></li>
          <?php
@@ -74,6 +80,9 @@ class TagModule extends Gdn_Module {
    }
 
    public function ToString() {
+      if (!$this->_TagData)
+         $this->GetData();
+      
       if ($this->_TagData->NumRows() == 0)
          return '';
       $String = '';
@@ -84,15 +93,15 @@ class TagModule extends Gdn_Module {
          <ul class="TagCloud">
          <?php
          foreach ($this->_TagData->Result() as $Tag) {
-            if ($Tag->Name != '') {
+            if ($Tag['Name'] != '') {
          ?>
             <li><span><?php 
-                           if (urlencode($Tag->Name) == $Tag->Name) {
-                              echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged/'.urlencode($Tag->Name));
+                           if (urlencode($Tag['Name']) == $Tag['Name']) {
+                              echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged/'.urlencode($Tag['Name']));
                            } else {
-                              echo Anchor(htmlspecialchars($Tag->Name), 'discussions/tagged?Tag='.urlencode($Tag->Name));
+                              echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged?Tag='.urlencode($Tag['Name']));
                            }
-                        ?></span> <span class="Count"><?php echo number_format($Tag->CountDiscussions); ?></span></li>
+                        ?></span> <span class="Count"><?php echo number_format($Tag['CountDiscussions']); ?></span></li>
          <?php
             }
          }

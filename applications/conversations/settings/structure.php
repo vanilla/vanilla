@@ -51,17 +51,26 @@ $Construct
 $Construct->Table('UserConversation');
 
 $UpdateCountReadMessages = $Construct->TableExists() && !$Construct->ColumnExists('CountReadMessages');
+$DateConversationUpdatedExists = $Construct->ColumnExists('DateConversationUpdated');
 
 $Construct
-   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('UserID', 'int', FALSE, array('primary', 'index.Inbox'))
    ->Column('ConversationID', 'int', FALSE, array('primary', 'key'))
    ->Column('CountReadMessages', 'int', 0) // # of read messages
    ->Column('LastMessageID', 'int', TRUE) // The last message posted by a user other than this one, unless this user is the only person who has added a message
    ->Column('DateLastViewed', 'datetime', TRUE)
    ->Column('DateCleared', 'datetime', TRUE)
    ->Column('Bookmarked', 'tinyint(1)', '0')
-   ->Column('Deleted', 'tinyint(1)', '0') // User deleted this conversation
+   ->Column('Deleted', 'tinyint(1)', '0', 'index.Inbox') // User deleted this conversation
+   ->Column('DateConversationUpdated', 'datetime', TRUE, 'index.Inbox') // For speeding up queries.
    ->Set($Explicit, $Drop);
+
+if (!$DateConversationUpdatedExists) {
+   $SQL->Update('UserConversation uc')
+      ->Join('Conversation c', 'uc.ConversationID = c.ConversationID')
+      ->Set('DateConversationUpdated', 'c.DateUpdated', FALSE)
+      ->Put();
+}
    
 // Contains messages for each conversation, as well as who inserted the message
 // and when it was inserted. Users cannot edit or delete their messages once

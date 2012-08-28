@@ -216,3 +216,6 @@ if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))
    
 // Include "Render" functions now - this way pluggables and custom confs can override them.
 require_once(PATH_LIBRARY_CORE.'/functions.render.php');
+
+if (!defined('CLIENT_NAME'))
+   define('CLIENT_NAME', 'vanilla');

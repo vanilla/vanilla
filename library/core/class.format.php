@@ -616,16 +616,29 @@ class Gdn_Format {
    }
 
    /**
-    * Formats an email address in a non-scrapable format that Garden can then
-    * make linkable using jquery.
+    * Formats an email address in a non-scrapable format.
     * 
     * @param string $Email
     * @return string
     */
    public static function Email($Email) {
-      $At = T('at');
-      $Dot = T('dot');
-      return '<span class="Email EmailUnformatted">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
+      $Max = max(3, floor(strlen($Email) / 2));
+      $Chunks = str_split($Email, mt_rand(3, $Max));
+      $Chunks = array_map('htmlentities', $Chunks);
+      
+      $St = mt_rand(0,1);
+      $End = count($Chunks) - mt_rand(1, 4);
+      
+      $Result = '';
+      foreach ($Chunks as $i => $Chunk) {
+         if ($i >= $St && $i <= $End) {
+            $Result .= '<span style="display:inline;display:none">'.str_rot13($Chunk).'</span>';
+         }
+         
+         $Result .= '<span style="display:none;display:inline">'.$Chunk.'</span>';
+      }
+      
+      return '<span class="Email">'.$Result.'</span>';
    }
 
    /**

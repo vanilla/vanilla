@@ -38,8 +38,12 @@ class DebuggerPlugin extends Gdn_Plugin {
    // Table_Render_After, Row_Render_After, Item_Render_After,
    // SignIn_Render_After, etc. and it essentially *_Render_After
    
-   public function Base_Render_Before($Sender) {
-      $Sender->AddCssFile('/plugins/Debugger/style.css');
+//   public function Base_Render_Before($Sender) {
+//      $Sender->AddCssFile('/plugins/Debugger/style.css');
+//   }
+   
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('style.css', 'plugins/Debugger');
    }
 
    public function Base_AfterBody_Handler($Sender) {

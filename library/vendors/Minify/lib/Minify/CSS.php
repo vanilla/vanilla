@@ -59,7 +59,7 @@ class Minify_CSS {
                 $css
                 ,$options['currentDir']
                 ,isset($options['docRoot']) ? $options['docRoot'] : $_SERVER['DOCUMENT_ROOT']
-                ,isset($options['symlinks']) ? $options['symlinks'] : array()
+                ,isset($options['prependRelativePath']) ? $options['prependRelativePath'] : null
             );  
         } elseif (isset($options['prependRelativePath'])) {
             $css = Minify_CSS_UriRewriter::prepend(

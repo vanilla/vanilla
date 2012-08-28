@@ -346,6 +346,10 @@ class DiscussionModel extends VanillaModel {
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Data);
       
+      // Prep and fire event
+		$this->EventArguments['Data'] = $Data;
+		$this->FireEvent('AfterAddColumns');
+      
       return $Data;
    }
    
@@ -555,8 +559,11 @@ class DiscussionModel extends VanillaModel {
 			}
          
          $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
-         if ($Category)
-            $Discussion->Read |= $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+         if ($Category) {
+            $Discussion->Read = $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+            if ($Discussion->Read)
+               $Discussion->CountUnreadComments = 0;
+         }
          
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
@@ -570,7 +577,6 @@ class DiscussionModel extends VanillaModel {
             $Discussion->CountUnreadComments = 0;
 			elseif ($Discussion->CountUnreadComments < 0)
             $Discussion->CountUnreadComments = 0;
-         
          
          $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
          

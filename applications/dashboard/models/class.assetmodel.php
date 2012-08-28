@@ -29,7 +29,7 @@ class AssetModel extends Gdn_Model {
       $Basename = ucfirst($Basename);
       
       $this->EventArguments['Basename'] = $Basename;
-      $this->ETag() = $ETag;
+      $this->EventArguments['ETag'] = $ETag;
       $this->FireEvent('BeforeServeCss');
       
       header_remove('Set-Cookie');

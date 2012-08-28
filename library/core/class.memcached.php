@@ -177,6 +177,8 @@ class Gdn_Memcached extends Gdn_Cache {
    }
    
    public function Get($Key, $Options = array()) {
+      $StartTime = microtime(TRUE);
+      
       $FinalOptions = array_merge($this->StoreDefaults, $Options);
       
       if (is_array($Key)) {
@@ -199,6 +201,9 @@ class Gdn_Memcached extends Gdn_Cache {
          $RealKey = $this->MakeKey($Key, $FinalOptions);
          $Data = $this->Memcache->get($RealKey);
       }
+      
+      Gdn_Cache::$GetTime += microtime(TRUE) - $StartTime;
+      Gdn_Cache::$GetCount++;
       
       return ($Data === FALSE) ? $this->Fallback($Key,$Options) : $Data;
    }

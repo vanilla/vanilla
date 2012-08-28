@@ -16,6 +16,8 @@
 class AssetModel extends Gdn_Model {
    protected $_CssFiles = array();
    
+   public $UrlPrefix = '';
+   
    public function AddCssFile($Filename, $Folder = FALSE, $Options = FALSE) {
       if (is_string($Options)) {
          $Options = array('Css' => $Options);
@@ -25,6 +27,10 @@ class AssetModel extends Gdn_Model {
    
    public function ServeCss($Basename, $ETag) {
       $Basename = ucfirst($Basename);
+      
+      $this->EventArguments['Basename'] = $Basename;
+      $this->ETag() = $ETag;
+      $this->FireEvent('BeforeServeCss');
       
       header_remove('Set-Cookie');
       header("Content-Type: text/css");
@@ -86,6 +92,7 @@ class AssetModel extends Gdn_Model {
       // Now that we have all of the paths we want to serve them.
       foreach ($Paths as $Info) {
          list($Path, $UrlPath, $Options) = $Info;
+         
          echo "/* File: $UrlPath */\n";
 
          $Css = GetValue('Css', $Options);
@@ -95,7 +102,7 @@ class AssetModel extends Gdn_Model {
          
          $Css = Minify_CSS::minify($Css, array(
                'preserveComments' => TRUE,
-               'prependRelativePath' => $UrlPath,
+               'prependRelativePath' => $this->UrlPrefix.$UrlPath,
                'currentDir' => dirname($Path),
                'minify' => TRUE
          ));

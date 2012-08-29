@@ -785,19 +785,25 @@ class CommentModel extends VanillaModel {
                if (!GetValue('Format', $Fields))
                   $Fields['Format'] = Gdn::Config('Garden.InputFormatter', '');
 
-               // Check for spam.
+               // Check for spam
                $Spam = SpamModel::IsSpam('Comment', $Fields);
-
-               if (!$Spam) {
-                  $CommentID = $this->SQL->Insert($this->Name, $Fields);
-                  $this->EventArguments['CommentID'] = $CommentID;
-                  // IsNewDiscussion is passed when the first comment for new discussions are created.
-                  $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
-
-                  $this->FireEvent('AfterSaveComment');
-               } else {
+               if ($Spam)
                   return SPAM;
+               
+               // Check for approval
+               $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+               if ($ApprovalRequired) {
+               	LogModel::Insert('Moderate', 'Comment', $Fields);
+               	return UNAPPROVED;
                }
+
+               // Create comment
+               $CommentID = $this->SQL->Insert($this->Name, $Fields);
+	            $this->EventArguments['CommentID'] = $CommentID;
+	               
+	            // IsNewDiscussion is passed when the first comment for new discussions are created.
+	            $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
+               $this->FireEvent('AfterSaveComment');
             }
          }
       }

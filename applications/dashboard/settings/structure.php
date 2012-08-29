@@ -591,6 +591,7 @@ $Construct->Table('Log')
    ->Column('OtherUserIDs', 'varchar(255)', NULL)
    ->Column('DateUpdated', 'datetime', NULL)
    ->Column('ParentRecordID', 'int', NULL, 'index')
+   ->Column('CategoryID', 'int', NULL, 'key')
    ->Column('Data', 'mediumtext', NULL) // the data from the record.
    ->Column('CountGroup', 'int', NULL)
    ->Engine('InnoDB')

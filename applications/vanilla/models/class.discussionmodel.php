@@ -1272,34 +1272,40 @@ class DiscussionModel extends VanillaModel {
                // Inserting.
                if (!GetValue('Format', $Fields))
                   $Fields['Format'] = C('Garden.InputFormatter', '');
-
-               // Check for spam.
-               $Spam = SpamModel::IsSpam('Discussion', $Fields);
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Fields)) {
                   $CacheKeys = array('Announcements');
                   $this->SQL->Cache($CacheKeys);
                }
-
-               if (!$Spam) {
-                  $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
-                  $Fields['DiscussionID'] = $DiscussionID;
-                  
-                  // Update the cache.
-                  if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
-                     $CategoryCache = array(
-                         'LastDiscussionID' => $DiscussionID,
-                         'LastCommentID' => NULL,
-                         'LastTitle' => Gdn_Format::Text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
-                         'LastUserID' => $Fields['InsertUserID'],
-                         'LastDateInserted' => $Fields['DateInserted'],
-                         'LastUrl' => DiscussionUrl($Fields)
-                     );
-                     CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
-                  }
-               } else {
+               
+               // Check for spam
+               $Spam = SpamModel::IsSpam('Discussion', $Fields);
+            	if ($Spam)
                   return SPAM;
+                  
+               // Check for approval
+					$ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+					if ($ApprovalRequired) {
+               	LogModel::Insert('Moderate', 'Discussion', $Fields);
+               	return UNAPPROVED;
+               }
+					
+               // Create discussion
+               $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+               $Fields['DiscussionID'] = $DiscussionID;
+                  
+               // Update the cache.
+               if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+                  $CategoryCache = array(
+                     'LastDiscussionID' => $DiscussionID,
+                     'LastCommentID' => NULL,
+                     'LastTitle' => Gdn_Format::Text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
+                     'LastUserID' => $Fields['InsertUserID'],
+                     'LastDateInserted' => $Fields['DateInserted'],
+                     'LastUrl' => DiscussionUrl($Fields)
+                  );
+                  CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
                }
                
                // Assign the new DiscussionID to the comment before saving.

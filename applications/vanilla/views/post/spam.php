@@ -5,7 +5,11 @@
 ?>
 <div class="Info">
 <?php
-echo '<div>', T("Your post will appear once it's been approved."), '</div>';
+if ($this->RequestMethod == 'discussion')
+	$Message = T('DiscussionRequiresApproval', "Your discussion will appear after it is approved.");
+else
+	$Message = T('CommentRequiresApproval', "Your comment will appear after it is approved.");
+echo '<div>', $Message, '</div>';
 
 if ($this->Data('DiscussionUrl'))
    echo '<div>', sprintf(T('Click <a href="%s">here</a> to go back to the discussion.'), Url($this->Data('DiscussionUrl'))), '</div>';

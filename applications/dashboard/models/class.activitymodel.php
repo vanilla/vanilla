@@ -1171,7 +1171,7 @@ class ActivityModel extends Gdn_Model {
             	// Check for approval
 		         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
 		         if ($ApprovalRequired) {
-		         	LogModel::Insert('Moderate', 'Activity', $Comment);
+		         	LogModel::Insert('Moderate', 'Activity', $Activity);
 		         	return UNAPPROVED;
 		         }
             }

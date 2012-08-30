@@ -1507,14 +1507,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // Grab all of the css files from the asset model.
                      $AssetModel = new AssetModel();
                      $CssFiles = $AssetModel->GetCssFiles(ucfirst(substr($CssFile, 0, -4)), $ETag);
-
                      foreach ($CssFiles as $Info) {
                         $this->Head->AddCss($Info[1], 'all', TRUE, $CssInfo);
                      }
                   } else {
                      $Basename = substr($CssFile, 0, -4);
                      
-                     $this->Head->AddCss(Url("/utility/css/$Basename/$Basename-$ETag.css", FALSE), 'all', FALSE, $CssInfo['Options']);
+                     $this->Head->AddCss("/utility/css/$Basename/$Basename-$ETag.css", 'all', FALSE, $CssInfo['Options']);
                   }
                   continue;
                }

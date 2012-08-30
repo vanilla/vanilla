@@ -102,7 +102,7 @@ class AssetModel extends Gdn_Model {
          
          $Css = Minify_CSS::minify($Css, array(
                'preserveComments' => TRUE,
-               'prependRelativePath' => $this->UrlPrefix.dirname($UrlPath).'/',
+               'prependRelativePath' => $this->UrlPrefix.Asset(dirname($UrlPath).'/'),
                'currentDir' => dirname($Path),
                'minify' => TRUE
          ));

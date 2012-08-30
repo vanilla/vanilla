@@ -30,7 +30,7 @@ if ($Session->IsValid()):
          $CountNotifications = $User->CountNotifications;
          $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert">'.$CountNotifications.'</span>' : '';
          
-         echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
+         echo '<span class="ToggleFlyout" rel="'.Url('/profile/notificationspopin', FALSE).'">';
          echo Anchor(Sprite('SpNotifications', 'Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton', array('title' => T('Notifications')));
          echo Sprite('SpFlyoutHandle');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
@@ -38,13 +38,13 @@ if ($Session->IsValid()):
          // Inbox
          $CountInbox = GetValue('CountUnreadConversations', Gdn::Session()->User);
          $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
-         echo '<span class="ToggleFlyout" rel="/messages/popin">';
+         echo '<span class="ToggleFlyout" rel="'.Url('/messages/popin', FALSE).'">';
          echo Anchor(Sprite('SpInbox', 'Sprite16').Wrap(T('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', array('title' => T('Inbox')));
          echo Sprite('SpFlyoutHandle');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
          
          // Bookmarks
-         echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
+         echo '<span class="ToggleFlyout" rel="'.Url('/discussions/bookmarkedpopin', FALSE).'">';
          echo Anchor(Sprite('SpBookmarks', 'Sprite16').Wrap(T('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', array('title' => T('Bookmarks')));
          echo Sprite('SpFlyoutHandle');
          echo '<div class="Flyout FlyoutMenu"></div></span>';

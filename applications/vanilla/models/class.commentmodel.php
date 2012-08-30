@@ -793,6 +793,9 @@ class CommentModel extends VanillaModel {
                // Check for approval
                $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
                if ($ApprovalRequired) {
+                  $DiscussionModel = new DiscussionModel();
+                  $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Fields));
+                  $Fields['CategoryID'] = GetValue('CategoryID', $Discussion);
                	LogModel::Insert('Moderate', 'Comment', $Fields);
                	return UNAPPROVED;
                }

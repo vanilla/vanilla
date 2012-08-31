@@ -1287,7 +1287,7 @@ class DiscussionModel extends VanillaModel {
                // Check for approval
 					$ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
 					if ($ApprovalRequired) {
-               	LogModel::Insert('Moderate', 'Discussion', $Fields);
+               	LogModel::Insert('Pending', 'Discussion', $Fields);
                	return UNAPPROVED;
                }
 					

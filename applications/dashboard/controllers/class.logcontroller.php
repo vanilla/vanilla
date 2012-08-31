@@ -259,7 +259,7 @@ class LogController extends DashboardController {
    public function Moderation($Page = '') {
       $this->Permission('Garden.Moderation.Manage');
       
-      $Where = array('Operation' => 'Moderate');
+      $Where = array('Operation' => array('Moderate', 'Pending'));
       
       // Filter by category menu
       if ($this->Form->IsPostBack()) { 

@@ -893,7 +893,7 @@ class ActivityModel extends Gdn_Model {
          // Check for approval
          $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
          if ($ApprovalRequired) {
-         	LogModel::Insert('Moderate', 'ActivityComment', $Comment);
+         	LogModel::Insert('Pending', 'ActivityComment', $Comment);
          	return UNAPPROVED;
          }
          
@@ -1171,7 +1171,7 @@ class ActivityModel extends Gdn_Model {
             	// Check for approval
 		         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
 		         if ($ApprovalRequired) {
-		         	LogModel::Insert('Moderate', 'Activity', $Activity);
+		         	LogModel::Insert('Pending', 'Activity', $Activity);
 		         	return UNAPPROVED;
 		         }
             }

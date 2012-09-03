@@ -172,4 +172,15 @@ jQuery(document).ready(function($) {
       var checked = $('#Confirm_SelectAll').attr('checked') == 'checked';
       $('#ConfirmForm input:checkbox').attr('checked', checked);
    });
+   
+   // Filter menu
+   $('.FilterButton').click(function(e) {
+      // Get selected value
+      var category = $('#Form_CategoryID').val();
+
+      // Ajax us to filtered results
+      $('#LogTable').load(gdn.url('/dashboard/log/moderation?DeliveryType=VIEW&CategoryID='+category));
+      
+      return false;
+   });
 });

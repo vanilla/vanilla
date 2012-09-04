@@ -602,7 +602,7 @@ class ConversationModel extends Gdn_Model {
             $ActivityModel->Queue(array(
                   'ActivityType' => 'AddedToConversation',
                   'NotifyUserID' => $AddedUserID,
-                  'HeadlineFormat' => T('You were added to a conversation.', '{InsertUserID,user} added {NotifyUserID,you} to a <a href="{Url,htmlencode}">conversation</a>.'),
+                  'HeadlineFormat' => T('You were added to a conversation.', '{ActivityUserID,User} added you to a <a href="{Url,htmlencode}">conversation</a>.'),
                 ),
                 'ConversationMessage'
             );

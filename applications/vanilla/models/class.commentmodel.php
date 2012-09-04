@@ -792,7 +792,7 @@ class CommentModel extends VanillaModel {
                
                // Check for approval
                $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-               if ($ApprovalRequired) {
+               if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
                   $DiscussionModel = new DiscussionModel();
                   $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Fields));
                   $Fields['CategoryID'] = GetValue('CategoryID', $Discussion);

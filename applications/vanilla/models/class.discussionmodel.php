@@ -1286,7 +1286,7 @@ class DiscussionModel extends VanillaModel {
                   
                // Check for approval
 					$ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-					if ($ApprovalRequired) {
+					if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
                	LogModel::Insert('Pending', 'Discussion', $Fields);
                	return UNAPPROVED;
                }

@@ -1327,11 +1327,18 @@ class DiscussionModel extends VanillaModel {
          }
             
          $this->AddInsertFields($FormPostValues);
+         
+         // The UpdateUserID used to be required. Just add it if it still is.
+         if (!$this->Schema->GetProperty('UpdateUserID', 'AllowNull', TRUE)) {
+            $FormPostValues['UpdateUserID'] = $FormPostValues['InsertUserID'];
+         }
+         
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
          $FormPostValues['DateLastComment'] = Gdn_Format::ToDateTime();
+      } else {
+         // Add the update fields.
+         $this->AddUpdateFields($FormPostValues);
       }
-      // Add the update fields because this table's default sort is by DateUpdated (see $this->Get()).
-      $this->AddUpdateFields($FormPostValues);
       
       // Set checkbox values to zero if they were unchecked
       if (ArrayValue('Announce', $FormPostValues, '') === FALSE)

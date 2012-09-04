@@ -85,7 +85,7 @@ $Construct
    ->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
    ->Column('CategoryID', 'int', FALSE, array('key', 'index.CategoryPages'))
    ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('UpdateUserID', 'int')
+   ->Column('UpdateUserID', 'int', TRUE)
    ->Column('FirstCommentID', 'int', TRUE)
    ->Column('LastCommentID', 'int', TRUE)
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')

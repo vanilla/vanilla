@@ -539,7 +539,7 @@ class ConversationModel extends Gdn_Model {
                'ConversationID' => $ConversationID,
                'LastMessageID' => $ConversationData->LastMessageID,
                'CountReadMessages' => 0,
-               'DateConversationUpdated' => $ConversationData['DateUpdated']
+               'DateConversationUpdated' => $ConversationData->DateUpdated
             ));
          } elseif ($OldContributorData[$NewUserID]->Deleted) {
             $AddedUserIDs[] = $NewUserID;

@@ -283,6 +283,7 @@ class LogModel extends Gdn_Pluggable {
           'InsertIPAddress' => $InsertIPAddress,
           'DateInserted' => Gdn_Format::ToDateTime(),
           'ParentRecordID' => $ParentRecordID,
+			 'CategoryID' => self::_LogValue($Data, 'CategoryID'),
           'OtherUserIDs' => implode(',', GetValue('OtherUserIDs', $Options, array())),
           'Data' => serialize($Data)
       );

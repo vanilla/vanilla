@@ -906,6 +906,13 @@ class ActivityModel extends Gdn_Model {
          if ($Spam)
             return SPAM;
          
+         // Check for approval
+         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+         if ($ApprovalRequired) {
+         	LogModel::Insert('Pending', 'ActivityComment', $Comment);
+         	return UNAPPROVED;
+         }
+         
          $ID = $this->SQL->Insert('ActivityComment', $Comment);
          
          if ($ID) {
@@ -1172,9 +1179,17 @@ class ActivityModel extends Gdn_Model {
             TouchValue('DateUpdated', $Activity, $Activity['DateInserted']);
             
             if (GetValue('CheckSpam', $Options)) {
-               $Spam = SpamModel::IsSpam('Activity', $Activity);
+               // Check for spam
+            	$Spam = SpamModel::IsSpam('Activity', $Activity);
                if ($Spam)
                   return SPAM;
+                  
+            	// Check for approval
+		         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+		         if ($ApprovalRequired) {
+		         	LogModel::Insert('Pending', 'Activity', $Activity);
+		         	return UNAPPROVED;
+		         }
             }
             
             $ActivityID = $this->SQL->Insert('Activity', $Activity);

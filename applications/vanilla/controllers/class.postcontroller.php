@@ -192,8 +192,8 @@ class PostController extends VanillaController {
                      if ($DraftID > 0)
                      $this->DraftModel->Delete($DraftID);
                   }
-                  if ($DiscussionID == SPAM) {
-                     $this->StatusMessage = T('Your post has been flagged for moderation.');
+                  if ($DiscussionID == SPAM || $DiscussionID == UNAPPROVED) {
+                  	$this->StatusMessage = T('DiscussionRequiresApprovalStatus', 'Your discussion will appear after it is approved.');
                      $this->Render('Spam');
                      return;
                   }
@@ -516,8 +516,8 @@ class PostController extends VanillaController {
                $this->EventArguments['Discussion'] = $Discussion;
                $this->EventArguments['Comment'] = $Comment;
                $this->FireEvent('AfterCommentSave');
-            } elseif ($CommentID === SPAM) {
-               $this->StatusMessage = T('Your post has been flagged for moderation.');
+            } elseif ($CommentID === SPAM || $CommentID === UNAPPROVED) {
+               $this->StatusMessage = T('CommentRequiresApprovalStatus', 'Your comment will appear after it is approved.');
             }
             
             $this->Form->SetValidationResults($this->CommentModel->ValidationResults());

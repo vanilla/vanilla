@@ -2814,9 +2814,9 @@ class UserModel extends Gdn_Model {
          $UserData['Name'] = $Data['Name'];
          $UserData['Password'] = RandomString(16);
          $UserData['Email'] = ArrayValue('Email', $Data, 'no@email.com');
-         $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Attributes, 'u'), 0, 1));
-         $UserData['HourOffset'] = ArrayValue('HourOffset', $Attributes, 0);
-         $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Attributes, '');
+         $UserData['Gender'] = strtolower(substr(ArrayValue('Gender', $Data, 'u'), 0, 1));
+         $UserData['HourOffset'] = ArrayValue('HourOffset', $Data, 0);
+         $UserData['DateOfBirth'] = ArrayValue('DateOfBirth', $Data, '');
          $UserData['CountNotifications'] = 0;
          $UserData['Attributes'] = $Attributes;
          $UserData['InsertIPAddress'] = Gdn::Request()->IpAddress();

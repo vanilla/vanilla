@@ -263,6 +263,96 @@ class DiscussionModel extends VanillaModel {
 		return $Data;
    }
    
+   public function GetWhere($Where = array(), $Offset = 0, $Limit = FALSE) {
+      if (!$Limit) 
+         $Limit = C('Vanilla.Discussions.PerPage', 30);
+      
+      if (!is_array($Where))
+         $Where = array();
+      
+      $Sql = $this->SQL;
+      
+      // Build up the base query. Self-join for optimization.
+      $Sql->Select('d2.*')
+         ->From('Discussion d')
+         ->Join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
+         ->OrderBy('d.DateLastComment', 'desc')
+         ->Limit($Limit, $Offset);
+      
+      if ($this->Watching && !isset($Where['d.CategoryID'])) {
+         $Watch = CategoryModel::CategoryWatch();
+         if ($Watch !== TRUE)
+            $Where['d.CategoryID'] = $Watch;
+      }
+      
+      $this->EventArguments['Wheres'] =& $Where;
+      $this->FireEvent('BeforeGet');
+      
+      // Verify permissions (restricting by category if necessary)
+      $Perms = self::CategoryPermissions();
+      
+      if($Perms !== TRUE) {
+         if (isset($Where['d.CategoryID'])) {
+            $Where['d.CategoryID'] = array_intersect((array)$Where['d.CategoryID'], $Perms);
+         } else {
+            $Where['d.CategoryID'] = $Perms;
+         }
+      }
+      
+      // Check to see whether or not we are removing announcements.
+      if (strtolower(GetValue('Announce', $Where)) ==  'all') {
+         $RemoveAnnouncements = FALSE;
+         unset($Where['Announce']);
+      } elseif (strtolower(GetValue('d.Announce', $Where)) ==  'all') {
+         $RemoveAnnouncements = FALSE;
+         unset($Where['d.Announce']);
+      } else {
+         $RemoveAnnouncements = TRUE;
+      }
+      
+      // Make sure there aren't any ambiguous discussion references.
+      foreach ($Where as $Key => $Value) {
+         if (strpos($Key, '.') === FALSE) {
+            $Where['d.'.$Key] = $Value;
+            unset($Where[$Key]);
+         }
+      }
+      
+      $Sql->Where($Where);
+      
+      // Add the UserDiscussion query.
+      if (($UserID = Gdn::Session()->UserID) > 0) {
+         $Sql
+            ->Join('UserDiscussion w', "w.DiscussionID = d2.DiscussionID and w.UserID = $UserID", 'left')
+            ->Select('w.UserID', '', 'WatchUserID')
+            ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+            ->Select('w.CountComments', '', 'CountCommentWatch');
+      }
+      
+      $Data = $Sql->Get();
+      $Result =& $Data->Result();
+      
+      // Change discussions returned based on additional criteria	
+		$this->AddDiscussionColumns($Data);
+      
+      // If not looking at discussions filtered by bookmarks or user, filter announcements out.
+      if ($RemoveAnnouncements && !isset($Where['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
+         $this->RemoveAnnouncements($Data);
+      
+      // Join in the users.
+      Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
+      CategoryModel::JoinCategories($Data);
+		
+      if (C('Vanilla.Views.Denormalize', FALSE))
+         $this->AddDenormalizedViews($Data);
+      
+      // Prep and fire event
+		$this->EventArguments['Data'] = $Data;
+		$this->FireEvent('AfterAddColumns');
+      
+      return $Data;
+   }
+   
    /**
     * Gets the data for multiple unread discussions based on the given criteria.
     * 
@@ -436,6 +526,23 @@ class DiscussionModel extends VanillaModel {
          
          $Discussion->Name = Gdn_Format::Text($Discussion->Name);
          $Discussion->Url = DiscussionUrl($Discussion);
+         
+         // Add some legacy calculated columns.
+         if (!property_exists($Discussion, 'FirstUserID')) {
+            $Discussion->FirstUserID = $Discussion->InsertUserID;
+            $Discussion->FirstDate = $Discussion->DateInserted;
+            $Discussion->LastUserID = $Discussion->LastCommentUserID;
+            $Discussion->LastDate = $Discussion->DateLastComment;
+         }
+         
+         // Add the columns from UserDiscussion if they don't exist.
+         if (!property_exists($Discussion, 'WatchUserID')) {
+            $Discussion->WatchUserID = NULL;
+            $Discussion->DateLastViewed = NULL;
+            $Discussion->Dismissed = 0;
+            $Discussion->Bookmarked = 0;
+            $Discussion->CountCommentWatch = 0;
+         }
 
 			if($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
 				$Discussion->Closed = '1';
@@ -452,8 +559,11 @@ class DiscussionModel extends VanillaModel {
 			}
          
          $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
-         if ($Category)
-            $Discussion->Read |= $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+         if ($Category) {
+            $Discussion->Read = $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+            if ($Discussion->Read)
+               $Discussion->CountUnreadComments = 0;
+         }
          
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
@@ -467,7 +577,6 @@ class DiscussionModel extends VanillaModel {
             $Discussion->CountUnreadComments = 0;
 			elseif ($Discussion->CountUnreadComments < 0)
             $Discussion->CountUnreadComments = 0;
-         
          
          $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
          
@@ -676,7 +785,11 @@ class DiscussionModel extends VanillaModel {
       
       $Result =& $Data->Result();
       $this->LastDiscussionCount = $Data->NumRows();
-      $this->LastDiscussionID = $Result[count($Result) - 1]->DiscussionID;
+      
+      if (count($Result) > 0)
+         $this->LastDiscussionID = $Result[count($Result) - 1]->DiscussionID;
+      else
+         $this->LastDiscussionID = NULL;
       
       // Now that we have th comments we can filter out the ones we don't have permission to.
       if ($Perms !== TRUE) {

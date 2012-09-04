@@ -259,7 +259,10 @@ class CommentModel extends VanillaModel {
       
       $Result =& $Data->Result();
       $this->LastCommentCount = $Data->NumRows();
-      $this->LastCommentID = $Result[count($Result) - 1]->CommentID;
+      if (count($Result) > 0) {
+         $this->LastCommentID = $Result[count($Result) - 1]->CommentID;
+      } else
+         $this->LastCommentID = NULL;
       
       // Now that we have th comments we can filter out the ones we don't have permission to.
       if ($Perms !== TRUE) {

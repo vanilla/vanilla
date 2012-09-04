@@ -83,7 +83,7 @@ $Construct
    ->PrimaryKey('DiscussionID')
    ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
-   ->Column('CategoryID', 'int', FALSE, 'key')
+   ->Column('CategoryID', 'int', FALSE, array('key', 'index.CategoryPages'))
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')
    ->Column('FirstCommentID', 'int', TRUE)
@@ -102,7 +102,7 @@ $Construct
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
-   ->Column('DateLastComment', 'datetime', NULL, 'index')
+   ->Column('DateLastComment', 'datetime', NULL, array('index', 'index.CategoryPages'))
 	->Column('LastCommentUserID', 'int', TRUE)
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)

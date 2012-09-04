@@ -2271,6 +2271,12 @@ class UserModel extends Gdn_Model {
       // Remove activity comments.
       $this->GetDelete('ActivityComment', array('InsertUserID' => $UserID), $Content);
       
+      // Clear out information on the user.
+      $this->SetField($UserID, array(
+          'About' => NULL,
+          'Title' => NULL,
+          'Location' => NULL));
+      
       if ($Log) {
          $User['_Data'] = $Content;
          unset($Content); // in case data gets copied

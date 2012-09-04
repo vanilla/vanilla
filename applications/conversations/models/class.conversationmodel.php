@@ -367,7 +367,8 @@ class ConversationModel extends Gdn_Model {
                'UserID' => $UserID,
                'ConversationID' => $ConversationID,
                'LastMessageID' => $MessageID,
-               'CountReadMessages' => $CountReadMessages
+               'CountReadMessages' => $CountReadMessages,
+               'DateConversationUpdated' => $FormPostValues['DateUpdated']
             ));
          }
          
@@ -537,7 +538,8 @@ class ConversationModel extends Gdn_Model {
                'UserID' => $NewUserID,
                'ConversationID' => $ConversationID,
                'LastMessageID' => $ConversationData->LastMessageID,
-               'CountReadMessages' => 0
+               'CountReadMessages' => 0,
+               'DateConversationUpdated' => $ConversationData['DateUpdated']
             ));
          } elseif ($OldContributorData[$NewUserID]->Deleted) {
             $AddedUserIDs[] = $NewUserID;

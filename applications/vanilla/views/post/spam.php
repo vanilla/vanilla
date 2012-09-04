@@ -13,5 +13,7 @@ echo '<div>', $Message, '</div>';
 
 if ($this->Data('DiscussionUrl'))
    echo '<div>', sprintf(T('Click <a href="%s">here</a> to go back to the discussion.'), Url($this->Data('DiscussionUrl'))), '</div>';
+else
+   echo '<div>', Anchor('Back to the discussions list.', 'discussions'), '</div>';
 ?>
 </div>

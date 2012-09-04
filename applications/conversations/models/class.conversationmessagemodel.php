@@ -268,7 +268,7 @@ class ConversationMessageModel extends Gdn_Model {
             if ($UserID == GetValue('InsertUserID', $Fields)) {
                $InsertUserFound = TRUE;
                if ($Deleted) {
-                  $this->SQL->Put('UserConversation', array('Deleted' => 0), array('ConversationID' => $ConversationID, 'UserID' => $UserID));
+                  $this->SQL->Put('UserConversation', array('Deleted' => 0, 'DateConversationUpdated' => $DateUpdated), array('ConversationID' => $ConversationID, 'UserID' => $UserID));
                }
             }
             
@@ -286,7 +286,8 @@ class ConversationMessageModel extends Gdn_Model {
                'UserID' => GetValue('InsertUserID', $Fields),
                'ConversationID' => $ConversationID,
                'LastMessageID' => $LastMessageID,
-               'CountReadMessages' => $CountMessages);
+               'CountReadMessages' => $CountMessages,
+               'DateConversationUpdated' => $DateUpdated);
             $this->SQL->Insert('UserConversation', $UserConversation);
          }
          

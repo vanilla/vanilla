@@ -8,6 +8,7 @@ $this->FireEvent('BeforeCommentForm');
 ?>
 <div class="<?php echo $this->EventArguments['FormCssClass']; ?>">
    <h2 class="H"><?php echo T($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
+   <?php $this->FireEvent('AfterFormHeading'); ?>
    <div class="CommentFormWrap">
       <div class="Form-HeaderWrap">
          <div class="Form-Header">
@@ -90,7 +91,6 @@ $this->FireEvent('BeforeCommentForm');
                $this->FireEvent('AfterFormButtons');
                echo "</div>\n";
                echo $this->Form->Close();
-//               echo '</div>';
                ?>
             </div>
          </div>

@@ -146,7 +146,7 @@ class CategoryModel extends Gdn_Model {
 		foreach ($Data as &$Category) {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
          $Category['CountAllComments'] = $Category['CountComments'];
-         $Category['Url'] = CategoryUrl($Category);
+         $Category['Url'] = CategoryUrl($Category, FALSE, '//');
          $Category['ChildIDs'] = array();
 		}
       
@@ -345,7 +345,7 @@ class CategoryModel extends Gdn_Model {
             $Row['LastUserID'] = $Discussion['InsertUserID'];
             $Row['LastDateInserted'] = $Discussion['DateInserted'];
             $NameUrl = Gdn_Format::Text($Discussion['Name'], TRUE);
-            $Row['LastUrl'] = DiscussionUrl($Discussion).'#latest';
+            $Row['LastUrl'] = DiscussionUrl($Discussion, FALSE, '//').'#latest';
          }
          $Comment = GetValue($Row['LastCommentID'], $Comments);
          if ($Comment) {
@@ -1369,7 +1369,7 @@ class CategoryModel extends Gdn_Model {
                 'CategoryID' => 'CategoryID',
                 'LastTitle' => 'Name'));
             
-            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion).'#latest');
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '//').'#latest');
             
             if (is_null($LastDateInserted))
                SetValue('LastDateInserted', $Category, GetValue('DateLastDiscussion', $Category, NULL));
@@ -1381,7 +1381,7 @@ class CategoryModel extends Gdn_Model {
             ));
             
             SetValue('LastUserID', $Category, GetValue('LastCommentUserID', $Category, NULL));
-            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE).'#latest');
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '//').'#latest');
             
             if (is_null($LastDateInserted))
                SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));

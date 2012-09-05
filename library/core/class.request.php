@@ -742,11 +742,14 @@ class Gdn_Request {
       } else {
          $Scheme = $this->Scheme();
       }
-      if (in_array(strpos($Path, '://'), array(4, 5))) // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
+      if (substr($Path, 0, 2) == '//' || in_array(strpos($Path, '://'), array(4, 5))) // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
          return $Path;
 
       $Parts = array();
-      if ($WithDomain) {
+      
+      if ($WithDomain === '//') {
+         $Parts[] = '//'.$this->Host();
+      } elseif ($WithDomain) {
          $Parts[] = $Scheme.'://'.$this->Host();
       } else
          $Parts[] = '';

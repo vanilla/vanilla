@@ -1338,6 +1338,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          return;
       }
       
+      // Add schemes to to urls.
+      $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
+      
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
@@ -1363,6 +1366,14 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
       }
       return FALSE;
+   }
+   
+   protected static function _FixUrlScheme(&$Value, $Key, $Scheme) {
+      if (!is_string($Value))
+         return;
+      
+      if (substr($Value, 0, 2) == '//' && substr($Key, -3) == 'Url')
+         $Value = $Scheme.':'.$Value;
    }
 
    /**

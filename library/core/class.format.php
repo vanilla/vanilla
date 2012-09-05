@@ -832,7 +832,7 @@ class Gdn_Format {
     * @param string $Body a serialized array of image properties (Image, Thumbnail, Caption)
     */
    public static function Image($Body) {
-      $Image = unserialize($Body);
+      $Image = @unserialize($Body);
       if (!$Image) 
          return Format::PlainText($Body);
       

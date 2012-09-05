@@ -21,9 +21,9 @@ $this->EventArguments['Type'] = 'Discussion';
                <?php
                if ($UserPhotoFirst) {
                   echo UserPhoto($Author);
-                  echo UserAnchor($Author);
+                  echo UserAnchor($Author, 'Username');
                } else {
-                  echo UserAnchor($Author);
+                  echo UserAnchor($Author, 'Username');
                   echo UserPhoto($Author);
                }
                ?>

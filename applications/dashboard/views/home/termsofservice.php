@@ -2,5 +2,5 @@
 
 <h1><?php echo T('TermsOfService');?></h1>
 <div class="Legal">
-   <?php echo T('TermsOfServiceText');?>
+   <?php echo Markdown(T('TermsOfServiceText'));?>
 </div>

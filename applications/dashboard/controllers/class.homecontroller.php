@@ -103,6 +103,8 @@ class HomeController extends Gdn_Controller {
     * @access public
     */
    public function TermsOfService() {
+      require_once PATH_LIBRARY.'/vendors/markdown/markdown.php';
+      
       $this->Render();
    }
    

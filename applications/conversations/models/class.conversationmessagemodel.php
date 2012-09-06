@@ -225,6 +225,16 @@ class ConversationMessageModel extends Gdn_Model {
             ->Where('uc.CountReadMessages', $CountMessages - 1)
             ->Where('uc.UserID <>', $Session->UserID)
             ->Put();
+         
+         // Update the date updated of the users that were not up-to-date.
+         $this->SQL
+            ->Update('UserConversation uc')
+            ->Set('uc.DateConversationUpdated', $DateUpdated)
+            ->Where('uc.ConversationID', $ConversationID)
+            ->Where('uc.Deleted', '0')
+            ->Where('uc.CountReadMessages <>', $CountMessages - 1)
+            ->Where('uc.UserID <>', $Session->UserID)
+            ->Put();
 
          // Update the sending user.
          $this->SQL
@@ -258,7 +268,7 @@ class ConversationMessageModel extends Gdn_Model {
             if ($UserID == GetValue('InsertUserID', $Fields)) {
                $InsertUserFound = TRUE;
                if ($Deleted) {
-                  $this->SQL->Put('UserConversation', array('Deleted' => 0), array('ConversationID' => $ConversationID, 'UserID' => $UserID));
+                  $this->SQL->Put('UserConversation', array('Deleted' => 0, 'DateConversationUpdated' => $DateUpdated), array('ConversationID' => $ConversationID, 'UserID' => $UserID));
                }
             }
             
@@ -276,7 +286,8 @@ class ConversationMessageModel extends Gdn_Model {
                'UserID' => GetValue('InsertUserID', $Fields),
                'ConversationID' => $ConversationID,
                'LastMessageID' => $LastMessageID,
-               'CountReadMessages' => $CountMessages);
+               'CountReadMessages' => $CountMessages,
+               'DateConversationUpdated' => $DateUpdated);
             $this->SQL->Insert('UserConversation', $UserConversation);
          }
          

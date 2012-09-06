@@ -179,8 +179,24 @@ class ActivityModel extends Gdn_Model {
          $Where = array($Where => $Offset);
          $Offset = 0;
       }
+
+      // Add the basic activity query.
+      $this->SQL
+         ->Select('a2.*')
+         ->Select('t.FullHeadline, t.ProfileHeadline, t.AllowComments, t.ShowIcon, t.RouteCode')
+         ->Select('t.Name', '', 'ActivityType')
+         ->From('Activity a')
+         ->Join('Activity a2', 'a.ActivityID = a2.ActivityID') // self-join for index speed.
+         ->Join('ActivityType t', 'a2.ActivityTypeID = t.ActivityTypeID');
       
-      $this->ActivityQuery(FALSE);
+      // Add prefixes to the where.
+      foreach ($Where as $Key => $Value) {
+         if (strpos($Key, '.') === FALSE) {
+            $Where['a.'.$Key] = $Value;
+            unset($Where[$Key]);
+         }
+      }
+      
       $Result = $this->SQL
          ->Where($Where)
          ->OrderBy('a.DateUpdated', 'desc')

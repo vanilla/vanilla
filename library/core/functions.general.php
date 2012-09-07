@@ -920,7 +920,7 @@ if (!function_exists('fnmatch')) {
  */
 function FormatString($String, $Args = array()) {
    _FormatStringCallback($Args, TRUE);
-   $Result = preg_replace_callback('/{([^}]+?)}/', '_FormatStringCallback', $String);
+   $Result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_FormatStringCallback', $String);
 
    return $Result;
 }

@@ -1,29 +1,26 @@
 How to create a theme:
 
 Part 1: CSS / Design
-================================================================================
+====================================================
+
 1. Copy this "default" theme folder and rename it to your new theme name.
 2. Open the "about.php" file and edit the information to reflect your theme. Be
    sure to change the array key like this: $ThemeInfo['YourThemeNameHere'].
-3. Create a "design" subfolder and copy /applications/dashboard/design/style.css 
-   and /applications/vanilla/design/vanilla.css into it.
-4. Any background images you want to continue using (like the star png images
-   for bookmarking) should be copied along with their respective stylesheets.
+3. Create a "design" subfolder and add a "custom.css" file to it.
+4. Create a "views" subfolder and copy "/applications/dashboard/views/default.master.tpl" to it.
 5. Go to your Dashboard, Themes, and apply your new theme.
 6. Edit the copied CSS files to look however you wish!
 
 Other things you should know:
 
- + All non-forum pages should be edited in the global "style.css" file.
+* All non-forum pages should be edited in the global "style.css" file.
 
- + If you want to edit the look & feel of the administrative screens, also 
-   copy /applications/dashboard/design/admin.css in step 3. Similarly, you can 
-   copy other CSS files like /applications/vanilla/design/vanillaprofile.css to
-   customize those pages as well.
+* If you want to edit the look & feel of the administrative screens, also
+  add a design/customadmin.css in step 3.
 
+Part 2: HTML / Views (Advanced)
+====================================================
 
-Part 2: HTML / Views
-================================================================================
 If you want to customize the HTML, you can edit that too. 
 Our pages are made up of two parts:
 

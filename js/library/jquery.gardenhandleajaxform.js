@@ -1,4 +1,4 @@
-jQuery(document).ready(function($) {
+(function($) {
    // This turns any form into a "post-in-place" form so it is ajaxed to save
    // without a refresh. The form must be within an element with the "AjaxForm"
    // class.
@@ -61,4 +61,4 @@ jQuery(document).ready(function($) {
          $(this).ajaxForm(options);
       });
    }
-});
+})(jQuery);

@@ -659,6 +659,7 @@ class Gdn_Form extends Gdn_Pluggable {
     * @return string
     */
    public function Date($FieldName, $Attributes = FALSE) {
+      $Return = '';
       $YearRange = ArrayValueI('yearrange', $Attributes, FALSE);
       $StartYear = 0;
       $EndYear = 0;
@@ -712,7 +713,7 @@ class Gdn_Form extends Gdn_Pluggable {
                   $Attributes['class'] = trim($CssClass . ' Month');
                   if ($SubmittedTimestamp)
                      $Attributes['Value'] = date('n', $SubmittedTimestamp);
-                  $Return = $this->DropDown($FieldName . '_Month', $Months, $Attributes);
+                  $Return .= $this->DropDown($FieldName . '_Month', $Months, $Attributes);
                   break;
                case 'day':
                   // Day select

@@ -6,6 +6,26 @@ $PluginCount = count($this->AvailablePlugins);
 $EnabledCount = count($this->EnabledPlugins);
 $DisabledCount = $PluginCount - $EnabledCount;
 ?>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+   var selectors = '.plugins-all, .plugins-enabled, .plugins-disabled';
+   $(selectors).click(function() {
+      $(selectors).parents('li').removeClass('Active');
+      $(this).parents('li').addClass('Active');
+      if ($(this).hasClass('plugins-disabled')) {
+         $('tr.Enabled').hide();
+         $('tr.Disabled').show();
+      } else if ($(this).hasClass('plugins-enabled')) {
+         $('tr.Enabled').show();
+         $('tr.Disabled').hide();
+      } else {
+         $('tr.Enabled').show();
+         $('tr.Disabled').show();
+      }
+      return false;
+   });
+});
+</script>
 <h1><?php echo T('Manage Plugins'); ?></h1>
 <div class="Info">
    <?php
@@ -17,9 +37,9 @@ $DisabledCount = $PluginCount - $EnabledCount;
 </div>
 <div class="Tabs FilterTabs">
    <ul>
-      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('All %1$s'), Wrap($PluginCount)), 'settings/plugins/all'); ?></li>
-      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Enabled %1$s'), Wrap($EnabledCount)), 'settings/plugins/enabled'); ?></li>
-      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Disabled %1$s'), Wrap($DisabledCount)), 'settings/plugins/disabled'); ?></li>
+      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('All %1$s'), Wrap($PluginCount)), 'settings/plugins/all', 'plugins-all'); ?></li>
+      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Enabled %1$s'), Wrap($EnabledCount)), 'settings/plugins/enabled', 'plugins-enabled'); ?></li>
+      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Disabled %1$s'), Wrap($DisabledCount)), 'settings/plugins/disabled', 'plugins-disabled'); ?></li>
       <?php
       if ($AddonUrl != '')
          echo Wrap(Anchor(T('Get More Plugins'), $AddonUrl), 'li');

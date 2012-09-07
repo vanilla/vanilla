@@ -752,6 +752,8 @@ class Gdn_Controller extends Gdn_Pluggable {
          $View .= '_atom';
       else if ($this->SyndicationMethod == SYNDICATION_RSS)
          $View .= '_rss';
+      
+      $ViewPath2 = ViewLocation($View, $ControllerName, $ApplicationFolder);
 
       $LocationName = ConcatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
       $ViewPath = ArrayValue($LocationName, $this->_ViewLocations, FALSE);
@@ -827,6 +829,10 @@ class Gdn_Controller extends Gdn_Pluggable {
          Gdn::Dispatcher()->PassData('ViewPaths', $ViewPaths);
          throw NotFoundException('View');
 //         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+      }
+      
+      if ($ViewPath2 != $ViewPath) {
+         Trace("View paths do not match: $ViewPath != $ViewPath2", TRACE_WARNING);
       }
 
       return $ViewPath;
@@ -1477,35 +1483,54 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
-            if (ArrayHasValue($this->_CssFiles, 'style.css')) {
-               $this->AddCssFile('custom.css');
-            
-               // Add the theme option's css file.
-               if ($this->Theme && $this->ThemeOptions) {
-                  $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
-                  if (is_string($Filenames) && $Filenames != '%s')
-                     $this->_CssFiles[] = array('FileName' => ChangeBasename('custom.css', $Filenames), 'AppFolder' => FALSE, 'Options' => FALSE);
-               }
-            }
-               
-            if (ArrayHasValue($this->_CssFiles, 'admin.css'))
-               $this->AddCssFile('customadmin.css');
+//            if (ArrayHasValue($this->_CssFiles, 'style.css')) {
+//               $this->AddCssFile('custom.css');
+//            
+//               // Add the theme option's css file.
+//               if ($this->Theme && $this->ThemeOptions) {
+//                  $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
+//                  if (is_string($Filenames) && $Filenames != '%s')
+//                     $this->_CssFiles[] = array('FileName' => ChangeBasename('custom.css', $Filenames), 'AppFolder' => FALSE, 'Options' => FALSE);
+//               }
+//            } elseif (ArrayHasValue($this->_CssFiles, 'admin.css')) {
+//               $this->AddCssFile('customadmin.css');
+//            }
             
             $this->EventArguments['CssFiles'] = &$this->_CssFiles;
             $this->FireEvent('BeforeAddCss');
+            
+            $ETag = AssetModel::ETag();
+            $DebugAssets = C('DebugAssets');
             
             // And now search for/add all css files.
             foreach ($this->_CssFiles as $CssInfo) {
                $CssFile = $CssInfo['FileName'];
                
+               // style.css and admin.css deserve some custom processing.
+               if (in_array($CssFile, array('style.css', 'admin.css'))) {
+                  if ($DebugAssets) {
+                     // Grab all of the css files from the asset model.
+                     $AssetModel = new AssetModel();
+                     $CssFiles = $AssetModel->GetCssFiles(ucfirst(substr($CssFile, 0, -4)), $ETag);
+                     foreach ($CssFiles as $Info) {
+                        $this->Head->AddCss($Info[1], 'all', TRUE, $CssInfo);
+                     }
+                  } else {
+                     $Basename = substr($CssFile, 0, -4);
+                     
+                     $this->Head->AddCss("/utility/css/$Basename/$Basename-$ETag.css", 'all', FALSE, $CssInfo['Options']);
+                  }
+                  continue;
+               }
+               
                if (StringBeginsWith($CssFile, 'http')) {
-                  $this->Head->AddCss($CssFile, 'all', TRUE, $CssInfo['Options']);
+                  $this->Head->AddCss($CssFile, 'all', GetValue('AddVersion', $CssInfo, TRUE), $CssInfo['Options']);
                   continue;
                } elseif(strpos($CssFile, '/') !== FALSE) {
                   // A direct path to the file was given.
                   $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
                } else {
-                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
+//                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
                   $AppFolder = $CssInfo['AppFolder'];
                   if ($AppFolder == '')
                      $AppFolder = $this->ApplicationFolder;
@@ -1638,8 +1663,10 @@ class Gdn_Controller extends Gdn_Pluggable {
                }
             }
          }
-         // Add the favicon
-         $this->Head->SetFavIcon(Gdn_Upload::Url(C('Garden.FavIcon', Asset('themes/'.$this->Theme.'/design/favicon.png', TRUE))));
+         // Add the favicon.
+         $Favicon = C('Garden.FavIcon');
+         if ($Favicon)
+            $this->Head->SetFavIcon(Gdn_Upload::Url($Favicon));
          
          // Make sure the head module gets passed into the assets collection.
          $this->AddModule('Head');
@@ -1647,6 +1674,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       // Master views come from one of four places:
       $MasterViewPaths = array();
+      
+      $MasterViewPath2 = ViewLocation($this->MasterView().'.master', '', $this->ApplicationFolder);
+      
       if(strpos($this->MasterView, '/') !== FALSE) {
          $MasterViewPaths[] = CombinePaths(array(PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*'));
       } else {
@@ -1671,6 +1701,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          }
       }
+      
+      if ($MasterViewPath != $MasterViewPath2)
+         Trace("Master views differ. Controller: $MasterViewPath, ViewLocation(): $MasterViewPath2", TRACE_WARNING);
       
       $this->EventArguments['MasterViewPath'] = &$MasterViewPath;
       $this->FireEvent('BeforeFetchMaster');

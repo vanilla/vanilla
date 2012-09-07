@@ -263,9 +263,12 @@ class DiscussionModel extends VanillaModel {
 		return $Data;
    }
    
-   public function GetWhere($Where = FALSE, $Offset = 0, $Limit = FALSE) {
+   public function GetWhere($Where = array(), $Offset = 0, $Limit = FALSE) {
       if (!$Limit) 
          $Limit = C('Vanilla.Discussions.PerPage', 30);
+      
+      if (!is_array($Where))
+         $Where = array();
       
       $Sql = $this->SQL;
       
@@ -277,15 +280,20 @@ class DiscussionModel extends VanillaModel {
          ->Limit($Limit, $Offset);
       
       if ($this->Watching && !isset($Where['d.CategoryID'])) {
-         $Where['d.CategoryID'] = CategoryModel::CategoryWatch();
+         $Watch = CategoryModel::CategoryWatch();
+         if ($Watch !== TRUE)
+            $Where['d.CategoryID'] = $Watch;
       }
+      
+      $this->EventArguments['Wheres'] =& $Where;
+      $this->FireEvent('BeforeGet');
       
       // Verify permissions (restricting by category if necessary)
       $Perms = self::CategoryPermissions();
       
       if($Perms !== TRUE) {
          if (isset($Where['d.CategoryID'])) {
-            $Where['d.CategorID'] = array_intersect((array)$Where['d.CategorID'], $Perms);
+            $Where['d.CategoryID'] = array_intersect((array)$Where['d.CategoryID'], $Perms);
          } else {
             $Where['d.CategoryID'] = $Perms;
          }
@@ -295,12 +303,12 @@ class DiscussionModel extends VanillaModel {
       if (strtolower(GetValue('Announce', $Where)) ==  'all') {
          $RemoveAnnouncements = FALSE;
          unset($Where['Announce']);
+      } elseif (strtolower(GetValue('d.Announce', $Where)) ==  'all') {
+         $RemoveAnnouncements = FALSE;
+         unset($Where['d.Announce']);
       } else {
          $RemoveAnnouncements = TRUE;
       }
-      
-      $this->EventArguments['Wheres'] =& $Where;
-      $this->FireEvent('BeforeGet');
       
       // Make sure there aren't any ambiguous discussion references.
       foreach ($Where as $Key => $Value) {
@@ -337,6 +345,10 @@ class DiscussionModel extends VanillaModel {
 		
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Data);
+      
+      // Prep and fire event
+		$this->EventArguments['Data'] = $Data;
+		$this->FireEvent('AfterAddColumns');
       
       return $Data;
    }
@@ -547,8 +559,11 @@ class DiscussionModel extends VanillaModel {
 			}
          
          $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
-         if ($Category)
-            $Discussion->Read |= $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+         if ($Category) {
+            $Discussion->Read = $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+            if ($Discussion->Read)
+               $Discussion->CountUnreadComments = 0;
+         }
          
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
@@ -562,7 +577,6 @@ class DiscussionModel extends VanillaModel {
             $Discussion->CountUnreadComments = 0;
 			elseif ($Discussion->CountUnreadComments < 0)
             $Discussion->CountUnreadComments = 0;
-         
          
          $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
          

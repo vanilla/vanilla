@@ -25,6 +25,16 @@ class UtilityController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
    
+   /**
+    * Gather all of the global styles together.
+    * @param string $Filename 
+    * @since 2.1
+    */
+   public function Css($Basename, $Revision) {
+      $AssetModel = new AssetModel();
+      $AssetModel->ServeCss($Basename, $Revision);
+   }
+   
    public function Initialize() {
       parent::Initialize();
       Gdn_Theme::Section('Dashboard');

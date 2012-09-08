@@ -2323,7 +2323,7 @@ if (!function_exists('ReflectArgs')) {
 
 if (!function_exists('RemoteIP')) {
    function RemoteIP() {
-      return GetValue('REMOTE_ADDR', $_SERVER, 'undefined');
+      return Gdn::Request()->IpAddress();
    }
 }
 

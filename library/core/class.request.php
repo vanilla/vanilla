@@ -314,7 +314,7 @@ class Gdn_Request {
       }
       
       # Varnish
-      $OriginalIP = isset($_SERVER['HTTP_X_ORIGINALLY_FORWARDED_FOR']) ? GetValue('HTTP_X_ORIGINALLY_FORWARDED_FOR',$_SERVER) : NULL;
+      $OriginalIP = GetValue('HTTP_X_ORIGINALLY_FORWARDED_FOR', $_SERVER, NULL);
       if (!is_null($OriginalIP)) $IP = $OriginalIP;
       
       $this->RequestAddress($IP);

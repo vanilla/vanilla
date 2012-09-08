@@ -183,6 +183,55 @@ class ProfileController extends Gdn_Controller {
          $this->Render('Blank', 'Utility');
       }
    }
+   
+   public function Connect($Type, $UserReference = '', $Username = '') {
+      $this->Permission('Garden.SignIn.Allow');
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
+      
+      // Fire an event and let whatever plugin handle the connection.
+      // This will fire an event in the form ProfileController_FacebookConnect_Handler(...).
+      $Connected = FALSE;
+      $this->EventArguments['Connected'] =& $Connected;
+      
+      try {
+         $this->FireEvent(ucfirst($Type).'Connect');
+      } catch (Gdn_UserException $Ex) {
+         $this->SetData('Message', $Ex->getMessage());
+         $this->Render('Error', 'Utility');
+         return;
+      }
+   }
+   
+   /**
+    * Lists the connections to other sites.
+    * 
+    * @param int|string $UserReference
+    * @param string $Username
+    * @since 2.1
+    */
+   public function Connections($UserReference = '', $Username = '') {
+      $this->Permission('Garden.SignIn.Allow');
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
+      $UserID = GetValueR('User.UserID', $this);
+      
+      $PModel = new Gdn_AuthenticationProviderModel();
+      $Providers = $PModel->GetProviders();
+      
+      $this->SetData('_Providers', $Providers);
+      $this->SetData('Connections', array());
+      $this->FireEvent('GetConnections');
+      
+      // Add some connection information.
+      foreach ($this->Data['Connections'] as &$Row) {
+         $Provider = GetValue($Row['ProviderKey'], $Providers, array());
+         
+         TouchValue('Connected', $Row, (bool)GetValue('UniqueID', $Provider, FALSE));
+      }
+      
+      $this->CanonicalUrl(UserUrl($this->User, '', 'connections'));
+      $this->Title(T('Connections'));
+      $this->Render();
+   }
 
    /**
     * Generic way to get count via UserModel->ProfileCount().
@@ -1060,13 +1109,11 @@ class ProfileController extends Gdn_Controller {
                $passwordLabel = T('Set A Password');
             $Module->AddLink('Options', Sprite('SpPassword').$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
          }
-
-         $Module->AddLink('Options', Sprite('SpPreferences').T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), FALSE, array('class' => 'Popup PreferencesLink'));
-         if ($AllowImages)
-            $Module->AddLink('Options', Sprite('SpPicture').T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
-            
-         if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-            $Module->AddLink('Options', Sprite('SpThumbnail').T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
+         
+         $this->SetData('Connections', array());
+         $this->FireEvent('GetConnections');
+         if (count($this->Data('Connections')) > 0) {
+            $Module->AddLink('Options', Sprite('SpConnection').T('Connections'), '/profile/connections', 'Garden.SignIn.Allow');
          }
       }
    }

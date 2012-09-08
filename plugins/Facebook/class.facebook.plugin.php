@@ -107,6 +107,19 @@ class FacebookPlugin extends Gdn_Plugin {
 		if (!Gdn::Session()->IsValid())
 			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect FacebookConnect'));
 	}
+   
+   public function Base_GetConnections_Handler($Sender) {
+      $Sender->Data['Connections']['facebook'] = array(
+            'Icon' => Asset('/plugins/Facebook/design/f_logo-64.png'),
+            'Name' => 'Facebook',
+            'ProviderKey' => 'Facebook',
+            'ConnectUrl' => $this->AuthorizeUri(FALSE, Url(UserUrl(Gdn::Session()->User, FALSE, 'connect/facebook'), TRUE))
+          );
+   }
+   
+   public function ProfileController_FacebookConnect_Handler($Sender, $Args) {
+      throw new Gdn_UserException("We don't like you");
+   }
 	
 	private function _GetButton() {
       $ImgSrc = Asset('/plugins/Facebook/design/facebook-icon.png');
@@ -254,11 +267,12 @@ class FacebookPlugin extends Gdn_Plugin {
       return $Profile;
    }
 
-   public function AuthorizeUri($Query = FALSE) {
+   public function AuthorizeUri($Query = FALSE, $RedirectUri = FALSE) {
       $AppID = C('Plugins.Facebook.ApplicationID');
       $FBScope = C('Plugins.Facebook.Scope', Array('email','publish_stream'));
 
-      $RedirectUri = $this->RedirectUri();
+      if (!$RedirectUri)
+         $RedirectUri = $this->RedirectUri();
       if ($Query)
          $RedirectUri .= '&'.$Query;
       $RedirectUri = urlencode($RedirectUri);

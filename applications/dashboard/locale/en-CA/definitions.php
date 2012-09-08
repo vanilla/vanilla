@@ -58,7 +58,7 @@ $Definition['Invalid password.'] = 'The password you entered was incorrect. Reme
 $Definition['ErrorPluginVersionMatch'] = 'The enabled {0} plugin (version {1}) failed to meet the version requirements ({2}).';
 $Definition['ErrorPluginDisableRequired'] = 'You cannot disable the {0} plugin because the {1} plugin requires it in order to function.';
 $Definition['ErrorPluginEnableRequired'] = 'This plugin requires that the {0} plugin be enabled before it can be enabled itself.';
-$Definition['ErrorTermsOfService'] = 'You must agree to the terms of service.';
+//$Definition['ErrorTermsOfService'] = 'You must agree to the terms of service.';
 $Definition['ErrorRecordNotFound'] = 'The requested record could not be found.';
 
 $Definition['PageDetailsMessageFull'] = '%1$s to %2$s of %3$s';

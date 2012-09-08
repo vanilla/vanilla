@@ -32,6 +32,27 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       unset($Row['Attributes']);
    }
    
+   public function GetProviders() {
+      $this->SQL
+         ->Select('uap.*')
+         ->From('UserAuthenticationProvider uap');
+      
+      if (Gdn::Session()->IsValid()) {
+         $UserID = Gdn::Session()->UserID;
+         
+         $this->SQL
+            ->Select('ua.ForeignUserKey', '', 'UniqueID')
+            ->Join('UserAuthentication ua', "uap.AuthenticationKey = ua.ProviderKey and ua.UserID = $UserID", 'left');
+      }
+      
+      $Data = $this->SQL->Get()->ResultArray();
+      $Data = Gdn_DataSet::Index($Data, array('AuthenticationKey'));
+      foreach ($Data as &$Row) {
+         self::_Calculate($Row);
+      }
+      return $Data;
+   }
+   
    public static function GetProviderByKey($AuthenticationProviderKey) {
       $ProviderData = Gdn::SQL()
          ->Select('uap.*')

@@ -62,9 +62,13 @@ class HomeController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $this->MasterView = 'default';
       
+      $this->CssClass = 'NoPanel';
+      
       if ($this->Data('ViewPaths')) {
          Trace($this->Data('ViewPaths'), 'View Paths');
       }
+      
+      $this->SetData('_NoMessages', TRUE);
       
       if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
          header("HTTP/1.0 404", TRUE, 404);

@@ -57,11 +57,13 @@ blockquote, q {
 }
 
 /* ==================== Pages that hide the panel and have full-width content */
+body.NoPanel #Panel,
 body.Entry #Panel,
 body.Conversations.add #Panel,
 body.Vanilla.Post #Panel {
    display: none;
 }
+body.NoPanel #Content,
 body.Conversations.add #Content,
 body.Vanilla.Post #Content {
    width: auto;
@@ -419,6 +421,20 @@ select {
 #Panel .ButtonGroup.Big > .NavButton:first-child,
 #Panel .ButtonGroup.Big > .Button:first-child {
     width: 78%;
+}
+
+.ActivateSlider {
+    display: inline-block;
+    background: #777;
+    box-shadow: 0 10px 30px inset;
+    width: 125px;
+    border-radius: 4px;
+    padding: 2px;
+    position: relative;
+}
+
+.ActivateSlider-Active {
+    text-align: right;
 }
 
 .Gloss {
@@ -1519,6 +1535,11 @@ overflow: hidden;
     border-radius: 6px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
+}
+
+.Hero h3 {
+   font-size: 24px;
+   font-weight: normal;
 }
 
 .ChildCategoryList {

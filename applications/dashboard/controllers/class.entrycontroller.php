@@ -731,7 +731,7 @@ class EntryController extends Gdn_Controller {
       $this->FireEvent('SignIn');
 
       if ($this->Form->IsPostBack()) {
-         $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('%s is required.'), T('Email/Username')));
+         $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('ValidateRequired'), T('Email/Username')));
          $this->Form->ValidateRule('Password', 'ValidateRequired');
 
          // Check the user.

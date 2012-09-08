@@ -339,6 +339,11 @@ class ActivityController extends Gdn_Controller {
             $Activities = array($Activity);
             ActivityModel::JoinUsers($Activities);
             $this->ActivityModel->CalculateData($Activities);
+         } else {
+            $this->Form->SetValidationResults($this->ActivityModel->ValidationResults());
+            
+            $this->StatusMessage = $this->ActivityModel->Validation->ResultsText();
+//            $this->Render('Blank', 'Utility');
          }
       }
 

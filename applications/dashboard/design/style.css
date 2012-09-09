@@ -69,6 +69,9 @@ body.Vanilla.Post #Content {
    width: auto;
    margin: 0;
 }
+body.NoPanel #Content {
+   margin: auto;
+}
 body.Entry #Content {
    float: none;
    margin: 0 auto;
@@ -941,6 +944,23 @@ a.Bookmarking:hover {
 	padding: 0;
 }
 
+
+/* ======================================================== Full Page Errors */
+
+.SplashMessage h1 {
+    font-size: 64px;
+    line-height: 1.4;
+}
+
+.SplashMessage #Message {
+    font-size: 18px;
+    margin-bottom: 3em;
+}
+
+.SplashMessage #Content {
+   max-width: 900px;
+   margin: auto;
+}
 
 /* ======================================================== Panels / Sidebars */
 #Panel {

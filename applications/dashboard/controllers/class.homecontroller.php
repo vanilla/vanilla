@@ -50,6 +50,21 @@ class HomeController extends Gdn_Controller {
       $this->FileNotFound();
    }
    
+   public function Error() {
+      $this->RemoveCssFile('admin.css');
+      $this->AddCssFile('style.css');
+      $this->MasterView = 'default';
+      
+      $this->CssClass = 'SplashMessage NoPanel';
+      
+      $this->SetData('_NoMessages', TRUE);
+      
+      $Code = $this->Data('Code', 400);
+      header("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), TRUE, $Code);
+      
+      $this->Render();
+   }
+   
    /**
     * A standard 404 File Not Found error message is delivered when this action
     * is encountered.
@@ -62,7 +77,7 @@ class HomeController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $this->MasterView = 'default';
       
-      $this->CssClass = 'NoPanel';
+      $this->CssClass = 'SplashMessage NoPanel';
       
       if ($this->Data('ViewPaths')) {
          Trace($this->Data('ViewPaths'), 'View Paths');

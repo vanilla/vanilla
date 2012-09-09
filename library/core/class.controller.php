@@ -1432,8 +1432,17 @@ class Gdn_Controller extends Gdn_Pluggable {
                      ->PassData('Message', $Ex->getMessage())
                      ->Dispatch('Default404');
                   break;
-               default:
-                  Gdn_ExceptionHandler($Ex);
+                  
+            }
+            
+            if (is_a($Ex, 'Gdn_UserException')) {
+               Gdn::Dispatcher()
+                  ->PassData('Code', $Ex->getCode())
+                  ->PassData('Exception', $Ex->getMessage())
+                  ->PassData('Trace', $Ex->getTraceAsString())
+                  ->Dispatch('/home/error');
+            } else {
+               Gdn_ExceptionHandler($Ex);
             }
          } catch(Exception $Ex2) {
             Gdn_ExceptionHandler($Ex);

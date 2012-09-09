@@ -929,7 +929,7 @@ if (!function_exists('fnmatch')) {
  */
 function FormatString($String, $Args = array()) {
    _FormatStringCallback($Args, TRUE);
-   $Result = preg_replace_callback('/{([^}]+?)}/', '_FormatStringCallback', $String);
+   $Result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_FormatStringCallback', $String);
 
    return $Result;
 }
@@ -2341,7 +2341,7 @@ if (!function_exists('ReflectArgs')) {
 
 if (!function_exists('RemoteIP')) {
    function RemoteIP() {
-      return GetValue('REMOTE_ADDR', $_SERVER, 'undefined');
+      return Gdn::Request()->IpAddress();
    }
 }
 

@@ -7,6 +7,8 @@
    $Controller->FireEvent('BeforeProfileOptions');
    echo ButtonGroup($Controller->EventArguments['MemberOptions'], 'NavButton MemberButtons');
    echo ' ';
-   echo ButtonGroup($Controller->EventArguments['ProfileOptions'], 'NavButton ProfileButtons');
+   echo ButtonGroup($Controller->EventArguments['ProfileOptions'], 'NavButton ProfileButtons',
+      array('Text' => Sprite('SpEditProfile'), 'Url' => FALSE) 
+   );
    ?>
 </div>

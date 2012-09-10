@@ -2484,7 +2484,7 @@ class UserModel extends Gdn_Model {
       $UserData = $this->GetID($UserID, DATASET_TYPE_OBJECT);
 
       if (!$UserData)
-         throw new Exception(T('ErrorRecordNotFound'));
+         throw new Exception(sprintf('User %s not found.', $UserID));
 
       $Values = GetValue($Column, $UserData);
       

@@ -20,15 +20,15 @@
       border-radius: 3px;
    }
    
-   .DataList-Connections .Item {
+   .DataList-Connections .Connection-Header {
     overflow: hidden;
    }
 
    .Connection-Connect {
        position: absolute;
        right: 0;
-       bottom: 0;
-       padding: 10px;
+       top: 0;
+       padding: 20px 10px;
    }
 </style>
 
@@ -44,35 +44,9 @@
 </div>
 
 <ul class="DataList DataList-Connections">
-   <?php foreach ($this->Data('Connections') as $Key => $Row): ?>
-   <li class="Item">
-      <div class="Connection-Header">
-         <span class="IconWrap">
-            <?php
-               echo Img(GetValue('Icon', $Row, Asset('/applications/dashboard/design/images/connection-64.png')));
-            ?>
-         </span>
-         <span class="Connection-Name">
-            <?php
-               echo GetValue('Name', $Row, T('Unknown'));
-            ?>
-         </span>
-         <span class="Connection-Connect">
-            <?php
-            $Connected = GetValue('Connected', $Row);
-            $CssClass = $Connected ? 'Active' : 'InActive';
-            $ConnectUrl = GetValue('ConnectUrl', $Row);
-            
-            echo '<span class="ActivateSlider ActivateSlider-'.$CssClass.'">';
-            if ($Connected) {
-               echo Anchor(T('Connected'), $ConnectUrl, 'Button Primary');
-            } else {
-               echo Anchor(T('Connect'), $ConnectUrl, 'Button');
-            }
-            echo '</span>';
-            ?>
-         </span>
-      </div>
-   </li>
-   <?php endforeach; ?>
+   <?php
+   foreach ($this->Data('Connections') as $Key => $Row) {
+      WriteConnection($Row);
+   }
+   ?>
 </ul>

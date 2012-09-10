@@ -10,7 +10,7 @@
       <li>
          <?php
             echo $this->Form->Label('Enter your email address or username', 'Email');
-            echo $this->Form->TextBox('Email', array('type' => 'email'));
+            echo $this->Form->TextBox('Email', array('autofocus' => 'autofocus'));
          ?>
       </li>
       <li class="Buttons">

@@ -262,11 +262,9 @@ class LogController extends DashboardController {
       $Where = array('Operation' => array('Moderate', 'Pending'));
       
       // Filter by category menu
-      if ($this->Form->IsPostBack()) { 
-         $CategoryID = $this->Form->GetFormValue('CategoryID');
+      if ($CategoryID = Gdn::Request()->GetValue('CategoryID')) { 
          $this->SetData('ModerationCategoryID', $CategoryID);
-         if ($CategoryID)
-            $Where['CategoryID'] = $CategoryID;
+         $Where['CategoryID'] = $CategoryID;
       }
       
       list($Offset, $Limit) = OffsetLimit($Page, 10);

@@ -621,7 +621,7 @@ class Gdn_Validation {
          }
       }
       
-      $Result = implode('. ', $Errors);
+      $Result = implode('. ', $Errors).'.';
       return $Result;
    }
 }

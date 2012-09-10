@@ -76,13 +76,14 @@ class DashboardController extends Gdn_Controller {
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
          // Configure SideMenu module
          $SideMenu = new SideMenuModule($this);
+         $SideMenu->EventName = 'GetAppSettingsMenuItems';
          $SideMenu->HtmlId = '';
          $SideMenu->HighlightRoute($CurrentUrl);
 			$SideMenu->Sort = C('Garden.DashboardMenu.Sort');
          
          // Hook for adding to menu
-         $this->EventArguments['SideMenu'] = &$SideMenu;
-         $this->FireEvent('GetAppSettingsMenuItems');
+//         $this->EventArguments['SideMenu'] = &$SideMenu;
+//         $this->FireEvent('GetAppSettingsMenuItems');
          
          // Add the module
          $this->AddModule($SideMenu, 'Panel');

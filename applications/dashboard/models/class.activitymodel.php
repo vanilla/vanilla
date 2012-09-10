@@ -890,6 +890,9 @@ class ActivityModel extends Gdn_Model {
       $this->Validation->ApplyRule('DateInserted', 'Required');
       $this->Validation->ApplyRule('InsertUserID', 'Required');
       
+      $this->EventArguments['Comment'] = $Comment;
+      $this->FireEvent('BeforeSaveComment');
+      
       if ($this->Validate($Comment)) {
          $Activity = $this->GetID($Comment['ActivityID'], DATASET_TYPE_ARRAY);
          Gdn::Controller()->Json('Activity', $CommentActivityID);
@@ -1178,6 +1181,13 @@ class ActivityModel extends Gdn_Model {
             $this->AddInsertFields($Activity);
             TouchValue('DateUpdated', $Activity, $Activity['DateInserted']);
             
+            $this->EventArguments['Activity'] =& $Activity;
+            $this->EventArguments['ActivityID'] = NULL;
+            $this->FireEvent('BeforeSave');
+            
+            if (count($this->ValidationResults()) > 0)
+               return FALSE;
+            
             if (GetValue('CheckSpam', $Options)) {
                // Check for spam
             	$Spam = SpamModel::IsSpam('Activity', $Activity);
@@ -1198,6 +1208,13 @@ class ActivityModel extends Gdn_Model {
       } else {
          $Activity['DateUpdated'] = Gdn_Format::ToDateTime();
          unset($Activity['ActivityID']);
+         
+         $this->EventArguments['Activity'] =& $Activity;
+         $this->EventArguments['ActivityID'] = $ActivityID;
+         $this->FireEvent('BeforeSave');
+         
+         if (count($this->ValidationResults()) > 0)
+               return FALSE;
          
          $this->SQL->Put('Activity', $Activity, array('ActivityID' => $ActivityID));
          $Activity['ActivityID'] = $ActivityID;

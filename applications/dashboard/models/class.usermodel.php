@@ -1083,6 +1083,11 @@ class UserModel extends Gdn_Model {
             $UserID = $this->InsertForBasic($FormPostValues, GetValue('CheckCaptcha', $Options, FALSE), $Options);
             break;
       }
+      
+      if ($UserID) {
+         $this->EventArguments['UserID'] = $UserID;
+         $this->FireEvent('AfterRegister');
+      }
       return $UserID;
    }
    

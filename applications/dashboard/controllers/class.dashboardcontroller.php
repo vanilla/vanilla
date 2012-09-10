@@ -75,6 +75,7 @@ class DashboardController extends Gdn_Controller {
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
          // Configure SideMenu module
          $SideMenu = new SideMenuModule($this);
+         $SideMenu->EventName = 'GetAppSettingsMenuItems';
          $SideMenu->HtmlId = '';
          $SideMenu->HighlightRoute($CurrentUrl);
 			$SideMenu->Sort = C('Garden.DashboardMenu.Sort');

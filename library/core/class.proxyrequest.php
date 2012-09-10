@@ -155,9 +155,9 @@ class ProxyRequest {
     *     'Simulate'             => FALSE       // Don't actually request, just set up
     * 
     * @param array/string $Options URL, or array options
-    * @param array $QueryParams
-    * @param array $Files
-    * @param type $ExtraHeaders
+    * @param array $QueryParams GET/POST parameters
+    * @param array $Files List of files to upload
+    * @param array $ExtraHeaders Any additional headers to tack on
     * @return type 
     */
    public function Request($Options = NULL, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {

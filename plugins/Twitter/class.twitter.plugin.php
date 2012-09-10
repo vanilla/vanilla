@@ -227,11 +227,13 @@ class TwitterPlugin extends Gdn_Plugin {
                $Message = Gdn_Format::PlainText($Row['Body'], $Row['Format']);
          }
          
-         // Slice the string to 124 characters (20 reservered for the url.
-         $Message = SliceParagraph($Message, 124);
-         if (strlen($Message) > 124) {
-            $Message = substr($Message, 0, 123).'…';
+         // Slice the string to 119 characters (21 reservered for the url.
+         $Message = SliceParagraph($Message, 119);
+         if (strlen($Message) > 119) {
+            $Message = substr($Message, 0, 119-strlen('…')).'…';
          }
+         
+         echo $Message.strlen($Message);
          
          if ($this->AccessToken()) {
             $Message .= ' '.$Row['ShareUrl'];
@@ -472,20 +474,20 @@ class TwitterPlugin extends Gdn_Plugin {
          $Post = NULL;
 
       $AccessToken = $this->AccessToken();
-      var_dump($AccessToken);
+//      var_dump($AccessToken);
       
       $Request = OAuthRequest::from_consumer_and_token($Consumer, $AccessToken, $Method, $Url, $Params);
       
       $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
       $Request->sign_request($SignatureMethod, $Consumer, $AccessToken);
       
-      print_r($Params);
+//      print_r($Params);
 
       $Curl = $this->_Curl($Request, $Post);
       curl_setopt($Curl, CURLINFO_HEADER_OUT, TRUE);
-      curl_setopt($Curl, CURLOPT_VERBOSE, TRUE);
-      $fp = fopen("php://stdout", 'w'); 
-      curl_setopt($Curl, CURLOPT_STDERR, $fp);
+//      curl_setopt($Curl, CURLOPT_VERBOSE, TRUE);
+//      $fp = fopen("php://stdout", 'w'); 
+//      curl_setopt($Curl, CURLOPT_STDERR, $fp);
       $Response = curl_exec($Curl);
       $HttpCode = curl_getinfo($Curl, CURLINFO_HTTP_CODE);
       
@@ -493,10 +495,10 @@ class TwitterPlugin extends Gdn_Plugin {
          $Response = curl_error($Curl);
       }
       
-      echo curl_getinfo($Curl, CURLINFO_HEADER_OUT);
-      
-      echo($Request->to_postdata());
-      echo "\n\n";
+//      echo curl_getinfo($Curl, CURLINFO_HEADER_OUT);
+//      
+//      echo($Request->to_postdata());
+//      echo "\n\n";
       
       Trace(curl_getinfo($Curl, CURLINFO_HEADER_OUT));
       
@@ -508,16 +510,18 @@ class TwitterPlugin extends Gdn_Plugin {
       curl_close($Curl);
 
       Gdn::Controller()->SetJson('Response', $Response);
-      if (strpos($Url, '.json', TRUE) !== FALSE) {
+      if (strpos($Url, '.json') !== FALSE) {
          $Result = @json_decode($Response, TRUE) or $Response;
       } else {
          $Result = $Response;
       }
       
+//      print_r($Result);
+      
       if ($HttpCode == '200')
          return $Result;
       else {
-         throw new Gdn_UserException(GetValue('error', $Result, $Response), $HttpCode);
+         throw new Gdn_UserException(GetValueR('errors.0.message', $Result, $Response), $HttpCode);
       }
    }
 

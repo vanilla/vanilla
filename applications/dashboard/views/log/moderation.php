@@ -13,7 +13,7 @@ echo $this->Form->Open();
             $this->Form->CategoryDropDown('CategoryID', array(
                'Value' => GetValue('ModerationCategoryID', $this->Data),
                'IncludeNull' => 'Everything'))
-      ).' '.$this->Form->Button(T('Filter'), array('class' => 'FilterButton SmallButton')), 'div');
+      ).' '.Anchor(T('Filter'), '#', array('class' => 'FilterButton SmallButton')), 'div');
    }
 ?></div>
 <div class="Info">

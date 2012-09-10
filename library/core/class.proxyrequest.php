@@ -136,23 +136,28 @@ class ProxyRequest {
     * Send a request and receive the response
     * 
     * Options:
-    *   URL
-    *   Host
-    *   Method
-    *   ConnectTimeout
-    *   Timeout
-    *   Redirects
-    *   Cookies
-    *   SaveAs
-    *   CloseSession
-    *   Redirected
-    *   Debug
-    *   Simulate
+    *     'URL'                  => NULL,
+    *     'Host'                 => NULL,       // Override the Host: header
+    *     'Method'               => 'GET',      // HTTP Method
+    *     'ConnectTimeout'       => 5,          // Connection timeout
+    *     'Timeout'              => 5,          // Request timeout
+    *     'TransferMode'         => 'normal',   // or 'binary'
+    *     'SaveAs'               => NULL,       // Download the response to this file
+    *     'Redirects'            => TRUE,       // Allow 302 and 302 redirects
+    *     'SSLNoVerify'          => FALSE,      // Verify the remote SSL cert
+    *     'PreEncodePost'        => TRUE,       // 
+    *     'Cookies'              => TRUE,       // Send user's browser cookies?
+    *     'CookieJar'            => FALSE,      // Create a cURL CookieJar?
+    *     'CookieSession'        => FALSE,      // Should old cookies be trashed starting now?
+    *     'CloseSession'         => TRUE,       // Whether to close the session. Should always do this.
+    *     'Redirected'           => FALSE,      // Is this a redirected request?
+    *     'Debug'                => FALSE,      // Debug output
+    *     'Simulate'             => FALSE       // Don't actually request, just set up
     * 
-    * @param type $Options
-    * @param array $QueryParams
-    * @param array $Files
-    * @param type $ExtraHeaders
+    * @param array/string $Options URL, or array options
+    * @param array $QueryParams GET/POST parameters
+    * @param array $Files List of files to upload
+    * @param array $ExtraHeaders Any additional headers to tack on
     * @return type 
     */
    public function Request($Options = NULL, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {

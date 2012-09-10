@@ -227,10 +227,15 @@ class TwitterPlugin extends Gdn_Plugin {
                $Message = Gdn_Format::PlainText($Row['Body'], $Row['Format']);
          }
          
-         // Slice the string to 119 characters (21 reservered for the url.
-         if (!normalizer_is_normalized($Message))
-            $Message = Normalizer::normalize($Message, Normalizer::OPTION_DEFAULT);
-         $Elips = Normalizer::normalize('…', Normalizer::OPTION_DEFAULT);
+         $Elips = '…';
+         
+         
+         if (function_exists('normalizer_is_normalized')) {
+            // Slice the string to 119 characters (21 reservered for the url.
+            if (!normalizer_is_normalized($Message))
+               $Message = Normalizer::normalize($Message, Normalizer::OPTION_DEFAULT);
+            $Elips = Normalizer::normalize($Elips, Normalizer::OPTION_DEFAULT);
+         }
          
          $Message = SliceParagraph($Message, 119);
          if (strlen($Message) > 119) {

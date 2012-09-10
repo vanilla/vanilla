@@ -1562,7 +1562,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // And now search for/add all JS files.
             $Cdns = array();
-            if (Gdn::Request()->Scheme() != 'https') {
+            if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', FALSE)) {
                $Cdns = array(
                   'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
                   );

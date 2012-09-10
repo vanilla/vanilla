@@ -253,14 +253,22 @@ class LogController extends DashboardController {
     * @since 2.0.?
     * @access public
     *
+    * @param mixed $CategoryUrl Slug.
     * @param int $Page Page number.
     */
    public function Moderation($Page = '') {
       $this->Permission('Garden.Moderation.Manage');
+      
+      $Where = array('Operation' => array('Moderate', 'Pending'));
+      
+      // Filter by category menu
+      if ($CategoryID = Gdn::Request()->GetValue('CategoryID')) { 
+         $this->SetData('ModerationCategoryID', $CategoryID);
+         $Where['CategoryID'] = $CategoryID;
+      }
+      
       list($Offset, $Limit) = OffsetLimit($Page, 10);
-      $this->SetData('Title', T('Moderation Queue'));
-
-      $Where = array('Operation' => 'Moderate');
+      $this->SetData('Title', T('Moderation Queue'));      
       
       $RecordCount = $this->LogModel->GetCountWhere($Where);
       $this->SetData('RecordCount', $RecordCount);

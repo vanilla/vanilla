@@ -397,6 +397,15 @@ if (!function_exists('CheckPermission')) {
    }
 }
 
+// Negative permission check
+if (!function_exists('CheckRestriction')) {
+   function CheckRestriction($PermissionName) {
+      $Result = Gdn::Session()->CheckPermission($PermissionName);
+      $Unrestricted = Gdn::Session()->CheckPermission('Garden.Admin.Only');
+      return $Result && !$Unrestricted;
+   }
+}
+
 // Smarty sux
 if (!function_exists('MultiCheckPermission')) {
    function MultiCheckPermission($PermissionName) {

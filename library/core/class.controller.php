@@ -1466,6 +1466,8 @@ class Gdn_Controller extends Gdn_Pluggable {
          
          if (!is_a($Ex, 'Gdn_UserException'))
             $Data['StackTrace'] = $Ex->getTraceAsString();
+         
+         $Data['Data'] = $this->Data;
       }
       
 

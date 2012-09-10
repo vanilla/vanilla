@@ -229,16 +229,17 @@ class TwitterPlugin extends Gdn_Plugin {
          
          $Elips = '...';
          
+         $Message = preg_replace('`\s+`', ' ', $Message);
          
-         if (function_exists('normalizer_is_normalized')) {
-            // Slice the string to 119 characters (21 reservered for the url.
-            if (!normalizer_is_normalized($Message))
-               $Message = Normalizer::normalize($Message, Normalizer::FORM_D);
-            $Elips = Normalizer::normalize($Elips, Normalizer::FORM_D);
-         }
+//         if (function_exists('normalizer_is_normalized')) {
+//            // Slice the string to 119 characters (21 reservered for the url.
+//            if (!normalizer_is_normalized($Message))
+//               $Message = Normalizer::normalize($Message, Normalizer::FORM_D);
+//            $Elips = Normalizer::normalize($Elips, Normalizer::FORM_D);
+//         }
          
          $Max = 140;
-         $LinkLen = 20;
+         $LinkLen = 21;
          
          $Max -= $LinkLen;
          
@@ -250,6 +251,8 @@ class TwitterPlugin extends Gdn_Plugin {
 //         echo $Message.strlen($Message);
          
          if ($this->AccessToken()) {
+            Gdn::Controller()->SetData('Message', $Message);
+            
             $Message .= ' '.$Row['ShareUrl'];
             $R = $this->API('/statuses/update.json', array(
                 'status' => $Message

@@ -3418,11 +3418,18 @@ body.embed .InformMessages {
   height: 14px;
   *margin-right: .3em;
   line-height: 14px;
-  vertical-align: text-top;
-  background-image: url("http://cdn.vanillaforums.com/images/sprites-14-000.png");
+  vertical-align: top;
+  background-image: url("images/sprites-14-000000.png");
   background-position: 14px 14px;
   background-repeat: no-repeat;
 }
+
+.ReactLabel {
+   display: inline-block;
+   line-height: 14px;
+   vertical-align: top;
+}
+
 .InProgress .ReactSprite {
    background-image: none !important;
 }
@@ -3447,6 +3454,8 @@ body.embed .InformMessages {
 .ReactInfraction { background-position: -100px -53px; }
 .ReactAccept { background-position: -6px -102px; }
 .ReactReject { background-position: -342px -6px; }
+.ReactFacebook { background-position: -29px -124px; }
+.ReactTwitter { background-position: -53px -124px; }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
 .Reactions .MenuItems a:hover .ReactSprite,

@@ -64,6 +64,11 @@ if (!function_exists('ButtonGroup')):
          list($CssClass, $ButtonClass) = $CssClass;
       
       if ($Default) {
+         if (is_array($Default)) {
+            $DefaultText = $Default['Text'];
+            $Default = $Default['Url'];
+         }
+         
          // Find the default button. 
          $Default = ltrim($Default, '/');
          foreach ($Links as $Link) {
@@ -73,6 +78,9 @@ if (!function_exists('ButtonGroup')):
                break;
             }
          }
+         
+         if (isset($DefaultText))
+            $Text = $DefaultText;
       }
       
       if (count($Links) < 2) {

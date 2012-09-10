@@ -228,9 +228,13 @@ class TwitterPlugin extends Gdn_Plugin {
          }
          
          // Slice the string to 119 characters (21 reservered for the url.
+         if (!normalizer_is_normalized($Message))
+            $Message = Normalizer::normalize($Message, Normalizer::OPTION_DEFAULT);
+         $Elips = Normalizer::normalize('…', Normalizer::OPTION_DEFAULT);
+         
          $Message = SliceParagraph($Message, 119);
          if (strlen($Message) > 119) {
-            $Message = substr($Message, 0, 119-strlen('…')).'…';
+            $Message = substr($Message, 0, 119-strlen($Elips)).$Elips;
          }
          
          echo $Message.strlen($Message);

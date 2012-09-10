@@ -1116,16 +1116,6 @@ class ProfileController extends Gdn_Controller {
          $Module->AddLink('Options', Sprite('SpEdit').T('Edit Profile'), UserUrl($this->User, '', 'edit'), FALSE, array('class' => 'Popup EditAccountLink'));
          $Module->AddLink('Options', Sprite('SpEdit').T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
          $Module->AddLink('Options', Sprite('SpDelete').T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
-         if ($this->User->Photo != '' && $AllowImages)
-            $Module->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'),$Session->TransientKey())), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
-         
-         $Module->AddLink('Options', Sprite('SpPreferences').T('Edit Preferences'), UserUrl($this->User, '', 'preferences'), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
-
-         // Add profile options for everyone
-         $Module->AddLink('Options', Sprite('SpPicture').T('Change Picture'), UserUrl($this->User, '', 'picture'), 'Garden.Users.Edit', array('class' => 'PictureLink'));
-         if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-            $Module->AddLink('Options', Sprite('SpThumbnail').T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
-         }
       } else {
          // Add profile options for the profile owner
          // Don't allow account editing if it has been turned off.
@@ -1153,6 +1143,17 @@ class ProfileController extends Gdn_Controller {
             $Module->AddLink('Options', Sprite('SpConnection').T('Connections'), '/profile/connections', 'Garden.SignIn.Allow');
          }
       }
+      
+      $Module->AddLink('Options', Sprite('SpPreferences').T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
+
+      // Add profile options for everyone
+      $Module->AddLink('Options', Sprite('SpPicture').T('Change Picture'), UserUrl($this->User, '', 'picture'), 'Garden.Users.Edit', array('class' => 'PictureLink'));
+      if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
+         $Module->AddLink('Options', Sprite('SpThumbnail').T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
+      }
+      
+      if ($this->User->Photo != '' && $AllowImages)
+         $Module->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'),$Session->TransientKey())), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
    }
    
    /**

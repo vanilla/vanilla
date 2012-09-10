@@ -49,6 +49,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       $ThemeName = $this->CurrentTheme();
       $ThemeInfo = $this->GetThemeInfo($ThemeName);
       $ThemeHooks = GetValue('RealHooksFile', $ThemeInfo, NULL);
+      if (!headers_sent()) header("X-Render: {$ThemeName}");
       if (file_exists($ThemeHooks))
          include_once($ThemeHooks);
    }

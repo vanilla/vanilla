@@ -1135,13 +1135,6 @@ class ProfileController extends Gdn_Controller {
                $passwordLabel = T('Set A Password');
             $Module->AddLink('Options', Sprite('SpPassword').$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
          }
-         
-         $this->SetData('Connections', array());
-         $this->EventArguments['User'] = $this->User;
-         $this->FireEvent('GetConnections');
-         if (count($this->Data('Connections')) > 0) {
-            $Module->AddLink('Options', Sprite('SpConnection').T('Connections'), '/profile/connections', 'Garden.SignIn.Allow');
-         }
       }
       
       $Module->AddLink('Options', Sprite('SpPreferences').T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
@@ -1154,6 +1147,16 @@ class ProfileController extends Gdn_Controller {
       
       if ($this->User->Photo != '' && $AllowImages)
          $Module->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'),$Session->TransientKey())), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
+   
+      
+      if ($this->User->UserID == $ViewingUserID || $Session->CheckPermission('Garden.Users.Edit')) {
+         $this->SetData('Connections', array());
+         $this->EventArguments['User'] = $this->User;
+         $this->FireEvent('GetConnections');
+         if (count($this->Data('Connections')) > 0) {
+            $Module->AddLink('Options', Sprite('SpConnection').T('Connections'), '/profile/connections', 'Garden.SignIn.Allow');
+         }
+      }
    }
    
    /**

@@ -228,8 +228,9 @@ class FacebookPlugin extends Gdn_Plugin {
                   'name' => Gdn_Format::PlainText($Row['Name'], 'Text'),
 //                  'caption' => 'Foo',
                   'description' => $Message,
-                  'redirect_uri' => Url('/post/shared/facebook', $TRUE)
+                  'redirect_uri' => Url('/post/shared/facebook', TRUE)
                 );
+            
             $Url = 'http://www.facebook.com/dialog/feed?'.http_build_query($Get);
             Redirect($Url);
          }

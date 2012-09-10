@@ -354,8 +354,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_Json = array();
       $this->_Headers = array(
          'X-Garden-Version'   => APPLICATION.' '.APPLICATION_VERSION,
-         'Content-Type'       => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', ''), // PROPERLY ENCODE THE CONTENT
-         'Vary'               => 'X-Render'
+         'Content-Type'       => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', '') // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
       );
       

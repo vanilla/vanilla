@@ -227,22 +227,27 @@ class TwitterPlugin extends Gdn_Plugin {
                $Message = Gdn_Format::PlainText($Row['Body'], $Row['Format']);
          }
          
-         $Elips = '…';
+         $Elips = '...';
          
          
          if (function_exists('normalizer_is_normalized')) {
             // Slice the string to 119 characters (21 reservered for the url.
             if (!normalizer_is_normalized($Message))
-               $Message = Normalizer::normalize($Message, Normalizer::OPTION_DEFAULT);
-            $Elips = Normalizer::normalize($Elips, Normalizer::OPTION_DEFAULT);
+               $Message = Normalizer::normalize($Message, Normalizer::FORM_D);
+            $Elips = Normalizer::normalize($Elips, Normalizer::FORM_D);
          }
          
-         $Message = SliceParagraph($Message, 119);
-         if (strlen($Message) > 119) {
-            $Message = substr($Message, 0, 119-strlen($Elips)).$Elips;
+         $Max = 140;
+         $LinkLen = 20;
+         
+         $Max -= $LinkLen;
+         
+         $Message = SliceParagraph($Message, $Max);
+         if (strlen($Message) > $Max) {
+            $Message = substr($Message, 0, $Max - strlen($Elips)).$Elips;
          }
          
-         echo $Message.strlen($Message);
+//         echo $Message.strlen($Message);
          
          if ($this->AccessToken()) {
             $Message .= ' '.$Row['ShareUrl'];

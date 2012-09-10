@@ -856,7 +856,7 @@ class Gdn_Format {
       
       if ($Format != 'Text') {
          // Remove returns and then replace html return tags with returns.
-         $Result = str_replace(array("\n", "\r"), '', $Result);
+         $Result = str_replace(array("\n", "\r"), ' ', $Result);
          $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
          
          // Fix lists.

@@ -151,7 +151,13 @@ class FacebookPlugin extends Gdn_Plugin {
     * Output Quote link.
     */
    protected function AddReactButton($Sender, $Args) {
-      echo Anchor(Sprite('ReactFacebook', 'ReactSprite'), Url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), 'ReactButton Hijack');
+      if ($this->AccessToken()) {
+         $CssClass = 'ReactButton Hijack';
+      } else {
+         $CssClass = 'ReactButton PopupWindow';
+      }
+      
+      echo Anchor(Sprite('ReactFacebook', 'ReactSprite'), Url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), $CssClass);
    }
    
    public function Base_SignInIcons_Handler($Sender, $Args) {
@@ -199,20 +205,32 @@ class FacebookPlugin extends Gdn_Plugin {
     * @throws type
     */
    public function PostController_Facebook_Create($Sender, $RecordType, $ID) {
-      if (!Gdn::Request()->IsPostBack())
-         throw PermissionException('Javascript');
+//      if (!Gdn::Request()->IsPostBack())
+//         throw PermissionException('Javascript');
       
       $Row = GetRecord($RecordType, $ID);
       if ($Row) {
          $Message = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
          
-         $R = $this->API('/me/feed', array(
-             'link' => $Row['ShareUrl'],
-             'message' => $Message
-             ));
-         
-         $Sender->SetJson('R', $R);
-         $Sender->InformMessage(T('Thanks for sharing!'));
+         if ($this->AccessToken() && $Sender->Request->IsPostBack()) {
+            $R = $this->API('/me/feed', array(
+                'link' => $Row['ShareUrl'],
+                'message' => $Message
+                ));
+
+            $Sender->SetJson('R', $R);
+            $Sender->InformMessage(T('Thanks for sharing!'));
+         } else {
+//            http://www.facebook.com/dialog/feed?app_id=231546166870342&redirect_uri=http%3A%2F%2Fvanillicon.com%2Fredirect%2Ffacebook%3Fhash%3Daad66afb13105676dffa79bfe2b8595f&link=http%3A%2F%2Fvanillicon.com&picture=http%3A%2F%2Fvanillicon.com%2Faad66afb13105676dffa79bfe2b8595f.png&name=Vanillicon&caption=What%27s+Your+Vanillicon+Look+Like%3F&description=Vanillicons+are+unique+avatars+generated+by+your+name+or+email+that+are+free+to+make+%26+use+around+the+web.+Create+yours+now%21
+            $Get = array(
+                  'app_id' => C('Plugins.Facebook.ApplicationID'),
+                  'name' => 'Share',
+                  'description' => $Message,
+                  'link' => $Row['ShareUrl']
+                );
+            $Url = 'http://www.facebook.com/dialog/feed?'.http_build_query($Get);
+            Redirect($Url);
+         }
       }
       
       $Sender->Render('Blank', 'Utility', 'Dashboard');

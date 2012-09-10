@@ -212,8 +212,8 @@ class TwitterPlugin extends Gdn_Plugin {
     * @throws type
     */
    public function PostController_Twitter_Create($Sender, $RecordType, $ID) {
-      if (!Gdn::Request()->IsPostBack())
-         throw PermissionException('Javascript');
+//      if (!Gdn::Request()->IsPostBack())
+//         throw PermissionException('Javascript');
       
       $Row = GetRecord($RecordType, $ID);
       if ($Row) {
@@ -235,13 +235,21 @@ class TwitterPlugin extends Gdn_Plugin {
          
          $Message .= ' '.$Row['ShareUrl'];
          
-         $R = $this->API('/statuses/update.json', array(
-             'status' => $Message
-             ),
-             'POST');
-         
-         $Sender->SetJson('R', $R);
-         $Sender->InformMessage(T('Thanks for sharing!'));
+         if ($this->AccessToken()) {
+            $R = $this->API('/statuses/update.json', array(
+                'status' => $Message
+                ),
+                'POST');
+
+            $Sender->SetJson('R', $R);
+            $Sender->InformMessage(T('Thanks for sharing!'));
+         } else {
+            $Get = array(
+                'text' => $Message
+                );
+            $Url = "http://twitter.com/share?".http_build_query($Get);
+            Redirect($Url);
+         }
       }
       
       $Sender->Render('Blank', 'Utility', 'Dashboard');
@@ -610,7 +618,15 @@ class TwitterPlugin extends Gdn_Plugin {
     * Output Quote link.
     */
    protected function AddReactButton($Sender, $Args) {
-      echo Anchor(Sprite('ReactTwitter', 'ReactSprite'), Url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), 'ReactButton Hijack');
+      if ($this->AccessToken()) {
+         $Url = Url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE);
+         $CssClass = 'ReactButton Hijack';
+      } else {
+         $Url = Url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE);
+         $CssClass = 'ReactButton PopupWindow';
+      }
+      
+      echo Anchor(Sprite('ReactTwitter', 'ReactSprite'), $Url, $CssClass);
    }
 
    public function SettingsController_Twitter_Create($Sender, $Args) {

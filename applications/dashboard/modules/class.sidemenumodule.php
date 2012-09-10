@@ -20,6 +20,8 @@ if (!class_exists('SideMenuModule', FALSE)) {
        */
       public $AutoLinkGroups;
       
+      public $EventName = FALSE;
+      
       /**
        * An array of menu items.
        */
@@ -209,7 +211,8 @@ if (!class_exists('SideMenuModule', FALSE)) {
 
       public function ToString($HighlightRoute = '') {
          Gdn::Controller()->EventArguments['SideMenu'] = $this;
-         Gdn::Controller()->FireEvent('GetAppSettingsMenuItems');
+         if ($this->EventName)
+            Gdn::Controller()->FireEvent($this->EventName);
          
          
          if ($HighlightRoute == '')

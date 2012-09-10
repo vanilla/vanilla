@@ -427,17 +427,19 @@ select {
 }
 
 .ActivateSlider {
-    display: inline-block;
-    background: #777;
-    box-shadow: 0 10px 30px inset;
-    width: 125px;
-    border-radius: 4px;
-    padding: 2px;
-    position: relative;
+   display: inline-block;
+   background: #bbb;
+   /*background: rgba(0, 0, 0, .2);*/
+   box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
+   border: solid 1px #ccc;
+   width: 125px;
+   border-radius: 4px;
+   padding: 1px;
+   position: relative;
 }
 
 .ActivateSlider-Active {
-    text-align: right;
+   text-align: right;
 }
 
 .Gloss {
@@ -3411,6 +3413,16 @@ body.embed .InformMessages {
    margin-right: 2px;
 }
 
+.SpEditProfile {
+   display: inline-block;
+   width: 14px;
+   height: 14px;
+   line-height: 14px;
+   vertical-align: top;
+   background-image: url("images/sprites-14-000000.png");
+   background-position: -245px -29px;
+}
+
 /* === Reaction Sprites === */
 .ReactSprite {
   display: inline-block;
@@ -3456,6 +3468,7 @@ body.embed .InformMessages {
 .ReactReject { background-position: -342px -6px; }
 .ReactFacebook { background-position: -29px -124px; }
 .ReactTwitter { background-position: -53px -124px; }
+.ReactGooglePlus { background-position: -77px -124px; }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
 .Reactions .MenuItems a:hover .ReactSprite,

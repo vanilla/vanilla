@@ -550,7 +550,7 @@ if (!function_exists('UserUrl')) {
     * @param string $Method Optional. ProfileController method to target.
     * @return string The url suitable to be passed into the Url() function.
     */
-   function UserUrl($User, $Px = '', $Method = '') {
+   function UserUrl($User, $Px = '', $Method = '', $Get = FALSE) {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
@@ -558,10 +558,15 @@ if (!function_exists('UserUrl')) {
       $UserName = GetValue($Px.'Name', $User);
       $UserName = preg_replace('/([\?&]+)/', '', $UserName);
       
-      return '/profile/'.
+      $Result = '/profile/'.
          ($Method ? trim($Method, '/').'/' : '').
          ($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').
          rawurlencode($UserName);
+      
+      if ($Get)
+         $Result .= '?'.http_build_query($Get);
+      
+      return $Result;
    }
 }
 

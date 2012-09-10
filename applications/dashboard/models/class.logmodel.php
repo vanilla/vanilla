@@ -242,6 +242,7 @@ class LogModel extends Gdn_Pluggable {
     *  - Edit: The record has been edited.
     *  - Spam: The record has been marked spam.
     *  - Moderate: The record requires moderation.
+    *  - Pending: The record needs pre-moderation.
     * @param string $RecordType The type of record being logged. This usually correspond to the tablename of the record.
     * @param array $Data The record data.
     *  - If you are logging just one row then pass the row as an array.
@@ -283,6 +284,7 @@ class LogModel extends Gdn_Pluggable {
           'InsertIPAddress' => $InsertIPAddress,
           'DateInserted' => Gdn_Format::ToDateTime(),
           'ParentRecordID' => $ParentRecordID,
+			 'CategoryID' => self::_LogValue($Data, 'CategoryID'),
           'OtherUserIDs' => implode(',', GetValue('OtherUserIDs', $Options, array())),
           'Data' => serialize($Data)
       );
@@ -571,6 +573,7 @@ class LogModel extends Gdn_Pluggable {
          case 'Delete':
          case 'Spam':
          case 'Moderate':
+         case 'Pending':
          case 'Ban':
             $IDColumn = $Log['RecordType'].'ID';
             

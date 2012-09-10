@@ -265,8 +265,12 @@ class Gdn_Form extends Gdn_Pluggable {
       $HasValue = ($Value !== array(FALSE) && $Value !== array('')) ? TRUE : FALSE;
       
       // Start with null option?
-      $IncludeNull = GetValue('IncludeNull', $Options) || !$HasValue;
+      $IncludeNull = GetValue('IncludeNull', $Options);
       if ($IncludeNull === TRUE)
+         $Return .= '<option value=""></option>';
+      elseif ($IncludeNull)
+         $Return .= "<option value=\"\">$IncludeNull</option>\n";
+      elseif (!$HasValue)
          $Return .= '<option value=""></option>';
          
       // Show root categories as headings (ie. you can't post in them)?

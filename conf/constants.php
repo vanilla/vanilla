@@ -59,5 +59,6 @@ if (!defined('E_USER_DEPRECATED'))
    define('E_USER_DEPRECATED', E_USER_WARNING);
 
 define('SPAM', 'SPAM');
+define('UNAPPROVED', 'UNAPPROVED');
    
 define('VANILLA_CONSTANTS', TRUE);

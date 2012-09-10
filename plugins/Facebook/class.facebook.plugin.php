@@ -224,9 +224,11 @@ class FacebookPlugin extends Gdn_Plugin {
 //            http://www.facebook.com/dialog/feed?app_id=231546166870342&redirect_uri=http%3A%2F%2Fvanillicon.com%2Fredirect%2Ffacebook%3Fhash%3Daad66afb13105676dffa79bfe2b8595f&link=http%3A%2F%2Fvanillicon.com&picture=http%3A%2F%2Fvanillicon.com%2Faad66afb13105676dffa79bfe2b8595f.png&name=Vanillicon&caption=What%27s+Your+Vanillicon+Look+Like%3F&description=Vanillicons+are+unique+avatars+generated+by+your+name+or+email+that+are+free+to+make+%26+use+around+the+web.+Create+yours+now%21
             $Get = array(
                   'app_id' => C('Plugins.Facebook.ApplicationID'),
-                  'name' => 'Share',
+                  'link' => $Row['ShareUrl'],
+                  'name' => Gdn_Format::PlainText($Row['Name'], 'Text'),
+//                  'caption' => 'Foo',
                   'description' => $Message,
-                  'link' => $Row['ShareUrl']
+                  'redirect_uri' => Url('/post/shared/facebook', $TRUE)
                 );
             $Url = 'http://www.facebook.com/dialog/feed?'.http_build_query($Get);
             Redirect($Url);
@@ -604,6 +606,7 @@ function GetRecord($RecordType, $ID) {
          $Discussion = $Model->GetID($Row['DiscussionID']);
          $Discussion->Url = DiscussionUrl($Discussion);
          $Row['ShareUrl'] = $Discussion->Url;
+         $Row['Name'] = $Discussion->Name;
          $Row['Discussion'] = (array)$Discussion;
          
          return $Row;

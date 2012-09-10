@@ -233,9 +233,8 @@ class TwitterPlugin extends Gdn_Plugin {
             $Message = substr($Message, 0, 123).'…';
          }
          
-         $Message .= ' '.$Row['ShareUrl'];
-         
          if ($this->AccessToken()) {
+            $Message .= ' '.$Row['ShareUrl'];
             $R = $this->API('/statuses/update.json', array(
                 'status' => $Message
                 ),
@@ -245,7 +244,8 @@ class TwitterPlugin extends Gdn_Plugin {
             $Sender->InformMessage(T('Thanks for sharing!'));
          } else {
             $Get = array(
-                'text' => $Message
+                'text' => $Message,
+                'url' => $Row['ShareUrl']
                 );
             $Url = "http://twitter.com/share?".http_build_query($Get);
             Redirect($Url);

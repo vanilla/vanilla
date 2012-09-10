@@ -1310,7 +1310,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $CleanOutut = C('Api.Clean', TRUE);
       if ($CleanOutut) {
          // Remove values that should not be transmitted via api
-         $Remove = array('Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes');
+         $Remove = array('Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes', 'AccessToken');
          if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             $Remove[] = 'InsertIPAddress';
             $Remove[] = 'UpdateIPAddress';
@@ -1421,29 +1421,31 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function RenderException($Ex) {
       if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
          try {
-            switch ($Ex->getCode()) {
-               case 401:
-                  Gdn::Dispatcher()
-                     ->PassData('Message', $Ex->getMessage())
-                     ->Dispatch('DefaultPermission');
-                  break;
-               case 404:
-                  Gdn::Dispatcher()
-                     ->PassData('Message', $Ex->getMessage())
-                     ->Dispatch('Default404');
-                  break;
-                  
-            }
-            
             if (is_a($Ex, 'Gdn_UserException')) {
                Gdn::Dispatcher()
                   ->PassData('Code', $Ex->getCode())
                   ->PassData('Exception', $Ex->getMessage())
                   ->PassData('Trace', $Ex->getTraceAsString())
+                  ->PassData('Breadcrumbs', $this->Data('Breadcrumbs', array()))
                   ->Dispatch('/home/error');
             } else {
-               Gdn_ExceptionHandler($Ex);
+               switch ($Ex->getCode()) {
+                  case 401:
+                     Gdn::Dispatcher()
+                        ->PassData('Message', $Ex->getMessage())
+                        ->Dispatch('DefaultPermission');
+                     break;
+                  case 404:
+                     Gdn::Dispatcher()
+                        ->PassData('Message', $Ex->getMessage())
+                        ->Dispatch('Default404');
+                     break;
+                 default:
+                    Gdn_ExceptionHandler($Ex);
+               }
             }
+            
+            
          } catch(Exception $Ex2) {
             Gdn_ExceptionHandler($Ex);
          }
@@ -1457,8 +1459,15 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Code = $Ex->getCode();
       $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
       
-      if (Debug() && !is_a($Ex, 'Gdn_UserException'))
-         $Data['Trace'] = $Ex->getTraceAsString();
+      if (Debug()) {
+         if ($Trace = Trace()) {
+            $Data['Trace'] = $Trace;
+         }
+         
+         if (!is_a($Ex, 'Gdn_UserException'))
+            $Data['StackTrace'] = $Ex->getTraceAsString();
+      }
+      
 
       if ($Code >= 100 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);

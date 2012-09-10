@@ -458,8 +458,11 @@ set_exception_handler('Gdn_ExceptionHandler');
  * @param string $Code The translation code of the type of object that wasn't found.
  * @return Exception
  */
-function NotFoundException($Code = 'Page') {
-   return new Exception(sprintf(T('%s not found.'), T($Code)), 404);
+function NotFoundException($RecordType = 'Page') {
+   Gdn::Dispatcher()
+      ->PassData('RecordType', $RecordType)
+      ->PassData('Description', sprintf(T('The %s you were looking for could not be found.'), strtolower($RecordType)));
+   return new Exception(sprintf(T('%s not found.'), T($RecordType)), 404);
 }
 
 /**

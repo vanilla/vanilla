@@ -193,13 +193,10 @@ class ProfileController extends Gdn_Controller {
       $Connected = FALSE;
       $this->EventArguments['Connected'] =& $Connected;
       
-      try {
-         $this->FireEvent(ucfirst($Type).'Connect');
-      } catch (Gdn_UserException $Ex) {
-         $this->SetData('Message', $Ex->getMessage());
-         $this->Render('Error', 'Utility');
-         return;
-      }
+      
+      $this->FireEvent(ucfirst($Type).'Connect');
+      
+      
    }
    
    /**
@@ -213,23 +210,26 @@ class ProfileController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $UserID = GetValueR('User.UserID', $this);
+      $this->_SetBreadcrumbs(T('Connections'), '/profile/connections');
       
       $PModel = new Gdn_AuthenticationProviderModel();
       $Providers = $PModel->GetProviders();
       
       $this->SetData('_Providers', $Providers);
       $this->SetData('Connections', array());
+      $this->EventArguments['User'] = $this->User;
       $this->FireEvent('GetConnections');
       
       // Add some connection information.
       foreach ($this->Data['Connections'] as &$Row) {
          $Provider = GetValue($Row['ProviderKey'], $Providers, array());
          
-         TouchValue('Connected', $Row, (bool)GetValue('UniqueID', $Provider, FALSE));
+         TouchValue('Connected', $Row, !is_null(GetValue('UniqueID', $Provider, NULL)));
       }
       
       $this->CanonicalUrl(UserUrl($this->User, '', 'connections'));
       $this->Title(T('Connections'));
+      require_once $this->FetchViewLocation('connection_functions');
       $this->Render();
    }
 
@@ -251,6 +251,42 @@ class ProfileController extends Gdn_Controller {
       $this->SetData('_Value', $Count);
       $this->SetData('_CssClass', 'Count');
       $this->Render('Value', 'Utility');
+   }
+   
+   public function Disconnect($UserReference = '', $Username = '', $Provider) {
+      if (!$this->Request->IsPostBack())
+         throw PermissionException('Javascript');
+      
+      $this->Permission('Garden.SignIn.Allow');
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
+      
+      // First try and delete the authentication the fast way.
+      Gdn::SQL()->Delete('UserAuthentication', 
+         array('UserID' => $this->User->UserID, 'ProviderKey' => $Provider));
+      
+      // Delete the profile information.
+      Gdn::UserModel()->SaveAttribute($this->User->UserID, $Provider, NULL);
+      
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
+         Redirect(UserUrl($this->User), '', 'connections');
+      } else {
+         // Grab all of the providers again.
+         $PModel = new Gdn_AuthenticationProviderModel();
+         $Providers = $PModel->GetProviders();
+         
+         $this->SetData('_Providers', $Providers);
+         $this->SetData('Connections', array());
+         $this->FireEvent('GetConnections');
+         
+         // Send back the connection button.
+         $Connection = $this->Data("Connections.$Provider");
+         require_once $this->FetchViewLocation('connection_functions');
+         $this->JsonTarget("#Provider_$Provider .ActivateSlider",
+            ConnectButton($Connection),
+            'ReplaceWith');
+         
+         $this->Render('Blank', 'Utility', 'Dashboard');
+      }
    }
    
    /**
@@ -1111,6 +1147,7 @@ class ProfileController extends Gdn_Controller {
          }
          
          $this->SetData('Connections', array());
+         $this->EventArguments['User'] = $this->User;
          $this->FireEvent('GetConnections');
          if (count($this->Data('Connections')) > 0) {
             $Module->AddLink('Options', Sprite('SpConnection').T('Connections'), '/profile/connections', 'Garden.SignIn.Allow');

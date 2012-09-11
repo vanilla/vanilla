@@ -31,9 +31,9 @@ class ProfileOptionsModule extends Gdn_Module {
       } else {
          if ($Controller->User->UserID != $Session->UserID) {
             if ($Session->CheckPermission('Garden.Users.Edit'))
-               $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
+               $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
          } else if (C('Garden.UserAccount.AllowEdit')) {
-            $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').T('Edit Profile'), 'Url' => '/profile/edit');
+            $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => '/profile/edit');
          }
          if ($Session->CheckPermission('Garden.Moderation.Manage') && $UserID != $Session->UserID) {
             // Ban/Unban

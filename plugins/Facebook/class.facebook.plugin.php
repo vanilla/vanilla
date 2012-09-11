@@ -187,7 +187,7 @@ class FacebookPlugin extends Gdn_Plugin {
    
    public function Base_GetConnections_Handler($Sender, $Args) {
       $Sender->Data['Connections'][self::ProviderKey] = array(
-            'Icon' => Asset('/plugins/Facebook/design/f_logo-64.png'),
+            'Icon' => '/plugins/Facebook/design/f_logo-64.png',
             'Name' => 'Facebook',
             'ProviderKey' => self::ProviderKey,
             'ConnectUrl' => $this->AuthorizeUri(FALSE, self::ProfileConnecUrl()),

@@ -239,7 +239,7 @@ class TwitterPlugin extends Gdn_Plugin {
 //         }
          
          $Max = 140;
-         $LinkLen = 21;
+         $LinkLen = 22;
          
          $Max -= $LinkLen;
          
@@ -470,7 +470,7 @@ class TwitterPlugin extends Gdn_Plugin {
    
    public function Base_GetConnections_Handler($Sender, $Args) {
       $Sender->Data['Connections'][self::ProviderKey] = array(
-            'Icon' => Asset('/plugins/Twitter/design/twitter_logo-64.png'),
+            'Icon' => '/plugins/Twitter/design/twitter_logo-64.png',
             'Name' => 'Twitter',
             'ProviderKey' => self::ProviderKey,
             'ConnectUrl' => '/entry/twauthorize/profile',

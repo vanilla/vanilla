@@ -12,21 +12,16 @@ if (count($this->Data('Conversations'))):
    <?php 
    foreach ($this->Data('Conversations') as $Row):
    
-   unset($PhotoUser);
    $Subject = '';
    if ($Row['Subject']) {
       $Subject = Gdn_Format::Text($Row['Subject']);
    } else {
       $Subject = '';
       foreach ($Row['Participants'] as $User) {
-         if (!isset($PhotoUser))
-            $PhotoUser = $User;
          $Subject = ConcatSep(', ', $Subject, FormatUsername($User, 'You'));
       }
    }
-
-   if (!isset($PhotoUser))
-      $PhotoUser = UserBuilder($Row, 'LastMessage');
+   $PhotoUser = UserBuilder($Row, 'LastMessage');
    ?>
    <li class="Item" rel="<?php echo Url("/messages/{$Row['ConversationID']}#latest"); ?>">
       <div class="Author Photo"><?php echo UserPhoto($PhotoUser); ?></div>

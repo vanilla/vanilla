@@ -11,7 +11,8 @@ if (count($this->Data('Conversations'))):
 ?>
    <?php 
    foreach ($this->Data('Conversations') as $Row):
-
+   
+   unset($PhotoUser);
    $Subject = '';
    if ($Row['Subject']) {
       $Subject = Gdn_Format::Text($Row['Subject']);

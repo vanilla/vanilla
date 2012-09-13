@@ -21,7 +21,7 @@ if (count($this->Data('Conversations'))):
          $Subject = ConcatSep(', ', $Subject, FormatUsername($User, 'You'));
       }
    }
-   $PhotoUser = UserBuilder($Row, 'LastMessage');
+   $PhotoUser = UserBuilder($Row, 'LastInsert');
    ?>
    <li class="Item" rel="<?php echo Url("/messages/{$Row['ConversationID']}#latest"); ?>">
       <div class="Author Photo"><?php echo UserPhoto($PhotoUser); ?></div>

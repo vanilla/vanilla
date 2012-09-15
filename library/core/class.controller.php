@@ -1317,7 +1317,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Remove[] = 'LastIPAddress';
             $Remove[] = 'AllIPAddresses';
             $Remove[] = 'Fingerprint';
-            $Remove[] = 'Email';
+            if (C('Api.Clean.Email', TRUE))
+               $Remove[] = 'Email';
             $Remove[] = 'DateOfBirth';
          }
          $Data = RemoveKeysFromNestedArray($Data, $Remove);

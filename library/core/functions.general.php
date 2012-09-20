@@ -700,7 +700,11 @@ if (!function_exists('FetchPageInfo')) {
          if (!defined('HDOM_TYPE_ELEMENT'))
             require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             
-         $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
+         $Request = new ProxyRequest();
+         $PageHtml = $Request->Request(array(
+            'URL'       => $Url,
+            'Timeout'   => $Timeout
+         ));
          $Dom = str_get_html($PageHtml);
          if (!$Dom)
             throw new Exception('Failed to load page for parsing.');

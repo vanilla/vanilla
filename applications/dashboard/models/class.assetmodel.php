@@ -253,8 +253,11 @@ class AssetModel extends Gdn_Model {
       $Info = Gdn::ThemeManager()->EnabledThemeInfo();
       if (!empty($Info)) {
          $Data[strtolower("{$Info['Index']}-theme-{$Info['Version']}")] = TRUE;
-//         decho($Theme);
-//         die();
+
+         if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
+            $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
+            $Data[$Filenames] = TRUE;
+         }
       }
       
       Gdn::PluginManager()->EventArguments['ETagData'] =& $Data;

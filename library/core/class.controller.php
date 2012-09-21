@@ -1425,6 +1425,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                Gdn::Dispatcher()
                   ->PassData('Code', $Ex->getCode())
                   ->PassData('Exception', $Ex->getMessage())
+                  ->PassData('Message', $Ex->getMessage())
                   ->PassData('Trace', $Ex->getTraceAsString())
                   ->PassData('Breadcrumbs', $this->Data('Breadcrumbs', array()))
                   ->Dispatch('/home/error');

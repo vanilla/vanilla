@@ -676,6 +676,12 @@ class ProfileController extends Gdn_Controller {
          }
       }
       $Defaults = array_merge($Defaults, $MetaPrefs);
+      
+      if (UserModel::NoEmail()) {
+         $this->PreferenceGroups = self::_RemoveEmailPreferences($this->PreferenceGroups);
+         $this->PreferenceTypes = self::_RemoveEmailPreferences($this->PreferenceTypes);
+         $this->SetData('NoEmail', TRUE);
+      }
          
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Use global defaults
@@ -713,6 +719,26 @@ class ProfileController extends Gdn_Controller {
       $this->Title(T('Notification Preferences'));
       $this->_SetBreadcrumbs($this->Data('Title'), $this->CanonicalUrl());
       $this->Render();
+   }
+   
+   protected static function _RemoveEmailPreferences($Data) {
+      $Data = array_filter($Data, array('ProfileController', '_RemoveEmailFilter'));
+      
+      $Result = array();
+      foreach ($Data as $K => $V) {
+         if (is_array($V))
+            $Result[$K] = self::_RemoveEmailPreferences($V);
+         else
+            $Result[$K] = $V;
+      }
+      
+      return $Result;
+   }
+   
+   protected static function _RemoveEmailFilter($Value) {
+      if (is_string($Value) && strpos($Value, 'Email') !== FALSE)
+         return FALSE;
+      return TRUE;
    }
    
    /**

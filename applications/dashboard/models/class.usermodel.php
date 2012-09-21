@@ -1657,6 +1657,10 @@ class UserModel extends Gdn_Model {
 
       return $Data === FALSE ? 0 : $Data->UserCount;
    }
+   
+   public static function SigninLabelCode() {
+      return UserModel::NoEmail() ? 'Username' : 'Email/Username';
+   }
 
    /**
     * To be used for invitation registration
@@ -2924,11 +2928,12 @@ class UserModel extends Gdn_Model {
    }
    
    public function PasswordRequest($Email) {
-      if (!$Email)
+      if (!$Email) {
          return FALSE;
+      }
 
       $Users = $this->GetWhere(array('Email' => $Email))->ResultObject();
-      if (count($Users) == 0 && C('Garden.Registration.NameUnique', 1)) {
+      if (count($Users) == 0) {
          // Check for the username.
          $Users = $this->GetWhere(array('Name' => $Email))->ResultObject();
       }
@@ -2937,11 +2942,19 @@ class UserModel extends Gdn_Model {
       $this->EventArguments['Email'] = $Email;
       $this->FireEvent('BeforePasswordRequest');
       
-      if (count($Users) == 0)
-            return FALSE;
+      if (count($Users) == 0) {
+         $this->Validation->AddValidationResult('Name', "Couldn't find an account associated with that email/username.");
+         return FALSE;
+      }
 
       $Email = new Gdn_Email();
+      $NoEmail = TRUE;
+      
       foreach ($Users as $User) {
+         if (!$User->Email) {
+            continue;
+         }
+         
          $PasswordResetKey = RandomString(6);
          $this->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
          $AppTitle = C('Garden.Title');
@@ -2957,6 +2970,12 @@ class UserModel extends Gdn_Model {
             )
          );
          $Email->Send();
+         $NoEmail = FALSE;
+      }
+      
+      if ($NoEmail) {
+         $this->Validation->AddValidationResult('Name', 'There is no email address associated with that account.');
+         return FALSE;
       }
       return TRUE;
    }

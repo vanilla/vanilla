@@ -731,7 +731,7 @@ class EntryController extends Gdn_Controller {
       $this->FireEvent('SignIn');
 
       if ($this->Form->IsPostBack()) {
-         $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('%s is required.'), T('Email/Username')));
+         $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('%s is required.'), T(UserModel::SigninLabelCode())));
          $this->Form->ValidateRule('Password', 'ValidateRequired');
 
          // Check the user.
@@ -742,7 +742,7 @@ class EntryController extends Gdn_Controller {
                $User = Gdn::UserModel()->GetByUsername($Email);
 
             if (!$User) {
-               $this->Form->AddError('User not found.');
+               $this->Form->AddError('@'.sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))));
             } else {
                $ClientHour = $this->Form->GetFormValue('ClientHour');
                $HourOffset = Gdn_Format::ToTimestamp($ClientHour) - time();
@@ -1070,7 +1070,9 @@ class EntryController extends Gdn_Controller {
          
       $this->Form->AddHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default
       $this->Form->AddHidden('Target', $this->Target());
-
+      
+      $this->SetData('NoEmail', UserModel::NoEmail());
+      
       $RegistrationMethod = $this->_RegistrationView();
       $this->View = $RegistrationMethod;
       $this->$RegistrationMethod($InvitationCode);
@@ -1347,6 +1349,8 @@ class EntryController extends Gdn_Controller {
     * @since 2.1
     */
    public function RegisterThanks() {
+      $this->CssClass = 'SplashMessage NoPanel';
+      $this->SetData('_NoMessages', TRUE);
       $this->SetData('Title', T('Thank You!'));
       $this->Render();
    }
@@ -1358,7 +1362,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    public function PasswordRequest() {
-      Gdn::Locale()->SetTranslation('Email', T('Email/Username'));
+      Gdn::Locale()->SetTranslation('Email', T(UserModel::SigninLabelCode()));
       if ($this->Form->IsPostBack() === TRUE) {
          $this->Form->ValidateRule('Email', 'ValidateRequired');
 
@@ -1366,7 +1370,7 @@ class EntryController extends Gdn_Controller {
             try {
                $Email = $this->Form->GetFormValue('Email');
                if (!$this->UserModel->PasswordRequest($Email)) {
-                  $this->Form->AddError("Couldn't find an account associated with that email/username.");
+                  $this->Form->SetValidationResults($this->UserModel->ValidationResults());
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());

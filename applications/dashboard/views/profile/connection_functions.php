@@ -16,7 +16,13 @@ function WriteConnection($Row) {
                echo GetValue('Name', $Row, T('Unknown'));
                
                if ($Connected) {
-                  echo ' <span class="Gloss">• '.htmlspecialchars(GetValueR('Profile.Name', $Row)).'</span>';
+                  echo ' <span class="Gloss Connected">';
+                  
+                  if ($Photo = GetValueR('Profile.Photo', $Row)) {
+                     echo ' '.Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall'));
+                  }
+                  
+                  echo ' '.htmlspecialchars(GetValueR('Profile.Name', $Row)).'</span>';
                }
             ?>
          </span>
@@ -26,13 +32,14 @@ function WriteConnection($Row) {
             ?>
          </span>
       </div>
-      <div class="Connection-Body Hidden">
+<!--      <div class="Connection-Body">
          <?php
-         if (Debug()) {
-            decho(GetValue($Row['ProviderKey'], $c->User->Attributes), 'Attributes');
-         }
+         
+//         if (Debug()) {
+//            decho(GetValue($Row['ProviderKey'], $c->User->Attributes), 'Attributes');
+//         }
          ?>
-      </div>
+      </div>-->
    </li>
 <?php
 }

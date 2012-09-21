@@ -333,6 +333,9 @@ li.Editing {
 	font-size: 14px;
 	line-height: 2;
 }
+td.BigCount.CountDiscussions {
+   width: 80px; /* Fix overlap glitch in category table homepage */
+}
 
 /* Foot */
 .FootMenu {

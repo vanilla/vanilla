@@ -249,6 +249,17 @@ class UtilityController extends DashboardController {
          $this->Render();
    }
    
+   public function Sprites() {
+      $this->RemoveCssFile('admin.css');
+      $this->AddCssFile('style.css');
+      $this->MasterView = 'default';
+      
+      $this->CssClass = 'SplashMessage NoPanel';
+      $this->SetData('_NoMessages', TRUE);
+      $this->SetData('Title', 'Sprite Sheet');
+      $this->Render();
+   }
+   
    /**
     * Update database structure based on current definitions in each app's structure.php file.
     *

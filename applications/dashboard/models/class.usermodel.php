@@ -119,6 +119,23 @@ class UserModel extends Gdn_Model {
       $Result = in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
       return $Result;
    }
+
+   /**
+    * Whether or not the application requires email confirmation.
+    * 
+    * @return bool
+    */
+   public static function RequireConfirmEmail() {
+      return C('Garden.Registration.ConfirmEmail') && !self::NoEmail();
+   }
+   
+   /**
+    * Whether or not users have email addresses.
+    * @return bool
+    */
+   public static function NoEmail() {
+      return C('Garden.Registration.NoEmail');
+   }
    
    /**
     * Unban a user.
@@ -442,7 +459,7 @@ class UserModel extends Gdn_Model {
       $this->FireEvent('BeforeInsertUser');
       
       // Massage the roles for email confirmation.
-      if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Options)) {
+      if (self::RequireConfirmEmail() && !GetValue('NoConfirmEmail', $Options)) {
          $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
          if ($ConfirmRoleID) {
             TouchValue('Attributes', $Fields, array());
@@ -463,6 +480,10 @@ class UserModel extends Gdn_Model {
          $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
          $Fields['HashMethod'] = 'Vanilla';
       }
+      
+      // Certain configurations can allow blank email addresses.
+      if (GetValue('Email', $Fields, NULL) === NULL)
+         $Fields['Email'] = '';
 
       $Roles = GetValue('Roles', $Fields);
       unset($Fields['Roles']);
@@ -1216,7 +1237,7 @@ class UserModel extends Gdn_Model {
          }
          
          // Check for email confirmation.
-         if (C('Garden.Registration.ConfirmEmail') && !GetValue('NoConfirmEmail', $Settings)) {
+         if (self::RequireConfirmEmail() && !GetValue('NoConfirmEmail', $Settings)) {
             if (isset($Fields['Email']) && $UserID == Gdn::Session()->UserID && $Fields['Email'] != Gdn::Session()->User->Email && !Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
                $User = Gdn::Session()->User;
                $Attributes = Gdn::Session()->User->Attributes;
@@ -1972,6 +1993,23 @@ class UserModel extends Gdn_Model {
             $BanModel->SetCounts($Ban);
          }
       }
+   }
+   
+   /**
+    * @param unknown_type $FormPostValues
+    * @param unknown_type $Insert
+    * @return unknown
+    * @todo add doc
+    */
+   public function Validate($FormPostValues, $Insert = FALSE) {
+      $this->DefineSchema();
+      
+      if (self::NoEmail()) {
+         // Remove the email requirement.
+         $this->Validation->UnapplyRule('Email', 'Required');
+      }
+      
+      return $this->Validation->Validate($FormPostValues, $Insert);
    }
 
    /**

@@ -30,6 +30,9 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 $this->FireEvent("BeforePreferencesRender");
+
+decho($this->PreferenceTypes);
+
 foreach ($this->PreferenceGroups as $PreferenceGroup => $Preferences) {
    echo Wrap(T($PreferenceGroup == 'Notifications' ? 'General' : $PreferenceGroup), 'h3');
    ?>

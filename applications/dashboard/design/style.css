@@ -3110,6 +3110,7 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 
 /* 16px Sprites White */
 .SpDashboard,
+.SpOptions,
 .SpCog { background-position: 0 -212px; }
 .SpSettings { background-position: -16px -212px; }
 .SpNotifications,

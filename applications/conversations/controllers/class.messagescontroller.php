@@ -381,10 +381,13 @@ class MessagesController extends ConversationsController {
          Gdn::Session()->UserID,
          0,
          5
-      );
+      )->ResultArray();
+      
+      // Last message user data
+      Gdn::UserModel()->JoinUsers($Conversations, array('LastInsertUserID'));
       
       // Join in the participants.
-      $this->SetData('Conversations', $Conversations->ResultArray());
+      $this->SetData('Conversations', $Conversations);
       $this->Render();
    }
    

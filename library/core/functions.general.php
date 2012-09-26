@@ -2713,7 +2713,7 @@ if (!function_exists('T')) {
 
 if (!function_exists('Theme')) {
    function Theme() {
-      return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+      return Gdn::ThemeManager()->CurrentTheme();
    }
 }
 

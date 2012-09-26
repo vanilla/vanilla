@@ -318,7 +318,6 @@ class ProfileController extends Gdn_Controller {
          
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       $this->Form->SetModel(Gdn::UserModel());
-      $this->Form->AddHidden('UserID', $UserID);
       
       // Define gender dropdown options
       $this->GenderOptions = array(
@@ -334,6 +333,7 @@ class ProfileController extends Gdn_Controller {
       
       // If seeing the form for the first time...
       if ($this->Form->IsPostBack()) {
+         $this->Form->SetValue('UserID', $UserID);
          
          if (!$this->CanEditUsername)
             $this->Form->SetFormValue("Name", $User['Name']);

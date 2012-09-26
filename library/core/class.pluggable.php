@@ -127,7 +127,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
     *
     * @param string $EventName The name of the event being fired.
     */
-   public function FireEvent($EventName) {
+   public function FireEvent($EventName, $Arguments = NULL) {
       if (!$this->ClassName) {
          $RealClassName = get_class($this);
          throw new Exception("Event fired from pluggable class '{$RealClassName}', but Gdn_Pluggable::__construct() was never called.");
@@ -136,6 +136,10 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
       $FireClass = !is_null($this->FireAs) ? $this->FireAs : $this->ClassName;
       $this->FireAs = NULL;
       
+      // Apply inline arguments to EventArguments
+      if (is_array($Arguments))
+         $this->EventArguments = array_merge($this->EventArguments, $Arguments);
+
       // Look to the PluginManager to see if there are related event handlers and call them
       return Gdn::PluginManager()->CallEventHandlers($this, $FireClass, $EventName);
    }

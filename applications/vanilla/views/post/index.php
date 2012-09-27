@@ -18,7 +18,7 @@ foreach ($Forms as $Form) {
 	$Name = GetValue('Name', $Form);
 	$Active = strtolower($Name) == strtolower($this->Data('CurrentFormName'));
 	$Url = GetValue('Url', $Form);
-	echo '<div class="FormWrap Type-'.$Name.' '.($Active ? 'Active' : 'Hidden').'">';
+	echo '<div class="Toggle-'.$Name.($Active ? ' Active' : '').' FormWrap">';
 		// echo ProxyRequest(Url($Url.'?DeliveryType=VIEW', TRUE));
 		echo '<div class="Popin" rel="'.Url($Url.'?DeliveryType=VIEW', TRUE).'"></div>';
 	echo '</div>';

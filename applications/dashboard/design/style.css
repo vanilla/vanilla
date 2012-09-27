@@ -1217,9 +1217,22 @@ overflow: hidden;
 #Panel .BoxFilter {
    margin: 10px 0;
 }
+#Content .FilterMenu {
+	margin: 0 0 10px;
+}
 #Content .FilterMenu li,
 #Content .FilterMenu li.Active {
 	display: inline-block;
+   white-space: nowrap;
+	margin: 0 6px;
+}
+#Content .FilterMenu li a {
+	padding: 4px 0;
+}
+#Content .FilterMenu li.Active a {
+	color: #000;
+	border-bottom: 2px solid #ddd;
+	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 #Content .BoxFilter a {
 	margin: 0 10px 0 0;
@@ -2383,7 +2396,9 @@ tr.CategoryHeading td {
 .SpDelete:after {
    background-position: -79px -38px;
 }
-*/
+
+Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
+
 .FormType {
 	margin: 0 0 10px;
 }
@@ -2400,6 +2415,7 @@ tr.CategoryHeading td {
 	border-bottom: 2px solid #ddd;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
+*/
 .DiscussionForm label {
    font-size: 14px;
    font-weight: bold;

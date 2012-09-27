@@ -9,8 +9,8 @@
    <ul>
       <li>
          <?php
-            echo $this->Form->Label('Email/Username', 'Email');
-            echo $this->Form->TextBox('Email', array('autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE));
+            echo $this->Form->Label(UserModel::SigninLabelCode(), 'Email');
+            echo $this->Form->TextBox('Email', array('autofocus' => 'autofocus', 'autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE));
          ?>
       </li>
       <li>

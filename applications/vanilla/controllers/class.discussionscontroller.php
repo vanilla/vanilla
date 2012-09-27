@@ -88,6 +88,12 @@ class DiscussionsController extends VanillaController {
       $Page = PageNumber($Offset, $Limit);
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
       
+      // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
+      $MaxPages = C('Vanilla.Discussions.MaxPages');
+      if ($MaxPages && $Page > $MaxPages) {
+         throw NotFoundException();
+      }
+      
       // Setup head.
       if (!$this->Data('Title')) {
          $Title = C('Garden.HomepageTitle');
@@ -116,6 +122,10 @@ class DiscussionsController extends VanillaController {
       
       // Get Discussion Count
       $CountDiscussions = $DiscussionModel->GetCount();
+      
+      if ($MaxPages)
+         $CountDiscussions = $MaxPages * $Limit;
+      
       $this->SetData('CountDiscussions', $CountDiscussions);
       
       // Get Announcements

@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
    
    // Hijack comment form button clicks.
    var draftSaving = 0;
-   $('.EditCommentForm .Button.Primary, div.CommentForm .Button.Primary, a.PreviewButton, a.DraftButton').livequery('click', function() {
+   $('.CommentButton, a.PreviewButton, a.DraftButton').livequery('click', function() {
       var btn = this;
       var parent = $(btn).parents('div.CommentForm, div.EditCommentForm');
       var frm = $(parent).find('form');

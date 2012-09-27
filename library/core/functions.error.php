@@ -462,7 +462,7 @@ function NotFoundException($RecordType = 'Page') {
    Gdn::Dispatcher()
       ->PassData('RecordType', $RecordType)
       ->PassData('Description', sprintf(T('The %s you were looking for could not be found.'), strtolower($RecordType)));
-   return new Exception(sprintf(T('%s not found.'), T($RecordType)), 404);
+   return new Gdn_UserException(sprintf(T('%s not found.'), T($RecordType)), 404);
 }
 
 /**

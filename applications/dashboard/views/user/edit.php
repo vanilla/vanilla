@@ -19,6 +19,11 @@ if ($this->Data('AllowEditing')) { ?>
       <li>
          <?php
             echo $this->Form->Label('Email', 'Email');
+            if (UserModel::NoEmail()) {
+               echo '<div class="Gloss">',
+                  T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
+                  '</div>';
+            }
             echo $this->Form->TextBox('Email');
          ?>
       </li>

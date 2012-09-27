@@ -313,6 +313,23 @@ jQuery(document).ready(function($) {
          return $.effects.highlight0.call(this, opts);
 		};
 	}
+
+   // Handle ToggleMenu toggling and set up default state
+   $('[class^="Toggle-"]').hide(); // hide all toggle containers
+   $('.ToggleMenu a').click(function() {
+      // Make all toggle buttons and toggle containers inactive
+		$(this).parents('.ToggleMenu').find('li').removeClass('Active'); 
+      $('[class^="Toggle-"]').hide();
+		var item = $(this).parents('li'); // Identify the clicked container
+		// The selector of the container that should be revealed.
+      var containerSelector = '.Toggle-' + item.attr('class');
+      containerSelector = containerSelector.replace(/Handle-/gi, ''); 
+		// Reveal the container & make the button active
+      item.addClass('Active'); // Make the clicked form button active
+      $(containerSelector).show();
+      return false;
+   });
+   $('.ToggleMenu .Active a').click(); // reveal the currently active item.
    
 	// Show hoverhelp on hover
 	$('.HoverHelp').hover(

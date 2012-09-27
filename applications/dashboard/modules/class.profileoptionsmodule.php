@@ -27,7 +27,8 @@ class ProfileOptionsModule extends Gdn_Module {
       $Controller->EventArguments['ProfileOptions'] = &$ProfileOptions;
       $Controller->EventArguments['MemberOptions'] = &$MemberOptions;
       if ($Controller->EditMode) {
-         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
+         return '<div class="ProfileOptions">'.Anchor(T('Back to Profile'), UserUrl($Controller->User)).'</div>';
+//         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
       } else {
          if ($Controller->User->UserID != $Session->UserID) {
             if ($Session->CheckPermission('Garden.Users.Edit'))
@@ -44,8 +45,7 @@ class ProfileOptionsModule extends Gdn_Module {
             }
 
             // Delete content.
-            if (!$Controller->User->Banned)
-               $ProfileOptions[] = array('Text' => Sprite('SpDelete').T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
+            $ProfileOptions[] = array('Text' => Sprite('SpDelete').T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
          }
       }
       return parent::ToString();

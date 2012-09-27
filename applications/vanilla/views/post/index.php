@@ -1,35 +1,17 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-   $('.FormType a').click(function() {
-		$(this).parents('.FormType').find('li').removeClass('Active'); // Make all buttons inactive
-		var item = $(this).parents('li'); // Identify the clicked container
-		var formType = item.attr('class'); // Identify the clicked form type
-		item.addClass('Active'); // Make the clicked form button active
-		$('.FormWrap').hide(); // Hide all forms
-		$('.'+formType).show(); // Reveal the selected form
-      return false;
-   });
-});
-</script>
-<?php
+<?php if (!defined('APPLICATION')) exit();
+
 $Forms = $this->Data('Forms');
 // Loop through the form collection and write out the handles
-echo '<ul class="FormType">';
+$FormToggleMenu = new ToggleMenuModule();
 foreach ($Forms as $Form) {
-	$Name = GetValue('Name', $Form);
-	$Active = strtolower($Name) == strtolower($this->Data('CurrentFormName'));
-	$CssClass = 'Type-'.$Name;
-	if ($Active)
-		$CssClass .= ' Active';
-	echo '<li class="'.$CssClass.'">';
-		echo Anchor(
-			Wrap(GetValue('Label', $Form), 'strong'),
-			GetValue('Url', $Form)
-		);
-	echo '</li>';
+	$Code = GetValue('Name', $Form);
+   $Active = strtolower($Code) == strtolower($this->Data('CurrentFormName'));
+   if ($Active)
+      $FormToggleMenu->CurrentLabelCode($Code);
+   
+   $FormToggleMenu->AddLabel(GetValue('Label', $Form), $Code);
 }
-echo '</ul>';
+echo $FormToggleMenu->ToString();
 
 // Now loop through the form collection and dump the forms
 foreach ($Forms as $Form) {

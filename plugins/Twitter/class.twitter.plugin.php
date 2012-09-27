@@ -469,13 +469,16 @@ class TwitterPlugin extends Gdn_Plugin {
    }
    
    public function Base_GetConnections_Handler($Sender, $Args) {
+      $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
+      
       $Sender->Data['Connections'][self::ProviderKey] = array(
             'Icon' => '/plugins/Twitter/design/twitter_logo-64.png',
             'Name' => 'Twitter',
             'ProviderKey' => self::ProviderKey,
             'ConnectUrl' => '/entry/twauthorize/profile',
             'Profile' => array(
-                'Name' => GetValueR('User.Attributes.'.self::ProviderKey.'.Profile.screen_name', $Args)
+                'Name' => '@'.GetValue('screen_name', $Profile),
+                'Photo' => GetValue('profile_image_url', $Profile)
                 )
           );
    }

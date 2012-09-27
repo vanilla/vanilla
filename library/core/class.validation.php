@@ -288,7 +288,7 @@ class Gdn_Validation {
          $this->_FieldRules[$FieldName] = array_unique(array_merge($ExistingRules, $RuleName));
       }
    }
-
+   
 
    /**
     * Allows the explicit definition of a schema to use
@@ -493,7 +493,18 @@ class Gdn_Validation {
          return sprintf('Validation does not exist: %s.', $RuleName);
       }
    }
-
+   
+   public function UnapplyRule($FieldName, $RuleName = FALSE) {
+      if ($RuleName) {
+         if (isset($this->_FieldRules[$FieldName])) {
+            $Index = array_search($RuleName, $this->_FieldRules[$FieldName]);
+            
+            if ($Index !== FALSE)
+               unset($this->_FieldRules[$FieldName][$Index]);
+         }
+      } else
+         unset($this->_FieldRules[$FieldName]);
+   }
 
    /**
     * Examines the posted fields, defines $this->_ValidationFields, and

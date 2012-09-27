@@ -918,7 +918,7 @@ class CommentModel extends VanillaModel {
                continue;
             
             $Activity['NotifyUserID'] = $Bookmark->UserID;
-            $ActivityModel->Queue($Activity, 'BookmarkComment');
+            $ActivityModel->Queue($Activity, 'BookmarkComment', array('CheckRecord' => TRUE));
          }
 
          // Record user-comment activity.

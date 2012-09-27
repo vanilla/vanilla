@@ -3,6 +3,7 @@
 <style>
    .Conneciton-Header * {
       line-height: 48px;
+      position: relative;
    }
    
    .Connection-Name {
@@ -21,14 +22,25 @@
    }
    
    .DataList-Connections .Connection-Header {
-    overflow: hidden;
+      overflow: hidden;
+      position: relative;
+   }
+   
+   .DataList-Connections .ProfilePhoto {
+      vertical-align: text-bottom;
    }
 
    .Connection-Connect {
        position: absolute;
        right: 0;
-       top: 0;
-       padding: 20px 10px;
+       bottom: 0;
+       padding: 5px;
+   }
+
+   .Gloss.Connected {
+      position: absolute;
+      bottom: 5px;
+      left: 250px;
    }
 </style>
 

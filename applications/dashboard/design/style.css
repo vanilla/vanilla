@@ -320,7 +320,6 @@ select {
    min-width: 65px;
 }
 
-.NavButton:hover,
 .NavButton {
    color: #333;
    text-shadow: 0 0 1px #fff;
@@ -383,6 +382,10 @@ select {
     border-color: #000 transparent transparent transparent;
     position: relative;
     top: 2px;
+    margin: 0;
+    height: initial;
+    width: initial;
+    vertical-align: middle;
 }
 .ButtonGroup.Big .NavButton.Handle .Sprite,
 .ButtonGroup.Big .Button.Handle .Sprite {
@@ -1151,7 +1154,7 @@ overflow: hidden;
    float: right;
 }
 .PanelInfo .Heading {
-   color: #000;
+   /*color: #000;*/
    font-weight: bold;
 }
 .PanelInfo li strong {
@@ -3123,6 +3126,7 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 
 /* 16px Sprites White */
 .SpDashboard,
+.SpOptions,
 .SpCog { background-position: 0 -212px; }
 .SpSettings { background-position: -16px -212px; }
 .SpNotifications,

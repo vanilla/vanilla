@@ -186,13 +186,16 @@ class FacebookPlugin extends Gdn_Plugin {
 	}
    
    public function Base_GetConnections_Handler($Sender, $Args) {
+      $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
+      
       $Sender->Data['Connections'][self::ProviderKey] = array(
             'Icon' => '/plugins/Facebook/design/f_logo-64.png',
             'Name' => 'Facebook',
             'ProviderKey' => self::ProviderKey,
             'ConnectUrl' => $this->AuthorizeUri(FALSE, self::ProfileConnecUrl()),
             'Profile' => array(
-               'Name' => GetValueR('User.Attributes.'.self::ProviderKey.'.Profile.name', $Args)
+               'Name' => GetValue('name', $Profile),
+               'Photo' => "http://graph.facebook.com/{$Profile['id']}/picture"
                )
           );
    }

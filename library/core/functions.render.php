@@ -63,7 +63,7 @@ if (!function_exists('ButtonGroup')):
       if (is_array($CssClass))
          list($CssClass, $ButtonClass) = $CssClass;
       
-      if ($Default) {
+      if ($Default && count($Links) > 1) {
          if (is_array($Default)) {
             $DefaultText = $Default['Text'];
             $Default = $Default['Url'];

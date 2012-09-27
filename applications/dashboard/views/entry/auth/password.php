@@ -10,7 +10,7 @@
    <ul>
       <li>
          <?php
-            echo $this->Form->Label('Email/Username', 'Email');
+            echo $this->Form->Label(UserModel::SigninLabelCode(), 'Email');
             echo $this->Form->TextBox('Email');
          ?>
       </li>

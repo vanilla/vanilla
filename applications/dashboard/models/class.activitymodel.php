@@ -1159,6 +1159,17 @@ class ActivityModel extends Gdn_Model {
             $Activity = $this->MergeActivities($GroupActivity, $Activity);
             $NotificationInc = 0;
          }
+      } elseif (GetValue('CheckRecord', $Options)) {
+         // Check to see if this record already notified so we don't notify multiple times.
+         $Where = ArrayTranslate($Activity, array('NotifyUserID', 'RecordType', 'RecordID'));
+         $Where['DateUpdated >'] = Gdn_Format::ToDateTime(strtotime('-2 days')); // index hint
+         
+         $CheckActivity = $this->SQL->GetWhere(
+            'Activity',
+            $Where)->FirstRow();
+         
+         if ($CheckActivity)
+            return FALSE;
       }
       
       $Delete = FALSE;

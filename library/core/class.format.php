@@ -834,14 +834,16 @@ class Gdn_Format {
    public static function Image($Body) {
       $Image = @unserialize($Body);
       if (!$Image) 
-         return Format::PlainText($Body);
+         return Gdn_Format::Html($Body);
       
       $Url = GetValue('Image', $Image);
-      $Caption = GetValue('Caption', $Image);
-      return Wrap(
-         Img($Url).Wrap($Caption, 'div class="Caption"'), 
-         'div class="Image"'
-      ); 
+      $Caption = Gdn_Format::PlainText(GetValue('Caption', $Image));
+      return '<div class="ImageWrap">'
+         .'<div class="Image">'
+            .Img($Url, array('alt' => $Caption, 'title' => $Caption))
+         .'</div>'
+         .'<div class="Caption">'.$Caption.'</div>'
+      .'</div>';
    }
    
    /**

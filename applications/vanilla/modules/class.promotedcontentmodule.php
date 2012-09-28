@@ -32,10 +32,17 @@ class PromotedContentModule extends Gdn_Module {
    public $Selection;
    
    /**
-    * How many discussions should be fetched
+    * How much content should be fetched
     * @var integer
     */
-   public $Limit = 10;
+   public $Limit = 9;
+   
+   /**
+    * How often should we encapsulate content in groups
+    * Groups of: n
+    * @var integer
+    */
+   public $Group = 3;
    
    /**
     * How long do we cache?

@@ -89,7 +89,7 @@ class PromotedContentModule extends Gdn_Module {
       // Check cache
       $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleID}";
       $Content = Gdn::Cache()->Get($SelectorRoleCacheKey);
-      //$Content = FALSE;
+      $Content = FALSE;
       
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
       
@@ -117,10 +117,10 @@ class PromotedContentModule extends Gdn_Module {
             ->Limit($this->Limit)
             ->Get()->Result(DATASET_TYPE_ARRAY);
          
-         $this->AttachCategory($Comments);
+         $this->JoinCategory($Comments);
          
          // Interleave
-         $Content = $this->Interleave('DateInserted', $this->Limit, array(
+         $Content = $this->Union('DateInserted', array(
             'Discussion'   => $Discussions, 
             'Comment'      => $Comments
          ));
@@ -133,6 +133,7 @@ class PromotedContentModule extends Gdn_Module {
       }
       
       $this->Security($Content);
+      $this->Condense($Content, $this->Limit);
       return $Content;
    }
    
@@ -176,10 +177,10 @@ class PromotedContentModule extends Gdn_Module {
             ->Limit($this->Limit)
             ->Get()->Result(DATASET_TYPE_ARRAY);
          
-         $this->AttachCategory($Comments);
+         $this->JoinCategory($Comments);
          
          // Interleave
-         $Content = $this->Interleave('DateInserted', $this->Limit, array(
+         $Content = $this->Union('DateInserted', array(
             'Discussion'   => $Discussions, 
             'Comment'      => $Comments
          ));
@@ -192,6 +193,7 @@ class PromotedContentModule extends Gdn_Module {
       }
       
       $this->Security($Content);
+      $this->Condense($Content, $this->Limit);
       return $Content;
    }
    
@@ -234,10 +236,10 @@ class PromotedContentModule extends Gdn_Module {
             ->Limit($this->Limit)
             ->Get()->Result(DATASET_TYPE_ARRAY);
          
-         $this->AttachCategory($Comments);
+         $this->JoinCategory($Comments);
          
          // Interleave
-         $Content = $this->Interleave('DateInserted', $this->Limit, array(
+         $Content = $this->Union('DateInserted', array(
             'Discussion'   => $Discussions, 
             'Comment'      => $Comments
          ));
@@ -250,6 +252,7 @@ class PromotedContentModule extends Gdn_Module {
       }
       
       $this->Security($Content);
+      $this->Condense($Content, $this->Limit);
       return $Content;
    }
    
@@ -286,10 +289,10 @@ class PromotedContentModule extends Gdn_Module {
             ->Limit($this->Limit)
             ->Get()->Result(DATASET_TYPE_ARRAY);
          
-         $this->AttachCategory($Comments);
+         $this->JoinCategory($Comments);
          
          // Interleave
-         $Content = $this->Interleave('DateInserted', $this->Limit, array(
+         $Content = $this->Union('DateInserted', array(
             'Discussion'   => $Discussions, 
             'Comment'      => $Comments
          ));
@@ -302,6 +305,7 @@ class PromotedContentModule extends Gdn_Module {
       }
       
       $this->Security($Content);
+      $this->Condense($Content, $this->Limit);
       return $Content;
    }
    
@@ -310,7 +314,7 @@ class PromotedContentModule extends Gdn_Module {
     * 
     * @param array $Comments
     */
-   protected function AttachCategory(&$Comments) {
+   protected function JoinCategory(&$Comments) {
       $DiscussionIDs = array();
       
       foreach ($Comments as &$Comment)
@@ -337,11 +341,10 @@ class PromotedContentModule extends Gdn_Module {
     * Interleave two or more result arrays by a common field
     * 
     * @param string $Field
-    * @param integer $Limit How many items are we condensing down to?
     * @param array $Sections Array of result arrays
     * @return array
     */
-   protected function Interleave($Field, $Limit, $Sections) {
+   protected function Union($Field, $Sections) {
       if (!is_array($Sections)) return;
       
       $Interleaved = array();
@@ -353,11 +356,10 @@ class PromotedContentModule extends Gdn_Module {
             $Interleaved[$ItemField] = array_merge($Item, array('ItemType' => $SectionType));
             
             ksort($Interleaved);
-            if (sizeof($Interleaved) > $Limit)
-               $Interleaved = array_slice($Interleaved, 0, $Limit);
          }
       }
       
+      $Interleaved = array_reverse($Interleaved);
       return $Interleaved;
    }
    
@@ -420,6 +422,16 @@ class PromotedContentModule extends Gdn_Module {
             continue;
          }
       }
+   }
+   
+   /**
+    * Condense an interleaved content list down to the required size
+    * 
+    * @param array $Content
+    * @param array $Limit
+    */
+   protected function Condense(&$Content, $Limit) {
+      $Content = array_slice($Content, 0, $Limit);
    }
    
    public function AssetTarget() {

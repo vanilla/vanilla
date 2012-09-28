@@ -35,6 +35,15 @@ function WritePromotedContent($Content, $Sender) {
    $ContentType = GetValue('ItemType', $Content);
    $ContentID = GetValue("{$ContentType}ID", $Content);
    $Author = GetValue('Author', $Content);
+   
+   switch (strtolower($ContentType)) {
+      case 'comment':
+         $ContentURL = CommentUrl($Content);
+         break;
+      case 'discussion':
+         $ContentURL = DiscussionUrl($Content);
+         break;
+   }
 ?>
    <li id="<?php echo "Promoted_{$ContentType}_{$ContentID}"; ?>" class="<?php echo CssClass($Content); ?>">
       <div class="AuthorWrap">
@@ -70,7 +79,7 @@ function WritePromotedContent($Content, $Sender) {
          $Sender->FireEvent('ContentInfo');
          ?>
       </div>
-      <div class="Title"><?php echo Anchor(Gdn_Format::Text($Content['Name'], FALSE), DiscussionUrl($Content), 'DiscussionLink'); ?></div>
+      <div class="Title"><?php echo Anchor(Gdn_Format::Text($Content['Name'], FALSE), $ContentURL, 'DiscussionLink'); ?></div>
       <div class="Body"><?php echo strip_tags(Gdn_Format::To($Content['Body'], $Content['Format'])); ?></div>
    </li>
 <?php   

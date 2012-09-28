@@ -1,17 +1,29 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once $this->FetchViewLocation('helper_functions');
 
-if (!isset($this->Prefix))
-   $this->Prefix = 'Promoted';
-
 ?>
 <div class="Box BoxPromoted">
    <h4><?php echo T('Promoted Content'); ?></h4>
-   <ul class="PanelInfo DataList">
+   <div class="PanelInfo DataList">
       <?php
-      foreach ($this->Data('Content') as $Content):
-         WritePromotedContent($Content, $this);
+      $Content = $this->Data('Content');
+      $ContentItems = sizeof($Content);
+      
+      if ($this->Group):
+         $Content = array_chunk($Content, $this->Group);
+      endif;
+      
+      foreach ($Content as $ContentChunk):
+         if ($this->Group):
+            echo '<div class="PromotedGroup">';
+            foreach ($ContentChunk as $ContentItem):
+               WritePromotedContent($ContentItem, $this);
+            endforeach;
+            echo '</div>';
+         else:
+            WritePromotedContent($ContentChunk, $this);
+         endif;
       endforeach;
       ?>
-   </ul>
+   </div>
 </div>

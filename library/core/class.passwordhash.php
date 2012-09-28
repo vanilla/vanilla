@@ -135,6 +135,10 @@ class Gdn_PasswordHash extends PasswordHash {
          case 'yaf':
             $Result = $this->CheckYaf($Password, $StoredHash);
             break;
+         case 'webwiz':
+            require_once PATH_LIBRARY.'/vendors/misc/functions.webwizhash.php';
+            $Result = ww_CheckPassword($Password, $StoredHash);
+            break;
          case 'vanilla':
          default:
             $Result = $this->CheckVanilla($Password, $StoredHash);

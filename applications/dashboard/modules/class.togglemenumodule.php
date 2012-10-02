@@ -41,11 +41,14 @@ class ToggleMenuModule extends Gdn_Module {
          $Code = GetValue('Code', $Label, '');
          $Active = strcasecmp($Code, $this->CurrentLabelCode()) == 0;
          $CssClass = 'Handle-'.$Code;
-         if ($Active)
+         $AnchorClass = '';
+         if ($Active) {
             $CssClass .= ' Active';
+            $AnchorClass = 'TextColor';
+         }
 
          $Return .= '<li class="'.$CssClass.'">';
-            $Return .= Anchor($Name, $Url);
+            $Return .= Anchor($Name, $Url, $AnchorClass);
          $Return .= '</li>';
       }
       $Return .= '</ul>';   

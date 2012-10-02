@@ -292,7 +292,7 @@ class CategoriesController extends VanillaController {
       else
          $this->Title(T('All Categories'));
       $this->Description(C('Garden.Description', NULL));
-      Gdn_Theme::Section('DiscussionList');
+      Gdn_Theme::Section('CategoryDiscussionList');
       
 		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
 		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);

@@ -370,9 +370,10 @@ select {
    border-left: 0;
 }
 .NavButton.Handle {
-    border-radius: 0 2px 2px 0;
-    border-left: 0;
-    margin: 0;
+   border-top-left-radius: 0;
+   border-bottom-left-radius: 0;
+   border-left: 0;
+   margin: 0;
 }
 .NavButton.Handle .Sprite,
 .Button.Handle .Sprite {
@@ -1230,7 +1231,6 @@ overflow: hidden;
 	padding: 4px 0;
 }
 #Content .FilterMenu li.Active a {
-	color: #000;
 	border-bottom: 2px solid #ddd;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
@@ -2349,8 +2349,7 @@ tr.CategoryHeading td {
 .SpNewConversation,
 .SpAskQuestion,
 .SpNewPoll,
-.SpNewDiscussion,
-.SpWarn {
+.SpNewDiscussion {
 	display: inline-block;
 	height: 16px;
 	width: 16px;
@@ -2367,12 +2366,6 @@ tr.CategoryHeading td {
    height: 14px;
    vertical-align: middle;
    width: 14px;
-}
-
-.SpWarn {
-   background-position: -96px -84px;
-   background-image: url('images/sprites.png') !important;
-   width: 18px;
 }
 
 /*

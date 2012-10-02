@@ -495,8 +495,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $PluginName = GetValue($AccessName, $this->PluginsByClass, FALSE);
          break;
       }
-
-      return ($PluginName !== FALSE) ? GetValue($PluginName, $this->AvailablePlugins(), FALSE) : FALSE;
+      $Available = $this->AvailablePlugins();
+      return ($PluginName !== FALSE) ? GetValue($PluginName, $Available, FALSE) : FALSE;
    }
 
    /**

@@ -1794,6 +1794,7 @@ class DiscussionModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
 	public function AddView($DiscussionID) {
+      
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
          $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);
@@ -1807,7 +1808,7 @@ class DiscussionModel extends VanillaModel {
          
          // Every X views, writeback to Discussions
          if (($Views % $WritebackLimit) == 0) {
-            $IncrementBy = floor($Views / $WritebackLimit);
+            $IncrementBy = floor($Views / $WritebackLimit) * $WritebackLimit;
             Gdn::Cache()->Decrement($CacheKey, $IncrementBy);
          }
       } else {
@@ -1821,6 +1822,7 @@ class DiscussionModel extends VanillaModel {
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
       }
+      
 	}
 
    /**

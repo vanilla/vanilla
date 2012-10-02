@@ -130,7 +130,7 @@ class ConversationsHooks implements Gdn_IPlugin {
    public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
       if (!$Sender->EditMode && Gdn::Session()->IsValid() && Gdn::Session()->UserID != $Sender->User->UserID)
          $Sender->EventArguments['MemberOptions'][] = array(
-            'Text' => Sprite('SpMessage').T('Message'),
+            'Text' => Sprite('SpMessage').' '.T('Message'),
             'Url' => '/messages/add/'.$Sender->User->Name,
             'CssClass' => 'MessageUser'
          );

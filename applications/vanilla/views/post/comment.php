@@ -7,7 +7,7 @@ $this->EventArguments['FormCssClass'] = 'MessageForm CommentForm FormTitleWrappe
 
 // Create a menu to toggle through the available forms.
 $FormToggleMenu = new ToggleMenuModule();
-$FormToggleMenu->AddLabel(Sprite('SpNewComment').' '.T('Comment'), 'CommentForm');
+$FormToggleMenu->AddLabel(Sprite('SpText').' '.T('Text'), 'CommentForm');
 $FormToggleMenu->CurrentLabelCode('CommentForm');
 $this->EventArguments['FormToggleMenu'] = &$FormToggleMenu;
 $this->FireEvent('BeforeCommentForm');

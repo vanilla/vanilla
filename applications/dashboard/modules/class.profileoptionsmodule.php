@@ -39,13 +39,13 @@ class ProfileOptionsModule extends Gdn_Module {
          if ($Session->CheckPermission('Garden.Moderation.Manage') && $UserID != $Session->UserID) {
             // Ban/Unban
             if ($Controller->User->Banned) {
-               $ProfileOptions[] = array('Text' => Sprite('SpBan').T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
+               $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
             } else {
-               $ProfileOptions[] = array('Text' => Sprite('SpBan').T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');
+               $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');
             }
 
             // Delete content.
-            $ProfileOptions[] = array('Text' => Sprite('SpDelete').T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
+            $ProfileOptions[] = array('Text' => Sprite('SpDelete').' '.T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
          }
       }
       return parent::ToString();

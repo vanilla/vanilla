@@ -2748,6 +2748,20 @@ if (!function_exists('TouchValue')) {
 	}
 }
 
+if (!function_exists('TouchFolder')) {
+   /**
+    * Ensure that a folder exists.
+    * 
+    * @param string $Path
+    * @param int $Perms
+    * @since 2.1
+    */
+   function TouchFolder($Path, $Perms = 0777) {
+      if (!file_exists($Path))
+         mkdir($Path, $Perms, TRUE);
+   }
+}
+
 if (!function_exists('Trace')) {
    function Trace($Value = NULL, $Type = TRACE_INFO) {
       static $Traces = array();

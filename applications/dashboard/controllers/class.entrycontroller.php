@@ -309,12 +309,14 @@ class EntryController extends Gdn_Controller {
          return $this->Render('ConnectError');
       }
       
-      if (!$this->Form->GetFormValue('Email') || $this->Form->GetFormValue('EmailVisible')) {
-         $this->Form->SetFormValue('EmailVisible', TRUE);
-         $this->Form->AddHidden('EmailVisible', TRUE);
-         
-         if ($IsPostBack) {
-            $this->Form->SetFormValue('Email', GetValue('Email', $CurrentData));
+      if (!UserModel::NoEmail()) {
+         if (!$this->Form->GetFormValue('Email') || $this->Form->GetFormValue('EmailVisible')) {
+            $this->Form->SetFormValue('EmailVisible', TRUE);
+            $this->Form->AddHidden('EmailVisible', TRUE);
+
+            if ($IsPostBack) {
+               $this->Form->SetFormValue('Email', GetValue('Email', $CurrentData));
+            }
          }
       }
 
@@ -479,8 +481,13 @@ class EntryController extends Gdn_Controller {
          }
 
          $this->SetData('ExistingUsers', $ExistingUsers);
+         
+         if (UserModel::NoEmail())
+            $EmailValid = TRUE;
+         else
+            $EmailValid = ValidateRequired($this->Form->GetFormValue('Email'));
 
-         if ($this->Form->GetFormValue('Name') && ValidateRequired($this->Form->GetFormValue('Email')) && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
+         if ($this->Form->GetFormValue('Name') && $EmailValid && (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
             // There is no existing user with the suggested name so we can just create the user.
             $User = $this->Form->FormValues();
             $User['Password'] = RandomString(50); // some password is required

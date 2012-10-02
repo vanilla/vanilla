@@ -264,6 +264,21 @@ if (!function_exists('Anchor')) {
    }
 }
 
+if (!function_exists('CommentUrl')):
+
+/**
+ * Return a url for a comment. This function is in here and not functions.general so that plugins can override.
+ * @param object $Comment
+ * @return string
+ */
+function CommentUrl($Comment, $WithDomain = TRUE) {
+   $Comment = (object)$Comment;
+   $Result = "/discussion/comment/{$Comment->CommentID}#Comment_{$Comment->CommentID}";
+   return Url($Result, $WithDomain);
+}
+   
+endif;
+
 if (!function_exists('DiscussionUrl')):
 
 /**

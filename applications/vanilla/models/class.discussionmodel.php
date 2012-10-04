@@ -295,7 +295,7 @@ class DiscussionModel extends VanillaModel {
       
       if($Perms !== TRUE) {
          if (isset($Where['d.CategoryID'])) {
-            $Where['d.CategoryID'] = array_intersect((array)$Where['d.CategoryID'], $Perms);
+            $Where['d.CategoryID'] = array_values(array_intersect((array)$Where['d.CategoryID'], $Perms));
          } else {
             $Where['d.CategoryID'] = $Perms;
          }

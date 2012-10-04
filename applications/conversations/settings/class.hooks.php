@@ -100,29 +100,29 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @access public
     */
-   public function ProfileController_AddProfileTabs_Handler($Sender) {
-      if (Gdn::Session()->IsValid()) {
-         $Inbox = T('Inbox');
-         $InboxHtml = Sprite('SpInbox').$Inbox;
-         $InboxLink = '/messages/all';
-         
-         if (Gdn::Session()->UserID != $Sender->User->UserID) {
-            if (C('Conversations.Moderation.Allow', FALSE) && Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
-               $CountUnread = $Sender->User->CountUnreadConversations;
-               $InboxLink .= "?userid={$Sender->User->UserID}";
-            } else {
-               return;
-            }
-         } else {
-            // Nothing
-            $CountUnread = Gdn::Session()->User->CountUnreadConversations;
-         }
-         
-         if (is_numeric($CountUnread) && $CountUnread > 0)
-            $InboxHtml .= ' <span class="Aside"><span class="Count">'.$CountUnread.'</span></span>';
-         $Sender->AddProfileTab($Inbox, $InboxLink, 'Inbox', $InboxHtml);
-      }
-   }
+//   public function ProfileController_AddProfileTabs_Handler($Sender) {
+//      if (Gdn::Session()->IsValid()) {
+//         $Inbox = T('Inbox');
+//         $InboxHtml = Sprite('SpInbox').' '.$Inbox;
+//         $InboxLink = '/messages/all';
+//         
+//         if (Gdn::Session()->UserID != $Sender->User->UserID) {
+//            if (C('Conversations.Moderation.Allow', FALSE) && Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
+//               $CountUnread = $Sender->User->CountUnreadConversations;
+//               $InboxLink .= "?userid={$Sender->User->UserID}";
+//            } else {
+//               return;
+//            }
+//         } else {
+//            // Nothing
+//            $CountUnread = Gdn::Session()->User->CountUnreadConversations;
+//         }
+//         
+//         if (is_numeric($CountUnread) && $CountUnread > 0)
+//            $InboxHtml .= ' <span class="Aside"><span class="Count">'.$CountUnread.'</span></span>';
+//         $Sender->AddProfileTab($Inbox, $InboxLink, 'Inbox', $InboxHtml);
+//      }
+//   }
    
    /**
     * Add "Message" option to profile options.

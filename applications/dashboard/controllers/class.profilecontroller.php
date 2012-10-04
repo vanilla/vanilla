@@ -1139,9 +1139,9 @@ class ProfileController extends Gdn_Controller {
 //              $this->AddJsFile('jquery.gardenmorepager.js');
            $this->AddJsFile('user.js');
          }
-         $Module->AddLink('Options', Sprite('SpEdit').T('Edit Profile'), UserUrl($this->User, '', 'edit'), FALSE, array('class' => 'Popup EditAccountLink'));
-         $Module->AddLink('Options', Sprite('SpEdit').T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
-         $Module->AddLink('Options', Sprite('SpDelete').T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
+         $Module->AddLink('Options', Sprite('SpProfile').' '.T('Edit Profile'), UserUrl($this->User, '', 'edit'), FALSE, array('class' => 'Popup EditAccountLink'));
+         $Module->AddLink('Options', Sprite('SpProfile').' '.T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
+         $Module->AddLink('Options', Sprite('SpDelete').' '.T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
       } else {
          // Add profile options for the profile owner
          // Don't allow account editing if it has been turned off.
@@ -1159,20 +1159,20 @@ class ProfileController extends Gdn_Controller {
             $passwordLabel = T('Change My Password');
             if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")
                $passwordLabel = T('Set A Password');
-            $Module->AddLink('Options', Sprite('SpPassword').$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
+            $Module->AddLink('Options', Sprite('SpPassword').' '.$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
          }
       }
       
-      $Module->AddLink('Options', Sprite('SpPreferences').T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
+      $Module->AddLink('Options', Sprite('SpNotifications').' '.T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
 
       // Add profile options for everyone
-      $Module->AddLink('Options', Sprite('SpPicture').T('Change Picture'), UserUrl($this->User, '', 'picture'), 'Garden.Users.Edit', array('class' => 'PictureLink'));
+      $Module->AddLink('Options', Sprite('SpPhoto').' '.T('Change Picture'), UserUrl($this->User, '', 'picture'), 'Garden.Users.Edit', array('class' => 'PictureLink'));
       if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-         $Module->AddLink('Options', Sprite('SpThumbnail').T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
+         $Module->AddLink('Options', Sprite('SpImage SpThumbnail').' '.T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
       }
       
       if ($this->User->Photo != '' && $AllowImages)
-         $Module->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'),$Session->TransientKey())), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
+         $Module->AddLink('Options', Sprite('SpDelete').' '.T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'),$Session->TransientKey())), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
    
       
       if ($this->User->UserID == $ViewingUserID || $Session->CheckPermission('Garden.Users.Edit')) {
@@ -1180,7 +1180,7 @@ class ProfileController extends Gdn_Controller {
          $this->EventArguments['User'] = $this->User;
          $this->FireEvent('GetConnections');
          if (count($this->Data('Connections')) > 0) {
-            $Module->AddLink('Options', Sprite('SpConnection').T('Connections'), '/profile/connections', 'Garden.SignIn.Allow');
+            $Module->AddLink('Options', Sprite('SpConnection').' '.T('Connections'), '/profile/connections', 'Garden.SignIn.Allow');
          }
       }
    }
@@ -1217,12 +1217,12 @@ class ProfileController extends Gdn_Controller {
          
          // Show activity?
          if (C('Garden.Profile.ShowActivities', TRUE))
-            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity', Sprite('SpActivity').T('Activity'));
+            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity', Sprite('SpActivity').' '.T('Activity'));
             
          // Show notifications?
          if ($this->User->UserID == $Session->UserID) {
             $Notifications = T('Notifications');
-            $NotificationsHtml = Sprite('SpNotifications').$Notifications;
+            $NotificationsHtml = Sprite('SpNotifications').' '.$Notifications;
             $CountNotifications = $Session->User->CountNotifications;
             if (is_numeric($CountNotifications) && $CountNotifications > 0)
                $NotificationsHtml .= ' <span class="Aside"><span class="Count">'.$CountNotifications.'</span></span>';

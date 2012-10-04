@@ -8,7 +8,7 @@
    echo ButtonGroup($Controller->EventArguments['MemberOptions'], 'NavButton MemberButtons');
    echo ' ';
    echo ButtonGroup($Controller->EventArguments['ProfileOptions'], 'NavButton ProfileButtons',
-      array('Text' => Sprite('Sprite16 SpEditProfile'), 'Url' => FALSE) 
+      array('Text' => Sprite('SpEditProfile', 'Sprite16'), 'Url' => FALSE) 
    );
    ?>
 </div>

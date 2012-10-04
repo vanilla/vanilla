@@ -57,13 +57,11 @@ class PromotedContentModule extends Gdn_Module {
    }
    
    public function GetData() {
+      $this->SetData('Content', FALSE);
       $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
       if (method_exists($this, $SelectorMethod)) {
          $this->SetData('Content', call_user_func(array($this, $SelectorMethod), $this->Selection));
-         return TRUE;
       }
-      
-      $this->SetData('Content', FALSE);
    }
    
    /**
@@ -96,7 +94,6 @@ class PromotedContentModule extends Gdn_Module {
       // Check cache
       $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleID}";
       $Content = Gdn::Cache()->Get($SelectorRoleCacheKey);
-      $Content = FALSE;
       
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
       

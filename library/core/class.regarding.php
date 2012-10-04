@@ -196,15 +196,17 @@ class Gdn_Regarding extends Gdn_Pluggable implements Gdn_IPlugin {
       try {
          $RegardingData = $this->RegardingModel()->GetID($RegardingID);
          $EntityModelName = ucfirst(GetValue('ForeignType',$RegardingData)).'Model';
-         $EntityModel = new $EntityModelName();
-         $Entity = $EntityModel->GetID(GetValue('ForeignID',$RegardingData));
-         $this->EventArguments = array_merge($this->EventArguments,array(
-            'EventSender'     => $Sender,
-            'Entity'          => $Entity,
-            'RegardingData'   => $RegardingData,
-            'Options'         => NULL
-         ));
-         $this->FireEvent('RegardingDisplay');
+         if (class_exists($EntityModelName)) {
+            $EntityModel = new $EntityModelName();
+            $Entity = $EntityModel->GetID(GetValue('ForeignID',$RegardingData));
+            $this->EventArguments = array_merge($this->EventArguments,array(
+               'EventSender'     => $Sender,
+               'Entity'          => $Entity,
+               'RegardingData'   => $RegardingData,
+               'Options'         => NULL
+            ));
+            $this->FireEvent('RegardingDisplay');
+         }
       } catch (Exception $e) {}
    }
 

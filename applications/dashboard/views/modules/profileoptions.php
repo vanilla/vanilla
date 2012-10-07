@@ -7,8 +7,9 @@
    $Controller->FireEvent('BeforeProfileOptions');
    echo ButtonGroup($Controller->EventArguments['MemberOptions'], 'NavButton MemberButtons');
    echo ' ';
-   echo ButtonGroup($Controller->EventArguments['ProfileOptions'], 'NavButton ProfileButtons',
-      array('Text' => Sprite('SpEditProfile', 'Sprite16'), 'Url' => FALSE) 
+   echo ButtonDropDown($Controller->EventArguments['ProfileOptions'], 
+      'NavButton ProfileButtons',
+      Sprite('SpEditProfile', 'Sprite16')
    );
    ?>
 </div>

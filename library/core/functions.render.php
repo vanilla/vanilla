@@ -42,6 +42,47 @@ if (!function_exists('Bullet')):
    }
 endif;
 
+if (!function_exists('ButtonDropDown')):
+   /**
+    *
+    * @param array $Links An array of arrays with the following keys:
+    *  - Text: The text of the link.
+    *  - Url: The url of the link.
+    * @param string|array $CssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
+    * @param string $Label The text of the button.
+    * @since 2.1
+    */
+   function ButtonDropDown($Links, $CssClass = 'Button', $Label = FALSE) {
+      if (!is_array($Links) || count($Links) < 1)
+         return;
+      
+      $ButtonClass = '';
+      if (is_array($CssClass))
+         list($CssClass, $ButtonClass) = $CssClass;
+      
+      if (count($Links) < 2) {
+         echo Anchor($Text, $Url, $CssClass);
+      } else {
+         // NavButton or Button?
+         $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== FALSE ? 'NavButton' : 'Button');
+         if (strpos($CssClass, 'Primary') !== FALSE)
+            $ButtonClass .= ' Primary';
+         // Strip "Button" or "NavButton" off the group class.
+         echo '<div class="ButtonGroup'.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
+//            echo Anchor($Text, $Url, $ButtonClass);
+            
+            echo '<ul class="Dropdown MenuItems">';
+               foreach ($Links as $Link) {
+                  echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
+               }
+            echo '</ul>';
+            
+            echo Anchor($Label.' '.Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+         echo '</div>';
+      }
+   }
+endif;
+
 if (!function_exists('ButtonGroup')):
    /**
     *
@@ -91,18 +132,20 @@ if (!function_exists('ButtonGroup')):
          if (strpos($CssClass, 'Primary') !== FALSE)
             $ButtonClass .= ' Primary';
          // Strip "Button" or "NavButton" off the group class.
-         echo '<div class="ButtonGroup '.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
+         echo '<div class="ButtonGroup Multi '.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
             echo Anchor($Text, $Url, $ButtonClass);
-            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+            
             echo '<ul class="Dropdown MenuItems">';
                foreach ($Links as $Link) {
                   echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
                }
             echo '</ul>';
+            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+            
          echo '</div>';
       }
    }
-endif; 
+endif;
 
 if (!function_exists('CategoryUrl')):
 

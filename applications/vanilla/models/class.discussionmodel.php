@@ -27,6 +27,8 @@ class DiscussionModel extends VanillaModel {
 
    public $Watching = FALSE;
    
+   const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
+   
    /**
     * Class constructor. Defines the related database table name.
     * 
@@ -486,24 +488,33 @@ class DiscussionModel extends VanillaModel {
       }
    }
    
+   /**
+    * Add denormalized views to discussions
+    * 
+    * WE NO LONGER NEED THIS SINCE THE LOGIC HAS BEEN CHANGED.
+    * 
+    * @deprecated since version 2.1.26a
+    * @param type $Discussions
+    */
    public function AddDenormalizedViews(&$Discussions) {
-      if ($Discussions instanceof Gdn_DataSet) {
-         $Result = $Discussions->Result();
-         foreach($Result as &$Discussion) {
-            $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
-            $CacheViews = Gdn::Cache()->Get($CacheKey);
-            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
-               $Discussion->CountViews = $CacheViews;
-         }
-      } else {
-         if (isset($Discussions->DiscussionID)) {
-            $Discussion = $Discussions;
-            $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
-            $CacheViews = Gdn::Cache()->Get($CacheKey);
-            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
-               $Discussion->CountViews = $CacheViews;
-         }
-      }
+      
+//      if ($Discussions instanceof Gdn_DataSet) {
+//         $Result = $Discussions->Result();
+//         foreach($Result as &$Discussion) {
+//            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
+//            $CacheViews = Gdn::Cache()->Get($CacheKey);
+//            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+//               $Discussion->CountViews = $CacheViews;
+//         }
+//      } else {
+//         if (isset($Discussions->DiscussionID)) {
+//            $Discussion = $Discussions;
+//            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
+//            $CacheViews = Gdn::Cache()->Get($CacheKey);
+//            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+//               $Discussion->CountViews += $CacheViews;
+//         }
+//      }
    }
 	
 	/**
@@ -1783,8 +1794,10 @@ class DiscussionModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
 	public function AddView($DiscussionID) {
+      
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
-         $CacheKey = "QueryCache.Discussion.{$DiscussionID}.CountViews";
+         $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
+         $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);
          
          // Increment. If not success, create key.
          $Views = Gdn::Cache()->Increment($CacheKey);
@@ -1794,16 +1807,22 @@ class DiscussionModel extends VanillaModel {
          }
          
          // Every X views, writeback to Discussions
-         if (($Views % C('Vanilla.Views.DenormalizeWriteback', 100)) == 0) {
-            $this->SetField($DiscussionID, 'CountViews', $Views);
+         if (($Views % $WritebackLimit) == 0) {
+            $IncrementBy = floor($Views / $WritebackLimit) * $WritebackLimit;
+            Gdn::Cache()->Decrement($CacheKey, $IncrementBy);
          }
       } else {
+         $IncrementBy = 1;
+      }
+      
+      if ($IncrementBy) {
          $this->SQL
             ->Update('Discussion')
-            ->Set('CountViews', 'CountViews + 1', FALSE)
+            ->Set('CountViews', "CountViews + {$IncrementBy}", FALSE)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
       }
+      
 	}
 
    /**

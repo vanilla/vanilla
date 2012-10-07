@@ -548,10 +548,8 @@ class VanillaHooks implements Gdn_IPlugin {
          }
       }
       
-      if ($DiscussionID) {
+      if ($DiscussionID)
          $DiscussionModel->AddView($DiscussionID);
-         Gdn::Controller()->SetData('Discussion.CountViews', array('DiscussionID' => $DiscussionID, 'Inc' => 1));
-      }
    }
    
    /**

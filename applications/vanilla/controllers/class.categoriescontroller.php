@@ -123,7 +123,7 @@ class CategoriesController extends VanillaController {
          Gdn_Theme::Section($Category->CssClass);
 				
 			// Load the breadcrumbs.
-			$this->SetData('Breadcrumbs', array_merge(array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category))));
+			$this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
 			
 			$this->SetData('Category', $Category, TRUE);
          

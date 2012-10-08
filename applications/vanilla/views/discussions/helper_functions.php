@@ -83,6 +83,7 @@ if (!function_exists('WriteDiscussion')):
 function WriteDiscussion($Discussion, &$Sender, &$Session) {
    $CssClass = CssClass($Discussion);
    $DiscussionUrl = $Discussion->Url;
+   $Category = CategoryModel::Categories($Discussion->CategoryID);
    
    if ($Session->UserID)
       $DiscussionUrl .= '#latest';
@@ -175,8 +176,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
                echo '</span> ';
             }
          
-            if (C('Vanilla.Categories.Use') && $Discussion->CategoryUrlCode != '')
-               echo Wrap(Anchor($Discussion->Category, CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category'));
+            if (C('Vanilla.Categories.Use') && $Category)
+               echo Wrap(Anchor($Discussion->Category, CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category '.$Category['CssClass']));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>

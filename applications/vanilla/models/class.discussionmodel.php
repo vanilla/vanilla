@@ -295,7 +295,7 @@ class DiscussionModel extends VanillaModel {
       
       if($Perms !== TRUE) {
          if (isset($Where['d.CategoryID'])) {
-            $Where['d.CategoryID'] = array_intersect((array)$Where['d.CategoryID'], $Perms);
+            $Where['d.CategoryID'] = array_values(array_intersect((array)$Where['d.CategoryID'], $Perms));
          } else {
             $Where['d.CategoryID'] = $Perms;
          }
@@ -1786,10 +1786,8 @@ class DiscussionModel extends VanillaModel {
          
          // Increment. If not success, create key.
          $Views = Gdn::Cache()->Increment($CacheKey);
-         if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
-            $Views = $this->GetWhere(array('DiscussionID' => $DiscussionID))->Value('CountViews', 0);
-            Gdn::Cache()->Store($CacheKey, $Views);
-         }
+         if ($Views === Gdn_Cache::CACHEOP_FAILURE)
+            Gdn::Cache()->Store($CacheKey, 1);
          
          // Every X views, writeback to Discussions
          if (($Views % $WritebackLimit) == 0) {

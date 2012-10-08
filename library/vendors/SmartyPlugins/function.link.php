@@ -42,6 +42,7 @@ function smarty_function_link($Params, &$Smarty) {
    if (isset($Params['withdomain'])) $Options['WithDomain'] = $Params['withdomain'];
    if (isset($Params['class'])) $Options['class'] = $Params['class'];
    if (isset($Params['tk'])) $Options['TK'] = $Params['tk'];
+   if (isset($Params['target'])) $Options['Target'] = $Params['target'];
 
    $Result = Gdn_Theme::Link($Path, $Text, $Format, $Options);
 

@@ -148,6 +148,9 @@ class CategoryModel extends Gdn_Model {
          $Category['CountAllComments'] = $Category['CountComments'];
          $Category['Url'] = CategoryUrl($Category);
          $Category['ChildIDs'] = array();
+         
+         if (!$Category['CssClass'])
+            $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
 		}
       
       $Keys = array_reverse(array_keys($Data));

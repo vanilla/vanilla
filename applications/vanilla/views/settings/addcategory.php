@@ -37,6 +37,12 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
+         echo $this->Form->Label('Css Class', 'CssClass');
+         echo $this->Form->TextBox('CssClass', array('MultiLine' => FALSE));
+      ?>
+   </li>
+   <li>
+      <?php
       echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
       ?>
    </li>

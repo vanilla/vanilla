@@ -333,7 +333,7 @@ class ProfileController extends Gdn_Controller {
       
       // If seeing the form for the first time...
       if ($this->Form->IsPostBack()) {
-         $this->Form->SetValue('UserID', $UserID);
+         $this->Form->SetFormValue('UserID', $UserID);
          
          if (!$this->CanEditUsername)
             $this->Form->SetFormValue("Name", $User['Name']);

@@ -135,19 +135,15 @@ function WriteListItem($Row, $Depth = 1) {
             ?></span>
             
             <span class="MItem MItem-Count DiscussionCount"><?php
-               echo Plural(
-                  $Row['CountDiscussions'],
-                  '%s discussion',
-                  '%s discussions',
-                  Gdn_Format::BigNumber($Row['CountDiscussions'], 'html'));
+               printf(PluralTranslate($Row['CountDiscussions'], 
+                  '%s discussion html', '%s discussions html', '%s discussion', '%s discussions'),
+                  BigPlural($Row['CountDiscussions'], '%s discussion'));
             ?></span>
             
             <span class="MItem MItem-Count CommentCount"><?php
-               echo Plural(
-                  $Row['CountDiscussions'],
-                  '%s comment',
-                  '%s comments',
-                  Gdn_Format::BigNumber($Row['CountComments'], 'html'));
+               printf(PluralTranslate($Row['CountComments'], 
+                  '%s comment html', '%s comments html', '%s comment', '%s comments'),
+                  BigPlural($Row['CountComments'], '%s comment'));
             ?></span>
             
             <span class="MItem LastestPost LastDiscussionTitle"><?php

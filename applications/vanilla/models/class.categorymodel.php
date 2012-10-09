@@ -149,7 +149,7 @@ class CategoryModel extends Gdn_Model {
          $Category['Url'] = CategoryUrl($Category);
          $Category['ChildIDs'] = array();
          
-         if (!$Category['CssClass'])
+         if (!GetValue('CssClass', $Category))
             $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
 		}
       

@@ -304,6 +304,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var array
     */
    protected $_JsFiles;
+   
+   /**
+    * 
+    * @var array
+    */
+   protected $_Staches;
 
    /**
     * If JSON is going to be delivered to the client (see the render method),
@@ -374,6 +380,31 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->ControllerName = strtolower($this->ClassName);
    }
 
+   /**
+    * Add a breadcrumb to the list
+    * 
+    * @param string $Name Translation code
+    * @param string $Link Optional. Hyperlink this breadcrumb somewhere.
+    * @param string $Position Optional. Where in the list to add it? 'front', 'back'
+    */
+   public function AddBreadcrumb($Name, $Link = NULL, $Position = 'back') {
+      $Breadcrumb = array(
+         'Name'   => T($Name),
+         'Url'    => $Link
+      );
+      
+      $Breadcrumbs = $this->Data('Breadcrumbs', array());
+      switch ($Position) {
+         case 'back':
+            $Breadcrumbs = array_merge($Breadcrumbs, array($Breadcrumb));
+            break;
+         case 'front':
+            $Breadcrumbs = array_merge(array($Breadcrumb), $Breadcrumbs);
+            break;
+      }
+      $this->SetData('Breadcrumbs', $Breadcrumbs);
+   }
+   
    /**
     * Adds as asset (string) to the $this->Assets collection. The assets will
     * later be added to the view if their $AssetName is called by
@@ -454,9 +485,10 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
-    * Adds the specified module to the specified asset target. If no asset
-    * target is defined, it will use the asset target defined by the module's
-    * AssetTarget method.
+    * Adds the specified module to the specified asset target. 
+    * 
+    * If no asset target is defined, it will use the asset target defined by the 
+    * module's AssetTarget method.
     *
     * @param mixed $Module A module or the name of a module to add to the page.
     * @param string $AssetTarget
@@ -488,6 +520,25 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       $this->FireEvent('AfterAddModule');
+   }
+   
+   
+   /**
+    * Add a Mustache template to the output
+    * 
+    * @param string $Template
+    * @param string $ControllerName Optional.
+    * @param string $ApplicationFolder Optional.
+    * @return boolean
+    */
+   public function AddStache($Template = '', $ControllerName = FALSE, $ApplicationFolder = FALSE) {
+      
+      $Template = StringEndsWith($Template, '.stache', TRUE, TRUE);
+      $StacheTemplate = "{$Template}.stache";
+      $TemplateData = $this->FetchView($StacheTemplate, $ControllerName, $ApplicationFolder);
+      
+      if ($TemplateData === FALSE) return FALSE;
+      $this->_Staches[$Template] = $TemplateData;
    }
 
    public function CanonicalUrl($Value = NULL) {
@@ -1639,7 +1690,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                   // This is a link to an external file.
                   $this->Head->AddScript($JsFile, 'text/javascript', GetValue('Options', $JsInfo, array()));
                   continue;
-               } if (strpos($JsFile, '/') !== FALSE) {
+               } elseif (strpos($JsFile, '/') !== FALSE) {
                   // A direct path to the file was given.
                   $JsPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $JsFile)), DS));
                } else {

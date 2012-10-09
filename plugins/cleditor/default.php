@@ -77,6 +77,13 @@ class cleditorPlugin extends Gdn_Plugin {
 //	}
    
    /**
+    * @param AssetModel $Sender
+    */
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor');
+   }
+   
+   /**
     *
     * @param Gdn_Form $Sender 
     */
@@ -107,7 +114,6 @@ class cleditorPlugin extends Gdn_Plugin {
 		$Options = array('ie' => 'gt IE 6', 'notie' => TRUE); // Exclude IE6
 		$Sender->RemoveJsFile('jquery.autogrow.js');
 		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor', $Options);
-		$Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor', $Options);
       
       $CssPath = Asset('/plugins/cleditor/design/cleditor.css');
       

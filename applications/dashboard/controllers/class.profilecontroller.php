@@ -210,7 +210,7 @@ class ProfileController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $UserID = GetValueR('User.UserID', $this);
-      $this->_SetBreadcrumbs(T('Connections'), '/profile/connections');
+      $this->_SetBreadcrumbs(T('Social'), '/profile/connections');
       
       $PModel = new Gdn_AuthenticationProviderModel();
       $Providers = $PModel->GetProviders();
@@ -228,7 +228,7 @@ class ProfileController extends Gdn_Controller {
       }
       
       $this->CanonicalUrl(UserUrl($this->User, '', 'connections'));
-      $this->Title(T('Connections'));
+      $this->Title(T('Social'));
       require_once $this->FetchViewLocation('connection_functions');
       $this->Render();
    }
@@ -1180,7 +1180,7 @@ class ProfileController extends Gdn_Controller {
          $this->EventArguments['User'] = $this->User;
          $this->FireEvent('GetConnections');
          if (count($this->Data('Connections')) > 0) {
-            $Module->AddLink('Options', Sprite('SpConnection').' '.T('Connections'), '/profile/connections', 'Garden.SignIn.Allow');
+            $Module->AddLink('Options', Sprite('SpConnection').' '.T('Social'), '/profile/connections', 'Garden.SignIn.Allow');
          }
       }
    }

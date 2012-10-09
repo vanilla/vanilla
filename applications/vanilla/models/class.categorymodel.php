@@ -148,6 +148,9 @@ class CategoryModel extends Gdn_Model {
          $Category['CountAllComments'] = $Category['CountComments'];
          $Category['Url'] = CategoryUrl($Category, FALSE, '//');
          $Category['ChildIDs'] = array();
+         
+         if (!$Category['CssClass'])
+            $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
 		}
       
       $Keys = array_reverse(array_keys($Data));
@@ -757,6 +760,67 @@ class CategoryModel extends Gdn_Model {
          elseif (!$Categories[$ID][$Permissions])
             unset($Categories[$ID]);
          elseif (is_array($CategoryID) && !in_array($ID, $CategoryID))
+            unset($Categories[$ID]);
+      }
+      
+      Gdn::UserModel()->JoinUsers($Categories, array('LastUserID'));
+      
+      $Result = new Gdn_DataSet($Categories, DATASET_TYPE_ARRAY);
+      $Result->DatasetType(DATASET_TYPE_OBJECT);
+      return $Result;
+   }
+   
+   /**
+    * Get a list of categories, considering several filters
+    * 
+    * @param array $RestrictIDs Optional list of category ids to mask the dataset
+    * @param string $Permissions Optional permission to require. Defaults to Vanilla.Discussions.View.
+    * @param array $ExcludeWhere Exclude categories with any of these flags
+    * @return \Gdn_DataSet
+    */
+   public function GetFiltered($RestrictIDs = FALSE, $Permissions = FALSE, $ExcludeWhere = FALSE) {
+      
+      // Get the current category list
+      $Categories = self::Categories();
+      
+      // Filter out the categories we aren't supposed to view.
+      if ($RestrictIDs && !is_array($RestrictIDs))
+         $RestrictIDs = array($RestrictIDs);
+      elseif ($this->Watching)
+         $RestrictIDs = self::CategoryWatch();
+      
+      switch ($Permissions) {
+         case 'Vanilla.Discussions.Add':
+            $Permissions = 'PermsDiscussionsAdd';
+            break;
+         case 'Vanilla.Disussions.Edit':
+            $Permissions = 'PermsDiscussionsEdit';
+            break;
+         default:
+            $Permissions = 'PermsDiscussionsView';
+            break;
+      }
+      
+      $IDs = array_keys($Categories);
+      foreach ($IDs as $ID) {
+         
+         // Exclude the root category
+         if ($ID < 0)
+            unset($Categories[$ID]);
+         
+         // No categories where we don't have permission
+         elseif (!$Categories[$ID][$Permissions])
+            unset($Categories[$ID]);
+         
+         // No categories whose filter fields match the provided filter values
+         elseif (is_array($ExcludeWhere)) {
+            foreach ($ExcludeWhere as $Filter => $FilterValue)
+               if (GetValue($Filter, $Categories[$ID], FALSE) == $FilterValue)
+                  unset($Categories[$ID]);
+         }
+         
+         // No categories that are otherwise filtered out
+         elseif (is_array($RestrictIDs) && !in_array($ID, $RestrictIDs))
             unset($Categories[$ID]);
       }
       

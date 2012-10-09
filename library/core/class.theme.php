@@ -140,6 +140,8 @@ class Gdn_Theme {
       $Class = GetValue('class', $Options, '');
       $WithDomain = GetValue('WithDomain', $Options);
       $Target = GetValue('Target', $Options, '');
+      if ($Target == 'current')
+         $Target = trim(Url('', TRUE), '/ ');
       
       if (is_null($Format))
          $Format = '<a href="%url" class="%class">%text</a>';

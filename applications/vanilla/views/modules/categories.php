@@ -24,14 +24,15 @@ if ($this->Data !== FALSE) {
          continue;
 
       if ($DoHeadings && $Category->Depth == 1)
-         $CssClass = 'Heading';
+         $CssClass = 'Heading '.$Category->CssClass;
       else
-         $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '');
+         $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').' '.$Category->CssClass;
       
       echo '<li class="ClearFix '.$CssClass.'">';
 
       if ($DoHeadings && $Category->Depth == 1) {
-         echo Gdn_Format::Text($Category->Name);
+         echo Gdn_Format::Text($Category->Name)
+            .' <span class="Aside"><span class="Count Hidden">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
       } else {
          $CountText = ' <span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
          

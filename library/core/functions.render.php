@@ -493,7 +493,30 @@ if (!function_exists('Plural')) {
       $WorkingNumber = str_replace(',', '', $Number);
       if ($FormattedNumber === FALSE)
          $FormattedNumber = $Number;
-      return sprintf(T(abs($WorkingNumber) == 1 ? $Singular : $Plural), $FormattedNumber);
+      
+      $Format = T(abs($WorkingNumber) == 1 ? $Singular : $Plural);
+      
+      return sprintf($Format, $FormattedNumber);
+   }
+}
+
+if (!function_exists('PluralTranslate')) {
+   /**
+    * Translate a plural string.
+    * 
+    * @param int $Number
+    * @param string $Singular
+    * @param string $Plural
+    * @param string|false $SingularDefault
+    * @param string|false $PluralDefault
+    * @return string
+    * @since 2.1
+    */
+   function PluralTranslate($Number, $Singular, $Plural, $SingularDefault = FALSE, $PluralDefault = FALSE) {
+      if ($Number == 1)
+         return T($Singular, $SingularDefault);
+      else
+         return T($Plural, $PluralDefault);
    }
 }
 

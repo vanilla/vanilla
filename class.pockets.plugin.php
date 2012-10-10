@@ -331,6 +331,9 @@ class PocketsPlugin extends Gdn_Plugin {
    }
 
    public function ProcessPockets($Sender, $Location, $CountHint = NULL) {
+      if (Gdn::Controller()->Data('_NoMessages'))
+         return;
+      
       // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
       $this->_LoadState();
       

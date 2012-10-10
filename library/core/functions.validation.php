@@ -54,8 +54,11 @@ if (!function_exists('ValidateRequired')) {
 if (!function_exists('ValidateMeAction')) {
    function ValidateMeAction($Value) {
       $Matched = preg_match('`^/me .*`i', $Value);
-      if ($Matched)
-         return Gdn::Session()->CheckPermission('Vanilla.Comments.Me');
+      if ($Matched) {
+         $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Comments.Me');
+         if (!$HasPermission)
+            return T('ErrorPermission');
+      }
       return TRUE;
    }
 }

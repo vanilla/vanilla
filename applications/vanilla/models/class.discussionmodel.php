@@ -1299,6 +1299,7 @@ class DiscussionModel extends VanillaModel {
       
       // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Body', 'Required');
+      $this->Validation->AddRule('MeAction', 'function:ValidateMeAction');
       $this->Validation->ApplyRule('Body', 'MeAction');
       $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {

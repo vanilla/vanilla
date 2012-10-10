@@ -250,14 +250,8 @@ $PermissionModel->SQL = $SQL;
 $PermissionModel->Define(array(
 	'Vanilla.Settings.Manage',
 	'Vanilla.Categories.Manage',
-	'Vanilla.Approval.Require'
-	));
-
-// Define some global vanilla permissions.
-$PermissionModel->Define(array(
-	'Vanilla.Comments.Me' => 1,
-	'Vanilla.Categories.Manage',
-	'Vanilla.Approval.Require'
+	'Vanilla.Approval.Require',
+   'Vanilla.Comments.Me' => 1,
 	));
 
 // Define some permissions for the Vanilla categories.

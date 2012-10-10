@@ -252,6 +252,13 @@ $PermissionModel->Define(array(
 	'Vanilla.Approval.Require'
 	));
 
+// Define some global vanilla permissions.
+$PermissionModel->Define(array(
+	'Vanilla.Comments.Me' => 1,
+	'Vanilla.Categories.Manage',
+	'Vanilla.Approval.Require'
+	));
+
 // Define some permissions for the Vanilla categories.
 $PermissionModel->Define(array(
 	'Vanilla.Discussions.View' => 1,

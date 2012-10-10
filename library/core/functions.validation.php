@@ -51,6 +51,15 @@ if (!function_exists('ValidateRequired')) {
    }
 }
 
+if (!function_exists('ValidateMeAction')) {
+   function ValidateMeAction($Value) {
+      $Matched = preg_match('`^/me .*`i', $Value);
+      if ($Matched)
+         return Gdn::Session()->CheckPermission('Vanilla.Comments.Me');
+      return TRUE;
+   }
+}
+
 if (!function_exists('ValidateRequiredArray')) {
    /**
     * Checkbox lists and DropDown lists that have no values selected return a

@@ -1099,9 +1099,10 @@ class ProfileController extends Gdn_Controller {
    public function BuildProfile() {
       if (!is_object($this->User))
          throw new Exception(T('Cannot build profile information if user is not defined.'));
-         
+      
       $Session = Gdn::Session();
-      $this->CssClass = 'Profile';
+      if (strpos($this->CssClass, 'Profile') === FALSE)
+         $this->CssClass .= ' Profile';
       $this->Title(Gdn_Format::Text($this->User->Name));
       
       if ($this->_DeliveryType != DELIVERY_TYPE_VIEW) {
@@ -1223,6 +1224,9 @@ class ProfileController extends Gdn_Controller {
 			
 			$this->SetData('Profile', $this->User);
 			$this->SetData('UserRoles', $this->Roles);
+         if ($CssClass = GetValue('_CssClass', $this->User)) {
+            $this->CssClass .= ' '.$CssClass;
+         }
       }
       
       if ($CheckPermissions && Gdn::Session()->UserID != $this->User->UserID)
@@ -1305,6 +1309,7 @@ class ProfileController extends Gdn_Controller {
    }
 	
 	public function EditMode($Switch) {
+      
 		$this->EditMode = $Switch;
 		if (!$this->EditMode && strpos($this->CssClass, 'EditMode'))
 			$this->CssClass = str_replace('EditMode', '', $this->CssClass);

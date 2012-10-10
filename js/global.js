@@ -655,7 +655,7 @@ jQuery(document).ready(function($) {
 
    // Activate ToggleFlyout and ButtonGroup menus
    $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
-      var buttonGroup = $(this).parents('.ButtonGroup');
+      var buttonGroup = $(this).closest('.ButtonGroup');
       if (buttonGroup.hasClass('Open')) {
          // Close
          $('.ButtonGroup').removeClass('Open');

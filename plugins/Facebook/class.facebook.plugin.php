@@ -144,6 +144,7 @@ class FacebookPlugin extends Gdn_Plugin {
     * Add 'Facebook' option to the row.
     */
    public function Base_AfterReactions_Handler($Sender, $Args) {
+      echo Gdn_Theme::BulletItem('Share');
       $this->AddReactButton($Sender, $Args);
    }
 

@@ -115,7 +115,12 @@ function WriteActivity($Activity, &$Sender, &$Session) {
          $CommentForm->AddHidden('Return', Gdn_Url::Request());
          echo $CommentForm->Open(array('action' => Url('/dashboard/activity/comment'), 'class' => 'Hidden'));
          echo '<div class="TextBoxWrapper">'.$CommentForm->TextBox('Body', array('MultiLine' => TRUE, 'value' => '')).'</div>';
-         echo $CommentForm->Close('Comment');
+         
+         echo '<div class="Buttons">';
+         echo $CommentForm->Button('Comment', array('class' => 'Button Primary'));
+         echo '</div>';
+         
+         echo $CommentForm->Close();
       ?></li>
    <?php 
    endif;

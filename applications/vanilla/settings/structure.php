@@ -37,6 +37,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('UrlCode', 'varchar(255)', TRUE)
    ->Column('Description', 'varchar(500)', TRUE)
    ->Column('Sort', 'int', TRUE)
+   ->Column('CssClass', 'varchar(50)', TRUE)
    ->Column('PermissionCategoryID', 'int', '-1') // default to root.
    ->Column('HideAllDiscussions', 'tinyint(1)', '0')
    ->Column('InsertUserID', 'int', FALSE, 'key')

@@ -635,6 +635,7 @@ class TwitterPlugin extends Gdn_Plugin {
     * Add 'Twitter' option to the row.
     */
    public function Base_AfterReactions_Handler($Sender, $Args) {
+      echo Gdn_Theme::BulletItem('Share');
       $this->AddReactButton($Sender, $Args);
    }
 

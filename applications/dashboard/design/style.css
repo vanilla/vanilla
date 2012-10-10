@@ -357,23 +357,32 @@ select {
 }
 
 /* Split Button Dropdown */
-.ButtonGroup > .NavButton:first-child,
-.ButtonGroup > .Button:first-child {
+.ButtonGroup.Multi > .NavButton:first-child,
+.ButtonGroup.Multi > .Button:first-child {
    border-top-right-radius: 0;
    border-bottom-right-radius: 0;
 }
-.Button.Handle {
+
+.ButtonGroup.Multi > .NavButton.Handle,
+.ButtonGroup.Multi > .Button.Handle {
+   border-top-left-radius: 0;
+   border-bottom-left-radius: 0;
+   border-left: 0;
+}
+
+/*.Multi .Button:last {
    border-top-left-radius: 0;
    border-bottom-left-radius: 0;
    font-size: 12px;
    line-height: 1;
    border-left: 0;
 }
-.NavButton.Handle {
-    border-radius: 0 2px 2px 0;
-    border-left: 0;
-    margin: 0;
-}
+.Multi .NavButton.Handle {
+   border-top-left-radius: 0;
+   border-bottom-left-radius: 0;
+   border-left: 0;
+   margin: 0;
+}*/
 .NavButton.Handle .Sprite,
 .Button.Handle .Sprite {
     display: inline-block;
@@ -1230,7 +1239,6 @@ overflow: hidden;
 	padding: 4px 0;
 }
 #Content .FilterMenu li.Active a {
-	color: #000;
 	border-bottom: 2px solid #ddd;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
@@ -2349,8 +2357,7 @@ tr.CategoryHeading td {
 .SpNewConversation,
 .SpAskQuestion,
 .SpNewPoll,
-.SpNewDiscussion,
-.SpWarn {
+.SpNewDiscussion {
 	display: inline-block;
 	height: 16px;
 	width: 16px;
@@ -2367,12 +2374,6 @@ tr.CategoryHeading td {
    height: 14px;
    vertical-align: middle;
    width: 14px;
-}
-
-.SpWarn {
-   background-position: -96px -84px;
-   background-image: url('images/sprites.png') !important;
-   width: 18px;
 }
 
 /*
@@ -3127,7 +3128,7 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 /* 16px Sprites White */
 .SpDashboard,
 .SpOptions,
-.SpCog { background-position: 0 -212px; }
+.SpCog { background-position: 0 -148px; }
 .SpSettings { background-position: -16px -212px; }
 .SpNotifications,
 .SpGlobe { background-position: -32px -212px; }

@@ -77,6 +77,51 @@ class Gdn_Theme {
       return $Result;
    }
    
+   protected static $_BulletSep = FALSE;
+   protected static $_BulletSection = FALSE;
+   
+   /**
+    * Call before writing an item and it will optionally write a bullet seperator.
+    * 
+    * @param string $Section The name of the section.
+    * @param bool $Return whether or not to return the result or echo it.
+    * @return string
+    * @since 2.1
+    */
+   public static function BulletItem($Section, $Return = TRUE) {
+      $Result = '';
+      
+      if (self::$_BulletSection === FALSE)
+         self::$_BulletSection = $Section;
+      elseif (self::$_BulletSection != $Section) {
+         $Result = "<!-- $Section -->".self::$_BulletSep;
+         self::$_BulletSection = $Section;
+      }
+      
+      if ($Return)
+         return $Result;
+      else
+         echo $Result;
+   }
+   
+   /**
+    * Call before starting a row of bullet-seperated items.
+    * 
+    * @param strng|bool $Sep The seperator used to seperate each section.
+    * @since 2.1
+    */
+   public static function BulletRow($Sep = FALSE) {
+      if (!$Sep) {
+         if (!self::$_BulletSep)
+            self::$_BulletSep = ' '.Bullet().' ';
+      } else {
+         self::$_BulletSep = $Sep;
+      }
+      self::$_BulletSection = FALSE;
+   }
+   
+   
+   
    /**
     * Returns whether or not the page is in the current section.
     * @param string|array $Section 

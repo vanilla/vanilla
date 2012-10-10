@@ -12,7 +12,7 @@ if (!$ModPermission && !$AdminPermission)
    <ul class="FilterMenu">
       <li <?php if ($Controller->Data('Filter') == 'public') echo 'class="Active"'; ?>>
          <?php
-         echo Anchor(Sprite('SpPublicActivities').T('Recent Activity'), '/activity');
+         echo Anchor(Sprite('SpActivity').' '.T('Recent Activity'), '/activity');
          ?>
       </li>
       <?php
@@ -20,7 +20,7 @@ if (!$ModPermission && !$AdminPermission)
       ?>
       <li <?php if ($Controller->Data('Filter') == 'mods') echo 'class="Active"'; ?>>
          <?php
-         echo Anchor(Sprite('SpModeratorActivities').T('Moderator Activity'), '/activity/mods');
+         echo Anchor(Sprite('SpMod').' '.T('Moderator Activity'), '/activity/mods');
          ?>
       </li>
       <?php
@@ -30,7 +30,7 @@ if (!$ModPermission && !$AdminPermission)
       ?>
       <li <?php if ($Controller->Data('Filter') == 'admins') echo 'class="Active"'; ?>>
          <?php
-         echo Anchor(Sprite('SpAdminActivities').T('Administrator Activity'), '/activity/admins');
+         echo Anchor(Sprite('SpDashboard').' '.T('Administrator Activity'), '/activity/admins');
          ?>
       </li>
       <?php endif; ?>

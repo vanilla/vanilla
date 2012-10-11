@@ -971,8 +971,8 @@ a.Bookmarking:hover {
     margin-bottom: 3em;
 }
 
-.SplashMessage #Content {
-   max-width: 900px;
+.SplashMessage .SplashInfo {
+   max-width: 640px;
    margin: auto;
 }
 
@@ -1829,8 +1829,7 @@ a.ChangePicuture:hover {
 
 .ProfileOptions {
 	float: right;
-    position: relative;
-    top: -6px;
+   position: relative;
 }
 /* Hiding form headings with CSS in case the forms get popped */
 body.Profile.picture .SmallPopup h1 {
@@ -3435,13 +3434,16 @@ body.embed .InformMessages {
 }
 
 .SpEditProfile {
+   background-image: url("images/sprites-14-000000.png");
+   background-position: -245px -29px;
+}
+.Handle > .SpEditProfile {
    display: inline-block;
    width: 14px;
    height: 14px;
    line-height: 14px;
    vertical-align: top;
-   background-image: url("images/sprites-14-000000.png");
-   background-position: -245px -29px;
+   
 }
 
 /* === Reaction Sprites === */

@@ -61,7 +61,9 @@ if (!function_exists('ButtonDropDown')):
          list($CssClass, $ButtonClass) = $CssClass;
       
       if (count($Links) < 2) {
-         echo Anchor($Text, $Url, $CssClass);
+         $Link = array_pop($Links);
+         
+         echo Anchor($Link['Text'], $Link['Url'], $CssClass);
       } else {
          // NavButton or Button?
          $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== FALSE ? 'NavButton' : 'Button');

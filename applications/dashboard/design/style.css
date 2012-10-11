@@ -3437,7 +3437,8 @@ body.embed .InformMessages {
    background-image: url("images/sprites-14-000000.png");
    background-position: -245px -29px;
 }
-.Handle > .SpEditProfile {
+.Handle > .SpEditProfile,
+.NavButton > .SpEditProfile {
    display: inline-block;
    width: 14px;
    height: 14px;

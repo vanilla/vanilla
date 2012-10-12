@@ -990,6 +990,14 @@ class ActivityModel extends Gdn_Model {
          ->Put();
    }
    
+   public function Share(&$Activity) {
+      // Massage the event for the user.
+      $this->EventArguments['RecordType'] = 'Activity';
+      $this->EventArguments['Activity'] =& $Activity;
+      
+      $this->FireEvent('Share');
+   }
+   
    /**
     * Queue a notification for sending.
     *
@@ -1139,6 +1147,26 @@ class ActivityModel extends Gdn_Model {
          $Activity['Data']['CommentNotifyUserID'] = $CommentActivity['NotifyUserID'];
       }
       
+      // Make sure this activity isn't a duplicate.
+      if (GetValue('CheckRecord', $Options)) {
+         // Check to see if this record already notified so we don't notify multiple times.
+         $Where = ArrayTranslate($Activity, array('NotifyUserID', 'RecordType', 'RecordID'));
+         $Where['DateUpdated >'] = Gdn_Format::ToDateTime(strtotime('-2 days')); // index hint
+         
+         $CheckActivity = $this->SQL->GetWhere(
+            'Activity',
+            $Where)->FirstRow();
+         
+         if ($CheckActivity)
+            return FALSE;
+      }
+      
+      // Check to share the activity.
+      if (GetValue('Share', $Options)) {
+         $this->Share($Activity);
+      }
+      
+      // Group he activity.
       if ($GroupBy = GetValue('GroupBy', $Options)) {
          $GroupBy = (array)$GroupBy;
          $Where = array();
@@ -1159,17 +1187,6 @@ class ActivityModel extends Gdn_Model {
             $Activity = $this->MergeActivities($GroupActivity, $Activity);
             $NotificationInc = 0;
          }
-      } elseif (GetValue('CheckRecord', $Options)) {
-         // Check to see if this record already notified so we don't notify multiple times.
-         $Where = ArrayTranslate($Activity, array('NotifyUserID', 'RecordType', 'RecordID'));
-         $Where['DateUpdated >'] = Gdn_Format::ToDateTime(strtotime('-2 days')); // index hint
-         
-         $CheckActivity = $this->SQL->GetWhere(
-            'Activity',
-            $Where)->FirstRow();
-         
-         if ($CheckActivity)
-            return FALSE;
       }
       
       $Delete = FALSE;

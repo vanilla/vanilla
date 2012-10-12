@@ -87,8 +87,6 @@
 .SpBan,
 .SpWarn,
 .SpWarnings,
-.SpDashboard,
-.SpWarnings,
 .SpActivity,
 .SpPublicActivities,
 .SpModeratorActivities,
@@ -97,7 +95,8 @@
 .SpQuote,
 .SpSignatures,
 .SpThumbnail,
-.SpPicture,
+.SpPicture, 
+.SpPhoto,
 .SpPreferences,
 .SpPassword,
 .SpEdit,
@@ -105,7 +104,9 @@
 .SpActivity,
 .SpAllCategories,
 .SpMyDrafts,
-.SpDashboard,
+.SpDashboard, 
+.SpOptions, 
+.SpCog
 .SpBookmarks,
 .SpInbox,
 .SpNotifications,
@@ -120,7 +121,7 @@
    background: url('http://cdn.vanillaforums.com/images/sprites-14-000.png') 0 0 no-repeat transparent;
    background-position: 14px 14px;
    vertical-align: top;
-   margin: 4px 4px 0 0;
+   margin: 4px 0 0 0;
 }
 .MenuItems .Sprite,
 .NavButton > .Sprite {
@@ -141,7 +142,7 @@
 .SpAdminActivities { background-position: -268px -53px; }
 .SpUnansweredQuestions { background-position: -102px -278px; } 
 .SpThumbnail { background-position: -246px -101px; } 
-.SpPicture { background-position: -269px -29px; } 
+.SpPicture, .SpPhoto { background-position: -269px -29px; } 
 .SpPassword { background-position: -317px -101px; } 
 .SpAllCategories { background-position: -150px -78px; } 
 .SpMyDrafts { background-position: -270px -78px; } 
@@ -157,7 +158,7 @@
 .SpNotifications { background-position: -174px -101px; }
 .SpQuote { background-position: -317px -6px; }
 .SpSignatures { background-position: -149px -101px; }
-.SpDashboard { background-position: -221px -53px; }
+.SpDashboard, .SpOptions, .SpCog { background-position: -221px -53px; }
 .SpInfraction, 
 .SpWarn,
 .SpWarnings { background-position: -100px -52px; }

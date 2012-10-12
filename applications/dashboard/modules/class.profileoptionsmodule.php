@@ -27,7 +27,7 @@ class ProfileOptionsModule extends Gdn_Module {
       $Controller->EventArguments['ProfileOptions'] = &$ProfileOptions;
       $Controller->EventArguments['MemberOptions'] = &$MemberOptions;
       if ($Controller->EditMode) {
-         return '<div class="ProfileOptions">'.Anchor(T('Back to Profile'), UserUrl($Controller->User)).'</div>';
+         return '<div class="ProfileOptions">'.Anchor(T('Back to Profile'), UserUrl($Controller->User), array('class' => 'ProfileButtons')).'</div>';
 //         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
       } else {
          if ($Controller->User->UserID != $Session->UserID) {

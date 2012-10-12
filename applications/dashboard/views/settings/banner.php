@@ -142,6 +142,30 @@ echo $this->Form->Errors();
                echo $this->Form->Input('Favicon', 'file');
             ?>
          </li>
+         <li>
+            <?php
+               echo $this->Form->Label('Share Image', 'ShareImage');
+               echo Wrap(
+                     T('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200."),
+                     'div',
+                     array('class' => 'Info')
+                  );
+               $ShareImage = $this->Data('ShareImage');
+               if ($ShareImage) {
+                  echo Wrap(
+                     Img(Gdn_Upload::Url($ShareImage), array('style' => 'max-width: 300px')),
+                     'div'
+                  );
+                  echo Wrap(Anchor(T('Remove Image'), '/dashboard/settings/removeshareimage', 'SmallButton Hijack'), 'div', array('style' => 'padding: 10px 0;'));
+                  echo Wrap(
+                     T('FaviconBrowse', 'Browse for a new favicon if you would like to change it:'),
+                     'div',
+                     array('class' => 'Info')
+                  );
+               }
+               echo $this->Form->Input('ShareImage', 'file');
+            ?>
+         </li>
       </ul>
    </div>
 </div>

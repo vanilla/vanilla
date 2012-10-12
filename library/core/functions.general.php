@@ -939,9 +939,15 @@ function FormatString($String, $Args = array()) {
 }
 
 function _FormatStringCallback($Match, $SetArgs = FALSE) {
-   static $Args = array();
+   static $Args = array(), $ContextUserID = NULL;
    if ($SetArgs) {
       $Args = $Match;
+      
+      if (isset($Args['_ContextUserID']))
+         $ContextUserID = $Args['_ContextUserID'];
+      else
+         $ContextUserID = Gdn::Session()->UserID;
+      
       return;
    }
 
@@ -1093,42 +1099,49 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = array_shift($Value);
             
             if (is_array($Value)) {
-               $Max = C('Garden.FormatUsername.Max', 5);
+               if (isset($Value['UserID'])) {
+                  $User = $Value;
+                  $User['Name'] = FormatUsername($User, $Format, $ContextUserID);
                
-               $Count = count($Value);
-               $Result = '';
-               for ($i = 0; $i < $Count; $i++) {
-                  if ($i >= $Max && $Count > $Max + 1) {
-                     $Others = $Count - $i;
-                     $Result .= ' '.T('sep and', 'and').' '
-                        .Plural($Others, '%s other', '%s others');
-                     break;
-                  }
-                  
-                  $ID = $Value[$i];
-                  if (is_array($ID)) {
-                     continue;
-                  }
-                  
-                  if ($i == $Count - 1)
-                     $Result .= ' '.T('sep and', 'and').' ';
-                  elseif ($i > 0)
-                     $Result .= ', ';
-                  
-                  $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
-                  if (isset($Special[$ID])) {
-                     $Result .= $Special[$ID];
-                  } else {
-                     $User = Gdn::UserModel()->GetID($ID);
-                     $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+                  $Result = UserAnchor($User);
+               } else {
+                  $Max = C('Garden.FormatUsername.Max', 5);
+
+                  $Count = count($Value);
+                  $Result = '';
+                  for ($i = 0; $i < $Count; $i++) {
+                     if ($i >= $Max && $Count > $Max + 1) {
+                        $Others = $Count - $i;
+                        $Result .= ' '.T('sep and', 'and').' '
+                           .Plural($Others, '%s other', '%s others');
+                        break;
+                     }
+
+                     $ID = $Value[$i];
+                     if (is_array($ID)) {
+                        continue;
+                     }
+
+                     if ($i == $Count - 1)
+                        $Result .= ' '.T('sep and', 'and').' ';
+                     elseif ($i > 0)
+                        $Result .= ', ';
+
+                     $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
+                     if (isset($Special[$ID])) {
+                        $Result .= $Special[$ID];
+                     } else {
+                        $User = Gdn::UserModel()->GetID($ID);
+                        $User->Name = FormatUsername($User, $Format, $ContextUserID);
 
 
-                     $Result .= UserAnchor($User);
+                        $Result .= UserAnchor($User);
+                     }
                   }
                }
             } else {
                $User = Gdn::UserModel()->GetID($Value);
-               $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+               $User->Name = FormatUsername($User, $Format, $ContextUserID);
                
                $Result = UserAnchor($User);
             }

@@ -594,6 +594,8 @@ class FacebookPlugin extends Gdn_Plugin {
 //	}
 }
 
+if (!function_exists('GetRecord')):
+   
 function GetRecord($RecordType, $ID) {
    switch(strtolower($RecordType)) {
       case 'discussion':
@@ -619,3 +621,5 @@ function GetRecord($RecordType, $ID) {
          throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($RecordType)));
    }
 }
+
+endif;

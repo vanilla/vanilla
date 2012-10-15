@@ -124,11 +124,6 @@ class VanillaHooks implements Gdn_IPlugin {
             ->Set('Format', 'Deleted')
             ->Where('InsertUserID', $UserID)
             ->Put();
-         
-         // Erase the user's comments
-			$SQL->From('Comment')
-				->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-				->Delete('Comment c', array('d.InsertUserID' => $UserID));
 
          $SQL->Update('Comment')
             ->Set('Body', T('The user and all related content has been deleted.'))

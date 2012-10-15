@@ -260,7 +260,7 @@ class FacebookPlugin extends Gdn_Plugin {
             'ConnectUrl' => $this->AuthorizeUri(FALSE, self::ProfileConnecUrl()),
             'Profile' => array(
                'Name' => GetValue('name', $Profile),
-               'Photo' => "http://graph.facebook.com/{$Profile['id']}/picture"
+               'Photo' => "http://graph.facebook.com/{$Profile['id']}/picture?type=large"
                )
           );
    }

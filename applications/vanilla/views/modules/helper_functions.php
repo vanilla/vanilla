@@ -80,7 +80,7 @@ function WritePromotedContent($Content, $Sender) {
          ?>
       </div>
       <div class="Title"><?php echo Anchor(Gdn_Format::Text($Content['Name'], FALSE), $ContentURL, 'DiscussionLink'); ?></div>
-      <div class="Body"><?php echo strip_tags(Gdn_Format::To($Content['Body'], $Content['Format'])); ?></div>
+      <div class="Body"><?php echo Anchor(strip_tags(Gdn_Format::To($Content['Body'], $Content['Format'])), $ContentURL, 'BodyLink'); ?></div>
    </div>
 <?php   
 }

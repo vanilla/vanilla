@@ -959,7 +959,7 @@ a.Bookmarking:hover {
 
 /* ======================================================== Full Page Errors */
 
-.SplashMessage h1 {
+.SplashMessage #Body h1 {
     font-size: 64px;
     line-height: 1.4;
 }

@@ -326,7 +326,6 @@ class ProfileController extends Gdn_Controller {
          'f' => T('Female')
       );
       
-      $this->SetData('User', $User);
       $this->Form->SetData($User);
       
       $this->FireEvent('BeforeEdit');
@@ -344,7 +343,7 @@ class ProfileController extends Gdn_Controller {
          
          if ($this->Form->Save() !== FALSE) {
             $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-            $this->SetData('User', $User);
+            $this->SetData('Profile', $User);
             
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
          }
@@ -1157,7 +1156,7 @@ class ProfileController extends Gdn_Controller {
          // Vanilla's login form regardless of the state of their membership in the 
          // external app.
          if (Gdn::Config('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
-            $Module->AddLink('Options', Sprite('SpEdit').T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+            $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
                
             // No password may have been set if they have only signed in with a connect plugin
             $passwordLabel = T('Change My Password');

@@ -350,9 +350,7 @@ select {
    );
    box-shadow: 0 1px 1px #ddd;
 }
-.ButtonGroup.Open .NavButton.Handle,
-.NavButton:active,
-.NavButton:focus {
+.ButtonGroup.Open .NavButton.Handle {
    background: #eee;
 }
 
@@ -2443,9 +2441,6 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
 }
 .DiscussionForm .Category label {
    padding: 0 8px 0 0;
-}
-.DiscussionForm a.Cancel {
-	margin-left: 18px;
 }
 .DiscussionForm .PostOptions li {
    display: inline;

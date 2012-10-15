@@ -353,8 +353,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       <div class="Border"> \
         <div class="Body"> \
           <div class="Content"><h1>Confirm</h1><p>Are you sure you want to do that?</p></div> \
-          <div class="Footer"> \
-            <input type="button" class="Button Okay" value="Okay" /> \
+          <div class="Buttons Footer"> \
+            <input type="button" class="Button Primary Okay" value="OK" /> \
             <input type="button" class="Button Cancel" value="Cancel" /> \
           </div> \
         </div> \

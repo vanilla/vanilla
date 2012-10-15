@@ -2453,6 +2453,10 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    color: #555;
 }
 
+.List.Inline * {
+   line-height: 16px;
+}
+
 /* ============================== Conversations ============================= */
 textarea.MultiComplete {
 	width: 100%;

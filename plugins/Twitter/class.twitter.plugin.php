@@ -140,6 +140,73 @@ class TwitterPlugin extends Gdn_Plugin {
 		if (!Gdn::Session()->IsValid())
 			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect TwitterConnect'));
 	}
+   
+   public function Base_DiscussionFormOptions_Handler($Sender, $Args) {
+      if (!$this->AccessToken())
+         return;
+      
+      $Options =& $Args['Options'];
+      
+      $Options .= ' <li>'.
+         $Sender->Form->CheckBox('ShareTwitter', '@'.Sprite('ReactTwitter'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
+         '</li> ';
+   }
+   
+   public function DiscussionController_AfterBodyField_Handler($Sender, $Args) {
+      if (!$this->AccessToken())
+         return;
+      
+      echo ' '.
+         $Sender->Form->CheckBox('ShareTwitter', '@'.Sprite('ReactTwitter'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
+         ' ';
+   }
+   
+   public function DiscussionModel_AfterSaveDiscussion_Handler($Sender, $Args) {
+      if (!$this->AccessToken())
+         return;
+      
+      $Share = GetValueR('FormPostValues.ShareTwitter', $Args);
+      
+      if ($Share && $this->AccessToken()) {
+         $Row = $Args['Fields'];
+         $Url = DiscussionUrl($Row, '', TRUE);
+         $Message = SliceTwitter(Gdn_Format::PlainText($Row['Body'], $Row['Format'])).' '.$Url;
+         
+         $R = $this->API('/statuses/update.json', array(
+             'status' => $Message
+             ),
+             'POST');
+      }
+   }
+   
+   public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
+      if (!$this->AccessToken())
+         return;
+      
+      $Share = GetValueR('FormPostValues.ShareTwitter', $Args);
+      
+      if ($Share && $this->AccessToken()) {
+         $Row = $Args['FormPostValues'];
+         
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Row));
+         if (!$Discussion)
+            return;
+         
+         $Url = DiscussionUrl($Discussion, '', TRUE);
+         $Message = SliceTwitter(Gdn_Format::PlainText($Row['Body'], $Row['Format'])).' '.$Url;
+         
+         $R = $this->API('/statuses/update.json', array(
+             'status' => $Message
+             ),
+             'POST');
+         
+//         decho($R);
+//         die();
+//      } else {
+//         die("$Share ".$this->AccessToken());
+      }
+   }
 	
 	private function _GetButton() {      
       $ImgSrc = Asset('/plugins/Twitter/design/twitter-icon.png');
@@ -685,4 +752,29 @@ class TwitterPlugin extends Gdn_Plugin {
          array('AuthenticationSchemeAlias' => 'twitter', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
          array('AuthenticationKey' => self::ProviderKey));
    }
+}
+
+function SliceTwitter($Str) {
+   $Elips = '...';
+         
+   $Str = preg_replace('`\s+`', ' ', $Str);
+
+//         if (function_exists('normalizer_is_normalized')) {
+//            // Slice the string to 119 characters (21 reservered for the url.
+//            if (!normalizer_is_normalized($Message))
+//               $Message = Normalizer::normalize($Message, Normalizer::FORM_D);
+//            $Elips = Normalizer::normalize($Elips, Normalizer::FORM_D);
+//         }
+
+   $Max = 140;
+   $LinkLen = 22;
+
+   $Max -= $LinkLen;
+
+   $Str = SliceParagraph($Str, $Max);
+   if (strlen($Str) > $Max) {
+      $Str = substr($Str, 0, $Max - strlen($Elips)).$Elips;
+   }
+   
+   return $Str;
 }

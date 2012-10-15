@@ -147,6 +147,70 @@ class FacebookPlugin extends Gdn_Plugin {
       echo Gdn_Theme::BulletItem('Share');
       $this->AddReactButton($Sender, $Args);
    }
+   
+   public function Base_DiscussionFormOptions_Handler($Sender, $Args) {
+      if (!$this->AccessToken())
+         return;
+      
+      $Options =& $Args['Options'];
+      
+      $Options .= ' <li>'.
+         $Sender->Form->CheckBox('ShareFacebook', '@'.Sprite('ReactFacebook'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Facebook'))).
+         '</li> ';
+   }
+   
+   public function DiscussionController_AfterBodyField_Handler($Sender, $Args) {
+      if (!$this->AccessToken())
+         return;
+      
+      echo ' '.
+         $Sender->Form->CheckBox('ShareFacebook', '@'.Sprite('ReactFacebook'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Facebook'))).
+         ' ';
+   }
+   
+   public function DiscussionModel_AfterSaveDiscussion_Handler($Sender, $Args) {
+      if (!$this->AccessToken())
+         return;
+      
+      $ShareFacebook = GetValueR('FormPostValues.ShareFacebook', $Args);
+      
+      if ($ShareFacebook) {
+         $Url = DiscussionUrl($Args['Fields'], '', TRUE);
+//         $Message = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
+         
+         if ($this->AccessToken()) {
+            $R = $this->API('/me/feed', array(
+                'link' => $Url
+                ));
+         }
+      }
+   }
+   
+   public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
+      if (!$this->AccessToken())
+         return;
+      
+      $ShareFacebook = GetValueR('FormPostValues.ShareFacebook', $Args);
+      
+      if ($ShareFacebook) {
+         $Row = $Args['FormPostValues'];
+         
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Row));
+         if (!$Discussion)
+            die('no discussion');
+         
+         $Url = DiscussionUrl($Discussion, '', TRUE);
+         $Message = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
+         
+         if ($this->AccessToken()) {
+            $R = $this->API('/me/feed', array(
+                'link' => $Url,
+                'message' => $Message
+                ));
+         }
+      }
+   }
 
    /**
     * Output Quote link.

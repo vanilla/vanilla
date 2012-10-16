@@ -1692,11 +1692,7 @@ class DiscussionModel extends VanillaModel {
     */
 	public function SetUserBookmarkCount($UserID) {
 		$Count = $this->UserBookmarkCount($UserID);
-      $this->SQL
-         ->Update('User')
-         ->Set('CountBookmarks', $Count)
-         ->Where('UserID', $UserID)
-         ->Put();
+      Gdn::UserModel()->SetField($UserID, 'CountBookmarks', $Count);
 		
 		return $Count;
 	}

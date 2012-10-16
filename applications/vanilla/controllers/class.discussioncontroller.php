@@ -378,6 +378,7 @@ class DiscussionController extends VanillaController {
 
       // Update the user's bookmark count
       $CountBookmarks = $this->DiscussionModel->SetUserBookmarkCount($Session->UserID);
+      $this->JsonTarget('.User-CountBookmarks', (string)$CountBookmarks);
       
       // Return the appropriate bookmark.
       require_once $this->FetchViewLocation('helper_functions', 'Discussions');

@@ -9,7 +9,7 @@
    echo ' ';
    echo ButtonDropDown($Controller->EventArguments['ProfileOptions'], 
       'NavButton ProfileButtons',
-      Sprite('SpEditProfile', 'Sprite16')
+      Sprite('SpEditProfile', 'Sprite16').' <span class="Hidden">'.T('Edit Profile').'</span>'
    );
    ?>
 </div>

@@ -138,11 +138,11 @@ class ModerationController extends VanillaController {
     * have been checked for administration, and if so, adds an inform message to
     * $Sender to take action.
     */
-   public static function InformCheckedDiscussions($Sender) {
+   public static function InformCheckedDiscussions($Sender, $Force = FALSE) {
       $Session = Gdn::Session();
-      $HadCheckedDiscussions = FALSE;
+      $HadCheckedDiscussions = $Force;
       $TransientKey = GetValue('TransientKey', $_POST);
-      if ($Session->IsValid() && $Session->ValidateTransientKey($TransientKey)) {
+      if ($Session->IsValid() && Gdn::Request()->IsPostBack()) {
          // Form was posted, so accept changes to checked items.
          $CheckIDs = GetValue('CheckIDs', $_POST);
          if (empty($CheckIDs))
@@ -154,7 +154,7 @@ class ModerationController extends VanillaController {
             $CheckedDiscussions = array();
             
          // Were there checked discussions before the form was posted?
-         $HadCheckedDiscussions = count($CheckedDiscussions) > 0;
+         $HadCheckedDiscussions |= count($CheckedDiscussions) > 0;
 
          foreach ($CheckIDs as $Check) {
             if (GetValue('checked', $Check)) {
@@ -302,6 +302,7 @@ class ModerationController extends VanillaController {
       // Check permissions on each discussion to make sure the user has permission to delete them
       $AllowedDiscussions = array();
       $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, CategoryID')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
+      $CountCheckedDiscussions = $DiscussionData->NumRows();
       foreach ($DiscussionData->Result() as $Discussion) {
          if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->CategoryID))
             $AllowedDiscussions[] = $Discussion->DiscussionID;
@@ -313,13 +314,15 @@ class ModerationController extends VanillaController {
       if ($this->Form->AuthenticatedPostBack()) {
          // Delete the selected discussions (that the user has permission to delete).
          foreach ($AllowedDiscussions as $DiscussionID) {
-            $DiscussionModel->Delete($DiscussionID);
+            $Deleted = $DiscussionModel->Delete($DiscussionID);
+            if ($Deleted) {
+               $this->JsonTarget("#Discussion_$DiscussionID", '', 'SlideUp');
+            }
          }
 
          // Clear selections
-         Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
-         ModerationController::InformCheckedDiscussions($this);
-         $this->RedirectUrl = 'discussions';
+         Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', NULL);
+         ModerationController::InformCheckedDiscussions($this, TRUE);
       }
       
       $this->Render();

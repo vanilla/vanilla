@@ -480,7 +480,7 @@ jQuery(document).ready(function($) {
                $target.html(item.Data);
                break;
             case 'Callback':
-               window[item.Target](item.Data);
+               jQuery.proxy(window[item.Data],$target)();
                break;
          }
       }

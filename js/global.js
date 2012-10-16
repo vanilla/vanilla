@@ -478,6 +478,10 @@ jQuery(document).ready(function($) {
                break;
             case 'Html':
                $target.html(item.Data);
+               break;
+            case 'Callback':
+               window[item.Target](item.Data);
+               break;
          }
       }
    };

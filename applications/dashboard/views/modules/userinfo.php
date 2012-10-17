@@ -38,7 +38,13 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
             echo htmlspecialchars(implode(', ', ConsolidateArrayValuesByKey($this->Roles, 'Name'))); 
       
       ?></dd>
-      <?php if ($Session->CheckPermission('Garden.Moderation.Manage')): ?>
+      <?php if ($Points = GetValueR('User.Points', $this, 0)) : // Only show positive point totals ?>
+      <dt class="Points"><?php echo T('Points'); ?></dt>
+      <dd class="Points"><?php echo number_format($Points); ?></dd>
+      <?php 
+      endif; 
+      
+      if ($Session->CheckPermission('Garden.Moderation.Manage')): ?>
       <dt class="IP"><?php echo T('Register IP'); ?></dt>
       <dd class="IP"><?php 
          $IP = IPAnchor($this->User->InsertIPAddress);

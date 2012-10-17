@@ -1061,6 +1061,63 @@ class UserModel extends Gdn_Model {
       SaveToConfig('Garden.SystemUserID', $SystemUserID);
       return $SystemUserID;
    }
+   
+   /**
+    * Add points to a user's total.
+    * 
+    * @since 2.1.0
+    * @access public
+    */
+   public static function GivePoints($UserID, $Points, $Source = 'Other', $Timestamp = FALSE) {
+      if (!$Timestamp)
+         $Timestamp = time();
+      
+      // Increment source points for the user.
+      self::_GivePoints($UserID, $Points, 'a', $Source);
+      
+      // Increment total points for the user.
+      self::_GivePoints($UserID, $Points, 'w', 'Total', $Timestamp);
+      self::_GivePoints($UserID, $Points, 'm', 'Total', $Timestamp);
+      self::_GivePoints($UserID, $Points, 'a', 'Total', $Timestamp);
+      
+      // Increment global daily points.
+      self::_GivePoints(0, $Points, 'd', 'Total', $Timestamp);
+      
+      // Grab the user's total points.
+      $Points = Gdn::SQL()->GetWhere('UserPoints', array('UserID' => $UserID, 'SlotType' => 'a', 'Source' => 'Total'))->Value('Points');
+      
+//      Gdn::Controller()->InformMessage('Points: '.$Points);
+      Gdn::UserModel()->SetField($UserID, 'Points', $Points);
+      
+      // Fire a give points event.
+      Gdn::UserModel()->EventArguments['UserID'] = $UserID;
+      Gdn::UserModel()->EventArguments['Points'] = $Points;
+      Gdn::UserModel()->FireEvent('GivePoints');
+   }
+   
+   /**
+    * Add points to a user's total in a specific timeslot.
+    * 
+    * @since 2.1.0
+    * @access protected
+    * @see self::GivePoints
+    */
+   protected static function _GivePoints($UserID, $Points, $SlotType, $Source = 'Total', $Timestamp = FALSE) {
+      $TimeSlot = gmdate('Y-m-d', Gdn_Statistics::TimeSlotStamp($SlotType, $Timestamp));
+      
+      $Px = Gdn::Database()->DatabasePrefix;
+      $Sql = "insert {$Px}UserPoints (UserID, SlotType, TimeSlot, Source, Points)
+         values (:UserID, :SlotType, :TimeSlot, :Source, :Points)
+         on duplicate key update Points = Points + :Points1";
+      
+      Gdn::Database()->Query($Sql, array(
+          ':UserID' => $UserID, 
+          ':Points' => $Points, 
+          ':SlotType' => $SlotType, 
+          ':Source' => $Source,
+          ':TimeSlot' => $TimeSlot, 
+          ':Points1' => $Points));
+   }
 
    public function Register($FormPostValues, $Options = array()) {
       $Valid = TRUE;

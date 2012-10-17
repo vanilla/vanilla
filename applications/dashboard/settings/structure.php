@@ -90,6 +90,7 @@ $Construct
    ->Column('Verified', 'tinyint(1)', '0') // user if verified as a non-spammer
    ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
    ->Column('Deleted', 'tinyint(1)', '0')
+   ->Column('Points', 'int', 0)
    ->Set($Explicit, $Drop);
 
 // Make sure the system user is okay.
@@ -132,6 +133,15 @@ $Construct->Table('UserMeta')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('Name', 'varchar(255)', FALSE, array('primary', 'index'))
    ->Column('Value', 'text', TRUE)
+   ->Set($Explicit, $Drop);
+
+// User Points Table   
+$Construct->Table('UserPoints')
+   ->Column('SlotType', array('d', 'w', 'm', 'y', 'a'), FALSE, 'primary')
+   ->Column('TimeSlot', 'datetime', FALSE, 'primary')
+   ->Column('Source', 'varchar(10)', 'Total', 'primary')
+   ->Column('UserID', 'int', FALSE, 'primary')
+   ->Column('Points', 'int', 0)
    ->Set($Explicit, $Drop);
 
 // Create the authentication table.

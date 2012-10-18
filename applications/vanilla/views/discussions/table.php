@@ -44,7 +44,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
    $FirstPageUrl = DiscussionUrl($Discussion, 1);
    $LastPageUrl = DiscussionUrl($Discussion, FALSE).'#latest';
 ?>
-<tr class="<?php echo $CssClass; ?>">
+<tr id="Discussion_<?php echo $Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
    <?php echo AdminCheck($Discussion, array('<td class="CheckBoxColumn">', '</td>')); ?>
 	<td class="DiscussionName">
 		<div class="Wrap">

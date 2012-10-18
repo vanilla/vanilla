@@ -15,6 +15,7 @@
    echo $this->Form->Errors();
    ?>
    <ul>
+      <?php if (!$this->Data('NoEmail')): ?>
       <li>
          <?php
             echo $this->Form->Label('Email', 'Email');
@@ -22,6 +23,7 @@
 				echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">'.T('Email Unavailable').'</span>';
          ?>
       </li>
+      <?php endif; ?>
       <li>
          <?php
             echo $this->Form->Label('Username', 'Name');

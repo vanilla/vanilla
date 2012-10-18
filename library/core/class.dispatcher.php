@@ -231,6 +231,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       // Analze the request AFTER checking for update mode.
       $this->AnalyzeRequest($Request);
+      $this->FireEvent('AfterAnalyzeRequest');
       
       // If we're in updatemode and can block, redirect to signin
       if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
@@ -277,9 +278,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Set up a default controller method in case one isn't defined.
          $ControllerMethod = str_replace('_', '', $this->ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
-
-         $this->FireEvent('AfterAnalyzeRequest');
-
+         
          // Take enabled plugins into account, as well
          $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->ControllerMethod);
          if (!$PluginReplacement && ($this->ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {

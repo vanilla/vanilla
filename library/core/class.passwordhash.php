@@ -132,6 +132,13 @@ class Gdn_PasswordHash extends PasswordHash {
             $VbHash = md5(md5($Password).$Salt);
             $Result = $VbHash == $VbStoredHash;
             break;
+         case 'yaf':
+            $Result = $this->CheckYaf($Password, $StoredHash);
+            break;
+         case 'webwiz':
+            require_once PATH_LIBRARY.'/vendors/misc/functions.webwizhash.php';
+            $Result = ww_CheckPassword($Password, $StoredHash);
+            break;
          case 'vanilla':
          default:
             $Result = $this->CheckVanilla($Password, $StoredHash);
@@ -153,5 +160,30 @@ class Gdn_PasswordHash extends PasswordHash {
          return TRUE;
       }
       return FALSE;
+   }
+   
+   function CheckYaf($Password, $StoredHash) {
+      if (strpos($StoredHash, '$') === FALSE) {
+         return md5($Password) == $StoredHash;
+      } else {
+         ini_set('mbstring.func_overload', "0");
+         list($Method, $Salt, $Hash, $Compare) = explode('$', $StoredHash);
+
+         $Salt = base64_decode($Salt);
+         $Hash = bin2hex(base64_decode($Hash));
+         $Password = mb_convert_encoding($Password, 'UTF-16LE');
+
+         // There are two ways of building the hash string in yaf.
+         if ($Compare == 's') {
+            // Compliant with ASP.NET Membership method of hash/salt
+            $HashString = $Salt.$Password;
+         } else {
+            // The yaf algorithm has a quirk where they knock a 
+            $HashString = substr($Password, 0, -1).$Salt.chr(0);
+         }
+
+         $CalcHash = hash($Method, $HashString);
+         return $Hash == $CalcHash; 
+      }
    }
 }

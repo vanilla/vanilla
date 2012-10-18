@@ -100,12 +100,6 @@ class DiscussionController extends VanillaController {
       // Actual number of comments, excluding the discussion itself.
       $ActualResponses = $this->Discussion->CountComments;
 
-      // If $Offset isn't defined, assume that the user has not clicked to
-      // view a next or previous page, and this is a "view" to be counted.
-      // NOTE: This has been moved to an event fired from analyticstick.
-//      if ($Offset == '')
-//         $this->DiscussionModel->AddView($DiscussionID, $this->Discussion->CountViews);
-
       $this->Offset = $Offset;
       if (C('Vanilla.Comments.AutoOffset')) {
 //         if ($this->Discussion->CountCommentWatch > 1 && $OffsetProvided == '')

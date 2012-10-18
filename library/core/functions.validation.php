@@ -99,6 +99,9 @@ if (!function_exists('ValidateOldPassword')) {
 
 if (!function_exists('ValidateEmail')) {
    function ValidateEmail($Value, $Field = '') {
+      if (!ValidateRequired($Value))
+         return TRUE;
+      
       $Result = PHPMailer::ValidateAddress($Value);
       $Result = (bool)$Result;
       return $Result;

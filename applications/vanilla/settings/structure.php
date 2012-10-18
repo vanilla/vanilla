@@ -37,6 +37,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('UrlCode', 'varchar(255)', TRUE)
    ->Column('Description', 'varchar(500)', TRUE)
    ->Column('Sort', 'int', TRUE)
+   ->Column('CssClass', 'varchar(50)', TRUE)
    ->Column('PermissionCategoryID', 'int', '-1') // default to root.
    ->Column('HideAllDiscussions', 'tinyint(1)', '0')
    ->Column('InsertUserID', 'int', FALSE, 'key')
@@ -85,7 +86,7 @@ $Construct
    ->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
    ->Column('CategoryID', 'int', FALSE, array('key', 'index.CategoryPages'))
    ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('UpdateUserID', 'int')
+   ->Column('UpdateUserID', 'int', TRUE)
    ->Column('FirstCommentID', 'int', TRUE)
    ->Column('LastCommentID', 'int', TRUE)
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')

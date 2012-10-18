@@ -688,7 +688,7 @@ if (!function_exists('FetchPageInfo')) {
     * @param integer $Timeout How long to allow for this request. Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
     * @return array an array containing Url, Title, Description, Images (array) and Exception (if there were problems retrieving the page).
     */
-   function FetchPageInfo($Url, $Timeout = 0) {
+   function FetchPageInfo($Url, $Timeout = 3) {
       $PageInfo = array(
          'Url' => $Url,
          'Title' => '',
@@ -2713,7 +2713,7 @@ if (!function_exists('T')) {
 
 if (!function_exists('Theme')) {
    function Theme() {
-      return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+      return Gdn::ThemeManager()->CurrentTheme();
    }
 }
 

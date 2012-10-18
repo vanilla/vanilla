@@ -141,6 +141,12 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
    <li>
       <div class="Info">
       <?php
+      if (UserModel::NoEmail()) {
+         echo '<div class="Warning">',
+            T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
+            '</div>';
+      }
+      
       echo $this->Form->CheckBox('Garden.Registration.ConfirmEmail', '@'.T('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
 
       echo $this->Form->Label('Email Confirmation Role', 'Garden.Registration.ConfirmEmailRole'),

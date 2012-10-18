@@ -16,9 +16,17 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Name', $Attributes);
       ?>
    </li>
+   
+   <?php if (!UserModel::NoEmail() || Gdn::Session()->CheckPermission('Garden.Users.Edit')): ?>
    <li>
       <?php
          echo $this->Form->Label('Email', 'Email');
+         
+         if (UserModel::NoEmail()) {
+            echo '<div class="Gloss">',
+               T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
+               '</div>';
+         }
          
          $Attributes2 = array();
          if (!$this->CanEditEmail) {
@@ -31,7 +39,9 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->CheckBox('ShowEmail', T('Allow other members to see your email?'), array('value' => '1'));
       ?>
-   </li>   
+   </li>
+   <?php endif ?>
+   
    <li class="Gender">
       <?php
          echo $this->Form->Label('Gender', 'Gender');

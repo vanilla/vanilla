@@ -248,9 +248,7 @@ select {
    color: #111;
    border-color: #666;
 }
-.ButtonGroup.Open .Button.Handle,
-.Button:focus,
-.Button:active {
+.ButtonGroup.Open .Button.Handle {
    border-color: #aaa;
    background: #f7f7f7;
    box-shadow: none;
@@ -306,9 +304,7 @@ select {
    );
    box-shadow: 0 1px 1px #ddd;
 }
-.ButtonGroup.Open .NavButton.Handle,
-.NavButton:active,
-.NavButton:focus {
+.ButtonGroup.Open .NavButton.Handle {
    background: #eee;
 }
 
@@ -2340,9 +2336,6 @@ tr.CategoryHeading td {
 }
 .DiscussionForm .Category label {
    padding: 0 8px 0 0;
-}
-.DiscussionForm a.Cancel {
-	margin-left: 18px;
 }
 .DiscussionForm .PostOptions li {
    display: inline;

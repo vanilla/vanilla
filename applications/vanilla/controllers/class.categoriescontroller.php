@@ -120,9 +120,10 @@ class CategoriesController extends VanillaController {
 					throw NotFoundException();
 			}
 			$Category = (object)$Category;
+         Gdn_Theme::Section($Category->CssClass);
 				
 			// Load the breadcrumbs.
-			$this->SetData('Breadcrumbs', array_merge(array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category))));
+			$this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
 			
 			$this->SetData('Category', $Category, TRUE);
          
@@ -292,7 +293,7 @@ class CategoriesController extends VanillaController {
       else
          $this->Title(T('All Categories'));
       $this->Description(C('Garden.Description', NULL));
-      Gdn_Theme::Section('DiscussionList');
+      Gdn_Theme::Section('CategoryDiscussionList');
       
 		// Set the category follow toggle before we load category data so that it affects the category query appropriately.
 		$CategoryFollowToggleModule = new CategoryFollowToggleModule($this);

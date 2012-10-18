@@ -404,7 +404,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {         
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {         
          echo '<div class="Form-Tags P">';
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));

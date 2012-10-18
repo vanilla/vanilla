@@ -691,7 +691,7 @@ class EntryController extends Gdn_Controller {
     * @param string $TransientKey (default: "")
     */
    public function SignOut($TransientKey = "") {
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->AuthenticatedPostBack()) {
+      if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->IsPostBack()) {
          $User = Gdn::Session()->User;
          
          $this->EventArguments['SignoutUser'] = $User;

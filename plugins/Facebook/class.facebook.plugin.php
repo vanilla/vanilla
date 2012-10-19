@@ -23,23 +23,15 @@ $PluginInfo['Facebook'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'Hidden' => TRUE,
+   'SocialConnect' => TRUE
 );
 
 class FacebookPlugin extends Gdn_Plugin {
    const ProviderKey = 'Facebook';
    
    protected $_AccessToken = NULL;
-   
-   /**
-	 * Adds social link to dashboard
-	 * 
-	 * @param object $Sender DashboardController.
-	 */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Social', T('Facebook'), 'dashboard/settings/facebook', 'Garden.Settings.Manage');
-   }
    
    public function AccessToken() {
       if ($this->_AccessToken === NULL) {
@@ -263,16 +255,16 @@ class FacebookPlugin extends Gdn_Plugin {
    public function Base_GetConnections_Handler($Sender, $Args) {
       $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
       
-      $Sender->Data['Connections'][self::ProviderKey] = array(
-            'Icon' => '/plugins/Facebook/design/f_logo-64.png',
-            'Name' => 'Facebook',
-            'ProviderKey' => self::ProviderKey,
-            'ConnectUrl' => $this->AuthorizeUri(FALSE, self::ProfileConnecUrl()),
-            'Profile' => array(
-               'Name' => GetValue('name', $Profile),
-               'Photo' => "http://graph.facebook.com/{$Profile['id']}/picture?type=large"
-               )
-          );
+      $Sender->Data["Connections"][self::ProviderKey] = array(
+         'Icon' => $this->GetWebResource('design/f_logo-64.png'),
+         'Name' => 'Facebook',
+         'ProviderKey' => self::ProviderKey,
+         'ConnectUrl' => $this->AuthorizeUri(FALSE, self::ProfileConnecUrl()),
+         'Profile' => array(
+            'Name' => GetValue('name', $Profile),
+            'Photo' => "http://graph.facebook.com/{$Profile['id']}/picture?type=large"
+            )
+      );
    }
    
    /**

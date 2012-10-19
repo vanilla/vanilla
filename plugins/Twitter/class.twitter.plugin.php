@@ -23,7 +23,9 @@ $PluginInfo['Twitter'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'Hidden' => TRUE,
+   'SocialConnect' => TRUE
 );
 
 require_once PATH_LIBRARY.'/vendors/oauth/OAuth.php';
@@ -34,16 +36,6 @@ class TwitterPlugin extends Gdn_Plugin {
 
    protected $_AccessToken = NULL;
    
-   /**
-	 * Adds social link to dashboard
-	 * 
-	 * @param object $Sender DashboardController.
-	 */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Social', T('Twitter'), 'dashboard/settings/twitter', 'Garden.Settings.Manage');
-   }
-
    /**
     * Gets/sets the current oauth access token.
     *
@@ -547,16 +539,16 @@ class TwitterPlugin extends Gdn_Plugin {
    public function Base_GetConnections_Handler($Sender, $Args) {
       $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
       
-      $Sender->Data['Connections'][self::ProviderKey] = array(
-            'Icon' => '/plugins/Twitter/design/twitter_logo-64.png',
-            'Name' => 'Twitter',
-            'ProviderKey' => self::ProviderKey,
-            'ConnectUrl' => '/entry/twauthorize/profile',
-            'Profile' => array(
-                'Name' => '@'.GetValue('screen_name', $Profile),
-                'Photo' => GetValue('profile_image_url', $Profile)
-                )
-          );
+      $Sender->Data["Connections"][self::ProviderKey] = array(
+         'Icon' => $this->GetWebResource('design/twitter_logo-64.png'),
+         'Name' => 'Twitter',
+         'ProviderKey' => self::ProviderKey,
+         'ConnectUrl' => '/entry/twauthorize/profile',
+         'Profile' => array(
+             'Name' => '@'.GetValue('screen_name', $Profile),
+             'Photo' => GetValue('profile_image_url', $Profile)
+             )
+      );
    }
 
    public function API($Url, $Params = NULL, $Method = 'GET') {

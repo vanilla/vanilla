@@ -36,18 +36,22 @@ if ($Session->IsValid()):
          echo '<div class="Flyout FlyoutMenu"></div></span>';
          
          // Inbox
-         $CountInbox = GetValue('CountUnreadConversations', Gdn::Session()->User);
-         $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
-         echo '<span class="ToggleFlyout" rel="/messages/popin">';
-         echo Anchor(Sprite('SpInbox', 'Sprite Sprite16').Wrap(T('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', array('title' => T('Inbox')));
-         echo Sprite('SpFlyoutHandle', 'Arrow');
-         echo '<div class="Flyout FlyoutMenu"></div></span>';
+         if (Gdn::ApplicationManager()->CheckApplication('conversations')) {
+            $CountInbox = GetValue('CountUnreadConversations', Gdn::Session()->User);
+            $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
+            echo '<span class="ToggleFlyout" rel="/messages/popin">';
+            echo Anchor(Sprite('SpInbox', 'Sprite Sprite16').Wrap(T('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', array('title' => T('Inbox')));
+            echo Sprite('SpFlyoutHandle', 'Arrow');
+            echo '<div class="Flyout FlyoutMenu"></div></span>';
+         }
          
          // Bookmarks
-         echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
-         echo Anchor(Sprite('SpBookmarks', 'Sprite Sprite16').Wrap(T('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', array('title' => T('Bookmarks')));
-         echo Sprite('SpFlyoutHandle', 'Arrow');
-         echo '<div class="Flyout FlyoutMenu"></div></span>';
+         if (Gdn::ApplicationManager()->CheckApplication('vanilla')) {
+            echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
+            echo Anchor(Sprite('SpBookmarks', 'Sprite Sprite16').Wrap(T('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', array('title' => T('Bookmarks')));
+            echo Sprite('SpFlyoutHandle', 'Arrow');
+            echo '<div class="Flyout FlyoutMenu"></div></span>';
+         }
          
          // Profile Settings & Logout
          echo '<span class="ToggleFlyout">';

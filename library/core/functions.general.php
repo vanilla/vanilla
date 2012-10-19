@@ -946,7 +946,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
       if (isset($Args['_ContextUserID']))
          $ContextUserID = $Args['_ContextUserID'];
       else
-         $ContextUserID = Gdn::Session()->IsValid() ? Gdn::Session()->UserID : NULL;
+         $ContextUserID = Gdn::Session() && Gdn::Session()->IsValid() ? Gdn::Session()->UserID : NULL;
       
       return;
    }

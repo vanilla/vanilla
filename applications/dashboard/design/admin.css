@@ -326,7 +326,7 @@ a.Button {
 	font-size: 11px;
    display: inline-block;
    text-align: center;
-   line-height: 1;
+   line-height: 13px;
 }
 .SmallButton:hover,
 .Button:hover {
@@ -2347,3 +2347,100 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 .Info ul li {
   list-style: disc !important;
 }
+
+.ActivateSlider {
+   display: inline-block;
+   background: #bbb;
+   box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
+   border: solid 1px #ccc;
+   width: 100px;
+   padding: 1px;
+   border-radius: 2px;
+   position: relative;
+   line-height: 1;
+   vertical-align: middle;
+}
+
+.ActivateSlider .SmallButton {
+   line-height: 11px;
+}
+
+.ActivateSlider-Active {
+   text-align: right;
+   background: #001F44;
+   box-shadow: 0 -5px 10px #0B64C6 inset;
+}
+
+.ActivateSlider .SmallButton {
+   margin: 0;
+   min-width: 45px;
+   
+}
+
+.Sprite {
+   width: 16px;
+   height: 16px;
+   line-height: 16px;
+   vertical-align: text-top;
+   border: solid 2px transparent;
+   margin: -2px;
+	background: url('//vanillicon.com/sprites/sprites-14-sweetx-001F44.png') 0 0 no-repeat;
+	display: inline-block;
+}
+
+/* 16px Sprites Black Transparent */
+/*.SpDashboard,
+.SpCog { background-position: 0 -148px; }
+.SpSettings { background-position: -16px -148px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -148px; }
+.SpSignOut,
+.SpExit { background-position: -48px -148px; }
+.SpMarker { background-position: -64px -148px; }
+.SpDocuments { background-position: -80px -148px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -164px; }
+.SpInmail { background-position: -16px -164px; }
+.SpRoundBubble { background-position: -32px -164px; }
+.SpSquareBubble { background-position: -48px -164px; }
+.SpRoundBubbles { background-position: -64px -164px; }
+.SpSquareBubbles { background-position: -80px -164px; }
+.SpTag { background-position: 0 -180px; }
+.SpWrite { background-position: -16px -180px; }
+.SpLock { background-position: -32px -180px; }
+.SpRoundAlert { background-position: -48px -180px; }
+.SpTriangleAlert { background-position: -64px -180px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -180px; }
+.SpSearch { background-position: 0 -196px; }
+.SpTrash { background-position: -16px -196px; }
+.SpUser { background-position: -32px -196px; }
+.SpRefresh { background-position: -48px -196px; }
+.SpPencil { background-position: -64px -196px; }
+.SpPlus { background-position: -80px -196px; }*/
+
+.SpActivity { background-position: -160px -120px; }
+.SpAllCategories { background-position: -60px -140px; }
+.SpApplicants { background-position: -260px -40px; }
+.SpBadge { background-position: -240px -140px; }
+.SpBan { background-position: -300px -20px; }
+.SpBookmarks { background-position: -100px -80px; }
+.SpComments, .SpComment { background-position: -160px -80px; }
+.SpConnection { background-position: -320px -20px; }
+.SpDashboard { background-position: -340px -20px }
+.SpDelete { background-position: -340px -140px; }
+.SpDiscussions, .SpMyDiscussions { background-position: -200px -80px; }
+.SpImage { background-position: -120px -140px; }
+.SpInbox { background-position: -80px -100px; }
+.SpMessage { background-position: -100px -100px;}
+.SpMod { background-position: -260px -60px; }
+.SpMyDrafts { background-position: -180px -20px; }
+.SpNotifications { background-position: -160px -100px; }
+.SpOptions { background-position: -180px -60px; }
+.SpPhoto { background-position: -160px -60px; }
+.SpProfile, .SpEditProfile { background-position: -220px -40px; }
+.SpQuote { background-position: -280px -20px ;}
+.SpSignOut { background-position: -240px -100px; }
+.SpText { background-position: -160px -80px; }
+.SpUnansweredQuestions { background-position: -60px -100px; }
+.SpWarn, .SpWarnings { background-position: -200px -20px; }

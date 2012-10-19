@@ -167,6 +167,8 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Moderation', T('Banning'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
+      
+      $Menu->AddItem('Social', T('Social'), FALSE, array('class' => 'Social'));
 		
 		$Menu->AddItem('Reputation', T('Reputation'), FALSE, array('class' => 'Reputation'));
 		

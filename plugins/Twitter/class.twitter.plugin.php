@@ -26,7 +26,6 @@ $PluginInfo['Twitter'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
 );
 
-
 require_once PATH_LIBRARY.'/vendors/oauth/OAuth.php';
 
 class TwitterPlugin extends Gdn_Plugin {
@@ -34,6 +33,16 @@ class TwitterPlugin extends Gdn_Plugin {
    public static $BaseApiUrl = 'http://api.twitter.com/1.1/';
 
    protected $_AccessToken = NULL;
+   
+   /**
+	 * Adds social link to dashboard
+	 * 
+	 * @param object $Sender DashboardController.
+	 */
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Social', T('Twitter'), 'dashboard/settings/twitter', 'Garden.Settings.Manage');
+   }
 
    /**
     * Gets/sets the current oauth access token.

@@ -31,6 +31,16 @@ class FacebookPlugin extends Gdn_Plugin {
    
    protected $_AccessToken = NULL;
    
+   /**
+	 * Adds social link to dashboard
+	 * 
+	 * @param object $Sender DashboardController.
+	 */
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Social', T('Facebook'), 'dashboard/settings/facebook', 'Garden.Settings.Manage');
+   }
+   
    public function AccessToken() {
       if ($this->_AccessToken === NULL) {
          if (Gdn::Session()->IsValid())

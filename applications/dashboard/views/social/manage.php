@@ -15,10 +15,10 @@
 
 <style>
    .DataList-Connections {
-      padding: 10px 20px;
+      padding: 0px 20px;
    }
    .DataList-Connections .Item {
-      margin: 10px 0px;
+      margin: 15px 0px;
       min-width: 700px;
    }
    .Conneciton-Header * {

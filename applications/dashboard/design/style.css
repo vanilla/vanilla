@@ -1225,7 +1225,7 @@ overflow: hidden;
    margin: 10px 0;
 }
 #Content .FilterMenu {
-	margin: 0 0 10px;
+	margin: 10px 0;
 }
 #Content .FilterMenu li,
 #Content .FilterMenu li.Active {

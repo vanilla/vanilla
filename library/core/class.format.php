@@ -832,9 +832,12 @@ class Gdn_Format {
     * @param string $Body a serialized array of image properties (Image, Thumbnail, Caption)
     */
    public static function Image($Body) {
-      $Image = @unserialize($Body);
-      if (!$Image) 
-         return Gdn_Format::Html($Body);
+      if (is_string($Body)) {
+         $Image = @unserialize($Body);
+      
+         if (!$Image) 
+            return Gdn_Format::Html($Body);
+      }
       
       $Url = GetValue('Image', $Image);
       $Caption = Gdn_Format::PlainText(GetValue('Caption', $Image));

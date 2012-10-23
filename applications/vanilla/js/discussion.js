@@ -327,6 +327,7 @@ jQuery(document).ready(function($) {
          } else {
             // Remove the affected row
             $(row).slideUp('fast', function() {$(this).remove();});
+            gdn.processTargets(json.Targets);
          }
       }
    });

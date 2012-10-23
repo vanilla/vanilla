@@ -655,13 +655,16 @@ class DiscussionController extends VanillaController {
       }
       
       // Redirect
-      if ($this->_DeliveryType != DELIVERY_TYPE_BOOL) {
+      if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
          $Target = GetIncomingValue('Target', $DefaultTarget);
          Redirect($Target);
       }
          
-      if ($this->Form->ErrorCount() > 0)
+      if ($this->Form->ErrorCount() > 0) {
          $this->SetJson('ErrorMessage', $this->Form->Errors());
+      } else {
+         $this->JsonTarget("#Comment_$CommentID", '', 'SlideUp');
+      }
          
       $this->Render();         
    }

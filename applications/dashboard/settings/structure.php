@@ -323,17 +323,17 @@ if (!$PermissionTableExists) {
 }
 $PermissionModel->ClearPermissions();
 
-// Photo Table
-$Construct->Table('Photo');
-
-$PhotoTableExists = $Construct->TableExists('Photo');
-
-$Construct
-	->PrimaryKey('PhotoID')
-   ->Column('Name', 'varchar(255)')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('DateInserted', 'datetime')
-   ->Set($Explicit, $Drop);
+//// Photo Table
+//$Construct->Table('Photo');
+//
+//$PhotoTableExists = $Construct->TableExists('Photo');
+//
+//$Construct
+//	->PrimaryKey('PhotoID')
+//   ->Column('Name', 'varchar(255)')
+//   ->Column('InsertUserID', 'int', TRUE, 'key')
+//   ->Column('DateInserted', 'datetime')
+//   ->Set($Explicit, $Drop);
 
 // Invitation Table
 $Construct->Table('Invitation')

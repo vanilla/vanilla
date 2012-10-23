@@ -106,7 +106,7 @@ class Gdn_ApplicationManager {
    }
    
    public function CheckApplication($ApplicationName) {
-      if (array_key_exists($ApplicationName, $this->_EnabledApplications))
+      if (array_key_exists($ApplicationName, $this->EnabledApplications()))
          return TRUE;
          
       return FALSE;

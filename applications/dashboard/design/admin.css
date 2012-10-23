@@ -1835,7 +1835,7 @@ div.Summary table tbody td {
 .Homepage {
 	padding: 0 20px;
 }
-.Homepage a {
+.Homepage a.Choice {
 	color: #777;
 	font-weight: bold;
 	font-size: 12px;
@@ -1853,7 +1853,7 @@ div.Summary table tbody td {
 	background: url('images/homepage-sprites.png') 0 0 no-repeat;
 	border: 1px solid #888;
 }
-.Homepage a .Wrap {
+.Homepage a.Choice .Wrap {
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
@@ -1869,14 +1869,15 @@ div.Summary table tbody td {
 .Homepage .SpCategoriesTable { background-position: 0 -124px; }
 .Homepage .SpCategoriesMixed { background-position: -180px -124px; }
 .Homepage .SpActivity { background-position: -360px -124px; }
-.Homepage a:hover {
+.Homepage .SpBestOf { background-position: -540px 0px; }
+.Homepage a.Choice:hover {
 	color: #000;
 }
-.Homepage a:hover .Wrap {
+.Homepage a.Choice:hover .Wrap {
 	background-color: #fafafa;
 	border-color: #aaa;
 }
-.Homepage a.Current {
+.Homepage a.Choice.Current {
 	color: #000;
 	background: url('images/check.png') 2px 3px no-repeat;
 	text-indent: 36px;

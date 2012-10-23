@@ -63,6 +63,20 @@ if (!function_exists('ValidateMeAction')) {
    }
 }
 
+if (!function_exists('ValidateNoLinks')) {
+   /**
+    * Check whether or not a
+    * 
+    * @param string $Value
+    * @return bool
+    * @since 2.1
+    */
+   function ValidateNoLinks($Value) {
+      $Matched = preg_match('`https?://`i', $Value);
+      return !$Matched;
+   }
+}
+
 if (!function_exists('ValidateRequiredArray')) {
    /**
     * Checkbox lists and DropDown lists that have no values selected return a

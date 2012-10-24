@@ -532,9 +532,6 @@ class Gdn_Validation {
       if ($HoneypotContents != '')
          $this->AddValidationResult($HoneypotName, "You've filled our honeypot! We use honeypots to help prevent spam. If you're  not a spammer or a bot, you should contact the application administrator for help.");
 
-      decho($PostedFields);
-      
-      decho($this->_ValidationFields);
       
       // Loop through the fields that should be validated
       foreach($this->_ValidationFields as $FieldName => $FieldValue) {

@@ -89,7 +89,7 @@
 .SpWarnings,
 .SpActivity,
 .SpPublicActivities,
-.SpModeratorActivities,
+.SpModeratorActivities, .SpMod,
 .SpAdminActivities,
 .SpUnansweredQuestions,
 .SpQuote,
@@ -138,7 +138,7 @@
 }
 .SpActivity,
 .SpPublicActivities { background-position: -222px -101px; }
-.SpModeratorActivities { background-position: -293px -54px; }
+.SpModeratorActivities, .SpMod { background-position: -293px -54px; }
 .SpAdminActivities { background-position: -268px -53px; }
 .SpUnansweredQuestions { background-position: -102px -278px; } 
 .SpThumbnail { background-position: -246px -101px; } 

@@ -2070,6 +2070,10 @@ class UserModel extends Gdn_Model {
          $this->Validation->UnapplyRule('Email', 'Required');
       }
       
+      if (!$Insert && !isset($FormPostValues['Name'])) {
+         $this->Validation->UnapplyRule('Name');
+      }
+      
       return $this->Validation->Validate($FormPostValues, $Insert);
    }
 

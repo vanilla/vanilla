@@ -809,13 +809,18 @@ class ProfileController extends Gdn_Controller {
          }
       }
       $Defaults = array_merge($Defaults, $MetaPrefs);
+      $this->SetData('Preferences', $Defaults);
       
       if (UserModel::NoEmail()) {
          $this->PreferenceGroups = self::_RemoveEmailPreferences($this->PreferenceGroups);
          $this->PreferenceTypes = self::_RemoveEmailPreferences($this->PreferenceTypes);
          $this->SetData('NoEmail', TRUE);
       }
-         
+      
+      $this->SetData('PreferenceGroups', $this->PreferenceGroups);
+      $this->SetData('PreferenceTypes', $this->PreferenceTypes);
+      $this->SetData('PreferenceList', $this->Preferences);
+      
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Use global defaults
          $this->Form->SetData($Defaults);

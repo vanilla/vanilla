@@ -31,23 +31,23 @@ $this->DefaultRolesWarning();
    <tbody>
 <?php
 $Alt = FALSE;
-foreach ($this->RoleData->Result() as $Role) {
+foreach ($this->Data('Roles') as $Role) {
    $Alt = $Alt ? FALSE : TRUE;
    ?>
-   <tr id="<?php echo $Role->RoleID; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
+   <tr id="<?php echo $Role['RoleID']; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
       <td class="Info">
-         <strong><?php echo $Role->Name; ?></strong>
+         <strong><?php echo $Role['Name']; ?></strong>
          <?php if ($Advanced) { ?>
          <div>
             <?php
-            echo Anchor(T('Edit'), '/role/edit/'.$Role->RoleID, 'SmallButton');
-            if ($Role->Deletable)
-               echo Anchor(T('Delete'), '/role/delete/'.$Role->RoleID, 'Popup SmallButton');
+            echo Anchor(T('Edit'), "/role/edit/{$Role['RoleID']}", 'SmallButton');
+            if ($Role['Deletable'])
+               echo Anchor(T('Delete'), "/role/delete/{$Role['RoleID']}", 'Popup SmallButton');
             ?>
          </div>
          <?php } ?>
       </td>
-      <td class="Alt"><?php echo $Role->Description; ?></td>
+      <td class="Alt"><?php echo $Role['Description']; ?></td>
    </tr>
 <?php } ?>
    </tbody>

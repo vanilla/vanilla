@@ -228,14 +228,22 @@ class RoleController extends DashboardController {
     * @since 2.0.0
     * @access public
     */
-   public function Index() {
+   public function Index($RoleID = NULL) {
 		$this->Permission('Garden.Roles.Manage');
 
       $this->AddSideMenu('dashboard/role');
       $this->AddJsFile('jquery.tablednd.js');
       $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
       $this->Title(T('Roles & Permissions'));
-      $this->RoleData = $this->RoleModel->Get();
+      
+      if (!$RoleID)
+         $RoleData = $this->RoleModel->Get()->ResultArray();
+      else {
+         $Role = $this->RoleModel->GetID($RoleID);
+         $RoleData = array($Role);
+      }
+      
+      $this->SetData('Roles', $RoleData);
       $this->Render();
    }
 

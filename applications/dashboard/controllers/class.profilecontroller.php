@@ -300,6 +300,7 @@ class ProfileController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
       $UserID = GetValueR('User.UserID', $this);
+      $Settings = array();
       
       // Decide if they have ability to edit the username
       $this->CanEditUsername = C("Garden.Profile.EditUsernames");
@@ -341,7 +342,44 @@ class ProfileController extends Gdn_Controller {
             Gdn::UserModel()->Validation->ApplyRule('Name', 'Username', $UsernameError);
          }
          
-         if ($this->Form->Save() !== FALSE) {
+         // API
+         // These options become available when POSTing as a user with Garden.Settings.Manage permissions
+         
+         if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            
+            // Role change
+            
+            $RequestedRoles = $this->Form->GetFormValue('RoleID', NULL);
+            if (!is_null($RequestedRoles)) {
+               
+               $RoleModel = new RoleModel();
+               $AllRoles = $RoleModel->GetArray();
+               
+               if (!is_array($RequestedRoles))
+                  $RequestedRoles = is_numeric($RequestedRoles) ? array($RequestedRoles) : array();
+               
+               $RequestedRoles = array_flip($RequestedRoles);
+               $UserNewRoles = array_intersect_key($AllRoles, $RequestedRoles);
+
+               // Put the data back into the forum object as if the user had submitted 
+               // this themselves
+               $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
+               
+               // Allow saving roles
+               $Settings['SaveRoles'] = TRUE;
+               
+            }
+            
+            // Password change
+            
+            $NewPassword = $this->Form->GetFormValue('Password', NULL);
+            if (!is_null($NewPassword)) {
+               
+            }
+         }
+         
+         
+         if ($this->Form->Save($Settings) !== FALSE) {
             $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
             $this->SetData('Profile', $User);
             
@@ -1324,6 +1362,11 @@ class ProfileController extends Gdn_Controller {
          if ($this->RoleData !== FALSE && $this->RoleData->NumRows(DATASET_TYPE_ARRAY) > 0) 
             $this->Roles = ConsolidateArrayValuesByKey($this->RoleData->Result(), 'Name');
          
+         if (Gdn::Session()->CheckPermission('Garden.Settings.Manage') || Gdn::Session()->UserID == $this->User->UserID) {
+            $this->User->Transient = GetValueR('Attributes.TransientKey', $this->User);
+            unset($this->User->Preferences);
+         }
+         
          $this->SetData('Profile', $this->User);
          $this->SetData('UserRoles', $this->Roles);
          if ($CssClass = GetValue('_CssClass', $this->User)) {
@@ -1415,6 +1458,33 @@ class ProfileController extends Gdn_Controller {
       $this->EditMode = $Switch;
       if (!$this->EditMode && strpos($this->CssClass, 'EditMode'))
          $this->CssClass = str_replace('EditMode', '', $this->CssClass);
+   }
+   
+   /**
+    * Fetch multiple users
+    * 
+    * Note: API only
+    * @param type $UserID
+    */
+   public function Multi($UserID) {
+      $this->Permission('Garden.Settings.Manage');
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      // Get rid of Reactions busybody data
+      unset($this->Data['Counts']);
+      
+      $UserID = (array)$UserID;
+      $Users = Gdn::UserModel()->GetIDs($UserID);
+      
+      $AllowedFields = array('UserID','Name','Title','Location','About','Email','Gender','CountVisits','CountInvitations','CountNotifications','Admin','Verified','Banned','Deleted','CountDiscussions','CountComments','CountBookmarks','CountBadges','Points','Punished','RankID','PhotoUrl','Online','LastOnlineDate');
+      $AllowedFields = array_fill_keys($AllowedFields, NULL);
+      foreach ($Users as &$User)
+         $User = array_intersect_key($User, $AllowedFields);
+      $Users = array_values($Users);
+      $this->SetData('Users', $Users);
+      
+      $this->Render();
    }
    
 }

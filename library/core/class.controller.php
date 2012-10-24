@@ -1047,6 +1047,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       $ResolvedPath = strtolower(CombinePaths(array(Gdn::Dispatcher()->Application(), Gdn::Dispatcher()->ControllerName, Gdn::Dispatcher()->ControllerMethod)));
       $this->ResolvedPath = $ResolvedPath;
+      
+      $this->FireEvent('Initialize');
    }
    
    public function JsFiles() {

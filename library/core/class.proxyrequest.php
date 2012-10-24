@@ -39,6 +39,27 @@ class ProxyRequest {
    
    protected $Options;
    
+   /**
+    * Set up ProxyRequest
+    * 
+    * Options:
+    *   URL
+    *   Host
+    *   Method
+    *   ConnectTimeout
+    *   Timeout
+    *   Redirects
+    *   Cookies
+    *   SaveAs
+    *   CloseSession
+    *   Redirected
+    *   Debug
+    *   Simulate
+    * 
+    * @param boolean $Loud
+    * @param array $RequestDefaults
+    * @return type 
+    */
    public function __construct($Loud = FALSE, $RequestDefaults = NULL) {
       $this->Loud = $Loud;
       

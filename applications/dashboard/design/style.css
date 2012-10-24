@@ -102,6 +102,9 @@ body {
 .Hidden {
    display: none;
 }
+.Invisible {
+   opacity: 0;
+}
 .ClearFix:after {
 	visibility: hidden;
 	display: block;

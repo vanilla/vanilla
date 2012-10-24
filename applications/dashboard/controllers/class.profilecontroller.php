@@ -1364,7 +1364,6 @@ class ProfileController extends Gdn_Controller {
          
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage') || Gdn::Session()->UserID == $this->User->UserID) {
             $this->User->Transient = GetValueR('Attributes.TransientKey', $this->User);
-            unset($this->User->Preferences);
          }
          
          $this->SetData('Profile', $this->User);

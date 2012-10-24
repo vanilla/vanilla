@@ -1362,6 +1362,11 @@ class ProfileController extends Gdn_Controller {
          if ($this->RoleData !== FALSE && $this->RoleData->NumRows(DATASET_TYPE_ARRAY) > 0) 
             $this->Roles = ConsolidateArrayValuesByKey($this->RoleData->Result(), 'Name');
          
+         if (Gdn::Session()->CheckPermission('Garden.Settings.Manage') || Gdn::Session()->UserID == $this->User->UserID) {
+            $this->User->Transient = GetValueR('Attributes.TransientKey', $this->User);
+            unset($this->User->Preferences);
+         }
+         
          $this->SetData('Profile', $this->User);
          $this->SetData('UserRoles', $this->Roles);
          if ($CssClass = GetValue('_CssClass', $this->User)) {

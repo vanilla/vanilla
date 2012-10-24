@@ -1460,4 +1460,31 @@ class ProfileController extends Gdn_Controller {
          $this->CssClass = str_replace('EditMode', '', $this->CssClass);
    }
    
+   /**
+    * Fetch multiple users
+    * 
+    * Note: API only
+    * @param type $UserID
+    */
+   public function Multi($UserID) {
+      $this->Permission('Garden.Settings.Manage');
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      // Get rid of Reactions busybody data
+      unset($this->Data['Counts']);
+      
+      $UserID = (array)$UserID;
+      $Users = Gdn::UserModel()->GetIDs($UserID);
+      
+      $AllowedFields = array('UserID','Name','Title','Location','About','Email','Gender','CountVisits','CountInvitations','CountNotifications','Admin','Verified','Banned','Deleted','CountDiscussions','CountComments','CountBookmarks','CountBadges','Points','Punished','RankID','PhotoUrl','Online','LastOnlineDate');
+      $AllowedFields = array_fill_keys($AllowedFields, NULL);
+      foreach ($Users as &$User)
+         $User = array_intersect_key($User, $AllowedFields);
+      $Users = array_values($Users);
+      $this->SetData('Users', $Users);
+      
+      $this->Render();
+   }
+   
 }

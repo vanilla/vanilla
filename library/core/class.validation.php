@@ -238,7 +238,7 @@ class Gdn_Validation {
       // Make sure that $FieldName is in the validation fields collection
       $this->ValidationFields();
       
-      if (!array_key_exists($FieldName, $this->_ValidationFields))
+      if (!array_key_exists($FieldName, $this->_ValidationFields)) //  && $RuleName == 'Required'
          $this->_ValidationFields[$FieldName] = '';
          
       $this->_ApplyRule($FieldName, $RuleName, $CustomError);
@@ -502,8 +502,11 @@ class Gdn_Validation {
             if ($Index !== FALSE)
                unset($this->_FieldRules[$FieldName][$Index]);
          }
-      } else
+      } else {
          unset($this->_FieldRules[$FieldName]);
+         unset($this->_ValidationFields[$FieldName]);
+      }
+      
    }
 
    /**
@@ -529,6 +532,10 @@ class Gdn_Validation {
       if ($HoneypotContents != '')
          $this->AddValidationResult($HoneypotName, "You've filled our honeypot! We use honeypots to help prevent spam. If you're  not a spammer or a bot, you should contact the application administrator for help.");
 
+      decho($PostedFields);
+      
+      decho($this->_ValidationFields);
+      
       // Loop through the fields that should be validated
       foreach($this->_ValidationFields as $FieldName => $FieldValue) {
          // If this field has rules to be enforced...

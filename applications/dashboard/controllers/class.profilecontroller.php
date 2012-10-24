@@ -300,6 +300,7 @@ class ProfileController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
       $UserID = GetValueR('User.UserID', $this);
+      $Settings = array();
       
       // Decide if they have ability to edit the username
       $this->CanEditUsername = C("Garden.Profile.EditUsernames");
@@ -341,7 +342,44 @@ class ProfileController extends Gdn_Controller {
             Gdn::UserModel()->Validation->ApplyRule('Name', 'Username', $UsernameError);
          }
          
-         if ($this->Form->Save() !== FALSE) {
+         // API
+         // These options become available when POSTing as a user with Garden.Settings.Manage permissions
+         
+         if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            
+            // Role change
+            
+            $RequestedRoles = $this->Form->GetFormValue('RoleID', NULL);
+            if (!is_null($RequestedRoles)) {
+               
+               $RoleModel = new RoleModel();
+               $AllRoles = $RoleModel->GetArray();
+               
+               if (!is_array($RequestedRoles))
+                  $RequestedRoles = is_numeric($RequestedRoles) ? array($RequestedRoles) : array();
+               
+               $RequestedRoles = array_flip($RequestedRoles);
+               $UserNewRoles = array_intersect_key($AllRoles, $RequestedRoles);
+
+               // Put the data back into the forum object as if the user had submitted 
+               // this themselves
+               $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
+               
+               // Allow saving roles
+               $Settings['SaveRoles'] = TRUE;
+               
+            }
+            
+            // Password change
+            
+            $NewPassword = $this->Form->GetFormValue('Password', NULL);
+            if (!is_null($NewPassword)) {
+               
+            }
+         }
+         
+         
+         if ($this->Form->Save($Settings) !== FALSE) {
             $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
             $this->SetData('Profile', $User);
             

@@ -18,7 +18,7 @@ class InboxModule extends Gdn_Module {
          0,
          $this->Limit,
          array()
-      )->ResultArray();
+      );
       
       // Join in the participants.
       $Model->JoinParticipants($Result);

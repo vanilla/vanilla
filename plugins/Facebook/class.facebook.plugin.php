@@ -35,7 +35,9 @@ class FacebookPlugin extends Gdn_Plugin {
    protected $_AccessToken = NULL;
    
    public function AccessToken() {
-      if (!$this->IsConfigured()) return FALSE;
+      if (!$this->IsConfigured()) 
+         return FALSE;
+      
       if ($this->_AccessToken === NULL) {
          if (Gdn::Session()->IsValid())
             $this->_AccessToken = GetValueR(self::ProviderKey.'.AccessToken', Gdn::Session()->User->Attributes);

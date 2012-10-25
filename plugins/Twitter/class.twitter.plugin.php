@@ -45,7 +45,9 @@ class TwitterPlugin extends Gdn_Plugin {
     * @return OAuthToken
     */
    public function AccessToken($Token = NULL, $Secret = NULL) {
-      if (!$this->IsConfigured()) return FALSE;
+      if (!$this->IsConfigured()) 
+         return FALSE;
+      
       if (is_object($Token)) {
          $this->_AccessToken = $Token;
       } if ($Token !== NULL && $Secret !== NULL) {

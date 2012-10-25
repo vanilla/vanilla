@@ -413,19 +413,21 @@ class PromotedContentModule extends Gdn_Module {
    protected function Security(&$Content) {
       if (!is_array($Content)) return;
       
-      foreach ($Content as &$ContentItem) {
-         $CategoryID = GetValueR('CategoryID', $ContentItem, NULL);
-         if (is_null($CategoryID) || $CategoryID === FALSE) {
-            unset($ContentItem);
+      $PermittedItems = array();
+      foreach ($Content as $ContentKey => $ContentItem) {
+         $CategoryID = GetValue('CategoryID', $ContentItem, NULL);
+         if (is_null($CategoryID) || $CategoryID === FALSE)
             continue;
-         }
          
          $Category = CategoryModel::Categories($CategoryID);
-         if (!GetValue('PermsDiscussionsView', $Category)) {
-            unset($ContentItem);
+         $CanView = GetValue('PermsDiscussionsView', $Category);
+         if (!$CanView)
             continue;
-         }
+         
+         $PermittedItems[$ContentKey] = $ContentItem;
       }
+      
+      $Content = $PermittedItems;
    }
    
    /**

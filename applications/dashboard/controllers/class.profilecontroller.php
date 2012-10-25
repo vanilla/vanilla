@@ -1225,6 +1225,7 @@ class ProfileController extends Gdn_Controller {
 
          if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
              $Module->AddLink('Options', Sprite('SpThumbnail').T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
+         }
       }
       
       if ($this->User->UserID == $ViewingUserID || $Session->CheckPermission('Garden.Users.Edit')) {

@@ -20,8 +20,10 @@ function WriteConnection($Connection) {
    if (!$Configured)
       $Addendums[] = Wrap(T('not configured'), 'span', array('class' => 'NotConfigured'));
    
+   $Index = GetValue('Index', $Connection, $Connection['ProviderKey']);
+   
 ?>
-   <li id="<?php echo "Provider_{$Connection['Index']}"; ?>" class="Item <?php echo $CssClasses; ?>">
+   <li id="<?php echo "Provider_$Index"; ?>" class="Item <?php echo $CssClasses; ?>">
       <div class="Connection-Header">
          <span class="IconWrap">
             <?php echo Img(Asset(GetValue('Icon', $Connection,'/applications/dashboard/design/images/connection-64.png'))); ?>
@@ -48,10 +50,10 @@ function WriteConnection($Connection) {
             if ($Enabled) {
                echo Anchor(Sprite('SpOptions'), Url("/social/{$Connection['Index']}"), 'Connection-Configure').' ';
                $SliderState = 'Active';
-               echo Wrap(Anchor(T('Enabled'), Url("/social/disable/{$Connection['Index']}"), 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
+               echo Wrap(Anchor(T('Enabled'), Url("/social/disable/$Index"), 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
             } else {
                $SliderState = 'InActive';
-               echo Wrap(Anchor(T('Disabled'), Url("/social/enable/{$Connection['Index']}"), 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
+               echo Wrap(Anchor(T('Disabled'), Url("/social/enable/$Index"), 'Hijack SmallButton'), 'span', array('class' => "ActivateSlider ActivateSlider-{$SliderState}"));
             }
          ?></span>
       </div>

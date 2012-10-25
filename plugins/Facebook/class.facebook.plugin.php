@@ -394,10 +394,10 @@ class FacebookPlugin extends Gdn_Plugin {
          $Sender->InformMessage(T("Your settings have been saved."));
 
       } else {
-         $Sender->Form->SetFormValue('ApplicationID', C('Plugins.Facebook.ApplicationID'));
-         $Sender->Form->SetFormValue('Secret', C('Plugins.Facebook.Secret'));
-         $Sender->Form->SetFormValue('UseFacebookNames', C('Plugins.Facebook.UseFacebookNames'));
-         $Sender->Form->SetFormValue('SendConnectEmail', C('Garden.Registration.SendConnectEmail', TRUE));
+         $Sender->Form->SetValue('ApplicationID', C('Plugins.Facebook.ApplicationID'));
+         $Sender->Form->SetValue('Secret', C('Plugins.Facebook.Secret'));
+         $Sender->Form->SetValue('UseFacebookNames', C('Plugins.Facebook.UseFacebookNames'));
+         $Sender->Form->SetValue('SendConnectEmail', C('Garden.Registration.SendConnectEmail', TRUE));
          $Sender->Form->SetValue('SocialReactions', $this->SocialReactions());
          $Sender->Form->SetValue('SocialSharing', $this->SocialSharing());
       }

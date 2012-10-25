@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook Sign In',
    'Description' => 'Users may sign into your site using their Facebook account.',	
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -593,11 +593,11 @@ class FacebookPlugin extends Gdn_Plugin {
    }
    
    public function SocialSharing() {
-      return C('Plugins.Facebook.SocialSharing', TRUE);
+      return C('Plugins.Facebook.SocialSharing', TRUE) && $this->IsConfigured();
    }
    
    public function SocialReactions() {
-      return C('Plugins.Facebook.SocialReactions', TRUE);
+      return C('Plugins.Facebook.SocialReactions', TRUE) && $this->IsConfigured();
    }
    
    public function Setup() {

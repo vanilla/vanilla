@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Sign In',
    'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -652,11 +652,11 @@ class TwitterPlugin extends Gdn_Plugin {
    }
    
    public function SocialSharing() {
-      return C('Plugins.Twitter.SocialSharing', TRUE);
+      return C('Plugins.Twitter.SocialSharing', TRUE) && $this->IsConfigured();
    }
    
    public function SocialReactions() {
-      return C('Plugins.Twitter.SocialReactions', TRUE);
+      return C('Plugins.Twitter.SocialReactions', TRUE) && $this->IsConfigured();
    }
 
    public function SetOAuthToken($Token, $Secret = NULL, $Type = 'request') {

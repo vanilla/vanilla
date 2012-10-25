@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Sign In',
    'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -156,7 +156,7 @@ class TwitterPlugin extends Gdn_Plugin {
       $Options =& $Args['Options'];
       
       $Options .= ' <li>'.
-         $Sender->Form->CheckBox('ShareTwitter', '@'.Sprite('ReactTwitter'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
+         $Sender->Form->CheckBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
          '</li> ';
    }
    
@@ -168,7 +168,7 @@ class TwitterPlugin extends Gdn_Plugin {
          return;
       
       echo ' '.
-         $Sender->Form->CheckBox('ShareTwitter', '@'.Sprite('ReactTwitter'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
+         $Sender->Form->CheckBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Twitter'))).
          ' ';
    }
    

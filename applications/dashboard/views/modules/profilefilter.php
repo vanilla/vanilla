@@ -4,11 +4,11 @@ $Controller = Gdn::Controller();
 $Session = Gdn::Session();
 
 // Get the tab sort order from the user-prefs.
-$SortOrder = FALSE;
-$SortOrder = ArrayValue('ProfileTabOrder', $Controller->User->Preferences, FALSE);
+//$SortOrder = FALSE;
+//$SortOrder = ArrayValue('ProfileTabOrder', $Controller->User->Preferences, FALSE);
 // If not in the user prefs, get the sort order from the application prefs.
-if ($SortOrder === FALSE)
-   $SortOrder = C('Garden.ProfileTabOrder');
+//if ($SortOrder === FALSE)
+$SortOrder = C('Garden.ProfileTabOrder');
 
 if (!is_array($SortOrder))
    $SortOrder = array();

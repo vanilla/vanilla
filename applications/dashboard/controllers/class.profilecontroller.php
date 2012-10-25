@@ -1460,7 +1460,7 @@ class ProfileController extends Gdn_Controller {
    public function EditMode($Switch) {
       
       $this->EditMode = $Switch;
-      if (!$this->EditMode && strpos($this->CssClass, 'EditMode'))
+      if (!$this->EditMode && strpos($this->CssClass, 'EditMode') !== FALSE)
          $this->CssClass = str_replace('EditMode', '', $this->CssClass);
    }
    

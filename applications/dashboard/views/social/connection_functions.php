@@ -20,7 +20,7 @@ function WriteConnection($Connection) {
    if (!$Configured)
       $Addendums[] = Wrap(T('not configured'), 'span', array('class' => 'NotConfigured'));
    
-   $Index = GetValue('Index', $Connection, $Connection['ProviderKey']);
+   $Index = GetValue('Index', $Connection, GetValue('ProviderKey', $Connection));
    
 ?>
    <li id="<?php echo "Provider_$Index"; ?>" class="Item <?php echo $CssClasses; ?>">

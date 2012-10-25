@@ -1351,6 +1351,36 @@ if (!function_exists('GetPostValue')) {
    }
 }
 
+if (!function_exists('GetRecord')):
+
+function GetRecord($RecordType, $ID) {
+   switch(strtolower($RecordType)) {
+      case 'discussion':
+         $Model = new DiscussionModel();
+         $Row = $Model->GetID($ID);
+         $Row->Url = DiscussionUrl($Row);
+         $Row->ShareUrl = $Row->Url;
+         return (array)$Row;
+      case 'comment':
+         $Model = new CommentModel();
+         $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
+         $Row['Url'] = Url("/discussion/comment/$ID#Comment_$ID", TRUE);
+         
+         $Model = new DiscussionModel();
+         $Discussion = $Model->GetID($Row['DiscussionID']);
+         $Discussion->Url = DiscussionUrl($Discussion);
+         $Row['ShareUrl'] = $Discussion->Url;
+         $Row['Name'] = $Discussion->Name;
+         $Row['Discussion'] = (array)$Discussion;
+         
+         return $Row;
+      default:
+         throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($RecordType)));
+   }
+}
+
+endif;
+
 if (!function_exists('GetValue')) {
 	/**
 	 * Return the value from an associative array or an object.

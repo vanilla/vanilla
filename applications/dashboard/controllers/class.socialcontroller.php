@@ -38,7 +38,8 @@ class SocialController extends DashboardController {
    protected function GetConnections() {
       
       $this->FireEvent('GetConnections');
-      $Connections = $this->Data('Connections');
+      $Connections = $this->Data('Connections', array());
+      if (!is_array($Connections)) $Connections = array();
       
       foreach (Gdn::PluginManager()->AvailablePlugins() as $PluginKey => $PluginInfo) {
          if (!array_key_exists('SocialConnect', $PluginInfo)) continue;

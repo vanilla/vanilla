@@ -45,6 +45,7 @@ class TwitterPlugin extends Gdn_Plugin {
     * @return OAuthToken
     */
    public function AccessToken($Token = NULL, $Secret = NULL) {
+      if (!$this->IsConfigured()) return FALSE;
       if (is_object($Token)) {
          $this->_AccessToken = $Token;
       } if ($Token !== NULL && $Secret !== NULL) {
@@ -144,6 +145,9 @@ class TwitterPlugin extends Gdn_Plugin {
 	}
    
    public function Base_DiscussionFormOptions_Handler($Sender, $Args) {
+      if (!$this->SocialSharing()) 
+         return;
+      
       if (!$this->AccessToken())
          return;
       
@@ -155,6 +159,9 @@ class TwitterPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_AfterBodyField_Handler($Sender, $Args) {
+      if (!$this->SocialSharing()) 
+         return;
+      
       if (!$this->AccessToken())
          return;
       
@@ -164,6 +171,9 @@ class TwitterPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionModel_AfterSaveDiscussion_Handler($Sender, $Args) {
+      if (!$this->SocialSharing()) 
+         return;
+      
       if (!$this->AccessToken())
          return;
       
@@ -182,6 +192,9 @@ class TwitterPlugin extends Gdn_Plugin {
    }
    
    public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
+      if (!$this->SocialSharing()) 
+         return;
+      
       if (!$this->AccessToken())
          return;
       
@@ -281,6 +294,9 @@ class TwitterPlugin extends Gdn_Plugin {
     * @throws type
     */
    public function PostController_Twitter_Create($Sender, $RecordType, $ID) {
+      if (!$this->SocialReactions()) 
+         throw PermissionException();
+            
 //      if (!Gdn::Request()->IsPostBack())
 //         throw PermissionException('Javascript');
       
@@ -632,6 +648,14 @@ class TwitterPlugin extends Gdn_Plugin {
       $Result = C('Plugins.Twitter.ConsumerKey') && C('Plugins.Twitter.Secret');
       return $Result;
    }
+   
+   public function SocialSharing() {
+      return C('Plugins.Twitter.SocialSharing', TRUE);
+   }
+   
+   public function SocialReactions() {
+      return C('Plugins.Twitter.SocialReactions', TRUE);
+   }
 
    public function SetOAuthToken($Token, $Secret = NULL, $Type = 'request') {
       if (is_a($Token, 'OAuthToken')) {
@@ -704,6 +728,9 @@ class TwitterPlugin extends Gdn_Plugin {
     * Add 'Twitter' option to the row.
     */
    public function Base_AfterReactions_Handler($Sender, $Args) {
+      if (!$this->SocialReactions()) 
+         return;
+      
       echo Gdn_Theme::BulletItem('Share');
       $this->AddReactButton($Sender, $Args);
    }
@@ -728,7 +755,10 @@ class TwitterPlugin extends Gdn_Plugin {
       if ($Sender->Form->IsPostBack()) {
          $Settings = array(
              'Plugins.Twitter.ConsumerKey' => $Sender->Form->GetFormValue('ConsumerKey'),
-             'Plugins.Twitter.Secret' => $Sender->Form->GetFormValue('Secret'));
+             'Plugins.Twitter.Secret' => $Sender->Form->GetFormValue('Secret'),
+             'Plugins.Twitter.SocialReactions' => $Sender->Form->GetFormValue('SocialReactions'),
+             'Plugins.Twitter.SocialSharing' => $Sender->Form->GetFormValue('SocialSharing')
+         );
 
          SaveToConfig($Settings);
          $Sender->InformMessage(T("Your settings have been saved."));
@@ -736,6 +766,8 @@ class TwitterPlugin extends Gdn_Plugin {
       } else {
          $Sender->Form->SetValue('ConsumerKey', C('Plugins.Twitter.ConsumerKey'));
          $Sender->Form->SetValue('Secret', C('Plugins.Twitter.Secret'));
+         $Sender->Form->SetValue('SocialReactions', $this->SocialReactions());
+         $Sender->Form->SetValue('SocialSharing', $this->SocialSharing());
       }
 
       $Sender->AddSideMenu('dashboard/social');

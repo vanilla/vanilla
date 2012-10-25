@@ -65,6 +65,16 @@ echo $this->Form->Errors();
                echo $this->Form->TextBox('Secret');
             ?>
          </li>
+         <li>
+            <?php
+               echo $this->Form->CheckBox('SocialReactions', "Enable Social Reactions.");
+            ?>
+         </li>
+         <li>
+            <?php
+               echo $this->Form->CheckBox('SocialSharing', 'Enable automatic Social Share.');
+            ?>
+         </li>
       </ul>
       <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
    </div>

@@ -153,7 +153,15 @@ endif;
 
 if (!function_exists('WriteReactions')):
 function WriteReactions($Row, $Type = 'Comment') {
+   list($RecordType, $RecordID) = RecordType($Row);
+   
+   Gdn::Controller()->EventArguments['RecordType'] = strtolower($RecordType);
+   Gdn::Controller()->EventArguments['RecordID'] = $RecordID;
+   
    echo '<div class="Reactions">';
+      Gdn_Theme::BulletRow();
+      Gdn::Controller()->FireEvent('AfterFlag');
+   
       Gdn::Controller()->FireEvent('AfterReactions');
    echo '</div>';
 }

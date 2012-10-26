@@ -793,7 +793,7 @@ class ProfileController extends Gdn_Controller {
       }
 
       // Loop the preferences, setting defaults from the configuration.
-      $Defaults = array();
+      $UserPrefs = array();
       foreach ($this->Preferences as $PrefGroup => $Prefs) {
          foreach ($Prefs as $Pref => $Desc) {
             $Location = 'Prefs';
@@ -801,15 +801,15 @@ class ProfileController extends Gdn_Controller {
                list($Desc, $Location) = $Desc;
 
             if ($Location == 'Meta')
-               $Defaults[$Pref] = GetValue($Pref, $MetaPrefs, FALSE);
+               $UserPrefs[$Pref] = GetValue($Pref, $MetaPrefs, FALSE);
             else
-               $Defaults[$Pref] = GetValue($Pref, $UserPrefs, C('Preferences.'.$Pref, '0'));
+               $UserPrefs[$Pref] = GetValue($Pref, $UserPrefs, C('Preferences.'.$Pref, '0'));
             
             unset($MetaPrefs[$Pref]);
          }
       }
-      $Defaults = array_merge($Defaults, $MetaPrefs);
-      $this->SetData('Preferences', $Defaults);
+      $UserPrefs = array_merge($UserPrefs, $MetaPrefs);
+      $this->SetData('Preferences', $UserPrefs);
       
       if (UserModel::NoEmail()) {
          $this->PreferenceGroups = self::_RemoveEmailPreferences($this->PreferenceGroups);
@@ -821,37 +821,38 @@ class ProfileController extends Gdn_Controller {
       $this->SetData('PreferenceTypes', $this->PreferenceTypes);
       $this->SetData('PreferenceList', $this->Preferences);
       
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Use global defaults
-         $this->Form->SetData($Defaults);
-      } else {
+      if ($this->Form->IsPostBack()) {
+         
          // Get, assign, and save the preferences.
-         $Meta = array();
          foreach ($this->Preferences as $PrefGroup => $Prefs) {
             foreach ($Prefs as $Pref => $Desc) {
                $Location = 'Prefs';
                if (is_array($Desc))
                   list($Desc, $Location) = $Desc;
 
-               $Value = $this->Form->GetValue($Pref, FALSE);
+               $Value = $this->Form->GetValue($Pref, NULL);
+               if (is_null($Value)) continue;
 
                if ($Location == 'Meta') {
-                  $Meta[$Pref] = $Value ? $Value : NULL;
+                  $MetaPrefs[$Pref] = $Value ? $Value : NULL;
                   if ($Value)
                      $UserPrefs[$Pref] = $Value; // dup for notifications code.
                } else {
-                  if (!$Defaults[$Pref] && !$Value)
+                  if (!$UserPrefs[$Pref] && !$Value)
                      unset($UserPrefs[$Pref]); // save some space
                   else
                      $UserPrefs[$Pref] = $Value;
                }
             }
          }
+         
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
-         UserModel::SetMeta($this->User->UserID, $Meta, 'Preferences.');
+         UserModel::SetMeta($this->User->UserID, $MetaPrefs, 'Preferences.');
          
          if (count($this->Form->Errors() == 0))
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
+      } else {
+         $this->Form->SetData($UserPrefs);
       }
       
       $this->Title(T('Notification Preferences'));
@@ -1213,18 +1214,19 @@ class ProfileController extends Gdn_Controller {
             $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
                
             // No password may have been set if they have only signed in with a connect plugin
-            $passwordLabel = T('Change My Password');
+            $PasswordLabel = T('Change My Password');
             if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")
-               $passwordLabel = T('Set A Password');
-            $Module->AddLink('Options', Sprite('SpPassword').' '.$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
+               $PasswordLabel = T('Set A Password');
+            $Module->AddLink('Options', Sprite('SpPassword').' '.$PasswordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
          }
          
          $Module->AddLink('Options', Sprite('SpPreferences').' '.T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), FALSE, array('class' => 'Popup PreferencesLink'));
-         if ($AllowImages)
+         if ($AllowImages) {
             $Module->AddLink('Options', Sprite('SpPicture').' '.T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
-
+         }
+         
          if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-             $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
+            $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
          }
       }
       

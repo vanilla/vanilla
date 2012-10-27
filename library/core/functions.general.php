@@ -1625,6 +1625,23 @@ if (!function_exists('IsTimestamp')) {
    }
 }
 
+if (!function_exists('IsUrl')) {
+   /**
+    * Whether or not a string is a url in the form http://, https://, or //
+    * 
+    * @param string $Str The string to check.
+    * @return bool
+    * @since 2.1
+    */
+   function IsUrl($Str) {
+      if (substr($Str, 0, 2) == '//')
+         return TRUE;
+      if (strpos($Str, '://', 1) !== FALSE)
+         return TRUE;
+      return FALSE;
+   }
+}
+
 if (!function_exists('IsWritable')) {
    /**
     * PHP's native is_writable() function fails to correctly determine write

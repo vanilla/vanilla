@@ -258,7 +258,7 @@ embed.onMessage = embed.fn.onMessage = function(message, origin) {
 //   console.log("Message from: "+origin+", "+message);
    var data = JSON.parse(message);
   
-   var func = embed.fn[data.func];
+   var func = this[data.func];
    if (!Vanilla.isFunction(func))
       Vanilla.error(data.func+' is not a function.');
    
@@ -275,6 +275,9 @@ embed.onMessage = embed.fn.onMessage = function(message, origin) {
       if (path.substring(0, this.root.length) == this.root) {
          path = path.substring(this.root.length);
       }
+      // Strip the sso stuff out of the path.
+      path = path.replace(/\??sso=[^&]*/, '');
+      
       data.args[0] = path;
    }
    

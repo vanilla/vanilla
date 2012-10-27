@@ -304,7 +304,7 @@ if (!class_exists('HeadModule', FALSE)) {
          if (method_exists($this->_Sender, 'CanonicalUrl') && !C('Garden.Modules.NoCanonicalUrl', FALSE)) {
             $CanonicalUrl = $this->_Sender->CanonicalUrl();
             
-            if (!preg_match('`^https?://`', $CanonicalUrl))
+            if (!IsUrl($CanonicalUrl))
                $CanonicalUrl = Gdn::Router()->ReverseRoute($CanonicalUrl);
             
             $this->_Sender->CanonicalUrl($CanonicalUrl);

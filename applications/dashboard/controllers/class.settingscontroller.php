@@ -357,7 +357,39 @@ class SettingsController extends DashboardController {
       }
       
       $this->Render();      
-   }      
+   }
+   
+   public function Configuration() {
+      $this->Permission('Garden.Settings.Manage');
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      $ConfigData = array(
+         'Title'        => C('Garden.Title'),
+         'Domain'       => C('Garden.Domain'),
+         'Cookie'       => C('Garden.Cookie'),
+         'Theme'        => C('Garden.Theme'),
+         'Analytics'    => array(
+            'InstallationID'    => C('Garden.InstallationID'),
+            'InstallationSecret'=> C('Garden.InstallationSecret')
+         )
+      );
+      
+      $Config = Gdn_Configuration::Format($ConfigData, array(
+         'FormatStyle'  => 'Dotted',
+         'WrapPHP'      => FALSE,
+         'SafePHP'      => FALSE,
+         'Headings'     => FALSE,
+         'ByLine'       => FALSE,
+      ));
+      
+      $Configuration = array();
+      eval($Config);
+      
+      $this->SetData('Configuration', $Configuration);
+      
+      $this->Render();
+   }
 
    /**
     * Outgoing Email management screen.

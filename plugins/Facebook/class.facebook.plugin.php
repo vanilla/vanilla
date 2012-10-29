@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook Sign In',
    'Description' => 'Users may sign into your site using their Facebook account.',	
-   'Version' => '1.0.2',
+   'Version' => '1.0.5',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -167,7 +167,7 @@ class FacebookPlugin extends Gdn_Plugin {
       $Options =& $Args['Options'];
       
       $Options .= ' <li>'.
-         $Sender->Form->CheckBox('ShareFacebook', '@'.Sprite('ReactFacebook'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Facebook'))).
+         $Sender->Form->CheckBox('ShareFacebook', '@'.Sprite('ReactFacebook', 'ReactSprite'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Facebook'))).
          '</li> ';
    }
    
@@ -179,7 +179,7 @@ class FacebookPlugin extends Gdn_Plugin {
          return;
       
       echo ' '.
-         $Sender->Form->CheckBox('ShareFacebook', '@'.Sprite('ReactFacebook'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Facebook'))).
+         $Sender->Form->CheckBox('ShareFacebook', '@'.Sprite('ReactFacebook', 'ReactSprite'), array('value' => '1', 'title' => sprintf(T('Share to %s.'), 'Facebook'))).
          ' ';
    }
    
@@ -428,8 +428,8 @@ class FacebookPlugin extends Gdn_Plugin {
          $Query = 'display='.urlencode($Sender->Request->Get('display'));
 
       $RedirectUri = ConcatSep('&', $this->RedirectUri(), $Query);
-      $RedirectUri = urlencode($RedirectUri);
-
+//      $RedirectUri = urlencode($RedirectUri);
+      
       // Get the access token.
       if ($Code) {
          // Exchange the token for an access token.
@@ -495,7 +495,7 @@ class FacebookPlugin extends Gdn_Plugin {
           'redirect_uri' => $RedirectUri);
       
       $Url = 'https://graph.facebook.com/oauth/access_token?'.http_build_query($Get);
-
+      
       // Get the redirect URI.
       $C = curl_init();
       curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
@@ -593,11 +593,11 @@ class FacebookPlugin extends Gdn_Plugin {
    }
    
    public function SocialSharing() {
-      return C('Plugins.Facebook.SocialSharing', TRUE);
+      return C('Plugins.Facebook.SocialSharing', TRUE) && $this->IsConfigured();
    }
    
    public function SocialReactions() {
-      return C('Plugins.Facebook.SocialReactions', TRUE);
+      return C('Plugins.Facebook.SocialReactions', TRUE) && $this->IsConfigured();
    }
    
    public function Setup() {

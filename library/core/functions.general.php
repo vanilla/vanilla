@@ -1792,6 +1792,31 @@ if (!function_exists('parse_ini_string')) {
    }
 }
 
+if (!function_exists('RecordType')) {
+   /**
+    * Return the record type and id of a row.
+    * 
+    * @param array|object $Row The record we are looking at.
+    * @return array An array with the following items
+    *  - 0: record type
+    *  - 1: record ID
+    * @since 2.1
+    */
+   function RecordType($Row) {
+      if ($RecordType = GetValue('RecordType', $Row)) {
+         return array($RecordType, GetValue('RecordID', $Row));
+      } elseif ($CommentID = GetValue('CommentID', $Row)) {
+         return array('Comment', $CommentID);
+      } elseif ($DiscussionID = GetValue('DiscussionID', $Row)) {
+         return array('Discussion', $DiscussionID);
+      } elseif ($ActivityID = GetValue('ActivityID', $Row)) {
+         return array('Activity', $ActivityID);
+      } else {
+         return array(null, null);
+      }
+   }
+}
+
 if (!function_exists('write_ini_string')) {
    function write_ini_string($Data) {
       $Flat = array();

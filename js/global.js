@@ -42,14 +42,15 @@ jQuery(document).ready(function($) {
    });
    
    // Reveal youtube player when preview clicked.
-   $('.Video.YouTube .VideoPreview').click(function() {
-      var preview = this;
-      var $container = $(preview).parents('.Video.YouTube');
+   $('.Video.YouTube').delegate('.VideoPreview', 'click', function(e) {
+      e.preventDefault();
+      var $target = $(e.target);
+      var $container = $target.closest('.Video.YouTube');
+      var $preview = $container.find('.VideoPreview');
       var $player = $container.find('.VideoPlayer');
-      var width = $(preview).width(), height = $(preview).height(), videoid = $container.attr('id').replace('youtube-', '');
+      var width = $preview.width(), height = $preview.height(), videoid = $container.attr('id').replace('youtube-', '');
 
-      $(preview).find('a').click(function() { return false; });
-      $(preview).hide();
+      $preview.hide();
       $player.html('<object width="'+width+'" height="'+height+'">'
          + '<param name="movie" value="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1"></param>'
          + '<param name="allowFullScreen" value="true"></param>'

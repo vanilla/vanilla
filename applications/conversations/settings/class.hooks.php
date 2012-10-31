@@ -85,44 +85,30 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @access public
     */
-   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-      $Session = Gdn::Session();
-      if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID && C('Conversations.Moderation.Allow', FALSE)) {
-         $SideMenu = $Sender->EventArguments['SideMenu'];
-         $SideMenu->AddLink('Options', T('Inbox'), '/messages/inbox?userid='.$Sender->User->UserID, 'Conversations.Moderation.Manage', array('class' => 'InboxLink'));
-         $Sender->EventArguments['SideMenu'] = $SideMenu;
+   public function ProfileController_AddProfileTabs_Handler($Sender) {
+      if (Gdn::Session()->IsValid()) {
+         $Inbox = T('Inbox');
+         $InboxHtml = Sprite('SpInbox').' '.$Inbox;
+         $InboxLink = '/messages/all';
+         
+         if (Gdn::Session()->UserID != $Sender->User->UserID) {
+            // Accomodate admin access
+            if (C('Conversations.Moderation.Allow', FALSE) && Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
+               $CountUnread = $Sender->User->CountUnreadConversations;
+               $InboxLink .= "?userid={$Sender->User->UserID}";
+            } else {
+               return;
+            }
+         } else {
+            // Current user
+            $CountUnread = Gdn::Session()->User->CountUnreadConversations;
+         }
+         
+         if (is_numeric($CountUnread) && $CountUnread > 0)
+            $InboxHtml .= ' <span class="Aside"><span class="Count">'.$CountUnread.'</span></span>';
+         $Sender->AddProfileTab($Inbox, $InboxLink, 'Inbox', $InboxHtml);
       }
    }
-   
-   /**
-    * Add 'Inbox' to profile menu.
-    *
-    * @since 2.0.0
-    * @access public
-    */
-//   public function ProfileController_AddProfileTabs_Handler($Sender) {
-//      if (Gdn::Session()->IsValid()) {
-//         $Inbox = T('Inbox');
-//         $InboxHtml = Sprite('SpInbox').' '.$Inbox;
-//         $InboxLink = '/messages/all';
-//         
-//         if (Gdn::Session()->UserID != $Sender->User->UserID) {
-//            if (C('Conversations.Moderation.Allow', FALSE) && Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
-//               $CountUnread = $Sender->User->CountUnreadConversations;
-//               $InboxLink .= "?userid={$Sender->User->UserID}";
-//            } else {
-//               return;
-//            }
-//         } else {
-//            // Nothing
-//            $CountUnread = Gdn::Session()->User->CountUnreadConversations;
-//         }
-//         
-//         if (is_numeric($CountUnread) && $CountUnread > 0)
-//            $InboxHtml .= ' <span class="Aside"><span class="Count">'.$CountUnread.'</span></span>';
-//         $Sender->AddProfileTab($Inbox, $InboxLink, 'Inbox', $InboxHtml);
-//      }
-//   }
    
    /**
     * Add "Message" option to profile options.

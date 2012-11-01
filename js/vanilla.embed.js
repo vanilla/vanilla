@@ -203,11 +203,6 @@ Vanilla.each("Boolean Number String Function Array Date RegExp Object".split(" "
 	class2type[ "[object " + name + "]" ] = name.toLowerCase();
 });
 
-window.easyXDM.Socket.prototype.callRemote = function(func, args, success, failure) {
-   var options = { func: func, args: args, success: success, failure: failure, id: Math.floor(Math.random()*4294967295) };
-   this.postMessage(JSON.stringify(options));
-};
-
 var embed = function(options) {
    var me = this == Vanilla ? Vanilla.embed : this;
    
@@ -236,6 +231,11 @@ var embed = function(options) {
 };
 
 embed.fn = embed.prototype;
+
+embed.callRemote = embed.fn.callRemote = function(func, args, success, failure) {
+   var options = { func: func, args: args, success: success, failure: failure, id: Math.floor(Math.random()*4294967295) };
+   this.socket.postMessage(JSON.stringify(options));
+};
 
 embed.height = embed.fn.height = function(height) {
    this.iframe.height = height;
@@ -289,7 +289,7 @@ embed.setLocation = embed.fn.setLocation = function(path) {
       Vanilla.error("The embed is not ready.");
    
    var url = this.root+Vanilla.slash(path);
-   this.socket.callRemote('setLocation', url);
+   this.callRemote('setLocation', url);
 };
 
 embed.start = embed.fn.start = function() {
@@ -297,7 +297,10 @@ embed.start = embed.fn.start = function() {
 
    // Destroy a previous socket.
    if (me.socket) {
-      me.socket.destroy();
+      try {
+         me.socket.destroy();
+      } catch(ex) {
+      }
    }
    
    var url = me.root+(me.initialPath || '/');
@@ -321,6 +324,20 @@ embed.start = embed.fn.start = function() {
          me.onMessage(message, origin);
       }
    });
+};
+
+embed.stop = embed.fn.stop = function() {
+   if (this.socket) {
+      if (!this.isReady) {
+         this.onReady = function() {
+            this.socket.destroy();
+            this.isReady = false;
+         };
+      } else {
+         this.socket.destroy();
+         this.isReady = false;
+      }
+   }
 };
 
 Vanilla.embed = embed;

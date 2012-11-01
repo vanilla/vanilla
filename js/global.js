@@ -43,7 +43,6 @@ jQuery(document).ready(function($) {
    
    // Reveal youtube player when preview clicked.
    function Youtube(Container) {
-      console.log('youtube');
       var $preview = Container.find('.VideoPreview');
       var $player = Container.find('.VideoPlayer');
       var width = $preview.width(), height = $preview.height(), videoid = Container.attr('id').replace('youtube-', '');
@@ -60,8 +59,6 @@ jQuery(document).ready(function($) {
       return false;
    }
    $(document).delegate('.Video.YouTube .VideoPreview', 'click', function(e) {
-      console.log('click');
-      
       var $target = $(e.target);
       var $container = $target.closest('.Video.YouTube');
       return Youtube($container);

@@ -159,11 +159,11 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 	<thead>
 		<tr>
          <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn">', '</td>')); ?>
-			<td class="DiscussionName"><?php echo DiscussionHeading() ?></td>
-			<td class="BlockColumn BlockColumn-User FirstUser"><?php echo T('Started By'); ?></td>
-			<td class="BigCount CountReplies"><?php echo T('Replies'); ?></td>
-			<td class="BigCount CountViews"><?php echo T('Views'); ?></td>
-			<td class="BlockColumn BlockColumn-User LastUser"><?php echo T('Most Recent Comment', 'Most Recent'); ?></td>
+			<td class="DiscussionName"><div class="Wrap"><?php echo DiscussionHeading() ?></div></td>
+			<td class="BlockColumn BlockColumn-User FirstUser"><div class="Wrap"><?php echo T('Started By'); ?></div></td>
+			<td class="BigCount CountReplies"><div class="Wrap"><?php echo T('Replies'); ?></div></td>
+			<td class="BigCount CountViews"><div class="Wrap"><?php echo T('Views'); ?></div></td>
+			<td class="BlockColumn BlockColumn-User LastUser"><div class="Wrap"><?php echo T('Most Recent Comment', 'Most Recent'); ?></div></td>
 		</tr>
 	</thead>
 	<tbody>

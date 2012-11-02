@@ -318,7 +318,7 @@ embed.start = embed.fn.start = function() {
          me.isReady = true;
          
          if (me.onReady)
-            me.onReady();
+            me.onReady.apply(me);
       },
       onMessage: function(message, origin) {
          me.onMessage(message, origin);
@@ -328,10 +328,12 @@ embed.start = embed.fn.start = function() {
 
 embed.stop = embed.fn.stop = function() {
    if (this.socket) {
+      var me = this;
+      
       if (!this.isReady) {
          this.onReady = function() {
-            this.socket.destroy();
-            this.isReady = false;
+            me.socket.destroy();
+            me.isReady = false;
          };
       } else {
          this.socket.destroy();

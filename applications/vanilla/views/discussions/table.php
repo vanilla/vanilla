@@ -88,22 +88,26 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 		</div>
    </td>
 	<td class="BigCount CountComments">
-		<?php
-		// Exact Number
-		// echo number_format($Discussion->CountComments);
-		
-		// Round Number
-		echo BigPlural($Discussion->CountComments, '%s comment');
-		?>
+      <div class="Wrap">
+         <?php
+         // Exact Number
+         // echo number_format($Discussion->CountComments);
+
+         // Round Number
+         echo BigPlural($Discussion->CountComments, '%s comment');
+         ?>
+      </div>
 	</td>
 	<td class="BigCount CountViews">
-		<?php
-		// Exact Number
-		// echo number_format($Discussion->CountViews);
-		
-		// Round Number
-		echo BigPlural($Discussion->CountViews, '%s view');
-		?>
+      <div class="Wrap">
+         <?php
+         // Exact Number
+         // echo number_format($Discussion->CountViews);
+
+         // Round Number
+         echo BigPlural($Discussion->CountViews, '%s view');
+         ?>
+      </div>
 	</td>
 	<td class="BlockColumn BlockColumn-User LastUser">
 		<div class="Block Wrap">
@@ -155,11 +159,11 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 	<thead>
 		<tr>
          <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn">', '</td>')); ?>
-			<td class="DiscussionName"><?php echo T('Discussion'); ?></td>
+			<td class="DiscussionName"><?php echo DiscussionHeading() ?></td>
 			<td class="BlockColumn BlockColumn-User FirstUser"><?php echo T('Started By'); ?></td>
 			<td class="BigCount CountReplies"><?php echo T('Replies'); ?></td>
 			<td class="BigCount CountViews"><?php echo T('Views'); ?></td>
-			<td class="BlockColumn BlockColumn-User LastUser"><?php echo T('Most Recent'); ?></td>
+			<td class="BlockColumn BlockColumn-User LastUser"><?php echo T('Most Recent Comment', 'Most Recent'); ?></td>
 		</tr>
 	</thead>
 	<tbody>

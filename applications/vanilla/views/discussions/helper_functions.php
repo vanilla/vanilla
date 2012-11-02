@@ -79,6 +79,14 @@ function CategoryLink($Discussion, $Prefix = ' ') {
 
 endif;
 
+if (!function_exists('DiscussionHeading')):
+   
+function DiscussionHeading() {
+   return T('Discussion');
+}
+
+endif;
+
 if (!function_exists('WriteDiscussion')):
 function WriteDiscussion($Discussion, &$Sender, &$Session) {
    $CssClass = CssClass($Discussion);

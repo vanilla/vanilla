@@ -148,6 +148,10 @@ class CategoryModel extends Gdn_Model {
          $Category['CountAllComments'] = $Category['CountComments'];
          $Category['Url'] = self::CategoryUrl($Category, FALSE, '//');
          $Category['ChildIDs'] = array();
+         if ($Category['Photo'])
+            $Category['PhotoUrl'] = Gdn_Upload::Url($Category['Photo']);
+         else
+            $Category['PhotoUrl'] = '';
          
          if (!GetValue('CssClass', $Category))
             $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
@@ -923,16 +927,15 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
-   public static function MakeTree($Categories) {
+   public static function MakeTree($Categories, $Root = NULL) {
       $Result = array();
       
       $Categories = (array)$Categories;
       
-      if (isset($Categories['Name'])) {
+      if ($Root) {
+         $Root = (array)$Root;
          // Make the tree out of this category as a subtree.
-         $Row = $Categories;
-         $Row['Children'] = self::_MakeTreeChildren($Row, self::Categories());
-         $Result[] = $Row;
+         $Result = self::_MakeTreeChildren($Root, $Categories);
       } else {
          // Make a tree out of all categories.
          foreach ($Categories as $Category) {

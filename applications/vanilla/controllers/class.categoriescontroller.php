@@ -89,19 +89,6 @@ class CategoriesController extends VanillaController {
          }
          return;
       } else {
-         Gdn_Theme::Section('DiscussionList');
-         // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
-         $Layout = C('Vanilla.Discussions.Layout');
-         switch($Layout) {
-            case 'table':
-               if ($this->SyndicationMethod == SYNDICATION_NONE)
-                  $this->View = 'table';
-               break;
-            default:
-               // $this->View = 'index';
-               break;
-         }
-         
          $Category = CategoryModel::Categories($CategoryIdentifier);
          
          if (empty($Category)) {
@@ -115,6 +102,26 @@ class CategoriesController extends VanillaController {
 			$this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
          
          $this->SetData('Category', $Category, TRUE);
+         
+         
+         
+         if ($Category->Depth <= C('Vanilla.Categories.NavDepth', 0)) {
+            $this->Table();
+            return;
+         }
+         
+         Gdn_Theme::Section('DiscussionList');
+         // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
+         $Layout = C('Vanilla.Discussions.Layout');
+         switch($Layout) {
+            case 'table':
+               if ($this->SyndicationMethod == SYNDICATION_NONE)
+                  $this->View = 'table';
+               break;
+            default:
+               // $this->View = 'index';
+               break;
+         }
          
          // Load the subtree.
          if (C('Vanilla.ExpandCategories'))

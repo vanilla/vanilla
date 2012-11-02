@@ -401,6 +401,22 @@ class SettingsController extends Gdn_Controller {
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->SetData($this->Category);
       } else {
+         $Upload = new Gdn_Upload();
+         $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
+         if ($TmpImage) {
+            
+            // Generate the target image name
+            $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
+            $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+
+            // Save the uploaded image
+            $Parts = $Upload->SaveAs(
+               $TmpImage,
+               $ImageBaseName
+            );
+            $this->Form->SetFormValue('Photo', $Parts['SaveName']);
+         }
+         
          if ($this->Form->Save()) {
             $Category = CategoryModel::Categories($CategoryID);
             $this->SetData('Category', $Category);

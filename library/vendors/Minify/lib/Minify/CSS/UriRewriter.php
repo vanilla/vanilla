@@ -39,6 +39,7 @@ class Minify_CSS_UriRewriter {
      */
     public static function rewrite($css, $currentDir, $docRoot = null, $prependPath = null) 
     {
+       
         self::$_docRoot = self::_realpath(
             $docRoot ? $docRoot : $_SERVER['DOCUMENT_ROOT']
         );
@@ -125,9 +126,6 @@ class Minify_CSS_UriRewriter {
     {
        $uri = trim($m[1], '()"\' ');
        
-//       decho(self::$_currentDir, 'currentDir');
-//       decho(self::$_docRoot, 'docRoot');
-       
        // We want to grab the import.
        if (strpos($uri, '//') !== false) {
           $path = $uri;
@@ -144,18 +142,22 @@ class Minify_CSS_UriRewriter {
        }
        $css = file_get_contents($path);
        // Not so fast, we've got to rewrite this file too. What's more, the current dir and path are different.
-       $currentDirBak = self::$_currentDir;
-       $newCurrentDir = realpath2($currentDirBak.realpath2(dirname($uri)));
        
-//       echo "
-//       currentDir: $currentDir,
-//       newCurrentDir: $newCurrentDir,
-//       docRoot: $docRoot
-//       uri:$uri\n";
+       $bak = array(self::$_currentDir, self::$_prependPath, self::$_docRoot, self::$debugText);
        
-       $css = self::rewrite($css, $newCurrentDir, self::$_docRoot);
+       self::$debugText = '';
        
-       self::$_currentDir = $currentDirBak;
+       if (IsUrl($path)) {
+          $newCurrentDir = $path;
+          $newDocRoot = $path;
+       } else {
+          $newDocRoot = self::$_docRoot;
+         $newCurrentDir = realpath2($currentDirBak.realpath2(dirname($uri)));
+       }
+       
+       $css = self::rewrite($css, $newCurrentDir, $newDocRoot);
+       
+       list(self::$_currentDir, self::$_prependPath, self::$_docRoot, self::$debugText) = $bak;
        
        return "/* @include url('$uri'); */\n".
          $css;
@@ -184,13 +186,17 @@ class Minify_CSS_UriRewriter {
             && 0 !== strpos($uri, 'data:')   // data protocol
         ) {
             // URI is file-relative: rewrite depending on options
-            $uri = (self::$_prependPath !== null)
-                ? (self::$_prependPath . $uri)
-                : self::rewriteRelative($uri, self::$_currentDir, self::$_docRoot);
+           
+           if (self::$_prependPath !== null)
+              $uri = self::$_prependPath . $uri;
+           else
+              $uri = self::rewriteRelative($uri, self::$_currentDir, self::$_docRoot);
         }
-        return $isImport
+        $result = $isImport
             ? "@import {$quoteChar}{$uri}{$quoteChar}"
             : "url({$quoteChar}{$uri}{$quoteChar})";
+            
+         return $result;
     }
     
     /**
@@ -275,6 +281,9 @@ class Minify_CSS_UriRewriter {
  * @return string
  */
 function realpath2($path) {
+   if (substr($path, 0, 2) == '//' || strpos($path, '://'))
+      return $path;
+   
    $parts = explode('/', str_replace('\\', '/', $path));
    $result = array();
 

@@ -37,9 +37,8 @@ $TargetUserID = Gdn::Session()->UserID;
 $Now = Gdn_Format::ToDateTime();
 $CategoryID = GetValue('CategoryID', CategoryModel::DefaultCategory());
 
-// Get wall post type ID if not set from structure.php
-if (!isset($WallCommentTypeID))
-   $WallCommentTypeID = $SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->Value('ActivityTypeID');
+// Get wall post type ID 
+$WallCommentTypeID = $SQL->GetWhere('ActivityType', array('Name' => 'WallPost'))->Value('ActivityTypeID');
 
 // Insert first discussion & comment
 $DiscussionID = $SQL->Insert('Discussion', array(
@@ -70,9 +69,13 @@ $DiscussionModel->UpdateDiscussionCount($CategoryID);
 // Insert first wall post
 $SQL->Insert('Activity', array(
    'Story' => T('StubWallBody', $WallBody),
+   'Format' => 'Html',
+   'HeadlineFormat' => '{RegardingUserID,you} &rarr; {ActivityUserID,you}',
+   'NotifyUserID' => -1,
    'ActivityUserID' => $TargetUserID,
-   'RegardingUserID' => $TargetUserID,
+   'RegardingUserID' => $SystemUserID,
    'ActivityTypeID' => $WallCommentTypeID,
    'InsertUserID' => $SystemUserID,
-   'DateInserted' => $Now
+   'DateInserted' => $Now,
+   'DateUpdated' => $Now
 ));

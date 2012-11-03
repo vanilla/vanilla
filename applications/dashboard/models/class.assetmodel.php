@@ -252,7 +252,8 @@ class AssetModel extends Gdn_Model {
       
       $Info = Gdn::ThemeManager()->EnabledThemeInfo();
       if (!empty($Info)) {
-         $Data[strtolower("{$Info['Index']}-theme-{$Info['Version']}")] = TRUE;
+         $Version = GetValue('Version', $Info, 'v0');
+         $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = TRUE;
 
          if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
             $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);

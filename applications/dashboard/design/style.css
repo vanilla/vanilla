@@ -3495,6 +3495,7 @@ body.embed .InformMessages {
 .ReactFacebook { background-position: -29px -124px; }
 .ReactTwitter { background-position: -53px -124px; }
 .ReactGooglePlus { background-position: -77px -124px; }
+.ReactMessage { background-position: -101px -102px; }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
 .Reactions .MenuItems a:hover .ReactSprite,

@@ -2363,11 +2363,12 @@ class UserModel extends Gdn_Model {
          $Content = NULL;
 
       // Remove photos
-      $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
+      /*$PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
       foreach ($PhotoData->Result() as $Photo) {
          @unlink(PATH_UPLOADS.DS.$Photo->Name);
       }
       $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
+      */
       
       // Remove invitations
       $this->GetDelete('Invitation', array('InsertUserID' => $UserID), $Content);

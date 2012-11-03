@@ -1862,7 +1862,7 @@ if (!function_exists('SignInPopup')) {
     * into modal in-page popups.
     */
    function SignInPopup() {
-      return C('Garden.SignIn.Popup') && !IsMobile();
+      return C('Garden.SignIn.Popup');
    }
 }
 

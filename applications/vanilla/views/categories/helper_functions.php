@@ -28,12 +28,12 @@ function CategoryPhoto($Row) {
       $Result = Anchor(
          '<img src="'.$PhotoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(GetValue('Name', $Row)).'" />',
          CategoryUrl($Row, '', '//'),
-         'PhotoWrap PhotoWrap-Category');
+         'Item-Icon PhotoWrap PhotoWrap-Category');
    } else {
       $Result = Anchor(
          ' ',
          CategoryUrl($Row, '', '//'),
-         'PhotoWrap PhotoWrap-Category');
+         'Item-Icon PhotoWrap PhotoWrap-Category');
    }
    
    return $Result;

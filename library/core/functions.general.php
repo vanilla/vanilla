@@ -391,8 +391,8 @@ if (!function_exists('ChangeBasename')) {
 
 // Smarty
 if (!function_exists('CheckPermission')) {
-   function CheckPermission($PermissionName) {
-      $Result = Gdn::Session()->CheckPermission($PermissionName);
+   function CheckPermission($PermissionName, $Type = '') {
+      $Result = Gdn::Session()->CheckPermission($PermissionName, TRUE, '', $Type);
       return $Result;
    }
 }

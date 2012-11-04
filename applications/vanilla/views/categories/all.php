@@ -58,6 +58,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'
                   .GetOptions($Category, $this)
+                  .CategoryPhoto($Category)
                   .'<div class="TitleWrap">'
                      .Anchor(Gdn_Format::Text($Category->Name), CategoryUrl($Category), 'Title')
                   .'</div>

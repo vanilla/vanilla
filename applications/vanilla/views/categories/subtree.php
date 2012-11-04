@@ -1,7 +1,10 @@
 <?php
 
-$SubCategories = CategoryModel::MakeTree(CategoryModel::Categories(), $this->Data('Category'));
-$SubCategories = array_pop($SubCategories);
+$Category = $this->Data('Category');
+if (!$Category)
+   return;
+
+$SubCategories = CategoryModel::MakeTree(CategoryModel::Categories(), $Cateogry);
 
 if (!$SubCategories || empty($SubCategories['Children']))
    return;

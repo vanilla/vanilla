@@ -33,7 +33,7 @@ function CategoryPhoto($Row) {
       $Result = Anchor(
          ' ',
          CategoryUrl($Row, '', '//'),
-         'Item-Icon PhotoWrap PhotoWrap-Category');
+         'Item-Icon PhotoWrap PhotoWrap-Category Hidden');
    }
    
    return $Result;

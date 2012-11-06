@@ -4,9 +4,9 @@ $Category = $this->Data('Category');
 if (!$Category)
    return;
 
-$SubCategories = CategoryModel::MakeTree(CategoryModel::Categories(), $Cateogry);
+$SubCategories = CategoryModel::MakeTree(CategoryModel::Categories(), $Category);
 
-if (!$SubCategories || empty($SubCategories['Children']))
+if (!$SubCategories)
    return;
    
 require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla');
@@ -15,7 +15,7 @@ require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla
 <h2 class="ChildCategories-Title Hidden"><?php echo T('Child Categories'); ?></h2>
 <ul class="DataList ChildCategoryList">
    <?php
-   foreach ($SubCategories['Children'] as $Row):
+   foreach ($SubCategories as $Row):
       if (!$Row['PermsDiscussionsView'])
          continue;
       

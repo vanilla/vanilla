@@ -1070,7 +1070,7 @@ class DiscussionModel extends VanillaModel {
 	 * @return object SQL result.
 	 */
    public function GetForeignID($ForeignID, $Type = '') {
-      $Hash = strlen($ForeignID) > 32 ? md5($ForeignID) : $ForeignID;
+      $Hash = ForeignIDHash($ForeignID);
       $Session = Gdn::Session();
       $this->FireEvent('BeforeGetForeignID');
       $this->SQL

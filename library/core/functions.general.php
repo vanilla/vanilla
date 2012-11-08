@@ -914,6 +914,18 @@ if (!function_exists('fnmatch')) {
 }
 
 /**
+ * If a ForeignID is longer than 32 characters, use its hash instead.
+ *
+ * @param $ForeignID string Current foreign ID value.
+ * @return string 32 characters or less.
+ */
+if (!function_exists('ForeignIDHash')) {
+   function ForeignIDHash($ForeignID) {
+      return strlen($ForeignID) > 32 ? md5($ForeignID) : $ForeignID;
+   }
+}
+
+/**
  * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
  *
  * @param string $String The string to format with fields from its args enclosed in curly braces. The format of fields is in the form {Field,Format,Arg1,Arg2}. The following formats are the following:

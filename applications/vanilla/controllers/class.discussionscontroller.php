@@ -508,6 +508,7 @@ class DiscussionsController extends VanillaController {
       $Misses = array();
       $CacheKey = 'embed.comments.count.%s';
       foreach ($vanilla_identifier as $ForeignID) {
+         $ForeignID = ForeignIDHash($ForeignID);
          $RealCacheKey = sprintf($CacheKey, $ForeignID);
          $Comments = Gdn::Cache()->Get($RealCacheKey);
          if ($Comments !== Gdn_Cache::CACHEOP_FAILURE)
@@ -517,7 +518,7 @@ class DiscussionsController extends VanillaController {
       }
       
       if (sizeof($Misses)) {
-         $CountData = Gdn::SQL()
+         $CountData = Gdn::SQL()ok
             ->Select('ForeignID, CountComments')
             ->From('Discussion')
             ->Where('Type', 'page')

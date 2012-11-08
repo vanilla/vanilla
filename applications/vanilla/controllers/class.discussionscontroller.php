@@ -518,7 +518,7 @@ class DiscussionsController extends VanillaController {
       }
       
       if (sizeof($Misses)) {
-         $CountData = Gdn::SQL()ok
+         $CountData = Gdn::SQL()
             ->Select('ForeignID, CountComments')
             ->From('Discussion')
             ->Where('Type', 'page')

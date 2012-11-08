@@ -10,9 +10,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Facebook'] = array(
-	'Name' => 'Facebook Sign In',
+	'Name' => 'Facebook Social Connect',
    'Description' => 'Users may sign into your site using their Facebook account.',	
-   'Version' => '1.0.5',
+   'Version' => '1.0.6',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -465,7 +465,7 @@ class FacebookPlugin extends Gdn_Plugin {
       $Form->SetFormValue('ProviderName', 'Facebook');
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
       $Form->SetFormValue('Email', GetValue('email', $Profile));
-      $Form->SetFormValue('Photo', "http://graph.facebook.com/$ID/picture");
+      $Form->SetFormValue('Photo', "http://graph.facebook.com/{$ID}/picture");
       
       if (C('Plugins.Facebook.UseFacebookNames')) {
          $Form->SetFormValue('Name', GetValue('name', $Profile));

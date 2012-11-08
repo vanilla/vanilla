@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Twitter'] = array(
-	'Name' => 'Twitter Sign In',
+	'Name' => 'Twitter Social Connect',
    'Description' => 'Users may sign into your site using their Twitter account.',
    'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),

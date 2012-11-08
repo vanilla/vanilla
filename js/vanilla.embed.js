@@ -290,7 +290,7 @@ embed.onMessage = embed.fn.onMessage = function(message, origin) {
   
    var func = this[data.func];
    if (!Vanilla.isFunction(func))
-      Vanilla.error(data.func+' is not a function.');
+      Vanilla.error(data.func+' needs to be added to Vanilla.embed.');
    
    data.args = data.args || [];
    if (!Vanilla.isArray(data.args))
@@ -329,6 +329,10 @@ embed.setLocation = embed.fn.setLocation = function(path) {
    
    var url = this.root+Vanilla.slash(path);
    this.callRemote('setLocation', url);
+};
+
+embed.signout = embed.fn.signout = function() {
+   this.callRemote('signout');
 };
 
 embed.start = embed.fn.start = function() {

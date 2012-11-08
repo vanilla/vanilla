@@ -230,12 +230,42 @@ var embed = function(options) {
    
 };
 
+// Generates a random ID for use as a callback id
+var generateCbid = function() {
+	var genRand = function(){
+		return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+	};
+	return genRand() + genRand();
+};
+
+// Object containing callbacks
+var callbacks = {};
+
 embed.fn = embed.prototype;
 
-embed.callRemote = embed.fn.callRemote = function(func, args, success, failure) {
-   var options = { func: func, args: args, success: success, failure: failure, id: Math.floor(Math.random()*4294967295) };
+embed.callRemote = embed.fn.callRemote = function(func, args, callback) {
+   var options = { func: func, args: args };
+   
+   if (callback) {
+      options.callbackID = generateCbid();
+      callbacks[options.callbackID] = callback;
+   }
+   
    this.socket.postMessage(JSON.stringify(options));
 };
+
+embed.callback = embed.fn.callRemoteCallback = function(callbackID, args) {
+   if (callbacks[callbackID] == undefined) {
+      Vanilla.error("Unkown callback ID: "+callbackID);
+   }
+   
+   args = args || [];
+   if (!Vanilla.isArray(args))
+      args = [args];
+   callbacks[callbackID].apply(this, args)
+   
+   delete callbacks[callbackID];
+}
 
 embed.height = embed.fn.height = function(height) {
    this.iframe.height = height;
@@ -255,8 +285,8 @@ embed.notifyLocation = embed.fn.notifyLocation = function(path) {
 }
 
 embed.onMessage = embed.fn.onMessage = function(message, origin) {
-//   console.log("Message from: "+origin+", "+message);
-   var data = JSON.parse(message);
+   var me = this,
+      data = JSON.parse(message);
   
    var func = this[data.func];
    if (!Vanilla.isFunction(func))
@@ -279,6 +309,15 @@ embed.onMessage = embed.fn.onMessage = function(message, origin) {
       path = path.replace(/\??sso=[^&]*/, '');
       
       data.args[0] = path;
+   }
+   
+   if (data.callbackID) {
+      // The function was called with a callback.
+      var callback = function() {
+         me.callRemote("callback", [data.callbackID, Array.prototype.slice.call(arguments)]);
+      }
+      
+      data.args.push(callback);
    }
    
    var result = func.apply(this, data.args);

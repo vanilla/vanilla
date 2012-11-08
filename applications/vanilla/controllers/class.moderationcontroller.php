@@ -97,10 +97,12 @@ class ModerationController extends VanillaController {
             Plural($CountComments, '%s comment', '%s comments')
          ), 'div');
          $ActionMessage = T('Take Action:');
+         
          // Can the user delete the comment?
          $DiscussionModel = new DiscussionModel();
          $Discussion = $DiscussionModel->GetID($DiscussionID);
-         if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->CategoryID))
+         $PermissionCategory = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+         if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', GetValue('PermissionCategoryID', $PermissionCategory)))
             $ActionMessage .= ' '.Anchor(T('Delete'), 'vanilla/moderation/confirmcommentdeletes/'.$DiscussionID, 'Delete Popup');
          
          $Sender->EventArguments['SelectionMessage'] = &$SelectionMessage;
@@ -231,7 +233,8 @@ class ModerationController extends VanillaController {
          return;
       
       // Verify that the user has permission to perform the delete
-      $this->Permission('Vanilla.Comment.Delete', TRUE, 'Category', $Discussion->CategoryID);
+      $PermissionCategory = CategoryModel::Categories($Discussion->CategoryID);
+      $this->Permission('Vanilla.Comments.Delete', TRUE, 'Category', GetValue('PermissionCategoryID', $PermissionCategory));
       $this->Title(T('Confirm'));
       
       $CheckedComments = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedComments', array());
@@ -278,7 +281,7 @@ class ModerationController extends VanillaController {
       $DiscussionModel = new DiscussionModel();
       
       // Verify that the user has permission to perform the deletes
-      $this->Permission('Vanilla.Comment.Delete', TRUE, 'Category', 'any');
+      $this->Permission('Vanilla.Discussions.Delete', TRUE, 'Category', 'any');
       $this->Title(T('Confirm'));
       
       $CheckedDiscussions = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedDiscussions', array());
@@ -292,9 +295,10 @@ class ModerationController extends VanillaController {
       // Check permissions on each discussion to make sure the user has permission to delete them
       $AllowedDiscussions = array();
       $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, CategoryID')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
-      $CountCheckedDiscussions = $DiscussionData->NumRows();
       foreach ($DiscussionData->Result() as $Discussion) {
-         if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->CategoryID))
+         $PermissionCategory = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+         $CountCheckedDiscussions = $DiscussionData->NumRows();
+         if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', GetValue('PermissionCategoryID', $PermissionCategory)))
             $AllowedDiscussions[] = $Discussion->DiscussionID;
       }
       $this->SetData('CountAllowed', count($AllowedDiscussions));

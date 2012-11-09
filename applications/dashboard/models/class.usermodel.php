@@ -387,8 +387,10 @@ class UserModel extends Gdn_Model {
          
          // Check to auto-connect based on email address.
          if (C('Garden.SSO.AutoConnect', C('Garden.Registration.AutoConnect')) && isset($UserData['Email'])) {
-            $User = (array)$this->GetByEmail($UserData['Email']);
+            $User = $this->GetByEmail($UserData['Email']);
+            Trace($User, "Autoconnect User");
             if ($User) {
+               $User = (array)$User;
                // Save the user.
                $this->SynchUser($User, $UserData);
                $UserID = $User['UserID'];

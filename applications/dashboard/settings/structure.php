@@ -595,6 +595,7 @@ $Construct->Table('Tag')
    ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
+   ->Column('CategoryID', 'int', -1, 'unique')
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

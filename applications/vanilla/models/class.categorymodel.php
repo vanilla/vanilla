@@ -511,6 +511,19 @@ class CategoryModel extends Gdn_Model {
                ->Update('Category')->Set('CountDiscussions', $Count)
                ->Where('CategoryID', $ReplacementCategoryID)
                ->Put();
+            
+            // Update tags
+            $this->SQL
+               ->Update('Tag')
+               ->Set('CategoryID', $ReplacementCategoryID)
+               ->Where('CategoryID', $Category->CategoryID)
+               ->Put();
+            
+            $this->SQL
+               ->Update('TagDiscussion')
+               ->Set('CategoryID', $ReplacementCategoryID)
+               ->Where('CategoryID', $Category->CategoryID)
+               ->Put();
          } else {
             // Delete comments in this category
             // Resorted to Query because of incompatibility of aliasing in MySQL 5.5 -mlr 2011-12-13
@@ -530,6 +543,10 @@ class CategoryModel extends Gdn_Model {
                ->Where('PermissionCategoryID', $Category->CategoryID)
                ->Where('CategoryID <>', $Category->CategoryID)
                ->Put();
+            
+            // Delete tags
+            $this->SQL->Delete('Tag', array('CategoryID' => $Category->CategoryID));
+            $this->SQL->Delete('TagDiscussion', array('CategoryID' => $Category->CategoryID));
          }
          
          // Delete the category

@@ -82,6 +82,10 @@ class DiscussionController extends VanillaController {
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       $this->SetData('Breadcrumbs', CategoryModel::GetAncestors($this->CategoryID));
       
+      $Category = CategoryModel::Categories($this->Discussion->CategoryID);
+      if ($CategoryCssClass = GetValue('CssClass', $Category))
+         Gdn_Theme::Section($CategoryCssClass);
+      
       // Setup
       $this->Title($this->Discussion->Name);
 

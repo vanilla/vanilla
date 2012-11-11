@@ -97,13 +97,11 @@ class CategoriesController extends VanillaController {
          }
          $Category = (object)$Category;
          Gdn_Theme::Section($Category->CssClass);
-            
+         
          // Load the breadcrumbs.
 			$this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
          
          $this->SetData('Category', $Category, TRUE);
-         
-         
          
          if ($Category->Depth <= C('Vanilla.Categories.NavDepth', 0)) {
             $this->Table();
@@ -234,7 +232,7 @@ class CategoriesController extends VanillaController {
             
       $this->Description(C('Garden.Description', NULL));
       
-      $this->SetData('Breadcrumbs', array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
+      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $this->Data('Category'))));
      
       // Set the category follow toggle before we load category data so that it affects the category query appropriately.
       $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);

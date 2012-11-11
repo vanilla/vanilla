@@ -256,7 +256,7 @@ function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
    if (!$CssClass)
       $CssClass = "Tag-$Code";
 
-   return ' <span class="Tag '.$CssClass.'">'.T($Code).'</span> ';
+   return ' <span class="Tag '.$CssClass.'" title="'.htmlspecialchars(T($Code)).'">'.T($Code).'</span> ';
 }
 endif;
 

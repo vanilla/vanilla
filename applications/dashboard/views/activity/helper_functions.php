@@ -59,7 +59,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    <?php } ?>
    <div class="ItemContent Activity">
       <?php echo $Title; ?>
-      <div class="Excerpt"><?php echo $Excerpt; ?></div>
+      <?php echo WrapIf($Excerpt, 'div', array('class' => 'Excerpt')); ?>
       <?php 
       $Sender->EventArguments['Activity'] = $Activity;
       $Sender->FireAs('ActivityController')->FireEvent('AfterActivityBody'); 
@@ -131,6 +131,8 @@ function WriteActivity($Activity, &$Sender, &$Session) {
 <?php
 }
 
+if (!function_exists('WriteActivityComment')):
+
 function WriteActivityComment($Comment, &$Sender, &$Session) {
    $Author = UserBuilder($Comment, 'Insert');
    $PhotoAnchor = UserPhoto($Author, 'Photo');
@@ -157,6 +159,8 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
 </li>
 <?php
 }
+
+endif;
 
 function WriteActivityTabs() {
    $Sender = Gdn::Controller();

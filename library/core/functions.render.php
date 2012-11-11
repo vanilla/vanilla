@@ -149,6 +149,38 @@ if (!function_exists('ButtonGroup')):
    }
 endif;
 
+if (!function_exists('Category')):
+
+/**
+ * Get the current category on the page.
+ * @param int $Depth The level you want to look at.
+ */
+function Category($Depth = NULL) {
+   $Category = Gdn::Controller()->Data('Category');
+   if (!$Category) {
+      $Category = Gdn::Controller()->Data('CategoryID');
+      if ($Category)
+         $Category = CategoryModel::Categories($Category);
+   }
+   if (!$Category)
+      return NULL;
+   
+   $Category = (array)$Category;
+   
+   if ($Depth !== NULL) {
+      // Get the category at the correct level.
+      while ($Category['Depth'] > $Depth) {
+         $Category = CategoryModel::Categories($Category['ParentCategoryID']);
+         if (!$Category)
+            return NULL;
+      }
+   }
+   
+   return $Category;
+}
+   
+endif;
+
 if (!function_exists('CategoryUrl')):
 
 /**

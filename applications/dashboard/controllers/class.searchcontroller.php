@@ -74,7 +74,6 @@ class SearchController extends Gdn_Controller {
     * @param int $Page Page number.
     */
 	public function Index($Page = '') {
-		$this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');
 		$this->Title(T('Search'));
       
@@ -120,11 +119,11 @@ class SearchController extends Gdn_Controller {
 			'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::Url($Search)
 		);
 		
-		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-         $this->SetJson('LessRow', $this->Pager->ToString('less'));
-         $this->SetJson('MoreRow', $this->Pager->ToString('more'));
-         $this->View = 'results';
-      }
+//		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+//         $this->SetJson('LessRow', $this->Pager->ToString('less'));
+//         $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+//         $this->View = 'results';
+//      }
 		
       $this->CanonicalUrl(Url('search', TRUE));
 

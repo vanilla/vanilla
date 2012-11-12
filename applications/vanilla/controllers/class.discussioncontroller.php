@@ -467,7 +467,7 @@ class DiscussionController extends VanillaController {
       $this->Render();         
    }
    
-   protected function SendOptions($Discussion) {
+   public function SendOptions($Discussion) {
       require_once $this->FetchViewLocation('helper_functions', 'Discussion');
       ob_start();
       WriteDiscussionOptions($Discussion);

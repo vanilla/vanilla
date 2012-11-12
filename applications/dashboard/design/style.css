@@ -2458,7 +2458,6 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    display: inline;
    font-weight: normal;
    font-size: 95%;
-   color: #555;
 }
 
 .List.Inline * {

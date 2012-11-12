@@ -1634,6 +1634,8 @@ if (!function_exists('IsUrl')) {
     * @since 2.1
     */
    function IsUrl($Str) {
+      if (!$Str)
+         return FALSE;
       if (substr($Str, 0, 2) == '//')
          return TRUE;
       if (strpos($Str, '://', 1) !== FALSE)

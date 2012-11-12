@@ -370,6 +370,14 @@ class MessagesController extends ConversationsController {
       
       $this->AddModule('AddPeopleModule');
       
+      $Subject = $this->Data('Conversation.Subject');
+      if (!$Subject)
+         $Subject = T('Message');
+      
+      $this->Data['Breadcrumbs'][] = array(
+          'Name' => $Subject,
+          Url('', '//'));
+      
       // Render view
       $this->Render();
    }

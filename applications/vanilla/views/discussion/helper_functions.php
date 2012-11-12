@@ -116,6 +116,9 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
             </span>
             <?php
+               echo DateUpdated($Comment, array('<span class="MItem">', '</span>'));
+            ?>
+            <?php
             // Include source if one was set
             if ($Source = GetValue('Source', $Comment))
                echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));

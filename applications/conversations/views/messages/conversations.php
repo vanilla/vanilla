@@ -24,6 +24,8 @@ foreach ($this->Data('Conversations') as $Conversation) {
    $CssClass .= $Alt ? ' Alt' : '';
    $CssClass .= $Conversation->CountNewMessages > 0 ? ' New' : '';
    $CssClass .= $LastPhoto != '' ? ' HasPhoto' : '';
+   $CssClass .= ' '.($Conversation->CountNewMessages <= 0 ? 'Read' : 'Unread');
+   
    $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
    if ($Conversation->LastFormat == 'Text')
       $Message = (SliceString(Gdn_Format::To($Conversation->LastBody, $Conversation->LastFormat), 100));
@@ -65,13 +67,13 @@ foreach ($this->Data('Conversations') as $Conversation) {
          <?php 
          $this->FireEvent('BeforeConversationMeta');
 
-         echo ' <span class="MItem">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
+         echo ' <span class="MItem CountMessages">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
 
          if ($Conversation->CountNewMessages > 0) {
             echo ' <strong class="HasNew"> '.Plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';
          }
          
-         echo ' <span class="MItem">'.Gdn_Format::Date($Conversation->LastDateInserted).'</span> ';
+         echo ' <span class="MItem LastDateInserted">'.Gdn_Format::Date($Conversation->LastDateInserted).'</span> ';
          ?>
       </div>
    </div>

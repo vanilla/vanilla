@@ -315,6 +315,7 @@ class DiscussionsController extends VanillaController {
     */
    public function Bookmarked($Page = '0') {
       $this->Permission('Garden.SignIn.Allow');
+      Gdn_Theme::Section('DiscussionList');
 
       // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
       $Layout = C('Vanilla.Discussions.Layout');

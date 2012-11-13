@@ -584,11 +584,13 @@ class DiscussionModel extends VanillaModel {
          $Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
       }
 
-      $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
-      if ($Category) {
-         $Discussion->Read = $Category['DateMarkedRead'] > $Discussion->DateLastComment;
-         if ($Discussion->Read)
-            $Discussion->CountUnreadComments = 0;
+      if (!property_exists($Discussion, 'Read')) {
+         $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
+         if ($Category) {
+            $Discussion->Read = $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+            if ($Discussion->Read)
+               $Discussion->CountUnreadComments = 0;
+         }
       }
 
       // Logic for incomplete comment count.

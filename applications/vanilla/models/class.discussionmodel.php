@@ -247,13 +247,13 @@ class DiscussionModel extends VanillaModel {
          if (!isset($Wheres['w.Bookmarked']) && !isset($Wheres['d.InsertUserID']))
             $this->RemoveAnnouncements($Data);
       }
-		
-		// Change discussions returned based on additional criteria	
-		$this->AddDiscussionColumns($Data);
       
       // Join in the users.
       Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
       CategoryModel::JoinCategories($Data);
+      
+      // Change discussions returned based on additional criteria	
+		$this->AddDiscussionColumns($Data);
 		
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Data);
@@ -537,9 +537,7 @@ class DiscussionModel extends VanillaModel {
    
    public function Calculate(&$Discussion) {
       $ArchiveTimestamp = Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
-      $CategoryID = $Discussion->CategoryID;
-      $Category = CategoryModel::Categories($CategoryID);
-
+      
       // Fix up output
       $Discussion->Name = Gdn_Format::Text($Discussion->Name);
       $Discussion->Attributes = @unserialize($Discussion->Attributes);
@@ -586,8 +584,13 @@ class DiscussionModel extends VanillaModel {
 
       if (!property_exists($Discussion, 'Read')) {
          $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
-         if ($Category) {
-            $Discussion->Read = $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+         
+         if ($Category && !is_null($Category['DateMarkedRead'])) {
+            
+            // If the category was marked explicitly read at some point, see if that applies here
+            if ($Category['DateMarkedRead'] > $Discussion->DateLastComment)
+               $Discussion->Read = TRUE;
+            
             if ($Discussion->Read)
                $Discussion->CountUnreadComments = 0;
          }
@@ -1155,10 +1158,11 @@ class DiscussionModel extends VanillaModel {
       // Join in the users.
       $Discussion = array($Discussion);
       Gdn::UserModel()->JoinUsers($Discussion, array('LastUserID', 'InsertUserID'));
+      CategoryModel::JoinCategories($Discussion);
       $Discussion = $Discussion[0];
       
       $this->Calculate($Discussion);
-      
+      var_dump($Discussion);
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Discussion);
 		

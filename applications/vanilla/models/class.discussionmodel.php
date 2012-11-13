@@ -1150,12 +1150,12 @@ class DiscussionModel extends VanillaModel {
       if (!$Discussion)
          return $Discussion;
       
-      $this->Calculate($Discussion);
-      
       // Join in the users.
       $Discussion = array($Discussion);
       Gdn::UserModel()->JoinUsers($Discussion, array('LastUserID', 'InsertUserID'));
       $Discussion = $Discussion[0];
+      
+      $this->Calculate($Discussion);
       
       if (C('Vanilla.Views.Denormalize', FALSE))
          $this->AddDenormalizedViews($Discussion);

@@ -5,15 +5,19 @@ $Discussion = $this->Data('Discussion');
 $Author = Gdn::UserModel()->GetID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
 
 // Prep event args
+$CssClass = CssClass($Discussion);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
+$this->EventArguments['CssClass'] = &$CssClass;
 
 // DEPRECATED ARGUMENTS (as of 2.1)
 $this->EventArguments['Object'] = &$Discussion; 
 $this->EventArguments['Type'] = 'Discussion';
 
+// Discussion template event
+$this->FireEvent('BeforeDiscussionDisplay');
 ?>
-<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo CssClass($Discussion); ?>">
+<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
    <div class="Discussion">
       <div class="Item-Header DiscussionHeader">
          <div class="AuthorWrap">

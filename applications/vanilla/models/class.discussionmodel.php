@@ -540,8 +540,18 @@ class DiscussionModel extends VanillaModel {
       $CategoryID = $Discussion->CategoryID;
       $Category = CategoryModel::Categories($CategoryID);
 
+      // Fix up output
       $Discussion->Name = Gdn_Format::Text($Discussion->Name);
+      $Discussion->Attributes = @unserialize($Discussion->Attributes);
       $Discussion->Url = DiscussionUrl($Discussion);
+      $Discussion->Tags = $this->FormatTags($Discussion->Tags);
+      
+      // Join in the category.
+      $Category = CategoryModel::Categories($Discussion->CategoryID);
+      if (!$Category) $Category = FALSE;
+      $Discussion->Category = $Category['Name'];
+      $Discussion->CategoryUrlCode = $Category['UrlCode'];
+      $Discussion->PermissionCategoryID = $Category['PermissionCategoryID'];
 
       // Add some legacy calculated columns.
       if (!property_exists($Discussion, 'FirstUserID')) {
@@ -552,7 +562,7 @@ class DiscussionModel extends VanillaModel {
       }
 
       // Add the columns from UserDiscussion if they don't exist.
-      if (!property_exists($Discussion, 'WatchUserID')) {
+      if (!property_exists($Discussion, 'CountCommentWatch')) {
          $Discussion->WatchUserID = NULL;
          $Discussion->DateLastViewed = NULL;
          $Discussion->Dismissed = 0;
@@ -1141,23 +1151,10 @@ class DiscussionModel extends VanillaModel {
          return $Discussion;
       
       $this->Calculate($Discussion);
-//      
-//      $Discussion->Name = Gdn_Format::Text($Discussion->Name);
-//      $Discussion->Attributes = @unserialize($Discussion->Attributes);
-//      $Discussion->Url = DiscussionUrl($Discussion);
-//      $Discussion->Tags = $this->FormatTags($Discussion->Tags);
-//      
-//      // Join in the category.
-//      $Category = CategoryModel::Categories($Discussion->CategoryID);
-//      if (!$Category) $Category = FALSE;
-//      $Discussion->Category = $Category['Name'];
-//      $Discussion->CategoryUrlCode = $Category['UrlCode'];
-//      $Discussion->PermissionCategoryID = $Category['PermissionCategoryID'];
       
       // Join in the users.
       $Discussion = array($Discussion);
       Gdn::UserModel()->JoinUsers($Discussion, array('LastUserID', 'InsertUserID'));
-      CategoryModel::JoinCategories($Discussion);
       $Discussion = $Discussion[0];
       
       if (C('Vanilla.Views.Denormalize', FALSE))

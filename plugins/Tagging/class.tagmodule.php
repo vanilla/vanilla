@@ -11,29 +11,42 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class TagModule extends Gdn_Module {
    
    protected $_TagData;
-   protected $_DiscussionID;
+   protected $_ParentID;
+   protected $_ParentType;
    
    public function __construct($Sender = '') {
       $this->_TagData = FALSE;
-      $this->_DiscussionID = 0;
+      $this->_ParentID = 0;
       parent::__construct($Sender);
    }
    
-   public function GetData($DiscussionID = '') {
-      $SQL = Gdn::SQL();
+   public function GetData($ParentID = '', $ParentType = 'Discussion') {
+      $TagQuery = Gdn::SQL();
       
-      if (!$DiscussionID)
-         $SQL->Cache('TagModule', 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+      if (!$ParentID)
+         $TagQuery->Cache('TagModule', 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
       
-      if (is_numeric($DiscussionID) && $DiscussionID > 0) {
-         $this->_DiscussionID = $DiscussionID;
-         $SQL->Join('TagDiscussion td', 't.TagID = td.TagID')
-            ->Where('td.DiscussionID', $DiscussionID);
+      if (is_numeric($ParentID) && $ParentID > 0) {
+         $this->_ParentID = $ParentID;
+         $this->_ParentType = $ParentType;
+         
+         switch ($ParentType) {
+            case 'Discussion':
+               $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
+                  ->Where('td.DiscussionID', $this->_ParentID);
+               break;
+            case 'Category':
+               $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
+                  ->Select('COUNT(DISTINCT td.TagID)', 'NumTags')
+                  ->Where('td.CategoryID', $this->_ParentID)
+                  ->GroupBy('td.TagID');
+               break;
+         }
       } else {
-         $SQL->Where('t.CountDiscussions >', 0, FALSE);
+         $TagQuery->Where('t.CountDiscussions >', 0, FALSE);
       }
-            
-      $this->_TagData = $SQL
+      
+      $this->_TagData = $TagQuery
          ->Select('t.*')
          ->From('Tag t')
          ->OrderBy('t.CountDiscussions', 'desc')
@@ -89,19 +102,19 @@ class TagModule extends Gdn_Module {
       ob_start();
       ?>
       <div class="Box Tags">
-         <h4><?php echo T($this->_DiscussionID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
+         <h4><?php echo T($this->_ParentID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
          <ul class="TagCloud">
          <?php
          foreach ($this->_TagData->Result() as $Tag) {
             if ($Tag['Name'] != '') {
          ?>
             <li><span><?php 
-                           if (urlencode($Tag['Name']) == $Tag['Name']) {
-                              echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged/'.urlencode($Tag['Name']));
-                           } else {
-                              echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged?Tag='.urlencode($Tag['Name']));
-                           }
-                        ?></span> <span class="Count"><?php echo number_format($Tag['CountDiscussions']); ?></span></li>
+               if (urlencode($Tag['Name']) == $Tag['Name']) {
+                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged/'.urlencode($Tag['Name']));
+               } else {
+                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged?Tag='.urlencode($Tag['Name']));
+               }
+            ?></span> <span class="Count"><?php echo number_format($Tag['CountDiscussions']); ?></span></li>
          <?php
             }
          }

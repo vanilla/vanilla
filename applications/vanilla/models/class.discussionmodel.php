@@ -565,19 +565,21 @@ class DiscussionModel extends VanillaModel {
          $Discussion->DateLastViewed = NULL;
          $Discussion->Dismissed = 0;
          $Discussion->Bookmarked = 0;
-         $Discussion->CountCommentWatch = 0;
+         $Discussion->CountCommentWatch = NULL;
       }
-
-      if($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
+   
+      // Allow for discussions to be archived
+      if ($Discussion->DateLastComment && Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $ArchiveTimestamp) {
          $Discussion->Closed = '1';
          if ($Discussion->CountCommentWatch) {
             $Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
          } else {
             $Discussion->CountUnreadComments = 0;
          }
+      // Allow for discussions to just be new.
       } elseif ($Discussion->CountCommentWatch === NULL) {
-         // Allow for discussions to just be new.
          $Discussion->CountUnreadComments = TRUE;
+      
       } else {
          $Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
       }
@@ -608,13 +610,13 @@ class DiscussionModel extends VanillaModel {
       elseif ($Discussion->CountUnreadComments < 0)
          $Discussion->CountUnreadComments = 0;
 
-      $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+      $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : NULL;
 
       if ($Discussion->LastUserID == NULL) {
          $Discussion->LastUserID = $Discussion->InsertUserID;
          $Discussion->LastDate = $Discussion->DateInserted;
       }
-
+      
       $this->EventArguments['Discussion'] = $Discussion;
       $this->FireEvent('SetCalculatedFields');
    }

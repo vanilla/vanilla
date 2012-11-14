@@ -198,8 +198,8 @@ class AllViewedPlugin extends Gdn_Plugin {
 		
 		// Recalculate New count with each category's DateMarkedRead
 		$Discussion = &$Sender->EventArguments['Discussion'];
-      $CategoryModel = CategoryModel::Categories($Discussion->CategoryID);
-      $CategoryLastDate = Gdn_Format::ToTimestamp($CategoryModel["DateMarkedRead"]);
+      $Category = CategoryModel::Categories($Discussion->CategoryID);
+      $CategoryLastDate = Gdn_Format::ToTimestamp($Category["DateMarkedRead"]);
       if ($CategoryLastDate != 0)
          $this->CheckDiscussionDate($Discussion, $CategoryLastDate);
       

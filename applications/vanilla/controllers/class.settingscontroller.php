@@ -392,6 +392,7 @@ class SettingsController extends Gdn_Controller {
       
       // Make sure the form knows which item we are editing.
       $this->Form->AddHidden('CategoryID', $CategoryID);
+      $this->SetData('CategoryID', $CategoryID);
       
       // Load all roles with editable permissions
       $this->RoleArray = $RoleModel->GetArray();

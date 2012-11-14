@@ -627,6 +627,11 @@ class LogModel extends Gdn_Pluggable {
 
             break;
       }
+      
+      // Fire 'after' event
+      if (isset($ID))
+         $this->EventArguments['InsertID'] = $ID;
+      $this->FireEvent('AfterRestore');
 
       if ($DeleteLog)
          Gdn::SQL()->Delete('Log', array('LogID' => $Log['LogID']));

@@ -508,6 +508,7 @@ class DiscussionsController extends VanillaController {
       $Misses = array();
       $CacheKey = 'embed.comments.count.%s';
       foreach ($vanilla_identifier as $ForeignID) {
+         $ForeignID = ForeignIDHash($ForeignID);
          $RealCacheKey = sprintf($CacheKey, $ForeignID);
          $Comments = Gdn::Cache()->Get($RealCacheKey);
          if ($Comments !== Gdn_Cache::CACHEOP_FAILURE)

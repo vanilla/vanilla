@@ -53,6 +53,7 @@ echo $this->Form->Errors();
       echo $this->Form->CheckBox('Archived', 'This category is archived.');
       ?>
    </li>
+   <?php $this->FireEvent('AfterCategorySettings'); ?>
    <li>
       <?php
 		if(count($this->PermissionData) > 0) {

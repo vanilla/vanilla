@@ -174,7 +174,14 @@ class SplitMergePlugin extends Gdn_Plugin {
                $CommentModel->Validation->Results(TRUE);
                $CommentID = $CommentModel->Save($Comment);
                if ($CommentID) {
-                  $DiscussionModel->Delete($Discussion['DiscussionID']);
+                  // Move any attachments (FileUpload plugin awareness)
+                  if (class_exists('MediaModel')) {
+                     $MediaModel = new MediaModel();
+                     $MediaModel->Reassign($Discussion['DiscussionID'], 'discussion', $CommentID, 'comment');
+                  }
+                  
+                  // Delete discussion that was merged
+                  $DiscussionModel->Delete($Discussion['DiscussionID']);                  
                } else {
                   $Sender->InformMessage($CommentModel->Validation->ResultsText());
                   $ErrorCount++;

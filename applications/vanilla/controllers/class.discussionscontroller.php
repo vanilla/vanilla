@@ -507,13 +507,19 @@ class DiscussionsController extends VanillaController {
       $FinalData = array_fill_keys($vanilla_identifier, 0);
       $Misses = array();
       $CacheKey = 'embed.comments.count.%s';
+      $OriginalIDs = array();
       foreach ($vanilla_identifier as $ForeignID) {
-         $RealCacheKey = sprintf($CacheKey, $ForeignID);
+         $HashedForeignID = ForeignIDHash($ForeignID);
+         
+         // Keep record of non-hashed identifiers for the reply
+         $OriginalIDs[$HashedForeignID] = $ForeignID;
+         
+         $RealCacheKey = sprintf($CacheKey, $HashedForeignID);
          $Comments = Gdn::Cache()->Get($RealCacheKey);
          if ($Comments !== Gdn_Cache::CACHEOP_FAILURE)
             $FinalData[$ForeignID] = $Comments;
          else
-            $Misses[] = $ForeignID;
+            $Misses[] = $HashedForeignID;
       }
       
       if (sizeof($Misses)) {
@@ -525,12 +531,15 @@ class DiscussionsController extends VanillaController {
             ->Get()->ResultArray();
          
          foreach ($CountData as $Row) {
-            $FinalData[$Row['ForeignID']] = $Row['CountComments'];
+            // Get original identifier to send back
+            $ForeignID = $OriginalIDs[$Row['ForeignID']];
+            $FinalData[$ForeignID] = $Row['CountComments'];
+            
+            // Cache using the hashed identifier
             $RealCacheKey = sprintf($CacheKey, $Row['ForeignID']);
             Gdn::Cache()->Store($RealCacheKey, $Row['CountComments'], array(
                Gdn_Cache::FEATURE_EXPIRY     => 60
             ));
-            
          }         
       }
       

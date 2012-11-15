@@ -13,40 +13,68 @@ class TagModule extends Gdn_Module {
    protected $_TagData;
    protected $ParentID;
    protected $ParentType;
+   protected $CategorySearch;
    
    public function __construct($Sender = '') {
       $this->_TagData = FALSE;
-      $this->ParentID = 0;
+      $this->ParentID = NULL;
       $this->ParentType = 'Global';
+      $this->CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
       parent::__construct($Sender);
    }
    
    public function __set($Name, $Value) {
-      switch ($Name) {
-         case 'Category':
-            $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
-            if ($CategorySearch) {
-               $this->ParentType = 'Category';
-               $CategoryID = Gdn::Controller() instanceof Gdn_Controller ? Gdn::Controller()->Data('Category.CategoryID') : NULL;
-               $this->ParentID = $CategoryID;
+      if ($Name == 'Context')
+         $this->AutoContext($Value);
+   }
+   
+   protected function AutoContext($Hint = NULL) {
+      // If we're already configured, don't auto configure
+      if (!is_null($this->ParentID) && is_null($Hint)) return;
+      
+      // If no hint was given, determine by environment
+      if (is_null($Hint)) {
+         if (Gdn::Controller() instanceof Gdn_Controller) {
+            $DiscussionID = Gdn::Controller()->Data('Discussion.DiscussionID', NULL);
+            $CategoryID = Gdn::Controller()->Data('Category.CategoryID', NULL);
+            
+            if ($DiscussionID) {
+               $Hint = 'Discussion';
+            } elseif ($CategoryID) {
+               $Hint = 'Category';
+            } else {
+               $Hint = 'Global';
             }
-            break;
-         
+         }
+      }
+      
+      switch ($Hint) {
          case 'Discussion':
             $this->ParentType = 'Discussion';
-            $DiscussionID = Gdn::Controller() instanceof Gdn_Controller ? Gdn::Controller()->Data('Discussion.DiscussionID') : NULL;
+            $DiscussionID = Gdn::Controller()->Data('Discussion.DiscussionID');
             $this->ParentID = $DiscussionID;
+            break;
+         
+         case 'Category':
+            if ($this->CategorySearch) {
+               $this->ParentType = 'Category';
+               $CategoryID = Gdn::Controller()->Data('Category.CategoryID');
+               $this->ParentID = $CategoryID;
+            }
             break;
       }
       
       if (!$this->ParentID) {
-         $this->ParentType = 'Global';
          $this->ParentID = 0;
+         $this->ParentType = 'Global';
       }
+      
    }
    
    public function GetData() {
       $TagQuery = Gdn::SQL();
+      
+      $this->AutoContext();
       
       $TagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
       switch ($this->ParentType) {
@@ -58,7 +86,7 @@ class TagModule extends Gdn_Module {
          
          case 'Category':
             $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
-               ->Select('COUNT(DISTINCT td.TagID)', 'NumTags')
+               ->Select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
                ->Where('td.CategoryID', $this->ParentID)
                ->GroupBy('td.TagID')
                ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
@@ -68,6 +96,10 @@ class TagModule extends Gdn_Module {
             $TagCacheKey = 'TagModule-Global';
             $TagQuery->Where('t.CountDiscussions >', 0, FALSE)
                ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+            
+            if ($this->CategorySearch)
+               $TagQuery->Where('t.CategoryID', '-1');
+            
             break;
       }
 
@@ -86,8 +118,12 @@ class TagModule extends Gdn_Module {
    }
    
    public function InlineDisplay() {
+      if (!$this->_TagData)
+         $this->GetData();
+      
       if ($this->_TagData->NumRows() == 0)
          return '';
+      
       $String = '';
       ob_start();
       ?>

@@ -1009,12 +1009,12 @@ class Gdn_Format {
          && C('Garden.Format.YouTube')) {
          $ID = $Matches['ID'];
          $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
-         $Result = '<div class="VideoWrap">';
-            $Result .= '<div class="Video YouTube" id="youtube-'.$ID.'">';
-               $Result .= '<div class="VideoPreview"><a href="http://youtube.com/watch?v='.$ID.'"><img src="http://img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></div>';
-               $Result .= '<div class="VideoPlayer"></div>';
-            $Result .= '</div>';
-         $Result .= '</div>';
+         $Result = '<span class="VideoWrap">';
+            $Result .= '<span class="Video YouTube" id="youtube-'.$ID.'">';
+               $Result .= '<span class="VideoPreview"><a href="http://youtube.com/watch?v='.$ID.'"><img src="http://img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
+               $Result .= '<span class="VideoPlayer"></span>';
+            $Result .= '</span>';
+         $Result .= '</span>';
       } elseif (preg_match('`(?:https?|ftp)://(www\.)?vimeo\.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[2];
          $Result = <<<EOT

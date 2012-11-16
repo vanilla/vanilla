@@ -43,6 +43,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'cdata' => 3,
        'css_expression' => 1,
        'deny_attribute' => 'on*',
+       'unique_ids' => 0,
        'elements' => $Elements,
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class

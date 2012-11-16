@@ -11,41 +11,66 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class TagModule extends Gdn_Module {
    
    protected $_TagData;
-   protected $_ParentID;
-   protected $_ParentType;
+   protected $ParentID;
+   protected $ParentType;
    
    public function __construct($Sender = '') {
       $this->_TagData = FALSE;
-      $this->_ParentID = 0;
+      $this->ParentID = 0;
+      $this->ParentType = 'Global';
       parent::__construct($Sender);
    }
    
-   public function GetData($ParentID = '', $ParentType = 'Discussion') {
-      $TagQuery = Gdn::SQL();
-      
-      if (!$ParentID)
-         $TagQuery->Cache('TagModule', 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
-      
-      if (is_numeric($ParentID) && $ParentID > 0) {
-         $this->_ParentID = $ParentID;
-         $this->_ParentType = $ParentType;
+   public function __set($Name, $Value) {
+      switch ($Name) {
+         case 'Category':
+            $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
+            if ($CategorySearch) {
+               $this->ParentType = 'Category';
+               $CategoryID = Gdn::Controller() instanceof Gdn_Controller ? Gdn::Controller()->Data('Category.CategoryID') : NULL;
+               $this->ParentID = $CategoryID;
+            }
+            break;
          
-         switch ($ParentType) {
-            case 'Discussion':
-               $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
-                  ->Where('td.DiscussionID', $this->_ParentID);
-               break;
-            case 'Category':
-               $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
-                  ->Select('COUNT(DISTINCT td.TagID)', 'NumTags')
-                  ->Where('td.CategoryID', $this->_ParentID)
-                  ->GroupBy('td.TagID');
-               break;
-         }
-      } else {
-         $TagQuery->Where('t.CountDiscussions >', 0, FALSE);
+         case 'Discussion':
+            $this->ParentType = 'Discussion';
+            $DiscussionID = Gdn::Controller() instanceof Gdn_Controller ? Gdn::Controller()->Data('Discussion.DiscussionID') : NULL;
+            $this->ParentID = $DiscussionID;
+            break;
       }
       
+      if (!$this->ParentID) {
+         $this->ParentType = 'Global';
+         $this->ParentID = 0;
+      }
+   }
+   
+   public function GetData() {
+      $TagQuery = Gdn::SQL();
+      
+      $TagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
+      switch ($this->ParentType) {
+         case 'Discussion':
+            $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
+               ->Where('td.DiscussionID', $this->ParentID)
+               ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+            break;
+         
+         case 'Category':
+            $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
+               ->Select('COUNT(DISTINCT td.TagID)', 'NumTags')
+               ->Where('td.CategoryID', $this->ParentID)
+               ->GroupBy('td.TagID')
+               ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+            break;
+         
+         case 'Global':
+            $TagCacheKey = 'TagModule-Global';
+            $TagQuery->Where('t.CountDiscussions >', 0, FALSE)
+               ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+            break;
+      }
+
       $this->_TagData = $TagQuery
          ->Select('t.*')
          ->From('Tag t')
@@ -102,7 +127,7 @@ class TagModule extends Gdn_Module {
       ob_start();
       ?>
       <div class="Box Tags">
-         <h4><?php echo T($this->_ParentID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
+         <h4><?php echo T($this->ParentID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
          <ul class="TagCloud">
          <?php
          foreach ($this->_TagData->Result() as $Tag) {

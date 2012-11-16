@@ -793,7 +793,6 @@ class ProfileController extends Gdn_Controller {
       }
 
       // Loop the preferences, setting defaults from the configuration.
-      $UserPrefs = array();
       foreach ($this->Preferences as $PrefGroup => $Prefs) {
          foreach ($Prefs as $Pref => $Desc) {
             $Location = 'Prefs';

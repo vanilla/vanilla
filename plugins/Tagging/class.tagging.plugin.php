@@ -1,18 +1,24 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
-// Define the plugin:
+/**
+ * Tagging Plugin
+ * 
+ * Users may add tags to discussions as they're being created. Tags are shown
+ * in the panel and on the OP.
+ * 
+ * Changes: 
+ *  1.5     Fix TagModule usage
+ * 
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Misc
+ */
+
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.4.2',
+   'Version' => '1.5',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -20,20 +26,13 @@ $PluginInfo['Tagging'] = array(
    'AuthorUrl' => 'http://markosullivan.ca'
 );
 
-/*
-v1.2 (2011-10-02 Matt Lincoln Russell lincoln@vanillaforums.com)
-- Added inline tags after first comment in discussion view.
-
-v1.3 (2011-10-21 Lincoln)
-- Removed redundant enable/disable plugin functionality.
-
-   1.3.3 - Fix inline display hook for 2.1a9 (2012-01-15 Lincoln)
-   
-v1.4 (2012-06-11 Lincoln)
-- Upgraded tokenizer to 1.6, re-customized it, and moved js files to /js folder.
-*/
-
 class TaggingPlugin extends Gdn_Plugin {
+   
+   public function __construct() {
+      parent::__construct();
+      //die('tagging');
+   }
+   
    /**
     * Add the Tagging admin menu option.
     */
@@ -47,7 +46,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * Display the tag module in a category.
     */
    public function CategoriesController_Render_Before($Sender) {
-      $this->_AddTagModule($Sender);
+      $this->AddTagModule($Sender);
    }
 
    /**
@@ -71,9 +70,7 @@ class TaggingPlugin extends Gdn_Plugin {
          if (!$DiscussionID)
             return;
          
-         include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
          $TagModule = new TagModule($Sender);
-         $TagModule->GetData($DiscussionID);
          echo $TagModule->InlineDisplay();
       }
    }
@@ -83,7 +80,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param DiscussionsController $Sender
     */
    public function DiscussionsController_Render_Before($Sender) {
-      $this->_AddTagModule($Sender);
+      $this->AddTagModule($Sender);
    }
 
    /**
@@ -587,11 +584,8 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Adds the tag module to the page.
     */
-   private function _AddTagModule($Sender) {
-      $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
-      include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
+   private function AddTagModule($Sender) {
       $TagModule = new TagModule($Sender);
-      $TagModule->GetData($DiscussionID);
       $Sender->AddModule($TagModule);      
    }   
    

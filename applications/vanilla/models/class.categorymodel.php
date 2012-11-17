@@ -346,6 +346,7 @@ class CategoryModel extends Gdn_Model {
          if ($Discussion) {
             $Row['LastTitle'] = Gdn_Format::Text($Discussion['Name']);
             $Row['LastUserID'] = $Discussion['InsertUserID'];
+            $Row['LastDiscussionUserID'] = $Discussion['InsertUserID'];
             $Row['LastDateInserted'] = $Discussion['DateInserted'];
             $NameUrl = Gdn_Format::Text($Discussion['Name'], TRUE);
             $Row['LastUrl'] = DiscussionUrl($Discussion, FALSE, '//').'#latest';
@@ -360,6 +361,7 @@ class CategoryModel extends Gdn_Model {
          
          TouchValue('LastTitle', $Row, '');
          TouchValue('LastUserID', $Row, NULL);
+         TouchValue('LastDiscussionUserID', $Row, NULL);
          TouchValue('LastDateInserted', $Row, NULL);
          TouchValue('LastUrl', $Row, NULL);
       }
@@ -627,7 +629,9 @@ class CategoryModel extends Gdn_Model {
     */
    public function GetAll() {
       $CategoryData = $this->SQL
-         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode, c.PermissionCategoryID')
+         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, 
+            c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode, 
+            c.PermissionCategoryID')
          ->From('Category c')
          ->OrderBy('TreeLeft', 'asc')
          ->Get();

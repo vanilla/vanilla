@@ -55,10 +55,12 @@ if (!class_exists('SideMenuModule', FALSE)) {
       private $_HighlightRoute;
    
       public function __construct($Sender = '') {
+         parent::__construct($Sender);
+         
+         $this->_ApplicationFolder = 'dashboard';
          $this->HtmlId = 'SideMenu';
          $this->AutoLinkGroups = TRUE;
          $this->ClearGroups();
-         parent::__construct($Sender);
       }
       
       public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = array()) {

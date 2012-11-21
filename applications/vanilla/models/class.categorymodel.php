@@ -614,7 +614,7 @@ class CategoryModel extends Gdn_Model {
     */
    public function GetAll() {
       $CategoryData = $this->SQL
-         ->Select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.CountComments, c.AllowDiscussions, c.UrlCode, c.PermissionCategoryID')
+         ->Select('c.*')
          ->From('Category c')
          ->OrderBy('TreeLeft', 'asc')
          ->Get();

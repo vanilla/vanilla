@@ -370,6 +370,9 @@ class LogModel extends Gdn_Pluggable {
                self::$_TransactionID = $LogID;
                Gdn::SQL()->Put('Log', array('TransactionLogID' => $LogID), array('LogID' => $LogID));
             }
+            
+            $L->EventArguments['LogID'] = $LogID;
+            $L->FireEvent('AfterInsert');
          }
       } else {
          if (self::$_TransactionID > 0)
@@ -387,6 +390,9 @@ class LogModel extends Gdn_Pluggable {
             self::$_TransactionID = $LogID;
             Gdn::SQL()->Put('Log', array('TransactionLogID' => $LogID), array('LogID' => $LogID));
          }
+         
+         $L->EventArguments['LogID'] = $LogID;
+         $L->FireEvent('AfterInsert');
       }
       return $LogID;
    }
@@ -621,6 +627,11 @@ class LogModel extends Gdn_Pluggable {
 
             break;
       }
+      
+      // Fire 'after' event
+      if (isset($ID))
+         $this->EventArguments['InsertID'] = $ID;
+      $this->FireEvent('AfterRestore');
 
       if ($DeleteLog)
          Gdn::SQL()->Delete('Log', array('LogID' => $Log['LogID']));

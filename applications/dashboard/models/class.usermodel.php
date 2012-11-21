@@ -85,10 +85,10 @@ class UserModel extends Gdn_Model {
    }
    
    /**
-    * Checks the currently authenticated user's permissions for the specified
-    * permission. Returns a boolean value indicating if the action is
-    * permitted.
+    * Checks the specified user's for the given permission. Returns a boolean 
+    * value indicating if the action is permitted.
     *
+    * @param mixed $User The user to check
     * @param mixed $Permission The permission (or array of permissions) to check.
     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
 	 * @return boolean

@@ -192,17 +192,16 @@ class AllViewedPlugin extends Gdn_Plugin {
 	 * @since 1.0
 	 * @access public
 	 */
-	public function DiscussionModel_AfterAddColumns_Handler($Sender) {
+	public function DiscussionModel_SetCalculatedFields_Handler($Sender) {
 		// Only for members
 		if (!Gdn::Session()->IsValid()) return;
 		
 		// Recalculate New count with each category's DateMarkedRead
-		foreach($Sender->EventArguments['Data']->Result() as $Discussion) {
-			$CategoryModel = CategoryModel::Categories($Discussion->CategoryID);
-			$CategoryLastDate = Gdn_Format::ToTimestamp($CategoryModel["DateMarkedRead"]);
-			if ($CategoryLastDate != 0) {
-				$this->CheckDiscussionDate($Discussion, $CategoryLastDate);
-			}
-		}
+		$Discussion = &$Sender->EventArguments['Discussion'];
+      $Category = CategoryModel::Categories($Discussion->CategoryID);
+      $CategoryLastDate = Gdn_Format::ToTimestamp($Category["DateMarkedRead"]);
+      if ($CategoryLastDate != 0)
+         $this->CheckDiscussionDate($Discussion, $CategoryLastDate);
+      
 	}
 }

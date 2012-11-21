@@ -230,7 +230,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    /**
 	 * Save custom fields during registration.
 	 */
-	public function UserModel_AfterInsertUser_Handler($Sender) {	   
+	public function UserModel_AfterInsertUser_Handler($Sender) {
+      if (!(Gdn::Controller() instanceof Gdn_Controller)) return;
+      
 	   // Get user-submitted
 	   $FormPostValues = Gdn::Controller()->Form->FormValues();
 	   $CustomLabels = GetValue('CustomLabel', $FormPostValues);

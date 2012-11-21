@@ -411,6 +411,7 @@ $DateInsertedExists = $Construct->ColumnExists('DateInserted');
 $Construct
    ->Column('TagID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
+   ->Column('CategoryID', 'int', FALSE, 'index')
    ->Column('DateInserted', 'datetime', !$DateInsertedExists)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);

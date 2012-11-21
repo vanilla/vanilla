@@ -128,41 +128,55 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
    public function FetchViewLocation($View = '', $ApplicationFolder = '') {
       if ($View == '')
          $View = strtolower($this->Name());
-
+         
       if (substr($View, -6) == 'module')
          $View = substr($View, 0, -6);
-         
+               
       if (substr($View, 0, 4) == 'gdn_')
          $View = substr($View, 4);
 
       if ($ApplicationFolder == '')
-         $ApplicationFolder = strtolower($this->_ApplicationFolder);
+         $ApplicationFolder = strpos($this->_ApplicationFolder, '/') ? $this->_ApplicationFolder : strtolower($this->_ApplicationFolder);
 
       $ThemeFolder = $this->_ThemeFolder;
-
-      // Views come from one of four places:
-      $ViewPaths = array();
-      // 1. An explicitly defined path to a view
-      if (strpos($View, DS) !== FALSE)
-         $ViewPaths[] = $View;
-
-      if ($ThemeFolder != '') {
-         // 1. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/modules/
-         $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, $ApplicationFolder, 'views', 'modules', $View . '.php'));
-         // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/modules/
-         $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, 'views', 'modules', $View . '.php'));
+      
+      $ViewPath = NULL;
+      
+      // Try to use Gdn_Controller's FetchViewLocation
+      if (Gdn::Controller() instanceof Gdn_Controller) {
+         try {
+            $ViewPath = Gdn::Controller()->FetchViewLocation($View, 'modules', $ApplicationFolder);
+         } catch (Exception $Ex) {}
       }
+      
+      if (!$ViewPath) {
+         
+         $ViewPaths = array();
+         // 1. An explicitly defined path to a view
+         if (strpos($View, '/') !== FALSE)
+            $ViewPaths[] = $View;
 
-      // 3. Application default. eg. /path/to/application/app_name/views/controller_name/
-      if ($this->_ApplicationFolder)
-         $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', 'modules', $View . '.php'));
-      else
-         $ViewPaths[] = dirname($this->Path())."/../views/modules/$View.php";
+         // 2. A theme
+         if ($ThemeFolder != '') {
+            // a. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/modules/
+            $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, $ApplicationFolder, 'views', 'modules', $View . '.php'));
+            
+            // b. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/modules/
+            $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, 'views', 'modules', $View . '.php'));
+         }
 
-      // 4. Garden default. eg. /path/to/application/dashboard/views/modules/
-      $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $View . '.php'));
+         // 3. Application default. eg. /path/to/application/app_name/views/controller_name/
+         if ($this->_ApplicationFolder)
+            $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', 'modules', $View . '.php'));
+         else
+            $ViewPaths[] = dirname($this->Path())."/../views/modules/$View.php";
 
-      $ViewPath = Gdn_FileSystem::Exists($ViewPaths);
+         // 4. Garden default. eg. /path/to/application/dashboard/views/modules/
+         $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $View . '.php'));
+
+         $ViewPath = Gdn_FileSystem::Exists($ViewPaths);
+      }
+      
       if ($ViewPath === FALSE)
          throw new Exception(ErrorMessage('Could not find a `' . $View . '` view for the `' . $this->Name() . '` module in the `' . $ApplicationFolder . '` application.', get_class($this), 'FetchView'), E_USER_ERROR);
 

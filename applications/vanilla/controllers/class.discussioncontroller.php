@@ -544,7 +544,7 @@ class DiscussionController extends VanillaController {
       
       $this->Permission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID);
       
-      // Sink the discussion.
+      // Close the discussion.
       $this->DiscussionModel->SetField($DiscussionID, 'Closed', $Close);
       $Discussion->Closed = $Close;
       

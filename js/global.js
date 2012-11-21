@@ -1154,6 +1154,9 @@ jQuery(window).load(function() {
          img.wrap('<a href="'+$(img).attr('src')+'"></a>');
       }
    });
+   
+   // Let the world know we're done here
+   jQuery(window).trigger('ImagesResized');
 });
 
 if(typeof String.prototype.trim !== 'function') {

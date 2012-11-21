@@ -100,7 +100,7 @@ class Gdn_Smarty {
       $Smarty->security = TRUE;
       
       $Smarty->security_settings['IF_FUNCS'] = array_merge($Smarty->security_settings['IF_FUNCS'],
-         array('CheckPermission', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url', 'InSection', 'InCategory'));
+         array('Category', 'CheckPermission', 'InSection', 'InCategory', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url'));
       
       $Smarty->security_settings['MODIFIER_FUNCS'] = array_merge($Smarty->security_settings['MODIFIER_FUNCS'],
          array('sprintf'));

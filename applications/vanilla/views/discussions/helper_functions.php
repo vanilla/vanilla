@@ -79,6 +79,14 @@ function CategoryLink($Discussion, $Prefix = ' ') {
 
 endif;
 
+if (!function_exists('DiscussionHeading')):
+   
+function DiscussionHeading() {
+   return T('Discussion');
+}
+
+endif;
+
 if (!function_exists('WriteDiscussion')):
 function WriteDiscussion($Discussion, &$Sender, &$Session) {
    $CssClass = CssClass($Discussion);
@@ -248,7 +256,7 @@ function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
    if (!$CssClass)
       $CssClass = "Tag-$Code";
 
-   return ' <span class="Tag '.$CssClass.'">'.T($Code).'</span> ';
+   return ' <span class="Tag '.$CssClass.'" title="'.htmlspecialchars(T($Code)).'">'.T($Code).'</span> ';
 }
 endif;
 

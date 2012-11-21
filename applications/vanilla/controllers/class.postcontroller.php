@@ -75,6 +75,8 @@ class PostController extends VanillaController {
       
       $Session = Gdn::Session();
       
+      Gdn_Theme::Section('PostDiscussion');
+      
       // Set discussion, draft, and category data
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;

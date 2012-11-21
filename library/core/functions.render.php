@@ -149,6 +149,38 @@ if (!function_exists('ButtonGroup')):
    }
 endif;
 
+if (!function_exists('Category')):
+
+/**
+ * Get the current category on the page.
+ * @param int $Depth The level you want to look at.
+ */
+function Category($Depth = NULL) {
+   $Category = Gdn::Controller()->Data('Category');
+   if (!$Category) {
+      $Category = Gdn::Controller()->Data('CategoryID');
+      if ($Category)
+         $Category = CategoryModel::Categories($Category);
+   }
+   if (!$Category)
+      return NULL;
+   
+   $Category = (array)$Category;
+   
+   if ($Depth !== NULL) {
+      // Get the category at the correct level.
+      while ($Category['Depth'] > $Depth) {
+         $Category = CategoryModel::Categories($Category['ParentCategoryID']);
+         if (!$Category)
+            return NULL;
+      }
+   }
+   
+   return $Category;
+}
+   
+endif;
+
 if (!function_exists('CategoryUrl')):
 
 /**
@@ -270,6 +302,35 @@ function CssClass($Row) {
 
    return trim($CssClass);
 }
+endif;
+
+if (!function_exists('DateUpdated')):
+
+function DateUpdated($Row, $Wrap = NULL) {
+   $Result = '';
+   $DateUpdated = GetValue('DateUpdated', $Row);
+   $UpdateUserID = GetValue('UpdateUserID', $Row);
+   
+   if ($DateUpdated) {
+      $Result = '';
+      
+      $UpdateUser = Gdn::UserModel()->GetID($UpdateUserID);
+      if ($UpdateUser)
+         $Title = sprintf(T('Edited by %s on %s.'), GetValue('Name', $UpdateUser), Gdn_Format::DateFull($DateUpdated));
+      else
+         $Title = sprintf(T('Edited on %s.'), Gdn_Format::DateFull($DateUpdated));
+      
+      $Result = ' <span title="'.htmlspecialchars($Title).'" class="DateUpdated">'.
+              sprintf(T('edited %s'), Gdn_Format::Date($DateUpdated)).
+              '</span> ';
+      
+      if ($Wrap)
+         $Result = $Wrap[0].$Result.$Wrap[1];
+   }
+   
+   return $Result;
+}
+   
 endif;
 
 /**
@@ -618,7 +679,7 @@ if (!function_exists('UserPhoto')) {
          $Photo = UserPhotoDefaultUrl($User, $ImgClass);
 
       if ($Photo) {
-         if (!preg_match('`^https?://`i', $Photo)) {
+         if (!isUrl($Photo, '//')) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
             $PhotoUrl = $Photo;

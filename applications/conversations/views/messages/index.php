@@ -2,7 +2,7 @@
 <h1 class="H"><?php echo $this->Participants; ?></h1>
 <?php
 if ($this->Data('Conversation.Subject') && C('Conversations.Subjects.Visible')) {
-   echo '<h2>'.htmlspecialchars($this->Data('Conversation.Subject')).'</h2>';
+   echo '<h2 class="Subject">'.htmlspecialchars($this->Data('Conversation.Subject')).'</h2>';
 }
 
 if ($this->Data('_HasDeletedUsers')) {

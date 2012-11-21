@@ -1177,7 +1177,7 @@ class ProfileController extends Gdn_Controller {
       $AllowImages = Gdn_UploadImage::CanUploadImages();
          
       // Is the photo hosted remotely?
-      $RemotePhoto = in_array(substr($this->User->Photo, 0, 7), array('http://', 'https:/'));
+      $RemotePhoto = IsUrl($this->User->Photo);
       
       if ($this->User->UserID != $ViewingUserID) {
          // Include user js files for people with edit users permissions

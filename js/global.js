@@ -1,4 +1,26 @@
 // This file contains javascript that is global to the entire Garden application
+
+
+// Global vanilla library function.
+(function(window, $) {
+
+var Vanilla = function() { };
+
+Vanilla.fn = Vanilla.prototype;
+
+if (!window.console)
+   window.console = { log: function() {} };
+
+// Add a stub for embedding.
+Vanilla.parent = function() {};
+Vanilla.parent.callRemote = function(func, args, success, failure) { console.log("callRemote stub: "+func, args); };
+
+window.Vanilla = Vanilla;
+
+})(window, jQuery);
+
+
+// Stuff to fire on document.ready().
 jQuery(document).ready(function($) {
    if ($.browser.msie) {
       $('body').addClass('MSIE');

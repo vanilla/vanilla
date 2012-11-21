@@ -1,5 +1,46 @@
 <?php if (!defined('APPLICATION')) exit();
 
+if (!function_exists('CategoryHeading')):
+
+/**
+ * Write the category heading in a category table.
+ * Good for plugins that want to override whats displayed in the heading to the category name.
+ * 
+ * @return string
+ * @since 2.1
+ */
+function CategoryHeading() {
+   return T('Categories');
+}
+   
+endif;
+
+if (!function_exists('CategoryPhoto')):
+
+/**
+ * 
+ * @since 2.1
+ */
+function CategoryPhoto($Row) {
+   $PhotoUrl = GetValue('PhotoUrl', $Row);
+   
+   if ($PhotoUrl) {
+      $Result = Anchor(
+         '<img src="'.$PhotoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(GetValue('Name', $Row)).'" />',
+         CategoryUrl($Row, '', '//'),
+         'Item-Icon PhotoWrap PhotoWrap-Category');
+   } else {
+      $Result = Anchor(
+         ' ',
+         CategoryUrl($Row, '', '//'),
+         'Item-Icon PhotoWrap PhotoWrap-Category Hidden');
+   }
+   
+   return $Result;
+}
+   
+endif;
+
 if (!function_exists('CategoryString')):
    
 function CategoryString($Rows) {
@@ -32,13 +73,13 @@ function GetOptions($Category) {
    $TKey = urlencode(Gdn::Session()->TransientKey());
 
    // Mark category read.
-   $Options .= '<li>'.Anchor(T('Mark Read'), "/vanilla/category/markread?categoryid=$CategoryID&tkey=$TKey").'</li>';
+   $Options .= '<li rel="MarkRead">'.Anchor(T('Mark Read'), "/vanilla/category/markread?categoryid=$CategoryID&tkey=$TKey").'</li>';
 
    // Follow/Unfollow category.
    if (!GetValue('Following', $Category))
-      $Options .= '<li>'.Anchor(T('Unhide'), "/vanilla/category/follow?categoryid=$CategoryID&value=1&tkey=$TKey").'</li>';
+      $Options .= '<li rel="Hide">'.Anchor(T('Unhide'), "/vanilla/category/follow?categoryid=$CategoryID&value=1&tkey=$TKey").'</li>';
    else
-      $Options .= '<li>'.Anchor(T('Hide'), "/vanilla/category/follow?categoryid=$CategoryID&value=0&tkey=$TKey").'</li>';
+      $Options .= '<li rel="Hide">'.Anchor(T('Hide'), "/vanilla/category/follow?categoryid=$CategoryID&value=0&tkey=$TKey").'</li>';
 
    // Allow plugins to add options
    $Sender->FireEvent('CategoryOptions');
@@ -114,6 +155,8 @@ function WriteListItem($Row, $Depth = 1) {
       <div class="ItemContent Category">
          <?php echo GetOptions($Row); ?>
          
+         <?php echo CategoryPhoto($Row); ?>
+         
          <?php echo Wrap(Anchor($Row['Name'], $Row['Url'], 'Title'), $H, array('class' => 'CategoryName TitleWrap')); ?>
          
          <div class="CategoryDescription">
@@ -166,10 +209,10 @@ if (!function_exists('WriteTableHead')):
 function WriteTableHead() {
    ?>
    <tr>
-      <td class="CategoryName"><?php echo T('Category'); ?></td>
-      <td class="BigCount CountDiscussions"><?php echo T('Discussions'); ?></td>
-      <td class="BigCount CountComments"><?php echo T('Comments'); ?></td>
-      <td class="BlockColumn LatestPost"><?php echo T('Latest Post'); ?></td>
+      <td class="CategoryName"><div class="Wrap"><?php echo CategoryHeading(); ?></div></td>
+      <td class="BigCount CountDiscussions"><div class="Wrap"><?php echo T('Discussions'); ?></div></td>
+      <td class="BigCount CountComments"><div class="Wrap"><?php echo T('Comments'); ?></div></td>
+      <td class="BlockColumn LatestPost"><div class="Wrap"><?php echo T('Latest Post'); ?></div></td>
    </tr>
    <?php
 }
@@ -192,25 +235,30 @@ function WriteTableRow($Row, $Depth = 1) {
    ?>
    <tr class="<?php echo CssClass($Row); ?>">
       <td class="CategoryName">
-         <?php 
-            echo GetOptions($Row);
-            echo "<{$H}>";
-            echo Anchor($Row['Name'], $Row['Url']);
-            Gdn::Controller()->EventArguments['Category'] = $Row;
-            Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
-            echo "</{$H}>";
-         ?>
-         <div class="CategoryDescription">
-            <?php echo $Row['Description']; ?>
-         </div>
-         <?php if ($WriteChildren === 'list'): ?>
-         <div class="ChildCategories">
-            <?php
-            echo Wrap(T('Child Categories').': ', 'b');
-            echo CategoryString($Children, $Depth + 1);
+         <div class="Wrap">
+            <?php 
+               echo GetOptions($Row);
+
+               echo CategoryPhoto($Row);
+
+               echo "<{$H}>";
+               echo Anchor($Row['Name'], $Row['Url']);
+               Gdn::Controller()->EventArguments['Category'] = $Row;
+               Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
+               echo "</{$H}>";
             ?>
+            <div class="CategoryDescription">
+               <?php echo $Row['Description']; ?>
+            </div>
+            <?php if ($WriteChildren === 'list'): ?>
+            <div class="ChildCategories">
+               <?php
+               echo Wrap(T('Child Categories').': ', 'b');
+               echo CategoryString($Children, $Depth + 1);
+               ?>
+            </div>
+            <?php endif; ?>
          </div>
-         <?php endif; ?>
       </td>
       <td class="BigCount CountDiscussions">
          <div class="Wrap">

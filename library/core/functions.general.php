@@ -1646,6 +1646,8 @@ if (!function_exists('IsUrl')) {
     * @since 2.1
     */
    function IsUrl($Str) {
+      if (!$Str)
+         return FALSE;
       if (substr($Str, 0, 2) == '//')
          return TRUE;
       if (strpos($Str, '://', 1) !== FALSE)
@@ -1874,7 +1876,7 @@ if (!function_exists('SignInPopup')) {
     * into modal in-page popups.
     */
    function SignInPopup() {
-      return C('Garden.SignIn.Popup') && !IsMobile();
+      return C('Garden.SignIn.Popup');
    }
 }
 

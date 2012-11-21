@@ -103,7 +103,7 @@ class DashboardHooks implements Gdn_IPlugin {
       }
 		
       // Allow forum embedding
-      if (C('Garden.Embed.Allow')) {
+      if ($Embed = C('Garden.Embed.Allow')) {
          // Record the remote url where the forum is being embedded.
          $RemoteUrl = C('Garden.Embed.RemoteUrl');
          if (!$RemoteUrl) {
@@ -123,7 +123,11 @@ class DashboardHooks implements Gdn_IPlugin {
          $Sender->AddDefinition('Path', Gdn::Request()->Path());
          // $Sender->AddDefinition('MasterView', $Sender->MasterView);
          $Sender->AddDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
-         $Sender->AddJsFile('js/embed_local.js');
+         
+         if ($Embed === 2)
+            $Sender->AddJsFile('vanilla.embed.local.js');
+         else
+            $Sender->AddJsFile('embed_local.js');
       }
          
       // Allow return to mobile site

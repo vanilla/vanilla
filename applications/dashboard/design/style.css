@@ -1362,6 +1362,11 @@ overflow: hidden;
    border: none;
 }
 
+.Item-Icon {
+   float: left;
+   margin: 0 10px 10px 0;
+}
+
 .Item h2, .Item h3, .Item h4, .Item h5 {
    margin: 0;
 }
@@ -2453,7 +2458,6 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    display: inline;
    font-weight: normal;
    font-size: 95%;
-   color: #555;
 }
 
 .List.Inline * {

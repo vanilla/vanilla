@@ -100,6 +100,7 @@ class MessagesController extends ConversationsController {
       if ($Target = Gdn::Request()->Get('Target'))
             $this->Form->AddHidden('Target', $Target);
 
+      Gdn_Theme::Section('PostConversation');
       $this->Title(T('New Conversation'));
       $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox'), array('Name' => $this->Data('Title'), 'Url' => 'messages/add')));
       $this->Render();      
@@ -368,6 +369,14 @@ class MessagesController extends ConversationsController {
       $this->AddModule($InThisConversationModule);
       
       $this->AddModule('AddPeopleModule');
+      
+      $Subject = $this->Data('Conversation.Subject');
+      if (!$Subject)
+         $Subject = T('Message');
+      
+      $this->Data['Breadcrumbs'][] = array(
+          'Name' => $Subject,
+          Url('', '//'));
       
       // Render view
       $this->Render();

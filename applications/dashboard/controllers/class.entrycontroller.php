@@ -699,6 +699,7 @@ class EntryController extends Gdn_Controller {
          
          // Sign the user right out.
          Gdn::Session()->End();
+         $this->SetData('SignedOut', TRUE);
          
          $this->EventArguments['SignoutUser'] = $User;
          $this->FireEvent("SignOut");

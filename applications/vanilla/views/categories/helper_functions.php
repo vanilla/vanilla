@@ -297,6 +297,15 @@ function WriteTableRow($Row, $Depth = 1) {
                   Gdn_Format::Date($Row['LastDateInserted'], 'html'),
                   $Row['LastUrl'],
                   'CommentDate MItem');
+               
+               if (isset($Row['LastCategoryID'])) {
+                  $LastCategory = CategoryModel::Categories($Row['LastCategoryID']);
+                  
+                  echo ' <span>',
+                     sprintf('in %s', Anchor($LastCategory['Name'], CategoryUrl($LastCategory, '', '//'))),
+                     '</span>';
+                  
+               }
                ?>
             </div>
             <?php endif; ?>

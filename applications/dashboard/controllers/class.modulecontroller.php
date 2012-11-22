@@ -1,15 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
-/**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @package Dashboard
- */
 
 /**
  * Provides a way to widgetize modules.
- *
- * @package Dashboard
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class ModuleController extends Gdn_Controller {
    /**
     * Creates and renders an instance of a module.

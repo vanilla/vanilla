@@ -4,10 +4,11 @@
  * Social Controller
  *
  * Manages the social plugins.
- *
- * @author Tim Gunter <tim@vanillaforums.com>
- * @since 2.0.18
- * @package Dashboard
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.1
  */
 
 class SocialController extends DashboardController {

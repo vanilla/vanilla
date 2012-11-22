@@ -209,18 +209,22 @@ class MessagesController extends ConversationsController {
     * 
     * @param int $ConversationID Unique ID of conversation to clear.
     */
-   public function Clear($ConversationID = FALSE) {
+   public function Clear($ConversationID = FALSE, $TransientKey = '') {
       $Session = Gdn::Session();
       
       // Yes/No response
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
       
-      // Clear it
-      if (is_numeric($ConversationID) && $ConversationID > 0 && $Session->IsValid())
-         $this->ConversationModel->Clear($ConversationID, $Session->UserID);
+      $ValidID = (is_numeric($ConversationID) && $ConversationID > 0);
+      $ValidSession = ($Session->UserID > 0 && $Session->ValidateTransientKey($TransientKey));
       
-      $this->InformMessage(T('The conversation has been cleared.'));
-      $this->RedirectUrl = Url('/messages/all');
+      if ($ValidID && $ValidSession) {
+         // Clear it
+         $this->ConversationModel->Clear($ConversationID, $Session->UserID);
+         $this->InformMessage(T('The conversation has been cleared.'));
+         $this->RedirectUrl = Url('/messages/all');
+      }
+      
       $this->Render();
    }
    

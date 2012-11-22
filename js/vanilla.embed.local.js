@@ -12,13 +12,25 @@
    
    Vanilla.parent.signout = function() { $.post('/entry/signout.json'); };
    
-   window.onload = function() {
+   var currentHeight = null;
+   var setHeight = function() {
       // Set the height of the iframe based on vanilla.
       var height = document.body.offsetHeight || document.body.scrollHeight;
       
-      Vanilla.parent.callRemote('height', height);
-      
+      if (height != currentHeight) {
+         currentHeight = height;
+         Vanilla.parent.callRemote('height', height);
+      }
+   }
+   
+   $(window).load(function() {
+      setHeight();
       Vanilla.parent.callRemote('notifyLocation', window.location.href);
-   }; 
-
+      
+      setInterval(setHeight, 300);
+   });
+   
+   $(window).unload(function() {
+      window.parent.hide();
+   });
 })(window, jQuery, Vanilla);

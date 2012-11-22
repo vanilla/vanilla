@@ -47,14 +47,33 @@
 
          // Object containing callbacks
          var iframe, callbacks = {};
+         
+         function hide() {
+            iframe.style.visibility = "hidden";
+         }
             
          var socket = new easyXDM.Socket({
             swf: "js/easyXDM/easyxdm.swf",
             onReady: function(){
                iframe = document.createElement("iframe");
                iframe.frameBorder = 0;
+               iframe.allowtransparency = true;
+               iframe.style.visibility = "hidden";
+               
+               var loaded = function() {
+                  iframe.style.visibility = "visible"; 
+               };
+               
                document.body.appendChild(iframe);
+               
                iframe.src = easyXDM.query.url;
+               
+               if(iframe.addEventListener) {
+                  iframe.addEventListener('load', loaded, true);
+               } else if(iframe.attachEvent) {
+                  iframe.attachEvent('onload', loaded);
+               } else
+                  loaded();
             },
             onMessage: function(message, origin) {
                var data = JSON.parse(message);
@@ -90,6 +109,7 @@
       </script>
       <style type="text/css">
          html, body {
+            background-color:transparent;
             overflow: hidden;
             margin: 0px;
             padding: 0px;

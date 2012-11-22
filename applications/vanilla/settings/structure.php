@@ -41,6 +41,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('Photo', 'varchar(255)', TRUE)
    ->Column('PermissionCategoryID', 'int', '-1') // default to root.
    ->Column('HideAllDiscussions', 'tinyint(1)', '0')
+   ->Column('DisplayAs', array('Categories', 'Discussions', 'Default'), 'Default')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')

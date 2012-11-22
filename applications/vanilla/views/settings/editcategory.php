@@ -54,6 +54,12 @@ echo $this->Form->Errors();
    ?>
    <li>
       <?php
+         echo $this->Form->Label('Display As', 'DisplayAs');
+         echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions'));
+      ?>
+   </li>
+   <li>
+      <?php
       echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
       ?>
    </li>

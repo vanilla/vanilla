@@ -153,6 +153,13 @@ class CategoryModel extends Gdn_Model {
          else
             $Category['PhotoUrl'] = '';
          
+         if ($Category['DisplayAs'] == 'Default') {
+            if ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0))
+               $Category['DisplayAs'] = 'Categories';
+            else
+               $Category['DisplayAs'] = 'Discussions';
+         }
+         
          if (!GetValue('CssClass', $Category))
             $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
 		}

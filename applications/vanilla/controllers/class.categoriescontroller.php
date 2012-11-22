@@ -71,9 +71,10 @@ class CategoriesController extends VanillaController {
     * @param int $Offset Number of discussions to skip.
     */
    public function Index($CategoryIdentifier = '', $Page = '0') {
+      // Figure out which category layout to choose (Defined on "Homepage" settings page).
+      $Layout = C('Vanilla.Categories.Layout');
+      
       if ($CategoryIdentifier == '') {
-         // Figure out which category layout to choose (Defined on "Homepage" settings page).
-         $Layout = C('Vanilla.Categories.Layout');
          switch($Layout) {
             case 'mixed':
                $this->View = 'discussions';
@@ -103,8 +104,21 @@ class CategoriesController extends VanillaController {
          
          $this->SetData('Category', $Category, TRUE);
          
-         if ($Category->Depth <= C('Vanilla.Categories.NavDepth', 0)) {
-            $this->Table();
+         if ($Category->DisplayAs == 'Categories') {
+            // This category is an overview style category and displays as a category list.
+            switch($Layout) {
+               case 'mixed':
+                  $this->View = 'discussions';
+                  $this->Discussions();
+                  break;
+               case 'table':
+                  $this->Table();
+                  break;
+               default:
+                  $this->View = 'all';
+                  $this->All();
+                  break;
+            }
             return;
          }
          
@@ -239,7 +253,6 @@ class CategoriesController extends VanillaController {
       $CategoryFollowToggleModule->SetToggle();
       
       // Get category data
-      $CategoryModel = new CategoryModel();
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
       
       $Categories = $this->CategoryModel->GetFull()->ResultArray();

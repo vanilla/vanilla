@@ -283,7 +283,7 @@ class UserController extends DashboardController {
       
       $UserModel = Gdn::UserModel();
       
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          if ($Unban) {
             $UserModel->Unban($UserID, array('RestoreContent' => $this->Form->GetFormValue('RestoreContent')));
          } else {
@@ -427,7 +427,7 @@ class UserController extends DashboardController {
       if (!$User)
          throw NotFoundException('User');
       
-      if ($this->Request->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          Gdn::UserModel()->DeleteContent($UserID, array('Log' => TRUE));
 
          if ($this->Request->Get('Target')) {

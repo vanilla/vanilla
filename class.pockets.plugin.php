@@ -57,7 +57,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
       if ($this->TestMode && Gdn::Session()->CheckPermission('Plugins.Pockets.Manage')) {
          // Add the css for the test pockets to the page.
-         $Sender->AddCSSFile('plugins/Pockets/design/pockets.css');
+         $Sender->AddCSSFile('pockets.css', 'plugins/Pockets');
       }
    }
 
@@ -112,7 +112,7 @@ class PocketsPlugin extends Gdn_Plugin {
    public function SettingsController_Pockets_Create($Sender, $Args = array()) {
       $Sender->Permission('Plugins.Pockets.Manage');
       $Sender->AddSideMenu('settings/pockets');
-      $Sender->AddJsFile('plugins/Pockets/pockets.js');
+      $Sender->AddJsFile('pockets.js', 'plugins/Pockets');
 
       $Page = GetValue(0, $Args);
       switch(strtolower($Page)) {

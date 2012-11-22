@@ -18,14 +18,19 @@
       var height = document.body.offsetHeight || document.body.scrollHeight;
       
       if (height != currentHeight) {
+         currentHeight = height;
          Vanilla.parent.callRemote('height', height);
       }
    }
    
-   window.onload = function() {
+   $(window).load(function() {
       setHeight();
       Vanilla.parent.callRemote('notifyLocation', window.location.href);
       
       setInterval(setHeight, 300);
-   };
+   });
+   
+   $(window).unload(function() {
+      window.parent.hide();
+   });
 })(window, jQuery, Vanilla);

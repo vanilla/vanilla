@@ -274,4 +274,22 @@ class AssetModel extends Gdn_Model {
 //      die();
       return $Result;
    }
+   
+   /**
+    * Generate a hash for a group of resources, based on keys + versions
+    * 
+    * @param array $ResourceFiles
+    * @return string
+    */
+   public function HashTag($ResourceFiles) {
+      $Keys = array();
+      
+      foreach ($ResourceFiles as $Key => $Options) {
+         $Version = GetValue('version', $Options, '');
+         $Keys[] = "{$Key} -> {$Version}";
+      }
+      
+      $HashTag = md5(implode("\n", $Keys));
+      return $HashTag;
+   }
 }

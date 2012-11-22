@@ -379,6 +379,56 @@ class CategoryModel extends Gdn_Model {
       return $Joined;
    }
    
+   public static function JoinRecentChildPosts(&$Category = NULL, &$Categories = NULL) {
+      if ($Categories === NULL)
+         $Categories =& self::$Categories;
+      
+      if ($Category === NULL)
+         $Category =& $Categories[-1];
+      
+      if (!isset($Category['ChildIDs']))
+         return;
+      
+      $LastTimestamp = Gdn_Format::ToTimestamp($Category['LastDateInserted']);;
+      $LastCategoryID = NULL;
+      
+      if ($Category['DisplayAs'] == 'Categories') {
+         // This is an overview category so grab it's recent data from it's children.
+         foreach ($Category['ChildIDs'] as $CategoryID) {
+            if (!isset($Categories[$CategoryID]))
+               continue;
+            
+            $ChildCategory =& $Categories[$CategoryID];
+            if ($ChildCategory['DisplayAs'] == 'Categories') {
+               self::JoinRecentChildPosts($ChildCategory, $Categories);
+            }
+            $Timestamp = Gdn_Format::ToTimestamp($ChildCategory['LastDateInserted']);
+            
+            if ($LastTimestamp === FALSE || $LastTimestamp < $Timestamp) {
+               $LastTimestamp = $Timestamp;
+               $LastCategoryID = $CategoryID;
+            }
+         }
+         
+         if ($LastCategoryID) {
+            $LastCategory = $Categories[$LastCategoryID];
+            
+            $Category['LastCommentID'] = $LastCategory['LastCommentID'];
+            $Category['LastDiscussionID'] = $LastCategory['LastDiscussionID'];
+            $Category['LastDateInserted'] = $LastCategory['LastDateInserted'];
+            $Category['LastTitle'] = $LastCategory['LastTitle'];
+            $Category['LastUserID'] = $LastCategory['LastUserID'];
+            $Category['LastDiscussionUserID'] = $LastCategory['LastDiscussionUserID'];
+            $Category['LastUrl'] = $LastCategory['LastUrl'];
+            $Category['LastCategoryID'] = $LastCategory['CategoryID'];
+//            $Category['LastName'] = $LastCategory['LastName'];
+//            $Category['LastName'] = $LastCategory['LastName'];
+//            $Category['LastEmail'] = $LastCategory['LastEmail'];
+//            $Category['LastPhoto'] = $LastCategory['LastPhoto'];
+         }
+      }
+   }
+   
    /**
     * Add UserCategory modifiers
     * 
@@ -791,6 +841,11 @@ class CategoryModel extends Gdn_Model {
             unset($Categories[$ID]);
          elseif (is_array($CategoryID) && !in_array($ID, $CategoryID))
             unset($Categories[$ID]);
+      }
+      
+      foreach ($Categories as &$Category) {
+         if ($Category['ParentCategoryID'] <= 0)
+            self::JoinRecentChildPosts($Category, $Categories);
       }
       
       Gdn::UserModel()->JoinUsers($Categories, array('LastUserID'));

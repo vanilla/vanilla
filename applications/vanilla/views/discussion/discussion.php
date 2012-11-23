@@ -4,7 +4,8 @@ $UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
 $Discussion = $this->Data('Discussion');
 $Author = Gdn::UserModel()->GetID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
 
-// Prep event args
+// Prep event args.
+unset($Discussion->CountUnreadComments, $Discussion->Read);
 $CssClass = CssClass($Discussion);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;

@@ -62,6 +62,11 @@ jQuery(document).ready(function($) {
                   if (target.offset()) {
                      $('html,body').animate({scrollTop: target.offset().top}, 'fast');
                   }
+
+                  // Let listeners know that the message was added.
+                  $(document).trigger('MessageAdded');
+                  $(frm).triggerHandler('complete');
+
                   gdn.inform(json);
                }
             },

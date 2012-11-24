@@ -59,7 +59,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
    /** @var bool Whether or not this table exists in the database.
     */
-   protected $_TableExixts;
+   protected $_TableExists;
 
    /** @var string The name of the storage engine for this table.
     */

@@ -222,7 +222,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
       }
 
       // Call the "After" event handlers
-      Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $MethodName, 'After');
+      Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $ReferenceMethodName, 'After');
 
       return $Return;
    }

@@ -89,7 +89,6 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
@@ -134,7 +133,6 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';

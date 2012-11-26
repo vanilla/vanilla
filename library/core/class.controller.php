@@ -1568,7 +1568,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                $Paths = $AssetModel->GetCssFiles(ucfirst($Mode), $ETag, $NotFound, FALSE);
                
                // Add them to the output
-               $this->_CssFiles = $Paths;
+               $this->_CssFiles = array_merge($this->_CssFiles, $Paths);
                
             } else {
                

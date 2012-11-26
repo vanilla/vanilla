@@ -685,6 +685,90 @@ class UserController extends DashboardController {
       $this->Render('filenotfound', 'home');
    }
    
+   public function SSO($UserID = FALSE) {
+      $this->Permission('Garden.Users.Edit');
+      
+      $ProviderModel = new Gdn_AuthenticationProviderModel();
+      
+      $Form = new Gdn_Form();
+      
+      if ($this->Request->IsPostBack()) {
+         // Make sure everything has been posted.
+         $Form->ValidateRule('ClientID', 'ValidateRequired');
+         $Form->ValidateRule('UniqueID', 'ValidateRequired');
+         
+         if (!ValidateRequired($Form->GetFormValue('Username')) && !ValidateRequired($Form->GetFormValue('Email'))) {
+            $Form->AddError('Username or Email is required.');
+         }
+         
+         $Form->ValidateRule('Password', 'ValidateRequired');
+         
+         $Provider = $ProviderModel->GetProviderByKey($Form->GetFormValue('ClientID'));
+         if (!$Provider) {
+            $Form->AddError(sprintf('%1$s "%2$s" not found.', T('Provider'), $Form->GetFormValue('ClientID')));
+         }
+         
+         if ($Form->ErrorCount() > 0) {
+            throw new Gdn_UserException($Form->ErrorString());
+         }
+         
+         // Grab the user.
+         $User = FALSE;
+         if ($Email = $Form->GetFormValue('Email')) {
+            $User = Gdn::UserModel()->GetByEmail($Email);
+         }
+         if (!$User && ($Username = $Form->GetFormValue('Username'))) {
+            $User = Gdn::UserModel()->GetByUsername($Username);
+         }
+         if (!$User) {
+            throw new Gdn_UserException(sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))), 404);
+         }
+         
+         // Valide the user's password.
+         $PasswordHash = new Gdn_PasswordHash();
+         $Password = $this->Form->GetFormValue('Password');
+         if (!$PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User))) {
+            throw new Gdn_UserException(T('Invalid password.'), 401);
+         }
+         
+         // Okay. We've gotten this far. Let's save the authentication.
+         $User = (array)$User;
+         
+         Gdn::UserModel()->SaveAuthentication(array(
+            'UserID' => $User['UserID'],
+            'Provider' => $Form->GetFormValue('ClientID'),
+            'UniqueID' => $Form->GetFormValue('UniqueID')
+         ));
+         
+         $Row = Gdn::UserModel()->GetAuthentication($Form->GetFormValue('UniqueID'), $Form->GetFormValue('UniqueID'));
+         
+         if ($Row) {
+            $this->SetData('Result', $Row);
+         } else {
+            throw new Gdn_UserException(T('There was an error saving the data.'));
+         }
+      } else {
+         $User = Gdn::UserModel()->GetID($UserID);
+         if (!$User)
+            throw NotFoundException('User');
+         
+         $Result = Gdn::SQL()
+               ->Select('ua.ProviderKey', '', 'ClientID')
+               ->Select('ua.ForeignUserKey', '', 'UniqueID')
+               ->Select('ua.UserID')
+               ->Select('p.Name')
+               ->Select('p.AuthenticationSchemeAlias', '', 'Type')
+               ->From('UserAuthentication ua')
+               ->Join('UserAuthenticationProvider p', 'ua.ProviderKey = p.AuthenticationKey')
+               ->Where('UserID', $UserID)
+               ->Get()->ResultArray();
+         
+         $this->SetData('Result', $Result);
+      }
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
+   }
+   
    /**
     * Determine whether user can register with this username.
     *

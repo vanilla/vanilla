@@ -1530,7 +1530,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             exit($Ex->getMessage());
       }
    }
-
+   
    /**
     * Undocumented method.
     *
@@ -1545,7 +1545,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
             
-            $RenderStartTime = microtime(true);
+            $DebugAssets = C('DebugAssets');
             
             /*
              * CSS Files
@@ -1554,7 +1554,6 @@ class Gdn_Controller extends Gdn_Pluggable {
              */
             
             $ETag = AssetModel::ETag();
-            $DebugAssets = C('DebugAssets');
             
             // Explode the condensed CSS files into _CssFiles
             $CssCdns = array();
@@ -1566,7 +1565,10 @@ class Gdn_Controller extends Gdn_Pluggable {
                
                // Grab all of the css files from the asset model.
                $AssetModel = new AssetModel();
-               $AssetModel->GetCssFiles(ucfirst($Mode), $ETag);
+               $Paths = $AssetModel->GetCssFiles(ucfirst($Mode), $ETag, $NotFound, FALSE);
+               
+               // Add them to the output
+               $this->_CssFiles = $Paths;
                
             } else {
                
@@ -1574,6 +1576,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                   'style.css' => "~/utility/css/style/style-{$ETag}.css",
                   'admin.css' => "~/utility/css/admin/admin-{$ETag}.css"
                );
+               
             }
             
             // Allow pre-modification of CSS included array
@@ -1583,13 +1586,13 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->EventArguments['Cdns'] = &$CssCdns;
             $this->FireEvent('AfterCssCdns');
             
-            $CssFiles = $this->ResolveStaticResources($this->_CssFiles, 'design', array(
+            $CssFiles = self::ResolveStaticResources($this->_CssFiles, 'design', array(
                'CDNS'         => $CssCdns
             ));
             
             foreach ($CssFiles as $CssSrc => $CssOptions)
                $this->Head->AddCss($CssSrc, 'all', TRUE, $CssOptions);
-
+            
             /*
              * Javascript Files
              * 
@@ -1613,7 +1616,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->EventArguments['Cdns'] = &$JsCdns;
             $this->FireEvent('AfterJsCdns');
             
-            $JsFiles = $this->ResolveStaticResources($this->_JsFiles, 'js', array(
+            $JsFiles = self::ResolveStaticResources($this->_JsFiles, 'js', array(
                'CDNS'         => $JsCdns
             ));
             
@@ -1626,7 +1629,7 @@ class Gdn_Controller extends Gdn_Pluggable {
              * Resolve and add Mustache template files to the output.
              */
             
-            $TemplateFiles = $this->ResolveStaticResources($this->_TemplateFiles, 'views', array(
+            $TemplateFiles = self::ResolveStaticResources($this->_TemplateFiles, 'views', array(
                'StripRoot'    => FALSE
             ));
             
@@ -1821,7 +1824,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *   - 'applications'
     *   - 'global'
     */
-   protected function ResolveStaticResources($ResourceList, $Stub, $Options = NULL, $CheckLocations = NULL) {
+   public static function ResolveStaticResources($ResourceList, $Stub, $Options = NULL, $CheckLocations = NULL) {
       
       // All locations by default
       if (!is_array($CheckLocations))
@@ -1846,10 +1849,34 @@ class Gdn_Controller extends Gdn_Pluggable {
       // See if we're allowing any CDN replacements
       $Cdns = GetValue('CDNS', $Options, array());
       
+      // Pre-get controller info
+      $ControllerAppFolder = FALSE;
+      $ControllerTheme = FALSE;
+      if (Gdn::Controller() instanceof Gdn_Controller) {
+         $ControllerAppFolder = Gdn::Controller()->ApplicationFolder;
+         $ControllerTheme = Gdn::Controller()->Theme;
+      }
+      
       $FileList = array();
       foreach ($ResourceList as $Index => $ResourceInfo) {
          
          $ResourceFile = $ResourceInfo['FileName'];
+         $ResourceFolder = GetValue('AppFolder', $ResourceInfo);
+         $ResourceOptions = (array)GetValue('Options', $ResourceInfo, FALSE);
+         
+         if ($ResourceFile === FALSE) {
+            if (!$ResourceOptions) continue;
+            
+            $RawCSS = GetValue('Css', $ResourceOptions, FALSE);
+            if (!$RawCSS) continue;
+            
+            $CssHash = md5($RawCSS);
+            $FileList[$ResourceFolder] = array(
+               'options'   => $ResourceOptions
+            );
+            continue;
+         }
+         
          $SkipFileCheck = FALSE;
          
          // Resolve CDN resources
@@ -1878,7 +1905,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Relative path
             $AppFolder = GetValue('AppFolder', $ResourceInfo, FALSE);
             if ($AppFolder == '')
-               $AppFolder = $this->ApplicationFolder;
+               $AppFolder = $ControllerAppFolder;
             
             if ($AppFolder == 'false')
                $AppFolder = FALSE;
@@ -1892,14 +1919,14 @@ class Gdn_Controller extends Gdn_Pluggable {
             $TestPaths = array();
             
             // Theme
-            if (in_array('themes', $CheckLocations) && $this->Theme) {
+            if (in_array('themes', $CheckLocations) && $ControllerTheme) {
                
                // Application-specific theme override
                if ($AppFolder)
-                  $TestPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $AppFolder, $Stub, $ResourceFile));
+                  $TestPaths[] = CombinePaths(array(PATH_THEMES, $ControllerTheme, $AppFolder, $Stub, $ResourceFile));
                
                // Garden-wide theme override
-               $TestPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $Stub, $ResourceFile));
+               $TestPaths[] = CombinePaths(array(PATH_THEMES, $ControllerTheme, $Stub, $ResourceFile));
             }
 
             // Application or plugin
@@ -2006,11 +2033,16 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
 
             // Bring options into response structure
-            $ResourceOptions = (array)GetValue('Options', $ResourceInfo, array());
-            $ResourceOptions['path'] = $ResourcePath;
-            TouchValue('version', $ResourceOptions, $Version);
+            $Resource = array(
+               'path'      => $ResourcePath
+            );
             
-            $FileList[$ResourceResolved] = $ResourceOptions;
+            $ResourceOptions = (array)GetValue('Options', $ResourceInfo, array());
+            TouchValue('version', $Resource, $Version);
+            if ($ResourceOptions)
+               TouchValue('options', $Resource, $ResourceOptions);
+            
+            $FileList[$ResourceResolved] = $Resource;
          }
       }
       

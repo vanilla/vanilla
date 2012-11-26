@@ -323,8 +323,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    }
    
    public function EnabledThemeInfo($ReturnInSourceFormat = FALSE) {
-      $EnabledThemeName = $this->EnabledTheme();
-      $ThemeInfo = $this->GetThemeInfo($EnabledThemeName);
+      $CurrentThemeName = $this->CurrentTheme();
+      $ThemeInfo = $this->GetThemeInfo($CurrentThemeName);
       
       if ($ThemeInfo === FALSE)
          return array();

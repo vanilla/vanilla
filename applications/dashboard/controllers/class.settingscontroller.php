@@ -456,7 +456,6 @@ class SettingsController extends DashboardController {
       $this->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Edit';

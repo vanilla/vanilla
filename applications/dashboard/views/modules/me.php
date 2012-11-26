@@ -14,7 +14,7 @@ if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermis
    $DashboardCount += $SpamCount + $ModerationCount;
 }
 // Applicant Count
-if ($Session->CheckPermission('Garden.Applicants.Manage')) {
+if ($Session->CheckPermission('Garden.Users.Approve')) {
    $RoleModel = new RoleModel();
    $ApplicantCount = $RoleModel->GetApplicantCount();
    $DashboardCount += $ApplicantCount;

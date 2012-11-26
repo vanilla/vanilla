@@ -560,6 +560,7 @@ class VanillaHooks implements Gdn_IPlugin {
       // Call structure.php to update database
       $Validation = new Gdn_Validation(); // Needed by structure.php to validate permission names
       include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'structure.php');
+      include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'stub.php');
       
       $ApplicationInfo = array();
       include(CombinePaths(array(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'about.php')));

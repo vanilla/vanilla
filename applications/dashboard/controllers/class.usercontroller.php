@@ -187,7 +187,7 @@ class UserController extends DashboardController {
     * @access public
     */
    public function ApplicantCount() {
-      $this->Permission('Garden.Applicants.Manage');
+      $this->Permission('Garden.Users.Approve');
       $RoleModel = new RoleModel();
       $Count = $RoleModel->GetApplicantCount();
       if ($Count > 0)

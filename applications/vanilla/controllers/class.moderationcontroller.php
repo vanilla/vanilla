@@ -93,7 +93,7 @@ class ModerationController extends VanillaController {
       }
       if ($CountComments > 0) {
          $SelectionMessage =  Wrap(sprintf(
-            'You have selected %1$s in this discussion.',
+            T('You have selected %1$s in this discussion.'),
             Plural($CountComments, '%s comment', '%s comments')
          ), 'div');
          $ActionMessage = T('Take Action:');
@@ -170,7 +170,7 @@ class ModerationController extends VanillaController {
       $CountDiscussions = count($CheckedDiscussions);
       if ($CountDiscussions > 0) {
          $SelectionMessage =  Wrap(sprintf(
-            'You have selected %1$s.',
+            T('You have selected %1$s.'),
             Plural($CountDiscussions, '%s discussion', '%s discussions')
          ), 'div');
          $ActionMessage = T('Take Action:');

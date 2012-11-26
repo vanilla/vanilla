@@ -35,6 +35,6 @@ if (count($this->Data('Discussions'))):
          ?>
       </li>
 <?php else: ?>
-<ul class="Item Empty Center"><?php echo sprintf(T('You do not have any %s yet.'), T('bookmarks')); ?></ul>
+<li class="Item Empty Center"><?php echo sprintf(T('You do not have any %s yet.'), T('bookmarks')); ?></li>
 <?php endif; ?>
 </ul>

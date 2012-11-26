@@ -113,7 +113,6 @@
       overflow: visible;
       visibility: hidden;
       position: absolute;
-      left: 0;
       right: 2px; /* Don't know why this is adding some extra padding */
       width: auto;
       display: block;

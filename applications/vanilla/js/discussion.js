@@ -318,6 +318,8 @@ jQuery(document).ready(function($) {
    // Delete comment
    $('a.DeleteComment').popup({
       confirm: true,
+      confirmHeading: gdn.definition('ConfirmDeleteCommentHeading', 'Delete Comment'),
+      confirmText: gdn.definition('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'),
       followConfirm: false,
       deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
       afterConfirm: function(json, sender) {

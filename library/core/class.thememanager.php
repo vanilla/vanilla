@@ -318,7 +318,6 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    }
    
    public function EnabledTheme() {
-      Deprecated('Gdn_ThemeManager->EnabledTheme()', 'Gdn_ThemeManager->CurrentTheme()');
       $ThemeName = Gdn::Config('Garden.Theme', 'default');
       return $ThemeName;
    }

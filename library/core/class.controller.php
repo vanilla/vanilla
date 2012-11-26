@@ -1545,7 +1545,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
             
-            $DebugAssets = C('DebugAssets');
+            $CombineCSS = C('Garden.CombineCss', FALSE);
             
             /*
              * CSS Files
@@ -1557,7 +1557,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             
             // Explode the condensed CSS files into _CssFiles
             $CssCdns = array();
-            if ($DebugAssets) {
+            if (!$CombineCSS) {
                
                $Mode = 'style';
                if (ArrayHasValue($this->_CssFiles, 'admin.css'))

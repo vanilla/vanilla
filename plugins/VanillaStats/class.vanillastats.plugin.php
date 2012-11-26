@@ -104,7 +104,6 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       } else {
          $Sender->AddJsFile('vanillastats.js', 'plugins/VanillaStats');
          $Sender->AddJsFile('picker.js', 'plugins/VanillaStats');
-         $Sender->AddCSSFile('style.css', 'plugins/VanillaStats');
          $Sender->AddCSSFile('picker.css', 'plugins/VanillaStats');
 
          $this->ConfigureRange($Sender);

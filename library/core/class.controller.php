@@ -1569,7 +1569,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                
             } else {
                
-               $CssCdns = $AssetModel->Cdns();
+               $CssCdns = $AssetModel->Cdns($ETag);
                
             }
             

@@ -1586,7 +1586,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             ));
             
             foreach ($CssFiles as $CssSrc => $CssOptions)
-               $this->Head->AddCss($CssSrc, 'all', TRUE, $CssOptions);
+               $this->Head->AddCss($CssSrc, 'all', TRUE, GetValue('options',$CssOptions));
             
             /*
              * Javascript Files
@@ -1616,7 +1616,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             ));
             
             foreach ($JsFiles as $JsSrc => $JsOptions)
-               $this->Head->AddScript($JsSrc, 'text/javascript', $JsOptions);
+               $this->Head->AddScript($JsSrc, 'text/javascript', GetValue('options',$JsOptions));
             
             /**
              * Mustache Files
@@ -1648,7 +1648,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                      if (!file_exists($TemplateFile)) {
                         $TemplateArchiveContents = array();
                         foreach ($TemplateFiles as $TemplateSrcFile => $TemplateSrcOptions) {
-                           $TemplateName = GetValue('name', $TemplateSrcOptions);
+                           $TemplateName = GetValueR('options.name', $TemplateSrcOptions);
                            
                            $TemplateRelativeSrc = str_replace(
                               array(PATH_ROOT, DS),
@@ -1684,7 +1684,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                         
                         $TemplateDeferredContents = array();
                         foreach ($TemplateFiles as $TemplateSrcFile => $TemplateSrcOptions) {
-                           $TemplateName = GetValue('name', $TemplateSrcOptions);
+                           $TemplateName = GetValueR('options.name', $TemplateSrcOptions);
 
                            $TemplateRelativeSrc = str_replace(
                               array(PATH_ROOT, DS),

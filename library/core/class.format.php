@@ -453,13 +453,17 @@ class Gdn_Format {
    public static function Date($Timestamp = '', $Format = '') {
       static $GuestHourOffset;
       
-      if ($Timestamp === NULL)
-         return T('Null Date', '-');
-
       // Was a mysqldatetime passed?
-      if (!is_numeric($Timestamp)) {
+      if ($Timestamp !== NULL && !is_numeric($Timestamp)) {
          $Timestamp = self::ToTimestamp($Timestamp);
       }
+      
+      if (function_exists('FormatDateCustom')) {
+         return FormatDateCustom($Timestamp, $Format);
+      }
+      
+      if ($Timestamp === NULL)
+         return T('Null Date', '-');
          
       if (!$Timestamp)
          $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
@@ -1349,6 +1353,43 @@ EOT;
       } else {
          return FALSE;
       }
+   }
+   
+   /**
+    * Formats a timestamp to the current user's timezone.
+    * 
+    * @param int $Timestamp The timestamp in gmt.
+    * @return int The timestamp according to the user's timezone.
+    */
+   public static function ToTimezone($Timestamp) {
+      static $GuestHourOffset;
+      $Now = time();
+      
+      // Alter the timestamp based on the user's hour offset
+      $Session = Gdn::Session();
+      $HourOffset = 0;
+      
+      if ($Session->UserID > 0) {
+         $HourOffset = $Session->User->HourOffset;
+      } elseif (class_exists('DateTimeZone')) {
+         if (!isset($GuestHourOffset)) {
+            $GuestTimeZone = C('Garden.GuestTimeZone');
+            if ($GuestTimeZone) {
+               $TimeZone = new DateTimeZone($GuestTimeZone);
+               $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+               $GuestHourOffset = floor($Offset / 3600);
+            }
+         }
+         $HourOffset = $GuestHourOffset;
+      }
+      
+      if ($HourOffset <> 0) {
+         $SecondsOffset = $HourOffset * 3600;
+         $Timestamp += $SecondsOffset;
+         $Now += $SecondsOffset;
+      }
+      
+      return $Timestamp;
    }
 
    public static function Timespan($timespan) {

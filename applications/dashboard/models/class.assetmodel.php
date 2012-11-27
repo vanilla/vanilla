@@ -14,9 +14,46 @@
  */
 
 class AssetModel extends Gdn_Model {
+   
+   protected static $Modes;
    protected $_CssFiles = array();
    
    public $UrlPrefix = '';
+   
+   public function Modes() {
+      if (is_null(self::$Modes)) {
+         self::$Modes = array(
+            'style.css'    => 'style',
+            'admin.css'    => 'admin'
+         );
+         
+         $this->EventArguments['Modes'] = &self::$Modes;
+         $this->FireEvent('CssMode');
+      }
+      
+      return self::$Modes;
+   }
+   
+   public function Mode(&$CssFiles) {
+      foreach ($this->Modes() as $ModeFile => $Mode) {
+         if (ArrayHasValue($CssFiles, $ModeFile))
+            return $Mode;
+      }
+      
+      return FALSE;
+   }
+   
+   /**
+    * Get RenderMaster CDN list
+    * 
+    */
+   public function Cdns($ETag) {
+      $CssCdns = array();
+      foreach ($this->Modes() as $ModeFile => $Mode) 
+         $CssCdns[$ModeFile] = "~/utility/css/{$Mode}/{$Mode}-{$ETag}.css";
+         
+      return $CssCdns;
+   }
    
    public function AddCssFile($Filename, $Folder = FALSE, $Options = FALSE) {
       if (is_string($Options))
@@ -38,7 +75,9 @@ class AssetModel extends Gdn_Model {
       
       header_remove('Set-Cookie');
       header("Content-Type: text/css");
-      if (!in_array($Basename, array('Style', 'Admin'))) {
+      
+      // Don't allow ourselves to be ddos'd
+      if (!ArraySearchI($Basename, $this->Modes())) {
          header("HTTP/1.0 404", TRUE, 404);
          
          echo "/* Could not find {$Basename}/{$ETag} */";
@@ -270,8 +309,6 @@ class AssetModel extends Gdn_Model {
       ksort($Data);
       
       $Result = substr(md5(implode(',', array_keys($Data))), 0, 8).$Suffix;
-//      decho($Data);
-//      die();
       return $Result;
    }
    

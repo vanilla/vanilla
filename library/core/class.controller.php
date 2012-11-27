@@ -1553,18 +1553,15 @@ class Gdn_Controller extends Gdn_Pluggable {
              * Resolve and add CSS static files.
              */
             
+            $AssetModel = new AssetModel();
             $ETag = AssetModel::ETag();
+            $Mode = $AssetModel->Mode($this->_CssFiles);
             
             // Explode the condensed CSS files into _CssFiles
             $CssCdns = array();
             if (!$CombineCSS) {
                
-               $Mode = 'style';
-               if (ArrayHasValue($this->_CssFiles, 'admin.css'))
-                  $Mode = 'admin';
-               
                // Grab all of the css files from the asset model.
-               $AssetModel = new AssetModel();
                $Paths = $AssetModel->GetCssFiles(ucfirst($Mode), $ETag, $NotFound, FALSE);
                
                // Add them to the output
@@ -1572,19 +1569,17 @@ class Gdn_Controller extends Gdn_Pluggable {
                
             } else {
                
-               $CssCdns = array(
-                  'style.css' => "~/utility/css/style/style-{$ETag}.css",
-                  'admin.css' => "~/utility/css/admin/admin-{$ETag}.css"
-               );
+               $CssCdns = $AssetModel->Cdns();
                
             }
             
             // Allow pre-modification of CSS included array
             $this->EventArguments['CssFiles'] = &$this->_CssFiles;
-            $this->FireEvent('BeforeAddCss');
+            $this->FireAs('Gdn_Controller')->FireEvent('BeforeAddCss');
             
             $this->EventArguments['Cdns'] = &$CssCdns;
-            $this->FireEvent('AfterCssCdns');
+            $this->EventArguments['ETag'] = $ETag;
+            $this->FireAs('Gdn_Controller')->FireEvent('AfterCssCdns');
             
             $CssFiles = self::ResolveStaticResources($this->_CssFiles, 'design', array(
                'CDNS'         => $CssCdns
@@ -1604,7 +1599,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             
             // Allow pre-modification of Js included array
             $this->EventArguments['JsFiles'] = &$this->_JsFiles;
-            $this->FireEvent('BeforeAddJs');
+            $this->FireAs('Gdn_Controller')->FireEvent('BeforeAddJs');
             
             $JsCdns = array();
             if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', FALSE)) {
@@ -1614,7 +1609,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
             
             $this->EventArguments['Cdns'] = &$JsCdns;
-            $this->FireEvent('AfterJsCdns');
+            $this->FireAs('Gdn_Controller')->FireEvent('AfterJsCdns');
             
             $JsFiles = self::ResolveStaticResources($this->_JsFiles, 'js', array(
                'CDNS'         => $JsCdns
@@ -1772,7 +1767,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          Trace("Master views differ. Controller: $MasterViewPath, ViewLocation(): $MasterViewPath2", TRACE_WARNING);
       
       $this->EventArguments['MasterViewPath'] = &$MasterViewPath;
-      $this->FireEvent('BeforeFetchMaster');
+      $this->FireAs('Gdn_Controller')->FireEvent('BeforeFetchMaster');
 
       if ($MasterViewPath === FALSE)
          trigger_error(ErrorMessage("Could not find master view: {$this->MasterView}.master*", $this->ClassName, '_FetchController'), E_USER_ERROR);

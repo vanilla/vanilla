@@ -135,11 +135,8 @@ class TagModule extends Gdn_Module {
             if ($Tag['Name'] != '') {
          ?>
             <li><?php 
-               if (rawurlencode($Tag['Name']) == $Tag['Name']) {
-                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged/'.rawurlencode($Tag['Name']));
-               } else {
-                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged?Tag='.urlencode($Tag['Name']));
-               }
+               $Url = (rawurlencode($Tag['Name']) == $Tag['Name']) ? '/'.rawurlencode($Tag['Name']) : '?Tag='.urlencode($Tag['Name']);
+               echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged'.$Url, array('class' => 'Tag_'.$Tag['Name']));
             ?></li>
          <?php
             }

@@ -934,6 +934,24 @@ class Gdn_Form extends Gdn_Pluggable {
       return $Return;
    }
    
+   public function ErrorString() {
+      $Return = '';
+      if (is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0) {
+         foreach($this->_ValidationResults as $FieldName => $Problems) {
+            $Count = count($Problems);
+            for($i = 0; $i < $Count; ++$i) {
+               if (substr($Problems[$i], 0, 1) == '@')
+                  $Return .= rtrim(substr($Problems[$i], 1), '.').'. ';
+               else
+                  $Return .= rtrim(sprintf(
+                     T($Problems[$i]),
+                     T($FieldName)), '.').'. ';
+            }
+         }
+      }
+      return trim($Return);
+   }
+   
    /**
     * Encodes the string in a php-form safe-encoded format.
     *

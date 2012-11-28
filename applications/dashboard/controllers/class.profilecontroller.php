@@ -793,6 +793,7 @@ class ProfileController extends Gdn_Controller {
       }
 
       // Loop the preferences, setting defaults from the configuration.
+      $CurrentPrefs = array();
       foreach ($this->Preferences as $PrefGroup => $Prefs) {
          foreach ($Prefs as $Pref => $Desc) {
             $Location = 'Prefs';
@@ -800,15 +801,15 @@ class ProfileController extends Gdn_Controller {
                list($Desc, $Location) = $Desc;
 
             if ($Location == 'Meta')
-               $UserPrefs[$Pref] = GetValue($Pref, $MetaPrefs, FALSE);
+               $CurrentPrefs[$Pref] = GetValue($Pref, $MetaPrefs, FALSE);
             else
-               $UserPrefs[$Pref] = GetValue($Pref, $UserPrefs, C('Preferences.'.$Pref, '0'));
+               $CurrentPrefs[$Pref] = GetValue($Pref, $UserPrefs, C('Preferences.'.$Pref, '0'));
             
             unset($MetaPrefs[$Pref]);
          }
       }
-      $UserPrefs = array_merge($UserPrefs, $MetaPrefs);
-      $this->SetData('Preferences', $UserPrefs);
+      $CurrentPrefs = array_merge($CurrentPrefs, $MetaPrefs);
+      $this->SetData('Preferences', $CurrentPrefs);
       
       if (UserModel::NoEmail()) {
          $this->PreferenceGroups = self::_RemoveEmailPreferences($this->PreferenceGroups);
@@ -820,9 +821,9 @@ class ProfileController extends Gdn_Controller {
       $this->SetData('PreferenceTypes', $this->PreferenceTypes);
       $this->SetData('PreferenceList', $this->Preferences);
       
-      if ($this->Form->IsPostBack()) {
-         
+      if ($this->Form->AuthenticatedPostBack()) {
          // Get, assign, and save the preferences.
+         $NewMetaPrefs = array();
          foreach ($this->Preferences as $PrefGroup => $Prefs) {
             foreach ($Prefs as $Pref => $Desc) {
                $Location = 'Prefs';
@@ -833,11 +834,11 @@ class ProfileController extends Gdn_Controller {
                if (is_null($Value)) continue;
 
                if ($Location == 'Meta') {
-                  $MetaPrefs[$Pref] = $Value ? $Value : NULL;
+                  $NewMetaPrefs[$Pref] = $Value ? $Value : NULL;
                   if ($Value)
                      $UserPrefs[$Pref] = $Value; // dup for notifications code.
                } else {
-                  if (!$UserPrefs[$Pref] && !$Value)
+                  if (!$CurrentPrefs[$Pref] && !$Value)
                      unset($UserPrefs[$Pref]); // save some space
                   else
                      $UserPrefs[$Pref] = $Value;
@@ -846,12 +847,12 @@ class ProfileController extends Gdn_Controller {
          }
          
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
-         UserModel::SetMeta($this->User->UserID, $MetaPrefs, 'Preferences.');
+         UserModel::SetMeta($this->User->UserID, $NewMetaPrefs, 'Preferences.');
          
          if (count($this->Form->Errors() == 0))
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
       } else {
-         $this->Form->SetData($UserPrefs);
+         $this->Form->SetData($CurrentPrefs);
       }
       
       $this->Title(T('Notification Preferences'));

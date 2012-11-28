@@ -2,6 +2,7 @@
 <div id="ConversationForm" class="FormTitleWrapper ConversationForm">
    <?php
    echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
+   $this->FireEvent('BeforeMessageAdd');
    
    echo '<div class="FormWrapper">'; 
    echo $this->Form->Open();

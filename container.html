@@ -2,7 +2,7 @@
 <html>
    <head>
       <title>Embed Container for easyXDM</title>
-      <script type="text/javascript" src="js/easyXDM/easyXDM.debug.js"></script>
+      <script type="text/javascript" src="js/easyXDM/easyXDM.min.js"></script>
       <script type="text/javascript">
          document.domain = document.domain;
          
@@ -58,6 +58,7 @@
                iframe = document.createElement("iframe");
                iframe.frameBorder = 0;
                iframe.allowtransparency = true;
+               iframe.scrolling = "no";
                iframe.style.visibility = "hidden";
                
                var loaded = function() {

@@ -356,7 +356,7 @@ embed.start = embed.fn.start = function() {
       swf: me.root+'/js/easyXDM/easyxdm.swf',
       remoteHelper: me.root+'/js/easyXDM/name.html',
       container: me.container,
-      props: { allowtransparency: "true", style: { visibility: "hidden" } },
+      props: { allowtransparency: "true", scrolling: "no", style: { visibility: "hidden" } },
       onReady: function() {
          me.iframe = me.container.getElementsByTagName('iframe')[0];
          me.iframe.style.visibility = "visible";

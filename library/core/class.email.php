@@ -207,6 +207,9 @@ class Gdn_Email extends Gdn_Pluggable {
     * @todo add port settings
     */
    public function Send($EventName = '') {
+      if (C('Garden.Email.Disabled')) {
+         return;
+      }
       
       if (Gdn::Config('Garden.Email.UseSmtp')) {
          $this->PhpMailer->IsSMTP();

@@ -260,8 +260,8 @@ jQuery(document).ready(function($) {
           .addClass(BUTTON_CLASS)
           .attr("title", button.title)
           .bind(CLICK, $.proxy(buttonClick, editor))
-          .appendTo($group)
-          .hover(hoverEnter, hoverLeave);
+          .appendTo($group);
+//          .hover(hoverEnter, hoverLeave);
 
         // Prepare the button image
         var map = {};
@@ -685,8 +685,8 @@ jQuery(document).ready(function($) {
     }
 
     // Add the hover effect to all items
-    if ($popup.hasClass(LIST_CLASS) || popupHover === true)
-      $popup.children().hover(hoverEnter, hoverLeave);
+//    if ($popup.hasClass(LIST_CLASS) || popupHover === true)
+//      $popup.children().hover(hoverEnter, hoverLeave);
 
     // Add the popup to the array and return it
     popups[popupName] = $popup[0];

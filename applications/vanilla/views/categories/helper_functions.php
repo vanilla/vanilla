@@ -118,7 +118,7 @@ function WriteListItem($Row, $Depth = 1) {
             echo Anchor($Row['Name'], $Row['Url'], 'Title');
             Gdn::Controller()->EventArguments['Category'] = $Row;
             Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
-            echo '<'.$H.'>';
+            echo '</'.$H.'>';
          ?>
          
          <div class="CategoryDescription">

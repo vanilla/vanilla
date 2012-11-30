@@ -358,11 +358,11 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param ProfileController $Sender ProfileController.
 	 */
-   public function ProfileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '') {
+   public function ProfileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
 		$Sender->EditMode(FALSE);
 		$View = $Sender->View;
       // Tell the ProfileController what tab to load
-		$Sender->GetUserInfo($UserReference, $Username);
+		$Sender->GetUserInfo($UserReference, $Username, $UserID);
       $Sender->_SetBreadcrumbs(T('Comments'), '/profile/comments');
       $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
       
@@ -416,11 +416,11 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param ProfileController $Sender ProfileController.
 	 */
-   public function ProfileController_Discussions_Create($Sender, $UserReference = '', $Username = '', $Page = '') {
+   public function ProfileController_Discussions_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
 		$Sender->EditMode(FALSE);
 		
       // Tell the ProfileController what tab to load
-		$Sender->GetUserInfo($UserReference, $Username);
+		$Sender->GetUserInfo($UserReference, $Username, $UserID);
       $Sender->_SetBreadcrumbs(T('Discussions'), '/profile/discussions');
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
 		$Sender->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);

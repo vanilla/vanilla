@@ -1,5 +1,5 @@
 jQuery(document).ready(function($){
-   statsUrl = gdn.definition('VanillaStatsUrl', 'http://analytics.vanillaforums.com');
+   statsUrl = gdn.definition('VanillaStatsUrl', '//analytics.vanillaforums.com');
    
    frame = function() {
       var frame = document.getElementById('VanillaStatsGraph');

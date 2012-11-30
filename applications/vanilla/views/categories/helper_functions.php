@@ -153,11 +153,16 @@ function WriteListItem($Row, $Depth = 1) {
    ?>
    <li id="Category_<?php echo $Row['CategoryID']; ?>" class="<?php echo CssClass($Row); ?>">
       <div class="ItemContent Category">
-         <?php echo GetOptions($Row); ?>
-         
+         <?php 
+            echo GetOptions($Row); 
          <?php echo CategoryPhoto($Row); ?>
          
-         <?php echo Wrap(Anchor($Row['Name'], $Row['Url'], 'Title'), $H, array('class' => 'CategoryName TitleWrap')); ?>
+            echo '<'.$H.' class="CategoryName TitleWrap">';
+            echo Anchor($Row['Name'], $Row['Url'], 'Title');
+            Gdn::Controller()->EventArguments['Category'] = $Row;
+            Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
+            echo '</'.$H.'>';
+         ?>
          
          <div class="CategoryDescription">
             <?php echo $Row['Description']; ?>

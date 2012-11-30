@@ -688,8 +688,6 @@ class DiscussionController extends VanillaController {
       if ($this->Head)
          $this->Head->AddString('<style type="text/css">
 body { background: transparent !important; }
-ul.MessageList li.Item { background: #fff; }
-ul.MessageList li.Item.Mine { background: #E3F4FF; }
 </style>');
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.gardenmorepager.js');

@@ -33,7 +33,11 @@
             ?>
             <div class="Tag<?php echo GetValue('Type', $Tag) ? ' Tag-'.$Tag['Type'] : '' ?>">
                <?php
-               echo Anchor(htmlspecialchars($Tag['Name']).' '.Wrap($Tag['CountDiscussions'], 'span', array('class' => 'Count')), 'settings/edittag/'.$Tag['TagID'], 'TagName');
+               echo Anchor(
+                       htmlspecialchars($Tag['Name']).' '.Wrap($Tag['CountDiscussions'], 'span', array('class' => 'Count')), 
+                       'settings/edittag/'.$Tag['TagID'], 
+                       'TagName Tag_'.str_replace(' ', '_', $Tag['Name'])
+                    );
                echo ' '.Anchor('×', 'settings/deletetag/'.$Tag['TagID'].'/'.$Session->TransientKey(), 'Delete');
                ?>
             </div>

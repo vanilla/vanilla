@@ -34,3 +34,10 @@
       window.parent.hide();
    });
 })(window, jQuery, Vanilla);
+
+jQuery(document).ready(function($) {
+   if (window.top == window.self)
+      return;
+   
+   $('body').addClass('Embedded');
+});

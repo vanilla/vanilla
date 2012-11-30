@@ -368,7 +368,7 @@ class ImportModel extends Gdn_Model {
 	 */
 	public function DeleteOverwriteTables() {
 		$Tables = array('Activity', 'Category', 'Comment', 'Conversation', 'ConversationMessage',
-   		'Discussion', 'Draft', 'Invitation', 'Media', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
+   		'Discussion', 'Draft', 'Invitation', 'Media', 'Message', 'Photo', 'Permission', 'Rank', 'Poll', 'PollOption', 'PollVote', 'Role', 'UserAuthentication',
    		'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
 
       // Delete the default role settings.
@@ -1595,6 +1595,14 @@ class ImportModel extends Gdn_Model {
            where c.DiscussionID = ud.DiscussionID
              and c.DateInserted <= ud.DateLastViewed)";
 
+      }
+      
+      if ($this->ImportExists('Activity', 'ActivityType')) {
+         $Sqls['Activity.ActivityTypeID'] = "
+            update :_Activity a
+            join :_ActivityType t
+               on a.ActivityType = t.Name
+            set a.ActivityTypeID = t.ActivityTypeID";
       }
 
       $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');

@@ -158,7 +158,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 <table class="DataTable DiscussionsTable">
 	<thead>
 		<tr>
-         <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn">', '</td>')); ?>
+         <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>')); ?>
 			<td class="DiscussionName"><div class="Wrap"><?php echo DiscussionHeading() ?></div></td>
 			<td class="BlockColumn BlockColumn-User FirstUser"><div class="Wrap"><?php echo T('Started By'); ?></div></td>
 			<td class="BigCount CountReplies"><div class="Wrap"><?php echo T('Replies'); ?></div></td>

@@ -231,7 +231,13 @@ function CssClass($Row) {
       
    // Discussion list classes
       $CssClass .= GetValue('Bookmarked', $Row) == '1' ? ' Bookmarked' : '';
-      $CssClass .= GetValue('Announce', $Row) ? ' Announcement' : '';
+      
+      $Announce = GetValue('Announce', $Row);
+      if ($Announce == 2)
+         $CssClass .= ' Announcement Announcement-Category';
+      elseif ($Announce)
+         $CssClass .= ' Announcement Announcement-Everywhere';
+      
       $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
       $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
       if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {

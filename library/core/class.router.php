@@ -26,7 +26,8 @@ class Gdn_Router extends Gdn_Pluggable {
          'Temporary'    => 'Temporary (302)',
          'Permanent'    => 'Permanent (301)',
          'NotAuthorized' => 'Not Authorized (401)',
-         'NotFound'     => 'Not Found (404)'
+         'NotFound'     => 'Not Found (404)',
+         'Test'         => 'Test'
       );
       $this->ReservedRoutes = array('DefaultController', 'DefaultForumRoot', 'Default404', 'DefaultPermission', 'UpdateMode');
       $this->_LoadRoutes();

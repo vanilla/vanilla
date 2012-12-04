@@ -250,7 +250,7 @@ jQuery(document).ready(function($) {
       draftInp.val('');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() {$(this).remove();});
-      $(frm).trigger('clearCommentForm');
+      $(sender).closest('form').trigger('clearCommentForm');
    }
    
    // Set up paging

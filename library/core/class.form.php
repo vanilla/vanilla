@@ -145,6 +145,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $this->SetValue('Format', $Attributes['format']);
       
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
+      $this->EventArguments['Column'] = $Column;
       
       $this->FireEvent('BeforeBodyBox');
       

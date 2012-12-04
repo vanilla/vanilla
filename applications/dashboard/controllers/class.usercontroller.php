@@ -701,6 +701,13 @@ class UserController extends DashboardController {
          $User = $Form->FormValues();
       }
       
+      if (!isset($User['UserID']) && isset($User['UniqueID'])) {
+         // Try and find the user based on SSO.
+         $Auth = Gdn::UserModel()->GetAuthentication($User['UniqueID'], $User['ClientID']);
+         if ($Auth)
+            $User['UserID'] = $Auth['UserID'];
+      }
+      
       if (!isset($User['UserID'])) {
          // Add some default values to make saving easier.
          if (!isset($User['RoleID'])) {
@@ -714,7 +721,7 @@ class UserController extends DashboardController {
          }
       }
       
-      $UserID = Gdn::UserModel()->Save($User, array('SaveRoles' => TRUE, 'NoConfirmEmail' => TRUE));
+      $UserID = Gdn::UserModel()->Save($User, array('SaveRoles' => isset($User['RoleID']), 'NoConfirmEmail' => TRUE));
       if ($UserID) {
          if (!isset($User['UserID']))
             $User['UserID'] = $UserID;

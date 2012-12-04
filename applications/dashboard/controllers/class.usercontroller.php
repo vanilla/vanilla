@@ -685,6 +685,56 @@ class UserController extends DashboardController {
       $this->Render('filenotfound', 'home');
    }
    
+   public function Save() {
+      $this->Permission('Garden.Users.Edit');
+      if (!Gdn::Request()->IsPostBack())
+         throw new Exception(405);
+      
+      $Form = new Gdn_Form();
+      
+      if ($SSOString = $Form->GetFormValue('SSOString')) {
+         $Parts = explode(' ', $SSOString);
+         $String = $Parts[0];
+         $Data = json_decode(base64_decode($String), TRUE);
+         $User = ArrayTranslate($Data, array('name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'client_id' => 'ClientID', 'uniqueid' => 'UniqueID'));
+      } else {
+         $User = $Form->FormValues();
+      }
+      
+      if (!isset($User['UserID'])) {
+         // Add some default values to make saving easier.
+         if (!isset($User['RoleID'])) {
+            $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
+            $User['RoleID'] = $DefaultRoles;
+         }
+         
+         if (!isset($User['Password'])) {
+            $User['Password'] = md5(microtime());
+            $User['HashMethod'] = 'Random';
+         }
+      }
+      
+      $UserID = Gdn::UserModel()->Save($User, array('SaveRoles' => TRUE, 'NoConfirmEmail' => TRUE));
+      if ($UserID) {
+         if (!isset($User['UserID']))
+            $User['UserID'] = $UserID;
+
+         if (isset($User['ClientID']) && isset($User['UniqueID'])) {
+            Gdn::UserModel()->SaveAuthentication(array(
+               'UserID' => $User['UserID'],
+               'Provider' => $User['ClientID'],
+               'UniqueID' => $User['UniqueID']
+            ));
+         }
+         
+         $this->SetData('User', $User);
+      } else {
+         throw new Gdn_UserException(Gdn::UserModel()->Validation->ResultsText());
+      }
+      
+      $this->Render('Blank', 'Utility');
+   }
+   
    public function SSO($UserID = FALSE) {
       $this->Permission('Garden.Users.Edit');
       

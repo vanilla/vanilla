@@ -688,7 +688,7 @@ class UserController extends DashboardController {
    public function Save() {
       $this->Permission('Garden.Users.Edit');
       if (!Gdn::Request()->IsPostBack())
-         throw new Exception(405);
+         throw new Exception('Requires POST', 405);
       
       $Form = new Gdn_Form();
       

@@ -208,36 +208,37 @@ if (!function_exists('CssClass')):
  * @param type $Row
  * @return string The CSS classes to be inserted into the row.
  */
-function CssClass($Row) {
+function CssClass($Row, $InList = TRUE) {
    static $Alt = FALSE;
    $Row = (array)$Row;
    $CssClass = 'Item';
    $Session = Gdn::Session();
 
    // Alt rows
-      if ($Alt)
-         $CssClass .= ' Alt';
-      $Alt = !$Alt;
+   if ($Alt)
+      $CssClass .= ' Alt';
+   $Alt = !$Alt;
       
    // Category list classes
-      if (array_key_exists('UrlCode', $Row))
-         $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
-   
-      if (array_key_exists('Depth', $Row))
-         $CssClass .= " Depth{$Row['Depth']} Depth-{$Row['Depth']}";
+   if (array_key_exists('UrlCode', $Row))
+      $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
+
+   if (array_key_exists('Depth', $Row))
+      $CssClass .= " Depth{$Row['Depth']} Depth-{$Row['Depth']}";
+
+   if (array_key_exists('Archive', $Row))
+      $CssClass .= ' Archived';
       
-      if (array_key_exists('Archive', $Row))
-         $CssClass .= ' Archived';
-      
-   // Discussion list classes
+   // Discussion list classes.
+   if ($InList) {
       $CssClass .= GetValue('Bookmarked', $Row) == '1' ? ' Bookmarked' : '';
-      
+
       $Announce = GetValue('Announce', $Row);
       if ($Announce == 2)
          $CssClass .= ' Announcement Announcement-Category';
       elseif ($Announce)
          $CssClass .= ' Announcement Announcement-Everywhere';
-      
+
       $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
       $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
       if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {
@@ -253,26 +254,27 @@ function CssClass($Row) {
          // Category list
          $CssClass .= $IsRead ? ' Read' : ' Unread';
       }
+   }
          
    // Comment list classes
-      if (array_key_exists('CommentID', $Row))
-          $CssClass .= ' ItemComment';
-      else if (array_key_exists('DiscussionID', $Row))
-          $CssClass .= ' ItemDiscussion';
-      
-      if (function_exists('IsMeAction'))
-         $CssClass .= IsMeAction($Row) ? ' MeAction' : '';
-      
-      if ($_CssClss = GetValue('_CssClass', $Row))
+   if (array_key_exists('CommentID', $Row))
+       $CssClass .= ' ItemComment';
+   else if (array_key_exists('DiscussionID', $Row))
+       $CssClass .= ' ItemDiscussion';
+
+   if (function_exists('IsMeAction'))
+      $CssClass .= IsMeAction($Row) ? ' MeAction' : '';
+
+   if ($_CssClss = GetValue('_CssClass', $Row))
+      $CssClass .= ' '.$_CssClss;
+
+   // Insert User classes.
+   if ($UserID = GetValue('InsertUserID', $Row)) {
+      $User = Gdn::UserModel()->GetID($UserID);
+      if ($_CssClss = GetValue('_CssClass', $User)) {
          $CssClass .= ' '.$_CssClss;
-      
-      // Insert User classes.
-      if ($UserID = GetValue('InsertUserID', $Row)) {
-         $User = Gdn::UserModel()->GetID($UserID);
-         if ($_CssClss = GetValue('_CssClass', $User)) {
-            $CssClass .= ' '.$_CssClss;
-         }
       }
+   }
 
    return trim($CssClass);
 }

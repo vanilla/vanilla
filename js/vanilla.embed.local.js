@@ -70,6 +70,9 @@
          case 'external':
             $(this).attr('target', '_blank');
             break;
+         case 'internal':
+            $(this).attr('target', '');
+            break;
       }
    });
 })(window, jQuery, Vanilla);

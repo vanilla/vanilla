@@ -29,7 +29,7 @@
          parts = parts.slice(parts.length - 2);
       var domain = parts.join(".");
       
-      regex = new RegExp("//[\\w-]+\\." + domain + "($|[/?#])");
+      regex = new RegExp("//.+\\." + domain + "($|[/?#])");
       if (regex.test(url))
          return "subdomain";
       

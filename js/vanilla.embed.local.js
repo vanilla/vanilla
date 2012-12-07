@@ -37,21 +37,22 @@
    };
    
    var currentHeight = null;
-   var setHeight = function() {
+   Vanilla.parent.setHeight = function() {
       // Set the height of the iframe based on vanilla.
       var height = document.body.offsetHeight || document.body.scrollHeight;
       
       if (height != currentHeight) {
          currentHeight = height;
+//         console.log('setHeight: ' + height);
          Vanilla.parent.callRemote('height', height);
       }
    }
    
    $(window).load(function() {
-      setHeight();
+      Vanilla.parent.setHeight();
       Vanilla.parent.callRemote('notifyLocation', window.location.href);
       
-      setInterval(setHeight, 300);
+      setInterval(Vanilla.parent.setHeight, 300);
    });
    
    $(window).unload(function() {
@@ -81,6 +82,7 @@ jQuery(document).ready(function($) {
    if (window.top == window.self)
       return;
    
+   Vanilla.parent.setHeight();
    window.parent.show();
    
    $('body').addClass('Embedded');

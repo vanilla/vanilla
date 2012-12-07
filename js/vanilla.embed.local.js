@@ -81,5 +81,7 @@ jQuery(document).ready(function($) {
    if (window.top == window.self)
       return;
    
+   window.parent.show();
+   
    $('body').addClass('Embedded');
 });

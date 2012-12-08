@@ -13,8 +13,12 @@
    Vanilla.parent.signout = function() { $.post('/entry/signout.json'); };
    
    Vanilla.urlType = function(url) {
+      var regex = /^#/;
+      if (regex.test(url))
+         return 'hash';
+      
       // Test for an internal link with no domain.
-      var regex = /^(https?:)?\/\//i;
+      regex = /^(https?:)?\/\//i;
       if (!regex.test(url))
          return 'internal';
 

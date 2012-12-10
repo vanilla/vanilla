@@ -32,3 +32,16 @@ applications.
 	color: transparent !important;
 	font-size: 1px !important;
 }
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+only screen and (     -o-min-device-pixel-ratio: 2/1),
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx) {
+   .vanilla-logo {
+      background: url('images/vanilla-logo-46px@2.png') 0 -2px no-repeat;
+      background-size: 46px;
+   }
+}

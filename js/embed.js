@@ -209,12 +209,21 @@ window.vanilla.embed = function(host) {
       var result = '';
       
       if (embed_type == 'comments') {
-         result = 'http://' + host + '/vanilla/discussion/embed/'
-            +'&vanilla_discussion_id='+encodeURIComponent(discussion_id)
+         result = 'http://' + host + '/discussion/embed/'
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
-            +'&vanilla_type='+encodeURIComponent(foreign_type)
-            +'&vanilla_url='+encodeURIComponent(foreign_url)
-            +'&vanilla_category_id='+encodeURIComponent(category_id);
+            +'&vanilla_url='+encodeURIComponent(foreign_url);
+         
+         if (typeof(vanilla_type) != 'undefined')
+            result += '&vanilla_type='+encodeURIComponent(vanilla_type)
+         
+         if (typeof(vanilla_discussion_id) != 'undefined')
+            result += '&vanilla_discussion_id='+encodeURIComponent(vanilla_discussion_id);
+         
+         if (typeof(vanilla_category_id) != 'undefined')
+            result += '&vanilla_category_id='+encodeURIComponent(vanilla_category_id);
+         
+         if (typeof(vanilla_title) != 'undefined')
+            result += '&title='+encodeURIComponent(vanilla_title);
       } else {
          result = 'http://' 
             +host

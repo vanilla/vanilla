@@ -439,6 +439,7 @@ function WriteEmbedCommentForm() {
       <?php
       echo $Controller->Form->Open(array('id' => 'Form_Comment'));
       echo $Controller->Form->Errors();
+      echo $Controller->Form->Hidden('Name');
       echo Wrap($Controller->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
       echo "<div class=\"Buttons\">\n";
       

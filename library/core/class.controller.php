@@ -1527,6 +1527,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          $Data['Data'] = $this->Data;
       }
       
+      // Try cleaning out any notices or errors.
+      @@ob_clean();
+      
 
       if ($Code >= 100 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);

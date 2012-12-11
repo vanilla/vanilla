@@ -1260,6 +1260,20 @@ EOT;
          return $Result;
       }
    }
+   
+   /**
+    * 
+    * 
+    * @param string $Str
+    * @return string
+    * @since 2.1
+    */
+   public static function TextEx($Str) {
+      $Str = self::Text($Str);
+      $Str = self::Links($Str);
+      $Str = self::Mentions($Str);
+      return $Str;
+   }
 
    /**
     * Takes a mixed variable, formats it in the specified format type, and

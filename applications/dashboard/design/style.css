@@ -948,6 +948,9 @@ a.Bookmarking:hover {
    vertical-align: top;
 	line-height: 1;
 }
+td.CheckBoxColumn {
+   text-align: center;
+}
 .HomepageTitle .AdminCheck {
     padding-left: 8px;
 }

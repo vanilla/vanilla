@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook',
    'Description' => 'This plugin integrates Vanilla with Facebook. <b>You must register your application with Facebook for this plugin to work.</b>',
-   'Version' => '1.0.1',
+   'Version' => '1.0.1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -151,9 +151,10 @@ class FacebookPlugin extends Gdn_Plugin {
 
       $RedirectUri = ConcatSep('&', $this->RedirectUri(), $Query);
       $RedirectUri = urlencode($RedirectUri);
+      $AccessToken = $Sender->Form->GetFormValue('AccessToken');
 
       // Get the access token.
-      if ($Code || !($AccessToken = $this->AccessToken())) {
+      if (!$AccessToken && $Code) {
          // Exchange the token for an access token.
          $Code = urlencode($Code);
 
@@ -210,6 +211,7 @@ class FacebookPlugin extends Gdn_Plugin {
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
       $Form->SetFormValue('Email', GetValue('email', $Profile));
       $Form->SetFormValue('Photo', "http://graph.facebook.com/$ID/picture");
+      $Form->AddHidden('AccessToken', $AccessToken);
       $Sender->SetData('Verified', TRUE);
    }
 

@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook Social Connect',
    'Description' => 'Users may sign into your site using their Facebook account.',	
-   'Version' => '1.0.7',
+   'Version' => '1.0.8',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -428,10 +428,11 @@ class FacebookPlugin extends Gdn_Plugin {
          $Query = 'display='.urlencode($Sender->Request->Get('display'));
 
       $RedirectUri = ConcatSep('&', $this->RedirectUri(), $Query);
-//      $RedirectUri = urlencode($RedirectUri);
+      
+      $AccessToken = $Sender->Form->GetFormValue('AccessToken');
       
       // Get the access token.
-      if ($Code) {
+      if (!$AccessToken && $Code) {
          // Exchange the token for an access token.
          $Code = urlencode($Code);
          
@@ -466,6 +467,7 @@ class FacebookPlugin extends Gdn_Plugin {
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
       $Form->SetFormValue('Email', GetValue('email', $Profile));
       $Form->SetFormValue('Photo', "http://graph.facebook.com/{$ID}/picture?type=large");
+      $Form->AddHidden('AccessToken', $AccessToken);
       
       if (C('Plugins.Facebook.UseFacebookNames')) {
          $Form->SetFormValue('Name', GetValue('name', $Profile));

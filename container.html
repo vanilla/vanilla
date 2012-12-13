@@ -51,6 +51,9 @@
          function hide() {
             iframe.style.visibility = "hidden";
          }
+         function show() {
+            iframe.style.visibility = "visible"; 
+         };
             
          var socket = new easyXDM.Socket({
             swf: "js/easyXDM/easyxdm.swf",
@@ -62,20 +65,16 @@
                iframe.scrolling = "no";
                iframe.style.visibility = "hidden";
                
-               var loaded = function() {
-                  iframe.style.visibility = "visible"; 
-               };
-               
                document.body.appendChild(iframe);
                
                iframe.src = easyXDM.query.url;
                
-               if(iframe.addEventListener) {
-                  iframe.addEventListener('load', loaded, true);
-               } else if(iframe.attachEvent) {
-                  iframe.attachEvent('onload', loaded);
-               } else
-                  loaded();
+//               if(iframe.addEventListener) {
+//                  iframe.addEventListener('DOMContentLoaded', loaded, true);
+//               } else if(iframe.attachEvent) {
+//                  iframe.attachEvent('onreadystatechange', loaded);
+//               } else
+//                  loaded();
             },
             onMessage: function(message, origin) {
                var data = JSON.parse(message);

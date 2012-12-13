@@ -948,6 +948,9 @@ a.Bookmarking:hover {
    vertical-align: top;
 	line-height: 1;
 }
+td.CheckBoxColumn {
+   text-align: center;
+}
 .HomepageTitle .AdminCheck {
     padding-left: 8px;
 }
@@ -3422,6 +3425,24 @@ body.embed .InformMessages {
    vertical-align: text-bottom;
    height: 24px;
    width: 24px;
+}
+
+.PhotoGrid .UserPicture {
+   display: inline-block;
+   min-width: 175px;
+}
+
+.PhotoGrid .UserPicture * {
+   vertical-align: bottom;
+}
+
+.PhotoGrid .Username {
+   display: inline-block;
+   line-height: 32px;
+}
+
+.PhotoGridSmall .Username {
+   line-height: 24px;
 }
 
 /* Reaction Buttons */

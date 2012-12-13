@@ -904,13 +904,17 @@ class DiscussionModel extends VanillaModel {
       return self::$_CategoryPermissions;
    }
    
-   public function FetchPageInfo($Url) {
-      $PageInfo = FetchPageInfo($Url);
+   public function FetchPageInfo($Url, $ThrowError = FALSE) {
+      $PageInfo = FetchPageInfo($Url, 3, $ThrowError);
       
       $Title = GetValue('Title', $PageInfo, '');
-      if ($Title == '')
+      if ($Title == '') {
+         if ($ThrowError) {
+            throw new Gdn_UserException(T("The page didn't contain any information."));
+         }
+         
          $Title = FormatString(T('Undefined discussion subject.'), array('Url' => $Url));
-      else {
+      } else {
          if ($Strip = C('Vanilla.Embed.StripPrefix'))
             $Title = StringBeginsWith($Title, $Strip, TRUE, TRUE);
          

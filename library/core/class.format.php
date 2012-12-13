@@ -458,7 +458,7 @@ class Gdn_Format {
          $Timestamp = self::ToTimestamp($Timestamp);
       }
       
-      if (function_exists('FormatDateCustom')) {
+      if (function_exists('FormatDateCustom') && (!$Format || strcasecmp($Format, 'html') == 0)) {
          return FormatDateCustom($Timestamp, $Format);
       }
       
@@ -1263,6 +1263,20 @@ EOT;
             $Result = nl2br(trim($Result));
          return $Result;
       }
+   }
+   
+   /**
+    * 
+    * 
+    * @param string $Str
+    * @return string
+    * @since 2.1
+    */
+   public static function TextEx($Str) {
+      $Str = self::Text($Str);
+      $Str = self::Links($Str);
+      $Str = self::Mentions($Str);
+      return $Str;
    }
 
    /**

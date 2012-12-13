@@ -202,6 +202,7 @@ class DashboardHooks implements Gdn_IPlugin {
          
          if ($UserID) {
             Gdn::Session()->Start($UserID, TRUE, TRUE);
+            Gdn::UserModel()->FireEvent('AfterSignIn');
          } else {
             // There was some sort of error. Let's print that out.
             Trace(Gdn::UserModel()->Validation->ResultsText(), TRACE_WARNING);

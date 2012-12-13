@@ -24,6 +24,11 @@ class UserController extends DashboardController {
    public $Uses = array('Database', 'Form');
    
    /**
+    * @var Gdn_Form 
+    */
+   public $Form;
+   
+   /**
     * Highlight menu path. Automatically run on every use.
     *
     * @since 2.0.0
@@ -420,6 +425,38 @@ class UserController extends DashboardController {
       $this->Render();
    }
    
+   public function Delete2() {
+      $this->Permission('Garden.Users.Delete');
+      
+      if (!Gdn::Request()->IsPostBack())
+         throw new Exception('Requires POST', 405);
+      
+      $this->Form->ValidateRule('UserID', 'ValidateRequired');
+      $DeleteType = $this->Form->GetFormValue('DeleteMethod');
+      if (!in_array($DeleteType, array('delete', 'keep', 'wipe'))) {
+         $this->Form->AddError(T('DeleteMethod must be one of: delete, keep, wipe.'));
+      }
+      
+      $UserID = $this->Form->GetFormValue('UserID');
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      if ($UserID && !$User)
+         throw NotFoundException('User');
+      
+      if ($User['Admin'] == 2)
+         $this->Form->AddError(T('You cannot delete a system-created user.'));
+      elseif ($User['Admin'])
+         $this->Form->AddError(T('You cannot delete a super-admin.'));
+      
+      if ($this->Form->ErrorCount() == 0) {
+         Gdn::UserModel()->Delete($UserID, array(
+            'DeleteMethod' => $this->Form->GetFormValue('DeleteMethod'),
+            'Log' => TRUE));
+         $this->SetData('Result', sprintf(T('%s was deleted.'), $User['Name']));
+      }
+      $this->Render('Blank', 'Utility');
+   }
+   
    public function DeleteContent($UserID) {
       $this->Permission('Garden.Moderation.Manage');
       
@@ -683,6 +720,63 @@ class UserController extends DashboardController {
       
       $this->MasterView = 'empty';
       $this->Render('filenotfound', 'home');
+   }
+   
+   public function Save() {
+      $this->Permission('Garden.Users.Edit');
+      if (!Gdn::Request()->IsPostBack())
+         throw new Exception('Requires POST', 405);
+      
+      $Form = new Gdn_Form();
+      
+      if ($SSOString = $Form->GetFormValue('SSOString')) {
+         $Parts = explode(' ', $SSOString);
+         $String = $Parts[0];
+         $Data = json_decode(base64_decode($String), TRUE);
+         $User = ArrayTranslate($Data, array('name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'client_id' => 'ClientID', 'uniqueid' => 'UniqueID'));
+      } else {
+         $User = $Form->FormValues();
+      }
+      
+      if (!isset($User['UserID']) && isset($User['UniqueID'])) {
+         // Try and find the user based on SSO.
+         $Auth = Gdn::UserModel()->GetAuthentication($User['UniqueID'], $User['ClientID']);
+         if ($Auth)
+            $User['UserID'] = $Auth['UserID'];
+      }
+      
+      if (!isset($User['UserID'])) {
+         // Add some default values to make saving easier.
+         if (!isset($User['RoleID'])) {
+            $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
+            $User['RoleID'] = $DefaultRoles;
+         }
+         
+         if (!isset($User['Password'])) {
+            $User['Password'] = md5(microtime());
+            $User['HashMethod'] = 'Random';
+         }
+      }
+      
+      $UserID = Gdn::UserModel()->Save($User, array('SaveRoles' => isset($User['RoleID']), 'NoConfirmEmail' => TRUE));
+      if ($UserID) {
+         if (!isset($User['UserID']))
+            $User['UserID'] = $UserID;
+
+         if (isset($User['ClientID']) && isset($User['UniqueID'])) {
+            Gdn::UserModel()->SaveAuthentication(array(
+               'UserID' => $User['UserID'],
+               'Provider' => $User['ClientID'],
+               'UniqueID' => $User['UniqueID']
+            ));
+         }
+         
+         $this->SetData('User', $User);
+      } else {
+         throw new Gdn_UserException(Gdn::UserModel()->Validation->ResultsText());
+      }
+      
+      $this->Render('Blank', 'Utility');
    }
    
    public function SSO($UserID = FALSE) {

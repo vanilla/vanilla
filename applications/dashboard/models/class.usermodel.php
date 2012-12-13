@@ -2302,13 +2302,15 @@ class UserModel extends Gdn_Model {
          return FALSE;
       }
       
-      $this->DeleteContent($UserID, $Options);
+      $Content = array();
       
       // Remove shared authentications.
-      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Options);
+      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Content);
 
       // Remove role associations.
-      $this->GetDelete('UserRole', array('UserID' => $UserID), $Options);
+      $this->GetDelete('UserRole', array('UserID' => $UserID), $Content);
+      
+      $this->DeleteContent($UserID, $Options, $Content);
       
       // Remove the user's information
       $this->SQL->Update('User')
@@ -2345,13 +2347,12 @@ class UserModel extends Gdn_Model {
       return TRUE;
    }
 
-   public function DeleteContent($UserID, $Options = array()) {
+   public function DeleteContent($UserID, $Options = array(), $Content = array()) {
       $Log = GetValue('Log', $Options);
       if ($Log === TRUE)
          $Log = 'Delete';
       
       $Result = FALSE;
-      $Content = array();
       
       // Fire an event so applications can remove their associated user data.
       $this->EventArguments['UserID'] = $UserID;
@@ -2363,7 +2364,7 @@ class UserModel extends Gdn_Model {
       
       if (!$Log)
          $Content = NULL;
-
+      
       // Remove photos
       /*$PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
       foreach ($PhotoData->Result() as $Photo) {

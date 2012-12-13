@@ -3427,6 +3427,24 @@ body.embed .InformMessages {
    width: 24px;
 }
 
+.PhotoGrid .UserPicture {
+   display: inline-block;
+   min-width: 175px;
+}
+
+.PhotoGrid .UserPicture * {
+   vertical-align: bottom;
+}
+
+.PhotoGrid .Username {
+   display: inline-block;
+   line-height: 32px;
+}
+
+.PhotoGridSmall .Username {
+   line-height: 24px;
+}
+
 /* Reaction Buttons */
 .Reactions {
    position: relative;

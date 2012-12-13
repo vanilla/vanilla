@@ -353,7 +353,7 @@ embed.start = embed.fn.start = function() {
    var url = me.root+(me.initialPath || '/');
    
    if (me.sso)
-      url += '?sso='+encodeURIComponent(me.sso)
+      url += (url.indexOf('?') == -1 ? '?' : '&') + 'sso='+encodeURIComponent(me.sso)
    
    me.socket = new easyXDM.Socket({
       remote: me.root+'/container.html?url='+encodeURIComponent(url),

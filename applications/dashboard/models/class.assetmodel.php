@@ -156,7 +156,7 @@ class AssetModel extends Gdn_Model {
             break;
       }
 		
-		$this->FireEvent('AfterGetCssFiles');
+      $this->FireEvent('AfterGetCssFiles');
       
       // Hunt the css files down.
       $Paths = array();

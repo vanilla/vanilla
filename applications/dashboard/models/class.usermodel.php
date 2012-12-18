@@ -553,7 +553,7 @@ class UserModel extends Gdn_Model {
                      if (!$Value) {
                         if ($UserPhotoDefaultUrl)
                            $Value = UserPhotoDefaultUrl($User);
-                     } elseif (!preg_match('`^https?://`i', $Value)) {
+                     } elseif (!IsUrl($Value)) {
                         $Value = Gdn_Upload::Url(ChangeBasename($Value, 'n%s'));
                      }
                   }
@@ -2690,7 +2690,7 @@ class UserModel extends Gdn_Model {
       if ($v = GetValue('Preferences', $User))
          SetValue('Preferences', $User, @unserialize($v));
       if ($v = GetValue('Photo', $User)) {
-         if (!preg_match('`^https?://`i', $v)) {
+         if (!IsUrl($v)) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($v, 'n%s'));
          } else {
             $PhotoUrl = $v;

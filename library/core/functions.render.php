@@ -658,7 +658,7 @@ if (!function_exists('UserPhoto')) {
          $Photo = UserPhotoDefaultUrl($User, $ImgClass);
 
       if ($Photo) {
-         if (!preg_match('`^https?://`i', $Photo)) {
+         if (!isUrl($Photo, '//')) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
             $PhotoUrl = $Photo;

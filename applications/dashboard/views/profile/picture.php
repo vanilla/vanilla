@@ -5,7 +5,7 @@ $Session = Gdn::Session();
 $AllowImages = Gdn_UploadImage::CanUploadImages();
 
 // Is the photo hosted remotely?
-$RemotePhoto = in_array(substr($this->User->Photo, 0, 7), array('http://', 'https:/'));
+$RemotePhoto = IsUrl($this->User->Photo, 0, 7);
 
 // Define the current profile picture
 $Picture = '';
@@ -21,7 +21,7 @@ $Thumbnail = $this->User->Photo;
 if (!$Thumbnail && function_exists('UserPhotoDefaultUrl'))
    $Thumbnail = UserPhotoDefaultUrl($this->User);
 
-if ($Thumbnail && !preg_match('`^https?://`i', $Thumbnail))
+if ($Thumbnail && !IsUrl($Thumbnail))
    $Thumbnail = Gdn_Upload::Url(ChangeBasename($Thumbnail, 'n%s'));
          
 $Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));

@@ -194,7 +194,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
              '/^utility(\/.*)?$/'                   => self::BLOCK_NEVER,
              '/^plugin(\/.*)?$/'                    => self::BLOCK_NEVER,
              '/^sso(\/.*)?$/'                       => self::BLOCK_NEVER,
-             '/^discussions/getcommentcounts/'      => self::BLOCK_NEVER,
+             '/^discussions\/getcommentcounts/'     => self::BLOCK_NEVER,
              '/^entry(\/.*)?$/'                     => self::BLOCK_PERMISSION,
              '/^user\/usernameavailable(\/.*)?$/'   => self::BLOCK_PERMISSION,
              '/^user\/emailavailable(\/.*)?$/'      => self::BLOCK_PERMISSION,

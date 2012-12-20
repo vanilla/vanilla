@@ -209,7 +209,7 @@ window.vanilla.embed = function(host) {
       var result = '';
       
       if (embed_type == 'comments') {
-         result = 'http://' + host + '/discussion/embed/'
+         result = '//' + host + '/discussion/embed/'
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
             +'&vanilla_url='+encodeURIComponent(foreign_url);
          
@@ -225,7 +225,7 @@ window.vanilla.embed = function(host) {
          if (typeof(vanilla_title) != 'undefined')
             result += '&title='+encodeURIComponent(vanilla_title);
       } else {
-         result = 'http://' 
+         result = '//' 
             +host
             +path
             +'&remote=' 
@@ -290,7 +290,7 @@ window.vanilla.embed = function(host) {
       // If jQuery is present in the page, include our defer-until-visible script
       if (vanilla_lazy_load && typeof jQuery != 'undefined') {
          jQuery.ajax({
-            url: 'http://cdn.vanillaforums.com/js/jquery.appear.js',
+            url: host_base_url+'js/library/jquery.appear.js',
             dataType: 'script',
             cache: true,
             success: function() {

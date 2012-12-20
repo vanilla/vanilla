@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook Social Connect',
    'Description' => 'Users may sign into your site using their Facebook account.',	
-   'Version' => '1.0.8',
+   'Version' => '1.0.9',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -281,7 +281,7 @@ class FacebookPlugin extends Gdn_Plugin {
          'ConnectUrl' => $this->AuthorizeUri(FALSE, self::ProfileConnecUrl()),
          'Profile' => array(
             'Name' => GetValue('name', $Profile),
-            'Photo' => "http://graph.facebook.com/{$Profile['id']}/picture?type=large"
+            'Photo' => "//graph.facebook.com/{$Profile['id']}/picture?type=large"
             )
       );
    }
@@ -466,7 +466,7 @@ class FacebookPlugin extends Gdn_Plugin {
       $Form->SetFormValue('ProviderName', 'Facebook');
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
       $Form->SetFormValue('Email', GetValue('email', $Profile));
-      $Form->SetFormValue('Photo', "http://graph.facebook.com/{$ID}/picture?type=large");
+      $Form->SetFormValue('Photo', "//graph.facebook.com/{$ID}/picture?type=large");
       $Form->AddHidden('AccessToken', $AccessToken);
       
       if (C('Plugins.Facebook.UseFacebookNames')) {

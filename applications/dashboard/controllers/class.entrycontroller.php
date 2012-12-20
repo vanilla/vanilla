@@ -344,11 +344,11 @@ class EntryController extends Gdn_Controller {
       $UserID = GetValue('UserID', $Auth);
       
       // Check to synchronise roles upon connecting.
-      if (C('Garden.SSO.SynchRoles')) {
+      if (($this->Data('Trusted') || C('Garden.SSO.SynchRoles')) && $this->Form->GetFormValue('Roles', NULL) !== NULL) {
          $SaveRoles = TRUE;
          
          // Translate the role names to IDs.
-         $Roles = $this->Form->GetFormValue('Roles');
+         $Roles = $this->Form->GetFormValue('Roles', NULL);
          $Roles = RoleModel::GetByName($Roles);
          $RoleIDs = array_keys($Roles);
          

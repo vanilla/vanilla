@@ -481,9 +481,15 @@ class Gdn_Format {
          if (!isset($GuestHourOffset)) {
             $GuestTimeZone = C('Garden.GuestTimeZone');
             if ($GuestTimeZone) {
-               $TimeZone = new DateTimeZone($GuestTimeZone);
-               $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
-               $GuestHourOffset = floor($Offset / 3600);
+               try {
+                  $TimeZone = new DateTimeZone($GuestTimeZone);
+                  $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+                  $GuestHourOffset = floor($Offset / 3600);
+               } catch (Exception $Ex) {
+                  $GuestHourOffset = 0;
+                  // Do nothing, but don't set the timezone.
+                  LogException($Ex);
+               }
             }
          }
          $HourOffset = $GuestHourOffset;
@@ -1367,6 +1373,48 @@ EOT;
       } else {
          return FALSE;
       }
+   }
+   
+   /**
+    * Formats a timestamp to the current user's timezone.
+    * 
+    * @param int $Timestamp The timestamp in gmt.
+    * @return int The timestamp according to the user's timezone.
+    */
+   public static function ToTimezone($Timestamp) {
+      static $GuestHourOffset;
+      $Now = time();
+      
+      // Alter the timestamp based on the user's hour offset
+      $Session = Gdn::Session();
+      $HourOffset = 0;
+      
+      if ($Session->UserID > 0) {
+         $HourOffset = $Session->User->HourOffset;
+      } elseif (class_exists('DateTimeZone')) {
+         if (!isset($GuestHourOffset)) {
+            $GuestTimeZone = C('Garden.GuestTimeZone');
+            if ($GuestTimeZone) {
+               try {
+                  $TimeZone = new DateTimeZone($GuestTimeZone);
+                  $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+                  $GuestHourOffset = floor($Offset / 3600);
+               } catch (Exception $Ex) {
+                  $GuestHourOffset = 0;
+                  LogException($Ex);
+               }
+            }
+         }
+         $HourOffset = $GuestHourOffset;
+      }
+      
+      if ($HourOffset <> 0) {
+         $SecondsOffset = $HourOffset * 3600;
+         $Timestamp += $SecondsOffset;
+         $Now += $SecondsOffset;
+      }
+      
+      return $Timestamp;
    }
    
    /**

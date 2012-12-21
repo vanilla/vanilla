@@ -425,6 +425,19 @@ function WriteCommentForm() {
 }
 endif;
 
+if (!function_exists('WriteCommentFormHeader')):
+function WriteCommentFormHeader() {
+   $Session = Gdn::Session();
+   if (C('Vanilla.Comment.UserPhotoFirst', TRUE)) {
+      echo UserPhoto($Session->User);
+      echo UserAnchor($Session->User, 'Username');
+   } else {
+      echo UserAnchor($Session->User, 'Username');
+      echo UserPhoto($Session->User);
+   }
+}  
+endif;
+
 if (!function_exists('WriteEmbedCommentForm')):
 function WriteEmbedCommentForm() {
  	$Session = Gdn::Session();

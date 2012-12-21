@@ -6,6 +6,8 @@
 $Session = Gdn::Session();
 include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
+if (!function_exists('WriteDiscussionRow')):
+
 /**
  * Writes a discussion in table row format.
  */
@@ -127,6 +129,8 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 </tr>
 <?php
 }
+
+endif;
 
 /**
  * Render the page.

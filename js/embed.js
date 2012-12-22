@@ -43,6 +43,8 @@ window.vanilla.embed = function(host) {
             
             host_base_url = scripts[i].src;
             host_base_url = host_base_url.substr(0, host_base_url.indexOf(jsPath));
+            if (host_base_url.substring(host_base_url.length-1) != '/')
+               host_base_url += '/';
             
          }
       }

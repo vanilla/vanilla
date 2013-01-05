@@ -50,10 +50,11 @@ blockquote, q {
 
 .Row {
    margin: auto;
-   width: 960px;
+   max-width: 960px; min-width:700px; /* for responsive */
 }
-#Body .ContentColumn {
-   margin: 0 0 0 230px
+#Body .ContentColumn { /* for responsive */
+   float: left;
+   width: 680px;
 }
 
 /* ==================== Pages that hide the panel and have full-width content */
@@ -740,9 +741,9 @@ body > #Frame > .Head {
    color: transparent;
    font-size: 0;
    border: none;
-   position: absolute;
-   top: 4px;
-   right: 4px;
+   position: relative;
+   top: -2px;
+   right: 18px;
    box-shadow: none;
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
@@ -980,7 +981,7 @@ a.Bookmarking:hover {
 /* ======================================================== Panels / Sidebars */
 #Panel {
    width: 200px;
-   float: left;
+   float: right; /* for responsive */
    
 /*   
 No overflow hidden on main elements. Causes too many bugs!
@@ -3538,4 +3539,35 @@ body.embed .InformMessages {
 }
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
+}
+
+/*for responsive */
+@media only screen and (max-width: 980px) {
+	#Body, #Panel, .SiteMenu {
+		width: 680px;
+		margin:0 auto 0 auto;
+	}
+	#Body {
+		padding-left: 2px;
+	}
+	#Panel {
+		float: left;
+	}
+	#Menu {
+		margin:auto;
+	}
+	#Head {
+		text-align:center
+		 /* set the background if change*/
+	}
+	.SiteMenu {
+		text-align: center;
+		 /* for Safari iPad: set again the background color*/
+	}
+	.SiteTitle {
+		display:block;
+	}
+	#Head .SiteSearch {
+		float:none;	
+	}
 }

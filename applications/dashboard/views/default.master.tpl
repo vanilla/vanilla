@@ -8,7 +8,6 @@
       <div class="Head" id="Head">
          <div class="Row">
             <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
-            <div class="SiteSearch">{searchbox}</div>
             <ul class="SiteMenu">
                <!-- {dashboard_link} -->
                {discussions_link}
@@ -18,16 +17,17 @@
                <!-- {profile_link}
                {signinout_link}  -->
             </ul>
+  <div class="SiteSearch">{searchbox}</div>
          </div>
       </div>
       <div id="Body">
          <div class="Row">
             <div class="BreadcrumbsWrapper">{breadcrumbs}</div>
-            <div class="Column PanelColumn" id="Panel">
+            <div class="Column ContentColumn" id="Content">{asset name="Content"}</div>
+	    <div class="Column PanelColumn" id="Panel">
                {module name="MeModule"}
                {asset name="Panel"}
             </div>
-            <div class="Column ContentColumn" id="Content">{asset name="Content"}</div>
          </div>
       </div>
       <div id="Foot">

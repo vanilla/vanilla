@@ -23,6 +23,8 @@ echo '<h1>'.$this->Data('Discussion.Name').'</h1>';
 
 echo "</div>\n\n";
 
+$this->FireEvent('AfterDiscussionTitle');
+
 // Write the initial discussion.
 if ($this->Data('Page') == 1) {
    include $this->FetchViewLocation('discussion', 'discussion');

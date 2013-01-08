@@ -3,7 +3,7 @@
    if (window.top == window.self)
       return;
    
-   window.document.domain = window.document.domain;
+//   window.document.domain = window.document.domain;
    
    // Call a remote function in the parent.
    Vanilla.parent.callRemote = function(func, args, success, failure) {

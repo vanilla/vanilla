@@ -4,7 +4,7 @@
 $PluginInfo['Gravatar'] = array(
    'Name' => 'Gravatar',
    'Description' => 'Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.',
-   'Version' => '1.4.2',
+   'Version' => '1.4.3',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -27,7 +27,7 @@ class GravatarPlugin extends Gdn_Plugin {
             .'&amp;size='.C('Garden.Profile.MaxWidth', 200);
 
          if (C('Plugins.Gravatar.UseVanillicon', TRUE))
-            $Url .= '&default='.urlencode(Gdn::Request()->Scheme().'//vanillicon.com/'.md5($Email).'_200.png');
+            $Url .= '&default='.urlencode(Gdn::Request()->Scheme().'://vanillicon.com/'.md5($Email).'_200.png');
          else
             $Url .= '&default='.urlencode(Asset(C('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default_250.png'), TRUE));
 

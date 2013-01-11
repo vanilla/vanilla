@@ -258,7 +258,6 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             'Reports'         => 1
          );
          
-         
          $RegardingID = $RegardingModel->Save($RegardingPreSend);
          
          if (!$RegardingID)
@@ -276,8 +275,13 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
          switch ($ActionType) {
             case 'discussion':
                $DiscussionModel = new DiscussionModel();
-               if ($Collapse)
-                  $Discussion = $DiscussionModel->GetWhere(array('RegardingID' => GetValue('RegardingID', $ExistingRegardingEntity, FALSE)))->FirstRow(DATASET_TYPE_ARRAY);
+               if ($Collapse) {
+                  $Discussion = Gdn::SQL()
+                     ->Select('*')
+                     ->From('Discussion')
+                     ->Where(array('RegardingID' => $RegardingID))
+                     ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+               }
                
                if (!$Collapse || !$Discussion) {
                   $CategoryID = GetValue('Parameters', $Action);

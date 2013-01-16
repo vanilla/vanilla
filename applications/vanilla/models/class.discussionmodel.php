@@ -1419,7 +1419,7 @@ class DiscussionModel extends VanillaModel {
                   $this->SQL->Cache($CacheKeys);
                }
                
-               // Check for spam
+               // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
             	if ($Spam)
                   return SPAM;
@@ -1447,6 +1447,9 @@ class DiscussionModel extends VanillaModel {
                   );
                   CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
                }
+               
+               // Update the user's discussion count.
+               $this->UpdateUserDiscussionCount(Gdn::Session()->UserID);
                
                // Assign the new DiscussionID to the comment before saving.
                $FormPostValues['IsNewDiscussion'] = TRUE;
@@ -1678,6 +1681,17 @@ class DiscussionModel extends VanillaModel {
          $CategoryModel = new CategoryModel();
          $CategoryModel->SetField($CategoryID, $CacheAmendment);
       }
+   }
+   
+   public function UpdateUserDiscussionCount($UserID) {
+      $CountDiscussions = $this->SQL
+         ->Select('DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion')
+         ->Where('InsertUserID', $UserID)
+         ->Get()->Value('CountDiscussions', 0);
+      
+      // Save the count to the user table
+      Gdn::UserModel()->SetField($UserID, 'CountDiscussions', $CountDiscussions);
    }
 	
 	/**
@@ -1998,19 +2012,8 @@ class DiscussionModel extends VanillaModel {
 		$this->SQL->Delete('UserDiscussion', array('DiscussionID' => $DiscussionID));
       $this->UpdateDiscussionCount($CategoryID);
       
-      // Get the user's discussion count
-      $CountDiscussions = $this->SQL
-         ->Select('DiscussionID', 'count', 'CountDiscussions')
-         ->From('Discussion')
-         ->Where('InsertUserID', $UserID)
-         ->Get()->Value('CountDiscussions', 0);
-      
-      // Save the count to the user table
-      $this->SQL
-         ->Update('User')
-         ->Set('CountDiscussions', $CountDiscussions)
-         ->Where('UserID', $UserID)
-         ->Put();
+      // Get the user's discussion count.
+      $this->UpdateUserDiscussionCount($UserID);
 
 		// Update bookmark counts for users who had bookmarked this discussion
 		foreach ($BookmarkData->Result() as $User) {

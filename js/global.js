@@ -42,7 +42,7 @@ window.Vanilla = Vanilla;
  * Global Definitions
  */
 
-	var gdn = {
+   var gdn = {
       focused: true,
       Libraries: {}
    }
@@ -312,136 +312,136 @@ window.Vanilla = Vanilla;
       });
    }
    
-	gdn.setAutoDismiss = function() {
-		var timerId = jQuery('div.InformMessages').attr('autodismisstimerid');
-		if (!timerId) {
-			timerId = setTimeout(function() {
-				jQuery('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
-					jQuery(this).remove();
+   gdn.setAutoDismiss = function() {
+      var timerId = jQuery('div.InformMessages').attr('autodismisstimerid');
+      if (!timerId) {
+         timerId = setTimeout(function() {
+            jQuery('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
+               jQuery(this).remove();
 
 
-				});
-				jQuery('div.InformMessages').removeAttr('autodismisstimerid');
-			}, 7000);
-			jQuery('div.InformMessages').attr('autodismisstimerid', timerId);
-		}
-	}
+            });
+            jQuery('div.InformMessages').removeAttr('autodismisstimerid');
+         }, 7000);
+         jQuery('div.InformMessages').attr('autodismisstimerid', timerId);
+      }
+   }
    
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
-		if (!response)
-			return false;
+      if (!response)
+         return false;
       
       if (!response.InformMessages || response.InformMessages.length == 0)
          return false;
-		
-		// If there is no message container in the page, add one
-		var informMessages = jQuery('div.InformMessages');
-		if (informMessages.length == 0) {
-			jQuery('<div class="InformMessages"></div>').appendTo('body');
-			informMessages = jQuery('div.InformMessages');
-		}
-		var wrappers = jQuery('div.InformMessages div.InformWrapper');
-		
-		// Loop through the inform messages and add them to the container
-		for (var i = 0; i < response.InformMessages.length; i++) {
-			css = 'InformWrapper';
-			if (response.InformMessages[i]['CssClass'])
-				css += ' ' + response.InformMessages[i]['CssClass'];
-				
-			elementId = '';
-			if (response.InformMessages[i]['id'])
-				elementId = response.InformMessages[i]['id'];
-				
-			sprite = '';
-			if (response.InformMessages[i]['Sprite']) {
-				css += ' HasSprite';
-				sprite = response.InformMessages[i]['Sprite'];
-			}
-			
-			dismissCallback = response.InformMessages[i]['DismissCallback'];
-			dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
-			if (dismissCallbackUrl)
-				dismissCallbackUrl = gdn.url(dismissCallbackUrl);
-				
-			try {
-				var message = response.InformMessages[i]['Message'];
-				var emptyMessage = message == '';
-				
-				// Is there a sprite?
-				if (sprite != '')
-					message = '<span class="InformSprite '+sprite+'"></span>' + message;
-				
-				// If the message is dismissable, add a close button
-				if (css.indexOf('Dismissable') > 0)
-					message = '<a class="Close"><span>×</span></a>' + message;
+      
+      // If there is no message container in the page, add one
+      var informMessages = jQuery('div.InformMessages');
+      if (informMessages.length == 0) {
+         jQuery('<div class="InformMessages"></div>').appendTo('body');
+         informMessages = jQuery('div.InformMessages');
+      }
+      var wrappers = jQuery('div.InformMessages div.InformWrapper');
+      
+      // Loop through the inform messages and add them to the container
+      for (var i = 0; i < response.InformMessages.length; i++) {
+         css = 'InformWrapper';
+         if (response.InformMessages[i]['CssClass'])
+            css += ' ' + response.InformMessages[i]['CssClass'];
+            
+         elementId = '';
+         if (response.InformMessages[i]['id'])
+            elementId = response.InformMessages[i]['id'];
+            
+         sprite = '';
+         if (response.InformMessages[i]['Sprite']) {
+            css += ' HasSprite';
+            sprite = response.InformMessages[i]['Sprite'];
+         }
+         
+         dismissCallback = response.InformMessages[i]['DismissCallback'];
+         dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
+         if (dismissCallbackUrl)
+            dismissCallbackUrl = gdn.url(dismissCallbackUrl);
+            
+         try {
+            var message = response.InformMessages[i]['Message'];
+            var emptyMessage = message == '';
+            
+            // Is there a sprite?
+            if (sprite != '')
+               message = '<span class="InformSprite '+sprite+'"></span>' + message;
+            
+            // If the message is dismissable, add a close button
+            if (css.indexOf('Dismissable') > 0)
+               message = '<a class="Close"><span>×</span></a>' + message;
 
-				message = '<div class="InformMessage">'+message+'</div>';
-				// Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
-				message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
-				// Insert the current url as a target for inform anchors
-				message = message.replace(/{SelfUrl}/g, document.URL);
-				
-				var skip = false;
-				for (var j = 0; j < wrappers.length; j++) {
-					if (jQuery(wrappers[j]).text() == jQuery(message).text()) {
-						skip = true;
-					}
-				}
-				if (!skip) {
-					if (elementId != '') {
-						jQuery('#'+elementId).remove();
-						elementId = ' id="'+elementId+'"';
-					}
-					if (!emptyMessage) {
-						informMessages.prepend('<div class="'+css+'"'+elementId+'>'+message+'</div>');
-						// Is there a callback or callback url to request on dismiss of the inform message?
-						if (dismissCallback) {
-							jQuery('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
-						} else if (dismissCallbackUrl) {
-							dismissCallbackUrl = dismissCallbackUrl.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
-							var closeAnchor = jQuery('div.InformWrapper:first').find('a.Close');
-							closeAnchor.attr('callbackurl', dismissCallbackUrl);
-							closeAnchor.click(function () {
-								$.ajax({
-									type: "POST",
-									url: jQuery(this).attr('callbackurl'),
-									data: 'TransientKey='+gdn.definition('TransientKey'),
-									dataType: 'json',
-									error: function(XMLHttpRequest, textStatus, errorThrown) {
-										gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
-									},
-									success: function(json) {
-										gdn.inform(json);
-									}
-								});
-							});
-						}
-					}
-				}
-			} catch (e) {
-			}
-		}
-		informMessages.show();
+            message = '<div class="InformMessage">'+message+'</div>';
+            // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
+            message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
+            // Insert the current url as a target for inform anchors
+            message = message.replace(/{SelfUrl}/g, document.URL);
+            
+            var skip = false;
+            for (var j = 0; j < wrappers.length; j++) {
+               if (jQuery(wrappers[j]).text() == jQuery(message).text()) {
+                  skip = true;
+               }
+            }
+            if (!skip) {
+               if (elementId != '') {
+                  jQuery('#'+elementId).remove();
+                  elementId = ' id="'+elementId+'"';
+               }
+               if (!emptyMessage) {
+                  informMessages.prepend('<div class="'+css+'"'+elementId+'>'+message+'</div>');
+                  // Is there a callback or callback url to request on dismiss of the inform message?
+                  if (dismissCallback) {
+                     jQuery('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
+                  } else if (dismissCallbackUrl) {
+                     dismissCallbackUrl = dismissCallbackUrl.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
+                     var closeAnchor = jQuery('div.InformWrapper:first').find('a.Close');
+                     closeAnchor.attr('callbackurl', dismissCallbackUrl);
+                     closeAnchor.click(function () {
+                        $.ajax({
+                           type: "POST",
+                           url: jQuery(this).attr('callbackurl'),
+                           data: 'TransientKey='+gdn.definition('TransientKey'),
+                           dataType: 'json',
+                           error: function(XMLHttpRequest, textStatus, errorThrown) {
+                              gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+                           },
+                           success: function(json) {
+                              gdn.inform(json);
+                           }
+                        });
+                     });
+                  }
+               }
+            }
+         } catch (e) {
+         }
+      }
+      informMessages.show();
       return true;
    }
-	
-	// Send an informMessage to the screen (same arguments as controller.InformMessage).
-	gdn.informMessage = function(message, options) {
-		if (!options)
-			options = new Array();
-			
-		if (typeof(options) == 'string') {
-			var css = options;
-			options = new Array();
-			options['CssClass'] = css;
-		}
-		options['Message'] = message;
-		if (!options['CssClass'])
-			options['CssClass'] = 'Dismissable AutoDismiss';
-		
-		gdn.inform({'InformMessages' : new Array(options)});
-	}
+   
+   // Send an informMessage to the screen (same arguments as controller.InformMessage).
+   gdn.informMessage = function(message, options) {
+      if (!options)
+         options = new Array();
+         
+      if (typeof(options) == 'string') {
+         var css = options;
+         options = new Array();
+         options['CssClass'] = css;
+      }
+      options['Message'] = message;
+      if (!options['CssClass'])
+         options['CssClass'] = 'Dismissable AutoDismiss';
+      
+      gdn.inform({'InformMessages' : new Array(options)});
+   }
    
    // Inform an error returned from an ajax call.
    gdn.informError = function(xhr, silentAbort) {
@@ -482,11 +482,11 @@ window.Vanilla = Vanilla;
       gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
    }
    
-	// Ping for new notifications on pageload, and subsequently every 1 minute.
+   // Ping for new notifications on pageload, and subsequently every 1 minute.
    gdn.notificationsPinging = 0;
    gdn.pingCount = 0;
    
-	gdn.pingForNotifications = function() {
+   gdn.pingForNotifications = function() {
       if (gdn.notificationsPinging > 0 || !gdn.focused)
          return;
       gdn.notificationsPinging++;
@@ -506,7 +506,7 @@ window.Vanilla = Vanilla;
             gdn.notificationsPinging--;
          }
       });
-	}
+   }
    
    gdn.Template = {
 
@@ -717,99 +717,99 @@ window.Vanilla = Vanilla;
 
 jQuery(document).ready(function($) {
    
-	var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-	
-	var uTF8Encode = function(string) {
-		string = string.replace(/\x0d\x0a/g, "\x0a");
-		var output = "";
-		for (var n = 0; n < string.length; n++) {
-			var c = string.charCodeAt(n);
-			if (c < 128) {
-				output += String.fromCharCode(c);
-			} else if ((c > 127) && (c < 2048)) {
-				output += String.fromCharCode((c >> 6) | 192);
-				output += String.fromCharCode((c & 63) | 128);
-			} else {
-				output += String.fromCharCode((c >> 12) | 224);
-				output += String.fromCharCode(((c >> 6) & 63) | 128);
-				output += String.fromCharCode((c & 63) | 128);
-			}
-		}
-		return output;
-	};
-	
-	var uTF8Decode = function(input) {
-		var string = "";
-		var i = 0;
-		var c = c1 = c2 = 0;
-		while ( i < input.length ) {
-			c = input.charCodeAt(i);
-			if (c < 128) {
-				string += String.fromCharCode(c);
-				i++;
-			} else if ((c > 191) && (c < 224)) {
-				c2 = input.charCodeAt(i+1);
-				string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-				i += 2;
-			} else {
-				c2 = input.charCodeAt(i+1);
-				c3 = input.charCodeAt(i+2);
-				string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-				i += 3;
-			}
-		}
-		return string;
-	}
-	
-	$.extend({
-		base64Encode: function(input) {
-			var output = "";
-			var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-			var i = 0;
-			input = uTF8Encode(input);
-			while (i < input.length) {
-				chr1 = input.charCodeAt(i++);
-				chr2 = input.charCodeAt(i++);
-				chr3 = input.charCodeAt(i++);
-				enc1 = chr1 >> 2;
-				enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-				enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-				enc4 = chr3 & 63;
-				if (isNaN(chr2)) {
-					enc3 = enc4 = 64;
-				} else if (isNaN(chr3)) {
-					enc4 = 64;
-				}
-				output = output + keyString.charAt(enc1) + keyString.charAt(enc2) + keyString.charAt(enc3) + keyString.charAt(enc4);
-			}
-			return output;
-		},
-		base64Decode: function(input) {
-			var output = "";
-			var chr1, chr2, chr3;
-			var enc1, enc2, enc3, enc4;
-			var i = 0;
-			input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-			while (i < input.length) {
-				enc1 = keyString.indexOf(input.charAt(i++));
-				enc2 = keyString.indexOf(input.charAt(i++));
-				enc3 = keyString.indexOf(input.charAt(i++));
-				enc4 = keyString.indexOf(input.charAt(i++));
-				chr1 = (enc1 << 2) | (enc2 >> 4);
-				chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-				chr3 = ((enc3 & 3) << 6) | enc4;
-				output = output + String.fromCharCode(chr1);
-				if (enc3 != 64) {
-					output = output + String.fromCharCode(chr2);
-				}
-				if (enc4 != 64) {
-					output = output + String.fromCharCode(chr3);
-				}
-			}
-			output = uTF8Decode(output);
-			return output;
-		}
-	});
+   var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+   
+   var uTF8Encode = function(string) {
+      string = string.replace(/\x0d\x0a/g, "\x0a");
+      var output = "";
+      for (var n = 0; n < string.length; n++) {
+         var c = string.charCodeAt(n);
+         if (c < 128) {
+            output += String.fromCharCode(c);
+         } else if ((c > 127) && (c < 2048)) {
+            output += String.fromCharCode((c >> 6) | 192);
+            output += String.fromCharCode((c & 63) | 128);
+         } else {
+            output += String.fromCharCode((c >> 12) | 224);
+            output += String.fromCharCode(((c >> 6) & 63) | 128);
+            output += String.fromCharCode((c & 63) | 128);
+         }
+      }
+      return output;
+   };
+   
+   var uTF8Decode = function(input) {
+      var string = "";
+      var i = 0;
+      var c = c1 = c2 = 0;
+      while ( i < input.length ) {
+         c = input.charCodeAt(i);
+         if (c < 128) {
+            string += String.fromCharCode(c);
+            i++;
+         } else if ((c > 191) && (c < 224)) {
+            c2 = input.charCodeAt(i+1);
+            string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+            i += 2;
+         } else {
+            c2 = input.charCodeAt(i+1);
+            c3 = input.charCodeAt(i+2);
+            string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+            i += 3;
+         }
+      }
+      return string;
+   }
+   
+   $.extend({
+      base64Encode: function(input) {
+         var output = "";
+         var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+         var i = 0;
+         input = uTF8Encode(input);
+         while (i < input.length) {
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+            if (isNaN(chr2)) {
+               enc3 = enc4 = 64;
+            } else if (isNaN(chr3)) {
+               enc4 = 64;
+            }
+            output = output + keyString.charAt(enc1) + keyString.charAt(enc2) + keyString.charAt(enc3) + keyString.charAt(enc4);
+         }
+         return output;
+      },
+      base64Decode: function(input) {
+         var output = "";
+         var chr1, chr2, chr3;
+         var enc1, enc2, enc3, enc4;
+         var i = 0;
+         input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+         while (i < input.length) {
+            enc1 = keyString.indexOf(input.charAt(i++));
+            enc2 = keyString.indexOf(input.charAt(i++));
+            enc3 = keyString.indexOf(input.charAt(i++));
+            enc4 = keyString.indexOf(input.charAt(i++));
+            chr1 = (enc1 << 2) | (enc2 >> 4);
+            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+            chr3 = ((enc3 & 3) << 6) | enc4;
+            output = output + String.fromCharCode(chr1);
+            if (enc3 != 64) {
+               output = output + String.fromCharCode(chr2);
+            }
+            if (enc4 != 64) {
+               output = output + String.fromCharCode(chr3);
+            }
+         }
+         output = uTF8Decode(output);
+         return output;
+      }
+   });
    
    $.postParseJson = function(json) {
       if (json.Data) json.Data = $.base64Decode(json.Data);
@@ -891,7 +891,7 @@ jQuery(document).ready(function($) {
    $(document).delegate('a.ForgotPassword', 'click', function() {
       $('.Methods').toggle();
       $('#Form_User_Password').toggle();
-		$('#Form_User_SignIn').toggle();
+      $('#Form_User_SignIn').toggle();
       return false;
    });
    
@@ -939,7 +939,7 @@ jQuery(document).ready(function($) {
          $(this).popup();
       });
       
-		jQuery('a.PopConfirm').livequery(function(){
+      jQuery('a.PopConfirm').livequery(function(){
          $(this).popup({'confirm' : true, 'followConfirm' : true});
       });
    }
@@ -1019,35 +1019,35 @@ jQuery(document).ready(function($) {
          if (color)
             opts.options.color = color;
          return $.effects.highlight0.call(this, opts);
-		};
-	}
+      };
+   }
 
    // Handle ToggleMenu toggling and set up default state
    $('[class^="Toggle-"]').hide(); // hide all toggle containers
    $('.ToggleMenu a').click(function() {
       // Make all toggle buttons and toggle containers inactive
-		$(this).parents('.ToggleMenu').find('li').removeClass('Active'); 
+      $(this).parents('.ToggleMenu').find('li').removeClass('Active'); 
       $('[class^="Toggle-"]').hide();
-		var item = $(this).parents('li'); // Identify the clicked container
-		// The selector of the container that should be revealed.
+      var item = $(this).parents('li'); // Identify the clicked container
+      // The selector of the container that should be revealed.
       var containerSelector = '.Toggle-' + item.attr('class');
       containerSelector = containerSelector.replace(/Handle-/gi, ''); 
-		// Reveal the container & make the button active
+      // Reveal the container & make the button active
       item.addClass('Active'); // Make the clicked form button active
       $(containerSelector).show();
       return false;
    });
    $('.ToggleMenu .Active a').click(); // reveal the currently active item.
    
-	// Show hoverhelp on hover
-	$('.HoverHelp').hover(
-		function() {
-			$(this).find('.Help').show();
-		},
-		function() {
-			$(this).find('.Help').hide();
-		}
-	);
+   // Show hoverhelp on hover
+   $('.HoverHelp').hover(
+      function() {
+         $(this).find('.Help').show();
+      },
+      function() {
+         $(this).find('.Help').hide();
+      }
+   );
 
    // If a page loads with a hidden redirect url, go there after a few moments.
    var RedirectUrl = gdn.definition('RedirectUrl', '');
@@ -1264,7 +1264,7 @@ jQuery(document).ready(function($) {
    // conditional stats tasks
    var AnalyticsTask = gdn.definition('AnalyticsTask', false);
    if (AnalyticsTask == 'tick')
-	     gdn.stats();
+      gdn.stats();
    
    // If a dismissable InformMessage close button is clicked, hide it.
    $(document).delegate('div.InformWrapper.Dismissable a.Close', 'click', function() {
@@ -1272,65 +1272,65 @@ jQuery(document).ready(function($) {
          $(this).remove();
       });
    });
-	
-	// Handle autodismissals
-	$('div.InformWrapper.AutoDismiss:first').livequery(function() {
-		gdn.setAutoDismiss();
-	});
    
-	// Prevent autodismiss if hovering any inform messages
-	$(document).delegate('div.InformWrapper', 'mouseover mouseout', function(e) {
-		if (e.type == 'mouseover') {
-			var timerId = $('div.InformMessages').attr('autodismisstimerid');
-			if (timerId) {
-				clearTimeout(timerId);
-				$('div.InformMessages').removeAttr('autodismisstimerid');
-			}
-		} else {
-			gdn.setAutoDismiss();
-		}
-	});
+   // Handle autodismissals
+   $('div.InformWrapper.AutoDismiss:first').livequery(function() {
+      gdn.setAutoDismiss();
+   });
    
-	// Pick up the inform message stack and display it on page load
-	var informMessageStack = gdn.definition('InformMessageStack', false);
-	if (informMessageStack) {
-		informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
-		gdn.inform(informMessageStack);
-	}
+   // Prevent autodismiss if hovering any inform messages
+   $(document).delegate('div.InformWrapper', 'mouseover mouseout', function(e) {
+      if (e.type == 'mouseover') {
+         var timerId = $('div.InformMessages').attr('autodismisstimerid');
+         if (timerId) {
+            clearTimeout(timerId);
+            $('div.InformMessages').removeAttr('autodismisstimerid');
+         }
+      } else {
+         gdn.setAutoDismiss();
+      }
+   });
+   
+   // Pick up the inform message stack and display it on page load
+   var informMessageStack = gdn.definition('InformMessageStack', false);
+   if (informMessageStack) {
+      informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
+      gdn.inform(informMessageStack);
+   }
    
    if (gdn.definition('SignedIn', '0') != '0' && gdn.definition('DoInform', '1') != '0') {
       setTimeout(gdn.pingForNotifications, 3000);
       setInterval(gdn.pingForNotifications, 60000);
    }
-	
-	// Stash something in the user's session (or unstash the value if it was not provided)
-	stash = function(name, value) {
-		$.ajax({
-			type: "POST",
-			url: gdn.url('session/stash'),
-			data: {'TransientKey' : gdn.definition('TransientKey'), 'Name' : name, 'Value' : value},
-			dataType: 'json',
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
-			},
-			success: function(json) {
-				gdn.inform(json);
-				return json.Unstash;
-			}
-		});
-		
-		return '';
-	}
-	
-	// When a stash anchor is clicked, look for inputs with values to stash
-	$('a.Stash').click(function() {
+   
+   // Stash something in the user's session (or unstash the value if it was not provided)
+   stash = function(name, value) {
+      $.ajax({
+         type: "POST",
+         url: gdn.url('session/stash'),
+         data: {'TransientKey' : gdn.definition('TransientKey'), 'Name' : name, 'Value' : value},
+         dataType: 'json',
+         error: function(XMLHttpRequest, textStatus, errorThrown) {
+            gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+         },
+         success: function(json) {
+            gdn.inform(json);
+            return json.Unstash;
+         }
+      });
+      
+      return '';
+   }
+   
+   // When a stash anchor is clicked, look for inputs with values to stash
+   $('a.Stash').click(function() {
       // Embedded comments
-		var comment = $('#Form_Comment textarea').val(),
+      var comment = $('#Form_Comment textarea').val(),
          placeholder = $('#Form_Comment textarea').attr('placeholder'),
          vanilla_identifier = gdn.definition('vanilla_identifier');
-		if (vanilla_identifier && comment != '' && comment != placeholder)
-			stash('CommentForForeignID_' + vanilla_identifier, comment);
-	});
+      if (vanilla_identifier && comment != '' && comment != placeholder)
+         stash('CommentForForeignID_' + vanilla_identifier, comment);
+   });
    
 });
 

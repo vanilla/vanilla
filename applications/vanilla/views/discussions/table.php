@@ -6,6 +6,22 @@
 $Session = Gdn::Session();
 include_once $this->FetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
+if (!function_exists('WriteDiscussionHeading')):
+   
+   function WriteDiscussionHeading() {
+   ?>
+   <tr>
+      <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>')); ?>
+      <td class="DiscussionName"><div class="Wrap"><?php echo DiscussionHeading() ?></div></td>
+      <td class="BlockColumn BlockColumn-User FirstUser"><div class="Wrap"><?php echo T('Started By'); ?></div></td>
+      <td class="BigCount CountReplies"><div class="Wrap"><?php echo T('Replies'); ?></div></td>
+      <td class="BigCount CountViews"><div class="Wrap"><?php echo T('Views'); ?></div></td>
+      <td class="BlockColumn BlockColumn-User LastUser"><div class="Wrap"><?php echo T('Most Recent Comment', 'Most Recent'); ?></div></td>
+   </tr>
+   <?php
+   }
+endif;
+
 if (!function_exists('WriteDiscussionRow')):
 
 /**
@@ -161,14 +177,9 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 <div class="DataTableWrap">
 <table class="DataTable DiscussionsTable">
 	<thead>
-		<tr>
-         <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>')); ?>
-			<td class="DiscussionName"><div class="Wrap"><?php echo DiscussionHeading() ?></div></td>
-			<td class="BlockColumn BlockColumn-User FirstUser"><div class="Wrap"><?php echo T('Started By'); ?></div></td>
-			<td class="BigCount CountReplies"><div class="Wrap"><?php echo T('Replies'); ?></div></td>
-			<td class="BigCount CountViews"><div class="Wrap"><?php echo T('Views'); ?></div></td>
-			<td class="BlockColumn BlockColumn-User LastUser"><div class="Wrap"><?php echo T('Most Recent Comment', 'Most Recent'); ?></div></td>
-		</tr>
+		<?php
+      WriteDiscussionHeading();
+      ?>
 	</thead>
 	<tbody>
    <?php

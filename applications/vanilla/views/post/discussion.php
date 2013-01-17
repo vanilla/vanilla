@@ -40,11 +40,17 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       // If the user has any of the following permissions (regardless of junction), show the options
       // Note: I need to validate that they have permission in the specified category on the back-end
       // TODO: hide these boxes depending on which category is selected in the dropdown above.
-      if ($Session->CheckPermission('Vanilla.Discussions.Announce'))
-         $Options .= '<li>'.$this->Form->CheckBox('Announce', T('Announce'), array('value' => '1')).'</li>';
+      if ($Session->CheckPermission('Vanilla.Discussions.Announce')) {
+         $Options .= //'<li>'.$this->Form->CheckBox('Announce', T('Announce'), array('value' => '1')).'</li>';
+         
+         '<li><b>'.T('Announce').'</b> '.$this->Form->Radio('Announce', '@'.sprintf(T('In <b>%s.</b>'), T('the category')), array('Value' => '2')).'</li>'.
+         '<li>'.$this->Form->Radio('Announce', '@'.sprintf(T('In <b>%s</b> and recent discussions.'), T('the category')), array('Value' => '1')).'</li>'.
+         '<li>'.$this->Form->Radio('Announce', '@'.T("Don't announce."), array('Value' => '0')).'</li>';
 
-      if ($Session->CheckPermission('Vanilla.Discussions.Close'))
-         $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close'), array('value' => '1')).'</li>';
+      }
+
+//      if ($Session->CheckPermission('Vanilla.Discussions.Close'))
+//         $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close'), array('value' => '1')).'</li>';
 
 		$this->EventArguments['Options'] = &$Options;
 		$this->FireEvent('DiscussionFormOptions');

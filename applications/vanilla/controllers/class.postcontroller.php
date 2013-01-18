@@ -201,6 +201,7 @@ class PostController extends VanillaController {
             $this->Comment->InsertPhoto = $Session->User->Photo;
             $this->Comment->DateInserted = Gdn_Format::Date();
             $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+            $this->Comment->Format = GetValue('Format', $FormValues, C('Garden.InputFormatter'));
             
             $this->EventArguments['Discussion'] = &$this->Discussion;
             $this->EventArguments['Comment'] = &$this->Comment;
@@ -570,6 +571,7 @@ class PostController extends VanillaController {
                   $this->Comment->InsertPhoto = $Session->User->Photo;
                   $this->Comment->DateInserted = Gdn_Format::Date();
                   $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+                  $this->Comment->Format = GetValue('Format', $FormValues, C('Garden.InputFormatter'));
                   $this->AddAsset('Content', $this->FetchView('preview'));
                } else {
                   // If this was a draft save, notify the user about the save
@@ -687,6 +689,7 @@ class PostController extends VanillaController {
          $this->Data = array('Comment' => $Comment);
          $this->RenderData($this->Data);
       } else {
+         require_once $this->FetchViewLocation('helper_functions', 'Discussion');
          // Render default view.
          $this->Render();
       }

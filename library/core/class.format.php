@@ -459,6 +459,9 @@ class Gdn_Format {
       }
       
       if (function_exists('FormatDateCustom') && (!$Format || strcasecmp($Format, 'html') == 0)) {
+         if (!$Timestamp)
+            $Timestamp = time();
+         
          return FormatDateCustom($Timestamp, $Format);
       }
       

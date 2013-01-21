@@ -363,7 +363,7 @@ class UserModel extends Gdn_Model {
     * @param array $UserData Data to go in the user table.
     * @return int The new/existing user ID.
     */
-   public function Connect($UniqueID, $ProviderKey, $UserData) {
+   public function Connect($UniqueID, $ProviderKey, $UserData, $Options = array()) {
       Trace('UserModel->Connect()');
       
       $UserID = FALSE;
@@ -403,8 +403,12 @@ class UserModel extends Gdn_Model {
             $UserData['Password'] = md5(microtime());
             $UserData['HashMethod'] = 'Random';
             
+            TouchValue('CheckCaptcha', $Options, FALSE);
+            TouchValue('NoConfirmEmail', $Options, TRUE);
+            TouchValue('NoActivity', $Options, TRUE);
+            
             Trace($UserData, 'Registering User');
-            $UserID = $this->Register($UserData, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserID = $this->Register($UserData, $Options);
             $UserInserted = TRUE;
          }
          
@@ -418,13 +422,6 @@ class UserModel extends Gdn_Model {
             
             if ($UserInserted && C('Garden.Registration.SendConnectEmail', TRUE)) {
                $Provider = $this->SQL->GetWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->FirstRow(DATASET_TYPE_ARRAY);
-               if ($Provider) {
-                  try {
-                     $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => GetValue('Name', $Provider, C('Garden.Title'))));
-                  } catch (Exception $Ex) {
-                     // Do nothing if emailing doesn't work.
-                  }
-               }
             }
          }
       }
@@ -1944,7 +1941,7 @@ class UserModel extends Gdn_Model {
 
          // And insert the new user
          $UserID = $this->_Insert($Fields, $Options);
-         if ($UserID) {
+         if ($UserID && !GetValue('NoActivity', $Options)) {
             $ActivityModel = new ActivityModel();
             $ActivityModel->Save(array(
                'ActivityUserID' => $UserID,

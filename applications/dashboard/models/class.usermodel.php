@@ -721,13 +721,16 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetActiveUsers($Limit = 5) {
-      $this->UserQuery();
-      $this->FireEvent('BeforeGetActiveUsers');
-      return $this->SQL
-         ->Where('u.Deleted', 0)
-         ->OrderBy('u.DateLastActive', 'desc')
+      $UserIDs = $this->SQL
+         ->Select('UserID')
+         ->From('User')
+         ->OrderBy('DateLastActive', 'desc')
          ->Limit($Limit, 0)
          ->Get();
+      $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
+      
+      $Data = $this->SQL->GetWhere('User', array('UserID' => $UserIDs), 'DateLastActive', 'desc');
+      return $Data;
    }
 
    public function GetApplicantCount() {

@@ -429,7 +429,8 @@ class Gdn_Session {
       if (!$ForceValid && $ValidateUser && $this->UserID <= 0)
          return FALSE;
       
-      return $ForceValid || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE);
+      // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
+      return ($ForceValid && Gdn::Request()->IsPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE);
    }
 	
 	/**

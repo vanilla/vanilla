@@ -756,12 +756,6 @@ class EntryController extends Gdn_Controller {
             if (!$User) {
                $this->Form->AddError('@'.sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))));
             } else {
-               $ClientHour = $this->Form->GetFormValue('ClientHour');
-               $HourOffset = Gdn::Session()->User->HourOffset;
-               if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
-                  $HourOffset = $ClientHour - date('G', time());
-               }
-
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
                $Password = $this->Form->GetFormValue('Password');
@@ -786,6 +780,12 @@ class EntryController extends Gdn_Controller {
                      $this->Form->AddError('ErrorPermission');
                      Gdn::Session()->End();
                   } else {
+                     $ClientHour = $this->Form->GetFormValue('ClientHour');
+                     $HourOffset = Gdn::Session()->User->HourOffset;
+                     if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
+                        $HourOffset = $ClientHour - date('G', time());
+                     }
+                     
                      if ($HourOffset != Gdn::Session()->User->HourOffset) {
                         Gdn::UserModel()->SetProperty(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
                      }

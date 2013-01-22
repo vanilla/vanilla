@@ -735,7 +735,7 @@ body { background: transparent !important; }
          $this->Title($this->Discussion->Name);
 
          // Actual number of comments, excluding the discussion itself
-         $ActualResponses = $this->Discussion->CountComments - 1;
+         $ActualResponses = $this->Discussion->CountComments;
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
             $Limit = C('Garden.Embed.CommentsPerPage', 30);

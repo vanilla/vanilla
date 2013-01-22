@@ -50,7 +50,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 		<div class="Wrap">
          <span class="Options">
             <?php
-            echo OptionsList($Discussion);
+            WriteDiscussionOptions($Discussion);
             echo BookmarkButton($Discussion);
             ?>
          </span>

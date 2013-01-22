@@ -5,7 +5,7 @@ $Discussion = $this->Data('Discussion');
 $Author = Gdn::UserModel()->GetID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
 
 // Prep event args
-$CssClass = CssClass($Discussion);
+$CssClass = CssClass($Discussion, FALSE);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
 $this->EventArguments['CssClass'] = &$CssClass;

@@ -334,11 +334,11 @@ class EntryController extends Gdn_Controller {
       $UserID = GetValue('UserID', $Auth);
       
       // Check to synchronise roles upon connecting.
-      if (C('Garden.SSO.SynchRoles')) {
+      if (($this->Data('Trusted') || C('Garden.SSO.SynchRoles')) && $this->Form->GetFormValue('Roles', NULL) !== NULL) {
          $SaveRoles = TRUE;
          
          // Translate the role names to IDs.
-         $Roles = $this->Form->GetFormValue('Roles');
+         $Roles = $this->Form->GetFormValue('Roles', NULL);
          $Roles = RoleModel::GetByName($Roles);
          $RoleIDs = array_keys($Roles);
          
@@ -377,6 +377,7 @@ class EntryController extends Gdn_Controller {
 
          // Sign the user in.
          Gdn::Session()->Start($UserID, TRUE, TRUE);
+         Gdn::UserModel()->FireEvent('AfterSignIn');
 //         $this->_SetRedirect(TRUE);
          $this->_SetRedirect($this->Request->Get('display') == 'popup');
       } elseif ($this->Form->GetFormValue('Name') || $this->Form->GetFormValue('Email')) {
@@ -429,6 +430,7 @@ class EntryController extends Gdn_Controller {
                   
                   // Sign the user in.
                   Gdn::Session()->Start($UserID, TRUE, TRUE);
+                  Gdn::UserModel()->FireEvent('AfterSignIn');
          //         $this->_SetRedirect(TRUE);
                   $this->_SetRedirect($this->Request->Get('display') == 'popup');
                   $this->Render();
@@ -502,6 +504,7 @@ class EntryController extends Gdn_Controller {
                $this->Form->SetFormValue('UserID', $UserID);
 
                Gdn::Session()->Start($UserID, TRUE, TRUE);
+               Gdn::UserModel()->FireEvent('AfterSignIn');
 
                // Send the welcome email.
                if (C('Garden.Registration.SendConnectEmail', TRUE)) {
@@ -604,6 +607,7 @@ class EntryController extends Gdn_Controller {
 
             // Sign the appropriate user in.
             Gdn::Session()->Start($this->Form->GetFormValue('UserID', TRUE, TRUE));
+            Gdn::UserModel()->FireEvent('AfterSignIn');
             $this->_SetRedirect(TRUE);
          }
       }

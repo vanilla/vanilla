@@ -683,13 +683,12 @@ class DiscussionController extends VanillaController {
       $this->AddDefinition('Embedded', TRUE);
       $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
       $this->Theme = C('Garden.CommentsTheme', $this->Theme);
+      Gdn_Theme::Section('Comments');
 
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)
          $this->Head->AddString('<style type="text/css">
 body { background: transparent !important; }
-ul.MessageList li.Item { background: #fff; }
-ul.MessageList li.Item.Mine { background: #E3F4FF; }
 </style>');
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.gardenmorepager.js');
@@ -708,7 +707,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       if (strlen($vanilla_identifier) > 32) {
          $vanilla_identifier = md5($vanilla_identifier);
       }
-      $vanilla_type = GetIncomingValue('vanilla_type', 'blog');
+      $vanilla_type = GetIncomingValue('vanilla_type', 'page');
       $vanilla_url = GetIncomingValue('vanilla_url', '');
       $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
       $ForeignSource = array(
@@ -794,6 +793,11 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $this->Form->AddHidden('CommentID', '');
       $this->Form->AddHidden('Embedded', 'true'); // Tell the post controller that this is an embedded page (in case there are custom views it needs to pick up from a theme).
       $this->Form->AddHidden('DisplayNewCommentOnly', 'true'); // Only load/display the new comment after posting (don't load all new comments since the page last loaded).
+      
+      if ($this->Request->Get('title')) {
+         $this->Form->SetValue('Name', $this->Request->Get('title'));
+      }
+      
       if ($Discussion) {
          $this->Form->AddHidden('DiscussionID', $Discussion->DiscussionID);
       }
@@ -865,7 +869,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          throw new Gdn_UserException(T("This discussion isn't associated with a url."));
       }
       
-      $Stub = $this->DiscussionModel->FetchPageInfo($ForeignUrl);
+      $Stub = $this->DiscussionModel->FetchPageInfo($ForeignUrl, TRUE);
 //      decho($Stub);
 //      die();
       

@@ -200,6 +200,8 @@ class AssetModel extends Gdn_Model {
             $this->AddCssFile('customadmin.css', FALSE, array('Sort' => 10));
             break;
       }
+		
+      $this->FireEvent('AfterGetCssFiles');
       
       // Hunt the css files down.
       if ($Pathify) {

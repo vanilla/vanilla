@@ -42,6 +42,8 @@ class Gdn_PasswordHash extends PasswordHash {
                return crypt($Password, $Salt) == $Hash;
             case 'md5':
                return md5($Salt.$Password) == $Hash;
+            case 'sha256':
+               return hash('sha256', $Salt.$Password) == $Hash;
             case 'sha1':
             default:
                return sha1($Salt.$Password) == $Hash;

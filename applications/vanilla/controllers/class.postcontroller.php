@@ -392,11 +392,16 @@ class PostController extends VanillaController {
             $vanilla_category_id = $Category['CategoryID'];
          }
          
-         $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+         $EmbedUserID = C('Garden.Embed.UserID');
+         if ($EmbedUserID)
+            $EmbedUser = Gdn::UserModel()->GetID($EmbedUserID);
+         if (!$EmbedUserID || !$EmbedUser)
+            $EmbedUserID = Gdn::UserModel()->GetSystemUserID();
+         
          $EmbeddedDiscussionData = array(
-            'InsertUserID' => $SystemUserID,
+            'InsertUserID' => $EmbedUserID,
             'DateInserted' => Gdn_Format::ToDateTime(),
-            'UpdateUserID' => $SystemUserID,
+            'UpdateUserID' => $EmbedUserID,
             'DateUpdated' => Gdn_Format::ToDateTime(),
             'CategoryID' => $vanilla_category_id,
             'ForeignID' => $vanilla_identifier,

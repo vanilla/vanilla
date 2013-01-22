@@ -152,13 +152,13 @@ class Gdn_Validation {
 
             // Force other constraints based on field type.
             switch($Properties->Type) {
-               case 'tinyint':
                case 'bit':
                case 'bool':
                case 'boolean':
                   $RuleNames[] = 'Boolean';
                   break;
 
+               case 'tinyint':
                case 'smallint':
                case 'mediumint':
                case 'int':

@@ -430,7 +430,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $DiscussionModel = new DiscussionModel();
       $Discussions = $DiscussionModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
       $CountDiscussions = $Offset + $DiscussionModel->LastDiscussionCount + 1;
-      $Sender->DiscussionData = $Discussions;
+      $Sender->DiscussionData = $Sender->SetData('Discussions', $Discussions);
       
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();

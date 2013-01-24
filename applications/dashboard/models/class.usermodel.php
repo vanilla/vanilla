@@ -238,6 +238,7 @@ class UserModel extends Gdn_Model {
       
       $String = $Parts[0];
       $Data = json_decode(base64_decode($String), TRUE);
+      Trace($Data, 'RAW SSO Data');
       $Errors = 0;
       
       if (!isset($Parts[1])) {
@@ -274,9 +275,6 @@ class UserModel extends Gdn_Model {
          case 'hmacsha1':
             $CalcSignature = hash_hmac('sha1', "$String $Timestamp", $Secret);
             break;
-         case 'md5':
-            $CalcSignature = md5("$String $Timestamp".$Secret);
-            break;
          default:
             Trace("Invalid SSO hash method $HashMethod.", TRACE_ERROR);
             return;
@@ -287,7 +285,12 @@ class UserModel extends Gdn_Model {
       }
       
       $UniqueID = $Data['uniqueid'];
-      $User = ArrayTranslate($Data, array('name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo'));
+      $User = ArrayTranslate($Data, array(
+         'name' => 'Name', 
+         'email' => 'Email',
+         'photourl' => 'Photo',
+         'uniqueid' => NULL,
+         'client_id' => NULL), TRUE);
       
       Trace($User, 'SSO User');
       

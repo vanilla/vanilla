@@ -173,9 +173,10 @@ if (!function_exists('ArrayTranslate')) {
     *
     * @param array $Array The input array to translate.
     * @param array $Mappings The mappings to translate the array.
+    * @param bool $AddRemaining Whether or not to add the remaining items to the array.
     * @return array
     */
-   function ArrayTranslate($Array, $Mappings) {
+   function ArrayTranslate($Array, $Mappings, $AddRemaining = FALSE) {
       $Array = (array)$Array;
       $Result = array();
       foreach ($Mappings as $Index => $Value) {
@@ -186,11 +187,26 @@ if (!function_exists('ArrayTranslate')) {
             $Key = $Index;
             $NewKey = $Value;
          }
-         if (isset($Array[$Key]))
+         if ($NewKey === NULL) {
+            unset($Array[$Key]);
+            continue;
+         }
+         
+         if (isset($Array[$Key])) {
             $Result[$NewKey] = $Array[$Key];
-         else
+            unset($Array[$Key]);
+         } else {
             $Result[$NewKey] = NULL;
+         }
       }
+      
+      if ($AddRemaining) {
+         foreach ($Array as $Key => $Value) {
+            if (!isset($Result[$Key]))
+               $Result[$Key] = $Value;
+         }
+      }
+      
       return $Result;
    }
 }

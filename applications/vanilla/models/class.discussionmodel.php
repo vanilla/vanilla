@@ -1678,6 +1678,7 @@ class DiscussionModel extends VanillaModel {
          
          $CategoryModel = new CategoryModel();
          $CategoryModel->SetField($CategoryID, $CacheAmendment);
+         $CategoryModel->SetRecentPost($CategoryID);
       }
    }
 	

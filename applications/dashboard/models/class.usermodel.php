@@ -3216,7 +3216,8 @@ class UserModel extends Gdn_Model {
    }
    
    public function ClearPermissions() {
-      $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
+      if (!Gdn::Cache()->ActiveEnabled())
+         $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
       
       $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
       $PermissionsIncrement = $this->GetPermissionsIncrement();

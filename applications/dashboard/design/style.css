@@ -3429,7 +3429,6 @@ body.embed .InformMessages {
 
 .PhotoGrid .UserPicture {
    display: inline-block;
-   min-width: 175px;
 }
 
 .PhotoGrid .UserPicture * {

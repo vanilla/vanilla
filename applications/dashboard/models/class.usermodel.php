@@ -587,7 +587,6 @@ class UserModel extends Gdn_Model {
    }
 
    public function DefinePermissions($UserID, $Serialize = TRUE) {
-      
       if (Gdn::Cache()->ActiveEnabled()) {
          $PermissionsIncrement = $this->GetPermissionsIncrement();
          $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array(
@@ -1019,7 +1018,7 @@ class UserModel extends Gdn_Model {
       //   ->Get()
       //   ->FirstRow();
 
-      if ($User && $User->Permissions == '')
+      if ($User && ($User->Permissions == '' || Gdn::Cache()->ActiveEnabled()))
          $User->Permissions = $this->DefinePermissions($UserID);
       
       // Remove secret info from session

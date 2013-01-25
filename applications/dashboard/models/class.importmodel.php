@@ -1616,6 +1616,10 @@ class ImportModel extends Gdn_Model {
             set a.ActivityTypeID = t.ActivityTypeID";
       }
 
+      if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
+         $Sqls['Tag.CoundDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
+      }
+      
       $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
       $Sqls['Category.CountComments'] = $this->GetCountSQL('sum', 'Category', 'Discussion', 'CountComments', 'CountComments');
       if (!$this->ImportExists('Category', 'PermissionCategoryID')) {

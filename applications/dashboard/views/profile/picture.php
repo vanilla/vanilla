@@ -10,7 +10,7 @@ $RemotePhoto = IsUrl($this->User->Photo, 0, 7);
 // Define the current profile picture
 $Picture = '';
 if ($this->User->Photo != '') {
-   if (StringBeginsWith($this->User->Photo, 'http'))
+   if (IsUrl($this->User->Photo))
       $Picture = Img($this->User->Photo, array('class' => 'ProfilePhotoLarge'));
    else
       $Picture = Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
@@ -23,7 +23,7 @@ if (!$Thumbnail && function_exists('UserPhotoDefaultUrl'))
 
 if ($Thumbnail && !IsUrl($Thumbnail))
    $Thumbnail = Gdn_Upload::Url(ChangeBasename($Thumbnail, 'n%s'));
-         
+
 $Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));
 ?>
 <div class="SmallPopup">

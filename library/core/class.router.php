@@ -66,9 +66,12 @@ class Gdn_Router extends Gdn_Pluggable {
    /**
     * Update or add a route to the config table
     * 
-    * @return void
+    * @param string $Route
+    * @param string $Destination
+    * @param string $Type
+    * @param bool $Save Optional. Save this to the config or just in memory?
     */
-   public function SetRoute($Route, $Destination, $Type) {
+   public function SetRoute($Route, $Destination, $Type, $Save = TRUE) {
       $Key = $this->_EncodeRouteKey($Route);
       SaveToConfig('Routes.'.$Key, array($Destination, $Type));
       $this->_LoadRoutes();

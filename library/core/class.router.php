@@ -73,7 +73,7 @@ class Gdn_Router extends Gdn_Pluggable {
     */
    public function SetRoute($Route, $Destination, $Type, $Save = TRUE) {
       $Key = $this->_EncodeRouteKey($Route);
-      SaveToConfig('Routes.'.$Key, array($Destination, $Type));
+      SaveToConfig('Routes.'.$Key, array($Destination, $Type), $Save);
       $this->_LoadRoutes();
    }
    

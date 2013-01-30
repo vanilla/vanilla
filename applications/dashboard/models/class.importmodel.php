@@ -1427,6 +1427,44 @@ class ImportModel extends Gdn_Model {
       file_put_contents(PATH_UPLOADS.'/'.$SQLPath, $Queries, FILE_APPEND | LOCK_EX);
    }
    
+   /**
+    * Set the category permissions based on the permission table.
+    */
+   public function SetCategoryPermissionIDs() {
+      // First build a list of category
+      $Permissions = $this->SQL->GetWhere('Permission', array('JunctionColumn' => 'PermissionCategoryID', 'JunctionID >' => 0))->ResultArray();
+      $CategoryIDs = array();
+      foreach ($Permissions as $Row) {
+         $CategoryIDs[$Row['JunctionID']] = $Row['JunctionID'];
+      }
+      
+      // Update all of the child categories.
+      $Root = CategoryModel::Categories(-1);
+      $this->_SetCategoryPermissionIDs($Root, $Root['CategoryID'], $CategoryIDs);
+   }
+   
+   protected function _SetCategoryPermissionIDs($Category, $PermissionID, $IDs) {
+      static $CategoryModel;
+      if (!isset($CategoryModel))
+         $CategoryModel = new CategoryModel();
+      
+      $CategoryID = $Category['CategoryID'];
+      if (isset($IDs[$CategoryID])) {
+         $PermissionID = $CategoryID;
+      }
+      
+      if ($Category['PermissionCategoryID'] != $PermissionID) {
+         $CategoryModel->SetField($CategoryID, 'PermissionCategoryID', $PermissionID);
+      }
+      
+      $ChildIDs = GetValue('ChildIDs', $Category, array());
+      foreach ($ChildIDs as $ChildID) {
+         $ChildCategory = CategoryModel::Categories($ChildID);
+         if ($ChildCategory)
+            $this->_SetCategoryPermissionIDs($ChildCategory, $PermissionID, $IDs);
+      }
+   }
+   
    public function SetRoleDefaults() {
       if (!$this->ImportExists('Role', 'RoleID'))
          return;
@@ -1760,6 +1798,7 @@ class ImportModel extends Gdn_Model {
       // Rebuild the category tree.
       $CategoryModel = new CategoryModel();
       $CategoryModel->RebuildTree();
+      $this->SetCategoryPermissionIDs();
 
       return TRUE;
 	}

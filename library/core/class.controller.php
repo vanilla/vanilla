@@ -1531,7 +1531,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       @@ob_clean();
       
 
-      if ($Code >= 100 && $Code <= 505)
+      if ($Code >= 400 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);
       else
          header('HTTP/1.0 500', TRUE, 500);

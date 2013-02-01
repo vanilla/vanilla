@@ -480,5 +480,19 @@ function PermissionException($Permission = NULL) {
       $Message = T(
          "PermissionRequired.$Permission",
          sprintf(T('You need the %s permission to do that.'), $Permission));
-   return new Gdn_UserException($Message, 401);
+   return new Gdn_UserException($Message, 403);
+}
+
+/**
+ * Create a new permission exception. This is a convenience function that will create an exception with a standard message.
+ *
+ * @param string|null $Permission The name of the permission that was required.
+ * @return Exception
+ */
+function ForbiddenException($Resource = NULL) {
+   if (!$Permission)
+      $Message = T('ForbiddenErrorMessage', "You are not allowed to do that.");
+   else
+      $Message = sprintf(T('You are not allowed to %s.'), $Resource);
+   return new Gdn_UserException($Message, 403);
 }

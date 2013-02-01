@@ -2456,6 +2456,25 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    color: #555;
 }
 
+.StructuredForm {
+   padding-top: 5px;
+}
+.StructuredForm label {
+   font-weight: bold;
+   font-size: 14px;
+}
+
+.StructuredForm .P {
+   margin: 15px 0;
+}
+
+.StructuredForm label.RadioLabel,
+.StructuredForm label.CheckBoxLabel
+{
+   font-size: 100%;
+   font-weight: normal;
+}
+
 .List.Inline * {
    line-height: 16px;
 }

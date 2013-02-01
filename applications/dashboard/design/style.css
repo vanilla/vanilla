@@ -2436,6 +2436,9 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    margin: 0;
    padding: 13px 20px;
 }
+label.B {
+   font-weight: bold;
+}
 .FormWrapper-Condensed {
    padding: 5px;
 }

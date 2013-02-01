@@ -5,7 +5,7 @@ echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 <ul>
-   <li>
+   <li class="User-Name">
       <?php
          echo $this->Form->Label('Username', 'Name');
          $Attributes = array();
@@ -18,7 +18,7 @@ echo $this->Form->Errors();
    </li>
    
    <?php if (!UserModel::NoEmail() || Gdn::Session()->CheckPermission('Garden.Users.Edit')): ?>
-   <li>
+   <li class="User-Email">
       <?php
          echo $this->Form->Label('Email', 'Email');
          
@@ -35,14 +35,14 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Email', $Attributes2);
       ?>
    </li>
-   <li>
+   <li class="User-ShowEmail">
       <?php
          echo $this->Form->CheckBox('ShowEmail', T('Allow other members to see your email?'), array('value' => '1'));
       ?>
    </li>
    <?php endif ?>
    
-   <li class="Gender">
+   <li class="Gender User-Gender">
       <?php
          echo $this->Form->Label('Gender', 'Gender');
          echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))

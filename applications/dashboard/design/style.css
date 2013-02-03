@@ -421,6 +421,11 @@ div.FileUpload .CurrentImage {
     margin-top: 1px;
     z-index: 100;
 }
+
+.ButtonGroup.DropRight .Dropdown {
+   right: 0;
+   left: auto;
+}
 #Panel .ButtonGroup .Dropdown {
    right: 0;
 }

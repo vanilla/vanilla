@@ -1910,9 +1910,12 @@ class Gdn_Form extends Gdn_Pluggable {
     * @param string $FieldName The name of the field to set the value of.
     * @param mixed $Value The new value of $FieldName.
     */
-   public function SetFormValue($FieldName, $Value) {
+   public function SetFormValue($FieldName, $Value = NULL) {
       $this->FormValues();
-      $this->_FormValues[$FieldName] = $Value;
+      if (is_array($FieldName))
+         $this->_FormValues = array_merge($this->_FormValues, $FieldName);
+      else
+         $this->_FormValues[$FieldName] = $Value;
    }
 
    /**

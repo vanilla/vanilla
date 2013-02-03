@@ -2639,12 +2639,13 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    color: #555;
 }
 
-.StructuredForm {
+.FormWrapper.StructuredForm {
    padding-top: 5px;
 }
 .StructuredForm label {
    font-weight: bold;
    font-size: 14px;
+   display: block;
 }
 
 .StructuredForm .P {
@@ -2652,7 +2653,8 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
 }
 
 .StructuredForm label.RadioLabel,
-.StructuredForm label.CheckBoxLabel
+.StructuredForm label.CheckBoxLabel,
+.StructuredForm label.Unstyled
 {
    font-size: 100%;
    font-weight: normal;

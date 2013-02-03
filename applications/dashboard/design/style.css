@@ -432,6 +432,13 @@ select {
    color: #111;
    border-color: #666;
 }
+
+div.FileUpload .CurrentImage {
+   display: block;
+   margin: 5px 0;
+   max-width: 100%;
+}
+
 .NavLabel {
    font-weight: bold;
    margin-right: 4px;

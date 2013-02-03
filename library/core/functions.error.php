@@ -490,7 +490,7 @@ function PermissionException($Permission = NULL) {
  * @return Exception
  */
 function ForbiddenException($Resource = NULL) {
-   if (!$Permission)
+   if (!$Resource)
       $Message = T('ForbiddenErrorMessage', "You are not allowed to do that.");
    else
       $Message = sprintf(T('You are not allowed to %s.'), $Resource);

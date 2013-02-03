@@ -476,6 +476,8 @@ function PermissionException($Permission = NULL) {
       $Message = T('PermissionErrorMessage', "You don't have permission to do that.");
    elseif ($Permission == 'Banned')
       $Message = T("You've been banned.");
+   elseif (StringBeginsWith($Permission, '@'))
+      $Message = StringBeginsWith($Permission, '@', TRUE, TRUE);
    else
       $Message = T(
          "PermissionRequired.$Permission",

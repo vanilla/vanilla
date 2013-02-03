@@ -44,6 +44,7 @@ jQuery(document).ready(function($) {
    // Convert date fields to datepickers
    if ($.fn.datepicker) {
       $('input.DatePicker').datepicker({
+         showOn: "focus",
          dateFormat: 'mm/dd/yy'
       });
    }

@@ -1536,7 +1536,8 @@ overflow: hidden;
 .Empty {
    margin: 10px 0;
 }
-.DataList .Item {
+.DataList .Item,
+.NarrowList .Item {
    margin: 0;
    padding: 8px;
    border: 0px solid #ddd;

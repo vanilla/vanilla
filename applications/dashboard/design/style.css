@@ -72,6 +72,9 @@ body.Vanilla.Post #Content {
 body.NoPanel #Content {
    margin: auto;
 }
+body.NarrowForm #Content {
+   max-width: 700px;
+}
 body.Entry #Content {
    float: none;
    margin: 0 auto;

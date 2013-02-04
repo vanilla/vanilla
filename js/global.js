@@ -63,6 +63,14 @@ jQuery(document).ready(function($) {
       return false;
    });
    
+   // Convert date fields to datepickers
+   if ($.fn.datepicker) {
+      $('input.DatePicker').datepicker({
+         showOn: "focus",
+         dateFormat: 'mm/dd/yy'
+      });
+   }
+   
    // Reveal youtube player when preview clicked.
    function Youtube(Container) {
       var $preview = Container.find('.VideoPreview');

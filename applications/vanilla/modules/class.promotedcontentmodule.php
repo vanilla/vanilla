@@ -280,16 +280,14 @@ class PromotedContentModule extends Gdn_Module {
          // Get matching Discussions
          $Discussions = Gdn::SQL()->Select('d.*')
             ->From('Discussion d')
-            ->WhereIn('d.InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
+            ->OrderBy('Score', 'DESC')
             ->Limit($this->Limit)
             ->Get()->Result(DATASET_TYPE_ARRAY);
 
          // Get matching Comments
          $Comments = Gdn::SQL()->Select('c.*')
             ->From('Comment c')
-            ->WhereIn('InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
+            ->OrderBy('Score', 'DESC')
             ->Limit($this->Limit)
             ->Get()->Result(DATASET_TYPE_ARRAY);
          

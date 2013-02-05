@@ -268,8 +268,14 @@ class PromotedContentModule extends Gdn_Module {
     * @return boolean
     */
    protected function SelectByScore($Parameters) {
-      //$RankID = GetValue('RankID', $Parameters, NULL);
-      //if (!$RankID) return FALSE;
+      if (!is_array($Parameters)) {
+         $MinScore = $Parameters;
+      } else {
+         $MinScore = GetValue('Score', $Parameters, NULL);
+      }
+      
+      if (!is_integer($MinScore))
+         $MinScore = FALSE;
       
       // Check cache
       $SelectorScoreCacheKey = "modules.promotedcontent.score.{$Score}";
@@ -280,16 +286,19 @@ class PromotedContentModule extends Gdn_Module {
          // Get matching Discussions
          $Discussions = Gdn::SQL()->Select('d.*')
             ->From('Discussion d')
+            ->Where('Score >', $MinScore)
             ->OrderBy('Score', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+            ->Limit($this->Limit);
+         if ($MinScore !== FALSE) $Discussions->Where('Score >', $MinScore);
+         $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
 
          // Get matching Comments
          $Comments = Gdn::SQL()->Select('c.*')
             ->From('Comment c')
             ->OrderBy('Score', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+            ->Limit($this->Limit);
+         if ($MinScore !== FALSE) $Comments->Where('Score >', $MinScore);
+         $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
          
          $this->JoinCategory($Comments);
          

@@ -436,6 +436,10 @@ select {
    border-color: #666;
 }
 
+.Button.Disabled {
+   opacity: .5;
+}
+
 div.FileUpload .CurrentImage {
    display: block;
    margin: 5px 0;
@@ -1349,7 +1353,8 @@ overflow: hidden;
 
 
 #Panel .FilterMenu .Aside,
-.PanelInfo .Aside {
+.PanelInfo .Aside,
+.Item .Aside {
    float: right;
 }
 .PanelInfo .Heading {

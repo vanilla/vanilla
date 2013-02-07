@@ -784,6 +784,9 @@ div.Warning {
 .Pager .Highlight {
 	color: #000;
 }
+.MoreWrap {
+   float: right;
+}
 
 .PagerNub {
     overflow: hidden;
@@ -3630,7 +3633,7 @@ body.embed .InformMessages {
 	width: 200px;
 }
 .PhotoGrid {
-   line-height: 1;
+   line-height: 32px;
    margin: 2px -2px;
 }
 .PhotoGrid img {
@@ -3640,7 +3643,7 @@ body.embed .InformMessages {
    width: 32px;
 }
 .PhotoGridSmall {
-   line-height: 1;
+   line-height: 24px;
    margin: 1px -1px;
 }
 .PhotoGridSmall img {

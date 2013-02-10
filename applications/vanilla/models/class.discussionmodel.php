@@ -1503,6 +1503,10 @@ class DiscussionModel extends VanillaModel {
                   $ActivityModel->Queue($Activity, 'Mention');
                }
                
+                //record activity
+				  
+				  $this->RecordActivity($Session->UserID, $DiscussionID, $DiscussionName);
+				  
                // Notify everyone that has advanced notifications.
                try {
                   $Fields['DiscussionID'] = $DiscussionID;
@@ -1934,6 +1938,39 @@ class DiscussionModel extends VanillaModel {
          
       return $Data !== FALSE ? $Data->Count : 0;
    }
+   
+   
+   /**
+	 * Records an activity. Update forum records for the user
+	 * 
+	 * Events: RecordActivity.
+	 *
+	 * 
+	 * **/
+   	public function RecordActivity($UserID, $DiscussionID, $DiscussionName) {
+      // Report that the discussion was created
+      AddActivity(
+         $UserID,
+         'NewDiscussion',
+         Anchor(Gdn_Format::Text($DiscussionName), 'discussion/'.$DiscussionID.'/'.Gdn_Format::Url($DiscussionName))
+      );
+      
+      // Get the user's discussion count
+      $Data = $this->SQL
+         ->Select('DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion')
+         ->Where('InsertUserID', $UserID)
+         ->Get();
+      
+      // Save the count to the user table
+      $this->SQL
+         ->Update('User')
+         ->Set('CountDiscussions', $Data->NumRows() > 0 ? $Data->FirstRow()->CountDiscussions : 0)
+         ->Where('UserID', $UserID)
+         ->Put();
+   }
+   
+   
    
 	/**
 	 * Delete a discussion. Update and/or delete all related data.

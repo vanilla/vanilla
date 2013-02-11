@@ -436,6 +436,10 @@ select {
    border-color: #666;
 }
 
+.Button.Disabled {
+   opacity: .5;
+}
+
 div.FileUpload .CurrentImage {
    display: block;
    margin: 5px 0;
@@ -779,6 +783,9 @@ div.Warning {
 }
 .Pager .Highlight {
 	color: #000;
+}
+.MoreWrap {
+   float: right;
 }
 
 .PagerNub {
@@ -1349,7 +1356,8 @@ overflow: hidden;
 
 
 #Panel .FilterMenu .Aside,
-.PanelInfo .Aside {
+.PanelInfo .Aside,
+.Item .Aside {
    float: right;
 }
 .PanelInfo .Heading {
@@ -2624,6 +2632,9 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    margin: 0;
    padding: 13px 20px;
 }
+label.B {
+   font-weight: bold;
+}
 .FormWrapper-Condensed {
    padding: 5px;
 }
@@ -3623,7 +3634,7 @@ body.embed .InformMessages {
 	width: 200px;
 }
 .PhotoGrid {
-   line-height: 1;
+   line-height: 32px;
    margin: 2px -2px;
 }
 .PhotoGrid img {
@@ -3633,7 +3644,7 @@ body.embed .InformMessages {
    width: 32px;
 }
 .PhotoGridSmall {
-   line-height: 1;
+   line-height: 24px;
    margin: 1px -1px;
 }
 .PhotoGridSmall img {

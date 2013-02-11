@@ -50,7 +50,7 @@ abstract class VanillaModel extends Gdn_Model {
       
       // If spam checking is disabled or user is an admin, skip
       $SpamCheckEnabled = GetValue('SpamCheck', $this, TRUE);
-      if ($SpamCheckEnabled === FALSE || $Session->User->Admin) 
+      if ($SpamCheckEnabled === FALSE || $Session->User->Admin || $Session->CheckPermission('Garden.Moderation.Manage')) 
          return FALSE;
       
       $Spam = FALSE;

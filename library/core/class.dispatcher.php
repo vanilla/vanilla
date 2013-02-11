@@ -332,6 +332,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             
             try {
                $this->FireEvent('BeforeControllerMethod');
+               Gdn::PluginManager()->CallEventHandlers($Controller, $Controller->ControllerName, $ControllerMethod, 'Before');
+               
                call_user_func_array($Callback, $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
@@ -343,6 +345,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             
             try {
                $this->FireEvent('BeforeControllerMethod');
+               Gdn::PluginManager()->CallEventHandlers($Controller, $Controller->ControllerName, $ControllerMethod, 'Before');
+               
                call_user_func_array(array($Controller, $ControllerMethod), $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);

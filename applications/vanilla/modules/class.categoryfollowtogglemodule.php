@@ -33,7 +33,7 @@ class CategoryFollowToggleModule extends Gdn_Module {
    }
    
    public function AssetTarget() {
-      return 'Panel';
+      return NULL;
    }
 
    public function ToString() {

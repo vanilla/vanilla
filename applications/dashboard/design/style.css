@@ -1445,6 +1445,7 @@ overflow: hidden;
 	margin-bottom: 10px;
 }
 /* Category Depths */
+.CategoryFilterOptions .CurrentFilter { font-weight: bold; }
 .PanelCategories .Depth2 { padding-left: 8px; }
 .PanelCategories .Depth3 { padding-left: 12px; }
 .PanelCategories .Depth4 { padding-left: 16px; }

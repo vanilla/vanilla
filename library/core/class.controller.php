@@ -653,6 +653,11 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
          $this->_Definitions['SignedIn'] = $SignedIn;
       }
+      
+      if (Gdn::Session()->IsValid()) {
+         // Tell the client what our hour offset is so it can compare it to the user's real offset.
+         TouchValue('SetHourOffset', $this->_Definitions, Gdn::Session()->User->HourOffset);
+      }
 
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
          $this->_Definitions['ConfirmHeading'] = T('Confirm');

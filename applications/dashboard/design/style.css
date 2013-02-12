@@ -2690,6 +2690,10 @@ label.B {
    padding-right: 24px;
 }
 
+.List.Inline {
+   display: inline;
+}
+
 .List.Inline * {
    line-height: 16px;
 }

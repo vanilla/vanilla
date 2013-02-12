@@ -26,12 +26,22 @@ jQuery(document).ready(function($) {
       $('body').addClass('MSIE');
    }
    
-   var d = new Date();
-   var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getMinutes();
+   var d = new Date()
+   var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
 
    // Set the ClientHour if there is an input looking for it.
-   $('input:hidden[name$=ClientHour]').livequery(function() {
-      $(this).val(clientDate);
+   $('input:hidden[name$=HourOffset]').livequery(function() {
+      $(this).val(hourOffset);
+   });
+   
+   // Ajax/Save the ClientHour if it is different from the value in the db.
+   $('input:hidden[id$=SetHourOffset]').livequery(function() {
+      if (hourOffset != $(this).val()) {
+         $.post(
+            gdn.url('/utility/sethouroffset.json'),
+            { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
+         );
+      }
    });
    
    // Add "checked" class to item rows if checkboxes are checked within.
@@ -44,16 +54,6 @@ jQuery(document).ready(function($) {
    }
    $('.Item :checkbox').each(checkItems);
    $('.Item :checkbox').change(checkItems);
-
-   // Ajax/Save the ClientHour if it is different from the value in the db.
-   $('input:hidden[id$=SetClientHour]').livequery(function() {
-      if (d.getHours() != $(this).val()) {
-         $.get(
-            gdn.url('/utility/setclienthour'),
-            {'ClientDate': clientDate, 'TransientKey': gdn.definition('TransientKey'), 'DeliveryType': 'BOOL'}
-         );
-      }
-   });
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $(document).delegate('a.ForgotPassword', 'click', function() {

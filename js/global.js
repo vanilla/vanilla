@@ -37,8 +37,6 @@ jQuery(document).ready(function($) {
    // Ajax/Save the ClientHour if it is different from the value in the db.
    $('input:hidden[id$=SetHourOffset]').livequery(function() {
       if (hourOffset != $(this).val()) {
-         console.log("Setting hour offset to " + hourOffset);
-         
          $.post(
             gdn.url('/utility/sethouroffset.json'),
             { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }

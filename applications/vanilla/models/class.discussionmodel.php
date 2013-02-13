@@ -1413,12 +1413,6 @@ class DiscussionModel extends VanillaModel {
                if (!GetValue('Format', $Fields))
                   $Fields['Format'] = C('Garden.InputFormatter', '');
                
-               // Clear the cache if necessary.
-               if (GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements');
-                  $this->SQL->Cache($CacheKeys);
-               }
-               
                // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
             	if ($Spam)
@@ -1446,6 +1440,11 @@ class DiscussionModel extends VanillaModel {
                      'LastUrl' => DiscussionUrl($Fields)
                   );
                   CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
+                  
+                  // Clear the cache if necessary.
+                  if (GetValue('Announce', $Fields)) {
+                     Gdn::Cache()->Remove('Announcements');
+                  }
                }
                
                // Update the user's discussion count.

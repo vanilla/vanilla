@@ -234,6 +234,14 @@ window.Vanilla = Vanilla;
       if (Response) gdn.loaded(null);
       return Response;
    };
+   // Convert date fields to datepickers
+   if ($.fn.datepicker) {
+      $('input.DatePicker').datepicker({
+         showOn: "focus",
+         dateFormat: 'mm/dd/yy'
+      });
+   }
+   
    
    gdn.events = {};
    gdn.event = function( id ) {

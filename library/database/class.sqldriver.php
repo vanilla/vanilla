@@ -1294,7 +1294,7 @@ abstract class Gdn_SQLDriver {
    public function MapAliases($TableString) {
       // Make sure all tables have an alias.
       if(strpos($TableString, ' ') === FALSE) {
-         $TableString .= ' ' . $TableString;
+         $TableString .= " `$TableString`";
       }
       
       // Map the alias to the alias mapping array
@@ -1306,7 +1306,7 @@ abstract class Gdn_SQLDriver {
       $Alias = trim($Alias);
       if(strlen($Alias) == 0) {
          $Alias = $TableName;
-         $TableString .= ' ' . $Alias;
+         $TableString .= " `$Alias`";
       }
       
       //$this->_AliasMap[$Alias] = $TableName;

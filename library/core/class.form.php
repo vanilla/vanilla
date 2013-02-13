@@ -652,6 +652,26 @@ class Gdn_Form extends Gdn_Pluggable {
    }
    
    /**
+    * Returns the current image in a field.
+    * This is meant to be used with image uploads so that users can see the current value.
+    * 
+    * @param type $FieldName
+    * @param type $Attributes
+    * @since 2.1
+    */
+   public function CurrentImage($FieldName, $Attributes = array()) {
+      $Result = $this->Hidden($FieldName);
+      
+      $Value = $this->GetValue($FieldName);
+      if ($Value) {
+         TouchValue('class', $Attributes, 'CurrentImage');
+         $Result .= Img(Gdn_Upload::Url($Value), $Attributes);
+      }
+      
+      return $Result;
+   }
+   
+   /**
     * Returns XHTML for a standard date input control.
     *
     * @param string $FieldName The name of the field that is being displayed/posted with this input. It
@@ -1019,7 +1039,7 @@ class Gdn_Form extends Gdn_Pluggable {
       }
       return $Return == '' ? '' : '<table class="CheckBoxGrid">'.$Return.'</tbody></table>';
    }
-
+   
    /**
     * Returns XHTML for all hidden fields.
     *
@@ -1058,6 +1078,23 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ' />';
       return $Return;
+   }
+   
+   /**
+    * Return a control for uploading images.
+    * 
+    * @param string $FieldName
+    * @param array $Attributes
+    * @return string
+    * @since 2.1
+    */
+   public function ImageUpload($FieldName, $Attributes = array()) {
+      $Result = '<div class="FileUpload ImageUpload">'.
+         $this->CurrentImage($FieldName, $Attributes).
+         $this->Input($FieldName.'_New', 'file').
+         '</div>';
+      
+      return $Result;
    }
    
    /**
@@ -1910,9 +1947,12 @@ class Gdn_Form extends Gdn_Pluggable {
     * @param string $FieldName The name of the field to set the value of.
     * @param mixed $Value The new value of $FieldName.
     */
-   public function SetFormValue($FieldName, $Value) {
+   public function SetFormValue($FieldName, $Value = NULL) {
       $this->FormValues();
-      $this->_FormValues[$FieldName] = $Value;
+      if (is_array($FieldName))
+         $this->_FormValues = array_merge($this->_FormValues, $FieldName);
+      else
+         $this->_FormValues[$FieldName] = $Value;
    }
 
    /**

@@ -114,13 +114,13 @@ jQuery(document).ready(function($) {
             var processedTargets = false;
             // If there are targets, process them
             if (json.Targets && json.Targets.length > 0) {
-               for(i = 0; i < json.Targets.length; i++) {
-                  if (json.Targets[i].Type != "Ajax") {
-                     json.Targets[i].Data = json.Data;
-                     processedTargets = true;
-                     break;
-                   }
-               }
+//               for(i = 0; i < json.Targets.length; i++) {
+//                  if (json.Targets[i].Type != "Ajax") {
+//                     json.Targets[i].Data = json.Data;
+//                     processedTargets = true;
+//                     break;
+//                   }
+//               }
                gdn.processTargets(json.Targets);
             }
 

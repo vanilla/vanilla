@@ -122,11 +122,15 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     * @param $UserID integer UserID or array of UserIDs
     * @param $Key string relative user meta key
     * @param $Default optional default return value if key is not found
+    * @param $AutoUnfold optional Automatically return key item for single key queries
     * @return array results or $Default
     */
-   protected function GetUserMeta($UserID, $Key, $Default = NULL) {
+   protected function GetUserMeta($UserID, $Key, $Default = NULL, $AutoUnfold = FALSE) {
       $MetaKey = $this->MakeMetaKey($Key);
-      return $this->UserMetaModel()->GetUserMeta($UserID, $MetaKey, $Default);
+      $R = $this->UserMetaModel()->GetUserMeta($UserID, $MetaKey, $Default);
+      if ($AutoUnfold)
+         $R = GetValue($MetaKey, $R);
+      return $R;
    }
    
    /**

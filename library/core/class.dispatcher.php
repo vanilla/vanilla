@@ -349,8 +349,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                exit();
             }
          } else {
-            Gdn::Request()->WithRoute('Default404');
-            return $this->Dispatch();
+            $this->EventArguments['Handled'] = FALSE;
+            $Handled =& $this->EventArguments['Handled'];
+            $this->FireEvent('NotFound');
+            
+            if (!$Handled) {
+               Gdn::Request()->WithRoute('Default404');
+               return $this->Dispatch();
+            } else {
+               return $Handled;
+            }
          }
       }
    }
@@ -540,9 +548,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
          return TRUE;
       } catch (GdnDispatcherControllerNotFoundException $e) {
-         header("HTTP/1.1 404 Not Found");
-         $Request->WithRoute('Default404');
-         return $this->AnalyzeRequest($Request);
+         $this->EventArguments['Handled'] = FALSE;
+         $Handled =& $this->EventArguments['Handled'];
+         $this->FireEvent('NotFound');
+         
+         if (!$Handled) {
+            header("HTTP/1.1 404 Not Found");
+            $Request->WithRoute('Default404');
+            return $this->AnalyzeRequest($Request);
+         }
       }
    }
 

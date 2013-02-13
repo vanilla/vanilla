@@ -13,6 +13,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class DiscussionFilterModule extends Gdn_Module {
    
+   public function __construct($Sender) {
+      parent::__construct($Sender, 'Vanilla');
+   }
+   
    public function AssetTarget() {
       return 'Panel';
    }

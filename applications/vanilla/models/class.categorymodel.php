@@ -146,7 +146,7 @@ class CategoryModel extends Gdn_Model {
 		foreach ($Data as &$Category) {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
          $Category['CountAllComments'] = $Category['CountComments'];
-         $Category['Url'] = CategoryUrl($Category, FALSE, '//');
+         $Category['Url'] = self::CategoryUrl($Category, FALSE, '//');
          $Category['ChildIDs'] = array();
          
          if (!GetValue('CssClass', $Category))
@@ -1486,5 +1486,19 @@ class CategoryModel extends Gdn_Model {
          }
 		}
 	}
+   
+   public static function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+      if (function_exists('CategoryUrl')) return CategoryUrl($Category, $Page, $WithDomain);
+      
+      if (is_string($Category))
+         $Category = CategoryModel::Categories($Category);
+      $Category = (array)$Category;
+
+      $Result = '/categories/'.rawurlencode($Category['UrlCode']);
+      if ($Page && $Page > 1) {
+            $Result .= '/p'.$Page;
+      }
+      return Url($Result, $WithDomain);
+   }
 
 }

@@ -384,7 +384,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset,
          $Limit,
          $TotalRecords,
-         UserUrl($Sender->User, '', 'comments').'/{Page}' //?lid='.$CommentModel->LastCommentID
+         UserUrl($Sender->User, '', 'comments').'?page={Page}' //?lid='.$CommentModel->LastCommentID
       );
       
       // Deliver JSON data if necessary

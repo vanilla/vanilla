@@ -266,7 +266,6 @@ class ConversationMessageModel extends Gdn_Model {
             ->Where('ConversationID', $ConversationID)
             ->Get()->Result(DATASET_TYPE_ARRAY);
          
-         $this->EventArguments['Recipients'] = $UserData;
          $UpdateCountUserIDs = array();
          $NotifyUserIDs = array();
          

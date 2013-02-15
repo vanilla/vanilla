@@ -266,6 +266,7 @@ class ConversationMessageModel extends Gdn_Model {
             ->Where('ConversationID', $ConversationID)
             ->Get()->Result(DATASET_TYPE_ARRAY);
          
+         $this->EventArguments['Recipients'] = $UserData;
          $UpdateCountUserIDs = array();
          $NotifyUserIDs = array();
          
@@ -306,6 +307,8 @@ class ConversationMessageModel extends Gdn_Model {
             $ConversationModel = new ConversationModel();
             $ConversationModel->UpdateUserUnreadCount($UpdateCountUserIDs, TRUE);
          }
+         
+         $this->FireEvent('AfterAdd');
 
          $ActivityModel = new ActivityModel();
          foreach ($NotifyUserIDs as $NotifyUserID) {

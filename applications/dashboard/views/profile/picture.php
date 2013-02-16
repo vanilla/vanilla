@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-         
+
 // Check that we have the necessary tools to allow image uploading
 $AllowImages = Gdn_UploadImage::CanUploadImages();
 

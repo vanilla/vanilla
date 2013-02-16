@@ -31,70 +31,70 @@ class InvitationModel extends Gdn_Model {
          ->Get();
       return $DataSet->FirstRow();
    }
-   
+
    public function GetByUserID($UserID, $InvitationID = '') {
       $this->SQL->Select('i.*')
          ->Select('u.Name', '', 'AcceptedName')
          ->From('Invitation i')
          ->Join('User u', 'i.AcceptedUserID = u.UserID', 'left')
          ->Where('i.InsertUserID', $UserID);
-         
+
       if (is_numeric($InvitationID))
          $this->SQL->Where('Invitation.InvitationID', $InvitationID);
-         
+
       return $this->SQL->Get();
    }
-   
+
    public function Save($FormPostValues, $UserModel) {
       $Session = Gdn::Session();
       $UserID = $Session->UserID;
-      
+
       // Define the primary key in this model's table.
       $this->DefineSchema();
-      
-      // Add & apply any extra validation rules:      
+
+      // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Email', 'Email');
-      
+
       // Make sure required db fields are present
       $this->AddInsertFields($FormPostValues);
       $FormPostValues['Code'] = $this->GetInvitationCode();
-      
+
       // Validate the form posted values
       if ($this->Validate($FormPostValues, TRUE) === TRUE) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated
          $Email = ArrayValue('Email', $Fields, '');
-         
+
          // Make sure this user has a spare invitation to send.
          $InviteCount = $UserModel->GetInvitationCount($UserID);
          if ($InviteCount == 0) {
             $this->Validation->AddValidationResult('Email', 'You do not have enough invitations left.');
             return FALSE;
          }
-         
+
          // Make sure that the email does not already belong to an account in the application.
          $TestData = $UserModel->GetWhere(array('Email' => $Email));
          if ($TestData->NumRows() > 0) {
             $this->Validation->AddValidationResult('Email', 'The email you have entered is already related to an existing account.');
             return FALSE;
          }
-         
+
          // Make sure that the email does not already belong to an invitation in the application.
          $TestData = $this->GetWhere(array('Email' => $Email));
          if ($TestData->NumRows() > 0) {
             $this->Validation->AddValidationResult('Email', 'An invitation has already been sent to the email you entered.');
             return FALSE;
          }
-            
+
          // Define the fields to be inserted
          $Fields = $this->Validation->SchemaValidationFields();
-         
+
          // Call the base model for saving
          $InvitationID = $this->Insert($Fields);
-         
+
          // Now that saving has succeeded, update the user's invitation settings
          if ($InviteCount > 0)
             $UserModel->ReduceInviteCount($UserID);
-         
+
          // And send the invitation email
          try {
             $this->Send($InvitationID);
@@ -106,7 +106,7 @@ class InvitationModel extends Gdn_Model {
       }
       return FALSE;
    }
-   
+
    public function Send($InvitationID) {
       $Invitation = $this->GetByInvitationID($InvitationID);
       $Session = Gdn::Session();
@@ -117,7 +117,7 @@ class InvitationModel extends Gdn_Model {
       } else {
          // Some information for the email
          $RegistrationUrl = ExternalUrl("entry/register/{$Invitation->Code}");
-         
+
          $AppTitle = Gdn::Config('Garden.Title');
          $Email = new Gdn_Email();
          $Email->Subject(sprintf(T('[%s] Invitation'), $AppTitle));
@@ -133,31 +133,31 @@ class InvitationModel extends Gdn_Model {
          $Email->Send();
       }
    }
-   
+
    public function Delete($InvitationID, $UserModel) {
       $Session = Gdn::Session();
       $UserID = $Session->UserID;
-      
+
       // Validate that this user can delete this invitation:
       $Invitation = $this->GetByInvitationID($InvitationID);
-      
+
       // Does the invitation exist?
       if ($Invitation === FALSE)
          throw new Exception(T('ErrorRecordNotFound'));
-      
+
       // Does this user own the invitation?
       if ($UserID != $Invitation->SenderUserID)
          throw new Exception(T('InviteErrorPermission', T('ErrorPermission')));
-      
+
       // Has the invitation been accepted?
       if ($Invitation->AcceptedUserID > 0)
          throw new Exception(T('You cannot remove an invitation that has been accepted.'));
-      
+
       // Delete it
       $this->SQL->Delete($this->Name, array('InvitationID' => $InvitationID));
 
       // Add the invitation back onto the user's account
-      $UserModel->IncreaseInviteCount($UserID);         
+      $UserModel->IncreaseInviteCount($UserID);
       return TRUE;
    }
 
@@ -167,13 +167,13 @@ class InvitationModel extends Gdn_Model {
    protected function GetInvitationCode() {
       // Generate a new invitation code.
       $Code = RandomString(8);
-      
+
       // Make sure the string doesn't already exist in the invitation table
       $CodeData = $this->GetWhere(array('Code' => $Code));
       if ($CodeData->NumRows() > 0) {
          return $this->GetInvitationCode();
       } else {
-         return $Code;         
+         return $Code;
       }
    }
 }

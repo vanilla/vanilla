@@ -3,44 +3,44 @@
       .Trace {
          width: 100%;
       }
-      
+
       .Trace table {
          width: 100%;
          border-collapse: collapse;
          table-layout: fixed;
       }
-      
+
       .Trace td {
          border-top: solid 1px #efefef;
          border-bottom: solid 1px #efefef;
          padding: 4px;
          vertical-align: top;
       }
-      
+
       .Trace pre {
          margin: 0;
          overflow: auto;
       }
-      
+
       .Trace .TagColumn {
          width: 50px;
       }
-      
+
       .Trace .Tag-Info {
          background: #00A6FF;
          color: #fff;
       }
-      
+
       .Trace .Tag-Warning {
          background: #FF9000;
          color: #fff;
       }
-      
+
       .Trace .Tag-Notice {
          background: #FF9000;
          color: #fff;
       }
-      
+
       .Trace .Tag-Error {
          background: #f00;
          color: #fff;
@@ -48,10 +48,10 @@
    </style>
 <h2>Debug Trace</h2>
 <table>
-   <?php 
-   foreach ($this->Data('Traces') as $Trace): 
+   <?php
+   foreach ($this->Data('Traces') as $Trace):
       list($Message, $Type) = $Trace;
-   
+
       $Var = 'Debug';
       if (!in_array($Type, array(TRACE_ERROR, TRACE_INFO, TRACE_NOTICE, TRACE_WARNING))) {
          $Var = $Type;
@@ -67,7 +67,7 @@
          if (is_string($Message)) {
             if ($Var != 'Debug')
                echo '<b>'.htmlspecialchars($Var).'</b>: ';
-            
+
             echo nl2br(htmlspecialchars($Message));
          } elseif (is_a($Message, 'Exception')) {
             echo '<pre>';

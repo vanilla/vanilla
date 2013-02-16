@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
       $('#Form_CodeIsDefined').val('1')
    });
    $('#UrlCode input, #UrlCode a.Save').hide();
-   
+
    // Reveal input when "change" button is clicked
    $('#UrlCode a, #UrlCode span').click(function() {
       $('#UrlCode').find('input,span,a').toggle();
@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
       }
    });
    // Categories->Delete()
-   // Hide onload if unchecked   
+   // Hide onload if unchecked
    if (!$('[name$=DeleteDiscussions]').attr('checked')) {
       $('#ReplacementCategory,#ReplacementWarning').hide();
       $('#DeleteDiscussions').show();

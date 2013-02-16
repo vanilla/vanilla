@@ -5,9 +5,9 @@ $Session = Gdn::Session();
    <h1><?php echo T('Sign Out'); ?></h1>
    <div class="Box">
       <p id="LeavingWrap" class="Leaving" <?php if (!$this->Leaving) echo 'style="display: none;"'; ?>><?php echo T('SigningOut', 'Hang on a sec while we sign you out.'); ?> <span class="TinyProgress"></span></p>
-   
+
       <?php if (!$this->Leaving): ?>
-      
+
       <?php if ($Session->IsValid()) { ?>
       <p id="SignoutWrap">
          <script language="javascript">
@@ -25,7 +25,7 @@ $Session = Gdn::Session();
       <?php } else { ?>
          <p><?php echo T('SignedOut', 'You are signed out.'); ?></p>
       <?php } ?>
-      
-      <?php endif; ?>   
+
+      <?php endif; ?>
    </div>
 </div>

@@ -31,7 +31,7 @@
                      if ($i == $Line - 1) {
                         if ($Class != '')
                            $Class .= ' ';
-                           
+
                         $Class .= 'Highlight';
                      }
                      echo '<pre',($Class == '' ? '' : ' class="'.$Class.'"'),'>',str_pad($i+1, $Padding, " ", STR_PAD_LEFT),': ',htmlentities(str_replace("\n", '', $ErrorLines[$i]), ENT_COMPAT, 'UTF-8'),"</pre>\n";
@@ -39,7 +39,7 @@
                   }
                }
             echo "</div>\n";
-            
+
          }
 
          $Backtrace = $SenderTrace;
@@ -50,7 +50,7 @@
             $Odd = FALSE;
             for ($i = 0; $i < $BacktraceCount; ++$i) {
                echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'>';
-               
+
                if (array_key_exists('file', $Backtrace[$i])) {
                   $File = '['.$Backtrace[$i]['file'].':'
                   .$Backtrace[$i]['line'].'] ';
@@ -62,7 +62,7 @@
                ,"</pre>\n";
                $Odd = $Odd == TRUE ? FALSE : TRUE;
             }
-            
+
             echo "</div>\n";
          }
          // Dump queries if present.
@@ -90,7 +90,7 @@
                echo "</div>\n";
             }
          }
-         
+
          if (function_exists('CleanErrorArguments') && is_array($Arguments) && count($Arguments) > 0) {
             echo '<h3><strong>Variables in local scope:</strong></h3>
             <div class="PreContainer">';
@@ -122,13 +122,13 @@
             <?php
                if (array_key_exists('SERVER_SOFTWARE', $_SERVER))
                   echo '<li><strong>Server Software:</strong> ',$_SERVER['SERVER_SOFTWARE'],"</li>\n";
-            
+
                if (array_key_exists('HTTP_REFERER', $_SERVER))
                   echo '<li><strong>Referer:</strong> ',$_SERVER['HTTP_REFERER'],"</li>\n";
-      
+
                if (array_key_exists('HTTP_USER_AGENT', $_SERVER))
                   echo '<li><strong>User Agent:</strong> ',$_SERVER['HTTP_USER_AGENT'],"</li>\n";
-      
+
                if (array_key_exists('REQUEST_URI', $_SERVER))
                   echo '<li><strong>Request Uri:</strong> ',$_SERVER['REQUEST_URI'],"</li>\n";
             ?>

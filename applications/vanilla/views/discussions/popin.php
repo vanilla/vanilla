@@ -6,7 +6,7 @@ if (count($this->Data('Discussions'))):
       <li class="Item Title">
          <?php echo Wrap($this->Data('Title'), 'strong'); ?>
       </li>
-      <?php 
+      <?php
       foreach ($this->Data('Discussions') as $Row):
       ?>
       <li class="Item">
@@ -14,7 +14,7 @@ if (count($this->Data('Discussions'))):
          <div class="ItemContent">
             <b class="Subject"><?php echo Anchor($Row->Name, $Row->Url.'#latest'); ?></b>
             <div class="Meta">
-               <?php 
+               <?php
                echo ' <span class="MItem">'.Plural($Row->CountComments, '%s comment', '%s comments').'</span> ';
 
                if ($Row->CountUnreadComments === TRUE) {
@@ -31,7 +31,7 @@ if (count($this->Data('Discussions'))):
       <?php endforeach; ?>
       <li class="Item Center">
          <?php
-         echo Anchor(sprintf(T('All %s'), T('Bookmarks')), '/discussions/bookmarked'); 
+         echo Anchor(sprintf(T('All %s'), T('Bookmarks')), '/discussions/bookmarked');
          ?>
       </li>
 <?php else: ?>

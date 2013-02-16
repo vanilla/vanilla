@@ -29,7 +29,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
    <?php include($this->FetchViewLocation('discussions')); ?>
 </ul>
 <?php
-   
+
 echo '<div class="PageControls Bottom">';
    PagerModule::Write($PagerOptions);
    echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary'));

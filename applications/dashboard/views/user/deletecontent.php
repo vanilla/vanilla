@@ -20,5 +20,5 @@ echo $this->Form->Button('No', array('type' => 'button', 'class' => 'Button Clos
 echo '</div>';
 
 echo $this->Form->Close();
-?>   
+?>
 </div>

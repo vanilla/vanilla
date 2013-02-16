@@ -12,12 +12,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the moderators in the specified category. Built for use in a side panel.
  */
 class CategoryModeratorsModule extends Gdn_Module {
-   
+
    public function __construct($Sender = '') {
       parent::__construct($Sender);
       $this->ModeratorData = FALSE;
    }
-   
+
    public function GetData($Category) {
       $this->ModeratorData = array($Category);
       CategoryModel::JoinModerators($this->ModeratorData);

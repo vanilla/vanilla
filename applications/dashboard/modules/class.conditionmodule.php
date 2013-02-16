@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class ConditionModule extends Gdn_Module {
    protected $_Conditions = NULL;
-   
+
    public $Prefix = 'Cond';
 
    public function Conditions($Value = NULL) {

@@ -9,7 +9,7 @@ if ($SortOrder === FALSE)
 
 if (!is_array($SortOrder))
    $SortOrder = array();
-   
+
 // Make sure that all tabs are present in $SortOrder
 foreach ($this->ProfileTabs as $TabCode => $TabInfo) {
    if (!in_array($TabCode, $SortOrder))

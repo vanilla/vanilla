@@ -5,7 +5,7 @@ $SubCategories = array_pop($SubCategories);
 
 if (!$SubCategories || empty($SubCategories['Children']))
    return;
-   
+
 require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 ?>
@@ -15,23 +15,23 @@ require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla
    foreach ($SubCategories['Children'] as $Row):
       if (!$Row['PermsDiscussionsView'])
          continue;
-      
+
       $Row['Depth'] = 1;
       ?>
       <li id="Category_<?php echo $Row['CategoryID']; ?>" class="Item Category">
          <div class="ItemContent Category">
-            <h3 class="CategoryName TitleWrap"><?php 
+            <h3 class="CategoryName TitleWrap"><?php
                echo Anchor($Row['Name'], $Row['Url'], 'Title');
                Gdn::Controller()->EventArguments['Category'] = $Row;
-               Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
+               Gdn::Controller()->FireEvent('AfterCategoryTitle');
             ?></h3>
-            
+
             <?php if ($Row['Description']): ?>
             <div class="CategoryDescription">
                <?php echo $Row['Description']; ?>
             </div>
             <?php endif; ?>
-            
+
             <div class="Meta Hidden">
                <span class="MItem MItem-Count DiscussionCount"><?php
                   echo Plural(

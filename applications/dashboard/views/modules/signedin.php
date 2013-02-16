@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 if ($Session->IsValid() && C('Garden.Modules.ShowSignedInModule')) {
-	$Name = $Session->User->Name;
+   $Name = $Session->User->Name;
 
    if (C('EnabledApplications.Conversations')) {
       $CountInbox = $Session->User->CountUnreadConversations;
       $CountInbox = (is_numeric($CountInbox) && $CountInbox > 0) ? $CountInbox : 0;
-	}
-	$CountNotifications = $Session->User->CountNotifications;
-	$CountNotifications = (is_numeric($CountNotifications) && $CountNotifications > 0) ? $CountNotifications : 0;
+   }
+   $CountNotifications = $Session->User->CountNotifications;
+   $CountNotifications = (is_numeric($CountNotifications) && $CountNotifications > 0) ? $CountNotifications : 0;
 
 ?>
 <div class="Box ProfileBox">

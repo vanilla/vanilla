@@ -11,7 +11,7 @@ echo $this->Form->Errors();
    echo FormatString(T('You are about to unban {User.UserID,user}.'), $this->Data);
    ?>
 </div>
-   
+
 <?php
 
 if ($LogID = $this->Data('User.Attributes.BanLogID')) {

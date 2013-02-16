@@ -8,7 +8,7 @@
 <table class="PreferenceGroup">
    <thead>
       <tr>
-         
+
          <td style="border: none;">&nbsp;</td>
          <td class="TopHeading" colspan="2"><?php echo T('Discussions'); ?></td>
          <td class="TopHeading" colspan="2"><?php echo T('Comments'); ?></td>
@@ -22,10 +22,10 @@
       </tr>
    </thead>
    <tbody>
-      <?php 
-      foreach (Gdn::Controller()->Data('CategoryNotifications') as $Category): 
+      <?php
+      foreach (Gdn::Controller()->Data('CategoryNotifications') as $Category):
          $CategoryID = $Category['CategoryID'];
-      
+
          if ($Category['Heading']):
          ?>
          <tr>
@@ -44,9 +44,9 @@
             <td class="PrefCheckBox"><?php echo Gdn::Controller()->Form->CheckBox("Email.NewComment.{$CategoryID}", '', array('value' => 1)); ?></td>
             <td class="PrefCheckBox"><?php echo Gdn::Controller()->Form->CheckBox("Popup.NewComment.{$CategoryID}", '', array('value' => 1)); ?></td>
          </tr>
-      <?php 
+      <?php
          endif;
-      endforeach; 
+      endforeach;
       ?>
    </tbody>
 </table>

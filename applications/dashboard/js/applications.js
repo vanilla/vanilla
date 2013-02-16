@@ -1,6 +1,6 @@
 // This file contains javascript that is specific to the garden/routes controller.
 jQuery(document).ready(function($) {
-   
+
    // Handle popping up setup screens when enabling applications
    $.fn.handleAppModify = function(options) {
       var frm = this;
@@ -16,7 +16,7 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             json = $.postParseJson(json);
-            
+
             if (json.FormSaved == true) {
                gdn.inform(json);
                if (json.RedirectUrl) {
@@ -40,7 +40,7 @@ jQuery(document).ready(function($) {
                $.popup({}, json.Data);
             }
           }
-      }, options || {});   
+      }, options || {});
       frm.ajaxForm(options);
    }
    $('form').handleAppModify();

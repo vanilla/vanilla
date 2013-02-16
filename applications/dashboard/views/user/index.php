@@ -23,7 +23,7 @@ $EditUser = $Session->CheckPermission('Garden.Users.Edit');
       echo ' ', $this->Form->Button(T('Go'));
       echo ' ', sprintf(T('%s user(s) found.'), $this->Data('RecordCount'));
       echo '</div>';
-      
+
    ?>
 </div>
 <div class="Wrap">
@@ -34,7 +34,7 @@ $EditUser = $Session->CheckPermission('Garden.Users.Edit');
          echo Anchor(T('Delete'), '#', 'Popup SmallButton');
       ?>
    </span>-->
-   
+
    <?php echo Anchor(T('Add User'), 'dashboard/user/add', 'Popup SmallButton'); ?>
 </div>
 <table id="Users" class="AltColumns">

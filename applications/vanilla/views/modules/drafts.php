@@ -10,7 +10,7 @@
          <?php echo Anchor(SliceString(Gdn_Format::Text($Draft->Body), 200), $EditUrl, 'DraftCommentLink'); ?>
       </li>
       <?php
-      } 
+      }
       ?>
       <li class="ShowAll"><?php echo Anchor(T('↳ Show All'), 'drafts'); ?></li>
    </ul>

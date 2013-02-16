@@ -5,27 +5,27 @@
       line-height: 48px;
       position: relative;
    }
-   
+
    .Connection-Name {
       font-size: 28px;
    }
-   
+
    .IconWrap {
       margin-right: 10px;
    }
-   
+
    .IconWrap img {
       height: 48px;
       width: 48px;
       vertical-align: bottom;
       border-radius: 3px;
    }
-   
+
    .DataList-Connections .Connection-Header {
       overflow: hidden;
       position: relative;
    }
-   
+
    .DataList-Connections .ProfilePhoto {
       vertical-align: text-bottom;
    }

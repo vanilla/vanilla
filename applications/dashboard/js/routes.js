@@ -5,9 +5,9 @@ jQuery(document).ready(function($) {
    $('a.AddRoute, a.EditRoute').popup({
       onUnload: function(settings) {
          $('#Content').load(gdn.url('/dashboard/routes?DeliveryType=VIEW'));
-      }   
+      }
    });
-   
+
    // Confirm deletes before performing them
    $('a.DeleteRoute').popup({
       confirm: true,

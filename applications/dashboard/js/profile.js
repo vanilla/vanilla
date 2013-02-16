@@ -2,7 +2,7 @@
 jQuery(document).ready(function($) {
    // Set the max chars in the about form.
    $('form.About textarea').setMaxChars(1000);
-   
+
    // Popup the picture form when the link is clicked
    $('.ChangePicture,.AddPicture').popup({hijackForms: false, afterLoad: function() {
       $('.Popup :submit').hide();
@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
          $('.Popup .Body').html('<div class="Loading">&nbsp;</div>');
       });
    }});
-   
+
    // Ajax invitation uninvites and send agains if they're in a popup
    $('div.Popup a.Uninvite, div.Popup a.SendAgain').live('click', function() {
       var btn = this;
@@ -72,7 +72,7 @@ jQuery(document).ready(function($) {
           if ($(checkbox).is(':checkbox')) {
             if (state == -1)
                state = $(checkbox).attr('checked');
-               
+
             if (state) {
               checkbox.removeAttr('checked');
             } else {
@@ -95,7 +95,7 @@ jQuery(document).ready(function($) {
          for (i = 0; i < checkboxes.length; i++) {
             if (i == 0)
                state = $(checkboxes[0]).attr('checked');
-            
+
             if (state)
                $(checkboxes[i]).removeAttr('checked');
             else

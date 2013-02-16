@@ -4,7 +4,7 @@ function TutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
    $Tutorial = GetTutorials($TutorialCode);
    if (!$Tutorial)
       return '';
-   
+
    $Thumbnail = $ThumbnailSize == 'medium' ? $Tutorial['Thumbnail'] : $Tutorial['LargeThumbnail'];
    return Anchor(
       '<img src="'.$Thumbnail.'" alt="'.$Tutorial['Name'].'" title="'.$Tutorial['Name'].'" />'
@@ -15,37 +15,37 @@ function TutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
 ?>
 <style type="text/css">
 .Welcome {
-	position: relative;
-	min-height: 181px;
-	background: #00346d;
-	background:-webkit-gradient(linear, center bottom, center top, from(#014a8a), to(#00346d));
-	background:-moz-linear-gradient(top, #00346d, #014a8a);
-	-pie-background:linear-gradient(top, #00346d, #014a8a);
-	background:linear-gradient(top, #00346d, #014a8a);
-	padding: 20px 400px 20px 20px;
-	color: #fff;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+   position: relative;
+   min-height: 181px;
+   background: #00346d;
+   background:-webkit-gradient(linear, center bottom, center top, from(#014a8a), to(#00346d));
+   background:-moz-linear-gradient(top, #00346d, #014a8a);
+   -pie-background:linear-gradient(top, #00346d, #014a8a);
+   background:linear-gradient(top, #00346d, #014a8a);
+   padding: 20px 400px 20px 20px;
+   color: #fff;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
 }
 .Welcome strong {
-	color: #FFF6CD;
+   color: #FFF6CD;
 }
 /*
  Put this definition in admin.css b/c of the relative path to the bg image
 .Welcome h2 {
-	overflow: hidden;
-	text-indent: -1000px;
-	font-size: 1px;
-	height: 42px;
-	width: 341px;
-	background: url('images/welcome-message.png') top left no-repeat transparent;
+   overflow: hidden;
+   text-indent: -1000px;
+   font-size: 1px;
+   height: 42px;
+   width: 341px;
+   background: url('images/welcome-message.png') top left no-repeat transparent;
 }
 */
 .Welcome .Video {
-	position: absolute;
-	top: 10px;
-	right: 10px;
+   position: absolute;
+   top: 10px;
+   right: 10px;
    line-height: 1;
 }
 .Welcome a {
@@ -71,64 +71,64 @@ function TutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
    width: 320px;
 }
 .Step {
-	background: #efefef;
-	border: 1px solid #dfdfdf;
-	margin: 20px 0 0;
-	padding: 16px 20px 10px;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	position: relative;
+   background: #efefef;
+   border: 1px solid #dfdfdf;
+   margin: 20px 0 0;
+   padding: 16px 20px 10px;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   position: relative;
 }
 .NumberPoint {
-	position: absolute;
-	top: 0px;
-	left: -16px;
-	border-radius: 40px;
-	-webkit-border-radius: 40px;
+   position: absolute;
+   top: 0px;
+   left: -16px;
+   border-radius: 40px;
+   -webkit-border-radius: 40px;
    -moz-border-radius: 40px;
    border: 5px solid #3CB3E8;
-	font-size: 28px;
-	height: 36px;
-	width: 36px;
-	background: #aee7fe;
-	-moz-transform: rotate(-20.5deg);
-	-o-transform: rotate(-20.5deg);
-	-webkit-transform: rotate(-20.5deg);
-	text-align: center;
-	font-family: monospace,Arial,Sans-Serif;
-	font-weight: bold;
-	color: #003673;
-	text-shadow: 1px 1px 0 rgba(256, 256, 256, 0.5);
-	box-shadow: 0 1px 1px #003673;
-	-moz-box-shadow: 0 1px 1px #003673;
-	-webkit-box-shadow: 0 1px 1px #003673;
+   font-size: 28px;
+   height: 36px;
+   width: 36px;
+   background: #aee7fe;
+   -moz-transform: rotate(-20.5deg);
+   -o-transform: rotate(-20.5deg);
+   -webkit-transform: rotate(-20.5deg);
+   text-align: center;
+   font-family: monospace,Arial,Sans-Serif;
+   font-weight: bold;
+   color: #003673;
+   text-shadow: 1px 1px 0 rgba(256, 256, 256, 0.5);
+   box-shadow: 0 1px 1px #003673;
+   -moz-box-shadow: 0 1px 1px #003673;
+   -webkit-box-shadow: 0 1px 1px #003673;
 }
 .Step textarea,
 .Step .RecipientBox {
    font-family: arial;
    color: #666;
    font-size: 14px;
-	width: 100%;
-	padding: 3px;
-	margin-bottom: 10px;
+   width: 100%;
+   padding: 3px;
+   margin-bottom: 10px;
 }
 .Step textarea:focus,
 .Step .RecipientBox:focus {
-	color: #222;
+   color: #222;
 }
 .Step textarea {
-	height: 85px;
+   height: 85px;
 }
 .Step .RecipientBox {
-	padding: 3px 1px;
+   padding: 3px 1px;
 }
 .Step h2 {
-	padding-left: 16px;
-	font-size: 14px;
+   padding-left: 16px;
+   font-size: 14px;
 }
 .Step .Videos {
-	padding: 10px 0 0;
+   padding: 10px 0 0;
 }
 .Step .Videos a {
    vertical-align: top;
@@ -224,7 +224,7 @@ Follow the link below to log in.");
       jQuery(document).ready(function($) {
          if ($('input.RecipientBox').val() == '')
             $('input.RecipientBox').val("<?php echo $this->TextEnterEmails; ?>");
-            
+
          $('input.RecipientBox').focus(function() {
             if ($(this).val() == "<?php echo $this->TextEnterEmails; ?>")
                $(this).val('');

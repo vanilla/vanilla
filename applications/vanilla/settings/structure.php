@@ -9,10 +9,10 @@
 
 if (!isset($Drop))
    $Drop = FALSE;
-   
+
 if (!isset($Explicit))
    $Explicit = TRUE;
-   
+
 $SQL = Gdn::Database()->SQL();
 $Construct = Gdn::Database()->Structure();
 $Px = $Construct->DatabasePrefix();
@@ -90,8 +90,8 @@ $Construct
    ->Column('FirstCommentID', 'int', TRUE)
    ->Column('LastCommentID', 'int', TRUE)
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
-	->Column('Body', 'text', FALSE, 'fulltext')
-	->Column('Format', 'varchar(20)', TRUE)
+   ->Column('Body', 'text', FALSE, 'fulltext')
+   ->Column('Format', 'varchar(20)', TRUE)
    ->Column('Tags', 'varchar(255)', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('CountBookmarks', 'int', NULL)
@@ -104,8 +104,8 @@ $Construct
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('DateLastComment', 'datetime', NULL, array('index', 'index.CategoryPages'))
-	->Column('LastCommentUserID', 'int', TRUE)
-	->Column('Score', 'float', NULL)
+   ->Column('LastCommentUserID', 'int', TRUE)
+   ->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
    ->Column('RegardingID', 'int(11)', TRUE, 'index')
    //->Column('Source', 'varchar(20)', TRUE)
@@ -123,13 +123,13 @@ $Construct->Table('UserCategory')
    ->Column('DateMarkedRead', 'datetime', NULL)
    ->Column('Unfollow', 'tinyint(1)', 0)
    ->Set($Explicit, $Drop);
-   
+
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->Table('UserDiscussion')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, array('primary', 'key'))
-	->Column('Score', 'float', NULL)
+   ->Column('Score', 'float', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
@@ -144,24 +144,24 @@ else
    $CommentIndexes = array();
 
 $Construct->PrimaryKey('CommentID')
-	->Column('DiscussionID', 'int', FALSE, 'index.1')
+   ->Column('DiscussionID', 'int', FALSE, 'index.1')
    //->Column('Type', 'varchar(10)', TRUE)
    //->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
-	->Column('InsertUserID', 'int', TRUE, 'key')
-	->Column('UpdateUserID', 'int', TRUE)
-	->Column('DeleteUserID', 'int', TRUE)
-	->Column('Body', 'text', FALSE, 'fulltext')
-	->Column('Format', 'varchar(20)', TRUE)
-	->Column('DateInserted', 'datetime', NULL, array('index.1', 'index'))
-	->Column('DateDeleted', 'datetime', TRUE)
-	->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('InsertUserID', 'int', TRUE, 'key')
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('DeleteUserID', 'int', TRUE)
+   ->Column('Body', 'text', FALSE, 'fulltext')
+   ->Column('Format', 'varchar(20)', TRUE)
+   ->Column('DateInserted', 'datetime', NULL, array('index.1', 'index'))
+   ->Column('DateDeleted', 'datetime', TRUE)
+   ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
-	->Column('Flag', 'tinyint', 0)
-	->Column('Score', 'float', NULL)
-	->Column('Attributes', 'text', TRUE)
+   ->Column('Flag', 'tinyint', 0)
+   ->Column('Score', 'float', NULL)
+   ->Column('Attributes', 'text', TRUE)
    //->Column('Source', 'varchar(20)', TRUE)
-	->Set($Explicit, $Drop);
+   ->Set($Explicit, $Drop);
 
 if (isset($CommentIndexes['FK_Comment_DiscussionID'])) {
    $Construct->Query("drop index FK_Comment_DiscussionID on {$Px}Comment");
@@ -177,7 +177,7 @@ $Construct->Table('UserComment')
    ->Column('Score', 'float', NULL)
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Set($Explicit, $Drop);
-   
+
 // Add extra columns to user table for tracking discussions & comments
 $Construct->Table('User')
    ->Column('CountDiscussions', 'int', NULL)
@@ -221,7 +221,7 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'NewDiscussion'))->NumRows() 
 // X commented on a discussion.
 if ($SQL->GetWhere('ActivityType', array('Name' => 'NewComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'NewComment', 'FullHeadline' => '%1$s commented on a discussion.', 'ProfileHeadline' => '%1$s commented on a discussion.', 'RouteCode' => 'discussion', 'Public' => '0'));
-   
+
 // People's comments on discussions
 if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s commented on %4$s %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
@@ -248,35 +248,35 @@ $PermissionModel->SQL = $SQL;
 
 // Define some global vanilla permissions.
 $PermissionModel->Define(array(
-	'Vanilla.Settings.Manage',
-	'Vanilla.Categories.Manage',
-	'Vanilla.Approval.Require',
+   'Vanilla.Settings.Manage',
+   'Vanilla.Categories.Manage',
+   'Vanilla.Approval.Require',
    'Vanilla.Comments.Me' => 1,
-	));
+   ));
 
 // Define some permissions for the Vanilla categories.
 $PermissionModel->Define(array(
-	'Vanilla.Discussions.View' => 1,
-	'Vanilla.Discussions.Add' => 1,
-	'Vanilla.Discussions.Edit' => 0,
-	'Vanilla.Discussions.Announce' => 0,
-	'Vanilla.Discussions.Sink' => 0,
-	'Vanilla.Discussions.Close' => 0,
-	'Vanilla.Discussions.Delete' => 0,
-	'Vanilla.Comments.Add' => 1,
-	'Vanilla.Comments.Edit' => 0,
-	'Vanilla.Comments.Delete' => 0),
-	'tinyint',
-	'Category',
-	'PermissionCategoryID'
-	);
+   'Vanilla.Discussions.View' => 1,
+   'Vanilla.Discussions.Add' => 1,
+   'Vanilla.Discussions.Edit' => 0,
+   'Vanilla.Discussions.Announce' => 0,
+   'Vanilla.Discussions.Sink' => 0,
+   'Vanilla.Discussions.Close' => 0,
+   'Vanilla.Discussions.Delete' => 0,
+   'Vanilla.Comments.Add' => 1,
+   'Vanilla.Comments.Edit' => 0,
+   'Vanilla.Comments.Delete' => 0),
+   'tinyint',
+   'Category',
+   'PermissionCategoryID'
+   );
 
 $PermissionModel->Undefine('Vanilla.Spam.Manage');
 
 if ($RootCategoryInserted) {
    // Get the root category so we can assign permissions to it.
    $GeneralCategoryID = -1; //$SQL->GetWhere('Category', array('Name' => 'General'))->Value('PermissionCategoryID', 0);
-   
+
    // Set the initial guest permissions.
    $PermissionModel->Save(array(
       'Role' => 'Guest',
@@ -301,7 +301,7 @@ if ($RootCategoryInserted) {
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.View' => 1
       ), TRUE);
-   
+
    // Set the intial member permissions.
    $PermissionModel->Save(array(
       'Role' => 'Member',
@@ -312,13 +312,13 @@ if ($RootCategoryInserted) {
       'Vanilla.Discussions.View' => 1,
       'Vanilla.Comments.Add' => 1
       ), TRUE);
-      
+
    // Set the initial moderator permissions.
    $PermissionModel->Save(array(
       'Role' => 'Moderator',
       'Vanilla.Categories.Manage' => 1
       ), TRUE);
-   
+
    $PermissionModel->Save(array(
       'Role' => 'Moderator',
       'JunctionTable' => 'Category',
@@ -335,14 +335,14 @@ if ($RootCategoryInserted) {
       'Vanilla.Comments.Edit' => 1,
       'Vanilla.Comments.Delete' => 1
       ), TRUE);
-      
+
    // Set the initial administrator permissions.
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
       'Vanilla.Settings.Manage' => 1,
       'Vanilla.Categories.Manage' => 1
       ), TRUE);
-   
+
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
       'JunctionTable' => 'Category',

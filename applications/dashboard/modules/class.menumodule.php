@@ -14,69 +14,69 @@ if (!class_exists('MenuModule', FALSE)) {
     * string with ToString();
     */
    class MenuModule extends Gdn_Module {
-      
+
       /**
        * An array of menu items.
        */
       public $Items;
-      
+
       /**
        * The html id attribute to be applied to the root element of the menu.
        * Default is "Menu".
        */
       public $HtmlId;
-      
+
       /**
        * The class attribute to be applied to the root element of the
        * breadcrumb. Default is none.
        */
       public $CssClass;
-      
+
       /**
        * An array of menu group names arranged in the order that the menu
        * should be rendered.
        */
       public $Sort;
-      
+
       /**
        * A route that, if found in the menu links, should cause that link to
        * have the Highlight class applied. This property is assigned with
        * $this->Highlight();
        */
       private $_HighlightRoute;
-   
+
       public function __construct($Sender = '') {
          $this->HtmlId = 'Menu';
          $this->ClearGroups();
          parent::__construct($Sender);
       }
-      
+
       public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = '', $AnchorAttributes = '') {
          if (!array_key_exists($Group, $this->Items))
             $this->Items[$Group] = array();
 
          $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, 'AnchorAttributes' => $AnchorAttributes);
       }
-      
+
       public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = '') {
          if (!array_key_exists($Group, $this->Items))
             $this->Items[$Group] = array();
 
          $this->Items[$Group][] = array('Text' => $Text, 'Url' => FALSE, 'Permission' => $Permission, 'Attributes' => $Attributes);
-      }      
-      
+      }
+
       public function AssetTarget() {
          return 'Menu';
       }
-      
+
       public function ClearGroups() {
          $this->Items = array();
       }
-      
+
       public function HighlightRoute($Route) {
          $this->_HighlightRoute = $Route;
       }
-      
+
       public function RemoveLink($Group, $Text) {
          if (array_key_exists($Group, $this->Items) && is_array($this->Items[$Group])) {
             foreach ($this->Items[$Group] as $Index => $GroupArray) {
@@ -93,9 +93,9 @@ if (!class_exists('MenuModule', FALSE)) {
        * Removes all links from a specific group.
        */
       public function RemoveLinks($Group) {
-			$this->Items[$Group] = array();
+         $this->Items[$Group] = array();
       }
-      
+
       /**
        * Removes an entire group of links, and the group itself, from the menu.
        */
@@ -103,16 +103,16 @@ if (!class_exists('MenuModule', FALSE)) {
          if (array_key_exists($Group, $this->Items))
             unset($this->Items[$Group]);
       }
-      
+
       public function ToString($HighlightRoute = '') {
          if ($HighlightRoute == '')
             $HighlightRoute = $this->_HighlightRoute;
-            
+
          if ($HighlightRoute == '')
             $HighlightRoute = Gdn_Url::Request();
-            
+
          $this->FireEvent('BeforeToString');
-         
+
          $Username = '';
          $UserID = '';
          $Session_TransientKey = '';
@@ -128,7 +128,7 @@ if (!class_exists('MenuModule', FALSE)) {
             $HasPermissions = count($Permissions) > 0;
             $Admin = $Session->User->Admin > 0 ? TRUE : FALSE;
          }
-         
+
          $Menu = '';
          if (count($this->Items) > 0) {
             // Apply the menu group sort if present...
@@ -159,10 +159,10 @@ if (!class_exists('MenuModule', FALSE)) {
                   $RequiredPermissions = array_key_exists('Permission', $Link) ? $Link['Permission'] : FALSE;
                   if ($RequiredPermissions !== FALSE && !is_array($RequiredPermissions))
                      $RequiredPermissions = explode(',', $RequiredPermissions);
-                     
+
                   // Show if there are no permissions or the user has the required permissions or the user is admin
                   $ShowLink = $Admin || $RequiredPermissions === FALSE || ArrayInArray($RequiredPermissions, $Permissions, FALSE) === TRUE;
-                  
+
                   if ($ShowLink === TRUE) {
                      if ($ItemCount == 1) {
                         $Group .= '<ul>';
@@ -170,7 +170,7 @@ if (!class_exists('MenuModule', FALSE)) {
                      } else if ($ItemCount > 1) {
                         $Group .= "</li>\r\n";
                      }
-                     
+
                      $Url = ArrayValue('Url', $Link);
                      if(substr($Link['Text'], 0, 1) === '\\') {
                         $Text = substr($Link['Text'], 1);
@@ -182,11 +182,11 @@ if (!class_exists('MenuModule', FALSE)) {
                      if ($Url !== FALSE) {
                         $Url = Url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
                         $CurrentLink = $Url == Url($HighlightRoute);
-                        
+
                         $CssClass = ArrayValue('class', $Attributes, '');
                         if ($CurrentLink)
                            $Attributes['class'] = $CssClass . ' Highlight';
-								
+
                         $Group .= '<li'.Attribute($Attributes).'><a'.Attribute($AnchorAttributes).' href="'.$Url.'">'.$Text.'</a>';
                         ++$LinkCount;
                      } else {

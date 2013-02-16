@@ -14,53 +14,53 @@ if (!class_exists('SideMenuModule', FALSE)) {
     * string with ToString();
     */
    class SideMenuModule extends Gdn_Module {
-      
+
       /**
        * Should the group titles be autolinked to the first anchor in the group? Default TRUE;
        */
       public $AutoLinkGroups;
-      
+
       public $EventName = FALSE;
-      
+
       /**
        * An array of menu items.
        */
       public $Items;
 
       protected $_Items;
-      
+
       /**
        * The html id attribute to be applied to the root element of the menu.
        * Default is "Menu".
        */
       public $HtmlId;
-      
+
       /**
        * The class attribute to be applied to the root element of the
        * breadcrumb. Default is none.
        */
       public $CssClass;
-      
+
       /**
        * An array of menu group names arranged in the order that the menu
        * should be rendered.
        */
       public $Sort;
-      
+
       /**
        * A route that, if found in the menu links, should cause that link to
        * have the Highlight class applied. This property is assigned with
        * $this->Highlight();
        */
       private $_HighlightRoute;
-   
+
       public function __construct($Sender = '') {
          $this->HtmlId = 'SideMenu';
          $this->AutoLinkGroups = TRUE;
          $this->ClearGroups();
          parent::__construct($Sender);
       }
-      
+
       public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = array()) {
          if (!array_key_exists($Group, $this->Items)) {
             $this->AddItem($Group, T($Group));
@@ -79,7 +79,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
             $this->Items[$Group]['Links'][$Url] = $Link;
          }
       }
-      
+
       public function AddItem($Group, $Text, $Permission = FALSE, $Attributes = array()) {
          if (!array_key_exists($Group, $this->Items))
             $Item = array('Group' => $Group, 'Links' => array(), 'Attributes' => array(), '_Sort' => count($this->Items));
@@ -98,8 +98,8 @@ if (!class_exists('SideMenuModule', FALSE)) {
          $Item['Attributes'] = array_merge($Item['Attributes'], $Attributes);
 
          $this->Items[$Group] = $Item;
-      }      
-      
+      }
+
       public function AssetTarget() {
          return 'Menu';
       }
@@ -122,7 +122,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
                unset($this->Items[$Group]);
          }
       }
-      
+
       public function ClearGroups() {
          $this->Items = array();
       }
@@ -167,14 +167,14 @@ if (!class_exists('SideMenuModule', FALSE)) {
                return $After['Sort'] + 0.1;
             return $After['_Sort'] + 0.1;
          }
-         
+
          return $A['_Sort'];
       }
-      
+
       public function HighlightRoute($Route) {
          $this->_HighlightRoute = $Route;
       }
-      
+
       public function RemoveLink($Group, $Text) {
          if (array_key_exists($Group, $this->Items) && isset($this->Items[$Group]['Links'])) {
             $Links =& $this->Items[$Group]['Links'];
@@ -193,14 +193,14 @@ if (!class_exists('SideMenuModule', FALSE)) {
             }
          }
       }
-      
+
       /**
        * Removes all links from a specific group.
        */
       public function RemoveLinks($Group) {
-			$this->Items[$Group] = array();
+         $this->Items[$Group] = array();
       }
-      
+
       /**
        * Removes an entire group of links, and the group itself, from the menu.
        */
@@ -213,8 +213,8 @@ if (!class_exists('SideMenuModule', FALSE)) {
          Gdn::Controller()->EventArguments['SideMenu'] = $this;
          if ($this->EventName)
             Gdn::Controller()->FireEvent($this->EventName);
-         
-         
+
+
          if ($HighlightRoute == '')
             $HighlightRoute = $this->_HighlightRoute;
          if ($HighlightRoute == '')
@@ -240,7 +240,7 @@ if (!class_exists('SideMenuModule', FALSE)) {
                }
             }
          }
-         
+
          // Sort the groups.
          $this->_Compare($this->Items);
          uasort($this->Items, array($this, '_Compare'));

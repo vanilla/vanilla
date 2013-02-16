@@ -22,7 +22,7 @@ $i = 0;
 $Alt = FALSE;
 foreach ($this->MyRoutes as $Route => $RouteData) {
    $Alt = !$Alt;
-   
+
    $Target = $RouteData['Destination'];
    $RouteType = T(Gdn::Router()->RouteTypes[$RouteData['Type']]);
    $Reserved = $RouteData['Reserved'];

@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 if (!isset($Drop))
    $Drop = FALSE;
-   
+
 if (!isset($Explicit))
    $Explicit = TRUE;
 
@@ -55,10 +55,10 @@ $PhotoIDExists = $Construct->ColumnExists('PhotoID');
 $PhotoExists = $Construct->ColumnExists('Photo');
 
 $Construct
-	->PrimaryKey('UserID')
+   ->PrimaryKey('UserID')
    ->Column('Name', 'varchar(50)', FALSE, 'key')
    ->Column('Password', 'varbinary(100)') // keep this longer because of some imports.
-	->Column('HashMethod', 'varchar(10)', TRUE)
+   ->Column('HashMethod', 'varchar(10)', TRUE)
    ->Column('Photo', 'varchar(255)', NULL)
    ->Column('Title', 'varchar(100)', NULL)
    ->Column('Location', 'varchar(100)', NULL)
@@ -85,7 +85,7 @@ $Construct
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('HourOffset', 'int', '0')
-	->Column('Score', 'float', NULL)
+   ->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
    ->Column('Verified', 'tinyint(1)', '0') // user if verified as a non-spammer
    ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
@@ -135,7 +135,7 @@ $Construct->Table('UserMeta')
    ->Column('Value', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
-// User Points Table   
+// User Points Table
 $Construct->Table('UserPoints')
    ->Column('SlotType', array('d', 'w', 'm', 'y', 'a'), FALSE, 'primary')
    ->Column('TimeSlot', 'datetime', FALSE, 'primary')
@@ -146,11 +146,11 @@ $Construct->Table('UserPoints')
 
 // Create the authentication table.
 $Construct->Table('UserAuthentication')
-	->Column('ForeignUserKey', 'varchar(255)', FALSE, 'primary')
-	->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
-	->Column('UserID', 'int', FALSE, 'key')
-	->Set($Explicit, $Drop);
-	
+   ->Column('ForeignUserKey', 'varchar(255)', FALSE, 'primary')
+   ->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
+   ->Column('UserID', 'int', FALSE, 'key')
+   ->Set($Explicit, $Drop);
+
 $Construct->Table('UserAuthenticationProvider')
    ->Column('AuthenticationKey', 'varchar(64)', FALSE, 'primary')
    ->Column('AuthenticationSchemeAlias', 'varchar(32)', FALSE)
@@ -183,15 +183,15 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
-   
+
 $Construct->Table('Session')
-	->Column('SessionID', 'char(32)', FALSE, 'primary')
-	->Column('UserID', 'int', 0)
-	->Column('DateInserted', 'datetime', FALSE)
-	->Column('DateUpdated', 'datetime', FALSE)
-	->Column('TransientKey', 'varchar(12)', FALSE)
-	->Column('Attributes', 'text', NULL)
-	->Set($Explicit, $Drop);
+   ->Column('SessionID', 'char(32)', FALSE, 'primary')
+   ->Column('UserID', 'int', 0)
+   ->Column('DateInserted', 'datetime', FALSE)
+   ->Column('DateUpdated', 'datetime', FALSE)
+   ->Column('TransientKey', 'varchar(12)', FALSE)
+   ->Column('Attributes', 'text', NULL)
+   ->Set($Explicit, $Drop);
 
 $Construct->Table('AnalyticsLocal')
    ->Engine('InnoDB')
@@ -208,15 +208,15 @@ $PermissionTableExists = FALSE;
 if($PermissionModel instanceof PermissionModel) {
    $PermissionTableExists = $Construct->TableExists('Permission');
 
-	// Permission Table
-	$Construct->Table('Permission')
-		->PrimaryKey('PermissionID')
-		->Column('RoleID', 'int', 0, 'key')
-		->Column('JunctionTable', 'varchar(100)', TRUE) 
-		->Column('JunctionColumn', 'varchar(100)', TRUE)
-		->Column('JunctionID', 'int', TRUE)
-		// The actual permissions will be added by PermissionModel::Define()
-		->Set($Explicit, $Drop);
+   // Permission Table
+   $Construct->Table('Permission')
+      ->PrimaryKey('PermissionID')
+      ->Column('RoleID', 'int', 0, 'key')
+      ->Column('JunctionTable', 'varchar(100)', TRUE)
+      ->Column('JunctionColumn', 'varchar(100)', TRUE)
+      ->Column('JunctionID', 'int', TRUE)
+      // The actual permissions will be added by PermissionModel::Define()
+      ->Set($Explicit, $Drop);
 }
 
 // Define the set of permissions that Garden uses.
@@ -333,7 +333,7 @@ $PermissionModel->ClearPermissions();
 //$PhotoTableExists = $Construct->TableExists('Photo');
 //
 //$Construct
-//	->PrimaryKey('PhotoID')
+//   ->PrimaryKey('PhotoID')
 //   ->Column('Name', 'varchar(255)')
 //   ->Column('InsertUserID', 'int', TRUE, 'key')
 //   ->Column('DateInserted', 'datetime')
@@ -341,7 +341,7 @@ $PermissionModel->ClearPermissions();
 
 // Invitation Table
 $Construct->Table('Invitation')
-	->PrimaryKey('InvitationID')
+   ->PrimaryKey('InvitationID')
    ->Column('Email', 'varchar(200)')
    ->Column('Code', 'varchar(50)')
    ->Column('InsertUserID', 'int', TRUE, 'key')
@@ -351,7 +351,7 @@ $Construct->Table('Invitation')
 
 // ActivityType Table
 $Construct->Table('ActivityType')
-	->PrimaryKey('ActivityTypeID')
+   ->PrimaryKey('ActivityTypeID')
    ->Column('Name', 'varchar(20)')
    ->Column('AllowComments', 'tinyint(1)', '0')
    ->Column('ShowIcon', 'tinyint(1)', '0')
@@ -361,7 +361,7 @@ $Construct->Table('ActivityType')
    ->Column('Notify', 'tinyint(1)', '0') // Add to RegardingUserID's notification list?
    ->Column('Public', 'tinyint(1)', '1') // Should everyone be able to see this, or just the RegardingUserID?
    ->Set($Explicit, $Drop);
-   
+
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 
@@ -379,7 +379,7 @@ else
    $ActivityIndexes = array();
 
 $Construct
-	->PrimaryKey('ActivityID')
+   ->PrimaryKey('ActivityID')
    ->Column('ActivityTypeID', 'int')
    ->Column('NotifyUserID', 'int', 0, array('index.Notify', 'index.Recent', 'index.Feed')) // user being notified or -1: public, -2 mods, -3 admins
    ->Column('ActivityUserID', 'int', TRUE, 'index.Feed')
@@ -433,7 +433,7 @@ if (!$NotifyUserIDExists && $ActivityExists) {
       ->Set('a.NotifyUserID', 'a.RegardingUserID', FALSE)
       ->Where('at.Notify', 1)
       ->Put();
-   
+
    // Update all public activities.
    $SQL->Update('Activity a')
       ->Join('ActivityType at', 'a.ActivityTypeID = at.ActivityTypeID')
@@ -441,7 +441,7 @@ if (!$NotifyUserIDExists && $ActivityExists) {
       ->Where('at.Public', 1)
       ->Where('a.NotifyUserID', 0)
       ->Put();
-   
+
    $SQL->Delete('Activity', array('NotifyUserID' => 0));
 }
 
@@ -490,7 +490,7 @@ $SQL->Replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AboutUpdate'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'AboutUpdate', 'FullHeadline' => '%1$s updated %6$s profile.', 'ProfileHeadline' => '%1$s updated %6$s profile.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:')); 
+   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'PictureChange'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'PictureChange', 'FullHeadline' => '%1$s changed %6$s profile picture.', 'ProfileHeadline' => '%1$s changed %6$s profile picture.'));
 //if ($SQL->GetWhere('ActivityType', array('Name' => 'RoleChange'))->NumRows() == 0)
@@ -531,7 +531,7 @@ $ActivityModel->DefineType('Ban');
 
 // Message Table
 $Construct->Table('Message')
-	->PrimaryKey('MessageID')
+   ->PrimaryKey('MessageID')
    ->Column('Content', 'text')
    ->Column('Format', 'varchar(20)', TRUE)
    ->Column('AllowDismiss', 'tinyint(1)', '1')
@@ -540,7 +540,7 @@ $Construct->Table('Message')
    ->Column('Controller', 'varchar(255)', TRUE)
    ->Column('Method', 'varchar(255)', TRUE)
    ->Column('AssetTarget', 'varchar(20)', TRUE)
-	->Column('CssClass', 'varchar(20)', TRUE)
+   ->Column('CssClass', 'varchar(20)', TRUE)
    ->Column('Sort', 'int', TRUE)
    ->Set($Explicit, $Drop);
 
@@ -561,7 +561,7 @@ if ($PhotoIDExists) {
 if ($Construct->TableExists('Tag')) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
-   
+
    $DupTags = Gdn::SQL()
       ->Select('Name')
       ->Select('TagID', 'min', 'TagID')
@@ -570,7 +570,7 @@ if ($Construct->TableExists('Tag')) {
       ->GroupBy('Name')
       ->Having('CountTags >', 1)
       ->Get()->ResultArray();
-   
+
    foreach ($DupTags as $Row) {
       $Name = $Row['Name'];
       $TagID = $Row['TagID'];
@@ -579,10 +579,10 @@ if ($Construct->TableExists('Tag')) {
       foreach ($DeleteTags as $DRow) {
          // Update all of the discussions to the new tag.
          Gdn::SQL()->Options('Ignore', TRUE)->Put(
-            'TagDiscussion', 
-            array('TagID' => $TagID), 
+            'TagDiscussion',
+            array('TagID' => $TagID),
             array('TagID' => $DRow['TagID']));
-         
+
          // Delete the tag.
          Gdn::SQL()->Delete('Tag', array('TagID' => $DRow['TagID']));
       }
@@ -590,7 +590,7 @@ if ($Construct->TableExists('Tag')) {
 }
 
 $Construct->Table('Tag')
-	->PrimaryKey('TagID')
+   ->PrimaryKey('TagID')
    ->Column('Name', 'varchar(255)', FALSE, 'unique')
    ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('InsertUserID', 'int', TRUE, 'key')
@@ -661,7 +661,7 @@ $Construct
    ->Column('Path', 'varchar(255)')
    ->Column('Type', 'varchar(128)')
    ->Column('Size', 'int(11)')
-   
+
    ->Column('InsertUserID', 'int(11)')
    ->Column('DateInserted', 'datetime')
    ->Column('ForeignID', 'int(11)', TRUE)
@@ -673,7 +673,7 @@ $Construct
    ->Column('ThumbWidth', 'usmallint', NULL)
    ->Column('ThumbHeight', 'usmallint', NULL)
    ->Column('ThumbPath', 'varchar(255)', NULL)
-   
+
    ->Set(FALSE, FALSE);
 
 // Make sure the smarty folders exist.

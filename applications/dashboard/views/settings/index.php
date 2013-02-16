@@ -25,7 +25,7 @@ $this->RenderAsset('Messages');
       </tbody>
    </table>
 </div>
- * 
+ *
  */
 ?>
 <div class="Column Column2">

@@ -2,9 +2,9 @@
 
 /**
  * Payment interface
- * 
+ *
  * An interface that all payment plugins must follow.
- * 
+ *
  * @author Matt Russell <lincoln@vanillaforums.com
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL

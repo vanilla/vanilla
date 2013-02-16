@@ -3,9 +3,9 @@
 <?php
 if (count($this->Data('Activities'))):
 ?>
-   <li class="Item Title"><?php 
+   <li class="Item Title"><?php
       echo Anchor(T('Notification Preferences'), 'profile/preferences');
-      echo Wrap(T('Notifications'), 'strong'); 
+      echo Wrap(T('Notifications'), 'strong');
    ?></li>
    <?php foreach ($this->Data('Activities') as $Activity): ?>
    <li class="Item">
@@ -29,7 +29,7 @@ if (count($this->Data('Activities'))):
    <?php endforeach; ?>
    <li class="Item Center">
       <?php
-      echo Anchor(sprintf(T('All %s'), T('Notifications')), '/profile/notifications'); 
+      echo Anchor(sprintf(T('All %s'), T('Notifications')), '/profile/notifications');
       ?>
    </li>
 <?php else: ?>

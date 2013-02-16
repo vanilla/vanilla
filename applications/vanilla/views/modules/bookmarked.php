@@ -7,7 +7,7 @@ $Bookmarks = $this->Data('Bookmarks');
 <div id="Bookmarks" class="Box BoxBookmarks">
    <h4><?php echo T('Bookmarked Discussions'); ?></h4>
    <?php if (count($Bookmarks->Result()) > 0): ?>
-   
+
    <ul id="<?php echo $this->ListID; ?>" class="PanelInfo PanelDiscussions DataList">
       <?php
       foreach ($Bookmarks->Result() as $Discussion) {
@@ -18,7 +18,7 @@ $Bookmarks = $this->Data('Bookmarks');
       <li class="ShowAll"><?php echo Anchor(T('All Bookmarks'), 'discussions/bookmarked'); ?></li>
       <?php } ?>
    </ul>
-   
+
    <?php else: ?>
    <div class="P PagerWrapper">
       <?php

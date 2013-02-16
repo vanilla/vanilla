@@ -57,7 +57,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
       $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
       $RowClass = $Css;
       if ($Alt) $RowClass .= ' Alt';
-      ?>   
+      ?>
       <tr class="More <?php echo $RowClass; ?>">
          <th><?php echo $ScreenName; ?></th>
          <td><?php echo ArrayValue('Description', $AppInfo, ''); ?></td>
@@ -70,7 +70,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
                '/settings/applications/'.$this->Filter.'/'.$AppName.'/'.$Session->TransientKey(),
                $ToggleText.'Addon SmallButton'
             );
-            
+
             if ($SettingsUrl != '') {
                echo Anchor(T('Settings'), $SettingsUrl, 'SmallButton');
             }
@@ -80,20 +80,20 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
             $Info = '';
             if ($Version != '')
                $Info = sprintf(T('Version %s'), $Version);
-               
+
             if (is_array($RequiredApplications)) {
                if ($Info != '')
                   $Info .= '<span>|</span>';
 
                $Info .= T('Requires: ');
             }
-               
+
             $i = 0;
             if (is_array($RequiredApplications)) {
                if ($i > 0)
                   $Info .= ', ';
-               
-               foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
+
+               foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
                   $Info .= sprintf(T('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
                   ++$i;
                }
@@ -103,12 +103,12 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
                $Info .= '<span>|</span>';
                $Info .= sprintf('By %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
             }
-            
+
             if ($AppUrl != '') {
                $Info .= '<span>|</span>';
                $Info .= Anchor(T('Visit Site'), $AppUrl);
             }
-            
+
             echo $Info != '' ? $Info : '&#160;';
             ?>
          </td>

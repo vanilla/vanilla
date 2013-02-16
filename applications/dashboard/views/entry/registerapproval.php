@@ -5,7 +5,7 @@
    <?php
    $TermsOfServiceUrl = Gdn::Config('Garden.TermsOfService', '#');
    $TermsOfServiceText = sprintf(T('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), Url($TermsOfServiceUrl));
-   
+
    // Make sure to force this form to post to the correct place in case the view is
    // rendered within another view (ie. /dashboard/entry/index/):
    echo $this->Form->Open(array('Action' => Url('/entry/register'), 'id' => 'Form_User_Register'));
@@ -17,7 +17,7 @@
          <?php
             echo $this->Form->Label('Email', 'Email');
             echo $this->Form->TextBox('Email', array('type' => 'email', 'Wrap' => TRUE));
-				echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">'.T('Email Unavailable').'</span>';
+            echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">'.T('Email Unavailable').'</span>';
          ?>
       </li>
       <?php endif; ?>

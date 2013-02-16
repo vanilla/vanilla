@@ -35,11 +35,11 @@ echo $Body;
 
 if (count($Images) > 1) {
    echo '<h2>Other Images</h2>';
-   
+
    array_shift($Images);
    foreach ($Images as $Src) {
       echo Img($Src);
-   }  
+   }
 }
 
 echo '</div>';

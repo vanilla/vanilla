@@ -12,21 +12,21 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the discussion categories.
  */
 class CategoriesModule extends Gdn_Module {
-   
+
    public function __construct($Sender = '') {
       // Load categories
       $this->Data = FALSE;
       if (C('Vanilla.Categories.Use') == TRUE && !C('Vanilla.Categories.HideModule')) {
          $Categories = CategoryModel::Categories();
          $Categories2 = $Categories;
-         
+
          // Filter out the categories we aren't watching.
          foreach ($Categories2 as $i => $Category) {
             if (!$Category['PermsDiscussionsView'] || !$Category['Following']) {
                unset($Categories[$i]);
             }
          }
-         
+
          $Data = new Gdn_DataSet($Categories);
          $Data->DatasetType(DATASET_TYPE_ARRAY);
          $Data->DatasetType(DATASET_TYPE_OBJECT);

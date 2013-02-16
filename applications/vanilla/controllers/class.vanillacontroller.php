@@ -10,12 +10,12 @@
  */
 
 class VanillaController extends Gdn_Controller {
-   
+
    /**
     * Include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -30,12 +30,12 @@ class VanillaController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddCssFile('style.css');
-      
+
       // Add modules
 //      $this->AddModule('MeModule');
       $this->AddModule('GuestModule');
       $this->AddModule('SignedInModule');
-      
+
       parent::Initialize();
    }
 

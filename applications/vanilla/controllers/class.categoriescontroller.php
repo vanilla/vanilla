@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
- 
+
 /**
  * Handles displaying categories.
  *
@@ -11,45 +11,45 @@
 class CategoriesController extends VanillaController {
    /**
     * Models to include.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var array
     */
    public $Uses = array('Database', 'Form', 'CategoryModel');
-   
+
    /**
-    * @var CategoryModel 
+    * @var CategoryModel
     */
    public $CategoryModel;
-   
+
    /**
     * Should the discussions have their options available.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var bool
     */
    public $ShowOptions = TRUE;
-   
+
    /**
     * Unique identifier.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var int
     */
    public $CategoryID;
-   
+
    /**
     * Category object.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var object
     */
    public $Category;
-   
+
    /**
     * "Table" layout for categories. Mimics more traditional forum category layout.
     */
@@ -60,13 +60,13 @@ class CategoriesController extends VanillaController {
          $this->View = 'all';
       $this->All();
    }
-   
+
    /**
     * Show all discussions in a particular category.
-    * 
+    *
     * @since 2.0.0
     * @access public
-    * 
+    *
     * @param string $CategoryIdentifier Unique category slug or ID.
     * @param int $Offset Number of discussions to skip.
     */
@@ -101,29 +101,29 @@ class CategoriesController extends VanillaController {
                // $this->View = 'index';
                break;
          }
-         
+
          $Category = CategoryModel::Categories($CategoryIdentifier);
-         
+
          if (empty($Category)) {
             if ($CategoryIdentifier)
                throw NotFoundException();
          }
          $Category = (object)$Category;
          Gdn_Theme::Section($Category->CssClass);
-            
+
          // Load the breadcrumbs.
-			$this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
-         
+         $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
+
          $this->SetData('Category', $Category, TRUE);
-         
+
          // Load the subtree.
          if (C('Vanilla.ExpandCategories'))
             $Categories = CategoryModel::GetSubtree($CategoryIdentifier);
          else
             $Categories = array($Category);
-         
+
          $this->SetData('Categories', $Categories);
-   
+
          // Setup head
          $this->AddCssFile('vanilla.css');
          $this->Menu->HighlightRoute('/discussions');
@@ -131,50 +131,50 @@ class CategoriesController extends VanillaController {
             $this->AddJsFile('discussions.js');
             $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
          }
-         
-         
+
+
          $this->Title(GetValue('Name', $Category, ''));
          $this->Description(GetValue('Description', $Category), TRUE);
-         
+
          // Set CategoryID
          $CategoryID = GetValue('CategoryID', $Category);
          $this->SetData('CategoryID', $CategoryID, TRUE);
-         
+
          // Add modules
          $this->AddModule('NewDiscussionModule');
          $this->AddModule('DiscussionFilterModule');
          $this->AddModule('CategoriesModule');
          $this->AddModule('BookmarkedModule');
-         
+
          // Get a DiscussionModel
          $DiscussionModel = new DiscussionModel();
          $CategoryIDs = ConsolidateArrayValuesByKey($this->Data('Categories'), 'CategoryID');
          $Wheres = array('d.CategoryID' => $CategoryIDs);
          $this->SetData('_ShowCategoryLink', count($CategoryIDs) > 1);
-         
+
          // Check permission
          $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', GetValue('PermissionCategoryID', $Category));
-         
+
          // Set discussion meta data.
          $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
          $this->FireEvent('BeforeGetDiscussions');
          list($Offset, $Limit) = OffsetLimit($Page, $this->EventArguments['PerPage']);
-         
+
          if (!is_numeric($Offset) || $Offset < 0)
             $Offset = 0;
-            
+
          $CountDiscussions = $DiscussionModel->GetCount($Wheres);
          $this->SetData('CountDiscussions', $CountDiscussions);
          $this->SetData('_Limit', $Limit);
-         
+
          // We don't wan't child categories in announcements.
          $Wheres['d.CategoryID'] = $CategoryID;
          $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
          $this->SetData('AnnounceData', $AnnounceData, TRUE);
          $Wheres['d.CategoryID'] = $CategoryIDs;
-         
+
          $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->GetWhere($Wheres, $Offset, $Limit));
-   
+
          // Build a pager
          $PagerFactory = new Gdn_PagerFactory();
          $this->Pager = $PagerFactory->GetPager('Pager', $this);
@@ -188,15 +188,15 @@ class CategoriesController extends VanillaController {
          $this->Pager->Record = $Category;
          PagerModule::Current($this->Pager);
          $this->SetData('_Page', $Page);
-   
+
          // Set the canonical Url.
          $this->CanonicalUrl(CategoryUrl($Category, PageNumber($Offset, $Limit)));
-         
+
          // Change the controller name so that it knows to grab the discussion views
          $this->ControllerName = 'DiscussionsController';
          // Pick up the discussions class
          $this->CssClass = 'Discussions Category-'.GetValue('UrlCode', $Category);
-         
+
          // Deliver JSON data if necessary
          if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
             $this->SetJson('LessRow', $this->Pager->ToString('less'));
@@ -208,7 +208,7 @@ class CategoriesController extends VanillaController {
          $this->Render();
       }
    }
-   
+
    /**
     * Show all (nested) categories.
     *
@@ -224,22 +224,22 @@ class CategoriesController extends VanillaController {
       else
          $this->Title(T('All Categories'));
       Gdn_Theme::Section('CategoryList');
-            
+
       $this->Description(C('Garden.Description', NULL));
-      
+
       $this->SetData('Breadcrumbs', array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
-     
+
       // Set the category follow toggle before we load category data so that it affects the category query appropriately.
       $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
       $CategoryFollowToggleModule->SetToggle();
-      
+
       // Get category data
       $CategoryModel = new CategoryModel();
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
-      
+
       $Categories = $this->CategoryModel->GetFull()->ResultArray();
       $this->SetData('Categories', $Categories);
-      
+
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('DiscussionFilterModule');
@@ -247,7 +247,7 @@ class CategoriesController extends VanillaController {
       $this->AddModule($CategoryFollowToggleModule);
 
       $this->CanonicalUrl(Url('/categories', TRUE));
-      
+
       // Set a definition of the user's current timezone from the db. jQuery
       // will pick this up, compare to the browser, and update the user's
       // timezone if necessary.
@@ -263,7 +263,7 @@ class CategoriesController extends VanillaController {
 
    /**
     * Show all categories and few discussions from each.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -279,11 +279,11 @@ class CategoriesController extends VanillaController {
          $this->Title(T('All Categories'));
       $this->Description(C('Garden.Description', NULL));
       Gdn_Theme::Section('CategoryDiscussionList');
-      
+
       // Set the category follow toggle before we load category data so that it affects the category query appropriately.
       $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
       $CategoryFollowToggleModule->SetToggle();
-      
+
       // Get category data and discussions
       $this->DiscussionsPerCategory = C('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new DiscussionModel();
@@ -295,14 +295,14 @@ class CategoriesController extends VanillaController {
          if ($Category->CategoryID > 0)
             $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->Get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'Announce' => 'all'));
       }
-      
+
       // Add modules
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('DiscussionFilterModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
       $this->AddModule($CategoryFollowToggleModule);
-      
+
       // Set view and render
       $this->View = 'discussions';
 
@@ -310,7 +310,7 @@ class CategoriesController extends VanillaController {
       include_once $this->FetchViewLocation('helper_functions', 'discussions');
       $this->Render();
    }
-   
+
    public function __get($Name) {
       switch ($Name) {
          case 'CategoryData':
@@ -320,12 +320,12 @@ class CategoriesController extends VanillaController {
             return $this->CategoryData;
       }
    }
-   
+
    /**
     * Highlight route.
     *
     * Always called by dispatcher before controller's requested method.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -333,7 +333,7 @@ class CategoriesController extends VanillaController {
       parent::Initialize();
       if ($this->Menu)
          $this->Menu->HighlightRoute('/categories');
-         
+
       $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
-   }      
+   }
 }

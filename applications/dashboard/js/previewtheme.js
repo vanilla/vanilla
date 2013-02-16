@@ -1,6 +1,6 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
-   
+
    // Adapted from getPageSize() by quirksmode.com
    function getPageHeight() {
       var windowHeight
@@ -10,11 +10,11 @@ jQuery(document).ready(function($) {
          windowHeight = document.documentElement.clientHeight;
       } else if (document.body) { // other Explorers
          windowHeight = document.body.clientHeight;
-      }   
+      }
       return windowHeight;
    }
-   
+
    // Fill the screen with the iframe
    $('iframe').height(getPageHeight()-46);
-   
+
 });

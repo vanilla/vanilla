@@ -5,7 +5,7 @@
    <span class="PasswordForce"><?php echo sprintf(T('You can always use your password at<a href="%1$s">%1$s</a>.', 'If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>'),Url('entry/password', TRUE)); ?></span>
 </div>
 <div class="AuthenticationChooser">
-   <?php 
+   <?php
       echo $this->Form->Open(array(
          'action'  => Url('dashboard/authentication/choose')
       ));
@@ -62,7 +62,7 @@
          var Chooser = $(e.target);
          var SliceElement = $('div.AuthenticationConfigure');
          var SliceObj = SliceElement.prop('Slice');
-         
+
          var ChooserVal = Chooser.val();
          var ChosenURL = (ConfigureList[ChooserVal]) ? ConfigureList[ChooserVal] : ((ConfigureList[ChooserVal] != 'undefined') ? '/dashboard/authentication/configure/'+ChooserVal : false);
          if (ChosenURL) {

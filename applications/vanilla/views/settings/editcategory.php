@@ -13,17 +13,17 @@ echo $this->Form->Errors();
    </li>
    <?php if ($this->Category->AllowDiscussions) { ?>
    <li id="UrlCode">
-		<?php
-		echo Wrap(T('Category Url:'), 'strong');
-		echo ' ';
-		echo Gdn::Request()->Url('category', TRUE);
-		echo '/';
-		echo Wrap(htmlspecialchars($this->Form->GetValue('UrlCode')));
-		echo $this->Form->TextBox('UrlCode');
-		echo '/';
-		echo Anchor(T('edit'), '#', 'Edit');
-		echo Anchor(T('OK'), '#', 'Save SmallButton');
-		?>
+      <?php
+      echo Wrap(T('Category Url:'), 'strong');
+      echo ' ';
+      echo Gdn::Request()->Url('category', TRUE);
+      echo '/';
+      echo Wrap(htmlspecialchars($this->Form->GetValue('UrlCode')));
+      echo $this->Form->TextBox('UrlCode');
+      echo '/';
+      echo Anchor(T('edit'), '#', 'Edit');
+      echo Anchor(T('OK'), '#', 'Save SmallButton');
+      ?>
    </li>
    <?php } ?>
    <li>
@@ -56,7 +56,7 @@ echo $this->Form->Errors();
    <?php $this->FireEvent('AfterCategorySettings'); ?>
    <li>
       <?php
-		if(count($this->PermissionData) > 0) {
+      if(count($this->PermissionData) > 0) {
          if (!$this->Category->AllowDiscussions) {
             echo T('This is a parent category that does not allow discussions.');
          } else {
@@ -67,7 +67,7 @@ echo $this->Form->Errors();
             echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
             echo '</div>';
          }
-		}
+      }
       ?>
    </li>
 </ul>

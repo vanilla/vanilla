@@ -2,10 +2,10 @@
 
 /**
  * Database manager
- * 
+ *
  * The Database object contains connection and engine information for a single database.
  * It also allows a database to execute string sql statements against that database.
- * 
+ *
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -23,24 +23,24 @@ class Gdn_Database {
       $this->ClassName = get_class($this);
       $this->Init($Config);
    }
-   
+
    /// PROPERTIES ///
-   
+
    /** @var string The instance name of this class or the class that inherits from this class. */
    public $ClassName;
-   
+
    private $_CurrentResultSet;
-   
+
    /** @var PDO The connectio to the database. */
    protected $_Connection = NULL;
-   
-   
+
+
    protected $_SQL = NULL;
-   
+
    protected $_Structure = NULL;
-   
+
    protected $_IsPersistent = FALSE;
-   
+
    /** Get the PDO connection to the database.
     * @return PDO The connection to the database.
     */
@@ -51,7 +51,7 @@ class Gdn_Database {
             $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
             if($this->ConnectionOptions[1002])
                $this->Query($this->ConnectionOptions[1002]);
-            
+
             // We only throw exceptions during connect
             $this->_Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
          } catch (Exception $ex) {
@@ -60,45 +60,45 @@ class Gdn_Database {
                $Timeout = TRUE;
             if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage()))
                $Timeout = TRUE;
-                    
+
             if ($Timeout)
                throw new Exception(ErrorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
-            
+
             trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
          }
       }
-      
+
       return $this->_Connection;
    }
-   
+
    /** @var array The connection options passed to the PDO constructor **/
    public $ConnectionOptions;
-   
+
    /** @var string The prefix to all database tables. */
    public $DatabasePrefix;
-   
+
    /** @var array Extented properties that a specific driver can use. **/
    public $ExtendedProperties;
-   
+
    /** $var bool Whether or not the connection is in a transaction. **/
    protected $_InTransaction = FALSE;
-   
+
    /** @var string The PDO dsn for the database connection.
     *  Note: This does NOT include the engine before the dsn.
     */
    public $Dsn;
-   
+
    /** @var string The name of the database engine for this class. */
    public $Engine;
-   
+
    /** @var string The password to the database. */
    public $Password;
-   
+
    /** @var string The username connecting to the database. */
    public $User;
-   
+
    /// METHODS ///
-   
+
    /**
     * Begin a transaction on the database.
     */
@@ -106,22 +106,22 @@ class Gdn_Database {
       if (!$this->_InTransaction)
          $this->_InTransaction = $this->Connection()->beginTransaction();
    }
-   
+
    public function CloseConnection() {
       if (!$this->_IsPersistent) {
          $this->CommitTransaction();
          $this->_Connection = NULL;
       }
    }
-   
+
    /**
-    * Hook for cleanup via Gdn_Factory 
-    * 
+    * Hook for cleanup via Gdn_Factory
+    *
     */
    public function Cleanup() {
       $this->CloseConnection();
    }
-   
+
    /**
     * Commit a transaction on the database.
     */
@@ -129,24 +129,24 @@ class Gdn_Database {
       if ($this->_InTransaction)
          $this->_InTransaction = !$this->Connection()->commit();
    }
-	
-	/**
-	 * Properly quotes and escapes a expression for an sql string.
-	 * @param mixed $Expr The expression to quote.
-	 * @return string The quoted expression.
-	 */
-	public function QuoteExpression($Expr) {
-		if(is_null($Expr)) {
-			return 'NULL';
-		} elseif(is_string($Expr)) {
-			return '\''.str_replace('\'', '\\\'', $Expr).'\'';
-		} elseif(is_object($Expr)) {
-			return '?OBJECT?';
-		} else {
-			return $Expr;
-		}
-	}
-   
+
+   /**
+    * Properly quotes and escapes a expression for an sql string.
+    * @param mixed $Expr The expression to quote.
+    * @return string The quoted expression.
+    */
+   public function QuoteExpression($Expr) {
+      if(is_null($Expr)) {
+         return 'NULL';
+      } elseif(is_string($Expr)) {
+         return '\''.str_replace('\'', '\\\'', $Expr).'\'';
+      } elseif(is_object($Expr)) {
+         return '?OBJECT?';
+      } else {
+         return $Expr;
+      }
+   }
+
    /**
     * Initialize the properties of this object.
     * @param mixed $Config The database is instantiated differently depending on the type of $Config:
@@ -165,20 +165,20 @@ class Gdn_Database {
          $Config = Gdn::Config('Database');
       elseif(is_string($Config))
          $Config = Gdn::Config($Config);
-         
+
       $DefaultConfig = Gdn::Config('Database');
-         
+
       $this->Engine = ArrayValue('Engine', $Config, $DefaultConfig['Engine']);
       $this->User = ArrayValue('User', $Config, $DefaultConfig['User']);
       $this->Password = ArrayValue('Password', $Config, $DefaultConfig['Password']);
       $this->ConnectionOptions = ArrayValue('ConnectionOptions', $Config, $DefaultConfig['ConnectionOptions']);
       $this->DatabasePrefix = ArrayValue('DatabasePrefix', $Config, ArrayValue('Prefix', $Config, $DefaultConfig['DatabasePrefix']));
       $this->ExtendedProperties = ArrayValue('ExtendedProperties', $Config, array());
-      
+
       if(array_key_exists('Dsn', $Config)) {
          // Get the dsn from the property.
          $Dsn = $Config['Dsn'];
-      } else {   
+      } else {
          $Host = ArrayValue('Host', $Config, ArrayValue('Host', $DefaultConfig, ''));
          if(array_key_exists('Dbname', $Config))
             $Dbname = $Config['Dbname'];
@@ -190,7 +190,7 @@ class Gdn_Database {
             $Dbname = $DefaultConfig['Name'];
          // Was the port explicitly defined in the config?
          $Port = ArrayValue('Port', $Config, ArrayValue('Port', $DefaultConfig, ''));
-         
+
          if(!isset($Dbname)) {
             $Dsn = $DefaultConfig['Dsn'];
          } else {
@@ -200,7 +200,7 @@ class Gdn_Database {
                $Port = count($Host) == 2 ? $Host[1] : '';
                $Host = $Host[0];
             }
-            
+
             if(empty($Port)) {
                $Dsn = sprintf('host=%s;dbname=%s;', $Host, $Dbname);
             } else {
@@ -208,10 +208,10 @@ class Gdn_Database {
             }
          }
       }
-      
+
       $this->Dsn = $Dsn;
    }
-   
+
    /**
     * Executes a string of SQL. Returns a @@DataSet object.
     *
@@ -232,7 +232,7 @@ class Gdn_Database {
       else
          $ReturnType = NULL;
 
-		if (isset($Options['Cache'])) {
+      if (isset($Options['Cache'])) {
          // Check to see if the query is cached.
          $CacheKeys = (array)GetValue('Cache',$Options,NULL);
          $CacheOperation = GetValue('CacheOperation',$Options,NULL);
@@ -247,7 +247,7 @@ class Gdn_Database {
                   break;
             }
          }
-         
+
          switch ($CacheOperation) {
             case 'get':
                foreach ($CacheKeys as $CacheKey) {
@@ -257,11 +257,11 @@ class Gdn_Database {
                // Cache hit. Return.
                if ($Data !== Gdn_Cache::CACHEOP_FAILURE)
                   return new Gdn_DataSet($Data);
-               
+
                // Cache miss. Save later.
                $StoreCacheKey = $CacheKey;
                break;
-            
+
             case 'increment':
             case 'decrement':
                $CacheMethod = ucfirst($CacheOperation);
@@ -269,14 +269,14 @@ class Gdn_Database {
                   $CacheResult = Gdn::Cache()->$CacheMethod($CacheKey);
                }
                break;
-            
+
             case 'remove':
                foreach ($CacheKeys as $CacheKey) {
                   $Res = Gdn::Cache()->Remove($CacheKey);
                }
                break;
          }
-		}
+      }
 
       // Run the Query
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
@@ -300,7 +300,7 @@ class Gdn_Database {
       if ($PDOStatement === FALSE) {
          trigger_error(ErrorMessage($this->GetPDOErrorMessage($this->Connection()->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
       }
-      
+
       // Did this query modify data in any way?
       if ($ReturnType == 'ID') {
          $this->_CurrentResultSet = $this->Connection()->lastInsertId();
@@ -312,19 +312,19 @@ class Gdn_Database {
             $this->_CurrentResultSet->PDOStatement($PDOStatement);
          }
       }
-      
+
       if (isset($StoreCacheKey)) {
          if ($CacheOperation == 'get')
             Gdn::Cache()->Store(
-               $StoreCacheKey, 
+               $StoreCacheKey,
                (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->ResultArray() : $this->_CurrentResultSet),
                GetValue('CacheOptions', $Options, array())
                );
       }
-      
+
       return $this->_CurrentResultSet;
    }
-   
+
    public function RollbackTransaction() {
       if($this->_InTransaction) {
          $this->_InTransaction = !$this->Connection()->rollBack();
@@ -343,7 +343,7 @@ class Gdn_Database {
 
       return $ErrorMessage;
    }
-   
+
    /**
     * Get the database driver class for the database.
     * @return Gdn_SQLDriver The database driver class associated with this database.
@@ -354,13 +354,13 @@ class Gdn_Database {
          $this->_SQL = Gdn::Factory($Name);
          $this->_SQL->Database = $this;
       }
-      
+
       return $this->_SQL;
    }
-   
+
    /**
     * Get the database structure class for this database.
-    * 
+    *
     * @return Gdn_DatabaseStructure The database structure class for this database.
     */
    public function Structure() {
@@ -369,7 +369,7 @@ class Gdn_Database {
          $this->_Structure = Gdn::Factory($Name);
          $this->_Structure->Database = $this;
       }
-      
+
       return $this->_Structure;
    }
 }

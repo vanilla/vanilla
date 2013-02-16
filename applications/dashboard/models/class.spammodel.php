@@ -7,7 +7,7 @@
 class SpamModel extends Gdn_Pluggable {
    /// PROPERTIES ///
    protected static $_Instance;
-   
+
    public static $Disabled = FALSE;
 
 
@@ -33,15 +33,15 @@ class SpamModel extends Gdn_Pluggable {
    public static function IsSpam($RecordType, $Data, $Options = array()) {
       if (self::$Disabled)
          return FALSE;
-      
+
       // Set some information about the user in the data.
       if ($RecordType == 'Registration') {
          TouchValue('Username', $Data, $Data['Name']);
       } else {
          TouchValue('InsertUserID', $Data, Gdn::Session()->UserID);
-         
+
          $User = Gdn::UserModel()->GetID(GetValue('InsertUserID', $Data), DATASET_TYPE_ARRAY);
-         
+
          if ($User) {
             if (GetValue('Verified', $User)) {
                // The user has been verified and isn't a spammer.
@@ -52,15 +52,15 @@ class SpamModel extends Gdn_Pluggable {
             TouchValue('IPAddress', $Data, $User['LastIPAddress']);
          }
       }
-      
+
       if (!isset($Data['Body']) && isset($Data['Story'])) {
          $Data['Body'] = $Data['Story'];
       }
-      
+
       TouchValue('IPAddress', $Data, Gdn::Request()->IpAddress());
 
       $Sp = self::_Instance();
-      
+
       $Sp->EventArguments['RecordType'] = $RecordType;
       $Sp->EventArguments['Data'] =& $Data;
       $Sp->EventArguments['Options'] =& $Options;

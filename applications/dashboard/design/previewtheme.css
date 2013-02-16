@@ -2,7 +2,7 @@
 input.PreviewThemeButton {
    background: none !important;
    border: none !important;
-	color: #aff !important;
+   color: #aff !important;
    text-decoration: none !important;
    font-size: 12px !important;
    cursor: pointer !important;
@@ -11,6 +11,6 @@ input.PreviewThemeButton {
    margin: 0 !important;
 }
 input.PreviewThemeButton:hover {
-	color: #cff !important;
-	text-decoration: underline !important;
+   color: #cff !important;
+   text-decoration: underline !important;
 }

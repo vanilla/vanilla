@@ -32,14 +32,14 @@ $this->FireEvent('BeforeCommentForm');
                echo $this->Form->Errors();
 //               $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
                $this->FireEvent('BeforeBodyField');
-               
+
                echo $this->Form->BodyBox('Body', array('Table' => 'Comment', 'tabindex' => 1));
-               
+
                echo '<div class="CommentOptions List Inline">';
                $this->FireEvent('AfterBodyField');
                echo '</div>';
-               
-               
+
+
                echo "<div class=\"Buttons\">\n";
                $this->FireEvent('BeforeFormButtons');
                $CancelText = T('Home');

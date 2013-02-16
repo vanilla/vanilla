@@ -7,7 +7,7 @@ $Url = Gdn::Request()->Path();
    <div class="CategoryFilterTitle"><?php echo T('Category Filter'); ?></div>
    <div class="CategoryFilterOptions">
       <?php echo Wrap(T('Viewing'), 'span').': '; ?>
-      <?php 
+      <?php
       if ($ShowAllCategoriesPref):
          echo Wrap(T('all categories'), 'span', array('class' => 'CurrentFilter'));
          echo ' | ';

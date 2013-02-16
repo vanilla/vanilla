@@ -6,11 +6,11 @@ $this->AddSideMenu();
 $CurrentStep = GetValue('CurrentStep', $this->Data, 0);
 $Complete = FALSE;
 if($CurrentStep < 1) {
-	// The import hasn't started yet.
-	echo '<div class="Info">',
-		T('Garden.Import.Info', 'You\'re almost ready to start the import.
+   // The import hasn't started yet.
+   echo '<div class="Info">',
+      T('Garden.Import.Info', 'You\'re almost ready to start the import.
 Please review the information below and click <b>Start Import</b> to begin the import.'),
-		  '</div>';
+        '</div>';
 } else {
    $Steps = GetValue('Steps', $this->Data, array());
    if(count($Steps) > 0 && !array_key_exists($CurrentStep, $Steps)) {
@@ -44,4 +44,4 @@ elseif(!$Complete)
 else
    echo Anchor(T('Finished'), 'dashboard/import/restart', 'Button');
 
-	
+

@@ -8,12 +8,12 @@
          $PhotoAnchor = Anchor(
             Img($Activity['Photo'], array('class' => 'ProfilePhotoSmall')),
             $Activity['PhotoUrl'], 'Photo');
-         
+
          echo '<li class="Activity ' . $Activity['ActivityType'] . '">';
          echo $PhotoAnchor.' '.$Activity['Headline'];
          echo '</li>';
       }
-      
+
       if ($Data->NumRows() >= $this->Limit) {
       ?>
       <li class="ShowAll"><?php echo Anchor(T('More…'), '/activity'); ?></li>

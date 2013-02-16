@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Displays profile options like "Message", "Edit Profile", or "Back to Profile" buttons on the top of the profile page.
  */
 class ProfileOptionsModule extends Gdn_Module {
-   
+
    public function AssetTarget() {
       return 'Content';
    }

@@ -55,14 +55,14 @@ p.WarningMessage {
    echo $this->Form->Errors();
    echo Wrap($this->Form->TextBox('Garden.TrustedDomains', array('MultiLine' => TRUE)), 'p');
    ?>
-   
+
    <h2>Forum Embed Settings</h2>
    <p>The url where the forum is embedded:</p>
    <p><?php echo $this->Form->TextBox('Garden.Embed.RemoteUrl'); ?> <em>Example: http://yourdomain.com/forum/</em></p>
    <p><?php echo $this->Form->CheckBox('Garden.Embed.ForceForum', "Force the forum to only be accessible through this url"); ?></p>
    <p><?php echo $this->Form->CheckBox('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?></p>
    <?php
-   echo $this->Form->Close('Save', '', array('style' => 'margin: 0;')); 
+   echo $this->Form->Close('Save', '', array('style' => 'margin: 0;'));
    }
    ?>
 </div>

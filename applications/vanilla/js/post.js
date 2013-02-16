@@ -1,18 +1,18 @@
 jQuery(document).ready(function($) {
-   
+
    if ($.autogrow)
       $('textarea.TextBox').livequery(function() {
          $(this).autogrow();
       });
-   
+
    // Hijack comment form button clicks
    $('#CommentForm :submit').click(function() {
       var btn = this;
       var frm = $(btn).parents('form').get(0);
-      
+
       // Handler before submitting
       $(frm).triggerHandler('BeforeCommentSubmit', [frm, btn]);
-      
+
       var textbox = $(frm).find('textarea');
       var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
       var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');
@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
       var discussionID = $(frm).find('[name$=DiscussionID]').val();
       var action = $(frm).attr('action') + '/' + discussionID;
       gdn.disable(btn);
-      
+
       $.ajax({
          type: "POST",
          url: action,
@@ -38,20 +38,20 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             json = $.postParseJson(json);
-            
+
             // Remove any old popups if not saving as a draft
             if (!draft)
                $('div.Popup').remove();
-            
+
             // Assign the comment id to the form if it was defined
             if (json.CommentID != null && json.CommentID != '') {
                $(inpCommentID).val(json.CommentID);
                gdn.definition('LastCommentID', json.CommentID, true);
             }
-               
+
             if (json.DraftID != null && json.DraftID != '')
                $(inpDraftID).val(json.DraftID);
-               
+
             // Remove any old errors from the form
             $(frm).find('div.Errors').remove();
 
@@ -75,15 +75,15 @@ jQuery(document).ready(function($) {
       $(frm).triggerHandler('submit');
       return false;
    });
-   
+
    // Hijack discussion form button clicks
    $('#DiscussionForm :submit').live('click', function() {
       var btn = this;
       var frm = $(btn).parents('form').get(0);
-      
+
       // Handler before submitting
       $(frm).triggerHandler('BeforeDiscussionSubmit', [frm, btn]);
-      
+
       var inpDiscussionID = $(frm).find(':hidden[name$=DiscussionID]');
       var inpDraftID = $(frm).find(':hidden[name$=DraftID]');
       var preview = $(btn).attr('name') == $('#Form_Preview').attr('name') ? true : false;
@@ -92,7 +92,7 @@ jQuery(document).ready(function($) {
       postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       postValues += '&'+btn.name+'='+btn.value;
       gdn.disable(btn);
-      
+
       $.ajax({
          type: "POST",
          url: $(frm).attr('action'),
@@ -104,7 +104,7 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             json = $.postParseJson(json);
-            
+
             // Remove any old popups if not saving as a draft
             if (!draft)
                $('div.Popup').remove();
@@ -112,7 +112,7 @@ jQuery(document).ready(function($) {
             // Assign the discussion id to the form if it was defined
             if (json.DiscussionID != null)
                $(inpDiscussionID).val(json.DiscussionID);
-               
+
             if (json.DraftID != null)
                $(inpDraftID).val(json.DraftID);
 
@@ -143,13 +143,13 @@ jQuery(document).ready(function($) {
       $(frm).triggerHandler('submit');
       return false;
    });
-   
+
    // Autosave
    $('#Form_SaveDraft').livequery(function() {
       var btn = this;
       $('#CommentForm textarea').autosave({ button: btn });
       $('#DiscussionForm textarea').autosave({ button: btn });
    });
-   
-   
+
+
 });

@@ -16,12 +16,12 @@ class UserPhotoModule extends Gdn_Module {
       parent::__construct();
       $this->_ApplicationFolder = 'dashboard';
    }
-   
+
    public function AssetTarget() {
       return 'Panel';
    }
 
    public function ToString() {
-		return parent::ToString();
+      return parent::ToString();
    }
 }

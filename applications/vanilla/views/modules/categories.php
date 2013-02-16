@@ -18,7 +18,7 @@ if ($this->Data !== FALSE) {
 
    $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
    $DoHeadings = C('Vanilla.Categories.DoHeadings');
-   
+
    foreach ($this->Data->Result() as $Category) {
       if ($Category->CategoryID < 0 || $MaxDepth > 0 && $Category->Depth > $MaxDepth)
          continue;
@@ -27,7 +27,7 @@ if ($this->Data !== FALSE) {
          $CssClass = 'Heading '.$Category->CssClass;
       else
          $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').' '.$Category->CssClass;
-      
+
       echo '<li class="ClearFix '.$CssClass.'">';
 
       if ($DoHeadings && $Category->Depth == 1) {
@@ -35,7 +35,7 @@ if ($this->Data !== FALSE) {
             .' <span class="Aside"><span class="Count Hidden">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
       } else {
          $CountText = ' <span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
-         
+
          echo Anchor(Gdn_Format::Text($Category->Name).$CountText, CategoryUrl($Category), 'ItemLink');
       }
       echo "</li>\n";

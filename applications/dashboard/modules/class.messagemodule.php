@@ -16,9 +16,9 @@ class MessageModule extends Gdn_Module {
       parent::__construct($Sender);
       $this->_Message = $Message;
    }
-   
+
    public function AssetTarget() {
       return $this->_Message == FALSE ? 'Content' : GetValue('AssetTarget', $this->_Message);
    }
-   
+
 }

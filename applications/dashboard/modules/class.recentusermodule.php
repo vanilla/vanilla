@@ -12,11 +12,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the recently active users. Built for use in a side panel.
  */
 class RecentUserModule extends Gdn_Module {
-   
+
    public function __construct($Sender = '') {
       parent::__construct($Sender);
    }
-   
+
    public function GetData($Limit = 20) {
       $UserModel = new UserModel();
       $this->_Sender->RecentUserData = $UserModel->GetActiveUsers($Limit);

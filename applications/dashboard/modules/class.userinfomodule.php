@@ -12,20 +12,20 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders information about a user in the user profile (email, join date, visits, etc).
  */
 class UserInfoModule extends Gdn_Module {
-   
+
    public $User;
    public $Roles;
-   
+
    public function __construct($Sender = '') {
       $this->User = FALSE;
       $this->Path(__FILE__);
       parent::__construct($Sender);
    }
-   
+
    public function AssetTarget() {
       return 'Panel';
    }
-   
+
    public function LoadData() {
       $UserID = Gdn::Controller()->Data('Profile.UserID', Gdn::Session()->UserID);
       $this->User = Gdn::UserModel()->GetID($UserID);
@@ -35,7 +35,7 @@ class UserInfoModule extends Gdn_Module {
    public function ToString() {
       if (!$this->User)
          $this->LoadData();
-      
+
       if (is_object($this->User))
          return parent::ToString();
 

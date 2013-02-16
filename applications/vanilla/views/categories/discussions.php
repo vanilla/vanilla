@@ -9,29 +9,29 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
 
       $this->Category = $Category;
       $this->DiscussionData = $this->CategoryDiscussionData[$Category->CategoryID];
-      
+
       if ($this->DiscussionData->NumRows() > 0) : ?>
-      
-   <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">      
+
+   <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
       <h2 class="H"><?php
             echo Anchor($Category->Name, '/categories/'.$Category->UrlCode);
             Gdn::Controller()->EventArguments['Category'] = $Category;
-            Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
+            Gdn::Controller()->FireEvent('AfterCategoryTitle');
       ?></h2>
-      
+
       <ul class="DataList Discussions">
          <?php include($this->FetchViewLocation('discussions', 'discussions')); ?>
       </ul>
-      
+
       <?php if ($this->DiscussionData->NumRows() == $this->DiscussionsPerCategory) : ?>
       <div class="MorePager">
          <?php echo Anchor(T('More Discussions'), '/categories/'.$Category->UrlCode); ?>
       </div>
       <?php endif; ?>
-      
+
    </div>
-   
+
       <?php endif; ?>
-      
+
    <?php endforeach; ?>
 </div>

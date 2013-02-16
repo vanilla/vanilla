@@ -16,7 +16,7 @@ if (!$ModPermission && !$AdminPermission)
          ?>
       </li>
       <?php
-      if ($ModPermission): 
+      if ($ModPermission):
       ?>
       <li <?php if ($Controller->Data('Filter') == 'mods') echo 'class="Active"'; ?>>
          <?php
@@ -25,7 +25,7 @@ if (!$ModPermission && !$AdminPermission)
       </li>
       <?php
       endif;
-      
+
       if ($AdminPermission):
       ?>
       <li <?php if ($Controller->Data('Filter') == 'admins') echo 'class="Active"'; ?>>

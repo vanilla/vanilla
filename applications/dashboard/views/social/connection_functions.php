@@ -4,24 +4,24 @@ function WriteConnection($Connection) {
    $c = Gdn::Controller();
    $Enabled = GetValue('Enabled', $Connection);
    $SettingsUrl = GetValue('SettingsUrl', $Connection);
-   
+
    $Css = array();
    $Css[] = $Enabled ? 'Enabled' : 'Disabled';
-   
+
    $CssClasses = implode(' ', $Css);
-   
+
    $Addendums = array();
-   
+
 //   $RequiresRegistration = GetValue('RequiresRegistration', $Connection);
 //   if ($RequiresRegistration)
 //      $Addendums[] = Wrap(T('requires registration'), 'span', array('class' => 'RequiresRegistration'));
-   
+
    $Configured = GetValue('Configured', $Connection);
    if (!$Configured)
       $Addendums[] = Wrap(T('not configured'), 'span', array('class' => 'NotConfigured'));
-   
+
    $Index = GetValue('Index', $Connection, GetValue('ProviderKey', $Connection));
-   
+
 ?>
    <li id="<?php echo "Provider_$Index"; ?>" class="Item <?php echo $CssClasses; ?>">
       <div class="Connection-Header">
@@ -30,13 +30,13 @@ function WriteConnection($Connection) {
          </span>
          <span class="Connection-Info">
             <span class="Connection-Name">
-               <?php 
+               <?php
                   if ($Enabled)
                      echo Anchor(GetValue('Name', $Connection, T('Unknown')), $SettingsUrl);
                   else
                      echo GetValue('Name', $Connection, T('Unknown'));
                ?>
-               
+
                <?php if (sizeof($Addendums)): ?>
                   <span class="Addendums">
                   <?php echo implode(', ', $Addendums); ?>

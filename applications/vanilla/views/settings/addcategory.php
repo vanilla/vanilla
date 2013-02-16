@@ -17,17 +17,17 @@ echo $this->Form->Errors();
       ?>
    </li>
    <li id="UrlCode">
-		<?php
-		echo Wrap(T('Category Url:'), 'strong');
-		echo ' ';
-		echo Gdn::Request()->Url('category', TRUE);
-		echo '/';
-		echo Wrap(htmlspecialchars($this->Form->GetValue('UrlCode')));
-		echo $this->Form->TextBox('UrlCode');
-		echo '/';
-		echo Anchor(T('edit'), '#', 'Edit');
-		echo Anchor(T('OK'), '#', 'Save SmallButton');
-		?>
+      <?php
+      echo Wrap(T('Category Url:'), 'strong');
+      echo ' ';
+      echo Gdn::Request()->Url('category', TRUE);
+      echo '/';
+      echo Wrap(htmlspecialchars($this->Form->GetValue('UrlCode')));
+      echo $this->Form->TextBox('UrlCode');
+      echo '/';
+      echo Anchor(T('edit'), '#', 'Edit');
+      echo Anchor(T('OK'), '#', 'Save SmallButton');
+      ?>
    </li>
    <li>
       <?php
@@ -51,7 +51,7 @@ echo $this->Form->Errors();
       $this->Data('_ExtendedFields', array()),
       array('Wrap' => array('', '')));
    ?>
-	<?php if(count($this->PermissionData) > 0) { ?>
+   <?php if(count($this->PermissionData) > 0) { ?>
    <li id="Permissions">
       <?php
          echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
@@ -62,6 +62,6 @@ echo $this->Form->Errors();
          echo '</div>';
       ?>
    </li>
-	<?php } ?>
+   <?php } ?>
 </ul>
 <?php echo $this->Form->Close('Save'); ?>

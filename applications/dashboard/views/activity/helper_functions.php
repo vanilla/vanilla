@@ -9,19 +9,19 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    $PhotoAnchor = Anchor(
       Img($Activity->Photo, array('class' => 'ProfilePhoto ProfilePhotoMedium')),
       $Activity->PhotoUrl, 'PhotoWrap');
-   
+
    $CssClass = 'Item Activity Activity-'.$ActivityType;
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
-   
+
    $Format = GetValue('Format', $Activity);
-      
+
    $Title = '';
    $Excerpt = $Activity->Story;
    if ($Format) {
       $Excerpt = Gdn_Format::To($Excerpt, $Format);
    }
-   
+
    if (!in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate'))) {
       $Title = '<div class="Title">'.GetValue('Headline', $Activity).'</div>';
    } else if ($ActivityType == 'WallPost') {
@@ -32,7 +32,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
          .' <span>&rarr;</span> '
          .UserAnchor($Author, 'Name')
          .'</div>';
-      
+
       if (!$Format)
          $Excerpt = Gdn_Format::Display($Excerpt);
    } else {
@@ -60,9 +60,9 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    <div class="ItemContent Activity">
       <?php echo $Title; ?>
       <div class="Excerpt"><?php echo $Excerpt; ?></div>
-      <?php 
+      <?php
       $Sender->EventArguments['Activity'] = $Activity;
-      $Sender->FireAs('ActivityController')->FireEvent('AfterActivityBody'); 
+      $Sender->FireAs('ActivityController')->FireEvent('AfterActivityBody');
       ?>
       <div class="Meta">
          <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateUpdated); ?></span>
@@ -71,24 +71,24 @@ function WriteActivity($Activity, &$Sender, &$Session) {
          $ID = GetValue('SharedNotifyUserID', $Activity->Data);
          if (!$ID)
             $ID = GetValue('CommentNotifyUserID', $Activity->Data);
-         
+
          if ($ID)
-            $SharedString = FormatString(T('Comments are between {UserID,you}.'), array('UserID' => array($Activity->NotifyUserID, $ID))); 
-         
+            $SharedString = FormatString(T('Comments are between {UserID,you}.'), array('UserID' => array($Activity->NotifyUserID, $ID)));
+
          $AllowComments = $Activity->NotifyUserID < 0 || $SharedString;
-         
-         
-         
+
+
+
          if ($AllowComments && $Session->CheckPermission('Garden.Profiles.Edit'))
             echo '<span class="MItem AddComment">'
                .Anchor(T('Activity.Comment', 'Comment'), '#CommentForm_'.$Activity->ActivityID, 'CommentOption');
-         
+
             if ($SharedString) {
                echo ' <span class="MItem"><i>'.$SharedString.'</i></span>';
             }
-         
+
             echo '</span>';
-         
+
          $Sender->FireEvent('AfterMeta');
          ?>
       </div>
@@ -103,7 +103,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    } else {
       echo '<ul class="DataList ActivityComments Hidden">';
    }
-   
+
    if ($Session->CheckPermission('Garden.Profiles.Edit')):
       ?>
       <li class="CommentForm">
@@ -115,16 +115,16 @@ function WriteActivity($Activity, &$Sender, &$Session) {
          $CommentForm->AddHidden('Return', Gdn_Url::Request());
          echo $CommentForm->Open(array('action' => Url('/dashboard/activity/comment'), 'class' => 'Hidden'));
          echo '<div class="TextBoxWrapper">'.$CommentForm->TextBox('Body', array('MultiLine' => TRUE, 'value' => '')).'</div>';
-         
+
          echo '<div class="Buttons">';
          echo $CommentForm->Button('Comment', array('class' => 'Button Primary'));
          echo '</div>';
-         
+
          echo $CommentForm->Close();
       ?></li>
-   <?php 
+   <?php
    endif;
-   
+
    echo '</ul>';
 ?>
 </li>
@@ -137,7 +137,7 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
    $CssClass = 'Item ActivityComment ActivityComment';
    if ($PhotoAnchor != '')
       $CssClass .= ' HasPhoto';
-   
+
 ?>
 <li id="ActivityComment_<?php echo $Comment['ActivityCommentID']; ?>" class="<?php echo $CssClass; ?>">
    <?php if ($PhotoAnchor != '') { ?>
@@ -162,7 +162,7 @@ function WriteActivityTabs() {
    $Sender = Gdn::Controller();
    $ModPermission = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
    $AdminPermission = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
-   
+
    if (!$ModPermission && !$AdminPermission)
       return;
 ?>
@@ -174,7 +174,7 @@ function WriteActivityTabs() {
             ?>
          </li>
          <?php
-         if ($ModPermission): 
+         if ($ModPermission):
          ?>
          <li <?php if ($Sender->Data('Filter') == 'mods') echo 'class="Active"'; ?>>
             <?php
@@ -183,7 +183,7 @@ function WriteActivityTabs() {
          </li>
          <?php
          endif;
-         
+
          if ($AdminPermission):
          ?>
          <li <?php if ($Sender->Data('Filter') == 'admins') echo 'class="Active"'; ?>>

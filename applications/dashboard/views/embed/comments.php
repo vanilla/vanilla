@@ -89,10 +89,10 @@ echo $this->Form->Errors();
       </p>
    </li>
 </ul>
-<?php 
+<?php
 echo $this->Form->Close('Save');
-      
-} else { 
+
+} else {
 ?>
    <style type="text/css">
 .CopyBox {
@@ -121,18 +121,18 @@ p.AlertMessage {
     padding: 6px;
     margin-bottom: 0;
     border-bottom: 0;
-}      
+}
    </style>
 <h1><?php echo T('Use Vanilla as a commenting system in your site'); ?></h1>
 <div class="Info">
    <p>You can use Vanilla as a commenting system for your website, and all
-   contributed comments will also be present in your discussion forum. Vanilla 
+   contributed comments will also be present in your discussion forum. Vanilla
    Comments can be used on any website using the following code.</p>
-   
+
    <p class="AlertMessage"><strong>Note:</strong> You MUST define the <code>vanilla_forum_url</code>
    and <code>vanilla_identifier</code> settings before pasting this script into
    your web page.</p>
-   
+
    <div class="CopyBox">&lt;div id="vanilla-comments">&lt;/div>
 &lt;script type="text/javascript">
 <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
@@ -160,7 +160,7 @@ var vanilla_identifier = 'your-content-identifier'; // Your unique identifier fo
    <h2>Comment Counts</h2>
    <p>To show the number of comments on each blog post on your main blog page, use the following code.</p>
 
-   <p class="AlertMessage"><strong>Note:</strong> You MUST define the <code>vanilla_forum_url</code> 
+   <p class="AlertMessage"><strong>Note:</strong> You MUST define the <code>vanilla_forum_url</code>
       before pasting this script into your web page.</p>
 
    <div class="CopyBox">&lt;script type="text/javascript">
@@ -186,7 +186,7 @@ var vanilla_forum_url = '<?php echo Url('/', TRUE); ?>'; // The full http url & 
    <p><strong>One more thing!</strong></p>
    <p>You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a <strong>vanilla-identifier</strong> attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when embedding the comments into the page.</p>
    <div class="CopyBox">&lt;a href="http://yourdomain.com/path/to/page/with/comments/#vanilla_comments" <strong>vanilla-identifier="embed-test"</strong>>Comments&lt;/a></div>
-   
+
    <p>Vanilla will then replace the content of the anchor (in this case, the word "Comments") with the number of comments on the page in question.</p>
 </div>
 <?php

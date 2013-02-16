@@ -37,7 +37,7 @@
 </style>
 <div>
    <?php
-   
+
    $ItemCount = $this->Data('ItemCount');
 
    if (!$ItemCount) {
@@ -75,7 +75,7 @@
             $UsersHtml = T("Check the box next to the user to mark them as <b>Verified</b> so their posts don't get marked as spam again.");
             break;
       }
-      
+
       if ($ShowUsers && sizeof($this->Data('Users'))) {
          echo '<div class="ExtraAction">';
             echo '<div class="ExtraActionTitle">'.$UsersHtml.'</div>';
@@ -89,14 +89,14 @@
                $RecordUser = Gdn::UserModel()->GetID($User['UserID'], DATASET_TYPE_ARRAY);
                echo '<div class="CheckBoxCell">';
                echo $this->Form->CheckBox('UserID[]', htmlspecialchars($User['Name']), array('value' => $User['UserID']));
-               echo ' <span class="Count">'.Plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';            
+               echo ' <span class="Count">'.Plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
 
                echo '</div>';
             }
          echo '</div>';
          echo '<div class="ClearFix"></div>';
       }
-      
+
       echo '<div class="ConfirmText">'.$AfterHtml.'</div>';
 
       echo '<div class="Buttons">',
@@ -105,8 +105,8 @@
          ' ',
          Anchor(T("No, get me outta here!"), '#', array('class' => 'ConfirmNo')),
          '</div>';
-      
-      
+
+
       echo $this->Form->Close();
    }
    ?>

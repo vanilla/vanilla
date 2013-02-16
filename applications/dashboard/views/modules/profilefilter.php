@@ -12,7 +12,7 @@ $SortOrder = C('Garden.ProfileTabOrder');
 
 if (!is_array($SortOrder))
    $SortOrder = array();
-   
+
 // Make sure that all tabs are present in $SortOrder
 foreach ($Controller->ProfileTabs as $TabCode => $TabInfo) {
    if (!in_array($TabCode, $SortOrder))

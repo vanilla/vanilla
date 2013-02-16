@@ -10,7 +10,7 @@ function OtherRecordsMeta($Data) {
    if (!GetValue('_Data', $Data)) {
       return '';
    }
-   
+
    $Result = '<div><b>'.T('Other Records').':</b></div><div>';
    $_Data = GetValue('_Data', $Data);
    foreach ($_Data as $Type => $Rows) {

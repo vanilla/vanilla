@@ -5,8 +5,8 @@
  *
  * This class is HEAVILY inspired by CodeIgniter (http://www.codeigniter.com).
  * My hat is off to them.
- * 
- * @author Todd Burry <todd@vanillaforums.com> 
+ *
+ * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -33,15 +33,15 @@ class Gdn_DataSet implements IteratorAggregate {
     * @var int
     */
    private $_Cursor = -1;
-	
-	/**
+
+   /**
     * Determines what type of result is returned from the various methods by default.
     *
     * @var int Either DATASET_TYPE_OBJECT or DATASET_TYPE_ARRAY.
     */
-	protected $_DatasetType = DATASET_TYPE_OBJECT;
-	
-	protected $_EOF = FALSE;
+   protected $_DatasetType = DATASET_TYPE_OBJECT;
+
+   protected $_EOF = FALSE;
 
    /**
     * Contains a PDOStatement object returned by a PDO query. FALSE by default.
@@ -51,12 +51,12 @@ class Gdn_DataSet implements IteratorAggregate {
     * @var object
     */
    private $_PDOStatement;
-	
-	/**
-	 * An array of either objects or associative arrays with the data in this dataset.
-	 * @var array
-	 */
-	protected $_Result;
+
+   /**
+    * An array of either objects or associative arrays with the data in this dataset.
+    * @var array
+    */
+   protected $_Result;
 
    /**
     * @todo Undocumented method.
@@ -94,33 +94,33 @@ class Gdn_DataSet implements IteratorAggregate {
    public function DataSeek($RowIndex = 0) {
       $this->_Cursor = $RowIndex;
    }
-	
-	public function DatasetType($DatasetType = FALSE) {
-		if($DatasetType !== FALSE) {
-			// Make sure the type isn't changed if the result is already fetched.
-			if(!is_null($this->_Result) && $DatasetType != $this->_DatasetType) {
+
+   public function DatasetType($DatasetType = FALSE) {
+      if($DatasetType !== FALSE) {
+         // Make sure the type isn't changed if the result is already fetched.
+         if(!is_null($this->_Result) && $DatasetType != $this->_DatasetType) {
             // Loop through the dataset and switch the types.
             $Count = count($this->_Result);
-				foreach($this->_Result as $Index => &$Row) {
+            foreach($this->_Result as $Index => &$Row) {
                switch($DatasetType) {
                   case DATASET_TYPE_ARRAY:
-							$Row = (array)$Row;
+                     $Row = (array)$Row;
                      //$this->_Result[$Index] = (array)$this->_Result[$Index];
                      break;
                   case DATASET_TYPE_OBJECT:
-							$Row = (object)$Row;
+                     $Row = (object)$Row;
                      //$this->_Result[$Index] = (object)$this->_Result[$Index];
                      break;
                }
             }
-			}
-			
-			$this->_DatasetType = $DatasetType;
-			return $this;
-		} else {
-			return $this->_DatasetType;
-		}
-	}
+         }
+
+         $this->_DatasetType = $DatasetType;
+         return $this;
+      } else {
+         return $this->_DatasetType;
+      }
+   }
 
    /**
     * Fetches all rows from the PDOStatement object into the resultset.
@@ -129,13 +129,13 @@ class Gdn_DataSet implements IteratorAggregate {
     * It will fill a different array depending on which type is specified.
     */
    protected function _FetchAllRows($DatasetType = FALSE) {
-		if(!is_null($this->_Result))
-			return;
+      if(!is_null($this->_Result))
+         return;
 
       if($DatasetType)
          $this->_DatasetType = $DatasetType;
-		
-		$Result = array();
+
+      $Result = array();
       if (is_null($this->_PDOStatement)) {
          $this->_Result = $Result;
          return;
@@ -143,13 +143,13 @@ class Gdn_DataSet implements IteratorAggregate {
 
       $Result = $this->_PDOStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
 
-//		$this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
+//      $this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
 //      while($Row = $this->_PDOStatement->fetch()) {
-//			$Result[] = $Row;
-//		}
+//         $Result[] = $Row;
+//      }
 
       $this->FreePDOStatement(TRUE);
-		$this->_Result = $Result;
+      $this->_Result = $Result;
    }
 
    /**
@@ -158,26 +158,26 @@ class Gdn_DataSet implements IteratorAggregate {
     * @param string $DatasetType The format in which the result should be returned: object or array.
     */
    public function &FirstRow($DatasetType = FALSE) {
-		$Result = &$this->Result($DatasetType);
+      $Result = &$this->Result($DatasetType);
       if(count($Result) == 0)
          return $this->_EOF;
 
       return $Result[0];
    }
-	
-	/**
-	 * Format the resultset with the given method.
-	 *
-	 * @param string $FormatMethod The method to use with Gdn_Format::To().
-	 * @return Gdn_Dataset $this pointer for chaining.
-	 */
-	public function Format($FormatMethod) {
-		$Result = &$this->Result();
-		foreach($Result as $Index => $Value) {
-			$Result[$Index] = Gdn_Format::To($Value, $FormatMethod);
-		}
-		return $this;
-	}
+
+   /**
+    * Format the resultset with the given method.
+    *
+    * @param string $FormatMethod The method to use with Gdn_Format::To().
+    * @return Gdn_Dataset $this pointer for chaining.
+    */
+   public function Format($FormatMethod) {
+      $Result = &$this->Result();
+      foreach($Result as $Index => $Value) {
+         $Result[$Index] = Gdn_Format::To($Value, $FormatMethod);
+      }
+      return $this;
+   }
 
    /**
     * Free's the result resource referenced by $this->_PDOStatement.
@@ -185,11 +185,11 @@ class Gdn_DataSet implements IteratorAggregate {
    public function FreePDOStatement($DestroyPDOStatement = TRUE) {
       if (is_object($this->_PDOStatement))
          $this->_PDOStatement->closeCursor();
-         
+
       if ($DestroyPDOStatement)
          $this->_PDOStatement = NULL;
    }
-   
+
    /**
     * Interface method for IteratorAggregate;
     */
@@ -206,7 +206,7 @@ class Gdn_DataSet implements IteratorAggregate {
     *  - <b>Unique</b>: Whether or not the results are unique.
     *   - <b>true</b> (default): The index is unique.
     *   - <b>false</b>: The index is not unique and each indexed row will be an array or arrays.
-    * @return type 
+    * @return type
     */
    public static function Index($Data, $Columns, $Options = array()) {
       $Columns = (array)$Columns;
@@ -233,7 +233,7 @@ class Gdn_DataSet implements IteratorAggregate {
       }
       return $Result;
    }
-   
+
    /**
     *
     * @param array $Data
@@ -251,10 +251,10 @@ class Gdn_DataSet implements IteratorAggregate {
     */
    public static function Join(&$Data, $Columns, $Options = array()) {
       $Options = array_change_key_case($Options);
-      
+
       $Sql = Gdn::SQL(); //GetValue('sql', $Options, Gdn::SQL());
       $ResultColumns = array();
-      
+
       // Grab the columns.
       foreach ($Columns as $Index => $Name) {
          if (is_numeric($Index)) {
@@ -266,7 +266,7 @@ class Gdn_DataSet implements IteratorAggregate {
                $Column = $Name;
                $ColumnAlias = '';
             }
-            
+
             if (($Pos = strpos($Column, '.')) !== FALSE) {
                $Sql->Select($Column, '', $ColumnAlias);
                $Column = substr($Column, $Pos + 1);
@@ -306,14 +306,14 @@ class Gdn_DataSet implements IteratorAggregate {
             }
          }
       }
-      
+
       if (!isset($TableAlias)) {
          if (isset($Table))
             $TableAlias = 'c';
          else
             $TableAlias = 'c';
       }
-      
+
       if (!isset($ParentColumn)) {
          if (isset($ChildColumn))
             $ParentColumn = $ChildColumn;
@@ -322,7 +322,7 @@ class Gdn_DataSet implements IteratorAggregate {
          else
             throw Exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
       }
-      
+
       // Figure out some options if they weren't specified.
       if (!isset($ChildColumn)) {
          if (isset($ParentColumn))
@@ -332,18 +332,18 @@ class Gdn_DataSet implements IteratorAggregate {
          else
             throw Exception("Gdn_DataSet::Join(): Missing 'child' argument'.");
       }
-      
+
       if (!isset($ColumnPrefix) && !isset($JoinColumn)) {
          $ColumnPrefix = StringEndsWith($ParentColumn, 'ID', TRUE, TRUE);
       }
-      
+
       $JoinType = strtolower(GetValue('Type', $Options, JOIN_LEFT));
-      
+
       // Start augmenting the sql for the join.
       if (isset($Table))
          $Sql->From("$Table $TableAlias");
       $Sql->Select("$TableAlias.$ChildColumn");
-      
+
       // Get the IDs to generate an in clause with.
       $IDs = array();
       foreach ($Data as $Row) {
@@ -351,13 +351,13 @@ class Gdn_DataSet implements IteratorAggregate {
          if ($Value)
             $IDs[$Value] = TRUE;
       }
-      
+
       $IDs = array_keys($IDs);
       $Sql->WhereIn($ChildColumn, $IDs);
-      
+
       $ChildData = $Sql->Get()->ResultArray();
       $ChildData = self::Index($ChildData, $ChildColumn, array('unique' => GetValue('unique', $Options, isset($ColumnPrefix))));
-      
+
       $NotFound = array();
 
       // Join the data in.
@@ -365,7 +365,7 @@ class Gdn_DataSet implements IteratorAggregate {
          $ParentID = GetValue($ParentColumn, $Row);
          if (isset($ChildData[$ParentID])) {
             $ChildRow = $ChildData[$ParentID];
-            
+
             if (isset($ColumnPrefix)) {
                // Add the data to the columns.
                foreach ($ChildRow as $Name => $Value) {
@@ -389,7 +389,7 @@ class Gdn_DataSet implements IteratorAggregate {
             }
          }
       }
-      
+
       // Remove inner join rows.
       if ($JoinType == JOIN_INNER) {
          foreach ($NotFound as $Index) {
@@ -416,10 +416,10 @@ class Gdn_DataSet implements IteratorAggregate {
     *
     * @param string $DatasetType The format in which the result should be returned: object or array.
     */
-   public function &NextRow($DatasetType = FALSE	) {
+   public function &NextRow($DatasetType = FALSE   ) {
       $Result = &$this->Result($DatasetType);
       ++$this->_Cursor;
-		
+
       if(isset($Result[$this->_Cursor]))
          return $Result[$this->_Cursor];
       return $this->_EOF;
@@ -430,8 +430,8 @@ class Gdn_DataSet implements IteratorAggregate {
     */
    public function NumFields() {
       $Result = is_object($this->_PDOStatement) ? $this->_PDOStatement->columnCount() : 0;
-		return $Result;
-	}
+      return $Result;
+   }
 
    /**
     * Returns the number of rows in the DataSet.
@@ -439,8 +439,8 @@ class Gdn_DataSet implements IteratorAggregate {
     * @param string $DatasetType The format in which the result should be returned: object or array.
     */
    public function NumRows($DatasetType = FALSE) {
-		$Result = count($this->Result($DatasetType));
-		return $Result;
+      $Result = count($this->Result($DatasetType));
+      return $Result;
    }
 
    /**
@@ -466,12 +466,12 @@ class Gdn_DataSet implements IteratorAggregate {
     *  - <b>FALSE</b>: The current value of the DatasetType property will be used.
     */
    public function &Result($DatasetType = FALSE) {
-		$this->DatasetType($DatasetType);
+      $this->DatasetType($DatasetType);
       if(is_null($this->_Result))
-			$this->_FetchAllRows();
+         $this->_FetchAllRows();
 
-			
-		return $this->_Result;
+
+      return $this->_Result;
    }
 
    /**
@@ -479,7 +479,7 @@ class Gdn_DataSet implements IteratorAggregate {
     *
     */
    public function &ResultArray() {
-		return $this->Result(DATASET_TYPE_ARRAY);
+      return $this->Result(DATASET_TYPE_ARRAY);
    }
 
    /**
@@ -487,7 +487,7 @@ class Gdn_DataSet implements IteratorAggregate {
     *
     */
    public function ResultObject($FormatType = '') {
-		return $this->Result(DATASET_TYPE_OBJECT);
+      return $this->Result(DATASET_TYPE_OBJECT);
    }
 
    /**
@@ -497,9 +497,9 @@ class Gdn_DataSet implements IteratorAggregate {
     * @return mixed The row at the given index or FALSE if there is no row at the index.
     */
    public function &Row($RowIndex) {
-		$Result = &$this->Result();
+      $Result = &$this->Result();
       if(isset($Result[$RowIndex]))
-			return $Result[$RowIndex];
+         return $Result[$RowIndex];
       return $this->_EOF;
    }
 
@@ -514,12 +514,12 @@ class Gdn_DataSet implements IteratorAggregate {
          $this->_Cursor = -1;
          $this->_PDOStatement = NULL;
          $FirstRow = $Resultset[0];
-			
+
          if (is_array($FirstRow))
-				$this->_DatasetType = DATASET_TYPE_ARRAY;
-			else
-				$this->_DatasetType = DATASET_TYPE_OBJECT;
-			$this->_Result = $Resultset;
+            $this->_DatasetType = DATASET_TYPE_ARRAY;
+         else
+            $this->_DatasetType = DATASET_TYPE_OBJECT;
+         $this->_Result = $Resultset;
       }
    }
 
@@ -534,16 +534,16 @@ class Gdn_DataSet implements IteratorAggregate {
       else
          $this->_PDOStatement = $PDOStatement;
    }
-   
+
    /**
     * Unserialize the fields in the dataset.
-    * @param array $Fields 
+    * @param array $Fields
     * @since 2.1
     */
    public function Unserialize($Fields = array('Attributes', 'Data')) {
       $Result =& $this->Result();
       $First = TRUE;
-      
+
       foreach ($Result as $Row) {
          if ($First) {
             // Check which fields are in the dataset.
@@ -554,7 +554,7 @@ class Gdn_DataSet implements IteratorAggregate {
             }
             $First = FALSE;
          }
-         
+
          foreach ($Fields as $Field) {
             if (is_object($Row)) {
                if (is_string($Row->$Field))
@@ -593,12 +593,12 @@ class Gdn_DataSet implements IteratorAggregate {
             elseif(is_array($Row) && array_key_exists($ColumnName, $Row))
                   return $Row[$ColumnName];
          }
-		}
+      }
       if(is_array($ColumnName))
          return array_values($ColumnName);
-		return $DefaultValue;
+      return $DefaultValue;
    }
-   
+
    /**
     * Advances to the next row and returns the value rom a column.
     *

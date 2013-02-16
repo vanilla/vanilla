@@ -41,14 +41,14 @@ if ($HasCommentData) {
          $this->AddDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
       $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
    }
-   
+
    // Send the user to the discussion in the forum when paging
    if (C('Garden.Embed.PageToForum') && $this->Pager->HasMorePages()) {
       $DiscussionUrl = DiscussionUrl($Discussion).'#latest';
       echo '<div class="PageToForum Foot">';
       echo Anchor(T('More Comments'), $DiscussionUrl);
       echo '</div>';
-   } else 
+   } else
       echo $this->Pager->ToString('more');
 }
 

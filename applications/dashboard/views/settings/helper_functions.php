@@ -60,7 +60,7 @@ function GetTutorials($TutorialCode = '') {
          'VideoID' => '31493119'
       )
    );
-   
+
    // Default Thumbnails
    $Thumbnail = Asset('applications/dashboard/design/images/help-tn-200.jpg');
    $LargeThumbnail = Asset('applications/dashboard/design/images/help-tn-640.jpg');
@@ -68,13 +68,13 @@ function GetTutorials($TutorialCode = '') {
       $Tutorials[$i]['Thumbnail'] = $Thumbnail;
       $Tutorials[$i]['LargeThumbnail'] = $LargeThumbnail;
    }
-   
+
    if ($TutorialCode != '') {
       $Keys = ConsolidateArrayValuesByKey($Tutorials, 'Code');
       $Index = array_search($TutorialCode, $Keys);
       if ($Index === FALSE)
          return FALSE; // Not found!
-      
+
       // Found it, so define it's thumbnail location
       $Tutorial = GetValue($Index, $Tutorials);
       $VideoID = GetValue('VideoID', $Tutorial);
@@ -83,7 +83,7 @@ function GetTutorials($TutorialCode = '') {
          $Tutorial['Thumbnail'] = GetValue('thumbnail_medium', GetValue('0', $Vimeo));
          $Tutorial['LargeThumbnail'] = GetValue('thumbnail_large', GetValue('0', $Vimeo));
       } catch (Exception $Ex) {
-         // Do nothing   
+         // Do nothing
       }
       return $Tutorial;
    } else {
@@ -95,7 +95,7 @@ function GetTutorials($TutorialCode = '') {
             $Tutorials[$Key]['LargeThumbnail'] = GetValue('thumbnail_large', GetValue('0', $Vimeo));
          }
       } catch (Exception $Ex) {
-         // Do nothing   
+         // Do nothing
       }
       return $Tutorials;
    }

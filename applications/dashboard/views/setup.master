@@ -6,9 +6,9 @@
 </head>
 <body<?php echo Attribute(array('id' => $BodyIdentifier, 'class' => $this->CssClass)); ?>>
    <div id="Frame">
-		<div id="Content">
-			<?php $this->RenderAsset('Content'); ?>
-		</div>
+      <div id="Content">
+         <?php $this->RenderAsset('Content'); ?>
+      </div>
    </div>
 </body>
 </html>

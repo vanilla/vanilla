@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Dashboard
  */
- 
+
 set_time_limit(0);
 
 /**
@@ -24,40 +24,40 @@ set_time_limit(0);
 class UtilityController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
-   
+
    /**
     * Gather all of the global styles together.
-    * @param string $Filename 
+    * @param string $Filename
     * @since 2.1
     */
    public function Css($Basename, $Revision) {
       $AssetModel = new AssetModel();
       $AssetModel->ServeCss($Basename, $Revision);
    }
-   
+
    public function Initialize() {
       parent::Initialize();
       Gdn_Theme::Section('Dashboard');
    }
-   
+
    /**
     * Call a method on the given model.
     */
    public function Model() {
       $this->Permission('Garden.Settings.Manage');
-      
+
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
       $this->DeliveryType(DELIVERY_TYPE_DATA);
-      
+
       $Args = func_get_args();
-      
+
       // Check to see if we have a model.
       $ModelName = StringEndsWith(array_shift($Args), 'Model', TRUE, TRUE);
       $ModelName = ucfirst($ModelName).'Model';
       if (!class_exists($ModelName)) {
          throw NotFoundException($ModelName);
       }
-      
+
       // Check for json/xml style extension.
       if (count($Args)) {
          $LastArg = $Args[count($Args) - 1];
@@ -69,14 +69,14 @@ class UtilityController extends DashboardController {
                $this->DeliveryMethod(DELIVERY_METHOD_XML);
          }
       }
-      
+
       // Instantiate the model.
       $Model = new $ModelName();
       $MethodName = array_shift($Args);
-      
+
       // Reflect the arguments.
       $Callback = array($Model, $MethodName);
-      
+
       if ($this->Request->Get('help')) {
          $this->SetData('Model', get_class($Model));
          if ($MethodName) {
@@ -104,7 +104,7 @@ class UtilityController extends DashboardController {
                $MethodName = $Meth->getName();
                if (StringBeginsWith($MethodName, '_'))
                   continue;
-               
+
                $MethArgs = $Meth->getParameters();
                $Args = array();
                foreach ($MethArgs as $Index => $MethArg) {
@@ -123,9 +123,9 @@ class UtilityController extends DashboardController {
          if (!method_exists($Model, $MethodName)) {
             throw NotFoundException($ModelName.'->'.$MethodName.'()');
          }
-         
+
          $MethodArgs = ReflectArgs($Callback, $this->Request->Get(), $Args);
-         
+
          $Result = call_user_func_array($Callback, $MethodArgs);
 
          if (is_array($Result))
@@ -138,10 +138,10 @@ class UtilityController extends DashboardController {
          else
             $this->SetData('Result', $Result);
       }
-      
+
       $this->Render();
    }
-   
+
    /**
     * Redirect to another page.
     * @since 2.0.18b4
@@ -159,17 +159,17 @@ class UtilityController extends DashboardController {
       } else {
          $Url = Url('/', TRUE);
       }
-      
+
       $Get = $this->Request->Get();
       if (count($Get) > 0) {
          $Query = '?'.http_build_query($Get);
       } else {
          $Query = '';
       }
-      
+
       Redirect($Url.$Query);
    }
-   
+
    /**
     * Set the sort order for data on an arbitrary database table.
     *
@@ -202,15 +202,15 @@ class UtilityController extends DashboardController {
       }
       if ($this->DeliveryType() != DELIVERY_TYPE_BOOL)
          Redirect($Target);
-         
+
       $this->Render();
    }
-   
+
    /**
     * Allows the setting of data into one of two serialized data columns on the
-    * user table: Preferences and Attributes. 
+    * user table: Preferences and Attributes.
     *
-    * The method expects "Name" & "Value" to be in the $_POST collection. This method always 
+    * The method expects "Name" & "Value" to be in the $_POST collection. This method always
     * saves to the row of the user id performing this action (ie. $Session->UserID). The
     * type of property column being saved should be specified in the url:
     * i.e. /dashboard/utility/set/preference/name/value/transientKey
@@ -238,28 +238,28 @@ class UtilityController extends DashboardController {
          $Method = $UserPropertyColumn == 'preference' ? 'SavePreference' : 'SaveAttribute';
          $Success = $UserModel->$Method($Session->UserID, $Name, $Value) ? 'TRUE' : 'FALSE';
       }
-      
+
       if (!$Success)
          $this->Form->AddError('ErrorBool');
-      
+
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL)
          Redirect($_SERVER['HTTP_REFERER']);
       else
          $this->Render();
    }
-   
+
    public function Sprites() {
       $this->RemoveCssFile('admin.css');
       $this->AddCssFile('style.css');
       $this->MasterView = 'default';
-      
+
       $this->CssClass = 'SplashMessage NoPanel';
       $this->SetData('_NoMessages', TRUE);
       $this->SetData('Title', 'Sprite Sheet');
       $this->Render();
    }
-   
+
    /**
     * Update database structure based on current definitions in each app's structure.php file.
     *
@@ -275,16 +275,16 @@ class UtilityController extends DashboardController {
       $Files = array();
       $AppName = $AppName == '' ? 'all': $AppName;
       if ($AppName == 'all') {
-			// Load all application structure files.
-			$ApplicationManager = new Gdn_ApplicationManager();
-			$Apps = $ApplicationManager->EnabledApplications();
-			$AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
-			foreach ($AppNames as $AppName) {
-				$Files[] = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
-			}
-			$AppName = 'all';
+         // Load all application structure files.
+         $ApplicationManager = new Gdn_ApplicationManager();
+         $Apps = $ApplicationManager->EnabledApplications();
+         $AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
+         foreach ($AppNames as $AppName) {
+            $Files[] = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
+         }
+         $AppName = 'all';
       } else {
-			 // Load that specific application structure file.
+          // Load that specific application structure file.
          $Files[] = CombinePaths(array(PATH_APPLICATIONS, $AppName, 'settings', 'structure.php'), DS);
       }
       $Validation = new Gdn_Validation();
@@ -304,13 +304,13 @@ class UtilityController extends DashboardController {
       $FoundStructureFile = FALSE;
       foreach ($Files as $File) {
          if (file_exists($File)) {
-			   $FoundStructureFile = TRUE;
-			   try {
-			      include($File);
-			   } catch (Exception $Ex) {
-			      $this->Form->AddError($Ex);
-			   }
-			}
+            $FoundStructureFile = TRUE;
+            try {
+               include($File);
+            } catch (Exception $Ex) {
+               $this->Form->AddError($Ex);
+            }
+         }
       }
 
       // Run the structure of all of the plugins.
@@ -329,12 +329,12 @@ class UtilityController extends DashboardController {
       if ($this->Form->ErrorCount() == 0 && !$CaptureOnly && $FoundStructureFile)
          $this->SetData('Status', 'The structure was successfully executed.');
 
-		$this->AddSideMenu('dashboard/settings/configure');
+      $this->AddSideMenu('dashboard/settings/configure');
       $this->AddCssFile('admin.css');
       $this->SetData('Title', T('Database Structure Upgrades'));
       $this->Render();
    }
-   
+
    /**
     * Run a structure update on the database.
     *
@@ -342,7 +342,7 @@ class UtilityController extends DashboardController {
     * @access public
     */
    public function Update() {
-      
+
       try {
          // Check for permission or flood control.
          // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
@@ -366,7 +366,7 @@ class UtilityController extends DashboardController {
       } catch (PermissionException $Ex) {
          return;
       } catch (Exception $Ex) {}
-      
+
       try {
          // Run the structure.
          $UpdateModel = new UpdateModel();
@@ -375,22 +375,22 @@ class UtilityController extends DashboardController {
       } catch (Exception $Ex) {
          $this->SetData('Success', FALSE);
       }
-      
+
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          SaveToConfig('Garden.Version', APPLICATION_VERSION);
       }
-      
+
       if ($Target = $this->Request->Get('Target')) {
          Redirect($Target);
       }
-      
+
       $this->FireEvent('AfterUpdate');
 
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';
       $this->Render();
    }
-   
+
    /**
     * Because people try this a lot and get confused.
     *
@@ -400,7 +400,7 @@ class UtilityController extends DashboardController {
    public function Upgrade() {
       $this->Update();
    }
-   
+
    /**
     * Signs of life.
     *
@@ -411,12 +411,12 @@ class UtilityController extends DashboardController {
       $this->SetData('Success', TRUE);
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';
-      
+
       $this->FireEvent('Alive');
-      
+
       $this->Render();
    }
-   
+
    /**
     * Because you cannot send xmlhttprequests across domains, we need to use
     * a proxy to check for updates.
@@ -439,13 +439,13 @@ class UtilityController extends DashboardController {
             $Fields[$Field] = $Value;
          }
       }
-      
-		$UpdateCheckUrl = C('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update');
+
+      $UpdateCheckUrl = C('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update');
       echo ProxyRequest($UpdateCheckUrl.'?'.http_build_query($Fields));
       $Database = Gdn::Database();
       $Database->CloseConnection();
    }
-   
+
    /**
     * What the mothership said about update availability.
     *
@@ -457,7 +457,7 @@ class UtilityController extends DashboardController {
       $Messages = TrueStripSlashes(GetValue('Messages', $_POST));
       $Response = TrueStripSlashes(GetValue('Response', $_POST));
       $TransientKey = GetIncomingValue('TransientKey', '');
-      
+
       // If the key validates
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($TransientKey)) {
@@ -498,13 +498,13 @@ class UtilityController extends DashboardController {
          // If the response wasn't empty, save it in the config
          if ($Response != '')
             $Save['Garden.RequiredUpdates'] = Gdn_Format::Unserialize($Response);
-      
+
          // Record the current update check time in the config.
          $Save['Garden.UpdateCheckDate'] = time();
          SaveToConfig($Save);
       }
    }
-   
+
    /**
     * Set the user's timezone (hour offset).
     *
@@ -521,22 +521,22 @@ class UtilityController extends DashboardController {
       $ClientTimestamp = Gdn_Format::ToTimestamp($ClientDate);
 
       if (
-			is_numeric($ClientTimestamp)
-			&& $Session->UserID > 0
+         is_numeric($ClientTimestamp)
+         && $Session->UserID > 0
          && $Session->ValidateTransientKey($TransientKey)
       ) {
          $UserModel = Gdn::UserModel();
-			$HourOffset = $ClientTimestamp - time();
+         $HourOffset = $ClientTimestamp - time();
          $HourOffset = round($HourOffset / 3600);
-         
-			$UserModel->SetField($Session->UserID, 'HourOffset', $HourOffset);
-			$Success = TRUE;
+
+         $UserModel->SetField($Session->UserID, 'HourOffset', $HourOffset);
+         $Success = TRUE;
       }
-         
+
       $this->Render();
    }
-	
-	/**
+
+   /**
     * Grab a feed from the mothership.
     *
     * @since 2.0.?
@@ -545,13 +545,13 @@ class UtilityController extends DashboardController {
     * @param int $Length Number of items to get.
     * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
     */
-	public function GetFeed($Type = 'news', $Length = 5, $FeedFormat = 'normal') {
-		echo file_get_contents('http://vanillaforums.org/vforg/home/getfeed/'.$Type.'/'.$Length.'/'.$FeedFormat.'/?DeliveryType=VIEW');
-		$this->DeliveryType(DELIVERY_TYPE_NONE);
+   public function GetFeed($Type = 'news', $Length = 5, $FeedFormat = 'normal') {
+      echo file_get_contents('http://vanillaforums.org/vforg/home/getfeed/'.$Type.'/'.$Length.'/'.$FeedFormat.'/?DeliveryType=VIEW');
+      $this->DeliveryType(DELIVERY_TYPE_NONE);
       $this->Render();
-	}
-   
-   /** 
+   }
+
+   /**
     * Return some meta information about any page on the internet in JSON format.
     */
    public function FetchPageInfo($Url = '') {
@@ -562,5 +562,5 @@ class UtilityController extends DashboardController {
       $this->AddCssFile('style.css');
       $this->SetData('_NoPanel', TRUE);
       $this->Render();
-   }   
+   }
 }

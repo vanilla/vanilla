@@ -64,11 +64,11 @@ jQuery(document).ready(function($) {
 $Alt = FALSE;
 foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
    // Skip Hidden & Trigger plugins
-   if (isset($PluginInfo['Hidden']) && $PluginInfo['Hidden'] === TRUE) 
+   if (isset($PluginInfo['Hidden']) && $PluginInfo['Hidden'] === TRUE)
       continue;
    if (isset($PluginInfo['Trigger']) && $PluginInfo['Trigger'] == TRUE) // Any 'true' value.
       continue;
-   
+
    $Css = array_key_exists($PluginName, $this->EnabledPlugins) ? 'Enabled' : 'Disabled';
    $State = strtolower($Css);
    if ($this->Filter == 'all' || $this->Filter == $State) {
@@ -99,10 +99,10 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
                '/settings/plugins/'.$this->Filter.'/'.$PluginName.'/'.$Session->TransientKey(),
                $ToggleText . 'Addon SmallButton'
             );
-            
+
             if ($SettingsUrl != '')
                echo Anchor(T('Settings'), $SettingsUrl, 'SmallButton');
-            
+
             if (SettingsModule::IsRemovable(SettingsModule::TYPE_PLUGIN, $PluginName))
                echo Anchor(T('Remove'), '/settings/removeaddon/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey(), 'RemoveItem SmallButton');
 
@@ -113,30 +113,30 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
             $Info = '';
             if ($Version != '')
                $Info = sprintf(T('Version %s'), $Version);
-               
+
             if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {
                if ($Info != '')
                   $Info .= '<span>|</span>';
 
                $Info .= T('Requires: ');
             }
-               
+
             $i = 0;
             if (is_array($RequiredApplications)) {
                if ($i > 0)
                   $Info .= ', ';
-               
-               foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {   
+
+               foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
                   $Info .= sprintf(T('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
                   ++$i;
                }
             }
-            
+
             if ($RequiredPlugins !== FALSE) {
                foreach ($RequiredPlugins as $RequiredPlugin => $VersionInfo) {
                   if ($i > 0)
                      $Info .= ', ';
-                     
+
                   $Info .= sprintf(T('%1$s Version %2$s'), $RequiredPlugin, $VersionInfo);
                   ++$i;
                }
@@ -146,14 +146,14 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
                $Info .= '<span>|</span>';
                $Info .= sprintf(T('By %s'), $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
             }
-            
+
             if ($PluginUrl != '') {
                $Info .= '<span>|</span>';
                $Info .= Anchor(T('Visit Site'), $PluginUrl);
             }
-            
+
             echo $Info != '' ? $Info : '&#160;';
-               
+
          ?></td>
       </tr>
       <?php

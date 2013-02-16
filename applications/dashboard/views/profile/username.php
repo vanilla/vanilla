@@ -1,4 +1,4 @@
-<h1 class="H"><?php 
+<h1 class="H"><?php
    echo htmlspecialchars($this->User->Name);
 
    echo '<span class="Gloss">';

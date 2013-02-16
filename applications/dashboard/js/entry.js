@@ -1,6 +1,6 @@
 // This file contains javascript that is specific to the dashboard/entry controller.
 jQuery(document).ready(function($) {
-	
+
    // Check to see if the selected email is valid
    $('#Register input[name$=Email], body.register input[name$=Email]').blur(function() {
       var email = $(this).val();
@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
          });
       }
    });
-	
+
    // Check to see if the selected username is valid
    $('#Register input[name$=Name], body.register input[name$=Name]').blur(function() {
       var name = $(this).val();
@@ -82,7 +82,7 @@ jQuery(document).ready(function($) {
    checkConnectName();
    $('#Form_ConnectName').blur(checkConnectName);
    $('input[name$=UserSelect]').click(checkConnectName);
-   
+
    // Check to see if passwords match
    $('input[name$=PasswordMatch]').blur(function() {
       if ($('#Register input[name$=Password], body.register input[name$=Password]').val() == $(this).val())

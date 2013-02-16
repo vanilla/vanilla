@@ -3,7 +3,7 @@
    <h4><?php echo T('Howdy, Stranger!'); ?></h4>
    <p><?php echo T($this->MessageCode, $this->MessageDefault); ?></p>
    <?php $this->FireEvent('BeforeSignInButton'); ?>
-   
+
    <?php
    if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0) {
       echo '<div class="P">';

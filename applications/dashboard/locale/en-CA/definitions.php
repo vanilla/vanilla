@@ -143,7 +143,7 @@ $Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
 $Definition['Saved'] = 'Your changes have been saved.';
 $Definition['%s new plural'] = '%s new';
 $Definition['TermsOfService'] = 'Terms of Service';
-$Definition['TermsOfServiceText'] = 
+$Definition['TermsOfServiceText'] =
 "You agree, through your use of this service, that you will not use this
 community to post any material which is knowingly false and/or defamatory,
 inaccurate, abusive, vulgar, hateful, harassing, obscene, profane, sexually

@@ -75,7 +75,7 @@ p.WarningMessage {
     border-top: 0;
 }
    </style>
-   
+
    <h1><?php echo T('Unviersal Forum Embed Code'); ?></h1>
    <div class="Info">
       <p><?php echo T('To embed your Vanilla forum into your web site, use the following code.'); ?></p>
@@ -84,8 +84,8 @@ p.WarningMessage {
 &lt;div class="vanilla-credit">&lt;a class="vanilla-anchor" href="http://vanillaforums.com">Discussions by &lt;span class="vanilla-logo">Vanilla&lt;/span>&lt;/a>&lt;/div>
 </div>
       <p class="WarningMessage">&uarr; Copy and paste this code into the web page where you want the forum to appear.</p>
-<?php 
-   } 
+<?php
+   }
 }
 ?>
    </div>

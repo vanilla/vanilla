@@ -6,9 +6,9 @@
 <div class="Info">
 <?php
 if ($this->RequestMethod == 'discussion')
-	$Message = T('DiscussionRequiresApproval', "Your discussion will appear after it is approved.");
+   $Message = T('DiscussionRequiresApproval', "Your discussion will appear after it is approved.");
 else
-	$Message = T('CommentRequiresApproval', "Your comment will appear after it is approved.");
+   $Message = T('CommentRequiresApproval', "Your comment will appear after it is approved.");
 echo '<div>', $Message, '</div>';
 
 if ($this->Data('DiscussionUrl'))

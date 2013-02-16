@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the activity filter menu
  */
 class ActivityFilterModule extends Gdn_Module {
-   
+
    public function AssetTarget() {
       return 'Panel';
    }

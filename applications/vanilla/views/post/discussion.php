@@ -7,34 +7,34 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 ?>
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
    <?php
-		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-			echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
-	
+      if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+         echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
+
       echo '<div class="FormWrapper">';
       echo $this->Form->Open();
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');
 
       if ($this->ShowCategorySelector === TRUE) {
-			echo '<div class="P">';
-				echo '<div class="Category">';
-				echo $this->Form->Label('Category', 'CategoryID'), ' ';
-				echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
-				echo '</div>';
-			echo '</div>';
+         echo '<div class="P">';
+            echo '<div class="Category">';
+            echo $this->Form->Label('Category', 'CategoryID'), ' ';
+            echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
+            echo '</div>';
+         echo '</div>';
       }
-      
+
       echo '<div class="P">';
-			echo $this->Form->Label('Discussion Title', 'Name');
-			echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
-		echo '</div>';
+         echo $this->Form->Label('Discussion Title', 'Name');
+         echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
+      echo '</div>';
 
       $this->FireEvent('BeforeBodyInput');
-		echo '<div class="P">';
+      echo '<div class="P">';
          echo $this->Form->BodyBox('Body', array('Table' => 'Discussion'));
-      
-//	      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'format' => $this->Data('Discussion.Format'))), 'div', array('class' => 'TextBoxWrapper'));
-		echo '</div>';
+
+//         echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'format' => $this->Data('Discussion.Format'))), 'div', array('class' => 'TextBoxWrapper'));
+      echo '</div>';
 
       $Options = '';
       // If the user has any of the following permissions (regardless of junction), show the options
@@ -42,7 +42,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       // TODO: hide these boxes depending on which category is selected in the dropdown above.
       if ($Session->CheckPermission('Vanilla.Discussions.Announce')) {
          $Options .= //'<li>'.$this->Form->CheckBox('Announce', T('Announce'), array('value' => '1')).'</li>';
-         
+
          '<li><b>'.T('Announce').'</b> '.$this->Form->Radio('Announce', '@'.sprintf(T('In <b>%s.</b>'), T('the category')), array('Value' => '2')).'</li>'.
          '<li>'.$this->Form->Radio('Announce', '@'.sprintf(T('In <b>%s</b> and recent discussions.'), T('the category')), array('Value' => '1')).'</li>'.
          '<li>'.$this->Form->Radio('Announce', '@'.T("Don't announce."), array('Value' => '0')).'</li>';
@@ -52,15 +52,15 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 //      if ($Session->CheckPermission('Vanilla.Discussions.Close'))
 //         $Options .= '<li>'.$this->Form->CheckBox('Closed', T('Close'), array('value' => '1')).'</li>';
 
-		$this->EventArguments['Options'] = &$Options;
-		$this->FireEvent('DiscussionFormOptions');
+      $this->EventArguments['Options'] = &$Options;
+      $this->FireEvent('DiscussionFormOptions');
 
       if ($Options != '') {
-			echo '<div class="P">';
-	         echo '<ul class="List Inline PostOptions">' . $Options .'</ul>';
-			echo '</div>';
+         echo '<div class="P">';
+            echo '<ul class="List Inline PostOptions">' . $Options .'</ul>';
+         echo '</div>';
       }
-      
+
       $this->FireEvent('AfterDiscussionFormOptions');
 
       echo '<div class="Buttons">';
@@ -73,9 +73,9 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       $this->FireEvent('AfterFormButtons');
       echo Anchor(T('Cancel'), $CancelUrl, 'Button Cancel');
       echo '</div>';
-      
-      
-      
+
+
+
       echo $this->Form->Close();
       echo '</div>';
    ?>

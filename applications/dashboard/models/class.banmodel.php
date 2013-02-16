@@ -4,7 +4,7 @@
  *
  * @package Dashboard
  */
- 
+
 /**
  * Manage banning of users.
  *
@@ -21,7 +21,7 @@ class BanModel extends Gdn_Model {
    public function  __construct() {
       parent::__construct('Ban');
    }
-   
+
    /*
     * Get and store list of current bans.
     *
@@ -36,7 +36,7 @@ class BanModel extends Gdn_Model {
 //      $AllBans =& self::$_AllBans;
       return self::$_AllBans;
    }
-   
+
    /**
     * Convert bans to new type.
     *
@@ -55,9 +55,9 @@ class BanModel extends Gdn_Model {
 
       $NewUsers = array();
       $NewUserIDs = array();
-      
+
       $AllBans = $this->AllBans();
-      
+
       if ($NewBan) {
          // Get a list of users affected by the new ban.
          if (isset($NewBan['BanID']))
@@ -98,7 +98,7 @@ class BanModel extends Gdn_Model {
          $this->SaveUser($User, TRUE, $NewBan);
       }
    }
-   
+
    /**
     * Ban users that meet conditions given.
     *
@@ -107,7 +107,7 @@ class BanModel extends Gdn_Model {
     * @param array $Ban Data about the ban.
     *    Valid keys are BanType and BanValue. BanValue is what is to be banned.
     *    Valid values for BanType are email, ipaddress or name.
-    */ 
+    */
    public function BanWhere($Ban) {
       $Result = array('u.Admin' => 0, 'u.Deleted' => 0);
       $Ban['BanValue'] = str_replace('*', '%', $Ban['BanValue']);
@@ -125,7 +125,7 @@ class BanModel extends Gdn_Model {
       }
       return $Result;
    }
-   
+
    /**
     * Add ban data to all Get requests.
     *
@@ -156,7 +156,7 @@ class BanModel extends Gdn_Model {
       $Bans = self::AllBans();
       $Fields = array('Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress');
       $Banned = array();
-      
+
       if (!$BansFound)
          $BansFound = array();
 
@@ -188,13 +188,13 @@ class BanModel extends Gdn_Model {
       }
       return count($Banned) == 0;
    }
-   
+
    /**
     * Remove a ban.
     *
     * @since 2.0.18
     * @access public
-    * 
+    *
     * @param array $Where
     * @param int $Limit
     * @param bool $ResetData
@@ -220,13 +220,13 @@ class BanModel extends Gdn_Model {
 //
 //      return $Result;
 //   }
-   
+
    /**
     * Save data about ban from form.
     *
     * @since 2.0.18
     * @access public
-    * 
+    *
     * @param array $FormPostValues
     * @param array $Settings
     */
@@ -238,7 +238,7 @@ class BanModel extends Gdn_Model {
          $CurrentBan = $this->GetID($CurrentBanID, DATASET_TYPE_ARRAY);
       else
          $CurrentBan = NULL;
-    
+
       $this->SetCounts($FormPostValues);
       $BanID = parent::Save($FormPostValues, $Settings);
       $FormPostValues['BanID'] = $BanID;
@@ -260,7 +260,7 @@ class BanModel extends Gdn_Model {
 
       if ($Banned == $BannedValue)
          return;
-      
+
       Gdn::UserModel()->SetField($User['UserID'], 'Banned', $BannedValue);
 
       // Add the activity.
@@ -271,14 +271,14 @@ class BanModel extends Gdn_Model {
           'RegardingUserID' => Gdn::Session()->UserID,
           'NotifyUserID' => ActivityModel::NOTIFY_MODS
           );
-      
+
       $BannedString = $BannedValue ? 'banned' : 'unbanned';
       if ($Ban) {
          $Activity['HeadlineFormat'] = '{ActivityUserID,user} was '.$BannedString.' (based on {Data.BanType}: {Data.BanValue}).';
          $Activity['Data'] = ArrayTranslate($Ban, array('BanType', 'BanValue'));
          $Activity['Story'] = $Ban['Notes'];
          $Activity['RecordType'] = 'Ban';
-         
+
          if (isset($Ban['BanID'])) {
             $Activity['BanID'] = $Ban['BanID'];
          }
@@ -287,7 +287,7 @@ class BanModel extends Gdn_Model {
       }
       $ActivityModel->Save($Activity);
    }
-   
+
    /**
     * Set number of banned users in $Data.
     *

@@ -11,7 +11,7 @@
  * This class is HEAVILY inspired by and, in places, flat out copied from
  * CodeIgniter (http://www.codeigniter.com). My hat is off to them.
  *
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -23,7 +23,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 // =============================================================================
 // SECTION 1. STRING SAFETY, PARSING, AND MANIPULATION.
 // =============================================================================
-   
+
    public function Backtick($String) {
       return '`'.trim($String, '`').'`';
    }
@@ -79,7 +79,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
       }
       return $String;
    }
-   
+
    public function EscapeIdentifier($RefExpr) {
       // The MySql back tick syntax is the default escape sequence so nothing needs to be done.
       return $RefExpr;
@@ -97,24 +97,24 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
    public function FetchColumnSql($Table) {
       if ($Table[0] != '`' && !StringBeginsWith($Table, $this->Database->DatabasePrefix))
          $Table = $this->Database->DatabasePrefix.$Table;
-      
+
       return "show columns from ".$this->FormatTableName($Table);
    }
 
    /**
     * Returns a platform-specific query to fetch table names.
     * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
-	 *  - <b>TRUE</b>: The search will be limited to the database prefix.
-	 *  - <b>FALSE</b>: All tables will be fetched. Default.
-	 *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
+    *  - <b>TRUE</b>: The search will be limited to the database prefix.
+    *  - <b>FALSE</b>: All tables will be fetched. Default.
+    *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
     */
    public function FetchTableSql($LimitToPrefix = FALSE) {
       $Sql = "show tables";
 
       if (is_bool($LimitToPrefix) && $LimitToPrefix && $this->Database->DatabasePrefix != '')
          $Sql .= " like ".$this->Database->Connection()->quote($this->Database->DatabasePrefix.'%');
-		elseif (is_string($LimitToPrefix) && $LimitToPrefix)
-			$Sql .= " like ".$this->Database->Connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $LimitToPrefix));
+      elseif (is_string($LimitToPrefix) && $LimitToPrefix)
+         $Sql .= " like ".$this->Database->Connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $LimitToPrefix));
 
       return $Sql;
       echo "<pre>$Sql</pre>";
@@ -136,12 +136,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $Type = $Field->Type;
          $Unsigned = stripos($Type, 'unsigned') !== FALSE;
          $Length = '';
-			$Precision = '';
+         $Precision = '';
          $Parentheses = strpos($Type, '(');
          $Enum = '';
 
          if ($Parentheses !== FALSE) {
-				$LengthParts = explode(',', substr($Type, $Parentheses + 1, -1));
+            $LengthParts = explode(',', substr($Type, $Parentheses + 1, -1));
             $Type = substr($Type, 0, $Parentheses);
 
             if (strcasecmp($Type, 'enum') == 0) {
@@ -164,9 +164,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          $Object->AllowNull = ($Field->Null == 'YES');
          $Object->Default = $Field->Default;
          $Object->Length = $Length;
-			$Object->Precision = $Precision;
+         $Object->Precision = $Precision;
          $Object->Enum = $Enum;
-			$Object->KeyType = NULL; // give placeholder so it can be defined again.
+         $Object->KeyType = NULL; // give placeholder so it can be defined again.
          $Object->AutoIncrement = strpos($Field->Extra, 'auto_increment') === FALSE ? FALSE : TRUE;
          $Schema[$Field->Field] = $Object;
       }
@@ -209,7 +209,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
    public function GetDelete($TableName, $Wheres = array()) {
       $Conditions = '';
       $Joins = '';
-      
+
       if (count($this->_Joins) > 0) {
          $Joins .= "\n";
 
@@ -218,7 +218,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
          //    $Joins .= implode("\n", $this->_FilterTableAliases($this->_Joins));
          // else
          $Joins .= implode("\n", $this->_Joins);
-      }      
+      }
 
       if (count($Wheres) > 0) {
          $Conditions = "\nwhere ";
@@ -255,7 +255,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $Keys = array_keys($Data[0]); $Keys = array_map(array($this, 'Backtick'), $Keys);
             $Sql .= "\n(".implode(', ', $Keys).') '
                ."\nvalues ";
-            
+
             // Append each insert statement.
             for($i = 0; $i < count($Data); $i++) {
                if($i > 0)
@@ -306,9 +306,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
       if (count($this->_Joins) > 0) {
          $sql .= "\n";
-         
+
          $Join = $this->_Joins[count($this->_Joins) - 1];
-   
+
          $sql .= implode("\n", $this->_Joins);
       }
 

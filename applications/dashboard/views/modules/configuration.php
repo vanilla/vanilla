@@ -12,7 +12,7 @@ echo $Form->Errors();
 ?>
 <ul>
    <?php
-   
+
    foreach ($Sf->Schema() as $Row) {
       echo "<li>\n  ";
 

@@ -28,7 +28,7 @@ Welcome to the Admin CSS File! Some things you should know:
 .Buttons-Confirm .Button {
    min-width: 65px;
 }
-   
+
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -82,29 +82,29 @@ body {
    color: #000;
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    font-size: 75%;
-	line-height: 1.7;
+   line-height: 1.7;
    margin: 0;
    padding: 0;
    font-size: small;
-	background: #dbf3fc;
+   background: #dbf3fc;
 }
 #Body {
-	background: #fff;
-	float: left;
-	width: 100%;
-	zoom: 1; /* hasLayout for IE6/7 */
+   background: #fff;
+   float: left;
+   width: 100%;
+   zoom: 1; /* hasLayout for IE6/7 */
 }
 #Body:after { /* clearfix */
-	visibility: hidden;
-	display: block;
-	content: "";
-	clear: both;
-	height: 0;
+   visibility: hidden;
+   display: block;
+   content: "";
+   clear: both;
+   height: 0;
 }
 #Content {
-	padding: 0 0 20px;
-	margin: 0 0 0 200px;
-	border-left: 1px solid #82bddd;
+   padding: 0 0 20px;
+   margin: 0 0 0 200px;
+   border-left: 1px solid #82bddd;
 }
 .Hidden {
    display: none;
@@ -113,10 +113,10 @@ body {
    white-space: nowrap;
 }
 .Center {
-	text-align: center;
+   text-align: center;
 }
 .Right {
-	text-align: right;
+   text-align: right;
 }
 .Wrap {
    margin: 20px;
@@ -138,28 +138,28 @@ hr {
 }
 #Content h1,
 #Content h3 {
-	text-shadow: 0 1px 0 #fff;
-	color: #222;
-	background: #dbf3fc;
-	border-top: 1px solid #8bc1de;
-	border-bottom: 1px solid #8bc1de;
-	padding: 10px 20px;
-	font-size: 14px;
-	margin: 0;
+   text-shadow: 0 1px 0 #fff;
+   color: #222;
+   background: #dbf3fc;
+   border-top: 1px solid #8bc1de;
+   border-bottom: 1px solid #8bc1de;
+   padding: 10px 20px;
+   font-size: 14px;
+   margin: 0;
 }
 #Content h1 a {
-	text-shadow: none;
-	font-size: 12px;
-	margin-left: 20px;
+   text-shadow: none;
+   font-size: 12px;
+   margin-left: 20px;
 }
 #Content h3 {
-	border-top: 1px solid #8bc1de;
+   border-top: 1px solid #8bc1de;
 }
 #Content h4 {
-	padding: 20px 20px 0;
+   padding: 20px 20px 0;
 }
 #Content table h4 {
-	padding: 0;
+   padding: 0;
 }
 p {
    margin: .5em 0;
@@ -169,8 +169,8 @@ p {
    margin: 5px 0;
 }
 small {
-	font-size: 12px;
-	color: #555;
+   font-size: 12px;
+   color: #555;
 }
 code {
    border-radius: 2px;
@@ -181,39 +181,39 @@ code {
    white-space: pre;
    font-family: monospace;
    overflow: auto;
-	box-shadow: 0px 0px 1px #999;
-	-moz-box-shadow: 0px 0px 1px #999;
-	-webkit-box-shadow: 0px 0px 1px #999;  
+   box-shadow: 0px 0px 1px #999;
+   -moz-box-shadow: 0px 0px 1px #999;
+   -webkit-box-shadow: 0px 0px 1px #999;
 }
 pre {
-	background: #F0F0F0;
-	border: 1px solid #C0C0C0;
-	color: #333;
-	font-family: 'Inconsolata',Courier,monospace;
-	font-size: 0.8em;
-	line-height: 1.5em;
-	margin: 2em 0;
-	overflow: auto;
-	padding: 0.5em;
+   background: #F0F0F0;
+   border: 1px solid #C0C0C0;
+   color: #333;
+   font-family: 'Inconsolata',Courier,monospace;
+   font-size: 0.8em;
+   line-height: 1.5em;
+   margin: 2em 0;
+   overflow: auto;
+   padding: 0.5em;
 }
 h1, h2 {
    font-size:140%;
    font-weight:bold;
    margin-bottom:10px;
-	text-shadow: #fff 0 1px 0;
+   text-shadow: #fff 0 1px 0;
 }
 h3 {
    font-size:120%;
 }
 h4 {
    font-size: 110%;
-	font-weight: bold;
+   font-weight: bold;
 }
 h5 {
    font-size: 110%;
 }
 .Arrow {
-	font-size: 18px;
+   font-size: 18px;
 }
 a {
    text-decoration: none;
@@ -235,25 +235,25 @@ textarea.TextBox {
    width: 250px;
    border: 1px solid #ccc;
    border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
 }
 textarea.TextBox {
-	font-size: 14px;
+   font-size: 14px;
    width: 500px;
    height: 100px;
    min-height: 100px;
    max-height: 500px;
 }
 input.WideInput {
-	width: 500px;
+   width: 500px;
 }
 #Popup textarea.TextBox {
    width: 465px;
 }
 .TextBoxWrapper {
-	width: auto;
-	padding-right: 8px;
+   width: auto;
+   padding-right: 8px;
 }
 .TextBoxWrapper textarea,
 .TextBoxWrapper input {
@@ -269,8 +269,8 @@ input.SmallInput:focus,
 input.InputBox:focus,
 textarea.TextBox:focus {
    background: #ffd;
-	color: #333;
-	border: 1px solid #aaa;
+   color: #333;
+   border: 1px solid #aaa;
 }
 input.BigInput {
    width: 100%;
@@ -293,20 +293,20 @@ select.Year {
 .Button {
    margin: 0;
    border-radius: .5ex;
-	-moz-border-radius: .5ex;
-	-webkit-border-radius: .5ex;
-	background: #3fbcf3;
-	background:-webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
-	background:-moz-linear-gradient(top, #aee7fe, #3fbcf3);
-	-pie-background:linear-gradient(top, #aee7fe, #3fbcf3);
-	background:linear-gradient(top, #aee7fe, #3fbcf3);
-	border:1px solid #0F7FE6;
-	color:#003673;
-	cursor:pointer;
-	font-size:12px;
-	padding:6px 10px;
-	text-decoration:none;
-	text-shadow:0 1px 0 #B7F5FD;
+   -moz-border-radius: .5ex;
+   -webkit-border-radius: .5ex;
+   background: #3fbcf3;
+   background:-webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
+   background:-moz-linear-gradient(top, #aee7fe, #3fbcf3);
+   -pie-background:linear-gradient(top, #aee7fe, #3fbcf3);
+   background:linear-gradient(top, #aee7fe, #3fbcf3);
+   border:1px solid #0F7FE6;
+   color:#003673;
+   cursor:pointer;
+   font-size:12px;
+   padding:6px 10px;
+   text-decoration:none;
+   text-shadow:0 1px 0 #B7F5FD;
    font-weight: normal;
    display: inline-block;
 }
@@ -314,39 +314,39 @@ select.Year {
    box-shadow: 0px 0px 2px #999;
    -moz-box-shadow: 0px 0px 2px #999;
    -webkit-box-shadow: 0px 0px 2px #999;
-	font-weight:bold;
+   font-weight:bold;
    margin: 0 0 0 20px;
 }
 a.Button {
-	padding: 5px 7px;
+   padding: 5px 7px;
 }
 .SmallButton {
-	margin-right: 10px;
-	padding: 4px;
-	font-size: 11px;
+   margin-right: 10px;
+   padding: 4px;
+   font-size: 11px;
    display: inline-block;
    text-align: center;
    line-height: 13px;
 }
 .SmallButton:hover,
 .Button:hover {
-	border-color: #0B64C6;
-	color: #001F44;
-	text-shadow:0 1px 0 #EEFFFF;
+   border-color: #0B64C6;
+   color: #001F44;
+   text-shadow:0 1px 0 #EEFFFF;
 }
 .SmallButton:hover {
-	box-shadow:0 0 2px #999999;
-	-moz-box-shadow:0 0 2px #999999;
-	-webkit-box-shadow:0 0 2px #999999;
+   box-shadow:0 0 2px #999999;
+   -moz-box-shadow:0 0 2px #999999;
+   -webkit-box-shadow:0 0 2px #999999;
 }
 .Button.Active,
 .Button:active,
 .SmallButton.Active,
 .SmallButton:active {
-	background: #003673;
-	border-color: #000;
-	color:#B7F5FD;
-	text-shadow:0 1px 0 #001D3F;
+   background: #003673;
+   border-color: #000;
+   color:#B7F5FD;
+   text-shadow:0 1px 0 #001D3F;
 }
 
 .ButtonList .SmallButton {
@@ -403,8 +403,8 @@ a.Button {
    background: url('images/progress.gif') center center no-repeat;
 }
 .TinyProgress {
-	padding: 10px 40px 10px 0 !important;
-	background: url('images/progress_sm.gif') center center no-repeat;
+   padding: 10px 40px 10px 0 !important;
+   background: url('images/progress_sm.gif') center center no-repeat;
    display: inline !Important;
 }
 .InProgress {
@@ -446,37 +446,37 @@ div.Info,
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    font-size: 14px;
-	position: relative;
+   position: relative;
    margin: 10px;
-	padding: 10px;
-	line-height: 1.4;
+   padding: 10px;
+   line-height: 1.4;
 }
 #Panel div.Info,
 #Panel .DismissMessage {
-	margin: 0;
-	border-width: 1px 0 1px 0;
-	font-size: 13px;
+   margin: 0;
+   border-width: 1px 0 1px 0;
+   font-size: 13px;
 }
 div.DismissMessage p {
    margin: 2px 0;
-	padding: 4px 0 0;
+   padding: 4px 0 0;
 }
 div.DismissMessage a.Dismiss {
-	position: absolute;
-	top: 3px;
-	right: 5px;
-	font-family: arial;
-	font-size: 22px;
-	font-weight: bold;
+   position: absolute;
+   top: 3px;
+   right: 5px;
+   font-family: arial;
+   font-size: 22px;
+   font-weight: bold;
    line-height: 1;
    color: #999;
 }
 #Panel div.DismissMessage a.Dismiss {
-	top: 1px;
-	right: 3px;
+   top: 1px;
+   right: 3px;
 }
 div.DismissMessage a.Dismiss:hover {
-	color: #ff0084;
+   color: #ff0084;
 }
 .CasualMessage {
    background: #CFECFF;
@@ -497,21 +497,21 @@ div.DismissMessage a.Dismiss:hover {
 }
 
 div.Box {
-	border: 1px solid #a5d0e7;
+   border: 1px solid #a5d0e7;
    background: #d3f0ff;
 }
 .Green {
-	color: #24AA09;
+   color: #24AA09;
    background-color: #dfffcb;
-	border: 1px solid #AAF091;
-	padding: 5px;
+   border: 1px solid #AAF091;
+   padding: 5px;
 }
 .Warning {
    background: #ff9;
    padding: 10px 20px;
 }
 strong {
-	font-weight: bold;
+   font-weight: bold;
 }
 .Alert {
    background: #d00;
@@ -521,7 +521,7 @@ strong {
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
-	text-shadow: 1px 1px 1px #444;
+   text-shadow: 1px 1px 1px #444;
 }
 .Alert a {
    color: #fff;
@@ -539,25 +539,25 @@ div.EmptyInfo {
    margin: 10px 0;
 }
 .HoverHelp {
-	position: relative;
+   position: relative;
 }
 .HoverHelp .Help {
-	display: none;
-	min-width: 200px;
-	background: #333;
-	color: #fff;
-	font-weight: normal;
-	font-size: 11px;
-	position: absolute;
-	left: -5px;
-	bottom: 20px;
+   display: none;
+   min-width: 200px;
+   background: #333;
+   color: #fff;
+   font-weight: normal;
+   font-size: 11px;
+   position: absolute;
+   left: -5px;
+   bottom: 20px;
    border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	padding: 6px;
-	box-shadow: 0px 0px 2px #777;
-	-moz-box-shadow: 0px 0px 2px #777;
-	-webkit-box-shadow: 0px 0px 2px #777;  
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   padding: 6px;
+   box-shadow: 0px 0px 2px #777;
+   -moz-box-shadow: 0px 0px 2px #777;
+   -webkit-box-shadow: 0px 0px 2px #777;
 }
 /* Note: MorePager is related to the /applications/dashboard/modules/MorePagerModule. */
 .MorePager {
@@ -576,7 +576,7 @@ div.EmptyInfo {
    text-decoration: underline;
 }
 .MorePager a.Loading:hover {
-	text-decoration: none;
+   text-decoration: none;
 }
 #PagerLess {
    border-top-right-radius: 2px;
@@ -590,7 +590,7 @@ div.EmptyInfo {
 tr#PagerMore td {
    border: 0;
    text-align: right;
-	border-bottom: 1px solid #aedefc;
+   border-bottom: 1px solid #aedefc;
 }
 #PagerMore {
    margin-bottom: 1px;
@@ -601,9 +601,9 @@ tr#PagerMore td {
 .FilterMenu {
    color: #aaa;
    padding: 0 0 10px;
-	padding:0 20px 10px;
-	position:relative;
-	top:-10px;	
+   padding:0 20px 10px;
+   position:relative;
+   top:-10px;
 }
 .FilterMenu strong {
    font-weight: bold;
@@ -614,7 +614,7 @@ tr#PagerMore td {
    padding: 0 4px;
 }
 div.Tabs {
-	display: block;
+   display: block;
    padding: 0 10px;
    margin: 0;
 }
@@ -627,11 +627,11 @@ div.Tabs li a:link,
 div.Tabs li a:hover,
 div.Tabs li a:active,
 div.Tabs li a:visited {
-	position: relative;
-	top: 4px;
+   position: relative;
+   top: 4px;
    margin: 0;
    border: 1px solid #8bc1de;
-	border-bottom: 0;
+   border-bottom: 0;
    border-radius: 3px 3px 0 0;
    -moz-border-radius: 3px 3px 0 0;
    -webkit-border-radius: 3px 3px 0 0;
@@ -641,14 +641,14 @@ div.Tabs li a:visited {
    color: #1e79a7;
    text-decoration: none;
    padding: 5px 10px;
-	line-height: 2.6;
+   line-height: 2.6;
 }
 div.Tabs li a:hover {
    background: #f3fcff;
 }
 div.Tabs li.Active a {
    background: #DBF3FC;
-	border-bottom: 1px solid #DBF3FC;
+   border-bottom: 1px solid #DBF3FC;
    color: #222;
 }
 div.Tabs li a span {
@@ -672,7 +672,7 @@ form ul {
    padding: 0px;
 }
 #Content form ul {
-	padding: 20px 20px 0;
+   padding: 20px 20px 0;
 }
 form ul li {
    margin-bottom: 10px;
@@ -683,10 +683,10 @@ form ul li label {
    color: #000;
    display: block;
    font-size: 14px;
-	font-weight: bold;
+   font-weight: bold;
    }
 form ul li span {
-	display: block;
+   display: block;
 }
 body.Messages div.Popup form ul li label {
    width: 100px;
@@ -714,7 +714,7 @@ form ul li label.CheckBoxLabel {
    margin: 0px;
    padding: 0px;
    line-height: 27px;
-	font-weight: normal;
+   font-weight: normal;
 }
 form ul li label.CheckBoxLabel input {
    margin: 7px 6px 4px 2px;
@@ -741,10 +741,10 @@ input.SmallInput {
 table {
    width: 100%;
    border-collapse: collapse;
-	border: 1px solid #a5d0e7;
-	border-left: none;
-	border-right: none;
-	margin: 0;
+   border: 1px solid #a5d0e7;
+   border-left: none;
+   border-right: none;
+   margin: 0;
 }
 table label {
    font-size: 12px;
@@ -760,7 +760,7 @@ table td {
    padding: 6px;
 }
 form ul li table label {
-	font-size: 100%;
+   font-size: 100%;
 }
 table thead th,
 table thead td {
@@ -794,7 +794,7 @@ table tbody td.Info span {
    padding: 0 6px;
 }
 table tbody td.Info strong {
-	margin-right: 10px;
+   margin-right: 10px;
    font-weight: bold;
    color: #000;
 }
@@ -824,7 +824,7 @@ table tr.Parent td {
 }
 table.AltColumns tr.Parent td.Alt,
 table tr.Parent td.Alt {
-	background: #fcfcfc;
+   background: #fcfcfc;
 }
 table tr.Child td.First {
    padding-left: 20px;
@@ -955,130 +955,130 @@ label.SubLabel {
    width: 321px;
 }
 body.managecategories div.Info div {
-	padding-top: 16px;
+   padding-top: 16px;
 }
 
 /* =================================================================== Header */
 #Head {
-	background: url('images/dashboard-bg.png') top center repeat-x #014687;
-	border-bottom: 1px solid #000;
-	padding: 10px 18px 18px;
+   background: url('images/dashboard-bg.png') top center repeat-x #014687;
+   border-bottom: 1px solid #000;
+   padding: 10px 18px 18px;
    text-align: right;
 }
 #Head h1 {
-	line-height: 160%;
-	border: 0;
-	float: left;
-	margin: 0;
-	padding: 3px 0 0;
+   line-height: 160%;
+   border: 0;
+   float: left;
+   margin: 0;
+   padding: 3px 0 0;
 }
 #Head h1 a {
-	font-size: 24px;
-	color:#f8fdff;
-	text-shadow:0 1px 0 #000;
+   font-size: 24px;
+   color:#f8fdff;
+   text-shadow:0 1px 0 #000;
 }
 #Head div.User {
-	padding: 8px 0 0;
+   padding: 8px 0 0;
 }
 #Head h1 a span {
-	vertical-align: middle;
+   vertical-align: middle;
 }
 #Head div.User a,
 #Head h1 a span {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-	background: url('images/dashboard-bg.png') -480px -191px repeat-x #01518d;
-	border: 1px solid #002b57;
-	color: #fff;
-	text-shadow:0 1px 0 #000;
-	padding: 4px 6px;
-	margin: 0 0 0 6px;
-	font-size: 12px;
-	font-weight: normal;
+   background: url('images/dashboard-bg.png') -480px -191px repeat-x #01518d;
+   border: 1px solid #002b57;
+   color: #fff;
+   text-shadow:0 1px 0 #000;
+   padding: 4px 6px;
+   margin: 0 0 0 6px;
+   font-size: 12px;
+   font-weight: normal;
    border-radius: 3px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
 }
 #Head div.User a:hover,
 #Head h1 a span:hover {
-	background-position: -480px -191px;
-	box-shadow: 0 0 1px #0066C8;
-	-moz-box-shadow: 0 0 1px #0066C8;
-	-webkit-box-shadow: 0 0 1px #0066C8;
+   background-position: -480px -191px;
+   box-shadow: 0 0 1px #0066C8;
+   -moz-box-shadow: 0 0 1px #0066C8;
+   -webkit-box-shadow: 0 0 1px #0066C8;
 }
 #Head div.User a.Profile,
 #Head div.User a.Profile:hover {
-	background-position: -5px -191px;
-	padding: 4px 6px 4px 24px;
+   background-position: -5px -191px;
+   padding: 4px 6px 4px 24px;
 }
 #Head h1 a span,
 #Head h1 a span:hover {
-	background-position: -454px -191px;
-	padding: 4px 6px 4px 22px;
+   background-position: -454px -191px;
+   padding: 4px 6px 4px 22px;
 }
 #Head div.User a:focus { background-position: -480px -294px; }
 #Head div.User a.Profile:focus { background-position: -5px -294px; }
 #Head h1 a:focus span { background-position: -454px -294px; }
 #Head div.User a:focus,
 #Head h1 a:focus span {
-	box-shadow: 0 0 1px #6fa3c9;
-	-moz-box-shadow: 0 1px 0 #6fa3c9;
-	-webkit-box-shadow: 0 0 1px #6fa3c9;
+   box-shadow: 0 0 1px #6fa3c9;
+   -moz-box-shadow: 0 1px 0 #6fa3c9;
+   -webkit-box-shadow: 0 0 1px #6fa3c9;
 }
 #Head div.User a span {
-	margin: 0 0 0 6px;
+   margin: 0 0 0 6px;
    border-radius: 3px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	background: #003671;
-	padding:0 4px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   background: #003671;
+   padding:0 4px;
 }
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
    float: left;
-	margin: 0;
-	width: 200px;
-	border-top: 1px solid #82BDDD;
-	border-right: 1px solid #82bddd;
-	background: #dbf3fc;
+   margin: 0;
+   width: 200px;
+   border-top: 1px solid #82BDDD;
+   border-right: 1px solid #82bddd;
+   background: #dbf3fc;
 }
 #Panel div.Box {
-	margin: 0;
-	border: none;
-	border-bottom: 1px solid #8bc1de;
-	background: none;
+   margin: 0;
+   border: none;
+   border-bottom: 1px solid #8bc1de;
+   background: none;
 }
 #Panel div.Group {
-	padding: 0;
+   padding: 0;
 }
 div.Box h4 {
-	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    font-size: 100%;
    font-weight: bold;
    margin: 0 0 4px;
    padding: 0 6px;
    color: #076C8E;
-	text-shadow: #fff 0 1px 0;
+   text-shadow: #fff 0 1px 0;
 }
 div.Box h4 a {
-	display: block;
+   display: block;
    color: #045974;
-	text-shadow: none;
+   text-shadow: none;
 }
 div.Box h4 a:hover {
    color: #ff0084;
-	text-shadow: none;
+   text-shadow: none;
 }
 div.Box h4.Active {
-	background: #045974;
+   background: #045974;
 }
 div.Box h4.Active a {
-	color: #fff;
-	text-shadow: none;
+   color: #fff;
+   text-shadow: none;
 }
 #Panel div.Box h4 {
-	padding: 0;
-	margin: 0;
+   padding: 0;
+   margin: 0;
 }
 #Panel div.Box h4 { background: url('images/dashboard-sprites.png') 166px -145px no-repeat; }
 #Panel div.Dashboard h4 { background-position: 166px 7px; }
@@ -1113,10 +1113,10 @@ div.Box p {
    color: #555;
 }
 #Panel div.Active {
-	background: #fff;
+   background: #fff;
 }
 ul.PanelInfo {
-	margin: 0 0 10px;
+   margin: 0 0 10px;
 }
 ul.PanelInfo li {
    padding: 0;
@@ -1126,17 +1126,17 @@ ul.PanelInfo li a {
    position: relative;
 }
 #Panel div.Box h4 {
-	font-size: 14px;
-	font-weight: bold;
-	padding: 10px;
+   font-size: 14px;
+   font-weight: bold;
+   padding: 10px;
    color: #000;
 }
 ul.PanelInfo li a {
-	font-size: 13px;
-	color: #000;
-	text-shadow: 0 0 1px #fff;
-	display: block;
-	padding: 2px 10px;
+   font-size: 13px;
+   color: #000;
+   text-shadow: 0 0 1px #fff;
+   display: block;
+   padding: 2px 10px;
 }
 #Panel div.Box h4 a {
    color: #000;
@@ -1150,67 +1150,67 @@ span.New {
    color: #000;
    font-size: 9px;
    font-weight: bold;
-	box-shadow: 0 1px 2px #333;
-	-moz-box-shadow: 0 1px 2px #333;
-	-webkit-box-shadow: 0 1px 2px #333;
-	padding:0px 2px;
-	position: relative;
-	top: -4px;
-	right: auto;
+   box-shadow: 0 1px 2px #333;
+   -moz-box-shadow: 0 1px 2px #333;
+   -webkit-box-shadow: 0 1px 2px #333;
+   padding:0px 2px;
+   position: relative;
+   top: -4px;
+   right: auto;
 }
 ul.PanelInfo li.Active {
    background-image: url('images/arrow.png');
-	background-position: center left;
-	background-repeat: no-repeat;
-	background-color: rgba(0, 0, 0, 0.03);
-	background-color: #F5F9FF;
+   background-position: center left;
+   background-repeat: no-repeat;
+   background-color: rgba(0, 0, 0, 0.03);
+   background-color: #F5F9FF;
 }
 ul.PanelInfo li.Active a {
-	text-shadow: 0 1px 0 #fff;
+   text-shadow: 0 1px 0 #fff;
 }
 ul.PanelInfo li:hover,
 ul.PanelInfo li.Active:hover {
-	background-color: rgba(0, 0, 0, 0.06);
+   background-color: rgba(0, 0, 0, 0.06);
 }
 
 /* ================================================= Dashboard Customizations */
 .Column table {
    width: 100%;
-	border: none;
+   border: none;
 }
 .Column table th {
-	width: 160px;
+   width: 160px;
 }
 .Col {
-	width: 175px;
-	float: left;
+   width: 175px;
+   float: left;
 }
 #RecentUsers img {
-	float: left;
-	height: 20px;
-	width: 20px;
-	margin-right: 8px;
-	overflow: hidden;
+   float: left;
+   height: 20px;
+   width: 20px;
+   margin-right: 8px;
+   overflow: hidden;
 }
 #UrlCode strong {
-	color: #000000;
+   color: #000000;
 }
 #UrlCode span {
-	display: inline;
-	background: #ff8;
-	padding: 2px 4px;
+   display: inline;
+   background: #ff8;
+   padding: 2px 4px;
    border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
 }
 #UrlCode input.InputBox {
-	width: 200px;
-	padding: 3px;
-	font-size: 12px;
-	font-family:'lucida grande','Lucida Sans Unicode',Tahoma,sans-serif;
+   width: 200px;
+   padding: 3px;
+   font-size: 12px;
+   font-family:'lucida grande','Lucida Sans Unicode',Tahoma,sans-serif;
 }
 #UrlCode a {
-	margin-left: 10px;
+   margin-left: 10px;
 }
 
 /* =============================================================== User Pages */
@@ -1226,10 +1226,10 @@ ul.PanelInfo li.Active:hover {
 body.Home {
    margin: 0;
    padding: 80px;
-	background: url('images/eyes.png') 30px 30px no-repeat #fff;   
+   background: url('images/eyes.png') 30px 30px no-repeat #fff;
 }
 body.Home #Content {
-	margin: 0 auto;
+   margin: 0 auto;
    border: none;
 }
 #Content .SplashInfo h1 {
@@ -1237,16 +1237,16 @@ body.Home #Content {
    background: transparent;
    border: none;
    font-weight:bold;
-	color:#000;
-	font-size:300%;
+   color:#000;
+   font-size:300%;
    margin: 20px 0;
    padding: 0;
    line-height: 1;
 }
 #Content .SplashInfo p {
-	margin: 10px 0;
-	color: #777;
-	font-size: 16px;
+   margin: 10px 0;
+   color: #777;
+   font-size: 16px;
    line-height: 1.6;
 }
 
@@ -1257,37 +1257,37 @@ div.Popup div.Messages {
    top: auto;
    left: auto;
    z-index: auto;
-	margin: 10px 0 !important;
+   margin: 10px 0 !important;
 }
 div.Popup div.Warning {
-	margin: 10px 0;
+   margin: 10px 0;
 }
 div.Popup div.Messages ul {
-	display: block;
+   display: block;
    border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
 }
 div.Popup div.Info {
-	border: 0;
+   border: 0;
 }
 * html div.Popup div.Messages {
   position: inherit;
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 div.Popup .Loading {
    display: block;
 }
 .Overlay {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(255,255,255,0.7);
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(255,255,255,0.7);
 }
 div.Popup {
   position: absolute;
@@ -1298,165 +1298,165 @@ div.Popup {
   text-align: center;
 }
 div.Popup div.Body {
-	margin: 0px auto;
-	text-align: left;
-	position: relative;
-	padding: 0 0 8px 0;
-	max-width: 500px;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	background: #f1fbfe;
-	border: 1px solid #01416b;
-	box-shadow: 0px 0px 3px #01416b;
-	-moz-box-shadow: 0px 0px 3px #01416b;
-	-webkit-box-shadow: 0px 0px 3px #01416b;  
+   margin: 0px auto;
+   text-align: left;
+   position: relative;
+   padding: 0 0 8px 0;
+   max-width: 500px;
+   border-radius: 5px;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;
+   background: #f1fbfe;
+   border: 1px solid #01416b;
+   box-shadow: 0px 0px 3px #01416b;
+   -moz-box-shadow: 0px 0px 3px #01416b;
+   -webkit-box-shadow: 0px 0px 3px #01416b;
 }
 div.Popup div.Body div.Body {
    border: 0;
 }
 div.Popup div.Legal,
 div.Popup .Content form {
-	max-height: 450px;
-	overflow: auto;
-	padding: 0 10px 10px;
+   max-height: 450px;
+   overflow: auto;
+   padding: 0 10px 10px;
 }
 div.Popup .Loading {
   text-align: center;
 }
 div.Popup h1,
 div.Popup h2 {
-	padding: 6px 9px 4px;
-	text-shadow: 0 1px 0 #fff;
-	border-radius: 4px 4px 0 0;
-	-webkit-border-radius: 4px 4px 0 0;
-	-moz-border-radius: 4px 4px 0 0;
-	font-size:14px;
-	font-weight:bold;
-	margin: 0 0 5px 0;
-	color: #f8fdff;
-	background: url('images/dashboard-bg.png') top center repeat-x #014687;
-	border-bottom: 1px solid #000;
-	text-shadow: 0 1px 0 #000;
+   padding: 6px 9px 4px;
+   text-shadow: 0 1px 0 #fff;
+   border-radius: 4px 4px 0 0;
+   -webkit-border-radius: 4px 4px 0 0;
+   -moz-border-radius: 4px 4px 0 0;
+   font-size:14px;
+   font-weight:bold;
+   margin: 0 0 5px 0;
+   color: #f8fdff;
+   background: url('images/dashboard-bg.png') top center repeat-x #014687;
+   border-bottom: 1px solid #000;
+   text-shadow: 0 1px 0 #000;
 }
 div.Popup h3 {
-	font-size: 13px;
-	font-weight: bold;
-	padding: 20px 0 10px;
+   font-size: 13px;
+   font-weight: bold;
+   padding: 20px 0 10px;
 }
 div.Popup p {
-	padding: 6px 10px 10px;
+   padding: 6px 10px 10px;
 }
 div.Popup small {
-	font-size: 80%;
+   font-size: 80%;
 }
 div.Popup form p {
-	padding: 0;
+   padding: 0;
 }
 div.Popup form ul li label {
-	color:#222;
-	display:block;
-	font-size:14px;
-	font-weight:bold;
-	margin: 10px 0 0;
+   color:#222;
+   display:block;
+   font-size:14px;
+   font-weight:bold;
+   margin: 10px 0 0;
 }
 div.Popup form ul li label.RadioLabel,
 div.Popup form ul li label.CheckBoxLabel {
-	font-weight: normal;
+   font-weight: normal;
 }
 div.Popup input.Button {
-	margin: 4px 0 2px;
+   margin: 4px 0 2px;
 }
 body.Entry div.Popup p {
-	color: #000;
+   color: #000;
 }
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
-	line-height: 1;
-	color: #555;
-	cursor: pointer;
-	font-family: arial;
-	font-size: 22px;
-	font-weight: bold;
-	padding: 0;
-	border-radius: 3px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
-	border-bottom: 1px solid #006edf;
-	position:absolute;
-	right:10px;
-	top:7px;
-	height: 18px;
-	width: 18px;
-	overflow: hidden;
+   line-height: 1;
+   color: #555;
+   cursor: pointer;
+   font-family: arial;
+   font-size: 22px;
+   font-weight: bold;
+   padding: 0;
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
+   border-bottom: 1px solid #006edf;
+   position:absolute;
+   right:10px;
+   top:7px;
+   height: 18px;
+   width: 18px;
+   overflow: hidden;
 }
 a.Close span {
-	display: none;
+   display: none;
 }
 a.Close:hover {
-	color: #111;
+   color: #111;
 }
 div.Popup .Footer {
-	border: none;
-	background: none;
-	padding: 0;
-	margin: 0;
-	text-align: right;
+   border: none;
+   background: none;
+   padding: 0;
+   margin: 0;
+   text-align: right;
 }
 div.Popup .Footer input.Button {
-	font-size: 11px;
-	margin-right: 2px;
+   font-size: 11px;
+   margin-right: 2px;
 }
 
 /* ==================================================================== Legal */
 div.Legal ol {
-	list-style-position:outside;
-	list-style-type:decimal;
-	margin:0 30px 10px;
+   list-style-position:outside;
+   list-style-type:decimal;
+   margin:0 30px 10px;
 }
 div.Legal ul {
-	list-style-position:outside;
-	list-style-type:disc;
-	margin:0 30px 10px;
+   list-style-position:outside;
+   list-style-type:disc;
+   margin:0 30px 10px;
 }
 div.Legal li {
-	padding: 5px 0;
+   padding: 5px 0;
 }
 div.Legal strong {
-	font-weight: bold;
+   font-weight: bold;
 }
 div.Legal em {
-	font-style: italic;
+   font-style: italic;
 }
 div.Legal p {
-	padding: 6px 0 10px;
-	margin: 0;
+   padding: 6px 0 10px;
+   margin: 0;
 }
 div.Legal h3 {
-	font-weight: bold;
-	padding: 6px 0 4px !important;
-	margin: 0 !important;
-	border: none !important;
-	background: none !important;
+   font-weight: bold;
+   padding: 6px 0 4px !important;
+   margin: 0 !important;
+   border: none !important;
+   background: none !important;
 }
 div.Legal {
-	margin: 10px;
-	padding: 2px 8px;
-	border: 1px solid #a5d0e7;
+   margin: 10px;
+   padding: 2px 8px;
+   border: 1px solid #a5d0e7;
    border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	background: #f6ffff;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #f6ffff;
 }
 div.Popup div.Legal {
-	margin: 0;
-	padding: 0 10px 10px;
-	border: none;
-	background: none;
+   margin: 0;
+   padding: 0 10px 10px;
+   border: none;
+   background: none;
    border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
 }
 
 
@@ -1464,63 +1464,63 @@ div.Popup div.Legal {
 /* =================================================================== Themes */
 div.CurrentTheme img,
 div.BrowseThemes img {
-	border: 1px solid #777;
+   border: 1px solid #777;
 }
 div.CurrentTheme h3,
 div.BrowseThemes h3 {
-	padding: 0 0 10px;
+   padding: 0 0 10px;
 }
 .CurrentTheme img {
-	float: left;
-	margin: 20px;
+   float: left;
+   margin: 20px;
 }
 .CurrentTheme {
-	min-height: 200px;
-	margin:0;
+   min-height: 200px;
+   margin:0;
 }
 .CurrentTheme h4 {
-	padding: 6px 0;
+   padding: 6px 0;
 }
 .CurrentTheme h4 span {
-	padding-left: 10px;
+   padding-left: 10px;
 }
 div.Description {
-	padding: 0 20px 20px;
+   padding: 0 20px 20px;
 }
 div.Options,
 div.CustomThemeOptions {
-	padding: 0 20px;
+   padding: 0 20px;
 }
 table.SelectionGrid {
-	background: none;
-	margin: 0;
-	border: none;
+   background: none;
+   margin: 0;
+   border: none;
 }
 table.SelectionGrid td {
-	width: 33%;
-	border: 1px solid #a5d0e7;
-	border-width: 0 0 1px;
-	padding: 16px;
-	vertical-align: top;
+   width: 33%;
+   border: 1px solid #a5d0e7;
+   border-width: 0 0 1px;
+   padding: 16px;
+   vertical-align: top;
 }
 table.Themes td {
    min-width: 235px;
 }
 table.Themes td h4 {
-	padding: 6px 0;
+   padding: 6px 0;
 }
 table.SelectionGrid td.FirstCol {
-	border-right: 1px solid #a5d0e7;
+   border-right: 1px solid #a5d0e7;
 }
 table.SelectionGrid td.EmptyCol,
 table.SelectionGrid td.LastCol {
-	border-left: 1px solid #a5d0e7;
+   border-left: 1px solid #a5d0e7;
 }
 table.SelectionGrid td.FirstCol,
 table.SelectionGrid td.EmptyCol,
 table.SelectionGrid td.LastCol,
 table.SelectionGrid td {
-	border-color: #e0e0e0;
+   border-color: #e0e0e0;
 }
 table.SelectionGrid h4 {
    color:#02455B;
@@ -1543,20 +1543,20 @@ table.SelectionGrid div.Buttons a {
    margin: 4px 0;
 }
 table.Themes em {
-	padding-top: 13px;
+   padding-top: 13px;
 }
 table.SelectionGrid dl {
-	padding: 0 0 10px;
+   padding: 0 0 10px;
 }
 table.SelectionGrid dl dt {
-	display: inline;
+   display: inline;
    color: #000;
    border-right: 1px solid #e2f4ff;
    padding: 4px 6px 4px 0;
    margin: 0 4px 0 0;
 }
 table.SelectionGrid dl dd {
-	display: inline;
+   display: inline;
 }
 table.SelectionGrid td.Active {
    -moz-background-clip:border;
@@ -1567,25 +1567,25 @@ table.SelectionGrid td.Active {
 
 /* A general rule to remove padding from info (form adds it) */
 #Content form ul div.Info {
-	padding: 0;
-	margin: 10px 0;
+   padding: 0;
+   margin: 10px 0;
 }
 /* Exceptions to padding rule */
 body#dashboard_settings_registration #Content form ul div.Info {
-	padding: 10px;
-	margin: 10px;
+   padding: 10px;
+   margin: 10px;
 }
 #dashboard_settings_registration #Content form ul {
-	padding: 0;
+   padding: 0;
 }
 body.Import table {
-	margin-bottom: 20px;
+   margin-bottom: 20px;
 }
 body.Import .Button {
-	margin: 0 0 0 20px;
+   margin: 0 0 0 20px;
 }
 #InvitationExpiration {
-	padding: 0 20px;
+   padding: 0 20px;
 }
 table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
@@ -1593,13 +1593,13 @@ table.AltColumns tr.Disabled th,
 table.AltColumns tr.Disabled td,
 table.AltColumns th.Alt,
 table.AltColumns td.Alt {
-	background: none;
+   background: none;
 }
 table.AltRows tr.Enabled th,
 table.AltRows tr.Enabled td,
 table.AltColumns tr.Enabled th,
 table.AltColumns tr.Enabled td {
-	background: #ff8;
+   background: #ff8;
 }
 .CheckBoxGrid tbody th,
 .CheckBoxGrid thead td,
@@ -1610,40 +1610,40 @@ table thead th,
 table thead td,
 table.AltColumns thead th.Alt,
 table.AltColumns thead td.Alt {
-	background: #dbf3fc;
-	font-size: 13px;
-	color: #222;
-	text-shadow: 0 1px 0 #fff;
+   background: #dbf3fc;
+   font-size: 13px;
+   color: #222;
+   text-shadow: 0 1px 0 #fff;
 }
 table th,
 table td {
-	padding: 6px 6px 6px 20px;
-	vertical-align: top;
+   padding: 6px 6px 6px 20px;
+   vertical-align: top;
 }
 table th.Less,
 table td.Less {
-	padding: 6px;
+   padding: 6px;
 }
 table tbody tr.More th.Less,
 table tbody tr.More td.Less,
 table tbody th,
 table tbody td {
-	border-bottom: 1px solid #e0e0e0;
+   border-bottom: 1px solid #e0e0e0;
 }
 table tbody tr:last-child th,
 table tbody tr:last-child td {
-	border-bottom: none;
+   border-bottom: none;
 }
 .CheckBoxGrid td.Alt {
-	background: none;
+   background: none;
 }
 
 li.RolePermissions table.CheckBoxGrid tbody tr th a {
-	white-space:nowrap;
+   white-space:nowrap;
 }
 
 li.RolePermissions table.CheckBoxGrid tbody tr th a span.Parent {
-	display:inline;
+   display:inline;
 }
 
 /* Summary Tables */
@@ -1678,33 +1678,33 @@ div.Summary table tbody td {
    font-size: 13px;
    color: #076C8E;
    font-weight: bold;
-	padding: 4px 18px 2px;
-	position: relative;
-	background: url('images/dashboard-bg.png') center -96px repeat-x #014687;
-	border: none;
-	border-bottom:1px solid #000204;
+   padding: 4px 18px 2px;
+   position: relative;
+   background: url('images/dashboard-bg.png') center -96px repeat-x #014687;
+   border: none;
+   border-bottom:1px solid #000204;
 }
 #Foot img {
-	display: none;
+   display: none;
 }
 #Foot a {
-	color: #076C8E;
+   color: #076C8E;
 }
 #Foot .Version {
-	position: absolute;
-	bottom: 10px;
-	right: 20px;
-	color: #5F9BBF;
-	font-size: 12px;
-	font-weight: normal;
-	padding-bottom: 5px;
+   position: absolute;
+   bottom: 10px;
+   right: 20px;
+   color: #5F9BBF;
+   font-size: 12px;
+   font-weight: normal;
+   padding-bottom: 5px;
 }
 #Foot div a {
-	display: block;
-	background: url('images/logo_footer.png') center center no-repeat;
-	height: 32px;
-	width: 72px;
-	margin: 6px 0 10px;
+   display: block;
+   background: url('images/logo_footer.png') center center no-repeat;
+   height: 32px;
+   width: 72px;
+   margin: 6px 0 10px;
 }
 
 .Count {
@@ -1770,19 +1770,19 @@ div.Summary table tbody td {
 
 .Pager a,
 .Pager span {
-	padding: 0 4px;
+   padding: 0 4px;
 }
 .Pager span,
 .Pager a.Highlight {
-	color: #777;
+   color: #777;
 }
 .NumberedPager a.Next,
 .NumberedPager span.Next {
-	margin-left: 6px;
+   margin-left: 6px;
 }
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
-	margin-right: 6px;
+   margin-right: 6px;
 }
 
 
@@ -1799,12 +1799,12 @@ div.Summary table tbody td {
 /* Help Links */
 .Help {
    padding: 8px;
-	line-height: 1;
+   line-height: 1;
 }
 .Help h2 {
    font-size: 14px;
-	font-weight: bold;
-	text-shadow: none;
+   font-weight: bold;
+   text-shadow: none;
    margin: 0 0 10px;
 }
 .Help ul {
@@ -1813,55 +1813,55 @@ div.Summary table tbody td {
 }
 .Help li {
    margin-top: 6px;
-	line-height: 1.5;
+   line-height: 1.5;
 }
 .Aside {
    border: solid 1px #cc8;
-	border-width: 1px 0 1px 1px;
+   border-width: 1px 0 1px 1px;
    border-top: solid 1px #aa8;
    background: #ffc;
    border-radius: 0 0 0 3px;
    -moz-border-radius: 0 0 0 3px;
    -webkit-border-radius: 0 0 0 3px;
    /* width: 220px; */
-	max-width: 500px;
+   max-width: 500px;
    float: right;
    z-index: 200;
    position: relative;
    margin: 0;
-	font-size: 12px;
+   font-size: 12px;
 }
 /* Homepage Admin */
 .Homepage {
-	padding: 0 20px;
+   padding: 0 20px;
 }
 .Homepage a.Choice {
-	color: #777;
-	font-weight: bold;
-	font-size: 12px;
-	text-decoration: none;
-	display: inline-block;
-	vertical-align: bottom;
-	margin: 0 10px 10px 0;
-	padding: 0;
-	line-height: 2.6;
+   color: #777;
+   font-weight: bold;
+   font-size: 12px;
+   text-decoration: none;
+   display: inline-block;
+   vertical-align: bottom;
+   margin: 0 10px 10px 0;
+   padding: 0;
+   line-height: 2.6;
 }
 .Homepage .Sprite {
-	display: block;
-	height: 124px;
-	width: 180px;
-	background: url('images/homepage-sprites.png') 0 0 no-repeat;
-	border: 1px solid #888;
+   display: block;
+   height: 124px;
+   width: 180px;
+   background: url('images/homepage-sprites.png') 0 0 no-repeat;
+   border: 1px solid #888;
 }
 .Homepage a.Choice .Wrap {
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	background: #f5f5f5;
-	border: 2px solid #ccc;
-	padding: 6px;
-	margin: 0;
-	display: block;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #f5f5f5;
+   border: 2px solid #ccc;
+   padding: 6px;
+   margin: 0;
+   display: block;
 }
 .Homepage .SpDiscussionsTable { background-position: 0 0; }
 .Homepage .SpDiscussions { background-position: -180px 0; }
@@ -1871,89 +1871,89 @@ div.Summary table tbody td {
 .Homepage .SpActivity { background-position: -360px -124px; }
 .Homepage .SpBestOf { background-position: -540px 0px; }
 .Homepage a.Choice:hover {
-	color: #000;
+   color: #000;
 }
 .Homepage a.Choice:hover .Wrap {
-	background-color: #fafafa;
-	border-color: #aaa;
+   background-color: #fafafa;
+   border-color: #aaa;
 }
 .Homepage a.Choice.Current {
-	color: #000;
-	background: url('images/check.png') 2px 3px no-repeat;
-	text-indent: 36px;
+   color: #000;
+   background: url('images/check.png') 2px 3px no-repeat;
+   text-indent: 36px;
 }
 .Homepage a.Current .Wrap {
    background-color: #D6FFCF;
    border-color: #06A800;
 }
 .LayoutOptions {
-	margin: 20px 0;
+   margin: 20px 0;
 }
 
 ol.Sortable, ol.Sortable ol {
-	margin: 0 0 0 25px;
-	padding: 0;
-	list-style-type: none;
+   margin: 0 0 0 25px;
+   padding: 0;
+   list-style-type: none;
 }
 ol.Sortable {
-	margin: 0;
-	background: #f3f3f3;
+   margin: 0;
+   background: #f3f3f3;
 }
 .Sortable li {
-	margin: 0;
-	padding: 0;
+   margin: 0;
+   padding: 0;
 }
 .Sortable li div  {
-	padding: 0;
-	margin: 0;
-	cursor: move;
+   padding: 0;
+   margin: 0;
+   cursor: move;
 }
 .Placeholder {
-	background-color: #cfcfcf;
+   background-color: #cfcfcf;
 }
 .SortableError {
-	background:#fbe3e4;
-	color:#8a1f11;
+   background:#fbe3e4;
+   color:#8a1f11;
 }
 .Sortable table {
-	border: 1px solid #e0e0e0;
-	border-right: none;
-	margin: -1px 0 0 -1px;
+   border: 1px solid #e0e0e0;
+   border-right: none;
+   margin: -1px 0 0 -1px;
 }
 .Sortable table td {
-	vertical-align: top;
-	padding: 6px;
-	background: #fff;
-	border-bottom: none;
+   vertical-align: top;
+   padding: 6px;
+   background: #fff;
+   border-bottom: none;
 }
 .Sortable table td strong,
 .Sortable table td blockquote {
-	display: block;
+   display: block;
 }
 .Sortable table td.Buttons {
-	text-align: right;
-	padding: 6px 0;
+   text-align: right;
+   padding: 6px 0;
 }
 
 /* ==================================================================== Feeds */
 .FeedItem {
-	padding: 6px 10px;
+   padding: 6px 10px;
 }
 .FeedItem a {
-	font-size: 13px;
-	display: inline;
-	font-weight: bold;
-	margin-right: 12px;
+   font-size: 13px;
+   display: inline;
+   font-weight: bold;
+   margin-right: 12px;
 }
 .FeedItem .Date {
-	display: inline;
-	font-size: 12px;
-	color: #888;
+   display: inline;
+   font-size: 12px;
+   color: #888;
 }
 .FeedItem em {
-	color: #333;
-	font-size: 12px;
-	display: block;
+   color: #333;
+   font-size: 12px;
+   display: block;
 }
 .Selected {
    background: #FFFF99 !Important;
@@ -1992,72 +1992,72 @@ div.Errors {
    top: auto;
    left: auto;
    z-index: auto;
-	margin: 0 !important;
+   margin: 0 !important;
 }
 * html div.Errors {
   position: inherit;
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 div.Errors ul {
-	border-bottom: 1px solid #a00 !important;
+   border-bottom: 1px solid #a00 !important;
    background: #d50a0a !important;
-	padding: 10px 20px !important;
-	display: block;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
+   padding: 10px 20px !important;
+   display: block;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
 }
 div.Popup div.Errors ul {
-	border: 1px solid #a00 !important;
-	padding: 6px 10px !important;
+   border: 1px solid #a00 !important;
+   padding: 6px 10px !important;
 }
 div.Errors ul li {
    color: #fff !important;
    background: #d50a0a !important;
-	margin: 0;
+   margin: 0;
 }
 div.Errors pre {
-	margin: 10px 0 5px;
-	padding: 4px 8px;
-	display: block;
+   margin: 10px 0 5px;
+   padding: 4px 8px;
+   display: block;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    white-space: pre;
    overflow: auto;
-	box-shadow: 0px 0px 2px #333;
-	-moz-box-shadow: 0px 0px 2px #333;
-	-webkit-box-shadow: 0px 0px 2px #333;  
+   box-shadow: 0px 0px 2px #333;
+   -moz-box-shadow: 0px 0px 2px #333;
+   -webkit-box-shadow: 0px 0px 2px #333;
 }
 div.Errors pre,
 div.Errors pre * {
-	background: #ffa !important;
-	font-size: 12px !important;
-	font-weight: normal !important;
-	font-family: monospace !important;
-	text-shadow: none !important;
-	color: #333  !important;
-	line-height: 1.4 !important;
+   background: #ffa !important;
+   font-size: 12px !important;
+   font-weight: normal !important;
+   font-family: monospace !important;
+   text-shadow: none !important;
+   color: #333  !important;
+   line-height: 1.4 !important;
 }
 div.Errors pre * {
-	margin: 0 !important;
-	padding: 0 !important;
+   margin: 0 !important;
+   padding: 0 !important;
 }
 
 .PageInfo {
-	background: #00346d;
-	background:-webkit-gradient(linear, center bottom, center top, from(#014a8a), to(#00346d));
-	background:-moz-linear-gradient(top, #00346d, #014a8a);
-	-pie-background:linear-gradient(top, #00346d, #014a8a);
-	background:linear-gradient(top, #00346d, #014a8a);
-	padding: 10px;
-	color: #fff;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+   background: #00346d;
+   background:-webkit-gradient(linear, center bottom, center top, from(#014a8a), to(#00346d));
+   background:-moz-linear-gradient(top, #00346d, #014a8a);
+   -pie-background:linear-gradient(top, #00346d, #014a8a);
+   background:linear-gradient(top, #00346d, #014a8a);
+   padding: 10px;
+   color: #fff;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
    margin: 20px;
 }
 
@@ -2097,99 +2097,99 @@ div.InformMessages {
   width: 100%;/*IE5.5*/
   top: auto;
   left: 20px;
-  overflow: visible; 
+  overflow: visible;
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 div.InformMessages div.InformWrapper {
-	display: block;
+   display: block;
 }
 div.InformMessages div.InformMessage {
    color: #fff !important;
-	text-shadow: 0 1px 1px #000;
+   text-shadow: 0 1px 1px #000;
    text-align: left !important;
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-	background: rgb(0, 0, 0) !important;
-	background: rgba(0, 0, 0, 0.7) !important;
+   background: rgb(0, 0, 0) !important;
+   background: rgba(0, 0, 0, 0.7) !important;
    border: none !important;
    width: auto !important;
-	max-width: 400px !important;
+   max-width: 400px !important;
    margin: 10px auto 0 !important;
    padding: 9px 14px 8px !important;
    display:-moz-inline-stack;
    display:inline-block;
    zoom:1;
    *display:inline;
-	position: relative;
-	line-height: 1.6;
+   position: relative;
+   line-height: 1.6;
 }
 div.InformMessages div.InformMessage:hover {
-	background: rgba(0, 0, 0, 0.8) !important;
+   background: rgba(0, 0, 0, 0.8) !important;
 }
 div.InformMessages div.InformMessage a {
-	color: #fff;
-	text-decoration: underline;
+   color: #fff;
+   text-decoration: underline;
 }
 div.InformMessages div.InformMessage a:hover {
-	text-decoration: none;
+   text-decoration: none;
 }
 div.InformMessages div.InformMessage a.Close {
-	border: none;
-	background: transparent;
+   border: none;
+   background: transparent;
    border-top-right-radius: 2px;
    -webkit-border-top-right-radius: 2px;
    -moz-border-radius-topright: 2px;
-	color: #ddd;
-	font-size: 14px;
-	text-align: center;
-	display: none;
-	height: 12px;
-	width: 12px;
-	line-height: 1;
-	text-decoration: none;
-	position: absolute;
-	top: 0px;
-	right: 0px;
+   color: #ddd;
+   font-size: 14px;
+   text-align: center;
+   display: none;
+   height: 12px;
+   width: 12px;
+   line-height: 1;
+   text-decoration: none;
+   position: absolute;
+   top: 0px;
+   right: 0px;
 }
 div.InformMessages div.InformMessage a.Close span {
-	display: inline;
+   display: inline;
 }
 div.InformMessages div.InformMessage a.Close:hover {
-	background: #000;
-	color: #fff;
+   background: #000;
+   color: #fff;
 }
 div.InformMessages div.InformMessage:hover a.Close {
-	display: block;
+   display: block;
 }
 /* Inform Sprites */
 div.InformMessages div.InformWrapper.HasIcon div.InformMessage {
-	padding-left: 42px !important;
-	min-height: 20px;
+   padding-left: 42px !important;
+   min-height: 20px;
 }
 div.InformMessages div.InformWrapper.HasSprite div.InformMessage {
-	padding-left: 40px !important;
+   padding-left: 40px !important;
 }
 div.InformMessages div.InformMessage a.Icon {
-	display: block;
-	position: absolute;
-	top: 5px;
-	left: 5px;
-	height: 28px;
-	width: 28px;
+   display: block;
+   position: absolute;
+   top: 5px;
+   left: 5px;
+   height: 28px;
+   width: 28px;
 }
 div.InformMessages div.InformMessage a.Icon img {
-	height: 28px;
-	width: 28px;
+   height: 28px;
+   width: 28px;
 }
 span.InformSprite {
-	background: url('images/inform-sprites.png') -9px -9px no-repeat;
-	display: block;
-	position: absolute;
-	top: 4px;
-	left: 5px;
-	height: 30px;
-	width: 30px;
+   background: url('images/inform-sprites.png') -9px -9px no-repeat;
+   display: block;
+   position: absolute;
+   top: 4px;
+   left: 5px;
+   height: 30px;
+   width: 30px;
 }
 span.InformSprite.Refresh { background-position: -9px -9px; }
 span.InformSprite.Recycle { background-position: -57px -9px; }
@@ -2324,19 +2324,19 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 
 /* Plugins */
 .PluginIcon {
-	display: block;
-	height: 50px;
-	width: 50px;
+   display: block;
+   height: 50px;
+   width: 50px;
 }
 
 /* Getting Started Screen */
 .Welcome h2 {
-	overflow: hidden;
-	text-indent: -1000px;
-	font-size: 1px;
-	height: 42px;
-	width: 341px;
-	background: url('images/welcome-message.png') top left no-repeat transparent;
+   overflow: hidden;
+   text-indent: -1000px;
+   font-size: 1px;
+   height: 42px;
+   width: 341px;
+   background: url('images/welcome-message.png') top left no-repeat transparent;
 }
 .Info ul,
 .Info ol {
@@ -2375,7 +2375,7 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 .ActivateSlider .SmallButton {
    margin: 0;
    min-width: 45px;
-   
+
 }
 
 .Sprite {
@@ -2385,8 +2385,8 @@ span.InformSprite.Dice { background-position: -442px -586px; }
    vertical-align: text-top;
    border: solid 2px transparent;
    margin: -2px;
-	background: url('//vanillicon.com/sprites/sprites-14-sweetx-001F44.png') 0 0 no-repeat;
-	display: inline-block;
+   background: url('//vanillicon.com/sprites/sprites-14-sweetx-001F44.png') 0 0 no-repeat;
+   display: inline-block;
 }
 
 /* 16px Sprites Black Transparent */

@@ -14,14 +14,14 @@ function WriteConnection($Row) {
          <span class="Connection-Name">
             <?php
                echo GetValue('Name', $Row, T('Unknown'));
-               
+
                if ($Connected) {
                   echo ' <span class="Gloss Connected">';
-                  
+
                   if ($Photo = GetValueR('Profile.Photo', $Row)) {
                      echo ' '.Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall'));
                   }
-                  
+
                   echo ' '.htmlspecialchars(GetValueR('Profile.Name', $Row)).'</span>';
                }
             ?>
@@ -34,7 +34,7 @@ function WriteConnection($Row) {
       </div>
 <!--      <div class="Connection-Body">
          <?php
-         
+
 //         if (Debug()) {
 //            decho(GetValue($Row['ProviderKey'], $c->User->Attributes), 'Attributes');
 //         }
@@ -47,7 +47,7 @@ function WriteConnection($Row) {
 
 function ConnectButton($Row) {
    $c = Gdn::Controller();
-   
+
    $Connected = GetValue('Connected', $Row);
    $CssClass = $Connected ? 'Active' : 'InActive';
    $ConnectUrl = GetValue('ConnectUrl', $Row);
@@ -60,6 +60,6 @@ function ConnectButton($Row) {
       $Result .= Anchor(T('Connect'), $ConnectUrl, 'Button');
    }
    $Result .= '</span>';
-   
+
    return $Result;
 }

@@ -8,7 +8,7 @@ $Keys = ConsolidateArrayValuesByKey($Tutorials, 'Code');
 $Index = array_search($CurrentTutorialCode, $Keys);
 if (!$Index)
    $Index = 0;
-   
+
 $CurrentTutorial = GetValue($Index, $Tutorials);
 $CurrentTutorialCode = GetValue('Code', $CurrentTutorial, '');
 ?>

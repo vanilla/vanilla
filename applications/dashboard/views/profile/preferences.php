@@ -15,7 +15,7 @@
    }
    td.PrefCheckBox {
       width: 50px;
-		text-align: center;
+      text-align: center;
    }
    table.PreferenceGroup tbody tr:hover td {
       background: #efefef;
@@ -39,7 +39,7 @@ foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
          <tr>
          <?php
          echo Wrap(T('Notification'), 'td', array('style' => 'text-align: left'));
-         
+
          $CountTypes = 0;
          foreach ($this->Data("PreferenceTypes.{$PreferenceGroup}") as $PreferenceType) {
             echo Wrap(T($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
@@ -60,13 +60,13 @@ foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
                }
                if ($ConfigCount == 0)
                   continue;
-               
+
                echo '<tr>';
                $Desc = GetValue($Name, $this->Data("PreferenceList.{$PreferenceGroup}"));
                if (is_array($Desc))
                   list($Desc, $Location) = $Desc;
                echo Wrap($Desc, 'td', array('class' => 'Description'));
-               
+
                $LastName = '';
                $i = 0;
                foreach ($Names as $Name) {
@@ -76,20 +76,20 @@ foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
                   if ($ConfigPref === FALSE) {
                      echo Wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
                   } else {
-                  	if (count($Names) < $CountTypes) {
-               			   $PreferenceTypeOrderCount = 0;
-               			   foreach ($PreferenceTypeOrder as $PreferenceTypeName => $PreferenceTypeOrderValue) {
-               			       if ($NameType == $PreferenceTypeName) {
-               				   if ($PreferenceTypeOrderValue == $PreferenceTypeOrderCount) echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
-               			       } else echo Wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
-               			       $PreferenceTypeOrderCount++;
-               			   }
-               		} else echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
+                     if (count($Names) < $CountTypes) {
+                           $PreferenceTypeOrderCount = 0;
+                           foreach ($PreferenceTypeOrder as $PreferenceTypeName => $PreferenceTypeOrderValue) {
+                               if ($NameType == $PreferenceTypeName) {
+                              if ($PreferenceTypeOrderValue == $PreferenceTypeOrderCount) echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
+                               } else echo Wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
+                               $PreferenceTypeOrderCount++;
+                           }
+                     } else echo Wrap($this->Form->CheckBox($Name, '', array('value' => '1')), 'td', array('class' => 'PrefCheckBox'));
                   }
                   $LastName = $Name;
                   $i++;
                }
-               
+
                echo '</tr>';
             }
          ?>

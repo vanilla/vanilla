@@ -23,7 +23,7 @@ $Session = Gdn::Session();
       echo Anchor(T('Use Categories'), 'vanilla/settings/managecategories/enable/'.Gdn::Session()->TransientKey(), 'SmallButton');
    }
 ?></div>
-<?php 
+<?php
 if (C('Vanilla.Categories.Use')) {
    ?>
    <div class="Help Aside">
@@ -68,14 +68,14 @@ if (C('Vanilla.Categories.Use')) {
       if ($Category->CategoryID > 0) {
          // Only check stack if there is one
          $CountRight = count($Right);
-         if ($CountRight > 0) {  
+         if ($CountRight > 0) {
             // Check if we should remove a node from the stack
             while (array_key_exists($CountRight - 1, $Right) && $Right[$CountRight - 1] < $Category->TreeRight) {
                array_pop($Right);
                $CountRight--;
-            }  
-         }  
-         
+            }
+         }
+
          // Are we opening a new list?
          if ($CountRight > $LastRight) {
             $OpenCount++;
@@ -91,7 +91,7 @@ if (C('Vanilla.Categories.Use')) {
             // Or are we closing an open list item?
             echo "</li>";
          }
-         
+
          echo "\n".'<li id="list_'.$Category->CategoryID.'">';
          // DEBUG: echo Wrap($Category->Name.' [countright: '.$CountRight.' lastcount: '.$LastRight.' opencount: '.$OpenCount.']', 'div');
          $CategoryUrl = Url('categories/'.rawurlencode($Category->UrlCode).'/', TRUE);
@@ -111,8 +111,8 @@ if (C('Vanilla.Categories.Use')) {
                </tr>
             </table>'
          ,'div');
-         
-         // Add this node to the stack  
+
+         // Add this node to the stack
          $Right[] = $Category->TreeRight;
          $LastRight = $CountRight;
          $Loop++;
@@ -122,6 +122,6 @@ if (C('Vanilla.Categories.Use')) {
       echo "</li>\n</ol>\n</li>\n";
    else
       echo "</li>\n";
-      
+
    echo '</ol>';
 }

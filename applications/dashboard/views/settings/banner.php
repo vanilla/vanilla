@@ -34,8 +34,8 @@ $Session = Gdn::Session();
 <div class="PageInfo">
    <h2><?php echo T('Heads up!');?></h2>
    <p>
-   <?php 
-   echo T('Spend a little time thinking about how you describe your site here.', 
+   <?php
+   echo T('Spend a little time thinking about how you describe your site here.',
       'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
    ?>
    </p>
@@ -46,7 +46,7 @@ echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
 ?>
 <div class="Row">
-   <div class="Column Grid_50">  
+   <div class="Column Grid_50">
       <ul>
          <li>
             <?php
@@ -74,7 +74,7 @@ echo $this->Form->Errors();
             <?php
                echo $this->Form->Label('Banner Title', 'Garden.Title');
                echo Wrap(
-                     T("The banner title appears on your site's banner and in your browser's title bar.", 
+                     T("The banner title appears on your site's banner and in your browser's title bar.",
                        "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may also hide this title."),
                      'div',
                      array('class' => 'Info')
@@ -169,7 +169,7 @@ echo $this->Form->Errors();
       </ul>
    </div>
 </div>
-<?php 
+<?php
 
 echo '<div class="Buttons">'.$this->Form->Button('Save').'</div>';
 

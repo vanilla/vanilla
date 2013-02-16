@@ -15,7 +15,7 @@ function WriteConditionEdit($Condition, $Sender) {
    $Expr = GetValue(2, $Condition, '');
 
    echo '<tr>';
-   
+
    // Type.
    echo '<td>',
       $Form->DropDown($Px.'Type[]', $Sender->Types, array('Value' => $Type, 'Class' => 'CondType')),

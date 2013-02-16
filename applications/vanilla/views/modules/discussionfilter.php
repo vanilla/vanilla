@@ -5,7 +5,7 @@ $Session = Gdn::Session();
 $Title = property_exists($Controller, 'Category') ? GetValue('Name', $Controller->Category, '') : '';
 if ($Title == '')
    $Title = T('All Discussions');
-      
+
 $Bookmarked = T('My Bookmarks');
 $MyDiscussions = T('My Discussions');
 $MyDrafts = T('My Drafts');
@@ -34,7 +34,7 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
 <div class="BoxFilter BoxDiscussionFilter">
    <ul class="FilterMenu">
       <?php
-      $Controller->FireEvent('BeforeDiscussionFilters');     
+      $Controller->FireEvent('BeforeDiscussionFilters');
 //      if (C('Vanilla.Categories.ShowTabs')) {
          $CssClass = 'AllCategories';
          if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), array('index', 'all'))) {

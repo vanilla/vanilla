@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-   
+
    // Show drafts delete button on hover
    $('li.Item').livequery(function() {
       var btn = $(this).find('a.Delete');
@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
             afterPageLoaded: function() { $(document).trigger('DiscussionPagingComplete'); }
          });
       });
-      
+
    if ($('.AdminCheck :checkbox').not(':checked').length == 1)
       $('.AdminCheck [name="Toggle"]').attr('checked', 'checked').change();
 

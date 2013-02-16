@@ -14,16 +14,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class DiscussionsModule extends Gdn_Module {
    public $Limit = 10;
    public $Prefix = 'Discussion';
-   
+
    public function __construct() {
       parent::__construct();
       $this->_ApplicationFolder = 'vanilla';
    }
-   
+
    public function GetData($Limit = FALSE) {
       if (!$Limit)
          $Limit = $this->Limit;
-      
+
       $DiscussionModel = new DiscussionModel();
       $this->SetData('Discussions', $DiscussionModel->Get(0, $Limit, array('Announce' => 'all')));
    }
@@ -36,9 +36,9 @@ class DiscussionsModule extends Gdn_Module {
       if (!$this->Data('Discussions')) {
          $this->GetData();
       }
-      
+
       require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
-      
+
       return parent::ToString();
    }
 }

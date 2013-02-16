@@ -19,7 +19,7 @@ function WriteHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
 ?>
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-   
+
    $('.HomeOptions a.Choice').click(function() {
       $('.HomeOptions a.Choice').removeClass('Current');
       $(this).addClass('Current');
@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
       $('#Form_Target').val(page);
       return false;
    });
-   
+
    $('.LayoutOptions a.Choice').click(function() {
       var parent = $(this).parents('.LayoutOptions');
       var layoutContainer = $(parent).hasClass('DiscussionsLayout') ? 'DiscussionsLayout' : 'CategoriesLayout';
@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
       $('#Form_'+layoutContainer).val(layout);
       return false;
    });
-   
+
 });
 </script>
 <div class="Help Aside">
@@ -60,14 +60,14 @@ jQuery(document).ready(function($) {
       <?php
       // Only show the vanilla pages if Vanilla is enabled
       $CurrentTarget = $this->Data('CurrentTarget');
-      
+
       if (Gdn::ApplicationManager()->CheckApplication('Vanilla')) {
          echo WriteHomepageOption('Discussions', 'discussions', 'SpDiscussions', $CurrentTarget);
          echo WriteHomepageOption('Categories', 'categories', 'SpCategories', $CurrentTarget);
          // echo WriteHomepageOption('Categories &amp; Discussions', 'categories/discussions', 'categoriesdiscussions', $CurrentTarget);
       }
       echo WriteHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
-      
+
       if (Gdn::PluginManager()->CheckPlugin('Reactions')) {
          echo WriteHomepageOption('Best Of', 'bestof', 'SpBestOf', $CurrentTarget);
       }

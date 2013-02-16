@@ -2,7 +2,7 @@
 
 if (!function_exists('GetOptions'))
    include $this->FetchViewLocation('helper_functions', 'categories');
-   
+
 echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
 if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
@@ -25,13 +25,13 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
    $Alt = FALSE;
    foreach ($this->Data('Categories') as $CategoryRow) {
       $Category = (object)$CategoryRow;
-      
+
       $this->EventArguments['CatList'] = &$CatList;
       $this->EventArguments['ChildCategories'] = &$ChildCategories;
       $this->EventArguments['Category'] = &$Category;
       $this->FireEvent('BeforeCategoryItem');
       $CssClass = CssClass($CategoryRow);
-      
+
       $CategoryID = GetValue('CategoryID', $Category);
 
       if ($Category->CategoryID > 0) {
@@ -80,7 +80,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                      // has children, add a replacement string for them.
                      if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
                         $CatList .= '{ChildCategories}';
-         
+
                   $CatList .= '</div>
                </div>
             </li>';
@@ -91,7 +91,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
    // the replacement one last time.
    if ($ChildCategories != '')
       $CatList = str_replace('{ChildCategories}', '<span class="ChildCategories">'.Wrap(T('Child Categories:'), 'b').' '.$ChildCategories.'</span>', $CatList);
-   
+
    echo $CatList;
 ?>
 </ul>

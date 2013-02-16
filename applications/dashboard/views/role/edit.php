@@ -24,7 +24,7 @@ echo $this->Form->Errors();
    </li>
    <?php
    $this->FireEvent('BeforeRolePermissions');
-   
+
    if (count($this->PermissionData) > 0) {
       if ($this->Role && $this->Role->CanSession != '1') {
          ?>

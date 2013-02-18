@@ -46,6 +46,14 @@ li.token-input-token {
     -webkit-border-radius: 5px;
     float: left;
 }
+li.token-input-token.not-allowed {
+    background-color: #FFC2C2;
+    color: #C91313;
+    border: 1px solid #FF3232;
+}
+li.token-input-token.not-allowed span {
+    color: #C91313;
+}
 li.token-input-token p {
     display: inline;
     padding: 0;
@@ -66,6 +74,14 @@ li.token-input-selected-token {
     background-color: #5670a6;
     border: 1px solid #3b5998;
     color: #fff;
+}
+li.token-input-selected-token.not-allowed {
+    background-color: red;
+    color: #ffffff;
+    border: 1px solid #FF3232;
+}
+li.token-input-selected-token.not-allowed span {
+    color: #ffffff;
 }
 li.token-input-input-token {
     float: left;

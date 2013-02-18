@@ -179,6 +179,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
       $UserID = ArrayValue(0, $Sender->EventArguments, '');
 		$CategoryID = ArrayValue(1, $Sender->EventArguments, '');
+      $Permission = GetValue(2, $Sender->EventArguments, 'Vanilla.Discussions.View');
 		if ($UserID && $CategoryID) {
          if ($PermissionModel === NULL)
             $PermissionModel = new PermissionModel();
@@ -189,8 +190,8 @@ class VanillaHooks implements Gdn_IPlugin {
          else
             $PermissionCategoryID = -1;
          
-         $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
-         return (GetValue('Vanilla.Discussions.View', GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
+         $Result = $PermissionModel->GetUserPermissions($UserID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
+         return (GetValue($Permission, GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
       }
       return FALSE;
    }

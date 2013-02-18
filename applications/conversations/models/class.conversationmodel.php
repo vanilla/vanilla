@@ -332,7 +332,7 @@ class ConversationModel extends Gdn_Model {
     * @access public
     *
     * @param array $FormPostValues Values submitted via form.
-    * @param object $MessageModel Message starting the conversation.
+    * @param ConversationMessageModel $MessageModel Message starting the conversation.
     * @return int Unique ID of conversation created or updated.
     */
    public function Save($FormPostValues, $MessageModel) {
@@ -410,6 +410,13 @@ class ConversationModel extends Gdn_Model {
          
          // And update the CountUnreadConversations count on each user related to the discussion.
          $this->UpdateUserUnreadCount($RecipientUserIDs, TRUE);
+         
+         $this->EventArguments['Recipients'] = $RecipientUserIDs;
+         $Conversation = $this->GetID($ConversationID);
+         $this->EventArguments['Conversation'] = $Conversation;
+         $Message = $MessageModel->GetID($MessageID, DATASET_TYPE_ARRAY);
+         $this->EventArguments['Message'] = $Message;
+         $this->FireEvent('AfterAdd');
 
          // Add notifications (this isn't done by the conversationmessagemodule
          // because the conversation has not yet been created at the time they are

@@ -80,6 +80,8 @@
             break;
       }
    });
+   
+   $(window).unload(function() { Vanilla.parent.callRemote('scrollTo', 0); });
 })(window, jQuery, Vanilla);
 
 jQuery(document).ready(function($) {

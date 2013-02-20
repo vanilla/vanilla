@@ -12,7 +12,7 @@
       <tbody>
          <?php foreach ($this->Data['DiscussionData'] as $Discussion) { ?>
          <tr>
-            <th><?php echo Anchor($Discussion->Name, 'discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name)); ?></th>
+            <th><?php echo Anchor(htmlspecialchars($Discussion->Name), DiscussionUrl($Discussion)); ?></th>
             <td><?php echo number_format($Discussion->CountComments); ?></td>
             <td><?php echo number_format($Discussion->CountBookmarks); ?></td>
             <td><?php echo number_format($Discussion->CountViews); ?></td>

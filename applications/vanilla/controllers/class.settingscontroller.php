@@ -39,6 +39,7 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Discussions.PerPage',
          'Vanilla.Comments.AutoRefresh',
          'Vanilla.Comments.PerPage',
+         'Garden.Html.AllowedElements',
          'Vanilla.Archive.Date',
          'Vanilla.Archive.Exclude',
          'Garden.EditContentTimeout',

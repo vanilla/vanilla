@@ -1196,7 +1196,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
          ob_clean();
-//         $this->ContentType('application/json');
+         $this->ContentType('application/json');
+         $this->SetHeader('X-Content-Type-Options', 'nosniff');
       }
       
       if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {

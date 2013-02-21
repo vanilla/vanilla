@@ -764,35 +764,36 @@ class EntryController extends Gdn_Controller {
                $Password = $this->Form->GetFormValue('Password');
                try {
                   $PasswordChecked = $PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User));
-               } catch (Gdn_UserException $Ex) {
-                  $this->Form->AddError($Ex);
-                  $this->Render();
-                  return;
-               }
-               
-               if ($PasswordChecked) {
-                  // Update weak passwords
-                  $HashMethod = GetValue('HashMethod', $User);
-                  if ($PasswordHash->Weak || ($HashMethod && strcasecmp($HashMethod, 'Vanilla') != 0)) {
-                     $Pw = $PasswordHash->HashPassword($Password);
-                     Gdn::UserModel()->SetField(GetValue('UserID', $User), array('Password' => $Pw, 'HashMethod' => 'Vanilla'));
-                  }
                   
-                  Gdn::Session()->Start(GetValue('UserID', $User), TRUE, (bool)$this->Form->GetFormValue('RememberMe'));
-                  if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
-                     $this->Form->AddError('ErrorPermission');
-                     Gdn::Session()->End();
-                  } else {
-                     if ($HourOffset != Gdn::Session()->User->HourOffset) {
-                        Gdn::UserModel()->SetProperty(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+                  // Rate limiting
+                  Gdn::UserModel()->RateLimit($User, $PasswordChecked);
+                  
+                  if ($PasswordChecked) {
+                     // Update weak passwords
+                     $HashMethod = GetValue('HashMethod', $User);
+                     if ($PasswordHash->Weak || ($HashMethod && strcasecmp($HashMethod, 'Vanilla') != 0)) {
+                        $Pw = $PasswordHash->HashPassword($Password);
+                        Gdn::UserModel()->SetField(GetValue('UserID', $User), array('Password' => $Pw, 'HashMethod' => 'Vanilla'));
                      }
-                     
-                     Gdn::UserModel()->FireEvent('AfterSignIn');
 
-                     $this->_SetRedirect();
+                     Gdn::Session()->Start(GetValue('UserID', $User), TRUE, (bool)$this->Form->GetFormValue('RememberMe'));
+                     if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
+                        $this->Form->AddError('ErrorPermission');
+                        Gdn::Session()->End();
+                     } else {
+                        if ($HourOffset != Gdn::Session()->User->HourOffset) {
+                           Gdn::UserModel()->SetProperty(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+                        }
+
+                        Gdn::UserModel()->FireEvent('AfterSignIn');
+
+                        $this->_SetRedirect();
+                     }
+                  } else {
+                     $this->Form->AddError('Invalid password.');
                   }
-               } else {
-                  $this->Form->AddError('Invalid password.');
+               } catch (Gdn_UserException $Ex) {                  
+                  $this->Form->AddError($Ex);
                }
             }
          }
@@ -1114,19 +1115,23 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterApproval() {
+      $this->AddJsFile('password.js');
+      
       // If the form has been posted back...
       if ($this->Form->IsPostBack()) {
+         
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', $this->UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
+         $this->UserModel->Validation->ApplyRule('Password', 'Strength');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          $this->UserModel->Validation->ApplyRule('DiscoveryText', 'Required', 'Tell us why you want to join!');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          
          $this->FireEvent('RegisterValidation');
-
+         
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
@@ -1172,12 +1177,15 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterBasic() {
+      $this->AddJsFile('password.js');
+      
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();
          $this->UserModel->Validation->ApplyRule('Name', 'Username', $this->UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
+         $this->UserModel->Validation->ApplyRule('Password', 'Strength');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          
@@ -1239,6 +1247,8 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterCaptcha() {
+      $this->AddJsFile('password.js');
+      
       include(CombinePaths(array(PATH_LIBRARY, 'vendors/recaptcha', 'functions.recaptchalib.php')));
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
@@ -1246,6 +1256,7 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Name', 'Username', $this->UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
+         $this->UserModel->Validation->ApplyRule('Password', 'Strength');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          
@@ -1311,6 +1322,8 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterInvitation($InvitationCode) {
+      $this->AddJsFile('password.js');
+      
       if ($this->Form->IsPostBack() === TRUE) {
          $this->InvitationCode = $this->Form->GetValue('InvitationCode');
          // Add validation rules that are not enforced by the model
@@ -1318,6 +1331,7 @@ class EntryController extends Gdn_Controller {
          $this->UserModel->Validation->ApplyRule('Name', 'Username', $this->UsernameError);
          $this->UserModel->Validation->ApplyRule('TermsOfService', 'Required', T('You must agree to the terms of service.'));
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
+         $this->UserModel->Validation->ApplyRule('Password', 'Strength');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          // $this->UserModel->Validation->ApplyRule('DateOfBirth', 'MinimumAge');
          

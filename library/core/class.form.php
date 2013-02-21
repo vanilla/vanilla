@@ -1142,6 +1142,7 @@ class Gdn_Form extends Gdn_Pluggable {
       
       $Return = '';
       $Wrap = GetValue('Wrap', $Attributes, FALSE, TRUE);
+      $Strength = GetValue('Strength', $Attributes, FALSE, TRUE);
       if ($Wrap) {
          $Return .= '<div class="TextBoxWrapper">';
       }
@@ -1165,6 +1166,20 @@ class Gdn_Form extends Gdn_Pluggable {
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
          $Return .= $this->InlineError($FieldName);
+      
+      if ($Type == 'password' && $Strength) {
+         $Return .= <<<PASSWORDMETER
+<div class="PasswordStrength">
+   <div class="Background"></div>
+   <div class="Strength"></div>
+   <div class="Separator" style="left: 20%;"></div>
+   <div class="Separator" style="left: 40%;"></div>
+   <div class="Separator" style="left: 60%;"></div>
+   <div class="Separator" style="left: 80%;"></div>
+   <div class="StrengthText">&nbsp;</div>
+</div>
+PASSWORDMETER;
+      }
       
       if ($Wrap)
          $Return .= '</div>';

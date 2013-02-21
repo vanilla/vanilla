@@ -957,6 +957,9 @@ label.SubLabel {
 body.managecategories div.Info div {
 	padding-top: 16px;
 }
+form ul li.PasswordOptions label.RadioLabel {
+   display: block;
+}
 
 /* =================================================================== Header */
 #Head {

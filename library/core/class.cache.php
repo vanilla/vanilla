@@ -46,6 +46,8 @@ abstract class Gdn_Cache {
    const FEATURE_FORCEPREFIX  = 'f_forceprefix';
    // Allows querying DB for missing keys, or firing a callback
    const FEATURE_FALLBACK     = 'f_fallback';
+   // In incr/decr ops, what should the initial value be
+   const FEATURE_INITIAL      = 'f_initial';
    
    /**
     * Location - SERVER:IP, Filepath, etc

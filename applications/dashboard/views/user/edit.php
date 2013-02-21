@@ -55,10 +55,14 @@ if ($this->Data('AllowEditing')) { ?>
    </ul>
    <h3><?php echo T('Password Options'); ?></h3>
    <ul>
-      <li>
+      <li class="PasswordOptions">
          <?php
-            echo $this->Form->Label('Reset Password');
-            echo $this->Form->CheckBox('ResetPassword', T('Reset password and send email notification to user'));
+            $ResetOptions = array(
+               0 => T('Keep current password.'),
+               'Auto' => T('Force user to reset their password and send email notification.'),
+               'Manual' => T('Manually set user password. No email notification.')
+            );
+            echo $this->Form->RadioList('ResetPassword', $ResetOptions);
          ?>
       </li>
       <li id="NewPassword">

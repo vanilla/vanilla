@@ -60,8 +60,14 @@ class TagModel extends Gdn_Model {
             $this->Database->RollbackTransaction();
             throw $Ex;
          }
+         
+         return $ToID;
       } else {
-         parent::Save($FormPostValues, $Settings);
+         if (Gdn::Session()->CheckPermission('Plugins.Tagging.Add')) {
+            return parent::Save($FormPostValues, $Settings);
+         } else {
+            return FALSE; 
+         }
       }
    }
 

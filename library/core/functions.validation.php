@@ -285,7 +285,7 @@ if (!function_exists('ValidateLength')) {
 
 if (!function_exists('ValidateEnum')) {
    function ValidateEnum($Value, $Field) {
-      return in_array($Value, $Field->Enum);
+      return (in_array($Value, $Field->Enum) || ($Field->AllowNull && is_null($Value)));
    }
 }
 

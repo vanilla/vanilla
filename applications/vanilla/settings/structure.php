@@ -248,11 +248,10 @@ $PermissionModel->SQL = $SQL;
 
 // Define some global vanilla permissions.
 $PermissionModel->Define(array(
-	'Vanilla.Settings.Manage',
-	'Vanilla.Categories.Manage',
 	'Vanilla.Approval.Require',
    'Vanilla.Comments.Me' => 1,
 	));
+$PermissionModel->Undefine(array('Vanilla.Settings.Manage', 'Vanilla.Categories.Manage'));
 
 // Define some permissions for the Vanilla categories.
 $PermissionModel->Define(array(
@@ -313,12 +312,6 @@ if ($RootCategoryInserted) {
       'Vanilla.Comments.Add' => 1
       ), TRUE);
       
-   // Set the initial moderator permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Moderator',
-      'Vanilla.Categories.Manage' => 1
-      ), TRUE);
-   
    $PermissionModel->Save(array(
       'Role' => 'Moderator',
       'JunctionTable' => 'Category',
@@ -336,13 +329,6 @@ if ($RootCategoryInserted) {
       'Vanilla.Comments.Delete' => 1
       ), TRUE);
       
-   // Set the initial administrator permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Administrator',
-      'Vanilla.Settings.Manage' => 1,
-      'Vanilla.Categories.Manage' => 1
-      ), TRUE);
-   
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
       'JunctionTable' => 'Category',

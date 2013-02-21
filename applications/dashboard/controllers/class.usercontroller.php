@@ -508,7 +508,7 @@ class UserController extends DashboardController {
             // If a new password was specified, add it to the form's collection
             $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
             $NewPassword = $this->Form->GetValue('NewPassword', '');
-            if ($ResetPassword !== FALSE)
+            if ($ResetPassword == 'Manual') 
                $this->Form->SetFormValue('Password', $NewPassword);
             
             // Role changes
@@ -535,8 +535,10 @@ class UserController extends DashboardController {
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
             
             if ($this->Form->Save(array('SaveRoles' => TRUE)) !== FALSE) {
-               if ($this->Form->GetValue('Password', '') != '')
-                  $UserModel->SendPasswordEmail($UserID, $NewPassword);
+               if ($this->Form->GetValue('ResetPassword', '') == 'Auto') {
+                  $UserModel->PasswordRequest($this->User->Email);
+                  $UserModel->SetField($UserID, 'HashMethod', 'Reset'); 
+               }
 
                $this->InformMessage(T('Your changes have been saved.'));
             }
@@ -712,7 +714,7 @@ class UserController extends DashboardController {
    public function Verify($UserID, $Verified) {
       $this->Permission('Garden.Moderation.Manage');
       
-      if (!$this->Request->IsPostBack()) {
+      if (!$this->Request->IsAuthenticatedPostBack()) {
          throw PermissionException('Javascript');
       }
       

@@ -21,7 +21,7 @@ require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla
       <li id="Category_<?php echo $Row['CategoryID']; ?>" class="Item Category">
          <div class="ItemContent Category">
             <h3 class="CategoryName TitleWrap"><?php 
-               echo Anchor($Row['Name'], $Row['Url'], 'Title');
+               echo Anchor(htmtspecialchars($Row['Name']), $Row['Url'], 'Title');
                Gdn::Controller()->EventArguments['Category'] = $Row;
                Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
             ?></h3>

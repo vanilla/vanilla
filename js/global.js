@@ -634,7 +634,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: href,
-         data: {DeliveryType: 'VIEW', 'DeliveryMethod': 'JSON'},
+         data: { DeliveryType: 'VIEW', DeliveryMethod: 'JSON', TransientKey: gdn.definition('TransientKey') },
          dataType: 'json',
          complete: function() {
             gdn.enable(this);

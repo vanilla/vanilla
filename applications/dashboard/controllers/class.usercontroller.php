@@ -712,7 +712,7 @@ class UserController extends DashboardController {
    public function Verify($UserID, $Verified) {
       $this->Permission('Garden.Moderation.Manage');
       
-      if (!$this->Request->IsPostBack()) {
+      if (!$this->Request->IsAuthenticatedPostBack()) {
          throw PermissionException('Javascript');
       }
       

@@ -535,7 +535,7 @@ class UserController extends DashboardController {
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
             
             if ($this->Form->Save(array('SaveRoles' => TRUE)) !== FALSE) {
-               if ($this->Form->GetValue('Password', '') == 'Auto') {
+               if ($this->Form->GetValue('ResetPassword', '') == 'Auto') {
                   $UserModel->PasswordRequest($this->User->Email);
                   $UserModel->SetField($UserID, 'HashMethod', 'Reset'); 
                }

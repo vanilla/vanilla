@@ -133,7 +133,7 @@ class CategoriesController extends VanillaController {
          }
          
          
-         $this->Title(GetValue('Name', $Category, ''));
+         $this->Title(htmlspecialchars(GetValue('Name', $Category, '')));
          $this->Description(GetValue('Description', $Category), TRUE);
          
          // Set CategoryID

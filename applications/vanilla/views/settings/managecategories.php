@@ -99,7 +99,7 @@ if (C('Vanilla.Categories.Use')) {
             '<table'.($OpenCount > 0 ? ' class="Indented"' : '').'>
                <tr>
                   <td>
-                     <strong>'.$Category->Name.'</strong>
+                     <strong>'.htmlspecialchars($Category->Name).'</strong>
                      '.Anchor(htmlspecialchars(rawurldecode($CategoryUrl)), $CategoryUrl).'
                      '.Wrap($Category->Description, 'blockquote').'
                      './*Wrap("ID: {$Category->CategoryID}, PermID: {$Category->PermissionCategoryID}", 'div').*/'

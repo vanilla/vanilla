@@ -189,6 +189,9 @@ textarea {
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	padding: 3px;	
 }
+.PasswordStrength {
+   width: 250px;
+}
 .ui-datepicker {
 	width: 17em;
 	padding: 2px 20px 2px 10px;
@@ -371,6 +374,9 @@ textarea.TextBox {
 }
 .TextBoxWrapper textarea,
 .TextBoxWrapper input {
+   width: 100%;
+}
+.TextBoxWrapper .PasswordStrength {
    width: 100%;
 }
 #Popup textarea.TextBox {
@@ -2892,7 +2898,6 @@ body#dashboard_entry_index #Content input.Password,
 }
 .PasswordStrength {
    position: relative;
-   width: 100%;
    margin-top: 2px;
    padding-right: 8px;
    margin-bottom: 4px;

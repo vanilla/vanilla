@@ -1153,6 +1153,8 @@ class Gdn_Form extends Gdn_Pluggable {
          ArrayValueI('Name', $Attributes, $FieldName));
       else $Return .= $this->_NameAttribute($FieldName, $Attributes);
 
+      if ($Strength)
+         $Return .= ' data-strength="true"';
       $Return .= $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ' />';

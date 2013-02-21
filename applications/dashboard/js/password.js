@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
    
    $('input[type=password]').each(function(i,el){
       el = $(el);
-      if (el.attr('name').match(/(Match)/i))
+      if (!el.data('strength'))
          return;
       
       // Detect changes, set a timeout for calling the check

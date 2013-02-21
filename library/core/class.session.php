@@ -403,7 +403,7 @@ class Gdn_Session {
    public function EnsureTransientKey() {
       if (!$this->_TransientKey) {
          // Generate a transient key in the browser.
-         $tk = sha1(microtime());
+         $tk = substr(md5(microtime()), 0, 16);
          SetAppCookie('tk', $tk);
          $this->_TransientKey = $tk;
       }

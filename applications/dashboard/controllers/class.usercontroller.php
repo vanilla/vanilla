@@ -596,6 +596,9 @@ class UserController extends DashboardController {
             }
             $FilterValue = $Parts[2];
          }
+         
+         if (!in_array($Field, array('InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastVisit')))
+            return FALSE;
 
          return array("$Field $Op" => $FilterValue);
       }

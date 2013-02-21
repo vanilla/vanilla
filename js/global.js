@@ -258,9 +258,11 @@ jQuery(document).ready(function($) {
       };
       
       // password1 == username
-      if (password.toLowerCase() == username.toLowerCase()) {
-         response.reason = 'similar';
-         return response;
+      if (username) {
+         if (password.toLowerCase() == username.toLowerCase()) {
+            response.reason = 'similar';
+            return response;
+         }
       }
       
       // divide into entropy buckets

@@ -55,7 +55,7 @@ class SettingsController extends DashboardController {
     * @param string $TransientKey Security token.
     */
    public function Applications($Filter = '', $ApplicationName = '', $TransientKey = '') {
-      $this->Permission('Garden.Applications.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Page setup
       $this->AddJsFile('addons.js');
@@ -451,12 +451,6 @@ class SettingsController extends DashboardController {
       $this->Title(T('Dashboard'));
          
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Edit';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Delete';
@@ -645,7 +639,7 @@ class SettingsController extends DashboardController {
     * @param string $TransientKey Security token.
     */
    public function Plugins($Filter = '', $PluginName = '', $TransientKey = '') {
-      $this->Permission('Garden.Plugins.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Page setup
       $this->AddJsFile('addons.js');
@@ -725,9 +719,7 @@ class SettingsController extends DashboardController {
     * @param string $RedirectUrl Where to send user after registration.
     */
    public function Registration($RedirectUrl = '') {
-      $this->Permission('Garden.Registration.Manage');
-		if(!C('Garden.Registration.Manage', TRUE))
-			return Gdn::Dispatcher()->Dispatch('Default404');
+      $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/settings/registration');
       
       $this->AddJsFile('registration.js');
@@ -912,7 +904,7 @@ class SettingsController extends DashboardController {
     * @todo Why is this in a giant try/catch block?
     */
    public function ThemeOptions($Style = NULL) {
-      $this->Permission('Garden.Themes.Manage');
+      $this->Permission('Garden.Settings.Manage');
 
       try {
          $this->AddJsFile('addons.js');
@@ -982,7 +974,7 @@ class SettingsController extends DashboardController {
       $this->AddJsFile('addons.js');
       $this->SetData('Title', T('Themes'));
          
-      $this->Permission('Garden.Themes.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/settings/themes');
       
       $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo(TRUE);
@@ -1062,7 +1054,7 @@ class SettingsController extends DashboardController {
     * @param string $ThemeName Unique ID.
     */
    public function PreviewTheme($ThemeName = '') {
-      $this->Permission('Garden.Themes.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
       
       $PreviewThemeName = $ThemeName;
@@ -1106,13 +1098,13 @@ class SettingsController extends DashboardController {
             $Manager = Gdn::Factory('ApplicationManager');
             $Enabled = 'EnabledApplications';
             $Remove  = 'RemoveApplication';
-            $RequiredPermission = 'Garden.Applications.Manage';
+            $RequiredPermission = 'Garden.Settings.Manage';
          break;
          case SettingsModule::TYPE_PLUGIN:
             $Manager = Gdn::Factory('PluginManager');
             $Enabled = 'EnabledPlugins';
             $Remove  = 'RemovePlugin';
-            $RequiredPermission = 'Garden.Plugins.Manage';
+            $RequiredPermission = 'Garden.Settings.Manage';
          break;
       }
       
@@ -1138,7 +1130,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveFavicon($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Themes.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
          $Favicon = C('Garden.FavIcon', '');
          RemoveFromConfig('Garden.FavIcon');
          $Upload = new Gdn_Upload();
@@ -1158,7 +1150,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveLogo($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Themes.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
          $Logo = C('Garden.Logo', '');
          RemoveFromConfig('Garden.Logo');
          @unlink(PATH_ROOT . DS . $Logo);

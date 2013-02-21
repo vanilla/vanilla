@@ -11,6 +11,11 @@ jQuery(document).ready(function($) {
       
       // Detect changes, set a timeout for calling the check
       var form = el.closest('form');
+      if (!form.find('.PasswordStrength')) return;
+      else {
+         var pwFieldWidth = el.width();
+         form.find('.PasswordStrength').css('width', pwFieldWidth);
+      }
       var timeout = 0;
       
       el.on('keyup', function(e){

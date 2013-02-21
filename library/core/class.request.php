@@ -285,8 +285,8 @@ class Gdn_Request {
       if (!$this->IsPostBack())
          return FALSE;
 
-      $PostBackKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST, 'TransientKey', FALSE);
-      return Gdn::Session()->ValidateTransientKey($PostBackKey);
+      $PostBackKey = Gdn::Request()->Post('TransientKey', FALSE);
+      return Gdn::Session()->ValidateTransientKey($PostBackKey, FALSE);
    }
    
    public function IsPostBack() {

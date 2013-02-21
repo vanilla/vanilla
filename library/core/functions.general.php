@@ -1285,6 +1285,20 @@ if (!function_exists('getallheaders')) {
    }
 }
 
+if (!function_exists('GetAppCookie')):
+/**
+ * Get a cookie with the application prefix.
+ * 
+ * @param string $Name
+ * @param mixed $Default
+ * @return string
+ */
+function GetAppCookie($Name, $Default = NULL) {
+   $Px = C('Garden.Cookie.Name');
+   return GetValue("$Px-$Name", $_COOKIE, $Default);
+}
+endif;
+
 if (!function_exists('GetConnectionString')) {
    function GetConnectionString($DatabaseName, $HostName = 'localhost', $ServerType = 'mysql') {
       $HostName = explode(':', $HostName);
@@ -2604,6 +2618,38 @@ if (!function_exists('SaveToConfig')) {
       Gdn::Config()->SaveToConfig($Name, $Value, $Options);
    }
 }
+
+if (!function_exists('SetAppCookie')):
+
+/**
+ * Set a cookie withe the appropriate application cookie prefix and other cookie information.
+ * 
+ * @param string $Name
+ * @param string $Value
+ * @param int $Expire
+ * @param bool $Force Whether or not to set the cookie even if already exists.
+ */
+function SetAppCookie($Name, $Value, $Expire = 0, $Force = FALSE) {
+   $Px = C('Garden.Cookie.Name');
+   $Key = "$Px-$Name";
+   
+   // Check to see if the cookie is already set before setting it again.
+   if (!$Force && isset($_COOKIE[$Key]) && $_COOKIE[$Key] == $Value) {
+      return;
+   }
+   
+   $Domain = C('Garden.Cookie.Domain', '');
+
+   // If the domain being set is completely incompatible with the current domain then make the domain work.
+   $CurrentHost = Gdn::Request()->Host();
+   if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
+      $Domain = '';
+      
+   // Create the cookie.
+   setcookie($Key, $Value, $Expire, '/', $Domain, NULL, TRUE);
+   $_COOKIE[$Key] = $Value;
+}
+endif;
 
 if (!function_exists('SliceParagraph')) {
    /**

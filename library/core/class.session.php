@@ -349,6 +349,9 @@ class Gdn_Session {
             if ($SetIdentity)
                Gdn::Authenticator()->SetIdentity(NULL);
          }
+      } else {
+         // Grab the transient key from the cookie. This doesn't always get set but we'll try it here anyway.
+         $this->_TransientKey = GetAppCookie('tk');
       }
       // Load guest permissions if necessary
       if ($this->UserID == 0)
@@ -396,6 +399,16 @@ class Gdn_Session {
          $UserModel->SavePreference($this->UserID, $Name);
       }
    }
+   
+   public function EnsureTransientKey() {
+      if (!$this->_TransientKey) {
+         // Generate a transient key in the browser.
+         $tk = sha1(microtime());
+         SetAppCookie('tk', $tk);
+         $this->_TransientKey = $tk;
+      }
+      return $this->_TransientKey;
+   }
 
    /**
     * Returns the transient key for the authenticated user.
@@ -408,10 +421,10 @@ class Gdn_Session {
          $this->_TransientKey = Gdn::Authenticator()->GetUserModel()->SetTransientKey($this->UserID, $NewKey);
       }
 
-      if ($this->_TransientKey !== FALSE)
+//      if ($this->_TransientKey)
          return $this->_TransientKey;
-      else
-         return RandomString(12); // Postbacks will never be authenticated if transientkey is not defined.
+//      else
+//         return RandomString(12); // Postbacks will never be authenticated if transientkey is not defined.
    }
 
    /**

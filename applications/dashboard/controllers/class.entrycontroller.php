@@ -113,6 +113,8 @@ class EntryController extends Gdn_Controller {
     * @param string $AuthenticationSchemeAlias Type of authentication we're attempting.
     */
    public function Auth($AuthenticationSchemeAlias = 'default') {
+      Gdn::Session()->EnsureTransientKey();
+      
       $this->EventArguments['AuthenticationSchemeAlias'] = $AuthenticationSchemeAlias;
       $this->FireEvent('BeforeAuth');
       
@@ -173,48 +175,53 @@ class EntryController extends Gdn_Controller {
             
             // Attempt to authenticate.
             try {
-               $AuthenticationResponse = $Authenticator->Authenticate();
+               if (!$this->Request->IsAuthenticatedPostBack()) {
+                  $this->Form->AddError('Please try again.');
+                  $Reaction = $Authenticator->FailedResponse();
+               } else {
+                  $AuthenticationResponse = $Authenticator->Authenticate();
 
-               $UserInfo = array();
-               $UserEventData = array_merge(array(
-                  'UserID'    => Gdn::Session()->UserID,
-                  'Payload'   => GetValue('HandshakeResponse', $Authenticator, FALSE)
-               ),$UserInfo);
-               
-               Gdn::Authenticator()->Trigger($AuthenticationResponse, $UserEventData);
-               switch ($AuthenticationResponse) {
-                  case Gdn_Authenticator::AUTH_PERMISSION:
-                     $this->Form->AddError('ErrorPermission');
-                     $Reaction = $Authenticator->FailedResponse();
-                  break;
+                  $UserInfo = array();
+                  $UserEventData = array_merge(array(
+                     'UserID'    => Gdn::Session()->UserID,
+                     'Payload'   => GetValue('HandshakeResponse', $Authenticator, FALSE)
+                  ),$UserInfo);
 
-                  case Gdn_Authenticator::AUTH_DENIED:
-                     $this->Form->AddError('ErrorCredentials');
-                     $Reaction = $Authenticator->FailedResponse();
-                  break;
+                  Gdn::Authenticator()->Trigger($AuthenticationResponse, $UserEventData);
+                  switch ($AuthenticationResponse) {
+                     case Gdn_Authenticator::AUTH_PERMISSION:
+                        $this->Form->AddError('ErrorPermission');
+                        $Reaction = $Authenticator->FailedResponse();
+                     break;
 
-                  case Gdn_Authenticator::AUTH_INSUFFICIENT:
-                     // Unable to comply with auth request, more information is needed from user.
-                     $this->Form->AddError('ErrorInsufficient');
-                     $Reaction = $Authenticator->FailedResponse();
-                  break;
+                     case Gdn_Authenticator::AUTH_DENIED:
+                        $this->Form->AddError('ErrorCredentials');
+                        $Reaction = $Authenticator->FailedResponse();
+                     break;
 
-                  case Gdn_Authenticator::AUTH_PARTIAL:
-                     // Partial auth completed.
-                     $Reaction = $Authenticator->PartialResponse();
-                  break;
+                     case Gdn_Authenticator::AUTH_INSUFFICIENT:
+                        // Unable to comply with auth request, more information is needed from user.
+                        $this->Form->AddError('ErrorInsufficient');
+                        $Reaction = $Authenticator->FailedResponse();
+                     break;
 
-                  case Gdn_Authenticator::AUTH_SUCCESS:
-                  default: 
-                     // Full auth completed.
-                     if ($AuthenticationResponse == Gdn_Authenticator::AUTH_SUCCESS)
-                        $UserID = Gdn::Session()->UserID;
-                     else
-                        $UserID = $AuthenticationResponse;
-                     
-                     header("X-Vanilla-Authenticated: yes");
-                     header("X-Vanilla-TransientKey: ".Gdn::Session()->TransientKey());
-                     $Reaction = $Authenticator->SuccessResponse();
+                     case Gdn_Authenticator::AUTH_PARTIAL:
+                        // Partial auth completed.
+                        $Reaction = $Authenticator->PartialResponse();
+                     break;
+
+                     case Gdn_Authenticator::AUTH_SUCCESS:
+                     default: 
+                        // Full auth completed.
+                        if ($AuthenticationResponse == Gdn_Authenticator::AUTH_SUCCESS)
+                           $UserID = Gdn::Session()->UserID;
+                        else
+                           $UserID = $AuthenticationResponse;
+
+                        header("X-Vanilla-Authenticated: yes");
+                        header("X-Vanilla-TransientKey: ".Gdn::Session()->TransientKey());
+                        $Reaction = $Authenticator->SuccessResponse();
+                  }
                }
             } catch (Exception $Ex) {
                $this->Form->AddError($Ex);
@@ -728,6 +735,8 @@ class EntryController extends Gdn_Controller {
     * @return string Rendered XHTML template.
     */
    public function SignIn($Method = FALSE, $Arg1 = FALSE) {
+      Gdn::Session()->EnsureTransientKey();
+      
       $this->AddJsFile('entry.js');
       $this->SetData('Title', T('Sign In'));
 		$this->Form->AddHidden('Target', $this->Target());
@@ -744,6 +753,10 @@ class EntryController extends Gdn_Controller {
       if ($this->Form->IsPostBack()) {
          $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('%s is required.'), T(UserModel::SigninLabelCode())));
          $this->Form->ValidateRule('Password', 'ValidateRequired');
+         
+         if (!$this->Request->IsAuthenticatedPostBack()) {
+            $this->Form->AddError('Please try again.');
+         }
 
          // Check the user.
          if ($this->Form->ErrorCount() == 0) {

@@ -1806,7 +1806,6 @@ class DiscussionModel extends VanillaModel {
     */
 	public function AddView($DiscussionID) {
       $IncrementBy = 0;
-      
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
          $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);

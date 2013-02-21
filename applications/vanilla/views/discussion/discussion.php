@@ -58,7 +58,7 @@ $this->FireEvent('BeforeDiscussionDisplay');
             if (C('Vanilla.Categories.Use')) {
                echo ' <span class="MItem Category">';
                echo ' '.T('in').' ';
-               echo Anchor($this->Data('Discussion.Category'), CategoryUrl($this->Data('Discussion.CategoryUrlCode')));
+               echo Anchor(htmlspecialchars($this->Data('Discussion.Category')), CategoryUrl($this->Data('Discussion.CategoryUrlCode')));
                echo '</span> ';
             }
             $this->FireEvent('DiscussionInfo');

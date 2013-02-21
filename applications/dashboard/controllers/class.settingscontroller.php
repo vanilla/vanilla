@@ -1174,6 +1174,8 @@ class SettingsController extends DashboardController {
     * @access public
     */
    public function GettingStarted() {
+      $this->Permission('Garden.Settings.Manage');
+      
       $this->SetData('Title', T('Getting Started'));
       $this->AddSideMenu('dashboard/settings/gettingstarted');
       $this->TextEnterEmails = T('TextEnterEmails', 'Type email addresses separated by commas here');

@@ -48,7 +48,7 @@ function CategoryString($Rows) {
    foreach ($Rows as $Row) {
       if ($Result)
          $Result .= ', ';
-      $Result .= Anchor($Row['Name'], $Row['Url']);
+      $Result .= Anchor(htmlspecialchars($Row['Name']), $Row['Url']);
    }
    return $Result;
 }
@@ -157,7 +157,7 @@ function WriteListItem($Row, $Depth = 1) {
             echo GetOptions($Row); 
             echo CategoryPhoto($Row);
             echo '<'.$H.' class="CategoryName TitleWrap">';
-            echo Anchor($Row['Name'], $Row['Url'], 'Title');
+            echo Anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
             Gdn::Controller()->EventArguments['Category'] = $Row;
             Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
             echo '</'.$H.'>';
@@ -246,7 +246,7 @@ function WriteTableRow($Row, $Depth = 1) {
                echo CategoryPhoto($Row);
 
                echo "<{$H}>";
-               echo Anchor($Row['Name'], $Row['Url']);
+            echo Anchor(htmlspecialchars($Row['Name']), $Row['Url']);
                Gdn::Controller()->EventArguments['Category'] = $Row;
                Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
                echo "</{$H}>";

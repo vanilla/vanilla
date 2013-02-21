@@ -43,6 +43,7 @@ $Definition['ValidateOneOrMoreArrayItemRequired'] = 'You must select at least on
 $Definition['ValidateConnection'] = 'The connection parameters you specified failed to open a connection to the database. The database reported the following error: <code>%s</code>';
 //$Definition['ValidateMinimumAge'] = 'You are too young to proceed.';
 $Definition['ValidateMatch'] = 'The %s fields do not match.';
+$Definition['ValidateStrength'] = 'The supplied %s is weak, choose a stronger password.';
 $Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
 $Definition['ValidateBanned'] = 'That %s is not allowed.';
 $Definition['ValidateUrlStringRelaxed'] = '%s can not contain slashes, quotes or tag characters.';
@@ -93,10 +94,8 @@ $Definition['EmailWelcome'] = '%2$s has created an account for you at %3$s. Your
   Email: %6$s
   Password: %5$s
   Url: %4$s';
-$Definition['EmailPassword'] = '%2$s has reset your password at %3$s. Your login credentials are now:
+$Definition['EmailPassword'] = '%2$s has reset your password at %3$s for your login with email address %6$s. Please contact them if you do not know the new password.
 
-  Email: %6$s
-  Password: %5$s
   Url: %4$s';
 $Definition['EmailConfirmEmail'] = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
 $Definition['EmailWelcomeRegister'] = 'You have successfully registered for an account at {Title}. Here is your information:

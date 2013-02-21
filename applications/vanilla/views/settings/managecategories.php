@@ -115,7 +115,7 @@ if (C('Vanilla.Categories.Use')) {
                <tr>
                   <td>
                      '.$Photo.'
-                     <strong>'.$Category->Name.'</strong>
+                     <strong>'.htmlspecialchars($Category->Name).'</strong>
                      '.Anchor(htmlspecialchars(rawurldecode($CategoryUrl)), $CategoryUrl).'
                      '.Wrap($Category->Description, 'blockquote').'
                      './*Wrap("ID: {$Category->CategoryID}, PermID: {$Category->PermissionCategoryID}", 'div').*/'

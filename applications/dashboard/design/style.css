@@ -189,6 +189,9 @@ textarea {
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	padding: 3px;	
 }
+.PasswordStrength {
+   width: 250px;
+}
 .ui-datepicker {
 	width: 17em;
 	padding: 2px 20px 2px 10px;
@@ -371,6 +374,9 @@ textarea.TextBox {
 }
 .TextBoxWrapper textarea,
 .TextBoxWrapper input {
+   width: 100%;
+}
+.TextBoxWrapper .PasswordStrength {
    width: 100%;
 }
 #Popup textarea.TextBox {
@@ -2905,6 +2911,87 @@ body#dashboard_entry_signin #Content input.Password,
 body#dashboard_entry_index #Content input.Password,
 .SignInPopup input.Password {
 	width: 180px;
+}
+.PasswordStrength {
+   position: relative;
+   margin-top: 2px;
+   padding-right: 8px;
+   margin-bottom: 4px;
+   height: 10px;
+}
+.PasswordStrength .Background {
+   height: 4px;
+   background-color: #e8e8e8;
+   width: 100%;
+   position: absolute;
+   left: 0;
+}
+.PasswordStrength .Strength {
+   height: 4px;
+   background-color: #c81818;
+   width: 0;
+   position: absolute;
+   left: 0;
+}
+.PasswordStrength .Separator {
+   height: 4px;
+   width: 2px;
+   background-color: #fff;
+   position: absolute;
+   left: 0;
+}
+.PasswordStrength .StrengthText {
+   padding-top: 2px;
+   text-align: right;
+   font-size: 12px;
+   margin-right: -8px;
+}
+
+.PasswordStrength.Score-0 .Strength {
+   width: 0;
+}
+.PasswordStrength.Score-0 .StrengthText {
+   color: #888888;
+}
+
+.PasswordStrength.Score-1 .Strength {
+   background-color: #C81818;
+   width: 20%;
+}
+.PasswordStrength.Score-1 .StrengthText {
+   color: #C81818;
+}
+
+.PasswordStrength.Score-2 .Strength {
+   background-color: #FF891D;
+   width: 40%;
+}
+.PasswordStrength.Score-2 .StrengthText {
+   color: #FF891D;
+}
+
+.PasswordStrength.Score-3 .Strength {
+   background-color: #FFAC1D;
+   width: 60%;
+}
+.PasswordStrength.Score-3 .StrengthText {
+   color: #FFAC1D;
+}
+
+.PasswordStrength.Score-4 .Strength {
+   background-color: #A6C060;
+   width: 80%;
+}
+.PasswordStrength.Score-4 .StrengthText {
+   color: #A6C060;
+}
+
+.PasswordStrength.Score-5 .Strength {
+   background-color: #27B30F;
+   width: 100%;
+}
+.PasswordStrength.Score-5 .StrengthText {
+   color: #27B30F;
 }
 a.ForgotPassword {
 	margin-left: 10px;

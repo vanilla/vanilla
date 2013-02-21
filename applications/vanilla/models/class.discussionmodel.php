@@ -1793,7 +1793,7 @@ class DiscussionModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
 	public function AddView($DiscussionID) {
-      
+      $IncrementBy = 0;
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
          $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);

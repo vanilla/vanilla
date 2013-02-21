@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo T('Edit Tag'); ?></h1>
+<h1><?php echo $this->Data('Title'); ?></h1>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();

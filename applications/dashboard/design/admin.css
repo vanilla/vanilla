@@ -957,6 +957,9 @@ label.SubLabel {
 body.managecategories div.Info div {
 	padding-top: 16px;
 }
+form ul li.PasswordOptions label.RadioLabel {
+   display: block;
+}
 
 /* =================================================================== Header */
 #Head {
@@ -1302,7 +1305,7 @@ div.Popup div.Body {
 	text-align: left;
 	position: relative;
 	padding: 0 0 8px 0;
-	max-width: 500px;
+	max-width: 550px;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;

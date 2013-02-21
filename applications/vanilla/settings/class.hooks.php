@@ -179,6 +179,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
       $UserID = ArrayValue(0, $Sender->EventArguments, '');
 		$CategoryID = ArrayValue(1, $Sender->EventArguments, '');
+      $Permission = GetValue(2, $Sender->EventArguments, 'Vanilla.Discussions.View');
 		if ($UserID && $CategoryID) {
          if ($PermissionModel === NULL)
             $PermissionModel = new PermissionModel();
@@ -189,8 +190,8 @@ class VanillaHooks implements Gdn_IPlugin {
          else
             $PermissionCategoryID = -1;
          
-         $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
-         return (GetValue('Vanilla.Discussions.View', GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
+         $Result = $PermissionModel->GetUserPermissions($UserID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
+         return (GetValue($Permission, GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
       }
       return FALSE;
    }
@@ -358,11 +359,11 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param ProfileController $Sender ProfileController.
 	 */
-   public function ProfileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '') {
+   public function ProfileController_Comments_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
 		$Sender->EditMode(FALSE);
 		$View = $Sender->View;
       // Tell the ProfileController what tab to load
-		$Sender->GetUserInfo($UserReference, $Username);
+		$Sender->GetUserInfo($UserReference, $Username, $UserID);
       $Sender->_SetBreadcrumbs(T('Comments'), '/profile/comments');
       $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
       
@@ -383,7 +384,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset,
          $Limit,
          $TotalRecords,
-         UserUrl($Sender->User, '', 'comments').'/{Page}' //?lid='.$CommentModel->LastCommentID
+         UserUrl($Sender->User, '', 'comments').'?page={Page}' //?lid='.$CommentModel->LastCommentID
       );
       
       // Deliver JSON data if necessary
@@ -416,11 +417,11 @@ class VanillaHooks implements Gdn_IPlugin {
 	 *
 	 * @param ProfileController $Sender ProfileController.
 	 */
-   public function ProfileController_Discussions_Create($Sender, $UserReference = '', $Username = '', $Page = '') {
+   public function ProfileController_Discussions_Create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
 		$Sender->EditMode(FALSE);
 		
       // Tell the ProfileController what tab to load
-		$Sender->GetUserInfo($UserReference, $Username);
+		$Sender->GetUserInfo($UserReference, $Username, $UserID);
       $Sender->_SetBreadcrumbs(T('Discussions'), '/profile/discussions');
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
 		$Sender->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
@@ -477,8 +478,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 */
    public function SettingsController_DefineAdminPermissions_Handler($Sender) {
       if (isset($Sender->RequiredAdminPermissions)) {
-         $Sender->RequiredAdminPermissions[] = 'Vanilla.Settings.Manage';
-         $Sender->RequiredAdminPermissions[] = 'Vanilla.Categories.Manage';
+         $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       }
    }
    
@@ -539,8 +539,8 @@ class VanillaHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Moderation', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage');
-      $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-      $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
+      $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Garden.Settings.Manage');
+      $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Garden.Settings.Manage');
       $Menu->AddLink('Forum', T('Blog Comments'), 'dashboard/embed/comments', 'Garden.Settings.Manage');
       $Menu->AddLink('Forum', T('Embed Forum'), 'dashboard/embed/forum', 'Garden.Settings.Manage');
    }
@@ -560,6 +560,7 @@ class VanillaHooks implements Gdn_IPlugin {
       // Call structure.php to update database
       $Validation = new Gdn_Validation(); // Needed by structure.php to validate permission names
       include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'structure.php');
+      include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'stub.php');
       
       $ApplicationInfo = array();
       include(CombinePaths(array(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'about.php')));

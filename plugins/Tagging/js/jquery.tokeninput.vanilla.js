@@ -49,6 +49,7 @@ var DEFAULT_SETTINGS = {
 	// Callbacks
    onResult: null,
    onAdd: null,
+   onBlankAdd: null,
    onDelete: null,
    onReady: null
 };
@@ -64,6 +65,7 @@ var DEFAULT_CLASSES = {
    dropdownItem: "token-input-dropdown-item",
    dropdownItem2: "token-input-dropdown-item2",
    selectedDropdownItem: "token-input-selected-dropdown-item",
+   focused: "token-input-focused",
    inputToken: "token-input-input-token"
 };
 
@@ -203,10 +205,12 @@ $.TokenList = function (input, url_or_data, settings) {
          if (settings.tokenLimit === null || settings.tokenLimit !== token_count) {
             show_dropdown_hint();
          }
+         token_list.addClass(settings.classes.focused);
       })
       .blur(function () {
          hide_dropdown();
          $(this).val("");
+         token_list.removeClass(settings.classes.focused);
       })
       .bind("keyup keydown blur update", resize_input)
       .keydown(function (event) {
@@ -276,23 +280,23 @@ $.TokenList = function (input, url_or_data, settings) {
             case KEY.ENTER:
             case KEY.NUMPAD_ENTER:
             case KEY.COMMA:
-              if(selected_dropdown_item) {
-               add_token($(selected_dropdown_item).data("tokeninput"));
-               hidden_input.change();
-               return false;
-              }
-              // VANILLA
-              else {
-               var val = $(input_box).val();
-               add_blank_token(val);
-               cancel_request = true;
-               return false;
-              }
-              break;
+               if(selected_dropdown_item) {
+                  add_token($(selected_dropdown_item).data("tokeninput"));
+                  hidden_input.change();
+                  return false;
+               }
+               // VANILLA
+               else {
+                  var val = $(input_box).val();
+                  add_blank_token(val);
+                  cancel_request = true;
+                  return false;
+               }
+               break;
 
             case KEY.ESCAPE:
-              hide_dropdown();
-              return true;
+               hide_dropdown();
+               return true;
 
             default:
                if(String.fromCharCode(event.which)) {
@@ -508,6 +512,8 @@ $.TokenList = function (input, url_or_data, settings) {
    // VANILLA
    // Add ability to create tokens on the fly
    function add_blank_token(item) {
+      var callback = settings.onBlankAdd;
+      
       // Build our token item from scratch
       if (item.trim() == '')
          return;
@@ -523,9 +529,14 @@ $.TokenList = function (input, url_or_data, settings) {
       
       // Don't show the help dropdown, they've got the idea
       hide_dropdown();
+      
+      // Execute the onBlankAdd callback if defined
+      if($.isFunction(callback)) {
+         callback.call('a', hidden_input,item);
+      }
    }
 
-   // Add a token to the token list based on user input
+   // Add an existing token to the token list
    function add_token (item) {
       var callback = settings.onAdd;
 

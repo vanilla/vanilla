@@ -332,6 +332,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             
             try {
                $this->FireEvent('BeforeControllerMethod');
+               Gdn::PluginManager()->CallEventHandlers($Controller, $Controller->ControllerName, $ControllerMethod, 'Before');
+               
                call_user_func_array($Callback, $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
@@ -343,6 +345,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             
             try {
                $this->FireEvent('BeforeControllerMethod');
+               Gdn::PluginManager()->CallEventHandlers($Controller, $Controller->ControllerName, $ControllerMethod, 'Before');
+               
                call_user_func_array(array($Controller, $ControllerMethod), $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
@@ -484,6 +488,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                header("HTTP/1.1 404 Not Found" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
+            case 'Test':
+               $Request->PathAndQuery($MatchRoute['FinalDestination']);
+               $this->Request = $Request->Path(FALSE);
+               decho($MatchRoute, 'Route');
+               decho(array(
+                  'Path' => $Request->Path(),
+                  'Get' => $Request->Get()
+                  ), 'Request');
+               die();
          }
       }
       

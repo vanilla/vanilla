@@ -189,6 +189,9 @@ textarea {
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	padding: 3px;	
 }
+.PasswordStrength {
+   width: 250px;
+}
 .ui-datepicker {
 	width: 17em;
 	padding: 2px 20px 2px 10px;
@@ -373,6 +376,9 @@ textarea.TextBox {
 .TextBoxWrapper input {
    width: 100%;
 }
+.TextBoxWrapper .PasswordStrength {
+   width: 100%;
+}
 #Popup textarea.TextBox {
    width: 100%;
 }
@@ -434,6 +440,10 @@ select {
 .Button:hover {
    color: #111;
    border-color: #666;
+}
+
+.Button.Disabled {
+   opacity: .5;
 }
 
 div.FileUpload .CurrentImage {
@@ -661,14 +671,7 @@ div.FileUpload .CurrentImage {
 	background: url('images/progress_sm.gif') center center no-repeat;
 }
 .InProgress {
-   color: transparent !Important;
-   background: url('images/progress_sm.gif') center center no-repeat !important;
-   border-color: transparent !important;
-   -moz-box-shadow: none !important;
-   -webkit-box-shadow: none !important;
-   box-shadow: none !important;
-   color: transparent !important;
-   text-shadow: none !important;
+   opacity: .5;
 }
 .Conversations .Deleted {
    text-decoration: line-through;
@@ -779,6 +782,9 @@ div.Warning {
 }
 .Pager .Highlight {
 	color: #000;
+}
+.MoreWrap {
+   float: right;
 }
 
 .PagerNub {
@@ -1134,6 +1140,9 @@ a.Bookmarking:hover {
    vertical-align: top;
 	line-height: 1;
 }
+td.CheckBoxColumn {
+   text-align: center;
+}
 .HomepageTitle .AdminCheck {
     padding-left: 8px;
 }
@@ -1346,7 +1355,8 @@ overflow: hidden;
 
 
 #Panel .FilterMenu .Aside,
-.PanelInfo .Aside {
+.PanelInfo .Aside,
+.Item .Aside {
    float: right;
 }
 .PanelInfo .Heading {
@@ -2621,6 +2631,9 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    margin: 0;
    padding: 13px 20px;
 }
+label.B {
+   font-weight: bold;
+}
 .FormWrapper-Condensed {
    padding: 5px;
 }
@@ -2674,6 +2687,10 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    background-repeat: no-repeat;
    background-position: center right;
    padding-right: 24px;
+}
+
+.List.Inline {
+   display: inline;
 }
 
 .List.Inline * {
@@ -2894,6 +2911,87 @@ body#dashboard_entry_signin #Content input.Password,
 body#dashboard_entry_index #Content input.Password,
 .SignInPopup input.Password {
 	width: 180px;
+}
+.PasswordStrength {
+   position: relative;
+   margin-top: 2px;
+   padding-right: 8px;
+   margin-bottom: 4px;
+   height: 10px;
+}
+.PasswordStrength .Background {
+   height: 4px;
+   background-color: #e8e8e8;
+   width: 100%;
+   position: absolute;
+   left: 0;
+}
+.PasswordStrength .Strength {
+   height: 4px;
+   background-color: #c81818;
+   width: 0;
+   position: absolute;
+   left: 0;
+}
+.PasswordStrength .Separator {
+   height: 4px;
+   width: 2px;
+   background-color: #fff;
+   position: absolute;
+   left: 0;
+}
+.PasswordStrength .StrengthText {
+   padding-top: 2px;
+   text-align: right;
+   font-size: 12px;
+   margin-right: -8px;
+}
+
+.PasswordStrength.Score-0 .Strength {
+   width: 0;
+}
+.PasswordStrength.Score-0 .StrengthText {
+   color: #888888;
+}
+
+.PasswordStrength.Score-1 .Strength {
+   background-color: #C81818;
+   width: 20%;
+}
+.PasswordStrength.Score-1 .StrengthText {
+   color: #C81818;
+}
+
+.PasswordStrength.Score-2 .Strength {
+   background-color: #FF891D;
+   width: 40%;
+}
+.PasswordStrength.Score-2 .StrengthText {
+   color: #FF891D;
+}
+
+.PasswordStrength.Score-3 .Strength {
+   background-color: #FFAC1D;
+   width: 60%;
+}
+.PasswordStrength.Score-3 .StrengthText {
+   color: #FFAC1D;
+}
+
+.PasswordStrength.Score-4 .Strength {
+   background-color: #A6C060;
+   width: 80%;
+}
+.PasswordStrength.Score-4 .StrengthText {
+   color: #A6C060;
+}
+
+.PasswordStrength.Score-5 .Strength {
+   background-color: #27B30F;
+   width: 100%;
+}
+.PasswordStrength.Score-5 .StrengthText {
+   color: #27B30F;
 }
 a.ForgotPassword {
 	margin-left: 10px;
@@ -3620,7 +3718,7 @@ body.embed .InformMessages {
 	width: 200px;
 }
 .PhotoGrid {
-   line-height: 1;
+   line-height: 32px;
    margin: 2px -2px;
 }
 .PhotoGrid img {
@@ -3630,7 +3728,7 @@ body.embed .InformMessages {
    width: 32px;
 }
 .PhotoGridSmall {
-   line-height: 1;
+   line-height: 24px;
    margin: 1px -1px;
 }
 .PhotoGridSmall img {
@@ -3638,6 +3736,23 @@ body.embed .InformMessages {
    vertical-align: text-bottom;
    height: 24px;
    width: 24px;
+}
+
+.PhotoGrid .UserPicture {
+   display: inline-block;
+}
+
+.PhotoGrid .UserPicture * {
+   vertical-align: bottom;
+}
+
+.PhotoGrid .Username {
+   display: inline-block;
+   line-height: 32px;
+}
+
+.PhotoGridSmall .Username {
+   line-height: 24px;
 }
 
 /* Reaction Buttons */
@@ -3688,9 +3803,6 @@ body.embed .InformMessages {
    vertical-align: top;
 }
 
-.InProgress .ReactSprite {
-   background-image: none !important;
-}
 .ReactEverything { background-position: -197px -53px; }
 .ReactAwesome { background-position: -269px -6px; }
 .ReactFlag { background-position: -54px -52px; }

@@ -245,7 +245,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
       if (!is_array($Data))
          trigger_error(ErrorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', 'GetInsert'), E_USER_ERROR);
 
-      $Sql = 'insert '.($this->Options('Ignore') ? 'ignore ' : '').$this->FormatTableName($Table).' ';
+      if ($this->Options('Replace'))
+         $Sql = 'replace ';
+      else
+         $Sql = 'insert '.($this->Options('Ignore') ? 'ignore ' : '');
+      
+      $Sql .= $this->FormatTableName($Table).' ';
       if ($Select != '') {
          $Sql .= "\n(".implode(', ', $Data).') '
          ."\n".$Select;

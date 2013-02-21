@@ -173,9 +173,10 @@ if (!function_exists('ArrayTranslate')) {
     *
     * @param array $Array The input array to translate.
     * @param array $Mappings The mappings to translate the array.
+    * @param bool $AddRemaining Whether or not to add the remaining items to the array.
     * @return array
     */
-   function ArrayTranslate($Array, $Mappings) {
+   function ArrayTranslate($Array, $Mappings, $AddRemaining = FALSE) {
       $Array = (array)$Array;
       $Result = array();
       foreach ($Mappings as $Index => $Value) {
@@ -186,11 +187,26 @@ if (!function_exists('ArrayTranslate')) {
             $Key = $Index;
             $NewKey = $Value;
          }
-         if (isset($Array[$Key]))
+         if ($NewKey === NULL) {
+            unset($Array[$Key]);
+            continue;
+         }
+         
+         if (isset($Array[$Key])) {
             $Result[$NewKey] = $Array[$Key];
-         else
+            unset($Array[$Key]);
+         } else {
             $Result[$NewKey] = NULL;
+         }
       }
+      
+      if ($AddRemaining) {
+         foreach ($Array as $Key => $Value) {
+            if (!isset($Result[$Key]))
+               $Result[$Key] = $Value;
+         }
+      }
+      
       return $Result;
    }
 }
@@ -625,9 +641,10 @@ if (!function_exists('Debug')) {
          return $Debug;
       
       $Debug = $Value;
-      if ($Debug)
+      if ($Debug) {
          error_reporting(E_ALL & ~E_STRICT);
-      else
+         ini_set('display_errors', 1);
+      } else
          error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
    }
 }
@@ -1283,6 +1300,20 @@ if (!function_exists('getallheaders')) {
       return $headers;
    }
 }
+
+if (!function_exists('GetAppCookie')):
+/**
+ * Get a cookie with the application prefix.
+ * 
+ * @param string $Name
+ * @param mixed $Default
+ * @return string
+ */
+function GetAppCookie($Name, $Default = NULL) {
+   $Px = C('Garden.Cookie.Name');
+   return GetValue("$Px-$Name", $_COOKIE, $Default);
+}
+endif;
 
 if (!function_exists('GetConnectionString')) {
    function GetConnectionString($DatabaseName, $HostName = 'localhost', $ServerType = 'mysql') {
@@ -2604,6 +2635,38 @@ if (!function_exists('SaveToConfig')) {
    }
 }
 
+if (!function_exists('SetAppCookie')):
+
+/**
+ * Set a cookie withe the appropriate application cookie prefix and other cookie information.
+ * 
+ * @param string $Name
+ * @param string $Value
+ * @param int $Expire
+ * @param bool $Force Whether or not to set the cookie even if already exists.
+ */
+function SetAppCookie($Name, $Value, $Expire = 0, $Force = FALSE) {
+   $Px = C('Garden.Cookie.Name');
+   $Key = "$Px-$Name";
+   
+   // Check to see if the cookie is already set before setting it again.
+   if (!$Force && isset($_COOKIE[$Key]) && $_COOKIE[$Key] == $Value) {
+      return;
+   }
+   
+   $Domain = C('Garden.Cookie.Domain', '');
+
+   // If the domain being set is completely incompatible with the current domain then make the domain work.
+   $CurrentHost = Gdn::Request()->Host();
+   if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
+      $Domain = '';
+      
+   // Create the cookie.
+   setcookie($Key, $Value, $Expire, '/', $Domain, NULL, TRUE);
+   $_COOKIE[$Key] = $Value;
+}
+endif;
+
 if (!function_exists('SliceParagraph')) {
    /**
     * Slices a string at a paragraph. 
@@ -2956,5 +3019,96 @@ if (!function_exists('ViewLocation')) {
       Trace($Paths, 'ViewLocation()');
       
       return FALSE;
+   }
+}
+
+if (!function_exists('PasswordStrength')) {
+   
+   /**
+    * Check a password's strength
+    * 
+    * Returns an analysis of the supplied password, comprised of an array with
+    * the following keys:
+    * 
+    *    Pass        // Does the password 'pass' our tests
+    *    Symbols     // 
+    *    Length
+    *    Entropy
+    *    Score
+    *    
+    * 
+    * @param string $Password
+    * @param string $Username
+    */
+   function PasswordStrength($Password, $Username) {
+      // calculate $Entropy
+      $Alphabet = 0;
+      if ( preg_match('/[0-9]/', $Password) )
+         $Alphabet += 10;
+      if ( preg_match('/[a-z]/', $Password) )
+         $Alphabet += 26;
+      if ( preg_match('/[A-Z]/', $Password) )
+         $Alphabet += 26;
+      if ( preg_match('/[^a-zA-Z0-9]/', $Password) )
+         $Alphabet += 31;
+      
+      $Length = strlen($Password);
+      $Entropy = log(pow($Alphabet, $Length), 2);
+      
+      $RequiredLength = C('Garden.Password.MinLength', 8);
+      $RequiredScore = C('Garden.Password.MinScore', 2);
+      $Response = array(
+         'Pass'      => FALSE,
+         'Symbols'   => $Alphabet,
+         'Length'    => $Length,
+         'Entropy'   => $Entropy,
+         'Required'  => $RequiredLength,
+         'Score'     => 0
+      );
+      
+      // password1 == username
+      if (strtolower($Password) == strtolower($Username)) {
+         $Response['Reason'] = 'similar';
+         return $Response;
+      }
+      
+      // divide into entropy buckets
+      $EntropyBuckets = array(10,26,36,41,52,62,83,93);
+      $EntropyBucket = 1; $nEntropyBuckets = sizeof($EntropyBuckets);
+      for ($i=0; $i < $nEntropyBuckets; $i++) {
+         if ($Entropy >= $EntropyBuckets[$i]) {
+            $EntropyBucket = $i+1;
+         }
+      }
+      $EntropyBucket = floor($EntropyBucket / 2);
+      
+      // reject on length
+      if ($Length < $RequiredLength) {
+         $Response['Reason'] = 'short';
+         return $Response;
+      }
+      
+      // divide into length buckets
+      $LengthBuckets = array(8,11,12,15);
+      $LengthBucket = 1; $nLengthBuckets = sizeof($LengthBuckets);
+      for ($i=0; $i < $nLengthBuckets; $i++) {
+         if ($Length >= $LengthBuckets[$i]) {
+            $LengthBucket = $i+1;
+         }
+      }
+      
+      // apply length modifications
+      $ZeroBucket = ceil($nLengthBuckets / 2);
+      $BucketMod = $LengthBucket - $ZeroBucket;
+      $FinalBucket = $EntropyBucket + $BucketMod;
+      
+      // Normalize
+      if ($FinalBucket < 1) $FinalBucket = 1;
+      if ($FinalBucket > 5) $FinalBucket = 5;
+      
+      $Response['Score'] = $FinalBucket;
+      if ($FinalBucket >= $RequiredScore)
+         $Response['Pass'] = TRUE;
+      return $Response;
    }
 }

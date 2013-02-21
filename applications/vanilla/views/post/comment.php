@@ -9,21 +9,17 @@ $this->FireEvent('BeforeCommentForm');
 <div class="<?php echo $this->EventArguments['FormCssClass']; ?>">
    <h2 class="H"><?php echo T($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
    <div class="CommentFormWrap">
+      <?php if (Gdn::Session()->IsValid()): ?>
       <div class="Form-HeaderWrap">
          <div class="Form-Header">
             <span class="Author">
                <?php
-               if (C('Vanilla.Comment.UserPhotoFirst', TRUE)) {
-                  echo UserPhoto($Session->User);
-                  echo UserAnchor($Session->User, 'Username');
-               } else {
-                  echo UserAnchor($Session->User, 'Username');
-                  echo UserPhoto($Session->User);
-               }
+               WriteCommentFormHeader();
                ?>
             </span>
          </div>
       </div>
+      <?php endif; ?>
       <div class="Form-BodyWrap">
          <div class="Form-Body">
             <div class="FormWrapper FormWrapper-Condensed">
@@ -55,7 +51,7 @@ $this->FireEvent('BeforeCommentForm');
                if ($CategoryID = $this->Data('Discussion.CategoryID')) {
                   $Category = CategoryModel::Categories($CategoryID);
                   if ($Category)
-                     echo ' <span class="Bullet">•</span> '.Anchor($Category['Name'], $Category['Url']);
+                     echo ' <span class="Bullet">•</span> '.Anchor(htmlspecialchars($Category['Name']), $Category['Url']);
                }
 
                echo '</span>';

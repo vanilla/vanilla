@@ -19,6 +19,10 @@ class UserModel extends Gdn_Model {
    const INC_PERMISSIONS_KEY = 'permissions.increment';
    const REDIRECT_APPROVE = 'REDIRECT_APPROVE';
    const USERNAME_REGEX_MIN = '^\/"\\\\#@\t\r\n';
+   const LOGIN_COOLDOWN_KEY = 'user.login.{Source}.cooldown';
+   const LOGIN_RATE_KEY = 'user.login.{Source}.rate';
+   
+   const LOGIN_RATE = 1;
    
    static $UserCache = array();
    
@@ -240,6 +244,7 @@ class UserModel extends Gdn_Model {
       
       $String = $Parts[0];
       $Data = json_decode(base64_decode($String), TRUE);
+      Trace($Data, 'RAW SSO Data');
       $Errors = 0;
       
       if (!isset($Parts[1])) {
@@ -276,9 +281,6 @@ class UserModel extends Gdn_Model {
          case 'hmacsha1':
             $CalcSignature = hash_hmac('sha1', "$String $Timestamp", $Secret);
             break;
-         case 'md5':
-            $CalcSignature = md5("$String $Timestamp".$Secret);
-            break;
          default:
             Trace("Invalid SSO hash method $HashMethod.", TRACE_ERROR);
             return;
@@ -289,7 +291,12 @@ class UserModel extends Gdn_Model {
       }
       
       $UniqueID = $Data['uniqueid'];
-      $User = ArrayTranslate($Data, array('name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo'));
+      $User = ArrayTranslate($Data, array(
+         'name' => 'Name', 
+         'email' => 'Email',
+         'photourl' => 'Photo',
+         'uniqueid' => NULL,
+         'client_id' => NULL), TRUE);
       
       Trace($User, 'SSO User');
       
@@ -365,7 +372,7 @@ class UserModel extends Gdn_Model {
     * @param array $UserData Data to go in the user table.
     * @return int The new/existing user ID.
     */
-   public function Connect($UniqueID, $ProviderKey, $UserData) {
+   public function Connect($UniqueID, $ProviderKey, $UserData, $Options = array()) {
       Trace('UserModel->Connect()');
       
       $UserID = FALSE;
@@ -405,8 +412,12 @@ class UserModel extends Gdn_Model {
             $UserData['Password'] = md5(microtime());
             $UserData['HashMethod'] = 'Random';
             
+            TouchValue('CheckCaptcha', $Options, FALSE);
+            TouchValue('NoConfirmEmail', $Options, TRUE);
+            TouchValue('NoActivity', $Options, TRUE);
+            
             Trace($UserData, 'Registering User');
-            $UserID = $this->Register($UserData, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserID = $this->Register($UserData, $Options);
             $UserInserted = TRUE;
          }
          
@@ -420,13 +431,6 @@ class UserModel extends Gdn_Model {
             
             if ($UserInserted && C('Garden.Registration.SendConnectEmail', TRUE)) {
                $Provider = $this->SQL->GetWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->FirstRow(DATASET_TYPE_ARRAY);
-               if ($Provider) {
-                  try {
-                     $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => GetValue('Name', $Provider, C('Garden.Title'))));
-                  } catch (Exception $Ex) {
-                     // Do nothing if emailing doesn't work.
-                  }
-               }
             }
          }
       }
@@ -722,13 +726,16 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetActiveUsers($Limit = 5) {
-      $this->UserQuery();
-      $this->FireEvent('BeforeGetActiveUsers');
-      return $this->SQL
-         ->Where('u.Deleted', 0)
-         ->OrderBy('u.DateLastActive', 'desc')
+      $UserIDs = $this->SQL
+         ->Select('UserID')
+         ->From('User')
+         ->OrderBy('DateLastActive', 'desc')
          ->Limit($Limit, 0)
          ->Get();
+      $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
+      
+      $Data = $this->SQL->GetWhere('User', array('UserID' => $UserIDs), 'DateLastActive', 'desc');
+      return $Data;
    }
 
    public function GetApplicantCount() {
@@ -1942,7 +1949,7 @@ class UserModel extends Gdn_Model {
 
          // And insert the new user
          $UserID = $this->_Insert($Fields, $Options);
-         if ($UserID) {
+         if ($UserID && !GetValue('NoActivity', $Options)) {
             $ActivityModel = new ActivityModel();
             $ActivityModel->Save(array(
                'ActivityUserID' => $UserID,
@@ -2303,13 +2310,15 @@ class UserModel extends Gdn_Model {
          return FALSE;
       }
       
-      $this->DeleteContent($UserID, $Options);
+      $Content = array();
       
       // Remove shared authentications.
-      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Options);
+      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Content);
 
       // Remove role associations.
-      $this->GetDelete('UserRole', array('UserID' => $UserID), $Options);
+      $this->GetDelete('UserRole', array('UserID' => $UserID), $Content);
+      
+      $this->DeleteContent($UserID, $Options, $Content);
       
       // Remove the user's information
       $this->SQL->Update('User')
@@ -2346,13 +2355,12 @@ class UserModel extends Gdn_Model {
       return TRUE;
    }
 
-   public function DeleteContent($UserID, $Options = array()) {
+   public function DeleteContent($UserID, $Options = array(), $Content = array()) {
       $Log = GetValue('Log', $Options);
       if ($Log === TRUE)
          $Log = 'Delete';
       
       $Result = FALSE;
-      $Content = array();
       
       // Fire an event so applications can remove their associated user data.
       $this->EventArguments['UserID'] = $UserID;
@@ -2364,7 +2372,7 @@ class UserModel extends Gdn_Model {
       
       if (!$Log)
          $Content = NULL;
-
+      
       // Remove photos
       /*$PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
       foreach ($PhotoData->Result() as $Photo) {
@@ -3057,6 +3065,82 @@ class UserModel extends Gdn_Model {
       $this->FireEvent('AfterPasswordReset');
 
       return $this->GetID($UserID);
+   }
+   
+   /**
+    * Check and apply login rate limiting
+    * 
+    * @param array $User
+    * @param boolean $PasswordOK
+    */
+   public static function RateLimit($User, $PasswordOK) {
+      if (!Gdn::Cache()->ActiveEnabled()) return FALSE;
+//      $CoolingDown = FALSE;
+//      
+//      // 1. Check if we're in userid cooldown
+//      $UserCooldownKey = FormatString(self::LOGIN_COOLDOWN_KEY, array('Source' => $User['UserID']));
+//      if (!$CoolingDown) {
+//         $InUserCooldown = Gdn::Cache()->Get($UserCooldownKey);
+//         if ($InUserCooldown) {
+//            $CoolingDown = $InUserCooldown;
+//            $CooldownError = T('LoginUserCooldown', "Your account is temporarily locked due to failed login attempts. Try again in %s.");
+//         }
+//      }
+//      
+//      // 2. Check if we're in source IP cooldown
+//      $SourceCooldownKey = FormatString(self::LOGIN_COOLDOWN_KEY, array('Source' => Gdn::Request()->IpAddress()));
+//      if (!$CoolingDown) {
+//         $InSourceCooldown = Gdn::Cache()->Get($SourceCooldownKey);
+//         if ($InSourceCooldown) {
+//            $CoolingDown = $InUserCooldown;
+//            $CooldownError = T('LoginSourceCooldown', "Your IP is temporarily blocked due to failed login attempts. Try again in %s.");
+//         }
+//      }
+//      
+//      // Block cooled down people
+//      if ($CoolingDown) {
+//         $Timespan = $InUserCooldown;
+//         $Timespan -= 3600 * ($Hours = (int) floor($Timespan / 3600));
+//         $Timespan -= 60 * ($Minutes = (int) floor($Timespan / 60));
+//         $Seconds = $Timespan;
+//      
+//         $TimeFormat = array();
+//         if ($Hours) $TimeFormat[] = "{$Hours} ".Plural($Hours, 'hour', 'hours');
+//         if ($Minutes) $TimeFormat[] = "{$Minutes} ".Plural($Minutes, 'minute', 'minutes');
+//         if ($Seconds) $TimeFormat[] = "{$Seconds} ".Plural($Seconds, 'second', 'seconds');
+//         $TimeFormat = implode(', ', $TimeFormat);
+//         throw new Exception(sprintf($CooldownError, $TimeFormat));
+//      }
+//      
+//      // Logged in OK
+//      if ($PasswordOK) {
+//         Gdn::Cache()->Remove($UserCooldownKey);
+//         Gdn::Cache()->Remove($SourceCooldownKey);
+//      }
+      
+      // Rate limiting
+      $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+      $UserRate = (int)Gdn::Cache()->Get($UserRateKey);
+      $UserRate += 1;
+      Gdn::Cache()->Store($UserRateKey, 1, array(
+         Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
+      ));
+      
+      $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+      $SourceRate = (int)Gdn::Cache()->Get($SourceRateKey);
+      $SourceRate += 1;
+      Gdn::Cache()->Store($SourceRateKey, 1, array(
+         Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
+      ));
+      
+      // Put user into cooldown mode
+      if ($UserRate > 1)
+         throw new Gdn_UserException(T('LoginUserCooldown', "You are trying to log in too often. Slow down!."));
+      
+      if ($SourceRate > 1)
+         throw new Gdn_UserException(T('LoginSourceCooldown', "Your IP is trying to log in too often. Slow down!"));
+      
+      return TRUE;
    }
    
 	public function SetField($RowID, $Property, $Value = FALSE) {

@@ -276,6 +276,19 @@ class Gdn_Request {
       return $this->RequestAddress();
    }
    
+   /* 
+    * Returns a boolean value indicating if the current page has an authenticated postback.
+    * @return type
+    * @since 2.1
+    */
+   public function IsAuthenticatedPostBack() {
+      if (!$this->IsPostBack())
+         return FALSE;
+
+      $PostBackKey = Gdn::Request()->Post('TransientKey', FALSE);
+      return Gdn::Session()->ValidateTransientKey($PostBackKey, FALSE);
+   }
+   
    public function IsPostBack() {
       return strcasecmp($this->RequestMethod(), 'post') == 0;
    }
@@ -340,7 +353,10 @@ class Gdn_Request {
             SafeParseStr($Get, $Get, $Original);
          }
 
-         if (isset($Get['p'])) {
+         if (isset($Get['_p'])) {
+            $Path = $Get['_p'];
+            unset($_GET['_p']);
+         } elseif (isset($Get['p'])) {
             $Path = $Get['p'];
             unset($_GET['p']);
          } else {

@@ -30,7 +30,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function Advanced() {
       // Check permission
-      $this->Permission('Vanilla.Settings.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Load up config options we'll be setting
       $Validation = new Gdn_Validation();
@@ -39,6 +39,7 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Discussions.PerPage',
          'Vanilla.Comments.AutoRefresh',
          'Vanilla.Comments.PerPage',
+         'Garden.Html.AllowedElements',
          'Vanilla.Archive.Date',
          'Vanilla.Archive.Exclude',
          'Garden.EditContentTimeout',
@@ -218,7 +219,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function AddCategory() {
       // Check permission
-      $this->Permission('Vanilla.Categories.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Set up head
       $this->AddJsFile('jquery.alphanumeric.js');
@@ -276,7 +277,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function DeleteCategory($CategoryID = FALSE) {
       // Check permission
-      $this->Permission('Vanilla.Categories.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Set up head
       $this->AddJsFile('categories.js');
@@ -366,7 +367,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function EditCategory($CategoryID = '') {
       // Check permission
-      $this->Permission('Vanilla.Categories.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Set up models
       $RoleModel = new RoleModel();
@@ -446,7 +447,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function ManageCategories() {
       // Check permission
-      $this->Permission('Vanilla.Categories.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Set up head
       $this->AddSideMenu('vanilla/settings/managecategories');
@@ -513,7 +514,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function SortCategories() {
       // Check permission
-      $this->Permission('Vanilla.Categories.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Set delivery type to true/false
       $TransientKey = GetIncomingValue('TransientKey');

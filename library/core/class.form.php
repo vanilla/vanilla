@@ -145,6 +145,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $this->SetValue('Format', $Attributes['format']);
       
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
+      $this->EventArguments['Column'] = $Column;
       
       $this->FireEvent('BeforeBodyBox');
       
@@ -954,6 +955,24 @@ class Gdn_Form extends Gdn_Pluggable {
       return $Return;
    }
    
+   public function ErrorString() {
+      $Return = '';
+      if (is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0) {
+         foreach($this->_ValidationResults as $FieldName => $Problems) {
+            $Count = count($Problems);
+            for($i = 0; $i < $Count; ++$i) {
+               if (substr($Problems[$i], 0, 1) == '@')
+                  $Return .= rtrim(substr($Problems[$i], 1), '.').'. ';
+               else
+                  $Return .= rtrim(sprintf(
+                     T($Problems[$i]),
+                     T($FieldName)), '.').'. ';
+            }
+         }
+      }
+      return trim($Return);
+   }
+   
    /**
     * Encodes the string in a php-form safe-encoded format.
     *
@@ -1142,6 +1161,7 @@ class Gdn_Form extends Gdn_Pluggable {
       
       $Return = '';
       $Wrap = GetValue('Wrap', $Attributes, FALSE, TRUE);
+      $Strength = GetValue('Strength', $Attributes, FALSE, TRUE);
       if ($Wrap) {
          $Return .= '<div class="TextBoxWrapper">';
       }
@@ -1152,6 +1172,8 @@ class Gdn_Form extends Gdn_Pluggable {
          ArrayValueI('Name', $Attributes, $FieldName));
       else $Return .= $this->_NameAttribute($FieldName, $Attributes);
 
+      if ($Strength)
+         $Return .= ' data-strength="true"';
       $Return .= $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ' />';
@@ -1165,6 +1187,20 @@ class Gdn_Form extends Gdn_Pluggable {
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
          $Return .= $this->InlineError($FieldName);
+      
+      if ($Type == 'password' && $Strength) {
+         $Return .= <<<PASSWORDMETER
+<div class="PasswordStrength">
+   <div class="Background"></div>
+   <div class="Strength"></div>
+   <div class="Separator" style="left: 20%;"></div>
+   <div class="Separator" style="left: 40%;"></div>
+   <div class="Separator" style="left: 60%;"></div>
+   <div class="Separator" style="left: 80%;"></div>
+   <div class="StrengthText">&nbsp;</div>
+</div>
+PASSWORDMETER;
+      }
       
       if ($Wrap)
          $Return .= '</div>';

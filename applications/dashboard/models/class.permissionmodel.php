@@ -158,6 +158,52 @@ class PermissionModel extends Gdn_Model {
    }
    
    /**
+    * Get the permissions of a role.
+    *
+    * If no junction table is specified, will return ONLY non-junction permissions.
+    * If you need every permission regardless of junction & suffix, see CachePermissions.
+    *
+    * @param int $RoleID Unique identifier for role.
+    * @param string $LimitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
+    * @param string $JunctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
+    * @param string $JunctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $JunctionTable.
+    * @param string $ForeignKey Foreign table column to join on.
+    * @param int $ForeignID Foreign ID to limit join to.
+    * @return array Permission records.
+    */
+   public function GetRolePermissions($RoleID, $LimitToSuffix = '', $JunctionTable = FALSE, $JunctionColumn = FALSE, $ForeignKey = FALSE, $ForeignID = FALSE) {
+      // Get all permissions
+      $PermissionColumns = $this->PermissionColumns($JunctionTable, $JunctionColumn);
+
+      // Select any that match $LimitToSuffix
+      foreach($PermissionColumns as $ColumnName => $Value) {
+         if (!empty($LimitToSuffix) && substr($ColumnName, -strlen($LimitToSuffix)) != $LimitToSuffix)
+            continue; // permission not in $LimitToSuffix
+         $this->SQL->Select('p.`'.$ColumnName.'`', 'MAX');
+      }
+      
+      // Generic part of query
+      $this->SQL->From('Permission p')
+         ->Where('p.RoleID', $RoleID);
+      
+      // Either limit to 1 junction or exclude junctions
+      if ($JunctionTable && $JunctionColumn) {
+         $this->SQL
+            ->Select(array('p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'))
+            ->GroupBy(array('p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'));
+         if ($ForeignKey && $ForeignID) {
+            $this->SQL
+               ->Join("$JunctionTable j", "j.$JunctionColumn = p.JunctionID")
+               ->Where("j.$ForeignKey", $ForeignID);
+         }
+      } else {
+         $this->SQL->Where('p.JunctionTable is null');
+      }
+      
+      return $this->SQL->Get()->ResultArray();
+   }
+   
+   /**
     * Returns a complete list of all enabled applications & plugins. This list
     * can act as a namespace list for permissions.
     * @return array

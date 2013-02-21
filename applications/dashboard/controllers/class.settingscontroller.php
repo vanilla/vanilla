@@ -446,7 +446,6 @@ class SettingsController extends DashboardController {
       $this->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Edit';
@@ -457,21 +456,6 @@ class SettingsController extends DashboardController {
       $this->AddSideMenu('dashboard/settings');
 
       $UserModel = Gdn::UserModel();
-      
-      // Load some data to display on the dashboard
-      $this->BuzzData = array();
-      // Get the number of users in the database
-      // $CountUsers = $UserModel->GetCountLike();
-      // $this->AddDefinition('CountUsers', $CountUsers);
-      // $this->BuzzData[T('Users')] = number_format($CountUsers);
-      // Get the number of new users in the last day
-      $this->BuzzData[T('New users in the last day')] = number_format(
-         $UserModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day'))))
-      );
-      // Get the number of new users in the last week
-      $this->BuzzData[T('New users in the last week')] = number_format(
-         $UserModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week'))))
-      );
       
       // Get recently active users
       $this->ActiveUserData = $UserModel->GetActiveUsers(5);
@@ -1180,6 +1164,8 @@ class SettingsController extends DashboardController {
     * @access public
     */
    public function GettingStarted() {
+      $this->Permission('Garden.Settings.Manage');
+      
       $this->SetData('Title', T('Getting Started'));
       $this->AddSideMenu('dashboard/settings/gettingstarted');
       $this->TextEnterEmails = T('TextEnterEmails', 'Type email addresses separated by commas here');

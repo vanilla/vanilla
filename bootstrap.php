@@ -26,8 +26,7 @@ if (!defined('VANILLA_CONSTANTS'))
    include(PATH_CONF.'/constants.php');
 
 // Make sure a default time zone is set
-if (ini_get('date.timezone') == '')
-   date_default_timezone_set('UTC');
+date_default_timezone_set('UTC');
 
 // Include the core function definitions
 require_once(PATH_LIBRARY_CORE.'/functions.error.php');

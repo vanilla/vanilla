@@ -19,710 +19,708 @@
  *
  */
 
-
-// Global vanilla library function.
-(function(window, $) {
-
-var Vanilla = function() { };
-
-Vanilla.fn = Vanilla.prototype;
-
-if (!window.console)
-   window.console = { log: function() {} };
-
-// Add a stub for embedding.
-Vanilla.parent = function() {};
-Vanilla.parent.callRemote = function(func, args, success, failure) { console.log("callRemote stub: "+func, args); };
-
-window.Vanilla = Vanilla;
-
-})(window, jQuery);
-
 /**
  * Global Definitions
  */
 
-   var gdn = {
-      focused: true,
-      Libraries: {}
-   }
+// Vanilla library function.
+(function(window, $) {
 
-   // Grab a definition from hidden inputs in the page
-   gdn.definition = function(definition, defaultVal, set) {
-      if (defaultVal == null)
-         defaultVal = definition;
-         
-      var $def = jQuery('#Definitions #' + definition);
-      var def;
-      
-      if(set) {
-         $def.val(defaultVal);
+   var Vanilla = function() { };
+
+   Vanilla.fn = Vanilla.prototype;
+
+   if (!window.console)
+      window.console = { log: function() {} };
+
+   // Add a stub for embedding.
+   Vanilla.parent = function() {};
+   Vanilla.parent.callRemote = function(func, args, success, failure) { console.log("callRemote stub: "+func, args); };
+
+   window.Vanilla = Vanilla;
+
+})(window, jQuery);
+
+var gdn = {
+   focused: true,
+   Libraries: {}
+}
+
+// Grab a definition from hidden inputs in the page
+gdn.definition = function(definition, defaultVal, set) {
+   if (defaultVal == null)
+      defaultVal = definition;
+
+   var $def = $('#Definitions #' + definition);
+   var def;
+
+   if(set) {
+      $def.val(defaultVal);
+      def = defaultVal;
+   } else {
+      def = $def.val();
+      if ($def.length == 0)
          def = defaultVal;
-      } else {
-         def = $def.val();
-         if ($def.length == 0)
-            def = defaultVal;
-      }
-         
-      return def;
    }
-   
-   gdn.disable = function(e, progressClass) {
-      var href = jQuery(e).attr('href');
-      if (href) {
-         $.data(e, 'hrefBak', href);
-      }
-      jQuery(e).addClass(progressClass ? progressClass : 'InProgress').removeAttr('href').attr('disabled', true);
+
+   return def;
+}
+
+gdn.disable = function(e, progressClass) {
+   var href = jQuery(e).attr('href');
+   if (href) {
+      $.data(e, 'hrefBak', href);
    }
-   
-   gdn.enable = function(e) {
-      jQuery(e).attr('disabled', false).removeClass('InProgress');
-      var href = $.data(e, 'hrefBak');
-      if (href) {
-         jQuery(e).attr('href', href);
-         $.removeData(e, 'hrefBak');
-      }
+   jQuery(e).addClass(progressClass ? progressClass : 'InProgress').removeAttr('href').attr('disabled', true);
+}
+
+gdn.enable = function(e) {
+   jQuery(e).attr('disabled', false).removeClass('InProgress');
+   var href = $.data(e, 'hrefBak');
+   if (href) {
+      jQuery(e).attr('href', href);
+      $.removeData(e, 'hrefBak');
    }
-   
-   gdn.elementSupports = function(element, attribute) {
-      var test = document.createElement(element);
-      if (attribute in test)
-         return true;
-      else
-         return false;
-   }
-   
-   gdn.querySep = function(url) {
-      return url.indexOf('?') == -1 ? '?' : '&';
-   }
-   
+}
+
+gdn.elementSupports = function(element, attribute) {
+   var test = document.createElement(element);
+   if (attribute in test)
+      return true;
+   else
+      return false;
+}
+
+gdn.querySep = function(url) {
+   return url.indexOf('?') == -1 ? '?' : '&';
+}
+
 // Generate a random string of specified length
-   gdn.generateString = function(length) {
-      if (length == null)
-         length = 5;
-         
-      var chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
-      var string = '';
-      var pos = 0;
-      for (var i = 0; i < length; i++) {
-         pos = Math.floor(Math.random() * chars.length);
-         string += chars.substring(pos, pos + 1);
-      }
-      return string;
-   };
-   
-   // Combine two paths and make sure that there is only a single directory concatenator
-   gdn.combinePaths = function(path1, path2) {
-      if (path1.substr(-1, 1) == '/')
-         path1 = path1.substr(0, path1.length - 1);
-         
-      if (path2.substring(0, 1) == '/')
-         path2 = path2.substring(1);
-      
-      return path1 + '/' + path2;
-   };
+gdn.generateString = function(length) {
+   if (length == null)
+      length = 5;
 
-   gdn.processTargets = function(targets, $elem, $parent) {
-      if(!targets || !targets.length)
-         return;
-      
-      var tar = function(q) {
-         switch (q) {
-            case '!element':
-               return $elem;
-            case '!parent':
-               return $parent;
-            default:
-               return q;
-         }
-      }
-      
-      for(i = 0; i < targets.length; i++) {
-         var item = targets[i];
-         
-         if (jQuery.isArray(item.Target)) {
-            $target = jQuery(tar(item.Target[0]), tar(item.Target[1]));
-         } else {
-            $target = jQuery(tar(item.Target));
-         }
-         
-         switch(item.Type) {
-            case 'AddClass':
-               $target.addClass(item.Data);
-               break;
-            case 'Ajax':
-               $.ajax({
-                  type: "POST",
-                  url: item.Data
-               });
-               break;
-            case 'Append':
-               $target.append(item.Data);
-               break;
-            case 'Before':
-               $target.before(item.Data);
-               break;
-            case 'After':
-               $target.after(item.Data);
-               break;
-            case 'Highlight':
-               $target.effect("highlight", {}, "slow");
-               break;
-            case 'Prepend':
-               $target.prepend(item.Data);
-               break;
-            case 'Redirect':
-               window.location.replace(item.Data);
-               break;
-            case 'Refresh':
-               window.location.reload();
-               break;
-            case 'Remove':
-               $target.remove();
-               break;
-            case 'RemoveClass':
-               $target.removeClass(item.Data);
-               break;
-            case 'ReplaceWith':
-               $target.replaceWith(item.Data);
-               break;
-            case 'SlideUp':
-               $target.slideUp('fast');
-               break;
-            case 'SlideDown':
-               $target.slideDown('fast');
-               break;
-            case 'Text':
-               $target.text(item.Data);
-               break;
-            case 'Html':
-               $target.html(item.Data);
-               break;
-            case 'Event':
-               gdn.event(item.Data).fire(item.Target);
-               break;
-         }
-      }
-   };
-   
-   gdn.requires = function(Library) {
-      if (!(Library instanceof Array))
-         Library = [Library];
-      
-      var Response = true;
-      
-      jQuery(Library).each(function(i,Lib){
-         // First check if we already have this library
-         var LibAvailable = gdn.available(Lib);
-         
-         if (!LibAvailable) Response = false;
-         
-         // Skip any libs that are ready or processing
-         if (gdn.Libraries[Lib] === false || gdn.Libraries[Lib] === true)
-            return;
-         
-         // As yet unseen. Try to load
-         gdn.Libraries[Lib] = false;
-         var Src = '/js/'+Lib+'.js';
-         var head = document.getElementsByTagName('head')[0];
-         var script = document.createElement('script');
-         script.type = 'text/javascript';
-         script.src = Src;
-         head.appendChild(script);
-      });
-      
-      if (Response) gdn.loaded(null);
-      return Response;
-   };
-   // Convert date fields to datepickers
-   if ($.fn.datepicker) {
-      $('input.DatePicker').datepicker({
-         showOn: "focus",
-         dateFormat: 'mm/dd/yy'
-      });
+   var chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
+   var string = '';
+   var pos = 0;
+   for (var i = 0; i < length; i++) {
+      pos = Math.floor(Math.random() * chars.length);
+      string += chars.substring(pos, pos + 1);
    }
-   
-   
-   gdn.events = {};
-   gdn.event = function( id ) {
-       var callbacks,
-           method,
-           topic = id && gdn.events[ id ];
-       if ( !topic ) {
-           callbacks = jQuery.Callbacks();
-           topic = {
-               fire: callbacks.fire,
-               subscribe: callbacks.add,
-               unsubscribe: callbacks.remove
-           };
-           if ( id ) {
-               gdn.events[ id ] = topic;
-           }
-       }
-       return topic;
-   };
-   
-   gdn.loaded = function(Library) {
-      if (Library != null) 
-         gdn.Libraries[Library] = true;
-         
-      jQuery(document).trigger('libraryloaded',[Library])
-   }
-   
-   gdn.available = function(Library) {
-      if (!(Library instanceof Array))
-         Library = [Library];
-         
-      for (var i = 0; i<Library.length; i++) {
-         var Lib = Library[i];
-         if (gdn.Libraries[Lib] !== true) return false;
+   return string;
+};
+
+// Combine two paths and make sure that there is only a single directory concatenator
+gdn.combinePaths = function(path1, path2) {
+   if (path1.substr(-1, 1) == '/')
+      path1 = path1.substr(0, path1.length - 1);
+
+   if (path2.substring(0, 1) == '/')
+      path2 = path2.substring(1);
+
+   return path1 + '/' + path2;
+};
+
+gdn.processTargets = function(targets, $elem, $parent) {
+   if(!targets || !targets.length)
+      return;
+
+   var tar = function(q) {
+      switch (q) {
+         case '!element':
+            return $elem;
+         case '!parent':
+            return $parent;
+         default:
+            return q;
       }
-      return true;
    }
-   
-   gdn.url = function(path) {
-      if (path.indexOf("//") >= 0)
-         return path; // this is an absolute path.
 
-      var urlFormat = gdn.definition("UrlFormat", "/{Path}");
-      
-      if (path.substr(0, 1) == "/")
-         path = path.substr(1);
+   for(i = 0; i < targets.length; i++) {
+      var item = targets[i];
 
-      if (urlFormat.indexOf("?") >= 0)
-         path = path.replace("?", "&");
+      if (jQuery.isArray(item.Target)) {
+         $target = jQuery(tar(item.Target[0]), tar(item.Target[1]));
+      } else {
+         $target = jQuery(tar(item.Target));
+      }
 
-      return urlFormat.replace("{Path}", path);
-   };
-   
-   gdn.stats = function() {
-      // Call directly back to the deployment and invoke the stats handler
-      var StatsURL = gdn.url('settings/analyticstick.json');
-      var SendData = {
-            'TransientKey': gdn.definition('TransientKey'), 
-            'Path': gdn.definition('Path'),
-            'Args': gdn.definition('Args'),
-            'ResolvedPath': gdn.definition('ResolvedPath'),
-            'ResolvedArgs': gdn.definition('ResolvedArgs')
-         };
-         
-      if (gdn.definition('TickExtra', null) != null)
-         SendData.TickExtra = gdn.definition('TickExtra');
-      
-      jQuery.ajax({
-         dataType: 'json',
-         type: 'post',
-         url: StatsURL,
-         data: SendData,
-         success: function(json) {
-            gdn.inform(json);
-         }
-      });
-   }
-   
-   gdn.setAutoDismiss = function() {
-      var timerId = jQuery('div.InformMessages').attr('autodismisstimerid');
-      if (!timerId) {
-         timerId = setTimeout(function() {
-            jQuery('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
-               jQuery(this).remove();
-
-
+      switch(item.Type) {
+         case 'AddClass':
+            $target.addClass(item.Data);
+            break;
+         case 'Ajax':
+            $.ajax({
+               type: "POST",
+               url: item.Data
             });
-            jQuery('div.InformMessages').removeAttr('autodismisstimerid');
-         }, 7000);
-         jQuery('div.InformMessages').attr('autodismisstimerid', timerId);
+            break;
+         case 'Append':
+            $target.append(item.Data);
+            break;
+         case 'Before':
+            $target.before(item.Data);
+            break;
+         case 'After':
+            $target.after(item.Data);
+            break;
+         case 'Highlight':
+            $target.effect("highlight", {}, "slow");
+            break;
+         case 'Prepend':
+            $target.prepend(item.Data);
+            break;
+         case 'Redirect':
+            window.location.replace(item.Data);
+            break;
+         case 'Refresh':
+            window.location.reload();
+            break;
+         case 'Remove':
+            $target.remove();
+            break;
+         case 'RemoveClass':
+            $target.removeClass(item.Data);
+            break;
+         case 'ReplaceWith':
+            $target.replaceWith(item.Data);
+            break;
+         case 'SlideUp':
+            $target.slideUp('fast');
+            break;
+         case 'SlideDown':
+            $target.slideDown('fast');
+            break;
+         case 'Text':
+            $target.text(item.Data);
+            break;
+         case 'Html':
+            $target.html(item.Data);
+            break;
+         case 'Event':
+            gdn.event(item.Data).fire(item.Target);
+            break;
       }
    }
-   
-   // Take any "inform" messages out of an ajax response and display them on the screen.
-   gdn.inform = function(response) {
-      if (!response)
-         return false;
-      
-      if (!response.InformMessages || response.InformMessages.length == 0)
-         return false;
-      
-      // If there is no message container in the page, add one
-      var informMessages = jQuery('div.InformMessages');
-      if (informMessages.length == 0) {
-         jQuery('<div class="InformMessages"></div>').appendTo('body');
-         informMessages = jQuery('div.InformMessages');
-      }
-      var wrappers = jQuery('div.InformMessages div.InformWrapper');
-      
-      // Loop through the inform messages and add them to the container
-      for (var i = 0; i < response.InformMessages.length; i++) {
-         css = 'InformWrapper';
-         if (response.InformMessages[i]['CssClass'])
-            css += ' ' + response.InformMessages[i]['CssClass'];
-            
-         elementId = '';
-         if (response.InformMessages[i]['id'])
-            elementId = response.InformMessages[i]['id'];
-            
-         sprite = '';
-         if (response.InformMessages[i]['Sprite']) {
-            css += ' HasSprite';
-            sprite = response.InformMessages[i]['Sprite'];
-         }
-         
-         dismissCallback = response.InformMessages[i]['DismissCallback'];
-         dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
-         if (dismissCallbackUrl)
-            dismissCallbackUrl = gdn.url(dismissCallbackUrl);
-            
-         try {
-            var message = response.InformMessages[i]['Message'];
-            var emptyMessage = message == '';
-            
-            // Is there a sprite?
-            if (sprite != '')
-               message = '<span class="InformSprite '+sprite+'"></span>' + message;
-            
-            // If the message is dismissable, add a close button
-            if (css.indexOf('Dismissable') > 0)
-               message = '<a class="Close"><span>×</span></a>' + message;
+};
+gdn.requires = function(Library) {
+   if (!(Library instanceof Array))
+      Library = [Library];
 
-            message = '<div class="InformMessage">'+message+'</div>';
-            // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
-            message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
-            // Insert the current url as a target for inform anchors
-            message = message.replace(/{SelfUrl}/g, document.URL);
-            
-            var skip = false;
-            for (var j = 0; j < wrappers.length; j++) {
-               if (jQuery(wrappers[j]).text() == jQuery(message).text()) {
-                  skip = true;
-               }
-            }
-            if (!skip) {
-               if (elementId != '') {
-                  jQuery('#'+elementId).remove();
-                  elementId = ' id="'+elementId+'"';
-               }
-               if (!emptyMessage) {
-                  informMessages.prepend('<div class="'+css+'"'+elementId+'>'+message+'</div>');
-                  // Is there a callback or callback url to request on dismiss of the inform message?
-                  if (dismissCallback) {
-                     jQuery('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
-                  } else if (dismissCallbackUrl) {
-                     dismissCallbackUrl = dismissCallbackUrl.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
-                     var closeAnchor = jQuery('div.InformWrapper:first').find('a.Close');
-                     closeAnchor.attr('callbackurl', dismissCallbackUrl);
-                     closeAnchor.click(function () {
-                        $.ajax({
-                           type: "POST",
-                           url: jQuery(this).attr('callbackurl'),
-                           data: 'TransientKey='+gdn.definition('TransientKey'),
-                           dataType: 'json',
-                           error: function(XMLHttpRequest, textStatus, errorThrown) {
-                              gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
-                           },
-                           success: function(json) {
-                              gdn.inform(json);
-                           }
-                        });
-                     });
-                  }
-               }
-            }
-         } catch (e) {
-         }
-      }
-      informMessages.show();
-      return true;
-   }
-   
-   // Send an informMessage to the screen (same arguments as controller.InformMessage).
-   gdn.informMessage = function(message, options) {
-      if (!options)
-         options = new Array();
-         
-      if (typeof(options) == 'string') {
-         var css = options;
-         options = new Array();
-         options['CssClass'] = css;
-      }
-      options['Message'] = message;
-      if (!options['CssClass'])
-         options['CssClass'] = 'Dismissable AutoDismiss';
-      
-      gdn.inform({'InformMessages' : new Array(options)});
-   }
-   
-   // Inform an error returned from an ajax call.
-   gdn.informError = function(xhr, silentAbort) {
-      if (xhr == undefined || xhr == null)
+   var Response = true;
+
+   jQuery(Library).each(function(i,Lib){
+      // First check if we already have this library
+      var LibAvailable = gdn.available(Lib);
+
+      if (!LibAvailable) Response = false;
+
+      // Skip any libs that are ready or processing
+      if (gdn.Libraries[Lib] === false || gdn.Libraries[Lib] === true)
          return;
-      
-      if (typeof(xhr) == 'string')
-         xhr = {responseText: xhr, code: 500};
-      
-      var message = xhr.responseText;
-      var code = xhr.status;
-      
-      if (message == undefined || message == null || message == '') {
-         switch (xhr.statusText) {
-            case 'error':
-               if (silentAbort) 
-                  return;
-               message = 'There was an error performing your request. Please try again.';
-               break;
-            case 'timeout':
-               message = 'Your request timed out. Please try again.';
-               break;
-            case 'abort':
-               return;
-         }
+
+      // As yet unseen. Try to load
+      gdn.Libraries[Lib] = false;
+      var Src = '/js/'+Lib+'.js';
+      var head = document.getElementsByTagName('head')[0];
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = Src;
+      head.appendChild(script);
+   });
+
+   if (Response) gdn.loaded(null);
+   return Response;
+};
+// Convert date fields to datepickers
+if ($.fn.datepicker) {
+   $('input.DatePicker').datepicker({
+      showOn: "focus",
+      dateFormat: 'mm/dd/yy'
+   });
+}
+
+
+gdn.events = {};
+gdn.event = function( id ) {
+    var callbacks,
+        method,
+        topic = id && gdn.events[ id ];
+    if ( !topic ) {
+        callbacks = jQuery.Callbacks();
+        topic = {
+            fire: callbacks.fire,
+            subscribe: callbacks.add,
+            unsubscribe: callbacks.remove
+        };
+        if ( id ) {
+            gdn.events[ id ] = topic;
+        }
+    }
+    return topic;
+};
+
+gdn.loaded = function(Library) {
+   if (Library != null) 
+      gdn.Libraries[Library] = true;
+
+   jQuery(document).trigger('libraryloaded',[Library])
+}
+
+gdn.available = function(Library) {
+   if (!(Library instanceof Array))
+      Library = [Library];
+
+   for (var i = 0; i<Library.length; i++) {
+      var Lib = Library[i];
+      if (gdn.Libraries[Lib] !== true) return false;
+   }
+   return true;
+}
+
+gdn.url = function(path) {
+   if (path.indexOf("//") >= 0)
+      return path; // this is an absolute path.
+
+   var urlFormat = gdn.definition("UrlFormat", "/{Path}");
+
+   if (path.substr(0, 1) == "/")
+      path = path.substr(1);
+
+   if (urlFormat.indexOf("?") >= 0)
+      path = path.replace("?", "&");
+
+   return urlFormat.replace("{Path}", path);
+};
+
+gdn.stats = function() {
+   // Call directly back to the deployment and invoke the stats handler
+   var StatsURL = gdn.url('settings/analyticstick.json');
+   var SendData = {
+         'TransientKey': gdn.definition('TransientKey'), 
+         'Path': gdn.definition('Path'),
+         'Args': gdn.definition('Args'),
+         'ResolvedPath': gdn.definition('ResolvedPath'),
+         'ResolvedArgs': gdn.definition('ResolvedArgs')
+      };
+
+   if (gdn.definition('TickExtra', null) != null)
+      SendData.TickExtra = gdn.definition('TickExtra');
+
+   jQuery.ajax({
+      dataType: 'json',
+      type: 'post',
+      url: StatsURL,
+      data: SendData,
+      success: function(json) {
+         gdn.inform(json);
       }
-      
+   });
+}
+
+gdn.setAutoDismiss = function() {
+   var timerId = jQuery('div.InformMessages').attr('autodismisstimerid');
+   if (!timerId) {
+      timerId = setTimeout(function() {
+         jQuery('div.InformWrapper.AutoDismiss').fadeOut('fast', function() {
+            jQuery(this).remove();
+
+
+         });
+         jQuery('div.InformMessages').removeAttr('autodismisstimerid');
+      }, 7000);
+      jQuery('div.InformMessages').attr('autodismisstimerid', timerId);
+   }
+}
+
+// Take any "inform" messages out of an ajax response and display them on the screen.
+gdn.inform = function(response) {
+   if (!response)
+      return false;
+
+   if (!response.InformMessages || response.InformMessages.length == 0)
+      return false;
+
+   // If there is no message container in the page, add one
+   var informMessages = jQuery('div.InformMessages');
+   if (informMessages.length == 0) {
+      jQuery('<div class="InformMessages"></div>').appendTo('body');
+      informMessages = jQuery('div.InformMessages');
+   }
+   var wrappers = jQuery('div.InformMessages div.InformWrapper');
+
+   // Loop through the inform messages and add them to the container
+   for (var i = 0; i < response.InformMessages.length; i++) {
+      css = 'InformWrapper';
+      if (response.InformMessages[i]['CssClass'])
+         css += ' ' + response.InformMessages[i]['CssClass'];
+
+      elementId = '';
+      if (response.InformMessages[i]['id'])
+         elementId = response.InformMessages[i]['id'];
+
+      sprite = '';
+      if (response.InformMessages[i]['Sprite']) {
+         css += ' HasSprite';
+         sprite = response.InformMessages[i]['Sprite'];
+      }
+
+      dismissCallback = response.InformMessages[i]['DismissCallback'];
+      dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
+      if (dismissCallbackUrl)
+         dismissCallbackUrl = gdn.url(dismissCallbackUrl);
+
       try {
-         var data = $.parseJSON(message);
-         if (typeof(data.Exception) == 'string')
-            message = data.Exception;
-      } catch(e) {
-      }
-      
-      if (message == '')
-         message = 'There was an error performing your request. Please try again.';
-      
-      gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
-   }
-   
-   // Ping for new notifications on pageload, and subsequently every 1 minute.
-   gdn.notificationsPinging = 0;
-   gdn.pingCount = 0;
-   
-   gdn.pingForNotifications = function() {
-      if (gdn.notificationsPinging > 0 || !gdn.focused)
-         return;
-      gdn.notificationsPinging++;
-      
-      jQuery.ajax({
-         type: "POST",
-         url: gdn.url('dashboard/notifications/inform'),
-         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON', 'Count': gdn.pingCount++},
-         dataType: 'json',
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            console.log(XMLHttpRequest.responseText);
-         },
-         success: function(json) {
-            gdn.inform(json);
-         },
-         complete: function() {
-            gdn.notificationsPinging--;
+         var message = response.InformMessages[i]['Message'];
+         var emptyMessage = message == '';
+
+         // Is there a sprite?
+         if (sprite != '')
+            message = '<span class="InformSprite '+sprite+'"></span>' + message;
+
+         // If the message is dismissable, add a close button
+         if (css.indexOf('Dismissable') > 0)
+            message = '<a class="Close"><span>×</span></a>' + message;
+
+         message = '<div class="InformMessage">'+message+'</div>';
+         // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
+         message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
+         // Insert the current url as a target for inform anchors
+         message = message.replace(/{SelfUrl}/g, document.URL);
+
+         var skip = false;
+         for (var j = 0; j < wrappers.length; j++) {
+            if (jQuery(wrappers[j]).text() == jQuery(message).text()) {
+               skip = true;
+            }
          }
+         if (!skip) {
+            if (elementId != '') {
+               jQuery('#'+elementId).remove();
+               elementId = ' id="'+elementId+'"';
+            }
+            if (!emptyMessage) {
+               informMessages.prepend('<div class="'+css+'"'+elementId+'>'+message+'</div>');
+               // Is there a callback or callback url to request on dismiss of the inform message?
+               if (dismissCallback) {
+                  jQuery('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
+               } else if (dismissCallbackUrl) {
+                  dismissCallbackUrl = dismissCallbackUrl.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
+                  var closeAnchor = jQuery('div.InformWrapper:first').find('a.Close');
+                  closeAnchor.attr('callbackurl', dismissCallbackUrl);
+                  closeAnchor.click(function () {
+                     $.ajax({
+                        type: "POST",
+                        url: jQuery(this).attr('callbackurl'),
+                        data: 'TransientKey='+gdn.definition('TransientKey'),
+                        dataType: 'json',
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                           gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+                        },
+                        success: function(json) {
+                           gdn.inform(json);
+                        }
+                     });
+                  });
+               }
+            }
+         }
+      } catch (e) {
+      }
+   }
+   informMessages.show();
+   return true;
+}
+
+// Send an informMessage to the screen (same arguments as controller.InformMessage).
+gdn.informMessage = function(message, options) {
+   if (!options)
+      options = new Array();
+
+   if (typeof(options) == 'string') {
+      var css = options;
+      options = new Array();
+      options['CssClass'] = css;
+   }
+   options['Message'] = message;
+   if (!options['CssClass'])
+      options['CssClass'] = 'Dismissable AutoDismiss';
+
+   gdn.inform({'InformMessages' : new Array(options)});
+}
+
+// Inform an error returned from an ajax call.
+gdn.informError = function(xhr, silentAbort) {
+   if (xhr == undefined || xhr == null)
+      return;
+
+   if (typeof(xhr) == 'string')
+      xhr = {responseText: xhr, code: 500};
+
+   var message = xhr.responseText;
+   var code = xhr.status;
+
+   if (message == undefined || message == null || message == '') {
+      switch (xhr.statusText) {
+         case 'error':
+            if (silentAbort) 
+               return;
+            message = 'There was an error performing your request. Please try again.';
+            break;
+         case 'timeout':
+            message = 'Your request timed out. Please try again.';
+            break;
+         case 'abort':
+            return;
+      }
+   }
+
+   try {
+      var data = $.parseJSON(message);
+      if (typeof(data.Exception) == 'string')
+         message = data.Exception;
+   } catch(e) {
+   }
+
+   if (message == '')
+      message = 'There was an error performing your request. Please try again.';
+
+   gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
+}
+
+// Ping for new notifications on pageload, and subsequently every 1 minute.
+gdn.notificationsPinging = 0;
+gdn.pingCount = 0;
+
+gdn.pingForNotifications = function() {
+   if (gdn.notificationsPinging > 0 || !gdn.focused)
+      return;
+   gdn.notificationsPinging++;
+
+   jQuery.ajax({
+      type: "POST",
+      url: gdn.url('dashboard/notifications/inform'),
+      data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON', 'Count': gdn.pingCount++},
+      dataType: 'json',
+      error: function(XMLHttpRequest, textStatus, errorThrown) {
+         console.log(XMLHttpRequest.responseText);
+      },
+      success: function(json) {
+         gdn.inform(json);
+      },
+      complete: function() {
+         gdn.notificationsPinging--;
+      }
+   });
+}
+
+gdn.Template = {
+
+   Driver: 'Mustache',
+   Templates: {},
+   Background: false,
+
+   /**
+    * Register a group of templates
+    * 
+    * @param array Template An array of Template objects suitable for 
+    * Template::RegisterTemplate().
+    */
+   Register: function(Templates) {
+      jQuery.each(Templates, function(i, Template){
+         gdn.Template.RegisterTemplate(Template)
       });
-   }
-   
-   gdn.Template = {
+   },
 
-      Driver: 'Mustache',
-      Templates: {},
-      Background: false,
+   /**
+    * Register a Template object
+    * 
+    * Template is a JSON object with the following keys:
+    * 
+    *  Name       // Name of the template as it is referred to on the serverside
+    *  URL        // String Mustache Template contents
+    *  Type       // Type of template
+    *  Contents   // Optional. Contents of the template.
+    *  
+    * @param JSON Template Template object
+    */
+   RegisterTemplate: function(Template) {
+      gdn.Template.Templates[Template.Name] = Template;
+      gdn.Template.Templates[Template.Name].Downloading = false;
 
-      /**
-       * Register a group of templates
-       * 
-       * @param array Template An array of Template objects suitable for 
-       * Template::RegisterTemplate().
-       */
-      Register: function(Templates) {
-         jQuery.each(Templates, function(i, Template){
-            gdn.Template.RegisterTemplate(Template)
-         });
-      },
+      // Background download templates
+      if (gdn.Template.Background && Template.Type == 'defer')
+         gdn.Template.Download(Template.Name);
+   },
 
-      /**
-       * Register a Template object
-       * 
-       * Template is a JSON object with the following keys:
-       * 
-       *  Name       // Name of the template as it is referred to on the serverside
-       *  URL        // String Mustache Template contents
-       *  Type       // Type of template
-       *  Contents   // Optional. Contents of the template.
-       *  
-       * @param JSON Template Template object
-       */
-      RegisterTemplate: function(Template) {
-         gdn.Template.Templates[Template.Name] = Template;
-         gdn.Template.Templates[Template.Name].Downloading = false;
-         
-         // Background download templates
-         if (gdn.Template.Background && Template.Type == 'defer')
-            gdn.Template.Download(Template.Name);
-      },
+   /**
+    * Render the supplied Template and View
+    * 
+    * Renders the Template with View as the data, then returns the resulting
+    * string.
+    * 
+    * @param string TemplateName Name of the template to render
+    * @param JSON View View object for Mustache
+    * @param array Partials A list of partial templates to include
+    */
+   Render: function(TemplateName, View, Partials) {
+      var TemplateSrc = gdn.Template.GetTemplateSrc(TemplateName);
+      if (TemplateSrc) {
+         Partials = gdn.Template.GetPartials(Partials);
+         return Mustache.render(TemplateSrc, View, Partials);
+      } else {
+         return '';
+      }
+   },
 
-      /**
-       * Render the supplied Template and View
-       * 
-       * Renders the Template with View as the data, then returns the resulting
-       * string.
-       * 
-       * @param string TemplateName Name of the template to render
-       * @param JSON View View object for Mustache
-       * @param array Partials A list of partial templates to include
-       */
-      Render: function(TemplateName, View, Partials) {
-         var TemplateSrc = gdn.Template.GetTemplateSrc(TemplateName);
-         if (TemplateSrc) {
-            Partials = gdn.Template.GetPartials(Partials);
-            return Mustache.render(TemplateSrc, View, Partials);
-         } else {
-            return '';
-         }
-      },
+   /**
+    * Render Template+View and replace Element with result
+    * 
+    * Performs a normal Template Render with the supplied Template and View, then
+    * replaces the supplied Element with the resulting string.
+    * 
+    * @param string Template Name of the template to render
+    * @param JSON View View object for Mustache
+    * @param DOMObject Element DOM object to replace
+    * @param array Partials A list of partial templates to include
+    */
+   RenderInPlace: function(TemplateName, View, Element, Partials) {
+      var Render = gdn.Template.Render(TemplateName, View, Partials);
+      var Replace = jQuery(Render);
+      jQuery(Element).replaceWith(Replace);
+      return Replace;
+   },
 
-      /**
-       * Render Template+View and replace Element with result
-       * 
-       * Performs a normal Template Render with the supplied Template and View, then
-       * replaces the supplied Element with the resulting string.
-       * 
-       * @param string Template Name of the template to render
-       * @param JSON View View object for Mustache
-       * @param DOMObject Element DOM object to replace
-       * @param array Partials A list of partial templates to include
-       */
-      RenderInPlace: function(TemplateName, View, Element, Partials) {
-         var Render = gdn.Template.Render(TemplateName, View, Partials);
-         var Replace = jQuery(Render);
-         jQuery(Element).replaceWith(Replace);
-         return Replace;
-      },
-      
-      /**
-       * Update the given template
-       *
-       * @param string TemplateName
-       * @param string Field
-       * @param mixed Value
-       */
-      SetTemplateField: function(TemplateName, Field, Value) {
-         if (!gdn.Template.Templates.hasOwnProperty(TemplateName)) return false;
-         gdn.Template.Templates[TemplateName][Field] = Value;
-      },
-      
-      /**
-       * Get a template object
-       *
-       * @param string TemplateName
-       */
-      GetTemplate: function(TemplateName) {
-         if (!gdn.Template.Templates.hasOwnProperty(TemplateName)) return false;
-         return gdn.Template.Templates[TemplateName];
-      },
+   /**
+    * Update the given template
+    *
+    * @param string TemplateName
+    * @param string Field
+    * @param mixed Value
+    */
+   SetTemplateField: function(TemplateName, Field, Value) {
+      if (!gdn.Template.Templates.hasOwnProperty(TemplateName)) return false;
+      gdn.Template.Templates[TemplateName][Field] = Value;
+   },
 
-      /**
-       * Get the string contents of the given template name
-       * 
-       * @param string Template Name of the template to retrieve
-       */
-      GetTemplateSrc: function(TemplateName) {
-         var Template = gdn.Template.GetTemplate(TemplateName);
-         if (!Template) return false;
-         
-         if (!Template.hasOwnProperty('Contents')) {
-            gdn.Template.Download(TemplateName, 'sync');
-            Template = gdn.Template.GetTemplate(TemplateName);
-         }
-         
-         return Template.Contents;
-         
-      },
-      
-      GetPartials: function(Partials) {
-         var PartialList = {};
-         if (Partials instanceof Array) {
-            jQuery.each(Partials, function(i, PartialName){
-               var PartialTemplate = gdn.Template.GetTemplateSrc(PartialName);
-               if (!PartialTemplate) return;
-               
-               PartialList[PartialName] = PartialTemplate;
-            });
-         }
-         return PartialList;
-      },
-      
-      Download: function(TemplateName, Mode) {
-         var Template = gdn.Template.GetTemplate(TemplateName);
-         
-         // We're downloading, don't queue another download
-         if (Template.Downloading) return null;
-         gdn.Template.SetTemplateField(TemplateName, 'Downloading', true);
-         
-         var Async = false;
-         switch (Mode) {
-            case 'sync':
-               Async = false;
-               break;
-               
-            case 'async':
-            default:
-               Async = true;
-               break;
-         }
-         var TemplateURL = Template.URL;
-         jQuery.ajax({
-            url: TemplateURL,
-            async: Async,
-            dataType: 'html',
-            success: function(data, status, xhr) {
-               
-               Template.Contents = data;
-               gdn.Template.TemplateLoaded(Template)
-               
-            },
-            error: function(xhr, status, error) {}
-         });
-      },
-      
-      TemplateLoaded: function(Template) {
-         // Store template contents
-         gdn.Template.SetTemplateField(Template.Name, 'Contents', Template.Contents);
-         gdn.Template.SetTemplateField(Template.Name, 'Downloading', false);
+   /**
+    * Get a template object
+    *
+    * @param string TemplateName
+    */
+   GetTemplate: function(TemplateName) {
+      if (!gdn.Template.Templates.hasOwnProperty(TemplateName)) return false;
+      return gdn.Template.Templates[TemplateName];
+   },
+
+   /**
+    * Get the string contents of the given template name
+    * 
+    * @param string Template Name of the template to retrieve
+    */
+   GetTemplateSrc: function(TemplateName) {
+      var Template = gdn.Template.GetTemplate(TemplateName);
+      if (!Template) return false;
+
+      if (!Template.hasOwnProperty('Contents')) {
+         gdn.Template.Download(TemplateName, 'sync');
+         Template = gdn.Template.GetTemplate(TemplateName);
       }
 
-   }
-   
-   String.prototype.addCommas = function() {
-      nStr = this;
-      x = nStr.split('.');
-      x1 = x[0];
-      x2 = x.length > 1 ? '.' + x[1] : '';
-      var rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      return Template.Contents;
+
+   },
+
+   GetPartials: function(Partials) {
+      var PartialList = {};
+      if (Partials instanceof Array) {
+         jQuery.each(Partials, function(i, PartialName){
+            var PartialTemplate = gdn.Template.GetTemplateSrc(PartialName);
+            if (!PartialTemplate) return;
+
+            PartialList[PartialName] = PartialTemplate;
+         });
       }
-      return x1 + x2;
-   }
-   
-   Array.prototype.sum = function(){
-      for(var i=0,sum=0;i<this.length;sum+=this[i++]);
-      return sum;
-   }
-   
-   Array.prototype.max = function(){
-      return Math.max.apply({},this)
-   }
-   
-   Array.prototype.min = function(){
-      return Math.min.apply({},this)
+      return PartialList;
+   },
+
+   Download: function(TemplateName, Mode) {
+      var Template = gdn.Template.GetTemplate(TemplateName);
+
+      // We're downloading, don't queue another download
+      if (Template.Downloading) return null;
+      gdn.Template.SetTemplateField(TemplateName, 'Downloading', true);
+
+      var Async = false;
+      switch (Mode) {
+         case 'sync':
+            Async = false;
+            break;
+
+         case 'async':
+         default:
+            Async = true;
+            break;
+      }
+      var TemplateURL = Template.URL;
+      jQuery.ajax({
+         url: TemplateURL,
+         async: Async,
+         dataType: 'html',
+         success: function(data, status, xhr) {
+
+            Template.Contents = data;
+            gdn.Template.TemplateLoaded(Template)
+
+         },
+         error: function(xhr, status, error) {}
+      });
+   },
+
+   TemplateLoaded: function(Template) {
+      // Store template contents
+      gdn.Template.SetTemplateField(Template.Name, 'Contents', Template.Contents);
+      gdn.Template.SetTemplateField(Template.Name, 'Downloading', false);
    }
 
-   if (typeof String.prototype.trim !== 'function') {
-     String.prototype.trim = function() {
-       return this.replace(/^\s+|\s+$/g, ''); 
-     }
+}
+
+String.prototype.addCommas = function() {
+   nStr = this;
+   x = nStr.split('.');
+   x1 = x[0];
+   x2 = x.length > 1 ? '.' + x[1] : '';
+   var rgx = /(\d+)(\d{3})/;
+   while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
    }
+   return x1 + x2;
+}
+
+Array.prototype.sum = function(){
+   for(var i=0,sum=0;i<this.length;sum+=this[i++]);
+   return sum;
+}
+
+Array.prototype.max = function(){
+   return Math.max.apply({},this)
+}
+
+Array.prototype.min = function(){
+   return Math.min.apply({},this)
+}
+
+if (typeof String.prototype.trim !== 'function') {
+   String.prototype.trim = function() {
+      return this.replace(/^\s+|\s+$/g, ''); 
+   }
+}
+
 
 /**
  * Document Ready Event
  * 
  */
-
 jQuery(document).ready(function($) {
    
    var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -866,6 +864,24 @@ jQuery(document).ready(function($) {
       $('body').addClass('MSIE');
    }
    
+   var d = new Date()
+   var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
+
+   // Set the ClientHour if there is an input looking for it.
+   $('input:hidden[name$=HourOffset]').livequery(function() {
+      $(this).val(hourOffset);
+   });
+   
+   // Ajax/Save the ClientHour if it is different from the value in the db.
+   $('input:hidden[id$=SetHourOffset]').livequery(function() {
+      if (hourOffset != $(this).val()) {
+         $.post(
+            gdn.url('/utility/sethouroffset.json'),
+            { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
+         );
+      }
+   });
+   
    var d = new Date();
    var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getMinutes();
 
@@ -930,6 +946,82 @@ jQuery(document).ready(function($) {
       $('textarea.Autogrow').livequery(function() {
          $(this).autogrow();
       });
+   }
+   
+   // password strength check
+   gdn.password = function(password, username) {
+      // calculate entropy
+      var alphabet = 0;
+      if ( password.match(/[0-9]/) )
+         alphabet += 10;
+      if ( password.match(/[a-z]/) )
+         alphabet += 26;
+      if ( password.match(/[A-Z]/) )
+         alphabet += 26;
+      if ( password.match(/[^a-zA-Z0-9]/) )
+         alphabet += 31;
+      var natLog = Math.log(Math.pow(alphabet, password.length));
+      var entropy = natLog / Math.LN2;
+      
+      var response = {
+         pass: false,
+         symbols: alphabet,
+         entropy: entropy,
+         score: 0
+      };
+      
+      // password1 == username
+      if (username) {
+         if (password.toLowerCase() == username.toLowerCase()) {
+            response.reason = 'similar';
+            return response;
+         }
+      }
+      
+      // divide into entropy buckets
+      var entropyBuckets = [10,26,36,41,52,57,83,93];
+      var entropyBucket = 1;
+      for (var i=0;i<entropyBuckets.length;i++) {
+         if (entropy >= entropyBuckets[i]) {
+            entropyBucket = i+1;
+         }
+      }
+      entropyBucket = Math.floor(parseFloat(entropyBucket) / parseFloat(2));
+      response.entropyBucket = entropyBucket;
+      
+      // reject on length
+      var length = password.length;
+      response.length = length;
+      var requiredLength = gdn.definition('MinPassLength', 8);
+      var requiredScore = gdn.definition('MinPassScore', 2);
+      response.required = requiredLength;
+      if (length < requiredLength) {
+         response.reason = 'short';
+         return response;
+      }
+      
+      // divide into length buckets
+      var lengthBuckets = [5,7,11,15];
+      var lengthBucket = 1;
+      for (var i=0; i < lengthBuckets.length; i++) {
+         if (length >= lengthBuckets[i]) {
+            lengthBucket = i+1;
+         }
+      }
+      
+      // apply length modifications
+      var zeroBucket = Math.ceil(lengthBuckets.length / 2);
+      var bucketMod = lengthBucket - zeroBucket;
+      var finalBucket = entropyBucket + bucketMod;
+      
+      // normalize
+      if (finalBucket < 1) finalBucket = 1;
+      if (finalBucket > 5) finalBucket = 5;
+      
+      response.score = finalBucket;
+      if (finalBucket >= requiredScore)
+         response.pass = true;
+      return response;
    }
 
    // Go to notifications if clicking on a user's notification count
@@ -1127,7 +1219,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: href,
-         data: {DeliveryType: 'VIEW', 'DeliveryMethod': 'JSON'},
+         data: { DeliveryType: 'VIEW', DeliveryMethod: 'JSON', TransientKey: gdn.definition('TransientKey') },
          dataType: 'json',
          complete: function() {
             gdn.enable(this);
@@ -1342,14 +1434,15 @@ jQuery(document).ready(function($) {
    
 });
 
+
 /**
  * Window Load Event
+ * 
  */
-
-// Shrink large images to fit into message space, and pop into new window when clicked.
-// This needs to happen in onload because otherwise the image sizes are not yet known.
 jQuery(window).load(function() {
 
+   // Shrink large images to fit into message space, and pop into new window when clicked.
+   // This needs to happen in onload because otherwise the image sizes are not yet known.
    var props = ['Width', 'Height'], prop;
 
    while (prop = props.pop()) {

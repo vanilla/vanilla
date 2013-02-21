@@ -152,7 +152,7 @@ class CategoriesController extends VanillaController {
          }
          
          
-         $this->Title(GetValue('Name', $Category, ''));
+         $this->Title(htmlspecialchars(GetValue('Name', $Category, '')));
          $this->Description(GetValue('Description', $Category), TRUE);
          
          // Set CategoryID
@@ -266,15 +266,6 @@ class CategoriesController extends VanillaController {
 
       $this->CanonicalUrl(Url('/categories', TRUE));
       
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $this->AddDefinition('SetClientHour', $ClientHour);
-      }
-
       include_once $this->FetchViewLocation('helper_functions', 'categories');
       $this->Render();
    }

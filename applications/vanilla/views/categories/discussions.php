@@ -14,7 +14,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       
    <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">      
       <h2 class="H"><?php
-            echo Anchor($Category->Name, '/categories/'.$Category->UrlCode);
+            echo Anchor(htmlspecialchars($Category->Name), CategoryUrl($Category));
             Gdn::Controller()->EventArguments['Category'] = $Category;
             Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
       ?></h2>

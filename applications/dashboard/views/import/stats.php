@@ -26,7 +26,7 @@
 	}
 
    if ($this->Data('GenerateSQL')) {
-      echo "<tr><th>Special</th><td class=\"Alt\">Generate Import SQL only</td></tr>\n";
+      echo "<tr><th>".T('Special')."</th><td class=\"Alt\">".T('Generate import SQL only')."</td></tr>\n";
    }
 	?>
 </table>

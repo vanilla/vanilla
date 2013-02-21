@@ -124,6 +124,8 @@ class DashboardHooks implements Gdn_IPlugin {
          // $Sender->AddDefinition('MasterView', $Sender->MasterView);
          $Sender->AddDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
          $Sender->AddJsFile('js/embed_local.js');
+      } else {
+         $Sender->SetHeader('X-Frame-Options', 'SAMEORIGIN');
       }
          
       // Allow return to mobile site

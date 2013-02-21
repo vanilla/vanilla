@@ -325,9 +325,8 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($SetIdentity) {
+            if ($SetIdentity)
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
-            }
             
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');

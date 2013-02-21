@@ -23,6 +23,9 @@ class Gdn_CookieIdentity {
    public $CookieHashMethod;
    public $CookieSalt;
    
+   const COOKIE_PERSIST_DAYS = 30;
+   const COOKIE_SESSION_DAYS = 2;
+   
    public function __construct($Config = NULL) {
       $this->Init($Config);
    }
@@ -138,47 +141,80 @@ class Gdn_CookieIdentity {
     * @param boolean $Persist Should the user's session remain persistent across visits?
     */
    public function SetIdentity($UserID, $Persist = FALSE) {
-      if(is_null($UserID)) {
+      if (is_null($UserID)) {
          $this->_ClearIdentity();
          return;
       }
       
       $this->UserID = $UserID;
       
-      if ($Persist !== FALSE) {
-         // Note: 2592000 is 60*60*24*30 or 30 days
-         $Expiration = $Expire = time() + 2592000;
+      // If we're persisting, both the cookie and its payload expire in 30days
+      $PayloadExpires = time();
+      if ($Persist) {
+         
+         $PayloadExpires += (86400 * self::COOKIE_PERSIST_DAYS);
+         $CookieExpires = $PayloadExpires;
+         
+      // Otherwise the payload expires in 2 days and the cookie expires on borwser restart
       } else {
-         // Note: 172800 is 60*60*24*2 or 2 days
-         $Expiration = time() + 172800;
-         // Note: setting $Expire to 0 will cause the cookie to die when the browser closes.
-         $Expire = 0;
+         // Note: $CookieExpires = 0 causes cookie to die when browser closes.
+         
+         $PayloadExpires += (86400 * self::COOKIE_SESSION_DAYS);
+         $CookieExpires = 0;
       }
 
-      // Create the cookie.
-      $KeyData = $UserID.'-'.$Expiration;
-      $this->_SetCookie($this->CookieName, $KeyData, array($UserID, $Expiration), $Expire);
+      // Create the cookie
+      $KeyData = $UserID.'-'.$PayloadExpires;
+      $this->_SetCookie($this->CookieName, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
       $this->SetVolatileMarker($UserID);
    }
    
+   /**
+    * 
+    * 
+    * @param integer $UserID
+    * @return void
+    */
    public function SetVolatileMarker($UserID) {
       if (is_null($UserID))
          return;
       
       // Note: 172800 is 60*60*24*2 or 2 days
-      $Expiration = time() + 172800;
+      $PayloadExpires = time() + 172800;
       // Note: setting $Expire to 0 will cause the cookie to die when the browser closes.
-      $Expire = 0;
+      $CookieExpires = 0;
       
-      $KeyData = $UserID.'-'.$Expiration;
-      $this->_SetCookie($this->VolatileMarker, $KeyData, array($UserID, $Expiration), $Expire);
+      $KeyData = $UserID.'-'.$PayloadExpires;
+      $this->_SetCookie($this->VolatileMarker, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
    }
    
-   protected function _SetCookie($CookieName, $KeyData, $CookieContents, $Expire) {
-      self::SetCookie($CookieName, $KeyData, $CookieContents, $Expire, $this->CookiePath, $this->CookieDomain, $this->CookieHashMethod, $this->CookieSalt);
+   /**
+    * Set a cookie, using path, domain, salt, and hash method from core config
+    * 
+    * @param string  $CookieName Name of the cookie
+    * @param string  $KeyData
+    * @param mixed   $CookieContents
+    * @param integer $CookieExpires
+    * @return void
+    */
+   protected function _SetCookie($CookieName, $KeyData, $CookieContents, $CookieExpires) {
+      self::SetCookie($CookieName, $KeyData, $CookieContents, $CookieExpires, $this->CookiePath, $this->CookieDomain, $this->CookieHashMethod, $this->CookieSalt);
    }
    
-   public static function SetCookie($CookieName, $KeyData, $CookieContents, $Expire, $Path = NULL, $Domain = NULL, $CookieHashMethod = NULL, $CookieSalt = NULL) {
+   /**
+    * Set a cookie, using specified path, domain, salt and hash method
+    * 
+    * @param string  $CookieName Name of the cookie
+    * @param string  $KeyData
+    * @param mixed   $CookieContents
+    * @param integer $CookieExpires
+    * @param string  $Path Optional. Cookie path (auto load from config)
+    * @param string  $Domain Optional. Cookie domain (auto load from config)
+    * @param string  $CookieHashMethod Optional. Cookie hash method (auto load from config)
+    * @param string  $CookieSalt Optional. Cookie salt (auto load from config)
+    * @return void
+    */
+   public static function SetCookie($CookieName, $KeyData, $CookieContents, $CookieExpires, $Path = NULL, $Domain = NULL, $CookieHashMethod = NULL, $CookieSalt = NULL) {
       
       if (is_null($Path))
          $Path = Gdn::Config('Garden.Cookie.Path', '/');
@@ -197,19 +233,21 @@ class Gdn_CookieIdentity {
       if (!$CookieSalt)
          $CookieSalt = Gdn::Config('Garden.Cookie.Salt');
       
-      // Create the cookie contents
-      $Key = self::_Hash($KeyData, $CookieHashMethod, $CookieSalt);
-      $Hash = self::_HashHMAC($CookieHashMethod, $KeyData, $Key);
-      $Cookie = array($KeyData,$Hash,time());
+      // Create the cookie signature
+      $KeyHash = self::_Hash($KeyData, $CookieHashMethod, $CookieSalt);
+      $KeyHashHash = self::_HashHMAC($CookieHashMethod, $KeyData, $KeyHash);
+      $Cookie = array($KeyData, $KeyHashHash, time());
+      
+      // Attach cookie payload
       if (!is_null($CookieContents)) {
-         if (!is_array($CookieContents)) $CookieContents = array($CookieContents);
+         $CookieContents = (array)$CookieContents;
          $Cookie = array_merge($Cookie, $CookieContents);
       }
-         
+      
       $CookieContents = implode('|',$Cookie);
 
       // Create the cookie.
-      setcookie($CookieName, $CookieContents, $Expire, $Path, $Domain, NULL, TRUE);
+      setcookie($CookieName, $CookieContents, $CookieExpires, $Path, $Domain, NULL, TRUE);
       $_COOKIE[$CookieName] = $CookieContents;
    }
    
@@ -237,15 +275,15 @@ class Gdn_CookieIdentity {
          return FALSE;
       }
       
-      list($HashKey, $CookieHash, $Time, $UserID, $Expiration) = $CookieData;
-      if ($Expiration < time() && $Expiration != 0) {
+      list($HashKey, $CookieHash, $Time, $UserID, $PayloadExpires) = $CookieData;
+      if ($PayloadExpires < time() && $PayloadExpires != 0) {
          self::DeleteCookie($CookieName);
          return FALSE;
       }
-      $Key = self::_Hash($HashKey, $CookieHashMethod, $CookieSalt);
-      $GeneratedHash = self::_HashHMAC($CookieHashMethod, $HashKey, $Key);
+      $KeyHash = self::_Hash($HashKey, $CookieHashMethod, $CookieSalt);
+      $CheckHash = self::_HashHMAC($CookieHashMethod, $HashKey, $KeyHash);
 
-      if (!CompareHashDigest($CookieHash, $GeneratedHash)) {
+      if (!CompareHashDigest($CookieHash, $CheckHash)) {
          self::DeleteCookie($CookieName);
          return FALSE;
       }

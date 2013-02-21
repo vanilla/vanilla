@@ -299,7 +299,7 @@ class Gdn_Form extends Gdn_Pluggable {
             else if ($Selected)
                $Return .= ' selected="selected"'; // only allow selection if NOT disabled
             
-            $Name = GetValue('Name', $Category, 'Blank Category Name');
+            $Name = htmlspecialchars(GetValue('Name', $Category, 'Blank Category Name'));
             if ($Depth > 1) {
                $Name = str_pad($Name, strlen($Name)+$Depth-1, ' ', STR_PAD_LEFT);
                $Name = str_replace(' ', '&#160;', $Name);

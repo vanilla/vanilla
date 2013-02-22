@@ -60,7 +60,7 @@ class EmbedFriendlyThemeHooks implements Gdn_IPlugin {
 	}
 
 	private function _TogglePanel($Sender) {
-		$Sender->Permission('Garden.Themes.Manage');
+		$Sender->Permission('Garden.Settings.Manage');
 		$TransientKey = GetValue(0, $Sender->RequestArgs);
 		if (Gdn::Session()->ValidateTransientKey($TransientKey))
 			SaveToConfig('Themes.EmbedFriendly.SingleColumn', C('Themes.EmbedFriendly.SingleColumn') ? FALSE : TRUE);

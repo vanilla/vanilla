@@ -43,7 +43,7 @@ class RoutesController extends DashboardController {
     * @access public
     */
    public function Add() {
-      $this->Permission('Garden.Routes.Manage');
+      $this->Permission('Garden.Settings.Manage');
       // Use the edit form with no roleid specified.
       $this->View = 'Edit';
       $this->Edit();
@@ -57,7 +57,7 @@ class RoutesController extends DashboardController {
     * @param string $RouteIndex Name of route.
     */
    public function Edit($RouteIndex = FALSE) {
-      $this->Permission('Garden.Routes.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/routes');
       $this->Route = Gdn::Router()->GetRoute($RouteIndex);
       
@@ -123,7 +123,7 @@ class RoutesController extends DashboardController {
     * @param string $TransientKey Security token.
     */
    public function Delete($RouteIndex = FALSE, $TransientKey = FALSE) {
-      $this->Permission('Garden.Routes.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $this->DeliveryType(DELIVERY_TYPE_BOOL);
       $Session = Gdn::Session();
       
@@ -144,7 +144,7 @@ class RoutesController extends DashboardController {
     * @access public
     */
    public function Index() {
-      $this->Permission('Garden.Routes.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/routes');
       $this->AddJsFile('routes.js');
       $this->Title(T('Routes'));

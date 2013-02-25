@@ -35,8 +35,8 @@ jQuery(document).ready(function($) {
       $(this).hide();
    });
    
-   $('#Form_ResetPassword').live('click', function() {
-      if ($(this).attr('checked'))
+   $('.PasswordOptions').live('click', function() {
+      if ($("input:radio[name='ResetPassword']:checked").val() == 'Manual')
          $('#NewPassword').slideDown('fast');
       else
          $('#NewPassword').slideUp('fast');

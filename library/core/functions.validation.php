@@ -329,6 +329,21 @@ if (!function_exists('ValidateMatch')) {
    }
 }
 
+if (!function_exists('ValidateStrength')) {
+   /**
+    * Validate a password's strength
+    * 
+    * @param string $Value
+    * @param string $Field
+    * @param array $FormValues
+    */
+   function ValidateStrength($Value, $Field, $PostedFields) {
+      $UsernameValue = GetValue('Name', $PostedFields);
+      $PScore = PasswordStrength($Value, $UsernameValue);
+      return $PScore['Pass'] ? TRUE : FALSE;
+   }
+}
+
 if (!function_exists('ValidateVersion')) {
    function ValidateVersion($Value) {
       if (empty($Value))

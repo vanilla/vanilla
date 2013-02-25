@@ -234,6 +234,82 @@ jQuery(document).ready(function($) {
    gdn.querySep = function(url) {
       return url.indexOf('?') == -1 ? '?' : '&';
    }
+   
+   // password strength check
+   gdn.password = function(password, username) {
+      // calculate entropy
+      var alphabet = 0;
+      if ( password.match(/[0-9]/) )
+         alphabet += 10;
+      if ( password.match(/[a-z]/) )
+         alphabet += 26;
+      if ( password.match(/[A-Z]/) )
+         alphabet += 26;
+      if ( password.match(/[^a-zA-Z0-9]/) )
+         alphabet += 31;
+      var natLog = Math.log(Math.pow(alphabet, password.length));
+      var entropy = natLog / Math.LN2;
+      
+      var response = {
+         pass: false,
+         symbols: alphabet,
+         entropy: entropy,
+         score: 0
+      };
+      
+      // password1 == username
+      if (username) {
+         if (password.toLowerCase() == username.toLowerCase()) {
+            response.reason = 'similar';
+            return response;
+         }
+      }
+      
+      // divide into entropy buckets
+      var entropyBuckets = [10,26,36,41,52,57,83,93];
+      var entropyBucket = 1;
+      for (var i=0;i<entropyBuckets.length;i++) {
+         if (entropy >= entropyBuckets[i]) {
+            entropyBucket = i+1;
+         }
+      }
+      entropyBucket = Math.floor(parseFloat(entropyBucket) / parseFloat(2));
+      response.entropyBucket = entropyBucket;
+      
+      // reject on length
+      var length = password.length;
+      response.length = length;
+      var requiredLength = gdn.definition('MinPassLength', 8);
+      var requiredScore = gdn.definition('MinPassScore', 2);
+      response.required = requiredLength;
+      if (length < requiredLength) {
+         response.reason = 'short';
+         return response;
+      }
+      
+      // divide into length buckets
+      var lengthBuckets = [5,7,11,15];
+      var lengthBucket = 1;
+      for (var i=0; i < lengthBuckets.length; i++) {
+         if (length >= lengthBuckets[i]) {
+            lengthBucket = i+1;
+         }
+      }
+      
+      // apply length modifications
+      var zeroBucket = Math.ceil(lengthBuckets.length / 2);
+      var bucketMod = lengthBucket - zeroBucket;
+      var finalBucket = entropyBucket + bucketMod;
+      
+      // normalize
+      if (finalBucket < 1) finalBucket = 1;
+      if (finalBucket > 5) finalBucket = 5;
+      
+      response.score = finalBucket;
+      if (finalBucket >= requiredScore)
+         response.pass = true;
+      return response;
+   }
 
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
@@ -634,7 +710,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "POST",
          url: href,
-         data: {DeliveryType: 'VIEW', 'DeliveryMethod': 'JSON'},
+         data: { DeliveryType: 'VIEW', DeliveryMethod: 'JSON', TransientKey: gdn.definition('TransientKey') },
          dataType: 'json',
          complete: function() {
             gdn.enable(this);

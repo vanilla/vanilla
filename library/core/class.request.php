@@ -324,7 +324,18 @@ class Gdn_Request {
       
       // Loadbalancers
       $IP = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? GetValue('HTTP_X_FORWARDED_FOR',$_SERVER) : $_SERVER['REMOTE_ADDR'];
-      if (strpos($IP, ',') !== FALSE) $IP = substr($IP, 0, strpos($IP, ','));
+      if (strpos($IP, ',') !== FALSE) {
+         $Matched = preg_match_all('/([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})(?:, )?/i', $IP, $Matches);
+         
+         // If we found matching IPs
+         if ($Matched) {
+            $IPs = $Matches[1];
+            $IP = $Matches[0];
+            
+         // Fallback 
+         } else { $IP = $_SERVER['REMOTE_ADDR']; }
+      }
+      
       // Varnish
       $OriginalIP = GetValue('HTTP_X_ORIGINALLY_FORWARDED_FOR', $_SERVER, NULL);
       if (!is_null($OriginalIP)) $IP = $OriginalIP;

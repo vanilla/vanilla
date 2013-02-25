@@ -17,7 +17,7 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('New Password', 'Password');
-         echo $this->Form->Input('Password', 'password');
+         echo $this->Form->Input('Password', 'password', array('Strength' => TRUE));
       ?>
    </li>
    <li>

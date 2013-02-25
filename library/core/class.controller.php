@@ -565,6 +565,18 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       $this->_TemplateFiles[] = $TemplateInfo;
    }
+   
+   public function AllowJSONP($Value = NULL) {
+      static $_Value;
+      
+      if (isset($Value))
+         $_Value = $Value;
+      
+      if (isset($_Value))
+         return $_Value;
+      else
+         return C('Garden.AllowJSONP');
+   }
 
    public function CanonicalUrl($Value = NULL) {
       if ($Value === NULL) {
@@ -1168,7 +1180,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
          ob_clean();
-//         $this->ContentType('application/json');
+         $this->ContentType('application/json');
+         $this->SetHeader('X-Content-Type-Options', 'nosniff');
       }
       
       if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
@@ -1231,7 +1244,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          $Json = json_encode($this->_Json);
          // Check for jsonp call.
-         if ($Callback = $this->Request->Get('callback', FALSE)) {
+         if (($Callback = $this->Request->Get('callback', FALSE)) && $this->AllowJSONP()) {
             $Json = $Callback.'('.$Json.')';
          }
 
@@ -1387,7 +1400,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          case DELIVERY_METHOD_JSON:
          default:
             header('Content-Type: application/json', TRUE);
-            if ($Callback = $this->Request->Get('callback', FALSE)) {
+            if (($Callback = $this->Request->Get('callback', FALSE)) && $this->AllowJSONP()) {
                // This is a jsonp request.
                echo $Callback.'('.json_encode($Data).');';
                return TRUE;
@@ -1509,7 +1522,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
             header('Content-Type: application/json', TRUE);
-            if ($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
+            if (($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) && $this->AllowJSONP()) {
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
             } else {
@@ -2229,11 +2242,14 @@ class Gdn_Controller extends Gdn_Pluggable {
     * 
     * @param string $Title The value to pass to $this->Head->Title().
     */
-   public function Title($Title, $Subtitle = NULL) {
-      $this->SetData('Title', $Title);
+   public function Title($Title = NULL, $Subtitle = NULL) {
+      if (!is_null($Title))
+         $this->SetData('Title', $Title);
       
-      if ($Subtitle !== NULL)
+      if (!is_null($Subtitle))
          $this->SetData('_Subtitle', $Subtitle);
+      
+      return $this->Data('Title');
    }
    
 }

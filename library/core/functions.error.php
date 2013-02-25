@@ -476,9 +476,27 @@ function PermissionException($Permission = NULL) {
       $Message = T('PermissionErrorMessage', "You don't have permission to do that.");
    elseif ($Permission == 'Banned')
       $Message = T("You've been banned.");
+   elseif (StringBeginsWith($Permission, '@'))
+      $Message = StringBeginsWith($Permission, '@', TRUE, TRUE);
    else
       $Message = T(
          "PermissionRequired.$Permission",
          sprintf(T('You need the %s permission to do that.'), $Permission));
-   return new Gdn_UserException($Message, 401);
+   return new Gdn_UserException($Message, 403);
+}
+
+/**
+ * Create a new permission exception. This is a convenience function that will create an exception with a standard message.
+ *
+ * @param string|null $Permission The name of the permission that was required.
+ * @return Exception
+ */
+function ForbiddenException($Resource = NULL) {
+   if (!$Resource)
+      $Message = T('ForbiddenErrorMessage', "You are not allowed to do that.");
+   elseif (StringBeginsWith($Resource, '@'))
+      $Message = StringBeginsWith($Resource, '@', TRUE, TRUE);
+   else
+      $Message = sprintf(T('You are not allowed to %s.'), $Resource);
+   return new Gdn_UserException($Message, 403);
 }

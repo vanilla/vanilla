@@ -136,29 +136,29 @@ class UtilityController extends DashboardController {
     * Redirect to another page.
     * @since 2.0.18b4
     */
-   public function Redirect() {
-      $Args = func_get_args();
-      $Path = $this->Request->Path();
-      if (count($Args) > 0) {
-         if (in_array($Args[0], array('http', 'https'))) {
-            $Protocal = array_shift($Args);
-         } else {
-            $Protocal = 'http';
-         }
-         $Url = $Protocal.'://'.implode($Args, '/');
-      } else {
-         $Url = Url('/', TRUE);
-      }
-      
-      $Get = $this->Request->Get();
-      if (count($Get) > 0) {
-         $Query = '?'.http_build_query($Get);
-      } else {
-         $Query = '';
-      }
-      
-      Redirect($Url.$Query);
-   }
+//   public function Redirect() {
+//      $Args = func_get_args();
+//      $Path = $this->Request->Path();
+//      if (count($Args) > 0) {
+//         if (in_array($Args[0], array('http', 'https'))) {
+//            $Protocal = array_shift($Args);
+//         } else {
+//            $Protocal = 'http';
+//         }
+//         $Url = $Protocal.'://'.implode($Args, '/');
+//      } else {
+//         $Url = Url('/', TRUE);
+//      }
+//      
+//      $Get = $this->Request->Get();
+//      if (count($Get) > 0) {
+//         $Query = '?'.http_build_query($Get);
+//      } else {
+//         $Query = '';
+//      }
+//      
+//      Redirect($Url.$Query);
+//   }
    
    /**
     * Set the sort order for data on an arbitrary database table.

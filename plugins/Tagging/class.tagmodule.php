@@ -135,11 +135,11 @@ class TagModule extends Gdn_Module {
             if ($Tag['Name'] != '') {
          ?>
             <li><?php 
-               if (rawurlencode($Tag['Name']) == $Tag['Name']) {
-                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged/'.rawurlencode($Tag['Name']));
-               } else {
-                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged?Tag='.urlencode($Tag['Name']));
-               }
+               $Url = (rawurlencode($Tag['Name']) == $Tag['Name']) ? '/'.rawurlencode($Tag['Name']) : '?Tag='.urlencode($Tag['Name']);
+               echo Anchor(htmlspecialchars($Tag['Name']), 
+                       'discussions/tagged'.$Url, 
+                       array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
+                    );
             ?></li>
          <?php
             }
@@ -170,11 +170,11 @@ class TagModule extends Gdn_Module {
             if ($Tag['Name'] != '') {
          ?>
             <li><span><?php 
-               if (urlencode($Tag['Name']) == $Tag['Name']) {
-                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged/'.urlencode($Tag['Name']));
-               } else {
-                  echo Anchor(htmlspecialchars($Tag['Name']), 'discussions/tagged?Tag='.urlencode($Tag['Name']));
-               }
+               $Url = (rawurlencode($Tag['Name']) == $Tag['Name']) ? '/'.rawurlencode($Tag['Name']) : '?Tag='.urlencode($Tag['Name']);
+               echo Anchor(htmlspecialchars($Tag['Name']), 
+                       'discussions/tagged'.$Url, 
+                       array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
+                    );
             ?></span> <span class="Count"><?php echo number_format($Tag['CountDiscussions']); ?></span></li>
          <?php
             }

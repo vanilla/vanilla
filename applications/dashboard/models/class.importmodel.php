@@ -733,6 +733,11 @@ class ImportModel extends Gdn_Model {
 
 		$TableInfo =& $this->Tables($TableName);
 		$Columns = $TableInfo['Columns'];
+      
+      foreach ($Columns as $Key => $Value) {
+         if (StringBeginsWith($Key, '_'))
+            unset($Columns[$Key]);
+      }
 
 		// Build the column insert list.
 		$Insert = "insert ignore :_$TableName (\n  "
@@ -807,11 +812,8 @@ class ImportModel extends Gdn_Model {
 	}
 
    public function InsertPermissionTable() {
-      if ($this->ImportExists('Permission', 'JunctionTable')) {
-         $this->_InsertTable('Permission');
-         return TRUE;
-      }
-
+//      $this->LoadState();
+      
       // Clear the permission table in case the step was only half done before.
       $this->SQL->Delete('Permission', array('RoleID <>' => 0));
 
@@ -822,19 +824,24 @@ class ImportModel extends Gdn_Model {
       $JunctionColumns = array_filter($PM->PermissionColumns('Category', 'PermissionCategoryID'));
       unset($JunctionColumns['PermissionID']);
       $JunctionColumns = array_merge(array('JunctionTable' => 'Category', 'JunctionColumn' => 'PermissionCategoryID', 'JunctionID' => -1), $JunctionColumns);
-      $ColumnSets = array($GlobalColumns, $JunctionColumns);
-
-
+      
+      if ($this->ImportExists('Permission', 'JunctionTable')) {
+         $ColumnSets = array(array_merge($GlobalColumns, $JunctionColumns));
+         $ColumnSets[0]['JunctionTable'] = NULL;
+         $ColumnSets[0]['JunctionColumn'] = NULL;
+         $ColumnSets[0]['JunctionID'] = NULL;
+      } else {
+         $ColumnSets = array($GlobalColumns, $JunctionColumns);
+      }
 
       $Data = $this->SQL->Get('zPermission')->ResultArray();
       foreach ($Data as $Row) {
          $Presets = array_map('trim', explode(',', GetValue('_Permissions', $Row)));
-
          
          foreach ($ColumnSets as $ColumnSet) {
             $Set = array();
             $Set['RoleID'] = $Row['RoleID'];
-
+            
             foreach ($Presets as $Preset) {
                if (strpos($Preset, '.') !== FALSE) {
                   // This preset is a specific permission.
@@ -1595,6 +1602,10 @@ class ImportModel extends Gdn_Model {
 
       }
 
+      if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
+         $Sqls['Tag.CoundDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
+      }
+      
       $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
       $Sqls['Category.CountComments'] = $this->GetCountSQL('sum', 'Category', 'Discussion', 'CountComments', 'CountComments');
       if (!$this->ImportExists('Category', 'PermissionCategoryID')) {

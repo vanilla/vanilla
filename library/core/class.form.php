@@ -652,6 +652,26 @@ class Gdn_Form extends Gdn_Pluggable {
    }
    
    /**
+    * Returns the current image in a field.
+    * This is meant to be used with image uploads so that users can see the current value.
+    * 
+    * @param type $FieldName
+    * @param type $Attributes
+    * @since 2.1
+    */
+   public function CurrentImage($FieldName, $Attributes = array()) {
+      $Result = $this->Hidden($FieldName);
+      
+      $Value = $this->GetValue($FieldName);
+      if ($Value) {
+         TouchValue('class', $Attributes, 'CurrentImage');
+         $Result .= Img(Gdn_Upload::Url($Value), $Attributes);
+      }
+      
+      return $Result;
+   }
+   
+   /**
     * Returns XHTML for a standard date input control.
     *
     * @param string $FieldName The name of the field that is being displayed/posted with this input. It
@@ -1019,7 +1039,7 @@ class Gdn_Form extends Gdn_Pluggable {
       }
       return $Return == '' ? '' : '<table class="CheckBoxGrid">'.$Return.'</tbody></table>';
    }
-
+   
    /**
     * Returns XHTML for all hidden fields.
     *
@@ -1058,6 +1078,23 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ' />';
       return $Return;
+   }
+   
+   /**
+    * Return a control for uploading images.
+    * 
+    * @param string $FieldName
+    * @param array $Attributes
+    * @return string
+    * @since 2.1
+    */
+   public function ImageUpload($FieldName, $Attributes = array()) {
+      $Result = '<div class="FileUpload ImageUpload">'.
+         $this->CurrentImage($FieldName, $Attributes).
+         $this->Input($FieldName.'_New', 'file').
+         '</div>';
+      
+      return $Result;
    }
    
    /**
@@ -1105,6 +1142,7 @@ class Gdn_Form extends Gdn_Pluggable {
       
       $Return = '';
       $Wrap = GetValue('Wrap', $Attributes, FALSE, TRUE);
+      $Strength = GetValue('Strength', $Attributes, FALSE, TRUE);
       if ($Wrap) {
          $Return .= '<div class="TextBoxWrapper">';
       }
@@ -1115,6 +1153,8 @@ class Gdn_Form extends Gdn_Pluggable {
          ArrayValueI('Name', $Attributes, $FieldName));
       else $Return .= $this->_NameAttribute($FieldName, $Attributes);
 
+      if ($Strength)
+         $Return .= ' data-strength="true"';
       $Return .= $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ' />';
@@ -1128,6 +1168,20 @@ class Gdn_Form extends Gdn_Pluggable {
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
          $Return .= $this->InlineError($FieldName);
+      
+      if ($Type == 'password' && $Strength) {
+         $Return .= <<<PASSWORDMETER
+<div class="PasswordStrength">
+   <div class="Background"></div>
+   <div class="Strength"></div>
+   <div class="Separator" style="left: 20%;"></div>
+   <div class="Separator" style="left: 40%;"></div>
+   <div class="Separator" style="left: 60%;"></div>
+   <div class="Separator" style="left: 80%;"></div>
+   <div class="StrengthText">&nbsp;</div>
+</div>
+PASSWORDMETER;
+      }
       
       if ($Wrap)
          $Return .= '</div>';
@@ -1910,9 +1964,12 @@ class Gdn_Form extends Gdn_Pluggable {
     * @param string $FieldName The name of the field to set the value of.
     * @param mixed $Value The new value of $FieldName.
     */
-   public function SetFormValue($FieldName, $Value) {
+   public function SetFormValue($FieldName, $Value = NULL) {
       $this->FormValues();
-      $this->_FormValues[$FieldName] = $Value;
+      if (is_array($FieldName))
+         $this->_FormValues = array_merge($this->_FormValues, $FieldName);
+      else
+         $this->_FormValues[$FieldName] = $Value;
    }
 
    /**

@@ -36,13 +36,14 @@ class HTMLawedPlugin extends Gdn_Plugin {
 
 	/// METHODS ///
 	public function Format($Html) {
-	   $Elements = C('Plugins.HtmLawed.BlockedElements', '*-applet-form-input-textarea-iframe-script-style'); // object, embed allowed
+	   $Elements = C('Garden.Html.AllowedElements');
+      $Attributes = C('Garden.Html.BlockedAttributes', 'on*');
       $Config = array(
        'anti_link_spam' => array('`.`', ''),
        'comment' => 1,
        'cdata' => 3,
        'css_expression' => 1,
-       'deny_attribute' => 'on*',
+       'deny_attribute' => $Attributes,
        'unique_ids' => 0,
        'elements' => $Elements,
        'keep_bad' => 0,

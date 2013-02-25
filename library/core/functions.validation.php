@@ -285,7 +285,7 @@ if (!function_exists('ValidateLength')) {
 
 if (!function_exists('ValidateEnum')) {
    function ValidateEnum($Value, $Field) {
-      return in_array($Value, $Field->Enum);
+      return (in_array($Value, $Field->Enum) || ($Field->AllowNull && is_null($Value)));
    }
 }
 
@@ -326,6 +326,21 @@ if (!function_exists('ValidateMatch')) {
    function ValidateMatch($Value, $Field, $PostedFields) {
       $MatchValue = ArrayValue($Field->Name.'Match', $PostedFields);
       return $Value == $MatchValue ? TRUE : FALSE;
+   }
+}
+
+if (!function_exists('ValidateStrength')) {
+   /**
+    * Validate a password's strength
+    * 
+    * @param string $Value
+    * @param string $Field
+    * @param array $FormValues
+    */
+   function ValidateStrength($Value, $Field, $PostedFields) {
+      $UsernameValue = GetValue('Name', $PostedFields);
+      $PScore = PasswordStrength($Value, $UsernameValue);
+      return $PScore['Pass'] ? TRUE : FALSE;
    }
 }
 

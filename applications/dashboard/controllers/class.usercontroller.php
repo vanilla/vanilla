@@ -252,7 +252,7 @@ class UserController extends DashboardController {
       $UserModel = new UserModel();
       $Data = $UserModel->GetLike(array('u.Name' => $Q), 'u.Name', 'asc', 10, 0);
       foreach ($Data->Result() as $User) {
-         echo $User->Name.'|'.Gdn_Format::Text($User->UserID)."\n";
+         echo Gdn_Format::Text($User->Name).'|'.Gdn_Format::Text($User->UserID)."\n";
       }
       $this->Render();
    }
@@ -498,7 +498,7 @@ class UserController extends DashboardController {
             // If a new password was specified, add it to the form's collection
             $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
             $NewPassword = $this->Form->GetValue('NewPassword', '');
-            if ($ResetPassword !== FALSE)
+            if ($ResetPassword == 'Manual') 
                $this->Form->SetFormValue('Password', $NewPassword);
             
             // Role changes
@@ -525,8 +525,10 @@ class UserController extends DashboardController {
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
             
             if ($this->Form->Save(array('SaveRoles' => TRUE)) !== FALSE) {
-               if ($this->Form->GetValue('Password', '') != '')
-                  $UserModel->SendPasswordEmail($UserID, $NewPassword);
+               if ($this->Form->GetValue('ResetPassword', '') == 'Auto') {
+                  $UserModel->PasswordRequest($this->User->Email);
+                  $UserModel->SetField($UserID, 'HashMethod', 'Reset'); 
+               }
 
                $this->InformMessage(T('Your changes have been saved.'));
             }
@@ -586,6 +588,9 @@ class UserController extends DashboardController {
             }
             $FilterValue = $Parts[2];
          }
+         
+         if (!in_array($Field, array('InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastVisit')))
+            return FALSE;
 
          return array("$Field $Op" => $FilterValue);
       }
@@ -699,7 +704,7 @@ class UserController extends DashboardController {
    public function Verify($UserID, $Verified) {
       $this->Permission('Garden.Moderation.Manage');
       
-      if (!$this->Request->IsPostBack()) {
+      if (!$this->Request->IsAuthenticatedPostBack()) {
          throw PermissionException('Javascript');
       }
       

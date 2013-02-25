@@ -19,7 +19,7 @@ if ($Photo) {
 ?>
    <div class="Photo PhotoWrap PhotoWrapLarge <?php echo GetValue('_CssClass', $User); ?>">
       <?php
-      if (StringBeginsWith($Photo, 'http'))
+      if (IsUrl($Photo))
          $Img = Img($Photo, array('class' => 'ProfilePhotoLarge'));
       else
          $Img = Img(Gdn_Upload::Url(ChangeBasename($Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));

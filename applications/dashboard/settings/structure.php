@@ -603,7 +603,7 @@ $Construct->Table('Tag')
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
    ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'))
-   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration'), FALSE, 'index')
+   ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group'), FALSE, 'index')
    ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record
@@ -676,6 +676,7 @@ $Construct
    ->Column('ThumbPath', 'varchar(255)', NULL)
    
    ->Set(FALSE, FALSE);
+
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');

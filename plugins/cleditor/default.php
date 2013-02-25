@@ -53,7 +53,7 @@ v1.1.1 28SEPT2011 - Linc
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.2.4',
+   'Version' => '1.2.7',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -136,6 +136,7 @@ a.PreviewButton {
                     "style | color highlight removeformat | bullets numbering | outdent indent | " +
                     "alignleft center alignright | undo redo | " +
                     "image link unlink | source fullscreen",
+            docType: '<!DOCTYPE html>',
             docCSSFile: "$CssPath"
          })[0];
 			this.editor = ed; // Support other plugins!

@@ -560,6 +560,8 @@ class ProfileController extends Gdn_Controller {
          exit();
       }
       
+      $this->AddJsFile('password.js');
+      
       // Get user data and set up form
       $this->GetUserInfo();
       
@@ -577,6 +579,7 @@ class ProfileController extends Gdn_Controller {
          }
          
          $this->UserModel->Validation->ApplyRule('Password', 'Required');
+         $this->UserModel->Validation->ApplyRule('Password', 'Strength');
          $this->UserModel->Validation->ApplyRule('Password', 'Match');
          
          if ($this->Form->Save()) {

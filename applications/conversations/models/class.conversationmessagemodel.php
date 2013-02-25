@@ -179,11 +179,17 @@ class ConversationMessageModel extends Gdn_Model {
       $this->Validation->ApplyRule('Body', 'Required');
       $this->AddInsertFields($FormPostValues);
       
+      $this->EventArguments['FormPostValues'] = $FormPostValues;
+      $this->FireEvent('BeforeSaveValidation');
+      
       // Validate the form posted values
       $MessageID = FALSE;
       if($this->Validate($FormPostValues)) {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
          TouchValue('Format', $Fields, C('Garden.InputFormatter', 'Html'));
+         
+         $this->EventArguments['Fields'] = $Fields;
+         $this->FireEvent('BeforeSave');
          
          $MessageID = $this->SQL->Insert($this->Name, $Fields);
          $this->LastMessageID = $MessageID;
@@ -192,6 +198,11 @@ class ConversationMessageModel extends Gdn_Model {
          if (!$Conversation)
             $Conversation = $this->SQL->GetWhere('Conversation', array('ConversationID' => $ConversationID))->FirstRow(DATASET_TYPE_ARRAY);
 
+         $Message = $this->GetID($MessageID);
+         $this->EventArguments['Conversation'] = $Conversation;
+         $this->EventArguments['Message'] = $Message;
+         $this->FireEvent('AfterSave');
+         
          // Get the new message count for the conversation.
          $SQLR = $this->SQL
             ->Select('MessageID', 'count', 'CountMessages')
@@ -295,6 +306,8 @@ class ConversationMessageModel extends Gdn_Model {
             $ConversationModel = new ConversationModel();
             $ConversationModel->UpdateUserUnreadCount($UpdateCountUserIDs, TRUE);
          }
+         
+         $this->FireEvent('AfterAdd');
 
          $ActivityModel = new ActivityModel();
          foreach ($NotifyUserIDs as $NotifyUserID) {

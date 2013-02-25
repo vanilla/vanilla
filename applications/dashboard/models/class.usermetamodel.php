@@ -150,17 +150,36 @@ class UserMetaModel extends Gdn_Model {
          }
          
          $UserMeta = $this->GetUserMeta($UserID);
-         if ($Value === NULL)
-            unset($UserMeta[$Key]);
-         else
-            $UserMeta[$Key] = $Value;
+         if (!stristr($Key, '%')) {
+            if ($Value === NULL)
+               unset($UserMeta[$Key]);
+            else
+               $UserMeta[$Key] = $Value;
+         } else {
+            $MatchKey = str_replace('%','*',$Key);
+            foreach ($UserMeta as $UserMetaKey => $UserMetaValue) {
+               if (fnmatch($MatchKey, $UserMetaKey)) {
+                  if ($Value === NULL)
+                     unset($UserMeta[$UserMetaKey]);
+                  else
+                     $UserMeta[$UserMetaKey] = $Value;
+               }
+            }
+         }
          
          $CacheKey = 'UserMeta_'.$UserID;
          Gdn::Cache()->Store($CacheKey, $UserMeta);
          
          // Update the DB.
+         $this->SQL->Reset();
          if ($Value === NULL) {
-            $this->SQL->Delete('UserMeta', array('UserID' => $UserID, 'Name' => $Key));
+            $Q = $this->SQL->Where('UserID', $UserID);
+            if (stristr($Key, '%'))
+               $Q->Like('Name', $Key);
+            else
+               $Q->Where('Name', $Key);
+            
+            $Q->Delete('UserMeta');
          } else {
             $Px = $this->SQL->Database->DatabasePrefix;
             $Sql = "insert {$Px}UserMeta (UserID, Name, Value) values(:UserID, :Name, :Value) on duplicate key update Value = :Value1";

@@ -312,7 +312,7 @@ class ActivityController extends Gdn_Controller {
                 'Format' => $Data['Format'],
                 'NotifyUserID' => $NotifyUserID
             );
-            $this->SetJson('StatusMessage', Gdn_Format::Display($Data['Comment']));
+            $this->SetJson('StatusMessage', Gdn_Format::PlainText($Activity['Story'], $Activity['Format']));
          }
          
          $Activity = $this->ActivityModel->Save($Activity, FALSE, array('CheckSpam' => TRUE));

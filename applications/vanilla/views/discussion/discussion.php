@@ -5,7 +5,7 @@ $Discussion = $this->Data('Discussion');
 $Author = Gdn::UserModel()->GetID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
 
 // Prep event args
-$CssClass = CssClass($Discussion);
+$CssClass = CssClass($Discussion, FALSE);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
 $this->EventArguments['CssClass'] = &$CssClass;
@@ -58,7 +58,7 @@ $this->FireEvent('BeforeDiscussionDisplay');
             if (C('Vanilla.Categories.Use')) {
                echo ' <span class="MItem Category">';
                echo ' '.T('in').' ';
-               echo Anchor($this->Data('Discussion.Category'), CategoryUrl($this->Data('Discussion.CategoryUrlCode')));
+               echo Anchor(htmlspecialchars($this->Data('Discussion.Category')), CategoryUrl($this->Data('Discussion.CategoryUrlCode')));
                echo '</span> ';
             }
             $this->FireEvent('DiscussionInfo');

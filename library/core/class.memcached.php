@@ -44,8 +44,6 @@ class Gdn_Memcached extends Gdn_Cache {
          $PoolIndex = mt_rand(1, $PoolSize);
          $PoolKey = sprintf($PoolKeyFormat, $PoolIndex);
          $this->Memcache = new Memcached($PoolKey);
-         
-         var_dump($this->Memcache->isPersistent());
       } else {
          $this->Memcache = new Memcached;
       }
@@ -227,16 +225,45 @@ class Gdn_Memcached extends Gdn_Cache {
    public function Increment($Key, $Amount = 1, $Options = array()) {
       $FinalOptions = array_merge($this->StoreDefaults, $Options);
       
+      $Initial = GetValue(Gdn_Cache::FEATURE_INITIAL, $FinalOptions, 0);
+      $Expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY, $FinalOptions, 0);
+      $RequireBinary = $Initial || $Expiry;
+      $Initial = !is_null($Initial) ? $Initial : 0;
+      $Expiry = !is_null($Expiry) ? $Expiry : 0;
+      
+      $TryBinary = $this->Option(Memcached::OPT_BINARY_PROTOCOL, FALSE) & $RequireBinary;
       $RealKey = $this->MakeKey($Key, $FinalOptions);
-      $Incremented = $this->Memcache->increment($RealKey, $Amount);
+      switch ($TryBinary) {
+         case FALSE:
+            $Incremented = $this->Memcache->increment($RealKey, $Amount);
+            break;
+         case TRUE;
+            $Incremented = $this->Memcache->increment($RealKey, $Amount, $Initial, $Expiry);
+            break;
+      }
       return ($Incremented !== FALSE) ? $Incremented : Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Decrement($Key, $Amount = 1, $Options = array()) {
       $FinalOptions = array_merge($this->StoreDefaults, $Options);
       
+      $Initial = GetValue(Gdn_Cache::FEATURE_INITIAL, $FinalOptions, NULL);
+      $Expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY, $FinalOptions, NULL);
+      $RequireBinary = $Initial || $Expiry;
+      $Initial = !is_null($Initial) ? $Initial : 0;
+      $Expiry = !is_null($Expiry) ? $Expiry : 0;
+      
+      $TryBinary = $this->Option(Memcached::OPT_BINARY_PROTOCOL, FALSE) & $RequireBinary;
       $RealKey = $this->MakeKey($Key, $FinalOptions);
-      return $this->Memcache->decrement($RealKey, $Amount);
+      switch ($TryBinary) {
+         case FALSE:
+            $Decremented = $this->Memcache->decrement($RealKey, $Amount);
+            break;
+         case TRUE;
+            $Decremented = $this->Memcache->decrement($RealKey, $Amount, $Initial, $Expiry);
+            break;
+      }
+      return ($Decremented !== FALSE) ? $Decremented : Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Flush() {
@@ -245,5 +272,9 @@ class Gdn_Memcached extends Gdn_Cache {
    
    public function ResultCode() {
       return $this->Memcache->getResultCode();
+   }
+   
+   public function ResultMessage() {
+      return $this->Memcache->getResultMessage();
    }
 }

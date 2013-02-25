@@ -73,7 +73,7 @@ function CategoryLink($Discussion, $Prefix = ' ') {
    $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
    
    if ($Category) {
-      return Wrap($Prefix.Anchor($Category['Name'], $Category['Url']), 'span', array('class' => 'MItem Category'));
+      return Wrap($Prefix.Anchor(htmlspecialchars($Category['Name']), $Category['Url']), 'span', array('class' => 'MItem Category'));
    }
 }
 
@@ -185,7 +185,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
             }
          
             if (C('Vanilla.Categories.Use') && $Category)
-               echo Wrap(Anchor($Discussion->Category, CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category '.$Category['CssClass']));
+               echo Wrap(Anchor(htmlspecialchars($Discussion->Category), CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category '.$Category['CssClass']));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>

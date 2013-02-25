@@ -23,7 +23,11 @@ require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla
       ?>
       <li id="Category_<?php echo $Row['CategoryID']; ?>" class="Item Category">
          <div class="ItemContent Category">
-            <?php echo Wrap(Anchor($Row['Name'], $Row['Url'], 'Title'), 'h3', array('class' => 'CategoryName TitleWrap')); ?>
+            <h3 class="CategoryName TitleWrap"><?php 
+               echo Anchor(htmtspecialchars($Row['Name']), $Row['Url'], 'Title');
+               Gdn::Controller()->EventArguments['Category'] = $Row;
+               Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
+            ?></h3>
             
             <?php if ($Row['Description']): ?>
             <div class="CategoryDescription">

@@ -119,6 +119,7 @@ class Gdn_Validation {
       $this->AddRule('MinimumAge', 'function:ValidateMinimumAge');
       $this->AddRule('Captcha', 'function:ValidateCaptcha');
       $this->AddRule('Match', 'function:ValidateMatch');
+      $this->AddRule('Strength', 'function:ValidateStrength');
       $this->AddRule('OldPassword', 'function:ValidateOldPassword');
       $this->AddRule('Version', 'function:ValidateVersion');
       $this->AddRule('PhoneNA', 'function:ValidatePhoneNA');
@@ -152,13 +153,13 @@ class Gdn_Validation {
 
             // Force other constraints based on field type.
             switch($Properties->Type) {
-               case 'tinyint':
                case 'bit':
                case 'bool':
                case 'boolean':
                   $RuleNames[] = 'Boolean';
                   break;
 
+               case 'tinyint':
                case 'smallint':
                case 'mediumint':
                case 'int':

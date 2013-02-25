@@ -149,13 +149,13 @@ class PostController extends VanillaController {
 
             if (is_object($this->Category)) {
                // Check category permissions.
-               if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               if ($this->Form->GetFormValue('Announce', '') && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to announce in this category', 'Announce');
 
-               if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               if ($this->Form->GetFormValue('Close', '') && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to close in this category', 'Close');
 
-               if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               if ($this->Form->GetFormValue('Sink', '') && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
                if (!isset($this->Discussion) && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
@@ -338,24 +338,35 @@ class PostController extends VanillaController {
          $this->Form->AddHidden('vanilla_category_id', $vanilla_category_id);
          
          $PageInfo = FetchPageInfo($vanilla_url);
-         $Title = GetValue('Title', $PageInfo, '');
-         if ($Title == '')
-            $Title = T('Undefined discussion subject.');
+         
+         if (!($Title = $this->Form->GetFormValue('Name'))) {
+            $Title = GetValue('Title', $PageInfo, '');
+            if ($Title == '')
+               $Title = T('Undefined discussion subject.');
+         }
+         
          $Description = GetValue('Description', $PageInfo, '');
          $Images = GetValue('Images', $PageInfo, array());
          $LinkText = T('EmbededDiscussionLinkText', 'Read the full story here');
-         $Body = FormatString('
-         <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
-            <p>{Excerpt}</p>
-            <p><a href="{Url}">{LinkText}</a></p>
-            <div class="ClearFix"></div>
-         </div>', array(
-             'Title' => $Title,
-             'Excerpt' => $Description,
-             'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
-             'Url' => $vanilla_url,
-             'LinkText' => $LinkText
-         ));
+         
+         if (!$Description && count($Images) == 0) {
+            $Body = FormatString('<p><a href="{Url}">{LinkText}</a></p>', 
+               array('Url' => $vanilla_url, 'LinkText' => $LinkText));
+         } else {
+            $Body = FormatString('
+            <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
+               <p>{Excerpt}</p>
+               <p><a href="{Url}">{LinkText}</a></p>
+               <div class="ClearFix"></div>
+            </div>', array(
+                'Title' => $Title,
+                'Excerpt' => $Description,
+                'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
+                'Url' => $vanilla_url,
+                'LinkText' => $LinkText
+            ));
+         }
+         
          if ($Body == '')
             $Body = $vanilla_url;
          if ($Body == '')
@@ -383,11 +394,16 @@ class PostController extends VanillaController {
             $vanilla_category_id = $Category['CategoryID'];
          }
          
-         $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+         $EmbedUserID = C('Garden.Embed.UserID');
+         if ($EmbedUserID)
+            $EmbedUser = Gdn::UserModel()->GetID($EmbedUserID);
+         if (!$EmbedUserID || !$EmbedUser)
+            $EmbedUserID = Gdn::UserModel()->GetSystemUserID();
+         
          $EmbeddedDiscussionData = array(
-            'InsertUserID' => $SystemUserID,
+            'InsertUserID' => $EmbedUserID,
             'DateInserted' => Gdn_Format::ToDateTime(),
-            'UpdateUserID' => $SystemUserID,
+            'UpdateUserID' => $EmbedUserID,
             'DateUpdated' => Gdn_Format::ToDateTime(),
             'CategoryID' => $vanilla_category_id,
             'ForeignID' => $vanilla_identifier,
@@ -491,6 +507,19 @@ class PostController extends VanillaController {
             $this->Form->AddHidden('DraftID', $DraftID, TRUE);
             $this->Form->SetValidationResults($this->DraftModel->ValidationResults());
          } else if (!$Preview) {
+            // Fix an undefined title if we can.
+            if ($this->Form->GetFormValue('Name') && GetValue('Name', $Discussion) == T('Undefined discussion subject.')) {
+               $Set = array('Name' => $this->Form->GetFormValue('Name'));
+               
+               if (isset($vanilla_url) && $vanilla_url && strpos(GetValue('Body', $Discussion), T('Undefined discussion subject.')) !== FALSE) {
+                  $LinkText = T('EmbededDiscussionLinkText', 'Read the full story here');
+                  $Set['Body'] = FormatString('<p><a href="{Url}">{LinkText}</a></p>', 
+                     array('Url' => $vanilla_url, 'LinkText' => $LinkText));
+               }
+               
+               $this->DiscussionModel->SetField(GetValue('DiscussionID', $Discussion), $Set);
+            }
+            
             $Inserted = !$CommentID;
             $CommentID = $this->CommentModel->Save($FormValues);
 

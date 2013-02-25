@@ -842,8 +842,10 @@ jQuery(document).ready(function($) {
     doc.open();
     doc.write(
       options.docType +
-      '<html>' +
+      '<html><head>' +
       ((options.docCSSFile === '') ? '' : '<head><link rel="stylesheet" type="text/css" href="' + options.docCSSFile + '" /></head>') +
+      '<meta http-equiv="X-UA-Compatible" content="IE=edge" />' + 
+      '</head>' + 
       '<body style="' + options.bodyStyle + '"></body></html>'
     );
     doc.close();

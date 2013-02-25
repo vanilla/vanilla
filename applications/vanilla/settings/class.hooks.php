@@ -179,6 +179,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
       $UserID = ArrayValue(0, $Sender->EventArguments, '');
 		$CategoryID = ArrayValue(1, $Sender->EventArguments, '');
+      $Permission = GetValue(2, $Sender->EventArguments, 'Vanilla.Discussions.View');
 		if ($UserID && $CategoryID) {
          if ($PermissionModel === NULL)
             $PermissionModel = new PermissionModel();
@@ -189,8 +190,8 @@ class VanillaHooks implements Gdn_IPlugin {
          else
             $PermissionCategoryID = -1;
          
-         $Result = $PermissionModel->GetUserPermissions($UserID, 'Vanilla.Discussions.View', 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
-         return (GetValue('Vanilla.Discussions.View', GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
+         $Result = $PermissionModel->GetUserPermissions($UserID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
+         return (GetValue($Permission, GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
       }
       return FALSE;
    }
@@ -430,7 +431,7 @@ class VanillaHooks implements Gdn_IPlugin {
       $DiscussionModel = new DiscussionModel();
       $Discussions = $DiscussionModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
       $CountDiscussions = $Offset + $DiscussionModel->LastDiscussionCount + 1;
-      $Sender->DiscussionData = $Discussions;
+      $Sender->DiscussionData = $Sender->SetData('Discussions', $Discussions);
       
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
@@ -477,8 +478,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 */
    public function SettingsController_DefineAdminPermissions_Handler($Sender) {
       if (isset($Sender->RequiredAdminPermissions)) {
-         $Sender->RequiredAdminPermissions[] = 'Vanilla.Settings.Manage';
-         $Sender->RequiredAdminPermissions[] = 'Vanilla.Categories.Manage';
+         $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       }
    }
    
@@ -539,8 +539,8 @@ class VanillaHooks implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Moderation', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage');
-      $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-      $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
+      $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Garden.Settings.Manage');
+      $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Garden.Settings.Manage');
       $Menu->AddLink('Forum', T('Blog Comments'), 'dashboard/embed/comments', 'Garden.Settings.Manage');
       $Menu->AddLink('Forum', T('Embed Forum'), 'dashboard/embed/forum', 'Garden.Settings.Manage');
    }

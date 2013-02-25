@@ -903,13 +903,17 @@ class DiscussionModel extends VanillaModel {
       return self::$_CategoryPermissions;
    }
    
-   public function FetchPageInfo($Url) {
-      $PageInfo = FetchPageInfo($Url);
+   public function FetchPageInfo($Url, $ThrowError = FALSE) {
+      $PageInfo = FetchPageInfo($Url, 3, $ThrowError);
       
       $Title = GetValue('Title', $PageInfo, '');
-      if ($Title == '')
+      if ($Title == '') {
+         if ($ThrowError) {
+            throw new Gdn_UserException(T("The page didn't contain any information."));
+         }
+         
          $Title = FormatString(T('Undefined discussion subject.'), array('Url' => $Url));
-      else {
+      } else {
          if ($Strip = C('Vanilla.Embed.StripPrefix'))
             $Title = StringBeginsWith($Title, $Strip, TRUE, TRUE);
          
@@ -1679,6 +1683,7 @@ class DiscussionModel extends VanillaModel {
          
          $CategoryModel = new CategoryModel();
          $CategoryModel->SetField($CategoryID, $CacheAmendment);
+         $CategoryModel->SetRecentPost($CategoryID);
       }
    }
 	
@@ -1793,7 +1798,7 @@ class DiscussionModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
 	public function AddView($DiscussionID) {
-      
+      $IncrementBy = 0;
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
          $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);

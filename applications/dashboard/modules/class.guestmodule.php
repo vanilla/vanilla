@@ -14,6 +14,12 @@ class GuestModule extends Gdn_Module {
    public $MessageCode = 'GuestModule.Message';
    public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
    
+   public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+      if (!$ApplicationFolder)
+         $ApplicationFolder = 'Dashboard';
+      parent::__construct($Sender, $ApplicationFolder);
+   }
+   
    public function AssetTarget() {
       return 'Panel';
    }

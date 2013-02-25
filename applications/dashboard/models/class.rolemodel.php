@@ -288,14 +288,18 @@ class RoleModel extends Gdn_Model {
          $Permissions = $PermissionModel->PivotPermissions($Permissions, array('RoleID' => $RoleID));
          $PermissionModel->SaveAll($Permissions, array('RoleID' => $RoleID));
          
-         // Remove the cached permissions for all users with this role.
-         $this->SQL->Update('User')
-            ->Join('UserRole', 'User.UserID = UserRole.UserID')
-            ->Set('Permissions', '')
-            ->Where(array('UserRole.RoleID' => $RoleID))
-            ->Put();
-         
-         $this->ClearCache();
+         if (Gdn::Cache()->ActiveEnabled()) {
+            // Don't update the user table if we are just using cached permissions.
+            $this->ClearCache();
+            Gdn::UserModel()->ClearPermissions();
+         } else {
+            // Remove the cached permissions for all users with this role.
+            $this->SQL->Update('User')
+               ->Join('UserRole', 'User.UserID = UserRole.UserID')
+               ->Set('Permissions', '')
+               ->Where(array('UserRole.RoleID' => $RoleID))
+               ->Put();
+         }
       } else {
          $RoleID = FALSE;
       }

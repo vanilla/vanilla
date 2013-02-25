@@ -31,7 +31,7 @@
       <li>
          <?php
             echo $this->Form->Label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password', array('Wrap' => TRUE));
+            echo $this->Form->Input('Password', 'password', array('Wrap' => TRUE, 'Strength' => TRUE));
          ?>
       </li>
       <li>

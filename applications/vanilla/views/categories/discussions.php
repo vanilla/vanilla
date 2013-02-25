@@ -12,8 +12,12 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       
       if ($this->DiscussionData->NumRows() > 0) : ?>
       
-   <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
-      <?php echo Wrap(Anchor($Category->Name, '/categories/'.$Category->UrlCode), 'h2', array('class' => 'H')); ?>
+   <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">      
+      <h2 class="H"><?php
+            echo Anchor(htmlspecialchars($Category->Name), CategoryUrl($Category));
+            Gdn::Controller()->EventArguments['Category'] = $Category;
+            Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
+      ?></h2>
       
       <ul class="DataList Discussions">
          <?php include($this->FetchViewLocation('discussions', 'discussions')); ?>

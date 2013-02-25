@@ -31,12 +31,12 @@ if ($this->Data !== FALSE) {
       echo '<li class="ClearFix '.$CssClass.'">';
 
       if ($DoHeadings && $Category->Depth == 1) {
-         echo Gdn_Format::Text($Category->Name)
+         echo htmlspecialchars($Category->Name)
             .' <span class="Aside"><span class="Count Hidden">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
       } else {
          $CountText = ' <span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
          
-         echo Anchor(Gdn_Format::Text($Category->Name).$CountText, CategoryUrl($Category), 'ItemLink');
+         echo Anchor(htmlspecialchars($Category->Name).$CountText, CategoryUrl($Category), 'ItemLink');
       }
       echo "</li>\n";
    }

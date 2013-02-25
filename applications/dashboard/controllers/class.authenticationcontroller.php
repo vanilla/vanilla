@@ -53,6 +53,7 @@ class AuthenticationController extends DashboardController {
     */
    public function Initialize() {
       parent::Initialize();
+      Gdn_Theme::Section('Dashboard');
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/authentication');
          

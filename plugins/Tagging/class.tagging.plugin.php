@@ -9,6 +9,7 @@
  * Changes: 
  *  1.5     Fix TagModule usage
  *  1.6     Add tag permissions
+ *  1.6.1   Add tag permissions to UI
  * 
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -19,19 +20,19 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.6',
+   'Version' => '1.6.1',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit')
 );
 
 class TaggingPlugin extends Gdn_Plugin {
    
    public function __construct() {
       parent::__construct();
-      //die('tagging');
    }
    
    /**

@@ -610,7 +610,7 @@ class TaggingPlugin extends Gdn_Plugin {
       }
 
       $Sender->SetData('Title', T('Delete Tag'));
-      return $Sender->Render('delete', '', 'plugins/Tagging');
+      $Sender->Render('delete', '', 'plugins/Tagging');
    }
 
    /**

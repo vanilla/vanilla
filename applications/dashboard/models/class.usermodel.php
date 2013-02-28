@@ -984,6 +984,11 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          $Fields['UserID'] = 1;
          
+         // Encrypt the password for saving only if it won't be hashed in _Insert()
+         $PasswordHash = new Gdn_PasswordHash();
+         $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
+         $Fields['HashMethod'] = 'Vanilla';
+         
          if ($this->GetID($UserID) !== FALSE) {
             $this->SQL->Put($this->Name, $Fields);
          } else {

@@ -152,7 +152,7 @@ class UserModel extends Gdn_Model {
       }
 
       // Make sure to encrypt the password for saving...
-      if (array_key_exists('Password', $Fields)) {
+      if (array_key_exists('Password', $Fields) && !array_key_exists('HashMethod', $Fields)) {
          $PasswordHash = new Gdn_PasswordHash();
          $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
          $Fields['HashMethod'] = 'Vanilla';
@@ -985,7 +985,12 @@ class UserModel extends Gdn_Model {
          $Fields['UserID'] = 1;
          
          if ($this->GetID($UserID) !== FALSE) {
-            $this->SQL->Put($this->Name, $Fields);
+            // Re-hash the password here.
+            $PasswordHash = new Gdn_PasswordHash();
+            $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
+            $Fields['HashMethod'] = 'Vanilla';
+            
+            $this->SQL->Put($this->Name, $Fields, array('UserID' => 1));
          } else {
             // Insert the new user
             $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));

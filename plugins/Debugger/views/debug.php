@@ -23,7 +23,7 @@ if (Gdn::Cache()->ActiveEnabled()) {
    }
    echo '</pre>';
    
-   if (property_exists('Gdn_Cache', 'trackGet')) {
+   if (property_exists('Gdn_Cache', 'trackGet') && sizeof(Gdn_Cache::$trackGet)) {
       
       uasort(Gdn_Cache::$trackGet, function($a, $b){
          return $b['hits'] - $a['hits'];

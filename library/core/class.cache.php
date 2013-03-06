@@ -99,8 +99,11 @@ abstract class Gdn_Cache {
    const CACHE_TYPE_FILE = 'ct_file';
    const CACHE_TYPE_NULL = 'ct_null';
    
-   public static $GetCount = 0;
-   public static $GetTime = 0;
+   public static $trackGet = array();
+   public static $trackGets = 0;
+   public static $trackSet = array();
+   public static $trackSets = 0;
+   public static $trackTime = 0;
 
    public function __construct() {
       $this->Containers = array();

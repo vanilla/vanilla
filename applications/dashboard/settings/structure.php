@@ -670,34 +670,6 @@ $Construct
    
    ->Set(FALSE, FALSE);
 
-/**
- * Log significant operations against used IP
- * Non unique.
- */
-$Construct
-   ->Table('IpLog')
-   ->PrimaryKey('IpLogID')
-   ->Column('UserID', 'int(11)', 'index')
-   ->Column('Event', 'varchar(32)', 'index')       // register, visit, ipchange
-   ->Column('IPAddress', 'varchar(60)', 'index')   // dotted quad format, or ipv6
-   ->Column('IPLong', 'int')                       // ip2long format
-   ->Column('DateInserted', 'datetime')
-   ->Column('DateUpdated', 'datetime')
-   ->Set(FALSE, FALSE);
-
-/**
- * Track all used IPs per user
- * Each user/ip combination is unique
- */
-$Construct
-   ->Table('IpTrack')
-   ->PrimaryKey('IpLogID')
-   ->Column('UserID', 'int(11)', 'unique')
-   ->Column('IPAddress', 'varchar(60)', 'unique')  // dotted quad format, or ipv6
-   ->Column('IPLong', 'int')                       // ip2long format
-   ->Column('DateInserted', 'datetime')
-   ->Column('DateUpdated', 'datetime')
-   ->Set(FALSE, FALSE);
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');

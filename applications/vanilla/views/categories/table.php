@@ -8,7 +8,7 @@ if (C('Vanilla.Categories.DoHeadings')) {
    foreach ($Categories as $Category) {
       ?>
       <div id="CategoryGroup-<?php echo $Category['UrlCode']; ?>" class="CategoryGroup">
-         <h2 class="H"><?php echo $Category['Name']; ?></h2>
+         <h2 class="H"><?php echo htmlspecialchars($Category['Name']); ?></h2>
          <?php
          WriteCategoryTable($Category['Children'], 2);
          ?>

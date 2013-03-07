@@ -175,7 +175,7 @@ class Gdn_Memcached extends Gdn_Cache {
    }
    
    public function Get($Key, $Options = array()) {
-      $StartTime = microtime(TRUE);
+      $startTime = microtime(TRUE);
       
       $FinalOptions = array_merge($this->StoreDefaults, $Options);
       
@@ -200,8 +200,41 @@ class Gdn_Memcached extends Gdn_Cache {
          $Data = $this->Memcache->get($RealKey);
       }
       
-      Gdn_Cache::$GetTime += microtime(TRUE) - $StartTime;
-      Gdn_Cache::$GetCount++;
+      // Track debug stats
+      $elapsedTime = microtime(TRUE) - $startTime;
+      if (Gdn_Cache::$trace) {
+         Gdn_Cache::$trackTime += $elapsedTime;
+         Gdn_Cache::$trackGets++;
+
+         if (!is_array($Key)) {
+            $RealKeys = array($RealKey);
+            $rData = array($RealKey => $Data);
+         }
+         
+         $keyTime = $elapsedTime / sizeof($RealKeys);
+         foreach ($RealKeys as $RealKey) {
+            TouchValue($RealKey, Gdn_Cache::$trackGet, array(
+               'hits'      => 0,
+               'time'      => 0,
+               'keysize'   => null,
+               'transfer'  => 0,
+               'wasted'    => 0
+            ));
+            Gdn_Cache::$trackGet[$RealKey]['hits']++;
+            Gdn_Cache::$trackGet[$RealKey]['time'] += $keyTime;
+            
+            $KeyData = GetValue($RealKey, $rData);
+            $KeyData = serialize($KeyData);
+            
+            $KeySize = strlen($KeyData);
+            if (is_null(Gdn_Cache::$trackGet[$RealKey]['keysize']))
+               Gdn_Cache::$trackGet[$RealKey]['keysize'] = $KeySize;
+            else
+               Gdn_Cache::$trackGet[$RealKey]['wasted'] += $KeySize;
+            
+            Gdn_Cache::$trackGet[$RealKey]['transfer'] += Gdn_Cache::$trackGet[$RealKey]['keysize'];
+         }
+      }
       
       return ($Data === FALSE) ? $this->Fallback($Key,$Options) : $Data;
    }

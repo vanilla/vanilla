@@ -101,8 +101,12 @@ abstract class Gdn_Cache {
    const CACHE_TYPE_FILE = 'ct_file';
    const CACHE_TYPE_NULL = 'ct_null';
    
-   public static $GetCount = 0;
-   public static $GetTime = 0;
+   public static $trace = true;
+   public static $trackGet = array();
+   public static $trackGets = 0;
+   public static $trackSet = array();
+   public static $trackSets = 0;
+   public static $trackTime = 0;
 
    public function __construct() {
       $this->Containers = array();
@@ -522,6 +526,15 @@ abstract class Gdn_Cache {
       }
       
       return GetValue($Key, $ActiveConfig, $Default);
+   }
+   
+   /**
+    * 
+    */
+   public static function Trace($trace = null) {
+      if (!is_null($trace))
+         Gdn_Cache::$trace = (bool)$trace;
+      return Gdn_Cache::$trace;
    }
    
    /**

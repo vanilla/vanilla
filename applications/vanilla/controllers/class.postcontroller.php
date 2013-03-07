@@ -768,13 +768,13 @@ function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array(
       $Value = array_pop(array_keys($ListOptions));
       
       // This can be represented by a checkbox.
-      return $Form->CheckBox($FieldName, $LabelCode, array('Value' => $Value));
+      return $Form->CheckBox($FieldName, $LabelCode);
    } else {
       $CssClass = GetValue('ListClass', $Attributes, 'List Inline');
       
       $Result = ' <b>'.T($LabelCode)."</b> <ul class=\"$CssClass\">";
       foreach ($ListOptions as $Value => $Code) {
-         $Result .= ' <li>'.$Form->Radio($FieldName, $Code).'</li> ';
+         $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
       }
       $Result .= '</ul>';
       return $Result;

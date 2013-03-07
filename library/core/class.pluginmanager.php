@@ -98,7 +98,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     */
    public function Start($Force = FALSE) {
       
-      if (function_exists('apc_fetch') && C('Garden.Apc', TRUE))
+      if (function_exists('apc_fetch') && C('Garden.Apc', FALSE))
          $this->Apc = TRUE;
 
       // Build list of all available plugins

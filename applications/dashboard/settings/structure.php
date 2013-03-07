@@ -670,6 +670,28 @@ $Construct
    
    ->Set(FALSE, FALSE);
 
+// Merge backup.
+$Construct
+   ->Table('UserMerge')
+   ->PrimaryKey('MergeID')
+   ->Column('OldUserID', 'int', FALSE, 'key')
+   ->Column('NewUserID', 'int', FALSE, 'key')
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertUserID', 'int')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('Attributes', 'text', TRUE)
+   ->Set();
+
+$Construct
+   ->Table('UserMergeItem')
+   ->Column('MergeID', 'int', FALSE, 'key')
+   ->Column('Table', 'varchar(30)')
+   ->Column('Column', 'varchar(30)')
+   ->Column('RecordID', 'int')
+   ->Column('OldUserID', 'int')
+   ->Column('NewUserID', 'int')
+   ->Set();
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');

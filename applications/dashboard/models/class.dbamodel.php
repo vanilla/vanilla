@@ -54,7 +54,8 @@ class DBAModel extends Gdn_Model {
       $Aggregate, // count, max, min, etc.
       $ParentTable, $ChildTable, 
       $ParentColumnName = '', $ChildColumnName = '',
-      $ParentJoinColumn = '', $ChildJoinColumn = '') {
+      $ParentJoinColumn = '', $ChildJoinColumn = '',
+      $Where = array()) {
 
       if(!$ParentColumnName) {
          switch(strtolower($Aggregate)) {
@@ -78,6 +79,17 @@ class DBAModel extends Gdn_Model {
                      select $Aggregate(c.$ChildColumnName)
                      from :_$ChildTable c
                      where p.$ParentJoinColumn = c.$ChildJoinColumn)";
+      
+      if (!empty($Where)) {
+         $Wheres = array();
+         $PDO = Gdn::Database()->Connection();
+         foreach ($Where as $Column => $Value) {
+            $Value = $PDO->quote($Value);
+            $Wheres[] = "p.`$Column` = $Value";
+         }
+         
+         $Result .= "\n where ".implode(" and ", $Wheres);
+      }
       
       $Result = str_replace(':_', Gdn::Database()->DatabasePrefix, $Result);
       return $Result;

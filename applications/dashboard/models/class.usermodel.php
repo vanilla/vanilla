@@ -24,8 +24,6 @@ class UserModel extends Gdn_Model {
    
    const LOGIN_RATE = 1;
    
-   static $UserCache = array();
-   
    public $SessionColumns;
    
    /**
@@ -864,11 +862,6 @@ class UserModel extends Gdn_Model {
          // Make keys for cache query
          foreach ($IDs as $UserID) {
             if (!$UserID) continue;
-            
-            if (isset(self::$UserCache[$UserID])) {
-               $Data[$UserID] = self::$UserCache[$UserID];
-               continue;
-            }
             
             $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          }
@@ -3197,11 +3190,7 @@ class UserModel extends Gdn_Model {
       
       if ($TokenType != 'userid') return FALSE;
       
-      // Check local page memory cache first
-      if (array_key_exists($UserID, self::$UserCache))
-         return self::$UserCache[$UserID];
-      
-      // Then memcached
+      // Get from memcached
       $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserToken));
       $User = Gdn::Cache()->Get($UserKey);
       
@@ -3230,9 +3219,6 @@ class UserModel extends Gdn_Model {
       if (is_null($UserID) || !$UserID) return FALSE;
       
       $Cached = TRUE;
-      
-      // Local memory page cache
-      self::$UserCache[$UserID] = $User;
       
       $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserID));
       $Cached = $Cached & Gdn::Cache()->Store($UserKey, $User, array(
@@ -3292,7 +3278,6 @@ class UserModel extends Gdn_Model {
          $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsIncrement));
          Gdn::Cache()->Remove($UserPermissionsKey);
       }
-      unset(self::$UserCache[$UserID]);
       return TRUE;
    }
    

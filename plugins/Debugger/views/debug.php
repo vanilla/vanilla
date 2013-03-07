@@ -17,9 +17,52 @@ if (Gdn::Cache()->ActiveEnabled()) {
    echo '<pre>';
    echo '<b>Cache Revision</b>: '.Gdn::Cache()->GetRevision()."\n";
    echo '<b>Permissions Revision</b>: '.Gdn::UserModel()->GetPermissionsIncrement()."\n";
-   echo '<b>Cache Gets</b>: '.sprintf('%s in %ss', Gdn_Cache::$GetCount, Gdn_Cache::$GetTime);
    
+   if (property_exists('Gdn_Cache', 'GetCount')) {
+      echo '<b>Cache Gets</b>: '.sprintf('%s in %ss', Gdn_Cache::$GetCount, Gdn_Cache::$GetTime);
+   }
    echo '</pre>';
+   
+   if (property_exists('Gdn_Cache', 'trackGet') && sizeof(Gdn_Cache::$trackGet)) {
+      
+      uasort(Gdn_Cache::$trackGet, function($a, $b){
+         return $b['hits'] - $a['hits'];
+      });
+      
+      $numKeys = sizeof(Gdn_Cache::$trackGet);
+      $duplicateGets = 0;
+      $wastedBytes = 0; $totalBytes = 0;
+      foreach (Gdn_Cache::$trackGet as $key => $keyData) {
+         if ($keyData['hits'] > 1) $duplicateGets += ($keyData['hits']-1);
+         $wastedBytes += $keyData['wasted'];
+         $totalBytes += $keyData['transfer'];
+      }
+      $wastedKB = round($wastedBytes / 1024, 2);
+      $totalKB = round($totalBytes / 1024, 2);
+      
+      echo "Gets\n";
+      echo '<pre>';
+      echo '<b>Trips to cache</b>: '.sprintf('%s in %ss', Gdn_Cache::$trackGets, Gdn_Cache::$trackTime)."\n";
+      echo '<b>Unique Keys</b>: '.sprintf('%s keys', $numKeys)."\n";
+      echo '<b>Total Transfer</b>: '.sprintf('%skB', $totalKB)."\n";
+      echo '<b>Wasted Transfer</b>: '.sprintf('%skB over %s duplicate key gets', $wastedKB, $duplicateGets)."\n";
+      echo '</pre>';
+      
+      foreach (Gdn_Cache::$trackGet as $key => $keyData) {
+         echo $key;
+         echo '<span>'.round($keyData['keysize'] / 1024, 2).'kB</span> ';
+         echo '<small>'.@number_format($keyData['time'], 6).'s</small><br/>';
+         if ($keyData['hits'] > 1) {
+            echo '<pre>';
+            echo '<b>Fetched</b>: '.$keyData['hits'];
+            if ($keyData['wasted']) {
+               $keyWastedKB = round($keyData['wasted'] / 1024, 2);
+               echo "\n<b>Wasted</b>: {$keyWastedKB}kB";
+            }
+            echo '</pre>';
+         }
+      }
+   }
 }
 ?>
 

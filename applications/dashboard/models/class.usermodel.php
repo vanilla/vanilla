@@ -21,7 +21,6 @@ class UserModel extends Gdn_Model {
    const LOGIN_RATE_KEY = 'user.login.{Source}.rate';
    
    const LOGIN_RATE = 1;
-   
    public $SessionColumns;
    
    /**

@@ -99,6 +99,7 @@ abstract class Gdn_Cache {
    const CACHE_TYPE_FILE = 'ct_file';
    const CACHE_TYPE_NULL = 'ct_null';
    
+   public static $trace = true;
    public static $trackGet = array();
    public static $trackGets = 0;
    public static $trackSet = array();
@@ -523,6 +524,15 @@ abstract class Gdn_Cache {
       }
       
       return GetValue($Key, $ActiveConfig, $Default);
+   }
+   
+   /**
+    * 
+    */
+   public static function Trace($trace = null) {
+      if (!is_null($trace))
+         Gdn_Cache::$trace = (bool)$trace;
+      return Gdn_Cache::$trace;
    }
    
    /**

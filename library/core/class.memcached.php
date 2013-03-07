@@ -237,7 +237,7 @@ class Gdn_Memcached extends Gdn_Cache {
          Gdn_Cache::$trackTime += $elapsedTime;
          Gdn_Cache::$trackGets++;
          
-         $keyTime = $elapsedTime / sizeof($realKeys);
+         $keyTime = sizeof($realKeys) ? $elapsedTime / sizeof($realKeys) : $elapsedTime;
          foreach ($realKeys as $realKey) {
             TouchValue($realKey, Gdn_Cache::$trackGet, array(
                'hits'      => 0,

@@ -137,7 +137,7 @@ class UserModel extends Gdn_Model {
          throw new Gdn_UserException("Could not find one or both users to merge.");
       }
       
-      $Map = array('UserID', 'Name', 'Email', 'CountDiscussions', 'CountComments');
+      $Map = array('UserID', 'Name', 'Email', 'CountVisits', 'CountDiscussions', 'CountComments');
       
       $Result = array('MergeID' => NULL, 'Before' => array(
          'OldUser' => ArrayTranslate($OldUser, $Map),
@@ -160,6 +160,11 @@ class UserModel extends Gdn_Model {
       // Copy all of the activity comments.
       $this->MergeCopy($MergeID, 'ActivityComment', 'InsertUserID', $OldUserID, $NewUserID);
       
+      // Copy all conversations.
+      $this->MergeCopy($MergeID, 'Conversation', 'InsertUserID', $OldUserID, $NewUserID);
+      $this->MergeCopy($MergeID, 'ConversationMessage', 'InsertUserID', $OldUserID, $NewUserID, 'MessageID');
+      $this->MergeCopy($MergeID, 'UserConversation', 'UserID', $OldUserID, $NewUserID, 'ConversationID');
+      
       $this->MergeFinish($MergeID);
       
       $OldUser = $this->GetID($OldUserID, DATASET_TYPE_ARRAY);
@@ -173,10 +178,13 @@ class UserModel extends Gdn_Model {
       return $Result;
    }
    
-   protected function MergeCopy($MergeID, $Table, $Column, $OldUserID, $NewUserID) {
+   protected function MergeCopy($MergeID, $Table, $Column, $OldUserID, $NewUserID, $PK = NULL) {
+      if (!$PK)
+         $PK = $Table.'ID';
+      
       // Insert the columns to the bak table.
       $Sql = "insert ignore GDN_UserMergeItem(`MergeID`, `Table`, `Column`, `RecordID`, `OldUserID`, `NewUserID`)
-         select :MergeID, :Table, :Column, `{$Table}ID`, :OldUserID, :NewUserID
+         select :MergeID, :Table, :Column, `$PK`, :OldUserID, :NewUserID
          from `GDN_$Table` t
          where t.`$Column` = :OldUserID2";
       Gdn::SQL()->Database->Query($Sql,

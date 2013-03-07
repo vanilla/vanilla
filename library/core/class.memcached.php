@@ -197,7 +197,8 @@ class Gdn_Memcached extends Gdn_Cache {
             $realKey = $this->MakeKey($multiKey, $finalOptions);
             
             // Skip this key if we already have it
-            if ($local = Gdn_Cache::LocalGet($realKey)) {
+            $local = Gdn_Cache::LocalGet($realKey);
+            if ($local !== Gdn_Cache::CACHEOP_FAILURE) {
                $localData[$realKey] = $local;
                continue;
             }
@@ -208,7 +209,8 @@ class Gdn_Memcached extends Gdn_Cache {
          $realKey = $this->MakeKey($key, $finalOptions);
          
          // Completely short circuit if we already have everything
-         if ($local = Gdn_Cache::LocalGet($realKey))
+         $local = Gdn_Cache::LocalGet($realKey);
+         if ($local !== false)
             return $local;
          
          $realKeys = array($realKey);
@@ -224,15 +226,23 @@ class Gdn_Memcached extends Gdn_Cache {
             $data = array($realKey => $data);
          }
 
+         $storeData = array();
+         foreach ($data as $localKey => $localValue)
+            if ($localValue !== false)
+               $storeData[$localKey] = $localValue;
+         $data = $storeData;
+         unset($storeData);
+         
          // Cache in process memory
-         Gdn_Cache::LocalSet($data);
+         if (sizeof($data))
+            Gdn_Cache::LocalSet($data);
       }
       
       // Merge in local data
       $data = array_merge($data, $localData);
       
       // Track debug stats
-      $elapsedTime = microtime(TRUE) - $startTime;
+      $elapsedTime = microtime(true) - $startTime;
       if (Gdn_Cache::$trace) {
          Gdn_Cache::$trackTime += $elapsedTime;
          Gdn_Cache::$trackGets++;
@@ -246,27 +256,33 @@ class Gdn_Memcached extends Gdn_Cache {
                'transfer'  => 0,
                'wasted'    => 0
             ));
+            
+            $keyData = GetValue($realKey, $data, false);
             Gdn_Cache::$trackGet[$realKey]['hits']++;
             Gdn_Cache::$trackGet[$realKey]['time'] += $keyTime;
             
-            $KeyData = GetValue($realKey, $data);
-            $KeyData = serialize($KeyData);
-            
-            $KeySize = strlen($KeyData);
-            if (is_null(Gdn_Cache::$trackGet[$realKey]['keysize']))
-               Gdn_Cache::$trackGet[$realKey]['keysize'] = $KeySize;
-            else
-               Gdn_Cache::$trackGet[$realKey]['wasted'] += $KeySize;
-            
-            Gdn_Cache::$trackGet[$realKey]['transfer'] += Gdn_Cache::$trackGet[$realKey]['keysize'];
+            if ($keyData !== false) {
+               $keyData = serialize($keyData);
+
+               $keySize = strlen($keyData);
+               if (is_null(Gdn_Cache::$trackGet[$realKey]['keysize']))
+                  Gdn_Cache::$trackGet[$realKey]['keysize'] = $keySize;
+               else
+                  Gdn_Cache::$trackGet[$realKey]['wasted'] += $keySize;
+
+               Gdn_Cache::$trackGet[$realKey]['transfer'] += Gdn_Cache::$trackGet[$realKey]['keysize'];
+            }
          }
       }
       
       // Miss: return the fallback
-      if ($data === FALSE) return $this->Fallback($key, $options);
+      if ($data === false) return $this->Fallback($key, $options);
       
       // Hit: Single key. Return the value
-      if (!$multi) return array_pop($data);
+      if (!$multi) {
+         $val = sizeof($data) ? array_pop($data) : false;
+         return $val;
+      }
       
       // Hit: Multi key. Return stripped array.
       $dataStripped = array();

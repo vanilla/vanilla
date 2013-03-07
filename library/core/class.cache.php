@@ -101,6 +101,13 @@ abstract class Gdn_Cache {
    const CACHE_TYPE_FILE = 'ct_file';
    const CACHE_TYPE_NULL = 'ct_null';
    
+   /**
+    * Local in-memory cache of fetched data
+    * This prevents duplicate gets to memcache
+    * @var array
+    */
+   protected static $localCache = array();
+   
    public static $trace = true;
    public static $trackGet = array();
    public static $trackGets = 0;
@@ -535,6 +542,17 @@ abstract class Gdn_Cache {
       if (!is_null($trace))
          Gdn_Cache::$trace = (bool)$trace;
       return Gdn_Cache::$trace;
+   }
+   
+   protected static function LocalGet($key) {
+      if (!array_key_exists($key, self::$localCache)) return Gdn_Cache::CACHEOP_FAILURE;
+      return self::$localCache[$key];
+   }
+   
+   protected static function LocalSet($key, $value = null) {
+      if (!is_array($key))
+         $key = array($key => $value);
+      self::$localCache = array_merge(self::$localCache, $key);
    }
    
    /**

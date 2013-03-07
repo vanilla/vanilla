@@ -3434,7 +3434,6 @@ class UserModel extends Gdn_Model {
       if (in_array('user', $CacheTypesToClear)) {
          $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          Gdn::Cache()->Remove($UserKey);
-         unset(self::$UserCache[$UserID]);
       }
       
       if (in_array('roles', $CacheTypesToClear)) {

@@ -31,17 +31,20 @@ if (Gdn::Cache()->ActiveEnabled()) {
       
       $numKeys = sizeof(Gdn_Cache::$trackGet);
       $duplicateGets = 0;
-      $wastedBytes = 0;
+      $wastedBytes = 0; $totalBytes = 0;
       foreach (Gdn_Cache::$trackGet as $key => $keyData) {
          if ($keyData['hits'] > 1) $duplicateGets += ($keyData['hits']-1);
          $wastedBytes += $keyData['wasted'];
+         $totalBytes += $keyData['transfer'];
       }
       $wastedKB = round($wastedBytes / 1024, 2);
+      $totalKB = round($totalBytes / 1024, 2);
       
       echo "Gets\n";
       echo '<pre>';
       echo '<b>Trips to cache</b>: '.sprintf('%s in %ss', Gdn_Cache::$trackGets, Gdn_Cache::$trackTime)."\n";
       echo '<b>Unique Keys</b>: '.sprintf('%s keys', $numKeys)."\n";
+      echo '<b>Total Transfer</b>: '.sprintf('%skB', $totalKB)."\n";
       echo '<b>Wasted Transfer</b>: '.sprintf('%skB over %s duplicate key gets', $wastedKB, $duplicateGets)."\n";
       echo '</pre>';
       

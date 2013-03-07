@@ -156,89 +156,126 @@ class Gdn_Memcached extends Gdn_Cache {
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
    
-   public function Add($Key, $Value, $Options = array()) {
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+   public function Add($key, $value, $options = array()) {
+      $finalOptions = array_merge($this->StoreDefaults, $options);
       
-      $Expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY,$FinalOptions,0);
+      $expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY,$finalOptions,0);
       
-      $RealKey = $this->MakeKey($Key, $FinalOptions);
-      $Stored = $this->Memcache->add($RealKey, $Value, $Expiry);
-      return ($Stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+      $realKey = $this->MakeKey($key, $finalOptions);
+      $stored = $this->Memcache->add($realKey, $value, $expiry);
+      if ($stored) {
+         Gdn_Cache::LocalSet($realKey, $value);
+         return Gdn_Cache::CACHEOP_SUCCESS;
+      }
+      return Gdn_Cache::CACHEOP_FAILURE;
    }
    
-   public function Store($Key, $Value, $Options = array()) {
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+   public function Store($key, $value, $options = array()) {
+      $finalOptions = array_merge($this->StoreDefaults, $options);
       
-      $Expiry = (int)GetValue(Gdn_Cache::FEATURE_EXPIRY,$FinalOptions,0);
+      $expiry = (int)GetValue(Gdn_Cache::FEATURE_EXPIRY,$finalOptions,0);
       
-      $RealKey = $this->MakeKey($Key, $FinalOptions);
-      $Stored = $this->Memcache->set($RealKey, $Value, $Expiry);
-      return ($Stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+      $realKey = $this->MakeKey($key, $finalOptions);
+      $stored = $this->Memcache->set($realKey, $value, $expiry);
+      if ($stored) {
+         Gdn_Cache::LocalSet($realKey, $value);
+         return Gdn_Cache::CACHEOP_SUCCESS;
+      }
+      return Gdn_Cache::CACHEOP_FAILURE;
    }
    
-   public function Get($Key, $Options = array()) {
+   public function Get($key, $options = array()) {
       $startTime = microtime(TRUE);
       
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+      $finalOptions = array_merge($this->StoreDefaults, $options);
       
-      if (is_array($Key)) {
-         $RealKeys = array();
-         foreach ($Key as $MultiKey)
-            $RealKeys[] = $this->MakeKey($MultiKey, $Options);
-         
-         $Data = $this->Memcache->getMulti($RealKeys);
-         
-         if (is_array($Data) && $Data !== FALSE) {
-            $Data2 = array();
-            foreach ($Data as $Index => $Value) {
-               $Data2[$this->StripKey($Index, $Options)] = $Value;
+      $localData = array();
+      $realKeys = array();
+      if (is_array($key)) {
+         $multi = true;
+         foreach ($key as $multiKey) {
+            $realKey = $this->MakeKey($multiKey, $finalOptions);
+            
+            // Skip this key if we already have it
+            if ($local = Gdn_Cache::LocalGet($realKey)) {
+               $localData[$realKey] = $local;
+               continue;
             }
-            $Data = $Data2;
-         } else {
-            $Data = array();
+            $realKeys[] = $realKey;
          }
       } else {
-         $RealKey = $this->MakeKey($Key, $FinalOptions);
-         $Data = $this->Memcache->get($RealKey);
+         $multi = false;
+         $realKey = $this->MakeKey($key, $finalOptions);
+         
+         // Completely short circuit if we already have everything
+         if ($local = Gdn_Cache::LocalGet($realKey))
+            return $local;
+         
+         $realKeys = array($realKey);
       }
+      
+      $data = array(); $hitCache = false;
+      if ($numKeys = sizeof($realKeys)) {
+         $hitCache = true;
+         if ($numKeys > 1) {
+            $data = $this->Memcache->getMulti($realKeys);
+         } else {
+            $data = $this->Memcache->get($realKey);
+            $data = array($realKey => $data);
+         }
+
+         // Cache in process memory
+         Gdn_Cache::LocalSet($data);
+      }
+      
+      // Merge in local data
+      $data = array_merge($data, $localData);
       
       // Track debug stats
       $elapsedTime = microtime(TRUE) - $startTime;
       if (Gdn_Cache::$trace) {
          Gdn_Cache::$trackTime += $elapsedTime;
          Gdn_Cache::$trackGets++;
-
-         if (!is_array($Key)) {
-            $RealKeys = array($RealKey);
-            $rData = array($RealKey => $Data);
-         }
          
-         $keyTime = $elapsedTime / sizeof($RealKeys);
-         foreach ($RealKeys as $RealKey) {
-            TouchValue($RealKey, Gdn_Cache::$trackGet, array(
+         $keyTime = $elapsedTime / sizeof($realKeys);
+         foreach ($realKeys as $realKey) {
+            TouchValue($realKey, Gdn_Cache::$trackGet, array(
                'hits'      => 0,
                'time'      => 0,
                'keysize'   => null,
                'transfer'  => 0,
                'wasted'    => 0
             ));
-            Gdn_Cache::$trackGet[$RealKey]['hits']++;
-            Gdn_Cache::$trackGet[$RealKey]['time'] += $keyTime;
+            Gdn_Cache::$trackGet[$realKey]['hits']++;
+            Gdn_Cache::$trackGet[$realKey]['time'] += $keyTime;
             
-            $KeyData = GetValue($RealKey, $rData);
+            $KeyData = GetValue($realKey, $data);
             $KeyData = serialize($KeyData);
             
             $KeySize = strlen($KeyData);
-            if (is_null(Gdn_Cache::$trackGet[$RealKey]['keysize']))
-               Gdn_Cache::$trackGet[$RealKey]['keysize'] = $KeySize;
+            if (is_null(Gdn_Cache::$trackGet[$realKey]['keysize']))
+               Gdn_Cache::$trackGet[$realKey]['keysize'] = $KeySize;
             else
-               Gdn_Cache::$trackGet[$RealKey]['wasted'] += $KeySize;
+               Gdn_Cache::$trackGet[$realKey]['wasted'] += $KeySize;
             
-            Gdn_Cache::$trackGet[$RealKey]['transfer'] += Gdn_Cache::$trackGet[$RealKey]['keysize'];
+            Gdn_Cache::$trackGet[$realKey]['transfer'] += Gdn_Cache::$trackGet[$realKey]['keysize'];
          }
       }
       
-      return ($Data === FALSE) ? $this->Fallback($Key,$Options) : $Data;
+      // Miss: return the fallback
+      if ($data === FALSE) return $this->Fallback($key, $options);
+      
+      // Hit: Single key. Return the value
+      if (!$multi) return array_pop($data);
+      
+      // Hit: Multi key. Return stripped array.
+      $dataStripped = array();
+      foreach ($data as $index => $value) {
+         $dataStripped[$this->StripKey($index, $finalOptions)] = $value;
+      }
+      $data = $dataStripped;
+      unset($dataStripped);
+      return $data;
    }
    
    public function Exists($Key, $Options = array()) {

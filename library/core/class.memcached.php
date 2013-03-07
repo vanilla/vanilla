@@ -299,14 +299,23 @@ class Gdn_Memcached extends Gdn_Cache {
       
       $RealKey = $this->MakeKey($Key, $FinalOptions);
       $Incremented = $this->Memcache->increment($RealKey, $Amount);
-      return ($Incremented !== FALSE) ? $Incremented : Gdn_Cache::CACHEOP_FAILURE;
+      if ($Incremented !== FALSE) {
+         Gdn_Cache::LocalSet($RealKey, $Incremented);
+         return $Incremented;
+      }
+      return Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Decrement($Key, $Amount = 1, $Options = array()) {
       $FinalOptions = array_merge($this->StoreDefaults, $Options);
       
       $RealKey = $this->MakeKey($Key, $FinalOptions);
-      return $this->Memcache->decrement($RealKey, $Amount);
+      $Decremented = $this->Memcache->decrement($RealKey, $Amount);
+      if ($Decremented !== FALSE) {
+         Gdn_Cache::LocalSet($RealKey, $Decremented);
+         return $Decremented;
+      }
+      return Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Flush() {

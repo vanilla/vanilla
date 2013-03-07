@@ -28,12 +28,6 @@ class Gdn_Memcached extends Gdn_Cache {
       parent::__construct();
       $this->CacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
       
-      // Only track if we're debugging
-      if (!Debug()) {
-         Gdn_Cache::$trackGet = null;
-         Gdn_Cache::$trackSet = null;
-      }
-      
       // Allow persistent connections
       
       /**
@@ -208,7 +202,7 @@ class Gdn_Memcached extends Gdn_Cache {
       
       // Track debug stats
       $elapsedTime = microtime(TRUE) - $startTime;
-      if (is_array(Gdn_Cache::$trackGet)) {
+      if (Gdn_Cache::$trace) {
          Gdn_Cache::$trackTime += $elapsedTime;
          Gdn_Cache::$trackGets++;
 

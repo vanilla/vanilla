@@ -113,6 +113,8 @@ if (file_exists(PATH_CONF.'/bootstrap.late.php'))
 if (C('Debug'))
    Debug(TRUE);
 
+Gdn_Cache::Trace(Debug());
+
 /**
  * Factory Services
  * 

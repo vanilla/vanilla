@@ -677,6 +677,8 @@ class ActivityModel extends Gdn_Model {
       }
       
       $ConfigPreference = C("Preferences.$Type.$ActivityType", '0');
+      if ((int)$ConfigPreference === 2)
+         $Preference = TRUE; // This preference is forced on.
       if ($ConfigPreference !== FALSE)
          $Preference = ArrayValue($Type.'.'.$ActivityType, $Preferences, $ConfigPreference);
       else
@@ -1260,6 +1262,11 @@ class ActivityModel extends Gdn_Model {
          Gdn::UserModel()->SetField($Activity['NotifyUserID'], 'CountNotifications', $CountNotifications);
       }
       
+      // If this is a wall post then we need to notify on that.
+      if ($Activity['ActivityType'] == 'WallPost' && $Activity['NotifyUserID'] == self::NOTIFY_PUBLIC) {
+         $this->NotifyWallPost($Activity);
+      }
+      
       return $Activity;
    }
    
@@ -1318,6 +1325,22 @@ class ActivityModel extends Gdn_Model {
 //      decho($NewActivity, 'MergedActivity');
 //      die();
       return $NewActivity;
+   }
+   
+   protected function NotifyWallPost($WallPost) {
+      $NotifyUser = Gdn::UserModel()->GetID($WallPost['ActivityUserID']);
+      
+      $Activity = array(
+         'ActivityType' => 'WallPost',
+         'ActivityUserID' => $WallPost['RegardingUserID'],
+         'NotifyUserID' => $WallPost['ActivityUserID'],
+         'RecordType' => 'Activity',
+         'RecordID' => $WallPost['ActivityID'],
+         'Route' => UserUrl($NotifyUser, ''),
+         'HeadlineFormat' => T('HeadlineFormat.NotifyWallPost', '{ActivityUserID,User} posted on your <a href="{Url,url}">wall</a>.')
+      );
+      
+      $this->Save($Activity, 'WallComment');
    }
    
    public function SaveQueue() {

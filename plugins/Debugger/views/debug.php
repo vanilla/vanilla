@@ -49,7 +49,9 @@ if (Gdn::Cache()->ActiveEnabled()) {
       echo '</pre>';
       
       foreach (Gdn_Cache::$trackGet as $key => $keyData) {
-         echo $key.'<small>'.@number_format($keyData['time'], 6).'s</small><br/>';
+         echo $key;
+         echo '<span>'.round($keyData['keysize'] / 1024, 2).'kB</span> ';
+         echo '<small>'.@number_format($keyData['time'], 6).'s</small><br/>';
          if ($keyData['hits'] > 1) {
             echo '<pre>';
             echo '<b>Fetched</b>: '.$keyData['hits'];

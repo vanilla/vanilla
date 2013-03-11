@@ -761,19 +761,6 @@ class PostController extends VanillaController {
       $this->AddCssFile('vanilla.css');
 		$this->AddModule('NewDiscussionModule');
    }
-}
-
-function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array()) {
-   $Form = new Gdn_Form();
-   
-   if (count($ListOptions) == 2 && array_key_exists(0, $ListOptions)) {
-      unset($ListOptions[0]);
-      $Value = array_pop(array_keys($ListOptions));
-      
-      // This can be represented by a checkbox.
-      return $Form->CheckBox($FieldName, $LabelCode);
-   } else {
-      $CssClass = GetValue('ListClass', $Attributes, 'List Inline');
    
    /**
     * Pre-populate the form with values from the query string.
@@ -788,16 +775,31 @@ function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array(
          $Form->SetValue($Key, $Value);
       }
       
-      $Result = ' <b>'.T($LabelCode)."</b> <ul class=\"$CssClass\">";
-      foreach ($ListOptions as $Value => $Code) {
-         $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
-      }
-      $Result .= '</ul>';
       if (isset($Get['category'])) {
          $Category = CategoryModel::Categories($Get['category']);
          if ($Category)
             $Form->SetValue('CategoryID', $Category['CategoryID']);
       }
+   }
+}
+
+function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array()) {
+   $Form = new Gdn_Form();
+   
+   if (count($ListOptions) == 2 && array_key_exists(0, $ListOptions)) {
+      unset($ListOptions[0]);
+      $Value = array_pop(array_keys($ListOptions));
+      
+      // This can be represented by a checkbox.
+      return $Form->CheckBox($FieldName, $LabelCode);
+   } else {
+      $CssClass = GetValue('ListClass', $Attributes, 'List Inline');
+      
+      $Result = ' <b>'.T($LabelCode)."</b> <ul class=\"$CssClass\">";
+      foreach ($ListOptions as $Value => $Code) {
+         $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
+      }
+      $Result .= '</ul>';
       return $Result;
    }
 }

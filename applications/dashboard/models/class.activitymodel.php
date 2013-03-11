@@ -1213,10 +1213,19 @@ class ActivityModel extends Gdn_Model {
             
             $this->EventArguments['Activity'] =& $Activity;
             $this->EventArguments['ActivityID'] = NULL;
+            
+            $Handled = FALSE;
+            $this->EventArguments['Handled'] =& $Handled;
+            
             $this->FireEvent('BeforeSave');
             
             if (count($this->ValidationResults()) > 0)
                return FALSE;
+            
+            if ($Handled) {
+               // A plugin handled this activity so don't save it.
+               return $Activity;
+            }
             
             if (GetValue('CheckSpam', $Options)) {
                // Check for spam

@@ -22,6 +22,7 @@ class UserPhotoModule extends Gdn_Module {
    }
 
    public function ToString() {
+      $this->CanEditPhotos = C('Garden.Profile.EditPhotos') || Gdn::Session()->CheckPermission('Garden.Users.Edit');
 		return parent::ToString();
    }
 }

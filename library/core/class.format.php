@@ -453,13 +453,20 @@ class Gdn_Format {
    public static function Date($Timestamp = '', $Format = '') {
       static $GuestHourOffset;
       
-      if ($Timestamp === NULL)
-         return T('Null Date', '-');
-
       // Was a mysqldatetime passed?
-      if (!is_numeric($Timestamp)) {
+      if ($Timestamp !== NULL && !is_numeric($Timestamp)) {
          $Timestamp = self::ToTimestamp($Timestamp);
       }
+      
+      if (function_exists('FormatDateCustom') && (!$Format || strcasecmp($Format, 'html') == 0)) {
+         if (!$Timestamp)
+            $Timestamp = time();
+         
+         return FormatDateCustom($Timestamp, $Format);
+      }
+      
+      if ($Timestamp === NULL)
+         return T('Null Date', '-');
          
       if (!$Timestamp)
          $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
@@ -1329,7 +1336,8 @@ EOT;
       return date('Y-m-d', $Timestamp);
    }
 
-   /** Format a timestamp or the current time to go into the database.
+   /** 
+    * Format a timestamp or the current time to go into the database.
     * 
     * @param int $Timestamp
     * @return string The formatted date and time.
@@ -1426,39 +1434,34 @@ EOT;
    protected static $_UrlTranslations = array('–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Ț' => 'T',  'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya');
 
    /**
-    * Replaces all non-url-friendly characters with dashes.
+    * Creates URL codes containing only lowercase Roman letters, digits, and hyphens.
     *
     * @param mixed $Mixed An object, array, or string to be formatted.
-    * @return mixed
+    * @return string
     */
    public static function Url($Mixed) {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Url');
       
+      // Preliminary decoding
+      $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
+      $Mixed = strtr($Mixed, self::$_UrlTranslations);
       
-      if (preg_replace('`([^\PP])`u', '', 'Test') == '') {
-         // No Unicode PCRE support.
-         $Mixed = trim($Mixed);
-         $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
-         $Mixed = strtr($Mixed, self::$_UrlTranslations);
-         $Mixed = preg_replace('/([^\w\d_:])/', ' ', $Mixed); // get rid of punctuation and symbols
-         $Mixed = str_replace(' ', '-', trim($Mixed)); // get rid of spaces
-         $Mixed = preg_replace('/-+/', '-', $Mixed); // limit to 1 hyphen at a time
-         $Mixed = urlencode(strtolower($Mixed));
-         $Mixed = trim($Mixed, '.-');
-         return $Mixed;
-      } else {
-         // Better Unicode support.
-         $Mixed = trim($Mixed);
-         $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
-         $Mixed = strtr($Mixed, self::$_UrlTranslations);
-         $Mixed = preg_replace('`([^\PP.\-_])`u', '', $Mixed); // get rid of punctuation
-         $Mixed = preg_replace('`([^\PS+])`u', '', $Mixed); // get rid of symbols
-         $Mixed = preg_replace('`[\s\-/+.]+`u', '-', $Mixed); // replace certain characters with dashes
-         $Mixed = rawurlencode(strtolower($Mixed));
-         $Mixed = trim($Mixed, '.-');
-			return $Mixed;
-      }
+      // Test for Unicode PCRE support
+      // On non-UTF8 systems this will result in a blank string.
+      $UnicodeSupport = (preg_replace('`[\pP]`u', '', 'P') != '');
+      
+      // Convert punctuation, symbols, and spaces to hyphens
+      if ($UnicodeSupport)
+         $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed); 
+      else 
+         $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);
+      
+      // Lowercase, no trailing or repeat hyphens
+      $Mixed = preg_replace('`-+`', '-', strtolower($Mixed));
+      $Mixed = trim($Mixed, '-');
+
+      return rawurlencode($Mixed);
    }
 
    /**

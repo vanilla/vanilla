@@ -78,7 +78,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 
                if ($Row['RecordName']) {
                   echo ' <span class="Meta">',
-                     '<span class="Meta-Label">'.sprintf('%s by', T($RecordLabel)).'</span> ',
+                     '<span class="Meta-Label">'.sprintf(T('%s by'), T($RecordLabel)).'</span> ',
                      UserAnchor($Row, 'Meta-Value', 'Record');
                   
                   if ($RecordUser['Banned']) {

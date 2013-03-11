@@ -505,7 +505,7 @@ if (!function_exists('Img')) {
       if ($Attributes == '')
          $Attributes = array();
 
-      if ($Image != '' && substr($Image, 0, 7) != 'http://' && substr($Image, 0, 8) != 'https://')
+      if (!IsUrl($Image))
          $Image = SmartAsset($Image, $WithDomain);
 
       return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
@@ -691,7 +691,7 @@ if (!function_exists('UserPhoto')) {
          $Photo = UserPhotoDefaultUrl($User, $ImgClass);
 
       if ($Photo) {
-         if (!isUrl($Photo, '//')) {
+         if (!isUrl($Photo)) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
             $PhotoUrl = $Photo;

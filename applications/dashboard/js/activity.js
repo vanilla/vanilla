@@ -140,8 +140,8 @@ jQuery(document).ready(function($) {
                gdn.inform(json);
                
                if (json['FormSaved'] == true) {
-                  $(inp).val('');
-                  // If there were no activities
+                  $(inp).val('').closest('form').trigger('clearCommentForm');
+                  // If there were no activities.
                   if ($('ul.Activities').length == 0) {
                      // Make sure that empty rows are removed
                      $('div.EmptyInfo').slideUp('fast');

@@ -93,7 +93,7 @@ class ModerationController extends VanillaController {
       }
       if ($CountComments > 0) {
          $SelectionMessage =  Wrap(sprintf(
-            'You have selected %1$s in this discussion.',
+            T('You have selected %1$s in this discussion.'),
             Plural($CountComments, '%s comment', '%s comments')
          ), 'div');
          $ActionMessage = T('Take Action:');
@@ -170,7 +170,7 @@ class ModerationController extends VanillaController {
       $CountDiscussions = count($CheckedDiscussions);
       if ($CountDiscussions > 0) {
          $SelectionMessage =  Wrap(sprintf(
-            'You have selected %1$s.',
+            T('You have selected %1$s.'),
             Plural($CountDiscussions, '%s discussion', '%s discussions')
          ), 'div');
          $ActionMessage = T('Take Action:');
@@ -345,7 +345,8 @@ class ModerationController extends VanillaController {
       $AllowedDiscussions = array();
       $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, CategoryID')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
       foreach ($DiscussionData->Result() as $Discussion) {
-         if ($Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->CategoryID))
+         $Category = CategoryModel::Categories($Discussion->CategoryID);
+         if ($Category && $Category['PermsDiscussionsEdit'])
             $AllowedDiscussions[] = $Discussion->DiscussionID;
       }
       $this->SetData('CountAllowed', count($AllowedDiscussions));
@@ -355,21 +356,23 @@ class ModerationController extends VanillaController {
       if ($this->Form->AuthenticatedPostBack()) {
          // Retrieve the category id
          $CategoryID = $this->Form->GetFormValue('CategoryID');
+         $Category = CategoryModel::Categories($CategoryID);
 
          // User must have add permission on the target category
-         $this->Permission('Vanilla.Discussions.Add', TRUE, 'Category', $CategoryID);
+         if (!$Category['PermsDiscussionsAdd']) {
+            throw ForbiddenException('@'.T('You do not have permission to add discussions to this category.'));
+         }
 
-         // Iterate and move
+         // Iterate and move.
          foreach ($AllowedDiscussions as $DiscussionID) {
-            $Discussion = get_object_vars($DiscussionModel->GetID($DiscussionID));
-            $Discussion['CategoryID'] = $CategoryID;
-            $DiscussionModel->Save($Discussion);
+            $DiscussionModel->SetField($DiscussionID, 'CategoryID', $CategoryID);
          }
 
          // Clear selections
          Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
          ModerationController::InformCheckedDiscussions($this);
-         $this->RedirectUrl = 'discussions';
+         
+         $this->JsonTarget('', '', 'Refresh');
       }
 
       $this->Render();

@@ -323,6 +323,10 @@ embed.onMessage = embed.fn.onMessage = function(message, origin) {
    var result = func.apply(this, data.args);
 };
 
+embed.scrollTo = embed.fn.scrollTo = function(top) {
+   window.scrollTo(0, this.iframe.offsetTop + top);
+};
+
 embed.setLocation = embed.fn.setLocation = function(path) {
    if (!this.isReady)
       Vanilla.error("The embed is not ready.");
@@ -349,16 +353,17 @@ embed.start = embed.fn.start = function() {
    var url = me.root+(me.initialPath || '/');
    
    if (me.sso)
-      url += '?sso='+encodeURIComponent(me.sso)
+      url += (url.indexOf('?') == -1 ? '?' : '&') + 'sso='+encodeURIComponent(me.sso)
    
    me.socket = new easyXDM.Socket({
       remote: me.root+'/container.html?url='+encodeURIComponent(url),
       swf: me.root+'/js/easyXDM/easyxdm.swf',
       remoteHelper: me.root+'/js/easyXDM/name.html',
       container: me.container,
-      props: { allowtransparency: "true" },
+      props: { allowtransparency: "true", scrolling: "no", style: { visibility: "hidden" } },
       onReady: function() {
          me.iframe = me.container.getElementsByTagName('iframe')[0];
+         me.iframe.style.visibility = "visible";
          me.isReady = true;
          
          if (me.onReady)

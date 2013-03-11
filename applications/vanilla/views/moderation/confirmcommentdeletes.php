@@ -6,7 +6,7 @@ echo $this->Form->Errors();
 
 $CountCheckedComments = GetValue('CountCheckedComments', $this->Data, 0);
 echo Wrap(sprintf(
-   'You are about to delete %s.',
+   T('AboutToDelete', 'You are about to delete %s.'),
    Plural($CountCheckedComments, '%s comment', '%s comments')
    ), 'p');
 

@@ -250,7 +250,7 @@ jQuery(document).ready(function($) {
       draftInp.val('');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() {$(this).remove();});
-      $(frm).trigger('clearCommentForm');
+      $(sender).closest('form').trigger('clearCommentForm');
    }
    
    // Set up paging
@@ -318,6 +318,8 @@ jQuery(document).ready(function($) {
    // Delete comment
    $('a.DeleteComment').popup({
       confirm: true,
+      confirmHeading: gdn.definition('ConfirmDeleteCommentHeading', 'Delete Comment'),
+      confirmText: gdn.definition('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'),
       followConfirm: false,
       deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
       afterConfirm: function(json, sender) {

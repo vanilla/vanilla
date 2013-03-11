@@ -78,10 +78,10 @@ $Construct
    ->Column('DateSetInvitations', 'datetime', TRUE)
    ->Column('DateOfBirth', 'datetime', TRUE)
    ->Column('DateFirstVisit', 'datetime', TRUE)
-   ->Column('DateLastActive', 'datetime', TRUE)
+   ->Column('DateLastActive', 'datetime', TRUE, 'index')
    ->Column('LastIPAddress', 'varchar(15)', TRUE)
    ->Column('AllIPAddresses', 'varchar(100)', TRUE)
-   ->Column('DateInserted', 'datetime')
+   ->Column('DateInserted', 'datetime', FALSE, 'index')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
@@ -233,7 +233,6 @@ $PermissionModel->Define(array(
    'Garden.Themes.Manage',
    'Garden.SignIn.Allow' => 1,
    'Garden.Registration.Manage',
-   'Garden.Applicants.Manage',
    'Garden.Roles.Manage',
    'Garden.Users.Add',
    'Garden.Users.Edit',
@@ -310,7 +309,6 @@ if (!$PermissionTableExists) {
       'Garden.Themes.Manage' => 1,
       'Garden.SignIn.Allow' => 1,
       'Garden.Registration.Manage' => 1,
-      'Garden.Applicants.Manage' => 1,
       'Garden.Roles.Manage' => 1,
       'Garden.Users.Add' => 1,
       'Garden.Users.Edit' => 1,
@@ -677,6 +675,34 @@ $Construct
    
    ->Set(FALSE, FALSE);
 
+/**
+ * Log significant operations against used IP
+ * Non unique.
+ */
+$Construct
+   ->Table('IpLog')
+   ->PrimaryKey('IpLogID')
+   ->Column('UserID', 'int(11)', FALSE, 'index')
+   ->Column('Event', 'varchar(32)', FALSE, 'index')      // register, visit, ipchange
+   ->Column('IPAddress', 'varchar(60)', FALSE, 'index')  // dotted quad format, or ipv6
+   ->Column('IPLong', 'int')                             // ip2long format
+   ->Column('DateInserted', 'datetime')
+   ->Column('DateUpdated', 'datetime')
+   ->Set(FALSE, FALSE);
+
+/**
+ * Track all used IPs per user
+ * Each user/ip combination is unique
+ */
+$Construct
+   ->Table('IpTrack')
+   ->PrimaryKey('IpLogID')
+   ->Column('UserID', 'int(11)', FALSE, 'unique')
+   ->Column('IPAddress', 'varchar(60)', FALSE, 'unique') // dotted quad format, or ipv6
+   ->Column('IPLong', 'int')                             // ip2long format
+   ->Column('DateInserted', 'datetime')
+   ->Column('DateUpdated', 'datetime')
+   ->Set(FALSE, FALSE);
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');

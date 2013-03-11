@@ -77,6 +77,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @since 2.1 
     */
    public $Trace = FALSE;
+   
+   /**
+    * Whether to use APC for plugin cache storage
+    * @var type 
+    */
+   protected $Apc = FALSE;
 
    public function __construct() {
       parent::__construct();
@@ -91,6 +97,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * methods.
     */
    public function Start($Force = FALSE) {
+      
+      if (function_exists('apc_fetch') && C('Garden.Apc', FALSE))
+         $this->Apc = TRUE;
 
       // Build list of all available plugins
       $this->AvailablePlugins($Force);
@@ -126,7 +135,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
             // Check Cache
             $SearchPathCacheKey = 'Garden.Plugins.PathCache.'.$SearchPath;
-            $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+            if ($this->Apc) {
+               $SearchPathCache = apc_fetch($SearchPathCacheKey);
+            } else {
+               $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+            }
 
             $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
             $CacheIntegrityCheck = FALSE;
@@ -155,6 +168,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $PathIntegrityHash = md5(serialize($PathListing));
             $CacheIntegrityHash = GetValue('CacheIntegrityHash',$SearchPathCache);
             if ($CacheIntegrityHash != $PathIntegrityHash) {
+               Trace('Need to re-index plugin cache');
                // Need to re-index this folder
                
                // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for 
@@ -169,7 +183,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                   continue;
 
                $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-               Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+               if ($this->Apc) {
+                  apc_store($SearchPathCacheKey, $SearchPathCache);
+               } else {
+                  Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+               }
             }
 
             $this->PluginCache = array_merge($this->PluginCache, $CachePluginInfo);
@@ -205,7 +223,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       
       foreach ($SearchPaths as $SearchPath => $SearchPathName) {
          $SearchPathCacheKey = "Garden.Plugins.PathCache.{$SearchPath}";
-         $SearchPathCache = Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+         if ($this->Apc) {
+            apc_delete($SearchPathCacheKey);
+         } else {
+            Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+         }
       }
    }
 

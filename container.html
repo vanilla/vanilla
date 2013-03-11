@@ -2,9 +2,9 @@
 <html>
    <head>
       <title>Embed Container for easyXDM</title>
-      <script type="text/javascript" src="js/easyXDM/easyXDM.debug.js"></script>
+      <script type="text/javascript" src="js/easyXDM/easyXDM.min.js"></script>
       <script type="text/javascript">
-         document.domain = document.domain;
+//         document.domain = document.domain;
          
          easyXDM.DomHelper.requiresJSON("js/easyXDM/json2.js");
          
@@ -51,29 +51,30 @@
          function hide() {
             iframe.style.visibility = "hidden";
          }
+         function show() {
+            iframe.style.visibility = "visible"; 
+         };
             
          var socket = new easyXDM.Socket({
             swf: "js/easyXDM/easyxdm.swf",
             onReady: function(){
                iframe = document.createElement("iframe");
+               iframe.id = 'vanilla-iframe';
                iframe.frameBorder = 0;
                iframe.allowtransparency = true;
+               iframe.scrolling = "no";
                iframe.style.visibility = "hidden";
-               
-               var loaded = function() {
-                  iframe.style.visibility = "visible"; 
-               };
                
                document.body.appendChild(iframe);
                
                iframe.src = easyXDM.query.url;
                
-               if(iframe.addEventListener) {
-                  iframe.addEventListener('load', loaded, true);
-               } else if(iframe.attachEvent) {
-                  iframe.attachEvent('onload', loaded);
-               } else
-                  loaded();
+//               if(iframe.addEventListener) {
+//                  iframe.addEventListener('DOMContentLoaded', loaded, true);
+//               } else if(iframe.attachEvent) {
+//                  iframe.attachEvent('onreadystatechange', loaded);
+//               } else
+//                  loaded();
             },
             onMessage: function(message, origin) {
                var data = JSON.parse(message);

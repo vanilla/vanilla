@@ -163,15 +163,6 @@ class TaggingPlugin extends Gdn_Plugin {
          $Sender->View = 'discussions';
       }
       
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $Sender->AddDefinition('SetClientHour', $ClientHour);
-      }
-      
       // Render the controller
       $Sender->Render('TaggedDiscussions', '', 'plugins/Tagging');
    }
@@ -488,7 +479,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $Sender->Form->Method = 'get';
       $Sender->Form->InputPrefix = '';
-      $Sender->Form->Action = '/settings/tagging';
+      //$Sender->Form->Action = '/settings/tagging';
 
       list($Offset, $Limit) = OffsetLimit($Sender->Request->Get('Page'), 100);
       $Sender->SetData('_Limit', $Limit);

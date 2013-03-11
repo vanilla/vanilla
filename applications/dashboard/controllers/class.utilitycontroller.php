@@ -503,27 +503,44 @@ class UtilityController extends DashboardController {
     * @param string $ClientDate Client-reported datetime.
     * @param string $TransientKey Security token.
     */
-   public function SetClientHour($ClientDate = '', $TransientKey = '') {
+   public function SetClientHour($ClientHour = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
       $Success = FALSE;
 
-      $ClientTimestamp = Gdn_Format::ToTimestamp($ClientDate);
-
-      if (
-			is_numeric($ClientTimestamp)
-			&& $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $UserModel = Gdn::UserModel();
-			$HourOffset = $ClientTimestamp - time();
-         $HourOffset = round($HourOffset / 3600);
-         
-			$UserModel->SetField($Session->UserID, 'HourOffset', $HourOffset);
-			$Success = TRUE;
+      if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
+         $HourOffset = $ClientHour - date('G', time());
+      
+         if (Gdn::Session()->IsValid() && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+            Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+            $Success = TRUE;
+         }
       }
          
       $this->Render();
+   }
+   
+   public function SetHourOffset() {
+      $Form = new Gdn_Form();
+      
+      if ($Form->AuthenticatedPostBack()) {
+         if (!Gdn::Session()->IsValid()) {
+            throw PermissionException('Garden.SignIn.Allow');
+         }
+         
+         $HourOffset = $Form->GetFormValue('HourOffset');
+         Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+         
+         $this->SetData('Result', TRUE);
+         $this->SetData('HourOffset', $HourOffset);
+         
+         $time = time();
+         $this->SetData('UTCDateTime', gmdate('r', $time));
+         $this->SetData('UserDateTime', gmdate('r', $time + $HourOffset * 3600));
+      } else {
+         throw ForbiddenException('GET');
+      }
+      
+      $this->Render('Blank');
    }
 	
 	/**

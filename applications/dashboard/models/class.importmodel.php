@@ -1,14 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
+/*
+Copyright 2008, 2009 Vanilla Forums Inc.
+This file is part of Garden.
+Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+*/
 
 /**
  * Object for importing files created with VanillaPorter.
- * 
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Garden
- * @since 2.0
  */
-
 class ImportModel extends Gdn_Model {
 	const COMMENT = '//';
 	const DELIM = ',';
@@ -366,7 +368,7 @@ class ImportModel extends Gdn_Model {
 	 */
 	public function DeleteOverwriteTables() {
 		$Tables = array('Activity', 'Category', 'Comment', 'Conversation', 'ConversationMessage',
-   		'Discussion', 'Draft', 'Invitation', 'Media', 'Message', 'Photo', 'Permission', 'Role', 'UserAuthentication',
+   		'Discussion', 'Draft', 'Invitation', 'Media', 'Message', 'Photo', 'Permission', 'Rank', 'Poll', 'PollOption', 'PollVote', 'Role', 'UserAuthentication',
    		'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole');
 
       // Delete the default role settings.
@@ -1051,7 +1053,7 @@ class ImportModel extends Gdn_Model {
 
    protected function _LoadTableWithInsert($Tablename, $Path) {
       // This option could take a while so set the timeout.
-      set_time_limit(60*5);
+      set_time_limit(0);
 
       // Get the column count of the table.
       $St = Gdn::Structure();
@@ -1254,7 +1256,7 @@ class ImportModel extends Gdn_Model {
 	
 	public function ProcessImportFile() {
       // This one step can take a while so give it more time.
-      set_time_limit(60 * 5);
+      set_time_limit(0);
 
 		$Path = $this->ImportPath;
 		$Tables = array();
@@ -1265,18 +1267,21 @@ class ImportModel extends Gdn_Model {
 		$fpout = NULL;
 
 		// Make sure it has the proper header.
+      unset($this->Data['Header']);
 		try {
 			$Header = $this->GetImportHeader($fpin);
 		} catch(Exception $Ex) {
 			fclose($fpin);
 			throw $Ex;
 		}
-
+      $Uniq = implode('-', $Header);
+      $Uniq = md5($Uniq);
+      
       $RowCount = 0;
       $LineNumber = 0;
 		while (($Line = fgets($fpin)) !== FALSE) {
          $LineNumber++;
-
+         
 			if ($Line == "\n") {
 				if ($fpout) {
 					// We are in a table so close it off.
@@ -1292,10 +1297,13 @@ class ImportModel extends Gdn_Model {
 				// This is the start of a table.
 				$TableInfo = $this->ParseInfoLine($Line);
             if (!array_key_exists('Table', $TableInfo)) {
-               throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s.'), $LineNumber));
+               throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s. %s'), $LineNumber, $Line));
             }
 				$Table = $TableInfo['Table'];
-				$Path = dirname($Path).DS.$Table.'.txt';
+				$Path = CombinePaths(array(PATH_UPLOADS,$Uniq,$Table.'.txt'));
+            $CheckPath = dirname($Path);
+            @mkdir($CheckPath, 0777, TRUE);
+            
 				$fpout = fopen($Path, 'wb');
 
 				$TableInfo['Path'] = $Path;
@@ -1432,6 +1440,44 @@ class ImportModel extends Gdn_Model {
       file_put_contents(PATH_UPLOADS.'/'.$SQLPath, $Queries, FILE_APPEND | LOCK_EX);
    }
    
+   /**
+    * Set the category permissions based on the permission table.
+    */
+   public function SetCategoryPermissionIDs() {
+      // First build a list of category
+      $Permissions = $this->SQL->GetWhere('Permission', array('JunctionColumn' => 'PermissionCategoryID', 'JunctionID >' => 0))->ResultArray();
+      $CategoryIDs = array();
+      foreach ($Permissions as $Row) {
+         $CategoryIDs[$Row['JunctionID']] = $Row['JunctionID'];
+      }
+      
+      // Update all of the child categories.
+      $Root = CategoryModel::Categories(-1);
+      $this->_SetCategoryPermissionIDs($Root, $Root['CategoryID'], $CategoryIDs);
+   }
+   
+   protected function _SetCategoryPermissionIDs($Category, $PermissionID, $IDs) {
+      static $CategoryModel;
+      if (!isset($CategoryModel))
+         $CategoryModel = new CategoryModel();
+      
+      $CategoryID = $Category['CategoryID'];
+      if (isset($IDs[$CategoryID])) {
+         $PermissionID = $CategoryID;
+      }
+      
+      if ($Category['PermissionCategoryID'] != $PermissionID) {
+         $CategoryModel->SetField($CategoryID, 'PermissionCategoryID', $PermissionID);
+      }
+      
+      $ChildIDs = GetValue('ChildIDs', $Category, array());
+      foreach ($ChildIDs as $ChildID) {
+         $ChildCategory = CategoryModel::Categories($ChildID);
+         if ($ChildCategory)
+            $this->_SetCategoryPermissionIDs($ChildCategory, $PermissionID, $IDs);
+      }
+   }
+   
    public function SetRoleDefaults() {
       if (!$this->ImportExists('Role', 'RoleID'))
          return;
@@ -1535,7 +1581,7 @@ class ImportModel extends Gdn_Model {
 
    public function UpdateCounts() {
       // This option could take a while so set the timeout.
-      set_time_limit(60*5);
+      set_time_limit(0);
       
       // Define the necessary SQL.
       $Sqls = array();
@@ -1600,6 +1646,44 @@ class ImportModel extends Gdn_Model {
            where c.DiscussionID = ud.DiscussionID
              and c.DateInserted <= ud.DateLastViewed)";
 
+      }
+      
+      if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
+         $Sqls['Tag.CountDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
+      }
+      
+      if ($this->ImportExists('Poll')) {
+         $Sqls['PollOption.CountVotes'] = $this->GetCountSQL('count', 'PollOption', 'PollVote', 'CountVotes', 'PollOptionID');
+         
+         $Sqls['Poll.CountOptions'] = $this->GetCountSQL('count', 'Poll', 'PollOption', 'CountOptions', 'PollID');
+         $Sqls['Poll.CountVotes'] = $this->GetCountSQL('sum', 'Poll', 'PollOption', 'CountVotes', 'CountVotes', 'PollID');
+      }
+      
+      if ($this->ImportExists('Activity', 'ActivityType')) {
+         $Sqls['Activity.ActivityTypeID'] = "
+            update :_Activity a
+            join :_ActivityType t
+               on a.ActivityType = t.Name
+            set a.ActivityTypeID = t.ActivityTypeID";
+      }
+
+      if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
+         $Sqls['Tag.CountDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
+      }
+      
+      if ($this->ImportExists('Poll')) {
+         $Sqls['PollOption.CountVotes'] = $this->GetCountSQL('count', 'PollOption', 'PollVote', 'CountVotes', 'PollOptionID');
+         
+         $Sqls['Poll.CountOptions'] = $this->GetCountSQL('count', 'Poll', 'PollOption', 'CountOptions', 'PollID');
+         $Sqls['Poll.CountVotes'] = $this->GetCountSQL('sum', 'Poll', 'PollOption', 'CountVotes', 'CountVotes', 'PollID');
+      }
+      
+      if ($this->ImportExists('Activity', 'ActivityType')) {
+         $Sqls['Activity.ActivityTypeID'] = "
+            update :_Activity a
+            join :_ActivityType t
+               on a.ActivityType = t.Name
+            set a.ActivityTypeID = t.ActivityTypeID";
       }
 
       if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
@@ -1746,6 +1830,7 @@ class ImportModel extends Gdn_Model {
       // Rebuild the category tree.
       $CategoryModel = new CategoryModel();
       $CategoryModel->RebuildTree();
+      $this->SetCategoryPermissionIDs();
 
       return TRUE;
 	}

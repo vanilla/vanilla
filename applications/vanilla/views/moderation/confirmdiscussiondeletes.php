@@ -10,18 +10,18 @@ $CountCheckedDiscussions = GetValue('CountCheckedDiscussions', $this->Data, 0);
 
 if ($CountNotAllowed > 0) {
    echo Wrap(sprintf(
-      'You do not have permission to delete %1$s of the selected discussions.',
+      T('NoPermissionToDeleteDiscussions', 'You do not have permission to delete %1$s of the selected discussions.'),
       $CountNotAllowed
       ), 'p');
 
    echo Wrap(sprintf(
-      'You are about to delete %1$s of the %2$s selected discussions.',
+      T('AboutToDeleteSelectedDiscussions', 'You are about to delete %1$s of the %2$s selected discussions.'),
       $CountAllowed,
       $CountCheckedDiscussions
       ), 'p');
 } else {
    echo Wrap(sprintf(
-      'You are about to delete %s.',
+      T('AboutToDelete', 'You are about to delete %s.'),
       Plural($CountAllowed, '%s discussion', '%s discussions')
       ), 'p');
 }

@@ -33,6 +33,11 @@ class FacebookPlugin extends Gdn_Plugin {
    const ProviderKey = 'Facebook';
    
    protected $_AccessToken = NULL;
+
+   public function Base_Render_Before($Sender) {
+      if ($Sender->MasterView == '' || $Sender->MasterView == 'default')
+         $Sender->AddCssFile('facebook.css', 'plugins/Facebook');
+   }
    
    public function AccessToken() {
       if (!$this->IsConfigured()) 
@@ -122,8 +127,7 @@ class FacebookPlugin extends Gdn_Plugin {
          return;
       
       if (isset($Sender->Data['Methods'])) {
-         $ImgSrc = Asset('/plugins/Facebook/design/facebook-login.png');
-         $ImgAlt = T('Sign In with Facebook');
+         $BtnText = T('Sign In with Facebook');
 
 //         if ($AccessToken) {
 //            $SigninHref = $this->RedirectUri();
@@ -139,7 +143,7 @@ class FacebookPlugin extends Gdn_Plugin {
             // Add the facebook method to the controller.
             $FbMethod = array(
                'Name' => self::ProviderKey,
-               'SignInHtml' => "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
+               'SignInHtml' => "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow facebook-login-button\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" rel=\"nofollow\" ><span></span>$BtnText</a>");
 //         }
 
          $Sender->Data['Methods'][] = $FbMethod;

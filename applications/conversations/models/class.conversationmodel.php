@@ -355,6 +355,10 @@ class ConversationModel extends Gdn_Model {
          $FormPostValues['RecipientUserID'] = $RecipientUserIDs;
       }
       
+      if (C('Garden.ForceInputFormatter')) {
+         $FormPostValues['Format'] = C('Garden.InputFormatter');
+      }
+      
       // Add & apply any extra validation rules:      
       $this->Validation->ApplyRule('Body', 'Required');
       $MessageModel->Validation->ApplyRule('Body', 'Required');     
@@ -427,22 +431,24 @@ class ConversationModel extends Gdn_Model {
             ->Where('uc.ConversationID', $ConversationID) // hopefully coax this index.
             ->Where('uc.UserID <>', $Session->UserID)
             ->Get();
+         
+         $Activity = array(
+            'ActivityType' => 'ConversationMessage',
+            'ActivityUserID' => $Session->UserID,
+            'HeadlineFormat' => T('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
+            'RecordType' => 'Conversation',
+            'RecordID' => $ConversationID,
+            'Story' => GetValue('Body', $FormPostValues),
+            'Format' => GetValue('Format', $FormPostValues, C('Garden.InputFormatter')),
+            'Route' => "/messages/$ConversationID#$MessageID"
+         );
    
          $ActivityModel = new ActivityModel();
          foreach ($UnreadData->Result() as $User) {
-            // Notify the users of the new message.
-            $ActivityID = $ActivityModel->Add(
-               $Session->UserID,
-               'ConversationMessage',
-               '',
-               $User->UserID,
-               '',
-               "/messages/$ConversationID#$MessageID",
-               FALSE
-            );
-            $Story = ArrayValue('Body', $FormPostValues, '');
-            $ActivityModel->SendNotification($ActivityID, $Story);
+            $Activity['NotifyUserID'] = $User->UserID;
+            $ActivityModel->Queue($Activity);
          }
+         $ActivityModel->SaveQueue();
 
       } else {
          // Make sure that all of the validation results from both validations are present for view by the form

@@ -120,8 +120,6 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->AddJsFile('vanilla.embed.local.js');
          else
             $Sender->AddJsFile('embed_local.js');
-      } else {
-         $Sender->SetHeader('X-Frame-Options', 'SAMEORIGIN');
       }
          
       // Allow return to mobile site

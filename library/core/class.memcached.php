@@ -296,12 +296,13 @@ class Gdn_Memcached extends Gdn_Cache {
       return ($this->Get($Key, $Options) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
    }
    
-   public function Remove($Key, $Options = array()) {
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+   public function Remove($key, $options = array()) {
+      $finalOptions = array_merge($this->StoreDefaults, $options);
       
-      $RealKey = $this->MakeKey($Key, $FinalOptions);
-      $Deleted = $this->Memcache->delete($RealKey);
-      return ($Deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+      $realKey = $this->MakeKey($key, $finalOptions);
+      $deleted = $this->Memcache->delete($realKey);
+      unset(Gdn_Cache::$localCache[$realKey]);
+      return ($deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Replace($Key, $Value, $Options = array()) {

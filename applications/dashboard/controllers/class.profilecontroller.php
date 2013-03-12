@@ -612,7 +612,7 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Picture($UserReference = '', $Username = '', $UserID = '') {
-      if (!$this->CanEditPhotos) {
+      if (!C('Garden.Profile.EditPhotos', TRUE)) {
          throw ForbiddenException('@Editing user photos has been disabled.');
       }
       
@@ -983,7 +983,7 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Thumbnail($UserReference = '', $Username = '') {
-      if (!$this->CanEditPhotos) {
+      if (!C('Garden.Profile.EditPhotos', TRUE)) {
          throw ForbiddenException('@Editing user photos has been disabled.');
       }
       

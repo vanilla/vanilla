@@ -330,7 +330,7 @@ class Gdn_Request {
          // If we found matching IPs
          if ($Matched) {
             $IPs = $Matches[1];
-            $IP = $Matches[0];
+            $IP = $IPs[0];
             
          // Fallback 
          } else { $IP = $_SERVER['REMOTE_ADDR']; }

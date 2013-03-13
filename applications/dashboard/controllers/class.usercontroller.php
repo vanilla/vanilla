@@ -257,7 +257,7 @@ class UserController extends DashboardController {
       $UserModel = new UserModel();
       $Data = $UserModel->GetLike(array('u.Name' => $Q), 'u.Name', 'asc', 10, 0);
       foreach ($Data->Result() as $User) {
-         echo Gdn_Format::Text($User->Name).'|'.Gdn_Format::Text($User->UserID)."\n";
+         echo htmlspecialchars($User->Name).'|'.Gdn_Format::Text($User->UserID)."\n";
       }
       $this->Render();
    }
@@ -672,6 +672,28 @@ class UserController extends DashboardController {
             }
          }
       }
+   }
+   
+   public function Merge() {
+      $this->Permission('Garden.Settings.Manage');
+      
+      // This must be a postback.
+      if (!$this->Request->IsAuthenticatedPostBack()) {
+         throw ForbiddenException('GET');
+      }
+      
+      $Validation = new Gdn_Validation();
+      $Validation->ApplyRule('OldUserID', 'ValidateRequired');
+      $Validation->ApplyRule('NewUserID', 'ValidateRequired');
+      if ($Validation->Validate($this->Request->Post())) {
+         $Result = Gdn::UserModel()->Merge(
+            $this->Request->Post('OldUserID'),
+            $this->Request->Post('NewUserID'));
+         $this->SetData($Result);
+      } else {
+         $this->Form->SetValidationResults($Validation->Results());
+      }
+      $this->Render('Blank', 'Utility');
    }
 
    /**

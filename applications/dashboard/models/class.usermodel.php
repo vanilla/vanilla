@@ -23,7 +23,6 @@ class UserModel extends Gdn_Model {
    const LOGIN_RATE_KEY = 'user.login.{Source}.rate';
    
    const LOGIN_RATE = 1;
-   
    public $SessionColumns;
    
    /**
@@ -119,9 +118,182 @@ class UserModel extends Gdn_Model {
       }
       
       // TODO: Check for junction table permissions.
-      
       $Result = in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
       return $Result;
+   }
+   
+   /**
+    * Merge the old user into the new user.
+    * 
+    * @param int $OldUserID
+    * @param int $NewUserID
+    */
+   public function Merge($OldUserID, $NewUserID) {
+      $OldUser = $this->GetID($OldUserID, DATASET_TYPE_ARRAY);
+      $NewUser = $this->GetID($NewUserID, DATASET_TYPE_ARRAY);
+      
+      if (!$OldUser || !$NewUser) {
+         throw new Gdn_UserException("Could not find one or both users to merge.");
+      }
+      
+      $Map = array('UserID', 'Name', 'Email', 'CountVisits', 'CountDiscussions', 'CountComments');
+      
+      $Result = array('MergeID' => NULL, 'Before' => array(
+         'OldUser' => ArrayTranslate($OldUser, $Map),
+         'NewUser' => ArrayTranslate($NewUser, $Map)));
+      
+      // Start the merge.
+      $MergeID = $this->MergeStart($OldUserID, $NewUserID);
+      
+      // Copy all discussions from the old user to the new user.
+      $this->MergeCopy($MergeID, 'Discussion', 'InsertUserID', $OldUserID, $NewUserID);
+      
+      // Copy all the comments from the old user to the new user.
+      $this->MergeCopy($MergeID, 'Comment', 'InsertUserID', $OldUserID, $NewUserID);
+      
+      // Copy all of the activities.
+      $this->MergeCopy($MergeID, 'Activity', 'NotifyUserID', $OldUserID, $NewUserID);
+      $this->MergeCopy($MergeID, 'Activity', 'InsertUserID', $OldUserID, $NewUserID);
+      $this->MergeCopy($MergeID, 'Activity', 'ActivityUserID', $OldUserID, $NewUserID);
+      
+      // Copy all of the activity comments.
+      $this->MergeCopy($MergeID, 'ActivityComment', 'InsertUserID', $OldUserID, $NewUserID);
+      
+      // Copy all conversations.
+      $this->MergeCopy($MergeID, 'Conversation', 'InsertUserID', $OldUserID, $NewUserID);
+      $this->MergeCopy($MergeID, 'ConversationMessage', 'InsertUserID', $OldUserID, $NewUserID, 'MessageID');
+      $this->MergeCopy($MergeID, 'UserConversation', 'UserID', $OldUserID, $NewUserID, 'ConversationID');
+      
+      $this->MergeFinish($MergeID);
+      
+      $OldUser = $this->GetID($OldUserID, DATASET_TYPE_ARRAY);
+      $NewUser = $this->GetID($NewUserID, DATASET_TYPE_ARRAY);
+      
+      $Result['MergeID'] = $MergeID;
+      $Result['After'] = array(
+         'OldUser' => ArrayTranslate($OldUser, $Map),
+         'NewUser' => ArrayTranslate($NewUser, $Map));
+      
+      return $Result;
+   }
+   
+   protected function MergeCopy($MergeID, $Table, $Column, $OldUserID, $NewUserID, $PK = NULL) {
+      if (!$PK)
+         $PK = $Table.'ID';
+      
+      // Insert the columns to the bak table.
+      $Sql = "insert ignore GDN_UserMergeItem(`MergeID`, `Table`, `Column`, `RecordID`, `OldUserID`, `NewUserID`)
+         select :MergeID, :Table, :Column, `$PK`, :OldUserID, :NewUserID
+         from `GDN_$Table` t
+         where t.`$Column` = :OldUserID2";
+      Gdn::SQL()->Database->Query($Sql,
+         array(':MergeID' => $MergeID, ':Table' => $Table, ':Column' => $Column, 
+            ':OldUserID' => $OldUserID, ':NewUserID' => $NewUserID, ':OldUserID2' => $OldUserID));
+      
+      Gdn::SQL()->Options('Ignore', TRUE)->Put(
+         $Table,
+         array($Column => $NewUserID),
+         array($Column => $OldUserID));
+   }
+   
+   protected function MergeStart($OldUserID, $NewUserID) {
+      $Model = new Gdn_Model('UserMerge');
+      
+      // Grab the users.
+      $OldUser = $this->GetID($OldUserID, DATASET_TYPE_ARRAY);
+      $NewUser = $this->GetID($NewUserID, DATASET_TYPE_ARRAY);
+      
+      // First see if there is a record with the same merge.
+      $Row = $Model->GetWhere(array('OldUserID' => $OldUserID, 'NewUserID' => $NewUserID))->FirstRow(DATASET_TYPE_ARRAY);
+      if ($Row) {
+         $MergeID = $Row['MergeID'];
+         
+         // Save this merge in the log.
+         if ($Row['Attributes'])
+            $Attributes = unserialize($Row['Attributes']);
+         else
+            $Attributes = array();
+        
+         $Attributes['Log'][] = array('UserID' => Gdn::Session()->UserID, 'Date' => Gdn_Format::ToDateTime());
+         $Row = array('MergeID' => $MergeID, 'Attributes' => $Attributes);
+      } else {
+         $Row = array(
+            'OldUserID' => $OldUserID,
+            'NewUserID' => $NewUserID);
+      }
+      
+      $UserSet = array();
+      $OldUserSet = array();
+      if (DateCompare($OldUser['DateFirstVisit'], $NewUser['DateFirstVisit']) < 0)
+         $UserSet['DateFirstVisit'] = $OldUser['DateFirstVisit'];
+      
+      if (!isset($Row['Attributes']['User']['CountVisits'])) {
+         $UserSet['CountVisits'] = $OldUser['CountVisits'] + $NewUser['CountVisits'];
+         $OldUserSet['CountVisits'] = 0;
+      }
+      
+      if (!empty($UserSet)) {
+         // Save the user information on the merge record.
+         foreach ($UserSet as $Key => $Value) {
+            // Only save changed values that aren't already there from a previous merge.
+            if ($NewUser[$Key] != $Value && !isset($Row['Attributes']['User'][$Key])) {
+               $Row['Attributes']['User'][$Key] = $NewUser[$Key];
+            }
+         }
+      }
+      
+      $MergeID = $Model->Save($Row);
+      if (GetValue('MergeID', $Row))
+         $MergeID = $Row['MergeID'];
+      
+      if (!$MergeID) {
+         throw new Gdn_UserException($Model->Validation->ResultsText());
+      }
+      
+      // Update the user with the new user-level data.
+      $this->SetField($NewUserID, $UserSet);
+      if (!empty($OldUserSet)) {
+         $this->SetField($OldUserID, $OldUserSet);
+      }
+      
+      return $MergeID;
+   }
+   
+   protected function MergeFinish($MergeID) {
+      $Row = Gdn::SQL()->GetWhere('UserMerge', array('MergeID' => $MergeID))->FirstRow(DATASET_TYPE_ARRAY);
+      
+      if (isset($Row['Attributes'])  && !empty($Row['Attributes'])) {
+         Trace(unserialize($Row['Attributes']), 'Merge Attributes');
+      }
+      
+      $UserIDs = array(
+         $Row['OldUserID'],
+         $Row['NewUserID']);
+      
+      foreach ($UserIDs as $UserID) {
+         $this->Counts('countdiscussions', $UserID);
+         $this->Counts('countcomments', $UserID);
+      }
+   }
+   
+   public function Counts($Column, $UserID = null) {
+      if ($UserID) {
+         $Where = array('UserID' => $UserID);
+      } else
+         $Where = NULL;
+      
+      switch (strtolower($Column)) {
+         case 'countdiscussions':
+            Gdn::Database()->Query(DBAModel::GetCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID', $Where));
+            break;
+         case 'countcomments':
+            Gdn::Database()->Query(DBAModel::GetCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID', $Where));
+            break;
+      }
+      
+      if ($UserID) {
+         $this->ClearCache($UserID);
+      }
    }
 
    /**

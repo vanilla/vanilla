@@ -1404,12 +1404,13 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          case DELIVERY_METHOD_JSON:
          default:
-            header('Content-Type: application/json', TRUE);
             if (($Callback = $this->Request->Get('callback', FALSE)) && $this->AllowJSONP()) {
+               header('Content-Type: application/javascript', TRUE);
                // This is a jsonp request.
                echo $Callback.'('.json_encode($Data).');';
                return TRUE;
             } else {
+               header('Content-Type: application/json', TRUE);
                // This is a regular json request.
                echo json_encode($Data);
                return TRUE;
@@ -1529,11 +1530,12 @@ class Gdn_Controller extends Gdn_Pluggable {
       
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
-            header('Content-Type: application/json', TRUE);
             if (($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) && $this->AllowJSONP()) {
+               header('Content-Type: application/javascript', TRUE);
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
             } else {
+               header('Content-Type: application/json', TRUE);
                // This is a regular json request.
                exit(json_encode($Data));
             }

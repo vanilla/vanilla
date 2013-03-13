@@ -223,17 +223,10 @@ if($PermissionModel instanceof PermissionModel) {
 // Define the set of permissions that Garden uses.
 $PermissionModel->Define(array(
    'Garden.Email.View' => 'Garden.SignIn.Allow',
-   'Garden.Email.Manage',
    'Garden.Settings.Manage',
    'Garden.Settings.View',
-   'Garden.Routes.Manage',
    'Garden.Messages.Manage',
-   'Garden.Applications.Manage',
-   'Garden.Plugins.Manage',
-   'Garden.Themes.Manage',
    'Garden.SignIn.Allow' => 1,
-   'Garden.Registration.Manage',
-   'Garden.Roles.Manage',
    'Garden.Users.Add',
    'Garden.Users.Edit',
    'Garden.Users.Delete',
@@ -245,6 +238,16 @@ $PermissionModel->Define(array(
    'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
    'Garden.Moderation.Manage',
    'Garden.AdvancedNotifications.Allow'
+   ));
+
+$PermissionModel->Undefine(array(
+   'Garden.Applications.Manage',
+   'Garden.Email.Manage',
+   'Garden.Plugins.Manage',
+   'Garden.Registration.Manage',
+   'Garden.Roles.Manage',
+   'Garden.Routes.Manage',
+   'Garden.Themes.Manage'
    ));
 
 if (!$PermissionTableExists) {
@@ -303,13 +306,6 @@ if (!$PermissionTableExists) {
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
       'Garden.Settings.Manage' => 1,
-      'Garden.Routes.Manage' => 1,
-      'Garden.Applications.Manage' => 1,
-      'Garden.Plugins.Manage' => 1,
-      'Garden.Themes.Manage' => 1,
-      'Garden.SignIn.Allow' => 1,
-      'Garden.Registration.Manage' => 1,
-      'Garden.Roles.Manage' => 1,
       'Garden.Users.Add' => 1,
       'Garden.Users.Edit' => 1,
       'Garden.Users.Delete' => 1,
@@ -675,6 +671,28 @@ $Construct
    
    ->Set(FALSE, FALSE);
 
+// Merge backup.
+$Construct
+   ->Table('UserMerge')
+   ->PrimaryKey('MergeID')
+   ->Column('OldUserID', 'int', FALSE, 'key')
+   ->Column('NewUserID', 'int', FALSE, 'key')
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertUserID', 'int')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('Attributes', 'text', TRUE)
+   ->Set();
+
+$Construct
+   ->Table('UserMergeItem')
+   ->Column('MergeID', 'int', FALSE, 'key')
+   ->Column('Table', 'varchar(30)')
+   ->Column('Column', 'varchar(30)')
+   ->Column('RecordID', 'int')
+   ->Column('OldUserID', 'int')
+   ->Column('NewUserID', 'int')
+   ->Set();
 /**
  * Log significant operations against used IP
  * Non unique.

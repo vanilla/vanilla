@@ -354,7 +354,6 @@ class Gdn_Memcached extends Gdn_Cache {
             $Decremented = $this->Memcache->decrement($RealKey, $Amount, $Initial, $Expiry);
             break;
       }
-      $Decremented = $this->Memcache->decrement($RealKey, $Amount);
       if ($Decremented !== FALSE) {
          Gdn_Cache::LocalSet($RealKey, $Decremented);
          return $Decremented;

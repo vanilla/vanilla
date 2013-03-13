@@ -157,7 +157,9 @@ function WriteListItem($Row, $Depth = 1) {
             echo GetOptions($Row); 
             echo CategoryPhoto($Row);
             echo '<'.$H.' class="CategoryName TitleWrap">';
+            echo CategoryPhoto($Row);
             echo Anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
+         
             Gdn::Controller()->EventArguments['Category'] = $Row;
             Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
             echo '</'.$H.'>';

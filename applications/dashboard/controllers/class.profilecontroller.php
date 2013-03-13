@@ -80,6 +80,7 @@ class ProfileController extends Gdn_Controller {
          $this->CssClass .= 'EditMode';
 
       $this->SetData('Breadcrumbs', array());
+      $this->CanEditPhotos = C('Garden.Profile.EditPhotos') || Gdn::Session()->CheckPermission('Garden.Users.Edit');
    }
    
    /** 
@@ -601,6 +602,10 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Picture($UserReference = '', $Username = '', $UserID = '') {
+      if (!C('Garden.Profile.EditPhotos', TRUE)) {
+         throw ForbiddenException('@Editing user photos has been disabled.');
+      }
+      
       // Permission checks
       $this->Permission('Garden.Profiles.Edit');
       $Session = Gdn::Session();
@@ -971,6 +976,10 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Thumbnail($UserReference = '', $Username = '') {
+      if (!C('Garden.Profile.EditPhotos', TRUE)) {
+         throw ForbiddenException('@Editing user photos has been disabled.');
+      }
+      
       // Initial permission checks (valid user)
       $this->Permission('Garden.SignIn.Allow');            
       $Session = Gdn::Session();
@@ -1171,7 +1180,7 @@ class ProfileController extends Gdn_Controller {
       $Module->AddItem('Options', '', FALSE, array('class' => 'SideMenu'));
          
       // Check that we have the necessary tools to allow image uploading
-      $AllowImages = Gdn_UploadImage::CanUploadImages();
+      $AllowImages = C('Garden.Profile.EditPhotos', TRUE) && Gdn_UploadImage::CanUploadImages();
          
       // Is the photo hosted remotely?
       $RemotePhoto = IsUrl($this->User->Photo);

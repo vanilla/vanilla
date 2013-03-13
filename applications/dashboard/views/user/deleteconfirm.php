@@ -6,7 +6,7 @@ echo $this->Form->Errors();
 ?>
 <div class="Messages Errors" style="margin-bottom: 20px;">
    <ul>
-      <li><?php printf(T("By clicking the button below, you will be deleting the user account for %s forever."), Wrap($this->User->Name, 'strong')); ?></li>
+      <li><?php printf(T("By clicking the button below, you will be deleting the user account for %s forever."), Wrap(htmlspecialchars($this->User->Name), 'strong')); ?></li>
       <li><?php
       if ($this->Method == 'keep')
          echo T("The user content will remain untouched.");

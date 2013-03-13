@@ -140,8 +140,11 @@ class PostController extends VanillaController {
             $this->Form->SetData($this->Discussion);
          } elseif (isset($this->Draft))
             $this->Form->SetData($this->Draft);
-         elseif ($this->Category !== NULL)
-            $this->Form->SetData(array('CategoryID' => $this->Category->CategoryID));
+         else {
+            if ($this->Category !== NULL)
+               $this->Form->SetData(array('CategoryID' => $this->Category->CategoryID));
+            $this->PopulateForm($this->Form);
+         }
             
       } else { // Form was submitted
          // Save as a draft?
@@ -758,6 +761,26 @@ class PostController extends VanillaController {
       $this->AddCssFile('vanilla.css');
 		$this->AddModule('NewDiscussionModule');
    }
+   
+   /**
+    * Pre-populate the form with values from the query string.
+    * 
+    * @param Gdn_Form $Form
+    */
+   protected function PopulateForm($Form) {
+      $Get = $this->Request->Get();
+      $Get = array_change_key_case($Get);
+      $Values = ArrayTranslate($Get, array('name' => 'Name', 'tags' => 'Tags', 'body' => 'Body'));
+      foreach ($Values as $Key => $Value) {
+         $Form->SetValue($Key, $Value);
+      }
+      
+      if (isset($Get['category'])) {
+         $Category = CategoryModel::Categories($Get['category']);
+         if ($Category)
+            $Form->SetValue('CategoryID', $Category['CategoryID']);
+      }
+   }
 }
 
 function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array()) {
@@ -768,13 +791,13 @@ function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array(
       $Value = array_pop(array_keys($ListOptions));
       
       // This can be represented by a checkbox.
-      return $Form->CheckBox($FieldName, $LabelCode, array('Value' => $Value));
+      return $Form->CheckBox($FieldName, $LabelCode);
    } else {
       $CssClass = GetValue('ListClass', $Attributes, 'List Inline');
       
       $Result = ' <b>'.T($LabelCode)."</b> <ul class=\"$CssClass\">";
       foreach ($ListOptions as $Value => $Code) {
-         $Result .= ' <li>'.$Form->Radio($FieldName, $Code).'</li> ';
+         $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
       }
       $Result .= '</ul>';
       return $Result;

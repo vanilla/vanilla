@@ -667,6 +667,8 @@ class ActivityModel extends Gdn_Model {
       }
       
       $ConfigPreference = C("Preferences.$Type.$ActivityType", '0');
+      if ((int)$ConfigPreference === 2)
+         $Preference = TRUE; // This preference is forced on.
       if ($ConfigPreference !== FALSE)
          $Preference = ArrayValue($Type.'.'.$ActivityType, $Preferences, $ConfigPreference);
       else
@@ -1201,10 +1203,19 @@ class ActivityModel extends Gdn_Model {
             
             $this->EventArguments['Activity'] =& $Activity;
             $this->EventArguments['ActivityID'] = NULL;
+            
+            $Handled = FALSE;
+            $this->EventArguments['Handled'] =& $Handled;
+            
             $this->FireEvent('BeforeSave');
             
             if (count($this->ValidationResults()) > 0)
                return FALSE;
+            
+            if ($Handled) {
+               // A plugin handled this activity so don't save it.
+               return $Activity;
+            }
             
             if (GetValue('CheckSpam', $Options)) {
                // Check for spam
@@ -1248,6 +1259,11 @@ class ActivityModel extends Gdn_Model {
       if ($NotificationInc > 0) {
          $CountNotifications =  Gdn::UserModel()->GetID($Activity['NotifyUserID'])->CountNotifications + $NotificationInc;
          Gdn::UserModel()->SetField($Activity['NotifyUserID'], 'CountNotifications', $CountNotifications);
+      }
+      
+      // If this is a wall post then we need to notify on that.
+      if ($Activity['ActivityType'] == 'WallPost' && $Activity['NotifyUserID'] == self::NOTIFY_PUBLIC) {
+         $this->NotifyWallPost($Activity);
       }
       
       return $Activity;
@@ -1308,6 +1324,22 @@ class ActivityModel extends Gdn_Model {
 //      decho($NewActivity, 'MergedActivity');
 //      die();
       return $NewActivity;
+   }
+   
+   protected function NotifyWallPost($WallPost) {
+      $NotifyUser = Gdn::UserModel()->GetID($WallPost['ActivityUserID']);
+      
+      $Activity = array(
+         'ActivityType' => 'WallPost',
+         'ActivityUserID' => $WallPost['RegardingUserID'],
+         'NotifyUserID' => $WallPost['ActivityUserID'],
+         'RecordType' => 'Activity',
+         'RecordID' => $WallPost['ActivityID'],
+         'Route' => UserUrl($NotifyUser, ''),
+         'HeadlineFormat' => T('HeadlineFormat.NotifyWallPost', '{ActivityUserID,User} posted on your <a href="{Url,url}">wall</a>.')
+      );
+      
+      $this->Save($Activity, 'WallComment');
    }
    
    public function SaveQueue() {

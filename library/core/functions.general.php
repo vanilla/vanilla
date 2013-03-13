@@ -634,6 +634,30 @@ if (!function_exists('filter_input')) {
    }
 }
 
+if (!function_exists('DateCompare')) {
+   /**
+    * Compare two dates.
+    * This function compares two dates in a way that is similar to strcmp().
+    * 
+    * @param int|string $Date1
+    * @param int|string $Date2
+    * @return int
+    * @since 2.1
+    */
+   function DateCompare($Date1, $Date2) {
+      if (!is_numeric($Date1))
+         $Date1 = strtotime($Date1);
+      if (!is_numeric($Date2))
+         $Date2 = strtotime($Date2);
+      
+      if ($Date1 == $Date2)
+         return 0;
+      if ($Date1 > $Date2)
+         return 1;
+      return -1;
+   }
+}
+
 if (!function_exists('Debug')) {
    function Debug($Value = NULL) {
       static $Debug = FALSE;
@@ -1585,7 +1609,7 @@ if (!function_exists('IsMobile')) {
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos|playbook)/i', $UserAgent))
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos|playbook|bb10)/i', $UserAgent))
          $Mobile++;
  
       if(

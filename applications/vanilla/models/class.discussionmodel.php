@@ -1416,7 +1416,7 @@ class DiscussionModel extends VanillaModel {
                
             } else {
                // Inserting.
-               if (!GetValue('Format', $Fields))
+               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
                   $Fields['Format'] = C('Garden.InputFormatter', '');
                
                // Check for spam.

@@ -892,6 +892,7 @@ class SettingsController extends DashboardController {
       }
       
       ob_clean();
+      header(self::GetStatusMessage(200), TRUE, 200);
       echo 'Success';
    }
 

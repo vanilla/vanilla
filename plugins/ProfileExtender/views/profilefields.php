@@ -6,7 +6,7 @@ $CustomValues = GetValue('CustomValue', $Sender->Form->FormValues(), array());
 
 // Write out the suggested fields first
 if (count($this->ProfileFields) > 0)
-   echo Wrap(Wrap(T('More Information'), 'label'), 'li');
+   echo Wrap(Wrap(T('More Information'), 'h3'), 'li');
 	
 $CountFields = 0;
 foreach ($this->ProfileFields as $Field) {

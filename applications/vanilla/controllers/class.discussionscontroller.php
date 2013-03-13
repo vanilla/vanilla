@@ -482,6 +482,8 @@ class DiscussionsController extends VanillaController {
 	 * Takes a set of discussion identifiers and returns their comment counts in the same order.
 	 */
 	public function GetCommentCounts() {
+      $this->AllowJSONP(TRUE);
+      
 		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
 		if (!is_array($vanilla_identifier))
 			$vanilla_identifier = array($vanilla_identifier);

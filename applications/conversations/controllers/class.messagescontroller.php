@@ -86,6 +86,10 @@ class MessagesController extends ConversationsController {
                   $RecipientUserIDs[] = $User->UserID;
             }
          }
+         
+         $this->EventArguments['Recipients'] = $RecipientUserIDs;
+         $this->FireEvent('BeforeAddConversation');
+         
          $this->Form->SetFormValue('RecipientUserID', $RecipientUserIDs);
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
          if ($ConversationID !== FALSE) {
@@ -121,6 +125,12 @@ class MessagesController extends ConversationsController {
       
       if ($this->Form->AuthenticatedPostBack()) {
          $ConversationID = $this->Form->GetFormValue('ConversationID', '');
+         $Conversation = $this->ConversationModel->GetID($ConversationID, Gdn::Session()->UserID);   
+         
+         $this->EventArguments['Conversation'] = $Conversation;
+         $this->EventArguments['ConversationID'] = $ConversationID;
+         $this->FireEvent('BeforeAddMessage');
+         
          $NewMessageID = $this->Form->Save();
          
          if ($NewMessageID) {
@@ -135,7 +145,6 @@ class MessagesController extends ConversationsController {
                $LastMessageID = $NewMessageID - 1;
             
             $Session = Gdn::Session();
-            $Conversation = $this->ConversationModel->GetID($ConversationID, $Session->UserID);   
             $MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
             $this->Conversation = $Conversation;
             $this->MessageData = $MessageData;

@@ -395,6 +395,7 @@ class DiscussionsController extends VanillaController {
     */
    public function Mine($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
+      Gdn_Theme::Section('DiscussionList');
       
       // Set criteria & get discussions data
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
@@ -481,6 +482,8 @@ class DiscussionsController extends VanillaController {
 	 * Takes a set of discussion identifiers and returns their comment counts in the same order.
 	 */
 	public function GetCommentCounts() {
+      $this->AllowJSONP(TRUE);
+      
 		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
 		if (!is_array($vanilla_identifier))
 			$vanilla_identifier = array($vanilla_identifier);

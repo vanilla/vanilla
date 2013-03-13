@@ -87,6 +87,7 @@ jQuery(document).ready(function($) {
       $('div.Popup').remove();
       var frm = $('#Form_ConversationMessage');
       frm.find('textarea').val('');
+      frm.trigger('clearCommentForm');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
    }

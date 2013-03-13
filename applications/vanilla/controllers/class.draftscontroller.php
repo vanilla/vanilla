@@ -28,6 +28,8 @@ class DraftsController extends VanillaController {
     * @param int $Offset Number of drafts to skip.
     */
    public function Index($Offset = '0') {
+      Gdn_Theme::Section('DiscussionList');
+      
       // Setup head
       $this->Permission('Garden.SignIn.Allow');
       $this->AddCssFile('vanilla.css');

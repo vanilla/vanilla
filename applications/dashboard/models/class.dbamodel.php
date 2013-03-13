@@ -140,6 +140,31 @@ class DBAModel extends Gdn_Model {
       return $Result;
    }
    
+   public function FixUrlCodes($Table, $Column) {
+      $Model = $this->CreateModel($Table);
+      
+      // Get the data to decode.
+      $Data = $this->SQL
+         ->Select($Model->PrimaryKey)
+         ->Select($Column)
+         ->From($Table)
+//         ->Like($Column, '&%;', 'both')
+//         ->Limit($Limit)
+         ->Get()->ResultArray();
+      
+      foreach ($Data as $Row) {
+         $Value = $Row[$Column];
+         $Encoded = Gdn_Format::Url($Value);
+         
+         if (!$Value || $Value != $Encoded) {
+            $Model->SetField($Row[$Model->PrimaryKey], $Column, $Encoded);
+            Gdn::Controller()->Data['Encoded'][$Row[$Model->PrimaryKey]] = $Encoded;
+         }
+      }
+      
+      return array('Complete' => TRUE);
+   }
+   
    public function ResetBatch($Table, $Key) {
       $Key = "DBA.Range.$Key";
       Gdn::Set($Key, NULL);

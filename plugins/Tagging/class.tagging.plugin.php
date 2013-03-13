@@ -89,6 +89,8 @@ class TaggingPlugin extends Gdn_Plugin {
     * Load discussions for a specific tag.
     */
    public function DiscussionsController_Tagged_Create($Sender) {
+      Gdn_Theme::Section('DiscussionList');
+      
       if ($Sender->Request->Get('Tag')) {
          $Tag = $Sender->Request->Get('Tag');
          $Page = GetValue('0', $Sender->RequestArgs, 'p1');

@@ -612,7 +612,7 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Picture($UserReference = '', $Username = '', $UserID = '') {
-      if (!$this->CanEditPhotos) {
+      if (!C('Garden.Profile.EditPhotos', TRUE)) {
          throw ForbiddenException('@Editing user photos has been disabled.');
       }
       
@@ -986,7 +986,7 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Thumbnail($UserReference = '', $Username = '') {
-      if (!$this->CanEditPhotos) {
+      if (!C('Garden.Profile.EditPhotos', TRUE)) {
          throw ForbiddenException('@Editing user photos has been disabled.');
       }
       
@@ -1190,7 +1190,7 @@ class ProfileController extends Gdn_Controller {
       $Module->AddItem('Options', '', FALSE, array('class' => 'SideMenu'));
          
       // Check that we have the necessary tools to allow image uploading
-      $AllowImages = $this->CanEditPhotos && Gdn_UploadImage::CanUploadImages();
+      $AllowImages = C('Garden.Profile.EditPhotos', TRUE) && Gdn_UploadImage::CanUploadImages();
          
       // Is the photo hosted remotely?
       $RemotePhoto = IsUrl($this->User->Photo);

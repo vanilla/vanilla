@@ -395,6 +395,7 @@ class DiscussionsController extends VanillaController {
     */
    public function Mine($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
+      Gdn_Theme::Section('DiscussionList');
       
       // Set criteria & get discussions data
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));

@@ -65,6 +65,7 @@ var DEFAULT_CLASSES = {
    dropdownItem: "token-input-dropdown-item",
    dropdownItem2: "token-input-dropdown-item2",
    selectedDropdownItem: "token-input-selected-dropdown-item",
+   focused: "token-input-focused",
    inputToken: "token-input-input-token"
 };
 
@@ -204,10 +205,12 @@ $.TokenList = function (input, url_or_data, settings) {
          if (settings.tokenLimit === null || settings.tokenLimit !== token_count) {
             show_dropdown_hint();
          }
+         token_list.addClass(settings.classes.focused);
       })
       .blur(function () {
          hide_dropdown();
          $(this).val("");
+         token_list.removeClass(settings.classes.focused);
       })
       .bind("keyup keydown blur update", resize_input)
       .keydown(function (event) {

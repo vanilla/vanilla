@@ -21,9 +21,6 @@ class UserModel extends Gdn_Model {
    const LOGIN_RATE_KEY = 'user.login.{Source}.rate';
    
    const LOGIN_RATE = 1;
-   
-   static $UserCache = array();
-   
    public $SessionColumns;
    
    /**
@@ -119,9 +116,182 @@ class UserModel extends Gdn_Model {
       }
       
       // TODO: Check for junction table permissions.
-      
       $Result = in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
       return $Result;
+   }
+   
+   /**
+    * Merge the old user into the new user.
+    * 
+    * @param int $OldUserID
+    * @param int $NewUserID
+    */
+   public function Merge($OldUserID, $NewUserID) {
+      $OldUser = $this->GetID($OldUserID, DATASET_TYPE_ARRAY);
+      $NewUser = $this->GetID($NewUserID, DATASET_TYPE_ARRAY);
+      
+      if (!$OldUser || !$NewUser) {
+         throw new Gdn_UserException("Could not find one or both users to merge.");
+      }
+      
+      $Map = array('UserID', 'Name', 'Email', 'CountVisits', 'CountDiscussions', 'CountComments');
+      
+      $Result = array('MergeID' => NULL, 'Before' => array(
+         'OldUser' => ArrayTranslate($OldUser, $Map),
+         'NewUser' => ArrayTranslate($NewUser, $Map)));
+      
+      // Start the merge.
+      $MergeID = $this->MergeStart($OldUserID, $NewUserID);
+      
+      // Copy all discussions from the old user to the new user.
+      $this->MergeCopy($MergeID, 'Discussion', 'InsertUserID', $OldUserID, $NewUserID);
+      
+      // Copy all the comments from the old user to the new user.
+      $this->MergeCopy($MergeID, 'Comment', 'InsertUserID', $OldUserID, $NewUserID);
+      
+      // Copy all of the activities.
+      $this->MergeCopy($MergeID, 'Activity', 'NotifyUserID', $OldUserID, $NewUserID);
+      $this->MergeCopy($MergeID, 'Activity', 'InsertUserID', $OldUserID, $NewUserID);
+      $this->MergeCopy($MergeID, 'Activity', 'ActivityUserID', $OldUserID, $NewUserID);
+      
+      // Copy all of the activity comments.
+      $this->MergeCopy($MergeID, 'ActivityComment', 'InsertUserID', $OldUserID, $NewUserID);
+      
+      // Copy all conversations.
+      $this->MergeCopy($MergeID, 'Conversation', 'InsertUserID', $OldUserID, $NewUserID);
+      $this->MergeCopy($MergeID, 'ConversationMessage', 'InsertUserID', $OldUserID, $NewUserID, 'MessageID');
+      $this->MergeCopy($MergeID, 'UserConversation', 'UserID', $OldUserID, $NewUserID, 'ConversationID');
+      
+      $this->MergeFinish($MergeID);
+      
+      $OldUser = $this->GetID($OldUserID, DATASET_TYPE_ARRAY);
+      $NewUser = $this->GetID($NewUserID, DATASET_TYPE_ARRAY);
+      
+      $Result['MergeID'] = $MergeID;
+      $Result['After'] = array(
+         'OldUser' => ArrayTranslate($OldUser, $Map),
+         'NewUser' => ArrayTranslate($NewUser, $Map));
+      
+      return $Result;
+   }
+   
+   protected function MergeCopy($MergeID, $Table, $Column, $OldUserID, $NewUserID, $PK = NULL) {
+      if (!$PK)
+         $PK = $Table.'ID';
+      
+      // Insert the columns to the bak table.
+      $Sql = "insert ignore GDN_UserMergeItem(`MergeID`, `Table`, `Column`, `RecordID`, `OldUserID`, `NewUserID`)
+         select :MergeID, :Table, :Column, `$PK`, :OldUserID, :NewUserID
+         from `GDN_$Table` t
+         where t.`$Column` = :OldUserID2";
+      Gdn::SQL()->Database->Query($Sql,
+         array(':MergeID' => $MergeID, ':Table' => $Table, ':Column' => $Column, 
+            ':OldUserID' => $OldUserID, ':NewUserID' => $NewUserID, ':OldUserID2' => $OldUserID));
+      
+      Gdn::SQL()->Options('Ignore', TRUE)->Put(
+         $Table,
+         array($Column => $NewUserID),
+         array($Column => $OldUserID));
+   }
+   
+   protected function MergeStart($OldUserID, $NewUserID) {
+      $Model = new Gdn_Model('UserMerge');
+      
+      // Grab the users.
+      $OldUser = $this->GetID($OldUserID, DATASET_TYPE_ARRAY);
+      $NewUser = $this->GetID($NewUserID, DATASET_TYPE_ARRAY);
+      
+      // First see if there is a record with the same merge.
+      $Row = $Model->GetWhere(array('OldUserID' => $OldUserID, 'NewUserID' => $NewUserID))->FirstRow(DATASET_TYPE_ARRAY);
+      if ($Row) {
+         $MergeID = $Row['MergeID'];
+         
+         // Save this merge in the log.
+         if ($Row['Attributes'])
+            $Attributes = unserialize($Row['Attributes']);
+         else
+            $Attributes = array();
+        
+         $Attributes['Log'][] = array('UserID' => Gdn::Session()->UserID, 'Date' => Gdn_Format::ToDateTime());
+         $Row = array('MergeID' => $MergeID, 'Attributes' => $Attributes);
+      } else {
+         $Row = array(
+            'OldUserID' => $OldUserID,
+            'NewUserID' => $NewUserID);
+      }
+      
+      $UserSet = array();
+      $OldUserSet = array();
+      if (DateCompare($OldUser['DateFirstVisit'], $NewUser['DateFirstVisit']) < 0)
+         $UserSet['DateFirstVisit'] = $OldUser['DateFirstVisit'];
+      
+      if (!isset($Row['Attributes']['User']['CountVisits'])) {
+         $UserSet['CountVisits'] = $OldUser['CountVisits'] + $NewUser['CountVisits'];
+         $OldUserSet['CountVisits'] = 0;
+      }
+      
+      if (!empty($UserSet)) {
+         // Save the user information on the merge record.
+         foreach ($UserSet as $Key => $Value) {
+            // Only save changed values that aren't already there from a previous merge.
+            if ($NewUser[$Key] != $Value && !isset($Row['Attributes']['User'][$Key])) {
+               $Row['Attributes']['User'][$Key] = $NewUser[$Key];
+            }
+         }
+      }
+      
+      $MergeID = $Model->Save($Row);
+      if (GetValue('MergeID', $Row))
+         $MergeID = $Row['MergeID'];
+      
+      if (!$MergeID) {
+         throw new Gdn_UserException($Model->Validation->ResultsText());
+      }
+      
+      // Update the user with the new user-level data.
+      $this->SetField($NewUserID, $UserSet);
+      if (!empty($OldUserSet)) {
+         $this->SetField($OldUserID, $OldUserSet);
+      }
+      
+      return $MergeID;
+   }
+   
+   protected function MergeFinish($MergeID) {
+      $Row = Gdn::SQL()->GetWhere('UserMerge', array('MergeID' => $MergeID))->FirstRow(DATASET_TYPE_ARRAY);
+      
+      if (isset($Row['Attributes'])  && !empty($Row['Attributes'])) {
+         Trace(unserialize($Row['Attributes']), 'Merge Attributes');
+      }
+      
+      $UserIDs = array(
+         $Row['OldUserID'],
+         $Row['NewUserID']);
+      
+      foreach ($UserIDs as $UserID) {
+         $this->Counts('countdiscussions', $UserID);
+         $this->Counts('countcomments', $UserID);
+      }
+   }
+   
+   public function Counts($Column, $UserID = null) {
+      if ($UserID) {
+         $Where = array('UserID' => $UserID);
+      } else
+         $Where = NULL;
+      
+      switch (strtolower($Column)) {
+         case 'countdiscussions':
+            Gdn::Database()->Query(DBAModel::GetCountSQL('count', 'User', 'Discussion', 'CountDiscussions', 'DiscussionID', 'UserID', 'InsertUserID', $Where));
+            break;
+         case 'countcomments':
+            Gdn::Database()->Query(DBAModel::GetCountSQL('count', 'User', 'Comment', 'CountComments', 'CommentID', 'UserID', 'InsertUserID', $Where));
+            break;
+      }
+      
+      if ($UserID) {
+         $this->ClearCache($UserID);
+      }
    }
 
    /**
@@ -242,6 +412,7 @@ class UserModel extends Gdn_Model {
       
       $String = $Parts[0];
       $Data = json_decode(base64_decode($String), TRUE);
+      Trace($Data, 'RAW SSO Data');
       $Errors = 0;
       
       if (!isset($Parts[1])) {
@@ -278,9 +449,6 @@ class UserModel extends Gdn_Model {
          case 'hmacsha1':
             $CalcSignature = hash_hmac('sha1', "$String $Timestamp", $Secret);
             break;
-         case 'md5':
-            $CalcSignature = md5("$String $Timestamp".$Secret);
-            break;
          default:
             Trace("Invalid SSO hash method $HashMethod.", TRACE_ERROR);
             return;
@@ -291,7 +459,12 @@ class UserModel extends Gdn_Model {
       }
       
       $UniqueID = $Data['uniqueid'];
-      $User = ArrayTranslate($Data, array('name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo'));
+      $User = ArrayTranslate($Data, array(
+         'name' => 'Name', 
+         'email' => 'Email',
+         'photourl' => 'Photo',
+         'uniqueid' => NULL,
+         'client_id' => NULL), TRUE);
       
       Trace($User, 'SSO User');
       
@@ -367,7 +540,7 @@ class UserModel extends Gdn_Model {
     * @param array $UserData Data to go in the user table.
     * @return int The new/existing user ID.
     */
-   public function Connect($UniqueID, $ProviderKey, $UserData) {
+   public function Connect($UniqueID, $ProviderKey, $UserData, $Options = array()) {
       Trace('UserModel->Connect()');
       
       $UserID = FALSE;
@@ -407,8 +580,12 @@ class UserModel extends Gdn_Model {
             $UserData['Password'] = md5(microtime());
             $UserData['HashMethod'] = 'Random';
             
+            TouchValue('CheckCaptcha', $Options, FALSE);
+            TouchValue('NoConfirmEmail', $Options, TRUE);
+            TouchValue('NoActivity', $Options, TRUE);
+            
             Trace($UserData, 'Registering User');
-            $UserID = $this->Register($UserData, array('CheckCaptcha' => FALSE, 'NoConfirmEmail' => TRUE));
+            $UserID = $this->Register($UserData, $Options);
             $UserInserted = TRUE;
          }
          
@@ -422,13 +599,6 @@ class UserModel extends Gdn_Model {
             
             if ($UserInserted && C('Garden.Registration.SendConnectEmail', TRUE)) {
                $Provider = $this->SQL->GetWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->FirstRow(DATASET_TYPE_ARRAY);
-               if ($Provider) {
-                  try {
-                     $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => GetValue('Name', $Provider, C('Garden.Title'))));
-                  } catch (Exception $Ex) {
-                     // Do nothing if emailing doesn't work.
-                  }
-               }
             }
          }
       }
@@ -724,13 +894,16 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetActiveUsers($Limit = 5) {
-      $this->UserQuery();
-      $this->FireEvent('BeforeGetActiveUsers');
-      return $this->SQL
-         ->Where('u.Deleted', 0)
-         ->OrderBy('u.DateLastActive', 'desc')
+      $UserIDs = $this->SQL
+         ->Select('UserID')
+         ->From('User')
+         ->OrderBy('DateLastActive', 'desc')
          ->Limit($Limit, 0)
          ->Get();
+      $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
+      
+      $Data = $this->SQL->GetWhere('User', array('UserID' => $UserIDs), 'DateLastActive', 'desc');
+      return $Data;
    }
 
    public function GetApplicantCount() {
@@ -859,11 +1032,6 @@ class UserModel extends Gdn_Model {
          // Make keys for cache query
          foreach ($IDs as $UserID) {
             if (!$UserID) continue;
-            
-            if (isset(self::$UserCache[$UserID])) {
-               $Data[$UserID] = self::$UserCache[$UserID];
-               continue;
-            }
             
             $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          }
@@ -1944,7 +2112,7 @@ class UserModel extends Gdn_Model {
 
          // And insert the new user
          $UserID = $this->_Insert($Fields, $Options);
-         if ($UserID) {
+         if ($UserID && !GetValue('NoActivity', $Options)) {
             $ActivityModel = new ActivityModel();
             $ActivityModel->Save(array(
                'ActivityUserID' => $UserID,
@@ -2305,13 +2473,15 @@ class UserModel extends Gdn_Model {
          return FALSE;
       }
       
-      $this->DeleteContent($UserID, $Options);
+      $Content = array();
       
       // Remove shared authentications.
-      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Options);
+      $this->GetDelete('UserAuthentication', array('UserID' => $UserID), $Content);
 
       // Remove role associations.
-      $this->GetDelete('UserRole', array('UserID' => $UserID), $Options);
+      $this->GetDelete('UserRole', array('UserID' => $UserID), $Content);
+      
+      $this->DeleteContent($UserID, $Options, $Content);
       
       // Remove the user's information
       $this->SQL->Update('User')
@@ -2348,13 +2518,12 @@ class UserModel extends Gdn_Model {
       return TRUE;
    }
 
-   public function DeleteContent($UserID, $Options = array()) {
+   public function DeleteContent($UserID, $Options = array(), $Content = array()) {
       $Log = GetValue('Log', $Options);
       if ($Log === TRUE)
          $Log = 'Delete';
       
       $Result = FALSE;
-      $Content = array();
       
       // Fire an event so applications can remove their associated user data.
       $this->EventArguments['UserID'] = $UserID;
@@ -2366,7 +2535,7 @@ class UserModel extends Gdn_Model {
       
       if (!$Log)
          $Content = NULL;
-
+      
       // Remove photos
       /*$PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
       foreach ($PhotoData->Result() as $Photo) {
@@ -3191,11 +3360,7 @@ class UserModel extends Gdn_Model {
       
       if ($TokenType != 'userid') return FALSE;
       
-      // Check local page memory cache first
-      if (array_key_exists($UserID, self::$UserCache))
-         return self::$UserCache[$UserID];
-      
-      // Then memcached
+      // Get from memcached
       $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserToken));
       $User = Gdn::Cache()->Get($UserKey);
       
@@ -3224,9 +3389,6 @@ class UserModel extends Gdn_Model {
       if (is_null($UserID) || !$UserID) return FALSE;
       
       $Cached = TRUE;
-      
-      // Local memory page cache
-      self::$UserCache[$UserID] = $User;
       
       $UserKey = FormatString(self::USERID_KEY, array('UserID' => $UserID));
       $Cached = $Cached & Gdn::Cache()->Store($UserKey, $User, array(
@@ -3286,7 +3448,6 @@ class UserModel extends Gdn_Model {
          $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array('UserID' => $UserID, 'PermissionsIncrement' => $PermissionsIncrement));
          Gdn::Cache()->Remove($UserPermissionsKey);
       }
-      unset(self::$UserCache[$UserID]);
       return TRUE;
    }
    

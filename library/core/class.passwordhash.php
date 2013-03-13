@@ -79,6 +79,9 @@ class Gdn_PasswordHash extends PasswordHash {
       $Result = FALSE;
       $ResetUrl = Url('entry/passwordrequest'.(Gdn::Request()->Get('display') ? '?display='.urlencode(Gdn::Request()->Get('display')) : ''));
       switch(strtolower($Method)) {
+         case 'crypt':
+            $Result = (crypt($Password, $StoredHash) === $StoredHash);
+            break;
          case 'django':
             $Result = $this->CheckDjango($Password, $StoredHash);
             break;

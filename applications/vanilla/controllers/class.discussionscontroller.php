@@ -163,15 +163,6 @@ class DiscussionsController extends VanillaController {
          $this->View = 'discussions';
       }
       
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $this->AddDefinition('SetClientHour', $ClientHour);
-      }
-      
       // We don't want search engines to index these pages because they can go in through the individual categories MUCH faster.
       if ($this->Head)
          $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
@@ -268,15 +259,6 @@ class DiscussionsController extends VanillaController {
          $this->View = 'discussions';
       }
       
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $this->AddDefinition('SetClientHour', $ClientHour);
-      }
-      
       $this->Render();
    }
    
@@ -315,6 +297,7 @@ class DiscussionsController extends VanillaController {
     */
    public function Bookmarked($Page = '0') {
       $this->Permission('Garden.SignIn.Allow');
+      Gdn_Theme::Section('DiscussionList');
 
       // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
       $Layout = C('Vanilla.Discussions.Layout');
@@ -412,6 +395,7 @@ class DiscussionsController extends VanillaController {
     */
    public function Mine($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
+      Gdn_Theme::Section('DiscussionList');
       
       // Set criteria & get discussions data
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
@@ -498,6 +482,8 @@ class DiscussionsController extends VanillaController {
 	 * Takes a set of discussion identifiers and returns their comment counts in the same order.
 	 */
 	public function GetCommentCounts() {
+      $this->AllowJSONP(TRUE);
+      
 		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
 		if (!is_array($vanilla_identifier))
 			$vanilla_identifier = array($vanilla_identifier);

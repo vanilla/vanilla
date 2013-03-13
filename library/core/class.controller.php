@@ -665,6 +665,11 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
          $this->_Definitions['SignedIn'] = $SignedIn;
       }
+      
+      if (Gdn::Session()->IsValid()) {
+         // Tell the client what our hour offset is so it can compare it to the user's real offset.
+         TouchValue('SetHourOffset', $this->_Definitions, Gdn::Session()->User->HourOffset);
+      }
 
       if (!array_key_exists('ConfirmHeading', $this->_Definitions))
          $this->_Definitions['ConfirmHeading'] = T('Confirm');
@@ -1541,8 +1546,11 @@ class Gdn_Controller extends Gdn_Pluggable {
          $Data['Data'] = $this->Data;
       }
       
+      // Try cleaning out any notices or errors.
+      @@ob_clean();
+      
 
-      if ($Code >= 100 && $Code <= 505)
+      if ($Code >= 400 && $Code <= 505)
          header("HTTP/1.0 $Code", TRUE, $Code);
       else
          header('HTTP/1.0 500', TRUE, 500);

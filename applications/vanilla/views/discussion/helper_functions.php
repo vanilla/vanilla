@@ -116,6 +116,9 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                <?php echo Anchor(Gdn_Format::Date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
             </span>
             <?php
+               echo DateUpdated($Comment, array('<span class="MItem">', '</span>'));
+            ?>
+            <?php
             // Include source if one was set
             if ($Source = GetValue('Source', $Comment))
                echo Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
@@ -400,7 +403,7 @@ function WriteCommentForm() {
       if (!Gdn::Session()->IsValid()) {
 		?>
 		<div class="Foot Closed">
-			<div class="Note Closed"><?php 
+			<div class="Note Closed SignInOrRegister"><?php 
 			   $Popup =  (C('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
             echo FormatString(
                T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'), 
@@ -420,6 +423,19 @@ function WriteCommentForm() {
 	if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
 		echo $Controller->FetchView('comment', 'post');
 }
+endif;
+
+if (!function_exists('WriteCommentFormHeader')):
+function WriteCommentFormHeader() {
+   $Session = Gdn::Session();
+   if (C('Vanilla.Comment.UserPhotoFirst', TRUE)) {
+      echo UserPhoto($Session->User);
+      echo UserAnchor($Session->User, 'Username');
+   } else {
+      echo UserAnchor($Session->User, 'Username');
+      echo UserPhoto($Session->User);
+   }
+}  
 endif;
 
 if (!function_exists('WriteEmbedCommentForm')):

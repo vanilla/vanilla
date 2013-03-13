@@ -45,6 +45,10 @@
          background: #f00;
          color: #fff;
       }
+      
+      .Trace pre {
+         color: #000;
+      }
    </style>
 <h2>Debug Trace</h2>
 <table>

@@ -4,7 +4,7 @@ $UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
 $Discussion = $this->Data('Discussion');
 $Author = Gdn::UserModel()->GetID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
 
-// Prep event args
+// Prep event args.
 $CssClass = CssClass($Discussion, FALSE);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
@@ -46,6 +46,9 @@ $this->FireEvent('BeforeDiscussionDisplay');
                echo Anchor(Gdn_Format::Date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
                ?>
             </span>
+            <?php
+               echo DateUpdated($Discussion, array('<span class="MItem">', '</span>'));
+            ?>
             <?php
             // Include source if one was set
             if ($Source = GetValue('Source', $Discussion))

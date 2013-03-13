@@ -28,6 +28,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     */
    protected $ThemeCache = NULL;
    
+   /**
+    * Whether to use APC for theme cache storage
+    * @var type 
+    */
+   protected $Apc = FALSE;
+   
    public function __construct() {
       parent::__construct();
    }
@@ -41,6 +47,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     * methods.
     */
    public function Start($Force = FALSE) {
+      
+      if (function_exists('apc_fetch') && C('Garden.Apc', FALSE))
+         $this->Apc = TRUE;
       
       // Build list of all available themes
       $this->AvailableThemes($Force);
@@ -69,7 +78,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             
             // Check Cache
             $SearchPathCacheKey = 'Garden.Themes.PathCache.'.$SearchPath;
-            $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+            if ($this->Apc) {
+               $SearchPathCache = apc_fetch($SearchPathCacheKey);
+            } else {
+               $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+            }
             
             $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
             if ($CacheHit && is_array($SearchPathCache)) {
@@ -91,13 +104,18 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             
             $PathIntegrityHash = md5(serialize($PathListing));
             if (GetValue('CacheIntegrityHash',$SearchPathCache) != $PathIntegrityHash) {
+               Trace('Need to re-index theme cache');
                // Need to re-index this folder
                $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
                if ($PathIntegrityHash === FALSE)
                   continue;
                
                $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-               Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+               if ($this->Apc) {
+                  apc_store($SearchPathCacheKey, $SearchPathCache);
+               } else {
+                  Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+               }
             }
             
             $this->ThemeCache = array_merge($this->ThemeCache, $CacheThemeInfo);
@@ -163,7 +181,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       
       foreach ($SearchPaths as $SearchPath => $SearchPathName) {
          $SearchPathCacheKey = "Garden.Themes.PathCache.{$SearchPath}";
-         $SearchPathCache = Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+         if ($this->Apc) {
+            apc_delete($SearchPathCacheKey);
+         } else {
+            Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+         }
       }
    }
    

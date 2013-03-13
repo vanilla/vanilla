@@ -20,7 +20,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.6.1',
+   'Version' => '1.6.2',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -89,6 +89,8 @@ class TaggingPlugin extends Gdn_Plugin {
     * Load discussions for a specific tag.
     */
    public function DiscussionsController_Tagged_Create($Sender) {
+      Gdn_Theme::Section('DiscussionList');
+      
       if ($Sender->Request->Get('Tag')) {
          $Tag = $Sender->Request->Get('Tag');
          $Page = GetValue('0', $Sender->RequestArgs, 'p1');
@@ -162,15 +164,6 @@ class TaggingPlugin extends Gdn_Plugin {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
          $Sender->View = 'discussions';
-      }
-      
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $Sender->AddDefinition('SetClientHour', $ClientHour);
       }
       
       // Render the controller
@@ -489,7 +482,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $Sender->Form->Method = 'get';
       $Sender->Form->InputPrefix = '';
-      $Sender->Form->Action = '/settings/tagging';
+      //$Sender->Form->Action = '/settings/tagging';
 
       list($Offset, $Limit) = OffsetLimit($Sender->Request->Get('Page'), 100);
       $Sender->SetData('_Limit', $Limit);

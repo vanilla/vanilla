@@ -145,6 +145,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $this->SetValue('Format', $Attributes['format']);
       
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
+      $this->EventArguments['Column'] = $Column;
       
       $this->FireEvent('BeforeBodyBox');
       
@@ -298,7 +299,7 @@ class Gdn_Form extends Gdn_Pluggable {
             else if ($Selected)
                $Return .= ' selected="selected"'; // only allow selection if NOT disabled
             
-            $Name = GetValue('Name', $Category, 'Blank Category Name');
+            $Name = htmlspecialchars(GetValue('Name', $Category, 'Blank Category Name'));
             if ($Depth > 1) {
                $Name = str_pad($Name, strlen($Name)+$Depth-1, ' ', STR_PAD_LEFT);
                $Name = str_replace(' ', '&#160;', $Name);
@@ -952,6 +953,24 @@ class Gdn_Form extends Gdn_Pluggable {
          $Return .= "</ul>\n</div>\n";
       }
       return $Return;
+   }
+   
+   public function ErrorString() {
+      $Return = '';
+      if (is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0) {
+         foreach($this->_ValidationResults as $FieldName => $Problems) {
+            $Count = count($Problems);
+            for($i = 0; $i < $Count; ++$i) {
+               if (substr($Problems[$i], 0, 1) == '@')
+                  $Return .= rtrim(substr($Problems[$i], 1), '.').'. ';
+               else
+                  $Return .= rtrim(sprintf(
+                     T($Problems[$i]),
+                     T($FieldName)), '.').'. ';
+            }
+         }
+      }
+      return trim($Return);
    }
    
    /**

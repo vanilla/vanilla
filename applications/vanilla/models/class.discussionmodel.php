@@ -586,7 +586,6 @@ class DiscussionModel extends VanillaModel {
 
       if (!property_exists($Discussion, 'Read')) {
          $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
-         
          if ($Category && !is_null($Category['DateMarkedRead'])) {
             
             // If the category was marked explicitly read at some point, see if that applies here
@@ -1411,16 +1410,10 @@ class DiscussionModel extends VanillaModel {
                
             } else {
                // Inserting.
-               if (!GetValue('Format', $Fields))
+               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
                   $Fields['Format'] = C('Garden.InputFormatter', '');
                
-               // Clear the cache if necessary.
-               if (GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements');
-                  $this->SQL->Cache($CacheKeys);
-               }
-               
-               // Check for spam
+               // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
             	if ($Spam)
                   return SPAM;
@@ -1447,7 +1440,15 @@ class DiscussionModel extends VanillaModel {
                      'LastUrl' => DiscussionUrl($Fields)
                   );
                   CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
+                  
+                  // Clear the cache if necessary.
+                  if (GetValue('Announce', $Fields)) {
+                     Gdn::Cache()->Remove('Announcements');
+                  }
                }
+               
+               // Update the user's discussion count.
+               $this->UpdateUserDiscussionCount(Gdn::Session()->UserID);
                
                // Assign the new DiscussionID to the comment before saving.
                $FormPostValues['IsNewDiscussion'] = TRUE;
@@ -1680,6 +1681,17 @@ class DiscussionModel extends VanillaModel {
          $CategoryModel->SetField($CategoryID, $CacheAmendment);
          $CategoryModel->SetRecentPost($CategoryID);
       }
+   }
+   
+   public function UpdateUserDiscussionCount($UserID) {
+      $CountDiscussions = $this->SQL
+         ->Select('DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion')
+         ->Where('InsertUserID', $UserID)
+         ->Get()->Value('CountDiscussions', 0);
+      
+      // Save the count to the user table
+      Gdn::UserModel()->SetField($UserID, 'CountDiscussions', $CountDiscussions);
    }
 	
 	/**
@@ -1999,19 +2011,8 @@ class DiscussionModel extends VanillaModel {
 		$this->SQL->Delete('UserDiscussion', array('DiscussionID' => $DiscussionID));
       $this->UpdateDiscussionCount($CategoryID);
       
-      // Get the user's discussion count
-      $CountDiscussions = $this->SQL
-         ->Select('DiscussionID', 'count', 'CountDiscussions')
-         ->From('Discussion')
-         ->Where('InsertUserID', $UserID)
-         ->Get()->Value('CountDiscussions', 0);
-      
-      // Save the count to the user table
-      $this->SQL
-         ->Update('User')
-         ->Set('CountDiscussions', $CountDiscussions)
-         ->Where('UserID', $UserID)
-         ->Put();
+      // Get the user's discussion count.
+      $this->UpdateUserDiscussionCount($UserID);
 
 		// Update bookmark counts for users who had bookmarked this discussion
 		foreach ($BookmarkData->Result() as $User) {

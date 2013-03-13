@@ -87,15 +87,6 @@ class DashboardHooks implements Gdn_IPlugin {
          }
 			$Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
       }
-      
-      // 2012-07-18 - This is handled by the mebox now.
-		// If there are applicants, alert admins by showing in the main menu
-		// if (in_array($Sender->MasterView, array('', 'default')) && $Sender->Menu && C('Garden.Registration.Method') == 'Approval') {
-			// $CountApplicants = Gdn::UserModel()->GetApplicantCount();
-			// if ($CountApplicants > 0)
-			// $Sender->Menu->AddLink('Applicants', T('Applicants').' <span class="Alert">'.$CountApplicants.'</span>', '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
-			// $Sender->Menu->AddLink('Applicants', T('Applicants'), '/dashboard/user/applicants', array('Garden.Applicants.Manage'));
-		// }
 		
       if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Gdn_Statistics = Gdn::Factory('Statistics');
@@ -103,7 +94,7 @@ class DashboardHooks implements Gdn_IPlugin {
       }
 		
       // Allow forum embedding
-      if (C('Garden.Embed.Allow')) {
+      if ($Embed = C('Garden.Embed.Allow')) {
          // Record the remote url where the forum is being embedded.
          $RemoteUrl = C('Garden.Embed.RemoteUrl');
          if (!$RemoteUrl) {
@@ -123,7 +114,11 @@ class DashboardHooks implements Gdn_IPlugin {
          $Sender->AddDefinition('Path', Gdn::Request()->Path());
          // $Sender->AddDefinition('MasterView', $Sender->MasterView);
          $Sender->AddDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
-         $Sender->AddJsFile('js/embed_local.js');
+         
+         if ($Embed === 2)
+            $Sender->AddJsFile('vanilla.embed.local.js');
+         else
+            $Sender->AddJsFile('embed_local.js');
       } else {
          $Sender->SetHeader('X-Frame-Options', 'SAMEORIGIN');
       }
@@ -144,23 +139,21 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
 		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage');
-      $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Themes.Manage');
+      $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Settings.Manage');
       if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) 
-         $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
+         $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Settings.Manage');
 
-		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
+		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
-		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
+		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Settings.Manage');
 			
-      if (C('Garden.Registration.Manage', TRUE))
-			$Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
-      
+      $Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Settings.Manage');
 		$Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage');
 			
       if (C('Garden.Registration.Method') == 'Approval')
-         $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+         $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Users.Approve');
 
       $Menu->AddItem('Moderation', T('Moderation'), FALSE, array('class' => 'Moderation'));
       $Menu->AddLink('Moderation', T('Spam Queue').' <span class="Popin" rel="/dashboard/log/count/spam"></span>', 'dashboard/log/spam', 'Garden.Moderation.Manage');
@@ -169,18 +162,18 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Moderation', T('Banning'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
-      $Menu->AddLink('Forum', T('Social'), 'dashboard/social', 'Garden.Plugins.Manage');
+      $Menu->AddLink('Forum', T('Social'), 'dashboard/social', 'Garden.Settings.Manage');
 		
 		$Menu->AddItem('Reputation', T('Reputation'), FALSE, array('class' => 'Reputation'));
 		
 		$Menu->AddItem('Add-ons', T('Addons'), FALSE, array('class' => 'Addons'));
-      $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Plugins.Manage');
-      $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Applications.Manage');
+      $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Settings.Manage');
+      $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Settings.Manage');
       $Menu->AddLink('Add-ons', T('Locales'), 'dashboard/settings/locales', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Site Settings', T('Settings'), FALSE, array('class' => 'SiteSettings'));
       $Menu->AddLink('Site Settings', T('Outgoing Email'), 'dashboard/settings/email', 'Garden.Settings.Manage');
-      $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Routes.Manage');
+      $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Settings.Manage');
       $Menu->AddLink('Site Settings', T('Statistics'), 'dashboard/statistics', 'Garden.Settings.Manage');
 		
 		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));

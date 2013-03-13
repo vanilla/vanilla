@@ -173,9 +173,10 @@ if (!function_exists('ArrayTranslate')) {
     *
     * @param array $Array The input array to translate.
     * @param array $Mappings The mappings to translate the array.
+    * @param bool $AddRemaining Whether or not to add the remaining items to the array.
     * @return array
     */
-   function ArrayTranslate($Array, $Mappings) {
+   function ArrayTranslate($Array, $Mappings, $AddRemaining = FALSE) {
       $Array = (array)$Array;
       $Result = array();
       foreach ($Mappings as $Index => $Value) {
@@ -186,11 +187,26 @@ if (!function_exists('ArrayTranslate')) {
             $Key = $Index;
             $NewKey = $Value;
          }
-         if (isset($Array[$Key]))
+         if ($NewKey === NULL) {
+            unset($Array[$Key]);
+            continue;
+         }
+         
+         if (isset($Array[$Key])) {
             $Result[$NewKey] = $Array[$Key];
-         else
+            unset($Array[$Key]);
+         } else {
             $Result[$NewKey] = NULL;
+         }
       }
+      
+      if ($AddRemaining) {
+         foreach ($Array as $Key => $Value) {
+            if (!isset($Result[$Key]))
+               $Result[$Key] = $Value;
+         }
+      }
+      
       return $Result;
    }
 }
@@ -615,6 +631,30 @@ if (!function_exists('filter_input')) {
          }
       }
       return $Value;     
+   }
+}
+
+if (!function_exists('DateCompare')) {
+   /**
+    * Compare two dates.
+    * This function compares two dates in a way that is similar to strcmp().
+    * 
+    * @param int|string $Date1
+    * @param int|string $Date2
+    * @return int
+    * @since 2.1
+    */
+   function DateCompare($Date1, $Date2) {
+      if (!is_numeric($Date1))
+         $Date1 = strtotime($Date1);
+      if (!is_numeric($Date2))
+         $Date2 = strtotime($Date2);
+      
+      if ($Date1 == $Date2)
+         return 0;
+      if ($Date1 > $Date2)
+         return 1;
+      return -1;
    }
 }
 
@@ -1569,7 +1609,7 @@ if (!function_exists('IsMobile')) {
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos|playbook)/i', $UserAgent))
+      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos|playbook|bb10)/i', $UserAgent))
          $Mobile++;
  
       if(
@@ -1891,7 +1931,7 @@ if (!function_exists('SignInPopup')) {
     * into modal in-page popups.
     */
    function SignInPopup() {
-      return C('Garden.SignIn.Popup') && !IsMobile();
+      return C('Garden.SignIn.Popup');
    }
 }
 

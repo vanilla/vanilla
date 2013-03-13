@@ -364,7 +364,10 @@ class Gdn_Request {
             SafeParseStr($Get, $Get, $Original);
          }
 
-         if (isset($Get['p'])) {
+         if (isset($Get['_p'])) {
+            $Path = $Get['_p'];
+            unset($_GET['_p']);
+         } elseif (isset($Get['p'])) {
             $Path = $Get['p'];
             unset($_GET['p']);
          } else {

@@ -55,7 +55,8 @@ foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
                // Make sure there are preferences.
                $ConfigCount = 0;
                foreach ($Names as $Name) {
-                  if (C('Preferences.'.$Name, '0') !== FALSE)
+                  $CP = C('Preferences.'.$Name, '0');
+                  if ($CP !== FALSE && $CP != 2)
                      $ConfigCount++;
                }
                if ($ConfigCount == 0)
@@ -73,7 +74,7 @@ foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
                   $NameTypeExplode = explode(".", $Name);
                   $NameType = $NameTypeExplode[0];
                   $ConfigPref = C('Preferences.'.$Name, '0');
-                  if ($ConfigPref === FALSE) {
+                  if ($ConfigPref === FALSE || $ConfigPref == 2) {
                      echo Wrap('&nbsp;', 'td', array('class' => 'PrefCheckBox'));
                   } else {
                   	if (count($Names) < $CountTypes) {

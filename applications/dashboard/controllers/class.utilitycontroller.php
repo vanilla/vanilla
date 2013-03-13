@@ -40,107 +40,107 @@ class UtilityController extends DashboardController {
       Gdn_Theme::Section('Dashboard');
    }
    
-   /**
-    * Call a method on the given model.
-    */
-   public function Model() {
-      $this->Permission('Garden.Settings.Manage');
-      
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $this->DeliveryType(DELIVERY_TYPE_DATA);
-      
-      $Args = func_get_args();
-      
-      // Check to see if we have a model.
-      $ModelName = StringEndsWith(array_shift($Args), 'Model', TRUE, TRUE);
-      $ModelName = ucfirst($ModelName).'Model';
-      if (!class_exists($ModelName)) {
-         throw NotFoundException($ModelName);
-      }
-      
-      // Check for json/xml style extension.
-      if (count($Args)) {
-         $LastArg = $Args[count($Args) - 1];
-         $Extension = strrchr($LastArg, '.');
-         if ($Extension) {
-            $Args[count($Args) - 1] = substr($LastArg, 0, -strlen($Extension));
-            $Extension = strtolower($Extension);
-            if ($Extension == '.xml')
-               $this->DeliveryMethod(DELIVERY_METHOD_XML);
-         }
-      }
-      
-      // Instantiate the model.
-      $Model = new $ModelName();
-      $MethodName = array_shift($Args);
-      
-      // Reflect the arguments.
-      $Callback = array($Model, $MethodName);
-      
-      if ($this->Request->Get('help')) {
-         $this->SetData('Model', get_class($Model));
-         if ($MethodName) {
-            if (!method_exists($Model, $MethodName)) {
-               throw NotFoundException($ModelName.'->'.$MethodName.'()');
-            }
-            $this->SetData('Method', $MethodName);
-            $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
-            $MethArgs = $Meth->getParameters();
-            $Args = array();
-            foreach ($MethArgs as $Index => $MethArg) {
-               $ParamName = $MethArg->getName();
-
-               if ($MethArg->isDefaultValueAvailable())
-                  $Args[$ParamName] = $MethArg->getDefaultValue();
-               else
-                  $Args[$ParamName] = 'REQUIRED';
-            }
-            $this->SetData('Args', $Args);
-         } else {
-            $Class = new ReflectionClass($Model);
-            $Meths = $Class->getMethods();
-            $Methods = array();
-            foreach ($Meths as $Meth) {
-               $MethodName = $Meth->getName();
-               if (StringBeginsWith($MethodName, '_'))
-                  continue;
-               
-               $MethArgs = $Meth->getParameters();
-               $Args = array();
-               foreach ($MethArgs as $Index => $MethArg) {
-                  $ParamName = $MethArg->getName();
-
-                  if ($MethArg->isDefaultValueAvailable())
-                     $Args[$ParamName] = $MethArg->getDefaultValue();
-                  else
-                     $Args[$ParamName] = 'REQUIRED';
-               }
-               $Methods[$MethodName] = array('Method' => $MethodName, 'Args' => $Args);
-            }
-            $this->SetData('Methods', $Methods);
-         }
-      } else {
-         if (!method_exists($Model, $MethodName)) {
-            throw NotFoundException($ModelName.'->'.$MethodName.'()');
-         }
-         
-         $MethodArgs = ReflectArgs($Callback, $this->Request->Get(), $Args);
-         
-         $Result = call_user_func_array($Callback, $MethodArgs);
-
-         if (is_array($Result))
-            $this->Data = $Result;
-         elseif (is_a($Result, 'Gdn_DataSet')) {
-            $Result = $Result->ResultArray();
-            $this->Data = $Result;
-         } elseif (is_a($Result, 'stdClass'))
-            $this->Data = (array)$Result;
-         else
-            $this->SetData('Result', $Result);
-      }
-      
-      $this->Render();
-   }
+//   /**
+//    * Call a method on the given model.
+//    */
+//   public function Model() {
+//      $this->Permission('Garden.Settings.Manage');
+//      
+//      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+//      $this->DeliveryType(DELIVERY_TYPE_DATA);
+//      
+//      $Args = func_get_args();
+//      
+//      // Check to see if we have a model.
+//      $ModelName = StringEndsWith(array_shift($Args), 'Model', TRUE, TRUE);
+//      $ModelName = ucfirst($ModelName).'Model';
+//      if (!class_exists($ModelName)) {
+//         throw NotFoundException($ModelName);
+//      }
+//      
+//      // Check for json/xml style extension.
+//      if (count($Args)) {
+//         $LastArg = $Args[count($Args) - 1];
+//         $Extension = strrchr($LastArg, '.');
+//         if ($Extension) {
+//            $Args[count($Args) - 1] = substr($LastArg, 0, -strlen($Extension));
+//            $Extension = strtolower($Extension);
+//            if ($Extension == '.xml')
+//               $this->DeliveryMethod(DELIVERY_METHOD_XML);
+//         }
+//      }
+//      
+//      // Instantiate the model.
+//      $Model = new $ModelName();
+//      $MethodName = array_shift($Args);
+//      
+//      // Reflect the arguments.
+//      $Callback = array($Model, $MethodName);
+//      
+//      if ($this->Request->Get('help')) {
+//         $this->SetData('Model', get_class($Model));
+//         if ($MethodName) {
+//            if (!method_exists($Model, $MethodName)) {
+//               throw NotFoundException($ModelName.'->'.$MethodName.'()');
+//            }
+//            $this->SetData('Method', $MethodName);
+//            $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
+//            $MethArgs = $Meth->getParameters();
+//            $Args = array();
+//            foreach ($MethArgs as $Index => $MethArg) {
+//               $ParamName = $MethArg->getName();
+//
+//               if ($MethArg->isDefaultValueAvailable())
+//                  $Args[$ParamName] = $MethArg->getDefaultValue();
+//               else
+//                  $Args[$ParamName] = 'REQUIRED';
+//            }
+//            $this->SetData('Args', $Args);
+//         } else {
+//            $Class = new ReflectionClass($Model);
+//            $Meths = $Class->getMethods();
+//            $Methods = array();
+//            foreach ($Meths as $Meth) {
+//               $MethodName = $Meth->getName();
+//               if (StringBeginsWith($MethodName, '_'))
+//                  continue;
+//               
+//               $MethArgs = $Meth->getParameters();
+//               $Args = array();
+//               foreach ($MethArgs as $Index => $MethArg) {
+//                  $ParamName = $MethArg->getName();
+//
+//                  if ($MethArg->isDefaultValueAvailable())
+//                     $Args[$ParamName] = $MethArg->getDefaultValue();
+//                  else
+//                     $Args[$ParamName] = 'REQUIRED';
+//               }
+//               $Methods[$MethodName] = array('Method' => $MethodName, 'Args' => $Args);
+//            }
+//            $this->SetData('Methods', $Methods);
+//         }
+//      } else {
+//         if (!method_exists($Model, $MethodName)) {
+//            throw NotFoundException($ModelName.'->'.$MethodName.'()');
+//         }
+//         
+//         $MethodArgs = ReflectArgs($Callback, $this->Request->Get(), $Args);
+//         
+//         $Result = call_user_func_array($Callback, $MethodArgs);
+//
+//         if (is_array($Result))
+//            $this->Data = $Result;
+//         elseif (is_a($Result, 'Gdn_DataSet')) {
+//            $Result = $Result->ResultArray();
+//            $this->Data = $Result;
+//         } elseif (is_a($Result, 'stdClass'))
+//            $this->Data = (array)$Result;
+//         else
+//            $this->SetData('Result', $Result);
+//      }
+//      
+//      $this->Render();
+//   }
    
    /**
     * Redirect to another page.
@@ -513,27 +513,44 @@ class UtilityController extends DashboardController {
     * @param string $ClientDate Client-reported datetime.
     * @param string $TransientKey Security token.
     */
-   public function SetClientHour($ClientDate = '', $TransientKey = '') {
+   public function SetClientHour($ClientHour = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
       $Success = FALSE;
 
-      $ClientTimestamp = Gdn_Format::ToTimestamp($ClientDate);
-
-      if (
-			is_numeric($ClientTimestamp)
-			&& $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $UserModel = Gdn::UserModel();
-			$HourOffset = $ClientTimestamp - time();
-         $HourOffset = round($HourOffset / 3600);
-         
-			$UserModel->SetField($Session->UserID, 'HourOffset', $HourOffset);
-			$Success = TRUE;
+      if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
+         $HourOffset = $ClientHour - date('G', time());
+      
+         if (Gdn::Session()->IsValid() && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+            Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+            $Success = TRUE;
+         }
       }
          
       $this->Render();
+   }
+   
+   public function SetHourOffset() {
+      $Form = new Gdn_Form();
+      
+      if ($Form->AuthenticatedPostBack()) {
+         if (!Gdn::Session()->IsValid()) {
+            throw PermissionException('Garden.SignIn.Allow');
+         }
+         
+         $HourOffset = $Form->GetFormValue('HourOffset');
+         Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+         
+         $this->SetData('Result', TRUE);
+         $this->SetData('HourOffset', $HourOffset);
+         
+         $time = time();
+         $this->SetData('UTCDateTime', gmdate('r', $time));
+         $this->SetData('UserDateTime', gmdate('r', $time + $HourOffset * 3600));
+      } else {
+         throw ForbiddenException('GET');
+      }
+      
+      $this->Render('Blank');
    }
 	
 	/**

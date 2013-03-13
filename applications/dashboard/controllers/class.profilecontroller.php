@@ -90,6 +90,7 @@ class ProfileController extends Gdn_Controller {
          $this->CssClass .= 'EditMode';
 
       $this->SetData('Breadcrumbs', array());
+      $this->CanEditPhotos = C('Garden.Profile.EditPhotos') || Gdn::Session()->CheckPermission('Garden.Users.Edit');
    }
    
    /** 
@@ -611,6 +612,10 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Picture($UserReference = '', $Username = '', $UserID = '') {
+      if (!C('Garden.Profile.EditPhotos', TRUE)) {
+         throw ForbiddenException('@Editing user photos has been disabled.');
+      }
+      
       // Permission checks
       $this->Permission('Garden.Profiles.Edit');
       $Session = Gdn::Session();
@@ -759,7 +764,7 @@ class ProfileController extends Gdn_Controller {
       );
       
       // Allow email notification of applicants (if they have permission & are using approval registration)
-      if (CheckPermission('Garden.Applicants.Manage') && C('Garden.Registration.Method') == 'Approval')
+      if (CheckPermission('Garden.Users.Approve') && C('Garden.Registration.Method') == 'Approval')
          $this->Preferences['Notifications']['Email.Applicant'] = array(T('NotifyApplicant', 'Notify me when anyone applies for membership.'), 'Meta');
       
       $this->FireEvent('AfterPreferencesDefined');
@@ -812,6 +817,7 @@ class ProfileController extends Gdn_Controller {
          }
       }
       $CurrentPrefs = array_merge($CurrentPrefs, $MetaPrefs);
+      $CurrentPrefs = array_map('intval', $CurrentPrefs);
       $this->SetData('Preferences', $CurrentPrefs);
       
       if (UserModel::NoEmail()) {
@@ -851,6 +857,8 @@ class ProfileController extends Gdn_Controller {
          
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
          UserModel::SetMeta($this->User->UserID, $NewMetaPrefs, 'Preferences.');
+         
+         $this->SetData('Preferences', array_merge($this->Data('Preferences', array()), $UserPrefs, $NewMetaPrefs));
          
          if (count($this->Form->Errors() == 0))
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
@@ -978,6 +986,10 @@ class ProfileController extends Gdn_Controller {
     * @param string $Username.
     */
    public function Thumbnail($UserReference = '', $Username = '') {
+      if (!C('Garden.Profile.EditPhotos', TRUE)) {
+         throw ForbiddenException('@Editing user photos has been disabled.');
+      }
+      
       // Initial permission checks (valid user)
       $this->Permission('Garden.SignIn.Allow');            
       $Session = Gdn::Session();
@@ -1178,7 +1190,7 @@ class ProfileController extends Gdn_Controller {
       $Module->AddItem('Options', '', FALSE, array('class' => 'SideMenu'));
          
       // Check that we have the necessary tools to allow image uploading
-      $AllowImages = Gdn_UploadImage::CanUploadImages();
+      $AllowImages = C('Garden.Profile.EditPhotos', TRUE) && Gdn_UploadImage::CanUploadImages();
          
       // Is the photo hosted remotely?
       $RemotePhoto = IsUrl($this->User->Photo);

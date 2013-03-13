@@ -9,7 +9,13 @@ if ($this->Data('_PagerUrl'))
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 
 // Pre Pager
-PagerModule::Write($PagerOptions);
+echo '<div class="PageControls Top">';
+   PagerModule::Write($PagerOptions);
+   
+   echo '<div class="BoxButtons BoxNewConversation">';
+   echo Anchor(T('New Message'), '/messages/add', 'Button NewConversation Primary');
+   echo '</div>';
+echo '</div>';
 ?>
 <ul class="Condensed DataList Conversations">
 <?php
@@ -25,4 +31,10 @@ endif;
 </ul>
 <?php
 // Post Pager
-PagerModule::Write($PagerOptions);
+echo '<div class="PageControls Bottom">';
+   PagerModule::Write($PagerOptions);
+   
+//   echo '<div class="BoxButtons BoxNewConversation">';
+//   echo Anchor(T('New Message'), '/messages/add', 'Button NewConversation Primary');
+//   echo '</div>';
+echo '</div>';

@@ -602,7 +602,7 @@ class LogModel extends Gdn_Pluggable {
                }
             } else {
                $ID = Gdn::SQL()
-                  ->Options('Ignore', TRUE)
+                  ->Options('Replace', TRUE)
                   ->Insert($TableName, $Set);
                if (!$ID && isset($Log['RecordID']))
                   $ID = $Log['RecordID'];

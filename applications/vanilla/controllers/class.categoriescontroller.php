@@ -71,9 +71,10 @@ class CategoriesController extends VanillaController {
     * @param int $Offset Number of discussions to skip.
     */
    public function Index($CategoryIdentifier = '', $Page = '0') {
+      // Figure out which category layout to choose (Defined on "Homepage" settings page).
+      $Layout = C('Vanilla.Categories.Layout');
+      
       if ($CategoryIdentifier == '') {
-         // Figure out which category layout to choose (Defined on "Homepage" settings page).
-         $Layout = C('Vanilla.Categories.Layout');
          switch($Layout) {
             case 'mixed':
                $this->View = 'discussions';
@@ -89,6 +90,38 @@ class CategoriesController extends VanillaController {
          }
          return;
       } else {
+         $Category = CategoryModel::Categories($CategoryIdentifier);
+         
+         if (empty($Category)) {
+            if ($CategoryIdentifier)
+               throw NotFoundException();
+         }
+         $Category = (object)$Category;
+         Gdn_Theme::Section($Category->CssClass);
+         
+         // Load the breadcrumbs.
+			$this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
+         
+         $this->SetData('Category', $Category, TRUE);
+         
+         if ($Category->DisplayAs == 'Categories') {
+            // This category is an overview style category and displays as a category list.
+            switch($Layout) {
+               case 'mixed':
+                  $this->View = 'discussions';
+                  $this->Discussions();
+                  break;
+               case 'table':
+                  $this->Table();
+                  break;
+               default:
+                  $this->View = 'all';
+                  $this->All();
+                  break;
+            }
+            return;
+         }
+         
          Gdn_Theme::Section('DiscussionList');
          // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
          $Layout = C('Vanilla.Discussions.Layout');
@@ -101,20 +134,6 @@ class CategoriesController extends VanillaController {
                // $this->View = 'index';
                break;
          }
-         
-         $Category = CategoryModel::Categories($CategoryIdentifier);
-         
-         if (empty($Category)) {
-            if ($CategoryIdentifier)
-               throw NotFoundException();
-         }
-         $Category = (object)$Category;
-         Gdn_Theme::Section($Category->CssClass);
-            
-         // Load the breadcrumbs.
-			$this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
-         
-         $this->SetData('Category', $Category, TRUE);
          
          // Load the subtree.
          if (C('Vanilla.ExpandCategories'))
@@ -227,14 +246,13 @@ class CategoriesController extends VanillaController {
             
       $this->Description(C('Garden.Description', NULL));
       
-      $this->SetData('Breadcrumbs', array(array('Name' => T('Categories'), 'Url' => '/categories')), CategoryModel::GetAncestors(GetValue('CategoryID', $Category)));
+      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $this->Data('Category'))));
      
       // Set the category follow toggle before we load category data so that it affects the category query appropriately.
       $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
       $CategoryFollowToggleModule->SetToggle();
       
       // Get category data
-      $CategoryModel = new CategoryModel();
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
       
       $Categories = $this->CategoryModel->GetFull()->ResultArray();
@@ -248,15 +266,6 @@ class CategoriesController extends VanillaController {
 
       $this->CanonicalUrl(Url('/categories', TRUE));
       
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $this->AddDefinition('SetClientHour', $ClientHour);
-      }
-
       include_once $this->FetchViewLocation('helper_functions', 'categories');
       $this->Render();
    }

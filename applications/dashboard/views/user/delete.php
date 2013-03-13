@@ -7,7 +7,7 @@
 <table class="Label AltRows">
    <thead>
       <tr>
-         <th><?php printf(T('UserDeletionPrompt', "Choose how to handle all of the content associated with the user account for %s (comments, messages, etc)."), Wrap($this->User->Name, 'em')); ?></th>
+         <th><?php printf(T('UserDeletionPrompt', "Choose how to handle all of the content associated with the user account for %s (comments, messages, etc)."), Wrap(htmlspecialchars($this->User->Name), 'em')); ?></th>
       </tr>
    </thead>
    <tbody>

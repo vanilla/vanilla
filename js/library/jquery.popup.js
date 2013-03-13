@@ -16,7 +16,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
    $.popup = function(options, data) {
       var settings = $.extend({}, $.popup.settings, options);
       $.popup.init(settings)
-      if (!settings.confrm)
+      if (!settings.confirm)
          $.popup.loading(settings)
 
       $.isFunction(data) ? data.call(this, settings) : $.popup.reveal(settings, data)
@@ -48,6 +48,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                   document.location = target;
                } else {
                   // request the target via ajax
+                  $.popup.loading(settings);
                   $.ajax({
                      type: "GET",
                      url: target,
@@ -183,8 +184,14 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             return $.popup.close(settings);
          });
       } else {
-         $('#'+settings.popupId+' .Content h1').text(gdn.definition('ConfirmHeading', 'Confirm'));
-         $('#'+settings.popupId+' .Content p').text(gdn.definition('ConfirmText', 'Are you sure you want to do that?'));
+         // 'Confirm' popup heading
+         var confirmHeading = (settings.confirmHeading) ? settings.confirmHeading : gdn.definition('ConfirmHeading', 'Confirm'); 
+         $('#'+settings.popupId+' .Content h1').text(confirmHeading);
+         
+         // 'Confirm' popup body text
+         var confirmText = (settings.confirmText) ? settings.confirmText : gdn.definition('ConfirmText', 'Are you sure you want to do that?');
+         $('#'+settings.popupId+' .Content p').text(confirmText);            
+         
          $('#'+settings.popupId+' .Okay').val(gdn.definition('Okay', 'Okay'));
          $('#'+settings.popupId+' .Cancel').val(gdn.definition('Cancel', 'Cancel')).click(function() {
             $.popup.close(settings);

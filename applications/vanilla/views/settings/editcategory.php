@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo $this->Form->Open();
+echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
 ?>
 <h1><?php echo T('Edit Category'); ?></h1>
@@ -38,11 +38,26 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('CssClass', array('MultiLine' => FALSE));
       ?>
    </li>
+   <li>
+      <?php
+         echo $this->Form->Label('Photo', 'PhotoUpload');
+         if ($Photo = $this->Form->GetValue('Photo')) {
+            echo Img(Gdn_Upload::Url($Photo));
+         }
+         echo $this->Form->Input('PhotoUpload', 'file');
+      ?>
+   </li>
    <?php
    echo $this->Form->Simple(
       $this->Data('_ExtendedFields', array()),
       array('Wrap' => array('', '')));
    ?>
+   <li>
+      <?php
+         echo $this->Form->Label('Display As', 'DisplayAs');
+         echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions'));
+      ?>
+   </li>
    <li>
       <?php
       echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');

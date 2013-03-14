@@ -1725,7 +1725,9 @@ class Gdn_Form extends Gdn_Pluggable {
                "You cannot call the form's save method if a model has not been defined.",
                "Form", "Save"), E_USER_ERROR);
          
-         $Data = $this->_Model->FilterForm($this->FormValues());
+         $Data = $this->FormValues();
+         if (method_exists($this->_Model, 'FilterForm'))
+             $Data = $this->_Model->FilterForm($this->FormValues());
 
          $Args = array_merge(func_get_args(),
             array(

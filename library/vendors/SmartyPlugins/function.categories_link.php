@@ -8,21 +8,12 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-/**
- * Renders a user's photo (if they've uploaded one).
- */
-class UserPhotoModule extends Gdn_Module {
-   public function __construct() {
-      parent::__construct();
-      $this->_ApplicationFolder = 'dashboard';
-   }
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
 
-   public function ToString() {
-      $this->CanEditPhotos = C('Garden.Profile.EditPhotos') || Gdn::Session()->CheckPermission('Garden.Users.Edit');
-		return parent::ToString();
-   }
+/**
+ */
+function smarty_function_categories_link($Params, &$Smarty) {
+   $Wrap = GetValue('wrap', $Params, 'li');
+   return Gdn_Theme::Link('categories',
+      GetValue('text', $Params, T('Categories')),
+      GetValue('format', $Params, Wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
 }

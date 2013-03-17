@@ -728,6 +728,8 @@ class PostController extends VanillaController {
          $this->Form->SetModel($this->DraftModel);
          $this->Comment = $this->DraftModel->GetID($DraftID);
       }
+      
+      $this->Form->SetFormValue('Format', GetValue('Format', $this->Comment));
       $this->View = 'editcomment';
       $this->Comment($this->Comment->DiscussionID);
    }

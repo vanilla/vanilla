@@ -54,6 +54,16 @@ class PostController extends VanillaController {
       $this->Render();
    }
    
+   public function AnnounceOptions() {
+      $Result = array(
+         2 => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
+         1 => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
+         0 => '@'.T("Don't announce.")
+         );
+      
+      return $Result;
+   }
+   
    /**
     * Create or update a discussion.
     *
@@ -74,6 +84,8 @@ class PostController extends VanillaController {
       $this->AddJsFile('autosave.js');
       
       $Session = Gdn::Session();
+      
+      Gdn_Theme::Section('PostDiscussion');
       
       // Set discussion, draft, and category data
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
@@ -202,6 +214,7 @@ class PostController extends VanillaController {
             $this->Comment->InsertPhoto = $Session->User->Photo;
             $this->Comment->DateInserted = Gdn_Format::Date();
             $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+            $this->Comment->Format = GetValue('Format', $FormValues, C('Garden.InputFormatter'));
             
             $this->EventArguments['Discussion'] = &$this->Discussion;
             $this->EventArguments['Comment'] = &$this->Comment;
@@ -256,6 +269,8 @@ class PostController extends VanillaController {
       $Breacrumbs[] = array('Name' => $this->Data('Title'), 'Url' => '/post/discussion');
       
 		$this->SetData('Breadcrumbs', $Breacrumbs);
+      
+      $this->SetData('_AnnounceOptions', $this->AnnounceOptions());
 
       // Render view (posts/discussion.php or post/preview.php)
 		$this->Render();
@@ -404,7 +419,6 @@ class PostController extends VanillaController {
          $EmbeddedDiscussionData = array(
             'InsertUserID' => $EmbedUserID,
             'DateInserted' => Gdn_Format::ToDateTime(),
-            'UpdateUserID' => $EmbedUserID,
             'DateUpdated' => Gdn_Format::ToDateTime(),
             'CategoryID' => $vanilla_category_id,
             'ForeignID' => $vanilla_identifier,
@@ -572,6 +586,7 @@ class PostController extends VanillaController {
                   $this->Comment->InsertPhoto = $Session->User->Photo;
                   $this->Comment->DateInserted = Gdn_Format::Date();
                   $this->Comment->Body = ArrayValue('Body', $FormValues, '');
+                  $this->Comment->Format = GetValue('Format', $FormValues, C('Garden.InputFormatter'));
                   $this->AddAsset('Content', $this->FetchView('preview'));
                } else {
                   // If this was a draft save, notify the user about the save
@@ -689,6 +704,7 @@ class PostController extends VanillaController {
          $this->Data = array('Comment' => $Comment);
          $this->RenderData($this->Data);
       } else {
+         require_once $this->FetchViewLocation('helper_functions', 'Discussion');
          // Render default view.
          $this->Render();
       }
@@ -764,5 +780,26 @@ class PostController extends VanillaController {
          if ($Category)
             $Form->SetValue('CategoryID', $Category['CategoryID']);
       }
+   }
+}
+
+function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array()) {
+   $Form = new Gdn_Form();
+   
+   if (count($ListOptions) == 2 && array_key_exists(0, $ListOptions)) {
+      unset($ListOptions[0]);
+      $Value = array_pop(array_keys($ListOptions));
+      
+      // This can be represented by a checkbox.
+      return $Form->CheckBox($FieldName, $LabelCode);
+   } else {
+      $CssClass = GetValue('ListClass', $Attributes, 'List Inline');
+      
+      $Result = ' <b>'.T($LabelCode)."</b> <ul class=\"$CssClass\">";
+      foreach ($ListOptions as $Value => $Code) {
+         $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
+      }
+      $Result .= '</ul>';
+      return $Result;
    }
 }

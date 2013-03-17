@@ -14,15 +14,56 @@
  */
 
 class AssetModel extends Gdn_Model {
+   
+   protected static $Modes;
    protected $_CssFiles = array();
    
    public $UrlPrefix = '';
    
-   public function AddCssFile($Filename, $Folder = FALSE, $Options = FALSE) {
-      if (is_string($Options)) {
-         $Options = array('Css' => $Options);
+   public function Modes() {
+      if (is_null(self::$Modes)) {
+         self::$Modes = array(
+            'style.css'    => 'style',
+            'admin.css'    => 'admin'
+         );
+         
+         $this->EventArguments['Modes'] = &self::$Modes;
+         $this->FireEvent('CssMode');
       }
-      $this->_CssFiles[] = array($Filename, $Folder, $Options);
+      
+      return self::$Modes;
+   }
+   
+   public function Mode(&$CssFiles) {
+      foreach ($this->Modes() as $ModeFile => $Mode) {
+         if (ArrayHasValue($CssFiles, $ModeFile))
+            return $Mode;
+      }
+      
+      return FALSE;
+   }
+   
+   /**
+    * Get RenderMaster CDN list
+    * 
+    */
+   public function Cdns($ETag) {
+      $CssCdns = array();
+      foreach ($this->Modes() as $ModeFile => $Mode) 
+         $CssCdns[$ModeFile] = "~/utility/css/{$Mode}/{$Mode}-{$ETag}.css";
+         
+      return $CssCdns;
+   }
+   
+   public function AddCssFile($Filename, $Folder = FALSE, $Options = FALSE) {
+      if (is_string($Options))
+         $Options = array('Css' => $Options);
+      
+      $this->_CssFiles[] = array(
+         'FileName'  => $Filename, 
+         'AppFolder' => $Folder, 
+         'Options'   => $Options
+      );
    }
    
    public function ServeCss($Basename, $ETag) {
@@ -34,10 +75,12 @@ class AssetModel extends Gdn_Model {
       
       header_remove('Set-Cookie');
       header("Content-Type: text/css");
-      if (!in_array($Basename, array('Style', 'Admin'))) {
+      
+      // Don't allow ourselves to be ddos'd
+      if (!ArraySearchI($Basename, $this->Modes())) {
          header("HTTP/1.0 404", TRUE, 404);
          
-         echo "/* Could not find $Basename/$ETag */";
+         echo "/* Could not find {$Basename}/{$ETag} */";
          die();
       }
       
@@ -57,7 +100,7 @@ class AssetModel extends Gdn_Model {
       $CurrentETag = self::ETag();
       header("ETag: $CurrentETag");
       
-      $CachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.strtolower($Basename)."-$CurrentETag.css";
+      $CachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.strtolower($Basename)."-{$CurrentETag}.css";
       
       if (!Debug() && file_exists($CachePath)) {
          readfile($CachePath);
@@ -69,7 +112,7 @@ class AssetModel extends Gdn_Model {
       require_once PATH_LIBRARY."/vendors/Minify/lib/Minify/CSS.php";
       
       ob_start();
-      echo "/* CSS generated for etag: $CurrentETag.\n *\n";
+      echo "/* CSS generated for etag: {$CurrentETag}.\n *\n";
       
       $Paths = $this->GetCssFiles($Basename, $ETag, $NotFound);
       
@@ -77,7 +120,7 @@ class AssetModel extends Gdn_Model {
       foreach ($Paths as $Info) {
          list($Path, $UrlPath) = $Info;
          
-         echo " * $UrlPath\n";
+         echo " * {$UrlPath}\n";
       }
       
       // Echo the paths that weren't found to help debugging.
@@ -118,19 +161,21 @@ class AssetModel extends Gdn_Model {
       file_put_contents($CachePath, $Css);
    }
    
-   public function GetCssFiles($Basename, $ETag, &$NotFound = NULL) {
+   public function GetCssFiles($Basename, $ETag, &$NotFound = NULL, $Pathify = TRUE) {
+      $Basename = ucfirst($Basename);
       $NotFound = array();
       
       // Gather all of the css paths.
+      $this->_CssFiles = array();
       switch ($Basename) {
          case 'Style':
-            $this->_CssFiles = array(
-               array('style.css', 'dashboard', array('Sort' => -10)));
+            $this->AddCssFile('style.css', 'dashboard', array('Sort' => -10));
             break;
+         
          case 'Admin':
-            $this->_CssFiles = array(
-                array('admin.css', 'dashboard', array('Sort' => -10)));
+            $this->AddCssFile('admin.css', 'dashboard', array('Sort' => -10));
             break;
+         
          default:
             $this->_CssFiles = array();
       }
@@ -156,33 +201,26 @@ class AssetModel extends Gdn_Model {
             break;
       }
 		
-      $this->FireEvent('AfterGetCssFiles');
+		$this->FireEvent('AfterGetCssFiles');
       
       // Hunt the css files down.
-      $Paths = array();
-      foreach ($this->_CssFiles as $Info) {
-         $Filename = $Info[0];
-         $Folder = GetValue(1, $Info);
-         $Options = GetValue(2, $Info);
-         $Css = GetValue('Css', $Options);
+      if ($Pathify) {
+         $CssFiles = Gdn_Controller::ResolveStaticResources($this->_CssFiles, 'design');
          
-         if ($Css) {
-            // Add some literal Css.
-            $Paths[] = array(FALSE, $Folder, $Options);
-         } else {
-            list($Path, $UrlPath) = self::CssPath($Filename, $Folder);
-            if ($Path) {
-               $Paths[] = array($Path, $UrlPath, $Options);
-            } else {
-               $NotFound[] = array($Filename, $Folder, $Options);
-            }
+         $Paths = array();
+         foreach ($CssFiles as $CssPath => $CssPathInfo) {
+            $Path = GetValue('path', $CssPathInfo, FALSE);
+            $Options = GetValue('options', $CssPathInfo, FALSE);
+            $Paths[] = array($Path, $CssPath, $Options);
          }
+         
+         // Sort the paths.
+         usort($Paths, array('AssetModel', '_ComparePath'));
+         
+         return $Paths;
       }
       
-      // Sort the paths.
-      usort($Paths, array('AssetModel', '_ComparePath'));
-      
-      return $Paths;
+      return $this->_CssFiles;
    }
    
    protected function _ComparePath($A, $B) {
@@ -209,23 +247,23 @@ class AssetModel extends Gdn_Model {
       
       // 2. Check the theme.
       if ($Theme = Gdn::Controller()->Theme) {
-         $Paths[] = array(PATH_THEMES."/$Theme/design/$Filename", "/themes/$Theme/design/$Filename");
+         $Paths[] = array(PATH_THEMES."/{$Theme}/design/{$Filename}", "/themes/{$Theme}/design/{$Filename}");
       }
       
       if ($Folder) {
          // 3. Check a plugin or application.
          if (StringBeginsWith($Folder, 'plugins/')) {
             $Folder = substr($Folder, strlen('plugins/'));
-            $Paths[] = array(PATH_PLUGINS."/$Folder/design/$Filename", "/plugins/$Folder/design/$Filename");
-            $Paths[] = array(PATH_PLUGINS."/$Folder/$Filename", "/plugins/$Folder/$Filename");
+            $Paths[] = array(PATH_PLUGINS."/{$Folder}/design/{$Filename}", "/plugins/{$Folder}/design/{$Filename}");
+            $Paths[] = array(PATH_PLUGINS."/{$Folder}/{$Filename}", "/plugins/{$Folder}/{$Filename}");
          } else {
-            $Paths[] = array(PATH_APPLICATIONS."/$Folder/design/$Filename", "/applications/$Folder/design/$Filename");
+            $Paths[] = array(PATH_APPLICATIONS."/{$Folder}/design/{$Filename}", "/applications/{$Folder}/design/{$Filename}");
          }
       }
       
       // 4. Check the default.
       if ($Folder != 'dashboard')
-         $Paths[] = array(PATH_APPLICATIONS.'/dashboard/design/$Filename', "/applications/dashboard/design/$Filename");
+         $Paths[] = array(PATH_APPLICATIONS.'/dashboard/design/$Filename', "/applications/dashboard/design/{$Filename}");
       
       foreach ($Paths as $Info) {
          if (file_exists($Info[0]))
@@ -271,9 +309,26 @@ class AssetModel extends Gdn_Model {
       unset(Gdn::PluginManager()->EventArguments['ETagData']);
       
       ksort($Data);
+      
       $Result = substr(md5(implode(',', array_keys($Data))), 0, 8).$Suffix;
-//      decho($Data);
-//      die();
       return $Result;
+   }
+   
+   /**
+    * Generate a hash for a group of resources, based on keys + versions
+    * 
+    * @param array $ResourceFiles
+    * @return string
+    */
+   public function HashTag($ResourceFiles) {
+      $Keys = array();
+      
+      foreach ($ResourceFiles as $Key => $Options) {
+         $Version = GetValue('version', $Options, '');
+         $Keys[] = "{$Key} -> {$Version}";
+      }
+      
+      $HashTag = md5(implode("\n", $Keys));
+      return $HashTag;
    }
 }

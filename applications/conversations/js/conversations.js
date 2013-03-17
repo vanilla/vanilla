@@ -62,6 +62,11 @@ jQuery(document).ready(function($) {
                   if (target.offset()) {
                      $('html,body').animate({scrollTop: target.offset().top}, 'fast');
                   }
+
+                  // Let listeners know that the message was added.
+                  $(document).trigger('MessageAdded');
+                  $(frm).triggerHandler('complete');
+
                   gdn.inform(json);
                }
             },
@@ -82,6 +87,7 @@ jQuery(document).ready(function($) {
       $('div.Popup').remove();
       var frm = $('#Form_ConversationMessage');
       frm.find('textarea').val('');
+      frm.trigger('clearCommentForm');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
    }

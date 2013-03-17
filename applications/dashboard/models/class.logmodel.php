@@ -1,7 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * Log Model
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
 
 class LogModel extends Gdn_Pluggable {
@@ -602,7 +606,7 @@ class LogModel extends Gdn_Pluggable {
                }
             } else {
                $ID = Gdn::SQL()
-                  ->Options('Ignore', TRUE)
+                  ->Options('Replace', TRUE)
                   ->Insert($TableName, $Set);
                if (!$ID && isset($Log['RecordID']))
                   $ID = $Log['RecordID'];

@@ -403,6 +403,22 @@ class SettingsController extends Gdn_Controller {
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->SetData($this->Category);
       } else {
+         $Upload = new Gdn_Upload();
+         $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
+         if ($TmpImage) {
+            
+            // Generate the target image name
+            $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
+            $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+
+            // Save the uploaded image
+            $Parts = $Upload->SaveAs(
+               $TmpImage,
+               $ImageBaseName
+            );
+            $this->Form->SetFormValue('Photo', $Parts['SaveName']);
+         }
+         
          if ($this->Form->Save()) {
             $Category = CategoryModel::Categories($CategoryID);
             $this->SetData('Category', $Category);
@@ -436,9 +452,9 @@ class SettingsController extends Gdn_Controller {
       // Set up head
       $this->AddSideMenu('vanilla/settings/managecategories');
       $this->AddJsFile('categories.js');
-      $this->AddJsFile('js/library/jquery.alphanumeric.js');
-      $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');
-      $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery.ui.nestedSortable.js');
+      $this->AddJsFile('jquery.alphanumeric.js');
+      $this->AddJsFile('nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');
+      $this->AddJsFile('nestedSortable.1.3.4/jquery.ui.nestedSortable.js');
       $this->Title(T('Categories'));
       
       // Get category data

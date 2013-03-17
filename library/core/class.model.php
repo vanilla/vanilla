@@ -350,10 +350,10 @@ class Gdn_Model extends Gdn_Pluggable {
     * @return unknown
     * @todo add doc
     */
-   public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+   public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $PageNumber = FALSE) {
       $this->_BeforeGet();
 
-      return $this->SQL->Get($this->Name, $OrderFields, $OrderDirection, $Limit, $Offset);
+      return $this->SQL->Get($this->Name, $OrderFields, $OrderDirection, $Limit, $PageNumber);
    }
    
    /**

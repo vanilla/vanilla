@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+include(PATH_APPLICATIONS.'/vanilla/views/discussion/helper_functions.php');
+
 if (!function_exists('AdminCheck')) {
 function AdminCheck($Discussion = NULL, $Wrap = FALSE) {
    static $UseAdminChecks = NULL;
@@ -79,6 +81,14 @@ function CategoryLink($Discussion, $Prefix = ' ') {
 
 endif;
 
+if (!function_exists('DiscussionHeading')):
+   
+function DiscussionHeading() {
+   return T('Discussion');
+}
+
+endif;
+
 if (!function_exists('WriteDiscussion')):
 function WriteDiscussion($Discussion, &$Sender, &$Session) {
    $CssClass = CssClass($Discussion);
@@ -124,7 +134,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
    ?>
    <span class="Options">
       <?php
-      echo OptionsList($Discussion);
+      WriteDiscussionOptions($Discussion);
       echo BookmarkButton($Discussion);
       ?>
    </span>
@@ -183,6 +193,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          ?>
       </div>
    </div>
+   <?php $Sender->FireEvent('AfterDiscussionContent'); ?>
 </li>
 <?php
 }
@@ -248,7 +259,7 @@ function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
    if (!$CssClass)
       $CssClass = "Tag-$Code";
 
-   return ' <span class="Tag '.$CssClass.'">'.T($Code).'</span> ';
+   return ' <span class="Tag '.$CssClass.'" title="'.htmlspecialchars(T($Code)).'">'.T($Code).'</span> ';
 }
 endif;
 
@@ -341,57 +352,9 @@ endif;
 
 if (!function_exists('OptionsList')):
 function OptionsList($Discussion) {
-   $Sender = Gdn::Controller();
-   $Session = Gdn::Session();
-   
-   if ($Session->IsValid() && $Sender->ShowOptions) {
-      $Sender->Options = '';
-      
-      // Dismiss an announcement
-      if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
-         $Sender->Options .= '<li>'.Anchor(T('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack') . '</li>';
-      
-      // Edit discussion
-      if ($Discussion->FirstUserID == $Session->UserID || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T('Edit'), 'vanilla/post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion') . '</li>';
-
-      // Announce discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T('Announce...'), '/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl), 'Popup AnnounceDiscussion') . '</li>';
-
-      // Sink discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-         $NewSink = (int)!$Discussion->Sink;
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Sink == '1' ? 'Unsink' : 'Sink'), "vanilla/discussion/sink?discussionid={$Discussion->DiscussionID}&sink={$NewSink}", 'SinkDiscussion Hijack') . '</li>';
-      }
-
-      // Close discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-         $NewClosed = (int)!$Discussion->Closed;
-         $Sender->Options .= '<li>'.Anchor(T($Discussion->Closed == '1' ? 'Reopen' : 'Close'), "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'CloseDiscussion Hijack') . '</li>';
-      }
-      
-      // Delete discussion
-      if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID))
-         $Sender->Options .= '<li>'.Anchor(T('Delete'), '/discussion/delete?discussionid='.$Discussion->DiscussionID, 'DeleteDiscussion Popup') . '</li>';
-      
-      // Allow plugins to add options
-      $Sender->FireEvent('DiscussionOptions');
-      
-      if ($Sender->Options != '') {
-         $Result = '<span class="ToggleFlyout OptionsMenu">'.
-            '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>'.
-            '<span class="SpFlyoutHandle"></span>'.
-            '<ul class="Flyout MenuItems">'.
-               $Sender->Options.
-            '</ul>'.
-            '</span>';
-         
-         return $Result;
-      }
-     
-   }
-   return '';
+   throw new Exception('DEPRECATED');
+      // Allow plugins to add options.
+      $Sender->EventArguments['Discussion'] = $Discussion;
 }
 
 endif;
@@ -409,7 +372,7 @@ function WriteOptions($Discussion) {
    echo '<span class="Options">';
    
    // Options list.
-   echo OptionsList($Discussion);
+   WriteDiscussionOptions($Discussion);
 
    // Bookmark button.
    echo BookmarkButton($Discussion);

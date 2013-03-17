@@ -917,8 +917,10 @@ class CommentModel extends VanillaModel {
          );
          
          // Allow simple fulltext notifications
-         if (C('Vanilla.Activity.ShowCommentBody', FALSE))
+         if (C('Vanilla.Activity.ShowCommentBody', FALSE)) {
             $Activity['Story'] = GetValue('Body', $Fields);
+            $Activity['Format'] = GetValue('Format', $Fields);
+         }
          
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);

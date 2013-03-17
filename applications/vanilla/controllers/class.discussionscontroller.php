@@ -163,15 +163,6 @@ class DiscussionsController extends VanillaController {
          $this->View = 'discussions';
       }
       
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $this->AddDefinition('SetClientHour', $ClientHour);
-      }
-      
       // We don't want search engines to index these pages because they can go in through the individual categories MUCH faster.
       if ($this->Head)
          $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
@@ -266,15 +257,6 @@ class DiscussionsController extends VanillaController {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
-      }
-      
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $this->AddDefinition('SetClientHour', $ClientHour);
       }
       
       $this->Render();

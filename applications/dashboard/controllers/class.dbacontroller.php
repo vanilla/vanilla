@@ -61,6 +61,20 @@ class DbaController extends DashboardController {
       $this->Render('Job');
    }
    
+   public function FixUrlCodes($Table, $Column) {
+      $this->Permission('Garden.Settings.Manage');
+      
+      if ($this->Request->IsAuthenticatedPostBack()) {
+         $Result = $this->Model->FixUrlCodes($Table, $Column);
+         $this->SetData('Result', $Result);
+      }
+      
+      $this->SetData('Title', "Fix url codes for $Table.$Column");
+      $this->_SetJob($this->Data('Title'));
+      $this->AddSideMenu();
+      $this->Render('Job');
+   }
+   
    public function HtmlEntityDecode($Table, $Column) {
       $this->Permission('Garden.Settings.Manage');
       

@@ -1,24 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-/**
- * Role Controller
- *
- * @package Dashboard
- */
- 
+
 /**
  * RBAC (Role Based Access Control) system.
- *
- * @since 2.0.0
- * @package Dashboard
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class RoleController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Database', 'Form', 'RoleModel');
@@ -107,7 +97,7 @@ class RoleController extends DashboardController {
     * @access public
     */
    public function DefaultRoles() {
-      $this->Permission('Garden.Roles.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('');
 
       $this->Title(T('Default Roles'));
@@ -229,7 +219,7 @@ class RoleController extends DashboardController {
     * @access public
     */
    public function Index($RoleID = NULL) {
-		$this->Permission('Garden.Roles.Manage');
+		$this->Permission('Garden.Settings.Manage');
 
       $this->AddSideMenu('dashboard/role');
       $this->AddJsFile('jquery.tablednd.js');
@@ -254,11 +244,7 @@ class RoleController extends DashboardController {
     * @access protected
     */
 	protected function _Permission() {
-      $this->Permission('Garden.Roles.Manage');
-		if(!C('Garden.Roles.Manage', TRUE)) {
-			Gdn::Dispatcher()->Dispatch('DefaultPermission');
-			return FALSE;
-		}
+      $this->Permission('Garden.Settings.Manage');
 		return TRUE;
 	}
 }

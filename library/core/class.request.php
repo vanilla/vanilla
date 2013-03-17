@@ -330,7 +330,7 @@ class Gdn_Request {
          // If we found matching IPs
          if ($Matched) {
             $IPs = $Matches[1];
-            $IP = $Matches[0];
+            $IP = $IPs[0];
             
          // Fallback 
          } else { $IP = $_SERVER['REMOTE_ADDR']; }
@@ -364,7 +364,10 @@ class Gdn_Request {
             SafeParseStr($Get, $Get, $Original);
          }
 
-         if (isset($Get['p'])) {
+         if (isset($Get['_p'])) {
+            $Path = $Get['_p'];
+            unset($_GET['_p']);
+         } elseif (isset($Get['p'])) {
             $Path = $Get['p'];
             unset($_GET['p']);
          } else {

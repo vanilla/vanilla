@@ -18,19 +18,24 @@ if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
             else
                echo $Row->Summary;
 			?></div>
-			<div class="Meta">
-				<span class="MItem"><?php echo UserPhoto($Row, array('ImageClass' => 'ProfilePhotoSmall')).' '.UserAnchor($Row); ?></span>
-				<span class="MItem"><?php echo Anchor(Gdn_Format::Date($Row->DateInserted, 'html'), $Row->Url); ?></span>
+         <div class="Item-Footer">
             <?php
-            if (isset($Row->CategoryID)) {
-               $Category = CategoryModel::Categories($Row->CategoryID);
-               if ($Category !== NULL) {
-                  $Url = Url('categories/'.$Category['UrlCode']);
-                  echo '<span class="MItem"><a class="Category" href="'.$Url.'">'.$Category['Name'].'</a></span>';
-               }
-            }
+               echo UserPhoto($Row, array('Size' => 'Small')).' '.UserAnchor($Row); 
             ?>
-			</div>
+            <span class="Meta"><span class="MItem">
+               <?php
+                  echo Anchor(Gdn_Format::Date($Row->DateInserted, 'html'), $Row->Url); 
+                 
+                  if (isset($Row->CategoryID)) {
+                     $Category = CategoryModel::Categories($Row->CategoryID);
+                     if ($Category) {
+                        $Url = CategoryUrl($Category);
+                        echo ' in '.Anchor($Category['Name'], $Url, 'Category');
+                     }
+                  }
+               ?>
+            </span></span>
+         </span>
 		</div>
 	</li>
 <?php

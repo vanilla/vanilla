@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProfileExtender'] = array(
    'Name' => 'Profile Extender',
    'Description' => 'Add fields (like status, location, or gamer tags) to profiles and registration.',
-   'Version' => '2.0',
+   'Version' => '2.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1a1'),
    'MobileFriendly' => TRUE,
    'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),

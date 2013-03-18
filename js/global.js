@@ -35,10 +35,13 @@ jQuery(document).ready(function($) {
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $(document).delegate('a.ForgotPassword', 'click', function() {
-      $('.Methods').toggle();
-      $('#Form_User_Password').toggle();
-		$('#Form_User_SignIn').toggle();
-      return false;
+      // Make sure we have both forms
+      if ($('#Form_User_SignIn').length) {
+         $('.Methods').toggle();
+         $('#Form_User_Password').toggle();
+		   $('#Form_User_SignIn').toggle();
+         return false;
+      }
    });
    
    // Convert date fields to datepickers

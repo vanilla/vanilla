@@ -1556,6 +1556,11 @@ overflow: hidden;
    border: none;
 }
 
+.Item-Icon {
+   float: left;
+   margin: 0 10px 10px 0;
+}
+
 .Item h2, .Item h3, .Item h4, .Item h5 {
    margin: 0;
 }
@@ -3721,6 +3726,9 @@ body.embed .InformMessages {
    vertical-align: text-bottom;
    height: 24px;
    width: 24px;
+}
+.CategoryPhoto {
+   max-height: 64px;
 }
 
 /* Reaction Buttons */

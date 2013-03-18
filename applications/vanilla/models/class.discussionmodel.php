@@ -1406,6 +1406,7 @@ class DiscussionModel extends VanillaModel {
                   $this->SQL->Cache($CacheKeys);
                }
 
+               self::SerializeRow($Fields);
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
 
                SetValue('DiscussionID', $Fields, $DiscussionID);

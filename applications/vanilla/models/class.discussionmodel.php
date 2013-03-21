@@ -214,7 +214,11 @@ class DiscussionModel extends VanillaModel {
       if ($Offset !== FALSE && $Limit !== FALSE)
          $this->SQL->Limit($Limit, $Offset);
       
-      $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      // Get preferred sort order
+      $SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      $SortField = Gdn::Session()->GetPreference('Discussions.SortField', $SortField);
+
+      $this->EventArguments['SortField'] = &$SortField; 
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
 		$this->EventArguments['Wheres'] = &$Wheres;
 		$this->FireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
@@ -228,8 +232,7 @@ class DiscussionModel extends VanillaModel {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
       
-		// Get sorting options from config
-		$SortField = $this->EventArguments['SortField'];
+		// Whitelist sorting options
 		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
 			$SortField = 'd.DateLastComment';
 		
@@ -274,21 +277,36 @@ class DiscussionModel extends VanillaModel {
       
       $Sql = $this->SQL;
       
-      // Build up the base query. Self-join for optimization.
-      $Sql->Select('d2.*')
-         ->From('Discussion d')
-         ->Join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
-         ->OrderBy('d.DateLastComment', 'desc')
-         ->Limit($Limit, $Offset);
-      
+      // Determine category watching
       if ($this->Watching && !isset($Where['d.CategoryID'])) {
          $Watch = CategoryModel::CategoryWatch();
          if ($Watch !== TRUE)
             $Where['d.CategoryID'] = $Watch;
       }
       
+      // Get preferred sort order
+      $SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      $SortField = Gdn::Session()->GetPreference('Discussions.SortField', $SortField);
+
+      $this->EventArguments['SortField'] = &$SortField; 
+      $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
       $this->EventArguments['Wheres'] =& $Where;
       $this->FireEvent('BeforeGet');
+      
+      // Whitelist sorting options
+      if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
+         $SortField = 'd.DateLastComment';
+      
+      $SortDirection = $this->EventArguments['SortDirection'];
+      if ($SortDirection != 'asc')
+         $SortDirection = 'desc';
+      
+      // Build up the base query. Self-join for optimization.
+      $Sql->Select('d2.*')
+         ->From('Discussion d')
+         ->Join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
+         ->OrderBy($SortField, $SortDirection)
+         ->Limit($Limit, $Offset);
       
       // Verify permissions (restricting by category if necessary)
       $Perms = self::CategoryPermissions();

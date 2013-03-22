@@ -528,15 +528,16 @@ class UpdateModel extends Gdn_Model {
          $TmpPath = dirname($Path).'/'.basename($Path, '.zip').'/';
       if (file_exists($TmpPath))
          Gdn_FileSystem::RemoveFolder($TmpPath);
-
+      
       $Result = array();
       for ($i = 0; $i < $Zip->numFiles; $i++) {
          $Entry = $Zip->statIndex($i);
+         $Name = '/'.ltrim($Entry['name'], '/');
 
          foreach ($InfoPaths as $InfoPath) {
             $Preg = '`('.str_replace(array('.', '*'), array('\.', '.*'), $InfoPath).')$`';
-            if (preg_match($Preg, $Entry['name'], $Matches)) {
-               $Base = trim(substr($Entry['name'], 0, -strlen($Matches[1])), '/');
+            if (preg_match($Preg, $Name, $Matches)) {
+               $Base = trim(substr($Name, 0, -strlen($Matches[1])), '/');
                if (strpos($Base, '/') !== FALSE)
                   continue; // file nested too deep.
 

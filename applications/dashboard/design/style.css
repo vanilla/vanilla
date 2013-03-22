@@ -3737,6 +3737,9 @@ body.embed .InformMessages {
    height: 24px;
    width: 24px;
 }
+.CategoryPhoto {
+   max-height: 64px;
+}
 
 .PhotoGrid .UserPicture {
    display: inline-block;

@@ -314,50 +314,18 @@ class UtilityController extends DashboardController {
     */
    public function UpdateResponse() {
       // Get the message, response, and transientkey
-      $Messages = TrueStripSlashes(GetValue('Messages', $_POST));
       $Response = TrueStripSlashes(GetValue('Response', $_POST));
       $TransientKey = GetIncomingValue('TransientKey', '');
       
       // If the key validates
       $Session = Gdn::Session();
       if ($Session->ValidateTransientKey($TransientKey)) {
-         // If messages wasn't empty
-         if ($Messages != '') {
-            // Unserialize them & save them if necessary
-            $Messages = Gdn_Format::Unserialize($Messages);
-            if (is_array($Messages)) {
-               $MessageModel = new MessageModel();
-               foreach ($Messages as $Message) {
-                  // Check to see if it already exists, and if not, add it.
-                  if (is_object($Message))
-                     $Message = Gdn_Format::ObjectAsArray($Message);
-
-                  $Content = ArrayValue('Content', $Message, '');
-                  if ($Content != '') {
-                     $Data = $MessageModel->GetWhere(array('Content' => $Content));
-                     if ($Data->NumRows() == 0) {
-                        $MessageModel->Save(array(
-                           'Content' => $Content,
-                           'AllowDismiss' => ArrayValue('AllowDismiss', $Message, '1'),
-                           'Enabled' => ArrayValue('Enabled', $Message, '1'),
-                           'Application' => ArrayValue('Application', $Message, 'Dashboard'),
-                           'Controller' => ArrayValue('Controller', $Message, 'Settings'),
-                           'Method' => ArrayValue('Method', $Message, ''),
-                           'AssetTarget' => ArrayValue('AssetTarget', $Message, 'Content'),
-                           'CssClass' => ArrayValue('CssClass', $Message, '')
-                        ));
-                     }
-                  }
-               }
-            }
-         }
-
          // Save some info to the configuration file
          $Save = array();
 
          // If the response wasn't empty, save it in the config
          if ($Response != '')
-            $Save['Garden.RequiredUpdates'] = Gdn_Format::Unserialize($Response);
+            $Save['Garden.RequiredUpdates'] = @json_decode($Response);
       
          // Record the current update check time in the config.
          $Save['Garden.UpdateCheckDate'] = time();

@@ -18,7 +18,7 @@
  */
 class SkeletonController extends Gdn_Controller {
    /** @var array List of objects to prep. They will be available as $this->$Name. */
-   $this->Uses = array('Form');
+   public $Uses = array('Form');
    
    /**
     * If you use a constructor, always call parent.

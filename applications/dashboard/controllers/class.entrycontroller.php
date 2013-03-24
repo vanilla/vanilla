@@ -524,7 +524,7 @@ class EntryController extends Gdn_Controller {
                Gdn::UserModel()->FireEvent('AfterSignIn');
 
                // Send the welcome email.
-               if (C('Garden.Registration.SendConnectEmail', TRUE)) {
+               if (C('Garden.Registration.SendConnectEmail', FALSE)) {
                   try {
                      $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
                   } catch (Exception $Ex) {

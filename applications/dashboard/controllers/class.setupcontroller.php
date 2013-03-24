@@ -32,6 +32,7 @@ class SetupController extends DashboardController {
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
+      $this->AddJsFile('jquery.js');
       // Make sure all errors are displayed.
       SaveToConfig('Garden.Errors.MasterView', 'deverror.master.php', array('Save' => FALSE));
    }
@@ -46,6 +47,8 @@ class SetupController extends DashboardController {
     * @access public
     */
    public function Index() {
+      $this->AddJsFile('setup.js');
+      
       $this->ApplicationFolder = 'dashboard';
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
@@ -230,23 +233,11 @@ class SetupController extends DashboardController {
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'about.php')));
             
             // Detect rewrite abilities
-            try {
-               $Query = ConcatSep('/', Gdn::Request()->Domain(), Gdn::Request()->WebRoot(), 'dashboard/setup');
-               $Results = ProxyHead($Query, array(), 3);
-               $CanRewrite = FALSE;
-               if (in_array(ArrayValue('StatusCode',$Results,404), array(200,302)) && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {
-                  $CanRewrite = TRUE;
-               }
-            } catch (Exception $e) {
-               // cURL and fsockopen arent supported... guess?
-               $CanRewrite = (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE;
-            }
+            $CanRewrite = (bool)$this->Form->GetFormValue('RewriteUrls');
       
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
-               //'Garden.WebRoot' => Gdn_Url::WebRoot(),
                'Garden.RewriteUrls' => $CanRewrite,
-               //'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HtmLawed' => 'HtmLawed' // Make sure html purifier is enabled so html has a default way of being safely parsed.
@@ -322,5 +313,9 @@ class SetupController extends DashboardController {
       }
 			
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
+   }
+   
+   public function TestUrlRewrites() {
+      die('ok');
    }
 }

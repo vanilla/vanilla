@@ -1,6 +1,6 @@
 body {
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-   background: url('images/slicesplash.jpg') top center no-repeat #C7E6FB;
+   background: #C7E6FB;
    margin: 0px;
    padding: 0px;
    text-align: center;
@@ -193,7 +193,7 @@ input.Button {
 	text-shadow: 0 1px 0 #fff;
    margin: 0;
    padding: 3px 10px;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+   background: #f8f8f8;
    border: 1px solid #999;
    border-radius: 3px;
    -moz-border-radius: 3px;

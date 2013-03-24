@@ -41,6 +41,7 @@ class DbaController extends DashboardController {
    }
    
    public function Counts($Table = FALSE, $Column = FALSE, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      set_time_limit(300);
       $this->Permission('Garden.Settings.Manage');
       
       if ($Table && $Column && strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {

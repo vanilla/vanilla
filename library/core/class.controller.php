@@ -1629,7 +1629,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                   } else {
                      $Basename = substr($CssFile, 0, -4);
                      
-                     $this->Head->AddCss("/utility/css/$Basename/$Basename-$ETag.css", 'all', FALSE, $CssInfo['Options']);
+                     $this->Head->AddCss(Url("/utility/css/$Basename/$Basename-$ETag.css", '//'), 'all', FALSE, $CssInfo['Options']);
                   }
                   continue;
                }

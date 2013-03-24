@@ -265,7 +265,7 @@ if (!function_exists('Asset')) {
     */
    function Asset($Destination = '', $WithDomain = FALSE, $AddVersion = FALSE) {
       $Destination = str_replace('\\', '/', $Destination);
-      if (substr($Destination, 0, 7) == 'http://' || substr($Destination, 0, 8) == 'https://') {
+      if (IsUrl($Destination)) {
          $Result = $Destination;
       } else {
          $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);

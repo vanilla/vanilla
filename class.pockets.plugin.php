@@ -387,7 +387,7 @@ class PocketsPlugin extends Gdn_Plugin {
       $this->_SaveState();
    }
 
-   public static function PocketString($Name) {
+   public static function PocketString($Name, $Data = NULL) {
       $Inst = Gdn::PluginManager()->GetPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
       $Pockets = $Inst->GetPockets($Name);
       
@@ -395,7 +395,28 @@ class PocketsPlugin extends Gdn_Plugin {
       foreach ($Pockets as $Pocket) {
          $Result .= $Pocket->ToString();
       }
+      
+      if (is_array($Data)) {
+         $Data = array_change_key_case($Data);
+         
+         self::PocketStringCb($Data, TRUE);
+         $Result = preg_replace_callback('`{{(\w+)}}`', array('PocketsPlugin', 'PocketStringCb'), $Result);
+      }
+      
       return $Result;
+   }
+   
+   public static function PocketStringCb($Match = NULL, $SetArgs = FALSE) {
+      static $Data;
+      if ($SetArgs) {
+         $Data = $Match;
+      }
+      
+      $Key = strtolower($Match[1]);
+      if (isset($Data[$Key]))
+         return $Data[$Key];
+      else
+         return '';
    }
 
    protected function _SaveState() {

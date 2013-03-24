@@ -1601,11 +1601,14 @@ if (!function_exists('InSubArray')) {
 }
 
 if (!function_exists('IsMobile')) {
-   function IsMobile() {
-      static $IsMobile = 'unset';
+   function IsMobile($Value = NULL) {
+      static $IsMobile = NULL;
+      
+      if ($Value !== NULL)
+         $IsMobile = $Value;
       
       // Short circuit so we only do this work once per pageload
-      if ($IsMobile != 'unset') return $IsMobile;
+      if ($IsMobile !== NULL) return $IsMobile;
       
       // Start out assuming not mobile
       $Mobile = 0;

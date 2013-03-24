@@ -1194,9 +1194,13 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                }
             } else {
                $User = Gdn::UserModel()->GetID($Value);
-               $User->Name = FormatUsername($User, $Format, $ContextUserID);
+               if ($User) {
+                  $User->Name = FormatUsername($User, $Format, $ContextUserID);
                
-               $Result = UserAnchor($User);
+                  $Result = UserAnchor($User);
+               } else {
+                  $Result = '';
+               }
             }
                
             $Args = $ArgsBak;

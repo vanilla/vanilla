@@ -55,11 +55,11 @@ class SocialController extends DashboardController {
             $Configured = NULL;
          }
          
-         $Connections[$PluginKey] = array_merge(array(
-            'Icon'         => sprintf("/plugins/%s/icon.png", $PluginInfo['Folder'])
-         ), $Connections[$PluginKey], $PluginInfo, array(
+         $Connections[$PluginKey] = array_merge($Connections[$PluginKey], $PluginInfo, array(
             'Enabled'      => Gdn::PluginManager()->CheckPlugin($PluginKey),
             'Configured'   => $Configured
+         ), array(
+            'Icon'         => sprintf("/plugins/%s/icon.png", $PluginInfo['Folder'])
          ));
       }
       

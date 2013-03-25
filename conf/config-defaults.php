@@ -62,6 +62,7 @@ $Configuration['Garden']['Registration']['InviteExpiration']    = '-1 week'; // 
 $Configuration['Garden']['Registration']['InviteRoles']         = 'FALSE';
 $Configuration['Garden']['Registration']['ConfirmEmail']        = FALSE;
 $Configuration['Garden']['Registration']['ConfirmEmailRole']    = 3;
+$Configuration['Garden']['Registration']['MinPasswordLength']   = 6;
 $Configuration['Garden']['TermsOfService']                      = '/home/termsofservice'; // The url to the terms of service.
 $Configuration['Garden']['Email']['UseSmtp']                    = FALSE;
 $Configuration['Garden']['Email']['SmtpHost']                   = '';

@@ -3072,6 +3072,8 @@ if (!function_exists('PasswordStrength')) {
     * @param string $Username
     */
    function PasswordStrength($Password, $Username) {
+      $Translations = explode(',', T('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
+      
       // calculate $Entropy
       $Alphabet = 0;
       if ( preg_match('/[0-9]/', $Password) )
@@ -3086,7 +3088,7 @@ if (!function_exists('PasswordStrength')) {
       $Length = strlen($Password);
       $Entropy = log(pow($Alphabet, $Length), 2);
       
-      $RequiredLength = C('Garden.Password.MinLength', 8);
+      $RequiredLength = C('Garden.Password.MinLength', 6);
       $RequiredScore = C('Garden.Password.MinScore', 2);
       $Response = array(
          'Pass'      => FALSE,
@@ -3097,49 +3099,36 @@ if (!function_exists('PasswordStrength')) {
          'Score'     => 0
       );
       
-      // password1 == username
-      if (strtolower($Password) == strtolower($Username)) {
-         $Response['Reason'] = 'similar';
-         return $Response;
-      }
-      
-      // divide into entropy buckets
-      $EntropyBuckets = array(10,26,36,41,52,62,83,93);
-      $EntropyBucket = 1; $nEntropyBuckets = sizeof($EntropyBuckets);
-      for ($i=0; $i < $nEntropyBuckets; $i++) {
-         if ($Entropy >= $EntropyBuckets[$i]) {
-            $EntropyBucket = $i+1;
-         }
-      }
-      $EntropyBucket = floor($EntropyBucket / 2);
-      
-      // reject on length
       if ($Length < $RequiredLength) {
-         $Response['Reason'] = 'short';
+         $Response['Reason'] = $Translations[0];
          return $Response;
       }
       
-      // divide into length buckets
-      $LengthBuckets = array(8,11,12,15);
-      $LengthBucket = 1; $nLengthBuckets = sizeof($LengthBuckets);
-      for ($i=0; $i < $nLengthBuckets; $i++) {
-         if ($Length >= $LengthBuckets[$i]) {
-            $LengthBucket = $i+1;
-         }
+      // password1 == username
+      if (strpos(strtolower($Username), strtolower($Password)) !== FALSE) {
+         $Response['Reason'] = $Translations[1];
+         return $Response;
       }
       
-      // apply length modifications
-      $ZeroBucket = ceil($nLengthBuckets / 2);
-      $BucketMod = $LengthBucket - $ZeroBucket;
-      $FinalBucket = $EntropyBucket + $BucketMod;
+      if ($Entropy < 30) {
+         $Response['Score'] = 1;
+         $Response['Reason'] = $Translations[2];
+      } else if ($Entropy < 40) {
+         $Response['Score'] = 2;
+         $Response['Reason'] = $Translations[3];
+      } else if ($Entropy < 55) {
+         $Response['Score'] = 3;
+         $Response['Reason'] = $Translations[4];
+      } else if ($Entropy < 70) {
+         $Response['Score'] = 4;
+         $Response['Reason'] = $Translations[5];
+      } else {
+         $Response['Score'] = 5;
+         $Response['Reason'] = $Translations[6];
+      }
       
-      // Normalize
-      if ($FinalBucket < 1) $FinalBucket = 1;
-      if ($FinalBucket > 5) $FinalBucket = 5;
+      $Response['Pass'] = $Response['Score'] >= $RequiredScore;
       
-      $Response['Score'] = $FinalBucket;
-      if ($FinalBucket >= $RequiredScore)
-         $Response['Pass'] = TRUE;
       return $Response;
    }
 }

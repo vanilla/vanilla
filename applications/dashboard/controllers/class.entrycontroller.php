@@ -1131,7 +1131,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterApproval() {
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       // If the form has been posted back...
       if ($this->Form->IsPostBack()) {
@@ -1193,7 +1193,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterBasic() {
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
@@ -1263,7 +1263,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterCaptcha() {
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       include(CombinePaths(array(PATH_LIBRARY, 'vendors/recaptcha', 'functions.recaptchalib.php')));
       if ($this->Form->IsPostBack() === TRUE) {
@@ -1338,7 +1338,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterInvitation($InvitationCode) {
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       if ($this->Form->IsPostBack() === TRUE) {
          $this->InvitationCode = $this->Form->GetValue('InvitationCode');

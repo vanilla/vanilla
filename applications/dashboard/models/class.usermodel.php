@@ -42,6 +42,16 @@ class UserModel extends Gdn_Model {
       return $Message;
    }
    
+   /**
+    * 
+    * @param Gdn_Controller $Controller
+    */
+   public function AddPasswordStrength($Controller) {
+      $Controller->AddJsFile('password.js');
+      $Controller->AddDefinition('MinPassLength', C('Garden.Registration.MinPasswordLength'));
+      $Controller->AddDefinition('PasswordTranslations', T('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
+   }
+   
    public function Ban($UserID, $Options) {
       $this->SetField($UserID, 'Banned', TRUE);
       

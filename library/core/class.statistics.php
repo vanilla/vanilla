@@ -138,33 +138,13 @@ class Gdn_Statistics extends Gdn_Plugin {
     * @return void
     */
    public function Check() {
-
-      // If we're local and not allowed, or just directly disabled, short circuit here.
-      $Enabled = self::CheckIsEnabled();
-      if ($Enabled === FALSE) {
-         return;
-      }
-
       // If we're hitting an exception app, short circuit here
       if (!self::CheckIsAllowed()) {
          return;
       }
-      
       Gdn::Controller()->AddDefinition('AnalyticsTask', 'tick');
       
-      if ($Enabled) {
-         // If the config file is not writable, show a warning to admin users and return
-         $ConfFile = PATH_CONF . '/config.php';
-         if (!is_writable($ConfFile)) {
-            // Admins see a helpful notice
-            if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-               $Warning = Sprite('Sliders', 'InformSprite');
-               $Warning .= T('Your config.php file is not writable.<br/> Find out <a href="http://vanillaforums.org/docs/vanillastatistics">how to fix this &raquo;</a>');
-               Gdn::Controller()->InformMessage($Warning, array('CssClass' => 'HasSprite'));
-            }
-            return;
-         }
-
+      if (self::CheckIsEnabled()) {
          // At this point there is nothing preventing stats from working, so queue a tick.
          Gdn::Controller()->AddDefinition('TickExtra', $this->GetEncodedTickExtra());
       }
@@ -182,12 +162,6 @@ class Gdn_Statistics extends Gdn_Plugin {
    }
 
    public static function CheckIsAllowed() {
-
-      // If we've recently received an error response, wait until the throttle expires
-      if (self::Throttled()) {
-         return FALSE;
-      }
-
       // These applications are not included in statistics
       $ExceptionApplications = array('dashboard');
 
@@ -202,6 +176,11 @@ class Gdn_Statistics extends Gdn_Plugin {
       $ApplicationFolder = Gdn::Controller()->ApplicationFolder;
       if (in_array($ApplicationFolder, $ExceptionApplications))
          return FALSE;
+      
+      // If we've recently received an error response, wait until the throttle expires
+      if (self::Throttled()) {
+         return FALSE;
+      }
 
       return TRUE;
    }
@@ -401,13 +380,17 @@ class Gdn_Statistics extends Gdn_Plugin {
       ));
    }
 
+   /**
+    * 
+    * @param Gdn_Controller $Sender
+    */
    public function SettingsController_AnalyticsTick_Create($Sender) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
       Gdn::Statistics()->Tick();
       $this->FireEvent("AnalyticsTick");
-
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->Render('tick', 'statistics', 'dashboard');
    }
 
@@ -606,15 +589,19 @@ class Gdn_Statistics extends Gdn_Plugin {
     * @return void;
     */
    public function Tick() {
-      // If we're local and not allowed, or just directly disabled, gtfo.
-      $Enabled = self::CheckIsEnabled();
-      
       // Fire an event for plugins to track their own stats.
       // TODO: Make this analyze the path and throw a specific event (this event will change in future versions).
       $this->EventArguments['Path'] = Gdn::Request()->Post('Path');
       $this->FireEvent('Tick');
       
-      if ($Enabled === FALSE)
+      // Store the view, using denormalization if enabled
+      $ViewType = 'normal';
+      if (preg_match('`discussion/embed`', Gdn::Request()->Post('ResolvedPath', '')))
+         $ViewType = 'embed';
+      
+      $this->AddView($ViewType);
+      
+      if (!self::CheckIsEnabled())
          return;
       
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
@@ -624,17 +611,24 @@ class Gdn_Statistics extends Gdn_Plugin {
             Gdn::Controller()->InformMessage($CallMessage, array('CssClass' => 'HasSprite'));
          }
       }
-
-      // If the config file is not writable, gtfo
-      $ConfFile = PATH_CONF . '/config.php';
-      if (!is_writable($ConfFile))
-         return;
       
       $InstallationID = Gdn::InstallationID();
       
       // Check if we're registered with the central server already. If not, this request is 
       // hijacked and used to perform that task instead of sending stats or recording a tick.
       if (is_null($InstallationID)) {
+         // If the config file is not writable, gtfo
+         $ConfFile = PATH_CONF . '/config.php';
+         if (!is_writable($ConfFile)) {
+            // Admins see a helpful notice
+            if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+               $Warning = Sprite('Sliders', 'InformSprite');
+               $Warning .= T('Your config.php file is not writable.<br/> Find out <a href="http://vanillaforums.org/docs/vanillastatistics">how to fix this &raquo;</a>');
+               Gdn::Controller()->InformMessage($Warning, array('CssClass' => 'HasSprite'));
+            }
+            return;
+         }
+         
          $AttemptedRegistration = Gdn::Get('Garden.Analytics.Registering', FALSE);
          // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
          if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60)
@@ -642,13 +636,6 @@ class Gdn_Statistics extends Gdn_Plugin {
 
          return $this->Register();
       }
-      
-      // Store the view, using denormalization if enabled
-      $ViewType = 'normal';
-      if (preg_match('`discussion/embed`', Gdn::Request()->Post('ResolvedPath', '')))
-         $ViewType = 'embed';
-      
-      $this->AddView($ViewType);
       
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
       $LastSentDate = self::LastSentDate();

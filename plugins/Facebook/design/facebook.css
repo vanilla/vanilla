@@ -1,0 +1,27 @@
+a.facebook-login-button {
+position: relative;
+display: inline-block;
+text-decoration: none;
+font-family: Tahoma, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+font-weight: bold;
+font-size: 11px;
+color: #fff;
+height: 19px;
+line-height: 18px;
+text-align: center;
+padding: 0 10px 0 31px;
+background-color: #5f78ab;
+border-top: 1px solid #879ac0;
+outline: 1px solid #29447e;
+}
+
+a.facebook-login-button span {
+width: 21px;
+height: 20px;
+padding: 0;
+margin: 0;
+left: 0;
+top: -1px;
+position: absolute;
+background: url("facebook-icon.png") no-repeat left top;
+}

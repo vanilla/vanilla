@@ -314,7 +314,8 @@ class PermissionModel extends Gdn_Model {
             if(!empty($LimitToSuffix) && substr($PermissionName, -strlen($LimitToSuffix)) != $LimitToSuffix)
                continue; // permission not in $LimitToSuffix
             if($index = strpos($PermissionName, '.')) {
-               if(!in_array(substr($PermissionName, 0, $index), $Namespaces))
+               if(!in_array(substr($PermissionName, 0, $index), $Namespaces) &&
+                  !in_array(substr($PermissionName, 0, strrpos($PermissionName, '.')), $Namespaces))
                   continue; // permission not in allowed namespaces
             }
 

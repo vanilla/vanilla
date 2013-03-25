@@ -230,8 +230,9 @@ class DiscussionModel extends VanillaModel {
       
 		// Get sorting options from config
 		$SortField = $this->EventArguments['SortField'];
-		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
-			$SortField = 'd.DateLastComment';
+		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted'))) {
+			trigger_error("You are sorting discussions by a possibly sub-optimal column.", E_USER_NOTICE);
+      }
 		
 		$SortDirection = $this->EventArguments['SortDirection'];
 		if ($SortDirection != 'asc')
@@ -423,8 +424,9 @@ class DiscussionModel extends VanillaModel {
       
 		// Get sorting options from config
 		$SortField = $this->EventArguments['SortField'];
-		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
-			$SortField = 'd.DateLastComment';
+		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted'))) {
+			trigger_error("You are sorting discussions by a possibly sub-optimal column.", E_USER_NOTICE);
+      }
 		
 		$SortDirection = $this->EventArguments['SortDirection'];
 		if ($SortDirection != 'asc')

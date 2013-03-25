@@ -19,7 +19,13 @@
       
    ?>
 </div>
-<div class="Wrap"><?php echo T('Click a tag name to edit. Click x to remove.'); ?></div>
+<div class="Wrap">
+   <?php 
+   echo T('Click a tag name to edit. Click x to remove.');
+   echo ' ';
+   echo T("Red tags are special and can't be removed.");
+   ?>
+</div>
 <div class="Tags">
    <?php
       $Session = Gdn::Session();
@@ -29,15 +35,30 @@
       } else {
          $Tags = $this->Data('Tags');
          foreach ($Tags as $Tag) {
+            $CssClass = 'TagAdmin';
+            $Title = '';
+            $Special = FALSE;
+            
+            if (GetValue('Type', $Tag)) {
+               $Special = TRUE;
+               $CssClass .= " Tag-Special Tag-{$Tag['Type']}";
+               $Title = T('This is a special tag.');
+            }
+            
             ?>
-            <div class="Tag<?php echo GetValue('Type', $Tag) ? ' Tag-'.$Tag['Type'] : '' ?>" id="Tag-<?php echo $Tag['TagID']; ?>">
+            <div id="<?php echo "Tag_{$Tag['TagID']}"; ?>" class="<?php echo $CssClass;?>" title="<?php echo $Title; ?>">
                <?php
-               echo Anchor(
-                       htmlspecialchars($Tag['Name']).' '.Wrap($Tag['CountDiscussions'], 'span', array('class' => 'Count')), 
-                       "settings/tagging/edit/{$Tag['TagID']}", 
-                       'TagName Tag_'.str_replace(' ', '_', $Tag['Name'])
-                    );
-               echo ' '.Anchor('×', "settings/tagging/delete/{$Tag['TagID']}", 'Popup');
+               if ($Special) {
+                  echo htmlspecialchars($Tag['Name']).' '.Wrap($Tag['CountDiscussions'], 'span', array('class' => 'Count'));
+               } else {
+                  echo Anchor(
+                     htmlspecialchars($Tag['Name']).' '.Wrap($Tag['CountDiscussions'], 'span', array('class' => 'Count')), 
+                     "settings/tagging/edit/{$Tag['TagID']}", 
+                     'TagName Tag_'.str_replace(' ', '_', $Tag['Name'])
+                  );
+                       
+                  echo ' '.Anchor('×', "settings/tagging/delete/{$Tag['TagID']}", 'Delete Popup');
+               }
                ?>
             </div>
             <?php

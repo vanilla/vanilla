@@ -7,12 +7,12 @@ jQuery(document).ready(function($) {
    });
    
    // Confirm deletes before performing them
-   $('a.Delete').popup({
-      confirm: true,
-      followConfirm: false,
-      afterConfirm: function(json, sender) {
-         $('#Content:first').load(gdn.url('/dashboard/settings/tagging?DeliveryType=VIEW'));
-      }
-   });
+//   $('a.Delete').popup({
+//      confirm: true,
+//      followConfirm: false,
+//      afterConfirm: function(json, sender) {
+//         $('#Content:first').load(gdn.url('/dashboard/settings/tagging?DeliveryType=VIEW'));
+//      }
+//   });
 
 });

@@ -109,15 +109,18 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->SetData('Tag', $Tag, TRUE);
       $Sender->Title(T('Tagged with ').htmlspecialchars($Tag));
       $Sender->Head->Title($Sender->Head->Title());
+      $UrlTag = rawurlencode($Tag);
       if (urlencode($Tag) == $Tag) {
-         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged/'.urlencode($Tag), PageNumber($Offset, $Limit, TRUE)), TRUE));
+         $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, TRUE)), TRUE));
+         $FeedUrl = Url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, TRUE, FALSE)), '//');
       } else {
-         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.urlencode($Tag), TRUE));
+         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.$UrlTag, TRUE));
+         $FeedUrl = Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE, FALSE), 'feed.rss').'?Tag='.$UrlTag, '//');
       }
 
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
-         $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
+         $Sender->Head->AddRss($FeedUrl, $Sender->Head->Title());
       }
       
       if (!is_numeric($Offset) || $Offset < 0)

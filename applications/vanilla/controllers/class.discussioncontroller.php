@@ -84,6 +84,7 @@ class DiscussionController extends VanillaController {
       
       // Setup
       $this->Title($this->Discussion->Name);
+      $this->Head->Description(Gdn_Format::To($this->Discussion->Body, $this->Discussion->Format));
 
       // Actual number of comments, excluding the discussion itself.
       $ActualResponses = $this->Discussion->CountComments;

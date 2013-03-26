@@ -34,6 +34,11 @@ if (!class_exists('HeadModule', FALSE)) {
       private $_Strings;
       
       /**
+       * The meta description for the page.
+       */
+      private $_Description;
+      
+      /**
        * The main text for the "title" tag in the head.
        */
       protected $_Title;
@@ -48,6 +53,7 @@ if (!class_exists('HeadModule', FALSE)) {
        * $this->_SubTitle string being concatenated.
        */
       protected $_TitleDivider;
+      
       
       public function __construct($Sender = '') {
          $this->_Tags = array();
@@ -296,6 +302,11 @@ if (!class_exists('HeadModule', FALSE)) {
          return $Cmp;
       }
       
+      public function Description($Description = '') {
+        // Twitter style length of description...
+        $this->_Description = substr(strip_tags($Description), 0, 137) . '...';
+      }
+      
       /**
        * Render the entire head module.
        */
@@ -350,9 +361,13 @@ if (!class_exists('HeadModule', FALSE)) {
                $this->AddTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Img));
             }
          }
+         
+         if (!empty($this->_Description)) {
+            $this->AddTag('meta', array('name' => 'description', 'content' => $this->_Description));
+         }
 
          $this->FireEvent('BeforeToString');
-
+         
          $Tags = $this->_Tags;
             
          // Make sure that css loads before js (for jquery)

@@ -1255,25 +1255,41 @@ class UserModel extends Gdn_Model {
       if (!$Timestamp)
          $Timestamp = time();
       
-      // Increment source points for the user.
-      self::_GivePoints($UserID, $Points, 'a', $Source);
+      if (is_array($Source)) {
+         $CategoryID = GetValue('CategoryID', $Source, 0);
+         $Source = $Source[0];
+      } else {
+         $CategoryID = 0;
+      }
       
-      // Increment total points for the user.
-      self::_GivePoints($UserID, $Points, 'w', 'Total', $Timestamp);
-      self::_GivePoints($UserID, $Points, 'm', 'Total', $Timestamp);
-      self::_GivePoints($UserID, $Points, 'a', 'Total', $Timestamp);
+      if ($CategoryID > 0) {
+         $CategoryIDs = array($CategoryID, 0);
+      } else {
+         $CategoryIDs = array($CategoryID);
+      }
       
-      // Increment global daily points.
-      self::_GivePoints(0, $Points, 'd', 'Total', $Timestamp);
+      foreach ($CategoryIDs as $ID) {
+         // Increment source points for the user.
+         self::_GivePoints($UserID, $Points, 'a', $Source, $ID);
+
+         // Increment total points for the user.
+         self::_GivePoints($UserID, $Points, 'w', 'Total', $ID, $Timestamp);
+         self::_GivePoints($UserID, $Points, 'm', 'Total', $ID, $Timestamp);
+         self::_GivePoints($UserID, $Points, 'a', 'Total', $ID, $Timestamp);
+
+         // Increment global daily points.
+         self::_GivePoints(0, $Points, 'd', 'Total', $ID, $Timestamp);
+      }
       
       // Grab the user's total points.
-      $Points = Gdn::SQL()->GetWhere('UserPoints', array('UserID' => $UserID, 'SlotType' => 'a', 'Source' => 'Total'))->Value('Points');
+      $Points = Gdn::SQL()->GetWhere('UserPoints', array('UserID' => $UserID, 'SlotType' => 'a', 'Source' => 'Total', 'CategoryID' => 0))->Value('Points');
       
 //      Gdn::Controller()->InformMessage('Points: '.$Points);
       Gdn::UserModel()->SetField($UserID, 'Points', $Points);
       
       // Fire a give points event.
       Gdn::UserModel()->EventArguments['UserID'] = $UserID;
+      Gdn::UserModel()->EventArguments['CategoryID'] = $CategoryID;
       Gdn::UserModel()->EventArguments['Points'] = $Points;
       Gdn::UserModel()->FireEvent('GivePoints');
    }
@@ -1285,12 +1301,12 @@ class UserModel extends Gdn_Model {
     * @access protected
     * @see self::GivePoints
     */
-   protected static function _GivePoints($UserID, $Points, $SlotType, $Source = 'Total', $Timestamp = FALSE) {
+   protected static function _GivePoints($UserID, $Points, $SlotType, $Source = 'Total', $CategoryID = 0, $Timestamp = FALSE) {
       $TimeSlot = gmdate('Y-m-d', Gdn_Statistics::TimeSlotStamp($SlotType, $Timestamp));
       
       $Px = Gdn::Database()->DatabasePrefix;
       $Sql = "insert {$Px}UserPoints (UserID, SlotType, TimeSlot, Source, Points)
-         values (:UserID, :SlotType, :TimeSlot, :Source, :Points)
+         values (:UserID, :SlotType, :TimeSlot, :Source, :CategoryID, :Points)
          on duplicate key update Points = Points + :Points1";
       
       Gdn::Database()->Query($Sql, array(
@@ -1298,6 +1314,7 @@ class UserModel extends Gdn_Model {
           ':Points' => $Points, 
           ':SlotType' => $SlotType, 
           ':Source' => $Source,
+          ':CategoryID' => $CategoryID,
           ':TimeSlot' => $TimeSlot, 
           ':Points1' => $Points));
    }

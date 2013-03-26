@@ -291,6 +291,22 @@ class CategoryModel extends Gdn_Model {
    }
    
    /**
+    * Give a user points specific to this category.
+    * 
+    * @param int $UserID The user to give the points to.
+    * @param int $Points The number of points to give.
+    * @param string $Source The source of the points.
+    * @param int $CategoryID The category to give the points for.
+    * @param int $Timestamp The time the points were given.
+    */
+   public static function GivePoints($UserID, $Points, $Source = 'Other', $CategoryID = 0, $Timestamp = FALSE) {
+      // TODO: Figure out whether or not the category tracks points seperately.
+      
+      
+      UserModel::GivePoints($UserID, $Points, array($Source, 'CategoryID' => $CategoryID), $Timestamp);
+   }
+   
+   /**
     * 
     * 
     * @since 2.0.18

@@ -140,6 +140,7 @@ $Construct->Table('UserPoints')
    ->Column('SlotType', array('d', 'w', 'm', 'y', 'a'), FALSE, 'primary')
    ->Column('TimeSlot', 'datetime', FALSE, 'primary')
    ->Column('Source', 'varchar(10)', 'Total', 'primary')
+   ->Column('CategoryID', 'int', 0, 'primary')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('Points', 'int', 0)
    ->Set($Explicit, $Drop);

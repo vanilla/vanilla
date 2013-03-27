@@ -9,10 +9,10 @@ foreach ($Activities as $Activity) {
 ?>
    <item>
       <title><?php echo Gdn_Format::Text(GetValue('Headline', $Activity)); ?></title>
-      <link><?php echo Url(UserUrl($Author, '', 'activity'), TRUE); ?></link>
+      <link><?php echo Url('/activity', TRUE); ?></link>
       <pubDate><?php echo date('r', Gdn_Format::ToTimeStamp(GetValue('DateUpdated', $Activity))); ?></pubDate>
       <dc:creator><?php echo Gdn_Format::Text($Author->Name); ?></dc:creator>
-      <guid isPermaLink="false"><?php echo GetValue('ActivityID', $Activity) . '@' . Url(UserUrl($Author, '', 'activity')); ?></guid>
+      <guid isPermaLink="false"><?php echo GetValue('ActivityID', $Activity) . '@' . Url('/activity'); ?></guid>
       <?php if ($Story = GetValue('Story', $Activity)) : ?>
       <description><![CDATA[<?php echo Gdn_Format::RssHtml($Story, GetValue('Format', $Activity)); ?>]]></description>
       <?php endif; ?>

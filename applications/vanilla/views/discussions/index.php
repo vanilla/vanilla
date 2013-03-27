@@ -20,6 +20,7 @@ if ($this->Data('_PagerUrl'))
 
 echo '<div class="PageControls Top">';
    PagerModule::Write($PagerOptions);
+   echo Gdn_Theme::Module('DiscussionSorterModule');
    echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
 echo '</div>';
 
@@ -32,6 +33,7 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
    
 echo '<div class="PageControls Bottom">';
    PagerModule::Write($PagerOptions);
+   echo Gdn_Theme::Module('DiscussionSorterModule');
    echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
 echo '</div>';
 

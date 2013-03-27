@@ -2530,6 +2530,46 @@ tr.CategoryHeading td {
 	font-size: 11px;
 }
 
+/* Discussion Sorter */
+.DiscussionSorter {
+   float: right;
+   margin-right: 24px;
+   font-size: 11px; 
+}
+.DiscussionSorter:hover {
+   cursor: pointer;
+   background: #f3f3f3;
+}
+.DiscussionSorter .MenuItems { 
+   padding: 0; 
+   width: 130px;
+   border-top: none;
+   border-radius: 0; 
+}
+.DiscussionSorter .Selected {
+   padding: 0 0 0 15px;
+   display: inline-block;
+   width: 115px;
+   border: 1px solid transparent;
+   border-bottom: none;
+}
+.DiscussionSorter .Open .Selected {
+   border: 1px solid #999;
+   border-bottom: none;  
+}
+.DiscussionSorter .SpMenu { 
+   background-position: -32px -20px;
+   height: 8px; 
+   width: 12px; 
+   margin-top: 8px;
+}
+.DiscussionSorter .Flyout:before, .Flyout:after { 
+   border: none; 
+}
+.DiscussionSorter .ToggleFlyout .Flyout { 
+   top: 18px; 
+}
+
 /* ======================================= Blocks */
 .Block {
    line-height: 1;

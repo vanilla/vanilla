@@ -553,8 +553,7 @@ class DiscussionsController extends VanillaController {
       Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, 'Discussions.SortField', $SortField);
       
       // Send sorted discussions
-      $this->View = 'index';
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $this->Index();
+      $this->Render();
    }
 }

@@ -37,14 +37,7 @@ jQuery(document).ready(function($) {
          url: SortURL,
          data: SendData,
          success: function(json) {
-            json = $.postParseJson(json);
-            if (json.RedirectUrl) {
-               $(frm).triggerHandler('complete');
-               // Redirect to the new discussions list
-               document.location = json.RedirectUrl;
-            } else {
-               $('#Content').html(json.Data);
-            }
+            location.reload();
          }
       });
       

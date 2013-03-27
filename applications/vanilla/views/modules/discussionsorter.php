@@ -17,31 +17,3 @@
    </div>
    </span>
 </div>
-
-<script>
-jQuery(document).ready(function($) {
-   $(document).undelegate('.SortDiscussions', 'click');
-   $(document).delegate('.SortDiscussions', 'click', function() {
-      // Gather data
-      var SortOrder = $(this).attr('data-field');
-      var SortURL = gdn.url('discussions/sort');
-      var SendData = {
-         'TransientKey': gdn.definition('TransientKey'),
-         'Path': gdn.definition('Path'), 
-         'DiscussionSort': SortOrder
-      };
-      
-      jQuery.ajax({
-         dataType: 'json',
-         type: 'post',
-         url: SortURL,
-         data: SendData,
-         success: function(json) {
-            location.reload();
-         }
-      });
-      
-      return false;
-   });
-});
-</script>

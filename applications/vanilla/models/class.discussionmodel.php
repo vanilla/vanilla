@@ -20,12 +20,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class DiscussionModel extends VanillaModel {
-   /**
-    * @var array
-    */
+   /** @var array */
    protected static $_CategoryPermissions = NULL;
-
+   
+   /** @var bool */
    public $Watching = FALSE;
+   
+   /** @var array Column names to allow sorting by. */
+   protected static $AllowedSortFields = array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted');
    
    const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
    
@@ -233,7 +235,7 @@ class DiscussionModel extends VanillaModel {
          $this->SQL->Where($Wheres);
       
 		// Whitelist sorting options
-		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
+		if (!in_array($SortField, self::AllowedSortFields()))
 			$SortField = 'd.DateLastComment';
 		
 		$SortDirection = $this->EventArguments['SortDirection'];
@@ -294,7 +296,7 @@ class DiscussionModel extends VanillaModel {
       $this->FireEvent('BeforeGet');
       
       // Whitelist sorting options
-      if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
+      if (!in_array($SortField, self::AllowedSortFields()))
          $SortField = 'd.DateLastComment';
       
       $SortDirection = $this->EventArguments['SortDirection'];
@@ -659,6 +661,8 @@ class DiscussionModel extends VanillaModel {
 			}
 		}
 	}
+   
+   
 
    /**
     * Gets announced discussions.
@@ -2066,5 +2070,16 @@ class DiscussionModel extends VanillaModel {
       
       // Send back an comma-separated string
       return implode(',', $TagsArray);
+   }
+   
+   /**
+    * Getter/setter for protected $AllowedSortFields array.
+    */
+   public static function AllowedSortFields($Allowed = NULL) {
+      if (is_array($Allowed)) {
+         self::$AllowedSortFields = $Allowed;
+      }
+      
+      return self::$AllowedSortFields;
    }
 }

@@ -129,7 +129,7 @@ class DiscussionController extends VanillaController {
       $this->SetData('_LatestItem', $LatestItem);
       
       // Set the canonical url to have the proper page title.
-      $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, FALSE)));
+      $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, 0, FALSE)));
       
 //      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
       

@@ -31,7 +31,7 @@ class DiscussionSorterModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (Gdn::Session()->IsValid())
+      if (Gdn::Session()->IsValid() && C('Vanilla.Discussions.UserSortField'))
          return parent::ToString();
    }
 }

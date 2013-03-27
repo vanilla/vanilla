@@ -27,7 +27,7 @@ class DiscussionModel extends VanillaModel {
    public $Watching = FALSE;
    
    /** @var array Column names to allow sorting by. */
-   protected static $AllowedSortFields = array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted');
+   protected static $AllowedSortFields = array('d.DateLastComment', 'd.DateInserted', 'd.DiscussionID');
    
    const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
    
@@ -217,8 +217,7 @@ class DiscussionModel extends VanillaModel {
          $this->SQL->Limit($Limit, $Offset);
       
       // Get preferred sort order
-      $SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
-      $SortField = Gdn::Session()->GetPreference('Discussions.SortField', $SortField);
+      $SortField = self::GetSortField();
 
       $this->EventArguments['SortField'] = &$SortField; 
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
@@ -287,8 +286,7 @@ class DiscussionModel extends VanillaModel {
       }
       
       // Get preferred sort order
-      $SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
-      $SortField = Gdn::Session()->GetPreference('Discussions.SortField', $SortField);
+      $SortField = self::GetSortField();
 
       $this->EventArguments['SortField'] = &$SortField; 
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
@@ -1233,6 +1231,19 @@ class DiscussionModel extends VanillaModel {
          $this->AddDenormalizedViews($Result);
       
       return $Result;
+   }
+   
+   /**
+    * Get discussions sort order based on config and optional user preference.
+    * 
+    * @return string Column name.
+    */
+   public static function GetSortField() {
+      $SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      if (C('Vanilla.Discussions.UserSortField'))
+         $SortField = Gdn::Session()->GetPreference('Discussions.SortField', $SortField);
+      
+      return $SortField;  
    }
    
    public static function GetViewsFallback($DiscussionID) {

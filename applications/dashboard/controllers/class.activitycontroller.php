@@ -138,6 +138,9 @@ class ActivityController extends Gdn_Controller {
       // Page meta.
       $this->AddJsFile('activity.js');
       
+      if ($this->Head)
+         $this->Head->AddRss(Url('/activity/feed.rss', TRUE), $this->Head->Title());
+      
       // Comment submission 
       $Session = Gdn::Session();
       $Comment = $this->Form->GetFormValue('Comment');

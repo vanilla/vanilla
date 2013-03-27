@@ -534,4 +534,26 @@ class DiscussionsController extends VanillaController {
 		$this->DeliveryType = DELIVERY_TYPE_DATA;
 		$this->Render();
 	}
+
+   /**
+    * Set user preference for sorting discussions.
+    */
+   public function Sort() {
+      if (!Gdn::Session()->IsValid() || !$this->Form->AuthenticatedPostBack())
+         Redirect('/discussions/index', 302);
+      
+      // Get param
+      $SortField = Gdn::Request()->Post('DiscussionSort');
+      
+      // Use whitelist here too to keep database clean
+      if (!in_array($SortField, DiscussionModel::AllowedSortFields()))
+         $SortField = 'd.DateInserted';
+      
+      // Set user pref
+      Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, 'Discussions.SortField', $SortField);
+      
+      // Send sorted discussions
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->Render();
+   }
 }

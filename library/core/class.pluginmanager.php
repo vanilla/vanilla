@@ -384,6 +384,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Loop through all declared classes looking for ones that implement Gdn_iPlugin.
       foreach (get_declared_classes() as $ClassName) {
+         if ($ClassName == 'Gdn_Plugin')
+            continue;
 
          // Only register the plugin if it implements the Gdn_IPlugin interface
          if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
@@ -397,6 +399,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
          }
       }
+   }
+   
+   public function RegisteredPlugins() {
+      return $this->RegisteredPlugins;
    }
 
    public function RegisterPlugin($ClassName) {

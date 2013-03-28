@@ -80,11 +80,14 @@ class DiscussionController extends VanillaController {
       // Check permissions
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
-      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors($this->CategoryID));
       
       $Category = CategoryModel::Categories($this->Discussion->CategoryID);
+      $this->SetData('Category', $Category);
+      
       if ($CategoryCssClass = GetValue('CssClass', $Category))
          Gdn_Theme::Section($CategoryCssClass);
+      
+      $this->SetData('Breadcrumbs', CategoryModel::GetAncestors($this->CategoryID));
       
       // Setup
       $this->Title($this->Discussion->Name);

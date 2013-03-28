@@ -1290,7 +1290,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
          
-         if (Debug()) {
+         if ($this->_DeliveryMethod == DELIVERY_METHOD_XHTML && Debug()) {
             $this->AddModule('TraceModule');
          }
 

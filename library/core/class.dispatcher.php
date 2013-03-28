@@ -553,6 +553,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                $this->_DeliveryType = DELIVERY_TYPE_VIEW;
                break;
             case DELIVERY_METHOD_XHTML:
+            case DELIVERY_METHOD_RSS:
                break;
             default:
                $this->_DeliveryMethod = DELIVERY_METHOD_XHTML;

@@ -16,6 +16,8 @@ class DiscussionSorterModule extends Gdn_Module {
    public function __construct($Sender) {
       parent::__construct($Sender, 'Vanilla');
       
+      $this->Visible = C('Vanilla.Discussions.UserSortField');
+      
       // Default options
       $this->SortOptions = array(
          'd.DateLastComment' => T('SortOptionLastComment', 'by Last Comment'),
@@ -31,7 +33,7 @@ class DiscussionSorterModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (Gdn::Session()->IsValid() && C('Vanilla.Discussions.UserSortField'))
+      if (Gdn::Session()->IsValid())
          return parent::ToString();
    }
 }

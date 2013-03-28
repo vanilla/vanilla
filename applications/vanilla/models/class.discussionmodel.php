@@ -732,7 +732,7 @@ class DiscussionModel extends VanillaModel {
       }
 
       $this->SQL
-         ->OrderBy('d.DateLastComment', 'desc')
+         ->OrderBy(self::GetSortField(), 'desc')
          ->Limit($Limit, $Offset);
 
       $Data = $this->SQL->Get();

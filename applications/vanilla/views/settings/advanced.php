@@ -52,7 +52,7 @@ echo $this->Form->Errors();
          foreach ($AllowedSortFields as $Field) {
             $SortFields[$Field] = DiscussionSortText($Field);
          }
-         echo $this->Form->Label('Sort discussions by their', 'Vanilla.Discussions.SortField');
+         echo $this->Form->Label('Sort discussions by', 'Vanilla.Discussions.SortField');
          echo $this->Form->DropDown('Vanilla.Discussions.SortField', $SortFields, $Fields);
       ?>
    </li>

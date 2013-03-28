@@ -492,6 +492,7 @@ div.FileUpload .CurrentImage {
   direction: ltr;
   cursor: pointer;
 }
+
 .Button.FileInput {
    position: relative;
    overflow: hidden;
@@ -1096,6 +1097,27 @@ div.Discussion:hover .OptionsTitle:hover,
 .FlyoutLeft .Flyout {
     right: inherit;
 }
+.DropHandle {
+   display: inline-block;
+   height: 0px;
+   width: 0px;
+   border-style: solid;
+   border-width: 4px;
+   border-color: #000 transparent transparent transparent;
+   position: relative;
+   bottom: -2px;
+}
+
+.SelectFlyout {
+   display: inline-block;
+   cursor: pointer;
+}
+
+.SelectFlyout .Flyout:before,
+.SelectFlyout .Flyout:after {
+   display: none;
+}
+
 .MeBox .Flyout {
     right: inherit;
     left: -4px;

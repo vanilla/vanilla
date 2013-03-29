@@ -518,23 +518,23 @@ class DiscussionModel extends VanillaModel {
     */
    public function AddDenormalizedViews(&$Discussions) {
       
-//      if ($Discussions instanceof Gdn_DataSet) {
-//         $Result = $Discussions->Result();
-//         foreach($Result as &$Discussion) {
-//            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
-//            $CacheViews = Gdn::Cache()->Get($CacheKey);
-//            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
-//               $Discussion->CountViews = $CacheViews;
-//         }
-//      } else {
-//         if (isset($Discussions->DiscussionID)) {
-//            $Discussion = $Discussions;
-//            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
-//            $CacheViews = Gdn::Cache()->Get($CacheKey);
-//            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
-//               $Discussion->CountViews += $CacheViews;
-//         }
-//      }
+      if ($Discussions instanceof Gdn_DataSet) {
+         $Result = $Discussions->Result();
+         foreach($Result as &$Discussion) {
+            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
+            $CacheViews = Gdn::Cache()->Get($CacheKey);
+            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+               $Discussion->CountViews += $CacheViews;
+         }
+      } else {
+         if (isset($Discussions->DiscussionID)) {
+            $Discussion = $Discussions;
+            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
+            $CacheViews = Gdn::Cache()->Get($CacheKey);
+            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+               $Discussion->CountViews += $CacheViews;
+         }
+      }
    }
 	
 	/**

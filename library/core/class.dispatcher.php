@@ -603,7 +603,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          if (is_null($Application)) {
             if (!$ControllerPath && class_exists($ControllerName, false)) {
                $Reflect = new ReflectionClass($ControllerName);
-               $ControllerPath = $Reflect->getFilename();
+               $Found = false;
+               do {
+                  $ControllerPath = $Reflect->getFilename();
+                  $Found = (bool)preg_match('`\/controllers\/`i', $ControllerPath);
+                  if (!$Found)
+                     $Reflect = $Reflect->getParentClass();
+               } while (!$Found && $Reflect);
+               if (!$Found) return false;
             }
 
             if ($ControllerPath) {

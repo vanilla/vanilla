@@ -584,7 +584,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
       
       $ControllerName = $Controller.'Controller';
-      
+      $ControllerPath = null;
       try {
          
          // Short circuit autoloader and pathing if controller already exists
@@ -593,18 +593,33 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
          // Manually look up controller file
          $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
-         if ($ControllerPath) {
-            // This was a guess search with no specified application. Look up
-            // the application folder from the controller path.
-            if (is_null($Application)) {
+         if ($ControllerPath)
+            throw new GdnDispatcherControllerFoundException();
+         
+      } catch (GdnDispatcherControllerFoundException $Ex) {
+         
+         // This was a guess search with no specified application. Look up
+         // the application folder from the controller path.
+         if (is_null($Application)) {
+            if (!$ControllerPath && class_exists($ControllerName, false)) {
+               $Reflect = new ReflectionClass($ControllerName);
+               $ControllerPath = $Reflect->getFilename();
+            }
+
+            if ($ControllerPath) {
                $InterimPath = explode('/controllers/', $ControllerPath);
                array_pop($InterimPath); // Get rid of the end. Useless;
                $InterimPath = explode('/', trim(array_pop($InterimPath)));
                $Application = array_pop($InterimPath);
                if (!in_array($Application, $this->EnabledApplicationFolders()))
-                  return FALSE;
+                  return false;
+            } else {
+               return false;
             }
-
+         }
+         
+         // If we need to autoload the class, do it here
+         if (!class_exists($ControllerName, false)) {
             Gdn_Autoloader::Priority(
                Gdn_Autoloader::CONTEXT_APPLICATION, 
                $Application,
@@ -613,11 +628,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                Gdn_Autoloader::PRIORITY_PERSIST);
 
             require_once($ControllerPath);
-
-            throw new GdnDispatcherControllerFoundException();
          }
-         
-      } catch (GdnDispatcherControllerFoundException $Ex) {
          
          $this->ControllerName = $Controller;
          $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);

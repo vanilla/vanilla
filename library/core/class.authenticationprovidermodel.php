@@ -32,6 +32,18 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       unset($Row['Attributes']);
    }
    
+   /**
+    * Return the default provider.
+    * 
+    * @return array
+    */
+   public static function GetDefault() {
+      $Rows = self::GetWhereStatic(array('IsDefault' => 1));
+      if (empty($Rows))
+         return FALSE;
+      return array_pop($Rows);
+   }
+   
    public function GetProviders() {
       $this->SQL
          ->Select('uap.*')
@@ -98,6 +110,14 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       return FALSE;
    }
    
+   public static function GetWhereStatic($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      $Data = Gdn::SQL()->GetWhere('UserAuthenticationProvider', $Where, $OrderFields, $OrderDirection, $Limit, $Offset)->ResultArray();
+      foreach ($Data as &$Row) {
+         self::_Calculate($Row);
+      }
+      return $Data;
+   }
+   
    public function Save($Data, $Settings = FALSE) {
       // Grab the current record.
       $Row = FALSE;
@@ -126,6 +146,15 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
 
       // Validate the form posted values
       if ($this->Validate($Data, $Insert) === TRUE) {
+         // Clear the default from other authentication providers.
+         $Default = GetValue('Default', $Data);
+         if ($Default) {
+            $this->SQL->Put(
+               $this->Name, 
+               array('Default' => 0),
+               array('AuthenticationKey <>' => GetValue('AuthenticationKey', $Data)));
+         }
+         
          $Fields = $this->Validation->ValidationFields();
          if ($Insert === FALSE) {
             $PrimaryKeyVal = $Row[$this->PrimaryKey];

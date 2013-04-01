@@ -183,6 +183,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          Gdn::UserModel()->FireEvent('Visit');
       }
       
+      $this->EventArguments['Request'] = &$Request;
+      
       // Move this up to allow pre-routing
       $this->FireEvent('BeforeDispatch');
       
@@ -313,7 +315,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          
          $this->EventArguments['Controller'] = &$Controller;
          $this->FireEvent('AfterControllerInit');
-
+         
+         $ReflectionArguments = $Request->Get();
+         $this->EventArguments['Arguments'] = &$ReflectionArguments;
+         $this->FireEvent('BeforeReflect');
+         
          // Call the requested method on the controller - error out if not defined.
          if ($PluginReplacement) {
             // Set the application folder to the plugin's key.
@@ -326,8 +332,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Callback = Gdn::PluginManager()->GetCallback($Controller->ControllerName, $ControllerMethod);
             // Augment the arguments to the plugin with the sender and these arguments.
             $InputArgs = array_merge(array($Controller), $this->_ControllerMethodArgs, array('Sender' => $Controller, 'Args' => $this->_ControllerMethodArgs));
-//            decho(array_keys($InputArgs), 'InputArgs');
-            $Args = ReflectArgs($Callback, $InputArgs, $Request->Get());
+            $Args = ReflectArgs($Callback, $InputArgs, $ReflectionArguments);
             $Controller->ReflectArgs = $Args;
             
             try {
@@ -339,7 +344,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                $Controller->RenderException($Ex);
             }
          } elseif (method_exists($Controller, $ControllerMethod)) {
-            $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $Request->Get());
+            $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $ReflectionArguments);
             $this->_ControllerMethodArgs = $Args;
             $Controller->ReflectArgs = $Args;
             
@@ -593,34 +598,49 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
       
       $ControllerName = $Controller.'Controller';
-      $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
-      if ($ControllerPath) {
-         // This was a guess search with no specified application. Look up
-         // the application folder from the controller path.
-         if (is_null($Application)) {
-            $InterimPath = explode('/controllers/', $ControllerPath);
-            array_pop($InterimPath); // Get rid of the end. Useless;
-            $InterimPath = explode('/', trim(array_pop($InterimPath)));
-            $Application = array_pop($InterimPath);
-            if (!in_array($Application, $this->EnabledApplicationFolders()))
-               return FALSE;
+      
+      try {
+         
+         // Short circuit autoloader and pathing if controller already exists
+         if (class_exists($ControllerName, false))
+            throw new GdnDispatcherControllerFoundException();
+
+         // Manually look up controller file
+         $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
+         if ($ControllerPath) {
+            // This was a guess search with no specified application. Look up
+            // the application folder from the controller path.
+            if (is_null($Application)) {
+               $InterimPath = explode('/controllers/', $ControllerPath);
+               array_pop($InterimPath); // Get rid of the end. Useless;
+               $InterimPath = explode('/', trim(array_pop($InterimPath)));
+               $Application = array_pop($InterimPath);
+               if (!in_array($Application, $this->EnabledApplicationFolders()))
+                  return FALSE;
+            }
+
+            Gdn_Autoloader::Priority(
+               Gdn_Autoloader::CONTEXT_APPLICATION, 
+               $Application,
+               Gdn_Autoloader::MAP_CONTROLLER, 
+               Gdn_Autoloader::PRIORITY_TYPE_PREFER,
+               Gdn_Autoloader::PRIORITY_PERSIST);
+
+            require_once($ControllerPath);
+
+            throw new GdnDispatcherControllerFoundException();
          }
-      
-         Gdn_Autoloader::Priority(
-            Gdn_Autoloader::CONTEXT_APPLICATION, 
-            $Application,
-            Gdn_Autoloader::MAP_CONTROLLER, 
-            Gdn_Autoloader::PRIORITY_TYPE_PREFER,
-            Gdn_Autoloader::PRIORITY_PERSIST);
-      
+         
+      } catch (GdnDispatcherControllerFoundException $Ex) {
+         
          $this->ControllerName = $Controller;
          $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
          $this->ControllerFolder = '';
-         
+
          $Length = sizeof($Parts);
          if ($Length > $ControllerKey + 1)
             list($this->ControllerMethod, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Parts[$ControllerKey + 1], FALSE);
-   
+
          if ($Length > $ControllerKey + 2) {
             for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
                if ($Parts[$i] != '')
@@ -628,9 +648,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
          }
          
-         require_once($ControllerPath);
-         
-         throw new GdnDispatcherControllerFoundException();
+         throw $Ex;
       }
       
       return FALSE;

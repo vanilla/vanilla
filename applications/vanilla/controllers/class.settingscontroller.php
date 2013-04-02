@@ -49,7 +49,9 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Archive.Date',
          'Vanilla.Archive.Exclude',
          'Garden.EditContentTimeout',
-         'Vanilla.AdminCheckboxes.Use'
+         'Vanilla.AdminCheckboxes.Use',
+         'Vanilla.Discussions.SortField' => 'd.DateLastComment',
+         'Vanilla.Discussions.UserSortField'
       ));
       
       // Set the model on the form.

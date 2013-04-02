@@ -812,12 +812,22 @@ class UpdateModel extends Gdn_Model {
 
       // Execute the structures for all of the plugins.
       $PluginManager = Gdn::PluginManager();
-      $Plugins = $PluginManager->EnabledPlugins();
-      foreach ($Plugins as $Key => $PluginInfo) {
-         $PluginName = GetValue('Index', $PluginInfo);
-         $Plugin = $PluginManager->GetPluginInstance($PluginName, Gdn_PluginManager::ACCESS_PLUGINNAME);
-         if (method_exists($Plugin, 'Structure'))
-            $Plugin->Structure();
+      
+      $Registered = $PluginManager->RegisteredPlugins();
+      
+      foreach ($Registered as $ClassName => $Enabled) {
+         if (!$Enabled)
+            continue;
+         
+         try {
+            $Plugin = $PluginManager->GetPluginInstance($ClassName, Gdn_PluginManager::ACCESS_CLASSNAME);
+            if (method_exists($Plugin, 'Structure')) {
+               Trace("{$ClassName}->Structure()");
+               $Plugin->Structure();
+            }
+         } catch (Exception $Ex) {
+            // Do nothing, plugin wouldn't load/structure.
+         }
       }
    }
 }

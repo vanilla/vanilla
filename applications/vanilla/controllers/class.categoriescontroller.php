@@ -104,6 +104,9 @@ class CategoriesController extends VanillaController {
          
          $this->SetData('Category', $Category, TRUE);
          
+         $this->Title(htmlspecialchars(GetValue('Name', $Category, '')));
+         $this->Description(GetValue('Description', $Category), TRUE);
+         
          if ($Category->DisplayAs == 'Categories') {
             // This category is an overview style category and displays as a category list.
             switch($Layout) {
@@ -150,10 +153,6 @@ class CategoriesController extends VanillaController {
             $this->AddJsFile('discussions.js');
             $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
          }
-         
-         
-         $this->Title(htmlspecialchars(GetValue('Name', $Category, '')));
-         $this->Description(GetValue('Description', $Category), TRUE);
          
          // Set CategoryID
          $CategoryID = GetValue('CategoryID', $Category);
@@ -237,11 +236,13 @@ class CategoriesController extends VanillaController {
    public function All() {
       // Setup head.
       $this->Menu->HighlightRoute('/discussions');
-      $Title = C('Garden.HomepageTitle');
-      if ($Title)
-         $this->Title($Title, '');
-      else
-         $this->Title(T('All Categories'));
+      if (!$this->Title()) {
+         $Title = C('Garden.HomepageTitle');
+         if ($Title)
+            $this->Title($Title, '');
+         else
+            $this->Title(T('All Categories'));
+      }
       Gdn_Theme::Section('CategoryList');
             
       $this->Description(C('Garden.Description', NULL));

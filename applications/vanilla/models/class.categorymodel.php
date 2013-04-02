@@ -1020,7 +1020,7 @@ class CategoryModel extends Gdn_Model {
       if ($Root) {
          $Root = (array)$Root;
          // Make the tree out of this category as a subtree.
-         $Result = self::_MakeTreeChildren($Root, $Categories);
+         $Result = self::_MakeTreeChildren($Root, $Categories, -$Root['Depth']);
       } else {
          // Make a tree out of all categories.
          foreach ($Categories as $Category) {
@@ -1034,12 +1034,13 @@ class CategoryModel extends Gdn_Model {
       return $Result;
    }
    
-   protected static function _MakeTreeChildren($Category, $Categories) {
+   protected static function _MakeTreeChildren($Category, $Categories, $DepthAdj = -1) {
       $Result = array();
       foreach ($Category['ChildIDs'] as $ID) {
          if (!isset($Categories[$ID]))
             continue;
          $Row = $Categories[$ID];
+         $Row['Depth'] += $DepthAdj;
          $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
          $Result[] = $Row;
       }

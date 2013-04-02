@@ -166,6 +166,7 @@ $Construct->Table('UserAuthenticationProvider')
    ->Column('PasswordUrl', 'varchar(255)', TRUE)
    ->Column('ProfileUrl', 'varchar(255)', TRUE)
    ->Column('Attributes', 'text', TRUE)
+   ->Column('IsDefault', 'tinyint', 0)
    ->Set($Explicit, $Drop);
 
 $Construct->Table('UserAuthenticationNonce')

@@ -1009,12 +1009,12 @@ class UserModel extends Gdn_Model {
       if ($User === Gdn_Cache::CACHEOP_FAILURE) {
          $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
          
-         if ($User) {
-            // If success, build more data, then cache user
-            $this->SetCalculatedFields($User);
+         if ($User)
             $this->UserCache($User);
-         }
       }
+      
+   // If success, build more data, then cache user
+      $this->SetCalculatedFields($User);
       
       // Allow FALSE returns
       if ($User === FALSE || is_null($User))
@@ -2898,12 +2898,14 @@ class UserModel extends Gdn_Model {
          SetValue('PhotoUrl', $User, $PhotoUrl);
       }
       if ($v = GetValue('AllIPAddresses', $User)) {
-         $IPAddresses = explode(',', $v);
-         foreach ($IPAddresses as $i => $IPAddress) {
-            if (strpos($IPAddress, '.') === FALSE)
-               $IPAddresses[$i] = long2ip(hexdec($IPAddress));
+         if (is_string($v)) {
+            $IPAddresses = explode(',', $v);
+            foreach ($IPAddresses as $i => $IPAddress) {
+               if (strpos($IPAddress, '.') === FALSE)
+                  $IPAddresses[$i] = long2ip(hexdec($IPAddress));
+            }
+            SetValue('AllIPAddresses', $User, $IPAddresses);
          }
-         SetValue('AllIPAddresses', $User, $IPAddresses);
       }
       
       TouchValue('_CssClass', $User, '');

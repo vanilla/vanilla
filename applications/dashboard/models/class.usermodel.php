@@ -1305,7 +1305,7 @@ class UserModel extends Gdn_Model {
       $TimeSlot = gmdate('Y-m-d', Gdn_Statistics::TimeSlotStamp($SlotType, $Timestamp));
       
       $Px = Gdn::Database()->DatabasePrefix;
-      $Sql = "insert {$Px}UserPoints (UserID, SlotType, TimeSlot, Source, Points)
+      $Sql = "insert {$Px}UserPoints (UserID, SlotType, TimeSlot, Source, CategoryID, Points)
          values (:UserID, :SlotType, :TimeSlot, :Source, :CategoryID, :Points)
          on duplicate key update Points = Points + :Points1";
       

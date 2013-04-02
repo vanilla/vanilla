@@ -300,8 +300,14 @@ class CategoryModel extends Gdn_Model {
     * @param int $Timestamp The time the points were given.
     */
    public static function GivePoints($UserID, $Points, $Source = 'Other', $CategoryID = 0, $Timestamp = FALSE) {
-      // TODO: Figure out whether or not the category tracks points seperately.
-      
+      // Figure out whether or not the category tracks points seperately.
+      if ($CategoryID) {
+         $Category = self::Categories($CategoryID);
+         if ($Category)
+            $CategoryID = $Category['PointsCategoryID'];
+         else
+            $CategoryID = 0;
+      }
       
       UserModel::GivePoints($UserID, $Points, array($Source, 'CategoryID' => $CategoryID), $Timestamp);
    }
@@ -1263,6 +1269,7 @@ class CategoryModel extends Gdn_Model {
       $UrlCode = ArrayValue('UrlCode', $FormPostValues, '');
       $AllowDiscussions = ArrayValue('AllowDiscussions', $FormPostValues, '');
       $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
+      $CustomPoints = GetValue('CustomPoints', $FormPostValues, NULL);
       
       // Is this a new category?
       $Insert = $CategoryID > 0 ? FALSE : TRUE;
@@ -1300,6 +1307,17 @@ class CategoryModel extends Gdn_Model {
             $OldCategory = $this->GetID($CategoryID, DATASET_TYPE_ARRAY);
             $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
+            
+            // Figure out custom points.
+            if ($CustomPoints !== NULL) {
+               if ($CustomPoints) {
+                  $Fields['PointsCategoryID'] = $CategoryID;
+               } else {
+                  $Parent = self::Categories(GetValue('ParentCategoryID', $Fields, $OldCategory['ParentCategoryID']));
+                  $Fields['PointsCategoryID'] = GetValue('PointsCategoryID', $Parent, 0);
+               }
+            }
+            
             $this->Update($Fields, array('CategoryID' => $CategoryID));
             
             // Check for a change in the parent category.
@@ -1311,8 +1329,13 @@ class CategoryModel extends Gdn_Model {
          } else {
             $CategoryID = $this->Insert($Fields);
 
-            if ($CustomPermissions && $CategoryID) {
-               $this->SQL->Put('Category', array('PermissionCategoryID' => $CategoryID), array('CategoryID' => $CategoryID));
+            if ($CategoryID) {
+               if ($CustomPermissions) {
+                  $this->SQL->Put('Category', array('PermissionCategoryID' => $CategoryID), array('CategoryID' => $CategoryID));
+               }
+               if ($CustomPoints) {
+                  $this->SQL->Put('Category', array('PointsCategoryID' => $CategoryID), array('CategoryID' => $CategoryID));
+               }
             }
 
             $this->RebuildTree(); // Safeguard to make sure that treeleft and treeright cols are added

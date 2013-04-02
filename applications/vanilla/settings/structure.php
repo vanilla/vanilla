@@ -40,6 +40,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('CssClass', 'varchar(50)', TRUE)
    ->Column('Photo', 'varchar(255)', TRUE)
    ->Column('PermissionCategoryID', 'int', '-1') // default to root.
+   ->Column('PointsCategoryID', 'int', '0') // default to global.
    ->Column('HideAllDiscussions', 'tinyint(1)', '0')
    ->Column('DisplayAs', array('Categories', 'Discussions', 'Default'), 'Default')
    ->Column('InsertUserID', 'int', FALSE, 'key')

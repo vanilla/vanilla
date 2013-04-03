@@ -28,7 +28,7 @@ $CommentBody = "This is the first comment on your site and it&rsquo;s an importa
 
 Don&rsquo;t see your must-have feature? We keep Vanilla nice and simple by default. Use <b>addons</b> to get the special sauce your community needs.
 
-Not sure which addons to enable? Our favorites are Button Bar and Discussion Photos. They&rsquo;re almost always a great start.";
+Not sure which addons to enable? Our favorites are Button Bar and Tagging. They&rsquo;re almost always a great start.";
 $WallBody = "Ping! An activity post is a public way to talk at someone. When you update your status here, it posts it on your activity feed.";
 
 // Prep content meta data

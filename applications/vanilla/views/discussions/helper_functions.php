@@ -199,6 +199,44 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
 }
 endif;
 
+if (!function_exists('DiscussionSorter')):
+
+function WriteDiscussionSorter($Selected = NULL, $Options = NULL) {
+   if ($Selected === NULL) {
+      $Selected = Gdn::Session()->GetPreference('Discussions.SortField', 'DateLastComment');
+   }
+   $Selected = StringBeginsWith($Selected, 'd.', TRUE, TRUE);
+   
+   $Options = array(
+      'DateLastComment' => T('Sort by Last Comment', 'by Last Comment'),
+      'DateInserted' => T('Sort by Start Date', 'by Start Date')
+   );
+   
+   ?>
+   <span class="ToggleFlyout SelectFlyout">
+   <?php
+      if (isset($Options[$Selected])) {
+         $Text = $Options[$Selected];
+      } else {
+         $Text = reset($Options);
+      }
+      echo Wrap($Text.' '.Sprite('', 'DropHandle'), 'span', array('class' => 'Selected'));
+   ?>
+   <div class="Flyout MenuItems">
+      <ul>
+         <?php 
+            foreach ($Options as $SortField => $SortText) {
+               echo Wrap(Anchor($SortText, '#', array('class' => 'SortDiscussions', 'data-field' => $SortField)), 'li'); 
+            }
+         ?>
+      </ul>
+   </div>
+   </span>
+   <?php
+}
+
+endif;
+
 if (!function_exists('WriteMiniPager')):
 function WriteMiniPager($Discussion) {
    if (!property_exists($Discussion, 'CountPages'))

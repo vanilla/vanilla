@@ -181,6 +181,10 @@ class Gdn_ApplicationManager {
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
 
       SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
+      
+      $this->EventArguments['AddonName'] = $ApplicationName;
+      Gdn::PluginManager()->CallEventHandlers($this, 'ApplicationManager', 'AddonEnabled');
+      
       return TRUE;
    }
 
@@ -244,6 +248,9 @@ class Gdn_ApplicationManager {
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
+      
+      $this->EventArguments['AddonName'] = $ApplicationName;
+      Gdn::PluginManager()->CallEventHandlers($this, 'ApplicationManager', 'AddonDisabled');
    }
 
    /**

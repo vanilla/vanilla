@@ -1262,7 +1262,7 @@ class ActivityModel extends Gdn_Model {
       }
       
       // If this is a wall post then we need to notify on that.
-      if ($Activity['ActivityType'] == 'WallPost' && $Activity['NotifyUserID'] == self::NOTIFY_PUBLIC) {
+      if (GetValue('Name', $ActivityType) == 'WallPost' && $Activity['NotifyUserID'] == self::NOTIFY_PUBLIC) {
          $this->NotifyWallPost($Activity);
       }
       

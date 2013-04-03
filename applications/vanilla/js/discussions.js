@@ -22,6 +22,26 @@ jQuery(document).ready(function($) {
       
    if ($('.AdminCheck :checkbox').not(':checked').length == 1)
       $('.AdminCheck [name="Toggle"]').attr('checked', 'checked').change();
+      
+   // Set up sorting
+   $(document).undelegate('.SortDiscussions', 'click');
+   $(document).delegate('.SortDiscussions', 'click', function() {
+      var SendData = {
+         'TransientKey': gdn.definition('TransientKey'),
+         'DiscussionSort': $(this).attr('data-field')
+      };
+      jQuery.ajax({
+         dataType: 'json',
+         type: 'post',
+         url: gdn.url('discussions/sort'),
+         data: SendData,
+         success: function(json) {
+            location.reload();
+         }
+      });
+      
+      return false;
+   });
 
    /* Discussion Checkboxes */
    $('.AdminCheck [name="Toggle"]').click(function() {

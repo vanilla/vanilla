@@ -82,13 +82,13 @@ jQuery(document).ready(function($) {
          
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action');
-      if (action.indexOf('?') >= 0)
-         action = action.substr(0, action.indexOf('?'));
+      if (action.indexOf('?') < 0)
+         action += '?';
+      else
+         action += '&';
+      
       if (discussionID > 0) {
-         if (action.substr(-1,1) != '/')
-            action += '/';
-         
-         action += discussionID;
+         action += 'discussionid='+discussionID;
       }
       
       $(frm).find(':submit').attr('disabled', 'disabled');

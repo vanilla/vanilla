@@ -57,6 +57,13 @@ echo $this->Form->Errors();
       $this->Data('_ExtendedFields', array()),
       array('Wrap' => array('', '')));
    ?>
+   <?php if ($this->ShowCustomPoints): ?>
+   <li>
+      <?php
+      echo $this->Form->CheckBox('CustomPoints', 'Track points for this category separately.');
+      ?>
+   </li>
+   <?php endif; ?>
 	<?php if(count($this->PermissionData) > 0) { ?>
    <li id="Permissions">
       <?php

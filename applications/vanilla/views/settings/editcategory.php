@@ -63,6 +63,13 @@ echo $this->Form->Errors();
       echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
       ?>
    </li>
+   <?php if ($this->ShowCustomPoints): ?>
+   <li>
+      <?php
+      echo $this->Form->CheckBox('CustomPoints', 'Track points for this category separately.');
+      ?>
+   </li>
+   <?php endif; ?>
    <li>
       <?php
       echo $this->Form->CheckBox('Archived', 'This category is archived.');

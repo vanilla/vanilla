@@ -384,6 +384,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Loop through all declared classes looking for ones that implement Gdn_iPlugin.
       foreach (get_declared_classes() as $ClassName) {
+         if ($ClassName == 'Gdn_Plugin')
+            continue;
 
          // Only register the plugin if it implements the Gdn_IPlugin interface
          if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
@@ -397,6 +399,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
          }
       }
+   }
+   
+   public function RegisteredPlugins() {
+      return $this->RegisteredPlugins;
    }
 
    public function RegisterPlugin($ClassName) {
@@ -706,6 +712,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                
                $Sender->Returns[$EventKey][$PluginKey] = $Return;
                $Return = TRUE;
+            } elseif (isset($Sender->EventArguments)) {
+               $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
             } else {
                $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, array(), $PassedEventKey);
             }
@@ -986,7 +994,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    }
 
    public function EnablePlugin($PluginName, $Validation, $Setup = FALSE, $EnabledPluginValueIndex = 'Folder') {
-
       // Check that the plugin is in AvailablePlugins...
       $PluginInfo = $this->GetPluginInfo($PluginName);
 
@@ -1011,6 +1018,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $this->RegisterPlugin($PluginClassName);
 
       Gdn::Locale()->Set(Gdn::Locale()->Current(), Gdn::ApplicationManager()->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
+      
+      $this->EventArguments['AddonName'] = $PluginName;
+      $this->FireEvent('AddonEnabled');
+      
       return TRUE;
    }
    
@@ -1041,6 +1052,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       Gdn::Locale()->Refresh();
+      
+      $this->EventArguments['AddonName'] = $PluginName;
+      $this->FireEvent('AddonDisabled');
+      
       return TRUE;
    }
 

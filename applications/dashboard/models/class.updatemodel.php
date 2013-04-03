@@ -529,15 +529,16 @@ class UpdateModel extends Gdn_Model {
          $TmpPath = dirname($Path).'/'.basename($Path, '.zip').'/';
       if (file_exists($TmpPath))
          Gdn_FileSystem::RemoveFolder($TmpPath);
-
+      
       $Result = array();
       for ($i = 0; $i < $Zip->numFiles; $i++) {
          $Entry = $Zip->statIndex($i);
+         $Name = '/'.ltrim($Entry['name'], '/');
 
          foreach ($InfoPaths as $InfoPath) {
             $Preg = '`('.str_replace(array('.', '*'), array('\.', '.*'), $InfoPath).')$`';
-            if (preg_match($Preg, $Entry['name'], $Matches)) {
-               $Base = trim(substr($Entry['name'], 0, -strlen($Matches[1])), '/');
+            if (preg_match($Preg, $Name, $Matches)) {
+               $Base = trim(substr($Name, 0, -strlen($Matches[1])), '/');
                if (strpos($Base, '/') !== FALSE)
                   continue; // file nested too deep.
 
@@ -812,12 +813,22 @@ class UpdateModel extends Gdn_Model {
 
       // Execute the structures for all of the plugins.
       $PluginManager = Gdn::PluginManager();
-      $Plugins = $PluginManager->EnabledPlugins();
-      foreach ($Plugins as $Key => $PluginInfo) {
-         $PluginName = GetValue('Index', $PluginInfo);
-         $Plugin = $PluginManager->GetPluginInstance($PluginName, Gdn_PluginManager::ACCESS_PLUGINNAME);
-         if (method_exists($Plugin, 'Structure'))
-            $Plugin->Structure();
+      
+      $Registered = $PluginManager->RegisteredPlugins();
+      
+      foreach ($Registered as $ClassName => $Enabled) {
+         if (!$Enabled)
+            continue;
+         
+         try {
+            $Plugin = $PluginManager->GetPluginInstance($ClassName, Gdn_PluginManager::ACCESS_CLASSNAME);
+            if (method_exists($Plugin, 'Structure')) {
+               Trace("{$ClassName}->Structure()");
+               $Plugin->Structure();
+            }
+         } catch (Exception $Ex) {
+            // Do nothing, plugin wouldn't load/structure.
+         }
       }
    }
 }

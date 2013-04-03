@@ -514,7 +514,7 @@ class EntryController extends Gdn_Controller {
                Gdn::UserModel()->FireEvent('AfterSignIn');
 
                // Send the welcome email.
-               if (C('Garden.Registration.SendConnectEmail', TRUE)) {
+               if (C('Garden.Registration.SendConnectEmail', FALSE)) {
                   try {
                      $UserModel->SendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->GetFormValue('ProviderName', $this->Form->GetFormValue('Provider', 'Unknown'))));
                   } catch (Exception $Ex) {
@@ -1121,7 +1121,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterApproval() {
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       // If the form has been posted back...
       if ($this->Form->IsPostBack()) {
@@ -1183,7 +1183,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterBasic() {
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
@@ -1253,7 +1253,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterCaptcha() {
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       include(CombinePaths(array(PATH_LIBRARY, 'vendors/recaptcha', 'functions.recaptchalib.php')));
       if ($this->Form->IsPostBack() === TRUE) {
@@ -1328,7 +1328,7 @@ class EntryController extends Gdn_Controller {
     * @since 2.0.0
     */
    private function RegisterInvitation($InvitationCode) {
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       if ($this->Form->IsPostBack() === TRUE) {
          $this->InvitationCode = $this->Form->GetValue('InvitationCode');
@@ -1628,6 +1628,10 @@ class EntryController extends Gdn_Controller {
       // Make sure that the target is a valid url.
       if (!preg_match('`(^https?://)`', $Target)) {
          $Target = '/'.ltrim($Target, '/');
+         
+         // Never redirect back to signin.
+         if (preg_match('`^/entry/signin`i', $Target))
+            $Target = '/';
       } else {
          $MyHostname = parse_url(Gdn::Request()->Domain(),PHP_URL_HOST);
          $TargetHostname = parse_url($Target, PHP_URL_HOST);

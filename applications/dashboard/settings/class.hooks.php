@@ -207,5 +207,31 @@ class DashboardHooks implements Gdn_IPlugin {
             Trace(Gdn::UserModel()->Validation->ResultsText(), TRACE_WARNING);
          }
       }
-   }   
+   }
+   
+   /**
+    * Method for plugins that want a friendly /sso method to hook into.
+    * 
+    * @param RootController $Sender
+    * @param string $Target The url to redirect to after sso.
+    */
+   public function RootController_SSO_Create($Sender, $Target = '') {
+      if (!$Target)
+         $Target = '/';
+      
+      // TODO: Make sure the target is a safe redirect.
+      
+      // Get the default authentication provider.
+      $DefaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
+      $Sender->EventArguments['Target'] = $Target;
+      $Sender->EventArguments['DefaultProvider'] = $DefaultProvider;
+      $Handled = FALSE;
+      $Sender->EventArguments['Handled'] =& $Handled;
+      
+      $Sender->FireEvent('SSO');
+      
+      // If an event handler didn't handle the signin then just redirect to the target.
+      if (!$Handled)
+         Redirect($Target, 302);
+   }
 }

@@ -291,6 +291,28 @@ class CategoryModel extends Gdn_Model {
    }
    
    /**
+    * Give a user points specific to this category.
+    * 
+    * @param int $UserID The user to give the points to.
+    * @param int $Points The number of points to give.
+    * @param string $Source The source of the points.
+    * @param int $CategoryID The category to give the points for.
+    * @param int $Timestamp The time the points were given.
+    */
+   public static function GivePoints($UserID, $Points, $Source = 'Other', $CategoryID = 0, $Timestamp = FALSE) {
+      // Figure out whether or not the category tracks points seperately.
+      if ($CategoryID) {
+         $Category = self::Categories($CategoryID);
+         if ($Category)
+            $CategoryID = $Category['PointsCategoryID'];
+         else
+            $CategoryID = 0;
+      }
+      
+      UserModel::GivePoints($UserID, $Points, array($Source, 'CategoryID' => $CategoryID), $Timestamp);
+   }
+   
+   /**
     * 
     * 
     * @since 2.0.18
@@ -589,12 +611,11 @@ class CategoryModel extends Gdn_Model {
                ->Put();
          } else {
             // Delete comments in this category
-            // Resorted to Query because of incompatibility of aliasing in MySQL 5.5 -mlr 2011-12-13
-            $Sql = "delete c from :_Comment c 
-               join :_Discussion d on c.DiscussionID = d.DiscussionID 
-               where d.CategoryID = :CategoryID";
-            $Sql = str_replace(':_', $this->Database->DatabasePrefix, $Sql);
-            $this->Database->Query($Sql, array(':CategoryID' => $Category->CategoryID));
+            $this->SQL
+               ->From('Comment c')
+               ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+               ->Where('d.CategoryID', $Category->CategoryID)
+               ->Delete();
                
             // Delete discussions in this category
             $this->SQL->Delete('Discussion', array('CategoryID' => $Category->CategoryID));
@@ -999,7 +1020,7 @@ class CategoryModel extends Gdn_Model {
       if ($Root) {
          $Root = (array)$Root;
          // Make the tree out of this category as a subtree.
-         $Result = self::_MakeTreeChildren($Root, $Categories);
+         $Result = self::_MakeTreeChildren($Root, $Categories, -$Root['Depth']);
       } else {
          // Make a tree out of all categories.
          foreach ($Categories as $Category) {
@@ -1013,12 +1034,13 @@ class CategoryModel extends Gdn_Model {
       return $Result;
    }
    
-   protected static function _MakeTreeChildren($Category, $Categories) {
+   protected static function _MakeTreeChildren($Category, $Categories, $DepthAdj = -1) {
       $Result = array();
       foreach ($Category['ChildIDs'] as $ID) {
          if (!isset($Categories[$ID]))
             continue;
          $Row = $Categories[$ID];
+         $Row['Depth'] += $DepthAdj;
          $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
          $Result[] = $Row;
       }
@@ -1248,6 +1270,7 @@ class CategoryModel extends Gdn_Model {
       $UrlCode = ArrayValue('UrlCode', $FormPostValues, '');
       $AllowDiscussions = ArrayValue('AllowDiscussions', $FormPostValues, '');
       $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
+      $CustomPoints = GetValue('CustomPoints', $FormPostValues, NULL);
       
       // Is this a new category?
       $Insert = $CategoryID > 0 ? FALSE : TRUE;
@@ -1285,6 +1308,17 @@ class CategoryModel extends Gdn_Model {
             $OldCategory = $this->GetID($CategoryID, DATASET_TYPE_ARRAY);
             $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
+            
+            // Figure out custom points.
+            if ($CustomPoints !== NULL) {
+               if ($CustomPoints) {
+                  $Fields['PointsCategoryID'] = $CategoryID;
+               } else {
+                  $Parent = self::Categories(GetValue('ParentCategoryID', $Fields, $OldCategory['ParentCategoryID']));
+                  $Fields['PointsCategoryID'] = GetValue('PointsCategoryID', $Parent, 0);
+               }
+            }
+            
             $this->Update($Fields, array('CategoryID' => $CategoryID));
             
             // Check for a change in the parent category.
@@ -1296,8 +1330,13 @@ class CategoryModel extends Gdn_Model {
          } else {
             $CategoryID = $this->Insert($Fields);
 
-            if ($CustomPermissions && $CategoryID) {
-               $this->SQL->Put('Category', array('PermissionCategoryID' => $CategoryID), array('CategoryID' => $CategoryID));
+            if ($CategoryID) {
+               if ($CustomPermissions) {
+                  $this->SQL->Put('Category', array('PermissionCategoryID' => $CategoryID), array('CategoryID' => $CategoryID));
+               }
+               if ($CustomPoints) {
+                  $this->SQL->Put('Category', array('PointsCategoryID' => $CategoryID), array('CategoryID' => $CategoryID));
+               }
             }
 
             $this->RebuildTree(); // Safeguard to make sure that treeleft and treeright cols are added

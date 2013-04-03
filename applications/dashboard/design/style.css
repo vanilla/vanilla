@@ -492,6 +492,7 @@ div.FileUpload .CurrentImage {
   direction: ltr;
   cursor: pointer;
 }
+
 .Button.FileInput {
    position: relative;
    overflow: hidden;
@@ -1096,6 +1097,27 @@ div.Discussion:hover .OptionsTitle:hover,
 .FlyoutLeft .Flyout {
     right: inherit;
 }
+.DropHandle {
+   display: inline-block;
+   height: 0px;
+   width: 0px;
+   border-style: solid;
+   border-width: 4px;
+   border-color: #000 transparent transparent transparent;
+   position: relative;
+   bottom: -2px;
+}
+
+.SelectFlyout {
+   display: inline-block;
+   cursor: pointer;
+}
+
+.SelectFlyout .Flyout:before,
+.SelectFlyout .Flyout:after {
+   display: none;
+}
+
 .MeBox .Flyout {
     right: inherit;
     left: -4px;
@@ -2528,6 +2550,46 @@ tr.CategoryHeading td {
 }
 .CategoryTable .ChildCategories {
 	font-size: 11px;
+}
+
+/* Discussion Sorter */
+.DiscussionSorter {
+   float: right;
+   margin-right: 24px;
+   font-size: 11px; 
+}
+.DiscussionSorter:hover {
+   cursor: pointer;
+   background: #f3f3f3;
+}
+.DiscussionSorter .MenuItems { 
+   padding: 0; 
+   width: 130px;
+   border-top: none;
+   border-radius: 0; 
+}
+.DiscussionSorter .Selected {
+   padding: 0 0 0 15px;
+   display: inline-block;
+   width: 115px;
+   border: 1px solid transparent;
+   border-bottom: none;
+}
+.DiscussionSorter .Open .Selected {
+   border: 1px solid #999;
+   border-bottom: none;  
+}
+.DiscussionSorter .SpMenu { 
+   background-position: -32px -20px;
+   height: 8px; 
+   width: 12px; 
+   margin-top: 8px;
+}
+.DiscussionSorter .Flyout:before, .Flyout:after { 
+   border: none; 
+}
+.DiscussionSorter .ToggleFlyout .Flyout { 
+   top: 18px; 
 }
 
 /* ======================================= Blocks */

@@ -21,6 +21,12 @@ class SettingsController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'CategoryModel');
    
    /**
+    *
+    * @var bool 
+    */
+   public $ShowCustomPoints = FALSE;
+   
+   /**
     * Advanced settings.
     *
     * Allows setting configuration values via form elements.
@@ -43,7 +49,9 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Archive.Date',
          'Vanilla.Archive.Exclude',
          'Garden.EditContentTimeout',
-         'Vanilla.AdminCheckboxes.Use'
+         'Vanilla.AdminCheckboxes.Use',
+         'Vanilla.Discussions.SortField' => 'd.DateLastComment',
+         'Vanilla.Discussions.UserSortField'
       ));
       
       // Set the model on the form.
@@ -244,6 +252,7 @@ class SettingsController extends Gdn_Controller {
          // Form was validly submitted
          $IsParent = $this->Form->GetFormValue('IsParent', '0');
          $this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
+         $this->Form->SetFormValue('CustomPoints', (bool)$this->Form->GetFormValue('CustomPoints'));
          $CategoryID = $this->Form->Save();
          if ($CategoryID) {
             $Category = CategoryModel::Categories($CategoryID);
@@ -402,6 +411,7 @@ class SettingsController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->SetData($this->Category);
+         $this->Form->SetValue('CustomPoints', $this->Category->PointsCategoryID == $this->Category->CategoryID);
       } else {
          $Upload = new Gdn_Upload();
          $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
@@ -418,6 +428,7 @@ class SettingsController extends Gdn_Controller {
             );
             $this->Form->SetFormValue('Photo', $Parts['SaveName']);
          }
+         $this->Form->SetFormValue('CustomPoints', (bool)$this->Form->GetFormValue('CustomPoints'));
          
          if ($this->Form->Save()) {
             $Category = CategoryModel::Categories($CategoryID);

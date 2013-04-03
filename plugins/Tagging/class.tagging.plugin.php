@@ -6,10 +6,11 @@
  * Users may add tags to discussions as they're being created. Tags are shown
  * in the panel and on the OP.
  * 
- * Changes: 
+ * @changes
  *  1.5     Fix TagModule usage
  *  1.6     Add tag permissions
  *  1.6.1   Add tag permissions to UI
+ *  1.7     Change the styling of special tags and prevent them from being edited/deleted.
  * 
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,7 +21,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.6.2',
+   'Version' => '1.7',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -109,15 +110,18 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->SetData('Tag', $Tag, TRUE);
       $Sender->Title(T('Tagged with ').htmlspecialchars($Tag));
       $Sender->Head->Title($Sender->Head->Title());
+      $UrlTag = rawurlencode($Tag);
       if (urlencode($Tag) == $Tag) {
-         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged/'.urlencode($Tag), PageNumber($Offset, $Limit, TRUE)), TRUE));
+         $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, TRUE)), TRUE));
+         $FeedUrl = Url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, TRUE, FALSE)), '//');
       } else {
-         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.urlencode($Tag), TRUE));
+         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.$UrlTag, TRUE));
+         $FeedUrl = Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE, FALSE), 'feed.rss').'?Tag='.$UrlTag, '//');
       }
 
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
-         $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
+         $Sender->Head->AddRss($FeedUrl, $Sender->Head->Title());
       }
       
       if (!is_numeric($Offset) || $Offset < 0)
@@ -599,7 +603,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $SQL->Delete('Tag', array('TagID' => $TagID));
          
          $Sender->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Tag));
-         $Sender->JsonTarget("#Tag-{$Tag['TagID']}", NULL, 'Remove');
+         $Sender->JsonTarget("#Tag_{$Tag['TagID']}", NULL, 'Remove');
       }
 
       $Sender->SetData('Title', T('Delete Tag'));

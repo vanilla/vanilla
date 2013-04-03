@@ -1262,7 +1262,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
          
-         if (Debug()) {
+         if ($this->_DeliveryMethod == DELIVERY_METHOD_XHTML && Debug()) {
             $this->AddModule('TraceModule');
          }
 
@@ -1584,8 +1584,21 @@ class Gdn_Controller extends Gdn_Pluggable {
             $CssCdns = array();
             if (!$CombineCSS) {
                
+               // style.css and admin.css deserve some custom processing.
+               if (in_array($CssFile, array('style.css', 'admin.css'))) {
+                  if (!$CombineAssets) {
                // Grab all of the css files from the asset model.
                $Paths = $AssetModel->GetCssFiles(ucfirst($Mode), $ETag, $NotFound, FALSE);
+                     foreach ($CssFiles as $Info) {
+                        $this->Head->AddCss($Info[1], 'all', TRUE, $CssInfo);
+                     }
+                  } else {
+                     $Basename = substr($CssFile, 0, -4);
+                     
+                     $this->Head->AddCss(Url("/utility/css/$Basename/$Basename-$ETag.css", '//'), 'all', FALSE, $CssInfo['Options']);
+                  }
+                  continue;
+               }
                
                // Add them to the output
                $this->_CssFiles = array_merge($this->_CssFiles, $Paths);

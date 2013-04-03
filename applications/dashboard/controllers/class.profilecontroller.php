@@ -561,13 +561,14 @@ class ProfileController extends Gdn_Controller {
          exit();
       }
       
-      $this->AddJsFile('password.js');
+      Gdn::UserModel()->AddPasswordStrength($this);
       
       // Get user data and set up form
       $this->GetUserInfo();
       
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
+      $this->AddDefinition('Username', $this->User->Name);
       
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
          $this->UserModel->DefineSchema();

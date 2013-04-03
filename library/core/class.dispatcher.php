@@ -602,7 +602,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       
       try {
          
-         // Short circuit autoloader and pathing if controller already exists
+         // If the lookup succeeded, good to go
          if (class_exists($ControllerName, false))
             throw new GdnDispatcherControllerFoundException();
 

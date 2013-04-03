@@ -1009,12 +1009,12 @@ class UserModel extends Gdn_Model {
       if ($User === Gdn_Cache::CACHEOP_FAILURE) {
          $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
          
-         if ($User)
+         if ($User) {
+            // If success, build more data, then cache user
+            $this->SetCalculatedFields($User);
             $this->UserCache($User);
+         }
       }
-      
-   // If success, build more data, then cache user
-      $this->SetCalculatedFields($User);
       
       // Allow FALSE returns
       if ($User === FALSE || is_null($User))

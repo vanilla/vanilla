@@ -1638,6 +1638,10 @@ class EntryController extends Gdn_Controller {
       // Make sure that the target is a valid url.
       if (!preg_match('`(^https?://)`', $Target)) {
          $Target = '/'.ltrim($Target, '/');
+         
+         // Never redirect back to signin.
+         if (preg_match('`^/entry/signin`i', $Target))
+            $Target = '/';
       } else {
          $MyHostname = parse_url(Gdn::Request()->Domain(),PHP_URL_HOST);
          $TargetHostname = parse_url($Target, PHP_URL_HOST);

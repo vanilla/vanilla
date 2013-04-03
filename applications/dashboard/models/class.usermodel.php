@@ -682,11 +682,13 @@ class UserModel extends Gdn_Model {
          $this->UserQuery();
          $User = $this->SQL->Where('u.Name', $Username)->Get()->FirstRow(DATASET_TYPE_ARRAY);
          if ($User) {
-            // If success, build more data, then cache user
-            $this->SetCalculatedFields($User);
+            // If success, cache user
             $this->UserCache($User);
          }
       }
+      
+      // Apply calculated fields
+      $this->SetCalculatedFields($User);
       
       // By default, FirstRow() gives stdClass
       if ($User !== FALSE)
@@ -827,11 +829,13 @@ class UserModel extends Gdn_Model {
          $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
          
          if ($User) {
-            // If success, build more data, then cache user
-            $this->SetCalculatedFields($User);
+            // If success, cache user
             $this->UserCache($User);
          }
       }
+      
+      // Apply calculated fields
+      $this->SetCalculatedFields($User);
       
       // Allow FALSE returns
       if ($User === FALSE || is_null($User))
@@ -898,8 +902,12 @@ class UserModel extends Gdn_Model {
          
          foreach ($DatabaseData as $DatabaseUserID => $DatabaseUser) {
             $Data[$DatabaseUserID] = $DatabaseUser;
+            
+            // Cache the user
+            $this->UserCache($DatabaseUser);
+            
+            // Apply calculated fields
             $this->SetCalculatedFields($DatabaseUser);
-            $Result = $this->UserCache($DatabaseUser);
          }
       }
       
@@ -1234,8 +1242,6 @@ class UserModel extends Gdn_Model {
       // Define the primary key in this model's table.
       $this->DefineSchema();
       
-      
-
       // Custom Rule: This will make sure that at least one role was selected if saving roles for this user.
       if ($SaveRoles) {
          $this->Validation->AddRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');

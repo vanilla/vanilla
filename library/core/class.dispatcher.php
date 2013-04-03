@@ -584,16 +584,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
       
       $ControllerName = $Controller.'Controller';
-      $ControllerPath = null;
+      $ControllerPath = Gdn_Autoloader::Lookup($ControllerName);
+      
       try {
          
-         // Short circuit autoloader and pathing if controller already exists
+         // If the lookup succeeded, good to go
          if (class_exists($ControllerName, false))
-            throw new GdnDispatcherControllerFoundException();
-
-         // Manually look up controller file
-         $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('Quiet' => TRUE));
-         if ($ControllerPath)
             throw new GdnDispatcherControllerFoundException();
          
       } catch (GdnDispatcherControllerFoundException $Ex) {

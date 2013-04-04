@@ -58,11 +58,6 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('Vanilla.Discussions.UserSortField', 'Users may set their own sort order preference.');
-      ?>
-   </li>
-   <li>
-      <?php
          $Options = array('0' => T('Authors may never edit'),
                         '350' => sprintf(T('Authors may edit for %s'), T('5 minutes')), 
                         '900' => sprintf(T('Authors may edit for %s'), T('15 minutes')), 

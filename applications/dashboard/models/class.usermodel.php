@@ -906,7 +906,6 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetActiveUsers($Limit = 5) {
-      $this->UserQuery();
       $UserIDs = $this->SQL
          ->Select('UserID')
          ->From('User')

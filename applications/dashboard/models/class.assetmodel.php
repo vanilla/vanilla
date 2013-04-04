@@ -20,6 +20,17 @@ class AssetModel extends Gdn_Model {
    
    public $UrlPrefix = '';
    
+   /**
+    * List available modes
+    * 
+    * Modes are the top level groups we have for compiled CSS. Since the backend
+    * and frontend have totally different CSS needs, we split them up so that 
+    * they don't conflict.
+    * 
+    * Modes() lists those groupings.
+    * 
+    * @return type
+    */
    public function Modes() {
       if (is_null(self::$Modes)) {
          self::$Modes = array(
@@ -34,6 +45,16 @@ class AssetModel extends Gdn_Model {
       return self::$Modes;
    }
    
+   /**
+    * Get the current mode
+    * 
+    * Examine the list of included files and determine which mode we're in based
+    * on signature files present. We group compiled CSS into modes in order to
+    * serve correct CSS based on backend or frontend.
+    * 
+    * @param array $CssFiles
+    * @return boolean
+    */
    public function Mode(&$CssFiles) {
       foreach ($this->Modes() as $ModeFile => $Mode) {
          if (ArrayHasValue($CssFiles, $ModeFile))

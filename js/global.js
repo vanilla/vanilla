@@ -953,8 +953,6 @@ jQuery(document).ready(function($) {
    
    // password strength check
    gdn.password = function(password, username) {
-      var translations = gdn.definition('PasswordTranslations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong').split(',');
-      
       // calculate entropy
       var alphabet = 0;
       if ( password.match(/[0-9]/) )
@@ -975,42 +973,57 @@ jQuery(document).ready(function($) {
          score: 0
       };
       
-      // reject on length
-      var length = password.length;
-      response.length = length;
-      var requiredLength = gdn.definition('MinPassLength', 6);
-      var requiredScore = gdn.definition('MinPassScore', 2);
-      response.required = requiredLength;
-      if (length < requiredLength) {
-         response.reason = translations[0];
-         return response;
-      }
-      
       // password1 == username
       if (username) {
-         if (password.toLowerCase().indexOf(username.toLowerCase()) >= 0) {
-            response.reason = translations[1];
+         if (password.toLowerCase() == username.toLowerCase()) {
+            response.reason = 'similar';
             return response;
          }
       }
       
-      if (entropy < 30) {
-         response.score = 1;
-         response.reason = translations[2]; // very weak
-      } else if (entropy < 40) {
-         response.score = 2;
-         response.reason = translations[3]; // weak
-      } else if (entropy < 55) {
-         response.score = 3;
-         response.reason = translations[4]; // ok
-      } else if (entropy < 70) {
-         response.score = 4;
-         response.reason = translations[5]; // good
-      } else {
-         response.score = 5;
-         response.reason = translations[6]; // strong
+      // divide into entropy buckets
+      var entropyBuckets = [10,26,36,41,52,57,83,93];
+      var entropyBucket = 1;
+      for (var i=0;i<entropyBuckets.length;i++) {
+         if (entropy >= entropyBuckets[i]) {
+            entropyBucket = i+1;
+         }
+      }
+      entropyBucket = Math.floor(parseFloat(entropyBucket) / parseFloat(2));
+      response.entropyBucket = entropyBucket;
+      
+      // reject on length
+      var length = password.length;
+      response.length = length;
+      var requiredLength = gdn.definition('MinPassLength', 8);
+      var requiredScore = gdn.definition('MinPassScore', 2);
+      response.required = requiredLength;
+      if (length < requiredLength) {
+         response.reason = 'short';
+         return response;
       }
       
+      // divide into length buckets
+      var lengthBuckets = [5,7,11,15];
+      var lengthBucket = 1;
+      for (var i=0; i < lengthBuckets.length; i++) {
+         if (length >= lengthBuckets[i]) {
+            lengthBucket = i+1;
+         }
+      }
+      
+      // apply length modifications
+      var zeroBucket = Math.ceil(lengthBuckets.length / 2);
+      var bucketMod = lengthBucket - zeroBucket;
+      var finalBucket = entropyBucket + bucketMod;
+      
+      // normalize
+      if (finalBucket < 1) finalBucket = 1;
+      if (finalBucket > 5) finalBucket = 5;
+      
+      response.score = finalBucket;
+      if (finalBucket >= requiredScore)
+         response.pass = true;
       return response;
    }
 
@@ -1380,11 +1393,6 @@ jQuery(document).ready(function($) {
          gdn.setAutoDismiss();
       }
    });
-      if (message == '')
-         message = 'There was an error performing your request. Please try again.';
-      
-      gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable');
-   }
    
    // Pick up the inform message stack and display it on page load
    var informMessageStack = gdn.definition('InformMessageStack', false);

@@ -32,7 +32,8 @@ class AssetModel extends Gdn_Model {
       $this->EventArguments['ETag'] = $ETag;
       $this->FireEvent('BeforeServeCss');
       
-      header_remove('Set-Cookie');
+      if (function_exists('header_remove'))
+         header_remove('Set-Cookie');
       header("Content-Type: text/css");
       if (!in_array($Basename, array('Style', 'Admin'))) {
          header("HTTP/1.0 404", TRUE, 404);

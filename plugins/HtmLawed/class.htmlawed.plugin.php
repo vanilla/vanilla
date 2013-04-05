@@ -36,7 +36,6 @@ class HTMLawedPlugin extends Gdn_Plugin {
 
 	/// METHODS ///
 	public function Format($Html) {
-	   $Elements = C('Garden.Html.AllowedElements');
       $Attributes = C('Garden.Html.BlockedAttributes', 'on*');
       $Config = array(
        'anti_link_spam' => array('`.`', ''),
@@ -45,7 +44,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'css_expression' => 1,
        'deny_attribute' => $Attributes,
        'unique_ids' => 0,
-       'elements' => $Elements,
+       'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
        'valid_xhtml' => 0,

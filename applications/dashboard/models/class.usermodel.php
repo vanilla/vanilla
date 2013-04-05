@@ -2719,7 +2719,7 @@ class UserModel extends Gdn_Model {
          }
       }
       
-      $User['_CssClass'] = '';
+      SetValue('_CssClass', $User, '');
       if ($v = GetValue('Banned', $User)) {
          SetValue('_CssClass', $User, 'Banned');
       }

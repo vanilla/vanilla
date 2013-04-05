@@ -2719,7 +2719,7 @@ class UserModel extends Gdn_Model {
          }
       }
       
-      TouchValue('_CssClass', $User, '');
+      $User['_CssClass'] = '';
       if ($v = GetValue('Banned', $User)) {
          SetValue('_CssClass', $User, 'Banned');
       }

@@ -458,7 +458,7 @@ class DiscussionsController extends VanillaController {
             $CountBookmarks = Gdn::Session()->User->CountBookmarks;
          } else {
             $UserModel = new UserModel();
-            $User = $UserModel->GetID($ID, DATASET_TYPE_ARRAY);
+            $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
             $CountBookmarks = $User['CountBookmarks'];
          }
 

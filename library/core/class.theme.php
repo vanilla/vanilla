@@ -31,7 +31,7 @@ class Gdn_Theme {
       Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
    }
 
-   public static function Breadcrumbs($Data, $HomeLink = TRUE) {
+   public static function Breadcrumbs($Data, $HomeLink = TRUE, $HomeUrl = NULL) {
       $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
       
       $Result = '';
@@ -41,7 +41,10 @@ class Gdn_Theme {
 
       
       if ($HomeLink) {
-         $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE), 'CssClass' => 'CrumbLabel HomeCrumb');
+         if (!$HomeUrl)
+            $HomeUrl = Url('/', TRUE);
+         
+         $Row = array('Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
             $Row['Name'] = T('Home');
          

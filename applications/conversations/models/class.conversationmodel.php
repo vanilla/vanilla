@@ -272,16 +272,14 @@ class ConversationModel extends Gdn_Model {
     * @return Gdn_DataSet SQL results.
     */
    public function GetRecipients($ConversationID, $IgnoreUserID = '0') {
-      return $this->SQL
-         ->Select('uc.UserID, u.Name, u.Email, uc.Deleted, u.Photo')
-         ->Select('cm.DateInserted', 'max', 'DateLastActive')
+      $Data = $this->SQL
+         ->Select('uc.*')
          ->From('UserConversation uc')
-         ->Join('User u', 'uc.UserID = u.UserID')
-         ->Join('ConversationMessage cm', 'uc.ConversationID = cm.ConversationID and uc.UserID = cm.InsertUserID', 'left')
          ->Where('uc.ConversationID', $ConversationID)
-         // ->Where('uc.UserID <>', $IgnoreUserID)
-         ->GroupBy('uc.UserID, u.Name, u.Email, uc.Deleted')
          ->Get();
+      
+      Gdn::UserModel()->JoinUsers($Data->Result(), array('UserID'));
+      return $Data;
    }
    
    public function JoinParticipants(&$Data) {

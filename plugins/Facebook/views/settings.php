@@ -82,6 +82,11 @@ echo $this->Form->Errors();
          </li>
          <li>
             <?php
+               echo $this->Form->CheckBox('SocialSignIn', 'Enable Social Sign In');
+            ?>
+         </li>
+         <li>
+            <?php
                echo $this->Form->CheckBox('SocialReactions', "Enable Social Reactions.");
             ?>
          </li>

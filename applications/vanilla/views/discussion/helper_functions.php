@@ -143,7 +143,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
             </div>
             <?php 
             $Sender->FireEvent('AfterCommentBody');
-            WriteReactions($Comment); 
+            WriteReactions($Comment);
             ?>
          </div>
       </div>
@@ -167,6 +167,7 @@ function WriteReactions($Row, $Type = 'Comment') {
    
       Gdn::Controller()->FireEvent('AfterReactions');
    echo '</div>';
+   Gdn::Controller()->FireEvent('Replies');
 }
 endif;
 

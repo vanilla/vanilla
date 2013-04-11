@@ -58,11 +58,6 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('Vanilla.Discussions.UserSortField', 'Users may set their own sort order preference.');
-      ?>
-   </li>
-   <li>
-      <?php
          $Options = array('0' => T('Authors may never edit'),
                         '350' => sprintf(T('Authors may edit for %s'), T('5 minutes')), 
                         '900' => sprintf(T('Authors may edit for %s'), T('15 minutes')), 
@@ -78,15 +73,6 @@ echo $this->Form->Errors();
 			echo Wrap(T('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', array('class' => 'Info'));
       ?>
    </li>
-   <?php if (C('EnabledPlugins.HtmLawed')) : ?>
-   <li>
-      <?php
-         echo $this->Form->Label('HTML elements allowed', 'Garden.Html.AllowedElements');
-         echo $this->Form->TextBox('Garden.Html.AllowedElements', array('MultiLine' => TRUE));
-         echo Wrap(T('HtmlELementsAllowed.Notes', 'A comma-separated list of all HTML elements allowed in discussions and comments. Adding elements can cause security vulnerabilities.'), 'div', array('class' => 'Info'));
-      ?>
-   </li>
-   <?php endif; ?> 
 <!--   <li>
       <?php
          $Options2 = array('0' => T('Never - Users Must Refresh Page'), 

@@ -423,6 +423,7 @@ class UserModel extends Gdn_Model {
       $Parts = explode(' ', $String);
       
       $String = $Parts[0];
+      Trace($String, "SSO String");
       $Data = json_decode(base64_decode($String), TRUE);
       Trace($Data, 'RAW SSO Data');
       $Errors = 0;
@@ -466,7 +467,7 @@ class UserModel extends Gdn_Model {
             return;
       }
       if ($CalcSignature != $Signature) {
-         Trace("Invalid SSO signature.", TRACE_ERROR);
+         Trace("Invalid SSO signature: $Signature", TRACE_ERROR);
          return;
       }
       
@@ -1039,7 +1040,6 @@ class UserModel extends Gdn_Model {
    }
    
    public function GetIDs($IDs, $SkipCacheQuery = FALSE) {
-      
       $DatabaseIDs = $IDs;
       $Data = array();
       
@@ -2893,9 +2893,11 @@ class UserModel extends Gdn_Model {
          if (is_string($v))
             SetValue('Attributes', $User, @unserialize($v));
       if ($v = GetValue('Permissions', $User))
-         SetValue('Permissions', $User, @unserialize($v));
+         if (is_string($v))
+            SetValue('Permissions', $User, @unserialize($v));
       if ($v = GetValue('Preferences', $User))
-         SetValue('Preferences', $User, @unserialize($v));
+         if (is_string($v))
+            SetValue('Preferences', $User, @unserialize($v));
       if ($v = GetValue('Photo', $User)) {
          if (!IsUrl($v)) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($v, 'n%s'));
@@ -2916,7 +2918,7 @@ class UserModel extends Gdn_Model {
          }
       }
       
-      TouchValue('_CssClass', $User, '');
+      SetValue('_CssClass', $User, '');
       if ($v = GetValue('Banned', $User)) {
          SetValue('_CssClass', $User, 'Banned');
       }

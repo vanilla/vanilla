@@ -94,7 +94,8 @@ class AssetModel extends Gdn_Model {
       $this->EventArguments['ETag'] = $ETag;
       $this->FireEvent('BeforeServeCss');
       
-      header_remove('Set-Cookie');
+      if (function_exists('header_remove'))
+         header_remove('Set-Cookie');
       header("Content-Type: text/css");
       
       // Don't allow ourselves to be ddos'd

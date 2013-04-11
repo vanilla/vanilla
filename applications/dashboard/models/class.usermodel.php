@@ -421,6 +421,7 @@ class UserModel extends Gdn_Model {
       $Parts = explode(' ', $String);
       
       $String = $Parts[0];
+      Trace($String, "SSO String");
       $Data = json_decode(base64_decode($String), TRUE);
       Trace($Data, 'RAW SSO Data');
       $Errors = 0;
@@ -464,7 +465,7 @@ class UserModel extends Gdn_Model {
             return;
       }
       if ($CalcSignature != $Signature) {
-         Trace("Invalid SSO signature.", TRACE_ERROR);
+         Trace("Invalid SSO signature: $Signature", TRACE_ERROR);
          return;
       }
       

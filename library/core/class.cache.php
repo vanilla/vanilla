@@ -34,6 +34,12 @@ abstract class Gdn_Cache {
    */
    protected $CacheType;
    
+   /**
+    * Memory copy of store containers
+    * @var array
+    */
+   protected static $Stores = array();
+   
    // Allows items to be internally compressed/decompressed
    const FEATURE_COMPRESS     = 'f_compress';
    // Allows items to autoexpire (seconds)
@@ -101,6 +107,10 @@ abstract class Gdn_Cache {
    const CACHE_TYPE_FILE = 'ct_file';
    const CACHE_TYPE_NULL = 'ct_null';
    
+   const CACHE_EJECT_DURATION = 60;
+   
+   const APC_CACHE_DURATION = 300;
+   
    /**
     * Local in-memory cache of fetched data
     * This prevents duplicate gets to memcache
@@ -149,14 +159,14 @@ abstract class Gdn_Cache {
    }
    
    /**
-   * Gets the shortname of the currently active cache
-   * 
-   * This method retrieves the name of the active cache according to the config file.
-   * It fires an event thereafter, allowing that value to be overridden 
-   * by loaded plugins.
-   * 
-   * @return string shortname of current auto active cache
-   */
+    * Gets the shortname of the currently active cache
+    * 
+    * This method retrieves the name of the active cache according to the config file.
+    * It fires an event thereafter, allowing that value to be overridden 
+    * by loaded plugins.
+    * 
+    * @return string shortname of current auto active cache
+    */
    public static function ActiveCache() {
       /*
        * There is a catch 22 with caching the config file. We need
@@ -207,18 +217,160 @@ abstract class Gdn_Cache {
     * @return mixed Active Store Location
     */
    public static function ActiveStore($ForceMethod = NULL) {
+      // Get the active cache name
       $ActiveCache = self::ActiveCache();
       if (!is_null($ForceMethod))
          $ActiveCache = $ForceMethod;
-      
       $ActiveCache = ucfirst($ActiveCache);
       
-      if (defined('CACHE_STORE_OVERRIDE') && defined('CACHE_METHOD_OVERRIDE') && CACHE_METHOD_OVERRIDE == $ActiveCache) {
-         $ActiveStore = unserialize(CACHE_STORE_OVERRIDE);
-      } else
-         $ActiveStore = C("Cache.{$ActiveCache}.Store", FALSE);
+      // Overrides
+      if (defined('CACHE_STORE_OVERRIDE') && defined('CACHE_METHOD_OVERRIDE') && CACHE_METHOD_OVERRIDE == $ActiveCache)
+         return unserialize(CACHE_STORE_OVERRIDE);
+      
+      $apc = false;
+      if (C('Garden.Apc', false) && function_exists('apc_fetch'))
+         $apc = true;
+      
+      $LocalStore = null;
+      $ActiveStore = null;
+      $ActiveStoreKey = "Cache.{$ActiveCache}.Store";
+      
+      // Check memory
+      if (is_null($LocalStore)) {
+         if (array_key_exists($ActiveCache, Gdn_Cache::$Stores)) {
+            $LocalStore = Gdn_Cache::$Stores[$ActiveCache];
+         }
+      }
+      
+      // Check APC cache
+      if (is_null($LocalStore) && $apc) {
+         $LocalStore = apc_fetch($ActiveStoreKey);
+         if ($LocalStore) {
+            Gdn_Cache::$Stores[$ActiveCache] = $LocalStore;
+         }
+      }
+      
+      if ($LocalStore !== false) {
+         
+         // Convert to ActiveStore format (with 'Active' key)
+         $Save = false;
+         $ActiveStore = array();
+         foreach ($LocalStore as $StoreServerName => &$StoreServer) {
+            $IsDelayed = &$StoreServer['Delay'];
+            $IsActive = &$StoreServer['Active'];
+            
+            if (is_numeric($IsDelayed)) {
+               if ($IsDelayed < time()) {
+                  $IsActive = true;
+                  $IsDelayed = false;
+                  $StoreServer['Fails'] = 0;
+                  $Save = true;
+               } else {
+                  if ($IsActive) {
+                     $IsActive = false;
+                     $Save = true;
+                  }
+               }
+            }
+
+            // Add active servers to ActiveStore array
+            if ($IsActive)
+               $ActiveStore[] = $StoreServer['Server'];
+         }
+         
+      }
+
+      // No local copy, get from config
+      if (is_null($ActiveStore)) {
+         $ActiveStore = C($ActiveStoreKey, false);
+
+         // Convert to LocalStore format
+         $LocalStore = array();
+         $ActiveStore = (array)$ActiveStore;
+         foreach ($ActiveStore as $StoreServer) {
+            $StoreServerName = md5($StoreServer);
+            $LocalStore[$StoreServerName] = array(
+               'Server' => $StoreServer,
+               'Active' => true,
+               'Delay'  => false,
+               'Fails'  => 0
+            );
+         }
+         
+         $Save = true;
+      }
+      
+      if ($Save) {
+         // Save to memory
+         Gdn_Cache::$Stores[$ActiveCache] = $LocalStore;
+
+         // Save back to APC for later
+         if ($apc) {
+            apc_store($ActiveStoreKey, $LocalStore, Gdn_Cache::APC_CACHE_DURATION);
+         }
+      }
       
       return $ActiveStore;
+   }
+   
+   /**
+    * Register a temporary server connection failure
+    * 
+    * This method will attempt to temporarily excise the offending server from
+    * the connect roster for a period of time.
+    * 
+    * @param string $server
+    */
+   public function Fail($server) {
+      
+      // Use APC?
+      $apc = false;
+      if (C('Garden.Apc', false) && function_exists('apc_fetch'))
+         $apc = true;
+
+      // Get the active cache name
+      $activeCache = Gdn_Cache::ActiveCache();
+      $activeCache = ucfirst($activeCache);
+      $sctiveStoreKey = "Cache.{$activeCache}.Store";
+
+      // Get the localstore
+      $localStore = GetValue($activeCache, Gdn_Cache::$Stores, null);
+      if (is_null($localStore)) {
+         Gdn_Cache::ActiveStore();
+         $localStore = GetValue($activeCache, Gdn_Cache::$Stores, null);
+         if (is_null($localStore)) {
+            return false;
+         }
+      }
+
+      $storeServerName = md5($server);
+      if (!array_key_exists($storeServerName, $localStore)) {
+         return false;
+      }
+
+      $storeServer = &$localStore[$storeServerName];
+      $isActive = &$storeServer['Active'];
+      if (!$isActive) return false;
+
+      $fails = &$storeServer['Fails'];
+      $fails++;
+      $active = $isActive ? 'active' : 'inactive';
+
+      // Check if we need to deactivate for 5 minutes
+      if ($isActive && $storeServer['Fails'] > 3) {
+         $isActive = false;
+         $storeServer['Delay'] = time() + Gdn_Cache::CACHE_EJECT_DURATION;
+      }
+
+      // Save
+      Gdn_Cache::$Stores[$activeCache] = $localStore;
+      
+      // Save to APC
+      if ($apc) {
+         apc_store($sctiveStoreKey, $localStore, Gdn_Cache::APC_CACHE_DURATION);
+      }
+      
+      return true;
    }
    
    /**
@@ -587,6 +739,15 @@ abstract class Gdn_Cache {
    */
    public function HasFeature($Feature) {
       return isset($this->Features[$Feature]) ? $this->Features[$Feature] : Gdn_Cache::CACHEOP_FAILURE;
+   }
+   
+   /**
+    * Is the current cache available?
+    * 
+    * @return boolean
+    */
+   public function Online() {
+      return true;
    }
    
    protected function Failure($Message) {

@@ -108,6 +108,11 @@ class CategoriesController extends VanillaController {
          $this->Description(GetValue('Description', $Category), TRUE);
          
          if ($Category->DisplayAs == 'Categories') {
+            if (GetValue('Depth', $Category) > 0) {
+               // Heading don't make sense if we've cascaded down one level.
+               SaveToConfig('Vanilla.Categories.DoHeadings', FALSE, FALSE);
+            }
+            
             // This category is an overview style category and displays as a category list.
             switch($Layout) {
                case 'mixed':

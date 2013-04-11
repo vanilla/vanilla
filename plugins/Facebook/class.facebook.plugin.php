@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook Social Connect',
    'Description' => 'Users may sign into your site using their Facebook account.',	
-   'Version' => '1.0.9',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -118,7 +118,7 @@ class FacebookPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
          return;
       
       if (isset($Sender->Data['Methods'])) {
@@ -247,21 +247,21 @@ class FacebookPlugin extends Gdn_Plugin {
    }
    
    public function Base_SignInIcons_Handler($Sender, $Args) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
          return;
 		
 		echo "\n".$this->_GetButton();
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
          return;
 		
 		echo "\n".$this->_GetButton();
 	}
 	
 	public function Base_BeforeSignInLink_Handler($Sender) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
 			return;
 		
 		// if (!IsMobile())
@@ -386,6 +386,7 @@ class FacebookPlugin extends Gdn_Plugin {
              'Plugins.Facebook.ApplicationID' => $Sender->Form->GetFormValue('ApplicationID'),
              'Plugins.Facebook.Secret' => $Sender->Form->GetFormValue('Secret'),
              'Plugins.Facebook.UseFacebookNames' => $Sender->Form->GetFormValue('UseFacebookNames'),
+             'Plugins.Facebook.SocialSignIn' => $Sender->Form->GetFormValue('SocialSignIn'),
              'Plugins.Facebook.SocialReactions' => $Sender->Form->GetFormValue('SocialReactions'),
              'Plugins.Facebook.SocialSharing' => $Sender->Form->GetFormValue('SocialSharing'),
              'Garden.Registration.SendConnectEmail' => $Sender->Form->GetFormValue('SendConnectEmail'));
@@ -397,7 +398,8 @@ class FacebookPlugin extends Gdn_Plugin {
          $Sender->Form->SetValue('ApplicationID', C('Plugins.Facebook.ApplicationID'));
          $Sender->Form->SetValue('Secret', C('Plugins.Facebook.Secret'));
          $Sender->Form->SetValue('UseFacebookNames', C('Plugins.Facebook.UseFacebookNames'));
-         $Sender->Form->SetValue('SendConnectEmail', C('Garden.Registration.SendConnectEmail', TRUE));
+         $Sender->Form->SetValue('SendConnectEmail', C('Garden.Registration.SendConnectEmail', FALSE));
+         $Sender->Form->SetValue('SocialSignIn', C('Plugins.Facebook.SocialSignIn', TRUE));
          $Sender->Form->SetValue('SocialReactions', $this->SocialReactions());
          $Sender->Form->SetValue('SocialSharing', $this->SocialSharing());
       }
@@ -592,6 +594,10 @@ class FacebookPlugin extends Gdn_Plugin {
       if (!$AppID || !$Secret)
          return FALSE;
       return TRUE;
+   }
+   
+   public function SocialSignIn() {
+      return C('Plugins.Facebook.SocialSignIn', TRUE) && $this->IsConfigured();
    }
    
    public function SocialSharing() {

@@ -619,6 +619,7 @@ class PostController extends VanillaController {
                      $this->Offset = 1;
                      $Comments = $this->CommentModel->GetIDData($CommentID);
                      $this->SetData('Comments', $Comments);
+                     $this->SetData('Discussion', $Discussion);
                      // Load the discussion
                      $this->ControllerName = 'discussion';
                      $this->View = 'comments';

@@ -258,6 +258,8 @@ function CssClass($Row, $InList = TRUE) {
    // Category list classes
    if (array_key_exists('UrlCode', $Row))
       $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
+   if (GetValue('CssClass', $Row))
+      $CssClass .= ' Item-'.$Row['CssClass'];
 
    if (array_key_exists('Depth', $Row))
       $CssClass .= " Depth{$Row['Depth']} Depth-{$Row['Depth']}";

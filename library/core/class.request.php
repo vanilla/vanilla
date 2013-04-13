@@ -292,6 +292,16 @@ class Gdn_Request {
    public function IsPostBack() {
       return strcasecmp($this->RequestMethod(), 'post') == 0;
    }
+   
+   /**
+    * Gets/sets the port of the request.
+    * @param int $Port
+    * @return int
+    * @since 2.1
+    */
+   public function Port($Port = NULL) {
+      return $this->_EnvironmentElement('PORT', $Port);
+   }
 
    /**
     * Gets/Sets the scheme from the current url. e.g. "http" in
@@ -354,6 +364,14 @@ class Gdn_Request {
       if (!is_null($OriginalProto)) $Scheme = $OriginalProto;
       
       $this->RequestScheme($Scheme);
+      
+      if (isset($_SERVER['SERVER_PORT']))
+         $Port = $_SERVER['SERVER_PORT'];
+      elseif ($Scheme === 'https')
+         $Port = 443;
+      else
+         $Port = 80;
+      $this->Port($Port);
       
       if (is_array($_GET)) {
          $Get = FALSE;
@@ -783,10 +801,15 @@ class Gdn_Request {
 
       $Parts = array();
       
+      $Port = $this->Port();
+      $Host = $this->Host();
+      if (!in_array($Host, array(80, 443)))
+         $Host .= ':'.$Port;
+      
       if ($WithDomain === '//') {
-         $Parts[] = '//'.$this->Host();
+         $Parts[] = '//'.$Host;
       } elseif ($WithDomain) {
-         $Parts[] = $Scheme.'://'.$this->Host();
+         $Parts[] = $Scheme.'://'.$Host;
       } else
          $Parts[] = '';
 

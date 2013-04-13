@@ -271,6 +271,20 @@ class Gdn_Request {
    public function Host($Hostname = NULL) {
       return $this->RequestHost($Hostname);
    }
+   
+   /**
+    * Return the host and port together if the port isn't standard.
+    * @return string
+    * @since 2.1
+    */
+   public function HostAndPort() {
+      $Host = $this->Host();
+      $Port = $this->Port();
+      if (!in_array($Port, array(80, 443)))
+         return $Host.':'.$Port;
+      else
+         return $Host;
+   }
 
    public function IpAddress() {
       return $this->RequestAddress();

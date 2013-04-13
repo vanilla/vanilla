@@ -314,7 +314,7 @@ class UserController extends DashboardController {
             if ($this->Request->Get('Target')) {
                $this->RedirectUrl = $this->Request->Get('Target');
             } else {
-               $this->RedirectUrl = UserUrl($User);
+               $this->RedirectUrl = Url(UserUrl($User));
             }
          }
       }

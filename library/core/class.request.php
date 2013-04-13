@@ -364,6 +364,7 @@ class Gdn_Request {
       $OriginalIP = GetValue('HTTP_X_ORIGINALLY_FORWARDED_FOR', $_SERVER, NULL);
       if (!is_null($OriginalIP)) $IP = $OriginalIP;
       
+      $IP = ForceIPv4($IP);
       $this->RequestAddress($IP);
       
       // Request Scheme

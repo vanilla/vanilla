@@ -275,7 +275,7 @@ class FacebookPlugin extends Gdn_Plugin {
       $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
       
       $Sender->Data["Connections"][self::ProviderKey] = array(
-         'Icon' => $this->GetWebResource('icon.png'),
+         'Icon' => $this->GetWebResource('icon.png', '/'),
          'Name' => 'Facebook',
          'ProviderKey' => self::ProviderKey,
          'ConnectUrl' => $this->AuthorizeUri(FALSE, self::ProfileConnecUrl()),

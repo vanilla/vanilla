@@ -2904,11 +2904,12 @@ class UserModel extends Gdn_Model {
       }
       if ($v = GetValue('AllIPAddresses', $User)) {
          if (is_string($v)) {
-         $IPAddresses = explode(',', $v);
-         foreach ($IPAddresses as $i => $IPAddress) {
-            $IPAddresses[$i] = ForceIPv4($IPAddress);
+            $IPAddresses = explode(',', $v);
+            foreach ($IPAddresses as $i => $IPAddress) {
+               $IPAddresses[$i] = ForceIPv4($IPAddress);
+            }
+            SetValue('AllIPAddresses', $User, $IPAddresses);
          }
-         SetValue('AllIPAddresses', $User, $IPAddresses);
       }
       
       SetValue('_CssClass', $User, '');

@@ -2585,7 +2585,7 @@ tr.CategoryHeading td {
    width: 12px; 
    margin-top: 8px;
 }
-.DiscussionSorter .Flyout:before, .Flyout:after { 
+.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after { 
    border: none; 
 }
 .DiscussionSorter .ToggleFlyout .Flyout { 

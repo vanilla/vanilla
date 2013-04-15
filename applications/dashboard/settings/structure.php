@@ -39,12 +39,13 @@ if (!$RoleTableExists || $Drop) {
    $RoleModel = Gdn::Factory('RoleModel');
    $RoleModel->Database = $Database;
    $RoleModel->SQL = $SQL;
-   $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => '1', 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
-   $RoleModel->Define(array('Name' => 'Unconfirmed', 'RoleID' => 3, 'Sort' => '2', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Users must confirm their emails before becoming full members. They get assigned to this role.'));
-   $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => '3', 'Deletable' => '0', 'CanSession' => '1', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
-   $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => '4', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
-   $RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => '5', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators have permission to edit most content.'));
-   $RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => '6', 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have permission to do anything.'));
+   $Sort = 1;
+   $RoleModel->Define(array('Name' => 'Guest', 'RoleID' => 2, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '0', 'Description' => 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".'));
+   $RoleModel->Define(array('Name' => 'Unconfirmed', 'RoleID' => 3, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => 'Users must confirm their emails before becoming full members. They get assigned to this role.'));
+   $RoleModel->Define(array('Name' => 'Applicant', 'RoleID' => 4, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'));
+   $RoleModel->Define(array('Name' => 'Member', 'RoleID' => 8, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Members can participate in discussions.'));
+   $RoleModel->Define(array('Name' => 'Moderator', 'RoleID' => 32, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Moderators have permission to edit most content.'));
+   $RoleModel->Define(array('Name' => 'Administrator', 'RoleID' => 16, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Administrators have permission to do anything.'));
    unset($RoleModel);
 }
 
@@ -87,7 +88,8 @@ $Construct
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
-   ->Column('Verified', 'tinyint(1)', '0') // user if verified as a non-spammer
+   ->Column('Confirmed', 'tinyint(1)', '0') // 1 means email confirmed, otherwise not confirmed
+   ->Column('Verified', 'tinyint(1)', '0') // 1 means verified (non spammer), otherwise not verified
    ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Column('Points', 'int', 0)

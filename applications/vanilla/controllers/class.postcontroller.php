@@ -281,6 +281,7 @@ class PostController extends VanillaController {
          $this->CategoryID = $this->Discussion->CategoryID;
       }
       
+      $this->Form->RemoveFormValue('Format');
       // Set view and render
       $this->View = 'Discussion';
       $this->Discussion($this->CategoryID);

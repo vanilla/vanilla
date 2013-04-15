@@ -101,6 +101,9 @@ class SearchModel extends Gdn_Model {
             $SearchMode = 'like';
       }
       
+      if (strlen($Search) <= 4)
+         $SearchMode = 'like';
+      
       $this->_SearchMode = $SearchMode;
 
       $this->FireEvent('Search');

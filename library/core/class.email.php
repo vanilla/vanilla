@@ -46,6 +46,16 @@ class Gdn_Email extends Gdn_Pluggable {
       $this->Clear();
       parent::__construct();
    }
+   
+   /**
+    * Add a custom header to the outgoing email.
+    * @param string $Name
+    * @param string $Value
+    * @since 2.1
+    */
+   public function AddHeader($Name, $Value) {
+      $this->PhpMailer->AddCustomHeader("$Name:$Value");
+   }
 
 
    /**

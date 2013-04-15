@@ -1973,6 +1973,21 @@ PASSWORDMETER;
    }
 
    /**
+    * Remove an element from a form
+    * 
+    * @param string $FieldName
+    */
+   public function RemoveFormValue($FieldName) {
+      $this->FormValues();
+      
+      if (!is_array($FieldName))
+         $FieldName = array($FieldName);
+      
+      foreach ($FieldName as $Field)
+         unset($this->_FormValues[$Field]);
+   }
+   
+   /**
     * Set the name of the model that will enforce data rules on $this->_DataArray.
     *
     * This value is also used to identify fields in the $_POST or $_GET

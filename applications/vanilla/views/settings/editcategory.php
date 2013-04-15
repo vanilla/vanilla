@@ -43,6 +43,9 @@ echo $this->Form->Errors();
          echo $this->Form->Label('Photo', 'PhotoUpload');
          if ($Photo = $this->Form->GetValue('Photo')) {
             echo Img(Gdn_Upload::Url($Photo));
+            echo '<br />'.Anchor(T('Delete Photo'), 
+               CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::Session()->TransientKey())), 
+               'SmallButton Danger PopConfirm');
          }
          echo $this->Form->Input('PhotoUpload', 'file');
       ?>

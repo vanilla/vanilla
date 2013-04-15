@@ -476,7 +476,7 @@ class DiscussionModel extends VanillaModel {
                unset($Result[$Key]);
                $Unset = TRUE;
             }
-         } elseif ($Discussion->Announce == 1 && $Discussion->Dismissed == 0) {
+         } elseif ($Discussion->Announce && $Discussion->Dismissed == 0) {
             // Unset discussions that are announced and not dismissed
             unset($Result[$Key]);
             $Unset = TRUE;

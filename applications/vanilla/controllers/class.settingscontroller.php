@@ -365,6 +365,36 @@ class SettingsController extends Gdn_Controller {
       // Render default view
       $this->Render();
    }
+
+   /**
+    * Deleting a category photo.
+    * 
+    * @since 2.1
+    * @access public
+    *
+    * @param int $CategoryID Unique ID of the category to have its photo deleted.
+    */
+   public function DeleteCategoryPhoto($CategoryID = FALSE, $TransientKey = '') {
+      // Check permission
+      $this->Permission('Garden.Settings.Manage');
+      
+      $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
+      
+      if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
+         // Do removal, set message, redirect
+         $CategoryModel = new CategoryModel();
+         $CategoryModel->SetField($CategoryID, 'Photo', NULL); 
+         $this->InformMessage(T('Category photo has been deleted.'));
+      }
+      if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+          Redirect($RedirectUrl);
+      } else {
+         $this->ControllerName = 'Home';
+         $this->View = 'FileNotFound';
+         $this->RedirectUrl = Url($RedirectUrl);
+         $this->Render();
+      }
+   }
    
    /**
     * Editing a category.

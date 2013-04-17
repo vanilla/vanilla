@@ -692,11 +692,13 @@ class UserModel extends Gdn_Model {
          $this->UserQuery();
          $User = $this->SQL->Where('u.Name', $Username)->Get()->FirstRow(DATASET_TYPE_ARRAY);
          if ($User) {
-            // If success, build more data, then cache user
-            $this->SetCalculatedFields($User);
+            // If success, cache user
             $this->UserCache($User);
          }
       }
+      
+      // Apply calculated fields
+      $this->SetCalculatedFields($User);
       
       // By default, FirstRow() gives stdClass
       if ($User !== FALSE)
@@ -836,11 +838,13 @@ class UserModel extends Gdn_Model {
       if ($User === Gdn_Cache::CACHEOP_FAILURE) {
          $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
          
-         if ($User)
+         if ($User) {
+            // If success, cache user
             $this->UserCache($User);
+         }
       }
       
-   // If success, build more data, then cache user
+      // Apply calculated fields
       $this->SetCalculatedFields($User);
       
       // Allow FALSE returns
@@ -860,7 +864,6 @@ class UserModel extends Gdn_Model {
    }
    
    public function GetIDs($IDs, $SkipCacheQuery = FALSE) {
-      
       $DatabaseIDs = $IDs;
       $Data = array();
       
@@ -908,8 +911,12 @@ class UserModel extends Gdn_Model {
          
          foreach ($DatabaseData as $DatabaseUserID => $DatabaseUser) {
             $Data[$DatabaseUserID] = $DatabaseUser;
+            
+            // Cache the user
+            $this->UserCache($DatabaseUser);
+            
+            // Apply calculated fields
             $this->SetCalculatedFields($DatabaseUser);
-            $Result = $this->UserCache($DatabaseUser);
          }
       }
       
@@ -1244,8 +1251,6 @@ class UserModel extends Gdn_Model {
       // Define the primary key in this model's table.
       $this->DefineSchema();
       
-      
-
       // Custom Rule: This will make sure that at least one role was selected if saving roles for this user.
       if ($SaveRoles) {
          $this->Validation->AddRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');
@@ -2699,9 +2704,11 @@ class UserModel extends Gdn_Model {
          if (is_string($v))
             SetValue('Attributes', $User, @unserialize($v));
       if ($v = GetValue('Permissions', $User))
-         SetValue('Permissions', $User, @unserialize($v));
+         if (is_string($v))
+            SetValue('Permissions', $User, @unserialize($v));
       if ($v = GetValue('Preferences', $User))
-         SetValue('Preferences', $User, @unserialize($v));
+         if (is_string($v))
+            SetValue('Preferences', $User, @unserialize($v));
       if ($v = GetValue('Photo', $User)) {
          if (!IsUrl($v)) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($v, 'n%s'));
@@ -2722,7 +2729,7 @@ class UserModel extends Gdn_Model {
          }
       }
       
-      TouchValue('_CssClass', $User, '');
+      SetValue('_CssClass', $User, '');
       if ($v = GetValue('Banned', $User)) {
          SetValue('_CssClass', $User, 'Banned');
       }

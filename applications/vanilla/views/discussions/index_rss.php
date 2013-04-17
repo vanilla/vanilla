@@ -9,6 +9,7 @@ foreach ($this->DiscussionData->Result() as $Discussion) {
       <title><?php echo Gdn_Format::Text($Discussion->Name); ?></title>
       <link><?php echo $Discussion->Url; ?></link>
       <pubDate><?php echo date('r', Gdn_Format::ToTimeStamp($Discussion->DateInserted)); ?></pubDate>
+      <category><?php echo Gdn_Format::Text($Discussion->Category); ?></category>
       <dc:creator><?php echo Gdn_Format::Text($Discussion->FirstName); ?></dc:creator>
       <guid isPermaLink="false"><?php echo $Discussion->DiscussionID . '@' . Url('/discussions'); ?></guid>
       <description><![CDATA[<?php echo Gdn_Format::RssHtml($Discussion->Body, $Discussion->Format); ?>]]></description>

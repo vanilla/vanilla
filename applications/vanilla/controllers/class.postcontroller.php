@@ -281,6 +281,7 @@ class PostController extends VanillaController {
          $this->CategoryID = $this->Discussion->CategoryID;
       }
       
+      $this->Form->RemoveFormValue('Format');
       // Set view and render
       $this->View = 'Discussion';
       $this->Discussion($this->CategoryID);
@@ -729,7 +730,7 @@ class PostController extends VanillaController {
          $this->Comment = $this->DraftModel->GetID($DraftID);
       }
       
-      $this->Form->SetFormValue('Format', GetValue('Format', $this->Comment));
+      $this->Form->RemoveFormValue('Format');
       $this->View = 'editcomment';
       $this->Comment($this->Comment->DiscussionID);
    }

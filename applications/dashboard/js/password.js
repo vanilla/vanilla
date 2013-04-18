@@ -28,8 +28,11 @@ jQuery(document).ready(function($) {
    });
    
    function checkPasswordStrength(el, form) {
-      var user = form.find('input[name=Name]');
-      var pscore = gdn.password(el.val(), user.val());
+      var username = form.find('input[name=Name]').val();
+      if (!username)
+         username = gdn.definition('Username', '');
+      
+      var pscore = gdn.password(el.val(), username);
 
       // update password strength
       var PasswordStrength = form.find('.PasswordStrength');
@@ -40,25 +43,7 @@ jQuery(document).ready(function($) {
          PasswordStrength.addClass('Score-'+score);
          PasswordStrength.addClass(passfail);
 
-         var scoretext = '';
-         switch (score) {
-            case 0:
-            case 1:
-               scoretext = "Very weak";
-               break;
-            case 2:
-               scoretext = "Weak";
-               break;
-            case 3:
-               scoretext = "Ok";
-               break;
-            case 4:
-               scoretext = "Good";
-               break;
-            case 5:
-               scoretext = "Amazing";
-               break;
-         }
+         var scoretext = pscore.reason;
 
          if (PasswordStrength.find('.StrengthText'))
             PasswordStrength.find('.StrengthText').html(scoretext);

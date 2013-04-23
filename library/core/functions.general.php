@@ -954,6 +954,27 @@ if (!function_exists('fnmatch')) {
    }
 }
 
+if (!function_exists('ForceIPv4')) {
+   /**
+    * Force a string into ipv4 notation.
+    * 
+    * @param string $IP
+    * @return string
+    * @since 2.1
+    */
+   function ForceIPv4($IP) {
+      if ($IP === '::1')
+         return '127.0.0.1';
+      elseif (strpos($IP, ':')) {
+         return '0.0.0.1';
+      } elseif (strpos($IP, '.') === FALSE) {
+         return '0.0.0.1';
+      } else {
+         return substr($IP, 0, 15);
+      }
+   }
+}
+
 /**
  * If a ForeignID is longer than 32 characters, use its hash instead.
  *

@@ -2208,8 +2208,6 @@ class UserModel extends Gdn_Model {
       // Update session level information if necessary.
       if ($UserID == Gdn::Session()->UserID) {
          $IP = Gdn::Request()->IpAddress();
-         if (strpos($IP, '.') === FALSE)
-               $IP = long2ip(hexdec($IP));
          $Fields['LastIPAddress'] = $IP;
          
          if (Gdn::Session()->NewVisit()) {
@@ -2226,7 +2224,7 @@ class UserModel extends Gdn_Model {
       if (!is_array($AllIPs))
          $AllIPs = array();
       if ($IP = GetValue('InsertIPAddress', $User))
-         $AllIPs[] = $IP;
+         $AllIPs[] = ForceIPv4($IP);
       if ($IP = GetValue('LastIPAddress', $User))
          $AllIPs[] = $IP;
       $AllIPs = array_unique($AllIPs);
@@ -2240,19 +2238,18 @@ class UserModel extends Gdn_Model {
       }
       
       // See if the fields have changed.
-      $Changed = FALSE;
+      $Set = array();
       foreach ($Fields as $Name => $Value) {
          if (GetValue($Name, $User) != $Value) {
-            $Changed = TRUE;
-            break;
+            $Set[$Name] = $Value;
          }
       }
       
-      if ($Changed) {
-         $this->EventArguments['Fields'] =& $Fields;
+      if (!empty($Set)) {
+         $this->EventArguments['Fields'] =& $Set;
          $this->FireEvent('UpdateVisit');
          
-         $this->SetField($UserID, $Fields);
+         $this->SetField($UserID, $Set);
       }
       
       if ($User['LastIPAddress'] != $Fields['LastIPAddress']) {
@@ -2913,8 +2910,7 @@ class UserModel extends Gdn_Model {
          if (is_string($v)) {
             $IPAddresses = explode(',', $v);
             foreach ($IPAddresses as $i => $IPAddress) {
-               if (strpos($IPAddress, '.') === FALSE)
-                  $IPAddresses[$i] = long2ip(hexdec($IPAddress));
+               $IPAddresses[$i] = ForceIPv4($IPAddress);
             }
             SetValue('AllIPAddresses', $User, $IPAddresses);
          }
@@ -3353,16 +3349,20 @@ class UserModel extends Gdn_Model {
 
       // Convert IP addresses to long.
       if (isset($Property['AllIPAddresses'])) {
-//         foreach ($Property['AllIPAddresses'] as &$IP) {
-//            if (strpos($IP, '.') !== FALSE)
-//               $IP = dechex(ip2long($IP));
-//         }
-         $Property['AllIPAddresses'] = implode(',', $Property['AllIPAddresses']);
+         if (is_array($Property['AllIPAddresses'])) {
+            $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
+            $IPs = array_unique($IPs);
+            $Property['AllIPAddresses'] = implode(',', $IPs);
+         }
       }
+      
+      $this->DefineSchema();      
+      $Set = array_intersect_key($Property, $this->Schema->Fields());
+      self::SerializeRow($Set);
       
 		$this->SQL
             ->Update($this->Name)
-            ->Set($Property, $Value)
+            ->Set($Set)
             ->Where('UserID', $RowID)
             ->Put();
       

@@ -219,7 +219,9 @@ class Gdn_Upload extends Gdn_Pluggable {
          if (!file_exists(dirname($Target)))
             mkdir(dirname($Target));
          
-         if (!move_uploaded_file($Source, $Target))
+         if (StringBeginsWith($Source, PATH_UPLOADS))
+            rename($Source, $Target);
+         elseif (!move_uploaded_file($Source, $Target))
             throw new Exception(sprintf(T('Failed to move uploaded file to target destination (%s).'), $Target));
       }
       return $Parsed;

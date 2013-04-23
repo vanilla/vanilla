@@ -92,7 +92,7 @@ $Configuration['Garden']['Menu']['Sort']                        = array('Dashboa
 $Configuration['Garden']['InputFormatter']                      = 'Html'; // Html, BBCode, Markdown, Text
 $Configuration['Garden']['Html']['SafeStyles']                  = TRUE; // disallow style/class attributes in html to prevent click jacking
 $Configuration['Garden']['Html']['AllowedElements']             = "a, abbr, acronym, address, area, audio, b, bdi, bdo, big, blockquote, br, caption, center, cite, code, col, colgroup, dd, del, details, dfn, div, dl, dt, em, figure, figcaption, font, h1, h2, h3, h4, h5, h6, hgroup, hr, i, img, ins, kbd, li, map, mark, menu, meter, ol, p, pre, q, s, samp, small, span, strike, strong, sub, sup, summary, table, tbody, td, tfoot, th, thead, time, tr, tt, u, ul, var, video, wbr";
-$Configuration['Garden']['Search']['Mode']                      = 'matchboolean'; // matchboolean, match, boolean, like
+$Configuration['Garden']['Search']['Mode']                      = 'boolean'; // matchboolean, match, boolean, like
 $Configuration['Garden']['Theme']                               = 'default';
 $Configuration['Garden']['MobileTheme']                         = 'mobile';
 $Configuration['Garden']['Profile']['Public']                   = TRUE;
@@ -102,6 +102,7 @@ $Configuration['Garden']['VanillaUrl']                          = 'http://vanill
 $Configuration['Garden']['AllowSSL']                            = TRUE;
 $Configuration['Garden']['PrivateCommunity']                    = FALSE;
 $Configuration['Garden']['EditContentTimeout']                  = 3600; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds. 60 * 60 = 3600 (aka 1hr)
+$Configuration['Garden']['Profile']['EditPhotos']               = TRUE; // false to disable user photo editing
 $Configuration['Garden']['Profile']['EditUsernames']            = FALSE;
 $Configuration['Garden']['Modules']['ShowGuestModule']          = TRUE;
 $Configuration['Garden']['Modules']['ShowSignedInModule']       = FALSE;

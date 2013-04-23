@@ -538,7 +538,7 @@ class DiscussionsController extends VanillaController {
    /**
     * Set user preference for sorting discussions.
     */
-   public function Sort() {
+   public function Sort($Target = '') {
       if (!Gdn::Session()->IsValid())
          throw PermissionException();
          
@@ -557,7 +557,10 @@ class DiscussionsController extends VanillaController {
       // Set user pref
       Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, 'Discussions.SortField', $SortField);
       
-      // Send sorted discussions
+      if ($Target)
+         Redirect($Target);
+      
+      // Send sorted discussions.
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
       $this->Render();
    }

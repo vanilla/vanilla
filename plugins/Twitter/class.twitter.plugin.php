@@ -559,7 +559,7 @@ class TwitterPlugin extends Gdn_Plugin {
       $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
       
       $Sender->Data["Connections"][self::ProviderKey] = array(
-         'Icon' => $this->GetWebResource('icon.png'),
+         'Icon' => $this->GetWebResource('icon.png', '/'),
          'Name' => 'Twitter',
          'ProviderKey' => self::ProviderKey,
          'ConnectUrl' => '/entry/twauthorize/profile',

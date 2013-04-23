@@ -17,5 +17,7 @@ function smarty_function_breadcrumbs($Params, &$Smarty) {
    if (!is_array($Breadcrumbs))
       $Breadcrumbs = array();
    
-   return Gdn_Theme::Breadcrumbs($Breadcrumbs, GetValue('homelink', $Params, TRUE), GetValue('homeurl', $Params));
+   $Options = ArrayTranslate($Params, array('homeurl' => 'HomeUrl', 'hidelast' => 'HideLast'));
+   
+   return Gdn_Theme::Breadcrumbs($Breadcrumbs, GetValue('homelink', $Params, TRUE), $Options);
 }

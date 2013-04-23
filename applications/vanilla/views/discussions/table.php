@@ -23,6 +23,7 @@ if ($Description = $this->Data('_Description')) {
    echo $this->Data('_Description', '&#160;');
    echo '</div>';
 }
+$this->FireEvent('AfterDescription');
 
 include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 

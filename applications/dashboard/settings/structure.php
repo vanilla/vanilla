@@ -308,6 +308,7 @@ if (!$PermissionTableExists) {
    // Set initial admininstrator permissions.
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
+      'Garden.SignIn.Allow' => 1,
       'Garden.Settings.Manage' => 1,
       'Garden.Users.Add' => 1,
       'Garden.Users.Edit' => 1,

@@ -611,6 +611,8 @@ class UserModel extends Gdn_Model {
             if ($UserInserted && C('Garden.Registration.SendConnectEmail', TRUE)) {
                $Provider = $this->SQL->GetWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->FirstRow(DATASET_TYPE_ARRAY);
             }
+         } else {
+            Trace($this->Validation->ResultsText(), TRACE_ERROR);
          }
       }
       

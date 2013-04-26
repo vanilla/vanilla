@@ -24,7 +24,7 @@ $this->FireEvent('BeforeCommentForm');
          <div class="Form-Body">
             <div class="FormWrapper FormWrapper-Condensed">
                <?php
-               echo $this->Form->Open();
+               echo $this->Form->Open(array('id' => 'Form_Comment'));
                echo $this->Form->Errors();
 //               $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
                $this->FireEvent('BeforeBodyField');

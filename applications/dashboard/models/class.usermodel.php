@@ -1197,18 +1197,22 @@ class UserModel extends Gdn_Model {
       // Ask for the user. This will check cache first.
       $User = $this->GetID($UserID, DATASET_TYPE_OBJECT);
       
-      // TIM: Removed on Jul 14, 2011 for PennyArcade
-      //
-      //$this->FireEvent('SessionQuery');
-      //if (is_array($this->SessionColumns)) {
-      //   $this->SQL->Select($this->SessionColumns);
-      //}
-      //$User = $this->SQL
-      //   ->Get()
-      //   ->FirstRow();
-
-      if ($User && ($User->Permissions == '' || Gdn::Cache()->ActiveEnabled()))
-         $User->Permissions = $this->DefinePermissions($UserID);
+      // If we require confirmation and user is not confirmed
+      $ConfirmEmail = C('Garden.Registration.ConfirmEmail', false);
+      $Confirmed = GetValue('Confirmed', $User);
+      if ($ConfirmEmail && !$Confirmed) {
+         
+         // Replace permissions with those of the ConfirmEmailRole
+         $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
+         $RoleModel = new RoleModel();
+         $RolePermissions = $RoleModel->GetPermissions($ConfirmEmailRoleID);
+         $User->Permissions = $RolePermissions;
+      
+      // Otherwise normal loadings!
+      } else {
+         if ($User && ($User->Permissions == '' || Gdn::Cache()->ActiveEnabled()))
+            $User->Permissions = $this->DefinePermissions($UserID);
+      }
       
       // Remove secret info from session
       unset($User->Password, $User->HashMethod);

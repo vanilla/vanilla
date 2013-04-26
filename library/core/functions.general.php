@@ -2983,7 +2983,8 @@ if (!function_exists('Trace')) {
       if ($Value === NULL)
          return $Traces;
       
-      $Traces[] = array($Value, $Type);
+      if ($Value)
+         $Traces[] = array($Value, $Type);
    }
 }
 

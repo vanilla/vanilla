@@ -611,6 +611,8 @@ class UserModel extends Gdn_Model {
             if ($UserInserted && C('Garden.Registration.SendConnectEmail', TRUE)) {
                $Provider = $this->SQL->GetWhere('UserAuthenticationProvider', array('AuthenticationKey' => $ProviderKey))->FirstRow(DATASET_TYPE_ARRAY);
             }
+         } else {
+            Trace($this->Validation->ResultsText(), TRACE_ERROR);
          }
       }
       
@@ -1336,8 +1338,8 @@ class UserModel extends Gdn_Model {
       $FormPostValues['LastIPAddress'] = Gdn::Request()->IpAddress();
       
       // Throw an error if the registering user has an active session
-      if (Gdn::Session()->IsValid())
-         $this->Validation->AddValidationResult('Name', 'You are already registered.');
+//      if (Gdn::Session()->IsValid())
+//         $this->Validation->AddValidationResult('Name', 'You are already registered.');
 
       // Check for banning first.
       $Valid = BanModel::CheckUser($FormPostValues, NULL, TRUE);

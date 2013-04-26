@@ -853,7 +853,9 @@ jQuery(document).ready(function($) {
    if (window.location.hash == '') {
       // Jump to the hash if desired.
       if (gdn.definition('LocationHash', 0) != 0) {
-         window.location.hash = gdn.definition('LocationHash');
+         $(window).load(function() {
+            window.location.hash = gdn.definition('LocationHash');
+         });
       }
       if (gdn.definition('ScrollTo', 0) != 0) {
          var scrollTo = $(gdn.definition('ScrollTo'));

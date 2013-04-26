@@ -1334,8 +1334,8 @@ class UserModel extends Gdn_Model {
       $FormPostValues['LastIPAddress'] = Gdn::Request()->IpAddress();
       
       // Throw an error if the registering user has an active session
-      if (Gdn::Session()->IsValid())
-         $this->Validation->AddValidationResult('Name', 'You are already registered.');
+//      if (Gdn::Session()->IsValid())
+//         $this->Validation->AddValidationResult('Name', 'You are already registered.');
 
       // Check for banning first.
       $Valid = BanModel::CheckUser($FormPostValues, NULL, TRUE);

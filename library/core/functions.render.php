@@ -622,6 +622,8 @@ if (!function_exists('UserAnchor')) {
           'class' => $CssClass,
           'rel' => GetValue('Rel', $Options)
           );
+      if (isset($Options['title']))
+         $Attributes['title'] = $Options['title'];
       $UserUrl = UserUrl($User,$Px);
       return '<a href="'.htmlspecialchars(Url($UserUrl)).'"'.Attribute($Attributes).'>'.$Text.'</a>';
    }

@@ -920,6 +920,9 @@ class CommentModel extends VanillaModel {
          if (C('Vanilla.Activity.ShowCommentBody', FALSE))
             $Activity['Story'] = GetValue('Body', $Fields);
          
+         // Pass generic activity to events.
+         $this->EventArguments['Activity'] = $Activity;
+         
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
          foreach ($BookmarkData->Result() as $Bookmark) {

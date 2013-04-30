@@ -1454,13 +1454,14 @@ class DiscussionModel extends VanillaModel {
                $FormPostValues['IsNewDiscussion'] = TRUE;
                $FormPostValues['DiscussionID'] = $DiscussionID;
                
-               // Notify users of mentions.
+               // Do data prep.
 					$DiscussionName = ArrayValue('Name', $Fields, '');
                $Story = ArrayValue('Body', $Fields, '');
-               
                $NotifiedUsers = array();
+               
                $UserModel = Gdn::UserModel();
                $ActivityModel = new ActivityModel();
+               
                if (GetValue('Type', $FormPostValues))
                   $Code = 'HeadlineFormat.Discussion.'.$FormPostValues['Type'];
                else
@@ -1489,6 +1490,10 @@ class DiscussionModel extends VanillaModel {
                $Usernames = array_merge(GetMentions($DiscussionName), GetMentions($Story));
                $Usernames = array_unique($Usernames);
                
+               // Use our generic Activity for events, not mentions
+               $this->EventArguments['Activity'] = $Activity;
+               
+               // Notifications for mentions
                foreach ($Usernames as $Username) {
                   $User = $UserModel->GetByUsername($Username);
                   if (!$User)
@@ -1503,7 +1508,7 @@ class DiscussionModel extends VanillaModel {
                   $Activity['NotifyUserID'] = GetValue('UserID', $User);
                   $ActivityModel->Queue($Activity, 'Mention');
                }
-               
+                              
                // Notify everyone that has advanced notifications.
                try {
                   $Fields['DiscussionID'] = $DiscussionID;
@@ -1514,7 +1519,6 @@ class DiscussionModel extends VanillaModel {
                
                // Throw an event for users to add their own events.
                $this->EventArguments['Discussion'] = $Fields;
-               $this->EventArguments['Activity'] = $Activity;
                $this->EventArguments['NotifiedUsers'] = $NotifiedUsers;
                $this->EventArguments['MentionedUsers'] = $Usernames;
                $this->EventArguments['ActivityModel'] = $ActivityModel;

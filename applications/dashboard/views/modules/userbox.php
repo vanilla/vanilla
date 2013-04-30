@@ -8,7 +8,7 @@ if ($User):
          echo '<div class="Email">';
 
          // Only show the email address if allowed.
-         if (GetValue('UserID', $User) == Gdn::Session()->UserID || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+         if (GetValue('UserID', $User) == Gdn::Session()->UserID || Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'))
             echo GetValue('Email', $User, '');
          else
             echo '&nbsp;';

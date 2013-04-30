@@ -16,6 +16,7 @@ if ($this->Data('AllowEditing')) { ?>
             echo $this->Form->TextBox('Name');
          ?>
       </li>
+      <?php if (Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')) : ?>
       <li>
          <?php
             echo $this->Form->Label('Email', 'Email');
@@ -32,6 +33,7 @@ if ($this->Data('AllowEditing')) { ?>
             echo $this->Form->CheckBox('ShowEmail', T('Email visible to other users'), array('value' => '1'));
          ?>
       </li>
+      <?php endif; ?>
       <li>
          <?php
             echo $this->Form->CheckBox('Verified', T('This user is verified as a non-spammer'), array('value' => '1'));

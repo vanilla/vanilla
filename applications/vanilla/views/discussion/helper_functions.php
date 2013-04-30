@@ -128,7 +128,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
             $Sender->FireEvent('AfterCommentMeta'); // DEPRECATED
 
             // Include IP Address if we have permission
-            if ($Session->CheckPermission('Garden.Moderation.Manage')) 
+            if ($Session->CheckPermission('Garden.PersonalInfo.View')) 
                echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
 
             ?>

@@ -63,9 +63,9 @@ if ($Session->IsValid()):
                // echo Wrap(Wrap(T('My Account'), 'strong'), 'li');
                // echo Wrap('<hr />', 'li');
                if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
-                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Edit Profile'), 'profile/edit'), 'li');
+                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Edit Profile'), 'profile/edit', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap'));
                } else {
-                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences'), 'li');
+                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap'));
                }
                
                if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {

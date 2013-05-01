@@ -7,6 +7,7 @@ echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
 if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
 }
+$this->FireEvent('AfterPageTitle');
 
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');

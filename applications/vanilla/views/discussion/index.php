@@ -24,6 +24,7 @@ echo '<h1>'.$this->Data('Discussion.Name').'</h1>';
 echo "</div>\n\n";
 
 $this->FireEvent('AfterDiscussionTitle');
+$this->FireEvent('AfterPageTitle');
 
 // Write the initial discussion.
 if ($this->Data('Page') == 1) {

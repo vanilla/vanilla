@@ -17,7 +17,8 @@ echo $this->Form->Errors();
       ?>
    </li>
    
-   <?php if (!UserModel::NoEmail() || Gdn::Session()->CheckPermission('Garden.Users.Edit')): ?>
+   <?php if ((!UserModel::NoEmail() || Gdn::Session()->CheckPermission('Garden.Users.Edit')) 
+      && Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')): ?>
    <li class="User-Email">
       <?php
          echo $this->Form->Label('Email', 'Email');

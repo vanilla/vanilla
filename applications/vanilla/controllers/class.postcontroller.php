@@ -30,6 +30,11 @@ class PostController extends VanillaController {
    public $Uses = array('Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel');
    
    /**
+    * @var bool Whether or not to show the category dropdown.
+    */
+   public $ShowCategorySelector = TRUE;
+   
+   /**
     * General "post" form, allows posting of any kind of form. Attach to PostController_AfterFormCollection_Handler.
     * 
     * @since 2.0.0
@@ -77,7 +82,7 @@ class PostController extends VanillaController {
       $UseCategories = $this->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
       if (!$UseCategories) 
          $CategoryUrlCode = '';
-         
+      
       // Setup head
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('post.js');
@@ -130,6 +135,19 @@ class PostController extends VanillaController {
          // Permission to add
          $this->Permission('Vanilla.Discussions.Add');
          $this->Title(T('New Discussion'));
+      }
+      
+      // See if we should hide the category dropdown.
+      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID));
+      if (count($AllowedCategories) == 1) {
+         $AllowedCategory = array_pop($AllowedCategories);
+         $this->ShowCategorySelector = FALSE;
+         $this->Form->SetValue('CategoryID', $AllowedCategory['CategoryID']);
+         $this->Form->AddHidden('CategoryID');
+         
+         if ($this->Form->IsPostBack() && !$this->Form->GetFormValue('CategoryID')) {
+            $this->Form->SetFormValue('CategoryID', $AllowedCategory['CategoryID']);
+         }
       }
       
       // Set the model on the form
@@ -766,10 +784,11 @@ class PostController extends VanillaController {
 		$this->AddModule('NewDiscussionModule');
    }
    
-   /**
+      /**
     * Pre-populate the form with values from the query string.
     * 
     * @param Gdn_Form $Form
+    * @param bool $LimitCategories Whether to turn off the category dropdown if there is only one category to show.
     */
    protected function PopulateForm($Form) {
       $Get = $this->Request->Get();
@@ -781,7 +800,7 @@ class PostController extends VanillaController {
       
       if (isset($Get['category'])) {
          $Category = CategoryModel::Categories($Get['category']);
-         if ($Category)
+         if ($Category && $Category['PermsDiscussionsAdd'])
             $Form->SetValue('CategoryID', $Category['CategoryID']);
       }
    }

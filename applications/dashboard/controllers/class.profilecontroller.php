@@ -1226,7 +1226,7 @@ class ProfileController extends Gdn_Controller {
          // password in Vanilla, they will then be able to log into Vanilla using 
          // Vanilla's login form regardless of the state of their membership in the 
          // external app.
-         if (Gdn::Config('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
+         if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
             $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
                
             // No password may have been set if they have only signed in with a connect plugin

@@ -25,6 +25,10 @@ echo $this->Form->Errors();
    <?php
    $this->FireEvent('BeforeRolePermissions');
    
+   echo $this->Form->Simple(
+      $this->Data('_ExtendedFields', array()),
+      array('Wrap' => array('', '')));   
+   
    if (count($this->PermissionData) > 0) {
       if ($this->Role && $this->Role->CanSession != '1') {
          ?>

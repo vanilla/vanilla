@@ -283,6 +283,32 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
+   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL) {
+      static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
+      $Field = $Map[$Permission];
+      $DoHeadings = C('Vanilla.Categories.DoHeadings');
+      
+      $Result = array();
+      foreach (self::Categories() as $ID => $Category) {
+         if (!$Category[$Field])
+            continue;
+         
+         if ($CategoryID != $ID) {
+            if ($Category['CategoryID'] <= 0)
+               continue;
+
+            if ($Category['Archived'])
+               continue;
+            
+            if ($DoHeadings && $Permission == 'Discussions.Add' && $Category['Level'] <= 1)
+               continue;
+         }
+
+         $Result[$ID] = $Category;
+      }
+      return $Result;
+   }
+   
    /**
     * 
     * 

@@ -100,7 +100,7 @@ echo $this->Form->Errors();
    </div>
    <div class="ConfigurationHelp">
       <strong>How to set up Facebook Connect</strong>
-      <p>In order to set up Facebook Connect, you must create an "application" in Facebook at: <a href="http://www.facebook.com/developers/apps.php">http://www.facebook.com/developers/apps.php</a></p>
+      <p>In order to set up Facebook Connect, you must create an "application" in Facebook at: <a href="https://developers.facebook.com/apps">https://developers.facebook.com/apps</a></p>
       <p>
          When you create the Facebook application, you can choose what to enter in most fields, but make sure you enter the following value in the "Site Url" field:
          <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>" />

@@ -392,16 +392,26 @@ class UserModel extends Gdn_Model {
             'We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.'));
          return FALSE;
       }
+      
+      $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
 
       // Update the user's roles.
-      $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
-      $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
-      $Roles = GetValue('ConfirmedEmailRoles', $Attributes, $DefaultRoles);
-      if (in_array($ConfirmRoleID, $Roles)) {
-//         throw new Exception('Foo!!!');
-         // The user is reconfirming to the confirm email role. At least set to the default roles.
-         $Roles = $DefaultRoles;
+      $UserRoles = $this->GetRoles($UserID);
+      $UserRoleIDs = array();
+      while ($UserRole = $UserRoles->NextRow(DATASET_TYPE_ARRAY))
+         $UserRoleIDs[] = $UserRole['RoleID'];
+      
+      // Need to give replacement roles
+      if (in_array($ConfirmRoleID, $UserRoleIDs) && sizeof($UserRoleIDs) < 2) {
+         $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
+         $Roles = GetValue('ConfirmedEmailRoles', $Attributes, $DefaultRoles);
+      } else {
+         $Roles = $UserRoleIDs;
       }
+      
+      // Sanitize result roles
+      $Roles = array_diff($UserRoleIDs, array($ConfirmRoleID));
+      if (!sizeof($Roles)) $Roles = $DefaultRoles;
       
       $this->EventArguments['ConfirmUserID'] = $UserID;
       $this->EventArguments['ConfirmUserRoles'] = &$Roles;
@@ -409,8 +419,8 @@ class UserModel extends Gdn_Model {
       $this->SaveRoles($UserID, $Roles, FALSE);
       
       // Remove the email confirmation attributes.
-//      unset($Attributes['EmailKey'], $Attributes['ConfirmedEmailRoles']);
-      $this->SaveAttribute($UserID, array('EmailKey' => NULL, 'ConfirmedEmailRoles' => NULL));
+      $this->SaveAttribute($UserID, array('EmailKey' => NULL));
+      $this->SetField($UserID, 'Confirmed', 1);
       return TRUE;
    }
    
@@ -626,7 +636,7 @@ class UserModel extends Gdn_Model {
                'Permissions' => 0, 'LastIPAddress' => 0, 'AllIPAddresses' => 0, 'DateFirstVisit' => 0, 'DateLastActive' => 0, 'CountDiscussions' => 0, 'CountComments' => 0,
                'Score' => 0));
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0));
+         $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0, 'Confirmed' => 0));
       }
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          unset($Data['RankID']);
@@ -654,12 +664,7 @@ class UserModel extends Gdn_Model {
             TouchValue('Attributes', $Fields, array());
             $ConfirmationCode = RandomString(8);
             $Fields['Attributes']['EmailKey'] = $ConfirmationCode;
-
-            if (isset($Fields['Roles'])) {
-               $Fields['Attributes']['ConfirmedEmailRoles'] = $Fields['Roles'];
-            }
-
-            $Fields['Roles'] = array($ConfirmRoleID);
+            $Fields['Confirmed'] = 0;
          }
       }
 
@@ -773,6 +778,13 @@ class UserModel extends Gdn_Model {
 //         ->Join('User as i', 'u.InviteUserID = i.UserID', 'left');
    }
 
+   /**
+    * Load and compile user permissions
+    * 
+    * @param integer $UserID
+    * @param boolean $Serialize
+    * @return array
+    */
    public function DefinePermissions($UserID, $Serialize = TRUE) {
       if (Gdn::Cache()->ActiveEnabled()) {
          $PermissionsIncrement = $this->GetPermissionsIncrement();
@@ -787,35 +799,7 @@ class UserModel extends Gdn_Model {
       }
       
       $Data = Gdn::PermissionModel()->CachePermissions($UserID);
-      
-      $Permissions = array();
-      foreach($Data as $i => $Row) {
-         $JunctionTable = $Row['JunctionTable'];
-         $JunctionColumn = $Row['JunctionColumn'];
-         $JunctionID = $Row['JunctionID'];
-         unset($Row['JunctionColumn'], $Row['JunctionColumn'], $Row['JunctionID'], $Row['RoleID'], $Row['PermissionID']);
-         
-         foreach($Row as $PermissionName => $Value) {
-            if($Value == 0)
-               continue;
-            
-            if(is_numeric($JunctionID) && $JunctionID !== NULL) {
-               if (!array_key_exists($PermissionName, $Permissions))
-                  $Permissions[$PermissionName] = array();
-                  
-               if (!is_array($Permissions[$PermissionName]))
-                  $Permissions[$PermissionName] = array();
-                  
-               $Permissions[$PermissionName][] = $JunctionID;
-            } else {
-               $Permissions[] = $PermissionName;
-            }
-         }
-      }
-      
-      // Throw a fatal error if the user has no permissions
-      // if (count($Permissions) == 0)
-      //    trigger_error(ErrorMessage('The requested user ('.$this->UserID.') has no permissions.', 'Session', 'Start'), E_USER_ERROR);
+      $Permissions = UserModel::CompilePermissions($Data);
 
       $PermissionsSerialized = NULL;
       if (Gdn::Cache()->ActiveEnabled()) {
@@ -833,6 +817,41 @@ class UserModel extends Gdn_Model {
       return $Serialize ? $PermissionsSerialized : $Permissions;
    }
 
+   /**
+    * Take raw permission definitions and create
+    * 
+    * @param array $Permissions
+    * @return array Compiled permissions
+    */
+   public static function CompilePermissions($Permissions) {
+      $Compiled = array();
+      foreach ($Permissions as $i => $Row) {
+         $JunctionID = array_key_exists('JunctionID', $Row) ? $Row['JunctionID'] : null;
+         //$JunctionTable = array_key_exists('JunctionColumn', $Row) ? $Row['JunctionTable'] : null;
+         //$JunctionColumn = array_key_exists('JunctionColumn', $Row) ? $Row['JunctionColumn'] : null;
+         unset($Row['JunctionColumn'], $Row['JunctionColumn'], $Row['JunctionID'], $Row['RoleID'], $Row['PermissionID']);
+         
+         foreach ($Row as $PermissionName => $Value) {
+            if ($Value == 0)
+               continue;
+            
+            if (is_numeric($JunctionID) && $JunctionID !== NULL) {
+               if (!array_key_exists($PermissionName, $Compiled))
+                  $Compiled[$PermissionName] = array();
+                  
+               if (!is_array($Compiled[$PermissionName]))
+                  $Compiled[$PermissionName] = array();
+                  
+               $Compiled[$PermissionName][] = $JunctionID;
+            } else {
+               $Compiled[] = $PermissionName;
+            }
+         }
+      }
+      
+      return $Compiled;
+   }
+   
    /**
     * Default Gdn_Model::Get() behavior.
     * 
@@ -1206,7 +1225,13 @@ class UserModel extends Gdn_Model {
          $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
          $RoleModel = new RoleModel();
          $RolePermissions = $RoleModel->GetPermissions($ConfirmEmailRoleID);
-         $User->Permissions = $RolePermissions;
+         $Permissions = UserModel::CompilePermissions($RolePermissions);
+         
+         // Ensure Confirm Email role can always sign in
+         if (!in_array('Garden.SignIn.Allow', $Permissions))
+            $Permissions[] = 'Garden.SignIn.Allow';
+         
+         $User->Permissions = $Permissions;
       
       // Otherwise normal loadings!
       } else {
@@ -1450,20 +1475,27 @@ class UserModel extends Gdn_Model {
          $this->Validation->ApplyRule('RoleID', 'OneOrMoreArrayItemRequired');
       }
 
-      // Make sure that the checkbox val for email is saved as the appropriate enum
+      // Make sure that checkbox vals are saved as the appropriate value
+      
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
       
       if (array_key_exists('Banned', $FormPostValues))
          $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
+      
+      if (array_key_exists('Confirmed', $FormPostValues))
+         $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
 
       // Validate the form posted values
+      
       $UserID = GetValue('UserID', $FormPostValues);
+      $User = array();
       $Insert = $UserID > 0 ? FALSE : TRUE;
       if ($Insert) {
          $this->AddInsertFields($FormPostValues);
       } else {
          $this->AddUpdateFields($FormPostValues);
+         $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
       }
       
       $this->EventArguments['FormPostValues'] = $FormPostValues;
@@ -1494,7 +1526,7 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         if (in_array('AllIPAddresses', $Fields) && is_array($Fields)) {
+         if (in_array('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
             $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
          }
          
@@ -1507,33 +1539,35 @@ class UserModel extends Gdn_Model {
          
          // Check for email confirmation.
          if (self::RequireConfirmEmail() && !GetValue('NoConfirmEmail', $Settings)) {
-            if (isset($Fields['Email']) && $UserID == Gdn::Session()->UserID && $Fields['Email'] != Gdn::Session()->User->Email && !Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
-               $User = Gdn::Session()->User;
-               $Attributes = Gdn::Session()->User->Attributes;
+            
+            // Email address has changed
+            if (isset($Fields['Email']) && (
+                     array_key_exists('Confirmed', $Fields) &&
+                     $Fields['Confirmed'] == 0 || 
+                  (
+                     $UserID == Gdn::Session()->UserID && 
+                     $Fields['Email'] != Gdn::Session()->User->Email && 
+                     !Gdn::Session()->CheckPermission('Garden.Users.Edit')
+                  )
+               )) {
+               
+               $Attributes = GetValue('Attributes', Gdn::Session()->User);
+               if (is_string($Attributes)) $Attributes = @unserialize($Attributes);
                
                $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
                if (RoleModel::Roles($ConfirmEmailRoleID)) {
                   // The confirm email role is set and it exists so go ahead with the email confirmation.
-                  $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
-                  
-                  if (isset($Attributes['ConfirmedEmailRoles']) && !in_array($ConfirmEmailRoleID, $Attributes['ConfirmedEmailRoles']))
-                     $ConfirmedEmailRoles = $Attributes['ConfirmedEmailRoles'];
-                  elseif ($RoleIDs)
-                     $ConfirmedEmailRoles = $RoleIDs;
-                  else
-                     $ConfirmedEmailRoles = ConsolidateArrayValuesByKey($this->GetRoles($UserID), 'RoleID');
-                  $Attributes['ConfirmedEmailRoles'] = $ConfirmedEmailRoles;
-
-                  $RoleIDs = (array)C('Garden.Registration.ConfirmEmailRole');
-
-                  $SaveRoles = TRUE;
+                  $NewKey = RandomString(8);
+                  $EmailKey = TouchValue('EmailKey', $Attributes, $NewKey);
                   $Fields['Attributes'] = serialize($Attributes);
+                  $Fields['Confirmed'] = 0;
                }
-            } 
+            }
          }
          
          $this->EventArguments['Fields'] = $Fields;
          $this->FireEvent('BeforeSave');
+         $User = array_merge($User, $Fields);
          
          // Check the validation results again in case something was added during the BeforeSave event.
          if (count($this->Validation->Results()) == 0) {
@@ -1551,6 +1585,7 @@ class UserModel extends Gdn_Model {
                   $Fields['Attributes'] = serialize($Fields['Attributes']);
                }
    
+               // Perform save DB operation
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
    
                // Record activity if the person changed his/her photo.
@@ -1630,7 +1665,8 @@ class UserModel extends Gdn_Model {
 
             // Send the confirmation email.
             if (isset($EmailKey)) {
-               $this->SendEmailConfirmationEmail((array)Gdn::Session()->User);
+               if (!is_array($User)) $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+               $this->SendEmailConfirmationEmail($User, true);
             }
 
             $this->EventArguments['UserID'] = $UserID;
@@ -1639,7 +1675,6 @@ class UserModel extends Gdn_Model {
             $UserID = FALSE;
          }
       } else {
-//         decho($this->Validation->ResultsText());
          $UserID = FALSE;
       }
       
@@ -2965,14 +3000,14 @@ class UserModel extends Gdn_Model {
       return $Result;
    }
 
-   public function SendEmailConfirmationEmail($User = NULL) {
+   public function SendEmailConfirmationEmail($User = NULL, $Force = FALSE) {
+      
       if (!$User)
          $User = Gdn::Session()->User;
       elseif (is_numeric($User))
          $User = $this->GetID($User);
-      elseif (is_string($User)) {
+      elseif (is_string($User))
          $User = $this->GetByEmail($User);
-      }
       
       if (!$User)
          throw NotFoundException('User');
@@ -2983,15 +3018,13 @@ class UserModel extends Gdn_Model {
          $User['Attributes'] = @unserialize($User['Attributes']);
 
       // Make sure the user needs email confirmation.
-      $Roles = $this->GetRoles($User['UserID']);
-      $Roles = ConsolidateArrayValuesByKey($Roles, 'RoleID');
-      if (!in_array(C('Garden.Registration.ConfirmEmailRole'), $Roles)) {
+      if ($User['Confirmed'] && !$Force) {
          $this->Validation->AddValidationResult('Role', 'Your email doesn\'t need confirmation.');
          
          // Remove the email key.
          if (isset($User['Attributes']['EmailKey'])) {
             unset($User['Attributes']['EmailKey']);
-            $this->SaveAttribute($User['UserID'], $User['Attribute']);
+            $this->SaveAttribute($User['UserID'], $User['Attributes']);
          }
 
          return;

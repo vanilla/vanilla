@@ -10,35 +10,52 @@ echo $this->Form->Errors();
          echo $this->Form->Label('Username', 'Name');
          $Attributes = array();
          
-         if (!$this->CanEditUsername) {
+         if (!$this->Data('_CanEditUsername')) {
             $Attributes['disabled'] = 'disabled';
          }
          echo $this->Form->TextBox('Name', $Attributes);
       ?>
    </li>
    
-   <?php if ((!UserModel::NoEmail() || Gdn::Session()->CheckPermission('Garden.Users.Edit')) 
-      && Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')): ?>
    <li class="User-Email">
       <?php
          echo $this->Form->Label('Email', 'Email');
          
-         if (UserModel::NoEmail()) {
+         if (!$this->Data('_CanEditEmail') && UserModel::NoEmail()) {
+            
             echo '<div class="Gloss">',
                T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
                '</div>';
-         }
+            
+         } else {
          
-         $Attributes2 = array();
-         if (!$this->CanEditEmail) {
-            $Attributes2['disabled'] = 'disabled';
+            $EmailAttributes = array();
+            if (!$this->Data('_CanEditEmail')) {
+               $EmailAttributes['disabled'] = 'disabled';
+            }
+            
+            // Email confirmation
+            if (!$this->Data('_EmailConfirmed'))
+               $EmailAttributes['class'] = 'InputBox Unconfirmed';
+            
+            echo $this->Form->TextBox('Email', $EmailAttributes);
+            
          }
-         echo $this->Form->TextBox('Email', $Attributes2);
       ?>
    </li>
+   
+   <?php if ($this->Data('_CanEditEmail')): ?>
    <li class="User-ShowEmail">
       <?php
          echo $this->Form->CheckBox('ShowEmail', T('Allow other members to see your email?'), array('value' => '1'));
+      ?>
+   </li>
+   <?php endif ?>
+   
+   <?php if ($this->Data('_CanConfirmEmail')): ?>
+   <li class="User-ConfirmEmail">
+      <?php
+         echo $this->Form->CheckBox('ConfirmEmail', T("Confirmed email address"), array('value' => '1'));
       ?>
    </li>
    <?php endif ?>

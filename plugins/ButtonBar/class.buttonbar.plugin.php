@@ -51,6 +51,12 @@ class ButtonBarPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('buttonbar.js', 'plugins/ButtonBar');
       $Sender->AddJsFile('jquery.hotkeys.js', 'plugins/ButtonBar');
       
+      $Sender->AddDefinition('ButtonBarLinkUrl', T('ButtonBar.LinkUrlText', 'Enter your URL:'));
+      $Sender->AddDefinition('ButtonBarImageUrl', T('ButtonBar.ImageUrlText', 'Enter image URL:'));
+      $Sender->AddDefinition('ButtonBarBBCodeHelpText', T('ButtonBar.BBCodeHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
+      $Sender->AddDefinition('ButtonBarHtmlHelpText', T('ButtonBar.HtmlHelp', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
+      $Sender->AddDefinition('ButtonBarMarkdownHelpText', T('ButtonBar.MarkdownHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
+      
       $Sender->AddDefinition('InputFormat', $Formatter);
    }
    

@@ -119,7 +119,7 @@ class ProfileController extends Gdn_Controller {
       $UserID = $this->User->UserID;
       $Username = $this->User->Name;
       
-      $this->_SetBreadcrumbs(T('Activity'), '/profile/activity');
+      $this->_SetBreadcrumbs(T('Activity'), UserUrl($this->User, '', 'activity'));
       
       $this->SetTabView('Activity');
       $Comment = $this->Form->GetFormValue('Comment');
@@ -211,7 +211,7 @@ class ProfileController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $UserID = GetValueR('User.UserID', $this);
-      $this->_SetBreadcrumbs(T('Social'), '/profile/connections');
+      $this->_SetBreadcrumbs(T('Social'), UserUrl($this->User, '', 'connections'));
       
       $PModel = new Gdn_AuthenticationProviderModel();
       $Providers = $PModel->GetProviders();
@@ -703,7 +703,7 @@ class ProfileController extends Gdn_Controller {
          $this->DeliveryType(DELIVERY_TYPE_ALL);
 
       $this->Title(T('Change Picture'));
-      $this->_SetBreadcrumbs(T('Change My Picture'), '/profile/picture');
+      $this->_SetBreadcrumbs(T('Change My Picture'), UserUrl($this->User, '', 'picture'));
       $this->Render();
    }
    

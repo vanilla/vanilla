@@ -364,7 +364,7 @@ class VanillaHooks implements Gdn_IPlugin {
 		$View = $Sender->View;
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username, $UserID);
-      $Sender->_SetBreadcrumbs(T('Comments'), '/profile/comments');
+      $Sender->_SetBreadcrumbs(T('Comments'), UserUrl($Sender->User, '', 'comments'));
       $Sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
       
       $PageSize = Gdn::Config('Vanilla.Discussions.PerPage', 30);
@@ -422,7 +422,7 @@ class VanillaHooks implements Gdn_IPlugin {
 		
       // Tell the ProfileController what tab to load
 		$Sender->GetUserInfo($UserReference, $Username, $UserID);
-      $Sender->_SetBreadcrumbs(T('Discussions'), '/profile/discussions');
+      $Sender->_SetBreadcrumbs(T('Discussions'), UserUrl($Sender->User, '', 'discussions'));
       $Sender->SetTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
 		$Sender->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
       

@@ -310,18 +310,20 @@ jQuery(document).ready(function($) {
       },
       
       PrepareBBCode: function(ButtonBarObj, TextArea) {
+         var HelpText = gdn.definition('ButtonBarBBCodeHelpText', 'ButtonBar.BBCodeHelp');
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.')
+            .html(HelpText)
             .insertAfter(TextArea);
       },
       
       PrepareHtml: function(ButtonBarObj, TextArea) {
          ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
          
+         var HelpText = gdn.definition('ButtonBarHtmlHelpText', 'ButtonBar.HtmlHelp');
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.')
+            .html(HelpText)
             .insertAfter(TextArea);
       },
       
@@ -329,9 +331,10 @@ jQuery(document).ready(function($) {
          ButtonBar.DisableButton(ButtonBarObj, 'underline');
          ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
          
+         var HelpText = gdn.definition('ButtonBarMarkdownHelpText', 'ButtonBar.MarkdownHelp');
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.')
+            .html(HelpText)
             .insertAfter(TextArea);
       },
       
@@ -382,7 +385,8 @@ jQuery(document).ready(function($) {
             case 'image':
                var thisOpts = $.extend(bbcodeOpts,{});
                
-               NewURL = prompt("Enter image URL:");
+               var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
+               NewURL = prompt(PromptText);
                thisOpts.replace = NewURL; 
                            
                $(TextArea).insertRoundTag('img',thisOpts);
@@ -394,10 +398,11 @@ jQuery(document).ready(function($) {
                var hasSelection = $(TextArea).hasSelection();
                console.log("sel: "+hasSelection);
                var NewURL = '';
+               var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
                if (hasSelection !== false)
                   NewURL = hasSelection;
                else
-                  NewURL = prompt("Enter your URL:",'http://');
+                  NewURL = prompt(PromptText,'http://');
                
                thisOpts.shortprop = NewURL;
                
@@ -415,7 +420,8 @@ jQuery(document).ready(function($) {
             case 'url':
                var thisOpts = $.extend(bbcodeOpts, {});
                
-               var NewURL = prompt("Enter your URL:",'http://');
+               var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+               var NewURL = prompt(PromptText,'http://');
                var GuessText = NewURL.replace('http://','').replace('www.','');
                thisOpts.shortprop = NewURL;
                
@@ -475,7 +481,8 @@ jQuery(document).ready(function($) {
                   closetype: 'short'
                });
                
-               NewURL = prompt("Enter image URL:");
+               var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
+               NewURL = prompt(PromptText);
                urlOpts.src = NewURL;         
                
                $(TextArea).insertRoundTag('img',thisOpts,urlOpts);
@@ -489,11 +496,12 @@ jQuery(document).ready(function($) {
                
                var hasSelection = $(TextArea).hasSelection();
                var NewURL = '';
+               var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
                if (hasSelection !== false) {
                   NewURL = hasSelection;
                   delete thisOpts.center;
                } else
-                  NewURL = prompt("Enter your URL:",'http://');
+                  NewURL = prompt(PromptText,'http://');
                
                urlOpts.href = NewURL;
                
@@ -512,7 +520,8 @@ jQuery(document).ready(function($) {
                var urlOpts = {};
                var thisOpts = $.extend(htmlOpts, {});
                
-               var NewURL = prompt("Enter your URL:",'http://');
+               var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+               var NewURL = prompt(PromptText,'http://');
                var GuessText = NewURL.replace('http://','').replace('www.','');
                urlOpts.href = NewURL;
                
@@ -577,7 +586,8 @@ jQuery(document).ready(function($) {
                   opener:'',
                   closer:''
                });
-               var NewURL = prompt("Enter image URL:",'');
+               var PromptText = gdn.definition('ButtonBarImageUrl', 'ButtonBar.ImageUrlText');
+               var NewURL = prompt(PromptText,'');
                thisOpts.prepend = NewURL;
                $(TextArea).insertRoundTag('',thisOpts);
                break;
@@ -589,10 +599,11 @@ jQuery(document).ready(function($) {
                });
                
                var hasSelection = $(TextArea).hasSelection();
+               var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
                if (hasSelection !== false)
                   var NewURL = hasSelection;
                else {
-                  var NewURL = prompt("Enter your URL:",'http://');
+                  var NewURL = prompt(PromptText,'http://');
                   thisOpts.prepend = NewURL;
                }
                
@@ -619,7 +630,8 @@ jQuery(document).ready(function($) {
                break;
 
             case 'url':
-               var NewURL = prompt("Enter your URL:",'http://');
+               var PromptText = gdn.definition('ButtonBarLinkUrl', 'ButtonBar.LinkUrlText');
+               var NewURL = prompt(PromptText,'http://');
                var GuessText = NewURL.replace('http://','').replace('www.','');
                
                var CurrentSelectText = GuessText;

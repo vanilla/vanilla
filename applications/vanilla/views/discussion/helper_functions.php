@@ -510,8 +510,9 @@ if (!function_exists('FormatMeAction')):
          return;
       
       // Maxlength (don't let people blow up the forum)
+      $Comment->Body = substr($Comment->Body, 4);
       $Maxlength = C('Vanilla.MeAction.MaxLength', 100);
-      $Body = Gdn_Format::PlainText(substr($Comment->Body, 4));
+      $Body = FormatBody($Comment);
       if (strlen($Body) > $Maxlength)
          $Body = substr($Body, 0, $Maxlength).'...';
       

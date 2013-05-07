@@ -37,23 +37,11 @@ class DashboardHooks implements Gdn_IPlugin {
          }
       }
 
-      if ($Session->IsValid() && $EmailKey = Gdn::Session()->GetAttribute('EmailKey')) {
-         $NotifyEmailConfirm = TRUE;
+      
+      if ($Session->IsValid()) {
+         $Confirmed = (bool)GetValue('Confirmed', Gdn::Session()->User, null);
          
-         // If this user was manually moved out of the confirmation role, get rid of their 'awaiting confirmation' flag
-         $ConfirmEmailRole = C('Garden.Registration.ConfirmEmailRole', FALSE);
-         
-         $UserRoles = array();
-         $RoleData = Gdn::UserModel()->GetRoles($Session->UserID);
-         if ($RoleData !== FALSE && $RoleData->NumRows() > 0) 
-            $UserRoles = ConsolidateArrayValuesByKey($RoleData->Result(DATASET_TYPE_ARRAY), 'RoleID','Name');
-         
-         if ($ConfirmEmailRole !== FALSE && !array_key_exists($ConfirmEmailRole, $UserRoles)) {
-            Gdn::UserModel()->SaveAttribute($Session->UserID, "EmailKey", NULL);
-            $NotifyEmailConfirm = FALSE;
-         }
-         
-         if ($NotifyEmailConfirm) {
+         if (!$Confirmed) {
             $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
             $Sender->InformMessage($Message, '');
          }

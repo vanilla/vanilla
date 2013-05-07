@@ -96,8 +96,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $this->IsPostBack = $Sender->Form->IsPostBack();
       
       $this->UserFields = array();
-      if (is_object($Sender->User))
-         $this->UserFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
+      if ($Sender->Data('User'))
+         $this->UserFields = Gdn::UserModel()->GetMeta($Sender->Data('User.UserID'), 'Profile.%', 'Profile.');
       
       include($this->GetView('profilefields.php'));
    }

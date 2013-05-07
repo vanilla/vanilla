@@ -54,6 +54,7 @@ $Construct->Table('User');
 
 $PhotoIDExists = $Construct->ColumnExists('PhotoID');
 $PhotoExists = $Construct->ColumnExists('Photo');
+$ConfirmedExists = $Construct->ColumnExists('Confirmed');
 
 $Construct
 	->PrimaryKey('UserID')
@@ -88,12 +89,30 @@ $Construct
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
-   ->Column('Confirmed', 'tinyint(1)', '0') // 1 means email confirmed, otherwise not confirmed
+   ->Column('Confirmed', 'tinyint(1)', '1') // 1 means email confirmed, otherwise not confirmed
    ->Column('Verified', 'tinyint(1)', '0') // 1 means verified (non spammer), otherwise not verified
    ->Column('Banned', 'tinyint(1)', '0') // 1 means banned, otherwise not banned
    ->Column('Deleted', 'tinyint(1)', '0')
    ->Column('Points', 'int', 0)
    ->Set($Explicit, $Drop);
+
+// Modify all users with ConfirmEmail role to be unconfirmed
+if (!$ConfirmedExists) {
+   $ConfirmEmail = C('Garden.Registration.ConfirmEmail', false);
+   if ($ConfirmEmail) {
+      $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
+      
+      // Select unconfirmed users
+      $Users = Gdn::SQL()->Select('UserID')->From('UserRole')->Where('RoleID', $ConfirmEmailRoleID)->Get();
+      $UserIDs = array();
+      while ($User = $Users->NextRow(DATASET_TYPE_ARRAY))
+         $UserIDs[] = $User['UserID'];
+      
+      // Update
+      Gdn::SQL()->Update('User')->Set('Confirmed', 0)->WhereIn('UserID', $UserIDs);
+      Gdn::SQL()->Delete('UserRole')->Where('RoleID', $ConfirmEmailRoleID)->WhereIn('UserID', $UserIDs);
+   }
+}
 
 // Make sure the system user is okay.
 $SystemUserID = C('Garden.SystemUserID');

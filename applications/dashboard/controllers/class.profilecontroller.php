@@ -303,23 +303,35 @@ class ProfileController extends Gdn_Controller {
       $UserID = GetValueR('User.UserID', $this);
       $Settings = array();
       
-      // Decide if they have ability to edit the username
-      $this->CanEditUsername = C("Garden.Profile.EditUsernames");
-      
-      if ($this->CanEditUsername < 0)
-         $this->CanEditUsername = FALSE;
-      else
-         $this->CanEditUsername = $this->CanEditUsername || Gdn::Session()->CheckPermission('Garden.Users.Edit');
-      
-      $this->CanEditEmail = C('Garden.Profile.EditEmails', TRUE);
-      
-      if ($this->CanEditEmail < 0)
-         $this->CanEditEmail = FALSE;
-      else
-         $this->CanEditEmail = $this->CanEditEmail || Gdn::Session()->CheckPermission('Garden.Users.Edit');
-         
+      // Set up form
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       $this->Form->SetModel(Gdn::UserModel());
+      $this->Form->SetData($User);
+      
+      // Decide if they have ability to edit the username
+      $CanEditUsername = (bool)C("Garden.Profile.EditUsernames") || Gdn::Session()->CheckPermission('Garden.Users.Edit');
+      $this->SetData('_CanEditUsername', $CanEditUsername);
+      
+      // Decide if they have ability to edit the email
+      $CanEditEmail = (
+              (bool)C('Garden.Profile.EditEmails', TRUE) && 
+              !UserModel::NoEmail() && 
+              $UserID == Gdn::Session()->UserID
+           ) || (
+              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
+              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')
+           );
+      $this->SetData('_CanEditEmail', $CanEditEmail);
+      
+      // Decide if they have ability to confirm users
+      $Confirmed = (bool)GetValueR('User.Confirmed', $this);
+      $CanConfirmEmail = (
+              UserModel::RequireConfirmEmail() &&
+              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
+              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'));
+      $this->SetData('_CanConfirmEmail', $CanConfirmEmail);
+      $this->SetData('_EmailConfirmed', $Confirmed);
+      $this->Form->SetValue('ConfirmEmail', (int)$Confirmed);
       
       // Define gender dropdown options
       $this->GenderOptions = array(
@@ -328,15 +340,13 @@ class ProfileController extends Gdn_Controller {
          'f' => T('Female')
       );
       
-      $this->Form->SetData($User);
-      
       $this->FireEvent('BeforeEdit');
       
       // If seeing the form for the first time...
       if ($this->Form->IsPostBack()) {
          $this->Form->SetFormValue('UserID', $UserID);
          
-         if (!$this->CanEditUsername)
+         if (!$CanEditUsername)
             $this->Form->SetFormValue("Name", $User['Name']);
          else {
             $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
@@ -379,6 +389,13 @@ class ProfileController extends Gdn_Controller {
             }
          }
          
+         // Allow mods to confirm emails
+         $this->Form->RemoveFormValue('Confirmed');
+         $Confirmation = $this->Form->GetFormValue('ConfirmEmail', null);
+         $Confirmation = !is_null($Confirmation) ? (bool)$Confirmation : null;
+         
+         if ($CanConfirmEmail && is_bool($Confirmation))
+            $this->Form->SetFormValue('Confirmed', (int)$Confirmation);
          
          if ($this->Form->Save($Settings) !== FALSE) {
             $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
@@ -387,7 +404,7 @@ class ProfileController extends Gdn_Controller {
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
          }
          
-         if (!$this->CanEditEmail)
+         if (!$CanEditEmail)
             $this->Form->SetFormValue("Email", $User['Email']);
          
       }

@@ -195,8 +195,6 @@ class SettingsController extends DashboardController {
          // Apply the config settings to the form.
          $this->Form->SetData($ConfigurationModel->Data);
       } else {
-         // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
          $SaveData = array();
          if ($this->Form->Save() !== FALSE) {
             $Upload = new Gdn_Upload();

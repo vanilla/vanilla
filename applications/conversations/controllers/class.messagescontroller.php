@@ -346,6 +346,8 @@ class MessagesController extends ConversationsController {
          $Limit
       );
 
+      $this->SetData('Messages', $this->MessageData);
+      
       // Figure out who's participating.
       $ParticipantTitle = ConversationModel::ParticipantTitle($this->Conversation, TRUE);
       $this->Participants = $ParticipantTitle;

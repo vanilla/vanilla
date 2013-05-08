@@ -823,6 +823,27 @@ if (!function_exists('SignOutUrl')) {
    }
 }
 
+if (!function_exists('SocialSignInButton')) {
+   function SocialSignInButton($Name, $Url, $Type = 'button', $Attributes = array()) {
+      TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
+      $Title = $Attributes['title'];
+      
+      switch ($Type) {
+         case 'icon':
+            $Result = Anchor('<span class="Icon"></span>',
+               $Url, 'SocialIcon SocialIcon-'.$Name, $Attributes);
+            break;
+         case 'button':
+         default:
+            $Result = Anchor('<span class="Icon"></span><span class="Text">'.$Title.'</span>',
+               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText', $Attributes);
+            break;
+      }
+      
+      return $Result;
+   }
+}
+
 if (!function_exists('Sprite')) {
 	function Sprite($Name, $Type = 'Sprite') {
 		return '<span class="'.$Type.' '.$Name.'"></span>';

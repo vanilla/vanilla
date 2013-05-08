@@ -316,6 +316,8 @@ class MessagesController extends ConversationsController {
          $this->Offset,
          $Limit
       );
+
+      $this->SetData('Messages', $this->MessageData);
       
       // Figure out who's participating.
       $this->Participants = '';

@@ -76,8 +76,8 @@ echo $Form->Errors();
    <li>
       <?php
          echo $Form->Label('Conditions', '');
-         echo '<div class="Info2">', T('Limit the pocket to one or more roles or permissions.'), '</div>';
-         $this->ConditionModule->Render();
+         // echo '<div class="Info2">', T('Limit the pocket to one or more roles or permissions.'), '</div>';
+         // $this->ConditionModule->Render();
          
          echo '<div class="Info2">', T('Limit the display of this pocket to "mobile only".'), '</div>';
          echo $Form->CheckBox("MobileOnly", T("Only display on mobile browsers."));

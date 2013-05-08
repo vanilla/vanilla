@@ -1,6 +1,6 @@
 /*
  * jQuery Plugin: Tokenizing Autocomplete Text Entry
- * Version 1.1
+ * Version 1.1p1
  *
  * Copyright (c) 2009 James Smith (http://loopj.com)
  * Licensed jointly under the GPL and MIT licenses,
@@ -285,7 +285,10 @@ $.TokenList = function (input, settings) {
             for(var i in li_data) {
                 if (li_data[i].trim() != '') {
                     token_count++;
-                    var this_token = $("<li><p>"+li_data[i]+"</p> </li>")
+                    var this_token = $("<li><p></p> </li>")
+                        .find('p')
+                        .text(li_data[i])
+                        .closest('li')
                         .addClass(settings.classes.token)
                         .insertBefore(input_token);
     
@@ -338,7 +341,10 @@ $.TokenList = function (input, settings) {
 
     // Inner function to a token to the list
     function insert_token(id, value) {
-      var this_token = $("<li><p>"+ value +"</p> </li>")
+      var this_token = $("<li><p></p> </li>")
+      .find('p')
+      .text(value)
+      .closest('li')
       .addClass(settings.classes.token)
       .insertBefore(input_token);
 
@@ -506,7 +512,9 @@ $.TokenList = function (input, settings) {
 
             for(var i in results) {
                 if (results.hasOwnProperty(i)) {
-                    var this_li = $("<li>"+highlight_term(results[i].name, query)+"</li>")
+                    var $tmp = $('span').text(results[i].name);
+                    var this_li = $("<li></li>")
+                                      .html(highlight_term($tmp.html(), query))
                                       .appendTo(dropdown_ul);
 
                     if(i%2) {

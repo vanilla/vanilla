@@ -110,7 +110,7 @@ if (!$ConfirmedExists) {
       
       // Update
       Gdn::SQL()->Update('User')->Set('Confirmed', 0)->WhereIn('UserID', $UserIDs);
-      Gdn::SQL()->Delete('UserRole')->Where('RoleID', $ConfirmEmailRoleID)->WhereIn('UserID', $UserIDs);
+      Gdn::SQL()->Delete('UserRole', array('RoleID' => $ConfirmEmailRoleID, 'UserID' => $UserIDs));
    }
 }
 

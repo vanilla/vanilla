@@ -274,6 +274,82 @@ class EntryController extends Gdn_Controller {
       $this->SetData('SendWhere', "/entry/auth/{$AuthenticationSchemeAlias}");
       $this->Render();
    }
+   
+   /**
+    * Check the default provider to see if it overrides one of the entry methods and then redirect.
+    * @param string $Type One of the following.
+    *  - SignIn
+    *  - Register
+    *  - SignOut (not complete)
+    */
+   protected function CheckOverride($Type, $Target, $TransientKey = NULL) {
+      if (!$this->Request->Get('override', TRUE))
+         return;
+      
+      $Provider = Gdn_AuthenticationProviderModel::GetDefault();
+      if (!$Provider)
+         return;
+      
+      $Url = $Provider[$Type.'Url'];
+      if ($Url) {
+         switch ($Type) {
+            case 'Register':
+            case 'SignIn':
+               // When the other page comes back it needs to go through /sso to force a sso check.
+               $Target = '/sso?target='.urlencode($Target);
+               break;
+            case 'SignOut':
+               $Cookie = C('Garden.Cookie.Name');
+               if (strpos($Url, '?') === FALSE)
+                  $Url .= '?vfcookie='.urlencode($Cookie);
+               else
+                  $Url .= '&vfcookie='.urlencode($Cookie);
+               
+               // Check to sign out here.
+               $SignedOut = !Gdn::Session()->IsValid();
+               if (!$SignedOut && (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->IsPostBack())) {
+                  Gdn::Session()->End();
+                  $SignedOut = TRUE;
+               }
+               
+               // Sign out is a bit of a tricky thing so we configure the way it works.
+               $SignoutType = C('Garden.SSO.Signout');
+               switch ($SignoutType) {
+                  case 'redirect-only':
+                     // Just redirect to the url.
+                     break;
+                  case 'post-only':
+                     $this->SetData('Method', 'POST');
+                     break;
+                  case 'post':
+                     // Post to the url after signing out here.
+                     if (!$SignedOut)
+                        return;
+                     $this->SetData('Method', 'POST');
+                     break;
+                  case 'redirect':
+                  default:
+                     if (!$SignedOut)
+                        return;
+                     break;
+               }
+               
+               break;
+            default:
+               throw new Exception("Unknown entry type $Type.");
+         }
+         
+         $Url = str_ireplace('{target}', rawurlencode(Url($Target, TRUE)), $Url);
+         
+         if ($this->DeliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->Data('Method'), 'POST') != 0)
+            Redirect($Url, 302);
+         else {
+            $this->SetData('Url', $Url);
+            $this->Render('Redirect', 'Utility');
+            die();
+         }
+      }
+   }
 
    /**
     * Connect the user with an external source.
@@ -702,6 +778,8 @@ class EntryController extends Gdn_Controller {
     * @param string $TransientKey (default: "")
     */
    public function SignOut($TransientKey = "") {
+      $this->CheckOverride('SignOut', $this->Target(), $TransientKey);
+      
       if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->IsPostBack()) {
          $User = Gdn::Session()->User;
          
@@ -736,6 +814,9 @@ class EntryController extends Gdn_Controller {
     * @return string Rendered XHTML template.
     */
    public function SignIn($Method = FALSE, $Arg1 = FALSE) {
+      if (!$this->Request->IsPostBack())
+         $this->CheckOverride('SignIn', $this->Target());
+      
       Gdn::Session()->EnsureTransientKey();
       
       $this->AddJsFile('entry.js');
@@ -1082,6 +1163,9 @@ class EntryController extends Gdn_Controller {
     * @param string $InvitationCode Unique code given to invited user.
     */
    public function Register($InvitationCode = '') {
+      if (!$this->Request->IsPostBack())
+         $this->CheckOverride('Register', $this->Target());
+      
       $this->FireEvent("Register");
       
       $this->Form->SetModel($this->UserModel);

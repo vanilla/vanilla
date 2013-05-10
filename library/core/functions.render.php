@@ -803,6 +803,16 @@ if (!function_exists('RegisterUrl')) {
 
 if (!function_exists('SignInUrl')) {
    function SignInUrl($Target = '') {
+      // See if there is a default authentication provider.
+//      $Provider = Gdn_AuthenticationProviderModel::GetDefault();
+//      if ($Provider) {
+//         $SignInUrl = $Provider['SignInUrl'];
+//         if ($SignInUrl) {
+//            $SignInUrl = str_ireplace('{target}', rawurlencode($Target), $SignInUrl);
+//            return $SignInUrl;
+//         }
+//      }
+         
       return '/entry/signin'.($Target ? '?Target='.urlencode($Target) : '');
    }
 }

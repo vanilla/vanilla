@@ -1773,9 +1773,14 @@ if (!function_exists('MarkString')):
    /**
     * Wrap occurences of $Needle in $Haystack with <mark> tags. Explodes $Needle 
     * on spaces. Returns $Haystack with replacements.
+    * 
+    * @changes
+    *    2.2   $Needle can now be an array of terms.
     */   
    function MarkString($Needle, $Haystack) {
-      $Needle = explode(' ', $Needle);
+      if (!is_array($Needle))
+         $Needle = explode(' ', $Needle);
+      
       foreach ($Needle as $n) {
          $Haystack = preg_replace('#(?!<.*?)('.preg_quote($n).')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
       }
@@ -3068,7 +3073,7 @@ if (!function_exists('ViewLocation')) {
             return $Path;
       }
       
-      Trace($View, 'View');
+      Trace(array('view' => $View, 'controller' => $Controller, 'folder' => $Folder), 'View');
       Trace($Paths, 'ViewLocation()');
       
       return FALSE;

@@ -307,7 +307,7 @@ class CategoryModel extends Gdn_Model {
             if ($Exclude)
                continue;
             
-            if ($DoHeadings && $Permission == 'Discussions.Add' && $Category['Level'] <= 1)
+            if ($DoHeadings && $Permission == 'Discussions.Add' && $Category['Depth'] <= 1)
                continue;
          }
 

@@ -403,7 +403,6 @@ class UserModel extends Gdn_Model {
       
       // Need to give replacement roles
       if (in_array($ConfirmRoleID, $UserRoleIDs) && sizeof($UserRoleIDs) < 2) {
-         $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
          $Roles = GetValue('ConfirmedEmailRoles', $Attributes, $DefaultRoles);
       } else {
          $Roles = $UserRoleIDs;
@@ -411,7 +410,10 @@ class UserModel extends Gdn_Model {
       
       // Sanitize result roles
       $Roles = array_diff($UserRoleIDs, array($ConfirmRoleID));
-      if (!sizeof($Roles)) $Roles = $DefaultRoles;
+      if (!sizeof($Roles)) {
+         $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
+         $Roles = $DefaultRoles;
+      }
       
       $this->EventArguments['ConfirmUserID'] = $UserID;
       $this->EventArguments['ConfirmUserRoles'] = &$Roles;

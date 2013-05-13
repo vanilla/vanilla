@@ -37,9 +37,8 @@ class DashboardHooks implements Gdn_IPlugin {
          }
       }
 
-      
       if ($Session->IsValid()) {
-         $Confirmed = (bool)GetValue('Confirmed', Gdn::Session()->User, null);
+         $Confirmed = GetValue('Confirmed', Gdn::Session()->User, true);
          
          if (!$Confirmed) {
             $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));

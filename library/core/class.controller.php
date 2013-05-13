@@ -1202,6 +1202,8 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo $View, $ControllerName, and $ApplicationFolder need correct variable types and descriptions.
     */
    public function xRender($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $AssetName = 'Content') {
+      Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $this->RequestMethod, 'Render');
+      
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)
          return;
       

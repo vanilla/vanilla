@@ -918,6 +918,11 @@ class UserController extends DashboardController {
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
+   public function TagSearch($q) {
+      $Data = Gdn::UserModel()->TagSearch($q);
+      die(json_encode($Data));
+   }
+   
    /**
     * Determine whether user can register with this username.
     *

@@ -37,8 +37,16 @@ if (!function_exists('BigPlural')) {
 }
 
 if (!function_exists('Bullet')):
-   function Bullet() {
-      return '<span class="Bullet">&bull;</span>';
+   /**
+    * Return a bullet character in html.
+    * @param string $Pad A string used to pad either side of the bullet.
+    * @return string
+    * 
+    * @changes
+    *    2.2 Added the $Pad parameter.
+    */
+   function Bullet($Pad = '') {
+      return $Pad.'<span class="Bullet">&bull;</span>'.$Pad;
    }
 endif;
 

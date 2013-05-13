@@ -785,9 +785,17 @@ class Gdn_Request {
     *    - Custom port, rewrites                      http://www.forum.com:8080/index.php?/
     *
     * @param sring $Path of the controller method.
-    * @param bool $WithDomain set to false to create a relative URL
+    * @param mixed $WithDomain Whether or not to include the domain with the url. This can take the following values.
+    * - true: Include the domain name.
+    * - false: Do not include the domain. This is a relative path.
+    * - //: Include the domain name, but use the // schemeless notation.
+    * - /: Just return the path.
     * @param bool $SSL set to true to implement SSL
     * @return string
+    * 
+    * @changes
+    *    2.1   Added the // option to $WithDomain.
+    *    2.2   Added the / option to $WithDomain.
     */
    public function Url($Path = '', $WithDomain = FALSE, $SSL = NULL) {
       static $AllowSSL = NULL; if ($AllowSSL === NULL) $AllowSSL = C('Garden.AllowSSL', FALSE);
@@ -823,12 +831,12 @@ class Gdn_Request {
       
       if ($WithDomain === '//') {
          $Parts[] = '//'.$Host;
-      } elseif ($WithDomain) {
+      } elseif ($WithDomain && $WithDomain !== '/') {
          $Parts[] = $Scheme.'://'.$Host;
       } else
          $Parts[] = '';
 
-      if ($this->WebRoot() != '')
+      if ($WithDomain !== '/' && $this->WebRoot() != '')
          $Parts[] = $this->WebRoot();
 
       // Strip out the hash.

@@ -1967,6 +1967,25 @@ class UserModel extends Gdn_Model {
    public static function SigninLabelCode() {
       return UserModel::NoEmail() ? 'Username' : 'Email/Username';
    }
+   
+   /**
+    * A simple search for tag queries.
+    * @param string $Search
+    * @since 2.2
+    */
+   public function TagSearch($Search) {
+      $Search = str_replace(array('%', '_'), array('\%', '\_'), $Search);
+      
+      $Results = $this->SQL
+         ->Select('UserID', '', 'id')
+         ->Select('Name', '', 'name')
+         ->From('User')
+         ->Like('Name', $Search, 'right')
+         ->Where('Deleted', 0)
+         ->Limit(10)
+         ->Get()->ResultArray();
+      return $Results;
+   }
 
    /**
     * To be used for invitation registration

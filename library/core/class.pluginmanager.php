@@ -420,6 +420,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                case 'handler':
                case 'before':
                case 'after':
+               case 'render':
                   $this->RegisterHandler($ClassName, $MethodName);
                break;
                case 'override':

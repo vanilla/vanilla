@@ -228,8 +228,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
             if ($CategorySearch)
                $NewTag['CategoryID'] = $CategoryID;
-
-            $TagID = $Sender->SQL->Insert('Tag', $NewTag);
+            $TagID = $Sender->SQL->Options('Ignore', TRUE)->Insert('Tag', $NewTag);
             $Tags[$TagID] = $NewTag;
          }
       }
@@ -257,7 +256,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
       // Associate the ones that weren't already associated
       foreach ($NonAssociatedTagIDs as $TagID) {
-         $Sender->SQL->Insert('TagDiscussion', array(
+         $Sender->SQL->Options('Ignore', TRUE)->Insert('TagDiscussion', array(
             'TagID' => $TagID,
             'DiscussionID' => $DiscussionID, 
             'CategoryID' => $CategoryID

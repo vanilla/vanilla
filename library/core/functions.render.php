@@ -46,7 +46,8 @@ if (!function_exists('Bullet')):
     *    2.2 Added the $Pad parameter.
     */
    function Bullet($Pad = '') {
-      return $Pad.'<span class="Bullet">&bull;</span>'.$Pad;
+      //·
+      return $Pad.'<span class="Bullet">&middot;</span>'.$Pad;
    }
 endif;
 

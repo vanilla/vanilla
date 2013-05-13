@@ -290,7 +290,7 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
-   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL) {
+   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL, $Filter = array()) {
       static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
       $Field = $Map[$Permission];
       $DoHeadings = C('Vanilla.Categories.DoHeadings');
@@ -304,7 +304,14 @@ class CategoryModel extends Gdn_Model {
             if ($Category['CategoryID'] <= 0)
                continue;
 
-            if ($Category['Archived'])
+            $Exclude = FALSE;
+            foreach ($Filter as $Key => $Value) {
+               if (isset($Category[$Key]) && $Category[$Key] != $Value) {
+                  $Exclude = TRUE;
+                  break;
+               }
+            }
+            if ($Exclude)
                continue;
             
             if ($DoHeadings && $Permission == 'Discussions.Add' && $Category['Depth'] <= 1)

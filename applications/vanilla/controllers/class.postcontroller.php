@@ -138,7 +138,7 @@ class PostController extends VanillaController {
       }
       
       // See if we should hide the category dropdown.
-      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID));
+      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0));
       if (count($AllowedCategories) == 1) {
          $AllowedCategory = array_pop($AllowedCategories);
          $this->ShowCategorySelector = FALSE;

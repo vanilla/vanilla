@@ -99,9 +99,8 @@ $Construct
 // Modify all users with ConfirmEmail role to be unconfirmed
 if (!$ConfirmedExists) {
    $ConfirmEmail = C('Garden.Registration.ConfirmEmail', false);
-   if ($ConfirmEmail) {
-      $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
-      
+   $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole', false);
+   if ($ConfirmEmail && $ConfirmEmailRoleID !== false) {
       // Select unconfirmed users
       $Users = Gdn::SQL()->Select('UserID')->From('UserRole')->Where('RoleID', $ConfirmEmailRoleID)->Get();
       $UserIDs = array();
@@ -109,7 +108,7 @@ if (!$ConfirmedExists) {
          $UserIDs[] = $User['UserID'];
       
       // Update
-      Gdn::SQL()->Update('User')->Set('Confirmed', 0)->WhereIn('UserID', $UserIDs);
+      Gdn::SQL()->Update('User')->Set('Confirmed', 0)->WhereIn('UserID', $UserIDs)->Put();
       Gdn::SQL()->Delete('UserRole', array('RoleID' => $ConfirmEmailRoleID, 'UserID' => $UserIDs));
    }
 }

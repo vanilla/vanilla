@@ -170,6 +170,34 @@ class Gdn_Session {
       return GetValue(C('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
    }
    
+   /**
+    * Return the timezone hour difference between the user and utc.
+    * @return int The hour offset.
+    */
+   public function HourOffset() {
+      static $GuestHourOffset;
+      
+      if ($this->UserID > 0) {
+         return $this->User->HourOffset;
+      } else {
+         if (!isset($GuestHourOffset)) {
+            $GuestTimeZone = C('Garden.GuestTimeZone');
+            if ($GuestTimeZone) {
+               try {
+                  $TimeZone = new DateTimeZone($GuestTimeZone);
+                  $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+                  $GuestHourOffset = floor($Offset / 3600);
+               } catch (Exception $Ex) {
+                  $GuestHourOffset = 0;
+                  LogException($Ex);
+               }
+            }
+         }
+         
+         return $GuestHourOffset;
+      }
+   }
+   
    public function SetCookie($Suffix, $Value, $Expires) {
       $Name = C('Garden.Cookie.Name').$Suffix;
       $Path = C('Garden.Cookie.Path');

@@ -333,14 +333,14 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Search results for tagging autocomplete.
     */
-   public function PluginController_TagSearch_Create($Sender) {
+   public function PluginController_TagSearch_Create($Sender, $q, $id = false) {
       
       // Allow per-category tags
       $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
       if ($CategorySearch)
          $CategoryID = GetIncomingValue('CategoryID');
       
-      $Query = GetIncomingValue('q');
+      $Query = $q;
       $Data = array();
       $Database = Gdn::Database();
       if ($Query) {
@@ -352,7 +352,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $TagQuery = Gdn::SQL()
             ->Select('TagID, Name')
             ->From('Tag')
-            ->Like('Name', $Query)
+            ->Like('Name', str_replace(array('%', '_'), array('\%', '_'), $Query), strlen($Query) > 2 ? 'both' : 'right')
             ->Limit(20);
          
          // Allow per-category tags
@@ -363,7 +363,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $TagData = $TagQuery->Get();
          
          foreach ($TagData as $Tag) {
-            $Data[] = array('id' => $Tag->Name, 'name' => $Tag->Name);
+            $Data[] = array('id' => $id ? $Tag->TagID : $Tag->Name, 'name' => $Tag->Name);
          }
       }
       // Close the db before exiting.

@@ -510,7 +510,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       return $Handlers;
    }
-
+   
    public function GetPluginInfo($AccessName, $AccessType = self::ACCESS_PLUGINNAME) {
       $PluginName = FALSE;
 
@@ -560,6 +560,18 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
 
       return $this->Instances[$ClassName];
+   }
+   
+   /**
+    * Returns whether or not a plugin is enabled.
+    * 
+    * @param string $Name The name of the plugin.
+    * @return bool Whether or not the plugin is enabled.
+    * @since 2.2
+    */
+   public function IsEnabled($Name) {
+      $Enabled = $this->EnabledPlugins;
+      return isset($Enabled[$Name]) && $Enabled[$Name];
    }
 
    /**

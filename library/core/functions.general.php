@@ -1782,7 +1782,12 @@ if (!function_exists('MarkString')):
          $Needle = explode(' ', $Needle);
       
       foreach ($Needle as $n) {
-         $Haystack = preg_replace('#(?!<.*?)('.preg_quote($n).')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
+         if (preg_match('`^\w+$`', $n))
+            $word = '\b';
+         else
+            $word = '';
+         
+         $Haystack = preg_replace('#(?!<.*?)('.$word.preg_quote($n).$word.')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
       }
       return $Haystack;
    }

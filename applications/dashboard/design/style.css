@@ -1974,6 +1974,11 @@ pre code {
    border: none;
    padding: 0;
 }
+mark {
+    padding: 0 2px;
+    color: inherit;
+    background: #ff6;
+}
 .Message strong, .Message b {
    font-weight: bold;
 }

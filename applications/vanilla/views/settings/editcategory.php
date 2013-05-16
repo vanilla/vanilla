@@ -16,7 +16,7 @@ echo $this->Form->Errors();
 		<?php
 		echo Wrap(T('Category Url:'), 'strong');
 		echo ' ';
-		echo Gdn::Request()->Url('category', TRUE);
+		echo Gdn::Request()->Url('categories', TRUE);
 		echo '/';
 		echo Wrap(htmlspecialchars($this->Form->GetValue('UrlCode')));
 		echo $this->Form->TextBox('UrlCode');

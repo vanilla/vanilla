@@ -1974,7 +1974,7 @@ class UserModel extends Gdn_Model {
     * @since 2.2
     */
    public function TagSearch($Search) {
-      $Search = str_replace(array('%', '_'), array('\%', '\_'), $Search);
+      $Search = trim(str_replace(array('%', '_'), array('\%', '\_'), $Search));
       
       $Results = $this->SQL
          ->Select('UserID', '', 'id')

@@ -271,6 +271,8 @@ class Gdn_Form extends Gdn_Pluggable {
       $IncludeNull = GetValue('IncludeNull', $Options);
       if ($IncludeNull === TRUE)
          $Return .= '<option value="">'.T('Select a category...').'</option>';
+      elseif (is_array($IncludeNull))
+         $Return .= "<option value=\"{$IncludeNull[0]}\">{$IncludeNull[1]}</option>\n";
       elseif ($IncludeNull)
          $Return .= "<option value=\"\">$IncludeNull</option>\n";
       elseif (!$HasValue)
@@ -1168,6 +1170,18 @@ class Gdn_Form extends Gdn_Pluggable {
          $Return .= '<div class="TextBoxWrapper">';
       }
       
+      if (strtolower($Type) == 'checkbox') {
+         if (isset($Attributes['nohidden'])) {
+            unset($Attributes['nohidden']);
+         } else {
+            if (substr($FieldName, -2) == '[]') $FieldName = substr($FieldName, 0, -2);
+
+            $Return .= '<input type="hidden" name="Checkboxes[]" value="' . $FieldName .
+                '" />';
+         }
+      }
+      
+      
       $Return .= '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       if ($Type == 'file') $Return .= Attribute('name',
@@ -1179,12 +1193,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return .= $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ' />';
-      if (strtolower($Type) == 'checkbox') {
-         if (substr($FieldName, -2) == '[]') $FieldName = substr($FieldName, 0, -2);
-
-         $Return .= '<input type="hidden" name="Checkboxes[]" value="' . $FieldName .
-             '" />';
-      }
+   
       
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  

@@ -200,15 +200,34 @@ if (!function_exists('CategoryUrl')):
  * @param array $Category
  * @return string
  */
-function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
-   if (is_string($Category))
+function CategoryUrl($Category, $Page = '', $WithDomain = TRUE, $IncludeThis = TRUE) {
+   $NestUrls = C('Vanilla.Categories.NestUrls');
+
+   if (is_string($Category) || is_numeric($Category)) {
       $Category = CategoryModel::Categories($Category);
-   $Category = (array)$Category;
-   
-   $Result = '/categories/'.rawurlencode($Category['UrlCode']);
-   if ($Page && $Page > 1) {
-         $Result .= '/p'.$Page;
    }
+
+   $Category = (array)$Category;
+   $Result = '/categories';
+
+   if ($NestUrls && $Category['ParentCategoryID'] !== '-1') {
+      // construct URL from ancestors
+      $Ancestors = CategoryModel::GetAncestors($Category['CategoryID'], '', $IncludeThis);
+
+      foreach ($Ancestors as $Ancestor) {
+         $Result .= '/'.rawurlencode($Ancestor['UrlCode']);
+      }
+   }
+
+   $AppendThis = ($IncludeThis && ((! $NestUrls) || (! isset($Ancestors))));
+   if ($AppendThis) {
+      $Result .= '/'.rawurlencode($Category['UrlCode']);
+   }
+
+   if ($Page && $Page > 1) {
+      $Result .= '/p'.$Page;
+   }
+
    return Url($Result, $WithDomain);
 }
    

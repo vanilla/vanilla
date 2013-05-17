@@ -761,12 +761,13 @@ class CategoryModel extends Gdn_Model {
     * Get all of the ancestor categories above this one.
     * @param int|string $Category The category ID or url code.
     * @param bool $CheckPermissions Whether or not to only return the categories with view permission.
+    * @param bool $IncludeThis Whether or not to include the base category in the return array.
     * @return array
     */
-   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE) {
+   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE, $IncludeThis = TRUE) {
       $Categories = self::Categories();
       $Result = array();
-      
+
       // Grab the category by ID or url code.
       if (is_numeric($CategoryID)) {
          if (isset($Categories[$CategoryID]))
@@ -779,12 +780,19 @@ class CategoryModel extends Gdn_Model {
             }
          }
       }
+      if (! $IncludeThis) {
+         // Start from parent.
+         $Category = $Categories[$Category['ParentCategoryID']];
+      }
 
-      if (!isset($Category))
+      if (!isset($Category)) {
+         // Category could not be found.
          return $Result;
+      }
+
+      $Result[$Category['CategoryID']] = $Category;
 
       // Build up the ancestor array by tracing back through parents.
-      $Result[$Category['CategoryID']] = $Category;
       $Max = 20;
       while (isset($Categories[$Category['ParentCategoryID']])) {
          // Check for an infinite loop.
@@ -810,6 +818,7 @@ class CategoryModel extends Gdn_Model {
 
          $Category = $Categories[$Category['ParentCategoryID']];
       }
+
       $Result = array_reverse($Result, TRUE); // order for breadcrumbs
       return $Result;
    }
@@ -1619,17 +1628,36 @@ class CategoryModel extends Gdn_Model {
 		}
 	}
    
-   public static function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+   public static function CategoryUrl($Category, $Page = '', $WithDomain = TRUE, $IncludeThis = TRUE) {
       if (function_exists('CategoryUrl')) return CategoryUrl($Category, $Page, $WithDomain);
       
-      if (is_string($Category))
-         $Category = CategoryModel::Categories($Category);
-      $Category = (array)$Category;
+      $NestUrls = C('Vanilla.Categories.NestUrls');
 
-      $Result = '/categories/'.rawurlencode($Category['UrlCode']);
-      if ($Page && $Page > 1) {
-            $Result .= '/p'.$Page;
+      if (is_string($Category) || is_numeric($Category)) {
+         $Category = self::Categories($Category);
       }
+
+      $Category = (array)$Category;
+      $Result = '/categories';
+
+      if ($NestUrls && $Category['ParentCategoryID'] !== '-1') {
+         // construct URL from ancestors
+         $Ancestors = self::GetAncestors($Category['CategoryID'], '', $IncludeThis);
+
+         foreach ($Ancestors as $Ancestor) {
+            $Result .= '/'.rawurlencode($Ancestor['UrlCode']);
+         }
+      }
+
+      $AppendThis = ($IncludeThis && ((! $NestUrls) || (! isset($Ancestors))));
+      if ($AppendThis) {
+         $Result .= '/'.rawurlencode($Category['UrlCode']);
+      }
+
+      if ($Page && $Page > 1) {
+         $Result .= '/p'.$Page;
+      }
+
       return Url($Result, $WithDomain);
    }
 

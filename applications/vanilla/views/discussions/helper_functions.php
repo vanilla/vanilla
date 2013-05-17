@@ -185,7 +185,34 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
             }
          
             if ($Sender->Data('_ShowCategoryLink', TRUE) && C('Vanilla.Categories.Use') && $Category)
-               echo Wrap(Anchor(htmlspecialchars($Discussion->Category), CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category '.$Category['CssClass']));
+               // force $Category to be set (fixes issue with missing last child)
+               // on child discussion listings
+               isset($Category);
+
+               $Path = Anchor(htmlspecialchars($Category['Name']),
+                     CategoryUrl($Category['CategoryID']));
+
+               if (C('Vanilla.Categories.NestUrls') && $Category['ParentCategoryID'] != '-1') {
+                  $Ancestors = CategoryModel::GetAncestors(
+                        $Category['CategoryID'], TRUE, FALSE);
+                  $PathSeparator = ' &gt; ';
+
+                  foreach ($Ancestors as $Ancestor) {
+                     if (!isset($AncestorPath)) $AncestorPath = '';
+
+                     $AncestorPath .= Anchor(htmlspecialchars($Ancestor['Name']),
+                          CategoryUrl($Ancestor['CategoryID']))
+                          .$PathSeparator;
+                  }
+
+                  $Path = $AncestorPath . $Path;
+               }
+
+               echo Wrap(
+                  $Path,
+                  'span',
+                  array('class' => 'MItem Category '.$Category['CssClass'])
+               );
                
             $Sender->FireEvent('DiscussionMeta');
          ?>

@@ -103,10 +103,12 @@ class AkismetPlugin extends Gdn_Plugin {
 
       $Result = FALSE;
       switch ($RecordType) {
-         case 'User':
-//            $Data['Name'] = '';
-//            $Data['Body'] = GetValue('DiscoveryText', $Data);
-//            $Result = $this->CheckAkismet($RecordType, $Data);
+         case 'Registration':
+            $Data['Name'] = '';
+            $Data['Body'] = GetValue('DiscoveryText', $Data);
+            $Result = $this->CheckAkismet($RecordType, $Data);
+            if ($Result)
+               $Data['Log_InsertUserID'] = $this->UserID();
             break;
          case 'Comment':
          case 'Discussion':

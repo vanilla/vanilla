@@ -11,7 +11,7 @@ if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermis
    $LogModel = new LogModel();
    $SpamCount = $LogModel->GetOperationCount('spam');
    $ModerationCount = $LogModel->GetOperationCount('moderate');
-   $DashboardCount += $SpamCount + $ModerationCount;
+   $DashboardCount += $ModerationCount;
 }
 // Applicant Count
 if ($Session->CheckPermission('Garden.Applicants.Manage')) {

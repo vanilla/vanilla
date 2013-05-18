@@ -193,7 +193,7 @@ if (!function_exists('CategoryUrl')):
  * @return string
  */
 function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
-   if (is_string($Category))
+   if (is_string($Category) || is_numeric($Category))
       $Category = CategoryModel::Categories($Category);
    $Category = (array)$Category;
    

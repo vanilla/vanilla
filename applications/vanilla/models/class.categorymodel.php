@@ -1603,7 +1603,7 @@ class CategoryModel extends Gdn_Model {
    public static function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
       if (function_exists('CategoryUrl')) return CategoryUrl($Category, $Page, $WithDomain);
       
-      if (is_string($Category))
+      if (is_string($Category) || is_numeric($Category))
          $Category = CategoryModel::Categories($Category);
       $Category = (array)$Category;
 

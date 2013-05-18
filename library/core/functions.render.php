@@ -199,18 +199,18 @@ function CategoryUrl($Category, $Page = '', $WithDomain = TRUE, $IncludeThis = '
 
    $Category = (array)$Category;
    $Result = '/categories';
-   $NestUrls = C('Vanilla.Categories.NestURLs');
+   $NestUrls = C('Vanilla.Categories.NestUrls');
 
    if ($NestUrls && $Category['ParentCategoryID'] != '-1') {
       // Construct URL from ancestors.
       $Ancestors = CategoryModel::GetAncestors($Category['CategoryID'], '', $IncludeThis);
 
-      foreach ($Ancestos as $Ancestor) {
+      foreach ($Ancestors as $Ancestor) {
          $Result .= '/'.rawurlencode($Ancestor['UrlCode']);
       }
    }
 
-   $AppendThis = ($IncludeThis && ((!$NestUrls || (!isset($Ancestors)))));
+   $AppendThis = ($IncludeThis && (!$NestUrls || !isset($Ancestors)));
    if ($AppendThis) {
       $Result .= '/'.rawurlencode($Category['UrlCode']);
    }

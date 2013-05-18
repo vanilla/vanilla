@@ -1600,17 +1600,35 @@ class CategoryModel extends Gdn_Model {
 		}
 	}
    
-   public static function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+   public static function CategoryUrl($Category, $Page = '', $WithDomain = TRUE, $IncludeThis = TRUE) {
       if (function_exists('CategoryUrl')) return CategoryUrl($Category, $Page, $WithDomain);
       
-      if (is_string($Category) || is_numeric($Category))
-         $Category = CategoryModel::Categories($Category);
-      $Category = (array)$Category;
+      if (is_string($Category) || is_numeric($Category)) {
+         $Category = self::Categories($Category);
+      }
 
-      $Result = '/categories/'.rawurlencode($Category['UrlCode']);
+      $Category = (array)$Category;
+      $Result = '/categories';
+      $NestUrls = C('Vanilla.Categories.NestURLs');
+
+      if ($NestUrls && $Category['ParentCategoryID'] != '-1') {
+         // Construct URL from ancestors.
+         $Ancestors = self::GetAncestors($Category['CategoryID'], '', $IncludeThis);
+
+         foreach ($Ancestos as $Ancestor) {
+            $Result .= '/'.rawurlencode($Ancestor['UrlCode']);
+         }
+      }
+
+      $AppendThis = ($IncludeThis && ((!$NestUrls || (!isset($Ancestors)))));
+      if ($AppendThis) {
+         $Result .= '/'.rawurlencode($Category['UrlCode']);
+      }
+
       if ($Page && $Page > 1) {
             $Result .= '/p'.$Page;
       }
+      
       return Url($Result, $WithDomain);
    }
 

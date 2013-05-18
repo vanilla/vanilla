@@ -735,9 +735,10 @@ class CategoryModel extends Gdn_Model {
     * Get all of the ancestor categories above this one.
     * @param int|string $Category The category ID or url code.
     * @param bool $CheckPermissions Whether or not to only return the categories with view permission.
+    * @param bool $IncludeThis Whether or not to include the base category in the return array.
     * @return array
     */
-   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE) {
+   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE, $IncludeThis = TRUE) {
       $Categories = self::Categories();
       $Result = array();
       
@@ -754,8 +755,14 @@ class CategoryModel extends Gdn_Model {
          }
       }
 
+      if (!$IncludeThis) {
+         // Start from parent.
+         $Category = $Categories[$Category['ParentCategoryID']];
+      }
+
       if (!isset($Category))
          return $Result;
+
 
       // Build up the ancestor array by tracing back through parents.
       $Result[$Category['CategoryID']] = $Category;

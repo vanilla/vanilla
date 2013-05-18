@@ -735,9 +735,10 @@ class CategoryModel extends Gdn_Model {
     * Get all of the ancestor categories above this one.
     * @param int|string $Category The category ID or url code.
     * @param bool $CheckPermissions Whether or not to only return the categories with view permission.
+    * @param bool $IncludeThis Whether or not to include the base category in the return array.
     * @return array
     */
-   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE) {
+   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE, $IncludeThis = TRUE) {
       $Categories = self::Categories();
       $Result = array();
       
@@ -754,8 +755,14 @@ class CategoryModel extends Gdn_Model {
          }
       }
 
+      if (!$IncludeThis) {
+         // Start from parent.
+         $Category = $Categories[$Category['ParentCategoryID']];
+      }
+
       if (!isset($Category))
          return $Result;
+
 
       // Build up the ancestor array by tracing back through parents.
       $Result[$Category['CategoryID']] = $Category;
@@ -1593,17 +1600,35 @@ class CategoryModel extends Gdn_Model {
 		}
 	}
    
-   public static function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
+   public static function CategoryUrl($Category, $Page = '', $WithDomain = TRUE, $IncludeThis = TRUE) {
       if (function_exists('CategoryUrl')) return CategoryUrl($Category, $Page, $WithDomain);
-      
-      if (is_string($Category))
-         $Category = CategoryModel::Categories($Category);
-      $Category = (array)$Category;
 
-      $Result = '/categories/'.rawurlencode($Category['UrlCode']);
+      if (is_string($Category) || is_numeric($Category)) {
+         $Category = self::Categories($Category);
+      }
+
+      $Category = (array)$Category;
+      $Result = '/categories';
+      $NestUrls = C('Vanilla.Categories.NestUrls');
+
+      if ($NestUrls && $Category['ParentCategoryID'] != '-1') {
+         // Construct URL from ancestors.
+         $Ancestors = self::GetAncestors($Category['CategoryID'], '', $IncludeThis);
+
+         foreach ($Ancestors as $Ancestor) {
+            $Result .= '/'.rawurlencode($Ancestor['UrlCode']);
+         }
+      }
+
+      $AppendThis = ($IncludeThis && (!$NestUrls || !isset($Ancestors)));
+      if ($AppendThis) {
+         $Result .= '/'.rawurlencode($Category['UrlCode']);
+      }
+
       if ($Page && $Page > 1) {
             $Result .= '/p'.$Page;
       }
+      
       return Url($Result, $WithDomain);
    }
 

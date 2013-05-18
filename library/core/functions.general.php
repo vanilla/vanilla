@@ -1782,7 +1782,7 @@ if (!function_exists('MarkString')):
          $Needle = explode(' ', $Needle);
       
       foreach ($Needle as $n) {
-         if (preg_match('`^\w+$`', $n))
+         if (strlen($n) <= 2 && preg_match('`^\w+$`', $n))
             $word = '\b';
          else
             $word = '';

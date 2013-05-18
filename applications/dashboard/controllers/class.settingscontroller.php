@@ -75,30 +75,6 @@ class SettingsController extends DashboardController {
       $this->AvailableApplications = $ApplicationManager->AvailableVisibleApplications();
       $this->EnabledApplications = $ApplicationManager->EnabledVisibleApplications();
       
-      // Loop through all of the available visible apps and mark them if they have an update available
-      // Retrieve the list of apps that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(C('Garden.RequiredUpdates', ''));
-      if (is_array($RequiredUpdates)) {
-         foreach ($RequiredUpdates as $UpdateInfo) {
-            if (is_object($UpdateInfo))
-               $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
-            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
-            $Name = ArrayValue('Name', $UpdateInfo, '');
-            $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach ($this->AvailableApplications as $App => $Info) {
-               $CurrentName = ArrayValue('Name', $Info, $App);
-               if (
-                  $CurrentName == $Name
-                  && $Type == 'Application'
-               ) {
-                  $Info['NewVersion'] = $NewVersion;
-                  $this->AvailableApplications[$App] = $Info;
-               }
-            }
-         }
-      }
-      
       if ($ApplicationName != '') {
          $this->EventArguments['ApplicationName'] = $ApplicationName;
          if (array_key_exists($ApplicationName, $this->EnabledApplications) === TRUE) {
@@ -681,30 +657,6 @@ class SettingsController extends DashboardController {
       $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
       self::SortAddons($this->AvailablePlugins);
       
-      // Loop through all of the available plugins and mark them if they have an update available
-      // Retrieve the list of plugins that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
-      if (is_array($RequiredUpdates)) {
-         foreach ($RequiredUpdates as $UpdateInfo) {
-            if (is_object($UpdateInfo))
-               $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
-            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
-            $Name = ArrayValue('Name', $UpdateInfo, '');
-            $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach ($this->AvailablePlugins as $Plugin => $Info) {
-               $CurrentName = ArrayValue('Name', $Info, $Plugin);
-               if (
-                  $CurrentName == $Name
-                  && $Type == 'Plugin'
-               ) {
-                  $Info['NewVersion'] = $NewVersion;
-                  $this->AvailablePlugins[$Plugin] = $Info;
-               }
-            }
-         }
-      }
-      
       if ($PluginName != '') {
          try {
             $this->EventArguments['PluginName'] = $PluginName;
@@ -1006,29 +958,6 @@ class SettingsController extends DashboardController {
       $this->SetData('EnabledTheme', Gdn::ThemeManager()->EnabledThemeInfo());
       $this->SetData('EnabledThemeName', GetValue('Name', $ThemeInfo, GetValue('Index', $ThemeInfo)));
       
-      // Loop through all of the available themes and mark them if they have an update available
-      // Retrieve the list of themes that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
-      if (is_array($RequiredUpdates)) {
-         foreach ($RequiredUpdates as $UpdateInfo) {
-            if (is_object($UpdateInfo))
-               $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
-            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
-            $Name = ArrayValue('Name', $UpdateInfo, '');
-            $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach (Gdn::ThemeManager()->AvailableThemes() as $Theme => $Info) {
-               $CurrentName = ArrayValue('Name', $Info, $Theme);
-               if (
-                  $CurrentName == $Name
-                  && $Type == 'Theme'
-               ) {
-                  $Info['NewVersion'] = $NewVersion;
-                  $AvailableThemes[$Theme] = $Info;
-               }
-            }
-         }
-      }
       $Themes = Gdn::ThemeManager()->AvailableThemes();
       uasort($Themes, array('SettingsController', '_NameSort'));
       

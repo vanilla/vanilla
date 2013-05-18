@@ -305,8 +305,8 @@ class Gdn_Form extends Gdn_Pluggable {
             
             $Name = htmlspecialchars(GetValue('Name', $Category, 'Blank Category Name'));
             if ($Depth > 1) {
-               $Name = str_pad($Name, strlen($Name)+$Depth-1, ' ', STR_PAD_LEFT);
-               $Name = str_replace(' ', '&#160;', $Name);
+               $Name = str_repeat('&#160;', 4*($Depth-1)).$Name;
+//               $Name = str_replace(' ', '&#160;', $Name);
             }
                
             $Return .= '>' . $Name . "</option>\n";

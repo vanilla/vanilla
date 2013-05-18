@@ -925,6 +925,9 @@ class CommentModel extends VanillaModel {
          // Pass generic activity to events.
          $this->EventArguments['Activity'] = $Activity;
          
+         // Pass generic activity to events.
+         $this->EventArguments['Activity'] = $Activity;
+         
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
          foreach ($BookmarkData->Result() as $Bookmark) {

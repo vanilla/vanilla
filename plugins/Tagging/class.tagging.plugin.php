@@ -209,7 +209,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $NewTags = $FormTags;
       $Tags = array(); // <-- Build a complete associative array of $Tags[TagID] => TagName values for this discussion.
       foreach ($ExistingTagData as $ExistingTag) {
-         if (in_array($ExistingTag->Name, $NewTags))
+         if (in_array(strtolower($ExistingTag->Name), $NewTags))
             unset($NewTags[array_search($ExistingTag->Name, $NewTags)]);
 
          $Tags[$ExistingTag->TagID] = $ExistingTag->Name;

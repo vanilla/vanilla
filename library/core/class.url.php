@@ -21,12 +21,23 @@ class Gdn_Url {
     * @param boolean $WithDomain Should it include the domain with the WebRoot? Default is FALSE.
     * @return string
     */
-   public static function WebRoot($WithDomain = FALSE) {
-      $WebRoot = Gdn::Request()->WebRoot();
+   public static function WebRoot($WithDomain = FALSE, $WithPortIfNonstandard = TRUE) {
+      $Request = Gdn::Request();
+      $WebRoot = $Request->WebRoot();
 
-      if ($WithDomain)
-         $Result = Gdn::Request()->Domain().'/'.$WebRoot;
-      else
+      if ($WithDomain) {
+         $Result = $Request->Domain();
+
+         if ($WithPortIfNonstandard) {
+            $Port = $Request->Port();
+
+            if (!in_array($Port, array(80, 443))) {
+               $Result .= ':'.$Request->Port();
+            }
+         }
+
+         $Result .= '/'.$WebRoot;
+      } else
          $Result = $WebRoot;
 
       return $Result;

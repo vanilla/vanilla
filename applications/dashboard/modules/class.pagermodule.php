@@ -156,6 +156,9 @@ class PagerModule extends Gdn_Module {
             $this->_LastOffset = $this->TotalRecords;
                
          $this->_PropertiesDefined = TRUE;
+         
+         Gdn::Controller()->EventArguments['Pager'] = $this;
+         Gdn::Controller()->FireEvent('PagerInit');
       }
    }
 
@@ -343,8 +346,13 @@ class PagerModule extends Gdn_Module {
       $ClientID = $this->ClientID;
       $ClientID = $Type == 'more' ? $ClientID.'After' : $ClientID.'Before';
 
-      if (isset($this->HtmlBefore)) {
-         $Pager = $this->HtmlBefore.$Pager;
+      if ($Pager) {
+         if (isset($this->HtmlBefore)) {
+            $Pager = $this->HtmlBefore.$Pager;
+         }
+         if (isset($this->HtmlAfter)) {
+            $Pager = ' '.$Pager.$this->HtmlAfter;
+         }
       }
       
       return $Pager == '' ? '' : sprintf($this->Wrapper, Attribute(array('id' => $ClientID, 'class' => $this->CssClass)), $Pager);

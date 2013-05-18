@@ -1048,6 +1048,9 @@ div.Discussion:hover .OptionsTitle:hover,
    text-decoration: none;
    background-color: #004D9F !Important;
 }
+.MenuItems a:hover .Gloss {
+   color: #ffffff !important;
+}
 .MenuItems li > strong {
    font-size: 12px;
    padding: 3px 10px;

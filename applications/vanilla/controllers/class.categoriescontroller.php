@@ -71,6 +71,11 @@ class CategoriesController extends VanillaController {
     * @param int $Offset Number of discussions to skip.
     */
    public function Index($CategoryIdentifier = '', $Page = '0') {
+      $RequestArgs = $this->RequestArgs;
+      if (C('Vanilla.Categories.NestUrls') && count($RequestArgs) >= 2) {
+         $CategoryIdentifier = end($RequestArgs);
+      }
+
       // Figure out which category layout to choose (Defined on "Homepage" settings page).
       $Layout = C('Vanilla.Categories.Layout');
       

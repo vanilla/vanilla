@@ -109,7 +109,7 @@ class SetupController extends DashboardController {
     * @access public
     * @param string $RedirectUrl Where to send user afterward.
     */
-   public function Configure($RedirectUrl = '') {
+   private function Configure($RedirectUrl = '') {
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);

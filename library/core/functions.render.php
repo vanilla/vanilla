@@ -606,6 +606,92 @@ if (!function_exists('PluralTranslate')) {
    }
 }
 
+if (!function_exists('SearchExcerpt')):
+   
+function SearchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
+   if (is_string($SearchTerms))
+      $SearchTerms = preg_split('`[\s|-]+`i', $SearchTerms);
+   
+   // Split the string into lines.
+   $Lines = explode("\n", $PlainText);
+   // Find the first line that includes a search term.
+   foreach ($Lines as $i => &$Line) {
+      $Line = trim($Line);
+      if (!$Line)
+         continue;
+      
+      foreach ($SearchTerms as $Term) {
+         if (($Pos = mb_stripos($Line, $Term)) !== FALSE) {
+            $Line = substrWord($Line, $Term, $Length);
+            
+//            if ($Pos + mb_strlen($Term) > $Length) {
+//               $St = -(strlen($Line) - ($Pos - $Length / 4));
+//               $Pos2 = strrpos($Line, ' ', $St);
+//               if ($Pos2 !== FALSE)
+//                  $Line = '…'.substrWord($Line, $Pos2, $Length, "!!!");
+//               else
+//                  $Line = '…!'.mb_substr($Line, $St, $Length);
+//            } else {
+//               $Line = substrWord($Line, 0, $Length, '---');
+//            }
+            
+            return MarkString($SearchTerms, $Line);
+         }
+      }
+   }
+   
+   // No line was found so return the first non-blank line.
+   foreach ($Lines as $Line) {
+      if ($Line)
+         return SliceString($Line, $Length);
+   }
+}
+
+function substrWord($str, $start, $length, $fix = '…') {
+   // If we are offsetting on a word then find it.
+   if (is_string($start)) {
+      $pos = mb_stripos($str, $start);
+      
+      $p = $pos + strlen($start);
+      
+      if ($pos !== false && (($pos + strlen($start)) <= $length))
+         $start = 0;
+      else
+         $start = $pos - $length / 4;
+   }
+   
+   // Find the word break from the offset.
+   if ($start > 0) {
+      $pos = mb_strpos($str, ' ', $start);
+      if ($pos !== false)
+         $start = $pos;
+   } elseif ($start < 0) {
+      $pos = mb_strrpos($str, ' ', $start);
+      if ($pos !== false)
+         $start = $pos;
+      else
+         $start = 0;
+   }
+   
+   $len = strlen($str);
+   
+   if ($start + $length > $len) {
+      if ($length - $start <= 0)
+         $start = 0;
+      else {
+         // Zoom the offset back a bit.
+         $pos = mb_strpos($str, ' ', max(0, $len - $length));
+         if ($pos === false)
+            $pos = $len - $length;
+      }
+   }
+   
+   $result = mb_substr($str, $start, $length);
+   return $result;
+}
+
+endif;
+
 /**
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */

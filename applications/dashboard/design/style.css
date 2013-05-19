@@ -3940,3 +3940,30 @@ body.embed .InformMessages {
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
 }
+
+/* Media */
+
+.Media {
+  margin: 5px 0 10px;
+}
+.Media, .Media .Media-Body {
+  overflow: hidden;
+  _overflow: visible;
+  zoom: 1;
+}
+.Media .Img {
+  float: left;
+  margin-right: 10px;
+}
+.Media .Img img {
+  display: block;
+}
+.Media .ImgExt {
+  float: right;
+  margin-left: 10px;
+}
+
+.Item h2 + .Media,
+.Item h3 + .Media  {
+   margin-top: 0;
+}

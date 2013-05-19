@@ -41,108 +41,6 @@ class UtilityController extends DashboardController {
    }
    
    /**
-    * Call a method on the given model.
-    */
-   public function Model() {
-      $this->Permission('Garden.Settings.Manage');
-      
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $this->DeliveryType(DELIVERY_TYPE_DATA);
-      
-      $Args = func_get_args();
-      
-      // Check to see if we have a model.
-      $ModelName = StringEndsWith(array_shift($Args), 'Model', TRUE, TRUE);
-      $ModelName = ucfirst($ModelName).'Model';
-      if (!class_exists($ModelName)) {
-         throw NotFoundException($ModelName);
-      }
-      
-      // Check for json/xml style extension.
-      if (count($Args)) {
-         $LastArg = $Args[count($Args) - 1];
-         $Extension = strrchr($LastArg, '.');
-         if ($Extension) {
-            $Args[count($Args) - 1] = substr($LastArg, 0, -strlen($Extension));
-            $Extension = strtolower($Extension);
-            if ($Extension == '.xml')
-               $this->DeliveryMethod(DELIVERY_METHOD_XML);
-         }
-      }
-      
-      // Instantiate the model.
-      $Model = new $ModelName();
-      $MethodName = array_shift($Args);
-      
-      // Reflect the arguments.
-      $Callback = array($Model, $MethodName);
-      
-      if ($this->Request->Get('help')) {
-         $this->SetData('Model', get_class($Model));
-         if ($MethodName) {
-            if (!method_exists($Model, $MethodName)) {
-               throw NotFoundException($ModelName.'->'.$MethodName.'()');
-            }
-            $this->SetData('Method', $MethodName);
-            $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
-            $MethArgs = $Meth->getParameters();
-            $Args = array();
-            foreach ($MethArgs as $Index => $MethArg) {
-               $ParamName = $MethArg->getName();
-
-               if ($MethArg->isDefaultValueAvailable())
-                  $Args[$ParamName] = $MethArg->getDefaultValue();
-               else
-                  $Args[$ParamName] = 'REQUIRED';
-            }
-            $this->SetData('Args', $Args);
-         } else {
-            $Class = new ReflectionClass($Model);
-            $Meths = $Class->getMethods();
-            $Methods = array();
-            foreach ($Meths as $Meth) {
-               $MethodName = $Meth->getName();
-               if (StringBeginsWith($MethodName, '_'))
-                  continue;
-               
-               $MethArgs = $Meth->getParameters();
-               $Args = array();
-               foreach ($MethArgs as $Index => $MethArg) {
-                  $ParamName = $MethArg->getName();
-
-                  if ($MethArg->isDefaultValueAvailable())
-                     $Args[$ParamName] = $MethArg->getDefaultValue();
-                  else
-                     $Args[$ParamName] = 'REQUIRED';
-               }
-               $Methods[$MethodName] = array('Method' => $MethodName, 'Args' => $Args);
-            }
-            $this->SetData('Methods', $Methods);
-         }
-      } else {
-         if (!method_exists($Model, $MethodName)) {
-            throw NotFoundException($ModelName.'->'.$MethodName.'()');
-         }
-         
-         $MethodArgs = ReflectArgs($Callback, $this->Request->Get(), $Args);
-         
-         $Result = call_user_func_array($Callback, $MethodArgs);
-
-         if (is_array($Result))
-            $this->Data = $Result;
-         elseif (is_a($Result, 'Gdn_DataSet')) {
-            $Result = $Result->ResultArray();
-            $this->Data = $Result;
-         } elseif (is_a($Result, 'stdClass'))
-            $this->Data = (array)$Result;
-         else
-            $this->SetData('Result', $Result);
-      }
-      
-      $this->Render();
-   }
-   
-   /**
     * Redirect to another page.
     * @since 2.0.18b4
     */
@@ -180,6 +78,8 @@ class UtilityController extends DashboardController {
     * @access public
     */
    public function Sort() {
+      $this->Permission('Garden.Settings.Manage');
+      
       $Session = Gdn::Session();
       $TransientKey = GetPostValue('TransientKey', '');
       $Target = GetPostValue('Target', '');
@@ -415,62 +315,6 @@ class UtilityController extends DashboardController {
       $this->FireEvent('Alive');
       
       $this->Render();
-   }
-   
-   /**
-    * Because you cannot send xmlhttprequests across domains, we need to use
-    * a proxy to check for updates.
-    *
-    * @since 2.0.?
-    * @access public
-    */
-   public function UpdateProxy() {
-      $Fields = $_POST;
-      foreach ($Fields as $Field => $Value) {
-         if (get_magic_quotes_gpc()) {
-            if (is_array($Value)) {
-               $Count = count($Value);
-               for ($i = 0; $i < $Count; ++$i) {
-                  $Value[$i] = stripslashes($Value[$i]);
-               }
-            } else {
-               $Value = stripslashes($Value);
-            }
-            $Fields[$Field] = $Value;
-         }
-      }
-      
-		$UpdateCheckUrl = C('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update');
-      echo ProxyRequest($UpdateCheckUrl.'?'.http_build_query($FielupdateChecksds));
-      $Database = Gdn::Database();
-      $Database->CloseConnection();
-   }
-   
-   /**
-    * What the mothership said about update availability.
-    *
-    * @since 2.0.?
-    * @access public
-    */
-   public function UpdateResponse() {
-      // Get the message, response, and transientkey
-      $Response = TrueStripSlashes(GetValue('Response', $_POST));
-      $TransientKey = GetIncomingValue('TransientKey', '');
-      
-      // If the key validates
-      $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey)) {
-         // Save some info to the configuration file
-         $Save = array();
-
-         // If the response wasn't empty, save it in the config
-         if ($Response != '')
-            $Save['Garden.RequiredUpdates'] = @json_decode($Response);
-      
-         // Record the current update check time in the config.
-         $Save['Garden.UpdateCheckDate'] = time();
-         SaveToConfig($Save);
-      }
    }
    
    /**

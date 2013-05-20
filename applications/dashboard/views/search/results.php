@@ -75,9 +75,7 @@
 echo '<div class="PageControls Bottom">';
 
 $RecordCount = $this->Data('RecordCount');
-if ($RecordCount >= SearchModel::$MaxResults)
-   echo '<span class="Gloss">'.Plural($RecordCount, '>%s result', '>%s results').'</span>';
-elseif ($RecordCount)
+if ($RecordCount)
    echo '<span class="Gloss">'.Plural($RecordCount, '%s result', '%s results').'</span>';
 
 PagerModule::Write(array('Wrapper' => '<div %1$s>%2$s</div>'));

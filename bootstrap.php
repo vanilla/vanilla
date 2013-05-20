@@ -31,6 +31,7 @@ date_default_timezone_set('UTC');
 // Include the core function definitions
 require_once(PATH_LIBRARY_CORE.'/functions.error.php');
 require_once(PATH_LIBRARY_CORE.'/functions.general.php');
+require_once(PATH_LIBRARY_CORE.'/functions.compatibility.php');
 
 // Include and initialize the autoloader
 require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');

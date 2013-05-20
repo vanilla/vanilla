@@ -54,6 +54,7 @@ $Construct->Table('User');
 
 $PhotoIDExists = $Construct->ColumnExists('PhotoID');
 $PhotoExists = $Construct->ColumnExists('Photo');
+$UserExists = $Construct->TableExists();
 $ConfirmedExists = $Construct->ColumnExists('Confirmed');
 
 $Construct
@@ -97,7 +98,7 @@ $Construct
    ->Set($Explicit, $Drop);
 
 // Modify all users with ConfirmEmail role to be unconfirmed
-if (!$ConfirmedExists) {
+if ($UserExists && !$ConfirmedExists) {
    $ConfirmEmail = C('Garden.Registration.ConfirmEmail', false);
    $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole', false);
    if ($ConfirmEmail && $ConfirmEmailRoleID !== false) {

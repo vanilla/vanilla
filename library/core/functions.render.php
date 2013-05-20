@@ -609,6 +609,9 @@ if (!function_exists('PluralTranslate')) {
 if (!function_exists('SearchExcerpt')):
    
 function SearchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
+   if (empty($SearchTerms))
+      return substrWord($PlainText, 0, $Length);
+   
    if (is_string($SearchTerms))
       $SearchTerms = preg_split('`[\s|-]+`i', $SearchTerms);
    

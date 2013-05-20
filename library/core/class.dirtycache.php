@@ -14,6 +14,7 @@
  */
  
 class Gdn_Dirtycache extends Gdn_Cache {
+   protected $Cache = array();
    
    public function __construct() {
       parent::__construct();
@@ -29,6 +30,7 @@ class Gdn_Dirtycache extends Gdn_Cache {
    }
    
    public function Store($Key, $Value, $Options = array()) {
+      $this->Cache[$Key] = $Value;
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
    
@@ -37,14 +39,29 @@ class Gdn_Dirtycache extends Gdn_Cache {
    }
    
    public function Get($Key, $Options = array()) {
-      return Gdn_Cache::CACHEOP_FAILURE;
+      if (is_array($Key)) {
+         $Result = array();
+         foreach ($Key as $k) {
+            if (isset($this->Cache[$k]))
+               $Result[$k] = $this->Cache[$k];
+         }
+         return $Result;
+      } else {
+         if (isset($this->Cache[$Key]))
+            return $this->Cache[$Key];
+         else
+            return Gdn_Cache::CACHEOP_FAILURE;
+      }
    }
    
    public function Remove($Key, $Options = array()) {
+      unset($this->Cache[$Key]);
+      
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
    
    public function Replace($Key, $Value, $Options = array()) {
+      $this->Cache[$Key] = $Value;
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
    

@@ -98,7 +98,7 @@ class VanillaSearchModel extends Gdn_Model {
 	 * @param object $SearchModel SearchModel (Dashboard)
 	 * @return object SQL result.
 	 */
-	public function CommentSql($SearchModel, $AddMatch = FALSE) {
+	public function CommentSql($SearchModel, $AddMatch = TRUE) {
       if ($AddMatch) {
    		// Get permission and limit search categories if necessary.
          $Perms = CategoryModel::CategoryWatch();

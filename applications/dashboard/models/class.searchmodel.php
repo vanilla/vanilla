@@ -152,4 +152,11 @@ class SearchModel extends Gdn_Model {
       
 		return $Result;
 	}
+   
+   
+   public function SearchMode($Value = NULL) {
+      if ($Value !== NULL)
+         $this->_SearchMode = $Value;
+      return $this->_SearchMode;
+   }
 }

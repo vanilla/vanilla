@@ -32,6 +32,7 @@ if (!function_exists('paths')) {
     */
    function paths() {
       $paths = func_get_args();
+      $delimiter = '/';
       if (is_array($paths)) {
          $mungedPath = implode($delimiter, $paths);
          $mungedPath = str_replace(array($delimiter.$delimiter.$delimiter, $delimiter.$delimiter), array($delimiter, $delimiter), $mungedPath);

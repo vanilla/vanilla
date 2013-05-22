@@ -3860,19 +3860,19 @@ body.embed .InformMessages {
 /* === Reaction Sprites === */
 .ReactSprite {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   *margin-right: .3em;
-  line-height: 14px;
-  vertical-align: text-top;
+  line-height: 16px;
+  vertical-align: top;
   background-image: url("images/sprites-14-000000.png");
-  background-position: 14px 14px;
+  background-position: 16px 16px;
   background-repeat: no-repeat;
 }
 
 .ReactLabel {
    display: inline-block;
-   line-height: 14px;
+   line-height: 16px;
    vertical-align: top;
 }
 

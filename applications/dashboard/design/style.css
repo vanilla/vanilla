@@ -102,9 +102,6 @@ body {
 	clear: both;
 	height: 0;
 }
-.Hidden {
-   display: none;
-}
 .Invisible {
    opacity: 0;
 }
@@ -2222,9 +2219,6 @@ form.Thumbnail .Warning {
 	float: left;
 	line-height: 2.2;
 }
-.Reactions .Bullet {
-   font-size: 10px;
-}
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,
 .CommentForm .DraftButton {
@@ -3966,4 +3960,10 @@ body.embed .InformMessages {
 .Item h2 + .Media,
 .Item h3 + .Media  {
    margin-top: 0;
+}
+
+/* Overrides */
+
+.Hidden {
+   display: none;
 }

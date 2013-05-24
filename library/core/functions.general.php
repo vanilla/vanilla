@@ -1778,6 +1778,8 @@ if (!function_exists('MarkString')):
     *    2.2   $Needle can now be an array of terms.
     */   
    function MarkString($Needle, $Haystack) {
+      if (!$Needle)
+         return $Haystack;
       if (!is_array($Needle))
          $Needle = explode(' ', $Needle);
       
@@ -1787,7 +1789,7 @@ if (!function_exists('MarkString')):
          else
             $word = '';
          
-         $Haystack = preg_replace('#(?!<.*?)('.$word.preg_quote($n).$word.')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
+         $Haystack = preg_replace('#(?!<.*?)('.$word.preg_quote($n, '#').$word.')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
       }
       return $Haystack;
    }

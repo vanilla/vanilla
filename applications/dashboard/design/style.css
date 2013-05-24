@@ -102,9 +102,6 @@ body {
 	clear: both;
 	height: 0;
 }
-.Hidden {
-   display: none;
-}
 .Invisible {
    opacity: 0;
 }
@@ -2216,15 +2213,6 @@ form.Thumbnail .Warning {
 	margin: 0;
 	padding: 6px 0;
 }
-.EditCommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Back {
-	float: left;
-	line-height: 2.2;
-}
-.Reactions .Bullet {
-   font-size: 10px;
-}
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,
 .CommentForm .DraftButton {
@@ -3860,19 +3848,19 @@ body.embed .InformMessages {
 /* === Reaction Sprites === */
 .ReactSprite {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   *margin-right: .3em;
-  line-height: 14px;
-  vertical-align: text-top;
+  line-height: 16px;
+  vertical-align: top;
   background-image: url("images/sprites-14-000000.png");
-  background-position: 14px 14px;
+  background-position: 16px 16px;
   background-repeat: no-repeat;
 }
 
 .ReactLabel {
    display: inline-block;
-   line-height: 14px;
+   line-height: 16px;
    vertical-align: top;
 }
 
@@ -3939,4 +3927,37 @@ body.embed .InformMessages {
 }
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
+}
+
+/* Media */
+
+.Media {
+  margin: 5px 0 10px;
+}
+.Media, .Media .Media-Body {
+  overflow: hidden;
+  _overflow: visible;
+  zoom: 1;
+}
+.Media .Img {
+  float: left;
+  margin-right: 10px;
+}
+.Media .Img img {
+  display: block;
+}
+.Media .ImgExt {
+  float: right;
+  margin-left: 10px;
+}
+
+.Item h2 + .Media,
+.Item h3 + .Media  {
+   margin-top: 0;
+}
+
+/* Overrides */
+
+.Hidden {
+   display: none;
 }

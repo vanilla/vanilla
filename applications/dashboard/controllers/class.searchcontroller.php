@@ -98,6 +98,14 @@ class SearchController extends Gdn_Controller {
          $ResultSet = array();
       }
       Gdn::UserModel()->JoinUsers($ResultSet, array('UserID'));
+      
+      // Fix up the summaries.
+      $SearchTerms = explode(' ', Gdn_Format::Text($Search));
+      foreach ($ResultSet as &$Row) {
+         $Row['Summary'] = SearchExcerpt(Gdn_Format::PlainText($Row['Summary'], $Row['Format']), $SearchTerms);
+         $Row['Format'] = 'Html';
+      }
+      
 		$this->SetData('SearchResults', $ResultSet, TRUE);
 		$this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);
 		if($ResultSet)

@@ -1699,6 +1699,8 @@ abstract class Gdn_SQLDriver {
       $this->_Sets            = array();
       $this->_NamedParameters = array();
       $this->_Options         = array();
+      
+      return $this;
    }
 
    /**

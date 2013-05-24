@@ -75,18 +75,19 @@ jQuery(document).ready(function($) {
    }
    
    // Reveal youtube player when preview clicked.
-   function Youtube(Container) {
-      var $preview = Container.find('.VideoPreview');
-      var $player = Container.find('.VideoPlayer');
-      var width = $preview.width(), height = $preview.height(), videoid = Container.attr('id').replace('youtube-', '');
+   function Youtube($container) {
+      var $preview = $container.find('.VideoPreview');
+      var $player = $container.find('.VideoPlayer');
+      
+      $container.addClass('Open').closest('.ImgExt').addClass('Open');
+      
+      var width = $preview.width(), height = $preview.height(), videoid = $container.attr('id').replace('youtube-', '');
 
+      
+      var html = '<iframe width="'+width+'" height="'+height+'" src="http://www.youtube.com/embed/'+videoid+'?autoplay=1" frameborder="0" allowfullscreen></iframe>';
+      $player.html(html);
+      
       $preview.hide();
-      $player.html('<object width="'+width+'" height="'+height+'">'
-         + '<param name="movie" value="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1"></param>'
-         + '<param name="allowFullScreen" value="true"></param>'
-         + '<param name="allowscriptaccess" value="always"></param>'
-         + '<embed src="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+width+'" height="'+height+'"></embed>'
-         + '</object>');
       $player.show();
       
       return false;

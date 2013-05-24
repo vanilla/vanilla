@@ -37,6 +37,10 @@ class ButtonBarPlugin extends Gdn_Plugin {
       $Formatter = C('Garden.InputFormatter','Html');
       $this->AttachButtonBarResources($Sender, $Formatter);
    }
+   
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('buttonbar.css', 'plugins/ButtonBar');
+   }
       
    /**
     * Insert buttonbar resources
@@ -47,7 +51,6 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    protected function AttachButtonBarResources($Sender, $Formatter) {
-      $Sender->AddCssFile('buttonbar.css', 'plugins/ButtonBar');
       $Sender->AddJsFile('buttonbar.js', 'plugins/ButtonBar');
       $Sender->AddJsFile('jquery.hotkeys.js', 'plugins/ButtonBar');
       

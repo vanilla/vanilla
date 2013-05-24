@@ -52,6 +52,22 @@ class UserModel extends Gdn_Model {
       $Controller->AddDefinition('PasswordTranslations', T('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
    }
    
+   /**
+    * Reliably get the attributes from any user array or object
+    * 
+    * @param array|object $user
+    * @return array
+    */
+   public static function Attributes($user) {
+      $user = (array)$user;
+      $attributes = $user['Attributes'];
+      if (is_string($attributes))
+         $attributes = unserialize($attributes);
+      if (!is_array($attributes))
+         $attributes = array();
+      return $attributes;
+   }
+   
    public function Ban($UserID, $Options) {
       $this->SetField($UserID, 'Banned', TRUE);
       

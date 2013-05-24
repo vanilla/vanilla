@@ -2213,12 +2213,6 @@ form.Thumbnail .Warning {
 	margin: 0;
 	padding: 6px 0;
 }
-.EditCommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Back {
-	float: left;
-	line-height: 2.2;
-}
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,
 .CommentForm .DraftButton {

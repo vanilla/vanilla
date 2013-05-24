@@ -10,7 +10,7 @@ $Session = Gdn::Session();
             echo $this->Form->Errors();
             echo $this->Form->BodyBox('Body', array('Table' => 'Comment', 'tabindex' => 1));
             echo "<div class=\"Buttons\">\n";
-            echo Wrap(Anchor(T('Cancel'), '/'), 'span class="Cancel"');
+            echo Anchor(T('Cancel'), '/', 'Button Cancel').' ';
             echo $this->Form->Button('Save Comment', array('class' => 'Button Primary CommentButton', 'tabindex' => 2));
             echo "</div>\n";
             echo $this->Form->Close();

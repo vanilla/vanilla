@@ -190,7 +190,7 @@ class FlaggingPlugin extends Gdn_Plugin {
    protected function AddFlagButton($Sender, $Args, $Context = 'comment') {
       $ElementID = ($Context == 'comment') ? $Args['Comment']->CommentID : $Args['Discussion']->DiscussionID;
       
-      if (!is_object($Args['Author'])) {
+      if (!is_object($Args['Author']) || !isset($Args['Author']->UserID)) {
          $ElementAuthorID = 0;
          $ElementAuthor = 'Unknown';
       } else {

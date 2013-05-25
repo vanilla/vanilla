@@ -44,13 +44,17 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'css_expression' => 1,
        'deny_attribute' => $Attributes,
        'unique_ids' => 0,
-       'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
+       'elements' => '*-applet-form-input-textarea-iframe-script-style-embed-object',
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
        'valid_xhtml' => 0,
        'direct_list_nest' => 1,
        'balance' => 1
       );
+      
+      // Turn embedded videos into simple links (legacy workaround)
+      $Html = Gdn_Format::UnembedVideos($Html);
+      
       // We check the flag within Gdn_Format to see
       // if htmLawed should place rel="nofollow" links
       // within output or not.

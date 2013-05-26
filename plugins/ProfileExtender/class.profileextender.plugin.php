@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProfileExtender'] = array(
    'Name' => 'Profile Extender',
    'Description' => 'Add fields (like status, location, or gamer tags) to profiles and registration.',
-   'Version' => '2.0.1',
+   'Version' => '2.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1a1'),
    'MobileFriendly' => TRUE,
    'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
@@ -54,7 +54,11 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * @param string $Type Profile, Registration, or Hide
     */
    public function GetFields($Type = 'Profile') {
-      return array_filter((array)explode(',', C('Plugins.ProfileExtender.'.$Type.'Fields', '')));
+      $Fields = C('Plugins.ProfileExtender.'.$Type.'Fields', '');
+      if (!is_array($Fields))
+         $Fields = (array)explode(',', $Fields);
+      
+      return array_filter($Fields);
    }
    
    /**

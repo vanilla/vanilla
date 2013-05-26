@@ -98,7 +98,7 @@ else:
    echo Anchor(T('Sign In'), SignInUrl($this->_Sender->SelfUrl), (SignInPopup() ? ' SignInPopup' : ''), array('rel' => 'nofollow'));
    $Url = RegisterUrl($this->_Sender->SelfUrl);
       if(!empty($Url))
-         echo ' <span class="Bullet">•</span> '.Anchor(T('Register'), $Url, 'ApplyButton', array('rel' => 'nofollow')).' ';
+         echo Bullet(' ').Anchor(T('Register'), $Url, 'ApplyButton', array('rel' => 'nofollow')).' ';
    echo '</div>';
       
    echo ' <div class="SignInIcons">';

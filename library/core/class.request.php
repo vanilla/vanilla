@@ -358,9 +358,6 @@ class Gdn_Request {
             
          // Fallback 
          } else { $IP = $_SERVER['REMOTE_ADDR']; }
-         
-         // Just in case, trim it
-         $IP = substr($IP,0,15);
       }
       
       // Varnish

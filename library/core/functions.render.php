@@ -339,9 +339,9 @@ function DateUpdated($Row, $Wrap = NULL) {
       
       $UpdateUser = Gdn::UserModel()->GetID($UpdateUserID);
       if ($UpdateUser)
-         $Title = sprintf(T('Edited by %s on %s.'), GetValue('Name', $UpdateUser), Gdn_Format::DateFull($DateUpdated));
+         $Title = sprintf(T('Edited %s by %s.'), Gdn_Format::DateFull($DateUpdated), GetValue('Name', $UpdateUser));
       else
-         $Title = sprintf(T('Edited on %s.'), Gdn_Format::DateFull($DateUpdated));
+         $Title = sprintf(T('Edited %s.'), Gdn_Format::DateFull($DateUpdated));
       
       $Result = ' <span title="'.htmlspecialchars($Title).'" class="DateUpdated">'.
               sprintf(T('edited %s'), Gdn_Format::Date($DateUpdated)).

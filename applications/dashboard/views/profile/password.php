@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2 class="H"><?php echo T('Change My Password'); ?></h2>
+<div class="FormTitleWrapper">
+<h1 class="H"><?php echo T('Change My Password'); ?></h1>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -27,4 +28,5 @@ echo $this->Form->Errors();
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Change Password', '', array('class' => 'Button Primary'));
+<?php echo $this->Form->Close('Change Password', '', array('class' => 'Button Primary')); ?>
+</div>

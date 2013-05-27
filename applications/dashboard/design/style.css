@@ -2063,7 +2063,7 @@ a.ChangePicuture:hover {
    position: relative;
 }
 /* Hiding form headings with CSS in case the forms get popped */
-body.Profile.picture .SmallPopup h1 {
+div.Popup .SmallPopup h1 {
 	display: none;
 }
 /* BGColor on profile forms */

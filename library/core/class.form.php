@@ -1174,9 +1174,8 @@ class Gdn_Form extends Gdn_Pluggable {
          if (isset($Attributes['nohidden'])) {
             unset($Attributes['nohidden']);
          } else {
-            if (substr($FieldName, -2) == '[]') $FieldName = substr($FieldName, 0, -2);
-
-            $Return .= '<input type="hidden" name="Checkboxes[]" value="' . $FieldName .
+            $Return .= '<input type="hidden" name="Checkboxes[]" value="'.
+               (substr($FieldName, -2) === '[]' ? substr($FieldName, 0, -2) : $FieldName).
                 '" />';
          }
       }

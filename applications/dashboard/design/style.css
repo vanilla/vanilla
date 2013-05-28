@@ -761,12 +761,6 @@ div.Warning {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
-.PagerWrap {
-   overflow: hidden;
-}
-.PageDescription .PagerWrap {
-   overflow: visible;
-}
 .Pager {
    font-weight: bold;
    float: right;
@@ -3851,17 +3845,11 @@ body.embed .InformMessages {
   width: 16px;
   height: 16px;
   *margin-right: .3em;
-  line-height: 16px;
+  line-height: 18px;
   vertical-align: top;
   background-image: url("images/sprites-14-000000.png");
   background-position: 16px 16px;
   background-repeat: no-repeat;
-}
-
-.ReactLabel {
-   display: inline-block;
-   line-height: 16px;
-   vertical-align: top;
 }
 
 .ReactEverything { background-position: -197px -53px; }

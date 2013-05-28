@@ -15,7 +15,7 @@
             <div class="Meta">
             <?php
                echo ' <span class="MItem-Author">'.
-                  sprintf(T('%s by %s'), T($Row['Type']), UserAnchor($Row)).
+                  sprintf(T('by %s'), UserAnchor($Row)).
                   '</span>';
 
                echo Bullet(' ');

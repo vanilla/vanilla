@@ -16,7 +16,7 @@
 define('JOIN_INNER', 'inner');
 define('JOIN_LEFT', 'left');
 
-class Gdn_DataSet implements IteratorAggregate {
+class Gdn_DataSet implements IteratorAggregate, Countable {
 
    /**
     * Contains a reference to the open database connection. FALSE by default.
@@ -84,6 +84,15 @@ class Gdn_DataSet implements IteratorAggregate {
    public function Clean() {
       $this->Connection = NULL;
       $this->FreePDOStatement(TRUE);
+   }
+   
+   /**
+    * Count elements of this object. This method provides support for the countable interface.
+    * 
+    * @return int
+    */
+   public function count() {
+      return $this->NumRows();
    }
 
    /**

@@ -184,4 +184,8 @@ jQuery(document).ready(function($) {
          }
       });
    }
+
+   $('#Form_Body').click(function() {
+      $('.SignInPopup').click();
+   });
 });

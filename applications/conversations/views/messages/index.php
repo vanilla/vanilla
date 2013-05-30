@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<div class="DataListWrap">
 <h1 class="H"><?php echo $this->Participants; ?></h1>
 <?php
 if ($this->Data('Conversation.Subject') && C('Conversations.Subjects.Visible')) {
@@ -17,6 +18,7 @@ echo $this->Pager->ToString('less');
    include($MessagesViewLocation);
    ?>
 </ul>
+</div>
 <?php 
 echo $this->Pager->ToString(); 
 echo Gdn::Controller()->FetchView('addmessage');

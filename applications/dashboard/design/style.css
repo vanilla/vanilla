@@ -3879,7 +3879,7 @@ body.embed .InformMessages {
 .ReactMessage { background-position: -101px -102px; }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
-.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
    background-image: url('http://cdn.vanillaforums.com/images/sprites-14-fff.png');
 }

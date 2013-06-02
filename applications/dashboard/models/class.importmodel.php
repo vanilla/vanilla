@@ -1582,20 +1582,12 @@ class ImportModel extends Gdn_Model {
 
       if(!$this->ImportExists('Discussion', 'LastCommentID'))
          $Sqls['Discussion.LastCommentID'] = $this->GetCountSQL('max', 'Discussion', 'Comment');
+      
       if(!$this->ImportExists('Discussion', 'DateLastComment')) {
          $Sqls['Discussion.DateLastComment'] = "update :_Discussion d
          left join :_Comment c
             on d.LastCommentID = c.CommentID
          set d.DateLastComment = coalesce(c.DateInserted, d.DateInserted)";
-      }
-      if (!$this->ImportExists('Discussion', 'CountBookmarks')) {
-         $Sqls['Discussion.CountBookmarks'] = "update :_Discussion d
-            set CountBookmarks = (
-               select count(ud.DiscussionID)
-               from :_UserDiscussion ud
-               where ud.Bookmarked = 1
-                  and ud.DiscussionID = d.DiscussionID
-            )";
       }
 
       if(!$this->ImportExists('Discussion', 'LastCommentUserID')) {

@@ -396,7 +396,7 @@ class PromotedContentModule extends Gdn_Module {
                break;
             
             case 'discussion':
-               $Fields = array_merge($Fields, array('Name'));
+               $Fields = array_merge($Fields, array('Name', 'Type'));
                break;
          }
          

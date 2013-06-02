@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 ?>
-<div class="MessageForm EditCommentForm FormTitleWrapper">
+<div class="MessageForm EditCommentForm">
    <div class="Form-BodyWrap">
       <div class="Form-Body">
          <div class="FormWrapper FormWrapper-Condensed">

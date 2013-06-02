@@ -143,6 +143,7 @@ class PostController extends VanillaController {
          $AllowedCategory = array_pop($AllowedCategories);
          $this->ShowCategorySelector = FALSE;
          $this->Form->AddHidden('CategoryID', $AllowedCategory['CategoryID']);
+         $this->Form->AddHidden('CategoryID');
          
          if ($this->Form->IsPostBack() && !$this->Form->GetFormValue('CategoryID')) {
             $this->Form->SetFormValue('CategoryID', $AllowedCategory['CategoryID']);

@@ -111,7 +111,8 @@ abstract class VanillaModel extends Gdn_Model {
       }
       // Update the user profile after every comment
       $UserModel = Gdn::UserModel();
-      $UserModel->SaveAttribute($Session->UserID, $Attributes);
+      if ($Session->UserID)
+         $UserModel->SaveAttribute($Session->UserID, $Attributes);
       
       return $Spam;
    }   

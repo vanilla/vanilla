@@ -495,16 +495,16 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       foreach($Indexes as $Name => $Sql) {
          if(array_key_exists($Name, $IndexesDb)) {
             if($Indexes[$Name] != $IndexesDb[$Name]) {
-               $IndexSql[$Name] = "/* '{$IndexesDb[$Name]}' => '{$Indexes[$Name]}' */\n";
+//               $IndexSql[$Name][] = "/* '{$IndexesDb[$Name]}' => '{$Indexes[$Name]}' */\n";
                if($Name == 'PRIMARY')
-                  $IndexSql[$Name] .= $AlterSqlPrefix."drop primary key;\n";
+                  $IndexSql[$Name][] = $AlterSqlPrefix."drop primary key;\n";
                else
-                  $IndexSql[$Name] .= $AlterSqlPrefix.'drop index '.$Name.";\n";
-               $IndexSql[$Name] .= $AlterSqlPrefix."add $Sql;\n";
+                  $IndexSql[$Name][] = $AlterSqlPrefix.'drop index '.$Name.";\n";
+               $IndexSql[$Name][] = $AlterSqlPrefix."add $Sql;\n";
             }
             unset($IndexesDb[$Name]);
          } else {
-            $IndexSql[$Name] = $AlterSqlPrefix."add $Sql;\n";   
+            $IndexSql[$Name][] = $AlterSqlPrefix."add $Sql;\n";   
          }
       }
       // Go through the indexes to drop.
@@ -517,10 +517,16 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          }
       }
       
+      if ($this->_TableName == 'UserPoints') {
+         $Foo = 'Bar';
+      }
+      
       // Modify all of the indexes.
-      foreach($IndexSql as $Name => $Sql) {
-         if(!$this->Query($Sql))
-            throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $Name, $this->_TableName));
+      foreach($IndexSql as $Name => $Sqls) {
+         foreach ($Sqls as $Sql) {
+            if(!$this->Query($Sql))
+               throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $Name, $this->_TableName));
+         }
       }
 
       // Run any additional Sql.

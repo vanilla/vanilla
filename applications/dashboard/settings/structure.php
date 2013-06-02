@@ -77,10 +77,10 @@ $Construct
    ->Column('DateSetInvitations', 'datetime', TRUE)
    ->Column('DateOfBirth', 'datetime', TRUE)
    ->Column('DateFirstVisit', 'datetime', TRUE)
-   ->Column('DateLastActive', 'datetime', TRUE)
+   ->Column('DateLastActive', 'datetime', TRUE, 'index')
    ->Column('LastIPAddress', 'varchar(15)', TRUE)
    ->Column('AllIPAddresses', 'varchar(100)', TRUE)
-   ->Column('DateInserted', 'datetime')
+   ->Column('DateInserted', 'datetime', FALSE, 'index')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
@@ -140,6 +140,7 @@ $Construct->Table('UserPoints')
    ->Column('SlotType', array('d', 'w', 'm', 'y', 'a'), FALSE, 'primary')
    ->Column('TimeSlot', 'datetime', FALSE, 'primary')
    ->Column('Source', 'varchar(10)', 'Total', 'primary')
+   ->Column('CategoryID', 'int', 0, 'primary')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('Points', 'int', 0)
    ->Set($Explicit, $Drop);
@@ -165,6 +166,8 @@ $Construct->Table('UserAuthenticationProvider')
    ->Column('PasswordUrl', 'varchar(255)', TRUE)
    ->Column('ProfileUrl', 'varchar(255)', TRUE)
    ->Column('Attributes', 'text', TRUE)
+   ->Column('Active', 'tinyint', '1')
+   ->Column('IsDefault', 'tinyint', 0)
    ->Set($Explicit, $Drop);
 
 $Construct->Table('UserAuthenticationNonce')
@@ -676,6 +679,28 @@ $Construct
    
    ->Set(FALSE, FALSE);
 
+// Merge backup.
+$Construct
+   ->Table('UserMerge')
+   ->PrimaryKey('MergeID')
+   ->Column('OldUserID', 'int', FALSE, 'key')
+   ->Column('NewUserID', 'int', FALSE, 'key')
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertUserID', 'int')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('Attributes', 'text', TRUE)
+   ->Set();
+
+$Construct
+   ->Table('UserMergeItem')
+   ->Column('MergeID', 'int', FALSE, 'key')
+   ->Column('Table', 'varchar(30)')
+   ->Column('Column', 'varchar(30)')
+   ->Column('RecordID', 'int')
+   ->Column('OldUserID', 'int')
+   ->Column('NewUserID', 'int')
+   ->Set();
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');

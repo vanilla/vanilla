@@ -148,7 +148,7 @@ class CategoryModel extends Gdn_Model {
          $Category['CountAllComments'] = $Category['CountComments'];
          $Category['Url'] = self::CategoryUrl($Category, FALSE, '//');
          $Category['ChildIDs'] = array();
-         if ($Category['Photo'])
+         if (GetValue('Photo', $Category))
             $Category['PhotoUrl'] = Gdn_Upload::Url($Category['Photo']);
          else
             $Category['PhotoUrl'] = '';

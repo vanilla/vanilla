@@ -1583,7 +1583,9 @@ class UserModel extends Gdn_Model {
             }
          }
          
-         $this->EventArguments['Fields'] = $Fields;
+         $this->EventArguments['SaveRoles'] = &$SaveRoles;
+         $this->EventArguments['RoleIDs'] = &$RoleIDs;
+         $this->EventArguments['Fields'] = &$Fields;
          $this->FireEvent('BeforeSave');
          $User = array_merge($User, $Fields);
          

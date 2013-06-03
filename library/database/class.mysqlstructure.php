@@ -517,10 +517,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          }
       }
       
-      if ($this->_TableName == 'UserPoints') {
-         $Foo = 'Bar';
-      }
-      
       // Modify all of the indexes.
       foreach($IndexSql as $Name => $Sqls) {
          foreach ($Sqls as $Sql) {

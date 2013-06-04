@@ -490,8 +490,12 @@ class SettingsController extends Gdn_Controller {
       // Check permission
       $this->Permission('Garden.Settings.Manage');
       
-      // Set up head
       $this->AddSideMenu('vanilla/settings/managecategories');
+      
+      // Nested sortable always breaks when we update jQuery so we give it it's own old version of jquery.
+      $this->RemoveJsFile('jquery.js');
+      $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery-1.7.2.min.js', '', array('Sort' => 0));
+      
       $this->AddJsFile('categories.js');
       $this->AddJsFile('js/library/jquery.alphanumeric.js');
       $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');

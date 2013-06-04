@@ -511,9 +511,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       if($Explicit) {
          foreach($IndexesDb as $Name => $Sql) {
             if($Name == 'PRIMARY')
-               $IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
+               $IndexSql[$Name][] = $AlterSqlPrefix."drop primary key;\n";
             else
-               $IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
+               $IndexSql[$Name][] = $AlterSqlPrefix.'drop index '.$Name.";\n";
          }
       }
       

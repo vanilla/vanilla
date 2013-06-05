@@ -27,6 +27,10 @@ $PluginInfo['ProfileExtender'] = array(
  * @todo Option to show in discussions
  * @todo Sort order
  * @todo Lockable for Garden.Moderation.Manage
+ * @todo Date fields
+ * @todo Gender, birthday adding
+ * @todo Dynamic magic field filtering/linking
+ * @todo Dynamic validation rule
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
    /** @var array */

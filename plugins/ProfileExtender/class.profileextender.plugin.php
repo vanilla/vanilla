@@ -1,12 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+/**
+ * @copyright 2013 Vanilla Forums Inc.
+ * @license GNU GPL2
+ */
 
 $PluginInfo['ProfileExtender'] = array(
    'Name' => 'Profile Extender',
@@ -17,23 +13,24 @@ $PluginInfo['ProfileExtender'] = array(
    //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
    'SettingsUrl' => '/dashboard/settings/profileextender',
    'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => "Matt Lincoln Russell",
+   'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://lincolnwebs.com'
 );
 
 /**
  * Plugin to add additional fields to user profiles.
  *
- * Based on Mark O'Sullivan's (mark@vanillaforums.com) CustomProfileFields plugin.
- * When enabled, this plugin will import content from CustomProfileFields.
+ * If the field name is an existing column on user table (e.g. Title, About, Location)
+ * it will store there. Otherwise, it stores in UserMeta.
  *
  * @todo Option to show in discussions
  * @todo Sort order
+ * @todo Lockable for Garden.Moderation.Manage
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
    /** @var array */
-   public $MagicLabels = array('Twitter', 'Google+', 'Real Name');
+   public $MagicLabels = array('Twitter', 'Google', 'Facebook', 'LinkedIn', 'Website', 'Real Name');
 
    /**
     * Available form field types in format Gdn_Type => DisplayName.
@@ -47,8 +44,15 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    /**
     * Whitelist of allowed field properties.
     */
-   public $FieldProperties = array('Name', 'Label', 'FormType', 'Required',
+   public $FieldProperties = array('Name', 'Label', 'FormType', 'Required', 'Locked',
       'Options', 'Length', 'Sort', 'OnRegister', 'OnProfile', 'OnDiscussion');
+
+   /**
+    * Blacklist of disallowed field names.
+    * Prevents accidental or malicious overwrite of sensitive fields.
+    */
+   public $ReservedNames = array('Name', 'Email', 'Password', 'HashMethod', 'Admin', 'Banned', 'Points',
+      'Deleted', 'Verified', 'Attributes', 'Permissions', 'Preferences');
 
    /**
     * Add the Dashboard menu item.
@@ -62,8 +66,25 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Add fields to registration forms.
     */
    public function EntryController_RegisterBeforePassword_Handler($Sender) {
-      $Sender->RegistrationFields = $this->GetFields('Registration');               
+      $ProfileFields = C('ProfileExtender.Fields');
+      foreach ($ProfileFields as $Name => $Field) {
+         if (GetValue('OnRegister', $Field))
+            $Sender->RegistrationFields[$Name] = $Field;
+      }
       include($this->GetView('registrationfields.php'));
+   }
+
+   /**
+    * Required fields on registration forms.
+    */
+   public function EntryController_RegisterValidation_Handler($Sender) {
+      // Require new fields
+      $ProfileFields = C('ProfileExtender.Fields');
+      foreach ($ProfileFields as $Name => $Field) {
+         // Check both so you can't break register form by requiring omitted field
+         if (GetValue('Required', $Field) && GetValue('OnRegister', $Field))
+            $Sender->UserModel->Validation->ApplyRule($Name, 'Required', $Field['Label']." is required.");
+      }
    }
    
    /**
@@ -73,10 +94,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       foreach ($Fields as $Label => $Value) {
          switch ($Label) {
             case 'Twitter':
-               $Fields['Twitter'] = Anchor($Value, 'http://twitter.com/'.$Value);
+               $Fields['Twitter'] = Anchor('@'.$Value, 'http://twitter.com/'.$Value);
                break;
-            case 'Google+':
-               $Fields['Google+'] = Anchor('Google+', $Value, '', array('rel' => 'me'));
+            case 'Facebook':
+               $Fields['Facebook'] = Anchor($Value, 'http://facebook.com/'.$Value);
+               break;
+            case 'LinkedIn':
+               $Fields['LinkedIn'] = Anchor($Value, 'http://www.linkedin.com/in/'.$Value);
+               break;
+            case 'Google':
+               $Fields['Google'] = Anchor('Google+', $Value, '', array('rel' => 'me'));
+               break;
+            case 'Website':
+               $Fields['Website'] = Anchor($Value, $Value);
                break;
             case 'Real Name':
                $Fields['Real Name'] = Wrap(htmlspecialchars($Value), 'span', array('itemprop' => 'name'));
@@ -92,6 +122,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     */
    public function ProfileController_EditMyAccountAfter_Handler($Sender) {
       $this->ProfileFields($Sender);
+   }
+
+   /**
+    * Add custom fields to discussions.
+    */
+   public function Base_AuthorInfo_Handler($Sender, $Args) {
+      //echo ' '.WrapIf(htmlspecialchars(GetValue('Department', $Args['Author'])), 'span', array('class' => 'MItem AuthorDepartment'));
+      //echo ' '.WrapIf(htmlspecialchars(GetValue('Organization', $Args['Author'])), 'span', array('class' => 'MItem AuthorOrganization'));
    }
    
    /**
@@ -157,7 +195,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Make unique name from label for new fields
             $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', GetValue('Label', $FormPostValues));
             $i = 1;
-            while (array_key_exists($Name, $Fields)) {
+            while (array_key_exists($Name, $Fields) || in_array($Name, $this->ReservedNames)) {
                $Name = $TestSlug.$i++;
             }
          }
@@ -183,9 +221,17 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    /**
     * Delete a field.
     */
-   public function SettingsController_ProfileFieldDelete_Create($Sender) {
+   public function SettingsController_ProfileFieldDelete_Create($Sender, $Args) {
+      $Sender->SetData('Title', 'Delete Field');
+      if (isset($Args[0])) {
+         if ($Sender->Form->IsPostBack()) {
+            RemoveFromConfig('ProfileExtender.Fields.'.$Args[0]);
+            $Sender->RedirectUrl = Url('/settings/profileextender');
+         }
+         else
+            $Sender->SetData('Field', C('ProfileExtender.Fields.'.$Args[0]));
+      }
       $Sender->Render('delete', '', 'plugins/ProfileExtender');
-
    }
    
    /**
@@ -304,14 +350,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          $NewData = array();
          foreach ($Fields as $Field) {
             // Make unique slug
-            $Slug = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', $Field);
+            $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', $Field);
             $i = 1;
-            while (array_key_exists($Slug, $NewData)) {
-               $Slug = $TestSlug.$i++;
+            while (array_key_exists($Name, $NewData) || in_array($Name, $this->ReservedNames)) {
+               $Name = $TestSlug.$i++;
             }
 
             // Convert
-            $NewData[$Slug] = array(
+            $NewData[$Name] = array(
                'Label' => $Field,
                'Length' => $Length,
                'FormType' => 'TextBox',
@@ -319,6 +365,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                'OnRegister' => (in_array($Field, $OnRegister)) ? 1 : 0,
                'OnDiscussion' => 0,
                'Required' => 0,
+               'Locked' => 0,
                'Sort' => 0
             );
          }

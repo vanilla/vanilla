@@ -29,7 +29,7 @@ $Fields = $this->Data('ExtendedFields');
          <td><?php echo (GetValue('OnProfile', $Field, 1)) ? T('Yes') : T('No'); ?></td>
          <!--<td><?php echo (GetValue('OnDiscussion', $Field, 0)) ? T('Yes') : T('No'); ?></td>-->
          <td><?php echo Anchor('Edit', '/settings/profilefieldaddedit/'.$Name, 'Popup SmallButton') .
-            ' ' ;//Anchor('Delete', '/settings/profilefielddelete/'.$Name, 'Popup SmallButton'); ?></td>
+            ' ' . Anchor('Delete', '/settings/profilefielddelete/'.$Name, 'Popup SmallButton'); ?></td>
       </tr>
 <?php endforeach; ?>
    </tbody>

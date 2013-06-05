@@ -1,11 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 	
-$CountFields = 0;
-foreach ($Sender->RegistrationFields as $Field) {
-	$CountFields++;
-	echo '<li>';
-		echo $Sender->Form->Hidden('CustomLabel[]', array('value' => $Field));
-		echo $Sender->Form->Label($Field, 'CustomValue[]');
-		echo $Sender->Form->TextBox('CustomValue[]');
-	echo '</li>';
+foreach ($Sender->RegistrationFields as $Name => $Field) {
+   $Options = array();
+   if ($Field['FormType'] == 'Dropdown')
+      $Options =  array_combine($Field['Options'], $Field['Options']);
+
+   echo Wrap($Sender->Form->Label($Field['Label'], $Name).
+      $Sender->Form->{$Field['FormType']}($Name, $Options), 'li');
 }

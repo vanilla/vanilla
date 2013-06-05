@@ -161,6 +161,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Settings page.
     */
    public function SettingsController_ProfileExtender_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
       // Detect if we need to upgrade settings
       if (!C('ProfileExtender.Fields'))
          $this->Setup();
@@ -178,6 +179,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Add/edit a field.
     */
    public function SettingsController_ProfileFieldAddEdit_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Add Profile Field'));
 
       if ($Sender->Form->IsPostBack()) {
@@ -226,6 +228,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Delete a field.
     */
    public function SettingsController_ProfileFieldDelete_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', 'Delete Field');
       if (isset($Args[0])) {
          if ($Sender->Form->IsPostBack()) {
@@ -246,7 +249,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $this->ProfileFields($Sender);
       echo '</ul>';
    }
-   
+
    /**
     * Display custom fields on Profile.
     */
@@ -312,28 +315,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             Gdn::UserModel()->SetMeta($UserID, $FormPostValues, 'Profile.');
       }
    }
-   
-   /**
-	 * Save custom fields during registration.
-	 */
-	public function UserModel_AfterInsertUser_Handler($Sender) {
-      if (!(Gdn::Controller() instanceof Gdn_Controller)) return;
-      
-	   // Get user-submitted
-	   $FormPostValues = Gdn::Controller()->Form->FormValues();
-	   $CustomLabels = GetValue('CustomLabel', $FormPostValues);
-      $CustomValues = GetValue('CustomValue', $FormPostValues);
-	   
-	   if (is_array($CustomLabels) && is_array($CustomValues)) {
-         $Fields = array_combine($CustomLabels, $CustomValues);
-	   
-   	   // Only grab valid fields
-   	   $RegistrationFields = array_flip((array)explode(',', C('Plugins.ProfileExtender.RegistrationFields')));
-         $SaveFields = array_intersect_key($Fields, $RegistrationFields);
-      
-         Gdn::UserModel()->SetMeta(GetValue('InsertUserID', $Sender->EventArguments), $SaveFields, 'Profile.');
-      }
-	}
    
    /**
     * Import from CustomProfileFields or upgrade from ProfileExtender 2.0.

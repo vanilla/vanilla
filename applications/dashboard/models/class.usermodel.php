@@ -3441,7 +3441,7 @@ class UserModel extends Gdn_Model {
             ->Put();
       
       if (in_array($Property, array('Permissions')))
-         $this->ClearCache ($RowID, array('permissions'));
+         $this->ClearCache($RowID, array('permissions'));
       else
          $this->UpdateUserCache($RowID, $Property, $Value);
       
@@ -3483,7 +3483,13 @@ class UserModel extends Gdn_Model {
    }
    
    public function UpdateUserCache($UserID, $Field, $Value = NULL) {
-      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+      // Try and get the user from the cache.
+      $User = $this->GetUserFromCache($UserID, 'userid');
+      
+      if (!$User)
+         return;
+      
+//      $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
       if (!is_array($Field))
          $Field = array($Field => $Value);
       

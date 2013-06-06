@@ -290,6 +290,10 @@ class EntryController extends Gdn_Controller {
       if (!$Provider)
          return;
       
+      $this->EventArguments['Target'] = $Target;
+      $this->EventArguments['DefaultProvider'] =& $Provider;
+      $this->FireEvent("Override{$Type}");
+      
       $Url = $Provider[$Type.'Url'];
       if ($Url) {
          switch ($Type) {

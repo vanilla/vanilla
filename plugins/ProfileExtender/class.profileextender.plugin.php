@@ -95,6 +95,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Special manipulations.
     */
    public function ParseSpecialFields($Fields = array()) {
+      if (!is_array($Fields))
+         return $Fields;
+
       foreach ($Fields as $Label => $Value) {
          switch ($Label) {
             case 'Twitter':
@@ -205,6 +208,11 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             SetValue('Options', $FormPostValues, $Options);
          }
 
+         // Check label
+         if (!GetValue('Label', $FormPostValues)) {
+            $Sender->Form->AddError('Label is required.', 'Label');
+         }
+
          // Check form type
          if (!array_key_exists(GetValue('FormType', $FormPostValues), $this->FormTypes)) {
             $Sender->Form->AddError('Invalid form type.', 'FormType');
@@ -290,8 +298,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // Send them off for magic formatting
          $ProfileFields = $this->ParseSpecialFields($ProfileFields);
          
-         // Display all non-hidden fields
+         // Get all field data, error check
          $AllFields = C('ProfileExtender.Fields');
+         if (!is_array($AllFields) || !is_array($ProfileFields))
+            return;
+
+         // Display all non-hidden fields
          foreach ($ProfileFields as $Name => $Value) {
             if (!$Value)
                continue;

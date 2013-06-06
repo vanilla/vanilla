@@ -137,19 +137,26 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Display custom profile fields.
+    * Display custom profile fields on form.
     *
     * @access private
     */
    private function ProfileFields($Sender) {
       // Retrieve user's existing profile fields
       $this->ProfileFields = C('ProfileExtender.Fields');
-      $this->IsPostBack = $Sender->Form->IsPostBack();
-      
+
+      // Verify field types
+      foreach ($this->ProfileFields as $Name => $Field) {
+         if (!array_key_exists($Field['FormType'], $this->FormTypes))
+            unset($this->ProfileFields[$Name]);
+      }
+
+      // Get user-specific data
       $this->UserFields = array();
       if ($Sender->Data('User'))
          $this->UserFields = Gdn::UserModel()->GetMeta($Sender->Data('User.UserID'), 'Profile.%', 'Profile.');
 
+      // Fill in user data on form
       foreach ($this->UserFields as $Field => $Value) {
          $Sender->Form->SetValue($Field, $Value);
       }
@@ -192,7 +199,15 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
          // Make Options an array
          if ($Options = GetValue('Options', $FormPostValues)) {
-            SetValue('Options', $FormPostValues, explode("\n", $Options));
+            $Options = explode("\n", $Options);
+            if (count($Options) < 2)
+               $Sender->Form->AddError('Must have at least 2 options.', 'Options');
+            SetValue('Options', $FormPostValues, $Options);
+         }
+
+         // Check form type
+         if (!array_key_exists(GetValue('FormType', $FormPostValues), $this->FormTypes)) {
+            $Sender->Form->AddError('Invalid form type.', 'FormType');
          }
 
          // Merge updated data into config
@@ -205,10 +220,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                $Name = $TestSlug.$i++;
             }
          }
-         $Data = C('ProfileExtender.Fields.'.$Name, array());
-         $Data = array_merge($Data, (array)$FormPostValues);
-         SaveToConfig('ProfileExtender.Fields.'.$Name, $Data);
-         $Sender->RedirectUrl = Url('/settings/profileextender');
+
+         // Save if no errors
+         if (!$Sender->Form->ErrorCount()) {
+            $Data = C('ProfileExtender.Fields.'.$Name, array());
+            $Data = array_merge($Data, (array)$FormPostValues);
+            SaveToConfig('ProfileExtender.Fields.'.$Name, $Data);
+            $Sender->RedirectUrl = Url('/settings/profileextender');
+         }
       }
       elseif (isset($Args[0])) {
          // Editing

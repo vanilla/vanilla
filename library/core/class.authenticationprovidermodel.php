@@ -130,7 +130,9 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       // Get the columns and put the extended data in the attributes.
       $this->DefineSchema();
       $Columns = $this->Schema->Fields();
-      $Attributes = array_diff_key($Data, $Columns, array('TransientKey' => 1, 'hpt' => 1, 'Save' => 1));
+      $Remove = array('TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1);
+      $Data = array_diff_key($Data, $Remove);
+      $Attributes = array_diff_key($Data, $Columns);
             
       if (!empty($Attributes)) {
          $Data = array_diff($Data, $Attributes);

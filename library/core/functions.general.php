@@ -1975,6 +1975,30 @@ if (!function_exists('RecordType')) {
    }
 }
 
+if (!function_exists('TouchConfig')):
+/**
+ * Make sure the config has a setting.
+ * This function is useful to call in the setup/structure of plugins to make sure they have some default config set.
+ * 
+ * @param string|array $Name The name of the config key or an array of config key value pairs.
+ * @param mixed $Default The default value to set in the config.
+ */
+function TouchConfig($Name, $Default = null) {
+   if (!is_array($Name)) {
+      $Name = array($Name => $Default);
+   }
+   
+   $Save = array();
+   foreach ($Name as $Key => $Value) {
+      if (!C($Name))
+         $Save[$Name] = $Value;
+   }
+   
+   if (!empty($Save))
+      SaveToConfig($Save);
+}
+endif;
+
 if (!function_exists('write_ini_string')) {
    function write_ini_string($Data) {
       $Flat = array();
@@ -2730,6 +2754,8 @@ if (!function_exists('SaveToConfig')) {
       Gdn::Config()->SaveToConfig($Name, $Value, $Options);
    }
 }
+
+
 
 if (!function_exists('SetAppCookie')):
 

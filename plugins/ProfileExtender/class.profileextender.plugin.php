@@ -157,6 +157,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       if (!is_array($Fields))
          $Fields = array();
 
+      // Make sure we have arrays for each field
+      foreach ($Fields as $Name => $Field) {
+         if (!is_array($Field) || strlen($Name) < 1) {
+            unset($Fields[$Name]);
+            //RemoveFromConfig('ProfileExtender.Fields.'.$Name);
+         }
+      }
+
       return $Fields;
    }
    

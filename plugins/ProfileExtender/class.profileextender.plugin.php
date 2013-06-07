@@ -58,6 +58,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    public $ReservedNames = array('Name', 'Email', 'Password', 'HashMethod', 'Admin', 'Banned', 'Points',
       'Deleted', 'Verified', 'Attributes', 'Permissions', 'Preferences');
 
+   /** @var array  */
+   public $ProfileFields = array();
+
    /**
     * Add the Dashboard menu item.
     */
@@ -70,7 +73,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Add fields to registration forms.
     */
    public function EntryController_RegisterBeforePassword_Handler($Sender) {
-      $ProfileFields = C('ProfileExtender.Fields');
+      $ProfileFields = $this->GetProfileFields();
       foreach ($ProfileFields as $Name => $Field) {
          if (GetValue('OnRegister', $Field))
             $Sender->RegistrationFields[$Name] = $Field;
@@ -83,7 +86,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     */
    public function EntryController_RegisterValidation_Handler($Sender) {
       // Require new fields
-      $ProfileFields = C('ProfileExtender.Fields');
+      $ProfileFields = $this->GetProfileFields();
       foreach ($ProfileFields as $Name => $Field) {
          // Check both so you can't break register form by requiring omitted field
          if (GetValue('Required', $Field) && GetValue('OnRegister', $Field))
@@ -138,6 +141,24 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       //echo ' '.WrapIf(htmlspecialchars(GetValue('Department', $Args['Author'])), 'span', array('class' => 'MItem AuthorDepartment'));
       //echo ' '.WrapIf(htmlspecialchars(GetValue('Organization', $Args['Author'])), 'span', array('class' => 'MItem AuthorOrganization'));
    }
+
+   /**
+    * Get custom profile field(s).
+    *
+    * @param string $Name Optional.
+    * @return array
+    */
+   private function GetProfileFields($Name = '') {
+      if ($Name)
+         $Fields = C('ProfileExtender.Fields.'.$Name, array());
+      else
+         $Fields = C('ProfileExtender.Fields', array());
+
+      if (!is_array($Fields))
+         $Fields = array();
+
+      return $Fields;
+   }
    
    /**
     * Display custom profile fields on form.
@@ -146,7 +167,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     */
    private function ProfileFields($Sender) {
       // Retrieve user's existing profile fields
-      $this->ProfileFields = C('ProfileExtender.Fields');
+      $this->ProfileFields = $this->GetProfileFields();
 
       // Verify field types
       foreach ($this->ProfileFields as $Name => $Field) {
@@ -177,7 +198,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          $this->Setup();
 
       // Set data
-      $Data = C('ProfileExtender.Fields');
+      $Data = $this->GetProfileFields();
       $Sender->SetData('ExtendedFields', $Data);
 
       $Sender->AddSideMenu('settings/profileextender');
@@ -219,7 +240,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          }
 
          // Merge updated data into config
-         $Fields = C('ProfileExtender.Fields');
+         $Fields = $this->GetProfileFields();;
          if (!$Name = GetValue('Name', $FormPostValues)) {
             // Make unique name from label for new fields
             $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', GetValue('Label', $FormPostValues));
@@ -232,14 +253,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // Save if no errors
          if (!$Sender->Form->ErrorCount()) {
             $Data = C('ProfileExtender.Fields.'.$Name, array());
-            $Data = array_merge($Data, (array)$FormPostValues);
+            $Data = array_merge((array)$Data, (array)$FormPostValues);
             SaveToConfig('ProfileExtender.Fields.'.$Name, $Data);
             $Sender->RedirectUrl = Url('/settings/profileextender');
          }
       }
       elseif (isset($Args[0])) {
          // Editing
-         $Data = C('ProfileExtender.Fields.'.$Args[0]);
+         $Data = $this->GetProfileFields($Args[0]);
          if (isset($Data['Options']) && is_array($Data['Options']))
             $Data['Options'] = implode("\n", $Data['Options']);
          $Sender->Form->SetData($Data);
@@ -263,7 +284,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $Sender->RedirectUrl = Url('/settings/profileextender');
          }
          else
-            $Sender->SetData('Field', C('ProfileExtender.Fields.'.$Args[0]));
+            $Sender->SetData('Field', $this->GetProfileFields($Args[0]));
       }
       $Sender->Render('delete', '', 'plugins/ProfileExtender');
    }
@@ -299,7 +320,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          $ProfileFields = $this->ParseSpecialFields($ProfileFields);
          
          // Get all field data, error check
-         $AllFields = C('ProfileExtender.Fields');
+         $AllFields = $this->GetProfileFields();
          if (!is_array($AllFields) || !is_array($ProfileFields))
             return;
 
@@ -328,7 +349,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
       if (is_array($FormPostValues)) {
          $UserID = GetValue('UserID', $Sender->EventArguments);
-         $AllowedFields = C('ProfileExtender.Fields');
+         $AllowedFields = $this->GetProfileFields();
          $Columns = Gdn::SQL()->FetchColumns('User');
 
          foreach ($FormPostValues as $Name => $Field) {

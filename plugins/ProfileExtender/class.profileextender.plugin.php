@@ -177,8 +177,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
       // Get user-specific data
       $this->UserFields = array();
-      if ($Sender->Data('User'))
-         $this->UserFields = Gdn::UserModel()->GetMeta($Sender->Data('User.UserID'), 'Profile.%', 'Profile.');
+      if (is_object($Sender->User))
+         $this->UserFields = Gdn::UserModel()->GetMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
 
       // Fill in user data on form
       foreach ($this->UserFields as $Field => $Value) {

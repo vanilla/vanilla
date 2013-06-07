@@ -40,7 +40,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     * Available form field types in format Gdn_Type => DisplayName.
     */
    public $FormTypes = array(
-      'TextBox' => 'Text',
+      'TextBox' => 'TextBox',
       'Dropdown' => 'Dropdown',
       //'CheckBox' => 'Checkbox',
    );
@@ -143,31 +143,47 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Get custom profile field(s).
+    * Get custom profile fields.
     *
-    * @param string $Name Optional.
     * @return array
     */
-   private function GetProfileFields($Name = '') {
-      if ($Name)
-         $Fields = C('ProfileExtender.Fields.'.$Name, array());
-      else
-         $Fields = C('ProfileExtender.Fields', array());
+   private function GetProfileFields() {
+      $Fields = C('ProfileExtender.Fields', array());
 
       if (!is_array($Fields))
          $Fields = array();
 
-      // Make sure we have arrays for each field
+      // Data checks
       foreach ($Fields as $Name => $Field) {
+         // Require an array for each field
          if (!is_array($Field) || strlen($Name) < 1) {
             unset($Fields[$Name]);
             //RemoveFromConfig('ProfileExtender.Fields.'.$Name);
          }
+
+         // Verify field form type
+         if (!isset($Field['FormType']))
+            $Fields[$Name]['FormType'] = 'TextBox';
+         elseif (!array_key_exists($Field['FormType'], $this->FormTypes))
+            unset($this->ProfileFields[$Name]);
       }
 
       return $Fields;
    }
-   
+
+   /**
+    * Get data for a single profile field.
+    *
+    * @param $Name
+    * @return array
+    */
+   private function GetProfileField($Name) {
+      $Field = C('ProfileExtender.Fields.'.$Name, array());
+      if (!isset($Field['FormType']))
+         $Field['FormType'] = 'TextBox';
+      return $Field;
+   }
+
    /**
     * Display custom profile fields on form.
     *
@@ -176,12 +192,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    private function ProfileFields($Sender) {
       // Retrieve user's existing profile fields
       $this->ProfileFields = $this->GetProfileFields();
-
-      // Verify field types
-      foreach ($this->ProfileFields as $Name => $Field) {
-         if (!array_key_exists($Field['FormType'], $this->FormTypes))
-            unset($this->ProfileFields[$Name]);
-      }
 
       // Get user-specific data
       $this->UserFields = array();
@@ -248,7 +258,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          }
 
          // Merge updated data into config
-         $Fields = $this->GetProfileFields();;
+         $Fields = $this->GetProfileFields();
          if (!$Name = GetValue('Name', $FormPostValues)) {
             // Make unique name from label for new fields
             $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', GetValue('Label', $FormPostValues));
@@ -268,7 +278,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       }
       elseif (isset($Args[0])) {
          // Editing
-         $Data = $this->GetProfileFields($Args[0]);
+         $Data = $this->GetProfileField($Args[0]);
          if (isset($Data['Options']) && is_array($Data['Options']))
             $Data['Options'] = implode("\n", $Data['Options']);
          $Sender->Form->SetData($Data);
@@ -292,7 +302,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $Sender->RedirectUrl = Url('/settings/profileextender');
          }
          else
-            $Sender->SetData('Field', $this->GetProfileFields($Args[0]));
+            $Sender->SetData('Field', $this->GetProfileField($Args[0]));
       }
       $Sender->Render('delete', '', 'plugins/ProfileExtender');
    }

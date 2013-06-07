@@ -80,16 +80,21 @@ class PromotedContentModule extends Gdn_Module {
       // Lookup role name -> roleID
       if (is_string($RoleID)) {
          $RoleModel = new RoleModel();
-         $Role = $RoleModel->GetByName($RoleID);
-         if (!$Role) {
-            $RoleID = NULL;
-         } else {
-            $Role = array_shift($Role);
-            $RoleID = GetValue('RoleID', $Role);
+         $Roles = explode(',', $RoleID);
+         $RoleID = array();
+         foreach ($Roles as $TestRoleID) {
+            $TestRoleID = trim($TestRoleID);
+            $Role = $RoleModel->GetByName($TestRoleID);
+            if (!$Role) {
+               continue;
+            } else {
+               $Role = array_shift($Role);
+               $RoleID[] = GetValue('RoleID', $Role);
+            }
          }
       }
       
-      if (!$RoleID) return FALSE;
+      if (empty($RoleID) || !sizeof($RoleID)) return FALSE;
       
       // Check cache
       $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleID}";

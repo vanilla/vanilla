@@ -12,7 +12,7 @@
 $PluginInfo['ButtonBar'] = array(
    'Name' => 'Button Bar',
    'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
-   'Version' => '1.2.4',
+   'Version' => '1.3',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -23,6 +23,8 @@ $PluginInfo['ButtonBar'] = array(
 );
 
 class ButtonBarPlugin extends Gdn_Plugin {
+   
+   protected $Formats = array('Html', 'BBCode', 'Markdown');
 
    /**
     * Hook the page-level event and insert buttonbar resource files
@@ -51,6 +53,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    protected function AttachButtonBarResources($Sender, $Formatter) {
+      if (!in_array($Formatter, $this->Formats)) return;
       $Sender->AddJsFile('buttonbar.js', 'plugins/ButtonBar');
       $Sender->AddJsFile('jquery.hotkeys.js', 'plugins/ButtonBar');
       
@@ -100,6 +103,9 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    protected function AttachButtonBar($Sender, $Wrap = FALSE) {
+      $Formatter = C('Garden.InputFormatter','Html');
+      if (!in_array($Formatter, $this->Formats)) return;
+      
       $View = $Sender->FetchView('buttonbar','','plugins/ButtonBar');
       
       if ($Wrap)

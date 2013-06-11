@@ -11,6 +11,7 @@
  *  1.6     Add tag permissions
  *  1.6.1   Add tag permissions to UI
  *  1.7     Change the styling of special tags and prevent them from being edited/deleted.
+ *  1.8     Add show exisitng tags
  * 
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -21,7 +22,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.7',
+   'Version' => '1.8',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -440,10 +441,25 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {         
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
+         // Setup, get tags
+         $TagModel = new TagModel;
+         $Tags = $TagModel->GetWhere(array('Type' => NULL), 'Name')->Result(DATASET_TYPE_ARRAY);
+         $TagsHtml = (count($Tags)) ? '' : T('No tags have been created yet.');
+
          echo '<div class="Form-Tags P">';
+
+         // Tag text box
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
+
+         // Available tags
+         echo Wrap(Anchor(T('Show all available tags'), '#'), 'span', array('class' => 'ShowTags'));
+         foreach ($Tags as $Tag) {
+            $TagsHtml .= Anchor($Tag['Name'], '#', 'AvailableTag', array('data-name' => $Tag['Name'])).' ';
+         }
+         echo Wrap($TagsHtml, 'div', array('class' => 'Hidden AvailableTags'));
+
          echo '</div>';
       }
    }

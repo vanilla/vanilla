@@ -29,5 +29,19 @@ jQuery(document).ready(function($) {
             Tag.addClass('not-allowed');
          }
       }
-  });
+   });
+
+   // Show available link
+   $('.ShowTags a').live('click', function() {
+       $('.ShowTags a').hide();
+       $('.AvailableTags').show();
+       return false;
+   });
+
+   // Use available tags
+    $('.AvailableTag').live('click', function() {
+        //$(this).hide();
+        $("#Form_Tags").tokenInput('add', $(this).attr('data-name'));
+        return false;
+    });
 });

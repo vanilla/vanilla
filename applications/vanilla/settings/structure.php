@@ -95,7 +95,7 @@ $Construct
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
-   ->Column('Tags', 'varchar(255)', NULL)
+   ->Column('Tags', 'text', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('CountBookmarks', 'int', NULL)
    ->Column('CountViews', 'int', '1')

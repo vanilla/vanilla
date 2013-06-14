@@ -74,6 +74,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     */
    public function EntryController_RegisterBeforePassword_Handler($Sender) {
       $ProfileFields = $this->GetProfileFields();
+      $Sender->RegistrationFields = array();
       foreach ($ProfileFields as $Name => $Field) {
          if (GetValue('OnRegister', $Field))
             $Sender->RegistrationFields[$Name] = $Field;

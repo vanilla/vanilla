@@ -205,8 +205,11 @@ class DashboardHooks implements Gdn_IPlugin {
     * @param string $Target The url to redirect to after sso.
     */
    public function RootController_SSO_Create($Sender, $Target = '') {
-      if (!$Target)
-         $Target = '/';
+      if (!$Target) {
+         $Target = $Sender->Request->Get('redirect');
+         if (!$Target)
+            $Target = '/';
+      }
       
       // TODO: Make sure the target is a safe redirect.
       

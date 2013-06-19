@@ -39,6 +39,9 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('ShowEmail', T('Email visible to other users'));
       ?>
    </li>
+   <?php
+   $this->FireEvent('CustomUserFields')
+   ?>
    <li>
       <strong><?php echo T('Check all roles that apply to this user:'); ?></strong>
       <?php echo $this->Form->CheckBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); ?>

@@ -155,7 +155,6 @@ function WriteListItem($Row, $Depth = 1) {
       <div class="ItemContent Category">
          <?php 
             echo GetOptions($Row); 
-            echo CategoryPhoto($Row);
             echo '<'.$H.' class="CategoryName TitleWrap">';
             echo CategoryPhoto($Row);
             echo Anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');

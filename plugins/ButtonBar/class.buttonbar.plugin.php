@@ -12,9 +12,9 @@
 $PluginInfo['ButtonBar'] = array(
    'Name' => 'Button Bar',
    'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
-   'Version' => '1.3',
+   'Version' => '1.4',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'Author' => "Tim Gunter",
@@ -36,6 +36,10 @@ class ButtonBarPlugin extends Gdn_Plugin {
       $this->AttachButtonBarResources($Sender, $Formatter);
    }
    public function PostController_Render_Before($Sender) {
+      $Formatter = C('Garden.InputFormatter','Html');
+      $this->AttachButtonBarResources($Sender, $Formatter);
+   }
+   public function MessagesController_Render_Before($Sender) {
       $Formatter = C('Garden.InputFormatter','Html');
       $this->AttachButtonBarResources($Sender, $Formatter);
    }
@@ -75,12 +79,15 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * 
     * @param Gdn_Controller $Sender 
     */
-   public function DiscussionController_BeforeBodyField_Handler($Sender) {
+   public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
       $this->AttachButtonBar($Sender);
    }
-   public function PostController_BeforeBodyField_Handler($Sender) {
-      $this->AttachButtonBar($Sender);
-   }
+//   public function DiscussionController_BeforeBodyField_Handler($Sender) {
+//      $this->AttachButtonBar($Sender);
+//   }
+//   public function PostController_BeforeBodyField_Handler($Sender) {
+//      $this->AttachButtonBar($Sender);
+//   }
    
    /**
     * Hook 'BeforeBodyInput' event
@@ -106,7 +113,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
       $Formatter = C('Garden.InputFormatter','Html');
       if (!in_array($Formatter, $this->Formats)) return;
       
-      $View = $Sender->FetchView('buttonbar','','plugins/ButtonBar');
+      $View = Gdn::Controller()->FetchView('buttonbar','','plugins/ButtonBar');
       
       if ($Wrap)
          echo Wrap($View, 'div', array('class' => 'P'));

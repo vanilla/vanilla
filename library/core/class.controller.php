@@ -1504,6 +1504,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                   ->PassData('Exception', $Ex->getMessage())
                   ->PassData('Message', $Ex->getMessage())
                   ->PassData('Trace', $Ex->getTraceAsString())
+                  ->PassData('Url', Url())
                   ->PassData('Breadcrumbs', $this->Data('Breadcrumbs', array()))
                   ->Dispatch('/home/error');
             } else {
@@ -1511,11 +1512,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                   case 401:
                      Gdn::Dispatcher()
                         ->PassData('Message', $Ex->getMessage())
+                        ->PassData('Url', Url())
                         ->Dispatch('DefaultPermission');
                      break;
                   case 404:
                      Gdn::Dispatcher()
                         ->PassData('Message', $Ex->getMessage())
+                        ->PassData('Url', Url())
                         ->Dispatch('Default404');
                      break;
                  default:

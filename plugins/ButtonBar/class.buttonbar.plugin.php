@@ -90,17 +90,6 @@ class ButtonBarPlugin extends Gdn_Plugin {
 //   }
    
    /**
-    * Hook 'BeforeBodyInput' event
-    * 
-    * This event fires just before the new discussion textbox is drawn.
-    * 
-    * @param Gdn_Controller $Sender 
-    */
-   public function PostController_BeforeBodyInput_Handler($Sender) {
-      $this->AttachButtonBar($Sender, TRUE);
-   }
-   
-   /**
     * Attach button bar in place
     * 
     * This method is abstracted because it is called from multiple places, due

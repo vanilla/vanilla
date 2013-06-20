@@ -272,7 +272,9 @@ class CategoriesController extends VanillaController {
 
       $this->CanonicalUrl(Url('/categories', TRUE));
       
-      include_once $this->FetchViewLocation('helper_functions', 'categories');
+      $Location = $this->FetchViewLocation('helper_functions', 'categories', FALSE, FALSE);
+      if ($Location)
+         include_once $Location;
       $this->Render();
    }
 
@@ -322,7 +324,9 @@ class CategoriesController extends VanillaController {
       $this->View = 'discussions';
 
       $this->CanonicalUrl(Url('/categories', TRUE));
-      include_once $this->FetchViewLocation('helper_functions', 'discussions');
+      $Path = $this->FetchViewLocation('helper_functions', 'discussions', FALSE, FALSE);
+      if ($Path)
+         include_once $Path;
       $this->Render();
    }
    

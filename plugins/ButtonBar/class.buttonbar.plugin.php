@@ -80,7 +80,10 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
-      $this->AttachButtonBar($Sender);
+      $Wrap = false;
+      if (Gdn::Controller() instanceof PostController)
+         $Wrap = true;
+      $this->AttachButtonBar($Sender, $Wrap);
    }
 //   public function DiscussionController_BeforeBodyField_Handler($Sender) {
 //      $this->AttachButtonBar($Sender);

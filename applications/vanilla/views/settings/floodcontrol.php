@@ -52,11 +52,16 @@ echo $this->Form->Errors();
 <ul>
    <li>
       <div class="Info"><?php echo T("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
-   </li>
-   <li>
       <?php
          echo $this->Form->Label('Max Comment Length', 'Vanilla.Comment.MaxLength');
          echo $this->Form->TextBox('Vanilla.Comment.MaxLength', array('class' => 'InputBox SmallInput'));
+      ?>
+   </li>
+   <li>
+      <div class="Info"><?php echo T("You can specify a minimum comment length to discourage short comments."); ?></div>
+      <?php
+         echo $this->Form->Label('Min Comment Length', 'Vanilla.Comment.MinLength');
+         echo $this->Form->TextBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput'));
       ?>
    </li>
 </ul>

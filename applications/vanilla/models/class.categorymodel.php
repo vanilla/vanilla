@@ -337,7 +337,7 @@ class CategoryModel extends Gdn_Model {
       if ($CategoryID) {
          $Category = self::Categories($CategoryID);
          if ($Category)
-            $CategoryID = $Category['PointsCategoryID'];
+            $CategoryID = GetValue('PointsCategoryID', $Category);
          else
             $CategoryID = 0;
       }

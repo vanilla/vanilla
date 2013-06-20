@@ -850,8 +850,6 @@ class UserController extends DashboardController {
             $Form->AddError('Username or Email is required.');
          }
          
-         $Form->ValidateRule('Password', 'ValidateRequired');
-         
          $Provider = $ProviderModel->GetProviderByKey($Form->GetFormValue('ClientID'));
          if (!$Provider) {
             $Form->AddError(sprintf('%1$s "%2$s" not found.', T('Provider'), $Form->GetFormValue('ClientID')));
@@ -873,10 +871,10 @@ class UserController extends DashboardController {
             throw new Gdn_UserException(sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))), 404);
          }
          
-         // Valide the user's password.
+         // Validate the user's password.
          $PasswordHash = new Gdn_PasswordHash();
-         $Password = $this->Form->GetFormValue('Password');
-         if (!$PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User))) {
+         $Password = $this->Form->GetFormValue('Password', NULL);
+         if ($Password !== NULL && !$PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User))) {
             throw new Gdn_UserException(T('Invalid password.'), 401);
          }
          
@@ -889,7 +887,7 @@ class UserController extends DashboardController {
             'UniqueID' => $Form->GetFormValue('UniqueID')
          ));
          
-         $Row = Gdn::UserModel()->GetAuthentication($Form->GetFormValue('UniqueID'), $Form->GetFormValue('UniqueID'));
+         $Row = Gdn::UserModel()->GetAuthentication($Form->GetFormValue('UniqueID'), $Form->GetFormValue('ClientID'));
          
          if ($Row) {
             $this->SetData('Result', $Row);

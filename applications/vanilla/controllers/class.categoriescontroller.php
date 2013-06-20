@@ -107,27 +107,37 @@ class CategoriesController extends VanillaController {
          $this->Title(htmlspecialchars(GetValue('Name', $Category, '')));
          $this->Description(GetValue('Description', $Category), TRUE);
          
+         
          if ($Category->DisplayAs == 'Categories') {
             if (GetValue('Depth', $Category) > 0) {
                // Heading don't make sense if we've cascaded down one level.
                SaveToConfig('Vanilla.Categories.DoHeadings', FALSE, FALSE);
             }
             
-            // This category is an overview style category and displays as a category list.
-            switch($Layout) {
-               case 'mixed':
-                  $this->View = 'discussions';
-                  $this->Discussions();
-                  break;
-               case 'table':
-                  $this->Table();
-                  break;
-               default:
-                  $this->View = 'all';
-                  $this->All();
-                  break;
+            Trace($this->DeliveryMethod(), 'delivery method');
+            Trace($this->DeliveryType(), 'delivery type');
+            Trace($this->SyndicationMethod, 'syndication');
+            
+            if ($this->SyndicationMethod != SYNDICATION_NONE) {
+               // RSS can't show a category list so just tell it to expand all categories.
+               SaveToConfig('Vanilla.ExpandCategories', TRUE, FALSE);
+            } else {
+               // This category is an overview style category and displays as a category list.
+               switch($Layout) {
+                  case 'mixed':
+                     $this->View = 'discussions';
+                     $this->Discussions();
+                     break;
+                  case 'table':
+                     $this->Table();
+                     break;
+                  default:
+                     $this->View = 'all';
+                     $this->All();
+                     break;
+               }
+               return;
             }
-            return;
          }
          
          Gdn_Theme::Section('DiscussionList');

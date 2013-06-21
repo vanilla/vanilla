@@ -1891,7 +1891,7 @@ jQuery(window).load(function() {
       var container = img.closest('div.Message');
       if (img.naturalWidth() > container.width() && container.width() > 0) {
          img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
-         img.wrap('<a href="'+$(img).attr('src')+'"></a>');
+         img.wrap('<a href="'+$(img).attr('src')+'" target="_blank"></a>');
       }
    });
 

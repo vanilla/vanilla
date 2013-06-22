@@ -183,7 +183,8 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Comment.SpamCount',
          'Vanilla.Comment.SpamTime',
          'Vanilla.Comment.SpamLock',
-         'Vanilla.Comment.MaxLength'
+         'Vanilla.Comment.MaxLength',
+         'Vanilla.Comment.MinLength'
       ));
       
       // Set the model on the form.

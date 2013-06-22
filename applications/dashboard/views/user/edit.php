@@ -59,6 +59,9 @@ if ($this->Data('AllowEditing')) { ?>
             echo $this->Form->CheckBox('Banned', T('Banned'), array('value' => '1'));
          ?>
       </li>
+      <?php
+      $this->FireEvent('CustomUserFields')
+      ?>
    </ul>
    <h3><?php echo T('Roles'); ?></h3>
    <ul>

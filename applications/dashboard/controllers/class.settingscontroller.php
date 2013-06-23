@@ -26,7 +26,7 @@ class SettingsController extends DashboardController {
    /** @var string */
    public $ModuleSortContainer = 'Dashboard';
 
-   /** @var object Gdn_Form */
+   /** @var Gdn_Form */
    public $Form;
    
    /** @var array List of permissions that should all have access to main dashboard. */

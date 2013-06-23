@@ -93,16 +93,30 @@ jQuery(document).ready(function($) {
    }
    
    // Enable multicomplete on selected inputs
-   $('.MultiComplete').livequery(function() {
-      $(this).autocomplete(
-         gdn.url('/dashboard/user/autocomplete/'),
-         {
+   $('.MultiComplete').each(function() {
+      /// Author tag token input.
+        var $author = $(this);
+
+        var author = $author.val();
+        if (author && author.length) {
+            author = author.split(",");
+            for (i = 0; i < author.length; i++) {
+                author[i] = { id: i, name: author[i] };
+            }
+        } else {
+            author = [];
+        }
+
+        $author.tokenInput(gdn.url('/user/tagsearch'), {
+            hintText: gdn.definition("TagHint", "Start to type..."),
+            tokenValue: 'name',
+            searchingText: '', // search text gives flickery ux, don't like
+            searchDelay: 300,
             minChars: 1,
-            multiple: true,
-            scrollHeight: 220,
-            selectFirst: true
-         }
-      ).autogrow();
+            maxLength: 25,
+            prePopulate: author,
+            animateDropdown: false
+        });
    });
    
    $('#Form_AddPeople :submit').click(function() {

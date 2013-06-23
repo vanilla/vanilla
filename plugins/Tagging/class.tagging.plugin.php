@@ -22,7 +22,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8',
+   'Version' => '1.8.1',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -473,8 +473,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add javascript to the post/edit discussion page so that tagging autocomplete works.
     */
    public function PostController_Render_Before($Sender) {
-      $Sender->AddCSSFile('token-input.css', 'plugins/Tagging');
-      $Sender->AddJsFile('jquery.tokeninput.vanilla.js', 'plugins/Tagging');
+      $Sender->AddJsFile('jquery.tokeninput.js');
       $Sender->AddJsFile('tagging.js', 'plugins/Tagging');
       $Sender->AddDefinition('PluginsTaggingAdd', Gdn::Session()->CheckPermission('Plugins.Tagging.Add'));
       $Sender->AddDefinition('PluginsTaggingSearchUrl', Gdn::Request()->Url('plugin/tagsearch'));

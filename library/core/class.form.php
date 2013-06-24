@@ -2132,6 +2132,11 @@ PASSWORDMETER;
                        . $Description
                        . $this->TextBox($Row['Name'], $Row['Options']);
                break;
+            case 'callback':
+               $Row['DescriptionHtml'] = $Description;
+               $Row['LabelCode'] = $LabelCode;
+               $Result .= call_user_func($Row['Callback'], $this, $Row);
+               break;
             default:
                $Result .= "Error a control type of {$Row['Control']} is not supported.";
                break;

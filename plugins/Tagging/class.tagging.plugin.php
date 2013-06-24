@@ -446,11 +446,14 @@ class TaggingPlugin extends Gdn_Plugin {
          $TagModel = new TagModel;
          $Tags = $TagModel->GetWhere(array('Type' => NULL), 'CountDiscussions', 'desc', C('Plugins.Tagging.ShowLimit', 100))->Result(DATASET_TYPE_ARRAY);
          $TagsHtml = (count($Tags)) ? '' : T('No tags have been created yet.');
-         foreach ($Tags as $Tag) {
-            $ShowTags[] = $Tag['Name'];
+         $ShowTags = array();
+         if (is_array($Tags)) {
+            foreach ($Tags as $Tag) {
+               $ShowTags[] = $Tag['Name'];
+            }
+            unset($Tags);
+            asort($ShowTags);
          }
-         unset($Tags);
-         asort($ShowTags);
 
          echo '<div class="Form-Tags P">';
 

@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
+echo '<div class="DataListWrap">';
 echo '<h2 class="H">'.T('Activity').'</h2>';
 
 $Session = Gdn::Session();
@@ -15,3 +16,4 @@ if ($Session->IsValid() && CheckPermission('Garden.Profiles.Edit')) {
 
 // Include the activities
 include($this->FetchViewLocation('index', 'activity', 'dashboard'));
+echo '</div>';

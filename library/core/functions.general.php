@@ -954,6 +954,27 @@ if (!function_exists('fnmatch')) {
    }
 }
 
+if (!function_exists('ForceIPv4')) {
+   /**
+    * Force a string into ipv4 notation.
+    * 
+    * @param string $IP
+    * @return string
+    * @since 2.1
+    */
+   function ForceIPv4($IP) {
+      if ($IP === '::1')
+         return '127.0.0.1';
+      elseif (strpos($IP, ':')) {
+         return '0.0.0.1';
+      } elseif (strpos($IP, '.') === FALSE) {
+         return '0.0.0.1';
+      } else {
+         return substr($IP, 0, 15);
+      }
+   }
+}
+
 /**
  * If a ForeignID is longer than 32 characters, use its hash instead.
  *
@@ -1616,41 +1637,73 @@ if (!function_exists('IsMobile')) {
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-      if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|opera m|kindle|webos|playbook|bb10)/i', $UserAgent))
-         $Mobile++;
  
-      if(
-         (strpos($HttpAccept,'application/vnd.wap.xhtml+xml') > 0)
-         || (
-            (isset($_SERVER['HTTP_X_WAP_PROFILE'])
-            || isset($_SERVER['HTTP_PROFILE'])))
-         )
-         $Mobile++;
+      // Match wap Accepts: header
+      if (!$Mobile) {
+         if(
+            (strpos($HttpAccept,'application/vnd.wap.xhtml+xml') > 0)
+            || (
+               (isset($_SERVER['HTTP_X_WAP_PROFILE'])
+               || isset($_SERVER['HTTP_PROFILE'])))
+            )
+            $Mobile++;
+      }
       
-      if(strpos($UserAgent,'android') > 0 && strpos($UserAgent,'mobile') > 0)
-         $Mobile++;
+      // Match mobile androids
+      if (!$Mobile) {
+         if(strpos($UserAgent,'android') !== false && strpos($UserAgent,'mobile') !== false)
+            $Mobile++;
+      }
+      
+      // Match operamini in 'ALL_HTTP'
+      if (!$Mobile) {
+         if (strpos($AllHttp, 'operamini') > 0)
+            $Mobile++;
+      }
  
-      $MobileUserAgent = substr($UserAgent, 0, 4);
-      $MobileUserAgents = array(
-          'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
-          'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
-          'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
-          'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
-          'newt','noki','palm','pana','pant','phil','play','port','prox','qwap',
-          'sage','sams','sany','sch-','sec-','send','seri','sgh-','shar','sie-',
-          'siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-','tosh',
-          'tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp','wapr',
-          'webc','winw','winw','xda','xda-');
- 
-      if (in_array($MobileUserAgent, $MobileUserAgents))
-         $Mobile++;
- 
-      if (strpos($AllHttp, 'operamini') > 0)
-         $Mobile++;
- 
-      // Windows Mobile 7 contains "windows" in the useragent string, so must comment this out
-      // if (strpos($UserAgent, 'windows') > 0)
-      //   $Mobile = 0;
+      // Match discrete chunks of known mobile agents
+      if (!$Mobile) {
+         $DirectAgents = array(
+            'up.browser',
+            'up.link',
+            'mmp',
+            'symbian',
+            'smartphone',
+            'midp',
+            'wap',
+            'phone',
+            'opera m',
+            'kindle',
+            'webos',
+            'playbook',
+            'bb10',
+            'playstation vita',
+            'windows phone',
+            'iphone',
+            'ipod'
+         );
+         $DirectAgentsMatch = implode('|', $DirectAgents);
+         if (preg_match("/({$DirectAgentsMatch})/i", $UserAgent))
+            $Mobile++;
+      }
+      
+      // Match starting chunks of known
+      if (!$Mobile) {
+         $MobileUserAgent = substr($UserAgent, 0, 4);
+         $MobileUserAgents = array(
+             'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
+             'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
+             'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
+             'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
+             'newt','noki','palm','pana','pant','phil','play','port','prox','qwap',
+             'sage','sams','sany','sch-','sec-','send','seri','sgh-','shar','sie-',
+             'siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-','tosh',
+             'tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp','wapr',
+             'webc','winw','winw','xda' ,'xda-');
+
+         if (in_array($MobileUserAgent, $MobileUserAgents))
+            $Mobile++;
+      }
       
       $IsMobile = ($Mobile > 0);
       
@@ -1752,11 +1805,23 @@ if (!function_exists('MarkString')):
    /**
     * Wrap occurences of $Needle in $Haystack with <mark> tags. Explodes $Needle 
     * on spaces. Returns $Haystack with replacements.
+    * 
+    * @changes
+    *    2.2   $Needle can now be an array of terms.
     */   
    function MarkString($Needle, $Haystack) {
-      $Needle = explode(' ', $Needle);
+      if (!$Needle)
+         return $Haystack;
+      if (!is_array($Needle))
+         $Needle = explode(' ', $Needle);
+      
       foreach ($Needle as $n) {
-         $Haystack = preg_replace('#(?!<.*?)('.preg_quote($n).')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
+         if (strlen($n) <= 2 && preg_match('`^\w+$`', $n))
+            $word = '\b';
+         else
+            $word = '';
+         
+         $Haystack = preg_replace('#(?!<.*?)('.$word.preg_quote($n, '#').$word.')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
       }
       return $Haystack;
    }
@@ -1909,6 +1974,30 @@ if (!function_exists('RecordType')) {
       }
    }
 }
+
+if (!function_exists('TouchConfig')):
+/**
+ * Make sure the config has a setting.
+ * This function is useful to call in the setup/structure of plugins to make sure they have some default config set.
+ * 
+ * @param string|array $Name The name of the config key or an array of config key value pairs.
+ * @param mixed $Default The default value to set in the config.
+ */
+function TouchConfig($Name, $Default = null) {
+   if (!is_array($Name)) {
+      $Name = array($Name => $Default);
+   }
+   
+   $Save = array();
+   foreach ($Name as $Key => $Value) {
+      if (!C($Name))
+         $Save[$Name] = $Value;
+   }
+   
+   if (!empty($Save))
+      SaveToConfig($Save);
+}
+endif;
 
 if (!function_exists('write_ini_string')) {
    function write_ini_string($Data) {
@@ -2666,6 +2755,8 @@ if (!function_exists('SaveToConfig')) {
    }
 }
 
+
+
 if (!function_exists('SetAppCookie')):
 
 /**
@@ -2962,7 +3053,8 @@ if (!function_exists('Trace')) {
       if ($Value === NULL)
          return $Traces;
       
-      $Traces[] = array($Value, $Type);
+      if ($Value)
+         $Traces[] = array($Value, $Type);
    }
 }
 
@@ -3046,7 +3138,7 @@ if (!function_exists('ViewLocation')) {
             return $Path;
       }
       
-      Trace($View, 'View');
+      Trace(array('view' => $View, 'controller' => $Controller, 'folder' => $Folder), 'View');
       Trace($Paths, 'ViewLocation()');
       
       return FALSE;

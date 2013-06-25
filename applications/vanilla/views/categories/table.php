@@ -2,6 +2,8 @@
 <h1 class="H HomepageTitle"><?php echo $this->Data('Title'); ?></h1>
 <div class="P PageDescription"><?php echo $this->Description(); ?></div>
 <?php
+$this->FireEvent('AfterDescription');
+$this->FireEvent('AfterPageTitle');
 $Categories = CategoryModel::MakeTree($this->Data('Categories'), $this->Data('Category', NULL));
 
 if (C('Vanilla.Categories.DoHeadings')) {

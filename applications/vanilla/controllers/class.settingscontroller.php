@@ -183,7 +183,8 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Comment.SpamCount',
          'Vanilla.Comment.SpamTime',
          'Vanilla.Comment.SpamLock',
-         'Vanilla.Comment.MaxLength'
+         'Vanilla.Comment.MaxLength',
+         'Vanilla.Comment.MinLength'
       ));
       
       // Set the model on the form.
@@ -365,6 +366,36 @@ class SettingsController extends Gdn_Controller {
       // Render default view
       $this->Render();
    }
+
+   /**
+    * Deleting a category photo.
+    * 
+    * @since 2.1
+    * @access public
+    *
+    * @param int $CategoryID Unique ID of the category to have its photo deleted.
+    */
+   public function DeleteCategoryPhoto($CategoryID = FALSE, $TransientKey = '') {
+      // Check permission
+      $this->Permission('Garden.Settings.Manage');
+      
+      $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
+      
+      if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
+         // Do removal, set message, redirect
+         $CategoryModel = new CategoryModel();
+         $CategoryModel->SetField($CategoryID, 'Photo', NULL); 
+         $this->InformMessage(T('Category photo has been deleted.'));
+      }
+      if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+          Redirect($RedirectUrl);
+      } else {
+         $this->ControllerName = 'Home';
+         $this->View = 'FileNotFound';
+         $this->RedirectUrl = Url($RedirectUrl);
+         $this->Render();
+      }
+   }
    
    /**
     * Editing a category.
@@ -460,8 +491,12 @@ class SettingsController extends Gdn_Controller {
       // Check permission
       $this->Permission('Garden.Settings.Manage');
       
-      // Set up head
       $this->AddSideMenu('vanilla/settings/managecategories');
+      
+      // Nested sortable always breaks when we update jQuery so we give it it's own old version of jquery.
+      $this->RemoveJsFile('jquery.js');
+      $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery-1.7.2.min.js', '', array('Sort' => 0));
+      
       $this->AddJsFile('categories.js');
       $this->AddJsFile('jquery.alphanumeric.js');
       $this->AddJsFile('nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');

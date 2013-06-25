@@ -14,6 +14,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class CategoriesModule extends Gdn_Module {
    
    public function __construct($Sender = '') {
+      parent::__construct($Sender);
+      $this->_ApplicationFolder = 'vanilla';
+      
       // Load categories
       $this->Data = FALSE;
       if (C('Vanilla.Categories.Use') == TRUE && !C('Vanilla.Categories.HideModule')) {
@@ -32,7 +35,6 @@ class CategoriesModule extends Gdn_Module {
          $Data->DatasetType(DATASET_TYPE_OBJECT);
          $this->Data = $Data;
       }
-      parent::__construct($Sender);
    }
 
    public function AssetTarget() {

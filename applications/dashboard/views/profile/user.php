@@ -14,7 +14,7 @@ $Session = Gdn::Session();
    ?></h1>
    <?php
    if ($this->User->Admin == 2) {
-      echo '<div class="Info">', T('This is a system account and does not represent a real person.'), '</div>';
+      echo '<div class="DismissMessage InfoMessage">', T('This is a system account and does not represent a real person.'), '</div>';
    }
 
    if ($this->User->About != '') {

@@ -38,23 +38,11 @@ class DashboardHooks implements Gdn_IPlugin {
          }
       }
 
-      if ($Session->IsValid() && $EmailKey = Gdn::Session()->GetAttribute('EmailKey')) {
-         $NotifyEmailConfirm = TRUE;
+      if ($Session->IsValid()) {
+         $ConfirmEmail = C('Garden.Registration.ConfirmEmail', false);
+         $Confirmed = GetValue('Confirmed', Gdn::Session()->User, true);
          
-         // If this user was manually moved out of the confirmation role, get rid of their 'awaiting confirmation' flag
-         $ConfirmEmailRole = C('Garden.Registration.ConfirmEmailRole', FALSE);
-         
-         $UserRoles = array();
-         $RoleData = Gdn::UserModel()->GetRoles($Session->UserID);
-         if ($RoleData !== FALSE && $RoleData->NumRows() > 0) 
-            $UserRoles = ConsolidateArrayValuesByKey($RoleData->Result(DATASET_TYPE_ARRAY), 'RoleID','Name');
-         
-         if ($ConfirmEmailRole !== FALSE && !array_key_exists($ConfirmEmailRole, $UserRoles)) {
-            Gdn::UserModel()->SaveAttribute($Session->UserID, "EmailKey", NULL);
-            $NotifyEmailConfirm = FALSE;
-         }
-         
-         if ($NotifyEmailConfirm) {
+         if ($ConfirmEmail && !$Confirmed) {
             $Message = FormatString(T('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
             $Sender->InformMessage($Message, '');
          }
@@ -155,7 +143,7 @@ class DashboardHooks implements Gdn_IPlugin {
          $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Users.Approve');
 
       $Menu->AddItem('Moderation', T('Moderation'), FALSE, array('class' => 'Moderation'));
-      $Menu->AddLink('Moderation', T('Spam Queue').' <span class="Popin" rel="/dashboard/log/count/spam"></span>', 'dashboard/log/spam', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Spam Queue'), 'dashboard/log/spam', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Moderation Queue').' <span class="Popin" rel="/dashboard/log/count/moderate"></span>', 'dashboard/log/moderation', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Change Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
       $Menu->AddLink('Moderation', T('Banning'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
@@ -216,8 +204,11 @@ class DashboardHooks implements Gdn_IPlugin {
     * @param string $Target The url to redirect to after sso.
     */
    public function RootController_SSO_Create($Sender, $Target = '') {
-      if (!$Target)
-         $Target = '/';
+      if (!$Target) {
+         $Target = $Sender->Request->Get('redirect');
+         if (!$Target)
+            $Target = '/';
+      }
       
       // TODO: Make sure the target is a safe redirect.
       

@@ -186,7 +186,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
                echo '</span> ';
             }
          
-            if (C('Vanilla.Categories.Use') && $Category)
+            if ($Sender->Data('_ShowCategoryLink', TRUE) && C('Vanilla.Categories.Use') && $Category)
                echo Wrap(Anchor(htmlspecialchars($Discussion->Category), CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category '.$Category['CssClass']));
                
             $Sender->FireEvent('DiscussionMeta');

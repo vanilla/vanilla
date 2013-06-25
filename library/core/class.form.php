@@ -231,11 +231,13 @@ class Gdn_Form extends Gdn_Pluggable {
          $CategoryData = (array)$CategoryData;
       else if (!is_array($CategoryData))
          $CategoryData = array();
+      
+      $Permission = GetValue('Permission', $Options, 'add');
 
       // Respect category permissions (remove categories that the user shouldn't see).
       $SafeCategoryData = array();
       foreach ($CategoryData as $CategoryID => $Category) {
-         if (!$Category['PermsDiscussionsAdd'])
+         if ($Permission == 'add' && !$Category['PermsDiscussionsAdd'])
             continue;
          
          if ($Value != $CategoryID) {
@@ -269,13 +271,15 @@ class Gdn_Form extends Gdn_Pluggable {
       $IncludeNull = GetValue('IncludeNull', $Options);
       if ($IncludeNull === TRUE)
          $Return .= '<option value="">'.T('Select a category...').'</option>';
+      elseif (is_array($IncludeNull))
+         $Return .= "<option value=\"{$IncludeNull[0]}\">{$IncludeNull[1]}</option>\n";
       elseif ($IncludeNull)
          $Return .= "<option value=\"\">$IncludeNull</option>\n";
       elseif (!$HasValue)
          $Return .= '<option value=""></option>';
          
       // Show root categories as headings (ie. you can't post in them)?
-      $DoHeadings = C('Vanilla.Categories.DoHeadings');
+      $DoHeadings = GetValue('Headings', $Options, C('Vanilla.Categories.DoHeadings'));
       
       // If making headings disabled and there was no default value for
       // selection, make sure to select the first non-disabled value, or the
@@ -301,8 +305,8 @@ class Gdn_Form extends Gdn_Pluggable {
             
             $Name = htmlspecialchars(GetValue('Name', $Category, 'Blank Category Name'));
             if ($Depth > 1) {
-               $Name = str_pad($Name, strlen($Name)+$Depth-1, ' ', STR_PAD_LEFT);
-               $Name = str_replace(' ', '&#160;', $Name);
+               $Name = str_repeat('&#160;', 4*($Depth-1)).$Name;
+//               $Name = str_replace(' ', '&#160;', $Name);
             }
                
             $Return .= '>' . $Name . "</option>\n";
@@ -1166,6 +1170,17 @@ class Gdn_Form extends Gdn_Pluggable {
          $Return .= '<div class="TextBoxWrapper">';
       }
       
+      if (strtolower($Type) == 'checkbox') {
+         if (isset($Attributes['nohidden'])) {
+            unset($Attributes['nohidden']);
+         } else {
+            $Return .= '<input type="hidden" name="Checkboxes[]" value="'.
+               (substr($FieldName, -2) === '[]' ? substr($FieldName, 0, -2) : $FieldName).
+                '" />';
+         }
+      }
+      
+      
       $Return .= '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       if ($Type == 'file') $Return .= Attribute('name',
@@ -1177,12 +1192,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return .= $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ' />';
-      if (strtolower($Type) == 'checkbox') {
-         if (substr($FieldName, -2) == '[]') $FieldName = substr($FieldName, 0, -2);
-
-         $Return .= '<input type="hidden" name="Checkboxes[]" value="' . $FieldName .
-             '" />';
-      }
+   
       
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
@@ -1992,6 +2002,21 @@ PASSWORDMETER;
    }
 
    /**
+    * Remove an element from a form
+    * 
+    * @param string $FieldName
+    */
+   public function RemoveFormValue($FieldName) {
+      $this->FormValues();
+      
+      if (!is_array($FieldName))
+         $FieldName = array($FieldName);
+      
+      foreach ($FieldName as $Field)
+         unset($this->_FormValues[$Field]);
+   }
+   
+   /**
     * Set the name of the model that will enforce data rules on $this->_DataArray.
     *
     * This value is also used to identify fields in the $_POST or $_GET
@@ -2106,6 +2131,11 @@ PASSWORDMETER;
                $Result .= $this->Label($LabelCode, $Row['Name'])
                        . $Description
                        . $this->TextBox($Row['Name'], $Row['Options']);
+               break;
+            case 'callback':
+               $Row['DescriptionHtml'] = $Description;
+               $Row['LabelCode'] = $LabelCode;
+               $Result .= call_user_func($Row['Callback'], $this, $Row);
                break;
             default:
                $Result .= "Error a control type of {$Row['Control']} is not supported.";

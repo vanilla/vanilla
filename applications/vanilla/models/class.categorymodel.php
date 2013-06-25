@@ -290,6 +290,39 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
+   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL, $Filter = array()) {
+      static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
+      $Field = $Map[$Permission];
+      $DoHeadings = C('Vanilla.Categories.DoHeadings');
+      
+      $Result = array();
+      foreach (self::Categories() as $ID => $Category) {
+         if (!$Category[$Field])
+            continue;
+         
+         if ($CategoryID != $ID) {
+            if ($Category['CategoryID'] <= 0)
+               continue;
+
+            $Exclude = FALSE;
+            foreach ($Filter as $Key => $Value) {
+               if (isset($Category[$Key]) && $Category[$Key] != $Value) {
+                  $Exclude = TRUE;
+                  break;
+               }
+            }
+            if ($Exclude)
+               continue;
+            
+            if ($DoHeadings && $Permission == 'Discussions.Add' && $Category['Depth'] <= 1)
+               continue;
+         }
+
+         $Result[$ID] = $Category;
+      }
+      return $Result;
+   }
+   
    /**
     * Give a user points specific to this category.
     * 
@@ -304,7 +337,7 @@ class CategoryModel extends Gdn_Model {
       if ($CategoryID) {
          $Category = self::Categories($CategoryID);
          if ($Category)
-            $CategoryID = $Category['PointsCategoryID'];
+            $CategoryID = GetValue('PointsCategoryID', $Category);
          else
             $CategoryID = 0;
       }
@@ -1020,7 +1053,8 @@ class CategoryModel extends Gdn_Model {
       if ($Root) {
          $Root = (array)$Root;
          // Make the tree out of this category as a subtree.
-         $Result = self::_MakeTreeChildren($Root, $Categories, -$Root['Depth']);
+         $DepthAdjust = C('Vanilla.Categories.DoHeadings') ? -$Root['Depth'] : 0;
+         $Result = self::_MakeTreeChildren($Root, $Categories, $DepthAdjust);
       } else {
          // Make a tree out of all categories.
          foreach ($Categories as $Category) {
@@ -1034,7 +1068,9 @@ class CategoryModel extends Gdn_Model {
       return $Result;
    }
    
-   protected static function _MakeTreeChildren($Category, $Categories, $DepthAdj = -1) {
+   protected static function _MakeTreeChildren($Category, $Categories, $DepthAdj = null) {
+      if (is_null($DepthAdj))
+         $DepthAdjust = C('Vanilla.Categories.DoHeadings') ? -1 : 0;
       $Result = array();
       foreach ($Category['ChildIDs'] as $ID) {
          if (!isset($Categories[$ID]))

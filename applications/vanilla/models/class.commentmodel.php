@@ -766,6 +766,12 @@ class CommentModel extends VanillaModel {
          $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
          $this->Validation->ApplyRule('Body', 'Length');
       }
+      $MinCommentLength = C('Vanilla.Comment.MinLength');
+      if ($MinCommentLength && is_numeric($MinCommentLength)) {
+         $this->Validation->SetSchemaProperty('Body', 'MinLength', $MinCommentLength);
+         $this->Validation->AddRule('MinTextLength', 'function:ValidateMinTextLength');
+         $this->Validation->ApplyRule('Body', 'MinTextLength');
+      }
       
       // Validate $CommentID and whether this is an insert
       $CommentID = ArrayValue('CommentID', $FormPostValues);
@@ -921,6 +927,12 @@ class CommentModel extends VanillaModel {
             $Activity['Story'] = GetValue('Body', $Fields);
             $Activity['Format'] = GetValue('Format', $Fields);
          }
+         
+         // Pass generic activity to events.
+         $this->EventArguments['Activity'] = $Activity;
+         
+         // Pass generic activity to events.
+         $this->EventArguments['Activity'] = $Activity;
          
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);

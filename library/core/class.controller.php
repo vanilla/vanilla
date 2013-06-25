@@ -1174,6 +1174,8 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo $View, $ControllerName, and $ApplicationFolder need correct variable types and descriptions.
     */
    public function xRender($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') {
+      Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $this->RequestMethod, 'Render');
+      
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)
          return;
       
@@ -1474,6 +1476,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                   ->PassData('Exception', $Ex->getMessage())
                   ->PassData('Message', $Ex->getMessage())
                   ->PassData('Trace', $Ex->getTraceAsString())
+                  ->PassData('Url', Url())
                   ->PassData('Breadcrumbs', $this->Data('Breadcrumbs', array()))
                   ->Dispatch('/home/error');
             } else {
@@ -1481,11 +1484,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                   case 401:
                      Gdn::Dispatcher()
                         ->PassData('Message', $Ex->getMessage())
+                        ->PassData('Url', Url())
                         ->Dispatch('DefaultPermission');
                      break;
                   case 404:
                      Gdn::Dispatcher()
                         ->PassData('Message', $Ex->getMessage())
+                        ->PassData('Url', Url())
                         ->Dispatch('Default404');
                      break;
                  default:

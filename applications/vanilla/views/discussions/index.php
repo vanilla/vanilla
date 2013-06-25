@@ -11,6 +11,8 @@ if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
 }
 
+$this->FireEvent('AfterPageTitle');
+
 include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
 

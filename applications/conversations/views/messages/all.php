@@ -13,10 +13,12 @@ echo '<div class="PageControls Top">';
    PagerModule::Write($PagerOptions);
    
    echo '<div class="BoxButtons BoxNewConversation">';
-   echo Anchor(T('New Message'), '/messages/add', 'Button NewConversation Primary');
+   echo Anchor(Sprite('SpMessage').' '.T('New Message'), '/messages/add', 'Button NewConversation Primary');
    echo '</div>';
 echo '</div>';
 ?>
+<div class="DataListWrap">
+<h2 class="Hidden"><?php echo $this->Data('Title'); ?></h2>
 <ul class="Condensed DataList Conversations">
 <?php
 if (count($this->Data('Conversations') > 0)):
@@ -29,6 +31,7 @@ else:
 endif;
 ?>
 </ul>
+</div>
 <?php
 // Post Pager
 echo '<div class="PageControls Bottom">';

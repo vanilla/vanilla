@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php
-   if (is_object($this->User))
+   if ($this->Data('User'))
       echo T('Edit User');
    else
       echo T('Add User');
@@ -16,22 +16,39 @@ if ($this->Data('AllowEditing')) { ?>
             echo $this->Form->TextBox('Name');
          ?>
       </li>
+      <?php if (Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')) : ?>
       <li>
          <?php
+            
             echo $this->Form->Label('Email', 'Email');
             if (UserModel::NoEmail()) {
                echo '<div class="Gloss">',
                   T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
                   '</div>';
             }
-            echo $this->Form->TextBox('Email');
+            
+            $EmailAttributes = array();
+            
+            // Email confirmation
+            if (!$this->Data('_EmailConfirmed'))
+               $EmailAttributes['class'] = 'InputBox Unconfirmed';
+            
+            echo $this->Form->TextBox('Email', $EmailAttributes);
          ?>
       </li>
+      <?php if ($this->Data('_CanConfirmEmail')): ?>
+      <li class="User-ConfirmEmail">
+         <?php
+            echo $this->Form->CheckBox('ConfirmEmail', T("Email is confirmed"), array('value' => '1'));
+         ?>
+      </li>
+      <?php endif ?>
       <li>
          <?php
             echo $this->Form->CheckBox('ShowEmail', T('Email visible to other users'), array('value' => '1'));
          ?>
       </li>
+      <?php endif; ?>
       <li>
          <?php
             echo $this->Form->CheckBox('Verified', T('This user is verified as a non-spammer'), array('value' => '1'));
@@ -42,6 +59,9 @@ if ($this->Data('AllowEditing')) { ?>
             echo $this->Form->CheckBox('Banned', T('Banned'), array('value' => '1'));
          ?>
       </li>
+      <?php
+      $this->FireEvent('CustomUserFields')
+      ?>
    </ul>
    <h3><?php echo T('Roles'); ?></h3>
    <ul>
@@ -49,7 +69,7 @@ if ($this->Data('AllowEditing')) { ?>
          <strong><?php echo T('Check all roles that apply to this user:'); ?></strong>
          <?php 
             //echo $this->Form->CheckBoxList("RoleID", $this->RoleData, $this->UserRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); 
-         echo $this->Form->CheckBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); 
+         echo $this->Form->CheckBoxList("RoleID", array_flip($this->Data('Roles')), array_flip($this->Data('UserRoles'))); 
          ?>
       </li>
    </ul>

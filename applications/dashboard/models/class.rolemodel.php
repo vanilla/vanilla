@@ -121,7 +121,9 @@ class RoleModel extends Gdn_Model {
    
    public function GetPermissions($RoleID) {
       $PermissionModel = Gdn::PermissionModel();
-      $LimitToSuffix = $this->CanSession == '1' ? '' : 'View';
+      $Role = self::Roles($RoleID);
+      
+      $LimitToSuffix = GetValue('CanSession', $Role, TRUE) ? '' : 'View';
       
       $Result = $PermissionModel->GetPermissions($RoleID, $LimitToSuffix);
       return $Result;      

@@ -3,13 +3,16 @@ $Alt = FALSE;
 $Session = Gdn::Session();
 $EditUser = $Session->CheckPermission('Garden.Users.Edit');
 $DeleteUser = $Session->CheckPermission('Garden.Users.Delete');
+$ViewPersonalInfo = $Session->CheckPermission('Garden.PersonalInfo.View');
 foreach ($this->UserData->Result() as $User) {
    $Alt = $Alt ? FALSE : TRUE;
    ?>
    <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
 <!--      <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $User->UserID; ?>" /></td>-->
       <td><strong><?php echo UserAnchor($User); ?></strong></td>
+      <?php if ($ViewPersonalInfo) : ?>
       <td class="Alt"><?php echo Gdn_Format::Email($User->Email); ?></td>
+      <?php endif; ?>
       <td style="max-width: 200px;">
          <?php
          $Roles = GetValue('Roles', $User, array());
@@ -32,7 +35,9 @@ foreach ($this->UserData->Result() as $User) {
       </td>
       <td class="Alt"><?php echo Gdn_Format::Date($User->DateFirstVisit, 'html'); ?></td>
       <td><?php echo Gdn_Format::Date($User->DateLastActive, 'html'); ?></td>
+      <?php if ($ViewPersonalInfo) : ?>
       <td><?php echo htmlspecialchars($User->LastIPAddress); ?></td>
+      <?php endif; ?>
       <?php
          $this->EventArgs['User'] = $User;
          $this->FireEvent('UserCell');

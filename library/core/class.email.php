@@ -46,6 +46,16 @@ class Gdn_Email extends Gdn_Pluggable {
       $this->Clear();
       parent::__construct();
    }
+   
+   /**
+    * Add a custom header to the outgoing email.
+    * @param string $Name
+    * @param string $Value
+    * @since 2.1
+    */
+   public function AddHeader($Name, $Value) {
+      $this->PhpMailer->AddCustomHeader("$Name:$Value");
+   }
 
 
    /**
@@ -90,7 +100,7 @@ class Gdn_Email extends Gdn_Pluggable {
       $this->PhpMailer->AltBody = '';
       $this->From();
       $this->_IsToSet = FALSE;
-      $this->MimeType(Gdn::Config('Garden.Email.MimeType', 'text/plain'));
+      $this->MimeType(C('Garden.Email.MimeType', 'text/plain'));
       $this->_MasterView = 'email.master';
       $this->Skipped = array();
       return $this;
@@ -211,19 +221,19 @@ class Gdn_Email extends Gdn_Pluggable {
          return;
       }
       
-      if (Gdn::Config('Garden.Email.UseSmtp')) {
+      if (C('Garden.Email.UseSmtp')) {
          $this->PhpMailer->IsSMTP();
-         $SmtpHost = Gdn::Config('Garden.Email.SmtpHost', '');
-         $SmtpPort = Gdn::Config('Garden.Email.SmtpPort', 25);
+         $SmtpHost = C('Garden.Email.SmtpHost', '');
+         $SmtpPort = C('Garden.Email.SmtpPort', 25);
          if (strpos($SmtpHost, ':') !== FALSE) {
             list($SmtpHost, $SmtpPort) = explode(':', $SmtpHost);
          }
 
          $this->PhpMailer->Host = $SmtpHost;
          $this->PhpMailer->Port = $SmtpPort;
-         $this->PhpMailer->SMTPSecure = Gdn::Config('Garden.Email.SmtpSecurity', '');
-         $this->PhpMailer->Username = $Username = Gdn::Config('Garden.Email.SmtpUser', '');
-         $this->PhpMailer->Password = $Password = Gdn::Config('Garden.Email.SmtpPassword', '');
+         $this->PhpMailer->SMTPSecure = C('Garden.Email.SmtpSecurity', '');
+         $this->PhpMailer->Username = $Username = C('Garden.Email.SmtpUser', '');
+         $this->PhpMailer->Password = $Password = C('Garden.Email.SmtpPassword', '');
          if(!empty($Username))
             $this->PhpMailer->SMTPAuth = TRUE;
 

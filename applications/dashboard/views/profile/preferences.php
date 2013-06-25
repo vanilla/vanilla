@@ -24,7 +24,8 @@
       width: 486px;
    }
 </style>
-<h2 class="H"><?php echo $this->Data('Title');  ?></h2>
+<div class="FormTitleWrapper">
+<h1 class="H"><?php echo $this->Data('Title');  ?></h1>
 <div class="Preferences">
 <?php
 echo $this->Form->Open();
@@ -102,4 +103,5 @@ $this->FireEvent('CustomNotificationPreferneces');
 echo $this->Form->Close('Save Preferences', '', array('class' => 'Button Primary'));
 $this->FireEvent("AfterPreferencesRender");
 ?>
+</div>
 </div>

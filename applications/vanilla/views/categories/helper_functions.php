@@ -155,7 +155,6 @@ function WriteListItem($Row, $Depth = 1) {
       <div class="ItemContent Category">
          <?php 
             echo GetOptions($Row); 
-            echo CategoryPhoto($Row);
             echo '<'.$H.' class="CategoryName TitleWrap">';
             echo CategoryPhoto($Row);
             echo Anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
@@ -184,15 +183,15 @@ function WriteListItem($Row, $Depth = 1) {
             ?></span>
             
             <span class="MItem MItem-Count DiscussionCount"><?php
-               printf(PluralTranslate($Row['CountDiscussions'], 
+               printf(PluralTranslate($Row['CountAllDiscussions'], 
                   '%s discussion html', '%s discussions html', '%s discussion', '%s discussions'),
-                  BigPlural($Row['CountDiscussions'], '%s discussion'));
+                  BigPlural($Row['CountAllDiscussions'], '%s discussion'));
             ?></span>
             
             <span class="MItem MItem-Count CommentCount"><?php
-               printf(PluralTranslate($Row['CountComments'], 
+               printf(PluralTranslate($Row['CountAllComments'], 
                   '%s comment html', '%s comments html', '%s comment', '%s comments'),
-                  BigPlural($Row['CountComments'], '%s comment'));
+                  BigPlural($Row['CountAllComments'], '%s comment'));
             ?></span>
             
             <span class="MItem LastestPost LastDiscussionTitle"><?php

@@ -124,7 +124,7 @@ class MessageController extends DashboardController {
       $this->AddSideMenu('dashboard/message');
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('jquery.tablednd.js');
-      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
+      $this->AddJsFile('jquery-ui.js');
       $this->AddJsFile('messages.js');
       $this->Title(T('Messages'));
          

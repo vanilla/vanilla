@@ -304,7 +304,7 @@ class UserController extends DashboardController {
             if ($this->Request->Get('Target')) {
                $this->RedirectUrl = $this->Request->Get('Target');
             } else {
-               $this->RedirectUrl = UserUrl($User);
+               $this->RedirectUrl = Url(UserUrl($User));
             }
          }
       }
@@ -484,20 +484,34 @@ class UserController extends DashboardController {
       $this->AddJsFile('user.js');
       $this->Title(T('Edit User'));
       $this->AddSideMenu('dashboard/user');
-      
-      // Determine if username can be edited
-      $this->CanEditUsername = TRUE;
-      $this->CanEditUsername = $this->CanEditUsername & Gdn::Config("Garden.Profile.EditUsernames");
-      $this->CanEditUsername = $this->CanEditUsername | Gdn::Session()->CheckPermission('Garden.Users.Edit');
 
-      $RoleModel = new RoleModel();
-      $AllRoles = $RoleModel->GetArray();
-      
       // By default, people with access here can freely assign all roles
-      $this->RoleData = $AllRoles;
+      $RoleModel = new RoleModel();
+      $RoleData = $AllRoles = $RoleModel->GetArray();
 
       $UserModel = new UserModel();
-      $this->User = $UserModel->GetID($UserID);
+      $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
+      
+      // Determine if username can be edited
+      $CanEditUsername = (bool)C("Garden.Profile.EditUsernames") || Gdn::Session()->CheckPermission('Garden.Users.Edit');
+      $this->SetData('_CanEditUsername', $CanEditUsername);
+      
+      // Determine if emails can be edited
+      $CanEditEmail = (
+              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
+              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')
+           );
+      $this->SetData('_CanEditEmail', $CanEditEmail);
+      
+      // Decide if they have ability to confirm users
+      $Confirmed = (bool)GetValueR('Confirmed', $User);
+      $CanConfirmEmail = (
+              UserModel::RequireConfirmEmail() &&
+              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
+              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'));
+      $this->SetData('_CanConfirmEmail', $CanConfirmEmail);
+      $this->SetData('_EmailConfirmed', $Confirmed);
+      $User['ConfirmEmail'] = (int)$Confirmed;
 
       // Set the model on the form.
       $this->Form->SetModel($UserModel);
@@ -509,28 +523,35 @@ class UserController extends DashboardController {
          
          $AllowEditing = TRUE;
          $this->EventArguments['AllowEditing'] = &$AllowEditing;
-         $this->EventArguments['TargetUser'] = &$this->User;
+         $this->EventArguments['TargetUser'] = &$User;
          
          // These are all the 'effective' roles for this edit action. This list can
          // be trimmed down from the real list to allow subsets of roles to be
          // edited.
-         $this->EventArguments['RoleData'] = &$this->RoleData;
+         $this->EventArguments['RoleData'] = &$RoleData;
          
          $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
          $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
          $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
-         $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
-         $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
+         $UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
+         $this->EventArguments['UserRoleData'] = &$UserRoleData;
          
          $this->FireEvent("BeforeUserEdit");
          $this->SetData('AllowEditing', $AllowEditing);
          
-         if (!$this->Form->AuthenticatedPostBack()) {
-            $this->Form->SetData($this->User);
+         $this->Form->SetData($User);
+         if ($this->Form->AuthenticatedPostBack()) {
             
-         } else {
-            if (!$this->CanEditUsername)
-               $this->Form->SetFormValue("Name", $this->User->Name);
+            if (!$CanEditUsername)
+               $this->Form->SetFormValue("Name", $User['Name']);
+            
+            // Allow mods to confirm/unconfirm emails
+            $this->Form->RemoveFormValue('Confirmed');
+            $Confirmation = $this->Form->GetFormValue('ConfirmEmail', null);
+            $Confirmation = !is_null($Confirmation) ? (bool)$Confirmation : null;
+
+            if ($CanConfirmEmail && is_bool($Confirmation))
+               $this->Form->SetFormValue('Confirmed', (int)$Confirmation);
             
             // If a new password was specified, add it to the form's collection
             $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
@@ -546,12 +567,12 @@ class UserController extends DashboardController {
             
             if (!is_array($RequestedRoles)) $RequestedRoles = array();
             $RequestedRoles = array_flip($RequestedRoles);
-            $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
+            $UserNewRoles = array_intersect_key($RoleData, $RequestedRoles);
             
             // These roles will stay turned on regardless of the form submission contents 
             // because the editing user does not have permission to modify them
-            $ImmutableRoles = array_diff_key($AllRoles, $this->RoleData);
-            $UserImmutableRoles = array_intersect_key($ImmutableRoles, $this->UserRoleData);
+            $ImmutableRoles = array_diff_key($AllRoles, $RoleData);
+            $UserImmutableRoles = array_intersect_key($ImmutableRoles, $UserRoleData);
             
             // Apply immutable roles
             foreach ($UserImmutableRoles as $IMRoleID => $IMRoleName)
@@ -563,18 +584,22 @@ class UserController extends DashboardController {
             
             if ($this->Form->Save(array('SaveRoles' => TRUE)) !== FALSE) {
                if ($this->Form->GetValue('ResetPassword', '') == 'Auto') {
-                  $UserModel->PasswordRequest($this->User->Email);
+                  $UserModel->PasswordRequest($User['Email']);
                   $UserModel->SetField($UserID, 'HashMethod', 'Reset'); 
                }
 
                $this->InformMessage(T('Your changes have been saved.'));
             }
             
-            $this->UserRoleData = $UserNewRoles;
+            $UserRoleData = $UserNewRoles;
          }
       } catch (Exception $Ex) {
          $this->Form->AddError($Ex);
       }
+      
+      $this->SetData('User', $User);
+      $this->SetData('Roles', $RoleData);
+      $this->SetData('UserRoles', $UserRoleData);
       
       $this->Render();
    }
@@ -626,7 +651,10 @@ class UserController extends DashboardController {
             $FilterValue = $Parts[2];
          }
          
-         if (!in_array($Field, array('InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastVisit')))
+         if (strpos($Field, '.') !== FALSE)
+            $Field = array_pop(explode('.', $Field));
+         
+         if (!in_array($Field, array('Name', 'Email', 'LastIPAddress', 'InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastVisit')))
             return FALSE;
 
          return array("$Field $Op" => $FilterValue);
@@ -812,8 +840,6 @@ class UserController extends DashboardController {
             $Form->AddError('Username or Email is required.');
          }
          
-         $Form->ValidateRule('Password', 'ValidateRequired');
-         
          $Provider = $ProviderModel->GetProviderByKey($Form->GetFormValue('ClientID'));
          if (!$Provider) {
             $Form->AddError(sprintf('%1$s "%2$s" not found.', T('Provider'), $Form->GetFormValue('ClientID')));
@@ -835,10 +861,10 @@ class UserController extends DashboardController {
             throw new Gdn_UserException(sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))), 404);
          }
          
-         // Valide the user's password.
+         // Validate the user's password.
          $PasswordHash = new Gdn_PasswordHash();
-         $Password = $this->Form->GetFormValue('Password');
-         if (!$PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User))) {
+         $Password = $this->Form->GetFormValue('Password', NULL);
+         if ($Password !== NULL && !$PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User))) {
             throw new Gdn_UserException(T('Invalid password.'), 401);
          }
          
@@ -851,7 +877,7 @@ class UserController extends DashboardController {
             'UniqueID' => $Form->GetFormValue('UniqueID')
          ));
          
-         $Row = Gdn::UserModel()->GetAuthentication($Form->GetFormValue('UniqueID'), $Form->GetFormValue('UniqueID'));
+         $Row = Gdn::UserModel()->GetAuthentication($Form->GetFormValue('UniqueID'), $Form->GetFormValue('ClientID'));
          
          if ($Row) {
             $this->SetData('Result', $Row);
@@ -878,6 +904,11 @@ class UserController extends DashboardController {
       }
       
       $this->Render('Blank', 'Utility', 'Dashboard');
+   }
+   
+   public function TagSearch($q) {
+      $Data = Gdn::UserModel()->TagSearch($q);
+      die(json_encode($Data));
    }
    
    /**

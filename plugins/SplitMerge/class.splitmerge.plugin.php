@@ -82,7 +82,7 @@ class SplitMergePlugin extends Gdn_Plugin {
          $Data = $Sender->Form->FormValues();
          $Data['Body'] = sprintf(T('This discussion was created from comments split from: %s.'), Anchor(Gdn_Format::Text($Discussion->Name), 'discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/'));
          $Data['Format'] = 'Html';
-         $Data['Type'] = GetValue('Type', $Discussion, NULL);
+         $Data['Type'] = 'Discussion';
          $NewDiscussionID = $DiscussionModel->Save($Data);
          $Sender->Form->SetValidationResults($DiscussionModel->ValidationResults());
          

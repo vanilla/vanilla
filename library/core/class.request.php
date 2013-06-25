@@ -271,6 +271,20 @@ class Gdn_Request {
    public function Host($Hostname = NULL) {
       return $this->RequestHost($Hostname);
    }
+   
+   /**
+    * Return the host and port together if the port isn't standard.
+    * @return string
+    * @since 2.1
+    */
+   public function HostAndPort() {
+      $Host = $this->Host();
+      $Port = $this->Port();
+      if (!in_array($Port, array(80, 443)))
+         return $Host.':'.$Port;
+      else
+         return $Host;
+   }
 
    public function IpAddress() {
       return $this->RequestAddress();
@@ -291,6 +305,16 @@ class Gdn_Request {
    
    public function IsPostBack() {
       return strcasecmp($this->RequestMethod(), 'post') == 0;
+   }
+   
+   /**
+    * Gets/sets the port of the request.
+    * @param int $Port
+    * @return int
+    * @since 2.1
+    */
+   public function Port($Port = NULL) {
+      return $this->_EnvironmentElement('PORT', $Port);
    }
 
    /**
@@ -340,6 +364,7 @@ class Gdn_Request {
       $OriginalIP = GetValue('HTTP_X_ORIGINALLY_FORWARDED_FOR', $_SERVER, NULL);
       if (!is_null($OriginalIP)) $IP = $OriginalIP;
       
+      $IP = ForceIPv4($IP);
       $this->RequestAddress($IP);
       
       // Request Scheme
@@ -354,6 +379,14 @@ class Gdn_Request {
       if (!is_null($OriginalProto)) $Scheme = $OriginalProto;
       
       $this->RequestScheme($Scheme);
+      
+      if (isset($_SERVER['SERVER_PORT']))
+         $Port = $_SERVER['SERVER_PORT'];
+      elseif ($Scheme === 'https')
+         $Port = 443;
+      else
+         $Port = 80;
+      $this->Port($Port);
       
       if (is_array($_GET)) {
          $Get = FALSE;
@@ -752,9 +785,17 @@ class Gdn_Request {
     *    - Custom port, rewrites                      http://www.forum.com:8080/index.php?/
     *
     * @param sring $Path of the controller method.
-    * @param bool $WithDomain set to false to create a relative URL
+    * @param mixed $WithDomain Whether or not to include the domain with the url. This can take the following values.
+    * - true: Include the domain name.
+    * - false: Do not include the domain. This is a relative path.
+    * - //: Include the domain name, but use the // schemeless notation.
+    * - /: Just return the path.
     * @param bool $SSL set to true to implement SSL
     * @return string
+    * 
+    * @changes
+    *    2.1   Added the // option to $WithDomain.
+    *    2.2   Added the / option to $WithDomain.
     */
    public function Url($Path = '', $WithDomain = FALSE, $SSL = NULL) {
       static $AllowSSL = NULL; if ($AllowSSL === NULL) $AllowSSL = C('Garden.AllowSSL', FALSE);
@@ -783,14 +824,19 @@ class Gdn_Request {
 
       $Parts = array();
       
+      $Port = $this->Port();
+      $Host = $this->Host();
+      if (!in_array($Port, array(80, 443)))
+         $Host .= ':'.$Port;
+      
       if ($WithDomain === '//') {
-         $Parts[] = '//'.$this->Host();
-      } elseif ($WithDomain) {
-         $Parts[] = $Scheme.'://'.$this->Host();
+         $Parts[] = '//'.$Host;
+      } elseif ($WithDomain && $WithDomain !== '/') {
+         $Parts[] = $Scheme.'://'.$Host;
       } else
          $Parts[] = '';
 
-      if ($this->WebRoot() != '')
+      if ($WithDomain !== '/' && $this->WebRoot() != '')
          $Parts[] = $this->WebRoot();
 
       // Strip out the hash.

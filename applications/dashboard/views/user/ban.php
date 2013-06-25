@@ -14,7 +14,7 @@ echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 
-<div class="Warning">
+<div class="DismissMessage WarningMessage">
    <?php
    echo FormatString(T('You are about to ban {User.UserID,user}.'), $this->Data);
    ?>

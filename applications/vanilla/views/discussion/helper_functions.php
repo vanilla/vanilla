@@ -128,7 +128,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
             $Sender->FireEvent('AfterCommentMeta'); // DEPRECATED
 
             // Include IP Address if we have permission
-            if ($Session->CheckPermission('Garden.Moderation.Manage')) 
+            if ($Session->CheckPermission('Garden.PersonalInfo.View')) 
                echo Wrap(IPAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
 
             ?>
@@ -510,8 +510,9 @@ if (!function_exists('FormatMeAction')):
          return;
       
       // Maxlength (don't let people blow up the forum)
+      $Comment->Body = substr($Comment->Body, 4);
       $Maxlength = C('Vanilla.MeAction.MaxLength', 100);
-      $Body = Gdn_Format::PlainText(substr($Comment->Body, 4));
+      $Body = FormatBody($Comment);
       if (strlen($Body) > $Maxlength)
          $Body = substr($Body, 0, $Maxlength).'...';
       

@@ -1,4 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
+
+echo '<div class="DataListWrap">';
 echo '<h2 class="H">'.T('Notifications').'</h2>';
 
 if (count($this->Data('Activities'))) {
@@ -11,3 +13,4 @@ if (count($this->Data('Activities'))) {
 <div class="Empty"><?php echo T('You do not have any notifications yet.'); ?></div>
    <?php
 }
+echo '</div>';

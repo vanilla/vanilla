@@ -12,9 +12,9 @@
 $PluginInfo['ButtonBar'] = array(
    'Name' => 'Button Bar',
    'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
-   'Version' => '1.2.4',
+   'Version' => '1.4',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'Author' => "Tim Gunter",
@@ -23,6 +23,8 @@ $PluginInfo['ButtonBar'] = array(
 );
 
 class ButtonBarPlugin extends Gdn_Plugin {
+   
+   protected $Formats = array('Html', 'BBCode', 'Markdown');
 
    /**
     * Hook the page-level event and insert buttonbar resource files
@@ -37,6 +39,14 @@ class ButtonBarPlugin extends Gdn_Plugin {
       $Formatter = C('Garden.InputFormatter','Html');
       $this->AttachButtonBarResources($Sender, $Formatter);
    }
+   public function MessagesController_Render_Before($Sender) {
+      $Formatter = C('Garden.InputFormatter','Html');
+      $this->AttachButtonBarResources($Sender, $Formatter);
+   }
+   
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('buttonbar.css', 'plugins/ButtonBar');
+   }
       
    /**
     * Insert buttonbar resources
@@ -47,9 +57,15 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    protected function AttachButtonBarResources($Sender, $Formatter) {
-      $Sender->AddCssFile('buttonbar.css', 'plugins/ButtonBar');
+      if (!in_array($Formatter, $this->Formats)) return;
       $Sender->AddJsFile('buttonbar.js', 'plugins/ButtonBar');
       $Sender->AddJsFile('jquery.hotkeys.js', 'plugins/ButtonBar');
+      
+      $Sender->AddDefinition('ButtonBarLinkUrl', T('ButtonBar.LinkUrlText', 'Enter your URL:'));
+      $Sender->AddDefinition('ButtonBarImageUrl', T('ButtonBar.ImageUrlText', 'Enter image URL:'));
+      $Sender->AddDefinition('ButtonBarBBCodeHelpText', T('ButtonBar.BBCodeHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
+      $Sender->AddDefinition('ButtonBarHtmlHelpText', T('ButtonBar.HtmlHelp', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
+      $Sender->AddDefinition('ButtonBarMarkdownHelpText', T('ButtonBar.MarkdownHelp', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
       
       $Sender->AddDefinition('InputFormat', $Formatter);
    }
@@ -63,23 +79,18 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * 
     * @param Gdn_Controller $Sender 
     */
-   public function DiscussionController_BeforeBodyField_Handler($Sender) {
-      $this->AttachButtonBar($Sender);
+   public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
+      $Wrap = false;
+      if (Gdn::Controller() instanceof PostController)
+         $Wrap = true;
+      $this->AttachButtonBar($Sender, $Wrap);
    }
-   public function PostController_BeforeBodyField_Handler($Sender) {
-      $this->AttachButtonBar($Sender);
-   }
-   
-   /**
-    * Hook 'BeforeBodyInput' event
-    * 
-    * This event fires just before the new discussion textbox is drawn.
-    * 
-    * @param Gdn_Controller $Sender 
-    */
-   public function PostController_BeforeBodyInput_Handler($Sender) {
-      $this->AttachButtonBar($Sender, TRUE);
-   }
+//   public function DiscussionController_BeforeBodyField_Handler($Sender) {
+//      $this->AttachButtonBar($Sender);
+//   }
+//   public function PostController_BeforeBodyField_Handler($Sender) {
+//      $this->AttachButtonBar($Sender);
+//   }
    
    /**
     * Attach button bar in place
@@ -91,7 +102,10 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    protected function AttachButtonBar($Sender, $Wrap = FALSE) {
-      $View = $Sender->FetchView('buttonbar','','plugins/ButtonBar');
+      $Formatter = C('Garden.InputFormatter','Html');
+      if (!in_array($Formatter, $this->Formats)) return;
+      
+      $View = Gdn::Controller()->FetchView('buttonbar','','plugins/ButtonBar');
       
       if ($Wrap)
          echo Wrap($View, 'div', array('class' => 'P'));

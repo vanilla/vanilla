@@ -102,9 +102,6 @@ body {
 	clear: both;
 	height: 0;
 }
-.Hidden {
-   display: none;
-}
 .Invisible {
    opacity: 0;
 }
@@ -764,12 +761,6 @@ div.Warning {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
-.PagerWrap {
-   overflow: hidden;
-}
-.PageDescription .PagerWrap {
-   overflow: visible;
-}
 .Pager {
    font-weight: bold;
    float: right;
@@ -1047,6 +1038,9 @@ div.Discussion:hover .OptionsTitle:hover,
    color: #ffffff !Important;
    text-decoration: none;
    background-color: #004D9F !Important;
+}
+.MenuItems a:hover .Gloss {
+   color: #ffffff !important;
 }
 .MenuItems li > strong {
    font-size: 12px;
@@ -1974,6 +1968,11 @@ pre code {
    border: none;
    padding: 0;
 }
+mark {
+    padding: 0 2px;
+    color: inherit;
+    background: #ff6;
+}
 .Message strong, .Message b {
    font-weight: bold;
 }
@@ -2058,7 +2057,7 @@ a.ChangePicuture:hover {
    position: relative;
 }
 /* Hiding form headings with CSS in case the forms get popped */
-body.Profile.picture .SmallPopup h1 {
+div.Popup .SmallPopup h1 {
 	display: none;
 }
 /* BGColor on profile forms */
@@ -2207,15 +2206,6 @@ form.Thumbnail .Warning {
    text-align: right; 
 	margin: 0;
 	padding: 6px 0;
-}
-.EditCommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Back {
-	float: left;
-	line-height: 2.2;
-}
-.Reactions .Bullet {
-   font-size: 10px;
 }
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,
@@ -2585,7 +2575,7 @@ tr.CategoryHeading td {
    width: 12px; 
    margin-top: 8px;
 }
-.DiscussionSorter .Flyout:before, .Flyout:after { 
+.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after { 
    border: none; 
 }
 .DiscussionSorter .ToggleFlyout .Flyout { 
@@ -3852,20 +3842,14 @@ body.embed .InformMessages {
 /* === Reaction Sprites === */
 .ReactSprite {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   *margin-right: .3em;
-  line-height: 14px;
-  vertical-align: text-top;
+  line-height: 18px;
+  vertical-align: top;
   background-image: url("images/sprites-14-000000.png");
-  background-position: 14px 14px;
+  background-position: 16px 16px;
   background-repeat: no-repeat;
-}
-
-.ReactLabel {
-   display: inline-block;
-   line-height: 14px;
-   vertical-align: top;
 }
 
 .ReactEverything { background-position: -197px -53px; }
@@ -3895,7 +3879,7 @@ body.embed .InformMessages {
 .ReactMessage { background-position: -101px -102px; }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
-.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
    background-image: url('http://cdn.vanillaforums.com/images/sprites-14-fff.png');
 }
@@ -3931,4 +3915,168 @@ body.embed .InformMessages {
 }
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
+}
+
+/* Media */
+
+.Media {
+  margin: 5px 0 10px;
+}
+.Media, .Media .Media-Body {
+  overflow: hidden;
+  _overflow: visible;
+  zoom: 1;
+}
+.Media .Img {
+  float: left;
+  margin-right: 10px;
+}
+.Media .Img img {
+  display: block;
+}
+.Media .ImgExt {
+  float: right;
+  margin-left: 10px;
+}
+
+.Item h2 + .Media,
+.Item h3 + .Media  {
+   margin-top: 0;
+}
+
+/* Overrides */
+
+.Hidden {
+   display: none;
+}
+
+/* Token input */
+
+ul.token-input-list {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #aaa;
+  color: #333;
+  font-size: 15px;
+  margin: 0 !important;
+  padding: 3px;
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  width: 100%;
+  cursor: text;
+  min-height: 1px;
+  z-index: 999;
+  background-color: #fff;
+  list-style-type: none;
+}
+
+ul.token-input-list-focus,
+ul.token-input-list-focus input {
+  background: #ffe;
+}
+
+/*#DiscussionForm input.Button {
+    margin-top: 20px;
+}*/
+ul.token-input-list li input {
+  border: 0;
+  width: 100px;
+  padding: 3px 3px;
+  margin: 2px 0;
+}
+
+li.token-input-token {
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  margin-right: 3px;
+  padding: 1px 5px;
+  line-height: 20px;
+  cursor: default;
+  border: 1px solid #999;
+  border-radius: 2px;
+  float: left;
+  font-size: 13px;
+}
+
+li.token-input-token.not-allowed {
+  background-color: #FFC2C2;
+  color: #C91313;
+  border: 1px solid #FF3232;
+}
+li.token-input-token.not-allowed span {
+  color: #C91313;
+}
+
+li.token-input-token p {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+li.token-input-token span {
+  margin-left: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: arial;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+li.token-input-selected-token {
+  background-color: #eee;
+}
+
+li.token-input-selected-token.not-allowed {
+  background-color: red;
+  color: #ffffff;
+  border: 1px solid #FF3232;
+}
+
+li.token-input-selected-token.not-allowed span {
+  color: #ffffff;
+}
+
+li.token-input-input-token {
+  float: left;
+}
+
+div.token-input-dropdown {
+  position: absolute;
+  background-color: #fff;
+  overflow: hidden;
+  border: 1px solid #aaa;
+  border-top-width: 0;
+  cursor: default;
+  z-index: 1;
+  padding: 0 3px;
+}
+div.token-input-dropdown p {
+  margin: 0;
+  padding: 5px;
+}
+div.token-input-dropdown ul {
+  margin: 0 -3px !important;
+  padding: 0;
+}
+div.token-input-dropdown ul li {
+  background-color: #fff;
+  padding: 3px 6px;
+}
+div.token-input-dropdown ul li.token-input-dropdown-item {
+  background-color: #fff;
+}
+div.token-input-dropdown ul li.token-input-dropdown-item2 {
+  background-color: #fff;
+}
+div.token-input-dropdown ul li em {
+  font-weight: bold;
+  font-style: none;
+}
+div.token-input-dropdown ul li.token-input-selected-dropdown-item {
+  background-color: #eee;
 }

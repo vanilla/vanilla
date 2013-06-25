@@ -24,7 +24,7 @@ $this->FireEvent('BeforeCommentForm');
          <div class="Form-Body">
             <div class="FormWrapper FormWrapper-Condensed">
                <?php
-               echo $this->Form->Open();
+               echo $this->Form->Open(array('id' => 'Form_Comment'));
                echo $this->Form->Errors();
 //               $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
                $this->FireEvent('BeforeBodyField');
@@ -66,10 +66,10 @@ $this->FireEvent('BeforeCommentForm');
                */
 
                if (!$Editing && $Session->IsValid()) {
-                  echo Anchor(T('Preview'), '#', 'PreviewButton')."\n";
-                  echo Anchor(T('Edit'), '#', 'WriteButton Hidden')."\n";
+                  echo ' '.Anchor(T('Preview'), '#', 'Button PreviewButton')."\n";
+                  echo ' '.Anchor(T('Edit'), '#', 'Button WriteButton Hidden')."\n";
                   if ($NewOrDraft)
-                     echo Anchor(T('Save Draft'), '#', 'DraftButton')."\n";
+                     echo ' '.Anchor(T('Save Draft'), '#', 'Button DraftButton')."\n";
                }
                if ($Session->IsValid())
                   echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);

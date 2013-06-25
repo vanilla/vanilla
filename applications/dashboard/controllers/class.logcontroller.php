@@ -241,7 +241,7 @@ class LogController extends DashboardController {
       Gdn_Theme::Section('Dashboard');
       $this->AddJsFile('log.js');
       $this->AddJsFile('jquery.expander.js');
-      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
+      $this->AddJsFile('jquery-ui.js');
       $this->Form->InputPrefix = '';
    }
    

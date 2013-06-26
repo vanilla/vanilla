@@ -81,6 +81,10 @@ class DiscussionController extends VanillaController {
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       
+      if (strcasecmp(GetValue('Type', $this->Discussion), 'redirect') === 0) {
+         $this->RedirectDiscussion($this->Discussion);
+      }
+      
       $Category = CategoryModel::Categories($this->Discussion->CategoryID);
       $this->SetData('Category', $Category);
       
@@ -847,6 +851,18 @@ body { background: transparent !important; }
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
+   }
+   
+   /**
+    * Redirect to the url specified by the discussion.
+    * @param array|object $Discussion
+    */
+   protected function RedirectDiscussion($Discussion) {
+      $Body = Gdn_Format::To(GetValue('Body', $Discussion), GetValue('Format', $Discussion));
+      if (preg_match('`href="([^"]+)"`i', $Body, $Matches)) {
+         $Url = $Matches[1];
+         Redirect($Url, 301);
+      }
    }
    
    /**

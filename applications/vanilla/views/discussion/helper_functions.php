@@ -508,6 +508,8 @@ if (!function_exists('FormatMeAction')):
    function FormatMeAction($Comment) {
       if (!IsMeAction($Comment))
          return;
+      if (!C('Garden.Format.MeActions'))
+         return;
       
       // Maxlength (don't let people blow up the forum)
       $Comment->Body = substr($Comment->Body, 4);

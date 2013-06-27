@@ -496,6 +496,8 @@ endif;
 
 if (!function_exists('IsMeAction')):
    function IsMeAction($Row) {
+      if (!C('Garden.Format.MeActions'))
+         return;
       $Row = (array)$Row;
       if (!array_key_exists('Body', $Row))
          return FALSE;
@@ -507,8 +509,6 @@ endif;
 if (!function_exists('FormatMeAction')):
    function FormatMeAction($Comment) {
       if (!IsMeAction($Comment))
-         return;
-      if (!C('Garden.Format.MeActions'))
          return;
       
       // Maxlength (don't let people blow up the forum)

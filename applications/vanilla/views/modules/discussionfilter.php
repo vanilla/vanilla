@@ -36,13 +36,14 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
       <?php
       $Controller->FireEvent('BeforeDiscussionFilters');     
 //      if (C('Vanilla.Categories.ShowTabs')) {
+      if (C('Vanilla.Categories.Use')) {
          $CssClass = 'AllCategories';
          if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), array('index', 'all'))) {
             $CssClass .= ' Active';
          }
 
          echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpAllCategories').' '.T('Categories'), '/categories').'</li> ';
-//      }
+      }
       ?>
       <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::Link('forumroot', Sprite('SpDiscussions').' '.T('Recent Discussions')); ?></li>
       <?php echo Gdn_Theme::Link('activity', Sprite('SpActivity').' '.T('Activity'), '<li class="Activities"><a href="%url" class="%class">%text</a></li>'); ?>

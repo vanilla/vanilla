@@ -244,7 +244,14 @@ var callbacks = {};
 embed.fn = embed.prototype;
 
 embed.callRemote = embed.fn.callRemote = function(func, args, callback) {
-   var options = { func: func, args: args };
+   var options = { func: func };
+   
+   
+   // Massage the args into an array.
+   args = args || [];
+   if (!Vanilla.isArray(args))
+      args = [args];
+   options.args = args;
    
    if (callback) {
       options.callbackID = generateCbid();

@@ -3,12 +3,27 @@
    if (window.top == window.self)
       return;
    
-//   window.document.domain = window.document.domain;
-   
    // Call a remote function in the parent.
    Vanilla.parent.callRemote = function(func, args, success, failure) {
       window.parent.callRemote(func, args, success, failure);
    };
+   
+   Vanilla.parent.adjustPopupPosition = function(pos) {
+       var height = document.body.offsetHeight || document.body.scrollHeight;
+       
+       var bottom0 = height - (pos.top + pos.height);
+       if (bottom0 < 0)
+           bottom0 = 0;
+       
+       // Move the inform messages.
+       $('.InformMessages').animate({ bottom: bottom0 });
+       
+       // Move the popup.
+       $('#Popup').animate({ top: pos.top + (pos.height - $('#Popup').height()) / 2.2 });
+   }
+   $(document).on('informMessage popupReveal', function() {
+       Vanilla.parent.callRemote('getScrollPosition', [], Vanilla.parent.adjustPopupPosition);
+   });
    
    Vanilla.parent.signout = function() { $.post('/entry/signout.json'); };
    

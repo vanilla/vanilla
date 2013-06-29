@@ -144,6 +144,28 @@ Vanilla.extend({
 		}
 		return true;
 	},
+            
+   // http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
+   debounce: function (func, threshold, execAsap) {
+        var timeout;
+
+        return function debounced () {
+            var obj = this, args = arguments;
+            function delayed () {
+                if (!execAsap)
+                    func.apply(obj, args);
+                timeout = null; 
+            };
+
+            if (timeout)
+                clearTimeout(timeout);
+            else if (execAsap)
+                func.apply(obj, args);
+
+            timeout = setTimeout(delayed, threshold || 100); 
+        };
+
+    },
    
    error: function( msg ) {
 		throw new Error( msg );
@@ -210,7 +232,8 @@ var embed = function(options) {
       me,
       {
          initialPath: '/',
-         autoStart: true
+         autoStart: true,
+         handleScroll: true
       },
       options);
       
@@ -222,6 +245,9 @@ var embed = function(options) {
          Vanilla.error("Could not find element #"+container);
       me.container = container;
    }
+   
+   if (me.handleScroll && window.jQuery)
+      window.jQuery(window).scroll(Vanilla.debounce(function() { me.adjustPopupPosition(); }));
    
    // TODO: ensure easyXDM.
    
@@ -242,6 +268,12 @@ var generateCbid = function() {
 var callbacks = {};
 
 embed.fn = embed.prototype;
+
+embed.adjustPopupPosition = embed.fn.adjustPopupPosition = function() {
+    var me = this;
+    
+    me.getScrollPosition(function(pos) { me.callRemote('adjustPopupPosition', pos); });
+}
 
 embed.callRemote = embed.fn.callRemote = function(func, args, callback) {
    var options = { func: func };
@@ -273,6 +305,31 @@ embed.callback = embed.fn.callRemoteCallback = function(callbackID, args) {
    
    delete callbacks[callbackID];
 }
+
+embed.getScrollPosition = embed.fn.getScrollPosition = function(callback) {
+   var result = {
+       top: document.body.scrollTop
+   };
+   
+   if( typeof( window.innerWidth ) == 'number' ) {
+       result.width = window.innerWidth;
+       result.height = window.innerHeight;
+   } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+       //IE 6+ in 'standards compliant mode'
+       result.width = document.documentElement.clientWidth;
+       result.height = document.documentElement.clientHeight;
+   } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+       //IE 4 compatible
+       result.width = document.body.clientWidth;
+       result.height = document.body.clientHeight;
+   }
+   
+   result.bottom = result.top + result.height;
+   
+   if (callback)
+      callback(result);
+   return result;
+};
 
 embed.height = embed.fn.height = function(height) {
    this.iframe.height = height;

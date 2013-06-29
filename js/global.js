@@ -1033,6 +1033,7 @@ jQuery(document).ready(function($) {
 			}
 		}
 		informMessages.show();
+        $(document).trigger('informMessage');
       return true;
    }
 	

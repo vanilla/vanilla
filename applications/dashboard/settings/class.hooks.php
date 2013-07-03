@@ -94,7 +94,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->AddDefinition('RemoteUrl', $RemoteUrl);
 
          // Force embedding?
-         if (!IsSearchEngine() && !IsMobile()) {
+         if (!IsSearchEngine() && !IsMobile() && strtolower($Sender->ControllerName) != 'entry') {
             $Sender->AddDefinition('ForceEmbedForum', C('Garden.Embed.ForceForum') ? '1' : '0');
             $Sender->AddDefinition('ForceEmbedDashboard', C('Garden.Embed.ForceDashboard') ? '1' : '0');
          }

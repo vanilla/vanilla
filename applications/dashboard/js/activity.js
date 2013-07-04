@@ -164,7 +164,8 @@ jQuery(document).ready(function($) {
    // Set up paging
    if ($.morepager)
       $('.MorePager').morepager({
-         pageContainerSelector: 'ul.DataList:first'
+         pageContainerSelector: 'ul.DataList:first',
+         pagerInContainer: true
       });
 
 });

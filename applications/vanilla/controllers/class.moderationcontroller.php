@@ -343,20 +343,22 @@ class ModerationController extends VanillaController {
 
       // Check for edit permissions on each discussion
       $AllowedDiscussions = array();
-      $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, CategoryID')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
-      foreach ($DiscussionData->Result() as $Discussion) {
-         $Category = CategoryModel::Categories($Discussion->CategoryID);
+      $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, Name, DateLastComment, CategoryID')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
+      $DiscussionData = Gdn_DataSet::Index($DiscussionData->ResultArray(), array('DiscussionID'));
+      foreach ($DiscussionData as $DiscussionID => $Discussion) {
+         $Category = CategoryModel::Categories($Discussion['CategoryID']);
          if ($Category && $Category['PermsDiscussionsEdit'])
-            $AllowedDiscussions[] = $Discussion->DiscussionID;
+            $AllowedDiscussions[] = $DiscussionID;
       }
       $this->SetData('CountAllowed', count($AllowedDiscussions));
       $CountNotAllowed = $CountCheckedDiscussions - count($AllowedDiscussions);
       $this->SetData('CountNotAllowed', $CountNotAllowed);
-
+      
       if ($this->Form->AuthenticatedPostBack()) {
          // Retrieve the category id
          $CategoryID = $this->Form->GetFormValue('CategoryID');
          $Category = CategoryModel::Categories($CategoryID);
+         $RedirectLink = $this->Form->GetFormValue('RedirectLink');
 
          // User must have add permission on the target category
          if (!$Category['PermsDiscussionsAdd']) {
@@ -365,6 +367,26 @@ class ModerationController extends VanillaController {
 
          // Iterate and move.
          foreach ($AllowedDiscussions as $DiscussionID) {
+            // Create the shadow redirect.
+            if ($RedirectLink) {
+               $Discussion = GetValue($DiscussionID, $DiscussionData);
+               
+               $RedirectDiscussion = array(
+                     'Name' => sprintf(T('Moved: %s'), $Discussion['Name']),
+                     'DateInserted' => $Discussion['DateLastComment'],
+                     'Type' => 'redirect',
+                     'CategoryID' => $Discussion['CategoryID'],
+                     'Body' => FormatString(T('This discussion has been moved <a href="{url,html}">here</a>.'), array('url' => DiscussionUrl($Discussion))),
+                     'Format' => 'Html',
+                     'Closed' => TRUE
+                  );
+               $RedirectID = $DiscussionModel->Save($RedirectDiscussion);
+               if (!$RedirectID) {
+                  $this->Form->SetValidationResults($DiscussionModel->ValidationResults());
+                  break;
+               }
+            }
+            
             $DiscussionModel->SetField($DiscussionID, 'CategoryID', $CategoryID);
          }
 
@@ -372,7 +394,8 @@ class ModerationController extends VanillaController {
          Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
          ModerationController::InformCheckedDiscussions($this);
          
-         $this->JsonTarget('', '', 'Refresh');
+         if ($this->Form->ErrorCount() == 0)
+            $this->JsonTarget('', '', 'Refresh');
       }
 
       $this->Render();

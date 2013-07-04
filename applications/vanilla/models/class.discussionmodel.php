@@ -1387,7 +1387,7 @@ class DiscussionModel extends VanillaModel {
          }
          
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
-         $FormPostValues['DateLastComment'] = Gdn_Format::ToDateTime();
+         $FormPostValues['DateLastComment'] = $FormPostValues['DateInserted'];
       } else {
          // Add the update fields.
          $this->AddUpdateFields($FormPostValues);

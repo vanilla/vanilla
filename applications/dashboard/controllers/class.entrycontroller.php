@@ -282,6 +282,7 @@ class EntryController extends Gdn_Controller {
       
       $this->EventArguments['Target'] = $Target;
       $this->EventArguments['DefaultProvider'] =& $Provider;
+      $this->EventArguments['TransientKey'] = $TransientKey;
       $this->FireEvent("Override{$Type}");
       
       $Url = $Provider[$Type.'Url'];
@@ -321,6 +322,8 @@ class EntryController extends Gdn_Controller {
                         return;
                      $this->SetData('Method', 'POST');
                      break;
+                  case 'none':
+                     return;
                   case 'redirect':
                   default:
                      if (!$SignedOut)

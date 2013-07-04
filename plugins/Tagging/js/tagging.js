@@ -9,8 +9,15 @@ jQuery(document).ready(function($) {
    });
    
    var tags = $("#Form_Tags").val();
-   if (tags && tags.length)
+   if (tags && tags.length) {
       tags = tags.split(",");
+      
+      for (i = 0; i < tags.length; i++) {
+        tags[i] = { id: tags[i], name: tags[i] };
+      }
+   } else {
+       tags = [];
+   }
    
    var TagSearch = gdn.definition('PluginsTaggingSearchUrl', false);
    var TagAdd = gdn.definition('PluginsTaggingAdd', false);

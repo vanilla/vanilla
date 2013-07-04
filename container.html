@@ -88,7 +88,12 @@
                   iframe.src = data.args[0];
                   return;
                } else if (data.func == 'callback') {
-                  callback.apply(this, data.args);
+                  var callbackID = data.args[0];
+                  var args = data.args[1];
+                  if (!args)
+                     args = [];
+                  
+                  callbacks[callbackID].apply(this, data.args[1]);
                   return;
                }
                

@@ -443,7 +443,7 @@ class VanillaHooks implements Gdn_IPlugin {
          $Offset,
          $Limit,
          $CountDiscussions,
-         UserUrl($Sender->User, '', 'discussions').'/{Page}'
+         UserUrl($Sender->User, '', 'discussions').'?page={Page}'
       );
       
       // Deliver JSON data if necessary

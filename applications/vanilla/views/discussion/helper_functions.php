@@ -496,6 +496,8 @@ endif;
 
 if (!function_exists('IsMeAction')):
    function IsMeAction($Row) {
+      if (!C('Garden.Format.MeActions'))
+         return;
       $Row = (array)$Row;
       if (!array_key_exists('Body', $Row))
          return FALSE;

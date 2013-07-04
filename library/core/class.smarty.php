@@ -121,6 +121,7 @@ class Gdn_Smarty {
       if (defined('CLIENT_NAME'))
          $CompileID = CLIENT_NAME;
       
+      $Smarty->template_dir = dirname($Path);
       $Smarty->display($Path, NULL, $CompileID);
    }
 

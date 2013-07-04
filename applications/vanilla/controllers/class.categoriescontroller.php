@@ -360,6 +360,8 @@ class CategoriesController extends VanillaController {
     */
    public function Initialize() {
       parent::Initialize();
+      if (!C('Vanilla.Categories.Use'))
+         Redirect('/discussions');
       if ($this->Menu)
          $this->Menu->HighlightRoute('/categories');
          

@@ -658,14 +658,8 @@ jQuery(document).ready(function($) {
    $('.ButtonBar').livequery(function(){
       var TextAreas = $(this).closest('form').find('div.TextBoxWrapper textarea');
       $.each(TextAreas, function(i,TextArea){
-         var Name = $(TextArea).prop('name');
-         var Ok = false;
-         
-         if (Name.match(/Body/)) Ok = true;
-         if (Name.match(/Message/)) Ok = true;
-         if (!Ok) return;
-         
-         ButtonBar.AttachTo(TextArea);
+         if ($(TextArea).hasClass('BodyBox'))
+            ButtonBar.AttachTo(TextArea);
       });
    });
    

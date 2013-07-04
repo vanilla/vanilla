@@ -308,7 +308,7 @@ embed.callback = embed.fn.callRemoteCallback = function(callbackID, args) {
 
 embed.getScrollPosition = embed.fn.getScrollPosition = function(callback) {
    var result = {
-       top: document.body.scrollTop - this.iframe.offsetTop
+       top: (document.body.scrollTop || document.documentElement.scrollTop) - this.iframe.offsetTop
    };
    
    if( typeof( window.innerWidth ) == 'number' ) {

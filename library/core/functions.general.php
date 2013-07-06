@@ -1990,8 +1990,8 @@ function TouchConfig($Name, $Default = null) {
    
    $Save = array();
    foreach ($Name as $Key => $Value) {
-      if (!C($Name))
-         $Save[$Name] = $Value;
+      if (!C($Key))
+         $Save[$Key] = $Value;
    }
    
    if (!empty($Save))

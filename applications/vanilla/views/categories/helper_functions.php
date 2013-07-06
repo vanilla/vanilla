@@ -47,7 +47,7 @@ function CategoryString($Rows) {
    $Result = '';
    foreach ($Rows as $Row) {
       if ($Result)
-         $Result .= ', ';
+         $Result .= '<span class="Comma">, </span>';
       $Result .= Anchor(htmlspecialchars($Row['Name']), $Row['Url']);
    }
    return $Result;

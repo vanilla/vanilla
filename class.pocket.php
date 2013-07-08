@@ -220,5 +220,27 @@ class Pocket {
       
       return Gdn_Format::To($this->Body, $this->Format);
    }
+   
+   public static function Touch($Name, $Value) {
+      $Model = new Gdn_Model('Pocket');
+      $Pockets = $Model->GetWhere(array('Name' => $Name))->ResultArray();
+         
+      if (empty($Pockets)) {
+         $Pocket = array(
+            'Name' => $Name,
+            'Location' => 'Content',
+            'Sort' => 0,
+            'Repeat' => Pocket::REPEAT_BEFORE,
+            'Body' => $Value,
+            'Format' => 'Raw',
+            'Disabled' => Pocket::DISABLED,
+            'MobileOnly' => 0,
+            'MobileNever' => 0,
+            'EmbeddedNever' => 0,
+            'ShowInDashboard' => 0
+            );
+         $Model->Save($Pocket);
+      }
+   }
 
 }

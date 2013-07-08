@@ -60,7 +60,11 @@ class Gdn_Theme {
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
 
       $Count = 0;
+      $DataCount = 0;
+      
       foreach ($Data as $Row) {
+         $DataCount++;
+         
          if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
             continue; // don't show default route twice.
          
@@ -70,7 +74,10 @@ class Gdn_Theme {
          }
          
          $Row['Url'] = Url($Row['Url']);
-         $CssClass = GetValue('CssClass', $Row, 'CrumbLabel');
+         $CssClass = 'CrumbLabel '.GetValue('CssClass', $Row);
+         if ($DataCount == count($Data))
+            $CssClass .= ' Last';
+         
          $Label = '<span class="'.$CssClass.'">'.FormatString($Format, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
          
@@ -78,7 +85,7 @@ class Gdn_Theme {
       }
       
       // Close the stack.
-      for ($Count--;$Count > 0; $Count--) {
+      for ($Count--; $Count > 0; $Count--) {
          $Result .= '</span>';
       }
 

@@ -9,7 +9,7 @@ $Categories = CategoryModel::MakeTree($this->Data('Categories'), $this->Data('Ca
 if (C('Vanilla.Categories.DoHeadings')) {
    foreach ($Categories as $Category) {
       ?>
-      <div id="CategoryGroup-<?php echo $Category['UrlCode']; ?>" class="CategoryGroup">
+      <div id="CategoryGroup-<?php echo $Category['UrlCode']; ?>" class="CategoryGroup <?php echo GetValue('CssClass', $Category); ?>">
          <h2 class="H"><?php echo htmlspecialchars($Category['Name']); ?></h2>
          <?php
          WriteCategoryTable($Category['Children'], 2);

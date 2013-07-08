@@ -140,7 +140,7 @@ a.PreviewButton {
             controls: "bold italic strikethrough | font size " +
                     "style | color highlight removeformat | bullets numbering | outdent indent | " +
                     "alignleft center alignright | undo redo | " +
-                    "image link unlink | source fullscreen",
+                    "image link unlink | pastetext source fullscreen",
             docType: '<!DOCTYPE html>',
             docCSSFile: "$CssPath"
          })[0];

@@ -146,5 +146,31 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-
+   
+   gdn.refreshConversation = function() {
+       // Get the last ID.
+       var conversationID = $('#Form_ConversationID').val();
+       var lastID = $('.DataList.Conversation > li:last-child').attr('id');
+       
+       $.ajax({
+           type: 'GET',
+           url: gdn.url('/messages/getnew'),
+           data: { conversationid: conversationID, lastmessageid: lastID, DeliveryType: 'VIEW' },
+           success: function(html) {
+               var $list = $('.DataList.Conversation');
+               var $html = $('<ul>'+html+'</ul>');
+               
+               $('li.Item', $html).each(function(index) {
+                   var id = $(this).attr('id');
+                   
+                   if ($('#'+id).length == 0) {                   
+                   $(this).appendTo($list);
+                   }
+               });
+           }
+       });
+   }
+   
+   if (Vanilla.parent)
+       Vanilla.parent.refreshConversation = gdn.refreshConversation;
 });

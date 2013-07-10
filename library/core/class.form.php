@@ -2093,7 +2093,7 @@ PASSWORDMETER;
             case 'categorydropdown':
                $Result .= $this->Label($LabelCode, $Row['Name'])
                        . $Description
-                       .$this->CategoryDropDown($Row['Name'] = $Row['Options']);
+                       .$this->CategoryDropDown($Row['Name'], $Row['Options']);
                break;
             case 'checkbox':
                $Result .= $Description

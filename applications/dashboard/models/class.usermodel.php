@@ -1497,7 +1497,7 @@ class UserModel extends Gdn_Model {
       
       if (array_key_exists('ShowEmail', $FormPostValues))
          $FormPostValues['ShowEmail'] = ForceBool($FormPostValues['ShowEmail'], '0', '1', '0');
-      
+
       if (array_key_exists('Banned', $FormPostValues))
          $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
       
@@ -1514,6 +1514,12 @@ class UserModel extends Gdn_Model {
       } else {
          $this->AddUpdateFields($FormPostValues);
          $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+
+         // Block banning the superadmin or System accounts
+         if (GetValue('Admin',$User) == 2 && $FormPostValues['Banned'])
+            $this->Validation->AddValidationResult('Banned', 'You may not ban a System user.');
+         elseif (GetValue('Admin',$User) && $FormPostValues['Banned'])
+            $this->Validation->AddValidationResult('Banned', 'You may not ban a user with the Admin flag set.');
       }
       
       $this->EventArguments['FormPostValues'] = $FormPostValues;

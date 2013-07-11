@@ -93,16 +93,30 @@ jQuery(document).ready(function($) {
    }
    
    // Enable multicomplete on selected inputs
-   $('.MultiComplete').livequery(function() {
-      $(this).autocomplete(
-         gdn.url('/dashboard/user/autocomplete/'),
-         {
+   $('.MultiComplete').each(function() {
+      /// Author tag token input.
+        var $author = $(this);
+
+        var author = $author.val();
+        if (author && author.length) {
+            author = author.split(",");
+            for (i = 0; i < author.length; i++) {
+                author[i] = { id: i, name: author[i] };
+            }
+        } else {
+            author = [];
+        }
+
+        $author.tokenInput(gdn.url('/user/tagsearch'), {
+            hintText: gdn.definition("TagHint", "Start to type..."),
+            tokenValue: 'name',
+            searchingText: '', // search text gives flickery ux, don't like
+            searchDelay: 300,
             minChars: 1,
-            multiple: true,
-            scrollHeight: 220,
-            selectFirst: true
-         }
-      ).autogrow();
+            maxLength: 25,
+            prePopulate: author,
+            animateDropdown: false
+        });
    });
    
    $('#Form_AddPeople :submit').click(function() {
@@ -132,5 +146,31 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-
+   
+   gdn.refreshConversation = function() {
+       // Get the last ID.
+       var conversationID = $('#Form_ConversationID').val();
+       var lastID = $('.DataList.Conversation > li:last-child').attr('id');
+       
+       $.ajax({
+           type: 'GET',
+           url: gdn.url('/messages/getnew'),
+           data: { conversationid: conversationID, lastmessageid: lastID, DeliveryType: 'VIEW' },
+           success: function(html) {
+               var $list = $('.DataList.Conversation');
+               var $html = $('<ul>'+html+'</ul>');
+               
+               $('li.Item', $html).each(function(index) {
+                   var id = $(this).attr('id');
+                   
+                   if ($('#'+id).length == 0) {                   
+                   $(this).appendTo($list);
+                   }
+               });
+           }
+       });
+   }
+   
+   if (Vanilla.parent)
+       Vanilla.parent.refreshConversation = gdn.refreshConversation;
 });

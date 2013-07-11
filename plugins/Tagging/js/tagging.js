@@ -9,26 +9,28 @@ jQuery(document).ready(function($) {
    });
    
    var tags = $("#Form_Tags").val();
-   if (tags && tags.length)
+   if (tags && tags.length) {
       tags = tags.split(",");
+      
+      for (i = 0; i < tags.length; i++) {
+        tags[i] = { id: tags[i], name: tags[i] };
+      }
+   } else {
+       tags = [];
+   }
    
    var TagSearch = gdn.definition('PluginsTaggingSearchUrl', false);
    var TagAdd = gdn.definition('PluginsTaggingAdd', false);
    $("#Form_Tags").tokenInput(TagSearch, {
-      hintText: "Start to type...",
-      searchingText: "Searching...",
+      hintText: gdn.definition("TagHint", "Start to type..."),
+      searchingText: '', // search text gives flickery ux, don't like
       searchDelay: 300,
+      animateDropdown: false,
       minChars: 1,
       maxLength: 25,
       prePopulate: tags,
       dataFields: ["#Form_CategoryID"],
-      onFocus: function() { $(".Help").hide(); $(".HelpTags").show(); },
-      onBlankAdd: function(hidden_input, item) {
-         if (!TagAdd) {
-            var Tag = $('.token-input-list').find('li:contains("'+item+'")');
-            Tag.addClass('not-allowed');
-         }
-      }
+      allowFreeTagging: TagAdd
    });
 
    // Show available link
@@ -41,7 +43,9 @@ jQuery(document).ready(function($) {
    // Use available tags
     $('.AvailableTag').live('click', function() {
         //$(this).hide();
-        $("#Form_Tags").tokenInput('add', $(this).attr('data-name'));
+        var tag = $(this).attr('data-name');
+        
+        $("#Form_Tags").tokenInput('add', {id: tag, name: tag});
         return false;
     });
 });

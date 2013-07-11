@@ -12,7 +12,7 @@
 $PluginInfo['ButtonBar'] = array(
    'Name' => 'Button Bar',
    'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
-   'Version' => '1.4',
+   'Version' => '1.6',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE, 
@@ -27,23 +27,15 @@ class ButtonBarPlugin extends Gdn_Plugin {
    protected $Formats = array('Html', 'BBCode', 'Markdown');
 
    /**
-    * Hook the page-level event and insert buttonbar resource files
+    * Insert ButtonBar resource files on every page so they are available
+    * to any new uses of BodyBox in plugins and applications.
     * 
     * @param Gdn_Controller $Sender 
     */
-   public function DiscussionController_Render_Before($Sender) {
+   public function Base_Render_Before($Sender) {
       $Formatter = C('Garden.InputFormatter','Html');
       $this->AttachButtonBarResources($Sender, $Formatter);
    }
-   public function PostController_Render_Before($Sender) {
-      $Formatter = C('Garden.InputFormatter','Html');
-      $this->AttachButtonBarResources($Sender, $Formatter);
-   }
-   public function MessagesController_Render_Before($Sender) {
-      $Formatter = C('Garden.InputFormatter','Html');
-      $this->AttachButtonBarResources($Sender, $Formatter);
-   }
-   
    public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('buttonbar.css', 'plugins/ButtonBar');
    }
@@ -51,8 +43,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
    /**
     * Insert buttonbar resources
     * 
-    * This method is abstracted because it is invoked by two different 
-    * controllers.
+    * This method is abstracted because it is invoked by multiple controllers.
     * 
     * @param Gdn_Controller $Sender 
     */
@@ -71,11 +62,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Hook 'BeforeBodyField' event
-    * 
-    * This event fires just before the comment textbox is drawn.
-    * We bind to two different events because the box is drawn by two different
-    * controllers.
+    * Attach ButtonBar anywhere 'BodyBox' is used.
     * 
     * @param Gdn_Controller $Sender 
     */

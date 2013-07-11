@@ -104,7 +104,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             
             $PathIntegrityHash = md5(serialize($PathListing));
             if (GetValue('CacheIntegrityHash',$SearchPathCache) != $PathIntegrityHash) {
-               Trace('Need to re-index theme cache');
+               // Trace('Need to re-index theme cache');
                // Need to re-index this folder
                $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
                if ($PathIntegrityHash === FALSE)

@@ -61,10 +61,19 @@ class PostController extends VanillaController {
    
    public function AnnounceOptions() {
       $Result = array(
-         2 => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
-         1 => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
-         0 => '@'.T("Don't announce.")
-         );
+         0  => '@'.T("Don't announce.")
+      );
+      
+      if (C('Vanilla.Categories.Use')) {
+         $Result = array_merge($Result, array(
+            2 => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
+            1 => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
+         ));
+      } else {
+         $Result = array_merge($Result, array(
+            1 => '@'.T('In recent discussions.'),
+         ));
+      }
       
       return $Result;
    }
@@ -807,7 +816,7 @@ class PostController extends VanillaController {
 }
 
 function CheckOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array()) {
-   $Form = new Gdn_Form();
+   $Form = Gdn::Controller()->Form;
    
    if (count($ListOptions) == 2 && array_key_exists(0, $ListOptions)) {
       unset($ListOptions[0]);

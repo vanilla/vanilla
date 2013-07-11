@@ -571,6 +571,7 @@ class ConversationModel extends Gdn_Model {
       // Get some information about this conversation
       $ConversationData = $this->SQL
          ->Select('LastMessageID')
+         ->Select('DateUpdated')
          ->Select('CountMessages')
          ->From('Conversation')
          ->Where('ConversationID', $ConversationID)

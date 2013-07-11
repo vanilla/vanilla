@@ -136,17 +136,28 @@ class Gdn_Form extends Gdn_Pluggable {
       else
          $Attributes['class'] = $this->ErrorClass;
    }
-   
+
+   /**
+    * A special text box for formattable text.
+    *
+    * Formatting plugins like ButtonBar will auto-attach to this element.
+    *
+    * @param string $Column
+    * @param array $Attributes
+    * @since 2.1
+    * @return string HTML element.
+    */
    public function BodyBox($Column = 'Body', $Attributes = array()) {
       TouchValue('MultiLine', $Attributes, TRUE);
       TouchValue('format', $Attributes, $this->GetValue('Format', C('Garden.InputFormatter')));
       TouchValue('Wrap', $Attributes, TRUE);
-      
+      TouchValue('class', $Attributes, '');
+      $Attributes['class'] .= ' TextBox BodyBox';
+
       $this->SetValue('Format', $Attributes['format']);
       
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
       $this->EventArguments['Column'] = $Column;
-      
       $this->FireEvent('BeforeBodyBox');
       
       return $this->TextBox($Column, $Attributes).$this->Hidden('Format');
@@ -2131,6 +2142,11 @@ PASSWORDMETER;
                $Result .= $this->Label($LabelCode, $Row['Name'])
                        . $Description
                        . $this->TextBox($Row['Name'], $Row['Options']);
+               break;
+            case 'callback':
+               $Row['DescriptionHtml'] = $Description;
+               $Row['LabelCode'] = $LabelCode;
+               $Result .= call_user_func($Row['Callback'], $this, $Row);
                break;
             default:
                $Result .= "Error a control type of {$Row['Control']} is not supported.";

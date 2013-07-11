@@ -991,6 +991,28 @@ class CategoryModel extends Gdn_Model {
    }
    
    /**
+    * A simplified version of GetWhere that polls the cache instead of the database.
+    * @param array $Where
+    * @return array
+    * @since 2.2.2
+    */
+   public function GetWhereCache($Where) {
+      $Result = array();
+      
+      foreach (self::Categories() as $Index => $Row) {
+         foreach ($Where as $Column => $Value) {
+            $RowValue = GetValue($Column, $Row, NULL);
+            
+            if ($RowValue == $Value || (is_array($Value) && in_array($RowValue, $Value))) {
+               $Result[$Index] = $Row;
+            }
+         }
+      }
+      
+      return $Result;
+   }
+   
+   /**
     * Check whether category has any children categories.
     * 
     * @since 2.0.0

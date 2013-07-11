@@ -307,6 +307,7 @@ class ProfileController extends Gdn_Controller {
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       $this->Form->SetModel(Gdn::UserModel());
       $this->Form->SetData($User);
+      $this->SetData('User', $User);
       
       // Decide if they have ability to edit the username
       $CanEditUsername = (bool)C("Garden.Profile.EditUsernames") || Gdn::Session()->CheckPermission('Garden.Users.Edit');

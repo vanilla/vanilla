@@ -483,5 +483,25 @@ class UtilityController extends DashboardController {
       $this->AddCssFile('style.css');
       $this->SetData('_NoPanel', TRUE);
       $this->Render();
-   }   
+   }
+
+   /**
+    * Redirect to touch icon.
+    *
+    * @since 1.0
+    * @access public
+    */
+   public function ShowTouchIcon() {
+      // Backwards compatibility to plugin daze
+      if (C('Plugins.TouchIcon.Uploaded')) {
+         SaveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
+         RemoveFromConfig('Plugins.TouchIcon.Uploaded');
+      }
+
+      // Get icon location and serve it
+      if (C('Garden.TouchIcon'))
+         Redirect(Gdn_Upload::Url(C('Garden.TouchIcon')), 301);
+      else
+         throw NotFoundException();
+   }
 }

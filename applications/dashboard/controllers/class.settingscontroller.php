@@ -126,7 +126,7 @@ class SettingsController extends DashboardController {
    public function Banner() {
       $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/settings/banner');
-      $this->Title(T('Banner'));
+      $this->Title(T('Branding'));
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -152,9 +152,14 @@ class SettingsController extends DashboardController {
       // Get the current favicon.
       $Favicon = C('Garden.FavIcon');
       $this->SetData('Favicon', $Favicon);
-      
+
+      // Get current Share Image
       $ShareImage = C('Garden.ShareImage');
       $this->SetData('ShareImage', $ShareImage);
+
+      // Get current Touch Icon
+      $TouchIcon = C('Garden.TouchIcon');
+      $this->SetData('TouchIcon', $TouchIcon);
       
       // If seeing the form for the first time...
       if (!$this->Form->AuthenticatedPostBack()) {
@@ -165,7 +170,7 @@ class SettingsController extends DashboardController {
          if ($this->Form->Save() !== FALSE) {
             $Upload = new Gdn_Upload();
             try {
-               // Validate the upload
+               // Logo
                $TmpImage = $Upload->ValidateUpload('Logo', FALSE);
                if ($TmpImage) {
                   // Generate the target image name
@@ -185,7 +190,8 @@ class SettingsController extends DashboardController {
                   $SaveData['Garden.Logo'] = $ImageBaseName;
                   $this->SetData('Logo', $ImageBaseName);
                }
-               
+
+               // Favicon
                $ImgUpload = new Gdn_UploadImage();
                $TmpFavicon = $ImgUpload->ValidateUpload('Favicon', FALSE);
                if ($TmpFavicon) {
@@ -199,7 +205,8 @@ class SettingsController extends DashboardController {
                   $SaveData['Garden.FavIcon'] = $Parts['SaveName'];
                   $this->SetData('Favicon', $Parts['SaveName']);
                }
-               
+
+               // Share Image
                $TmpShareImage = $Upload->ValidateUpload('ShareImage', FALSE);
                if ($TmpShareImage) {
                   $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS, FALSE);
@@ -212,6 +219,30 @@ class SettingsController extends DashboardController {
                   $SaveData['Garden.ShareImage'] = $Parts['SaveName'];
                   $this->SetData('ShareImage', $Parts['SaveName']);
                   
+               }
+
+               // Touch Icon
+               $TmpImage = $Upload->ValidateUpload('TouchIcon', FALSE);
+               if ($TmpImage) {
+                  // Generate the target image name
+                  $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
+                  $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+
+                  // Delete any previously uploaded images.
+                  if ($TouchIcon)
+                     $Upload->Delete($TouchIcon);
+
+                  // Save the uploaded image
+                  $Parts = $Upload->SaveAs(
+                     $TmpImage,
+                     $ImageBaseName
+                  );
+                  $ImageBaseName = $Parts['SaveName'];
+                  $SaveData['Garden.TouchIcon'] = $ImageBaseName;
+                  $this->SetData('TouchIcon', $ImageBaseName);
+
+                  // Set the route
+                  Gdn::Router()->SetRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex);
@@ -1072,6 +1103,42 @@ class SettingsController extends DashboardController {
          $Logo = C('Garden.Logo', '');
          RemoveFromConfig('Garden.Logo');
          @unlink(PATH_ROOT . DS . $Logo);
+      }
+
+      Redirect('/settings/banner');
+   }
+
+   /**
+    * Remove the share image from config & delete it.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $TransientKey Security token.
+    */
+   public function RemoveShareImage($TransientKey = '') {
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+         $ShareImage = C('Garden.ShareImage', '');
+         RemoveFromConfig('Garden.ShareImage');
+         @unlink(PATH_ROOT . DS . $ShareImage);
+      }
+
+      Redirect('/settings/banner');
+   }
+
+   /**
+    * Remove the touch icon from config & delete it.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $TransientKey Security token.
+    */
+   public function RemoveTouchIcon($TransientKey = '') {
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+         $TouchIcon = C('Garden.TouchIcon', '');
+         RemoveFromConfig('Garden.TouchIcon');
+         @unlink(PATH_ROOT . DS . $TouchIcon);
       }
 
       Redirect('/settings/banner');

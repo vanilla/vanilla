@@ -1137,8 +1137,6 @@ class CommentModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of the discussion we are updating.
     */
    public function UpdateUserCommentCounts($DiscussionID) {
-      return false;
-      
       $Sql = "update ".$this->Database->DatabasePrefix."UserDiscussion ud
          set CountComments = (
             select count(c.CommentID)+1 

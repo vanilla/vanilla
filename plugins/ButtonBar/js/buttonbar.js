@@ -655,12 +655,13 @@ jQuery(document).ready(function($) {
    }
    
    // Always find new button bars and handle their events
-   $('.ButtonBar').livequery(function(){
-      var TextAreas = $(this).closest('form').find('div.TextBoxWrapper textarea');
-      $.each(TextAreas, function(i,TextArea){
-         if ($(TextArea).hasClass('BodyBox'))
-            ButtonBar.AttachTo(TextArea);
+   if(jQuery().livequery) {
+      $('.ButtonBar').livequery(function(){
+         var TextAreas = $(this).closest('form').find('div.TextBoxWrapper textarea');
+         $.each(TextAreas, function(i,TextArea){
+            if ($(TextArea).hasClass('BodyBox'))
+               ButtonBar.AttachTo(TextArea);
+         });
       });
-   });
-   
+   }
 });

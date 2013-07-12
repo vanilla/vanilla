@@ -123,9 +123,9 @@ class SettingsController extends DashboardController {
     * @since 2.0.0
     * @access public
     */
-   public function Banner() {
+   public function Branding() {
       $this->Permission('Garden.Settings.Manage');
-      $this->AddSideMenu('dashboard/settings/banner');
+      $this->AddSideMenu('dashboard/settings/branding');
       $this->Title(T('Branding'));
       
       $Validation = new Gdn_Validation();
@@ -1086,7 +1086,7 @@ class SettingsController extends DashboardController {
          $Upload->Delete($Favicon);
       }
 
-      Redirect('/settings/banner');
+      Redirect('/settings/branding');
    }
    
    
@@ -1105,7 +1105,7 @@ class SettingsController extends DashboardController {
          @unlink(PATH_ROOT . DS . $Logo);
       }
 
-      Redirect('/settings/banner');
+      Redirect('/settings/branding');
    }
 
    /**
@@ -1123,7 +1123,7 @@ class SettingsController extends DashboardController {
          @unlink(PATH_ROOT . DS . $ShareImage);
       }
 
-      Redirect('/settings/banner');
+      Redirect('/settings/branding');
    }
 
    /**
@@ -1141,7 +1141,7 @@ class SettingsController extends DashboardController {
          @unlink(PATH_ROOT . DS . $TouchIcon);
       }
 
-      Redirect('/settings/banner');
+      Redirect('/settings/branding');
    }
    
    /**

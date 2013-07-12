@@ -54,7 +54,7 @@ echo $this->Form->Errors();
             echo $this->Form->Label('Site Title', 'Garden.Title');
             echo Wrap(
                T("The banner title appears on your site's banner and in your browser's title bar.",
-                  "The site title appears in your browser's title bar and at the very top of the page. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may also hide this title."),
+                  "The site title appears in your browser's title bar and at the very top of the page. It should be less than 20 characters. If a logo is uploaded, it will replace the site title on user-facing forum pages. Also, keep in mind some themes may also hide this title."),
                'div',
                array('class' => 'Info')
             );

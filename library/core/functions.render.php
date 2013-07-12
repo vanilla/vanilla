@@ -727,12 +727,12 @@ if (!function_exists('UserAnchor')) {
    }
 }
 
-/**
- * Takes an object & prefix value, and converts it to a user object that can be
- * used by UserAnchor() && UserPhoto() to write out anchors to the user's
- * profile. The object must have the following fields: UserID, Name, Photo.
- */
 if (!function_exists('UserBuilder')) {
+   /**
+    * Takes an object & prefix value, and converts it to a user object that can be
+    * used by UserAnchor() && UserPhoto() to write out anchors to the user's
+    * profile. The object must have the following fields: UserID, Name, Photo.
+    */
    function UserBuilder($Object, $UserPrefix = '') {
 		$Object = (object)$Object;
       $User = new stdClass();
@@ -749,10 +749,13 @@ if (!function_exists('UserBuilder')) {
    }
 }
 
-/**
- * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
- */
 if (!function_exists('UserPhoto')) {
+   /**
+    * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
+    * 
+    * @param object|array $User User object or array
+    * @param array $Options 
+    */
    function UserPhoto($User, $Options = array()) {
       if (is_string($Options))
          $Options = array('LinkClass' => $Options);
@@ -808,9 +811,38 @@ if (!function_exists('UserPhoto')) {
    }
 }
 
+if (!function_exists('UserPhotoUrl')) {
+   /**
+    * Takes a user object an returns the URL to their photo
+    * 
+    * @param object|array $User
+    */
+   function UserPhotoUrl($User) {
+      $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
+      $Photo = GetValue('Photo', $User);
+      if ($FullUser && $FullUser['Banned']) {
+         $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
+      }
+      
+      if (!$Photo && function_exists('UserPhotoDefaultUrl'))
+         $Photo = UserPhotoDefaultUrl($User, $ImgClass);
+      
+      if ($Photo) {
+         if (!isUrl($Photo)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+         } else {
+            $PhotoUrl = $Photo;
+         }
+         return $PhotoUrl;
+      }
+      return '';
+   }
+}
+
 if (!function_exists('UserUrl')) {
    /**
     * Return the url for a user.
+    * 
     * @param array|object $User The user to get the url for.
     * @param string $Px The prefix to apply before fieldnames. @since 2.1
     * @param string $Method Optional. ProfileController method to target.

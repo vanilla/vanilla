@@ -395,6 +395,56 @@ class MessagesController extends ConversationsController {
       $this->Render();
    }
    
+   public function GetNew($ConversationID, $LastMessageID = NULL) {
+      $this->RecipientData = $this->ConversationModel->GetRecipients($ConversationID);
+      $this->SetData('Recipients', $this->RecipientData);
+
+      // Check permissions on the recipients.
+      $InConversation = FALSE;
+      foreach($this->RecipientData->Result() as $Recipient) {
+         if ($Recipient->UserID == Gdn::Session()->UserID) {
+            $InConversation = TRUE;
+            break;
+         }
+      }
+      
+      if (!$InConversation) {
+         // Conversation moderation must be enabled and they must have permission
+         if (!C('Conversations.Moderation.Allow', FALSE)) {
+            throw PermissionException();
+         }
+         $this->Permission('Conversations.Moderation.Manage');
+      }
+      
+      $this->Conversation = $this->ConversationModel->GetID($ConversationID);
+      $this->SetData('Conversation', $this->Conversation);
+      
+      // Bad conversation? Redirect
+      if ($this->Conversation === FALSE)
+         throw NotFoundException('Conversation');
+      
+      $Where = array();
+      if ($LastMessageID) {
+         if (strpos($LastMessageID, '_') !== FALSE) {
+            $LastMessageID = array_pop(explode('_', $LastMessageID));
+         }
+         
+         $Where['MessageID >='] = $LastMessageID;
+      }
+      
+      // Fetch message data
+      $this->SetData('MessageData', $this->ConversationMessageModel->Get(
+         $ConversationID,
+         Gdn::Session()->UserID,
+         0,
+         50,
+         $Where),
+         TRUE
+      );
+      
+      $this->Render('Messages');
+   }
+   
    public function Popin() {
       $this->Permission('Garden.SignIn.Allow');
       

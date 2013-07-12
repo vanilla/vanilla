@@ -287,7 +287,15 @@ class UserController extends DashboardController {
 //      $this->Form = new Gdn_Form();
       
       $UserModel = Gdn::UserModel();
-      
+
+      // Block banning the superadmin or System accounts
+      $User = $UserModel->GetID($UserID);
+      if (GetValue('Admin', $User) == 2)
+         throw ForbiddenException("@You may not ban a System user.");
+      elseif (GetValue('Admin', $User))
+         throw ForbiddenException("@You may not ban a user with the Admin flag set.");
+
+
       if ($this->Form->AuthenticatedPostBack()) {
          if ($Unban) {
             $UserModel->Unban($UserID, array('RestoreContent' => $this->Form->GetFormValue('RestoreContent')));

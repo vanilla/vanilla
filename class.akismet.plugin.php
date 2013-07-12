@@ -8,7 +8,7 @@
 $PluginInfo['Akismet'] = array(
    'Name' => 'Akismet',
    'Description' => 'Akismet spam protection integration for Vanilla.',
-   'Version' => '1.0.2b',
+   'Version' => '1.0.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'SettingsUrl' => '/settings/akismet',
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -28,7 +28,7 @@ class AkismetPlugin extends Gdn_Plugin {
    public static function Akismet() {
       static $Akismet;
       if (!$Akismet) {
-         $Key = C('Plugins.Akismet.Key');
+         $Key = C('Plugins.Akismet.Key', C('Plugins.Akismet.MasterKey'));
          
          if (!$Key)
             return NULL;
@@ -128,13 +128,18 @@ class AkismetPlugin extends Gdn_Plugin {
    }
 
    public function SettingsController_Akismet_Create($Sender, $Args = array()) {
+      // Allow for master hosted key
+      $KeyDesc = 'Enter the key you obtained from <a href="http://akismet.com">akismet.com</a>';
+      if (C('Plugins.Akismet.MasterKey'))
+         $KeyDesc = 'No key is required! You may optionally use your own.';
+
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Akismet Settings'));
 
       $Cf = new ConfigurationModule($Sender);
       $Cf->Initialize(array(
-          'Plugins.Akismet.Key' => array('Description' => 'Enter the key you obtained from <a href="http://akismet.com">akismet.com</a>'),
-          'Plugins.Akismet.Server' => array('Description' => 'You can use either Akismet or TypePad antispam.', 'Control' => 'DropDown', 
+          'Plugins.Akismet.Key' => array('Description' => $KeyDesc),
+          'Plugins.Akismet.Server' => array('Description' => 'You can use either Akismet or TypePad antispam.', 'Control' => 'DropDown',
               'Items' => array('' => 'Aksimet', 'api.antispam.typepad.com' => 'TypePad', 'DefaultValue' => ''))
           ));
 

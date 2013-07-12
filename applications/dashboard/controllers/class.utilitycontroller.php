@@ -496,6 +496,7 @@ class UtilityController extends DashboardController {
       if (C('Plugins.TouchIcon.Uploaded')) {
          SaveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
          RemoveFromConfig('Plugins.TouchIcon.Uploaded');
+         RemoveFromConfig('EnabledPlugins.TouchIcon');
       }
 
       // Get icon location and serve it

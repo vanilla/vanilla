@@ -34,44 +34,13 @@ class Gdn_Database {
    /** @var PDO The connectio to the database. */
    protected $_Connection = NULL;
    
+   protected $_IsPersistent = FALSE;
+   
+   
    
    protected $_SQL = NULL;
    
    protected $_Structure = NULL;
-   
-   protected $_IsPersistent = FALSE;
-   
-   /** Get the PDO connection to the database.
-    * @return PDO The connection to the database.
-    */
-   public function Connection() {
-      $this->_IsPersistent = GetValue(PDO::ATTR_PERSISTENT, $this->ConnectionOptions, FALSE);
-      if(!is_object($this->_Connection)) {
-         try {
-            $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
-            $this->_Connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
-            
-            if($this->ConnectionOptions[1002])
-               $this->Query($this->ConnectionOptions[1002]);
-            
-            // We only throw exceptions during connect
-            $this->_Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
-         } catch (Exception $ex) {
-            $Timeout = FALSE;
-            if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage()))
-               $Timeout = TRUE;
-            if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage()))
-               $Timeout = TRUE;
-                    
-            if ($Timeout)
-               throw new Exception(ErrorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
-            
-            trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
-         }
-      }
-      
-      return $this->_Connection;
-   }
    
    /** @var array The connection options passed to the PDO constructor **/
    public $ConnectionOptions;
@@ -109,6 +78,18 @@ class Gdn_Database {
          $this->_InTransaction = $this->Connection()->beginTransaction();
    }
    
+   /** Get the PDO connection to the database.
+    * @return PDO The connection to the database.
+    */
+   public function Connection() {
+      $this->_IsPersistent = GetValue(PDO::ATTR_PERSISTENT, $this->ConnectionOptions, FALSE);
+      if($this->_Connection === NULL) {
+         $this->_Connection = $this->NewPDO($this->Dsn, $this->User, $this->Password);
+      }
+      
+      return $this->_Connection;
+   }
+   
    public function CloseConnection() {
       if (!$this->_IsPersistent) {
          $this->CommitTransaction();
@@ -131,8 +112,34 @@ class Gdn_Database {
       if ($this->_InTransaction)
          $this->_InTransaction = !$this->Connection()->commit();
    }
-	
-	/**
+   
+   protected function NewPDO($Dsn, $User, $Password) {
+      try {
+         $PDO = new PDO(strtolower($this->Engine).':'.$Dsn, $User, $Password, $this->ConnectionOptions);
+         $PDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
+
+         if($this->ConnectionOptions[1002])
+            $PDO->query($this->ConnectionOptions[1002]);
+
+         // We only throw exceptions during connect
+         $PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+      } catch (Exception $ex) {
+         $Timeout = FALSE;
+         if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage()))
+            $Timeout = TRUE;
+         if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage()))
+            $Timeout = TRUE;
+
+         if ($Timeout)
+            throw new Exception(ErrorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
+
+         trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
+      }
+      
+      return $PDO;
+   }
+
+   /**
 	 * Properly quotes and escapes a expression for an sql string.
 	 * @param mixed $Expr The expression to quote.
 	 * @return string The quoted expression.

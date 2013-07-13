@@ -1618,13 +1618,15 @@ abstract class Gdn_SQLDriver {
    }
    
    public function Query($Sql, $Type = 'select') {
+      $QueryOptions = array('Type' => $Type, 'Slave' => GetValue('Slave', $this->_Options, NULL));
+      
       switch ($Type) {
          case 'insert': $ReturnType = 'ID'; break;
          case 'update': $ReturnType = NULL; break;
          default: $ReturnType = 'DataSet'; break;
       }
 
-      $QueryOptions = array('ReturnType' => $ReturnType);
+      $QueryOptions['ReturnType'] = $ReturnType;
       if (!is_null($this->_CacheKey)) {
          $QueryOptions['Cache'] = $this->_CacheKey;
       }

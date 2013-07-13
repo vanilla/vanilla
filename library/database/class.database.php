@@ -36,7 +36,11 @@ class Gdn_Database {
    
    protected $_IsPersistent = FALSE;
    
+   /** @var PDO The connection to the slave database. */
+   protected $_Slave = NULL;
    
+   /** @var array The slave connection settings. */
+   protected $_SlaveConfig = NULL;
    
    protected $_SQL = NULL;
    
@@ -61,6 +65,11 @@ class Gdn_Database {
    
    /** @var string The name of the database engine for this class. */
    public $Engine;
+   
+   /**
+    * @var array Information about the last query.
+    */
+   public $LastInfo = array();
    
    /** @var string The password to the database. */
    public $Password;
@@ -218,6 +227,10 @@ class Gdn_Database {
          }
       }
       
+      if (array_key_exists('Slave', $Config)) {
+         $this->_SlaveConfig = $Config['Slave'];
+      }
+      
       $this->Dsn = $Dsn;
    }
    
@@ -228,6 +241,8 @@ class Gdn_Database {
     * @param array $InputParameters An array of values with as many elements as there are bound parameters in the SQL statement being executed.
     */
    public function Query($Sql, $InputParameters = NULL, $Options = array()) {
+      $this->LastInfo = array();
+      
       if ($Sql == '')
          trigger_error(ErrorMessage('Database was queried with an empty string.', $this->ClassName, 'Query'), E_USER_ERROR);
 
@@ -286,6 +301,14 @@ class Gdn_Database {
                break;
          }
 		}
+      
+      if (GetValue('Type', $Options) == 'select' && GetValue('Slave', $Options, NULL) !== FALSE) {
+         $PDO = $this->Slave();
+         $this->LastInfo['connection'] = 'slave';
+      } else {
+         $PDO = $this->Connection();
+         $this->LastInfo['connection'] = 'master';
+      }
 
       // Run the Query
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
@@ -295,29 +318,29 @@ class Gdn_Database {
             $this->_CurrentResultSet->FreePDOStatement(FALSE);
          }
 
-         $PDOStatement = $this->Connection()->prepare($Sql);
+         $PDOStatement = $PDO->prepare($Sql);
 
          if (!is_object($PDOStatement)) {
-            trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->GetPDOErrorMessage($this->Connection()->errorInfo())), E_USER_ERROR);
+            trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->GetPDOErrorMessage($PDO->errorInfo())), E_USER_ERROR);
          } else if ($PDOStatement->execute($InputParameters) === FALSE) {
             trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDOStatement->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
          }
       } else {
-         $PDOStatement = $this->Connection()->query($Sql);
+         $PDOStatement = $PDO->query($Sql);
       }
 
       if ($PDOStatement === FALSE) {
-         trigger_error(ErrorMessage($this->GetPDOErrorMessage($this->Connection()->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
+         trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDO->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
       }
       
       // Did this query modify data in any way?
       if ($ReturnType == 'ID') {
-         $this->_CurrentResultSet = $this->Connection()->lastInsertId();
+         $this->_CurrentResultSet = $PDO->lastInsertId();
       } else {
          if ($ReturnType == 'DataSet') {
             // Create a DataSet to manage the resultset
             $this->_CurrentResultSet = new Gdn_DataSet();
-            $this->_CurrentResultSet->Connection = $this->Connection();
+            $this->_CurrentResultSet->Connection = $PDO;
             $this->_CurrentResultSet->PDOStatement($PDOStatement);
          }
       }
@@ -351,6 +374,22 @@ class Gdn_Database {
       }
 
       return $ErrorMessage;
+   }
+   
+   /**
+    * The slave connection to the database.
+    * @return PDO
+    */
+   public function Slave() {
+      if ($this->_Slave === NULL) {
+         if (empty($this->_SlaveConfig)) {
+            $this->_Slave = $this->Connection();
+         } else {
+            $this->_Slave = $this->NewPDO($this->_SlaveConfig['Dsn'], $this->_SlaveConfig['User'], $this->_SlaveConfig['Password']);
+         }
+      }
+      
+      return $this->_Slave;
    }
    
    /**

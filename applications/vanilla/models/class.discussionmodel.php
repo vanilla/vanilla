@@ -1164,9 +1164,12 @@ class DiscussionModel extends VanillaModel {
 	 * @param int $DiscussionID Unique ID of discussion to get.
 	 * @return object SQL result.
 	 */
-   public function GetID($DiscussionID) {
+   public function GetID($DiscussionID, $DataSetType = DATASET_TYPE_OBJECT, $Options = array()) {
       $Session = Gdn::Session();
       $this->FireEvent('BeforeGetID');
+      
+      $this->Options($Options);
+      
       $Discussion = $this->SQL
          ->Select('d.*')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')

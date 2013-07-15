@@ -590,9 +590,12 @@ class CommentModel extends VanillaModel {
     * 
     * @param int $CommentID Unique ID of the comment.
     * @param string $ResultType Format to return comment in.
+    * @param array $Options options to pass to the database.
     * @return mixed SQL result in format specified by $ResultType.
 	 */
-   public function GetID($CommentID, $ResultType = DATASET_TYPE_OBJECT) {
+   public function GetID($CommentID, $ResultType = DATASET_TYPE_OBJECT, $Options = array()) {
+      $this->Options($Options);
+      
       $this->CommentQuery(FALSE); // FALSE supresses FireEvent
       $Comment = $this->SQL
          ->Where('c.CommentID', $CommentID)
@@ -612,9 +615,11 @@ class CommentModel extends VanillaModel {
     * @param int $CommentID Unique ID of the comment.
     * @return object SQL result.
 	 */
-   public function GetIDData($CommentID) {
+   public function GetIDData($CommentID, $Options = array()) {
       $this->FireEvent('BeforeGetIDData');
       $this->CommentQuery(FALSE); // FALSE supresses FireEvent
+      $this->Options($Options);
+      
       return $this->SQL
          ->Where('c.CommentID', $CommentID)
          ->Get();

@@ -1526,9 +1526,9 @@ class UserModel extends Gdn_Model {
          $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
 
          // Block banning the superadmin or System accounts
-         if (GetValue('Admin',$User) == 2 && $FormPostValues['Banned'])
+         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues))
             $this->Validation->AddValidationResult('Banned', 'You may not ban a System user.');
-         elseif (GetValue('Admin',$User) && $FormPostValues['Banned'])
+         elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues))
             $this->Validation->AddValidationResult('Banned', 'You may not ban a user with the Admin flag set.');
       }
       

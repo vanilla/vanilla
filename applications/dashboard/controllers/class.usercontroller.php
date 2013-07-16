@@ -321,8 +321,10 @@ class UserController extends DashboardController {
             // Redirect after a successful save.
             if ($this->Request->Get('Target')) {
                $this->RedirectUrl = $this->Request->Get('Target');
-            } else {
+            } elseif ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
                $this->RedirectUrl = Url(UserUrl($User));
+            } else {
+               $this->JsonTarget('', '', 'Refresh');
             }
          }
       }

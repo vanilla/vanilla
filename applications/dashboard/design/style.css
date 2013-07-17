@@ -2045,13 +2045,16 @@ body.Profile.EditMode #Content form {
 form.Activity {
    display: block;
    margin: 0 0 10px;
-	text-align: right;
+	overflow: hidden;
 }
 form.Activity textarea {
    width: 100%;
    margin-bottom: 2px;
    height: 60px;
    min-height: 60px;
+}
+form.Activity .Button {
+   float: right;
 }
 .ActivityComments textarea {
    height: 60px;

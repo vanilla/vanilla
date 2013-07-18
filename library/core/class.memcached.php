@@ -38,7 +38,7 @@ class Gdn_Memcached extends Gdn_Cache {
        */
       
       $Persist = $this->Config(Gdn_Cache::CONTAINER_PERSISTENT);
-      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT)) {
+      if ($Persist) {
          $PoolSize = $this->Config(Gdn_Cache::CONTAINER_POOLSIZE, 10);
          $PoolKeyFormat = $this->Config(Gdn_Cache::CONTAINER_POOLKEY, "cachekey-%d");
          $PoolIndex = mt_rand(1, $PoolSize);

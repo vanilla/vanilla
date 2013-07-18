@@ -837,7 +837,7 @@ class CommentModel extends VanillaModel {
       
       // Update discussion's comment count
       $DiscussionID = GetValue('DiscussionID', $FormPostValues);
-      $this->UpdateCommentCount($DiscussionID);
+      $this->UpdateCommentCount($DiscussionID, array('Slave' => FALSE));
 
       return $CommentID;
    }
@@ -1074,16 +1074,21 @@ class CommentModel extends VanillaModel {
     * @access public
     *
     * @param int $DiscussionID Unique ID of the discussion we are updating.
+    * @param array $Options
+    * 
+    * @since 2.3 Added the $Options parameter.
     */
-   public function UpdateCommentCount($Discussion) {
+   public function UpdateCommentCount($Discussion, $Options = array()) {
       // Get the discussion.
-      if (is_numeric($Discussion))
-         $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
+      if (is_numeric($Discussion)) {
+         $Discussion = $this->SQL->Options($Options)->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
+      }
       $DiscussionID = $Discussion['DiscussionID'];
 
       $this->FireEvent('BeforeUpdateCommentCountQuery');
       
       $Data = $this->SQL
+         ->Options($Options)
          ->Select('c.CommentID', 'min', 'FirstCommentID')
          ->Select('c.CommentID', 'max', 'LastCommentID')
          ->Select('c.DateInserted', 'max', 'DateLastComment')
@@ -1222,7 +1227,7 @@ class CommentModel extends VanillaModel {
       $this->SQL->Delete('Comment', array('CommentID' => $CommentID));
 
       // Update the comment count
-      $this->UpdateCommentCount($Discussion);
+      $this->UpdateCommentCount($Discussion, array('Slave' => FALSE));
 
       // Update the user's comment count
       $this->UpdateUser($Comment['InsertUserID']);

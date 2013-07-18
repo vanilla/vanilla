@@ -228,7 +228,7 @@ abstract class Gdn_Cache {
          return unserialize(CACHE_STORE_OVERRIDE);
       
       $apc = false;
-      if (C('Garden.Apc', false) && function_exists('apc_fetch'))
+      if (C('Garden.Apc', false) && C('Garden.Cache.ApcPrecache', false) && function_exists('apc_fetch'))
          $apc = true;
       
       $LocalStore = null;

@@ -882,14 +882,21 @@ class CommentModel extends VanillaModel {
       if ($Insert) {
 			// UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
 			if ($Discussion->CategoryID > 0) {
-				$CountComments = $this->SQL
-					->Select('CountComments', 'sum', 'CountComments')
-					->From('Discussion')
-					->Where('CategoryID', $Discussion->CategoryID)
-					->Get()
-					->FirstRow()
-					->CountComments;
+            $Category = CategoryModel::Categories($Discussion->CategoryID);
             
+            if ($Category) {
+               $CountComments = GetValue('CountComments', $Category, 0) + 1;
+               
+               if ($CountComments < 1000 || $CountComments % 20 == 0) {
+                  $CountComments = $this->SQL
+                     ->Select('CountComments', 'sum', 'CountComments')
+                     ->From('Discussion')
+                     ->Where('CategoryID', $Discussion->CategoryID)
+                     ->Get()
+                     ->FirstRow()
+                     ->CountComments;
+               }
+            }
             $CategoryModel = new CategoryModel();
             
             $CategoryModel->SetField($Discussion->CategoryID, array(
@@ -1080,13 +1087,14 @@ class CommentModel extends VanillaModel {
     */
    public function UpdateCommentCount($Discussion, $Options = array()) {
       // Get the discussion.
-      if (is_numeric($Discussion)) {
-         $Discussion = $this->SQL->Options($Options)->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
-      }
+      if (is_numeric($Discussion))
+         $this->Options($Options);
+         $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
       $DiscussionID = $Discussion['DiscussionID'];
 
       $this->FireEvent('BeforeUpdateCommentCountQuery');
-      
+
+      $this->Options($Options);
       $Data = $this->SQL
          ->Options($Options)
          ->Select('c.CommentID', 'min', 'FirstCommentID')

@@ -38,7 +38,7 @@ class Gdn_Memcached extends Gdn_Cache {
        */
       
       $Persist = $this->Config(Gdn_Cache::CONTAINER_PERSISTENT);
-      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT)) {
+      if ($Persist) {
          $PoolSize = $this->Config(Gdn_Cache::CONTAINER_POOLSIZE, 10);
          $PoolKeyFormat = $this->Config(Gdn_Cache::CONTAINER_POOLKEY, "cachekey-%d");
          $PoolIndex = mt_rand(1, $PoolSize);
@@ -68,12 +68,12 @@ class Gdn_Memcached extends Gdn_Cache {
    }
    
    /**
-   * Reads in known/config servers and adds them to the instance.
-   * 
-   * This method is called when the cache object is invoked by the framework 
-   * automatically, and needs to configure itself from the values in the global
-   * config file.
-   */
+    * Reads in known/config servers and adds them to the instance.
+    * 
+    * This method is called when the cache object is invoked by the framework 
+    * automatically, and needs to configure itself from the values in the global
+    * config file.
+    */
    public function Autorun() {
       $Servers = Gdn_Cache::ActiveStore('memcached');
       if (!is_array($Servers)) 
@@ -84,6 +84,10 @@ class Gdn_Memcached extends Gdn_Cache {
          SaveToConfig('Cache.Enabled', false, false);
          return false;
       }
+      
+      // Persistent, and already have servers. Shortcircuit adding.
+      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT) && count($this->Memcache->getServerList()))
+         return true;
       
       $Keys = array(
          Gdn_Cache::CONTAINER_LOCATION,

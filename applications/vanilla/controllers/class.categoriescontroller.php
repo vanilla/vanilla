@@ -192,11 +192,22 @@ class CategoriesController extends VanillaController {
          $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
          $this->FireEvent('BeforeGetDiscussions');
          list($Offset, $Limit) = OffsetLimit($Page, $this->EventArguments['PerPage']);
-         
          if (!is_numeric($Offset) || $Offset < 0)
             $Offset = 0;
+         
+         $Page = PageNumber($Offset, $Limit);
+         
+         // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
+         $MaxPages = C('Vanilla.Categories.MaxPages');
+         if ($MaxPages && $Page > $MaxPages) {
+            throw NotFoundException();
+         }
             
          $CountDiscussions = $DiscussionModel->GetCount($Wheres);
+         if ($MaxPages && $MaxPages * $Limit < $CountDiscussions) {
+            $CountDiscussions = $MaxPages * $Limit;
+         }
+         
          $this->SetData('CountDiscussions', $CountDiscussions);
          $this->SetData('_Limit', $Limit);
          

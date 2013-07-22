@@ -53,12 +53,12 @@ class CategoriesController extends VanillaController {
    /**
     * "Table" layout for categories. Mimics more traditional forum category layout.
     */
-   public function Table() {
+   public function Table($Category = '') {
       if ($this->SyndicationMethod == SYNDICATION_NONE) {
          $this->View = 'table';
       } else
          $this->View = 'all';
-      $this->All();
+      $this->All($Category);
    }
    
    /**
@@ -129,11 +129,11 @@ class CategoriesController extends VanillaController {
                      $this->Discussions();
                      break;
                   case 'table':
-                     $this->Table();
+                     $this->Table($CategoryIdentifier);
                      break;
                   default:
                      $this->View = 'all';
-                     $this->All();
+                     $this->All($CategoryIdentifier);
                      break;
                }
                return;
@@ -248,7 +248,7 @@ class CategoriesController extends VanillaController {
     * @since 2.0.17
     * @access public
     */
-   public function All() {
+   public function All($Category = '') {
       // Setup head.
       $this->Menu->HighlightRoute('/discussions');
       if (!$this->Title()) {
@@ -271,7 +271,13 @@ class CategoriesController extends VanillaController {
       // Get category data
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
       
-      $Categories = $this->CategoryModel->GetFull()->ResultArray();
+      if ($Category) {
+         $Subtree = CategoryModel::GetSubtree($Category);
+         $CategoryIDs = ConsolidateArrayValuesByKey($Subtree, 'CategoryID');
+         $Categories = $this->CategoryModel->GetFull($CategoryIDs)->ResultArray();
+      } else {
+         $Categories = $this->CategoryModel->GetFull()->ResultArray();
+      }
       $this->SetData('Categories', $Categories);
       
       // Add modules

@@ -29,6 +29,7 @@ class ActivityModel extends Gdn_Model {
    const SENT_PENDING = 3; // The activity is waiting to be sent.
    const SENT_FAIL = 4; // The activity could not be sent.
    const SENT_ERROR = 5; // There was an error sending the activity, but it can be retried.
+   const SENT_INPROGRESS = 31; // Sending is in progress.
    
    public static $ActivityTypes = NULL;
    public static $Queue = array();

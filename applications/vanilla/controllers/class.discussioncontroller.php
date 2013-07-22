@@ -170,6 +170,11 @@ class DiscussionController extends VanillaController {
                $this->Image($img->src);
          }
       }
+      
+      // Queue notification.
+      if ($this->Request->Get('new') && C('Vanilla.QueueNotifications')) {
+         $this->AddDefinition('NotifyNewDiscussion', 1);
+      }
          
       // Make sure to set the user's discussion watch records
       $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);

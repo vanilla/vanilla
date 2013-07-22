@@ -110,8 +110,13 @@ $Construct
 	->Column('LastCommentUserID', 'int', TRUE)
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
-   ->Column('RegardingID', 'int(11)', TRUE, 'index')
+   ->Column('RegardingID', 'int(11)', TRUE, 'index');
    //->Column('Source', 'varchar(20)', TRUE)
+
+if (C('Vanilla.QueueNotifications'))
+   $Construct->Column('Notified', 'tinyint', ActivityModel::SENT_ARCHIVE);
+
+$Construct
    ->Set($Explicit, $Drop);
 
 if ($DiscussionExists && !$FirstCommentIDExists) {

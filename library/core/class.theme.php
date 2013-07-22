@@ -33,7 +33,6 @@ class Gdn_Theme {
 
    public static function Breadcrumbs($Data, $HomeLink = TRUE, $Options = array()) {
       $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
-      $PlainFormat = '<span itemprop="title">{Name,html}</span>';
       
       $Result = '';
       
@@ -62,7 +61,6 @@ class Gdn_Theme {
 
       $Count = 0;
       $DataCount = 0;
-      $categoryHeadings = C('Vanilla.Categories.DoHeadings', false);
       
       foreach ($Data as $Row) {
          $DataCount++;
@@ -80,11 +78,7 @@ class Gdn_Theme {
          if ($DataCount == count($Data))
             $CssClass .= ' Last';
          
-         $useFormat = $Format;
-         if ($Count == 1 && array_key_exists('CategoryID', $Row) && $categoryHeadings)
-            $useFormat = $PlainFormat;
-         
-         $Label = '<span class="'.$CssClass.'">'.FormatString($useFormat, $Row).'</span> ';
+         $Label = '<span class="'.$CssClass.'">'.FormatString($Format, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
          
          $Count++;

@@ -11,6 +11,11 @@
 
 class PostController extends VanillaController {
    /**
+    * @var DiscussionModel
+    */
+   public $DiscussionModel;
+   
+   /**
     * @var Gdn_Form
     */
    public $Form;
@@ -271,9 +276,9 @@ class PostController extends VanillaController {
                   $this->FireEvent('AfterDiscussionSave');
                   
                   if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                     Redirect(DiscussionUrl($Discussion));
+                     Redirect(DiscussionUrl($Discussion)).'?new=1';
                   } else {
-                     $this->RedirectUrl = DiscussionUrl($Discussion, '', TRUE);
+                     $this->RedirectUrl = DiscussionUrl($Discussion, '', TRUE).'?new=1';
                   }
                } else {
                   // If this was a draft save, notify the user about the save
@@ -791,6 +796,47 @@ class PostController extends VanillaController {
       parent::Initialize();
       $this->AddCssFile('vanilla.css');
 		$this->AddModule('NewDiscussionModule');
+   }
+   
+   public function NotifyNewDiscussion($DiscussionID) {
+      if (!C('Vanilla.QueueNotifications'))
+         throw ForbiddenException('NotifyNewDiscussion');
+      
+      if (!$this->Request->IsPostBack())
+         throw ForbiddenException('GET');
+      
+      // Grab the discussion.
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      if (GetValue('Notified', $Discussion) != ActivityModel::SENT_PENDING)
+         die('Not pending');
+      
+      // Mark the notification as in progress.
+      $this->DiscussionModel->SetField($DiscussionID, 'Notified', ActivityModel::SENT_INPROGRESS);
+      
+      $HeadlineFormat = T($Code, '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>');
+      $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+      $Activity = array(
+         'ActivityType' => 'Discussion',
+         'ActivityUserID' => $Discussion->InsertUserID,
+         'HeadlineFormat' => $HeadlineFormat,
+         'RecordType' => 'Discussion',
+         'RecordID' => $DiscussionID,
+         'Route' => DiscussionUrl($Discussion),
+         'Data' => array(
+            'Name' => $Discussion->Name,
+            'Category' => GetValue('Name', $Category)
+         )
+      );
+      
+      $ActivityModel = new ActivityModel();
+      $this->DiscussionModel->NotifyNewDiscussion($Discussion, $ActivityModel, $Activity);
+      $ActivityModel->SaveQueue();
+      $this->DiscussionModel->SetField($DiscussionID, 'Notified', ActivityModel::SENT_OK);
+      
+      die('OK');
    }
    
       /**

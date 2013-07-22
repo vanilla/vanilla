@@ -1,5 +1,6 @@
 jQuery(document).ready(function($) {
-   
+   if (gdn.definition('NotifyNewDiscussion', false))
+       $.post(gdn.url('/post/notifynewdiscussion?discussionid='+gdn.definition('DiscussionID', '')));
 /* Comment Form */
 
    if ($.autogrow)

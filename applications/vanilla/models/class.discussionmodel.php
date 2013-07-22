@@ -1452,6 +1452,10 @@ class DiscussionModel extends VanillaModel {
                if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
                   $Fields['Format'] = C('Garden.InputFormatter', '');
                
+               if (C('Vanilla.QueueNotifications')) {
+                  $Fields['Notified'] = ActivityModel::SENT_PENDING;
+               }
+               
                // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
             	if ($Spam)
@@ -1549,11 +1553,13 @@ class DiscussionModel extends VanillaModel {
                }
                               
                // Notify everyone that has advanced notifications.
-               try {
-                  $Fields['DiscussionID'] = $DiscussionID;
-                  $this->NotifyNewDiscussion($Fields, $ActivityModel, $Activity);
-               } catch(Exception $Ex) {
-                  throw $Ex;
+               if (!C('Vanilla.QueueNotifications')) {
+                  try {
+                     $Fields['DiscussionID'] = $DiscussionID;
+                     $this->NotifyNewDiscussion($Fields, $ActivityModel, $Activity);
+                  } catch(Exception $Ex) {
+                     throw $Ex;
+                  }
                }
                
                // Throw an event for users to add their own events.

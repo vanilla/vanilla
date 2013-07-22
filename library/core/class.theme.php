@@ -33,7 +33,7 @@ class Gdn_Theme {
 
    public static function Breadcrumbs($Data, $HomeLink = TRUE, $Options = array()) {
       $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
-      $PlainFormat = '<span itemprop="title">{Name,html}</span>';
+      $PlainFormat = '<a href="#" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
       
       $Result = '';
       

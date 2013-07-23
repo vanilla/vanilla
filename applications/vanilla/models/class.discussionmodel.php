@@ -1491,7 +1491,7 @@ class DiscussionModel extends VanillaModel {
                }
                
                // Update the user's discussion count.
-               $this->UpdateUserDiscussionCount(Gdn::Session()->UserID);
+               $this->UpdateUserDiscussionCount(Gdn::Session()->UserID, TRUE);
                
                // Assign the new DiscussionID to the comment before saving.
                $FormPostValues['IsNewDiscussion'] = TRUE;
@@ -1578,8 +1578,10 @@ class DiscussionModel extends VanillaModel {
             $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
             $CategoryID = GetValue('CategoryID', $Discussion, FALSE);
             
-            // Update discussion counter for affected categories
-            $this->UpdateDiscussionCount($CategoryID, $Insert ? $Discussion : FALSE);
+            // Update discussion counter for affected categories.
+            if ($Insert)
+               $this->IncrementNewDiscussion($Discussion);
+            
             if ($StoredCategoryID)
                $this->UpdateDiscussionCount($StoredCategoryID);
 				
@@ -1732,7 +1734,51 @@ class DiscussionModel extends VanillaModel {
       }
    }
    
-   public function UpdateUserDiscussionCount($UserID) {
+   public function IncrementNewDiscussion($Discussion) {
+      if (is_numeric($Discussion)) {
+         $Discussion = $this->GetID($Discussion);
+      }
+      
+      if (!$Discussion)
+         return;
+      
+      $this->SQL->Update('Category')
+         ->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)
+         ->Set('LastDiscussionID', GetValue('DiscussionID', $Discussion))
+         ->Set('LastCommentID', NULL)
+         ->Set('LastDateInserted', GetValue('DateInserted', $Discussion))
+         ->Where('CategoryID', GetValue('CategoryID', $Discussion))
+         ->Put();
+      
+      $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+      if ($Category)
+         CategoryModel::SetCache($Category['CategoryID'], array(
+            'CountDiscussions' => $Category['CountDiscussions'] + 1,
+            'LastDiscussionID' => GetValue('DiscussionID', $Discussion),
+            'LastCommentID' => NULL,
+            'LastDateInserted' => GetValue('DateInserted', $Discussion),
+            'LastTitle' => Gdn_Format::Text(GetValue('Name', $Discussion, T('No Title'))),
+            'LastUserID' => GetValue('InsertUserID', $Discussion),
+            'LastDiscussionUserID' => GetValue('InsertUserID', $Discussion),
+            'LastUrl' => DiscussionUrl($Discussion, FALSE, '//').'#latest'));
+   }
+   
+   public function UpdateUserDiscussionCount($UserID, $Inc = FALSE) {
+      if ($Inc) {
+         $User = Gdn::UserModel()->GetID($UserID);
+         
+         $CountDiscussions = GetValue('CountDiscussions', $User);
+         if ($CountDiscussions < 100 || $CountDiscussions % 20 != 0) {
+            $this->SQL->Update('User')
+               ->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)
+               ->Where('UserID', $UserID)
+               ->Put();
+            
+            Gdn::UserModel()->UpdateUserCache($UserID, 'CountDiscussions', $CountDiscussions + 1);
+            return;
+         }
+      }
+      
       $CountDiscussions = $this->SQL
          ->Select('DiscussionID', 'count', 'CountDiscussions')
          ->From('Discussion')

@@ -1388,7 +1388,12 @@ abstract class Gdn_SQLDriver {
     * @return mixed The value of the option or $this if $Value is specified.
     */
    public function Options($Key, $Value = NULL) {
-      if ($Value !== NULL) {
+      if (is_array($Key)) {
+         foreach ($Key as $K => $V) {
+            $this->Options[$K] = $V;
+            return $this;
+         }
+      } elseif ($Value !== NULL) {
          $this->_Options[$Key] = $Value;
          return $this;
       } elseif (isset($this->_Options[$Key]))

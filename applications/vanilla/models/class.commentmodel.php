@@ -1087,9 +1087,10 @@ class CommentModel extends VanillaModel {
     */
    public function UpdateCommentCount($Discussion, $Options = array()) {
       // Get the discussion.
-      if (is_numeric($Discussion))
+      if (is_numeric($Discussion)) {
          $this->Options($Options);
          $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
+      }
       $DiscussionID = $Discussion['DiscussionID'];
 
       $this->FireEvent('BeforeUpdateCommentCountQuery');

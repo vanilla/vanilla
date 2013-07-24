@@ -1000,13 +1000,17 @@ class CategoryModel extends Gdn_Model {
       $Result = array();
       
       foreach (self::Categories() as $Index => $Row) {
+         $Match = true;
          foreach ($Where as $Column => $Value) {
             $RowValue = GetValue($Column, $Row, NULL);
             
-            if ($RowValue == $Value || (is_array($Value) && in_array($RowValue, $Value))) {
-               $Result[$Index] = $Row;
+            if ($RowValue != $Value && !(is_array($Value) && in_array($RowValue, $Value))) {
+               $Match = false;
+               break;
             }
          }
+         if ($Match)
+            $Result[$Index] = $Row;
       }
       
       return $Result;

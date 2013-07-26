@@ -675,22 +675,28 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
             
          // Validate the CategoryID for inserting
          if (!is_numeric($CategoryID)) {
-            $CategoryID = C('Vanilla.Embed.DefaultCategoryID', 0);
-            if ($CategoryID <= 0) {
-               // No default category defined, so grab the first non-root category and use that.
-               try {
-                  $CategoryID = $this->DiscussionModel
-                     ->SQL
-                     ->Select('CategoryID')
-                     ->From('Category')
-                     ->Where('CategoryID >', 0)
-                     ->Get()
-                     ->FirstRow()
-                     ->CategoryID;
-               } catch (Exception $ex) {
-                  // No categories in the db? default to 0
-                  $CategoryID = 0;
-               }
+            $CategoryModel = new CategoryModel();
+            $Category = $CategoryModel->GetFullByUrlCode($CategoryID);
+            if($Category) {
+              $CategoryID = $Category->CategoryID;
+            } else {
+                $CategoryID = C('Vanilla.Embed.DefaultCategoryID', 0);
+                if ($CategoryID <= 0) {
+                   // No default category defined, so grab the first non-root category and use that.
+                   try {
+                      $CategoryID = $this->DiscussionModel
+                         ->SQL
+                         ->Select('CategoryID')
+                         ->From('Category')
+                         ->Where('CategoryID >', 0)
+                         ->Get()
+                         ->FirstRow()
+                         ->CategoryID;
+                   } catch (Exception $ex) {
+                      // No categories in the db? default to 0
+                      $CategoryID = 0;
+                   }
+                }
             }
          }
          

@@ -50,6 +50,59 @@ class CategoriesController extends VanillaController {
     */
    public $Category;
    
+   public function Archives($Category, $Month, $Page = FALSE) {
+      $Category = CategoryModel::Categories($Category);
+      if (!$Category)
+         throw NotFoundException($Category);
+      
+      if (!$Category['PermsDiscussionsView'])
+         throw PermissionException();
+      
+      $Timestamp = strtotime($Month);
+      if (!$Timestamp)
+         throw new Gdn_UserException("$Month is not a valid date.");
+      
+      $this->SetData('Category', $Category);
+      
+      // Round the month to the first day.
+      $From = gmdate('Y-m-01', $Timestamp);
+      $To = gmdate('Y-m-01', strtotime('+1 month', strtotime($From)));
+      
+      // Grab the discussions.
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $Where = array(
+         'CategoryID' => $Category['CategoryID'],
+         'Announce' => 'all',
+         'DateInserted >=' => $From,
+         'DateInserted <' => $To);
+      
+      $DiscussionModel = new DiscussionModel();
+      $Discussions = $DiscussionModel->GetWhere($Where, $Offset, $Limit);
+      $this->DiscussionData = $this->SetData('Discussions', $Discussions);
+      $this->SetData('_CurrentRecords', count($Discussions));
+      $this->SetData('_Limit', $Limit);
+      
+      $Canonical = '/categories/archives/'.rawurlencode($Category['UrlCode']).'/'.gmdate('Y-m', $Timestamp);
+      $Page = PageNumber($Offset, $Limit, TRUE, FALSE);
+      $this->CanonicalUrl(Url($Canonical.($Page ? '?page='.$Page : ''), TRUE));
+      
+      PagerModule::Current()->Configure($Offset, $Limit, FALSE, $Canonical.'?page={Page}');
+      
+//      PagerModule::Current()->Offset = $Offset;
+//      PagerModule::Current()->Url = '/categories/archives'.rawurlencode($Category['UrlCode']).'?page={Page}';
+      
+      Gdn_Theme::Section(GetValue('CssClass', $Category));
+      Gdn_Theme::Section('DiscussionList');
+      
+      $this->Title(htmlspecialchars(GetValue('Name', $Category, '')));
+      $this->Description(sprintf(T("Archives for %s"), gmdate('F Y', strtotime($From))), TRUE);
+
+      $this->ControllerName = 'DiscussionsController';
+      $this->CssClass = 'Discussions';
+      
+      $this->Render();
+   }
+   
    /**
     * "Table" layout for categories. Mimics more traditional forum category layout.
     */

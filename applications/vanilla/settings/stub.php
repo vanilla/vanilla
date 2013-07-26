@@ -7,7 +7,7 @@
  */
 
 // Only do this once, ever.
-if (!$Drop)
+if (Gdn::Config('Vanilla.Version') !== FALSE)
    return;
 
 $SQL = Gdn::Database()->SQL();

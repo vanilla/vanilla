@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit(); 
+require_once $this->FetchViewLocation('helper_functions');
+?>
 
 <h1 class="H"><?php echo $this->Data('Title'); ?></h1>
 <div class="P PageDescription">
@@ -15,7 +17,7 @@
 
 <?php
 if (C('Vanilla.Discussions.Layout') == 'table'):
-   if (!method_exists('WriteDiscussionHeading'))
+   if (!function_exists('WriteDiscussionHeading'))
       require_once $this->FetchViewLocation('table_functions');
    ?>
    <div class="DataTableWrap">
@@ -28,7 +30,7 @@ if (C('Vanilla.Discussions.Layout') == 'table'):
       <tbody>
       <?php
          foreach ($this->DiscussionData->Result() as $Discussion) {
-            WriteDiscussionRow($Discussion, $this, Gdn::Session());
+            WriteDiscussionRow($Discussion, $this, Gdn::Session(), FALSE);
          }	
       ?>
       </tbody>

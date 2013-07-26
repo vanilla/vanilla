@@ -441,7 +441,7 @@ if (!$LastDiscussionIDExists) {
 }
 
 // Add stub content
-//include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'stub.php');
+include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'stub.php');
 
 // Set current Vanilla.Version
 $ApplicationInfo = array();

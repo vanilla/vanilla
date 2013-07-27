@@ -7,7 +7,8 @@
  */
 
 // Only do this once, ever.
-if (Gdn::Config('Vanilla.Version') !== FALSE)
+$DiscussionModel = new DiscussionModel();
+if ($DiscussionModel->GetCount())
    return;
 
 $SQL = Gdn::Database()->SQL();

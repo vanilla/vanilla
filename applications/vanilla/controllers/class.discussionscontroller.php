@@ -105,7 +105,8 @@ class DiscussionsController extends VanillaController {
       // Setup head.
       if (!$this->Data('Title')) {
          $Title = C('Garden.HomepageTitle');
-         if ($Title)
+         $DefaultControllerRoute = Gdn::Router()->GetRoute('DefaultController')['Destination'];
+         if ($Title && ($DefaultControllerRoute == 'discussions'))
             $this->Title($Title, '');
          else
             $this->Title(T('Recent Discussions'));

@@ -22,7 +22,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.2',
+   'Version' => '1.8.3',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -130,6 +130,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       // Add Modules
       $Sender->AddModule('NewDiscussionModule');
+      $Sender->AddModule('DiscussionFilterModule');
       $BookmarkedModule = new BookmarkedModule($Sender);
       $BookmarkedModule->GetData();
       $Sender->AddModule($BookmarkedModule);

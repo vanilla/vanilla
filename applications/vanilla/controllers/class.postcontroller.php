@@ -143,6 +143,8 @@ class PostController extends VanillaController {
          // Make sure only moderators can edit closed things
          if ($this->Discussion->Closed)
             $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
+         
+         $this->Form->SetFormValue('DiscussionID', $this->Discussion->DiscussionID);
 
          $this->Title(T('Edit Discussion'));
       } else {
@@ -527,6 +529,7 @@ class PostController extends VanillaController {
          if ($Discussion->Closed)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
          
+         $this->Form->SetFormValue('CommentID', $CommentID);
       } else if ($Discussion) {
          // Permission to add
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);

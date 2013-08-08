@@ -440,11 +440,16 @@ class ConversationModel extends Gdn_Model {
             'Format' => GetValue('Format', $FormPostValues, C('Garden.InputFormatter')),
             'Route' => "/messages/$ConversationID#$MessageID"
          );
+         
+         $Subject = GetValue('Subject', $Fields);
+         if ($Subject) {
+            $Activity['HeadlineFormat'] = $Subject;
+         }
    
          $ActivityModel = new ActivityModel();
          foreach ($UnreadData->Result() as $User) {
             $Activity['NotifyUserID'] = $User->UserID;
-            $ActivityModel->Queue($Activity);
+            $ActivityModel->Queue($Activity, 'ConversationMessage');
          }
          $ActivityModel->SaveQueue();
 

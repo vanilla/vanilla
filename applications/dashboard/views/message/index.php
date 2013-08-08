@@ -37,6 +37,17 @@ foreach ($this->MessageData->Result() as $Message) {
             ArrayValue($Message->AssetTarget, $this->_GetAssetData(), 'Custom Location'),
             ArrayValue($Message->Location, $this->_GetLocationData(), 'Custom Page')
          );
+         
+         if (GetValue('CategoryID', $Message) && $Category = CategoryModel::Categories($Message->CategoryID)) {
+            echo '<div>'.
+               Anchor($Category['Name'], CategoryUrl($Category));
+            
+            if (GetValue('IncludeSubcategories', $Message)) {
+               echo ' '.T('and subcategories');
+            }
+               
+            echo '</div>';
+         }
       ?><div>
          <strong><?php echo $Message->Enabled == '1' ? T('Enabled') : T('Disabled'); ?></strong>
          <?php

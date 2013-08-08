@@ -1137,7 +1137,10 @@ class Markdown_Parser {
 	# Create a code span markup for $code. Called from handleSpanToken.
 	#
 		$code = htmlspecialchars(trim($code), ENT_NOQUOTES);
-		return $this->hashPart("<code>$code</code>");
+      if (strpos($code, "\n") !== false)
+         return $this->hashPart("<pre><code>$code</code></pre>");
+      else
+         return $this->hashPart("<code>$code</code>");
 	}
 
 
@@ -1365,7 +1368,7 @@ class Markdown_Parser {
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx', 
 			array(&$this, '_doSpoilers_callback2'), $bq);
 
-		return "\n". $this->hashBlock("<blockquote class=\"Spoiler\">\n$bq\n</blockquote>")."\n\n";
+		return "\n". $this->hashBlock("<div class=\"Spoiler\">\n$bq\n</div>")."\n\n";
 	}
 	function _doSpoilers_callback2($matches) {
 		$pre = $matches[1];

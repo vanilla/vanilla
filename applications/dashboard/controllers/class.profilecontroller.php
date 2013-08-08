@@ -440,7 +440,7 @@ class ProfileController extends Gdn_Controller {
       //    return $this->Notifications($Page);
       // elseif (C('Garden.Profile.ShowActivities', TRUE))
       if (C('Garden.Profile.ShowActivities', TRUE))
-         return $this->Activity($User, $Username, $UserID);
+         return $this->Activity($User, $Username, $UserID, $Page);
       else
          return Gdn::Dispatcher()->Dispatch(UserUrl($this->User, '', 'discussions'));
    }

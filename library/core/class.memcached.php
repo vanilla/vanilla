@@ -86,7 +86,7 @@ class Gdn_Memcached extends Gdn_Cache {
       }
       
       // Persistent, and already have servers. Shortcircuit adding.
-      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT) && count($this->Memcache->getServerList()))
+      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT) && count($this->servers()))
          return true;
       
       $Keys = array(
@@ -438,6 +438,10 @@ class Gdn_Memcached extends Gdn_Cache {
    
    public function online() {
       return (bool)sizeof($this->Containers);
+   }
+   
+   public function servers() {
+      return $this->Memcache->getServerList();
    }
    
    public function ResultCode() {

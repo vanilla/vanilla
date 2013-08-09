@@ -167,6 +167,9 @@ class Gdn_Database {
          $Config = Gdn::Config('Database');
       elseif(is_string($Config))
          $Config = Gdn::Config($Config);
+      
+      if (is_null($Config))
+         $Config = array();
          
       $DefaultConfig = Gdn::Config('Database');
          
@@ -177,7 +180,7 @@ class Gdn_Database {
       $this->DatabasePrefix = ArrayValue('DatabasePrefix', $Config, ArrayValue('Prefix', $Config, $DefaultConfig['DatabasePrefix']));
       $this->ExtendedProperties = ArrayValue('ExtendedProperties', $Config, array());
       
-      if(array_key_exists('Dsn', $Config)) {
+      if (array_key_exists('Dsn', $Config)) {
          // Get the dsn from the property.
          $Dsn = $Config['Dsn'];
       } else {   

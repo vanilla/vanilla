@@ -22,6 +22,11 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Description', array('MultiLine' => TRUE));
       ?>
    </li>
+   <li>
+      <?php
+      echo $this->Form->CheckBox('PersonalInfo', T('RolePersonalInfo', "This role is personal info. Only users with permission to view personal info will see it."), array('value' => '1'));
+      ?>
+   </li>
    <?php
    $this->FireEvent('BeforeRolePermissions');
    

@@ -1342,10 +1342,13 @@ class ActivityModel extends Gdn_Model {
       $Activity = array(
          'ActivityType' => 'WallPost',
          'ActivityUserID' => $WallPost['RegardingUserID'],
+         'Format' => $WallPost['Format'],
          'NotifyUserID' => $WallPost['ActivityUserID'],
          'RecordType' => 'Activity',
          'RecordID' => $WallPost['ActivityID'],
+         'RegardingUserID' => $WallPost['ActivityUserID'],
          'Route' => UserUrl($NotifyUser, ''),
+         'Story' => $WallPost['Story'],
          'HeadlineFormat' => T('HeadlineFormat.NotifyWallPost', '{ActivityUserID,User} posted on your <a href="{Url,url}">wall</a>.')
       );
       

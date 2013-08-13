@@ -50,15 +50,9 @@ class RoleModel extends Gdn_Model {
    }
    
    /**
-    * Returns a resultset of all roles user is allowed to see.
-    *
-    * @return Gdn_Dataset
+    * Returns a resultset of all roles.
     */
    public function Get() {
-      // Current user must have permission to see personal info roles
-      if (!CheckPermission('Garden.PersonalInfo.View'))
-         $this->SQL->Where('PersonalInfo', 0);
-
       return $this->SQL
          ->Select()
          ->From('Role')
@@ -241,9 +235,6 @@ class RoleModel extends Gdn_Model {
          $Key = 'Roles';
          $Roles = Gdn::Cache()->Get($Key);
          if ($Roles === Gdn_Cache::CACHEOP_FAILURE) {
-            // Only return roles user is allowed to see
-            if (!CheckPermission('Garden.PersonalInfo.View'))
-               Gdn::SQL()->Where('PersonalInfo', 0);
             $Roles = Gdn::SQL()->Get('Role', 'Sort')->ResultArray();
             $Roles = Gdn_DataSet::Index($Roles, array('RoleID'));
             Gdn::Cache()->Store($Key, $Roles, array(Gdn_Cache::FEATURE_EXPIRY => 24 * 3600));
@@ -341,6 +332,7 @@ class RoleModel extends Gdn_Model {
          ->From('UserRole ur')
          ->WhereIn('ur.UserID', array_keys($MissingIDs))
          ->Get()->ResultArray();
+         
          $DbUserRoles = Gdn_DataSet::Index($DbUserRoles, 'UserID', array('Unique' => FALSE));
          
          // Store the user role mappings.

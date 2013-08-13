@@ -228,7 +228,7 @@ abstract class Gdn_Cache {
          return unserialize(CACHE_STORE_OVERRIDE);
       
       $apc = false;
-      if (C('Garden.Apc', false) && function_exists('apc_fetch'))
+      if (C('Garden.Apc', false) && C('Garden.Cache.ApcPrecache', false) && function_exists('apc_fetch'))
          $apc = true;
       
       $LocalStore = null;
@@ -680,9 +680,11 @@ abstract class Gdn_Cache {
          $ActiveConfig = C($ConfigKey, array());
       }
       
-      if (is_null($Key) || !array_key_exists($Key, $ActiveConfig)) {
+      if (is_null($Key))
          return $ActiveConfig;
-      }
+      
+      if (!array_key_exists($Key, $ActiveConfig))
+         return $Default;
       
       return GetValue($Key, $ActiveConfig, $Default);
    }

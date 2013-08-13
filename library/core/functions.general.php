@@ -1206,10 +1206,10 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                         $Result .= $Special[$ID];
                      } else {
                         $User = Gdn::UserModel()->GetID($ID);
-                        $User->Name = FormatUsername($User, $Format, $ContextUserID);
-
-
-                        $Result .= UserAnchor($User);
+                        if ($User) {
+                           $User->Name = FormatUsername($User, $Format, $ContextUserID);
+                           $Result .= UserAnchor($User);
+                        }
                      }
                   }
                }
@@ -1990,8 +1990,8 @@ function TouchConfig($Name, $Default = null) {
    
    $Save = array();
    foreach ($Name as $Key => $Value) {
-      if (!C($Name))
-         $Save[$Name] = $Value;
+      if (!C($Key))
+         $Save[$Key] = $Value;
    }
    
    if (!empty($Save))

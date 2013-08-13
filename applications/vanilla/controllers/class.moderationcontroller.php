@@ -371,12 +371,15 @@ class ModerationController extends VanillaController {
             if ($RedirectLink) {
                $Discussion = GetValue($DiscussionID, $DiscussionData);
                
+               $DiscussionModel->DefineSchema();
+               $MaxNameLength = GetValue('Length', $DiscussionModel->Schema->GetField('Name'));
+               
                $RedirectDiscussion = array(
-                     'Name' => sprintf(T('Moved: %s'), $Discussion['Name']),
+                     'Name' => SliceString(sprintf(T('Moved: %s'), $Discussion['Name']), $MaxNameLength),
                      'DateInserted' => $Discussion['DateLastComment'],
                      'Type' => 'redirect',
                      'CategoryID' => $Discussion['CategoryID'],
-                     'Body' => FormatString(T('This discussion has been moved <a href="{url,html}">here</a>.'), array('url' => DiscussionUrl($Discussion))),
+                     'Body' => FormatString(T('This discussion has been <a href="{url,html}">moved</a>.'), array('url' => DiscussionUrl($Discussion))),
                      'Format' => 'Html',
                      'Closed' => TRUE
                   );

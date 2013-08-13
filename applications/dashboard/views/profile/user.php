@@ -6,7 +6,9 @@ $Session = Gdn::Session();
       echo htmlspecialchars($this->User->Name);
       
       echo '<span class="Gloss">';
+      Gdn_Theme::BulletRow();
       if ($this->User->Title)
+         echo Gdn_Theme::BulletItem('Title');
          echo ' '.Bullet().' '.Wrap(htmlspecialchars($this->User->Title), 'span', array('class' => 'User-Title'));
       
          $this->FireEvent('UsernameMeta');

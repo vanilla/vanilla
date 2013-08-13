@@ -95,7 +95,16 @@ class MessageController extends DashboardController {
       // Make sure the form knows which item we are editing.
       if (is_numeric($MessageID) && $MessageID > 0)
          $this->Form->AddHidden('MessageID', $MessageID);
-
+      
+      $CategoriesData = CategoryModel::Categories();
+      $Categories = array();
+      foreach ($CategoriesData as $Row) {
+         if ($Row['CategoryID'] < 0)
+            continue;
+         
+         $Categories[$Row['CategoryID']] = str_repeat('&nbsp;&nbsp;&nbsp;', max(0, $Row['Depth'] - 1)).$Row['Name'];
+      }
+      $this->SetData('Categories', $Categories);
 
       // If seeing the form for the first time...
       if (!$this->Form->AuthenticatedPostBack()) {

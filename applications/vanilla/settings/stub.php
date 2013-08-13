@@ -7,7 +7,8 @@
  */
 
 // Only do this once, ever.
-if (!$Drop)
+$DiscussionModel = new DiscussionModel();
+if ($DiscussionModel->GetCount())
    return;
 
 $SQL = Gdn::Database()->SQL();

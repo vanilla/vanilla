@@ -152,7 +152,7 @@ class Gdn_Form extends Gdn_Pluggable {
       TouchValue('format', $Attributes, $this->GetValue('Format', C('Garden.InputFormatter')));
       TouchValue('Wrap', $Attributes, TRUE);
       TouchValue('class', $Attributes, '');
-      $Attributes['class'] .= ' BodyBox';
+      $Attributes['class'] .= ' TextBox BodyBox';
 
       $this->SetValue('Format', $Attributes['format']);
       
@@ -2118,7 +2118,7 @@ PASSWORDMETER;
             case 'categorydropdown':
                $Result .= $this->Label($LabelCode, $Row['Name'])
                        . $Description
-                       .$this->CategoryDropDown($Row['Name'] = $Row['Options']);
+                       .$this->CategoryDropDown($Row['Name'], $Row['Options']);
                break;
             case 'checkbox':
                $Result .= $Description

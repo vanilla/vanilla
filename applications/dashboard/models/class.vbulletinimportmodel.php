@@ -45,6 +45,17 @@ class vBulletinImportModel extends Gdn_Model {
       
       // Prep config for ProfileExtender plugin based on imported fields
       $this->ProfileExtenderPrep();
+
+      // Set guests to System user to prevent security issues
+      $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+      $this->SQL->Update('Discussion')
+         ->Set('InsertUserID', $SystemUserID)
+         ->Where('InsertUserID', 0)
+         ->Put();
+      $this->SQL->Update('Comment')
+         ->Set('InsertUserID', $SystemUserID)
+         ->Where('InsertUserID', 0)
+         ->Put();
    }
    
    /**

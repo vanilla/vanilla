@@ -61,7 +61,11 @@ class Gdn_Theme {
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
       
       $Count = 0;
+      $DataCount = 0;
+      
       foreach ($Data as $Row) {
+         $DataCount++;
+         
          if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
             continue; // don't show default route twice.
          
@@ -70,10 +74,11 @@ class Gdn_Theme {
             $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
          }
          
-         if ($Row['Url'])
-            $Row['Url'] = Url($Row['Url']);
+         $Row['Url'] = Url($Row['Url']);
+         $CssClass = 'CrumbLabel '.GetValue('CssClass', $Row);
+         if ($DataCount == count($Data))
+            $CssClass .= ' Last';
          
-         $CssClass = GetValue('CssClass', $Row, 'CrumbLabel');
          $Label = '<span class="'.$CssClass.'">'.FormatString($Row['Url'] ? $Format : $PlainFormat, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
          
@@ -81,7 +86,7 @@ class Gdn_Theme {
       }
       
       // Close the stack.
-      for ($Count--;$Count > 0; $Count--) {
+      for ($Count--; $Count > 0; $Count--) {
          $Result .= '</span>';
       }
 

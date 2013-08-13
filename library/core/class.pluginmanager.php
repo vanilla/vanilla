@@ -168,7 +168,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $PathIntegrityHash = md5(serialize($PathListing));
             $CacheIntegrityHash = GetValue('CacheIntegrityHash',$SearchPathCache);
             if ($CacheIntegrityHash != $PathIntegrityHash) {
-               Trace('Need to re-index plugin cache');
+               // Trace('Need to re-index plugin cache');
                // Need to re-index this folder
                
                // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for 

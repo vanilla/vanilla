@@ -31,6 +31,7 @@ $Construct
    ->Column('Sort', 'int', TRUE)
    ->Column('Deletable', 'tinyint(1)', '1')
    ->Column('CanSession', 'tinyint(1)', '1')
+   ->Column('PersonalInfo', 'tinyint(1)', '0')
    ->Set($Explicit, $Drop);
 
 if (!$RoleTableExists || $Drop) {

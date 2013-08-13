@@ -48,7 +48,21 @@ class RoleModel extends Gdn_Model {
       }
       $this->ClearCache();
    }
-   
+
+   /**
+    * Use with array_filter to remove PersonalInfo roles.
+    *
+    * @var mixed $Roles Role name (string) or $Role data (array or object).
+    * @return bool Whether role is NOT personal info (FALSE = remove it, it's personal).
+    */
+   public static function FilterPersonalInfo($Role) {
+      if (is_string($Role)) {
+         $Role = array_shift(self::GetByName($Role));
+      }
+
+      return (GetValue('PersonalInfo', $Role)) ? FALSE : TRUE;
+   }
+
    /**
     * Returns a resultset of all roles.
     */
@@ -345,6 +359,11 @@ class RoleModel extends Gdn_Model {
       }
       
       $AllRoles = self::Roles(); // roles indexed by role id.
+
+      // Skip personal info roles
+      if (!CheckPermission('Garden.PersonalInfo.View')) {
+         $AllRoles = array_filter($AllRoles, 'self::FilterPersonalInfo');
+      }
       
       // Join the users.
       foreach ($Users as &$User) {

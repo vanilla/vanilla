@@ -2465,7 +2465,7 @@ if (!function_exists('ProxyRequest')) {
 
 if (!function_exists('RandomString')) {
    function RandomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
-      $CharLen = strlen($Characters) - 1;
+      $CharLen = strlen($Characters);
       $String = '' ;
       for ($i = 0; $i < $Length; ++$i) {
         $Offset = mt_rand() % $CharLen;

@@ -1046,7 +1046,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    }
 
    $Value = GetValueR($Field, $Args, '');
-   if ($Value == '' && !in_array($Format, array('url', 'exurl'))) {
+   if ($Value == '' && !in_array($Format, array('url', 'exurl', 'number', 'plural'))) {
       $Result = '';
    } else {
       switch(strtolower($Format)) {

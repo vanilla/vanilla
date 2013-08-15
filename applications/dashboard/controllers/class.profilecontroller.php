@@ -1413,7 +1413,12 @@ class ProfileController extends Gdn_Controller {
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage') || Gdn::Session()->UserID == $this->User->UserID) {
             $this->User->Transient = GetValueR('Attributes.TransientKey', $this->User);
          }
-         
+
+         // Hide personal info roles
+         if (!CheckPermission('Garden.PersonalInfo.View')) {
+            $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
+         }
+
          $this->SetData('Profile', $this->User);
          $this->SetData('UserRoles', $this->Roles);
          if ($CssClass = GetValue('_CssClass', $this->User)) {

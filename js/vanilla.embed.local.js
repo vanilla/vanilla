@@ -19,7 +19,9 @@
        $('.InformMessages').animate({ bottom: bottom0 });
        
        // Move the popup.
-       $('#Popup').animate({ top: pos.top + (pos.height - $('#Popup').height()) / 2.2 });
+       $('div.Popup').each(function() { 
+           $(this).animate({ top: pos.top + (pos.height - $(this).height()) / 2.2 });
+       });
    }
    $(document).on('informMessage popupReveal', function() {
        Vanilla.parent.callRemote('getScrollPosition', [], Vanilla.parent.adjustPopupPosition);

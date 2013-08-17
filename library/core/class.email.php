@@ -217,6 +217,8 @@ class Gdn_Email extends Gdn_Pluggable {
     * @todo add port settings
     */
    public function Send($EventName = '') {
+      $this->FireEvent('BeforeSendMail');
+      
       if (C('Garden.Email.Disabled')) {
          return;
       }

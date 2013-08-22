@@ -167,9 +167,15 @@ if (!function_exists('Category')):
 /**
  * Get the current category on the page.
  * @param int $Depth The level you want to look at.
+ * @param array $Category 
  */
-function Category($Depth = NULL) {
-   $Category = Gdn::Controller()->Data('Category');
+function Category($Depth = NULL, $Category = NULL) {
+   if (!$Category) {
+      $Category = Gdn::Controller()->Data('Category');
+   } elseif (!is_array($Category)) {
+      $Category = CategoryModel::Categories($Category);
+   }
+   
    if (!$Category) {
       $Category = Gdn::Controller()->Data('CategoryID');
       if ($Category)

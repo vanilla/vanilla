@@ -648,7 +648,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('ResolvedArgs', $this->_Definitions)) {
          if (sizeof($this->ReflectArgs) && (
                  (isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof Gdn_Pluggable) ||
-                 (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable)
+                 (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable) || 
+                 (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof Gdn_Pluggable)
                ))
             $ReflectArgs = json_encode(array_slice($this->ReflectArgs, 1));
          else
@@ -1420,7 +1421,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       // Add schemes to to urls.
-      $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
+      if (!C('Garden.AllowSSL') || C('Garden.ForceSSL')) {
+         $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
+      }
       
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:

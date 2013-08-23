@@ -982,6 +982,10 @@ class Gdn_Format {
             $Regex,
          array('Gdn_Format', 'LinksCallback'),
          $Mixed);
+         
+         Gdn::PluginManager()->FireAs('Format')->FireEvent('Links', array(
+            'Mixed' => &$Mixed
+         ));
 
          return $Mixed;
       }

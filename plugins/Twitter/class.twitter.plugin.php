@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Social Connect',
    'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.0.4',
+   'Version' => '1.1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -96,6 +96,17 @@ class TwitterPlugin extends Gdn_Plugin {
       $Result = $UrlParts[0].'?'.http_build_query($Query);
 
       return $Result;
+   }
+   
+   public function Format_Links_Handler($Sender, $Args) {
+      if (!C('Garden.Format.Twitter', true)) return;
+      if (!array_key_exists('Mixed', $Args)) return;
+      $Mixed = &$Args['Mixed'];
+      $TweetUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status/([\d]+)';
+      $Mixed = preg_replace("`<a href=\"({$TweetUrlMatch})\"[^>]+>{$TweetUrlMatch}</a>`i", '<a href="$1" target="_blank" rel="nofollow" data-tweetid="$2" class="twitter-card">$1</a>', $Mixed, -1, $Count);
+      if ($Count) {
+         Gdn::Controller()->AddJsFile('twitter.js', 'plugins/Twitter');
+      }
    }
 
    /**

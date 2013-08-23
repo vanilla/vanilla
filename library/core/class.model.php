@@ -143,6 +143,48 @@ class Gdn_Model extends Gdn_Pluggable {
    protected function _BeforeGet() {
    }
 
+   /**
+    * Take all of the values that aren't in the schema and put them into the attributes column.
+    * 
+    * @param array $Data
+    * @param string $Name
+    * @return array
+    */
+   protected function CollapseAttributes($Data, $Name = 'Attributes') {
+      $this->DefineSchema();
+      
+      $Row = array_intersect_key($Data, $this->Schema->Fields());
+      $Attributes = array_diff_key($Data, $Row);
+      
+      TouchValue($Name, $Row, array());
+      if (isset($Row[$Name]) && is_array($Row[$Name]))
+         $Row[$Name] = array_merge($Row[$Name], $Attributes);
+      else
+         $Row[$Name] = $Attributes;
+      return $Row;
+   }
+   
+   /**
+    * Expand all of the values in the attributes column so they become part of the row.
+    * 
+    * @param array $Row
+    * @param string $Name
+    * @return array
+    * @since 2.2
+    */
+   protected function ExpandAttributes($Row, $Name = 'Attributes') {
+      if (isset($Row[$Name])) {
+         $Attributes = $Row[$Name];
+         unset($Row[$Name]);
+         
+         if (is_string($Attributes))
+            $Attributes = @unserialize($Attributes);
+         
+         if (is_array($Attributes))
+            $Row = array_merge($Row, $Attributes);
+      }
+      return $Row;
+   }
 
    /**
     * Connects to the database and defines the schema associated with

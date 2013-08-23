@@ -14,19 +14,18 @@ window.twttr = (function (d,s,id) {
 
 twttr.ready(function(){
    
-   $('a.twitter-card').each(function(i, el){
-      var link = $(el);
-      var tweetUrl = link.attr('href');
-      var tweetID = link.attr('data-tweetid');
-      
-      var card = $('<div class="twitter-card"><a class="tweeturl" href="'+tweetUrl+'">'+tweetUrl+'</span></div>');
-      link.replaceWith(card);
+   $('div.twitter-card').each(function(i, el){
+      var card = $(el);
+      var tweetUrl = card.attr('data-tweeturl');
+      var tweetID = card.attr('data-tweetid');
       var cardref = card.get(0);
+      
       twttr.widgets.createTweet(
          tweetID,
          cardref,
-         null,
-         { 
+         function(el){ card.children('a').first().css('display','none'); },
+         {
+            conversation: "none",
             align: "center"
          }
       );

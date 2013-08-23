@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Social Connect',
    'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.1.0',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,

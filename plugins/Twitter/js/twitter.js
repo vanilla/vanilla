@@ -25,7 +25,9 @@ twttr.ready(function(){
       twttr.widgets.createTweet(
          tweetID,
          el,
-         function(el) { card.find('a.tweeturl').remove(); },
+         function(el) { 
+            $(el).find('a.tweeturl').remove(); 
+         },
          { 
             align: "center"
          }

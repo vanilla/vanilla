@@ -21,13 +21,11 @@ twttr.ready(function(){
       
       var card = $('<div class="twitter-card"><a class="tweeturl" href="'+tweetUrl+'">'+tweetUrl+'</span></div>');
       link.replaceWith(card);
-      var el = card.get(0);
+      var cardref = card.get(0);
       twttr.widgets.createTweet(
          tweetID,
-         el,
-         function(el) { 
-            $(el).find('a.tweeturl').remove(); 
-         },
+         cardref,
+         null,
          { 
             align: "center"
          }

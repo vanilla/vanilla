@@ -1213,8 +1213,7 @@ jQuery(document).ready(function($) {
             cardref,
             function(iframe){ card.find('a.tweet-url').remove(); },
             {
-               conversation: "none",
-               align: "left"
+               conversation: "none"
             }
          );
 
@@ -1259,6 +1258,21 @@ jQuery(document).ready(function($) {
     */
    
    // Automatic, requires no JS
+   
+   /**
+    * Pintrest pin embedding
+    * 
+    */
+   
+   if ($('a.pintrest-pin').length) {
+      (function(d){
+         var f = d.getElementsByTagName('SCRIPT')[0], p = d.createElement('SCRIPT');
+         p.type = 'text/javascript';
+         p.async = true;
+         p.src = '//assets.pinterest.com/js/pinit.js';
+         f.parentNode.insertBefore(p, f);
+       }(document));
+   }
    
    /**
     * Textarea autogrow

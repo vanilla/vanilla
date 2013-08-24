@@ -1057,6 +1057,7 @@ class Gdn_Format {
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
+      $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 
@@ -1107,6 +1108,12 @@ EOT;
 <div class="VideoWrap">
    <iframe src="//instagram.com/p/{$Matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
+EOT;
+   
+      // Pintrest
+      } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)) {
+         $Result = <<<EOT
+<a data-pin-do="embedPin" href="http://pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
 EOT;
    
       // Unformatted links

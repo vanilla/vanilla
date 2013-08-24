@@ -11,7 +11,7 @@ if ($this->Data('_PagerUrl'))
 // Pre Pager
 echo '<div class="PageControls Top">';
    PagerModule::Write($PagerOptions);
-   if (CheckPermission('Conversations.Conversations.Start')) {
+   if (CheckPermission('Conversations.Conversations.Add')) {
       echo '<div class="BoxButtons BoxNewConversation">';
       echo Anchor(T('New Message'), '/messages/add', 'Button NewConversation Primary');
       echo '</div>';

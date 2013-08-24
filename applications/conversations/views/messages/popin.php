@@ -2,7 +2,7 @@
 <ul class="PopList Conversations">
    <li class="Item Title">
       <?php
-      if (CheckPermission('Conversations.Conversations.Start'))
+      if (CheckPermission('Conversations.Conversations.Add'))
          echo Anchor(T('New Message'), 'messages/add');
       echo Wrap(T('Inbox'), 'strong'); 
       ?>

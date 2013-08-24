@@ -57,7 +57,7 @@ $SubjectsVisible = C('Conversations.Subjects.Visible');
    </ul>   
    <div class="P PagerContainer">
       <?php
-      if (CheckPermission('Conversations.Conversations.Start'))
+      if (CheckPermission('Conversations.Conversations.Add'))
          echo Anchor(Sprite('SpNewConversation SpAdd').T('New Message'), '/messages/add');
       ?>
       <span class="Pager"><?php echo Anchor(T('More…'), '/messages/inbox'); ?></span>
@@ -68,7 +68,7 @@ $SubjectsVisible = C('Conversations.Subjects.Visible');
       ?>
       <div class="P PagerContainer">
          <?php
-         if (CheckPermission('Conversations.Conversations.Start'))
+         if (CheckPermission('Conversations.Conversations.Add'))
             echo Anchor(Sprite('SpNewConversation SpAdd').T('New Message'), '/messages/add');
          ?>
       </div>

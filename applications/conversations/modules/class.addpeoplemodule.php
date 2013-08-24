@@ -17,7 +17,7 @@ class AddPeopleModule extends Gdn_Module {
    public $Form;
 
    public function __construct($Sender = '') {
-      if (!CheckPermission('Conversations.Conversations.Start'))
+      if (!CheckPermission('Conversations.Conversations.Add'))
          throw PermissionException();
 
       $Session = Gdn::Session();

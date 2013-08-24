@@ -347,14 +347,14 @@ class Gdn_Request {
       // Request IP
       
       // Loadbalancers
-      if ($this->GetValue('HTTP_X_CLUSTER_CLIENT_IP')) {
-         $IP = $this->GetValue('HTTP_X_CLUSTER_CLIENT_IP');
-      } elseif ($this->GetValue('HTTP_CLIENT_IP')) {
-         $IP = $this->GetValue('HTTP_CLIENT_IP');
-      } elseif ($this->GetValue('HTTP_X_FORWARDED_FOR')) {
-         $IP = $this->GetValue('HTTP_X_FORWARDED_FOR');
+      if ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_X_CLUSTER_CLIENT_IP')) {
+         $IP = $TestIP;
+      } elseif ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_CLIENT_IP')) {
+         $IP = $TestIP;
+      } elseif ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_X_FORWARDED_FOR')) {
+         $IP = $TestIP;
       } else {
-         $IP = $this->GetValue('REMOTE_ADDR');
+         $IP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'REMOTE_ADDR');
       }
       
       if (strpos($IP, ',') !== FALSE) {

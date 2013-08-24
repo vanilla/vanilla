@@ -376,6 +376,8 @@ class UtilityController extends DashboardController {
          $this->SetData('Success', TRUE);
       } catch (Exception $Ex) {
          $this->SetData('Success', FALSE);
+         if (Debug())
+            throw $Ex;
       }
       
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {

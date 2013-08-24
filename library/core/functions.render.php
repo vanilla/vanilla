@@ -794,7 +794,7 @@ if (!function_exists('UserPhoto')) {
       $Title = htmlspecialchars(GetValue('Title', $Options, $Name));
       
       if ($FullUser && $FullUser['Banned']) {
-         $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
+         $Photo = C('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');;
          $Title .= ' ('.T('Banned').')';
       }
       

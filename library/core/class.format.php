@@ -982,6 +982,10 @@ class Gdn_Format {
             $Regex,
          array('Gdn_Format', 'LinksCallback'),
          $Mixed);
+         
+         Gdn::PluginManager()->FireAs('Format')->FireEvent('Links', array(
+            'Mixed' => &$Mixed
+         ));
 
          return $Mixed;
       }
@@ -1047,9 +1051,14 @@ class Gdn_Format {
          return $Matches[0];
       $Url = $Matches[4];
 
-      if ((preg_match('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches) 
+      $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
+      $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com\/(\d+)';
+      $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
+      
+      // Youtube
+      if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 
          || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches)) 
-         && C('Garden.Format.YouTube')) {
+         && C('Garden.Format.YouTube', true)) {
          $ID = $Matches['ID'];
          $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
          $Result = '<span class="VideoWrap">';
@@ -1058,15 +1067,26 @@ class Gdn_Format {
                $Result .= '<span class="VideoPlayer"></span>';
             $Result .= '</span>';
          $Result .= '</span>';
-      } elseif (preg_match('`(?:https?|ftp)://(www\.)?vimeo\.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
+         
+      // Vimeo
+      } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)) {
          $ID = $Matches[2];
          $Result = <<<EOT
 <div class="VideoWrap"><div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div></div>
 EOT;
+         
+      // Twitter
+      } elseif (preg_match("`{$TwitterUrlMatch}`", $Url, $Matches) && C('Garden.Format.Twitter', true)) {
+         $Result = <<<EOT
+<div class="twitter-card" data-tweeturl="{$Matches[0]}" data-tweetid="{$Matches[1]}"><a href="{$Matches[0]}" class="tweet-url" rel="nofollow" target="_blank">{$Matches[0]}</a></div>
+EOT;
+      
+      // Unformatted links
       } elseif (!self::$FormatLinks) {
          $Result = $Url;
-      } else {
          
+      // Formatted links
+      } else {
 
          // Strip punctuation off of the end of the url.
          $Punc = '';

@@ -1054,6 +1054,10 @@ class Gdn_Format {
       $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
       $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com\/(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
+      $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
+      $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
+      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
+      $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 
@@ -1081,6 +1085,37 @@ EOT;
 <div class="twitter-card" data-tweeturl="{$Matches[0]}" data-tweetid="{$Matches[1]}"><a href="{$Matches[0]}" class="tweet-url" rel="nofollow" target="_blank">{$Matches[0]}</a></div>
 EOT;
       
+      // Github
+// @tim : 2013-08-22
+// Experiment on hold
+// 
+//      } elseif (preg_match("`{$GithubCommitUrlMatch}`", $Url, $Matches) && C('Garden.Format.Github', true)) {
+//         $Result = <<<EOT
+//<div class="github-commit" data-commiturl="{$Matches[0]}" data-commituser="{$Matches[1]}" data-commitrepo="{$Matches[2]}" data-commithash="{$Matches[3]}"><a href="{$Matches[0]}" class="commit-url" rel="nofollow" target="_blank">{$Matches[0]}</a></div>
+//EOT;
+
+      // Vine
+      } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Vine', true)) {
+         $Result = <<<EOT
+<div class="VideoWrap">
+   <iframe class="vine-embed" src="https://vine.co/v/{$Matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
+</div>
+EOT;
+   
+      // Instagram
+      } elseif (preg_match("`{$InstagramUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Instagram', true)) {
+         $Result = <<<EOT
+<div class="VideoWrap">
+   <iframe src="//instagram.com/p/{$Matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+</div>
+EOT;
+   
+      // Pintrest
+      } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)) {
+         $Result = <<<EOT
+<a data-pin-do="embedPin" href="http://pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
+EOT;
+   
       // Unformatted links
       } elseif (!self::$FormatLinks) {
          $Result = $Url;

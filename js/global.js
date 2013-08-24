@@ -21,135 +21,6 @@ window.Vanilla = Vanilla;
 
 // Stuff to fire on document.ready().
 jQuery(document).ready(function($) {
-   if ($.browser.msie) {
-      $('body').addClass('MSIE');
-   }
-   
-   var d = new Date()
-   var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
-
-   // Set the ClientHour if there is an input looking for it.
-   $('input:hidden[name$=HourOffset]').livequery(function() {
-      $(this).val(hourOffset);
-   });
-   
-   // Ajax/Save the ClientHour if it is different from the value in the db.
-   $('input:hidden[id$=SetHourOffset]').livequery(function() {
-      if (hourOffset != $(this).val()) {
-         $.post(
-            gdn.url('/utility/sethouroffset.json'),
-            { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
-         );
-      }
-   });
-   
-   // Add "checked" class to item rows if checkboxes are checked within.
-   checkItems = function() {
-      var container = $(this).parents('.Item');
-      if ($(this).attr('checked') == 'checked')
-         $(container).addClass('Checked');
-      else
-         $(container).removeClass('Checked');
-   }
-   $('.Item :checkbox').each(checkItems);
-   $('.Item :checkbox').change(checkItems);
-   
-   // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
-   $(document).delegate('a.ForgotPassword', 'click', function() {
-      // Make sure we have both forms
-      if ($('#Form_User_SignIn').length) {
-         $('.Methods').toggle();
-         $('#Form_User_Password').toggle();
-		   $('#Form_User_SignIn').toggle();
-         return false;
-      }
-   });
-   
-   // Convert date fields to datepickers
-   if ($.fn.datepicker) {
-      $('input.DatePicker').datepicker({
-         showOn: "focus",
-         dateFormat: 'mm/dd/yy'
-      });
-   }
-   
-   /**
-    * Youtube preview revealing
-    * 
-    */
-   
-   // Reveal youtube player when preview clicked.
-   function Youtube($container) {
-      var $preview = $container.find('.VideoPreview');
-      var $player = $container.find('.VideoPlayer');
-      
-      $container.addClass('Open').closest('.ImgExt').addClass('Open');
-      
-      var width = $preview.width(), height = $preview.height(), videoid = $container.attr('id').replace('youtube-', '');
-
-      
-      var html = '<iframe width="'+width+'" height="'+height+'" src="http://www.youtube.com/embed/'+videoid+'?autoplay=1" frameborder="0" allowfullscreen></iframe>';
-      $player.html(html);
-      
-      $preview.hide();
-      $player.show();
-      
-      return false;
-   }
-   $(document).delegate('.Video.YouTube .VideoPreview', 'click', function(e) {
-      var $target = $(e.target);
-      var $container = $target.closest('.Video.YouTube');
-      return Youtube($container);
-   });
-   
-   /**
-    * Twitter card embedding
-    * 
-    */
-   
-   if ($('div.twitter-card').length) {
-      // Twitter widgets library
-      window.twttr = (function (d,s,id) {
-         var t, js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
-         js.src="https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs);
-         return window.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
-      }(document, "script", "twitter-wjs"));
-
-      twttr.ready(function(twttr){
-         setTimeout(tweets, 300);
-      });
-   }
-   
-   function tweets() {
-      $('div.twitter-card').each(function(i, el){
-         var card = $(el);
-         var tweetUrl = card.attr('data-tweeturl');
-         var tweetID = card.attr('data-tweetid');
-         var cardref = card.get(0);
-
-         twttr.widgets.createTweet(
-            tweetID,
-            cardref,
-            function(iframe){ card.find('a.tweet-url').remove(); },
-            {
-               conversation: "none",
-               align: "center"
-            }
-         );
-
-      });
-   }
-   
-   /**
-    * Textarea autogrow
-    * 
-    */
-   
-   if ($.fn.autogrow)
-      $('textarea.Autogrow').livequery(function() {
-         $(this).autogrow();
-      });
       
    $.postParseJson = function(json) {
       if (json.Data) json.Data = $.base64Decode(json.Data);
@@ -1228,6 +1099,190 @@ jQuery(document).ready(function($) {
    }
    Array.prototype.min = function(){
       return Math.min.apply({},this)
+   }
+   
+   if ($.browser.msie) {
+      $('body').addClass('MSIE');
+   }
+   
+   var d = new Date()
+   var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
+
+   // Set the ClientHour if there is an input looking for it.
+   $('input:hidden[name$=HourOffset]').livequery(function() {
+      $(this).val(hourOffset);
+   });
+   
+   // Ajax/Save the ClientHour if it is different from the value in the db.
+   $('input:hidden[id$=SetHourOffset]').livequery(function() {
+      if (hourOffset != $(this).val()) {
+         $.post(
+            gdn.url('/utility/sethouroffset.json'),
+            { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
+         );
+      }
+   });
+   
+   // Add "checked" class to item rows if checkboxes are checked within.
+   checkItems = function() {
+      var container = $(this).parents('.Item');
+      if ($(this).attr('checked') == 'checked')
+         $(container).addClass('Checked');
+      else
+         $(container).removeClass('Checked');
+   }
+   $('.Item :checkbox').each(checkItems);
+   $('.Item :checkbox').change(checkItems);
+   
+   // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
+   $(document).delegate('a.ForgotPassword', 'click', function() {
+      // Make sure we have both forms
+      if ($('#Form_User_SignIn').length) {
+         $('.Methods').toggle();
+         $('#Form_User_Password').toggle();
+		   $('#Form_User_SignIn').toggle();
+         return false;
+      }
+   });
+   
+   // Convert date fields to datepickers
+   if ($.fn.datepicker) {
+      $('input.DatePicker').datepicker({
+         showOn: "focus",
+         dateFormat: 'mm/dd/yy'
+      });
+   }
+   
+   /**
+    * Youtube preview revealing
+    * 
+    */
+   
+   // Reveal youtube player when preview clicked.
+   function Youtube($container) {
+      var $preview = $container.find('.VideoPreview');
+      var $player = $container.find('.VideoPlayer');
+      
+      $container.addClass('Open').closest('.ImgExt').addClass('Open');
+      
+      var width = $preview.width(), height = $preview.height(), videoid = $container.attr('id').replace('youtube-', '');
+
+      
+      var html = '<iframe width="'+width+'" height="'+height+'" src="http://www.youtube.com/embed/'+videoid+'?autoplay=1" frameborder="0" allowfullscreen></iframe>';
+      $player.html(html);
+      
+      $preview.hide();
+      $player.show();
+      
+      return false;
+   }
+   $(document).delegate('.Video.YouTube .VideoPreview', 'click', function(e) {
+      var $target = $(e.target);
+      var $container = $target.closest('.Video.YouTube');
+      return Youtube($container);
+   });
+   
+   /**
+    * Twitter card embedding
+    * 
+    */
+   
+   if ($('div.twitter-card').length) {
+      // Twitter widgets library
+      window.twttr = (function (d,s,id) {
+         var t, js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
+         js.src="https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs);
+         return window.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
+      }(document, "script", "twitter-wjs"));
+
+      twttr.ready(function(twttr){
+         setTimeout(tweets, 300);
+      });
+   }
+   
+   function tweets() {
+      $('div.twitter-card').each(function(i, el){
+         var card = $(el);
+         var tweetUrl = card.attr('data-tweeturl');
+         var tweetID = card.attr('data-tweetid');
+         var cardref = card.get(0);
+
+         twttr.widgets.createTweet(
+            tweetID,
+            cardref,
+            function(iframe){ card.find('a.tweet-url').remove(); },
+            {
+               conversation: "none"
+            }
+         );
+
+      });
+   }
+   
+   /**
+    * GitHub commit embedding
+    * 
+    */
+   
+// @tim : 2013-08-24
+// Experiment on hold.
+//   if ($('div.github-commit').length) {
+//      // Github embed library
+//      window.GitHubCommit = (function (d,s,id) {
+//         var t, js, fjs = d.getElementsByTagName(s)[0];
+//         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
+//         js.src=gdn.url('js/library/github.embed.js'); fjs.parentNode.insertBefore(js, fjs);
+//         return window.GitHubCommit || (t = { _e: [], ready: function(f){ t._e.push(f) } });
+//      }(document, "script", "github-embd"));
+//
+//      GitHubCommit.ready(function(GitHubCommit){
+//         setTimeout(commits, 300);
+//      });
+//   }
+//   
+//   function commits(GitHubCommit) {
+//      $('div.github-commit').each(function(i, el){
+//         var commit = $(el);
+//         var commiturl = commit.attr('data-commiturl');
+//         var commituser = commit.attr('data-commituser');
+//         var commitrepo = commit.attr('data-commitrepo');
+//         var commithash = commit.attr('data-commithash');
+//         console.log(el);
+//      });
+//   }
+
+   /**
+    * Vine image embedding
+    * 
+    */
+   
+   // Automatic, requires no JS
+   
+   /**
+    * Pintrest pin embedding
+    * 
+    */
+   
+   if ($('a.pintrest-pin').length) {
+      (function(d){
+         var f = d.getElementsByTagName('SCRIPT')[0], p = d.createElement('SCRIPT');
+         p.type = 'text/javascript';
+         p.async = true;
+         p.src = '//assets.pinterest.com/js/pinit.js';
+         f.parentNode.insertBefore(p, f);
+       }(document));
+   }
+   
+   /**
+    * Textarea autogrow
+    * 
+    */
+   
+   if ($.fn.autogrow) {
+      $('textarea.Autogrow').livequery(function() {
+         $(this).autogrow();
+      });
    }
    
 });

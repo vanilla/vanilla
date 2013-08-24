@@ -19,7 +19,6 @@ window.Vanilla = Vanilla;
 
 })(window, jQuery);
 
-
 // Stuff to fire on document.ready().
 jQuery(document).ready(function($) {
    if ($.browser.msie) {
@@ -74,6 +73,11 @@ jQuery(document).ready(function($) {
       });
    }
    
+   /**
+    * Youtube preview revealing
+    * 
+    */
+   
    // Reveal youtube player when preview clicked.
    function Youtube($container) {
       var $preview = $container.find('.VideoPreview');
@@ -97,6 +101,50 @@ jQuery(document).ready(function($) {
       var $container = $target.closest('.Video.YouTube');
       return Youtube($container);
    });
+   
+   /**
+    * Twitter card embedding
+    * 
+    */
+   
+   if ($('div.twitter-card').length) {
+      // Twitter widgets library
+      window.twttr = (function (d,s,id) {
+         var t, js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
+         js.src="https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs);
+         return window.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
+      }(document, "script", "twitter-wjs"));
+
+      twttr.ready(function(twttr){
+         setTimeout(tweets, 300);
+      });
+   }
+   
+   function tweets() {
+      $('div.twitter-card').each(function(i, el){
+         var card = $(el);
+         var tweetUrl = card.attr('data-tweeturl');
+         var tweetID = card.attr('data-tweetid');
+         var cardref = card.get(0);
+
+         twttr.widgets.createTweet(
+            tweetID,
+            cardref,
+            function(iframe){ card.find('a.tweet-url').remove(); },
+            {
+               conversation: "none",
+               align: "center"
+            }
+         );
+
+      });
+   }
+   
+   /**
+    * Textarea autogrow
+    * 
+    */
    
    if ($.fn.autogrow)
       $('textarea.Autogrow').livequery(function() {

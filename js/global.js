@@ -1214,7 +1214,7 @@ jQuery(document).ready(function($) {
             function(iframe){ card.find('a.tweet-url').remove(); },
             {
                conversation: "none",
-               align: "center"
+               align: "left"
             }
          );
 

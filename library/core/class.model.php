@@ -143,6 +143,48 @@ class Gdn_Model extends Gdn_Pluggable {
    protected function _BeforeGet() {
    }
 
+   /**
+    * Take all of the values that aren't in the schema and put them into the attributes column.
+    * 
+    * @param array $Data
+    * @param string $Name
+    * @return array
+    */
+   protected function CollapseAttributes($Data, $Name = 'Attributes') {
+      $this->DefineSchema();
+      
+      $Row = array_intersect_key($Data, $this->Schema->Fields());
+      $Attributes = array_diff_key($Data, $Row);
+      
+      TouchValue($Name, $Row, array());
+      if (isset($Row[$Name]) && is_array($Row[$Name]))
+         $Row[$Name] = array_merge($Row[$Name], $Attributes);
+      else
+         $Row[$Name] = $Attributes;
+      return $Row;
+   }
+   
+   /**
+    * Expand all of the values in the attributes column so they become part of the row.
+    * 
+    * @param array $Row
+    * @param string $Name
+    * @return array
+    * @since 2.2
+    */
+   protected function ExpandAttributes($Row, $Name = 'Attributes') {
+      if (isset($Row[$Name])) {
+         $Attributes = $Row[$Name];
+         unset($Row[$Name]);
+         
+         if (is_string($Attributes))
+            $Attributes = @unserialize($Attributes);
+         
+         if (is_array($Attributes))
+            $Row = array_merge($Row, $Attributes);
+      }
+      return $Row;
+   }
 
    /**
     * Connects to the database and defines the schema associated with
@@ -180,7 +222,7 @@ class Gdn_Model extends Gdn_Pluggable {
 
       // See if a primary key value was posted and decide how to save
       $PrimaryKeyVal = GetValue($this->PrimaryKey, $FormPostValues, FALSE);
-      $Insert = $PrimaryKeyVal === FALSE ? TRUE : FALSE;
+      $Insert = $PrimaryKeyVal == FALSE ? TRUE : FALSE;
       if ($Insert) {
          $this->AddInsertFields($FormPostValues);
       } else {
@@ -324,7 +366,7 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function FilterForm($Data) {
       $Data = array_diff_key($Data, array('Attributes' => 0, 'DateInserted' => 0, 'InsertUserID' => 0, 'InsertIPAddress' => 0,
-            'DateUpdated' => 0, 'UpdateUserID' => 0, 'UpdateIPAddress' => 0));
+            'DateUpdated' => 0, 'UpdateUserID' => 0, 'UpdateIPAddress' => 0, 'DeliveryMethod' => 0, 'DeliveryType' => 0, 'OK' => 0, 'TransientKey' => 0, 'hpt' => 0));
       return $Data;
    }
 
@@ -532,7 +574,7 @@ class Gdn_Model extends Gdn_Pluggable {
 			->Set($Column, $Values)
 			->Put();
 	}
-    
+   
     
 	public function SetProperty($RowID, $Property, $ForceValue = FALSE) {
 		if (!isset($this->Schema)) $this->DefineSchema();

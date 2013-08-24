@@ -49,18 +49,23 @@ foreach ($this->Data('Conversations') as $Conversation) {
       <?php
       $Url = '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem;
 
+      echo '<h3 class="Users">';
+      
       if ($Names) {
-         echo '<h3 class="Users">';
-         
          if ($LastPhoto) {
             echo '<div class="Author Photo">'.$LastPhoto.'</div>';
          }
 
-         echo Anchor(htmlspecialchars($Names), $Url), '</h3>';
+         echo Anchor(htmlspecialchars($Names), $Url);
       }
-      if ($SubjectsVisible && $Subject = GetValue('Subject', $Conversation)) {
-         echo '<div class="Subject"><b>'.Anchor(htmlspecialchars($Subject), $Url).'</b></div>';
+      if ($Subject = GetValue('Subject', $Conversation)) {
+         if ($Names)
+            echo Bullet(' ');
+         
+         echo '<span class="Subject">'.Anchor(htmlspecialchars($Subject), $Url).'</span>';
       }
+      
+      echo '</h3>';
       ?>
       <div class="Excerpt"><?php echo Anchor($Message, $Url, 'Message'); ?></div>
       <div class="Meta">

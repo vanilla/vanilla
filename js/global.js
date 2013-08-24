@@ -81,12 +81,9 @@ jQuery(document).ready(function($) {
       var width = $preview.width(), height = $preview.height(), videoid = Container.attr('id').replace('youtube-', '');
 
       $preview.hide();
-      $player.html('<object width="'+width+'" height="'+height+'">'
-         + '<param name="movie" value="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1"></param>'
-         + '<param name="allowFullScreen" value="true"></param>'
-         + '<param name="allowscriptaccess" value="always"></param>'
-         + '<embed src="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+width+'" height="'+height+'"></embed>'
-         + '</object>');
+      $player.html('<iframe width="'+width+'" height="'+height+'" '
+         + 'src="https://www.youtube-nocookie.com/embed/'+videoid+'" '
+         + 'frameborder="0" allowfullscreen></iframe>');
       $player.show();
       
       return false;

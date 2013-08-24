@@ -1056,6 +1056,7 @@ class Gdn_Format {
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
+      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 
@@ -1093,13 +1094,21 @@ EOT;
 //EOT;
 
       // Vine
-      } elseif (preg_match("`{$VineUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vine', true)) {
+      } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Vine', true)) {
          $Result = <<<EOT
 <div class="VideoWrap">
    <iframe class="vine-embed" src="https://vine.co/v/{$Matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
 </div>
 EOT;
-
+   
+      // Instagram
+      } elseif (preg_match("`{$InstagramUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Instagram', true)) {
+         $Result = <<<EOT
+<div class="VideoWrap">
+   <iframe src="//instagram.com/p/{$Matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+</div>
+EOT;
+   
       // Unformatted links
       } elseif (!self::$FormatLinks) {
          $Result = $Url;

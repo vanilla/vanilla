@@ -1058,7 +1058,7 @@ class Gdn_Format {
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
-	  $GistUrlMatch = 'https?://(gist\.)?github.com\/(\w+)\/(\w+).js';
+	  $GistUrlMatch = 'https?://(gist\.)?github.com\/(\w+)\/(\w+)';
 	 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 

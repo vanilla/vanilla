@@ -1233,7 +1233,7 @@ EOT;
          // Handle @mentions.
          if(C('Garden.Format.Mentions')) {
             $Mixed = preg_replace(
-               '/(^|[\s,\.>])@(\w{1,50})\b/i', //{3,20}
+               '/(^|[\s,\.>])@('.ValidateUsernameRegex().')\b/i', //{3,20}
                '\1'.Anchor('@\2', '/profile/\\2'),
                $Mixed
             );

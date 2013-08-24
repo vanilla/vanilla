@@ -263,12 +263,12 @@ class PostController extends VanillaController {
       $this->FireEvent('BeforeDiscussionRender');
       
       if ($this->CategoryID)
-         $Breacrumbs = CategoryModel::GetAncestors($this->CategoryID);
+         $Breadcrumbs = CategoryModel::GetAncestors($this->CategoryID);
       else
-         $Breacrumbs = array();
-      $Breacrumbs[] = array('Name' => $this->Data('Title'), 'Url' => '/post/discussion');
+         $Breadcrumbs = array();
+      $Breadcrumbs[] = array('Name' => $this->Data('Title'), 'Url' => '/post/discussion');
       
-		$this->SetData('Breadcrumbs', $Breacrumbs);
+		$this->SetData('Breadcrumbs', $Breadcrumbs);
       
       $this->SetData('_AnnounceOptions', $this->AnnounceOptions());
 

@@ -102,9 +102,6 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
             
             if ($SettingsUrl != '')
                echo Anchor(T('Settings'), $SettingsUrl, 'SmallButton');
-            
-            if (SettingsModule::IsRemovable(SettingsModule::TYPE_PLUGIN, $PluginName))
-               echo Anchor(T('Remove'), '/settings/removeaddon/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey(), 'RemoveItem SmallButton');
 
          ?></td>
          <td class="Alt Info"><?php

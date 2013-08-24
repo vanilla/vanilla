@@ -19,7 +19,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
    const ACTION_ENABLE  = 1;
    const ACTION_DISABLE = 2;
-   const ACTION_REMOVE  = 3;
+   //const ACTION_REMOVE  = 3;
 
    const ACCESS_CLASSNAME = 'classname';
    const ACCESS_PLUGINNAME = 'pluginname';
@@ -1078,26 +1078,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       return $Result;
       
    }
-   
-    /**
-    * Remove the plugin.
-    *
-    * @param string $PluginName
-    * @return void
-    */
-   public function RemovePlugin($PluginName) {
-      $this->_PluginHook($PluginName, self::ACTION_REMOVE, TRUE);
-   }
-
-   /**
-    * Remove the plugin folder.
-    *
-    * @param string $PluginFolder
-    * @return void
-    */
-   private function _RemovePluginFolder($PluginFolder) {
-      Gdn_FileSystem::RemoveFolder(PATH_PLUGINS.DS.$PluginFolder);
-   }
 
    /**
     * Hooks to the various actions, i.e. enable, disable and remove.
@@ -1112,17 +1092,13 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       switch ($ForAction) {
          case self::ACTION_ENABLE:  $HookMethod = 'Setup'; break;
          case self::ACTION_DISABLE: $HookMethod = 'OnDisable'; break;
-         case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
+         //case self::ACTION_REMOVE:  $HookMethod = 'CleanUp'; break;
          case self::ACTION_ONLOAD:  $HookMethod = 'OnLoad'; break;
       }
 
       $PluginInfo      = ArrayValue($PluginName, $this->AvailablePlugins(), FALSE);
       $PluginFolder    = ArrayValue('Folder', $PluginInfo, FALSE);
       $PluginClassName = ArrayValue('ClassName', $PluginInfo, FALSE);
-
-      if ($ForAction === self::ACTION_REMOVE) {
-         $this->_RemovePluginFolder($PluginFolder);
-      }
 
       if ($PluginFolder !== FALSE && $PluginClassName !== FALSE && class_exists($PluginClassName) === FALSE) {
          if ($ForAction !== self::ACTION_DISABLE) {

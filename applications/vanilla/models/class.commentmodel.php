@@ -782,7 +782,7 @@ class CommentModel extends VanillaModel {
     */
    public function RecordAdvancedNotications($ActivityModel, $Discussion, $Comment, &$NotifiedUsers) {
       // Grab all of the users that need to be notified.
-      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewDiscussion'))->ResultArray();
+      $Data = $this->SQL->GetWhere('UserMeta', array('Name' => 'Preferences.Email.NewComment'))->ResultArray();
       
       // Grab all of their follow/unfollow preferences.
       $UserIDs = ConsolidateArrayValuesByKey($Data, 'UserID');

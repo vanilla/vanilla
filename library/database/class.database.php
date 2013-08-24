@@ -277,15 +277,15 @@ class Gdn_Database {
                break;
          }
 		}
+      
+      // Make sure other unbufferred queries are not open
+      if (is_object($this->_CurrentResultSet)) {
+         $this->_CurrentResultSet->Result();
+         $this->_CurrentResultSet->FreePDOStatement(FALSE);
+      }
 
       // Run the Query
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
-         // Make sure other unbufferred queries are not open
-         if (is_object($this->_CurrentResultSet)) {
-            $this->_CurrentResultSet->Result();
-            $this->_CurrentResultSet->FreePDOStatement(FALSE);
-         }
-
          $PDOStatement = $this->Connection()->prepare($Sql);
 
          if (!is_object($PDOStatement)) {
@@ -304,12 +304,17 @@ class Gdn_Database {
       // Did this query modify data in any way?
       if ($ReturnType == 'ID') {
          $this->_CurrentResultSet = $this->Connection()->lastInsertId();
+         if (is_a($PDOStatement, 'PDOStatement')) {
+            $PDOStatement->closeCursor();
+         }
       } else {
          if ($ReturnType == 'DataSet') {
             // Create a DataSet to manage the resultset
             $this->_CurrentResultSet = new Gdn_DataSet();
             $this->_CurrentResultSet->Connection = $this->Connection();
             $this->_CurrentResultSet->PDOStatement($PDOStatement);
+         } elseif (is_a($PDOStatement, 'PDOStatement')) {
+            $PDOStatement->closeCursor();
          }
       }
       

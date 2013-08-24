@@ -9,16 +9,7 @@ foreach ($this->Data('Conversations') as $Conversation) {
    
    
    // Figure out the last photo.
-   $LastPhoto = '';
-   foreach ($Conversation->Participants as $User) {
-      if ($User['UserID'] == $Conversation->LastInsertUserID) {
-         $LastPhoto = UserPhoto($User);
-         if ($LastPhoto)
-            break;
-      } elseif (!$LastPhoto) {
-         $LastPhoto = UserPhoto($User);
-      }
-   }
+   $LastPhoto = UserPhoto(Gdn::UserModel()->GetID($Conversation->LastInsertUserID));
    
    $CssClass = 'Item';
    $CssClass .= $Alt ? ' Alt' : '';

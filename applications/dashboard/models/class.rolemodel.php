@@ -363,7 +363,9 @@ class RoleModel extends Gdn_Model {
    public function Delete($RoleID, $ReplacementRoleID) {
       // First update users that will be orphaned
       if (is_numeric($ReplacementRoleID) && $ReplacementRoleID > 0) {
-         $this->SQL->Update('UserRole')
+         $this->SQL
+            ->Options('Ignore', TRUE)
+            ->Update('UserRole')
             ->Join('UserRole urs', 'UserRole.UserID = urs.UserID')
             ->GroupBy('urs.UserID')
             ->Having('count(urs.RoleID) =', '1', TRUE, FALSE)

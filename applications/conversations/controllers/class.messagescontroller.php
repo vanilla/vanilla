@@ -62,7 +62,7 @@ class MessagesController extends ConversationsController {
 //      $this->AddModule('MeModule');
       $this->AddModule('SignedInModule');
 
-      if (CheckPermission('Conversations.Conversations.Start'))
+      if (CheckPermission('Conversations.Conversations.Add'))
          $this->AddModule('NewConversationModule');
    }
    
@@ -75,7 +75,7 @@ class MessagesController extends ConversationsController {
     * @param string $Recipient Username of the recipient.
     */
    public function Add($Recipient = '') {
-      $this->Permission('Conversations.Conversations.Start');
+      $this->Permission('Conversations.Conversations.Add');
       $this->Form->SetModel($this->ConversationModel);
       
       if ($this->Form->AuthenticatedPostBack()) {
@@ -385,7 +385,7 @@ class MessagesController extends ConversationsController {
       $this->AddModule($InThisConversationModule);
 
       // Doesn't make sense for people who can't even start conversations to be adding people
-      if (CheckPermission('Conversations.Conversations.Start'))
+      if (CheckPermission('Conversations.Conversations.Add'))
          $this->AddModule('AddPeopleModule');
       
       $Subject = $this->Data('Conversation.Subject');

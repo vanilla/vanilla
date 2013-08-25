@@ -693,8 +693,8 @@ body { background: transparent !important; }
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('jquery.autogrow.js');
-      $this->AddJsFile('discussion.js');
       $this->RemoveJsFile('autosave.js');
+      $this->AddJsFile('discussion.js');
       $this->MasterView = 'empty';
       
       // Define incoming variables (prefer querystring parameters over method parameters)

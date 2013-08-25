@@ -7,7 +7,7 @@ echo $this->Form->Errors();
 $CountCheckedComments = GetValue('CountCheckedComments', $this->Data, 0);
 
 echo Wrap(sprintf(
-   'You have chosen to split %s into a new discussion.',
+   T('Split %s to new discussion', 'You have chosen to split %s into a new discussion.'),
    Plural($CountCheckedComments, '%s comment', '%s comments')
    ), 'p');
 ?>

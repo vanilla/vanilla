@@ -30,7 +30,10 @@
    if (!$NumFlaggedItems) {
       echo T('FlagQueueEmpty', "There are no items awaiting moderation at this time.");
    } else {
-      echo $NumFlaggedItems." ".Plural($NumFlaggedItems,"item","items")." in queue\n";
+      echo sprintf(
+         T('Flagging queue counter', '%s in queue.'),
+         Plural($NumFlaggedItems, '%s post', '%s posts')
+      );
       foreach ($this->FlaggedItems as $URL => $FlaggedList) {
 ?>
             <div class="FlaggedItem">

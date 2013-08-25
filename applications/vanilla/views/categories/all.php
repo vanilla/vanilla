@@ -66,7 +66,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                      if ($Category->LastCommentID != '' && $Category->LastDiscussionTitle != '') {
                         $CatList .= '<span class="LastDiscussionTitle">'.sprintf(
                               T('Most recent: %1$s by %2$s'),
-                              Anchor(SliceString($Category->LastDiscussionTitle, 40), '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionTitle)),
+                              Anchor(Gdn_Format::Text(SliceString($Category->LastDiscussionTitle, 40)), '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionTitle)),
                               UserAnchor($LastComment)
                            ).'</span>'
                            .'<span class="LastCommentDate">'.Gdn_Format::Date($Category->DateLastComment).'</span>';

@@ -81,7 +81,7 @@ if (C('Plugins.Flagging.Enabled')) {
                ?>
                         <div class="FlaggedOtherCell">
                            <div class="FlaggedItemInfo"><?php echo T('On').' '.$Flag['DateInserted'].', <strong>'.Anchor($Flag['InsertName'],"profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}").'</strong> '.T('said:'); ?></div>
-                           <div class="FlaggedItemComment">"<?php echo $Flag['Comment']; ?>"</div>
+                           <div class="FlaggedItemComment">"<?php echo Gdn_Format::Text($Flag['Comment']); ?>"</div>
                         </div>
                <?php
                      }

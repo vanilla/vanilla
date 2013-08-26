@@ -322,8 +322,8 @@ function GetCommentOptions($Comment) {
 		$Options['EditComment'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
 
 	// Can the user delete the comment?
-	// if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
-   if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
+	$SelfDeleting = ($CanEdit && $Session->UserID == $Comment->InsertUserID && C('Vanilla.Comments.AllowSelfDelete'));
+   if ($SelfDeleting || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
 		$Options['DeleteComment'] = array('Label' => T('Delete'), 'Url' => 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
    
    // DEPRECATED (as of 2.1)

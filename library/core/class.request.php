@@ -347,7 +347,16 @@ class Gdn_Request {
       // Request IP
       
       // Loadbalancers
-      $IP = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? GetValue('HTTP_X_FORWARDED_FOR',$_SERVER) : $_SERVER['REMOTE_ADDR'];
+      if ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_X_CLUSTER_CLIENT_IP')) {
+         $IP = $TestIP;
+      } elseif ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_CLIENT_IP')) {
+         $IP = $TestIP;
+      } elseif ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_X_FORWARDED_FOR')) {
+         $IP = $TestIP;
+      } else {
+         $IP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'REMOTE_ADDR');
+      }
+      
       if (strpos($IP, ',') !== FALSE) {
          $Matched = preg_match_all('/([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})(?:, )?/i', $IP, $Matches);
          

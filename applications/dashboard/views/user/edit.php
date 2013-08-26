@@ -51,7 +51,7 @@ if ($this->Data('AllowEditing')) { ?>
       <?php endif; ?>
       <li>
          <?php
-            echo $this->Form->CheckBox('Verified', T('This user is verified as a non-spammer'), array('value' => '1'));
+            echo $this->Form->CheckBox('Verified', T('Verified Label', 'Verified. Bypasses spam and pre-moderation filters.'), array('value' => '1'));
          ?>
       </li>
       <li>

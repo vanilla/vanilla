@@ -3101,12 +3101,12 @@ if (!function_exists('ViewLocation')) {
             $Controller = '/'.$Controller;
          }
 
-         $Extensions = array('tpl', 'php');
+         $Extensions = array('tpl', 'php', 'mustache');
          
          // 1. First we check the theme.
          if ($Theme = Gdn::Controller()->Theme) {
             foreach ($Extensions as $Ext) {
-               $Paths[] = PATH_THEMES."/{$Theme}/views{$Controller}/$View.$Ext";
+               $Paths[] = PATH_THEMES."/{$Theme}/views{$Controller}/{$View}.{$Ext}";
             }
          }
 
@@ -3114,19 +3114,19 @@ if (!function_exists('ViewLocation')) {
          if (StringBeginsWith($Folder, 'plugins/')) {
             // This is a plugin view.
             foreach ($Extensions as $Ext) {
-               $Paths[] = PATH_ROOT."/{$Folder}/views{$Controller}/$View.$Ext";
+               $Paths[] = PATH_ROOT."/{$Folder}/views{$Controller}/{$View}.{$Ext}";
             }
          } else {
             // This is an application view.
             $Folder = strtolower($Folder);
             foreach ($Extensions as $Ext) {
-               $Paths[] = PATH_APPLICATIONS."/{$Folder}/views{$Controller}/$View.$Ext";
+               $Paths[] = PATH_APPLICATIONS."/{$Folder}/views{$Controller}/{$View}.{$Ext}";
             }
 
             if ($Folder != 'dashboard' && StringEndsWith($View, '.master')) {
                // This is a master view that can always fall back to the dashboard.
                foreach ($Extensions as $Ext) {
-               $Paths[] = PATH_APPLICATIONS."/dashboard/views{$Controller}/$View.$Ext";
+               $Paths[] = PATH_APPLICATIONS."/dashboard/views{$Controller}/{$View}.{$Ext}";
             }
             }
          }

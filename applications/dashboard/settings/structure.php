@@ -1,12 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * Dashboard Application Structure
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
+ */
 
 if (!isset($Drop))
    $Drop = FALSE;
@@ -721,6 +722,34 @@ $Construct
    ->Column('OldUserID', 'int')
    ->Column('NewUserID', 'int')
    ->Set();
+/**
+ * Log significant operations against used IP
+ * Non unique.
+ */
+$Construct
+   ->Table('IpLog')
+   ->PrimaryKey('IpLogID')
+   ->Column('UserID', 'int(11)', FALSE, 'index')
+   ->Column('Event', 'varchar(32)', FALSE, 'index')      // register, visit, ipchange
+   ->Column('IPAddress', 'varchar(60)', FALSE, 'index')  // dotted quad format, or ipv6
+   ->Column('IPLong', 'int')                             // ip2long format
+   ->Column('DateInserted', 'datetime')
+   ->Column('DateUpdated', 'datetime')
+   ->Set(FALSE, FALSE);
+
+/**
+ * Track all used IPs per user
+ * Each user/ip combination is unique
+ */
+$Construct
+   ->Table('IpTrack')
+   ->PrimaryKey('IpLogID')
+   ->Column('UserID', 'int(11)', FALSE, 'unique')
+   ->Column('IPAddress', 'varchar(60)', FALSE, 'unique') // dotted quad format, or ipv6
+   ->Column('IPLong', 'int')                             // ip2long format
+   ->Column('DateInserted', 'datetime')
+   ->Column('DateUpdated', 'datetime')
+   ->Set(FALSE, FALSE);
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');

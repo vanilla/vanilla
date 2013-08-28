@@ -607,7 +607,6 @@ class DiscussionModel extends VanillaModel {
       if (!property_exists($Discussion, 'Read')) {
          $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
          if ($Category && !is_null($Category['DateMarkedRead'])) {
-            
             // If the category was marked explicitly read at some point, see if that applies here
             if ($Category['DateMarkedRead'] > $Discussion->DateLastComment)
                $Discussion->Read = TRUE;
@@ -1181,6 +1180,13 @@ class DiscussionModel extends VanillaModel {
       
       if (!$Discussion)
          return $Discussion;
+//      
+//      // Join in the category.
+//      $Category = CategoryModel::Categories($Discussion->CategoryID);
+//      if (!$Category) $Category = FALSE;
+//      $Discussion->Category = $Category['Name'];
+//      $Discussion->CategoryUrlCode = $Category['UrlCode'];
+//      $Discussion->PermissionCategoryID = $Category['PermissionCategoryID'];
       
       // Join in the users.
       $Discussion = array($Discussion);

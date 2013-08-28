@@ -6,6 +6,7 @@
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
+ * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
@@ -13,7 +14,7 @@
  */
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.2.3.5');
+define('APPLICATION_VERSION', '2.3a1');
 
 // Report and track all errors.
 

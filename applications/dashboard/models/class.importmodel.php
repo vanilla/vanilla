@@ -1053,7 +1053,7 @@ class ImportModel extends Gdn_Model {
 
    protected function _LoadTableWithInsert($Tablename, $Path) {
       // This option could take a while so set the timeout.
-      set_time_limit(60*5);
+      set_time_limit(0);
 
       // Get the column count of the table.
       $St = Gdn::Structure();
@@ -1256,7 +1256,7 @@ class ImportModel extends Gdn_Model {
 	
 	public function ProcessImportFile() {
       // This one step can take a while so give it more time.
-      set_time_limit(60 * 5);
+      set_time_limit(0);
 
 		$Path = $this->ImportPath;
 		$Tables = array();
@@ -1267,18 +1267,21 @@ class ImportModel extends Gdn_Model {
 		$fpout = NULL;
 
 		// Make sure it has the proper header.
+      unset($this->Data['Header']);
 		try {
 			$Header = $this->GetImportHeader($fpin);
 		} catch(Exception $Ex) {
 			fclose($fpin);
 			throw $Ex;
 		}
-
+      $Uniq = implode('-', $Header);
+      $Uniq = md5($Uniq);
+      
       $RowCount = 0;
       $LineNumber = 0;
 		while (($Line = fgets($fpin)) !== FALSE) {
          $LineNumber++;
-
+         
 			if ($Line == "\n") {
 				if ($fpout) {
 					// We are in a table so close it off.
@@ -1294,10 +1297,13 @@ class ImportModel extends Gdn_Model {
 				// This is the start of a table.
 				$TableInfo = $this->ParseInfoLine($Line);
             if (!array_key_exists('Table', $TableInfo)) {
-               throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s.'), $LineNumber));
+               throw new Gdn_UserException(sprintf(T('Could not parse import file. The problem is near line %s. %s'), $LineNumber, $Line));
             }
 				$Table = $TableInfo['Table'];
-				$Path = dirname($Path).DS.$Table.'.txt';
+				$Path = CombinePaths(array(PATH_UPLOADS,$Uniq,$Table.'.txt'));
+            $CheckPath = dirname($Path);
+            @mkdir($CheckPath, 0777, TRUE);
+            
 				$fpout = fopen($Path, 'wb');
 
 				$TableInfo['Path'] = $Path;
@@ -1575,7 +1581,7 @@ class ImportModel extends Gdn_Model {
 
    public function UpdateCounts() {
       // This option could take a while so set the timeout.
-      set_time_limit(60*5);
+      set_time_limit(0);
       
       // Define the necessary SQL.
       $Sqls = array();
@@ -1635,7 +1641,26 @@ class ImportModel extends Gdn_Model {
       }
       
       if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
-         $Sqls['Tag.CoundDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
+         $Sqls['Tag.CountDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
+      }
+      
+      if ($this->ImportExists('Poll')) {
+         $Sqls['PollOption.CountVotes'] = $this->GetCountSQL('count', 'PollOption', 'PollVote', 'CountVotes', 'PollOptionID');
+         
+         $Sqls['Poll.CountOptions'] = $this->GetCountSQL('count', 'Poll', 'PollOption', 'CountOptions', 'PollID');
+         $Sqls['Poll.CountVotes'] = $this->GetCountSQL('sum', 'Poll', 'PollOption', 'CountVotes', 'CountVotes', 'PollID');
+      }
+      
+      if ($this->ImportExists('Activity', 'ActivityType')) {
+         $Sqls['Activity.ActivityTypeID'] = "
+            update :_Activity a
+            join :_ActivityType t
+               on a.ActivityType = t.Name
+            set a.ActivityTypeID = t.ActivityTypeID";
+      }
+
+      if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
+         $Sqls['Tag.CountDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
       }
       
       if ($this->ImportExists('Poll')) {

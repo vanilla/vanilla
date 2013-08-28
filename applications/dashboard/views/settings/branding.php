@@ -30,13 +30,14 @@ $Session = Gdn::Session();
    echo '</ul>';
    ?>
 </div>
-<h1><?php echo T('Banner'); ?></h1>
+<h1><?php echo T('Branding'); ?></h1>
 <div class="PageInfo">
    <h2><?php echo T('Heads up!');?></h2>
    <p>
    <?php 
    echo T('Spend a little time thinking about how you describe your site here.', 
-      'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
+      'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.
+      Crafting great images and icons will increase your brand&rsquo;s strength.');
    ?>
    </p>
 </div>
@@ -46,13 +47,25 @@ echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
 ?>
 <div class="Row">
-   <div class="Column Grid_50">  
+   <div class="BrandingText">
       <ul>
+         <li>
+            <?php
+            echo $this->Form->Label('Site Title', 'Garden.Title');
+            echo Wrap(
+               T("The banner title appears on your site's banner and in your browser's title bar.",
+                  "The site title appears in your browser's title bar and at the very top of the page. It should be less than 20 characters. If a logo is uploaded, it will replace the site title on user-facing forum pages. Also, keep in mind some themes may also hide this title."),
+               'div',
+               array('class' => 'Info')
+            );
+            echo $this->Form->TextBox('Garden.Title');
+            ?>
+         </li>
          <li>
             <?php
                echo $this->Form->Label('Homepage Title', 'Garden.HomepageTitle');
                echo Wrap(
-                     T('The homepage title is displayed on your home page.', 'The homepage title is displayed on your home page. Pick a title that you would want to see appear in search engines.'),
+                     T('The homepage title is displayed on your home page.', 'The homepage title is displayed on your home page just above the content. Pick a title that you would want to see appear in search engines. It&rsquo;s OK for this to be the same as the Site Title.'),
                      'div',
                      array('class' => 'Info')
                   );
@@ -70,27 +83,15 @@ echo $this->Form->Errors();
                echo $this->Form->TextBox('Garden.Description', array('Multiline' => TRUE));
             ?>
          </li>
-         <li>
-            <?php
-               echo $this->Form->Label('Banner Title', 'Garden.Title');
-               echo Wrap(
-                     T("The banner title appears on your site's banner and in your browser's title bar.", 
-                       "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may also hide this title."),
-                     'div',
-                     array('class' => 'Info')
-                  );
-               echo $this->Form->TextBox('Garden.Title');
-            ?>
-         </li>
       </ul>
    </div>
-   <div class="Column Grid_50">
+   <div class="BrandingImages">
       <ul>
          <li>
             <?php
-               echo $this->Form->Label('Banner Logo', 'Logo');
+               echo $this->Form->Label('Logo', 'Logo');
                echo Wrap(
-                     T('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.'),
+                     T('LogoDescription', 'Appears at the top of your site. Some themes may not display it.'),
                      'div',
                      array('class' => 'Info')
                   );
@@ -101,9 +102,9 @@ echo $this->Form->Errors();
                      Img(Gdn_Upload::Url($Logo)),
                      'div'
                   );
-                  echo Wrap(Anchor(T('Remove Banner Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+                  echo Wrap(Anchor(T('Remove Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
                   echo Wrap(
-                     T('LogoBrowse', 'Browse for a new banner logo if you would like to change it:'),
+                     T('LogoBrowse', 'Browse for a new logo if you would like to change it:'),
                      'div',
                      array('class' => 'Info')
                   );
@@ -116,7 +117,7 @@ echo $this->Form->Errors();
             <?php
                echo $this->Form->Label('Favicon', 'Favicon');
                echo Wrap(
-                     T('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels."),
+                     T('FaviconDescription', "Your site's favicon appears in your browser's title bar and bookmark menu. It will be scaled to 16x16 pixels."),
                      'div',
                      array('class' => 'Info')
                   );
@@ -129,12 +130,6 @@ echo $this->Form->Errors();
                   echo Wrap(Anchor(T('Remove Favicon'), '/dashboard/settings/removefavicon/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
                   echo Wrap(
                      T('FaviconBrowse', 'Browse for a new favicon if you would like to change it:'),
-                     'div',
-                     array('class' => 'Info')
-                  );
-               } else {
-                  echo Wrap(
-                     T('FaviconDescription', "The shortcut icon that shows up in your browser's bookmark menu (16x16 px)."),
                      'div',
                      array('class' => 'Info')
                   );
@@ -156,14 +151,39 @@ echo $this->Form->Errors();
                      Img(Gdn_Upload::Url($ShareImage), array('style' => 'max-width: 300px')),
                      'div'
                   );
-                  echo Wrap(Anchor(T('Remove Image'), '/dashboard/settings/removeshareimage', 'SmallButton Hijack'), 'div', array('style' => 'padding: 10px 0;'));
+                  echo Wrap(Anchor(T('Remove Image'), '/dashboard/settings/removeshareimage/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
                   echo Wrap(
-                     T('FaviconBrowse', 'Browse for a new favicon if you would like to change it:'),
+                     T('FaviconBrowse', 'Browse for a new Share Image if you would like to change it:'),
                      'div',
                      array('class' => 'Info')
                   );
                }
                echo $this->Form->Input('ShareImage', 'file');
+            ?>
+         </li>
+         <li>
+            <?php
+            echo $this->Form->Label('Touch Icon', 'TouchIcon');
+            echo Wrap(
+               T('TouchIconInfo', 'The touch icon appears when you bookmark a website on the homescreen of an iOS device.
+                  We recommend a 114x114 pixel 72dpi png image. Do not use gloss, bevel, or shine effects.'),
+               'div',
+               array('class' => 'Info')
+            );
+            $TouchIcon = $this->Data('TouchIcon');
+            if ($TouchIcon) {
+               echo Wrap(
+                  Img(Gdn_Upload::Url($TouchIcon), array('style' => 'max-width: 144px')),
+                  'div'
+               );
+               echo Wrap(Anchor(T('Remove Image'), '/dashboard/settings/removetouchicon/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+               echo Wrap(
+                  T('TouchIconBrowse', 'Browse for a new Touch Icon if you would like to change it:'),
+                  'div',
+                  array('class' => 'Info')
+               );
+            }
+            echo $this->Form->Input('TouchIcon', 'file');
             ?>
          </li>
       </ul>

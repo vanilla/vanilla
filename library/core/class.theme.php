@@ -33,6 +33,7 @@ class Gdn_Theme {
 
    public static function Breadcrumbs($Data, $HomeLink = TRUE, $Options = array()) {
       $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
+      $PlainFormat = '<span itemprop="title">{Name,html}</span>';
       
       $Result = '';
       
@@ -58,7 +59,7 @@ class Gdn_Theme {
       }
       
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
-
+      
       $Count = 0;
       $DataCount = 0;
       
@@ -78,7 +79,7 @@ class Gdn_Theme {
          if ($DataCount == count($Data))
             $CssClass .= ' Last';
          
-         $Label = '<span class="'.$CssClass.'">'.FormatString($Format, $Row).'</span> ';
+         $Label = '<span class="'.$CssClass.'">'.FormatString($Row['Url'] ? $Format : $PlainFormat, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
          
          $Count++;

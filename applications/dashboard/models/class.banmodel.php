@@ -1,16 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
-/**
- * Ban Model
- *
- * @package Dashboard
- */
- 
+
 /**
  * Manage banning of users.
- *
- * @since 2.0.18
- * @package Dashboard
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class BanModel extends Gdn_Model {
    /* @var array */
    protected static $_AllBans;

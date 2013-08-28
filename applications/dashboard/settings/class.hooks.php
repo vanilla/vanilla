@@ -1,12 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * Dashboard Application Hooks
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
+ */
 
 class DashboardHooks implements Gdn_IPlugin {
    public function Setup() {
@@ -102,13 +103,11 @@ class DashboardHooks implements Gdn_IPlugin {
          $Sender->AddDefinition('Path', Gdn::Request()->Path());
          // $Sender->AddDefinition('MasterView', $Sender->MasterView);
          $Sender->AddDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
-         
+         $Sender->AddJsFile('embed_local.js');
          if ($Embed === 2)
             $Sender->AddJsFile('vanilla.embed.local.js');
          else
             $Sender->AddJsFile('embed_local.js');
-      } else {
-         $Sender->SetHeader('X-Frame-Options', 'SAMEORIGIN');
       }
          
       // Allow return to mobile site
@@ -125,7 +124,7 @@ class DashboardHooks implements Gdn_IPlugin {
 		$Menu->AddLink('Dashboard', T('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
-		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Settings.Manage');
+		$Menu->AddLink('Appearance', T('Branding'), '/dashboard/settings/branding', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Settings.Manage');
       if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) 

@@ -23,6 +23,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
    }
 
    $.fn.popup = function(options) {
+      
       // IE7 or less gets no popups because they're jerks
       if ($.browser.msie && parseInt($.browser.version, 10) < 8)
          return false;
@@ -30,7 +31,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // Merge the two settings arrays into a central data store
       var settings = $.extend({}, $.popup.settings, options);
       var sender = this;
-
+      
       this.live('click', function() {
          settings.sender = this;
          $.extend(settings, { popupType: $(this).attr('popupType') });

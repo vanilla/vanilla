@@ -105,9 +105,9 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       if (!Gdn_Statistics::CheckIsEnabled() && Gdn_Statistics::CheckIsLocalhost()) {
          $Sender->Render('dashboardlocalhost', '', 'plugins/VanillaStats');
       } else {
-         $Sender->AddJsFile('plugins/VanillaStats/js/vanillastats.js');
-         $Sender->AddJsFile('plugins/VanillaStats/js/picker.js');
-         $Sender->AddCSSFile('plugins/VanillaStats/design/picker.css');
+         $Sender->AddJsFile('vanillastats.js', 'plugins/VanillaStats');
+         $Sender->AddJsFile('picker.js', 'plugins/VanillaStats');
+         $Sender->AddCSSFile('picker.css', 'plugins/VanillaStats');
 
          $this->ConfigureRange($Sender);
          

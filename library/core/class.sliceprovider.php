@@ -24,8 +24,8 @@ class Gdn_SliceProvider {
          'css'       => array(),
          'js'        => array()
       );
-      $Sender->AddJsFile('/js/library/jquery.class.js');
-      $Sender->AddJsFile('/js/slice.js');
+      $Sender->AddJsFile('jquery.class.js');
+      $Sender->AddJsFile('slice.js');
       $Sender->AddCssFile('/applications/dashboard/design/slice.css');
    }
 

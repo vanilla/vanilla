@@ -1,0 +1,351 @@
+
+/* Note: InformMessages are "growl" style messages that appear in a fixed
+position on the page to notify users of things like drafts being saved, etc. */
+.InformMessages {
+   text-align: left;
+   position: fixed;
+   top: auto;
+   bottom: 0;
+   left: 0;
+   z-index: 200;
+   margin: 0;
+   padding: 0;
+   list-style: none;
+   font-size: 12px;
+   display: block;
+   width: auto;
+}
+* html .InformMessages {
+  position: absolute;
+  top: auto;
+  margin-left: 10px;
+  overflow: visible; 
+  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
+}
+.InformWrapper {
+	display: block;
+   margin: 10px;
+}
+.InformMessages .InformMessage {
+   color: #fff !important;
+	text-shadow: 0 1px 1px #000;
+   text-align: left !important;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	background: rgb(0, 0, 0) !important;
+	background: rgba(0, 0, 0, 0.7) !important;
+   border: none !important;
+   width: auto;
+	max-width: 400px;
+   padding: 9px 14px 8px;
+   display:-moz-inline-stack;
+   display:inline-block;
+   zoom:1;
+   *display:inline;
+	position: relative;
+	line-height: 1.6;
+}
+.InformMessages .InformMessage:hover {
+	background: #333;
+	background: rgba(0, 0, 0, 0.8) !important;
+}
+.InformMessages .InformMessage a {
+	color: #aff;
+}
+.InformMessages .InformMessage a:hover {
+	color: #cff;
+	text-decoration: underline;
+}
+.InformMessages .InformMessage strong {
+	font-weight: bold;
+}
+.InformMessages .InformMessage a.Close {
+	border: none;
+	background: transparent;
+   border-top-right-radius: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -moz-border-radius-topright: 2px;
+	color: #ddd;
+	font-size: 14px;
+	text-align: center;
+	display: none;
+	height: 12px;
+	width: 12px;
+	line-height: 1;
+	text-decoration: none;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+.InformMessages .InformMessage a.Close span {
+	display: inline;
+}
+.InformMessages .InformMessage a.Close:hover {
+	background: #000;
+	color: #fff;
+}
+.InformMessages .InformMessage:hover a.Close {
+	display: block;
+}
+
+/* iPad/iPhone */
+@media only screen and (device-width: 768px),
+only screen and (max-device-width: 480px) {
+   .InformMessages .InformMessage a.Close {
+      color: #fff;
+      display: block;
+   }
+   
+   .Item .OptionsTitle {
+      visibility: visible;
+   }
+}
+
+/* Small screens */
+@media (max-width: 500px) {
+   .InformMessages {
+      width: 100%;
+   }
+   .InformWrapper {
+      margin: 5px;
+   }
+   .InformMessages .InformMessage {
+      display: block;
+      max-width: inherit;
+   }
+}
+
+.InformMessages .Actions a { margin-right: 4px; }
+.InformMessages .Actions a:last-child { margin-right: 0; }
+.InformMessages .Actions a.CancelAction {	color: #aaa; }
+
+/* Inform Sprites */
+.InformMessages .InformWrapper.HasIcon .InformMessage {
+	padding-left: 42px !important;
+	min-height: 20px;
+}
+.InformMessages .InformWrapper.HasSprite .InformMessage {
+	padding-left: 40px !important;
+}
+.InformMessages .InformMessage a.Icon {
+	display: block;
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	height: 28px;
+	width: 28px;
+}
+.InformMessages .InformMessage a.Icon img {
+	height: 28px;
+	width: 28px;
+}
+span.InformSprite {
+	background: url('images/inform-sprites.png') -9px -9px no-repeat;
+	display: block;
+	position: absolute;
+	top: 4px;
+	left: 5px;
+	height: 30px;
+	width: 30px;
+}
+span.InformSprite.Refresh { background-position: -9px -9px; }
+span.InformSprite.Recycle { background-position: -57px -9px; }
+span.InformSprite.Infinity { background-position: -105px -9px; }
+span.InformSprite.Squiggle { background-position: -153px -9px; }
+span.InformSprite.Random { background-position: -200px -9px; }
+span.InformSprite.Magnify { background-position: -250px -9px; }
+span.InformSprite.Location { background-position: -298px -9px; }
+span.InformSprite.Bubble { background-position: -346px -9px; }
+span.InformSprite.ElipsisBubble { background-position: -394px -9px; }
+span.InformSprite.Plus { background-position: -442px -9px; }
+span.InformSprite.Time { background-position: -9px -57px; }
+span.InformSprite.Eye { background-position: -57px -57px; }
+span.InformSprite.Target { background-position: -105px -57px; }
+span.InformSprite.Redflag { background-position: -153px -57px; }
+span.InformSprite.Flags { background-position: -200px -57px; }
+span.InformSprite.Graph { background-position: -250px -57px; }
+span.InformSprite.Chart { background-position: -298px -57px; }
+span.InformSprite.Envelope { background-position: -346px -57px; }
+span.InformSprite.Gear { background-position: -394px -57px; }
+span.InformSprite.Gears { background-position: -442px -57px; }
+span.InformSprite.Skull { background-position: -9px -106px; }
+span.InformSprite.SkullBones { background-position: -57px -106px; }
+span.InformSprite.Bird { background-position: -105px -106px; }
+span.InformSprite.Present { background-position: -153px -106px; }
+span.InformSprite.Thundercloud { background-position: -200px -106px; }
+span.InformSprite.Bandaid { background-position: -250px -106px; }
+span.InformSprite.Saturn { background-position: -298px -106px; }
+span.InformSprite.Star { background-position: -346px -106px; }
+span.InformSprite.Heart { background-position: -394px -106px; }
+span.InformSprite.Key { background-position: -442px -106px; }
+span.InformSprite.Ipod { background-position: -9px -152px; }
+span.InformSprite.Iphone { background-position: -57px -152px; }
+span.InformSprite.Cabinet { background-position: -105px -152px; }
+span.InformSprite.Coffee { background-position: -153px -152px; }
+span.InformSprite.Briefcase { background-position: -200px -152px; }
+span.InformSprite.Toolcase { background-position: -250px -152px; }
+span.InformSprite.Suitcase { background-position: -298px -152px; }
+span.InformSprite.Airplane { background-position: -346px -152px; }
+span.InformSprite.Spraypaint { background-position: -394px -152px; }
+span.InformSprite.MailInbox { background-position: -442px -154px; }
+span.InformSprite.WallPicture { background-position: -9px -200px; }
+span.InformSprite.Photos { background-position: -57px -200px; }
+span.InformSprite.FilmRoll { background-position: -105px -200px; }
+span.InformSprite.Drawer { background-position: -153px -200px; }
+span.InformSprite.FilmStrip { background-position: -200px -200px; }
+span.InformSprite.FilmStrip2 { background-position: -250px -200px; }
+span.InformSprite.Gas { background-position: -298px -200px; }
+span.InformSprite.Cutlery { background-position: -346px -200px; }
+span.InformSprite.Battery { background-position: -394px -200px; }
+span.InformSprite.Beaker { background-position: -442px -200px; }
+span.InformSprite.Outlet { background-position: -9px -250px; }
+span.InformSprite.Pinetree { background-position: -57px -250px; }
+span.InformSprite.House { background-position: -105px -250px; }
+span.InformSprite.Padlock { background-position: -153px -250px; }
+span.InformSprite.Network { background-position: -200px -250px; }
+span.InformSprite.Cloud { background-position: -250px -250px; }
+span.InformSprite.Download { background-position: -298px -250px; }
+span.InformSprite.BookmarkRibbon { background-position: -346px -250px; }
+span.InformSprite.Flag { background-position: -394px -250px; }
+span.InformSprite.Signpost { background-position: -442px -250px; }
+span.InformSprite.Brightness { background-position: -9px -298px; }
+span.InformSprite.Contrast { background-position: -57px -298px; }
+span.InformSprite.Runner { background-position: -105px -298px; }
+span.InformSprite.Zap { background-position: -153px -298px; }
+span.InformSprite.MusicNote { background-position: -200px -298px; }
+span.InformSprite.Microphone { background-position: -250px -298px; }
+span.InformSprite.Tshirt { background-position: -298px -298px; }
+span.InformSprite.Paperclip { background-position: -346px -298px; }
+span.InformSprite.Monitor { background-position: -394px -298px; }
+span.InformSprite.Tv { background-position: -442px -297px; }
+span.InformSprite.Compass { background-position: -9px -346px; }
+span.InformSprite.Pin { background-position: -57px -346px; }
+span.InformSprite.Radar { background-position: -105px -346px; }
+span.InformSprite.Location { background-position: -153px -346px; }
+span.InformSprite.Telephone { background-position: -200px -346px; }
+span.InformSprite.Baby { background-position: -250px -346px; }
+span.InformSprite.Ekg { background-position: -298px -346px; }
+span.InformSprite.Stopwatch { background-position: -346px -346px; }
+span.InformSprite.MedicalBag { background-position: -394px -346px; }
+span.InformSprite.ShoppingCart { background-position: -442px -346px; }
+span.InformSprite.Dashboard { background-position: -9px -393px; }
+span.InformSprite.Dogpaw { background-position: -57px -393px; }
+span.InformSprite.Calendar { background-position: -105px -393px; }
+span.InformSprite.Lightbulb { background-position: -153px -393px; }
+span.InformSprite.Trophy { background-position: -200px -393px; }
+span.InformSprite.Camera { background-position: -250px -393px; }
+span.InformSprite.Wineglass { background-position: -298px -393px; }
+span.InformSprite.Beerglass { background-position: -346px -391px; }
+span.InformSprite.Dumbbells { background-position: -394px -393px; }
+span.InformSprite.Buoy { background-position: -442px -393px; }
+span.InformSprite.Beaker2 { background-position: -9px -440px; }
+span.InformSprite.Testtube { background-position: -57px -440px; }
+span.InformSprite.Thermometer { background-position: -105px -440px; }
+span.InformSprite.Pill { background-position: -153px -440px; }
+span.InformSprite.Equalizer { background-position: -200px -440px; }
+span.InformSprite.Book { background-position: -250px -440px; }
+span.InformSprite.Puzzle { background-position: -298px -440px; }
+span.InformSprite.Palette { background-position: -346px -440px; }
+span.InformSprite.Umbrella { background-position: -394px -440px; }
+span.InformSprite.CoffeeCup { background-position: -442px -440px; }
+span.InformSprite.Gameplan { background-position: -9px -490px; }
+span.InformSprite.Walk { background-position: -57px -490px; }
+span.InformSprite.Map { background-position: -105px -490px; }
+span.InformSprite.IndexCards { background-position: -153px -490px; }
+span.InformSprite.Piano { background-position: -200px -490px; }
+span.InformSprite.Sliders { background-position: -250px -490px; }
+span.InformSprite.Widescreen { background-position: -298px -490px; }
+span.InformSprite.Badge { background-position: -346px -490px; }
+span.InformSprite.Chicken { background-position: -394px -490px; }
+span.InformSprite.Bug { background-position: -442px -490px; }
+span.InformSprite.SingleUser { background-position: -9px -539px; }
+span.InformSprite.Group { background-position: -57px -537px; }
+span.InformSprite.Navigation { background-position: -105px -537px; }
+span.InformSprite.Balloon { background-position: -153px -537px; }
+span.InformSprite.Bowandarrow { background-position: -200px -537px; }
+span.InformSprite.Controller { background-position: -250px -537px; }
+span.InformSprite.Check { background-position: -298px -537px; }
+span.InformSprite.Hanger { background-position: -346px -537px; }
+span.InformSprite.Piggybank { background-position: -394px -537px; }
+span.InformSprite.Headphones { background-position: -442px -537px; }
+span.InformSprite.Landscape { background-position: -9px -586px; }
+span.InformSprite.Stats { background-position: -57px -586px; }
+span.InformSprite.Idcard { background-position: -105px -586px; }
+span.InformSprite.Bullhorn { background-position: -153px -586px; }
+span.InformSprite.Food { background-position: -200px -586px; }
+span.InformSprite.Moon { background-position: -250px -586px; }
+span.InformSprite.Sock { background-position: -298px -586px; }
+span.InformSprite.Bone { background-position: -346px -586px; }
+span.InformSprite.Golf { background-position: -394px -586px; }
+span.InformSprite.Dice { background-position: -442px -586px; }
+
+.Sprite16 {
+	background: url('images/sprites.png') 0 0 no-repeat;
+	display: inline-block;
+	height: 16px;
+	width: 16px;
+   vertical-align: top;
+}
+
+/* 16px Sprites White */
+.SpDashboard,
+.SpCog { background-position: 0 -212px; }
+.SpSettings { background-position: -16px -212px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -212px; }
+.SpSignOut,
+.SpExit { background-position: -48px -212px; }
+.SpMarker { background-position: -64px -212px; }
+.SpDocuments { background-position: -80px -212px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -228px; }
+.SpInmail { background-position: -16px -228px; }
+.SpRoundBubble { background-position: -32px -228px; }
+.SpSquareBubble { background-position: -48px -228px; }
+.SpRoundBubbles { background-position: -64px -228px; }
+.SpSquareBubbles { background-position: -80px -228px; }
+.SpTag { background-position: 0 -244px; }
+.SpWrite { background-position: -16px -244px; }
+.SpLock { background-position: -32px -244px; }
+.SpRoundAlert { background-position: -48px -244px; }
+.SpTriangleAlert { background-position: -64px -244px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -244px; }
+.SpSearch { background-position: 0 -260px; }
+.SpTrash { background-position: -16px -260px; }
+.SpUser { background-position: -32px -260px; }
+.SpRefresh { background-position: -48px -260px; }
+.SpPencil { background-position: -64px -260px; }
+.SpPlus { background-position: -80px -260px; }
+
+/* 16px Sprites White Transparent */
+.SpDashboard,
+.SpCog { background-position: 0 -276px; }
+.SpSettings { background-position: -16px -276px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -276px; }
+.SpSignOut,
+.SpExit { background-position: -48px -276px; }
+.SpMarker { background-position: -64px -276px; }
+.SpDocuments { background-position: -80px -276px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -292px; }
+.SpInmail { background-position: -16px -292px; }
+.SpRoundBubble { background-position: -32px -292px; }
+.SpSquareBubble { background-position: -48px -292px; }
+.SpRoundBubbles { background-position: -64px -292px; }
+.SpSquareBubbles { background-position: -80px -292px; }
+.SpTag { background-position: 0 -308px; }
+.SpWrite { background-position: -16px -308px; }
+.SpLock { background-position: -32px -308px; }
+.SpRoundAlert { background-position: -48px -308px; }
+.SpTriangleAlert { background-position: -64px -308px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -308px; }
+.SpSearch { background-position: 0 -324px; }
+.SpTrash { background-position: -16px -324px; }
+.SpUser { background-position: -32px -324px; }
+.SpRefresh { background-position: -48px -324px; }
+.SpPencil { background-position: -64px -324px; }
+.SpPlus { background-position: -80px -324px; }

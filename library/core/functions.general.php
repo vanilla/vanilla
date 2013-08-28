@@ -1046,7 +1046,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    }
 
    $Value = GetValueR($Field, $Args, '');
-   if ($Value == '' && !in_array($Format, array('url', 'exurl'))) {
+   if ($Value == '' && !in_array($Format, array('url', 'exurl', 'number', 'plural'))) {
       $Result = '';
    } else {
       switch(strtolower($Format)) {
@@ -2465,7 +2465,7 @@ if (!function_exists('ProxyRequest')) {
 
 if (!function_exists('RandomString')) {
    function RandomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
-      $CharLen = strlen($Characters) - 1;
+      $CharLen = strlen($Characters);
       $String = '' ;
       for ($i = 0; $i < $Length; ++$i) {
         $Offset = mt_rand() % $CharLen;

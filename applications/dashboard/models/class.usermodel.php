@@ -1227,10 +1227,7 @@ class UserModel extends Gdn_Model {
       
       $Result = array();
       foreach ($RolesDataArray as $RoleID) {
-         $Role = RoleModel::Roles($RoleID, TRUE);
-         // Exclude personal info roles if current user may not see them
-         if (CheckPermission('Garden.PersonalInfo.View') || !GetValue('PersonalInfo', $Role))
-            $Result[] = $Role;
+         $Result[] = RoleModel::Roles($RoleID, TRUE);
       }
       return new Gdn_DataSet($Result);
    }

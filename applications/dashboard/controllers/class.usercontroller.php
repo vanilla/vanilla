@@ -499,6 +499,11 @@ class UserController extends DashboardController {
       $RoleModel = new RoleModel();
       $RoleData = $AllRoles = $RoleModel->GetArray();
 
+      // Hide personal info roles
+      if (!CheckPermission('Garden.PersonalInfo.View')) {
+         $RoleData = array_filter($RoleData, 'RoleModel::FilterPersonalInfo');
+      }
+
       $UserModel = new UserModel();
       $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
       

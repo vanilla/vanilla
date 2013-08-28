@@ -525,18 +525,14 @@ class UserController extends DashboardController {
       $this->SetData('_CanEditUsername', $CanEditUsername);
       
       // Determine if emails can be edited
-      $CanEditEmail = (
-              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
-              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')
-           );
+      $CanEditEmail = Gdn::Session()->CheckPermission('Garden.Users.Edit');
       $this->SetData('_CanEditEmail', $CanEditEmail);
       
       // Decide if they have ability to confirm users
       $Confirmed = (bool)GetValueR('Confirmed', $User);
       $CanConfirmEmail = (
               UserModel::RequireConfirmEmail() &&
-              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
-              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'));
+              Gdn::Session()->CheckPermission('Garden.Users.Edit'));
       $this->SetData('_CanConfirmEmail', $CanConfirmEmail);
       $this->SetData('_EmailConfirmed', $Confirmed);
       $User['ConfirmEmail'] = (int)$Confirmed;

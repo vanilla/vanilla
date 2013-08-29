@@ -1,8 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <ul class="PopList Conversations">
    <li class="Item Title">
-      <?php 
-      echo Anchor(T('New Message'), 'messages/add');
+      <?php
+      if (CheckPermission('Conversations.Conversations.Add'))
+         echo Anchor(T('New Message'), 'messages/add');
       echo Wrap(T('Inbox'), 'strong'); 
       ?>
    </li>

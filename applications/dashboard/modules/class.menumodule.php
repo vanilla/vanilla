@@ -160,7 +160,7 @@ if (!class_exists('MenuModule', FALSE)) {
                   if ($RequiredPermissions !== FALSE && !is_array($RequiredPermissions))
                      $RequiredPermissions = explode(',', $RequiredPermissions);
                      
-                  // Show if there are no permissions or the user has the required permissions or the user is admin
+                  // Show if there are no permissions or the user has ANY of the specified permissions or the user is admin
                   $ShowLink = $Admin || $RequiredPermissions === FALSE || ArrayInArray($RequiredPermissions, $Permissions, FALSE) === TRUE;
                   
                   if ($ShowLink === TRUE) {

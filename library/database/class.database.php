@@ -183,8 +183,12 @@ class Gdn_Database {
          $Config = Gdn::Config('Database');
       elseif(is_string($Config))
          $Config = Gdn::Config($Config);
-         
+      
       $DefaultConfig = Gdn::Config('Database');
+      if (is_null($Config))
+         $Config = array();
+      if (is_null($DefaultConfig))
+         $DefaultConfig = array();
          
       $this->Engine = ArrayValue('Engine', $Config, $DefaultConfig['Engine']);
       $this->User = ArrayValue('User', $Config, $DefaultConfig['User']);
@@ -193,7 +197,7 @@ class Gdn_Database {
       $this->DatabasePrefix = ArrayValue('DatabasePrefix', $Config, ArrayValue('Prefix', $Config, $DefaultConfig['DatabasePrefix']));
       $this->ExtendedProperties = ArrayValue('ExtendedProperties', $Config, array());
       
-      if(array_key_exists('Dsn', $Config)) {
+      if (array_key_exists('Dsn', $Config)) {
          // Get the dsn from the property.
          $Dsn = $Config['Dsn'];
       } else {   
@@ -336,12 +340,17 @@ class Gdn_Database {
       // Did this query modify data in any way?
       if ($ReturnType == 'ID') {
          $this->_CurrentResultSet = $PDO->lastInsertId();
+         if (is_a($PDOStatement, 'PDOStatement')) {
+            $PDOStatement->closeCursor();
+         }
       } else {
          if ($ReturnType == 'DataSet') {
             // Create a DataSet to manage the resultset
             $this->_CurrentResultSet = new Gdn_DataSet();
             $this->_CurrentResultSet->Connection = $PDO;
             $this->_CurrentResultSet->PDOStatement($PDOStatement);
+         } elseif (is_a($PDOStatement, 'PDOStatement')) {
+            $PDOStatement->closeCursor();
          }
       }
       

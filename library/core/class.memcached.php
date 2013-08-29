@@ -86,7 +86,7 @@ class Gdn_Memcached extends Gdn_Cache {
       }
       
       // Persistent, and already have servers. Shortcircuit adding.
-      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT) && count($this->Memcache->getServerList()))
+      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT) && count($this->servers()))
          return true;
       
       $Keys = array(
@@ -366,6 +366,10 @@ class Gdn_Memcached extends Gdn_Cache {
       switch ($tryBinary) {
          case FALSE:
             $incremented = $this->Memcache->increment($realKey, $amount);
+            if (is_null($incremented) && $initial) {
+               $incremented = $this->Memcache->set($realKey, $initial);
+               if ($incremented) $incremented = $initial;
+            }
             break;
          case TRUE;
             $incremented = $this->Memcache->increment($realKey, $amount, $initial, $expiry);
@@ -399,6 +403,10 @@ class Gdn_Memcached extends Gdn_Cache {
       switch ($tryBinary) {
          case FALSE:
             $decremented = $this->Memcache->decrement($realKey, $amount);
+            if (is_null($decremented) && $initial) {
+               $decremented = $this->Memcache->set($realKey, $initial);
+               if ($decremented) $decremented = $initial;
+            }
             break;
          case TRUE;
             $decremented = $this->Memcache->decrement($realKey, $amount, $initial, $expiry);
@@ -438,6 +446,10 @@ class Gdn_Memcached extends Gdn_Cache {
    
    public function online() {
       return (bool)sizeof($this->Containers);
+   }
+   
+   public function servers() {
+      return $this->Memcache->getServerList();
    }
    
    public function ResultCode() {

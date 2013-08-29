@@ -342,6 +342,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             return;
 
          // Display all non-hidden fields
+         $ProfileFields = array_reverse($ProfileFields);
          foreach ($ProfileFields as $Name => $Value) {
             if (!$Value)
                continue;

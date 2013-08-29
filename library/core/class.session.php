@@ -147,6 +147,7 @@ class Gdn_Session {
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
       $this->SetCookie('-Vv', NULL, -3600);
+      $this->SetCookie('SessionID', NULL, -3600);
       
       $this->UserID = 0;
       $this->User = FALSE;

@@ -30,6 +30,7 @@ $UpdateLastMessageID = $Construct->TableExists() && !$Construct->ColumnExists('L
 
 $Construct
    ->PrimaryKey('ConversationID')
+   ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('Subject', 'varchar(100)', NULL)
    ->Column('Contributors', 'varchar(255)')
    ->Column('FirstMessageID', 'int', TRUE, 'key')
@@ -140,5 +141,6 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'AddedToConversation'))->NumR
 
 $PermissionModel = Gdn::PermissionModel();
 $PermissionModel->Define(array(
-   'Conversations.Moderation.Manage' => 0
+   'Conversations.Moderation.Manage' => 0,
+   'Conversations.Conversations.Add' => 'Garden.Profiles.Edit',
 ));

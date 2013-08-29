@@ -1469,6 +1469,7 @@ class DiscussionModel extends VanillaModel {
                }
 					
                // Create discussion
+               $this->SerializeRow($Fields);
                $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
                $Fields['DiscussionID'] = $DiscussionID;
                   

@@ -440,7 +440,7 @@ class ProfileController extends Gdn_Controller {
       //    return $this->Notifications($Page);
       // elseif (C('Garden.Profile.ShowActivities', TRUE))
       if (C('Garden.Profile.ShowActivities', TRUE))
-         return $this->Activity($User, $Username, $UserID);
+         return $this->Activity($User, $Username, $UserID, $Page);
       else
          return Gdn::Dispatcher()->Dispatch(UserUrl($this->User, '', 'discussions'));
    }
@@ -979,14 +979,14 @@ class ProfileController extends Gdn_Controller {
    
    public function _SetBreadcrumbs($Name = NULL, $Url = NULL) {
       // Add the root link.
-      if ($this->User->UserID == Gdn::Session()->UserID) {
+      if (GetValue('UserID', $this->User) == Gdn::Session()->UserID) {
          $Root = array('Name' => T('Profile'), 'Url' => '/profile');
          $Breadcrumb = array('Name' => $Name, 'Url' => $Url);
       } else {
          $NameUnique = C('Garden.Registration.NameUnique');
          
-         $Root = array('Name' => $this->User->Name, 'Url' => UserUrl($this->User));
-         $Breadcrumb = array('Name' => $Name, 'Url' => $Url.'/'.($NameUnique ? '' : $this->User->UserID.'/').rawurlencode($this->User->Name));
+         $Root = array('Name' => GetValue('Name', $this->User), 'Url' => UserUrl($this->User));
+         $Breadcrumb = array('Name' => $Name, 'Url' => $Url.'/'.($NameUnique ? '' : GetValue('UserID', $this->User).'/').rawurlencode(GetValue('Name', $this->User)));
       }
       
       $this->Data['Breadcrumbs'][] = $Root;
@@ -1413,7 +1413,12 @@ class ProfileController extends Gdn_Controller {
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage') || Gdn::Session()->UserID == $this->User->UserID) {
             $this->User->Transient = GetValueR('Attributes.TransientKey', $this->User);
          }
-         
+
+         // Hide personal info roles
+         if (!CheckPermission('Garden.PersonalInfo.View')) {
+            $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
+         }
+
          $this->SetData('Profile', $this->User);
          $this->SetData('UserRoles', $this->Roles);
          if ($CssClass = GetValue('_CssClass', $this->User)) {

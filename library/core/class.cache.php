@@ -680,9 +680,11 @@ abstract class Gdn_Cache {
          $ActiveConfig = C($ConfigKey, array());
       }
       
-      if (is_null($Key) || !array_key_exists($Key, $ActiveConfig)) {
+      if (is_null($Key))
          return $ActiveConfig;
-      }
+      
+      if (!array_key_exists($Key, $ActiveConfig))
+         return $Default;
       
       return GetValue($Key, $ActiveConfig, $Default);
    }

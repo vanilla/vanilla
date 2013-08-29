@@ -842,7 +842,6 @@ class SettingsController extends DashboardController {
       }
       
       ob_clean();
-      header(self::GetStatusMessage(200), TRUE, 200);
       echo 'Success';
    }
 
@@ -1008,46 +1007,6 @@ class SettingsController extends DashboardController {
       $Session = Gdn::Session();
       $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => ''));
       Redirect('settings/themes');
-   }
-   
-   /**
-    * Remove an addon.
-    *
-    * @since 2.0.0
-    * @access public
-    * @param string $Type Application or plugin.
-    * @param string $Name Unique ID of app or plugin.
-    * @param string $TransientKey Security token.
-    */
-   public function RemoveAddon($Type, $Name, $TransientKey = '') {
-      $RequiredPermission = 'Undefined';
-      switch ($Type) {
-         case SettingsModule::TYPE_APPLICATION:
-            $Manager = Gdn::Factory('ApplicationManager');
-            $Enabled = 'EnabledApplications';
-            $Remove  = 'RemoveApplication';
-            $RequiredPermission = 'Garden.Settings.Manage';
-         break;
-         case SettingsModule::TYPE_PLUGIN:
-            $Manager = Gdn::Factory('PluginManager');
-            $Enabled = 'EnabledPlugins';
-            $Remove  = 'RemovePlugin';
-            $RequiredPermission = 'Garden.Settings.Manage';
-         break;
-      }
-      
-      $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission($RequiredPermission)) {
-         try {
-            if (array_key_exists($Name, $Manager->$Enabled()) === FALSE) {
-               $Manager->$Remove($Name);
-            }
-         } catch (Exception $e) {
-            $this->Form->AddError(strip_tags($e->getMessage()));
-         }
-      }
-      if ($this->Form->ErrorCount() == 0)
-         Redirect('/settings/plugins');
    }
    
    /**

@@ -65,7 +65,7 @@ class DashboardHooks implements Gdn_IPlugin {
 			
 		if ($Sender->MasterView != 'admin' && !$Sender->Data('_NoMessages') && (GetValue('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, FALSE) || InArrayI($Location, $MessageCache))) {
          $MessageModel = new MessageModel();
-         $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions);
+         $MessageData = $MessageModel->GetMessagesForLocation($Location, $Exceptions, $Sender->Data('Category.CategoryID'));
          foreach ($MessageData as $Message) {
             $MessageModule = new MessageModule($Sender, $Message);
             if ($SignInOnly) // Insert special messages even in SignIn popup

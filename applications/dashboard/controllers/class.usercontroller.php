@@ -278,7 +278,7 @@ class UserController extends DashboardController {
     * @param type $UserID 
     */
    public function Ban($UserID, $Unban = FALSE) {
-      $this->Permission('Garden.Moderation.Manage');
+      $this->Permission(array('Garden.Moderation.Manage','Moderation.Users.Ban'), FALSE);
       
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       if (!$User)
@@ -508,6 +508,11 @@ class UserController extends DashboardController {
       // By default, people with access here can freely assign all roles
       $RoleModel = new RoleModel();
       $RoleData = $AllRoles = $RoleModel->GetArray();
+
+      // Hide personal info roles
+      if (!CheckPermission('Garden.PersonalInfo.View')) {
+         $RoleData = array_filter($RoleData, 'RoleModel::FilterPersonalInfo');
+      }
 
       $UserModel = new UserModel();
       $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);

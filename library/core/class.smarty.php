@@ -51,7 +51,7 @@ class Gdn_Smarty {
          
          $Photo = $Session->User->Photo;
          if ($Photo) {
-            if (!preg_match('`^https?://`i', $Photo)) {
+            if (!IsUrl($Photo)) {
                $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
             }
          } else {

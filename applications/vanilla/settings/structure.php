@@ -439,3 +439,12 @@ if (!$LastDiscussionIDExists) {
       ->Set('c.LastDiscussionID', 'cm.DiscussionID', FALSE, FALSE)
       ->Put();
 }
+
+// Add stub content
+include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'stub.php');
+
+// Set current Vanilla.Version
+$ApplicationInfo = array();
+include(CombinePaths(array(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'about.php')));
+$Version = ArrayValue('Version', ArrayValue('Vanilla', $ApplicationInfo, array()), 'Undefined');
+SaveToConfig('Vanilla.Version', $Version);

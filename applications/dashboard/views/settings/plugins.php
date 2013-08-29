@@ -89,7 +89,7 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
       <tr <?php echo 'id="'.Gdn_Format::Url(strtolower($PluginName)).'-plugin"', ' class="More '.$RowClass.'"'; ?>>
          <td rowspan="2" class="Less"><?php echo Img($IconPath, array('class' => 'PluginIcon')); ?></td>
          <th><?php echo $ScreenName; ?></th>
-         <td class="Alt"><?php echo Gdn_Format::Html(GetValue('Description', $PluginInfo, '')); ?></td>
+         <td class="Alt"><?php echo Gdn_Format::Html(T(GetValue('Name', $PluginInfo, $PluginName).' Description', GetValue('Description', $PluginInfo, ''))); ?></td>
       </tr>
       <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
          <td class="Info"><?php
@@ -102,9 +102,6 @@ foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
             
             if ($SettingsUrl != '')
                echo Anchor(T('Settings'), $SettingsUrl, 'SmallButton');
-            
-            if (SettingsModule::IsRemovable(SettingsModule::TYPE_PLUGIN, $PluginName))
-               echo Anchor(T('Remove'), '/settings/removeaddon/'.SettingsModule::TYPE_PLUGIN.'/'.$PluginName.'/'.$Session->TransientKey(), 'RemoveItem SmallButton');
 
          ?></td>
          <td class="Alt Info"><?php

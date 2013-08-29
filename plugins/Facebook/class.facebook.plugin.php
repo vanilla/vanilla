@@ -243,7 +243,10 @@ class FacebookPlugin extends Gdn_Plugin {
          $CssClass = 'ReactButton PopupWindow';
       }
       
-      echo ' '.Anchor(Sprite('ReactFacebook', 'ReactSprite'), Url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), $CssClass).' ';
+      echo ' '.Anchor(Sprite('ReactFacebook', 'ReactSprite'), Url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), $CssClass, array(
+            'popupWidth' => '627',
+            'popupHeight' => '370'
+         )).' ';
    }
    
    public function Base_SignInIcons_Handler($Sender, $Args) {
@@ -320,7 +323,8 @@ class FacebookPlugin extends Gdn_Plugin {
                   'name' => Gdn_Format::PlainText($Row['Name'], 'Text'),
 //                  'caption' => 'Foo',
                   'description' => $Message,
-                  'redirect_uri' => Url('/post/shared/facebook', TRUE)
+                  'redirect_uri' => Url('/post/shared/facebook', TRUE),
+                  'display' => 'popup'
                 );
             
             $Url = 'http://www.facebook.com/dialog/feed?'.http_build_query($Get);

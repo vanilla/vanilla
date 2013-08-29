@@ -2270,7 +2270,7 @@ class UserModel extends Gdn_Model {
       // Set some required dates.
       $Now = Gdn_Format::ToDateTime();
       $Fields[$this->DateInserted] = $Now;
-      $Fields['DateFirstVisit'] = $Now;
+      TouchValue('DateFirstVisit', $Fields, $Now);
       $Fields['DateLastActive'] = $Now;
       $Fields['InsertIPAddress'] = Gdn::Request()->IpAddress();
       $Fields['LastIPAddress'] = Gdn::Request()->IpAddress();

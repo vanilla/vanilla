@@ -75,6 +75,12 @@ echo $this->Form->Errors();
                echo $this->Form->CheckBox('SocialSharing', 'Enable automatic Social Share.');
             ?>
          </li>
+         <li>
+            <?php
+               echo $this->Form->Label('Twitter handle to use for via: @', 'Handle');
+               echo $this->Form->TextBox('Handle');
+            ?>
+         </li>
       </ul>
       <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
    </div>

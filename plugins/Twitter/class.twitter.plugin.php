@@ -324,8 +324,17 @@ class TwitterPlugin extends Gdn_Plugin {
 //               $Message = Normalizer::normalize($Message, Normalizer::FORM_D);
 //            $Elips = Normalizer::normalize($Elips, Normalizer::FORM_D);
 //         }
+
+         $Handle = C('Plugins.Twitter.Handle', '');
          
-         $Max = 140;
+         if($Handle != '') {
+            $ViaPrefix = ' via @'; // Count default via chars included on Twitter share.
+            $ViaStrLen = strlen($ViaPrefix) + strlen($Handle);
+            $Max = 140 - $ViaStrLen;
+         } else {
+            $Max = 140;
+         }
+         
          $LinkLen = 22;
          
          $Max -= $LinkLen;
@@ -334,6 +343,9 @@ class TwitterPlugin extends Gdn_Plugin {
          if (strlen($Message) > $Max) {
             $Message = substr($Message, 0, $Max - strlen($Elips)).$Elips;
          }
+         
+         if(strtolower($RecordType) == 'discussion')
+            $Message = ucfirst($Message);
          
 //         echo $Message.strlen($Message);
          
@@ -353,6 +365,10 @@ class TwitterPlugin extends Gdn_Plugin {
                 'text' => $Message,
                 'url' => $Row['ShareUrl']
                 );
+            
+            if($Handle != '')
+               array_merge($Get, array('via' => $Handle));
+            
             $Url = "http://twitter.com/share?".http_build_query($Get);
             Redirect($Url);
          }
@@ -749,7 +765,10 @@ class TwitterPlugin extends Gdn_Plugin {
          $CssClass = 'ReactButton PopupWindow';
       }
       
-      echo Anchor(Sprite('ReactTwitter', 'ReactSprite'), $Url, $CssClass);
+      echo Anchor(Sprite('ReactTwitter', 'ReactSprite'), $Url, $CssClass, array(
+            'popupWidth' => '550',
+            'popupHeight' => '420'
+         ));
    }
 
    public function SocialController_Twitter_Create($Sender, $Args) {
@@ -759,7 +778,8 @@ class TwitterPlugin extends Gdn_Plugin {
              'Plugins.Twitter.ConsumerKey' => $Sender->Form->GetFormValue('ConsumerKey'),
              'Plugins.Twitter.Secret' => $Sender->Form->GetFormValue('Secret'),
              'Plugins.Twitter.SocialReactions' => $Sender->Form->GetFormValue('SocialReactions'),
-             'Plugins.Twitter.SocialSharing' => $Sender->Form->GetFormValue('SocialSharing')
+             'Plugins.Twitter.SocialSharing' => $Sender->Form->GetFormValue('SocialSharing'),
+             'Plugins.Twitter.Handle' => $Sender->Form->GetFormValue('Handle')
          );
 
          SaveToConfig($Settings);
@@ -770,6 +790,7 @@ class TwitterPlugin extends Gdn_Plugin {
          $Sender->Form->SetValue('Secret', C('Plugins.Twitter.Secret'));
          $Sender->Form->SetValue('SocialReactions', $this->SocialReactions());
          $Sender->Form->SetValue('SocialSharing', $this->SocialSharing());
+         $Sender->Form->SetValue('Handle', C('Plugins.Twitter.Handle'));
       }
 
       $Sender->AddSideMenu('dashboard/social');

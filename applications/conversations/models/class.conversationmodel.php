@@ -287,7 +287,7 @@ class ConversationModel extends Gdn_Model {
          ->From('UserConversation uc')
          ->Join('User u', 'u.UserID = uc.UserID');
       
-      Gdn_DataSet::Join($Data, array('alias' => 'uc', 'parent' => 'ConversationID', 'column' => 'Participants', 'UserID', 'u.Name', 'u.Photo'), array('sql' => $this->SQL));
+      Gdn_DataSet::Join($Data, array('alias' => 'uc', 'parent' => 'ConversationID', 'column' => 'Participants', 'UserID', 'u.Name', 'u.Email', 'u.Photo'), array('sql' => $this->SQL));
    }
    
    public function JoinLastMessages(&$Data) {

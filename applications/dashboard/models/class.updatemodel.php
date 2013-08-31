@@ -795,10 +795,12 @@ class UpdateModel extends Gdn_Model {
       $Apps = $ApplicationManager->EnabledApplications();
       $AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
       $Paths = array();
-      foreach ($Apps as $AppInfo) {
+      foreach ($Apps as $Key => $AppInfo) {
          $Path = PATH_APPLICATIONS."/{$AppInfo['Folder']}/settings/structure.php";
          if (file_exists($Path))
             $Paths[] = $Path;
+         
+         Gdn::ApplicationManager()->RegisterPermissions($Key, $this->Validation);
       }
       
       // Execute the structures.

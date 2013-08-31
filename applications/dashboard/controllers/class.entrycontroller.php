@@ -784,7 +784,7 @@ class EntryController extends Gdn_Controller {
     *
     * @param string $TransientKey (default: "")
     */
-   public function SignOut($TransientKey = "") {
+   public function SignOut($TransientKey = "", $Override = "0") {
       $this->CheckOverride('SignOut', $this->Target(), $TransientKey);
       
       if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->IsPostBack()) {
@@ -804,6 +804,7 @@ class EntryController extends Gdn_Controller {
       } elseif (!Gdn::Session()->IsValid())
          $this->_SetRedirect();
       
+      $this->SetData('Override', $Override);
       $this->SetData('Target', $this->Target());
       $this->Leaving = FALSE;
       $this->Render();

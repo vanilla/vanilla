@@ -798,6 +798,7 @@ class CommentModel extends VanillaModel {
                // Log the save.
                LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));
                // Save the new value.
+               $this->SerializeRow($Fields);
                $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
             } else {
                // Make sure that the comments get formatted in the method defined by Garden.
@@ -819,7 +820,8 @@ class CommentModel extends VanillaModel {
                	return UNAPPROVED;
                }
 
-               // Create comment
+               // Create comment.
+               $this->SerializeRow($Fields);
                $CommentID = $this->SQL->Insert($this->Name, $Fields);
 	            $this->EventArguments['CommentID'] = $CommentID;
 	               

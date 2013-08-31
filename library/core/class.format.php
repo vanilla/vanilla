@@ -1067,7 +1067,7 @@ class Gdn_Format {
          $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
          $Result = '<span class="VideoWrap">';
             $Result .= '<span class="Video YouTube" id="youtube-'.$ID.'">';
-               $Result .= '<span class="VideoPreview"><a href="http://youtube.com/watch?v='.$ID.'"><img src="http://img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
+               $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$ID.'"><img src="//img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
                $Result .= '<span class="VideoPlayer"></span>';
             $Result .= '</span>';
          $Result .= '</span>';
@@ -1391,7 +1391,7 @@ EOT;
             $Mixed = self::$FormatMethod($Mixed);
          } elseif (function_exists($FormatMethod)) {
             $Mixed = $FormatMethod($Mixed);
-         } elseif ($Formatter = Gdn::Factory($FormatMethod.'Formatter')) {;
+         } elseif ($Formatter = Gdn::Factory($FormatMethod.'Formatter')) {
             $Mixed = $Formatter->Format($Mixed);
          } else {
             $Mixed = Gdn_Format::Text($Mixed);

@@ -1697,6 +1697,18 @@ class DiscussionModel extends VanillaModel {
       // Save the count to the user table
       Gdn::UserModel()->SetField($UserID, 'CountDiscussions', $CountDiscussions);
    }
+   
+   public function UpdateUserCommentCount($UserID) {
+      $CountComments = $this->SQL
+         ->Select('CommentID', 'count', 'CountComments')
+         ->From('Comment')
+         ->Where('InsertUserID', $UserID)
+         ->Get()->Value('CountComments', 0);
+      
+      // Save the count to the user table
+      Gdn::UserModel()->SetField($UserID, 'CountComments', $CountComments);
+   }
+
 	
 	/**
 	 * Update and get bookmark count for the specified user.
@@ -2017,6 +2029,19 @@ class DiscussionModel extends VanillaModel {
       
       // Get the user's discussion count.
       $this->UpdateUserDiscussionCount($UserID);
+      
+      // Set the user's comment count if necessary
+      if (count($Comments) > 0) {
+         $CommentUserIDs = array();
+         foreach ($Comments as $Comment) {
+            $CommentUserIDs[] = $Comment['InsertUserID'];
+         }
+         // Reduce db calls as much as possible 
+         $CommentUserIDs = array_unique($CommentUserIDs);
+	 foreach ($CommentUserIDs as $CommentUserID) {
+            $this->UpdateUserCommentCount($CommentUserID);
+         }
+      }
 
 		// Update bookmark counts for users who had bookmarked this discussion
 		foreach ($BookmarkData->Result() as $User) {

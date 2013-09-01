@@ -23,6 +23,11 @@ class DiscussionModel extends VanillaModel {
    /** @var array */
    protected static $_CategoryPermissions = NULL;
    
+   /**
+    * @var array 
+    */
+   protected static $_DiscussionTypes = NULL;
+   
    /** @var bool */
    public $Watching = FALSE;
    
@@ -167,6 +172,24 @@ class DiscussionModel extends VanillaModel {
 		}
          
       $this->FireEvent('AfterDiscussionSummaryQuery');
+   }
+   
+   public static function DiscussionTypes() {
+      if (!self::$_DiscussionTypes) {
+         $DiscussionTypes = array('Discussion' => array(
+            'Singular' => 'Discussion',
+            'Plural' => 'Discussions', 
+            'AddUrl' => '/post/discussion',
+            'AddText' => 'New Discussion'
+            ));
+         
+         
+         Gdn::PluginManager()->EventArguments['Types'] =& $DiscussionTypes;
+         Gdn::PluginManager()->FireAs('DiscussionModel')->FireEvent('DiscussionTypes');
+         self::$_DiscussionTypes = $DiscussionTypes;
+         unset(Gdn::PluginManager()->EventArguments['Types']);
+      }
+      return self::$_DiscussionTypes;
    }
    
    /**

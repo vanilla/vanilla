@@ -367,8 +367,16 @@ class CategoryModel extends Gdn_Model {
          // If there are no discussion types set then all discussion types are allowed.
          if ($Key == 'AllowedDiscussionTypes' && empty($RowValue))
             continue;
-         
-         if (is_array($Value)) {
+
+         if (is_array($RowValue)) {
+            if (is_array($Value)) {
+               // If both items are arrays then all values in the filter must be in the row.
+               if (count(array_intersect($Value, $RowValue)) < count($Value))
+                  return FALSE;
+            } elseif (!in_array($Value, $RowValue)) {
+               return FALSE;
+            }
+         } elseif (is_array($Value)) {
             if (!in_array($RowValue, $Value))
                return FALSE;
          } else {

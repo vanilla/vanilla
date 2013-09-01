@@ -21,6 +21,11 @@ class SettingsController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'CategoryModel');
    
    /**
+    * @var Gdn_Form
+    */
+   public $Form;
+   
+   /**
     *
     * @var bool 
     */
@@ -246,6 +251,7 @@ class SettingsController extends Gdn_Controller {
       $this->RoleArray = $RoleModel->GetArray();
       
       $this->FireEvent('AddEditCategory');
+      $this->SetupDiscussionTypes($this->Category);
       
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->AddHidden('CodeIsDefined', '0');
@@ -397,6 +403,25 @@ class SettingsController extends Gdn_Controller {
       }
    }
    
+   protected function SetupDiscussionTypes($Category) {
+      $DiscussionTypes = DiscussionModel::DiscussionTypes();
+      $this->SetData('DiscussionTypes', $DiscussionTypes);
+      
+      if (!$this->Form->IsPostBack()) {
+         $PCatID = GetValue('PermissionCategoryID', $Category, -1);
+         if ($PCatID == GetValue('CategoryID', $Category)) {
+            $PCat = $Category;
+         } else {
+            $PCat = CategoryModel::Categories($PCatID);
+         }
+         $AllowedTypes = GetValue('AllowedDiscussionTypes', $PCat);
+         if (empty($AllowedTypes))
+            $AllowedTypes = array_keys($DiscussionTypes);
+         
+         $this->Form->SetValue("AllowedDiscussionTypes", $AllowedTypes);
+      }
+   }
+   
    /**
     * Editing a category.
     * 
@@ -442,8 +467,10 @@ class SettingsController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->SetData($this->Category);
+         $this->SetupDiscussionTypes($this->Category);
          $this->Form->SetValue('CustomPoints', $this->Category->PointsCategoryID == $this->Category->CategoryID);
       } else {
+         $this->SetupDiscussionTypes($this->Category);
          $Upload = new Gdn_Upload();
          $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
          if ($TmpImage) {

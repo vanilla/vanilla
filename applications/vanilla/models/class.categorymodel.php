@@ -332,10 +332,6 @@ class CategoryModel extends Gdn_Model {
                $PermCategory = GetValue($Category['PermissionCategoryID'], $Categories);
                if ($PermCategory) {
                   if (!isset($PermFilters[$PermCategory['CategoryID']])) {
-                     if (!isset($PermCategory['AllowedDiscussionTypes']) || empty($PermCategory['AllowedDiscussionTypes'])) {
-                        unset($PermFilter['AllowedDiscussionTypes']);
-                     }
-                     
                      $PermFilters[$PermCategory['CategoryID']] = self::Where($PermCategory, $PermFilter);
                   }
                   
@@ -367,6 +363,10 @@ class CategoryModel extends Gdn_Model {
       
       foreach ($Where as $Key => $Value) {
          $RowValue = GetValue($Key, $Row);
+         
+         // If there are no discussion types set then all discussion types are allowed.
+         if ($Key == 'AllowedDiscussionTypes' && empty($RowValue))
+            continue;
          
          if (is_array($Value)) {
             if (!in_array($RowValue, $Value))

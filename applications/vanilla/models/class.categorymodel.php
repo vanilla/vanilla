@@ -41,6 +41,17 @@ class CategoryModel extends Gdn_Model {
       parent::__construct('Category');
    }
    
+   public static function AllowedDiscussionTypes($Category) {
+      $Category = self::PermissionCategory($Category);
+      $Allowed = GetValue('AllowedDiscussionTypes', $Category);
+      $AllTypes = DiscussionModel::DiscussionTypes();;
+      
+      if (empty($Allowed) || !is_array($Allowed))
+         return $AllTypes;
+      else
+         return array_intersect_key($AllTypes, array_flip($Allowed));
+   }
+   
    /**
     * 
     * 
@@ -162,6 +173,9 @@ class CategoryModel extends Gdn_Model {
          
          if (!GetValue('CssClass', $Category))
             $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
+         
+         if (isset($Category['AllowedDiscussionTypes']) && is_string($Category['AllowedDiscussionTypes']))
+            $Category['AllowedDiscussionTypes'] = unserialize($Category['AllowedDiscussionTypes']);
 		}
       
       $Keys = array_reverse(array_keys($Data));
@@ -290,13 +304,15 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
-   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL, $Filter = array()) {
+   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL, $Filter = array(), $PermFilter = array()) {
       static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
       $Field = $Map[$Permission];
       $DoHeadings = C('Vanilla.Categories.DoHeadings');
+      $PermFilters = array();
       
       $Result = array();
-      foreach (self::Categories() as $ID => $Category) {
+      $Categories = self::Categories();
+      foreach ($Categories as $ID => $Category) {
          if (!$Category[$Field])
             continue;
          
@@ -311,16 +327,57 @@ class CategoryModel extends Gdn_Model {
                   break;
                }
             }
+            
+            if (!empty($PermFilter)) {
+               $PermCategory = GetValue($Category['PermissionCategoryID'], $Categories);
+               if ($PermCategory) {
+                  if (!isset($PermFilters[$PermCategory['CategoryID']])) {
+                     if (!isset($PermCategory['AllowedDiscussionTypes']) || empty($PermCategory['AllowedDiscussionTypes'])) {
+                        unset($PermFilter['AllowedDiscussionTypes']);
+                     }
+                     
+                     $PermFilters[$PermCategory['CategoryID']] = self::Where($PermCategory, $PermFilter);
+                  }
+                  
+                  $Exclude = !$PermFilters[$PermCategory['CategoryID']];
+               } else {
+                  $Exclude = TRUE;
+               }
+            }
+            
             if ($Exclude)
                continue;
             
-            if ($DoHeadings && $Permission == 'Discussions.Add' && $Category['Depth'] <= 1)
-               continue;
+            if ($DoHeadings && $Category['Depth'] <= 1) {
+               if ($Permission == 'Discussions.Add')
+                  continue;
+               else
+                  $Category['PermsDiscussionsAdd'] = FALSE;
+            }
          }
 
          $Result[$ID] = $Category;
       }
       return $Result;
+   }
+   
+   public static function Where($Row, $Where) {
+      if (empty($Where))
+         return TRUE;
+      
+      foreach ($Where as $Key => $Value) {
+         $RowValue = GetValue($Key, $Row);
+         
+         if (is_array($Value)) {
+            if (!in_array($RowValue, $Value))
+               return FALSE;
+         } else {
+            if ($RowValue != $Value)
+               return FALSE;
+         }
+      }
+      
+      return TRUE;
    }
    
    /**
@@ -696,7 +753,11 @@ class CategoryModel extends Gdn_Model {
     * @return object SQL results.
     */
    public function GetID($CategoryID, $DatasetType = DATASET_TYPE_OBJECT) {
-      return $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow($DatasetType);
+      $Category = $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow($DatasetType);
+      if (isset($Category->AllowedDiscussionTypes) && is_string($Category->AllowedDiscussionTypes))
+            $Category->AllowedDiscussionTypes = unserialize($Category->AllowedDiscussionTypes);
+      
+      return $Category;
    }
 
    /**
@@ -1110,6 +1171,23 @@ class CategoryModel extends Gdn_Model {
    }
    
    /**
+    * Return the category that contains the permissions for the given category.
+    * 
+    * @param mixed $Category
+    * @since 2.2
+    */
+   public static function PermissionCategory($Category) {
+      if (empty($Category))
+         return self::Categories(-1);
+      
+      if (!is_array($Category) && !is_object($Category)) {
+         $Category = self::Categories($Category);
+      }
+      
+      return self::Categories(GetValue('PermissionCategoryID', $Category));
+   }
+   
+   /**
     * Rebuilds the category tree. We are using the Nested Set tree model.
     * 
     * @ref http://articles.sitepoint.com/article/hierarchical-data-database/2
@@ -1334,6 +1412,10 @@ class CategoryModel extends Gdn_Model {
       $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
       $CustomPoints = GetValue('CustomPoints', $FormPostValues, NULL);
       
+      if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
+         $FormPostValues['AllowedDiscussionTypes'] = serialize($FormPostValues['AllowedDiscussionTypes']);
+      }
+      
       // Is this a new category?
       $Insert = $CategoryID > 0 ? FALSE : TRUE;
       if ($Insert)
@@ -1519,6 +1601,10 @@ class CategoryModel extends Gdn_Model {
    public function SetField($ID, $Property, $Value = FALSE) {
       if (!is_array($Property))
          $Property = array($Property => $Value);
+      
+      if (isset($Property['AllowedDiscussionTypes']) && is_array($Property['AllowedDiscussionTypes'])) {
+         $Property['AllowedDiscussionTypes'] = serialize($Property['AllowedDiscussionTypes']);
+      }
       
       $this->SQL->Put($this->Name, $Property, array('CategoryID' => $ID));
       

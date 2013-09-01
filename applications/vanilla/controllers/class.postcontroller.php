@@ -117,10 +117,12 @@ class PostController extends VanillaController {
          $CategoryModel = new CategoryModel();
          $Category = $CategoryModel->GetByCode($CategoryUrlCode);
          $this->CategoryID = $Category->CategoryID;
+         
       }
-      if ($Category)
+      if ($Category) {
          $this->Category = (object)$Category;
-      else {
+         $this->SetData('Category', $Category);
+      } else {
          $this->CategoryID = 0;
          $this->Category = NULL;
       }
@@ -147,14 +149,21 @@ class PostController extends VanillaController {
          $this->Form->SetFormValue('DiscussionID', $this->Discussion->DiscussionID);
 
          $this->Title(T('Edit Discussion'));
+         
+         if ($this->Discussion->Type)
+            $this->SetData('Type', $this->Discussion->Type);
+         else
+            $this->SetData('Type', 'Discussion');
       } else {
          // Permission to add
          $this->Permission('Vanilla.Discussions.Add');
          $this->Title(T('New Discussion'));
       }
       
+      TouchValue('Type', $this->Data, 'Discussion');
+      
       // See if we should hide the category dropdown.
-      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0));
+      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0), array('AllowedDiscussionTypes' => $this->Data['Type']));
       if (count($AllowedCategories) == 1) {
          $AllowedCategory = array_pop($AllowedCategories);
          $this->ShowCategorySelector = FALSE;

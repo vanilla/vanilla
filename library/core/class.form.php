@@ -235,7 +235,7 @@ class Gdn_Form extends Gdn_Pluggable {
     */
    public function CategoryDropDown($FieldName = 'CategoryID', $Options = FALSE) {
       $Value = ArrayValueI('Value', $Options); // The selected category id
-      $CategoryData = GetValue('CategoryData', $Options, CategoryModel::Categories());
+      $CategoryData = GetValue('CategoryData', $Options);
       
       // Sanity check
       if (is_object($CategoryData))
@@ -244,12 +244,19 @@ class Gdn_Form extends Gdn_Pluggable {
          $CategoryData = array();
       
       $Permission = GetValue('Permission', $Options, 'add');
+      
+      // Grab the category data.
+      if (!$CategoryData) {
+         $CategoryData = CategoryModel::GetByPermission('Discussions.View', $Value,
+            GetValue('Filter', $Options, array('Archived' => 0)),
+            GetValue('PermFilter', $Options, array())
+            );
+      }
 
       // Respect category permissions (remove categories that the user shouldn't see).
       $SafeCategoryData = array();
       foreach ($CategoryData as $CategoryID => $Category) {
-         if ($Permission == 'add' && !$Category['PermsDiscussionsAdd'])
-            continue;
+         $Name = $Category['Name'];
          
          if ($Value != $CategoryID) {
             if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsView'])
@@ -261,6 +268,8 @@ class Gdn_Form extends Gdn_Pluggable {
 
          $SafeCategoryData[$CategoryID] = $Category;
       }
+      
+      unset($Options['Filter'], $Options['PermFilter']);
       
       // Opening select tag
       $Return = '<select';
@@ -307,6 +316,8 @@ class Gdn_Form extends Gdn_Pluggable {
                $Selected = TRUE;
                $ForceCleanSelection = FALSE;
             }
+            
+            $Disabled &= $Permission == 'add' && !$Category['PermsDiscussionsAdd'];
 
             $Return .= '<option value="' . $CategoryID . '"';
             if ($Disabled)

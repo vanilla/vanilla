@@ -260,7 +260,7 @@ class Gdn_Form extends Gdn_Pluggable {
          }
 
          $SafeCategoryData[$CategoryID] = $Category;
-      }  
+      }
       
       // Opening select tag
       $Return = '<select';
@@ -342,9 +342,19 @@ class Gdn_Form extends Gdn_Pluggable {
    public function CheckBox($FieldName, $Label = '', $Attributes = FALSE) {
       $Value = ArrayValueI('value', $Attributes, true);
       $Attributes['value'] = $Value;
-
-      if ($this->GetValue($FieldName) == $Value)
-         $Attributes['checked'] = 'checked';
+      
+      if (StringEndsWith($FieldName, '[]')) {
+         if (!isset($Attributes['checked'])) {
+            $GetValue = $this->GetValue(substr($FieldName, 0, -2));
+            if (is_array($GetValue) && in_array($Value, $GetValue))
+               $Attributes['checked'] = 'checked';
+            elseif ($GetValue == $Value)
+               $Attributes['checked'] = 'checked';
+         }
+      } else {
+         if ($this->GetValue($FieldName) == $Value)
+            $Attributes['checked'] = 'checked';
+      }
          
       // Show inline errors?
       $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));

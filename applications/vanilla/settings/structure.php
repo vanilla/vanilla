@@ -51,6 +51,7 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('LastDiscussionID', 'int', NULL)
    ->Column('LastDateInserted', 'datetime', NULL)
    ->Column('AllowedDiscussionTypes', 'varchar(255)', NULL)
+   ->Column('DefaultDiscussionType', 'varchar(10)', NULL)
    ->Set($Explicit, $Drop);
 
 $RootCategoryInserted = FALSE;

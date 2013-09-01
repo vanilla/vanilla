@@ -133,10 +133,17 @@ class UserController extends DashboardController {
       $this->AddSideMenu('dashboard/user');
       
       $RoleModel = new RoleModel();
-      $AllRoles = $RoleModel->GetArray();
+      $RoleData = $AllRoles = $RoleModel->GetArray();
+
+      // If not administrator, restrict to default registration roles.
+      if (!CheckPermission('Garden.Settings.Manage')) {
+         $DefaultRoleIDs = C('Garden.Registration.DefaultRoles', array(8));
+         $DefaultRoles = array_combine($DefaultRoleIDs, $DefaultRoleIDs);
+         $RoleData = array_intersect_key($AllRoles, $DefaultRoles);
+      }
       
       // By default, people with access here can freely assign all roles
-      $this->RoleData = $AllRoles;
+      $this->RoleData = $RoleData;
       
       $UserModel = new UserModel();
       $this->User = FALSE;
@@ -505,14 +512,10 @@ class UserController extends DashboardController {
       $this->Title(T('Edit User'));
       $this->AddSideMenu('dashboard/user');
 
-      // By default, people with access here can freely assign all roles
+      // Only admins can reassign roles
       $RoleModel = new RoleModel();
-      $RoleData = $AllRoles = $RoleModel->GetArray();
-
-      // Hide personal info roles
-      if (!CheckPermission('Garden.PersonalInfo.View')) {
-         $RoleData = array_filter($RoleData, 'RoleModel::FilterPersonalInfo');
-      }
+      $AllRoles = $RoleModel->GetArray();
+      $RoleData = (CheckPermission('Garden.Settings.Manage')) ? $AllRoles : array();
 
       $UserModel = new UserModel();
       $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
@@ -522,21 +525,31 @@ class UserController extends DashboardController {
       $this->SetData('_CanEditUsername', $CanEditUsername);
       
       // Determine if emails can be edited
-      $CanEditEmail = (
-              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
-              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')
-           );
+      $CanEditEmail = Gdn::Session()->CheckPermission('Garden.Users.Edit');
       $this->SetData('_CanEditEmail', $CanEditEmail);
       
       // Decide if they have ability to confirm users
       $Confirmed = (bool)GetValueR('Confirmed', $User);
       $CanConfirmEmail = (
               UserModel::RequireConfirmEmail() &&
-              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
-              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'));
+              Gdn::Session()->CheckPermission('Garden.Users.Edit'));
       $this->SetData('_CanConfirmEmail', $CanConfirmEmail);
       $this->SetData('_EmailConfirmed', $Confirmed);
       $User['ConfirmEmail'] = (int)$Confirmed;
+
+      // Determine whether user being edited is privileged (can escalate permissions)
+      $UserModel = new UserModel();
+      $EditingPrivilegedUser = $UserModel->CheckPermission($User, 'Garden.Settings.Manage');
+
+      // Determine our password reset options
+      // Anyone with user editing my force reset over email
+      $this->ResetOptions = array(
+         0 => T('Keep current password.'),
+         'Auto' => T('Force user to reset their password and send email notification.')
+      );
+      // Only admins may manually reset passwords for other admins
+      if (CheckPermission('Garden.Settings.Manage') || !$EditingPrivilegedUser)
+         $this->ResetOptions['Manual'] = T('Manually set user password. No email notification.');
 
       // Set the model on the form.
       $this->Form->SetModel($UserModel);
@@ -578,12 +591,16 @@ class UserController extends DashboardController {
             if ($CanConfirmEmail && is_bool($Confirmation))
                $this->Form->SetFormValue('Confirmed', (int)$Confirmation);
             
-            // If a new password was specified, add it to the form's collection
             $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
-            $NewPassword = $this->Form->GetValue('NewPassword', '');
-            if ($ResetPassword == 'Manual') 
+
+            // If we're an admin or this isn't a privileged user, allow manual setting of password
+            $AllowManualReset = (CheckPermission('Garden.Settings.Manage') || !$EditingPrivilegedUser);
+            if ($ResetPassword == 'Manual' && $AllowManualReset) {
+               // If a new password was specified, add it to the form's collection
+               $NewPassword = $this->Form->GetValue('NewPassword', '');
                $this->Form->SetFormValue('Password', $NewPassword);
-            
+            }
+
             // Role changes
             
             // These are the new roles the editing user wishes to apply to the target

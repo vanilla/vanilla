@@ -63,6 +63,8 @@ if ($this->Data('AllowEditing')) { ?>
       $this->FireEvent('CustomUserFields')
       ?>
    </ul>
+
+   <?php if (count($this->Data('Roles'))) : ?>
    <h3><?php echo T('Roles'); ?></h3>
    <ul>
       <li>
@@ -73,18 +75,16 @@ if ($this->Data('AllowEditing')) { ?>
          ?>
       </li>
    </ul>
+   <?php endif; ?>
+
    <h3><?php echo T('Password Options'); ?></h3>
    <ul>
       <li class="PasswordOptions">
          <?php
-            $ResetOptions = array(
-               0 => T('Keep current password.'),
-               'Auto' => T('Force user to reset their password and send email notification.'),
-               'Manual' => T('Manually set user password. No email notification.')
-            );
-            echo $this->Form->RadioList('ResetPassword', $ResetOptions);
+            echo $this->Form->RadioList('ResetPassword', $this->ResetOptions);
          ?>
       </li>
+      <?php if (array_key_exists('Manual', $this->ResetOptions)) : ?>
       <li id="NewPassword">
          <?php
             echo $this->Form->Label('New Password', 'NewPassword');
@@ -97,6 +97,7 @@ if ($this->Data('AllowEditing')) { ?>
             ?>
          </div>
       </li>
+      <?php endif; ?>
    </ul>
 <?php 
 

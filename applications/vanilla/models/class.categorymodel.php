@@ -941,8 +941,10 @@ class CategoryModel extends Gdn_Model {
       // Filter out the categories we aren't supposed to view.
       if ($CategoryID && !is_array($CategoryID))
          $CategoryID = array($CategoryID);
-      elseif ($this->Watching)
+      
+      if (!$CategoryID && $this->Watching) {
          $CategoryID = self::CategoryWatch();
+      }
       
       switch ($Permissions) {
          case 'Vanilla.Discussions.Add':

@@ -175,6 +175,7 @@ class Gdn_Theme {
                $Text = T('Home');
             break;
          case 'inbox':
+            $ApplicationManager = new Gdn_ApplicationManager();
             $Path = 'messages/inbox';
             TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
             if (!$Text)
@@ -183,7 +184,7 @@ class Gdn_Theme {
                $Class = trim($Class.' HasCount');
                $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
             }
-            if (!$Session->IsValid())
+            if (!$Session->IsValid() || !GetValue('Conversations', $ApplicationManager->EnabledApplications(), FALSE))
                $Text = FALSE;
             break;
          case 'forumroot':

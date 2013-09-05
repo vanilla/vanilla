@@ -105,6 +105,10 @@ class cleditorPlugin extends Gdn_Plugin {
       }
       $Sender->SetValue('Format', 'Wysiwyg');
    }
+   
+   public function AddClEditor() {
+      $this->_AddCLEditor(Gdn::Controller());
+   }
 	
 	private function _AddCLEditor($Sender, $Column = 'Body') {
       static $Added = FALSE;

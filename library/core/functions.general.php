@@ -1827,6 +1827,103 @@ if (!function_exists('MarkString')):
    }
 endif;
 
+if (!function_exists('JoinRecords')):
+
+/**
+ * Join external records to an array.
+ * @param array $Data The data to join. In order to join records each row must have the a RecordType and RecordID column.
+ * @param string $Column The name of the column to put the record in. If this is blank then the record will be merged into the row.
+ * @param bool $Unset Whether or not to unset rows that don't have a record.
+ * @since 2.3
+ */
+function JoinRecords(&$Data, $Column = '', $Unset = FALSE) {
+   $IDs = array();
+   $AllowedCats = DiscussionModel::CategoryPermissions();
+
+   if ($AllowedCats === FALSE) {
+      // This user does not have permission to view anything.
+      $Data = array();
+      return;
+   }
+
+   // Gather all of the ids to fetch.
+   foreach ($Data as &$Row) {
+      if (!$Row['RecordType'])
+         continue;
+      
+      $RecordType = ucfirst(StringEndsWith($Row['RecordType'], '-Total', TRUE, TRUE));
+      $Row['RecordType'] = $RecordType;
+      $ID = $Row['RecordID'];
+      $IDs[$RecordType][$ID] = $ID;
+   }
+
+   // Fetch all of the data in turn.
+   $JoinData = array();
+   foreach ($IDs as $RecordType => $RecordIDs) {
+      if ($RecordType == 'Comment') {
+         Gdn::SQL()->Select('d.Name, d.CategoryID')->Join('Discussion d', 'd.DiscussionID = r.DiscussionID');
+      }
+
+      $Rows = Gdn::SQL()->Select('r.*')->WhereIn($RecordType.'ID', array_values($RecordIDs))->Get($RecordType. ' r')->ResultArray();
+      $JoinData[$RecordType] = Gdn_DataSet::Index($Rows, array($RecordType.'ID'));
+   }
+
+   // Join the rows.
+   $Unsets = array();
+   foreach ($Data as $Index => &$Row) {
+      $RecordType = $Row['RecordType'];
+      $ID = $Row['RecordID'];
+
+      if (!isset($JoinData[$RecordType][$ID])) {
+         if ($Unset) {
+            $Unsets[] = $Index;
+         }
+         continue; // orphaned?
+      }
+
+      $Record = $JoinData[$RecordType][$ID];
+
+      if ($AllowedCats !== TRUE) {
+         // Check to see if the user has permission to view this record.
+         $CategoryID = GetValue('CategoryID', $Record, -1);
+         if (!in_array($CategoryID, $AllowedCats)) {
+            $Unsets[] = $Index;
+            continue;
+         }
+      }
+
+      switch ($RecordType) {
+         case 'Discussion':
+            $Url = DiscussionUrl($Record, '', '/').'#latest';
+            break;
+         case 'Comment':
+            $Url = CommentUrl($Record, '/');
+            $Record['Name'] = sprintf(T('Re: %s'), $Record['Name']);
+            break;
+         default:
+            $Url = '';
+      }
+      $Record['Url'] = $Url;
+      
+      if ($Column)
+         $Row[$Column] = $Record;
+      else
+         $Row = array_merge($Row, $Record);
+   }
+
+   foreach ($Unsets as $Index) {
+      unset($Data[$Index]);
+   }
+
+   // Join the users.
+   Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
+
+   if (!empty($Unsets))
+      $Data = array_values($Data);
+}
+
+endif;
+
 if (!function_exists('MergeArrays')) {
    /**
     * Merge two associative arrays into a single array.

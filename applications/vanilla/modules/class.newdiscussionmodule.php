@@ -47,7 +47,7 @@ class NewDiscussionModule extends Gdn_Module {
       
       foreach ($DiscussionTypes as $Key => $Type) {
          if (isset($Type['AddPermission']) && !Gdn::Session()->CheckPermission($Type['AddPermission'])) {
-            unset($DiscussionTypes[$Type]);
+            unset($DiscussionTypes[$Key]);
             continue;
          }
          

@@ -2174,6 +2174,13 @@ class UserModel extends Gdn_Model {
 
          if (!$this->ValidateUniqueFields($Username, $Email))
             return FALSE;
+         
+         // If in Captcha registration mode, check the captcha value
+         $CaptchaValid = ValidateCaptcha();
+         if ($CaptchaValid !== TRUE) {
+            $this->Validation->AddValidationResult('Garden.Registration.CaptchaPublicKey', 'The reCAPTCHA value was not entered correctly. Please try again.');
+            return FALSE;
+         }
 
          // Define the other required fields:
          $Fields['Email'] = $Email;

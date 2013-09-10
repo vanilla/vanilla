@@ -1146,7 +1146,9 @@ class Gdn_Form extends Gdn_Pluggable {
    public function ImageUpload($FieldName, $Attributes = array()) {
       $Result = '<div class="FileUpload ImageUpload">'.
          $this->CurrentImage($FieldName, $Attributes).
+         '<div>'.
          $this->Input($FieldName.'_New', 'file').
+         '</div>'.
          '</div>';
       
       return $Result;
@@ -1993,6 +1995,79 @@ PASSWORDMETER;
          }
       }
       return $SaveResult;
+   }
+   
+   /**
+    * Save an image from a field and delete any old image that's been uploaded.
+    * 
+    * @param string $Field The name of the field. The image will be uploaded with the _New extension while the current image will be just the field name.
+    * @param array $Options
+    */
+   public function SaveImage($Field, $Options = array()) {
+      $Upload = new Gdn_UploadImage();
+      
+      $FileField = str_replace('.', '_', $Field);
+      
+      if (!GetValueR("{$FileField}_New.name", $_FILES)) {
+         Trace("$Field not uploaded, returning.");
+         return FALSE;
+      }
+      
+      // First make sure the file is valid.
+      try {
+         $TmpName = $Upload->ValidateUpload($FileField.'_New', TRUE);
+         
+         if (!$TmpName)
+            return FALSE; // no file uploaded.
+      } catch (Exception $Ex) {
+         $this->AddError($Ex);
+         return FALSE;
+      }
+      
+      // Get the file extension of the file.
+      $Ext = GetValue('OutputType', $Options, trim($Upload->GetUploadedFileExtension(), '.'));
+      if ($Ext == 'jpeg')
+         $Ext = 'jpg';
+      Trace($Ext, 'Ext');
+      
+      // The file is valid so let's come up with its new name.
+      if (isset($Options['Name']))
+         $Name = $Options['Name'];
+      elseif (isset($Options['Prefix']))
+         $Name = $Options['Prefix'].md5(microtime()).'.'.$Ext;
+      else
+         $Name = md5(microtime()).'.'.$Ext;
+      
+      // We need to parse out the size.
+      $Size = GetValue('Size', $Options);
+      if ($Size) {
+         if (is_numeric($Size)) {
+            TouchValue('Width', $Options, $Size);
+            TouchValue('Height', $Options, $Size);
+         } elseif (preg_match('`(\d+)x(\d+)`i', $Size, $M)) {
+            TouchValue('Width', $Options, $M[1]);
+            TouchValue('Height', $Options, $M[2]);
+         }
+      }
+      
+      Trace($Options, "Saving image $Name.");
+      try {
+         $Parsed = $Upload->SaveImageAs($TmpName, $Name, GetValue('Height', $Options, ''), GetValue('Width', $Options, ''), $Options);
+         Trace($Parsed, 'Saved Image');
+         
+         $Current = $this->GetFormValue($Field);
+         if ($Current && GetValue('DeleteOriginal', $Options, TRUE)) {
+            // Delete the current image.
+            Trace("Deleting original image: $Current.");
+            if ($Current)
+               $Upload->Delete($Current);
+         }
+         
+         // Set the current value.
+         $this->SetFormValue($Field, $Parsed['SaveName']);
+      } catch (Exception $Ex) {
+         $this->AddError($Ex);
+      }
    }
    
    /**

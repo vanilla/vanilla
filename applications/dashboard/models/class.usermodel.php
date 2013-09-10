@@ -667,6 +667,20 @@ class UserModel extends Gdn_Model {
       
    }
    
+   public static function FixGender($Value) {
+      if (!$Value || !is_string($Value))
+         return 'u';
+      
+      if ($Value) {
+         $Value = strtolower(substr(trim($Value), 0, 1));
+      }
+      
+      if (!in_array($Value, array('u', 'm', 'f')))
+         $Value = 'u';
+      
+      return 'u';
+   }
+   
    /**
     * A convenience method to be called when inserting users (because users
     * are inserted in various methods depending on registration setups).
@@ -1398,6 +1412,9 @@ class UserModel extends Gdn_Model {
 
       if (!$Valid)
          return FALSE; // plugin blocked registration
+      
+      if (array_key_exists('Gender', $FormPostValues))
+         $FormPostValues['Gender'] = self::FixGender($FormPostValues['Gender']);
 
       switch (strtolower(C('Garden.Registration.Method'))) {
          case 'captcha':
@@ -1503,8 +1520,11 @@ class UserModel extends Gdn_Model {
       
       if (array_key_exists('Confirmed', $FormPostValues))
          $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
-
+      
       // Validate the form posted values
+      
+      if (array_key_exists('Gender', $FormPostValues))
+         $FormPostValues['Gender'] = self::FixGender($FormPostValues['Gender']);
       
       $UserID = GetValue('UserID', $FormPostValues);
       $User = array();

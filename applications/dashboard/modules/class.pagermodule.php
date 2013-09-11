@@ -263,6 +263,7 @@ class PagerModule extends Gdn_Module {
       $this->CssClass = ConcatSep(' ', $this->CssClass, 'NumberedPager');
          
       $PageCount = ceil($this->TotalRecords / $this->Limit);
+      $this->_PageCount = $PageCount;
       $CurrentPage = ceil($this->Offset / $this->Limit) + 1;
       
       // Show $Range pages on either side of current
@@ -307,11 +308,11 @@ class PagerModule extends Gdn_Module {
          }
 
          $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
-         $Pager .= Anchor($PageCount, $this->PageUrl($PageCount));
+         $Pager .= Anchor($PageCount, $this->PageUrl($PageCount), $this->_GetCssClass($PageCount, $CurrentPage));
          
       } else if ($CurrentPage + $Range >= $PageCount - 1) { // -1 prevents 80 ... 81
          // We're on a page that is after the last elipsis (ex: 1 ... 75 76 77 78 79 80 81)
-         $Pager .= Anchor(1, $this->PageUrl(1));
+         $Pager .= Anchor(1, $this->PageUrl(1), $this->_GetCssClass(1, $CurrentPage));
          $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
          
          for ($i = $PageCount - ($PagesToDisplay - 1); $i <= $PageCount; $i++) {
@@ -321,7 +322,7 @@ class PagerModule extends Gdn_Module {
          
       } else {
          // We're between the two elipsises (ex: 1 ... 4 5 6 7 8 9 10 ... 81)
-         $Pager .= Anchor(1, $this->PageUrl(1));
+         $Pager .= Anchor(1, $this->PageUrl(1), $this->_GetCssClass(1, $CurrentPage));
          $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
          
          for ($i = $CurrentPage - $Range; $i <= $CurrentPage + $Range; $i++) {
@@ -330,7 +331,7 @@ class PagerModule extends Gdn_Module {
          }
 
          $Pager .= '<span class="Ellipsis">'.$Separator.'</span>';
-         $Pager .= Anchor($PageCount, $this->PageUrl($PageCount));
+         $Pager .= Anchor($PageCount, $this->PageUrl($PageCount), $this->_GetCssClass($PageCount, $CurrentPage));
       }
       
       // Next
@@ -447,7 +448,15 @@ class PagerModule extends Gdn_Module {
    }
    
    private function _GetCssClass($ThisPage, $HighlightPage) {
-      return $ThisPage == $HighlightPage ? 'Highlight' : FALSE;
+      $Result = $ThisPage == $HighlightPage ? 'Highlight' : '';
+      
+      $Result .= " p-$ThisPage";
+      if ($ThisPage == 1)
+         $Result .= ' FirstPage';
+      elseif ($ThisPage == $this->_PageCount)
+         $Result .= ' LastPage';
+      
+      return $Result;
    }
    
    /** 

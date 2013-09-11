@@ -99,6 +99,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
       $TimeStart = Now();
       
       $Result = parent::Query($Sql, $InputParameters, $Options);
+      $Query = array_merge($this->LastInfo, $Query);
       
       // Aggregate the query times
       $TimeEnd = Now();

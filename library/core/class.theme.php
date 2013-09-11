@@ -354,6 +354,12 @@ class Gdn_Theme {
          else
             $Result = $Ex->getMessage();
       }
+      
+      if (isset($Key)) {
+//         Trace($Result, "Store $Key");
+         Gdn::Cache()->Store($Key, $Result, array(Gdn_Cache::FEATURE_EXPIRY => $Properties['cache']));
+      }
+      
       return $Result;
    }
    

@@ -1065,10 +1065,13 @@ class UserModel extends Gdn_Model {
       if ($User === Gdn_Cache::CACHEOP_FAILURE) {
          $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
          
-         if ($User) {
-            // If success, cache user
-            $this->UserCache($User);
-         }
+         // We want to cache a non-existant user no-matter what.
+         if (!$User)
+            $User = NULL;
+         
+         $this->UserCache($User, $ID);
+      } elseif (!$User) {
+         return FALSE;
       }
       
       // Apply calculated fields
@@ -1109,7 +1112,11 @@ class UserModel extends Gdn_Model {
             $CacheData = array();
             
          foreach ($CacheData as $RealKey => $User) {
-            $ResultUserID = GetValue('UserID', $User);
+            if ($User === NULL) {
+               $ResultUserID = trim(strrchr($RealKey, '.'), '.');
+            } else {
+               $ResultUserID = GetValue('UserID', $User);
+            }
             $Data[$ResultUserID] = $User;
          }
          
@@ -1131,14 +1138,17 @@ class UserModel extends Gdn_Model {
          //echo "from DB:\n";
          //print_r($DatabaseData);
          
-         foreach ($DatabaseData as $DatabaseUserID => $DatabaseUser) {
-            $Data[$DatabaseUserID] = $DatabaseUser;
-            
-            // Cache the user
-            $this->UserCache($DatabaseUser);
-            
-            // Apply calculated fields
-            $this->SetCalculatedFields($DatabaseUser);
+         foreach ($DatabaseIDs as $ID) {
+            if (isset($DatabaseData[$ID])) {
+               $User = $DatabaseData[$ID];
+               $this->UserCache($User, $ID);
+               // Apply calculated fields
+               $this->SetCalculatedFields($User);
+               $Data[$ID] = $User;
+            } else {
+               $User = NULL;
+               $this->UserCache($User, $ID);
+            }
          }
       }
       
@@ -3538,8 +3548,9 @@ class UserModel extends Gdn_Model {
     * @param type $User
     * @return type 
     */
-   public function UserCache($User) {
-      $UserID = GetValue('UserID', $User, NULL);
+   public function UserCache($User, $UserID = NULL) {
+      if (!$UserID)
+         $UserID = GetValue('UserID', $User, NULL);
       if (is_null($UserID) || !$UserID) return FALSE;
       
       $Cached = TRUE;

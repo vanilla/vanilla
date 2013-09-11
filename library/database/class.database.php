@@ -34,44 +34,17 @@ class Gdn_Database {
    /** @var PDO The connectio to the database. */
    protected $_Connection = NULL;
    
+   protected $_IsPersistent = FALSE;
+   
+   /** @var PDO The connection to the slave database. */
+   protected $_Slave = NULL;
+   
+   /** @var array The slave connection settings. */
+   protected $_SlaveConfig = NULL;
    
    protected $_SQL = NULL;
    
    protected $_Structure = NULL;
-   
-   protected $_IsPersistent = FALSE;
-   
-   /** Get the PDO connection to the database.
-    * @return PDO The connection to the database.
-    */
-   public function Connection() {
-      $this->_IsPersistent = GetValue(PDO::ATTR_PERSISTENT, $this->ConnectionOptions, FALSE);
-      if(!is_object($this->_Connection)) {
-         try {
-            $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
-            $this->_Connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
-            
-            if($this->ConnectionOptions[1002])
-               $this->Query($this->ConnectionOptions[1002]);
-            
-            // We only throw exceptions during connect
-            $this->_Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
-         } catch (Exception $ex) {
-            $Timeout = FALSE;
-            if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage()))
-               $Timeout = TRUE;
-            if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage()))
-               $Timeout = TRUE;
-                    
-            if ($Timeout)
-               throw new Exception(ErrorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
-            
-            trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
-         }
-      }
-      
-      return $this->_Connection;
-   }
    
    /** @var array The connection options passed to the PDO constructor **/
    public $ConnectionOptions;
@@ -93,6 +66,11 @@ class Gdn_Database {
    /** @var string The name of the database engine for this class. */
    public $Engine;
    
+   /**
+    * @var array Information about the last query.
+    */
+   public $LastInfo = array();
+   
    /** @var string The password to the database. */
    public $Password;
    
@@ -107,6 +85,18 @@ class Gdn_Database {
    public function BeginTransaction() {
       if (!$this->_InTransaction)
          $this->_InTransaction = $this->Connection()->beginTransaction();
+   }
+   
+   /** Get the PDO connection to the database.
+    * @return PDO The connection to the database.
+    */
+   public function Connection() {
+      $this->_IsPersistent = GetValue(PDO::ATTR_PERSISTENT, $this->ConnectionOptions, FALSE);
+      if($this->_Connection === NULL) {
+         $this->_Connection = $this->NewPDO($this->Dsn, $this->User, $this->Password);
+      }
+      
+      return $this->_Connection;
    }
    
    public function CloseConnection() {
@@ -131,8 +121,34 @@ class Gdn_Database {
       if ($this->_InTransaction)
          $this->_InTransaction = !$this->Connection()->commit();
    }
-	
-	/**
+   
+   protected function NewPDO($Dsn, $User, $Password) {
+      try {
+         $PDO = new PDO(strtolower($this->Engine).':'.$Dsn, $User, $Password, $this->ConnectionOptions);
+         $PDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
+
+         if($this->ConnectionOptions[1002])
+            $PDO->query($this->ConnectionOptions[1002]);
+
+         // We only throw exceptions during connect
+         $PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+      } catch (Exception $ex) {
+         $Timeout = FALSE;
+         if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage()))
+            $Timeout = TRUE;
+         if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage()))
+            $Timeout = TRUE;
+
+         if ($Timeout)
+            throw new Exception(ErrorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
+
+         trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
+      }
+      
+      return $PDO;
+   }
+
+   /**
 	 * Properly quotes and escapes a expression for an sql string.
 	 * @param mixed $Expr The expression to quote.
 	 * @return string The quoted expression.
@@ -215,6 +231,10 @@ class Gdn_Database {
          }
       }
       
+      if (array_key_exists('Slave', $Config)) {
+         $this->_SlaveConfig = $Config['Slave'];
+      }
+      
       $this->Dsn = $Dsn;
    }
    
@@ -225,6 +245,8 @@ class Gdn_Database {
     * @param array $InputParameters An array of values with as many elements as there are bound parameters in the SQL statement being executed.
     */
    public function Query($Sql, $InputParameters = NULL, $Options = array()) {
+      $this->LastInfo = array();
+      
       if ($Sql == '')
          trigger_error(ErrorMessage('Database was queried with an empty string.', $this->ClassName, 'Query'), E_USER_ERROR);
 
@@ -284,6 +306,14 @@ class Gdn_Database {
          }
 		}
       
+      if (GetValue('Type', $Options) == 'select' && GetValue('Slave', $Options, NULL) !== FALSE) {
+         $PDO = $this->Slave();
+         $this->LastInfo['connection'] = 'slave';
+      } else {
+         $PDO = $this->Connection();
+         $this->LastInfo['connection'] = 'master';
+      }
+      
       // Make sure other unbufferred queries are not open
       if (is_object($this->_CurrentResultSet)) {
          $this->_CurrentResultSet->Result();
@@ -292,24 +322,24 @@ class Gdn_Database {
 
       // Run the Query
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
-         $PDOStatement = $this->Connection()->prepare($Sql);
+         $PDOStatement = $PDO->prepare($Sql);
 
          if (!is_object($PDOStatement)) {
-            trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->GetPDOErrorMessage($this->Connection()->errorInfo())), E_USER_ERROR);
+            trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->GetPDOErrorMessage($PDO->errorInfo())), E_USER_ERROR);
          } else if ($PDOStatement->execute($InputParameters) === FALSE) {
             trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDOStatement->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
          }
       } else {
-         $PDOStatement = $this->Connection()->query($Sql);
+         $PDOStatement = $PDO->query($Sql);
       }
 
       if ($PDOStatement === FALSE) {
-         trigger_error(ErrorMessage($this->GetPDOErrorMessage($this->Connection()->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
+         trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDO->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
       }
       
       // Did this query modify data in any way?
       if ($ReturnType == 'ID') {
-         $this->_CurrentResultSet = $this->Connection()->lastInsertId();
+         $this->_CurrentResultSet = $PDO->lastInsertId();
          if (is_a($PDOStatement, 'PDOStatement')) {
             $PDOStatement->closeCursor();
          }
@@ -317,7 +347,7 @@ class Gdn_Database {
          if ($ReturnType == 'DataSet') {
             // Create a DataSet to manage the resultset
             $this->_CurrentResultSet = new Gdn_DataSet();
-            $this->_CurrentResultSet->Connection = $this->Connection();
+            $this->_CurrentResultSet->Connection = $PDO;
             $this->_CurrentResultSet->PDOStatement($PDOStatement);
          } elseif (is_a($PDOStatement, 'PDOStatement')) {
             $PDOStatement->closeCursor();
@@ -353,6 +383,22 @@ class Gdn_Database {
       }
 
       return $ErrorMessage;
+   }
+   
+   /**
+    * The slave connection to the database.
+    * @return PDO
+    */
+   public function Slave() {
+      if ($this->_Slave === NULL) {
+         if (empty($this->_SlaveConfig)) {
+            $this->_Slave = $this->Connection();
+         } else {
+            $this->_Slave = $this->NewPDO($this->_SlaveConfig['Dsn'], $this->_SlaveConfig['User'], $this->_SlaveConfig['Password']);
+         }
+      }
+      
+      return $this->_Slave;
    }
    
    /**

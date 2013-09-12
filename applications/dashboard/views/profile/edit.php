@@ -17,7 +17,8 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Name', $Attributes);
       ?>
    </li>
-   
+
+   <?php if ($this->Data('_CanViewPersonalInfo')) : ?>
    <li class="User-Email">
       <?php
          echo $this->Form->Label('Email', 'Email');
@@ -44,6 +45,7 @@ echo $this->Form->Errors();
          }
       ?>
    </li>
+   <?php endif; ?>
    
    <?php if ($this->Data('_CanEditEmail')): ?>
    <li class="User-ShowEmail">

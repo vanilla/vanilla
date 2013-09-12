@@ -1019,7 +1019,7 @@ class Gdn_Format {
 
       return $Mixed;
    }
-   
+
    protected static function LinksCallback($Matches) {
       static $Width, $Height, $InTag = 0, $InAnchor = FALSE;
       if (!isset($Width)) {
@@ -1059,6 +1059,7 @@ class Gdn_Format {
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
 	  $GistUrlMatch = 'https?://(gist\.)?github.com\/(\w+)\/(\w+)';
+	  $GooglePlusMatch =  'https?://plus.google.com/([\d]+)/posts/(\w+)';
 	 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 
@@ -1121,6 +1122,13 @@ EOT;
         } elseif (preg_match("`({$GistUrlMatch})`", $Url, $Matches) && C('Garden.Format.Gist', true)) {
 		 $Result = <<<EOT
 		<script src="https://gist.github.com/{$Matches[3]}/{$Matches[4]}.js"></script>
+EOT;
+
+	//Google+
+		} elseif (preg_match("`({$GooglePlusMatch})`", $Url, $Matches) && C('Garden.Format.GooglePlus', true)) {
+	     echo '<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>'; //must be called in the head or before body
+		 $Result = <<<EOT
+		<div class="g-post" data-href="https://plus.google.com/{$Matches[2]}/posts/{$Matches[3]}"></div>
 EOT;
    
       // Unformatted links
@@ -1636,6 +1644,5 @@ EOT;
 
          return $Mixed;
       }
-   }
-   
+   } 
 }

@@ -59,14 +59,18 @@ class CategoryModel extends Gdn_Model {
     * @access public
     * @return array Category IDs.
     */
-   public static function CategoryWatch() {
+   public static function CategoryWatch($AllDiscussions = TRUE) {
       $Categories = self::Categories();
       $AllCount = count($Categories);
       
       $Watch = array();
       
       foreach ($Categories as $CategoryID => $Category) {
-         if ($Category['PermsDiscussionsView'] && $Category['Following'] && !GetValue('HideAllDiscussions', $Category)) {
+         if ($AllDiscussions && GetValue('HideAllDiscussions', $Category)) {
+            continue;
+         }
+         
+         if ($Category['PermsDiscussionsView'] && $Category['Following']) {
             $Watch[] = $CategoryID;
          }
       }
@@ -943,7 +947,7 @@ class CategoryModel extends Gdn_Model {
          $CategoryID = array($CategoryID);
       
       if (!$CategoryID && $this->Watching) {
-         $CategoryID = self::CategoryWatch();
+         $CategoryID = self::CategoryWatch(FALSE);
       }
       
       switch ($Permissions) {

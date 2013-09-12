@@ -281,7 +281,7 @@ class PostController extends VanillaController {
                // If the discussion was not a draft
                if (!$Draft) {
                   // Redirect to the new discussion
-                  $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  $Discussion = $this->DiscussionModel->GetID($DiscussionID, DATASET_TYPE_OBJECT, array('Slave' => FALSE));
                   $this->SetData('Discussion', $Discussion);
                   $this->EventArguments['Discussion'] = $Discussion;
                   $this->FireEvent('AfterDiscussionSave');
@@ -483,7 +483,7 @@ class PostController extends VanillaController {
             $this->Form->AddHidden('DiscussionID', $DiscussionID); // Put this in the form so reposts won't cause new discussions.
             $this->Form->SetFormValue('DiscussionID', $DiscussionID); // Put this in the form values so it is used when saving comments.
             $this->SetJson('DiscussionID', $DiscussionID);
-            $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID, DATASET_TYPE_OBJECT, array('Slave' => FALSE));
             // Update the category discussion count
             if ($vanilla_category_id > 0)
                $this->DiscussionModel->UpdateDiscussionCount($vanilla_category_id, $DiscussionID);
@@ -592,7 +592,7 @@ class PostController extends VanillaController {
                }
 
                // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-               $Comment = $this->CommentModel->GetID($CommentID);
+               $Comment = $this->CommentModel->GetID($CommentID, DATASET_TYPE_OBJECT, array('Slave' => FALSE));
 
                $this->EventArguments['Discussion'] = $Discussion;
                $this->EventArguments['Comment'] = $Comment;
@@ -662,7 +662,7 @@ class PostController extends VanillaController {
                   if ($Editing) {
                      // Just reload the comment in question
                      $this->Offset = 1;
-                     $Comments = $this->CommentModel->GetIDData($CommentID);
+                     $Comments = $this->CommentModel->GetIDData($CommentID, array('Slave' => FALSE));
                      $this->SetData('Comments', $Comments);
                      $this->SetData('Discussion', $Discussion);
                      // Load the discussion
@@ -699,7 +699,7 @@ class PostController extends VanillaController {
 //                        // Make sure to load all new comments since the page was last loaded by this user
 //								if ($DisplayNewCommentOnly)
                         $this->Offset = $this->CommentModel->GetOffset($CommentID);
-                        $Comments = $this->CommentModel->GetIDData($CommentID);
+                        $Comments = $this->CommentModel->GetIDData($CommentID, array('Slave' => FALSE));
                         $this->SetData('Comments', $Comments);
 
                         $this->SetData('NewComments', TRUE);

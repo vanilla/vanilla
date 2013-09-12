@@ -667,6 +667,20 @@ class UserModel extends Gdn_Model {
       
    }
    
+   public static function FixGender($Value) {
+      if (!$Value || !is_string($Value))
+         return 'u';
+      
+      if ($Value) {
+         $Value = strtolower(substr(trim($Value), 0, 1));
+      }
+      
+      if (!in_array($Value, array('u', 'm', 'f')))
+         $Value = 'u';
+      
+      return 'u';
+   }
+   
    /**
     * A convenience method to be called when inserting users (because users
     * are inserted in various methods depending on registration setups).
@@ -1051,10 +1065,13 @@ class UserModel extends Gdn_Model {
       if ($User === Gdn_Cache::CACHEOP_FAILURE) {
          $User = parent::GetID($ID, DATASET_TYPE_ARRAY);
          
-         if ($User) {
-            // If success, cache user
-            $this->UserCache($User);
-         }
+         // We want to cache a non-existant user no-matter what.
+         if (!$User)
+            $User = NULL;
+         
+         $this->UserCache($User, $ID);
+      } elseif (!$User) {
+         return FALSE;
       }
       
       // Apply calculated fields
@@ -1095,7 +1112,11 @@ class UserModel extends Gdn_Model {
             $CacheData = array();
             
          foreach ($CacheData as $RealKey => $User) {
-            $ResultUserID = GetValue('UserID', $User);
+            if ($User === NULL) {
+               $ResultUserID = trim(strrchr($RealKey, '.'), '.');
+            } else {
+               $ResultUserID = GetValue('UserID', $User);
+            }
             $Data[$ResultUserID] = $User;
          }
          
@@ -1117,14 +1138,17 @@ class UserModel extends Gdn_Model {
          //echo "from DB:\n";
          //print_r($DatabaseData);
          
-         foreach ($DatabaseData as $DatabaseUserID => $DatabaseUser) {
-            $Data[$DatabaseUserID] = $DatabaseUser;
-            
-            // Cache the user
-            $this->UserCache($DatabaseUser);
-            
-            // Apply calculated fields
-            $this->SetCalculatedFields($DatabaseUser);
+         foreach ($DatabaseIDs as $ID) {
+            if (isset($DatabaseData[$ID])) {
+               $User = $DatabaseData[$ID];
+               $this->UserCache($User, $ID);
+               // Apply calculated fields
+               $this->SetCalculatedFields($User);
+               $Data[$ID] = $User;
+            } else {
+               $User = NULL;
+               $this->UserCache($User, $ID);
+            }
          }
       }
       
@@ -1398,6 +1422,9 @@ class UserModel extends Gdn_Model {
 
       if (!$Valid)
          return FALSE; // plugin blocked registration
+      
+      if (array_key_exists('Gender', $FormPostValues))
+         $FormPostValues['Gender'] = self::FixGender($FormPostValues['Gender']);
 
       switch (strtolower(C('Garden.Registration.Method'))) {
          case 'captcha':
@@ -1503,8 +1530,11 @@ class UserModel extends Gdn_Model {
       
       if (array_key_exists('Confirmed', $FormPostValues))
          $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
-
+      
       // Validate the form posted values
+      
+      if (array_key_exists('Gender', $FormPostValues))
+         $FormPostValues['Gender'] = self::FixGender($FormPostValues['Gender']);
       
       $UserID = GetValue('UserID', $FormPostValues);
       $User = array();
@@ -2154,6 +2184,13 @@ class UserModel extends Gdn_Model {
 
          if (!$this->ValidateUniqueFields($Username, $Email))
             return FALSE;
+         
+         // If in Captcha registration mode, check the captcha value
+         $CaptchaValid = ValidateCaptcha();
+         if ($CaptchaValid !== TRUE) {
+            $this->Validation->AddValidationResult('Garden.Registration.CaptchaPublicKey', 'The reCAPTCHA value was not entered correctly. Please try again.');
+            return FALSE;
+         }
 
          // Define the other required fields:
          $Fields['Email'] = $Email;
@@ -3511,8 +3548,9 @@ class UserModel extends Gdn_Model {
     * @param type $User
     * @return type 
     */
-   public function UserCache($User) {
-      $UserID = GetValue('UserID', $User, NULL);
+   public function UserCache($User, $UserID = NULL) {
+      if (!$UserID)
+         $UserID = GetValue('UserID', $User, NULL);
       if (is_null($UserID) || !$UserID) return FALSE;
       
       $Cached = TRUE;

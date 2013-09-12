@@ -1099,7 +1099,6 @@ class CommentModel extends VanillaModel {
 
       $this->Options($Options);
       $Data = $this->SQL
-         ->Options($Options)
          ->Select('c.CommentID', 'min', 'FirstCommentID')
          ->Select('c.CommentID', 'max', 'LastCommentID')
          ->Select('c.DateInserted', 'max', 'DateLastComment')

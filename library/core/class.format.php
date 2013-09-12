@@ -1058,7 +1058,8 @@ class Gdn_Format {
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
-      
+	  $GistUrlMatch = 'https?://(gist\.)?github.com\/(\w+)\/(\w+)';
+	 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 
          || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches)) 
@@ -1114,6 +1115,12 @@ EOT;
       } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)) {
          $Result = <<<EOT
 <a data-pin-do="embedPin" href="http://pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
+EOT;
+   
+   //Gist
+        } elseif (preg_match("`({$GistUrlMatch})`", $Url, $Matches) && C('Garden.Format.Gist', true)) {
+		 $Result = <<<EOT
+		<script src="https://gist.github.com/{$Matches[3]}/{$Matches[4]}.js"></script>
 EOT;
    
       // Unformatted links

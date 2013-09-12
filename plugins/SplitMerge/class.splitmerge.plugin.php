@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['SplitMerge'] = array(
    'Name' => 'Split / Merge',
    'Description' => 'Allows moderators with discussion edit permission to split & merge discussions.',
-   'Version' => '1.1',
+   'Version' => '1.2',
    'HasLocale' => TRUE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -147,6 +147,8 @@ class SplitMergePlugin extends Gdn_Plugin {
                break;
             }
          }
+         $RedirectLink = $Sender->Form->GetFormValue('RedirectLink');
+            
          if ($MergeDiscussion) {
             $ErrorCount = 0;
             
@@ -155,13 +157,16 @@ class SplitMergePlugin extends Gdn_Plugin {
             if ($Category && !$Category['PermsDiscussionsEdit'])
                throw PermissionException('Vanilla.Discussions.Edit');
             
+            $DiscussionModel->DefineSchema();
+            $MaxNameLength = GetValue('Length', $DiscussionModel->Schema->GetField('Name'));
+            
             // Assign the comments to the new discussion record
             $DiscussionModel->SQL
                ->Update('Comment')
                ->Set('DiscussionID', $MergeDiscussionID)
                ->WhereIn('DiscussionID', $DiscussionIDs)
                ->Put();
-               
+            
             $CommentModel = new CommentModel();
             foreach ($Discussions as $Discussion) {
                if ($Discussion['DiscussionID'] == $MergeDiscussionID)
@@ -180,8 +185,21 @@ class SplitMergePlugin extends Gdn_Plugin {
                      $MediaModel->Reassign($Discussion['DiscussionID'], 'discussion', $CommentID, 'comment');
                   }
                   
-                  // Delete discussion that was merged
-                  $DiscussionModel->Delete($Discussion['DiscussionID']);                  
+                  if ($RedirectLink) {
+                     // The discussion needs to be changed to a moved link.
+                     $RedirectDiscussion = array(
+                        'Name' => SliceString(sprintf(T('Merged: %s'), $Discussion['Name']), $MaxNameLength),
+                        'Type' => 'redirect',
+                        'Body' => FormatString(T('This discussion has been <a href="{url,html}">merged</a>.'), array('url' => DiscussionUrl($MergeDiscussion))),
+                        'Format' => 'Html'
+                        );
+                     $DiscussionModel->SetField($Discussion['DiscussionID'], $RedirectDiscussion);
+                     $CommentModel->UpdateCommentCount($Discussion['DiscussionID']);
+                     $CommentModel->RemovePageCache($Discussion['DiscussionID']);
+                  } else {
+                     // Delete discussion that was merged.
+                     $DiscussionModel->Delete($Discussion['DiscussionID']);                  
+                  }
                } else {
                   $Sender->InformMessage($CommentModel->Validation->ResultsText());
                   $ErrorCount++;
@@ -195,7 +213,7 @@ class SplitMergePlugin extends Gdn_Plugin {
             Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
             ModerationController::InformCheckedDiscussions($Sender);
             if ($ErrorCount == 0)
-               $Sender->RedirectUrl = Url("/discussion/$MergeDiscussionID/".Gdn_Format::Url($MergeDiscussion['Name']));
+               $Sender->JsonTarget('', '', 'Refresh');
          }
       }
       

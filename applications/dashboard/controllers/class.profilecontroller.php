@@ -326,7 +326,7 @@ class ProfileController extends Gdn_Controller {
       $this->Form->SetValue('ConfirmEmail', (int)$Confirmed);
 
       // Decide if we can *see* email
-      $this->SetData('_CanViewPersonalInfo',Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'));
+      $this->SetData('_CanViewPersonalInfo',(CheckPermission('Garden.PersonalInfo.View') || CheckPermission('Garden.Users.Edit')));
       
       // Define gender dropdown options
       $this->GenderOptions = array(

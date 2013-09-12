@@ -285,7 +285,7 @@ class UserController extends DashboardController {
     * @param type $UserID 
     */
    public function Ban($UserID, $Unban = FALSE) {
-      $this->Permission(array('Garden.Moderation.Manage','Moderation.Users.Ban'), FALSE);
+      $this->Permission(array('Garden.Moderation.Manage','Garden.Users.Edit','Moderation.Users.Ban'), FALSE);
       
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       if (!$User)

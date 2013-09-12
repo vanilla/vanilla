@@ -320,7 +320,9 @@ class UserController extends DashboardController {
                else
                   $Reason = $this->Form->GetFormValue('Reason');
 
-               $UserModel->Ban($UserID, array('Reason' => $Reason, 'DeleteContent' => $this->Form->GetFormValue('DeleteContent')));
+               // Just because we're banning doesn't mean we can nuke their content
+               $DeleteContent = (CheckPermission('Garden.Moderation.Manage')) ? $this->Form->GetFormValue('DeleteContent') : FALSE;
+               $UserModel->Ban($UserID, array('Reason' => $Reason, 'DeleteContent' => $DeleteContent));
             }
          }
          
@@ -335,6 +337,9 @@ class UserController extends DashboardController {
             }
          }
       }
+
+      // Permission flag for view
+      $this->SetData('_MayDeleteContent', CheckPermission('Garden.Moderation.Manage'));
       
       $this->SetData('User', $User);
       $this->AddSideMenu();

@@ -314,25 +314,19 @@ class ProfileController extends Gdn_Controller {
       $this->SetData('_CanEditUsername', $CanEditUsername);
       
       // Decide if they have ability to edit the email
-      $CanEditEmail = (
-              (bool)C('Garden.Profile.EditEmails', TRUE) && 
-              !UserModel::NoEmail() && 
-              $UserID == Gdn::Session()->UserID
-           ) || (
-              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
-              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')
-           );
+      $EmailEnabled = (bool)C('Garden.Profile.EditEmails', TRUE) && !UserModel::NoEmail();
+      $CanEditEmail = ($EmailEnabled && $UserID == Gdn::Session()->UserID) || CheckPermission('Garden.Users.Edit');
       $this->SetData('_CanEditEmail', $CanEditEmail);
       
       // Decide if they have ability to confirm users
       $Confirmed = (bool)GetValueR('User.Confirmed', $this);
-      $CanConfirmEmail = (
-              UserModel::RequireConfirmEmail() &&
-              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
-              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'));
+      $CanConfirmEmail = (UserModel::RequireConfirmEmail() && CheckPermission('Garden.Users.Edit'));
       $this->SetData('_CanConfirmEmail', $CanConfirmEmail);
       $this->SetData('_EmailConfirmed', $Confirmed);
       $this->Form->SetValue('ConfirmEmail', (int)$Confirmed);
+
+      // Decide if we can *see* email
+      $this->SetData('_CanViewPersonalInfo',Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'));
       
       // Define gender dropdown options
       $this->GenderOptions = array(
@@ -636,7 +630,7 @@ class ProfileController extends Gdn_Controller {
       }
       
       // Permission checks
-      $this->Permission('Garden.Profiles.Edit');
+      $this->Permission(array('Garden.Profiles.Edit', 'Moderation.Profiles.Edit'), FALSE);
       $Session = Gdn::Session();
       if (!$Session->IsValid())
          $this->Form->AddError('You must be authenticated in order to use this form.');
@@ -766,7 +760,7 @@ class ProfileController extends Gdn_Controller {
       $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
       $UserPrefs = Gdn_Format::Unserialize($this->User->Preferences);
       if ($this->User->UserID != $Session->UserID)
-         $this->Permission('Garden.Users.Edit');
+         $this->Permission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), FALSE);
       
       if (!is_array($UserPrefs))
          $UserPrefs = array();
@@ -928,17 +922,15 @@ class ProfileController extends Gdn_Controller {
       // Get user data & another permission check
       $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $RedirectUrl = UserUrl($this->User, '', 'picture');
-      if ($Session->ValidateTransientKey($TransientKey)
-         && is_object($this->User)
-         && (
-            $this->User->UserID == $Session->UserID
-            || $Session->CheckPermission('Garden.Users.Edit')
-         )
-      ) {
-         // Do removal, set message, redirect
-         Gdn::UserModel()->RemovePicture($this->User->UserID);
-         $this->InformMessage(T('Your picture has been removed.'));
+      if ($Session->ValidateTransientKey($TransientKey) && is_object($this->User)) {
+         $HasRemovePermission = CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Profiles.Edit');
+         if ($this->User->UserID == $Session->UserID || $HasRemovePermission) {
+            // Do removal, set message, redirect
+            Gdn::UserModel()->RemovePicture($this->User->UserID);
+            $this->InformMessage(T('Your picture has been removed.'));
+         }
       }
+
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
           Redirect($RedirectUrl);
       } else {
@@ -1022,7 +1014,7 @@ class ProfileController extends Gdn_Controller {
       $this->GetUserInfo($UserReference, $Username, '', TRUE);
       
       // Permission check (correct user)
-      if ($this->User->UserID != $Session->UserID && !$Session->CheckPermission('Garden.Users.Edit'))
+      if ($this->User->UserID != $Session->UserID && !CheckPermission('Garden.Users.Edit') && !CheckPermission('Moderation.Profiles.Edit'))
          throw new Exception(T('You cannot edit the thumbnail of another member.'));
       
       // Form prep
@@ -1216,23 +1208,23 @@ class ProfileController extends Gdn_Controller {
       
       if ($this->User->UserID != $ViewingUserID) {
          // Include user js files for people with edit users permissions
-         if ($Session->CheckPermission('Garden.Users.Edit')) {
+         if (CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Profiles.Edit')) {
 //              $this->AddJsFile('jquery.gardenmorepager.js');
            $this->AddJsFile('user.js');
          }
-         $Module->AddLink('Options', Sprite('SpProfile').' '.T('Edit Profile'), UserUrl($this->User, '', 'edit'), FALSE, array('class' => 'Popup EditAccountLink'));
+         $Module->AddLink('Options', Sprite('SpProfile').' '.T('Edit Profile'), UserUrl($this->User, '', 'edit'), array('Garden.Users.Edit','Moderation.Profiles.Edit'), array('class' => 'Popup EditAccountLink'));
          $Module->AddLink('Options', Sprite('SpProfile').' '.T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
          $Module->AddLink('Options', Sprite('SpDelete').' '.T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
          
          if ($this->User->Photo != '' && $AllowImages)
-            $Module->AddLink('Options', Sprite('SpDelete').' '.T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'),$Session->TransientKey())), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
+            $Module->AddLink('Options', Sprite('SpDelete').' '.T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'),$Session->TransientKey())), array('Garden.Users.Edit','Moderation.Profiles.Edit'), array('class' => 'RemovePictureLink'));
          
-         $Module->AddLink('Options', Sprite('SpPreferences').' '.T('Edit Preferences'), UserUrl($this->User, '', 'preferences'), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
+         $Module->AddLink('Options', Sprite('SpPreferences').' '.T('Edit Preferences'), UserUrl($this->User, '', 'preferences'), array('Garden.Users.Edit','Moderation.Profiles.Edit'), array('class' => 'Popup PreferencesLink'));
 
          // Add profile options for everyone
-         $Module->AddLink('Options', Sprite('SpPicture').' '.T('Change Picture'), UserUrl($this->User, '', 'picture'), 'Garden.Users.Edit', array('class' => 'PictureLink'));
+         $Module->AddLink('Options', Sprite('SpPicture').' '.T('Change Picture'), UserUrl($this->User, '', 'picture'), array('Garden.Users.Edit','Moderation.Profiles.Edit'), array('class' => 'PictureLink'));
          if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-            $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
+            $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), array('Garden.Users.Edit','Moderation.Profiles.Edit'), array('class' => 'ThumbnailLink'));
          }
       } else {
          // Add profile options for the profile owner
@@ -1427,7 +1419,7 @@ class ProfileController extends Gdn_Controller {
       }
       
       if ($CheckPermissions && Gdn::Session()->UserID != $this->User->UserID)
-         $this->Permission('Garden.Users.Edit');
+         $this->Permission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), FALSE);
       
       $this->AddSideMenu();
       $this->_UserInfoRetrieved = TRUE;

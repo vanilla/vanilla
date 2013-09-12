@@ -31,7 +31,7 @@ class ProfileOptionsModule extends Gdn_Module {
 //         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
       } else {
          if ($Controller->User->UserID != $Session->UserID) {
-            if ($Session->CheckPermission('Garden.Users.Edit'))
+            if (CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Profiles.Edit'))
                $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
          } else if (C('Garden.UserAccount.AllowEdit')) {
             $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => '/profile/edit');
@@ -40,12 +40,13 @@ class ProfileOptionsModule extends Gdn_Module {
             // Ban/Unban
             if ($Controller->User->Banned) {
                $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Unban'), 'Url' => "/user/ban?userid=$UserID&unban=1", 'CssClass' => 'Popup');
-            } else {
+            } elseif (!$Controller->User->Admin) {
                $ProfileOptions[] = array('Text' => Sprite('SpBan').' '.T('Ban'), 'Url' => "/user/ban?userid=$UserID", 'CssClass' => 'Popup');
             }
 
             // Delete content.
-            $ProfileOptions[] = array('Text' => Sprite('SpDelete').' '.T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
+            if (CheckPermission('Garden.Moderation.Manage'))
+               $ProfileOptions[] = array('Text' => Sprite('SpDelete').' '.T('Delete Content'), 'Url' => "/user/deletecontent?userid=$UserID", 'CssClass' => 'Popup');
          }
       }
       return parent::ToString();

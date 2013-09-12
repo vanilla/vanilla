@@ -998,10 +998,24 @@ if (!function_exists('Sprite')) {
 
 if (!function_exists('WriteReactions')):
    function WriteReactions($Row) {
-      list($RecordType, $RecordID) = RecordType($Row);
+      $Attributes = GetValue('Attributes', $Row);
+      if (is_string($Attributes)) {
+         $Attributes = @unserialize($Attributes);
+         SetValue('Attributes', $Row, $Attributes);
+      }
 
-      Gdn::Controller()->EventArguments['RecordType'] = strtolower($RecordType);
-      Gdn::Controller()->EventArguments['RecordID'] = $RecordID;
+      Gdn::Controller()->EventArguments['ReactionTypes'] = array();
+
+      if ($ID = GetValue('CommentID', $Row)) {
+         $RecordType = 'comment';
+      } elseif ($ID = GetValue('ActivityID', $Row)) {
+         $RecordType = 'activity';
+      } else {
+         $RecordType = 'discussion';
+         $ID = GetValue('DiscussionID', $Row);
+      }
+      Gdn::Controller()->EventArguments['RecordType'] = $RecordType;
+      Gdn::Controller()->EventArguments['RecordID'] = $ID;
 
       echo '<div class="Reactions">';
       Gdn_Theme::BulletRow();

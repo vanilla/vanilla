@@ -163,27 +163,6 @@ function WriteReactions($Row, $Type = 'Comment') {
    
    echo '<div class="Reactions">';
       Gdn_Theme::BulletRow();
-
-      // Write the flags.
-      static $Flags = NULL;
-
-      // Allow addons to work with flags menu
-      Gdn::Controller()->EventArguments['Flags'] = &$Flags;
-      Gdn::Controller()->FireEvent('BeforeFlag');
-
-      if (!empty($Flags)) {
-         echo Gdn_Theme::BulletItem('Flags');
-
-         echo ' <span class="FlagMenu ToggleFlyout">';
-         // Write the handle.
-         echo Anchor(Sprite('ReactFlag', 'ReactSprite').' '.Wrap(T('Flag'), 'span', array('class'=>'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title'=>'Flag'), TRUE);
-         echo Sprite('SpFlyoutHandle', 'Arrow');
-         echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
-         Gdn::Controller()->FireEvent('AfterFlagOptions');
-         echo '</ul>';
-         echo '</span> ';
-      }
-
       Gdn::Controller()->FireEvent('AfterFlag');
    
       Gdn::Controller()->FireEvent('AfterReactions');
@@ -343,8 +322,8 @@ function GetCommentOptions($Comment) {
 		$Options['EditComment'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
 
 	// Can the user delete the comment?
-	// if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
-   if ($Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
+	$SelfDeleting = ($CanEdit && $Session->UserID == $Comment->InsertUserID && C('Vanilla.Comments.AllowSelfDelete'));
+   if ($SelfDeleting || $Session->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $PermissionCategoryID))
 		$Options['DeleteComment'] = array('Label' => T('Delete'), 'Url' => 'vanilla/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->TransientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"), 'Class' => 'DeleteComment');
    
    // DEPRECATED (as of 2.1)

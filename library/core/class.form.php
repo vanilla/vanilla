@@ -214,6 +214,12 @@ class Gdn_Form extends Gdn_Pluggable {
       // IN THE MEANTIME...
       return $this->Input($FieldName, 'text', $Attributes);
    }
+   
+   public function Captcha() {
+      require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
+      
+      return recaptcha_get_html(C('Garden.Registration.CaptchaPublicKey'), NULL, Gdn::Request()->Scheme() == 'https');
+   }
 
    /**
     * Returns XHTML for a select list containing categories that the user has

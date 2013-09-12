@@ -3763,7 +3763,13 @@ body.embed .InformMessages {
    position: relative;
    font-size: 11px;
    line-height: 18px;
-   margin-left: -10px;
+   margin: 15px 0px 0px;
+}
+.ReactButton {
+   display: inline-block;
+   margin: 0px 2px;
+   line-height: 18px;
+   vertical-align: top;
 }
 .Reactions > a.React {
     margin: 0 10px;
@@ -3771,6 +3777,14 @@ body.embed .InformMessages {
 }
 .Reactions > a.React > .ReactSprite {
    margin-right: 2px;
+}
+.Flyout.Flags {
+   top: 25px;
+   z-index: 1000;
+}
+.Reactions .FlagMenu .MenuItems .ReactButton {
+   margin: 0px;
+   padding: 0px 15px;
 }
 
 .SpEditProfile {

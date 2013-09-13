@@ -1051,6 +1051,22 @@ div.Discussion:hover .OptionsTitle:hover,
     border: 0;
     border-bottom: 1px solid #ddd;
 }
+
+.MenuItems.Up:before,
+.MenuItems.Up:after {
+   border-top: 7px solid #444444;
+   border-left: 7px solid transparent;
+   border-right: 7px solid transparent;
+   content: "";
+   left: 71px;
+   position: absolute;
+   bottom: -7px;
+}
+.MenuItems.Up:after {
+   border-top: 7px solid #fff;
+   bottom: -6px;
+}
+
 .ToggleFlyout {
    position: relative;
 }
@@ -1282,8 +1298,11 @@ overflow: hidden;
 .MeBox.Inline,
 .MeBox.Inline .WhoIs,
 .MeBox.Inline .MeMenu {
-    display: inline;
+    display: inline-block;
     line-height: 24px;
+    margin: 0;
+    vertical-align: top;
+    min-height: 24px;
 }
 .MeBox.Inline > .PhotoWrap {
     float: none;

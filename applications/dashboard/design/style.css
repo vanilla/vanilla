@@ -1282,8 +1282,11 @@ overflow: hidden;
 .MeBox.Inline,
 .MeBox.Inline .WhoIs,
 .MeBox.Inline .MeMenu {
-    display: inline;
+    display: inline-block;
     line-height: 24px;
+    margin: 0;
+    vertical-align: top;
+    min-height: 24px;
 }
 .MeBox.Inline > .PhotoWrap {
     float: none;

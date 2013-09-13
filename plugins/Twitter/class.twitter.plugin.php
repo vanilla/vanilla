@@ -767,7 +767,7 @@ class TwitterPlugin extends Gdn_Plugin {
       
       echo Anchor(Sprite('ReactTwitter', 'ReactSprite'), $Url, $CssClass, array(
             'popupWidth' => '550',
-            'popupHeight' => '420'
+            'popupHeight' => '265'
          ));
    }
 

@@ -42,7 +42,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    public $FormTypes = array(
       'TextBox' => 'TextBox',
       'Dropdown' => 'Dropdown',
-      //'CheckBox' => 'Checkbox',
+      'CheckBox' => 'Checkbox',
+      'DateOfBirth' => 'Birthday',
    );
 
    /**
@@ -70,13 +71,26 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Add fields to registration forms.
+    * Add non-checkbox fields to registration forms.
     */
    public function EntryController_RegisterBeforePassword_Handler($Sender) {
       $ProfileFields = $this->GetProfileFields();
       $Sender->RegistrationFields = array();
       foreach ($ProfileFields as $Name => $Field) {
-         if (GetValue('OnRegister', $Field))
+         if (GetValue('OnRegister', $Field) && GetValue('FormType', $Field) != 'CheckBox')
+            $Sender->RegistrationFields[$Name] = $Field;
+      }
+      include($this->GetView('registrationfields.php'));
+   }
+
+   /**
+    * Add checkbox fields to registration forms.
+    */
+   public function EntryController_RegisterFormBeforeTerms_Handler($Sender) {
+      $ProfileFields = $this->GetProfileFields();
+      $Sender->RegistrationFields = array();
+      foreach ($ProfileFields as $Name => $Field) {
+         if (GetValue('OnRegister', $Field) && GetValue('FormType', $Field) == 'CheckBox')
             $Sender->RegistrationFields[$Name] = $Field;
       }
       include($this->GetView('registrationfields.php'));
@@ -169,6 +183,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             unset($this->ProfileFields[$Name]);
       }
 
+      // Special case for birthday field
+      if (isset($Fields['DateOfBirth'])) {
+         $Fields['DateOfBirth']['FormType'] = 'Date';
+         $Fields['DateOfBirth']['Label'] = T('Birthday');
+      }
+
       return $Fields;
    }
 
@@ -247,6 +267,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          }
 
          // Check label
+         if (GetValue('FormType', $FormPostValues) == 'DateOfBirth') {
+            SetValue('Label', $FormPostValues, 'DateOfBirth');
+         }
          if (!GetValue('Label', $FormPostValues)) {
             $Sender->Form->AddError('Label is required.', 'Label');
          }
@@ -254,6 +277,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // Check form type
          if (!array_key_exists(GetValue('FormType', $FormPostValues), $this->FormTypes)) {
             $Sender->Form->AddError('Invalid form type.', 'FormType');
+         }
+
+         // Force CheckBox options
+         if (GetValue('FormType', $FormPostValues) == 'CheckBox') {
+            SetValue('Required', $FormPostValues, TRUE);
+            SetValue('OnRegister', $FormPostValues, TRUE);
          }
 
          // Merge updated data into config
@@ -341,6 +370,13 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          if (!is_array($AllFields) || !is_array($ProfileFields))
             return;
 
+         // DateOfBirth is special case that core won't handle
+         // Hack it in here instead
+         if (C('ProfileExtender.Fields.DateOfBirth.OnProfile')) {
+            $ProfileFields['DateOfBirth'] = Gdn_Format::Date($Sender->User->DateOfBirth, T('Birthday Format', '%B %e, %Y'));
+            $AllFields['DateOfBirth'] = array('Label' => T('Birthday'), 'OnProfile' => TRUE);
+         }
+
          // Display all non-hidden fields
          $ProfileFields = array_reverse($ProfileFields);
          foreach ($ProfileFields as $Name => $Value) {
@@ -374,7 +410,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Whitelist
             if (!array_key_exists($Name, $AllowedFields))
                unset($FormPostValues[$Name]);
-
             // Don't allow duplicates on User table
             if (in_array($Name, $Columns))
                unset($FormPostValues[$Name]);

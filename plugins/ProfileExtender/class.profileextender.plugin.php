@@ -117,6 +117,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          return $Fields;
 
       foreach ($Fields as $Label => $Value) {
+         if ($Value == '')
+            continue;
+         
          switch ($Label) {
             case 'Twitter':
                $Fields['Twitter'] = Anchor('@'.$Value, 'http://twitter.com/'.$Value);

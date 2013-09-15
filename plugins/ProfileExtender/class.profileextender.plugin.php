@@ -373,7 +373,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // DateOfBirth is special case that core won't handle
          // Hack it in here instead
          if (C('ProfileExtender.Fields.DateOfBirth.OnProfile')) {
-            $ProfileFields['DateOfBirth'] = Gdn_Format::Date($Sender->User->DateOfBirth, T('Birthday Format', '%B %e, %Y'));
+            // Do not use Gdn_Format::Date because it shifts to local timezone
+            $ProfileFields['DateOfBirth'] = date(T('Birthday Format','F j, Y'), Gdn_Format::ToTimestamp($Sender->User->DateOfBirth));
             $AllFields['DateOfBirth'] = array('Label' => T('Birthday'), 'OnProfile' => TRUE);
          }
 

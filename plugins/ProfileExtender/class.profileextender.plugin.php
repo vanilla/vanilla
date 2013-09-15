@@ -107,6 +107,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          if (GetValue('Required', $Field) && GetValue('OnRegister', $Field))
             $Sender->UserModel->Validation->ApplyRule($Name, 'Required', $Field['Label']." is required.");
       }
+
+      // DateOfBirth zeroes => NULL
+      if ('0-00-00' == $Sender->Form->GetFormValue('DateOfBirth'))
+         $Sender->Form->SetFormValue('DateOfBirth', NULL);
    }
    
    /**
@@ -119,7 +123,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       foreach ($Fields as $Label => $Value) {
          if ($Value == '')
             continue;
-         
+
          switch ($Label) {
             case 'Twitter':
                $Fields['Twitter'] = Anchor('@'.$Value, 'http://twitter.com/'.$Value);

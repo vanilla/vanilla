@@ -159,7 +159,7 @@ function WriteListItem($Row, $Depth = 1) {
             echo CategoryPhoto($Row);
             echo Anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
          
-            Gdn::Controller()->EventArguments['Category'] = $Row;
+            Gdn::Controller()->EventArguments['Category'] = &$Row;
             Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
             echo '</'.$H.'>';
          ?>
@@ -248,7 +248,7 @@ function WriteTableRow($Row, $Depth = 1) {
 
                echo "<{$H}>";
             echo Anchor(htmlspecialchars($Row['Name']), $Row['Url']);
-               Gdn::Controller()->EventArguments['Category'] = $Row;
+               Gdn::Controller()->EventArguments['Category'] = &$Row;
                Gdn::Controller()->FireEvent('AfterCategoryTitle'); 
                echo "</{$H}>";
             ?>

@@ -12,6 +12,7 @@
  *  1.6.1   Add tag permissions to UI
  *  1.7     Change the styling of special tags and prevent them from being edited/deleted.
  *  1.8     Add show existing tags
+ *  1.8.4   Add tags before render so that other plugins can look at them.
  * 
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -22,7 +23,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.3',
+   'Version' => '1.8.4',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -77,6 +78,17 @@ class TaggingPlugin extends Gdn_Plugin {
          $TagModule = new TagModule($Sender);
          echo $TagModule->InlineDisplay();
       }
+   }
+   
+   public function DiscussionController_Render_Before($Sender) {
+      // Get the tags on this discussion.
+      $Tags = Gdn::SQL()->Select('t.TagID, t.Name')
+         ->From('TagDiscussion td')
+         ->Join('Tag t', 't.TagID = td.TagID')
+         ->Where('td.DiscussionID', $Sender->Data('Discussion.DiscussionID'))
+         ->Get()->ResultArray();
+      
+      SetValue('Tags', $Sender->Data['Discussion'], $Tags);
    }
 
    /**

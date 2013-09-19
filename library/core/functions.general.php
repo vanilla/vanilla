@@ -1559,30 +1559,43 @@ if (!function_exists('GetPostValue')) {
 
 if (!function_exists('GetRecord')):
 
-function GetRecord($RecordType, $ID) {
+function GetRecord($RecordType, $ID, $ThrowError = FALSE) {
+   $Row = FALSE;
+   
    switch(strtolower($RecordType)) {
       case 'discussion':
          $Model = new DiscussionModel();
          $Row = $Model->GetID($ID);
          $Row->Url = DiscussionUrl($Row);
          $Row->ShareUrl = $Row->Url;
-         return (array)$Row;
+         if ($Row)
+            return (array)$Row;
+         break;
       case 'comment':
          $Model = new CommentModel();
          $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
-         $Row['Url'] = Url("/discussion/comment/$ID#Comment_$ID", TRUE);
-         
-         $Model = new DiscussionModel();
-         $Discussion = $Model->GetID($Row['DiscussionID']);
-         $Discussion->Url = DiscussionUrl($Discussion);
-         $Row['ShareUrl'] = $Discussion->Url;
-         $Row['Name'] = $Discussion->Name;
-         $Row['Discussion'] = (array)$Discussion;
-         
-         return $Row;
+         if ($Row) {
+            $Row['Url'] = Url("/discussion/comment/$ID#Comment_$ID", TRUE);
+
+            $Model = new DiscussionModel();
+            $Discussion = $Model->GetID($Row['DiscussionID']);
+            if ($Discussion) {
+               $Discussion->Url = DiscussionUrl($Discussion);
+               $Row['ShareUrl'] = $Discussion->Url;
+               $Row['Name'] = $Discussion->Name;
+               $Row['Discussion'] = (array)$Discussion;
+            }
+            return $Row;
+         }
+         break;
       default:
          throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($RecordType)));
    }
+   
+   if ($ThrowError)
+      throw NotFoundException($RecordType);
+   else
+      return FALSE;
 }
 
 endif;

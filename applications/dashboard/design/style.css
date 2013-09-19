@@ -2048,7 +2048,7 @@ body.Profile.EditMode #Content form {
 	background: #f3f3f3;
 	background: rgba(0, 0, 0, 0.05);
 }
-form.Activity {
+/*form.Activity {
    display: block;
    margin: 0 0 10px;
 	overflow: hidden;
@@ -2065,7 +2065,7 @@ form.Activity .Button {
 .ActivityComments textarea {
    height: 60px;
    min-height: 60px;
-}
+}*/
 
 /* Invitations Form */
 table.PreferenceGroup,
@@ -2635,16 +2635,16 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
 	background: #f7f7f7;
    background: rgba(0, 0, 0, 0.03);
    margin: 0;
-   padding: 13px 20px;
+   padding: 20px;
+}
+.FormWrapper-Condensed {
+   padding: 10px;
 }
 .FormWrapper-Condensed .Buttons {
    text-align: right;
 }
 label.B {
    font-weight: bold;
-}
-.FormWrapper-Condensed {
-   padding: 5px;
 }
 .DiscussionForm textarea {
    width: 100%;
@@ -3821,6 +3821,9 @@ body.embed .InformMessages {
   background-image: url("images/sprites-14-000000.png");
   background-position: 14px 14px;
   background-repeat: no-repeat;
+}
+input + .ReactSprite {
+   vertical-align: middle;
 }
 
 .ReactLabel {

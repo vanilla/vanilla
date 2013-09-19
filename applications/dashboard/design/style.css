@@ -46,6 +46,12 @@ blockquote, q {
    quotes: "" "";
 }
 
+textarea, input[type=text] {
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   box-sizing: border-box;
+}
+
 /* ===================================================================== Grid */
 
 .Row {
@@ -367,11 +373,11 @@ textarea.TextBox {
 }
 .TextBoxWrapper {
 	width: auto;
-	padding-right: 8px;
 }
 .TextBoxWrapper textarea,
 .TextBoxWrapper input {
    width: 100%;
+   display: block;
 }
 .TextBoxWrapper .PasswordStrength {
    width: 100%;
@@ -2630,6 +2636,9 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    background: rgba(0, 0, 0, 0.03);
    margin: 0;
    padding: 13px 20px;
+}
+.FormWrapper-Condensed .Buttons {
+   text-align: right;
 }
 label.B {
    font-weight: bold;

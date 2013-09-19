@@ -1920,7 +1920,7 @@ body.Post .Popup a.Close {
 	color: #1e79a7;
 }
 .Message {
-   line-height: 1.5;
+   line-height: 1.7;
    font-size: 100%;
 	word-wrap: break-word;
    margin-top: 5px;
@@ -1933,8 +1933,8 @@ blockquote {
 }
 
 .emoji {
-   margin-bottom: -2px; /* account for shadow */
-   margin-top: -2px; /* account for shadow */
+   margin-top: -2px;
+   margin-bottom: -2px; /* account for image padding */
 }
 
 blockquote.Quote, blockQuote.UserQuote {

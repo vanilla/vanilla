@@ -424,7 +424,7 @@ function WriteCommentForm() {
 	}
 
 	if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
-		echo $Controller->FetchView('comment', 'post');
+		echo $Controller->FetchView('comment', 'post', 'vanilla');
 }
 endif;
 
@@ -525,4 +525,4 @@ if (!function_exists('FormatMeAction')):
 
       return '<div class="AuthorAction">'.$Body.'</div>';
    }
-endif;
+endif; 

@@ -670,6 +670,8 @@ div.FileUpload .CurrentImage {
 }
 .InProgress {
    opacity: .5;
+   cursor: progress;
+   pointer-events: none;
 }
 .Conversations .Deleted {
    text-decoration: line-through;

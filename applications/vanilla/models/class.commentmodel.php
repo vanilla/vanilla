@@ -602,7 +602,8 @@ class CommentModel extends VanillaModel {
          ->Get()
          ->FirstRow($ResultType);
       
-      $this->Calculate($Comment);
+      if ($Comment)
+         $this->Calculate($Comment);
       return $Comment;
    }
    

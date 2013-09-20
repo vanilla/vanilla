@@ -46,6 +46,12 @@ blockquote, q {
    quotes: "" "";
 }
 
+textarea, input[type=text] {
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   box-sizing: border-box;
+}
+
 /* ===================================================================== Grid */
 
 .Row {
@@ -367,11 +373,11 @@ textarea.TextBox {
 }
 .TextBoxWrapper {
 	width: auto;
-	padding-right: 8px;
 }
 .TextBoxWrapper textarea,
 .TextBoxWrapper input {
    width: 100%;
+   display: block;
 }
 .TextBoxWrapper .PasswordStrength {
    width: 100%;
@@ -1916,7 +1922,7 @@ body.Post .Popup a.Close {
 	color: #1e79a7;
 }
 .Message {
-   line-height: 140%;
+   line-height: 1.7;
    font-size: 100%;
 	word-wrap: break-word;
    margin-top: 5px;
@@ -1926,6 +1932,11 @@ body.Post .Popup a.Close {
 }
 blockquote {
    margin: 1em 0 1em 40px;
+}
+
+.emoji {
+   margin-top: -2px;
+   margin-bottom: -2px; /* account for image padding */
 }
 
 blockquote.Quote, blockQuote.UserQuote {
@@ -2087,7 +2098,7 @@ body.Profile.EditMode #Content form {
 	background: #f3f3f3;
 	background: rgba(0, 0, 0, 0.05);
 }
-form.Activity {
+/*form.Activity {
    display: block;
    margin: 0 0 10px;
 	overflow: hidden;
@@ -2104,7 +2115,7 @@ form.Activity .Button {
 .ActivityComments textarea {
    height: 60px;
    min-height: 60px;
-}
+}*/
 
 /* Invitations Form */
 table.PreferenceGroup,
@@ -2705,13 +2716,16 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
 	background: #f7f7f7;
    background: rgba(0, 0, 0, 0.03);
    margin: 0;
-   padding: 13px 20px;
+   padding: 20px;
+}
+.FormWrapper-Condensed {
+   padding: 10px;
+}
+.FormWrapper-Condensed .Buttons {
+   text-align: right;
 }
 label.B {
    font-weight: bold;
-}
-.FormWrapper-Condensed {
-   padding: 5px;
 }
 .DiscussionForm textarea {
    width: 100%;
@@ -3888,6 +3902,9 @@ body.embed .InformMessages {
   background-image: url("images/sprites-14-000000.png");
   background-position: 16px 16px;
   background-repeat: no-repeat;
+}
+input + .ReactSprite {
+   vertical-align: middle;
 }
 
 .ReactEverything { background-position: -197px -53px; }

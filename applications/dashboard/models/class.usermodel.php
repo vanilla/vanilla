@@ -442,7 +442,7 @@ class UserModel extends Gdn_Model {
       return TRUE;
    }
    
-   public function SSO($String) {
+   public function SSO($String, $ThrowError = FALSE) {
       if (!$String)
          return;
       
@@ -452,18 +452,17 @@ class UserModel extends Gdn_Model {
       Trace($String, "SSO String");
       $Data = json_decode(base64_decode($String), TRUE);
       Trace($Data, 'RAW SSO Data');
-      $Errors = 0;
+      $Errors = array();
       
       if (!isset($Parts[1])) {
-         Trace('Missing SSO signature', TRACE_ERROR);
-         $Errors++;
+         $Errors[] = 'Missing SSO signature';
       }
       if (!isset($Parts[2])) {
-         Trace('Missing SSO timestamp', TRACE_ERROR);
-         $Errors++;
+         $Errors[] = 'Missing SSO timestamp';
       }
-      if ($Errors)
+      if (!empty($Errors)) {
          return;
+      }
       
       $Signature = $Parts[1];
       $Timestamp = $Parts[2];

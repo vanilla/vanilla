@@ -7,6 +7,10 @@ $CssClass = count($Methods) > 0 ? ' MultipleEntryMethods' : ' SingleEntryMethod'
 //$Methods['Facebook'] = array('Label' => 'Facebook', 'Url' => '#', 'ViewLocation' => 'signin');
 //$Methods['Twitter'] = array('Label' => 'Twitter', 'Url' => '#', 'ViewLocation' => 'signin');
 
+// Check user login to prevent appearing login page to logged in users
+
+if (!Gdn::Session()->IsValid()) {
+
 echo '<h1>'.$this->Data('Title').'</h1>';
 
 // Make sure to force this form to post to the correct place in case the view is
@@ -98,3 +102,11 @@ echo $this->Form->Open(array('Action' => Url('/entry/passwordrequest'), 'id' => 
    </li>
 </ul>
 <?php echo $this->Form->Close();
+
+}
+
+//Redirect logged in users to discussions
+
+else {
+   header('Location: '.Url('discussions'));
+}

@@ -20,6 +20,8 @@ class GuestModule extends Gdn_Module {
       if (!$ApplicationFolder)
          $ApplicationFolder = 'Dashboard';
       parent::__construct($Sender, $ApplicationFolder);
+      
+      $this->Visible = C('Garden.Modules.ShowGuestModule');
    }
    
    public function AssetTarget() {
@@ -27,7 +29,7 @@ class GuestModule extends Gdn_Module {
    }
    
    public function ToString() {
-      if (!Gdn::Session()->IsValid() && C('Garden.Modules.ShowGuestModule'))
+      if (!Gdn::Session()->IsValid())
          return parent::ToString();
 
       return '';

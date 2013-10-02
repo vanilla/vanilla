@@ -1399,6 +1399,10 @@ class Gdn_Controller extends Gdn_Pluggable {
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }
       
+      if (Debug() && $Trace = Trace()) {
+         $Data['Trace'] = $Trace;
+      }
+      
       // Make sure the database connection is closed before exiting.
       $this->EventArguments['Data'] = &$Data;
       $this->Finalize();
@@ -1411,7 +1415,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       
-      $this->SendHeaders();
+//      $this->SendHeaders();
 
       // Check for a special view.
       $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), FALSE, FALSE, FALSE);
@@ -1425,6 +1429,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
       }
       
+      @ob_clean();
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', TRUE);
@@ -1555,7 +1560,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       // Try cleaning out any notices or errors.
-      @@ob_clean();
+      @ob_clean();
       
 
       if ($Code >= 400 && $Code <= 505)

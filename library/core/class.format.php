@@ -968,6 +968,9 @@ class Gdn_Format {
     * @return string
     */
    public static function Links($Mixed) {
+      if (!C('Garden.Format.Links', TRUE))
+            return $Mixed;
+      
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {

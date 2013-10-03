@@ -1271,7 +1271,8 @@ EOT;
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Raw');
       } else {
-         return $Mixed;
+         // Deprecate raw formatting. It's too dangeous.
+         return self::Wysiwyg($Mixed);
       }
    }
 

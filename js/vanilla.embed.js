@@ -246,8 +246,11 @@ var embed = function(options) {
       me.container = container;
    }
    
-   if (me.handleScroll && window.jQuery)
-      window.jQuery(window).scroll(Vanilla.debounce(function() { me.adjustPopupPosition(); }));
+   if (me.handleScroll && window.jQuery) {
+      if (me.isReady) {
+         window.jQuery(window).scroll(Vanilla.debounce(function() { me.adjustPopupPosition(); }));
+      }
+   }
    
    // TODO: ensure easyXDM.
    

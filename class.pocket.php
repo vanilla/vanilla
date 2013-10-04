@@ -218,7 +218,10 @@ class Pocket {
       $Plugin->EventArguments['Pocket'] = $this;
       $Plugin->FireEvent('ToString');
       
-      return Gdn_Format::To($this->Body, $this->Format);
+      if (strcasecmp($this->Format, 'raw') == 0)
+         return $this->Body;
+      else
+         return Gdn_Format::To($this->Body, $this->Format);
    }
    
    public static function Touch($Name, $Value) {

@@ -414,3 +414,9 @@ td.BigCount {
 .CommentForm .FormWrapper {
     padding: 10px;
 }
+
+blockquote
+{
+background: #ECECEC;
+padding-left: 15px;
+}

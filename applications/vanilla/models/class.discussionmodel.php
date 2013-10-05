@@ -2094,7 +2094,7 @@ class DiscussionModel extends VanillaModel {
       $TagsArray = Gdn_Format::Text($TagsArray);
       
       // Send back an comma-separated string
-      return implode(',', $TagsArray);
+      return (is_array($TagsArray)) ? implode(',', $TagsArray) : '';
    }
    
    /**

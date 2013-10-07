@@ -7,9 +7,11 @@ $ViewPersonalInfo = $Session->CheckPermission('Garden.PersonalInfo.View');
 foreach ($this->UserData->Result() as $User) {
    $Alt = $Alt ? FALSE : TRUE;
    ?>
-   <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
+   <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?> data-userid="<?php echo $User->UserID ?>">
 <!--      <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $User->UserID; ?>" /></td>-->
-      <td><strong><?php echo UserAnchor($User); ?></strong></td>
+      <td><strong><?php 
+         echo UserAnchor($User, 'Username'); 
+         ?></strong></td>
       <?php if ($ViewPersonalInfo) : ?>
       <td class="Alt"><?php echo Gdn_Format::Email($User->Email); ?></td>
       <?php endif; ?>

@@ -829,10 +829,13 @@ class CommentModel extends VanillaModel {
                // Create comment.
                $this->SerializeRow($Fields);
                $CommentID = $this->SQL->Insert($this->Name, $Fields);
-	            $this->EventArguments['CommentID'] = $CommentID;
-	               
-	            // IsNewDiscussion is passed when the first comment for new discussions are created.
-	            $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
+            }
+            if ($CommentID) {
+               $this->EventArguments['CommentID'] = $CommentID;
+               $this->EventArguments['Insert'] = $Insert;
+
+               // IsNewDiscussion is passed when the first comment for new discussions are created.
+               $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
                $this->FireEvent('AfterSaveComment');
             }
          }

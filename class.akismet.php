@@ -100,7 +100,7 @@ class Akismet
 		
 		// Start to populate the comment data
 		$this->comment['blog'] = $blogURL;
-		$this->comment['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+		$this->comment['user_agent'] = @$_SERVER['HTTP_USER_AGENT'];
 		
 		if(isset($_SERVER['HTTP_REFERER'])) {
 			$this->comment['referrer'] = $_SERVER['HTTP_REFERER'];

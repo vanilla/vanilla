@@ -1294,12 +1294,14 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                   $Result = UserAnchor($User);
                } else {
                   $Max = C('Garden.FormatUsername.Max', 5);
+                  // See if there is another count.
+                  $ExtraCount = GetValueR($Field.'_Count', $Args, 0);
 
                   $Count = count($Value);
                   $Result = '';
                   for ($i = 0; $i < $Count; $i++) {
                      if ($i >= $Max && $Count > $Max + 1) {
-                        $Others = $Count - $i;
+                        $Others = $Count - $i + $ExtraCount;
                         $Result .= ' '.T('sep and', 'and').' '
                            .Plural($Others, '%s other', '%s others');
                         break;

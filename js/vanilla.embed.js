@@ -391,6 +391,7 @@ embed.onMessage = embed.fn.onMessage = function(message, origin) {
 };
 
 embed.scrollTo = embed.fn.scrollTo = function(top) {
+   console.log('scrollTo: '+top);
    window.scrollTo(0, this.iframe.offsetTop + top);
 };
 

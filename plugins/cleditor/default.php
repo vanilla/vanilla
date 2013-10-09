@@ -160,6 +160,12 @@ EOT
 );
       $Added = TRUE;
    }
+   
+   public function PostController_Quote_Before($Sender, $Args) {
+      // Make sure quotes know that we are hijacking the format to wysiwyg.
+      if (!C('Garden.ForceInputFormatter'))
+         SaveToConfig('Garden.InputFormatter', 'Wysiwyg', FALSE);
+   }
 
 	public function Setup() {
       $this->Structure();

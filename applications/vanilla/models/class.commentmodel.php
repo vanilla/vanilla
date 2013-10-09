@@ -1231,6 +1231,7 @@ class CommentModel extends VanillaModel {
          ->Where('CountComments >', $Offset)
          ->Put();
 
+      $this->EventArguments['Discussion'] = $Discussion;
       $this->FireEvent('DeleteComment');
 
       // Log the deletion.

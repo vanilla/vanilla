@@ -114,6 +114,12 @@ class Gdn_UploadImage extends Gdn_Upload {
          $SaveGif = GetValue('SaveGif', $Options);
       }
 
+      // Set some boundaries for $ImageQuality
+      if ($ImageQuality < 10)
+         $ImageQuality = 10;
+      if ($ImageQuality > 100 || !is_numeric($ImageQuality))
+         $ImageQuality = 100;
+
       // Make sure type, height & width are properly defined.
       
       if (!function_exists('gd_info'))
@@ -236,7 +242,7 @@ class Gdn_UploadImage extends Gdn_Upload {
          if ($OutputType == 'gif')
             imagegif($TargetImage, $TargetPath);
          elseif ($OutputType == 'png') {
-            imagepng($TargetImage, $TargetPath, (int)($ImageQuality/10));
+            imagepng($TargetImage, $TargetPath, 10 - (int)($ImageQuality/10));
          } elseif ($OutputType == 'ico') {
             self::ImageIco($TargetImage, $TargetPath);
          } else

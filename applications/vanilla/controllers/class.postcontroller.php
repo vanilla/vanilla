@@ -330,7 +330,9 @@ class PostController extends VanillaController {
          $this->CategoryID = $this->Discussion->CategoryID;
       }
       
-      $this->Form->RemoveFormValue('Format');
+      if (C('Garden.ForceInputFormatter'))
+         $this->Form->RemoveFormValue('Format');
+      
       // Set view and render
       $this->View = 'Discussion';
       $this->Discussion($this->CategoryID);
@@ -782,7 +784,9 @@ class PostController extends VanillaController {
          $this->Comment = $this->DraftModel->GetID($DraftID);
       }
       
-      $this->Form->RemoveFormValue('Format');
+      if (C('Garden.ForceInputFormatter'))
+         $this->Form->RemoveFormValue('Format');
+      
       $this->View = 'editcomment';
       $this->Comment($this->Comment->DiscussionID);
    }

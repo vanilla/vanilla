@@ -1285,8 +1285,8 @@ class CommentModel extends VanillaModel {
    public function Calculate($Comment) {
       
       // Do nothing yet.
-      if ($Comment->Attributes)
-         $Comment->Attributes = unserialize($Comment->Attributes);
+      if ($Attributes = GetValue('Attributes', $Comment))
+         SetValue('Attributes', $Comment, unserialize($Attributes));
       
       $this->EventArguments['Comment'] = $Comment;
       $this->FireEvent('SetCalculatedFields');

@@ -1078,7 +1078,7 @@ class DiscussionModel extends VanillaModel {
       else
          $Perms = self::CategoryPermissions();
       
-      if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
+      /*if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
          // Grab the counts from the faster category cache.
          if (isset($Wheres['d.CategoryID'])) {
             $CategoryIDs = (array)$Wheres['d.CategoryID'];
@@ -1103,7 +1103,7 @@ class DiscussionModel extends VanillaModel {
             $Count += (int)$Cat['CountDiscussions'];
          }
          return $Count;
-      }
+      }*/
       
       if ($Perms !== TRUE) {
          $this->SQL->WhereIn('c.CategoryID', $Perms);

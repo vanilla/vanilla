@@ -246,8 +246,11 @@ var embed = function(options) {
       me.container = container;
    }
    
-   if (me.handleScroll && window.jQuery)
-      window.jQuery(window).scroll(Vanilla.debounce(function() { me.adjustPopupPosition(); }));
+   if (me.handleScroll && window.jQuery) {
+      if (me.isReady) {
+         window.jQuery(window).scroll(Vanilla.debounce(function() { me.adjustPopupPosition(); }));
+      }
+   }
    
    // TODO: ensure easyXDM.
    
@@ -356,7 +359,8 @@ embed.onMessage = embed.fn.onMessage = function(message, origin) {
    if (!Vanilla.isFunction(func))
       Vanilla.error(data.func+' needs to be added to Vanilla.embed.');
    
-   data.args = data.args || [];
+   if (data.args == undefined)
+       data.args = [];
    if (!Vanilla.isArray(data.args))
       data.args = [data.args];
    
@@ -388,6 +392,7 @@ embed.onMessage = embed.fn.onMessage = function(message, origin) {
 };
 
 embed.scrollTo = embed.fn.scrollTo = function(top) {
+   console.log('scrollTo: '+top);
    window.scrollTo(0, this.iframe.offsetTop + top);
 };
 

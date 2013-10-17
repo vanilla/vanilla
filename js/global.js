@@ -10,6 +10,12 @@ Vanilla.fn = Vanilla.prototype;
 
 if (!window.console)
    window.console = { log: function() {} };
+   
+Vanilla.scrollTo = function(q) {
+    var top = $(q).offset().top;
+    window.scrollTo(0, top);
+    return false;
+};
 
 // Add a stub for embedding.
 Vanilla.parent = function() {};

@@ -42,7 +42,7 @@ if (C('Vanilla.Discussions.ShowCounts', TRUE)) {
             $CssClass .= ' Active';
          }
 
-         echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpAllCategories').' '.T('Categories'), '/categories').'</li> ';
+         echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpAllCategories').' '.T('All Categories', 'Categories'), '/categories').'</li> ';
       }
       ?>
       <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::Link('forumroot', Sprite('SpDiscussions').' '.T('Recent Discussions')); ?></li>

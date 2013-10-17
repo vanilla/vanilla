@@ -7,7 +7,11 @@ if ($Sf->RenderAll) {
    echo '<h1>', $Sf->Controller()->Data('Title'), '</h1>';
 }
 
-echo $Form->Open();
+$Options = array();
+if ($Sf->HasFiles())
+   $Options['enctype'] = 'multipart/form-data';
+
+echo $Form->Open($Options);
 echo $Form->Errors();
 ?>
 <ul>
@@ -39,6 +43,10 @@ echo $Form->Errors();
             echo $Form->Label($LabelCode, $Row['Name']);
             echo $Description;
             echo $Form->DropDown($Row['Name'], $Row['Items'], $Row['Options']);
+            break;
+         case 'imageupload':
+            echo $Form->Label($LabelCode, $Row['Name']);
+            echo $Form->ImageUpload($Row['Name'], $Row['Options']);
             break;
          case 'radiolist':
             echo $Form->Label($LabelCode, $Row['Name']);

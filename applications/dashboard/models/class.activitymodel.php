@@ -33,6 +33,7 @@ class ActivityModel extends Gdn_Model {
    
    public static $ActivityTypes = NULL;
    public static $Queue = array();
+   public static $MaxMergeCount = 10;
    
    /**
     * Defines the related database table name.
@@ -103,11 +104,15 @@ class ActivityModel extends Gdn_Model {
       }
       
       $Data = $Row['Data'];
-      if (isset($Data['ActivityUserIDs']))
+      if (isset($Data['ActivityUserIDs'])) {
          $Row['ActivityUserID'] = array_merge(array($Row['ActivityUserID']), $Data['ActivityUserIDs']);
+         $Row['ActivityUserID_Count'] = GetValue('ActivityUserID_Count', $Data);
+      }
       
-      if (isset($Data['RegardingUserIDs']))
+      if (isset($Data['RegardingUserIDs'])) {
          $Row['RegardingUserID'] = array_merge(array($Row['RegardingUserID']), $Data['RegardingUserIDs']);
+         $Row['RegardingUserID_Count'] = GetValue('RegardingUserID_Count', $Data);
+      }
       
       
       $Row['Url'] = ExternalUrl($Row['Route']);
@@ -1300,20 +1305,31 @@ class ActivityModel extends Gdn_Model {
 
       // Group the two activities together.
       $ActivityUserIDs = GetValue('ActivityUserIDs', $OldActivity['Data'], array());
+      $ActivityUserCount = GetValue('ActivityUserID_Count', $OldActivity['Data'], 0);
       array_unshift($ActivityUserIDs, $OldActivity['ActivityUserID']);
       if (($i = array_search($NewActivity['ActivityUserID'], $ActivityUserIDs)) !== FALSE) {
          unset($ActivityUserIDs[$i]);
          $ActivityUserIDs = array_values($ActivityUserIDs);
       }
       $ActivityUserIDs = array_unique($ActivityUserIDs);
+      if (count($ActivityUserIDs) > self::$MaxMergeCount) {
+         array_pop($ActivityUserIDs);
+         $ActivityUserCount++;
+      }
+      
 //      decho($ActivityUserIDs, 'AIDs');
       
       if (GetValue('RegardingUserID', $NewActivity)) {
          $RegardingUserIDs = GetValue('RegardingUserIDs', $OldActivity['Data'], array());
+         $RegardingUserCount = GetValue('RegardingUserID_Count', $OldActivity['Data'], 0);
          array_unshift($RegardingUserIDs, $OldActivity['RegardingUserID']);
          if (($i = array_search($NewActivity['RegardingUserID'])) !== FALSE) {
             unset($RegardingUserIDs[$i]);
             $RegardingUserIDs = array_values($RegardingUserIDs);
+         }
+         if (count($RegardingUserIDs) > self::$MaxMergeCount) {
+            array_pop($RegardingUserIDs);
+            $RegardingUserCount++;
          }
       }
 
@@ -1326,10 +1342,15 @@ class ActivityModel extends Gdn_Model {
       
       if (count($ActivityUserIDs) > 0)
          $NewActivity['Data']['ActivityUserIDs'] = $ActivityUserIDs;
+      if ($ActivityUserCount)
+         $NewActivity['Data']['ActivityUserID_Count'] = $ActivityUserCount;
       if (count($RecordIDs) > 0)
          $NewActivity['Data']['RecordIDs'] = $RecordIDs;
       if (isset($RegardingUserIDs) && count($RegardingUserIDs) > 0) {
          $NewActivity['Data']['RegardingUserIDs'] = $RegardingUserIDs;
+         
+         if ($RegardingUserCount)
+            $NewActivity['Data']['RegardingUserID_Count'] = $RegardingUserCount;
       }
       
 //      decho($NewActivity, 'MergedActivity');

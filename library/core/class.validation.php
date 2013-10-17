@@ -465,7 +465,7 @@ class Gdn_Validation {
       // Figure out the type of rule.
       if (is_string($Rule)) {
          if (StringBeginsWith($Rule, 'regex:', TRUE)) {
-            $RuleName = 'regex';
+            $RuleName = 'validateregex';
             $Args = substr($Rule, 6);
          } elseif (StringBeginsWith($Rule, 'function:', TRUE)) {
             $RuleName = substr($Rule, 9);

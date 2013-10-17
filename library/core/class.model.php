@@ -365,7 +365,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * @param array $Data 
     */
    public function FilterForm($Data) {
-      $Data = array_diff_key($Data, array('Attributes' => 0, 'DateInserted' => 0, 'InsertUserID' => 0, 'InsertIPAddress' => 0,
+      $Data = array_diff_key($Data, array('Attributes' => 0, 'DateInserted' => 0, 'InsertUserID' => 0, 'InsertIPAddress' => 0, 'CheckBoxes' => 0,
             'DateUpdated' => 0, 'UpdateUserID' => 0, 'UpdateIPAddress' => 0, 'DeliveryMethod' => 0, 'DeliveryType' => 0, 'OK' => 0, 'TransientKey' => 0, 'hpt' => 0));
       return $Data;
    }
@@ -424,9 +424,13 @@ class Gdn_Model extends Gdn_Pluggable {
     *
     * @param mixed $ID The value of the primary key in the database.
     * @param string $DatasetType The format of the result dataset.
+    * @param array $Options options to pass to the database.
     * @return Gdn_DataSet
+    * 
+    * @since 2.3 Added the $Options parameter.
     */
-   public function GetID($ID, $DatasetType = FALSE) {
+   public function GetID($ID, $DatasetType = FALSE, $Options = array()) {
+      $this->Options($Options);
       $Result = $this->GetWhere(array($this->PrimaryKey => $ID))->FirstRow($DatasetType);
       
       $Fields = array('Attributes', 'Data');
@@ -540,6 +544,25 @@ class Gdn_Model extends Gdn_Pluggable {
       if ($this->Schema->FieldExists($this->Name, 'UpdateIPAddress') && !isset($Fields['UpdateIPAddress'])) {
          $Fields['UpdateIPAddress'] = Gdn::Request()->IpAddress();
       }
+   }
+   
+   /**
+    * Gets/sets an option on the object.
+    *
+    * @param string|array $Key The key of the option.
+    * @param mixed $Value The value of the option or not specified just to get the current value.
+    * @return mixed The value of the option or $this if $Value is specified.
+    * @since 2.3
+    */
+   public function Options($Key, $Value = NULL) {
+      if (is_array($Key)) {
+         foreach ($Key as $K => $V) {
+            $this->SQL->Options($K, $V);
+         }
+      } else {
+         $this->SQL->Options($Key, $Value);
+      }
+      return $this;
    }
 
 	public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {

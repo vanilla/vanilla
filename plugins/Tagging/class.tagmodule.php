@@ -79,9 +79,16 @@ class TagModule extends Gdn_Module {
       $TagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
       switch ($this->ParentType) {
          case 'Discussion':
-            $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
-               ->Where('td.DiscussionID', $this->ParentID)
-               ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+            $Tags = Gdn::Controller()->Data('Discussion.Tags');
+            if ($Tags) {
+               $TagQuery->Reset();
+               $this->_TagData = new Gdn_DataSet($Tags, DATASET_TYPE_ARRAY);
+               return;
+            } else {
+               $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
+                  ->Where('td.DiscussionID', $this->ParentID)
+                  ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+            }
             break;
          
          case 'Category':

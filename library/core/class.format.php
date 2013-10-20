@@ -968,6 +968,9 @@ class Gdn_Format {
     * @return string
     */
    public static function Links($Mixed) {
+      if (!C('Garden.Format.Links', TRUE))
+            return $Mixed;
+      
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {
@@ -1080,7 +1083,7 @@ class Gdn_Format {
       } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)) {
          $ID = $Matches[2];
          $Result = <<<EOT
-<div class="VideoWrap"><div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div></div>
+<div class="VideoWrap"><div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="//vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div></div>
 EOT;
          
       // Twitter
@@ -1102,7 +1105,7 @@ EOT;
       } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Vine', true)) {
          $Result = <<<EOT
 <div class="VideoWrap">
-   <iframe class="vine-embed" src="https://vine.co/v/{$Matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
+   <iframe class="vine-embed" src="//vine.co/v/{$Matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
 </div>
 EOT;
    
@@ -1117,7 +1120,7 @@ EOT;
       // Pintrest
       } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)) {
          $Result = <<<EOT
-<a data-pin-do="embedPin" href="http://pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
+<a data-pin-do="embedPin" href="//pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
 EOT;
    
    //Gist
@@ -1297,7 +1300,8 @@ EOT;
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Raw');
       } else {
-         return $Mixed;
+         // Deprecate raw formatting. It's too dangeous.
+         return self::Wysiwyg($Mixed);
       }
    }
 
@@ -1415,7 +1419,8 @@ EOT;
       if (is_string($Mixed)) {
          if (method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
-         } elseif (function_exists($FormatMethod)) {
+         } elseif (function_exists('format'.$FormatMethod)) {
+            $FormatMethod = 'format'.$FormatMethod;
             $Mixed = $FormatMethod($Mixed);
          } elseif ($Formatter = Gdn::Factory($FormatMethod.'Formatter')) {
             $Mixed = $Formatter->Format($Mixed);

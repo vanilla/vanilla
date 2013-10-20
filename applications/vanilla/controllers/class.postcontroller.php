@@ -117,10 +117,12 @@ class PostController extends VanillaController {
          $CategoryModel = new CategoryModel();
          $Category = $CategoryModel->GetByCode($CategoryUrlCode);
          $this->CategoryID = $Category->CategoryID;
+         
       }
-      if ($Category)
+      if ($Category) {
          $this->Category = (object)$Category;
-      else {
+         $this->SetData('Category', $Category);
+      } else {
          $this->CategoryID = 0;
          $this->Category = NULL;
       }
@@ -147,14 +149,21 @@ class PostController extends VanillaController {
          $this->Form->SetFormValue('DiscussionID', $this->Discussion->DiscussionID);
 
          $this->Title(T('Edit Discussion'));
+         
+         if ($this->Discussion->Type)
+            $this->SetData('Type', $this->Discussion->Type);
+         else
+            $this->SetData('Type', 'Discussion');
       } else {
          // Permission to add
          $this->Permission('Vanilla.Discussions.Add');
          $this->Title(T('New Discussion'));
       }
       
+      TouchValue('Type', $this->Data, 'Discussion');
+      
       // See if we should hide the category dropdown.
-      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0));
+      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0), array('AllowedDiscussionTypes' => $this->Data['Type']));
       if (count($AllowedCategories) == 1) {
          $AllowedCategory = array_pop($AllowedCategories);
          $this->ShowCategorySelector = FALSE;
@@ -272,7 +281,7 @@ class PostController extends VanillaController {
                // If the discussion was not a draft
                if (!$Draft) {
                   // Redirect to the new discussion
-                  $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  $Discussion = $this->DiscussionModel->GetID($DiscussionID, DATASET_TYPE_OBJECT, array('Slave' => FALSE));
                   $this->SetData('Discussion', $Discussion);
                   $this->EventArguments['Discussion'] = $Discussion;
                   $this->FireEvent('AfterDiscussionSave');
@@ -330,7 +339,9 @@ class PostController extends VanillaController {
          $this->CategoryID = $this->Discussion->CategoryID;
       }
       
-      $this->Form->RemoveFormValue('Format');
+      if (C('Garden.ForceInputFormatter'))
+         $this->Form->RemoveFormValue('Format');
+      
       // Set view and render
       $this->View = 'Discussion';
       $this->Discussion($this->CategoryID);
@@ -474,7 +485,7 @@ class PostController extends VanillaController {
             $this->Form->AddHidden('DiscussionID', $DiscussionID); // Put this in the form so reposts won't cause new discussions.
             $this->Form->SetFormValue('DiscussionID', $DiscussionID); // Put this in the form values so it is used when saving comments.
             $this->SetJson('DiscussionID', $DiscussionID);
-            $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+            $this->Discussion = $Discussion = $this->DiscussionModel->GetID($DiscussionID, DATASET_TYPE_OBJECT, array('Slave' => FALSE));
             // Update the category discussion count
             if ($vanilla_category_id > 0)
                $this->DiscussionModel->UpdateDiscussionCount($vanilla_category_id, $DiscussionID);
@@ -583,7 +594,7 @@ class PostController extends VanillaController {
                }
 
                // $Discussion = $this->DiscussionModel->GetID($DiscussionID);
-               $Comment = $this->CommentModel->GetID($CommentID);
+               $Comment = $this->CommentModel->GetID($CommentID, DATASET_TYPE_OBJECT, array('Slave' => FALSE));
 
                $this->EventArguments['Discussion'] = $Discussion;
                $this->EventArguments['Comment'] = $Comment;
@@ -653,7 +664,7 @@ class PostController extends VanillaController {
                   if ($Editing) {
                      // Just reload the comment in question
                      $this->Offset = 1;
-                     $Comments = $this->CommentModel->GetIDData($CommentID);
+                     $Comments = $this->CommentModel->GetIDData($CommentID, array('Slave' => FALSE));
                      $this->SetData('Comments', $Comments);
                      $this->SetData('Discussion', $Discussion);
                      // Load the discussion
@@ -690,7 +701,7 @@ class PostController extends VanillaController {
 //                        // Make sure to load all new comments since the page was last loaded by this user
 //								if ($DisplayNewCommentOnly)
                         $this->Offset = $this->CommentModel->GetOffset($CommentID);
-                        $Comments = $this->CommentModel->GetIDData($CommentID);
+                        $Comments = $this->CommentModel->GetIDData($CommentID, array('Slave' => FALSE));
                         $this->SetData('Comments', $Comments);
 
                         $this->SetData('NewComments', TRUE);
@@ -782,7 +793,9 @@ class PostController extends VanillaController {
          $this->Comment = $this->DraftModel->GetID($DraftID);
       }
       
-      $this->Form->RemoveFormValue('Format');
+      if (C('Garden.ForceInputFormatter'))
+         $this->Form->RemoveFormValue('Format');
+      
       $this->View = 'editcomment';
       $this->Comment($this->Comment->DiscussionID);
    }

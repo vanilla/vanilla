@@ -33,7 +33,8 @@ echo '<div class="P">',
    '</div>',
    '</div>';
 
-echo '<div class="P">', $this->Form->CheckBox('DeleteContent', T("Also delete this user's content.")), '</div>';
+if ($this->Data('_MayDeleteContent'))
+   echo '<div class="P">', $this->Form->CheckBox('DeleteContent', T("Also delete this user's content.")), '</div>';
 
 ?>
 

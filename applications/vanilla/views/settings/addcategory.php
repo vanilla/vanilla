@@ -68,8 +68,22 @@ echo $this->Form->Errors();
    <li id="Permissions">
       <?php
          echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
-
+         
          echo '<div class="CategoryPermissions">';
+         
+         if (count($this->Data('DiscussionTypes')) > 1) {
+            echo '<div class="P DiscussionTypes">';
+            echo $this->Form->Label('Discussion Types');
+            foreach ($this->Data('DiscussionTypes') as $Type => $Row) {
+               echo $this->Form->CheckBox("AllowedDiscussionTypes[]", GetValue('Plural', $Row, $Type), array('value' => $Type));
+            }
+            echo '</div>';
+         }
+         
+         echo $this->Form->Simple(
+            $this->Data('_PermissionFields', array()),
+         array('Wrap' => array('', '')));
+
          echo T('Check all permissions that apply for each role');
          echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
          echo '</div>';

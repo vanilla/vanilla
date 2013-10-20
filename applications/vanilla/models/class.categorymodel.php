@@ -41,6 +41,17 @@ class CategoryModel extends Gdn_Model {
       parent::__construct('Category');
    }
    
+   public static function AllowedDiscussionTypes($Category) {
+      $Category = self::PermissionCategory($Category);
+      $Allowed = GetValue('AllowedDiscussionTypes', $Category);
+      $AllTypes = DiscussionModel::DiscussionTypes();;
+      
+      if (empty($Allowed) || !is_array($Allowed))
+         return $AllTypes;
+      else
+         return array_intersect_key($AllTypes, array_flip($Allowed));
+   }
+   
    /**
     * 
     * 
@@ -48,14 +59,18 @@ class CategoryModel extends Gdn_Model {
     * @access public
     * @return array Category IDs.
     */
-   public static function CategoryWatch() {
+   public static function CategoryWatch($AllDiscussions = TRUE) {
       $Categories = self::Categories();
       $AllCount = count($Categories);
       
       $Watch = array();
       
       foreach ($Categories as $CategoryID => $Category) {
-         if ($Category['PermsDiscussionsView'] && $Category['Following'] && !GetValue('HideAllDiscussions', $Category)) {
+         if ($AllDiscussions && GetValue('HideAllDiscussions', $Category)) {
+            continue;
+         }
+         
+         if ($Category['PermsDiscussionsView'] && $Category['Following']) {
             $Watch[] = $CategoryID;
          }
       }
@@ -162,6 +177,9 @@ class CategoryModel extends Gdn_Model {
          
          if (!GetValue('CssClass', $Category))
             $Category['CssClass'] = 'Category-'.$Category['UrlCode'];
+         
+         if (isset($Category['AllowedDiscussionTypes']) && is_string($Category['AllowedDiscussionTypes']))
+            $Category['AllowedDiscussionTypes'] = unserialize($Category['AllowedDiscussionTypes']);
 		}
       
       $Keys = array_reverse(array_keys($Data));
@@ -290,13 +308,15 @@ class CategoryModel extends Gdn_Model {
       }
    }
    
-   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL, $Filter = array()) {
+   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL, $Filter = array(), $PermFilter = array()) {
       static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
       $Field = $Map[$Permission];
       $DoHeadings = C('Vanilla.Categories.DoHeadings');
+      $PermFilters = array();
       
       $Result = array();
-      foreach (self::Categories() as $ID => $Category) {
+      $Categories = self::Categories();
+      foreach ($Categories as $ID => $Category) {
          if (!$Category[$Field])
             continue;
          
@@ -311,16 +331,65 @@ class CategoryModel extends Gdn_Model {
                   break;
                }
             }
+            
+            if (!empty($PermFilter)) {
+               $PermCategory = GetValue($Category['PermissionCategoryID'], $Categories);
+               if ($PermCategory) {
+                  if (!isset($PermFilters[$PermCategory['CategoryID']])) {
+                     $PermFilters[$PermCategory['CategoryID']] = self::Where($PermCategory, $PermFilter);
+                  }
+                  
+                  $Exclude = !$PermFilters[$PermCategory['CategoryID']];
+               } else {
+                  $Exclude = TRUE;
+               }
+            }
+            
             if ($Exclude)
                continue;
             
-            if ($DoHeadings && $Permission == 'Discussions.Add' && $Category['Depth'] <= 1)
-               continue;
+            if ($DoHeadings && $Category['Depth'] <= 1) {
+               if ($Permission == 'Discussions.Add')
+                  continue;
+               else
+                  $Category['PermsDiscussionsAdd'] = FALSE;
+            }
          }
 
          $Result[$ID] = $Category;
       }
       return $Result;
+   }
+   
+   public static function Where($Row, $Where) {
+      if (empty($Where))
+         return TRUE;
+      
+      foreach ($Where as $Key => $Value) {
+         $RowValue = GetValue($Key, $Row);
+         
+         // If there are no discussion types set then all discussion types are allowed.
+         if ($Key == 'AllowedDiscussionTypes' && empty($RowValue))
+            continue;
+
+         if (is_array($RowValue)) {
+            if (is_array($Value)) {
+               // If both items are arrays then all values in the filter must be in the row.
+               if (count(array_intersect($Value, $RowValue)) < count($Value))
+                  return FALSE;
+            } elseif (!in_array($Value, $RowValue)) {
+               return FALSE;
+            }
+         } elseif (is_array($Value)) {
+            if (!in_array($RowValue, $Value))
+               return FALSE;
+         } else {
+            if ($RowValue != $Value)
+               return FALSE;
+         }
+      }
+      
+      return TRUE;
    }
    
    /**
@@ -696,7 +765,11 @@ class CategoryModel extends Gdn_Model {
     * @return object SQL results.
     */
    public function GetID($CategoryID, $DatasetType = DATASET_TYPE_OBJECT) {
-      return $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow($DatasetType);
+      $Category = $this->SQL->GetWhere('Category', array('CategoryID' => $CategoryID))->FirstRow($DatasetType);
+      if (isset($Category->AllowedDiscussionTypes) && is_string($Category->AllowedDiscussionTypes))
+            $Category->AllowedDiscussionTypes = unserialize($Category->AllowedDiscussionTypes);
+      
+      return $Category;
    }
 
    /**
@@ -872,8 +945,10 @@ class CategoryModel extends Gdn_Model {
       // Filter out the categories we aren't supposed to view.
       if ($CategoryID && !is_array($CategoryID))
          $CategoryID = array($CategoryID);
-      elseif ($this->Watching)
-         $CategoryID = self::CategoryWatch();
+      
+      if (!$CategoryID && $this->Watching) {
+         $CategoryID = self::CategoryWatch(FALSE);
+      }
       
       switch ($Permissions) {
          case 'Vanilla.Discussions.Add':
@@ -1351,6 +1426,10 @@ class CategoryModel extends Gdn_Model {
       $CustomPermissions = (bool)GetValue('CustomPermissions', $FormPostValues);
       $CustomPoints = GetValue('CustomPoints', $FormPostValues, NULL);
       
+      if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
+         $FormPostValues['AllowedDiscussionTypes'] = serialize($FormPostValues['AllowedDiscussionTypes']);
+      }
+      
       // Is this a new category?
       $Insert = $CategoryID > 0 ? FALSE : TRUE;
       if ($Insert)
@@ -1536,6 +1615,10 @@ class CategoryModel extends Gdn_Model {
    public function SetField($ID, $Property, $Value = FALSE) {
       if (!is_array($Property))
          $Property = array($Property => $Value);
+      
+      if (isset($Property['AllowedDiscussionTypes']) && is_array($Property['AllowedDiscussionTypes'])) {
+         $Property['AllowedDiscussionTypes'] = serialize($Property['AllowedDiscussionTypes']);
+      }
       
       $this->SQL->Put($this->Name, $Property, array('CategoryID' => $ID));
       

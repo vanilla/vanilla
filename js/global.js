@@ -10,6 +10,12 @@ Vanilla.fn = Vanilla.prototype;
 
 if (!window.console)
    window.console = { log: function() {} };
+   
+Vanilla.scrollTo = function(q) {
+    var top = $(q).offset().top;
+    window.scrollTo(0, top);
+    return false;
+};
 
 // Add a stub for embedding.
 Vanilla.parent = function() {};
@@ -72,6 +78,8 @@ jQuery(document).ready(function($) {
 	}
 	
 	$.extend({
+      // private property
+      keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 		base64Encode: function(input) {
 			var output = "";
 			var chr1, chr2, chr3, enc1, enc2, enc3, enc4;

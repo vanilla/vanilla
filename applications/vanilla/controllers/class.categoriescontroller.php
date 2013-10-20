@@ -50,15 +50,70 @@ class CategoriesController extends VanillaController {
     */
    public $Category;
    
+   public function Archives($Category, $Month, $Page = FALSE) {
+      $Category = CategoryModel::Categories($Category);
+      if (!$Category)
+         throw NotFoundException($Category);
+      
+      if (!$Category['PermsDiscussionsView'])
+         throw PermissionException();
+      
+      $Timestamp = strtotime($Month);
+      if (!$Timestamp)
+         throw new Gdn_UserException("$Month is not a valid date.");
+      
+      $this->SetData('Category', $Category);
+      
+      // Round the month to the first day.
+      $From = gmdate('Y-m-01', $Timestamp);
+      $To = gmdate('Y-m-01', strtotime('+1 month', strtotime($From)));
+      
+      // Grab the discussions.
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $Where = array(
+         'CategoryID' => $Category['CategoryID'],
+         'Announce' => 'all',
+         'DateInserted >=' => $From,
+         'DateInserted <' => $To);
+      
+      $DiscussionModel = new DiscussionModel();
+      $Discussions = $DiscussionModel->GetWhere($Where, $Offset, $Limit);
+      $this->DiscussionData = $this->SetData('Discussions', $Discussions);
+      $this->SetData('_CurrentRecords', count($Discussions));
+      $this->SetData('_Limit', $Limit);
+      
+      $Canonical = '/categories/archives/'.rawurlencode($Category['UrlCode']).'/'.gmdate('Y-m', $Timestamp);
+      $Page = PageNumber($Offset, $Limit, TRUE, FALSE);
+      $this->CanonicalUrl(Url($Canonical.($Page ? '?page='.$Page : ''), TRUE));
+      
+      PagerModule::Current()->Configure($Offset, $Limit, FALSE, $Canonical.'?page={Page}');
+      
+//      PagerModule::Current()->Offset = $Offset;
+//      PagerModule::Current()->Url = '/categories/archives'.rawurlencode($Category['UrlCode']).'?page={Page}';
+      
+      Gdn_Theme::Section(GetValue('CssClass', $Category));
+      Gdn_Theme::Section('DiscussionList');
+      
+      $this->Title(htmlspecialchars(GetValue('Name', $Category, '')));
+      $this->Description(sprintf(T("Archives for %s"), gmdate('F Y', strtotime($From))), TRUE);
+      $this->AddJsFile('discussions.js');
+      $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex'));
+
+      $this->ControllerName = 'DiscussionsController';
+      $this->CssClass = 'Discussions';
+      
+      $this->Render();
+   }
+   
    /**
     * "Table" layout for categories. Mimics more traditional forum category layout.
     */
-   public function Table() {
+   public function Table($Category = '') {
       if ($this->SyndicationMethod == SYNDICATION_NONE) {
          $this->View = 'table';
       } else
          $this->View = 'all';
-      $this->All();
+      $this->All($Category);
    }
    
    /**
@@ -93,8 +148,16 @@ class CategoriesController extends VanillaController {
          $Category = CategoryModel::Categories($CategoryIdentifier);
          
          if (empty($Category)) {
-            if ($CategoryIdentifier)
-               throw NotFoundException();
+            
+            // Try lowercasing before outright failing
+            $LowerCategoryIdentifier = strtolower($CategoryIdentifier);
+            if ($LowerCategoryIdentifier != $CategoryIdentifier) {
+               $Category = CategoryModel::Categories($LowerCategoryIdentifier);
+               if ($Category) {
+                  Redirect("/categories/{$LowerCategoryIdentifier}", 301);
+               }
+            }
+            throw NotFoundException();
          }
          $Category = (object)$Category;
          Gdn_Theme::Section($Category->CssClass);
@@ -110,7 +173,7 @@ class CategoriesController extends VanillaController {
          
          if ($Category->DisplayAs == 'Categories') {
             if (GetValue('Depth', $Category) > 0) {
-               // Heading don't make sense if we've cascaded down one level.
+               // Headings don't make sense if we've cascaded down one level.
                SaveToConfig('Vanilla.Categories.DoHeadings', FALSE, FALSE);
             }
             
@@ -129,11 +192,11 @@ class CategoriesController extends VanillaController {
                      $this->Discussions();
                      break;
                   case 'table':
-                     $this->Table();
+                     $this->Table($CategoryIdentifier);
                      break;
                   default:
                      $this->View = 'all';
-                     $this->All();
+                     $this->All($CategoryIdentifier);
                      break;
                }
                return;
@@ -192,11 +255,22 @@ class CategoriesController extends VanillaController {
          $this->EventArguments['PerPage'] = C('Vanilla.Discussions.PerPage', 30);
          $this->FireEvent('BeforeGetDiscussions');
          list($Offset, $Limit) = OffsetLimit($Page, $this->EventArguments['PerPage']);
-         
          if (!is_numeric($Offset) || $Offset < 0)
             $Offset = 0;
+         
+         $Page = PageNumber($Offset, $Limit);
+         
+         // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
+         $MaxPages = C('Vanilla.Categories.MaxPages');
+         if ($MaxPages && $Page > $MaxPages) {
+            throw NotFoundException();
+         }
             
          $CountDiscussions = $DiscussionModel->GetCount($Wheres);
+         if ($MaxPages && $MaxPages * $Limit < $CountDiscussions) {
+            $CountDiscussions = $MaxPages * $Limit;
+         }
+         
          $this->SetData('CountDiscussions', $CountDiscussions);
          $this->SetData('_Limit', $Limit);
          
@@ -248,7 +322,7 @@ class CategoriesController extends VanillaController {
     * @since 2.0.17
     * @access public
     */
-   public function All() {
+   public function All($Category = '') {
       // Setup head.
       $this->Menu->HighlightRoute('/discussions');
       if (!$this->Title()) {
@@ -271,7 +345,13 @@ class CategoriesController extends VanillaController {
       // Get category data
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
       
-      $Categories = $this->CategoryModel->GetFull()->ResultArray();
+      if ($Category) {
+         $Subtree = CategoryModel::GetSubtree($Category);
+         $CategoryIDs = ConsolidateArrayValuesByKey($Subtree, 'CategoryID');
+         $Categories = $this->CategoryModel->GetFull($CategoryIDs)->ResultArray();
+      } else {
+         $Categories = $this->CategoryModel->GetFull()->ResultArray();
+      }
       $this->SetData('Categories', $Categories);
       
       // Add modules

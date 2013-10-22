@@ -279,7 +279,6 @@ class DiscussionModel extends VanillaModel {
       $Sql->Select('d2.*')
          ->From('Discussion d')
          ->Join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
-         ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset);
       
       if ($this->Watching && !isset($Where['d.CategoryID'])) {
@@ -288,6 +287,8 @@ class DiscussionModel extends VanillaModel {
             $Where['d.CategoryID'] = $Watch;
       }
       
+      $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
       $this->EventArguments['Wheres'] =& $Where;
       $this->FireEvent('BeforeGet');
       
@@ -322,6 +323,18 @@ class DiscussionModel extends VanillaModel {
       }
       
       $Sql->Where($Where);
+      
+      // Get sorting options from config
+      $SortField = $this->EventArguments['SortField'];
+      if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted'))) {
+         trigger_error("You are sorting discussions by a possibly sub-optimal column.", E_USER_NOTICE);
+      }
+      
+      $SortDirection = $this->EventArguments['SortDirection'];
+      if ($SortDirection != 'asc')
+         $SortDirection = 'desc';
+      
+      $Sql->OrderBy($SortField, $SortDirection);
       
       // Add the UserDiscussion query.
       if (($UserID = Gdn::Session()->UserID) > 0) {

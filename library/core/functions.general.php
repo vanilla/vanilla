@@ -1590,6 +1590,14 @@ function GetRecord($RecordType, $ID, $ThrowError = FALSE) {
             return $Row;
          }
          break;
+      case 'activity':
+         $Model = new ActivityModel();
+         $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
+         if ($Row) {
+            $Row['Name'] = FormatString($Row['HeadlineFormat'], $Row);
+            $Row['Body'] = $Row['Story'];
+            return $Row;
+         }
       default:
          throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($RecordType)));
    }

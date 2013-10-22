@@ -375,26 +375,50 @@ class DiscussionController extends VanillaController {
     *
     * @param int $DiscussionID Unique discussion ID.
     */
-   public function Bookmark($DiscussionID) {
+   public function Bookmark($DiscussionID = NULL) {
       // Make sure we are posting back.
       if (!$this->Request->IsPostBack())
          throw PermissionException('Javascript');
       
       $Session = Gdn::Session();
       
-      if ($Session->UserID == 0)
+      if (!$Session->UserID)
          throw PermissionException('SignedIn');
       
-      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+      // Check the form to see if the data was posted.
+      $Form = new Gdn_Form();
+      $DiscussionID = $Form->GetFormValue('DiscussionID', $DiscussionID);
+      $Bookmark = $Form->GetFormValue('Bookmark', NULL);
+      $UserID = $Form->GetFormValue('UserID', $Session->UserID);
       
+      // Check the permission on the user.
+      if ($UserID != $Session->UserID) {
+         $this->Permission('Garden.Moderation.Manage');
+      }
+      
+      $Discussion = $this->DiscussionModel->GetID($DiscussionID);
       if (!$Discussion)
          throw NotFoundException('Discussion');
       
-      $State = $this->DiscussionModel->BookmarkDiscussion($DiscussionID, $Session->UserID, $Discussion);
+      $Bookmark = $this->DiscussionModel->Bookmark($DiscussionID, $UserID, $Bookmark);
+      
+      // Set the new value for api calls and json targets.
+      $this->SetData(array(
+         'UserID' => $UserID,
+         'DiscussionID' => $DiscussionID,
+         'Bookmarked' => (bool)$Bookmark
+         ));
+      SetValue('Bookmarked', $Discussion, (int)$Bookmark);
 
       // Update the user's bookmark count
-      $CountBookmarks = $this->DiscussionModel->SetUserBookmarkCount($Session->UserID);
+      $CountBookmarks = $this->DiscussionModel->SetUserBookmarkCount($UserID);
       $this->JsonTarget('.User-CountBookmarks', (string)$CountBookmarks);
+      
+      //  Short circuit if this is an api call.
+      if ($this->DeliveryType() === DELIVERY_TYPE_DATA) {
+         $this->Render('Blank', 'Utility', 'Dashboard');
+         return;
+      }
       
       // Return the appropriate bookmark.
       require_once $this->FetchViewLocation('helper_functions', 'Discussions');
@@ -403,7 +427,7 @@ class DiscussionController extends VanillaController {
       $this->JsonTarget("!element", $Html, 'ReplaceWith');
 
       // Add the bookmark to the bookmarks module.
-      if($State) {
+      if($Bookmark) {
          // Grab the individual bookmark and send it to the client.
          $Bookmarks = new BookmarkedModule($this);
          if($CountBookmarks == 1) {

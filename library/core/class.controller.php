@@ -83,7 +83,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *
     * @var array The data from method calls.
     */
-   public $Data = array();
+   public $Data;
 
    /**
     * The Head module that this controller should use to add CSS files.
@@ -338,6 +338,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->Assets = array();
       $this->ControllerFolder = '';
       $this->CssClass = '';
+      $this->Data = array();
       $this->Head = Gdn::Factory('Dummy');
       $this->MasterView = '';
       $this->ModuleSortContainer = '';

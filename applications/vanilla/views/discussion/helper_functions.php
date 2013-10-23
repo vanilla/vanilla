@@ -195,7 +195,7 @@ function GetDiscussionOptions($Discussion = NULL) {
 
    // Can the user announce?
    if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
-      $Options['AnnounceDiscussion'] = array('Label' => T('Announce...'), 'Url' => 'vanilla/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Popup');
+      $Options['AnnounceDiscussion'] = array('Label' => T('Announce'), 'Url' => 'vanilla/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Popup');
 
    // Can the user sink?
    if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID)) {
@@ -211,6 +211,11 @@ function GetDiscussionOptions($Discussion = NULL) {
       
    if ($CanEdit && GetValueR('Attributes.ForeignUrl', $Discussion)) {
       $Options['RefetchPage'] = array('Label' => T('Refetch Page'), 'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID, 'Class' => 'Hijack');
+   }
+   
+   // Can the user move?
+   if ($CanEdit) {
+      $Options['MoveDiscussion'] = array('Label' => T('Move'), 'Url' => '/moderation/confirmdiscussionmoves?discussionid='.$Discussion->DiscussionID, 'Class' => 'Popup');
    }
 
    // Can the user delete?

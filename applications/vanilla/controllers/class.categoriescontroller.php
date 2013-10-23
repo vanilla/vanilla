@@ -148,8 +148,16 @@ class CategoriesController extends VanillaController {
          $Category = CategoryModel::Categories($CategoryIdentifier);
          
          if (empty($Category)) {
-            if ($CategoryIdentifier)
-               throw NotFoundException();
+            
+            // Try lowercasing before outright failing
+            $LowerCategoryIdentifier = strtolower($CategoryIdentifier);
+            if ($LowerCategoryIdentifier != $CategoryIdentifier) {
+               $Category = CategoryModel::Categories($LowerCategoryIdentifier);
+               if ($Category) {
+                  Redirect("/categories/{$LowerCategoryIdentifier}", 301);
+               }
+            }
+            throw NotFoundException();
          }
          $Category = (object)$Category;
          Gdn_Theme::Section($Category->CssClass);

@@ -144,7 +144,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       // Load the most active discussions during this date range
       $UserModel = new UserModel();
       $Sender->SetData('DiscussionData', $UserModel->SQL
-         ->Select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments')
+         ->Select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID')
          ->From('Discussion d')
          ->Where('d.DateLastComment >=', $Sender->DateStart)
          ->Where('d.DateLastComment <=', $Sender->DateEnd)

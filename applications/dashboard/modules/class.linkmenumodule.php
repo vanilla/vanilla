@@ -137,7 +137,7 @@ class LinkMenuModule extends Gdn_Module {
    }
    
    protected function getCssClass($key, $item) {
-      $result = val('class', $item, '')." nav-item nav-$key";
+      $result = val('class', $item, '')." nav-$key";
       return trim($result);
    }
    
@@ -173,7 +173,7 @@ class LinkMenuModule extends Gdn_Module {
       $text = $link['text'];
       $icon = val('icon', $link);
       $badge = val('badge', $link);
-      $class = $this->getCssClass($key, $link);
+      $class = 'nav-link '.$this->getCssClass($key, $link);
       unset($link['url'], $link['text'], $link['class'], $link['icon'], $link['badge']);
       
       if ($icon)
@@ -187,7 +187,7 @@ class LinkMenuModule extends Gdn_Module {
    
    protected function renderGroup($key, $group, $level = 0) {
       $text = $group['text'];
-      $group['class'] = $this->getCssClass($key, $group);
+      $group['class'] = 'nav-group '.$this->getCssClass($key, $group);
       $items = $group['items'];
       unset($group['text'], $group['items']);
       

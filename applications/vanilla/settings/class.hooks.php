@@ -352,6 +352,31 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    /**
+    * 
+    * @param SiteLinkMenuModule $sender
+    */
+   public function SiteLinkMenuModule_Site_Handler($sender) {
+      // Add the site discussion links.
+      $sender->addLink('main.categories', array('text' => t('All Categories', 'Categories'), 'url' => '/categories', 'icon' => icon('th-list')));
+      $sender->addLink('main.discussions', array('text' => t('Recent Discussions'), 'url' => '/discussions', 'icon' => icon('discussion')));
+      
+      // Add favorites.
+      $sender->addGroup('favorites', array('text' => t('Favorites')));
+      
+      if (Gdn::Session()->IsValid()) {
+         $sender->addLink('favorites.bookmarks', array('text' => t('My Bookmarks'), 
+            'url' => '/discussions/bookmarked', 'icon' => icon('star'), 
+            'badge' => countString(Gdn::Session()->User->CountBookmarks, Url('/discussions/userbookmarkcount'))));
+         $sender->addLink('favorites.discussions', array('text' => t('My Discussions'), 
+            'url' => '/discussions/mine', 'icon' => icon('discussion'),
+            'badge' => countString(Gdn::Session()->User->CountDiscussions)));
+         $sender->addLink('favorites.drafts', array('text' => t('Drafts'), 'url' => '/drafts', 
+            'icon' => icon('compose'),
+            'badge' => countString(Gdn::Session()->User->CountDrafts)));
+      }
+   }
+   
+   /**
 	 * Creates virtual 'Comments' method in ProfileController.
 	 * 
     * @since 2.0.0

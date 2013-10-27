@@ -137,7 +137,7 @@ class LinkMenuModule extends Gdn_Module {
    }
    
    protected function getCssClass($key, $item) {
-      $result = val('class', $item, '')." nav-$key";
+      $result = val('class', $item, '')." nav nav-$key";
       return trim($result);
    }
    
@@ -180,7 +180,7 @@ class LinkMenuModule extends Gdn_Module {
          $text = $icon.' '.$text;
       
       if ($badge)
-         $text .= ' <span class="Aside">'.$badge.'</span>';
+         $text = '<span class="Aside">'.$badge.'</span> '.$text;
       
       echo Anchor($text, $href, $class, $link, true)."\n";
    }

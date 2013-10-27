@@ -137,7 +137,7 @@ class LinkMenuModule extends Gdn_Module {
    }
    
    protected function getCssClass($key, $item) {
-      $result = val('class', $item, '')." nav nav-$key";
+      $result = val('class', $item, '')." nav-item nav-$key";
       return trim($result);
    }
    

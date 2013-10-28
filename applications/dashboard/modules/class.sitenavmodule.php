@@ -16,16 +16,28 @@
 class SiteNavModule extends NavModule {
    /// Properties ///
    
+   protected $customSections = array('Profile');
    
    /// Methods ///
    
    public function render() {
+      $section_found = false;
+      
       // The module contains different links depending on its section.
-      if (InSection('Profile')) {
-         $this->FireEvent('Profile');
-      } else {
-         $this->FireEvent('Site');
+      foreach ($this->customSections as $section) {
+         if (InSection($section)) {
+            $this->fireEvent($section);
+            $section_found = true;
+            break;
+         }
       }
+      
+      // If a section wasn't found then add the default nav.
+      if (!$section_found)
+         $this->fireEvent('default');
+      
+      // Fire an event for everything.
+      $this->fireEvent('all');
       
       parent::render();
    }

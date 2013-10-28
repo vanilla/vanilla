@@ -60,6 +60,8 @@ class NavModule extends Gdn_Module {
     * @param string $key The group key. Dot syntax is allowed to nest groups within eachother.
     * @param array $group The group with the following key(s):
     * - **text**: The text of the group. Html is allowed.
+    * - **sort**: Specify a custom sort order for the item.
+    *   This can be either a number or an array in the form ('before|after', 'key').
     */
    public function addGroup($key, $group) {
       $this->addItem('group', $key, $group);
@@ -93,7 +95,7 @@ class NavModule extends Gdn_Module {
                if ($items[$key_part]['type'] !== $type)
                   throw new \Exception("$key of type $type does not match exsisting type {$items[$key_part]['type']}.", 500);
                
-               $items[$key_part] = array_merge_recursive($items[$key_part], $item);
+               $items[$key_part] = array_merge($items[$key_part], $item);
             } else {
                // The item is new so just add it here.
                touchValue('_sort', $item, count($items));
@@ -125,6 +127,8 @@ class NavModule extends Gdn_Module {
     * - **text**: The text of the link. Html is allowed.
     * - **icon**: The html of the icon.
     * - **badge**: The link contain a badge. such as a count or alert. Html is allowed.
+    * - **sort**: Specify a custom sort order for the item.
+    *   This can be either a number or an array in the form ('before|after', 'key').
     */
    public function addLink($key, $link) {
       $this->addItem('link', $key, $link);
@@ -141,6 +145,17 @@ class NavModule extends Gdn_Module {
       return trim($result);
    }
    
+   protected function itemVisible($key, $item) {
+      $visible = val('visible', $item, true);
+      $prop = 'show'.$key;
+      
+      if (property_exists($this, $prop)) {
+         return $this->$prop;
+      } else {
+         return $visible;
+      }
+   }
+   
    /**
     * Render the menu as a nav.
     */
@@ -151,7 +166,13 @@ class NavModule extends Gdn_Module {
    }
    
    protected function renderItems($items, $level = 0) {
+      self::sortItems($items);
+      
       foreach ($items as $key => $item) {
+         $visible = $this->itemVisible($key, $item);
+         if (!$visible)
+            continue;
+         
          switch ($item['type']) {
             case 'link':
                $this->renderLink($key, $item);
@@ -187,7 +208,8 @@ class NavModule extends Gdn_Module {
    
    protected function renderGroup($key, $group, $level = 0) {
       $text = $group['text'];
-      $group['class'] = 'nav-group '.$this->getCssClass($key, $group);
+      $group['class'] = 'nav-group '.($text ? '' : 'nav-group-noheading ').$this->getCssClass($key, $group);
+      
       $items = $group['items'];
       unset($group['text'], $group['items']);
       
@@ -212,6 +234,65 @@ class NavModule extends Gdn_Module {
       echo "<div class=\"nav-divider\"></div>\n";
    }
    
+   /**
+    * Sort the items in a given dataset (array).
+    * 
+    * @param array $items
+    */
+   public static function sortItems(&$items) {
+      uasort($items, function($a, $b) use ($items) {
+         $sort_a = self::sortItemsOrder($a, $items);
+         $sort_b = self::sortItemsOrder($b, $items);
+         
+         if ($sort_a > $sort_b)
+            return 1;
+         elseif ($sort_a < $sort_b)
+            return -1;
+         else
+            return 0;
+      });
+   }
+   
+   /**
+    * Get the sort order of an item in the items array.
+    * This function looks at the following keys:
+    * - **sort (numeric)**: A specific numeric sort was provided.
+    * - **sort array('before|after', 'key')**: You can specify that the item is before or after another item.
+    * - **_sort**: The order the item was added is used.
+    * 
+    * @param array $item The item to get the sort order from.
+    * @param array $items The entire list of items.
+    * @param int $depth The current recursive depth used to prevent inifinite recursion.
+    * @return number
+    */
+   protected static function sortItemsOrder($item, $items, $depth = 0) {
+      $default_sort = val('_sort', $item, 100);
+      
+      // Check to see if a custom sort has been specified.
+      if (isset($item['sort'])) {
+         if (is_numeric($item['sort'])) {
+            // This is a numeric sort
+            return $item['sort'] * 10000 + $default_sort;
+         } elseif (is_array($item['sort']) && $depth < 10) {
+            // This sort is before or after another depth.
+            list($op, $key) = $item['sort'];
+            
+            if (array_key_exists($key, $items)) {
+               switch ($op) {
+                  case 'after':
+                     return self::sortItemsOrder($items[$key], $items, $depth + 1) + 1000;
+                  case 'before':
+                  default:
+                     return self::sortItemsOrder($items[$key], $items, $depth + 1) - 1000;
+               }
+            }
+         }
+      }
+      
+      return $default_sort * 10000 + $default_sort;
+   }
+
+
    public function toString() {
       ob_start();
       $this->render();

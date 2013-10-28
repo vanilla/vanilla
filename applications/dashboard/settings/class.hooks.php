@@ -226,4 +226,28 @@ class DashboardHooks implements Gdn_IPlugin {
       if (!$Handled)
          Redirect($Target, 302);
    }
+   
+   public function SiteNavModule_All_Handler($sender) {
+   }
+   
+   /**
+    * @param SiteNavModule $sender
+    */
+   public function SiteNavModule_Default_Handler($sender) {
+      $sender->addLink('main.profile', array('text' => t('Profile'), 'url' => '/profile', 'icon' => icon('user'), 'sort' => 10));
+      $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => '/activity', 'icon' => icon('time'), 'sort' => 10));
+      
+      $sender->addGroup('etc', array('sort' => 100));
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         $sender->addLink('etc.dashboard', array('text' => t('Dashboard'), 'url' => '/settings', 'icon' => icon('dashboard')));
+      }
+      if (Gdn::Session()->IsValid()) {
+         $sender->addLink('etc.signout', array('text' => t('Sign Out'), 'url' => SignOutUrl(), 'icon' => icon('signout'), 'sort' => 100));
+      } else {
+         $sender->addLink('etc.signin', array('text' => t('Sign Out'), 'url' => SignInUrl(), 'icon' => icon('signin'), 'sort' => 100));
+      }
+   }
+   
+   public function SiteNavModeule_Profile_Handler($sender) {
+   }
 }

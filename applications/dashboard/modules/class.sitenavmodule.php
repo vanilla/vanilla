@@ -13,7 +13,7 @@
 /**
  * 
  */
-class SiteLinkMenuModule extends LinkMenuModule {
+class SiteNavModule extends NavModule {
    /// Properties ///
    
    

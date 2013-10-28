@@ -355,7 +355,7 @@ class VanillaHooks implements Gdn_IPlugin {
     * 
     * @param SiteLinkMenuModule $sender
     */
-   public function SiteLinkMenuModule_Site_Handler($sender) {
+   public function SiteNavModule_Site_Handler($sender) {
       // Add the site discussion links.
       $sender->addLink('main.categories', array('text' => t('All Categories', 'Categories'), 'url' => '/categories', 'icon' => icon('th-list')));
       $sender->addLink('main.discussions', array('text' => t('Recent Discussions'), 'url' => '/discussions', 'icon' => icon('discussion')));

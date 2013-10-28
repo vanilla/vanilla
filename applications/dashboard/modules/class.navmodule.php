@@ -16,7 +16,7 @@
  * The module contains an array of items. Each item can be one of the following types: link, group, or divider.
  * When adding an item you provide an array of with the following keys.
  */
-class LinkMenuModule extends Gdn_Module {
+class NavModule extends Gdn_Module {
    /// Properties ///
    
    /**

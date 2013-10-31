@@ -352,13 +352,17 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    /**
-    * 
     * @param SiteLinkMenuModule $sender
     */
-   public function SiteNavModule_Default_Handler($sender) {
+   public function SiteNavModule_default_handler($sender) {
+      // Grab the default route so that we don't add a link to it twice.
+      $home = trim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController')), '/');
+      
       // Add the site discussion links.
-      $sender->addLink('main.categories', array('text' => t('All Categories', 'Categories'), 'url' => '/categories', 'icon' => icon('th-list')));
-      $sender->addLink('main.discussions', array('text' => t('Recent Discussions'), 'url' => '/discussions', 'icon' => icon('discussion')));
+      if ($home !== 'categories')
+         $sender->addLink('main.categories', array('text' => t('All Categories', 'Categories'), 'url' => '/categories', 'icon' => icon('th-list'), 'sort' => 1));
+      if ($home !== 'discussions')
+         $sender->addLink('main.discussions', array('text' => t('Recent Discussions'), 'url' => '/discussions', 'icon' => icon('discussion'), 'sort' => 1));
       
       // Add favorites.
       $sender->addGroup('favorites', array('text' => t('Favorites')));
@@ -374,6 +378,26 @@ class VanillaHooks implements Gdn_IPlugin {
             'icon' => icon('compose'),
             'badge' => countString(Gdn::Session()->User->CountDrafts)));
       }
+   }
+   
+   /**
+    * @param SiteLinkMenuModule $sender
+    */
+   public function SiteNavModule_profile_handler($sender) {
+      $user = Gdn::Controller()->Data('Profile');
+      
+      if (!$user)
+         return;
+      
+      $user_id = val('UserID', $user);
+      
+      $sender->addGroup('posts', array('text' => t('Posts')));
+      
+      $sender->addLink('posts.discussions', array('text' => t('Discussions'), 'url' => UserUrl($user, '', 'discussions'),
+         'icon' => icon('discussion'), 'badge' => countString(val('CountDiscussions', $user), "/profile/count/discussions?userid=$user_id")));
+      
+      $sender->addLink('posts.comments', array('text' => t('Comments'), 'url' => UserUrl($user, '', 'comments'),
+         'icon' => icon('comment'), 'badge' => countString(val('CountComments', $user), "/profile/count/comments?userid=$user_id")));
    }
    
    /**

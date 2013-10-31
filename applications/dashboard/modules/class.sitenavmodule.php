@@ -16,7 +16,7 @@
 class SiteNavModule extends NavModule {
    /// Properties ///
    
-   protected $customSections = array('Profile');
+   protected $customSections = array('EditProfile', 'Profile');
    
    /// Methods ///
    

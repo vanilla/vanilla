@@ -33,8 +33,15 @@ class Gdn_Router extends Gdn_Pluggable {
       $this->_LoadRoutes();
    }
    
-   public function GetRoute($Route) {
-      if (is_numeric($Route) && $Route !== FALSE) {
+   /**
+    * Get an route that exactly matches a string.
+    * @param string|int $Route The route to search for.
+    * @param int $Indexed If the route is a number then it will be looked up as an index.
+    * 
+    * @return array|bool A route or false if there is no matching route.
+    */
+   public function GetRoute($Route, $Indexed = TRUE) {
+      if ($Indexed && is_numeric($Route) && $Route !== FALSE) {
          $Keys = array_keys($this->Routes);
          $Route = ArrayValue($Route, $Keys);
       }
@@ -94,11 +101,10 @@ class Gdn_Router extends Gdn_Pluggable {
    public function MatchRoute($Request) {
    
       // Check for a literal match
-      if ($this->GetRoute($Request))
+      if ($this->GetRoute($Request, FALSE))
          return $this->GetRoute($Request);
          
-      foreach ($this->Routes as $Route => $RouteData)
-      {
+      foreach ($this->Routes as $Route => $RouteData) {
          // Check for wild-cards
          $Route = str_replace(
             array(':alphanum', ':num'),

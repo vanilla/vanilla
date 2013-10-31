@@ -60,7 +60,7 @@ class ProfileController extends Gdn_Controller {
       $this->_TabApplication = 'Dashboard';
       $this->CurrentTab = 'Activity';
       $this->ProfileTabs = array();
-      $this->EditMode = TRUE;
+      $this->EditMode(TRUE);
       parent::__construct();
    }
    
@@ -1502,6 +1502,12 @@ class ProfileController extends Gdn_Controller {
       $this->EditMode = $Switch;
       if (!$this->EditMode && strpos($this->CssClass, 'EditMode') !== FALSE)
          $this->CssClass = str_replace('EditMode', '', $this->CssClass);
+      
+      if ($Switch) {
+         Gdn_Theme::Section('EditProfile');
+      } else {
+         Gdn_Theme::Section('EditProfile', 'remove');
+      }
    }
    
    /**

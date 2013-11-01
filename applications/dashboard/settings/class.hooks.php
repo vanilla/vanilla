@@ -178,7 +178,7 @@ class DashboardHooks implements Gdn_IPlugin {
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       header('P3P: CP="CAO PSA OUR"', TRUE);
       
-      if (!Gdn::Session()->IsValid() && $SSO = Gdn::Request()->Get('sso')) {
+      if ($SSO = Gdn::Request()->Get('sso')) {
          SaveToConfig('Garden.Registration.SendConnectEmail', FALSE, FALSE);
          
          $UserID = FALSE;

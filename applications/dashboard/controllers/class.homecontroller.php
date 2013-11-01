@@ -61,6 +61,7 @@ class HomeController extends Gdn_Controller {
       
       $Code = $this->Data('Code', 400);
       header("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), TRUE, $Code);
+      Gdn_Theme::Section('Error');
       
       $this->Render();
    }
@@ -84,6 +85,7 @@ class HomeController extends Gdn_Controller {
       }
       
       $this->SetData('_NoMessages', TRUE);
+      Gdn_Theme::Section('Error');
       
       if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
          header("HTTP/1.0 404", TRUE, 404);
@@ -112,6 +114,7 @@ class HomeController extends Gdn_Controller {
     */
    public function Deleted() {
       header("HTTP/1.0 410", TRUE, 410);
+      Gdn_Theme::Section('Error');
       $this->Render();
    }
    
@@ -144,6 +147,8 @@ class HomeController extends Gdn_Controller {
     * @access public
     */
    public function Permission() {
+      Gdn_Theme::Section('Error');
+      
       if ($this->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
          header("HTTP/1.0 401", TRUE, 401);
          $this->Render();

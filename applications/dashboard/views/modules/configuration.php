@@ -19,7 +19,7 @@ echo $Form->Errors();
       $LabelCode = $Sf->LabelCode($Row);
       $Description = GetValue('Description', $Row, '');
       if ($Description)
-         $Description = '<div class="Info">'.$Description.'</div>';
+         $Description = '<div class="Info">'.T($Description).'</div>';
 
       switch (strtolower($Row['Control'])) {
          case 'categorydropdown':

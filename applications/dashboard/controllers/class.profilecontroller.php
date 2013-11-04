@@ -430,10 +430,9 @@ class ProfileController extends Gdn_Controller {
          $this->Head->AddTag('meta', array('name' => 'googlebot', 'content' => 'noindex'));
       }
 
-      // if ($this->User->UserID == Gdn::Session()->UserID)
-      //    return $this->Notifications($Page);
-      // elseif (C('Garden.Profile.ShowActivities', TRUE))
-      if (C('Garden.Profile.ShowActivities', TRUE))
+      if ($this->User->UserID == Gdn::Session()->UserID && Gdn::Session()->User->CountNotifications > 0)
+         return $this->Notifications($Page);
+      elseif (C('Garden.Profile.ShowActivities', TRUE))
          return $this->Activity($User, $Username, $UserID, $Page);
       else
          return Gdn::Dispatcher()->Dispatch(UserUrl($this->User, '', 'discussions'));

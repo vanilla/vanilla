@@ -227,20 +227,11 @@ class DashboardHooks implements Gdn_IPlugin {
          Redirect($Target, 302);
    }
    
-   public function SiteNavModule_All_Handler($sender) {
-   }
-   
-   /**
-    * @param SiteNavModule $sender
-    */
-   public function SiteNavModule_Default_Handler($sender) {
-      $sender->addLink('main.profile', array('text' => t('Profile'), 'url' => '/profile', 'icon' => icon('user'), 'sort' => 10));
-      $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => '/activity', 'icon' => icon('time'), 'sort' => 10));
+   public function SiteNavModule_all_handler($sender) {
+      // Add a link to the community home.
+      $sender->addLink('main.home', array('text' => t('Community Home'), 'url' => '/', 'icon' => icon('home'), 'sort' => -100));
       
       $sender->addGroup('etc', array('sort' => 100));
-      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-         $sender->addLink('etc.dashboard', array('text' => t('Dashboard'), 'url' => '/settings', 'icon' => icon('dashboard')));
-      }
       if (Gdn::Session()->IsValid()) {
          $sender->addLink('etc.signout', array('text' => t('Sign Out'), 'url' => SignOutUrl(), 'icon' => icon('signout'), 'sort' => 100));
       } else {
@@ -248,6 +239,83 @@ class DashboardHooks implements Gdn_IPlugin {
       }
    }
    
-   public function SiteNavModeule_Profile_Handler($sender) {
+   /**
+    * @param SiteNavModule $sender
+    */
+   public function SiteNavModule_default_handler($sender) {
+      $sender->addLink('main.profile', array('text' => t('Profile'), 'url' => '/profile', 'icon' => icon('user'), 'sort' => 10));
+      $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => '/activity', 'icon' => icon('time'), 'sort' => 10));
+      
+      // Add the moderation items.
+      $sender->addGroup('moderation', array('text' => t('Moderation'), 'sort' => 90));
+      if (Gdn::Session()->CheckPermission('Garden.Users.Approve')) {
+         $RoleModel = new RoleModel();
+         $applicant_count = (int)$RoleModel->GetApplicantCount();
+         if ($applicant_count > 0 || true) {
+            $sender->addLink('moderation.applicants', array('text' => t('Applicants'), 'url' => '/user/applicants', 'icon' => icon('user'), 'badge' => countString($applicant_count)));
+         }
+      }
+      
+      if (Gdn::Session()->CheckPermission('Garden.Modertion.Manage')) {
+         $sender->addLink('moderation.spam', array('text' => 'Spam Queue', 'url' => '/log/spam', 'icon' => icon('spam')));
+//         $sender->addLink('moderation.queue', array('text' => 'Moderaton Queue', 'url' => '/log/moderation', 'icon' => icon('report')));
+      }
+      
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         $sender->addLink('etc.dashboard', array('text' => t('Dashboard'), 'url' => '/settings', 'icon' => icon('dashboard')));
+      }
+   }
+   
+   /**
+    * @param SiteNavModule $sender
+    */
+   public function SiteNavModule_editprofile_handler($sender) {
+      $user = Gdn::Controller()->Data('Profile');
+      $user_id = val('UserID', $user);
+      $is_me = $user_id == Gdn::Session()->UserID;
+      
+      // Users can edit their own profiles and moderators can edit any profile.
+      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))
+         || ($is_me && C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect')) {
+         
+         $sender->addLink('main.editprofile', array('text' => t('Profile'), 'url' => UserUrl($user, '', 'edit'), 'icon' => icon('edit')));
+      }
+      
+      if (CheckPermission('Garden.Users.Edit'))
+         $sender->addLink('main.editaccount', array('text' => t('Edit Account'), 'url' => "/user/edit/$user_id", 'icon' => icon('cog'), 'class' => 'Popup'));
+      
+      $sender->addLink('main.profile', array('text' => t('Back to Profile'), 'url' => UserUrl('user'), 'icon' => icon('arrow-left'), 'sort' => 100));
+   }
+   
+   /**
+    * @param SiteNavModule $sender
+    */
+   public function SiteNavModule_profile_handler($sender) {
+      $user = Gdn::Controller()->Data('Profile');
+      $user_id = val('UserID', $user);
+      
+      // Show the activity.
+      if (C('Garden.Profile.ShowActivities', TRUE)) {
+         $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => UserUrl($user, '', 'activity'), 'icon' => icon('time')));
+      }
+         
+      // Display the notifications for the current user.
+      if (Gdn::Controller()->Data('Profile.UserID') == Gdn::Session()->UserID) {
+         $sender->addLink('main.notifications', array('text' => t('Notifications'), 'url' => UserUrl($user, '', 'notifications'), 'icon' => icon('globe'), 'badge' => Gdn::Controller()->Data('Profile.CountNotifications')));
+      }
+      
+      // Show the invitations if we're using the invite registration method.
+      if (strcasecmp(C('Garden.Registration.Method'), 'invitation') === 0)
+         $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => UserUrl($User, '', 'invitations'), 'icon' => icon('ticket')));
+      
+      // Users can edit their own profiles and moderators can edit any profile.
+      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))
+         || ($user_id == Gdn::Session()->UserID && C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect')) {
+         
+         $sender->addLink('main.editprofile', array('text' => t('Edit Profile'), 'url' => UserUrl($user, '', 'edit'), 'icon' => icon('edit')));
+      }
+      
+      // Add a stub group for moderation.
+      $sender->addGroup('moderation', array('text' => t('Moderation'), 'sort' => 90));
    }
 }

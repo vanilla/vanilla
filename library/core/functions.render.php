@@ -1021,13 +1021,17 @@ if (!function_exists('WriteReactions')):
       Gdn_Theme::BulletRow();
 
       // Write the flags.
-      static $Flags = NULL;
+      static $Flags = NULL, $FlagCodes = NULL;
+      if ($Flags === NULL) {
+         Gdn::Controller()->EventArguments['Flags'] = &$Flags;
+         Gdn::Controller()->FireEvent('Flags');
+      }
 
-      // Allow addons to work with flags menu
+      // Allow addons to work with flags
       Gdn::Controller()->EventArguments['Flags'] = &$Flags;
       Gdn::Controller()->FireEvent('BeforeFlag');
 
-      if (!empty($Flags)) {
+      if (!empty($Flags) && is_array($Flags)) {
          echo Gdn_Theme::BulletItem('Flags');
 
          echo ' <span class="FlagMenu ToggleFlyout">';
@@ -1035,6 +1039,12 @@ if (!function_exists('WriteReactions')):
          echo Anchor(Sprite('ReactFlag', 'ReactSprite').' '.Wrap(T('Flag'), 'span', array('class'=>'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title'=>'Flag'), TRUE);
          echo Sprite('SpFlyoutHandle', 'Arrow');
          echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+         foreach ($Flags as $Flag) {
+            if (is_callable($Flag))
+               echo '<li>'.call_user_func($Flag, $Row, $RecordType, $ID).'</li>';
+            else
+               echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
+         }
          Gdn::Controller()->FireEvent('AfterFlagOptions');
          echo '</ul>';
          echo '</span> ';
@@ -1046,4 +1056,5 @@ if (!function_exists('WriteReactions')):
       echo '</div>';
       Gdn::Controller()->FireEvent('Replies');
    }
+
 endif;

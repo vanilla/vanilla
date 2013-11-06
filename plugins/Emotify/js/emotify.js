@@ -97,7 +97,7 @@ jQuery(document).ready(function($) {
          return false;
       });
    }
-   emotify($('.CommentForm .TextBox'));
+   emotify($('.CommentForm .TextBox,.DiscussionForm .TextBox'));
    $(document).bind('EditCommentFormLoaded', function(e, container) {
       emotify(container.find('.EditCommentForm .TextBox'));
    });

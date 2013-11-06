@@ -61,7 +61,9 @@ class MessagesController extends ConversationsController {
       $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox')));
 //      $this->AddModule('MeModule');
       $this->AddModule('SignedInModule');
-      $this->AddModule('NewConversationModule');
+
+      if (CheckPermission('Conversations.Conversations.Add'))
+         $this->AddModule('NewConversationModule');
    }
    
    /**
@@ -73,6 +75,7 @@ class MessagesController extends ConversationsController {
     * @param string $Recipient Username of the recipient.
     */
    public function Add($Recipient = '') {
+      $this->Permission('Conversations.Conversations.Add');
       $this->Form->SetModel($this->ConversationModel);
       
       if ($this->Form->AuthenticatedPostBack()) {
@@ -380,8 +383,10 @@ class MessagesController extends ConversationsController {
       $InThisConversationModule = new InThisConversationModule($this);
       $InThisConversationModule->SetData($this->RecipientData);
       $this->AddModule($InThisConversationModule);
-      
-      $this->AddModule('AddPeopleModule');
+
+      // Doesn't make sense for people who can't even start conversations to be adding people
+      if (CheckPermission('Conversations.Conversations.Add'))
+         $this->AddModule('AddPeopleModule');
       
       $Subject = $this->Data('Conversation.Subject');
       if (!$Subject)

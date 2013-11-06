@@ -32,6 +32,12 @@
 
    if (!window.console)
       window.console = { log: function() {} };
+   
+Vanilla.scrollTo = function(q) {
+    var top = $(q).offset().top;
+    window.scrollTo(0, top);
+    return false;
+};
 
    // Add a stub for embedding.
    Vanilla.parent = function() {};
@@ -838,6 +844,7 @@ jQuery(document).ready(function($) {
          var url = $(elem).attr('rel');
          var $elem = $(elem);
          $.ajax({
+      // private property
             url: gdn.url(url),
             data: {DeliveryType: 'VIEW'},
             success: function(data) {
@@ -1437,6 +1444,90 @@ jQuery(document).ready(function($) {
       if (vanilla_identifier && comment != '' && comment != placeholder)
          stash('CommentForForeignID_' + vanilla_identifier, comment);
    });
+   
+   function tweets() {
+      $('div.twitter-card').each(function(i, el){
+         var card = $(el);
+         var tweetUrl = card.attr('data-tweeturl');
+         var tweetID = card.attr('data-tweetid');
+         var cardref = card.get(0);
+
+         twttr.widgets.createTweet(
+            tweetID,
+            cardref,
+            function(iframe){ card.find('a.tweet-url').remove(); },
+            {
+               conversation: "none"
+            }
+         );
+
+      });
+   }
+   
+   /**
+    * GitHub commit embedding
+    * 
+    */
+   
+// @tim : 2013-08-24
+// Experiment on hold.
+//   if ($('div.github-commit').length) {
+//      // Github embed library
+//      window.GitHubCommit = (function (d,s,id) {
+//         var t, js, fjs = d.getElementsByTagName(s)[0];
+//         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
+//         js.src=gdn.url('js/library/github.embed.js'); fjs.parentNode.insertBefore(js, fjs);
+//         return window.GitHubCommit || (t = { _e: [], ready: function(f){ t._e.push(f) } });
+//      }(document, "script", "github-embd"));
+//
+//      GitHubCommit.ready(function(GitHubCommit){
+//         setTimeout(commits, 300);
+//      });
+//   }
+//   
+//   function commits(GitHubCommit) {
+//      $('div.github-commit').each(function(i, el){
+//         var commit = $(el);
+//         var commiturl = commit.attr('data-commiturl');
+//         var commituser = commit.attr('data-commituser');
+//         var commitrepo = commit.attr('data-commitrepo');
+//         var commithash = commit.attr('data-commithash');
+//         console.log(el);
+//      });
+//   }
+
+   /**
+    * Vine image embedding
+    * 
+    */
+   
+   // Automatic, requires no JS
+   
+   /**
+    * Pintrest pin embedding
+    * 
+    */
+   
+   if ($('a.pintrest-pin').length) {
+      (function(d){
+         var f = d.getElementsByTagName('SCRIPT')[0], p = d.createElement('SCRIPT');
+         p.type = 'text/javascript';
+         p.async = true;
+         p.src = '//assets.pinterest.com/js/pinit.js';
+         f.parentNode.insertBefore(p, f);
+       }(document));
+   }
+   
+   /**
+    * Textarea autogrow
+    * 
+    */
+   
+   if ($.fn.autogrow) {
+      $('textarea.Autogrow').livequery(function() {
+         $(this).autogrow();
+      });
+   }
    
 });
 

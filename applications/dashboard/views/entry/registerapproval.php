@@ -55,6 +55,11 @@
             echo $this->Form->TextBox('DiscoveryText', array('MultiLine' => TRUE, 'Wrap' => TRUE));
          ?>
       </li>
+      <li class="CaptchaInput">
+      <?php
+         echo $this->Form->Label("Security Check", '');
+         echo $this->Form->Captcha();
+      ?></li>
       <?php $this->FireEvent('RegisterBeforeTerms'); ?>
       <li>
          <?php

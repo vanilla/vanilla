@@ -304,7 +304,7 @@ class FacebookPlugin extends Gdn_Plugin {
 //      if (!Gdn::Request()->IsPostBack())
 //         throw PermissionException('Javascript');
       
-      $Row = GetRecord($RecordType, $ID);
+      $Row = GetRecord($RecordType, $ID, TRUE);
       if ($Row) {
          $Message = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
          

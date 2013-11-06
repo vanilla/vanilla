@@ -84,7 +84,8 @@ if(!is_null($Database)) {
          $Query = $SQL->ApplyParameters($Query, $tmp);
       }
       $String .= $QueryInfo['Method']
-         .'<small>'.@number_format($QueryInfo['Time'], 6).'s</small>'
+         .' <small>'.$QueryInfo['connection'].'</small>'
+         .' <small>'.@number_format($QueryInfo['Time'], 6).'s</small> '
          .(isset($QueryInfo['Cache']) ? '<div><b>Cache:</b> '.var_export($QueryInfo['Cache'], TRUE).'</div>' : '')
          .'<pre>'.htmlspecialchars($Query).';</pre>';
    }

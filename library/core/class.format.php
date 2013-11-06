@@ -968,6 +968,9 @@ class Gdn_Format {
     * @return string
     */
    public static function Links($Mixed) {
+      if (!C('Garden.Format.Links', TRUE))
+            return $Mixed;
+      
       if (!is_string($Mixed))
          return self::To($Mixed, 'Links');
       else {
@@ -982,6 +985,10 @@ class Gdn_Format {
             $Regex,
          array('Gdn_Format', 'LinksCallback'),
          $Mixed);
+         
+         Gdn::PluginManager()->FireAs('Format')->FireEvent('Links', array(
+            'Mixed' => &$Mixed
+         ));
 
          return $Mixed;
       }
@@ -1047,26 +1054,77 @@ class Gdn_Format {
          return $Matches[0];
       $Url = $Matches[4];
 
-      if ((preg_match('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches) 
+      $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
+      $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com\/(\d+)';
+      $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
+      $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
+      $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
+      $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
+      $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
+      
+      // Youtube
+      if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 
          || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches)) 
-         && C('Garden.Format.YouTube')) {
+         && C('Garden.Format.YouTube', true)) {
          $ID = $Matches['ID'];
          $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
          $Result = '<span class="VideoWrap">';
             $Result .= '<span class="Video YouTube" id="youtube-'.$ID.'">';
-               $Result .= '<span class="VideoPreview"><a href="http://youtube.com/watch?v='.$ID.'"><img src="http://img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
+               $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$ID.'"><img src="//img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
                $Result .= '<span class="VideoPlayer"></span>';
             $Result .= '</span>';
          $Result .= '</span>';
-      } elseif (preg_match('`(?:https?|ftp)://(www\.)?vimeo\.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
+         
+      // Vimeo
+      } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)) {
          $ID = $Matches[2];
          $Result = <<<EOT
-<div class="VideoWrap"><div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div></div>
+<div class="VideoWrap"><div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="//vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div></div>
 EOT;
+         
+      // Twitter
+      } elseif (preg_match("`{$TwitterUrlMatch}`", $Url, $Matches) && C('Garden.Format.Twitter', true)) {
+         $Result = <<<EOT
+<div class="twitter-card" data-tweeturl="{$Matches[0]}" data-tweetid="{$Matches[1]}"><a href="{$Matches[0]}" class="tweet-url" rel="nofollow" target="_blank">{$Matches[0]}</a></div>
+EOT;
+      
+      // Github
+// @tim : 2013-08-22
+// Experiment on hold
+// 
+//      } elseif (preg_match("`{$GithubCommitUrlMatch}`", $Url, $Matches) && C('Garden.Format.Github', true)) {
+//         $Result = <<<EOT
+//<div class="github-commit" data-commiturl="{$Matches[0]}" data-commituser="{$Matches[1]}" data-commitrepo="{$Matches[2]}" data-commithash="{$Matches[3]}"><a href="{$Matches[0]}" class="commit-url" rel="nofollow" target="_blank">{$Matches[0]}</a></div>
+//EOT;
+
+      // Vine
+      } elseif (preg_match("`{$VineUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Vine', true)) {
+         $Result = <<<EOT
+<div class="VideoWrap">
+   <iframe class="vine-embed" src="//vine.co/v/{$Matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
+</div>
+EOT;
+   
+      // Instagram
+      } elseif (preg_match("`{$InstagramUrlMatch}`i", $Url, $Matches) && C('Garden.Format.Instagram', true)) {
+         $Result = <<<EOT
+<div class="VideoWrap">
+   <iframe src="//instagram.com/p/{$Matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+</div>
+EOT;
+   
+      // Pintrest
+      } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)) {
+         $Result = <<<EOT
+<a data-pin-do="embedPin" href="//pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
+EOT;
+   
+      // Unformatted links
       } elseif (!self::$FormatLinks) {
          $Result = $Url;
-      } else {
          
+      // Formatted links
+      } else {
 
          // Strip punctuation off of the end of the url.
          $Punc = '';
@@ -1216,7 +1274,8 @@ EOT;
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Raw');
       } else {
-         return $Mixed;
+         // Deprecate raw formatting. It's too dangeous.
+         return self::Wysiwyg($Mixed);
       }
    }
 
@@ -1334,9 +1393,10 @@ EOT;
       if (is_string($Mixed)) {
          if (method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
-         } elseif (function_exists($FormatMethod)) {
+         } elseif (function_exists('format'.$FormatMethod)) {
+            $FormatMethod = 'format'.$FormatMethod;
             $Mixed = $FormatMethod($Mixed);
-         } elseif ($Formatter = Gdn::Factory($FormatMethod.'Formatter')) {;
+         } elseif ($Formatter = Gdn::Factory($FormatMethod.'Formatter')) {
             $Mixed = $Formatter->Format($Mixed);
          } else {
             $Mixed = Gdn_Format::Text($Mixed);

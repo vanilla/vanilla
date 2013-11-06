@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Social Connect',
    'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.0.4',
+   'Version' => '1.1.7',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -302,7 +302,7 @@ class TwitterPlugin extends Gdn_Plugin {
 //      if (!Gdn::Request()->IsPostBack())
 //         throw PermissionException('Javascript');
       
-      $Row = GetRecord($RecordType, $ID);
+      $Row = GetRecord($RecordType, $ID, TRUE);
       if ($Row) {
          // Grab the tweet message.
          switch (strtolower($RecordType)) {

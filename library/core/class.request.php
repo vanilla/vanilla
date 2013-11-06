@@ -124,7 +124,7 @@ class Gdn_Request {
     */
    public function __call($Method, $Args) {
       $Matches = array();
-      if (preg_match('/^(Request)(.*)$/',$Method,$Matches)) {
+      if (preg_match('/^(Request)(.*)$/i',$Method,$Matches)) {
          $PassedArg = (is_array($Args) && sizeof($Args)) ? $Args[0] : NULL;
          return $this->_EnvironmentElement(strtoupper($Matches[2]),$PassedArg);
       }
@@ -347,7 +347,16 @@ class Gdn_Request {
       // Request IP
       
       // Loadbalancers
-      $IP = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? GetValue('HTTP_X_FORWARDED_FOR',$_SERVER) : $_SERVER['REMOTE_ADDR'];
+      if ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_X_CLUSTER_CLIENT_IP')) {
+         $IP = $TestIP;
+      } elseif ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_CLIENT_IP')) {
+         $IP = $TestIP;
+      } elseif ($TestIP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_X_FORWARDED_FOR')) {
+         $IP = $TestIP;
+      } else {
+         $IP = $this->GetValueFrom(Gdn_Request::INPUT_SERVER, 'REMOTE_ADDR');
+      }
+      
       if (strpos($IP, ',') !== FALSE) {
          $Matched = preg_match_all('/([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})(?:, )?/i', $IP, $Matches);
          

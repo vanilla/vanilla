@@ -83,7 +83,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *
     * @var array The data from method calls.
     */
-   public $Data = array();
+   public $Data;
 
    /**
     * The Head module that this controller should use to add CSS files.
@@ -339,6 +339,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->Assets = array();
       $this->ControllerFolder = '';
       $this->CssClass = '';
+      $this->Data = array();
       $this->Head = Gdn::Factory('Dummy');
       $this->MasterView = '';
       $this->ModuleSortContainer = '';
@@ -680,7 +681,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('ResolvedArgs', $this->_Definitions)) {
          if (sizeof($this->ReflectArgs) && (
                  (isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof Gdn_Pluggable) ||
-                 (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable)
+                 (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable) || 
+                 (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof Gdn_Pluggable)
                ))
             $ReflectArgs = json_encode(array_slice($this->ReflectArgs, 1));
          else
@@ -1370,6 +1372,10 @@ class Gdn_Controller extends Gdn_Pluggable {
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }
       
+      if (Debug() && $Trace = Trace()) {
+         $Data['Trace'] = $Trace;
+      }
+      
       // Make sure the database connection is closed before exiting.
       $this->EventArguments['Data'] = &$Data;
       $this->Finalize();
@@ -1382,7 +1388,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       
-      $this->SendHeaders();
+//      $this->SendHeaders();
 
       // Check for a special view.
       $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), false, false, false);
@@ -1392,8 +1398,11 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       // Add schemes to to urls.
-      $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
+      if (!C('Garden.AllowSSL') || C('Garden.ForceSSL')) {
+         $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
+      }
       
+      @ob_clean();
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             header('Content-Type: text/xml', true);
@@ -1524,7 +1533,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       
       // Try cleaning out any notices or errors.
-      @@ob_clean();
+      @ob_clean();
       
 
       if ($Code >= 400 && $Code <= 505)

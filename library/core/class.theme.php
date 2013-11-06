@@ -274,7 +274,6 @@ class Gdn_Theme {
             } else {
                if(!$Text)
                   $Text = T('Sign In');
-               $Attribs = array();
 
                $Path = SignInUrl($Target);
                if (SignInPopup() && strpos(Gdn::Request()->Url(), 'entry') === FALSE)
@@ -325,6 +324,16 @@ class Gdn_Theme {
    }
 
    public static function Module($Name, $Properties = array()) {
+      if (isset($Properties['cache'])) {
+         $Key = isset($Properties['cachekey']) ? $Properties['cachekey'] : 'module.'.$Name;
+         
+         $Result = Gdn::Cache()->Get($Key);
+         if ($Result !== Gdn_Cache::CACHEOP_FAILURE) {
+//            Trace('Module: '.$Result, $Key);
+            return $Result;
+         }
+      }
+      
       try {
          if (!class_exists($Name)) {
             if (Debug())
@@ -346,6 +355,12 @@ class Gdn_Theme {
          else
             $Result = $Ex->getMessage();
       }
+      
+      if (isset($Key)) {
+//         Trace($Result, "Store $Key");
+         Gdn::Cache()->Store($Key, $Result, array(Gdn_Cache::FEATURE_EXPIRY => $Properties['cache']));
+      }
+      
       return $Result;
    }
    

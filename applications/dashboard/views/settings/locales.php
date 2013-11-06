@@ -6,7 +6,7 @@ $Session = Gdn::Session();
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
    echo '<li>', Anchor(T('Enabling a Locale Pack'), 'http://vanillaforums.org/docs/Localization#Enabling'), '</li>';
-   echo '<li>', Anchor(T('Internaltionalization & Localization'), 'http://vanillaforums.org/docs/Localization'), '</li>';
+   echo '<li>', Anchor(T('Internationalization & Localization'), 'http://vanillaforums.org/docs/Localization'), '</li>';
    echo '</ul>';
    ?>
 </div>

@@ -20,6 +20,9 @@ if ($Session->CheckPermission('Garden.Users.Approve')) {
    $DashboardCount += $ApplicantCount;
 }
 
+$this->EventArguments['DashboardCount'] = &$DashboardCount;
+$this->FireEvent('BeforeFlyoutMenu');
+
 if ($Session->IsValid()):
    echo '<div class="MeBox'.$CssClass.'">';
    echo UserPhoto($User);

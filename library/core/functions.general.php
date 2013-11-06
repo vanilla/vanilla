@@ -66,6 +66,120 @@ if (!function_exists('AddActivity')) {
    }
 }
 
+
+/**
+ * This file is part of the array_column library
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @copyright Copyright (c) 2013 Ben Ramsey <http://benramsey.com>
+ * @license http://opensource.org/licenses/MIT MIT
+ */
+
+if (!function_exists('array_column')):
+
+/**
+ * Returns the values from a single column of the input array, identified by
+ * the $columnKey.
+ *
+ * Optionally, you may provide an $indexKey to index the values in the returned
+ * array by the values from the $indexKey column in the input array.
+ *
+ * @param array $input A multi-dimensional array (record set) from which to pull
+ *                     a column of values.
+ * @param mixed $columnKey The column of values to return. This value may be the
+ *                         integer key of the column you wish to retrieve, or it
+ *                         may be the string key name for an associative array.
+ * @param mixed $indexKey (Optional.) The column to use as the index/keys for
+ *                        the returned array. This value may be the integer key
+ *                        of the column, or it may be the string key name.
+ * @return array
+ */
+function array_column($input = null, $columnKey = null, $indexKey = null) {
+    // Using func_get_args() in order to check for proper number of
+    // parameters and trigger errors exactly as the built-in array_column()
+    // does in PHP 5.5.
+    $argc = func_num_args();
+    $params = func_get_args();
+
+    if ($argc < 2) {
+        trigger_error("array_column() expects at least 2 parameters, {$argc} given", E_USER_WARNING);
+        return null;
+    }
+
+    if (!is_array($params[0])) {
+        trigger_error('array_column() expects parameter 1 to be array, ' . gettype($params[0]) . ' given', E_USER_WARNING);
+        return null;
+    }
+
+    if (!is_int($params[1])
+        && !is_float($params[1])
+        && !is_string($params[1])
+        && $params[1] !== null
+        && !(is_object($params[1]) && method_exists($params[1], '__toString'))
+    ) {
+        trigger_error('array_column(): The column key should be either a string or an integer', E_USER_WARNING);
+        return false;
+    }
+
+    if (isset($params[2])
+        && !is_int($params[2])
+        && !is_float($params[2])
+        && !is_string($params[2])
+        && !(is_object($params[2]) && method_exists($params[2], '__toString'))
+    ) {
+        trigger_error('array_column(): The index key should be either a string or an integer', E_USER_WARNING);
+        return false;
+    }
+
+    $paramsInput = $params[0];
+    $paramsColumnKey = ($params[1] !== null) ? (string) $params[1] : null;
+
+    $paramsIndexKey = null;
+    if (isset($params[2])) {
+        if (is_float($params[2]) || is_int($params[2])) {
+            $paramsIndexKey = (int) $params[2];
+        } else {
+            $paramsIndexKey = (string) $params[2];
+        }
+    }
+
+    $resultArray = array();
+
+    foreach ($paramsInput as $row) {
+
+        $key = $value = null;
+        $keySet = $valueSet = false;
+
+        if ($paramsIndexKey !== null && array_key_exists($paramsIndexKey, $row)) {
+            $keySet = true;
+            $key = (string) $row[$paramsIndexKey];
+        }
+
+        if ($paramsColumnKey === null) {
+            $valueSet = true;
+            $value = $row;
+        } elseif (is_array($row) && array_key_exists($paramsColumnKey, $row)) {
+            $valueSet = true;
+            $value = $row[$paramsColumnKey];
+        }
+
+        if ($valueSet) {
+            if ($keySet) {
+                $resultArray[$key] = $value;
+            } else {
+                $resultArray[] = $value;
+            }
+        }
+
+    }
+
+    return $resultArray;
+}
+
+endif;
+
 if (!function_exists('ArrayCombine')) {
    /**
     * PHP's array_combine has a limitation that doesn't allow array_combine to
@@ -1180,12 +1294,14 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                   $Result = UserAnchor($User);
                } else {
                   $Max = C('Garden.FormatUsername.Max', 5);
+                  // See if there is another count.
+                  $ExtraCount = GetValueR($Field.'_Count', $Args, 0);
 
                   $Count = count($Value);
                   $Result = '';
                   for ($i = 0; $i < $Count; $i++) {
                      if ($i >= $Max && $Count > $Max + 1) {
-                        $Others = $Count - $i;
+                        $Others = $Count - $i + $ExtraCount;
                         $Result .= ' '.T('sep and', 'and').' '
                            .Plural($Others, '%s other', '%s others');
                         break;
@@ -1445,30 +1561,51 @@ if (!function_exists('GetPostValue')) {
 
 if (!function_exists('GetRecord')):
 
-function GetRecord($RecordType, $ID) {
+function GetRecord($RecordType, $ID, $ThrowError = FALSE) {
+   $Row = FALSE;
+   
    switch(strtolower($RecordType)) {
       case 'discussion':
          $Model = new DiscussionModel();
          $Row = $Model->GetID($ID);
          $Row->Url = DiscussionUrl($Row);
          $Row->ShareUrl = $Row->Url;
-         return (array)$Row;
+         if ($Row)
+            return (array)$Row;
+         break;
       case 'comment':
          $Model = new CommentModel();
          $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
-         $Row['Url'] = Url("/discussion/comment/$ID#Comment_$ID", TRUE);
-         
-         $Model = new DiscussionModel();
-         $Discussion = $Model->GetID($Row['DiscussionID']);
-         $Discussion->Url = DiscussionUrl($Discussion);
-         $Row['ShareUrl'] = $Discussion->Url;
-         $Row['Name'] = $Discussion->Name;
-         $Row['Discussion'] = (array)$Discussion;
-         
-         return $Row;
+         if ($Row) {
+            $Row['Url'] = Url("/discussion/comment/$ID#Comment_$ID", TRUE);
+
+            $Model = new DiscussionModel();
+            $Discussion = $Model->GetID($Row['DiscussionID']);
+            if ($Discussion) {
+               $Discussion->Url = DiscussionUrl($Discussion);
+               $Row['ShareUrl'] = $Discussion->Url;
+               $Row['Name'] = $Discussion->Name;
+               $Row['Discussion'] = (array)$Discussion;
+            }
+            return $Row;
+         }
+         break;
+      case 'activity':
+         $Model = new ActivityModel();
+         $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
+         if ($Row) {
+            $Row['Name'] = FormatString($Row['HeadlineFormat'], $Row);
+            $Row['Body'] = $Row['Story'];
+            return $Row;
+         }
       default:
          throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($RecordType)));
    }
+   
+   if ($ThrowError)
+      throw NotFoundException($RecordType);
+   else
+      return FALSE;
 }
 
 endif;
@@ -1825,6 +1962,103 @@ if (!function_exists('MarkString')):
       }
       return $Haystack;
    }
+endif;
+
+if (!function_exists('JoinRecords')):
+
+/**
+ * Join external records to an array.
+ * @param array $Data The data to join. In order to join records each row must have the a RecordType and RecordID column.
+ * @param string $Column The name of the column to put the record in. If this is blank then the record will be merged into the row.
+ * @param bool $Unset Whether or not to unset rows that don't have a record.
+ * @since 2.3
+ */
+function JoinRecords(&$Data, $Column = '', $Unset = FALSE) {
+   $IDs = array();
+   $AllowedCats = DiscussionModel::CategoryPermissions();
+
+   if ($AllowedCats === FALSE) {
+      // This user does not have permission to view anything.
+      $Data = array();
+      return;
+   }
+
+   // Gather all of the ids to fetch.
+   foreach ($Data as &$Row) {
+      if (!$Row['RecordType'])
+         continue;
+      
+      $RecordType = ucfirst(StringEndsWith($Row['RecordType'], '-Total', TRUE, TRUE));
+      $Row['RecordType'] = $RecordType;
+      $ID = $Row['RecordID'];
+      $IDs[$RecordType][$ID] = $ID;
+   }
+
+   // Fetch all of the data in turn.
+   $JoinData = array();
+   foreach ($IDs as $RecordType => $RecordIDs) {
+      if ($RecordType == 'Comment') {
+         Gdn::SQL()->Select('d.Name, d.CategoryID')->Join('Discussion d', 'd.DiscussionID = r.DiscussionID');
+      }
+
+      $Rows = Gdn::SQL()->Select('r.*')->WhereIn($RecordType.'ID', array_values($RecordIDs))->Get($RecordType. ' r')->ResultArray();
+      $JoinData[$RecordType] = Gdn_DataSet::Index($Rows, array($RecordType.'ID'));
+   }
+
+   // Join the rows.
+   $Unsets = array();
+   foreach ($Data as $Index => &$Row) {
+      $RecordType = $Row['RecordType'];
+      $ID = $Row['RecordID'];
+
+      if (!isset($JoinData[$RecordType][$ID])) {
+         if ($Unset) {
+            $Unsets[] = $Index;
+         }
+         continue; // orphaned?
+      }
+
+      $Record = $JoinData[$RecordType][$ID];
+
+      if ($AllowedCats !== TRUE) {
+         // Check to see if the user has permission to view this record.
+         $CategoryID = GetValue('CategoryID', $Record, -1);
+         if (!in_array($CategoryID, $AllowedCats)) {
+            $Unsets[] = $Index;
+            continue;
+         }
+      }
+
+      switch ($RecordType) {
+         case 'Discussion':
+            $Url = DiscussionUrl($Record, '', '/').'#latest';
+            break;
+         case 'Comment':
+            $Url = CommentUrl($Record, '/');
+            $Record['Name'] = sprintf(T('Re: %s'), $Record['Name']);
+            break;
+         default:
+            $Url = '';
+      }
+      $Record['Url'] = $Url;
+      
+      if ($Column)
+         $Row[$Column] = $Record;
+      else
+         $Row = array_merge($Row, $Record);
+   }
+
+   foreach ($Unsets as $Index) {
+      unset($Data[$Index]);
+   }
+
+   // Join the users.
+   Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
+
+   if (!empty($Unsets))
+      $Data = array_values($Data);
+}
+
 endif;
 
 if (!function_exists('MergeArrays')) {

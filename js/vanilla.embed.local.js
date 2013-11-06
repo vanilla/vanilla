@@ -29,6 +29,12 @@
    
    Vanilla.parent.signout = function() { $.post('/entry/signout.json'); };
    
+   Vanilla.scrollTo = function(q) {
+      var top = $(q).offset().top;
+      Vanilla.parent.callRemote('scrollTo', top);
+      return false;
+   };
+   
    Vanilla.urlType = function(url) {
       var regex = /^#/;
       if (regex.test(url))

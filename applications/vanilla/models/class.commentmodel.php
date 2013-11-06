@@ -590,16 +590,20 @@ class CommentModel extends VanillaModel {
     * 
     * @param int $CommentID Unique ID of the comment.
     * @param string $ResultType Format to return comment in.
+    * @param array $Options options to pass to the database.
     * @return mixed SQL result in format specified by $ResultType.
 	 */
-   public function GetID($CommentID, $ResultType = DATASET_TYPE_OBJECT) {
+   public function GetID($CommentID, $ResultType = DATASET_TYPE_OBJECT, $Options = array()) {
+      $this->Options($Options);
+      
       $this->CommentQuery(FALSE); // FALSE supresses FireEvent
       $Comment = $this->SQL
          ->Where('c.CommentID', $CommentID)
          ->Get()
          ->FirstRow($ResultType);
       
-      $this->Calculate($Comment);
+      if ($Comment)
+         $this->Calculate($Comment);
       return $Comment;
    }
    
@@ -612,9 +616,11 @@ class CommentModel extends VanillaModel {
     * @param int $CommentID Unique ID of the comment.
     * @return object SQL result.
 	 */
-   public function GetIDData($CommentID) {
+   public function GetIDData($CommentID, $Options = array()) {
       $this->FireEvent('BeforeGetIDData');
       $this->CommentQuery(FALSE); // FALSE supresses FireEvent
+      $this->Options($Options);
+      
       return $this->SQL
          ->Where('c.CommentID', $CommentID)
          ->Get();
@@ -798,6 +804,7 @@ class CommentModel extends VanillaModel {
                // Log the save.
                LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));
                // Save the new value.
+               $this->SerializeRow($Fields);
                $this->SQL->Put($this->Name, $Fields, array('CommentID' => $CommentID));
             } else {
                // Make sure that the comments get formatted in the method defined by Garden.
@@ -819,12 +826,16 @@ class CommentModel extends VanillaModel {
                	return UNAPPROVED;
                }
 
-               // Create comment
+               // Create comment.
+               $this->SerializeRow($Fields);
                $CommentID = $this->SQL->Insert($this->Name, $Fields);
-	            $this->EventArguments['CommentID'] = $CommentID;
-	               
-	            // IsNewDiscussion is passed when the first comment for new discussions are created.
-	            $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
+            }
+            if ($CommentID) {
+               $this->EventArguments['CommentID'] = $CommentID;
+               $this->EventArguments['Insert'] = $Insert;
+
+               // IsNewDiscussion is passed when the first comment for new discussions are created.
+               $this->EventArguments['IsNewDiscussion'] = GetValue('IsNewDiscussion', $FormPostValues);
                $this->FireEvent('AfterSaveComment');
             }
          }
@@ -832,7 +843,7 @@ class CommentModel extends VanillaModel {
       
       // Update discussion's comment count
       $DiscussionID = GetValue('DiscussionID', $FormPostValues);
-      $this->UpdateCommentCount($DiscussionID);
+      $this->UpdateCommentCount($DiscussionID, array('Slave' => FALSE));
 
       return $CommentID;
    }
@@ -877,14 +888,21 @@ class CommentModel extends VanillaModel {
       if ($Insert) {
 			// UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
 			if ($Discussion->CategoryID > 0) {
-				$CountComments = $this->SQL
-					->Select('CountComments', 'sum', 'CountComments')
-					->From('Discussion')
-					->Where('CategoryID', $Discussion->CategoryID)
-					->Get()
-					->FirstRow()
-					->CountComments;
+            $Category = CategoryModel::Categories($Discussion->CategoryID);
             
+            if ($Category) {
+               $CountComments = GetValue('CountComments', $Category, 0) + 1;
+               
+               if ($CountComments < 1000 || $CountComments % 20 == 0) {
+                  $CountComments = $this->SQL
+                     ->Select('CountComments', 'sum', 'CountComments')
+                     ->From('Discussion')
+                     ->Where('CategoryID', $Discussion->CategoryID)
+                     ->Get()
+                     ->FirstRow()
+                     ->CountComments;
+               }
+            }
             $CategoryModel = new CategoryModel();
             
             $CategoryModel->SetField($Discussion->CategoryID, array(
@@ -1069,15 +1087,21 @@ class CommentModel extends VanillaModel {
     * @access public
     *
     * @param int $DiscussionID Unique ID of the discussion we are updating.
+    * @param array $Options
+    * 
+    * @since 2.3 Added the $Options parameter.
     */
-   public function UpdateCommentCount($Discussion) {
+   public function UpdateCommentCount($Discussion, $Options = array()) {
       // Get the discussion.
-      if (is_numeric($Discussion))
+      if (is_numeric($Discussion)) {
+         $this->Options($Options);
          $Discussion = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Discussion))->FirstRow(DATASET_TYPE_ARRAY);
+      }
       $DiscussionID = $Discussion['DiscussionID'];
 
       $this->FireEvent('BeforeUpdateCommentCountQuery');
-      
+
+      $this->Options($Options);
       $Data = $this->SQL
          ->Select('c.CommentID', 'min', 'FirstCommentID')
          ->Select('c.CommentID', 'max', 'LastCommentID')
@@ -1207,6 +1231,7 @@ class CommentModel extends VanillaModel {
          ->Where('CountComments >', $Offset)
          ->Put();
 
+      $this->EventArguments['Discussion'] = $Discussion;
       $this->FireEvent('DeleteComment');
 
       // Log the deletion.
@@ -1217,7 +1242,7 @@ class CommentModel extends VanillaModel {
       $this->SQL->Delete('Comment', array('CommentID' => $CommentID));
 
       // Update the comment count
-      $this->UpdateCommentCount($Discussion);
+      $this->UpdateCommentCount($Discussion, array('Slave' => FALSE));
 
       // Update the user's comment count
       $this->UpdateUser($Comment['InsertUserID']);
@@ -1259,7 +1284,9 @@ class CommentModel extends VanillaModel {
     */
    public function Calculate($Comment) {
       
-      // Do nothing yet
+      // Do nothing yet.
+      if ($Attributes = GetValue('Attributes', $Comment))
+         SetValue('Attributes', $Comment, unserialize($Attributes));
       
       $this->EventArguments['Comment'] = $Comment;
       $this->FireEvent('SetCalculatedFields');

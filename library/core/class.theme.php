@@ -342,6 +342,11 @@ class Gdn_Theme {
          } else {
                $Module = new $Name(Gdn::Controller(), '');
                $Module->Visible = TRUE;
+
+               // Add properties passed in from the controller.
+               $ControllerProperties = Gdn::Controller()->Data('_properties.'.strtolower($Name), array());
+               $Properties = array_merge($ControllerProperties, $Properties);
+               
                foreach ($Properties as $Name => $Value) {
                   $Module->$Name = $Value;
                }

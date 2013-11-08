@@ -589,10 +589,10 @@ class ProfileController extends Gdn_Controller {
       $this->GetUserInfo();
       
       $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('UserID', $this->User->UserID);
       $this->AddDefinition('Username', $this->User->Name);
       
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
+         $this->Form->SetFormValue('UserID', $this->User->UserID);
          $this->UserModel->DefineSchema();
 //         $this->UserModel->Validation->AddValidationField('OldPassword', $this->Form->FormValues());
          

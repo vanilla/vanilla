@@ -2168,6 +2168,29 @@ dl.About dt.Posts { background-position: 0 -113px; }
 dl.About dd {
    padding: 0 8px 0 0;
 }
+
+/* Invitations */
+.Invitations.DataTable {
+   margin: 15px 0;
+}
+.Invitations.DataTable th {
+   text-align: left;
+}
+.Invitations.DataTable th {
+   padding: 4px;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+   vertical-align: top;
+}
+.Invitations th.InviteMeta {
+   width: 20%;
+}
+.InviteForm {
+   margin: 5px 0;
+}
+.InviteForm label {
+   display: block
+}
+
 /* ======================================================== Thumbnail Cropper */
 .Popup .CurrentPicture {
 	display: none;
@@ -2517,7 +2540,7 @@ div.Popup form ul li label.RadioLabel {
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 	vertical-align: top;
 }
-.DataTable thead td {
+.DataTable thead td, .DataTable thead th {
 	font-weight: bold;
    vertical-align: bottom;
 }

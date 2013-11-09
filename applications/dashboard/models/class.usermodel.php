@@ -665,7 +665,13 @@ class UserModel extends Gdn_Model {
       return $Data;
       
    }
-   
+
+   /**
+    * Force gender to be a verified value.
+    *
+    * @param $Value
+    * @return string
+    */
    public static function FixGender($Value) {
       if (!$Value || !is_string($Value))
          return 'u';
@@ -677,7 +683,7 @@ class UserModel extends Gdn_Model {
       if (!in_array($Value, array('u', 'm', 'f')))
          $Value = 'u';
       
-      return 'u';
+      return $Value;
    }
    
    /**

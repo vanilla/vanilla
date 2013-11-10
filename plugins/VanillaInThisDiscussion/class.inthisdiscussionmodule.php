@@ -29,7 +29,8 @@ class InThisDiscussionModule extends Gdn_Module {
          ->Join('Comment c', 'u.UserID = c.InsertUserID')
          ->Where('c.DiscussionID', $DiscussionID)
          ->GroupBy('u.UserID, u.Name')
-         ->OrderBy('u.Name', 'asc')
+         ->OrderBy('c.DateInserted', 'desc')
+         ->Limit($Limit)
          ->Get();
    }
 

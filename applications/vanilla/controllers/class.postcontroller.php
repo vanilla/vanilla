@@ -702,7 +702,6 @@ class PostController extends VanillaController {
 //								if ($DisplayNewCommentOnly)
                         $this->Offset = $this->CommentModel->GetOffset($CommentID);
                         $Comments = $this->CommentModel->GetIDData($CommentID, array('Slave' => FALSE));
-                        $Comments['Attributes'] = Gdn_Format::Unserialize($Comments['Attributes']);
                         $this->SetData('Comments', $Comments);
 
                         $this->SetData('NewComments', TRUE);
@@ -748,6 +747,9 @@ class PostController extends VanillaController {
                $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
             }
             $Comment['InsertPhoto'] = $Photo;
+
+            // Set Attributes
+            $Comment['Attributes'] = Gdn_Format::Unserialize($Comment['Attributes']);
          }
          $this->Data = array('Comment' => $Comment);
          $this->RenderData($this->Data);

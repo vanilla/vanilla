@@ -702,7 +702,7 @@ class PostController extends VanillaController {
 //								if ($DisplayNewCommentOnly)
                         $this->Offset = $this->CommentModel->GetOffset($CommentID);
                         $Comments = $this->CommentModel->GetIDData($CommentID, array('Slave' => FALSE));
-                        SetValue('Attributes', $Comments, Gdn_Format::Unserialize(GetValue('Attributes', $Comments)));
+                        $Comments['Attributes'] = Gdn_Format::Unserialize($Comments['Attributes']);
                         $this->SetData('Comments', $Comments);
 
                         $this->SetData('NewComments', TRUE);

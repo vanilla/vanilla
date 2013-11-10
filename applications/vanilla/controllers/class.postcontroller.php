@@ -741,15 +741,13 @@ class PostController extends VanillaController {
       if ($this->DeliveryType() == DELIVERY_TYPE_DATA) {
          $Comment = $this->Data('Comments')->FirstRow(DATASET_TYPE_ARRAY);
          if ($Comment) {
-            // Set Photo
             $Photo = $Comment['InsertPhoto'];
+            
             if (strpos($Photo, '//') === FALSE) {
                $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
             }
+            
             $Comment['InsertPhoto'] = $Photo;
-
-            // Set Attributes
-            $Comment['Attributes'] = Gdn_Format::Unserialize($Comment['Attributes']);
          }
          $this->Data = array('Comment' => $Comment);
          $this->RenderData($this->Data);

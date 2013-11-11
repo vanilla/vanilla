@@ -630,6 +630,9 @@ function SearchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
          continue;
       
       foreach ($SearchTerms as $Term) {
+         if (!$Term)
+            continue;
+         
          if (($Pos = mb_stripos($Line, $Term)) !== FALSE) {
             $Line = substrWord($Line, $Term, $Length);
             

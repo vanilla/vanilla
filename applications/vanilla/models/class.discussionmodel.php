@@ -1735,6 +1735,10 @@ class DiscussionModel extends VanillaModel {
             continue;
 
          $UserID = $Row['UserID'];
+         // Check user can still see the discussion.
+         if (!Gdn::UserModel()->GetCategoryViewPermission($UserID, $Category['CategoryID']))
+            continue;
+            
          $Name = $Row['Name'];
          if (strpos($Name, '.Email.') !== FALSE) {
             $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;

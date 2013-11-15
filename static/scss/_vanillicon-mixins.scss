@@ -1,0 +1,20 @@
+// Vanillicon Mixins
+// -----------------------------------------------------------------------------
+
+@mixin icon {
+    display: inline-block;
+    min-width: 1em;
+    font: {
+        family: "vanillicon";
+        variant: normal;
+        weight: normal;
+        style: normal;
+    };
+    text: {
+        align: center;
+        decoration: inherit;
+        transform: none;
+    };
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}

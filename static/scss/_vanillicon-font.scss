@@ -1,0 +1,8 @@
+// Vanillicon Font
+// -----------------------------------------------------------------------------
+
+@include font-face("vanillicon", font-files(
+    "vanillicon.woff", "woff",
+    "vanillicon.ttf", "truetype",
+    "vanillicon.svg", "svg"
+), "vanillicon.eot", normal, normal);

@@ -16,7 +16,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @param Smarty The smarty object rendering the template.
  * @return The url.
  */
-function smarty_function_logo($Params, &$Smarty) {
-   $Result = Gdn_Theme::Logo('Title');
+function smarty_function_mobile_logo($Params, &$Smarty) {
+   $Result = Gdn_Theme::MobileLogo('Title');
 	return $Result;
 }

@@ -1464,7 +1464,8 @@ class CategoryModel extends Gdn_Model {
 
          if ($Insert === FALSE) {
             $OldCategory = $this->GetID($CategoryID, DATASET_TYPE_ARRAY);
-            $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
+            if (NULL === GetValue('AllowDiscussions', $FormPostValues, NULL))
+               $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
             
             // Figure out custom points.

@@ -319,14 +319,15 @@ class Gdn_Form extends Gdn_Pluggable {
       if (is_array($SafeCategoryData)) {
          foreach($SafeCategoryData as $CategoryID => $Category) {
             $Depth = GetValue('Depth', $Category, 0);
-            $Disabled = $Depth == 1 && $DoHeadings;
+            $Disabled = (($Depth == 1 && $DoHeadings) || !$Category['AllowDiscussions']);
             $Selected = in_array($CategoryID, $Value) && $HasValue;
             if ($ForceCleanSelection && $Depth > 1) {
                $Selected = TRUE;
                $ForceCleanSelection = FALSE;
             }
-            
-            $Disabled &= $Permission == 'add' && !$Category['PermsDiscussionsAdd'];
+
+            if ($Category['AllowDiscussions'])
+               $Disabled &= $Permission == 'add' && !$Category['PermsDiscussionsAdd'];
 
             $Return .= '<option value="' . $CategoryID . '"';
             if ($Disabled)

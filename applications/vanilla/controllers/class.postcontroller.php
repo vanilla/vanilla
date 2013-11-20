@@ -163,7 +163,7 @@ class PostController extends VanillaController {
       TouchValue('Type', $this->Data, 'Discussion');
       
       // See if we should hide the category dropdown.
-      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0), array('AllowedDiscussionTypes' => $this->Data['Type']));
+      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0, 'AllowDiscussions' => 1), array('AllowedDiscussionTypes' => $this->Data['Type']));
       if (count($AllowedCategories) == 1) {
          $AllowedCategory = array_pop($AllowedCategories);
          $this->ShowCategorySelector = FALSE;
@@ -214,7 +214,7 @@ class PostController extends VanillaController {
                if ($this->Form->GetFormValue('Sink', '') && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
-               if (!isset($this->Discussion) && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               if (!isset($this->Discussion) && (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID) || ! $this->Category->AllowDiscussions))
                   $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
             }
 

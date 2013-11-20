@@ -269,7 +269,7 @@ class NavModule extends Gdn_Module {
     * @param int $depth The current recursive depth used to prevent inifinite recursion.
     * @return number
     */
-   protected static function sortItemsOrder($item, $items, $depth = 0) {
+   public static function sortItemsOrder($item, $items, $depth = 0) {
       $default_sort = val('_sort', $item, 100);
 
       // Check to see if a custom sort has been specified.

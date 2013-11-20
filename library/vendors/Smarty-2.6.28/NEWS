@@ -1,3 +1,6 @@
+- revert super global access changes, and instead rely on
+  USE_SUPER_GLOBALS for security
+
 Version 2.6.25 (May 19th, 2009)
 -------------------------------
 - fix E_NOTICE when sessions are disabled (mohrt)

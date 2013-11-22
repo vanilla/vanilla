@@ -38,7 +38,7 @@ jQuery(document).ready(function($) {
    $('.CommentButton, a.PreviewButton, a.DraftButton').livequery('click', function() {
       var btn = this;
       var parent = $(btn).parents('div.CommentForm, div.EditCommentForm');
-      var frm = $(parent).find('form');
+      var frm = $(parent).find('form').first();
       var textbox = $(frm).find('textarea');
       var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
       var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');

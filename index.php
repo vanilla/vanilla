@@ -1,6 +1,6 @@
 <?php
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.0.18.8');
+define('APPLICATION_VERSION', '2.0.18.9');
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -23,13 +23,13 @@ if (isset($_GET['xhprof']) && $_GET['xhprof'] == 'yes')
 
 if (defined('PROFILER') && PROFILER) {
    $ProfileWhat = 0;
-   
+
    if (isset($_GET['memory']) && $_GET['memory'] == 'yes')
       $ProfileWhat += XHPROF_FLAGS_MEMORY;
-   
+
    if (isset($_GET['cpu']) && $_GET['cpu'] == 'yes')
       $ProfileWhat += XHPROF_FLAGS_CPU;
-   
+
    xhprof_enable($ProfileWhat);
 }
 
@@ -56,13 +56,13 @@ $Dispatcher->Cleanup();
 // 5. Finish profiling and save results to disk, if requested
 if (defined('PROFILER') && PROFILER) {
    $xhprof_data = xhprof_disable();
-   
+
    if (is_null($XHPROF_ROOT))
       die("Unable to save XHProf data. \$XHPROF_ROOT not defined in index.php");
 
    if (is_null($XHPROF_SERVER_NAME))
       die("Unable to save XHProf data. \$XHPROF_SERVER_NAME not defined in index.php");
-   
+
    //
    // Saving the XHProf run
    // using the default implementation of iXHProfRuns.
@@ -73,7 +73,7 @@ if (defined('PROFILER') && PROFILER) {
    $xhprof_runs = new XHProfRuns_Default();
    $xhprof_namespace = 'vanilla';
 
-   // Save the run under a namespace              
+   // Save the run under a namespace
    //
    // **NOTE**:
    // By default save_run() will automatically generate a unique

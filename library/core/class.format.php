@@ -609,6 +609,20 @@ class Gdn_Format {
    }
 
    /**
+    * Return the default input formatter.
+    * 
+    * @param bool|null $is_mobile Whether or not you want the format for mobile browsers.
+    * @return string
+    */
+   public static function DefaultFormat($is_mobile = NULL) {
+      if ($is_mobile === true || ($is_mobile === null && IsMobile())) {
+         return C('Garden.MobileInputFormatter', C('Garden.InputFormatter', 'Html'));
+      } else {
+         return C('Garden.InputFormatter', 'Html');
+      }
+   }
+
+   /**
     * Takes a mixed variable, formats it for display on the screen, and returns
     * it.
     *

@@ -326,7 +326,7 @@ class ProfileController extends Gdn_Controller {
       $this->Form->SetValue('ConfirmEmail', (int)$Confirmed);
 
       // Decide if we can *see* email
-      $this->SetData('_CanViewPersonalInfo',(CheckPermission('Garden.PersonalInfo.View') || CheckPermission('Garden.Users.Edit')));
+      $this->SetData('_CanViewPersonalInfo', Gdn::Session()->UserID == GetValue('UserID', $User) || CheckPermission('Garden.PersonalInfo.View') || CheckPermission('Garden.Users.Edit'));
       
       // Define gender dropdown options
       $this->GenderOptions = array(
@@ -589,10 +589,10 @@ class ProfileController extends Gdn_Controller {
       $this->GetUserInfo();
       
       $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('UserID', $this->User->UserID);
       $this->AddDefinition('Username', $this->User->Name);
       
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
+         $this->Form->SetFormValue('UserID', $this->User->UserID);
          $this->UserModel->DefineSchema();
 //         $this->UserModel->Validation->AddValidationField('OldPassword', $this->Form->FormValues());
          

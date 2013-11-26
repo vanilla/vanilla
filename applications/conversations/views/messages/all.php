@@ -11,10 +11,11 @@ if ($this->Data('_PagerUrl'))
 // Pre Pager
 echo '<div class="PageControls Top">';
    PagerModule::Write($PagerOptions);
-   
-   echo '<div class="BoxButtons BoxNewConversation">';
-   echo Anchor(T('New Message'), '/messages/add', 'Button NewConversation Primary');
-   echo '</div>';
+   if (CheckPermission('Conversations.Conversations.Add')) {
+      echo '<div class="BoxButtons BoxNewConversation">';
+      echo Anchor(T('New Message'), '/messages/add', 'Button NewConversation Primary');
+      echo '</div>';
+   }
 echo '</div>';
 ?>
 <ul class="Condensed DataList Conversations">

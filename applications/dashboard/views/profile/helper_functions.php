@@ -11,11 +11,11 @@ function UserVerified($User) {
    
    if (GetValue('Verified', $User)) {
       $Label = T('Verified');
-      $Title = T('This user has been verified as a non-spammer.');
+      $Title = T('Verified Description', 'Verified users bypass spam and pre-moderation filters.');
       $Url = "/user/verify.json?userid=$UserID&verified=0";
    } else {
       $Label = T('Not Verified');
-      $Title = T('This user has not been verified as a non-spammer.');
+      $Title = T('Not Verified Description', 'Unverified users are passed thru any enabled spam and pre-moderation filters.');
       $Url = "/user/verify.json?userid=$UserID&verified=1";
    }
    

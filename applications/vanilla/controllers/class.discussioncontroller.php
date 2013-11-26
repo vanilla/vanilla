@@ -638,7 +638,7 @@ class DiscussionController extends VanillaController {
             $DefaultTarget = DiscussionUrl($Discussion);
 
             // Make sure comment is this user's or they have Delete permission
-            if ($Comment->InsertUserID != $Session->UserID)
+            if ($Comment->InsertUserID != $Session->UserID || !C('Vanilla.Comments.AllowSelfDelete'))
                $this->Permission('Vanilla.Comments.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
             // Make sure that content can (still) be edited

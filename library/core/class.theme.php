@@ -262,6 +262,11 @@ class Gdn_Theme {
                $Text .= ' <span class="Count">'.$Session->User->CountDiscussions.'</span>';
             }
             break;
+         case 'register':
+            if (!$Text)
+               $Text = T('Register');
+            $Path = RegisterUrl($Target);
+            break;
          case 'signin':
          case 'signinout':
             // The destination is the signin/signout toggle link.

@@ -10,7 +10,7 @@ Vanilla.fn = Vanilla.prototype;
 
 if (!window.console)
    window.console = { log: function() {} };
-   
+
 Vanilla.scrollTo = function(q) {
     var top = $(q).offset().top;
     window.scrollTo(0, top);
@@ -27,14 +27,14 @@ window.Vanilla = Vanilla;
 
 // Stuff to fire on document.ready().
 jQuery(document).ready(function($) {
-      
+
    $.postParseJson = function(json) {
       if (json.Data) json.Data = $.base64Decode(json.Data);
       return json;
    }
-   
+
 	var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-	
+
 	var uTF8Encode = function(string) {
 		string = string.replace(/\x0d\x0a/g, "\x0a");
 		var output = "";
@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
 		}
 		return output;
 	};
-	
+
 	var uTF8Decode = function(input) {
 		var string = "";
 		var i = 0;
@@ -76,7 +76,7 @@ jQuery(document).ready(function($) {
 		}
 		return string;
 	}
-	
+
 	$.extend({
       // private property
       keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
@@ -128,10 +128,10 @@ jQuery(document).ready(function($) {
 			return output;
 		}
 	});
-		
+
 	gdn = {focused: true};
 	gdn.Libraries = {};
-   
+
    $(window).blur(function() {
       gdn.focused = false;
    });
@@ -143,10 +143,10 @@ jQuery(document).ready(function($) {
    gdn.definition = function(definition, defaultVal, set) {
       if (defaultVal == null)
          defaultVal = definition;
-         
+
       var $def = $('#Definitions #' + definition);
       var def;
-      
+
       if(set) {
          $def.val(defaultVal);
          def = defaultVal;
@@ -155,10 +155,10 @@ jQuery(document).ready(function($) {
          if ($def.length == 0)
             def = defaultVal;
       }
-         
+
       return def;
    }
-   
+
    gdn.disable = function(e, progressClass) {
       var href = $(e).attr('href');
       if (href) {
@@ -166,7 +166,7 @@ jQuery(document).ready(function($) {
       }
       $(e).addClass(progressClass ? progressClass : 'InProgress').removeAttr('href').attr('disabled', true);
    }
-   
+
    gdn.enable = function(e) {
       $(e).attr('disabled', false).removeClass('InProgress');
       var href = $.data(e, 'hrefBak');
@@ -175,7 +175,7 @@ jQuery(document).ready(function($) {
          $.removeData(e, 'hrefBak');
       }
    }
-   
+
    gdn.elementSupports = function(element, attribute) {
       var test = document.createElement(element);
       if (attribute in test)
@@ -183,15 +183,15 @@ jQuery(document).ready(function($) {
       else
          return false;
    }
-   
+
    gdn.querySep = function(url) {
       return url.indexOf('?') == -1 ? '?' : '&';
    }
-   
+
    // password strength check
    gdn.password = function(password, username) {
       var translations = gdn.definition('PasswordTranslations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong').split(',');
-      
+
       // calculate entropy
       var alphabet = 0;
       if ( password.match(/[0-9]/) )
@@ -204,14 +204,14 @@ jQuery(document).ready(function($) {
          alphabet += 31;
       var natLog = Math.log(Math.pow(alphabet, password.length));
       var entropy = natLog / Math.LN2;
-      
+
       var response = {
          pass: false,
          symbols: alphabet,
          entropy: entropy,
          score: 0
       };
-      
+
       // reject on length
       var length = password.length;
       response.length = length;
@@ -222,7 +222,7 @@ jQuery(document).ready(function($) {
          response.reason = translations[0];
          return response;
       }
-      
+
       // password1 == username
       if (username) {
          if (password.toLowerCase().indexOf(username.toLowerCase()) >= 0) {
@@ -230,7 +230,7 @@ jQuery(document).ready(function($) {
             return response;
          }
       }
-      
+
       if (entropy < 30) {
          response.score = 1;
          response.reason = translations[2]; // very weak
@@ -247,7 +247,7 @@ jQuery(document).ready(function($) {
          response.score = 5;
          response.reason = translations[6]; // strong
       }
-      
+
       return response;
    }
 
@@ -256,7 +256,7 @@ jQuery(document).ready(function($) {
       document.location = gdn.url('/profile/notifications');
       return false;
    });
-   
+
    // This turns any anchor with the "Popup" class into an in-page pop-up (the
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
@@ -267,7 +267,7 @@ jQuery(document).ready(function($) {
 
    $(document).delegate(".PopupWindow", 'click', function() {
       var $this = $(this);
-      
+
       if ($this.hasClass('NoMSIE') && $.browser.misie) {
          return;
       }
@@ -289,16 +289,16 @@ jQuery(document).ready(function($) {
          win.focus();
       return false;
    });
-   
+
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.
    if ($.fn.popup)
       $('a.Popdown').popup({hijackForms: false});
-   
+
    // This turns SignInPopup anchors into in-page popups
    if ($.fn.popup)
       $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
-   
+
    if ($.fn.popup)
       $(document).delegate('.PopupClose', 'click', function(event){
          var Popup = $(event.target).parents('.Popup');
@@ -328,11 +328,11 @@ jQuery(document).ready(function($) {
    // class.
    if ($.fn.handleAjaxForm)
       $('.AjaxForm').handleAjaxForm();
-   
+
    // Make the highlight effect themable.
    if ($.effects && $.effects.highlight) {
       $.effects.highlight0 = $.effects.highlight;
-      
+
       $.effects.highlight = function(opts) {
          var color = $('#HighlightColor').css('backgroundColor');
          if (color)
@@ -345,19 +345,19 @@ jQuery(document).ready(function($) {
    $('[class^="Toggle-"]').hide(); // hide all toggle containers
    $('.ToggleMenu a').click(function() {
       // Make all toggle buttons and toggle containers inactive
-		$(this).parents('.ToggleMenu').find('li').removeClass('Active'); 
+		$(this).parents('.ToggleMenu').find('li').removeClass('Active');
       $('[class^="Toggle-"]').hide();
 		var item = $(this).parents('li'); // Identify the clicked container
 		// The selector of the container that should be revealed.
       var containerSelector = '.Toggle-' + item.attr('class');
-      containerSelector = containerSelector.replace(/Handle-/gi, ''); 
+      containerSelector = containerSelector.replace(/Handle-/gi, '');
 		// Reveal the container & make the button active
       item.addClass('Active'); // Make the clicked form button active
       $(containerSelector).show();
       return false;
    });
    $('.ToggleMenu .Active a').click(); // reveal the currently active item.
-   
+
 	// Show hoverhelp on hover
 	$('.HoverHelp').hover(
 		function() {
@@ -408,7 +408,7 @@ jQuery(document).ready(function($) {
    gdn.generateString = function(length) {
       if (length == null)
          length = 5;
-         
+
       var chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
       var string = '';
       var pos = 0;
@@ -418,22 +418,22 @@ jQuery(document).ready(function($) {
       }
       return string;
    };
-   
+
    // Combine two paths and make sure that there is only a single directory concatenator
    gdn.combinePaths = function(path1, path2) {
       if (path1.substr(-1, 1) == '/')
          path1 = path1.substr(0, path1.length - 1);
-         
+
       if (path2.substring(0, 1) == '/')
          path2 = path2.substring(1);
-      
+
       return path1 + '/' + path2;
    };
 
    gdn.processTargets = function(targets, $elem, $parent) {
       if(!targets || !targets.length)
          return;
-      
+
       var tar = function(q) {
          switch (q) {
             case '!element':
@@ -444,16 +444,16 @@ jQuery(document).ready(function($) {
                return q;
          }
       }
-      
+
       for(i = 0; i < targets.length; i++) {
          var item = targets[i];
-         
+
          if (jQuery.isArray(item.Target)) {
             $target = $(tar(item.Target[0]), tar(item.Target[1]));
          } else {
             $target = $(tar(item.Target));
          }
-         
+
          switch(item.Type) {
             case 'AddClass':
                $target.addClass(item.Data);
@@ -512,23 +512,23 @@ jQuery(document).ready(function($) {
          }
       }
    };
-   
+
    gdn.requires = function(Library) {
       if (!(Library instanceof Array))
          Library = [Library];
-      
+
       var Response = true;
-      
+
       $(Library).each(function(i,Lib){
          // First check if we already have this library
          var LibAvailable = gdn.available(Lib);
-         
+
          if (!LibAvailable) Response = false;
-         
+
          // Skip any libs that are ready or processing
          if (gdn.Libraries[Lib] === false || gdn.Libraries[Lib] === true)
             return;
-         
+
          // As yet unseen. Try to load
          gdn.Libraries[Lib] = false;
          var Src = '/js/'+Lib+'.js';
@@ -538,35 +538,35 @@ jQuery(document).ready(function($) {
          script.src = Src;
          head.appendChild(script);
       });
-      
+
       if (Response) gdn.loaded(null);
       return Response;
    };
-   
+
    gdn.loaded = function(Library) {
-      if (Library != null) 
+      if (Library != null)
          gdn.Libraries[Library] = true;
-         
+
       $(document).trigger('libraryloaded',[Library])
    }
-   
+
    gdn.available = function(Library) {
       if (!(Library instanceof Array))
          Library = [Library];
-         
+
       for (var i = 0; i<Library.length; i++) {
          var Lib = Library[i];
          if (gdn.Libraries[Lib] !== true) return false;
       }
       return true;
    }
-   
+
    gdn.url = function(path) {
       if (path.indexOf("//") >= 0)
          return path; // this is an absolute path.
 
       var urlFormat = gdn.definition("UrlFormat", "/{Path}");
-      
+
       if (path.substr(0, 1) == "/")
          path = path.substr(1);
 
@@ -581,7 +581,7 @@ jQuery(document).ready(function($) {
       $('input:text,textarea').not('.NoIE').each(function() {
          var $this = $(this);
          var placeholder = $this.attr('placeholder');
-         
+
          if (!$this.val() && placeholder) {
             $this.val(placeholder);
             $this.blur(function() {
@@ -599,7 +599,7 @@ jQuery(document).ready(function($) {
          }
       });
    }
-   
+
 //   var searchText = gdn.definition('Search', 'Search');
 //   if (!$('div.Search input.InputBox').val())
 //      $('div.Search input.InputBox').val(searchText);
@@ -614,7 +614,7 @@ jQuery(document).ready(function($) {
 
    $.fn.popin = function(options) {
       var settings = $.extend({}, options);
-      
+
       this.each(function(i, elem) {
          var url = $(elem).attr('rel');
          var $elem = $(elem);
@@ -634,19 +634,19 @@ jQuery(document).ready(function($) {
      });
    };
    $('.Popin').popin();
-   
-   var hijackClick = function(e) {   
+
+   var hijackClick = function(e) {
       var $elem = $(this);
       var $parent = $(this).closest('.Item');
       var $flyout = $elem.closest('.ToggleFlyout');
       var href = $elem.attr('href');
       var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
-      
+
       if (!href)
          return;
       gdn.disable(this, progressClass);
       e.stopPropagation();
-      
+
       $.ajax({
          type: "POST",
          url: href,
@@ -656,7 +656,7 @@ jQuery(document).ready(function($) {
             gdn.enable(this);
             $elem.removeClass(progressClass);
             $elem.attr('href', href);
-            
+
             // If we are in a flyout, close it.
             $flyout.removeClass('Open').find('.Flyout').hide();
          },
@@ -665,7 +665,7 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             if (json == null) json = {};
-            
+
             var informed = gdn.inform(json);
             gdn.processTargets(json.Targets, $elem, $parent);
             // If there is a redirect url, go to it.
@@ -699,11 +699,11 @@ jQuery(document).ready(function($) {
       return false;
    });
    var lastOpen = null;
-   $(document).delegate('.ToggleFlyout', 'click', function(e) {        
-        
+   $(document).delegate('.ToggleFlyout', 'click', function(e) {
+
       var $flyout = $('.Flyout', this);
         var isHandle = false;
-        
+
         if ($(e.target).closest('.Flyout').length == 0) {
            e.stopPropagation();
            isHandle = true;
@@ -711,13 +711,13 @@ jQuery(document).ready(function($) {
            return;
         }
         e.stopPropagation();
-      
+
       // Dynamically fill the flyout.
       var rel = $(this).attr('rel');
       if (rel) {
          $(this).attr('rel', '');
          $flyout.html('<div class="InProgress" style="height: 30px"></div>');
-         
+
          $.ajax({
             url: gdn.url(rel),
             data: {DeliveryType: 'VIEW'},
@@ -730,13 +730,13 @@ jQuery(document).ready(function($) {
             }
          });
       }
-      
+
       if ($flyout.css('display') == 'none') {
          if (lastOpen != null) {
             $('.Flyout', lastOpen).hide();
             $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
          }
-        
+
          $(this).addClass('Open').closest('.Item').addClass('Open');
          $flyout.show();
          lastOpen = this;
@@ -744,33 +744,33 @@ jQuery(document).ready(function($) {
          $flyout.hide();
          $(this).removeClass('Open').closest('.Item').removeClass('Open');
       }
-     
+
         if (isHandle)
            return false;
    });
-   
+
    // Close ToggleFlyout menu even if their links are hijacked
    $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
       if ($(this).hasClass('FlyoutButton'))
          return;
-      
+
       $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
       $('.Flyout').hide();
    });
 
-   $(document).delegate('#Body', 'click', function() {
+   $(document).delegate(document, 'click', function() {
       if (lastOpen) {
          $('.Flyout', lastOpen).hide();
          $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
       }
       $('.ButtonGroup').removeClass('Open');
    });
-   
+
    // Add a spinner onclick of buttons with this class
    $(document).delegate('input.SpinOnClick', 'click', function() {
       $(this).before('<span class="AfterButtonLoading">&#160;</span>').removeClass('SpinOnClick');
    });
-   
+
    // Confirmation for item removals
    $('a.RemoveItem').click(function() {
       if (!confirm('Are you sure you would like to remove this item?')) {
@@ -794,21 +794,21 @@ jQuery(document).ready(function($) {
          }
       }
    }
-   
+
    gdn.stats = function() {
       // Call directly back to the deployment and invoke the stats handler
       var StatsURL = gdn.url('settings/analyticstick.json');
       var SendData = {
-            'TransientKey': gdn.definition('TransientKey'), 
+            'TransientKey': gdn.definition('TransientKey'),
             'Path': gdn.definition('Path'),
             'Args': gdn.definition('Args'),
             'ResolvedPath': gdn.definition('ResolvedPath'),
             'ResolvedArgs': gdn.definition('ResolvedArgs')
          };
-         
+
       if (gdn.definition('TickExtra', null) != null)
          SendData.TickExtra = gdn.definition('TickExtra');
-      
+
       jQuery.ajax({
          dataType: 'json',
          type: 'post',
@@ -819,13 +819,13 @@ jQuery(document).ready(function($) {
          }
       });
    }
-   
+
    // Ping back to the deployment server to track views, and trigger
    // conditional stats tasks
    var AnalyticsTask = gdn.definition('AnalyticsTask', false);
    if (AnalyticsTask == 'tick')
 	     gdn.stats();
-   
+
    // If a dismissable InformMessage close button is clicked, hide it.
    $(document).delegate('div.InformWrapper.Dismissable a.Close', 'click', function() {
       $(this).parents('div.InformWrapper').fadeOut('fast', function() {
@@ -845,12 +845,12 @@ jQuery(document).ready(function($) {
 			$('div.InformMessages').attr('autodismisstimerid', timerId);
 		}
 	}
-	
+
 	// Handle autodismissals
 	$('div.InformWrapper.AutoDismiss:first').livequery(function() {
 		gdn.setAutoDismiss();
 	});
-   
+
 	// Prevent autodismiss if hovering any inform messages
 	$(document).delegate('div.InformWrapper', 'mouseover mouseout', function(e) {
 		if (e.type == 'mouseover') {
@@ -863,15 +863,15 @@ jQuery(document).ready(function($) {
 			gdn.setAutoDismiss();
 		}
 	});
-	
+
    // Take any "inform" messages out of an ajax response and display them on the screen.
    gdn.inform = function(response) {
 		if (!response)
 			return false;
-      
+
       if (!response.InformMessages || response.InformMessages.length == 0)
          return false;
-		
+
 		// If there is no message container in the page, add one
 		var informMessages = $('div.InformMessages');
 		if (informMessages.length == 0) {
@@ -879,36 +879,36 @@ jQuery(document).ready(function($) {
 			informMessages = $('div.InformMessages');
 		}
 		var wrappers = $('div.InformMessages div.InformWrapper');
-		
+
 		// Loop through the inform messages and add them to the container
 		for (var i = 0; i < response.InformMessages.length; i++) {
 			css = 'InformWrapper';
 			if (response.InformMessages[i]['CssClass'])
 				css += ' ' + response.InformMessages[i]['CssClass'];
-				
+
 			elementId = '';
 			if (response.InformMessages[i]['id'])
 				elementId = response.InformMessages[i]['id'];
-				
+
 			sprite = '';
 			if (response.InformMessages[i]['Sprite']) {
 				css += ' HasSprite';
 				sprite = response.InformMessages[i]['Sprite'];
 			}
-			
+
 			dismissCallback = response.InformMessages[i]['DismissCallback'];
 			dismissCallbackUrl = response.InformMessages[i]['DismissCallbackUrl'];
 			if (dismissCallbackUrl)
 				dismissCallbackUrl = gdn.url(dismissCallbackUrl);
-				
+
 			try {
 				var message = response.InformMessages[i]['Message'];
 				var emptyMessage = message == '';
-				
+
 				// Is there a sprite?
 				if (sprite != '')
 					message = '<span class="InformSprite '+sprite+'"></span>' + message;
-				
+
 				// If the message is dismissable, add a close button
 				if (css.indexOf('Dismissable') > 0)
 					message = '<a class="Close"><span>×</span></a>' + message;
@@ -918,7 +918,7 @@ jQuery(document).ready(function($) {
 				message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
 				// Insert the current url as a target for inform anchors
 				message = message.replace(/{SelfUrl}/g, document.URL);
-				
+
 				var skip = false;
 				for (var j = 0; j < wrappers.length; j++) {
 					if ($(wrappers[j]).text() == $(message).text()) {
@@ -963,12 +963,12 @@ jQuery(document).ready(function($) {
         $(document).trigger('informMessage');
       return true;
    }
-	
+
 	// Send an informMessage to the screen (same arguments as controller.InformMessage).
 	gdn.informMessage = function(message, options) {
 		if (!options)
 			options = new Array();
-			
+
 		if (typeof(options) == 'string') {
 			var css = options;
 			options = new Array();
@@ -977,25 +977,25 @@ jQuery(document).ready(function($) {
 		options['Message'] = message;
 		if (!options['CssClass'])
 			options['CssClass'] = 'Dismissable AutoDismiss';
-		
+
 		gdn.inform({'InformMessages' : new Array(options)});
 	}
-   
+
    // Inform an error returned from an ajax call.
    gdn.informError = function(xhr, silentAbort) {
       if (xhr == undefined || xhr == null)
          return;
-      
+
       if (typeof(xhr) == 'string')
          xhr = {responseText: xhr, code: 500};
-      
+
       var message = xhr.responseText;
       var code = xhr.status;
-      
+
       if (message == undefined || message == null || message == '') {
          switch (xhr.statusText) {
             case 'error':
-               if (silentAbort) 
+               if (silentAbort)
                   return;
                message = 'There was an error performing your request. Please try again.';
                break;
@@ -1006,34 +1006,34 @@ jQuery(document).ready(function($) {
                return;
          }
       }
-      
+
       try {
          var data = $.parseJSON(message);
          if (typeof(data.Exception) == 'string')
             message = data.Exception;
       } catch(e) {
       }
-      
+
       if (message == '')
          message = 'There was an error performing your request. Please try again.';
-      
+
       gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable');
    }
-   
+
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
 	if (informMessageStack) {
 		informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
 		gdn.inform(informMessageStack);
 	}
-	
+
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
    var notificationsPinging = 0, pingCount = 0;
 	var pingForNotifications = function() {
       if (notificationsPinging > 0 || !gdn.focused)
          return;
       notificationsPinging++;
-      
+
       $.ajax({
          type: "POST",
          url: gdn.url('dashboard/notifications/inform'),
@@ -1051,12 +1051,12 @@ jQuery(document).ready(function($) {
       });
 	}
    gdn.pingForNotifications = pingForNotifications;
-   
+
    if (gdn.definition('SignedIn', '0') != '0' && gdn.definition('DoInform', '1') != '0') {
       setTimeout(pingForNotifications, 3000);
       setInterval(pingForNotifications, 60000);
    }
-	
+
 	// Stash something in the user's session (or unstash the value if it was not provided)
 	stash = function(name, value) {
 		$.ajax({
@@ -1072,10 +1072,10 @@ jQuery(document).ready(function($) {
 				return json.Unstash;
 			}
 		});
-		
+
 		return '';
 	}
-	
+
 	// When a stash anchor is clicked, look for inputs with values to stash
 	$('a.Stash').click(function() {
       // Embedded comments
@@ -1085,7 +1085,7 @@ jQuery(document).ready(function($) {
 		if (vanilla_identifier && comment != '' && comment != placeholder)
 			stash('CommentForForeignID_' + vanilla_identifier, comment);
 	});
-   
+
    String.prototype.addCommas = function() {
       nStr = this;
       x = nStr.split('.');
@@ -1097,7 +1097,7 @@ jQuery(document).ready(function($) {
       }
       return x1 + x2;
    }
-   
+
    Array.prototype.sum = function(){
       for(var i=0,sum=0;i<this.length;sum+=this[i++]);
       return sum;
@@ -1108,11 +1108,11 @@ jQuery(document).ready(function($) {
    Array.prototype.min = function(){
       return Math.min.apply({},this)
    }
-   
+
    if ($.browser.msie) {
       $('body').addClass('MSIE');
    }
-   
+
    var d = new Date()
    var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
 
@@ -1120,7 +1120,7 @@ jQuery(document).ready(function($) {
    $('input:hidden[name$=HourOffset]').livequery(function() {
       $(this).val(hourOffset);
    });
-   
+
    // Ajax/Save the ClientHour if it is different from the value in the db.
    $('input:hidden[id$=SetHourOffset]').livequery(function() {
       if (hourOffset != $(this).val()) {
@@ -1130,7 +1130,7 @@ jQuery(document).ready(function($) {
          );
       }
    });
-   
+
    // Add "checked" class to item rows if checkboxes are checked within.
    checkItems = function() {
       var container = $(this).parents('.Item');
@@ -1141,7 +1141,7 @@ jQuery(document).ready(function($) {
    }
    $('.Item :checkbox').each(checkItems);
    $('.Item :checkbox').change(checkItems);
-   
+
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $(document).delegate('a.ForgotPassword', 'click', function() {
       // Make sure we have both forms
@@ -1152,7 +1152,7 @@ jQuery(document).ready(function($) {
          return false;
       }
    });
-   
+
    // Convert date fields to datepickers
    if ($.fn.datepicker) {
       $('input.DatePicker').datepicker({
@@ -1160,28 +1160,28 @@ jQuery(document).ready(function($) {
          dateFormat: 'mm/dd/yy'
       });
    }
-   
+
    /**
     * Youtube preview revealing
-    * 
+    *
     */
-   
+
    // Reveal youtube player when preview clicked.
    function Youtube($container) {
       var $preview = $container.find('.VideoPreview');
       var $player = $container.find('.VideoPlayer');
-      
+
       $container.addClass('Open').closest('.ImgExt').addClass('Open');
-      
+
       var width = $preview.width(), height = $preview.height(), videoid = $container.attr('id').replace('youtube-', '');
 
-      
+
       var html = '<iframe width="'+width+'" height="'+height+'" src="//www.youtube.com/embed/'+videoid+'?autoplay=1" frameborder="0" allowfullscreen></iframe>';
       $player.html(html);
-      
+
       $preview.hide();
       $player.show();
-      
+
       return false;
    }
    $(document).delegate('.Video.YouTube .VideoPreview', 'click', function(e) {
@@ -1189,12 +1189,12 @@ jQuery(document).ready(function($) {
       var $container = $target.closest('.Video.YouTube');
       return Youtube($container);
    });
-   
+
    /**
     * Twitter card embedding
-    * 
+    *
     */
-   
+
    if ($('div.twitter-card').length) {
       // Twitter widgets library
       window.twttr = (function (d,s,id) {
@@ -1208,7 +1208,7 @@ jQuery(document).ready(function($) {
          setTimeout(tweets, 300);
       });
    }
-   
+
    function tweets() {
       $('div.twitter-card').each(function(i, el){
          var card = $(el);
@@ -1227,12 +1227,12 @@ jQuery(document).ready(function($) {
 
       });
    }
-   
+
    /**
     * GitHub commit embedding
-    * 
+    *
     */
-   
+
 // @tim : 2013-08-24
 // Experiment on hold.
 //   if ($('div.github-commit').length) {
@@ -1248,7 +1248,7 @@ jQuery(document).ready(function($) {
 //         setTimeout(commits, 300);
 //      });
 //   }
-//   
+//
 //   function commits(GitHubCommit) {
 //      $('div.github-commit').each(function(i, el){
 //         var commit = $(el);
@@ -1262,16 +1262,16 @@ jQuery(document).ready(function($) {
 
    /**
     * Vine image embedding
-    * 
+    *
     */
-   
+
    // Automatic, requires no JS
-   
+
    /**
     * Pintrest pin embedding
-    * 
+    *
     */
-   
+
    if ($('a.pintrest-pin').length) {
       (function(d){
          var f = d.getElementsByTagName('SCRIPT')[0], p = d.createElement('SCRIPT');
@@ -1281,28 +1281,28 @@ jQuery(document).ready(function($) {
          f.parentNode.insertBefore(p, f);
        }(document));
    }
-   
+
    /**
     * Textarea autogrow
-    * 
+    *
     */
-   
+
    if ($.fn.autogrow) {
       $('textarea.Autogrow').livequery(function() {
          $(this).autogrow();
       });
    }
-   
+
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.
 // This needs to happen in onload because otherwise the image sizes are not yet known.
 jQuery(window).load(function() {
    /*
-   Adds .naturalWidth() and .naturalHeight() methods to jQuery for retreaving a 
+   Adds .naturalWidth() and .naturalHeight() methods to jQuery for retreaving a
    normalized naturalWidth and naturalHeight.
    // Example usage:
-   var 
+   var
    nWidth = $('img#example').naturalWidth(),
    nHeight = $('img#example').naturalHeight();
    */
@@ -1314,12 +1314,12 @@ jQuery(window).load(function() {
 
       while (prop = props.pop()) {
          (function (natural, prop) {
-            $.fn[natural] = (natural in new Image()) ? 
+            $.fn[natural] = (natural in new Image()) ?
             function () {
                return this[0][natural];
-            } : 
+            } :
             function () {
-               var 
+               var
                   node = this[0],
                   img,
                   value;
@@ -1343,13 +1343,13 @@ jQuery(window).load(function() {
          img.wrap('<a href="'+$(img).attr('src')+'"></a>');
       }
    });
-   
+
    // Let the world know we're done here
    jQuery(window).trigger('ImagesResized');
 });
 
 if(typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
-    return this.replace(/^\s+|\s+$/g, ''); 
+    return this.replace(/^\s+|\s+$/g, '');
   }
 }

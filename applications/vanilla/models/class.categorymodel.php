@@ -32,6 +32,13 @@ class CategoryModel extends Gdn_Model {
    public static $Categories = NULL;
 
    /**
+    * Whether or not to join the users in some calls.
+    * Forums with a lot of categories may need to optimize using this setting and simpler views.
+    * @var bool Whether or not to join users to recent posts.
+    */
+   public $JoinRecentUsers = TRUE;
+
+   /**
     * Class constructor. Defines the related database table name.
     *
     * @since 2.0.0
@@ -980,7 +987,9 @@ class CategoryModel extends Gdn_Model {
             self::JoinRecentChildPosts($Category, $Categories);
       }
 
-      Gdn::UserModel()->JoinUsers($Categories, array('LastUserID'));
+      // This join users call can be very slow on forums with a lot of categories so we can disable it here.
+      if ($this->JoinRecentUsers)
+         Gdn::UserModel()->JoinUsers($Categories, array('LastUserID'));
 
       $Result = new Gdn_DataSet($Categories, DATASET_TYPE_ARRAY);
       $Result->DatasetType(DATASET_TYPE_OBJECT);

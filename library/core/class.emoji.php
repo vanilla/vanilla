@@ -60,6 +60,7 @@ class Emoji {
       $this->emojiCanonicalList = array();
 
       // Initialize the alias list. (emoticons)
+      $this->emojiAliasList = array();
 
       // Translate the emoji.
 
@@ -108,6 +109,10 @@ class Emoji {
          : $emojiAliasList[$emojiAlias];
    }
 
+   /**
+    *
+    * @return array List of Emojis that will appear in the editor.
+    */
    public function getEmojiEditorList() {
       if ($this->editorList === null)
          return $this->getEmojiAliasList();
@@ -256,7 +261,7 @@ class Emoji {
     *               loopable.
     */
    public function mergeAliasAndCanonicalList() {
-      return array_merge($this->getEmojiAliasList(), $this->buildHiddenAliasListFromCanonicalList());
+      return array_merge($this->getEmojiEditorList(), $this->buildHiddenAliasListFromCanonicalList());
    }
 
    /**
@@ -305,9 +310,19 @@ class Emoji {
 
       // Determine if hidden emoji aliases are allowed, i.e., the emojis that
       // are not listed in the official alias list array.
+      // Note: this was removed to perform the translations in two parts,
+      // in lieu of translating a single and potentially large array of Emoji,
+      // many of which will not even be in a body of text.
+      // TODO: remove.
+      /*
       $emojiAliasList = ($this->emojiInterpretAllowHidden)
               ? $this->mergeAliasAndCanonicalList()
-              : $this->getEmojiAliasList();
+              : $this->getEmojiEditorList();
+      */
+
+      // First, translate all aliases. Canonical emoji will get translated
+      // out of a loop.
+      $emojiAliasList = $this->getEmojiEditorList();
 
       // Loop through and apply changes to all visible aliases from dropdown
 		foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
@@ -323,29 +338,32 @@ class Emoji {
          }
 		}
 
-      /*
+      // Second, translate canonical list, without looping.
       $ldelim = preg_quote($this->ldelim, '`');
       $rdelim = preg_quote($this->rdelim, '`');
 
-      preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) {
-         $code = trim($m[1], ':');
-
-         $alias = $this->getEmojiCanonicalList($code);
-         if ($alias) {
-            $filename = '';
-            return $this->img($filename);
+      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) {
+         $emoji_name = trim($m[1], ':');
+         $emoji_path = $this->getEmojiCanonicalList($emoji_name);
+         if ($emoji_path) {
+            return $this->img($emoji_path, $emoji_name);
          } else {
             return $m[0];
          }
       }, $Text);
-       * 
-       */
 
 		return substr($Text, 1, -1);
 	}
 
-   public function img($filename) {
-      //<img class="emoji" src="'. $emojiFilePath .'" title="'. $emojiAlias .'" alt=":'. $emojiCanonical .':" width="'. $emojiDimension .'" /> ',
+   /**
+    * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
+    *
+    * @param string $emoji_path Full path to Emoji file.
+    * @param string $emoji_name Name given to Emoji.
+    * @return string HTML IMG tag with Emoji.
+    */
+   public function img($emoji_path, $emoji_name) {
+      return '<img class="emoji" src="'. $emoji_path .'" title="'. $emoji_name .'" alt="'. $this->ldelim . $emoji_name . $this->rdelim .'" width="'. $this->emojiDimension .'" /> ';
    }
 
    /**

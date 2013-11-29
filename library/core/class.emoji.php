@@ -135,83 +135,83 @@ class Emoji {
    public function getEmojiCanonicalList($emojiCanonical = '') {
       $emojiCanonicalList = array(
         // Smileys
-        'relaxed'                      => array('relaxed', '50'),
-        'grinning'                     => array('grinning', '701'),
-        'grin'                         => array('grin', '702'),
-        'joy'                          => array('joy', '703'),
-        'smiley'                       => array('smiley', '704'),
-        'smile'                        => array('smile', '705'),
-        'sweat_smile'                  => array('sweat_smile', '706'),
-        'satisfied'                    => array('satisfied', '707'),
-        'innocent'                     => array('innocent', '708'),
-        'smiling_imp'                  => array('smiling_imp', '709'),
-        'wink'                         => array('wink', '710'),
-        'blush'                        => array('blush', '711'),
-        'yum'                          => array('yum', '712'),
-        'relieved'                     => array('relieved', '713'),
-        'heart_eyes'                   => array('heart_eyes', '714'),
-        'sunglasses'                   => array('sunglasses', '715'),
-        'smirk'                        => array('smirk', '716'),
-        'neutral_face'                 => array('neutral_face', '717'),
-        'expressionless'               => array('expressionless', '718'),
-        'unamused'                     => array('unamused', '719'),
-        'sweat'                        => array('sweat', '720'),
-        'pensive'                      => array('pensive', '721'),
-        'confused'                     => array('confused', '722'),
-        'confounded'                   => array('confounded', '723'),
-        'kissing'                      => array('kissing', '724'),
-        'kissing_heart'                => array('kissing_heart', '725'),
-        'kissing_smiling_eyes'         => array('kissing_smiling_eyes', '726'),
-        'kissing_closed_eyes'          => array('kissing_closed_eyes', '727'),
-        'stuck_out_tongue'             => array('stuck_out_tongue', '728'),
-        'stuck_out_tongue_winking_eye' => array('stuck_out_tongue_winking_eye', '729'),
-        'stuck_out_tongue_closed_eyes' => array('stuck_out_tongue_closed_eyes', '730'),
-        'disappointed'                 => array('disappointed', '731'),
-        'worried'                      => array('worried', '732'),
-        'angry'                        => array('angry', '733'),
-        'rage'                         => array('rage', '734'),
-        'cry'                          => array('cry', '735'),
-        'persevere'                    => array('persevere', '736'),
-        'triumph'                      => array('triumph', '737'),
-        'disapponted_relieved'         => array('disappointed_relieved', '738'),
-        'frowning'                     => array('frowning', '739'),
-        'anguished'                    => array('anguished', '740'),
-        'fearful'                      => array('fearful', '741'),
-        'weary'                        => array('weary', '742'),
-        'sleepy'                       => array('sleepy', '743'),
-        'tired_face'                   => array('tired_face', '744'),
-        'grimacing'                    => array('grimacing', '745'),
-        'sob'                          => array('sob', '746'),
-        'open_mouth'                   => array('open_mouth', '747'),
-        'hushed'                       => array('hushed', '748'),
-        'cold_sweat'                   => array('cold_sweat', '749'),
-        'scream'                       => array('scream', '750'),
-        'astonished'                   => array('astonished', '751'),
-        'flushed'                      => array('flushed', '752'),
-        'sleeping'                     => array('sleeping', '753'),
-        'dizzy_face'                   => array('dizzy_face', '754'),
-        'no_mouth'                     => array('no_mouth', '755'),
-        'mask'                         => array('mask', '756'),
-        'star'                         => array('star', '123'),
-        'cookie'                       => array('cookie', '262'),
-        'warning'                      => array('warning', '71'),
-        'mrgreen'                      => array('mrgreen'),
+        'relaxed'                      => array('relaxed.png', '50'),
+        'grinning'                     => array('grinning.png', '701'),
+        'grin'                         => array('grin.png', '702'),
+        'joy'                          => array('joy.png', '703'),
+        'smiley'                       => array('smiley.png', '704'),
+        'smile'                        => array('smile.png', '705'),
+        'sweat_smile'                  => array('sweat_smile.png', '706'),
+        'satisfied'                    => array('satisfied.png', '707'),
+        'innocent'                     => array('innocent.png', '708'),
+        'smiling_imp'                  => array('smiling_imp.png', '709'),
+        'wink'                         => array('wink.png', '710'),
+        'blush'                        => array('blush.png', '711'),
+        'yum'                          => array('yum.png', '712'),
+        'relieved'                     => array('relieved.png', '713'),
+        'heart_eyes'                   => array('heart_eyes.png', '714'),
+        'sunglasses'                   => array('sunglasses.png', '715'),
+        'smirk'                        => array('smirk.png', '716'),
+        'neutral_face'                 => array('neutral_face.png', '717'),
+        'expressionless'               => array('expressionless.png', '718'),
+        'unamused'                     => array('unamused.png', '719'),
+        'sweat'                        => array('sweat.png', '720'),
+        'pensive'                      => array('pensive.png', '721'),
+        'confused'                     => array('confused.png', '722'),
+        'confounded'                   => array('confounded.png', '723'),
+        'kissing'                      => array('kissing.png', '724'),
+        'kissing_heart'                => array('kissing_heart.png', '725'),
+        'kissing_smiling_eyes'         => array('kissing_smiling_eyes.png', '726'),
+        'kissing_closed_eyes'          => array('kissing_closed_eyes.png', '727'),
+        'stuck_out_tongue'             => array('stuck_out_tongue.png', '728'),
+        'stuck_out_tongue_winking_eye' => array('stuck_out_tongue_winking_eye.png', '729'),
+        'stuck_out_tongue_closed_eyes' => array('stuck_out_tongue_closed_eyes.png', '730'),
+        'disappointed'                 => array('disappointed.png', '731'),
+        'worried'                      => array('worried.png', '732'),
+        'angry'                        => array('angry.png', '733'),
+        'rage'                         => array('rage.png', '734'),
+        'cry'                          => array('cry.png', '735'),
+        'persevere'                    => array('persevere.png', '736'),
+        'triumph'                      => array('triumph.png', '737'),
+        'disapponted_relieved'         => array('disappointed_relieved.png', '738'),
+        'frowning'                     => array('frowning.png', '739'),
+        'anguished'                    => array('anguished.png', '740'),
+        'fearful'                      => array('fearful.png', '741'),
+        'weary'                        => array('weary.png', '742'),
+        'sleepy'                       => array('sleepy.png', '743'),
+        'tired_face'                   => array('tired_face.png', '744'),
+        'grimacing'                    => array('grimacing.png', '745'),
+        'sob'                          => array('sob.png', '746'),
+        'open_mouth'                   => array('open_mouth.png', '747'),
+        'hushed'                       => array('hushed.png', '748'),
+        'cold_sweat'                   => array('cold_sweat.png', '749'),
+        'scream'                       => array('scream.png', '750'),
+        'astonished'                   => array('astonished.png', '751'),
+        'flushed'                      => array('flushed.png', '752'),
+        'sleeping'                     => array('sleeping.png', '753'),
+        'dizzy_face'                   => array('dizzy_face.png', '754'),
+        'no_mouth'                     => array('no_mouth.png', '755'),
+        'mask'                         => array('mask.png', '756'),
+        'star'                         => array('star.png', '123'),
+        'cookie'                       => array('cookie.png', '262'),
+        'warning'                      => array('warning.png', '71'),
+        'mrgreen'                      => array('mrgreen.png'),
 
         // Love
-        'heart'                        => array('heart', '109'),
-        'broken_heart'                 => array('broken_heart', '506'),
-        'kiss'                         => array('kiss', '497'),
+        'heart'                        => array('heart.png', '109'),
+        'broken_heart'                 => array('broken_heart.png', '506'),
+        'kiss'                         => array('kiss.png', '497'),
 
         // Hand gestures
-        '+1'                           => array('+1', '435'),
-        '-1'                           => array('-1', '436'),
+        '+1'                           => array('+1.png', '435'),
+        '-1'                           => array('-1.png', '436'),
 
         // Custom icons, canonical naming
-        'trollface'                    => array('trollface', 'trollface'),
+        'trollface'                    => array('trollface.png', 'trollface'),
 
         // This is used for aliases that are set incorrectly above or point
         // to items not listed in the canonical list.
-        'grey_question'                => array('grey_question', '106')
+        'grey_question'                => array('grey_question.png', '106')
       );
 
       // Some aliases self-referencing the canonical list. Use this syntax.
@@ -223,8 +223,6 @@ class Emoji {
       $emojiCanonicalList['disagree']  = &$emojiCanonicalList['stuck_out_tongue_closed_eyes'];
       $emojiCanonicalList['awesome']   = &$emojiCanonicalList['heart'];
 
-      $emojiFileSuffix = '.png';
-
       // If the $emojiCanonical does not exist in the list, deliver a
       // warning emoji, to degrade gracefully.
       if ($emojiCanonical && !isset($emojiCanonicalList[$emojiCanonical])) {
@@ -234,7 +232,7 @@ class Emoji {
       // Return first value from canonical array
       return (!$emojiCanonical)
          ? $emojiCanonicalList
-         : $this->buildEmojiFilePath(reset($emojiCanonicalList[$emojiCanonical]) . $emojiFileSuffix);
+         : $this->buildEmojiFilePath(reset($emojiCanonicalList[$emojiCanonical]));
    }
 
    /**
@@ -324,6 +322,7 @@ class Emoji {
 				);
          }
 		}
+
       /*
       $ldelim = preg_quote($this->ldelim, '`');
       $rdelim = preg_quote($this->rdelim, '`');
@@ -338,10 +337,10 @@ class Emoji {
          } else {
             return $m[0];
          }
-      }, $Text)
-
+      }, $Text);
+       * 
        */
-;
+
 		return substr($Text, 1, -1);
 	}
 

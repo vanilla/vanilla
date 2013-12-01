@@ -243,7 +243,10 @@ class FacebookPlugin extends Gdn_Plugin {
          $CssClass = 'ReactButton PopupWindow';
       }
       
-      echo ' '.Anchor(Sprite('ReactFacebook', 'ReactSprite'), Url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), $CssClass).' ';
+      echo ' '.Anchor(Sprite('ReactFacebook', 'ReactSprite'), Url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), $CssClass, array(
+            'popupWidth' => '625',
+            'popupHeight' => '325'
+         )).' ';
    }
    
    public function Base_SignInIcons_Handler($Sender, $Args) {
@@ -314,16 +317,22 @@ class FacebookPlugin extends Gdn_Plugin {
             $Sender->InformMessage(T('Thanks for sharing!'));
          } else {
 //            http://www.facebook.com/dialog/feed?app_id=231546166870342&redirect_uri=http%3A%2F%2Fvanillicon.com%2Fredirect%2Ffacebook%3Fhash%3Daad66afb13105676dffa79bfe2b8595f&link=http%3A%2F%2Fvanillicon.com&picture=http%3A%2F%2Fvanillicon.com%2Faad66afb13105676dffa79bfe2b8595f.png&name=Vanillicon&caption=What%27s+Your+Vanillicon+Look+Like%3F&description=Vanillicons+are+unique+avatars+generated+by+your+name+or+email+that+are+free+to+make+%26+use+around+the+web.+Create+yours+now%21
-            $Get = array(
-                  'app_id' => C('Plugins.Facebook.ApplicationID'),
-                  'link' => $Row['ShareUrl'],
-                  'name' => Gdn_Format::PlainText($Row['Name'], 'Text'),
-//                  'caption' => 'Foo',
-                  'description' => $Message,
-                  'redirect_uri' => Url('/post/shared/facebook', TRUE)
-                );
+            if(strtolower($RecordType) == 'discussion') {
+                $Url = 'https://www.facebook.com/sharer/sharer.php?u=' . $Row['ShareUrl'];
+            } else {
+                $Get = array(
+                      'app_id' => C('Plugins.Facebook.ApplicationID'),
+                      'link' => $Row['ShareUrl'],
+                      'name' => Gdn_Format::PlainText($Row['Name'], 'Text'),
+    //                  'caption' => 'Foo',
+                      'description' => $Message,
+                      'redirect_uri' => Url('/post/shared/facebook', TRUE),
+                      'display' => 'popup'
+                    );
+                
+                $Url = 'http://www.facebook.com/dialog/feed?'.http_build_query($Get);
+            }
             
-            $Url = 'http://www.facebook.com/dialog/feed?'.http_build_query($Get);
             Redirect($Url);
          }
       }

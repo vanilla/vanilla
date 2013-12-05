@@ -16,18 +16,40 @@ class Emoji {
    /// Properties ///
 
    /**
+    * The emoji aliases are an array where each key is an alias and each value is the name of an emoji.
     *
-    * @var int The width and height of emoji icons are set to 20px each side.
+    * @var array All of the emoji aliases.
+    */
+   protected $aliases;
+
+   /**
+    * @var string The base path where the emoji are located.
     */
    public $assetPath = '/resources/emoji';
 
    /**
-    *
-    * @var int The width and height of emoji icons are set to 20px each side.
+    * @var string The sprintf format for emoji with the following parameters.
+    * - %1$s: The emoji path.
+    * - %2$s: The emoji code.
     */
-   public $emojiDimension = 20;
+   public $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
 
+   /**
+    * @var array An emoji alias list that represents the emoji that display in an editor dropdown.
+    */
    protected $editorList;
+
+   /**
+    * This array contains all of the emoji avaliable in the system. The array is in the following format:
+    * ~~~
+    * array (
+    *     'emoji_name' => array('filename.png', 'misc info'...)
+    * )
+    * ~~~
+    *
+    * @var array All of the available emoji.
+    */
+   protected $emoji;
 
    /**
     *
@@ -327,12 +349,11 @@ class Emoji {
       // Loop through and apply changes to all visible aliases from dropdown
 		foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
          $emojiFilePath  = $this->getEmojiCanonicalList($emojiCanonical);
-         $emojiDimension = $this->emojiDimension;
 
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
 				$Text = preg_replace(
                '/(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
-               ' <img class="emoji" src="'. $emojiFilePath .'" title="'. $emojiAlias .'" alt=":'. $emojiCanonical .':" width="'. $emojiDimension .'" /> ',
+               $this->img($emojiFilePath, $emojiAlias),
 					$Text
 				);
          }
@@ -346,7 +367,7 @@ class Emoji {
          $emoji_name = trim($m[1], ':');
          $emoji_path = $this->getEmojiCanonicalList($emoji_name);
          if ($emoji_path) {
-            return $this->img($emoji_path, $emoji_name);
+            return $this->img($emoji_path, $this->ldelim.$emoji_name.$this->rdelim);
          } else {
             return $m[0];
          }
@@ -358,12 +379,12 @@ class Emoji {
    /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
     *
-    * @param string $emoji_path Full path to Emoji file.
-    * @param string $emoji_name Name given to Emoji.
-    * @return string HTML IMG tag with Emoji.
+    * @param string $emoji_path The full path to Emoji file.
+    * @param string $emoji_name The name given to Emoji.
+    * @return string The html that represents the emiji.
     */
    public function img($emoji_path, $emoji_name) {
-      return '<img class="emoji" src="'. $emoji_path .'" title="'. $emoji_name .'" alt="'. $this->ldelim . $emoji_name . $this->rdelim .'" width="'. $this->emojiDimension .'" /> ';
+      return sprintf($this->format, $emoji_path, $emoji_name);
    }
 
    /**
@@ -373,7 +394,7 @@ class Emoji {
    public static function instance() {
       if (Emoji::$instance === null) {
          Emoji::$instance = new Emoji();
-         Gdn::PluginManager()->CallEventHandlers(Emoji::instance(), 'Emoji', 'Initialize', 'Handler');
+         Gdn::PluginManager()->CallEventHandlers(Emoji::instance(), 'Emoji', 'Init', 'Handler');
       }
 
       return Emoji::$instance;

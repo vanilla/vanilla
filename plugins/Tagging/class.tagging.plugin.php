@@ -183,18 +183,16 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Pager->ClientID = 'Pager';
       $Sender->View = C('Vanilla.Discussions.Layout');
 
-      // If the tag is a CarModel, insert CarMake to breadcrumb
-      // TODO
-      if ($Sender->Data['TagRow']['Type'] == 'CarModel') {
-         $Sender->Data['Breadcrumbs'][] = array('Name' => 'CarMake', 'Url' => '');
+      if ($TagRow['Type'] == 'CarModel') {
+         $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['CategoryName'], 'Url' => TagUrl($TagRow, ''));
       }
-      $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($Sender->Tag), 'Url' => TagUrl($Tag, ''));
+      $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($Sender->Tag), 'Url' => '');
 
       $Sender->Pager->Configure(
          $Offset,
          $Limit,
          $RecordCount, // record count
-         TagUrl($Tag, '')
+         ''
       );
 
       // Render the controller
@@ -687,11 +685,17 @@ class TaggingPlugin extends Gdn_Plugin {
 }
 
 if (!function_exists('TagUrl')):
-   function TagUrl($Tag, $Page = '', $WithDomain = FALSE) {
-      $Tag = Gdn_Format::Url($Tag);
+   function TagUrl($Row, $Page = '', $WithDomain = FALSE) {
+      $Tag = Gdn_Format::Url($Row['Name']);
       $Page = Gdn_Format::Url($Page);
-      $Result = "discussions/tagged/$Tag/$Page";
 
+      // Then it is a parent category
+      if ($Row['FullName'] == $Row['CategoryName']) {
+         $Result = "discussions/tagged/$Tag/$Page";
+      } else {
+         $CategoryName = Gdn_Format::Url($Row['CategoryName']);
+         $Result = "categories/$CategoryName/$Page";
+      }
       return Url($Result, $WithDomain);
    }
 endif;

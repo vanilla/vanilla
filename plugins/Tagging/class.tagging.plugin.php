@@ -125,7 +125,26 @@ class TaggingPlugin extends Gdn_Plugin {
       $MultipleTags = strpos($Tag, ',') !== FALSE;
 
       $Sender->SetData('Tag', $Tag, TRUE);
-      $Sender->Title(htmlspecialchars($Tag));
+
+      $TagModel = new TagModel();
+      $RecordCount = FALSE;
+      if (!$MultipleTags) {
+         $TagRow = $TagModel->GetWhere(array('Name' => $Tag))->FirstRow(DATASET_TYPE_ARRAY);
+
+         if (!$TagRow) {
+            throw NotFoundException('Page');
+         }
+
+         $RecordCount = $TagRow['CountDiscussions'];
+         $Sender->SetData('TagRow', $TagRow);
+      }
+
+
+
+
+
+
+      $Sender->Title(htmlspecialchars($TagRow['FullName']));
       $UrlTag = rawurlencode($Tag);
       if (urlencode($Tag) == $Tag) {
          $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, TRUE)), TRUE));
@@ -156,19 +175,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $DiscussionModel = new DiscussionModel();
 
-      $TagModel = new TagModel();
 
-      $RecordCount = FALSE;
-      if (!$MultipleTags) {
-         $TagRow = $TagModel->GetWhere(array('Name' => $Tag))->FirstRow(DATASET_TYPE_ARRAY);
-
-         if (!$TagRow) {
-            throw NotFoundException('Page');
-         }
-
-         $RecordCount = $TagRow['CountDiscussions'];
-         $Sender->SetData('TagRow', $TagRow);
-      }
 
       $TagModel->SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
 
@@ -184,9 +191,9 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->View = C('Vanilla.Discussions.Layout');
 
       if ($TagRow['Type'] == 'CarModel') {
-         $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['CategoryName'], 'Url' => TagUrl($TagRow, ''));
+         $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($TagRow['CategoryName']), 'Url' => TagUrl($TagRow, ''));
       }
-      $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($Sender->Tag), 'Url' => '');
+      $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($TagRow['FullName']), 'Url' => '');
 
       $Sender->Pager->Configure(
          $Offset,

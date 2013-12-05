@@ -42,6 +42,10 @@ class TagModel extends Gdn_Model {
                where TagID = :FromID";
             $this->Database->Query($Sql, array(':FromID' => $FromID, ':ToID' => $ToID));
 
+            // Update the counts
+            $this->UpdateTagCountDiscussions($ToID);
+
+            /*
             // Update the counts.
             $Sql = "update {$Px}Tag t
                set CountDiscussions = (
@@ -50,6 +54,7 @@ class TagModel extends Gdn_Model {
                   where td.TagID = t.TagID)
                 where t.TagID = :ToID";
             $this->Database->Query($Sql, array(':ToID' => $ToID));
+             */
 
             // Delete the old tag.
             $Sql = "delete from {$Px}Tag where TagID = :FromID";
@@ -60,15 +65,103 @@ class TagModel extends Gdn_Model {
             $this->Database->RollbackTransaction();
             throw $Ex;
          }
-         
+
          return $ToID;
       } else {
          if (Gdn::Session()->CheckPermission('Plugins.Tagging.Add')) {
             return parent::Save($FormPostValues, $Settings);
          } else {
-            return FALSE; 
+            return FALSE;
          }
       }
+   }
+
+   /**
+    * Update the tag count per discussion in the Tag table
+    *
+    * @param int $TagID
+    */
+   public function UpdateTagCountDiscussions($TagID) {
+      $Px = $this->Database->DatabasePrefix;
+      // Update the counts.
+      $Sql = "update {$Px}Tag t
+         set CountDiscussions = (
+            select count(DiscussionID)
+            from {$Px}TagDiscussion td
+            where td.TagID = t.TagID)
+          where t.TagID = :TagID";
+      $this->Database->Query($Sql, array(':TagID' => $TagID));
+   }
+
+   public function GetDiscussions($Tag, $Limit, $Offset, $Op = 'or') {
+      $DiscussionModel = new DiscussionModel();
+      $this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Op);
+      $Result = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
+
+      return $Result;
+   }
+
+   /**
+    *
+    * @param Gdn_SQLDriver $Sql
+    */
+   public function _SetTagSql($Sql, $Tag, &$Limit, &$Offset = 0, $Op = 'or') {
+      $SortField = 'd.DateLastComment';
+      $SortDirection = 'desc';
+
+      $TagSql = clone Gdn::Sql();
+
+      if ($DateFrom = Gdn::Request()->Get('DateFrom')) {
+         // Find the discussion ID of the first discussion created on or after the date from.
+         $DiscussionIDFrom = $TagSql->GetWhere('Discussion', array('DateInserted >= ' => $DateFrom), 'DiscussionID', 'asc', 1)->Value('DiscussionID');
+         $SortField = 'd.DiscussionID';
+      }
+
+      if (!is_array($Tag)) {
+         $Tags = array_map('trim', explode(',', $Tag));
+      }
+      $TagIDs = $TagSql
+         ->Select('TagID')
+         ->From('Tag')
+         ->WhereIn('Name', $Tags)
+         ->Get()->ResultArray();
+
+      $TagIDs = ConsolidateArrayValuesByKey($TagIDs, 'TagID');
+
+      if ($Op == 'and' && count($Tags) > 1) {
+         $DiscussionIDs = $TagSql
+            ->Select('DiscussionID')
+            ->Select('TagID', 'count', 'CountTags')
+            ->From('TagDiscussion')
+            ->WhereIn('TagID', $TagIDs)
+            ->GroupBy('DiscussionID')
+            ->Having('CountTags >=', count($Tags))
+            ->Limit($Limit, $Offset)
+            ->OrderBy('DiscussionID', 'desc')
+            ->Get()->ResultArray();
+         $Limit = '';
+         $Offset = 0;
+
+         $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
+
+         $Sql->WhereIn('d.DiscussionID', $DiscussionIDs);
+         $SortField = 'd.DiscussionID';
+      } else {
+         $Sql
+            ->Join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID')
+            ->Limit($Limit, $Offset)
+            ->WhereIn('td.TagID', $TagIDs);
+
+         if ($Op == 'and')
+            $SortField = 'd.DiscussionID';
+      }
+
+      // Set up the sort field and direction.
+      SaveToConfig(array(
+          'Vanilla.Discussions.SortField' => $SortField,
+          'Vanilla.Discussions.SortDirection' => $SortDirection),
+          '',
+          FALSE);
    }
 
    public static function ValidateTag($Tag) {

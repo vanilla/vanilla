@@ -1,10 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
+include $this->FetchViewLocation($this->View);
+return;
 ?>
-<h1 class="H TaggedHeading"><?php printf(T('Tagged with "%s"'), htmlspecialchars($this->Tag)); ?></h1>
+<h1 class="H TaggedHeading"><?php printf(T('%s'), htmlspecialchars($this->Tag)); ?></h1>
 <?php if ($this->DiscussionData->NumRows() > 0) { ?>
 <ul class="DataList Discussions">
-   <?php include($this->FetchViewLocation('discussions')); ?>
+   <?php include $this->FetchViewLocation($this->View); ?>
 </ul>
 <?php
    $PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());

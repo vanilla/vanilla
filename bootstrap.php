@@ -95,7 +95,7 @@ foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationN
  * begin installation.
  */
 if (Gdn::Config('Garden.Installed', FALSE) === FALSE && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
-   header('Location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
+   safeHeader('Location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
    exit();
 }
 

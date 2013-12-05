@@ -2,10 +2,10 @@
 
 /**
  * Controller base class
- * 
+ *
  * A base class that all controllers can inherit for common controller
  * properties and methods.
- * 
+ *
  * @method void Render() Render the controller's view.
  * @param string $View
  * @param string $ControllerName
@@ -13,7 +13,7 @@
  * @param string $AssetName The name of the asset container that the content should be rendered in.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -77,7 +77,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $CssClass;
-   
+
    /**
     * The data that a controller method has built up from models and other calcualtions.
     *
@@ -99,7 +99,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $MasterView;
-   
+
    /**
     * A Menu module for rendering the main menu on each page.
     *
@@ -130,13 +130,13 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $RedirectUrl;
-   
+
    /**
     * @var string Fully resolved path to the application/controller/method
     * @since 2.1
     */
    public $ResolvedPath;
-   
+
    /**
     * @var array The arguments passed into the controller mapped to their proper argument names.
     * @since 2.1
@@ -168,10 +168,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    public $RequestMethod;
-   
+
    /**
     * Reference to the Request object that spawned this controller
-    * 
+    *
     * @var Gdn_Request
     */
    public $Request;
@@ -189,7 +189,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *
     * @deprecated since 2.0.18; $this->ErrorMessage() and $this->InformMessage()
     * are to be used going forward.
-    * 
+    *
     * @var string
     */
    public $StatusMessage;
@@ -267,7 +267,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var string
     */
    protected $_DeliveryType;
-   
+
    /**
     * A string of html containing error messages to be displayed to the user.
     *
@@ -304,10 +304,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @var array
     */
    protected $_JsFiles;
-   
+
    /**
     * An array of Mustache templates to send with the output
-    * 
+    *
     * @var array
     */
    protected $_TemplateFiles;
@@ -366,26 +366,26 @@ class Gdn_Controller extends Gdn_Pluggable {
          'Content-Type'       => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', '') // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
       );
-      
+
       if (Gdn::Session()->IsValid()) {
          $this->_Headers = array_merge($this->_Headers, array(
-            'Cache-Control'   => 'private, no-cache, no-store, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1 
+            'Cache-Control'   => 'private, no-cache, no-store, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1
             'Expires'         => 'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
             'Pragma'          => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
          ));
       }
-      
+
       $this->_ErrorMessages = '';
       $this->_InformMessages = array();
       $this->StatusMessage = '';
-      
+
       parent::__construct();
       $this->ControllerName = strtolower($this->ClassName);
    }
 
    /**
     * Add a breadcrumb to the list
-    * 
+    *
     * @param string $Name Translation code
     * @param string $Link Optional. Hyperlink this breadcrumb somewhere.
     * @param string $Position Optional. Where in the list to add it? 'front', 'back'
@@ -395,7 +395,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          'Name'   => T($Name),
          'Url'    => $Link
       );
-      
+
       $Breadcrumbs = $this->Data('Breadcrumbs', array());
       switch ($Position) {
          case 'back':
@@ -407,7 +407,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       $this->SetData('Breadcrumbs', $Breadcrumbs);
    }
-   
+
    /**
     * Adds as asset (string) to the $this->Assets collection. The assets will
     * later be added to the view if their $AssetName is called by
@@ -447,7 +447,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function AddCssFile($FileName, $AppFolder = '', $Options = null) {
       $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
    }
-   
+
    /**
     * Undocumented method.
     *
@@ -473,7 +473,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function AddJsFile($FileName, $AppFolder = '', $Options = null) {
       $JsInfo = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
-      
+
       if (StringBeginsWith($AppFolder, 'plugins/')) {
          $Name = StringBeginsWith($AppFolder, 'plugins/', true, true);
          $Info = Gdn::PluginManager()->GetPluginInfo($Name, Gdn_PluginManager::ACCESS_PLUGINNAME);
@@ -481,9 +481,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             $JsInfo['Version'] = GetValue('Version', $Info);
          }
       }
-      
+
       $this->_JsFiles[] = $JsInfo;
-      
+
       // Hedge our bets and try include non-js-prefixed version too
       //if (StringBeginsWith($FileName, 'js/')) {
       //   $JsInfo = array('FileName' => substr($FileName,3), 'AppFolder' => $AppFolder, 'Options' => $Options);
@@ -492,9 +492,9 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
-    * Adds the specified module to the specified asset target. 
-    * 
-    * If no asset target is defined, it will use the asset target defined by the 
+    * Adds the specified module to the specified asset target.
+    *
+    * If no asset target is defined, it will use the asset target defined by the
     * module's AssetTarget method.
     *
     * @param mixed $Module A module or the name of a module to add to the page.
@@ -504,7 +504,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function AddModule($Module, $AssetTarget = '') {
       $this->FireEvent('BeforeAddModule');
       $AssetModule = $Module;
-      
+
       if (!is_object($AssetModule)) {
          if (property_exists($this, $Module) && is_object($this->$Module)) {
             $AssetModule = $this->$Module;
@@ -519,7 +519,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
          }
       }
-      
+
       if (is_object($AssetModule)) {
          $AssetTarget = ($AssetTarget == '' ? $AssetModule->AssetTarget() : $AssetTarget);
          // echo '<div>adding: '.get_class($AssetModule).' ('.(property_exists($AssetModule, 'HtmlId') ? $AssetModule->HtmlId : '').') to '.$AssetTarget.' <textarea>'.$AssetModule->ToString().'</textarea></div>';
@@ -528,11 +528,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       $this->FireEvent('AfterAddModule');
    }
-   
-   
+
+
    /**
     * Add a Mustache template to the output
-    * 
+    *
     * @param string $Template
     * @param string $ControllerName Optional.
     * @param string $ApplicationFolder Optional.
@@ -541,20 +541,20 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function AddTemplateFile($Template = '', $ControllerName = null, $ApplicationFolder = false) {
       if (is_null($ControllerName))
          $ControllerName = StringEndsWith($this->ControllerName, 'controller', true, true);
-         
+
       if ($ControllerName)
          $Template = "{$ControllerName}/{$Template}";
-         
+
       $Template = StringEndsWith($Template, '.mustache', true, true);
       $FileName = "{$Template}.mustache";
       $TemplateInfo = array(
-         'FileName'  => $FileName, 
+         'FileName'  => $FileName,
          'AppFolder' => $ApplicationFolder,
          'Options'   => array(
             'name'      => $Template
          )
       );
-      
+
       if (StringBeginsWith($ApplicationFolder, 'plugins/')) {
          $Name = StringBeginsWith($ApplicationFolder, 'plugins/', true, true);
          $Info = Gdn::PluginManager()->GetPluginInfo($Name, Gdn_PluginManager::ACCESS_PLUGINNAME);
@@ -563,16 +563,16 @@ class Gdn_Controller extends Gdn_Pluggable {
       } else {
          $TemplateInfo['Version'] = APPLICATION_VERSION;
       }
-      
+
       $this->_TemplateFiles[] = $TemplateInfo;
    }
-   
+
    public function AllowJSONP($Value = null) {
       static $_Value;
-      
+
       if (isset($Value))
          $_Value = $Value;
-      
+
       if (isset($_Value))
          return $_Value;
       else
@@ -585,9 +585,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             return $this->_CanonicalUrl;
          } else {
             $Parts = array();
-            
+
             $Controller = strtolower(StringEndsWith($this->ControllerName, 'Controller', true, true));
-            
+
             if ($Controller == 'settings')
                $Parts[] = strtolower($this->ApplicationFolder);
 
@@ -611,29 +611,29 @@ class Gdn_Controller extends Gdn_Pluggable {
          return $Value;
       }
    }
-   
+
    public function ClearCssFiles() {
       $this->_CssFiles = array();
    }
-   
+
    /**
     * Clear all js files from the collection.
     */
    public function ClearJsFiles() {
       $this->_JsFiles = array();
    }
-   
+
    /**
     * Clear all Mustache files from the collection.
     */
    public function ClearTemplateFiles() {
       $this->_TemplateFiles = array();
    }
-   
+
    public function ContentType($ContentType) {
       $this->SetHeader("Content-Type", $ContentType);
    }
-   
+
    public function CssFiles() {
       return $this->_CssFiles;
    }
@@ -671,23 +671,23 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (!array_key_exists('Path', $this->_Definitions))
          $this->_Definitions['Path'] = Gdn::Request()->Path();
-      
+
       if (!array_key_exists('Args', $this->_Definitions))
          $this->_Definitions['Args'] = http_build_query (Gdn::Request()->Get());
-      
+
       if (!array_key_exists('ResolvedPath', $this->_Definitions))
          $this->_Definitions['ResolvedPath'] = $this->ResolvedPath;
-      
+
       if (!array_key_exists('ResolvedArgs', $this->_Definitions)) {
          if (sizeof($this->ReflectArgs) && (
                  (isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof Gdn_Pluggable) ||
-                 (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable) || 
+                 (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable) ||
                  (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof Gdn_Pluggable)
                ))
             $ReflectArgs = json_encode(array_slice($this->ReflectArgs, 1));
          else
             $ReflectArgs = json_encode($this->ReflectArgs);
-         
+
          $this->_Definitions['ResolvedArgs'] = $ReflectArgs;
       }
 
@@ -699,7 +699,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
          $this->_Definitions['SignedIn'] = $SignedIn;
       }
-      
+
       if (Gdn::Session()->IsValid()) {
          // Tell the client what our hour offset is so it can compare it to the user's real offset.
          TouchValue('SetHourOffset', $this->_Definitions, Gdn::Session()->User->HourOffset);
@@ -740,10 +740,10 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function DeliveryType($Default = '') {
       if ($Default)
          $this->_DeliveryType = $Default;
-      
+
       return $this->_DeliveryType;
    }
-   
+
    /**
     * Returns the requested delivery method of the controller if $Default is not
     * provided. Sets and returns the delivery method otherwise.
@@ -756,7 +756,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       return $this->_DeliveryMethod;
    }
-   
+
    public function Description($Value = false, $PlainText = false) {
       if ($Value != false) {
          if ($PlainText)
@@ -790,13 +790,13 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function FetchView($View = '', $ControllerName = false, $ApplicationFolder = false) {
       $ViewPath = $this->FetchViewLocation($View, $ControllerName, $ApplicationFolder);
-      
+
       // Check to see if there is a handler for this particular extension.
       $ViewHandler = Gdn::Factory('ViewHandler' . strtolower(strrchr($ViewPath, '.')));
-      
+
       $ViewContents = '';
       ob_start();
-      if(is_null($ViewHandler)) {   
+      if(is_null($ViewHandler)) {
          // Parse the view and place it into the asset container if it was found.
          include($ViewPath);
       } else {
@@ -804,7 +804,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $ViewHandler->Render($ViewPath, $this);
       }
       $ViewContents = ob_get_clean();
-      
+
       return $ViewContents;
    }
 
@@ -854,15 +854,15 @@ class Gdn_Controller extends Gdn_Pluggable {
          $View .= '_atom';
       else if ($this->SyndicationMethod == SYNDICATION_RSS)
          $View .= '_rss';
-      
+
       $ViewPath = ViewLocation($View, $ControllerName, $ApplicationFolder);
-      
+
       // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
       if ($ViewPath === false && $ThrowError) {
          throw NotFoundException('View');
 //         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
       }
-      
+
       return $ViewPath;
    }
 
@@ -884,7 +884,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          return '';
       if (!is_array($this->Assets[$AssetName]))
          return $this->Assets[$AssetName];
-      
+
       // Include the module sort
       $Modules = Gdn::Config('Modules', array());
       if ($this->ModuleSortContainer === false)
@@ -897,7 +897,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       // Get all the assets for this AssetContainer
       $ThisAssets = $this->Assets[$AssetName];
       $Assets = array();
-      
+
       if (isset($ModuleSort) && is_array($ModuleSort)) {
          // There is a specified sort so sort by it.
          foreach ($ModuleSort as $Name) {
@@ -907,11 +907,11 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
          }
       }
-      
+
       // Pick up any leftover assets that werent explicitly sorted
       foreach ($ThisAssets as $Name => $Asset)
          $Assets[] = $Asset;
-         
+
       if (count($Assets) == 0) {
          return '';
       } elseif (count($Assets) == 1) {
@@ -922,7 +922,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          return $Result;
       }
    }
-   
+
    /**
     * Undocumented method.
     *
@@ -931,7 +931,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function GetImports() {
       if(!isset($this->Uses) || !is_array($this->Uses))
          return;
-      
+
       // Load any classes in the uses array and make them properties of this class
       foreach ($this->Uses as $Class) {
          if(strlen($Class) >= 4 && substr_compare($Class, 'Gdn_', 0, 4) == 0) {
@@ -939,14 +939,14 @@ class Gdn_Controller extends Gdn_Pluggable {
          } else {
             $Property = $Class;
          }
-         
+
          // Find the class and instantiate an instance..
          if(Gdn::FactoryExists($Property)) {
             $this->$Property = Gdn::Factory($Property);
          } if(Gdn::FactoryExists($Class)) {
             // Instantiate from the factory.
             $this->$Property = Gdn::Factory($Class);
-         } elseif(class_exists($Class)) {               
+         } elseif(class_exists($Class)) {
             // Instantiate as an object.
             $ReflectionClass = new ReflectionClass($Class);
             // Is this class a singleton?
@@ -965,11 +965,11 @@ class Gdn_Controller extends Gdn_Pluggable {
       return $this->_Json;
    }
 
-   /** 
-    * Allows images to be specified for the page, to be used by the head module 
+   /**
+    * Allows images to be specified for the page, to be used by the head module
     * to add facebook open graph information.
     * @param mixed $Img An image or array of image urls.
-    * @return array The array of image urls. 
+    * @return array The array of image urls.
     */
    public function Image($Img = false) {
       if ($Img) {
@@ -992,7 +992,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * Add an "inform" message to be displayed to the user.
     *
     * @since 2.0.18
-    * 
+    *
     * @param string $Message The message to be displayed.
     * @param mixed $Options An array of options for the message. If not an array, it is assumed to be a string of CSS classes to apply to the message.
     */
@@ -1000,10 +1000,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       // If $Options isn't an array of options, accept it as a string of css classes to be assigned to the message.
       if (!is_array($Options))
          $Options = array('CssClass' => $Options);
-      
+
       if (!$Message && !array_key_exists('id', $Options))
          return;
-      
+
       $Options['Message'] = $Message;
       $this->_InformMessages[] = $Options;
    }
@@ -1018,20 +1018,20 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (in_array($this->SyndicationMethod, array(SYNDICATION_ATOM, SYNDICATION_RSS))) {
          $this->_Headers['Content-Type'] = 'text/xml; charset='.C('Garden.Charset', '');
       }
-      
+
       if (is_object($this->Menu))
          $this->Menu->Sort = Gdn::Config('Garden.Menu.Sort');
-      
+
       $ResolvedPath = strtolower(CombinePaths(array(Gdn::Dispatcher()->Application(), Gdn::Dispatcher()->ControllerName, Gdn::Dispatcher()->ControllerMethod)));
       $this->ResolvedPath = $ResolvedPath;
-      
+
       $this->FireEvent('Initialize');
    }
-   
+
    public function JsFiles() {
       return $this->_JsFiles;
    }
-   
+
    /**
     * If JSON is going to be sent to the client, this method allows you to add
     * extra values to the JSON array.
@@ -1046,16 +1046,16 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       return ArrayValue($Key, $this->_Json, null);
    }
-   
+
    public function JsonTarget($Target, $Data, $Type = 'Html') {
       $Item = array('Target' => $Target, 'Data' => $Data, 'Type' => $Type);
-      
+
       if(!array_key_exists('Targets', $this->_Json))
          $this->_Json['Targets'] = array($Item);
       else
          $this->_Json['Targets'][] = $Item;
    }
-   
+
    /**
     * Define & return the master view.
     */
@@ -1093,7 +1093,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          else
             $Name = get_class($this);
          $Name = strtolower($Name);
-         
+
          if (StringEndsWith($Name, 'controller', false))
             $Name = substr($Name, 0, -strlen('controller'));
 
@@ -1102,7 +1102,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          return $this->_PageName;
       }
    }
-   
+
    /**
     * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.
     * @param mixed $Permission A permission or array of permission names required to access this resource.
@@ -1122,7 +1122,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
       }
    }
-   
+
    /**
     * Removes a CSS file from the collection.
     *
@@ -1136,7 +1136,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
       }
    }
-   
+
    /**
     * Removes a JS file from the collection.
     *
@@ -1150,7 +1150,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
       }
    }
-      
+
    /**
     * Removes a Template file from the collection.
     *
@@ -1177,10 +1177,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function xRender($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') {
       Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $this->RequestMethod, 'Render');
-      
+
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)
          return;
-      
+
       // Handle deprecated StatusMessage values that may have been added by plugins
       $this->InformMessage($this->StatusMessage);
 
@@ -1192,7 +1192,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->ContentType('application/json');
          $this->SetHeader('X-Content-Type-Options', 'nosniff');
       }
-      
+
       if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
          $this->ContentType('text/plain');
       }
@@ -1221,7 +1221,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          if (property_exists($this, 'Form') && is_object($this->Form))
             $View = $this->Form->ErrorCount() > 0 ? false : true;
       }
-      
+
       if ($this->_DeliveryType == DELIVERY_TYPE_MESSAGE && $this->Form) {
          $View = $this->Form->Errors();
       }
@@ -1237,17 +1237,17 @@ class Gdn_Controller extends Gdn_Pluggable {
          // with the result.
          if ($this->_FormSaved === '') // Allow for override
             $this->_FormSaved = (property_exists($this, 'Form') && $this->Form->ErrorCount() == 0) ? true : false;
-         
+
          $this->SetJson('FormSaved', $this->_FormSaved);
          $this->SetJson('DeliveryType', $this->_DeliveryType);
          $this->SetJson('Data', base64_encode(($View instanceof Gdn_IModule) ? $View->ToString() : $View));
          $this->SetJson('InformMessages', $this->_InformMessages);
          $this->SetJson('ErrorMessages', $this->_ErrorMessages);
          $this->SetJson('RedirectUrl', $this->RedirectUrl);
-         
+
          // Make sure the database connection is closed before exiting.
          $this->Finalize();
-         
+
          if (!check_utf8($this->_Json['Data']))
             $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
 
@@ -1265,7 +1265,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE)
             $this->AddDefinition('RedirectUrl', $this->RedirectUrl);
-         
+
          if ($this->_DeliveryMethod == DELIVERY_METHOD_XHTML && Debug()) {
             $this->AddModule('TraceModule');
          }
@@ -1342,7 +1342,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                continue;
             if (isset($Key[0]) && $Key[0] === '_')
                continue; // protected
-            
+
             $Data[$Key] = $Value;
          }
          unset($this->Data);
@@ -1354,7 +1354,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Data[$Key] = $Value->ResultArray();
          }
       }
-      
+
       $CleanOutut = C('Api.Clean', true);
       if ($CleanOutut) {
          // Remove values that should not be transmitted via api
@@ -1371,23 +1371,23 @@ class Gdn_Controller extends Gdn_Pluggable {
          }
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }
-      
+
       if (Debug() && $Trace = Trace()) {
          $Data['Trace'] = $Trace;
       }
-      
+
       // Make sure the database connection is closed before exiting.
       $this->EventArguments['Data'] = &$Data;
       $this->Finalize();
-      
+
       // Add error information from the form.
       if (isset($this->Form) && sizeof($this->Form->ValidationResults())) {
          $this->StatusCode(400);
          $Data['Code'] = 400;
          $Data['Exception'] = Gdn_Validation::ResultsAsText($this->Form->ValidationResults());
       }
-      
-      
+
+
 //      $this->SendHeaders();
 
       // Check for a special view.
@@ -1396,16 +1396,16 @@ class Gdn_Controller extends Gdn_Pluggable {
          include $ViewLocation;
          return;
       }
-      
+
       // Add schemes to to urls.
       if (!C('Garden.AllowSSL') || C('Garden.ForceSSL')) {
          $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
       }
-      
+
       @ob_clean();
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
-            header('Content-Type: text/xml', true);
+            safeHeader('Content-Type: text/xml', true);
             echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
             $this->_RenderXml($Data);
             return true;
@@ -1416,12 +1416,12 @@ class Gdn_Controller extends Gdn_Pluggable {
          case DELIVERY_METHOD_JSON:
          default:
             if (($Callback = $this->Request->Get('callback', false)) && $this->AllowJSONP()) {
-               header('Content-Type: application/javascript', true);
+               safeHeader('Content-Type: application/javascript', true);
                // This is a jsonp request.
                echo $Callback.'('.json_encode($Data).');';
                return true;
             } else {
-               header('Content-Type: application/json', true);
+               safeHeader('Content-Type: application/json', true);
                // This is a regular json request.
                echo json_encode($Data);
                return true;
@@ -1430,11 +1430,11 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       return false;
    }
-   
+
    protected static function _FixUrlScheme(&$Value, $Key, $Scheme) {
       if (!is_string($Value))
          return;
-      
+
       if (substr($Value, 0, 2) == '//' && substr($Key, -3) == 'Url')
          $Value = $Scheme.':'.$Value;
    }
@@ -1453,7 +1453,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (!$Node)
          return;
-      
+
       echo "$Indent<$Node>";
 
       if (is_scalar($Data)) {
@@ -1506,8 +1506,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                     Gdn_ExceptionHandler($Ex);
                }
             }
-            
-            
+
+
          } catch(Exception $Ex2) {
             Gdn_ExceptionHandler($Ex);
          }
@@ -1520,36 +1520,36 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       $Code = $Ex->getCode();
       $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
-      
+
       if (Debug()) {
          if ($Trace = Trace()) {
             $Data['Trace'] = $Trace;
          }
-         
+
          if (!is_a($Ex, 'Gdn_UserException'))
             $Data['StackTrace'] = $Ex->getTraceAsString();
-         
+
          $Data['Data'] = $this->Data;
       }
-      
+
       // Try cleaning out any notices or errors.
       @ob_clean();
-      
+
 
       if ($Code >= 400 && $Code <= 505)
-         header("HTTP/1.0 $Code", true, $Code);
+         safeHeader("HTTP/1.0 $Code", true, $Code);
       else
-         header('HTTP/1.0 500', true, 500);
+         safeHeader('HTTP/1.0 500', true, 500);
 
-      
+
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
             if (($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) && $this->AllowJSONP()) {
-               header('Content-Type: application/javascript', true);
+               safeHeader('Content-Type: application/javascript', true);
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
             } else {
-               header('Content-Type: application/json', true);
+               safeHeader('Content-Type: application/json', true);
                // This is a regular json request.
                exit(json_encode($Data));
             }
@@ -1558,141 +1558,141 @@ class Gdn_Controller extends Gdn_Pluggable {
 //            Gdn_ExceptionHandler($Ex);
 //            break;
          case DELIVERY_METHOD_XML:
-            header('Content-Type: text/xml', true);
+            safeHeader('Content-Type: text/xml', true);
             array_map('htmlspecialchars', $Data);
             exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
             break;
          default:
-            header('Content-Type: text/plain', true);
+            safeHeader('Content-Type: text/plain', true);
             exit($Ex->getMessage());
       }
    }
-   
+
    /**
     * Undocumented method.
     *
     * @todo Method RenderMaster() needs a description.
     */
    public function RenderMaster() {
-      
+
       // Build the master view if necessary
       if (in_array($this->_DeliveryType, array(DELIVERY_TYPE_ALL))) {
          $this->MasterView = $this->MasterView();
 
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
-            
+
             $CombineAssets = C('Garden.CombineAssets', false);
-            
+
             /*
              * CSS Files
-             * 
+             *
              * Resolve and add CSS static files.
              */
-            
+
             $AssetModel = new AssetModel();
             $ETag = AssetModel::ETag();
             $Mode = $AssetModel->Mode($this->_CssFiles);
-            
+
             // Explode the condensed CSS files into _CssFiles
             $CssCdns = array();
             if (!$CombineAssets) {
-               
+
                // Grab all of the css files from the asset model.
                $Paths = $AssetModel->GetCssFiles(ucfirst($Mode), $ETag, $NotFound, false);
-               
+
                // Add them to the output
                $this->_CssFiles = array_merge($this->_CssFiles, $Paths);
-               
+
             } else {
-               
+
                $CssCdns = $AssetModel->Cdns($ETag);
-               
+
             }
-            
+
             // Allow pre-modification of CSS included array
             $this->EventArguments['CssFiles'] = &$this->_CssFiles;
             $this->FireAs('Gdn_Controller')->FireEvent('BeforeAddCss');
-            
+
             $this->EventArguments['Cdns'] = &$CssCdns;
             $this->EventArguments['ETag'] = $ETag;
             $this->FireAs('Gdn_Controller')->FireEvent('AfterCssCdns');
-            
+
             $CssFiles = self::ResolveStaticResources($this->_CssFiles, 'design', array(
                'CDNS'         => $CssCdns
             ));
-            
+
             foreach ($CssFiles as $CssSrc => $CssOptions)
                $this->Head->AddCss($CssSrc, 'all', true, GetValue('options',$CssOptions));
-            
+
             /*
              * Javascript Files
-             * 
+             *
              * Resolve and add Javascript static files.
              */
-            
+
             if (ArrayHasValue($this->_CssFiles, 'style.css'))
                $this->AddJsFile('custom.js'); // only to non-admin pages.
-            
+
             // Allow pre-modification of Js included array
             $this->EventArguments['JsFiles'] = &$this->_JsFiles;
             $this->FireAs('Gdn_Controller')->FireEvent('BeforeAddJs');
-            
+
             $JsCdns = array();
             if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', false)) {
                $JsCdns = array(
                   'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
                );
             }
-            
+
             $this->EventArguments['Cdns'] = &$JsCdns;
             $this->FireAs('Gdn_Controller')->FireEvent('AfterJsCdns');
-            
+
             $JsFiles = self::ResolveStaticResources($this->_JsFiles, 'js', array(
                'CDNS'         => $JsCdns
             ));
-            
+
             foreach ($JsFiles as $JsSrc => $JsOptions)
                $this->Head->AddScript($JsSrc, 'text/javascript', GetValue('options',$JsOptions));
-            
+
             /**
              * Mustache Files
-             * 
+             *
              * Resolve and add Mustache template files to the output.
              */
-            
+
             $TemplateFiles = self::ResolveStaticResources($this->_TemplateFiles, 'views', array(
                'StripRoot'    => false
             ));
-            
+
             if (sizeof($TemplateFiles)) {
                ksort($TemplateFiles);
-               
+
                $TemplateDeliveryMode = C('Garden.Template.DeliveryMethod', 'defer');
                $ScriptHint = false;
-               
+
                switch ($TemplateDeliveryMode) {
-                  
+
                   // Consolidated asynchronous or Inline synchronous loading serves the template content directly
                   case 'consolidate':
                   case 'inline':
-                     
+
                      $HashTag = AssetModel::HashTag($TemplateFiles);
                      $TemplateFile = CombinePaths(array(PATH_CACHE, "stache-{$HashTag}.js"));
                      if ($TemplateDeliveryMode == 'inline')
                         $ScriptHint = 'inline';
-                     
+
                      if (!file_exists($TemplateFile)) {
                         $TemplateArchiveContents = array();
                         foreach ($TemplateFiles as $TemplateSrcFile => $TemplateSrcOptions) {
                            $TemplateName = GetValueR('options.name', $TemplateSrcOptions);
-                           
+
                            $TemplateRelativeSrc = str_replace(
                               array(PATH_ROOT, DS),
                               array('', '/'),
                               $TemplateSrcFile
                            );
-                           
+
                            $TemplateArchiveContents[] = array(
                               'Name'      => $TemplateName,
                               'URL'       => Gdn::Request()->Url($TemplateRelativeSrc, '//'),
@@ -1706,19 +1706,19 @@ class Gdn_Controller extends Gdn_Pluggable {
                         file_put_contents($TemplateTempFile, "gdn.Template.Register({$TemplateArchiveContents});");
                         rename($TemplateTempFile, $TemplateFile);
                      }
-                     
+
                      break;
-                  
+
                   // Deferred loading, just registers the templates and allows lazyloading on the client
                   case 'defer':
-                     
+
                      $HashTag = AssetModel::HashTag($TemplateFiles);
                      $TemplateFile = CombinePaths(array(PATH_CACHE, "stache-defer-{$HashTag}.js"));
                      $ScriptHint = 'inline';
 
                      if (!file_exists($TemplateFile)) {
                         $TemplateDeferredContents = array();
-                        
+
                         $TemplateDeferredContents = array();
                         foreach ($TemplateFiles as $TemplateSrcFile => $TemplateSrcOptions) {
                            $TemplateName = GetValueR('options.name', $TemplateSrcOptions);
@@ -1736,15 +1736,15 @@ class Gdn_Controller extends Gdn_Pluggable {
                            );
                         }
                         $TemplateDeferredContents = json_encode($TemplateDeferredContents);
-                        
+
                         $TemplateTempFile = "{$TemplateFile}.tmp";
                         file_put_contents($TemplateTempFile, "gdn.Template.Register({$TemplateDeferredContents});");
                         rename($TemplateTempFile, $TemplateFile);
                      }
-                        
+
                      break;
                }
-               
+
                if ($TemplateFile && file_exists($TemplateFile)) {
                   $TemplateSrc = str_replace(
                      array(PATH_ROOT, DS),
@@ -1758,23 +1758,23 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                   $this->Head->AddScript($TemplateSrc, 'text/javascript', $TemplateOptions);
                }
-               
+
             }
          }
          // Add the favicon.
          $Favicon = C('Garden.FavIcon');
          if ($Favicon)
             $this->Head->SetFavIcon(Gdn_Upload::Url($Favicon));
-         
+
          // Make sure the head module gets passed into the assets collection.
          $this->AddModule('Head');
       }
-      
+
       // Master views come from one of four places:
       $MasterViewPaths = array();
-      
+
       $MasterViewPath2 = ViewLocation($this->MasterView().'.master', '', $this->ApplicationFolder);
-      
+
       if(strpos($this->MasterView, '/') !== false) {
          $MasterViewPaths[] = CombinePaths(array(PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*'));
       } else {
@@ -1789,7 +1789,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          // 4. Garden default. eg. root/dashboard/views/
          $MasterViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', $this->MasterView . '.master*'));
       }
-      
+
       // Find the first file that matches the path.
       $MasterViewPath = false;
       foreach($MasterViewPaths as $Glob) {
@@ -1799,28 +1799,28 @@ class Gdn_Controller extends Gdn_Pluggable {
             break;
          }
       }
-      
+
       if ($MasterViewPath != $MasterViewPath2)
          Trace("Master views differ. Controller: $MasterViewPath, ViewLocation(): $MasterViewPath2", TRACE_WARNING);
-      
+
       $this->EventArguments['MasterViewPath'] = &$MasterViewPath;
       $this->FireAs('Gdn_Controller')->FireEvent('BeforeFetchMaster');
 
       if ($MasterViewPath === false)
          trigger_error(ErrorMessage("Could not find master view: {$this->MasterView}.master*", $this->ClassName, '_FetchController'), E_USER_ERROR);
-      
+
       /// A unique identifier that can be used in the body tag of the master view if needed.
       $ControllerName = $this->ClassName;
       // Strip "Controller" from the body identifier.
       if (substr($ControllerName, -10) == 'Controller')
          $ControllerName = substr($ControllerName, 0, -10);
-         
+
       // Strip "Gdn_" from the body identifier.
       if (substr($ControllerName, 0, 4) == 'Gdn_')
-         $ControllerName = substr($ControllerName, 4); 
+         $ControllerName = substr($ControllerName, 4);
 
       $this->SetData('CssClass', $this->Application.' '.$ControllerName.' '.$this->RequestMethod.' '.$this->CssClass, true);
-     
+
       // Check to see if there is a handler for this particular extension.
       $ViewHandler = Gdn::Factory('ViewHandler' . strtolower(strrchr($MasterViewPath, '.')));
       if(is_null($ViewHandler)) {
@@ -1830,20 +1830,20 @@ class Gdn_Controller extends Gdn_Pluggable {
          $ViewHandler->Render($MasterViewPath, $this);
       }
    }
-   
+
    /**
     * Resolve relative static resources into full paths
-    * 
-    * This method is used to translate CSS, Js and Template relative file lists 
+    *
+    * This method is used to translate CSS, Js and Template relative file lists
     * into absolute paths.
-    * 
+    *
     * Element values should conform to the following format:
-    * 
+    *
     * [] => array(
     *    'FileName'     => // filename (relative, absolute, or URL)
     *    'AppFolder'    => // optional application folder to target (default controller app)
     * );
-    * 
+    *
     * @param array $ResourceList
     * @param string $Stub
     * @param array $Options Optional. List of check options.
@@ -1857,11 +1857,11 @@ class Gdn_Controller extends Gdn_Pluggable {
     *   - 'global'
     */
    public static function ResolveStaticResources($ResourceList, $Stub, $Options = null, $CheckLocations = null) {
-      
+
       // All locations by default
       if (!is_array($CheckLocations))
          $CheckLocations = array('themes', 'plugins', 'applications', 'global');
-      
+
       // Default options
       $DefaultOptions = array(
          'GlobalLibrary'   => true,
@@ -1872,15 +1872,15 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!is_array($Options))
          $Options = array();
       $Options = array_merge($DefaultOptions, $Options);
-      
+
       // Parse options
       $CheckGlobalLibrary = GetValue('GlobalLibrary', $Options);
       $StripRoot = GetValue('StripRoot', $Options);
       $AutoDetectVersion = GetValue('AutoVersion', $Options);
-      
+
       // See if we're allowing any CDN replacements
       $Cdns = GetValue('CDNS', $Options, array());
-      
+
       // Pre-get controller info
       $ControllerAppFolder = false;
       $ControllerTheme = false;
@@ -1888,75 +1888,75 @@ class Gdn_Controller extends Gdn_Pluggable {
          $ControllerAppFolder = Gdn::Controller()->ApplicationFolder;
          $ControllerTheme = Gdn::Controller()->Theme;
       }
-      
+
       $FileList = array();
       foreach ($ResourceList as $Index => $ResourceInfo) {
-         
+
          $ResourceFile = $ResourceInfo['FileName'];
          $ResourceFolder = GetValue('AppFolder', $ResourceInfo);
          $ResourceOptions = (array)GetValue('Options', $ResourceInfo, false);
-         
+
          if ($ResourceFile === false) {
             if (!$ResourceOptions) continue;
-            
+
             $RawCSS = GetValue('Css', $ResourceOptions, false);
             if (!$RawCSS) continue;
-            
+
             $CssHash = md5($RawCSS);
             $FileList[$ResourceFolder] = array(
                'options'   => $ResourceOptions
             );
             continue;
          }
-         
+
          $SkipFileCheck = false;
-         
+
          // Resolve CDN resources
          if (array_key_exists($ResourceFile, $Cdns))
             $ResourceFile = $Cdns[$ResourceFile];
-         
+
          if (strpos($ResourceFile, '//') !== false) {
-            
+
             // This is a link to an external file.
             $SkipFileCheck = true;
             $TestPaths = array($ResourceFile);
-            
+
          } elseif (strpos($ResourceFile, '/') === 0) {
-            
+
             // A direct path to the file was given.
             $TestPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $ResourceFile)), DS));
-            
+
          } elseif (strpos($ResourceFile, '~') === 0) {
-            
+
             $SkipFileCheck = true;
             $ResourceFile = substr($ResourceFile, 1);
             $TestPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $ResourceFile)), DS));
-            
+
          } else {
-            
+
             // Relative path
             $AppFolder = GetValue('AppFolder', $ResourceInfo, false);
             if ($AppFolder == '')
                $AppFolder = $ControllerAppFolder;
-            
+
             if ($AppFolder == 'false')
                $AppFolder = false;
 
             // Resources can come from:
             //   - a theme
-            //   - an application 
+            //   - an application
             //   - a plugin
             //   - global garden resource-specific folder
             //   - global garden resource-specific library folder
             $TestPaths = array();
-            
+
             // Theme
             if (in_array('themes', $CheckLocations) && $ControllerTheme) {
-               
+
                // Application-specific theme override
                if ($AppFolder)
                   $TestPaths[] = CombinePaths(array(PATH_THEMES, $ControllerTheme, $AppFolder, $Stub, $ResourceFile));
-               
+
                // Garden-wide theme override
                $TestPaths[] = CombinePaths(array(PATH_THEMES, $ControllerTheme, $Stub, $ResourceFile));
             }
@@ -1966,38 +1966,38 @@ class Gdn_Controller extends Gdn_Pluggable {
             if ($IsPluginFolder)
                $PluginFolder = StringBeginsWith(trim($AppFolder, '/'), 'plugins/', true, true);
             if (in_array('plugins', $CheckLocations) && $IsPluginFolder) {
-               
+
                // Plugin
                $TestPaths[] = CombinePaths(array(PATH_PLUGINS, $PluginFolder, $Stub, $ResourceFile));
                $TestPaths[] = CombinePaths(array(PATH_PLUGINS, $PluginFolder, $ResourceFile));
-               
+
             }
-            
+
             if (in_array('applications', $CheckLocations) && !$IsPluginFolder) {
-               
+
                // Application
                if ($AppFolder)
                   $TestPaths[] = CombinePaths(array(PATH_APPLICATIONS, $AppFolder, $Stub, $ResourceFile));
-               
+
                // Dashboard app is added by default
                if ($AppFolder != 'dashboard')
                   $TestPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', $Stub, $ResourceFile));
-               
+
             }
-            
+
             if (in_array('global', $CheckLocations)) {
-               
+
                // Global folder. eg. root/js/
                $TestPaths[] = CombinePaths(array(PATH_ROOT, $Stub, $ResourceFile));
-               
+
                if ($CheckGlobalLibrary) {
                   // Global library folder. eg. root/js/library/
                   $TestPaths[] = CombinePaths(array(PATH_ROOT, $Stub, 'library', $ResourceFile));
                }
             }
-            
+
          }
-         
+
          // Find the first file that matches the path.
          $ResourcePath = false;
          if (!$SkipFileCheck) {
@@ -2009,10 +2009,10 @@ class Gdn_Controller extends Gdn_Pluggable {
                }
             }
          }
-         
+
          // Get version
          $Version = GetValue('Version', $ResourceInfo, false);
-         
+
          // If a path was matched, make sure it has a version
          if ($ResourcePath && !$Version) {
 
@@ -2039,21 +2039,21 @@ class Gdn_Controller extends Gdn_Pluggable {
                $Version = GetValue('Version', $ApplicationInfo);
                $VersionSource = "app {$ApplicationName}";
             }
-            
+
          }
-         
+
          // Global file
          if (!$Version)
             $Version = APPLICATION_VERSION;
 
          // If a path was succesfully matched
          if ($ResourcePath !== false || $SkipFileCheck) {
-            
-            // We enact SkipFileCheck for virtual paths, targeting controllers 
+
+            // We enact SkipFileCheck for virtual paths, targeting controllers
             // perhaps, or full URLs from the CDN resolver.
             if ($SkipFileCheck)
                $ResourcePath = array_pop($TestPaths);
-            
+
             // Strip PATH_ROOT from absolute path
             $ResourceResolved = $ResourcePath;
             if ($StripRoot) {
@@ -2068,16 +2068,16 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Resource = array(
                'path'      => $ResourcePath
             );
-            
+
             $ResourceOptions = (array)GetValue('Options', $ResourceInfo, array());
             TouchValue('version', $Resource, $Version);
             if ($ResourceOptions)
                TouchValue('options', $Resource, $ResourceOptions);
-            
+
             $FileList[$ResourceResolved] = $Resource;
          }
       }
-      
+
       return $FileList;
    }
 
@@ -2089,10 +2089,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       // TODO: ALWAYS RENDER OR REDIRECT FROM THE CONTROLLER OR HEADERS WILL NOT BE SENT!! PUT THIS IN DOCS!!!
       foreach ($this->_Headers as $Name => $Value) {
          if ($Name != 'Status')
-            header($Name.': '.$Value, true);
+            safeHeader($Name.': '.$Value, true);
          else {
             $Code = array_shift($Shift = explode(' ', $Value));
-            header($Name.': '.$Value, true, $Code);
+            safeHeader($Name.': '.$Value, true, $Code);
          }
       }
       // Empty the collection after sending
@@ -2109,7 +2109,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function SetHeader($Name, $Value) {
       $this->_Headers[$Name] = $Value;
    }
-   
+
    /**
     * Set data from a method call.
     *
@@ -2119,7 +2119,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @return mixed The $Value that was set.
     */
    public function SetData($Key, $Value = null, $AddProperty = false) {
-      
+
       // Make sure the config settings are in the right format
       if (!is_array($this->Data))
          $this->Data = array();
@@ -2129,44 +2129,44 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Key => $Value
          );
       }
-      
+
       $Data = $Key;
       foreach ($Data as $Key => $Value) {
 
          $Keys = explode('.', $Key);
          $KeyCount = count($Keys);
          $Settings = &$this->Data;
-         
+
          // Set prop on controller
          if ($AddProperty && $KeyCount == 1)
             $this->$Key = $Value;
 
          for ($i = 0; $i < $KeyCount; ++$i) {
             $Key = $Keys[$i];
-            
+
             if (!is_array($Settings)) $Settings = array();
             $KeyExists = array_key_exists($Key, $Settings);
-   
+
             if ($i == $KeyCount - 1) {
-               
+
                // If we are on the last iteration of the key, then set the value.
                $Settings[$Key] = $Value;
-               
+
             } else {
-               
+
                // Build the array as we loop over the key. Doucement.
                if ($KeyExists === false)
                   $Settings[$Key] = array();
-               
+
                // Advance the pointer
                $Settings = &$Settings[$Key];
             }
          }
       }
-      
+
       return $Value;
    }
-   
+
    /**
     * Set $this->_FormSaved for JSON Renders.
     *
@@ -2207,7 +2207,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $this->SetHeader('Content-Length', '0');
             $this->SendHeaders();
-            header('HTTP/1.1 304 Not Modified');
+            safeHeader('HTTP/1.1 304 Not Modified');
             exit("\n\n"); // Send two linefeeds so that the client knows the response is complete
          }
       }
@@ -2223,20 +2223,20 @@ class Gdn_Controller extends Gdn_Pluggable {
    public function SetJson($Key, $Value = '') {
       $this->_Json[$Key] = $Value;
    }
-   
+
    public function TemplateFiles() {
       return $this->_TemplateFiles;
    }
-   
+
    public function StatusCode($StatusCode, $Message = null, $SetHeader = true) {
       if (is_null($Message))
          $Message = self::GetStatusMessage($StatusCode);
-      
+
       if ($SetHeader)
          $this->SetHeader('Status', "{$StatusCode} {$Message}");
       return $Message;
    }
-   
+
    public static function GetStatusMessage($StatusCode) {
       switch ($StatusCode) {
          case 100: $Message = 'Continue'; break;
@@ -2287,20 +2287,20 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
       return $Message;
    }
-   
+
    /**
     * If this object has a "Head" object as a property, this will set it's Title value.
-    * 
+    *
     * @param string $Title The value to pass to $this->Head->Title().
     */
    public function Title($Title = null, $Subtitle = null) {
       if (!is_null($Title))
          $this->SetData('Title', $Title);
-      
+
       if (!is_null($Subtitle))
          $this->SetData('_Subtitle', $Subtitle);
-      
+
       return $this->Data('Title');
    }
-   
+
 }

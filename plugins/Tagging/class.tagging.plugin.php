@@ -167,13 +167,10 @@ class TaggingPlugin extends Gdn_Plugin {
          }
 
          $RecordCount = $TagRow['CountDiscussions'];
-
-         // TODO: Does this tag belong to a category? Add that first.
          $Sender->SetData('TagRow', $TagRow);
       }
 
-      $TagModel->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
-      //$this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
+      $TagModel->SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
 
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
 
@@ -187,10 +184,10 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->View = C('Vanilla.Discussions.Layout');
 
       // If the tag is a CarModel, insert CarMake to breadcrumb
+      // TODO
       if ($Sender->Data['TagRow']['Type'] == 'CarModel') {
          $Sender->Data['Breadcrumbs'][] = array('Name' => 'CarMake', 'Url' => '');
       }
-
       $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($Sender->Tag), 'Url' => TagUrl($Tag, ''));
 
       $Sender->Pager->Configure(
@@ -694,7 +691,7 @@ if (!function_exists('TagUrl')):
       $Tag = Gdn_Format::Url($Tag);
       $Page = Gdn_Format::Url($Page);
       $Result = "discussions/tagged/$Tag/$Page";
-      
+
       return Url($Result, $WithDomain);
    }
 endif;

@@ -105,7 +105,7 @@ class TagModel extends Gdn_Model {
     *
     * @param Gdn_SQLDriver $Sql
     */
-   public function _SetTagSql($Sql, $Tag, &$Limit, &$Offset = 0, $Op = 'or') {
+   public function SetTagSql($Sql, $Tag, &$Limit, &$Offset = 0, $Op = 'or') {
       $SortField = 'd.DateLastComment';
       $SortDirection = 'desc';
 

@@ -118,6 +118,7 @@ class TaggingPlugin extends Gdn_Plugin {
 //         $Page = $Sender->Request->Get('Page');
 //      }
 
+
       $Tag = StringEndsWith($Tag, '.rss', TRUE, TRUE);
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
 
@@ -183,29 +184,20 @@ class TaggingPlugin extends Gdn_Plugin {
       $PagerFactory = new Gdn_PagerFactory();
       $Sender->Pager = $PagerFactory->GetPager('Pager', $Sender);
       $Sender->Pager->ClientID = 'Pager';
-
       $Sender->View = C('Vanilla.Discussions.Layout');
 
-      // TODO add to function below
-      if (urlencode($Sender->Tag) == $Sender->Tag)
-         $PageUrlFormat = "discussions/tagged/{$Sender->Tag}/{Page}";
-      else
-         $PageUrlFormat = 'discussions/tagged/{Page}?Tag='.urlencode($Sender->Tag);
+      // If the tag is a CarModel, insert CarMake to breadcrumb
+      if ($Sender->Data['TagRow']['Type'] == 'CarModel') {
+         $Sender->Data['Breadcrumbs'][] = array('Name' => 'CarMake', 'Url' => '');
+      }
 
-      decho($Sender->Data);
-
-      $disc = GetValue('Discussions', $Sender->Data);
-      decho($disc);
-
-
-      $Sender->Data['Breadcrumbs'][] = array('Name' => 'carmake', 'Url' => '');
-      $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($Sender->Tag), 'Url' => str_replace('{Page}', '', $PageUrlFormat));
+      $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($Sender->Tag), 'Url' => TagUrl($Tag, ''));
 
       $Sender->Pager->Configure(
          $Offset,
          $Limit,
          $RecordCount, // record count
-         $PageUrlFormat
+         TagUrl($Tag, '')
       );
 
       // Render the controller
@@ -698,36 +690,11 @@ class TaggingPlugin extends Gdn_Plugin {
 }
 
 if (!function_exists('TagUrl')):
-   function TagUrl($Row, $Page = '', $WithDomain = FALSE) {
-
-      if (urlencode($Sender->Tag) == $Sender->Tag)
-         $PageUrlFormat = "discussions/tagged/{$Sender->Tag}/{Page}";
-      else
-         $PageUrlFormat = 'discussions/tagged/{Page}?Tag='.urlencode($Sender->Tag);
-
-
-      $Row = (object)$Row;
-      $Result = '/discussion/'.$Row->DiscussionID.'/'.Gdn_Format::Url($Row->Name);
-      if ($Page) {
-         if ($Page > 1 || Gdn::Session()->UserID)
-            $Result .= '/p'.$Page;
-      }
-
+   function TagUrl($Tag, $Page = '', $WithDomain = FALSE) {
+      $Tag = Gdn_Format::Url($Tag);
+      $Page = Gdn_Format::Url($Page);
+      $Result = "discussions/tagged/$Tag/$Page";
+      
       return Url($Result, $WithDomain);
-
    }
 endif;
-
-
-
-/*
-function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
-   $Discussion = (object)$Discussion;
-   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
-   if ($Page) {
-      if ($Page > 1 || Gdn::Session()->UserID)
-         $Result .= '/p'.$Page;
-   }
-   return Url($Result, $WithDomain);
-}
-*/

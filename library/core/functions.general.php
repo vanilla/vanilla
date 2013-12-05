@@ -3022,7 +3022,7 @@ function SetAppCookie($Name, $Value, $Expire = 0, $Force = FALSE) {
       $Domain = '';
 
    // Create the cookie.
-   setcookie($Key, $Value, $Expire, '/', $Domain, NULL, TRUE);
+   safeCookie($Key, $Value, $Expire, '/', $Domain, NULL, TRUE);
    $_COOKIE[$Key] = $Value;
 }
 endif;

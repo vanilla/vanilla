@@ -25,7 +25,7 @@ class Emoji {
    /**
     * @var string The base path where the emoji are located.
     */
-   public $assetPath = '/resources/emoji';
+   protected $assetPath = '/resources/emoji';
 
    /**
     * @var array An emoji alias list that represents the emoji that display
@@ -332,6 +332,34 @@ class Emoji {
    }
 
    /**
+    *
+    * @param array $aliases
+    */
+   public function setAliases($aliases) {
+      if (count(array_filter($aliases))) {
+         $this->aliases = $aliases;
+      }
+   }
+
+   /**
+    *
+    * @param string $assetPath
+    */
+   public function setAssetPath($assetPath) {
+      $this->assetPath = $assetPath;
+   }
+
+   /**
+    *
+    * @param array $emoji
+    */
+   public function setEmoji($emoji) {
+      if (count(array_filter($emoji))) {
+         $this->emoji = $emoji;
+      }
+   }
+
+   /**
     * Translate all emoji aliases to their corresponding Html image tags.
     *
     * Thanks to punbb 1.3.5 (GPL License) for function, which was largely
@@ -353,7 +381,7 @@ class Emoji {
 
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
 				$Text = preg_replace(
-               '/(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
+               '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                $this->img($emojiFilePath, $emojiAlias),
 					$Text
 				);

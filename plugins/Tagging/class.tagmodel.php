@@ -93,6 +93,25 @@ class TagModel extends Gdn_Model {
       $this->Database->Query($Sql, array(':TagID' => $TagID));
    }
 
+   /**
+    * Get detailed tag data for a given discussion. An example use case would
+    * be when editing discussions: any non-typical tags, that is, ones that
+    * may appear to be categories, should have their specific data available,
+    * like Type, or Source.
+    *
+    * @param int $DiscussionID
+    * @return array
+    */
+   public function getDiscussionTagData($DiscussionID) {
+      $DiscussionTagData = Gdn::SQL()->Select('t.*')
+         ->From('TagDiscussion td')
+         ->Join('Tag t', 'td.TagID = t.TagID')
+         ->Where('td.DiscussionID', $DiscussionID)
+         ->Get()->ResultArray();
+
+      return Gdn_DataSet::Index($DiscussionTagData, 'Type', array('Unique' => false));
+   }
+
    public function GetDiscussions($Tag, $Limit, $Offset, $Op = 'or') {
       $DiscussionModel = new DiscussionModel();
       $this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Op);

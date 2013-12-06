@@ -139,11 +139,6 @@ class TaggingPlugin extends Gdn_Plugin {
          $Sender->SetData('TagRow', $TagRow);
       }
 
-
-
-
-
-
       $Sender->Title(htmlspecialchars($TagRow['FullName']));
       $UrlTag = rawurlencode($Tag);
       if (urlencode($Tag) == $Tag) {
@@ -175,8 +170,6 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $DiscussionModel = new DiscussionModel();
 
-
-
       $TagModel->SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Sender->Request->Get('op', 'or'));
 
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
@@ -190,7 +183,8 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Pager->ClientID = 'Pager';
       $Sender->View = C('Vanilla.Discussions.Layout');
 
-      if ($TagRow['Type'] == 'CarModel') {
+      // If these don't equal, then there is a category that should be inserted.
+      if ($TagRow['FullName'] != $TagRow['CategoryName']) {
          $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($TagRow['CategoryName']), 'Url' => TagUrl($TagRow, ''));
       }
       $Sender->Data['Breadcrumbs'][] = array('Name' => htmlspecialchars($TagRow['FullName']), 'Url' => '');
@@ -511,6 +505,12 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('tagging.js', 'plugins/Tagging');
       $Sender->AddDefinition('PluginsTaggingAdd', Gdn::Session()->CheckPermission('Plugins.Tagging.Add'));
       $Sender->AddDefinition('PluginsTaggingSearchUrl', Gdn::Request()->Url('plugin/tagsearch'));
+
+      // Make sure that detailed tag data is available to the form.
+      $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);
+      $TagModel = new TagModel();
+      $Tags = $TagModel->getDiscussionTagData($DiscussionID);
+      $Sender->SetData('Tags', $Tags);
    }
 
    /**

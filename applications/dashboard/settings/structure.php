@@ -2,7 +2,7 @@
 
 /**
  * Dashboard Application Structure
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -11,7 +11,7 @@
 
 if (!isset($Drop))
    $Drop = FALSE;
-   
+
 if (!isset($Explicit))
    $Explicit = TRUE;
 
@@ -84,7 +84,7 @@ $Construct
    ->Column('DateFirstVisit', 'datetime', TRUE)
    ->Column('DateLastActive', 'datetime', TRUE, 'index')
    ->Column('LastIPAddress', 'varchar(15)', TRUE)
-   ->Column('AllIPAddresses', 'varchar(100)', TRUE)
+   ->Column('AllIPAddresses', 'text', TRUE)
    ->Column('DateInserted', 'datetime', FALSE, 'index')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
@@ -109,7 +109,7 @@ if ($UserExists && !$ConfirmedExists) {
       $UserIDs = array();
       while ($User = $Users->NextRow(DATASET_TYPE_ARRAY))
          $UserIDs[] = $User['UserID'];
-      
+
       // Update
       Gdn::SQL()->Update('User')->Set('Confirmed', 0)->WhereIn('UserID', $UserIDs)->Put();
       Gdn::SQL()->Delete('UserRole', array('RoleID' => $ConfirmEmailRoleID, 'UserID' => $UserIDs));
@@ -158,7 +158,7 @@ $Construct->Table('UserMeta')
    ->Column('Value', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
-// User Points Table   
+// User Points Table
 $Construct->Table('UserPoints')
    ->Column('SlotType', array('d', 'w', 'm', 'y', 'a'), FALSE, 'primary')
    ->Column('TimeSlot', 'datetime', FALSE, 'primary')
@@ -174,7 +174,7 @@ $Construct->Table('UserAuthentication')
 	->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
 	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
-	
+
 $Construct->Table('UserAuthenticationProvider')
    ->Column('AuthenticationKey', 'varchar(64)', FALSE, 'primary')
    ->Column('AuthenticationSchemeAlias', 'varchar(32)', FALSE)
@@ -209,7 +209,7 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
-   
+
 $Construct->Table('Session')
 	->Column('SessionID', 'char(32)', FALSE, 'primary')
 	->Column('UserID', 'int', 0)
@@ -238,7 +238,7 @@ if($PermissionModel instanceof PermissionModel) {
 	$Construct->Table('Permission')
 		->PrimaryKey('PermissionID')
 		->Column('RoleID', 'int', 0, 'key')
-		->Column('JunctionTable', 'varchar(100)', TRUE) 
+		->Column('JunctionTable', 'varchar(100)', TRUE)
 		->Column('JunctionColumn', 'varchar(100)', TRUE)
 		->Column('JunctionID', 'int', TRUE)
 		// The actual permissions will be added by PermissionModel::Define()
@@ -383,7 +383,7 @@ $Construct->Table('ActivityType')
    ->Column('Notify', 'tinyint(1)', '0') // Add to RegardingUserID's notification list?
    ->Column('Public', 'tinyint(1)', '1') // Should everyone be able to see this, or just the RegardingUserID?
    ->Set($Explicit, $Drop);
-   
+
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 
@@ -455,7 +455,7 @@ if (!$NotifyUserIDExists && $ActivityExists) {
       ->Set('a.NotifyUserID', 'a.RegardingUserID', FALSE)
       ->Where('at.Notify', 1)
       ->Put();
-   
+
    // Update all public activities.
    $SQL->Update('Activity a')
       ->Join('ActivityType at', 'a.ActivityTypeID = at.ActivityTypeID')
@@ -463,7 +463,7 @@ if (!$NotifyUserIDExists && $ActivityExists) {
       ->Where('at.Public', 1)
       ->Where('a.NotifyUserID', 0)
       ->Put();
-   
+
    $SQL->Delete('Activity', array('NotifyUserID' => 0));
 }
 
@@ -512,7 +512,7 @@ $SQL->Replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AboutUpdate'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'AboutUpdate', 'FullHeadline' => '%1$s updated %6$s profile.', 'ProfileHeadline' => '%1$s updated %6$s profile.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:')); 
+   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'PictureChange'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'PictureChange', 'FullHeadline' => '%1$s changed %6$s profile picture.', 'ProfileHeadline' => '%1$s changed %6$s profile picture.'));
 //if ($SQL->GetWhere('ActivityType', array('Name' => 'RoleChange'))->NumRows() == 0)
@@ -585,7 +585,7 @@ if ($PhotoIDExists) {
 if ($Construct->TableExists('Tag')) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
-   
+
    $DupTags = Gdn::SQL()
       ->Select('Name')
       ->Select('TagID', 'min', 'TagID')
@@ -594,7 +594,7 @@ if ($Construct->TableExists('Tag')) {
       ->GroupBy('Name')
       ->Having('CountTags >', 1)
       ->Get()->ResultArray();
-   
+
    foreach ($DupTags as $Row) {
       $Name = $Row['Name'];
       $TagID = $Row['TagID'];
@@ -603,10 +603,10 @@ if ($Construct->TableExists('Tag')) {
       foreach ($DeleteTags as $DRow) {
          // Update all of the discussions to the new tag.
          Gdn::SQL()->Options('Ignore', TRUE)->Put(
-            'TagDiscussion', 
-            array('TagID' => $TagID), 
+            'TagDiscussion',
+            array('TagID' => $TagID),
             array('TagID' => $DRow['TagID']));
-         
+
          // Delete the tag.
          Gdn::SQL()->Delete('Tag', array('TagID' => $DRow['TagID']));
       }
@@ -685,7 +685,7 @@ $Construct
    ->Column('Path', 'varchar(255)')
    ->Column('Type', 'varchar(128)')
    ->Column('Size', 'int(11)')
-   
+
    ->Column('InsertUserID', 'int(11)')
    ->Column('DateInserted', 'datetime')
    ->Column('ForeignID', 'int(11)', TRUE)
@@ -697,7 +697,7 @@ $Construct
    ->Column('ThumbWidth', 'usmallint', NULL)
    ->Column('ThumbHeight', 'usmallint', NULL)
    ->Column('ThumbPath', 'varchar(255)', NULL)
-   
+
    ->Set(FALSE, FALSE);
 
 // Merge backup.

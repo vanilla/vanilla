@@ -8,7 +8,7 @@
 
 // Only do this once, ever.
 $DiscussionModel = new DiscussionModel();
-if ($DiscussionModel->GetCount())
+if ($DiscussionModel->GetWhere(array('ForeignID' => 'stub')))
    return;
 
 $SQL = Gdn::Database()->SQL();
@@ -25,7 +25,7 @@ $DiscussionBody = "There&rsquo;s nothing sweeter than a fresh new forum, ready t
    <li>Bookmark a discussion (click the star) to get notifications for new comments. You can edit notification settings from your profile.</li>
 </ul>
 Go ahead and edit or delete this discussion, then spread the word to get this place cooking. Cheers!";
-$CommentBody = "This is the first comment on your site and it&rsquo;s an important one. 
+$CommentBody = "This is the first comment on your site and it&rsquo;s an important one.
 
 Don&rsquo;t see your must-have feature? We keep Vanilla nice and simple by default. Use <b>addons</b> to get the special sauce your community needs.
 
@@ -38,7 +38,7 @@ $TargetUserID = Gdn::Session()->UserID;
 $Now = Gdn_Format::ToDateTime();
 $CategoryID = GetValue('CategoryID', CategoryModel::DefaultCategory());
 
-// Get wall post type ID 
+// Get wall post type ID
 $WallCommentTypeID = $SQL->GetWhere('ActivityType', array('Name' => 'WallPost'))->Value('ActivityTypeID');
 
 // Insert first discussion & comment
@@ -66,7 +66,7 @@ $SQL->Update('Discussion')
    ->Where('DiscussionID', $DiscussionID)
    ->Put();
 $DiscussionModel->UpdateDiscussionCount($CategoryID);
-   
+
 // Insert first wall post
 $SQL->Insert('Activity', array(
    'Story' => T('StubWallBody', $WallBody),

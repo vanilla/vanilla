@@ -1032,6 +1032,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          }
       }
 
+      $this->FireEvent('BeforeAddonDisabled');
       // 2. Perform necessary hook action
       $this->_PluginHook($PluginName, self::ACTION_DISABLE, TRUE);
 

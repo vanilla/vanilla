@@ -28,6 +28,12 @@ class Emoji {
    protected $assetPath = '/resources/emoji';
 
    /**
+    *
+    * @var string If assetPath is modified, this will hold the original path.
+    */
+   protected $assetPathOriginal;
+
+   /**
     * @var array An emoji alias list that represents the emoji that display
     * in an editor dropdown. Typically, it is a copy of the alias list.
     */
@@ -45,6 +51,21 @@ class Emoji {
     * @var array All of the available emoji.
     */
    protected $emoji;
+
+   /**
+    *
+    * @var array The original emoji that are not accounted for in the custom
+    * set of emoji supplied by plugin, if any. This is useful when merging the
+    * custom ones with the original ones, which have different assetPaths.
+    */
+   protected $emojiOriginalUnaccountedFor;
+
+   /**
+    * This is the emoji name that will represent the error emoji.
+    *
+    * @var string If emoji is missing, use grey_question emoji.
+    */
+   protected $errorEmoji = 'error';
 
    /**
     *
@@ -77,6 +98,13 @@ class Emoji {
     * @var string right-side delimiter surrounding emoji, typically a full-colon
     */
    public $rdelim = ':';
+
+   /**
+    *
+    * @var bool If set to true, original unaccounted for emoji will get merged
+    * into the custom set.
+    */
+   protected $mergeOriginals = false;
 
    /// Methods ///
 
@@ -155,15 +183,19 @@ class Emoji {
         '+1'                           => array('+1.png', '435'),
         '-1'                           => array('-1.png', '436'),
 
-        // Custom icons, canonical naming
-        'trollface'                    => array('trollface.png', 'trollface'),
+        // This is used for aliases that are set incorrectly or point
+        // to items not listed in the emoji list.
+        // errorEmoji
+        'grey_question'                => array('grey_question.png', '106'),
 
-        // This is used for aliases that are set incorrectly above or point
-        // to items not listed in the canonical list.
-        'grey_question'                => array('grey_question.png', '106')
+        // Custom icons, canonical naming
+        'trollface'                    => array('trollface.png', 'trollface')
       );
 
       // Some aliases self-referencing the canonical list. Use this syntax.
+
+      // This is used in cases where emoji image cannot be found.
+      $this->emoji['error'] = &$this->emoji['grey_question'];
 
       // Vanilla reactions, non-canonical referencing canonical
       $this->emoji['lol']       = &$this->emoji['smile'];
@@ -219,8 +251,30 @@ class Emoji {
     * @param string $emojiFileName File name of emoji icon.
     * @return string Root-relative path.
     */
-   public function buildFilePath($emojiFileName) {
-      return $this->assetPath . '/' . $emojiFileName;
+   public function buildFilePath($emojiName) {
+
+      // By default, just characters will be outputted (img alt text)
+      $filePath = $emojiFileName = '';
+
+      if ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
+         $filePath = $this->assetPathOriginal;
+         $emojiFileName = reset($this->emojiOriginalUnaccountedFor[$emojiName]);
+      } else if (isset($this->emoji[$emojiName])) {
+         $filePath = $this->assetPath;
+         $emojiFileName = reset($this->emoji[$emojiName]);
+      } else {
+         // If the emojiName is not in the list and they have not enabled
+         // mergeOriginals, then take the original file path and output
+         // the error emoji, defined in this class.
+         //
+         // Note: disabled for now so if done incorrectly, just output the
+         // raw characters.
+         //
+         //$filePath = $this->assetPathOriginal;
+         //$emojiFileName = reset($this->emojiOriginalUnaccountedFor['error']);
+      }
+
+      return $filePath . '/' . $emojiFileName;
    }
 
    /**
@@ -282,17 +336,10 @@ class Emoji {
     * @return string|array File name or full canonical array
     */
    public function getEmoji($emojiCanonical = '') {
-
-      // If the $emojiCanonical does not exist in the list, deliver a
-      // warning emoji, to degrade gracefully.
-      if ($emojiCanonical && !isset($this->emoji[$emojiCanonical])) {
-         $emojiCanonical = 'grey_question';
-      }
-
       // Return first value from canonical array
       return (!$emojiCanonical)
          ? $this->emoji
-         : $this->buildFilePath(reset($this->emoji[$emojiCanonical]));
+         : $this->buildFilePath($emojiCanonical);
    }
 
    /**
@@ -332,6 +379,32 @@ class Emoji {
    }
 
    /**
+    * This is useful in case the custom set should be merged with the default
+    * set. Any custom emoji tags that match the default will overwrite the
+    * default.
+    *
+    * TODO: this will require the original assetPath to be stored if it's been
+    * overwritten.
+    *
+    * @param array $additionEmoji
+    */
+   public function mergeAdditionalEmoji($additionEmoji) {
+      return array_merge($this->emoji, $additionEmoji);
+   }
+
+   /**
+    * Note: if setting this to true, it must be the first method called in a
+    * plugin that will use custom emojis, but also want to merge the unaccounted
+    * for original ones, otherwise the original emojis and path will not be
+    * stored.
+    *
+    * @param bool $bool
+    */
+   public function mergeOriginals($bool) {
+      $this->mergeOriginals = $bool;
+   }
+
+   /**
     *
     * @param array $aliases
     */
@@ -346,15 +419,29 @@ class Emoji {
     * @param string $assetPath
     */
    public function setAssetPath($assetPath) {
+      // Save original asset path for merging default emoji.
+      if ($this->mergeOriginals) {
+         $this->assetPathOriginal = $this->assetPath;
+      }
+
       $this->assetPath = $assetPath;
    }
 
    /**
+    * Sets custom emoji, and saves the original ones that are unaccounted for.
     *
     * @param array $emoji
     */
    public function setEmoji($emoji) {
       if (count(array_filter($emoji))) {
+         // Save the emoji that are unaccounted for in their custom set.
+         // This can be used if merging them with the custom set, as they
+         // have different assetPaths.
+         if ($this->mergeOriginals) {
+            $this->emojiOriginalUnaccountedFor = array_diff_key($this->emoji, $emoji);
+         }
+
+         // Set custom emoji.
          $this->emoji = $emoji;
       }
    }

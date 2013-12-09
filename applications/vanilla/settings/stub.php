@@ -8,7 +8,7 @@
 
 // Only do this once, ever.
 $DiscussionModel = new DiscussionModel();
-if ($DiscussionModel->GetWhere(array('ForeignID' => 'stub')))
+if ($DiscussionModel->GetCount())
    return;
 
 $SQL = Gdn::Database()->SQL();

@@ -9,8 +9,26 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class TagModel extends Gdn_Model {
+   /// Properties ///
+
+   protected $Types;
+   protected static $instance;
+
+   /// Methods ///
+
    public function  __construct($Name = '') {
       parent::__construct('Tag');
+   }
+
+   /**
+    * The singleton instance of this object.
+    * @return TagModel
+    */
+   public static function instance() {
+      if (!isset(self::$instance)) {
+         self::$instance = new TagModel();
+      }
+      return self::$instance;
    }
 
    public function  Save($FormPostValues, $Settings = FALSE) {
@@ -76,6 +94,28 @@ class TagModel extends Gdn_Model {
       }
    }
 
+   public function AddType($key, $row) {
+      $row['key'] = $key;
+      $this->Types[$key] = $row;
+   }
+
+   /**
+    * Get the available tag types.
+    *
+    */
+   public function Types() {
+      if (!isset($this->Types)) {
+         $this->Types = array(
+            '' => array(
+               'key' => '',
+               'name' => 'Tag'
+               ));
+
+         $this->FireEvent('Types');
+      }
+      return $this->Types;
+   }
+
    /**
     * Update the tag count per discussion in the Tag table
     *
@@ -94,6 +134,35 @@ class TagModel extends Gdn_Model {
    }
 
    /**
+    * Get all of the tags related to the current tag.
+    * @param mixed $tag
+    */
+   public function getRelatedTags($tag) {
+      if (is_numeric($tag)) {
+         $tag = $this->GetID($tag, DATASET_TYPE_ARRAY);
+      }
+      if (!is_array($tag))
+         return array();
+
+      $result = array(
+         $tag['Type'] => array($tag)
+      );
+
+      // Get all of the parent tags.
+      for ($i = 0, $parentid = GetValue('ParentTagID', $tag);
+         $parentid && $i < 10;
+         $i++, $parentid = GetValue('ParentTagID', $tag)) {
+
+         $tag = $this->GetID($parentid, DATASET_TYPE_ARRAY);
+         if (!$tag)
+            break;
+
+         $result[$tag['Type']][] = $tag;
+      }
+      return $result;
+   }
+
+   /**
     * Get detailed tag data for a given discussion. An example use case would
     * be when editing discussions: any non-typical tags, that is, ones that
     * may appear to be categories, should have their specific data available,
@@ -102,7 +171,7 @@ class TagModel extends Gdn_Model {
     * @param int $DiscussionID
     * @return array
     */
-   public function getDiscussionTagData($DiscussionID) {
+   public function getDiscussionTags($DiscussionID) {
       $DiscussionTagData = Gdn::SQL()->Select('t.*')
          ->From('TagDiscussion td')
          ->Join('Tag t', 'td.TagID = t.TagID')
@@ -181,6 +250,20 @@ class TagModel extends Gdn_Model {
           'Vanilla.Discussions.SortDirection' => $SortDirection),
           '',
           FALSE);
+   }
+
+   /**
+    * Unpivot tags that are grouped by type.
+    *
+    * @param array $tags
+    * @return array
+    */
+   public function unpivot($tags) {
+      $result = array();
+      foreach ($tags as $rows) {
+         $result = array_merge($result, $rows);
+      }
+      return $result;
    }
 
    public static function ValidateTag($Tag) {

@@ -80,13 +80,12 @@ class TaggingPlugin extends Gdn_Plugin {
       }
    }
 
+   /**
+    * @param DiscussionController $Sender
+    */
    public function DiscussionController_Render_Before($Sender) {
       // Get the tags on this discussion.
-      $Tags = Gdn::SQL()->Select('*')
-         ->From('TagDiscussion td')
-         ->Join('Tag t', 't.TagID = td.TagID')
-         ->Where('td.DiscussionID', $Sender->Data('Discussion.DiscussionID'))
-         ->Get()->ResultArray();
+      $Tags = TagModel::instance()->getDiscussionTags($Sender->Data('Discussion.DiscussionID'));
 
       SetValue('Tags', $Sender->Data['Discussion'], $Tags);
    }
@@ -134,7 +133,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $Sender->SetData('Tag', $Tag, TRUE);
 
-      $TagModel = new TagModel();
+      $TagModel = TagModel::instance();
       $RecordCount = FALSE;
       if (!$MultipleTags) {
          $Tags = $TagModel->GetWhere(array('Name' => $Tag))->ResultArray();
@@ -152,10 +151,11 @@ class TaggingPlugin extends Gdn_Plugin {
          } else {
             $TagRow = array_pop($Tags);
          }
+         $Tags = $TagModel->getRelatedTags($TagRow);
 
          $RecordCount = $TagRow['CountDiscussions'];
          $Sender->SetData('CountDiscussions', $RecordCount);
-         $Sender->SetData('TagRow', $TagRow);
+         $Sender->SetData('Tags', $Tags);
       }
 
       $Sender->Title(htmlspecialchars($TagRow['FullName']));
@@ -539,7 +539,7 @@ class TaggingPlugin extends Gdn_Plugin {
       // Make sure that detailed tag data is available to the form.
       $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);
       $TagModel = new TagModel();
-      $Tags = $TagModel->getDiscussionTagData($DiscussionID);
+      $Tags = $TagModel->getDiscussionTags($DiscussionID);
       $Sender->SetData('Tags', $Tags);
    }
 

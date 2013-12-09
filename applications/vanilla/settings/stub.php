@@ -42,7 +42,7 @@ $CategoryID = GetValue('CategoryID', CategoryModel::DefaultCategory());
 $WallCommentTypeID = $SQL->GetWhere('ActivityType', array('Name' => 'WallPost'))->Value('ActivityTypeID');
 
 // Insert first discussion & comment
-$DiscussionID = $SQL->Insert('Discussion', array(
+$DiscussionID = $SQL->Options('Ignore', true)->Insert('Discussion', array(
    'Name' => T('StubDiscussionTitle', $DiscussionTitle),
    'Body' => T('StubDiscussionBody', $DiscussionBody),
    'Format' => 'Html',

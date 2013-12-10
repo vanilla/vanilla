@@ -1294,21 +1294,21 @@ if (!function_exists('_FormatStringCallback')) {
                      $User = $Value;
                      $User['Name'] = FormatUsername($User, $Format, $ContextUserID);
 
-                     $Result = UserAnchor($User);
-                  } else {
-                     $Max = C('Garden.FormatUsername.Max', 5);
-                     // See if there is another count.
-                     $ExtraCount = GetValueR($Field.'_Count', $Args, 0);
+                  $Result = UserAnchor($User);
+               } else {
+                  $Max = C('Garden.FormatUsername.Max', 5);
+                  // See if there is another count.
+                  $ExtraCount = GetValueR($Field.'_Count', $Args, 0);
 
-                     $Count = count($Value);
-                     $Result = '';
-                     for ($i = 0; $i < $Count; $i++) {
-                        if ($i >= $Max && $Count > $Max + 1) {
-                           $Others = $Count - $i + $ExtraCount;
-                           $Result .= ' '.T('sep and', 'and').' '
-                              .Plural($Others, '%s other', '%s others');
-                           break;
-                        }
+                  $Count = count($Value);
+                  $Result = '';
+                  for ($i = 0; $i < $Count; $i++) {
+                     if ($i >= $Max && $Count > $Max + 1) {
+                        $Others = $Count - $i + $ExtraCount;
+                        $Result .= ' '.T('sep and', 'and').' '
+                           .Plural($Others, '%s other', '%s others');
+                        break;
+                     }
 
                         $ID = $Value[$i];
                         if (is_array($ID)) {
@@ -2975,6 +2975,29 @@ if (!function_exists('SafeParseStr')) {
    }
 }
 
+
+if (!function_exists('SafeRedirect')) {
+   /**
+    * Redirect, but only to a safe domain.
+    *
+    * @param string $Destination Where to redirect.
+    * @param int $StatusCode
+    */
+   function SafeRedirect($Destination = FALSE, $StatusCode = NULL) {
+      if (!$Destination)
+         $Destination = Url('', TRUE);
+      else
+         $Destination = Url($Destination, TRUE);
+
+      $Domain = parse_url($Destination, PHP_URL_HOST);
+      if (in_array($Domain, TrustedDomains())) {
+         Redirect($Destination, $StatusCode);
+      } else {
+         throw PermissionException();
+      }
+   }
+}
+
 if (!function_exists('SaveToConfig')) {
    /**
     * Save values to the application's configuration file.
@@ -3305,6 +3328,21 @@ if (!function_exists('TrueStripSlashes')) {
       function TrueStripSlashes($String) {
          return $String;
       }
+   }
+}
+
+if (!function_exists('TrustedDomains')) {
+   /**
+    * Get an array of all of the trusted domains in the application.
+    * @return array
+    */
+   function TrustedDomains() {
+      $Result = (array)C('Garden.TrustedDomains', array());
+
+      // This domain is safe.
+      $Result[] = Gdn::Request()->Host();
+
+      return array_unique($Result);
    }
 }
 

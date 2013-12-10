@@ -755,6 +755,10 @@ $Construct
 // This will allow us to change the default later and grandfather existing forums in.
 SaveToConfig('Garden.InputFormatter', C('Garden.InputFormatter'));
 
+// Save the current input formatter to the user's config.
+// This will allow us to change the default later and grandfather existing forums in.
+SaveToConfig('Garden.InputFormatter', C('Garden.InputFormatter'));
+
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');
 if (!file_exists(PATH_CACHE.'/Smarty/cache')) @mkdir(PATH_CACHE.'/Smarty/cache');

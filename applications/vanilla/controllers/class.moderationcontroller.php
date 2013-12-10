@@ -326,16 +326,23 @@ class ModerationController extends VanillaController {
    /**
     * Form to ask for the destination of the move, confirmation and permission check.
     */
-   public function ConfirmDiscussionMoves() {
+   public function ConfirmDiscussionMoves($DiscussionID = NULL) {
       $Session = Gdn::Session();
       $this->Form = new Gdn_Form();
       $DiscussionModel = new DiscussionModel();
 
       $this->Title(T('Confirm'));
 
-      $CheckedDiscussions = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedDiscussions', array());
-      if (!is_array($CheckedDiscussions))
-         $CheckedDiscussions = array();
+      if ($DiscussionID) {
+         $CheckedDiscussions = (array)$DiscussionID;
+         $ClearSelection = FALSE;
+      } else {
+         $CheckedDiscussions = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedDiscussions', array());
+         if (!is_array($CheckedDiscussions))
+            $CheckedDiscussions = array();
+         
+         $ClearSelection = TRUE;
+      }
 
       $DiscussionIDs = $CheckedDiscussions;
       $CountCheckedDiscussions = count($DiscussionIDs);
@@ -393,9 +400,11 @@ class ModerationController extends VanillaController {
             $DiscussionModel->SetField($DiscussionID, 'CategoryID', $CategoryID);
          }
 
-         // Clear selections
-         Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
-         ModerationController::InformCheckedDiscussions($this);
+         // Clear selections.
+         if ($ClearSelection) {
+            Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
+            ModerationController::InformCheckedDiscussions($this);
+         }
          
          if ($this->Form->ErrorCount() == 0)
             $this->JsonTarget('', '', 'Refresh');

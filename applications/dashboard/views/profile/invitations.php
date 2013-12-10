@@ -8,27 +8,25 @@ if ($this->InvitationCount > 0) {
 }
 if ($this->InvitationCount != 0) {
 ?>
-   <div class="Info"><?php echo T('Enter the email address of the person you would like to invite:'); ?></div>
-<ul>
-   <li>
-   <?php
-      echo $this->Form->Label('Email', 'Email');
+   <div class="InviteForm">
+      <?php
+      echo $this->Form->Label('Enter the email address of the person you would like to invite:', 'Email');
       echo $this->Form->TextBox('Email');
       echo ' ', $this->Form->Button('Invite');
-   ?></li>
-</ul>
+      ?>
+   </div>
 <?php
 }
 
 if ($this->InvitationData->NumRows() > 0) {
 ?>
-<table class="AltRows">
+<table class="AltRows Invitations DataTable">
    <thead>
       <tr>
-         <th><?php echo T('Invitation Code'); ?></th>
-         <th class="Alt"><?php echo T('Sent To'); ?></th>
-         <th><?php echo T('On'); ?></th>
-         <th class="Alt"><?php echo T('Status'); ?></th>
+         <th class=""><?php echo T('Sent To', 'Recipient'); ?></th>
+         <th class="Alt InviteMeta"><?php echo T('On'); ?></th>
+         <th class="InviteMeta"><?php echo T('Status'); ?></th>
+         <th class="InviteCode Alt InviteMeta"><?php echo T('Invitation Code', 'Code'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -39,18 +37,22 @@ foreach ($this->InvitationData->Format('Text')->Result() as $Invitation) {
    $Alt = $Alt == TRUE ? FALSE : TRUE;
 ?>
    <tr<?php echo ($Alt ? ' class="Alt"' : ''); ?>>
-      <td><?php echo $Invitation->Code; ?></td>
       <td class="Alt"><?php
-         if ($Invitation->AcceptedName == '')
-            echo $Invitation->Email;
-         else
-            echo Anchor($Invitation->AcceptedName, '/profile/'.$Invitation->AcceptedUserID);
-            
          if ($Invitation->AcceptedName == '') {
-            echo '<div>'
-               .Anchor(T('Uninvite'), '/profile/uninvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'Uninvite')
-               .' | '.Anchor(T('Send Again'), '/profile/sendinvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'SendAgain')
-            .'</div>';
+            echo $Invitation->Email;
+            echo Wrap(
+               Anchor(T('Uninvite'), '/profile/uninvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'Uninvite')
+               .' | '.
+               Anchor(T('Send Again'), '/profile/sendinvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'SendAgain')
+               , 'div');
+         }
+         else {
+            $User = Gdn::UserModel()->GetID($Invitation->AcceptedUserID);
+            echo UserAnchor($User);
+         }
+
+         if ($Invitation->AcceptedName == '') {
+
          }
       ?></td>
       <td><?php echo Gdn_Format::Date($Invitation->DateInserted); ?></td>
@@ -62,6 +64,7 @@ foreach ($this->InvitationData->Format('Text')->Result() as $Invitation) {
          }
             
       ?></td>
+      <td><?php echo $Invitation->Code; ?></td>
    </tr>
 <?php } ?>
     </tbody>

@@ -2,7 +2,7 @@
 
 /**
  * Theme system
- * 
+ *
  * Allows access to theme controls from within views, to give themers a unified
  * toolset for interacting with Vanilla from within views.
  *
@@ -34,57 +34,57 @@ class Gdn_Theme {
    public static function Breadcrumbs($Data, $HomeLink = TRUE, $Options = array()) {
       $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
       $PlainFormat = '<span itemprop="title">{Name,html}</span>';
-      
+
       $Result = '';
-      
+
       if (!is_array($Data))
          $Data = array();
 
-      
+
       if ($HomeLink) {
          $HomeUrl = GetValue('HomeUrl', $Options);
          if (!$HomeUrl)
             $HomeUrl = Url('/', TRUE);
-         
+
          $Row = array('Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
             $Row['Name'] = T('Home');
-         
+
          array_unshift($Data, $Row);
       }
-      
+
       if (GetValue('HideLast', $Options)) {
          // Remove the last item off the list.
          array_pop($Data);
       }
-      
+
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
       
       $Count = 0;
       $DataCount = 0;
-      
+
       foreach ($Data as $Row) {
          $DataCount++;
-         
+
          if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
             continue; // don't show default route twice.
-         
+
          // Add the breadcrumb wrapper.
          if ($Count > 0) {
             $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
          }
-         
+
          $Row['Url'] = Url($Row['Url']);
          $CssClass = 'CrumbLabel '.GetValue('CssClass', $Row);
          if ($DataCount == count($Data))
             $CssClass .= ' Last';
-         
-         $Label = '<span class="'.$CssClass.'">'.FormatString($Row['Url'] ? $Format : $PlainFormat, $Row).'</span> ';
+
+         $Label = '<span class="'.$CssClass.'">'.FormatString($Format, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
-         
+
          $Count++;
       }
-      
+
       // Close the stack.
       for ($Count--; $Count > 0; $Count--) {
          $Result .= '</span>';
@@ -93,13 +93,13 @@ class Gdn_Theme {
       $Result ='<span class="Breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">'.$Result.'</span>';
       return $Result;
    }
-   
+
    protected static $_BulletSep = FALSE;
    protected static $_BulletSection = FALSE;
-   
+
    /**
     * Call before writing an item and it will optionally write a bullet seperator.
-    * 
+    *
     * @param string $Section The name of the section.
     * @param bool $Return whether or not to return the result or echo it.
     * @return string
@@ -107,23 +107,23 @@ class Gdn_Theme {
     */
    public static function BulletItem($Section, $Return = TRUE) {
       $Result = '';
-      
+
       if (self::$_BulletSection === FALSE)
          self::$_BulletSection = $Section;
       elseif (self::$_BulletSection != $Section) {
          $Result = "<!-- $Section -->".self::$_BulletSep;
          self::$_BulletSection = $Section;
       }
-      
+
       if ($Return)
          return $Result;
       else
          echo $Result;
    }
-   
+
    /**
     * Call before starting a row of bullet-seperated items.
-    * 
+    *
     * @param strng|bool $Sep The seperator used to seperate each section.
     * @since 2.1
     */
@@ -136,12 +136,12 @@ class Gdn_Theme {
       }
       self::$_BulletSection = FALSE;
    }
-   
-   
-   
+
+
+
    /**
     * Returns whether or not the page is in the current section.
-    * @param string|array $Section 
+    * @param string|array $Section
     */
    public static function InSection($Section) {
       $Section = (array)$Section;
@@ -151,7 +151,7 @@ class Gdn_Theme {
       }
       return FALSE;
    }
-   
+
    public static function Link($Path, $Text = FALSE, $Format = NULL, $Options = array()) {
       $Session = Gdn::Session();
       $Class = GetValue('class', $Options, '');
@@ -159,7 +159,7 @@ class Gdn_Theme {
       $Target = GetValue('Target', $Options, '');
       if ($Target == 'current')
          $Target = trim(Url('', TRUE), '/ ');
-      
+
       if (is_null($Format))
          $Format = '<a href="%url" class="%class">%text</a>';
 
@@ -263,6 +263,11 @@ class Gdn_Theme {
                $Text .= ' <span class="Count">'.$Session->User->CountDiscussions.'</span>';
             }
             break;
+         case 'register':
+            if (!$Text)
+               $Text = T('Register');
+            $Path = RegisterUrl($Target);
+            break;
          case 'signin':
          case 'signinout':
             // The destination is the signin/signout toggle link.
@@ -281,15 +286,15 @@ class Gdn_Theme {
             }
             break;
       }
-      
+
       if ($Text == FALSE && strpos($Format, '%text') !== FALSE)
          return '';
-      
+
       if (GetValue('Permissions', $Options) && !$Session->CheckPermission($Options['Permissions'], FALSE))
          return '';
 
       $Url = Gdn::Request()->Url($Path, $WithDomain);
-      
+
       if ($TK = GetValue('TK', $Options)) {
          if (in_array($TK, array(1, 'true')))
             $TK = 'TransientKey';
@@ -304,7 +309,7 @@ class Gdn_Theme {
       $Result = str_replace('%url', $Url, $Result);
       $Result = str_replace('%text', $Text, $Result);
       $Result = str_replace('%class', $Class, $Result);
-      
+
       return $Result;
    }
 
@@ -323,17 +328,33 @@ class Gdn_Theme {
       echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
    }
 
+   /**
+    * Returns the mobile banner logo. If there is no mobile logo defined then this will just return
+    * the regular logo or the mobile title.
+    *
+    * @return string
+    */
+   public static function MobileLogo() {
+      $Logo = C('Garden.MobileLogo', C('Garden.Logo'));
+      $Title = C('Garden.MobileTitle', C('Garden.Title', 'Title'));
+
+      if ($Logo)
+         return Img(Gdn_Upload::Url($Logo), array('alt' => $Title));
+      else
+         return $Title;
+   }
+
    public static function Module($Name, $Properties = array()) {
       if (isset($Properties['cache'])) {
          $Key = isset($Properties['cachekey']) ? $Properties['cachekey'] : 'module.'.$Name;
-         
+
          $Result = Gdn::Cache()->Get($Key);
          if ($Result !== Gdn_Cache::CACHEOP_FAILURE) {
 //            Trace('Module: '.$Result, $Key);
             return $Result;
          }
       }
-      
+
       try {
          if (!class_exists($Name)) {
             if (Debug())
@@ -343,10 +364,15 @@ class Gdn_Theme {
          } else {
                $Module = new $Name(Gdn::Controller(), '');
                $Module->Visible = TRUE;
+
+               // Add properties passed in from the controller.
+               $ControllerProperties = Gdn::Controller()->Data('_properties.'.strtolower($Name), array());
+               $Properties = array_merge($ControllerProperties, $Properties);
+
                foreach ($Properties as $Name => $Value) {
                   $Module->$Name = $Value;
                }
-               
+
                $Result = $Module->ToString();
          }
       } catch (Exception $Ex) {
@@ -355,15 +381,15 @@ class Gdn_Theme {
          else
             $Result = $Ex->getMessage();
       }
-      
+
       if (isset($Key)) {
 //         Trace($Result, "Store $Key");
          Gdn::Cache()->Store($Key, $Result, array(Gdn_Cache::FEATURE_EXPIRY => $Properties['cache']));
       }
-      
+
       return $Result;
    }
-   
+
    public static function Pagename() {
       $Application = Gdn::Dispatcher()->Application();
       $Controller = Gdn::Dispatcher()->Controller();
@@ -372,28 +398,28 @@ class Gdn_Theme {
          case 'discussion':
          case 'post':
             return 'discussions';
-            
+
          case 'inbox':
             return 'inbox';
-            
+
          case 'activity':
             return 'activity';
-            
+
          case 'profile':
             $Args = Gdn::Dispatcher()->ControllerArguments();
             if (!sizeof($Args) || (sizeof($Args) && $Args[0] == Gdn::Session()->UserID))
                return 'profile';
             break;
       }
-      
+
       return 'unknown';
    }
-   
+
    /**
     * @var array
     */
    protected static $_Section = array();
-   
+
    /**
     * The current section the site is in. This can be one or more values. Think of it like a server-side css-class.
     * @since 2.1
@@ -406,8 +432,8 @@ class Gdn_Theme {
     */
    public static function Section($Section, $Method = 'add') {
       $Section = array_fill_keys((array)$Section, TRUE);
-      
-      
+
+
       switch (strtolower($Method)) {
          case 'add':
             self::$_Section = array_merge(self::$_Section, $Section);

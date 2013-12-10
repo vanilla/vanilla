@@ -32,6 +32,13 @@ class CategoryModel extends Gdn_Model {
    public static $Categories = NULL;
 
    /**
+    * Whether or not to join the users in some calls.
+    * Forums with a lot of categories may need to optimize using this setting and simpler views.
+    * @var bool Whether or not to join users to recent posts.
+    */
+   public $JoinRecentUsers = TRUE;
+
+   /**
     * Class constructor. Defines the related database table name.
     *
     * @since 2.0.0
@@ -160,7 +167,7 @@ class CategoryModel extends Gdn_Model {
 		foreach ($Data as &$Category) {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
          $Category['CountAllComments'] = $Category['CountComments'];
-         $Category['Url'] = self::CategoryUrl($Category, FALSE, '//');
+         $Category['Url'] = self::CategoryUrl($Category, FALSE, '/');
          $Category['ChildIDs'] = array();
          if (GetValue('Photo', $Category))
             $Category['PhotoUrl'] = Gdn_Upload::Url($Category['Photo']);
@@ -483,7 +490,7 @@ class CategoryModel extends Gdn_Model {
             $Row['LastDiscussionUserID'] = $Discussion['InsertUserID'];
             $Row['LastDateInserted'] = $Discussion['DateInserted'];
             $NameUrl = Gdn_Format::Text($Discussion['Name'], TRUE);
-            $Row['LastUrl'] = DiscussionUrl($Discussion, FALSE, '//').'#latest';
+            $Row['LastUrl'] = DiscussionUrl($Discussion, FALSE, '/').'#latest';
          }
          $Comment = GetValue($Row['LastCommentID'], $Comments);
          if ($Comment) {
@@ -625,6 +632,9 @@ class CategoryModel extends Gdn_Model {
       $Session = Gdn::Session();
       foreach ($IDs as $CID) {
          $Category = $Categories[$CID];
+         $Categories[$CID]['Url'] = Url($Category['Url'], '//');
+         if ($Category['LastUrl'])
+            $Categories[$CID]['LastUrl'] = Url($Category['LastUrl'], '//');
          $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
@@ -976,7 +986,9 @@ class CategoryModel extends Gdn_Model {
             self::JoinRecentChildPosts($Category, $Categories);
       }
 
-      Gdn::UserModel()->JoinUsers($Categories, array('LastUserID'));
+      // This join users call can be very slow on forums with a lot of categories so we can disable it here.
+      if ($this->JoinRecentUsers)
+         Gdn::UserModel()->JoinUsers($Categories, array('LastUserID'));
 
       $Result = new Gdn_DataSet($Categories, DATASET_TYPE_ARRAY);
       $Result->DatasetType(DATASET_TYPE_OBJECT);
@@ -1463,7 +1475,8 @@ class CategoryModel extends Gdn_Model {
 
          if ($Insert === FALSE) {
             $OldCategory = $this->GetID($CategoryID, DATASET_TYPE_ARRAY);
-            $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
+            if (NULL === GetValue('AllowDiscussions', $FormPostValues, NULL))
+               $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
             $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
 
             // Figure out custom points.
@@ -1717,7 +1730,7 @@ class CategoryModel extends Gdn_Model {
                 'CategoryID' => 'CategoryID',
                 'LastTitle' => 'Name'));
 
-            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '//').'#latest');
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '/').'#latest');
 
             if (is_null($LastDateInserted))
                SetValue('LastDateInserted', $Category, GetValue('DateLastDiscussion', $Category, NULL));
@@ -1729,7 +1742,7 @@ class CategoryModel extends Gdn_Model {
             ));
 
             SetValue('LastUserID', $Category, GetValue('LastCommentUserID', $Category, NULL));
-            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '//').'#latest');
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '/').'#latest');
 
             if (is_null($LastDateInserted))
                SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));

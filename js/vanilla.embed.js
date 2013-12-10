@@ -460,6 +460,10 @@ embed.stop = embed.fn.stop = function() {
    }
 };
 
+embed.unembed = embed.fn.unembed = function(url) {
+    window.location.replace(url);
+}
+
 Vanilla.embed = embed;
 
 // Expose Vanilla to the global object

@@ -119,7 +119,7 @@
     position: absolute;
     text-align: left;
     top: 0;
-    right: -7px;
+    right: 0;
     cursor: pointer;
 }
 
@@ -133,7 +133,7 @@
 .EmoticonContainer {
     position: absolute;
     top: 23px;
-    right: -8px;
+    right: 0;
     border: 1px solid #aaa;
     border-bottom: 0;
     border-right: 0;

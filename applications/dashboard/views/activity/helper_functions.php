@@ -73,7 +73,7 @@ function WriteActivity($Activity, &$Sender, &$Session) {
          WriteReactions($Activity);
       ?>
       <div class="Meta">
-         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateUpdated); ?></span>
+         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Activity->DateInserted); ?></span>
          <?php
          $SharedString = FALSE;
          $ID = GetValue('SharedNotifyUserID', $Activity->Data);

@@ -273,8 +273,11 @@ class AssetModel extends Gdn_Model {
       }
 
       if ($Folder) {
-         // 3. Check a plugin or application.
-         if (StringBeginsWith($Folder, 'plugins/')) {
+         // 3. Check static, a plugin or application.
+         if (in_array($Folder, array('resources', 'static'))) {
+            $path = "/resources/css/$Filename";
+            $Paths[] = array(PATH_ROOT.$path, $path);
+         } elseif (StringBeginsWith($Folder, 'plugins/')) {
             $Folder = substr($Folder, strlen('plugins/'));
             $Paths[] = array(PATH_PLUGINS."/{$Folder}/design/{$Filename}", "/plugins/{$Folder}/design/{$Filename}");
             $Paths[] = array(PATH_PLUGINS."/{$Folder}/{$Filename}", "/plugins/{$Folder}/{$Filename}");

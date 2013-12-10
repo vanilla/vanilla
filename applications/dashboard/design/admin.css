@@ -470,6 +470,9 @@ div.DismissMessage a.Dismiss {
 div.DismissMessage a.Dismiss:hover {
 	color: #ff0084;
 }
+.Message {
+   padding: 10px;
+}
 .CasualMessage {
    background: #CFECFF;
    border: 1px solid #ABDAFB;

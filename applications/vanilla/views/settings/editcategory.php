@@ -11,7 +11,6 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Name');
       ?>
    </li>
-   <?php if ($this->Category->AllowDiscussions) { ?>
    <li id="UrlCode">
 		<?php
 		echo Wrap(T('Category Url:'), 'strong');
@@ -25,7 +24,6 @@ echo $this->Form->Errors();
 		echo Anchor(T('OK'), '#', 'Save SmallButton');
 		?>
    </li>
-   <?php } ?>
    <li>
       <?php
          echo $this->Form->Label('Description', 'Description');

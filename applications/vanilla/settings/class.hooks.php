@@ -352,6 +352,55 @@ class VanillaHooks implements Gdn_IPlugin {
    }
    
    /**
+    * @param SiteLinkMenuModule $sender
+    */
+   public function SiteNavModule_default_handler($sender) {
+      // Grab the default route so that we don't add a link to it twice.
+      $home = trim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController')), '/');
+      
+      // Add the site discussion links.
+      if ($home !== 'categories')
+         $sender->addLink('main.categories', array('text' => t('All Categories', 'Categories'), 'url' => '/categories', 'icon' => icon('th-list'), 'sort' => 1));
+      if ($home !== 'discussions')
+         $sender->addLink('main.discussions', array('text' => t('Recent Discussions'), 'url' => '/discussions', 'icon' => icon('discussion'), 'sort' => 1));
+      
+      // Add favorites.
+      $sender->addGroup('favorites', array('text' => t('Favorites')));
+      
+      if (Gdn::Session()->IsValid()) {
+         $sender->addLink('favorites.bookmarks', array('text' => t('My Bookmarks'), 
+            'url' => '/discussions/bookmarked', 'icon' => icon('star'), 
+            'badge' => countString(Gdn::Session()->User->CountBookmarks, Url('/discussions/userbookmarkcount'))));
+         $sender->addLink('favorites.discussions', array('text' => t('My Discussions'), 
+            'url' => '/discussions/mine', 'icon' => icon('discussion'),
+            'badge' => countString(Gdn::Session()->User->CountDiscussions)));
+         $sender->addLink('favorites.drafts', array('text' => t('Drafts'), 'url' => '/drafts', 
+            'icon' => icon('compose'),
+            'badge' => countString(Gdn::Session()->User->CountDrafts)));
+      }
+   }
+   
+   /**
+    * @param SiteLinkMenuModule $sender
+    */
+   public function SiteNavModule_profile_handler($sender) {
+      $user = Gdn::Controller()->Data('Profile');
+      
+      if (!$user)
+         return;
+      
+      $user_id = val('UserID', $user);
+      
+      $sender->addGroup('posts', array('text' => t('Posts')));
+      
+      $sender->addLink('posts.discussions', array('text' => t('Discussions'), 'url' => UserUrl($user, '', 'discussions'),
+         'icon' => icon('discussion'), 'badge' => countString(val('CountDiscussions', $user), "/profile/count/discussions?userid=$user_id")));
+      
+      $sender->addLink('posts.comments', array('text' => t('Comments'), 'url' => UserUrl($user, '', 'comments'),
+         'icon' => icon('comment'), 'badge' => countString(val('CountComments', $user), "/profile/count/comments?userid=$user_id")));
+   }
+   
+   /**
 	 * Creates virtual 'Comments' method in ProfileController.
 	 * 
     * @since 2.0.0

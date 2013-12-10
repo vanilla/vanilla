@@ -16,7 +16,7 @@
       <li>
          <?php
             echo $this->Form->Label('Category to Use', 'Plugins.Flagging.CategoryID');
-            echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', C('Plugins.Flagging.CategoryID'));
+            echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', array('Value' => C('Plugins.Flagging.CategoryID')));
          ?>
       </li>
    </ul>

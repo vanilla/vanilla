@@ -50,7 +50,7 @@ class ProfileController extends Gdn_Controller {
       $this->_TabApplication = 'Dashboard';
       $this->CurrentTab = 'Activity';
       $this->ProfileTabs = array();
-      $this->EditMode = TRUE;
+      $this->EditMode(TRUE);
       parent::__construct();
    }
 
@@ -316,8 +316,8 @@ class ProfileController extends Gdn_Controller {
       $this->Form->SetValue('ConfirmEmail', (int)$Confirmed);
 
       // Decide if we can *see* email
-      $this->SetData('_CanViewPersonalInfo',(CheckPermission('Garden.PersonalInfo.View') || CheckPermission('Garden.Users.Edit')));
-
+      $this->SetData('_CanViewPersonalInfo', Gdn::Session()->UserID == GetValue('UserID', $User) || CheckPermission('Garden.PersonalInfo.View') || CheckPermission('Garden.Users.Edit'));
+      
       // Define gender dropdown options
       $this->GenderOptions = array(
          'u' => T('Unspecified'),
@@ -1492,6 +1492,12 @@ class ProfileController extends Gdn_Controller {
       $this->EditMode = $Switch;
       if (!$this->EditMode && strpos($this->CssClass, 'EditMode') !== FALSE)
          $this->CssClass = str_replace('EditMode', '', $this->CssClass);
+      
+      if ($Switch) {
+         Gdn_Theme::Section('EditProfile');
+      } else {
+         Gdn_Theme::Section('EditProfile', 'remove');
+      }
    }
 
    /**

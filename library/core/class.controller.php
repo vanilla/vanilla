@@ -855,6 +855,61 @@ class Gdn_Controller extends Gdn_Pluggable {
       else if ($this->SyndicationMethod == SYNDICATION_RSS)
          $View .= '_rss';
 
+      $ViewPath2 = ViewLocation($View, $ControllerName, $ApplicationFolder);
+
+      $LocationName = ConcatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
+      $ViewPath = ArrayValue($LocationName, $this->_ViewLocations, FALSE);
+      if ($ViewPath === FALSE) {
+         // Define the search paths differently depending on whether or not we are in a plugin or application.
+         $ApplicationFolder = trim($ApplicationFolder, '/');
+         if (StringBeginsWith($ApplicationFolder, 'plugins/')) {
+            $KeyExplode = explode('/',$ApplicationFolder);
+            $PluginName = array_pop($KeyExplode);
+            $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginName);
+
+            $BasePath = GetValue('SearchPath', $PluginInfo);
+            $ApplicationFolder = GetValue('Folder', $PluginInfo);
+         } else {
+            $BasePath = PATH_APPLICATIONS;
+            $ApplicationFolder = strtolower($ApplicationFolder);
+         }
+
+         $SubPaths = array();
+         // Define the subpath for the view.
+         // The $ControllerName used to default to '' instead of FALSE.
+         // This extra search is added for backwards-compatibility.
+         if (strlen($ControllerName) > 0)
+            $SubPaths[] = "views/$ControllerName/$View";
+         else {
+            $SubPaths[] = "views/$View";
+
+            $SubPaths[] = 'views/'.StringEndsWith($this->ControllerName, 'Controller', TRUE, TRUE)."/$View";
+         }
+
+         // Views come from one of four places:
+         $ViewPaths = array();
+
+         // 1. An explicitly defined path to a view
+         if (strpos($View, DS) !== FALSE)
+            $ViewPaths[] = $View;
+
+         if ($this->Theme) {
+            // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
+            foreach ($SubPaths as $SubPath) {
+               $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$ApplicationFolder/$SubPath.*";
+               // $ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
+            }
+
+            // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
+            foreach ($SubPaths as $SubPath) {
+               $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$SubPath.*";
+               //$ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
+            }
+         }
+
+         // 4. Application/plugin default. eg. /path/to/application/app_name/views/controller_name/
+         foreach ($SubPaths as $SubPath) {
+            $ViewPaths[] = "$BasePath/$ApplicationFolder/$SubPath.*";
       $ViewPath = ViewLocation($View, $ControllerName, $ApplicationFolder);
 
       // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
@@ -1581,6 +1636,18 @@ class Gdn_Controller extends Gdn_Pluggable {
 
          // Only get css & ui components if this is NOT a syndication request
          if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
+//            if (ArrayHasValue($this->_CssFiles, 'style.css')) {
+//               $this->AddCssFile('custom.css');
+//
+//               // Add the theme option's css file.
+//               if ($this->Theme && $this->ThemeOptions) {
+//                  $Filenames = GetValueR('Styles.Value', $this->ThemeOptions);
+//                  if (is_string($Filenames) && $Filenames != '%s')
+//                     $this->_CssFiles[] = array('FileName' => ChangeBasename('custom.css', $Filenames), 'AppFolder' => FALSE, 'Options' => FALSE);
+//               }
+//            } elseif (ArrayHasValue($this->_CssFiles, 'admin.css')) {
+//               $this->AddCssFile('customadmin.css');
+//            }
 
             $CombineAssets = C('Garden.CombineAssets', false);
 

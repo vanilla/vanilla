@@ -1958,6 +1958,43 @@ class DiscussionModel extends VanillaModel {
       }
       
 	}
+   
+   /**
+    * Bookmarks (or unbookmarks) a discussion for the specified user.
+    * 
+    * @param int $DiscussionID The unique id of the discussion.
+    * @param int $UserID The unique id of the user.
+    * @param bool|null $Bookmarked Whether or not to bookmark or unbookmark. Pass null to toggle the bookmark.
+    * @return bool The new value of bookmarked.
+    */
+   public function Bookmark($DiscussionID, $UserID, $Bookmarked = NULL) {
+      // Get the current user discussion record.
+      $UserDiscussion = $this->SQL->GetWhere('UserDiscussion', 
+         array('DiscussionID' => $DiscussionID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
+      
+      if ($UserDiscussion) {
+         if ($Bookmarked === NULL)
+            $Bookmarked = !$UserDiscussion['Bookmarked'];
+         
+         // Update the bookmarked value.
+         $this->SQL->Put('UserDiscussion', 
+            array('Bookmarked' => (int)$Bookmarked),
+            array('DiscussionID' => $DiscussionID, 'UserID' => $UserID));
+      } else {
+         if ($Bookmarked === NULL)
+            $Bookmarked = TRUE;
+         
+         // Insert the new bookmarked value.
+         $this->SQL->Options('Ignore', TRUE)
+            ->Insert('UserDiscussion', array(
+               'UserID' => $UserID,
+               'DiscussionID' => $DiscussionID,
+               'Bookmarked' => (int)$Bookmarked
+            ));
+      }
+      
+      return (bool)$Bookmarked;
+   }
 
    /**
     * Bookmarks (or unbookmarks) a discussion for specified user.

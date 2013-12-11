@@ -119,7 +119,7 @@ class Emoji {
         'smiley'                       => array('smiley.png', '704'),
         'smile'                        => array('smile.png', '705'),
         'sweat_smile'                  => array('sweat_smile.png', '706'),
-        'satisfied'                    => array('satisfied.png', '707'),
+        'lol'                           => array('lol.png', '707'),
         'innocent'                     => array('innocent.png', '708'),
         'smiling_imp'                  => array('smiling_imp.png', '709'),
         'wink'                         => array('wink.png', '710'),

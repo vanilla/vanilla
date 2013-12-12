@@ -63,17 +63,6 @@ class TagModel extends Gdn_Model {
             // Update the counts
             $this->UpdateTagCountDiscussions($ToID);
 
-            /*
-            // Update the counts.
-            $Sql = "update {$Px}Tag t
-               set CountDiscussions = (
-                  select count(DiscussionID)
-                  from {$Px}TagDiscussion td
-                  where td.TagID = t.TagID)
-                where t.TagID = :ToID";
-            $this->Database->Query($Sql, array(':ToID' => $ToID));
-             */
-
             // Delete the old tag.
             $Sql = "delete from {$Px}Tag where TagID = :FromID";
             $this->Database->Query($Sql, array(':FromID' => $FromID));
@@ -160,6 +149,21 @@ class TagModel extends Gdn_Model {
          $result[$tag['Type']][] = $tag;
       }
       return $result;
+   }
+
+   /**
+    * Get the child tags associated with the parent tag id.
+    *
+    * @param int $parentTagID The parent tag ID to check for children.
+    * @return array All child tag rows
+    */
+   public function getChildTags($parentTagID) {
+      $childTags = $this->GetWhere(array('ParentTagID' => $parentTagID))->ResultArray();
+      if (!count(array_filter($childTags))) {
+         $childTags = array();
+      }
+
+      return $childTags;
    }
 
    /**

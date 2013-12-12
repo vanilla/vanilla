@@ -80,17 +80,11 @@ class TagModule extends Gdn_Module {
       switch ($this->ParentType) {
          case 'Discussion':
             $Tags = Gdn::Controller()->Data('Discussion.Tags');
-            if ($Tags) {
-               $TagQuery->Reset();
-               $this->_TagData = new Gdn_DataSet($Tags, DATASET_TYPE_ARRAY);
-               return;
-            } else {
-               $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
-                  ->Where('td.DiscussionID', $this->ParentID)
-                  ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+            if (!$Tags) {
+               $Tags = TagModel::instance()->getDiscussionTags($this->ParentID);
             }
+            $Tags = TagModel::instance()->unpivot($Tags);
             break;
-
          case 'Category':
             $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')
                ->Select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
@@ -110,12 +104,16 @@ class TagModule extends Gdn_Module {
             break;
       }
 
-      $this->_TagData = $TagQuery
-         ->Select('t.*')
-         ->From('Tag t')
-         ->OrderBy('t.CountDiscussions', 'desc')
-         ->Limit(25)
-         ->Get();
+      if (isset($Tags) && $Tags) {
+         $this->_TagData = new Gdn_DataSet($Tags, DATASET_TYPE_ARRAY);
+      } else {
+         $this->_TagData = $TagQuery
+            ->Select('t.*')
+            ->From('Tag t')
+            ->OrderBy('t.CountDiscussions', 'desc')
+            ->Limit(25)
+            ->Get();
+      }
 
       $this->_TagData->DatasetType(DATASET_TYPE_ARRAY);
    }

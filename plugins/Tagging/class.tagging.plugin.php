@@ -59,6 +59,7 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCSSFile('tag.css', 'plugins/Tagging');
+      $Sender->AddCSSFile('childtagslist.css', 'plugins/Tagging');
    }
 
    /**
@@ -156,6 +157,10 @@ class TaggingPlugin extends Gdn_Plugin {
          $RecordCount = $TagRow['CountDiscussions'];
          $Sender->SetData('CountDiscussions', $RecordCount);
          $Sender->SetData('Tags', $Tags);
+         $Sender->SetData('Tag', $TagRow);
+
+         $ChildTags = $TagModel->getChildTags($TagRow['TagID']);
+         $Sender->SetData('ChildTags', $ChildTags);
       }
 
       $Sender->Title(htmlspecialchars($TagRow['FullName']));

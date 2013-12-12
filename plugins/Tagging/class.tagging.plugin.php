@@ -215,7 +215,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
       // If these don't equal, then there is a category that should be inserted.
       if ($UseCategories && $Category && $TagRow['FullName'] != GetValue('Name', $Category)) {
-         $Sender->Data['Breadcrumbs'][] = array('Name' => $Category['Name'], 'Url' => CategoryUrl($Category));
+         $Sender->Data['Breadcrumbs'][] = array('Name' => $Category['Name'], 'Url' => TagUrl($TagRow));
       }
       $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['FullName'], 'Url' => '');
 

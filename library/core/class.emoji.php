@@ -256,22 +256,14 @@ class Emoji {
       // By default, just characters will be outputted (img alt text)
       $filePath = $emojiFileName = '';
 
-      if ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
-         $filePath = $this->assetPathOriginal;
-         $emojiFileName = reset($this->emojiOriginalUnaccountedFor[$emojiName]);
-      } else if (isset($this->emoji[$emojiName])) {
+      if (isset($this->emoji[$emojiName])) {
          $filePath = $this->assetPath;
          $emojiFileName = reset($this->emoji[$emojiName]);
+      } elseif ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
+         $filePath = $this->assetPathOriginal;
+         $emojiFileName = reset($this->emojiOriginalUnaccountedFor[$emojiName]);
       } else {
-         // If the emojiName is not in the list and they have not enabled
-         // mergeOriginals, then take the original file path and output
-         // the error emoji, defined in this class.
-         //
-         // Note: disabled for now so if done incorrectly, just output the
-         // raw characters.
-         //
-         //$filePath = $this->assetPathOriginal;
-         //$emojiFileName = reset($this->emojiOriginalUnaccountedFor['error']);
+         return '';
       }
 
       return $filePath . '/' . $emojiFileName;

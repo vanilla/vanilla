@@ -86,9 +86,11 @@ class TaggingPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Render_Before($Sender) {
       // Get the tags on this discussion.
-      $Tags = TagModel::instance()->getDiscussionTags($Sender->Data('Discussion.DiscussionID'));
+      $Tags = TagModel::instance()->getDiscussionTags($Sender->Data('Discussion.DiscussionID'), TagModel::IX_EXTENDED);
 
-      SetValue('Tags', $Sender->Data['Discussion'], $Tags);
+      foreach ($Tags as $Key => $Value) {
+         SetValue($Key, $Sender->Data['Discussion'], $Value);
+      }
    }
 
    /**
@@ -544,9 +546,9 @@ class TaggingPlugin extends Gdn_Plugin {
 
       // Make sure that detailed tag data is available to the form.
       $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);
-      $TagModel = new TagModel();
-      $Tags = $TagModel->getDiscussionTags($DiscussionID);
-      $Sender->SetData('Tags', $Tags);
+      $TagModel = TagModel::instance();
+      $Tags = $TagModel->getDiscussionTags($DiscussionID, TagModel::IX_EXTENDED);
+      $Sender->SetData($Tags);
    }
 
    /**

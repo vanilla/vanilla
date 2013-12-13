@@ -9,6 +9,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class TagModel extends Gdn_Model {
+   const IX_EXTENDED = 'x';
+
    /// Properties ///
 
    protected $Types;
@@ -190,14 +192,28 @@ class TagModel extends Gdn_Model {
     * @param int $DiscussionID
     * @return array
     */
-   public function getDiscussionTags($DiscussionID) {
-      $DiscussionTagData = Gdn::SQL()->Select('t.*')
+   public function getDiscussionTags($DiscussionID, $indexed = true) {
+      $Tags = Gdn::SQL()->Select('t.*')
          ->From('TagDiscussion td')
          ->Join('Tag t', 'td.TagID = t.TagID')
          ->Where('td.DiscussionID', $DiscussionID)
          ->Get()->ResultArray();
 
-      return Gdn_DataSet::Index($DiscussionTagData, 'Type', array('Unique' => false));
+      if ($indexed) {
+         // The tags are indexed by type.
+         $Tags = Gdn_DataSet::Index($Tags, 'Type', array('Unique' => false));
+         if ($indexed === TagModel::IX_EXTENDED) {
+            // The tags are indexed by type, but tags with no type are seperated.
+            if (array_key_exists('', $Tags)) {
+               $Tags = array('Tags' => $Tags[''], 'XTags' => $Tags);
+               unset($Tags['XTags']['']);
+            } else {
+               $Tags = array('Tags' => array(), 'XTags' => $Tags);
+            }
+         }
+      }
+
+      return $Tags;
    }
 
    public function GetDiscussions($Tag, $Limit, $Offset, $Op = 'or') {

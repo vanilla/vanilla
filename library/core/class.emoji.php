@@ -478,12 +478,13 @@ class Emoji {
       // Second, translate canonical list, without looping.
       $ldelim = preg_quote($this->ldelim, '`');
       $rdelim = preg_quote($this->rdelim, '`');
+      $emoji = $this;
 
-      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) {
+      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) use ($emoji) {
          $emoji_name = trim($m[1], ':');
-         $emoji_path = $this->getEmoji($emoji_name);
+         $emoji_path = $emoji->getEmoji($emoji_name);
          if ($emoji_path) {
-            return $this->img($emoji_path, $this->ldelim.$emoji_name.$this->rdelim);
+            return $emoji->img($emoji_path, $emoji->ldelim.$emoji_name.$emoji->rdelim);
          } else {
             return $m[0];
          }

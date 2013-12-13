@@ -383,7 +383,7 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Search results for tagging autocomplete.
     */
-   public function PluginController_TagSearch_Create($Sender, $q = '', $id = false, $parent = false, $type = 'null') {
+   public function PluginController_TagSearch_Create($Sender, $q = '', $id = false, $parent = false, $type = 'default') {
 
       // Allow per-category tags
       $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
@@ -396,7 +396,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Query = $q;
       $Data = array();
       $Database = Gdn::Database();
-      if ($Query || $parent || $type !== 'null') {
+      if ($Query || $parent || $type !== 'default') {
          $TagQuery = Gdn::SQL()
             ->Select('*')
             ->From('Tag')
@@ -406,8 +406,9 @@ class TaggingPlugin extends Gdn_Plugin {
             $TagQuery->Like('FullName', str_replace(array('%', '_'), array('\%', '_'), $Query), strlen($Query) > 2 ? 'both' : 'right');
          }
 
-         if ($type === 'null') {
-            $TagQuery->Where("nullif(Type, '') is null"); // Other UIs can set a different type
+         if ($type === 'default') {
+            $defaultTypes = array_keys(TagModel::instance()->defaultTags());
+            $TagQuery->Where('Type', $defaultTypes); // Other UIs can set a different type
          } elseif ($type) {
             $TagQuery->Where('Type', $type);
          }

@@ -31,6 +31,15 @@ class TagModel extends Gdn_Model {
       return self::$instance;
    }
 
+   public function defaultTags() {
+      $types = array_filter($this->Types(), function ($val) {
+         if (val('default', $val))
+            return true;
+         return false;
+      });
+      return $types;
+   }
+
    public function  Save($FormPostValues, $Settings = FALSE) {
       // Get the ID of an existing tag with the same name.
       $ExistingTag = $this->GetWhere(array('Name' => $FormPostValues['Name'], 'TagID <>' => GetValue('TagID', $FormPostValues)))->FirstRow(DATASET_TYPE_ARRAY);
@@ -83,6 +92,11 @@ class TagModel extends Gdn_Model {
       }
    }
 
+   /**
+    * Add a tag type.
+    * @param string $key
+    * @param array $row
+    */
    public function AddType($key, $row) {
       $row['key'] = $key;
       $this->Types[$key] = $row;
@@ -97,7 +111,8 @@ class TagModel extends Gdn_Model {
          $this->Types = array(
             '' => array(
                'key' => '',
-               'name' => 'Tag'
+               'name' => 'Tag',
+               'default' => true
                ));
 
          $this->FireEvent('Types');

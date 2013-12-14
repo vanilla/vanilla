@@ -233,98 +233,26 @@ class TaggingPlugin extends Gdn_Plugin {
       $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
       $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
       $CategoryID = GetValueR('Fields.CategoryID', $Sender->EventArguments, 0);
-      $IsInsert = GetValue('Insert', $Sender->EventArguments);
+//      $IsInsert = GetValue('Insert', $Sender->EventArguments);
       $RawFormTags = GetValue('Tags', $FormPostValues, '');
       $FormTags = trim(strtolower($RawFormTags));
       $FormTags = TagModel::SplitTags($FormTags);
-
-      // Get discussion
 
       // If we're associating with categories
       $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
       if ($CategorySearch)
          $CategoryID = GetValue('CategoryID', $FormPostValues, FALSE);
 
-      // Resave the Discussion's Tags field as serialized
-      $SerializedTags = Gdn_Format::Serialize(explode(',',$RawFormTags));
-      $Sender->SQL->Update('Discussion')->Set('Tags', $SerializedTags)->Where('DiscussionID', $DiscussionID)->Put();
+      // Let plugins add their information getting saved.
+      $Types = array('');
+      $this->EventArguments['Data'] = $FormPostValues;
+      $this->EventArguments['Tags'] =& $FormTags;
+      $this->EventArguments['Types'] =& $Types;
+      $this->EventArguments['CategoryID'] = $CategoryID;
+      $this->FireEvent('SaveDiscussion');
 
-      // Find out which of these tags is not yet in the tag table
-      $ExistingTagQuery = $Sender->SQL->Select('TagID, Name')
-         ->From('Tag')
-         ->WhereIn('Name', $FormTags);
-
-      if ($CategorySearch)
-         $ExistingTagQuery->Where('CategoryID', $CategoryID);
-
-      $ExistingTagData = $ExistingTagQuery->Get();
-      $NewTags = $FormTags;
-      $Tags = array(); // <-- Build a complete associative array of $Tags[TagID] => TagName values for this discussion.
-      foreach ($ExistingTagData as $ExistingTag) {
-         if (in_array(strtolower($ExistingTag->Name), $NewTags))
-            unset($NewTags[array_search($ExistingTag->Name, $NewTags)]);
-
-         $Tags[$ExistingTag->TagID] = $ExistingTag->Name;
-      }
-
-      // Insert the missing ones (if we have permission)
-      if (Gdn::Session()->CheckPermission('Plugins.Tagging.Add')) {
-         foreach ($NewTags as $NewTag) {
-
-            $NewTag = array(
-               'Name' => strtolower($NewTag),
-               'InsertUserID' => Gdn::Session()->UserID,
-               'DateInserted' => Gdn_Format::ToDateTime(),
-               'CountDiscussions' => 0
-            );
-
-            if ($CategorySearch)
-               $NewTag['CategoryID'] = $CategoryID;
-            $TagID = $Sender->SQL->Options('Ignore', TRUE)->Insert('Tag', $NewTag);
-            $Tags[$TagID] = $NewTag;
-         }
-      }
-
-      // Find out which tags are not yet associated with this discussion, and which tags are no longer on this discussion
-      $TagIDs = array_keys($Tags);
-      $NonAssociatedTagIDs = $TagIDs;
-      $AssociatedTagIDs = array();
-      $RemovedTagIDs = array();
-      $ExistingTagData = $Sender->SQL
-         ->Select('t.*')
-         ->From('TagDiscussion td')
-         ->Join('Tag t', 'td.TagID = t.TagID')
-         ->Where('DiscussionID', $DiscussionID)
-         ->Get();
-
-      foreach ($ExistingTagData as $ExistingTag) {
-         if (in_array($ExistingTag->TagID, $TagIDs))
-            unset($NonAssociatedTagIDs[array_search($ExistingTag->TagID, $NonAssociatedTagIDs)]);
-         else if (!GetValue('Type', $ExistingTag) && !in_array($ExistingTag->TagID, $TagIDs))
-            $RemovedTagIDs[] = $ExistingTag->TagID;
-         else
-            $AssociatedTagIDs[] = $ExistingTag->TagID;
-      }
-
-      // Associate the ones that weren't already associated
-      foreach ($NonAssociatedTagIDs as $TagID) {
-         $Sender->SQL->Options('Ignore', TRUE)->Insert('TagDiscussion', array(
-            'TagID' => $TagID,
-            'DiscussionID' => $DiscussionID,
-            'CategoryID' => $CategoryID
-         ));
-      }
-
-      // Remove tags that were removed, and reduce their counts
-      if (count($RemovedTagIDs) > 0) {
-         // Reduce count
-         $Sender->SQL->Update('Tag')->Set('CountDiscussions', 'CountDiscussions - 1', FALSE)->WhereIn('TagID', $RemovedTagIDs)->Put();
-         // Remove association
-         $Sender->SQL->WhereIn('TagID', $RemovedTagIDs)->Delete('TagDiscussion', array('DiscussionID' => $DiscussionID));
-      }
-
-      // Update the count on all previously unassociated tags
-      $Sender->SQL->Update('Tag')->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)->WhereIn('TagID', $NonAssociatedTagIDs)->Put();
+      // Save the tags to the db.
+      TagModel::instance()->saveDiscussion($DiscussionID, $FormTags, $Types, $CategoryID);
    }
 
    /**
@@ -409,7 +337,7 @@ class TaggingPlugin extends Gdn_Plugin {
          }
 
          if ($type === 'default') {
-            $defaultTypes = array_keys(TagModel::instance()->defaultTags());
+            $defaultTypes = array_keys(TagModel::instance()->defaultTypes());
             $TagQuery->Where('Type', $defaultTypes); // Other UIs can set a different type
          } elseif ($type) {
             $TagQuery->Where('Type', $type);
@@ -506,28 +434,41 @@ class TaggingPlugin extends Gdn_Plugin {
    public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
       if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
          // Setup, get most popular tags
-         $TagModel = new TagModel;
-         $Tags = $TagModel->GetWhere(array('Type' => NULL), 'CountDiscussions', 'desc', C('Plugins.Tagging.ShowLimit', 100))->Result(DATASET_TYPE_ARRAY);
+         $TagModel = TagModel::instance();
+         $Tags = $TagModel->GetWhere(array('Type' => array_keys($TagModel->defaultTypes())), 'CountDiscussions', 'desc', C('Plugins.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
          $TagsHtml = (count($Tags)) ? '' : T('No tags have been created yet.');
-         $ShowTags = array();
-         if (is_array($Tags)) {
-            foreach ($Tags as $Tag) {
-               $ShowTags[] = $Tag['Name'];
+         $Tags = Gdn_DataSet::Index($Tags, 'FullName');
+         ksort($Tags, SORT_NATURAL);
+
+         // The tags must be fetched.
+         if ($Sender->Request->IsPostBack()) {
+            $tag_ids = TagModel::SplitTags($Sender->Form->GetFormValue('Tags'));
+            $tags = TagModel::instance()->GetWhere(array('TagID' => $tag_ids))->ResultArray();
+            $tags = ConsolidateArrayValuesByKey($tags, 'FullName', 'TagID');
+         } else {
+            // The tags should be set on the data.
+            $tags = ConsolidateArrayValuesByKey($Sender->Data('Tags', array()), 'TagID', 'FullName');
+            $xtags = $Sender->Data('XTags', array());
+            foreach (TagModel::instance()->defaultTypes() as $key => $row) {
+               if (isset($xtags[$key])) {
+                  $xtags2 = ConsolidateArrayValuesByKey($xtags[$key], 'TagID', 'FullName');
+                  foreach ($xtags2 as $id => $name) {
+                     $tags[$id] = $name;
+                  }
+               }
             }
-            unset($Tags);
-            asort($ShowTags);
          }
 
          echo '<div class="Form-Tags P">';
 
          // Tag text box
          echo $Sender->Form->Label('Tags', 'Tags');
-         echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
+         echo $Sender->Form->TextBox('Tags', array('data-tags' => json_encode($tags)));
 
          // Available tags
          echo Wrap(Anchor(T('Show popular tags'), '#'), 'span', array('class' => 'ShowTags'));
-         foreach ($ShowTags as $Tag) {
-            $TagsHtml .= Anchor($Tag, '#', 'AvailableTag', array('data-name' => $Tag)).' ';
+         foreach ($Tags as $Tag) {
+            $TagsHtml .= Anchor(htmlspecialchars($Tag['FullName']), '#', 'AvailableTag', array('data-name' => $Tag['Name'], 'data-id' => $Tag['TagID'])).' ';
          }
          echo Wrap($TagsHtml, 'div', array('class' => 'Hidden AvailableTags'));
 

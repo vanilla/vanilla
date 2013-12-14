@@ -10,6 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class TagModel extends Gdn_Model {
    const IX_EXTENDED = 'x';
+   const IX_TAGID = 'id';
 
    /// Properties ///
 
@@ -33,7 +34,7 @@ class TagModel extends Gdn_Model {
       return self::$instance;
    }
 
-   public function defaultTags() {
+   public function defaultTypes() {
       $types = array_filter($this->Types(), function ($val) {
          if (val('default', $val))
             return true;
@@ -200,20 +201,130 @@ class TagModel extends Gdn_Model {
          ->Get()->ResultArray();
 
       if ($indexed) {
-         // The tags are indexed by type.
-         $Tags = Gdn_DataSet::Index($Tags, 'Type', array('Unique' => false));
-         if ($indexed === TagModel::IX_EXTENDED) {
-            // The tags are indexed by type, but tags with no type are seperated.
-            if (array_key_exists('', $Tags)) {
-               $Tags = array('Tags' => $Tags[''], 'XTags' => $Tags);
-               unset($Tags['XTags']['']);
-            } else {
-               $Tags = array('Tags' => array(), 'XTags' => $Tags);
+         if ($indexed === TagModel::IX_TAGID) {
+            $Tags = Gdn_DataSet::Index($Tags, 'TagID');
+         } else {
+            // The tags are indexed by type.
+            $Tags = Gdn_DataSet::Index($Tags, 'Type', array('Unique' => false));
+            if ($indexed === TagModel::IX_EXTENDED) {
+               // The tags are indexed by type, but tags with no type are seperated.
+               if (array_key_exists('', $Tags)) {
+                  $Tags = array('Tags' => $Tags[''], 'XTags' => $Tags);
+                  unset($Tags['XTags']['']);
+               } else {
+                  $Tags = array('Tags' => array(), 'XTags' => $Tags);
+               }
             }
          }
       }
 
       return $Tags;
+   }
+
+   public function saveDiscussion($discussion_id, $tags, $types = array(''), $category_id = 0, $new_type = '') {
+      // First grab all of the current tags.
+      $all_tags = $current_tags = $this->getDiscussionTags($discussion_id, TagModel::IX_TAGID);
+
+      // Put all the default tag types in the types if necessary.
+      if (in_array('', $types)) {
+         $types = array_merge($types, array_keys($this->defaultTypes()));
+         $types = array_unique($types);
+      }
+
+      // Remove the types from the current tags that we don't need anymore.
+      $current_tags = array_filter($current_tags, function($row) use ($types) {
+         if (in_array($row['Type'], $types))
+            return true;
+         return false;
+      });
+
+      // Turn the tags into a nice array.
+      if (is_string($tags)) {
+         $tags = TagModel::SplitTags($tags);
+      }
+
+      $new_tags = array();
+      $tag_ids = array();
+
+      // See which tags are new and which ones aren't.
+      foreach ($tags as $tag_id) {
+         if (is_id($tag_id))
+            $tag_ids[$tag_id] = true;
+         else
+            $new_tags[TagModel::TagSlug($tag_id)] = $tag_id;
+      }
+
+      // See if any of the new tags actually exist by searching by name.
+      if (!empty($new_tags)) {
+         $found_tags = $this->GetWhere(array('Name' => array_keys($new_tags)))->ResultArray();
+         foreach ($found_tags as $found_tag_row) {
+            $tag_ids[$found_tag_row['TagID']] = $found_tag_row;
+            unset($new_tags[TagModel::TagSlug($found_tag_row['Name'])]);
+         }
+      }
+
+      // Add any remaining tags that need to be added.
+      if (Gdn::Session()->CheckPermission('Plugins.Tagging.Add')) {
+         foreach ($new_tags as $name => $full_name) {
+            $new_tag = array(
+               'Name' => trim(str_replace(' ', '-', strtolower($name)), '-'),
+               'FullName' => $full_name,
+               'Type' => $new_type,
+               'CategoryID' => $category_id,
+               'InsertUserID' => Gdn::Session()->UserID,
+               'DateInserted' => Gdn_Format::ToDateTime(),
+               'CountDiscussions' => 0
+            );
+            $tag_id = $this->SQL->Options('Ignore', TRUE)->Insert('Tag', $new_tag);
+            $tag_ids[$tag_id] = true;
+         }
+      }
+
+      // Grab the tags so we can see more information about them.
+      $save_tags = $this->GetWhere(array('TagID' => array_keys($tag_ids)))->ResultArray();
+      // Add any parent tags that may need to be added.
+      foreach ($save_tags as $save_tag) {
+         $parent_tag_id = val('ParentTagID', $save_tag);
+         if ($parent_tag_id) {
+            $tag_ids[$parent_tag_id] = true;
+         }
+         $all_tags[$save_tag['TagID']] = $save_tag;
+      }
+
+      // Remove tags that are already associated with the discussion.
+//      $same_tag_ids = array_intersect_key($tag_ids, $current_tags);
+//      $current_tags = array_diff_key($current_tags, $same_tag_ids);
+//      $tag_ids = array_diff_key($tag_ids, $same_tag_ids);
+
+      // Figure out the tags we need to add.
+      $insert_tag_ids = array_diff_key($tag_ids, $current_tags);
+      // Figure out the tags we need to remove.
+      $delete_tag_ids = array_diff_key($current_tags, $tag_ids);
+      $now = Gdn_Format::ToDateTime();
+
+      // Insert the new tag mappings.
+      foreach ($insert_tag_ids as $tag_id => $bool) {
+         if (isset($all_tags[$tag_id])) {
+            $insert_category_id = $all_tags[$tag_id]['CategoryID'];
+         } else {
+            $insert_category_id = $category_id;
+         }
+
+         $this->SQL->Options('Ignore', TRUE)->Insert('TagDiscussion',
+            array('DiscussionID' => $discussion_id, 'TagID' => $tag_id, 'DateInserted' => $now, 'CategoryID' => $insert_category_id));
+      }
+
+      // Delete the old tag mappings.
+      if (!empty($delete_tag_ids))
+         $this->SQL->Delete('TagDiscussion', array('DiscussionID' => $discussion_id, 'TagID' => array_keys($delete_tag_ids)));
+
+      // Increment the tag counts.
+      if (!empty($insert_tag_ids))
+         $this->SQL->Update('Tag')->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)->WhereIn('TagID', array_keys($insert_tag_ids))->Put();
+
+      // Decrement the tag counts.
+      if (!empty($delete_tag_ids))
+         $this->SQL->Update('Tag')->Set('CountDiscussions', 'CountDiscussions - 1', FALSE)->WhereIn('TagID', array_keys($delete_tag_ids))->Put();
    }
 
    public function GetDiscussions($Tag, $Limit, $Offset, $Op = 'or') {
@@ -331,5 +442,9 @@ class TagModel extends Gdn_Model {
       }
       $Tags = array_unique($Tags);
       return $Tags;
+   }
+
+   public static function TagSlug($Str) {
+      return rawurldecode(Gdn_Format::Url($Str));
    }
 }

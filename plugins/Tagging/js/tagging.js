@@ -12,8 +12,10 @@ jQuery(document).ready(function($) {
    var data_tags = $("#Form_Tags").data('tags');
    if (data_tags) {
       tags = [];
-      for (id in data_tags) {
-         tags.push({id: id, name: data_tags[id]});
+      if (jQuery.isPlainObject(data_tags)) {
+         for (id in data_tags) {
+            tags.push({id: id, name: data_tags[id]});
+         }
       }
    } else {
       tags = $("#Form_Tags").val();

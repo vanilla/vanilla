@@ -79,11 +79,7 @@ class TagModule extends Gdn_Module {
       $TagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
       switch ($this->ParentType) {
          case 'Discussion':
-            $Tags = Gdn::Controller()->Data('Discussion.Tags');
-            if (!$Tags) {
-               $Tags = TagModel::instance()->getDiscussionTags($this->ParentID);
-            }
-            $Tags = TagModel::instance()->unpivot($Tags);
+            $Tags = TagModel::instance()->getDiscussionTags($this->ParentID, false);
             break;
          case 'Category':
             $TagQuery->Join('TagDiscussion td', 't.TagID = td.TagID')

@@ -438,7 +438,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $Tags = $TagModel->GetWhere(array('Type' => array_keys($TagModel->defaultTypes())), 'CountDiscussions', 'desc', C('Plugins.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
          $TagsHtml = (count($Tags)) ? '' : T('No tags have been created yet.');
          $Tags = Gdn_DataSet::Index($Tags, 'FullName');
-         ksort($Tags, SORT_NATURAL);
+         ksort($Tags);
 
          // The tags must be fetched.
          if ($Sender->Request->IsPostBack()) {

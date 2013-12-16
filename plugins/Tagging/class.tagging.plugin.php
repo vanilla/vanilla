@@ -215,15 +215,68 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $Sender->View = C('Vanilla.Discussions.Layout');
 
+      /*
       // If these don't equal, then there is a category that should be inserted.
       if ($UseCategories && $Category && $TagRow['FullName'] != GetValue('Name', $Category)) {
          $Sender->Data['Breadcrumbs'][] = array('Name' => $Category['Name'], 'Url' => TagUrl($TagRow));
       }
       $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['FullName'], 'Url' => '');
-
+*/
       // Render the controller.
       $this->View = C('Vanilla.Discussions.Layout') == 'table' ? 'table' : 'discussions';
       $Sender->Render($this->View, 'discussions', 'vanilla');
+   }
+
+
+   public function Base_Render_Before($Sender) {
+
+      // Set breadcrumbs, where relevant.
+      $this->setTagBreadcrumbs($Sender->Data);
+
+   }
+
+   /**
+    * Create breadcrumbs for tag listings.
+    *
+    * @param object $data Sender->Data object
+    */
+   protected function setTagBreadcrumbs($data) {
+
+      if (isset($data['Tag']) && isset($data['Tags'])) {
+
+         $ParentTag = array();
+         $CurrentTag = $data['Tag'];
+         $CurrentTags = $data['Tags'];
+
+         $ParentTagID = ($CurrentTag['ParentTagID'])
+            ? $CurrentTag['ParentTagID']
+            : '';
+
+         foreach($CurrentTags as $Tag) {
+            foreach($Tag as $SubTag) {
+               if ($SubTag['TagID'] == $ParentTagID) {
+                  $ParentTag = $SubTag;
+               }
+            }
+         }
+
+         $Breadcrumbs = array();
+
+         if (is_array($ParentTag) && count(array_filter($ParentTag))) {
+            $Breadcrumbs[] = array('Name' => $ParentTag['FullName'], 'Url' => TagUrl($ParentTag));
+         }
+
+         if (is_array($CurrentTag) && count(array_filter($CurrentTag))) {
+            $Breadcrumbs[] = array('Name' => $CurrentTag['FullName'], 'Url' => TagUrl($CurrentTag));
+         }
+
+         if (count($Breadcrumbs)) {
+            // Rebuild breadcrumbs in discussions when there is a child, as the
+            // parent must come before it.
+            Gdn::Controller()->SetData('Breadcrumbs', $Breadcrumbs);
+         }
+
+      }
    }
 
    /**

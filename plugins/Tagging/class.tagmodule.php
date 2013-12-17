@@ -100,7 +100,7 @@ class TagModule extends Gdn_Module {
             break;
       }
 
-      if (isset($Tags) && $Tags) {
+      if (isset($Tags)) {
          $this->_TagData = new Gdn_DataSet($Tags, DATASET_TYPE_ARRAY);
       } else {
          $this->_TagData = $TagQuery

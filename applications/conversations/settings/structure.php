@@ -35,10 +35,10 @@ $Construct
    ->Column('FirstMessageID', 'int', TRUE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('DateInserted', 'datetime', NULL, 'key')
-   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('InsertIPAddress', 'varchar(39)', TRUE)
    ->Column('UpdateUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime')
-   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(39)', TRUE)
    ->Column('CountMessages', 'int', 0)
    ->Column('LastMessageID', 'int', NULL)
    ->Column('RegardingID', 'int(11)', TRUE, 'index')
@@ -73,7 +73,7 @@ $Construct->Table('ConversationMessage')
    ->Column('Format', 'varchar(20)', NULL)
    ->Column('InsertUserID', 'int', NULL)
    ->Column('DateInserted', 'datetime', FALSE)
-   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('InsertIPAddress', 'varchar(39)', TRUE)
    ->Set($Explicit, $Drop);
 
 if ($UpdateCountMessages) {

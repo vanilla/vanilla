@@ -76,11 +76,11 @@ $Construct
    ->Column('DateOfBirth', 'datetime', TRUE)
    ->Column('DateFirstVisit', 'datetime', TRUE)
    ->Column('DateLastActive', 'datetime', TRUE)
-   ->Column('LastIPAddress', 'varchar(15)', TRUE)
+   ->Column('LastIPAddress', 'varchar(39)', TRUE)
    ->Column('DateInserted', 'datetime')
-   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('InsertIPAddress', 'varchar(39)', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
-   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(39)', TRUE)
    ->Column('HourOffset', 'int', '0')
 	->Column('Score', 'float', NULL)
    ->Column('Admin', 'tinyint(1)', '0')
@@ -340,7 +340,7 @@ $Construct
    ->Column('CountComments', 'int', '0')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
-   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('InsertIPAddress', 'varchar(39)', TRUE)
    ->Column('Emailed', 'tinyint(1)', 0)
    ->Set($Explicit, $Drop);
 
@@ -488,10 +488,10 @@ $Construct->Table('Log')
    ->Column('RecordID', 'int', NULL, 'index')
    ->Column('RecordUserID', 'int', NULL) // user responsible for the record
    ->Column('RecordDate', 'datetime')
-   ->Column('RecordIPAddress', 'varchar(15)', NULL, 'index')
+   ->Column('RecordIPAddress', 'varchar(39)', NULL, 'index')
    ->Column('InsertUserID', 'int') // user that put record in the log
    ->Column('DateInserted', 'datetime') // date item added to log
-   ->Column('InsertIPAddress', 'varchar(15)', NULL)
+   ->Column('InsertIPAddress', 'varchar(39)', NULL)
    ->Column('OtherUserIDs', 'varchar(255)', NULL)
    ->Column('DateUpdated', 'datetime', NULL)
    ->Column('ParentRecordID', 'int', NULL, 'index')

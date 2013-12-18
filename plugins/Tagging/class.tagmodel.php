@@ -329,7 +329,7 @@ class TagModel extends Gdn_Model {
 
    public function GetDiscussions($Tag, $Limit, $Offset, $Op = 'or') {
       $DiscussionModel = new DiscussionModel();
-      $this->_SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Op);
+      $this->SetTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Op);
       $Result = $DiscussionModel->Get($Offset, $Limit, array('Announce' => 'all'));
 
       return $Result;

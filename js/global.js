@@ -299,6 +299,7 @@ gdn.url = function(path) {
    return urlFormat.replace("{Path}", path);
 };
 
+// Define stats handler
 gdn.stats = function() {
    // Call directly back to the deployment and invoke the stats handler
    var StatsURL = gdn.url('settings/analyticstick.json');
@@ -324,6 +325,70 @@ gdn.stats = function() {
    });
 }
 
+// password strength check
+gdn.password = function(password, username) {
+   var translations = gdn.definition('PasswordTranslations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong').split(',');
+
+   // calculate entropy
+   var alphabet = 0;
+   if ( password.match(/[0-9]/) )
+      alphabet += 10;
+   if ( password.match(/[a-z]/) )
+      alphabet += 26;
+   if ( password.match(/[A-Z]/) )
+      alphabet += 26;
+   if ( password.match(/[^a-zA-Z0-9]/) )
+      alphabet += 31;
+   var natLog = Math.log(Math.pow(alphabet, password.length));
+   var entropy = natLog / Math.LN2;
+
+   var response = {
+      pass: false,
+      symbols: alphabet,
+      entropy: entropy,
+      score: 0
+   };
+
+   // password1 == username
+   if (username) {
+      if (password.toLowerCase() == username.toLowerCase()) {
+         response.reason = translations[1];
+         return response;
+      }
+   }
+
+   // reject on length
+   var length = password.length;
+   response.length = length;
+   var requiredLength = gdn.definition('MinPassLength', 6);
+   var requiredScore = gdn.definition('MinPassScore', 2);
+   response.required = requiredLength;
+   if (length < requiredLength) {
+      response.reason = translations[0];
+      return response;
+   }
+
+   if (entropy < 30) {
+      response.score = 1;
+      response.reason = translations[2]; // very weak
+   } else if (entropy < 40) {
+      response.score = 2;
+      response.reason = translations[3]; // weak
+   } else if (entropy < 55) {
+      response.score = 3;
+      response.reason = translations[4]; // ok
+   } else if (entropy < 70) {
+      response.score = 4;
+      response.reason = translations[5]; // good
+   } else {
+      response.score = 5;
+      response.reason = translations[6]; // strong
+   }
+
+   return response;
+}
+
+// Define inform autodismiss handler
 gdn.setAutoDismiss = function() {
    var timerId = jQuery('div.InformMessages').attr('autodismisstimerid');
    if (!timerId) {
@@ -494,7 +559,7 @@ gdn.informError = function(xhr, silentAbort) {
    gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
 }
 
-// Ping for new notifications on pageload, and subsequently every 1 minute.
+// Define notification ping handler
 gdn.notificationsPinging = 0;
 gdn.pingCount = 0;
 
@@ -519,6 +584,53 @@ gdn.pingForNotifications = function() {
       }
    });
 }
+
+// Define click hijacking handler
+gdn.hijackClick = function(e) {
+   var $elem = $(this);
+   var $parent = $(this).closest('.Item');
+   var $flyout = $elem.closest('.ToggleFlyout');
+   var href = $elem.attr('href');
+   var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
+
+   if (!href)
+      return;
+   gdn.disable(this, progressClass);
+   e.stopPropagation();
+
+   $.ajax({
+      type: "POST",
+      url: href,
+      data: { DeliveryType: 'VIEW', DeliveryMethod: 'JSON', TransientKey: gdn.definition('TransientKey') },
+      dataType: 'json',
+      complete: function() {
+         gdn.enable(this);
+         $elem.removeClass(progressClass);
+         $elem.attr('href', href);
+
+         // If we are in a flyout, close it.
+         $flyout.removeClass('Open').find('.Flyout').hide();
+      },
+      error: function(xhr) {
+         gdn.informError(xhr);
+      },
+      success: function(json) {
+         if (json == null) json = {};
+
+         var informed = gdn.inform(json);
+         gdn.processTargets(json.Targets, $elem, $parent);
+         // If there is a redirect url, go to it.
+         if (json.RedirectUrl) {
+            setTimeout(function() {
+                  window.location.replace(json.RedirectUrl);
+               },
+               informed ? 3000 : 0);
+         }
+      }
+   });
+
+   return false;
+};
 
 gdn.Template = {
 
@@ -828,8 +940,6 @@ jQuery(document).ready(function($) {
       return json;
    }
 
-   
-
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters
    $.fn.setMaxChars = function(iMaxChars) {
       $(this).bind('keyup', function() {
@@ -863,7 +973,6 @@ jQuery(document).ready(function($) {
 
    };
    
-
    jQuery(window).blur(function() {
       gdn.focused = false;
    });
@@ -875,7 +984,6 @@ jQuery(document).ready(function($) {
       $('body').addClass('MSIE');
    }
 
-   
    var d = new Date()
    var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
 
@@ -924,7 +1032,7 @@ jQuery(document).ready(function($) {
    });   
 
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
-   $(document).delegate('a.ForgotPassword', 'click', function() {
+   $(document).on('click', 'a.ForgotPassword', function() {
       // Make sure we have both forms
       if ($('#Form_User_SignIn').length) {
       $('.Methods').toggle();
@@ -965,69 +1073,6 @@ jQuery(document).ready(function($) {
       });
    }
 
-   // password strength check
-   gdn.password = function(password, username) {
-      var translations = gdn.definition('PasswordTranslations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong').split(',');
-
-      // calculate entropy
-      var alphabet = 0;
-      if ( password.match(/[0-9]/) )
-         alphabet += 10;
-      if ( password.match(/[a-z]/) )
-         alphabet += 26;
-      if ( password.match(/[A-Z]/) )
-         alphabet += 26;
-      if ( password.match(/[^a-zA-Z0-9]/) )
-         alphabet += 31;
-      var natLog = Math.log(Math.pow(alphabet, password.length));
-      var entropy = natLog / Math.LN2;
-
-      var response = {
-         pass: false,
-         symbols: alphabet,
-         entropy: entropy,
-         score: 0
-      };
-      
-      // password1 == username
-      if (username) {
-         if (password.toLowerCase() == username.toLowerCase()) {
-            response.reason = translations[1];
-            return response;
-         }
-      }
-
-      // reject on length
-      var length = password.length;
-      response.length = length;
-      var requiredLength = gdn.definition('MinPassLength', 6);
-      var requiredScore = gdn.definition('MinPassScore', 2);
-      response.required = requiredLength;
-      if (length < requiredLength) {
-         response.reason = translations[0];
-         return response;
-      }
-
-      if (entropy < 30) {
-         response.score = 1;
-         response.reason = translations[2]; // very weak
-      } else if (entropy < 40) {
-         response.score = 2;
-         response.reason = translations[3]; // weak
-      } else if (entropy < 55) {
-         response.score = 3;
-         response.reason = translations[4]; // ok
-      } else if (entropy < 70) {
-         response.score = 4;
-         response.reason = translations[5]; // good
-      } else {
-         response.score = 5;
-         response.reason = translations[6]; // strong
-      }
-
-      return response;
-   }
-
    // Go to notifications if clicking on a user's notification count
    $('li.UserNotifications a span').click(function() {
       document.location = gdn.url('/profile/notifications');
@@ -1048,7 +1093,7 @@ jQuery(document).ready(function($) {
       });
    }
 
-   $(document).delegate(".PopupWindow", 'click', function() {
+   $(document).on('click', '.PopupWindow', function() {
       var $this = $(this);
 
       if ($this.hasClass('NoMSIE') && $.browser.misie) {
@@ -1083,7 +1128,7 @@ jQuery(document).ready(function($) {
       $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
    
    if ($.fn.popup) {
-      $(document).delegate('.PopupClose', 'click', function(event){
+      $(document).on('click', '.PopupClose', function(event){
          var Popup = $(event.target).parents('.Popup');
          if (Popup.length) {
             var PopupID = Popup.prop('id');
@@ -1093,7 +1138,7 @@ jQuery(document).ready(function($) {
    }
 
    // Make sure that message dismissalls are ajax'd
-   $(document).delegate('a.Dismiss', 'click', function() {
+   $(document).on('click', 'a.Dismiss', function() {
       var anchor = this;
       var container = $(anchor).parent();
       var transientKey = gdn.definition('TransientKey');
@@ -1205,65 +1250,22 @@ jQuery(document).ready(function($) {
       });
    }
 
-//   var searchText = gdn.definition('Search', 'Search');
-//   if (!$('div.Search input.InputBox').val())
-//      $('div.Search input.InputBox').val(searchText);
-//   $('div.Search input.InputBox').blur(function() {
-//      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
-//         $(this).val(searchText);
-//   });
+   //   var searchText = gdn.definition('Search', 'Search');
+   //   if (!$('div.Search input.InputBox').val())
+   //      $('div.Search input.InputBox').val(searchText);
+   //   $('div.Search input.InputBox').blur(function() {
+   //      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
+   //         $(this).val(searchText);
+   //   });
+
    // Attach popin functionality to .Popin class
    $('.Popin').popin();
 
-   var hijackClick = function(e) {
-      var $elem = $(this);
-      var $parent = $(this).closest('.Item');
-      var $flyout = $elem.closest('.ToggleFlyout');
-      var href = $elem.attr('href');
-      var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
-
-      if (!href)
-         return;
-      gdn.disable(this, progressClass);
-      e.stopPropagation();
-
-      $.ajax({
-         type: "POST",
-         url: href,
-         data: { DeliveryType: 'VIEW', DeliveryMethod: 'JSON', TransientKey: gdn.definition('TransientKey') },
-         dataType: 'json',
-         complete: function() {
-            gdn.enable(this);
-            $elem.removeClass(progressClass);
-            $elem.attr('href', href);
-
-            // If we are in a flyout, close it.
-            $flyout.removeClass('Open').find('.Flyout').hide();
-         },
-         error: function(xhr) {
-            gdn.informError(xhr);
-         },
-         success: function(json) {
-            if (json == null) json = {};
-
-            var informed = gdn.inform(json);
-            gdn.processTargets(json.Targets, $elem, $parent);
-            // If there is a redirect url, go to it.
-            if (json.RedirectUrl) {
-               setTimeout(function() {
-                     window.location.replace(json.RedirectUrl);
-                  },
-                  informed ? 3000 : 0);
-            }
-         }
-      });
-
-      return false;
-   };
-   $(document).delegate('.Hijack', 'click', hijackClick);
+   // Hijack clicks with the Hijack class
+   $(document).on('click', '.Hijack', gdn.hijackClick);
    
    // Activate ToggleFlyout and ButtonGroup menus
-   $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
+   $(document).on('click', '.ButtonGroup > .Handle', function() {
       var buttonGroup = $(this).closest('.ButtonGroup');
       if (buttonGroup.hasClass('Open')) {
          // Close
@@ -1276,8 +1278,9 @@ jQuery(document).ready(function($) {
       }
       return false;
    });
+   
    var lastOpen = null;
-   $(document).delegate('.ToggleFlyout', 'click', function(e) {
+   $(document).on('click', '.ToggleFlyout', function(e) {
 
       var $flyout = $('.Flyout', this);
         var isHandle = false;
@@ -1328,7 +1331,7 @@ jQuery(document).ready(function($) {
    });
 
    // Close ToggleFlyout menu even if their links are hijacked
-   $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
+   $(document).on('mouseup', '.ToggleFlyout a', function() {
       if ($(this).hasClass('FlyoutButton'))
          return;
 
@@ -1336,7 +1339,7 @@ jQuery(document).ready(function($) {
       $('.Flyout').hide();
    });
 
-   $(document).delegate(document, 'click', function() {
+   $(document).on('click', document, function() {
       if (lastOpen) {
          $('.Flyout', lastOpen).hide();
          $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
@@ -1345,7 +1348,7 @@ jQuery(document).ready(function($) {
    });
 
    // Add a spinner onclick of buttons with this class
-   $(document).delegate('input.SpinOnClick', 'click', function() {
+   $(document).on('click', 'input.SpinOnClick', function() {
       $(this).before('<span class="AfterButtonLoading">&#160;</span>').removeClass('SpinOnClick');
    });
 
@@ -1372,32 +1375,7 @@ jQuery(document).ready(function($) {
          }
       }
    }
-
-   gdn.stats = function() {
-      // Call directly back to the deployment and invoke the stats handler
-      var StatsURL = gdn.url('settings/analyticstick.json');
-      var SendData = {
-            'TransientKey': gdn.definition('TransientKey'),
-            'Path': gdn.definition('Path'),
-            'Args': gdn.definition('Args'),
-            'ResolvedPath': gdn.definition('ResolvedPath'),
-            'ResolvedArgs': gdn.definition('ResolvedArgs')
-         };
-
-      if (gdn.definition('TickExtra', null) != null)
-         SendData.TickExtra = gdn.definition('TickExtra');
-
-      jQuery.ajax({
-         dataType: 'json',
-         type: 'post',
-         url: StatsURL,
-         data: SendData,
-         success: function(json) {
-            gdn.inform(json);
-         }
-      });
-   }
-
+   
    // Ping back to the deployment server to track views, and trigger
    // conditional stats tasks
    var AnalyticsTask = gdn.definition('AnalyticsTask', false);
@@ -1405,7 +1383,7 @@ jQuery(document).ready(function($) {
       gdn.stats();
    
    // If a dismissable InformMessage close button is clicked, hide it.
-   $(document).delegate('div.InformWrapper.Dismissable a.Close', 'click', function() {
+   $(document).on('click', 'div.InformWrapper.Dismissable a.Close', function() {
       $(this).parents('div.InformWrapper').fadeOut('fast', function() {
          $(this).remove();
       });
@@ -1416,9 +1394,8 @@ jQuery(document).ready(function($) {
       gdn.setAutoDismiss();
    });
 
-   
    // Prevent autodismiss if hovering any inform messages
-   $(document).delegate('div.InformWrapper', 'mouseover mouseout', function(e) {
+   $(document).on('mouseover mouseout', 'div.InformWrapper', function(e) {
       if (e.type == 'mouseover') {
          var timerId = $('div.InformMessages').attr('autodismisstimerid');
          if (timerId) {
@@ -1429,14 +1406,6 @@ jQuery(document).ready(function($) {
          gdn.setAutoDismiss();
       }
    });
-   
-   // Pick up the inform message stack and display it on page load
-   var informMessageStack = gdn.definition('InformMessageStack', false);
-   if (informMessageStack) {
-
-      informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
-      gdn.inform(informMessageStack);
-   }
 
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
@@ -1446,31 +1415,7 @@ jQuery(document).ready(function($) {
 	}
 
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
-   var notificationsPinging = 0, pingCount = 0;
-	var pingForNotifications = function() {
-   
-         return;
-      notificationsPinging++;
-
-      $.ajax({
-         type: "POST",
-         url: gdn.url('dashboard/notifications/inform'),
-         data: {'TransientKey': gdn.definition('TransientKey'), 'Path': gdn.definition('Path'), 'DeliveryMethod': 'JSON', 'Count': pingCount++},
-         dataType: 'json',
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            console.log(XMLHttpRequest.responseText);
-         },
-         success: function(json) {
-            gdn.inform(json);
-         },
-         complete: function() {
-            notificationsPinging--;
-         }
-      });
-	}
-   gdn.pingForNotifications = pingForNotifications;
-
-   if (gdn.definition('SignedIn', '0') != '0' && gdn.definition('DoInform', '1') != '0') {
+   if (gdn.definition('SignedIn', false) && gdn.definition('DoInform', true)) {
       setTimeout(gdn.pingForNotifications, 3000);
       setInterval(gdn.pingForNotifications, 60000);
    }
@@ -1547,32 +1492,32 @@ jQuery(document).ready(function($) {
     *
     */
 
-// @tim : 2013-08-24
-// Experiment on hold.
-//   if ($('div.github-commit').length) {
-//      // Github embed library
-//      window.GitHubCommit = (function (d,s,id) {
-//         var t, js, fjs = d.getElementsByTagName(s)[0];
-//         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
-//         js.src=gdn.url('js/library/github.embed.js'); fjs.parentNode.insertBefore(js, fjs);
-//         return window.GitHubCommit || (t = { _e: [], ready: function(f){ t._e.push(f) } });
-//      }(document, "script", "github-embd"));
-//
-//      GitHubCommit.ready(function(GitHubCommit){
-//         setTimeout(commits, 300);
-//      });
-//   }
-//
-//   function commits(GitHubCommit) {
-//      $('div.github-commit').each(function(i, el){
-//         var commit = $(el);
-//         var commiturl = commit.attr('data-commiturl');
-//         var commituser = commit.attr('data-commituser');
-//         var commitrepo = commit.attr('data-commitrepo');
-//         var commithash = commit.attr('data-commithash');
-//         console.log(el);
-//      });
-//   }
+   // @tim : 2013-08-24
+   // Experiment on hold.
+   //   if ($('div.github-commit').length) {
+   //      // Github embed library
+   //      window.GitHubCommit = (function (d,s,id) {
+   //         var t, js, fjs = d.getElementsByTagName(s)[0];
+   //         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
+   //         js.src=gdn.url('js/library/github.embed.js'); fjs.parentNode.insertBefore(js, fjs);
+   //         return window.GitHubCommit || (t = { _e: [], ready: function(f){ t._e.push(f) } });
+   //      }(document, "script", "github-embd"));
+   //
+   //      GitHubCommit.ready(function(GitHubCommit){
+   //         setTimeout(commits, 300);
+   //      });
+   //   }
+   //
+   //   function commits(GitHubCommit) {
+   //      $('div.github-commit').each(function(i, el){
+   //         var commit = $(el);
+   //         var commiturl = commit.attr('data-commiturl');
+   //         var commituser = commit.attr('data-commituser');
+   //         var commitrepo = commit.attr('data-commitrepo');
+   //         var commithash = commit.attr('data-commithash');
+   //         console.log(el);
+   //      });
+   //   }
 
    /**
     * Vine image embedding

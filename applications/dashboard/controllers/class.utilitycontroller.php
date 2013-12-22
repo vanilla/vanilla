@@ -418,62 +418,6 @@ class UtilityController extends DashboardController {
    }
    
    /**
-    * Because you cannot send xmlhttprequests across domains, we need to use
-    * a proxy to check for updates.
-    *
-    * @since 2.0.?
-    * @access public
-    */
-   public function UpdateProxy() {
-      $Fields = $_POST;
-      foreach ($Fields as $Field => $Value) {
-         if (get_magic_quotes_gpc()) {
-            if (is_array($Value)) {
-               $Count = count($Value);
-               for ($i = 0; $i < $Count; ++$i) {
-                  $Value[$i] = stripslashes($Value[$i]);
-               }
-            } else {
-               $Value = stripslashes($Value);
-            }
-            $Fields[$Field] = $Value;
-         }
-      }
-      
-		$UpdateCheckUrl = C('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update');
-      echo ProxyRequest($UpdateCheckUrl.'?'.http_build_query($FielupdateChecksds));
-      $Database = Gdn::Database();
-      $Database->CloseConnection();
-   }
-   
-   /**
-    * What the mothership said about update availability.
-    *
-    * @since 2.0.?
-    * @access public
-    */
-   public function UpdateResponse() {
-      // Get the message, response, and transientkey
-      $Response = TrueStripSlashes(GetValue('Response', $_POST));
-      $TransientKey = GetIncomingValue('TransientKey', '');
-      
-      // If the key validates
-      $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey)) {
-         // Save some info to the configuration file
-         $Save = array();
-
-         // If the response wasn't empty, save it in the config
-         if ($Response != '')
-            $Save['Garden.RequiredUpdates'] = @json_decode($Response);
-      
-         // Record the current update check time in the config.
-         $Save['Garden.UpdateCheckDate'] = time();
-         SaveToConfig($Save);
-      }
-   }
-   
-   /**
     * Set the user's timezone (hour offset).
     *
     * @since 2.0.0

@@ -150,7 +150,7 @@ class Emoji {
         'cry'                          => array('cry.png', '735'),
         'persevere'                    => array('persevere.png', '736'),
         'triumph'                      => array('triumph.png', '737'),
-        'disapponted_relieved'         => array('disappointed_relieved.png', '738'),
+        'disappointed_relieved'        => array('disappointed_relieved.png', '738'),
         'frowning'                     => array('frowning.png', '739'),
         'anguished'                    => array('anguished.png', '740'),
         'fearful'                      => array('fearful.png', '741'),
@@ -316,6 +316,15 @@ class Emoji {
       return (!$emojiAlias)
          ? $this->aliases
          : $this->aliases[$emojiAlias];
+   }
+
+   /**
+    * Gets the asset path location.
+    *
+    * @return string The asset path location
+    */
+   public function getAssetPath() {
+      return $this->assetPath;
    }
 
    /**

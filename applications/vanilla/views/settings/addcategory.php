@@ -43,6 +43,24 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
+      echo $this->Form->Label('Photo', 'PhotoUpload');
+      if ($Photo = $this->Form->GetValue('Photo')) {
+         echo Img(Gdn_Upload::Url($Photo));
+         echo '<br />'.Anchor(T('Delete Photo'),
+               CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::Session()->TransientKey())),
+               'SmallButton Danger PopConfirm');
+      }
+      echo $this->Form->Input('PhotoUpload', 'file');
+      ?>
+   </li>
+   <?php
+   echo $this->Form->Simple(
+      $this->Data('_ExtendedFields', array()),
+      array('Wrap' => array('', '')));
+   ?>
+   <?php if ($this->ShowCustomPoints): ?>
+   <li>
+      <?php
          echo $this->Form->Label('Display As', 'DisplayAs');
          echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions'));
       ?>
@@ -52,12 +70,6 @@ echo $this->Form->Errors();
       echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
       ?>
    </li>
-   <?php
-   echo $this->Form->Simple(
-      $this->Data('_ExtendedFields', array()),
-      array('Wrap' => array('', '')));
-   ?>
-   <?php if ($this->ShowCustomPoints): ?>
    <li>
       <?php
       echo $this->Form->CheckBox('CustomPoints', 'Track points for this category separately.');

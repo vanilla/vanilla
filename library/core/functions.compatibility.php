@@ -143,7 +143,7 @@ if (!function_exists('requestContext')) {
     * @return string
     */
    function requestContext() {
-      static $context;
+      static $context = null;
       if (is_null($context)) {
          $context = C('Garden.RequestContext', null);
          if (is_null($context)) {
@@ -173,7 +173,7 @@ if (!function_exists('safeHeader')) {
     * @param type $http_response_code
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
-      static $context;
+      static $context = null;
       if (is_null($context))
          $context = requestContext();
 
@@ -199,7 +199,7 @@ if (!function_exists('safeCookie')) {
     * @param boolean $httponly
     */
    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
-      static $context;
+      static $context = null;
       if (is_null($context))
          $context = requestContext();
 

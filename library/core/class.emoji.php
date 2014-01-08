@@ -112,18 +112,20 @@ class Emoji {
       // Initialize the canonical list. (emoji)
       $this->emoji = array(
         // Smileys
+        'smile'                        => array('smile.png', '705'),
+        'smiley'                       => array('smiley.png', '704'),
+        'wink'                         => array('wink.png', '710'),
+        'blush'                        => array('blush.png', '711'),
+        'neutral_face'                 => array('neutral_face.png', '717'),
+
         'relaxed'                      => array('relaxed.png', '50'),
         'grinning'                     => array('grinning.png', '701'),
         'grin'                         => array('grin.png', '702'),
         'joy'                          => array('joy.png', '703'),
-        'smiley'                       => array('smiley.png', '704'),
-        'smile'                        => array('smile.png', '705'),
         'sweat_smile'                  => array('sweat_smile.png', '706'),
-        'lol'                           => array('lol.png', '707'),
+        'lol'                          => array('lol.png', '707'),
         'innocent'                     => array('innocent.png', '708'),
         'smiling_imp'                  => array('smiling_imp.png', '709'),
-        'wink'                         => array('wink.png', '710'),
-        'blush'                        => array('blush.png', '711'),
         'yum'                          => array('yum.png', '712'),
         'relieved'                     => array('relieved.png', '713'),
         'heart_eyes'                   => array('heart_eyes.png', '714'),
@@ -150,7 +152,7 @@ class Emoji {
         'cry'                          => array('cry.png', '735'),
         'persevere'                    => array('persevere.png', '736'),
         'triumph'                      => array('triumph.png', '737'),
-        'disapponted_relieved'         => array('disappointed_relieved.png', '738'),
+        'disappointed_relieved'        => array('disappointed_relieved.png', '738'),
         'frowning'                     => array('frowning.png', '739'),
         'anguished'                    => array('anguished.png', '740'),
         'fearful'                      => array('fearful.png', '741'),
@@ -316,6 +318,15 @@ class Emoji {
       return (!$emojiAlias)
          ? $this->aliases
          : $this->aliases[$emojiAlias];
+   }
+
+   /**
+    * Gets the asset path location.
+    *
+    * @return string The asset path location
+    */
+   public function getAssetPath() {
+      return $this->assetPath;
    }
 
    /**

@@ -3344,14 +3344,13 @@ class UserModel extends Gdn_Model {
          return FALSE;
       }
 
-      $Email = new Gdn_Email();
       $NoEmail = TRUE;
       
       foreach ($Users as $User) {
          if (!$User->Email) {
             continue;
          }
-         
+         $Email = new Gdn_Email(); // Instantiate in loop to clear previous settings
          $PasswordResetKey = RandomString(6);
          $this->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
          $AppTitle = C('Garden.Title');

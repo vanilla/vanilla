@@ -455,4 +455,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    public function MobileTheme() {
       return C('Garden.MobileTheme', 'default');
    }
+
+   public function ThemeFromType($Type) {
+      if ($Type === 'mobile')
+         return $this->MobileTheme();
+      else
+         return $this->DesktopTheme();
+   }
 }

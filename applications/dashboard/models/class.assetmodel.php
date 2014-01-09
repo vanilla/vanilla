@@ -198,7 +198,12 @@ class AssetModel extends Gdn_Model {
    }
 
    public static function CssPath($Filename, $Folder) {
-      // 1. Check for a fill path.
+      // 1. Check for a url.
+      if (IsUrl($Filename)) {
+         return array($Filename, $Filename);
+      }
+
+      // 2. Check for a full path.
       if (strpos($Filename, '/') !== FALSE) {
          $Filename = '/'.ltrim($Filename, '/');
          $Path = PATH_ROOT.$Filename;
@@ -208,13 +213,13 @@ class AssetModel extends Gdn_Model {
             return FALSE;
       }
 
-      // 2. Check the theme.
+      // 3. Check the theme.
       if ($Theme = Gdn::Controller()->Theme) {
          $Paths[] = array(PATH_THEMES."/$Theme/design/$Filename", "/themes/$Theme/design/$Filename");
       }
 
       if ($Folder) {
-         // 3. Check static, a plugin or application.
+         // 4. Check static, a plugin or application.
          if (in_array($Folder, array('resources', 'static'))) {
             $path = "/resources/css/$Filename";
             $Paths[] = array(PATH_ROOT.$path, $path);
@@ -227,7 +232,7 @@ class AssetModel extends Gdn_Model {
          }
       }
 
-      // 4. Check the default.
+      // 5. Check the default.
       if ($Folder != 'dashboard')
          $Paths[] = array(PATH_APPLICATIONS.'/dashboard/design/$Filename', "/applications/dashboard/design/$Filename");
 
@@ -269,7 +274,7 @@ class AssetModel extends Gdn_Model {
 
       Gdn::PluginManager()->EventArguments['ETagData'] =& $Data;
 
-      $Suffix = '';
+      $Suffix = IsMobile() ? 'm' : '';
       Gdn::PluginManager()->EventArguments['Suffix'] =& $Suffix;
       Gdn::PluginManager()->FireAs('AssetModel')->FireEvent('GenerateETag');
       unset(Gdn::PluginManager()->EventArguments['ETagData']);

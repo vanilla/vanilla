@@ -1439,7 +1439,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
 
-//      $this->SendHeaders();
+      $this->SendHeaders();
 
       // Check for a special view.
       $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), FALSE, FALSE, FALSE);

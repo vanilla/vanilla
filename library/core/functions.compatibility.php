@@ -330,6 +330,7 @@ if (!function_exists('safeHeader')) {
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
       static $context;
+      if (headers_sent()) return false;
       if (is_null($context))
          $context = requestContext();
 

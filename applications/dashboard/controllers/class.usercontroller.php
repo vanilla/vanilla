@@ -295,7 +295,7 @@ class UserController extends DashboardController {
          if ($PasswordChecked) {
             $this->SetData('User', ArrayTranslate((array)$User, array('UserID', 'Name', 'Email', 'PhotoUrl')));
          } else {
-            $this->Form->AddError('Invalid password.');
+            throw new Exception(T('Invalid password.'), 401); // Can't be a user exception.
          }
       } catch (Gdn_UserException $Ex) {
          $this->Form->AddError($Ex);

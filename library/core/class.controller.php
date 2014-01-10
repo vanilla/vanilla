@@ -1404,6 +1404,12 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       if (Debug() && $Trace = Trace()) {
+         // Clear passwords from the trace.
+         array_walk_recursive($Trace, function(&$Value, $Key) {
+            if (in_array(strtolower($Key), array('password'))) {
+               $Value = '***';
+            }
+         });
          $Data['Trace'] = $Trace;
       }
 
@@ -1554,6 +1560,12 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (Debug()) {
          if ($Trace = Trace()) {
+            // Clear passwords from the trace.
+            array_walk_recursive($Trace, function(&$Value, $Key) {
+               if (in_array(strtolower($Key), array('password'))) {
+                  $Value = '***';
+               }
+            });
             $Data['Trace'] = $Trace;
          }
 

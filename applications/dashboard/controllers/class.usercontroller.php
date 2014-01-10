@@ -262,6 +262,48 @@ class UserController extends DashboardController {
       }
    }
 
+   public function Authenticate() {
+      if (!$this->Request->IsPostBack()) {
+         throw ForbiddenException($this->Request->RequestMethod());
+      }
+
+      $Args = array_change_key_case($this->Form->FormValues());
+      $UserModel = new UserModel();
+
+      // Look up the user.
+      $User = NULL;
+      if ($Email = GetValue('email', $Args)) {
+         $User = $UserModel->GetByEmail($Email);
+      } elseif ($Name = GetValue('name', $Args)) {
+         $User = $UserModel->GetByUsername($Name);
+      } else {
+         throw new Gdn_UserException("One of the following parameters required: Email, Name.", 400);
+      }
+
+      if (!$User)
+         throw NotFoundException('User');
+
+      // Check the password.
+      $PasswordHash = new Gdn_PasswordHash();
+      $Password = $this->Form->GetFormValue('Password');
+      try {
+         $PasswordChecked = $PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User));
+
+         // Rate limiting
+         Gdn::UserModel()->RateLimit($User, $PasswordChecked);
+
+         if ($PasswordChecked) {
+            $this->SetData('User', ArrayTranslate((array)$User, array('UserID', 'Name', 'Email', 'PhotoUrl')));
+         } else {
+            $this->Form->AddError('Invalid password.');
+         }
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+      }
+
+      $this->Render();
+   }
+
 	/**
     * Autocomplete a username.
     *

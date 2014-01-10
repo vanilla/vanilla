@@ -26,8 +26,8 @@ jQuery(document).ready(function($) {
     and increase the page height manually so the container knows to do the same.
    */
    popupHeight = function() {
-      var height = ($.popup.getPagePosition().top*1) + ($('.Popup').height()*1);
-      if (height > minHeight) {
+      var height = Math.round(($.popup.getPagePosition().top*1) + ($('.Popup').height()*1));
+      if (height > minHeight && height > document.body.offsetHeight) {
          setHeight(height); // Set it immediately to prevent content being cut off.
          $('body').css('minHeight', height+'px');
       }

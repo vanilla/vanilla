@@ -123,6 +123,8 @@ window.vanilla.embed = function(host) {
    }
 
    processMessage = function(message) {
+      var iframe = document.getElementById('vanilla'+id); 
+       
       if (message[0] == 'height') {
          setHeight(message[1]);
       } else if (message[0] == 'location') {
@@ -142,6 +144,8 @@ window.vanilla.embed = function(host) {
       } else if (message[0] == 'unload') {
          if (window.attachEvent || scrollPosition('vanilla'+id) < 0)
             document.getElementById('vanilla'+id).scrollIntoView(true);
+        
+         iframe.style.visibility = "hidden";
 
       } else if (message[0] == 'scrolltop') {
          window.scrollTo(0, document.getElementById('vanilla'+id).offsetTop);
@@ -254,7 +258,7 @@ window.vanilla.embed = function(host) {
    vanillaIframe.style.width = "100%";
    vanillaIframe.style.border = "0";
    vanillaIframe.style.display = "block"; // must be block
-   
+
    if (window.postMessage) {
       vanillaIframe.height = "0";
       vanillaIframe.style.height = "0";
@@ -267,7 +271,7 @@ window.vanilla.embed = function(host) {
    var img = document.createElement('div');
    img.className = 'vn-loading';
    img.style.textAlign = 'center';
-   img.innerHTML = '<img src="http://cdn.vanillaforums.com/images/progress.gif" />';
+   img.innerHTML = window.vanilla_loadinghtml ? vanilla_loadinghtml : '<img src="http://cdn.vanillaforums.com/images/progress.gif" />';
    
    var container = document.getElementById('vanilla-comments');
    // Couldn't find the container, so dump it out and try again.
@@ -277,14 +281,18 @@ window.vanilla.embed = function(host) {
    
    if (container) {
       var loaded = function() {
-         container.removeChild(img);
-      }
+         if (img) {
+            container.removeChild(img);
+            img = null;
+         }
+         vanillaIframe.style.visibility = "visible";
+      };
       
-      if(vanillaIframe.addEventListener)
+      if(vanillaIframe.addEventListener) {
          vanillaIframe.addEventListener('load', loaded, true);
-      else if(vanillaIframe.attachEvent)
+      } else if(vanillaIframe.attachEvent) {
          vanillaIframe.attachEvent('onload', loaded);
-      else
+      } else
          setTimeout(2000, loaded);
       
       container.appendChild(img);

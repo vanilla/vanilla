@@ -182,7 +182,7 @@ class AssetModel extends Gdn_Model {
             // Add some literal Css.
             $Paths[] = array(FALSE, $Folder, $Options);
          } else {
-            list($Path, $UrlPath) = self::CssPath($ThemeType, $Filename, $Folder);
+            list($Path, $UrlPath) = self::CssPath($Filename, $Folder, $ThemeType);
             if ($Path) {
                $Paths[] = array($Path, $UrlPath, $Options);
             } else {
@@ -208,7 +208,10 @@ class AssetModel extends Gdn_Model {
       return -1;
    }
 
-   public static function CssPath($ThemeType, $Filename, $Folder) {
+   public static function CssPath($Filename, $Folder, $ThemeType = FALSE) {
+      if (!$ThemeType)
+         $ThemeType = IsMobile() ? 'mobile' : 'desktop';
+
       // 1. Check for a url.
       if (IsUrl($Filename)) {
          return array($Filename, $Filename);

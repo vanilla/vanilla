@@ -30,6 +30,7 @@ $this->FireEvent('BeforeDiscussionDisplay');
                   echo UserAnchor($Author, 'Username');
                   echo UserPhoto($Author);
                }
+               echo FormatMeAction($Discussion);
                ?>
             </span>
             <span class="AuthorInfo">

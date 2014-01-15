@@ -2053,8 +2053,10 @@ class Gdn_Controller extends Gdn_Pluggable {
                }
 
             }
+         } else {
+            $Version = null;
          }
-         
+
          // Global file
          if (!$Version)
             $Version = APPLICATION_VERSION;

@@ -1651,9 +1651,10 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->FireAs('Gdn_Controller')->FireEvent('BeforeAddJs');
 
             $JsCdns = array();
-            if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', false)) {
+            if (!C('Garden.Cdns.Disable', false)) {
+               $scheme = Gdn::Request()->Scheme();
                $JsCdns = array(
-                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
+                  'jquery.js' => "{$scheme}://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"
                );
             }
 
@@ -2020,40 +2021,40 @@ class Gdn_Controller extends Gdn_Pluggable {
                   break;
                }
             }
+
+            // Get version
+            $Version = GetValue('Version', $ResourceInfo, false);
+
+            // If a path was matched, make sure it has a version
+            if ($ResourcePath && !$Version) {
+
+               // Theme file
+               if (!$Version && preg_match('`themes/([^/]+)/`i', $ResourcePath, $Matches)) {
+                  $ThemeName = $Matches[1];
+                  $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
+                  $Version = GetValue('Version', $ThemeInfo);
+                  $VersionSource = "theme {$ThemeName}";
+               }
+
+               // Plugin file
+               if (!$Version && preg_match('`plugins/([^/]+)/`i', $ResourcePath, $Matches)) {
+                  $PluginName = $Matches[1];
+                  $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginName, Gdn_PluginManager::ACCESS_PLUGINNAME);
+                  $Version = GetValue('Version', $PluginInfo);
+                  $VersionSource = "plugin {$PluginName}";
+               }
+
+               // Application file
+               if (!$Version && preg_match('`applications/([^/]+)/`i', $ResourcePath, $Matches)) {
+                  $ApplicationName = $Matches[1];
+                  $ApplicationInfo = Gdn::ApplicationManager()->GetApplicationInfo($ApplicationName);
+                  $Version = GetValue('Version', $ApplicationInfo);
+                  $VersionSource = "app {$ApplicationName}";
+               }
+
+            }
          }
-
-         // Get version
-         $Version = GetValue('Version', $ResourceInfo, false);
-
-         // If a path was matched, make sure it has a version
-         if ($ResourcePath && !$Version) {
-
-            // Theme file
-            if (!$Version && preg_match('`themes/([^/]+)/`i', $ResourcePath, $Matches)) {
-               $ThemeName = $Matches[1];
-               $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
-               $Version = GetValue('Version', $ThemeInfo);
-               $VersionSource = "theme {$ThemeName}";
-            }
-
-            // Plugin file
-            if (!$Version && preg_match('`plugins/([^/]+)/`i', $ResourcePath, $Matches)) {
-               $PluginName = $Matches[1];
-               $PluginInfo = Gdn::PluginManager()->GetPluginInfo($PluginName, Gdn_PluginManager::ACCESS_PLUGINNAME);
-               $Version = GetValue('Version', $PluginInfo);
-               $VersionSource = "plugin {$PluginName}";
-            }
-
-            // Application file
-            if (!$Version && preg_match('`applications/([^/]+)/`i', $ResourcePath, $Matches)) {
-               $ApplicationName = $Matches[1];
-               $ApplicationInfo = Gdn::ApplicationManager()->GetApplicationInfo($ApplicationName);
-               $Version = GetValue('Version', $ApplicationInfo);
-               $VersionSource = "app {$ApplicationName}";
-            }
-
-         }
-
+         
          // Global file
          if (!$Version)
             $Version = APPLICATION_VERSION;

@@ -14,13 +14,13 @@
 class LogController extends DashboardController {
    /** @var array Objects to prep. */
    public $Uses = array('Form', 'LogModel');
-   
+
    /**
     *
-    * @var Gdn_Form 
+    * @var Gdn_Form
     */
    public $Form;
-   
+
    /**
     *
     * @var LogModel
@@ -37,8 +37,8 @@ class LogController extends DashboardController {
     * @param array $LogIDs Numeric IDs of items to confirm.
     */
    public function Confirm($Action, $LogIDs = '') {
-      $this->Permission('Garden.Moderation.Manage');
-      
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
+
       $this->Form->InputPrefix = '';
       $this->Form->IDPrefix = 'Confirm_';
 
@@ -46,7 +46,7 @@ class LogController extends DashboardController {
          $LogIDArray = explode(',', $LogIDs);
       else
          $LogIDArray = array();
-      
+
       // We also want to collect the users from the log.
       $Logs = $this->LogModel->GetIDs($LogIDArray);
       $Users = array();
@@ -65,7 +65,7 @@ class LogController extends DashboardController {
 
       $this->Render();
    }
-   
+
    /**
     * Count log items.
     *
@@ -75,7 +75,7 @@ class LogController extends DashboardController {
     * @param string $Operation Comma-separated ist of action types to find.
     */
    public function Count($Operation) {
-      $this->Permission('Garden.Moderation.Manage');
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
 
       if ($Operation == 'edits')
          $Operation = array('edit', 'delete');
@@ -88,7 +88,7 @@ class LogController extends DashboardController {
       if ($Count > 0)
          echo '<span class="Alert">', $Count, '</span>';
    }
-   
+
    /**
     * Delete logs.
     *
@@ -98,29 +98,29 @@ class LogController extends DashboardController {
     * @param array $LogIDs Numeric IDs of logs to delete.
     */
    public function Delete($LogIDs) {
-      $this->Permission('Garden.Moderation.Manage');
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
       // Grab the logs.
       $this->LogModel->Delete($LogIDs);
       $this->Render('Blank', 'Utility');
    }
-   
+
    /**
     * Delete spam and optionally delete the users.
-    * @param type $LogIDs 
+    * @param type $LogIDs
     */
    public function DeleteSpam($LogIDs) {
-      $this->Permission('Garden.Moderation.Manage');
-      
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), FALSE);
+
       if (!$this->Request->IsPostBack())
          throw PermissionException('Javascript');
-      
+
       $LogIDs = explode(',', $LogIDs);
-      
+
       // Ban the appropriate users.
       $UserIDs = $this->Form->GetFormValue('UserID', array());
       if (!is_array($UserIDs))
          $UserIDs = array();
-      
+
       if (!empty($UserIDs)) {
          // Grab the rest of the log entries.
          $OtherLogIDs = $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserIDs));
@@ -131,12 +131,12 @@ class LogController extends DashboardController {
             Gdn::UserModel()->Ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => TRUE, 'Log' => TRUE));
          }
       }
-      
+
       // Grab the logs.
       $this->LogModel->Delete($LogIDs);
       $this->Render('Blank', 'Utility');
    }
-   
+
    /**
     * View list of edits (edit/delete actions).
     *
@@ -153,14 +153,14 @@ class LogController extends DashboardController {
       $Operations = array('Edit', 'Delete', 'Ban');
       if ($Op && in_array(ucfirst($Op), $Operations))
          $Operations = ucfirst($Op);
-      
+
       $Where = array(
           'Operation' => $Operations//,
 //          'RecordType' => array('Discussion', 'Comment', 'Activity')
           );
-      
+
       $AllowedTypes = array('Discussion', 'Comment', 'Activity', 'User');
-      
+
       $Type = strtolower($Type);
       if ($Type == 'configuration') {
          $this->Permission('Garden.Settings.Manage');
@@ -171,7 +171,7 @@ class LogController extends DashboardController {
          else
             $Where['RecordType'] = $AllowedTypes;
       }
-      
+
       $RecordCount = $this->LogModel->GetCountWhere($Where);
       $this->SetData('RecordCount', $RecordCount);
       if ($Offset >= $RecordCount)
@@ -186,12 +186,12 @@ class LogController extends DashboardController {
       $this->AddSideMenu('dashboard/log/edits');
       $this->Render();
    }
-   
+
    /**
     * Access the log history of a specific record
-    * 
+    *
     * @param string $RecordType
-    * @param int $RecordID 
+    * @param int $RecordID
     */
    public function Record($RecordType, $RecordID, $Page = '') {
       $this->Permission('Garden.Moderation.Manage');
@@ -204,7 +204,7 @@ class LogController extends DashboardController {
          'RecordType'   => $RecordType,
          'RecordID'     => $RecordID
       );
-      
+
       $RecordCount = $this->LogModel->GetCountWhere($Where);
       $this->SetData('RecordCount', $RecordCount);
       if ($Offset >= $RecordCount)
@@ -215,11 +215,11 @@ class LogController extends DashboardController {
 
       if ($this->DeliveryType() == DELIVERY_TYPE_VIEW)
          $this->View = 'Table';
-      
+
       $this->AddSideMenu('dashboard/log/edits');
       $this->Render();
    }
-   
+
    /**
     * Convenience method to call model's FormatContent.
     *
@@ -231,7 +231,7 @@ class LogController extends DashboardController {
    protected function FormatContent($Log) {
       return $this->LogModel->FormatContent($Log);
    }
-   
+
    /**
     * Always triggered first. Add Javascript files.
     *
@@ -246,7 +246,7 @@ class LogController extends DashboardController {
       $this->AddJsFile('jquery-ui.js');
       $this->Form->InputPrefix = '';
    }
-   
+
    /**
     * View moderation logs.
     *
@@ -257,19 +257,19 @@ class LogController extends DashboardController {
     * @param int $Page Page number.
     */
    public function Moderation($Page = '') {
-      $this->Permission('Garden.Moderation.Manage');
-      
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
+
       $Where = array('Operation' => array('Moderate', 'Pending'));
-      
+
       // Filter by category menu
-      if ($CategoryID = Gdn::Request()->GetValue('CategoryID')) { 
+      if ($CategoryID = Gdn::Request()->GetValue('CategoryID')) {
          $this->SetData('ModerationCategoryID', $CategoryID);
          $Where['CategoryID'] = $CategoryID;
       }
-      
+
       list($Offset, $Limit) = OffsetLimit($Page, 10);
-      $this->SetData('Title', T('Moderation Queue'));      
-      
+      $this->SetData('Title', T('Moderation Queue'));
+
       $RecordCount = $this->LogModel->GetCountWhere($Where);
       $this->SetData('RecordCount', $RecordCount);
       if ($Offset >= $RecordCount)
@@ -294,7 +294,7 @@ class LogController extends DashboardController {
     * @param array $LogIDs List of log IDs.
     */
    public function Restore($LogIDs) {
-      $this->Permission('Garden.Moderation.Manage');
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
 
       // Grab the logs.
       $Logs = $this->LogModel->GetIDs($LogIDs);
@@ -308,20 +308,20 @@ class LogController extends DashboardController {
       $this->LogModel->Recalculate();
       $this->Render('Blank', 'Utility');
    }
-   
+
    public function NotSpam($LogIDs) {
-      $this->Permission('Garden.Moderation.Manage');
-      
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), FALSE);
+
       if (!$this->Request->IsPostBack())
          throw PermissionException('Javascript');
-      
+
       $Logs = array();
-      
+
       // Verify the appropriate users.
       $UserIDs = $this->Form->GetFormValue('UserID', array());
       if (!is_array($UserIDs))
          $UserIDs = array();
-      
+
       foreach ($UserIDs as $UserID) {
          Gdn::UserModel()->SetField($UserID, 'Verified', TRUE);
          $Logs = array_merge($Logs, $this->LogModel->GetWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserID)));
@@ -329,7 +329,7 @@ class LogController extends DashboardController {
 
       // Grab the logs.
       $Logs = array_merge($Logs, $this->LogModel->GetIDs($LogIDs));
-      
+
 //      try {
          foreach ($Logs as $Log) {
             $this->LogModel->Restore($Log);
@@ -338,7 +338,7 @@ class LogController extends DashboardController {
 //         $this->Form->AddError($Ex->getMessage());
 //      }
       $this->LogModel->Recalculate();
-      
+
       $this->SetData('Complete');
       $this->SetData('Count', count($Logs));
       $this->Render('Blank', 'Utility');
@@ -353,7 +353,7 @@ class LogController extends DashboardController {
     * @param int $Page Page number.
     */
    public function Spam($Page = '') {
-      $this->Permission('Garden.Moderation.Manage');
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), FALSE);
       list($Offset, $Limit) = OffsetLimit($Page, 10);
       $this->SetData('Title', T('Spam Queue'));
 

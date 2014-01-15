@@ -657,7 +657,7 @@ class Gdn_Form extends Gdn_Pluggable {
          for($i = 0; $i < count($RowNames) - 1; ++$i) {
             $Result .= '<span class="Parent">'.T($RowNames[$i]).'</span>';
          }
-         $Result .= T($RowNames[count($RowNames) - 1]).'</th>';
+         $Result .= T(self::LabelCode($RowNames[count($RowNames) - 1])).'</th>';
          // Append the columns within the rows.
          $Alt = TRUE;
          foreach($Columns as $ColumnName => $Y) {

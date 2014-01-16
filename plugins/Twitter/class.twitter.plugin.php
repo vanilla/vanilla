@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Social Connect',
    'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.1.7',
+   'Version' => '1.1.8',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -267,7 +267,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $this->SetOAuthToken($Data['oauth_token'], $Data['oauth_token_secret'], 'request');
 
             // Redirect to twitter's authorization page.
-            $Url = "http://api.twitter.com/oauth/authenticate?oauth_token={$Data['oauth_token']}";
+            $Url = "https://api.twitter.com/oauth/authenticate?oauth_token={$Data['oauth_token']}";
             Redirect($Url);
          }
       }

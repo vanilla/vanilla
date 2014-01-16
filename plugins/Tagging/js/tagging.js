@@ -8,15 +8,26 @@ jQuery(document).ready(function($) {
       taglist.triggerHandler('BeforeSubmit',[frm]);
    });
    
-   var tags = $("#Form_Tags").val();
-   if (tags && tags.length) {
-      tags = tags.split(",");
-      
-      for (i = 0; i < tags.length; i++) {
-        tags[i] = { id: tags[i], name: tags[i] };
+   var tags;
+   var data_tags = $("#Form_Tags").data('tags');
+   if (data_tags) {
+      tags = [];
+      if (jQuery.isPlainObject(data_tags)) {
+         for (id in data_tags) {
+            tags.push({id: id, name: data_tags[id]});
+         }
       }
    } else {
-       tags = [];
+      tags = $("#Form_Tags").val();
+      if (tags && tags.length) {
+         tags = tags.split(",");
+
+         for (i = 0; i < tags.length; i++) {
+           tags[i] = { id: tags[i], name: tags[i] };
+         }
+      } else {
+          tags = [];
+      }
    }
    
    var TagSearch = gdn.definition('PluginsTaggingSearchUrl', false);
@@ -43,9 +54,9 @@ jQuery(document).ready(function($) {
    // Use available tags
     $('.AvailableTag').live('click', function() {
         //$(this).hide();
-        var tag = $(this).attr('data-name');
+        var tag = $(this).attr('data-id');
         
-        $("#Form_Tags").tokenInput('add', {id: tag, name: tag});
+        $("#Form_Tags").tokenInput('add', {id: tag, name: $(this).text()});
         return false;
     });
 });

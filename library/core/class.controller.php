@@ -1157,6 +1157,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
         if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
+           if (is_string($Permission)) {
+              header("X-Permission: $Permission");
+           }
            Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
         } else {
            Gdn::Dispatcher()->Dispatch('DefaultPermission');

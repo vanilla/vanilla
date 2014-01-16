@@ -258,22 +258,14 @@ class Emoji {
       // By default, just characters will be outputted (img alt text)
       $filePath = $emojiFileName = '';
 
-      if ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
-         $filePath = $this->assetPathOriginal;
-         $emojiFileName = reset($this->emojiOriginalUnaccountedFor[$emojiName]);
-      } else if (isset($this->emoji[$emojiName])) {
+      if (isset($this->emoji[$emojiName])) {
          $filePath = $this->assetPath;
          $emojiFileName = reset($this->emoji[$emojiName]);
+      } elseif ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
+         $filePath = $this->assetPathOriginal;
+         $emojiFileName = reset($this->emojiOriginalUnaccountedFor[$emojiName]);
       } else {
-         // If the emojiName is not in the list and they have not enabled
-         // mergeOriginals, then take the original file path and output
-         // the error emoji, defined in this class.
-         //
-         // Note: disabled for now so if done incorrectly, just output the
-         // raw characters.
-         //
-         //$filePath = $this->assetPathOriginal;
-         //$emojiFileName = reset($this->emojiOriginalUnaccountedFor['error']);
+         return '';
       }
 
       return $filePath . '/' . $emojiFileName;
@@ -489,12 +481,13 @@ class Emoji {
       // Second, translate canonical list, without looping.
       $ldelim = preg_quote($this->ldelim, '`');
       $rdelim = preg_quote($this->rdelim, '`');
+      $emoji = $this;
 
-      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) {
+      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) use ($emoji) {
          $emoji_name = trim($m[1], ':');
-         $emoji_path = $this->getEmoji($emoji_name);
+         $emoji_path = $emoji->getEmoji($emoji_name);
          if ($emoji_path) {
-            return $this->img($emoji_path, $this->ldelim.$emoji_name.$this->rdelim);
+            return $emoji->img($emoji_path, $emoji->ldelim.$emoji_name.$emoji->rdelim);
          } else {
             return $m[0];
          }

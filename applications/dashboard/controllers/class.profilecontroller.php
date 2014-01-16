@@ -630,7 +630,7 @@ class ProfileController extends Gdn_Controller {
       }
       
       // Permission checks
-      $this->Permission(array('Garden.Profiles.Edit', 'Moderation.Profiles.Edit'), FALSE);
+      $this->Permission(array('Garden.Profiles.Edit', 'Moderation.Profiles.Edit', 'Garden.ProfilePicture.Edit'), FALSE);
       $Session = Gdn::Session();
       if (!$Session->IsValid())
          $this->Form->AddError('You must be authenticated in order to use this form.');
@@ -1248,11 +1248,11 @@ class ProfileController extends Gdn_Controller {
          
          $Module->AddLink('Options', Sprite('SpPreferences').' '.T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), FALSE, array('class' => 'Popup PreferencesLink'));
          if ($AllowImages) {
-            $Module->AddLink('Options', Sprite('SpPicture').' '.T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
+            $Module->AddLink('Options', Sprite('SpPicture').' '.T('Change My Picture'), '/profile/picture', array('Garden.Profiles.Edit','Garden.ProfilePicture.Edit'), array('class' => 'PictureLink'));
          }
          
          if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-            $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit My Thumbnail'), '/profile/thumbnail', 'Garden.Profiles.Edit', array('class' => 'ThumbnailLink'));
+            $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit My Thumbnail'), '/profile/thumbnail', array('Garden.Profiles.Edit','Garden.ProfilePicture.Edit'), array('class' => 'ThumbnailLink'));
          }
       }
       

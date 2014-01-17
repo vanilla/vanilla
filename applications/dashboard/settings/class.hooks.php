@@ -238,7 +238,7 @@ class DashboardHooks implements Gdn_IPlugin {
       if (Gdn::Session()->IsValid()) {
          $sender->addLink('etc.signout', array('text' => t('Sign Out'), 'url' => SignOutUrl(), 'icon' => icon('signout'), 'sort' => 100));
       } else {
-         $sender->addLink('etc.signin', array('text' => t('Sign Out'), 'url' => SignInUrl(), 'icon' => icon('signin'), 'sort' => 100));
+         $sender->addLink('etc.signin', array('text' => t('Sign In'), 'url' => SignInUrl(), 'icon' => icon('signin'), 'sort' => 100));
       }
    }
 
@@ -246,7 +246,8 @@ class DashboardHooks implements Gdn_IPlugin {
     * @param SiteNavModule $sender
     */
    public function SiteNavModule_default_handler($sender) {
-      $sender->addLink('main.profile', array('text' => t('Profile'), 'url' => '/profile', 'icon' => icon('user'), 'sort' => 10));
+      if (Gdn::Session()->IsValid())
+         $sender->addLink('main.profile', array('text' => t('Profile'), 'url' => '/profile', 'icon' => icon('user'), 'sort' => 10));
       $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => '/activity', 'icon' => icon('time'), 'sort' => 10));
 
       // Add the moderation items.
@@ -276,6 +277,9 @@ class DashboardHooks implements Gdn_IPlugin {
       $user = Gdn::Controller()->Data('Profile');
       $user_id = val('UserID', $user);
       $is_me = $user_id == Gdn::Session()->UserID;
+
+      if (!Gdn::Session()->IsValid())
+         return;
 
       // Users can edit their own profiles and moderators can edit any profile.
       if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))

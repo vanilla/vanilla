@@ -1207,6 +1207,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo $View, $ControllerName, and $ApplicationFolder need correct variable types and descriptions.
     */
    public function xRender($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $AssetName = 'Content') {
+      // Remove the deliver type and method from the query string so they don't corrupt calls to Url.
+      $this->Request->SetValueOn(Gdn_Request::INPUT_GET, 'DeliveryType', NULL);
+      $this->Request->SetValueOn(Gdn_Request::INPUT_GET, 'DeliveryMethod', NULL);
+
       Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $this->RequestMethod, 'Render');
 
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)

@@ -27,22 +27,31 @@
  * $('.Option').duplicate({addButton: '.AddOption'});
  * 
  */
-jQuery(document).ready(function($) {
+jQuery(function($) {
    
-   $.fn.duplicate = function(options) {
-      var settings = {
-         addButton:           '', // The button that adds another item when clicked.
+   $.fn.duplicate = function (options) {
+      var self = this;
+
+      self.options = {
+         addButton:           '',   // The button that adds another item when clicked.
          hideTemplate:        true, // Hide the template
-         minItems:            2, // The minimum number of template copies to display
-         maxItems:            10, // The maximum number of template copies to display (0 is infinite)
+         minItems:            2,    // The minimum number of template copies to display
+         maxItems:            10,   // The maximum number of template copies to display (0 is infinite)
          hideButtonAfterMax:  true, // Hide the add button after you hit the max # of items
          autoAdd:             true, // Automatically add another when tabbing away from the last input in the last row
          curLength:           0
-      }      
-      settings = $.extend({}, settings, options);
-      var btn = $(settings.addButton),
+      };
+      
+      if (options) {
+         $.extend(self.options, options);
+      }
+
+      var settings = self.options;
+
+      var btn = settings.addButton,
+         $btn = $(btn),
          tpl = this;
-         
+
       // If more than one match was found, use the first one.
       if (tpl.length > 1) {
          // Make sure to add a new row on blur of the last row.
@@ -51,12 +60,12 @@ jQuery(document).ready(function($) {
             var textbox = $(last).is('input,textarea') ? last : last.find('input,textarea').last();
             $(textbox).addClass('DuplicateAutoAddOnBlur');
          }
-         
+
          tpl = $(tpl[0]); // Use the first one as the template.
       }
 
       // Don't do anything unless the required elements are present.
-      if (btn.length != 1 || !tpl || settings.minItems > settings.maxItems)
+      if ($btn.length != 1 || !tpl || settings.minItems > settings.maxItems)
          return;
 
       // Get the container
@@ -72,7 +81,10 @@ jQuery(document).ready(function($) {
       if (settings.hideTemplate)
          settings.curLength = settings.curLength - 1;
       
-      btn.live('click', function() {
+      jQuery(document).on('click', btn, function(e) {
+         e.stopPropagation();
+         e.preventDefault();
+
          // Don't add more than we're allowed
          if (settings.curLength >= settings.maxItems)
             return false;
@@ -82,7 +94,7 @@ jQuery(document).ready(function($) {
 
          // Hide the button when we've reached our limit.
          if (settings.curLength >= settings.maxItems && settings.hideButtonAfterMax)
-            btn.hide();
+            $btn.hide();
          
          var lastItem = container.children().last(),
             textbox = null;
@@ -101,22 +113,24 @@ jQuery(document).ready(function($) {
             textbox = $(lastItem).is('input,textarea') ? lastItem : lastItem.find('input,textarea').last();
             $(textbox).addClass('DuplicateAutoAddOnBlur');
          }
-         
-         return false;
       });
+
       // Add a new row when the last input in the last row is blurred.
       $('.DuplicateAutoAddOnBlur').live('blur', function() {
          if ($(this).val() != '')
-            btn.click();
+            $btn.click();
       });
 
       // Add the minimum number of items
-      if (settings.minItems > 0)
-         while (settings.curLength < settings.minItems) {
+      if (settings.minItems > 0) {
+         var counter = 0;
+         while (settings.curLength < settings.minItems && counter < settings.minItems) {
             noFocus = true;
-            btn.click();
+            counter++;
+            $btn.click();
          }
+      }
       
       noFocus = false;
-   }
+   };
 });

@@ -520,4 +520,16 @@ class ProxyRequest {
       return TRUE;
    }
 
+   public function Headers() {
+      return $this->ResponseHeaders;
+   }
+
+   public function Status() {
+      return $this->ResponseStatus;
+   }
+
+   public function Body() {
+      return $this->ResponseBody;
+   }
+
 }

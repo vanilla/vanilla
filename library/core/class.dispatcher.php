@@ -2,11 +2,11 @@
 
 /**
  * Framework dispatcher
- * 
+ *
  * Handles all requests and routing.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -112,7 +112,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @var string
     */
    private $_SyndicationMethod;
-   
+
    const BLOCK_NEVER = 0;
    const BLOCK_PERMISSION = 1;
    const BLOCK_ANY = 2;
@@ -133,7 +133,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->_PropertyCollection = array();
       $this->_Data = array();
    }
-   
+
    public function Cleanup() {
       $this->FireEvent('Cleanup');
    }
@@ -144,19 +144,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    public function ControllerName() {
       return $this->ControllerName.'Controller';
    }
-   
+
    public function Application() {
       return $this->_ApplicationFolder;
    }
-   
+
    public function Controller() {
       return $this->ControllerName;
    }
-   
+
    public function ControllerMethod() {
       return $this->ControllerMethod;
    }
-   
+
    public function ControllerArguments() {
       return $this->_ControllerMethodArgs;
    }
@@ -164,33 +164,33 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    public function Start() {
       $this->FireEvent('AppStartup');
    }
-   
+
    /**
     * Analyzes the supplied query string and decides how to dispatch the request.
     */
    public function Dispatch($ImportRequest = NULL, $Permanent = TRUE) {
-      
+
       if ($ImportRequest && is_string($ImportRequest))
          $ImportRequest = Gdn_Request::Create()->FromEnvironment()->WithURI($ImportRequest);
-      
+
       if (is_a($ImportRequest, 'Gdn_Request') && $Permanent) {
          Gdn::Request($ImportRequest);
       }
-      
+
       $Request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::Request();
-      
+
       if (Gdn::Session()->NewVisit()) {
          Gdn::UserModel()->FireEvent('Visit');
       }
-      
+
       $this->EventArguments['Request'] = &$Request;
-      
+
       // Move this up to allow pre-routing
       $this->FireEvent('BeforeDispatch');
-      
+
       // By default, all requests can be blocked by UpdateMode/PrivateCommunity
       $CanBlock = self::BLOCK_ANY;
-      
+
       try {
          $BlockExceptions = array(
              '/^utility(\/.*)?$/'                   => self::BLOCK_NEVER,
@@ -202,23 +202,23 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
              '/^user\/emailavailable(\/.*)?$/'      => self::BLOCK_PERMISSION,
              '/^home\/termsofservice(\/.*)?$/'      => self::BLOCK_PERMISSION
          );
-         
+
          $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
          $this->FireEvent('BeforeBlockDetect');
-         
+
          $PathRequest = Gdn::Request()->Path();
          foreach ($BlockExceptions as $BlockException => $BlockLevel) {
             if (preg_match($BlockException, $PathRequest))
                throw new Exception("Block detected - {$BlockException}", $BlockLevel);
          }
-         
+
          // Never block an admin
          if (Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
             throw new Exception("Block detected", self::BLOCK_NEVER);
-         
+
          if (Gdn::Session()->IsValid())
             throw new Exception("Block detected", self::BLOCK_PERMISSION);
-         
+
       } catch (Exception $e) {
          // BlockLevel
          //  TRUE = Block any time
@@ -226,28 +226,28 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          //  NULL = Block for permissions (e.g. PrivateCommunity)
          $CanBlock = $e->getCode();
       }
-      
+
       // If we're in updatemode and arent explicitly prevented from blocking, block
       if (Gdn::Config('Garden.UpdateMode', FALSE) && $CanBlock > self::BLOCK_NEVER) {
          $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
       }
-      
+
       // Analze the request AFTER checking for update mode.
       $this->AnalyzeRequest($Request);
       $this->FireEvent('AfterAnalyzeRequest');
-      
+
       // If we're in updatemode and can block, redirect to signin
       if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
          Redirect('/entry/signin?Target='.urlencode($this->Request));
          exit();
       }
-      
+
       $ControllerName = $this->ControllerName();
       if ($ControllerName != '' && class_exists($ControllerName)) {
          // Create it and call the appropriate method/action
          $Controller = new $ControllerName();
          Gdn::Controller($Controller);
-         
+
          $this->EventArguments['Controller'] =& $Controller;
          $this->FireEvent('AfterControllerCreate');
 
@@ -281,7 +281,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Set up a default controller method in case one isn't defined.
          $ControllerMethod = str_replace('_', '', $this->ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
-         
+
          // Take enabled plugins into account, as well
          $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->ControllerMethod);
          if (!$PluginReplacement && ($this->ControllerMethod == '' || !method_exists($Controller, $ControllerMethod))) {
@@ -309,17 +309,17 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Controller->Request = $Request;
          $Controller->DeliveryType($Request->GetValue('DeliveryType', $this->_DeliveryType));
          $Controller->DeliveryMethod($Request->GetValue('DeliveryMethod', $this->_DeliveryMethod));
-         
+
          // Set special controller method options for REST APIs.
          $Controller->Initialize();
-         
+
          $this->EventArguments['Controller'] = &$Controller;
          $this->FireEvent('AfterControllerInit');
-         
+
          $ReflectionArguments = $Request->Get();
          $this->EventArguments['Arguments'] = &$ReflectionArguments;
          $this->FireEvent('BeforeReflect');
-         
+
          // Call the requested method on the controller - error out if not defined.
          if ($PluginReplacement) {
             // Set the application folder to the plugin's key.
@@ -327,18 +327,18 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 //            if ($PluginInfo) {
 //               $Controller->ApplicationFolder = 'plugins/'.GetValue('Index', $PluginInfo);
 //            }
-            
+
             // Reflect the args for the method.
             $Callback = Gdn::PluginManager()->GetCallback($Controller->ControllerName, $ControllerMethod);
             // Augment the arguments to the plugin with the sender and these arguments.
             $InputArgs = array_merge(array($Controller), $this->_ControllerMethodArgs, array('Sender' => $Controller, 'Args' => $this->_ControllerMethodArgs));
             $Args = ReflectArgs($Callback, $InputArgs, $ReflectionArguments);
             $Controller->ReflectArgs = $Args;
-            
+
             try {
                $this->FireEvent('BeforeControllerMethod');
                Gdn::PluginManager()->CallEventHandlers($Controller, $Controller->ControllerName, $ControllerMethod, 'Before');
-               
+
                call_user_func_array($Callback, $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
@@ -347,11 +347,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $ReflectionArguments);
             $this->_ControllerMethodArgs = $Args;
             $Controller->ReflectArgs = $Args;
-            
+
             try {
                $this->FireEvent('BeforeControllerMethod');
                Gdn::PluginManager()->CallEventHandlers($Controller, $Controller->ControllerName, $ControllerMethod, 'Before');
-               
+
                call_user_func_array(array($Controller, $ControllerMethod), $Args);
             } catch (Exception $Ex) {
                $Controller->RenderException($Ex);
@@ -361,7 +361,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->EventArguments['Handled'] = FALSE;
             $Handled =& $this->EventArguments['Handled'];
             $this->FireEvent('NotFound');
-            
+
             if (!$Handled) {
                Gdn::Request()->WithRoute('Default404');
                return $this->Dispatch();
@@ -371,7 +371,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          }
       }
    }
-   
+
    /**
     * Undocumented method.
     *
@@ -442,7 +442,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     * @param int $FolderDepth
     */
    protected function AnalyzeRequest(&$Request) {
-   
+
       // Here is the basic format of a request:
       // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
 
@@ -463,7 +463,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       $PathAndQuery = $Request->PathAndQuery();
       $MatchRoute = Gdn::Router()->MatchRoute($PathAndQuery);
-      
+
       // We have a route. Take action.
       if ($MatchRoute !== FALSE) {
          switch ($MatchRoute['Type']) {
@@ -473,24 +473,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                break;
 
             case 'Temporary':
-               header("HTTP/1.1 302 Moved Temporarily" );
-               header("Location: ".Url($MatchRoute['FinalDestination']));
+               safeHeader("HTTP/1.1 302 Moved Temporarily" );
+               safeHeader("Location: ".Url($MatchRoute['FinalDestination']));
                exit();
                break;
 
             case 'Permanent':
-               header("HTTP/1.1 301 Moved Permanently" );
-               header("Location: ".Url($MatchRoute['FinalDestination']));
+               safeHeader("HTTP/1.1 301 Moved Permanently" );
+               safeHeader("Location: ".Url($MatchRoute['FinalDestination']));
                exit();
                break;
 
             case 'NotAuthorized':
-               header("HTTP/1.1 401 Not Authorized" );
+               safeHeader("HTTP/1.1 401 Not Authorized" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
 
             case 'NotFound':
-               header("HTTP/1.1 404 Not Found" );
+               safeHeader("HTTP/1.1 404 Not Found" );
                $this->Request = $MatchRoute['FinalDestination'];
                break;
             case 'Test':
@@ -504,7 +504,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                die();
          }
       }
-      
+
       switch ($Request->OutputFormat()) {
          case 'rss':
             $this->_SyndicationMethod = SYNDICATION_RSS;
@@ -570,9 +570,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $this->EventArguments['Handled'] = FALSE;
          $Handled =& $this->EventArguments['Handled'];
          $this->FireEvent('NotFound');
-         
+
          if (!$Handled) {
-            header("HTTP/1.1 404 Not Found");
+            safeHeader("HTTP/1.1 404 Not Found");
             $Request->WithRoute('Default404');
             return $this->AnalyzeRequest($Request);
          }
@@ -586,28 +586,28 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       // Check for a file extension on the controller.
       list($Controller, $this->_DeliveryMethod) = $this->_SplitDeliveryMethod($Controller, FALSE);
-      
+
       // If we're loading from a fully qualified path, prioritize this app's library
       if (!is_null($Application)) {
          Gdn_Autoloader::Priority(
-            Gdn_Autoloader::CONTEXT_APPLICATION, 
+            Gdn_Autoloader::CONTEXT_APPLICATION,
             $Application,
-            Gdn_Autoloader::MAP_CONTROLLER, 
+            Gdn_Autoloader::MAP_CONTROLLER,
             Gdn_Autoloader::PRIORITY_TYPE_RESTRICT,
             Gdn_Autoloader::PRIORITY_ONCE);
       }
-      
+
       $ControllerName = $Controller.'Controller';
       $ControllerPath = Gdn_Autoloader::Lookup($ControllerName);
-      
+
       try {
-         
+
          // If the lookup succeeded, good to go
          if (class_exists($ControllerName, false))
             throw new GdnDispatcherControllerFoundException();
 
       } catch (GdnDispatcherControllerFoundException $Ex) {
-         
+
          // This was a guess search with no specified application. Look up
          // the application folder from the controller path.
          if (is_null($Application)) {
@@ -634,19 +634,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                return false;
             }
          }
-         
+
          // If we need to autoload the class, do it here
          if (!class_exists($ControllerName, false)) {
             Gdn_Autoloader::Priority(
-               Gdn_Autoloader::CONTEXT_APPLICATION, 
+               Gdn_Autoloader::CONTEXT_APPLICATION,
                $Application,
-               Gdn_Autoloader::MAP_CONTROLLER, 
+               Gdn_Autoloader::MAP_CONTROLLER,
                Gdn_Autoloader::PRIORITY_TYPE_PREFER,
                Gdn_Autoloader::PRIORITY_PERSIST);
 
             require_once($ControllerPath);
          }
-         
+
          $this->ControllerName = $Controller;
          $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
          $this->ControllerFolder = '';
@@ -661,13 +661,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                   $this->_ControllerMethodArgs[] = $Parts[$i];
             }
          }
-         
+
          throw $Ex;
       }
-      
+
       return FALSE;
    }
-   
+
    /**
     * An internal method used to map parts of the request to various properties
     * of this object that represent the controller, controller method, and
@@ -705,7 +705,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $Args = array();
       $Get = array_change_key_case($Controller->Request->Get());
       $MissingArgs = array();
-      
+
       if (count($MethArgs) == 0) {
          // The method has no arguments so just pass all of the arguments in.
          return;
@@ -728,25 +728,25 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
 
       $this->_ControllerMethodArgs = $Args;
-         
+
    }
 
    /**
     * Parses methods that may be using dot-syntax to express a delivery type
-    * 
+    *
     * For example, /controller/method.json
     * method.json should be split up and return array('method', 'JSON')
-    * 
+    *
     * @param type $Name Name of method to search for forced delivery types
     * @param type $AllowAll Whether to allow delivery types that don't exist
-    * @return type 
+    * @return type
     */
    protected function _SplitDeliveryMethod($Name, $AllowAll = FALSE) {
       $Parts = explode('.', $Name);
       if (count($Parts) >= 2) {
          $DeliveryPart = array_pop($Parts);
          $MethodPart = implode('.', $Parts);
-         
+
          if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT, DELIVERY_METHOD_RSS))) {
             return array($MethodPart, strtoupper($DeliveryPart));
          } else {

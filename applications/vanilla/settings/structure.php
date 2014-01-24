@@ -144,7 +144,7 @@ $Construct->Table('UserDiscussion')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
    ->Column('Bookmarked', 'tinyint(1)', '0')
-//   ->Column('Contributed', 'tinyint(1)', '0') // whether or not the user has contributed to the discussion.
+   ->Column('Participated', 'tinyint(1)', '0') // whether or not the user has participated in the discussion.
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment');

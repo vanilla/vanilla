@@ -71,7 +71,7 @@ if ($Session->IsValid()):
                   echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap'));
                }
 
-               if ($Session->CheckPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
+               if ($Session->CheckPermission(array('Garden.Settings.View', 'Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
                   echo Wrap('<hr />', 'li');
                   $CApplicant = $ApplicantCount > 0 ? ' '.Wrap($ApplicantCount, 'span class="Alert"') : '';
                   $CSpam = ''; //$SpamCount > 0 ? ' '.Wrap($SpamCount, 'span class="Alert"') : '';
@@ -86,7 +86,7 @@ if ($Session->IsValid()):
                      echo Wrap(Anchor(Sprite('SpMod').' '.T('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li');
                   }
 
-                  if ($Session->CheckPermission('Garden.Settings.Manage')) {
+                  if ($Session->CheckPermission(array('Garden.Settings.View', 'Garden.Settings.Manage'), FALSE)) {
                      echo Wrap(Anchor(Sprite('SpDashboard').' '.T('Dashboard'), '/dashboard/settings'), 'li');
                   }
                }

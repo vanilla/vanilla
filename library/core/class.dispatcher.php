@@ -343,7 +343,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             } catch (Exception $Ex) {
                if (requestContext() == 'http')
                   $Controller->RenderException($Ex);
-               throw $ex;
+               throw $Ex;
             }
          } elseif (method_exists($Controller, $ControllerMethod)) {
             $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $ReflectionArguments);
@@ -360,7 +360,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                   $Controller->RenderException($Ex);
                   exit;
                }
-               throw $ex;
+               throw $Ex;
             }
          } else {
             $this->EventArguments['Handled'] = FALSE;

@@ -83,7 +83,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *
     * @var array The data from method calls.
     */
-   public $Data;
+   public $Data = array();
 
    /**
     * The Head module that this controller should use to add CSS files.

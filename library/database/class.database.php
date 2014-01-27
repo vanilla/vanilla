@@ -106,6 +106,10 @@ class Gdn_Database {
       }
    }
 
+   public function ForceCloseConnection() {
+      $this->_Connection = NULL;
+   }
+
    /**
     * Hook for cleanup via Gdn_Factory
     *

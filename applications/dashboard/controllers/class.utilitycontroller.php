@@ -422,6 +422,16 @@ class UtilityController extends DashboardController {
       $this->Render();
    }
 
+   public function Ping() {
+      $this->SetData('Pong', TRUE);
+      $this->MasterView = 'empty';
+      $this->CssClass = 'Home';
+
+      $this->FireEvent('Ping');
+
+      $this->Render();
+   }
+
    /**
     * Set the user's timezone (hour offset).
     *

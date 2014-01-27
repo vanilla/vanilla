@@ -341,7 +341,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
                call_user_func_array($Callback, $Args);
             } catch (Exception $Ex) {
-               $Controller->RenderException($Ex);
+               if (requestContext() == 'http')
+                  $Controller->RenderException($Ex);
+               throw $ex;
             }
          } elseif (method_exists($Controller, $ControllerMethod)) {
             $Args = ReflectArgs(array($Controller, $ControllerMethod), $this->_ControllerMethodArgs, $ReflectionArguments);
@@ -354,8 +356,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
                call_user_func_array(array($Controller, $ControllerMethod), $Args);
             } catch (Exception $Ex) {
-               $Controller->RenderException($Ex);
-               exit();
+               if (requestContext() == 'http') {
+                  $Controller->RenderException($Ex);
+                  exit;
+               }
+               throw $ex;
             }
          } else {
             $this->EventArguments['Handled'] = FALSE;

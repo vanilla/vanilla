@@ -5,7 +5,7 @@ $(function() {
          return '';
       }
    }
-      
+
    var currentHeight = null,
       minHeight = 600,
       remotePostMessage = null,
@@ -16,7 +16,7 @@ $(function() {
       forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
-      
+
    if (inIframe) {
       if ("postMessage" in parent) {
          remotePostMessage = function(message, target) {
@@ -31,11 +31,11 @@ $(function() {
             var id = Math.floor(Math.random() * 100000);
             if (remoteUrl.substr(remoteUrl.length - 1) != '/')
                remoteUrl += '/';
-            
+
             return remoteUrl + "poll.html#poll:" + id + ":" + message;
 //            return remoteUrl + "#poll:" + id + ":" + message;
          }
-        
+
          remotePostMessage = function(message, target) {
             if (message.indexOf(':') >= 0) {
                // Check to replace a similar message.
@@ -52,7 +52,7 @@ $(function() {
 //            console.log('Push message: '+message + ', ' + messages.length);
             messages.push(message);
          }
-        
+
          setLocation = function(newLocation) {
             if (messages.length == 0)
                parent.window.frames[0].location.replace(newLocation);
@@ -81,11 +81,11 @@ $(function() {
 
             document.getElementById('messageFrame').src = url;
          }
-           
+
          $(function() {
             var body = document.getElementsByTagName("body")[0],
                messageIframe = document.createElement("iframe");
-       
+
             messageIframe.id = "messageFrame";
             messageIframe.name = "messageFrame";
             messageIframe.src = messageUrl('');
@@ -103,7 +103,7 @@ $(function() {
       var hashIndex = path.indexOf('#');
       if (hashIndex > -1)
          path = path.substr(0, hashIndex);
-      
+
       document.location = remoteUrl + '#' + path;
    }
 
@@ -115,19 +115,19 @@ $(function() {
             newHeight = minHeight;
          if (newHeight != currentHeight) {
             currentHeight = newHeight;
-               
+
             remotePostMessage('height:'+currentHeight, '*');
          }
       }
-   
+
       setHeight();
       setInterval(setHeight, 300);
-      
+
       // Simulate a page unload when popups are opened (so they are scrolled into view).
       $('body').bind('popupReveal', function() {
          remotePostMessage('scrollto:' + $('div.Popup').offset().top, '*');
       });
-      
+
       $(window).unload(function() { remotePostMessage('unload', '*'); });
    }
    else return; // Ignore the rest if we're not embedded.
@@ -138,7 +138,7 @@ $(function() {
          path = '/'+path;
       remotePostMessage('location:' + path, '*');
    } else {
-      $('a').live('click', function() {
+      $(document).on('click', 'a', function() {
          var href = $(this).attr('href'),
             isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://';
 
@@ -162,7 +162,7 @@ $(function() {
          }
       });
    }
-   
+
    // Unembed the dashboard.
    // Note: This must be done AFTER the location is set.
    if (inIframe && inDashboard && !embedDashboard) {

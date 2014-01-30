@@ -261,14 +261,23 @@ jQuery(document).ready(function($) {
    // view of the requested in-garden link will be displayed in a popup on the
    // current screen).
    if ($.fn.popup) {
+
+      // Previously, jquery.popup used live() to attach events, even to elements
+      // that do not yet exist. live() has been deprecated. Vanilla upgraded
+      // jQuery to version 1.10.2, which removed a lot of code.  Instead, event
+      // delegation will need to be used, which means everywhere that Popup
+      // is called, will need to have a very high up parent delegate to it.
+      //$('a.Popup').popup();
+		//$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
+
       $('a.Popup').popup();
-		$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
+      $('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
    }
 
    $(document).delegate(".PopupWindow", 'click', function() {
       var $this = $(this);
 
-      if ($this.hasClass('NoMSIE') && $.browser.misie) {
+      if ($this.hasClass('NoMSIE') && /msie/.test(navigator.userAgent.toLowerCase())) {
          return;
       }
 
@@ -1109,7 +1118,7 @@ jQuery(document).ready(function($) {
       return Math.min.apply({},this)
    }
 
-   if ($.browser.msie) {
+   if (/msie/.test(navigator.userAgent.toLowerCase())) {
       $('body').addClass('MSIE');
    }
 
@@ -1134,7 +1143,7 @@ jQuery(document).ready(function($) {
    // Add "checked" class to item rows if checkboxes are checked within.
    checkItems = function() {
       var container = $(this).parents('.Item');
-      if ($(this).attr('checked') == 'checked')
+      if ($(this).prop('checked'))
          $(container).addClass('Checked');
       else
          $(container).removeClass('Checked');

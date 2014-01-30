@@ -1,8 +1,8 @@
 jQuery(document).ready(function($) {
-   
+
    // Set the max chars in the activity comment boxes
    $('form.Activity textarea').setMaxChars(1000);
-   
+
    // Hide activity deletes and hijack their clicks to confirm
    $('li.Activity a.Delete, ul.Activities a.DeleteComment').popup({
       confirm: true,
@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
          });
       }
    });
-   
+
    // Reveal activity deletes on hover
 //   $('ul.Activities li').livequery(function() {
 //      $(this).find('a.Delete').hide();
@@ -28,25 +28,29 @@ jQuery(document).ready(function($) {
 /* Comments */
 
    // Hide/reveal the comments when the comment link is clicked
-   $('a.CommentOption').live('click', function() {
+   // Jan28, 2014 jQuery upgrade to 1.10.2, as live() removed in 1.7.
+   //$('a.CommentOption').live('click', function() {
+   $(document).on('click', 'a.CommentOption', function() {
       var comments = $(this).parents('li.Activity').find('ul.ActivityComments');
       comments.toggle();
       comments.find('a.CommentLink').click();
       return false;
    });
-   
+
    // Hijack commentlink clicks
-   $('a.CommentLink').live('click', function() {
+   // Jan28, 2014 jQuery upgrade to 1.10.2, as live() removed in 1.7.
+   //$('a.CommentLink').live('click', function() {
+   $(document).on('click', 'a.CommentLink', function() {
       // Hide the anchor
       var anchor = this;
       $(anchor).hide();
       var row = $(anchor).parents('li.CommentForm');
-   
+
       // Reveal the form
       var frm = $(row).find('form');
       frm.show();
-      
-      // Focus on the textbox 
+
+      // Focus on the textbox
       var textbox = frm.find('textarea');
       textbox.focus().blur(function() {
          // Hide the form onblur if empty
@@ -67,15 +71,17 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
    // Hijack comment form button clicks
-   $('ul.ActivityComments form input.Button').live('click', function() {
+   // Jan28, 2014 jQuery upgrade to 1.10.2, as live() removed in 1.7.
+   //$('ul.ActivityComments form input.Button').live('click', function() {
+   $(document).on('click', 'ul.ActivityComments form input.Button', function() {
       var button = this;
       gdn.disable(button);
       var frm = $(button).parents('form');
       var row = $(frm).parents('li.CommentForm');
       var textbox = $(row).find('textarea');
-      
+
       // Post the form, place the results above the input, and erase the textbox
       var postValues = frm.serialize() + '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       var activityId = frm.find('[name$=ActivityID]').val();
@@ -90,9 +96,9 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             json = $.postParseJson(json);
-            
+
             gdn.inform(json);
-            
+
             // Remove any old errors from the form
             $('div.Errors').remove();
 
@@ -100,7 +106,7 @@ jQuery(document).ready(function($) {
                if (json.ErrorMessages)
                   $(row).prepend(json.ErrorMessages);
             } else {
-               $(row).before(json.Data);         
+               $(row).before(json.Data);
                textbox.val('').blur();
                // Make sure that hidden items appear
                $('ul.ActivityComments li.Hidden').slideDown('fast');
@@ -112,9 +118,11 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
       // Hijack activity comment form submits
-   $('form.Activity :submit').live('click', function() {
+
+   // Jan28, 2014 jQuery upgrade to 1.10.2, as live() removed in 1.7.
+   $(document).on('click', 'form.Activity :submit', function() {
       var but = this;
       var frm = $(this).parents('form');
       var inp = $(frm).find('textarea');
@@ -136,9 +144,9 @@ jQuery(document).ready(function($) {
             },
             success: function(json) {
                json = $.postParseJson(json);
-               
+
                gdn.inform(json);
-               
+
                if (json['FormSaved'] == true) {
                   $(inp).val('').closest('form').trigger('clearCommentForm');
                   // If there were no activities.

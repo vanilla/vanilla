@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
       $('input:checked').each(function(index, element) {
          if ($(element).attr('id') == 'SelectAll')
             return;
-         
+
          IDs.push($(element).val());
       });
       return IDs;
@@ -49,7 +49,7 @@ jQuery(document).ready(function($) {
    var deleteForever = function() {
       handleAction('/dashboard/log/delete');
    };
-   
+
    var deleteSpam = function() {
       handleAction('/dashboard/log/deletespam');
    };
@@ -59,7 +59,7 @@ jQuery(document).ready(function($) {
       $('.Expander').expander({slicePoint: 200, expandText: gdn.definition('ExpandText'), userCollapseText: gdn.definition('CollapseText')});
    };
    setExpander();
-   
+
    $(document).delegate('.CheckboxCell', 'click', function(e) {
       var $checkbox = $('input:checkbox', this);
       $checkbox.trigger('click', true);
@@ -68,30 +68,30 @@ jQuery(document).ready(function($) {
    $(document).delegate('tbody .CheckboxCell input', 'click', function(e, flip) {
       e.stopPropagation();
       var $checkbox = $(this);
-      
-      var selected = $checkbox.attr('checked') == 'checked';
+
+      var selected = $checkbox.prop('checked');
       if (flip)
          selected = !selected;
-      
+
       if (selected)
          $checkbox.closest('tr').addClass('Selected');
       else
          $checkbox.closest('tr').removeClass('Selected');
    });
 
-   $('#SelectAll').live('click', function(e, flip) {
+   $(document).on('click', '#SelectAll', function(e, flip) {
       e.stopPropagation();
-      var selected = $(this).attr('checked') == 'checked';
-      
+      var selected = $(this).prop('checked');
+
       if (flip)
          selected = !selected;
-      
+
       var table = $(this).closest('table').find('tbody');
-      $('input:checkbox', table).attr('checked', selected);
+      $('input:checkbox', table).prop('checked', selected);
       if (selected)
-         $('tr', table).addClass('Selected', selected);
+         $('tr', table).addClass('Selected');
       else
-         $('tr', table).removeClass('Selected', selected);
+         $('tr', table).removeClass('Selected');
    });
 
    $('.RestoreButton').click(function(e) {
@@ -108,7 +108,7 @@ jQuery(document).ready(function($) {
                   $.popup.reveal(settings, data);
                })
          });
-      
+
       return false;
    });
 
@@ -128,7 +128,7 @@ jQuery(document).ready(function($) {
 
       return false;
    });
-   
+
    $('.SpamButton').click(function(e) {
       var IDs = getIDs().join(',');
       currentAction = deleteSpam;
@@ -163,16 +163,16 @@ jQuery(document).ready(function($) {
       return false;
    });
 
-   $('.ConfirmNo').live('click', function() {
+   $(document).on('click', '.ConfirmNo', function() {
       $.popup.close({});
       return false;
    });
-   
+
    $(document).delegate('#Confirm_SelectAll', 'click', function() {
-      var checked = $('#Confirm_SelectAll').attr('checked') == 'checked';
-      $('#ConfirmForm input:checkbox').attr('checked', checked);
+      var checked = $('#Confirm_SelectAll').prop('checked');
+      $('#ConfirmForm input:checkbox').prop('checked', checked);
    });
-   
+
    // Filter menu
    $('.FilterButton').click(function(e) {
       // Get selected value
@@ -180,7 +180,7 @@ jQuery(document).ready(function($) {
 
       // Ajax us to filtered results
       $('#LogTable').load(gdn.url('/dashboard/log/moderation?DeliveryType=VIEW&CategoryID='+category));
-      
+
       return false;
    });
 });

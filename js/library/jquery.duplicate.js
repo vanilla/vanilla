@@ -1,18 +1,18 @@
-/** 
- * Duplicate allows you to duplicate a "template row". Always keep your inputs to 
- * be duplicated in their own container so the js knows what to add the new items 
+/**
+ * Duplicate allows you to duplicate a "template row". Always keep your inputs to
+ * be duplicated in their own container so the js knows what to add the new items
  * to.
- * 
+ *
  * EXAMPLE 1: Duplicate a single input.
  * Html:
  * <div class="Options">
  *    <input class="OptionInput" type="text" name="input[]" placeholder="Add an option..." />
  * </div>
  * <a href="#" class="AddOption">Add another option...</a>
- * 
+ *
  * Javascript:
  * $('.OptionInput').duplicate({addButton: '.AddOption'});
- * 
+ *
  * EXAMPLE 2: Duplicate a group of inputs.
  * Html:
  * <div class="Options">
@@ -22,13 +22,13 @@
  *    </div>
  * </div>
  * <a href="#" class="AddOption">Add another option...</a>
- * 
+ *
  * Javascript:
  * $('.Option').duplicate({addButton: '.AddOption'});
- * 
+ *
  */
 jQuery(function($) {
-   
+
    $.fn.duplicate = function (options) {
       var self = this;
 
@@ -41,7 +41,7 @@ jQuery(function($) {
          autoAdd:             true, // Automatically add another when tabbing away from the last input in the last row
          curLength:           0
       };
-      
+
       if (options) {
          $.extend(self.options, options);
       }
@@ -70,17 +70,17 @@ jQuery(function($) {
 
       // Get the container
       var container = $(tpl).parent();
-         
+
       // Hide the template?
       if (settings.hideTemplate)
          tpl.hide();
 
-      // Add an item on button click   
+      // Add an item on button click
       var noFocus = false;
       settings.curLength = container.children().length;
       if (settings.hideTemplate)
          settings.curLength = settings.curLength - 1;
-      
+
       jQuery(document).on('click', btn, function(e) {
          e.stopPropagation();
          e.preventDefault();
@@ -88,27 +88,27 @@ jQuery(function($) {
          // Don't add more than we're allowed
          if (settings.curLength >= settings.maxItems)
             return false;
-         
+
          container.append(tpl.clone().show());
          settings.curLength++;
 
          // Hide the button when we've reached our limit.
          if (settings.curLength >= settings.maxItems && settings.hideButtonAfterMax)
             $btn.hide();
-         
+
          var lastItem = container.children().last(),
             textbox = null;
-            
+
          // Focus on the first input in the newly added clone
          if (!noFocus) {
             textbox = $(lastItem).is('input,textarea') ? lastItem : lastItem.find('input,textarea').first();
             $(textbox).focus();
          }
-         
+
          // Identify the last element in the row so it can be duplicated on blur.
          if (settings.autoAdd && settings.curLength < settings.maxItems) {
             // Remove the class from previously added rows
-            $('.DuplicateAutoAddOnBlur').removeClass('DuplicateAutoAddOnBlur'); 
+            $('.DuplicateAutoAddOnBlur').removeClass('DuplicateAutoAddOnBlur');
             // Add the class to this row
             textbox = $(lastItem).is('input,textarea') ? lastItem : lastItem.find('input,textarea').last();
             $(textbox).addClass('DuplicateAutoAddOnBlur');
@@ -116,7 +116,7 @@ jQuery(function($) {
       });
 
       // Add a new row when the last input in the last row is blurred.
-      $('.DuplicateAutoAddOnBlur').live('blur', function() {
+      $(document).on('blur', '.DuplicateAutoAddOnBlur', function() {
          if ($(this).val() != '')
             $btn.click();
       });
@@ -130,7 +130,7 @@ jQuery(function($) {
             $btn.click();
          }
       }
-      
+
       noFocus = false;
    };
 });

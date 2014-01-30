@@ -941,7 +941,7 @@ class CommentModel extends VanillaModel {
             'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
             'Data' => array(
                'Name' => $Discussion->Name,
-               'Category' => GetValue('Name', $Category)
+               'Category' => GetValue('Name', $Category),
             )
          );
 
@@ -954,8 +954,6 @@ class CommentModel extends VanillaModel {
          // Pass generic activity to events.
          $this->EventArguments['Activity'] = $Activity;
 
-         // Pass generic activity to events.
-         $this->EventArguments['Activity'] = $Activity;
 
          // Notify users who have bookmarked the discussion.
          $BookmarkData = $DiscussionModel->GetBookmarkUsers($DiscussionID);
@@ -965,6 +963,7 @@ class CommentModel extends VanillaModel {
                continue;
 
             $Activity['NotifyUserID'] = $Bookmark->UserID;
+            $Activity['Data']['Reason'] = 'bookmark';
             $ActivityModel->Queue($Activity, 'BookmarkComment', array('CheckRecord' => TRUE));
          }
 
@@ -976,18 +975,20 @@ class CommentModel extends VanillaModel {
             }
 
             $Activity['NotifyUserID'] = $UserRow->UserID;
-            $Activity['Data']['participated'] = TRUE;
+            $Activity['Data']['Reason'] = 'participated';
             $ActivityModel->Queue($Activity, 'ParticipateComment', array('CheckRecord' => TRUE));
          }
 
          // Record user-comment activity.
          if ($Discussion != FALSE) {
             $Activity['NotifyUserID'] = GetValue('InsertUserID', $Discussion);
+            $Activity['Data']['Reason'] = 'mine';
             $ActivityModel->Queue($Activity, 'DiscussionComment');
 			}
 
          // Record advanced notifications.
          if ($Discussion !== FALSE) {
+            $Activity['Data']['Reason'] = 'advanced';
             $this->RecordAdvancedNotications($ActivityModel, $Activity, $Discussion);
          }
 
@@ -1007,11 +1008,12 @@ class CommentModel extends VanillaModel {
 
             $HeadlineFormatBak = $Activity['HeadlineFormat'];
             $Activity['HeadlineFormat'] = T('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
-
             $Activity['NotifyUserID'] = $User->UserID;
+            $Activity['Data']['Reason'] = 'mention';
             $ActivityModel->Queue($Activity, 'Mention');
             $Activity['HeadlineFormat'] = $HeadlineFormatBak;
          }
+         unset($Activity['Data']['Reason']);
 
          // Throw an event for users to add their own events.
          $this->EventArguments['Comment'] = $Fields;

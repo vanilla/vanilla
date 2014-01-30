@@ -641,7 +641,7 @@ if (!$FullNameColumnExists) {
 
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
-   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'))
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'), FALSE, 'index')
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group'), FALSE, 'index')
    ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')
@@ -704,8 +704,8 @@ $Construct
 
    ->Column('InsertUserID', 'int(11)')
    ->Column('DateInserted', 'datetime')
-   ->Column('ForeignID', 'int(11)', TRUE)
-   ->Column('ForeignTable', 'varchar(24)', TRUE)
+   ->Column('ForeignID', 'int(11)', TRUE, 'index.Foreign')
+   ->Column('ForeignTable', 'varchar(24)', TRUE, 'index.Foreign')
 
    ->Column('ImageWidth', 'usmallint', NULL)
    ->Column('ImageHeight', 'usmallint', NULL)

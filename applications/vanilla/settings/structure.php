@@ -136,8 +136,11 @@ $Construct->Table('UserCategory')
 
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('UserDiscussion')
-   ->Column('UserID', 'int', FALSE, 'primary')
+$Construct->Table('UserDiscussion');
+
+$ParticipatedExists = $Construct->ColumnExists('Participated');
+
+$Construct->Column('UserID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, array('primary', 'key'))
 	->Column('Score', 'float', NULL)
    ->Column('CountComments', 'int', '0')
@@ -146,6 +149,20 @@ $Construct->Table('UserDiscussion')
    ->Column('Bookmarked', 'tinyint(1)', '0')
    ->Column('Participated', 'tinyint(1)', '0') // whether or not the user has participated in the discussion.
    ->Set($Explicit, $Drop);
+
+// Update the participated flag.
+if (!$ParticipatedExists) {
+   $SQL->Update('UserDiscussion ud')
+       ->Join('Discussion d', 'ud.DiscussionID = d.DiscussionID and ud.UserID = d.InsertUserID')
+       ->Set('ud.Participated', 1)
+       ->Put();
+
+   $SQL->Update('UserDiscussion ud')
+       ->Join('Comment d', 'ud.DiscussionID = d.DiscussionID and ud.UserID = d.InsertUserID')
+       ->Set('ud.Participated', 1)
+       ->Put();
+}
+
 
 $Construct->Table('Comment');
 

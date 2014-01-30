@@ -79,7 +79,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    public $CssClass;
 
    /**
-    * The data that a controller method has built up from models and other calcualtions.
+    * The data that a controller method has built up from models and other calculations.
     *
     * @var array The data from method calls.
     */
@@ -1188,7 +1188,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
-         ob_clean();
+         if (ob_get_level()) ob_clean();
          $this->ContentType('application/json');
          $this->SetHeader('X-Content-Type-Options', 'nosniff');
       }
@@ -1402,7 +1402,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
       }
 
-      @ob_clean();
+      if (ob_get_level()) ob_clean();
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             safeHeader('Content-Type: text/xml', true);
@@ -1533,7 +1533,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       // Try cleaning out any notices or errors.
-      @ob_clean();
+      if (ob_get_level()) ob_clean();
 
 
       if ($Code >= 400 && $Code <= 505)
@@ -2135,7 +2135,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function SetData($Key, $Value = null, $AddProperty = false) {
 
-      // Make sure the config settings are in the right format
+      // Make sure the data property is in the right format
       if (!is_array($this->Data))
          $this->Data = array();
 

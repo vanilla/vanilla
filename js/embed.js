@@ -125,9 +125,6 @@ window.vanilla.embed = function(host) {
    processMessage = function(message) {
       var iframe = document.getElementById('vanilla'+id);
 
-      console.log(message);
-      console.log(iframe);
-
       if (message[0] == 'height') {
          setHeight(message[1]);
 

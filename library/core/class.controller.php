@@ -83,7 +83,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *
     * @var array The data from method calls.
     */
-   public $Data = array();
+   public $Data;
 
    /**
     * The Head module that this controller should use to add CSS files.
@@ -1336,6 +1336,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       if ($Data === null) {
          $Data = array();
 
+         if (!is_array($this->Data))
+            $this->Data = array();
+
          // Remove standard and "protected" data from the top level.
          foreach ($this->Data as $Key => $Value) {
             if ($Key && in_array($Key, array('Title', 'Breadcrumbs')))
@@ -1345,7 +1348,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $Data[$Key] = $Value;
          }
-         unset($this->Data);
+
+         // Clear out data contents to save peak mem
+         $this->Data = array();
       }
 
       // Massage the data for better rendering.

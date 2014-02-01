@@ -2006,6 +2006,11 @@ class DiscussionModel extends VanillaModel {
             ));
       }
 
+      $this->EventArguments['DiscussionID'] = $DiscussionID;
+      $this->EventArguments['UserID'] = $UserID;
+      $this->EventArguments['Bookmarked'] = $Bookmarked;
+      $this->FireEvent('AfterBookmark');
+
       return (bool)$Bookmarked;
    }
 

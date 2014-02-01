@@ -186,6 +186,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
          $UserID = FALSE;
          try {
+            $CurrentUserID = Gdn::Session()->UserID;
             $UserID = Gdn::UserModel()->SSO($SSO);
          } catch (Exception $Ex) {
             Trace($Ex, TRACE_ERROR);
@@ -193,7 +194,9 @@ class DashboardHooks implements Gdn_IPlugin {
 
          if ($UserID) {
             Gdn::Session()->Start($UserID, TRUE, TRUE);
-            Gdn::UserModel()->FireEvent('AfterSignIn');
+
+            if ($UserID != $CurrentUserID)
+               Gdn::UserModel()->FireEvent('AfterSignIn');
          } else {
             // There was some sort of error. Let's print that out.
             Trace(Gdn::UserModel()->Validation->ResultsText(), TRACE_WARNING);

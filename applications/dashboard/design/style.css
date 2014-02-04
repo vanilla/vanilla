@@ -52,6 +52,12 @@ textarea, input[type=text] {
    box-sizing: border-box;
 }
 
+/* Elements that are disabled, make sure they reflect that with UX feedback. */
+[disabled] {
+   opacity: 0.50;
+   pointer-events: none;
+}
+
 /* ===================================================================== Grid */
 
 .Row {
@@ -190,7 +196,7 @@ textarea {
 	background: #fff;
 	border: 1px solid #999;
 	border: 1px solid rgba(0, 0, 0, 0.4);
-	padding: 3px;	
+	padding: 3px;
 }
 .PasswordStrength {
    width: 250px;
@@ -947,7 +953,7 @@ body > #Frame > .Head {
 #Head .SiteSearch .InputBox {
    border: none;
    width: 175px;
-   
+
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
@@ -1216,10 +1222,10 @@ td.CheckBoxColumn {
 #Panel {
    width: 200px;
    float: left;
-   
-/*   
+
+/*
 No overflow hidden on main elements. Causes too many bugs!
-overflow: hidden; 
+overflow: hidden;
 }
 #Panel > :first-child {
 	margin-top: 0;
@@ -1384,7 +1390,7 @@ overflow: hidden;
 /** Make standard items a bit more condensed when in the panel. **/
 
 .PanelColumn .Item {
-    padding: 2px;   
+    padding: 2px;
 }
 
 .PanelColumn .Item .Title {
@@ -1638,7 +1644,7 @@ overflow: hidden;
    margin-right: 0;
 }
 .CommentInfo {
-   line-height: 1.5; 
+   line-height: 1.5;
 }
 .Item .AuthorInfo {
    font-size: 11px;
@@ -2261,7 +2267,7 @@ form.Thumbnail .Warning {
 .EditCommentForm .Buttons,
 .CommentForm .Buttons {
 	position: relative;
-   text-align: right; 
+   text-align: right;
 	margin: 0;
 	padding: 6px 0;
 }
@@ -2510,7 +2516,7 @@ div.Popup form ul li label.RadioLabel {
    margin-top: 20px;
 }
 .ItemDiscussion .MItem a {
-   font-size: 11px; 
+   font-size: 11px;
 }
 .ItemDiscussion .ProfilePhotoMedium {
 	height: 24px;
@@ -2604,17 +2610,17 @@ tr.CategoryHeading td {
 .DiscussionSorter {
    float: right;
    margin-right: 24px;
-   font-size: 11px; 
+   font-size: 11px;
 }
 .DiscussionSorter:hover {
    cursor: pointer;
    background: #f3f3f3;
 }
-.DiscussionSorter .MenuItems { 
-   padding: 0; 
+.DiscussionSorter .MenuItems {
+   padding: 0;
    width: 130px;
    border-top: none;
-   border-radius: 0; 
+   border-radius: 0;
 }
 .DiscussionSorter .Selected {
    padding: 0 0 0 15px;
@@ -2625,19 +2631,19 @@ tr.CategoryHeading td {
 }
 .DiscussionSorter .Open .Selected {
    border: 1px solid #999;
-   border-bottom: none;  
+   border-bottom: none;
 }
-.DiscussionSorter .SpMenu { 
+.DiscussionSorter .SpMenu {
    background-position: -32px -20px;
-   height: 8px; 
-   width: 12px; 
+   height: 8px;
+   width: 12px;
    margin-top: 8px;
 }
-.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after { 
-   border: none; 
+.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after {
+   border: none;
 }
-.DiscussionSorter .ToggleFlyout .Flyout { 
-   top: 18px; 
+.DiscussionSorter .ToggleFlyout .Flyout {
+   top: 18px;
 }
 
 /* ======================================= Blocks */
@@ -2844,14 +2850,14 @@ textarea.MultiComplete {
    padding: 5px;
    cursor: default;
    display: block;
-   /* 
-   if width will be 100% horizontal scrollbar will apear 
+   /*
+   if width will be 100% horizontal scrollbar will apear
    when scroll mode will be used
    */
    /*width: 100%;*/
    font-size: 12px;
-   /* 
-   it is very important, if line-height not setted or setted 
+   /*
+   it is very important, if line-height not setted or setted
    in relative units scroll will be broken in firefox
    */
    line-height: 16px;
@@ -2884,7 +2890,7 @@ textarea.MultiComplete {
 	text-align: left;
 	color:#666666;
 	font-size:14px;
-	font-weight:bold;	
+	font-weight:bold;
 }
 #ConversationForm .TextBox {
 	width: 100%;
@@ -3207,7 +3213,7 @@ body#dashboard_entry_leave p.Leaving {
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 .Errors ul {
 	border: 1px solid #a00 !important;
@@ -3288,7 +3294,7 @@ position on the page to notify users of things like drafts being saved, etc. */
   position: absolute;
   top: auto;
   margin-left: 10px;
-  overflow: visible; 
+  overflow: visible;
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 .InformWrapper {
@@ -3365,7 +3371,7 @@ only screen and (max-device-width: 480px) {
       color: #fff;
       display: block;
    }
-   
+
    .Item .OptionsTitle {
       visibility: visible;
    }
@@ -3750,10 +3756,10 @@ body.embed .InformMessages {
 
 .RegardingEvent {
    padding: 10px;
-   
+
    position: relative;
    padding-left: 38px;
-   
+
    color: #fff !important;
    text-shadow: 0 1px 1px #000;
    text-align: left !important;
@@ -3911,7 +3917,7 @@ body.embed .InformMessages {
    height: 14px;
    line-height: 14px;
    vertical-align: top;
-   
+
 }
 
 /* === Reaction Sprites === */

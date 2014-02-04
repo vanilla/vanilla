@@ -91,16 +91,16 @@ class OpenIDPlugin extends Gdn_Plugin {
 //      $this->AutoToggle($Sender);
 //   }
 
-   public function AuthenticationController_Render_Before($Sender, $Args) {
-      if (isset($Sender->ChooserList)) {
-         $Sender->ChooserList['openid'] = 'OpenID';
-      }
-      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
-         $List = $Sender->Data('AuthenticationConfigureList');
-         $List['openid'] = '/dashboard/plugin/openid';
-         $Sender->SetData('AuthenticationConfigureList', $List);
-      }
-   }
+//   public function AuthenticationController_Render_Before($Sender, $Args) {
+//      if (isset($Sender->ChooserList)) {
+//         $Sender->ChooserList['openid'] = 'OpenID';
+//      }
+//      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
+//         $List = $Sender->Data('AuthenticationConfigureList');
+//         $List['openid'] = '/dashboard/plugin/openid';
+//         $Sender->SetData('AuthenticationConfigureList', $List);
+//      }
+//   }
 
    public function Setup() {
       if (!ini_get('allow_url_fopen')) {

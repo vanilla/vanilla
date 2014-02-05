@@ -422,6 +422,8 @@ class Gdn_Database {
       if(is_null($this->_SQL)) {
          $Name = $this->Engine . 'Driver';
          $this->_SQL = Gdn::Factory($Name);
+         if (!$this->_SQL)
+            $this->_SQL = new stdClass();
          $this->_SQL->Database = $this;
       }
 

@@ -1157,9 +1157,6 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
         if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
-           if (is_string($Permission)) {
-              header("X-Permission: $Permission");
-           }
            Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
         } else {
            Gdn::Dispatcher()->Dispatch('DefaultPermission');
@@ -1446,7 +1443,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       @ob_clean();
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
-            header('Content-Type: text/xml', TRUE);
+            safeHeader('Content-Type: text/xml', TRUE);
             echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
             $this->_RenderXml($Data);
             return TRUE;
@@ -1457,12 +1454,12 @@ class Gdn_Controller extends Gdn_Pluggable {
          case DELIVERY_METHOD_JSON:
          default:
             if (($Callback = $this->Request->Get('callback', FALSE)) && $this->AllowJSONP()) {
-               header('Content-Type: application/javascript', TRUE);
+               safeHeader('Content-Type: application/javascript', TRUE);
                // This is a jsonp request.
                echo $Callback.'('.json_encode($Data).');';
                return TRUE;
             } else {
-               header('Content-Type: application/json', TRUE);
+               safeHeader('Content-Type: application/json', TRUE);
                // This is a regular json request.
                echo json_encode($Data);
                return TRUE;
@@ -1584,19 +1581,19 @@ class Gdn_Controller extends Gdn_Pluggable {
 
 
       if ($Code >= 400 && $Code <= 505)
-         header("HTTP/1.0 $Code", TRUE, $Code);
+         safeHeader("HTTP/1.0 $Code", TRUE, $Code);
       else
-         header('HTTP/1.0 500', TRUE, 500);
+         safeHeader('HTTP/1.0 500', TRUE, 500);
 
 
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
             if (($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) && $this->AllowJSONP()) {
-               header('Content-Type: application/javascript', TRUE);
+               safeHeader('Content-Type: application/javascript', TRUE);
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
             } else {
-               header('Content-Type: application/json', TRUE);
+               safeHeader('Content-Type: application/json', TRUE);
                // This is a regular json request.
                exit(json_encode($Data));
             }
@@ -1605,12 +1602,12 @@ class Gdn_Controller extends Gdn_Pluggable {
 //            Gdn_ExceptionHandler($Ex);
 //            break;
          case DELIVERY_METHOD_XML:
-            header('Content-Type: text/xml', TRUE);
+            safeHeader('Content-Type: text/xml', TRUE);
             array_map('htmlspecialchars', $Data);
             exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
             break;
          default:
-            header('Content-Type: text/plain', TRUE);
+            safeHeader('Content-Type: text/plain', TRUE);
             exit($Ex->getMessage());
       }
    }
@@ -1889,10 +1886,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       // TODO: ALWAYS RENDER OR REDIRECT FROM THE CONTROLLER OR HEADERS WILL NOT BE SENT!! PUT THIS IN DOCS!!!
       foreach ($this->_Headers as $Name => $Value) {
          if ($Name != 'Status')
-            header($Name.': '.$Value, TRUE);
+            safeHeader($Name.': '.$Value, TRUE);
          else {
             $Code = array_shift($Shift = explode(' ', $Value));
-            header($Name.': '.$Value, TRUE, $Code);
+            safeHeader($Name.': '.$Value, TRUE, $Code);
          }
       }
       // Empty the collection after sending
@@ -1977,7 +1974,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $this->SetHeader('Content-Length', '0');
             $this->SendHeaders();
-            header('HTTP/1.1 304 Not Modified');
+            safeHeader('HTTP/1.1 304 Not Modified');
             exit("\n\n"); // Send two linefeeds so that the client knows the response is complete
          }
       }

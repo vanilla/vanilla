@@ -1101,253 +1101,257 @@ if (!function_exists('ForeignIDHash')) {
    }
 }
 
-/**
- * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
- *
- * @param string $String The string to format with fields from its args enclosed in curly braces. The format of fields is in the form {Field,Format,Arg1,Arg2}. The following formats are the following:
- *  - date: Formats the value as a date. Valid arguments are short, medium, long.
- *  - number: Formats the value as a number. Valid arguments are currency, integer, percent.
- *  - time: Formats the valud as a time. This format has no additional arguments.
- *  - url: Calls Url() function around the value to show a valid url with the site. You can pass a domain to include the domain.
- *  - urlencode, rawurlencode: Calls urlencode/rawurlencode respectively.
- *  - html: Calls htmlspecialchars.
- * @param array $Args The array of arguments. If you want to nest arrays then the keys to the nested values can be seperated by dots.
- * @return string The formatted string.
- * <code>
- * echo FormatString("Hello {Name}, It's {Now,time}.", array('Name' => 'Frank', 'Now' => '1999-12-31 23:59'));
- * // This would output the following string:
- * // Hello Frank, It's 12:59PM.
- * </code>
- */
-function FormatString($String, $Args = array()) {
-   _FormatStringCallback($Args, TRUE);
-   $Result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_FormatStringCallback', $String);
+if (!function_exists('FormatString')) {
+   /**
+    * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
+    *
+    * @param string $String The string to format with fields from its args enclosed in curly braces. The format of fields is in the form {Field,Format,Arg1,Arg2}. The following formats are the following:
+    *  - date: Formats the value as a date. Valid arguments are short, medium, long.
+    *  - number: Formats the value as a number. Valid arguments are currency, integer, percent.
+    *  - time: Formats the valud as a time. This format has no additional arguments.
+    *  - url: Calls Url() function around the value to show a valid url with the site. You can pass a domain to include the domain.
+    *  - urlencode, rawurlencode: Calls urlencode/rawurlencode respectively.
+    *  - html: Calls htmlspecialchars.
+    * @param array $Args The array of arguments. If you want to nest arrays then the keys to the nested values can be seperated by dots.
+    * @return string The formatted string.
+    * <code>
+    * echo FormatString("Hello {Name}, It's {Now,time}.", array('Name' => 'Frank', 'Now' => '1999-12-31 23:59'));
+    * // This would output the following string:
+    * // Hello Frank, It's 12:59PM.
+    * </code>
+    */
+   function FormatString($String, $Args = array()) {
+      _FormatStringCallback($Args, TRUE);
+      $Result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_FormatStringCallback', $String);
 
-   return $Result;
+      return $Result;
+   }
 }
 
-function _FormatStringCallback($Match, $SetArgs = FALSE) {
-   static $Args = array(), $ContextUserID = NULL;
-   if ($SetArgs) {
-      $Args = $Match;
+if (!function_exists('_FormatStringCallback')) {
+   function _FormatStringCallback($Match, $SetArgs = FALSE) {
+      static $Args = array(), $ContextUserID = NULL;
+      if ($SetArgs) {
+         $Args = $Match;
 
-      if (isset($Args['_ContextUserID']))
-         $ContextUserID = $Args['_ContextUserID'];
-      else
-         $ContextUserID = Gdn::Session() && Gdn::Session()->IsValid() ? Gdn::Session()->UserID : NULL;
+         if (isset($Args['_ContextUserID']))
+            $ContextUserID = $Args['_ContextUserID'];
+         else
+            $ContextUserID = Gdn::Session() && Gdn::Session()->IsValid() ? Gdn::Session()->UserID : NULL;
 
-      return;
-   }
+         return;
+      }
 
-   $Match = $Match[1];
-   if ($Match == '{')
-      return $Match;
+      $Match = $Match[1];
+      if ($Match == '{')
+         return $Match;
 
-   // Parse out the field and format.
-   $Parts = explode(',', $Match);
-   $Field = trim($Parts[0]);
-   $Format = trim(GetValue(1, $Parts, ''));
-   $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
-   $FormatArgs = GetValue(3, $Parts, '');
+      // Parse out the field and format.
+      $Parts = explode(',', $Match);
+      $Field = trim($Parts[0]);
+      $Format = trim(GetValue(1, $Parts, ''));
+      $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
+      $FormatArgs = GetValue(3, $Parts, '');
 
-   if (in_array($Format, array('currency', 'integer', 'percent'))) {
-      $FormatArgs = $SubFormat;
-      $SubFormat = $Format;
-      $Format = 'number';
-   } elseif(is_numeric($SubFormat)) {
-      $FormatArgs = $SubFormat;
-      $SubFormat = '';
-   }
+      if (in_array($Format, array('currency', 'integer', 'percent'))) {
+         $FormatArgs = $SubFormat;
+         $SubFormat = $Format;
+         $Format = 'number';
+      } elseif(is_numeric($SubFormat)) {
+         $FormatArgs = $SubFormat;
+         $SubFormat = '';
+      }
 
-   $Value = GetValueR($Field, $Args, '');
-   if ($Value == '' && !in_array($Format, array('url', 'exurl', 'number', 'plural'))) {
-      $Result = '';
-   } else {
-      switch(strtolower($Format)) {
-         case 'date':
-            switch($SubFormat) {
-               case 'short':
-                  $Result = Gdn_Format::Date($Value, '%d/%m/%Y');
-                  break;
-               case 'medium':
-                  $Result = Gdn_Format::Date($Value, '%e %b %Y');
-                  break;
-               case 'long':
-                  $Result = Gdn_Format::Date($Value, '%e %B %Y');
-                  break;
-               default:
-                  $Result = Gdn_Format::Date($Value);
-                  break;
-            }
-            break;
-         case 'html':
-         case 'htmlspecialchars':
-            $Result = htmlspecialchars($Value);
-            break;
-         case 'number':
-            if(!is_numeric($Value)) {
-               $Result = $Value;
-            } else {
+      $Value = GetValueR($Field, $Args, '');
+      if ($Value == '' && !in_array($Format, array('url', 'exurl', 'number', 'plural'))) {
+         $Result = '';
+      } else {
+         switch(strtolower($Format)) {
+            case 'date':
                switch($SubFormat) {
-                  case 'currency':
-                     $Result = '$'.number_format($Value, is_numeric($FormatArgs) ? $FormatArgs : 2);
-                  case 'integer':
-                     $Result = (string)round($Value);
-                     if(is_numeric($FormatArgs) && strlen($Result) < $FormatArgs) {
-                           $Result = str_repeat('0', $FormatArgs - strlen($Result)).$Result;
-                     }
+                  case 'short':
+                     $Result = Gdn_Format::Date($Value, '%d/%m/%Y');
                      break;
-                  case 'percent':
-                     $Result = round($Value * 100, is_numeric($FormatArgs) ? $FormatArgs : 0);
+                  case 'medium':
+                     $Result = Gdn_Format::Date($Value, '%e %b %Y');
+                     break;
+                  case 'long':
+                     $Result = Gdn_Format::Date($Value, '%e %B %Y');
                      break;
                   default:
-                     $Result = number_format($Value, is_numeric($FormatArgs) ? $FormatArgs : 0);
+                     $Result = Gdn_Format::Date($Value);
                      break;
                }
-            }
-            break;
-         case 'plural':
-            if (is_array($Value))
-               $Value = count($Value);
-            elseif (StringEndsWith($Field, 'UserID', TRUE))
-               $Value = 1;
-
-            if(!is_numeric($Value)) {
-               $Result = $Value;
-            } else {
-               if (!$SubFormat)
-                  $SubFormat = rtrim("%s $Field", 's');
-               if (!$FormatArgs)
-                  $FormatArgs = $SubFormat.'s';
-
-               $Result = Plural($Value, $SubFormat, $FormatArgs);
-            }
-            break;
-         case 'rawurlencode':
-            $Result = rawurlencode($Value);
-            break;
-         case 'text':
-            $Result = Gdn_Format::Text($Value, FALSE);
-            break;
-         case 'time':
-            $Result = Gdn_Format::Date($Value, '%l:%M%p');
-            break;
-         case 'url':
-            if (strpos($Field, '/') !== FALSE)
-               $Value = $Field;
-            $Result = Url($Value, $SubFormat == 'domain');
-            break;
-         case 'exurl':
-            if (strpos($Field, '/') !== FALSE)
-               $Value = $Field;
-            $Result = ExternalUrl($Value);
-            break;
-         case 'urlencode':
-            $Result = urlencode($Value);
-            break;
-         case 'gender':
-            // Format in the form of FieldName,gender,male,female,unknown[,plural]
-
-            if (is_array($Value) && count($Value) == 1)
-               $Value = array_shift($Value);
-
-            $Gender = 'u';
-
-            if (!is_array($Value)) {
-               $User = Gdn::UserModel()->GetID($Value);
-               if ($User)
-                  $Gender = $User->Gender;
-            } else {
-               $Gender = 'p';
-            }
-
-            switch($Gender) {
-               case 'm':
-                  $Result = $SubFormat;
-                  break;
-               case 'f':
-                  $Result = $FormatArgs;
-                  break;
-               case 'p':
-                  $Result = GetValue(5, $Parts, GetValue(4, $Parts));
-               case 'u':
-               default:
-                  $Result = GetValue(4, $Parts);
-            }
-
-            break;
-         case 'user':
-         case 'you':
-         case 'his':
-         case 'her':
-         case 'your':
-            $Result = print_r($Value, TRUE);
-            $ArgsBak = $Args;
-            if (is_array($Value) && count($Value) == 1)
-               $Value = array_shift($Value);
-
-            if (is_array($Value)) {
-               if (isset($Value['UserID'])) {
-                  $User = $Value;
-                  $User['Name'] = FormatUsername($User, $Format, $ContextUserID);
-
-                  $Result = UserAnchor($User);
+               break;
+            case 'html':
+            case 'htmlspecialchars':
+               $Result = htmlspecialchars($Value);
+               break;
+            case 'number':
+               if(!is_numeric($Value)) {
+                  $Result = $Value;
                } else {
-                  $Max = C('Garden.FormatUsername.Max', 5);
-                  // See if there is another count.
-                  $ExtraCount = GetValueR($Field.'_Count', $Args, 0);
-
-                  $Count = count($Value);
-                  $Result = '';
-                  for ($i = 0; $i < $Count; $i++) {
-                     if ($i >= $Max && $Count > $Max + 1) {
-                        $Others = $Count - $i + $ExtraCount;
-                        $Result .= ' '.T('sep and', 'and').' '
-                           .Plural($Others, '%s other', '%s others');
+                  switch($SubFormat) {
+                     case 'currency':
+                        $Result = '$'.number_format($Value, is_numeric($FormatArgs) ? $FormatArgs : 2);
+                     case 'integer':
+                        $Result = (string)round($Value);
+                        if(is_numeric($FormatArgs) && strlen($Result) < $FormatArgs) {
+                              $Result = str_repeat('0', $FormatArgs - strlen($Result)).$Result;
+                        }
                         break;
-                     }
+                     case 'percent':
+                        $Result = round($Value * 100, is_numeric($FormatArgs) ? $FormatArgs : 0);
+                        break;
+                     default:
+                        $Result = number_format($Value, is_numeric($FormatArgs) ? $FormatArgs : 0);
+                        break;
+                  }
+               }
+               break;
+            case 'plural':
+               if (is_array($Value))
+                  $Value = count($Value);
+               elseif (StringEndsWith($Field, 'UserID', TRUE))
+                  $Value = 1;
 
-                     $ID = $Value[$i];
-                     if (is_array($ID)) {
-                        continue;
-                     }
+               if(!is_numeric($Value)) {
+                  $Result = $Value;
+               } else {
+                  if (!$SubFormat)
+                     $SubFormat = rtrim("%s $Field", 's');
+                  if (!$FormatArgs)
+                     $FormatArgs = $SubFormat.'s';
 
-                     if ($i == $Count - 1)
-                        $Result .= ' '.T('sep and', 'and').' ';
-                     elseif ($i > 0)
-                        $Result .= ', ';
+                  $Result = Plural($Value, $SubFormat, $FormatArgs);
+               }
+               break;
+            case 'rawurlencode':
+               $Result = rawurlencode($Value);
+               break;
+            case 'text':
+               $Result = Gdn_Format::Text($Value, FALSE);
+               break;
+            case 'time':
+               $Result = Gdn_Format::Date($Value, '%l:%M%p');
+               break;
+            case 'url':
+               if (strpos($Field, '/') !== FALSE)
+                  $Value = $Field;
+               $Result = Url($Value, $SubFormat == 'domain');
+               break;
+            case 'exurl':
+               if (strpos($Field, '/') !== FALSE)
+                  $Value = $Field;
+               $Result = ExternalUrl($Value);
+               break;
+            case 'urlencode':
+               $Result = urlencode($Value);
+               break;
+            case 'gender':
+               // Format in the form of FieldName,gender,male,female,unknown[,plural]
 
-                     $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
-                     if (isset($Special[$ID])) {
-                        $Result .= $Special[$ID];
-                     } else {
-                        $User = Gdn::UserModel()->GetID($ID);
-                        if ($User) {
-                           $User->Name = FormatUsername($User, $Format, $ContextUserID);
-                           $Result .= UserAnchor($User);
+               if (is_array($Value) && count($Value) == 1)
+                  $Value = array_shift($Value);
+
+               $Gender = 'u';
+
+               if (!is_array($Value)) {
+                  $User = Gdn::UserModel()->GetID($Value);
+                  if ($User)
+                     $Gender = $User->Gender;
+               } else {
+                  $Gender = 'p';
+               }
+
+               switch($Gender) {
+                  case 'm':
+                     $Result = $SubFormat;
+                     break;
+                  case 'f':
+                     $Result = $FormatArgs;
+                     break;
+                  case 'p':
+                     $Result = GetValue(5, $Parts, GetValue(4, $Parts));
+                  case 'u':
+                  default:
+                     $Result = GetValue(4, $Parts);
+               }
+
+               break;
+            case 'user':
+            case 'you':
+            case 'his':
+            case 'her':
+            case 'your':
+               $Result = print_r($Value, TRUE);
+               $ArgsBak = $Args;
+               if (is_array($Value) && count($Value) == 1)
+                  $Value = array_shift($Value);
+
+               if (is_array($Value)) {
+                  if (isset($Value['UserID'])) {
+                     $User = $Value;
+                     $User['Name'] = FormatUsername($User, $Format, $ContextUserID);
+
+                     $Result = UserAnchor($User);
+                  } else {
+                     $Max = C('Garden.FormatUsername.Max', 5);
+                     // See if there is another count.
+                     $ExtraCount = GetValueR($Field.'_Count', $Args, 0);
+
+                     $Count = count($Value);
+                     $Result = '';
+                     for ($i = 0; $i < $Count; $i++) {
+                        if ($i >= $Max && $Count > $Max + 1) {
+                           $Others = $Count - $i + $ExtraCount;
+                           $Result .= ' '.T('sep and', 'and').' '
+                              .Plural($Others, '%s other', '%s others');
+                           break;
+                        }
+
+                        $ID = $Value[$i];
+                        if (is_array($ID)) {
+                           continue;
+                        }
+
+                        if ($i == $Count - 1)
+                           $Result .= ' '.T('sep and', 'and').' ';
+                        elseif ($i > 0)
+                           $Result .= ', ';
+
+                        $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
+                        if (isset($Special[$ID])) {
+                           $Result .= $Special[$ID];
+                        } else {
+                           $User = Gdn::UserModel()->GetID($ID);
+                           if ($User) {
+                              $User->Name = FormatUsername($User, $Format, $ContextUserID);
+                              $Result .= UserAnchor($User);
+                           }
                         }
                      }
                   }
-               }
-            } else {
-               $User = Gdn::UserModel()->GetID($Value);
-               if ($User) {
-                  $User->Name = FormatUsername($User, $Format, $ContextUserID);
-
-                  $Result = UserAnchor($User);
                } else {
-                  $Result = '';
-               }
-            }
+                  $User = Gdn::UserModel()->GetID($Value);
+                  if ($User) {
+                     $User->Name = FormatUsername($User, $Format, $ContextUserID);
 
-            $Args = $ArgsBak;
-            break;
-         default:
-            $Result = $Value;
-            break;
+                     $Result = UserAnchor($User);
+                  } else {
+                     $Result = '';
+                  }
+               }
+
+               $Args = $ArgsBak;
+               break;
+            default:
+               $Result = $Value;
+               break;
+         }
       }
+      return $Result;
    }
-   return $Result;
 }
 
 if (!function_exists('ForceBool')) {
@@ -2751,7 +2755,7 @@ if (!function_exists('Redirect')) {
       // assign status code
       $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
       // re-assign the location header
-      header("Location: ".Url($Destination), TRUE, $SendCode);
+      safeHeader("Location: ".Url($Destination), TRUE, $SendCode);
       // Exit
       exit();
    }

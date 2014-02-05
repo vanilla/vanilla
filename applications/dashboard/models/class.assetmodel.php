@@ -44,9 +44,9 @@ class AssetModel extends Gdn_Model {
          header_remove('Set-Cookie');
       }
 
-      header("Content-Type: text/css");
+      safeHeader("Content-Type: text/css");
       if (!in_array($Basename, array('Style', 'Admin'))) {
-         header("HTTP/1.0 404", TRUE, 404);
+         safeHeader("HTTP/1.0 404", TRUE, 404);
 
          echo "/* Could not find $Basename/$ETag */";
          die();
@@ -58,15 +58,15 @@ class AssetModel extends Gdn_Model {
       $RequestETags = explode(',', $RequestETags);
       foreach ($RequestETags as $RequestETags) {
          if ($RequestETags == $ETag) {
-            header("HTTP/1.0 304", TRUE, 304);
+            safeHeader("HTTP/1.0 304", TRUE, 304);
             die();
          }
       }
 
-      header("Cache-Control:public, max-age=14400");
+      safeHeader("Cache-Control:public, max-age=14400");
 
       $CurrentETag = self::ETag();
-      header("ETag: $CurrentETag");
+      safeHeader("ETag: $CurrentETag");
 
       $CachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.$ThemeType.'-'.strtolower($Basename)."-$CurrentETag.css";
 

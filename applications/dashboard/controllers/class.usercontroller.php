@@ -295,11 +295,12 @@ class UserController extends DashboardController {
          if ($PasswordChecked) {
             $this->SetData('User', ArrayTranslate((array)$User, array('UserID', 'Name', 'Email', 'PhotoUrl')));
 
-            Gdn::Session()->Start($this->Data('User.UserID'));
-            $this->SetData('Cookie', array(
-                'Name' => C('Garden.Cookie.Name'),
-                'Value' => $_COOKIE[C('Garden.Cookie.Name')]
-                ));
+            if (GetValue('session', $Args)) {
+               Gdn::Session()->Start($this->Data('User.UserID'));
+               $this->SetData('Cookie', array(
+                     C('Garden.Cookie.Name') =>  $_COOKIE[C('Garden.Cookie.Name')]
+                  ));
+            }
          } else {
             throw new Exception(T('Invalid password.'), 401); // Can't be a user exception.
          }

@@ -1627,7 +1627,19 @@ class CategoryModel extends Gdn_Model {
 
 		return $Property;
    }
-   
+
+   public static function SetLocalField($ID, $Property, $Value) {
+      // Make sure the field is here.
+      if (!self::$Categories === null)
+         self::Categories(-1);
+
+      if (isset(self::$Categories[$ID])) {
+         self::$Categories[$ID][$Property] = $Value;
+         return TRUE;
+      }
+      return FALSE;
+   }
+
    public function SetRecentPost($CategoryID) {
       $Row = $this->SQL->GetWhere('Discussion', array('CategoryID' => $CategoryID), 'DateLastComment', 'desc', 1)->FirstRow(DATASET_TYPE_ARRAY);
       

@@ -405,7 +405,7 @@ function WriteCommentForm() {
 	}
    
 	if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
-		echo $Controller->FetchView('comment', 'post');
+		echo $Controller->FetchView('comment', 'post', 'vanilla');
 }
 endif;
 

@@ -394,7 +394,7 @@ class MessagesController extends ConversationsController {
       
       $this->Data['Breadcrumbs'][] = array(
           'Name' => $Subject,
-          Url('', '//'));
+          'Url' => Url('', '//'));
       
       // Render view
       $this->Render();

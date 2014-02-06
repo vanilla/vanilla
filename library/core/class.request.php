@@ -344,6 +344,7 @@ class Gdn_Request {
       $this->RequestHost(     isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? GetValue('HTTP_X_FORWARDED_HOST',$_SERVER) : (isset($_SERVER['HTTP_HOST']) ? GetValue('HTTP_HOST',$_SERVER) : GetValue('SERVER_NAME',$_SERVER)));
       $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? GetValue('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
       
+      $this->WithArgs(Gdn_Request::INPUT_SERVER);
       // Request IP
       
       // Loadbalancers

@@ -1077,12 +1077,12 @@ if (!function_exists('ForceIPv4')) {
     * @since 2.1
     */
    function ForceIPv4($IP) {
-      if ($IP === '::1')
+      if ($IP === '::1') {
          return '127.0.0.1';
-      elseif (strpos($IP, ':')) {
+      } elseif (strpos($IP, ':') === true) {
          return '0.0.0.1';
-      } elseif (strpos($IP, '.') === FALSE) {
-         return '0.0.0.1';
+      } elseif (strpos($IP, '.') === false) {
+         return '0.0.0.2';
       } else {
          return substr($IP, 0, 15);
       }

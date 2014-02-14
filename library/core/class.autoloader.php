@@ -894,6 +894,10 @@ class Gdn_Autoloader_Map {
       return $this->MapInfo['maptype']; //GetValue('maptype', $this->MapInfo);
    }
 
+   public function MapName() {
+      return $this->MapInfo['name'];
+   }
+
    public function Shutdown() {
 
       if (!GetValue('dirty', $this->MapInfo)) return FALSE;

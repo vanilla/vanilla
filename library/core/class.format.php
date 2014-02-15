@@ -1061,7 +1061,11 @@ class Gdn_Format {
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
-      
+	  $GistUrlMatch = 'https?://(gist\.)?github.com\/(\w+)\/(\w+)';
+	  $GooglePlusMatch =  'https?://plus.google.com/([\d]+)/posts/(\w+)';
+	  $FacebookUrlMatch =  'https?://www.facebook.com/([\w]+)/posts/(\w+)';
+	 
+	 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches) 
          || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches)) 
@@ -1119,6 +1123,28 @@ EOT;
 <a data-pin-do="embedPin" href="//pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
 EOT;
    
+   //Gist
+        } elseif (preg_match("`({$GistUrlMatch})`", $Url, $Matches) && C('Garden.Format.Gist', true)) {
+		 $Result = <<<EOT
+		<script src="https://gist.github.com/{$Matches[3]}/{$Matches[4]}.js"></script>
+EOT;
+
+	//Google+
+	//https://developers.google.com/+/web/embedded-post/
+		} elseif (preg_match("`({$GooglePlusMatch})`", $Url, $Matches) && C('Garden.Format.GooglePlus', true)) {
+	     echo '<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>'; //must be called in the head or before body
+		 $Result = <<<EOT
+		<div class="g-post" data-href="https://plus.google.com/{$Matches[2]}/posts/{$Matches[3]}"></div>
+EOT;
+
+	//Facebook
+	//https://developers.facebook.com/docs/plugins/embedded-posts/
+	} elseif (preg_match("`({$FacebookUrlMatch})`", $Url, $Matches) && C('Garden.Format.FacebookUrl', true)) {
+	     echo '<div id="fb-root"></div> <script>(function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "//connect.facebook.net/en_US/all.js#xfbml=1"; fjs.parentNode.insertBefore(js, fjs); }(document, \'script\', \'facebook-jssdk\'));</script>'; //must be called in the head or before body
+		 $Result = <<<EOT
+		<div class="fb-post" data-href="https://www.facebook.com/{$Matches[2]}/posts/{$Matches[3]}" data-width="550"><div class="fb-xfbml-parse-ignore"></div></div>
+EOT;
+
       // Unformatted links
       } elseif (!self::$FormatLinks) {
          $Result = $Url;
@@ -1634,6 +1660,5 @@ EOT;
 
          return $Mixed;
       }
-   }
-   
+   } 
 }

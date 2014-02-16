@@ -147,3 +147,9 @@ $Configuration['Routes']['DefaultForumRoot'] = 'discussions';
 $Configuration['Routes']['Default404'] = array('dashboard/home/filenotfound', 'NotFound');
 $Configuration['Routes']['DefaultPermission'] = array('dashboard/home/permission', 'NotAuthorized');
 $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';
+
+// Optional HTTP proxy
+$Configuration['Proxy']['Hostname'] = null;
+$configuration['Proxy']['Port'] = '3128';
+$Configuration['Proxy']['Login'] = NULL;
+$Configuration['Proxy']['Password'] = NULL;

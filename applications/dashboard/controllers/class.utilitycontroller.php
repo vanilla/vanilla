@@ -469,7 +469,7 @@ class UtilityController extends DashboardController {
       $this->Render('Blank');
    }
 	
-	/**
+   /**
     * Grab a feed from the mothership.
     *
     * @since 2.0.?
@@ -478,12 +478,15 @@ class UtilityController extends DashboardController {
     * @param int $Length Number of items to get.
     * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
     */
-	public function GetFeed($Type = 'news', $Length = 5, $FeedFormat = 'normal') {
-		echo file_get_contents('http://vanillaforums.org/vforg/home/getfeed/'.$Type.'/'.$Length.'/'.$FeedFormat.'/?DeliveryType=VIEW');
-		$this->DeliveryType(DELIVERY_TYPE_NONE);
+   public function GetFeed($Type = 'news', $Length = 5, $FeedFormat = 'normal') {
+      // Set proxy if needed
+      $context = GetStreamContextForHttpProxy();
+	  
+      echo file_get_contents('http://vanillaforums.org/vforg/home/getfeed/'.$Type.'/'.$Length.'/'.$FeedFormat.'/?DeliveryType=VIEW', false, $context);
+      $this->DeliveryType(DELIVERY_TYPE_NONE);
       $this->Render();
-	}
-   
+   }
+
    /** 
     * Return some meta information about any page on the internet in JSON format.
     */

@@ -66,10 +66,19 @@ function _recaptcha_qsencode ($data) {
  */
 function _recaptcha_http_post($host, $path, $data, $port = 80) {
 
+        if ($port != 80) {
+                $host = $host . ':' . $port;
+        }
+
+        $proxy_config = GetProxyConfig();
+
         $req = _recaptcha_qsencode ($data);
 
-        $http_request  = "POST $path HTTP/1.0\r\n";
+        $http_request  = ($proxy_config ? "POST http://$host$path HTTP/1.0\r\n" : "POST $path HTTP/1.0\r\n");
         $http_request .= "Host: $host\r\n";
+        if ($proxy_config && $proxy_config['auth']) {
+                $http_request .= 'Proxy-Authorization: Basic ' . $proxy_config['auth'] . "\r\n";
+        }
         $http_request .= "Content-Type: application/x-www-form-urlencoded;\r\n";
         $http_request .= "Content-Length: " . strlen($req) . "\r\n";
         $http_request .= "User-Agent: reCAPTCHA/PHP\r\n";
@@ -77,6 +86,10 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
         $http_request .= $req;
 
         $response = '';
+        if ($proxy_config) {
+                $host = $proxy_config['hostname'];
+                $port = $proxy_config['port'];
+        }
         if( false == ( $fs = @fsockopen($host, $port, $errno, $errstr, 10) ) ) {
                 die ('Could not open socket');
         }
@@ -139,7 +152,6 @@ class ReCaptchaResponse {
         var $is_valid;
         var $error;
 }
-
 
 /**
   * Calls an HTTP POST function to verify if the user's guess was correct

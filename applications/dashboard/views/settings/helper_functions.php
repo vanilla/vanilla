@@ -69,6 +69,9 @@ function GetTutorials($TutorialCode = '') {
       $Tutorials[$i]['LargeThumbnail'] = $LargeThumbnail;
    }
    
+   // Set proxy if needed
+   $context = GetStreamContextForHttpProxy();
+
    if ($TutorialCode != '') {
       $Keys = ConsolidateArrayValuesByKey($Tutorials, 'Code');
       $Index = array_search($TutorialCode, $Keys);
@@ -79,7 +82,7 @@ function GetTutorials($TutorialCode = '') {
       $Tutorial = GetValue($Index, $Tutorials);
       $VideoID = GetValue('VideoID', $Tutorial);
       try {
-         $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php"));
+         $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php", false, $context));
          $Tutorial['Thumbnail'] = GetValue('thumbnail_medium', GetValue('0', $Vimeo));
          $Tutorial['LargeThumbnail'] = GetValue('thumbnail_large', GetValue('0', $Vimeo));
       } catch (Exception $Ex) {
@@ -90,7 +93,7 @@ function GetTutorials($TutorialCode = '') {
       // Loop through each tutorial populating the thumbnail image location
       try {
          foreach ($Tutorials as $Key => $Tutorial) {
-            $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php"));
+            $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php", false, $context));
             $Tutorials[$Key]['Thumbnail'] = GetValue('thumbnail_medium', GetValue('0', $Vimeo));
             $Tutorials[$Key]['LargeThumbnail'] = GetValue('thumbnail_large', GetValue('0', $Vimeo));
          }

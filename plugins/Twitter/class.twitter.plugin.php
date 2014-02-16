@@ -706,6 +706,8 @@ class TwitterPlugin extends Gdn_Plugin {
          default:
             curl_setopt($C, CURLOPT_URL, $Request->to_url());
       }
+      // Set proxy if needed
+      SetCurlOptionsForHttpProxy($C);
       return $C;
    }
 

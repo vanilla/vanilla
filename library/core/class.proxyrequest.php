@@ -38,7 +38,7 @@ class ProxyRequest {
    public $ActionLog;
    
    protected $Options;
-   
+
    /**
     * Set up ProxyRequest
     * 
@@ -362,7 +362,7 @@ class ProxyRequest {
       // We need cURL
       if (!function_exists('curl_init'))
          throw new Exception('Encountered an error while making a request to the remote server: Your PHP configuration does not allow cURL requests.');
-      
+
       $Handler = curl_init();
       curl_setopt($Handler, CURLOPT_HEADER, FALSE);
       curl_setopt($Handler, CURLINFO_HEADER_OUT, TRUE);
@@ -467,6 +467,9 @@ class ProxyRequest {
       curl_setopt($Handler, CURLOPT_URL, $Url);
       curl_setopt($Handler, CURLOPT_PORT, $Port);
       
+      // Set proxy if any
+      SetCurlOptionsForHttpProxy($Handler);
+
       $this->CurlReceive($Handler);
 
       if ($Simulate) return NULL;

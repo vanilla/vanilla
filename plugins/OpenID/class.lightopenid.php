@@ -177,6 +177,10 @@ class LightOpenID
         } else {
             curl_setopt($curl, CURLOPT_HTTPGET, true);
         }
+
+        // Set proxy options if needed
+        SetCurlOptionsForHttpProxy($curl);
+
         $response = curl_exec($curl);
 
         if($method == 'HEAD') {
@@ -201,6 +205,25 @@ class LightOpenID
         }
 
         return $response;
+    }
+
+    private static function addProxyOptionsToStreamContextOptions(&$opts)
+    {
+        $proxyOpts = GetStreamContextOptionsForHttpProxy();
+
+        foreach ($proxyOpts as $key => $params) {
+            if (array_key_exists($key, $opts)) {
+                foreach ($params as $key2 => $param) {
+                    if (array_key_exists($key2, $opts[$key])) {
+                        $opts[$key][$key2] .= "\r\n" . $param;
+                    } else {
+                        $opts[$key][$key2] = $param;
+                    }
+                }
+            } else {
+                $opts[$key] = $params;
+            }
+        }
     }
 
     protected function request_streams($url, $method='GET', $params=array())
@@ -236,13 +259,15 @@ class LightOpenID
             # but since get_headers doesn't accept $context parameter,
             # we have to change the defaults.
             $default = stream_context_get_options(stream_context_get_default());
-            stream_context_get_default(
-                array('http' => array(
-                    'method' => 'HEAD',
-                    'header' => 'Accept: application/xrds+xml, */*',
-                    'ignore_errors' => true,
-                ))
-            );
+            $opts = array('http' => array(
+                 'method' => 'HEAD',
+                 'header' => 'Accept: application/xrds+xml, */*',
+                 'ignore_errors' => true,
+            ));
+            // Set proxy options if needed
+            self::addProxyOptionsToStreamContextOptions($opts);
+
+            stream_context_get_default($opts);
 
             $url = $url . ($params ? '?' . $params : '');
             $headers_tmp = get_headers ($url);
@@ -287,6 +312,9 @@ class LightOpenID
                 'cafile'      => $this->cainfo,
             ));
         }
+
+        // Set proxy options if needed
+        self::addProxyOptionsToStreamContextOptions($opts);
 
         $context = stream_context_create ($opts);
 

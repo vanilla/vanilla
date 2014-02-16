@@ -2405,6 +2405,103 @@ if (!function_exists('PrepareArray')) {
    }
 }
 
+if (!function_exists('GetProxyConfig')) {
+
+   /**
+    * Gets the proxy parameters if any (based on the Proxy.Hostname,
+    * Proxy.Port, Proxy.Login and Proxy.Password configuration
+    * variables).
+    *
+    * @return mixed array containing the configuration parameters or false
+    */
+   function GetProxyConfig() {
+
+      $proxy_hostname = Gdn::Config('Proxy.Hostname', NULL);
+      if ($proxy_hostname) {
+         $proxy_port = Gdn::Config('Proxy.Port', '3128');
+         $proxy_login = Gdn::Config('Proxy.Login', NULL);
+         if ($proxy_login) {
+            $proxy_password = Gdn::Config('Proxy.Password', NULL);
+            if (!$proxy_password) {
+               throw new Exception(sprintf(T('Cannot found password for the "%1$s" HTTP proxy username. Please set the Proxy.Password variable in the configuration file.'), $proxy_login));
+            }
+            $proxy_auth = base64_encode("$proxy_login:$proxy_password");
+         } else {
+            $proxy_password = NULL;
+            $proxy_auth = NULL;
+         }
+         return array(
+            'hostname' => $proxy_hostname,
+            'port' => $proxy_port,
+            'login' => $proxy_login,
+            'password' => $proxy_password,
+            'auth' => $proxy_auth,
+         );
+      } else {
+         return FALSE;
+      }
+   }
+}
+
+if (!function_exists('SetCurlOptionsForHttpProxy')) {
+
+   /**
+    * Allows to use cURL through a proxy server: sets the CURLOPT_PROXY
+    * and CURLOPT_PROXYUSERPWD options on the given cURL handler if
+    * the configuration file contains the Proxy.Hostname, Proxy.Port,
+    * Proxy.Login and Proxy.Password variables.
+    *
+    * @param $Handler cURL handler returned by the curl_init() function.
+    */
+   function SetCurlOptionsForHttpProxy($Handler) {
+      if ( FALSE === ($proxy_config = GetProxyConfig()) ) {
+         return;
+      }
+      curl_setopt($Handler, CURLOPT_PROXY, $proxy_config['hostname'] . ':' . $proxy_config['port']);
+      if ($proxy_config['login']) {
+         curl_setopt($Handler, CURLOPT_PROXYUSERPWD, $proxy_config['login'] . ':' . $proxy_config['password']);
+      }
+   }
+}
+
+if (!function_exists('GetStreamContextOptionsForHttpProxy')) {
+   /**
+    * Returns an array containing the options to use for a stream context if a HTTP proxy must be used.
+    *
+    * @param array stream context options
+    */
+   function GetStreamContextOptionsForHttpProxy() {
+      if ( FALSE === ($proxy_config = GetProxyConfig()) ) {
+         return array();
+      }
+      
+      $params = array(
+         'http' => array(
+            'proxy' => 'tcp://' . $proxy_config['hostname'] . ':' . $proxy_config['port'],
+            'request_fulluri' => true,
+         ),
+      );
+      if ($proxy_config['auth']) {
+         $params['http']['header'] = 'Proxy-Authorization: Basic ' . $proxy_config['auth'];
+      }
+      return $params;
+   }
+}
+
+if (!function_exists('GetStreamContextForHttpProxy')) {
+   /**
+    * Returns a stream context to use if a HTTP proxy must be used.
+    *
+    * @param resource stream context (or null if no proxy is set in the configuration file).
+    */
+   function GetStreamContextForHttpProxy() {
+      if ( FALSE === GetProxyConfig() ) {
+         return null;
+      }
+      return stream_context_create(GetStreamContextOptionsForHttpProxy());
+   }
+}
+
 if (!function_exists('ProxyHead')) {
 
    function ProxyHead($Url, $Headers=NULL, $Timeout = FALSE, $FollowRedirects = FALSE) {
@@ -2455,6 +2552,9 @@ if (!function_exists('ProxyHead')) {
          if (strlen($Cookie['Cookie']))
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie['Cookie']);
 
+         // Set proxy if needed
+         SetHttpProxyForCurl($Handler);
+
          //if ($Query != '') {
          //   curl_setopt($Handler, CURLOPT_POST, 1);
          //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
@@ -2468,13 +2568,24 @@ if (!function_exists('ProxyHead')) {
          $Referer = Gdn::Request()->WebRoot();
 
          // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
+         $proxy_config = GetProxyConfig();
+         if ($proxy_config) {
+            $Pointer = @fsockopen($proxy_config['hostname'], $proxy_config['port'], $ErrorNumber, $Error, $Timeout);
+         } else {
+            $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
+         }
+
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
 
-         $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
+         if ($proxy_config) {
+            $Request = 'HEAD '.$Host.(($Port != 80) ? ":{$Port}" : '')."$Path?$Query HTTP/1.1\r\n";
+            $HostHeader = $proxy_config['hostname'] . (($proxy_config['port'] != 80) ? ":{$proxy_config['port']}" : '');
+         } else {
+            $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
+            $HostHeader = $Host.($Port != 80) ? ":{$Port}" : '';
+         }
 
-         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
          $Header = array(
             'Host'            => $HostHeader,
             'User-Agent'      => ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
@@ -2483,6 +2594,9 @@ if (!function_exists('ProxyHead')) {
             'Referer'         => $Referer,
             'Connection'      => 'close'
          );
+         if ($proxy_config && $proxy_config('auth')) {
+            $Request .= 'Proxy-Authorization: Basic ' . $proxy_config['auth'] . "\r\n";
+         }
 
          if (strlen($Cookie['Cookie']))
             $Header = array_merge($Header, $Cookie);
@@ -2595,6 +2709,9 @@ if (!function_exists('ProxyRequest')) {
          if ($Timeout > 0)
             curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
 
+         // Set proxy if needed
+         SetHttpProxyForCurl($Handler);
+
          // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
          //
          //if ($Query != '') {
@@ -2614,7 +2731,12 @@ if (!function_exists('ProxyRequest')) {
          $Referer = Gdn_Url::WebRoot(TRUE);
 
          // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
+         $proxy_config = GetProxyConfig();
+         if ($proxy_config) {
+            $Pointer = @fsockopen($proxy_config['hostname'], $proxy_config['port'], $ErrorNumber, $Error, $Timeout);
+         } else {
+            $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error, $Timeout);
+         }
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
 
@@ -2622,9 +2744,15 @@ if (!function_exists('ProxyRequest')) {
          if (strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
 
-         $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
-         $Header = "GET $Path?$Query HTTP/1.1\r\n"
-            ."Host: {$HostHeader}\r\n"
+         if ($proxy_config) {
+            $HostHeader = $proxy_config['hostname'] . (($proxy_config['port'] != 80) ? ":{$proxy_config['port']}" : '');
+            $Header = 'GET '.$proxy_config['hostname'].(($proxy_config['port'] != 80) ? $proxy_config['port'] : '') . "$Path?$Query HTTP/1.1\r\n";
+         } else {
+            $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
+            $Header = "GET $Path?$Query HTTP/1.1\r\n";
+         }
+
+         $Header .= "Host: {$HostHeader}\r\n"
             // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" .
             ."User-Agent: ".ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
@@ -2635,6 +2763,10 @@ if (!function_exists('ProxyRequest')) {
 
          if ($Cookie != '')
             $Header .= $Cookie;
+
+         if ($proxy_config && $proxy_config('auth')) {
+            $Header .= 'Proxy-Authorization: Basic ' . $proxy_config['auth'] . "\r\n";
+         }
 
          $Header .= "\r\n";
 

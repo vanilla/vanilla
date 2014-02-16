@@ -81,6 +81,9 @@ class FacebookPlugin extends Gdn_Plugin {
          Trace("  GET  $Url");
       }
 
+      // Set proxy if needed
+      SetCurlOptionsForHttpProxy($ch);
+
       $Response = curl_exec($ch);
 
       $HttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -505,6 +508,8 @@ class FacebookPlugin extends Gdn_Plugin {
       curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
       curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
       curl_setopt($C, CURLOPT_URL, $Url);
+      // Set proxy if needed
+      SetCurlOptionsForHttpProxy($C);
       $Contents = curl_exec($C);
 
       $Info = curl_getinfo($C);
@@ -520,7 +525,7 @@ class FacebookPlugin extends Gdn_Plugin {
 
       $AccessToken = GetValue('access_token', $Tokens);
 //      $Expires = GetValue('expires', $Tokens, NULL);
-      
+
       return $AccessToken;
    }
 
@@ -530,9 +535,10 @@ class FacebookPlugin extends Gdn_Plugin {
 //      curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
 //      curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
 //      curl_setopt($C, CURLOPT_URL, $Url);
+//      SetCurlOptionsForHttpProxy($C);
 //      $Contents = curl_exec($C);
 //      $Contents = ProxyRequest($Url);
-      $Contents = file_get_contents($Url);
+      $Contents = file_get_contents($Url, false, GetStreamContextForHttpProxy());
       $Profile = json_decode($Contents, TRUE);
       return $Profile;
    }

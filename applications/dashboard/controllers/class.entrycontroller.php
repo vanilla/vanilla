@@ -1272,8 +1272,10 @@ class EntryController extends Gdn_Controller {
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);
          }
+         $this->Render();
+      } else {
+         $this->Render();
       }
-      $this->Render();
    }
 
    /**

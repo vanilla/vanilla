@@ -625,6 +625,10 @@ class Gdn_Statistics extends Gdn_Plugin {
 
       $this->AddView($ViewType);
 
+      if (Gdn::Session()->IsValid()) {
+         Gdn::UserModel()->UpdateVisit(Gdn::Session()->UserID);
+      }
+
       if (!self::CheckIsEnabled())
          return;
 

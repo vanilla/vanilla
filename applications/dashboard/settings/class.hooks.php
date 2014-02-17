@@ -184,6 +184,8 @@ class DashboardHooks implements Gdn_IPlugin {
       if ($SSO = Gdn::Request()->Get('sso')) {
          SaveToConfig('Garden.Registration.SendConnectEmail', FALSE, FALSE);
 
+         $IsApi = preg_match('`\.json$`i', Gdn::Request()->Path());
+
          $UserID = FALSE;
          try {
             $CurrentUserID = Gdn::Session()->UserID;
@@ -193,7 +195,7 @@ class DashboardHooks implements Gdn_IPlugin {
          }
 
          if ($UserID) {
-            Gdn::Session()->Start($UserID, TRUE, TRUE);
+            Gdn::Session()->Start($UserID, !$IsApi, !$IsApi);
 
             if ($UserID != $CurrentUserID)
                Gdn::UserModel()->FireEvent('AfterSignIn');

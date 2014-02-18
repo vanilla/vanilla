@@ -140,7 +140,7 @@ $UserRoleExists = $Construct->TableExists();
 
 $Construct
    ->Column('UserID', 'int', FALSE, 'primary')
-   ->Column('RoleID', 'int', FALSE, 'primary')
+   ->Column('RoleID', 'int', FALSE, array('primary', 'index'))
    ->Set($Explicit, $Drop);
 
 if (!$UserRoleExists) {

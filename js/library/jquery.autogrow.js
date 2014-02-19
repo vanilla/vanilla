@@ -15,6 +15,43 @@
  *
  */
 
+/**
+ * Vanilla Forums NOTE:
+ * ====================
+ *
+ * @date Feb.19,2014
+ *
+ * I (Dane) modified this plugin as it's no longer supported by the author,
+ * and ultimately not available by the author. His site is not even up, and
+ * it's no longer listed as a plugin on plugins.jquery.com.
+ * There was a copy of the plugin found on Github, hosted by someone
+ * unrelated, who made a minor tweak five years ago, but it was unofficial.
+ * It's safe to say the plugin is now living on its own.
+ *
+ * I made changes to this plugin for two reasons:
+ *
+ *    #1 - Autogrow functionality and the manual resizing corner of textareas
+ *      (introduced after the creation of this plugin), don't play well
+ *      together. If typing text into a manually resized textarea, it will
+ *      snap to the current height of the text. There's no purpose to a
+ *      manual resize when there is autogrow enabled. Autogrow's purpose is
+ *      to show all typed in text and nothing more. This was not a case
+ *      coded for, as browsers at the time did not have the ability to
+ *      manually resize a textarea. In addition, there was a
+ *      related bug filed in TW. This is fixed by setting the `resize`
+ *      CSS property to `none` on the textarea.
+ *
+ *    #2 - Secondly, Firefox and Chrome calculate the height of nodes
+ *      differently when a node has the `box-sizing` value of `border-box`.
+ *      This causes the topmost text in the textarea to slowly creep out of
+ *      view and disappear. This was not an issue when the plugin was created,
+ *      as `box-sizing` was not available in any browser at the time.
+ *      This is fixed by checking the `box-sizing` value of the textarea and
+ *      applying it to the "dummy" node created by the plugin.
+ *
+ * These changes are noted below.
+ */
+
 jQuery(document).ready(function(jQuery) {
 
    var self = null;
@@ -63,7 +100,8 @@ jQuery(document).ready(function(jQuery) {
 
       init: function() {
          var self = this;
-         this.textarea.css({overflow: 'hidden', display: 'block'});
+         // Fix #1, adding resize:none
+         this.textarea.css({overflow: 'hidden', display: 'block', resize: 'none'});
          this.textarea.bind('focus', function() { self.startExpand() } ).bind('blur', function() { self.stopExpand() });
          this.checkExpand();
       },
@@ -97,6 +135,15 @@ jQuery(document).ready(function(jQuery) {
 
          if (this.dummy == null)
          {
+            // Fix #2
+            // content-box is default box-sizing value.
+            var box_sizing = 'content-box';
+            var css_box_sizing = this.textarea.css('box-sizing');
+            if (css_box_sizing != 'hundefined') {
+               box_sizing = this.textarea.css('box-sizing');
+
+            }
+
             this.dummy = jQuery('<div></div>');
             this.dummy.css({
                                     'font-size'  : this.textarea.css('font-size'),
@@ -110,7 +157,9 @@ jQuery(document).ready(function(jQuery) {
                                     'overflow-x' : 'hidden',
                                     'position'   : 'absolute',
                                     'top'        : 0,
-                                    'left'       : -9999
+                                    'left'       : -9999,
+                                    // Fix #2
+                                    'box-sizing' : box_sizing
                                     }).appendTo('body');
          }
 

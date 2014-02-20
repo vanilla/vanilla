@@ -220,7 +220,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // IN THE MEANTIME...
       return $this->Input($FieldName, 'text', $Attributes);
    }
-   
+
    public function Captcha() {
       require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
 
@@ -256,7 +256,7 @@ class Gdn_Form extends Gdn_Pluggable {
          $CategoryData = array();
 
       $Permission = GetValue('Permission', $Options, 'add');
-      
+
       // Grab the category data.
       if (!$CategoryData) {
          $CategoryData = CategoryModel::GetByPermission('Discussions.View', $Value,
@@ -366,7 +366,7 @@ class Gdn_Form extends Gdn_Pluggable {
    public function CheckBox($FieldName, $Label = '', $Attributes = FALSE) {
       $Value = ArrayValueI('value', $Attributes, true);
       $Attributes['value'] = $Value;
-      
+
       if (StringEndsWith($FieldName, '[]')) {
          if (!isset($Attributes['checked'])) {
             $GetValue = $this->GetValue(substr($FieldName, 0, -2));
@@ -1365,6 +1365,7 @@ PASSWORDMETER;
                   continue;
                $Key = Gdn_Format::Form($Key);
                $Value = Gdn_Format::Form($Value);
+               if (is_array($Value)) continue;
                $Hiddens .= "\n<input type=\"hidden\" name=\"$Key\" value=\"$Value\" />";
             }
          }

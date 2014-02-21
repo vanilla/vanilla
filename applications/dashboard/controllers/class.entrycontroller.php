@@ -1438,10 +1438,20 @@ class EntryController extends Gdn_Controller {
     * @param string $PasswordResetKey Authenticate with unique, 1-time code sent via email.
     */
    public function PasswordReset($UserID = '', $PasswordResetKey = '') {
+      $PasswordResetKey = trim($PasswordResetKey);
+
       if (!is_numeric($UserID)
           || $PasswordResetKey == ''
           || $this->UserModel->GetAttribute($UserID, 'PasswordResetKey', '') != $PasswordResetKey
-         ) $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
+         ) {
+         $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
+      }
+
+      $Expires = $this->UserModel->GetAttribute($UserID, 'PasswordResetExpires');
+      if ($this->Form->ErrorCount() === 0 && $Expires < time()) {
+         $this->Form->AddError('@'.T('Your password reset token has expired.', 'Your password reset token has expired. Try using the reset request form again.'));
+      }
+
 
       if ($this->Form->ErrorCount() == 0) {
          $User = $this->UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
@@ -1449,6 +1459,8 @@ class EntryController extends Gdn_Controller {
             $User = ArrayTranslate($User, array('UserID', 'Name', 'Email'));
             $this->SetData('User', $User);
          }
+      } else {
+         $this->SetData('Fatal', TRUE);
       }
       
       if ($this->Form->ErrorCount() == 0

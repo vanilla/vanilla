@@ -75,10 +75,17 @@ function Gdn_ExceptionHandler($Exception) {
       // prevent headers already sent error
       if (!headers_sent()) {
          if ($ErrorNumber >= 100 && $ErrorNumber < 600)
-            safeHeader("HTTP/1.0 $ErrorNumber", TRUE, $ErrorNumber);
+            $Code = $ErrorNumber;
          else
-            safeHeader('HTTP/1.0 500', TRUE, 500);
+            $Code = 500;
 
+         if (class_exists('Gdn_Controller', false)) {
+            $msg = Gdn_Controller::GetStatusMessage($Code);
+         } else {
+            $msg = 'Error';
+         }
+
+         safeHeader("HTTP/1.0 $Code $msg", TRUE, $ErrorNumber);
          safeHeader('Content-Type: text/html; charset=utf-8');
       }
 

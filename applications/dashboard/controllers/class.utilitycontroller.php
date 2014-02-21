@@ -455,6 +455,7 @@ class UtilityController extends DashboardController {
          $this->SetData('database', true);
       } catch(Exception $ex) {
          $this->SetData('database', false);
+         $valid = false;
       }
 
       $this->EventArguments['Valid'] =& $valid;
@@ -467,6 +468,7 @@ class UtilityController extends DashboardController {
       $time = microtime(true) - $start;
       $this->SetData('time', Gdn_Format::Timespan($time));
       $this->SetData('time_s', $time);
+      $this->SetData('valid', $valid);
 
       $this->Render();
    }

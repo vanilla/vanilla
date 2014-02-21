@@ -2713,28 +2713,52 @@ if (!function_exists('RandomString')) {
    }
 }
 
-if (!function_exists('BetterRandomString')) {
-   function BetterRandomString($Length, $CharacterOptions = 'A0') {
-      $CharacterClasses = array(
-          'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-          'a' => 'abcdefghijklmnopqrstuvwxyz',
-          '0' => '0123456789',
-          '!' => '~!@#$^&*_+-'
-      );
+if (!function_exists('BetterRandomString')):
 
-      $Characters = '';
-      for ($i=0;$i<strlen($CharacterOptions);$i++)
-         $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+/**
+ * Generate a random string of characters with additional character options that can be cryptographically strong.
+ *
+ * This function attempts to use {@link openssl_random_pseudo_bytes()} to generate its randomness.
+ * If that function does not exists then it just uses mt_rand().
+ *
+ * @param int $Length The length of the string.
+ * @param string $CharacterOptions Character sets that are allowed in the string. This is a string made up of the following characters.
+ *  - A: uppercase characters
+ *  - a: lowercase characters
+ *  - 0: digits
+ *  - !: basic punctuation (~!@#$^&*_+-)
+ * @return string Returns the random string for the given arguments.
+ */
+function BetterRandomString($Length, $CharacterOptions = 'A0') {
+   $CharacterClasses = array(
+       'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'a' => 'abcdefghijklmnopqrstuvwxyz',
+       '0' => '0123456789',
+       '!' => '~!@#$^&*_+-'
+   );
 
-      $CharLen = strlen($Characters) - 1;
-      $String = '' ;
+   $Characters = '';
+   for ($i=0;$i<strlen($CharacterOptions);$i++)
+      $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+
+   $CharLen = strlen($Characters);
+   $String = '' ;
+
+   if (function_exists('openssl_random_pseudo_bytes')) {
+      $random_chars = unpack('C*', openssl_random_pseudo_bytes($Length));
+      foreach ($random_chars as $c) {
+         $Offset = (int)$c % $CharLen;
+         $String .= substr($Characters, $Offset, 1);
+      }
+   } else {
       for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % $CharLen;
+        $Offset = mt_rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
-      return $String;
    }
+   return $String;
 }
+endif;
 
 if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {

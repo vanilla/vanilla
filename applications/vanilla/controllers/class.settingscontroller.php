@@ -129,6 +129,7 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('jquery.form.js');
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('jquery.atwho.js');
       $this->AddJsFile('global.js');
 
       if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
@@ -524,7 +525,7 @@ class SettingsController extends Gdn_Controller {
 
 
       // This now works on latest jQuery version 1.10.2
-      // 
+      //
       // Jan29, 2014, upgraded jQuery UI to 1.10.3 from 1.8.11
       $this->AddJsFile('js/library/nestedSortable/jquery-ui.min.js');
       // Newer nestedSortable, but does not work.

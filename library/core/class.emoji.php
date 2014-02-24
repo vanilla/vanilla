@@ -227,8 +227,29 @@ class Emoji {
          '>:)'         => 'smiling_imp'
        );
 
-      // Translate the emoji.
+      // Add emoji to definition list for whole site. This used to be in the
+      // advanced editor plugin, but since moving atmentions to core, had to
+      // make sure they were still being added. This will make sure that
+      // emoji autosuggest works. Note: emoji will not be core yet, so the only
+      // way that this gets called is by the editor when it instantiates. Core
+      // does not instantiate this class anywhere, so there will not be any
+      // suggestions for emoji yet, but keep here for whenever Advanced Editor
+      // is running.
+      $c = Gdn::Controller();
+      if ($c) {
+         $emojis = $this->getEmoji();
+         $emojiAssetPath = $this->getAssetPath();
+         $emoji = array();
 
+         foreach ($emojis as $name => $data) {
+            $emoji[] = array(
+                "name" => "". $name ."",
+                "url" =>  $emojiAssetPath . '/' . reset($data)
+            );
+         }
+
+         $c->AddDefinition('emoji', json_encode($emoji));
+      }
    }
 
    /**

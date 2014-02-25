@@ -2157,6 +2157,7 @@ class DiscussionModel extends VanillaModel {
 
       // Prep and fire event
       $this->EventArguments['DiscussionID'] = $DiscussionID;
+      $this->EventArguments['Discussion'] = $Data;
       $this->FireEvent('DeleteDiscussion');
 
       // Execute deletion of discussion and related bits

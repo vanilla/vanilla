@@ -586,19 +586,21 @@ if ($Construct->TableExists('Tag')) {
    $Px = Gdn::Database()->DatabasePrefix;
 
    $DupTags = Gdn::SQL()
-      ->Select('Name')
+      ->Select('Name, CategoryID')
       ->Select('TagID', 'min', 'TagID')
       ->Select('TagID', 'count', 'CountTags')
       ->From('Tag')
       ->GroupBy('Name')
+      ->GroupBy('CategoryID')
       ->Having('CountTags >', 1)
       ->Get()->ResultArray();
 
    foreach ($DupTags as $Row) {
       $Name = $Row['Name'];
+      $CategoryID = $Row['CategoryID'];
       $TagID = $Row['TagID'];
       // Get the tags that need to be deleted.
-      $DeleteTags = Gdn::SQL()->GetWhere('Tag', array('Name' => $Name, 'TagID <> ' => $TagID))->ResultArray();
+      $DeleteTags = Gdn::SQL()->GetWhere('Tag', array('Name' => $Name, 'CategoryID' => $CategoryID, 'TagID <> ' => $TagID))->ResultArray();
       foreach ($DeleteTags as $DRow) {
          // Update all of the discussions to the new tag.
          Gdn::SQL()->Options('Ignore', TRUE)->Put(
@@ -612,19 +614,34 @@ if ($Construct->TableExists('Tag')) {
    }
 }
 
+$Construct->Table('Tag');
+$FullNameColumnExists = $Construct->ColumnExists('FullName');
+
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
    ->Column('Name', 'varchar(255)', FALSE, 'unique')
-   ->Column('Type', 'varchar(10)', TRUE, 'index')
+   ->Column('FullName', 'varchar(255)', !$FullNameColumnExists, 'index')
+   ->Column('Type', 'varchar(20)', '', 'index')
+   ->Column('ParentTagID', 'int', TRUE, 'key')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('CategoryID', 'int', -1, 'unique')
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
+if (!$FullNameColumnExists) {
+   Gdn::SQL()->Update('Tag')
+      ->Set('FullName', 'Name', FALSE, FALSE)
+      ->Put();
+
+   $Construct->Table('Tag')
+      ->Column('FullName', 'varchar(255)', FALSE, 'index')
+      ->Set();
+}
+
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
-   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'))
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'), FALSE, 'index')
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group'), FALSE, 'index')
    ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')
@@ -687,8 +704,8 @@ $Construct
 
    ->Column('InsertUserID', 'int(11)')
    ->Column('DateInserted', 'datetime')
-   ->Column('ForeignID', 'int(11)', TRUE)
-   ->Column('ForeignTable', 'varchar(24)', TRUE)
+   ->Column('ForeignID', 'int(11)', TRUE, 'index.Foreign')
+   ->Column('ForeignTable', 'varchar(24)', TRUE, 'index.Foreign')
 
    ->Column('ImageWidth', 'usmallint', NULL)
    ->Column('ImageHeight', 'usmallint', NULL)

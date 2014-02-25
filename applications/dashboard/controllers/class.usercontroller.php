@@ -1002,8 +1002,8 @@ class UserController extends DashboardController {
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
-   public function TagSearch($q) {
-      $Data = Gdn::UserModel()->TagSearch($q);
+   public function TagSearch($q, $limit = 10) {
+      $Data = Gdn::UserModel()->TagSearch($q, $limit);
       die(json_encode($Data));
    }
 

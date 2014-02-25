@@ -422,6 +422,57 @@ class UtilityController extends DashboardController {
       $this->Render();
    }
 
+   public function Ping() {
+      $start = microtime(true);
+
+      $this->SetData('pong', TRUE);
+      $this->MasterView = 'empty';
+      $this->CssClass = 'Home';
+
+      $valid = true;
+
+      // Test the cache.
+      if (Gdn::Cache()->ActiveEnabled()) {
+         $k = BetterRandomString(20);
+         Gdn::Cache()->Store($k, 1);
+         Gdn::Cache()->Increment($k, 1);
+         $v = Gdn::Cache()->Get($k);
+
+         if ($v !== 2) {
+            $valid = false;
+            $this->SetData('cache', false);
+         } else {
+            $this->SetData('cache', true);
+         }
+
+      } else {
+         $this->SetData('cache', 'disabled');
+      }
+
+      // Test the db.
+      try {
+         $users = Gdn::SQL()->Get('User', 'UserID', 'asc', 1);
+         $this->SetData('database', true);
+      } catch(Exception $ex) {
+         $this->SetData('database', false);
+         $valid = false;
+      }
+
+      $this->EventArguments['Valid'] =& $valid;
+      $this->FireEvent('Ping');
+
+      if (!$valid) {
+         $this->StatusCode(500);
+      }
+
+      $time = microtime(true) - $start;
+      $this->SetData('time', Gdn_Format::Timespan($time));
+      $this->SetData('time_s', $time);
+      $this->SetData('valid', $valid);
+
+      $this->Render();
+   }
+
    /**
     * Set the user's timezone (hour offset).
     *

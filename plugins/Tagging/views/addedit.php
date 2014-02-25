@@ -7,7 +7,13 @@ echo $this->Form->Errors();
 <ul>
    <li>
       <?php
-         echo $this->Form->Label('Tag Name', 'Name');
+         echo $this->Form->Label('Tag Name', 'FullName');
+         echo $this->Form->TextBox('FullName');
+      ?>
+   </li>
+   <li>
+      <?php
+         echo $this->Form->Label('Url Slug', 'Name');
          echo $this->Form->TextBox('Name');
       ?>
    </li>

@@ -3,11 +3,11 @@
    <?php
    echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
    $this->FireEvent('BeforeMessageAdd');
-   
-   echo '<div class="FormWrapper">'; 
+
+   echo '<div class="FormWrapper">';
    echo $this->Form->Open();
    echo $this->Form->Errors();
-   
+
    echo '<div class="P">';
       echo $this->Form->Label('Recipients', 'To');
       echo Wrap($this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
@@ -22,13 +22,18 @@
             array('class' => 'TextBoxWrapper'));
       echo '</div>';
    }
-   
+
    echo '<div class="P">';
    echo $this->Form->BodyBox('Body', array('Table' => 'ConversationMessage'));
 //      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
    echo '</div>';
+
+   echo '<div class="Buttons">';
+   echo $this->Form->Button('Start Conversation', array('class' => 'Button Primary DiscussionButton'));
+   echo Anchor(T('Cancel'), '/messages/inbox', 'Button Cancel');
+   echo '</div>';
    
-   echo $this->Form->Close('Start Conversation', '', array('class' => 'Button Primary'));
+   echo $this->Form->Close();
    echo '</div>';
    ?>
 </div>

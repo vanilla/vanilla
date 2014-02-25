@@ -2713,28 +2713,52 @@ if (!function_exists('RandomString')) {
    }
 }
 
-if (!function_exists('BetterRandomString')) {
-   function BetterRandomString($Length, $CharacterOptions = 'A0') {
-      $CharacterClasses = array(
-          'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-          'a' => 'abcdefghijklmnopqrstuvwxyz',
-          '0' => '0123456789',
-          '!' => '~!@#$^&*_+-'
-      );
+if (!function_exists('BetterRandomString')):
 
-      $Characters = '';
-      for ($i=0;$i<strlen($CharacterOptions);$i++)
-         $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+/**
+ * Generate a random string of characters with additional character options that can be cryptographically strong.
+ *
+ * This function attempts to use {@link openssl_random_pseudo_bytes()} to generate its randomness.
+ * If that function does not exists then it just uses mt_rand().
+ *
+ * @param int $Length The length of the string.
+ * @param string $CharacterOptions Character sets that are allowed in the string. This is a string made up of the following characters.
+ *  - A: uppercase characters
+ *  - a: lowercase characters
+ *  - 0: digits
+ *  - !: basic punctuation (~!@#$^&*_+-)
+ * @return string Returns the random string for the given arguments.
+ */
+function BetterRandomString($Length, $CharacterOptions = 'A0') {
+   $CharacterClasses = array(
+       'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'a' => 'abcdefghijklmnopqrstuvwxyz',
+       '0' => '0123456789',
+       '!' => '~!@#$^&*_+-'
+   );
 
-      $CharLen = strlen($Characters) - 1;
-      $String = '' ;
+   $Characters = '';
+   for ($i=0;$i<strlen($CharacterOptions);$i++)
+      $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+
+   $CharLen = strlen($Characters);
+   $String = '' ;
+
+   if (function_exists('openssl_random_pseudo_bytes')) {
+      $random_chars = unpack('C*', openssl_random_pseudo_bytes($Length));
+      foreach ($random_chars as $c) {
+         $Offset = (int)$c % $CharLen;
+         $String .= substr($Characters, $Offset, 1);
+      }
+   } else {
       for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % $CharLen;
+        $Offset = mt_rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
-      return $String;
    }
+   return $String;
 }
+endif;
 
 if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
@@ -2971,6 +2995,29 @@ if (!function_exists('SafeParseStr')) {
          }
 
          $Output[$Key] = $Value;
+      }
+   }
+}
+
+
+if (!function_exists('SafeRedirect')) {
+   /**
+    * Redirect, but only to a safe domain.
+    *
+    * @param string $Destination Where to redirect.
+    * @param int $StatusCode
+    */
+   function SafeRedirect($Destination = FALSE, $StatusCode = NULL) {
+      if (!$Destination)
+         $Destination = Url('', TRUE);
+      else
+         $Destination = Url($Destination, TRUE);
+
+      $Domain = parse_url($Destination, PHP_URL_HOST);
+      if (in_array($Domain, TrustedDomains())) {
+         Redirect($Destination, $StatusCode);
+      } else {
+         throw PermissionException();
       }
    }
 }
@@ -3308,6 +3355,21 @@ if (!function_exists('TrueStripSlashes')) {
    }
 }
 
+if (!function_exists('TrustedDomains')) {
+   /**
+    * Get an array of all of the trusted domains in the application.
+    * @return array
+    */
+   function TrustedDomains() {
+      $Result = (array)C('Garden.TrustedDomains', array());
+
+      // This domain is safe.
+      $Result[] = Gdn::Request()->Host();
+
+      return array_unique($Result);
+   }
+}
+
 // Takes a route and prepends the web root (expects "/controller/action/params" as $Destination)
 if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
@@ -3340,7 +3402,7 @@ if (!function_exists('ViewLocation')) {
          }
 
          $Extensions = array('tpl', 'php');
-         
+
          // 1. First we check the theme.
          if ($Theme = Gdn::Controller()->Theme) {
             foreach ($Extensions as $Ext) {

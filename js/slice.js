@@ -205,7 +205,7 @@ jQuery(document).ready(function($){
             Field = $(Field);
 
             if (Field.attr('type').toLowerCase() == 'checkbox') {
-               if (Field.attr('checked'))
+               if (Field.prop('checked'))
                   SubmitData[Field.attr('name')] = Field.val();
             } else {
                SubmitData[Field.attr('name')] = Field.val();
@@ -219,6 +219,6 @@ jQuery(document).ready(function($){
       }
 
    }
-   
+
    Gdn_Slices.Prepare();
 });

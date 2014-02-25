@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Conversations
  */
- 
+
 /**
  * MessagesController handles displaying lists of conversations and conversation messages.
  *
@@ -22,36 +22,42 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class MessagesController extends ConversationsController {
    /**
     * Models to include.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var array
     */
    public $Uses = array('Form', 'ConversationModel', 'ConversationMessageModel');
-   
+
+
+   /**
+    * @var ConversationModel
+    */
+   public $ConversationModel;
+
    /**
     * A dataset of users taking part in this discussion. Used by $this->Index.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var object
     */
    public $RecipientData;
-   
+
    /**
     * The current offset of the paged data set. Defined and used by $this->Index and $this->All.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var int
     */
    public $Offset;
-   
+
    /**
     * Highlight route and include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -65,7 +71,7 @@ class MessagesController extends ConversationsController {
       if (CheckPermission('Conversations.Conversations.Add'))
          $this->AddModule('NewConversationModule');
    }
-   
+
    /**
     * Start a new conversation.
     *
@@ -77,7 +83,7 @@ class MessagesController extends ConversationsController {
    public function Add($Recipient = '') {
       $this->Permission('Conversations.Conversations.Add');
       $this->Form->SetModel($this->ConversationModel);
-      
+
       if ($this->Form->AuthenticatedPostBack()) {
          $RecipientUserIDs = array();
          $To = explode(',', $this->Form->GetFormValue('To', ''));
@@ -89,15 +95,15 @@ class MessagesController extends ConversationsController {
                   $RecipientUserIDs[] = $User->UserID;
             }
          }
-         
+
          $this->EventArguments['Recipients'] = $RecipientUserIDs;
          $this->FireEvent('BeforeAddConversation');
-         
+
          $this->Form->SetFormValue('RecipientUserID', $RecipientUserIDs);
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
          if ($ConversationID !== FALSE) {
             $Target = $this->Form->GetFormValue('Target', 'messages/'.$ConversationID);
-            
+
             $this->RedirectUrl = Url($Target);
          }
       } else {
@@ -110,43 +116,43 @@ class MessagesController extends ConversationsController {
       Gdn_Theme::Section('PostConversation');
       $this->Title(T('New Conversation'));
       $this->SetData('Breadcrumbs', array(array('Name' => T('Inbox'), 'Url' => '/messages/inbox'), array('Name' => $this->Data('Title'), 'Url' => 'messages/add')));
-      $this->Render();      
+      $this->Render();
    }
-   
+
    /**
     * Add a message to a conversation.
     *
     * @since 2.0.0
     * @access public
-    * 
+    *
     * @param int $ConversationID Unique ID of the conversation.
     */
    public function AddMessage($ConversationID = '') {
       $this->Form->SetModel($this->ConversationMessageModel);
       if (is_numeric($ConversationID) && $ConversationID > 0)
          $this->Form->AddHidden('ConversationID', $ConversationID);
-      
+
       if ($this->Form->AuthenticatedPostBack()) {
          $ConversationID = $this->Form->GetFormValue('ConversationID', '');
-         $Conversation = $this->ConversationModel->GetID($ConversationID, Gdn::Session()->UserID);   
-         
+         $Conversation = $this->ConversationModel->GetID($ConversationID, Gdn::Session()->UserID);
+
          $this->EventArguments['Conversation'] = $Conversation;
          $this->EventArguments['ConversationID'] = $ConversationID;
          $this->FireEvent('BeforeAddMessage');
-         
+
          $NewMessageID = $this->Form->Save();
-         
+
          if ($NewMessageID) {
             if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
                Redirect('messages/'.$ConversationID.'/#'.$NewMessageID, 302);
-               
+
             $this->SetJson('MessageID', $NewMessageID);
             // If this was not a full-page delivery type, return the partial response
             // Load all new messages that the user hasn't seen yet (including theirs)
             $LastMessageID = $this->Form->GetFormValue('LastMessageID');
             if (!is_numeric($LastMessageID))
                $LastMessageID = $NewMessageID - 1;
-            
+
             $Session = Gdn::Session();
             $MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
             $this->Conversation = $Conversation;
@@ -159,15 +165,15 @@ class MessagesController extends ConversationsController {
                $this->ErrorMessage($this->Form->Errors());
          }
       }
-      $this->Render();      
+      $this->Render();
    }
-   
+
    /**
     * Show all conversations for the currently authenticated user.
     *
     * @since 2.0.0
     * @access public
-    * 
+    *
     * @param string $Page
     */
    public function All($Page = '') {
@@ -176,10 +182,10 @@ class MessagesController extends ConversationsController {
       Gdn_Theme::Section('ConversationList');
 
       list($Offset, $Limit) = OffsetLimit($Page, C('Conversations.Conversations.PerPage', 50));
-      
+
       // Calculate offset
       $this->Offset = $Offset;
-      
+
       $UserID = $this->Request->Get('userid', Gdn::Session()->UserID);
       if ($UserID != Gdn::Session()->UserID) {
          if (!C('Conversations.Moderation.Allow', FALSE)) {
@@ -187,59 +193,59 @@ class MessagesController extends ConversationsController {
          }
          $this->Permission('Conversations.Moderation.Manage');
       }
-      
+
       $Conversations = $this->ConversationModel->Get2($UserID, $Offset, $Limit);
       $this->SetData('Conversations', $Conversations->ResultArray());
-      
+
       // Get Conversations Count
       //$CountConversations = $this->ConversationModel->GetCount($UserID);
       //$this->SetData('CountConversations', $CountConversations);
-      
+
       // Build the pager
       if (!$this->Data('_PagerUrl'))
          $this->SetData('_PagerUrl', 'messages/all/{Page}');
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
       $this->SetData('_CurrentRecords', count($Conversations->ResultArray()));
-      
+
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'conversations';
       }
-      
+
       // Build and display page.
       $this->Render();
    }
-   
+
    /**
     * Clear the message history for a specific conversation & user.
     *
     * @since 2.0.0
     * @access public
-    * 
+    *
     * @param int $ConversationID Unique ID of conversation to clear.
     */
    public function Clear($ConversationID = FALSE, $TransientKey = '') {
       $Session = Gdn::Session();
-      
+
       // Yes/No response
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      
+
       $ValidID = (is_numeric($ConversationID) && $ConversationID > 0);
       $ValidSession = ($Session->UserID > 0 && $Session->ValidateTransientKey($TransientKey));
-      
+
       if ($ValidID && $ValidSession) {
          // Clear it
          $this->ConversationModel->Clear($ConversationID, $Session->UserID);
          $this->InformMessage(T('The conversation has been cleared.'));
          $this->RedirectUrl = Url('/messages/all');
       }
-      
+
       $this->Render();
    }
-   
+
    /**
     * Shows all uncleared messages within a conversation for the viewing user
     *
@@ -254,7 +260,7 @@ class MessagesController extends ConversationsController {
       $this->Offset = $Offset;
       $Session = Gdn::Session();
       Gdn_Theme::Section('Conversation');
-      
+
       // Figure out Conversation ID
       if (!is_numeric($ConversationID) || $ConversationID < 0)
          $ConversationID = 0;
@@ -262,19 +268,10 @@ class MessagesController extends ConversationsController {
       // Form setup for adding comments
       $this->Form->SetModel($this->ConversationMessageModel);
       $this->Form->AddHidden('ConversationID', $ConversationID);
-      
-      // Get conversation data
-      $this->RecipientData = $this->ConversationModel->GetRecipients($ConversationID);
-      $this->SetData('Recipients', $this->RecipientData);
 
       // Check permissions on the recipients.
-      $InConversation = FALSE;
-      foreach($this->RecipientData->Result() as $Recipient) {
-         if ($Recipient->UserID == Gdn::Session()->UserID) {
-            $InConversation = TRUE;
-            break;
-         }
-      }
+      $InConversation = $this->ConversationModel->InConversation($ConversationID, Gdn::Session()->UserID);
+
       if (!$InConversation) {
          // Conversation moderation must be enabled and they must have permission
          if (!C('Conversations.Moderation.Allow', FALSE)) {
@@ -282,28 +279,29 @@ class MessagesController extends ConversationsController {
          }
          $this->Permission('Conversations.Moderation.Manage');
       }
-      
+
       $this->Conversation = $this->ConversationModel->GetID($ConversationID);
+      $this->Conversation->Participants = $this->ConversationModel->GetRecipients($ConversationID);
       $this->SetData('Conversation', $this->Conversation);
-      
+
       // Bad conversation? Redirect
       if ($this->Conversation === FALSE)
          throw NotFoundException('Conversation');
-      
+
       // Get limit
       if ($Limit == '' || !is_numeric($Limit) || $Limit < 0)
          $Limit = Gdn::Config('Conversations.Messages.PerPage', 50);
-      
+
       // Calculate counts
       if (!is_numeric($this->Offset) || $this->Offset < 0) {
          // Round down to the appropriate offset based on the user's read messages & messages per page
          $CountReadMessages = $this->Conversation->CountMessages - $this->Conversation->CountNewMessages;
          if ($CountReadMessages < 0)
             $CountReadMessages = 0;
-            
+
          if ($CountReadMessages > $this->Conversation->CountMessages)
             $CountReadMessages = $this->Conversation->CountMessages;
-         
+
          // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
          $this->Offset = floor($CountReadMessages / $Limit) * $Limit;
 
@@ -311,7 +309,7 @@ class MessagesController extends ConversationsController {
          if ($CountReadMessages > 1)
             $this->AddDefinition('LocationHash', '#Item_'.$CountReadMessages);
       }
-      
+
       // Fetch message data
       $this->MessageData = $this->ConversationMessageModel->Get(
          $ConversationID,
@@ -319,39 +317,15 @@ class MessagesController extends ConversationsController {
          $this->Offset,
          $Limit
       );
-      
-      // Figure out who's participating.
-      $this->Participants = '';
-      $Count = 0;
-      $Users = array();
-      $InConversation = FALSE;
-      foreach($this->RecipientData->Result() as $User) {
-         $Count++;
-         if($User->UserID == $Session->UserID) {
-            $InConversation = TRUE;
-            continue;
-         }
-         if($User->Deleted) {
-            $Users[] = Wrap(UserAnchor($User), 'del', array('title' => sprintf(T('%s has left this conversation.'), htmlspecialchars($User->Name))));
-            $this->SetData('_HasDeletedUsers', TRUE);
-         } else
-            $Users[] = UserAnchor($User);
 
-         
-      }
-      if ($InConversation) {
-         if(count($Users) == 0)
-            $this->Participants = T('Just you!');
-         else
-            $this->Participants = sprintf(T('%s and you'), implode(', ', $Users));
-      } else {
-         $this->Participants = implode(', ', $Users);
-      }
-      
+      // Figure out who's participating.
+      $ParticipantTitle = ConversationModel::ParticipantTitle($this->Conversation, TRUE);
+      $this->Participants = $ParticipantTitle;
+
       $this->Title(strip_tags($this->Participants));
 
       // $CountMessages = $this->ConversationMessageModel->GetCount($ConversationID, $Session->UserID);
-      
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
       $this->Pager = $PagerFactory->GetPager('MorePager', $this);
@@ -364,42 +338,42 @@ class MessagesController extends ConversationsController {
          $this->Conversation->CountMessages,
          'messages/'.$ConversationID.'/%1$s/%2$s/'
       );
-      
+
       // Mark the conversation as ready by this user.
       $this->ConversationModel->MarkRead($ConversationID, $Session->UserID);
-      
+
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'messages';
       }
-      
+
       // Add modules.
       $ClearHistoryModule = new ClearHistoryModule($this);
       $ClearHistoryModule->ConversationID($ConversationID);
       $this->AddModule($ClearHistoryModule);
-      
+
       $InThisConversationModule = new InThisConversationModule($this);
-      $InThisConversationModule->SetData($this->RecipientData);
+      $InThisConversationModule->SetData($this->Conversation->Participants);
       $this->AddModule($InThisConversationModule);
 
       // Doesn't make sense for people who can't even start conversations to be adding people
       if (CheckPermission('Conversations.Conversations.Add'))
          $this->AddModule('AddPeopleModule');
-      
+
       $Subject = $this->Data('Conversation.Subject');
       if (!$Subject)
          $Subject = T('Message');
-      
+
       $this->Data['Breadcrumbs'][] = array(
           'Name' => $Subject,
           Url('', '//'));
-      
+
       // Render view
       $this->Render();
    }
-   
+
    public function GetNew($ConversationID, $LastMessageID = NULL) {
       $this->RecipientData = $this->ConversationModel->GetRecipients($ConversationID);
       $this->SetData('Recipients', $this->RecipientData);
@@ -412,7 +386,7 @@ class MessagesController extends ConversationsController {
             break;
          }
       }
-      
+
       if (!$InConversation) {
          // Conversation moderation must be enabled and they must have permission
          if (!C('Conversations.Moderation.Allow', FALSE)) {
@@ -420,23 +394,23 @@ class MessagesController extends ConversationsController {
          }
          $this->Permission('Conversations.Moderation.Manage');
       }
-      
+
       $this->Conversation = $this->ConversationModel->GetID($ConversationID);
       $this->SetData('Conversation', $this->Conversation);
-      
+
       // Bad conversation? Redirect
       if ($this->Conversation === FALSE)
          throw NotFoundException('Conversation');
-      
+
       $Where = array();
       if ($LastMessageID) {
          if (strpos($LastMessageID, '_') !== FALSE) {
             $LastMessageID = array_pop(explode('_', $LastMessageID));
          }
-         
+
          $Where['MessageID >='] = $LastMessageID;
       }
-      
+
       // Fetch message data
       $this->SetData('MessageData', $this->ConversationMessageModel->Get(
          $ConversationID,
@@ -446,28 +420,28 @@ class MessagesController extends ConversationsController {
          $Where),
          TRUE
       );
-      
+
       $this->Render('Messages');
    }
-   
+
    public function Popin() {
       $this->Permission('Garden.SignIn.Allow');
-      
-      // Fetch from model  
+
+      // Fetch from model
       $Conversations = $this->ConversationModel->Get2(
          Gdn::Session()->UserID,
          0,
          5
       )->ResultArray();
-      
+
       // Last message user data
       Gdn::UserModel()->JoinUsers($Conversations, array('LastInsertUserID'));
-      
+
       // Join in the participants.
       $this->SetData('Conversations', $Conversations);
       $this->Render();
    }
-   
+
    /**
     * Allows users to bookmark conversations.
     *
@@ -481,7 +455,7 @@ class MessagesController extends ConversationsController {
       $Session = Gdn::Session();
       $Success = FALSE;
       $Star = FALSE;
-      
+
       // Validate & do bookmarking
       if (
          is_numeric($ConversationID)
@@ -491,20 +465,20 @@ class MessagesController extends ConversationsController {
       ) {
          $Bookmark = $this->ConversationModel->Bookmark($ConversationID, $Session->UserID);
       }
-      
+
       // Report success or error
       if ($Bookmark === FALSE)
          $this->Form->AddError('ErrorBool');
       else
          $this->SetJson('Bookmark', $Bookmark);
-      
+
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL)
          Redirect($_SERVER['HTTP_REFERER']);
       else
          $this->Render();
    }
-   
+
    /**
     * Show bookmarked conversations for the current user.
     *

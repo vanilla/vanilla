@@ -4166,3 +4166,73 @@ div.token-input-dropdown ul li em {
 div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   background-color: #eee;
 }
+
+/**
+ * At mentions in core, moved from advanced editor.
+ */
+.atwho-view {
+   font: normal 14px/1.7em 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   position: absolute;
+   top: 0;
+   left: 0;
+   display: none;
+   margin-top: 18px;
+   background: #fff;
+   min-width: 120px;
+   z-index: 10000;
+   border-radius: 2px;
+   overflow: hidden;
+   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.atwho-view .cur {
+   background: #1E79A7;
+   color: #fff;
+}
+
+.atwho-view .cur small {
+   color: #fff;
+}
+
+.atwho-view strong {
+   color: #1E79A7;
+}
+
+.atwho-view .cur strong {
+   color: #fff;
+   font: bold;
+}
+
+.atwho-view ul {
+   list-style: none;
+   padding: 0;
+   margin: auto;
+}
+
+.atwho-view ul li {
+   display: block;
+   padding: 5px 10px;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+   cursor: pointer;
+}
+
+.atwho-view ul li:last-child {
+   border: 0;
+}
+
+.atwho-view small {
+   font-size: smaller;
+   color: #777;
+   font-weight: 400;
+}
+
+.at-suggest-emoji .emoji-img {
+   position: relative;
+   top: 3px;
+}
+
+.at-suggest-emoji .emoji-name {
+   position: relative;
+   top: -2px;
+   padding: 0 0 0 2px;
+}

@@ -1302,6 +1302,383 @@ jQuery(document).ready(function($) {
       });
    }
 
+   /**
+    * Uses highly modified jquery.atwho.js library. See the note in that
+    * file for details about the modifications.
+    *
+    * This allows @mentions and :emoji: autocomplete. It's also possible to
+    * add other types of suggestions.
+    *
+    * @param node editorElement Pass the textarea or the body within iframe
+    * @param node iframe If there's an iframe body getting passed in the
+    *                    first param, also pass just the iframe node itself.
+    *                    If there's no iframe, pass a blank string or false.
+    *
+    * @author Dane MacMillan
+    */
+   gdn.atCompleteInit = function(editorElement, iframe) {
+
+      // Added cache results to global, so all instances share the same data
+      // and can build the cache together.
+
+      // Cache non-empty server requests
+      gdn.atcache = gdn.atcache || {};
+
+      // Cache empty server requests to prevent similarly-started requests
+      // from being sent.
+      gdn.atempty = gdn.atempty || {};
+
+      // Set minimum characters to type for @mentions to fire
+      var min_characters = 2;
+
+      // Max suggestions to show in dropdown.
+      var max_suggestions = 5;
+
+      // Server response limit. This should match the limit set in
+      // *UserController->TagSearch* and UserModel->TagSearch
+      var server_limit = 30;
+
+      // Emoji, set in definition list in foot, by Emoji class. Make sure
+      // that class is getting instantiated, otherwise emoji will be empty.
+      var emoji_array = gdn.definition('emoji', []);
+      var emoji = (emoji_array.length)
+         ? $.parseJSON(emoji_array)
+         : [];
+
+      // Handle iframe situation
+      var iframe_window = (iframe)
+         ? iframe.contentWindow
+         : '';
+
+      $(editorElement)
+         .atwho({
+            at: '@',
+            tpl: '<li data-value="@${name}" data-id="${id}">${name}</li>',
+            limit: max_suggestions,
+            callbacks: {
+
+               // Custom data source.
+               remote_filter: function(query, callback) {
+                  // Do this because of undefined when adding spaces to
+                  // matcher callback, as it will be monitoring changes.
+                  var query = query || '';
+
+                  // Only all query strings greater than min_characters
+                  if (query.length >= min_characters) {
+
+                     // If the cache array contains less than LIMIT 30
+                     // (according to server logic), then there's no
+                     // point sending another request to server, as there
+                     // won't be any more results, as this is the maximum.
+                     var filter_more = true;
+
+                     // Remove last character so that the string can be
+                     // found in the cache, if exists, then check if its
+                     // matching array has less than the server limit of
+                     // matches, which means there are no more, so save the
+                     // additional server request from being sent.
+                     var filter_string = '';
+
+                     // Loop through string and find first closest match in
+                     // the cache, and if a match, check if more filtering
+                     // is required.
+                     for (var i = 0, l = query.length; i < l; i++) {
+                        filter_string = query.slice(0, -i);
+
+                        if (gdn.atcache[filter_string]
+                        && gdn.atcache[filter_string].length < server_limit) {
+                           //console.log('no more filtering for "'+ query + '" as its parent filter array, "'+ filter_string +'" is not maxed out.');
+
+                           // Add this other query to empty array, so that it
+                           // will not fire off another request.
+                           gdn.atempty[query] = query;
+
+                           // Do not filter more, meaning, do not send
+                           // another server request, as all the necessary
+                           // data is already in memory.
+                           filter_more = false;
+                           break;
+                        }
+                     }
+
+                     // Check if query would be empty, based on previously
+                     // cached empty results. Compare against the start of
+                     // the latest query string.
+                     var empty_query = false;
+
+                     // Loop through cache of empty query strings.
+                     for (key in gdn.atempty) {
+                        if (gdn.atempty.hasOwnProperty(key)) {
+                           // See if cached empty results match the start
+                           // of the latest query. If so, then no point
+                           // sending new request, as it will return empty.
+                           if (query.match(new RegExp('^'+ key +'+')) !== null) {
+                              empty_query = true;
+                              break;
+                           }
+                        }
+                     }
+
+                     // Produce the suggestions based on data either
+                     // cached or retrieved.
+                     if (filter_more && !empty_query  && !gdn.atcache[query]) {
+                        $.getJSON('/user/tagsearch', {"q": query, "limit": server_limit}, function(data) {
+                           callback(data);
+
+                           // If data is empty, cache the results to prevent
+                           // other requests against similarly-started
+                           // query strings.
+                           if (data.length) {
+                              gdn.atcache[query] = data;
+                           } else {
+                              gdn.atempty[query] = query;
+                           }
+                        });
+                     } else {
+                        // If no point filtering more as the parent filter
+                        // has not been maxed out with responses, use the
+                        // closest parent filter instead of the latest
+                        // query string.
+                        if (!filter_more) {
+                           callback(gdn.atcache[filter_string]);
+                        } else {
+                           callback(gdn.atcache[query]);
+                        }
+                     }
+                  }
+               },
+
+               // Note, in contenteditable mode (iframe for us), the value
+               // is surrounded by span tags.
+               before_insert: function(value, $li) {
+
+                  // It's better to use the value provided, as it may have
+                  // html tags around it, depending on mode. Using the
+                  // regular expression avoids the need to check what mode
+                  // the suggestion is made in, and then constructing
+                  // it based on that. Optional assignment for undefined
+                  // matcher callback results.
+                  var username = $li.data('value') || '';
+                  // Pop off the flag--usually @ or :
+                  username = username.slice(1, username.length);
+
+                  // Check if there are any whitespaces, and if so, add
+                  // quotation marks around the whole name.
+                  var requires_quotation = (/\s/g.test(username))
+                     ? true
+                     : false;
+
+                  // Check if there are already quotation marks around
+                  // the string--double or single.
+                  var has_quotation = (/(\"|\')(.+)(\"|\')/g.test(username))
+                     ? true
+                     : false;
+
+                  var insert = username;
+
+                  if (requires_quotation && !has_quotation) {
+                     // Do not even need to have value wrapped in
+                     // any tags at all. It will be done automatically.
+                     //insert = value.replace(/(.*\>?)@([\w\d\s\-\+\_]+)(\<?.*)/, '$1@"$2"$3');
+                     insert = '"' + username + '"';
+                  }
+
+                  // This is needed for checking quotation mark directly
+                  // after at character, and preventing another at character
+                  // from being inserted into the page.
+                  var raw_at_match = this.raw_at_match || '';
+
+                  var at_quote = (/.?@(\"|\')/.test(raw_at_match))
+                     ? true
+                     : false;
+
+                  // If at_quote is false, then insert the at character,
+                  // otherwise it means the user typed a quotation mark
+                  // directly after the at character, which, would get
+                  // inserted again if not checked. at_quote would
+                  // be false most of the time; the exception is when
+                  // it's true.
+                  if (!at_quote) {
+                     insert = this.at + insert;
+                  }
+
+                  // Keep for reference, but also, spaces add complexity,
+                  // so use zero-width non-joiner delimiting those advanced
+                  // username mentions.
+                  var hidden_unicode_chars = {
+                     zws:  '\u200b',
+                     zwnj: '\u200C',
+                     nbsp: '\u00A0' // \xA0
+                  };
+
+                  // The last character prevents the matcher from trigger
+                  // on nearly everything.
+                  return insert + hidden_unicode_chars.zwnj;
+               },
+
+               // Custom highlighting to accept spaces in names. This is
+               // almost a copy of the default in the library, with tweaks
+               // in the regex.
+               highlighter: function(li, query) {
+                  var regexp;
+                  if (!query) {
+                     return li;
+                  }
+                  regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*(\\s+.+)?<", 'ig');
+                  // Capture group 4 for possible spaces
+                  return li.replace(regexp, function(str, $1, $2, $3, $4) {
+                     // Weird Chrome behaviour, so check for undefined, then
+                     // set to empty string if so.
+                     if (typeof $3 == 'undefined') {
+                        $3 = '';
+                     }
+                     if (typeof $4 == 'undefined') {
+                        $4 = '';
+                     }
+
+                     return '> ' + $1 + '<strong>' + $2 + '</strong>' + $3 + $4 + ' <';
+                  });
+               },
+
+               // Custom matching to allow quotation marks in the matching
+               // string as well as spaces. Spaces make things more
+               // complicated.
+               matcher: function(flag, subtext, should_start_with_space) {
+                  var match, regexp;
+                  flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+
+                  if (should_start_with_space) {
+                     flag = '(?:^|\\s)' + flag;
+                  }
+
+                  // Note: adding whitespace to regex makes the query in
+                  // remote_filter and before_insert callbacks throw
+                  // undefined when not accounted for, so optional
+                  // assigments added to each.
+                  //regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
+                  // Note: this does make the searching a bit more loose,
+                  // but it's the only way, as spaces make searching
+                  // more ambiguous.
+                  // \xA0 non-breaking space
+                  regexp = new RegExp(flag + '\"?([\\sA-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
+
+                  match = regexp.exec(subtext);
+                  if (match) {
+                     // Store the original matching string to check against
+                     // quotation marks after the at symbol, to prevent
+                     // double insertions of the at symbol. This will be
+                     // used in the before_insert callback.
+                     this.raw_at_match = match[0];
+
+                     return match[2] || match[1];
+                  } else {
+                     return null;
+                  }
+               }
+            },
+            display_timeout: 0,
+            cWindow: iframe_window
+         })
+         .atwho({
+            at: ':',
+            tpl: '<li data-value=":${name}:" class="at-suggest-emoji"><img src="${url}" width="20" height="20" alt=":${name}:" class="emoji-img" /> <span class="emoji-name">${name}</span></li>',
+            limit: max_suggestions,
+            data: emoji,
+            cWindow: iframe_window
+         });
+
+      // http://stackoverflow.com/questions/118241/calculate-text-width-with-javascript
+      String.prototype.width = function(font) {
+         var f = font || "15px 'lucida grande','Lucida Sans Unicode',tahoma,sans-serif'";
+         o = $('<div>' + this + '</div>')
+            .css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': f})
+            .appendTo($('body')),
+         w = o.width();
+         o.remove();
+         return w;
+      }
+
+      // Only necessary for iframe.
+      // Based on work here: https://github.com/ichord/At.js/issues/124
+      if (iframe_window) {
+         // This hook is triggered when atWho places a selection list in the
+         // window. The context is passed implicitly when triggered by at.js.
+         $(iframe_window).on("reposition.atwho", function(e, offset, context) {
+
+            // Actual suggestion box that will appear.
+            var suggest_el = context.view.$el;
+
+            // The area where text will be typed (contenteditable body).
+            var $inputor = context.$inputor;
+
+            // Display it below the text.
+            var line_height = parseInt($inputor.css('line-height'));
+
+            // offset contains the top left values of the offset to the iframe
+            // we need to convert that to main window coordinates
+            var oIframe = $(iframe).offset(),
+               iLeft = oIframe.left + offset.left,
+               iTop = oIframe.top,
+               select_height = 0;
+
+            // In wysiwyg mode, the suggestbox follows the typing, which
+            // does not happen in regular mode, so adjust it.
+            // Either @ or : for now.
+            var at = context.at;
+            var text = context.query.text;
+            var font_mirror = $('.BodyBox');
+            var font = font_mirror.css('font-size') + ' ' + font_mirror.css('font-family');
+
+            // Get font width
+            var font_width = (at+text).width(font) - 2;
+
+            if (at == '@') {
+               iLeft -= font_width;
+            }
+
+            if (at == ':') {
+               iLeft -= 2;
+            }
+
+            // atWho adds 3 select areas, presumably for differnet positing on screen (above below etc)
+            // This finds the active one and gets the container height
+            $(suggest_el).each(function(i, el) {
+               if ($(this).outerHeight() > 0) {
+                  select_height += $(this).height() + line_height;
+               }
+            });
+
+            // Now should we show the selection box above or below?
+            var iWindowHeight = $(window).height(),
+               iDocViewTop = $(window).scrollTop(),
+               iSelectionPosition = iTop + offset.top - $(window).scrollTop(),
+               iAvailableSpace = iWindowHeight - (iSelectionPosition - iDocViewTop);
+
+            if (iAvailableSpace >= select_height) {
+               // Enough space below
+               iTop = iTop + offset.top + select_height - $(window).scrollTop();
+            }
+            else {
+               // Place it above instead
+               // @todo should check if this is more space than below
+               iTop= iTop + offset.top - $(window).scrollTop();
+            }
+
+            // Move the select box
+            offset = {left: iLeft, top: iTop};
+            $(suggest_el).offset(offset);
+         });
+      }
+   };
+   // Now call atCompleteInit on all .BodyBox elements. The advanced editor
+   // calls this function directly when in wysiwyg format, as it needs to
+   // handle an iframe, and the editor instance needs to be referenced.
+   if ($.fn.atwho && gdn.atCompleteInit) {
+      $('.BodyBox').livequery(function() {
+         gdn.atCompleteInit(this, '');
+      });
+   }
+
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.

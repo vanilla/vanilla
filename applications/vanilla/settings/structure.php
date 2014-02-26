@@ -171,7 +171,9 @@ if ($Construct->TableExists())
 else
    $CommentIndexes = array();
 
-$Construct->PrimaryKey('CommentID')
+$Construct
+   ->Table('Comment')
+   ->PrimaryKey('CommentID')
 	->Column('DiscussionID', 'int', FALSE, 'index.1')
    //->Column('Type', 'varchar(10)', TRUE)
    //->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions

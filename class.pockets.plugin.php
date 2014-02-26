@@ -45,9 +45,9 @@ class PocketsPlugin extends Gdn_Plugin {
     */
    protected $_Pockets = array();
    protected $_PocketNames = array();
-   
+
    protected $StateLoaded = FALSE;
-   
+
 
    /** Whether or not to display test items for all pockets. */
    public $TestMode = NULL;
@@ -256,7 +256,7 @@ class PocketsPlugin extends Gdn_Plugin {
       $Sender->SetData('Locations', $this->Locations);
       $Sender->SetData('LocationsArray', $this->GetLocationsArray());
       $Sender->SetData('Pages', array('' => '('.T('All').')', 'activity' => 'activity', 'comments' => 'comments', 'dashboard' => 'dashboard', 'discussions' => 'discussions', 'inbox' => 'inbox', 'profile' => 'profile'));
-      
+
       return $Sender->Render('AddEdit', '', 'plugins/Pockets');
    }
 
@@ -268,7 +268,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
    protected function _Delete($Sender, $PocketID) {
       $Sender->SetData('Title', sprintf(T('Delete %s'), T('Pocket')));
-      
+
       $Form = new Gdn_Form();
 
       if ($Form->AuthenticatedPostBack()) {
@@ -310,24 +310,24 @@ class PocketsPlugin extends Gdn_Plugin {
    protected function _LoadState($Force = FALSE) {
       if (!$Force && $this->StateLoaded)
          return;
-      
+
       $Pockets = Gdn::SQL()->Get('Pocket', 'Location, Sort, Name')->ResultArray();
       foreach ($Pockets as $Row) {
          $Pocket = new Pocket();
          $Pocket->Load($Row);
          $this->AddPocket($Pocket);
       }
-      
+
       $this->StateLoaded = TRUE;
    }
 
    public function ProcessPockets($Sender, $Location, $CountHint = NULL) {
       if (Gdn::Controller()->Data('_NoMessages'))
          return;
-      
+
       // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
       $this->_LoadState();
-      
+
       // Build up the data for filtering.
       $Data = array();
       $Data['Request'] = Gdn::Request();
@@ -381,28 +381,32 @@ class PocketsPlugin extends Gdn_Plugin {
    public static function PocketString($Name, $Data = NULL) {
       $Inst = Gdn::PluginManager()->GetPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
       $Pockets = $Inst->GetPockets($Name);
-      
+
+      if (GetValue('random', $Data)) {
+         $Pockets = array(array_rand($Pockets));
+      }
+
       $Result = '';
       foreach ($Pockets as $Pocket) {
          $Result .= $Pocket->ToString();
       }
-      
+
       if (is_array($Data)) {
          $Data = array_change_key_case($Data);
-         
+
          self::PocketStringCb($Data, TRUE);
          $Result = preg_replace_callback('`{{(\w+)}}`', array('PocketsPlugin', 'PocketStringCb'), $Result);
       }
-      
+
       return $Result;
    }
-   
+
    public static function PocketStringCb($Match = NULL, $SetArgs = FALSE) {
       static $Data;
       if ($SetArgs) {
          $Data = $Match;
       }
-      
+
       $Key = strtolower($Match[1]);
       if (isset($Data[$Key]))
          return $Data[$Key];

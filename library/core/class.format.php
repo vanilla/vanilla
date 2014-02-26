@@ -1629,7 +1629,7 @@ EOT;
 
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
-      } elseif ($CustomFormatter) {
+      } elseif (is_callable($CustomFormatter)) {
          return $CustomFormatter($Mixed);
       } else {
          // The text contains html and must be purified.

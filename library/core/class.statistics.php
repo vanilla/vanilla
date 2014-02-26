@@ -2,11 +2,11 @@
 
 /**
  * Analytics system
- * 
+ *
  * Handles install-side analytics gathering and sending.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -17,16 +17,16 @@ class Gdn_Statistics extends Gdn_Plugin {
 
    protected $AnalyticsServer;
    public static $Increments = array('h' => 'hours', 'd' => 'days', 'w' => 'weeks', 'm' => 'months', 'y' => 'years');
-   
+
    protected $TickExtra;
 
    public function __construct() {
       parent::__construct();
-      
+
       $AnalyticsServer = C('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
       $AnalyticsServer = str_replace(array('http://', 'https://'), '', $AnalyticsServer);
       $this->AnalyticsServer = $AnalyticsServer;
-      
+
       $this->TickExtra = array();
    }
 
@@ -34,28 +34,31 @@ class Gdn_Statistics extends Gdn_Plugin {
       $FullMethod = explode('/',$Method);
       if (sizeof($FullMethod) < 2)
          array_unshift($FullMethod, "analytics");
-      
+
       list($ApiController, $ApiMethod) = $FullMethod;
       $ApiController = strtolower($ApiController);
       $ApiMethod = StringEndsWith(strtolower($ApiMethod), '.json', TRUE, TRUE).'.json';
-      
+
       $FinalURL = 'http://'.CombinePaths(array(
          $this->AnalyticsServer,
          $ApiController,
          $ApiMethod
       ));
-      
+
+      $RequestHeaders = array();
+
       // Allow hooking of analytics events
       $this->EventArguments['AnalyticsMethod'] = &$Method;
       $this->EventArguments['AnalyticsArgs'] = &$RequestParameters;
       $this->EventArguments['AnalyticsUrl'] = &$FinalURL;
+      $this->EventArguments['AnalyticsHeaders'] = &$RequestHeaders;
       $this->FireEvent('SendAnalytics');
-      
+
       // Sign request
       $this->Sign($RequestParameters, TRUE);
       $RequestMethod = GetValue('RequestMethod', $RequestParameters, 'GET');
       unset($RequestParameters['RequestMethod']);
-      
+
       try {
          $ProxyRequest = new ProxyRequest(FALSE, array(
             'Method'    => $RequestMethod,
@@ -64,14 +67,14 @@ class Gdn_Statistics extends Gdn_Plugin {
          ));
          $Response = $ProxyRequest->Request(array(
             'Url'       => $FinalURL
-         ), $RequestParameters);
+         ), $RequestParameters, null, $RequestHeaders);
       } catch (Exception $e) {
          $Response = FALSE;
       }
-      
+
       if ($Response !== FALSE) {
-         $JsonResponse = json_decode($Response, TRUE);         
-         
+         $JsonResponse = json_decode($Response, TRUE);
+
          if ($JsonResponse !== FALSE) {
             if ($ParseResponse) {
                $AnalyticsJsonResponse = (array)GetValue('Analytics', $JsonResponse, FALSE);
@@ -84,18 +87,18 @@ class Gdn_Statistics extends Gdn_Plugin {
                return $JsonResponse;
             }
          }
-         
+
          return $Response;
       }
-      
+
       return FALSE;
    }
-   
+
    public function Api($Method, $Parameters) {
       $ApiResponse = $this->Analytics($Method, $Parameters, FALSE, FALSE);
       return $ApiResponse;
    }
-   
+
    protected function AnalyticsFailed($JsonResponse) {
       self::Throttled(TRUE);
 
@@ -114,7 +117,7 @@ class Gdn_Statistics extends Gdn_Plugin {
    /**
     * Automatically configures a ProxyRequest array with basic parameters
     * such as IP, VanillaVersion, RequestTime, Hostname, PHPVersion, ServerType.
-    * 
+    *
     * @param array $Request Reference to the existing request array
     * @return void
     */
@@ -131,10 +134,10 @@ class Gdn_Statistics extends Gdn_Plugin {
     * This method is called each page request and checks the environment. If
     * a stats send is warranted, tells the browser to ping us back.
     *
-    * If the site is not registered at the analytics server (does not contain 
+    * If the site is not registered at the analytics server (does not contain
     * a guid), have the browser request a register instead and defer stats until
     * next request.
-    * 
+    *
     * @return void
     */
    public function Check() {
@@ -143,21 +146,21 @@ class Gdn_Statistics extends Gdn_Plugin {
          return;
       }
       Gdn::Controller()->AddDefinition('AnalyticsTask', 'tick');
-      
+
       if (self::CheckIsEnabled()) {
          // At this point there is nothing preventing stats from working, so queue a tick.
          Gdn::Controller()->AddDefinition('TickExtra', $this->GetEncodedTickExtra());
       }
    }
-   
+
    public function AddExtra($Name, $Value) {
       $this->TickExtra[$Name] = $Value;
    }
-   
+
    public function GetEncodedTickExtra() {
       if (!sizeof($this->TickExtra))
          return NULL;
-      
+
       return @json_encode($this->TickExtra);
    }
 
@@ -176,7 +179,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       $ApplicationFolder = Gdn::Controller()->ApplicationFolder;
       if (in_array($ApplicationFolder, $ExceptionApplications))
          return FALSE;
-      
+
       // If we've recently received an error response, wait until the throttle expires
       if (self::Throttled()) {
          return FALSE;
@@ -203,7 +206,7 @@ class Gdn_Statistics extends Gdn_Plugin {
             return TRUE;
       }
 
-      // Comment local hostnames / hostname suffixes 
+      // Comment local hostnames / hostname suffixes
       if ($ServerHostname == 'localhost' || substr($ServerHostname, -6) == '.local')
          return TRUE;
 
@@ -381,13 +384,13 @@ class Gdn_Statistics extends Gdn_Plugin {
    }
 
    /**
-    * 
+    *
     * @param Gdn_Controller $Sender
     */
    public function SettingsController_AnalyticsTick_Create($Sender) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
-      
+
       Gdn::Statistics()->Tick();
       $this->FireEvent("AnalyticsTick");
       $Sender->Render();
@@ -395,11 +398,11 @@ class Gdn_Statistics extends Gdn_Plugin {
 
    /**
     * Sign a request or response
-    * 
-    * Uses the known site secret to sign the given request or response. The 
-    * request/response is passed in by reference so that it can be augmented 
+    *
+    * Uses the known site secret to sign the given request or response. The
+    * request/response is passed in by reference so that it can be augmented
     * with the signature.
-    * 
+    *
     * @param array $Request The request array to be signed
     * @param boolean $Modify Optional whether or not to modify the request in place (default false)
     */
@@ -409,7 +412,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       $VanillaID = GetValue('VanillaID', $Request, FALSE);
       if (empty($VanillaID))
          return FALSE;
-      
+
       if ($VanillaID != Gdn::InstallationID()) return FALSE;
 
       // We're going to work on a copy for now
@@ -515,7 +518,7 @@ class Gdn_Statistics extends Gdn_Plugin {
                          ->From('AnalyticsLocal')
                          ->Where('TimeSlot', $TimeSlot)
                          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-         
+
          $NumViews = GetValue('Views', $NumViewsData, NULL);
          $NumEmbedViews = GetValue('EmbedViews', $NumViewsData, NULL);
 
@@ -579,12 +582,12 @@ class Gdn_Statistics extends Gdn_Plugin {
 
    /**
     * This is the asynchronous callback
-    * 
+    *
     * This method is triggerd on every page request via a callback AJAX request
     * so that it may execute asychronously and reduce lag for users. It tracks
-    * views, handles registration for new installations, and sends stats every 
+    * views, handles registration for new installations, and sends stats every
     * day as needed.
-    * 
+    *
     * @return void;
     */
    public function Tick() {
@@ -592,17 +595,17 @@ class Gdn_Statistics extends Gdn_Plugin {
       // TODO: Make this analyze the path and throw a specific event (this event will change in future versions).
       $this->EventArguments['Path'] = Gdn::Request()->Post('Path');
       $this->FireEvent('Tick');
-      
+
       // Store the view, using denormalization if enabled
       $ViewType = 'normal';
       if (preg_match('`discussion/embed`', Gdn::Request()->Post('ResolvedPath', '')))
          $ViewType = 'embed';
-      
+
       $this->AddView($ViewType);
-      
+
       if (!self::CheckIsEnabled())
          return;
-      
+
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          if (Gdn::Get('Garden.Analytics.Notify', FALSE) !== FALSE) {
             $CallMessage = Sprite('Bandaid', 'InformSprite');
@@ -610,10 +613,10 @@ class Gdn_Statistics extends Gdn_Plugin {
             Gdn::Controller()->InformMessage($CallMessage, array('CssClass' => 'HasSprite'));
          }
       }
-      
+
       $InstallationID = Gdn::InstallationID();
-      
-      // Check if we're registered with the central server already. If not, this request is 
+
+      // Check if we're registered with the central server already. If not, this request is
       // hijacked and used to perform that task instead of sending stats or recording a tick.
       if (is_null($InstallationID)) {
          // If the config file is not writable, gtfo
@@ -627,7 +630,7 @@ class Gdn_Statistics extends Gdn_Plugin {
             }
             return;
          }
-         
+
          $AttemptedRegistration = Gdn::Get('Garden.Analytics.Registering', FALSE);
          // If we last attempted to register less than 60 seconds ago, do nothing. Could still be working.
          if ($AttemptedRegistration !== FALSE && (time() - $AttemptedRegistration) < 60)
@@ -635,7 +638,7 @@ class Gdn_Statistics extends Gdn_Plugin {
 
          return $this->Register();
       }
-      
+
       // If we get here, the installation is registered and we can decide on whether or not to send stats now.
       $LastSentDate = self::LastSentDate();
       if (empty($LastSentDate) || $LastSentDate < date('Ymd', strtotime('-1 day')))
@@ -652,22 +655,22 @@ class Gdn_Statistics extends Gdn_Plugin {
       // Add a pageview entry.
       $TimeSlot = date('Ymd');
       $Px = Gdn::Database()->DatabasePrefix;
-      
+
       $Views = 1;
       $EmbedViews = 0;
-      
+
       try {
          if (C('Garden.Analytics.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
             $CacheKey = "QueryCache.Analytics.CountViews";
-            
+
             // Increment. If not success, create key.
             $Incremented = Gdn::Cache()->Increment($CacheKey);
             if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
                Gdn::Cache()->Store($CacheKey, 1);
-            
+
             // Get current cache value
             $Views = Gdn::Cache()->Get($CacheKey);
-            
+
             if ($ViewType == 'embed') {
                $EmbedCacheKey = "QueryCache.Analytics.CountEmbedViews";
 
@@ -679,37 +682,37 @@ class Gdn_Statistics extends Gdn_Plugin {
                // Get current cache value
                $EmbedViews = Gdn::Cache()->Get($EmbedCacheKey);
             }
-            
+
             // Every X views, writeback to AnalyticsLocal
             $DenormalizeWriteback = C('Garden.Analytics.Views.DenormalizeWriteback', 10);
             if (($Views % $DenormalizeWriteback) == 0) {
                Gdn::Controller()->SetData('WritebackViews', $Views);
                Gdn::Controller()->SetData('WritebackEmbed', $EmbedViews);
-                  
+
                Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$Views}, {$EmbedViews})
-               on duplicate key update 
-                  Views = COALESCE(Views, 0)+{$Views}, 
-                  EmbedViews = COALESCE(EmbedViews, 0)+{$EmbedViews}", 
+               on duplicate key update
+                  Views = COALESCE(Views, 0)+{$Views},
+                  EmbedViews = COALESCE(EmbedViews, 0)+{$EmbedViews}",
                array(
                   ':TimeSlot' => $TimeSlot
                ));
-               
+
                // ... and get rid of those views from the keys
-               
+
                if ($Views)
                   Gdn::Cache()->Decrement($CacheKey, $Views);
-               
+
                if ($EmbedViews)
                   Gdn::Cache()->Decrement($EmbedCacheKey, $EmbedViews);
             }
          } else {
             $ExtraViews = 1;
             $ExtraEmbedViews = ($ViewType == 'embed') ? 1 : 0;
-            
+
             Gdn::Database()->Query("insert into {$Px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$ExtraViews}, {$ExtraEmbedViews})
-               on duplicate key update 
-                  Views = COALESCE(Views, 0)+{$ExtraViews}, 
-                  EmbedViews = COALESCE(EmbedViews, 0)+{$ExtraEmbedViews}", 
+               on duplicate key update
+                  Views = COALESCE(Views, 0)+{$ExtraViews},
+                  EmbedViews = COALESCE(EmbedViews, 0)+{$ExtraEmbedViews}",
             array(
                ':TimeSlot' => $TimeSlot
             ));
@@ -787,23 +790,23 @@ class Gdn_Statistics extends Gdn_Plugin {
          $TimeslotLength = strlen($TimeSlot);
       else
          $TimeslotLength = $Resolution;
-      
+
       if ($TimeslotLength >= 4)
          $Year = substr($TimeSlot, 0, 4);
-      
+
       if ($TimeslotLength >= 6)
          $Month = substr($TimeSlot, 4, 2);
-      
+
       if ($TimeslotLength >= 8)
          $Day = (int) substr($TimeSlot, 6, 2);
       if ($Day == 0) $Day = 1;
-      
+
       if ($TimeslotLength >= 10)
          $Hour = (int) substr($TimeSlot, 8, 2);
-      
+
       if ($TimeslotLength >= 12)
          $Minute = (int) substr($TimeSlot, 10, 2);
-      
+
       $DateRaw = mktime($Hour, $Minute, 0, $Month, $Day, $Year);
 
       if ($DateRaw === FALSE)
@@ -836,14 +839,14 @@ class Gdn_Statistics extends Gdn_Plugin {
 
    /**
     * Signature check
-    * 
+    *
     * This method checks the supplied signature of a request against a hash of
     * the request arguments augmented with the local secret from the config file.
-    * 
+    *
     * ****
     * THIS METHOD USES ALL SUPPLIED ARGUMENTS IN ITS SIGNATURE HASH ALGORITHM
     * ****
-    * 
+    *
     * @param type $Request Array of request parameters
     * @return boolean Status of verification check, or null if no VanillaID
     */

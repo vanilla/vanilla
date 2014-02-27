@@ -425,7 +425,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * @param mixed $ID The value of the primary key in the database.
     * @param string $DatasetType The format of the result dataset.
     * @param array $Options options to pass to the database.
-    * @return Gdn_DataSet
+    * @return array|object
     * 
     * @since 2.3 Added the $Options parameter.
     */

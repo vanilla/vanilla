@@ -223,7 +223,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['FullName'], 'Url' => '');
 */
       // Render the controller.
-      $this->View = C('Vanilla.Discussions.Layout') == 'table' ? 'table' : 'discussions';
+      $this->View = C('Vanilla.Discussions.Layout') == 'table' ? 'table' : 'index';
       $Sender->Render($this->View, 'discussions', 'vanilla');
    }
 

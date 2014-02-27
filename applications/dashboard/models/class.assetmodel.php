@@ -156,7 +156,7 @@ class AssetModel extends Gdn_Model {
          case 'Style':
             $this->AddCssFile('custom.css', FALSE, array('Sort' => 10));
 
-            if ($ThemeType == 'desktop' && Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
+            if (Gdn::Controller()->Theme && Gdn::Controller()->ThemeOptions) {
                $Filenames = GetValueR('Styles.Value', Gdn::Controller()->ThemeOptions);
                if (is_string($Filenames) && $Filenames != '%s')
                   $this->AddCssFile(ChangeBasename('custom.css', $Filenames), FALSE, array('Sort' => 11));

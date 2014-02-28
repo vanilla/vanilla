@@ -167,9 +167,8 @@ class CommentModel extends VanillaModel {
       $this->SetCalculatedFields($Result);
 
       $this->EventArguments['Comments'] =& $Result;
-      $this->FireEvent('AfterGet');
-
       $this->CachePageWhere($Result->Result(), $PageWhere, $DiscussionID, $Page, $Limit);
+      $this->FireEvent('AfterGet');
 
       return $Result;
    }

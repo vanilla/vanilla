@@ -1263,6 +1263,10 @@ class UserModel extends Gdn_Model {
       // Ask for the user. This will check cache first.
       $User = $this->GetID($UserID, DATASET_TYPE_OBJECT);
 
+      if (!$User) {
+         return FALSE;
+      }
+
       // If we require confirmation and user is not confirmed
       $ConfirmEmail = C('Garden.Registration.ConfirmEmail', false);
       $Confirmed = GetValue('Confirmed', $User);

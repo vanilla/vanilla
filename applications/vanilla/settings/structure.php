@@ -150,20 +150,6 @@ $Construct->Column('UserID', 'int', FALSE, 'primary')
    ->Column('Participated', 'tinyint(1)', '0') // whether or not the user has participated in the discussion.
    ->Set($Explicit, $Drop);
 
-// Update the participated flag.
-if (!$ParticipatedExists) {
-   $SQL->Update('UserDiscussion ud')
-       ->Join('Discussion d', 'ud.DiscussionID = d.DiscussionID and ud.UserID = d.InsertUserID')
-       ->Set('ud.Participated', 1)
-       ->Put();
-
-   $SQL->Update('UserDiscussion ud')
-       ->Join('Comment d', 'ud.DiscussionID = d.DiscussionID and ud.UserID = d.InsertUserID')
-       ->Set('ud.Participated', 1)
-       ->Put();
-}
-
-
 $Construct->Table('Comment');
 
 if ($Construct->TableExists())
@@ -171,7 +157,9 @@ if ($Construct->TableExists())
 else
    $CommentIndexes = array();
 
-$Construct->PrimaryKey('CommentID')
+$Construct
+   ->Table('Comment')
+   ->PrimaryKey('CommentID')
 	->Column('DiscussionID', 'int', FALSE, 'index.1')
    //->Column('Type', 'varchar(10)', TRUE)
    //->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
@@ -196,6 +184,19 @@ if (isset($CommentIndexes['FK_Comment_DiscussionID'])) {
 }
 if (isset($CommentIndexes['FK_Comment_DateInserted'])) {
    $Construct->Query("drop index FK_Comment_DateInserted on {$Px}Comment");
+}
+
+// Update the participated flag.
+if (!$ParticipatedExists) {
+   $SQL->Update('UserDiscussion ud')
+      ->Join('Discussion d', 'ud.DiscussionID = d.DiscussionID and ud.UserID = d.InsertUserID')
+      ->Set('ud.Participated', 1)
+      ->Put();
+
+   $SQL->Update('UserDiscussion ud')
+      ->Join('Comment d', 'ud.DiscussionID = d.DiscussionID and ud.UserID = d.InsertUserID')
+      ->Set('ud.Participated', 1)
+      ->Put();
 }
 
 // Allows the tracking of already-read comments & votes on a per-user basis.

@@ -13,8 +13,8 @@
 </h1>
 <?php
 
-if ($this->Data('Type')) {
-   $this->FireEvent('Conversation'.strreplace('_', '', $this->Data('Type')));
+if ($this->Data('Conversation.Type')) {
+   $this->FireEvent('Conversation'.str_replace('_', '', $this->Data('Conversation.Type')));
 }
 
 

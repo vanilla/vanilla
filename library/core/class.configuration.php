@@ -478,13 +478,44 @@ class Gdn_Configuration extends Gdn_Pluggable {
          $ConfigurationSource->AssignCallback($SaveCallback, $CallbackOptions);
    }
 
+
+
    /**
-    * DO NOT USE, THIS IS RUBBISH
+    * Loads settings from an array into the object with the specified name;
     *
-    * @deprecated
+    * This array should be a hierarchical Vanilla config.
+    *
+    * @param string $ConfigData An array containing the configuration data
+    * @param string $Tag A string descriptor of this config set
+    * @param string $Name The name of the variable and initial group settings.
+    *   Note: When $Name is 'Configuration' then the data will be set to the root of the config.
+    * @param boolean $Dynamic Optional, whether to treat this as the request's "dynamic" config, and
+    *   to save config changes here. These settings will also be re-applied later when "OverlayDynamic"
+    *   is called after all defaults are loaded.
+    * @return boolean
     */
-   public function LoadArray($Name, $Settings, $Overwrite = FALSE) {
-      throw new Exception("DEPRECATED");
+   public function LoadArray($ConfigData, $Tag, $Name = 'Configuration', $Dynamic = TRUE, $SaveCallback = NULL, $CallbackOptions = NULL) {
+      $ConfigurationSource = Gdn_ConfigurationSource::FromArray($this, $ConfigData, $Tag, $Name);
+      if (!$ConfigurationSource) return FALSE;
+
+      $UseSplitting = $this->Splitting;
+      $ConfigurationSource->Splitting($UseSplitting);
+
+      $SourceTag = "array:{$Tag}";
+      $this->Sources[$SourceTag] = $ConfigurationSource;
+
+      if ($Dynamic)
+         $this->Dynamic = $ConfigurationSource;
+
+      if (!$UseSplitting) {
+         $this->MassImport($ConfigurationSource->Export());
+      } else {
+         self::MergeConfig($this->Data, $ConfigurationSource->Export());
+      }
+
+      // Callback for saving
+      if (!is_null($SaveCallback))
+         $ConfigurationSource->AssignCallback($SaveCallback, $CallbackOptions);
    }
 
    /**
@@ -898,6 +929,21 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       return new Gdn_ConfigurationSource($Parent, 'string', $Tag, $Name, $ConfigurationData);
    }
 
+   /**
+    * Load config data from an array
+    *
+    * @param Gdn_Configuration $Parent Parent config object
+    * @param array $ConfigData Config data array
+    * @param string $Tag Internal friendly name
+    * @param string $Name Optional setting name
+    * @return Gdn_ConfigurationSource
+    */
+   public static function FromArray($Parent, $ConfigData, $Tag, $Name = 'Configuration') {
+      if (!is_array($ConfigData))
+         throw new Exception('Invalid config data.');
+      return new Gdn_ConfigurationSource($Parent, 'array', $Tag, $Name, $ConfigData);
+   }
+
    public static function ParseString($String, $Name) {
       // Define the variable properly.
       $$Name = NULL;
@@ -1212,6 +1258,8 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             return $Result;
             break;
 
+         case 'json':
+         case 'array':
          case 'string':
             /**
              * How would these even save? String config data must be handled by

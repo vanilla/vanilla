@@ -382,12 +382,12 @@ class Gdn_Database {
                   $pdoErrorMessage = $this->GetPDOErrorMessage($ex->getPrevious()->errorInfo());
 
                   // Connection Error
-                  if (preg_match('`^08`',$pdoErrorCode)) {
+                  //if (preg_match('`^08`',$pdoErrorCode)) {
                      if ($tries) {
                         $this->closeConnection();
                         continue;
                      }
-                  }
+                  //}
                   break;
 
                default:

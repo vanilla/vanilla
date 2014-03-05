@@ -1,9 +1,11 @@
 jQuery(document).ready(function($) {
 
-   if ($.autogrow)
-      $('textarea.TextBox').livequery(function() {
-         $(this).autogrow();
-      });
+   // Since there are no dynamically loaded textareas on the "Post" page, we
+   // can attach autogrow as soon as the document is ready and not worry about
+   // having to attach it again later on.
+   if ($.fn.autogrow) {
+      $('textarea.TextBox').autogrow();
+   }
 
    // Hijack comment form button clicks
    $('#CommentForm :submit').click(function() {
@@ -148,11 +150,14 @@ jQuery(document).ready(function($) {
    });
 
    // Autosave
-   $('#Form_SaveDraft').livequery(function() {
-      var btn = this;
-      $('#CommentForm textarea').autosave({ button: btn });
-      $('#DiscussionForm textarea').autosave({ button: btn });
-   });
+   if ($.fn.autosave) {
+      var btn = $('#Form_SaveDraft');
 
-
+      $('#CommentForm textarea').autosave({
+         button: btn
+      });
+      $('#DiscussionForm textarea').autosave({
+         button: btn
+      });
+   }
 });

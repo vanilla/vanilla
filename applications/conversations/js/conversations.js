@@ -1,15 +1,18 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
-   
+
    $('a.ClearConversation').popup({
       confirm: true,
       followConfirm: false
    });
-   
-   $('textarea.MessageBox, textarea.TextBox').livequery(function() {
-      $(this).autogrow();
-   });
-   
+
+   // Since there are no dynamically loaded textareas on the "Conversations"
+   // page, we can attach autogrow as soon as the document is ready and not
+   // worry about having to attach it again later on.
+   if ($.fn.autogrow) {
+      $('textarea.MessageBox, textarea.TextBox').autogrow();
+   }
+
    // Hijack "add message" clicks and handle via ajax...
    $.fn.handleMessageForm = function() {
       this.click(function() {
@@ -38,7 +41,7 @@ jQuery(document).ready(function($) {
             },
             success: function(json) {
                json = $.postParseJson(json);
-               
+
                // Remove any old errors from the form
                $(frm).find('div.Errors').remove();
 
@@ -46,17 +49,17 @@ jQuery(document).ready(function($) {
                   $(frm).prepend(json.ErrorMessages);
                   json.ErrorMessages = null;
                }
-               
+
                if (json.FormSaved) {
                   // Clean up the form
-                  clearMessageForm();                
-   
+                  clearMessageForm();
+
                   // And show the new comments
                   $('ul.Conversation').append(json.Data);
-                  
+
                   // Remove any "More" pager links
                   $('#PagerMore').remove();
-                  
+
                   // And scroll to them
                   var target = $('#' + json.MessageID);
                   if (target.offset()) {
@@ -77,11 +80,11 @@ jQuery(document).ready(function($) {
             }
          });
          return false;
-      
+
       });
    }
    $('#Form_ConversationMessage :submit').handleMessageForm();
-   
+
    // Utility function to clear out the message form
    function clearMessageForm() {
       $('div.Popup').remove();
@@ -91,7 +94,7 @@ jQuery(document).ready(function($) {
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
    }
-   
+
    $.fn.userTokenInput = function() {
       $(this).each(function() {
          /// Author tag token input.
@@ -120,18 +123,18 @@ jQuery(document).ready(function($) {
            });
       });
    };
-   
+
    // Enable multicomplete on selected inputs
    $('.MultiComplete').userTokenInput();
-   
+
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;
       $(btn).hide();
       $(btn).before('<span class="TinyProgress">&#160;</span>');
-      
+
       var frm = $(btn).parents('form');
       var textbox = $(frm).find('textarea');
-      
+
       // Post the form, show the status and then redirect.
       $.ajax({
          type: "POST",
@@ -151,12 +154,12 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
    gdn.refreshConversation = function() {
        // Get the last ID.
        var conversationID = $('#Form_ConversationID').val();
        var lastID = $('.DataList.Conversation > li:last-child').attr('id');
-       
+
        $.ajax({
            type: 'GET',
            url: gdn.url('/messages/getnew'),
@@ -164,18 +167,18 @@ jQuery(document).ready(function($) {
            success: function(html) {
                var $list = $('.DataList.Conversation');
                var $html = $('<ul>'+html+'</ul>');
-               
+
                $('li.Item', $html).each(function(index) {
                    var id = $(this).attr('id');
-                   
-                   if ($('#'+id).length == 0) {                   
+
+                   if ($('#'+id).length == 0) {
                    $(this).appendTo($list);
                    }
                });
            }
        });
    }
-   
+
    if (Vanilla.parent)
        Vanilla.parent.refreshConversation = gdn.refreshConversation;
 });

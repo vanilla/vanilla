@@ -1033,7 +1033,7 @@ class Gdn_Format {
             $Mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $Mixed);
          }
          if (C('Garden.Format.Getty', TRUE)) {
-            $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w\d=?&]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
+            $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w\d=?&+-_]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
          }
       }
 
@@ -1078,7 +1078,7 @@ class Gdn_Format {
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
-      $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;]*)/([\d]*)/([\d]*)';
+      $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)

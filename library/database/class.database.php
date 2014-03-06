@@ -370,12 +370,12 @@ class Gdn_Database {
 
          } catch (ReconnectException $ex) {
 
-            $errorCode = $ex->getCode();
-            switch ($errorCode) {
+            $errorType = $ex->getErrorType();
+            switch ($errorType) {
                case 'fail':
                case 'error':
-                  $pdoErrorCode = $ex->getPrevious()->errorCode();
-                  $pdoErrorMessage = $this->GetPDOErrorMessage($ex->getPrevious()->errorInfo());
+                  $pdoErrorCode = $ex->getPDO()->errorCode();
+                  $pdoErrorMessage = $this->GetPDOErrorMessage($ex->getPDO()->errorInfo());
 
                   // Connection Error
                   //if (preg_match('`^08`',$pdoErrorCode)) {
@@ -385,13 +385,11 @@ class Gdn_Database {
                      }
                   //}
                   break;
-
-               default:
-                  $pdoErrorMessage = $this->GetPDOErrorMessage($PDO->errorInfo());
-                  break;
             }
-
             // Unable to rescue
+            trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);
+         } catch (Exception $ex) {
+            $pdoErrorMessage = $this->GetPDOErrorMessage($PDO->errorInfo());
             trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);
          }
 
@@ -497,15 +495,21 @@ class Gdn_Database {
 
 class ReconnectException extends Exception {
 
+   protected $errorType;
    protected $pdo;
 
-   public function __construct($message, $code, $pdo) {
+   public function __construct($message, $type, $pdo) {
       $this->pdo = $pdo;
-      parent::__construct($message, $code, null);
+      $this->errorType = $type;
+      parent::__construct($message, 1, null);
    }
 
    public function getPDO() {
       return $this->pdo;
+   }
+
+   public function getErrorType() {
+      return $this->errorType;
    }
 
 }

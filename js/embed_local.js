@@ -11,6 +11,8 @@ jQuery(document).ready(function($) {
       remotePostMessage = function(message, target) {},
       remoteUrl = gdn.definition('RemoteUrl', ''),
       inIframe = top !== self,
+      inPopup = window.opener != null,
+      inConnect = window.location.pathname.indexOf("/entry/connect") >= 0,
       inDashboard = gdn.definition('InDashboard') == '1',
       forceEmbedDashboard = gdn.definition('ForceEmbedDashboard') == '1',
       forceEmbedForum = gdn.definition('ForceEmbedForum') == '1',
@@ -113,7 +115,7 @@ jQuery(document).ready(function($) {
    }
 
    // If not embedded and we should be, redirect to the embedded version.
-   if (!inIframe && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
+   if (!inIframe && !inPopup && inConnect && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
       document.location = remoteUrl + '#' + path;
 
    if (inIframe) {

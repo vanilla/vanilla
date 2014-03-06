@@ -375,6 +375,8 @@ class Gdn_Session {
          } else {
             $this->UserID = 0;
             $this->User = FALSE;
+            $this->_TransientKey = GetAppCookie('tk');
+
             if ($SetIdentity)
                Gdn::Authenticator()->SetIdentity(NULL);
          }

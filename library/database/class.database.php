@@ -357,11 +357,11 @@ class Gdn_Database {
 
                // Problem with prepare
                if (!is_object($PDOStatement)) {
-                  throw new Exception('PDO Statement failed to prepare', 'error', $PDO);
+                  throw new ReconnectException('PDO Statement failed to prepare', 'error', $PDO);
 
                // Problem with execute
                } else if ($PDOStatement->execute($InputParameters) === FALSE) {
-                  throw new Exception('PDO Statement failed to execute', 'error', $PDOStatement);
+                  throw new ReconnectException('PDO Statement failed to execute', 'error', $PDOStatement);
                }
 
             // Query
@@ -370,9 +370,9 @@ class Gdn_Database {
             }
 
             if ($PDOStatement === FALSE)
-               throw new Exception('PDO Statement could not be created', 'fail', $PDO);
+               throw new ReconnectException('PDO Statement could not be created', 'fail', $PDO);
 
-         } catch (Exception $ex) {
+         } catch (ReconnectException $ex) {
 
             $errorCode = $ex->getCode();
             switch ($errorCode) {
@@ -495,4 +495,19 @@ class Gdn_Database {
 
       return $this->_Structure;
    }
+}
+
+class ReconnectException extends Exception {
+
+   protected $pdo;
+
+   public function __construct($message, $code, $pdo) {
+      $this->pdo = $pdo;
+      parent::__construct($message, $code, null);
+   }
+
+   public function getPDO() {
+      return $this->pdo;
+   }
+
 }

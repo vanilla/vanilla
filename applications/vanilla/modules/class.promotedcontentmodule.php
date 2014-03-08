@@ -283,7 +283,7 @@ class PromotedContentModule extends Gdn_Module {
          $MinScore = FALSE;
       
       // Check cache
-      $SelectorScoreCacheKey = "modules.promotedcontent.score.{$Score}";
+      $SelectorScoreCacheKey = "modules.promotedcontent.score.{$MinScore}";
       $Content = Gdn::Cache()->Get($SelectorScoreCacheKey);
       
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
@@ -345,7 +345,7 @@ class PromotedContentModule extends Gdn_Module {
       $DiscussionsByID = array();
       foreach ($Discussions as $Discussion)
          $DiscussionsByID[$Discussion['DiscussionID']] = $Discussion;
-      unset($$Discussions);
+      unset($Discussions);
       
       foreach ($Comments as &$Comment) {
          $Comment['Discussion'] = $DiscussionsByID[$Comment['DiscussionID']];

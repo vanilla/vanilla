@@ -30,6 +30,15 @@ class PromotedContentModule extends Gdn_Module {
     * @var type 
     */
    public $Selection;
+
+   /**
+    * What type of content to fetch.
+    * - all
+    * - discussions
+    * - comments
+    * @var string
+    */
+   public $ContentType = 'all';
    
    /**
     * How much content should be fetched
@@ -109,24 +118,30 @@ class PromotedContentModule extends Gdn_Module {
             ->GroupBy('UserID')
             ->Get()->Result(DATASET_TYPE_ARRAY);
          $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
-         
+
          // Get matching Discussions
-         $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->WhereIn('d.InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Discussions = array();
+         if ($this->ContentType == 'all' || $this->ContentType == 'discussions') {
+            $Discussions = Gdn::SQL()->Select('d.*')
+               ->From('Discussion d')
+               ->WhereIn('d.InsertUserID', $UserIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+         }
 
          // Get matching Comments
-         $Comments = Gdn::SQL()->Select('c.*')
-            ->From('Comment c')
-            ->WhereIn('InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
-         
-         $this->JoinCategory($Comments);
+         $Comments = array();
+         if ($this->ContentType == 'all' || $this->ContentType == 'comments') {
+            $Comments = Gdn::SQL()->Select('c.*')
+               ->From('Comment c')
+               ->WhereIn('InsertUserID', $UserIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+
+            $this->JoinCategory($Comments);
+         }
          
          // Interleave
          $Content = $this->Union('DateInserted', array(
@@ -171,22 +186,28 @@ class PromotedContentModule extends Gdn_Module {
          $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
 
          // Get matching Discussions
-         $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->WhereIn('d.InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Discussions = array();
+         if ($this->ContentType == 'all' || $this->ContentType == 'discussions') {
+            $Discussions = Gdn::SQL()->Select('d.*')
+               ->From('Discussion d')
+               ->WhereIn('d.InsertUserID', $UserIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+         }
 
          // Get matching Comments
-         $Comments = Gdn::SQL()->Select('c.*')
-            ->From('Comment c')
-            ->WhereIn('InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
-         
-         $this->JoinCategory($Comments);
+         $Comments = array();
+         if ($this->ContentType == 'all' || $this->ContentType == 'comments') {
+            $Comments = Gdn::SQL()->Select('c.*')
+               ->From('Comment c')
+               ->WhereIn('InsertUserID', $UserIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+
+            $this->JoinCategory($Comments);
+         }
          
          // Interleave
          $Content = $this->Union('DateInserted', array(
@@ -223,30 +244,36 @@ class PromotedContentModule extends Gdn_Module {
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
       
          // Get matching Discussions
-         $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->Where('d.CategoryID', $CategoryID)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Discussions = array();
+         if ($this->ContentType == 'all' || $this->ContentType == 'discussions') {
+            $Discussions = Gdn::SQL()->Select('d.*')
+               ->From('Discussion d')
+               ->Where('d.CategoryID', $CategoryID)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+         }
 
          // Get matching Comments
-         $CommentDiscussionIDs = Gdn::SQL()->Select('d.DiscussionID')
-            ->From('Discussion d')
-            ->Where('d.CategoryID', $CategoryID)
-            ->OrderBy('DateLastComment', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
-         
-         $Comments = Gdn::SQL()->Select('c.*')
-            ->From('Comment c')
-            ->WhereIn('DiscussionID', $CommentDiscussionIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
-         
-         $this->JoinCategory($Comments);
-         
+         $Comments = array();
+         if ($this->ContentType == 'all' || $this->ContentType == 'comments') {
+            $CommentDiscussionIDs = Gdn::SQL()->Select('d.DiscussionID')
+               ->From('Discussion d')
+               ->Where('d.CategoryID', $CategoryID)
+               ->OrderBy('DateLastComment', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+
+            $Comments = Gdn::SQL()->Select('c.*')
+               ->From('Comment c')
+               ->WhereIn('DiscussionID', $CommentDiscussionIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+
+            $this->JoinCategory($Comments);
+         }
+
          // Interleave
          $Content = $this->Union('DateInserted', array(
             'Discussion'   => $Discussions, 
@@ -289,24 +316,30 @@ class PromotedContentModule extends Gdn_Module {
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
          
          // Get matching Discussions
-         $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->Where('Score >', $MinScore)
-            ->OrderBy('Score', 'DESC')
-            ->Limit($this->Limit);
-         if ($MinScore !== FALSE) $Discussions->Where('Score >', $MinScore);
-         $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
+         $Discussions = array();
+         if ($this->ContentType == 'all' || $this->ContentType == 'discussions') {
+            $Discussions = Gdn::SQL()->Select('d.*')
+               ->From('Discussion d')
+               ->Where('Score >', $MinScore)
+               ->OrderBy('Score', 'DESC')
+               ->Limit($this->Limit);
+            if ($MinScore !== FALSE) $Discussions->Where('Score >', $MinScore);
+            $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
+         }
 
          // Get matching Comments
-         $Comments = Gdn::SQL()->Select('c.*')
-            ->From('Comment c')
-            ->OrderBy('Score', 'DESC')
-            ->Limit($this->Limit);
-         if ($MinScore !== FALSE) $Comments->Where('Score >', $MinScore);
-         $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
-         
-         $this->JoinCategory($Comments);
-         
+         $Comments = array();
+         if ($this->ContentType == 'all' || $this->ContentType == 'comments') {
+            $Comments = Gdn::SQL()->Select('c.*')
+               ->From('Comment c')
+               ->OrderBy('Score', 'DESC')
+               ->Limit($this->Limit);
+            if ($MinScore !== FALSE) $Comments->Where('Score >', $MinScore);
+            $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
+
+            $this->JoinCategory($Comments);
+         }
+
          // Interleave
          $Content = $this->Union('DateInserted', array(
             'Discussion'   => $Discussions, 

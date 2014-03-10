@@ -1769,15 +1769,21 @@ if (!function_exists('IsMobile')) {
       if ($Value !== NULL)
          $IsMobile = $Value;
 
-      // Short circuit so we only do this work once per pageload
+      // Short circuit so we only do this work once per pageload.
       if ($IsMobile !== NULL) return $IsMobile;
 
       // Start out assuming not mobile
       $Mobile = 0;
 
+      $Device = strtolower(GetValue('HTTP_X_DEVICE', $_SERVER, ''));
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
+
+      // The X-Device header can be set to explicitly state that we want mobile.
+      if (!$Mobile && $Device === 'mobile') {
+         $Mobile++;
+      }
 
       // Match wap Accepts: header
       if (!$Mobile) {

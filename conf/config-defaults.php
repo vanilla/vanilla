@@ -122,12 +122,14 @@ $Configuration['Garden']['Format']['EmbedSize']                 = 'normal'; // t
 // Default Preferences
 $Configuration['Preferences']['Email']['ConversationMessage']   = '1';
 $Configuration['Preferences']['Email']['BookmarkComment']       = '1';
+$Configuration['Preferences']['Email']['ParticipateComment']    = '0';
 $Configuration['Preferences']['Email']['WallComment']           = '0';
 $Configuration['Preferences']['Email']['ActivityComment']       = '0';
 $Configuration['Preferences']['Email']['DiscussionComment']     = '0';
 $Configuration['Preferences']['Email']['Mention']               = '0';
 $Configuration['Preferences']['Popup']['ConversationMessage']   = '1';
 $Configuration['Preferences']['Popup']['BookmarkComment']       = '1';
+$Configuration['Preferences']['Popup']['ParticipateComment']    = '0';
 $Configuration['Preferences']['Popup']['WallComment']           = '1';
 $Configuration['Preferences']['Popup']['ActivityComment']       = '1';
 $Configuration['Preferences']['Popup']['DiscussionComment']     = '1';

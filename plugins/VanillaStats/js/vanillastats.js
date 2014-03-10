@@ -1,16 +1,16 @@
 jQuery(document).ready(function($){
    statsUrl = gdn.definition('VanillaStatsUrl', '//analytics.vanillaforums.com');
-   
+
    frame = function() {
       var frame = document.getElementById('VanillaStatsGraph');
       return !frame ? null : frame;
    }
-   
+
    function getData() {
       // Add spinners
       if ($('#Content h1 span').length == 0)
          $('<span class="TinyProgress"></span>').appendTo('#Content h1:last');
-            
+
       if ($('div.DashboardSummaries div.Loading').length == 0)
          $('div.DashboardSummaries').html('<div class="Loading"></div>');
 
@@ -18,11 +18,11 @@ jQuery(document).ready(function($){
       var vanillaId = $('input.VanillaID').val();
       var vanillaVersion = $('input.VanillaVersion').val();
       var securityToken = $('input.SecurityToken').val();
-      
+
       // Grab the ranges and
       var range = $('input.Range').val();
       var dateRange = $('input.DateRange').val();
-      
+
       // Load the graph data
       // REMOTE QUERY
       frame().src = statsUrl
@@ -32,12 +32,12 @@ jQuery(document).ready(function($){
          +'&SecurityToken=' + securityToken
          +'&Range=' + range
          +'&DateRange=' + dateRange
-      
+
       // Load the summary data
       // LOCAL QUERY
       var range = $('input.Range').val();
       var dateRange = $('input.DateRange').val();
-      
+
       $.ajax({
          url: gdn.url('/index.php?p=/dashboard/settings/dashboardsummaries&DeliveryType=VIEW&Range='+range+'&DateRange='+dateRange),
          success: function(data) {
@@ -49,7 +49,7 @@ jQuery(document).ready(function($){
          },
          timeout: 15000 // 15 seconds in ms
       });
-      
+
       // Remove Spinners
       $('#Content h1 span.TinyProgress').remove();
    }
@@ -65,8 +65,8 @@ jQuery(document).ready(function($){
    });
 
    // Redraw the graph if the date range changes
-   $('input.DateRange').live('change', function() {
+   $(document).on('change', 'input.DateRange', function() {
       getData();
    });
-   
+
 });

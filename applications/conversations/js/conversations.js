@@ -92,32 +92,37 @@ jQuery(document).ready(function($) {
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
    }
    
+   $.fn.userTokenInput = function() {
+      $(this).each(function() {
+         /// Author tag token input.
+           var $author = $(this);
+
+           var author = $author.val();
+           if (author && author.length) {
+               author = author.split(",");
+               for (i = 0; i < author.length; i++) {
+                   author[i] = { id: i, name: author[i] };
+               }
+           } else {
+               author = [];
+           }
+
+           $author.tokenInput(gdn.url('/user/tagsearch'), {
+               hintText: gdn.definition("TagHint", "Start to type..."),
+               tokenValue: 'name',
+               searchingText: '', // search text gives flickery ux, don't like
+               searchDelay: 300,
+               minChars: 1,
+               maxLength: 25,
+               zindex: 9999,
+               prePopulate: author,
+               animateDropdown: false
+           });
+      });
+   };
+   
    // Enable multicomplete on selected inputs
-   $('.MultiComplete').each(function() {
-      /// Author tag token input.
-        var $author = $(this);
-
-        var author = $author.val();
-        if (author && author.length) {
-            author = author.split(",");
-            for (i = 0; i < author.length; i++) {
-                author[i] = { id: i, name: author[i] };
-            }
-        } else {
-            author = [];
-        }
-
-        $author.tokenInput(gdn.url('/user/tagsearch'), {
-            hintText: gdn.definition("TagHint", "Start to type..."),
-            tokenValue: 'name',
-            searchingText: '', // search text gives flickery ux, don't like
-            searchDelay: 300,
-            minChars: 1,
-            maxLength: 25,
-            prePopulate: author,
-            animateDropdown: false
-        });
-   });
+   $('.MultiComplete').userTokenInput();
    
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;

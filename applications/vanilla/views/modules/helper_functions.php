@@ -71,7 +71,7 @@ function WritePromotedContent($Content, $Sender) {
       </div>
       <div class="Meta CommentMeta CommentInfo">
          <span class="MItem DateCreated">
-            <?php echo Anchor(Gdn_Format::Date($Content['DateInserted'], 'html'), $Permalink, 'Permalink', array('rel' => 'nofollow')); ?>
+            <?php echo Anchor(Gdn_Format::Date($Content['DateInserted'], 'html'), $ContentURL, 'Permalink', array('rel' => 'nofollow')); ?>
          </span>
          <?php
          // Include source if one was set

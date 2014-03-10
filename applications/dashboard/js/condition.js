@@ -1,7 +1,7 @@
 // This file contains javascript that is specific to editing conditions
 jQuery(document).ready(function($) {
    // Hide/reveal elements based on the condition type.
-   $(".ConditionEdit .CondType").live("change", function() {
+   $(document).on("change", ".ConditionEdit .CondType", function() {
       var selectedValue = $(this).val();
       var types = ['permission', 'request', 'role'];
       var $tr = $(this).parents('table.ConditionEdit tr');
@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
       }
    });
 
-   $(".ConditionEdit .DeleteCondition").live("click", function() {
+   $(document).on("click", ".ConditionEdit .DeleteCondition", function() {
       var $tr = $(this).parents('table.ConditionEdit tr');
       $tr.remove();
 

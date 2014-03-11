@@ -1009,7 +1009,7 @@ class Gdn_Format {
    }
 
    /**
-    * Strips out most YouTube embed/iframe and replaces with text URL.
+    * Strips out embed/iframes we support and replaces with placeholder.
     *
     * This allows later parsing to insert a sanitized video video embed normally.
     * Necessary for backwards compatibility from when we allowed embed & object tags.
@@ -1020,9 +1020,9 @@ class Gdn_Format {
     * @param mixed $Mixed
     * @return HTML string
     */
-   public static function UnembedVideos($Mixed) {
+   public static function UnembedContent($Mixed) {
       if (!is_string($Mixed))
-         return self::To($Mixed, 'UnembedVideos');
+         return self::To($Mixed, 'UnembedContent');
       else {
          if (C('Garden.Format.YouTube')) {
             $Mixed = preg_replace('`<iframe.*src="((https?)://.*youtube\.com/embed/([a-z0-9_-]*))".*</iframe>`i', "\n$2://www.youtube.com/watch?v=$3\n", $Mixed);
@@ -1031,6 +1031,9 @@ class Gdn_Format {
          if (C('Garden.Format.Vimeo')) {
             $Mixed = preg_replace('`<iframe.*src="((https?)://.*vimeo\.com/video/([0-9]*))".*</iframe>`i', "\n$2://vimeo.com/$3\n", $Mixed);
             $Mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $Mixed);
+         }
+         if (C('Garden.Format.Getty', TRUE)) {
+            $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w\d=?&+-_]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
          }
       }
 
@@ -1075,6 +1078,7 @@ class Gdn_Format {
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
+      $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)
@@ -1131,6 +1135,12 @@ EOT;
       } elseif (preg_match("`({$PintrestUrlMatch})`", $Url, $Matches) && C('Garden.Format.Pintrest', true)) {
          $Result = <<<EOT
 <a data-pin-do="embedPin" href="//pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
+EOT;
+
+      // Getty
+      } elseif (preg_match("`({$GettyUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Getty', true)) {
+         $Result = <<<EOT
+<iframe src="//embed.gettyimages.com/embed/{$Matches[2]}" width="{$Matches[3]}" height="{$Matches[4]}" frameborder="0" scrolling="no"></iframe>
 EOT;
 
       // Unformatted links

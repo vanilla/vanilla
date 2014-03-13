@@ -1795,6 +1795,8 @@ if (!function_exists('IsMobile')) {
       switch ($Device) {
          case 'desktop':
             return $IsMobile = FALSE;
+         case 'tablet':
+            return $IsMobile = FALSE;
          case 'mobile':
             return $IsMobile = TRUE;
       }

@@ -26,3 +26,5 @@ _notes
 .settings
 .buildpath
 .idea/*
+/nbproject
+/nbproject/private/*.*

@@ -26,3 +26,6 @@ _notes
 .settings
 .buildpath
 .idea/*
+/nbproject/private/
+nbproject/project.properties
+nbproject/project.xml

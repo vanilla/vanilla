@@ -12,6 +12,12 @@
    ?>
 </h1>
 <?php
+
+if ($this->Data('Type')) {
+   $this->FireEvent('Conversation'.strreplace('_', '', $this->Data('Type')));
+}
+
+
 if ($this->Data('_HasDeletedUsers')) {
    echo '<div class="Info">', T('One or more users have left this conversation.', 'One or more users have left this conversation. They won\'t receive any more messages unless you add them back in to the conversation.'), '</div>';
 }
@@ -26,5 +32,5 @@ echo $this->Pager->ToString('less');
 </ul>
 </div>
 <?php 
-echo $this->Pager->ToString(); 
+echo $this->Pager->ToString();
 echo Gdn::Controller()->FetchView('addmessage');

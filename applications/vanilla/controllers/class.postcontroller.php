@@ -291,6 +291,10 @@ class PostController extends VanillaController {
       if ($DraftID != '') {
          $this->Draft = $this->DraftModel->GetID($DraftID);
          $this->CategoryID = $this->Draft->CategoryID;
+
+         // Verify this is their draft
+         if (GetValue('InsertUserID', $this->Draft) != Gdn::Session()->UserID)
+            throw PermissionException();
       } else {
          $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
          $this->CategoryID = $this->Discussion->CategoryID;

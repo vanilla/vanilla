@@ -1763,10 +1763,19 @@ if (!function_exists('InSubArray')) {
 }
 
 if (!function_exists('IsMobile')) {
-   function IsMobile($Value = NULL) {
+   /**
+    * Returns whether or not the site is in mobile mode.
+    * @param mixed $Value Sets a new value for mobile. Pass one of the following:
+    * - true: Force mobile.
+    * - false: Force desktop.
+    * - null: Reset and use the system determined mobile setting.
+    * - not specified: Use the current setting or use the system determined mobile setting.
+    * @return bool
+    */
+   function IsMobile($Value = '') {
       static $IsMobile = NULL;
 
-      if ($Value !== NULL)
+      if ($Value !== '')
          $IsMobile = $Value;
 
       // Short circuit so we only do this work once per pageload.
@@ -1775,15 +1784,26 @@ if (!function_exists('IsMobile')) {
       // Start out assuming not mobile
       $Mobile = 0;
 
+      // Check for a specific cookie override.
+      $ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+      if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile)) {
+         return $IsMobile = FALSE;
+      }
+
+      // The X-Device header can be set to explicitly state that we want mobile.
       $Device = strtolower(GetValue('HTTP_X_DEVICE', $_SERVER, ''));
+      switch ($Device) {
+         case 'desktop':
+            return $IsMobile = FALSE;
+         case 'tablet':
+            return $IsMobile = FALSE;
+         case 'mobile':
+            return $IsMobile = TRUE;
+      }
+
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
       $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-
-      // The X-Device header can be set to explicitly state that we want mobile.
-      if (!$Mobile && $Device === 'mobile') {
-         $Mobile++;
-      }
 
       // Match wap Accepts: header
       if (!$Mobile) {

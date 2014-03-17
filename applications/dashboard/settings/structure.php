@@ -364,10 +364,13 @@ $PermissionModel->ClearPermissions();
 $Construct->Table('Invitation')
 	->PrimaryKey('InvitationID')
    ->Column('Email', 'varchar(200)')
+   ->Column('Name', 'varchar(50)', TRUE)
+   ->Column('RoleIDs', 'text', TRUE)
    ->Column('Code', 'varchar(50)')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('AcceptedUserID', 'int', TRUE)
+   //->Column('DateExpires', 'datetime', TRUE)
    ->Set($Explicit, $Drop);
 
 // ActivityType Table

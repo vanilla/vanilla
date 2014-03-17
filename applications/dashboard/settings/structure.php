@@ -370,7 +370,7 @@ $Construct->Table('Invitation')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('AcceptedUserID', 'int', TRUE)
-   //->Column('DateExpires', 'datetime', TRUE)
+   ->Column('DateExpires', 'datetime', TRUE)
    ->Set($Explicit, $Drop);
 
 // ActivityType Table

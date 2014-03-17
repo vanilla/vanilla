@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
    attachAutogrow();
 
    // Attach autogrow whenever a trigger is, well, triggered
-   $(document).on(autogrowTriggers.join(','), attachAutogrow);
+   $(document).on(autogrowTriggers.join(' '), attachAutogrow);
 
    // Hide it if they leave the area without typing
    $('div.CommentForm textarea').blur(function(ev) {

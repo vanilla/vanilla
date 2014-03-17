@@ -45,7 +45,7 @@ jQuery(document).ready(function($) {
 
    // Hide the password reset input when any of the specified events are
    // triggered
-   $(document).on(newPasswordTriggers.join(','), hideNewPassword);
+   $(document).on(newPasswordTriggers.join(' '), hideNewPassword);
 
    // When the password options are clicked, check to see if the admin/mod
    // wishes to set a new password for the user. If that's the case, show the

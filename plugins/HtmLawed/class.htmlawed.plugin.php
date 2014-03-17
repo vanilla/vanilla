@@ -53,7 +53,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
       );
       
       // Turn embedded videos into simple links (legacy workaround)
-      $Html = Gdn_Format::UnembedVideos($Html);
+      $Html = Gdn_Format::UnembedContent($Html);
       
       // We check the flag within Gdn_Format to see
       // if htmLawed should place rel="nofollow" links

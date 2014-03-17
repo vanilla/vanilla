@@ -1791,7 +1791,7 @@ if (!function_exists('IsMobile')) {
       }
 
       // The X-Device header can be set to explicitly state that we want mobile.
-      $Device = strtolower(GetValue('HTTP_X_DEVICE', $_SERVER, ''));
+      $Device = strtolower(GetValue('HTTP_X_UA_DEVICE', $_SERVER, ''));
       switch ($Device) {
          case 'desktop':
             return $IsMobile = FALSE;

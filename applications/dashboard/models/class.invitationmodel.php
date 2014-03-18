@@ -32,11 +32,12 @@ class InvitationModel extends Gdn_Model {
       return $DataSet->FirstRow();
    }
 
-   public function GetByUserID($UserID, $InvitationID = '') {
+   public function GetByUserID($UserID, $InvitationID = '', $Limit = 30, $Offset = 0) {
       $this->SQL->Select('i.*')
          ->Select('u.Name', '', 'AcceptedName')
          ->From('Invitation i')
          ->Join('User u', 'i.AcceptedUserID = u.UserID', 'left')
+         ->Limit($Limit, $Offset)
          ->Where('i.InsertUserID', $UserID);
 
       if (is_numeric($InvitationID))

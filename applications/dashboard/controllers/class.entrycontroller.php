@@ -1414,6 +1414,16 @@ class EntryController extends Gdn_Controller {
    }
 
    /**
+    * Accept an invitation.
+    * @param type $InvitationCode
+    */
+   public function Invitation($InvitationCode) {
+      $this->SetData('_Action', '/entry/invitation/'.rawurlencode($InvitationCode));
+      SaveToConfig('Garden.Registration.Method', 'Invitation', FALSE);
+      $this->Register();
+   }
+
+   /**
     * Invitation-only registration. Requires code.
     *
     * Events: RegistrationSuccessful
@@ -1440,7 +1450,7 @@ class EntryController extends Gdn_Controller {
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
-            $AuthUserID = $this->UserModel->Register($Values);
+            $AuthUserID = $this->UserModel->Register($Values, array('Method' => 'Invitation'));
 
             if (!$AuthUserID) {
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());

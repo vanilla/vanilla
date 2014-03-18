@@ -22,6 +22,11 @@ class ProfileController extends Gdn_Controller {
    /** @var bool Is the page in "edit" mode or not. */
    public $EditMode;
 
+   /**
+    * @var Gdn_Form
+    */
+   public $Form;
+
    /** @var array List of available tabs. */
    public $ProfileTabs;
 
@@ -444,6 +449,9 @@ class ProfileController extends Gdn_Controller {
       $InvitationModel = new InvitationModel();
       $this->Form->SetModel($InvitationModel);
       if ($this->Form->AuthenticatedPostBack()) {
+         // Remove insecure invitation data.
+         $this->Form->RemoveFormValue(array('Name', 'DateExpires', 'RoleIDs'));
+
          // Send the invitation
          if ($this->Form->Save($this->UserModel)) {
             $this->InformMessage(T('Your invitation has been sent.'));

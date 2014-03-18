@@ -115,7 +115,7 @@ jQuery(document).ready(function($) {
    }
 
    // If not embedded and we should be, redirect to the embedded version.
-   if (!inIframe && !inPopup && inConnect && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
+   if (!inIframe && !inPopup && !inConnect && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
       document.location = remoteUrl + '#' + path;
 
    if (inIframe) {

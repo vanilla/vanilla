@@ -412,6 +412,22 @@ class TagModel extends Gdn_Model {
       return $result;
    }
 
+   /**
+    * @param array $FormPostValues
+    * @param bool $Insert
+    * @return bool
+    */
+   public function Validate($FormPostValues, $Insert = FALSE) {
+      $this->DefineSchema();
+
+      // The model doesn't play well with empty string defaults so spoof an empty string default.
+      if ($Insert && !isset($FormPostValues['Type'])) {
+         $FormPostValues['Type'] = 'Default';
+      }
+
+      return $this->Validation->Validate($FormPostValues, $Insert);
+   }
+
    public static function ValidateTag($Tag) {
       // Tags can't contain commas.
       if (preg_match('`,`', $Tag))

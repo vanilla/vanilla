@@ -416,7 +416,7 @@ class ConversationModel extends Gdn_Model {
 
           if ($Count + 1 === $Total && $FoundMe) {
               $Result = $Px;
-          } elseif ($Total === $Count + 1) {
+          } elseif ($Total - $Count === 1) {
               $Result = sprintf(T('%s and 1 other'), $Px);
           } elseif ($Total > $Count) {
               $Result = sprintf(T('%s and %s others'), $Px, $Total - $Count);

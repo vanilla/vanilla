@@ -1514,7 +1514,7 @@ class CategoryModel extends Gdn_Model {
          }
 
          // Save the permissions
-         if ($AllowDiscussions && $CategoryID) {
+         if ($CategoryID) {
             // Check to see if this category uses custom permissions.
             if ($CustomPermissions) {
                $PermissionModel = Gdn::PermissionModel();

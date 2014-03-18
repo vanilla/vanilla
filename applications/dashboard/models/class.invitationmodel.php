@@ -45,7 +45,7 @@ class InvitationModel extends Gdn_Model {
       return $this->SQL->Get();
    }
 
-   public function Save($FormPostValues, $UserModel) {
+   public function Save($FormPostValues, $UserModel, $SendEmail = TRUE) {
       $Session = Gdn::Session();
       $UserID = $Session->UserID;
 
@@ -96,11 +96,13 @@ class InvitationModel extends Gdn_Model {
             $UserModel->ReduceInviteCount($UserID);
 
          // And send the invitation email
-         try {
-            $this->Send($InvitationID);
-         } catch (Exception $ex) {
-            $this->Validation->AddValidationResult('Email', sprintf(T('Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'), strip_tags($ex->getMessage())));
-            return FALSE;
+         if ($SendEmail) {
+            try {
+               $this->Send($InvitationID);
+            } catch (Exception $ex) {
+               $this->Validation->AddValidationResult('Email', sprintf(T('Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'), strip_tags($ex->getMessage())));
+               return FALSE;
+            }
          }
          return TRUE;
       }

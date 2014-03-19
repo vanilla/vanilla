@@ -536,7 +536,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     */
    public function MassImport($Data) {
       if ($this->Splitting) return;
-      $this->Data = array_merge($this->Data, $Data);
+      $this->Data = array_replace_recursive($this->Data, $Data);
 
       if ($this->Dynamic instanceof Gdn_ConfigurationSource)
          $this->Dynamic->MassImport($Data);
@@ -977,7 +977,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       if (!$this->Dirty)
          $CheckCopy = $this->Settings;
 
-      $this->Settings = array_merge($this->Settings, $Data);
+      $this->Settings = array_replace_recursive($this->Settings, $Data);
 
       // Only do dirty checks if we aren't already dirty
       if (!$this->Dirty) {

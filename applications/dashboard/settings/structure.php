@@ -373,6 +373,13 @@ $Construct->Table('Invitation')
    ->Column('DateExpires', 'datetime', TRUE)
    ->Set($Explicit, $Drop);
 
+// Fix negative invitation expiry dates..
+$InviteExpiry = C('Garden.Registration.InviteExpiration');
+if ($InviteExpiry && substr($InviteExpiry, 0, 1) === '-') {
+   $InviteExpiry = substr($InviteExpiry, 1);
+   SaveToConfig('Garden.Registration.InviteExpiration', $InviteExpiry);
+}
+
 // ActivityType Table
 $Construct->Table('ActivityType')
 	->PrimaryKey('ActivityTypeID')

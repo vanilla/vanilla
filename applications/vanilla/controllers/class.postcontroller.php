@@ -66,17 +66,17 @@ class PostController extends VanillaController {
    
    public function AnnounceOptions() {
       $Result = array(
-         0  => '@'.T("Don't announce.")
+         '0'  => '@'.T("Don't announce.")
       );
       
       if (C('Vanilla.Categories.Use')) {
          $Result = array_merge($Result, array(
-            2 => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
-            1 => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
+            '2' => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
+            '1' => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
          ));
       } else {
          $Result = array_merge($Result, array(
-            1 => '@'.T('In recent discussions.'),
+            '1' => '@'.T('In recent discussions.'),
          ));
       }
       
@@ -334,6 +334,10 @@ class PostController extends VanillaController {
       if ($DraftID != '') {
          $this->Draft = $this->DraftModel->GetID($DraftID);
          $this->CategoryID = $this->Draft->CategoryID;
+
+         // Verify this is their draft
+         if (GetValue('InsertUserID', $this->Draft) != Gdn::Session()->UserID)
+            throw PermissionException();
       } else {
          $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
          $this->CategoryID = $this->Discussion->CategoryID;

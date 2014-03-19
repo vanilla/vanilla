@@ -1318,6 +1318,11 @@ jQuery(document).ready(function($) {
     */
    gdn.atCompleteInit = function(editorElement, iframe) {
 
+      if (!jQuery.fn.atwho) {
+         //console.warn('Editor missing atwho dependency.');
+         return false;
+      }
+
       // Added cache results to global, so all instances share the same data
       // and can build the cache together.
 

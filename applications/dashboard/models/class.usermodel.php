@@ -2082,39 +2082,34 @@ class UserModel extends Gdn_Model {
       $InviteUsername = '';
       $InvitationCode = ArrayValue('InvitationCode', $FormPostValues, '');
 
-      $Invitation = $this->SQL->Select('i.InvitationID, i.InsertUserID, i.Email, i.RoleIDs, i.DateExpires')
-         ->Select('s.Name', '', 'SenderName')
-         ->From('Invitation i')
-         ->Join('User s', 'i.InsertUserID = s.UserID', 'left')
-         ->Where('Code', $InvitationCode)
-         ->Where('AcceptedUserID is null') // Do not let them use the same invitation code twice!
-         ->Get()->FirstRow();
+      $Invitation = $this->SQL->GetWhere('Invitation', array('Code' => $InvitationCode))->FirstRow();
+
+      // If there is no invitation then bail out.
+      if (!$Invitation) {
+         $this->Validation->AddValidationResult('InvitationCode', 'Invitation not found.');
+         return FALSE;
+      }
 
       // Get expiration date in timestamp. If nothing set, grab config default.
       $InviteExpiration = $Invitation->DateExpires;
-      if ($InviteExpiration != NULL
-      && ($ExpireTimestamp = strtotime($InviteExpiration)) !== FALSE) {
-         $InviteExpiration = $ExpireTimestamp;
+      if ($InviteExpiration != NULL) {
+         $InviteExpiration = Gdn_Format::ToTimestamp($InviteExpiration);
       } else {
          $DefaultExpire = '1 week';
-         $InviteExpiration = strtotime(C('Garden.Registration.InviteExpiration', $DefaultExpire));
+         $InviteExpiration = strtotime(C('Garden.Registration.InviteExpiration', '1 week'), Gdn_Format::ToTimestamp($Invitation->DateInserted));
          if ($InviteExpiration === FALSE) {
             $InviteExpiration = strtotime($DefaultExpire);
          }
       }
 
-      if ($InviteExpiration >= time()) {
-         $InviteUserID = $Invitation->InsertUserID;
-         $InviteUsername = $Invitation->SenderName;
-         $FormPostValues['Email'] = $Invitation->Email;
+      if ($InviteExpiration <= time()) {
+         $this->Validation->AddValidationResult('DateExpires', 'The invitation has expired.');
       }
 
-      if ($InviteUserID <= 0) {
-         $this->Validation->AddValidationResult('InvitationCode', 'ErrorBadInvitationCode');
-         return FALSE;
-      }
+      $InviteUserID = $Invitation->InsertUserID;
+      $FormPostValues['Email'] = $Invitation->Email;
 
-      if ($this->Validate($FormPostValues, TRUE) === TRUE) {
+      if ($this->Validate($FormPostValues, TRUE)) {
          // Check for spam.
          $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
          if ($Spam) {

@@ -1414,24 +1414,46 @@ class EntryController extends Gdn_Controller {
    }
 
    /**
-    * Accept an invitation.
-    * @param type $InvitationCode
-    */
-   public function Invitation($InvitationCode) {
-      $this->SetData('_Action', '/entry/invitation/'.rawurlencode($InvitationCode));
-      SaveToConfig('Garden.Registration.Method', 'Invitation', FALSE);
-      $this->Register();
-   }
-
-   /**
     * Invitation-only registration. Requires code.
     *
-    * Events: RegistrationSuccessful
-    *
-    * @access private
+    * @param int $InvitationCode
     * @since 2.0.0
     */
-   private function RegisterInvitation($InvitationCode) {
+   public function RegisterInvitation($InvitationCode = 0) {
+      $this->Form->SetModel($this->UserModel);
+
+      // Define gender dropdown options
+      $this->GenderOptions = array(
+         'u' => T('Unspecified'),
+         'm' => T('Male'),
+         'f' => T('Female')
+      );
+
+      if (!$this->Form->IsPostBack()) {
+         $this->Form->SetValue('InvitationCode', $InvitationCode);
+      }
+
+      $InvitationModel = new InvitationModel();
+
+      // Look for the invitation.
+      $Invitation = $InvitationModel
+         ->GetWhere(array('Code' => $this->Form->GetValue('InvitationCode')))
+         ->FirstRow(DATASET_TYPE_ARRAY);
+
+      if (!$Invitation) {
+         $this->Form->AddError('Invitation not found.', 'Code');
+      } else {
+         if ($Expires = GetValue('DateExpires', $Invitation)) {
+            $Expires = Gdn_Format::ToTimestamp($Expires);
+            if ($Expires <= time()) {
+
+            }
+         }
+      }
+
+      $this->Form->AddHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default
+      $this->Form->AddHidden('Target', $this->Target());
+
       Gdn::UserModel()->AddPasswordStrength($this);
 
       if ($this->Form->IsPostBack() === TRUE) {
@@ -1475,8 +1497,16 @@ class EntryController extends Gdn_Controller {
             $this->Form->AddError($Ex);
          }
       } else {
+         // Set some form defaults.
+         if ($Name = GetValue('Name', $Invitation)) {
+            $this->Form->SetValue('Name', $Name);
+         }
+
          $this->InvitationCode = $InvitationCode;
       }
+
+      // Make sure that the hour offset for new users gets defined when their account is created
+      $this->AddJsFile('entry.js');
       $this->Render();
    }
 

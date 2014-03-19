@@ -37,8 +37,10 @@ class InvitationModel extends Gdn_Model {
          ->Select('u.Name', '', 'AcceptedName')
          ->From('Invitation i')
          ->Join('User u', 'i.AcceptedUserID = u.UserID', 'left')
-         ->Limit($Limit, $Offset)
-         ->Where('i.InsertUserID', $UserID);
+         ->Where('i.InsertUserID', $UserID)
+         ->OrderBy('i.DateInserted', 'desc')
+         ->Limit($Limit, $Offset);
+
 
       if (is_numeric($InvitationID))
          $this->SQL->Where('Invitation.InvitationID', $InvitationID);
@@ -56,8 +58,15 @@ class InvitationModel extends Gdn_Model {
       // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Email', 'Email');
 
-      // Make sure required db fields are present
+      // Make sure required db fields are present.
       $this->AddInsertFields($FormPostValues);
+      if (!isset($FormPostValues['DateExpires'])) {
+         $Expires = strtotime(C('Garden.Registration.InviteExpiration'));
+         if ($Expires > time()) {
+            $FormPostValues['DateExpires'] = Gdn_Format::ToDateTime($Expires);
+         }
+      }
+
       $FormPostValues['Code'] = $this->GetInvitationCode();
 
       // Validate the form posted values
@@ -115,11 +124,11 @@ class InvitationModel extends Gdn_Model {
       $Session = Gdn::Session();
       if ($Invitation === FALSE) {
          throw new Exception(T('ErrorRecordNotFound'));
-      } else if ($Session->UserID != $Invitation->SenderUserID) {
+      } elseif ($Session->UserID != $Invitation->SenderUserID) {
          throw new Exception(T('InviteErrorPermission', T('ErrorPermission')));
       } else {
          // Some information for the email
-         $RegistrationUrl = ExternalUrl("entry/register/{$Invitation->Code}");
+         $RegistrationUrl = ExternalUrl("entry/registerinvitation/{$Invitation->Code}");
 
          $AppTitle = Gdn::Config('Garden.Title');
          $Email = new Gdn_Email();
@@ -137,30 +146,29 @@ class InvitationModel extends Gdn_Model {
       }
    }
 
-   public function Delete($InvitationID, $UserModel) {
+   public function Delete($InvitationID) {
       $Session = Gdn::Session();
       $UserID = $Session->UserID;
 
       // Validate that this user can delete this invitation:
-      $Invitation = $this->GetByInvitationID($InvitationID);
+      $Invitation = $this->GetID($InvitationID, DATASET_TYPE_ARRAY);
 
       // Does the invitation exist?
-      if ($Invitation === FALSE)
-         throw new Exception(T('ErrorRecordNotFound'));
+      if (!$Invitation)
+         throw NotFoundException('Invitation');
 
       // Does this user own the invitation?
-      if ($UserID != $Invitation->SenderUserID)
-         throw new Exception(T('InviteErrorPermission', T('ErrorPermission')));
+      if ($UserID != $Invitation['InsertUserID'] && !$Session->CheckPermission('Garden.Moderation.Manage'))
+         throw PermissionException('@'.T('InviteErrorPermission', T('ErrorPermission')));
 
-      // Has the invitation been accepted?
-      if ($Invitation->AcceptedUserID > 0)
-         throw new Exception(T('You cannot remove an invitation that has been accepted.'));
-
-      // Delete it
+      // Delete it.
       $this->SQL->Delete($this->Name, array('InvitationID' => $InvitationID));
 
-      // Add the invitation back onto the user's account
-      $UserModel->IncreaseInviteCount($UserID);
+      // Add the invitation back onto the user's account if the invitation has not been accepted.
+      if (!$Invitation->AcceptedUserID) {
+         Gdn::UserModel()->IncreaseInviteCount($UserID);
+      }
+
       return TRUE;
    }
 

@@ -48,9 +48,10 @@ class InvitationModel extends Gdn_Model {
       return $this->SQL->Get();
    }
 
-   public function Save($FormPostValues, $UserModel, $SendEmail = TRUE) {
+   public function Save($FormPostValues, $UserModel, $Options = array()) {
       $Session = Gdn::Session();
       $UserID = $Session->UserID;
+      $SendEmail = GetValue('SendEmail', $Options, TRUE);
 
       // Define the primary key in this model's table.
       $this->DefineSchema();

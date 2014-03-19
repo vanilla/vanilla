@@ -363,12 +363,22 @@ $PermissionModel->ClearPermissions();
 // Invitation Table
 $Construct->Table('Invitation')
 	->PrimaryKey('InvitationID')
-   ->Column('Email', 'varchar(200)')
-   ->Column('Code', 'varchar(50)')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('DateInserted', 'datetime')
+   ->Column('Email', 'varchar(200)', FALSE, 'index')
+   ->Column('Name', 'varchar(50)', TRUE)
+   ->Column('RoleIDs', 'text', TRUE)
+   ->Column('Code', 'varchar(50)', FALSE, 'unique.code')
+   ->Column('InsertUserID', 'int', TRUE, 'index.userdate')
+   ->Column('DateInserted', 'datetime', FALSE, 'index.userdate')
    ->Column('AcceptedUserID', 'int', TRUE)
+   ->Column('DateExpires', 'datetime', TRUE)
    ->Set($Explicit, $Drop);
+
+// Fix negative invitation expiry dates..
+$InviteExpiry = C('Garden.Registration.InviteExpiration');
+if ($InviteExpiry && substr($InviteExpiry, 0, 1) === '-') {
+   $InviteExpiry = substr($InviteExpiry, 1);
+   SaveToConfig('Garden.Registration.InviteExpiration', $InviteExpiry);
+}
 
 // ActivityType Table
 $Construct->Table('ActivityType')

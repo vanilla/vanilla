@@ -719,9 +719,9 @@ class SettingsController extends DashboardController {
       
       // Options for when invitations should expire.
       $this->InviteExpirationOptions = array(
-        '-1 week' => T('1 week after being sent'),
-        '-2 weeks' => T('2 weeks after being sent'),
-        '-1 month' => T('1 month after being sent'),
+        '1 week' => T('1 week after being sent'),
+        '2 weeks' => T('2 weeks after being sent'),
+        '1 month' => T('1 month after being sent'),
         'FALSE' => T('never')
       );
       

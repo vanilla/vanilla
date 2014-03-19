@@ -363,13 +363,12 @@ $PermissionModel->ClearPermissions();
 // Invitation Table
 $Construct->Table('Invitation')
 	->PrimaryKey('InvitationID')
-   ->Column('Email', 'varchar(200)')
+   ->Column('Email', 'varchar(200)', FALSE, 'index')
    ->Column('Name', 'varchar(50)', TRUE)
    ->Column('RoleIDs', 'text', TRUE)
-   ->Column('Banned', 'tinyint(1)', TRUE)
-   ->Column('Code', 'varchar(50)')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('DateInserted', 'datetime')
+   ->Column('Code', 'varchar(50)', FALSE, 'unique.code')
+   ->Column('InsertUserID', 'int', TRUE, 'index.userdate')
+   ->Column('DateInserted', 'datetime', FALSE, 'index.userdate')
    ->Column('AcceptedUserID', 'int', TRUE)
    ->Column('DateExpires', 'datetime', TRUE)
    ->Set($Explicit, $Drop);

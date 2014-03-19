@@ -13,10 +13,9 @@
 </h1>
 <?php
 
-if ($this->Data('Type')) {
-   $this->FireEvent('Conversation'.strreplace('_', '', $this->Data('Type')));
+if ($this->Data('Conversation.Type')) {
+   $this->FireEvent('Conversation'.str_replace('_', '', $this->Data('Conversation.Type')));
 }
-
 
 if ($this->Data('_HasDeletedUsers')) {
    echo '<div class="Info">', T('One or more users have left this conversation.', 'One or more users have left this conversation. They won\'t receive any more messages unless you add them back in to the conversation.'), '</div>';

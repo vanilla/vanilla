@@ -16,11 +16,13 @@ class TagModel extends Gdn_Model {
 
    protected $Types;
    protected static $instance;
+   public $StringTags;
 
    /// Methods ///
 
    public function  __construct($Name = '') {
       parent::__construct('Tag');
+      $this->StringTags = C('Plugins.Tagging.StringTags');
    }
 
    /**
@@ -219,6 +221,51 @@ class TagModel extends Gdn_Model {
       }
 
       return $Tags;
+   }
+
+   /**
+    * Join the tags to a set of discussions.
+    * @param $data
+    */
+   public function joinTags(&$data) {
+      $ids = array();
+      foreach ($data as $row) {
+         $discussionId = val('DiscussionID', $row);
+         if ($discussionId)
+            $ids[] = $discussionId;
+      }
+
+      // Select the tags.
+      $tags = $this->SQL->Select('td.DiscussionID, t.TagID, t.Name, t.FullName')
+           ->From('TagDiscussion td')
+           ->Join('Tag t', 't.TagID = td.TagID')
+           ->WhereIn('td.DiscussionID', $ids)
+           ->Get()->ResultArray();
+
+      $tags = Gdn_DataSet::Index($tags, 'DiscussionID', array('Unique' => FALSE));
+      foreach ($data as &$row) {
+         $discussionId = val('DiscussionID', $row);
+         if (isset($tags[$discussionId])) {
+            $tags = $tags[$discussionId];
+
+            if ($this->StringTags) {
+               $tags = ConsolidateArrayValuesByKey($tags, 'Name');
+               SetValue('Tags', $row, implode(',', $tags));
+            } else {
+               foreach ($tags as &$trow) {
+                  unset($trow['DiscussionID']);
+               }
+               SetValue('Tags', $row, $tags);
+            }
+         } else {
+            if ($this->StringTags) {
+               SetValue('Tags', $row, '');
+            } else {
+               SetValue('Tags', $row, array());
+            }
+         }
+      }
+
    }
 
    public function saveDiscussion($discussion_id, $tags, $types = array(''), $category_id = 0, $new_type = '') {

@@ -21,7 +21,7 @@ if ($CountNotAllowed > 0) {
       ), 'p');
 } else {
 echo Wrap(sprintf(
-   'You are about to move %s.',
+   T('You are about to move %s.'),
    Plural($CountCheckedDiscussions, '%s discussion', '%s discussions')
    ), 'p');
 }

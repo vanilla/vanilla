@@ -101,7 +101,7 @@ foreach ($this->AvailableApplications as $AppName => $AppInfo) {
 
             if ($Author != '') {
                $Info .= '<span>|</span>';
-               $Info .= sprintf('By %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
+               $Info .= sprintf(T('By %s'), $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
             }
             
             if ($AppUrl != '') {

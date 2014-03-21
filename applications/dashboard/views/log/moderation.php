@@ -12,7 +12,7 @@ echo $this->Form->Open();
          T('Vanilla.Moderation.FilterBy', 'Show moderation queue for %1$s'),
             $this->Form->CategoryDropDown('CategoryID', array(
                'Value' => GetValue('ModerationCategoryID', $this->Data),
-               'IncludeNull' => 'Everything'))
+               'IncludeNull' => T('Everything')))
       ).' '.Anchor(T('Filter'), '#', array('class' => 'FilterButton SmallButton')), 'div');
    }
 ?></div>

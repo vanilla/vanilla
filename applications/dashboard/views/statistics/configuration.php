@@ -75,6 +75,6 @@
    <div class="ConfigurationHelp">
       <strong><?php echo T("About Vanilla Statistics"); ?></strong>
       <p><?php echo T("About.VanillaStatistics", "It is vitally important to the life of this free, open-source software that we accurately measure the reach and effectiveness of Vanilla. We ask that you please do not disable the reporting of this data."); ?></p>
-      <p><?php echo T("About.DisableStatistics", "If you must disable this data reporting for some business reason, you can do so by adding the following line to your installation's configuration file: <code>\$Configuration['Garden']['Analytics']['Enabled'] = FALSE;</code>"); ?></p>
+      <p><?php echo T("About.DisableStatistics", "If you must disable this data reporting for some business reason, you can do so by adding the following line to your installation's configuration file:"); ?> <code>$Configuration['Garden']['Analytics']['Enabled'] = FALSE;</code></p>
    </div>
 </div>

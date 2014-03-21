@@ -236,17 +236,18 @@ class TagModel extends Gdn_Model {
       }
 
       // Select the tags.
-      $tags = $this->SQL->Select('td.DiscussionID, t.TagID, t.Name, t.FullName')
+      $all_tags = $this->SQL->Select('td.DiscussionID, t.TagID, t.Name, t.FullName')
            ->From('TagDiscussion td')
            ->Join('Tag t', 't.TagID = td.TagID')
            ->WhereIn('td.DiscussionID', $ids)
            ->Get()->ResultArray();
 
-      $tags = Gdn_DataSet::Index($tags, 'DiscussionID', array('Unique' => FALSE));
+      $all_tags = Gdn_DataSet::Index($all_tags, 'DiscussionID', array('Unique' => FALSE));
+
       foreach ($data as &$row) {
          $discussionId = val('DiscussionID', $row);
-         if (isset($tags[$discussionId])) {
-            $tags = $tags[$discussionId];
+         if (isset($all_tags[$discussionId])) {
+            $tags = $all_tags[$discussionId];
 
             if ($this->StringTags) {
                $tags = ConsolidateArrayValuesByKey($tags, 'Name');

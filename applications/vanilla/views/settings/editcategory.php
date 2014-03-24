@@ -56,7 +56,7 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Display As', 'DisplayAs');
-         echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions'));
+         echo $this->Form->DropDown('DisplayAs', array('Default' => T('Default'), 'Categories' => T('Categories'), 'Discussions' => T('Discussions')));
       ?>
    </li>
    <li>

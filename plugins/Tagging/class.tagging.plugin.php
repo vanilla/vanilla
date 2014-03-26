@@ -23,7 +23,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.5',
+   'Version' => '1.8.7',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -229,11 +229,22 @@ class TaggingPlugin extends Gdn_Plugin {
    }
 
 
+   /**
+    * Add tag breadcrumbs and tags data if appropriate.
+    *
+    * @param Gdn_Controller $Sender
+    */
    public function Base_Render_Before($Sender) {
-
       // Set breadcrumbs, where relevant.
       $this->setTagBreadcrumbs($Sender->Data);
 
+      if (isset($Sender->Data['Announcements'])) {
+         TagModel::instance()->joinTags($Sender->Data['Announcements']);
+      }
+
+      if (isset($Sender->Data['Discussions'])) {
+         TagModel::instance()->joinTags($Sender->Data['Discussions']);
+      }
    }
 
    /**

@@ -79,12 +79,11 @@ echo $this->Form->Errors();
       <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
    </div>
    <div class="ConfigurationHelp">
-      <p><strong>How to set up Twitter Connect</strong></p>
+      <p><strong><?php echo T('How to set up Twitter Connect'); ?></strong></p>
       <ol>
-         <li>You must register Vanilla with Twitter at: <a href="http://dev.twitter.com/apps/new">http://dev.twitter.com/apps/new</a></li>
-         <li>Set the <strong>Callback URL</strong> by appending &ldquo;/entry/twauthorize&rdquo; to the end of your forum&rsquo;s URL. 
-         (If your forum is at example.com/forum, your Callback URL would be http://example.com/forum/entry/twauthorize).</li>
-         <li>After registering, copy the "Consumer Key" and "Consumer Secret" into the form on this page and click Save.</li>
+         <li><?php echo T('You must register Vanilla with Twitter at:'); ?> <a href="http://dev.twitter.com/apps/new">http://dev.twitter.com/apps/new</a></li>
+         <li><?php echo T('Set the <strong>Callback URL</strong> by appending &ldquo;/entry/twauthorize&rdquo; to the end of your forum&rsquo;s URL. (If your forum is at example.com/forum, your Callback URL would be http://example.com/forum/entry/twauthorize).'); ?></li>
+         <li><?php echo T('After registering, copy the "Consumer Key" and "Consumer Secret" into the form on this page and click Save.'); ?></li>
       </ol>
       <p><?php echo Anchor(Img('/plugins/Twitter/design/help-consumervalues-sm.png', array('style' => 'max-width: 763px;')), '/plugins/Twitter/design/help-consumervalues.png', array('target' => '_blank')); ?></p>
    </div>

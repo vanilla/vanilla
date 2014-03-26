@@ -1,8 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$CancelUrl = '/vanilla/discussions';
-if (C('Vanilla.Categories.Use') && is_object($this->Category))
+
+$CancelUrl = $this->Data('_CancelUrl');
+if (!$CancelUrl) {
+   $CancelUrl = '/vanilla/discussions';
+   if (C('Vanilla.Categories.Use') && is_object($this->Category))
    $CancelUrl = '/vanilla/categories/'.urlencode($this->Category->UrlCode);
+}
 
 ?>
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
@@ -41,12 +45,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       // Note: I need to validate that they have permission in the specified category on the back-end
       // TODO: hide these boxes depending on which category is selected in the dropdown above.
       if ($Session->CheckPermission('Vanilla.Discussions.Announce')) {
-         $Options .= //'<li>'.$this->Form->CheckBox('Announce', T('Announce'), array('value' => '1')).'</li>';
-         
-         '<li><b>'.T('Announce').'</b> '.$this->Form->Radio('Announce', '@'.sprintf(T('In <b>%s.</b>'), T('the category')), array('Value' => '2')).'</li>'.
-         '<li>'.$this->Form->Radio('Announce', '@'.sprintf(T('In <b>%s</b> and recent discussions.'), T('the category')), array('Value' => '1')).'</li>'.
-         '<li>'.$this->Form->Radio('Announce', '@'.T("Don't announce."), array('Value' => '0')).'</li>';
-
+         $Options .= '<li>'.CheckOrRadio('Announce', 'Announce', $this->Data('_AnnounceOptions')).'</li>';
       }
 
 //      if ($Session->CheckPermission('Vanilla.Discussions.Close'))

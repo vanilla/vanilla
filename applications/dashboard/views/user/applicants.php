@@ -48,7 +48,7 @@ $Session = Gdn::Session();
          ?></td>
          <td><?php
          echo Anchor(T('Approve'), '/user/approve/'.$User->UserID.'/'.$Session->TransientKey())
-            .', '.Anchor(T('Decline'), '/user/decline/'.$User->UserID.'/'.$Session->TransientKey());
+            .' '.Anchor(T('Decline'), '/user/decline/'.$User->UserID.'/'.$Session->TransientKey());
          ?></td>
       </tr>
    <?php } ?>

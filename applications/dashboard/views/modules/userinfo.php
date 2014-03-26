@@ -21,7 +21,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       <?php endif; ?>
       
       <?php               
-      if ($this->User->Email && ($this->User->ShowEmail || $Session->CheckPermission('Garden.Moderation.Manage'))) {
+      if ($this->User->Email && ($this->User->ShowEmail || $Session->CheckPermission('Garden.PersonalInfo.View'))) {
          echo '<dt class="Email">'.T('Email').'</dt>
          <dd class="Email" itemprop="email">'.Gdn_Format::Email($this->User->Email).'</dd>';
       }
@@ -50,7 +50,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       <?php 
       endif; 
       
-      if ($Session->CheckPermission('Garden.Moderation.Manage')): ?>
+      if ($Session->CheckPermission('Garden.PersonalInfo.View')): ?>
       <dt class="IP"><?php echo T('Register IP'); ?></dt>
       <dd class="IP"><?php 
          $IP = IPAnchor($this->User->InsertIPAddress);

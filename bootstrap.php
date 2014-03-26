@@ -26,12 +26,12 @@ if (!defined('VANILLA_CONSTANTS'))
    include(PATH_CONF.'/constants.php');
 
 // Make sure a default time zone is set
-if (ini_get('date.timezone') == '')
-   date_default_timezone_set('UTC');
+date_default_timezone_set('UTC');
 
 // Include the core function definitions
 require_once(PATH_LIBRARY_CORE.'/functions.error.php');
 require_once(PATH_LIBRARY_CORE.'/functions.general.php');
+require_once(PATH_LIBRARY_CORE.'/functions.compatibility.php');
 
 // Include and initialize the autoloader
 require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
@@ -95,7 +95,7 @@ foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationN
  * begin installation.
  */
 if (Gdn::Config('Garden.Installed', FALSE) === FALSE && strpos(Gdn_Url::Request(), 'setup') === FALSE) {
-   header('Location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
+   safeHeader('Location: '.Gdn::Request()->Url('dashboard/setup', TRUE));
    exit();
 }
 
@@ -113,6 +113,8 @@ if (file_exists(PATH_CONF.'/bootstrap.late.php'))
 
 if (C('Debug'))
    Debug(TRUE);
+
+Gdn_Cache::Trace(Debug());
 
 /**
  * Factory Services

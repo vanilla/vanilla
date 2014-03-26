@@ -4,7 +4,7 @@
 $Form = $this->Form;
 $Form->InputPrefix = '';
 echo  $Form->Open(array('action' => Url('/search'), 'method' => 'get')),
-   '<div class="SiteSearch">',
+   '<div class="SiteSearch InputAndButton">',
    $Form->TextBox('Search'),
    $Form->Button('Search', array('Name' => '')),
    '</div>',
@@ -13,11 +13,5 @@ echo  $Form->Open(array('action' => Url('/search'), 'method' => 'get')),
 ?>
 </div>
 <?php
-if (!is_array($this->SearchResults) || count($this->SearchResults) == 0) {
-   echo '<p class="NoResults">', sprintf(T('No results for %s.', 'No results for <b>%s</b>.'), htmlspecialchars($this->SearchTerm)), '</p>';
-} else {
-   echo $this->Pager->ToString('less');
-   $ViewLocation = $this->FetchViewLocation('results');
+$ViewLocation = $this->FetchViewLocation('results');
    include($ViewLocation);
-   $this->Pager->Render();
-}

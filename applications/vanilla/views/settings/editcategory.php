@@ -11,12 +11,11 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Name');
       ?>
    </li>
-   <?php if ($this->Category->AllowDiscussions) { ?>
    <li id="UrlCode">
 		<?php
 		echo Wrap(T('Category Url:'), 'strong');
 		echo ' ';
-		echo Gdn::Request()->Url('category', TRUE);
+		echo Gdn::Request()->Url('categories', TRUE);
 		echo '/';
 		echo Wrap(htmlspecialchars($this->Form->GetValue('UrlCode')));
 		echo $this->Form->TextBox('UrlCode');
@@ -25,7 +24,6 @@ echo $this->Form->Errors();
 		echo Anchor(T('OK'), '#', 'Save SmallButton');
 		?>
    </li>
-   <?php } ?>
    <li>
       <?php
          echo $this->Form->Label('Description', 'Description');
@@ -57,9 +55,22 @@ echo $this->Form->Errors();
    ?>
    <li>
       <?php
+         echo $this->Form->Label('Display As', 'DisplayAs');
+         echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions'));
+      ?>
+   </li>
+   <li>
+      <?php
       echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
       ?>
    </li>
+   <?php if ($this->ShowCustomPoints): ?>
+   <li>
+      <?php
+      echo $this->Form->CheckBox('CustomPoints', 'Track points for this category separately.');
+      ?>
+   </li>
+   <?php endif; ?>
    <li>
       <?php
       echo $this->Form->CheckBox('Archived', 'This category is archived.');
@@ -69,16 +80,26 @@ echo $this->Form->Errors();
    <li>
       <?php
 		if(count($this->PermissionData) > 0) {
-         if (!$this->Category->AllowDiscussions) {
-            echo T('This is a parent category that does not allow discussions.');
-         } else {
-            echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
-
-            echo '<div class="CategoryPermissions">';
-            echo T('Check all permissions that apply for each role');
-            echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
+         echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
+         
+         echo '<div class="CategoryPermissions">';
+         
+         if (count($this->Data('DiscussionTypes')) > 1) {
+            echo '<div class="P DiscussionTypes">';
+            echo $this->Form->Label('Discussion Types');
+            foreach ($this->Data('DiscussionTypes') as $Type => $Row) {
+               echo $this->Form->CheckBox("AllowedDiscussionTypes[]", GetValue('Plural', $Row, $Type), array('value' => $Type));
+            }
             echo '</div>';
          }
+         
+         echo $this->Form->Simple(
+            $this->Data('_PermissionFields', array()),
+         array('Wrap' => array('', ''), 'ItemWrap' => array('<div class="P">', '</div>')));
+
+         echo T('Check all permissions that apply for each role');
+         echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
+         echo '</div>';
 		}
       ?>
    </li>

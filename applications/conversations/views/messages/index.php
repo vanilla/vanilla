@@ -1,8 +1,20 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1 class="H"><?php echo $this->Participants; ?></h1>
+<div class="DataListWrap">
+<h1 class="H">
+   <?php
+   echo $this->Participants;
+   
+   if ($this->Data('Conversation.Subject')) {
+      echo 
+         Bullet(' ').
+         '<span class="Gloss">' .htmlspecialchars($this->Data('Conversation.Subject')).'</span>';
+   }
+   ?>
+</h1>
 <?php
-if ($this->Data('Conversation.Subject') && C('Conversations.Subjects.Visible')) {
-   echo '<h2>'.htmlspecialchars($this->Data('Conversation.Subject')).'</h2>';
+
+if ($this->Data('Conversation.Type')) {
+   $this->FireEvent('Conversation'.str_replace('_', '', $this->Data('Conversation.Type')));
 }
 
 if ($this->Data('_HasDeletedUsers')) {
@@ -17,6 +29,7 @@ echo $this->Pager->ToString('less');
    include($MessagesViewLocation);
    ?>
 </ul>
+</div>
 <?php 
-echo $this->Pager->ToString(); 
+echo $this->Pager->ToString();
 echo Gdn::Controller()->FetchView('addmessage');

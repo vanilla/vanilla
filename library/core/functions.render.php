@@ -37,8 +37,17 @@ if (!function_exists('BigPlural')) {
 }
 
 if (!function_exists('Bullet')):
-   function Bullet() {
-      return '<span class="Bullet">&bull;</span>';
+   /**
+    * Return a bullet character in html.
+    * @param string $Pad A string used to pad either side of the bullet.
+    * @return string
+    * 
+    * @changes
+    *    2.2 Added the $Pad parameter.
+    */
+   function Bullet($Pad = '') {
+      //·
+      return $Pad.'<span class="Bullet">&middot;</span>'.$Pad;
    }
 endif;
 
@@ -158,9 +167,15 @@ if (!function_exists('Category')):
 /**
  * Get the current category on the page.
  * @param int $Depth The level you want to look at.
+ * @param array $Category 
  */
-function Category($Depth = NULL) {
-   $Category = Gdn::Controller()->Data('Category');
+function Category($Depth = NULL, $Category = NULL) {
+   if (!$Category) {
+      $Category = Gdn::Controller()->Data('Category');
+   } elseif (!is_array($Category)) {
+      $Category = CategoryModel::Categories($Category);
+   }
+   
    if (!$Category) {
       $Category = Gdn::Controller()->Data('CategoryID');
       if ($Category)
@@ -258,6 +273,8 @@ function CssClass($Row, $InList = TRUE) {
    // Category list classes
    if (array_key_exists('UrlCode', $Row))
       $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
+   if (GetValue('CssClass', $Row))
+      $CssClass .= ' Item-'.$Row['CssClass'];
 
    if (array_key_exists('Depth', $Row))
       $CssClass .= " Depth{$Row['Depth']} Depth-{$Row['Depth']}";
@@ -314,6 +331,35 @@ function CssClass($Row, $InList = TRUE) {
 
    return trim($CssClass);
 }
+endif;
+
+if (!function_exists('DateUpdated')):
+
+function DateUpdated($Row, $Wrap = NULL) {
+   $Result = '';
+   $DateUpdated = GetValue('DateUpdated', $Row);
+   $UpdateUserID = GetValue('UpdateUserID', $Row);
+   
+   if ($DateUpdated) {
+      $Result = '';
+      
+      $UpdateUser = Gdn::UserModel()->GetID($UpdateUserID);
+      if ($UpdateUser)
+         $Title = sprintf(T('Edited %s by %s.'), Gdn_Format::DateFull($DateUpdated), GetValue('Name', $UpdateUser));
+      else
+         $Title = sprintf(T('Edited %s.'), Gdn_Format::DateFull($DateUpdated));
+      
+      $Result = ' <span title="'.htmlspecialchars($Title).'" class="DateUpdated">'.
+              sprintf(T('edited %s'), Gdn_Format::Date($DateUpdated)).
+              '</span> ';
+      
+      if ($Wrap)
+         $Result = $Wrap[0].$Result.$Wrap[1];
+   }
+   
+   return $Result;
+}
+   
 endif;
 
 /**
@@ -476,7 +522,7 @@ if (!function_exists('Img')) {
       if ($Attributes == '')
          $Attributes = array();
 
-      if ($Image != '' && substr($Image, 0, 7) != 'http://' && substr($Image, 0, 8) != 'https://')
+      if (!IsUrl($Image))
          $Image = SmartAsset($Image, $WithDomain);
 
       return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
@@ -566,6 +612,98 @@ if (!function_exists('PluralTranslate')) {
    }
 }
 
+if (!function_exists('SearchExcerpt')):
+   
+function SearchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
+   if (empty($SearchTerms))
+      return substrWord($PlainText, 0, $Length);
+   
+   if (is_string($SearchTerms))
+      $SearchTerms = preg_split('`[\s|-]+`i', $SearchTerms);
+   
+   // Split the string into lines.
+   $Lines = explode("\n", $PlainText);
+   // Find the first line that includes a search term.
+   foreach ($Lines as $i => &$Line) {
+      $Line = trim($Line);
+      if (!$Line)
+         continue;
+      
+      foreach ($SearchTerms as $Term) {
+         if (!$Term)
+            continue;
+         
+         if (($Pos = mb_stripos($Line, $Term)) !== FALSE) {
+            $Line = substrWord($Line, $Term, $Length);
+            
+//            if ($Pos + mb_strlen($Term) > $Length) {
+//               $St = -(strlen($Line) - ($Pos - $Length / 4));
+//               $Pos2 = strrpos($Line, ' ', $St);
+//               if ($Pos2 !== FALSE)
+//                  $Line = '…'.substrWord($Line, $Pos2, $Length, "!!!");
+//               else
+//                  $Line = '…!'.mb_substr($Line, $St, $Length);
+//            } else {
+//               $Line = substrWord($Line, 0, $Length, '---');
+//            }
+            
+            return MarkString($SearchTerms, $Line);
+         }
+      }
+   }
+   
+   // No line was found so return the first non-blank line.
+   foreach ($Lines as $Line) {
+      if ($Line)
+         return SliceString($Line, $Length);
+   }
+}
+
+function substrWord($str, $start, $length, $fix = '…') {
+   // If we are offsetting on a word then find it.
+   if (is_string($start)) {
+      $pos = mb_stripos($str, $start);
+      
+      $p = $pos + strlen($start);
+      
+      if ($pos !== false && (($pos + strlen($start)) <= $length))
+         $start = 0;
+      else
+         $start = $pos - $length / 4;
+   }
+   
+   // Find the word break from the offset.
+   if ($start > 0) {
+      $pos = mb_strpos($str, ' ', $start);
+      if ($pos !== false)
+         $start = $pos;
+   } elseif ($start < 0) {
+      $pos = mb_strrpos($str, ' ', $start);
+      if ($pos !== false)
+         $start = $pos;
+      else
+         $start = 0;
+   }
+   
+   $len = strlen($str);
+   
+   if ($start + $length > $len) {
+      if ($length - $start <= 0)
+         $start = 0;
+      else {
+         // Zoom the offset back a bit.
+         $pos = mb_strpos($str, ' ', max(0, $len - $length));
+         if ($pos === false)
+            $pos = $len - $length;
+      }
+   }
+   
+   $result = mb_substr($str, $start, $length);
+   return $result;
+}
+
+endif;
+
 /**
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
@@ -591,17 +729,19 @@ if (!function_exists('UserAnchor')) {
           'class' => $CssClass,
           'rel' => GetValue('Rel', $Options)
           );
+      if (isset($Options['title']))
+         $Attributes['title'] = $Options['title'];
       $UserUrl = UserUrl($User,$Px);
       return '<a href="'.htmlspecialchars(Url($UserUrl)).'"'.Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
 
-/**
- * Takes an object & prefix value, and converts it to a user object that can be
- * used by UserAnchor() && UserPhoto() to write out anchors to the user's
- * profile. The object must have the following fields: UserID, Name, Photo.
- */
 if (!function_exists('UserBuilder')) {
+   /**
+    * Takes an object & prefix value, and converts it to a user object that can be
+    * used by UserAnchor() && UserPhoto() to write out anchors to the user's
+    * profile. The object must have the following fields: UserID, Name, Photo.
+    */
    function UserBuilder($Object, $UserPrefix = '') {
 		$Object = (object)$Object;
       $User = new stdClass();
@@ -618,10 +758,13 @@ if (!function_exists('UserBuilder')) {
    }
 }
 
-/**
- * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
- */
 if (!function_exists('UserPhoto')) {
+   /**
+    * Takes a user object, and writes out an anchor of the user's icon to the user's profile.
+    * 
+    * @param object|array $User User object or array
+    * @param array $Options 
+    */
    function UserPhoto($User, $Options = array()) {
       if (is_string($Options))
          $Options = array('LinkClass' => $Options);
@@ -653,8 +796,8 @@ if (!function_exists('UserPhoto')) {
       $Name = GetValue('Name', $User);
       $Title = htmlspecialchars(GetValue('Title', $Options, $Name));
       
-      if ($FullUser['Banned']) {
-         $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
+      if ($FullUser && $FullUser['Banned']) {
+         $Photo = C('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');;
          $Title .= ' ('.T('Banned').')';
       }
       
@@ -662,7 +805,7 @@ if (!function_exists('UserPhoto')) {
          $Photo = UserPhotoDefaultUrl($User, $ImgClass);
 
       if ($Photo) {
-         if (!isUrl($Photo, '//')) {
+         if (!isUrl($Photo)) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
             $PhotoUrl = $Photo;
@@ -677,9 +820,38 @@ if (!function_exists('UserPhoto')) {
    }
 }
 
+if (!function_exists('UserPhotoUrl')) {
+   /**
+    * Takes a user object an returns the URL to their photo
+    * 
+    * @param object|array $User
+    */
+   function UserPhotoUrl($User) {
+      $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
+      $Photo = GetValue('Photo', $User);
+      if ($FullUser && $FullUser['Banned']) {
+         $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
+      }
+      
+      if (!$Photo && function_exists('UserPhotoDefaultUrl'))
+         $Photo = UserPhotoDefaultUrl($User, $ImgClass);
+      
+      if ($Photo) {
+         if (!isUrl($Photo)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+         } else {
+            $PhotoUrl = $Photo;
+         }
+         return $PhotoUrl;
+      }
+      return '';
+   }
+}
+
 if (!function_exists('UserUrl')) {
    /**
     * Return the url for a user.
+    * 
     * @param array|object $User The user to get the url for.
     * @param string $Px The prefix to apply before fieldnames. @since 2.1
     * @param string $Method Optional. ProfileController method to target.
@@ -770,6 +942,16 @@ if (!function_exists('RegisterUrl')) {
 
 if (!function_exists('SignInUrl')) {
    function SignInUrl($Target = '') {
+      // See if there is a default authentication provider.
+//      $Provider = Gdn_AuthenticationProviderModel::GetDefault();
+//      if ($Provider) {
+//         $SignInUrl = $Provider['SignInUrl'];
+//         if ($SignInUrl) {
+//            $SignInUrl = str_ireplace('{target}', rawurlencode($Target), $SignInUrl);
+//            return $SignInUrl;
+//         }
+//      }
+         
       return '/entry/signin'.($Target ? '?Target='.urlencode($Target) : '');
    }
 }
@@ -790,8 +972,92 @@ if (!function_exists('SignOutUrl')) {
    }
 }
 
+if (!function_exists('SocialSignInButton')) {
+   function SocialSignInButton($Name, $Url, $Type = 'button', $Attributes = array()) {
+      TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
+      $Title = $Attributes['title'];
+      
+      switch ($Type) {
+         case 'icon':
+            $Result = Anchor('<span class="Icon"></span>',
+               $Url, 'SocialIcon SocialIcon-'.$Name, $Attributes);
+            break;
+         case 'button':
+         default:
+            $Result = Anchor('<span class="Icon"></span><span class="Text">'.$Title.'</span>',
+               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText', $Attributes);
+            break;
+      }
+      
+      return $Result;
+   }
+}
+
 if (!function_exists('Sprite')) {
 	function Sprite($Name, $Type = 'Sprite') {
 		return '<span class="'.$Type.' '.$Name.'"></span>';
 	}
 }
+
+if (!function_exists('WriteReactions')):
+   function WriteReactions($Row) {
+      $Attributes = GetValue('Attributes', $Row);
+      if (is_string($Attributes)) {
+         $Attributes = @unserialize($Attributes);
+         SetValue('Attributes', $Row, $Attributes);
+      }
+
+      Gdn::Controller()->EventArguments['ReactionTypes'] = array();
+
+      if ($ID = GetValue('CommentID', $Row)) {
+         $RecordType = 'comment';
+      } elseif ($ID = GetValue('ActivityID', $Row)) {
+         $RecordType = 'activity';
+      } else {
+         $RecordType = 'discussion';
+         $ID = GetValue('DiscussionID', $Row);
+      }
+      Gdn::Controller()->EventArguments['RecordType'] = $RecordType;
+      Gdn::Controller()->EventArguments['RecordID'] = $ID;
+
+      echo '<div class="Reactions">';
+      Gdn_Theme::BulletRow();
+
+      // Write the flags.
+      static $Flags = NULL, $FlagCodes = NULL;
+      if ($Flags === NULL) {
+         Gdn::Controller()->EventArguments['Flags'] = &$Flags;
+         Gdn::Controller()->FireEvent('Flags');
+      }
+
+      // Allow addons to work with flags
+      Gdn::Controller()->EventArguments['Flags'] = &$Flags;
+      Gdn::Controller()->FireEvent('BeforeFlag');
+
+      if (!empty($Flags) && is_array($Flags)) {
+         echo Gdn_Theme::BulletItem('Flags');
+
+         echo ' <span class="FlagMenu ToggleFlyout">';
+         // Write the handle.
+         echo Anchor(Sprite('ReactFlag', 'ReactSprite').' '.Wrap(T('Flag'), 'span', array('class'=>'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title'=>'Flag'), TRUE);
+         echo Sprite('SpFlyoutHandle', 'Arrow');
+         echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+         foreach ($Flags as $Flag) {
+            if (is_callable($Flag))
+               echo '<li>'.call_user_func($Flag, $Row, $RecordType, $ID).'</li>';
+            else
+               echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
+         }
+         Gdn::Controller()->FireEvent('AfterFlagOptions');
+         echo '</ul>';
+         echo '</span> ';
+      }
+
+      Gdn::Controller()->FireEvent('AfterFlag');
+
+      Gdn::Controller()->FireEvent('AfterReactions');
+      echo '</div>';
+      Gdn::Controller()->FireEvent('Replies');
+   }
+
+endif;

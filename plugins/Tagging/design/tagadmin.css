@@ -1,7 +1,7 @@
 .Tags {
     padding: 0 20px;
 }
-.Tag {
+.TagAdmin {
    border: 1px solid #A5D0E7;
    border-radius: 3px;
    -moz-border-radius: 3px;
@@ -16,34 +16,18 @@
    width: 200px;
    overflow: hidden;
    white-space: nowrap;
-   text-align: right;
+   line-height: 20px;
 }
-.Tag a {
+.TagAdmin a {
    color: #1e79a7;
 }
 
-.Tag-Archived {
-   background: #ddd;
-   color: #666;
-   border-color: #666;
+.TagAdmin a.Delete {
+	font-weight: bold;
+   float: right;
 }
 
-.Tag-Archived a {
-   color: #666;
-}
-
-a.TagName {
-    margin: 0;
-    padding: 4px 0 0 0;
-    display: inline-block;
-    text-align: left;
-    float: left;
-    width: 186px;
-}
-.Tag:hover {
-   background: #f3fcff;
-}
-.Tag .Count {
+.TagAdmin .Count {
    line-height: 1;
    font-size: 80%;
    padding: 0 3px;
@@ -56,14 +40,35 @@ a.TagName {
    margin: 0 0 0 1px;
 }
 
+.TagAdmin:hover {
+   background: #f3fcff;
+}
+
+.Tag-Archived {
+   background: #ddd;
+   color: #666;
+   border-color: #666;
+}
+
+.Tag-Archived a {
+   color: #666;
+}
+
 .Tag-Archived .Count {
    background-color: #666;
    color: #eee;
 }
 
-a.Delete {
-	font-family: arial;
-	font-size: 22px;
-	font-weight: bold;
-   line-height: 1.4;
+.Tag-Special {
+   background: #f2dede;
+   color: #b94a48;
+   border-color: #eed3d7;
+}
+
+.Tag-Special a {
+   color: #b94a48;
+}
+
+.Tag-Special .Count {
+   background: #b94a48;
 }

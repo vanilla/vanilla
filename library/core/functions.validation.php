@@ -22,9 +22,11 @@
  */
 
 if (!function_exists('ValidateCaptcha')) {
-   function ValidateCaptcha($Value) {
-      $CaptchaPrivateKey = Gdn::Config('Garden.Registration.CaptchaPrivateKey', '');
-      $Response = recaptcha_check_answer($CaptchaPrivateKey, ArrayValue('REMOTE_ADDR', $_SERVER, ''), ArrayValue('recaptcha_challenge_field', $_POST, ''), ArrayValue('recaptcha_response_field', $_POST, ''));
+   function ValidateCaptcha($Value = NULL) {
+      require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
+      
+      $CaptchaPrivateKey = C('Garden.Registration.CaptchaPrivateKey', '');
+      $Response = recaptcha_check_answer($CaptchaPrivateKey, Gdn::Request()->IpAddress(), Gdn::Request()->Post('recaptcha_challenge_field', ''), Gdn::Request()->Post('recaptcha_response_field', ''));
       return $Response->is_valid ?  TRUE : 'The reCAPTCHA value was not entered correctly. Please try again.';
    }
 }
@@ -326,6 +328,28 @@ if (!function_exists('ValidateMatch')) {
    function ValidateMatch($Value, $Field, $PostedFields) {
       $MatchValue = ArrayValue($Field->Name.'Match', $PostedFields);
       return $Value == $MatchValue ? TRUE : FALSE;
+   }
+}
+
+if (!function_exists('ValidateMinTextLength')) {
+   function ValidateMinTextLength($Value, $Field, $Post) {
+      if (isset($Post['Format'])) {
+         $Value = Gdn_Format::To($Value, $Post['Format']);
+      }
+      
+      $Value = html_entity_decode(trim(strip_tags($Value)));
+      $MinLength = GetValue('MinLength', $Field, 0);
+      
+      if (function_exists('mb_strlen'))
+         $Diff = $MinLength - mb_strlen($Value, 'UTF-8');
+      else
+         $Diff = $MinLength - strlen($Value);
+         
+      if ($Diff <= 0) {
+         return TRUE;
+      } else {
+         return sprintf(T('ValidateMinLength'), T($Field->Name), $Diff);
+      }
    }
 }
 

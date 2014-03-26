@@ -45,12 +45,15 @@
 .ButtonBar .ButtonOff:hover {
    background-color: white;
 }
-.ButtonBar .ButtonBarBold { background-image: url('images/bold.png'); }
-.ButtonBar .ButtonBarItalic { background-image: url('images/italic.png'); }
-.ButtonBar .ButtonBarUnderline { background-image: url('images/underline.png'); }
-.ButtonBar .ButtonBarStrike { background-image: url('images/strike.png'); }
-.ButtonBar .ButtonBarCode { background-image: url('images/code.png'); }
-.ButtonBar .ButtonBarImage { background-image: url('images/image.png'); }
-.ButtonBar .ButtonBarUrl { background-image: url('images/url.png'); }
-.ButtonBar .ButtonBarQuote { background-image: url('images/quote.png'); }
-.ButtonBar .ButtonBarSpoiler { background-image: url('images/spoiler.png'); }
+.ButtonBar .ButtonWrap {
+   background: transparent url('images/sprites.png') no-repeat 0 0;
+}
+.ButtonBar .ButtonBarBold { background-position: 0px 0px; }
+.ButtonBar .ButtonBarItalic { background-position: 0px -24px; }
+.ButtonBar .ButtonBarUnderline { background-position: 0px -48px; }
+.ButtonBar .ButtonBarStrike { background-position: 0px -72px; }
+.ButtonBar .ButtonBarCode { background-position: 0px -96px; }
+.ButtonBar .ButtonBarImage { background-position: 0px -120px; }
+.ButtonBar .ButtonBarUrl { background-position: 0px -144px; }
+.ButtonBar .ButtonBarQuote { background-position: 0px -168px; }
+.ButtonBar .ButtonBarSpoiler { background-position: 0px -192px; }

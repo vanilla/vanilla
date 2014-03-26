@@ -55,10 +55,12 @@ if (!class_exists('SideMenuModule', FALSE)) {
       private $_HighlightRoute;
    
       public function __construct($Sender = '') {
+         parent::__construct($Sender);
+         
+         $this->_ApplicationFolder = 'dashboard';
          $this->HtmlId = 'SideMenu';
          $this->AutoLinkGroups = TRUE;
          $this->ClearGroups();
-         parent::__construct($Sender);
       }
       
       public function AddLink($Group, $Text, $Url, $Permission = FALSE, $Attributes = array()) {
@@ -108,13 +110,13 @@ if (!class_exists('SideMenuModule', FALSE)) {
          $Session = Gdn::Session();
 
          foreach ($this->Items as $Group => $Item) {
-            if (GetValue('Permission', $Item) && !$Session->CheckPermission($Item['Permission'])) {
+            if (GetValue('Permission', $Item) && !$Session->CheckPermission($Item['Permission'], FALSE)) {
                unset($this->Items[$Group]);
                continue;
             }
 
             foreach ($Item['Links'] as $Key => $Link) {
-               if (GetValue('Permission', $Link) && !$Session->CheckPermission($Link['Permission']))
+               if (GetValue('Permission', $Link) && !$Session->CheckPermission($Link['Permission'], FALSE))
                   unset($this->Items[$Group]['Links'][$Key]);
             }
             // Remove the item if there are no more links.

@@ -11,8 +11,11 @@ if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
 }
 
+$this->FireEvent('AfterPageTitle');
+
 include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
 
+$this->FireEvent('AfterCategorySubtree');
 
 $PagerOptions = array('Wrapper' => '<span class="PagerNub">&#160;</span><div %1$s>%2$s</div>', 'RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
 if ($this->Data('_PagerUrl'))
@@ -20,19 +23,19 @@ if ($this->Data('_PagerUrl'))
 
 echo '<div class="PageControls Top">';
    PagerModule::Write($PagerOptions);
-   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary'));
+   echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
 echo '</div>';
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
 <ul class="DataList Discussions">
-   <?php include($this->FetchViewLocation('discussions')); ?>
+   <?php include($this->FetchViewLocation('discussions', 'Discussions', 'Vanilla')); ?>
 </ul>
 <?php
    
 echo '<div class="PageControls Bottom">';
    PagerModule::Write($PagerOptions);
-   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary'));
+   echo Gdn_Theme::Module('NewDiscussionModule', $this->Data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
 echo '</div>';
 
 } else {

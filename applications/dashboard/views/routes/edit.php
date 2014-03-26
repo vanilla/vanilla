@@ -13,19 +13,18 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Route Expression', 'Route');
-         $Attributes = array();
+         $Attributes = array('class' => 'InputBox WideInput');
          if ($this->Route['Reserved']) {
             //$Attributes['value'] = $this->Route;
             $Attributes['disabled'] = 'disabled';
          }
-         
          echo $this->Form->TextBox('Route', $Attributes);
       ?>
    </li>
    <li>
       <?php
          echo $this->Form->Label('Target', 'Target');
-         echo $this->Form->TextBox('Target');
+         echo $this->Form->TextBox('Target', array('class' => 'InputBox WideInput'));
       ?>
    </li>
    <li>

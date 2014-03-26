@@ -1,0 +1,771 @@
+// Font Vanillicon
+//
+// Vanillicon is the icon font for use on Vanilla Forums and is an extension of
+// the excellent Font Awesome.
+//
+// Authors
+// -----------------------------------------------------------------------------
+// - Todd Burry <todd@vanillaforums.com>
+// - Kasper Isager <kasper@vanillaforums.com>
+//
+// License
+// -----------------------------------------------------------------------------
+// - The Font Vanillicon font is licensed under the SIL OFL 1.1 -
+//   http://scripts.sil.org/OFL
+// - The Font Vanillicon CSS, LESS, and Sass files are licensed under the
+//   MIT License - http://opensource.org/licenses/mit-license.html
+//
+// - All brand icons are trademarks of their respective owners.
+//   The use of these trademarks does not indicate endorsement of the trademark
+//   holder by Vanilla Forums, nor vice versa.
+
+@import "vanillicon-mixins", "vanillicon-icons", "vanillicon-font";
+
+.icon:before {
+   @include icon;
+}
+
+.icon-adjust:before {
+   content: $icon-adjust;
+}
+
+.icon-agree:before {
+   content: $icon-agree;
+}
+
+.icon-align-center:before {
+   content: $icon-align-center;
+}
+
+.icon-align-justify:before {
+   content: $icon-align-justify;
+}
+
+.icon-align-left:before {
+   content: $icon-align-left;
+}
+
+.icon-align-right:before {
+   content: $icon-align-right;
+}
+
+.icon-angry:before {
+   content: $icon-angry;
+}
+
+.icon-archive:before {
+   content: $icon-archive;
+}
+
+.icon-arrow-down:before {
+   content: $icon-arrow-down;
+}
+
+.icon-arrow-left:before {
+   content: $icon-arrow-left;
+}
+
+.icon-arrow-right:before {
+   content: $icon-arrow-right;
+}
+
+.icon-arrow-up:before {
+   content: $icon-arrow-up;
+}
+
+.icon-ban:before {
+   content: $icon-ban;
+}
+
+.icon-bar-chart:before {
+   content: $icon-bar-chart;
+}
+
+.icon-bell:before {
+   content: $icon-bell;
+}
+
+.icon-bold:before {
+   content: $icon-bold;
+}
+
+.icon-bookmark:before {
+   content: $icon-bookmark;
+}
+
+.icon-bookmark-empty:before {
+   content: $icon-bookmark-empty;
+}
+
+.icon-bug:before {
+   content: $icon-bug;
+}
+
+.icon-bullhorn:before {
+   content: $icon-bullhorn;
+}
+
+.icon-bullseye:before {
+   content: $icon-bullseye;
+}
+
+.icon-calendar:before {
+   content: $icon-calendar;
+}
+
+.icon-camera:before {
+   content: $icon-camera;
+}
+
+.icon-caret-down:before {
+   content: $icon-caret-down;
+}
+
+.icon-caret-left:before {
+   content: $icon-caret-left;
+}
+
+.icon-caret-right:before {
+   content: $icon-caret-right;
+}
+
+.icon-caret-up:before {
+   content: $icon-caret-up;
+}
+
+.icon-certificate:before {
+   content: $icon-certificate;
+}
+
+.icon-check:before {
+   content: $icon-check;
+}
+
+.icon-check-empty:before {
+   content: $icon-check-empty;
+}
+
+.icon-check-sign:before {
+   content: $icon-check-sign;
+}
+
+.icon-chevron-down:before {
+   content: $icon-chevron-down;
+}
+
+.icon-chevron-left:before {
+   content: $icon-chevron-left;
+}
+
+.icon-chevron-right:before {
+   content: $icon-chevron-right;
+}
+
+.icon-chevron-sign-down:before {
+   content: $icon-chevron-sign-down;
+}
+
+.icon-chevron-sign-left:before {
+   content: $icon-chevron-sign-left;
+}
+
+.icon-chevron-sign-right:before {
+   content: $icon-chevron-sign-right;
+}
+
+.icon-chevron-sign-up:before {
+   content: $icon-chevron-sign-up;
+}
+
+.icon-chevron-up:before {
+   content: $icon-chevron-up;
+}
+
+.icon-circle:before {
+   content: $icon-circle;
+}
+
+.icon-circle-blank:before {
+   content: $icon-circle-blank;
+}
+
+.icon-cloud:before {
+   content: $icon-cloud;
+}
+
+.icon-cloud-download:before {
+   content: $icon-cloud-download;
+}
+
+.icon-cloud-upload:before {
+   content: $icon-cloud-upload;
+}
+
+.icon-code:before {
+   content: $icon-code;
+}
+
+.icon-cog:before {
+   content: $icon-cog;
+}
+
+.icon-cogs:before {
+   content: $icon-cogs;
+}
+
+.icon-collapse:before {
+   content: $icon-collapse;
+}
+
+.icon-collapse-top:before {
+   content: $icon-collapse-top;
+}
+
+.icon-comment:before {
+   content: $icon-comment;
+}
+
+.icon-comments:before {
+   content: $icon-comments;
+}
+
+.icon-compass:before {
+   content: $icon-compass;
+}
+
+.icon-compose:before {
+   content: $icon-compose;
+}
+
+.icon-crown:before {
+   content: $icon-crown;
+}
+
+.icon-dashboard:before {
+   content: $icon-dashboard;
+}
+
+.icon-discussion:before {
+   content: $icon-discussion;
+}
+
+.icon-dot-circle:before {
+   content: $icon-dot-circle;
+}
+
+.icon-dropbox:before {
+   content: $icon-dropbox;
+}
+
+.icon-edit:before {
+   content: $icon-edit;
+}
+
+.icon-edit-sign:before {
+   content: $icon-edit-sign;
+}
+
+.icon-ellipsis:before {
+   content: $icon-ellipsis;
+}
+
+.icon-exclamation-sign:before {
+   content: $icon-exclamation-sign;
+}
+
+.icon-expand:before {
+   content: $icon-expand;
+}
+
+.icon-external-link:before {
+   content: $icon-external-link;
+}
+
+.icon-eye-close:before {
+   content: $icon-eye-close;
+}
+
+.icon-eye-open:before {
+   content: $icon-eye-open;
+}
+
+.icon-facebook:before {
+   content: $icon-facebook;
+}
+
+.icon-facebook-alt:before {
+   content: $icon-facebook-alt;
+}
+
+.icon-file:before {
+   content: $icon-file;
+}
+
+.icon-file-text:before {
+   content: $icon-file-text;
+}
+
+.icon-filter:before {
+   content: $icon-filter;
+}
+
+.icon-flag:before {
+   content: $icon-flag;
+}
+
+.icon-flame:before {
+   content: $icon-flame;
+}
+
+.icon-folder-close:before {
+   content: $icon-folder-close;
+}
+
+.icon-folder-open:before {
+   content: $icon-folder-open;
+}
+
+.icon-font:before {
+   content: $icon-font;
+}
+
+.icon-frown:before {
+   content: $icon-frown;
+}
+
+.icon-gift:before {
+   content: $icon-gift;
+}
+
+.icon-github:before {
+   content: $icon-github;
+}
+
+.icon-globe:before {
+   content: $icon-globe;
+}
+
+.icon-google-plus:before {
+   content: $icon-google-plus;
+}
+
+.icon-google-plus-alt:before {
+   content: $icon-google-plus-alt;
+}
+
+.icon-group:before {
+   content: $icon-group;
+}
+
+.icon-hand-down:before {
+   content: $icon-hand-down;
+}
+
+.icon-hand-left:before {
+   content: $icon-hand-left;
+}
+
+.icon-hand-right:before {
+   content: $icon-hand-right;
+}
+
+.icon-hand-up:before {
+   content: $icon-hand-up;
+}
+
+.icon-heart:before {
+   content: $icon-heart;
+}
+
+.icon-home:before {
+   content: $icon-home;
+}
+
+.icon-inbox:before {
+   content: $icon-inbox;
+}
+
+.icon-indent-left:before {
+   content: $icon-indent-left;
+}
+
+.icon-indent-right:before {
+   content: $icon-indent-right;
+}
+
+.icon-info-sign:before {
+   content: $icon-info-sign;
+}
+
+.icon-italic:before {
+   content: $icon-italic;
+}
+
+.icon-jail:before {
+   content: $icon-jail;
+}
+
+.icon-key:before {
+   content: $icon-key;
+}
+
+.icon-lightbulb:before {
+   content: $icon-lightbulb;
+}
+
+.icon-link:before {
+   content: $icon-link;
+}
+
+.icon-linkedin:before {
+   content: $icon-linkedin;
+}
+
+.icon-linkedin-alt:before {
+   content: $icon-linkedin-alt;
+}
+
+.icon-list-ol:before {
+   content: $icon-list-ol;
+}
+
+.icon-list-ul:before {
+   content: $icon-list-ul;
+}
+
+.icon-lock:before {
+   content: $icon-lock;
+}
+
+.icon-lol:before {
+   content: $icon-lol;
+}
+
+.icon-mail:before {
+   content: $icon-mail;
+}
+
+.icon-mail-open:before {
+   content: $icon-mail-open;
+}
+
+.icon-map-marker:before {
+   content: $icon-map-marker;
+}
+
+.icon-meh:before {
+   content: $icon-meh;
+}
+
+.icon-menu:before {
+   content: $icon-menu;
+}
+
+.icon-minus-sign:before {
+   content: $icon-minus-sign;
+}
+
+.icon-mobile-phone:before {
+   content: $icon-mobile-phone;
+}
+
+.icon-mod:before {
+   content: $icon-mod;
+}
+
+.icon-note:before {
+   content: $icon-note;
+}
+
+.icon-ok:before {
+   content: $icon-ok;
+}
+
+.icon-ok-circle:before {
+   content: $icon-ok-circle;
+}
+
+.icon-ok-sign:before {
+   content: $icon-ok-sign;
+}
+
+.icon-paper-clip:before {
+   content: $icon-paper-clip;
+}
+
+.icon-paragraph:before {
+   content: $icon-paragraph;
+}
+
+.icon-pencil:before {
+   content: $icon-pencil;
+}
+
+.icon-permalink:before {
+   content: $icon-permalink;
+}
+
+.icon-picture:before {
+   content: $icon-picture;
+}
+
+.icon-pinterest:before {
+   content: $icon-pinterest;
+}
+
+.icon-pinterest-alt:before {
+   content: $icon-pinterest-alt;
+}
+
+.icon-play-circle:before {
+   content: $icon-play-circle;
+}
+
+.icon-plus-sign:before {
+   content: $icon-plus-sign;
+}
+
+.icon-poll:before {
+   content: $icon-poll;
+}
+
+.icon-preview:before {
+   content: $icon-preview;
+}
+
+.icon-pushpin:before {
+   content: $icon-pushpin;
+}
+
+.icon-question:before {
+   content: $icon-question;
+}
+
+.icon-question-sign:before {
+   content: $icon-question-sign;
+}
+
+.icon-quote:before {
+   content: $icon-quote;
+}
+
+.icon-refresh:before {
+   content: $icon-refresh;
+}
+
+.icon-remove:before {
+   content: $icon-remove;
+}
+
+.icon-remove-sign:before {
+   content: $icon-remove-sign;
+}
+
+.icon-repeat:before {
+   content: $icon-repeat;
+}
+
+.icon-reply:before {
+   content: $icon-reply;
+}
+
+.icon-reply-all:before {
+   content: $icon-reply-all;
+}
+
+.icon-report:before {
+   content: $icon-report;
+}
+
+.icon-resize-full:before {
+   content: $icon-resize-full;
+}
+
+.icon-resize-small:before {
+   content: $icon-resize-small;
+}
+
+.icon-retweet:before {
+   content: $icon-retweet;
+}
+
+.icon-rss:before {
+   content: $icon-rss;
+}
+
+.icon-search:before {
+   content: $icon-search;
+}
+
+.icon-select:before {
+   content: $icon-select;
+}
+
+.icon-share:before {
+   content: $icon-share;
+}
+
+.icon-shield:before {
+   content: $icon-shield;
+}
+
+.icon-sign-blank:before {
+   content: $icon-sign-blank;
+}
+
+.icon-signin:before {
+   content: $icon-signin;
+}
+
+.icon-signout:before {
+   content: $icon-signout;
+}
+
+.icon-skull:before {
+   content: $icon-skull;
+}
+
+.icon-smile:before {
+   content: $icon-smile;
+}
+
+.icon-source:before {
+   content: $icon-source;
+}
+
+.icon-spam:before {
+   content: $icon-spam;
+}
+
+.icon-star:before {
+   content: $icon-star;
+}
+
+.icon-star-empty:before {
+   content: $icon-star-empty;
+}
+
+.icon-star-half-empty:before {
+   content: $icon-star-half-empty;
+}
+
+.icon-steam:before {
+   content: $icon-steam;
+}
+
+.icon-strikethrough:before {
+   content: $icon-strikethrough;
+}
+
+.icon-subscript:before {
+   content: $icon-subscript;
+}
+
+.icon-superscript:before {
+   content: $icon-superscript;
+}
+
+.icon-table:before {
+   content: $icon-table;
+}
+
+.icon-tag:before {
+   content: $icon-tag;
+}
+
+.icon-tags:before {
+   content: $icon-tags;
+}
+
+.icon-th:before {
+   content: $icon-th;
+}
+
+.icon-th-large:before {
+   content: $icon-th-large;
+}
+
+.icon-th-list:before {
+   content: $icon-th-list;
+}
+
+.icon-thumbs-down:before {
+   content: $icon-thumbs-down;
+}
+
+.icon-thumbs-up:before {
+   content: $icon-thumbs-up;
+}
+
+.icon-ticket:before {
+   content: $icon-ticket;
+}
+
+.icon-time:before {
+   content: $icon-time;
+}
+
+.icon-trash:before {
+   content: $icon-trash;
+}
+
+.icon-troll:before {
+   content: $icon-troll;
+}
+
+.icon-trophy:before {
+   content: $icon-trophy;
+}
+
+.icon-twitter:before {
+   content: $icon-twitter;
+}
+
+.icon-twitter-alt:before {
+   content: $icon-twitter-alt;
+}
+
+.icon-underline:before {
+   content: $icon-underline;
+}
+
+.icon-undo:before {
+   content: $icon-undo;
+}
+
+.icon-unlink:before {
+   content: $icon-unlink;
+}
+
+.icon-unlock:before {
+   content: $icon-unlock;
+}
+
+.icon-user:before {
+   content: $icon-user;
+}
+
+.icon-vcard:before {
+   content: $icon-vcard;
+}
+
+.icon-video:before {
+   content: $icon-video;
+}
+
+.icon-warn:before {
+   content: $icon-warn;
+}
+
+.icon-warning-sign:before {
+   content: $icon-warning-sign;
+}
+
+.icon-wtf:before {
+   content: $icon-wtf;
+}
+
+.icon-zendesk:before {
+   content: $icon-zendesk;
+}
+

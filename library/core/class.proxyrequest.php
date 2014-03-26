@@ -394,7 +394,7 @@ class ProxyRequest {
       if ($this->UseSSL) {
          $this->Action(" Using SSL");
          curl_setopt($Handler, CURLOPT_SSL_VERIFYPEER, !$SSLNoVerify);
-         curl_setopt($Handler, CURLOPT_SSL_VERIFYHOST, !$SSLNoVerify);
+         curl_setopt($Handler, CURLOPT_SSL_VERIFYHOST, $SSLNoVerify ? 0 : 2);
       }
 
       if ($Timeout > 0)
@@ -518,5 +518,17 @@ class ProxyRequest {
       
       return TRUE;
    }
-   
+
+   public function Headers() {
+      return $this->ResponseHeaders;
+   }
+
+   public function Status() {
+      return $this->ResponseStatus;
+   }
+
+   public function Body() {
+      return $this->ResponseBody;
+   }
+
 }

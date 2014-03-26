@@ -7,6 +7,7 @@ echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
 if ($Description = $this->Description()) {
    echo Wrap($Description, 'div', array('class' => 'P PageDescription'));
 }
+$this->FireEvent('AfterPageTitle');
 
 $CatList = '';
 $DoHeadings = C('Vanilla.Categories.DoHeadings');
@@ -72,7 +73,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                      if ($Category->LastTitle != '') {
                         $CatList .= '<span class="MItem LastDiscussionTitle">'.sprintf(
                               T('Most recent: %1$s by %2$s'),
-                              Anchor(SliceString($Category->LastTitle, 40), $Category->LastUrl),
+                              Anchor(Gdn_Format::Text(SliceString($Category->LastTitle, 40)), $Category->LastUrl),
                               UserAnchor($LastComment)
                            ).'</span>'
                            .'<span class="MItem LastCommentDate">'.Gdn_Format::Date($Category->LastDateInserted).'</span>';

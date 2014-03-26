@@ -9,10 +9,10 @@
 
 if (!isset($Drop))
    $Drop = FALSE;
-   
+
 if (!isset($Explicit))
    $Explicit = TRUE;
-   
+
 $SQL = Gdn::Database()->SQL();
 $Construct = Gdn::Database()->Structure();
 $Px = $Construct->DatabasePrefix();
@@ -40,7 +40,9 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('CssClass', 'varchar(50)', TRUE)
    ->Column('Photo', 'varchar(255)', TRUE)
    ->Column('PermissionCategoryID', 'int', '-1') // default to root.
+   ->Column('PointsCategoryID', 'int', '0') // default to global.
    ->Column('HideAllDiscussions', 'tinyint(1)', '0')
+   ->Column('DisplayAs', array('Categories', 'Discussions', 'Default'), 'Default')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')
@@ -48,6 +50,8 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('LastCommentID', 'int', NULL)
    ->Column('LastDiscussionID', 'int', NULL)
    ->Column('LastDateInserted', 'datetime', NULL)
+   ->Column('AllowedDiscussionTypes', 'varchar(255)', NULL)
+   ->Column('DefaultDiscussionType', 'varchar(10)', NULL)
    ->Set($Explicit, $Drop);
 
 $RootCategoryInserted = FALSE;
@@ -85,7 +89,7 @@ $Construct
    ->PrimaryKey('DiscussionID')
    ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
-   ->Column('CategoryID', 'int', FALSE, array('key', 'index.CategoryPages'))
+   ->Column('CategoryID', 'int', FALSE, array('index.CategoryPages', 'index.CategoryInserted'))
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('FirstCommentID', 'int', TRUE)
@@ -93,14 +97,14 @@ $Construct
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
-   ->Column('Tags', 'varchar(255)', NULL)
+   ->Column('Tags', 'text', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('CountBookmarks', 'int', NULL)
    ->Column('CountViews', 'int', '1')
    ->Column('Closed', 'tinyint(1)', '0')
    ->Column('Announce', 'tinyint(1)', '0')
    ->Column('Sink', 'tinyint(1)', '0')
-   ->Column('DateInserted', 'datetime', FALSE, 'index')
+   ->Column('DateInserted', 'datetime', FALSE, array('index', 'index.CategoryInserted'))
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
@@ -108,8 +112,13 @@ $Construct
 	->Column('LastCommentUserID', 'int', TRUE)
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
-   ->Column('RegardingID', 'int(11)', TRUE, 'index')
+   ->Column('RegardingID', 'int(11)', TRUE, 'index');
    //->Column('Source', 'varchar(20)', TRUE)
+
+if (C('Vanilla.QueueNotifications'))
+   $Construct->Column('Notified', 'tinyint', ActivityModel::SENT_ARCHIVE);
+
+$Construct
    ->Set($Explicit, $Drop);
 
 if ($DiscussionExists && !$FirstCommentIDExists) {
@@ -124,17 +133,21 @@ $Construct->Table('UserCategory')
    ->Column('DateMarkedRead', 'datetime', NULL)
    ->Column('Unfollow', 'tinyint(1)', 0)
    ->Set($Explicit, $Drop);
-   
+
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
-$Construct->Table('UserDiscussion')
-   ->Column('UserID', 'int', FALSE, 'primary')
+$Construct->Table('UserDiscussion');
+
+$ParticipatedExists = $Construct->ColumnExists('Participated');
+
+$Construct->Column('UserID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, array('primary', 'key'))
 	->Column('Score', 'float', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Column('Dismissed', 'tinyint(1)', '0') // relates to dismissed announcements
    ->Column('Bookmarked', 'tinyint(1)', '0')
+   ->Column('Participated', 'tinyint(1)', '0') // whether or not the user has participated in the discussion.
    ->Set($Explicit, $Drop);
 
 $Construct->Table('Comment');
@@ -144,7 +157,9 @@ if ($Construct->TableExists())
 else
    $CommentIndexes = array();
 
-$Construct->PrimaryKey('CommentID')
+$Construct
+   ->Table('Comment')
+   ->PrimaryKey('CommentID')
 	->Column('DiscussionID', 'int', FALSE, 'index.1')
    //->Column('Type', 'varchar(10)', TRUE)
    //->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
@@ -171,6 +186,19 @@ if (isset($CommentIndexes['FK_Comment_DateInserted'])) {
    $Construct->Query("drop index FK_Comment_DateInserted on {$Px}Comment");
 }
 
+// Update the participated flag.
+if (!$ParticipatedExists) {
+   $SQL->Update('UserDiscussion ud')
+      ->Join('Discussion d', 'ud.DiscussionID = d.DiscussionID and ud.UserID = d.InsertUserID')
+      ->Set('ud.Participated', 1)
+      ->Put();
+
+   $SQL->Update('UserDiscussion ud')
+      ->Join('Comment d', 'ud.DiscussionID = d.DiscussionID and ud.UserID = d.InsertUserID')
+      ->Set('ud.Participated', 1)
+      ->Put();
+}
+
 // Allows the tracking of already-read comments & votes on a per-user basis.
 $Construct->Table('UserComment')
    ->Column('UserID', 'int', FALSE, 'primary')
@@ -178,7 +206,7 @@ $Construct->Table('UserComment')
    ->Column('Score', 'float', NULL)
    ->Column('DateLastViewed', 'datetime', NULL) // null signals never
    ->Set($Explicit, $Drop);
-   
+
 // Add extra columns to user table for tracking discussions & comments
 $Construct->Table('User')
    ->Column('CountDiscussions', 'int', NULL)
@@ -222,7 +250,7 @@ if ($SQL->GetWhere('ActivityType', array('Name' => 'NewDiscussion'))->NumRows() 
 // X commented on a discussion.
 if ($SQL->GetWhere('ActivityType', array('Name' => 'NewComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'NewComment', 'FullHeadline' => '%1$s commented on a discussion.', 'ProfileHeadline' => '%1$s commented on a discussion.', 'RouteCode' => 'discussion', 'Public' => '0'));
-   
+
 // People's comments on discussions
 if ($SQL->GetWhere('ActivityType', array('Name' => 'DiscussionComment'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s commented on %4$s %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
@@ -276,7 +304,7 @@ $PermissionModel->Undefine('Vanilla.Spam.Manage');
 if ($RootCategoryInserted) {
    // Get the root category so we can assign permissions to it.
    $GeneralCategoryID = -1; //$SQL->GetWhere('Category', array('Name' => 'General'))->Value('PermissionCategoryID', 0);
-   
+
    // Set the initial guest permissions.
    $PermissionModel->Save(array(
       'Role' => 'Guest',
@@ -301,7 +329,7 @@ if ($RootCategoryInserted) {
       'JunctionID' => $GeneralCategoryID,
       'Vanilla.Discussions.View' => 1
       ), TRUE);
-   
+
    // Set the intial member permissions.
    $PermissionModel->Save(array(
       'Role' => 'Member',
@@ -312,7 +340,7 @@ if ($RootCategoryInserted) {
       'Vanilla.Discussions.View' => 1,
       'Vanilla.Comments.Add' => 1
       ), TRUE);
-      
+
    $PermissionModel->Save(array(
       'Role' => 'Moderator',
       'JunctionTable' => 'Category',
@@ -329,7 +357,7 @@ if ($RootCategoryInserted) {
       'Vanilla.Comments.Edit' => 1,
       'Vanilla.Comments.Delete' => 1
       ), TRUE);
-      
+
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
       'JunctionTable' => 'Category',
@@ -432,3 +460,12 @@ if (!$LastDiscussionIDExists) {
       ->Set('c.LastDiscussionID', 'cm.DiscussionID', FALSE, FALSE)
       ->Put();
 }
+
+// Add stub content
+include(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'stub.php');
+
+// Set current Vanilla.Version
+$ApplicationInfo = array();
+include(CombinePaths(array(PATH_APPLICATIONS . DS . 'vanilla' . DS . 'settings' . DS . 'about.php')));
+$Version = ArrayValue('Version', ArrayValue('Vanilla', $ApplicationInfo, array()), 'Undefined');
+SaveToConfig('Vanilla.Version', $Version);

@@ -16,7 +16,7 @@
       <li>
          <?php
             echo $this->Form->Label('Category to Use', 'Plugins.Flagging.CategoryID');
-            echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', C('Plugins.Flagging.CategoryID'));
+            echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', array('Value' => C('Plugins.Flagging.CategoryID')));
          ?>
       </li>
    </ul>
@@ -30,7 +30,10 @@
    if (!$NumFlaggedItems) {
       echo T('FlagQueueEmpty', "There are no items awaiting moderation at this time.");
    } else {
-      echo $NumFlaggedItems." ".Plural($NumFlaggedItems,"item","items")." in queue\n";
+      echo sprintf(
+         T('Flagging queue counter', '%s in queue.'),
+         Plural($NumFlaggedItems, '%s post', '%s posts')
+      );
       foreach ($this->FlaggedItems as $URL => $FlaggedList) {
 ?>
             <div class="FlaggedItem">
@@ -75,7 +78,7 @@
                ?>
                         <div class="FlaggedOtherCell">
                            <div class="FlaggedItemInfo"><?php echo T('On').' '.$Flag['DateInserted'].', <strong>'.Anchor($Flag['InsertName'],"profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}").'</strong> '.T('said:'); ?></div>
-                           <div class="FlaggedItemComment">"<?php echo $Flag['Comment']; ?>"</div>
+                           <div class="FlaggedItemComment">"<?php echo Gdn_Format::Text($Flag['Comment']); ?>"</div>
                         </div>
                <?php
                      }

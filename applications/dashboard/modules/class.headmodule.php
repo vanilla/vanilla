@@ -403,7 +403,7 @@ if (!class_exists('HeadModule', FALSE)) {
                   $TagString .= '<!--[if !IE]> -->';
                   
                // Build tag
-               $TagString .= '<'.$Tag.Attribute($Attributes, '_');
+               $TagString .= '  <'.$Tag.Attribute($Attributes, '_');
                if (array_key_exists(self::CONTENT_KEY, $Attributes))
                   $TagString .= '>'.$Attributes[self::CONTENT_KEY].'</'.$Tag.'>';
                elseif ($Tag == 'script') {

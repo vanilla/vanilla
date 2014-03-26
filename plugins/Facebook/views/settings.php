@@ -44,7 +44,7 @@ input.CopyInput {
    width: 280px;
 }
 #Form_ApplicationID {
-   width: 280px;  
+   width: 280px;
 }
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
@@ -82,6 +82,11 @@ echo $this->Form->Errors();
          </li>
          <li>
             <?php
+               echo $this->Form->CheckBox('SocialSignIn', 'Enable Social Sign In');
+            ?>
+         </li>
+         <li>
+            <?php
                echo $this->Form->CheckBox('SocialReactions', "Enable Social Reactions.");
             ?>
          </li>
@@ -95,14 +100,15 @@ echo $this->Form->Errors();
    </div>
    <div class="ConfigurationHelp">
       <strong>How to set up Facebook Connect</strong>
-      <p>In order to set up Facebook Connect, you must create an "application" in Facebook at: <a href="http://www.facebook.com/developers/apps.php">http://www.facebook.com/developers/apps.php</a></p>
+      <p>In order to set up Facebook Connect, you must create an "application" in Facebook at: <a href="https://developers.facebook.com/apps">https://developers.facebook.com/apps</a></p>
       <p>
          When you create the Facebook application, you can choose what to enter in most fields, but make sure you enter the following value in the "Site Url" field:
          <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>" />
       </p>
       <p>Once your application has been set up, you must copy the "Application ID" and "Application Secret" into the form on this page and click save.</p>
-      <p><?php echo Anchor(Img('/plugins/Facebook/design/help-newapp.png', array('style' => 'max-width: 961px;')), '/plugins/Facebook/design/help-newapp.png', array('target' => '_blank')); ?></p>
+      <strong>Need help?</strong>
+      <p>For a complete walk-through of the steps involved, read <a href="http://blog.vanillaforums.com/facebook-application-for-vanillaforums-sso/">How to Create a Facebook Application for Vanillaforums Single Sign-On (SSO)</a>.</p>
    </div>
 </div>
-<?php 
+<?php
    echo $this->Form->Close();

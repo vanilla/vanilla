@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $EditUser = $Session->CheckPermission('Garden.Users.Edit');
+$ViewPersonalInfo = $Session->CheckPermission('Garden.PersonalInfo.View');
 ?>
 <div class="Help Aside">
    <?php
@@ -42,11 +43,15 @@ $EditUser = $Session->CheckPermission('Garden.Users.Edit');
       <tr>
 <!--         <th class="CheckboxCell"><input id="SelectAll" type="checkbox" /></th>-->
          <th><?php echo Anchor(T('Username'), $this->_OrderUrl('Name')); ?></th>
+         <?php if ($ViewPersonalInfo) : ?>
          <th class="Alt"><?php echo T('Email'); ?></th>
+         <?php endif; ?>
          <th><?php echo T('Roles'); ?></th>
          <th class="Alt"><?php echo Anchor(T('First Visit'), $this->_OrderUrl('DateFirstVisit')); ?></th>
          <th><?php echo Anchor(T('Last Visit'), $this->_OrderUrl('DateLastActive')); ?></th>
+         <?php if ($ViewPersonalInfo) : ?>
          <th><?php echo T('Last IP'); ?></th>
+         <?php endif; ?>
          <?php
          $this->FireEvent('UserCell');
          ?>

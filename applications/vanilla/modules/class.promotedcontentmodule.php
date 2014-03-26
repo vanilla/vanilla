@@ -80,16 +80,21 @@ class PromotedContentModule extends Gdn_Module {
       // Lookup role name -> roleID
       if (is_string($RoleID)) {
          $RoleModel = new RoleModel();
-         $Role = $RoleModel->GetByName($RoleID);
-         if (!$Role) {
-            $RoleID = NULL;
-         } else {
-            $Role = array_shift($Role);
-            $RoleID = GetValue('RoleID', $Role);
+         $Roles = explode(',', $RoleID);
+         $RoleID = array();
+         foreach ($Roles as $TestRoleID) {
+            $TestRoleID = trim($TestRoleID);
+            $Role = $RoleModel->GetByName($TestRoleID);
+            if (!$Role) {
+               continue;
+            } else {
+               $Role = array_shift($Role);
+               $RoleID[] = GetValue('RoleID', $Role);
+            }
          }
       }
       
-      if (!$RoleID) return FALSE;
+      if (empty($RoleID) || !sizeof($RoleID)) return FALSE;
       
       // Check cache
       $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleID}";
@@ -278,7 +283,7 @@ class PromotedContentModule extends Gdn_Module {
          $MinScore = FALSE;
       
       // Check cache
-      $SelectorScoreCacheKey = "modules.promotedcontent.score.{$Score}";
+      $SelectorScoreCacheKey = "modules.promotedcontent.score.{$MinScore}";
       $Content = Gdn::Cache()->Get($SelectorScoreCacheKey);
       
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
@@ -340,7 +345,7 @@ class PromotedContentModule extends Gdn_Module {
       $DiscussionsByID = array();
       foreach ($Discussions as $Discussion)
          $DiscussionsByID[$Discussion['DiscussionID']] = $Discussion;
-      unset($$Discussions);
+      unset($Discussions);
       
       foreach ($Comments as &$Comment) {
          $Comment['Discussion'] = $DiscussionsByID[$Comment['DiscussionID']];
@@ -396,7 +401,7 @@ class PromotedContentModule extends Gdn_Module {
                break;
             
             case 'discussion':
-               $Fields = array_merge($Fields, array('Name'));
+               $Fields = array_merge($Fields, array('Name', 'Type'));
                break;
          }
          

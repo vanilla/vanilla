@@ -240,7 +240,7 @@ textarea.TextBox {
 }
 textarea.TextBox {
 	font-size: 14px;
-   width: 500px;
+   width: 600px;
    height: 100px;
    min-height: 100px;
    max-height: 500px;
@@ -416,16 +416,8 @@ a.Button {
    box-shadow: none !important;
    color: transparent !important;
    text-shadow: none !important;
-}
-.InProgress {
-   color: transparent !Important;
-   background: url('images/progress_sm.gif') center center no-repeat !important;
-   border-color: transparent !important;
-   -moz-box-shadow: none !important;
-   -webkit-box-shadow: none !important;
-   box-shadow: none !important;
-   color: transparent !important;
-   text-shadow: none !important;
+   cursor: progress;
+   pointer-events: none;
 }
 
 div.Padded {
@@ -477,6 +469,9 @@ div.DismissMessage a.Dismiss {
 }
 div.DismissMessage a.Dismiss:hover {
 	color: #ff0084;
+}
+div.Message {
+   padding: 10px;
 }
 .CasualMessage {
    background: #CFECFF;
@@ -1305,7 +1300,7 @@ div.Popup div.Body {
 	text-align: left;
 	position: relative;
 	padding: 0 0 8px 0;
-	max-width: 500px;
+	max-width: 550px;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;

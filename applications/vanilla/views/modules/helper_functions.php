@@ -44,6 +44,8 @@ function WritePromotedContent($Content, $Sender) {
          $ContentURL = DiscussionUrl($Content);
          break;
    }
+   $Sender->EventArgs['Content'] = $Content;
+   $Sender->EventArgs['ContentUrl'] = $ContentURL;
 ?>
    <div id="<?php echo "Promoted_{$ContentType}_{$ContentID}"; ?>" class="<?php echo CssClass($Content); ?>">
       <div class="AuthorWrap">
@@ -69,7 +71,7 @@ function WritePromotedContent($Content, $Sender) {
       </div>
       <div class="Meta CommentMeta CommentInfo">
          <span class="MItem DateCreated">
-            <?php echo Anchor(Gdn_Format::Date($Content['DateInserted'], 'html'), $Permalink, 'Permalink', array('rel' => 'nofollow')); ?>
+            <?php echo Anchor(Gdn_Format::Date($Content['DateInserted'], 'html'), $ContentURL, 'Permalink', array('rel' => 'nofollow')); ?>
          </span>
          <?php
          // Include source if one was set
@@ -80,7 +82,12 @@ function WritePromotedContent($Content, $Sender) {
          ?>
       </div>
       <div class="Title"><?php echo Anchor(Gdn_Format::Text($Content['Name'], FALSE), $ContentURL, 'DiscussionLink'); ?></div>
-      <div class="Body"><?php echo Anchor(strip_tags(Gdn_Format::To($Content['Body'], $Content['Format'])), $ContentURL, 'BodyLink'); ?></div>
+      <div class="Body">
+      <?php
+         echo Anchor(strip_tags(Gdn_Format::To($Content['Body'], $Content['Format'])), $ContentURL, 'BodyLink'); 
+         $Sender->FireEvent('AfterBody'); // seperate event to account for less space.
+      ?>
+      </div>
    </div>
 <?php   
 }

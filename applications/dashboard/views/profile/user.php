@@ -6,7 +6,9 @@ $Session = Gdn::Session();
       echo htmlspecialchars($this->User->Name);
       
       echo '<span class="Gloss">';
+      Gdn_Theme::BulletRow();
       if ($this->User->Title)
+         echo Gdn_Theme::BulletItem('Title');
          echo ' '.Bullet().' '.Wrap(htmlspecialchars($this->User->Title), 'span', array('class' => 'User-Title'));
       
          $this->FireEvent('UsernameMeta');
@@ -14,7 +16,7 @@ $Session = Gdn::Session();
    ?></h1>
    <?php
    if ($this->User->Admin == 2) {
-      echo '<div class="Info">', T('This is a system account and does not represent a real person.'), '</div>';
+      echo '<div class="DismissMessage InfoMessage">', T('This is a system account and does not represent a real person.'), '</div>';
    }
 
    if ($this->User->About != '') {

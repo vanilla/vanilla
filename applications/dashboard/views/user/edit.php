@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php
-   if (is_object($this->User))
+   if ($this->Data('User'))
       echo T('Edit User');
    else
       echo T('Add User');
@@ -18,15 +18,30 @@ if ($this->Data('AllowEditing')) { ?>
       </li>
       <li>
          <?php
+            
             echo $this->Form->Label('Email', 'Email');
             if (UserModel::NoEmail()) {
                echo '<div class="Gloss">',
                   T('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
                   '</div>';
             }
-            echo $this->Form->TextBox('Email');
+            
+            $EmailAttributes = array();
+            
+            // Email confirmation
+            if (!$this->Data('_EmailConfirmed'))
+               $EmailAttributes['class'] = 'InputBox Unconfirmed';
+            
+            echo $this->Form->TextBox('Email', $EmailAttributes);
          ?>
       </li>
+      <?php if ($this->Data('_CanConfirmEmail')): ?>
+      <li class="User-ConfirmEmail">
+         <?php
+            echo $this->Form->CheckBox('ConfirmEmail', T("Email is confirmed"), array('value' => '1'));
+         ?>
+      </li>
+      <?php endif ?>
       <li>
          <?php
             echo $this->Form->CheckBox('ShowEmail', T('Email visible to other users'), array('value' => '1'));
@@ -34,7 +49,7 @@ if ($this->Data('AllowEditing')) { ?>
       </li>
       <li>
          <?php
-            echo $this->Form->CheckBox('Verified', T('This user is verified as a non-spammer'), array('value' => '1'));
+            echo $this->Form->CheckBox('Verified', T('Verified Label', 'Verified. Bypasses spam and pre-moderation filters.'), array('value' => '1'));
          ?>
       </li>
       <li>
@@ -42,29 +57,32 @@ if ($this->Data('AllowEditing')) { ?>
             echo $this->Form->CheckBox('Banned', T('Banned'), array('value' => '1'));
          ?>
       </li>
+      <?php
+      $this->FireEvent('CustomUserFields')
+      ?>
    </ul>
+
+   <?php if (count($this->Data('Roles'))) : ?>
    <h3><?php echo T('Roles'); ?></h3>
    <ul>
       <li>
          <strong><?php echo T('Check all roles that apply to this user:'); ?></strong>
          <?php 
             //echo $this->Form->CheckBoxList("RoleID", $this->RoleData, $this->UserRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); 
-         echo $this->Form->CheckBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); 
+         echo $this->Form->CheckBoxList("RoleID", array_flip($this->Data('Roles')), array_flip($this->Data('UserRoles'))); 
          ?>
       </li>
    </ul>
+   <?php endif; ?>
+
    <h3><?php echo T('Password Options'); ?></h3>
    <ul>
       <li class="PasswordOptions">
          <?php
-            $ResetOptions = array(
-               0 => T('Keep current password.'),
-               'Auto' => T('Force user to reset their password and send email notification.'),
-               'Manual' => T('Manually set user password. No email notification.')
-            );
-            echo $this->Form->RadioList('ResetPassword', $ResetOptions);
+            echo $this->Form->RadioList('ResetPassword', $this->ResetOptions);
          ?>
       </li>
+      <?php if (array_key_exists('Manual', $this->ResetOptions)) : ?>
       <li id="NewPassword">
          <?php
             echo $this->Form->Label('New Password', 'NewPassword');
@@ -77,6 +95,7 @@ if ($this->Data('AllowEditing')) { ?>
             ?>
          </div>
       </li>
+      <?php endif; ?>
    </ul>
 <?php 
 

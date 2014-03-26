@@ -29,6 +29,14 @@
    border: none;
    box-shadow: inset 0 0 2px #999;
 }
+.DebugInfo span {
+   padding: 0 4px;
+   margin: 0 10px;
+   font-family: trebuchet ms;
+   font-size: 12px;
+   font-weight: normal;
+   color: #454545;
+}
 .DebugInfo small {
    padding: 0 4px;
    margin: 0 10px;

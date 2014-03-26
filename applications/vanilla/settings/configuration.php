@@ -47,3 +47,5 @@ $Configuration['Vanilla']['Comment']['ReplaceNewlines']        = TRUE;
 // Module visibility
 $Configuration['Vanilla']['Modules']['ShowBookmarkedModule']    = FALSE;
 
+// Allow users to delete their own comments if are still allowed to edit (per timeout).
+$Configuration['Vanilla']['Comments']['AllowSelfDelete']        = FALSE;

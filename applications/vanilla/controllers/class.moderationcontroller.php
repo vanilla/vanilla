@@ -326,16 +326,23 @@ class ModerationController extends VanillaController {
    /**
     * Form to ask for the destination of the move, confirmation and permission check.
     */
-   public function ConfirmDiscussionMoves() {
+   public function ConfirmDiscussionMoves($DiscussionID = NULL) {
       $Session = Gdn::Session();
       $this->Form = new Gdn_Form();
       $DiscussionModel = new DiscussionModel();
 
       $this->Title(T('Confirm'));
 
-      $CheckedDiscussions = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedDiscussions', array());
-      if (!is_array($CheckedDiscussions))
-         $CheckedDiscussions = array();
+      if ($DiscussionID) {
+         $CheckedDiscussions = (array)$DiscussionID;
+         $ClearSelection = FALSE;
+      } else {
+         $CheckedDiscussions = Gdn::UserModel()->GetAttribute($Session->User->UserID, 'CheckedDiscussions', array());
+         if (!is_array($CheckedDiscussions))
+            $CheckedDiscussions = array();
+         
+         $ClearSelection = TRUE;
+      }
 
       $DiscussionIDs = $CheckedDiscussions;
       $CountCheckedDiscussions = count($DiscussionIDs);
@@ -343,20 +350,22 @@ class ModerationController extends VanillaController {
 
       // Check for edit permissions on each discussion
       $AllowedDiscussions = array();
-      $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, CategoryID')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
-      foreach ($DiscussionData->Result() as $Discussion) {
-         $Category = CategoryModel::Categories($Discussion->CategoryID);
+      $DiscussionData = $DiscussionModel->SQL->Select('DiscussionID, Name, DateLastComment, CategoryID')->From('Discussion')->WhereIn('DiscussionID', $DiscussionIDs)->Get();
+      $DiscussionData = Gdn_DataSet::Index($DiscussionData->ResultArray(), array('DiscussionID'));
+      foreach ($DiscussionData as $DiscussionID => $Discussion) {
+         $Category = CategoryModel::Categories($Discussion['CategoryID']);
          if ($Category && $Category['PermsDiscussionsEdit'])
-            $AllowedDiscussions[] = $Discussion->DiscussionID;
+            $AllowedDiscussions[] = $DiscussionID;
       }
       $this->SetData('CountAllowed', count($AllowedDiscussions));
       $CountNotAllowed = $CountCheckedDiscussions - count($AllowedDiscussions);
       $this->SetData('CountNotAllowed', $CountNotAllowed);
-
+      
       if ($this->Form->AuthenticatedPostBack()) {
          // Retrieve the category id
          $CategoryID = $this->Form->GetFormValue('CategoryID');
          $Category = CategoryModel::Categories($CategoryID);
+         $RedirectLink = $this->Form->GetFormValue('RedirectLink');
 
          // User must have add permission on the target category
          if (!$Category['PermsDiscussionsAdd']) {
@@ -365,14 +374,40 @@ class ModerationController extends VanillaController {
 
          // Iterate and move.
          foreach ($AllowedDiscussions as $DiscussionID) {
+            // Create the shadow redirect.
+            if ($RedirectLink) {
+               $Discussion = GetValue($DiscussionID, $DiscussionData);
+               
+               $DiscussionModel->DefineSchema();
+               $MaxNameLength = GetValue('Length', $DiscussionModel->Schema->GetField('Name'));
+               
+               $RedirectDiscussion = array(
+                     'Name' => SliceString(sprintf(T('Moved: %s'), $Discussion['Name']), $MaxNameLength),
+                     'DateInserted' => $Discussion['DateLastComment'],
+                     'Type' => 'redirect',
+                     'CategoryID' => $Discussion['CategoryID'],
+                     'Body' => FormatString(T('This discussion has been <a href="{url,html}">moved</a>.'), array('url' => DiscussionUrl($Discussion))),
+                     'Format' => 'Html',
+                     'Closed' => TRUE
+                  );
+               $RedirectID = $DiscussionModel->Save($RedirectDiscussion);
+               if (!$RedirectID) {
+                  $this->Form->SetValidationResults($DiscussionModel->ValidationResults());
+                  break;
+               }
+            }
+            
             $DiscussionModel->SetField($DiscussionID, 'CategoryID', $CategoryID);
          }
 
-         // Clear selections
-         Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
-         ModerationController::InformCheckedDiscussions($this);
+         // Clear selections.
+         if ($ClearSelection) {
+            Gdn::UserModel()->SaveAttribute($Session->UserID, 'CheckedDiscussions', FALSE);
+            ModerationController::InformCheckedDiscussions($this);
+         }
          
-         $this->JsonTarget('', '', 'Refresh');
+         if ($this->Form->ErrorCount() == 0)
+            $this->JsonTarget('', '', 'Refresh');
       }
 
       $this->Render();

@@ -1,24 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-/**
- * Setup Controller
- *
- * @package Dashboard
- */
  
 /**
  * Manages installation of Dashboard.
- *
- * @since 2.0.0
- * @package Dashboard
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class SetupController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form', 'Database');
@@ -32,6 +22,7 @@ class SetupController extends DashboardController {
    public function Initialize() {
       $this->Head = new HeadModule($this);
       $this->AddCssFile('setup.css');
+      $this->AddJsFile('jquery.js');
       // Make sure all errors are displayed.
       SaveToConfig('Garden.Errors.MasterView', 'deverror.master.php', array('Save' => FALSE));
    }
@@ -46,6 +37,8 @@ class SetupController extends DashboardController {
     * @access public
     */
    public function Index() {
+      $this->AddJsFile('setup.js');
+      
       $this->ApplicationFolder = 'dashboard';
       $this->MasterView = 'setup';
       // Fatal error if Garden has already been installed.
@@ -106,7 +99,7 @@ class SetupController extends DashboardController {
     * @access public
     * @param string $RedirectUrl Where to send user afterward.
     */
-   public function Configure($RedirectUrl = '') {
+   private function Configure($RedirectUrl = '') {
       // Create a model to save configuration settings
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -230,23 +223,11 @@ class SetupController extends DashboardController {
             include(CombinePaths(array(PATH_APPLICATIONS . DS . 'dashboard' . DS . 'settings' . DS . 'about.php')));
             
             // Detect rewrite abilities
-            try {
-               $Query = ConcatSep('/', Gdn::Request()->Domain(), Gdn::Request()->WebRoot(), 'dashboard/setup');
-               $Results = ProxyHead($Query, array(), 3);
-               $CanRewrite = FALSE;
-               if (in_array(ArrayValue('StatusCode',$Results,404), array(200,302)) && ArrayValue('X-Garden-Version',$Results,'None') != 'None') {
-                  $CanRewrite = TRUE;
-               }
-            } catch (Exception $e) {
-               // cURL and fsockopen arent supported... guess?
-               $CanRewrite = (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) ? TRUE : FALSE;
-            }
+            $CanRewrite = (bool)$this->Form->GetFormValue('RewriteUrls');
       
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
-               //'Garden.WebRoot' => Gdn_Url::WebRoot(),
                'Garden.RewriteUrls' => $CanRewrite,
-               //'Garden.Domain' => $Domain,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HtmLawed' => 'HtmLawed' // Make sure html purifier is enabled so html has a default way of being safely parsed.
@@ -322,5 +303,9 @@ class SetupController extends DashboardController {
       }
 			
       return $this->Form->ErrorCount() == 0 ? TRUE : FALSE;
+   }
+   
+   public function TestUrlRewrites() {
+      die('ok');
    }
 }

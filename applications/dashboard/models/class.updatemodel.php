@@ -35,7 +35,7 @@ class UpdateModel extends Gdn_Model {
             throw new Exception("$Path not found.", 404);
          return FALSE;
       }
-      
+
       $Result = array();
 
       $InfoPaths = array(
@@ -104,7 +104,7 @@ class UpdateModel extends Gdn_Model {
             if (!GetValue('Name', $Info)) {
                $Info['Name'] = $Key;
             }
-            
+
             if (!GetValue('Description', $Info)) {
                $Result[] = $Name.': '.sprintf(T('ValidateRequired'), T('Description'));
                $Valid = FALSE;
@@ -137,7 +137,7 @@ class UpdateModel extends Gdn_Model {
                   break;
                case 'ThemeInfo':
                   $Addon['AddonTypeID'] = ADDON_TYPE_THEME;
-                  break;  
+                  break;
             }
          }
       }
@@ -528,7 +528,7 @@ class UpdateModel extends Gdn_Model {
          $TmpPath = dirname($Path).'/'.basename($Path, '.zip').'/';
       if (file_exists($TmpPath))
          Gdn_FileSystem::RemoveFolder($TmpPath);
-      
+
       $Result = array();
       for ($i = 0; $i < $Zip->numFiles; $i++) {
          $Entry = $Zip->statIndex($i);
@@ -781,7 +781,7 @@ class UpdateModel extends Gdn_Model {
       $Url = $this->AddonSiteUrl.'/addon/getlist.json?ids='.$SlugsString;
       $SiteAddons = ProxyRequest($Url);
       $UpdateAddons = array();
-      
+
       if ($SiteAddons) {
          $SiteAddons = GetValue('Addons', json_decode($SiteAddons, TRUE));
          $UpdateAddons = $this->CompareAddons($MyAddons, $SiteAddons);
@@ -795,12 +795,14 @@ class UpdateModel extends Gdn_Model {
       $Apps = $ApplicationManager->EnabledApplications();
       $AppNames = ConsolidateArrayValuesByKey($Apps, 'Folder');
       $Paths = array();
-      foreach ($Apps as $AppInfo) {
+      foreach ($Apps as $Key => $AppInfo) {
          $Path = PATH_APPLICATIONS."/{$AppInfo['Folder']}/settings/structure.php";
          if (file_exists($Path))
             $Paths[] = $Path;
+
+         Gdn::ApplicationManager()->RegisterPermissions($Key, $this->Validation);
       }
-      
+
       // Execute the structures.
       $Database = Gdn::Database();
       $SQL = Gdn::SQL();
@@ -812,12 +814,24 @@ class UpdateModel extends Gdn_Model {
 
       // Execute the structures for all of the plugins.
       $PluginManager = Gdn::PluginManager();
-      $Plugins = $PluginManager->EnabledPlugins();
-      foreach ($Plugins as $Key => $PluginInfo) {
-         $PluginName = GetValue('Index', $PluginInfo);
-         $Plugin = $PluginManager->GetPluginInstance($PluginName, Gdn_PluginManager::ACCESS_PLUGINNAME);
-         if (method_exists($Plugin, 'Structure'))
-            $Plugin->Structure();
+
+      $Registered = $PluginManager->RegisteredPlugins();
+
+      foreach ($Registered as $ClassName => $Enabled) {
+         if (!$Enabled)
+            continue;
+
+         try {
+            $Plugin = $PluginManager->GetPluginInstance($ClassName, Gdn_PluginManager::ACCESS_CLASSNAME);
+            if (method_exists($Plugin, 'Structure')) {
+               Trace("{$ClassName}->Structure()");
+               $Plugin->Structure();
+            }
+         } catch (Exception $Ex) {
+            // Do nothing, plugin wouldn't load/structure.
+            if (Debug())
+               throw $Ex;
+         }
       }
    }
 }

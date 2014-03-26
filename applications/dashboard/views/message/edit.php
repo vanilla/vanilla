@@ -18,6 +18,13 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php
+         echo $this->Form->Label('Category', 'CategoryID');
+         echo $this->Form->DropDown('CategoryID', $this->Data('Categories'), array('IncludeNull' => T('All Categories')));
+         echo $this->Form->CheckBox('IncludeSubcategories', 'Include Subcategories');
+      ?>
+   </li>
+   <li>
+      <?php
          echo $this->Form->Label('Position', 'AssetTarget');
          echo $this->Form->DropDown('AssetTarget', $this->AssetData);
       ?>

@@ -163,15 +163,6 @@ class DiscussionsController extends VanillaController {
          $this->View = 'discussions';
       }
       
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $this->AddDefinition('SetClientHour', $ClientHour);
-      }
-      
       // We don't want search engines to index these pages because they can go in through the individual categories MUCH faster.
       if ($this->Head)
          $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
@@ -266,15 +257,6 @@ class DiscussionsController extends VanillaController {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
-      }
-      
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $this->AddDefinition('SetClientHour', $ClientHour);
       }
       
       $this->Render();
@@ -476,7 +458,7 @@ class DiscussionsController extends VanillaController {
             $CountBookmarks = Gdn::Session()->User->CountBookmarks;
          } else {
             $UserModel = new UserModel();
-            $User = $UserModel->GetID($ID, DATASET_TYPE_ARRAY);
+            $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
             $CountBookmarks = $User['CountBookmarks'];
          }
 
@@ -552,4 +534,34 @@ class DiscussionsController extends VanillaController {
 		$this->DeliveryType = DELIVERY_TYPE_DATA;
 		$this->Render();
 	}
+
+   /**
+    * Set user preference for sorting discussions.
+    */
+   public function Sort($Target = '') {
+      if (!Gdn::Session()->IsValid())
+         throw PermissionException();
+         
+      if (!$this->Request->IsAuthenticatedPostBack())
+         throw ForbiddenException('GET');
+      
+      // Get param
+      $SortField = Gdn::Request()->Post('DiscussionSort');
+      $SortField = 'd.'.StringBeginsWith($SortField, 'd.', TRUE, TRUE);
+      
+      // Use whitelist here too to keep database clean
+      if (!in_array($SortField, DiscussionModel::AllowedSortFields())) {
+         throw new Gdn_UserException("Unknown sort $SortField.");
+      }
+      
+      // Set user pref
+      Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, 'Discussions.SortField', $SortField);
+      
+      if ($Target)
+         Redirect($Target);
+      
+      // Send sorted discussions.
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->Render();
+   }
 }

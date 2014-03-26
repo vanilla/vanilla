@@ -2,7 +2,7 @@
 <script language="javascript">
    jQuery(document).ready(function($) {
       $('#Form_ReasonText').focus(function() {
-         $('#Form_Reason2').attr('checked', 'checked');
+         $('#Form_Reason2').prop('checked', true);
       });
    });
 </script>
@@ -14,7 +14,7 @@ echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 
-<div class="Warning">
+<div class="DismissMessage WarningMessage">
    <?php
    echo FormatString(T('You are about to ban {User.UserID,user}.'), $this->Data);
    ?>
@@ -26,14 +26,15 @@ echo $this->Form->Errors();
 
 echo '<div class="P">', $this->Form->Radio('Reason', 'Spamming', array('Value' => 'Spam')), '</div>';
 echo '<div class="P">', $this->Form->Radio('Reason', 'Abusive Behavior', array('Value' => 'Abuse')), '</div>';
-echo '<div class="P">', 
+echo '<div class="P">',
    $this->Form->Radio('Reason', 'Other', array('Value' => 'Other')),
    '<div class="TextBoxWrapper">',
    $this->Form->TextBox('ReasonText', array('MultiLine' => TRUE)),
    '</div>',
    '</div>';
 
-echo '<div class="P">', $this->Form->CheckBox('DeleteContent', T("Also delete this user's content.")), '</div>';
+if ($this->Data('_MayDeleteContent'))
+   echo '<div class="P">', $this->Form->CheckBox('DeleteContent', T("Also delete this user's content.")), '</div>';
 
 ?>
 

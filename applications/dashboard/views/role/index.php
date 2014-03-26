@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-$Advanced = C('Garden.Roles.Manage');
+$Advanced = TRUE;
 ?>
 <div class="Help Aside">
    <?php

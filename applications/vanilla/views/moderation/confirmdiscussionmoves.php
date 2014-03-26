@@ -35,6 +35,13 @@ echo Wrap(sprintf(
          echo '</div></p>';
       ?>
    </li>
+   <li>
+      <?php
+         echo '<p>'.
+            $this->Form->CheckBox('RedirectLink', 'Leave a redirect link.'). 
+            '</p>';
+      ?>
+   </li>
 </ul>
 <?php
 echo $this->Form->Close('Move');

@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
          $.ajax({
             url: url,
             type: 'POST',
-            data: {Postback: true },
+            data: {Postback: true, TransientKey: gdn.definition('TransientKey', '') },
             success: function(data) {
                var result = data.Result;
                

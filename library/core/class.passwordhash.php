@@ -113,6 +113,8 @@ class Gdn_PasswordHash extends PasswordHash {
             
             if (md5($Password) == $StoredHash)
                $Result = TRUE;
+            elseif (sha1($Password) == $StoredHash)
+               $Result = TRUE;
             elseif (sha1($StoredSalt.sha1($Password)) == $StoredHash)
                $Result = TRUE;
             else

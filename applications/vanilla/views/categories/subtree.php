@@ -16,7 +16,7 @@ require_once $this->FetchViewLocation('helper_functions', 'categories', 'vanilla
 <ul class="DataList ChildCategoryList">
    <?php
    foreach ($SubCategories as $Row):
-      if (!$Row['PermsDiscussionsView'])
+      if (!$Row['PermsDiscussionsView'] || $Row['Archived'])
          continue;
       
       $Row['Depth'] = 1;

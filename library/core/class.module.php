@@ -102,8 +102,8 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     *
     * @return string
     */
-   public function FetchView() {
-      $ViewPath = $this->FetchViewLocation();
+   public function FetchView($View = '') {
+      $ViewPath = $this->FetchViewLocation($View);
       $String = '';
       ob_start();
       if(is_object($this->_Sender) && isset($this->_Sender->Data)) {
@@ -223,6 +223,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
    public function ToString() {
       if ($this->Visible)
          return $this->FetchView();
+      else return '';
    }
 
    /**

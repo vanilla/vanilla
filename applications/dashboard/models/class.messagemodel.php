@@ -64,7 +64,30 @@ class MessageModel extends Gdn_Model {
       return $Message;
    }
    
-   public function GetMessagesForLocation($Location, $Exceptions = array('[Base]')) {
+   protected function InCategory($NeedleCategoryID, $HaystackCategoryID, $IncludeSubcategories = FALSE) {
+      if (!$HaystackCategoryID)
+         return TRUE;
+      
+      if ($NeedleCategoryID == $HaystackCategoryID)
+         return TRUE;
+      
+      if ($IncludeSubcategories) {
+         $Cat = CategoryModel::Categories($NeedleCategoryID);
+         for ($i = 0; $i < 10; $i++) {
+            if (!$Cat)
+               break;
+            
+            if ($Cat['CategoryID'] == $HaystackCategoryID)
+               return TRUE;
+            
+            $Cat = CategoryModel::Categories($Cat['ParentCategoryID']);
+         }
+      }
+      
+      return FALSE;
+   }
+   
+   public function GetMessagesForLocation($Location, $Exceptions = array('[Base]'), $CategoryID = NULL) {
       $Session = Gdn::Session();
       $Prefs = $Session->GetPreference('DismissedMessages', array());
       if (count($Prefs) == 0)
@@ -85,16 +108,24 @@ class MessageModel extends Gdn_Model {
             $MApplication = strtolower($Message['Application']);
             $MController = strtolower($Message['Controller']);
             $MMethod = strtolower($Message['Method']);
+            
+            $Visible = FALSE;
 
             if (in_array($MController, $Exceptions))
-               $Result[] = $Message;
+               $Visible = TRUE;
             elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method)
+               $Visible = TRUE;
+            
+            if ($Visible && !$this->InCategory($CategoryID, GetValue('CategoryID', $Message), GetValue('IncludeSubcategories', $Message)))
+               $Visible = FALSE;
+            
+            if ($Visible)
                $Result[] = $Message;
          }
          return $Result;
       }
       
-      return $this->SQL
+      $Result = $this->SQL
          ->Select()
          ->From('Message')
          ->Where('Enabled', '1')
@@ -109,6 +140,12 @@ class MessageModel extends Gdn_Model {
          ->WhereNotIn('MessageID', $Prefs)
          ->OrderBy('Sort', 'asc')
          ->Get()->ResultArray();
+      
+      $Result = array_filter($Result, function($Message) use ($CategoryID) {
+         return $this->InCategory($CategoryID, GetValue('CategoryID', $Message), GetValue('IncludeSubcategories', $Message));
+      });
+      
+      return $Result;
    }
    
    /**

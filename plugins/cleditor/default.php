@@ -53,7 +53,7 @@ v1.1.1 28SEPT2011 - Linc
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.2.7',
+   'Version' => '1.3.1',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -88,7 +88,8 @@ class cleditorPlugin extends Gdn_Plugin {
     * @param Gdn_Form $Sender 
     */
    public function Gdn_Form_BeforeBodyBox_Handler($Sender, $Args) {
-      $this->_AddCLEditor(Gdn::Controller());
+      $Column = GetValue('Column', $Args, 'Body');
+      $this->_AddCLEditor(Gdn::Controller(), $Column);
       
       $Format = $Sender->GetValue('Format');
       
@@ -96,16 +97,20 @@ class cleditorPlugin extends Gdn_Plugin {
          $Formatter = Gdn::Factory($Format.'Formatter');
          
          if ($Formatter && method_exists($Formatter, 'FormatForWysiwyg')) {
-            $Body = $Formatter->FormatForWysiwyg($Sender->GetValue('Body'));
-            $Sender->SetValue('Body', $Body);
+            $Body = $Formatter->FormatForWysiwyg($Sender->GetValue($Column));
+            $Sender->SetValue($Column, $Body);
          } elseif (!in_array($Format, array('Html', 'Wysiwyg'))) {
-            $Sender->SetValue('Body', Gdn_Format::To($Sender->GetValue('Body'), $Format));
+            $Sender->SetValue($Column, Gdn_Format::To($Sender->GetValue($Column), $Format));
          }
       }
       $Sender->SetValue('Format', 'Wysiwyg');
    }
+   
+   public function AddClEditor() {
+      $this->_AddCLEditor(Gdn::Controller());
+   }
 	
-	private function _AddCLEditor($Sender) {
+	private function _AddCLEditor($Sender, $Column = 'Body') {
       static $Added = FALSE;
       if ($Added)
          return;
@@ -115,7 +120,11 @@ class cleditorPlugin extends Gdn_Plugin {
 		$Sender->RemoveJsFile('jquery.autogrow.js');
 		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor', $Options);
       
-      $CssPath = Asset('/plugins/cleditor/design/cleditor.css');
+      $CssInfo = AssetModel::CssPath(FALSE, 'cleditor.css', 'plugins/cleditor');
+      
+      if ($CssInfo) {
+         $CssPath = Asset($CssInfo[1]);
+      }
       
 		$Sender->Head->AddString(<<<EOT
 <style type="text/css">
@@ -126,16 +135,16 @@ a.PreviewButton {
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
 		// Make sure the removal of autogrow does not break anything
-		jQuery.fn.autogrow = function(o) { return; }
-		// Attach the editor to comment boxes
-		jQuery("#Form_Body").livequery(function() {
-			var frm = $(this).parents("div.CommentForm");
+		$.fn.autogrow = function(o) { return; }
+		// Attach the editor to comment boxes.
+		$("textarea.BodyBox").livequery(function() {
+			var frm = $(this).closest("form");
 			ed = jQuery(this).cleditor({
             width:"100%", height:"100%",
             controls: "bold italic strikethrough | font size " +
                     "style | color highlight removeformat | bullets numbering | outdent indent | " +
                     "alignleft center alignright | undo redo | " +
-                    "image link unlink | source fullscreen",
+                    "image link unlink | pastetext source",
             docType: '<!DOCTYPE html>',
             docCSSFile: "$CssPath"
          })[0];
@@ -150,6 +159,12 @@ a.PreviewButton {
 EOT
 );
       $Added = TRUE;
+   }
+   
+   public function PostController_Quote_Before($Sender, $Args) {
+      // Make sure quotes know that we are hijacking the format to wysiwyg.
+      if (!C('Garden.ForceInputFormatter'))
+         SaveToConfig('Garden.InputFormatter', 'Wysiwyg', FALSE);
    }
 
 	public function Setup() {

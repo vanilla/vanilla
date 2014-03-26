@@ -10,10 +10,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 if (!isset($Drop))
    $Drop = FALSE;
-   
+
 if (!isset($Explicit))
    $Explicit = TRUE;
-   
+
 $SQL = $Database->SQL();
 $Construct = $Database->Structure();
 $Px = $Database->DatabasePrefix;
@@ -27,9 +27,12 @@ $Construct->Table('Conversation');
 
 $UpdateCountMessages = $Construct->TableExists() && !$Construct->ColumnExists('CountMessages');
 $UpdateLastMessageID = $Construct->TableExists() && !$Construct->ColumnExists('LastMessageID');
+$CountParticipantsExists = $Construct->ColumnExists('CountParticipants');
+
 
 $Construct
    ->PrimaryKey('ConversationID')
+   ->Column('Type', 'varchar(10)', TRUE, 'index')
    ->Column('Subject', 'varchar(100)', NULL)
    ->Column('Contributors', 'varchar(255)')
    ->Column('FirstMessageID', 'int', TRUE, 'key')
@@ -40,6 +43,7 @@ $Construct
    ->Column('DateUpdated', 'datetime')
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('CountMessages', 'int', 0)
+   ->Column('CountParticipants', 'int', 0)
    ->Column('LastMessageID', 'int', NULL)
    ->Column('RegardingID', 'int(11)', TRUE, 'index')
    ->Set($Explicit, $Drop);
@@ -47,9 +51,10 @@ $Construct
 // Contains the user/conversation relationship. Keeps track of all users who are
 // taking part in the conversation. It also keeps DateCleared, which is a
 // per-user date relating to when each users last cleared the conversation
-// history, and 
+// history, and
 $Construct->Table('UserConversation');
 
+$UserConversationExists = $Construct->TableExists();
 $UpdateCountReadMessages = $Construct->TableExists() && !$Construct->ColumnExists('CountReadMessages');
 $DateConversationUpdatedExists = $Construct->ColumnExists('DateConversationUpdated');
 
@@ -71,7 +76,13 @@ if (!$DateConversationUpdatedExists) {
       ->Set('DateConversationUpdated', 'c.DateUpdated', FALSE)
       ->Put();
 }
-   
+
+if (!$CountParticipantsExists && $UserConversationExists) {
+   $SQL->Update('Conversation c')
+       ->Set('c.CountParticipants', '(select count(uc.ConversationID) from GDN_UserConversation uc where uc.ConversationID = c.ConversationID and uc.Deleted = 0)', FALSE, FALSE)
+       ->Put();
+}
+
 // Contains messages for each conversation, as well as who inserted the message
 // and when it was inserted. Users cannot edit or delete their messages once
 // they have been sent.
@@ -119,7 +130,7 @@ set CountReadMessages = (
 $Construct->Table('User')
    ->Column('CountUnreadConversations', 'int', NULL)
    ->Set(FALSE, FALSE);
-   
+
 // Insert some activity types
 ///  %1 = ActivityName
 ///  %2 = ActivityName Possessive
@@ -134,11 +145,12 @@ $Construct->Table('User')
 if ($SQL->GetWhere('ActivityType', array('Name' => 'ConversationMessage'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'ConversationMessage', 'FullHeadline' => '%1$s sent you a %8$s.', 'ProfileHeadline' => '%1$s sent you a %8$s.', 'RouteCode' => 'message', 'Notify' => '1', 'Public' => '0'));
 
-// X added Y to a conversation   
+// X added Y to a conversation
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AddedToConversation'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'AddedToConversation', 'FullHeadline' => '%1$s added %3$s to a %8$s.', 'ProfileHeadline' => '%1$s added %3$s to a %8$s.', 'RouteCode' => 'conversation', 'Notify' => '1', 'Public' => '0'));
 
 $PermissionModel = Gdn::PermissionModel();
 $PermissionModel->Define(array(
-   'Conversations.Moderation.Manage' => 0
+   'Conversations.Moderation.Manage' => 0,
+   'Conversations.Conversations.Add' => 'Garden.Profiles.Edit',
 ));

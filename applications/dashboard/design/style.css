@@ -46,6 +46,18 @@ blockquote, q {
    quotes: "" "";
 }
 
+textarea, input[type=text] {
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   box-sizing: border-box;
+}
+
+/* Elements that are disabled, make sure they reflect that with UX feedback. */
+[disabled] {
+   opacity: 0.50;
+   pointer-events: none;
+}
+
 /* ===================================================================== Grid */
 
 .Row {
@@ -101,9 +113,6 @@ body {
 	content: "";
 	clear: both;
 	height: 0;
-}
-.Hidden {
-   display: none;
 }
 .Invisible {
    opacity: 0;
@@ -187,7 +196,7 @@ textarea {
 	background: #fff;
 	border: 1px solid #999;
 	border: 1px solid rgba(0, 0, 0, 0.4);
-	padding: 3px;	
+	padding: 3px;
 }
 .PasswordStrength {
    width: 250px;
@@ -370,11 +379,11 @@ textarea.TextBox {
 }
 .TextBoxWrapper {
 	width: auto;
-	padding-right: 8px;
 }
 .TextBoxWrapper textarea,
 .TextBoxWrapper input {
    width: 100%;
+   display: block;
 }
 .TextBoxWrapper .PasswordStrength {
    width: 100%;
@@ -442,6 +451,10 @@ select {
    border-color: #666;
 }
 
+.Button.Disabled {
+   opacity: .5;
+}
+
 div.FileUpload .CurrentImage {
    display: block;
    margin: 5px 0;
@@ -488,6 +501,7 @@ div.FileUpload .CurrentImage {
   direction: ltr;
   cursor: pointer;
 }
+
 .Button.FileInput {
    position: relative;
    overflow: hidden;
@@ -667,14 +681,9 @@ div.FileUpload .CurrentImage {
 	background: url('images/progress_sm.gif') center center no-repeat;
 }
 .InProgress {
-   color: transparent !Important;
-   background: url('images/progress_sm.gif') center center no-repeat !important;
-   border-color: transparent !important;
-   -moz-box-shadow: none !important;
-   -webkit-box-shadow: none !important;
-   box-shadow: none !important;
-   color: transparent !important;
-   text-shadow: none !important;
+   opacity: .5;
+   cursor: progress;
+   pointer-events: none;
 }
 .Conversations .Deleted {
    text-decoration: line-through;
@@ -766,12 +775,6 @@ div.Warning {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
-.PagerWrap {
-   overflow: hidden;
-}
-.PageDescription .PagerWrap {
-   overflow: visible;
-}
 .Pager {
    font-weight: bold;
    float: right;
@@ -785,6 +788,9 @@ div.Warning {
 }
 .Pager .Highlight {
 	color: #000;
+}
+.MoreWrap {
+   float: right;
 }
 
 .PagerNub {
@@ -947,7 +953,7 @@ body > #Frame > .Head {
 #Head .SiteSearch .InputBox {
    border: none;
    width: 175px;
-   
+
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
@@ -1047,6 +1053,9 @@ div.Discussion:hover .OptionsTitle:hover,
    text-decoration: none;
    background-color: #004D9F !Important;
 }
+.MenuItems a:hover .Gloss {
+   color: #ffffff !important;
+}
 .MenuItems li > strong {
    font-size: 12px;
    padding: 3px 10px;
@@ -1056,6 +1065,22 @@ div.Discussion:hover .OptionsTitle:hover,
     border: 0;
     border-bottom: 1px solid #ddd;
 }
+
+.MenuItems.Up:before,
+.MenuItems.Up:after {
+   border-top: 7px solid #444444;
+   border-left: 7px solid transparent;
+   border-right: 7px solid transparent;
+   content: "";
+   left: 71px;
+   position: absolute;
+   bottom: -7px;
+}
+.MenuItems.Up:after {
+   border-top: 7px solid #fff;
+   bottom: -6px;
+}
+
 .ToggleFlyout {
    position: relative;
 }
@@ -1096,6 +1121,27 @@ div.Discussion:hover .OptionsTitle:hover,
 .FlyoutLeft .Flyout {
     right: inherit;
 }
+.DropHandle {
+   display: inline-block;
+   height: 0px;
+   width: 0px;
+   border-style: solid;
+   border-width: 4px;
+   border-color: #000 transparent transparent transparent;
+   position: relative;
+   bottom: -2px;
+}
+
+.SelectFlyout {
+   display: inline-block;
+   cursor: pointer;
+}
+
+.SelectFlyout .Flyout:before,
+.SelectFlyout .Flyout:after {
+   display: none;
+}
+
 .MeBox .Flyout {
     right: inherit;
     left: -4px;
@@ -1140,6 +1186,9 @@ a.Bookmarking:hover {
    vertical-align: top;
 	line-height: 1;
 }
+td.CheckBoxColumn {
+   text-align: center;
+}
 .HomepageTitle .AdminCheck {
     padding-left: 8px;
 }
@@ -1173,10 +1222,10 @@ a.Bookmarking:hover {
 #Panel {
    width: 200px;
    float: left;
-   
-/*   
+
+/*
 No overflow hidden on main elements. Causes too many bugs!
-overflow: hidden; 
+overflow: hidden;
 }
 #Panel > :first-child {
 	margin-top: 0;
@@ -1263,8 +1312,11 @@ overflow: hidden;
 .MeBox.Inline,
 .MeBox.Inline .WhoIs,
 .MeBox.Inline .MeMenu {
-    display: inline;
+    display: inline-block;
     line-height: 24px;
+    margin: 0;
+    vertical-align: top;
+    min-height: 24px;
 }
 .MeBox.Inline > .PhotoWrap {
     float: none;
@@ -1338,7 +1390,7 @@ overflow: hidden;
 /** Make standard items a bit more condensed when in the panel. **/
 
 .PanelColumn .Item {
-    padding: 2px;   
+    padding: 2px;
 }
 
 .PanelColumn .Item .Title {
@@ -1352,7 +1404,8 @@ overflow: hidden;
 
 
 #Panel .FilterMenu .Aside,
-.PanelInfo .Aside {
+.PanelInfo .Aside,
+.Item .Aside {
    float: right;
 }
 .PanelInfo .Heading {
@@ -1591,7 +1644,7 @@ overflow: hidden;
    margin-right: 0;
 }
 .CommentInfo {
-   line-height: 1.5; 
+   line-height: 1.5;
 }
 .Item .AuthorInfo {
    font-size: 11px;
@@ -1875,7 +1928,7 @@ body.Post .Popup a.Close {
 	color: #1e79a7;
 }
 .Message {
-   line-height: 140%;
+   line-height: 1.7;
    font-size: 100%;
 	word-wrap: break-word;
    margin-top: 5px;
@@ -1885,6 +1938,11 @@ body.Post .Popup a.Close {
 }
 blockquote {
    margin: 1em 0 1em 40px;
+}
+
+.emoji {
+   margin-top: -2px;
+   margin-bottom: -2px; /* account for image padding */
 }
 
 blockquote.Quote, blockQuote.UserQuote {
@@ -1947,6 +2005,11 @@ pre {
 pre code {
    border: none;
    padding: 0;
+}
+mark {
+    padding: 0 2px;
+    color: inherit;
+    background: #ff6;
 }
 .Message strong, .Message b {
    font-weight: bold;
@@ -2032,7 +2095,7 @@ a.ChangePicuture:hover {
    position: relative;
 }
 /* Hiding form headings with CSS in case the forms get popped */
-body.Profile.picture .SmallPopup h1 {
+div.Popup .SmallPopup h1 {
 	display: none;
 }
 /* BGColor on profile forms */
@@ -2041,10 +2104,10 @@ body.Profile.EditMode #Content form {
 	background: #f3f3f3;
 	background: rgba(0, 0, 0, 0.05);
 }
-form.Activity {
+/*form.Activity {
    display: block;
    margin: 0 0 10px;
-	text-align: right;
+	overflow: hidden;
 }
 form.Activity textarea {
    width: 100%;
@@ -2052,10 +2115,13 @@ form.Activity textarea {
    height: 60px;
    min-height: 60px;
 }
+form.Activity .Button {
+   float: right;
+}
 .ActivityComments textarea {
    height: 60px;
    min-height: 60px;
-}
+}*/
 
 /* Invitations Form */
 table.PreferenceGroup,
@@ -2108,6 +2174,29 @@ dl.About dt.Posts { background-position: 0 -113px; }
 dl.About dd {
    padding: 0 8px 0 0;
 }
+
+/* Invitations */
+.Invitations.DataTable {
+   margin: 15px 0;
+}
+.Invitations.DataTable th {
+   text-align: left;
+}
+.Invitations.DataTable th {
+   padding: 4px;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+   vertical-align: top;
+}
+.Invitations th.InviteMeta {
+   width: 20%;
+}
+.InviteForm {
+   margin: 5px 0;
+}
+.InviteForm label {
+   display: block
+}
+
 /* ======================================================== Thumbnail Cropper */
 .Popup .CurrentPicture {
 	display: none;
@@ -2178,18 +2267,9 @@ form.Thumbnail .Warning {
 .EditCommentForm .Buttons,
 .CommentForm .Buttons {
 	position: relative;
-   text-align: right; 
+   text-align: right;
 	margin: 0;
 	padding: 6px 0;
-}
-.EditCommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Back {
-	float: left;
-	line-height: 2.2;
-}
-.Reactions .Bullet {
-   font-size: 10px;
 }
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,
@@ -2436,7 +2516,7 @@ div.Popup form ul li label.RadioLabel {
    margin-top: 20px;
 }
 .ItemDiscussion .MItem a {
-   font-size: 11px; 
+   font-size: 11px;
 }
 .ItemDiscussion .ProfilePhotoMedium {
 	height: 24px;
@@ -2466,7 +2546,7 @@ div.Popup form ul li label.RadioLabel {
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 	vertical-align: top;
 }
-.DataTable thead td {
+.DataTable thead td, .DataTable thead th {
 	font-weight: bold;
    vertical-align: bottom;
 }
@@ -2524,6 +2604,46 @@ tr.CategoryHeading td {
 }
 .CategoryTable .ChildCategories {
 	font-size: 11px;
+}
+
+/* Discussion Sorter */
+.DiscussionSorter {
+   float: right;
+   margin-right: 24px;
+   font-size: 11px;
+}
+.DiscussionSorter:hover {
+   cursor: pointer;
+   background: #f3f3f3;
+}
+.DiscussionSorter .MenuItems {
+   padding: 0;
+   width: 130px;
+   border-top: none;
+   border-radius: 0;
+}
+.DiscussionSorter .Selected {
+   padding: 0 0 0 15px;
+   display: inline-block;
+   width: 115px;
+   border: 1px solid transparent;
+   border-bottom: none;
+}
+.DiscussionSorter .Open .Selected {
+   border: 1px solid #999;
+   border-bottom: none;
+}
+.DiscussionSorter .SpMenu {
+   background-position: -32px -20px;
+   height: 8px;
+   width: 12px;
+   margin-top: 8px;
+}
+.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after {
+   border: none;
+}
+.DiscussionSorter .ToggleFlyout .Flyout {
+   top: 18px;
 }
 
 /* ======================================= Blocks */
@@ -2625,10 +2745,16 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
 	background: #f7f7f7;
    background: rgba(0, 0, 0, 0.03);
    margin: 0;
-   padding: 13px 20px;
+   padding: 20px;
 }
 .FormWrapper-Condensed {
-   padding: 5px;
+   padding: 10px;
+}
+.FormWrapper-Condensed .Buttons {
+   text-align: right;
+}
+label.B {
+   font-weight: bold;
 }
 .DiscussionForm textarea {
    width: 100%;
@@ -2652,7 +2778,6 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    display: inline;
    font-weight: normal;
    font-size: 95%;
-   color: #555;
 }
 
 .FormWrapper.StructuredForm {
@@ -2681,6 +2806,10 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    background-repeat: no-repeat;
    background-position: center right;
    padding-right: 24px;
+}
+
+.List.Inline {
+   display: inline;
 }
 
 .List.Inline * {
@@ -2721,14 +2850,14 @@ textarea.MultiComplete {
    padding: 5px;
    cursor: default;
    display: block;
-   /* 
-   if width will be 100% horizontal scrollbar will apear 
+   /*
+   if width will be 100% horizontal scrollbar will apear
    when scroll mode will be used
    */
    /*width: 100%;*/
    font-size: 12px;
-   /* 
-   it is very important, if line-height not setted or setted 
+   /*
+   it is very important, if line-height not setted or setted
    in relative units scroll will be broken in firefox
    */
    line-height: 16px;
@@ -2761,7 +2890,7 @@ textarea.MultiComplete {
 	text-align: left;
 	color:#666666;
 	font-size:14px;
-	font-weight:bold;	
+	font-weight:bold;
 }
 #ConversationForm .TextBox {
 	width: 100%;
@@ -3084,7 +3213,7 @@ body#dashboard_entry_leave p.Leaving {
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 .Errors ul {
 	border: 1px solid #a00 !important;
@@ -3165,7 +3294,7 @@ position on the page to notify users of things like drafts being saved, etc. */
   position: absolute;
   top: auto;
   margin-left: 10px;
-  overflow: visible; 
+  overflow: visible;
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 .InformWrapper {
@@ -3242,7 +3371,7 @@ only screen and (max-device-width: 480px) {
       color: #fff;
       display: block;
    }
-   
+
    .Item .OptionsTitle {
       visibility: visible;
    }
@@ -3627,10 +3756,10 @@ body.embed .InformMessages {
 
 .RegardingEvent {
    padding: 10px;
-   
+
    position: relative;
    padding-left: 38px;
-   
+
    color: #fff !important;
    text-shadow: 0 1px 1px #000;
    text-align: left !important;
@@ -3708,7 +3837,7 @@ body.embed .InformMessages {
 	width: 200px;
 }
 .PhotoGrid {
-   line-height: 1;
+   line-height: 32px;
    margin: 2px -2px;
 }
 .PhotoGrid img {
@@ -3718,7 +3847,7 @@ body.embed .InformMessages {
    width: 32px;
 }
 .PhotoGridSmall {
-   line-height: 1;
+   line-height: 24px;
    margin: 1px -1px;
 }
 .PhotoGridSmall img {
@@ -3731,12 +3860,35 @@ body.embed .InformMessages {
    max-height: 64px;
 }
 
+.PhotoGrid .UserPicture {
+   display: inline-block;
+}
+
+.PhotoGrid .UserPicture * {
+   vertical-align: bottom;
+}
+
+.PhotoGrid .Username {
+   display: inline-block;
+   line-height: 32px;
+}
+
+.PhotoGridSmall .Username {
+   line-height: 24px;
+}
+
 /* Reaction Buttons */
 .Reactions {
    position: relative;
    font-size: 11px;
    line-height: 18px;
-   margin-left: -10px;
+   margin: 15px 0px 0px;
+}
+.ReactButton {
+   display: inline-block;
+   margin: 0px 2px;
+   line-height: 18px;
+   vertical-align: top;
 }
 .Reactions > a.React {
     margin: 0 10px;
@@ -3744,6 +3896,14 @@ body.embed .InformMessages {
 }
 .Reactions > a.React > .ReactSprite {
    margin-right: 2px;
+}
+.Flyout.Flags {
+   top: 25px;
+   z-index: 1000;
+}
+.Reactions .FlagMenu .MenuItems .ReactButton {
+   margin: 0px;
+   padding: 0px 15px;
 }
 
 .SpEditProfile {
@@ -3757,33 +3917,28 @@ body.embed .InformMessages {
    height: 14px;
    line-height: 14px;
    vertical-align: top;
-   
+
 }
 
 /* === Reaction Sprites === */
 .ReactSprite {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   *margin-right: .3em;
-  line-height: 14px;
-  vertical-align: text-top;
+  line-height: 18px;
+  vertical-align: top;
   background-image: url("images/sprites-14-000000.png");
-  background-position: 14px 14px;
+  background-position: 16px 16px;
   background-repeat: no-repeat;
 }
-
-.ReactLabel {
-   display: inline-block;
-   line-height: 14px;
-   vertical-align: top;
+input + .ReactSprite {
+   vertical-align: middle;
 }
 
-.InProgress .ReactSprite {
-   background-image: none !important;
-}
 .ReactEverything { background-position: -197px -53px; }
 .ReactAwesome { background-position: -269px -6px; }
+.ReactFeature { background-position:  -280px -60px; }
 .ReactFlag { background-position: -54px -52px; }
 .ReactInsightful { background-position: -149px -6px; }
 .ReactOffTopic { background-position: -173px -6px; }
@@ -3807,9 +3962,10 @@ body.embed .InformMessages {
 .ReactTwitter { background-position: -53px -124px; }
 .ReactGooglePlus { background-position: -77px -124px; }
 .ReactMessage { background-position: -101px -102px; }
+.ReactWarn { background-position: -222px -6px; }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
-.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
    background-image: url('http://cdn.vanillaforums.com/images/sprites-14-fff.png');
 }
@@ -3845,4 +4001,238 @@ body.embed .InformMessages {
 }
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
+}
+
+/* Media */
+
+.Media {
+  margin: 5px 0 10px;
+}
+.Media, .Media .Media-Body {
+  overflow: hidden;
+  _overflow: visible;
+  zoom: 1;
+}
+.Media .Img {
+  float: left;
+  margin-right: 10px;
+}
+.Media .Img img {
+  display: block;
+}
+.Media .ImgExt {
+  float: right;
+  margin-left: 10px;
+}
+
+.Item h2 + .Media,
+.Item h3 + .Media  {
+   margin-top: 0;
+}
+
+/* Overrides */
+
+.Hidden {
+   display: none;
+}
+
+/* Token input */
+
+ul.token-input-list {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #aaa;
+  color: #333;
+  font-size: 15px;
+  margin: 0 !important;
+  padding: 3px;
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  width: 100%;
+  cursor: text;
+  min-height: 1px;
+  z-index: 999;
+  background-color: #fff;
+  list-style-type: none;
+}
+
+ul.token-input-list-focus,
+ul.token-input-list-focus input {
+  background: #ffe;
+}
+
+/*#DiscussionForm input.Button {
+    margin-top: 20px;
+}*/
+ul.token-input-list li input {
+  border: 0;
+  width: 100px;
+  padding: 3px 3px;
+  margin: 2px 0;
+}
+
+li.token-input-token {
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  margin-right: 3px;
+  padding: 1px 5px;
+  line-height: 20px;
+  cursor: default;
+  border: 1px solid #999;
+  border-radius: 2px;
+  float: left;
+  font-size: 13px;
+}
+
+li.token-input-token.not-allowed {
+  background-color: #FFC2C2;
+  color: #C91313;
+  border: 1px solid #FF3232;
+}
+li.token-input-token.not-allowed span {
+  color: #C91313;
+}
+
+li.token-input-token p {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+li.token-input-token span {
+  margin-left: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: arial;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+li.token-input-selected-token {
+  background-color: #eee;
+}
+
+li.token-input-selected-token.not-allowed {
+  background-color: red;
+  color: #ffffff;
+  border: 1px solid #FF3232;
+}
+
+li.token-input-selected-token.not-allowed span {
+  color: #ffffff;
+}
+
+li.token-input-input-token {
+  float: left;
+}
+
+div.token-input-dropdown {
+  position: absolute;
+  background-color: #fff;
+  overflow: hidden;
+  border: 1px solid #aaa;
+  border-top-width: 0;
+  cursor: default;
+  z-index: 1;
+  padding: 0 3px;
+}
+div.token-input-dropdown p {
+  margin: 0;
+  padding: 5px;
+}
+div.token-input-dropdown ul {
+  margin: 0 -3px !important;
+  padding: 0;
+}
+div.token-input-dropdown ul li {
+  background-color: #fff;
+  padding: 3px 6px;
+}
+div.token-input-dropdown ul li.token-input-dropdown-item {
+  background-color: #fff;
+}
+div.token-input-dropdown ul li.token-input-dropdown-item2 {
+  background-color: #fff;
+}
+div.token-input-dropdown ul li em {
+  font-weight: bold;
+  font-style: none;
+}
+div.token-input-dropdown ul li.token-input-selected-dropdown-item {
+  background-color: #eee;
+}
+
+/**
+ * At mentions in core, moved from advanced editor.
+ */
+.atwho-view {
+   font: normal 14px/1.7em 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   position: absolute;
+   top: 0;
+   left: 0;
+   display: none;
+   margin-top: 18px;
+   background: #fff;
+   min-width: 120px;
+   z-index: 10000;
+   border-radius: 2px;
+   overflow: hidden;
+   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.atwho-view .cur {
+   background: #1E79A7;
+   color: #fff;
+}
+
+.atwho-view .cur small {
+   color: #fff;
+}
+
+.atwho-view strong {
+   color: #1E79A7;
+}
+
+.atwho-view .cur strong {
+   color: #fff;
+   font: bold;
+}
+
+.atwho-view ul {
+   list-style: none;
+   padding: 0;
+   margin: auto;
+}
+
+.atwho-view ul li {
+   display: block;
+   padding: 5px 10px;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+   cursor: pointer;
+}
+
+.atwho-view ul li:last-child {
+   border: 0;
+}
+
+.atwho-view small {
+   font-size: smaller;
+   color: #777;
+   font-weight: 400;
+}
+
+.at-suggest-emoji .emoji-img {
+   position: relative;
+   top: 3px;
+}
+
+.at-suggest-emoji .emoji-name {
+   position: relative;
+   top: -2px;
+   padding: 0 0 0 2px;
 }

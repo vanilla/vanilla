@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="Box">
+<div class="Box InThisConversation">
    <h4><?php echo T('In this Conversation'); ?></h4>
    <ul class="PanelInfo">
    <?php

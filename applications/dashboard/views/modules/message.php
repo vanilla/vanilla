@@ -10,6 +10,6 @@ if (is_array($Message)) {
    }
    
    // echo Gdn_Format::To($this->_Message->Content, 'Html');
-   echo $Message['Content'];
+   echo nl2br(Gdn_Format::Links($Message['Content']));
    echo '</div>';
 }

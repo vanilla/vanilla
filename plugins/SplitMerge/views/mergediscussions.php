@@ -16,6 +16,13 @@ if (count($Discussions) < 2) {
    echo '<ul><li>';
    echo $this->Form->RadioList('MergeDiscussionID', $RadioData, array('ValueField' => 'DiscussionID', 'TextField' => 'Name', 'Default' => $DefaultDiscussionID));
    echo '</li></ul>';
-   echo $this->Form->Button('Merge Discussions');
+   
+   echo '<div class="P">'.
+      $this->Form->CheckBox('RedirectLink', 'Leave a redirect links from the old discussions.'). 
+      '</div>';
+   
+   echo '<div class="Buttons">'.
+      $this->Form->Button('Merge').
+      '</div>';
 }
 echo $this->Form->Close();

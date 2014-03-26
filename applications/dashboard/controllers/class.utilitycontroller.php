@@ -1,147 +1,138 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-/**
- * Utility Controller
- *
- * @package Dashboard
- */
- 
+
 set_time_limit(0);
 
 /**
  * Perform miscellaneous operations for Dashboard.
  *
- * @since 2.0.0
- * @package Dashboard
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class UtilityController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form');
-   
+
    /**
     * Gather all of the global styles together.
-    * @param string $Filename 
+    * @param string ThemeType Either `desktop` or `mobile`.
+    * @param string $Filename The basename of the file to
     * @since 2.1
     */
-   public function Css($Basename, $Revision) {
+   public function Css($ThemeType, $Filename) {
       $AssetModel = new AssetModel();
-      $AssetModel->ServeCss($Basename, $Revision);
+      $AssetModel->ServeCss($ThemeType, $Filename);
    }
-   
+
    public function Initialize() {
       parent::Initialize();
       Gdn_Theme::Section('Dashboard');
    }
-   
-   /**
-    * Call a method on the given model.
-    */
-   public function Model() {
-      $this->Permission('Garden.Settings.Manage');
-      
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $this->DeliveryType(DELIVERY_TYPE_DATA);
-      
-      $Args = func_get_args();
-      
-      // Check to see if we have a model.
-      $ModelName = StringEndsWith(array_shift($Args), 'Model', TRUE, TRUE);
-      $ModelName = ucfirst($ModelName).'Model';
-      if (!class_exists($ModelName)) {
-         throw NotFoundException($ModelName);
-      }
-      
-      // Check for json/xml style extension.
-      if (count($Args)) {
-         $LastArg = $Args[count($Args) - 1];
-         $Extension = strrchr($LastArg, '.');
-         if ($Extension) {
-            $Args[count($Args) - 1] = substr($LastArg, 0, -strlen($Extension));
-            $Extension = strtolower($Extension);
-            if ($Extension == '.xml')
-               $this->DeliveryMethod(DELIVERY_METHOD_XML);
-         }
-      }
-      
-      // Instantiate the model.
-      $Model = new $ModelName();
-      $MethodName = array_shift($Args);
-      
-      // Reflect the arguments.
-      $Callback = array($Model, $MethodName);
-      
-      if ($this->Request->Get('help')) {
-         $this->SetData('Model', get_class($Model));
-         if ($MethodName) {
-            if (!method_exists($Model, $MethodName)) {
-               throw NotFoundException($ModelName.'->'.$MethodName.'()');
-            }
-            $this->SetData('Method', $MethodName);
-            $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
-            $MethArgs = $Meth->getParameters();
-            $Args = array();
-            foreach ($MethArgs as $Index => $MethArg) {
-               $ParamName = $MethArg->getName();
 
-               if ($MethArg->isDefaultValueAvailable())
-                  $Args[$ParamName] = $MethArg->getDefaultValue();
-               else
-                  $Args[$ParamName] = 'REQUIRED';
-            }
-            $this->SetData('Args', $Args);
-         } else {
-            $Class = new ReflectionClass($Model);
-            $Meths = $Class->getMethods();
-            $Methods = array();
-            foreach ($Meths as $Meth) {
-               $MethodName = $Meth->getName();
-               if (StringBeginsWith($MethodName, '_'))
-                  continue;
-               
-               $MethArgs = $Meth->getParameters();
-               $Args = array();
-               foreach ($MethArgs as $Index => $MethArg) {
-                  $ParamName = $MethArg->getName();
+//   /**
+//    * Call a method on the given model.
+//    */
+//   public function Model() {
+//      $this->Permission('Garden.Settings.Manage');
+//
+//      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+//      $this->DeliveryType(DELIVERY_TYPE_DATA);
+//
+//      $Args = func_get_args();
+//
+//      // Check to see if we have a model.
+//      $ModelName = StringEndsWith(array_shift($Args), 'Model', TRUE, TRUE);
+//      $ModelName = ucfirst($ModelName).'Model';
+//      if (!class_exists($ModelName)) {
+//         throw NotFoundException($ModelName);
+//      }
+//
+//      // Check for json/xml style extension.
+//      if (count($Args)) {
+//         $LastArg = $Args[count($Args) - 1];
+//         $Extension = strrchr($LastArg, '.');
+//         if ($Extension) {
+//            $Args[count($Args) - 1] = substr($LastArg, 0, -strlen($Extension));
+//            $Extension = strtolower($Extension);
+//            if ($Extension == '.xml')
+//               $this->DeliveryMethod(DELIVERY_METHOD_XML);
+//         }
+//      }
+//
+//      // Instantiate the model.
+//      $Model = new $ModelName();
+//      $MethodName = array_shift($Args);
+//
+//      // Reflect the arguments.
+//      $Callback = array($Model, $MethodName);
+//
+//      if ($this->Request->Get('help')) {
+//         $this->SetData('Model', get_class($Model));
+//         if ($MethodName) {
+//            if (!method_exists($Model, $MethodName)) {
+//               throw NotFoundException($ModelName.'->'.$MethodName.'()');
+//            }
+//            $this->SetData('Method', $MethodName);
+//            $Meth = new ReflectionMethod($Callback[0], $Callback[1]);
+//            $MethArgs = $Meth->getParameters();
+//            $Args = array();
+//            foreach ($MethArgs as $Index => $MethArg) {
+//               $ParamName = $MethArg->getName();
+//
+//               if ($MethArg->isDefaultValueAvailable())
+//                  $Args[$ParamName] = $MethArg->getDefaultValue();
+//               else
+//                  $Args[$ParamName] = 'REQUIRED';
+//            }
+//            $this->SetData('Args', $Args);
+//         } else {
+//            $Class = new ReflectionClass($Model);
+//            $Meths = $Class->getMethods();
+//            $Methods = array();
+//            foreach ($Meths as $Meth) {
+//               $MethodName = $Meth->getName();
+//               if (StringBeginsWith($MethodName, '_'))
+//                  continue;
+//
+//               $MethArgs = $Meth->getParameters();
+//               $Args = array();
+//               foreach ($MethArgs as $Index => $MethArg) {
+//                  $ParamName = $MethArg->getName();
+//
+//                  if ($MethArg->isDefaultValueAvailable())
+//                     $Args[$ParamName] = $MethArg->getDefaultValue();
+//                  else
+//                     $Args[$ParamName] = 'REQUIRED';
+//               }
+//               $Methods[$MethodName] = array('Method' => $MethodName, 'Args' => $Args);
+//            }
+//            $this->SetData('Methods', $Methods);
+//         }
+//      } else {
+//         if (!method_exists($Model, $MethodName)) {
+//            throw NotFoundException($ModelName.'->'.$MethodName.'()');
+//         }
+//
+//         $MethodArgs = ReflectArgs($Callback, $this->Request->Get(), $Args);
+//
+//         $Result = call_user_func_array($Callback, $MethodArgs);
+//
+//         if (is_array($Result))
+//            $this->Data = $Result;
+//         elseif (is_a($Result, 'Gdn_DataSet')) {
+//            $Result = $Result->ResultArray();
+//            $this->Data = $Result;
+//         } elseif (is_a($Result, 'stdClass'))
+//            $this->Data = (array)$Result;
+//         else
+//            $this->SetData('Result', $Result);
+//      }
+//
+//      $this->Render();
+//   }
 
-                  if ($MethArg->isDefaultValueAvailable())
-                     $Args[$ParamName] = $MethArg->getDefaultValue();
-                  else
-                     $Args[$ParamName] = 'REQUIRED';
-               }
-               $Methods[$MethodName] = array('Method' => $MethodName, 'Args' => $Args);
-            }
-            $this->SetData('Methods', $Methods);
-         }
-      } else {
-         if (!method_exists($Model, $MethodName)) {
-            throw NotFoundException($ModelName.'->'.$MethodName.'()');
-         }
-         
-         $MethodArgs = ReflectArgs($Callback, $this->Request->Get(), $Args);
-         
-         $Result = call_user_func_array($Callback, $MethodArgs);
-
-         if (is_array($Result))
-            $this->Data = $Result;
-         elseif (is_a($Result, 'Gdn_DataSet')) {
-            $Result = $Result->ResultArray();
-            $this->Data = $Result;
-         } elseif (is_a($Result, 'stdClass'))
-            $this->Data = (array)$Result;
-         else
-            $this->SetData('Result', $Result);
-      }
-      
-      $this->Render();
-   }
-   
    /**
     * Redirect to another page.
     * @since 2.0.18b4
@@ -159,17 +150,17 @@ class UtilityController extends DashboardController {
 //      } else {
 //         $Url = Url('/', TRUE);
 //      }
-//      
+//
 //      $Get = $this->Request->Get();
 //      if (count($Get) > 0) {
 //         $Query = '?'.http_build_query($Get);
 //      } else {
 //         $Query = '';
 //      }
-//      
+//
 //      Redirect($Url.$Query);
 //   }
-   
+
    /**
     * Set the sort order for data on an arbitrary database table.
     *
@@ -180,6 +171,8 @@ class UtilityController extends DashboardController {
     * @access public
     */
    public function Sort() {
+      $this->Permission('Garden.Settings.Manage');
+
       $Session = Gdn::Session();
       $TransientKey = GetPostValue('TransientKey', '');
       $Target = GetPostValue('Target', '');
@@ -202,15 +195,15 @@ class UtilityController extends DashboardController {
       }
       if ($this->DeliveryType() != DELIVERY_TYPE_BOOL)
          Redirect($Target);
-         
+
       $this->Render();
    }
-   
+
    /**
     * Allows the setting of data into one of two serialized data columns on the
-    * user table: Preferences and Attributes. 
+    * user table: Preferences and Attributes.
     *
-    * The method expects "Name" & "Value" to be in the $_POST collection. This method always 
+    * The method expects "Name" & "Value" to be in the $_POST collection. This method always
     * saves to the row of the user id performing this action (ie. $Session->UserID). The
     * type of property column being saved should be specified in the url:
     * i.e. /dashboard/utility/set/preference/name/value/transientKey
@@ -238,28 +231,28 @@ class UtilityController extends DashboardController {
          $Method = $UserPropertyColumn == 'preference' ? 'SavePreference' : 'SaveAttribute';
          $Success = $UserModel->$Method($Session->UserID, $Name, $Value) ? 'TRUE' : 'FALSE';
       }
-      
+
       if (!$Success)
          $this->Form->AddError('ErrorBool');
-      
+
       // Redirect back where the user came from if necessary
       if ($this->_DeliveryType == DELIVERY_TYPE_ALL)
          Redirect($_SERVER['HTTP_REFERER']);
       else
          $this->Render();
    }
-   
+
    public function Sprites() {
       $this->RemoveCssFile('admin.css');
       $this->AddCssFile('style.css');
       $this->MasterView = 'default';
-      
+
       $this->CssClass = 'SplashMessage NoPanel';
       $this->SetData('_NoMessages', TRUE);
       $this->SetData('Title', 'Sprite Sheet');
       $this->Render();
    }
-   
+
    /**
     * Update database structure based on current definitions in each app's structure.php file.
     *
@@ -334,7 +327,7 @@ class UtilityController extends DashboardController {
       $this->SetData('Title', T('Database Structure Upgrades'));
       $this->Render();
    }
-   
+
    /**
     * Run a structure update on the database.
     *
@@ -342,7 +335,7 @@ class UtilityController extends DashboardController {
     * @access public
     */
    public function Update() {
-      
+
       try {
          // Check for permission or flood control.
          // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
@@ -366,7 +359,7 @@ class UtilityController extends DashboardController {
       } catch (PermissionException $Ex) {
          return;
       } catch (Exception $Ex) {}
-      
+
       try {
          // Run the structure.
          $UpdateModel = new UpdateModel();
@@ -374,23 +367,25 @@ class UtilityController extends DashboardController {
          $this->SetData('Success', TRUE);
       } catch (Exception $Ex) {
          $this->SetData('Success', FALSE);
+         if (Debug())
+            throw $Ex;
       }
-      
+
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          SaveToConfig('Garden.Version', APPLICATION_VERSION);
       }
-      
+
       if ($Target = $this->Request->Get('Target')) {
          Redirect($Target);
       }
-      
+
       $this->FireEvent('AfterUpdate');
 
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';
       $this->Render();
    }
-   
+
    /**
     * Because people try this a lot and get confused.
     *
@@ -400,7 +395,7 @@ class UtilityController extends DashboardController {
    public function Upgrade() {
       $this->Update();
    }
-   
+
    /**
     * Signs of life.
     *
@@ -411,68 +406,63 @@ class UtilityController extends DashboardController {
       $this->SetData('Success', TRUE);
       $this->MasterView = 'empty';
       $this->CssClass = 'Home';
-      
+
       $this->FireEvent('Alive');
-      
+
       $this->Render();
    }
-   
-   /**
-    * Because you cannot send xmlhttprequests across domains, we need to use
-    * a proxy to check for updates.
-    *
-    * @since 2.0.?
-    * @access public
-    */
-   public function UpdateProxy() {
-      $Fields = $_POST;
-      foreach ($Fields as $Field => $Value) {
-         if (get_magic_quotes_gpc()) {
-            if (is_array($Value)) {
-               $Count = count($Value);
-               for ($i = 0; $i < $Count; ++$i) {
-                  $Value[$i] = stripslashes($Value[$i]);
-               }
-            } else {
-               $Value = stripslashes($Value);
-            }
-            $Fields[$Field] = $Value;
-         }
-      }
-      
-		$UpdateCheckUrl = C('Garden.UpdateCheckUrl', 'http://vanillaforums.org/addons/update');
-      echo ProxyRequest($UpdateCheckUrl.'?'.http_build_query($FielupdateChecksds));
-      $Database = Gdn::Database();
-      $Database->CloseConnection();
-   }
-   
-   /**
-    * What the mothership said about update availability.
-    *
-    * @since 2.0.?
-    * @access public
-    */
-   public function UpdateResponse() {
-      // Get the message, response, and transientkey
-      $Response = TrueStripSlashes(GetValue('Response', $_POST));
-      $TransientKey = GetIncomingValue('TransientKey', '');
-      
-      // If the key validates
-      $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey)) {
-         // Save some info to the configuration file
-         $Save = array();
 
-         // If the response wasn't empty, save it in the config
-         if ($Response != '')
-            $Save['Garden.RequiredUpdates'] = @json_decode($Response);
-      
-         // Record the current update check time in the config.
-         $Save['Garden.UpdateCheckDate'] = time();
-         SaveToConfig($Save);
+   public function Ping() {
+      $start = microtime(true);
+
+      $this->SetData('pong', TRUE);
+      $this->MasterView = 'empty';
+      $this->CssClass = 'Home';
+
+      $valid = true;
+
+      // Test the cache.
+      if (Gdn::Cache()->ActiveEnabled()) {
+         $k = BetterRandomString(20);
+         Gdn::Cache()->Store($k, 1);
+         Gdn::Cache()->Increment($k, 1);
+         $v = Gdn::Cache()->Get($k);
+
+         if ($v !== 2) {
+            $valid = false;
+            $this->SetData('cache', false);
+         } else {
+            $this->SetData('cache', true);
+         }
+
+      } else {
+         $this->SetData('cache', 'disabled');
       }
+
+      // Test the db.
+      try {
+         $users = Gdn::SQL()->Get('User', 'UserID', 'asc', 1);
+         $this->SetData('database', true);
+      } catch(Exception $ex) {
+         $this->SetData('database', false);
+         $valid = false;
+      }
+
+      $this->EventArguments['Valid'] =& $valid;
+      $this->FireEvent('Ping');
+
+      if (!$valid) {
+         $this->StatusCode(500);
+      }
+
+      $time = microtime(true) - $start;
+      $this->SetData('time', Gdn_Format::Timespan($time));
+      $this->SetData('time_s', $time);
+      $this->SetData('valid', $valid);
+
+      $this->Render();
    }
-   
+
    /**
     * Set the user's timezone (hour offset).
     *
@@ -481,29 +471,46 @@ class UtilityController extends DashboardController {
     * @param string $ClientDate Client-reported datetime.
     * @param string $TransientKey Security token.
     */
-   public function SetClientHour($ClientDate = '', $TransientKey = '') {
+   public function SetClientHour($ClientHour = '', $TransientKey = '') {
       $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-      $Session = Gdn::Session();
       $Success = FALSE;
 
-      $ClientTimestamp = Gdn_Format::ToTimestamp($ClientDate);
+      if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
+         $HourOffset = $ClientHour - date('G', time());
 
-      if (
-			is_numeric($ClientTimestamp)
-			&& $Session->UserID > 0
-         && $Session->ValidateTransientKey($TransientKey)
-      ) {
-         $UserModel = Gdn::UserModel();
-			$HourOffset = $ClientTimestamp - time();
-         $HourOffset = round($HourOffset / 3600);
-         
-			$UserModel->SetField($Session->UserID, 'HourOffset', $HourOffset);
-			$Success = TRUE;
+         if (Gdn::Session()->IsValid() && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+            Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+            $Success = TRUE;
+         }
       }
-         
+
       $this->Render();
    }
-	
+
+   public function SetHourOffset() {
+      $Form = new Gdn_Form();
+
+      if ($Form->AuthenticatedPostBack()) {
+         if (!Gdn::Session()->IsValid()) {
+            throw PermissionException('Garden.SignIn.Allow');
+         }
+
+         $HourOffset = $Form->GetFormValue('HourOffset');
+         Gdn::UserModel()->SetField(Gdn::Session()->UserID, 'HourOffset', $HourOffset);
+
+         $this->SetData('Result', TRUE);
+         $this->SetData('HourOffset', $HourOffset);
+
+         $time = time();
+         $this->SetData('UTCDateTime', gmdate('r', $time));
+         $this->SetData('UserDateTime', gmdate('r', $time + $HourOffset * 3600));
+      } else {
+         throw ForbiddenException('GET');
+      }
+
+      $this->Render('Blank');
+   }
+
 	/**
     * Grab a feed from the mothership.
     *
@@ -518,8 +525,8 @@ class UtilityController extends DashboardController {
 		$this->DeliveryType(DELIVERY_TYPE_NONE);
       $this->Render();
 	}
-   
-   /** 
+
+   /**
     * Return some meta information about any page on the internet in JSON format.
     */
    public function FetchPageInfo($Url = '') {
@@ -530,5 +537,5 @@ class UtilityController extends DashboardController {
       $this->AddCssFile('style.css');
       $this->SetData('_NoPanel', TRUE);
       $this->Render();
-   }   
+   }
 }

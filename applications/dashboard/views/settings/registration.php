@@ -64,7 +64,7 @@ echo Gdn::Slice('/dashboard/role/defaultroleswarning');
    */
    ?>
    <li id="CaptchaSettings">
-      <div class="Info"><?php echo T('The basic registration form requires that new users copy text from a "Captcha" image to help prevent spam.', '<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
+      <div class="Info"><?php echo T('Captcha Explanation', 'The basic registration form requires that new users copy text from a "Captcha" image to help prevent spam.', '<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:'); ?></div>
       <table class="Label AltColumns">
          <thead>
             <tr>

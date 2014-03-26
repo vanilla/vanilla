@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['OpenID'] = array(
 	'Name' => 'OpenID',
    'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; plugin.',
-   'Version' => '0.2',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -75,7 +75,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
       $this->EventArguments['OpenID'] = $OpenID;
       $this->FireEvent('GetOpenID');
-      
+
       return $OpenID;
    }
 
@@ -86,21 +86,21 @@ class OpenIDPlugin extends Gdn_Plugin {
 //      $Sender->Permission('Garden.Settings.Manage');
 //		$this->Dispatch($Sender, $Sender->RequestArgs);
 //   }
-   
+
 //   public function Controller_Toggle($Sender) {
 //      $this->AutoToggle($Sender);
 //   }
-   
-   public function AuthenticationController_Render_Before($Sender, $Args) {
-      if (isset($Sender->ChooserList)) {
-         $Sender->ChooserList['openid'] = 'OpenID';
-      }
-      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
-         $List = $Sender->Data('AuthenticationConfigureList');
-         $List['openid'] = '/dashboard/plugin/openid';
-         $Sender->SetData('AuthenticationConfigureList', $List);
-      }
-   }
+
+//   public function AuthenticationController_Render_Before($Sender, $Args) {
+//      if (isset($Sender->ChooserList)) {
+//         $Sender->ChooserList['openid'] = 'OpenID';
+//      }
+//      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
+//         $List = $Sender->Data('AuthenticationConfigureList');
+//         $List['openid'] = '/dashboard/plugin/openid';
+//         $Sender->SetData('AuthenticationConfigureList', $List);
+//      }
+//   }
 
    public function Setup() {
       if (!ini_get('allow_url_fopen')) {
@@ -119,13 +119,13 @@ class OpenIDPlugin extends Gdn_Plugin {
          return; // this will error out
 
       $this->EventArguments = $Args;
-      
+
       // Check session before retrieving
       $Session = Gdn::Session();
       $OpenID = $Session->Stash('OpenID', '', FALSE);
       if (!$OpenID)
          $OpenID = $this->GetOpenID();
-      
+
       if ($Session->Stash('OpenID', '', FALSE) || $OpenID->validate()) {
          $Attr = $OpenID->getAttributes();
 
@@ -135,11 +135,11 @@ class OpenIDPlugin extends Gdn_Plugin {
          $Form->SetFormValue('Provider', self::$ProviderKey);
          $Form->SetFormValue('ProviderName', 'OpenID');
          $Form->SetFormValue('FullName', GetValue('namePerson/first', $Attr).' '.GetValue('namePerson/last', $Attr));
-         
+
          if ($Email = GetValue('contact/email', $Attr)) {
             $Form->SetFormValue('Email', $Email);
          }
-         
+
          $Sender->SetData('Verified', TRUE);
          $Session->Stash('OpenID', $OpenID);
       }
@@ -191,7 +191,7 @@ class OpenIDPlugin extends Gdn_Plugin {
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
-      
+
       if (isset($Sender->Data['Methods'])) {
          $ImgSrc = Asset('/plugins/OpenID/design/openid-signin.png');
          $ImgAlt = T('Sign In with OpenID');
@@ -207,7 +207,7 @@ class OpenIDPlugin extends Gdn_Plugin {
          $Sender->Data['Methods'][] = $Method;
       }
    }
-   
+
    public function Base_SignInIcons_Handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
       echo "\n".$this->_GetButton();
@@ -217,7 +217,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 //      if (!$this->IsEnabled()) return;
       echo "\n".$this->_GetButton();
    }
-	
+
 	private function _GetButton() {
       $ImgSrc = Asset('/plugins/OpenID/design/openid-icon.png');
       $ImgAlt = T('Sign In with OpenID');
@@ -225,11 +225,11 @@ class OpenIDPlugin extends Gdn_Plugin {
       $PopupSigninHref = $this->_AuthorizeHref(TRUE);
       return "<a id=\"OpenIDAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
 	}
-	
+
 	public function Base_BeforeSignInLink_Handler($Sender) {
 //      if (!$this->IsEnabled())
 //			return;
-		
+
 		// if (!IsMobile())
 		// 	return;
 

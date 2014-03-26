@@ -41,6 +41,7 @@ class DbaController extends DashboardController {
    }
    
    public function Counts($Table = FALSE, $Column = FALSE, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      set_time_limit(300);
       $this->Permission('Garden.Settings.Manage');
       
       if ($Table && $Column && strcasecmp($this->Request->RequestMethod(), Gdn_Request::INPUT_POST) == 0) {
@@ -57,6 +58,20 @@ class DbaController extends DashboardController {
       }
       
       $this->SetData('Title', T('Recalculate Counts'));
+      $this->AddSideMenu();
+      $this->Render('Job');
+   }
+   
+   public function FixUrlCodes($Table, $Column) {
+      $this->Permission('Garden.Settings.Manage');
+      
+      if ($this->Request->IsAuthenticatedPostBack()) {
+         $Result = $this->Model->FixUrlCodes($Table, $Column);
+         $this->SetData('Result', $Result);
+      }
+      
+      $this->SetData('Title', "Fix url codes for $Table.$Column");
+      $this->_SetJob($this->Data('Title'));
       $this->AddSideMenu();
       $this->Render('Job');
    }

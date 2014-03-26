@@ -38,7 +38,7 @@ class Gdn_Memcached extends Gdn_Cache {
        */
       
       $Persist = $this->Config(Gdn_Cache::CONTAINER_PERSISTENT);
-      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT)) {
+      if ($Persist) {
          $PoolSize = $this->Config(Gdn_Cache::CONTAINER_POOLSIZE, 10);
          $PoolKeyFormat = $this->Config(Gdn_Cache::CONTAINER_POOLKEY, "cachekey-%d");
          $PoolIndex = mt_rand(1, $PoolSize);
@@ -68,17 +68,27 @@ class Gdn_Memcached extends Gdn_Cache {
    }
    
    /**
-   * Reads in known/config servers and adds them to the instance.
-   * 
-   * This method is called when the cache object is invoked by the framework 
-   * automatically, and needs to configure itself from the values in the global
-   * config file.
-   */
+    * Reads in known/config servers and adds them to the instance.
+    * 
+    * This method is called when the cache object is invoked by the framework 
+    * automatically, and needs to configure itself from the values in the global
+    * config file.
+    */
    public function Autorun() {
       $Servers = Gdn_Cache::ActiveStore('memcached');
       if (!is_array($Servers)) 
          $Servers = explode(',',$Servers);
-         
+      
+      // No servers, cache temporarily offline
+      if (!sizeof($Servers)) {
+         SaveToConfig('Cache.Enabled', false, false);
+         return false;
+      }
+      
+      // Persistent, and already have servers. Shortcircuit adding.
+      if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT) && count($this->servers()))
+         return true;
+      
       $Keys = array(
          Gdn_Cache::CONTAINER_LOCATION,
          Gdn_Cache::CONTAINER_PERSISTENT,
@@ -100,7 +110,6 @@ class Gdn_Memcached extends Gdn_Cache {
          
          $this->AddContainer($CacheServer);
       }
-      
    }
    
    /**
@@ -154,120 +163,293 @@ class Gdn_Memcached extends Gdn_Cache {
       return Gdn_Cache::CACHEOP_SUCCESS;
    }
    
-   public function Add($Key, $Value, $Options = array()) {
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+   public function Add($key, $value, $options = array()) {
+      if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
       
-      $Expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY,$FinalOptions,0);
+      $finalOptions = array_merge($this->StoreDefaults, $options);
       
-      $RealKey = $this->MakeKey($Key, $FinalOptions);
-      $Stored = $this->Memcache->add($RealKey, $Value, $Expiry);
-      return ($Stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+      $expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY,$finalOptions,0);
+      
+      $realKey = $this->MakeKey($key, $finalOptions);
+      $stored = $this->Memcache->add($realKey, $value, $expiry);
+      
+      // Check if things went ok
+      $ok = $this->lastAction($realKey);
+      if (!$ok) return Gdn_Cache::CACHEOP_FAILURE;
+      
+      if ($stored) {
+         Gdn_Cache::LocalSet($realKey, $value);
+         return Gdn_Cache::CACHEOP_SUCCESS;
+      }
+      return Gdn_Cache::CACHEOP_FAILURE;
    }
    
-   public function Store($Key, $Value, $Options = array()) {
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+   public function Store($key, $value, $options = array()) {
+      if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
       
-      $Expiry = (int)GetValue(Gdn_Cache::FEATURE_EXPIRY,$FinalOptions,0);
+      $finalOptions = array_merge($this->StoreDefaults, $options);
       
-      $RealKey = $this->MakeKey($Key, $FinalOptions);
-      $Stored = $this->Memcache->set($RealKey, $Value, $Expiry);
-      return ($Stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+      $expiry = (int)GetValue(Gdn_Cache::FEATURE_EXPIRY,$finalOptions,0);
+      
+      $realKey = $this->MakeKey($key, $finalOptions);
+      $stored = $this->Memcache->set($realKey, $value, $expiry);
+      
+      // Check if things went ok
+      $ok = $this->lastAction($realKey);
+      if (!$ok) return Gdn_Cache::CACHEOP_FAILURE;
+      
+      if ($stored) {
+         Gdn_Cache::LocalSet($realKey, $value);
+         return Gdn_Cache::CACHEOP_SUCCESS;
+      }
+      return Gdn_Cache::CACHEOP_FAILURE;
    }
    
-   public function Get($Key, $Options = array()) {
-      $StartTime = microtime(TRUE);
+   public function Get($key, $options = array()) {
+      if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
       
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+      $startTime = microtime(TRUE);
       
-      if (is_array($Key)) {
-         $RealKeys = array();
-         foreach ($Key as $MultiKey)
-            $RealKeys[] = $this->MakeKey($MultiKey, $Options);
-         
-         $Data = $this->Memcache->getMulti($RealKeys);
-         
-         if (is_array($Data) && $Data !== FALSE) {
-            $Data2 = array();
-            foreach ($Data as $Index => $Value) {
-               $Data2[$this->StripKey($Index, $Options)] = $Value;
+      $finalOptions = array_merge($this->StoreDefaults, $options);
+      
+      $localData = array();
+      $realKeys = array();
+      if (is_array($key)) {
+         $multi = true;
+         foreach ($key as $multiKey) {
+            $realKey = $this->MakeKey($multiKey, $finalOptions);
+            
+            // Skip this key if we already have it
+            $local = Gdn_Cache::LocalGet($realKey);
+            if ($local !== Gdn_Cache::CACHEOP_FAILURE) {
+               $localData[$realKey] = $local;
+               continue;
             }
-            $Data = $Data2;
-         } else {
-            $Data = array();
+            $realKeys[] = $realKey;
          }
       } else {
-         $RealKey = $this->MakeKey($Key, $FinalOptions);
-         $Data = $this->Memcache->get($RealKey);
+         $multi = false;
+         $realKey = $this->MakeKey($key, $finalOptions);
+         
+         // Completely short circuit if we already have everything
+         $local = Gdn_Cache::LocalGet($realKey);
+         if ($local !== false)
+            return $local;
+         
+         $realKeys = array($realKey);
       }
       
-      Gdn_Cache::$GetTime += microtime(TRUE) - $StartTime;
-      Gdn_Cache::$GetCount++;
+      $data = array(); $hitCache = false;
+      if ($numKeys = sizeof($realKeys)) {
+         $hitCache = true;
+         if ($numKeys > 1) {
+            $data = $this->Memcache->getMulti($realKeys);
+            $ok = $this->lastAction();
+         } else {
+            $data = $this->Memcache->get($realKey);
+            // Check if things went ok
+            $ok = $this->lastAction($realKey);
+            $data = array($realKey => $data);
+         }
       
-      return ($Data === FALSE) ? $this->Fallback($Key,$Options) : $Data;
+         if (!$ok) return Gdn_Cache::CACHEOP_FAILURE;
+
+         $storeData = array();
+         foreach ($data as $localKey => $localValue)
+            if ($localValue !== false)
+               $storeData[$localKey] = $localValue;
+         $data = $storeData;
+         unset($storeData);
+         
+         // Cache in process memory
+         if (sizeof($data))
+            Gdn_Cache::LocalSet($data);
+      }
+      
+      // Merge in local data
+      $data = array_merge($data, $localData);
+      
+      // Track debug stats
+      $elapsedTime = microtime(true) - $startTime;
+      if (Gdn_Cache::$trace) {
+         Gdn_Cache::$trackTime += $elapsedTime;
+         Gdn_Cache::$trackGets++;
+         
+         $keyTime = sizeof($realKeys) ? $elapsedTime / sizeof($realKeys) : $elapsedTime;
+         foreach ($realKeys as $realKey) {
+            TouchValue($realKey, Gdn_Cache::$trackGet, array(
+               'hits'      => 0,
+               'time'      => 0,
+               'keysize'   => null,
+               'transfer'  => 0,
+               'wasted'    => 0
+            ));
+            
+            $keyData = GetValue($realKey, $data, false);
+            Gdn_Cache::$trackGet[$realKey]['hits']++;
+            Gdn_Cache::$trackGet[$realKey]['time'] += $keyTime;
+            
+            if ($keyData !== false) {
+               $keyData = serialize($keyData);
+
+               $keySize = strlen($keyData);
+               if (is_null(Gdn_Cache::$trackGet[$realKey]['keysize']))
+                  Gdn_Cache::$trackGet[$realKey]['keysize'] = $keySize;
+               else
+                  Gdn_Cache::$trackGet[$realKey]['wasted'] += $keySize;
+
+               Gdn_Cache::$trackGet[$realKey]['transfer'] += Gdn_Cache::$trackGet[$realKey]['keysize'];
+            }
+         }
+      }
+      
+      // Miss: return the fallback
+      if ($data === false) return $this->Fallback($key, $options);
+      
+      // Hit: Single key. Return the value
+      if (!$multi) {
+         $val = sizeof($data) ? array_pop($data) : false;
+         return $val;
+      }
+      
+      // Hit: Multi key. Return stripped array.
+      $dataStripped = array();
+      foreach ($data as $index => $value) {
+         $dataStripped[$this->StripKey($index, $finalOptions)] = $value;
+      }
+      $data = $dataStripped;
+      unset($dataStripped);
+      return $data;
    }
    
    public function Exists($Key, $Options = array()) {
+      if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
+      
       return ($this->Get($Key, $Options) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
    }
    
-   public function Remove($Key, $Options = array()) {
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+   public function Remove($key, $options = array()) {
+      if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
       
-      $RealKey = $this->MakeKey($Key, $FinalOptions);
-      $Deleted = $this->Memcache->delete($RealKey);
-      return ($Deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+      $finalOptions = array_merge($this->StoreDefaults, $options);
+      
+      $realKey = $this->MakeKey($key, $finalOptions);
+      $deleted = $this->Memcache->delete($realKey);
+      
+      // Check if things went ok
+      $ok = $this->lastAction($realKey);
+      if (!$ok) return Gdn_Cache::CACHEOP_FAILURE;
+      
+      unset(Gdn_Cache::$localCache[$realKey]);
+      return ($deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
    }
    
-   public function Replace($Key, $Value, $Options = array()) {
-      return $this->Store($Key, $Value, $Options);
+   public function Replace($key, $value, $options = array()) {
+      if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
+      
+      return $this->Store($key, $value, $options);
    }
    
-   public function Increment($Key, $Amount = 1, $Options = array()) {
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+   public function Increment($key, $amount = 1, $options = array()) {
+      if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
       
-      $Initial = GetValue(Gdn_Cache::FEATURE_INITIAL, $FinalOptions, 0);
-      $Expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY, $FinalOptions, 0);
-      $RequireBinary = $Initial || $Expiry;
-      $Initial = !is_null($Initial) ? $Initial : 0;
-      $Expiry = !is_null($Expiry) ? $Expiry : 0;
+      $finalOptions = array_merge($this->StoreDefaults, $options);
       
-      $TryBinary = $this->Option(Memcached::OPT_BINARY_PROTOCOL, FALSE) & $RequireBinary;
-      $RealKey = $this->MakeKey($Key, $FinalOptions);
-      switch ($TryBinary) {
+      $initial = GetValue(Gdn_Cache::FEATURE_INITIAL, $finalOptions, 0);
+      $expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY, $finalOptions, 0);
+      $requireBinary = $initial || $expiry;
+      $initial = !is_null($initial) ? $initial : 0;
+      $expiry = !is_null($expiry) ? $expiry : 0;
+      
+      $tryBinary = $this->Option(Memcached::OPT_BINARY_PROTOCOL, FALSE) & $requireBinary;
+      $realKey = $this->MakeKey($key, $finalOptions);
+      switch ($tryBinary) {
          case FALSE:
-            $Incremented = $this->Memcache->increment($RealKey, $Amount);
+            $incremented = $this->Memcache->increment($realKey, $amount);
+            if (is_null($incremented) && $initial) {
+               $incremented = $this->Memcache->set($realKey, $initial);
+               if ($incremented) $incremented = $initial;
+            }
             break;
          case TRUE;
-            $Incremented = $this->Memcache->increment($RealKey, $Amount, $Initial, $Expiry);
+            $incremented = $this->Memcache->increment($realKey, $amount, $initial, $expiry);
             break;
       }
-      return ($Incremented !== FALSE) ? $Incremented : Gdn_Cache::CACHEOP_FAILURE;
+      
+      // Check if things went ok
+      $ok = $this->lastAction($realKey);
+      if (!$ok) return Gdn_Cache::CACHEOP_FAILURE;
+      
+      if ($incremented !== FALSE) {
+         Gdn_Cache::LocalSet($realKey, $incremented);
+         return $incremented;
+      }
+      return Gdn_Cache::CACHEOP_FAILURE;
    }
    
-   public function Decrement($Key, $Amount = 1, $Options = array()) {
-      $FinalOptions = array_merge($this->StoreDefaults, $Options);
+   public function Decrement($key, $amount = 1, $options = array()) {
+      if (!$this->Online()) return Gdn_Cache::CACHEOP_FAILURE;
       
-      $Initial = GetValue(Gdn_Cache::FEATURE_INITIAL, $FinalOptions, NULL);
-      $Expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY, $FinalOptions, NULL);
-      $RequireBinary = $Initial || $Expiry;
-      $Initial = !is_null($Initial) ? $Initial : 0;
-      $Expiry = !is_null($Expiry) ? $Expiry : 0;
+      $finalOptions = array_merge($this->StoreDefaults, $options);
       
-      $TryBinary = $this->Option(Memcached::OPT_BINARY_PROTOCOL, FALSE) & $RequireBinary;
-      $RealKey = $this->MakeKey($Key, $FinalOptions);
-      switch ($TryBinary) {
+      $initial = GetValue(Gdn_Cache::FEATURE_INITIAL, $finalOptions, NULL);
+      $expiry = GetValue(Gdn_Cache::FEATURE_EXPIRY, $finalOptions, NULL);
+      $requireBinary = $initial || $expiry;
+      $initial = !is_null($initial) ? $initial : 0;
+      $expiry = !is_null($expiry) ? $expiry : 0;
+      
+      $tryBinary = $this->Option(Memcached::OPT_BINARY_PROTOCOL, FALSE) & $requireBinary;
+      $realKey = $this->MakeKey($key, $finalOptions);
+      switch ($tryBinary) {
          case FALSE:
-            $Decremented = $this->Memcache->decrement($RealKey, $Amount);
+            $decremented = $this->Memcache->decrement($realKey, $amount);
+            if (is_null($decremented) && $initial) {
+               $decremented = $this->Memcache->set($realKey, $initial);
+               if ($decremented) $decremented = $initial;
+            }
             break;
          case TRUE;
-            $Decremented = $this->Memcache->decrement($RealKey, $Amount, $Initial, $Expiry);
+            $decremented = $this->Memcache->decrement($realKey, $amount, $initial, $expiry);
             break;
       }
-      return ($Decremented !== FALSE) ? $Decremented : Gdn_Cache::CACHEOP_FAILURE;
+      
+      // Check if things went ok
+      $ok = $this->lastAction($realKey);
+      if (!$ok) return Gdn_Cache::CACHEOP_FAILURE;
+      
+      if ($decremented !== FALSE) {
+         Gdn_Cache::LocalSet($realKey, $decremented);
+         return $decremented;
+      }
+      return Gdn_Cache::CACHEOP_FAILURE;
    }
    
    public function Flush() {
       return $this->Memcache->flush();
+   }
+   
+   public function lastAction($key = null) {
+      $lastCode = $this->Memcache->getResultCode();
+      $lastMessage = $this->Memcache->getResultMessage();
+      
+      if ($lastCode == 47 || $lastCode == 35) {
+         if ($key) {
+            $server = $this->Memcache->getServerByKey('beep');
+            $host = $server['host'];
+            $port = $server['port'];
+            $this->Fail("{$host}:{$port}");
+         }
+         return false;
+      }
+      return true;
+   }
+   
+   public function online() {
+      return (bool)sizeof($this->Containers);
+   }
+   
+   public function servers() {
+      return $this->Memcache->getServerList();
    }
    
    public function ResultCode() {

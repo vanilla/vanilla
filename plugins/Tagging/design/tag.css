@@ -11,6 +11,10 @@
 .MessageList .Meta.InlineTags {
    min-height: 0;
 }
+.TagCloud {
+   padding: 0;
+   list-style: none;
+}
 .TagCloud li {
    display: inline-block;
    background: #F7F7F7;
@@ -23,4 +27,7 @@
    border: solid 1px #CCCCCC;
    border-color: rgba(0, 0, 0, .2);
    margin: 2px 0;
+}
+.AvailableTag {
+   padding: 2px 5px;
 }

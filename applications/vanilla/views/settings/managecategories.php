@@ -1,6 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 ?>
+<style>
+   .CategoryPhoto {
+      float: left;
+      margin-right: 8px;
+      max-height: 64px;
+      max-width: 64px;
+   }
+</style>
 <div class="Help Aside">
    <?php
    echo Wrap(T('Need More Help?'), 'h2');
@@ -94,11 +102,19 @@ if (C('Vanilla.Categories.Use')) {
          
          echo "\n".'<li id="list_'.$Category->CategoryID.'">';
          // DEBUG: echo Wrap($Category->Name.' [countright: '.$CountRight.' lastcount: '.$LastRight.' opencount: '.$OpenCount.']', 'div');
-         $CategoryUrl = Url('categories/'.rawurlencode($Category->UrlCode).'/', TRUE);
+         $CategoryUrl = CategoryUrl($Category);
+         
+         if ($Category->Photo) {
+            $Photo = Img(Gdn_Upload::Url($Category->Photo), array('class' => 'CategoryPhoto'));
+         } else {
+            $Photo = '';
+         }
+         
          echo Wrap(
             '<table'.($OpenCount > 0 ? ' class="Indented"' : '').'>
                <tr>
                   <td>
+                     '.$Photo.'
                      <strong>'.htmlspecialchars($Category->Name).'</strong>
                      '.Anchor(htmlspecialchars(rawurldecode($CategoryUrl)), $CategoryUrl).'
                      '.Wrap($Category->Description, 'blockquote').'

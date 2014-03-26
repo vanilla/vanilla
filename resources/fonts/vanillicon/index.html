@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>vanillicon glyphs preview</title>
+
+    <style>
+      /* Page Styles */
+
+      * {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      *,
+      *:before,
+      *:after {
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #fff;
+        color: #444;
+        font: 14px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      a,
+      a:visited {
+        color: #888;
+        text-decoration: underline;
+      }
+      a:hover,
+      a:focus { color: #000; }
+
+      header {
+        border-bottom: 2px solid #ddd;
+        margin-bottom: 20px;
+        overflow: hidden;
+        padding: 20px 0;
+      }
+
+      header h1 {
+        color: #888;
+        float: left;
+        font-size: 36px;
+        font-weight: 300;
+      }
+
+      header a {
+        float: right;
+        font-size: 14px;
+      }
+
+      .container {
+        margin: 0 auto;
+        max-width: 1200px;
+        min-width: 960px;
+        padding: 0 40px;
+        width: 90%;
+      }
+
+      .row {
+         margin-left: -5px;
+         margin-right: -5px;
+       }
+       .row:before, .row:after {
+         content: " ";
+         /* 1 */
+         display: table;
+         /* 2 */
+       }
+       .row:after {
+         clear: both;
+       }
+
+       .col {
+         float: left;
+         min-height: 1px;
+         padding-left: 5px;
+         padding-right: 5px;
+         width: 25%;
+       }
+
+       .icon-and-label {
+          position: relative;
+          display: inline-block;
+          padding: 2px 6px;
+       }
+
+      .glyph {
+        border-bottom: 1px dotted #ccc;
+        padding: 10px 0 20px;
+        margin-bottom: 20px;
+      }
+
+      .preview-glyphs { vertical-align: bottom; }
+
+      .preview-scale {
+        color: #888;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+
+      .step {
+        display: inline-block;
+        line-height: 1;
+        position: relative;
+        width: 10%;
+      }
+
+      
+      .size-12 { font-size: 12px; }
+      
+      .size-14 { font-size: 14px; }
+      
+      .size-16 { font-size: 16px; }
+      
+      .size-18 { font-size: 18px; }
+      
+      .size-21 { font-size: 21px; }
+      
+      .size-24 { font-size: 24px; }
+      
+      .size-36 { font-size: 36px; }
+      
+      .size-48 { font-size: 48px; }
+      
+      .size-60 { font-size: 60px; }
+      
+      .size-72 { font-size: 72px; }
+      
+
+      .usage { margin-top: 10px; }
+
+      .usage input {
+        font-family: monospace;
+        margin-right: 3px;
+        padding: 2px 5px;
+        text-align: center;
+      }
+
+      footer {
+        color: #888;
+        font-size: 12px;
+        padding: 20px 0;
+      }
+    </style>
+
+    <link type="text/css" rel="stylesheet" href="../../css/vanillicon.css">
+
+    <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  </head>
+
+  <body>
+    <div id="page" class="container">
+      <header>
+        <h1>vanillicon contains 186 glyphs:</h1>
+      </header>
+
+      <div class="row">
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-adjust"></i> adjust</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-agree"></i> agree</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-align-center"></i> align-center</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-align-justify"></i> align-justify</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-align-left"></i> align-left</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-align-right"></i> align-right</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-angry"></i> angry</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-archive"></i> archive</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-arrow-down"></i> arrow-down</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-arrow-left"></i> arrow-left</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-arrow-right"></i> arrow-right</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-arrow-up"></i> arrow-up</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-ban"></i> ban</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-bar-chart"></i> bar-chart</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-bell"></i> bell</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-bold"></i> bold</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-bookmark"></i> bookmark</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-bookmark-empty"></i> bookmark-empty</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-bug"></i> bug</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-bullhorn"></i> bullhorn</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-bullseye"></i> bullseye</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-calendar"></i> calendar</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-camera"></i> camera</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-caret-down"></i> caret-down</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-caret-left"></i> caret-left</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-caret-right"></i> caret-right</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-caret-up"></i> caret-up</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-certificate"></i> certificate</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-check"></i> check</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-check-empty"></i> check-empty</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-check-sign"></i> check-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-chevron-down"></i> chevron-down</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-chevron-left"></i> chevron-left</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-chevron-right"></i> chevron-right</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-chevron-sign-down"></i> chevron-sign-down</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-chevron-sign-left"></i> chevron-sign-left</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-chevron-sign-right"></i> chevron-sign-right</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-chevron-sign-up"></i> chevron-sign-up</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-chevron-up"></i> chevron-up</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-circle"></i> circle</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-circle-blank"></i> circle-blank</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-cloud"></i> cloud</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-cloud-download"></i> cloud-download</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-cloud-upload"></i> cloud-upload</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-code"></i> code</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-cog"></i> cog</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-cogs"></i> cogs</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-collapse"></i> collapse</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-collapse-top"></i> collapse-top</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-comment"></i> comment</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-comments"></i> comments</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-compass"></i> compass</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-compose"></i> compose</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-crown"></i> crown</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-dashboard"></i> dashboard</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-discussion"></i> discussion</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-dot-circle"></i> dot-circle</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-dropbox"></i> dropbox</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-edit"></i> edit</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-edit-sign"></i> edit-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-ellipsis"></i> ellipsis</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-exclamation-sign"></i> exclamation-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-expand"></i> expand</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-external-link"></i> external-link</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-eye-close"></i> eye-close</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-eye-open"></i> eye-open</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-facebook"></i> facebook</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-facebook-alt"></i> facebook-alt</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-file"></i> file</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-file-text"></i> file-text</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-filter"></i> filter</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-flag"></i> flag</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-flame"></i> flame</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-folder-close"></i> folder-close</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-folder-open"></i> folder-open</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-font"></i> font</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-frown"></i> frown</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-gift"></i> gift</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-github"></i> github</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-globe"></i> globe</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-google-plus"></i> google-plus</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-google-plus-alt"></i> google-plus-alt</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-group"></i> group</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-hand-down"></i> hand-down</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-hand-left"></i> hand-left</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-hand-right"></i> hand-right</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-hand-up"></i> hand-up</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-heart"></i> heart</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-home"></i> home</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-inbox"></i> inbox</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-indent-left"></i> indent-left</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-indent-right"></i> indent-right</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-info-sign"></i> info-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-italic"></i> italic</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-jail"></i> jail</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-key"></i> key</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-lightbulb"></i> lightbulb</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-link"></i> link</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-linkedin"></i> linkedin</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-linkedin-alt"></i> linkedin-alt</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-list-ol"></i> list-ol</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-list-ul"></i> list-ul</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-lock"></i> lock</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-lol"></i> lol</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-mail"></i> mail</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-mail-open"></i> mail-open</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-map-marker"></i> map-marker</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-meh"></i> meh</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-menu"></i> menu</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-minus-sign"></i> minus-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-mobile-phone"></i> mobile-phone</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-mod"></i> mod</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-note"></i> note</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-ok"></i> ok</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-ok-circle"></i> ok-circle</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-ok-sign"></i> ok-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-paper-clip"></i> paper-clip</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-paragraph"></i> paragraph</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-pencil"></i> pencil</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-permalink"></i> permalink</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-picture"></i> picture</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-pinterest"></i> pinterest</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-pinterest-alt"></i> pinterest-alt</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-play-circle"></i> play-circle</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-plus-sign"></i> plus-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-poll"></i> poll</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-preview"></i> preview</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-pushpin"></i> pushpin</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-question"></i> question</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-question-sign"></i> question-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-quote"></i> quote</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-refresh"></i> refresh</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-remove"></i> remove</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-remove-sign"></i> remove-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-repeat"></i> repeat</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-reply"></i> reply</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-reply-all"></i> reply-all</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-report"></i> report</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-resize-full"></i> resize-full</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-resize-small"></i> resize-small</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-retweet"></i> retweet</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-rss"></i> rss</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-search"></i> search</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-select"></i> select</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-share"></i> share</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-shield"></i> shield</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-sign-blank"></i> sign-blank</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-signin"></i> signin</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-signout"></i> signout</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-skull"></i> skull</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-smile"></i> smile</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-source"></i> source</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-spam"></i> spam</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-star"></i> star</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-star-empty"></i> star-empty</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-star-half-empty"></i> star-half-empty</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-steam"></i> steam</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-strikethrough"></i> strikethrough</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-subscript"></i> subscript</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-superscript"></i> superscript</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-table"></i> table</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-tag"></i> tag</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-tags"></i> tags</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-th"></i> th</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-th-large"></i> th-large</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-th-list"></i> th-list</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-thumbs-down"></i> thumbs-down</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-thumbs-up"></i> thumbs-up</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-ticket"></i> ticket</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-time"></i> time</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-trash"></i> trash</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-troll"></i> troll</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-trophy"></i> trophy</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-twitter"></i> twitter</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-twitter-alt"></i> twitter-alt</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-underline"></i> underline</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-undo"></i> undo</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-unlink"></i> unlink</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-unlock"></i> unlock</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-user"></i> user</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-vcard"></i> vcard</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-video"></i> video</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-warn"></i> warn</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-warning-sign"></i> warning-sign</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-wtf"></i> wtf</span>
+      </div>
+      
+      <div class="col">
+         <span class="icon-and-label"><i class="icon icon-zendesk"></i> zendesk</span>
+      </div>
+      
+      </div>
+
+      <footer>
+        Made with love using <a href="http://fontcustom.com">Font Custom</a>.
+      </footer>
+    </div>
+  </body>
+</html>

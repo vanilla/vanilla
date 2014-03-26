@@ -1,24 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-/**
- * Settings Controller
- *
- * @package Dashboard
- */
  
 /**
  * Managing core Dashboard settings.
- *
- * @since 2.0.0
- * @package Dashboard
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class SettingsController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Form', 'Database');
@@ -26,7 +16,7 @@ class SettingsController extends DashboardController {
    /** @var string */
    public $ModuleSortContainer = 'Dashboard';
 
-   /** @var object Gdn_Form */
+   /** @var Gdn_Form */
    public $Form;
    
    /** @var array List of permissions that should all have access to main dashboard. */
@@ -55,7 +45,7 @@ class SettingsController extends DashboardController {
     * @param string $TransientKey Security token.
     */
    public function Applications($Filter = '', $ApplicationName = '', $TransientKey = '') {
-      $this->Permission('Garden.Applications.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Page setup
       $this->AddJsFile('addons.js');
@@ -74,30 +64,6 @@ class SettingsController extends DashboardController {
       $ApplicationManager = new Gdn_ApplicationManager();
       $this->AvailableApplications = $ApplicationManager->AvailableVisibleApplications();
       $this->EnabledApplications = $ApplicationManager->EnabledVisibleApplications();
-      
-      // Loop through all of the available visible apps and mark them if they have an update available
-      // Retrieve the list of apps that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(C('Garden.RequiredUpdates', ''));
-      if (is_array($RequiredUpdates)) {
-         foreach ($RequiredUpdates as $UpdateInfo) {
-            if (is_object($UpdateInfo))
-               $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
-            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
-            $Name = ArrayValue('Name', $UpdateInfo, '');
-            $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach ($this->AvailableApplications as $App => $Info) {
-               $CurrentName = ArrayValue('Name', $Info, $App);
-               if (
-                  $CurrentName == $Name
-                  && $Type == 'Application'
-               ) {
-                  $Info['NewVersion'] = $NewVersion;
-                  $this->AvailableApplications[$App] = $Info;
-               }
-            }
-         }
-      }
       
       if ($ApplicationName != '') {
          $this->EventArguments['ApplicationName'] = $ApplicationName;
@@ -195,8 +161,6 @@ class SettingsController extends DashboardController {
          // Apply the config settings to the form.
          $this->Form->SetData($ConfigurationModel->Data);
       } else {
-         // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Garden.Title', 'Required');
          $SaveData = array();
          if ($this->Form->Save() !== FALSE) {
             $Upload = new Gdn_Upload();
@@ -451,13 +415,6 @@ class SettingsController extends DashboardController {
       $this->Title(T('Dashboard'));
          
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
-      $this->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Edit';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Delete';
@@ -467,21 +424,6 @@ class SettingsController extends DashboardController {
       $this->AddSideMenu('dashboard/settings');
 
       $UserModel = Gdn::UserModel();
-      
-      // Load some data to display on the dashboard
-      $this->BuzzData = array();
-      // Get the number of users in the database
-      // $CountUsers = $UserModel->GetCountLike();
-      // $this->AddDefinition('CountUsers', $CountUsers);
-      // $this->BuzzData[T('Users')] = number_format($CountUsers);
-      // Get the number of new users in the last day
-      $this->BuzzData[T('New users in the last day')] = number_format(
-         $UserModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 day'))))
-      );
-      // Get the number of new users in the last week
-      $this->BuzzData[T('New users in the last week')] = number_format(
-         $UserModel->GetCountWhere(array('DateInserted >=' => Gdn_Format::ToDateTime(strtotime('-1 week'))))
-      );
       
       // Get recently active users
       $this->ActiveUserData = $UserModel->GetActiveUsers(5);
@@ -661,7 +603,7 @@ class SettingsController extends DashboardController {
     * @param string $TransientKey Security token.
     */
    public function Plugins($Filter = '', $PluginName = '', $TransientKey = '') {
-      $this->Permission('Garden.Plugins.Manage');
+      $this->Permission('Garden.Settings.Manage');
       
       // Page setup
       $this->AddJsFile('addons.js');
@@ -680,30 +622,6 @@ class SettingsController extends DashboardController {
       self::SortAddons($this->EnabledPlugins);
       $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
       self::SortAddons($this->AvailablePlugins);
-      
-      // Loop through all of the available plugins and mark them if they have an update available
-      // Retrieve the list of plugins that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
-      if (is_array($RequiredUpdates)) {
-         foreach ($RequiredUpdates as $UpdateInfo) {
-            if (is_object($UpdateInfo))
-               $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
-            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
-            $Name = ArrayValue('Name', $UpdateInfo, '');
-            $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach ($this->AvailablePlugins as $Plugin => $Info) {
-               $CurrentName = ArrayValue('Name', $Info, $Plugin);
-               if (
-                  $CurrentName == $Name
-                  && $Type == 'Plugin'
-               ) {
-                  $Info['NewVersion'] = $NewVersion;
-                  $this->AvailablePlugins[$Plugin] = $Info;
-               }
-            }
-         }
-      }
       
       if ($PluginName != '') {
          try {
@@ -741,9 +659,7 @@ class SettingsController extends DashboardController {
     * @param string $RedirectUrl Where to send user after registration.
     */
    public function Registration($RedirectUrl = '') {
-      $this->Permission('Garden.Registration.Manage');
-		if(!C('Garden.Registration.Manage', TRUE))
-			return Gdn::Dispatcher()->Dispatch('Default404');
+      $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/settings/registration');
       
       $this->AddJsFile('registration.js');
@@ -928,7 +844,7 @@ class SettingsController extends DashboardController {
     * @todo Why is this in a giant try/catch block?
     */
    public function ThemeOptions($Style = NULL) {
-      $this->Permission('Garden.Themes.Manage');
+      $this->Permission('Garden.Settings.Manage');
 
       try {
          $this->AddJsFile('addons.js');
@@ -998,7 +914,7 @@ class SettingsController extends DashboardController {
       $this->AddJsFile('addons.js');
       $this->SetData('Title', T('Themes'));
          
-      $this->Permission('Garden.Themes.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $this->AddSideMenu('dashboard/settings/themes');
       
       $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo(TRUE);
@@ -1006,29 +922,6 @@ class SettingsController extends DashboardController {
       $this->SetData('EnabledTheme', Gdn::ThemeManager()->EnabledThemeInfo());
       $this->SetData('EnabledThemeName', GetValue('Name', $ThemeInfo, GetValue('Index', $ThemeInfo)));
       
-      // Loop through all of the available themes and mark them if they have an update available
-      // Retrieve the list of themes that require updates from the config file
-      $RequiredUpdates = Gdn_Format::Unserialize(Gdn::Config('Garden.RequiredUpdates', ''));
-      if (is_array($RequiredUpdates)) {
-         foreach ($RequiredUpdates as $UpdateInfo) {
-            if (is_object($UpdateInfo))
-               $UpdateInfo = Gdn_Format::ObjectAsArray($UpdateInfo);
-               
-            $NewVersion = ArrayValue('Version', $UpdateInfo, '');
-            $Name = ArrayValue('Name', $UpdateInfo, '');
-            $Type = ArrayValue('Type', $UpdateInfo, '');
-            foreach (Gdn::ThemeManager()->AvailableThemes() as $Theme => $Info) {
-               $CurrentName = ArrayValue('Name', $Info, $Theme);
-               if (
-                  $CurrentName == $Name
-                  && $Type == 'Theme'
-               ) {
-                  $Info['NewVersion'] = $NewVersion;
-                  $AvailableThemes[$Theme] = $Info;
-               }
-            }
-         }
-      }
       $Themes = Gdn::ThemeManager()->AvailableThemes();
       uasort($Themes, array('SettingsController', '_NameSort'));
       
@@ -1078,7 +971,7 @@ class SettingsController extends DashboardController {
     * @param string $ThemeName Unique ID.
     */
    public function PreviewTheme($ThemeName = '') {
-      $this->Permission('Garden.Themes.Manage');
+      $this->Permission('Garden.Settings.Manage');
       $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
       
       $PreviewThemeName = $ThemeName;
@@ -1107,46 +1000,6 @@ class SettingsController extends DashboardController {
    }
    
    /**
-    * Remove an addon.
-    *
-    * @since 2.0.0
-    * @access public
-    * @param string $Type Application or plugin.
-    * @param string $Name Unique ID of app or plugin.
-    * @param string $TransientKey Security token.
-    */
-   public function RemoveAddon($Type, $Name, $TransientKey = '') {
-      $RequiredPermission = 'Undefined';
-      switch ($Type) {
-         case SettingsModule::TYPE_APPLICATION:
-            $Manager = Gdn::Factory('ApplicationManager');
-            $Enabled = 'EnabledApplications';
-            $Remove  = 'RemoveApplication';
-            $RequiredPermission = 'Garden.Applications.Manage';
-         break;
-         case SettingsModule::TYPE_PLUGIN:
-            $Manager = Gdn::Factory('PluginManager');
-            $Enabled = 'EnabledPlugins';
-            $Remove  = 'RemovePlugin';
-            $RequiredPermission = 'Garden.Plugins.Manage';
-         break;
-      }
-      
-      $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission($RequiredPermission)) {
-         try {
-            if (array_key_exists($Name, $Manager->$Enabled()) === FALSE) {
-               $Manager->$Remove($Name);
-            }
-         } catch (Exception $e) {
-            $this->Form->AddError(strip_tags($e->getMessage()));
-         }
-      }
-      if ($this->Form->ErrorCount() == 0)
-         Redirect('/settings/plugins');
-   }
-   
-   /**
     * Remove the logo from config & delete it.
     *
     * @since 2.1
@@ -1154,7 +1007,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveFavicon($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Themes.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
          $Favicon = C('Garden.FavIcon', '');
          RemoveFromConfig('Garden.FavIcon');
          $Upload = new Gdn_Upload();
@@ -1174,7 +1027,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveLogo($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Themes.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
          $Logo = C('Garden.Logo', '');
          RemoveFromConfig('Garden.Logo');
          @unlink(PATH_ROOT . DS . $Logo);

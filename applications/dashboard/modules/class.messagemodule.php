@@ -14,6 +14,8 @@ class MessageModule extends Gdn_Module {
 
    public function __construct($Sender = '', $Message = FALSE) {
       parent::__construct($Sender);
+      
+      $this->_ApplicationFolder = 'dashboard';
       $this->_Message = $Message;
    }
    

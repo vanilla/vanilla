@@ -209,16 +209,23 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
    public function GetDelete($TableName, $Wheres = array()) {
       $Conditions = '';
       $Joins = '';
+      $DeleteFrom = '';
       
       if (count($this->_Joins) > 0) {
          $Joins .= "\n";
-
-         // special consideration for table aliases
-         // if (count($this->_AliasMap) > 0 && $this->Database->DatabasePrefix)
-         //    $Joins .= implode("\n", $this->_FilterTableAliases($this->_Joins));
-         // else
          $Joins .= implode("\n", $this->_Joins);
-      }      
+         
+         
+         $DeleteFroms = array();
+         foreach ($this->_Froms as $From) {
+            $Parts = preg_split('`\s`', trim($From));
+            if (count($Parts) > 1)
+               $DeleteFroms[] = $Parts[1].'.*';
+            else
+               $DeleteFroms[] = $Parts[0].'.*';
+         }
+         $DeleteFrom = implode(', ', $DeleteFroms);
+      }
 
       if (count($Wheres) > 0) {
          $Conditions = "\nwhere ";
@@ -229,7 +236,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
       }
 
-      return "delete ".$TableName." from ".$TableName.$Joins.$Conditions;
+      return "delete $DeleteFrom from ".$TableName.$Joins.$Conditions;
    }
 
    /**
@@ -245,7 +252,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
       if (!is_array($Data))
          trigger_error(ErrorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', 'GetInsert'), E_USER_ERROR);
 
-      $Sql = 'insert '.($this->Options('Ignore') ? 'ignore ' : '').$this->FormatTableName($Table).' ';
+      if ($this->Options('Replace'))
+         $Sql = 'replace ';
+      else
+         $Sql = 'insert '.($this->Options('Ignore') ? 'ignore ' : '');
+      
+      $Sql .= $this->FormatTableName($Table).' ';
       if ($Select != '') {
          $Sql .= "\n(".implode(', ', $Data).') '
          ."\n".$Select;

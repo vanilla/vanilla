@@ -16,7 +16,7 @@
 define('JOIN_INNER', 'inner');
 define('JOIN_LEFT', 'left');
 
-class Gdn_DataSet implements IteratorAggregate {
+class Gdn_DataSet implements IteratorAggregate, Countable {
 
    /**
     * Contains a reference to the open database connection. FALSE by default.
@@ -85,6 +85,15 @@ class Gdn_DataSet implements IteratorAggregate {
       $this->Connection = NULL;
       $this->FreePDOStatement(TRUE);
    }
+   
+   /**
+    * Count elements of this object. This method provides support for the countable interface.
+    * 
+    * @return int
+    */
+   public function count() {
+      return $this->NumRows();
+   }
 
    /**
     * Moves the dataset's internal cursor pointer to the specified RowIndex.
@@ -121,6 +130,33 @@ class Gdn_DataSet implements IteratorAggregate {
 			return $this->_DatasetType;
 		}
 	}
+   
+   public function ExpandAttributes($Name = 'Attributes') {
+      $Result =& $this->Result();
+      
+      foreach ($Result as &$Row) {
+         if (is_object($Row)) {
+            if (is_string($Row->$Name)) {
+               $Attributes = @unserialize($Row->$Name);
+               
+               if (is_array($Attributes)) {
+                  foreach ($Attributes as $N => $V) {
+                     $Row->$N = $V;
+                  }
+               }
+               unset($Row->$Name);
+            }
+         } else {
+            if (is_string($Row[$Name])) {
+               $Attributes = @unserialize($Row[$Name]);
+               
+               if (is_array($Attributes))
+                  $Row = array_merge($Row, $Attributes);
+               unset($Row[$Name]);
+            }
+         }
+      }
+   }
 
    /**
     * Fetches all rows from the PDOStatement object into the resultset.
@@ -544,7 +580,7 @@ class Gdn_DataSet implements IteratorAggregate {
       $Result =& $this->Result();
       $First = TRUE;
       
-      foreach ($Result as $Row) {
+      foreach ($Result as &$Row) {
          if ($First) {
             // Check which fields are in the dataset.
             foreach ($Fields as $Index => $Field) {
@@ -566,7 +602,7 @@ class Gdn_DataSet implements IteratorAggregate {
          }
       }
    }
-
+   
    /**
     * Advances to the next row and returns the value rom a column.
     *

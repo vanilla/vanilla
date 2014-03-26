@@ -26,8 +26,8 @@ if ($Thumbnail && !IsUrl($Thumbnail))
 
 $Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));
 ?>
-<div class="SmallPopup">
-<h2 class="H"><?php echo $this->Data('Title'); ?></h2>
+<div class="SmallPopup FormTitleWrapper">
+<h1 class="H"><?php echo $this->Data('Title'); ?></h1>
 <?php
 echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
@@ -66,6 +66,6 @@ echo $this->Form->Errors();
       <?php echo $this->Form->Input('Picture', 'file'); ?>
    </li>
 </ul>
-<div class="Warning"><?php echo T('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
+<div class="DismissMessage WarningMessage"><?php echo T('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
 <?php echo $this->Form->Close('Upload', '', array('class' => 'Button Primary')); ?>
 </div>

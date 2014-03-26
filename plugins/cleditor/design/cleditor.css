@@ -19,3 +19,7 @@ blockquote.Quote, blockQuote.UserQuote {
 .Spoiler {
    background: #ff0;
 }
+
+.cleditorGroup {
+   background: #ffffff;
+}

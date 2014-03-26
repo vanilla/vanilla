@@ -223,6 +223,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
    public function ToString() {
       if ($this->Visible)
          return $this->FetchView();
+      else return '';
    }
 
    /**

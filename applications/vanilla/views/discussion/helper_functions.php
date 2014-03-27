@@ -449,8 +449,11 @@ function WriteEmbedCommentForm() {
       echo "<div class=\"Buttons\">\n";
 
       $AllowSigninPopup = C('Garden.SignIn.Popup');
-      $Attributes = array('tabindex' => '-1');
-      $ReturnUrl = Gdn::Request()->PathAndQuery();
+      $Attributes = array('tabindex' => '-1', 'target' => '_top');
+
+      // If we aren't ajaxing this call then we need to target the url of the parent frame.
+      $ReturnUrl = $Controller->Data('ForeignSource.vanilla_url', Gdn::Request()->PathAndQuery());
+      
       if ($Session->IsValid()) {
          $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
          echo Wrap(

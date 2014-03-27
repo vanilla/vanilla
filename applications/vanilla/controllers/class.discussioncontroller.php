@@ -853,13 +853,15 @@ body { background: transparent !important; }
          $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
       }
 
-      if ($Draft)
+      if ($Draft) {
          $this->Form->SetFormValue('Body', $Draft->Body);
-      else {
+      } else {
          // Look in the session stash for a comment
          $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE);
-         if ($StashComment)
+         if ($StashComment) {
+            $this->Form->SetValue('Body', $StashComment);
             $this->Form->SetFormValue('Body', $StashComment);
+         }
       }
 
       // Deliver JSON data if necessary

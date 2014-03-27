@@ -17,10 +17,7 @@ echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 <div class="Info">
-   <?php
-   echo T('Your entire vanilla forum can be embedded into another page. This is typically done so you can insert your forum into another site with minimal theming effort. The preferred method is to ');
-   echo Anchor(T('customize your theme'), 'settings/themes');
-   echo T(' to match your existing website.');
+   <?php echo sprintf(T('Your entire vanilla forum can be embedded into another page. This is typically done so you can insert your forum into another site with minimal theming effort. The preferred method is to %s to match your existing website.'), Anchor(T('customize your theme'), 'settings/themes'));
    if (!$AllowEmbed) {
       echo Wrap('<span style="background: #ff0;">'.T('Embedding is currently DISABLED.').'</span>', 'p');
       echo Anchor(T('Enable Embedding'), 'embed/forum/enable/'.Gdn::Session()->TransientKey(), 'SmallButton');
@@ -49,7 +46,7 @@ echo $this->Form->Close();
    <?php echo Anchor(T('Get The Vanilla Forums Plugin from WordPress.org Now'), 'http://wordpress.org/extend/plugins/vanilla-forums/', 'Button'); ?>
    <div class="Info">
       <h2><?php echo T('Not Using WordPress?'); ?></h2>
-      <p><?php echo T('If you are not using WordPress, you can '); ?><?php echo Anchor(T('use the universal code', 'embed/forum/universal')); ?> <?php echo T('for embedding your Vanilla Forum.'); ?></p>
+      <p><?php echo sprintf(T('If you are not using WordPress, you can %s for embedding your Vanilla Forum.'), Anchor(T('use the universal code'), 'embed/forum/universal')); ?></p>
    </div>
 <?php } else if ($this->EmbedType == 'universal') { ?>
    <style type="text/css">

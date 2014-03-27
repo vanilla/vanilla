@@ -49,7 +49,7 @@ echo $this->Form->Close();
    <?php echo Anchor(T('Get The Vanilla Forums Plugin from WordPress.org Now'), 'http://wordpress.org/extend/plugins/vanilla-forums/', 'Button'); ?>
    <div class="Info">
       <h2><?php echo T('Not Using WordPress?'); ?></h2>
-      <p><?php echo T('If you are not using WordPress, you can '); ?><?php echo Anchor(T('use the universal code'), 'embed/comments/universal'); ?><?php echo T(' for embedding Vanilla Comments.'); ?></p>
+      <p><?php echo sprintf(T('If you are not using WordPress, you can %s for embedding Vanilla Comments.'), Anchor(T('use the universal code'), 'embed/comments/universal')); ?></p>
    </div>
 <?php } else if ($this->EmbedType == 'settings') { ?>
    <style type="text/css">
@@ -125,14 +125,8 @@ p.AlertMessage {
    </style>
 <h1><?php echo T('Use Vanilla as a commenting system in your site'); ?></h1>
 <div class="Info">
-   <p><?php echo T('You can use Vanilla as a commenting system for your website, and all
-   contributed comments will also be present in your discussion forum. Vanilla 
-   Comments can be used on any website using the following code.'); ?></p>
-   
-   <p class="AlertMessage"><strong><?php echo T('Note:'); ?></strong> <?php echo T('You MUST define the'); ?> <code>vanilla_forum_url</code>
-   <?php echo T('and'); ?> <code>vanilla_identifier</code> <?php echo T('settings before pasting this script into
-   your web page.'); ?></p>
-   
+   <p><?php echo T('You can use Vanilla as a commenting system for your website, and all contributed comments will also be present in your discussion forum. Vanilla Comments can be used on any website using the following code.'); ?></p>
+   <p class="AlertMessage"><strong><?php echo T('Note:'); ?></strong> <?php echo sprintf(T('You MUST define the %s and %s settings before pasting this script into your web page.'), '<code>vanilla_forum_url</code>', '<code>vanilla_identifier</code>'); ?></p>   
    <div class="CopyBox">&lt;div id="vanilla-comments">&lt;/div>
 &lt;script type="text/javascript">
 <p><strong><?php echo T('/*** Required Settings: Edit BEFORE pasting into your web page ***/'); ?></strong></p>
@@ -160,8 +154,7 @@ p.AlertMessage {
    <h2><?php echo T('Comment Counts'); ?></h2>
    <p><?php echo T('To show the number of comments on each blog post on your main blog page, use the following code.'); ?></p>
 
-   <p class="AlertMessage"><strong><?php echo T('Note:'); ?></strong> <?php echo T('You MUST define the'); ?> <code>vanilla_forum_url</code> 
-      <?php echo T('before pasting this script into your web page.'); ?></p>
+   <p class="AlertMessage"><strong><?php echo T('Note:'); ?></strong> <?php echo sprintf(T('You MUST define the %s before pasting this script into your web page.'), '<code>vanilla_forum_url</code>'); ?></p>
 
    <div class="CopyBox">&lt;script type="text/javascript">
 <p><strong><?php echo T('/*** Required Settings: Edit BEFORE pasting into your web page ***/'); ?></strong></p>
@@ -184,10 +177,10 @@ p.AlertMessage {
    <p class="WarningMessage">&uarr; <?php echo T('Copy and paste this code at the bottom of the page right before the closing &lt;/body> tag.'); ?></p>
    <p>&nbsp;</p>
    <p><strong><?php echo T('One more thing!'); ?></strong></p>
-   <p><?php echo T('You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a '); ?><strong>vanilla-identifier</strong> <?php echo T('attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when embedding the comments into the page.'); ?></p>
-   <div class="CopyBox">&lt;a href="<?php echo T('http://yourdomain.com/path/to/page/with/comments/#vanilla_comments'); ?>" <strong>vanilla-identifier="embed-test"</strong>><?php echo T('Comments'); ?>&lt;/a></div>
+   <p><?php echo sprintf(T('You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a %s attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when embedding the comments into the page.'), '<strong>vanilla-identifier</strong>'); ?></p>
+   <div class="CopyBox">&lt;a href="<?php echo T('http://yourdomain.com/path/to/page/with/comments/#vanilla_comments'); ?>" <strong>vanilla-identifier="embed-test"</strong> <?php echo T('Comments'); ?>&lt;/a></div>
    
-   <p><?php echo T('Vanilla will then replace the content of the anchor (in this case, the word'); ?> "<?php echo T('Comments'); ?>") <?php echo T('with the number of comments on the page in question.'); ?></p>
+   <p><?php echo sprintf(T('Vanilla will then replace the content of the anchor (in this case, the word %s with the number of %s on the page in question.'), T('Comments'), T('comments')); ?></p>
 </div>
 <?php
    }

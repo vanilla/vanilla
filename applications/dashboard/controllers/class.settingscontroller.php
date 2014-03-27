@@ -972,40 +972,46 @@ class SettingsController extends DashboardController {
       $this->SetData('Title', T('Mobile Themes'));
 
       $this->Permission('Garden.Settings.Manage');
-      $this->AddSideMenu('dashboard/settings/themes');
+      $this->AddSideMenu('dashboard/settings/mobilethemes');
 
-      $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo(TRUE);
+      // Get currently enabled theme.
+      $EnabledThemeName = Gdn::ThemeManager()->MobileTheme();
+      $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($EnabledThemeName);
       $this->SetData('EnabledThemeFolder', GetValue('Folder', $ThemeInfo));
-      $this->SetData('EnabledTheme', Gdn::ThemeManager()->EnabledThemeInfo());
+      $this->SetData('EnabledTheme', $ThemeInfo);
       $this->SetData('EnabledThemeName', GetValue('Name', $ThemeInfo, GetValue('Index', $ThemeInfo)));
 
+      decho($ThemeInfo);
+
+
+
+      // Get all themes.
       $Themes = Gdn::ThemeManager()->AvailableThemes();
-      // Only show mobile themes.
+
+      // Filter themes.
       foreach ($Themes as $ThemeKey => $ThemeData) {
+
+         // Only show mobile themes.
          if (empty($ThemeData['IsMobile'])) {
+            unset($Themes[$ThemeKey]);
+         }
+
+         // Remove themes that are archived
+         if (!empty($ThemeData['Archived'])) {
             unset($Themes[$ThemeKey]);
          }
       }
 
       uasort($Themes, array('SettingsController', '_NameSort'));
-
-      // Remove themes that are archived
-      $Remove = array();
-      foreach ($Themes as $Index => $Theme) {
-         $Archived = GetValue('Archived', $Theme);
-         if ($Archived)
-            $Remove[] = $Index;
-      }
-      foreach ($Remove as $Index) {
-         unset($Themes[$Index]);
-      }
       $this->SetData('AvailableThemes', $Themes);
 
+      // Process self-post.
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
-            if ($ThemeInfo === FALSE)
+            if ($ThemeInfo === FALSE) {
                throw new Exception(sprintf(T("Could not find a theme identified by '%s'"), $ThemeName));
+            }
 
             Gdn::Session()->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
             Gdn::ThemeManager()->EnableTheme($ThemeName);
@@ -1016,10 +1022,12 @@ class SettingsController extends DashboardController {
             $this->Form->AddError($Ex);
          }
 
-         if ($this->Form->ErrorCount() == 0)
+         // TODO Ajaxify this.
+         if ($this->Form->ErrorCount() == 0) {
             Redirect('/settings/mobilethemes');
-
+         }
       }
+
       $this->Render();
    }
 

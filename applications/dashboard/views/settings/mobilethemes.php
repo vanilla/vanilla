@@ -3,16 +3,19 @@ $Session = Gdn::Session();
 $AddonUrl = Gdn::Config('Garden.AddonUrl');
 ?>
 
-<h1><?php echo T('Manage Mobile Themes'); ?></h1>
+<h1>
+   <?php echo T('Manage Mobile Themes'); ?>
+</h1>
 
 <?php echo $this->Form->Errors(); ?>
+
 <div class="Messages Errors TestAddonErrors Hidden">
    <ul>
       <li><?php echo T('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
    </ul>
 </div>
+
 <div class="CurrentTheme">
-   <h3><?php echo T('Current Theme'); ?></h3>
    <?php
    $Version = $this->Data('EnabledTheme.Version');
    $ThemeUrl = $this->Data('EnabledTheme.Url');
@@ -72,53 +75,40 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
    }
    ?>
 </div>
-<?php if (count($this->Data('AvailableThemes', array())) > 1) { ?>
+
+
+
+
+
+
+
+
+<?php if (count($this->Data('AvailableThemes', array())) > 1): ?>
 <div class="BrowseThemes">
    <h3><?php echo T('Other Themes'); ?></h3>
-   <table class="SelectionGrid Themes">
-      <tbody>
-   <?php
-   $Alt = FALSE;
-   $Cols = 3;
-   $Col = 0;
+   <div class="SelectionGrid Themes">
 
-   foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
+   <?php
+
+   foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo):
+
       $ScreenName = GetValue('Name', $ThemeInfo, $ThemeName);
       $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
       $Active = $ThemeFolder == $this->Data('EnabledThemeFolder');
-      if (!$Active) {
-         $Version = GetValue('Version', $ThemeInfo, '');
-         $ThemeUrl = GetValue('Url', $ThemeInfo, '');
-         $Author = GetValue('Author', $ThemeInfo, '');
-         $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');
-         $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
-         $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-         $PreviewUrl = GetValue('ScreenshotUrl', $ThemeInfo, FALSE);
 
-         $Col++;
-         if ($Col == 1) {
-            $ColClass = 'FirstCol';
-            echo '<tr>';
-         } elseif ($Col == 2) {
-            $ColClass = 'MiddleCol';
-         } else {
-            $ColClass = 'LastCol';
-            $Col = 0;
-         }
-         $ColClass .= $Active ? ' Enabled' : '';
-         $ColClass .= $PreviewUrl ? ' HasPreview' : '';
-         ?>
-            <td class="<?php echo $ColClass; ?>">
+      $Version = GetValue('Version', $ThemeInfo, '');
+      $ThemeUrl = GetValue('Url', $ThemeInfo, '');
+      $Author = GetValue('Author', $ThemeInfo, '');
+      $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');
+      $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
+      $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+      $PreviewUrl = GetValue('ScreenshotUrl', $ThemeInfo, FALSE);
+
+      ?>
+            <div class="themeblock">
                <?php
                   echo '<h4>';
                      echo $ThemeUrl != '' ? Anchor($ScreenName, $ThemeUrl) : $ScreenName;
-                            /*
-                     if ($Version != '')
-                        $Info = sprintf(T('Version %s'), $Version);
-
-                     if ($Author != '')
-                        $Info .= sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author);
-                            */
                   echo '</h4>';
 
                   if ($PreviewUrl !== FALSE) {
@@ -166,18 +156,9 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                      echo '</div>';
                   }
                ?>
-            </td>
-            <?php
-         if ($Col == 0)
-            echo '</tr>';
-      }
-   }
-   // Close the row if it wasn't a full row.
-   if ($Col > 0)
-      echo '<td class="LastCol EmptyCol"'.($Col == 1 ? ' colspan="2"' : '').'>&#160;</td></tr>';
-   ?>
-      </tbody>
-   </table>
+            </div>
+   <?php endforeach; ?>
+   </div>
 </div>
-<?php
-}
+
+<?php endif; ?>

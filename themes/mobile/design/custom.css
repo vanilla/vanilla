@@ -56,7 +56,7 @@ a.Close {
 	color: #555;
 }
 body.Post a.Close {
-	color: inherit;	
+	color: inherit;
 }
 
 /* Banner */
@@ -260,7 +260,7 @@ body#dashboard_entry_signin .Methods,
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 .Warning {
 	background: #d00;
@@ -413,4 +413,9 @@ td.BigCount {
 }
 .CommentForm .FormWrapper {
     padding: 10px;
+}
+
+/* Data counts */
+.CountItemWrap {
+    width: auto; /* Keep counts from being mushed together */
 }

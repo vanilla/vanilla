@@ -14,7 +14,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 $ThemeInfo['mobile'] = array(
    'Name' => 'Mobile',
    'Description' => "A refined design for mobile browsers",
-   'Version' => '1.1.3',
+   'Version' => '1.1.4',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'

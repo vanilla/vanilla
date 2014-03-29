@@ -1067,7 +1067,7 @@ jQuery(document).ready(function($) {
    }
 
 	// Stash something in the user's session (or unstash the value if it was not provided)
-	stash = function(name, value) {
+	stash = function(name, value, callback) {
 		$.ajax({
 			type: "POST",
 			url: gdn.url('session/stash'),
@@ -1078,7 +1078,12 @@ jQuery(document).ready(function($) {
 			},
 			success: function(json) {
 				gdn.inform(json);
-				return json.Unstash;
+
+                if (typeof(callback) === 'function') {
+                    callback();
+                } else {
+				    return json.Unstash;
+                }
 			}
 		});
 
@@ -1086,13 +1091,21 @@ jQuery(document).ready(function($) {
 	}
 
 	// When a stash anchor is clicked, look for inputs with values to stash
-	$('a.Stash').click(function() {
-      // Embedded comments
+	$('a.Stash').click(function(e) {
+        // Embedded comments
 		var comment = $('#Form_Comment textarea').val(),
-         placeholder = $('#Form_Comment textarea').attr('placeholder'),
-         vanilla_identifier = gdn.definition('vanilla_identifier');
-		if (vanilla_identifier && comment != '' && comment != placeholder)
-			stash('CommentForForeignID_' + vanilla_identifier, comment);
+        placeholder = $('#Form_Comment textarea').attr('placeholder'),
+        vanilla_identifier = gdn.definition('vanilla_identifier');
+
+		if (vanilla_identifier && comment != '' && comment != placeholder) {
+            var href = $(this).attr('href');
+            e.preventDefault();
+
+
+			stash('CommentForForeignID_' + vanilla_identifier, comment, function() {
+                window.top.location = href;
+            });
+        }
 	});
 
    String.prototype.addCommas = function() {

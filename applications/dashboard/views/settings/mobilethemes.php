@@ -15,6 +15,8 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
    </ul>
 </div>
 
+
+<?php /*
 <div class="CurrentTheme">
    <?php
    $Version = $this->Data('EnabledTheme.Version');
@@ -76,7 +78,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
    ?>
 </div>
 
-
+*/ ?>
 
 
 
@@ -84,17 +86,43 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
 
 <?php if (count($this->Data('AvailableThemes', array())) > 1): ?>
-<div class="BrowseThemes">
-   <h3><?php echo T('Other Themes'); ?></h3>
-   <div class="SelectionGrid Themes">
+
+
+
+
+
+<div class="browser-mobile-themes">
 
    <?php
 
+   // Get currently enabled theme data.
+   $EnabledVersion = $this->Data('EnabledTheme.Version');
+   $EnabledThemeUrl = $this->Data('EnabledTheme.Url');
+   $EnabledAuthor = $this->Data('EnabledTheme.Author');
+   $EnabledAuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
+   $EnabledNewVersion = $this->Data('EnabledTheme.NewVersion');
+   $EnabledUpgrade = $EnabledNewVersion != '' && version_compare($EnabledNewVersion, $EnabledVersion, '>');
+   $EnabledPreviewUrl = $this->Data('EnabledTheme.ScreenshotUrl', FALSE);
+   $EnabledThemeName = $this->Data('EnabledThemeName');
+
+   if ($this->Data('EnabledTheme.Options')) {
+      $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'), Anchor(T('Theme Options'), '/dashboard/settings/themeoptions'));
+   }
+
    foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo):
+
+      decho($EnabledThemeName);
+   decho($ThemeName);
+
+      if ($EnabledThemeName == $ThemeName) {
+         decho('THIS IS IT');
+      }
 
       $ScreenName = GetValue('Name', $ThemeInfo, $ThemeName);
       $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
       $Active = $ThemeFolder == $this->Data('EnabledThemeFolder');
+
+      decho($ScreenName);
 
       $Version = GetValue('Version', $ThemeInfo, '');
       $ThemeUrl = GetValue('Url', $ThemeInfo, '');
@@ -158,7 +186,6 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                ?>
             </div>
    <?php endforeach; ?>
-   </div>
 </div>
 
 <?php endif; ?>

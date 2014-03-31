@@ -1435,7 +1435,9 @@ class UserModel extends Gdn_Model {
       if (array_key_exists('Gender', $FormPostValues))
          $FormPostValues['Gender'] = self::FixGender($FormPostValues['Gender']);
 
-      switch (strtolower(C('Garden.Registration.Method'))) {
+      $Method = strtolower(GetValue('Method', $Options, C('Garden.Registration.Method')));
+
+      switch ($Method) {
          case 'captcha':
             $UserID = $this->InsertForBasic($FormPostValues, GetValue('CheckCaptcha', $Options, TRUE), $Options);
             break;
@@ -2079,28 +2081,35 @@ class UserModel extends Gdn_Model {
       $InviteUserID = 0;
       $InviteUsername = '';
       $InvitationCode = ArrayValue('InvitationCode', $FormPostValues, '');
-      $this->SQL->Select('i.InvitationID, i.InsertUserID, i.Email')
-         ->Select('s.Name', '', 'SenderName')
-         ->From('Invitation i')
-         ->Join('User s', 'i.InsertUserID = s.UserID', 'left')
-         ->Where('Code', $InvitationCode)
-         ->Where('AcceptedUserID is null'); // Do not let them use the same invitation code twice!
-      $InviteExpiration = Gdn::Config('Garden.Registration.InviteExpiration');
-      if ($InviteExpiration != 'FALSE' && $InviteExpiration !== FALSE)
-         $this->SQL->Where('i.DateInserted >=', Gdn_Format::ToDateTime(strtotime($InviteExpiration)));
 
-      $Invitation = $this->SQL->Get()->FirstRow();
-      if ($Invitation !== FALSE) {
-         $InviteUserID = $Invitation->InsertUserID;
-         $InviteUsername = $Invitation->SenderName;
-         $FormPostValues['Email'] = $Invitation->Email;
-      }
-      if ($InviteUserID <= 0) {
-         $this->Validation->AddValidationResult('InvitationCode', 'ErrorBadInvitationCode');
+      $Invitation = $this->SQL->GetWhere('Invitation', array('Code' => $InvitationCode))->FirstRow();
+
+      // If there is no invitation then bail out.
+      if (!$Invitation) {
+         $this->Validation->AddValidationResult('InvitationCode', 'Invitation not found.');
          return FALSE;
       }
 
-      if ($this->Validate($FormPostValues, TRUE) === TRUE) {
+      // Get expiration date in timestamp. If nothing set, grab config default.
+      $InviteExpiration = $Invitation->DateExpires;
+      if ($InviteExpiration != NULL) {
+         $InviteExpiration = Gdn_Format::ToTimestamp($InviteExpiration);
+      } else {
+         $DefaultExpire = '1 week';
+         $InviteExpiration = strtotime(C('Garden.Registration.InviteExpiration', '1 week'), Gdn_Format::ToTimestamp($Invitation->DateInserted));
+         if ($InviteExpiration === FALSE) {
+            $InviteExpiration = strtotime($DefaultExpire);
+         }
+      }
+
+      if ($InviteExpiration <= time()) {
+         $this->Validation->AddValidationResult('DateExpires', 'The invitation has expired.');
+      }
+
+      $InviteUserID = $Invitation->InsertUserID;
+      $FormPostValues['Email'] = $Invitation->Email;
+
+      if ($this->Validate($FormPostValues, TRUE)) {
          // Check for spam.
          $Spam = SpamModel::IsSpam('Registration', $FormPostValues);
          if ($Spam) {
@@ -2122,10 +2131,22 @@ class UserModel extends Gdn_Model {
          if ($InviteUserID > 0)
             $Fields['InviteUserID'] = $InviteUserID;
 
-
          // And insert the new user.
          if (!isset($Options['NoConfirmEmail']))
             $Options['NoConfirmEmail'] = TRUE;
+
+         // Use RoleIDs from Invitation table, if any. They are stored as a
+         // serialized array of the Role IDs.
+         $InvitationRoleIDs = $Invitation->RoleIDs;
+         if (strlen($InvitationRoleIDs)) {
+            $InvitationRoleIDs = unserialize($InvitationRoleIDs);
+
+            if (is_array($InvitationRoleIDs)
+            && count(array_filter($InvitationRoleIDs))) {
+               // Overwrite default RoleIDs set at top of method.
+               $RoleIDs = $InvitationRoleIDs;
+            }
+         }
 
          $Fields['Roles'] = $RoleIDs;
          $UserID = $this->_Insert($Fields, $Options);

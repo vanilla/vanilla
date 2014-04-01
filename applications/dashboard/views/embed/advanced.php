@@ -36,7 +36,7 @@ p.WarningMessage {
 <h1><?php echo T('Settings'); ?></h1>
 <div class="Info">
    <h2><?php echo T('Trusted Domains'); ?></h2>
-   <p><?php echo T('You can optionally specify a white-list of trusted domains (ie. yourdomain.com) that are allowed to embed elements of your community (forum, comments, or modules).'); ?></p>
+   <p><?php echo T('Add a white-list of trusted domains.', 'You can optionally specify a white-list of trusted domains (ie. yourdomain.com) that are allowed to embed elements of your community (forum, comments, or modules).'); ?></p>
    <p><small>
       <strong><?php echo T('Notes:'); ?></strong>
       <?php echo T('Specify one domain per line, without protocol (ie. yourdomain.com).'); ?>
@@ -51,7 +51,7 @@ p.WarningMessage {
    
    <h2><?php echo T('Forum Embed Settings'); ?></h2>
    <p><?php echo T('The url where the forum is embedded:'); ?></p>
-   <p><?php echo $this->Form->TextBox('Garden.Embed.RemoteUrl'); ?> <em><?php echo T('Example: http://yourdomain.com/forum/'); ?></em></p>
+   <p><?php echo $this->Form->TextBox('Garden.Embed.RemoteUrl'); ?> <em><?php echo sprintf(T('Example: %s'), 'http://yourdomain.com/forum/'); ?></em></p>
    <p><?php echo $this->Form->CheckBox('Garden.Embed.ForceForum', "Force the forum to only be accessible through this url"); ?></p>
    <p><?php echo $this->Form->CheckBox('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?></p>
    <?php

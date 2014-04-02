@@ -147,7 +147,7 @@ class Gdn_Session {
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
       $this->SetCookie('-Vv', NULL, -3600);
-      $this->SetCookie('SessionID', NULL, -3600);
+      $this->SetCookie('-sid', NULL, -3600);
 
       $this->UserID = 0;
       $this->User = FALSE;
@@ -520,7 +520,7 @@ class Gdn_Session {
 	 */
    private function _GetStashSession($ValueToStash) {
       $CookieName = C('Garden.Cookie.Name', 'Vanilla');
-      $Name = $CookieName.'SessionID';
+      $Name = $CookieName.'-sid';
 
       // Grab the entire session record
       $SessionID = GetValue($Name, $_COOKIE, '');
@@ -537,7 +537,7 @@ class Gdn_Session {
          ->FirstRow();
 
       if (!$Session) {
-         $SessionID = md5(mt_rand());
+         $SessionID = BetterRandomString(32);
          $TransientKey = substr(md5(mt_rand()), 0, 11).'!';
          // Save the session information to the database.
          Gdn::SQL()->Insert(

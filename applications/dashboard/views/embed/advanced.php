@@ -61,6 +61,10 @@ p.WarningMessage {
    <p><?php echo $this->Form->TextBox('Garden.Embed.RemoteUrl'); ?> <em>Example: http://yourdomain.com/forum/</em></p>
    <p><?php echo $this->Form->CheckBox('Garden.Embed.ForceForum', "Force the forum to only be accessible through this url"); ?></p>
    <p><?php echo $this->Form->CheckBox('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?></p>
+
+   <h2>Sign In Settings</h2>
+   <p><small>If you are using SSO you probably need to disable sign in popups.</small></p>
+   <p><?php echo $this->Form->CheckBox('Garden.SignIn.Popup', "Use popups for sign in pages."); ?></p>
    <?php
    echo $this->Form->Close('Save', '', array('style' => 'margin: 0;')); 
    }

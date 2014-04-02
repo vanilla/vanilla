@@ -466,7 +466,7 @@ class EntryController extends Gdn_Controller {
          }
 
          // Sign the user in.
-         Gdn::Session()->Start($UserID, TRUE, TRUE);
+         Gdn::Session()->Start($UserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe', TRUE));
          Gdn::UserModel()->FireEvent('AfterSignIn');
 //         $this->_SetRedirect(TRUE);
          $this->_SetRedirect($this->Request->Get('display') == 'popup');
@@ -519,7 +519,7 @@ class EntryController extends Gdn_Controller {
                       'UniqueID' => $this->Form->GetFormValue('UniqueID')));
 
                   // Sign the user in.
-                  Gdn::Session()->Start($UserID, TRUE, TRUE);
+                  Gdn::Session()->Start($UserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe', TRUE));
                   Gdn::UserModel()->FireEvent('AfterSignIn');
          //         $this->_SetRedirect(TRUE);
                   $this->_SetRedirect($this->Request->Get('display') == 'popup');
@@ -593,7 +593,7 @@ class EntryController extends Gdn_Controller {
 
                $this->Form->SetFormValue('UserID', $UserID);
 
-               Gdn::Session()->Start($UserID, TRUE, TRUE);
+               Gdn::Session()->Start($UserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe', TRUE));
                Gdn::UserModel()->FireEvent('AfterSignIn');
 
                // Send the welcome email.
@@ -696,7 +696,7 @@ class EntryController extends Gdn_Controller {
             }
 
             // Sign the appropriate user in.
-            Gdn::Session()->Start($this->Form->GetFormValue('UserID', TRUE, TRUE));
+            Gdn::Session()->Start($this->Form->GetFormValue('UserID'), TRUE, (bool)$this->Form->GetFormValue('RememberMe', TRUE));
             Gdn::UserModel()->FireEvent('AfterSignIn');
             $this->_SetRedirect(TRUE);
          }

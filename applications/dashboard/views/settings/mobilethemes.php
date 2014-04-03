@@ -86,8 +86,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                $ColClass = 'LastCol';
                $Col = 0;
             }
-            $ColClass .= $Active ? ' Enabled' : '';
-            $ColClass .= $PreviewUrl ? ' HasPreview' : '';
+
          ?>
 
          <td class="themeblock <?php echo $ClassCurrentTheme; ?> <?php echo $ColClass; ?>">
@@ -141,21 +140,18 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
             <div class="Buttons">
 
-               <?php if (!$ClassCurrentTheme): ?>
-
+               <div class="theme-buttons">
                   <?php
                      echo Anchor(T('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
                      //echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
                      $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                      $this->FireEvent('AfterThemeButtons');
                   ?>
+               </div>
 
-               <?php else: ?>
+               <div class="theme-apply-progress"></div>
 
-                  <div class="theme-applied">Enabled</div>
-
-               <?php endif; ?>
-
+               <div class="theme-applied">Enabled</div>
             </div>
          </td>
 

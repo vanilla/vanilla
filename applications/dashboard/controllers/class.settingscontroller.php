@@ -1098,17 +1098,24 @@ class SettingsController extends DashboardController {
             $this->Form->AddError($Ex);
          }
 
-         // TODO Ajaxify this.
+         $AsyncRequest = ($this->DeliveryType() === DELIVERY_METHOD_JSON)
+            ? TRUE
+            : FALSE;
+
          if ($this->Form->ErrorCount() == 0) {
-            /*
-            if ($this->DeliveryType() === DELIVERY_TYPE_JSON) {
-               // Ajax response does not work yet.
+            if ($AsyncRequest) {
                echo 'Success';
                $this->Render('Blank', 'Utility', 'Dashboard');
-
-            } else {*/
+               exit;
+            } else {
                Redirect('/settings/mobilethemes');
-            //}
+            }
+         } else {
+            if ($AsyncRequest) {
+               echo $this->Form->ErrorString();
+               $this->Render('Blank', 'Utility', 'Dashboard');
+               exit;
+            }
          }
       }
 

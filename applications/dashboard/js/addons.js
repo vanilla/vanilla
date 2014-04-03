@@ -47,9 +47,14 @@ jQuery(document).ready(function($) {
                gdn.fillAddonErrors(data);
             } else {
                // If not mobile themes, traditional submit.
-               //if (!url.toLowerCase().indexOf('mobilethemes')) {
+               if (!url.toLowerCase().indexOf('mobilethemes')) {
                   document.location = url;
-               /*} else {
+               } else {
+                  // Start progress
+                  var $currentThemeBlock = $(e.target).closest('.themeblock');
+                  $currentThemeBlock.addClass('theme-progressing');
+                  $currentThemeBlock.find('.theme-apply-progress').addClass('TinyProgress');
+
                   $.ajax({
                      type: 'GET',
                      url: url,
@@ -62,20 +67,42 @@ jQuery(document).ready(function($) {
                      success: function(data) {
                         if (data != 'Success') {
                            gdn.fillAddonErrors(data);
+                        } else {
+                           gdn.setMobileTheme(e);
                         }
                      }
                   });
-               }*/
+               }
             }
          }
       });
       return false;
    });
 
+   /**
+    * This will strip any current-theme classes from the themeblocks and apply
+    * it to the latest successfully activated mobile theme.
+    *
+    * @param Event e
+    */
+   gdn.setMobileTheme = function(e) {
+      var $currentThemeBlock = $(e.target).closest('.themeblock');
+      var $themeblocks = $('.themeblock');
+
+      $themeblocks.each(function(i, el) {
+         $(el).removeClass('current-theme');
+         $(el).removeClass('theme-progressing');
+         $(el).find('.theme-apply-progress').removeClass('TinyProgress');
+      });
+
+      $currentThemeBlock.addClass('current-theme');
+   };
+
    gdn.clearAddonErrors  = function() {
       $('div.TestAddonErrors:not(.Hidden)').remove();
       $('.TinyProgress').remove();
-   }
+   };
+
    gdn.fillAddonErrors = function(errorMessage) {
       $('.TinyProgress').remove();
       err = $('div.TestAddonErrors');
@@ -85,7 +112,7 @@ jQuery(document).ready(function($) {
       $('div.TestAddonErrors:first').removeClass('Hidden');
       // $(window).scrollTop($("div.TestAddonErrors").offset().top);
       $(window).scrollTop();
-   }
+   };
 
    // Ajax-test addons before enabling
    $('a.PreviewAddon').click(function() {

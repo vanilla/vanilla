@@ -1769,11 +1769,30 @@ div.Summary table tbody td {
 }
 
 .theme-applied {
+   display: none;
    padding: 10px;
    border-radius: 2px;
    background-color: #fff;
    color: #aaa;
    margin: 3px 0 0 0;
+}
+
+.themeblock.theme-progressing .theme-buttons,
+.themeblock.current-theme .theme-buttons {
+   display: none;
+}
+
+.themeblock.current-theme .theme-applied {
+   display: block;
+}
+
+.themeblock.current-theme .theme-apply-progress {
+   display: none;
+}
+
+.themeblock .TinyProgress.theme-apply-progress {
+   display: block !important;
+   margin: 13px;
 }
 
 

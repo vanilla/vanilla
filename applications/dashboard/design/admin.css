@@ -28,7 +28,7 @@ Welcome to the Admin CSS File! Some things you should know:
 .Buttons-Confirm .Button {
    min-width: 65px;
 }
-   
+
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -183,7 +183,7 @@ code {
    overflow: auto;
 	box-shadow: 0px 0px 1px #999;
 	-moz-box-shadow: 0px 0px 1px #999;
-	-webkit-box-shadow: 0px 0px 1px #999;  
+	-webkit-box-shadow: 0px 0px 1px #999;
 }
 pre {
 	background: #F0F0F0;
@@ -552,7 +552,7 @@ div.EmptyInfo {
 	padding: 6px;
 	box-shadow: 0px 0px 2px #777;
 	-moz-box-shadow: 0px 0px 2px #777;
-	-webkit-box-shadow: 0px 0px 2px #777;  
+	-webkit-box-shadow: 0px 0px 2px #777;
 }
 /* Note: MorePager is related to the /applications/dashboard/modules/MorePagerModule. */
 .MorePager {
@@ -598,7 +598,7 @@ tr#PagerMore td {
    padding: 0 0 10px;
 	padding:0 20px 10px;
 	position:relative;
-	top:-10px;	
+	top:-10px;
 }
 .FilterMenu strong {
    font-weight: bold;
@@ -1224,7 +1224,7 @@ ul.PanelInfo li.Active:hover {
 body.Home {
    margin: 0;
    padding: 80px;
-	background: url('images/eyes.png') 30px 30px no-repeat #fff;   
+	background: url('images/eyes.png') 30px 30px no-repeat #fff;
 }
 body.Home #Content {
 	margin: 0 auto;
@@ -1274,7 +1274,7 @@ div.Popup div.Info {
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 div.Popup .Loading {
    display: block;
@@ -1308,7 +1308,7 @@ div.Popup div.Body {
 	border: 1px solid #01416b;
 	box-shadow: 0px 0px 3px #01416b;
 	-moz-box-shadow: 0px 0px 3px #01416b;
-	-webkit-box-shadow: 0px 0px 3px #01416b;  
+	-webkit-box-shadow: 0px 0px 3px #01416b;
 }
 div.Popup div.Body div.Body {
    border: 0;
@@ -1670,6 +1670,113 @@ div.Summary table tbody td {
    padding: 4px 6px 4px 0;
 }
 
+/* Mobile themes */
+
+.browser-mobile-themes {
+}
+
+.themeblock {
+   box-sizing: border-box;
+   margin: 0;
+   width: 33.33%;
+   min-width: 235px;
+   padding: 20px;
+   position: relative;
+   min-height: 100%;
+   padding-bottom: 80px !important;
+}
+
+.themeblock.current-theme {
+   background-color: rgba(0,0,0,0.02);
+}
+
+#Content .themeblock h4 {
+   display: block;
+   padding: 0;
+   font-size: 20px;
+}
+
+.themeblock .theme-version {
+   font-size: 14px;
+   color: #aaa;
+   font-weight: normal;
+}
+
+.themeblock .author-name {
+   color: #aaa;
+   padding: 0 0 20px 0;
+}
+
+.themeblock .theme-image {
+   display: block;
+   max-width: 50%;
+   max-height: 50%;
+   overflow: hidden;
+   float: left;
+   box-shadow: 0 0 1px 0 #aaa;
+   margin: 0 20px 5px 0;
+}
+
+.themeblock .theme-image img {
+   display: block;
+   width: 100%;
+   height: auto;
+}
+
+.themeblock .theme-description {
+   display: block;
+   margin: -5px 0 0 0;
+   font-style: normal;
+}
+
+.themeblock dl {
+   clear: both;
+   float: left;
+   margin-top: 20px;
+}
+
+.themeblock dt {
+   font-weight: bold;
+}
+
+.themeblock dd {
+   color: #aaa;
+}
+
+.themeblock .Alert {
+   clear: both;
+   margin: 0 0 20px 0;
+}
+
+.browser-mobile-themes.SelectionGrid div.Buttons {
+   display: block;
+   clear: both;
+   width: 100%;
+   float: left;
+   box-sizing: border-box;
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   height: 80px;
+   padding: 15px;
+}
+
+.browser-mobile-themes.SelectionGrid div.Buttons a {
+   display: inline-block;
+   padding: 10px 0;
+   margin: 5px;
+   width: 40%;
+}
+
+.theme-applied {
+   padding: 10px;
+   border-radius: 2px;
+   background-color: #fff;
+   color: #aaa;
+   margin: 3px 0 0 0;
+}
+
+
 /* =================================================================== Footer */
 #Foot {
    clear: both;
@@ -1997,7 +2104,7 @@ div.Errors {
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 div.Errors ul {
 	border-bottom: 1px solid #a00 !important;
@@ -2028,7 +2135,7 @@ div.Errors pre {
    overflow: auto;
 	box-shadow: 0px 0px 2px #333;
 	-moz-box-shadow: 0px 0px 2px #333;
-	-webkit-box-shadow: 0px 0px 2px #333;  
+	-webkit-box-shadow: 0px 0px 2px #333;
 }
 div.Errors pre,
 div.Errors pre * {
@@ -2095,7 +2202,7 @@ div.InformMessages {
   width: 100%;/*IE5.5*/
   top: auto;
   left: 20px;
-  overflow: visible; 
+  overflow: visible;
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 div.InformMessages div.InformWrapper {
@@ -2373,7 +2480,7 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 .ActivateSlider .SmallButton {
    margin: 0;
    min-width: 45px;
-   
+
 }
 
 .Sprite {

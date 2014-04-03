@@ -29,6 +29,7 @@ $PluginInfo['Tagging'] = array(
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
+   'MobileFriendly' => true,
    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit')
 );
 

@@ -537,7 +537,7 @@ class Gdn_Session {
          ->FirstRow();
 
       if (!$Session) {
-         $SessionID = md5(mt_rand());
+         $SessionID = BetterRandomString(32);
          $TransientKey = substr(md5(mt_rand()), 0, 11).'!';
          // Save the session information to the database.
          Gdn::SQL()->Insert(

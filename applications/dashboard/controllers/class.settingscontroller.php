@@ -1124,6 +1124,7 @@ class SettingsController extends DashboardController {
 
       $PreviewThemeName = $ThemeName;
       $PreviewThemeFolder = GetValue('Folder', $ThemeInfo);
+      $IsMobile = GetValue('IsMobile', $ThemeInfo);
 
       // If we failed to get the requested theme, cancel preview
       if ($ThemeInfo === FALSE) {
@@ -1131,7 +1132,12 @@ class SettingsController extends DashboardController {
          $PreviewThemeFolder = '';
       }
 
-      Gdn::Session()->SetPreference(array('PreviewThemeName' => $PreviewThemeName, 'PreviewThemeFolder' => $PreviewThemeFolder));
+      Gdn::Session()->SetPreference(array(
+          'PreviewThemeName' => $PreviewThemeName,
+          'PreviewThemeFolder' => $PreviewThemeFolder,
+          'PreviewIsMobile' => $IsMobile
+      ));
+
       Redirect('/');
    }
 
@@ -1143,8 +1149,14 @@ class SettingsController extends DashboardController {
     */
    public function CancelPreview() {
       $Session = Gdn::Session();
-      $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => ''));
-      Redirect('settings/themes');
+      $IsMobile = $Session->User->Preferences['PreviewIsMobile'];
+      $Session->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '', 'PreviewIsMobile' => ''));
+
+      if ($IsMobile) {
+         Redirect('settings/mobilethemes');
+      } else {
+         Redirect('settings/themes');
+      }
    }
 
    /**

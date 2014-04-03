@@ -286,7 +286,7 @@ class DiscussionController extends VanillaController {
    }
 
    /**
-    * Highlight route.
+    * Highlight route & add common JS definitions.
     *
     * Always called by dispatcher before controller's requested method.
     *
@@ -296,6 +296,8 @@ class DiscussionController extends VanillaController {
    public function Initialize() {
       parent::Initialize();
       $this->AddDefinition('ImageResized', T('This image has been resized to fit in the page. Click to enlarge.'));
+      $this->AddDefinition('ConfirmDeleteCommentHeading', T('ConfirmDeleteCommentHeading', 'Delete Comment'));
+      $this->AddDefinition('ConfirmDeleteCommentText', T('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'));
       $this->Menu->HighlightRoute('/discussions');
    }
 
@@ -853,13 +855,15 @@ body { background: transparent !important; }
          $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
       }
 
-      if ($Draft)
+      if ($Draft) {
          $this->Form->SetFormValue('Body', $Draft->Body);
-      else {
+      } else {
          // Look in the session stash for a comment
          $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE);
-         if ($StashComment)
+         if ($StashComment) {
+            $this->Form->SetValue('Body', $StashComment);
             $this->Form->SetFormValue('Body', $StashComment);
+         }
       }
 
       // Deliver JSON data if necessary

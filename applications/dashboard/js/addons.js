@@ -1,9 +1,9 @@
 jQuery(document).ready(function($) {
-   
+
    // Ajax-test addons before enabling
-   $('a.EnableAddon').click(function() {
+   $('a.EnableAddon').click(function(e) {
       gdn.clearAddonErrors();
-      
+
       var url = $(this).attr('href');
       var urlParts = url.split('/');
       var addonType = urlParts[urlParts.length - 4];
@@ -22,17 +22,17 @@ jQuery(document).ready(function($) {
             addonType = 'Locale';
             break;
       }
-      
+
       if ($(this).hasClass('EnableTheme'))
          addonType = 'Theme';
-         
+
       if (addonType != 'Theme') {
          $('.TinyProgress').remove();
          $(this).after('<span class="TinyProgress">&#160;</span>');
       }
       var addonName = urlParts[urlParts.length - 2];
       var testUrl = gdn.url('/dashboard/settings/testaddon/'+addonType+'/'+addonName+'/'+gdn.definition('TransientKey'));
-      
+
       $.ajax({
          type: "GET",
          url: testUrl,
@@ -46,13 +46,32 @@ jQuery(document).ready(function($) {
             if (data != 'Success') {
                gdn.fillAddonErrors(data);
             } else {
-               document.location = url;
+               // If not mobile themes, traditional submit.
+               //if (!url.toLowerCase().indexOf('mobilethemes')) {
+                  document.location = url;
+               /*} else {
+                  $.ajax({
+                     type: 'GET',
+                     url: url,
+                     data: {'DeliveryType': 'JSON'},
+                     dataType: 'html',
+                     error: function(XMLHttpRequest, textStatus, errorThrown) {
+                       // Remove any old errors from the form
+                        gdn.fillAddonErrors(XMLHttpRequest.responseText);
+                     },
+                     success: function(data) {
+                        if (data != 'Success') {
+                           gdn.fillAddonErrors(data);
+                        }
+                     }
+                  });
+               }*/
             }
          }
       });
       return false;
    });
-   
+
    gdn.clearAddonErrors  = function() {
       $('div.TestAddonErrors:not(.Hidden)').remove();
       $('.TinyProgress').remove();
@@ -71,12 +90,12 @@ jQuery(document).ready(function($) {
    // Ajax-test addons before enabling
    $('a.PreviewAddon').click(function() {
       gdn.clearAddonErrors();
-      
+
       var url = $(this).attr('href');
       var urlParts = url.split('/');
       var addonName = urlParts[urlParts.length - 1];
       var testUrl = gdn.url('/dashboard/settings/testaddon/Theme/'+addonName+'/'+gdn.definition('TransientKey'));
-      
+
       $.ajax({
          type: "GET",
          url: testUrl,

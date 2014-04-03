@@ -1100,7 +1100,15 @@ class SettingsController extends DashboardController {
 
          // TODO Ajaxify this.
          if ($this->Form->ErrorCount() == 0) {
-            Redirect('/settings/mobilethemes');
+            /*
+            if ($this->DeliveryType() === DELIVERY_TYPE_JSON) {
+               // Ajax response does not work yet.
+               echo 'Success';
+               $this->Render('Blank', 'Utility', 'Dashboard');
+
+            } else {*/
+               Redirect('/settings/mobilethemes');
+            //}
          }
       }
 

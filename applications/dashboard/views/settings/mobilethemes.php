@@ -145,7 +145,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
                   <?php
                      echo Anchor(T('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
-                     echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
+                     //echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
                      $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                      $this->FireEvent('AfterThemeButtons');
                   ?>

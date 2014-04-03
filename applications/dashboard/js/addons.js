@@ -47,7 +47,7 @@ jQuery(document).ready(function($) {
                gdn.fillAddonErrors(data);
             } else {
                // If not mobile themes, traditional submit.
-               if (!url.toLowerCase().indexOf('mobilethemes')) {
+               if (url.toLowerCase().indexOf('mobilethemes') == -1) {
                   document.location = url;
                } else {
                   // Start progress

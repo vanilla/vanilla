@@ -7,6 +7,13 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
    <?php echo T('Manage Mobile Themes'); ?>
 </h1>
 
+<div class="Info">
+   <p class="P"><?php echo T('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
+   <p class="P"><?php echo T('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
+</div>
+
+<h3>Available Mobile Themes</h3>
+
 <?php echo $this->Form->Errors(); ?>
 
 <div class="Messages Errors TestAddonErrors Hidden">
@@ -15,177 +22,158 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
    </ul>
 </div>
 
+<?php if (count($this->Data('AvailableThemes', array()))): ?>
 
-<?php /*
-<div class="CurrentTheme">
-   <?php
-   $Version = $this->Data('EnabledTheme.Version');
-   $ThemeUrl = $this->Data('EnabledTheme.Url');
-   $Author = $this->Data('EnabledTheme.Author');
-   $AuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
-   $NewVersion = $this->Data('EnabledTheme.NewVersion');
-   $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+   <table class="browser-mobile-themes SelectionGrid Themes">
+      <tbody>
 
-   $PreviewUrl = $this->Data('EnabledTheme.ScreenshotUrl', FALSE);
-   if ($PreviewUrl !== FALSE)
-      echo Img($PreviewUrl, array('alt' => $this->Data('EnabledThemeName'), 'height' => '112', 'width' => '150'));
+      <?php
+         // Get currently enabled theme data.
+         $EnabledThemeInfo = $this->Data('EnabledThemeInfo');
+         $EnabledVersion = $this->Data('EnabledTheme.Version');
+         $EnabledThemeUrl = $this->Data('EnabledTheme.Url');
+         $EnabledAuthor = $this->Data('EnabledTheme.Author');
+         $EnabledAuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
+         $EnabledNewVersion = $this->Data('EnabledTheme.NewVersion');
+         $EnabledUpgrade = $EnabledNewVersion != '' && version_compare($EnabledNewVersion, $EnabledVersion, '>');
+         $EnabledPreviewUrl = $this->Data('EnabledTheme.ScreenshotUrl', FALSE);
+         $EnabledThemeName = $this->Data('EnabledThemeName');
 
-   echo '<h4>';
-      echo $ThemeUrl != '' ? Anchor($this->Data('EnabledThemeName'), $ThemeUrl) : $this->Data('EnabledThemeName');
-      if ($Version != '')
-         echo '<span class="Version">'.sprintf(T('version %s'), $Version).'</span>';
+         if ($this->Data('EnabledTheme.Options')) {
+            $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'), Anchor(T('Theme Options'), '/dashboard/settings/themeoptions'));
+         }
 
-      if ($Author != '')
-         echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author).'</span>';
+         $Cols = 3;
+         $Col = 0;
+         foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo):
 
-   echo '</h4>';
-   echo '<div class="Description">'.GetValue('Description', $this->Data('EnabledTheme'), '').'</div>';
-    if ($this->Data('EnabledTheme.Options')) {
-      $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'),
-         Anchor(T('Theme Options'), '/dashboard/settings/themeoptions'));
+            $ScreenName = GetValue('Name', $ThemeInfo, $ThemeName);
+            $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
+            $Active = $ThemeFolder == $this->Data('EnabledThemeFolder');
+            $Version = GetValue('Version', $ThemeInfo, '');
+            $ThemeUrl = GetValue('Url', $ThemeInfo, '');
+            $Author = GetValue('Author', $ThemeInfo, '');
+            $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');
+            $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
+            $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+            $PreviewUrl = GetValue('ScreenshotUrl', $ThemeInfo, FALSE);
+            $Description = GetValue('Description', $ThemeInfo);
+            $RequiredApplications = GetValue('RequiredApplications', $ThemeInfo, FALSE);
 
-      echo '<div class="Options">',
-         $OptionsDescription,
-         '</div>';
+            $ClassCurrentTheme = ($EnabledThemeInfo['Index'] == $ThemeInfo['Index'])
+               ? 'current-theme'
+               : '';
 
-   }
+            $UpgradeHtml = ($Upgrade)
+               ? '<div class="Alert">' . Anchor(sprintf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion), CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/')) . '</div>'
+               : '';
 
-   $this->FireEvent('AfterCurrentTheme');
+            $PreviewImageHtml = ($PreviewUrl !== FALSE)
+               ? Anchor(Img($PreviewUrl, array('alt' => $ScreenName)), 'dashboard/settings/previewtheme/'.$ThemeName, '', array('target' => '_top', 'class' => 'theme-image'))
+               : '';
 
-   $RequiredApplications = GetValue('RequiredApplications', $this->Data('EnabledTheme'), FALSE);
-   if (is_array($RequiredApplications)) {
-      echo '<div class="Requirements">'.T('Requires: ');
+            $DescriptionHtml = ($Description)
+               ? '<em class="theme-description">' . $Description . '</em>'
+               : '';
 
-      $i = 0;
-      if ($i > 0)
-         echo ', ';
+            $Col++;
+            if ($Col == 1) {
+               $ColClass = 'FirstCol';
+               echo '<tr>';
+            } elseif ($Col == 2) {
+               $ColClass = 'MiddleCol';
+            } else {
+               $ColClass = 'LastCol';
+               $Col = 0;
+            }
+            $ColClass .= $Active ? ' Enabled' : '';
+            $ColClass .= $PreviewUrl ? ' HasPreview' : '';
+         ?>
 
-      foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
-         printf(T('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
-         ++$i;
-      }
-      echo '</div>';
-   }
+         <td class="themeblock <?php echo $ClassCurrentTheme; ?> <?php echo $ColClass; ?>">
+            <h4>
+               <?php echo ($ThemeUrl != '') ? Anchor($ScreenName, $ThemeUrl) : $ScreenName; ?>
+               <span class="theme-version">
+                  <?php echo $Version; ?>
+               </span>
+            </h4>
 
-   if ($Upgrade) {
-      echo '<div class="Alert">';
-      echo Url(
-            sprintf(T('%1$s version %2$s is available.'), $this->Data('EnabledThemeName'), $NewVersion),
-            CombinePaths(array($AddonUrl, 'find', urlencode($this->Data('EnabledThemeName'))), '/')
-         );
-      echo '</div>';
-   }
-   ?>
-</div>
-
-*/ ?>
-
-
-
-
-
-
-<?php if (count($this->Data('AvailableThemes', array())) > 1): ?>
-
-
-
-
-
-<div class="browser-mobile-themes">
-
-   <?php
-
-   // Get currently enabled theme data.
-   $EnabledVersion = $this->Data('EnabledTheme.Version');
-   $EnabledThemeUrl = $this->Data('EnabledTheme.Url');
-   $EnabledAuthor = $this->Data('EnabledTheme.Author');
-   $EnabledAuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
-   $EnabledNewVersion = $this->Data('EnabledTheme.NewVersion');
-   $EnabledUpgrade = $EnabledNewVersion != '' && version_compare($EnabledNewVersion, $EnabledVersion, '>');
-   $EnabledPreviewUrl = $this->Data('EnabledTheme.ScreenshotUrl', FALSE);
-   $EnabledThemeName = $this->Data('EnabledThemeName');
-
-   if ($this->Data('EnabledTheme.Options')) {
-      $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'), Anchor(T('Theme Options'), '/dashboard/settings/themeoptions'));
-   }
-
-   foreach ($this->Data('AvailableThemes') as $ThemeName => $ThemeInfo):
-
-      decho($EnabledThemeName);
-   decho($ThemeName);
-
-      if ($EnabledThemeName == $ThemeName) {
-         decho('THIS IS IT');
-      }
-
-      $ScreenName = GetValue('Name', $ThemeInfo, $ThemeName);
-      $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
-      $Active = $ThemeFolder == $this->Data('EnabledThemeFolder');
-
-      decho($ScreenName);
-
-      $Version = GetValue('Version', $ThemeInfo, '');
-      $ThemeUrl = GetValue('Url', $ThemeInfo, '');
-      $Author = GetValue('Author', $ThemeInfo, '');
-      $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');
-      $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
-      $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-      $PreviewUrl = GetValue('ScreenshotUrl', $ThemeInfo, FALSE);
-
-      ?>
-            <div class="themeblock">
-               <?php
-                  echo '<h4>';
-                     echo $ThemeUrl != '' ? Anchor($ScreenName, $ThemeUrl) : $ScreenName;
-                  echo '</h4>';
-
-                  if ($PreviewUrl !== FALSE) {
-                     echo Anchor(Img($PreviewUrl, array('alt' => $ScreenName, 'height' => '112', 'width' => '150')),
-                        'dashboard/settings/previewtheme/'.$ThemeName,
-                        '',
-                        array('target' => '_top')
-                     );
-                  }
-
-                  echo '<div class="Buttons">';
-                  echo Anchor(T('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
-                  echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
-                        $this->EventArguments['ThemeInfo'] = $ThemeInfo;
-                        $this->FireEvent('AfterThemeButtons');
-                  echo '</div>';
-
-                  $Description = GetValue('Description', $ThemeInfo);
-                  if ($Description)
-                     echo '<em>'.$Description.'</em>';
-
-                  $RequiredApplications = GetValue('RequiredApplications', $ThemeInfo, FALSE);
-                  if (is_array($RequiredApplications)) {
-                     echo '<dl>
-                        <dt>'.T('Requires').'</dt>
-                        <dd>';
-
-                     $i = 0;
-                     foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
-                        if ($i > 0)
-                           echo ', ';
-
-                        printf(T('%1$s %2$s'), $RequiredApplication, $VersionInfo);
-                        ++$i;
-                     }
-                     echo '</dl>';
-                  }
-
-                  if ($Upgrade) {
-                     echo '<div class="Alert">';
-                     echo Anchor(
-                           sprintf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion),
-                           CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/')
-                        );
-                     echo '</div>';
-                  }
-               ?>
+            <div class="author-name">
+               <?php echo $Author; ?>
             </div>
-   <?php endforeach; ?>
-</div>
+
+            <?php echo $UpgradeHtml; ?>
+            <?php echo $PreviewImageHtml; ?>
+            <?php echo $DescriptionHtml; ?>
+
+            <?php
+               if ($this->Data('EnabledTheme.Options')) {
+               $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'),
+                  Anchor(T('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions'));
+
+               echo '<div class="Options">',
+                  $OptionsDescription,
+                  '</div>';
+               }
+            ?>
+
+            <?php $this->FireEvent('AfterCurrentTheme'); ?>
+
+            <?php if (is_array($RequiredApplications)): ?>
+
+               <dl>
+                  <dt><?php echo T('Requires'); ?></dt>
+                  <dd>
+
+                     <?php
+                        $i = 0;
+                        foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
+                           if ($i > 0) {
+                              echo ', ';
+                           }
+                           printf(T('%1$s %2$s'), $RequiredApplication, $VersionInfo);
+                           ++$i;
+                        }
+                     ?>
+               </dl>
+
+            <?php endif; ?>
+
+            <div class="Buttons">
+
+               <?php if (!$ClassCurrentTheme): ?>
+
+                  <?php
+                     echo Anchor(T('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
+                     echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
+                     $this->EventArguments['ThemeInfo'] = $ThemeInfo;
+                     $this->FireEvent('AfterThemeButtons');
+                  ?>
+
+               <?php else: ?>
+
+                  <div class="theme-applied">Enabled</div>
+
+               <?php endif; ?>
+
+            </div>
+         </td>
+
+         <?php
+            if ($Col == 0) {
+               echo '</tr>';
+            }
+         ?>
+
+      <?php endforeach; ?>
+
+      <?php
+         if ($Col > 0) {
+            echo '<td class="LastCol EmptyCol"'.($Col == 1 ? ' colspan="2"' : '').'>&#160;</td></tr>';
+         }
+      ?>
+
+      </tbody>
+   </table>
 
 <?php endif; ?>

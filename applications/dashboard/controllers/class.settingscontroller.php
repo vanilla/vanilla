@@ -903,6 +903,76 @@ class SettingsController extends DashboardController {
    }
 
    /**
+    * Manage options for a mobile theme.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $Style Unique ID.
+    * @todo Why is this in a giant try/catch block?
+    */
+   public function MobileThemeOptions($Style = NULL) {
+      $this->Permission('Garden.Settings.Manage');
+
+      try {
+         $this->AddJsFile('addons.js');
+         $this->AddSideMenu('dashboard/settings/mobilethemeoptions');
+
+         $ThemeManager = Gdn::ThemeManager();
+         $EnabledThemeName = $ThemeManager->MobileTheme();
+         $EnabledThemeInfo = $ThemeManager->GetThemeInfo($EnabledThemeName);
+
+         $this->SetData('ThemeInfo', $EnabledThemeInfo);
+
+         if ($this->Form->IsPostBack()) {
+            // Save the styles to the config.
+            $StyleKey = $this->Form->GetFormValue('StyleKey');
+
+            $ConfigSaveData = array(
+               'Garden.MobileThemeOptions.Styles.Key' => $StyleKey,
+               'Garden.MobileThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename"));
+
+            // Save the text to the locale.
+            $Translations = array();
+            foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
+               $Value = $this->Form->GetFormValue($this->Form->EscapeString('Text_'.$Key));
+               $ConfigSaveData["ThemeOption.{$Key}"] = $Value;
+               //$this->Form->SetFormValue('Text_'.$Key, $Value);
+            }
+
+            SaveToConfig($ConfigSaveData);
+
+            $this->InformMessage(T("Your changes have been saved."));
+         } elseif ($Style) {
+            SaveToConfig(array(
+               'Garden.MobileThemeOptions.Styles.Key' => $Style,
+               'Garden.MobileThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$Style.Basename")));
+         }
+
+         $this->SetData('ThemeOptions', C('Garden.MobileThemeOptions'));
+         $StyleKey = $this->Data('ThemeOptions.Styles.Key');
+
+         if (!$this->Form->IsPostBack()) {
+            foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Options) {
+               $Default = GetValue('Default', $Options, '');
+               $Value = C("ThemeOption.{$Key}", '#DEFAULT#');
+               if ($Value === '#DEFAULT#')
+                  $Value = $Default;
+
+               $this->Form->SetFormValue($this->Form->EscapeString('Text_'.$Key), $Value);
+            }
+         }
+
+         $this->SetData('ThemeFolder', $EnabledThemeName);
+         $this->Title(T('Mobile Theme Options'));
+         $this->Form->AddHidden('StyleKey', $StyleKey);
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex);
+      }
+
+      $this->Render();
+   }
+
+   /**
     * Themes management screen.
     *
     * @since 2.0.0
@@ -931,6 +1001,11 @@ class SettingsController extends DashboardController {
          $Archived = GetValue('Archived', $Theme);
          if ($Archived)
             $Remove[] = $Index;
+
+         // Remove mobile themes, as they have own page.
+         if (isset($Theme['IsMobile']) && $Theme['IsMobile']) {
+            unset($Themes[$Index]);
+         }
       }
       foreach ($Remove as $Index) {
          unset($Themes[$Index]);
@@ -968,6 +1043,9 @@ class SettingsController extends DashboardController {
     * @param string $TransientKey Security token.
     */
    public function MobileThemes($ThemeName = '', $TransientKey = '') {
+      $IsMobile = TRUE;
+
+      $this->AddJsFile('addons.js');
       $this->AddJsFile('addons.js');
       $this->SetData('Title', T('Mobile Themes'));
 
@@ -977,13 +1055,10 @@ class SettingsController extends DashboardController {
       // Get currently enabled theme.
       $EnabledThemeName = Gdn::ThemeManager()->MobileTheme();
       $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($EnabledThemeName);
+      $this->SetData('EnabledThemeInfo', $ThemeInfo);
       $this->SetData('EnabledThemeFolder', GetValue('Folder', $ThemeInfo));
       $this->SetData('EnabledTheme', $ThemeInfo);
       $this->SetData('EnabledThemeName', GetValue('Name', $ThemeInfo, GetValue('Index', $ThemeInfo)));
-
-      decho($ThemeInfo);
-
-
 
       // Get all themes.
       $Themes = Gdn::ThemeManager()->AvailableThemes();
@@ -1007,6 +1082,7 @@ class SettingsController extends DashboardController {
 
       // Process self-post.
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
+
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
             if ($ThemeInfo === FALSE) {
@@ -1014,7 +1090,7 @@ class SettingsController extends DashboardController {
             }
 
             Gdn::Session()->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
-            Gdn::ThemeManager()->EnableTheme($ThemeName);
+            Gdn::ThemeManager()->EnableTheme($ThemeName, $IsMobile);
             $this->EventArguments['ThemeName'] = $ThemeName;
             $this->EventArguments['ThemeInfo'] = $ThemeInfo;
             $this->FireEvent('AfterEnableTheme');

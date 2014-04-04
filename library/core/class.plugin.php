@@ -257,11 +257,11 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
       return C($EnabledKey, FALSE);
    }
    
-   public function Dispatch($Sender, $RequestArgs = array()) {
+   public function Dispatch($Sender, $RequestArgs = array(), $ControllerName = 'Controller') {
       $this->Sender = $Sender;
       $Sender->Form = new Gdn_Form();
       
-      $ControllerMethod = 'Controller_Index';
+      $ControllerMethod = $ControllerName . '_Index';
       if (is_array($RequestArgs) && sizeof($Sender->RequestArgs)) {
          list($MethodName) = $Sender->RequestArgs;
          // Account for suffix

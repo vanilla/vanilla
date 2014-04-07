@@ -170,12 +170,12 @@ class Gdn_Memcached extends Gdn_Cache {
       $data = serialize($value);
       $hash = md5($data);
       $size = strlen($data);
-      $manifest = [
+      $manifest = array(
          'type'   => 'shard',
          'hash'   => $hash,
          'size'   => $size,
-         'keys'   => []
-      ];
+         'keys'   => array()
+      );
 
       // Determine chunk size
       $chunk = $size / $shards;
@@ -292,7 +292,7 @@ class Gdn_Memcached extends Gdn_Cache {
       $startTime = microtime(TRUE);
 
       $finalOptions = array_merge($this->StoreDefaults, $options);
-
+      
       $localData = array();
       $realKeys = array();
       if (is_array($key)) {
@@ -341,15 +341,16 @@ class Gdn_Memcached extends Gdn_Cache {
             // Is this a sharded key?
             if (is_array($localValue) && key_exists('type', $localValue) && $localValue['type'] == 'shard') {
 
+               $manifest = $localValue;
                // MultiGet sub-keys
-               $shardKeys = $this->Memcache->getMulti($localValue['keys']);
+               $shardKeys = $this->Memcache->getMulti($manifest['keys']);
                asort($shardKeys);
 
                // Check subkeys for validity
                $shardData = implode('', $shardKeys);
                unset($shardKeys);
                $dataHash = md5($shardData);
-               if ($dataHash != $localValue['hash']) continue;
+               if ($dataHash != $manifest['hash']) continue;
 
                $localValue = unserialize($shardData);
             }

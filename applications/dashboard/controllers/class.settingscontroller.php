@@ -149,6 +149,17 @@ class SettingsController extends DashboardController {
          $this->SetData('Logo', $Logo);
       }
 
+      // Get the current mobile logo.
+      $MobileLogo = C('Garden.MobileLogo');
+      if ($MobileLogo) {
+         $MobileLogo = ltrim($MobileLogo, '/');
+         // Fix the logo path.
+         if (StringBeginsWith($MobileLogo, 'uploads/'))
+            $MobileLogo = substr($MobileLogo, strlen('uploads/'));
+         $this->SetData('MobileLogo', $MobileLogo);
+      }
+
+
       // Get the current favicon.
       $Favicon = C('Garden.FavIcon');
       $this->SetData('Favicon', $Favicon);
@@ -184,6 +195,26 @@ class SettingsController extends DashboardController {
                   $ImageBaseName = $Parts['SaveName'];
                   $SaveData['Garden.Logo'] = $ImageBaseName;
                   $this->SetData('Logo', $ImageBaseName);
+               }
+
+               $TmpMobileImage = $Upload->ValidateUpload('MobileLogo', FALSE);
+               if ($TmpMobileImage) {
+                  // Generate the target image name
+                  $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
+                  $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+
+                  // Delete any previously uploaded images.
+                  if ($MobileLogo)
+                     $Upload->Delete($MobileLogo);
+
+                  // Save the uploaded image
+                  $Parts = $Upload->SaveAs(
+                     $TmpMobileImage,
+                     $ImageBaseName
+                  );
+                  $ImageBaseName = $Parts['SaveName'];
+                  $SaveData['Garden.MobileLogo'] = $ImageBaseName;
+                  $this->SetData('MobileLogo', $ImageBaseName);
                }
 
                $ImgUpload = new Gdn_UploadImage();
@@ -1206,6 +1237,24 @@ class SettingsController extends DashboardController {
          $Logo = C('Garden.Logo', '');
          RemoveFromConfig('Garden.Logo');
          @unlink(PATH_ROOT . DS . $Logo);
+      }
+
+      Redirect('/settings/banner');
+   }
+
+   /**
+    * Remove the mobile logo from config & delete it.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $TransientKey Security token.
+    */
+   public function RemoveMobileLogo($TransientKey = '') {
+      $Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+         $MobileLogo = C('Garden.MobileLogo', '');
+         RemoveFromConfig('Garden.MobileLogo');
+         @unlink(PATH_ROOT . DS . $MobileLogo);
       }
 
       Redirect('/settings/banner');

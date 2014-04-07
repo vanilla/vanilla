@@ -54,6 +54,8 @@ abstract class Gdn_Cache {
    const FEATURE_FALLBACK     = 'f_fallback';
    // In incr/decr ops, what should the initial value be
    const FEATURE_INITIAL      = 'f_initial';
+   // Allows sharding large keys across all servers [Add,Store,Get,Replace,Remove]
+   const FEATURE_SHARD        = 'f_shard';
 
    /**
     * Location - SERVER:IP, Filepath, etc

@@ -218,7 +218,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
          // Write real keys
          foreach ($keys as $shardKey => $shardData) {
-            $this->Memcache->store($shardKey, $shardData, $expiry);
+            $this->Memcache->set($shardKey, $shardData, $expiry);
          }
 
          Gdn_Cache::localSet($realKey, $value);
@@ -258,7 +258,7 @@ class Gdn_Memcached extends Gdn_Cache {
          $manifest['keys'] = array_keys($manifest['keys']);
 
          // Attempt to write manifest
-         $stored = $this->Memcache->store($realKey, $manifest, $expiry);
+         $stored = $this->Memcache->set($realKey, $manifest, $expiry);
 
          // Check if things went ok
          $ok = $this->lastAction($realKey);
@@ -266,7 +266,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
          // Write real keys
          foreach ($keys as $shardKey => $shardData) {
-            $this->Memcache->store($shardKey, $shardData, $expiry);
+            $this->Memcache->set($shardKey, $shardData, $expiry);
          }
 
          Gdn_Cache::localSet($realKey, $value);

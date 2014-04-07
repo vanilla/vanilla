@@ -346,7 +346,7 @@ class Gdn_Memcached extends Gdn_Cache {
                if (key_exists('hash', $manifest) && key_exists('keys', $manifest)) {
                   // MultiGet sub-keys
                   $shardKeys = $this->Memcache->getMulti($manifest['keys']);
-                  asort($shardKeys);
+                  ksort($shardKeys);
 
                   // Check subkeys for validity
                   $shardData = implode('', $shardKeys);

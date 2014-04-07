@@ -250,7 +250,7 @@ class Gdn_Memcached extends Gdn_Cache {
       // Sharding, write real keys
       if (key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
 
-         if (!in_numeric($shards))
+         if (!is_numeric($shards))
             $shards = count($this->Containers);
 
          $manifest = $this->shard($realKey, $value, $shards);

@@ -109,7 +109,6 @@ class CategoryModel extends Gdn_Model {
             $Sql = Gdn::SQL();
             $Sql = clone $Sql;
             $Sql->Reset();
-            $Session = Gdn::Session();
 
             $Sql->Select('c.*')
                ->Select('lc.DateInserted', '', 'DateLastComment')
@@ -154,7 +153,10 @@ class CategoryModel extends Gdn_Model {
    protected static function BuildCache() {
       self::CalculateData(self::$Categories);
       self::JoinRecentPosts(self::$Categories);
-      Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+      Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(
+         Gdn_Cache::FEATURE_EXPIRY  => 600,
+         Gdn_Cache::FEATURE_SHARD   => 'auto'
+      ));
    }
 
    /**

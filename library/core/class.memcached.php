@@ -338,21 +338,24 @@ class Gdn_Memcached extends Gdn_Cache {
          $storeData = array();
          foreach ($data as $localKey => &$localValue) {
 
-            // Is this a sharded key?
+            // Is this a sharded key manifest?
             if (is_array($localValue) && key_exists('type', $localValue) && $localValue['type'] == 'shard') {
 
+               // Be very sure this is a sharded key
                $manifest = $localValue;
-               // MultiGet sub-keys
-               $shardKeys = $this->Memcache->getMulti($manifest['keys']);
-               asort($shardKeys);
+               if (key_exists('hash', $manifest) && key_exists('keys', $manifest)) {
+                  // MultiGet sub-keys
+                  $shardKeys = $this->Memcache->getMulti($manifest['keys']);
+                  asort($shardKeys);
 
-               // Check subkeys for validity
-               $shardData = implode('', $shardKeys);
-               unset($shardKeys);
-               $dataHash = md5($shardData);
-               if ($dataHash != $manifest['hash']) continue;
+                  // Check subkeys for validity
+                  $shardData = implode('', $shardKeys);
+                  unset($shardKeys);
+                  $dataHash = md5($shardData);
+                  if ($dataHash != $manifest['hash']) continue;
 
-               $localValue = unserialize($shardData);
+                  $localValue = unserialize($shardData);
+               }
             }
 
             if ($localValue !== false)

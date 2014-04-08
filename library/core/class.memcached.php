@@ -319,7 +319,7 @@ class Gdn_Memcached extends Gdn_Cache {
          unset($manifest['shards']);
 
          // Attempt to write manifest
-         $added = $this->Memcache->add($realKey, $manifest, $expiry);
+         $added = $this->Memcache->set($realKey, $manifest, $expiry);
 
          // Check if things went ok
          $ok = $this->lastAction($realKey);

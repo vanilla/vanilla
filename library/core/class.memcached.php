@@ -166,8 +166,14 @@ class Gdn_Memcached extends Gdn_Cache {
 
    public function Shard($key, $value, $shards) {
 
+      // Calculate automatic shard count
+      if (!is_numeric($shards)) {
+         $shards = count($this->Containers) + 1;
+         if ($shards < 4) $shards = 4;
+      }
+
       // Prepare manifest
-      $data = serialize($value);
+      $data = base64_encode(serialize($value));
       $hash = md5($data);
       $size = strlen($data);
       $manifest = array(
@@ -201,9 +207,6 @@ class Gdn_Memcached extends Gdn_Cache {
 
       // Sharding, write real keys
       if (key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
-
-         if (!is_numeric($shards))
-            $shards = count($this->Containers);
 
          $manifest = $this->shard($realKey, $value, $shards);
          $keys = $manifest['keys'];
@@ -249,9 +252,6 @@ class Gdn_Memcached extends Gdn_Cache {
 
       // Sharding, write real keys
       if (key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
-
-         if (!is_numeric($shards))
-            $shards = count($this->Containers);
 
          $manifest = $this->shard($realKey, $value, $shards);
          $keys = $manifest['keys'];
@@ -349,12 +349,12 @@ class Gdn_Memcached extends Gdn_Cache {
                   ksort($shardKeys);
 
                   // Check subkeys for validity
-                  $shardData = implode('', $shardKeys);
+                  $shardData = implode('', array_values($shardKeys));
                   unset($shardKeys);
                   $dataHash = md5($shardData);
                   if ($dataHash != $manifest['hash']) continue;
 
-                  $localValue = unserialize($shardData);
+                  $localValue = unserialize(base64_decode($shardData));
                }
             }
 

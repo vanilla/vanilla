@@ -255,7 +255,7 @@ class Gdn_Memcached extends Gdn_Cache {
       );
 
       // Determine chunk size
-      $chunk = $size / $shards;
+      $chunk = ceil($size / $shards);
 
       // Write keys
       $chunks = str_split($data, $chunk);
@@ -269,7 +269,7 @@ class Gdn_Memcached extends Gdn_Cache {
             'data'   => $chunks[$i]
          );
          if (!key_exists($serverKey, $manifest['keys']))
-            $manifest['keys'] = array();
+            $manifest['keys'][$serverKey] = array();
          $manifest['keys'][$serverKey][] = $shardKey;
          $j++;
          if ($j >= $mapSize) $j = 0;

@@ -176,21 +176,25 @@ class Gdn_Memcached extends Gdn_Cache {
       if (is_null($servers)) {
          $serverList = $this->servers();
          $ns = count($serverList);
+         $servers = array();
 
-         $mcversion = phpversion('memcached');
-         if (version_compare($mcversion, '2.2', '>=')) {
+         if ($this->canAutoShard()) {
 
             // Use getServerByKey to determine server keys
 
-            $servers = array();
+            $i = $ns*10;
             do {
+               $i--; // limited iterations
                $shardKey = betterRandomString(6,'a0');
                $shardServer = $this->Memcache->getServerByKey($shardKey);
                $shardServerName = $shardServer['host'];
-               $servers[$shardServerName] = $shardKey;
-            } while (count($servers) < $ns);
+               if ($shardServerName)
+                  $servers[$shardServerName] = $shardKey;
+            } while ($i > 0 && count($servers) < $ns);
 
-         } else {
+         }
+
+         if (!count($servers)) {
 
             // Use random server keys
 
@@ -202,6 +206,20 @@ class Gdn_Memcached extends Gdn_Cache {
          }
       }
       return $servers;
+   }
+
+   /**
+    * Determine if we can auto distribute shards
+    *
+    * Version of memcached prior to v2.2 could not be relied upon to return
+    * reliable results for getServerByKey(), so we have to generate random
+    * server keys and hope for the best.
+    *
+    * @return boolean
+    */
+   public function CanAutoShard() {
+      $mcversion = phpversion('memcached');
+      return version_compare($mcversion, '2.2', '>=');
    }
 
    public function Shard($key, $value, $shards) {

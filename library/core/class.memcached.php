@@ -215,11 +215,16 @@ class Gdn_Memcached extends Gdn_Cache {
     * reliable results for getServerByKey(), so we have to generate random
     * server keys and hope for the best.
     *
+    * @static boolean $canAutoShard
     * @return boolean
     */
    public function CanAutoShard() {
-      $mcversion = phpversion('memcached');
-      return version_compare($mcversion, '2.2', '>=');
+      static $canAutoShard = null;
+      if (is_null($canAutoShard)) {
+         $mcversion = phpversion('memcached');
+         $canAutoShard = version_compare($mcversion, '2.2', '>=');
+      }
+      return $canAutoShard;
    }
 
    public function Shard($key, $value, $shards) {
@@ -231,7 +236,10 @@ class Gdn_Memcached extends Gdn_Cache {
       // Calculate automatic shard count
       if (!is_numeric($shards)) {
          $shards = $mapSize;
-         if ($shards < 4) $shards = 4;
+
+         // If we're not precisely targeting keys, add a shard for safety
+         if (!$this->canAutoShard())
+            $shards = $mapSize + 1;
       }
 
       // Prepare manifest

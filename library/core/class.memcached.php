@@ -243,7 +243,7 @@ class Gdn_Memcached extends Gdn_Cache {
       }
 
       // Prepare manifest
-      $data = base64_encode(serialize($value));
+      $data = serialize($value);
       $hash = md5($data);
       $size = strlen($data);
       $manifest = array(
@@ -454,7 +454,7 @@ class Gdn_Memcached extends Gdn_Cache {
                   $dataHash = md5($shardData);
                   if ($dataHash != $manifest['hash']) continue;
 
-                  $localValue = unserialize(base64_decode($shardData));
+                  $localValue = unserialize($shardData);
                }
             }
 

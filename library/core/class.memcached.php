@@ -177,13 +177,29 @@ class Gdn_Memcached extends Gdn_Cache {
          $serverList = $this->servers();
          $ns = count($serverList);
 
-         $servers = array();
-         do {
-            $shardKey = betterRandomString(6,'a0');
-            $shardServer = $this->Memcache->getServerByKey($shardKey);
-            $shardServerName = $shardServer['host'];
-            $servers[$shardServerName] = $shardKey;
-         } while (count($servers) < $ns);
+         $mcversion = phpversion('memcached');
+         if (version_compare($mcversion, '2.2', '>=')) {
+
+            // Use getServerByKey to determine server keys
+
+            $servers = array();
+            do {
+               $shardKey = betterRandomString(6,'a0');
+               $shardServer = $this->Memcache->getServerByKey($shardKey);
+               $shardServerName = $shardServer['host'];
+               $servers[$shardServerName] = $shardKey;
+            } while (count($servers) < $ns);
+
+         } else {
+
+            // Use random server keys
+
+            foreach ($serverList as $server) {
+               $serverName = $server['host'];
+               $servers[$serverName] = betterRandomString(6,'a0');
+            }
+
+         }
       }
       return $servers;
    }

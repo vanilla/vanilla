@@ -56,6 +56,8 @@ abstract class Gdn_Cache {
    const FEATURE_INITIAL      = 'f_initial';
    // Allows sharding large keys across all servers [Add,Store,Get,Replace,Remove]
    const FEATURE_SHARD        = 'f_shard';
+   // Allows control over localcache usage
+   const FEATURE_LOCAL        = 'f_local';
 
    /**
     * Location - SERVER:IP, Filepath, etc

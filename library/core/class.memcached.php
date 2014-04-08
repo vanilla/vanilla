@@ -208,6 +208,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
       $shardMap = $this->shardMap();
       $mapSize = count($shardMap);
+      $shardMap = array_values($shardMap);
 
       // Calculate automatic shard count
       if (!is_numeric($shards)) {

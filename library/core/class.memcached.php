@@ -174,7 +174,7 @@ class Gdn_Memcached extends Gdn_Cache {
    public function ShardMap() {
       static $servers = null;
       if (is_null($servers)) {
-         $serverList = $this->Memcache->getServerList();
+         $serverList = $this->servers();
          $ns = count($serverList);
 
          $servers = array();

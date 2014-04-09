@@ -155,7 +155,7 @@ class CategoryModel extends Gdn_Model {
       self::JoinRecentPosts(self::$Categories);
       Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(
          Gdn_Cache::FEATURE_EXPIRY  => 600,
-         Gdn_Cache::FEATURE_SHARD   => 'auto'
+         Gdn_Cache::FEATURE_SHARD   => true
       ));
    }
 

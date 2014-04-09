@@ -227,6 +227,28 @@ class Gdn_Memcached extends Gdn_Cache {
       return $canAutoShard;
    }
 
+   /**
+    * Shard a key/value and create its manifest key
+    *
+    *  array
+    *    type     // 'shard'
+    *    hash     // hash of serialized data
+    *    size     // number of bytes in serialized data
+    *    shards   // sharded data
+    *      [...]
+    *        server  // server key, for assigning a server
+    *        key     // actual key
+    *        data    // data shard
+    *    keys     // list of shard keys grouped by server key
+    *      [server key]
+    *        [...]
+    *          key
+    *
+    * @param string $key data key
+    * @param mixed $value data value to shard
+    * @param int|boolean $shards number of shards, or simply bool true
+    * @return array
+    */
    public function Shard($key, $value, $shards) {
 
       $shardMap = $this->shardMap();

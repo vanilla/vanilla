@@ -268,13 +268,9 @@ class Gdn_Memcached extends Gdn_Cache {
       $data = serialize($value);
       $hash = md5($data);
       $size = strlen($data);
-      $manifest = array(
-         'type'   => 'shard',
-         'hash'   => $hash,
-         'size'   => $size,
-         'shards' => array(),
-         'keys'   => array()
-      );
+      $manifest = new MemcachedShard();
+      $manifest->hash = $hash;
+      $manifest->size = $size;
 
       // Determine chunk size
       $chunk = ceil($size / $shards);
@@ -285,14 +281,14 @@ class Gdn_Memcached extends Gdn_Cache {
       for ($i = 0; $i < $shards; $i++) {
          $shardKey = sprintf('%s-shard%d', $key, $i);
          $serverKey = $shardMap[$j];
-         $manifest['shards'][] = array(
+         $manifest->shards[] = array(
             'server' => $serverKey,
             'key'    => $shardKey,
             'data'   => $chunks[$i]
          );
-         if (!key_exists($serverKey, $manifest['keys']))
-            $manifest['keys'][$serverKey] = array();
-         $manifest['keys'][$serverKey][] = $shardKey;
+         if (!key_exists($serverKey, $manifest->keys))
+            $manifest->keys[$serverKey] = array();
+         $manifest->keys[$serverKey][] = $shardKey;
          $j++;
          if ($j >= $mapSize) $j = 0;
       }
@@ -314,8 +310,8 @@ class Gdn_Memcached extends Gdn_Cache {
       if (key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
 
          $manifest = $this->shard($realKey, $value, $shards);
-         $shards = $manifest['shards'];
-         unset($manifest['shards']);
+         $shards = $manifest->shards;
+         unset($manifest->shards);
 
          // Attempt to write manifest
          $added = $this->Memcache->add($realKey, $manifest, $expiry);
@@ -363,8 +359,8 @@ class Gdn_Memcached extends Gdn_Cache {
       if (key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
 
          $manifest = $this->shard($realKey, $value, $shards);
-         $shards = $manifest['shards'];
-         unset($manifest['shards']);
+         $shards = $manifest->shards;
+         unset($manifest->shards);
 
          // Attempt to write manifest
          $added = $this->Memcache->set($realKey, $manifest, $expiry);
@@ -457,27 +453,25 @@ class Gdn_Memcached extends Gdn_Cache {
          foreach ($data as $localKey => &$localValue) {
 
             // Is this a sharded key manifest?
-            if (is_array($localValue) && key_exists('type', $localValue) && $localValue['type'] == 'shard') {
+            if (is_object($localValue) && $localValue instanceof MemcachedShard) {
 
-               // Be very sure this is a sharded key
                $manifest = $localValue;
-               if (key_exists('hash', $manifest) && key_exists('keys', $manifest)) {
-                  // MultiGet sub-keys
-                  $shardKeys = array();
-                  foreach ($manifest['keys'] as $serverKey => $keys) {
-                     $serverKeys = $this->Memcache->getMultiByKey($serverKey, $keys);
-                     $shardKeys = array_merge($shardKeys, $serverKeys);
-                  }
-                  ksort($shardKeys);
 
-                  // Check subkeys for validity
-                  $shardData = implode('', array_values($shardKeys));
-                  unset($shardKeys);
-                  $dataHash = md5($shardData);
-                  if ($dataHash != $manifest['hash']) continue;
-
-                  $localValue = unserialize($shardData);
+               // MultiGet sub-keys
+               $shardKeys = array();
+               foreach ($manifest->keys as $serverKey => $keys) {
+                  $serverKeys = $this->Memcache->getMultiByKey($serverKey, $keys);
+                  $shardKeys = array_merge($shardKeys, $serverKeys);
                }
+               ksort($shardKeys);
+
+               // Check subkeys for validity
+               $shardData = implode('', array_values($shardKeys));
+               unset($shardKeys);
+               $dataHash = md5($shardData);
+               if ($dataHash != $manifest->hash) continue;
+
+               $localValue = unserialize($shardData);
             }
 
             if ($localValue !== false)
@@ -662,7 +656,6 @@ class Gdn_Memcached extends Gdn_Cache {
     */
    public function lastAction($key = null) {
       $lastCode = $this->Memcache->getResultCode();
-      $lastMessage = $this->Memcache->getResultMessage();
 
       if ($lastCode == 47 || $lastCode == 35) {
          if ($key) {
@@ -691,4 +684,14 @@ class Gdn_Memcached extends Gdn_Cache {
    public function ResultMessage() {
       return $this->Memcache->getResultMessage();
    }
+}
+
+class MemcachedShard {
+
+   public $hash;
+   public $size;
+
+   public $shards = array();
+   public $keys = array();
+
 }

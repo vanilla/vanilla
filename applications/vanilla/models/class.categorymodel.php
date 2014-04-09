@@ -35,7 +35,7 @@ class CategoryModel extends Gdn_Model {
     * Whether or not to explicitly shard the categories cache.
     * @var bool
     */
-   public static $ShardCache = TRUE;
+   public static $ShardCache = FALSE;
 
    /**
     * Whether or not to join the users in some calls.

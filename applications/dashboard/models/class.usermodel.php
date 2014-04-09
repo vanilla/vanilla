@@ -516,7 +516,11 @@ class UserModel extends Gdn_Model {
     * @param array $NewUser
     * @since 2.1
     */
-   public function SynchUser($CurrentUser, $NewUser) {
+   public function SynchUser($CurrentUser, $NewUser, $Force = FALSE) {
+      // Don't synchronize the user if we are configured not to.
+      if (!$Force && !C('Garden.Registration.ConnectSynchronize', TRUE))
+         return;
+
       if (is_numeric($CurrentUser)) {
          $CurrentUser = $this->GetID($CurrentUser, DATASET_TYPE_ARRAY);
       }

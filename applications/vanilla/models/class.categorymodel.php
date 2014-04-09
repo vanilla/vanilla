@@ -32,6 +32,12 @@ class CategoryModel extends Gdn_Model {
    public static $Categories = NULL;
 
    /**
+    * Whether or not to explicitly shard the categories cache.
+    * @var bool
+    */
+   public static $ShardCache = TRUE;
+
+   /**
     * Whether or not to join the users in some calls.
     * Forums with a lot of categories may need to optimize using this setting and simpler views.
     * @var bool Whether or not to join users to recent posts.
@@ -155,7 +161,7 @@ class CategoryModel extends Gdn_Model {
       self::JoinRecentPosts(self::$Categories);
       Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(
          Gdn_Cache::FEATURE_EXPIRY  => 600,
-         Gdn_Cache::FEATURE_SHARD   => true
+         Gdn_Cache::FEATURE_SHARD   => self::$ShardCache
       ));
    }
 

@@ -1305,15 +1305,33 @@ jQuery(document).ready(function($) {
    }
 
    /**
-    * Textarea autogrow
-    *
+    * Textarea autogrow. Create wrapper for jquery.autosize.min.js library,
+    * so that the custom arguments passed do not need to be repeated for
+    * every call.
     */
+   gdn.autosize = function(textarea) {
+      if ($.fn.autosize) {
+         $(textarea).autosize({
+            append: '\n',
+            resizeDelay: 20,
+            callback: function(el) {
+               // This class adds the transition, and removes manual resize.
+               $(el).addClass('textarea-autosize');
+            }
+         })
+      }
+   };
 
-   if ($.fn.autogrow) {
-      $('textarea.Autogrow').livequery(function() {
-         $(this).autogrow();
-      });
-   }
+   // Attach autosize to all textareas. Previously this existed across multiple
+   // files, probably as it was slowly incorporated into different areas, but
+   // at this point it's safe to call it once here. The wrapper makes sure
+   // that it will not throw any errors if the library is unavailable.
+   $('textarea').livequery(function() {
+      gdn.autosize(this);
+   });
+
+
+
 
    /**
     * Uses highly modified jquery.atwho.js library. See the note in that

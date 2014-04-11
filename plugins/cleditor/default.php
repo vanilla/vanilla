@@ -11,8 +11,8 @@ Included files:
 4. images/buttons.gif (as v.1.3.0 - unchanged)
 
 Changelog:
-v0.1: 25AUG2010 - Initial release. 
-- Known bugs: 
+v0.1: 25AUG2010 - Initial release.
+- Known bugs:
 -- 1. Both HTML and WYSIWYG view are visible in 'Write comment' view. Quick fix: click HTML view button twice to toggle on/off.
 
 Optional: Edit line 19 of jquery.cleditor.min.js to remove extra toolbar buttons.
@@ -38,7 +38,7 @@ some glitches.
 v0.5: 02NOV2010 - by Tim @ Vanilla
 - Fixed:
 -- 1. Added backreference to the cleditor JS object and attached it to the textarea, for external interaction
- 
+
 v1.0.1 31AUG2011 - by Todd @ Vanilla
 - Fixed:
 -- 1. Fixed js error with new versions of jQuery.
@@ -48,17 +48,21 @@ v1.1 14SEPT2011 - by Linc @ Vanilla
 
 v1.1.1 28SEPT2011 - Linc
 -- Fixed infinite height loop confict with embed plugin.
+
+v1.3.2 11Aug2014 - Dane
+-- Upgraded core textarea autosizer, which no longer conflicts with this editor,
+   as far as I have tested, so commented out the RemoveJsFile line.
  */
 
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.3.1',
+   'Version' => '1.3.2',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
    'RequiredApplications' => array('Vanilla' => '>=2'),
-   'RequiredTheme' => FALSE, 
+   'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
    'RegisterPermissions' => FALSE,
@@ -71,31 +75,31 @@ class cleditorPlugin extends Gdn_Plugin {
 //	public function PostController_Render_Before($Sender) {
 //		$this->_AddCLEditor($Sender);
 //	}
-//	
+//
 //	public function DiscussionController_Render_Before($Sender) {
 //		$this->_AddCLEditor($Sender);
 //	}
-   
+
    /**
     * @param AssetModel $Sender
     */
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
       $Sender->AddCssFile('jquery.cleditor.css', 'plugins/cleditor');
    }
-   
+
    /**
     *
-    * @param Gdn_Form $Sender 
+    * @param Gdn_Form $Sender
     */
    public function Gdn_Form_BeforeBodyBox_Handler($Sender, $Args) {
       $Column = GetValue('Column', $Args, 'Body');
       $this->_AddCLEditor(Gdn::Controller(), $Column);
-      
+
       $Format = $Sender->GetValue('Format');
-      
+
       if ($Format) {
          $Formatter = Gdn::Factory($Format.'Formatter');
-         
+
          if ($Formatter && method_exists($Formatter, 'FormatForWysiwyg')) {
             $Body = $Formatter->FormatForWysiwyg($Sender->GetValue($Column));
             $Sender->SetValue($Column, $Body);
@@ -105,27 +109,27 @@ class cleditorPlugin extends Gdn_Plugin {
       }
       $Sender->SetValue('Format', 'Wysiwyg');
    }
-   
+
    public function AddClEditor() {
       $this->_AddCLEditor(Gdn::Controller());
    }
-	
+
 	private function _AddCLEditor($Sender, $Column = 'Body') {
       static $Added = FALSE;
       if ($Added)
          return;
-      
+
 		// Add the CLEditor to the form
 		$Options = array('ie' => 'gt IE 6', 'notie' => TRUE); // Exclude IE6
-		$Sender->RemoveJsFile('jquery.autogrow.js');
+		//$Sender->RemoveJsFile('jquery.autosize.min.js');
 		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor', $Options);
-      
+
       $CssInfo = AssetModel::CssPath(FALSE, 'cleditor.css', 'plugins/cleditor');
-      
+
       if ($CssInfo) {
          $CssPath = Asset($CssInfo[1]);
       }
-      
+
 		$Sender->Head->AddString(<<<EOT
 <style type="text/css">
 a.PreviewButton {
@@ -160,7 +164,7 @@ EOT
 );
       $Added = TRUE;
    }
-   
+
    public function PostController_Quote_Before($Sender, $Args) {
       // Make sure quotes know that we are hijacking the format to wysiwyg.
       if (!C('Garden.ForceInputFormatter'))
@@ -170,7 +174,7 @@ EOT
 	public function Setup() {
       $this->Structure();
    }
-   
+
    public function Structure() {
       SaveToConfig('Garden.Html.SafeStyles', FALSE);
    }

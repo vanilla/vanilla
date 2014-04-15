@@ -36,7 +36,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
          $EnabledAuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
          $EnabledNewVersion = $this->Data('EnabledTheme.NewVersion');
          $EnabledUpgrade = $EnabledNewVersion != '' && version_compare($EnabledNewVersion, $EnabledVersion, '>');
-         $EnabledPreviewUrl = $this->Data('EnabledTheme.ScreenshotUrl', FALSE);
+         $EnabledPreviewUrl = $this->Data('EnabledTheme.MobileScreenshotUrl', FALSE);
          $EnabledThemeName = $this->Data('EnabledThemeName');
 
          if ($this->Data('EnabledTheme.Options')) {
@@ -56,7 +56,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
             $AuthorUrl = GetValue('AuthorUrl', $ThemeInfo, '');
             $NewVersion = GetValue('NewVersion', $ThemeInfo, '');
             $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-            $PreviewUrl = GetValue('ScreenshotUrl', $ThemeInfo, FALSE);
+            $PreviewUrl = GetValue('MobileScreenshotUrl', $ThemeInfo, FALSE);
             $Description = GetValue('Description', $ThemeInfo);
             $RequiredApplications = GetValue('RequiredApplications', $ThemeInfo, FALSE);
 

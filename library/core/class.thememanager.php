@@ -157,6 +157,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
          }
 
+         // Add the mobile screenshot.
+         if (array_key_exists('mobilescreenshot', $ThemeFiles)) {
+            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', GetValue('mobilescreenshot', $ThemeFiles)),'/');
+            $SearchThemeInfo['MobileScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
+         }
+
          if (array_key_exists('hooks', $ThemeFiles)) {
             $SearchThemeInfo['HooksFile'] = GetValue('hooks', $ThemeFiles, FALSE);
             $SearchThemeInfo['RealHooksFile'] = realpath($SearchThemeInfo['HooksFile']);
@@ -244,7 +250,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          'about\.php'                           => 'about',
          '.*\.theme\.php'                       => 'about',
          'class\..*themehooks\.php'             => 'hooks',
-         'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot'
+         'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot',
+         'mobile\.(gif|jpg|jpeg|png)'           => 'mobilescreenshot'
       );
 
       $MatchedThemeFiles = array();

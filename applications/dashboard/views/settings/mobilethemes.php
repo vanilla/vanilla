@@ -97,13 +97,33 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                </span>
             </h4>
 
-            <div class="author-name">
+            <!--<div class="author-name">
                <?php echo $Author; ?>
-            </div>
+            </div>-->
 
             <?php echo $UpgradeHtml; ?>
             <?php echo $PreviewImageHtml; ?>
-            <?php echo $DescriptionHtml; ?>
+
+            <div class="theme-right-column">
+
+               <?php echo $DescriptionHtml; ?>
+
+               <div class="Buttons">
+                  <div class="theme-buttons">
+                     <?php
+                        echo Anchor(T('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
+                        //echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
+                        $this->EventArguments['ThemeInfo'] = $ThemeInfo;
+                        $this->FireEvent('AfterThemeButtons');
+                     ?>
+                  </div>
+
+                  <div class="theme-apply-progress"></div>
+
+                  <div class="theme-applied">Enabled</div>
+               </div>
+
+            </div>
 
             <?php
                if ($this->Data('EnabledTheme.Options')) {
@@ -138,21 +158,6 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
             <?php endif; ?>
 
-            <div class="Buttons">
-
-               <div class="theme-buttons">
-                  <?php
-                     echo Anchor(T('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
-                     //echo Anchor(T('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
-                     $this->EventArguments['ThemeInfo'] = $ThemeInfo;
-                     $this->FireEvent('AfterThemeButtons');
-                  ?>
-               </div>
-
-               <div class="theme-apply-progress"></div>
-
-               <div class="theme-applied">Enabled</div>
-            </div>
          </td>
 
          <?php

@@ -73,6 +73,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddJsFile('jquery.form.js');
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('global.js');
 
       $this->AddCssFile('style.css');

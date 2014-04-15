@@ -1320,39 +1320,66 @@ jQuery(document).ready(function($) {
     * @depends js/library/jquery.autosize.min.js
     */
    gdn.autosize = function(textarea) {
+      // Check if library available.
       if ($.fn.autosize) {
-         $(textarea).autosize({
-            append: '\n',
-            resizeDelay: 20, // Keep higher than CSS transition, else creep.
-            callback: function(el) {
-               // This class adds the transition, and removes manual resize.
-               $(el).addClass('textarea-autosize');
-            }
-         });
+         // Check if not already active on node.
+         if (!$(textarea).hasClass('textarea-autosize')) {
+            $(textarea).autosize({
+               append: '\n',
+               resizeDelay: 20, // Keep higher than CSS transition, else creep.
+               callback: function(el) {
+                  // This class adds the transition, and removes manual resize.
+                  $(el).addClass('textarea-autosize');
+               }
+            });
+         // Otherwise just trigger a resize refresh.
+         } else {
+            $(textarea).trigger('autosize.resize');
+         }
       }
    };
 
+   /**
+    * Bind autosize to relevant nodes.
+    *
+    * Attach autosize to all textareas. Previously this existed across multiple
+    * files, probably as it was slowly incorporated into different areas, but
+    * at this point it's safe to call it once here. The wrapper above makes
+    * sure that it will not throw any errors if the library is unavailable.
+    *
+    * Note: if there is a textarea not autosizing, it would be good to find out
+    * if there is another event for that exception, and if all fails, there
+    * is the livequery fallback, which is not recommended.
+    */
    gdn.initAutosizeEvents = (function() {
-      // Attach autosize to all textareas. Previously this existed across multiple
-      // files, probably as it was slowly incorporated into different areas, but
-      // at this point it's safe to call it once here. The wrapper makes sure
-      // that it will not throw any errors if the library is unavailable.
-      $('textarea').livequery(function() {
-         gdn.autosize(this);
+      $('textarea').each(function(i, el) {
+         // Attach to all immediately available textareas.
+         gdn.autosize(el);
 
          // Also, make sure that focus on the textarea will trigger a resize,
          // just to cover all possibilities.
-         $(this).on('focus', function(e) {
-            $(this).trigger('autosize.resize');
+         $(el).on('focus', function(e) {
+            gdn.autosize(this);
          });
       });
 
-      // If any forms with textareas are submitted, they should throw a
-      // clearCommentForm event, so bind to that event. Attempted to bind to
-      // appendHtml event, but it required a (0ms) timeout, so it's being
-      // kept in Quotes plugin, where it's actually triggered.
-      $('form').on('clearCommentForm', function(e) {
-         $(this).find('textarea').trigger('autosize.resize');
+      // For any dynamically loaded textareas that are inserted and have an
+      // event triggered to grab their node, or just events that should call
+      // a resize on the textarea. Attempted to bind to `appendHtml` event,
+      // but it required a (0ms) timeout, so it's being kept in Quotes plugin,
+      // where it's actually triggered.
+      var autosizeTriggers = [
+         'clearCommentForm',
+         'EditCommentFormLoaded',
+         'popupReveal'
+         //'appendHtml'
+      ];
+
+      $(document).on(autosizeTriggers.join(' '), function(e, data) {
+         var data = (typeof data == 'object') ? data : '';
+         $(data||e.target||this).parent().find('textarea').each(function(i, el) {
+            gdn.autosize(el);
+         });
       });
    }());
 

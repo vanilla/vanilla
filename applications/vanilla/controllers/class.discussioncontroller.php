@@ -675,27 +675,37 @@ class DiscussionController extends VanillaController {
 
    /**
     * Alternate version of Index that uses the embed master view.
+    *
+    * @param int $DiscussionID Unique identifier, if discussion has been created.
+    * @param string $DiscussionStub Deprecated.
+    * @param int $Offset
+    * @param int $Limit
     */
    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
       $this->Title(T('Comments'));
-      $this->AddDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
-      $this->AddDefinition('SelfUrl', Gdn::Request()->PathAndQuery());
-      $this->AddDefinition('Embedded', TRUE);
-      $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
+
+      // Add theme data
       $this->Theme = C('Garden.CommentsTheme', $this->Theme);
       Gdn_Theme::Section('Comments');
+
+      // Force view options
+      $this->MasterView = 'empty';
+      $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
 
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)
          $this->Head->AddString('<style type="text/css">
 body { background: transparent !important; }
 </style>');
-      $Session = Gdn::Session();
+
+      // Javascript files & options
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('jquery.autogrow.js');
       $this->RemoveJsFile('autosave.js');
       $this->AddJsFile('discussion.js');
-      $this->MasterView = 'empty';
+      $this->AddDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
+      $this->AddDefinition('SelfUrl', Gdn::Request()->PathAndQuery());
+      $this->AddDefinition('Embedded', TRUE);
 
       // Define incoming variables (prefer querystring parameters over method parameters)
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
@@ -703,6 +713,7 @@ body { background: transparent !important; }
       $Offset = GetIncomingValue('Offset', $Offset);
       $Limit = GetIncomingValue('Limit', $Limit);
       $vanilla_identifier = GetIncomingValue('vanilla_identifier', '');
+
       // Only allow vanilla identifiers of 32 chars or less - md5 if larger
       if (strlen($vanilla_identifier) > 32) {
          $vanilla_identifier = md5($vanilla_identifier);
@@ -718,10 +729,11 @@ body { background: transparent !important; }
       );
       $this->SetData('ForeignSource', $ForeignSource);
 
+      // Set comment sorting
       $SortComments = C('Garden.Embed.SortComments') == 'desc' ? 'desc' : 'asc';
       $this->SetData('SortComments', $SortComments);
 
-      // Retrieve the discussion record.
+      // Retrieve the discussion record
       $Discussion = FALSE;
       if ($DiscussionID > 0) {
          $Discussion = $this->DiscussionModel->GetID($DiscussionID);
@@ -729,13 +741,16 @@ body { background: transparent !important; }
          $Discussion = $this->DiscussionModel->GetForeignID($vanilla_identifier, $vanilla_type);
       }
 
+      // Set discussion data if we have one for this page
       if ($Discussion) {
+         $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Discussion->PermissionCategoryID);
          $this->SetData('Discussion', $Discussion, TRUE);
          $this->SetData('DiscussionID', $Discussion->DiscussionID, TRUE);
-         $this->Title($this->Discussion->Name);
+         $this->Title($Discussion->Name);
 
          // Actual number of comments, excluding the discussion itself
-         $ActualResponses = $this->Discussion->CountComments;
+         $ActualResponses = $Discussion->CountComments;
+
          // Define the query offset & limit
          if (!is_numeric($Limit) || $Limit < 0)
             $Limit = C('Garden.Embed.CommentsPerPage', 30);
@@ -763,7 +778,7 @@ body { background: transparent !important; }
          if (StringBeginsWith(GetValueR('0.0', $CurrentOrderBy), 'c.DateInserted'))
             $this->CommentModel->OrderBy('c.DateInserted '.$SortComments); // allow custom sort
 
-         $this->SetData('Comments', $this->CommentModel->Get($this->Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
+         $this->SetData('Comments', $this->CommentModel->Get($Discussion->DiscussionID, $Limit, $this->Offset), TRUE);
 
          if (count($this->CommentModel->Where()) > 0)
             $ActualResponses = FALSE;
@@ -781,7 +796,7 @@ body { background: transparent !important; }
             $this->Offset,
             $Limit,
             $ActualResponses,
-            'discussion/embed/'.$this->Discussion->DiscussionID.'/'.Gdn_Format::Url($this->Discussion->Name).'/%1$s'
+            'discussion/embed/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/%1$s'
          );
          $this->Pager->CurrentRecords = $this->Comments->NumRows();
          $this->FireEvent('AfterBuildPager');
@@ -794,10 +809,12 @@ body { background: transparent !important; }
       $this->Form->AddHidden('Embedded', 'true'); // Tell the post controller that this is an embedded page (in case there are custom views it needs to pick up from a theme).
       $this->Form->AddHidden('DisplayNewCommentOnly', 'true'); // Only load/display the new comment after posting (don't load all new comments since the page last loaded).
 
+      // Grab the page title
       if ($this->Request->Get('title')) {
          $this->Form->SetValue('Name', $this->Request->Get('title'));
       }
 
+      // Set existing DiscussionID for comment form
       if ($Discussion) {
          $this->Form->AddHidden('DiscussionID', $Discussion->DiscussionID);
       }
@@ -805,6 +822,7 @@ body { background: transparent !important; }
       foreach ($ForeignSource as $Key => $Val) {
          // Drop the foreign source information into the form so it can be used if creating a discussion
          $this->Form->AddHidden($Key, $Val);
+         
          // Also drop it into the definitions so it can be picked up for stashing comments
          $this->AddDefinition($Key, $Val);
       }
@@ -813,7 +831,7 @@ body { background: transparent !important; }
       $Draft = FALSE;
       if (Gdn::Session()->UserID && $Discussion) {
          $DraftModel = new DraftModel();
-         $Draft = $DraftModel->Get($Session->UserID, 0, 1, $Discussion->DiscussionID)->FirstRow();
+         $Draft = $DraftModel->Get(Gdn::Session()->UserID, 0, 1, $Discussion->DiscussionID)->FirstRow();
          $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
       }
 
@@ -821,8 +839,9 @@ body { background: transparent !important; }
          $this->Form->SetFormValue('Body', $Draft->Body);
       else {
          // Look in the session stash for a comment
-         $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE);
-         if ($StashComment)
+         $StashComment = Gdn::Session()->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE);
+         if ($StashComment) {
+            $this->Form->SetValue('Body', $StashComment);
             $this->Form->SetFormValue('Body', $StashComment);
       }
 
@@ -835,6 +854,7 @@ body { background: transparent !important; }
          $this->View = 'comments';
       }
 
+      // Ordering note for JS
       if ($SortComments == 'desc')
          $this->AddDefinition('PrependNewComments', '1');
 
@@ -870,8 +890,6 @@ body { background: transparent !important; }
       }
 
       $Stub = $this->DiscussionModel->FetchPageInfo($ForeignUrl, TRUE);
-//      decho($Stub);
-//      die();
 
       // Save the stub.
       $this->DiscussionModel->SetField($DiscussionID, (array)$Stub);

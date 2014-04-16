@@ -106,8 +106,6 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
             <div class="theme-right-column">
 
-               <?php echo $DescriptionHtml; ?>
-
                <div class="Buttons">
                   <div class="theme-buttons">
                      <?php
@@ -122,6 +120,8 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
                   <div class="theme-applied">Enabled</div>
                </div>
+
+               <?php echo $DescriptionHtml; ?>
 
             </div>
 

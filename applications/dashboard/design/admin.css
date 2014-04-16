@@ -1757,8 +1757,7 @@ div.Summary table tbody td {
    display: block;
    width: 100%;
    box-sizing: border-box;
-   height: 80px;
-   margin: 10px 0 0 0;
+   margin: 10px 0 20px 0;
 }
 
 .browser-mobile-themes.SelectionGrid div.Buttons a {

@@ -1779,7 +1779,7 @@ div.Summary table tbody td {
 
 .browser-mobile-themes.SelectionGrid div.Buttons a,
 .theme-applied {
-   min-width: 64px;
+   min-width: 62px;
    width: 50%;
    margin: auto;
    float: right;

@@ -125,6 +125,8 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
             </div>
 
+
+
             <?php
                if ($this->Data('EnabledTheme.Options')) {
                $OptionsDescription = sprintf(T('This theme has additional options.', 'This theme has additional options on the %s page.'),
@@ -135,8 +137,6 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                   '</div>';
                }
             ?>
-
-            <?php $this->FireEvent('AfterCurrentTheme'); ?>
 
             <?php if (is_array($RequiredApplications)): ?>
 

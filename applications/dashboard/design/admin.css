@@ -1722,6 +1722,8 @@ div.Summary table tbody td {
 
 .themeblock .theme-image:empty {
    width: 120px;
+   border: 1px solid #fff;
+   background-color: rgba(0,0,0,0.02);
 }
 
 .themeblock .theme-description {
@@ -1763,7 +1765,6 @@ div.Summary table tbody td {
 .browser-mobile-themes.SelectionGrid div.Buttons a {
    display: inline-block;
    padding: 10px 0;
-   width: 40%;
 }
 
 .theme-applied {
@@ -1774,6 +1775,14 @@ div.Summary table tbody td {
    color: #aaa;
    margin: 3px 0 0 0;
    box-shadow: inset 0 0 2px 0 #ddd;
+}
+
+.browser-mobile-themes.SelectionGrid div.Buttons a,
+.theme-applied {
+   min-width: 64px;
+   width: 50%;
+   margin: auto;
+   float: right;
 }
 
 .themeblock.theme-progressing .theme-buttons,

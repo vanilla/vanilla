@@ -638,12 +638,15 @@ class ProfileController extends Gdn_Controller {
       }
 
       // Get user data & prep form.
+      if ($this->Form->IsPostBack() && $this->Form->GetFormValue('UserID')) {
+         $UserID = $this->Form->GetFormValue('UserID');
+      }
       $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
 
       $this->Form->SetModel($this->UserModel);
-      $this->Form->AddHidden('UserID', $this->User->UserID);
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
+         $this->Form->SetFormValue('UserID', $this->User->UserID);
          $UploadImage = new Gdn_UploadImage();
          try {
             // Validate the upload

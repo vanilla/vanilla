@@ -70,7 +70,7 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
 
             $PreviewImageHtml = ($PreviewUrl !== FALSE)
                ? Anchor(Img($PreviewUrl, array('alt' => $ScreenName)), 'dashboard/settings/previewtheme/'.$ThemeName, '', array('target' => '_top', 'class' => 'theme-image'))
-               : '';
+               : '<div class="theme-image"></div>';
 
             $DescriptionHtml = ($Description)
                ? '<em class="theme-description">' . $Description . '</em>'

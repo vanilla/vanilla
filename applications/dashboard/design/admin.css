@@ -1720,6 +1720,10 @@ div.Summary table tbody td {
    height: 213px;
 }
 
+.themeblock .theme-image:empty {
+   width: 120px;
+}
+
 .themeblock .theme-description {
    display: block;
    margin: -5px 0 0 0;

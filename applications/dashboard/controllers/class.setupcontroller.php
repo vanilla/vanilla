@@ -234,10 +234,14 @@ class SetupController extends DashboardController {
             
             // Detect rewrite abilities
             $CanRewrite = (bool)$this->Form->GetFormValue('RewriteUrls');
-      
+
+            // Detect Internet connection for CDNs
+            $Disconnected = !(bool)@fsockopen('ajax.googleapis.com',80);
+
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
                'Garden.RewriteUrls' => $CanRewrite,
+               'Garden.Cdns.Disable' => $Disconnected,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HtmLawed' => 'HtmLawed' // Make sure html purifier is enabled so html has a default way of being safely parsed.

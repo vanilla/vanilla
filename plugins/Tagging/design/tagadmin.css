@@ -20,6 +20,7 @@
 }
 .TagAdmin a {
    color: #1e79a7;
+   float: left;
 }
 
 .TagAdmin a.Delete {

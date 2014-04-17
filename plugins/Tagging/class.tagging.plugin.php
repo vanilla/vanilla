@@ -603,7 +603,9 @@ class TaggingPlugin extends Gdn_Plugin {
          $Type = 'Search Results';
          // This is made up, and exists so search results can be placed in
          // their own tab.
-         $TagTypes[] = 'Search Results';
+         $TagTypes[$Type] = array(
+             'key' => $Type
+         );
       }
 
       // Store type for view

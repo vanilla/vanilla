@@ -22,9 +22,6 @@
       echo $this->Form->TextBox('Search');
       echo ' '.$this->Form->Button(T('Go'));
       printf(T('%s tag(s) found.'), $this->Data('RecordCount'));
-
-      echo ' '.Anchor('Add Tag', '/settings/tags/add', 'Popup Button');
-
    ?>
 </div>
 <div class="Wrap">
@@ -37,13 +34,17 @@
 
 <ul class="tabbed-content tag-tabs">
 
-   <?php foreach($TagTypes as $TagTypeName): ?>
+   <?php foreach($TagTypes as $TagTypeName => $TagMeta): ?>
 
       <?php
 
-         $TagName = ($TagTypeName == '' || strtolower($TagTypeName) == 'tags')
+         $TagName = ($TagMeta['key'] == '' || strtolower($TagMeta['key']) == 'tags')
             ? 'Tags'
             : $TagTypeName;
+
+         $TagName = (!empty($TagMeta['plural']))
+            ? $TagMeta['plural']
+            : $TagName;
 
          $CurrentTab = (strtolower($TagType) == strtolower($TagName))
             ? 'current-tab'
@@ -101,7 +102,13 @@
             <?php
          }
       }
+
+      echo ' '.Anchor('Add Tag', '/settings/tags/add', 'Popup Button');
+
    ?>
+
+
+
 </div>
 <?php
 

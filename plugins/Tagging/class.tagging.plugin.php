@@ -602,7 +602,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $Type = 'Search Results';
          // This is made up, and exists so search results can be placed in
          // their own tab.
-         $TagTypes[] = 'Search Results';
+         $TagTypes[] = $Type;
       }
 
       // Store type for view
@@ -630,9 +630,11 @@ class TaggingPlugin extends Gdn_Plugin {
 
       // Make sure search uses its own search type, so results appear
       // in their own tab.
-      $Sender->Form->Action = '/settings/tagging/?type=' . $TagType;
+      $Sender->Form->Action = Url('/settings/tagging/?type=' . $TagType);
 
-      $Sender->SetData('RecordCount', $SQL->GetCount('Tag'));
+      $Sender->SetData('RecordCount', $SQL->GetCount('Tag', array(
+          'Type' => $Type
+      )));
 
       $Sender->Render('tagging', '', 'plugins/Tagging');
    }

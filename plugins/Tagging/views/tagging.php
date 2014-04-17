@@ -37,7 +37,7 @@
 
    <?php foreach($TagTypes as $TagTypeName => $TagMeta): ?>
 
-      <?php
+     <?php
 
          $TagName = ($TagMeta['key'] == '' || strtolower($TagMeta['key']) == 'tags')
             ? 'Tags'
@@ -47,11 +47,19 @@
             ? $TagMeta['plural']
             : $TagName;
 
-         $CurrentTab = (strtolower($TagType) == strtolower($TagName))
-            ? 'current-tab'
-            : '';
+         if ($TagMeta['key'] == '') {
+            $TagMeta['key'] = (!empty($TagMeta['plural']))
+               ? $TagMeta['plural']
+               : $TagMeta['key'];
+         }
 
-         $TabUrl = Url('/settings/tagging/?type=' . strtolower($TagName));
+         $CurrentTab = '';
+         if (strtolower($TagType) == strtolower($TagMeta['key'])
+         || (!empty($TagMeta['plural']) && strtolower($TagType) == strtolower($TagMeta['plural']))) {
+            $CurrentTab = 'current-tab';
+         }
+
+         $TabUrl = Url('/settings/tagging/?type=' . strtolower($TagMeta['key']));
 
       ?>
 

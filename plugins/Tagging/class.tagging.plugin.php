@@ -580,11 +580,25 @@ class TaggingPlugin extends Gdn_Plugin {
       if ($Search) {
          $SQL->Like('FullName', $Search , 'right');
       }
+
       if ($Type !== NULL) {
          if ($Type === 'null')
             $Type = NULL;
          $SQL->Where('Type', $Type);
+      } else if ($Type == '') {
+         $SQL->Where('Type', '');
       }
+
+      // Store type for view
+      $Sender->SetData('TagType', (!empty($Type))
+         ? $Type
+         : 'Tags'
+      );
+
+      // Store tag types
+      $TagModel = TagModel::instance();
+      $TagTypes = $TagModel->getTagTypes();
+      $Sender->SetData('TagTypes', $TagTypes);
 
       $Data = $SQL
          ->Select('t.*')

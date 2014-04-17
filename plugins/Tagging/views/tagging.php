@@ -1,4 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+
+<?php
+
+   $TagType = $this->Data('TagType');
+   $TagTypes = $this->Data('TagTypes');
+
+?>
+
 <h1><?php echo T($this->Data['Title']); ?></h1>
 <div class="Info">
    <?php echo T('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'); ?>
@@ -26,6 +34,31 @@
    echo T("Red tags are special and can't be removed.");
    ?>
 </div>
+
+<ul class="tabbed-content tag-tabs ClearFix">
+
+   <?php foreach($TagTypes as $TagMeta): ?>
+
+      <?php
+
+         $TagName = ($TagMeta['Type'] == '' || $TagMeta['Type'] == 'Tags')
+            ? 'Tags'
+            : $TagMeta['Type'];
+
+         $CurrentTab = (strtolower($TagType) == strtolower($TagName))
+            ? 'current-tab'
+            : '';
+
+         $TabUrl = Url('/settings/tagging/?type=' . strtolower($TagMeta['Type']));
+         
+      ?>
+
+      <li><a href="<?php echo $TabUrl; ?>" class="<?php echo $CurrentTab; ?>"><?php echo $TagName; ?></a></li>
+
+   <?php endforeach; ?>
+
+</ul>
+
 <div class="Tags">
    <?php
       $Session = Gdn::Session();

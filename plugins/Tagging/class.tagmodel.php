@@ -125,6 +125,22 @@ class TagModel extends Gdn_Model {
       return $this->Types;
    }
 
+   public function getTagTypes() {
+      $Px = $this->Database->DatabasePrefix;
+      $Sql = "SELECT DISTINCT Type FROM {$Px}Tag";
+      $tag_types = $this->Database->Query($Sql)->ResultArray();
+
+      // If there are is an empty Type.
+      $tag_types = array_map(function($type) {
+         if (empty($type['Type'])) {
+            $type['Type'] = '';
+         }
+         return $type;
+      }, $tag_types);
+
+      return $tag_types;
+   }
+
    /**
     * Update the tag count per discussion in the Tag table
     *

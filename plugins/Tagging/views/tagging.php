@@ -21,7 +21,7 @@
 
       echo $this->Form->TextBox('Search');
       echo ' '.$this->Form->Button(T('Go'));
-      printf(T('%s tag(s) found.'), $this->Data('RecordCount'));
+      //printf(T('%s tag(s) found.'), $this->Data('RecordCount'));
    ?>
 </div>
 <div class="Wrap">
@@ -55,7 +55,10 @@
       ?>
 
       <li>
-         <a href="<?php echo $TabUrl; ?>" class="<?php echo $CurrentTab; ?>"><?php echo $TagName; ?></a>
+         <a href="<?php echo $TabUrl; ?>" class="<?php echo $CurrentTab; ?>">
+            <?php echo $TagName; ?>
+            <?php if ($CurrentTab) echo "({$this->Data('RecordCount')})"; ?>
+         </a>
       </li>
 
    <?php endforeach; ?>
@@ -103,11 +106,15 @@
          }
       }
 
-      echo ' '.Anchor('Add Tag', '/settings/tags/add', 'Popup Button');
+      ?>
 
-   ?>
+      <div class="add-new-tag">
 
+         <?php
+            echo ' '.Anchor('Add Tag', '/settings/tags/add', 'Popup Button');
+         ?>
 
+      </div>
 
 </div>
 <?php

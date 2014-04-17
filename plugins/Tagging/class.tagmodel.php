@@ -130,22 +130,25 @@ class TagModel extends Gdn_Model {
    }
 
    public function getTagTypes() {
-      $DefaultTypes = $this->defaultTypes();
-      if (count($DefaultTypes) == 1) {
-         $Px = $this->Database->DatabasePrefix;
-         $Sql = "SELECT DISTINCT Type FROM {$Px}Tag";
-         $TagTypes = $this->Database->Query($Sql)->ResultArray();
-         $TagTypes = array_column($TagTypes, 'Type');
+      $DefaultTypes = $this->Types();
 
-         $AvailableTypes = array();
-         foreach($TagTypes as $Type) {
-            $AvailableTypes[$Type] = array(
-               'key' => $Type,
-               'name' => $Type
-            );
-         }
+      $Px = $this->Database->DatabasePrefix;
+      $Sql = "SELECT DISTINCT Type FROM {$Px}Tag";
+      $TagTypes = $this->Database->Query($Sql)->ResultArray();
+      $TagTypes = array_column($TagTypes, 'Type');
 
-         $TagTypes = array_merge($AvailableTypes, $DefaultTypes);
+      $AvailableTypes = array();
+      foreach($TagTypes as $Type) {
+         $AvailableTypes[$Type] = array(
+            'key' => $Type,
+            'name' => $Type
+         );
+      }
+
+      $TagTypes = array_merge($AvailableTypes, $DefaultTypes);
+
+      if (!is_array($TagTypes)) {
+         $TagTypes = $DefaultTypes;
       }
 
       return $TagTypes;

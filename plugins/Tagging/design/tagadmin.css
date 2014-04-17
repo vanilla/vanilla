@@ -74,6 +74,10 @@
    background: #b94a48;
 }
 
+.add-new-tag a {
+   margin: 0;
+}
+
 /**
  * Tag tabbing
  */

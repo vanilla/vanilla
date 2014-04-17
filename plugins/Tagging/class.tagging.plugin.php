@@ -637,9 +637,13 @@ class TaggingPlugin extends Gdn_Plugin {
 
       // Search results pagination will mess up a bit, so don't provide a type
       // in the count.
-      $RecordCountWhere = (!$Search)
-         ? array('Type' => $Type)
-         : array();
+      $RecordCountWhere = array('Type' => $Type);
+      if ($Type == '') {
+         $RecordCountWhere = array('Type' => '');
+      }
+      if ($Search) {
+         $RecordCountWhere = array();
+      }
 
       $Sender->SetData('RecordCount', $SQL->GetCount('Tag', $RecordCountWhere));
 

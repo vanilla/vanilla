@@ -65,7 +65,7 @@
 
       <li>
          <a href="<?php echo $TabUrl; ?>" class="<?php echo $CurrentTab; ?>">
-            <?php echo $TagName; ?>
+            <?php echo ucwords(strtolower($TagName)); ?>
             <?php if ($CurrentTab) echo "({$this->Data('RecordCount')})"; ?>
          </a>
       </li>

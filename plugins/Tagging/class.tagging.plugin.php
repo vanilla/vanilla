@@ -602,7 +602,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $Type = 'Search Results';
          // This is made up, and exists so search results can be placed in
          // their own tab.
-         $TagTypes[] = $Type;
+         $TagTypes[] = 'Search Results';
       }
 
       // Store type for view
@@ -632,9 +632,13 @@ class TaggingPlugin extends Gdn_Plugin {
       // in their own tab.
       $Sender->Form->Action = Url('/settings/tagging/?type=' . $TagType);
 
-      $Sender->SetData('RecordCount', $SQL->GetCount('Tag', array(
-          'Type' => $Type
-      )));
+      // Search results pagination will mess up a bit, so don't provide a type
+      // in the count.
+      $RecordCountWhere = (!$Search)
+         ? array('Type' => $Type)
+         : array();
+
+      $Sender->SetData('RecordCount', $SQL->GetCount('Tag', $RecordCountWhere));
 
       $Sender->Render('tagging', '', 'plugins/Tagging');
    }

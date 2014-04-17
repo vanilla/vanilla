@@ -4,6 +4,7 @@
 
    $TagType = $this->Data('_TagType');
    $TagTypes = $this->Data('_TagTypes');
+   $CanAddTags = $this->Data('_CanAddTags');
 
 ?>
 
@@ -111,7 +112,9 @@
       <div class="add-new-tag">
 
          <?php
-            echo ' '.Anchor('Add Tag', '/settings/tags/add', 'Popup Button');
+            if ($CanAddTags) {
+               echo ' '.Anchor('Add Tag', '/settings/tags/add', 'Popup Button');
+            }
          ?>
 
       </div>

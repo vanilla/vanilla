@@ -617,6 +617,13 @@ class TaggingPlugin extends Gdn_Plugin {
       // Store tag types
       $Sender->SetData('_TagTypes', $TagTypes);
 
+      // Determine if new tags can be added for the current type.
+      $CanAddTags = (!empty($TagTypes[$Type]['addtag']))
+         ? 1
+         : 0;
+
+      $Sender->SetData('_CanAddTags', $CanAddTags);
+
       $Data = $SQL
          ->Select('t.*')
          ->From('Tag t')

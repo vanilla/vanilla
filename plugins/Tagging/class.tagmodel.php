@@ -138,6 +138,8 @@ class TagModel extends Gdn_Model {
          return $type;
       }, $tag_types);
 
+      $tag_types = array_column($tag_types, 'Type');
+
       return $tag_types;
    }
 

@@ -37,13 +37,13 @@
 
 <ul class="tabbed-content tag-tabs">
 
-   <?php foreach($TagTypes as $TagMeta): ?>
+   <?php foreach($TagTypes as $TagTypeName): ?>
 
       <?php
 
-         $TagName = ($TagMeta['Type'] == '' || strtolower($TagMeta['Type']) == 'tags')
+         $TagName = ($TagTypeName == '' || strtolower($TagTypeName) == 'tags')
             ? 'Tags'
-            : $TagMeta['Type'];
+            : $TagTypeName;
 
          $CurrentTab = (strtolower($TagType) == strtolower($TagName))
             ? 'current-tab'

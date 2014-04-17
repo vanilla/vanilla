@@ -570,6 +570,10 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddJSFile('plugins/Tagging/js/admin.js');
       $SQL = Gdn::SQL();
 
+      // Get all tag types
+      $TagModel = TagModel::instance();
+      $TagTypes = $TagModel->getTagTypes();
+
       $Sender->Form->Method = 'get';
       $Sender->Form->InputPrefix = '';
 
@@ -586,27 +590,28 @@ class TaggingPlugin extends Gdn_Plugin {
          $Type = '';
       }
 
-      if ($Type !== NULL) {
-         if ($Type === 'null')
-            $Type = NULL;
-         $SQL->Where('Type', $Type);
-      } else if ($Type == '') {
-         $SQL->Where('Type', '');
+      if (!$Search) {
+         if ($Type !== NULL) {
+            if ($Type === 'null')
+               $Type = NULL;
+            $SQL->Where('Type', $Type);
+         } else if ($Type == '') {
+            $SQL->Where('Type', '');
+         }
+      } else {
+         $Type = 'Search Results';
+         // This is made up, and exists so search results can be placed in
+         // their own tab.
+         $TagTypes[] = 'Search Results';
       }
 
       // Store type for view
       $TagType = (!empty($Type))
          ? $Type
          : 'Tags';
-
       $Sender->SetData('_TagType', $TagType);
 
-      // Make sure search uses the correct type
-      $Sender->Form->Action = '/settings/tagging/?type=' . $TagType;
-
       // Store tag types
-      $TagModel = TagModel::instance();
-      $TagTypes = $TagModel->getTagTypes();
       $Sender->SetData('_TagTypes', $TagTypes);
 
       $Data = $SQL
@@ -619,9 +624,14 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $Sender->SetData('Tags', $Data);
 
-      if ($Search = $Sender->Request->Get('Search')) {
+      if ($Search) {
          $SQL->Like('Name', $Search , 'right');
       }
+
+      // Make sure search uses its own search type, so results appear
+      // in their own tab.
+      $Sender->Form->Action = '/settings/tagging/?type=' . $TagType;
+
       $Sender->SetData('RecordCount', $SQL->GetCount('Tag'));
 
       $Sender->Render('tagging', '', 'plugins/Tagging');

@@ -6,6 +6,8 @@
    $TagTypes = $this->Data('_TagTypes');
    $CanAddTags = $this->Data('_CanAddTags');
 
+   decho($TagTypes);
+
 ?>
 
 <h1><?php echo T($this->Data['Title']); ?></h1>

@@ -608,6 +608,8 @@ class TaggingPlugin extends Gdn_Plugin {
          );
       }
 
+      $TagTypes = array_change_key_case($TagTypes, CASE_LOWER);
+
       // Store type for view
       $TagType = (!empty($Type))
          ? $Type
@@ -618,7 +620,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->SetData('_TagTypes', $TagTypes);
 
       // Determine if new tags can be added for the current type.
-      $CanAddTags = (!empty($TagTypes[$Type]['addtag']))
+      $CanAddTags = (!empty($TagTypes[$Type]['addtag']) && $TagTypes[$Type]['addtag'])
          ? 1
          : 0;
 

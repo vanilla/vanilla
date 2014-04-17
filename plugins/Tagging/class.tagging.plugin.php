@@ -577,7 +577,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->Form->Method = 'get';
       $Sender->Form->InputPrefix = '';
 
-      list($Offset, $Limit) = OffsetLimit($Page, 10);
+      list($Offset, $Limit) = OffsetLimit($Page, 100);
       $Sender->SetData('_Limit', $Limit);
 
       if ($Search) {

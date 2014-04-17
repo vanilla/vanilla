@@ -13,6 +13,7 @@
  *  1.7     Change the styling of special tags and prevent them from being edited/deleted.
  *  1.8     Add show existing tags
  *  1.8.4   Add tags before render so that other plugins can look at them.
+ *  1.8.8   Added tabs.
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,7 +24,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.7',
+   'Version' => '1.8.8',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",

@@ -151,6 +151,12 @@ class TagModel extends Gdn_Model {
          $TagTypes = $DefaultTypes;
       }
 
+      // Sort by keys, and because the default, "Tags," has a blank key, it
+      // will be set as the first key, which is good for the tabs.
+      if (count($TagTypes)) {
+         ksort($TagTypes);
+      }
+
       return $TagTypes;
    }
 

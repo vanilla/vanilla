@@ -572,13 +572,18 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $Sender->Form->Method = 'get';
       $Sender->Form->InputPrefix = '';
-      //$Sender->Form->Action = '/settings/tagging';
 
-      list($Offset, $Limit) = OffsetLimit($Page, 100);
+      list($Offset, $Limit) = OffsetLimit($Page, 10);
       $Sender->SetData('_Limit', $Limit);
 
       if ($Search) {
          $SQL->Like('FullName', $Search , 'right');
+      }
+
+      // This type doesn't actually exist, but it will represent the
+      // blank types in the column.
+      if (strtolower($Type) == 'tags') {
+         $Type = '';
       }
 
       if ($Type !== NULL) {
@@ -590,15 +595,19 @@ class TaggingPlugin extends Gdn_Plugin {
       }
 
       // Store type for view
-      $Sender->SetData('TagType', (!empty($Type))
+      $TagType = (!empty($Type))
          ? $Type
-         : 'Tags'
-      );
+         : 'Tags';
+
+      $Sender->SetData('_TagType', $TagType);
+
+      // Make sure search uses the correct type
+      $Sender->Form->Action = '/settings/tagging/?type=' . $TagType;
 
       // Store tag types
       $TagModel = TagModel::instance();
       $TagTypes = $TagModel->getTagTypes();
-      $Sender->SetData('TagTypes', $TagTypes);
+      $Sender->SetData('_TagTypes', $TagTypes);
 
       $Data = $SQL
          ->Select('t.*')

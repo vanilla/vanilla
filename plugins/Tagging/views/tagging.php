@@ -2,8 +2,8 @@
 
 <?php
 
-   $TagType = $this->Data('TagType');
-   $TagTypes = $this->Data('TagTypes');
+   $TagType = $this->Data('_TagType');
+   $TagTypes = $this->Data('_TagTypes');
 
 ?>
 
@@ -35,13 +35,13 @@
    ?>
 </div>
 
-<ul class="tabbed-content tag-tabs ClearFix">
+<ul class="tabbed-content tag-tabs">
 
    <?php foreach($TagTypes as $TagMeta): ?>
 
       <?php
 
-         $TagName = ($TagMeta['Type'] == '' || $TagMeta['Type'] == 'Tags')
+         $TagName = ($TagMeta['Type'] == '' || strtolower($TagMeta['Type']) == 'tags')
             ? 'Tags'
             : $TagMeta['Type'];
 
@@ -49,11 +49,13 @@
             ? 'current-tab'
             : '';
 
-         $TabUrl = Url('/settings/tagging/?type=' . strtolower($TagMeta['Type']));
-         
+         $TabUrl = Url('/settings/tagging/?type=' . strtolower($TagName));
+
       ?>
 
-      <li><a href="<?php echo $TabUrl; ?>" class="<?php echo $CurrentTab; ?>"><?php echo $TagName; ?></a></li>
+      <li>
+         <a href="<?php echo $TabUrl; ?>" class="<?php echo $CurrentTab; ?>"><?php echo $TagName; ?></a>
+      </li>
 
    <?php endforeach; ?>
 

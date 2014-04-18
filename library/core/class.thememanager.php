@@ -157,6 +157,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
          }
 
+         // Add the mobile screenshot.
+         if (array_key_exists('mobilescreenshot', $ThemeFiles)) {
+            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', GetValue('mobilescreenshot', $ThemeFiles)),'/');
+            $SearchThemeInfo['MobileScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
+         }
+
          if (array_key_exists('hooks', $ThemeFiles)) {
             $SearchThemeInfo['HooksFile'] = GetValue('hooks', $ThemeFiles, FALSE);
             $SearchThemeInfo['RealHooksFile'] = realpath($SearchThemeInfo['HooksFile']);
@@ -244,7 +250,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          'about\.php'                           => 'about',
          '.*\.theme\.php'                       => 'about',
          'class\..*themehooks\.php'             => 'hooks',
-         'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot'
+         'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot',
+         'mobile\.(gif|jpg|jpeg|png)'           => 'mobilescreenshot'
       );
 
       $MatchedThemeFiles = array();
@@ -387,7 +394,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       return $ThemeInfo;
    }
 
-   public function EnableTheme($ThemeName) {
+   public function EnableTheme($ThemeName, $IsMobile = FALSE) {
       // Make sure to run the setup
       $this->TestTheme($ThemeName);
 
@@ -400,12 +407,25 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       } else {
          $Options = GetValueR("{$ThemeName}.Options", $this->AvailableThemes());
          if ($Options) {
-            SaveToConfig(array(
-               'Garden.Theme' => $ThemeName,
-               'Garden.ThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)));
+            if ($IsMobile) {
+               SaveToConfig(array(
+                  'Garden.MobileTheme' => $ThemeName,
+                  'Garden.MobileThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+               ));
+            } else {
+               SaveToConfig(array(
+                  'Garden.Theme' => $ThemeName,
+                  'Garden.ThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+               ));
+            }
          } else {
-            SaveToConfig('Garden.Theme', $ThemeName);
-            RemoveFromConfig('Garden.ThemeOptions');
+            if ($IsMobile) {
+               SaveToConfig('Garden.MobileTheme', $ThemeName);
+               RemoveFromConfig('Garden.MobileThemeOptions');
+            } else {
+               SaveToConfig('Garden.Theme', $ThemeName);
+               RemoveFromConfig('Garden.ThemeOptions');
+            }
          }
       }
 

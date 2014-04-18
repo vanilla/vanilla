@@ -542,7 +542,7 @@ class TwitterPlugin extends Gdn_Plugin {
       $Form->SetValue('ConnectName', GetValue('screen_name', $Profile));
       $Form->SetFormValue('Name', GetValue('screen_name', $Profile));
       $Form->SetFormValue('FullName', GetValue('name', $Profile));
-      $Form->SetFormValue('Photo', GetValue('profile_image_url', $Profile));
+      $Form->SetFormValue('Photo', GetValue('profile_image_url_https', $Profile));
       $Form->AddHidden('AccessToken', $AccessToken->key);
 
       // Save some original data in the attributes of the connection for later API calls.
@@ -565,7 +565,7 @@ class TwitterPlugin extends Gdn_Plugin {
          'ConnectUrl' => '/entry/twauthorize/profile',
          'Profile' => array(
              'Name' => '@'.GetValue('screen_name', $Profile),
-             'Photo' => GetValue('profile_image_url', $Profile)
+             'Photo' => GetValue('profile_image_url_https', $Profile)
              )
       );
    }

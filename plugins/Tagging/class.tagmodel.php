@@ -130,25 +130,10 @@ class TagModel extends Gdn_Model {
    }
 
    public function getTagTypes() {
-      $DefaultTypes = $this->Types();
-
-      $Px = $this->Database->DatabasePrefix;
-      $Sql = "SELECT DISTINCT Type FROM {$Px}Tag";
-      $TagTypes = $this->Database->Query($Sql)->ResultArray();
-      $TagTypes = array_column($TagTypes, 'Type');
-
-      $AvailableTypes = array();
-      foreach($TagTypes as $Type) {
-         $AvailableTypes[$Type] = array(
-            'key' => $Type,
-            'name' => $Type
-         );
-      }
-
-      $TagTypes = array_merge($AvailableTypes, $DefaultTypes);
+      $TagTypes = $this->Types();
 
       if (!is_array($TagTypes)) {
-         $TagTypes = $DefaultTypes;
+         $TagTypes = array();
       }
 
       // Sort by keys, and because the default, "Tags," has a blank key, it

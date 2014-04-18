@@ -234,8 +234,9 @@ $PermissionModel->Define(array(
    'Garden.Activity.View' => 1,
    'Garden.Profiles.View' => 1,
    'Garden.Profiles.Edit' => 'Garden.SignIn.Allow',
+   'Garden.Moderation.Manage' => 0,
    'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
-   'Garden.Moderation.Manage',
+   'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
    'Garden.AdvancedNotifications.Allow'
    ));
 

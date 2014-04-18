@@ -1764,7 +1764,7 @@ div.Summary table tbody td {
 
 .browser-mobile-themes.SelectionGrid div.Buttons a {
    display: inline-block;
-   padding: 10px 0;
+   padding: 12px 0;
 }
 
 .theme-applied {
@@ -1773,7 +1773,6 @@ div.Summary table tbody td {
    border-radius: 2px;
    background-color: #fff;
    color: #aaa;
-   margin: 3px 0 0 0;
    box-shadow: inset 0 0 2px 0 #ddd;
 }
 
@@ -1800,7 +1799,8 @@ div.Summary table tbody td {
 
 .themeblock .TinyProgress.theme-apply-progress {
    display: block !important;
-   margin: 13px;
+   margin: auto;
+   height: 19px;
 }
 
 

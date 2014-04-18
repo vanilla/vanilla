@@ -383,7 +383,7 @@ class SettingsController extends Gdn_Controller {
       $this->Category = $this->CategoryModel->GetID($CategoryID);
 
       if(!$this->Category) {
-         $this->Form->AddError('The specified category could not be found.');
+         throw NotFoundException('Category');
       } else {
          $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
 

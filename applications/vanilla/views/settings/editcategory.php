@@ -2,8 +2,6 @@
 
 echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
-
-if($this->Form->ErrorCount() == 0) {
 ?>
    <h1><?php echo T('Edit Category'); ?></h1>
    <ul>
@@ -90,5 +88,4 @@ if($this->Form->ErrorCount() == 0) {
    </ul>
 <?php
    echo $this->Form->Close('Save');
-}
 ?>

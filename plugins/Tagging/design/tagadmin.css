@@ -20,6 +20,7 @@
 }
 .TagAdmin a {
    color: #1e79a7;
+   float: left;
 }
 
 .TagAdmin a.Delete {
@@ -71,4 +72,48 @@
 
 .Tag-Special .Count {
    background: #b94a48;
+}
+
+.add-new-tag {
+   margin: 20px 0;
+}
+
+.add-new-tag a {
+   margin: 0;
+}
+
+/**
+ * Tag tabbing
+ */
+.tabbed-content {
+   border-bottom: 1px solid #82BDDD;
+   margin: 0 0 20px 0;
+   font-size: 0;
+}
+
+.tabbed-content li {
+   display: inline-block;
+   margin: 0;
+}
+
+.tabbed-content li a {
+   cursor: pointer;
+   display: block;
+   padding: 10px 20px;
+   margin: 0 -1px -1px 0;
+   border-radius: 2px;
+   border-bottom-left-radius: 0;
+   border-bottom-right-radius: 0;
+}
+
+.tabbed-content .current-tab {
+   border: 1px solid #82BDDD;
+   border-bottom: 1px solid #fff;
+   font-weight: bold;
+   pointer-events: none;
+   color: #000;
+}
+
+.tabbed-content li a:hover {
+   background-color: rgba(0,0,0,0.025);
 }

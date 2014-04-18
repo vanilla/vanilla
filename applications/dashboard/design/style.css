@@ -102,9 +102,6 @@ body {
 	clear: both;
 	height: 0;
 }
-.Hidden {
-   display: none;
-}
 .Invisible {
    opacity: 0;
 }
@@ -3883,4 +3880,10 @@ body.embed .InformMessages {
 }
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
+}
+
+/* Overrides */
+
+.Hidden {
+   display: none;
 }

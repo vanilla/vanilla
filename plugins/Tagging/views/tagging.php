@@ -121,7 +121,7 @@
 
          <?php
             if ($CanAddTags) {
-               echo ' '.Anchor('Add Tag', '/settings/tags/add', 'Popup Button');
+               echo ' '.Anchor('Add Tag', '/settings/tags/add?type=' . $TagType, 'Popup Button');
             }
          ?>
 

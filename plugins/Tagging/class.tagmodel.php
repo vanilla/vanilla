@@ -529,6 +529,49 @@ class TagModel extends Gdn_Model {
       return TRUE;
    }
 
+   public function ValidateType($Type) {
+      $ValidType = false;
+      $TagTypes = $this->Types();
+
+      foreach ($TagTypes as $TypeKey => $TypeMeta) {
+         $TypeChecks = array(
+             strtolower($TypeKey),
+             strtolower($TypeMeta['key']),
+             strtolower($TypeMeta['name']),
+             strtolower($TypeMeta['plural'])
+         );
+
+         if (in_array(strtolower($Type), $TypeChecks)) {
+            $ValidType = true;
+            break;
+         }
+      }
+
+      return $ValidType;
+   }
+
+   public function CanAddTagForType($Type) {
+      $CanAddTagForType = false;
+      $TagTypes = $this->Types();
+
+      foreach ($TagTypes as $TypeKey => $TypeMeta) {
+         $TypeChecks = array(
+             strtolower($TypeKey),
+             strtolower($TypeMeta['key']),
+             strtolower($TypeMeta['name']),
+             strtolower($TypeMeta['plural'])
+         );
+
+         if (in_array(strtolower($Type), $TypeChecks)
+         && $TypeMeta['addtag']) {
+            $CanAddTagForType = true;
+            break;
+         }
+      }
+
+      return $CanAddTagForType;
+   }
+
    public static function SplitTags($TagsString) {
       $Tags = preg_split('`[,]`', $TagsString);
       // Trim each tag.

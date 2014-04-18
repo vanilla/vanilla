@@ -14,6 +14,7 @@
  *  1.8     Add show existing tags
  *  1.8.4   Add tags before render so that other plugins can look at them.
  *  1.8.8   Added tabs.
+ *  1.8.9   Ability to add tags based on tab.
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -24,7 +25,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.8',
+   'Version' => '1.8.9',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -674,11 +675,24 @@ class TaggingPlugin extends Gdn_Plugin {
       $TagModel = new TagModel;
       $Sender->Form->SetModel($TagModel);
 
+      // Add types if allowed to add tags for it, and not '' or 'tags', which
+      // are the same.
+      $TagType = Gdn::Request()->Get('type');
+      if (strtolower($TagType) != 'tags'
+      && $TagModel->CanAddTagForType($TagType)) {
+         $Sender->Form->AddHidden('Type', $TagType, TRUE);
+      }
+
       if ($Sender->Form->AuthenticatedPostBack()) {
          // Make sure the tag is valid
          $TagName = $Sender->Form->GetFormValue('Name');
          if (!TagModel::ValidateTag($TagName))
             $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain commas.'));
+
+         $TagType = $Sender->Form->GetFormValue('Type');
+         if (!$TagModel->CanAddTagForType($TagType)) {
+            $Sender->Form->AddError('@'.T('ValidateTagType', 'That type does not accept manually adding new tags.'));
+         }
 
          // Make sure that the tag name is not already in use.
          if ($TagModel->GetWhere(array('Name' => $TagName))->NumRows() > 0) {

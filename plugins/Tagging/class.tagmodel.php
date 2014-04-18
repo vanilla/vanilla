@@ -503,12 +503,23 @@ class TagModel extends Gdn_Model {
    public function Validate($FormPostValues, $Insert = FALSE) {
       $this->DefineSchema();
 
+      $Type = GetValue('Type', $FormPostValues, '');
+      $SetType = FALSE;
+
       // The model doesn't play well with empty string defaults so spoof an empty string default.
-      if ($Insert && !isset($FormPostValues['Type'])) {
+      if ($Insert && !$Type) {
          $FormPostValues['Type'] = 'Default';
+         $SetType = TRUE;
       }
 
-      return $this->Validation->Validate($FormPostValues, $Insert);
+      $Result = $this->Validation->Validate($FormPostValues, $Insert);
+
+      if ($SetType) {
+         $FormPostValues['Type'] = $Type;
+         $this->Validation->AddValidationField('Type', $FormPostValues);
+      }
+
+      return $Result;
    }
 
    public static function ValidateTag($Tag) {

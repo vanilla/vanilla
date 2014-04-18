@@ -843,6 +843,7 @@ body { background: transparent !important; }
          if ($StashComment) {
             $this->Form->SetValue('Body', $StashComment);
             $this->Form->SetFormValue('Body', $StashComment);
+         }
       }
 
       // Deliver JSON data if necessary

@@ -293,9 +293,15 @@ class Gdn_Model extends Gdn_Pluggable {
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {
-            if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
+            if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
                $Value = empty($Value) ? NULL : serialize($Value);
-            
+            }
+
+            // Make sure integers are not empty for MySQL strict mode.
+            if (empty($Value) && stristr($SchemaFields[$Name]->Type, 'int') !== FALSE) {
+               $Value = 0;
+            }
+
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 
@@ -330,8 +336,14 @@ class Gdn_Model extends Gdn_Pluggable {
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {
-            if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
+            if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
                $Value = empty($Value) ? NULL : serialize($Value);
+            }
+
+            // Make sure integers are not empty for MySQL strict mode.
+            if (empty($Value) && stristr($SchemaFields[$Name]->Type, 'int') !== FALSE) {
+               $Value = 0;
+            }
             
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }

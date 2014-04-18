@@ -378,62 +378,67 @@ class SettingsController extends Gdn_Controller {
          if ($ID = $this->Form->GetFormValue('CategoryID'))
             $CategoryID = $ID;
       }
-      
+
       // Get category data
       $this->Category = $this->CategoryModel->GetID($CategoryID);
-      $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
-      
-      // Set up head
-      $this->AddJsFile('jquery.alphanumeric.js');
-      $this->AddJsFile('categories.js');
-      $this->AddJsFile('jquery.gardencheckboxgrid.js');
-      $this->Title(T('Edit Category'));
-         
-      $this->AddSideMenu('vanilla/settings/managecategories');
-      
-      // Make sure the form knows which item we are editing.
-      $this->Form->AddHidden('CategoryID', $CategoryID);
-      $this->SetData('CategoryID', $CategoryID);
-      
-      // Load all roles with editable permissions
-      $this->RoleArray = $RoleModel->GetArray();
-      
-      $this->FireEvent('AddEditCategory');
-      
-      if ($this->Form->IsPostBack() == FALSE) {
-         $this->Form->SetData($this->Category);
-      } else {
-         $Upload = new Gdn_Upload();
-         $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
-         if ($TmpImage) {
-            
-            // Generate the target image name
-            $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
-            $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
 
-            // Save the uploaded image
-            $Parts = $Upload->SaveAs(
-               $TmpImage,
-               $ImageBaseName
-            );
-            $this->Form->SetFormValue('Photo', $Parts['SaveName']);
+      if(!$this->Category) {
+         $this->Form->AddError('The specified category could not be found.');
+      } else {
+         $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
+
+         // Set up head
+         $this->AddJsFile('jquery.alphanumeric.js');
+         $this->AddJsFile('categories.js');
+         $this->AddJsFile('jquery.gardencheckboxgrid.js');
+         $this->Title(T('Edit Category'));
+
+         // Make sure the form knows which item we are editing.
+         $this->Form->AddHidden('CategoryID', $CategoryID);
+         $this->SetData('CategoryID', $CategoryID);
+
+         // Load all roles with editable permissions
+         $this->RoleArray = $RoleModel->GetArray();
+
+         $this->FireEvent('AddEditCategory');
+
+         if ($this->Form->IsPostBack() == FALSE) {
+            $this->Form->SetData($this->Category);
+         } else {
+            $Upload = new Gdn_Upload();
+            $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
+            if ($TmpImage) {
+
+               // Generate the target image name
+               $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS);
+               $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+
+               // Save the uploaded image
+               $Parts = $Upload->SaveAs(
+                  $TmpImage,
+                  $ImageBaseName
+               );
+               $this->Form->SetFormValue('Photo', $Parts['SaveName']);
+            }
+
+            if ($this->Form->Save()) {
+               $Category = CategoryModel::Categories($CategoryID);
+               $this->SetData('Category', $Category);
+
+               if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+                  Redirect('vanilla/settings/managecategories');
+            }
          }
-         
-         if ($this->Form->Save()) {
-            $Category = CategoryModel::Categories($CategoryID);
-            $this->SetData('Category', $Category);
-            
-            if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-               Redirect('vanilla/settings/managecategories');
-         }
+
+         // Get all of the currently selected role/permission combinations for this junction.
+         $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
+         $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
+
+         if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
+            $this->SetData('PermissionData', $Permissions, TRUE);
       }
-       
-      // Get all of the currently selected role/permission combinations for this junction.
-      $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
-      $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
-      
-      if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-         $this->SetData('PermissionData', $Permissions, TRUE);
+
+      $this->AddSideMenu('vanilla/settings/managecategories');
       
       // Render default view
       $this->Render();

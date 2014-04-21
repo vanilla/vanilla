@@ -122,7 +122,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       $Request = array_merge($Request, array(
          'ServerHostname' => Url('/', TRUE),
          'ServerType' => Gdn::Request()->GetValue('SERVER_SOFTWARE'),
-         'PHPVersion' => phpversion(),
+         'PHPVersion' => str_replace(PHP_EXTRA_VERSION, '', PHP_VERSION),
          'VanillaVersion' => APPLICATION_VERSION
       ));
    }

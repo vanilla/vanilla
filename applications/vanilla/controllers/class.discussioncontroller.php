@@ -152,7 +152,7 @@ class DiscussionController extends VanillaController {
 
       // Retrieve & apply the draft if there is one:
       $DraftModel = new DraftModel();
-      $Draft = $DraftModel->Get($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
+      $Draft = $DraftModel->Get(Gdn::Session()->UserID, 0, 1, $this->Discussion->DiscussionID)->FirstRow();
       $this->Form->AddHidden('DraftID', $Draft ? $Draft->DraftID : '');
       if ($Draft)
          $this->Form->SetFormValue('Body', $Draft->Body);
@@ -165,7 +165,7 @@ class DiscussionController extends VanillaController {
       }
 
 		// Inform moderator of checked comments in this discussion
-		$CheckedComments = $Session->GetAttribute('CheckedComments', array());
+		$CheckedComments = Gdn::Session()->GetAttribute('CheckedComments', array());
 		if (count($CheckedComments) > 0)
 			ModerationController::InformCheckedComments($this);
 
@@ -615,6 +615,8 @@ class DiscussionController extends VanillaController {
    public function Embed($DiscussionID = '', $DiscussionStub = '', $Offset = '', $Limit = '') {
       $this->CanEditComments = FALSE; // Don't show the comment checkboxes on the embed comments page
       $this->Theme = 'default'; // Force the default theme on embedded comments
+      $this->MasterView = 'empty';
+
       // Add some css to help with the transparent bg on embedded comments
       if ($this->Head)
          $this->Head->AddString('<style type="text/css">
@@ -622,19 +624,22 @@ body { background: transparent !important; }
 ul.MessageList li.Item { background: #fff; }
 ul.MessageList li.Item.Mine { background: #E3F4FF; }
 </style>');
-      $Session = Gdn::Session();
+
+      // Javascript
       $this->AddJsFile('jquery.ui.packed.js');
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('jquery.autogrow.js');
       $this->AddJsFile('options.js');
       $this->AddJsFile('discussion.js');
-      $this->MasterView = 'empty';
 
       // Define incoming variables (prefer querystring parameters over method parameters)
       $DiscussionID = (is_numeric($DiscussionID) && $DiscussionID > 0) ? $DiscussionID : 0;
       $DiscussionID = GetIncomingValue('vanilla_discussion_id', $DiscussionID);
+
+      // Pagination
       $Offset = GetIncomingValue('Offset', $Offset);
       $Limit = GetIncomingValue('Limit', $Limit);
+
       $ForeignID = GetIncomingValue('vanilla_identifier', '');
       $ForeignType = GetIncomingValue('vanilla_type', '');
       $ForeignName = GetIncomingValue('vanilla_name', '');
@@ -667,11 +672,13 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
                      .$ForeignBody;
             }
          }
+
+         // Build OP Body
          $Body = $ForeignBody;
          if ($Body == '' && $ForeignUrl != '')
             $Body = $ForeignUrl;
          if ($Body == '')
-            $Body = T('This discussion is related to an undefined foriegn content source.');
+            $Body = T('This discussion is related to an undefined foreign content source.');
 
          // Validate the CategoryID for inserting
          if (!is_numeric($CategoryID)) {
@@ -694,6 +701,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
             }
          }
 
+         // Insert the discussion
          $SystemUserID = Gdn::UserModel()->GetSystemUserID();
          $DiscussionID = $this->DiscussionModel->SQL->Insert(
             'Discussion',
@@ -724,6 +732,8 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       if (!$Discussion) {
          $this->Render('FileNotFound', 'HomeController', 'Dashboard');
          return;
+      } else {
+         $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
       $this->SetData('Discussion', $Discussion, TRUE);
       $this->SetData('DiscussionID', $Discussion->DiscussionID, TRUE);
@@ -735,6 +745,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       if (!is_numeric($Limit) || $Limit < 0)
          $Limit = C('Vanilla.Comments.PerPage', 50);
 
+      // Calculate offset
       $OffsetProvided = $Offset != '';
       list($Offset, $Limit) = OffsetLimit($Offset, $Limit);
       $this->Offset = $Offset;
@@ -787,7 +798,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->Form->SetFormValue('Body', $Draft->Body);
       else {
          // Look in the session stash for a comment
-         $StashComment = $Session->Stash('CommentForDiscussionID_'.$this->Discussion->DiscussionID, '', FALSE);
+         $StashComment = Gdn::Session()->Stash('CommentForDiscussionID_'.$this->Discussion->DiscussionID, '', FALSE);
          if ($StashComment)
             $this->Form->SetFormValue('Body', $StashComment);
       }
@@ -799,6 +810,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->View = 'comments';
       }
 
+      // Add JS data
       $this->AddDefinition('PrependNewComments', '1');
       $this->AddDefinition('DiscussionID', $Discussion->DiscussionID);
 

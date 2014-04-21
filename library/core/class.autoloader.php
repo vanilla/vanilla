@@ -893,7 +893,17 @@ class Gdn_Autoloader_Map {
    public function MapType() {
       return $this->MapInfo['maptype']; //GetValue('maptype', $this->MapInfo);
    }
-   
+   function fixBackSlash($path) {
+	if (preg_match('/[A-Za-z]\:/',$path)) {
+	// do nothing is local file
+	} else if (!empty($path)) {
+            $path = str_replace("\\", "/", $path);  // convert to / to avoid parse_in_file create array with missing \
+            if (preg_match('/^\/{1}\w/',$path)==TRUE) { // for some reason there is only 1 / then add / to have a valid network path
+                $path = "/" . $path;
+            }
+        }
+        return $path;
+    }   
    public function Shutdown() {
       
       if (!GetValue('dirty', $this->MapInfo)) return FALSE;
@@ -909,6 +919,7 @@ class Gdn_Autoloader_Map {
       foreach ($this->Map as $SplitTopic => $TopicFiles) {
          $MapContents .= "[{$SplitTopic}]\n";
          foreach ($TopicFiles as $ClassName => $Location)
+          $Location = $this->fixBackSlash($Location);	 
             $MapContents .= "{$ClassName} = \"{$Location}\"\n";
       }
       

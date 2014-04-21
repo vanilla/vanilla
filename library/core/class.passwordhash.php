@@ -85,6 +85,10 @@ class Gdn_PasswordHash extends PasswordHash {
          case 'django':
             $Result = $this->CheckDjango($Password, $StoredHash);
             break;
+         case 'drupal':
+            require_once PATH_LIBRARY.'/vendors/drupal/password.inc.php';
+            $Result = Drupal\user_check_password($Password, $StoredHash);
+            break;
          case 'ipb':
             $Result = $this->CheckIPB($Password, $StoredHash);
             break;

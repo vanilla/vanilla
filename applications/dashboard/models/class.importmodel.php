@@ -1646,7 +1646,7 @@ class ImportModel extends Gdn_Model {
          $Sqls['Tag.CoundDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
       }
       
-      if ($this->ImportExists('Poll')) {
+      if ($this->ImportExists('Poll') && Gdn::Structure()->TableExists('Poll')) {
          $Sqls['PollOption.CountVotes'] = $this->GetCountSQL('count', 'PollOption', 'PollVote', 'CountVotes', 'PollOptionID');
          
          $Sqls['Poll.CountOptions'] = $this->GetCountSQL('count', 'Poll', 'PollOption', 'CountOptions', 'PollID');

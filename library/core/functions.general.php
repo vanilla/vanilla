@@ -600,7 +600,7 @@ if (!function_exists('decho')) {
    function decho($Mixed, $Prefix = 'DEBUG', $Permission = FALSE) {
       $Prefix = StringEndsWith($Prefix, ': ', TRUE, TRUE).': ';
       
-      if (!$Permission || Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
+      if ($Permission || Gdn::Session()->CheckPermission('Garden.Debug.Allow')) {
          echo '<pre style="text-align: left; padding: 0 4px;">'.$Prefix;
          if (is_string($Mixed))
             echo $Mixed;

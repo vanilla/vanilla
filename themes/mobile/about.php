@@ -12,8 +12,8 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['mobile'] = array(
-   'Name' => 'Mobile',
-   'Description' => "A refined design for mobile browsers",
+   'Name' => 'Mobile 2012',
+   'Description' => "A simplified theme made to target mobile browsers.",
    'Version' => '1.1.4',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

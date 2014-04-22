@@ -376,7 +376,7 @@ class ConversationModel extends Gdn_Model {
     */
    public static function ParticipantTitle($Conversation, $Html = TRUE, $Max = 3) {
       $Participants = GetValue('Participants', $Conversation);
-      $Total = GetValue('CountParticipants', $Conversation);
+      $Total = (int)GetValue('CountParticipants', $Conversation);
       $MyID = Gdn::Session()->UserID;
       $FoundMe = FALSE;
 

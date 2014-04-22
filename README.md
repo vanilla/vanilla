@@ -119,12 +119,7 @@ Releases will receive the next odd-point number and `master` will then jump to t
 Therefore, the next open source release after 2.1 will be 2.3. When the 2.3 beta begins, `master` will move to 2.4.
 
 ## Legal Stuff
-
-<<<<<<< HEAD
-Copyright 2009-2014 Vanilla Forums Inc.
-=======
-Copyright &copy; 2014 Vanilla Forums Inc.
->>>>>>> 08cc8210b9d5a46a532e775c9823fb23538a99e8
+Copyright &copy; 2009-2014 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

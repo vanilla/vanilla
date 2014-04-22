@@ -11,17 +11,19 @@ can build a custom-tailored environment that meets your community's particular n
 
 ## 5 reasons Vanilla is the sweetest forum
 
-1. We've reimagined traditional forums for mass-appeal
-1. Our theming flexibility is second-to-none
-1. Impossibly good integration options with single sign-ons and embedding
-1. The best tools available for community management
-1. Curated features with great plugin options, not the kitchen sink
+1. We've reimagined traditional forums for mass-appeal.
+1. Our theming flexibility is second-to-none.
+1. Impossibly good integration options with single sign-ons and embedding.
+1. The best tools available for community management.
+1. Curated features with great plugin options, not the kitchen sink.
 
 ## Open Source
 
 Vanilla is free, open source software distributed under the GNU GPL2.
 We accept and encourage contributions from our community and sometimes give hugs in return.
 You can join us on the [Vanilla Community Forums](http://vanillaforums.org/discussions) to be part of that discussion.
+
+The latest stable release is always [listed here](http://vanillaforums.org/addon/vanilla-core). Currently, it is the 2.1 branch. We will support the 2.0 branch with security patches until the end of 2014.
 
 New plugins and themes can be listed in the [Official Addon Directory](http://vanillaforums.org/addon/).
 We encourage addon developers to release their code under the GPL as well, but do not require it.
@@ -33,8 +35,7 @@ with a 1-click install, automatic upgrades, amazing professional support, incred
 integration assistance, theming and migration services, and exclusive features. For the very best Vanilla forum experience,
 you can skip the rest of this technical stuff and [go there directly](http://vanillaforums.com/plans).
 
-If you professionally run a large community or enterprise forum solution, our cloud solution will make the
-best technical and economic sense by far.
+If you professionally run a large community or enterprise forum, our cloud solution will make the best technical and economic sense by far.
 
 ## Self-Hosting Requirements
 
@@ -47,7 +48,7 @@ Vanilla 2.1 will be the last version to support PHP 5.2. PHP 5.4 or higher will 
 Vanilla ships with a .htaccess file for Apache support. Nginx and IIS require additional configuration.
 
 On the client side, Vanilla should run & look good in just about any modern browser.
-Using IE? How exotic. You'll need IE7 or greater.
+Using IE? How exotic. You'll want IE8 or greater. IE7 *might* work if you squint hard and click gently, but we make no promises.
 
 We've been natively mobile since before it was cool. Vanilla ships with a mobile-optimized theme enabled
 by default for all smartphones & tablets. Heck, it even works on the PlayStation Vita.
@@ -56,18 +57,18 @@ by default for all smartphones & tablets. Heck, it even works on the PlayStation
 
 Vanilla is built to be simple, and its installation is no exception.
 
-* Upload this entire file structure up to your web server
-* Confirm the cache, conf, and uploads folders are writable by PHP
-* Navigate to that folder in your web browser
-* Follow the instructions on screen
+* Upload this entire file structure up to your web server.
+* Confirm the cache, conf, and uploads folders are writable by PHP.
+* Navigate to that folder in your web browser.
+* Follow the instructions on screen.
 
 ## Upgrading
 
 Follow these steps to upgrade Vanilla when a new stable release is announced.
 
-* Backup your database and conf/config.php file somewhere safe
-* Upload the new release's files so they overwrite the old ones
-* Go to yourforum.com/index.php?p=/utility/update to force any updates needed
+* Backup your database and conf/config.php file somewhere safe.
+* Upload the new release's files so they overwrite the old ones.
+* Go to yourforum.com/index.php?p=/utility/update to force any updates needed.
 * If it fails, try it a second times by refreshing the page.
 
 To upgrade to **2.1 from 2.0.18**, add this step:
@@ -78,11 +79,11 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 
 ## Migrating to Vanilla
 
-* Get [Vanilla Porter](http://vanillaforums.org/addon/porter-core) and verify it supports your platform
-* Read the Advanced Uses notes on that page
-* Upload it to your current server
-* Navigate to the file in your web browser & run it
-* Take the file it produces and import it to Vanilla
+* Get [Vanilla Porter](http://vanillaforums.org/addon/porter-core) and verify it supports your platform.
+* Read the Advanced Uses notes on that page.
+* Upload it to your current server.
+* Navigate to the file in your web browser & run it.
+* Take the file it produces and import it to Vanilla.
 
 ## Getting Help
 
@@ -93,11 +94,11 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 
 ## Contributing
 
-* Troubleshoot issues you run into on the community forum so everyone can help & reference it later
-* Got an idea or suggestion? Use the forum to discuss it
-* File detailed issues on GitHub (version number, what you did, and actual vs expected outcomes)
-* Sign the Contributors' Agreement to send us code
-* Use pull requests against the correct release
+* Troubleshoot issues you run into on the community forum so everyone can help & reference it later.
+* Got an idea or suggestion? Use the forum to discuss it.
+* File detailed issues on GitHub (version number, what you did, and actual vs expected outcomes).
+* Sign the Contributors' Agreement to send us code.
+* Use pull requests against the correct release.
 
 ## Version Control Strategy
 
@@ -118,7 +119,7 @@ Therefore, the next open source release after 2.1 will be 2.3. When the 2.3 beta
 
 ## Legal Stuff
 
-Copyright 2014 Vanilla Forums Inc.
+Copyright 2009-2014 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

@@ -1,4 +1,4 @@
-![Vanilla](http://cdn.vanillaforums.com/vanilla-black-logo-400.png)
+![Vanilla](http://cdn.vanillaforums.com/vanilla-black-logo-400.svg)
 
 ## Howdy, Stranger!
 

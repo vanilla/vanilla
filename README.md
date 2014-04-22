@@ -3,7 +3,7 @@
 ## Howdy, Stranger!
 
 Vanilla was born out of the desire to create flexible, customizable, and downright entertaining
-community solutions. Vanilla has been used to power over 500,000 community forums around the world
+community solutions. Vanilla has been used to power tens of thousands of community forums around the world
 and we couldn't be happier if you've decided to use Vanilla to grow yours.
 
 Every community is unique. Vanilla is a finely-crafted platform on which designers and developers
@@ -30,7 +30,7 @@ We encourage addon developers to release their code under the GPL as well, but d
 
 Vanilla Forums provides an official cloud hosting solution at [vanillaforums.com](http://vanillaforums.com)
 with a 1-click install, automatic upgrades, amazing professional support, incredible scalability,
-integration assistance, theming services, and exclusive features. For the very best Vanilla forum experience,
+integration assistance, theming and migration services, and exclusive features. For the very best Vanilla forum experience,
 you can skip the rest of this technical stuff and [go there directly](http://vanillaforums.com/plans).
 
 If you professionally run a large community or enterprise forum solution, our cloud solution will make the
@@ -70,16 +70,11 @@ Follow these steps to upgrade Vanilla when a new stable release is announced.
 * Go to yourforum.com/index.php?p=/utility/update to force any updates needed
 * If it fails, try it a second times by refreshing the page.
 
-To upgrade to 2.1 from 2.0.18, add this step:
+To upgrade to **2.1 from 2.0.18**, add this step:
 
 * Delete the file /themes/mobile/views/discussions/helper_functions.php
 
-### Vanilla 1 to Vanilla 2
-
-Vanilla 1 is not compatible with Vanilla 2 in any way.
-You will need to export your data using the Vanilla Porter and recreate your theme and any customizations.
-Backup your Vanilla 1 data and files completely, then delete them from your server before attempting
-to install Vanilla 2 and importing your Vanilla 1 data using the process below.
+To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Porter as if it were a migration. Your theme and any customizations will need to be recreated. Backup your Vanilla 1 data and files completely, then delete them from your server before attempting to install Vanilla 2.
 
 ## Migrating to Vanilla
 
@@ -91,9 +86,10 @@ to install Vanilla 2 and importing your Vanilla 1 data using the process below.
 
 ## Getting Help
 
+* [Troubleshooting upgrades & installs](http://codex.vanillaforums.com/developers/troubleshooting/)
 * [Official documentation](http://codex.vanillaforums.com)
 * [Vanilla community forums](http://vanillaforums.org/discussions)
-* [Official cloud hosting with professional support](http://vanillaforums.com/plans)
+* [Official cloud hosting with professional support & migration services](http://vanillaforums.com/plans)
 
 ## Contributing
 

@@ -64,10 +64,6 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
                ? 'current-theme'
                : '';
 
-            $UpgradeHtml = ($Upgrade)
-               ? '<div class="Alert">' . Anchor(sprintf(T('%1$s version %2$s is available.'), $ScreenName, $NewVersion), CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/')) . '</div>'
-               : '';
-
             $PreviewImageHtml = ($PreviewUrl !== FALSE)
                ? Anchor(Img($PreviewUrl, array('alt' => $ScreenName)), $PreviewUrl, '', array('class' => 'theme-image mfp-image'))
                : '<div class="theme-image"></div>';
@@ -92,16 +88,12 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
          <td class="themeblock <?php echo $ClassCurrentTheme; ?> <?php echo $ColClass; ?>">
             <h4>
                <?php echo ($ThemeUrl != '') ? Anchor($ScreenName, $ThemeUrl) : $ScreenName; ?>
-               <span class="theme-version">
-                  <?php echo $Version; ?>
-               </span>
             </h4>
 
             <!--<div class="author-name">
                <?php echo $Author; ?>
             </div>-->
 
-            <?php echo $UpgradeHtml; ?>
             <?php echo $PreviewImageHtml; ?>
 
             <div class="theme-right-column">

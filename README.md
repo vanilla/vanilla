@@ -45,7 +45,7 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 Vanilla 2.1 will be the last version to support PHP 5.2. PHP 5.4 or higher will be required in the future.
 
-Vanilla ships with a .htaccess file for Apache support. Nginx and IIS require additional configuration.
+Vanilla ships with a `.htaccess` file for Apache support. Nginx and IIS require additional configuration.
 
 On the client side, Vanilla should run & look good in just about any modern browser.
 Using IE? How exotic. You'll want IE8 or greater. IE7 *might* work if you squint hard and click gently, but we make no promises.
@@ -66,14 +66,15 @@ Vanilla is built to be simple, and its installation is no exception.
 
 Follow these steps to upgrade Vanilla when a new stable release is announced.
 
-* Backup your database and conf/config.php file somewhere safe.
+
+* Backup your database and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
-* Go to yourforum.com/index.php?p=/utility/update to force any updates needed.
+* Go to `yourforum.com/index.php?p=/utility/update` to force any updates needed.
 * If it fails, try it a second times by refreshing the page.
 
 To upgrade to **2.1 from 2.0.18**, add this step:
 
-* Delete the file /themes/mobile/views/discussions/helper_functions.php
+* Delete the file [`/themes/mobile/views/discussions/helper_functions.php`](https://github.com/vanillaforums/Garden/blob/2.0/themes/mobile/views/discussions/helper_functions.php)
 
 To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Porter as if it were a migration. Your theme and any customizations will need to be recreated. Backup your Vanilla 1 data and files completely, then delete them from your server before attempting to install Vanilla 2.
 
@@ -119,7 +120,11 @@ Therefore, the next open source release after 2.1 will be 2.3. When the 2.3 beta
 
 ## Legal Stuff
 
+<<<<<<< HEAD
 Copyright 2009-2014 Vanilla Forums Inc.
+=======
+Copyright &copy; 2014 Vanilla Forums Inc.
+>>>>>>> 08cc8210b9d5a46a532e775c9823fb23538a99e8
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

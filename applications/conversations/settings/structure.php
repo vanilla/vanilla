@@ -39,9 +39,7 @@ $Construct
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('DateInserted', 'datetime', NULL, 'key')
    ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-   // by chanh on 3/14/2014 Field 'UpdateUserID' doesn't have a default  during instal with Mysql strict mode
    ->Column('UpdateUserID', 'int', NULL, 'key')
-   // by chanh on 3/14/2014 Field 'DateUpdated' doesn't have a default during instal with Mysql strict mode
    ->Column('DateUpdated', 'datetime', NULL)        
    ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Column('CountMessages', 'int', 0)

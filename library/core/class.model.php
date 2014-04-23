@@ -296,6 +296,7 @@ class Gdn_Model extends Gdn_Pluggable {
             if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
                $Value = empty($Value) ? NULL : serialize($Value);
             
+            $Value = $this->initIntField($SchemaFields, $Name, $Value);            
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 
@@ -304,7 +305,14 @@ class Gdn_Model extends Gdn_Pluggable {
       return $Result;
    }
 
-
+    // by chanh on 3/14/2014 fix error when the int field is empty
+    function initIntField($SchemaFields, $Name, $Value) {
+        if (preg_match("/int/i", $SchemaFields[$Name]->Type) <> 0 and !empty($SchemaFields[$Name]->Type)) {
+            $Value = empty($Value) ? '0' : $Value; // if any int type and empty set it to '0' to avoid bonk screen
+        }
+        return $Value;
+    }
+    
    /**
     * @param unknown_type $Fields
     * @param unknown_type $Where
@@ -332,7 +340,8 @@ class Gdn_Model extends Gdn_Pluggable {
          foreach ($Fields as $Name => $Value) {
             if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
                $Value = empty($Value) ? NULL : serialize($Value);
-            
+
+            $Value = $this->initIntField($SchemaFields, $Name, $Value);            
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 

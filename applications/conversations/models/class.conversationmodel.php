@@ -414,7 +414,7 @@ class ConversationModel extends Gdn_Model {
       } else {
           $Px = implode(', ', $Users);
 
-          if ($Count + 1 === $Total && $FoundMe) {
+          if ($Count + 1 == $Total && $FoundMe) {
               $Result = $Px;
           } elseif ($Total === $Count + 1) {
               $Result = sprintf(T('%s and 1 other'), $Px);

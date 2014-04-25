@@ -324,8 +324,8 @@ class Gdn_CookieIdentity {
          $Domain = '';
       
       $Expiry = time() - 60 * 60;
-      setcookie($CookieName, "", $Expiry, $Path, $Domain);
+      setcookie($CookieName, "", $Expiry, $Path, $Domain, NULL, TRUE);
       $_COOKIE[$CookieName] = NULL;
    }
-   
+
 }

@@ -4272,7 +4272,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
           transition: background-color 0.1s;
 }
 
-.SocialIcon .Icon {
+.SocialIcon .Icon,
+.SocialIcon .Text {
   display: block;
   float: left;
   vertical-align: top;

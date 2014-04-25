@@ -2133,7 +2133,7 @@ if (!function_exists('OffsetLimit')) {
     *  - <x>: This is a limit where offset is given in the next parameter.
     * @param int $LimitOrPageSize The page size or limit.
     */
-   function OffsetLimit($OffsetOrPage = '', $LimitOrPageSize = '') {
+   function OffsetLimit($OffsetOrPage = '', $LimitOrPageSize = '', $Throw = false) {
       $LimitOrPageSize = is_numeric($LimitOrPageSize) ? (int)$LimitOrPageSize : 50;
 
       if (is_numeric($OffsetOrPage)) {
@@ -2156,6 +2156,9 @@ if (!function_exists('OffsetLimit')) {
          $Limit = (int)$Matches[2];
          if (!is_numeric($Limit))
             $Limit = $LimitOrPageSize;
+      } elseif ($OffsetOrPage && $Throw) {
+         // Some unrecognized page string was passed.
+         throw NotFoundException();
       } else {
          $Offset = 0;
          $Limit = $LimitOrPageSize;

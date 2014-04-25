@@ -571,15 +571,15 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
       $Return = array();
       foreach ($Array as $Index => $AssociativeArray) {
 
-			if (is_object($AssociativeArray)) {
-				if($ValueKey === '') {
-					$Return[] = $AssociativeArray->$Key;
-				} elseif(property_exists($AssociativeArray, $ValueKey)) {
-					$Return[$AssociativeArray[$Key]] = $AssociativeArray->$ValueKey;
-				} else {
-					$Return[$AssociativeArray->$Key] = $DefaultValue;
-				}
-			} elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
+		if (is_object($AssociativeArray)) {
+			if($ValueKey === '') {
+				$Return[] = $AssociativeArray->$Key;
+			} elseif(property_exists($AssociativeArray, $ValueKey)) {
+				$Return[$AssociativeArray->$Key] = $AssociativeArray->$ValueKey;
+			} else {
+				$Return[$AssociativeArray->$Key] = $DefaultValue;
+			}
+		} elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
             if($ValueKey === '') {
                $Return[] = $AssociativeArray[$Key];
             } elseif (array_key_exists($ValueKey, $AssociativeArray)) {

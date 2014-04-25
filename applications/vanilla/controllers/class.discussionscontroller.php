@@ -82,9 +82,14 @@ class DiscussionsController extends VanillaController {
             break;
       }
       Gdn_Theme::Section('DiscussionList');
+
+      // Check for the feed keyword.
+      if ($Page === 'feed' && $this->SyndicationMethod != SYNDICATION_NONE) {
+         $Page = 'p1';
+      }
       
       // Determine offset from $Page
-      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30), TRUE);
       $Page = PageNumber($Offset, $Limit);
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
       

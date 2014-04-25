@@ -4236,3 +4236,171 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
    top: -2px;
    padding: 0 0 0 2px;
 }
+
+/**
+ * Socialcons
+ */
+
+.SocialIcon {
+  display: inline-block;
+  overflow: hidden;
+  font-weight: bold;
+  line-height: 32px;
+  color: #fff !important;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.SocialIcon .Icon {
+  width: 32px;
+  height: 32px;
+  background-color: #FFF;
+  background-size: 32px 32px;
+}
+
+.SocialIcon .Text {
+  padding: 0 15px 0 10px;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.SocialIcon,
+.SocialIcon .Icon,
+.SocialIcon .Text {
+  -webkit-transition: background-color 0.1s;
+     -moz-transition: background-color 0.1s;
+       -o-transition: background-color 0.1s;
+          transition: background-color 0.1s;
+}
+
+.SocialIcon .Icon {
+  display: block;
+  float: left;
+  vertical-align: top;
+}
+
+.SocialIcon .Icon {
+  background-image: url('images/socialcons.png');
+  background-repeat: no-repeat;
+  background-size: auto auto;
+}
+@media
+(-webkit-min-device-pixel-ratio: 2),
+(-o-min-device-pixel-ratio: 3 / 2),
+(min-device-pixel-ratio: 2) {
+  .SocialIcon .Icon {
+    background-image: url('Images/socialcons@2x.png');
+    background-size: 32px 224px;
+  }
+}
+
+.SocialIcon-Facebook .Icon {
+  background-position: 0 -32px;
+}
+.SocialIcon-Facebook,
+.SocialIcon-Facebook .Icon {
+  background-color: #36609e;
+}
+.SocialIcon-Facebook:hover,
+.SocialIcon-Facebook:hover .Icon,
+.SocialIcon-Facebook:hover .Text {
+  background-color: #294978;
+}
+.SocialIcon-Facebook.HasText:hover .Icon {
+  background-color: #36609e;
+}
+
+.SocialIcon-Twitter .Icon {
+  background-position: 0 -192px;
+}
+.SocialIcon-Twitter,
+.SocialIcon-Twitter .Icon {
+  background-color: #2aa8df;
+}
+.SocialIcon-Twitter:hover,
+.SocialIcon-Twitter:hover .Icon,
+.SocialIcon-Twitter:hover .Text {
+  background-color: #1c8aba;
+}
+.SocialIcon-Twitter.HasText:hover .Icon {
+  background-color: #2aa8df;
+}
+
+.SocialIcon-Google .Icon {
+  background-position: 0 -96px;
+}
+.SocialIcon-Google,
+.SocialIcon-Google .Icon {
+  background-color: #da5442;
+}
+.SocialIcon-Google:hover,
+.SocialIcon-Google:hover .Icon,
+.SocialIcon-Google:hover .Text {
+  background-color: #c33926;
+}
+.SocialIcon-Google.HasText:hover .Icon {
+  background-color: #da5442;
+}
+
+.SocialIcon-OpenID .Icon {
+  background-position: 0 -160px;
+}
+.SocialIcon-OpenID,
+.SocialIcon-OpenID .Icon {
+  background-color: #f7921c;
+}
+.SocialIcon-OpenID:hover,
+.SocialIcon-OpenID:hover .Icon,
+.SocialIcon-OpenID:hover .Text {
+  background-color: #d87808;
+}
+.SocialIcon-OpenID.HasText:hover .Icon {
+  background-color: #f7921c;
+}
+
+.SocialIcon-LinkedIn .Icon {
+  background-position: 0 -128px;
+}
+.SocialIcon-LinkedIn,
+.SocialIcon-LinkedIn .Icon {
+  background-color: #066c9a;
+}
+.SocialIcon-LinkedIn:hover,
+.SocialIcon-LinkedIn:hover .Icon,
+.SocialIcon-LinkedIn:hover .Text {
+  background-color: #044a69;
+}
+.SocialIcon-LinkedIn.HasText:hover .Icon {
+  background-color: #066c9a;
+}
+
+.SocialIcon-Disqus .Icon {
+  background-position: 0 0;
+}
+.SocialIcon.Disqus,
+.SocialIcon.Disqus .Icon {
+  background-color: #2e9fff;
+}
+.SocialIcon-Disqus:hover,
+.SocialIcon-Disqus:hover .Icon,
+.SocialIcon-Disqus:hover .Text {
+  background-color: #0087fa;
+}
+.SocialIcon-Disqus.HasText:hover .Icon {
+  background-color: #2e9fff;
+}
+
+.SocialIcon-GitHub .Icon {
+  background-position: 0 -64px;
+}
+.SocialIcon-GitHub,
+.SocialIcon-GitHub .Icon {
+  background-color: #6b9ecf;
+}
+.SocialIcon-GitHub:hover,
+.SocialIcon-GitHub:hover .Icon,
+.SocialIcon-GitHub:hover .Text {
+  background-color: #4485c3;
+}
+.SocialIcon-GitHub.HasText:hover .Icon {
+  background-color: #6b9ecf;
+}

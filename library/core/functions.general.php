@@ -2134,10 +2134,10 @@ if (!function_exists('OffsetLimit')) {
     * @param int $LimitOrPageSize The page size or limit.
     */
    function OffsetLimit($OffsetOrPage = '', $LimitOrPageSize = '') {
-      $LimitOrPageSize = is_numeric($LimitOrPageSize) ? $LimitOrPageSize : 50;
+      $LimitOrPageSize = is_numeric($LimitOrPageSize) ? (int)$LimitOrPageSize : 50;
 
       if (is_numeric($OffsetOrPage)) {
-         $Offset = $OffsetOrPage;
+         $Offset = (int)$OffsetOrPage;
          $Limit = $LimitOrPageSize;
       } elseif (preg_match('/p(\d+)/i', $OffsetOrPage, $Matches)) {
          $Page = $Matches[1];
@@ -2147,13 +2147,13 @@ if (!function_exists('OffsetLimit')) {
          $Offset = $Matches[1] - 1;
          $Limit = $Matches[2] - $Matches[1] + 1;
       } elseif (preg_match('/(\d+)lim(\d*)/i', $OffsetOrPage, $Matches)) {
-         $Offset = $Matches[1];
-         $Limit = $Matches[2];
+         $Offset = (int)$Matches[1];
+         $Limit = (int)$Matches[2];
          if (!is_numeric($Limit))
             $Limit = $LimitOrPageSize;
       } elseif (preg_match('/(\d+)lin(\d*)/i', $OffsetOrPage, $Matches)) {
          $Offset = $Matches[1] - 1;
-         $Limit = $Matches[2];
+         $Limit = (int)$Matches[2];
          if (!is_numeric($Limit))
             $Limit = $LimitOrPageSize;
       } else {

@@ -3,7 +3,7 @@ jQuery(document).ready(function($) {
    // Load news & tutorials from Vanilla
    var lists = $('div.Column div.List'),
       newsColumn = $('div.NewsColumn div.List'),
-      helpColumn = $('div.HelpColumn div.List');
+      announceColumn = $('div.AnnounceColumn div.List');
 
    loadFeed = function(container, type, rows, format) {
       $.ajax({
@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
    };
 
    lists.addClass('Loading');
-   loadFeed(newsColumn, 'news', 3, 'extended');
-   loadFeed(helpColumn, 'help', 3, 'extended');
+   loadFeed(newsColumn, 'news', 4, 'extended');
+   loadFeed(announceColumn, 'announce', 2, 'extended');
 
 });

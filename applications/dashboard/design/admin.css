@@ -2392,6 +2392,14 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 	display: inline-block;
 }
 
+/* Hide extra News info in Dashboard feed */
+.List .FeedItem .tptn_counter {
+   display: none;
+}
+.List .FeedItem em p:nth-of-type(2) {
+   display: none;
+}
+
 /* 16px Sprites Black Transparent */
 /*.SpDashboard,
 .SpCog { background-position: 0 -148px; }

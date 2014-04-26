@@ -447,6 +447,8 @@ class SettingsController extends Gdn_Controller {
 
       // Get category data
       $this->Category = $this->CategoryModel->GetID($CategoryID);
+      if(!$this->Category)
+         throw NotFoundException('Category');
       $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
 
       // Set up head

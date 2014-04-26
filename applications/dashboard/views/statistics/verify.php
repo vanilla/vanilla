@@ -4,7 +4,7 @@
    <?php } else { ?>
       <div class="StatisticsVerification StatisticsProblem">
          <?php echo T("Problem with credentials."); ?>
-         <?php echo $this->Form->Hidden('ClearCredentials',array('value'=>1)); ?>
+         <?php // echo $this->Form->Hidden('ClearCredentials',array('value'=>1)); ?>
          <p><?php echo $this->Form->Button('Re-Register API Key', array('class' => 'SmallButton', 'name' => 'Reregister')); ?></p>
       </div>
    <?php } ?>

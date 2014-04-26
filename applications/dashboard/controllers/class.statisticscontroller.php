@@ -71,6 +71,9 @@ class StatisticsController extends DashboardController {
             Gdn::Statistics()->Tick();
             $Flow = FALSE;
          }
+      } else {
+         $this->Form->SetValue('InstallationID', Gdn::InstallationID());
+         $this->Form->SetValue('InstallationSecret', Gdn::InstallationSecret());
       }
       
       $AnalyticsEnabled = Gdn_Statistics::CheckIsEnabled();
@@ -87,10 +90,7 @@ class StatisticsController extends DashboardController {
       $this->SetData('NotifyMessage', $NotifyMessage);
       if ($NotifyMessage !== FALSE)
          Gdn::Set('Garden.Analytics.Notify', NULL);
-      
-      $this->Form->SetFormValue('InstallationID', Gdn::InstallationID());
-      $this->Form->SetFormValue('InstallationSecret', Gdn::InstallationSecret());
-      
+
       $this->Render();
    }
    

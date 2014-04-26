@@ -22,6 +22,11 @@ class ProfileController extends Gdn_Controller {
    /** @var bool Is the page in "edit" mode or not. */
    public $EditMode;
 
+   /**
+    * @var Gdn_Form
+    */
+   public $Form;
+
    /** @var array List of available tabs. */
    public $ProfileTabs;
 
@@ -244,6 +249,27 @@ class ProfileController extends Gdn_Controller {
       $this->Render('Value', 'Utility');
    }
 
+   /**
+    * Delete an invitation that has already been accepted.
+    * @param int $InvitationID
+    * @throws Exception The inviation was not found or the user doesn't have permission to remove it.
+    */
+   public function DeleteInvitation($InvitationID) {
+      $this->Permission('Garden.SignIn.Allow');
+
+      if (!$this->Form->AuthenticatedPostBack())
+         throw ForbiddenException('GET');
+
+      $InvitationModel = new InvitationModel();
+
+      $InvitationModel->Delete($InvitationID);
+      $this->InformMessage(T('The invitation was removed successfully.'));
+
+      $this->JsonTarget(".js-invitation[data-id=\"{$InvitationID}\"]",'', 'SlideUp');
+
+      $this->Render('Blank', 'Utility');
+   }
+
    public function Disconnect($UserReference = '', $Username = '', $Provider) {
       if (!$this->Request->IsPostBack())
          throw PermissionException('Javascript');
@@ -444,6 +470,9 @@ class ProfileController extends Gdn_Controller {
       $InvitationModel = new InvitationModel();
       $this->Form->SetModel($InvitationModel);
       if ($this->Form->AuthenticatedPostBack()) {
+         // Remove insecure invitation data.
+         $this->Form->RemoveFormValue(array('Name', 'DateExpires', 'RoleIDs'));
+
          // Send the invitation
          if ($this->Form->Save($this->UserModel)) {
             $this->InformMessage(T('Your invitation has been sent.'));
@@ -940,23 +969,24 @@ class ProfileController extends Gdn_Controller {
     * @since 2.0.0
     * @access public
     * @param int $InvitationID Unique identifier.
-    * @param string $TransientKey Security token.
     */
-   public function SendInvite($InvitationID = '', $TransientKey = '') {
+   public function SendInvite($InvitationID = '') {
+      if (!$this->Form->AuthenticatedPostBack())
+         throw ForbiddenException('GET');
+
       $this->Permission('Garden.SignIn.Allow');
       $InvitationModel = new InvitationModel();
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey)) {
-         try {
-            $Email = new Gdn_Email();
-            $InvitationModel->Send($InvitationID, $Email);
-         } catch (Exception $ex) {
-            $this->Form->AddError(strip_tags($ex->getMessage()));
-         }
-         if ($this->Form->ErrorCount() == 0)
-            $this->InformMessage(T('The invitation was sent successfully.'));
 
+      try {
+         $Email = new Gdn_Email();
+         $InvitationModel->Send($InvitationID, $Email);
+      } catch (Exception $ex) {
+         $this->Form->AddError(strip_tags($ex->getMessage()));
       }
+      if ($this->Form->ErrorCount() == 0)
+         $this->InformMessage(T('The invitation was sent successfully.'));
+
 
       $this->View = 'Invitations';
       $this->Invitations();
@@ -1089,28 +1119,30 @@ class ProfileController extends Gdn_Controller {
     * Revoke an invitation.
     *
     * @since 2.0.0
-    * @access public
     * @param int $InvitationID Unique identifier.
-    * @param string $TransientKey Security token.
+    * @throws Exception Throws an exception when the invitation isn't found or the user doesn't have permission to delete it.
     */
-   public function UnInvite($InvitationID = '', $TransientKey = '') {
+   public function UnInvite($InvitationID) {
       $this->Permission('Garden.SignIn.Allow');
+
+      if (!$this->Form->AuthenticatedPostBack())
+         throw ForbiddenException('GET');
+
       $InvitationModel = new InvitationModel();
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey)) {
-         try {
-            $InvitationModel->Delete($InvitationID, $this->UserModel);
-         } catch (Exception $ex) {
-            $this->Form->AddError(strip_tags($ex->getMessage()));
-         }
-
-         if ($this->Form->ErrorCount() == 0)
+      try {
+         $Valid = $InvitationModel->Delete($InvitationID, $this->UserModel);
+         if ($Valid) {
             $this->InformMessage(T('The invitation was removed successfully.'));
-
+            $this->JsonTarget(".js-invitation[data-id=\"{$InvitationID}\"]",'', 'SlideUp');
+         }
+      } catch (Exception $ex) {
+         $this->Form->AddError(strip_tags($ex->getMessage()));
       }
 
-      $this->View = 'Invitations';
-      $this->Invitations();
+      if ($this->Form->ErrorCount() == 0)
+
+      $this->Render('Blank', 'Utility');
    }
 
 

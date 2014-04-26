@@ -117,12 +117,32 @@ class TagModel extends Gdn_Model {
             '' => array(
                'key' => '',
                'name' => 'Tag',
-               'default' => true
-               ));
+               'plural' => 'Tags',
+               'default' => true,
+               'addtag' => true
+            )
+         );
 
          $this->FireEvent('Types');
       }
+
       return $this->Types;
+   }
+
+   public function getTagTypes() {
+      $TagTypes = $this->Types();
+
+      if (!is_array($TagTypes)) {
+         $TagTypes = array();
+      }
+
+      // Sort by keys, and because the default, "Tags," has a blank key, it
+      // will be set as the first key, which is good for the tabs.
+      if (count($TagTypes)) {
+         ksort($TagTypes);
+      }
+
+      return $TagTypes;
    }
 
    /**
@@ -468,12 +488,23 @@ class TagModel extends Gdn_Model {
    public function Validate($FormPostValues, $Insert = FALSE) {
       $this->DefineSchema();
 
+      $Type = GetValue('Type', $FormPostValues, '');
+      $SetType = FALSE;
+
       // The model doesn't play well with empty string defaults so spoof an empty string default.
-      if ($Insert && !isset($FormPostValues['Type'])) {
+      if ($Insert && !$Type) {
          $FormPostValues['Type'] = 'Default';
+         $SetType = TRUE;
       }
 
-      return $this->Validation->Validate($FormPostValues, $Insert);
+      $Result = $this->Validation->Validate($FormPostValues, $Insert);
+
+      if ($SetType) {
+         $FormPostValues['Type'] = $Type;
+         $this->Validation->AddValidationField('Type', $FormPostValues);
+      }
+
+      return $Result;
    }
 
    public static function ValidateTag($Tag) {
@@ -492,6 +523,49 @@ class TagModel extends Gdn_Model {
             return FALSE;
       }
       return TRUE;
+   }
+
+   public function ValidateType($Type) {
+      $ValidType = false;
+      $TagTypes = $this->Types();
+
+      foreach ($TagTypes as $TypeKey => $TypeMeta) {
+         $TypeChecks = array(
+             strtolower($TypeKey),
+             strtolower($TypeMeta['key']),
+             strtolower($TypeMeta['name']),
+             strtolower($TypeMeta['plural'])
+         );
+
+         if (in_array(strtolower($Type), $TypeChecks)) {
+            $ValidType = true;
+            break;
+         }
+      }
+
+      return $ValidType;
+   }
+
+   public function CanAddTagForType($Type) {
+      $CanAddTagForType = false;
+      $TagTypes = $this->Types();
+
+      foreach ($TagTypes as $TypeKey => $TypeMeta) {
+         $TypeChecks = array(
+             strtolower($TypeKey),
+             strtolower($TypeMeta['key']),
+             strtolower($TypeMeta['name']),
+             strtolower($TypeMeta['plural'])
+         );
+
+         if (in_array(strtolower($Type), $TypeChecks)
+         && $TypeMeta['addtag']) {
+            $CanAddTagForType = true;
+            break;
+         }
+      }
+
+      return $CanAddTagForType;
    }
 
    public static function SplitTags($TagsString) {

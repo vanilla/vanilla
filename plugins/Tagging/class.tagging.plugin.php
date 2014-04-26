@@ -13,6 +13,8 @@
  *  1.7     Change the styling of special tags and prevent them from being edited/deleted.
  *  1.8     Add show existing tags
  *  1.8.4   Add tags before render so that other plugins can look at them.
+ *  1.8.8   Added tabs.
+ *  1.8.9   Ability to add tags based on tab.
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,12 +25,13 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.7',
+   'Version' => '1.8.10',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
+   'MobileFriendly' => true,
    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit')
 );
 
@@ -569,9 +572,12 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddJSFile('plugins/Tagging/js/admin.js');
       $SQL = Gdn::SQL();
 
+      // Get all tag types
+      $TagModel = TagModel::instance();
+      $TagTypes = $TagModel->getTagTypes();
+
       $Sender->Form->Method = 'get';
       $Sender->Form->InputPrefix = '';
-      //$Sender->Form->Action = '/settings/tagging';
 
       list($Offset, $Limit) = OffsetLimit($Page, 100);
       $Sender->SetData('_Limit', $Limit);
@@ -579,11 +585,47 @@ class TaggingPlugin extends Gdn_Plugin {
       if ($Search) {
          $SQL->Like('FullName', $Search , 'right');
       }
-      if ($Type !== NULL) {
-         if ($Type === 'null')
-            $Type = NULL;
-         $SQL->Where('Type', $Type);
+
+      // This type doesn't actually exist, but it will represent the
+      // blank types in the column.
+      if (strtolower($Type) == 'tags') {
+         $Type = '';
       }
+
+      if (!$Search) {
+         if ($Type !== NULL) {
+            if ($Type === 'null')
+               $Type = NULL;
+            $SQL->Where('Type', $Type);
+         } else if ($Type == '') {
+            $SQL->Where('Type', '');
+         }
+      } else {
+         $Type = 'Search Results';
+         // This is made up, and exists so search results can be placed in
+         // their own tab.
+         $TagTypes[$Type] = array(
+             'key' => $Type
+         );
+      }
+
+      $TagTypes = array_change_key_case($TagTypes, CASE_LOWER);
+
+      // Store type for view
+      $TagType = (!empty($Type))
+         ? $Type
+         : 'Tags';
+      $Sender->SetData('_TagType', $TagType);
+
+      // Store tag types
+      $Sender->SetData('_TagTypes', $TagTypes);
+
+      // Determine if new tags can be added for the current type.
+      $CanAddTags = (!empty($TagTypes[$Type]['addtag']) && $TagTypes[$Type]['addtag'])
+         ? 1
+         : 0;
+
+      $Sender->SetData('_CanAddTags', $CanAddTags);
 
       $Data = $SQL
          ->Select('t.*')
@@ -595,10 +637,25 @@ class TaggingPlugin extends Gdn_Plugin {
 
       $Sender->SetData('Tags', $Data);
 
-      if ($Search = $Sender->Request->Get('Search')) {
+      if ($Search) {
          $SQL->Like('Name', $Search , 'right');
       }
-      $Sender->SetData('RecordCount', $SQL->GetCount('Tag'));
+
+      // Make sure search uses its own search type, so results appear
+      // in their own tab.
+      $Sender->Form->Action = Url('/settings/tagging/?type=' . $TagType);
+
+      // Search results pagination will mess up a bit, so don't provide a type
+      // in the count.
+      $RecordCountWhere = array('Type' => $Type);
+      if ($Type == '') {
+         $RecordCountWhere = array('Type' => '');
+      }
+      if ($Search) {
+         $RecordCountWhere = array();
+      }
+
+      $Sender->SetData('RecordCount', $SQL->GetCount('Tag', $RecordCountWhere));
 
       $Sender->Render('tagging', '', 'plugins/Tagging');
    }
@@ -618,11 +675,24 @@ class TaggingPlugin extends Gdn_Plugin {
       $TagModel = new TagModel;
       $Sender->Form->SetModel($TagModel);
 
+      // Add types if allowed to add tags for it, and not '' or 'tags', which
+      // are the same.
+      $TagType = Gdn::Request()->Get('type');
+      if (strtolower($TagType) != 'tags'
+      && $TagModel->CanAddTagForType($TagType)) {
+         $Sender->Form->AddHidden('Type', $TagType, TRUE);
+      }
+
       if ($Sender->Form->AuthenticatedPostBack()) {
          // Make sure the tag is valid
          $TagName = $Sender->Form->GetFormValue('Name');
          if (!TagModel::ValidateTag($TagName))
             $Sender->Form->AddError('@'.T('ValidateTag', 'Tags cannot contain commas.'));
+
+         $TagType = $Sender->Form->GetFormValue('Type');
+         if (!$TagModel->CanAddTagForType($TagType)) {
+            $Sender->Form->AddError('@'.T('ValidateTagType', 'That type does not accept manually adding new tags.'));
+         }
 
          // Make sure that the tag name is not already in use.
          if ($TagModel->GetWhere(array('Name' => $TagName))->NumRows() > 0) {

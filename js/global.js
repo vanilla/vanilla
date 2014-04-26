@@ -1697,6 +1697,44 @@ jQuery(document).ready(function($) {
       });
    }
 
+
+   /**
+    * Running magnific-popup. Image tag or text must be wrapped with an anchor
+    * tag. This will render the content of the anchor tag's href. If using an
+    * image tag, the anchor tag's href can point to either the same location
+    * as the image tag, or a higher quality version of the image. If zoom is
+    * not wanted, remove the zoom and mainClass properties, and it will just
+    * load the content of the anchor tag with no special effects.
+    *
+    * @documentation http://dimsemenov.com/plugins/magnific-popup/documentation.html
+    *
+    */
+   gdn.magnificPopup = (function() {
+      if ($.fn.magnificPopup) {
+         $('.mfp-image').each(function(i, el){
+            $(el).magnificPopup({
+               type: 'image',
+               mainClass: 'mfp-with-zoom',
+               zoom: {
+                  enabled: true,
+                  duration: 300,
+                  easing: 'ease',
+                  opener: function(openerElement) {
+                    return openerElement.is('img')
+                       ? openerElement
+                       : openerElement.find('img');
+                  }
+               }
+            });
+         });
+      }
+   }());
+
+
+
+
+
+
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.

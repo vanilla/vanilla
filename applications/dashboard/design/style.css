@@ -4179,7 +4179,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
    margin-top: 18px;
    background: #fff;
    min-width: 120px;
-   z-index: 10000;
+   z-index: 100010; /* So high because a client actually had 99999 in a theme */
    border-radius: 2px;
    overflow: hidden;
    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);

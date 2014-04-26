@@ -894,8 +894,8 @@ class Gdn_Autoloader_Map {
       return $this->MapInfo['maptype']; //GetValue('maptype', $this->MapInfo);
    }
    function fixBackSlash($path) {
-	if (preg_match('/[A-Za-z]\:/',$path)) {
-	// do nothing is local file
+	if ((preg_match('/[A-Za-z]\:/',$path) or (strtoupper(substr(PHP_OS, 0, 3)) <> 'WIN'))                ) {
+	// do nothing is local file or not WIN
 	} else if (!empty($path)) {
             $path = str_replace("\\", "/", $path);  // convert to / to avoid parse_in_file create array with missing \
             if (preg_match('/^\/{1}\w/',$path)==TRUE) { // for some reason there is only 1 / then add / to have a valid network path

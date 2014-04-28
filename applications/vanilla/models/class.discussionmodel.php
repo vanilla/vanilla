@@ -383,6 +383,7 @@ class DiscussionModel extends VanillaModel {
       $this->DiscussionSummaryQuery($AdditionalFields, FALSE);
          
       if ($UserID > 0) {
+         $Perms = self::CategoryPermissions();
          $this->SQL
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
@@ -393,7 +394,14 @@ class DiscussionModel extends VanillaModel {
             //->OrWhere('d.DateLastComment >', 'w.DateLastViewed')
             //->EndWhereGroup()
             ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE)
-            ->OrWhere('w.DateLastViewed', NULL);
+            ->OrOp()     
+            ->BeginWhereGroup()     
+            ->Where('w.DateLastViewed', NULL);
+         if($Perms !== TRUE) {
+            $this->SQL->WhereIn('d.CategoryID', $Perms);
+         }
+         $this->SQL
+            ->EndWhereGroup();
       } else {
 			$this->SQL
 				->Select('0', '', 'WatchUserID')

@@ -655,10 +655,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
          trigger_error(ErrorMessage('Failed to define configuration file contents.', $Group, 'Save'), E_USER_ERROR);
 
       $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
-      if ($this->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
-         $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data, array(
-             Gdn_Cache::FEATURE_NOPREFIX => TRUE
+      if ($this->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled()) {
+         Gdn::Cache()->Store($FileKey, $Data, array(
+             Gdn_Cache::FEATURE_NOPREFIX    => TRUE,
+             Gdn_Cache::FEATURE_EXPIRY      => 3600
          ));
+      }
 
       // Infrastructure deployment. Use old method.
       $TmpFile = tempnam(PATH_CONF, 'config');
@@ -905,7 +907,8 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       // Write it there now.
       if ($Parent && $Parent->Caching() && $UseCache && !$LoadedFromCache) {
          Gdn::Cache()->Store($FileKey, $$Name, array(
-             Gdn_Cache::FEATURE_NOPREFIX => TRUE
+             Gdn_Cache::FEATURE_NOPREFIX    => TRUE,
+             Gdn_Cache::FEATURE_EXPIRY      => 3600
          ));
       }
 
@@ -1239,7 +1242,8 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $this->Source);
             if ($this->Configuration && $this->Configuration->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
                $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data, array(
-                   Gdn_Cache::FEATURE_NOPREFIX => TRUE
+                   Gdn_Cache::FEATURE_NOPREFIX  => TRUE,
+                   Gdn_Cache::FEATURE_EXPIRY    => 3600
                ));
 
             $TmpFile = tempnam(PATH_CONF, 'config');

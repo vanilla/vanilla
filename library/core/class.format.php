@@ -358,7 +358,8 @@ class Gdn_Format {
       return $Result;
    }
 
-   /** Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.
+   /**
+    * Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.
     *
     * @param int $Bytes The bytes to format.
     * @param int $Precision The number of decimal places to return.
@@ -610,7 +611,7 @@ class Gdn_Format {
 
    /**
     * Return the default input formatter.
-    * 
+    *
     * @param bool|null $is_mobile Whether or not you want the format for mobile browsers.
     * @return string
     */
@@ -999,7 +1000,7 @@ class Gdn_Format {
             $Regex,
          array('Gdn_Format', 'LinksCallback'),
          $Mixed);
-         
+
          Gdn::PluginManager()->FireAs('Format')->FireEvent('Links', array(
             'Mixed' => &$Mixed
          ));

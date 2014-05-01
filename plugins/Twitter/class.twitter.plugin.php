@@ -104,7 +104,7 @@ class TwitterPlugin extends Gdn_Plugin {
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
       if (isset($Sender->Data['Methods'])) {
-         if (!$this->IsConfigured())
+         if (!$this->SocialSignIn())
             return;
 
          $ImgSrc = Asset('/plugins/Twitter/design/twitter-signin.png');
@@ -136,7 +136,7 @@ class TwitterPlugin extends Gdn_Plugin {
 	}
 
 	public function Base_BeforeSignInLink_Handler($Sender) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
 			return;
 
 		// if (!IsMobile())

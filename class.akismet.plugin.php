@@ -9,7 +9,7 @@ $PluginInfo['Akismet'] = array(
    'Name' => 'Akismet',
    'Description' => 'Akismet spam protection integration for Vanilla.',
    'Version' => '1.0.3',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'SettingsUrl' => '/settings/akismet',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => 'Todd Burry',

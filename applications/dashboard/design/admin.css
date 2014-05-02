@@ -1469,6 +1469,8 @@ div.CurrentTheme img,
 div.BrowseThemes img {
 	border: 1px solid #777;
   width: 150px;
+  height: auto;
+  max-height: 112px;
 }
 div.CurrentTheme h3,
 div.BrowseThemes h3 {

@@ -1468,6 +1468,9 @@ div.Popup div.Legal {
 div.CurrentTheme img,
 div.BrowseThemes img {
 	border: 1px solid #777;
+  width: 150px;
+  height: auto;
+  max-height: 112px;
 }
 div.CurrentTheme h3,
 div.BrowseThemes h3 {
@@ -1487,7 +1490,8 @@ div.BrowseThemes h3 {
 .CurrentTheme h4 span {
 	padding-left: 10px;
 }
-div.Description {
+div.Description,
+div.Requirements {
 	padding: 0 20px 20px;
 }
 div.Options,

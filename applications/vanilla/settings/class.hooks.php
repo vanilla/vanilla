@@ -605,8 +605,6 @@ class VanillaHooks implements Gdn_IPlugin {
    public function Setup() {
       $Database = Gdn::Database();
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Drop = Gdn::Config('Vanilla.Version') === FALSE ? TRUE : FALSE;
-      $Explicit = TRUE;
 
       // Call structure.php to update database
       $Validation = new Gdn_Validation(); // Needed by structure.php to validate permission names

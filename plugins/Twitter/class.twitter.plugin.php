@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Social Connect',
    'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.1.8',
+   'Version' => '1.1.9',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -104,7 +104,7 @@ class TwitterPlugin extends Gdn_Plugin {
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
       if (isset($Sender->Data['Methods'])) {
-         if (!$this->IsConfigured())
+         if (!$this->SocialSignIn())
             return;
 
          $ImgSrc = Asset('/plugins/Twitter/design/twitter-signin.png');
@@ -122,21 +122,21 @@ class TwitterPlugin extends Gdn_Plugin {
    }
 
    public function Base_SignInIcons_Handler($Sender, $Args) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
 			return;
 
 		echo "\n".$this->_GetButton();
 	}
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
 			return;
 
 		echo "\n".$this->_GetButton();
 	}
 
 	public function Base_BeforeSignInLink_Handler($Sender) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
 			return;
 
 		// if (!IsMobile())
@@ -659,6 +659,10 @@ class TwitterPlugin extends Gdn_Plugin {
       return C('Plugins.Twitter.SocialReactions', TRUE) && $this->IsConfigured();
    }
 
+   public function SocialSignIn() {
+      return C('Plugins.Twitter.SocialSignIn', TRUE) && $this->IsConfigured();
+   }
+
    public function SetOAuthToken($Token, $Secret = NULL, $Type = 'request') {
       if (is_a($Token, 'OAuthToken')) {
          $Secret = $Token->secret;
@@ -758,6 +762,7 @@ class TwitterPlugin extends Gdn_Plugin {
          $Settings = array(
              'Plugins.Twitter.ConsumerKey' => $Sender->Form->GetFormValue('ConsumerKey'),
              'Plugins.Twitter.Secret' => $Sender->Form->GetFormValue('Secret'),
+             'Plugins.Twitter.SocialSignIn' => $Sender->Form->GetFormValue('SocialSignIn'),
              'Plugins.Twitter.SocialReactions' => $Sender->Form->GetFormValue('SocialReactions'),
              'Plugins.Twitter.SocialSharing' => $Sender->Form->GetFormValue('SocialSharing')
          );
@@ -768,6 +773,7 @@ class TwitterPlugin extends Gdn_Plugin {
       } else {
          $Sender->Form->SetValue('ConsumerKey', C('Plugins.Twitter.ConsumerKey'));
          $Sender->Form->SetValue('Secret', C('Plugins.Twitter.Secret'));
+         $Sender->Form->SetValue('SocialSignIn', $this->SocialSignIn());
          $Sender->Form->SetValue('SocialReactions', $this->SocialReactions());
          $Sender->Form->SetValue('SocialSharing', $this->SocialSharing());
       }

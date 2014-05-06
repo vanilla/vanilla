@@ -4245,7 +4245,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   display: inline-block;
   overflow: hidden;
   font-weight: bold;
-  line-height: 32px;
+  line-height: 24px;
   color: #fff !important;
   text-decoration: none;
   vertical-align: middle;
@@ -4253,12 +4253,17 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .SocialIcon.HasText {
   min-width: 210px;
+  line-height: 32px;
 }
 
 .SocialIcon .Icon {
+  width: 24px;
+  height: 24px;
+}
+
+.SocialIcon.HasText .Icon {
   width: 32px;
   height: 32px;
-  background-size: 32px 32px;
 }
 
 .SocialIcon .Text {
@@ -4283,7 +4288,10 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 .SocialIcon .Icon {
   background-image: url('images/socialcons.png');
   background-repeat: no-repeat;
-  background-size: auto auto;
+  background-size: 24px 168px;
+}
+.SocialIcon.HasText .Icon {
+  background-size: 32px 224px;
 }
 @media
 (-webkit-min-device-pixel-ratio: 2),
@@ -4291,11 +4299,13 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 (min-device-pixel-ratio: 2) {
   .SocialIcon .Icon {
     background-image: url('Images/socialcons@2x.png');
-    background-size: 32px 224px;
   }
 }
 
 .SocialIcon-Facebook .Icon {
+  background-position: 0 -24px;
+}
+.SocialIcon-Facebook.HasText .Icon {
   background-position: 0 -32px;
 }
 .SocialIcon-Facebook,
@@ -4307,6 +4317,9 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon-Twitter .Icon {
+  background-position: 0 -144px;
+}
+.SocialIcon-Twitter.HasText .Icon {
   background-position: 0 -192px;
 }
 .SocialIcon-Twitter,
@@ -4318,6 +4331,9 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon-Google .Icon {
+  background-position: 0 -72px;
+}
+.SocialIcon-Google.HasText .Icon {
   background-position: 0 -96px;
 }
 .SocialIcon-Google,
@@ -4329,6 +4345,9 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon-OpenID .Icon {
+  background-position: 0 -120px;
+}
+.SocialIcon-OpenID.HasText .Icon {
   background-position: 0 -160px;
 }
 .SocialIcon-OpenID,
@@ -4340,6 +4359,9 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon-LinkedIn .Icon {
+  background-position: 0 -96px;
+}
+.SocialIcon-LinkedIn.HasText .Icon {
   background-position: 0 -128px;
 }
 .SocialIcon-LinkedIn,
@@ -4362,6 +4384,9 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon-GitHub .Icon {
+  background-position: 0 -48px;
+}
+.SocialIcon-GitHub.HasText .Icon {
   background-position: 0 -64px;
 }
 .SocialIcon-GitHub,

@@ -193,16 +193,13 @@ class OpenIDPlugin extends Gdn_Plugin {
 //      if (!$this->IsEnabled()) return;
 
       if (isset($Sender->Data['Methods'])) {
-         $ImgSrc = Asset('/plugins/OpenID/design/openid-signin.png');
-         $ImgAlt = T('Sign In with OpenID');
+         $Url = $this->_AuthorizeHref();
 
-         $SigninHref = $this->_AuthorizeHref();
-         $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-
-         // Add the twitter method to the controller.
+         // Add the OpenID method to the controller.
          $Method = array(
             'Name' => 'OpenID',
-            'SignInHtml' => "<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
+            'SignInHtml' => SocialSigninButton('OpenID', $Url, 'button')
+        );
 
          $Sender->Data['Methods'][] = $Method;
       }
@@ -219,11 +216,9 @@ class OpenIDPlugin extends Gdn_Plugin {
    }
 
 	private function _GetButton() {
-      $ImgSrc = Asset('/plugins/OpenID/design/openid-icon.png');
-      $ImgAlt = T('Sign In with OpenID');
-      $SigninHref = $this->_AuthorizeHref();
-      $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-      return "<a id=\"OpenIDAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
+      $Url = $this->_AuthorizeHref();
+
+      return SocialSigninButton('OpenID', $Url, 'icon');
 	}
 
 	public function Base_BeforeSignInLink_Handler($Sender) {

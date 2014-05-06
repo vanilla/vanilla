@@ -4286,18 +4286,22 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon .Icon {
-  background-image: url('images/socialcons.png');
+  background-image: url('images/socialcons-small.png');
   background-repeat: no-repeat;
   background-size: 24px 168px;
 }
 .SocialIcon.HasText .Icon {
   background-size: 32px 224px;
+  background-image: url('images/socialcons.png');
 }
 @media
 (-webkit-min-device-pixel-ratio: 2),
 (-o-min-device-pixel-ratio: 3 / 2),
 (min-device-pixel-ratio: 2) {
   .SocialIcon .Icon {
+    background-image: url('images/socialcons-small@2x.png');
+  }
+  .SocialIcon.HasText .Icon {
     background-image: url('images/socialcons@2x.png');
   }
 }

@@ -4298,7 +4298,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 (-o-min-device-pixel-ratio: 3 / 2),
 (min-device-pixel-ratio: 2) {
   .SocialIcon .Icon {
-    background-image: url('Images/socialcons@2x.png');
+    background-image: url('images/socialcons@2x.png');
   }
 }
 

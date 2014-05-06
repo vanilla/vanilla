@@ -980,9 +980,13 @@ class CommentModel extends VanillaModel {
 
          // Record user-comment activity.
          if ($Discussion != FALSE) {
-            $Activity['NotifyUserID'] = GetValue('InsertUserID', $Discussion);
-            $Activity['Data']['Reason'] = 'mine';
-            $ActivityModel->Queue($Activity, 'DiscussionComment');
+            $InsertUserID = val('InsertUserID', $Discussion);
+            // Check user can still see the discussion.
+            if ($UserModel->GetCategoryViewPermission($InsertUserID, $Discussion->CategoryID)) {
+               $Activity['NotifyUserID'] = $InsertUserID;
+               $Activity['Data']['Reason'] = 'mine';
+               $ActivityModel->Queue($Activity, 'DiscussionComment');
+            }
 			}
 
          // Record advanced notifications.
@@ -993,7 +997,6 @@ class CommentModel extends VanillaModel {
 
          // Notify any users who were mentioned in the comment.
          $Usernames = GetMentions($Fields['Body']);
-         $NotifiedUsers = array();
          foreach ($Usernames as $i => $Username) {
             $User = $UserModel->GetByUsername($Username);
             if (!$User) {

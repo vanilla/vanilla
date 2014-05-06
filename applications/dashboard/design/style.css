@@ -4396,3 +4396,9 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 .SocialIcon-GitHub:hover {
   background-color: #4485c3;
 }
+
+/* Woe unto whoever caused this */
+
+.MeBox-SignIn.Inline .SocialIcon {
+  display: inline-block;
+}

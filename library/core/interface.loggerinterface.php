@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright 2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 /**
  * Describes a logger instance
@@ -18,8 +18,7 @@
  * See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
  * for the full interface specification.
  */
-interface LoggerInterface
-{
+interface LoggerInterface {
     /**
      * System is unusable.
      *

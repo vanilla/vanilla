@@ -1,9 +1,8 @@
 <?php
 /**
- * @copyright 2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
-
 /**
  * A base logger interface that does nothing.
  */
@@ -118,7 +117,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function log($level, $message, array $context = array()) {
-        Trace(FormatString($message, $context), 'Formattedmessage');
+        Trace(FormatString($message, $context), 'FormattedMessage');
         Trace($context, 'context');
 
     }

@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright 2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 /**
  * EventLogging
@@ -9,8 +9,7 @@
  * If nothing sets logger; then Logger will be set to BaseLogger which is a dry loop
  *
  * @see DbLogger BaseLogger
- *
- * Class Logger
+ * @since 2.2
  */
 class Logger {
 
@@ -66,7 +65,9 @@ class Logger {
             'InsertName'=> val("Name", Gdn::Session()->User, 'anonymous'),
             'InsertIPAddress'=> Gdn::Request()->IpAddress(),
             'TimeInserted'=> time(),
-            'LogLevel' => $level
+            'LogLevel' => $level,
+            'Domain' => Url('/', '//'),
+            'Path' => Url('', '/')
         );
         $context = $context + $defaults;
         static::getLogger()->log($level, $message, $context);

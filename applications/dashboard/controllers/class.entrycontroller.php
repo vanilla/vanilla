@@ -1577,6 +1577,12 @@ EOT;
                $Email = $this->Form->GetFormValue('Email');
                if (!$this->UserModel->PasswordRequest($Email)) {
                   $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+                  Logger::event(
+                     'password_reset_request_failure',
+                     LogLevel::INFO,
+                     'Cant find account associated to email/username {Input}.',
+                     array('Input' => $Email)
+                  );
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());
@@ -1584,10 +1590,23 @@ EOT;
             if ($this->Form->ErrorCount() == 0) {
                $this->Form->AddError('Success!');
                $this->View = 'passwordrequestsent';
+               Logger::event(
+                  'password_reset_request',
+                  LogLevel::INFO,
+                  '{Input} has been sent password reset email.',
+                  array('Input' => $Email)
+               );
             }
          } else {
-            if ($this->Form->ErrorCount() == 0)
+            if ($this->Form->ErrorCount() == 0) {
                $this->Form->AddError("Couldn't find an account associated with that email/username.");
+               Logger::event(
+                  'password_reset_request_failure',
+                  LogLevel::INFO,
+                  'Cant find account associated to email/username {Input}.',
+                  array('Input' => $this->Form->GetValue('Email'))
+               );
+            }
          }
       }
       $this->Render();
@@ -1610,11 +1629,21 @@ EOT;
           || $this->UserModel->GetAttribute($UserID, 'PasswordResetKey', '') != $PasswordResetKey
          ) {
          $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
+         Logger::event(
+            'password_reset_failure',
+            LogLevel::NOTICE,
+            '{InsertName} failed to authenticate password reset request.'
+         );
       }
 
       $Expires = $this->UserModel->GetAttribute($UserID, 'PasswordResetExpires');
       if ($this->Form->ErrorCount() === 0 && $Expires < time()) {
          $this->Form->AddError('@'.T('Your password reset token has expired.', 'Your password reset token has expired. Try using the reset request form again.'));
+         Logger::event(
+            'password_reset_failure',
+            LogLevel::NOTICE,
+            '{InsertName} has an expired reset token.'
+         );
       }
 
 
@@ -1633,13 +1662,28 @@ EOT;
       ) {
          $Password = $this->Form->GetFormValue('Password', '');
          $Confirm = $this->Form->GetFormValue('Confirm', '');
-         if ($Password == '')
+         if ($Password == '') {
             $this->Form->AddError('Your new password is invalid');
-         else if ($Password != $Confirm)
+            Logger::event(
+               'password_reset_failure',
+               LogLevel::NOTICE,
+               '{InsertName} passwords is invalid.'
+            );
+         } else if ($Password != $Confirm)
             $this->Form->AddError('Your passwords did not match.');
+            Logger::event(
+               'password_reset_failure',
+               LogLevel::NOTICE,
+               '{InsertName} passwords did not match.'
+            );
 
          if ($this->Form->ErrorCount() == 0) {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
+            Logger::event(
+               'password_reset',
+               LogLevel::NOTICE,
+               '{InsertName} has reset their password.'
+            );
             Gdn::Session()->Start($User->UserID, TRUE);
 //            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
 //            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));

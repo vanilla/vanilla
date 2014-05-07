@@ -4,11 +4,11 @@ php:
   - 5.4
   - hhvm
 
-intstall:
+install:
   - composer install
 
 before_script:
-  - git clone git@github.com:vanilla/addons
+  - git clone https://github.com/vanilla/addons.git
   - vendor/bin/phpcs --config-set default_standard addons/standards/Vanilla
 
 script:

@@ -156,8 +156,14 @@ class EntryController extends Gdn_Controller {
          case Gdn_Authenticator::MODE_GATHER:
             $this->AddJsFile('entry.js');
             $Reaction = $Authenticator->LoginResponse();
-				if ($this->Form->IsPostBack())
+				if ($this->Form->IsPostBack()) {
 					$this->Form->AddError('ErrorCredentials');
+                    Logger::event(
+                       'signin_failure',
+                       LogLevel::WARNING,
+                       '{InsertName} failed to signed in.  Not enough information to authenticate'
+                    );
+                }
          break;
 
          // All information is present, authenticate
@@ -181,16 +187,31 @@ class EntryController extends Gdn_Controller {
                   switch ($AuthenticationResponse) {
                      case Gdn_Authenticator::AUTH_PERMISSION:
                         $this->Form->AddError('ErrorPermission');
+                         Logger::event(
+                            'signin_failure',
+                            LogLevel::WARNING,
+                            '{InsertName} failed to signed in. Permission Denied'
+                         );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
 
                      case Gdn_Authenticator::AUTH_DENIED:
                         $this->Form->AddError('ErrorCredentials');
+                        Logger::event(
+                           'signin_failure',
+                           LogLevel::WARNING,
+                           '{InsertName} failed to signed in. Authentication Denied'
+                        );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
 
                      case Gdn_Authenticator::AUTH_INSUFFICIENT:
                         // Unable to comply with auth request, more information is needed from user.
+                         Logger::event(
+                            'signin_failure',
+                            LogLevel::WARNING,
+                            '{InsertName} failed to signed in. More information needed from user.'
+                         );
                         $this->Form->AddError('ErrorInsufficient');
                         $Reaction = $Authenticator->FailedResponse();
                      break;
@@ -854,6 +875,7 @@ EOT;
 
             if (!$User) {
                $this->Form->AddError('@'.sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))));
+               Logger::event('signin_failure', LogLevel::INFO, '{Login} failed to signed in. User not found.', array('Login' => $Email));
             } else {
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
@@ -893,6 +915,13 @@ EOT;
                      }
                   } else {
                      $this->Form->AddError('Invalid password.');
+                     Logger::event(
+                        'signin_failure',
+                        LogLevel::WARNING,
+                        '{InsertName} failed to signed in.  Invalid password.',
+                        array('InsertName' => $User->Name)
+                     );
+
                   }
                } catch (Gdn_UserException $Ex) {
                   $this->Form->AddError($Ex);
@@ -1086,6 +1115,11 @@ EOT;
                $this->Form->AddError('ErrorPermission');
             } else if ($UserID == 0) {
                $this->Form->AddError('ErrorCredentials');
+                Logger::event(
+                   'signin_failure',
+                   LogLevel::WARNING,
+                   '{InsertName} failed to signed in. Authentication Denied'
+                );
             }
 
             if ($UserID > 0) {

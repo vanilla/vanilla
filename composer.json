@@ -1,0 +1,17 @@
+{
+    "name": "vanilla/vanilla",
+    "description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com"
+        }
+    ],
+    "require": {
+
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "1.5.*"
+   }
+}

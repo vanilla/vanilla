@@ -686,7 +686,11 @@ class Gdn_Statistics extends Gdn_Plugin {
       $EmbedViews = 0;
 
       try {
-         if (C('Garden.Analytics.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
+         if (
+            C('Garden.Analytics.Views.Denormalize', FALSE) &&
+            Gdn::Cache()->ActiveEnabled() &&
+            Gdn::Cache()->Type() != Gdn_Cache::CACHE_TYPE_NULL)
+         {
             $CacheKey = "QueryCache.Analytics.CountViews";
 
             // Increment. If not success, create key.

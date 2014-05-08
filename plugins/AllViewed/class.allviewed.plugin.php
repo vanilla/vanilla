@@ -3,7 +3,7 @@
 /**
  * 'All Viewed' plugin for Vanilla Forums.
  *
- * v1.2 
+ * v1.2
  * - Fixed "New" count jumping back to "Total" (rather than 1) after new comment if user hadn't actually viewed a discussion.
  * - Removed spurious config checks and &s
  * v1.3
@@ -14,17 +14,20 @@
  * - Reimplemented using UserCategory's DateMarkedRead column
  * - Added Mark Category Read
  * - Redirects to previous page instead of /discussions
- *
+ * v2.1
+ * - Added SpMarkAllViewed and SpMarkCategoryViewed sprites to links
+ * - Cleaned up formatting to match majority
+ * 
  * @copyright 2009 Vanilla Forums Inc.
  * @author Matt Lincoln Russell <lincoln@vanillaforums.com>
  * @author Oliver Chung <shoat@cs.washington.edu>
  * @package AllViewed
  */
- 
+
 $PluginInfo['AllViewed'] = array(
 	'Name' => 'All Viewed',
 	'Description' => 'Allows users to mark all discussions as viewed and mark category viewed.',
-	'Version' => '2.0',
+	'Version' => '2.1',
 	'Author' => "Matt Lincoln Russell, Oliver Chung",
 	'AuthorEmail' => 'lincoln@vanillaforums.com, shoat@cs.washington.edu',
 	'AuthorUrl' => 'http://lincolnwebs.com',
@@ -38,21 +41,21 @@ $PluginInfo['AllViewed'] = array(
  * @package AllViewed
  */
 class AllViewedPlugin extends Gdn_Plugin {
-   
-   /**
-    * Adds "Mark All Viewed" to main menu.
-    *
-    * @since 1.0
-    * @access public
-    */
-   public function Base_Render_Before($Sender) {
-      // Add "Mark All Viewed" to main menu
-      if ($Sender->Menu && Gdn::Session()->IsValid()) {
-         if (C('Plugins.AllViewed.ShowInMenu', TRUE))
-            $Sender->Menu->AddLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
-      }
-   }
-   
+	/**
+	* Adds "Mark All Viewed" to main menu.
+	*
+	* @since 1.0
+	* @access public
+	*/
+	public function Base_Render_Before($Sender) {
+		// Add "Mark All Viewed" to main menu
+		if ($Sender->Menu && Gdn::Session()->IsValid()) {
+			if (C('Plugins.AllViewed.ShowInMenu', TRUE)) {
+				$Sender->Menu->AddLink('AllViewed', T('Mark All Viewed'), '/discussions/markallviewed');
+			}
+		}
+	}
+
 	/**
 	 * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to MeModule menu.
 	 *
@@ -62,16 +65,17 @@ class AllViewedPlugin extends Gdn_Plugin {
 	public function MeModule_FlyoutMenu_Handler($Sender) {
 		// Add "Mark All Viewed" to menu
 		if (Gdn::Session()->IsValid()) {
-         echo Wrap(Anchor(T('Mark All Viewed'), '/discussions/markallviewed'), 'li', array('class' => 'MarkAllViewed'));
-         
+			echo Wrap(Anchor(Sprite('SpMarkAllViewed').' '.T('Mark All Viewed'), '/discussions/markallviewed'), 'li', array('class' => 'MarkAllViewed'));
+
 			$CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
-			if ($CategoryID > 0)
-            echo Wrap(Anchor(T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
+			if ($CategoryID > 0) {
+				echo Wrap(Anchor(Sprite('SpMarkCategoryViewed').' '.T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
+			}
 		}
 	}
-   
+
 	/**
-	 * Helper function that actually sets the DateMarkedRead column in UserCategory 
+	 * Helper function that actually sets the DateMarkedRead column in UserCategory
 	 *
 	 * @since 2.0
 	 * @access private
@@ -83,17 +87,17 @@ class AllViewedPlugin extends Gdn_Plugin {
 	/**
 	 * Allows user to mark all discussions in a specified category as viewed.
 	 *
-    * @param DiscussionsController $Sender
+	 * @param DiscussionsController $Sender
 	 * @since 1.0
 	 * @access public
 	 */
 	public function DiscussionsController_MarkCategoryViewed_Create($Sender, $CategoryID) {
 		if (strlen($CategoryID) > 0 && (int)$CategoryID > 0) {
-         $CategoryModel = new CategoryModel();
+			$CategoryModel = new CategoryModel();
 			$this->MarkCategoryRead($CategoryModel, $CategoryID);
 			$this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array($CategoryID));
 		}
-      
+
 		Redirect(Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER'));
 	}
 
@@ -146,12 +150,13 @@ class AllViewedPlugin extends Gdn_Plugin {
 	public function GetCommentCountSince($DiscussionID, $DateAllViewed) {
 		// Only for members
 		if(!Gdn::Session()->IsValid()) return;
-		
+
 		// Validate DiscussionID
 		$DiscussionID = (int) $DiscussionID;
-		if (!$DiscussionID)
+		if (!$DiscussionID) {
 			throw new Exception('A valid DiscussionID is required in GetCommentCountSince.');
-		
+		}
+
 		// Get new comment count
 		return Gdn::Database()->SQL()
 			->From('Comment c')
@@ -171,17 +176,17 @@ class AllViewedPlugin extends Gdn_Plugin {
 			// Discussion is newer than DateAllViewed
 			return;
 		}
-		
+
 		if (Gdn_Format::ToTimestamp($Discussion->DateLastComment) <= $DateAllViewed) {
 			// Covered by AllViewed
-			$Discussion->CountUnreadComments = 0; 
+			$Discussion->CountUnreadComments = 0;
 		} elseif (Gdn_Format::ToTimestamp($Discussion->DateLastViewed) == $DateAllViewed || !$Discussion->DateLastViewed) {
 			// User clicked AllViewed. Discussion is older than click. Last comment is newer than click.
 			// No UserDiscussion record found OR UserDiscussion was set by AllViewed
 			$Discussion->CountUnreadComments = $this->GetCommentCountSince($Discussion->DiscussionID, $DateAllViewed);
 		}
 	}
-	
+
 	/**
 	 * Modify CountUnreadComments to account for DateAllViewed.
 	 *
@@ -195,13 +200,13 @@ class AllViewedPlugin extends Gdn_Plugin {
 	public function DiscussionModel_SetCalculatedFields_Handler($Sender) {
 		// Only for members
 		if (!Gdn::Session()->IsValid()) return;
-		
+
 		// Recalculate New count with each category's DateMarkedRead
 		$Discussion = &$Sender->EventArguments['Discussion'];
-      $Category = CategoryModel::Categories($Discussion->CategoryID);
-      $CategoryLastDate = Gdn_Format::ToTimestamp($Category["DateMarkedRead"]);
-      if ($CategoryLastDate != 0)
-         $this->CheckDiscussionDate($Discussion, $CategoryLastDate);
-      
+		$Category = CategoryModel::Categories($Discussion->CategoryID);
+		$CategoryLastDate = Gdn_Format::ToTimestamp($Category["DateMarkedRead"]);
+		if ($CategoryLastDate != 0) {
+			$this->CheckDiscussionDate($Discussion, $CategoryLastDate);
+		}
 	}
 }

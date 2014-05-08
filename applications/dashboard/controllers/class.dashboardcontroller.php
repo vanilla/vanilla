@@ -37,6 +37,7 @@ class DashboardController extends Gdn_Controller {
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('magnific-popup.min.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('global.js');
 
       if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {

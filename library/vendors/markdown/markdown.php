@@ -67,8 +67,14 @@ function Markdown($text) {
 		$parser = new $parser_class;
 	}
 
-	# Transform text using parser.
-	return $parser->transform($text);
+   # Transform text using parser.
+   $text = $parser->transform($text);
+
+   // VANILLA HACK FOR NEWLINES
+   if (C('Markdown.PreserveNewlines', TRUE)) {
+      $text = FixNl2Br(nl2br($text));
+   }
+   return $text;
 }
 
 

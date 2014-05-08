@@ -1,3 +1,5 @@
+_Cloning to your production site? Checkout the 2.1 branch! It's our vetted stable release._
+
 ![Vanilla](http://cdn.vanillaforums.com/vanilla-black-logo-400.svg)
 
 ## Howdy, Stranger!

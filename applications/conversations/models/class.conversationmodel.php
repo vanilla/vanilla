@@ -730,11 +730,13 @@ class ConversationModel extends Gdn_Model {
    /**
     * Are we allowed to add more recipients?
     *
+    * If we pass $CountRecipients then $ConversationID isn't needed (set to zero).
+    *
     * @param $ConversationID int Unique ID of the conversation.
     * @param $CountRecipients int Optionally skip needing to query the count by passing it.
     * @return bool Whether user may add more recipients to conversation.
     */
-   public function AddUserAllowed($ConversationID, $CountRecipients = 0) {
+   public function AddUserAllowed($ConversationID = 0, $CountRecipients = 0) {
       // Determine whether recipients can be added
       $CanAddRecipients = TRUE;
       $MaxCount = C('Conversations.MaxRecipients');

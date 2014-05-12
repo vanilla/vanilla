@@ -15,6 +15,8 @@ class AddPeopleModule extends Gdn_Module {
 
    public $Conversation;
    public $Form;
+
+   /** @var bool Whether user is allowed to use this form. */
    public $AddUserAllowed = TRUE;
 
    public function __construct($Sender = '') {

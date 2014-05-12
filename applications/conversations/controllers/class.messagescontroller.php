@@ -86,6 +86,7 @@ class MessagesController extends ConversationsController {
 
       // Set recipient limit
       if (!CheckPermission('Garden.Moderation.Manage') && C('Conversations.MaxRecipients')) {
+         $this->AddDefinition('MaxRecipients', C('Conversations.MaxRecipients'));
          $this->SetData('MaxRecipients', C('Conversations.MaxRecipients'));
       }
 

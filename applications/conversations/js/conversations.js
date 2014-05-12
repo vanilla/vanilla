@@ -110,10 +110,10 @@ jQuery(document).ready(function($) {
            $author.tokenInput(gdn.url('/user/tagsearch'), {
                hintText: gdn.definition("TagHint", "Start to type..."),
                tokenValue: 'name',
+               tokenLimit: gdn.definition('MaxRecipients', null),
                searchingText: '', // search text gives flickery ux, don't like
                searchDelay: 300,
                minChars: 1,
-               maxLength: 25,
                zindex: 9999,
                prePopulate: author,
                animateDropdown: false

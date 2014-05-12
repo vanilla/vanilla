@@ -728,6 +728,33 @@ class ConversationModel extends Gdn_Model {
    }
 
    /**
+    * Are we allowed to add more recipients?
+    *
+    * @param $ConversationID int Unique ID of the conversation.
+    * @param $CountRecipients int Optionally skip needing to query the count by passing it.
+    * @return bool Whether user may add more recipients to conversation.
+    */
+   public function AddUserAllowed($ConversationID, $CountRecipients = 0) {
+      // Determine whether recipients can be added
+      $CanAddRecipients = TRUE;
+      $MaxCount = C('Conversations.MaxRecipients');
+
+      // Avoid a query if we already know we can add. MaxRecipients being unset means unlimited.
+      if ($MaxCount && !CheckPermission('Garden.Moderation.Manage')) {
+         if (!$CountParticipants) {
+            // Count current recipients
+            $ConversationModel = new ConversationModel();
+            $CountRecipients = $ConversationModel->GetRecipients($ConversationID);
+         }
+
+         // Add 1 because sender counts as a recipient.
+         $CanAddRecipients = ($CountRecipients < ($MaxCount+1));
+      }
+
+      return $CanAddRecipients;
+   }
+
+   /**
     * Update the count of participants.
     * @param type $ConversationID
     */

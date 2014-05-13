@@ -3056,7 +3056,7 @@ if (!function_exists('SaveToConfig')) {
     *  - string: The key to save.
     *  - array: An array of key/value pairs to save.
     * @param mixed|null $Value The value to save.
-    * @param array $Options An array of additional options for the save.
+    * @param array|bool $Options An array of additional options for the save.
     *  - Save: If this is false then only the in-memory config is set.
     *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
     * @return bool: Whether or not the save was successful. NULL if no changes were necessary.

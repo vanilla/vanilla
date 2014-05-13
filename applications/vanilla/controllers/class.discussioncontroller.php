@@ -243,6 +243,16 @@ class DiscussionController extends VanillaController {
       $this->AddDefinition('DiscussionID', $DiscussionID);
 
       $this->FireEvent('BeforeDiscussionRender');
+
+      $this->AddCssFile('vanillicon.css', 'static');
+      $AttachmentModel = AttachmentModel::Instance();
+      $AttachmentModel->JoinAttachments($this->Data['Discussion'], $this->Data['Comments']);
+
+      $this->FireEvent('FetchAttachmentViews');
+      if ($this->DeliveryMethod() === DELIVERY_METHOD_XHTML) {
+         require_once $this->FetchViewLocation('attachment', 'attachments', 'dashboard');
+      }
+
       $this->Render();
    }
 

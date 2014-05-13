@@ -1,4 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ */
+
+if (!defined('APPLICATION')) {
+   exit();
+}
 
 /**
  * Format content of comment or discussion.
@@ -144,6 +152,9 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
             <?php
             $Sender->FireEvent('AfterCommentBody');
             WriteReactions($Comment);
+            if (GetValue('Attachments', $Comment)) {
+               WriteAttachments($Comment->Attachments);
+            }
             ?>
          </div>
       </div>

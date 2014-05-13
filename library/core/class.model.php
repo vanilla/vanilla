@@ -336,7 +336,7 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function FilterForm($Data) {
       $Data = array_diff_key($Data, array('Attributes' => 0, 'DateInserted' => 0, 'InsertUserID' => 0, 'InsertIPAddress' => 0,
-            'DateUpdated' => 0, 'UpdateUserID' => 0, 'UpdateIPAddress' => 0));
+            'DateUpdated' => 0, 'UpdateUserID' => 0, 'UpdateIPAddress' => 0, 'Format' => 0));
       return $Data;
    }
 

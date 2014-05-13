@@ -1,10 +1,5 @@
 jQuery(document).ready(function($) {
 
-   if ($.autogrow)
-      $('textarea.TextBox').livequery(function() {
-         $(this).autogrow();
-      });
-
    // Hijack comment form button clicks
    $('#CommentForm :submit').click(function() {
       var btn = this;

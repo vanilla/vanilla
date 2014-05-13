@@ -610,7 +610,7 @@ class Gdn_Format {
 
    /**
     * Return the default input formatter.
-    * 
+    *
     * @param bool|null $is_mobile Whether or not you want the format for mobile browsers.
     * @return string
     */
@@ -1040,7 +1040,24 @@ class Gdn_Format {
       return $Mixed;
    }
 
-   protected static function LinksCallback($Matches) {
+    /**
+     * Transform match to HTML embedded equivalent.
+     *
+     * URLs are typically matched against, which are then translated into their
+     * equivalent embed, if supported. There is a universal config to disable
+     * automatic embedding.
+     *
+     * @param arr $Matches Captured and grouped matches against string.
+     * @return string
+     */
+    protected static function LinksCallback($Matches) {
+
+      // Do not process the match if embeds are disabled. Simply return the
+      // original string.
+      if (C('Garden.Format.DisableUrlEmbeds')) {
+         return $Matches[0];
+      }
+
       static $Width, $Height, $InTag = 0, $InAnchor = FALSE;
       if (!isset($Width)) {
          list($Width, $Height) = Gdn_Format::GetEmbedSize();

@@ -19,7 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @since 2.0.0
  * @package Conversations
  */
-class ConversationModel extends Gdn_Model {
+class ConversationModel extends ConversationsModel {
    /**
     * Class constructor. Defines the related database table name.
     *
@@ -478,6 +478,7 @@ class ConversationModel extends Gdn_Model {
       if (
          $this->Validate($FormPostValues)
          && $MessageModel->Validate($FormPostValues)
+         && !$this->CheckForSpam()
       ) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that relate to the schema
 
@@ -743,14 +744,14 @@ class ConversationModel extends Gdn_Model {
 
       // Avoid a query if we already know we can add. MaxRecipients being unset means unlimited.
       if ($MaxCount && !CheckPermission('Garden.Moderation.Manage')) {
-         if (!$CountParticipants) {
+         if (!$CountRecipients) {
             // Count current recipients
             $ConversationModel = new ConversationModel();
             $CountRecipients = $ConversationModel->GetRecipients($ConversationID);
          }
 
          // Add 1 because sender counts as a recipient.
-         $CanAddRecipients = ($CountRecipients < ($MaxCount+1));
+         $CanAddRecipients = (count($CountRecipients) < ($MaxCount+1));
       }
 
       return $CanAddRecipients;

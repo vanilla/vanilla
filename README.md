@@ -1,3 +1,5 @@
+_Cloning to your production site? Checkout the 2.1 branch! It's our vetted stable release._
+
 ![Vanilla](http://cdn.vanillaforums.com/vanilla-black-logo-400.svg)
 
 ## Howdy, Stranger!
@@ -88,7 +90,7 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 
 ## Getting Help
 
-* [Troubleshooting upgrades & installs](http://codex.vanillaforums.com/developers/troubleshooting/)
+* [Troubleshooting upgrades & installs](http://docs.vanillaforums.com/developers/troubleshooting/)
 * [Official documentation](http://docs.vanillaforums.com)
 * [Vanilla community forums](http://vanillaforums.org/discussions)
 * [Official cloud hosting with professional support & migration services](http://vanillaforums.com/plans)

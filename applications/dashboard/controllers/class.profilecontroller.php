@@ -1343,7 +1343,7 @@ class ProfileController extends Gdn_Controller {
 
          // Show invitations?
          if (C('Garden.Registration.Method') == 'Invitation')
-            $this->AddProfileTab(T('Invitations'), 'profile/invitations', 'InvitationsLink');
+            $this->AddProfileTab(T('Invitations'), 'profile/invitations', 'InvitationsLink', Sprite('SpInvitations').' '.T('Invitations'));
 
          $this->FireEvent('AddProfileTabs');
       }

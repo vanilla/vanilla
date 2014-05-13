@@ -107,15 +107,13 @@ class TwitterPlugin extends Gdn_Plugin {
          if (!$this->SocialSignIn())
             return;
 
-         $ImgSrc = Asset('/plugins/Twitter/design/twitter-signin.png');
-         $ImgAlt = T('Sign In with Twitter');
-            $SigninHref = $this->_AuthorizeHref();
-            $PopupSigninHref = $this->_AuthorizeHref(TRUE);
+            $Url = $this->_AuthorizeHref();
 
             // Add the twitter method to the controller.
             $TwMethod = array(
                'Name' => 'Twitter',
-               'SignInHtml' => "<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\"><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
+               'SignInHtml' => SocialSigninButton('Twitter', $Url, 'button')
+            );
 
          $Sender->Data['Methods'][] = $TwMethod;
       }
@@ -226,11 +224,9 @@ class TwitterPlugin extends Gdn_Plugin {
    }
 
 	private function _GetButton() {
-      $ImgSrc = Asset('/plugins/Twitter/design/twitter-icon.png');
-      $ImgAlt = T('Sign In with Twitter');
-      $SigninHref = $this->_AuthorizeHref();
-      $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-		return "<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"800\" popupWidth=\"800\" rel=\"nofollow\"><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
+      $Url = $this->_AuthorizeHref();
+
+      return SocialSigninButton('Twitter', $Url, 'icon');
    }
 
 	public function Authorize($Query = FALSE) {

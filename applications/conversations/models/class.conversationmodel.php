@@ -592,6 +592,13 @@ class ConversationModel extends ConversationsModel {
       $this->UpdateParticipantCount($ConversationID);
    }
 
+   /**
+    * Count unread messages.
+    *
+    * @param int $UserID Unique ID for user being queried.
+    * @param bool $Save Whether to update user record.
+    * @return int
+    */
    public function CountUnread($UserID, $Save = TRUE) {
       // Also update the unread conversation count for this user
       $CountUnread = $this->SQL
@@ -733,8 +740,8 @@ class ConversationModel extends ConversationsModel {
     *
     * If we pass $CountRecipients then $ConversationID isn't needed (set to zero).
     *
-    * @param $ConversationID int Unique ID of the conversation.
-    * @param $CountRecipients int Optionally skip needing to query the count by passing it.
+    * @param int $ConversationID Unique ID of the conversation.
+    * @param int $CountRecipients Optionally skip needing to query the count by passing it.
     * @return bool Whether user may add more recipients to conversation.
     */
    public function AddUserAllowed($ConversationID = 0, $CountRecipients = 0) {
@@ -759,7 +766,8 @@ class ConversationModel extends ConversationsModel {
 
    /**
     * Update the count of participants.
-    * @param type $ConversationID
+    *
+    * @param int $ConversationID
     */
    public function UpdateParticipantCount($ConversationID) {
       if (!$ConversationID)
@@ -775,6 +783,12 @@ class ConversationModel extends ConversationsModel {
       $this->SetField($ConversationID, 'CountParticipants', $Count);
    }
 
+   /**
+    * Update users' unread conversation counter.
+    *
+    * @param array $UserIDs Array of ints.
+    * @param bool $SkipSelf Whether to omit current user.
+    */
    public function UpdateUserUnreadCount($UserIDs, $SkipSelf = FALSE) {
 
       // Get the current user out of this array

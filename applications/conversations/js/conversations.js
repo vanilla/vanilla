@@ -103,13 +103,19 @@ jQuery(document).ready(function($) {
                author = [];
            }
 
+           // gdn.definition can't return null default because that'd be too easy
+           var maxRecipients = gdn.definition('MaxRecipients', null);
+           if (maxRecipients == 'MaxRecipients') {
+               maxRecipients = null;
+           }
+
            $author.tokenInput(gdn.url('/user/tagsearch'), {
                hintText: gdn.definition("TagHint", "Start to type..."),
                tokenValue: 'name',
+               tokenLimit: maxRecipients,
                searchingText: '', // search text gives flickery ux, don't like
                searchDelay: 300,
                minChars: 1,
-               maxLength: 25,
                zindex: 9999,
                prePopulate: author,
                animateDropdown: false
@@ -119,6 +125,12 @@ jQuery(document).ready(function($) {
 
    // Enable multicomplete on selected inputs
    $('.MultiComplete').userTokenInput();
+
+   // Hack: When tokenLimit is reached, hintText will not go away after input is clicked
+   // Force it to go away when we click the Body textarea
+   $('#Form_Body').click(function() {
+      $('.token-input-dropdown').css('display', 'none');
+   });
 
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;

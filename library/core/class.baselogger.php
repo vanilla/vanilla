@@ -56,7 +56,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function error($message, array $context = array()) {
-        $this->log(LogLevel::ALERT, $message, $context);
+        $this->log(LogLevel::ERROR, $message, $context);
     }
 
     /**

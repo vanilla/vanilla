@@ -10,9 +10,7 @@
 
    if ($this->Data('MaxRecipients')) {
       echo '<div class="Info">';
-         echo Plural($this->Data('MaxRecipients'),
-            T('Conversations MaxRecipients message singular', "You are limited to %s recipient."),
-            T('Conversations MaxRecipients message plural', "You are limited to %s recipients."));
+      echo Plural($this->Data('MaxRecipients'), "You are limited to %s recipient.", "You are limited to %s recipients.");
       echo '</div>';
    }
 

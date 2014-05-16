@@ -107,8 +107,8 @@ class MessagesController extends ConversationsController {
             // Reuse the Info message now as an error.
             $this->Form->AddError(sprintf(
                Plural($this->Data('MaxRecipients'),
-                  T('Conversations MaxRecipients message singular', "You are limited to %s recipient."),
-                  T('Conversations MaxRecipients message plural', "You are limited to %s recipients.")),
+                  "You are limited to %s recipient.",
+                  "You are limited to %s recipients."),
                C('Conversations.MaxRecipients')
             ));
          }

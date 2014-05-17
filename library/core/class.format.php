@@ -1089,6 +1089,7 @@ class Gdn_Format {
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
+      $GooglePlusUrlMatch =  'https?://plus.google.com/([\d]+)/posts/(\w+)';
 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)
@@ -1159,6 +1160,15 @@ EOT;
          $Result = <<<EOT
 <iframe src="//embed.gettyimages.com/embed/{$Matches[2]}" width="{$Matches[3]}" height="{$Matches[4]}" frameborder="0" scrolling="no"></iframe>
 EOT;
+
+	//Google+
+	//https://developers.google.com/+/web/embedded-post/
+	} elseif (preg_match("`({$GooglePlusUrlMatch})`", $Url, $Matches) && C('Garden.Format.GooglePlus', true)) {
+	echo '<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>'; //must be called in the head or before body
+	$Result = <<<EOT
+<div class="g-post" data-href="https://plus.google.com/{$Matches[2]}/posts/{$Matches[3]}"></div>
+EOT;
+
 
       // Unformatted links
       } elseif (!self::$FormatLinks) {

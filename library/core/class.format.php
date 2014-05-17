@@ -1089,6 +1089,7 @@ class Gdn_Format {
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
+      $GistUrlMatch = 'https?://(gist\.)?github.com\/(\w+)\/(\w+)';
 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)
@@ -1159,6 +1160,14 @@ EOT;
          $Result = <<<EOT
 <iframe src="//embed.gettyimages.com/embed/{$Matches[2]}" width="{$Matches[3]}" height="{$Matches[4]}" frameborder="0" scrolling="no"></iframe>
 EOT;
+
+
+   //Gist
+        } elseif (preg_match("`({$GistUrlMatch})`", $Url, $Matches) && C('Garden.Format.Gist', true)) {
+	  $Result = <<<EOT
+<script src="https://gist.github.com/{$Matches[3]}/{$Matches[4]}.js"></script>
+EOT;
+
 
       // Unformatted links
       } elseif (!self::$FormatLinks) {

@@ -19,7 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @since 2.0.0
  * @package Conversations
  */
-class ConversationMessageModel extends Gdn_Model {
+class ConversationMessageModel extends ConversationsModel {
    /**
     * Class constructor. Defines the related database table name.
     * 
@@ -184,7 +184,7 @@ class ConversationMessageModel extends Gdn_Model {
       
       // Validate the form posted values
       $MessageID = FALSE;
-      if($this->Validate($FormPostValues)) {
+      if($this->Validate($FormPostValues) && !$this->CheckForSpam()) {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
          TouchValue('Format', $Fields, C('Garden.InputFormatter', 'Html'));
          

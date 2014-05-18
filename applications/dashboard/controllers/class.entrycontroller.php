@@ -342,6 +342,13 @@ class EntryController extends Gdn_Controller {
             Redirect($Url, 302);
          else {
             $this->SetData('Url', $Url);
+            $Script = <<<EOT
+<script type="text/javascript">
+   window.location = "$Url";
+</script>
+EOT;
+
+
             $this->Render('Redirect', 'Utility');
             die();
          }

@@ -247,6 +247,11 @@ class DashboardHooks implements Gdn_IPlugin {
 
       $sender->addGroup('etc', array('sort' => 100));
       if (Gdn::Session()->IsValid()) {
+         // Switch between the full site and mobile.
+         if (IsMobile()) {
+            $sender->addLink('etc.nomobile', array('text' => t('Full Site'), 'url' => '/profile/nomobile', 'icon' => icon('resize-full'), 'sort' => 100));
+         }
+
          $sender->addLink('etc.signout', array('text' => t('Sign Out'), 'url' => SignOutUrl(), 'icon' => icon('signout'), 'sort' => 100));
       } else {
          $sender->addLink('etc.signin', array('text' => t('Sign In'), 'url' => SignInUrl(), 'icon' => icon('signin'), 'sort' => 100));

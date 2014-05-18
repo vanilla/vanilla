@@ -1944,7 +1944,11 @@ class DiscussionModel extends VanillaModel {
     */
 	public function AddView($DiscussionID) {
       $IncrementBy = 0;
-      if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
+      if (
+         C('Vanilla.Views.Denormalize', FALSE) &&
+         Gdn::Cache()->ActiveEnabled() &&
+         Gdn::Cache()->Type() != Gdn_Cache::CACHE_TYPE_NULL)
+      {
          $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
          $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);
 

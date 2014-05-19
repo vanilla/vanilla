@@ -6,8 +6,8 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @copyright 2003-2014 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
  * @since 2.0
  */
@@ -2807,6 +2807,34 @@ if (!function_exists('Redirect')) {
       // re-assign the location header
       safeHeader("Location: ".Url($Destination), TRUE, $SendCode);
       // Exit
+      exit();
+   }
+}
+
+if (!function_exists('redirectUrl')) {
+   /**
+    * Redirect to a specific url that can be outside of the site.
+    *
+    * @param string $url The url to redirect to.
+    * @param int $code The http status code.
+    */
+   function redirectUrl($url, $code = 302) {
+      if (!$url) {
+         $url = Url('', true);
+      }
+
+      // Close any db connections before exit
+      $Database = Gdn::Database();
+      $Database->CloseConnection();
+      // Clear out any previously sent content
+      @ob_end_clean();
+
+      if (!in_array($code, array(301, 302))) {
+         $code = 302;
+      }
+
+      safeHeader("Location: ". $url, true, $code);
+
       exit();
    }
 }

@@ -1579,7 +1579,7 @@ class CategoryModel extends Gdn_Model {
    }
 
    /**
-    * Grab the Category IDs of the tree.
+    * Update current user's UserCategory rows for the entire tree.
     *
     * @since 2.0.18
     * @access public
@@ -1594,6 +1594,22 @@ class CategoryModel extends Gdn_Model {
             $Set,
             array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $Category['CategoryID']));
       }
+      $Key = 'UserCategory_'.Gdn::Session()->UserID;
+      Gdn::Cache()->Remove($Key);
+   }
+
+   /**
+    * Update current user's UserCategory row for a single category.
+    *
+    * @since 2.2
+    * @param int $CategoryID
+    * @param array $Set Column => NewValue
+    */
+   public function SaveUserCategory($CategoryID, $Set) {
+      $this->SQL->Replace(
+         'UserCategory',
+         $Set,
+         array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $CategoryID));
       $Key = 'UserCategory_'.Gdn::Session()->UserID;
       Gdn::Cache()->Remove($Key);
    }

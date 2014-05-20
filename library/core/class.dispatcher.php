@@ -629,6 +629,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                      if (!in_array($Application, $this->EnabledApplicationFolders()))
                         return false;
                      break;
+                  default:
+                     return false;
                }
 
 

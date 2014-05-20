@@ -599,7 +599,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
 
       $ControllerName = $Controller.'Controller';
-      $ControllerPath = Gdn_Autoloader::Lookup($ControllerName);
+      $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('MapType' => NULL));
 
       try {
 
@@ -629,8 +629,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                array_pop($InterimPath); // Get rid of the end. Useless;
                $InterimPath = explode('/', trim(array_pop($InterimPath)));
                $Application = array_pop($InterimPath);
-               if (!in_array($Application, $this->EnabledApplicationFolders()))
-                  return false;
+               $AddonType = array_pop($InterimPath);
+               switch ($AddonType) {
+                  case 'plugins':
+                     if (!in_array($Application, Gdn::PluginManager()->EnabledPluginFolders()))
+                        return false;
+                     $Application = 'plugins/'.$Application;
+                     break;
+                  case 'applications':
+                     if (!in_array($Application, $this->EnabledApplicationFolders()))
+                        return false;
+                     break;
+               }
+
+
             } else {
                return false;
             }

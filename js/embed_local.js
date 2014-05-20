@@ -170,9 +170,9 @@ jQuery(document).ready(function($) {
             // Opening social sign in URLs in the main window (using _top) makes
             // sure the window.opener variable remains null when redirected
             // back to the forum.
-            var target = ($(this).hasClass('SocialIcon'))
-               ? '_top'
-               : '_blank';
+            var target = ($(this).closest('.Message').length)
+               ? '_blank'
+               : '_top';
 
             $(this).attr('target', target);
          } else if (isEmbeddedComments) {

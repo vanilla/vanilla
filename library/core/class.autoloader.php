@@ -176,7 +176,9 @@ class Gdn_Autoloader {
          
          // Drill to the caches associated with this map type
          foreach (self::$Maps as $MapHash => &$Map) {
-            if ($Map->MapType() != $MapType) continue;
+            if ($MapType !== NULL && $Map->MapType() != $MapType) {
+               continue;
+            }
             
             $MapContext = self::GetContextType($MapHash);
             if ($MapContext != $ContextType) {
@@ -249,7 +251,7 @@ class Gdn_Autoloader {
       if (!preg_match("/^[a-zA-Z0-9_\x7f-\xff]*$/", $ClassName))
          return;
       
-      $MapType = self::GetMapType($ClassName);
+      $MapType = GetValue('MapType', $Options, self::GetMapType($ClassName));
       
       $DefaultOptions = array(
          'Quiet'              => FALSE,

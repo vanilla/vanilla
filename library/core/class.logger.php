@@ -66,7 +66,7 @@ class Logger {
             'InsertIPAddress'=> Gdn::Request()->IpAddress(),
             'TimeInserted'=> time(),
             'LogLevel' => $level,
-            'Domain' => Url('/', '//'),
+            'Domain' => Url('/', true),
             'Path' => Url('', '/')
         );
         $context = $context + $defaults;

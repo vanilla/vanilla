@@ -485,8 +485,7 @@ class Gdn_Session {
          Logger::event(
             'csrf_failure',
             LogLevel::ERROR,
-            'Invalid Transient Key.',
-            array('Url' => Url('', '/'))
+            'Invalid Transient Key.'
          );
       }
       return $Return;

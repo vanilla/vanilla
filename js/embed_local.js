@@ -155,21 +155,8 @@ jQuery(document).ready(function($) {
             noTop = $(this).hasClass('SignOut') || $(this).hasClass('NoTop');
 
          if (isHttp && href.substr(0, webroot.length) != webroot) {
-            // If clicking through social sign in icons, they are normally
-            // opened in a new tab. Opening them in a new tab/window means that
-            // window.opener will be set, which prevents the forum from
-            // forcing its content to appear only within the embedded version,
-            // when redirected back, due to the inPopup variable. This means
-            // a forum that is supposed to always appear in its embedded state,
-            // will suddenly not be embedded after successfully authenticating
-            // and being redirected to the callback URI; that callback URI
-            // location is supposed to be forcefully redirected to the
-            // designated URL in the embed settings, but it is not, because
-            // window.opener is not null.
-            //
-            // Opening social sign in URLs in the main window (using _top) makes
-            // sure the window.opener variable remains null when redirected
-            // back to the forum.
+            // Make sure the social sign in links are opened within the topmost
+            // window instead of a new window, otherwise forced embed problem.
             var target = ($(this).closest('.Message').length)
                ? '_blank'
                : '_top';

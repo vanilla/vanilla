@@ -58,14 +58,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    private $_AssetCollection;
 
    /**
-    * The name of the controller folder that contains the controller that has
-    * been requested.
-    *
-    * @var string
-    */
-   public $ControllerFolder;
-
-   /**
     * The name of the controller to be dispatched.
     *
     * @var string
@@ -126,7 +118,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->Request = '';
       $this->_ApplicationFolder = '';
       $this->_AssetCollection = array();
-      $this->ControllerFolder = '';
       $this->ControllerName = '';
       $this->ControllerMethod = '';
       $this->_ControllerMethodArgs = array();
@@ -304,7 +295,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Pass in the querystring values
          $Controller->ApplicationFolder = $this->_ApplicationFolder;
          $Controller->Application = $this->EnabledApplication();
-         $Controller->ControllerFolder = $this->ControllerFolder;
          $Controller->RequestMethod = $this->ControllerMethod;
          $Controller->RequestArgs = $this->_ControllerMethodArgs;
          $Controller->Request = $Request;
@@ -456,7 +446,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       // Clear the slate
       $this->_ApplicationFolder = '';
-      $this->ControllerFolder = '';
       $this->ControllerName = '';
       $this->ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
@@ -662,7 +651,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
          $this->ControllerName = $Controller;
          $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
-         $this->ControllerFolder = '';
 
          $Length = sizeof($Parts);
          if ($Length > $ControllerKey + 1)

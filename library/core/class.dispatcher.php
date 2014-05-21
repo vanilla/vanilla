@@ -148,7 +148,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       return $this->ControllerMethod;
    }
 
-   public function ControllerArguments() {
+   public function ControllerArguments($Value = NULL) {
+      if ($Value !== NULL) {
+         $this->_ControllerMethodArgs = $Value;
+      }
       return $this->_ControllerMethodArgs;
    }
 

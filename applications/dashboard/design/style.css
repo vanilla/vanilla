@@ -1422,12 +1422,6 @@ overflow: hidden;
 .PanelInfo .Meta {
    font-size: 11px;
 }
-.PanelInfo .Username {
-   display: block;
-   overflow: hidden;
-   white-space: nowrap;
-   text-overflow: ellipsis;
-}
 /*
 .PanelInfo .Meta span,
 .PanelInfo .Meta strong {

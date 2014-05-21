@@ -386,12 +386,22 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ApplicationFolder == '')
          $ApplicationFolder = $this->_ApplicationFolder;
 
-      foreach (Gdn::ApplicationManager()->AvailableApplications() as $ApplicationName => $ApplicationInfo) {
-         if (GetValue('Folder', $ApplicationInfo, FALSE) === $ApplicationFolder) {
-            $EnabledApplication = $ApplicationName;
-            $this->EventArguments['EnabledApplication'] = $EnabledApplication;
-            $this->FireEvent('AfterEnabledApplication');
-            return $EnabledApplication;
+      if (strpos($ApplicationFolder, 'plugins/') === 0) {
+         $Plugin = StringBeginsWith($ApplicationFolder, 'plugins/', FALSE, TRUE);
+
+         if (array_key_exists($Plugin, Gdn::PluginManager()->AvailablePlugins())) {
+            return $Plugin;
+         }
+
+         return FALSE;
+      } else {
+         foreach (Gdn::ApplicationManager()->AvailableApplications() as $ApplicationName => $ApplicationInfo) {
+            if (GetValue('Folder', $ApplicationInfo, FALSE) === $ApplicationFolder) {
+               $EnabledApplication = $ApplicationName;
+               $this->EventArguments['EnabledApplication'] = $EnabledApplication;
+               $this->FireEvent('AfterEnabledApplication');
+               return $EnabledApplication;
+            }
          }
       }
       return FALSE;

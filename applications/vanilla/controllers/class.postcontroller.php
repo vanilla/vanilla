@@ -46,7 +46,7 @@ class PostController extends VanillaController {
     * @access public
     */
    public function Index($CurrentFormName = 'discussion') {
-      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('autosave.js');
       $this->AddJsFile('post.js');
 
@@ -98,7 +98,7 @@ class PostController extends VanillaController {
          $CategoryUrlCode = '';
 
       // Setup head
-      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('autosave.js');
       $this->AddJsFile('post.js');
 
@@ -504,7 +504,7 @@ class PostController extends VanillaController {
       $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion);
 
       // Setup head
-      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('autosave.js');
       $this->AddJsFile('post.js');
 

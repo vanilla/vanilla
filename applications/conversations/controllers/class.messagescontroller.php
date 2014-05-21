@@ -84,6 +84,12 @@ class MessagesController extends ConversationsController {
       $this->Permission('Conversations.Conversations.Add');
       $this->Form->SetModel($this->ConversationModel);
 
+      // Set recipient limit
+      if (!CheckPermission('Garden.Moderation.Manage') && C('Conversations.MaxRecipients')) {
+         $this->AddDefinition('MaxRecipients', C('Conversations.MaxRecipients'));
+         $this->SetData('MaxRecipients', C('Conversations.MaxRecipients'));
+      }
+
       if ($this->Form->AuthenticatedPostBack()) {
          $RecipientUserIDs = array();
          $To = explode(',', $this->Form->GetFormValue('To', ''));
@@ -94,6 +100,17 @@ class MessagesController extends ConversationsController {
                if (is_object($User))
                   $RecipientUserIDs[] = $User->UserID;
             }
+         }
+
+         // Enforce MaxRecipients
+         if (!$this->ConversationModel->AddUserAllowed(0, count($RecipientUserIDs))) {
+            // Reuse the Info message now as an error.
+            $this->Form->AddError(sprintf(
+               Plural($this->Data('MaxRecipients'),
+                  "You are limited to %s recipient.",
+                  "You are limited to %s recipients."),
+               C('Conversations.MaxRecipients')
+            ));
          }
 
          $this->EventArguments['Recipients'] = $RecipientUserIDs;

@@ -52,6 +52,11 @@ textarea, input[type=text] {
    box-sizing: border-box;
 }
 
+.textarea-autosize {
+   transition: height 0.1s ease;
+   resize: none !important;
+}
+
 /* Elements that are disabled, make sure they reflect that with UX feedback. */
 [disabled] {
    opacity: 0.50;

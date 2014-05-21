@@ -3,23 +3,6 @@ jQuery(document).ready(function($) {
        $.post(gdn.url('/post/notifynewdiscussion?discussionid='+gdn.definition('DiscussionID', '')));
 /* Comment Form */
 
-   var attachAutogrow = function () {
-         // Bail out if autogrow isn't available
-         if (!$.fn.autogrow) return;
-
-         $('textarea.TextBox').autogrow();
-      },
-      // These are the events that will trigger an autogrow attachment
-      autogrowTriggers = [
-         'EditCommentFormLoaded' // When a user clicks "Edit Comment"
-      ];
-
-   // Attach autogrow to textareas available at document ready
-   attachAutogrow();
-
-   // Attach autogrow whenever a trigger is, well, triggered
-   $(document).on(autogrowTriggers.join(' '), attachAutogrow);
-
    // Hide it if they leave the area without typing
    $('div.CommentForm textarea').blur(function(ev) {
       var Comment = $(ev.target).val();

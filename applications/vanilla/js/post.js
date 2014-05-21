@@ -1,12 +1,5 @@
 jQuery(document).ready(function($) {
 
-   // Since there are no dynamically loaded textareas on the "Post" page, we
-   // can attach autogrow as soon as the document is ready and not worry about
-   // having to attach it again later on.
-   if ($.fn.autogrow) {
-      $('textarea.TextBox').autogrow();
-   }
-
    // Hijack comment form button clicks
    $('#CommentForm :submit').click(function() {
       var btn = this;

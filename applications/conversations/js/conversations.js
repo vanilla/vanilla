@@ -6,13 +6,6 @@ jQuery(document).ready(function($) {
       followConfirm: false
    });
 
-   // Since there are no dynamically loaded textareas on the "Conversations"
-   // page, we can attach autogrow as soon as the document is ready and not
-   // worry about having to attach it again later on.
-   if ($.fn.autogrow) {
-      $('textarea.MessageBox, textarea.TextBox').autogrow();
-   }
-
    // Hijack "add message" clicks and handle via ajax...
    $.fn.handleMessageForm = function() {
       this.click(function() {
@@ -110,13 +103,19 @@ jQuery(document).ready(function($) {
                author = [];
            }
 
+           // gdn.definition can't return null default because that'd be too easy
+           var maxRecipients = gdn.definition('MaxRecipients', null);
+           if (maxRecipients == 'MaxRecipients') {
+               maxRecipients = null;
+           }
+
            $author.tokenInput(gdn.url('/user/tagsearch'), {
                hintText: gdn.definition("TagHint", "Start to type..."),
                tokenValue: 'name',
+               tokenLimit: maxRecipients,
                searchingText: '', // search text gives flickery ux, don't like
                searchDelay: 300,
                minChars: 1,
-               maxLength: 25,
                zindex: 9999,
                prePopulate: author,
                animateDropdown: false
@@ -126,6 +125,12 @@ jQuery(document).ready(function($) {
 
    // Enable multicomplete on selected inputs
    $('.MultiComplete').userTokenInput();
+
+   // Hack: When tokenLimit is reached, hintText will not go away after input is clicked
+   // Force it to go away when we click the Body textarea
+   $('#Form_Body').click(function() {
+      $('.token-input-dropdown').css('display', 'none');
+   });
 
    $('#Form_AddPeople :submit').click(function() {
       var btn = this;

@@ -12,12 +12,13 @@ if (!function_exists('WriteAttachment')) {
     * @return string
     */
    function WriteAttachment($Attachment) {
-      if (GetValue('Error', $Attachment)) {
-         Write_Error_Attachment($Attachment);
-         return;
-      }
+
       $customMethod = AttachmentModel::GetWriteAttachmentMethodName($Attachment['Type']);
       if (function_exists($customMethod)) {
+         if (GetValue('Error', $Attachment)) {
+            Write_Error_Attachment($Attachment);
+            return;
+         }
          $customMethod($Attachment);
       } else {
          Trace($customMethod, 'Write Attachment method not found');

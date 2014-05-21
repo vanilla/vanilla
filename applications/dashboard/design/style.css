@@ -90,7 +90,7 @@ body.NarrowForm #Content {
 body.Entry #Content {
    float: none;
    margin: 0 auto;
-   max-width: 500px;
+   max-width: 600px;
 }
 
 /* ============================================== General Styles & Typography */
@@ -4179,7 +4179,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
    margin-top: 18px;
    background: #fff;
    min-width: 120px;
-   z-index: 10000;
+   z-index: 100010; /* So high because a client actually had 99999 in a theme */
    border-radius: 2px;
    overflow: hidden;
    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -4235,4 +4235,174 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
    position: relative;
    top: -2px;
    padding: 0 0 0 2px;
+}
+
+/**
+ * Socialcons
+ */
+
+.SocialIcon {
+  display: inline-block;
+  overflow: hidden;
+  font-weight: bold;
+  line-height: 24px;
+  color: #fff !important;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.SocialIcon.HasText {
+  min-width: 210px;
+  line-height: 32px;
+}
+
+.SocialIcon .Icon {
+  width: 24px;
+  height: 24px;
+}
+
+.SocialIcon.HasText .Icon {
+  width: 32px;
+  height: 32px;
+}
+
+.SocialIcon .Text {
+  padding: 0 15px 0 10px;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.SocialIcon {
+  -webkit-transition: background-color 100ms;
+     -moz-transition: background-color 100ms;
+       -o-transition: background-color 100ms;
+          transition: background-color 100ms;
+}
+
+.SocialIcon .Icon,
+.SocialIcon .Text {
+  display: block;
+  float: left;
+  vertical-align: top;
+}
+
+.SocialIcon .Icon {
+  background-image: url('images/socialcons-small.png');
+  background-repeat: no-repeat;
+  background-size: 24px 168px;
+}
+.SocialIcon.HasText .Icon {
+  background-size: 32px 224px;
+  background-image: url('images/socialcons.png');
+}
+@media
+(-webkit-min-device-pixel-ratio: 2),
+(-o-min-device-pixel-ratio: 3 / 2),
+(min-device-pixel-ratio: 2) {
+  .SocialIcon .Icon {
+    background-image: url('images/socialcons-small@2x.png');
+  }
+  .SocialIcon.HasText .Icon {
+    background-image: url('images/socialcons@2x.png');
+  }
+}
+
+.SocialIcon-Facebook .Icon {
+  background-position: 0 -24px;
+}
+.SocialIcon-Facebook.HasText .Icon {
+  background-position: 0 -32px;
+}
+.SocialIcon-Facebook,
+.SocialIcon-Facebook.HasText .Icon {
+  background-color: #36609e;
+}
+.SocialIcon-Facebook:hover {
+  background-color: #294978;
+}
+
+.SocialIcon-Twitter .Icon {
+  background-position: 0 -144px;
+}
+.SocialIcon-Twitter.HasText .Icon {
+  background-position: 0 -192px;
+}
+.SocialIcon-Twitter,
+.SocialIcon-Twitter.HasText .Icon {
+  background-color: #2aa8df;
+}
+.SocialIcon-Twitter:hover {
+  background-color: #1c8aba;
+}
+
+.SocialIcon-Google .Icon {
+  background-position: 0 -72px;
+}
+.SocialIcon-Google.HasText .Icon {
+  background-position: 0 -96px;
+}
+.SocialIcon-Google,
+.SocialIcon-Google.HasText .Icon {
+  background-color: #da5442;
+}
+.SocialIcon-Google:hover {
+  background-color: #c33926;
+}
+
+.SocialIcon-OpenID .Icon {
+  background-position: 0 -120px;
+}
+.SocialIcon-OpenID.HasText .Icon {
+  background-position: 0 -160px;
+}
+.SocialIcon-OpenID,
+.SocialIcon-OpenID.HasText .Icon {
+  background-color: #f7921c;
+}
+.SocialIcon-OpenID:hover {
+  background-color: #d87808;
+}
+
+.SocialIcon-LinkedIn .Icon {
+  background-position: 0 -96px;
+}
+.SocialIcon-LinkedIn.HasText .Icon {
+  background-position: 0 -128px;
+}
+.SocialIcon-LinkedIn,
+.SocialIcon-LinkedIn.HasText .Icon {
+  background-color: #066c9a;
+}
+.SocialIcon-LinkedIn:hover {
+  background-color: #044a69;
+}
+
+.SocialIcon-Disqus .Icon {
+  background-position: 0 0;
+}
+.SocialIcon.Disqus,
+.SocialIcon.Disqus.HasText .Icon {
+  background-color: #2e9fff;
+}
+.SocialIcon-Disqus:hover {
+  background-color: #0087fa;
+}
+
+.SocialIcon-GitHub .Icon {
+  background-position: 0 -48px;
+}
+.SocialIcon-GitHub.HasText .Icon {
+  background-position: 0 -64px;
+}
+.SocialIcon-GitHub,
+.SocialIcon-GitHub.HasText .Icon {
+  background-color: #6b9ecf;
+}
+.SocialIcon-GitHub:hover {
+  background-color: #4485c3;
+}
+
+/* Woe unto whoever caused this */
+
+.MeBox-SignIn.Inline .SocialIcon {
+  display: inline-block;
 }

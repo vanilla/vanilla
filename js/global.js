@@ -1067,7 +1067,7 @@ jQuery(document).ready(function($) {
    }
 
 	// Stash something in the user's session (or unstash the value if it was not provided)
-	stash = function(name, value) {
+	stash = function(name, value, callback) {
 		$.ajax({
 			type: "POST",
 			url: gdn.url('session/stash'),
@@ -1078,7 +1078,12 @@ jQuery(document).ready(function($) {
 			},
 			success: function(json) {
 				gdn.inform(json);
-				return json.Unstash;
+
+                if (typeof(callback) === 'function') {
+                    callback();
+                } else {
+				    return json.Unstash;
+                }
 			}
 		});
 
@@ -1086,13 +1091,21 @@ jQuery(document).ready(function($) {
 	}
 
 	// When a stash anchor is clicked, look for inputs with values to stash
-	$('a.Stash').click(function() {
-      // Embedded comments
+	$('a.Stash').click(function(e) {
+        // Embedded comments
 		var comment = $('#Form_Comment textarea').val(),
-         placeholder = $('#Form_Comment textarea').attr('placeholder'),
-         vanilla_identifier = gdn.definition('vanilla_identifier');
-		if (vanilla_identifier && comment != '' && comment != placeholder)
-			stash('CommentForForeignID_' + vanilla_identifier, comment);
+        placeholder = $('#Form_Comment textarea').attr('placeholder'),
+        vanilla_identifier = gdn.definition('vanilla_identifier');
+
+		if (vanilla_identifier && comment != '' && comment != placeholder) {
+            var href = $(this).attr('href');
+            e.preventDefault();
+
+
+			stash('CommentForForeignID_' + vanilla_identifier, comment, function() {
+                window.top.location = href;
+            });
+        }
 	});
 
    String.prototype.addCommas = function() {
@@ -1683,6 +1696,44 @@ jQuery(document).ready(function($) {
          gdn.atCompleteInit(this, '');
       });
    }
+
+
+   /**
+    * Running magnific-popup. Image tag or text must be wrapped with an anchor
+    * tag. This will render the content of the anchor tag's href. If using an
+    * image tag, the anchor tag's href can point to either the same location
+    * as the image tag, or a higher quality version of the image. If zoom is
+    * not wanted, remove the zoom and mainClass properties, and it will just
+    * load the content of the anchor tag with no special effects.
+    *
+    * @documentation http://dimsemenov.com/plugins/magnific-popup/documentation.html
+    *
+    */
+   gdn.magnificPopup = (function() {
+      if ($.fn.magnificPopup) {
+         $('.mfp-image').each(function(i, el){
+            $(el).magnificPopup({
+               type: 'image',
+               mainClass: 'mfp-with-zoom',
+               zoom: {
+                  enabled: true,
+                  duration: 300,
+                  easing: 'ease',
+                  opener: function(openerElement) {
+                    return openerElement.is('img')
+                       ? openerElement
+                       : openerElement.find('img');
+                  }
+               }
+            });
+         });
+      }
+   }());
+
+
+
+
+
 
 });
 

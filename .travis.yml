@@ -1,0 +1,23 @@
+language: php
+php:
+  - 5.5
+  - 5.4
+  - hhvm
+
+install:
+  - composer install
+
+before_script:
+  - git clone https://github.com/vanilla/addons.git
+  - vendor/bin/phpcs --config-set default_standard addons/standards/Vanilla
+
+script:
+  # Check coding standards compliance
+  - vendor/bin/phpcs ./library/core
+  - vendor/bin/phpcs ./applications
+  - vendor/bin/phpcs ./plugins
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: hhvm

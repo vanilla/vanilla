@@ -34,8 +34,8 @@ $Session = Gdn::Session();
 <div class="PageInfo">
    <h2><?php echo T('Heads up!');?></h2>
    <p>
-   <?php 
-   echo T('Spend a little time thinking about how you describe your site here.', 
+   <?php
+   echo T('Spend a little time thinking about how you describe your site here.',
       'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
    ?>
    </p>
@@ -46,7 +46,7 @@ echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->Errors();
 ?>
 <div class="Row">
-   <div class="Column Grid_50">  
+   <div class="Column Grid_50">
       <ul>
          <li>
             <?php
@@ -74,7 +74,7 @@ echo $this->Form->Errors();
             <?php
                echo $this->Form->Label('Banner Title', 'Garden.Title');
                echo Wrap(
-                     T("The banner title appears on your site's banner and in your browser's title bar.", 
+                     T("The banner title appears on your site's banner and in your browser's title bar.",
                        "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may also hide this title."),
                      'div',
                      array('class' => 'Info')
@@ -110,6 +110,32 @@ echo $this->Form->Errors();
                }
 
                echo $this->Form->Input('Logo', 'file');
+            ?>
+         </li>
+         <li>
+            <?php
+               echo $this->Form->Label('Mobile Banner Logo', 'MobileLogo');
+               echo Wrap(
+                     T('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'),
+                     'div',
+                     array('class' => 'Info')
+                  );
+
+               $MobileLogo = $this->Data('MobileLogo');
+               if ($MobileLogo) {
+                  echo Wrap(
+                     Img(Gdn_Upload::Url($MobileLogo)),
+                     'div'
+                  );
+                  echo Wrap(Anchor(T('Remove Mobile Banner Logo'), '/dashboard/settings/removemobilelogo/'.$Session->TransientKey(), 'SmallButton'), 'div', array('style' => 'padding: 10px 0;'));
+                  echo Wrap(
+                     T('MobileLogoBrowse', 'Browse for a new mobile banner logo if you would like to change it:'),
+                     'div',
+                     array('class' => 'Info')
+                  );
+               }
+
+               echo $this->Form->Input('MobileLogo', 'file');
             ?>
          </li>
          <li>
@@ -169,7 +195,7 @@ echo $this->Form->Errors();
       </ul>
    </div>
 </div>
-<?php 
+<?php
 
 echo '<div class="Buttons">'.$this->Form->Button('Save').'</div>';
 

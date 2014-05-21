@@ -32,6 +32,12 @@ class CategoryModel extends Gdn_Model {
    public static $Categories = NULL;
 
    /**
+    * Whether or not to explicitly shard the categories cache.
+    * @var bool
+    */
+   public static $ShardCache = FALSE;
+
+   /**
     * Whether or not to join the users in some calls.
     * Forums with a lot of categories may need to optimize using this setting and simpler views.
     * @var bool Whether or not to join users to recent posts.
@@ -109,7 +115,6 @@ class CategoryModel extends Gdn_Model {
             $Sql = Gdn::SQL();
             $Sql = clone $Sql;
             $Sql->Reset();
-            $Session = Gdn::Session();
 
             $Sql->Select('c.*')
                ->Select('lc.DateInserted', '', 'DateLastComment')
@@ -154,7 +159,10 @@ class CategoryModel extends Gdn_Model {
    protected static function BuildCache() {
       self::CalculateData(self::$Categories);
       self::JoinRecentPosts(self::$Categories);
-      Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+      Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(
+         Gdn_Cache::FEATURE_EXPIRY  => 600,
+         Gdn_Cache::FEATURE_SHARD   => self::$ShardCache
+      ));
    }
 
    /**
@@ -1514,7 +1522,7 @@ class CategoryModel extends Gdn_Model {
          }
 
          // Save the permissions
-         if ($AllowDiscussions && $CategoryID) {
+         if ($CategoryID) {
             // Check to see if this category uses custom permissions.
             if ($CustomPermissions) {
                $PermissionModel = Gdn::PermissionModel();

@@ -376,7 +376,7 @@ class ConversationModel extends Gdn_Model {
     */
    public static function ParticipantTitle($Conversation, $Html = TRUE, $Max = 3) {
       $Participants = GetValue('Participants', $Conversation);
-      $Total = GetValue('CountParticipants', $Conversation);
+      $Total = (int)GetValue('CountParticipants', $Conversation);
       $MyID = Gdn::Session()->UserID;
       $FoundMe = FALSE;
 
@@ -416,7 +416,7 @@ class ConversationModel extends Gdn_Model {
 
           if ($Count + 1 === $Total && $FoundMe) {
               $Result = $Px;
-          } elseif ($Total === $Count + 1) {
+          } elseif ($Total - $Count === 1) {
               $Result = sprintf(T('%s and 1 other'), $Px);
           } elseif ($Total > $Count) {
               $Result = sprintf(T('%s and %s others'), $Px, $Total - $Count);

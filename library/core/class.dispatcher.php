@@ -58,14 +58,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    private $_AssetCollection;
 
    /**
-    * The name of the controller folder that contains the controller that has
-    * been requested.
-    *
-    * @var string
-    */
-   public $ControllerFolder;
-
-   /**
     * The name of the controller to be dispatched.
     *
     * @var string
@@ -126,7 +118,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->Request = '';
       $this->_ApplicationFolder = '';
       $this->_AssetCollection = array();
-      $this->ControllerFolder = '';
       $this->ControllerName = '';
       $this->ControllerMethod = '';
       $this->_ControllerMethodArgs = array();
@@ -157,7 +148,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       return $this->ControllerMethod;
    }
 
-   public function ControllerArguments() {
+   public function ControllerArguments($Value = NULL) {
+      if ($Value !== NULL) {
+         $this->_ControllerMethodArgs = $Value;
+      }
       return $this->_ControllerMethodArgs;
    }
 
@@ -304,7 +298,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Pass in the querystring values
          $Controller->ApplicationFolder = $this->_ApplicationFolder;
          $Controller->Application = $this->EnabledApplication();
-         $Controller->ControllerFolder = $this->ControllerFolder;
          $Controller->RequestMethod = $this->ControllerMethod;
          $Controller->RequestArgs = $this->_ControllerMethodArgs;
          $Controller->Request = $Request;
@@ -396,12 +389,22 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ApplicationFolder == '')
          $ApplicationFolder = $this->_ApplicationFolder;
 
-      foreach (Gdn::ApplicationManager()->AvailableApplications() as $ApplicationName => $ApplicationInfo) {
-         if (GetValue('Folder', $ApplicationInfo, FALSE) === $ApplicationFolder) {
-            $EnabledApplication = $ApplicationName;
-            $this->EventArguments['EnabledApplication'] = $EnabledApplication;
-            $this->FireEvent('AfterEnabledApplication');
-            return $EnabledApplication;
+      if (strpos($ApplicationFolder, 'plugins/') === 0) {
+         $Plugin = StringBeginsWith($ApplicationFolder, 'plugins/', FALSE, TRUE);
+
+         if (array_key_exists($Plugin, Gdn::PluginManager()->AvailablePlugins())) {
+            return $Plugin;
+         }
+
+         return FALSE;
+      } else {
+         foreach (Gdn::ApplicationManager()->AvailableApplications() as $ApplicationName => $ApplicationInfo) {
+            if (GetValue('Folder', $ApplicationInfo, FALSE) === $ApplicationFolder) {
+               $EnabledApplication = $ApplicationName;
+               $this->EventArguments['EnabledApplication'] = $EnabledApplication;
+               $this->FireEvent('AfterEnabledApplication');
+               return $EnabledApplication;
+            }
          }
       }
       return FALSE;
@@ -456,7 +459,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       // Clear the slate
       $this->_ApplicationFolder = '';
-      $this->ControllerFolder = '';
       $this->ControllerName = '';
       $this->ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
@@ -640,6 +642,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                      if (!in_array($Application, $this->EnabledApplicationFolders()))
                         return false;
                      break;
+                  default:
+                     return false;
                }
 
 
@@ -662,7 +666,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
          $this->ControllerName = $Controller;
          $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
-         $this->ControllerFolder = '';
 
          $Length = sizeof($Parts);
          if ($Length > $ControllerKey + 1)

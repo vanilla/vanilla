@@ -51,7 +51,7 @@ class InThisDiscussionModule extends Gdn_Module {
                <li>
                   <?php
                   echo Anchor(
-                     Wrap(Wrap(Gdn_Format::Date($User->DateLastActive)), 'span', array('class' => 'Aside')).' '.
+                     Wrap(Wrap(Gdn_Format::Date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
                      Wrap(Wrap(GetValue('Name', $User), 'span', array('class' => 'Username')), 'span'),
                      UserUrl($User)
                   )

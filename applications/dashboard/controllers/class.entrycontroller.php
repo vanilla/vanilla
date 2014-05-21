@@ -1349,18 +1349,6 @@ class EntryController extends Gdn_Controller {
    private function RegisterCaptcha() {
       Gdn::UserModel()->AddPasswordStrength($this);
 
-      // Locales included in Recaptcha by default
-      $RecaptchaLocales = array(
-         'en',
-         'nl',
-         'fr',
-         'de',
-         'pt',
-         'ru',
-         'es',
-         'tr'
-      );
-
       // Add custom translation strings as JSON
       Gdn::Controller()->Head->AddString('
 <script type="text/javascript">

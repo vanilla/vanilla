@@ -227,13 +227,18 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
       }
 
-      // Analze the request AFTER checking for update mode.
+      // Analyze the request AFTER checking for update mode.
       $this->AnalyzeRequest($Request);
       $this->FireEvent('AfterAnalyzeRequest');
 
-      // If we're in updatemode and can block, redirect to signin
+      // If we're in update mode and can block, redirect to signin
       if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
-         Redirect('/entry/signin?Target='.urlencode($this->Request));
+         if ($this->_DeliveryType === DELIVERY_TYPE_DATA) {
+            safeHeader('HTTP/1.0 401 Unauthorized', TRUE, 401);
+            echo json_encode(array('Code' => '401', 'Exception' => T('You must sign in.')));
+         } else {
+            Redirect('/entry/signin?Target='.urlencode($this->Request));
+         }
          exit();
       }
 

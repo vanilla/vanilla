@@ -951,23 +951,35 @@ if (!function_exists('DiscussionLink')) {
 
 if (!function_exists('RegisterUrl')) {
    function RegisterUrl($Target = '') {
+      $registrationMethod = strtolower(C('Garden.Registration.Method'));
+
+      if ($registrationMethod === 'closed') {
+         return '';
+      }
+
+      // Check to see if there is even a sign in button.
+      if (!$force && $registrationMethod === 'connect') {
+         $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
+         if (!val('RegistrationUrl', $defaultProvider)) {
+            return '';
+         }
+      }
+
       return '/entry/register'.($Target ? '?Target='.urlencode($Target) : '');
    }
 }
 
 if (!function_exists('SignInUrl')) {
-   function SignInUrl($Target = '') {
-      // See if there is a default authentication provider.
-//      $Provider = Gdn_AuthenticationProviderModel::GetDefault();
-//      if ($Provider) {
-//         $SignInUrl = $Provider['SignInUrl'];
-//         if ($SignInUrl) {
-//            $SignInUrl = str_ireplace('{target}', rawurlencode($Target), $SignInUrl);
-//            return $SignInUrl;
-//         }
-//      }
+   function SignInUrl($target = '', $force = false) {
+      // Check to see if there is even a sign in button.
+      if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0) {
+         $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
+         if (!val('SignInUrl', $defaultProvider)) {
+            return '';
+         }
+      }
 
-      return '/entry/signin'.($Target ? '?Target='.urlencode($Target) : '');
+      return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
    }
 }
 

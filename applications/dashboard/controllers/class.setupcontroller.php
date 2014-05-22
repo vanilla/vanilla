@@ -65,7 +65,7 @@ class SetupController extends DashboardController {
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
             // Get list of applications to enable during install
-            // Override by creating conf/config.php and adding this setting before install begins
+            // Override by creating the config and adding this setting before install begins
             $AppNames = C('Garden.Install.Applications', array('Conversations', 'Vanilla'));
             try {
                // Step through the available applications, enabling each of them.
@@ -284,7 +284,7 @@ class SetupController extends DashboardController {
       
       // Make sure the config folder is writeable
       if (!$PermissionProblem) {
-         $ConfigFile = PATH_CONF.'/config.php';
+         $ConfigFile = Gdn::Config()->DefaultPath();
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
          

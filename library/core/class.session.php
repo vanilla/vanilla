@@ -153,6 +153,8 @@ class Gdn_Session {
       $this->SetCookie('-Vv', NULL, -3600);
       $this->SetCookie('-sid', NULL, -3600);
 
+      Gdn::PluginManager()->CallEventHandlers($this, 'Gdn_Session', 'End');
+
       $this->UserID = 0;
       $this->User = FALSE;
       $this->_Attributes = array();

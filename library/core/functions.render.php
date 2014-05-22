@@ -155,7 +155,7 @@ if (!function_exists('ButtonGroup')):
                   echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
                }
             echo '</ul>';
-            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+            echo Anchor(Sprite('SpDropdownHandle', 'Sprite', T('Expand for more options.')), '#', $ButtonClass.' Handle');
 
          echo '</div>';
       }
@@ -994,8 +994,13 @@ if (!function_exists('SocialSignInButton')) {
 }
 
 if (!function_exists('Sprite')) {
-	function Sprite($Name, $Type = 'Sprite') {
-		return '<span class="'.$Type.' '.$Name.'"></span>';
+	function Sprite($Name, $Type = 'Sprite', $Text = FALSE) {
+      $Sprite = '<span class="'.$Type.' '.$Name.'"></span>';
+      if ($Text) {
+         $Sprite .= '<span class="sr-only">' . $Text . '</span>';
+      }
+
+		return $Sprite;
 	}
 }
 

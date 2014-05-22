@@ -361,7 +361,7 @@ class EntryController extends Gdn_Controller {
          $Url = str_ireplace('{target}', rawurlencode(Url($Target, TRUE)), $Url);
 
          if ($this->DeliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->Data('Method'), 'POST') != 0)
-            Redirect($Url, 302);
+            redirectUrl($Url, 302);
          else {
             $this->SetData('Url', $Url);
             $Script = <<<EOT

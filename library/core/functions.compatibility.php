@@ -178,10 +178,9 @@ if (!function_exists('safeHeader')) {
     * This method is context-aware and will avoid sending headers if the request
     * context is not HTTP.
     *
-    * @staticvar string $context
-    * @param type $header
-    * @param type $replace
-    * @param type $http_response_code
+    * @param string $header
+    * @param bool $replace
+    * @param int $http_response_code
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
       static $context;

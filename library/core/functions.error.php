@@ -462,8 +462,8 @@ set_exception_handler('Gdn_ExceptionHandler');
 /**
  * Create a new not found exception. This is a convenience function that will create an exception with a standard message.
  *
- * @param string $Code The translation code of the type of object that wasn't found.
- * @return Exception
+ * @param string $RecordType The translation code of the type of object that wasn't found.
+ * @return Gdn_UserException
  */
 function NotFoundException($RecordType = 'Page') {
    Gdn::Dispatcher()

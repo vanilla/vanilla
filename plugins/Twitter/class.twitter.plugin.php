@@ -24,7 +24,7 @@ $PluginInfo['Twitter'] = array(
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'Hidden' => TRUE,
+   'Hidden' => FALSE,
    'SocialConnect' => TRUE,
    'RequiresRegistration' => TRUE
 );
@@ -112,7 +112,7 @@ class TwitterPlugin extends Gdn_Plugin {
             // Add the twitter method to the controller.
             $TwMethod = array(
                'Name' => 'Twitter',
-               'SignInHtml' => SocialSigninButton('Twitter', $Url, 'button')
+               'SignInHtml' => SocialSigninButton('Twitter', $Url, 'button', array('class' => 'js-extern'))
             );
 
          $Sender->Data['Methods'][] = $TwMethod;
@@ -226,7 +226,7 @@ class TwitterPlugin extends Gdn_Plugin {
 	private function _GetButton() {
       $Url = $this->_AuthorizeHref();
 
-      return SocialSigninButton('Twitter', $Url, 'icon');
+      return SocialSigninButton('Twitter', $Url, 'icon', array('class' => 'js-extern'));
    }
 
 	public function Authorize($Query = FALSE) {

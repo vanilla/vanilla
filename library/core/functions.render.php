@@ -574,6 +574,20 @@ if (!function_exists('IPAnchor')) {
    }
 }
 
+if (!function_exists('panelHeading')) {
+   /**
+    * Define default head tag for the side panel.
+    *
+    * @param $content The content of the tag.
+    * @param $attributes The attributes of the tag.
+    *
+    * @return string The full tag.
+    */
+   function panelHeading($content, $attributes) {
+      return Wrap($content, 'h4', $attributes);
+   }
+}
+
 /**
  * English "plural" formatting.
  * This can be overridden in language definition files like:

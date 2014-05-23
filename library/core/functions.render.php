@@ -578,12 +578,12 @@ if (!function_exists('panelHeading')) {
    /**
     * Define default head tag for the side panel.
     *
-    * @param $content The content of the tag.
-    * @param $attributes The attributes of the tag.
+    * @param string $content The content of the tag.
+    * @param string $attributes The attributes of the tag.
     *
     * @return string The full tag.
     */
-   function panelHeading($content, $attributes) {
+   function panelHeading($content, $attributes = '') {
       return Wrap($content, 'h4', $attributes);
    }
 }

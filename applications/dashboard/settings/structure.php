@@ -670,6 +670,22 @@ $Construct->Table('Log')
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
+$Construct->Table('Queue')
+   ->PrimaryKey('QueueID', 'int')
+   ->Column('Queue', 'varchar(50)')
+   ->Column('DateInserted', 'datetime', true, 'index')
+   ->Column('InsertUserID', 'int')
+   ->Column('CategoryID', 'int', true)
+   ->Column('Name', 'varchar(255)')
+   ->Column('Body', 'text')
+   ->Column('ForeignType', 'varchar(50)')
+   ->Column('ForeignUserID', 'int')
+   ->Column('Status', 'varchar(50)')
+   ->Column('DateStatus', 'datetime', true)
+   ->Column('StatusUserID', 'int', true)
+   ->Column('Attributes', 'text', true)
+   ->Set($Explicit, $Drop);
+
 $Construct->Table('Regarding')
    ->PrimaryKey('RegardingID')
    ->Column('Type', 'varchar(255)', FALSE, 'key')

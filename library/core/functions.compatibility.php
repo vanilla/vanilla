@@ -14,6 +14,141 @@
  * @since 2.2
  */
 
+/**
+ * Takes an associative array in the layout of parse_url, and constructs a URL from it
+ *
+ * see http://www.php.net/manual/en/function.http-build-url.php#96335
+ *
+ * @param   mixed   (Part(s) of) an URL in form of a string or associative array like parse_url() returns
+ * @param   mixed   Same as the first argument
+ * @param   int     A bitmask of binary or'ed HTTP_URL constants (Optional)HTTP_URL_REPLACE is the default
+ * @param   array   If set, it will be filled with the parts of the composed url like parse_url() would return
+ *
+ * @return  string  constructed URL
+ */
+// Based on https://github.com/fuel/core/blob/974281dde67345ca8d7cfa27bcf4aa55c984d48e/base.php#L248
+// Bug http://stackoverflow.com/questions/7751679/php-http-build-url-and-pecl-install/7753154#comment11239561_7753154
+if (!function_exists('http_build_url')) {
+
+   define('HTTP_URL_REPLACE', 1);				// Replace every part of the first URL when there's one of the second URL
+   define('HTTP_URL_JOIN_PATH', 2);			// Join relative paths
+   define('HTTP_URL_JOIN_QUERY', 4);			// Join query strings
+   define('HTTP_URL_STRIP_USER', 8);			// Strip any user authentication information
+   define('HTTP_URL_STRIP_PASS', 16);			// Strip any password authentication information
+   define('HTTP_URL_STRIP_AUTH', 32);			// Strip any authentication information
+   define('HTTP_URL_STRIP_PORT', 64);			// Strip explicit port numbers
+   define('HTTP_URL_STRIP_PATH', 128);			// Strip complete path
+   define('HTTP_URL_STRIP_QUERY', 256);		// Strip query string
+   define('HTTP_URL_STRIP_FRAGMENT', 512);		// Strip any fragments (#identifier)
+   define('HTTP_URL_STRIP_ALL', 1024);			// Strip anything but scheme and host
+
+   function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, &$new_url = false)
+   {
+      $keys = array('user','pass','port','path','query','fragment');
+
+      // HTTP_URL_STRIP_ALL becomes all the HTTP_URL_STRIP_Xs
+      if ($flags & HTTP_URL_STRIP_ALL)
+      {
+         $flags |= HTTP_URL_STRIP_USER;
+         $flags |= HTTP_URL_STRIP_PASS;
+         $flags |= HTTP_URL_STRIP_PORT;
+         $flags |= HTTP_URL_STRIP_PATH;
+         $flags |= HTTP_URL_STRIP_QUERY;
+         $flags |= HTTP_URL_STRIP_FRAGMENT;
+      }
+      // HTTP_URL_STRIP_AUTH becomes HTTP_URL_STRIP_USER and HTTP_URL_STRIP_PASS
+      else if ($flags & HTTP_URL_STRIP_AUTH)
+      {
+         $flags |= HTTP_URL_STRIP_USER;
+         $flags |= HTTP_URL_STRIP_PASS;
+      }
+
+      // parse the current URL
+      $current_url = parse_url(current_url());
+
+      // parse the original URL
+      $parse_url = is_array($url) ? $url : parse_url($url);
+
+      // make sure we always have a scheme, host and path
+      empty($parse_url['scheme']) and $parse_url['scheme'] = $current_url['scheme'];
+      empty($parse_url['host']) and $parse_url['host'] = $current_url['host'];
+      isset($parse_url['path']) or $parse_url['path'] = '';
+
+      // make the path absolute if needed
+      if ( ! empty($parse_url['path']) and substr($parse_url['path'], 0, 1) != '/')
+      {
+         $parse_url['path'] = '/'.$parse_url['path'];
+      }
+
+      // scheme and host are always replaced
+      isset($parts['scheme']) and $parse_url['scheme'] = $parts['scheme'];
+      isset($parts['host']) and $parse_url['host'] = $parts['host'];
+
+      // replace the original URL with it's new parts (if applicable)
+      if ($flags & HTTP_URL_REPLACE)
+      {
+         foreach ($keys as $key)
+         {
+            if (isset($parts[$key]))
+               $parse_url[$key] = $parts[$key];
+         }
+      }
+      else
+      {
+         // join the original URL path with the new path
+         if (isset($parts['path']) && ($flags & HTTP_URL_JOIN_PATH))
+         {
+            if (isset($parse_url['path']))
+               $parse_url['path'] = rtrim(str_replace(basename($parse_url['path']), '', $parse_url['path']), '/') . '/' . ltrim($parts['path'], '/');
+            else
+               $parse_url['path'] = $parts['path'];
+         }
+
+         // join the original query string with the new query string
+         if (isset($parts['query']) && ($flags & HTTP_URL_JOIN_QUERY))
+         {
+            if (isset($parse_url['query']))
+               $parse_url['query'] .= '&' . $parts['query'];
+            else
+               $parse_url['query'] = $parts['query'];
+         }
+      }
+
+      // strips all the applicable sections of the URL
+      // note: scheme and host are never stripped
+      foreach ($keys as $key)
+      {
+         if ($flags & (int)constant('HTTP_URL_STRIP_' . strtoupper($key)))
+            unset($parse_url[$key]);
+      }
+
+
+      $new_url = $parse_url;
+
+      return
+         ((isset($parse_url['scheme'])) ? $parse_url['scheme'] . '://' : '')
+         .((isset($parse_url['user'])) ? $parse_url['user'] . ((isset($parse_url['pass'])) ? ':' . $parse_url['pass'] : '') .'@' : '')
+         .((isset($parse_url['host'])) ? $parse_url['host'] : '')
+         .((isset($parse_url['port'])) ? ':' . $parse_url['port'] : '')
+         .((isset($parse_url['path'])) ? $parse_url['path'] : '')
+         .((isset($parse_url['query'])) ? '?' . $parse_url['query'] : '')
+         .((isset($parse_url['fragment'])) ? '#' . $parse_url['fragment'] : '')
+         ;
+   }
+
+   function current_url() {
+      $pageURL = 'http';
+      if (val('HTTPS', $_SERVER) === "on") {$pageURL .= "s";}
+      $pageURL .= "://";
+      if ($_SERVER["SERVER_PORT"] != "80") {
+         $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+      } else {
+         $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+      }
+      return $pageURL;
+   }
+}
+
 if (!function_exists('is_id')) {
    /**
     * Finds whether the type given variable is a database id.

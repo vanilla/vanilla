@@ -990,16 +990,17 @@ if (!function_exists('SocialSignInButton')) {
    function SocialSignInButton($Name, $Url, $Type = 'button', $Attributes = array()) {
       TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
       $Title = $Attributes['title'];
+      $Class = val('class', $Attributes, '');
 
       switch ($Type) {
          case 'icon':
             $Result = Anchor('<span class="Icon"></span>',
-               $Url, 'SocialIcon SocialIcon-'.$Name, $Attributes);
+               $Url, 'SocialIcon SocialIcon-'.$Name . ' ' . $Class, $Attributes);
             break;
          case 'button':
          default:
             $Result = Anchor('<span class="Icon"></span><span class="Text">'.$Title.'</span>',
-               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText', $Attributes);
+               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText ' . $Class, $Attributes);
             break;
       }
 

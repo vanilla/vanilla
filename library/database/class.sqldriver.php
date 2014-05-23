@@ -1721,7 +1721,7 @@ abstract class Gdn_SQLDriver {
     * the select column. Only valid if a single column name is provided.
     * Accepted values are MAX, MIN, AVG, SUM.
     * @param string $Alias NotRequired "" The alias to give a column name.
-    * @return this
+    * @return Gdn_SQLDriver this
     */
    public function Select($Select = '*', $Function = '', $Alias = '') {
       if (is_string($Select)) {

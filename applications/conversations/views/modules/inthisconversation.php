@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Box InThisConversation">
-   <?php echo panelHeading(T('In this Conversationssss')); ?>
+   <?php echo panelHeading(T('In this Conversation')); ?>
    <ul class="PanelInfo">
    <?php
    $Result = $this->Data->Result();

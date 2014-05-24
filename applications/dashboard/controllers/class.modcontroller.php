@@ -8,9 +8,10 @@
  * Class ModController.
  */
 class ModController extends DashboardController {
-   protected $pageSize = 1;
+   protected $pageSize = 30;
 
-   protected $queues = array('premoderation', 'reported', 'spam');
+//   protected $queues = array('premoderation', 'reported', 'spam');
+   protected $queues = array('premoderation', 'reported', 'spam', 'testing');
 
    /**
     * Index.
@@ -43,6 +44,32 @@ class ModController extends DashboardController {
 
    }
 
+   /**
+    * Unit testing moderation endpoint.
+    */
+   public function testing() {
+      $queue = 'testing';
+      $this->setData('QueueName', $queue);
+
+      switch ($this->Request->RequestMethod()) {
+         case 'GET':
+            $this->getQueue($queue);
+            break;
+         case 'POST':
+            $this->postQueue($queue);
+            break;
+         case 'PATCH':
+            $this->postQueue($queue);
+            break;
+         case 'DELETE':
+            $this->deleteQueue($queue);
+            break;
+         default:
+            throw new Gdn_UserException('Invalid request method');
+      }
+
+   }
+
    protected function isQueueValid($queue) {
       if (!in_array($queue, $this->queues)) {
          throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
@@ -52,19 +79,23 @@ class ModController extends DashboardController {
    protected function getQueue($queue) {
       $this->isQueueValid($queue);
       $page = $this->Request->Get('page', 'p1');
+      $status = $this->Request->Get('status');
 
       $queueModel = QueueModel::Instance();
       $where = array(
-         'ForeignID' => 60
+         'Queue' => $queue,
       );
+      if ($status) {
+         $where['Status'] = $status;
+      }
       $queueItems = $queueModel->Get($queue, $page, $this->pageSize, $where);
 
       $this->setData(
          array(
-            'queueName' => $queue,
-            'queue' => $queueItems,
-            'page' => $page,
-            'total' => $queueModel->GetQueueCounts($queue)
+            'QueueName' => $queue,
+            'Queue' => $queueItems,
+            'Page' => $page,
+            'Total' => $queueModel->GetQueueCounts($queue)
          )
       );
       $this->Render();
@@ -97,6 +128,18 @@ class ModController extends DashboardController {
 
       $queueModel = QueueModel::Instance();
       $queueID = $queueModel->Save($data);
+      $validationResults = $queueModel->ValidationResults();
+      if ($validationResults) {
+         $errorMsg = 'Validation Error: ';
+         foreach ($validationResults as $field => $errors) {
+            $errorMsg .= $field;
+            foreach ($errors as $error) {
+               $errorMsg .= ' - ' . $error;
+            }
+            $errorMsg .= "\n";
+         }
+         throw new Gdn_UserException($errorMsg);
+      }
       if (!$queueID) {
          throw new Gdn_UserException('Error saving record to queue.');
       }
@@ -108,14 +151,20 @@ class ModController extends DashboardController {
    protected function deleteQueue($queue) {
       $this->isQueueValid($queue);
       if (count($this->RequestArgs) != 1) {
-         throw new Gdn_UserException('Invalid Parameter');
+         throw new Gdn_UserException('Missing Parameter: QueueID');
       }
-      $ID = $this->RequestArgs[0];
+      $queueID = $this->RequestArgs[0];
+      if (!is_numeric($queueID) || $queueID == 0) {
+         throw new Gdn_UserException('Invalid QueueID: ' . $queueID);
+      }
+      //cast to int
+      $queueID = (int)$queueID;
+
 
       //soft delete from queue
       //now what...
 
-      $this->SetData('ID', $ID);
+      $this->SetData('QueueID', $queueID);
       $this->Render('mod', '', '');
 
    }
@@ -131,5 +180,10 @@ class ModController extends DashboardController {
     */
    public function spam() {
    }
+
+   public function set($property, $value) {
+      $this->$property = $value;
+   }
+
 
 }

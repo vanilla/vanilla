@@ -9,7 +9,7 @@
  */
 class QueueModel extends Gdn_Model {
 
-   public $dbColumns = array(
+   protected $dbColumns = array(
       'Queue',
       'DateInserted',
       'InsertUserID',
@@ -28,6 +28,7 @@ class QueueModel extends Gdn_Model {
 
    protected $countTTL = 30;
 
+   protected $defaultSaveStatus = 'unread';
 
    public static $Instance;
 
@@ -53,6 +54,10 @@ class QueueModel extends Gdn_Model {
    public function Save($Data, $Settings = FALSE) {
 
 
+      //add any defaults if missing
+      if (!GetValue('Status', $Data)) {
+         $Data['Status'] = $this->defaultSaveStatus;
+      }
       //collect attributes
       $attributes = array_diff_key($Data, array_flip($this->dbColumns));
       $Data = array_diff_key($Data, $attributes);
@@ -76,8 +81,9 @@ class QueueModel extends Gdn_Model {
                $Attributes = array();
 
             $Insert = FALSE;
-         } else
+         } else {
             $Insert = TRUE;
+         }
       } else {
          $PrimaryKeyVal = FALSE;
          $Insert = TRUE;
@@ -85,8 +91,9 @@ class QueueModel extends Gdn_Model {
 
       // Grab any values that aren't in the db schema and stick them in attributes.
       foreach ($Data as $Name => $Value) {
-         if ($Name == 'Attributes')
+         if ($Name == 'Attributes') {
             continue;
+         }
          if (isset($SchemaFields[$Name])) {
             $SaveData[$Name] = $Value;
          } elseif ($Value === NULL) {
@@ -125,7 +132,6 @@ class QueueModel extends Gdn_Model {
 
    public function Get($queue, $page = 'p1', $limit = 30, $where = array()) {
       list($offset, $limit) = OffsetLimit($page, $limit);
-
       $sql = Gdn::SQL();
       $sql->From('Queue')
          ->Limit($limit, $offset);

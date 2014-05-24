@@ -26,6 +26,8 @@ class QueueModel extends Gdn_Model {
       'Attributes'
    );
 
+   protected $statusEnum = array('unread', 'approved', 'denied');
+
    protected $countTTL = 30;
 
    protected $defaultSaveStatus = 'unread';
@@ -155,7 +157,7 @@ class QueueModel extends Gdn_Model {
       return $rows;
    }
 
-   public function GetQueueCounts($queue) {
+   public function GetQueueCounts($queue, $pageSize = 30) {
 
       $cacheKeyFormat = 'Queue:Count:{queue}';
       $cache = Gdn::Cache();
@@ -174,8 +176,22 @@ class QueueModel extends Gdn_Model {
 
          $counts = array();
          foreach ($rows as $row) {
-            $counts[$row['Status']] = $row['CountStatus'];
+            $counts['Status'][$row['Status']] = (int)$row['CountStatus'];
          }
+         foreach ($this->statusEnum as $status) {
+            //set empty counts to zero
+            if (!GetValueR('Status.' . $status, $counts)) {
+               $counts['Status'][$status] = 0;
+            }
+         }
+         $total = 0;
+         foreach ($counts['Status'] as $statusTotal) {
+            $total += $statusTotal;
+         }
+         $counts['Records'] = $total;
+         $counts['PageSize'] = $pageSize;
+         $counts['Pages'] = ceil($total/$pageSize);
+
          $cache->Store($cacheKey, $counts, array(
                Gdn_Cache::FEATURE_EXPIRY  => $this->countTTL,
                Gdn_Cache::FEATURE_COMPRESS => TRUE

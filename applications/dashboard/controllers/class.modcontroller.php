@@ -24,7 +24,7 @@ class ModController extends DashboardController {
     * Pre moderation endpoint.
     */
    public function preModeration() {
-      $this->setData('queue', 'premoderation');
+      $this->setData('QueueName', 'premoderation');
       switch ($this->Request->RequestMethod()) {
          case 'GET':
             $this->getQueue('premoderation');
@@ -95,12 +95,10 @@ class ModController extends DashboardController {
             'QueueName' => $queue,
             'Queue' => $queueItems,
             'Page' => $page,
-            'Total' => $queueModel->GetQueueCounts($queue)
+            'Totals' => $queueModel->GetQueueCounts($queue, $this->pageSize),
          )
       );
       $this->Render();
-
-
    }
 
    protected function postQueue($queue) {

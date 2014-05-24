@@ -82,11 +82,14 @@ class ModController extends DashboardController {
       $status = $this->Request->Get('status');
 
       $queueModel = QueueModel::Instance();
+      $totals = $queueModel->GetQueueCounts($queue, $this->pageSize);
       $where = array(
          'Queue' => $queue,
       );
       if ($status) {
          $where['Status'] = $status;
+         $totals['Records'] = $totals['Status'][$status];
+         $totals['Pages'] = ceil($totals['Status'][$status]/$totals['PageSize']);
       }
       $queueItems = $queueModel->Get($queue, $page, $this->pageSize, $where);
 
@@ -95,7 +98,7 @@ class ModController extends DashboardController {
             'QueueName' => $queue,
             'Queue' => $queueItems,
             'Page' => $page,
-            'Totals' => $queueModel->GetQueueCounts($queue, $this->pageSize),
+            'Totals' => $totals,
          )
       );
       $this->Render();

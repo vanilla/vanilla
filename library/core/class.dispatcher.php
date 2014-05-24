@@ -282,6 +282,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Set up a default controller method in case one isn't defined.
          $ControllerMethod = str_replace('_', '', $this->ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
+         $this->EventArguments['ControllerMethod'] =& $ControllerMethod;
 
          // Take enabled plugins into account, as well
          $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->ControllerMethod);

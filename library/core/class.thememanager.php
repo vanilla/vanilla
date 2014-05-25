@@ -347,7 +347,18 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       if ($this->CurrentTheme() == 'default') {
          throw new Gdn_UserException(T('You cannot disable the default theme.'));
       }
+      $oldTheme = $this->EnabledTheme();
       RemoveFromConfig('Garden.Theme');
+      $newTheme = $this->EnabledTheme();
+      Logger::event(
+         'theme_changed',
+         'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
+         array(
+            'themeType' => 'desktop',
+            'oldTheme' => $oldTheme,
+            'newTheme' => $newTheme
+         )
+      );
    }
 
    public function EnabledTheme() {
@@ -402,6 +413,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       $ThemeInfo = $this->GetThemeInfo($ThemeName);
       $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
 
+      $oldTheme = $IsMobile ? C('Garden.MobileTheme', 'mobile') : C('Garden.Theme', 'default');
+
       if ($ThemeFolder == '') {
          throw new Exception(T('The theme folder was not properly defined.'));
       } else {
@@ -428,6 +441,17 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             }
          }
       }
+
+      Logger::event(
+         'theme_changed',
+         LogLevel::NOTICE,
+         'The {themeType} theme changed from {oldTheme} to {newTheme}.',
+         array(
+            'themeType' => $IsMobile ? 'mobile' : 'desktop',
+            'oldTheme' => $oldTheme,
+            'newTheme' => $ThemeName
+         )
+      );
 
       // Tell the locale cache to refresh itself.
       Gdn::Locale()->Refresh();

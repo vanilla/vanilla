@@ -8,76 +8,83 @@
  * Class ModController.
  */
 class ModController extends DashboardController {
+
    protected $pageSize = 30;
 
-//   protected $queues = array('premoderation', 'reported', 'spam');
-   protected $queues = array('premoderation', 'reported', 'spam', 'testing');
+   protected $queues = array('premoderation', 'reported', 'spam');
 
    /**
     * Index.
     */
    public function index() {
-      echo 'index';
-   }
 
-   /**
-    * Pre moderation endpoint.
-    */
-   public function preModeration() {
-      $this->setData('QueueName', 'premoderation');
-      switch ($this->Request->RequestMethod()) {
-         case 'GET':
-            $this->getQueue('premoderation');
-            break;
-         case 'POST':
-            $this->postQueue('premoderation');
-            break;
-         case 'PATCH':
-            $this->postQueue('premoderation');
-            break;
-         case 'DELETE':
-            $this->deleteQueue('premoderation');
-            break;
-         default:
-            throw new Gdn_UserException('Invalid request method');
+      if (count($this->RequestArgs) > 0) {
+         $queueName = $this->RequestArgs[0];
+         if ($this->isQueueValid($queueName)) {
+            $this->setData('QueueName', $queueName);
+            switch ($this->Request->RequestMethod()) {
+               case 'GET':
+                  $this->getQueue($queueName);
+                  break;
+               case 'POST':
+                  $this->postQueue($queueName);
+                  break;
+               case 'PATCH':
+                  $this->postQueue($queueName);
+                  break;
+               case 'DELETE':
+                  $this->deleteQueue($queueName);
+                  break;
+               default:
+                  throw new Gdn_UserException('Invalid request method');
+            }
+         }
+         if (is_numeric($this->RequestArgs[0])) {
+            $queueID = $this->RequestArgs[0];
+            //update and delete items in the queue
+         }
       }
 
    }
 
-   /**
-    * Unit testing moderation endpoint.
-    */
-   public function testing() {
-      $queue = 'testing';
-      $this->setData('QueueName', $queue);
-
-      switch ($this->Request->RequestMethod()) {
-         case 'GET':
-            $this->getQueue($queue);
-            break;
-         case 'POST':
-            $this->postQueue($queue);
-            break;
-         case 'PATCH':
-            $this->postQueue($queue);
-            break;
-         case 'DELETE':
-            $this->deleteQueue($queue);
-            break;
-         default:
-            throw new Gdn_UserException('Invalid request method');
+   public function totals() {
+      $testing = $this->Request->Get('testing');
+      if ($testing) {
+         $queueTotals = $this->getQueueTotals(array('testing', 'testingSpam'));
+      } else {
+         $queueTotals = $this->getQueueTotals($this->queues);
       }
+      $this->setData(array(
+            'Queues' => $queueTotals,
+         ));
+      $this->Render();
+   }
 
+   protected function getQueueTotals($queues) {
+
+      $queueModel = QueueModel::Instance();
+      $totals = array();
+      foreach ($queues as $queue) {
+         $totals[$queue] = $queueModel->GetQueueCounts($queue);
+      }
+      return $totals;
    }
 
    protected function isQueueValid($queue) {
-      if (!in_array($queue, $this->queues)) {
-         throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
+      if (stristr($queue, 'testing') !== false) {
+         return true;
       }
+      if (!in_array($queue, $this->queues)) {
+         return false;
+      }
+      return true;
    }
 
    protected function getQueue($queue) {
-      $this->isQueueValid($queue);
+      if (!$this->isQueueValid($queue)) {
+         throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
+      }
+
       $page = $this->Request->Get('page', 'p1');
       $status = $this->Request->Get('status');
 
@@ -106,8 +113,9 @@ class ModController extends DashboardController {
 
    protected function postQueue($queue) {
 
-      $this->isQueueValid($queue);
-
+      if (!$this->isQueueValid($queue)) {
+         throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
+      }
       //validate fields
       $requiredFields = array(
          'name' => 'Name is a required field.',
@@ -150,41 +158,27 @@ class ModController extends DashboardController {
    }
 
    protected function deleteQueue($queue) {
-      $this->isQueueValid($queue);
-      if (count($this->RequestArgs) != 1) {
+      if (!$this->isQueueValid($queue)) {
+         throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
+      }
+      if (count($this->RequestArgs) != 2) {
          throw new Gdn_UserException('Missing Parameter: QueueID');
       }
-      $queueID = $this->RequestArgs[0];
+      $queueID = $this->RequestArgs[1];
       if (!is_numeric($queueID) || $queueID == 0) {
          throw new Gdn_UserException('Invalid QueueID: ' . $queueID);
       }
       //cast to int
       $queueID = (int)$queueID;
 
-
-      //soft delete from queue
-      //now what...
+      //soft delete from queue?
 
       $this->SetData('QueueID', $queueID);
       $this->Render('mod', '', '');
 
    }
 
-   /**
-    * List items in the queue.
-    */
-   public function reported() {
-   }
-
-   /**
-    * List items in the queue.
-    */
-   public function spam() {
-   }
-
    public function set($property, $value) {
       $this->$property = $value;
    }
-
-
 }

@@ -204,5 +204,9 @@ class QueueModel extends Gdn_Model {
       return $counts;
    }
 
+   public function getStatuses() {
+      return $this->statusEnum;
+   }
+
 
 }

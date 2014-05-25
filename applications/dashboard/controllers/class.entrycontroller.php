@@ -161,7 +161,7 @@ class EntryController extends Gdn_Controller {
                     Logger::event(
                        'signin_failure',
                        LogLevel::WARNING,
-                       '{InsertName} failed to signed in.  Not enough information to authenticate'
+                       '{InsertName} failed to sign in. Some or all credentials were missing.'
                     );
                 }
          break;
@@ -190,7 +190,7 @@ class EntryController extends Gdn_Controller {
                          Logger::event(
                             'signin_failure',
                             LogLevel::WARNING,
-                            '{InsertName} failed to signed in. Permission Denied'
+                            '{InsertName} failed to sign in. Permission denied.'
                          );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
@@ -200,7 +200,7 @@ class EntryController extends Gdn_Controller {
                         Logger::event(
                            'signin_failure',
                            LogLevel::WARNING,
-                           '{InsertName} failed to signed in. Authentication Denied'
+                           '{InsertName} failed to sign in. Authentication denied.'
                         );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
@@ -210,7 +210,7 @@ class EntryController extends Gdn_Controller {
                          Logger::event(
                             'signin_failure',
                             LogLevel::WARNING,
-                            '{InsertName} failed to signed in. More information needed from user.'
+                            '{InsertName} failed to sign in. More information needed from user.'
                          );
                         $this->Form->AddError('ErrorInsufficient');
                         $Reaction = $Authenticator->FailedResponse();
@@ -875,7 +875,7 @@ EOT;
 
             if (!$User) {
                $this->Form->AddError('@'.sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))));
-               Logger::event('signin_failure', LogLevel::INFO, '{Login} failed to signed in. User not found.', array('Login' => $Email));
+               Logger::event('signin_failure', LogLevel::INFO, '{Signin} failed to sign in. User not found.', array('Signin' => $Email));
             } else {
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
@@ -918,7 +918,7 @@ EOT;
                      Logger::event(
                         'signin_failure',
                         LogLevel::WARNING,
-                        '{InsertName} failed to signed in.  Invalid password.',
+                        '{InsertName} failed to sign in.  Invalid password.',
                         array('InsertName' => $User->Name)
                      );
 
@@ -1118,7 +1118,7 @@ EOT;
                 Logger::event(
                    'signin_failure',
                    LogLevel::WARNING,
-                   '{InsertName} failed to signed in. Authentication Denied'
+                   '{InsertName} failed to sign in. Invalid credentials.'
                 );
             }
 
@@ -1578,9 +1578,9 @@ EOT;
                if (!$this->UserModel->PasswordRequest($Email)) {
                   $this->Form->SetValidationResults($this->UserModel->ValidationResults());
                   Logger::event(
-                     'password_reset_request_failure',
+                     'password_reset_failure',
                      LogLevel::INFO,
-                     'Cant find account associated to email/username {Input}.',
+                     'Can\'t find account associated with email/username {Input}.',
                      array('Input' => $Email)
                   );
                }
@@ -1593,7 +1593,7 @@ EOT;
                Logger::event(
                   'password_reset_request',
                   LogLevel::INFO,
-                  '{Input} has been sent password reset email.',
+                  '{Input} has been sent a password reset email.',
                   array('Input' => $Email)
                );
             }
@@ -1601,9 +1601,9 @@ EOT;
             if ($this->Form->ErrorCount() == 0) {
                $this->Form->AddError("Couldn't find an account associated with that email/username.");
                Logger::event(
-                  'password_reset_request_failure',
+                  'password_reset_failure',
                   LogLevel::INFO,
-                  'Cant find account associated to email/username {Input}.',
+                  'Can\'t find account associated with email/username {Input}.',
                   array('Input' => $this->Form->GetValue('Email'))
                );
             }
@@ -1667,14 +1667,14 @@ EOT;
             Logger::event(
                'password_reset_failure',
                LogLevel::NOTICE,
-               '{InsertName} passwords is invalid.'
+               'Failed to reset the password for {InsertName}. Password is invalid.'
             );
          } else if ($Password != $Confirm)
             $this->Form->AddError('Your passwords did not match.');
             Logger::event(
                'password_reset_failure',
                LogLevel::NOTICE,
-               '{InsertName} passwords did not match.'
+               'Failed to reset the password for {InsertName}. Passwords did not match.'
             );
 
          if ($this->Form->ErrorCount() == 0) {
@@ -1874,7 +1874,7 @@ EOT;
          if (is_array($TrustedDomains)) {
             // Add this domain to the trusted hosts.
             $TrustedDomains[] = $MyHostname;
-            $Sender->EventArguments['TrustedDomains'] = &$TrustedDomains;
+            $this->EventArguments['TrustedDomains'] = &$TrustedDomains;
             $this->FireEvent('BeforeTargetReturn');
          }
 

@@ -1159,7 +1159,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          Logger::event(
             'permission_denied',
             LogLevel::INFO,
-            '{InsertName} Was denied permission.',
+            '{InsertName} was denied permission {Permission}.',
             array(
                'Permission' => $Permission,
            )

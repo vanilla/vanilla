@@ -65,14 +65,14 @@ class Logger {
     */
    public static function levelPriority($level) {
       static $priorities = array(
-         self::DEBUG => 0,
-         self::INFO => 1,
-         self::NOTICE => 2,
-         self::WARNING => 3,
-         self::ERROR => 4,
-         self::CRITICAL => 5,
-         self::ALERT => 6,
-         self::EMERGENCY => 7
+         LogLevel::DEBUG => 0,
+         LogLevel::INFO => 1,
+         LogLevel::NOTICE => 2,
+         LogLevel::WARNING => 3,
+         LogLevel::ERROR => 4,
+         LogLevel::CRITICAL => 5,
+         LogLevel::ALERT => 6,
+         LogLevel::EMERGENCY => 7
       );
 
       if (isset($priorities[$level])) {

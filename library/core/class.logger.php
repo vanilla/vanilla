@@ -95,6 +95,8 @@ class Logger {
             throw new Exception("Invalid log level $value.", 422);
          }
          self::$logLevel = $value;
+      } elseif ($value === null) {
+         $value = LogLevel::NOTICE;
       }
       return self::$logLevel;
    }

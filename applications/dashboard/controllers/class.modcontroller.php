@@ -38,10 +38,18 @@ class ModController extends DashboardController {
                default:
                   throw new Gdn_UserException('Invalid request method');
             }
-         }
-         if (is_numeric($this->RequestArgs[0])) {
+         } elseif (is_numeric($this->RequestArgs[0])) {
             $queueID = $this->RequestArgs[0];
             //update and delete items in the queue
+            switch ($this->Request->RequestMethod()) {
+               case 'GET':
+                  $this->getQueueItem($queueID);
+                  break;
+               default:
+                  throw new Gdn_UserException('Invalid request method');
+            }
+         } else {
+            throw new Gdn_UserException('Not Found', 404);
          }
       }
 
@@ -180,5 +188,14 @@ class ModController extends DashboardController {
 
    public function set($property, $value) {
       $this->$property = $value;
+   }
+
+   protected function getQueueItem($queueID) {
+
+      $queueModel = QueueModel::Instance();
+      $item = $queueModel->GetID($queueID);
+
+      $this->SetData('Item', $item);
+      $this->Render();
    }
 }

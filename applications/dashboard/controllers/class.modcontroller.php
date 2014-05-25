@@ -14,13 +14,23 @@ class ModController extends DashboardController {
    protected $queues = array('premoderation', 'reported', 'spam');
 
    /**
-    * Index.
+    * Primary endpoint.
+    *
+    * Handles requests that match:
+    * GET mod/
+    * POST, GET, PATCH, DELETE mod/{queueName}
+    * GET mod/{queueID}
+    *
+    * Checks if request arguments match queue name or ID.  If matched we check the request type
+    * and send to the appropriate method. 404 will returned if invalid arguments are provided.
+    *
+    * If no arguments are provided then index page is displayed.
     */
    public function index() {
 
       if (count($this->RequestArgs) > 0) {
-         $queueName = $this->RequestArgs[0];
-         if ($this->isQueueValid($queueName)) {
+         if ($this->isQueueValid($this->RequestArgs[0])) {
+            $queueName = $this->RequestArgs[0];
             $this->setData('QueueName', $queueName);
             switch ($this->Request->RequestMethod()) {
                case 'GET':
@@ -52,9 +62,13 @@ class ModController extends DashboardController {
             throw new Gdn_UserException('Not Found', 404);
          }
       }
+      //default page to display if no request arguments
 
    }
 
+   /**
+    * Display queue totals.
+    */
    public function totals() {
       $testing = $this->Request->Get('testing');
       if ($testing) {
@@ -68,6 +82,13 @@ class ModController extends DashboardController {
       $this->Render();
    }
 
+   /**
+    * Get queue totals.
+    * 
+    * @param array $queues Queue names.
+    * 
+    * @return array
+    */
    protected function getQueueTotals($queues) {
 
       $queueModel = QueueModel::Instance();
@@ -78,6 +99,13 @@ class ModController extends DashboardController {
       return $totals;
    }
 
+   /**
+    * Check if queue name is valid.
+    * 
+    * @param string $queue Queue name.
+    * 
+    * @return bool
+    */
    protected function isQueueValid($queue) {
       if (stristr($queue, 'testing') !== false) {
          return true;
@@ -88,6 +116,27 @@ class ModController extends DashboardController {
       return true;
    }
 
+   /**
+    * Check if queue ID is valid.
+    *
+    * @param int $queueID QueueID.
+    *
+    * @return bool
+    */
+   protected function isQueueIDValid($queueID) {
+      if (!is_numeric($queueID) || $queueID == 0) {
+         return false;
+      }
+      return true;
+   }
+
+   /**
+    * Get Queue.
+    * 
+    * @param string $queue Queue name.
+    * 
+    * @throws Gdn_UserException Queue name provided is invalid.
+    */
    protected function getQueue($queue) {
       if (!$this->isQueueValid($queue)) {
          throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
@@ -119,6 +168,13 @@ class ModController extends DashboardController {
       $this->Render();
    }
 
+   /**
+    * Add items to the queue.
+    * 
+    * @param string $queue Queue name.
+    *
+    * @throws Gdn_UserException Queue name provided is invalid.
+    */
    protected function postQueue($queue) {
 
       if (!$this->isQueueValid($queue)) {
@@ -165,6 +221,13 @@ class ModController extends DashboardController {
 
    }
 
+   /**
+    * Remove items from the queue.
+    *
+    * @param string $queue Queue name.
+    *
+    * @throws Gdn_UserException Queue ID or name provided is invalid.
+    */
    protected function deleteQueue($queue) {
       if (!$this->isQueueValid($queue)) {
          throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
@@ -173,7 +236,7 @@ class ModController extends DashboardController {
          throw new Gdn_UserException('Missing Parameter: QueueID');
       }
       $queueID = $this->RequestArgs[1];
-      if (!is_numeric($queueID) || $queueID == 0) {
+      if (!$this->isQueueIDValid($queueID)) {
          throw new Gdn_UserException('Invalid QueueID: ' . $queueID);
       }
       //cast to int
@@ -186,12 +249,18 @@ class ModController extends DashboardController {
 
    }
 
-   public function set($property, $value) {
-      $this->$property = $value;
-   }
-
+   /**
+    * Display queue item.
+    *
+    * @param int $queueID QueueID.
+    *
+    * @throws Gdn_UserException Queue ID is invalid.
+    */
    protected function getQueueItem($queueID) {
 
+      if (!$this->isQueueIDValid($queueID)) {
+         throw new Gdn_UserException('Invalid QueueID: ' . $queueID);
+      }
       $queueModel = QueueModel::Instance();
       $item = $queueModel->GetID($queueID);
 

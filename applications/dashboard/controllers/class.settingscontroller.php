@@ -55,11 +55,12 @@ class SettingsController extends DashboardController {
 
       // Validate & set parameters
       $Session = Gdn::Session();
-      $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $ApplicationName : '';
+      if ($ApplicationName && !$Session->ValidateTransientKey($TransientKey)) {
+         $ApplicationName = '';
+      }
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $this->Filter = $Filter;
-      $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
 
       $ApplicationManager = new Gdn_ApplicationManager();
       $this->AvailableApplications = $ApplicationManager->AvailableVisibleApplications();
@@ -643,7 +644,10 @@ class SettingsController extends DashboardController {
 
       // Validate and set properties
       $Session = Gdn::Session();
-      $PluginName = $Session->ValidateTransientKey($TransientKey) ? $PluginName : '';
+      if ($PluginName && !$Session->ValidateTransientKey($TransientKey)) {
+         $PluginName =  '';
+      }
+
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $this->Filter = $Filter;
@@ -1043,7 +1047,7 @@ class SettingsController extends DashboardController {
       }
       $this->SetData('AvailableThemes', $Themes);
 
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
+      if ($ThemeName != '' && Gdn::Session()->ValidateTransientKey($TransientKey)) {
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
             if ($ThemeInfo === FALSE)

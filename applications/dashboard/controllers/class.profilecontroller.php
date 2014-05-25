@@ -628,6 +628,18 @@ class ProfileController extends Gdn_Controller {
          if ($this->Form->Save()) {
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your password has been changed.'), 'Dismissable AutoDismiss HasSprite');
             $this->Form->ClearInputs();
+            Logger::event(
+               'password_change',
+               LogLevel::INFO,
+               '{InsertName} changed password.'
+            );
+         } else {
+            Logger::event(
+               'password_change_failure',
+               LogLevel::INFO,
+               '{InsertName} failed to change password.',
+               array('Error' => $this->Form->ErrorString())
+            );
          }
       }
       $this->Title(T('Change My Password'));

@@ -145,6 +145,10 @@ class Gdn_Session {
       if ($Authenticator == NULL)
          $Authenticator = Gdn::Authenticator();
 
+      if ($this->UserID) {
+         Logger::event('signout', LogLevel::INFO, '{InsertName} signed out.');
+      }
+
       $Authenticator->AuthenticateWith()->DeAuthenticate();
       $this->SetCookie('-Vv', NULL, -3600);
       $this->SetCookie('-sid', NULL, -3600);
@@ -473,10 +477,28 @@ class Gdn_Session {
          $ForceValid = TRUE;
 
       if (!$ForceValid && $ValidateUser && $this->UserID <= 0)
-         return FALSE;
+         $Return = FALSE;
 
-      // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
-      return ($ForceValid && Gdn::Request()->IsPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE);
+      if (!isset($Return)) {
+         // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
+         $Return = ($ForceValid && Gdn::Request()->IsPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE);
+      }
+      if (!$Return) {
+         if (Gdn::Session()->User) {
+            Logger::event(
+               'csrf_failure',
+               LogLevel::ERROR,
+               'Invalid transient key for {InsertName}.'
+            );
+         } else {
+            Logger::event(
+               'csrf_failure',
+               LogLevel::ERROR,
+               'Invalid transient key.'
+            );
+         }
+      }
+      return $Return;
    }
 
 	/**

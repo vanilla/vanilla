@@ -96,7 +96,7 @@ class Logger {
          }
          self::$logLevel = $value;
       } elseif ($value === null) {
-         $value = LogLevel::NOTICE;
+         self::$logLevel = LogLevel::NOTICE;
       }
       return self::$logLevel;
    }

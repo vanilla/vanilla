@@ -146,7 +146,7 @@ class Gdn_Session {
          $Authenticator = Gdn::Authenticator();
 
       if ($this->UserID) {
-         Logger::event('signout', LogLevel::INFO, '{InsertName} signed out.');
+         Logger::event('session_end', LogLevel::INFO, 'Session ended for {InsertName}.');
       }
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
@@ -348,7 +348,9 @@ class Gdn_Session {
     * @param bool $Persist If setting an identity, should we persist it beyond browser restart?
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
-      if (!C('Garden.Installed', FALSE)) return;
+      if (!C('Garden.Installed', FALSE)) {
+         return;
+      }
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $this->UserID = $UserID !== FALSE ? $UserID : Gdn::Authenticator()->GetIdentity();
@@ -360,8 +362,10 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($SetIdentity)
+            if ($SetIdentity) {
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
+               Logger::event('session_start', LogLevel::INFO, 'Session started for {InsertName}.');
+            }
 
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');

@@ -563,7 +563,7 @@ class SettingsController extends DashboardController {
       $EnabledLocales = $LocaleModel->EnabledLocalePacks();
 
       // Check to enable/disable a locale.
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->AuthenticatedPostBack()) {
+      if (($TransientKey && Gdn::Session()->ValidateTransientKey($TransientKey)) || $this->Form->AuthenticatedPostBack()) {
          if ($Op) {
             $Refresh = FALSE;
             switch(strtolower($Op)) {
@@ -1117,7 +1117,7 @@ class SettingsController extends DashboardController {
       $this->SetData('AvailableThemes', $Themes);
 
       // Process self-post.
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
+      if ($ThemeName != '' && Gdn::Session()->ValidateTransientKey($TransientKey)) {
 
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);

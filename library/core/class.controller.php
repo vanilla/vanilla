@@ -1143,20 +1143,38 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Session = Gdn::Session();
 
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
-         Logger::event(
-            'permission_denied',
-            LogLevel::INFO,
-            '{InsertName} was denied permission {Permission}.',
-            array(
-               'Permission' => $Permission,
-           )
-        );
-        if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
+         if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
            Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
-        } else {
-           Gdn::Dispatcher()->Dispatch('DefaultPermission');
-           exit();
-        }
+         } else {
+            Logger::event(
+              'permission_denied',
+              LogLevel::INFO,
+              '{InsertName} was denied permission {permission}.',
+              array(
+                'permission' => $Permission,
+              )
+            );
+
+            Gdn::Dispatcher()->Dispatch('DefaultPermission');
+            exit();
+         }
+      } else {
+         // Log the access of a settings resource.
+         if ($Permission === 'Garden.Moderation.Manage' || (is_array($Permission) && in_array('Garden.Moderation.Manage', $Permission))) {
+            Logger::logAccess(
+               'access_moderation',
+               LogLevel::INFO,
+               '{InsertName} accessed moderation.',
+               array('access' => 'moderation')
+            );
+         } elseif ($Permission === 'Garden.Settings.Manage' || (is_array($Permission) && in_array('Garden.Settings.Manage', $Permission))) {
+            Logger::logAccess(
+               'access_settings',
+               LogLevel::INFO,
+               '{InsertName} accessed settings.',
+               array('access' => 'settings')
+            );
+         }
       }
    }
 

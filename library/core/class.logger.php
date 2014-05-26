@@ -112,7 +112,7 @@ class Logger {
     * @return string Returns the current logLevel.
     * @throws Exception Throws an exception of {@link $value} is an incorrect log level.
     */
-   public function logLevel($value = '') {
+   public static function logLevel($value = '') {
       if ($value !== '') {
          if (self::levelPriority($value) < 0) {
             throw new Exception("Invalid log level $value.", 422);

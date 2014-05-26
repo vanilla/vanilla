@@ -370,7 +370,8 @@ class DiscussionModel extends VanillaModel {
             ->Join('UserDiscussion w', "w.DiscussionID = d2.DiscussionID and w.UserID = $UserID", 'left')
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
-            ->Select('w.CountComments', '', 'CountCommentWatch');
+	    ->Select('w.CountComments', '', 'CountCommentWatch')
+	    ->Select('w.Participated');
       }
 
       $Data = $Sql->Get();

@@ -83,6 +83,29 @@ class Logger {
    }
 
    /**
+    * Log the access of a resource.
+    *
+    * Since resources can be accessed with every page view this event will only log when the cache is enabled
+    * and once every five minutes.
+    *
+    * @param string $event The name of the event to log.
+    * @param string $level The log level of the event.
+    * @param string $message The log message format.
+    * @param array $context Additional information to pass to the event.
+    */
+   public static function logAccess($event, $level, $message, $context = array()) {
+      // Throttle the log access to 1 event every 5 minutes.
+      if (Gdn::Cache()->ActiveEnabled()) {
+         $userID = Gdn::Session()->UserID;
+         $key = "log:$event:$userID";
+         if (Gdn::Cache()->Get($key) === FALSE) {
+            self::event($event, $level, $message, $context);
+            Gdn::Cache()->Store($key, time(), array(Gdn_Cache::FEATURE_EXPIRY => 300));
+         }
+      }
+   }
+
+   /**
     * Gets or sets the current log level.
     *
     * @param string $value Pass a non-empty string to set a new log level.

@@ -1653,6 +1653,11 @@ PASSWORDMETER;
       $KeyName = $this->EscapeFieldName('TransientKey');
       $PostBackKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST, $KeyName, FALSE);
 
+      // If this isn't a postback then return false if there isn't a transient key.
+      if (!$PostBackKey && !Gdn::Request()->IsPostBack()) {
+         return FALSE;
+      }
+
       // DEBUG:
       //$Result .= '<div>KeyName: '.$KeyName.'</div>';
       //echo '<div>PostBackKey: '.$PostBackKey.'</div>';

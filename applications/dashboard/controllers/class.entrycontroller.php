@@ -156,8 +156,14 @@ class EntryController extends Gdn_Controller {
          case Gdn_Authenticator::MODE_GATHER:
             $this->AddJsFile('entry.js');
             $Reaction = $Authenticator->LoginResponse();
-				if ($this->Form->IsPostBack())
+				if ($this->Form->IsPostBack()) {
 					$this->Form->AddError('ErrorCredentials');
+                    Logger::event(
+                       'signin_failure',
+                       LogLevel::WARNING,
+                       '{InsertName} failed to sign in. Some or all credentials were missing.'
+                    );
+                }
          break;
 
          // All information is present, authenticate
@@ -181,16 +187,31 @@ class EntryController extends Gdn_Controller {
                   switch ($AuthenticationResponse) {
                      case Gdn_Authenticator::AUTH_PERMISSION:
                         $this->Form->AddError('ErrorPermission');
+                         Logger::event(
+                            'signin_failure',
+                            LogLevel::WARNING,
+                            '{InsertName} failed to sign in. Permission denied.'
+                         );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
 
                      case Gdn_Authenticator::AUTH_DENIED:
                         $this->Form->AddError('ErrorCredentials');
+                        Logger::event(
+                           'signin_failure',
+                           LogLevel::WARNING,
+                           '{InsertName} failed to sign in. Authentication denied.'
+                        );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
 
                      case Gdn_Authenticator::AUTH_INSUFFICIENT:
                         // Unable to comply with auth request, more information is needed from user.
+                         Logger::event(
+                            'signin_failure',
+                            LogLevel::WARNING,
+                            '{InsertName} failed to sign in. More information needed from user.'
+                         );
                         $this->Form->AddError('ErrorInsufficient');
                         $Reaction = $Authenticator->FailedResponse();
                      break;
@@ -854,6 +875,7 @@ EOT;
 
             if (!$User) {
                $this->Form->AddError('@'.sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))));
+               Logger::event('signin_failure', LogLevel::INFO, '{Signin} failed to sign in. User not found.', array('Signin' => $Email));
             } else {
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
@@ -893,6 +915,13 @@ EOT;
                      }
                   } else {
                      $this->Form->AddError('Invalid password.');
+                     Logger::event(
+                        'signin_failure',
+                        LogLevel::WARNING,
+                        '{InsertName} failed to sign in.  Invalid password.',
+                        array('InsertName' => $User->Name)
+                     );
+
                   }
                } catch (Gdn_UserException $Ex) {
                   $this->Form->AddError($Ex);
@@ -1086,6 +1115,11 @@ EOT;
                $this->Form->AddError('ErrorPermission');
             } else if ($UserID == 0) {
                $this->Form->AddError('ErrorCredentials');
+                Logger::event(
+                   'signin_failure',
+                   LogLevel::WARNING,
+                   '{InsertName} failed to sign in. Invalid credentials.'
+                );
             }
 
             if ($UserID > 0) {
@@ -1543,6 +1577,12 @@ EOT;
                $Email = $this->Form->GetFormValue('Email');
                if (!$this->UserModel->PasswordRequest($Email)) {
                   $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+                  Logger::event(
+                     'password_reset_failure',
+                     LogLevel::INFO,
+                     'Can\'t find account associated with email/username {Input}.',
+                     array('Input' => $Email)
+                  );
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());
@@ -1550,10 +1590,23 @@ EOT;
             if ($this->Form->ErrorCount() == 0) {
                $this->Form->AddError('Success!');
                $this->View = 'passwordrequestsent';
+               Logger::event(
+                  'password_reset_request',
+                  LogLevel::INFO,
+                  '{Input} has been sent a password reset email.',
+                  array('Input' => $Email)
+               );
             }
          } else {
-            if ($this->Form->ErrorCount() == 0)
+            if ($this->Form->ErrorCount() == 0) {
                $this->Form->AddError("Couldn't find an account associated with that email/username.");
+               Logger::event(
+                  'password_reset_failure',
+                  LogLevel::INFO,
+                  'Can\'t find account associated with email/username {Input}.',
+                  array('Input' => $this->Form->GetValue('Email'))
+               );
+            }
          }
       }
       $this->Render();
@@ -1576,11 +1629,21 @@ EOT;
           || $this->UserModel->GetAttribute($UserID, 'PasswordResetKey', '') != $PasswordResetKey
          ) {
          $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
+         Logger::event(
+            'password_reset_failure',
+            LogLevel::NOTICE,
+            '{InsertName} failed to authenticate password reset request.'
+         );
       }
 
       $Expires = $this->UserModel->GetAttribute($UserID, 'PasswordResetExpires');
       if ($this->Form->ErrorCount() === 0 && $Expires < time()) {
          $this->Form->AddError('@'.T('Your password reset token has expired.', 'Your password reset token has expired. Try using the reset request form again.'));
+         Logger::event(
+            'password_reset_failure',
+            LogLevel::NOTICE,
+            '{InsertName} has an expired reset token.'
+         );
       }
 
 
@@ -1599,13 +1662,29 @@ EOT;
       ) {
          $Password = $this->Form->GetFormValue('Password', '');
          $Confirm = $this->Form->GetFormValue('Confirm', '');
-         if ($Password == '')
+         if ($Password == '') {
             $this->Form->AddError('Your new password is invalid');
-         else if ($Password != $Confirm)
+            Logger::event(
+               'password_reset_failure',
+               LogLevel::NOTICE,
+               'Failed to reset the password for {InsertName}. Password is invalid.'
+            );
+         } else if ($Password != $Confirm)
             $this->Form->AddError('Your passwords did not match.');
+            Logger::event(
+               'password_reset_failure',
+               LogLevel::NOTICE,
+               'Failed to reset the password for {InsertName}. Passwords did not match.'
+            );
 
          if ($this->Form->ErrorCount() == 0) {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
+            Logger::event(
+               'password_reset',
+               LogLevel::NOTICE,
+               '{UserName} has reset their password.',
+               array('UserName', $User->Name)
+            );
             Gdn::Session()->Start($User->UserID, TRUE);
 //            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
 //            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
@@ -1795,7 +1874,7 @@ EOT;
          if (is_array($TrustedDomains)) {
             // Add this domain to the trusted hosts.
             $TrustedDomains[] = $MyHostname;
-            $Sender->EventArguments['TrustedDomains'] = &$TrustedDomains;
+            $this->EventArguments['TrustedDomains'] = &$TrustedDomains;
             $this->FireEvent('BeforeTargetReturn');
          }
 

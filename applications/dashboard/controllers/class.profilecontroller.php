@@ -73,6 +73,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddJsFile('jquery.form.js');
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('global.js');
 
       $this->AddCssFile('style.css');
@@ -1354,7 +1355,7 @@ class ProfileController extends Gdn_Controller {
 
          // Show invitations?
          if (C('Garden.Registration.Method') == 'Invitation')
-            $this->AddProfileTab(T('Invitations'), 'profile/invitations', 'InvitationsLink');
+            $this->AddProfileTab(T('Invitations'), 'profile/invitations', 'InvitationsLink', Sprite('SpInvitations').' '.T('Invitations'));
 
          $this->FireEvent('AddProfileTabs');
       }

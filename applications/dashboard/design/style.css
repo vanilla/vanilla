@@ -52,6 +52,11 @@ textarea, input[type=text] {
    box-sizing: border-box;
 }
 
+.textarea-autosize {
+   transition: height 0.1s ease;
+   resize: none !important;
+}
+
 /* Elements that are disabled, make sure they reflect that with UX feedback. */
 [disabled] {
    opacity: 0.50;
@@ -4405,4 +4410,16 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .MeBox-SignIn.Inline .SocialIcon {
   display: inline-block;
+}
+
+/* Screen readers only, as part of Section 508 compliance. */
+.sr-only {
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   margin: -1px;
+   padding: 0;
+   overflow: hidden;
+   clip: rect(0,0,0,0);
+   border: 0;
 }

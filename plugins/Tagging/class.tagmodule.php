@@ -163,7 +163,7 @@ class TagModule extends Gdn_Module {
       ob_start();
       ?>
       <div class="Box Tags">
-         <h4><?php echo T($this->ParentID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
+         <?php echo panelHeading(T($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
          <ul class="TagCloud">
          <?php
          foreach ($this->_TagData->Result() as $Tag) {

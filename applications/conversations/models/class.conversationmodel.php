@@ -19,7 +19,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @since 2.0.0
  * @package Conversations
  */
-class ConversationModel extends Gdn_Model {
+class ConversationModel extends ConversationsModel {
    /**
     * Class constructor. Defines the related database table name.
     *
@@ -478,6 +478,7 @@ class ConversationModel extends Gdn_Model {
       if (
          $this->Validate($FormPostValues)
          && $MessageModel->Validate($FormPostValues)
+         && !$this->CheckForSpam()
       ) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that relate to the schema
 
@@ -591,6 +592,13 @@ class ConversationModel extends Gdn_Model {
       $this->UpdateParticipantCount($ConversationID);
    }
 
+   /**
+    * Count unread messages.
+    *
+    * @param int $UserID Unique ID for user being queried.
+    * @param bool $Save Whether to update user record.
+    * @return int
+    */
    public function CountUnread($UserID, $Save = TRUE) {
       // Also update the unread conversation count for this user
       $CountUnread = $this->SQL
@@ -728,8 +736,38 @@ class ConversationModel extends Gdn_Model {
    }
 
    /**
+    * Are we allowed to add more recipients?
+    *
+    * If we pass $CountRecipients then $ConversationID isn't needed (set to zero).
+    *
+    * @param int $ConversationID Unique ID of the conversation.
+    * @param int $CountRecipients Optionally skip needing to query the count by passing it.
+    * @return bool Whether user may add more recipients to conversation.
+    */
+   public function AddUserAllowed($ConversationID = 0, $CountRecipients = 0) {
+      // Determine whether recipients can be added
+      $CanAddRecipients = TRUE;
+      $MaxCount = C('Conversations.MaxRecipients');
+
+      // Avoid a query if we already know we can add. MaxRecipients being unset means unlimited.
+      if ($MaxCount && !CheckPermission('Garden.Moderation.Manage')) {
+         if (!$CountRecipients) {
+            // Count current recipients
+            $ConversationModel = new ConversationModel();
+            $CountRecipients = $ConversationModel->GetRecipients($ConversationID);
+         }
+
+         // Add 1 because sender counts as a recipient.
+         $CanAddRecipients = (count($CountRecipients) < ($MaxCount+1));
+      }
+
+      return $CanAddRecipients;
+   }
+
+   /**
     * Update the count of participants.
-    * @param type $ConversationID
+    *
+    * @param int $ConversationID
     */
    public function UpdateParticipantCount($ConversationID) {
       if (!$ConversationID)
@@ -745,6 +783,12 @@ class ConversationModel extends Gdn_Model {
       $this->SetField($ConversationID, 'CountParticipants', $Count);
    }
 
+   /**
+    * Update users' unread conversation counter.
+    *
+    * @param array $UserIDs Array of ints.
+    * @param bool $SkipSelf Whether to omit current user.
+    */
    public function UpdateUserUnreadCount($UserIDs, $SkipSelf = FALSE) {
 
       // Get the current user out of this array

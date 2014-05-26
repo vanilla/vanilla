@@ -231,7 +231,7 @@ class FacebookPlugin extends Gdn_Plugin {
          $CssClass = 'ReactButton PopupWindow';
       }
 
-      echo ' '.Anchor(Sprite('ReactFacebook', 'ReactSprite'), Url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), $CssClass).' ';
+      echo ' '.Anchor(Sprite('ReactFacebook', 'Sprite ReactSprite', T('Share on Facebook')), Url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE), $CssClass).' ';
    }
 
    public function Base_SignInIcons_Handler($Sender, $Args) {

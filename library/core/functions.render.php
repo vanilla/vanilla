@@ -294,6 +294,7 @@ function CssClass($Row, $InList = TRUE) {
 
       $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
       $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
+      $CssClass .= GetValue('Participated', $Row) == '1' ? ' Participated' : '';
       if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {
          $CountUnreadComments = $Row['CountUnreadComments'];
          if ($CountUnreadComments === TRUE) {

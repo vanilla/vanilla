@@ -1159,21 +1159,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             exit();
          }
       } else {
-         // Log the access of a settings resource.
-         if ($Permission === 'Garden.Moderation.Manage' || (is_array($Permission) && in_array('Garden.Moderation.Manage', $Permission))) {
-            Logger::logAccess(
-               'access_moderation',
-               LogLevel::INFO,
-               '{InsertName} accessed moderation.',
-               array('access' => 'moderation')
-            );
-         } elseif ($Permission === 'Garden.Settings.Manage' || (is_array($Permission) && in_array('Garden.Settings.Manage', $Permission))) {
-            Logger::logAccess(
-               'access_settings',
-               LogLevel::INFO,
-               '{InsertName} accessed settings.',
-               array('access' => 'settings')
-            );
+         $Required = array_intersect((array)$Permission, array('Garden.Settings.Manage', 'Garden.Moderation.Manage'));
+         if (!empty($Required)) {
+            Logger::logAccess('security_access', LogLevel::INFO, "{InsertName} accessed {Path}.");
          }
       }
    }

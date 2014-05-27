@@ -574,6 +574,20 @@ if (!function_exists('IPAnchor')) {
    }
 }
 
+if (!function_exists('panelHeading')) {
+/**
+    * Define default head tag for the side panel.
+    *
+    * @param string $content The content of the tag.
+    * @param string $attributes The attributes of the tag.
+    *
+    * @return string The full tag.
+    */
+   function panelHeading($content, $attributes = '') {
+      return Wrap($content, 'h4', $attributes);
+   }
+}
+
 /**
  * English "plural" formatting.
  * This can be overridden in language definition files like:
@@ -834,7 +848,7 @@ if (!function_exists('UserPhotoUrl')) {
       }
 
       if (!$Photo && function_exists('UserPhotoDefaultUrl'))
-         $Photo = UserPhotoDefaultUrl($User, $ImgClass);
+         $Photo = UserPhotoDefaultUrl($User);
 
       if ($Photo) {
          if (!isUrl($Photo)) {
@@ -976,16 +990,17 @@ if (!function_exists('SocialSignInButton')) {
    function SocialSignInButton($Name, $Url, $Type = 'button', $Attributes = array()) {
       TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
       $Title = $Attributes['title'];
+      $Class = val('class', $Attributes, '');
 
       switch ($Type) {
          case 'icon':
             $Result = Anchor('<span class="Icon"></span>',
-               $Url, 'SocialIcon SocialIcon-'.$Name, $Attributes);
+               $Url, 'SocialIcon SocialIcon-'.$Name . ' ' . $Class, $Attributes);
             break;
          case 'button':
          default:
             $Result = Anchor('<span class="Icon"></span><span class="Text">'.$Title.'</span>',
-               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText', $Attributes);
+               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText ' . $Class, $Attributes);
             break;
       }
 

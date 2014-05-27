@@ -85,7 +85,7 @@ class GoogleSignInPlugin extends Gdn_Plugin {
          // Add the twitter method to the controller.
          $Method = array(
             'Name' => 'Google',
-            'SignInHtml' => SocialSigninButton('Google', $Url, 'button')
+            'SignInHtml' => SocialSigninButton('Google', $Url, 'button', array('class' => 'js-extern'))
          );
 
          $Sender->Data['Methods'][] = $Method;
@@ -105,7 +105,7 @@ class GoogleSignInPlugin extends Gdn_Plugin {
 	private function _GetButton() {
       $Url = $this->_AuthorizeHref();
 
-      return SocialSigninButton('Google', $Url, 'icon');
+      return SocialSigninButton('Google', $Url, 'icon', array('class' => 'js-extern'));
    }
 
 	public function Base_BeforeSignInLink_Handler($Sender) {

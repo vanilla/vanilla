@@ -60,25 +60,28 @@ class Logger {
    /**
     * Get the numeric priority for a log level.
     *
+    * The priorities are set to the LOG_* constants from the {@link syslog()} function.
+    * A lower number is more severe.
+    *
     * @param string $level The string log level.
     * @return int Returns the numeric log level or `-1` if the level is invalid.
     */
    public static function levelPriority($level) {
       static $priorities = array(
-         LogLevel::DEBUG => 0,
-         LogLevel::INFO => 1,
-         LogLevel::NOTICE => 2,
-         LogLevel::WARNING => 3,
-         LogLevel::ERROR => 4,
-         LogLevel::CRITICAL => 5,
-         LogLevel::ALERT => 6,
-         LogLevel::EMERGENCY => 7
+         LogLevel::DEBUG => LOG_DEBUG,
+         LogLevel::INFO => LOG_INFO,
+         LogLevel::NOTICE => LOG_NOTICE,
+         LogLevel::WARNING => LOG_WARNING,
+         LogLevel::ERROR => LOG_ERR,
+         LogLevel::CRITICAL => LOG_CRIT,
+         LogLevel::ALERT => LOG_ALERT,
+         LogLevel::EMERGENCY => LOG_EMERG
       );
 
       if (isset($priorities[$level])) {
          return $priorities[$level];
       } else {
-         return -1;
+         return LOG_DEBUG + 1;
       }
    }
 
@@ -97,7 +100,8 @@ class Logger {
       // Throttle the log access to 1 event every 5 minutes.
       if (Gdn::Cache()->ActiveEnabled()) {
          $userID = Gdn::Session()->UserID;
-         $key = "log:$event:$userID";
+         $path = Url('', '/');
+         $key = "log:$event:$userID:$path";
          if (Gdn::Cache()->Get($key) === FALSE) {
             self::event($event, $level, $message, $context);
             Gdn::Cache()->Store($key, time(), array(Gdn_Cache::FEATURE_EXPIRY => 300));
@@ -114,7 +118,7 @@ class Logger {
     */
    public static function logLevel($value = '') {
       if ($value !== '') {
-         if (self::levelPriority($value) < 0) {
+         if (self::levelPriority($value) > LOG_DEBUG) {
             throw new Exception("Invalid log level $value.", 422);
          }
          self::$logLevel = $value;
@@ -132,19 +136,18 @@ class Logger {
     * @param array $context
     */
    public static function log($level, $message, $context = array()) {
-      if (self::levelPriority($level) < self::levelPriority(self::logLevel())) {
+      if (self::levelPriority($level) > self::levelPriority(self::logLevel())) {
          return;
       }
 
-      //Add default fields to the context if they don't exist.
+      // Add default fields to the context if they don't exist.
       $defaults = array(
          'InsertUserID' => Gdn::Session()->UserID,
          'InsertName' => val("Name", Gdn::Session()->User, 'anonymous'),
          'InsertIPAddress' => Gdn::Request()->IpAddress(),
          'TimeInserted' => time(),
-         'LogLevel' => $level,
          'Method' => Gdn::Request()->RequestMethod(),
-         'Domain' => Url('/', true),
+         'Domain' => rtrim(Url('/', true), '/'),
          'Path' => Url('', '/')
       );
       $context = $context + $defaults;

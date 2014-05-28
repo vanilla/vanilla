@@ -2,7 +2,7 @@
 
 <div class="SplashInfo">
    <?php
-   if ($this->Data('Pong')) {
+   if ($this->Data('valid')) {
       echo '<h1>', T('Pong'), '</h1>';
    }
    ?>

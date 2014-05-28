@@ -187,7 +187,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       try {
          $BlockExceptions = array(
-             '`^utility/ping(/.*)?$`i'              => self::BLOCK_ANY,
              '/^utility(\/.*)?$/'                   => self::BLOCK_NEVER,
              '/^plugin(\/.*)?$/'                    => self::BLOCK_NEVER,
              '/^sso(\/.*)?$/'                       => self::BLOCK_NEVER,

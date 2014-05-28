@@ -55,6 +55,9 @@ class ModController extends DashboardController {
                case 'GET':
                   $this->getQueueItem($queueID);
                   break;
+               case 'POST':
+                  $this->postQueueItem($queueID);
+                  break;
                default:
                   throw new Gdn_UserException('Invalid request method');
             }
@@ -245,7 +248,7 @@ class ModController extends DashboardController {
       //soft delete from queue?
 
       $this->SetData('QueueID', $queueID);
-      $this->Render('mod', '', '');
+      $this->Render();
 
    }
 
@@ -265,6 +268,25 @@ class ModController extends DashboardController {
       $item = $queueModel->GetID($queueID);
 
       $this->SetData('Item', $item);
+      $this->Render();
+   }
+
+   protected function postQueueItem($queueID) {
+      if (!$this->isQueueIDValid($queueID)) {
+         throw new Gdn_UserException('Invalid QueueID: ' . $queueID);
+      }
+      //cast to int
+      $queueID = (int)$queueID;
+      $queueModel = QueueModel::Instance();
+      $data = $this->Request->Post();
+      $data['QueueID'] = $queueID;
+      $queueModel->Save($data);
+      $validationResults = $queueModel->ValidationResults();
+      if (count($validationResults) > 0) {
+         $this->SetData('Data', $data);
+         throw new Gdn_UserException('Invalid request, validation failed.');
+      }
+      $this->SetData('QueueID', $queueID);
       $this->Render();
    }
 }

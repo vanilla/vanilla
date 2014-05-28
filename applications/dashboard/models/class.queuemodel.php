@@ -10,6 +10,7 @@
 class QueueModel extends Gdn_Model {
 
    protected $dbColumns = array(
+      'QueueID',
       'Queue',
       'DateInserted',
       'InsertUserID',
@@ -55,34 +56,32 @@ class QueueModel extends Gdn_Model {
     */
    public function Save($Data, $Settings = FALSE) {
 
-
-      //add any defaults if missing
-      if (!GetValue('Status', $Data)) {
-         $Data['Status'] = $this->defaultSaveStatus;
-      }
       //collect attributes
-      $attributes = array_diff_key($Data, array_flip($this->dbColumns));
-      $Data = array_diff_key($Data, $attributes);
-      $Data['Attributes'] = json_encode($attributes);
-
+      $Attributes = array_diff_key($Data, array_flip($this->dbColumns));
+      $Data = array_diff_key($Data, $Attributes);
 
       $this->DefineSchema();
       $SchemaFields = $this->Schema->Fields();
 
       $SaveData = array();
-      $Attributes = array();
-
       // Grab the current queue item.
+
       if (isset($Data['QueueID'])) {
          $PrimaryKeyVal = $Data['QueueID'];
-         $CurrentItem = $this->SQL->GetWhere('Mod', array('QueueID' => $PrimaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
+         $CurrentItem = $this->SQL->GetWhere('Queue', array('QueueID' => $PrimaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
          if ($CurrentItem) {
-
-            $Attributes = @unserialize($CurrentItem['Attributes']);
-            if (!$Attributes)
-               $Attributes = array();
-
+            $CurrentAttributes = @unserialize($CurrentItem['Attributes']);
+            if ($CurrentAttributes) {
+               $Attributes =  $CurrentAttributes + $Attributes;
+            }
             $Insert = FALSE;
+            if (isset($Data['Status']) && $Data['Status'] != $CurrentItem['Status']) {
+               $Data['DateStatus'] = Gdn_Format::ToDateTime();
+               if (Gdn::Session()->UserID) {
+                  $Data['DateStatus'] = Gdn::Session()->UserID;
+               }
+
+            }
          } else {
             $Insert = TRUE;
          }
@@ -91,6 +90,10 @@ class QueueModel extends Gdn_Model {
          $Insert = TRUE;
       }
 
+      //add any defaults if missing
+      if (!GetValue('Status', $Data)) {
+         $Data['Status'] = $this->defaultSaveStatus;
+      }
       // Grab any values that aren't in the db schema and stick them in attributes.
       foreach ($Data as $Name => $Value) {
          if ($Name == 'Attributes') {
@@ -105,11 +108,10 @@ class QueueModel extends Gdn_Model {
          }
       }
       if (sizeof($Attributes)) {
-         $SaveData['Attributes'] = $Attributes;
+         $SaveData['Attributes'] = serialize($Attributes);
       } else {
          $SaveData['Attributes'] = NULL;
       }
-
       if ($Insert) {
          $this->AddInsertFields($SaveData);
       } else {
@@ -145,16 +147,30 @@ class QueueModel extends Gdn_Model {
       foreach ($where as $key => $value) {
          $sql->Where($key, $value)  ;
       }
-      $queue = $sql->Get()->ResultArray();
-      return $this->CalculateRows($queue);
+      $Rows = $sql->Get()->ResultArray();
+      foreach ($Rows as &$Row) {
+         $Row = $this->CalculateRow($Row);
+      }
+      return $Rows;
 
    }
 
-   public function CalculateRows(&$rows) {
-      foreach ($rows as &$row) {
-         unset($row['Queue']);
+   protected function CalculateRow(&$Row) {
+      if (isset($Row['Attributes']) && !empty($Row['Attributes'])) {
+         if (is_array($Row['Attributes'])) {
+            $Attributes = $Row['Attributes'];
+         } else {
+            $Attributes = unserialize($Row['Attributes']);
+         }
+         if (is_array($Attributes)) {
+            $Row = array_replace($Row, $Attributes);
+         }
       }
-      return $rows;
+      unset($Row['Attributes']);
+      unset($Row['Queue']);
+
+      return $Row;
+
    }
 
    public function GetQueueCounts($queue, $pageSize = 30) {
@@ -206,6 +222,15 @@ class QueueModel extends Gdn_Model {
 
    public function getStatuses() {
       return $this->statusEnum;
+   }
+
+
+   /**
+    * {@inheritDoc}
+    */
+   public function GetID($ID, $DatasetType = FALSE, $Options = array()) {
+      $Row = parent::GetID($ID, DATASET_TYPE_ARRAY, $Options);
+      return $this->CalculateRow($Row);
    }
 
 

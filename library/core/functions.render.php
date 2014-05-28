@@ -294,6 +294,7 @@ function CssClass($Row, $InList = TRUE) {
 
       $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
       $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
+      $CssClass .= GetValue('Participated', $Row) == '1' ? ' Participated' : '';
       if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {
          $CountUnreadComments = $Row['CountUnreadComments'];
          if ($CountUnreadComments === TRUE) {
@@ -574,6 +575,20 @@ if (!function_exists('IPAnchor')) {
    }
 }
 
+if (!function_exists('panelHeading')) {
+   /**
+    * Define default head tag for the side panel.
+    *
+    * @param string $content The content of the tag.
+    * @param string $attributes The attributes of the tag.
+    *
+    * @return string The full tag.
+    */
+   function panelHeading($content, $attributes = '') {
+      return Wrap($content, 'h4', $attributes);
+   }
+}
+
 /**
  * English "plural" formatting.
  * This can be overridden in language definition files like:
@@ -609,6 +624,20 @@ if (!function_exists('PluralTranslate')) {
          return T($Singular, $SingularDefault);
       else
          return T($Plural, $PluralDefault);
+   }
+}
+
+if (!function_exists('preferenceGroupHeading')) {
+   /**
+    * Define default head tag for profile preference groups.
+    *
+    * @param string $content The content of the tag.
+    * @param string $attributes The attributes of the tag.
+    *
+    * @return string The full tag.
+    */
+   function preferenceGroupHeading($content, $attributes = '') {
+      return Wrap($content, 'h3', $attributes);
    }
 }
 
@@ -976,16 +1005,17 @@ if (!function_exists('SocialSignInButton')) {
    function SocialSignInButton($Name, $Url, $Type = 'button', $Attributes = array()) {
       TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
       $Title = $Attributes['title'];
+      $Class = val('class', $Attributes, '');
 
       switch ($Type) {
          case 'icon':
             $Result = Anchor('<span class="Icon"></span>',
-               $Url, 'SocialIcon SocialIcon-'.$Name, $Attributes);
+               $Url, 'SocialIcon SocialIcon-'.$Name . ' ' . $Class, $Attributes);
             break;
          case 'button':
          default:
             $Result = Anchor('<span class="Icon"></span><span class="Text">'.$Title.'</span>',
-               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText', $Attributes);
+               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText ' . $Class, $Attributes);
             break;
       }
 

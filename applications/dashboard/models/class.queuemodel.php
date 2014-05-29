@@ -27,14 +27,31 @@ class QueueModel extends Gdn_Model {
       'Attributes'
    );
 
+   /**
+    * @var array Possible status options.
+    */
    protected $statusEnum = array('unread', 'approved', 'denied');
 
+   /**
+    * @var int Time to cache the total counts for.
+    */
    protected $countTTL = 30;
 
+   /**
+    * @var string Default status for adding new items.
+    */
    protected $defaultSaveStatus = 'unread';
 
+   /**
+    * @var QueueModel
+    */
    public static $Instance;
 
+   /**
+    * Get an instance of the model.
+    *
+    * @return QueueModel
+    */
    public static function Instance() {
       if (isset(self::$Instance)) {
          return self::$Instance;
@@ -50,55 +67,32 @@ class QueueModel extends Gdn_Model {
 
    /**
     * {@inheritDoc}
-    * @param array $Data
-    * @param bool $Settings
-    * @return bool|mixed Primary Key Value
     */
    public function Save($Data, $Settings = FALSE) {
-
-      //collect attributes
-      $Attributes = array_diff_key($Data, array_flip($this->dbColumns));
-      $Data = array_diff_key($Data, $Attributes);
-
       $this->DefineSchema();
       $SchemaFields = $this->Schema->Fields();
 
       $SaveData = array();
-      // Grab the current queue item.
+      $Attributes = array();
 
+      // Grab the current attachment.
       if (isset($Data['QueueID'])) {
          $PrimaryKeyVal = $Data['QueueID'];
+         $Insert = FALSE;
          $CurrentItem = $this->SQL->GetWhere('Queue', array('QueueID' => $PrimaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
          if ($CurrentItem) {
-            $CurrentAttributes = @unserialize($CurrentItem['Attributes']);
-            if ($CurrentAttributes) {
-               $Attributes =  $CurrentAttributes + $Attributes;
-            }
-            $Insert = FALSE;
-            if (isset($Data['Status']) && $Data['Status'] != $CurrentItem['Status']) {
-               $Data['DateStatus'] = Gdn_Format::ToDateTime();
-               if (Gdn::Session()->UserID) {
-                  $Data['DateStatus'] = Gdn::Session()->UserID;
-               }
-
-            }
-         } else {
-            $Insert = TRUE;
+            $Attributes = @unserialize($CurrentItem['Attributes']);
+            if (!$Attributes)
+               $Attributes = array();
          }
       } else {
          $PrimaryKeyVal = FALSE;
          $Insert = TRUE;
       }
-
-      //add any defaults if missing
-      if (!GetValue('Status', $Data)) {
-         $Data['Status'] = $this->defaultSaveStatus;
-      }
       // Grab any values that aren't in the db schema and stick them in attributes.
       foreach ($Data as $Name => $Value) {
-         if ($Name == 'Attributes') {
+         if ($Name == 'Attributes')
             continue;
-         }
          if (isset($SchemaFields[$Name])) {
             $SaveData[$Name] = $Value;
          } elseif ($Value === NULL) {
@@ -108,16 +102,26 @@ class QueueModel extends Gdn_Model {
          }
       }
       if (sizeof($Attributes)) {
-         $SaveData['Attributes'] = serialize($Attributes);
+         $SaveData['Attributes'] = $Attributes;
       } else {
          $SaveData['Attributes'] = NULL;
       }
+
       if ($Insert) {
          $this->AddInsertFields($SaveData);
+         //add any defaults if missing
+         if (!GetValue('Status', $Data)) {
+            $SaveData['Status'] = $this->defaultSaveStatus;
+         }
       } else {
          $this->AddUpdateFields($SaveData);
+         if (GetValue('Status', $Data)) {
+            if (Gdn::Session()->UserID) {
+               $SaveData['StatusUserID'] = Gdn::Session()->UserID;
+               $SaveData['DateStatus'] = Gdn_Format::ToDateTime();
+            }
+         }
       }
-
       // Validate the form posted values.
       if ($this->Validate($SaveData, $Insert) === TRUE) {
          $Fields = $this->Validation->ValidationFields();
@@ -134,6 +138,10 @@ class QueueModel extends Gdn_Model {
       return $PrimaryKeyVal;
    }
 
+
+   /**
+    * {@inheritDoc}
+    */
    public function Get($queue, $page = 'p1', $limit = 30, $where = array()) {
       list($offset, $limit) = OffsetLimit($page, $limit);
       $sql = Gdn::SQL();
@@ -155,7 +163,13 @@ class QueueModel extends Gdn_Model {
 
    }
 
-   protected function CalculateRow(&$Row) {
+   /**
+    * Calculate row.
+    *
+    * @param Array $Row Row from the database.
+    * @return array Modififed Row
+    */
+   protected function CalculateRow($Row) {
       if (isset($Row['Attributes']) && !empty($Row['Attributes'])) {
          if (is_array($Row['Attributes'])) {
             $Attributes = $Row['Attributes'];
@@ -167,12 +181,18 @@ class QueueModel extends Gdn_Model {
          }
       }
       unset($Row['Attributes']);
-      unset($Row['Queue']);
 
       return $Row;
 
    }
 
+   /**
+    * Get Queue Counts.
+    *
+    * @param string $queue Name of the queue.
+    * @param int $pageSize Number of results per page.
+    * @return array
+    */
    public function GetQueueCounts($queue, $pageSize = 30) {
 
       $cacheKeyFormat = 'Queue:Count:{queue}';
@@ -220,6 +240,11 @@ class QueueModel extends Gdn_Model {
       return $counts;
    }
 
+   /**
+    * Get list of possible statuses.
+    *
+    * @return array
+    */
    public function getStatuses() {
       return $this->statusEnum;
    }
@@ -232,6 +257,5 @@ class QueueModel extends Gdn_Model {
       $Row = parent::GetID($ID, DATASET_TYPE_ARRAY, $Options);
       return $this->CalculateRow($Row);
    }
-
 
 }

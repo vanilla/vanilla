@@ -28,6 +28,8 @@ class ModController extends DashboardController {
     */
    public function index() {
 
+      $this->Permission('Garden.Moderation.Manage');
+
       if (count($this->RequestArgs) > 0) {
          if ($this->isQueueValid($this->RequestArgs[0])) {
             $queueName = $this->RequestArgs[0];
@@ -58,6 +60,12 @@ class ModController extends DashboardController {
                case 'POST':
                   $this->postQueueItem($queueID);
                   break;
+               case 'DELETE':
+                  $this->deleteQueueItem($queueID);
+                  break;
+               case 'PATCH':
+                  $this->postQueueItem($queueID);
+                  break;
                default:
                   throw new Gdn_UserException('Invalid request method');
             }
@@ -73,6 +81,9 @@ class ModController extends DashboardController {
     * Display queue totals.
     */
    public function totals() {
+
+      $this->Permission('Garden.Moderation.Manage');
+
       $testing = $this->Request->Get('testing');
       if ($testing) {
          $queueTotals = $this->getQueueTotals(array('testing', 'testingSpam'));
@@ -245,7 +256,8 @@ class ModController extends DashboardController {
       //cast to int
       $queueID = (int)$queueID;
 
-      //soft delete from queue?
+      $queueModel = QueueModel::Instance();
+      $queueModel->Delete($queueID);
 
       $this->SetData('QueueID', $queueID);
       $this->Render();
@@ -267,6 +279,10 @@ class ModController extends DashboardController {
       $queueModel = QueueModel::Instance();
       $item = $queueModel->GetID($queueID);
 
+      if ($item == false) {
+         throw new Gdn_UserException('Not Found', 404);
+      }
+
       $this->SetData('Item', $item);
       $this->Render();
    }
@@ -286,6 +302,23 @@ class ModController extends DashboardController {
          $this->SetData('Data', $data);
          throw new Gdn_UserException('Invalid request, validation failed.');
       }
+      $this->SetData('QueueID', $queueID);
+      $this->Render();
+   }
+
+   protected function deleteQueueItem($queueID) {
+      if (!$this->isQueueIDValid($queueID)) {
+         throw new Gdn_UserException('Invalid QueueID: ' . $queueID);
+      }
+      //cast to int
+      $queueID = (int)$queueID;
+      $queueModel = QueueModel::Instance();
+      $data = $this->Request->Post();
+      $data['QueueID'] = $queueID;
+
+      $queueModel = QueueModel::Instance();
+      $queueModel->Delete($queueID);
+
       $this->SetData('QueueID', $queueID);
       $this->Render();
    }

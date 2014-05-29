@@ -25,7 +25,16 @@ class Gdn_Url {
       $WebRoot = Gdn::Request()->WebRoot();
 
       if ($WithDomain)
-         $Result = Gdn::Request()->Domain().'/'.$WebRoot;
+      {
+        if (!in_array(Gdn::Request()->Port(), array(80, 443)))
+        {
+            $Result = Gdn::Request()->Domain().':'.Gdn::Request()->Port() . '/'.$WebRoot;            
+        }
+        else
+        {
+            $Result = Gdn::Request()->Domain().'/'.$WebRoot;
+        }
+      }
       else
          $Result = $WebRoot;
 

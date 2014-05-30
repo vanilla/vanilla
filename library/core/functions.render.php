@@ -626,20 +626,6 @@ if (!function_exists('PluralTranslate')) {
    }
 }
 
-if (!function_exists('preferenceGroupHeading')) {
-   /**
-    * Define default head tag for profile preference groups.
-    *
-    * @param string $content The content of the tag.
-    * @param string $attributes The attributes of the tag.
-    *
-    * @return string The full tag.
-    */
-   function preferenceGroupHeading($content, $attributes = '') {
-      return Wrap($content, 'h3', $attributes);
-   }
-}
-
 if (!function_exists('SearchExcerpt')):
 
 function SearchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
@@ -862,7 +848,7 @@ if (!function_exists('UserPhotoUrl')) {
       }
 
       if (!$Photo && function_exists('UserPhotoDefaultUrl'))
-         $Photo = UserPhotoDefaultUrl($User, $ImgClass);
+         $Photo = UserPhotoDefaultUrl($User);
 
       if ($Photo) {
          if (!isUrl($Photo)) {

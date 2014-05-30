@@ -13,7 +13,7 @@
  */
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.2.11.3');
+define('APPLICATION_VERSION', '2.2.12');
 
 // Report and track all errors.
 

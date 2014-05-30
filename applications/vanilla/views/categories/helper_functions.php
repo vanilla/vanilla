@@ -31,7 +31,7 @@ function CategoryPhoto($Row) {
          'Item-Icon PhotoWrap PhotoWrap-Category');
    } else {
       $Result = Anchor(
-         '<span class="sr-only">' . T('More category options') . '</span>',
+         '<span class="sr-only">' . T('Expand for more options.') . '</span>',
          CategoryUrl($Row, '', '//'),
          'Item-Icon PhotoWrap PhotoWrap-Category Hidden NoPhoto');
    }

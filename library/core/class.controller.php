@@ -1168,7 +1168,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       } else {
          $Required = array_intersect((array)$Permission, array('Garden.Settings.Manage', 'Garden.Moderation.Manage'));
          if (!empty($Required)) {
-            Logger::logAccess('security_access', LogLevel::INFO, "{InsertName} accessed {Path}.");
+            Logger::logAccess('security_access', Logger::INFO, "{username} accessed {path}.");
          }
       }
    }

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) return; ?>
-<h3><?php echo T('Category Notifications'); ?></h3>
+<h2><?php echo T('Category Notifications'); ?></h2>
 <div class="DismissMessage InfoMessage">
    <?php
    echo T('You can follow individual categories and be notified of all posts within them.');

@@ -146,7 +146,7 @@ class Gdn_Session {
          $Authenticator = Gdn::Authenticator();
 
       if ($this->UserID) {
-         Logger::event('session_end', LogLevel::INFO, 'Session ended for {InsertName}.');
+         Logger::event('session_end', Logger::INFO, 'Session ended for {username}.');
       }
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
@@ -364,7 +364,7 @@ class Gdn_Session {
          if ($this->User) {
             if ($SetIdentity) {
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
-               Logger::event('session_start', LogLevel::INFO, 'Session started for {InsertName}.');
+               Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
             }
 
             $UserModel->EventArguments['User'] =& $this->User;

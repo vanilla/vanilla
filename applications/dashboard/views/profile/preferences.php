@@ -33,7 +33,7 @@ echo $this->Form->Errors();
 $this->FireEvent("BeforePreferencesRender");
 
 foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
-   echo preferenceGroupHeading(T($PreferenceGroup == 'Notifications' ? 'General' : $PreferenceGroup));
+   echo Wrap(T($PreferenceGroup == 'Notifications' ? 'General' : $PreferenceGroup), 'h2');
    ?>
    <table class="PreferenceGroup">
       <thead>

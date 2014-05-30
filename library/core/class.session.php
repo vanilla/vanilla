@@ -492,7 +492,7 @@ class Gdn_Session {
             Logger::event(
                'csrf_failure',
                Logger::ERROR,
-               'Invalid transient key for {InsertName}.'
+               'Invalid transient key for {username}.'
             );
          } else {
             Logger::event(

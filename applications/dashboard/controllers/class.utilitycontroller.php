@@ -479,6 +479,7 @@ class UtilityController extends DashboardController {
       $this->SetData('time', Gdn_Format::Timespan($time));
       $this->SetData('time_s', $time);
       $this->SetData('valid', $valid);
+      $this->Title('Ping');
 
       $this->Render();
    }

@@ -16,6 +16,8 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
    const COLUMN_KEY = 'AuthenticationKey';
    const COLUMN_ALIAS = 'AuthenticationSchemeAlias';
    const COLUMN_NAME = 'Name';
+
+   protected static $DefaultProvider = null;
    
    public function __construct() {
       parent::__construct('UserAuthenticationProvider');
@@ -38,10 +40,13 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     * @return array
     */
    public static function GetDefault() {
-      $Rows = self::GetWhereStatic(array('IsDefault' => 1));
-      if (empty($Rows))
-         return FALSE;
-      return array_pop($Rows);
+      if (!isset(self::$DefaultProvider)) {
+         $Rows = self::GetWhereStatic(array('IsDefault' => 1));
+         if (empty($Rows))
+            return FALSE;
+          self::$DefaultProvider = array_pop($Rows);
+      }
+      return self::$DefaultProvider;
    }
    
    public function GetProviders() {

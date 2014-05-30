@@ -147,10 +147,15 @@ abstract class Gdn_Cache {
       $ActiveCacheClass = 'Gdn_'.ucfirst($ActiveCache);
 
       if (!$AllowCaching || !$ActiveCache || !class_exists($ActiveCacheClass)) {
-
          $CacheObject = new Gdn_Dirtycache();
-      } else
+      } else {
          $CacheObject = new $ActiveCacheClass();
+      }
+
+      // Null caches should not acount as enabled.
+      if (!$ForceEnable && $CacheObject->Type() === Gdn_Cache::CACHE_TYPE_NULL) {
+         SaveToConfig('Cache.Enabled', FALSE, FALSE);
+      }
 
       if (method_exists($CacheObject,'Autorun'))
          $CacheObject->Autorun();
@@ -733,7 +738,7 @@ abstract class Gdn_Cache {
    * @param int $Feature feature contant
    */
    public function UnregisterFeature($Feature) {
-      if (isset($this->Features[$Features]))
+      if (isset($this->Features[$Feature]))
          unset($this->Features[$Feature]);
    }
 

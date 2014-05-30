@@ -16,7 +16,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function emergency($message, array $context = array()) {
-        $this->log(LogLevel::EMERGENCY, $message, $context);
+        $this->log(Logger::EMERGENCY, $message, $context);
     }
 
 
@@ -31,7 +31,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function alert($message, array $context = array()) {
-        $this->log(LogLevel::ALERT, $message, $context);
+        $this->log(Logger::ALERT, $message, $context);
     }
 
     /**
@@ -44,7 +44,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function critical($message, array $context = array()) {
-        $this->log(LogLevel::CRITICAL, $message, $context);
+        $this->log(Logger::CRITICAL, $message, $context);
     }
 
     /**
@@ -56,7 +56,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function error($message, array $context = array()) {
-        $this->log(LogLevel::ERROR, $message, $context);
+        $this->log(Logger::ERROR, $message, $context);
     }
 
     /**
@@ -70,7 +70,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function warning($message, array $context = array()) {
-        $this->log(LogLevel::WARNING, $message, $context);
+        $this->log(Logger::WARNING, $message, $context);
     }
 
     /**
@@ -81,7 +81,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function notice($message, array $context = array()) {
-        $this->log(LogLevel::NOTICE, $message, $context);
+        $this->log(Logger::NOTICE, $message, $context);
     }
 
     /**
@@ -94,7 +94,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function info($message, array $context = array()) {
-        $this->log(LogLevel::INFO, $message, $context);
+        $this->log(Logger::INFO, $message, $context);
     }
 
     /**
@@ -105,7 +105,7 @@ class BaseLogger implements LoggerInterface {
      * @return null
      */
     public function debug($message, array $context = array()) {
-        $this->log(LogLevel::DEBUG, $message, $context);
+        $this->log(Logger::DEBUG, $message, $context);
     }
 
     /**

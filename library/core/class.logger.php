@@ -162,4 +162,33 @@ class Logger {
       $context = $context + $defaults;
       static::getLogger()->log($level, $message, $context);
    }
+
+   /**
+    * Return the string label for a numeric log priority.
+    *
+    * @param int $priority One of the LOG_* log levels.
+    * @return string Returns one of the constants from this class or "unknown" if the priority isn't known.
+    */
+   public static function priorityLabel($priority) {
+      switch ($priority) {
+         case LOG_DEBUG:
+            return self::DEBUG;
+         case LOG_INFO:
+            return self::INFO;
+         case LOG_NOTICE:
+            return self::NOTICE;
+         case LOG_WARNING:
+            return self::WARNING;
+         case LOG_ERR:
+            return self::ERROR;
+         case LOG_CRIT:
+            return self::CRITICAL;
+         case LOG_ALERT:
+            return self::ALERT;
+         case LOG_EMERG:
+            return self::EMERGENCY;
+         default:
+            return 'unknown';
+      }
+   }
 }

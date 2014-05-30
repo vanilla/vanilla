@@ -77,14 +77,14 @@ class Logger {
     */
    public static function levelPriority($level) {
       static $priorities = array(
-         LogLevel::DEBUG => LOG_DEBUG,
-         LogLevel::INFO => LOG_INFO,
-         LogLevel::NOTICE => LOG_NOTICE,
-         LogLevel::WARNING => LOG_WARNING,
-         LogLevel::ERROR => LOG_ERR,
-         LogLevel::CRITICAL => LOG_CRIT,
-         LogLevel::ALERT => LOG_ALERT,
-         LogLevel::EMERGENCY => LOG_EMERG
+         Logger::DEBUG => LOG_DEBUG,
+         Logger::INFO => LOG_INFO,
+         Logger::NOTICE => LOG_NOTICE,
+         Logger::WARNING => LOG_WARNING,
+         Logger::ERROR => LOG_ERR,
+         Logger::CRITICAL => LOG_CRIT,
+         Logger::ALERT => LOG_ALERT,
+         Logger::EMERGENCY => LOG_EMERG
       );
 
       if (isset($priorities[$level])) {
@@ -132,7 +132,7 @@ class Logger {
          }
          self::$logLevel = $value;
       } elseif ($value === null) {
-         self::$logLevel = LogLevel::NOTICE;
+         self::$logLevel = Logger::NOTICE;
       }
       return self::$logLevel;
    }
@@ -161,5 +161,34 @@ class Logger {
       );
       $context = $context + $defaults;
       static::getLogger()->log($level, $message, $context);
+   }
+
+   /**
+    * Return the string label for a numeric log priority.
+    *
+    * @param int $priority One of the LOG_* log levels.
+    * @return string Returns one of the constants from this class or "unknown" if the priority isn't known.
+    */
+   public static function priorityLabel($priority) {
+      switch ($priority) {
+         case LOG_DEBUG:
+            return self::DEBUG;
+         case LOG_INFO:
+            return self::INFO;
+         case LOG_NOTICE:
+            return self::NOTICE;
+         case LOG_WARNING:
+            return self::WARNING;
+         case LOG_ERR:
+            return self::ERROR;
+         case LOG_CRIT:
+            return self::CRITICAL;
+         case LOG_ALERT:
+            return self::ALERT;
+         case LOG_EMERG:
+            return self::EMERGENCY;
+         default:
+            return 'unknown';
+      }
    }
 }

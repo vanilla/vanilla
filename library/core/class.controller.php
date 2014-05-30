@@ -1148,13 +1148,15 @@ class Gdn_Controller extends Gdn_Pluggable {
          } else {
             Logger::event(
               'permission_denied',
-              LogLevel::INFO,
-              '{InsertName} was denied permission {permission}.',
+            Logger::INFO,
+            '{InsertName} was denied permission {Permission}.',
               array(
                 'permission' => $Permission,
               )
             );
-
+        if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
+           Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
+        } else {
             Gdn::Dispatcher()->Dispatch('DefaultPermission');
             exit();
          }

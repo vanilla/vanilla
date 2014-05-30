@@ -384,7 +384,11 @@ class UserModel extends Gdn_Model {
              'ActivityUserID' => $UserID,
              'RegardingUserID' => Gdn::Session()->UserID,
              'HeadlineFormat' => T('HeadlineFormat.Unban', '{RegardingUserID,You} unbanned {ActivityUserID,you}.'),
-             'Story' => $Story);
+             'Story' => $Story,
+             'Data' => array(
+                'Unban' => TRUE
+             )
+         );
 
          $ActivityModel->Queue($Activity);
 

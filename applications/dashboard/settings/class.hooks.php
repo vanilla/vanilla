@@ -14,7 +14,7 @@ class DashboardHooks implements Gdn_IPlugin {
    }
 
    public function UserModel_AfterSignIn_Handler($Sender) {
-      Logger::event('signin', LogLevel::INFO, '{InsertName} signed in.');
+      Logger::event('signin', Logger::INFO, '{InsertName} signed in.');
    }
    /**
     *

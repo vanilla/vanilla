@@ -13,6 +13,15 @@
  * @since 2.2
  */
 class Logger {
+   const EMERGENCY = 'emergency';
+   const ALERT = 'alert';
+   const CRITICAL = 'critical';
+   const ERROR = 'error';
+   const WARNING = 'warning';
+   const NOTICE = 'notice';
+   const INFO = 'info';
+   const DEBUG = 'debug';
+
    /**
     * @var LoggerInterface The interface responsible for doing the actual logging.
     */

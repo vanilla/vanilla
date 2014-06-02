@@ -332,7 +332,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
       // Show the invitations if we're using the invite registration method.
       if (strcasecmp(C('Garden.Registration.Method'), 'invitation') === 0)
-         $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => UserUrl($User, '', 'invitations'), 'icon' => icon('ticket')));
+         $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => UserUrl($user, '', 'invitations'), 'icon' => icon('ticket')));
 
       // Users can edit their own profiles and moderators can edit any profile.
       if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))

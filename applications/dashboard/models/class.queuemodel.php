@@ -28,6 +28,11 @@ class QueueModel extends Gdn_Model {
    );
 
    /**
+    * @var int Limits the number af attributes that can be added to an item.
+    */
+   protected $maxAttributes = 10;
+
+   /**
     * @var array Possible status options.
     */
    protected $statusEnum = array('unread', 'approved', 'denied');
@@ -101,7 +106,10 @@ class QueueModel extends Gdn_Model {
             $Attributes[$Name] = $Value;
          }
       }
-      if (sizeof($Attributes)) {
+      $attributeCount = sizeof($Attributes);
+      if ($attributeCount > $this->maxAttributes) {
+         throw new Gdn_UserException('Maximum number of attributes exceeded (' . $this->maxAttributes . ').');
+      } elseif ($attributeCount > 0) {
          $SaveData['Attributes'] = $Attributes;
       } else {
          $SaveData['Attributes'] = NULL;
@@ -193,9 +201,14 @@ class QueueModel extends Gdn_Model {
     * @param int $pageSize Number of results per page.
     * @return array
     */
-   public function GetQueueCounts($queue, $pageSize = 30) {
+   public function GetQueueCounts($queue, $pageSize = 30, $where = array()) {
 
-      $cacheKeyFormat = 'Queue:Count:{queue}';
+      $cacheKeyFormat = 'Queue:Count:';
+
+      foreach ($where as $key => $value) {
+         $cacheKeyFormat .= $key . ':' . $value .':';
+      }
+      $cacheKeyFormat .= '{queue}';
       $cache = Gdn::Cache();
 
       $cacheKey = FormatString($cacheKeyFormat, array('queue' => $queue));
@@ -206,8 +219,12 @@ class QueueModel extends Gdn_Model {
          $sql->Select('Status')
             ->Select('Status', 'count', 'CountStatus')
             ->From('Queue')
-            ->Where('Queue =', $queue)
-            ->GroupBy('Status');
+            ->Where('Queue =', $queue);
+         foreach ($where as $key => $value) {
+            $sql->Where($key, $value);
+         }
+
+         $sql->GroupBy('Status');
          $rows = $sql->Get()->ResultArray();
 
          $counts = array();

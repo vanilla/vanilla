@@ -156,19 +156,22 @@ class ModController extends DashboardController {
          throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
       }
 
-      $page = $this->Request->Get('page', 'p1');
-      $status = $this->Request->Get('status');
+      $page = $this->Request->Get('Page', 'p1');
+      $status = $this->Request->Get('Status');
+      $categoryID = $this->Request->Get('CategoryID');
 
       $queueModel = QueueModel::Instance();
-      $totals = $queueModel->GetQueueCounts($queue, $this->pageSize);
       $where = array(
          'Queue' => $queue,
       );
       if ($status) {
          $where['Status'] = $status;
-         $totals['Records'] = $totals['Status'][$status];
-         $totals['Pages'] = ceil($totals['Status'][$status]/$totals['PageSize']);
       }
+      if ($categoryID) {
+         $where['CategoryID'] = $categoryID;
+      }
+
+      $totals = $queueModel->GetQueueCounts($queue, $this->pageSize, $where);
       $queueItems = $queueModel->Get($queue, $page, $this->pageSize, $where);
 
       $this->setData(
@@ -247,7 +250,7 @@ class ModController extends DashboardController {
          throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
       }
       if (count($this->RequestArgs) != 2) {
-         throw new Gdn_UserException('Missing Parameter: QueueID');
+         throw new Gdn_UserException('Missing parameter: QueueID');
       }
       $queueID = $this->RequestArgs[1];
       if (!$this->isQueueIDValid($queueID)) {
@@ -287,6 +290,26 @@ class ModController extends DashboardController {
       $this->Render();
    }
 
+
+   /**
+    * Get queue items by relations
+    *
+    * @throws Gdn_UserException
+    *
+    */
+   public function relation() {
+      if ($this->RequestMethod != 'GET') {
+         throw new Gdn_UserException('Invalid request method.  Only GET is accepted.');
+      }
+   }
+
+   /**
+    * Update item in the queue.
+    *
+    * @param int $queueID QueueID.
+    *
+    * @throws Gdn_UserException QueueID or any other input is invalid.
+    */
    protected function postQueueItem($queueID) {
       if (!$this->isQueueIDValid($queueID)) {
          throw new Gdn_UserException('Invalid QueueID: ' . $queueID);
@@ -306,6 +329,13 @@ class ModController extends DashboardController {
       $this->Render();
    }
 
+   /**
+    * Delete an item from the queue.
+    *
+    * @param int $queueID QueueID
+    *
+    * @throws Gdn_UserException If queueID is invalid.
+    */
    protected function deleteQueueItem($queueID) {
       if (!$this->isQueueIDValid($queueID)) {
          throw new Gdn_UserException('Invalid QueueID: ' . $queueID);

@@ -68,6 +68,8 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->EventArguments['Comment'] = &$Comment;
    $Sender->EventArguments['Author'] = &$Author;
    $Sender->EventArguments['CssClass'] = &$CssClass;
+   $Sender->EventArguments['CurrentOffset'] = $CurrentOffset;
+   $Sender->EventArguments['Permalink'] = $Permalink;
 
    // DEPRECATED ARGUMENTS (as of 2.1)
 	$Sender->EventArguments['Object'] = &$Comment;

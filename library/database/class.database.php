@@ -22,6 +22,7 @@ class Gdn_Database {
    public function __construct($Config = NULL) {
       $this->ClassName = get_class($this);
       $this->Init($Config);
+      $this->ReconnectTries = 2;
    }
 
    /// PROPERTIES ///

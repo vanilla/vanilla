@@ -107,6 +107,7 @@ class Gdn_Database {
       if (!$this->_IsPersistent) {
          $this->CommitTransaction();
          $this->_Connection = NULL;
+         $this->_Slave = NULL;
       }
    }
 

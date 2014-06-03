@@ -476,7 +476,7 @@ class ProxyRequest {
       curl_setopt($Handler, CURLOPT_URL, $Url);
       curl_setopt($Handler, CURLOPT_PORT, $Port);
 
-      Logger::event('http_request', LogLevel::DEBUG, '{method} {url}', $logContext);
+      Logger::event('http_request', Logger::DEBUG, '{method} {url}', $logContext);
 
       $this->CurlReceive($Handler);
 
@@ -499,9 +499,9 @@ class ProxyRequest {
          }
       }
       if ($this->ResponseClass('2xx')) {
-         Logger::event('http_response', LogLevel::INFO, '{responseCode} {method} {url} in {responseTime}s', $logContext);
+         Logger::event('http_response', Logger::DEBUG, '{responseCode} {method} {url} in {responseTime}s', $logContext);
       } else {
-         Logger::event('http_response_error', LogLevel::ERROR, '{method} {url} {responseCode} in {responseTime}s', $logContext);
+         Logger::event('http_response_error', Logger::DEBUG, '{responseCode} {method} {url} in {responseTime}s', $logContext);
       }
       
       $this->Loud = $OldVolume;

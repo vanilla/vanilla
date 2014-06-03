@@ -22,6 +22,7 @@ class Gdn_Database {
    public function __construct($Config = NULL) {
       $this->ClassName = get_class($this);
       $this->Init($Config);
+      $this->ReconnectTries = 2;
    }
 
    /// PROPERTIES ///
@@ -77,6 +78,9 @@ class Gdn_Database {
    /** @var string The username connecting to the database. */
    public $User;
 
+   /** @var integer Number of tries to reconnect */
+   public $ReconnectTries;
+
    /// METHODS ///
 
    /**
@@ -103,6 +107,7 @@ class Gdn_Database {
       if (!$this->_IsPersistent) {
          $this->CommitTransaction();
          $this->_Connection = NULL;
+         $this->_Slave = NULL;
       }
    }
 
@@ -317,38 +322,77 @@ class Gdn_Database {
                }
                break;
          }
-		}
-
-      if (val('Type', $Options) == 'select' && val('Slave', $Options, NULL) !== FALSE) {
-         $PDO = $this->Slave();
-         $this->LastInfo['connection'] = 'slave';
-      } else {
-         $PDO = $this->Connection();
-         $this->LastInfo['connection'] = 'master';
       }
 
-      // Make sure other unbufferred queries are not open
-      if (is_object($this->_CurrentResultSet)) {
-         $this->_CurrentResultSet->Result();
-         $this->_CurrentResultSet->FreePDOStatement(FALSE);
-      }
+      // We will retry this query a few times if it fails.
+      $tries = $this->ReconnectTries;
+      if ($tries <= 0) $tries = 0;
 
-      // Run the Query
-      if (!is_null($InputParameters) && count($InputParameters) > 0) {
-         $PDOStatement = $PDO->prepare($Sql);
+      do {
 
-         if (!is_object($PDOStatement)) {
-            trigger_error(ErrorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->GetPDOErrorMessage($PDO->errorInfo())), E_USER_ERROR);
-         } else if ($PDOStatement->execute($InputParameters) === FALSE) {
-            trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDOStatement->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
+         $tries--;
+
+         if (val('Type', $Options) == 'select' && val('Slave', $Options, NULL) !== FALSE) {
+            $PDO = $this->Slave();
+            $this->LastInfo['connection'] = 'slave';
+         } else {
+            $PDO = $this->Connection();
+            $this->LastInfo['connection'] = 'master';
          }
-      } else {
-         $PDOStatement = $PDO->query($Sql);
-      }
 
-      if ($PDOStatement === FALSE) {
-         trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDO->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
-      }
+         // Make sure other unbufferred queries are not open
+         if (is_object($this->_CurrentResultSet)) {
+            $this->_CurrentResultSet->Result();
+            $this->_CurrentResultSet->FreePDOStatement(FALSE);
+         }
+
+         $PDOStatement = null;
+         try {
+
+            // Prepare / Execute
+            if (!is_null($InputParameters) && count($InputParameters) > 0) {
+               $PDOStatement = $PDO->prepare($Sql);
+
+               // Problem with prepare
+               if (!is_object($PDOStatement)) {
+                  throw new ReconnectException('PDO Statement failed to prepare', 'error', $PDO);
+
+               // Problem with execute
+               } else if ($PDOStatement->execute($InputParameters) === FALSE) {
+                  throw new ReconnectException('PDO Statement failed to execute', 'error', $PDOStatement);
+               }
+
+            // Query
+            } else {
+               $PDOStatement = $PDO->query($Sql);
+            }
+
+            if ($PDOStatement === FALSE)
+               throw new ReconnectException('PDO Statement could not be created', 'fail', $PDO);
+
+         } catch (ReconnectException $ex) {
+
+            $errorType = $ex->getErrorType();
+            if (in_array($errorType, array('error', 'fail'))) {
+               $pdoErrorCode = $ex->getPDO()->errorCode();
+               $pdoErrorMessage = $this->GetPDOErrorMessage($ex->getPDO()->errorInfo());
+
+               // Connection Error
+               //if (preg_match('`^08`',$pdoErrorCode)) {
+                  if ($tries) {
+                     $this->closeConnection();
+                     continue;
+                  }
+               //}
+            }
+            // Unable to rescue
+            trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);
+         } catch (Exception $ex) {
+            $pdoErrorMessage = $this->GetPDOErrorMessage($PDO->errorInfo());
+            trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);
+         }
+
+      } while($tries > 0);
 
       // Did this query modify data in any way?
       if ($ReturnType == 'ID') {
@@ -384,13 +428,15 @@ class Gdn_Database {
          $this->_InTransaction = !$this->Connection()->rollBack();
       }
    }
+
    public function GetPDOErrorMessage($ErrorInfo) {
       $ErrorMessage = '';
       if (is_array($ErrorInfo)) {
-         if (count($ErrorInfo) >= 2)
-            $ErrorMessage = $ErrorInfo[2];
-         elseif (count($ErrorInfo) >= 1)
+         if (count($ErrorInfo) >= 3) {
+            $ErrorMessage = "[{$ErrorInfo[0]}] ({$ErrorInfo[1]}) {$ErrorInfo[2]}";
+         } elseif (count($ErrorInfo) >= 1) {
             $ErrorMessage = $ErrorInfo[0];
+         }
       } elseif (is_string($ErrorInfo)) {
          $ErrorMessage = $ErrorInfo;
       }
@@ -444,4 +490,25 @@ class Gdn_Database {
 
       return $this->_Structure;
    }
+}
+
+class ReconnectException extends Exception {
+
+   protected $errorType;
+   protected $pdo;
+
+   public function __construct($message, $type, $pdo) {
+      $this->pdo = $pdo;
+      $this->errorType = $type;
+      parent::__construct($message, 1, null);
+   }
+
+   public function getPDO() {
+      return $this->pdo;
+   }
+
+   public function getErrorType() {
+      return $this->errorType;
+   }
+
 }

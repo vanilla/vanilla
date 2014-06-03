@@ -56,7 +56,8 @@ class ActivityController extends Gdn_Controller {
       $this->AddJsFile('global.js');
       
       $this->AddCssFile('style.css');
-      
+      $this->AddCssFile('vanillicon.css');
+
       // Add Modules
       $this->AddModule('GuestModule');
       $this->AddModule('SignedInModule');

@@ -76,6 +76,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddJsFile('global.js');
 
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css');
       $this->AddModule('GuestModule');
       parent::Initialize();
 

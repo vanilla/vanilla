@@ -244,7 +244,6 @@ class DiscussionController extends VanillaController {
 
       $this->FireEvent('BeforeDiscussionRender');
 
-      $this->AddCssFile('vanillicon.css', 'static');
       $AttachmentModel = AttachmentModel::Instance();
       $AttachmentModel->JoinAttachments($this->Data['Discussion'], $this->Data['Comments']);
 

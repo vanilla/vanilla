@@ -15,7 +15,7 @@
  *    [AttachmentID]       - int       - Primary Key
  *    [ForeignID]          - string    - @see AttachmentModel::RowID()
  *    [ForeignUserID]      - int       - WIll be used for attachments on User (currently not supported)
- *    [Source]             - string    - ie 'salesforce', 'zendesk'
+ *    [Source]             - string    - PluginID ie 'salesforce', 'zendesk'
  *    [SourceID]           - string    - ie 123, abc123
  *    [Attributes]         - text      - This should not be used manually - see notes below about Attributes
  *    [DateInserted]       - datetime  - Added automatically
@@ -41,17 +41,17 @@
  *  Example:
  *   Add to Plugin:
  *    public function DiscussionController_FetchAttachmentViews_Handler($Sender) {
- *       require_once $Sender->FetchViewLocation('attachment', '', 'plugins/Salesforce');
+ *       require_once $Sender->FetchViewLocation('attachment', '', 'plugins/PluginID');
  *    }
  *  Now inside plugins views we add attachment.php with a function like:
- *    function Write_MyType_Attachment($attachment) {}     ... would be called if Type = my-type
+ *    function WriteMyTypeAttachment($attachment) {}     ... would be called if Type = my-type
  *  You can see a skeleton for this in ./applications/dashboard/views/attachments/attachment.php
- *  function: Write_Skeleton_Attachment
+ *  function: WriteSkeletonAttachment
  *
  *
  * Errors
  *
- * To set an error just use the key 'Error'.  Write_Error_Attachment() will then display the error.
+ * To set an error just use the key 'Error'.  WriteErrorAttachment() will then display the error.
  */
 class AttachmentModel extends Gdn_Model {
    /// Properties ///
@@ -334,7 +334,7 @@ class AttachmentModel extends Gdn_Model {
       $method = str_replace('-', ' ', $Type);
       $method = ucwords($method);
       $method = str_replace(' ', '', $method);
-      return 'Write_' . $method . '_Attachment';
+      return 'Write' . $method . 'Attachment';
    }
 
 }

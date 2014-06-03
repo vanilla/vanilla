@@ -6,7 +6,7 @@
 
 if (!function_exists('WriteAttachment')) {
    /**
-    * Renders attachments.  Checks for error key and if present will display error using Write_Error_Attachment.
+    * Renders attachments.  Checks for error key and if present will display error using WriteErrorAttachment.
     *
     * @param array $Attachment Attachment
     * @return string
@@ -16,7 +16,7 @@ if (!function_exists('WriteAttachment')) {
       $customMethod = AttachmentModel::GetWriteAttachmentMethodName($Attachment['Type']);
       if (function_exists($customMethod)) {
          if (GetValue('Error', $Attachment)) {
-            Write_Error_Attachment($Attachment);
+            WriteErrorAttachment($Attachment);
             return;
          }
          $customMethod($Attachment);
@@ -41,8 +41,8 @@ if (!function_exists('WriteAttachments')) {
    }
 }
 
-if (!function_exists('Write_Skeleton_Attachment')) {
-      function Write_Skeleton_Attachment($Attachment) {
+if (!function_exists('WriteSkeletonAttachment')) {
+      function WriteSkeletonAttachment($Attachment) {
       ?>
       <div class="item-attachment">
       <div class="alert">
@@ -86,15 +86,15 @@ if (!function_exists('Write_Skeleton_Attachment')) {
    }
 }
 
-if (!function_exists('Write_Error_Attachment')) {
+if (!function_exists('WriteErrorAttachment')) {
    /**
     * Given a parsed attachment, render it in HTML
     *
     * @param array $Attachment
     * @return string
     */
-   function Write_Error_Attachment($Attachment) {
-      Write_Generic_Attachment(array(
+   function WriteErrorAttachment($Attachment) {
+      WriteGenericAttachment(array(
             'Type' => 'Warning',
             'Icon' => 'warning-sign',
             'Body' => $Attachment['Error']
@@ -102,14 +102,14 @@ if (!function_exists('Write_Error_Attachment')) {
    }
 }
 
-if (!function_exists('Write_Generic_Attachment')) {
+if (!function_exists('WriteGenericAttachment')) {
    /**
     * Given a parsed attachment, render it in HTML
     *
     * @param array $Attachment
     * @return string
     */
-   function Write_Generic_Attachment($Attachment) {
+   function WriteGenericAttachment($Attachment) {
       $Type = GetValue('Type', $Attachment);
       $Icon = GetValue('Icon', $Attachment, 'sign-blank');
       $Title = GetValue('Title', $Attachment);

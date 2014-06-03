@@ -354,39 +354,26 @@ class Gdn_Database {
                $PDOStatement = $PDO->prepare($Sql);
 
                // Problem with prepare
-               if (!is_object($PDOStatement)) {
-                  throw new ReconnectException('PDO Statement failed to prepare', 'error', $PDO);
-
-               // Problem with execute
-               } else if ($PDOStatement->execute($InputParameters) === FALSE) {
-                  throw new ReconnectException('PDO Statement failed to execute', 'error', $PDOStatement);
+               if (!is_object($PDOStatement) || $PDOStatement->execute($InputParameters) === FALSE) {
+                  $PDOStatement = FALSE;
                }
-
             // Query
             } else {
                $PDOStatement = $PDO->query($Sql);
             }
 
-            if ($PDOStatement === FALSE)
-               throw new ReconnectException('PDO Statement could not be created', 'fail', $PDO);
+            if ($PDOStatement === FALSE) {
+               list($state, $code, $message) = $PDO->errorInfo();
 
-         } catch (ReconnectException $ex) {
-
-            $errorType = $ex->getErrorType();
-            if (in_array($errorType, array('error', 'fail'))) {
-               $pdoErrorCode = $ex->getPDO()->errorCode();
-               $pdoErrorMessage = $this->GetPDOErrorMessage($ex->getPDO()->errorInfo());
-
-               // Connection Error
-               //if (preg_match('`^08`',$pdoErrorCode)) {
-                  if ($tries) {
-                     $this->closeConnection();
-                     continue;
-                  }
-               //}
+               // Check for a mysql server has gone away and try to reconnect.
+               if ($code == 2006) {
+                  $this->closeConnection();
+                  continue;
+               }
             }
-            // Unable to rescue
-            trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);
+
+            // If we got here then the pdo statement prepared properly.
+            break;
          } catch (Exception $ex) {
             $pdoErrorMessage = $this->GetPDOErrorMessage($PDO->errorInfo());
             trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);
@@ -490,25 +477,4 @@ class Gdn_Database {
 
       return $this->_Structure;
    }
-}
-
-class ReconnectException extends Exception {
-
-   protected $errorType;
-   protected $pdo;
-
-   public function __construct($message, $type, $pdo) {
-      $this->pdo = $pdo;
-      $this->errorType = $type;
-      parent::__construct($message, 1, null);
-   }
-
-   public function getPDO() {
-      return $this->pdo;
-   }
-
-   public function getErrorType() {
-      return $this->errorType;
-   }
-
 }

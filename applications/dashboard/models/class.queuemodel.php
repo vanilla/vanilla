@@ -130,6 +130,11 @@ class QueueModel extends Gdn_Model {
             }
          }
       }
+      //format fields
+      if (GetValue('Format', $SaveData)) {
+         $SaveData['Format'] = strtolower($SaveData['Format']);
+      }
+
       // Validate the form posted values.
       if ($this->Validate($SaveData, $Insert) === TRUE) {
          $Fields = $this->Validation->ValidationFields();

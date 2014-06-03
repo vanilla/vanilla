@@ -203,6 +203,7 @@ class ModController extends DashboardController {
       $requiredFields = array(
          'name' => 'Name is a required field.',
          'body' => 'Body is a required field.',
+         'format' => 'Format is a required field.',
          'foreigntype' => 'Foreign Type is a required field.',
          'foreignid' => 'Foreign ID is a required field.',
          'foreignuserid' => 'Foreign User ID is a required field.',

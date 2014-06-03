@@ -373,20 +373,17 @@ class Gdn_Database {
          } catch (ReconnectException $ex) {
 
             $errorType = $ex->getErrorType();
-            switch ($errorType) {
-               case 'fail':
-               case 'error':
-                  $pdoErrorCode = $ex->getPDO()->errorCode();
-                  $pdoErrorMessage = $this->GetPDOErrorMessage($ex->getPDO()->errorInfo());
+            if (in_array($errorType, array('error', 'fail'))) {
+               $pdoErrorCode = $ex->getPDO()->errorCode();
+               $pdoErrorMessage = $this->GetPDOErrorMessage($ex->getPDO()->errorInfo());
 
-                  // Connection Error
-                  //if (preg_match('`^08`',$pdoErrorCode)) {
-                     if ($tries) {
-                        $this->closeConnection();
-                        continue;
-                     }
-                  //}
-                  break;
+               // Connection Error
+               //if (preg_match('`^08`',$pdoErrorCode)) {
+                  if ($tries) {
+                     $this->closeConnection();
+                     continue;
+                  }
+               //}
             }
             // Unable to rescue
             trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);

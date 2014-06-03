@@ -150,19 +150,22 @@ class QueueModel extends Gdn_Model {
    /**
     * {@inheritDoc}
     */
-   public function Get($queue, $page = 'p1', $limit = 30, $where = array()) {
+   public function Get($queue, $page = 'p1', $limit = 30, $where = array(), $orderBy = 'DateInserted', $order = 'desc') {
       list($offset, $limit) = OffsetLimit($page, $limit);
+
+      $order = strtolower($order);
+      if ($order != 'asc' || $order != 'asc') {
+         $order = 'desc';
+      }
       $sql = Gdn::SQL();
       $sql->From('Queue')
          ->Limit($limit, $offset);
 
-      $sql->Where('Queue', $queue);
-
-      $sql->OrderBy('DateInserted', 'desc');
-
+      $where['Queue'] = $queue;
       foreach ($where as $key => $value) {
-         $sql->Where($key, $value)  ;
+         $sql->Where($key, $value);
       }
+      $sql->OrderBy($orderBy, $order);
       $Rows = $sql->Get()->ResultArray();
       foreach ($Rows as &$Row) {
          $Row = $this->CalculateRow($Row);
@@ -203,6 +206,7 @@ class QueueModel extends Gdn_Model {
     */
    public function GetQueueCounts($queue, $pageSize = 30, $where = array()) {
 
+      $where['Queue'] = $queue;
       $cacheKeyFormat = 'Queue:Count:';
 
       foreach ($where as $key => $value) {
@@ -218,8 +222,7 @@ class QueueModel extends Gdn_Model {
          $sql = Gdn::SQL();
          $sql->Select('Status')
             ->Select('Status', 'count', 'CountStatus')
-            ->From('Queue')
-            ->Where('Queue =', $queue);
+            ->From('Queue');
          foreach ($where as $key => $value) {
             $sql->Where($key, $value);
          }

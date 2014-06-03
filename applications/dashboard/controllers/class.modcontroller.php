@@ -159,6 +159,7 @@ class ModController extends DashboardController {
       $page = $this->Request->Get('Page', 'p1');
       $status = $this->Request->Get('Status');
       $categoryID = $this->Request->Get('CategoryID');
+      $order = $this->Request->Get('Order');
 
       $queueModel = QueueModel::Instance();
       $where = array(
@@ -170,10 +171,11 @@ class ModController extends DashboardController {
       if ($categoryID) {
          $where['CategoryID'] = $categoryID;
       }
-
+      if (strcasecmp($order, 'ASC') && strcasecmp($order, 'DESC')) {
+         $order = 'desc';
+      }
       $totals = $queueModel->GetQueueCounts($queue, $this->pageSize, $where);
-      $queueItems = $queueModel->Get($queue, $page, $this->pageSize, $where);
-
+      $queueItems = $queueModel->Get($queue, $page, $this->pageSize, $where, 'DateInserted', $order);
       $this->setData(
          array(
             'QueueName' => $queue,

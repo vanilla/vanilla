@@ -109,7 +109,7 @@ class Logger {
       // Throttle the log access to 1 event every 5 minutes.
       if (Gdn::Cache()->ActiveEnabled()) {
          $userID = Gdn::Session()->UserID;
-         $path = Url('', '/');
+         $path = Gdn::Request()->Path();
          $key = "log:$event:$userID:$path";
          if (Gdn::Cache()->Get($key) === FALSE) {
             self::event($event, $level, $message, $context);

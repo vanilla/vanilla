@@ -4053,7 +4053,7 @@ ul.token-input-list {
   width: 100%;
   cursor: text;
   min-height: 1px;
-  z-index: 999;
+  z-index: 9999;
   background-color: #fff;
   list-style-type: none;
 }

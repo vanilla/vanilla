@@ -481,7 +481,7 @@ class ConversationModel extends ConversationsModel {
       if (
          $this->Validate($FormPostValues)
          && $MessageModel->Validate($FormPostValues)
-         && !$this->CheckForSpam()
+         && !$this->CheckForSpam('Conversation')
       ) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that relate to the schema
 

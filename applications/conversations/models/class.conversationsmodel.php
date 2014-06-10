@@ -30,7 +30,7 @@ abstract class ConversationsModel extends Gdn_Model {
     * @since 2.2
     * @return bool Whether spam check is positive (TRUE = spammer).
     */
-   public function CheckForSpam() {
+   public function CheckForSpam($Type) {
       // If spam checking is disabled or user is an admin, skip
       $SpamCheckEnabled = GetValue('SpamCheck', $this, TRUE);
       if ($SpamCheckEnabled === FALSE || CheckPermission('Garden.Moderation.Manage'))
@@ -38,20 +38,25 @@ abstract class ConversationsModel extends Gdn_Model {
 
       $Spam = FALSE;
 
-      $CountSpamCheck = Gdn::Session()->GetAttribute('CountConversationsSpamCheck', 0);
-      $DateSpamCheck = Gdn::Session()->GetAttribute('DateConversationsSpamCheck', 0);
+      // Validate $Type
+      if (!in_array($Type, array('Conversation', 'ConversationMessage'))) {
+         trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $Type), 'ConversationsModel', 'CheckForSpam'), E_USER_ERROR);
+      }
+
+      $CountSpamCheck = Gdn::Session()->GetAttribute('Count'.$Type.'SpamCheck', 0);
+      $DateSpamCheck = Gdn::Session()->GetAttribute('Date'.$Type.'SpamCheck', 0);
       $SecondsSinceSpamCheck = time() - Gdn_Format::ToTimestamp($DateSpamCheck);
 
       // Get spam config settings
-      $SpamCount = C('Conversations.SpamCount', 5); // 5 messages
+      $SpamCount = C("Vanilla.$Type.SpamCount", 5); // 5 messages
       if (!is_numeric($SpamCount) || $SpamCount < 2)
          $SpamCount = 2; // 2 spam minimum
 
-      $SpamTime = C('Conversations.SpamTime', 60); // 1 minute
+      $SpamTime = C("Vanilla.$Type.SpamTime", 60); // 1 minute
       if (!is_numeric($SpamTime) || $SpamTime < 0)
          $SpamTime = 30; // 30 second minimum spam span
 
-      $SpamLock = C('Conversations.SpamLock', 300); // 5 minutes
+      $SpamLock = C("Vanilla.$Type.SpamLock", 300); // 5 minutes
       if (!is_numeric($SpamLock) || $SpamLock < 30)
          $SpamLock = 30; // 30 second minimum lockout
 
@@ -70,13 +75,14 @@ abstract class ConversationsModel extends Gdn_Model {
          );
 
          // Update the 'waiting period' every time they try to post again
-         $Attributes['DateConversationsSpamCheck'] = Gdn_Format::ToDateTime();
+         $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::ToDateTime();
       } else {
+
          if ($SecondsSinceSpamCheck > $SpamTime) {
-            $Attributes['CountConversationsSpamCheck'] = 1;
-            $Attributes['DateConversationsSpamCheck'] = Gdn_Format::ToDateTime();
+            $Attributes['Count'.$Type.'SpamCheck'] = 1;
+            $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::ToDateTime();
          } else {
-            $Attributes['CountConversationsSpamCheck'] = $CountSpamCheck + 1;
+            $Attributes['Count'.$Type.'SpamCheck'] = $CountSpamCheck + 1;
          }
       }
       // Update the user profile after every comment

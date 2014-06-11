@@ -54,14 +54,6 @@ class Gdn_Controller extends Gdn_Pluggable {
    protected $_CanonicalUrl;
 
    /**
-    * The controllers subfolder that this controller is placed in (if present).
-    * This is defined by the dispatcher.
-    *
-    * @var string
-    */
-   public $ControllerFolder;
-
-   /**
     * The name of the controller that holds the view (used by $this->FetchView
     * when retrieving the view). Default value is $this->ClassName.
     *
@@ -336,7 +328,6 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->Application = '';
       $this->ApplicationFolder = '';
       $this->Assets = array();
-      $this->ControllerFolder = '';
       $this->CssClass = '';
       $this->Data = array();
       $this->Head = Gdn::Factory('Dummy');
@@ -798,10 +789,6 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if ($ControllerName === FALSE)
          $ControllerName = $this->ControllerName;
-
-      // Munge the controller folder onto the controller name if it is present.
-      if ($this->ControllerFolder != '')
-         $ControllerName = $this->ControllerFolder . DS . $ControllerName;
 
       if (StringEndsWith($ControllerName, 'controller', TRUE))
          $ControllerName = substr($ControllerName, 0, -10);

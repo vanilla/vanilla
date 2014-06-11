@@ -47,20 +47,17 @@ class InThisDiscussionModule extends Gdn_Module {
       <div class="Box">
          <?php echo panelHeading(T('In this Discussion')); ?>
          <ul class="PanelInfo">
-         <?php
-         foreach ($this->_UserData->Result() as $User) {
-            ?>
-            <li>
-               <strong><?php
-                  echo UserAnchor($User, 'UserLink');
-               ?></strong>
-               <?php
-                  echo Gdn_Format::Date($User->DateLastActive);
-               ?>
-            </li>
-            <?php
-         }
-         ?>
+            <?php foreach ($this->_UserData->Result() as $User): ?>
+               <li>
+                  <?php
+                  echo Anchor(
+                     Wrap(Wrap(Gdn_Format::Date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
+                     Wrap(Wrap(GetValue('Name', $User), 'span', array('class' => 'Username')), 'span'),
+                     UserUrl($User)
+                  )
+                  ?>
+               </li>
+            <?php endforeach; ?>
          </ul>
       </div>
       <?php

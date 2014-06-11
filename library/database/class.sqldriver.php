@@ -258,7 +258,7 @@ abstract class Gdn_SQLDriver {
    /**
     * Begin bracketed group in the where clause to group logical expressions together.
     *
-    * @return Gdn_DatabaseDriver $this
+    * @return Gdn_SQLDriver $this
     */
    public function BeginWhereGroup() {
       $this->_WhereGroupCount++;

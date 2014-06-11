@@ -90,8 +90,10 @@ class AttachmentModel extends Gdn_Model {
          'Name' => $InsertUser->Name,
          'ProfileLink' => UserAnchor($InsertUser)
       );
+   }
 
-
+   public function Enabled() {
+      return C('Garden.AttachmentsEnabled', FALSE);
    }
 
    /**

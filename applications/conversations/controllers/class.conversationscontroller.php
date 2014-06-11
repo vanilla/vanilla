@@ -66,7 +66,7 @@ class ConversationsController extends Gdn_Controller {
 
       $this->AddCssFile('style.css');
       $this->AddCssFile('conversations.css');
-      $this->AddCssFile('vanillicon.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       parent::Initialize();
    }
 }

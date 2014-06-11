@@ -88,7 +88,7 @@ class EntryController extends Gdn_Controller {
       $this->AddJsFile('global.js');
 
       $this->AddCssFile('style.css');
-      $this->AddCssFile('vanillicon.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       parent::Initialize();
       Gdn_Theme::Section('Entry');
    }

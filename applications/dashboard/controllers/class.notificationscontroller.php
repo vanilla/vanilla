@@ -22,7 +22,7 @@ class NotificationsController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddCssFile('style.css');
-      $this->AddCssFile('vanillicon.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       $this->AddModule('GuestModule');
       parent::Initialize();
    }

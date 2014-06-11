@@ -2,20 +2,34 @@
 <div class="Box InThisConversation">
    <h4><?php echo T('In this Conversation'); ?></h4>
    <ul class="PanelInfo">
-   <?php
-   $Result = $this->Data->Result();
-   foreach ($this->Data->Result() as $User) {
-      echo '<li>';
+   <?php foreach ($this->Data->Result() as $User): ?>
+      <li>
+         <?php
+         $Username = htmlspecialchars(GetValue('Name', $User));
+         $Photo = GetValue('Photo', $User);
 
-      if (GetValue('Deleted', $User))
-         echo Wrap(UserPhoto($User, array('ImageClass' => 'ProfilePhotoSmall')).' '.UserAnchor($User, 'UserLink'), 'del',
-            array('title' => sprintf(T('%s has left this conversation.'), htmlspecialchars(GetValue('Name', $User))))
+         if (GetValue('Deleted', $User)) {
+            echo Anchor(
+               Wrap(
+                  Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')).' '.
+                  Wrap($Username, 'del', array('class' => 'Username')),
+                  'span', array('class' => 'Conversation-User',)
+               ),
+               UserUrl($User),
+               array('title' => sprintf(T('%s has left this conversation.'), $Username))
             );
-      else
-         echo UserPhoto($User, array('ImageClass' => 'ProfilePhotoSmall')).' '.UserAnchor($User, 'UserLink');
-
-      echo '</li>';
-   }
-   ?>
+         } else {
+            echo Anchor(
+               Wrap(
+                  Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')).' '.
+                  Wrap($Username, 'span', array('class' => 'Username')),
+                  'span', array('class' => 'Conversation-User')
+               ),
+               UserUrl($User)
+            );
+         }
+         ?>
+      </li>
+   <?php endforeach; ?>
    </ul>
 </div>

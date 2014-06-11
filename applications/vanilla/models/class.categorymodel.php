@@ -143,6 +143,11 @@ class CategoryModel extends Gdn_Model {
             $Result = self::$Categories[$ID];
             return $Result;
          } else {
+            foreach (self::$Categories as $Category) {
+               if ($Category['Name'] == $ID) {
+                  return self::$Categories[$Category['CategoryID']];
+               }
+            }
             return NULL;
          }
       } else {

@@ -56,7 +56,7 @@ echo $this->Form->Errors();
          <tr>
             <td>
                <?php echo $this->Form->DropDown('Conversations.Conversation.SpamCount', $SpamCount); ?>
-               <?php echo T('new discussion(s)'); ?>
+               <?php echo T('private conversation(s)'); ?>
             </td>
             <td class="Alt">
                <?php echo $this->Form->DropDown('Conversations.Conversation.SpamTime', $SpamTime); ?>
@@ -70,7 +70,7 @@ echo $this->Form->Errors();
          <tr>
             <td>
                <?php echo $this->Form->DropDown('Conversations.ConversationMessage.SpamCount', $SpamCount); ?>
-               <?php echo T('reply to discussion(s)'); ?>
+               <?php echo T('reply to private conversation(s)'); ?>
             </td>
             <td class="Alt">
                <?php echo $this->Form->DropDown('Conversations.ConversationMessage.SpamTime', $SpamTime); ?>

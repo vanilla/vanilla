@@ -154,21 +154,21 @@ class Gdn_Database {
    }
 
    /**
-	 * Properly quotes and escapes a expression for an sql string.
-	 * @param mixed $Expr The expression to quote.
-	 * @return string The quoted expression.
-	 */
-	public function QuoteExpression($Expr) {
-		if(is_null($Expr)) {
-			return 'NULL';
-		} elseif(is_string($Expr)) {
-			return '\''.str_replace('\'', '\\\'', $Expr).'\'';
-		} elseif(is_object($Expr)) {
-			return '?OBJECT?';
-		} else {
-			return $Expr;
-		}
-	}
+    * Properly quotes and escapes a expression for an sql string.
+    * @param mixed $Expr The expression to quote.
+    * @return string The quoted expression.
+    */
+   public function QuoteExpression($Expr) {
+      if(is_null($Expr)) {
+         return 'NULL';
+      } elseif(is_string($Expr)) {
+         return '\''.str_replace('\'', '\\\'', $Expr).'\'';
+      } elseif(is_object($Expr)) {
+         return '?OBJECT?';
+      } else {
+         return $Expr;
+      }
+   }
 
    /**
     * Initialize the properties of this object.
@@ -278,7 +278,7 @@ class Gdn_Database {
       else
          $ReturnType = NULL;
 
-		if (isset($Options['Cache'])) {
+      if (isset($Options['Cache'])) {
          // Check to see if the query is cached.
          $CacheKeys = (array)val('Cache',$Options,NULL);
          $CacheOperation = val('CacheOperation',$Options,NULL);
@@ -326,7 +326,9 @@ class Gdn_Database {
 
       // We will retry this query a few times if it fails.
       $tries = $this->ReconnectTries;
-      if ($tries <= 0) $tries = 0;
+      if ($tries <= 0) {
+          $tries = 0;
+      }
 
       do {
 
@@ -353,8 +355,9 @@ class Gdn_Database {
             if (!is_null($InputParameters) && count($InputParameters) > 0) {
                $PDOStatement = $PDO->prepare($Sql);
 
-               // Problem with prepare
-               if (!is_object($PDOStatement) || $PDOStatement->execute($InputParameters) === FALSE) {
+               $Executed = $PDOStatement->execute($InputParameters);
+               if (!is_object($PDOStatement) || $Executed === FALSE) {
+                  // Problem with prepare
                   $PDOStatement = FALSE;
                }
             // Query
@@ -365,21 +368,22 @@ class Gdn_Database {
             if ($PDOStatement === FALSE) {
                list($state, $code, $message) = $PDO->errorInfo();
 
-               // Check for a mysql server has gone away and try to reconnect.
+               // Detect mysql "server has gone away" and try to reconnect.
                if ($code == 2006) {
                   $this->closeConnection();
                   continue;
                }
             }
 
-            // If we got here then the pdo statement prepared properly.
+            // If we get here then the pdo statement prepared properly.
             break;
+
          } catch (Exception $ex) {
             $pdoErrorMessage = $this->GetPDOErrorMessage($PDO->errorInfo());
             trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);
          }
 
-      } while($tries > 0);
+      } while ($tries > 0);
 
       // Did this query modify data in any way?
       if ($ReturnType == 'ID') {
@@ -399,12 +403,13 @@ class Gdn_Database {
       }
 
       if (isset($StoreCacheKey)) {
-         if ($CacheOperation == 'get')
+         if ($CacheOperation == 'get') {
             Gdn::Cache()->Store(
                $StoreCacheKey,
                (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->ResultArray() : $this->_CurrentResultSet),
                val('CacheOptions', $Options, array())
-               );
+            );
+         }
       }
 
       return $this->_CurrentResultSet;

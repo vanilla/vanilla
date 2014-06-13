@@ -22,7 +22,7 @@ class Gdn_Database {
    public function __construct($Config = NULL) {
       $this->ClassName = get_class($this);
       $this->Init($Config);
-      $this->ReconnectTries = 1;
+      $this->ConnectRetries = 1;
    }
 
    /// PROPERTIES ///
@@ -78,8 +78,8 @@ class Gdn_Database {
    /** @var string The username connecting to the database. */
    public $User;
 
-   /** @var integer Number of tries to reconnect */
-   public $ReconnectTries;
+   /** @var int Number of retries when the db has gone away. */
+   public $ConnectRetries;
 
    /// METHODS ///
 
@@ -325,7 +325,7 @@ class Gdn_Database {
       }
 
       // We will retry this query a few times if it fails.
-      $tries = $this->ReconnectTries + 1;
+      $tries = $this->ConnectRetries + 1;
       if ($tries < 1) {
           $tries = 1;
       }

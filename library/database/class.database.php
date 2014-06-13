@@ -369,15 +369,19 @@ class Gdn_Database {
                list($state, $code, $message) = $PDO->errorInfo();
 
                // Detect mysql "server has gone away" and try to reconnect.
-               if ($code == 2006) {
+               if ($code == 2006 && $tries >= 0) {
                   $this->closeConnection();
                   continue;
+               } else {
+                  throw new Gdn_UserException($message, $code);
                }
             }
 
             // If we get here then the pdo statement prepared properly.
             break;
 
+         } catch (Gdn_UserException $uex) {
+            trigger_error($uex->getMessage(), E_USER_ERROR);
          } catch (Exception $ex) {
             $pdoErrorMessage = $this->GetPDOErrorMessage($PDO->errorInfo());
             trigger_error(ErrorMessage($ex->getMessage(), $this->ClassName, 'Query', $pdoErrorMessage.'|'.$Sql), E_USER_ERROR);

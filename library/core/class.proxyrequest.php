@@ -82,7 +82,7 @@ class ProxyRequest {
           'SaveAs'               => NULL,
           'Redirects'            => TRUE,
           'SSLNoVerify'          => FALSE,
-          'PreEncodePost'        => TRUE,
+          'PreEncodePost'        => TRUE,       // Should we try to http_build_query the post data before sending?
           'Cookies'              => TRUE,       // Send my cookies?
           'CookieJar'            => FALSE,      // Create a cURL CookieJar?
           'CookieSession'        => FALSE,      // Should old cookies be trashed starting now?
@@ -167,7 +167,7 @@ class ProxyRequest {
     *     'SaveAs'               => NULL,       // Download the response to this file
     *     'Redirects'            => TRUE,       // Allow 302 and 302 redirects
     *     'SSLNoVerify'          => FALSE,      // Verify the remote SSL cert
-    *     'PreEncodePost'        => TRUE,       //
+    *     'PreEncodePost'        => TRUE,       // Should we try to http_build_query the post data?
     *     'Cookies'              => TRUE,       // Send user's browser cookies?
     *     'CookieJar'            => FALSE,      // Create a cURL CookieJar?
     *     'CookieSession'        => FALSE,      // Should old cookies be trashed starting now?

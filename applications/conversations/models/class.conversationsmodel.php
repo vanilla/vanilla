@@ -48,17 +48,17 @@ abstract class ConversationsModel extends Gdn_Model {
       $SecondsSinceSpamCheck = time() - Gdn_Format::ToTimestamp($DateSpamCheck);
 
       // Get spam config settings
-      $SpamCount = C("Conversations.$Type.SpamCount", 5); // 5 messages
-      if (!is_numeric($SpamCount) || $SpamCount < 2)
-         $SpamCount = 2; // 2 spam minimum
+      $SpamCount = C("Conversations.$Type.SpamCount", 1);
+      if (!is_numeric($SpamCount) || $SpamCount < 1)
+         $SpamCount = 1; // 1 spam minimum
 
-      $SpamTime = C("Conversations.$Type.SpamTime", 60); // 1 minute
-      if (!is_numeric($SpamTime) || $SpamTime < 0)
+      $SpamTime = C("Conversations.$Type.SpamTime", 30);
+      if (!is_numeric($SpamTime) || $SpamTime < 30)
          $SpamTime = 30; // 30 second minimum spam span
 
-      $SpamLock = C("Conversations.$Type.SpamLock", 300); // 5 minutes
-      if (!is_numeric($SpamLock) || $SpamLock < 30)
-         $SpamLock = 30; // 30 second minimum lockout
+      $SpamLock = C("Conversations.$Type.SpamLock", 60);
+      if (!is_numeric($SpamLock) || $SpamLock < 60)
+         $SpamLock = 60; // 60 second minimum lockout
 
       // Apply a spam lock if necessary
       $Attributes = array();

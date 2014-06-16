@@ -83,6 +83,7 @@ echo $this->Form->Errors();
          </tr>
 
       <?php endif; ?>
+
    </tbody>
 </table>
 <ul>

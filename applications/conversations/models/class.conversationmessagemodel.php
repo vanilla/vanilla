@@ -169,7 +169,7 @@ class ConversationMessageModel extends ConversationsModel {
     * @param array $FormPostValues Values submitted via form.
     * @return int Unique ID of message created or updated.
     */
-   public function Save($FormPostValues, $Conversation = NULL) {
+   public function Save($FormPostValues, $Conversation = NULL, $Options = array()) {
       $Session = Gdn::Session();
 
       // Define the primary key in this model's table.
@@ -182,10 +182,13 @@ class ConversationMessageModel extends ConversationsModel {
       $this->EventArguments['FormPostValues'] = $FormPostValues;
       $this->FireEvent('BeforeSaveValidation');
 
+      // Determine if spam check should be skipped.
+      $SkipSpamCheck = (!empty($Options['NewConversation']));
+
       // Validate the form posted values
       $MessageID = FALSE;
       if($this->Validate($FormPostValues)
-      && !$this->CheckForSpam('ConversationMessage')) {
+      && !$this->CheckForSpam('ConversationMessage', $SkipSpamCheck)) {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
          TouchValue('Format', $Fields, C('Garden.InputFormatter', 'Html'));
 

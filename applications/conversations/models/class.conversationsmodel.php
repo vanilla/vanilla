@@ -30,10 +30,10 @@ abstract class ConversationsModel extends Gdn_Model {
     * @since 2.2
     * @return bool Whether spam check is positive (TRUE = spammer).
     */
-   public function CheckForSpam($Type) {
+   public function CheckForSpam($Type, $SkipSpamCheck = FALSE) {
       // If spam checking is disabled or user is an admin, skip
       $SpamCheckEnabled = GetValue('SpamCheck', $this, TRUE);
-      if ($SpamCheckEnabled === FALSE || CheckPermission('Garden.Moderation.Manage'))
+      if ($SkipSpamCheck == TRUE || $SpamCheckEnabled === FALSE || CheckPermission('Garden.Moderation.Manage'))
          return FALSE;
 
       $Spam = FALSE;

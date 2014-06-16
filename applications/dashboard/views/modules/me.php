@@ -93,6 +93,7 @@ if ($Session->IsValid()):
 
                $this->FireEvent('FlyoutMenu');
                echo Wrap('<hr />'.Anchor(Sprite('SpSignOut').' '.T('Sign Out'), SignOutUrl()), 'li', array('class' => 'SignInOutWrap SignOutWrap'));
+            echo '</ul>';
          echo '</div>';
          echo '</span>';
 

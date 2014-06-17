@@ -103,8 +103,7 @@ abstract class ConversationsModel extends Gdn_Model {
       ))->ResultArray();
 
       if (is_array($UserMembers) && count($UserMembers)) {
-         $UserMembers = array_column($UserMembers, 'UserID');
-         $ConversationMembers = $UserMembers;
+         $ConversationMembers = array_column($UserMembers, 'UserID');
       }
 
       return $ConversationMembers;

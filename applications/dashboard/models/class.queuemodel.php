@@ -6,8 +6,12 @@
 
 /**
  * Class QueueModel.
+ *
+ * @todo Add Unique index to ForeignID.
  */
 class QueueModel extends Gdn_Model {
+
+   protected $moderatorUserID;
 
    protected $dbColumns = array(
       'QueueID',
@@ -21,6 +25,7 @@ class QueueModel extends Gdn_Model {
       'ForeignType',
       'ForeignID',
       'ForeignUserID',
+      'ForeignIPAddress',
       'Status',
       'DateStatus',
       'DateStatusUserID',
@@ -30,7 +35,7 @@ class QueueModel extends Gdn_Model {
    /**
     * @var int Limits the number af attributes that can be added to an item.
     */
-   protected $maxAttributes = 10;
+   protected $maxAttributes = 20;
 
    /**
     * @var array Possible status options.
@@ -73,7 +78,7 @@ class QueueModel extends Gdn_Model {
    /**
     * {@inheritDoc}
     */
-   public function Save($Data, $Settings = FALSE) {
+   public function Save($data, $Settings = FALSE) {
       $this->DefineSchema();
       $SchemaFields = $this->Schema->Fields();
 
@@ -81,8 +86,8 @@ class QueueModel extends Gdn_Model {
       $Attributes = array();
 
       // Grab the current attachment.
-      if (isset($Data['QueueID'])) {
-         $PrimaryKeyVal = $Data['QueueID'];
+      if (isset($data['QueueID'])) {
+         $PrimaryKeyVal = $data['QueueID'];
          $Insert = FALSE;
          $CurrentItem = $this->SQL->GetWhere('Queue', array('QueueID' => $PrimaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
          if ($CurrentItem) {
@@ -95,7 +100,7 @@ class QueueModel extends Gdn_Model {
          $Insert = TRUE;
       }
       // Grab any values that aren't in the db schema and stick them in attributes.
-      foreach ($Data as $Name => $Value) {
+      foreach ($data as $Name => $Value) {
          if ($Name == 'Attributes')
             continue;
          if (isset($SchemaFields[$Name])) {
@@ -118,14 +123,16 @@ class QueueModel extends Gdn_Model {
       if ($Insert) {
          $this->AddInsertFields($SaveData);
          //add any defaults if missing
-         if (!GetValue('Status', $Data)) {
+         if (!GetValue('Status', $data)) {
             $SaveData['Status'] = $this->defaultSaveStatus;
          }
       } else {
          $this->AddUpdateFields($SaveData);
-         if (GetValue('Status', $Data)) {
+         if (GetValue('Status', $data)) {
             if (Gdn::Session()->UserID) {
-               $SaveData['StatusUserID'] = Gdn::Session()->UserID;
+               if (!GetValue('StatusUserID', $SaveData)) {
+                  $SaveData['StatusUserID'] = Gdn::Session()->UserID;
+               }
                $SaveData['DateStatus'] = Gdn_Format::ToDateTime();
             }
          }
@@ -177,6 +184,19 @@ class QueueModel extends Gdn_Model {
       }
       return $Rows;
 
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+      $this->_BeforeGet();
+
+      $results = $this->SQL->GetWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
+      foreach($results->ResultArray(DATASET_TYPE_ARRAY) as &$row) {
+         $row = $this->CalculateRow($row);
+      }
+      return $results;
    }
 
    /**
@@ -274,13 +294,461 @@ class QueueModel extends Gdn_Model {
       return $this->statusEnum;
    }
 
-
    /**
     * {@inheritDoc}
     */
-   public function GetID($ID, $DatasetType = FALSE, $Options = array()) {
+   public function GetID($ID, $datasetType = FALSE, $Options = array()) {
       $Row = parent::GetID($ID, DATASET_TYPE_ARRAY, $Options);
       return $this->CalculateRow($Row);
+   }
+
+   /**
+    * Check if content being posted needs moderation.
+    *
+    * @param string $recordType Record type.  ie: Discussion, Comment, Activity
+    * @param array $data Record data.
+    * @param array $Options Additional options.
+    * @return bool
+    * @throws Gdn_UserException If error updating queue.
+    */
+   public static function Premoderate($recordType, $data, $Options = array()) {
+
+      $IsPremoderation = FALSE;
+      $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+      if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
+         //@todo There is no interface to manage these yet.
+         $IsPremoderation = true;
+      }
+
+      $Qm = self::Instance();
+      $Qm->EventArguments['RecordType'] = $recordType;
+      $Qm->EventArguments['Data'] =& $data;
+      $Qm->EventArguments['Options'] =& $Options;
+      $Qm->EventArguments['Premoderate'] =& $IsPremoderation;
+
+      $Qm->FireEvent('CheckPremoderation');
+
+      $IsPremoderation = $Qm->EventArguments['Premoderate'];
+
+      if ($IsPremoderation) {
+
+         $data['ForeignID'] = $Qm->EventArguments['ForeignID'];
+         $queueRow = self::convertToQueueRow($recordType, $data);
+         // Allow InsertUserID to be overwritten
+         if ($Qm->EventArguments['InsertUserID'] && !$ApprovalRequired) {
+            $queueRow['InsertUserID'] = $Qm->EventArguments['InsertUserID'];
+         }
+
+         // Save to Queue
+
+         $Saved = $Qm->Save($queueRow);
+         if (!$Saved) {
+            throw new Gdn_UserException($Qm->Validation->ResultsText());
+         }
+
+      }
+
+      return $IsPremoderation;
+   }
+
+   /**
+    * Approve content in the queue.
+    *
+    * @param array $where
+    * @return bool
+    */
+   public function approveWhere($where) {
+      $queueItems = $this->getQueueItems($where);
+
+      $errors = array();
+
+      if (sizeof($queueItems) == 0) {
+         $error = 'Not found';
+         if (GetValue('ForeignID', $where)) {
+            $error = 'Foreign ID: ' . $where['ForeignID'];
+         }
+         $errors['Not Found'] = $error;
+         Trace('No item(s) found');
+      }
+      foreach($queueItems as $item) {
+         $valid = $this->approve($item);
+         if (!$valid) {
+            $errors[$item['QueueID']] = $this->Validation->ResultsText();
+         }
+         $this->Validation->Results(TRUE);
+      }
+
+      foreach ($errors as $id => $value) {
+         $this->Validation->AddValidationResult('QueueID', "{$id}: $value");
+      }
+
+      return sizeof($errors) == 0;
+   }
+
+   /**
+    * Approve an item in the queue.
+    *
+    * @param array|string $queueItem QueueID or array containing queue row.
+    * @return bool Item saved.
+    * @throws Gdn_UserException Unknown type.
+    */
+   public function approve($queueItem) {
+
+      if (!is_array($queueItem)) {
+         $queueItem = $this->GetID($queueItem);
+      }
+
+      if ($queueItem['Status'] != 'unread') {
+         Trace('QueueID: ' . $queueItem['QueueID'] . ' already processed.  Skipping.');
+         return true;
+      }
+
+
+      $ContentType = $queueItem['ForeignType'];
+      $Attributes = false;
+      switch(strtolower($ContentType)) {
+         case 'comment':
+            $model = new CommentModel();
+            $Attributes = true;
+            break;
+         case 'discussion':
+            $model = new DiscussionModel();
+            $Attributes = true;
+            break;
+         case 'activity':
+            $model = new ActivityModel();
+            break;
+         case 'activitycomment':
+            $model = new ActivityModel();
+            break;
+         default:
+            throw new Gdn_UserException('Unknown Type: ' . $ContentType);
+      }
+
+      // Am I approving an item that is already in the system?
+      if (GetValue('ForeignID', $queueItem)) {
+         $parts = explode('-', $queueItem['ForeignID'], 2);
+         $validContentParts = array('A', 'C', 'D');
+         if (in_array($parts[0], $validContentParts)) {
+            $exisiting = $model->GetID($parts[1]);
+            if ($exisiting) {
+               Trace('Item has already been added');
+               return true;
+            }
+         }
+      }
+
+      $saveData = $this->convertToSaveData($queueItem);
+      if ($Attributes) {
+         $saveData['Attributes'] = serialize(
+            array(
+               'Moderation' =>
+                  array(
+                     'Approved' => true,
+                     'ApprovedUserID' => $this->getModeratorUserID(),
+                     'DateApproved' => Gdn_Format::ToDateTime()
+                  )
+            )
+         );
+      }
+      $saveData['Approved'] = true;
+
+      if (strtolower($queueItem['ForeignType']) == 'activitycomment') {
+         $ID = $model->Comment($saveData);
+      } else {
+         $ID = $model->Save($saveData);
+      }
+      // Add the validation results from the model to this one.
+      $this->Validation->AddValidationResult($model->ValidationResults());
+      $valid = count($this->ValidationResults()) == 0;
+      if (!$valid) {
+         $this->Validation->AddValidationResult('Validation', 'Error validating');
+         Trace('QueueID: ' . $queueItem['QueueID'] . ' already approved. Skipping.');
+         return false;
+      }
+
+      if (method_exists($model, 'Save2')) {
+         $model->Save2($ID, true);
+      }
+
+      // Update Queue
+      $saved = $this->Save(
+         array(
+            'QueueID' => $queueItem['QueueID'],
+            'Status' => 'approved',
+            'StatusUserID' => $this->getModeratorUserID(),
+            'DateUpdated' => Gdn_Format::ToDateTime(),
+            'UpdateUserID' => Gdn::Session()->UserID,
+            'ForeignID' => $this->generateForeignID(null, $ID, $ContentType),
+            'PreviousForeignID' => $queueItem['ForeignID']
+         )
+      );
+      if (!$saved) {
+         $this->Validation->AddValidationResult('Error', 'Error updating queue.');
+         return false;
+      }
+
+      return true;
+
+   }
+
+   /**
+    * Deny items from the queue.
+    *
+    * @param array $where Key value pair to be removed.
+    * @return bool
+    */
+   public function denyWhere($where) {
+
+      $queueItems = $this->getQueueItems($where);
+
+      $errors = array();
+
+      if (sizeof($queueItems) == 0) {
+
+         $errors[] = 'not found...';
+         Trace('No item(s) found');
+      }
+      foreach($queueItems as $item) {
+         $valid = $this->deny($item);
+         if (!$valid) {
+            $errors[$item['QueueID']] = $this->Validation->ResultsText();
+         }
+         $this->Validation->Results(TRUE);
+      }
+
+      foreach ($errors as $id => $value) {
+         $this->Validation->AddValidationResult('QueueID', "Error in id {$id}: $value");
+      }
+
+      return sizeof($errors) == 0;
+
+   }
+
+   /**
+    * Deny an item from the queue.
+    *
+    * @param array|string $item QueueID or queue row
+    * @return bool true if item was updated
+    */
+   public function deny($item) {
+
+      if (is_numeric($item)) {
+         $item = $this->GetID($item);
+      }
+
+      if ($item['Status'] != 'unread') {
+         Trace('QueueID: ' . $item['QueueID'] . ' already processed.  Skipping.');
+         return true;
+      }
+      $saved = $this->Save(
+         array(
+            'QueueID' => $item['QueueID'],
+            'Status' => 'denied',
+            'StatusUserID' => $this->getModeratorUserID()
+         )
+      );
+      if (!$saved) {
+         return false;
+      }
+
+      return true;
+
+   }
+
+   /**
+    * Convert save data to an array that can be saved in the queue.
+    *
+    * @param string $recordType Record Type. Discussion, Comment, Activity
+    * @param array $data Data fields.
+    * @return array Row to be saved to the Model.
+    * @throws Gdn_UserException On unknown record type.
+    */
+   protected function convertToQueueRow($recordType, $data) {
+
+      $queueRow = array(
+         'Queue' => val('Queue', $data, 'premoderation'),
+         'Status' => val('Status', $data, 'unread'),
+         'ForeignUserID' => val('InsertUserID', $data, Gdn::Session()->UserID),
+         'ForeignIPAddress' => val('InsertIPAddress', $data, Gdn::Request()->IpAddress()),
+         'Body' => $data['Body'],
+         'Format' => val('Format', $data, C('Garden.InputFormatter')),
+         'ForeignID' => val('ForeignID', $data, self::generateForeignID($data))
+      );
+
+      switch (strtolower($recordType)) {
+         case 'comment':
+            $DiscussionModel = new DiscussionModel();
+            $Discussion = $DiscussionModel->GetID($data['DiscussionID'], DATASET_TYPE_OBJECT);
+            $queueRow['ForeignType'] = 'Comment';
+            $queueRow['DiscussionID'] = $data['DiscussionID'];
+            $queueRow['CategoryID'] = $Discussion->CategoryID;
+            break;
+         case 'discussion':
+            $queueRow['ForeignType'] = 'Discussion';
+            $queueRow['Name'] = $data['Name'];
+            $queueRow['Announce'] = $data['Announce'];
+            $queueRow['CategoryID'] = $data['CategoryID'];
+            break;
+         case 'activity':
+            $queueRow['ForeignType'] = 'Activity';
+            $queueRow['Body'] = $data['Story'];
+            $queueRow['HeadlineFormat'] = $data['HeadlineFormat'];
+            $queueRow['RegardingUserID'] = $data['RegardingUserID'];
+            $queueRow['ActivityUserID'] = $data['ActivityUserID'];
+            $queueRow['ActivityType'] = 'WallPost';
+            $queueRow['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
+            break;
+         case 'activitycomment':
+            $queueRow['ForeignType'] = 'ActivityComment';
+            $queueRow['ActivityID'] = $data['ActivityID'];
+            break;
+         default:
+            throw new Gdn_UserException('Unknown Type: ' . $recordType);
+      }
+
+      return $queueRow;
+
+   }
+
+   /**
+    * Convert a queue row to an array to be saved to the model.
+    *
+    * @param array $queueRow Queue row data.
+    * @return array Of data to be saved.
+    * @throws Gdn_UserException on unknown ForeignType.
+    */
+   protected function convertToSaveData($queueRow) {
+      $data = array(
+         'Body' => $queueRow['Body'],
+         'Format' => $queueRow['Format'],
+         'InsertUserID' => $queueRow['ForeignUserID'],
+         'InsertIPAddress' => $queueRow['ForeignIPAddress'],
+      );
+      switch (strtolower($queueRow['ForeignType'])) {
+         case 'comment':
+            $data['DiscussionID'] = $queueRow['DiscussionID'];
+            $data['CategoryID'] = $queueRow['CategoryID'];
+            break;
+         case 'discussion':
+            $data['Name'] = $queueRow['Name'];
+            $data['CategoryID'] = $queueRow['CategoryID'];
+            break;
+         case 'activity':
+            $data['HeadlineFormat'] = $queueRow['HeadlineFormat'];
+
+            if (GetValue('RegardingUserID', $queueRow)) {
+               //posting on own wall
+               $data['RegardingUserID'] = $queueRow['RegardingUserID'];
+            }
+            $data['ActivityUserID'] = $queueRow['ActivityUserID'];
+            $data['NotifyUserID'] = $queueRow['NotifyUserID'];
+            $data['Story'] = $queueRow['Body'];
+
+            break;
+         case 'activitycomment':
+            $data['ActivityID'] = $queueRow['ActivityID'];
+            break;
+         default:
+            throw new Gdn_UserException('Unknown Type');
+      }
+
+      return $data;
+   }
+
+   /**
+    * Get items from the queue.
+    *
+    * @param array $where key value pair for where clause.
+    * @return array|null
+    */
+   protected function getQueueItems($where) {
+      $queueItems = $this->GetWhere($where)->ResultArray();
+      return $queueItems;
+   }
+
+   /**
+    * Get moderator userID
+    * @return int Moderator user ID.
+    * @throws Gdn_UserException if cant determine moderator id
+    */
+   public function getModeratorUserID() {
+
+      $userID = false;
+
+      if ($this->moderatorUserID) {
+         $userID = $this->moderatorUserID;
+      }
+
+      if (!$userID) {
+         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            return Gdn::Session()->UserID;
+         }
+      }
+
+      if (!$userID) {
+         throw new Gdn_UserException('Error finding Moderator');
+      }
+
+
+      return $userID;
+   }
+
+   /**
+    * Sets the moderator.
+    *
+    * @param int $userID Moderator User ID.
+    */
+   public function setModerator($userID) {
+      $this->moderatorUserID = $userID;
+   }
+
+   /**
+    * Generate Foreign Id's
+    *
+    * @param null|array $data array of new data.
+    * @param null|int $newID New ID for content.
+    * @param null $contentType Content Type.
+    * @return string ForeignID.
+    * @throws Gdn_UserException Unknown content type.
+    */
+   public function generateForeignID($data = null, $newID = null, $contentType = null) {
+
+      if ($data == null && $newID != null) {
+         switch (strtolower($contentType)) {
+            case 'comment':
+               return 'C-' . $newID;
+               break;
+            case 'discussion':
+               return 'D-' . $newID;
+               break;
+            case 'activity':
+               return 'A-' . $newID['ActivityID'];
+               break;
+            case 'activitycomment':
+               return 'AC-' . $newID;
+               break;
+            default:
+               throw new Gdn_UserException('Unknown content type');
+
+         }
+         return;
+      }
+      if (GetValue('CommentID', $data)) {
+         //comment
+         return 'c-' . substr($data['CommentID'], 0, 1);
+      }
+      if (GetValue('DiscussionID', $data)) {
+         //discussion
+         return 'd-' . substr($data['DiscussionID'], 0, 1);
+      }
+      if (GetValue('ActivityID', $data)) {
+         //activity comment
+         return 'ac-' . substr($data['DiscussionID'], 0, 1);
+      }
+
+      return 'rand-' . mt_rand(1,500000) . '-' . mt_rand(mt_rand(100,999), 999999);
+
    }
 
 }

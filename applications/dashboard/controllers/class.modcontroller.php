@@ -14,6 +14,11 @@ class ModController extends DashboardController {
    protected $queues = array('premoderation', 'reported', 'spam');
 
    /**
+    * @var Gdn_Form
+    */
+   public $form;
+
+   /**
     * Primary endpoint.
     *
     * Handles requests that match:
@@ -224,14 +229,8 @@ class ModController extends DashboardController {
       $validationResults = $queueModel->ValidationResults();
       if ($validationResults) {
          $errorMsg = 'Validation Error: ';
-         foreach ($validationResults as $field => $errors) {
-            $errorMsg .= $field;
-            foreach ($errors as $error) {
-               $errorMsg .= ' - ' . $error;
-            }
-            $errorMsg .= "\n";
-         }
-         throw new Gdn_UserException($errorMsg);
+         $errorMsg .= $queueModel->Validation->ResultsText();
+         throw new Gdn_UserException($errorMsg, 400);
       }
       if (!$queueID) {
          throw new Gdn_UserException('Error saving record to queue.');
@@ -325,8 +324,8 @@ class ModController extends DashboardController {
       $queueModel->Save($data);
       $validationResults = $queueModel->ValidationResults();
       if (count($validationResults) > 0) {
-         $this->SetData('Data', $data);
-         throw new Gdn_UserException('Invalid request, validation failed.');
+         $this->form->SetValidationResults($validationResults);
+//         throw new Gdn_UserException('Invalid request, validation failed.');
       }
       $this->SetData('QueueID', $queueID);
       $this->Render();
@@ -355,4 +354,58 @@ class ModController extends DashboardController {
       $this->SetData('QueueID', $queueID);
       $this->Render();
    }
+
+   public function test() {
+      $qm = QueueModel::Instance();
+//      $return = $qm->approveWhere(array('ForeignID' => '00001b39-142d-086f-868a-27b0826c30bc'));
+      $return = $qm->approveWhere(array('ForeignID' => 'D-87'));
+      $this->SetData('return', $return);
+      $this->Render();
+   }
+
+   public function test2() {
+      $qm = QueueModel::Instance();
+      $qm->setModerator(array(
+            'moderatorId' => 'b00916ba-f647-4e9f-b2a6-537f69f89b87',
+            'moderatorEmail' => 'john+vanilla@vanillaforums.com',
+            'moderatorExternalId' => 4
+         ));
+      var_dump($qm->getModeratorUserID());
+
+   }
+
+   /**
+    * Approve an item in the queue.
+    *
+    * @param $queueID
+    */
+   public function approve($queueID) {
+
+      $this->Permission('Garden.Moderation.Manage');
+
+      $queueModel = QueueModel::Instance();
+      $approved = $queueModel->approve($queueID);
+
+      $this->SetData('Approved', $approved);
+      $this->Render('blank', 'utility', 'dashboard');
+
+   }
+
+   /**
+    * Deny an item in the queue.
+    *
+    * @param $queueID
+    */
+   public function deny($queueID) {
+
+      $this->Permission('Garden.Moderation.Manage');
+
+      $queueModel = QueueModel::Instance();
+      $denied = $queueModel->deny($queueID);
+
+      $this->SetData('Denied', $denied);
+      $this->Render('blank', 'utility', 'dashboard');
+
+   }
+
 }

@@ -889,9 +889,9 @@ class ActivityModel extends Gdn_Model {
     * @since 2.1
     */
    public function Comment($Comment) {
-      $Comment['InsertUserID'] = Gdn::Session()->UserID;
+      TouchValue('InsertUserID', $Comment, Gdn::Session()->UserID);
+      TouchValue('InsertIPAddress', $Comment, Gdn::Request()->IpAddress());
       $Comment['DateInserted'] = Gdn_Format::ToDateTime();
-      $Comment['InsertIPAddress'] = Gdn::Request()->IpAddress();
 
       $this->Validation->ApplyRule('ActivityID', 'Required');
       $this->Validation->ApplyRule('Body', 'Required');
@@ -903,7 +903,6 @@ class ActivityModel extends Gdn_Model {
 
       if ($this->Validate($Comment)) {
          $Activity = $this->GetID($Comment['ActivityID'], DATASET_TYPE_ARRAY);
-         Gdn::Controller()->Json('Activity', $CommentActivityID);
 
          $_ActivityID = $Comment['ActivityID'];
          // Check to see if this is a shared activity/notification.
@@ -911,17 +910,21 @@ class ActivityModel extends Gdn_Model {
             Gdn::Controller()->Json('CommentActivityID', $CommentActivityID);
             $Comment['ActivityID'] = $CommentActivityID;
          }
+         Gdn::Controller()->Json('Activity', $CommentActivityID);
 
          // Check for spam.
          $Spam = SpamModel::IsSpam('ActivityComment', $Comment);
          if ($Spam)
             return SPAM;
 
-         // Check for approval
-         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-         if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
-         	LogModel::Insert('Pending', 'ActivityComment', $Comment);
-         	return UNAPPROVED;
+         // Check for premoderation
+         if (!GetValue('Approved', $Comment)) {
+            $Premoderation = QueueModel::Premoderate('ActivityComment', $Comment);
+            if ($Premoderation) {
+               return UNAPPROVED;
+            }
+         } else {
+            unset($Comment['Approved']);
          }
 
          $ID = $this->SQL->Insert('ActivityComment', $Comment);
@@ -1249,12 +1252,20 @@ class ActivityModel extends Gdn_Model {
                if ($Spam)
                   return SPAM;
 
-            	// Check for approval
-		         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-		         if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
-		         	LogModel::Insert('Pending', 'Activity', $Activity);
-		         	return UNAPPROVED;
-		         }
+
+               if (!GetValue('Approved', $Activity)) {
+                  $Premoderation = QueueModel::Premoderate('Activity', $Activity);
+                  if ($Premoderation) {
+                     return UNAPPROVED;
+                  }
+               }
+
+//            	// Check for approval
+//		         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+//		         if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
+//		         	LogModel::Insert('Pending', 'Activity', $Activity);
+//		         	return UNAPPROVED;
+//		         }
             }
 
             $ActivityID = $this->SQL->Insert('Activity', $Activity);

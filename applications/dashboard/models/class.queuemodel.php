@@ -35,7 +35,7 @@ class QueueModel extends Gdn_Model {
    /**
     * @var int Limits the number af attributes that can be added to an item.
     */
-   protected $maxAttributes = 20;
+   protected $maxAttributes = 10;
 
    /**
     * @var array Possible status options.
@@ -314,6 +314,11 @@ class QueueModel extends Gdn_Model {
    public static function Premoderate($recordType, $data, $Options = array()) {
 
       $IsPremoderation = FALSE;
+      // Allow for Feed Discussions or any other message posted as system.
+      if ($data['InsertUserID'] == C('Garden.SystemUserID')) {
+         return false;
+      }
+
       $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
       if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
          //@todo There is no interface to manage these yet.
@@ -332,10 +337,12 @@ class QueueModel extends Gdn_Model {
 
       if ($IsPremoderation) {
 
-         $data['ForeignID'] = $Qm->EventArguments['ForeignID'];
+         if (GetValue('ForeignID', $Qm->EventArguments)) {
+            $data['ForeignID'] = $Qm->EventArguments['ForeignID'];
+         }
          $queueRow = self::convertToQueueRow($recordType, $data);
          // Allow InsertUserID to be overwritten
-         if ($Qm->EventArguments['InsertUserID'] && !$ApprovalRequired) {
+         if (isset($Qm->EventArguments['InsertUserID']) && !$ApprovalRequired) {
             $queueRow['InsertUserID'] = $Qm->EventArguments['InsertUserID'];
          }
 
@@ -428,7 +435,7 @@ class QueueModel extends Gdn_Model {
       // Am I approving an item that is already in the system?
       if (GetValue('ForeignID', $queueItem)) {
          $parts = explode('-', $queueItem['ForeignID'], 2);
-         $validContentParts = array('A', 'C', 'D');
+         $validContentParts = array('A', 'C', 'D', 'AC');
          if (in_array($parts[0], $validContentParts)) {
             $exisiting = $model->GetID($parts[1]);
             if ($exisiting) {
@@ -462,8 +469,7 @@ class QueueModel extends Gdn_Model {
       $this->Validation->AddValidationResult($model->ValidationResults());
       $valid = count($this->ValidationResults()) == 0;
       if (!$valid) {
-         $this->Validation->AddValidationResult('Validation', 'Error validating');
-         Trace('QueueID: ' . $queueItem['QueueID'] . ' already approved. Skipping.');
+         Trace('QueueID: ' . $queueItem['QueueID'] . ' - ' . $this->Validation->ResultsText());
          return false;
       }
 
@@ -587,7 +593,12 @@ class QueueModel extends Gdn_Model {
          case 'discussion':
             $queueRow['ForeignType'] = 'Discussion';
             $queueRow['Name'] = $data['Name'];
-            $queueRow['Announce'] = $data['Announce'];
+            if (GetValue('Announce', $data)) {
+               $queueRow['Announce'] = $data['Announce'];
+            }
+            if (!GetValue('CategoryID', $data)) {
+               throw new Gdn_UserException('CateogryID is a required field for discussions.');
+            }
             $queueRow['CategoryID'] = $data['CategoryID'];
             break;
          case 'activity':
@@ -712,7 +723,7 @@ class QueueModel extends Gdn_Model {
     * @return string ForeignID.
     * @throws Gdn_UserException Unknown content type.
     */
-   public function generateForeignID($data = null, $newID = null, $contentType = null) {
+   public static function generateForeignID($data = null, $newID = null, $contentType = null) {
 
       if ($data == null && $newID != null) {
          switch (strtolower($contentType)) {
@@ -747,8 +758,80 @@ class QueueModel extends Gdn_Model {
          return 'ac-' . substr($data['DiscussionID'], 0, 1);
       }
 
+      return self::generateUUIDFromInts(
+         array(self::get32BitRand(), self::get32BitRand(), self::get32BitRand(), self::get32BitRand())
+      );
+
       return 'rand-' . mt_rand(1,500000) . '-' . mt_rand(mt_rand(100,999), 999999);
 
    }
+
+
+   /**
+    * Given an array of 4 numbers create a UUID
+    *
+    * @param arrat ints Ints to be converted to UUID.  4 numbers; last 3 default to 0
+    * @return string UUID
+    *
+    * @throws Gdn_UserException
+    */
+   public static function generateUUIDFromInts($ints) {
+      if (sizeof($ints) != 4 && !isset($ints[0])) {
+         throw new Gdn_UserException('Invalid arguments passed to ' . __METHOD__);
+      }
+      if (!isset($ints[1])) {
+         $ints[1] = 0;
+      }
+      if (!isset($ints[2])) {
+         $ints[2] = 0;
+      }
+      if (!isset($ints[3])) {
+         $ints[3] = 0;
+      }
+      $result = static::hexInt($ints[0]) . static::hexInt($ints[1], true) . '-'
+         . static::hexInt($ints[2], true).static::hexInt($ints[3]);
+      return $result;
+   }
+
+
+   /**
+    * Get a random 32bit integer.  0x80000000 to 0xFFFFFFFF were not being tested with rand().
+    *
+    * @return int randon 32bi integer.
+    */
+   public static function get32BitRand() {
+      return mt_rand(0, 0xFFFF) | (mt_rand(0, 0xFFFF) << 16);
+   }
+
+   /**
+    * Used to help generate UUIDs; pad and convert from decimal to hexadecimal; and split if neeeded
+    *
+    * @param $int Integer to be converted
+    * @param bool $split Split result into parts.
+    * @return string
+    */
+   public static function hexInt($int, $split = false) {
+      $result = substr(str_pad(dechex($int), 8, '0', STR_PAD_LEFT), 0, 8);
+      if ($split) {
+         $result = implode('-', str_split($result, 4));
+      }
+      return $result;
+   }
+
+
+//   public function validate($FormPostValues, $Insert = FALSE) {
+//
+//      if (!$Insert) {
+//         if (GetValue('Status', $FormPostValues)) {
+//            //status update.  Check DateStatus + StatusUserID
+//            if (!GetValue('DateStatus', $FormPostValues) && !GetValue('StatusUserID', $FormPostValues)) {
+//               $this->Validation->AddValidationResult('Status', 'You must update required fields.' .
+//                  ' StatusUserID and DateStatus must be updated with status.');
+//            }
+//         }
+//      }
+//      return parent::Validate($FormPostValues, $Insert);
+//
+//   }
 
 }

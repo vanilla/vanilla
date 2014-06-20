@@ -129,16 +129,26 @@ if (!function_exists('svalr')) {
             $subSelector = $path[$i];
 
             if (is_array($selection)) {
-               if (!isset($selection[$subSelector]))
+               if (!isset($selection[$subSelector])) {
                   $selection[$subSelector] = array();
+               }
                $selection = &$selection[$subSelector];
+            } else if (is_object($selection)) {
+               if (!isset($selection->$subSelector)) {
+                  $selection->$subSelector = new stdClass();
+               }
+               $selection = &$selection->$subSelector;
             } else {
                return null;
             }
          }
          return $selection = $value;
       } else {
-         return $collection[$key] = $value;
+         if (is_array($collection)) {
+            return $collection[$key] = $value;
+         } else {
+            return $collection->$key = $value;
+         }
       }
    }
 }

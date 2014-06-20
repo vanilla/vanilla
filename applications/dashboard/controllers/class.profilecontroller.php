@@ -77,6 +77,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddJsFile('global.js');
 
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       $this->AddModule('GuestModule');
       parent::Initialize();
 
@@ -631,13 +632,13 @@ class ProfileController extends Gdn_Controller {
             $this->Form->ClearInputs();
             Logger::event(
                'password_change',
-               LogLevel::INFO,
+               Logger::INFO,
                '{InsertName} changed password.'
             );
          } else {
             Logger::event(
                'password_change_failure',
-               LogLevel::INFO,
+               Logger::INFO,
                '{InsertName} failed to change password.',
                array('Error' => $this->Form->ErrorString())
             );

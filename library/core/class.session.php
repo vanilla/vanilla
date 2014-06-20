@@ -146,7 +146,7 @@ class Gdn_Session {
          $Authenticator = Gdn::Authenticator();
 
       if ($this->UserID) {
-         Logger::event('signout', LogLevel::INFO, '{InsertName} signed out.');
+         Logger::event('signout', Logger::INFO, '{username} signed out.');
       }
 
       $Authenticator->AuthenticateWith()->DeAuthenticate();
@@ -485,13 +485,13 @@ class Gdn_Session {
          if (Gdn::Session()->User) {
             Logger::event(
                'csrf_failure',
-               LogLevel::ERROR,
-               'Invalid transient key for {InsertName}.'
+               Logger::ERROR,
+               'Invalid transient key for {username}.'
             );
          } else {
             Logger::event(
                'csrf_failure',
-               LogLevel::ERROR,
+               Logger::ERROR,
                'Invalid transient key.'
             );
          }

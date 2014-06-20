@@ -88,6 +88,7 @@ class EntryController extends Gdn_Controller {
       $this->AddJsFile('global.js');
 
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       parent::Initialize();
       Gdn_Theme::Section('Entry');
    }
@@ -160,8 +161,8 @@ class EntryController extends Gdn_Controller {
 					$this->Form->AddError('ErrorCredentials');
                     Logger::event(
                        'signin_failure',
-                       LogLevel::WARNING,
-                       '{InsertName} failed to sign in. Some or all credentials were missing.'
+                       Logger::WARNING,
+                       '{username} failed to sign in. Some or all credentials were missing.'
                     );
                 }
          break;
@@ -189,8 +190,8 @@ class EntryController extends Gdn_Controller {
                         $this->Form->AddError('ErrorPermission');
                          Logger::event(
                             'signin_failure',
-                            LogLevel::WARNING,
-                            '{InsertName} failed to sign in. Permission denied.'
+                            Logger::WARNING,
+                            '{username} failed to sign in. Permission denied.'
                          );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
@@ -199,8 +200,8 @@ class EntryController extends Gdn_Controller {
                         $this->Form->AddError('ErrorCredentials');
                         Logger::event(
                            'signin_failure',
-                           LogLevel::WARNING,
-                           '{InsertName} failed to sign in. Authentication denied.'
+                           Logger::WARNING,
+                           '{username} failed to sign in. Authentication denied.'
                         );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
@@ -209,8 +210,8 @@ class EntryController extends Gdn_Controller {
                         // Unable to comply with auth request, more information is needed from user.
                          Logger::event(
                             'signin_failure',
-                            LogLevel::WARNING,
-                            '{InsertName} failed to sign in. More information needed from user.'
+                            Logger::WARNING,
+                            '{username} failed to sign in. More information needed from user.'
                          );
                         $this->Form->AddError('ErrorInsufficient');
                         $Reaction = $Authenticator->FailedResponse();
@@ -875,7 +876,7 @@ EOT;
 
             if (!$User) {
                $this->Form->AddError('@'.sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))));
-               Logger::event('signin_failure', LogLevel::INFO, '{Signin} failed to sign in. User not found.', array('Signin' => $Email));
+               Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', array('signin' => $Email));
             } else {
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
@@ -917,8 +918,8 @@ EOT;
                      $this->Form->AddError('Invalid password.');
                      Logger::event(
                         'signin_failure',
-                        LogLevel::WARNING,
-                        '{InsertName} failed to sign in.  Invalid password.',
+                        Logger::WARNING,
+                        '{username} failed to sign in.  Invalid password.',
                         array('InsertName' => $User->Name)
                      );
 
@@ -1117,8 +1118,8 @@ EOT;
                $this->Form->AddError('ErrorCredentials');
                 Logger::event(
                    'signin_failure',
-                   LogLevel::WARNING,
-                   '{InsertName} failed to sign in. Invalid credentials.'
+                   Logger::WARNING,
+                   '{username} failed to sign in. Invalid credentials.'
                 );
             }
 
@@ -1579,7 +1580,7 @@ EOT;
                   $this->Form->SetValidationResults($this->UserModel->ValidationResults());
                   Logger::event(
                      'password_reset_failure',
-                     LogLevel::INFO,
+                     Logger::INFO,
                      'Can\'t find account associated with email/username {Input}.',
                      array('Input' => $Email)
                   );
@@ -1592,7 +1593,7 @@ EOT;
                $this->View = 'passwordrequestsent';
                Logger::event(
                   'password_reset_request',
-                  LogLevel::INFO,
+                  Logger::INFO,
                   '{Input} has been sent a password reset email.',
                   array('Input' => $Email)
                );
@@ -1602,7 +1603,7 @@ EOT;
                $this->Form->AddError("Couldn't find an account associated with that email/username.");
                Logger::event(
                   'password_reset_failure',
-                  LogLevel::INFO,
+                  Logger::INFO,
                   'Can\'t find account associated with email/username {Input}.',
                   array('Input' => $this->Form->GetValue('Email'))
                );
@@ -1631,8 +1632,8 @@ EOT;
          $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
          Logger::event(
             'password_reset_failure',
-            LogLevel::NOTICE,
-            '{InsertName} failed to authenticate password reset request.'
+            Logger::NOTICE,
+            '{username} failed to authenticate password reset request.'
          );
       }
 
@@ -1641,8 +1642,8 @@ EOT;
          $this->Form->AddError('@'.T('Your password reset token has expired.', 'Your password reset token has expired. Try using the reset request form again.'));
          Logger::event(
             'password_reset_failure',
-            LogLevel::NOTICE,
-            '{InsertName} has an expired reset token.'
+            Logger::NOTICE,
+            '{username} has an expired reset token.'
          );
       }
 
@@ -1666,23 +1667,23 @@ EOT;
             $this->Form->AddError('Your new password is invalid');
             Logger::event(
                'password_reset_failure',
-               LogLevel::NOTICE,
-               'Failed to reset the password for {InsertName}. Password is invalid.'
+               Logger::NOTICE,
+               'Failed to reset the password for {username}. Password is invalid.'
             );
          } else if ($Password != $Confirm)
             $this->Form->AddError('Your passwords did not match.');
             Logger::event(
                'password_reset_failure',
-               LogLevel::NOTICE,
-               'Failed to reset the password for {InsertName}. Passwords did not match.'
+               Logger::NOTICE,
+               'Failed to reset the password for {username}. Passwords did not match.'
             );
 
          if ($this->Form->ErrorCount() == 0) {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
             Logger::event(
                'password_reset',
-               LogLevel::NOTICE,
-               '{UserName} has reset their password.',
+               Logger::NOTICE,
+               '{username} has reset their password.',
                array('UserName', $User->Name)
             );
             Gdn::Session()->Start($User->UserID, TRUE);

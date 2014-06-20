@@ -749,6 +749,24 @@ $Construct
    ->Column('NewUserID', 'int')
    ->Set();
 
+$Construct
+   ->Table('Attachment')
+   ->PrimaryKey('AttachmentID')
+   ->Column('Type', 'varchar(64)') // ex: zendesk-case, vendor-item
+   ->Column('ForeignID', 'varchar(50)', FALSE, 'index') // ex: d-123 for DiscussionID 123, u-555 for UserID 555
+   ->Column('ForeignUserID', 'int', FALSE, 'key') // the user id of the record we are attached to (de-normalization)
+   ->Column('Source', 'varchar(64)') // ex: Zendesk, Vendor
+   ->Column('SourceID', 'varchar(32)') // ex: 1
+   ->Column('SourceURL', 'varchar(255)') 
+   ->Column('Attributes', 'text', TRUE)
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertUserID', 'int', FALSE, 'key')
+   ->Column('InsertIPAddress', 'varchar(64)')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
+   ->Set($Explicit, $Drop);
+
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.
 SaveToConfig('Garden.InputFormatter', C('Garden.InputFormatter'));

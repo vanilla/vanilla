@@ -43,6 +43,7 @@ class HomeController extends Gdn_Controller {
    public function Error() {
       $this->RemoveCssFile('admin.css');
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       $this->MasterView = 'default';
 
       $this->CssClass = 'SplashMessage NoPanel';
@@ -66,6 +67,8 @@ class HomeController extends Gdn_Controller {
    public function FileNotFound() {
       $this->RemoveCssFile('admin.css');
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
+
       $this->MasterView = 'default';
 
       $this->CssClass = 'SplashMessage NoPanel';

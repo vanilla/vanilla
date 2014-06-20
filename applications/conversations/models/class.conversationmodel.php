@@ -445,6 +445,9 @@ class ConversationModel extends ConversationsModel {
       $this->DefineSchema();
       $MessageModel->DefineSchema();
 
+      $this->EventArguments['FormPostValues'] = $FormPostValues;
+      $this->FireEvent('BeforeSaveValidation');
+
       if (!GetValue('RecipientUserID', $FormPostValues) && isset($FormPostValues['To'])) {
          $To = explode(',', $FormPostValues['To']);
          $To = array_map('trim', $To);

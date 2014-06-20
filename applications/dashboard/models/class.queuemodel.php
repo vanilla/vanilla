@@ -405,6 +405,10 @@ class QueueModel extends Gdn_Model {
          $queueItem = $this->GetID($queueItem);
       }
 
+      if (!$queueItem) {
+         throw new Gdn_UserException("Item not found in queue.", 404);
+      }
+
       if ($queueItem['Status'] != 'unread') {
          Trace('QueueID: ' . $queueItem['QueueID'] . ' already processed.  Skipping.');
          return true;
@@ -537,19 +541,24 @@ class QueueModel extends Gdn_Model {
     * @param array|string $item QueueID or queue row
     * @return bool true if item was updated
     */
-   public function deny($item) {
+   public function deny($queueItem) {
 
-      if (is_numeric($item)) {
-         $item = $this->GetID($item);
+      if (is_numeric($queueItem)) {
+         $queueItem = $this->GetID($queueItem);
       }
 
-      if ($item['Status'] != 'unread') {
-         Trace('QueueID: ' . $item['QueueID'] . ' already processed.  Skipping.');
+      if (!$queueItem) {
+         throw new Gdn_UserException("Item not found in queue.", 404);
+      }
+
+
+      if ($queueItem['Status'] != 'unread') {
+         Trace('QueueID: ' . $queueItem['QueueID'] . ' already processed.  Skipping.');
          return true;
       }
       $saved = $this->Save(
          array(
-            'QueueID' => $item['QueueID'],
+            'QueueID' => $queueItem['QueueID'],
             'Status' => 'denied',
             'StatusUserID' => $this->getModeratorUserID()
          )

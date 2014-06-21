@@ -99,15 +99,14 @@ echo $this->Form->Errors();
       <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
    </div>
    <div class="ConfigurationHelp">
-      <strong>How to set up Facebook Connect</strong>
-      <p>In order to set up Facebook Connect, you must create an "application" in Facebook at: <a href="https://developers.facebook.com/apps">https://developers.facebook.com/apps</a></p>
-      <p>
-         When you create the Facebook application, you can choose what to enter in most fields, but make sure you enter the following value in the "Site Url" field:
-         <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>" />
-      </p>
-      <p>Once your application has been set up, you must copy the "Application ID" and "Application Secret" into the form on this page and click save.</p>
-      <strong>Need help?</strong>
-      <p>For a complete walk-through of the steps involved, read <a href="http://blog.vanillaforums.com/facebook-application-for-vanillaforums-sso/">How to Create a Facebook Application for Vanillaforums Single Sign-On (SSO)</a>.</p>
+      <strong><?php echo T('How to set up Facebook Connect'); ?></strong>
+      <p><?php echo T('In order to set up Facebook Connect, you must create an "application" in Facebook at:'); ?> <a href="https://developers.facebook.com/apps">https://developers.facebook.com/apps</a></p>
+      <p><?php echo T('When you create the Facebook application, you can choose what to enter in most fields, but make sure you enter the following value in the "Site Url" field:'); ?>
+		<input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>" />
+		</p>
+      <p><?php echo T('Once your application has been set up, you must copy the "Application ID" and "Application Secret" into the form on this page and click save.'); ?></p>
+      <strong><?php echo T('Need help?'); ?></strong>
+      <p><?php echo T('For a complete walk-through of the steps involved, read <a href="http://blog.vanillaforums.com/facebook-application-for-vanillaforums-sso/">How to Create a Facebook Application for Vanillaforums Single Sign-On (SSO)</a>.'); ?></p>
    </div>
 </div>
 <?php

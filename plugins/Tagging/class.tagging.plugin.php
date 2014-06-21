@@ -551,6 +551,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('tagging.js', 'plugins/Tagging');
       $Sender->AddDefinition('PluginsTaggingAdd', Gdn::Session()->CheckPermission('Plugins.Tagging.Add'));
       $Sender->AddDefinition('PluginsTaggingSearchUrl', Gdn::Request()->Url('plugin/tagsearch'));
+	  $Sender->AddDefinition('TagHint', T('TagHint','Start to type...'));	  
 
       // Make sure that detailed tag data is available to the form.
       $DiscussionID = GetValue('DiscussionID', $Sender->Data['Discussion']);

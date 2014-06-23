@@ -13,25 +13,6 @@ class QueueModel extends Gdn_Model {
 
    protected $moderatorUserID;
 
-   protected $dbColumns = array(
-      'QueueID',
-      'Queue',
-      'DateInserted',
-      'InsertUserID',
-      'Name',
-      'Body',
-      'Format',
-      'CategoryID',
-      'ForeignType',
-      'ForeignID',
-      'ForeignUserID',
-      'ForeignIPAddress',
-      'Status',
-      'DateStatus',
-      'DateStatusUserID',
-      'Attributes'
-   );
-
    /**
     * @var int Limits the number af attributes that can be added to an item.
     */
@@ -399,7 +380,7 @@ class QueueModel extends Gdn_Model {
     * @return bool Item saved.
     * @throws Gdn_UserException Unknown type.
     */
-   public function approve($queueItem) {
+   public function approve($queueItem, $doSave = true) {
 
       if (!is_array($queueItem)) {
          $queueItem = $this->GetID($queueItem);
@@ -414,73 +395,77 @@ class QueueModel extends Gdn_Model {
          return true;
       }
 
-
-      $ContentType = $queueItem['ForeignType'];
-      $Attributes = false;
-      switch(strtolower($ContentType)) {
-         case 'comment':
-            $model = new CommentModel();
-            $Attributes = true;
-            break;
-         case 'discussion':
-            $model = new DiscussionModel();
-            $Attributes = true;
-            break;
-         case 'activity':
-            $model = new ActivityModel();
-            break;
-         case 'activitycomment':
-            $model = new ActivityModel();
-            break;
-         default:
-            throw new Gdn_UserException('Unknown Type: ' . $ContentType);
+      if (stristr($queueItem['Queue'], 'testing') !== false) {
+         $doSave = false;
       }
 
-      // Am I approving an item that is already in the system?
-      if (GetValue('ForeignID', $queueItem)) {
-         $parts = explode('-', $queueItem['ForeignID'], 2);
-         $validContentParts = array('A', 'C', 'D', 'AC');
-         if (in_array($parts[0], $validContentParts)) {
-            $exisiting = $model->GetID($parts[1]);
-            if ($exisiting) {
-               Trace('Item has already been added');
-               return true;
+      if ($doSave) {
+         $ContentType = $queueItem['ForeignType'];
+         $Attributes = false;
+         switch(strtolower($ContentType)) {
+            case 'comment':
+               $model = new CommentModel();
+               $Attributes = true;
+               break;
+            case 'discussion':
+               $model = new DiscussionModel();
+               $Attributes = true;
+               break;
+            case 'activity':
+               $model = new ActivityModel();
+               break;
+            case 'activitycomment':
+               $model = new ActivityModel();
+               break;
+            default:
+               throw new Gdn_UserException('Unknown Type: ' . $ContentType);
+         }
+
+         // Am I approving an item that is already in the system?
+         if (GetValue('ForeignID', $queueItem)) {
+            $parts = explode('-', $queueItem['ForeignID'], 2);
+            $validContentParts = array('A', 'C', 'D', 'AC');
+            if (in_array($parts[0], $validContentParts)) {
+               $exisiting = $model->GetID($parts[1]);
+               if ($exisiting) {
+                  Trace('Item has already been added');
+                  return true;
+               }
             }
          }
-      }
 
-      $saveData = $this->convertToSaveData($queueItem);
-      if ($Attributes) {
-         $saveData['Attributes'] = serialize(
-            array(
-               'Moderation' =>
-                  array(
-                     'Approved' => true,
-                     'ApprovedUserID' => $this->getModeratorUserID(),
-                     'DateApproved' => Gdn_Format::ToDateTime()
-                  )
-            )
-         );
-      }
-      $saveData['Approved'] = true;
+         $saveData = $this->convertToSaveData($queueItem);
+         if ($Attributes) {
+            $saveData['Attributes'] = serialize(
+               array(
+                  'Moderation' =>
+                     array(
+                        'Approved' => true,
+                        'ApprovedUserID' => $this->getModeratorUserID(),
+                        'DateApproved' => Gdn_Format::ToDateTime()
+                     )
+               )
+            );
+         }
+         $saveData['Approved'] = true;
 
-      if (strtolower($queueItem['ForeignType']) == 'activitycomment') {
-         $ID = $model->Comment($saveData);
-      } else {
-         $ID = $model->Save($saveData);
-      }
-      // Add the validation results from the model to this one.
-      $this->Validation->AddValidationResult($model->ValidationResults());
-      $valid = count($this->ValidationResults()) == 0;
-      if (!$valid) {
-         Trace('QueueID: ' . $queueItem['QueueID'] . ' - ' . $this->Validation->ResultsText());
-         return false;
-      }
+         if (strtolower($queueItem['ForeignType']) == 'activitycomment') {
+            $ID = $model->Comment($saveData);
+         } else {
+            $ID = $model->Save($saveData);
+         }
+         // Add the validation results from the model to this one.
+         $this->Validation->AddValidationResult($model->ValidationResults());
+         $valid = count($this->ValidationResults()) == 0;
+         if (!$valid) {
+            Trace('QueueID: ' . $queueItem['QueueID'] . ' - ' . $this->Validation->ResultsText());
+            return false;
+         }
 
-      if (method_exists($model, 'Save2')) {
-         $model->Save2($ID, true);
+         if (method_exists($model, 'Save2')) {
+            $model->Save2($ID, true);
+         }
       }
-
       // Update Queue
       $saved = $this->Save(
          array(
@@ -663,6 +648,7 @@ class QueueModel extends Gdn_Model {
             }
             $data['ActivityUserID'] = $queueRow['ActivityUserID'];
             $data['NotifyUserID'] = $queueRow['NotifyUserID'];
+            $data['ActivityType'] = $queueRow['ActivityType'];
             $data['Story'] = $queueRow['Body'];
 
             break;
@@ -800,6 +786,16 @@ class QueueModel extends Gdn_Model {
       $result = static::hexInt($ints[0]) . static::hexInt($ints[1], true) . '-'
          . static::hexInt($ints[2], true).static::hexInt($ints[3]);
       return $result;
+   }
+
+   /**
+    * @param string $UUID Universal Unique Identifier.
+    * @return array Containing the 4 numbers used to generate generateUUIDFromInts
+    */
+   public static function getIntsFromUUID($UUID) {
+      $parts = str_split(str_replace('-', '', $UUID), 8);
+      $parts = array_map('hexdec', $parts);
+      return $parts;
    }
 
 

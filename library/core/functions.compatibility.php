@@ -2,11 +2,11 @@
 
 /**
  * General functions Interim Compatibility Map
- * 
+ *
  * These functions are copies of existing functions but with new and improved
  * names. Parent functions will be deprecated in a future release.
  *
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -14,19 +14,30 @@
  * @since 2.2
  */
 
+if (!function_exists('is_id')) {
+   /**
+    * Finds whether the type given variable is a database id.
+    * @param mixed $val The variable being evaluated.
+    * @return bool Returns true if the variable is a database id or false if it isn't.
+    */
+   function is_id($val) {
+      return is_numeric($val);
+   }
+}
+
 if (!function_exists('paths')) {
    /**
     * Concatenate path elements into single string
-    * 
-    * Takes a variable number of arguments and concatenates them. Delimiters will 
-    * not be duplicated. Example: all of the following invocations will generate 
+    *
+    * Takes a variable number of arguments and concatenates them. Delimiters will
+    * not be duplicated. Example: all of the following invocations will generate
     * the path "/path/to/vanilla/applications/dashboard"
-    * 
+    *
     * '/path/to/vanilla', 'applications/dashboard'
     * '/path/to/vanilla/', '/applications/dashboard'
     * '/path', 'to', 'vanilla', 'applications', 'dashboard'
     * '/path/', '/to/', '/vanilla/', '/applications/', '/dashboard'
-    * 
+    *
     * @param function arguments
     * @return the concatentated path.
     */
@@ -94,10 +105,10 @@ if (!function_exists('valr')) {
 if (!function_exists('svalr')) {
    /**
     * Set a key to a value in a collection
-    * 
+    *
     * Works with single keys or "dot" notation. If $key is an array, a simple
     * shallow array_merge is performed.
-    * 
+    *
     * @param string $key The key or property name of the value.
     * @param array $collection The array or object to search.
     * @param type $value The value to set
@@ -118,16 +129,26 @@ if (!function_exists('svalr')) {
             $subSelector = $path[$i];
 
             if (is_array($selection)) {
-               if (!isset($selection[$subSelector]))
+               if (!isset($selection[$subSelector])) {
                   $selection[$subSelector] = array();
+               }
                $selection = &$selection[$subSelector];
+            } else if (is_object($selection)) {
+               if (!isset($selection->$subSelector)) {
+                  $selection->$subSelector = new stdClass();
+               }
+               $selection = &$selection->$subSelector;
             } else {
                return null;
             }
          }
          return $selection = $value;
       } else {
-         return $collection[$key] = $value;
+         if (is_array($collection)) {
+            return $collection[$key] = $value;
+         } else {
+            return $collection->$key = $value;
+         }
       }
    }
 }

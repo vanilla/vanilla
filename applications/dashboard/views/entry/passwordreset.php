@@ -5,6 +5,8 @@
    echo $this->Form->Open();
    echo $this->Form->Errors();
    ?>
+
+   <?php if (!$this->Data('Fatal')) { ?>
    <ul>
       <li>
          <?php
@@ -29,5 +31,16 @@
          ?>
       </li>
    </ul>
+   <?php
+   } else {
+   ?>
+      <div class="P Center">
+         <?php
+         echo Anchor(T('Request another password reset.'), '/entry/passwordrequest');
+         ?>
+      </div>
+   <?php
+   }
+   ?>
    <?php echo $this->Form->Close(); ?>
 </div>

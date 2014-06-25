@@ -1,33 +1,23 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-/**
- * User Controller
- *
- * @package Dashboard
- */
  
 /**
  * Manage users.
- *
- * @since 2.0.0
- * @package Dashboard
+ * 
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class UserController extends DashboardController {
    /** @var array Models to automatically instantiate. */
    public $Uses = array('Database', 'Form');
-   
+
    /**
-    * @var Gdn_Form 
+    * @var Gdn_Form
     */
    public $Form;
-   
+
    /**
     * Highlight menu path. Automatically run on every use.
     *
@@ -40,7 +30,7 @@ class UserController extends DashboardController {
       if ($this->Menu)
          $this->Menu->HighlightRoute('/dashboard/settings');
    }
-   
+
    /**
     * User management list.
     *
@@ -60,13 +50,13 @@ class UserController extends DashboardController {
          '',
          FALSE
       );
-      
+
       // Page setup
       $this->AddJsFile('jquery.gardenmorepager.js');
       $this->AddJsFile('user.js');
       $this->Title(T('Users'));
       $this->AddSideMenu('dashboard/user');
-      
+
       // Form setup
       $this->Form->Method = 'get';
 
@@ -85,7 +75,7 @@ class UserController extends DashboardController {
       $UserModel = new UserModel();
       //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
       list($Offset, $Limit) = OffsetLimit($Page, 30);
-      
+
       $Filter = $this->_GetFilter();
       if ($Filter)
          $Filter['Keywords'] = $Keywords;
@@ -93,7 +83,7 @@ class UserController extends DashboardController {
          $Filter = $Keywords;
 
       $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
-      
+
       // Sorting
       if (in_array($Order, array('DateInserted','DateFirstVisit', 'DateLastActive'))) {
          $Order = 'u.'.$Order;
@@ -107,7 +97,7 @@ class UserController extends DashboardController {
       $this->UserData = $UserModel->Search($Filter, $Order, $OrderDir, $Limit, $Offset);
       $this->SetData('Users', $this->UserData);
       RoleModel::SetUserRoles($this->UserData->Result());
-      
+
       // Deliver json data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
@@ -117,7 +107,7 @@ class UserController extends DashboardController {
 
       $this->Render();
    }
-   
+
    /**
     * Create a user.
     *
@@ -126,12 +116,12 @@ class UserController extends DashboardController {
     */
    public function Add() {
       $this->Permission('Garden.Users.Add');
-      
+
       // Page setup
       $this->AddJsFile('user.js');
       $this->Title(T('Add User'));
       $this->AddSideMenu('dashboard/user');
-      
+
       $RoleModel = new RoleModel();
       $RoleData = $AllRoles = $RoleModel->GetArray();
 
@@ -141,16 +131,16 @@ class UserController extends DashboardController {
          $DefaultRoles = array_combine($DefaultRoleIDs, $DefaultRoleIDs);
          $RoleData = array_intersect_key($AllRoles, $DefaultRoles);
       }
-      
+
       // By default, people with access here can freely assign all roles
       $this->RoleData = $RoleData;
-      
+
       $UserModel = new UserModel();
       $this->User = FALSE;
 
       // Set the model on the form.
       $this->Form->SetModel($UserModel);
-      
+
       try {
          // These are all the 'effective' roles for this add action. This list can
          // be trimmed down from the real list to allow subsets of roles to be edited.
@@ -168,7 +158,7 @@ class UserController extends DashboardController {
             $RequestedRoles = array_flip($RequestedRoles);
             $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
 
-            // Put the data back into the forum object as if the user had submitted 
+            // Put the data back into the forum object as if the user had submitted
             // this themselves
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
 
@@ -191,7 +181,7 @@ class UserController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    /**
     * Show how many applicants are in the queue.
     *
@@ -205,7 +195,7 @@ class UserController extends DashboardController {
       if ($Count > 0)
          echo '<span class="Alert">', $Count, '</span>';
    }
-	
+
 	/**
     * Show applicants queue.
     *
@@ -217,7 +207,7 @@ class UserController extends DashboardController {
       $this->AddSideMenu('dashboard/user/applicants');
       $this->AddJsFile('jquery.gardencheckcolumn.js');
       $this->Title(T('Applicants'));
-      
+
       $this->FireEvent('BeforeApplicants');
 
       if ($this->Form->AuthenticatedPostBack() === TRUE) {
@@ -236,7 +226,7 @@ class UserController extends DashboardController {
       $this->View = 'applicants';
       $this->Render();
    }
-   
+
    /**
     * Approve a user application.
     *
@@ -261,7 +251,56 @@ class UserController extends DashboardController {
          $this->Applicants();
       }
    }
-	
+
+   public function Authenticate() {
+      if (!$this->Request->IsPostBack()) {
+         throw ForbiddenException($this->Request->RequestMethod());
+      }
+
+      $Args = array_change_key_case($this->Form->FormValues());
+      $UserModel = new UserModel();
+
+      // Look up the user.
+      $User = NULL;
+      if ($Email = GetValue('email', $Args)) {
+         $User = $UserModel->GetByEmail($Email);
+      } elseif ($Name = GetValue('name', $Args)) {
+         $User = $UserModel->GetByUsername($Name);
+      } else {
+         throw new Gdn_UserException("One of the following parameters required: Email, Name.", 400);
+      }
+
+      if (!$User)
+         throw NotFoundException('User');
+
+      // Check the password.
+      $PasswordHash = new Gdn_PasswordHash();
+      $Password = $this->Form->GetFormValue('Password');
+      try {
+         $PasswordChecked = $PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User));
+
+         // Rate limiting
+         Gdn::UserModel()->RateLimit($User, $PasswordChecked);
+
+         if ($PasswordChecked) {
+            $this->SetData('User', ArrayTranslate((array)$User, array('UserID', 'Name', 'Email', 'PhotoUrl')));
+
+            if (GetValue('session', $Args)) {
+               Gdn::Session()->Start($this->Data('User.UserID'));
+               $this->SetData('Cookie', array(
+                     C('Garden.Cookie.Name') =>  $_COOKIE[C('Garden.Cookie.Name')]
+                  ));
+            }
+         } else {
+            throw new Exception(T('Invalid password.'), 401); // Can't be a user exception.
+         }
+      } catch (Gdn_UserException $Ex) {
+         $this->Form->AddError($Ex);
+      }
+
+      $this->Render();
+   }
+
 	/**
     * Autocomplete a username.
     *
@@ -278,21 +317,21 @@ class UserController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    /**
     * Ban a user and optionally delete their content.
     * @since 2.1
-    * @param type $UserID 
+    * @param type $UserID
     */
    public function Ban($UserID, $Unban = FALSE) {
       $this->Permission(array('Garden.Moderation.Manage','Garden.Users.Edit','Moderation.Users.Ban'), FALSE);
-      
+
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       if (!$User)
          throw NotFoundException($User);
-      
+
 //      $this->Form = new Gdn_Form();
-      
+
       $UserModel = Gdn::UserModel();
 
       // Block banning the superadmin or System accounts
@@ -325,7 +364,7 @@ class UserController extends DashboardController {
                $UserModel->Ban($UserID, array('Reason' => $Reason, 'DeleteContent' => $DeleteContent));
             }
          }
-         
+
          if ($this->Form->ErrorCount() == 0) {
             // Redirect after a successful save.
             if ($this->Request->Get('Target')) {
@@ -340,7 +379,7 @@ class UserController extends DashboardController {
 
       // Permission flag for view
       $this->SetData('_MayDeleteContent', CheckPermission('Garden.Moderation.Manage'));
-      
+
       $this->SetData('User', $User);
       $this->AddSideMenu();
       $this->Title($Unban ? T('Unban User') : T('Ban User'));
@@ -348,7 +387,7 @@ class UserController extends DashboardController {
          $this->View = 'Unban';
       $this->Render();
    }
-	
+
 	/**
     * Page thru user list.
     *
@@ -362,7 +401,7 @@ class UserController extends DashboardController {
       $this->View = 'index';
       $this->Index($Keywords, $Page, $Order = '');
    }
-   
+
    /**
     * Decline a user application.
     *
@@ -385,7 +424,7 @@ class UserController extends DashboardController {
          $this->Applicants();
       }
    }
-   
+
    /**
     * Delete a user account.
     *
@@ -404,33 +443,33 @@ class UserController extends DashboardController {
 
       $RoleModel = new RoleModel();
       $AllRoles = $RoleModel->GetArray();
-      
+
       // By default, people with access here can freely assign all roles
       $this->RoleData = $AllRoles;
-      
+
       $UserModel = new UserModel();
       $this->User = $UserModel->GetID($UserID);
-      
+
       try {
-         
+
          $CanDelete = TRUE;
          $this->EventArguments['CanDelete'] = &$CanDelete;
          $this->EventArguments['TargetUser'] = &$this->User;
-         
+
          // These are all the 'effective' roles for this delete action. This list can
          // be trimmed down from the real list to allow subsets of roles to be
          // edited.
          $this->EventArguments['RoleData'] = &$this->RoleData;
-         
+
          $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
          $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
          $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
          $this->UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
          $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
-         
+
          $this->FireEvent("BeforeUserDelete");
          $this->SetData('CanDelete', $CanDelete);
-         
+
          $Method = in_array($Method, array('delete', 'keep', 'wipe')) ? $Method : '';
          $this->Method = $Method;
          if ($Method != '')
@@ -446,30 +485,30 @@ class UserController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    public function Delete2() {
       $this->Permission('Garden.Users.Delete');
-      
+
       if (!Gdn::Request()->IsPostBack())
          throw new Exception('Requires POST', 405);
-      
+
       $this->Form->ValidateRule('UserID', 'ValidateRequired');
       $DeleteType = $this->Form->GetFormValue('DeleteMethod');
       if (!in_array($DeleteType, array('delete', 'keep', 'wipe'))) {
          $this->Form->AddError(T('DeleteMethod must be one of: delete, keep, wipe.'));
       }
-      
+
       $UserID = $this->Form->GetFormValue('UserID');
-      
+
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       if ($UserID && !$User)
          throw NotFoundException('User');
-      
+
       if ($User['Admin'] == 2)
          $this->Form->AddError(T('You cannot delete a system-created user.'));
       elseif ($User['Admin'])
          $this->Form->AddError(T('You cannot delete a super-admin.'));
-      
+
       if ($this->Form->ErrorCount() == 0) {
          Gdn::UserModel()->Delete($UserID, array(
             'DeleteMethod' => $this->Form->GetFormValue('DeleteMethod'),
@@ -478,14 +517,14 @@ class UserController extends DashboardController {
       }
       $this->Render('Blank', 'Utility');
    }
-   
+
    public function DeleteContent($UserID) {
       $this->Permission('Garden.Moderation.Manage');
-      
+
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
          throw NotFoundException('User');
-      
+
       if ($this->Form->AuthenticatedPostBack()) {
          Gdn::UserModel()->DeleteContent($UserID, array('Log' => TRUE));
 
@@ -497,11 +536,11 @@ class UserController extends DashboardController {
       } else {
          $this->SetData('Title', T('Are you sure you want to do this?'));
       }
-      
+
       $this->SetData('User', $User);
       $this->Render();
    }
-   
+
    /**
     * Edit a user account.
     *
@@ -511,7 +550,7 @@ class UserController extends DashboardController {
     */
    public function Edit($UserID) {
       $this->Permission('Garden.Users.Edit');
-      
+
       // Page setup
       $this->AddJsFile('user.js');
       $this->Title(T('Edit User'));
@@ -524,15 +563,15 @@ class UserController extends DashboardController {
 
       $UserModel = new UserModel();
       $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
-      
+
       // Determine if username can be edited
       $CanEditUsername = (bool)C("Garden.Profile.EditUsernames") || Gdn::Session()->CheckPermission('Garden.Users.Edit');
       $this->SetData('_CanEditUsername', $CanEditUsername);
-      
+
       // Determine if emails can be edited
       $CanEditEmail = Gdn::Session()->CheckPermission('Garden.Users.Edit');
       $this->SetData('_CanEditEmail', $CanEditEmail);
-      
+
       // Decide if they have ability to confirm users
       $Confirmed = (bool)GetValueR('Confirmed', $User);
       $CanConfirmEmail = (
@@ -563,31 +602,31 @@ class UserController extends DashboardController {
       $this->Form->AddHidden('UserID', $UserID);
 
       try {
-         
+
          $AllowEditing = TRUE;
          $this->EventArguments['AllowEditing'] = &$AllowEditing;
          $this->EventArguments['TargetUser'] = &$User;
-         
+
          // These are all the 'effective' roles for this edit action. This list can
          // be trimmed down from the real list to allow subsets of roles to be
          // edited.
          $this->EventArguments['RoleData'] = &$RoleData;
-         
+
          $UserRoleData = $UserModel->GetRoles($UserID)->ResultArray();
          $RoleIDs = ConsolidateArrayValuesByKey($UserRoleData, 'RoleID');
          $RoleNames = ConsolidateArrayValuesByKey($UserRoleData, 'Name');
          $UserRoleData = ArrayCombine($RoleIDs, $RoleNames);
          $this->EventArguments['UserRoleData'] = &$UserRoleData;
-         
+
          $this->FireEvent("BeforeUserEdit");
          $this->SetData('AllowEditing', $AllowEditing);
-         
+
          $this->Form->SetData($User);
          if ($this->Form->AuthenticatedPostBack()) {
-            
+
             if (!$CanEditUsername)
                $this->Form->SetFormValue("Name", $User['Name']);
-            
+
             // Allow mods to confirm/unconfirm emails
             $this->Form->RemoveFormValue('Confirmed');
             $Confirmation = $this->Form->GetFormValue('ConfirmEmail', null);
@@ -595,7 +634,7 @@ class UserController extends DashboardController {
 
             if ($CanConfirmEmail && is_bool($Confirmation))
                $this->Form->SetFormValue('Confirmed', (int)$Confirmation);
-            
+
             $ResetPassword = $this->Form->GetValue('ResetPassword', FALSE);
 
             // If we're an admin or this isn't a privileged user, allow manual setting of password
@@ -607,50 +646,50 @@ class UserController extends DashboardController {
             }
 
             // Role changes
-            
+
             // These are the new roles the editing user wishes to apply to the target
             // user, adjusted for his ability to affect those roles
             $RequestedRoles = $this->Form->GetFormValue('RoleID');
-            
+
             if (!is_array($RequestedRoles)) $RequestedRoles = array();
             $RequestedRoles = array_flip($RequestedRoles);
             $UserNewRoles = array_intersect_key($RoleData, $RequestedRoles);
-            
-            // These roles will stay turned on regardless of the form submission contents 
+
+            // These roles will stay turned on regardless of the form submission contents
             // because the editing user does not have permission to modify them
             $ImmutableRoles = array_diff_key($AllRoles, $RoleData);
             $UserImmutableRoles = array_intersect_key($ImmutableRoles, $UserRoleData);
-            
+
             // Apply immutable roles
             foreach ($UserImmutableRoles as $IMRoleID => $IMRoleName)
                $UserNewRoles[$IMRoleID] = $IMRoleName;
-            
-            // Put the data back into the forum object as if the user had submitted 
+
+            // Put the data back into the forum object as if the user had submitted
             // this themselves
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
-            
+
             if ($this->Form->Save(array('SaveRoles' => TRUE)) !== FALSE) {
                if ($this->Form->GetValue('ResetPassword', '') == 'Auto') {
                   $UserModel->PasswordRequest($User['Email']);
-                  $UserModel->SetField($UserID, 'HashMethod', 'Reset'); 
+                  $UserModel->SetField($UserID, 'HashMethod', 'Reset');
                }
 
                $this->InformMessage(T('Your changes have been saved.'));
             }
-            
+
             $UserRoleData = $UserNewRoles;
          }
       } catch (Exception $Ex) {
          $this->Form->AddError($Ex);
       }
-      
+
       $this->SetData('User', $User);
       $this->SetData('Roles', $RoleData);
       $this->SetData('UserRoles', $UserRoleData);
-      
+
       $this->Render();
    }
-   
+
    /**
     * Determine whether user can register with this email address.
     *
@@ -669,7 +708,7 @@ class UserController extends DashboardController {
       }
       if (!$Available)
          $this->Form->AddError(sprintf(T('%s unavailable'), T('Email')));
-         
+
       $this->Render();
 	}
 
@@ -685,7 +724,7 @@ class UserController extends DashboardController {
          $Parts = explode(' ', $Filter, 3);
          if (count($Parts) < 2)
             return FALSE;
-         
+
          $Field = $Parts[0];
          if (count($Parts) == 2) {
             $Op = '=';
@@ -697,10 +736,10 @@ class UserController extends DashboardController {
             }
             $FilterValue = $Parts[2];
          }
-         
+
          if (strpos($Field, '.') !== FALSE)
             $Field = array_pop(explode('.', $Field));
-         
+
          if (!in_array($Field, array('Name', 'Email', 'LastIPAddress', 'InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastVisit')))
             return FALSE;
 
@@ -708,7 +747,7 @@ class UserController extends DashboardController {
       }
       return FALSE;
    }
-   
+
    /**
     * Handle a user application.
     *
@@ -720,7 +759,7 @@ class UserController extends DashboardController {
     */
    private function HandleApplicant($Action, $UserID) {
       $this->Permission('Garden.Users.Approve');
-      
+
       //$this->_DeliveryType = DELIVERY_TYPE_BOOL;
       if (!in_array($Action, array('Approve', 'Decline')) || !is_numeric($UserID)) {
          $this->Form->AddError('ErrorInput');
@@ -732,14 +771,14 @@ class UserController extends DashboardController {
             try {
                $this->EventArguments['UserID'] = $UserID;
                $this->FireEvent("Before{$Action}User");
-               
+
                $Email = new Gdn_Email();
                $Result = $UserModel->$Action($UserID, $Email);
-               
+
                // Re-calculate applicant count
                $RoleModel = new RoleModel();
                $RoleModel->GetApplicantCount(TRUE);
-               
+
                $this->FireEvent("After{$Action}User");
             } catch(Exception $ex) {
                $Result = FALSE;
@@ -748,15 +787,15 @@ class UserController extends DashboardController {
          }
       }
    }
-   
+
    public function Merge() {
       $this->Permission('Garden.Settings.Manage');
-      
+
       // This must be a postback.
       if (!$this->Request->IsAuthenticatedPostBack()) {
          throw ForbiddenException('GET');
       }
-      
+
       $Validation = new Gdn_Validation();
       $Validation->ApplyRule('OldUserID', 'ValidateRequired');
       $Validation->ApplyRule('NewUserID', 'ValidateRequired');
@@ -783,8 +822,8 @@ class UserController extends DashboardController {
       $Get = Gdn::Request()->Get();
       $Get['order'] = $Field;
       return '/dashboard/user?'.http_build_query($Get);
-   }	
-   
+   }
+
    /**
     * Convenience function for listing users. At time of this writing, it is
     * being used by wordpress widgets to display recently active users.
@@ -804,23 +843,23 @@ class UserController extends DashboardController {
       $SortDirection = $SortDirection == 'asc' ? 'asc' : 'desc';
       $Limit = is_numeric($Limit) && $Limit < 100 && $Limit > 0 ? $Limit : 30;
       $Offset = is_numeric($Offset) ? $Offset : 0;
-      
+
       // Get user list
       $UserModel = new UserModel();
       $UserData = $UserModel->GetSummary('u.'.$SortField, $SortDirection, $Limit, $Offset);
       $this->SetData('UserData', $UserData);
-      
+
       $this->MasterView = 'empty';
       $this->Render('filenotfound', 'home');
    }
-   
+
    public function Save() {
       $this->Permission('Garden.Users.Edit');
       if (!Gdn::Request()->IsPostBack())
          throw new Exception('Requires POST', 405);
-      
+
       $Form = new Gdn_Form();
-      
+
       if ($SSOString = $Form->GetFormValue('SSOString')) {
          $Parts = explode(' ', $SSOString);
          $String = $Parts[0];
@@ -829,27 +868,27 @@ class UserController extends DashboardController {
       } else {
          $User = $Form->FormValues();
       }
-      
+
       if (!isset($User['UserID']) && isset($User['UniqueID'])) {
          // Try and find the user based on SSO.
          $Auth = Gdn::UserModel()->GetAuthentication($User['UniqueID'], $User['ClientID']);
          if ($Auth)
             $User['UserID'] = $Auth['UserID'];
       }
-      
+
       if (!isset($User['UserID'])) {
          // Add some default values to make saving easier.
          if (!isset($User['RoleID'])) {
             $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
             $User['RoleID'] = $DefaultRoles;
          }
-         
+
          if (!isset($User['Password'])) {
             $User['Password'] = md5(microtime());
             $User['HashMethod'] = 'Random';
          }
       }
-      
+
       $UserID = Gdn::UserModel()->Save($User, array('SaveRoles' => isset($User['RoleID']), 'NoConfirmEmail' => TRUE));
       if ($UserID) {
          if (!isset($User['UserID']))
@@ -862,40 +901,40 @@ class UserController extends DashboardController {
                'UniqueID' => $User['UniqueID']
             ));
          }
-         
+
          $this->SetData('User', $User);
       } else {
          throw new Gdn_UserException(Gdn::UserModel()->Validation->ResultsText());
       }
-      
+
       $this->Render('Blank', 'Utility');
    }
-   
+
    public function SSO($UserID = FALSE) {
       $this->Permission('Garden.Users.Edit');
-      
+
       $ProviderModel = new Gdn_AuthenticationProviderModel();
-      
+
       $Form = new Gdn_Form();
-      
+
       if ($this->Request->IsPostBack()) {
          // Make sure everything has been posted.
          $Form->ValidateRule('ClientID', 'ValidateRequired');
          $Form->ValidateRule('UniqueID', 'ValidateRequired');
-         
+
          if (!ValidateRequired($Form->GetFormValue('Username')) && !ValidateRequired($Form->GetFormValue('Email'))) {
             $Form->AddError('Username or Email is required.');
          }
-         
+
          $Provider = $ProviderModel->GetProviderByKey($Form->GetFormValue('ClientID'));
          if (!$Provider) {
             $Form->AddError(sprintf('%1$s "%2$s" not found.', T('Provider'), $Form->GetFormValue('ClientID')));
          }
-         
+
          if ($Form->ErrorCount() > 0) {
             throw new Gdn_UserException($Form->ErrorString());
          }
-         
+
          // Grab the user.
          $User = FALSE;
          if ($Email = $Form->GetFormValue('Email')) {
@@ -907,25 +946,25 @@ class UserController extends DashboardController {
          if (!$User) {
             throw new Gdn_UserException(sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))), 404);
          }
-         
+
          // Validate the user's password.
          $PasswordHash = new Gdn_PasswordHash();
          $Password = $this->Form->GetFormValue('Password', NULL);
          if ($Password !== NULL && !$PasswordHash->CheckPassword($Password, GetValue('Password', $User), GetValue('HashMethod', $User))) {
             throw new Gdn_UserException(T('Invalid password.'), 401);
          }
-         
+
          // Okay. We've gotten this far. Let's save the authentication.
          $User = (array)$User;
-         
+
          Gdn::UserModel()->SaveAuthentication(array(
             'UserID' => $User['UserID'],
             'Provider' => $Form->GetFormValue('ClientID'),
             'UniqueID' => $Form->GetFormValue('UniqueID')
          ));
-         
+
          $Row = Gdn::UserModel()->GetAuthentication($Form->GetFormValue('UniqueID'), $Form->GetFormValue('ClientID'));
-         
+
          if ($Row) {
             $this->SetData('Result', $Row);
          } else {
@@ -935,7 +974,7 @@ class UserController extends DashboardController {
          $User = Gdn::UserModel()->GetID($UserID);
          if (!$User)
             throw NotFoundException('User');
-         
+
          $Result = Gdn::SQL()
                ->Select('ua.ProviderKey', '', 'ClientID')
                ->Select('ua.ForeignUserKey', '', 'UniqueID')
@@ -946,18 +985,18 @@ class UserController extends DashboardController {
                ->Join('UserAuthenticationProvider p', 'ua.ProviderKey = p.AuthenticationKey')
                ->Where('UserID', $UserID)
                ->Get()->ResultArray();
-         
+
          $this->SetData('Result', $Result);
       }
-      
+
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
-   
-   public function TagSearch($q) {
-      $Data = Gdn::UserModel()->TagSearch($q);
+
+   public function TagSearch($q, $limit = 10) {
+      $Data = Gdn::UserModel()->TagSearch($q, $limit);
       die(json_encode($Data));
    }
-   
+
    /**
     * Determine whether user can register with this username.
     *
@@ -975,28 +1014,28 @@ class UserController extends DashboardController {
       }
       if (!$Available)
          $this->Form->AddError(sprintf(T('%s unavailable'), T('Name')));
-         
+
       $this->Render();
    }
-   
+
    public function Verify($UserID, $Verified) {
       $this->Permission('Garden.Moderation.Manage');
-      
+
       if (!$this->Request->IsAuthenticatedPostBack()) {
          throw PermissionException('Javascript');
       }
-      
+
       // First, set the field value.
       Gdn::UserModel()->SetField($UserID, 'Verified', $Verified);
-      
+
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
          throw NotFoundException('User');
-      
+
       // Send back the verified button.
       require_once $this->FetchViewLocation('helper_functions', 'Profile', 'Dashboard');
       $this->JsonTarget('.User-Verified', UserVerified($User), 'ReplaceWith');
-      
+
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
 }

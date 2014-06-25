@@ -3,7 +3,7 @@ jQuery(document).ready(function($) {
    $("#Form_Name").keyup(function(event) {
       if ($('#Form_CodeIsDefined').val() == '0') {
          $('#UrlCode').show();
-         var val = $(this).val().replace(/[ \/\\&.?;,<>'"]+/g, '-')
+         var val = $(this).val().replace(/[ \/\\&.?;,<>'"]+/g, '-');
          val = val.replace(/\-+/g, '-').toLowerCase();
          $("#Form_UrlCode").val(val);
          $("#UrlCode span").text(val);
@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
       $('#Form_CodeIsDefined').val('1')
    });
    $('#UrlCode input, #UrlCode a.Save').hide();
-   
+
    // Reveal input when "change" button is clicked
    $('#UrlCode a, #UrlCode span').click(function() {
       $('#UrlCode').find('input,span,a').toggle();
@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
    // Categories->Delete()
    // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
    $('[name$=DeleteDiscussions]').click(function() {
-      if ($(this).attr('checked')) {
+      if ($(this).prop('checked')) {
          $('#ReplacementCategory,#ReplacementWarning').slideDown('fast');
          $('#DeleteDiscussions').slideUp('fast');
       } else {
@@ -36,8 +36,8 @@ jQuery(document).ready(function($) {
       }
    });
    // Categories->Delete()
-   // Hide onload if unchecked   
-   if (!$('[name$=DeleteDiscussions]').attr('checked')) {
+   // Hide onload if unchecked
+   if (!$('[name$=DeleteDiscussions]').prop('checked')) {
       $('#ReplacementCategory,#ReplacementWarning').hide();
       $('#DeleteDiscussions').show();
    } else {
@@ -47,7 +47,7 @@ jQuery(document).ready(function($) {
 
    // Set custom categories display.
    var displayCategoryPermissions = function() {
-      var checked = $('#Form_CustomPermissions').attr('checked');
+      var checked = $('#Form_CustomPermissions').prop('checked');
       if (checked) {
          $('.CategoryPermissions').show();
       } else {

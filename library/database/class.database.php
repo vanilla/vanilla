@@ -142,7 +142,7 @@ class Gdn_Database {
          if ($Timeout)
             throw new Exception(ErrorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
 
-         trigger_error(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), E_USER_ERROR);
+         throw new Exception(ErrorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), 500);
       }
 
       return $PDO;
@@ -422,6 +422,8 @@ class Gdn_Database {
       if(is_null($this->_SQL)) {
          $Name = $this->Engine . 'Driver';
          $this->_SQL = Gdn::Factory($Name);
+         if (!$this->_SQL)
+            $this->_SQL = new stdClass();
          $this->_SQL->Database = $this;
       }
 

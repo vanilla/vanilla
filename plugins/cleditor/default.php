@@ -120,7 +120,7 @@ class cleditorPlugin extends Gdn_Plugin {
 		$Sender->RemoveJsFile('jquery.autogrow.js');
 		$Sender->AddJsFile('jquery.cleditor'.(Debug() ? '' : '.min').'.js', 'plugins/cleditor', $Options);
       
-      $CssInfo = AssetModel::CssPath('cleditor.css', 'plugins/cleditor');
+      $CssInfo = AssetModel::CssPath(FALSE, 'cleditor.css', 'plugins/cleditor');
       
       if ($CssInfo) {
          $CssPath = Asset($CssInfo[1]);

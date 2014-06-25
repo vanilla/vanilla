@@ -66,17 +66,17 @@ class PostController extends VanillaController {
    
    public function AnnounceOptions() {
       $Result = array(
-         0  => '@'.T("Don't announce.")
+         '0'  => '@'.T("Don't announce.")
       );
       
       if (C('Vanilla.Categories.Use')) {
          $Result = array_merge($Result, array(
-            2 => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
-            1 => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
+            '2' => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
+            '1' => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
          ));
       } else {
          $Result = array_merge($Result, array(
-            1 => '@'.T('In recent discussions.'),
+            '1' => '@'.T('In recent discussions.'),
          ));
       }
       
@@ -163,7 +163,7 @@ class PostController extends VanillaController {
       TouchValue('Type', $this->Data, 'Discussion');
       
       // See if we should hide the category dropdown.
-      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0), array('AllowedDiscussionTypes' => $this->Data['Type']));
+      $AllowedCategories = CategoryModel::GetByPermission('Discussions.Add', $this->Form->GetValue('CategoryID', $this->CategoryID), array('Archived' => 0, 'AllowDiscussions' => 1), array('AllowedDiscussionTypes' => $this->Data['Type']));
       if (count($AllowedCategories) == 1) {
          $AllowedCategory = array_pop($AllowedCategories);
          $this->ShowCategorySelector = FALSE;
@@ -214,7 +214,7 @@ class PostController extends VanillaController {
                if ($this->Form->GetFormValue('Sink', '') && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
-               if (!isset($this->Discussion) && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               if (!isset($this->Discussion) && (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID) || ! $this->Category->AllowDiscussions))
                   $this->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
             }
 
@@ -334,6 +334,10 @@ class PostController extends VanillaController {
       if ($DraftID != '') {
          $this->Draft = $this->DraftModel->GetID($DraftID);
          $this->CategoryID = $this->Draft->CategoryID;
+
+         // Verify this is their draft
+         if (GetValue('InsertUserID', $this->Draft) != Gdn::Session()->UserID)
+            throw PermissionException();
       } else {
          $this->SetData('Discussion', $this->DiscussionModel->GetID($DiscussionID), TRUE);
          $this->CategoryID = $this->Discussion->CategoryID;

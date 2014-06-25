@@ -29,7 +29,7 @@ echo '</div>';
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
 <ul class="DataList Discussions">
-   <?php include($this->FetchViewLocation('discussions')); ?>
+   <?php include($this->FetchViewLocation('discussions', 'Discussions', 'Vanilla')); ?>
 </ul>
 <?php
    

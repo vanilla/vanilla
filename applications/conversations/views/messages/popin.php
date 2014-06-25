@@ -4,23 +4,20 @@
       <?php
       if (CheckPermission('Conversations.Conversations.Add'))
          echo Anchor(T('New Message'), 'messages/add');
-      echo Wrap(T('Inbox'), 'strong'); 
+      echo Wrap(T('Inbox'), 'strong');
       ?>
    </li>
 <?php
 if (count($this->Data('Conversations'))):
 ?>
-   <?php 
+   <?php
    foreach ($this->Data('Conversations') as $Row):
-   
+
    $Subject = '';
    if ($Row['Subject']) {
       $Subject = Gdn_Format::Text($Row['Subject']);
    } else {
-      $Subject = '';
-      foreach ($Row['Participants'] as $User) {
-         $Subject = ConcatSep(', ', $Subject, FormatUsername($User, 'You'));
-      }
+      $Subject = ConversationModel::ParticipantTitle($Row, FALSE);
    }
    $PhotoUser = UserBuilder($Row, 'LastInsert');
    ?>
@@ -33,7 +30,7 @@ if (count($this->Data('Conversations'))):
          echo Wrap(nl2br($Excerpt), 'div', array('class' => 'Excerpt'));
          ?>
          <div class="Meta">
-            <?php 
+            <?php
             echo ' <span class="MItem">'.Plural($Row['CountMessages'], '%s message', '%s messages').'</span> ';
 
             if ($Row['CountNewMessages'] > 0) {
@@ -48,7 +45,7 @@ if (count($this->Data('Conversations'))):
    <?php endforeach; ?>
    <li class="Item Center">
       <?php
-      echo Anchor(sprintf(T('All %s'), T('Messages')), '/messages/inbox'); 
+      echo Anchor(sprintf(T('All %s'), T('Messages')), '/messages/inbox');
       ?>
    </li>
 <?php else: ?>

@@ -1156,6 +1156,14 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Session = Gdn::Session();
 
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
+         Logger::event(
+            'permission_denied',
+            LogLevel::INFO,
+            '{InsertName} was denied permission {Permission}.',
+            array(
+               'Permission' => $Permission,
+           )
+        );
         if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
            Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
         } else {
@@ -1204,6 +1212,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @todo $View, $ControllerName, and $ApplicationFolder need correct variable types and descriptions.
     */
    public function xRender($View = '', $ControllerName = FALSE, $ApplicationFolder = FALSE, $AssetName = 'Content') {
+      // Remove the deliver type and method from the query string so they don't corrupt calls to Url.
+      $this->Request->SetValueOn(Gdn_Request::INPUT_GET, 'DeliveryType', NULL);
+      $this->Request->SetValueOn(Gdn_Request::INPUT_GET, 'DeliveryMethod', NULL);
+
       Gdn::PluginManager()->CallEventHandlers($this, $this->ClassName, $this->RequestMethod, 'Render');
 
       if ($this->_DeliveryType == DELIVERY_TYPE_NONE)
@@ -1401,6 +1413,12 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       if (Debug() && $Trace = Trace()) {
+         // Clear passwords from the trace.
+         array_walk_recursive($Trace, function(&$Value, $Key) {
+            if (in_array(strtolower($Key), array('password'))) {
+               $Value = '***';
+            }
+         });
          $Data['Trace'] = $Trace;
       }
 
@@ -1551,6 +1569,12 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (Debug()) {
          if ($Trace = Trace()) {
+            // Clear passwords from the trace.
+            array_walk_recursive($Trace, function(&$Value, $Key) {
+               if (in_array(strtolower($Key), array('password'))) {
+                  $Value = '***';
+               }
+            });
             $Data['Trace'] = $Trace;
          }
 
@@ -1626,6 +1650,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $ETag = AssetModel::ETag();
             $CombineAssets = C('Garden.CombineAssets');
+            $ThemeType = IsMobile() ? 'mobile' : 'desktop';
 
             // And now search for/add all css files.
             foreach ($this->_CssFiles as $CssInfo) {
@@ -1636,14 +1661,14 @@ class Gdn_Controller extends Gdn_Pluggable {
                   if (!$CombineAssets) {
                      // Grab all of the css files from the asset model.
                      $AssetModel = new AssetModel();
-                     $CssFiles = $AssetModel->GetCssFiles(ucfirst(substr($CssFile, 0, -4)), $ETag);
+                     $CssFiles = $AssetModel->GetCssFiles($ThemeType, ucfirst(substr($CssFile, 0, -4)), $ETag);
                      foreach ($CssFiles as $Info) {
                         $this->Head->AddCss($Info[1], 'all', TRUE, $CssInfo);
                      }
                   } else {
                      $Basename = substr($CssFile, 0, -4);
 
-                     $this->Head->AddCss(Url("/utility/css/$Basename/$Basename-$ETag.css", '//'), 'all', FALSE, $CssInfo['Options']);
+                     $this->Head->AddCss(Url("/utility/css/$ThemeType/$Basename-$ETag.css", '//'), 'all', FALSE, $CssInfo['Options']);
                   }
                   continue;
                }
@@ -1674,6 +1699,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                      $AppFolder = substr($AppFolder, strlen('plugins/'));
                      $CssPaths[] = PATH_PLUGINS . "/$AppFolder/design/$CssFile";
                      $CssPaths[] = PATH_PLUGINS . "/$AppFolder/$CssFile";
+                  } elseif (in_array($AppFolder, array('static', 'resources'))) {
+                     // This is a static css file.
+                     $CssPaths[] = PATH_ROOT."/resources/css/$CssFile";
                   } else {
                      // Application default. eg. root/applications/app_name/design/
                      $CssPaths[] = PATH_APPLICATIONS . DS . $AppFolder . DS . 'design' . DS . $CssFile;
@@ -1714,7 +1742,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Cdns = array();
             if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', FALSE)) {
                $Cdns = array(
-                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
+                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'
                   );
             }
 

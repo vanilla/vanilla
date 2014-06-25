@@ -85,7 +85,10 @@ jQuery(document).ready(function($) {
    
    // Check to see if passwords match
    $('input[name$=PasswordMatch]').blur(function() {
-      if ($('#Register input[name$=Password], body.register input[name$=Password]').val() == $(this).val())
+      var $pwmatch = $(this);
+      var $pw = $pwmatch.closest('form').find('input[name=Password]');
+
+      if ($pw.val() == $pwmatch.val())
          $('#PasswordsDontMatch').hide();
       else
          $('#PasswordsDontMatch').show();

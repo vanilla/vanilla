@@ -11,7 +11,7 @@ window.vanilla.embed = function(host) {
       jsPath = '/js/embed.js',
       currentPath = window.location.hash.substr(1),
       disablePath = (window != top);
-   
+
    var optStr = function(name, defaultValue, definedValue) {
       if (window['vanilla_'+name]) {
          if (definedValue == undefined)
@@ -24,13 +24,13 @@ window.vanilla.embed = function(host) {
 
    if (!currentPath || disablePath)
       currentPath = "/";
-   
+
    if (currentPath.substr(0, 1) != '/')
       currentPath = '/' + currentPath;
 
    if (window.gadgets)
       embedUrl = '';
-      
+
    if (typeof(host) == 'undefined') {
       host = '';
       host_base_url = '';
@@ -40,16 +40,16 @@ window.vanilla.embed = function(host) {
             host = host.replace('http://', '').replace('https://', '');
             host = host.substr(0, host.indexOf(jsPath));
             host += '/index.php?p=';
-            
+
             host_base_url = scripts[i].src;
             host_base_url = host_base_url.substr(0, host_base_url.indexOf(jsPath));
             if (host_base_url.substring(host_base_url.length-1) != '/')
                host_base_url += '/';
-            
+
          }
       }
    }
-      
+
    window.vanilla.embeds[id] = this;
    if (window.postMessage) {
       onMessage = function(e) {
@@ -78,7 +78,7 @@ window.vanilla.embed = function(host) {
          var newMessageId = message[0];
          if (newMessageId == messageId)
             return;
-         
+
          messageId = newMessageId;
          message.splice(0, 1);
          processMessage(message);
@@ -123,11 +123,21 @@ window.vanilla.embed = function(host) {
    }
 
    processMessage = function(message) {
-      var iframe = document.getElementById('vanilla'+id); 
-       
+      var iframe = document.getElementById('vanilla'+id);
+
       if (message[0] == 'height') {
          setHeight(message[1]);
+
+         if (message[1] > 0) {
+            iframe.style.visibility = "visible";
+         }
+
       } else if (message[0] == 'location') {
+
+         if (message[1] != '') {
+            iframe.style.visibility = "visible";
+         }
+
          if (disablePath) {
             //currentPath = cmd[1];
          } else {
@@ -144,7 +154,7 @@ window.vanilla.embed = function(host) {
       } else if (message[0] == 'unload') {
          if (window.attachEvent || scrollPosition('vanilla'+id) < 0)
             document.getElementById('vanilla'+id).scrollIntoView(true);
-        
+
          iframe.style.visibility = "hidden";
 
       } else if (message[0] == 'scrolltop') {
@@ -203,47 +213,47 @@ window.vanilla.embed = function(host) {
       var embed_locale = typeof(vanilla_embed_locale) == 'undefined' ? '' : vanilla_embed_locale;
       if (typeof(vanilla_lazy_load) == 'undefined')
          vanilla_lazy_load = true;
-      
+
       // If path was defined, and we're sitting at app root, use the defined path instead.
       if (typeof(vanilla_path) != 'undefined' && path == '/')
          path = vanilla_path;
-      
+
       // Force type based on incoming variables
       if (discussion_id != '' || foreign_id != '')
          embed_type = 'comments';
-         
+
       var result = '';
-      
+
       if (embed_type == 'comments') {
          result = '//' + host + '/discussion/embed/'
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
             +'&vanilla_url='+encodeURIComponent(foreign_url);
-         
+
          if (typeof(vanilla_type) != 'undefined')
             result += '&vanilla_type='+encodeURIComponent(vanilla_type)
-         
+
          if (typeof(vanilla_discussion_id) != 'undefined')
             result += '&vanilla_discussion_id='+encodeURIComponent(vanilla_discussion_id);
-         
+
          if (typeof(vanilla_category_id) != 'undefined')
             result += '&vanilla_category_id='+encodeURIComponent(vanilla_category_id);
-         
+
          if (typeof(vanilla_title) != 'undefined')
             result += '&title='+encodeURIComponent(vanilla_title);
       } else {
-         result = '//' 
+         result = '//'
             +host
             +path
-            +'&remote=' 
-            +encodeURIComponent(embedUrl) 
-            +'&locale=' 
+            +'&remote='
+            +encodeURIComponent(embedUrl)
+            +'&locale='
             +encodeURIComponent(embed_locale);
       }
-   
+
       if (window.vanilla_sso) {
          result += '&sso='+encodeURIComponent(vanilla_sso);
       }
-       
+
       return result.replace(/\?/g, '&').replace('&', '?'); // Replace the first occurrence of amp with question.
    }
    var vanillaIframe = document.createElement('iframe');
@@ -266,19 +276,19 @@ window.vanilla.embed = function(host) {
       vanillaIframe.height = "300";
       vanillaIframe.style.height = "300px";
    }
-   
-   
+
+
    var img = document.createElement('div');
    img.className = 'vn-loading';
    img.style.textAlign = 'center';
    img.innerHTML = window.vanilla_loadinghtml ? vanilla_loadinghtml : '<img src="http://cdn.vanillaforums.com/images/progress.gif" />';
-   
+
    var container = document.getElementById('vanilla-comments');
    // Couldn't find the container, so dump it out and try again.
    if (!container)
       document.write('<div id="vanilla-comments"></div>');
    container = document.getElementById('vanilla-comments');
-   
+
    if (container) {
       var loaded = function() {
          if (img) {
@@ -287,16 +297,16 @@ window.vanilla.embed = function(host) {
          }
          vanillaIframe.style.visibility = "visible";
       };
-      
+
       if(vanillaIframe.addEventListener) {
          vanillaIframe.addEventListener('load', loaded, true);
       } else if(vanillaIframe.attachEvent) {
          vanillaIframe.attachEvent('onload', loaded);
       } else
          setTimeout(2000, loaded);
-      
+
       container.appendChild(img);
-      
+
       // If jQuery is present in the page, include our defer-until-visible script
       if (vanilla_lazy_load && typeof jQuery != 'undefined') {
          jQuery.ajax({
@@ -305,7 +315,7 @@ window.vanilla.embed = function(host) {
             cache: true,
             success: function() {
 //               setTimeout(function() {
-                  
+
                if (jQuery.fn.appear)
                   jQuery('#vanilla-comments').appear(function() {container.appendChild(vanillaIframe);});
                else
@@ -323,7 +333,7 @@ window.vanilla.embed = function(host) {
    vanilla_embed_css.type = 'text/css';
    vanilla_embed_css.href = host_base_url + (host_base_url.substring(host_base_url.length-1) == '/' ? '' : '/') +'applications/dashboard/design/embed.css';
    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_embed_css);
-   
+
    return this;
 };
 try {

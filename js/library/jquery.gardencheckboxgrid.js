@@ -4,7 +4,7 @@ jQuery / Garden CheckBoxGrid Plugin v1
 Usage:
 (1) Use Garden's /garden/library/class.form.php to render a
  $Form->OrganizedCheckBoxList();
- 
+
 (2) Include this file on the page, and the labels in the table will be
 transformed into hyperlinks, allowing the checking/unchecking of all items in a
 specific row, column, or the entire table.
@@ -15,20 +15,20 @@ specific row, column, or the entire table.
    opt = $.extend({
      noOptionsYet: 0
    }, opt);
-   
+
   // Remove the cellpadding on label cells
   $(this).find('th, thead td').css('padding', '0px');
-   
+
   // Handle table heading clicks
   $(this).find('thead th').each(function() {
       var text = $(this).html();
       var anchor = document.createElement('a');
       anchor.onclick = function(sender) {
         var checkboxes = $(this).parents('table').find(":checkbox");
-        if ($(this).parents('table').find(":checkbox:first").attr('checked')) {
-          checkboxes.removeAttr('checked');
+        if ($(this).parents('table').find(":checkbox:first").prop('checked')) {
+          checkboxes.prop('checked', false);
         } else {
-          checkboxes.attr('checked', 'checked');
+          checkboxes.prop('checked', true);
         }
         return false;
       }
@@ -44,10 +44,10 @@ specific row, column, or the entire table.
       anchor.onclick = function(sender) {
         var checkBoxes = $(this).parents('tr').find(":checkbox");
         if (checkBoxes.length > 0) {
-          if ($(checkBoxes[0]).attr('checked')) {
-            checkBoxes.removeAttr('checked');
+          if ($(checkBoxes[0]).prop('checked')) {
+            checkBoxes.prop('checked', false);
           } else {
-            checkBoxes.attr('checked', 'checked');
+            checkBoxes.prop('checked', true);
           }
         }
         return false;
@@ -56,7 +56,7 @@ specific row, column, or the entire table.
       anchor.href = '#';
       $(this).html(anchor);
   });
-  
+
   // Handle column heading clicks
   $(this).find('thead td').each(function() {
       var columnIndex = $(this).parent().children().index($(this)); //$(this).attr('cellIndex');
@@ -73,13 +73,13 @@ specific row, column, or the entire table.
           checkbox = $(rows[i]).find('td:eq(' + (columnIndex-1) + ')').find(":checkbox");
           if (!found && checkbox.length > 0) {
             found = true;
-            checked = $(checkbox).attr('checked');
+            checked = $(checkbox).prop('checked');
           }
-          
+
           if (checked) {
-            checkbox.removeAttr('checked');
+            checkbox.prop('checked', false);
           } else {
-            checkbox.attr('checked', 'checked');
+            checkbox.prop('checked', true);
           }
         }
         return false;
@@ -88,8 +88,8 @@ specific row, column, or the entire table.
       anchor.href = '#';
       $(this).html(anchor);
   });
-  
-   
+
+
    // Return the object for chaining
      return $(this);
   }

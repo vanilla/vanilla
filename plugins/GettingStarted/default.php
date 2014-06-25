@@ -49,11 +49,11 @@ class GettingStartedPlugin extends Gdn_Plugin {
    ."<h1>".T("Here's how to get started:")."</h1>"
    .'<ul>
       <li class="One'.(C('Plugins.GettingStarted.Dashboard', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor('Welcome to your Dashboard', 'settings').'</strong>
+	 <strong>'.Anchor(T('Welcome to your Dashboard'), 'settings').'</strong>
          <p>'.T('This is the administrative dashboard for your new community. Check out the configuration options to the left: from here you can configure how your community works. <b>Only users in the "Administrator" role can see this part of your community.</b>').'</p>
       </li>
       <li class="Two'.(C('Plugins.GettingStarted.Discussions', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor("Where is your Community Forum?", '/').'</strong>
+	 <strong>'.Anchor(T("Where is your Community Forum?"), '/').'</strong>
          <p>'.T('Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by ').Anchor(T('clicking here'), '/').T('. The community forum is what all of your users &amp; customers will see when they visit ').Anchor(Gdn::Request()->Url('/', TRUE), Gdn::Request()->Url('/', TRUE)).'.</p>
       </li>
       <li class="Three'.(C('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">
@@ -66,7 +66,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
       </li>
       <li class="Five'.(C('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor(T('Start your First Discussion'), 'post/discussion').'</strong>
-         <p>'.T('Get the ball rolling in your community by ').Anchor(T('starting your first discussion'), 'post/discussion').' now.</p>
+	 <p>'.T('Get the ball rolling in your community by ').Anchor(T('starting your first discussion'), 'post/discussion'). T(' now.') . '</p>
       </li>
       <li class="Six'.(C('Plugins.GettingStarted.Plugins', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor(T('Manage your Plugins'), 'settings/plugins').'</strong>

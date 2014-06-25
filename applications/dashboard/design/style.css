@@ -52,6 +52,12 @@ textarea, input[type=text] {
    box-sizing: border-box;
 }
 
+/* Elements that are disabled, make sure they reflect that with UX feedback. */
+[disabled] {
+   opacity: 0.50;
+   pointer-events: none;
+}
+
 /* ===================================================================== Grid */
 
 .Row {
@@ -84,7 +90,7 @@ body.NarrowForm #Content {
 body.Entry #Content {
    float: none;
    margin: 0 auto;
-   max-width: 500px;
+   max-width: 600px;
 }
 
 /* ============================================== General Styles & Typography */
@@ -190,7 +196,7 @@ textarea {
 	background: #fff;
 	border: 1px solid #999;
 	border: 1px solid rgba(0, 0, 0, 0.4);
-	padding: 3px;	
+	padding: 3px;
 }
 .PasswordStrength {
    width: 250px;
@@ -947,7 +953,7 @@ body > #Frame > .Head {
 #Head .SiteSearch .InputBox {
    border: none;
    width: 175px;
-   
+
 }
 
 /* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
@@ -1216,10 +1222,10 @@ td.CheckBoxColumn {
 #Panel {
    width: 200px;
    float: left;
-   
-/*   
+
+/*
 No overflow hidden on main elements. Causes too many bugs!
-overflow: hidden; 
+overflow: hidden;
 }
 #Panel > :first-child {
 	margin-top: 0;
@@ -1384,7 +1390,7 @@ overflow: hidden;
 /** Make standard items a bit more condensed when in the panel. **/
 
 .PanelColumn .Item {
-    padding: 2px;   
+    padding: 2px;
 }
 
 .PanelColumn .Item .Title {
@@ -1638,7 +1644,7 @@ overflow: hidden;
    margin-right: 0;
 }
 .CommentInfo {
-   line-height: 1.5; 
+   line-height: 1.5;
 }
 .Item .AuthorInfo {
    font-size: 11px;
@@ -2168,6 +2174,29 @@ dl.About dt.Posts { background-position: 0 -113px; }
 dl.About dd {
    padding: 0 8px 0 0;
 }
+
+/* Invitations */
+.Invitations.DataTable {
+   margin: 15px 0;
+}
+.Invitations.DataTable th {
+   text-align: left;
+}
+.Invitations.DataTable th {
+   padding: 4px;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+   vertical-align: top;
+}
+.Invitations th.InviteMeta {
+   width: 20%;
+}
+.InviteForm {
+   margin: 5px 0;
+}
+.InviteForm label {
+   display: block
+}
+
 /* ======================================================== Thumbnail Cropper */
 .Popup .CurrentPicture {
 	display: none;
@@ -2238,7 +2267,7 @@ form.Thumbnail .Warning {
 .EditCommentForm .Buttons,
 .CommentForm .Buttons {
 	position: relative;
-   text-align: right; 
+   text-align: right;
 	margin: 0;
 	padding: 6px 0;
 }
@@ -2278,7 +2307,7 @@ form.Thumbnail .Warning {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 5000;
+  z-index: 998;
 }
 .MSIE .Overlay {
    background: gray;
@@ -2487,7 +2516,7 @@ div.Popup form ul li label.RadioLabel {
    margin-top: 20px;
 }
 .ItemDiscussion .MItem a {
-   font-size: 11px; 
+   font-size: 11px;
 }
 .ItemDiscussion .ProfilePhotoMedium {
 	height: 24px;
@@ -2517,7 +2546,7 @@ div.Popup form ul li label.RadioLabel {
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 	vertical-align: top;
 }
-.DataTable thead td {
+.DataTable thead td, .DataTable thead th {
 	font-weight: bold;
    vertical-align: bottom;
 }
@@ -2581,17 +2610,17 @@ tr.CategoryHeading td {
 .DiscussionSorter {
    float: right;
    margin-right: 24px;
-   font-size: 11px; 
+   font-size: 11px;
 }
 .DiscussionSorter:hover {
    cursor: pointer;
    background: #f3f3f3;
 }
-.DiscussionSorter .MenuItems { 
-   padding: 0; 
+.DiscussionSorter .MenuItems {
+   padding: 0;
    width: 130px;
    border-top: none;
-   border-radius: 0; 
+   border-radius: 0;
 }
 .DiscussionSorter .Selected {
    padding: 0 0 0 15px;
@@ -2602,19 +2631,19 @@ tr.CategoryHeading td {
 }
 .DiscussionSorter .Open .Selected {
    border: 1px solid #999;
-   border-bottom: none;  
+   border-bottom: none;
 }
-.DiscussionSorter .SpMenu { 
+.DiscussionSorter .SpMenu {
    background-position: -32px -20px;
-   height: 8px; 
-   width: 12px; 
+   height: 8px;
+   width: 12px;
    margin-top: 8px;
 }
-.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after { 
-   border: none; 
+.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after {
+   border: none;
 }
-.DiscussionSorter .ToggleFlyout .Flyout { 
-   top: 18px; 
+.DiscussionSorter .ToggleFlyout .Flyout {
+   top: 18px;
 }
 
 /* ======================================= Blocks */
@@ -2821,14 +2850,14 @@ textarea.MultiComplete {
    padding: 5px;
    cursor: default;
    display: block;
-   /* 
-   if width will be 100% horizontal scrollbar will apear 
+   /*
+   if width will be 100% horizontal scrollbar will apear
    when scroll mode will be used
    */
    /*width: 100%;*/
    font-size: 12px;
-   /* 
-   it is very important, if line-height not setted or setted 
+   /*
+   it is very important, if line-height not setted or setted
    in relative units scroll will be broken in firefox
    */
    line-height: 16px;
@@ -2861,7 +2890,7 @@ textarea.MultiComplete {
 	text-align: left;
 	color:#666666;
 	font-size:14px;
-	font-weight:bold;	
+	font-weight:bold;
 }
 #ConversationForm .TextBox {
 	width: 100%;
@@ -3184,7 +3213,7 @@ body#dashboard_entry_leave p.Leaving {
   width: auto;
   top: auto;
   left: auto;
-  overflow: auto; 
+  overflow: auto;
 }
 .Errors ul {
 	border: 1px solid #a00 !important;
@@ -3265,7 +3294,7 @@ position on the page to notify users of things like drafts being saved, etc. */
   position: absolute;
   top: auto;
   margin-left: 10px;
-  overflow: visible; 
+  overflow: visible;
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 .InformWrapper {
@@ -3342,7 +3371,7 @@ only screen and (max-device-width: 480px) {
       color: #fff;
       display: block;
    }
-   
+
    .Item .OptionsTitle {
       visibility: visible;
    }
@@ -3727,10 +3756,10 @@ body.embed .InformMessages {
 
 .RegardingEvent {
    padding: 10px;
-   
+
    position: relative;
    padding-left: 38px;
-   
+
    color: #fff !important;
    text-shadow: 0 1px 1px #000;
    text-align: left !important;
@@ -3870,7 +3899,7 @@ body.embed .InformMessages {
 }
 .Flyout.Flags {
    top: 25px;
-   z-index: 1000;
+   z-index: 997;
 }
 .Reactions .FlagMenu .MenuItems .ReactButton {
    margin: 0px;
@@ -3888,7 +3917,7 @@ body.embed .InformMessages {
    height: 14px;
    line-height: 14px;
    vertical-align: top;
-   
+
 }
 
 /* === Reaction Sprites === */
@@ -3909,6 +3938,7 @@ input + .ReactSprite {
 
 .ReactEverything { background-position: -197px -53px; }
 .ReactAwesome { background-position: -269px -6px; }
+.ReactFeature { background-position:  -280px -60px; }
 .ReactFlag { background-position: -54px -52px; }
 .ReactInsightful { background-position: -149px -6px; }
 .ReactOffTopic { background-position: -173px -6px; }
@@ -4135,4 +4165,244 @@ div.token-input-dropdown ul li em {
 }
 div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   background-color: #eee;
+}
+
+/**
+ * At mentions in core, moved from advanced editor.
+ */
+.atwho-view {
+   font: normal 14px/1.7em 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   position: absolute;
+   top: 0;
+   left: 0;
+   display: none;
+   margin-top: 18px;
+   background: #fff;
+   min-width: 120px;
+   z-index: 100010; /* So high because a client actually had 99999 in a theme */
+   border-radius: 2px;
+   overflow: hidden;
+   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.atwho-view .cur {
+   background: #1E79A7;
+   color: #fff;
+}
+
+.atwho-view .cur small {
+   color: #fff;
+}
+
+.atwho-view strong {
+   color: #1E79A7;
+}
+
+.atwho-view .cur strong {
+   color: #fff;
+   font: bold;
+}
+
+.atwho-view ul {
+   list-style: none;
+   padding: 0;
+   margin: auto;
+}
+
+.atwho-view ul li {
+   display: block;
+   padding: 5px 10px;
+   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+   cursor: pointer;
+}
+
+.atwho-view ul li:last-child {
+   border: 0;
+}
+
+.atwho-view small {
+   font-size: smaller;
+   color: #777;
+   font-weight: 400;
+}
+
+.at-suggest-emoji .emoji-img {
+   position: relative;
+   top: 3px;
+}
+
+.at-suggest-emoji .emoji-name {
+   position: relative;
+   top: -2px;
+   padding: 0 0 0 2px;
+}
+
+/**
+ * Socialcons
+ */
+
+.SocialIcon {
+  display: inline-block;
+  overflow: hidden;
+  font-weight: bold;
+  line-height: 24px;
+  color: #fff !important;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.SocialIcon.HasText {
+  min-width: 210px;
+  line-height: 32px;
+}
+
+.SocialIcon .Icon {
+  width: 24px;
+  height: 24px;
+}
+
+.SocialIcon.HasText .Icon {
+  width: 32px;
+  height: 32px;
+}
+
+.SocialIcon .Text {
+  padding: 0 15px 0 10px;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.SocialIcon {
+  -webkit-transition: background-color 100ms;
+     -moz-transition: background-color 100ms;
+       -o-transition: background-color 100ms;
+          transition: background-color 100ms;
+}
+
+.SocialIcon .Icon,
+.SocialIcon .Text {
+  display: block;
+  float: left;
+  vertical-align: top;
+}
+
+.SocialIcon .Icon {
+  background-image: url('images/socialcons-small.png');
+  background-repeat: no-repeat;
+  background-size: 24px 168px;
+}
+.SocialIcon.HasText .Icon {
+  background-size: 32px 224px;
+  background-image: url('images/socialcons.png');
+}
+@media
+(-webkit-min-device-pixel-ratio: 2),
+(-o-min-device-pixel-ratio: 3 / 2),
+(min-device-pixel-ratio: 2) {
+  .SocialIcon .Icon {
+    background-image: url('images/socialcons-small@2x.png');
+  }
+  .SocialIcon.HasText .Icon {
+    background-image: url('images/socialcons@2x.png');
+  }
+}
+
+.SocialIcon-Facebook .Icon {
+  background-position: 0 -24px;
+}
+.SocialIcon-Facebook.HasText .Icon {
+  background-position: 0 -32px;
+}
+.SocialIcon-Facebook,
+.SocialIcon-Facebook.HasText .Icon {
+  background-color: #36609e;
+}
+.SocialIcon-Facebook:hover {
+  background-color: #294978;
+}
+
+.SocialIcon-Twitter .Icon {
+  background-position: 0 -144px;
+}
+.SocialIcon-Twitter.HasText .Icon {
+  background-position: 0 -192px;
+}
+.SocialIcon-Twitter,
+.SocialIcon-Twitter.HasText .Icon {
+  background-color: #2aa8df;
+}
+.SocialIcon-Twitter:hover {
+  background-color: #1c8aba;
+}
+
+.SocialIcon-Google .Icon {
+  background-position: 0 -72px;
+}
+.SocialIcon-Google.HasText .Icon {
+  background-position: 0 -96px;
+}
+.SocialIcon-Google,
+.SocialIcon-Google.HasText .Icon {
+  background-color: #da5442;
+}
+.SocialIcon-Google:hover {
+  background-color: #c33926;
+}
+
+.SocialIcon-OpenID .Icon {
+  background-position: 0 -120px;
+}
+.SocialIcon-OpenID.HasText .Icon {
+  background-position: 0 -160px;
+}
+.SocialIcon-OpenID,
+.SocialIcon-OpenID.HasText .Icon {
+  background-color: #f7921c;
+}
+.SocialIcon-OpenID:hover {
+  background-color: #d87808;
+}
+
+.SocialIcon-LinkedIn .Icon {
+  background-position: 0 -96px;
+}
+.SocialIcon-LinkedIn.HasText .Icon {
+  background-position: 0 -128px;
+}
+.SocialIcon-LinkedIn,
+.SocialIcon-LinkedIn.HasText .Icon {
+  background-color: #066c9a;
+}
+.SocialIcon-LinkedIn:hover {
+  background-color: #044a69;
+}
+
+.SocialIcon-Disqus .Icon {
+  background-position: 0 0;
+}
+.SocialIcon.Disqus,
+.SocialIcon.Disqus.HasText .Icon {
+  background-color: #2e9fff;
+}
+.SocialIcon-Disqus:hover {
+  background-color: #0087fa;
+}
+
+.SocialIcon-GitHub .Icon {
+  background-position: 0 -48px;
+}
+.SocialIcon-GitHub.HasText .Icon {
+  background-position: 0 -64px;
+}
+.SocialIcon-GitHub,
+.SocialIcon-GitHub.HasText .Icon {
+  background-color: #6b9ecf;
+}
+.SocialIcon-GitHub:hover {
+  background-color: #4485c3;
+}
+
+/* Woe unto whoever caused this */
+
+.MeBox-SignIn.Inline .SocialIcon {
+  display: inline-block;
 }

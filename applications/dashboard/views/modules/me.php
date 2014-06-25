@@ -7,7 +7,7 @@ if ($this->CssClass)
 
 $DashboardCount = 0;
 // Spam & Moderation Queue
-if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {
+if ($Session->CheckPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
    $LogModel = new LogModel();
    //$SpamCount = $LogModel->GetOperationCount('spam');
    $ModerationCount = $LogModel->GetOperationCount('moderate');
@@ -32,12 +32,12 @@ if ($Session->IsValid()):
          // Notifications
          $CountNotifications = $User->CountNotifications;
          $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert">'.$CountNotifications.'</span>' : '';
-         
+
          echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
          echo Anchor(Sprite('SpNotifications', 'Sprite Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton', array('title' => T('Notifications')));
          echo Sprite('SpFlyoutHandle', 'Arrow');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
-         
+
          // Inbox
          if (Gdn::ApplicationManager()->CheckApplication('Conversations')) {
             $CountInbox = GetValue('CountUnreadConversations', Gdn::Session()->User);
@@ -47,7 +47,7 @@ if ($Session->IsValid()):
             echo Sprite('SpFlyoutHandle', 'Arrow');
             echo '<div class="Flyout FlyoutMenu"></div></span>';
          }
-         
+
          // Bookmarks
          if (Gdn::ApplicationManager()->CheckApplication('Vanilla')) {
             echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
@@ -55,7 +55,7 @@ if ($Session->IsValid()):
             echo Sprite('SpFlyoutHandle', 'Arrow');
             echo '<div class="Flyout FlyoutMenu"></div></span>';
          }
-         
+
          // Profile Settings & Logout
          echo '<span class="ToggleFlyout">';
          $CDashboard = $DashboardCount > 0 ? Wrap($DashboardCount, 'span class="Alert"') : '';
@@ -70,22 +70,30 @@ if ($Session->IsValid()):
                } else {
                   echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap'));
                }
-               
-               if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {
+
+               if ($Session->CheckPermission(array('Garden.Settings.View', 'Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
                   echo Wrap('<hr />', 'li');
                   $CApplicant = $ApplicantCount > 0 ? ' '.Wrap($ApplicantCount, 'span class="Alert"') : '';
                   $CSpam = ''; //$SpamCount > 0 ? ' '.Wrap($SpamCount, 'span class="Alert"') : '';
                   $CModeration = $ModerationCount > 0 ? ' '.Wrap($ModerationCount, 'span class="Alert"') : '';
                   echo Wrap(Anchor(Sprite('SpApplicants').' '.T('Applicants').$CApplicant, '/dashboard/user/applicants'), 'li');
-                  echo Wrap(Anchor(Sprite('SpSpam').' '.T('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li');
-                  echo Wrap(Anchor(Sprite('SpMod').' '.T('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li');
-                  if ($Session->CheckPermission('Garden.Settings.Manage')) {
+
+                  if ($Session->CheckPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
+                     echo Wrap(Anchor(Sprite('SpSpam').' '.T('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li');
+                  }
+
+                  if ($Session->CheckPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
+                     echo Wrap(Anchor(Sprite('SpMod').' '.T('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li');
+                  }
+
+                  if ($Session->CheckPermission(array('Garden.Settings.View', 'Garden.Settings.Manage'), FALSE)) {
                      echo Wrap(Anchor(Sprite('SpDashboard').' '.T('Dashboard'), '/dashboard/settings'), 'li');
                   }
                }
-               
+
                $this->FireEvent('FlyoutMenu');
                echo Wrap('<hr />'.Anchor(Sprite('SpSignOut').' '.T('Sign Out'), SignOutUrl()), 'li', array('class' => 'SignInOutWrap SignOutWrap'));
+            echo '</ul>';
          echo '</div>';
          echo '</span>';
 
@@ -105,10 +113,10 @@ else:
       if(!empty($Url))
          echo Bullet(' ').Anchor(T('Register'), $Url, 'ApplyButton', array('rel' => 'nofollow')).' ';
    echo '</div>';
-      
+
    echo ' <div class="SignInIcons">';
    $this->FireEvent('SignInIcons');
    echo '</div>';
-   
+
    echo '</div>';
 endif;

@@ -29,7 +29,7 @@ class Gdn_PasswordHash extends PasswordHash {
     */
    function __construct() {
       // 8 iteration to create a Portable hash
-      parent::PasswordHash(8, TRUE);
+      parent::PasswordHash(8, FALSE);
    }
 
    function CheckDjango($Password, $StoredHash) {
@@ -85,6 +85,10 @@ class Gdn_PasswordHash extends PasswordHash {
          case 'django':
             $Result = $this->CheckDjango($Password, $StoredHash);
             break;
+         case 'drupal':
+            require_once PATH_LIBRARY.'/vendors/drupal/password.inc.php';
+            $Result = Drupal\user_check_password($Password, $StoredHash);
+            break;
          case 'ipb':
             $Result = $this->CheckIPB($Password, $StoredHash);
             break;
@@ -112,6 +116,8 @@ class Gdn_PasswordHash extends PasswordHash {
             $StoredSalt = GetValue(1, $Parts);
             
             if (md5($Password) == $StoredHash)
+               $Result = TRUE;
+            elseif (sha1($Password) == $StoredHash)
                $Result = TRUE;
             elseif (sha1($StoredSalt.sha1($Password)) == $StoredHash)
                $Result = TRUE;
@@ -172,7 +178,13 @@ class Gdn_PasswordHash extends PasswordHash {
          return FALSE;
       
       if ($StoredHash[0] === '_' || $StoredHash[0] === '$') {
-         return parent::CheckPassword($Password, $StoredHash);
+         $Result = parent::CheckPassword($Password, $StoredHash);
+
+         // Check to see if this password should be rehashed to crypt-blowfish.
+         if (!$this->portable_hashes &&  CRYPT_BLOWFISH == 1 && substr($StoredHash, 0, 3) === '$P$')
+            $this->Weak = TRUE;
+
+         return $Result;
       } else if ($Password && $StoredHash !== '*'
          && ($Password === $StoredHash || md5($Password) === $StoredHash)
       ) {

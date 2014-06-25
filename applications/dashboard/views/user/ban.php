@@ -2,7 +2,7 @@
 <script language="javascript">
    jQuery(document).ready(function($) {
       $('#Form_ReasonText').focus(function() {
-         $('#Form_Reason2').attr('checked', 'checked');
+         $('#Form_Reason2').prop('checked', true);
       });
    });
 </script>
@@ -26,7 +26,7 @@ echo $this->Form->Errors();
 
 echo '<div class="P">', $this->Form->Radio('Reason', 'Spamming', array('Value' => 'Spam')), '</div>';
 echo '<div class="P">', $this->Form->Radio('Reason', 'Abusive Behavior', array('Value' => 'Abuse')), '</div>';
-echo '<div class="P">', 
+echo '<div class="P">',
    $this->Form->Radio('Reason', 'Other', array('Value' => 'Other')),
    '<div class="TextBoxWrapper">',
    $this->Form->TextBox('ReasonText', array('MultiLine' => TRUE)),

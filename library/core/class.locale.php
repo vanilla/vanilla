@@ -159,14 +159,6 @@ class Gdn_Locale extends Gdn_Pluggable {
          if ($PluginLocaleSources !== FALSE)
             $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
 
-         // Get theme-based locale definition files.
-         $Theme = C('Garden.Theme');
-         if ($Theme) {
-            $ThemeLocalePath = PATH_THEMES."/{$Theme}/locale/{$LocaleName}.php";
-            if (file_exists($ThemeLocalePath))
-               $LocaleSources[] = $ThemeLocalePath;
-         }
-
          // Get locale-based locale definition files.
          $EnabledLocales = C('EnabledLocales');
          if (is_array($EnabledLocales)) {
@@ -182,6 +174,14 @@ class Gdn_Locale extends Gdn_Pluggable {
                   }
                }
             }
+         }
+
+         // Get theme-based locale definition files.
+         $Theme = C('Garden.Theme');
+         if ($Theme) {
+            $ThemeLocalePath = PATH_THEMES."/{$Theme}/locale/{$LocaleName}.php";
+            if (file_exists($ThemeLocalePath))
+               $LocaleSources[] = $ThemeLocalePath;
          }
             
          // Save the mappings

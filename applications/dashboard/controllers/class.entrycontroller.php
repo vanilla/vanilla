@@ -1,24 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-/**
- * Entry Controller
- *
- * @package Dashboard
- */
 
 /**
  * Manages users manually authenticating (signing in).
  *
- * @since 2.0.0
- * @package Dashboard
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Garden
+ * @since 2.0
  */
+
 class EntryController extends Gdn_Controller {
    /**
     * Models to include.
@@ -166,8 +156,14 @@ class EntryController extends Gdn_Controller {
          case Gdn_Authenticator::MODE_GATHER:
             $this->AddJsFile('entry.js');
             $Reaction = $Authenticator->LoginResponse();
-				if ($this->Form->IsPostBack())
+				if ($this->Form->IsPostBack()) {
 					$this->Form->AddError('ErrorCredentials');
+                    Logger::event(
+                       'signin_failure',
+                       LogLevel::WARNING,
+                       '{InsertName} failed to sign in. Some or all credentials were missing.'
+                    );
+                }
          break;
 
          // All information is present, authenticate
@@ -191,16 +187,31 @@ class EntryController extends Gdn_Controller {
                   switch ($AuthenticationResponse) {
                      case Gdn_Authenticator::AUTH_PERMISSION:
                         $this->Form->AddError('ErrorPermission');
+                         Logger::event(
+                            'signin_failure',
+                            LogLevel::WARNING,
+                            '{InsertName} failed to sign in. Permission denied.'
+                         );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
 
                      case Gdn_Authenticator::AUTH_DENIED:
                         $this->Form->AddError('ErrorCredentials');
+                        Logger::event(
+                           'signin_failure',
+                           LogLevel::WARNING,
+                           '{InsertName} failed to sign in. Authentication denied.'
+                        );
                         $Reaction = $Authenticator->FailedResponse();
                      break;
 
                      case Gdn_Authenticator::AUTH_INSUFFICIENT:
                         // Unable to comply with auth request, more information is needed from user.
+                         Logger::event(
+                            'signin_failure',
+                            LogLevel::WARNING,
+                            '{InsertName} failed to sign in. More information needed from user.'
+                         );
                         $this->Form->AddError('ErrorInsufficient');
                         $Reaction = $Authenticator->FailedResponse();
                      break;
@@ -352,6 +363,13 @@ class EntryController extends Gdn_Controller {
             Redirect($Url, 302);
          else {
             $this->SetData('Url', $Url);
+            $Script = <<<EOT
+<script type="text/javascript">
+   window.location = "$Url";
+</script>
+EOT;
+
+
             $this->Render('Redirect', 'Utility');
             die();
          }
@@ -476,7 +494,7 @@ class EntryController extends Gdn_Controller {
          }
 
          // Sign the user in.
-         Gdn::Session()->Start($UserID, TRUE, TRUE);
+         Gdn::Session()->Start($UserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe', TRUE));
          Gdn::UserModel()->FireEvent('AfterSignIn');
 //         $this->_SetRedirect(TRUE);
          $this->_SetRedirect($this->Request->Get('display') == 'popup');
@@ -529,7 +547,7 @@ class EntryController extends Gdn_Controller {
                       'UniqueID' => $this->Form->GetFormValue('UniqueID')));
 
                   // Sign the user in.
-                  Gdn::Session()->Start($UserID, TRUE, TRUE);
+                  Gdn::Session()->Start($UserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe', TRUE));
                   Gdn::UserModel()->FireEvent('AfterSignIn');
          //         $this->_SetRedirect(TRUE);
                   $this->_SetRedirect($this->Request->Get('display') == 'popup');
@@ -603,7 +621,7 @@ class EntryController extends Gdn_Controller {
 
                $this->Form->SetFormValue('UserID', $UserID);
 
-               Gdn::Session()->Start($UserID, TRUE, TRUE);
+               Gdn::Session()->Start($UserID, TRUE, (bool)$this->Form->GetFormValue('RememberMe', TRUE));
                Gdn::UserModel()->FireEvent('AfterSignIn');
 
                // Send the welcome email.
@@ -706,7 +724,7 @@ class EntryController extends Gdn_Controller {
             }
 
             // Sign the appropriate user in.
-            Gdn::Session()->Start($this->Form->GetFormValue('UserID', TRUE, TRUE));
+            Gdn::Session()->Start($this->Form->GetFormValue('UserID'), TRUE, (bool)$this->Form->GetFormValue('RememberMe', TRUE));
             Gdn::UserModel()->FireEvent('AfterSignIn');
             $this->_SetRedirect(TRUE);
          }
@@ -857,6 +875,7 @@ class EntryController extends Gdn_Controller {
 
             if (!$User) {
                $this->Form->AddError('@'.sprintf(T('User not found.'), strtolower(T(UserModel::SigninLabelCode()))));
+               Logger::event('signin_failure', LogLevel::INFO, '{Signin} failed to sign in. User not found.', array('Signin' => $Email));
             } else {
                // Check the password.
                $PasswordHash = new Gdn_PasswordHash();
@@ -896,6 +915,13 @@ class EntryController extends Gdn_Controller {
                      }
                   } else {
                      $this->Form->AddError('Invalid password.');
+                     Logger::event(
+                        'signin_failure',
+                        LogLevel::WARNING,
+                        '{InsertName} failed to sign in.  Invalid password.',
+                        array('InsertName' => $User->Name)
+                     );
+
                   }
                } catch (Gdn_UserException $Ex) {
                   $this->Form->AddError($Ex);
@@ -1089,6 +1115,11 @@ class EntryController extends Gdn_Controller {
                $this->Form->AddError('ErrorPermission');
             } else if ($UserID == 0) {
                $this->Form->AddError('ErrorCredentials');
+                Logger::event(
+                   'signin_failure',
+                   LogLevel::WARNING,
+                   '{InsertName} failed to sign in. Invalid credentials.'
+                );
             }
 
             if ($UserID > 0) {
@@ -1272,8 +1303,10 @@ class EntryController extends Gdn_Controller {
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);
          }
+         $this->Render();
+      } else {
+         $this->Render();
       }
-      $this->Render();
    }
 
    /**
@@ -1424,12 +1457,44 @@ class EntryController extends Gdn_Controller {
    /**
     * Invitation-only registration. Requires code.
     *
-    * Events: RegistrationSuccessful
-    *
-    * @access private
+    * @param int $InvitationCode
     * @since 2.0.0
     */
-   private function RegisterInvitation($InvitationCode) {
+   public function RegisterInvitation($InvitationCode = 0) {
+      $this->Form->SetModel($this->UserModel);
+
+      // Define gender dropdown options
+      $this->GenderOptions = array(
+         'u' => T('Unspecified'),
+         'm' => T('Male'),
+         'f' => T('Female')
+      );
+
+      if (!$this->Form->IsPostBack()) {
+         $this->Form->SetValue('InvitationCode', $InvitationCode);
+      }
+
+      $InvitationModel = new InvitationModel();
+
+      // Look for the invitation.
+      $Invitation = $InvitationModel
+         ->GetWhere(array('Code' => $this->Form->GetValue('InvitationCode')))
+         ->FirstRow(DATASET_TYPE_ARRAY);
+
+      if (!$Invitation) {
+         $this->Form->AddError('Invitation not found.', 'Code');
+      } else {
+         if ($Expires = GetValue('DateExpires', $Invitation)) {
+            $Expires = Gdn_Format::ToTimestamp($Expires);
+            if ($Expires <= time()) {
+
+            }
+         }
+      }
+
+      $this->Form->AddHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default
+      $this->Form->AddHidden('Target', $this->Target());
+
       Gdn::UserModel()->AddPasswordStrength($this);
 
       if ($this->Form->IsPostBack() === TRUE) {
@@ -1448,7 +1513,7 @@ class EntryController extends Gdn_Controller {
          try {
             $Values = $this->Form->FormValues();
             unset($Values['Roles']);
-            $AuthUserID = $this->UserModel->Register($Values);
+            $AuthUserID = $this->UserModel->Register($Values, array('Method' => 'Invitation'));
 
             if (!$AuthUserID) {
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
@@ -1473,8 +1538,16 @@ class EntryController extends Gdn_Controller {
             $this->Form->AddError($Ex);
          }
       } else {
+         // Set some form defaults.
+         if ($Name = GetValue('Name', $Invitation)) {
+            $this->Form->SetValue('Name', $Name);
+         }
+
          $this->InvitationCode = $InvitationCode;
       }
+
+      // Make sure that the hour offset for new users gets defined when their account is created
+      $this->AddJsFile('entry.js');
       $this->Render();
    }
 
@@ -1504,6 +1577,12 @@ class EntryController extends Gdn_Controller {
                $Email = $this->Form->GetFormValue('Email');
                if (!$this->UserModel->PasswordRequest($Email)) {
                   $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+                  Logger::event(
+                     'password_reset_failure',
+                     LogLevel::INFO,
+                     'Can\'t find account associated with email/username {Input}.',
+                     array('Input' => $Email)
+                  );
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex->getMessage());
@@ -1511,10 +1590,23 @@ class EntryController extends Gdn_Controller {
             if ($this->Form->ErrorCount() == 0) {
                $this->Form->AddError('Success!');
                $this->View = 'passwordrequestsent';
+               Logger::event(
+                  'password_reset_request',
+                  LogLevel::INFO,
+                  '{Input} has been sent a password reset email.',
+                  array('Input' => $Email)
+               );
             }
          } else {
-            if ($this->Form->ErrorCount() == 0)
+            if ($this->Form->ErrorCount() == 0) {
                $this->Form->AddError("Couldn't find an account associated with that email/username.");
+               Logger::event(
+                  'password_reset_failure',
+                  LogLevel::INFO,
+                  'Can\'t find account associated with email/username {Input}.',
+                  array('Input' => $this->Form->GetValue('Email'))
+               );
+            }
          }
       }
       $this->Render();
@@ -1530,10 +1622,30 @@ class EntryController extends Gdn_Controller {
     * @param string $PasswordResetKey Authenticate with unique, 1-time code sent via email.
     */
    public function PasswordReset($UserID = '', $PasswordResetKey = '') {
+      $PasswordResetKey = trim($PasswordResetKey);
+
       if (!is_numeric($UserID)
           || $PasswordResetKey == ''
           || $this->UserModel->GetAttribute($UserID, 'PasswordResetKey', '') != $PasswordResetKey
-         ) $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
+         ) {
+         $this->Form->AddError('Failed to authenticate your password reset request. Try using the reset request form again.');
+         Logger::event(
+            'password_reset_failure',
+            LogLevel::NOTICE,
+            '{InsertName} failed to authenticate password reset request.'
+         );
+      }
+
+      $Expires = $this->UserModel->GetAttribute($UserID, 'PasswordResetExpires');
+      if ($this->Form->ErrorCount() === 0 && $Expires < time()) {
+         $this->Form->AddError('@'.T('Your password reset token has expired.', 'Your password reset token has expired. Try using the reset request form again.'));
+         Logger::event(
+            'password_reset_failure',
+            LogLevel::NOTICE,
+            '{InsertName} has an expired reset token.'
+         );
+      }
+
 
       if ($this->Form->ErrorCount() == 0) {
          $User = $this->UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
@@ -1541,6 +1653,8 @@ class EntryController extends Gdn_Controller {
             $User = ArrayTranslate($User, array('UserID', 'Name', 'Email'));
             $this->SetData('User', $User);
          }
+      } else {
+         $this->SetData('Fatal', TRUE);
       }
 
       if ($this->Form->ErrorCount() == 0
@@ -1548,13 +1662,29 @@ class EntryController extends Gdn_Controller {
       ) {
          $Password = $this->Form->GetFormValue('Password', '');
          $Confirm = $this->Form->GetFormValue('Confirm', '');
-         if ($Password == '')
+         if ($Password == '') {
             $this->Form->AddError('Your new password is invalid');
-         else if ($Password != $Confirm)
+            Logger::event(
+               'password_reset_failure',
+               LogLevel::NOTICE,
+               'Failed to reset the password for {InsertName}. Password is invalid.'
+            );
+         } else if ($Password != $Confirm)
             $this->Form->AddError('Your passwords did not match.');
+            Logger::event(
+               'password_reset_failure',
+               LogLevel::NOTICE,
+               'Failed to reset the password for {InsertName}. Passwords did not match.'
+            );
 
          if ($this->Form->ErrorCount() == 0) {
             $User = $this->UserModel->PasswordReset($UserID, $Password);
+            Logger::event(
+               'password_reset',
+               LogLevel::NOTICE,
+               '{UserName} has reset their password.',
+               array('UserName', $User->Name)
+            );
             Gdn::Session()->Start($User->UserID, TRUE);
 //            $Authenticator = Gdn::Authenticator()->AuthenticateWith('password');
 //            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
@@ -1744,7 +1874,7 @@ class EntryController extends Gdn_Controller {
          if (is_array($TrustedDomains)) {
             // Add this domain to the trusted hosts.
             $TrustedDomains[] = $MyHostname;
-            $Sender->EventArguments['TrustedDomains'] = &$TrustedDomains;
+            $this->EventArguments['TrustedDomains'] = &$TrustedDomains;
             $this->FireEvent('BeforeTargetReturn');
          }
 

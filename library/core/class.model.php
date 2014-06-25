@@ -425,7 +425,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * @param mixed $ID The value of the primary key in the database.
     * @param string $DatasetType The format of the result dataset.
     * @param array $Options options to pass to the database.
-    * @return Gdn_DataSet
+    * @return array|object
     * 
     * @since 2.3 Added the $Options parameter.
     */
@@ -477,8 +477,7 @@ class Gdn_Model extends Gdn_Pluggable {
    /**
     * Returns the $this->Validation->ValidationResults() array.
     *
-    * @return unknown
-    * @todo add return type
+    * @return array
     */
    public function ValidationResults() {
       return $this->Validation->Results();
@@ -486,10 +485,9 @@ class Gdn_Model extends Gdn_Pluggable {
 
 
    /**
-    * @param unknown_type $FormPostValues
-    * @param unknown_type $Insert
-    * @return unknown
-    * @todo add doc
+    * @param array $FormPostValues
+    * @param bool $Insert
+    * @return bool
     */
    public function Validate($FormPostValues, $Insert = FALSE) {
       $this->DefineSchema();

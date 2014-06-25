@@ -11,16 +11,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Debugger'] = array(
    'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
-   'Version' => '1.0',
-   'RequiredApplications' => FALSE, 
-   'RequiredTheme' => FALSE, 
+   'Version' => '1.0.1',
+   'RequiredApplications' => FALSE,
+   'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE, // This is an array of plugin names/versions that this plugin requires
    'HasLocale' => FALSE, // Does this plugin have any locale definitions?
    'RegisterPermissions' => array('Plugins.Debugger.View','Plugins.Debugger.Manage'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
    'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca', 
+   'AuthorUrl' => 'http://markosullivan.ca',
    'MobileFriendly' => TRUE,
 );
 
@@ -37,13 +37,9 @@ class DebuggerPlugin extends Gdn_Plugin {
    // be called. It saves you from having to go:
    // Table_Render_After, Row_Render_After, Item_Render_After,
    // SignIn_Render_After, etc. and it essentially *_Render_After
-   
-//   public function Base_Render_Before($Sender) {
-//      $Sender->AddCssFile('/plugins/Debugger/style.css');
-//   }
-   
+
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('style.css', 'plugins/Debugger');
+      $Sender->AddCssFile('debugger.css', 'plugins/Debugger');
    }
 
    public function Base_AfterBody_Handler($Sender) {
@@ -51,7 +47,7 @@ class DebuggerPlugin extends Gdn_Plugin {
       if(!Debug() && !$Session->CheckPermission('Plugins.Debugger.View')) {
          return;
       }
-      
+
       require $Sender->FetchViewLocation('Debug', '', 'plugins/Debugger');
    }
 
@@ -71,7 +67,7 @@ class DebuggerPlugin extends Gdn_Plugin {
                if (is_a($Value, 'Gdn_DataSet'))
                   $Result .= "DataSet";
 
-               $Result .= 
+               $Result .=
                   "\n"
                   .self::FormatData($Value, $Indent.'   ');
             }
@@ -95,11 +91,11 @@ class DebuggerPlugin extends Gdn_Plugin {
       }
       return $Result;
    }
-   
+
    public function PluginController_Debugger_Create($Sender) {
       $Sender->Render();
    }
-   
+
    public function Setup() {
       // This setup method should trigger errors when it encounters them - the plugin manager will catch the errors...
    }

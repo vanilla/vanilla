@@ -1077,12 +1077,12 @@ if (!function_exists('ForceIPv4')) {
     * @since 2.1
     */
    function ForceIPv4($IP) {
-      if ($IP === '::1')
+      if ($IP === '::1') {
          return '127.0.0.1';
-      elseif (strpos($IP, ':')) {
+      } elseif (strpos($IP, ':') === true) {
          return '0.0.0.1';
-      } elseif (strpos($IP, '.') === FALSE) {
-         return '0.0.0.1';
+      } elseif (strpos($IP, '.') === false) {
+         return '0.0.0.2';
       } else {
          return substr($IP, 0, 15);
       }
@@ -1763,17 +1763,43 @@ if (!function_exists('InSubArray')) {
 }
 
 if (!function_exists('IsMobile')) {
-   function IsMobile($Value = NULL) {
+   /**
+    * Returns whether or not the site is in mobile mode.
+    * @param mixed $Value Sets a new value for mobile. Pass one of the following:
+    * - true: Force mobile.
+    * - false: Force desktop.
+    * - null: Reset and use the system determined mobile setting.
+    * - not specified: Use the current setting or use the system determined mobile setting.
+    * @return bool
+    */
+   function IsMobile($Value = '') {
       static $IsMobile = NULL;
 
-      if ($Value !== NULL)
+      if ($Value !== '')
          $IsMobile = $Value;
 
-      // Short circuit so we only do this work once per pageload
+      // Short circuit so we only do this work once per pageload.
       if ($IsMobile !== NULL) return $IsMobile;
 
       // Start out assuming not mobile
       $Mobile = 0;
+
+      // Check for a specific cookie override.
+      $ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
+      if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile)) {
+         return $IsMobile = FALSE;
+      }
+
+      // The X-Device header can be set to explicitly state that we want mobile.
+      $Device = strtolower(GetValue('HTTP_X_UA_DEVICE', $_SERVER, ''));
+      switch ($Device) {
+         case 'desktop':
+            return $IsMobile = FALSE;
+         case 'tablet':
+            return $IsMobile = FALSE;
+         case 'mobile':
+            return $IsMobile = TRUE;
+      }
 
       $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
       $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
@@ -2713,28 +2739,52 @@ if (!function_exists('RandomString')) {
    }
 }
 
-if (!function_exists('BetterRandomString')) {
-   function BetterRandomString($Length, $CharacterOptions = 'A0') {
-      $CharacterClasses = array(
-          'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-          'a' => 'abcdefghijklmnopqrstuvwxyz',
-          '0' => '0123456789',
-          '!' => '~!@#$^&*_+-'
-      );
+if (!function_exists('BetterRandomString')):
 
-      $Characters = '';
-      for ($i=0;$i<strlen($CharacterOptions);$i++)
-         $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+/**
+ * Generate a random string of characters with additional character options that can be cryptographically strong.
+ *
+ * This function attempts to use {@link openssl_random_pseudo_bytes()} to generate its randomness.
+ * If that function does not exists then it just uses mt_rand().
+ *
+ * @param int $Length The length of the string.
+ * @param string $CharacterOptions Character sets that are allowed in the string. This is a string made up of the following characters.
+ *  - A: uppercase characters
+ *  - a: lowercase characters
+ *  - 0: digits
+ *  - !: basic punctuation (~!@#$^&*_+-)
+ * @return string Returns the random string for the given arguments.
+ */
+function BetterRandomString($Length, $CharacterOptions = 'A0') {
+   $CharacterClasses = array(
+       'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'a' => 'abcdefghijklmnopqrstuvwxyz',
+       '0' => '0123456789',
+       '!' => '~!@#$^&*_+-'
+   );
 
-      $CharLen = strlen($Characters) - 1;
-      $String = '' ;
+   $Characters = '';
+   for ($i=0;$i<strlen($CharacterOptions);$i++)
+      $Characters .= GetValue($CharacterOptions{$i}, $CharacterClasses);
+
+   $CharLen = strlen($Characters);
+   $String = '' ;
+
+   if (function_exists('openssl_random_pseudo_bytes')) {
+      $random_chars = unpack('C*', openssl_random_pseudo_bytes($Length));
+      foreach ($random_chars as $c) {
+         $Offset = (int)$c % $CharLen;
+         $String .= substr($Characters, $Offset, 1);
+      }
+   } else {
       for ($i = 0; $i < $Length; ++$i) {
-        $Offset = rand() % $CharLen;
+        $Offset = mt_rand() % $CharLen;
         $String .= substr($Characters, $Offset, 1);
       }
-      return $String;
    }
+   return $String;
 }
+endif;
 
 if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
@@ -2971,6 +3021,29 @@ if (!function_exists('SafeParseStr')) {
          }
 
          $Output[$Key] = $Value;
+      }
+   }
+}
+
+
+if (!function_exists('SafeRedirect')) {
+   /**
+    * Redirect, but only to a safe domain.
+    *
+    * @param string $Destination Where to redirect.
+    * @param int $StatusCode
+    */
+   function SafeRedirect($Destination = FALSE, $StatusCode = NULL) {
+      if (!$Destination)
+         $Destination = Url('', TRUE);
+      else
+         $Destination = Url($Destination, TRUE);
+
+      $Domain = parse_url($Destination, PHP_URL_HOST);
+      if (in_array($Domain, TrustedDomains())) {
+         Redirect($Destination, $StatusCode);
+      } else {
+         throw PermissionException();
       }
    }
 }
@@ -3308,6 +3381,21 @@ if (!function_exists('TrueStripSlashes')) {
    }
 }
 
+if (!function_exists('TrustedDomains')) {
+   /**
+    * Get an array of all of the trusted domains in the application.
+    * @return array
+    */
+   function TrustedDomains() {
+      $Result = (array)C('Garden.TrustedDomains', array());
+
+      // This domain is safe.
+      $Result[] = Gdn::Request()->Host();
+
+      return array_unique($Result);
+   }
+}
+
 // Takes a route and prepends the web root (expects "/controller/action/params" as $Destination)
 if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
@@ -3340,7 +3428,7 @@ if (!function_exists('ViewLocation')) {
          }
 
          $Extensions = array('tpl', 'php');
-         
+
          // 1. First we check the theme.
          if ($Theme = Gdn::Controller()->Theme) {
             foreach ($Extensions as $Ext) {

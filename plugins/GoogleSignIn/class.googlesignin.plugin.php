@@ -46,7 +46,7 @@ class GoogleSignInPlugin extends Gdn_Plugin {
        $Result = $UrlParts[0].'?'.http_build_query($Query);
       return $Result;
    }
-   
+
    /**
     * Act as a mini dispatcher for API requests to the plugin app
     */
@@ -54,11 +54,11 @@ class GoogleSignInPlugin extends Gdn_Plugin {
 //      $Sender->Permission('Garden.Settings.Manage');
 //		$this->Dispatch($Sender, $Sender->RequestArgs);
 //   }
-   
+
 //   public function Controller_Toggle($Sender) {
 //      $this->AutoToggle($Sender);
 //   }
-   
+
    public function AuthenticationController_Render_Before($Sender, $Args) {
       if (isset($Sender->ChooserList)) {
          $Sender->ChooserList['googlesignin'] = 'Google';
@@ -78,22 +78,20 @@ class GoogleSignInPlugin extends Gdn_Plugin {
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
-      
+
       if (isset($Sender->Data['Methods'])) {
-         $ImgSrc = Asset('/plugins/GoogleSignIn/design/google-signin.png');
-         $ImgAlt = T('Sign In with Google');
-         $SigninHref = $this->_AuthorizeHref();
-         $PopupSigninHref = $this->_AuthorizeHref(TRUE);
+         $Url = $this->_AuthorizeHref();
 
          // Add the twitter method to the controller.
          $Method = array(
             'Name' => 'Google',
-            'SignInHtml' => "<a id=\"GoogleAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
+            'SignInHtml' => SocialSigninButton('Google', $Url, 'button', array('class' => 'js-extern'))
+         );
 
          $Sender->Data['Methods'][] = $Method;
       }
    }
-   
+
    public function Base_SignInIcons_Handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
 		echo "\n".$this->_GetButton();
@@ -103,15 +101,13 @@ class GoogleSignInPlugin extends Gdn_Plugin {
 //      if (!$this->IsEnabled()) return;
 		echo "\n".$this->_GetButton();
 	}
-	
-	private function _GetButton() {      
-      $ImgSrc = Asset('/plugins/GoogleSignIn/design/google-icon.png');
-      $ImgAlt = T('Sign In with Google');
-      $SigninHref = $this->_AuthorizeHref();
-      $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-      return "<a id=\"GoogleAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
+
+	private function _GetButton() {
+      $Url = $this->_AuthorizeHref();
+
+      return SocialSigninButton('Google', $Url, 'icon', array('class' => 'js-extern'));
    }
-	
+
 	public function Base_BeforeSignInLink_Handler($Sender) {
 //      if (!$this->IsEnabled())
 //			return;

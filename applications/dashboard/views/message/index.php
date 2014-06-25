@@ -56,7 +56,7 @@ foreach ($this->MessageData->Result() as $Message) {
          ?>
          </div>
       </td>
-      <td class="Alt"><span class="<?php echo $Message->CssClass; ?>"><?php echo Gdn_Format::Text($Message->Content); ?></span></td>
+      <td class="Alt"><div class="Message <?php echo $Message->CssClass; ?>"><?php echo Gdn_Format::Text($Message->Content); ?></div></td>
    </tr>
 <?php } ?>
    </tbody>

@@ -1,7 +1,7 @@
 /*
 This is a highly modified version of the Facebox plugin for jQuery by Chris
 Wanstrath. Original Credits:
- 
+
 Facebox (for jQuery)
 version: 1.0 (12/19/2007)
 @requires jQuery v1.2 or later
@@ -23,15 +23,30 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
    }
 
    $.fn.popup = function(options) {
+
+      /*
+       * Since upgrading jQuery to 1.10.2 this does not work, as $.browser was
+       * removed. The author of this popup plugin does not explain why
+       * ie6+7 don't get popups, but at this point in time it's no matter. Just
+       * make sure the popup function works as expected.
+       */
+      var browser = navigator.userAgent.toLowerCase();
       // IE7 or less gets no popups because they're jerks
-      if ($.browser.msie && parseInt($.browser.version, 10) < 8)
+      if (/msie\s6/.test(browser) || /msie\s7/.test(browser)) {
          return false;
-   
+      }
+
       // Merge the two settings arrays into a central data store
       var settings = $.extend({}, $.popup.settings, options);
       var sender = this;
 
-      this.live('click', function() {
+      // Need to rewrite how popup is called, to incorporate
+      // event delegation, as live() removed from jQuery in 1.7, and Vanilla
+      // upgraded to 1.10.2 on Jan28, 2014.
+      //this.live('click', function() {
+      var delegateToSelector = this.selector;
+      $(document).on('click', delegateToSelector, function() {
+
          settings.sender = this;
          $.extend(settings, { popupType: $(this).attr('popupType') });
 
@@ -75,7 +90,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                   type: 'GET',
                   url: target,
                   data: {
-                     'DeliveryType': settings.deliveryType 
+                     'DeliveryType': settings.deliveryType
                   },
                   error: function(request, textStatus, errorThrown) {
                      $.popup.reveal(settings, request.responseText);
@@ -89,28 +104,28 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 //          });
             }
          }
-        
+
          return false;
       });
-    
+
       this.mouseover(function() {
          settings.sender = this;
          if ($.popup.findTarget(settings))
             $(this).addClass(settings.mouseoverClass);
       });
-    
+
       this.mouseout(function() {
          settings.sender = this;
          if ($.popup.findTarget(settings))
             $(this).removeClass(settings.mouseoverClass);
       });
-    
+
       return this;
    }
-  
+
    $.popup.findTarget = function(settings) {
       settings.foundTarget = settings.targetUrl;
-    
+
       // See if the matched element was an anchor. If it was, use the href.
       if (!settings.foundTarget && $(settings.sender).attr('href') != 'undefined') {
          settings.foundTarget = settings.sender.href;
@@ -123,7 +138,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                settings.foundTarget = anchor[0].href;
          }
       }
-    
+
       return settings.foundTarget;
    }
 
@@ -132,10 +147,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $(document).unbind('keydown.popup');
       $('#'+settings.popupId).trigger('popupClose');
       $('.Overlay').remove();
-    
+
       return false;
    }
-    
+
    $.popup.init = function(settings) {
       // Define a unique identifier for this popup
       var i = 1;
@@ -150,16 +165,16 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          popupHtml = settings.popupHtml;
       else
          popupHtml = settings.confirmHtml;
-    
+
       popupHtml = popupHtml.replace('{popup.id}', settings.popupId);
-    
+
       $('body').append(popupHtml);
       if (settings.containerCssClass != '')
          $('#'+settings.popupId).addClass(settings.containerCssClass);
-      
+
       var pagesize = $.popup.getPageSize();
       $('div.Overlay').css({height: pagesize[1]});
-    
+
       var pagePos = $.popup.getPagePosition();
       $('#'+settings.popupId).css({
          top: pagePos.top,
@@ -170,7 +185,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $(document).bind('keydown.popup', function(e) {
          if (e.keyCode == 27)
             $.popup.close(settings);
-      })    
+      })
 
       if (settings.onUnload) {
          $('#'+settings.popupId).bind('popupClose',function(){
@@ -185,13 +200,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          });
       } else {
          // 'Confirm' popup heading
-         var confirmHeading = (settings.confirmHeading) ? settings.confirmHeading : gdn.definition('ConfirmHeading', 'Confirm'); 
+         var confirmHeading = (settings.confirmHeading) ? settings.confirmHeading : gdn.definition('ConfirmHeading', 'Confirm');
          $('#'+settings.popupId+' .Content h1').text(confirmHeading);
-         
+
          // 'Confirm' popup body text
          var confirmText = (settings.confirmText) ? settings.confirmText : gdn.definition('ConfirmText', 'Are you sure you want to do that?');
-         $('#'+settings.popupId+' .Content p').text(confirmText);            
-         
+         $('#'+settings.popupId+' .Content p').text(confirmText);
+
          $('#'+settings.popupId+' .Okay').val(gdn.definition('Okay', 'Okay'));
          $('#'+settings.popupId+' .Cancel').val(gdn.definition('Cancel', 'Cancel')).click(function() {
             $.popup.close(settings);
@@ -203,13 +218,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       settings.onLoad(settings);
       if ($('#'+settings.popupId+' .Loading').length == 1)
          return true;
-    
+
       $('#'+settings.popupId+' .Content').empty();
       $('#'+settings.popupId+' .Body').children().hide().end().append('<div class="Loading">&#160;</div>');
       // Trigger an even that plugins can attach to when popups are loading.
       $('body').trigger('popupLoading');
    }
-  
+
    $.popup.reveal = function(settings, data) {
       // First see if we've retrieved json or something else
       var json = false;
@@ -243,16 +258,16 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          if (data) // Prevent blank popups
             $('#'+settings.popupId+' .Content').html(data);
       }
-    
+
       $('#'+settings.popupId+' .Loading').remove();
       $('#'+settings.popupId+' .Body').children().fadeIn('normal');
-      
+
       $('#'+settings.popupId+' .Close').unbind().click(function() {
          return $.popup.close(settings);
       });
 
       settings.afterLoad();
-    
+
       // Now, if there are any forms in the popup, hijack them if necessary.
       if (settings.hijackForms == true) {
          $('#'+settings.popupId+' form').ajaxForm({
@@ -263,7 +278,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             dataType: 'json',
             beforeSubmit: function() {
                settings.onSave(settings); // Notify the user that it is being saved.
-            },  
+            },
             success: function(json) {
                json = $.postParseJson(json);
                gdn.inform(json);
@@ -305,7 +320,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             return false;
          });
       }
-    
+
       // If there is a cancel button in the popup, hide it (the popup has it's own close button)
       $('#'+settings.popupId+' a.Cancel').hide();
 
@@ -314,7 +329,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       return false;
    }
-  
+
    $.popup.settings = {
       targetUrl:        false,        // Use this URL instead of one provided by the matched element?
       confirm:          false,        // Pop up a confirm message?
@@ -376,10 +391,10 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
          if (top !== self && $(parent.document).width())
             return true;
       } catch(e) { }
-    
+
       return false;
    }
-  
+
    $.popup.getPageSize = function() {
       var inFrame = $.popup.inFrame();
       var doc = $(inFrame ? parent.document : document);
@@ -392,7 +407,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       );
       return arrayPageSize;
    };
-  
+
    $.popup.getPagePosition = function() {
       var inFrame = $.popup.inFrame();
       var doc = $(inFrame ? parent.document : document);

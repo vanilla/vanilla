@@ -2,7 +2,7 @@
 jQuery(document).ready(function($) {
    // Set the max chars in the about form.
    $('form.About textarea').setMaxChars(1000);
-   
+
    // Popup the picture form when the link is clicked
    $('.ChangePicture,.AddPicture').popup({hijackForms: false, afterLoad: function() {
       $('.Popup :submit').hide();
@@ -11,9 +11,11 @@ jQuery(document).ready(function($) {
          $('.Popup .Body').html('<div class="Loading">&nbsp;</div>');
       });
    }});
-   
+
    // Ajax invitation uninvites and send agains if they're in a popup
-   $('div.Popup a.Uninvite, div.Popup a.SendAgain').live('click', function() {
+   // Jan28, 2014 jQuery upgrade to 1.10.2, as live() removed in 1.7.
+   // $('div.Popup a.Uninvite, div.Popup a.SendAgain').live('click', function() {
+   $(document).on('click', 'div.Popup a.Uninvite, div.Popup a.SendAgain', function() {
       var btn = this;
       var popupId = $('div.Popup').attr('id');
       $.ajax({
@@ -71,12 +73,12 @@ jQuery(document).ready(function($) {
           checkbox = $(rows[i]).find('td:eq(' + (columnIndex) + ') :checkbox');
           if ($(checkbox).is(':checkbox')) {
             if (state == -1)
-               state = $(checkbox).attr('checked');
-               
+               state = $(checkbox).prop('checked');
+
             if (state) {
-              checkbox.removeAttr('checked');
+              checkbox.prop('checked', false).trigger('change');
             } else {
-              checkbox.attr('checked', 'checked');
+              checkbox.prop('checked', true).trigger('change');
             }
           }
         }
@@ -94,12 +96,12 @@ jQuery(document).ready(function($) {
          var state = false;
          for (i = 0; i < checkboxes.length; i++) {
             if (i == 0)
-               state = $(checkboxes[0]).attr('checked');
-            
+               state = $(checkboxes[0]).prop('checked');
+
             if (state)
-               $(checkboxes[i]).removeAttr('checked');
+               $(checkboxes[i]).prop('checked', false).trigger('change');
             else
-               $(checkboxes[i]).attr('checked', 'checked');
+               $(checkboxes[i]).prop('checked', true).trigger('change');
          }
          return false;
       }

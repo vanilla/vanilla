@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 if (!isset($Drop))
    $Drop = FALSE;
-   
+
 if (!isset($Explicit))
    $Explicit = TRUE;
 
@@ -108,7 +108,7 @@ if ($UserExists && !$ConfirmedExists) {
       $UserIDs = array();
       while ($User = $Users->NextRow(DATASET_TYPE_ARRAY))
          $UserIDs[] = $User['UserID'];
-      
+
       // Update
       Gdn::SQL()->Update('User')->Set('Confirmed', 0)->WhereIn('UserID', $UserIDs)->Put();
       Gdn::SQL()->Delete('UserRole', array('RoleID' => $ConfirmEmailRoleID, 'UserID' => $UserIDs));
@@ -140,7 +140,7 @@ $UserRoleExists = $Construct->TableExists();
 
 $Construct
    ->Column('UserID', 'int', FALSE, 'primary')
-   ->Column('RoleID', 'int', FALSE, 'primary')
+   ->Column('RoleID', 'int', FALSE, array('primary', 'index'))
    ->Set($Explicit, $Drop);
 
 if (!$UserRoleExists) {
@@ -157,7 +157,7 @@ $Construct->Table('UserMeta')
    ->Column('Value', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
-// User Points Table   
+// User Points Table
 $Construct->Table('UserPoints')
    ->Column('SlotType', array('d', 'w', 'm', 'y', 'a'), FALSE, 'primary')
    ->Column('TimeSlot', 'datetime', FALSE, 'primary')
@@ -173,7 +173,7 @@ $Construct->Table('UserAuthentication')
 	->Column('ProviderKey', 'varchar(64)', FALSE, 'primary')
 	->Column('UserID', 'int', FALSE, 'key')
 	->Set($Explicit, $Drop);
-	
+
 $Construct->Table('UserAuthenticationProvider')
    ->Column('AuthenticationKey', 'varchar(64)', FALSE, 'primary')
    ->Column('AuthenticationSchemeAlias', 'varchar(32)', FALSE)
@@ -208,7 +208,7 @@ $Construct->Table('UserAuthenticationToken')
    ->Column('Timestamp', 'timestamp', FALSE)
    ->Column('Lifetime', 'int', FALSE)
    ->Set($Explicit, $Drop);
-   
+
 $Construct->Table('Session')
 	->Column('SessionID', 'char(32)', FALSE, 'primary')
 	->Column('UserID', 'int', 0)
@@ -237,7 +237,7 @@ if($PermissionModel instanceof PermissionModel) {
 	$Construct->Table('Permission')
 		->PrimaryKey('PermissionID')
 		->Column('RoleID', 'int', 0, 'key')
-		->Column('JunctionTable', 'varchar(100)', TRUE) 
+		->Column('JunctionTable', 'varchar(100)', TRUE)
 		->Column('JunctionColumn', 'varchar(100)', TRUE)
 		->Column('JunctionID', 'int', TRUE)
 		// The actual permissions will be added by PermissionModel::Define()
@@ -363,12 +363,22 @@ $PermissionModel->ClearPermissions();
 // Invitation Table
 $Construct->Table('Invitation')
 	->PrimaryKey('InvitationID')
-   ->Column('Email', 'varchar(200)')
-   ->Column('Code', 'varchar(50)')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('DateInserted', 'datetime')
+   ->Column('Email', 'varchar(200)', FALSE, 'index')
+   ->Column('Name', 'varchar(50)', TRUE)
+   ->Column('RoleIDs', 'text', TRUE)
+   ->Column('Code', 'varchar(50)', FALSE, 'unique.code')
+   ->Column('InsertUserID', 'int', TRUE, 'index.userdate')
+   ->Column('DateInserted', 'datetime', FALSE, 'index.userdate')
    ->Column('AcceptedUserID', 'int', TRUE)
+   ->Column('DateExpires', 'datetime', TRUE)
    ->Set($Explicit, $Drop);
+
+// Fix negative invitation expiry dates..
+$InviteExpiry = C('Garden.Registration.InviteExpiration');
+if ($InviteExpiry && substr($InviteExpiry, 0, 1) === '-') {
+   $InviteExpiry = substr($InviteExpiry, 1);
+   SaveToConfig('Garden.Registration.InviteExpiration', $InviteExpiry);
+}
 
 // ActivityType Table
 $Construct->Table('ActivityType')
@@ -382,7 +392,7 @@ $Construct->Table('ActivityType')
    ->Column('Notify', 'tinyint(1)', '0') // Add to RegardingUserID's notification list?
    ->Column('Public', 'tinyint(1)', '1') // Should everyone be able to see this, or just the RegardingUserID?
    ->Set($Explicit, $Drop);
-   
+
 // Activity Table
 // Column($Name, $Type, $Length = '', $Null = FALSE, $Default = NULL, $KeyType = FALSE, $AutoIncrement = FALSE)
 
@@ -454,7 +464,7 @@ if (!$NotifyUserIDExists && $ActivityExists) {
       ->Set('a.NotifyUserID', 'a.RegardingUserID', FALSE)
       ->Where('at.Notify', 1)
       ->Put();
-   
+
    // Update all public activities.
    $SQL->Update('Activity a')
       ->Join('ActivityType at', 'a.ActivityTypeID = at.ActivityTypeID')
@@ -462,7 +472,7 @@ if (!$NotifyUserIDExists && $ActivityExists) {
       ->Where('at.Public', 1)
       ->Where('a.NotifyUserID', 0)
       ->Put();
-   
+
    $SQL->Delete('Activity', array('NotifyUserID' => 0));
 }
 
@@ -511,7 +521,7 @@ $SQL->Replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%
 if ($SQL->GetWhere('ActivityType', array('Name' => 'AboutUpdate'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'AboutUpdate', 'FullHeadline' => '%1$s updated %6$s profile.', 'ProfileHeadline' => '%1$s updated %6$s profile.'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'WallComment'))->NumRows() == 0)
-   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:')); 
+   $SQL->Insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:'));
 if ($SQL->GetWhere('ActivityType', array('Name' => 'PictureChange'))->NumRows() == 0)
    $SQL->Insert('ActivityType', array('AllowComments' => '1', 'Name' => 'PictureChange', 'FullHeadline' => '%1$s changed %6$s profile picture.', 'ProfileHeadline' => '%1$s changed %6$s profile picture.'));
 //if ($SQL->GetWhere('ActivityType', array('Name' => 'RoleChange'))->NumRows() == 0)
@@ -584,47 +594,64 @@ if ($PhotoIDExists) {
 if ($Construct->TableExists('Tag')) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
-   
+
    $DupTags = Gdn::SQL()
-      ->Select('Name')
+      ->Select('Name, CategoryID')
       ->Select('TagID', 'min', 'TagID')
       ->Select('TagID', 'count', 'CountTags')
       ->From('Tag')
       ->GroupBy('Name')
+      ->GroupBy('CategoryID')
       ->Having('CountTags >', 1)
       ->Get()->ResultArray();
-   
+
    foreach ($DupTags as $Row) {
       $Name = $Row['Name'];
+      $CategoryID = $Row['CategoryID'];
       $TagID = $Row['TagID'];
       // Get the tags that need to be deleted.
-      $DeleteTags = Gdn::SQL()->GetWhere('Tag', array('Name' => $Name, 'TagID <> ' => $TagID))->ResultArray();
+      $DeleteTags = Gdn::SQL()->GetWhere('Tag', array('Name' => $Name, 'CategoryID' => $CategoryID, 'TagID <> ' => $TagID))->ResultArray();
       foreach ($DeleteTags as $DRow) {
          // Update all of the discussions to the new tag.
          Gdn::SQL()->Options('Ignore', TRUE)->Put(
-            'TagDiscussion', 
-            array('TagID' => $TagID), 
+            'TagDiscussion',
+            array('TagID' => $TagID),
             array('TagID' => $DRow['TagID']));
-         
+
          // Delete the tag.
          Gdn::SQL()->Delete('Tag', array('TagID' => $DRow['TagID']));
       }
    }
 }
 
+$Construct->Table('Tag');
+$FullNameColumnExists = $Construct->ColumnExists('FullName');
+
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
    ->Column('Name', 'varchar(255)', FALSE, 'unique')
-   ->Column('Type', 'varchar(10)', TRUE, 'index')
+   ->Column('FullName', 'varchar(255)', !$FullNameColumnExists, 'index')
+   ->Column('Type', 'varchar(20)', '', 'index')
+   ->Column('ParentTagID', 'int', TRUE, 'key')
    ->Column('InsertUserID', 'int', TRUE, 'key')
    ->Column('DateInserted', 'datetime')
    ->Column('CategoryID', 'int', -1, 'unique')
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
+if (!$FullNameColumnExists) {
+   Gdn::SQL()->Update('Tag')
+      ->Set('FullName', 'Name', FALSE, FALSE)
+      ->Put();
+
+   $Construct->Table('Tag')
+      ->Column('FullName', 'varchar(255)', FALSE, 'index')
+      ->Set();
+}
+
 $Construct->Table('Log')
    ->PrimaryKey('LogID')
-   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'))
+   ->Column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'), FALSE, 'index')
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group'), FALSE, 'index')
    ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')
@@ -684,11 +711,11 @@ $Construct
    ->Column('Path', 'varchar(255)')
    ->Column('Type', 'varchar(128)')
    ->Column('Size', 'int(11)')
-   
+
    ->Column('InsertUserID', 'int(11)')
    ->Column('DateInserted', 'datetime')
-   ->Column('ForeignID', 'int(11)', TRUE)
-   ->Column('ForeignTable', 'varchar(24)', TRUE)
+   ->Column('ForeignID', 'int(11)', TRUE, 'index.Foreign')
+   ->Column('ForeignTable', 'varchar(24)', TRUE, 'index.Foreign')
 
    ->Column('ImageWidth', 'usmallint', NULL)
    ->Column('ImageHeight', 'usmallint', NULL)
@@ -696,7 +723,7 @@ $Construct
    ->Column('ThumbWidth', 'usmallint', NULL)
    ->Column('ThumbHeight', 'usmallint', NULL)
    ->Column('ThumbPath', 'varchar(255)', NULL)
-   
+
    ->Set(FALSE, FALSE);
 
 // Merge backup.

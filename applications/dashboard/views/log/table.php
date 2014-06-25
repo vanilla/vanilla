@@ -23,7 +23,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
       ?>
       <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
          <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>" /></td>
-         <td class="UsernameCell"><?php 
+         <td class="UsernameCell"><?php
             echo UserAnchor($Row, '', 'Insert');
 
             if (!empty($Row['OtherUserIDs'])) {
@@ -42,12 +42,17 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                      case 'comment':
                         $Url = "/discussion/comment/{$Row['RecordID']}#Comment_{$Row['RecordID']}";
                   }
+               } elseif ($Row['Operation'] === 'Delete') {
+                  switch (strtolower($Row['RecordType'])) {
+                     case 'comment':
+                        $Url = "/discussion/{$Row['ParentRecordID']}/x/p1";
+                  }
                }
 
                echo '<div"><span class="Expander">', $this->FormatContent($Row), '</span></div>';
-               
+
                // Write the other record counts.
-               
+
                echo OtherRecordsMeta($Row['Data']);
 
                echo '<div class="Meta-Container">';
@@ -55,7 +60,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
                echo '<span class="Tags">';
                echo '<span class="Tag Tag-'.$Row['Operation'].'">'.T($Row['Operation']).'</span> ';
                echo '<span class="Tag Tag-'.$RecordLabel.'">'.Anchor(T($RecordLabel), $Url).'</span> ';
-               
+
                echo '</span>';
 
                if ($Row['RecordIPAddress']) {
@@ -73,21 +78,21 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 
 //                  echo ' ', sprintf(T('%s times'), $Row['CountGroup']);
                }
-               
+
                $RecordUser = Gdn::UserModel()->GetID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
 
                if ($Row['RecordName']) {
                   echo ' <span class="Meta">',
                      '<span class="Meta-Label">'.sprintf(T('%s by'), T($RecordLabel)).'</span> ',
                      UserAnchor($Row, 'Meta-Value', 'Record');
-                  
+
                   if ($RecordUser['Banned']) {
                      echo ' <span class="Tag Tag-Ban">'.T('Banned').'</span>';
                   }
-                  
+
                   echo ' <span class="Count">'.Plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
-                  
-                  
+
+
                   echo '</span> ';
                }
 
@@ -102,10 +107,10 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 
                   }
                }
-              
+
                echo '</div>';
             ?>
-            
+
          </td>
          <td class="DateCell"><?php
             echo Gdn_Format::Date($Row['DateInserted'], 'html');

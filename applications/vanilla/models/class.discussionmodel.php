@@ -1341,6 +1341,21 @@ class DiscussionModel extends VanillaModel {
    }
    
    /**
+    * Evented wrapper for Gdn_Model::SetField
+    *
+    * @param integer $RowID
+    * @param string $Property
+    * @param mixed $Value
+    */
+   public function SetField($RowID, $Property, $Value = FALSE) {
+       $this->EventArguments['DiscussionID'] = $RowID;
+       $this->EventArguments['SetField'] = array($Property => $Value);
+
+       parent::SetField($RowID, $Property, $Value);
+       $this->fireEvent('AfterSetField');
+   }
+
+   /**
     * Inserts or updates the discussion via form values.
     * 
     * Events: BeforeSaveDiscussion, AfterSaveDiscussion.

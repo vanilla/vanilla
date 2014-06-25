@@ -145,9 +145,15 @@ class Gdn_Session {
       if ($Authenticator == NULL)
          $Authenticator = Gdn::Authenticator();
 
+      if ($this->UserID) {
+         Logger::event('session_end', Logger::INFO, 'Session ended for {username}.');
+      }
+
       $Authenticator->AuthenticateWith()->DeAuthenticate();
       $this->SetCookie('-Vv', NULL, -3600);
       $this->SetCookie('-sid', NULL, -3600);
+
+      Gdn::PluginManager()->CallEventHandlers($this, 'Gdn_Session', 'End');
 
       $this->UserID = 0;
       $this->User = FALSE;
@@ -342,7 +348,9 @@ class Gdn_Session {
     * @param bool $Persist If setting an identity, should we persist it beyond browser restart?
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
-      if (!C('Garden.Installed', FALSE)) return;
+      if (!C('Garden.Installed', FALSE)) {
+         return;
+      }
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $this->UserID = $UserID !== FALSE ? $UserID : Gdn::Authenticator()->GetIdentity();
@@ -354,8 +362,10 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($SetIdentity)
+            if ($SetIdentity) {
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
+               Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
+            }
 
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');
@@ -471,10 +481,28 @@ class Gdn_Session {
          $ForceValid = TRUE;
 
       if (!$ForceValid && $ValidateUser && $this->UserID <= 0)
-         return FALSE;
+         $Return = FALSE;
 
-      // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
-      return ($ForceValid && Gdn::Request()->IsPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE);
+      if (!isset($Return)) {
+         // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
+         $Return = ($ForceValid && Gdn::Request()->IsPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE);
+      }
+      if (!$Return) {
+         if (Gdn::Session()->User) {
+            Logger::event(
+               'csrf_failure',
+               Logger::ERROR,
+               'Invalid transient key for {username}.'
+            );
+         } else {
+            Logger::event(
+               'csrf_failure',
+               Logger::ERROR,
+               'Invalid transient key.'
+            );
+         }
+      }
+      return $Return;
    }
 
 	/**

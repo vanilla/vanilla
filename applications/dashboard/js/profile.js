@@ -76,9 +76,9 @@ jQuery(document).ready(function($) {
                state = $(checkbox).prop('checked');
 
             if (state) {
-              checkbox.prop('checked', false);
+              checkbox.prop('checked', false).trigger('change');
             } else {
-              checkbox.prop('checked', true);
+              checkbox.prop('checked', true).trigger('change');
             }
           }
         }
@@ -99,9 +99,9 @@ jQuery(document).ready(function($) {
                state = $(checkboxes[0]).prop('checked');
 
             if (state)
-               $(checkboxes[i]).prop('checked', false);
+               $(checkboxes[i]).prop('checked', false).trigger('change');
             else
-               $(checkboxes[i]).prop('checked', true);
+               $(checkboxes[i]).prop('checked', true).trigger('change');
          }
          return false;
       }

@@ -25,6 +25,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
    public $Data = array();
 
    /**
+    * @var string The path to the default configuration file.
+    * @since 2.3
+    */
+   protected $DefaultPath;
+
+   /**
     * Configuration Source List
     *
     * This is an associative array of Gdn_ConfigurationSource objects indexed
@@ -82,6 +88,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
       parent::__construct();
       if (!is_null($DefaultGroup))
          $this->DefaultGroup = $DefaultGroup;
+
+      if (defined('PATH_CONF_DEFAULT')) {
+         $this->DefaultPath = PATH_CONF_DEFAULT;
+      } else {
+         $this->DefaultPath = PATH_CONF.'/config.php';
+      }
    }
 
    public function AutoSave($AutoSave = TRUE) {
@@ -126,6 +138,19 @@ class Gdn_Configuration extends Gdn_Pluggable {
              Gdn_Cache::FEATURE_NOPREFIX => TRUE
          ));
       }
+   }
+
+   /**
+    * Gets or sets the path of the default configuration file.
+    * @param string $Value Pass a value to set a new default config path.
+    * @return string Returns the current default config path.
+    * @since 2.3
+    */
+   public function DefaultPath($Value = null) {
+      if ($Value !== null) {
+         $this->DefaultPath = $Value;
+      }
+      return $this->DefaultPath;
    }
 
    /**
@@ -632,7 +657,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
          $Data = $Data[$Group];
 
       // Do a sanity check on the config save.
-      if ($File == PATH_CONF.'/config.php') {
+      if ($File == $this->DefaultPath()) {
          if (!isset($Data['Database'])) {
             if ($Pm = Gdn::PluginManager()) {
                $Pm->EventArguments['Data'] = $Data;
@@ -1206,7 +1231,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                $Data = $Data[$Group];
 
             // Do a sanity check on the config save.
-            if ($this->Source == PATH_CONF.'/config.php') {
+            if ($this->Source == Gdn::Config()->DefaultPath()) {
 
                // Log root config changes
                try {

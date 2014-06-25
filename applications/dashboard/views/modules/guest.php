@@ -5,7 +5,9 @@
    <p><?php $this->FireEvent('BeforeSignInButton'); ?></p>
 
    <?php
-   if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0) {
+   $signInUrl = SignInUrl($this->_Sender->SelfUrl);
+
+   if ($signInUrl) {
       echo '<div class="P">';
 
       echo Anchor(T('Sign In'), SignInUrl($this->_Sender->SelfUrl), 'Button Primary'.(SignInPopup() ? ' SignInPopup' : ''), array('rel' => 'nofollow'));

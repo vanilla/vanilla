@@ -1144,7 +1144,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
          Logger::event(
-            'permission_denied',
+           'permission_denied',
             Logger::INFO,
             '{username} was denied permission {permission}.',
             array(
@@ -1153,10 +1153,15 @@ class Gdn_Controller extends Gdn_Pluggable {
          );
 
          if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
-            Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
+           Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
          } else {
             Gdn::Dispatcher()->Dispatch('DefaultPermission');
             exit();
+         }
+      } else {
+         $Required = array_intersect((array)$Permission, array('Garden.Settings.Manage', 'Garden.Moderation.Manage'));
+         if (!empty($Required)) {
+            Logger::logAccess('security_access', Logger::INFO, "{username} accessed {path}.");
          }
       }
    }

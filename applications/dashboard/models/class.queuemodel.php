@@ -377,6 +377,7 @@ class QueueModel extends Gdn_Model {
     * Approve an item in the queue.
     *
     * @param array|string $queueItem QueueID or array containing queue row.
+    * @param bool $doSave Call model save after approve
     * @return bool Item saved.
     * @throws Gdn_UserException Unknown type.
     */
@@ -399,8 +400,48 @@ class QueueModel extends Gdn_Model {
          $doSave = false;
       }
 
+      // Content Restore.
+      if ($queueItem['Queue'] == 'reported' || $queueItem['Queue'] == 'spam') {
+
+         $logModel = new LogModel();
+
+         switch (strtolower($queueItem['ForeignType'])) {
+            case 'discussion':
+               $ID = $queueItem['DiscussionID'];
+               $logs = $logModel->GetWhere(array(
+                     'RecordType' => 'Discussion',
+                     'Operation' => 'Delete',
+                     'RecordID' => $queueItem['DiscussionID']
+                  ));
+               break;
+            case 'comment':
+               $ID = $queueItem['CommentID'];
+               $logs = $logModel->GetWhere(array(
+                     'RecordType' => 'Comment',
+                     'Operation' => 'Delete',
+                     'RecordID' => $queueItem['CommentID']
+                  ));
+               break;
+
+            default:
+               Trace('Content not restored.');
+
+         }
+         $doSave = false;
+
+         if (count($logs) == 1) {
+            $log = reset($logs);
+            if (GetValue('LogID', $log)) {
+               $logModel->Restore($log);
+            }
+         } else {
+            Trace('Item not found in logs.');
+         }
+
+      }
+      $ContentType = $queueItem['ForeignType'];
+
       if ($doSave) {
-         $ContentType = $queueItem['ForeignType'];
          $Attributes = false;
          switch(strtolower($ContentType)) {
             case 'comment':
@@ -467,6 +508,9 @@ class QueueModel extends Gdn_Model {
          }
       }
       // Update Queue
+      if (empty($foreignID)) {
+         $foreignID = $this->generateForeignID(null, $ID, $ContentType);
+      }
       $saved = $this->Save(
          array(
             'QueueID' => $queueItem['QueueID'],
@@ -474,7 +518,7 @@ class QueueModel extends Gdn_Model {
             'StatusUserID' => $this->getModeratorUserID(),
             'DateUpdated' => Gdn_Format::ToDateTime(),
             'UpdateUserID' => Gdn::Session()->UserID,
-            'ForeignID' => $this->generateForeignID(null, $ID, $ContentType),
+            'ForeignID' => $foreignID,
             'PreviousForeignID' => $queueItem['ForeignID']
          )
       );
@@ -523,8 +567,9 @@ class QueueModel extends Gdn_Model {
    /**
     * Deny an item from the queue.
     *
-    * @param array|string $item QueueID or queue row
+    * @param array|string $queueItem QueueID or queue row
     * @return bool true if item was updated
+    * @throws Gdn_UserException Item not found
     */
    public function deny($queueItem) {
 
@@ -564,7 +609,7 @@ class QueueModel extends Gdn_Model {
     * @return array Row to be saved to the Model.
     * @throws Gdn_UserException On unknown record type.
     */
-   protected function convertToQueueRow($recordType, $data) {
+   public function convertToQueueRow($recordType, $data) {
 
       $queueRow = array(
          'Queue' => val('Queue', $data, 'premoderation'),
@@ -591,7 +636,7 @@ class QueueModel extends Gdn_Model {
                $queueRow['Announce'] = $data['Announce'];
             }
             if (!GetValue('CategoryID', $data)) {
-               throw new Gdn_UserException('CateogryID is a required field for discussions.');
+               throw new Gdn_UserException('CategoryID is a required field for discussions.');
             }
             $queueRow['CategoryID'] = $data['CategoryID'];
             break;
@@ -623,7 +668,7 @@ class QueueModel extends Gdn_Model {
     * @return array Of data to be saved.
     * @throws Gdn_UserException on unknown ForeignType.
     */
-   protected function convertToSaveData($queueRow) {
+   public function convertToSaveData($queueRow) {
       $data = array(
          'Body' => $queueRow['Body'],
          'Format' => $queueRow['Format'],
@@ -674,7 +719,8 @@ class QueueModel extends Gdn_Model {
    }
 
    /**
-    * Get moderator userID
+    * Get moderator userID.
+    *
     * @return int Moderator user ID.
     * @throws Gdn_UserException if cant determine moderator id
     */
@@ -742,25 +788,23 @@ class QueueModel extends Gdn_Model {
       }
       if (GetValue('CommentID', $data)) {
          //comment
-         return 'c-' . substr($data['CommentID'], 0, 1);
+         return 'C-' . $data['CommentID'];
       }
       if (GetValue('DiscussionID', $data)) {
          //discussion
-         return 'd-' . substr($data['DiscussionID'], 0, 1);
+         return 'D-' . $data['DiscussionID'];
       }
       if (GetValue('ActivityID', $data)) {
          //activity comment
-         return 'ac-' . substr($data['DiscussionID'], 0, 1);
+         return 'AC-' . $data['ActivityID'];
       }
 
       return self::generateUUIDFromInts(
          array(self::get32BitRand(), self::get32BitRand(), self::get32BitRand(), self::get32BitRand())
       );
 
-      return 'rand-' . mt_rand(1,500000) . '-' . mt_rand(mt_rand(100,999), 999999);
 
    }
-
 
    /**
     * Given an array of 4 numbers create a UUID
@@ -824,19 +868,187 @@ class QueueModel extends Gdn_Model {
    }
 
 
-//   public function validate($FormPostValues, $Insert = FALSE) {
-//
-//      if (!$Insert) {
-//         if (GetValue('Status', $FormPostValues)) {
-//            //status update.  Check DateStatus + StatusUserID
-//            if (!GetValue('DateStatus', $FormPostValues) && !GetValue('StatusUserID', $FormPostValues)) {
-//               $this->Validation->AddValidationResult('Status', 'You must update required fields.' .
-//                  ' StatusUserID and DateStatus must be updated with status.');
-//            }
-//         }
-//      }
-//      return parent::Validate($FormPostValues, $Insert);
-//
-//   }
+   public function validate($FormPostValues, $Insert = FALSE) {
+
+      if (!$Insert) {
+         if (GetValue('Status', $FormPostValues)) {
+            //status update.  Check DateStatus + StatusUserID
+            if (!GetValue('DateStatus', $FormPostValues) && !GetValue('StatusUserID', $FormPostValues)) {
+               $this->Validation->AddValidationResult('Status', 'You must update required fields.' .
+                  ' StatusUserID and DateStatus must be updated with status.');
+            }
+         }
+      }
+      return parent::Validate($FormPostValues, $Insert);
+
+   }
+
+   /**
+    * Content Reporting.
+    *
+    * @param string $contentType
+    * @param int $contentID
+    * @param array $report
+    *    [ReportUserID]
+    *    [Reason]
+    * @param string $queue
+    * @throws Gdn_UserException
+    * @return bool
+    */
+   public function report($contentType, $contentID, $report, $queue = 'reported') {
+
+      $numberOfReportsToRemove = 2;
+      $removeContent = false;
+
+      switch (strtolower($contentType)) {
+
+         case 'discussion':
+            $model = new DiscussionModel();
+            break;
+         case 'comment':
+            $model = new CommentModel();
+            break;
+         default:
+            throw new Gdn_UserException('Unknown type');
+
+      }
+
+      $data = $model->GetID($contentID);
+      if (!$data) {
+         throw new Gdn_UserException($contentType . ' not found.', 404);
+      }
+      $data = (array)$data;
+
+      $moderation = GetValueR('Attributes.Moderation', $data);
+      if ($moderation) {
+         Trace('Item has already been moderated.');
+         return false;
+      }
+
+      $existingQueueRow = $this->GetWhere(
+         array(
+            'ForeignID' => $this->generateForeignID(null, $contentID, $contentType),
+            'ForeignType' => $contentType
+         ))
+         ->FirstRow(DATASET_TYPE_ARRAY);
+
+
+      if ($existingQueueRow) {
+         // Check if content should be removed
+         if (GetValue('Reports', $existingQueueRow)) {
+
+
+            if (count($existingQueueRow['Reports']) >= $numberOfReportsToRemove) {
+               $removeContent = true;
+            }
+         }
+         // Save report to queue
+         $newQueueRow = $existingQueueRow;
+         if (GetValue('Reports', $existingQueueRow)) {
+            $newReports[] = $existingQueueRow['Reports'];
+         }
+         $newReports[] = array(
+            'ReportUserID' => $report['ReportUserID'],
+            'DateReport' => Gdn_Format::ToDateTime(),
+            'Reason' => GetValue('Reason', $report, NULL)
+         );
+
+         $newQueueRow['Reports'] = $newReports;
+         $queueID = $this->Save($newQueueRow);
+
+      } else {
+
+         // Save to queue
+
+         $data['Queue'] = $queue;
+         $data['ForeignID'] = $contentID;
+         $data['ForeignID'] = $this->generateForeignID(null, $contentID, $contentType);
+
+         $queueRow = $this->convertToQueueRow($contentType, $data);
+
+         switch (strtolower($contentType)) {
+            case 'discussion':
+               // Save ID so we can restore it to the same if approved
+               $queueRow['DiscussionID'] = $data['DiscussionID'];
+               break;
+            case 'comment':
+               // Save ID so we can restore it to the same if approved
+               $queueRow['CommentID'] = $data['CommentID'];
+               break;
+            default:
+               throw new Gdn_UserException('Unknown type');
+
+         }
+
+         $queueRow['InsertUserID'] = GetValue('ReportUserID', $report, Gdn::Session()->UserID);
+         $queueRow['Reports'] = array(
+            'ReportUserID' => $report['ReportUserID'],
+            'DateReport' => Gdn_Format::ToDateTime(),
+            'Reason' => GetValue('Reason', $report, NULL)
+         );
+
+         $queueID = $this->Save($queueRow);
+         if ($numberOfReportsToRemove <= 1) {
+            $removeContent = true;
+         }
+
+      }
+
+
+      if ($removeContent) {
+
+         $existingQueueRow = $this->GetID($queueID);
+
+         $this->EventArguments['ReportHandled'] = false;
+         $this->EventArguments['ForeignID'] = false;
+         $this->EventArguments['QueueRow'] = $existingQueueRow;
+
+         $this->FireEvent('ReportRemoval');
+         Trace($this->EventArguments);
+
+         // Update ForeignID in queue.
+         if (!$this->EventArguments['ReportHandled']) {
+            Trace('Failed getting ForeignID from plugins.');
+            return;
+         }
+         // Update ForeignID in queue.
+         if ($this->EventArguments['ForeignID']) {
+            $existingQueueRow['ForeignID'] = $this->EventArguments['ForeignID'];
+            $this->Save($existingQueueRow);
+         }
+
+         $this->removeContentIfRequired($existingQueueRow);
+      }
+
+      return $queueID;
+   }
+
+
+   /**
+    * Handle content removal.
+    *
+    * @param $existingQueueRow
+    * @throws Gdn_UserException
+    */
+   public function removeContentIfRequired($existingQueueRow) {
+
+      switch (strtolower($existingQueueRow['ForeignType'])) {
+
+         case 'discussion':
+            // Content Removal.
+            $model = new DiscussionModel();
+            $model->Delete($existingQueueRow['DiscussionID']);
+            break;
+         case 'comment':
+            // Content Removal.
+            $model = new CommentModel();
+            $model->Delete($existingQueueRow['CommentID']);
+            break;
+         default:
+            throw new Gdn_UserException('Unknown type');
+
+      }
+
+   }
 
 }

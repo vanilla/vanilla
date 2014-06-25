@@ -206,15 +206,16 @@ class ModController extends DashboardController {
       }
       //validate fields
       $requiredFields = array(
-         'name' => 'Name is a required field.',
          'body' => 'Body is a required field.',
          'format' => 'Format is a required field.',
          'foreigntype' => 'Foreign Type is a required field.',
          'foreignid' => 'Foreign ID is a required field.',
          'foreignuserid' => 'Foreign User ID is a required field.',
       );
-
       $post = array_change_key_case($this->Request->Post());
+      if ($post['foreigntype'] == 'discussion') {
+         $requiredFields['name'] = 'Name is a required field.';
+      }
       foreach ($requiredFields as $field => $errorMsg) {
          if (!$v = val($field, $post)) {
             throw new Gdn_UserException($errorMsg);
@@ -344,7 +345,6 @@ class ModController extends DashboardController {
       }
       //cast to int
       $queueID = (int)$queueID;
-      $queueModel = QueueModel::Instance();
       $data = $this->Request->Post();
       $data['QueueID'] = $queueID;
 
@@ -355,24 +355,7 @@ class ModController extends DashboardController {
       $this->Render();
    }
 
-   public function test() {
-      $qm = QueueModel::Instance();
-//      $return = $qm->approveWhere(array('ForeignID' => '00001b39-142d-086f-868a-27b0826c30bc'));
-      $return = $qm->approveWhere(array('ForeignID' => 'D-87'));
-      $this->SetData('return', $return);
-      $this->Render();
-   }
 
-   public function test2() {
-      $qm = QueueModel::Instance();
-      $qm->setModerator(array(
-            'moderatorId' => 'b00916ba-f647-4e9f-b2a6-537f69f89b87',
-            'moderatorEmail' => 'john+vanilla@vanillaforums.com',
-            'moderatorExternalId' => 4
-         ));
-      var_dump($qm->getModeratorUserID());
-
-   }
 
    /**
     * Approve an item in the queue.
@@ -406,6 +389,51 @@ class ModController extends DashboardController {
       $this->SetData('Denied', $denied);
       $this->Render('blank', 'utility', 'dashboard');
 
+   }
+
+   public function report() {
+
+      /*
+      POST http://localhost/api/v1/mod.json/report/?access_token=d7db8b7f0034c13228e4761bf1bfd434
+      {
+         "ForeignID" : "148",
+         "ForeignType" : "Discussion",
+         "Reason" : "Reason",
+         "ReportUserID" : 3
+      }
+      */
+
+      $queueModel = QueueModel::Instance();
+      // Validate request
+      $post = array_change_key_case($this->Request->Post());
+      $queue = 'reported';
+      if (GetValue('queue', $post)) {
+         $queue = $post['queue'];
+      }
+      if (!$this->isQueueValid($queue)) {
+         throw new Gdn_UserException('Invalid moderation queue: ' . $queue);
+      }
+      //validate fields
+      $requiredFields = array(
+         'foreigntype' => 'Foreign Type is a required field.',
+         'foreignid' => 'Foreign ID is a required field.',
+      );
+      foreach ($requiredFields as $field => $errorMsg) {
+         if (!$v = val($field, $post)) {
+            throw new Gdn_UserException($errorMsg);
+         }
+      }
+
+      $report['ReportUserID'] = GetValue('reportuserid', $post, Gdn::Session()->UserID);
+      $report['Reason'] = GetValue('reason', $post, null);
+
+      $queueID = $queueModel->report($post['foreigntype'], $post['foreignid'], $report);
+      $this->SetData('Reported', false);
+      if ($queueID !=0 && is_numeric($queueID)) {
+         $this->SetData('Reported', true);
+         $this->SetData('QueueID', $queueID);
+      }
+      $this->Render();
    }
 
 }

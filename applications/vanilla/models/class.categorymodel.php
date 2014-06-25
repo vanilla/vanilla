@@ -642,6 +642,10 @@ class CategoryModel extends Gdn_Model {
       foreach ($IDs as $CID) {
          $Category = $Categories[$CID];
          $Categories[$CID]['Url'] = Url($Category['Url'], '//');
+         if ($Photo = val('Photo', $Category)) {
+            $Categories[$CID]['PhotoUrl'] = Gdn_Upload::Url($Photo);
+         }
+
          if ($Category['LastUrl'])
             $Categories[$CID]['LastUrl'] = Url($Category['LastUrl'], '//');
          $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);

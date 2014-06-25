@@ -651,7 +651,9 @@ jQuery(document).ready(function($) {
       var href = $elem.attr('href');
       var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
 
-      if (!href)
+      // If empty, or starts with a fragment identifier, do not send
+      // an async request.
+      if (!href || href.trim().indexOf('#') === 0)
          return;
       gdn.disable(this, progressClass);
       e.stopPropagation();

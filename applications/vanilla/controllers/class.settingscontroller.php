@@ -135,6 +135,7 @@ class SettingsController extends Gdn_Controller {
 
       if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
          $this->AddCssFile('style.css');
+         $this->AddCssFile('vanillicon.css', 'static');
       } else {
          $this->AddCssFile('admin.css');
       }

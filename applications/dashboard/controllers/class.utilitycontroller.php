@@ -31,6 +31,26 @@ class UtilityController extends DashboardController {
       Gdn_Theme::Section('Dashboard');
    }
 
+   public function Rack() {
+      header('Content-Type: application/json; charset=UTF-8');
+      date_default_timezone_set('America/Montreal');
+
+      $keys = array('REQUEST_METHOD', 'SCRIPT_NAME', 'PATH_INFO', 'SERVER_NAME', 'SERVER_PORT', 'HTTP_ACCEPT', 'HTTP_ACCEPT_LANGUAGE', 'HTTP_ACCEPT_CHARSET', 'HTTP_USER_AGENT', 'HTTP_REMOTE_ADDR');
+      $rack = array_intersect_key($_SERVER, array_fill_keys($keys, true));
+
+      ksort($rack);
+      ksort($_SERVER);
+
+      $result = array(
+         'rack' => $rack,
+         'server' => $_SERVER,
+         'get' => $_GET,
+         'cookie' => $_COOKIE
+      );
+
+      echo json_encode($result);
+   }
+
 //   /**
 //    * Call a method on the given model.
 //    */
@@ -245,6 +265,7 @@ class UtilityController extends DashboardController {
    public function Sprites() {
       $this->RemoveCssFile('admin.css');
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       $this->MasterView = 'default';
 
       $this->CssClass = 'SplashMessage NoPanel';
@@ -535,6 +556,8 @@ class UtilityController extends DashboardController {
       $this->MasterView = 'default';
       $this->RemoveCssFile('admin.css');
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
+
       $this->SetData('_NoPanel', TRUE);
       $this->Render();
    }

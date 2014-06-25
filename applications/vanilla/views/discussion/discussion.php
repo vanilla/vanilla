@@ -1,4 +1,12 @@
-<?php if (!defined('APPLICATION')) exit(); 
+<?php
+/**
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ */
+
+if (!defined('APPLICATION')) {
+   exit();
+}
 $UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
 
 $Discussion = $this->Data('Discussion');
@@ -78,6 +86,9 @@ $this->FireEvent('BeforeDiscussionDisplay');
             <?php 
             $this->FireEvent('AfterDiscussionBody');
             WriteReactions($Discussion);
+            if (GetValue('Attachments', $Discussion)) {
+               WriteAttachments($Discussion->Attachments);
+            }
             ?>
          </div>
       </div>

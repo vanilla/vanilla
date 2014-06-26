@@ -799,74 +799,10 @@ class QueueModel extends Gdn_Model {
          return 'AC-' . $data['ActivityID'];
       }
 
-      return self::generateUUIDFromInts(
-         array(self::get32BitRand(), self::get32BitRand(), self::get32BitRand(), self::get32BitRand())
-      );
+      return uniqid('', true);
 
 
    }
-
-   /**
-    * Given an array of 4 numbers create a UUID
-    *
-    * @param arrat ints Ints to be converted to UUID.  4 numbers; last 3 default to 0
-    * @return string UUID
-    *
-    * @throws Gdn_UserException
-    */
-   public static function generateUUIDFromInts($ints) {
-      if (sizeof($ints) != 4 && !isset($ints[0])) {
-         throw new Gdn_UserException('Invalid arguments passed to ' . __METHOD__);
-      }
-      if (!isset($ints[1])) {
-         $ints[1] = 0;
-      }
-      if (!isset($ints[2])) {
-         $ints[2] = 0;
-      }
-      if (!isset($ints[3])) {
-         $ints[3] = 0;
-      }
-      $result = static::hexInt($ints[0]) . static::hexInt($ints[1], true) . '-'
-         . static::hexInt($ints[2], true).static::hexInt($ints[3]);
-      return $result;
-   }
-
-   /**
-    * @param string $UUID Universal Unique Identifier.
-    * @return array Containing the 4 numbers used to generate generateUUIDFromInts
-    */
-   public static function getIntsFromUUID($UUID) {
-      $parts = str_split(str_replace('-', '', $UUID), 8);
-      $parts = array_map('hexdec', $parts);
-      return $parts;
-   }
-
-
-   /**
-    * Get a random 32bit integer.  0x80000000 to 0xFFFFFFFF were not being tested with rand().
-    *
-    * @return int randon 32bi integer.
-    */
-   public static function get32BitRand() {
-      return mt_rand(0, 0xFFFF) | (mt_rand(0, 0xFFFF) << 16);
-   }
-
-   /**
-    * Used to help generate UUIDs; pad and convert from decimal to hexadecimal; and split if neeeded
-    *
-    * @param $int Integer to be converted
-    * @param bool $split Split result into parts.
-    * @return string
-    */
-   public static function hexInt($int, $split = false) {
-      $result = substr(str_pad(dechex($int), 8, '0', STR_PAD_LEFT), 0, 8);
-      if ($split) {
-         $result = implode('-', str_split($result, 4));
-      }
-      return $result;
-   }
-
 
    public function validate($FormPostValues, $Insert = FALSE) {
 

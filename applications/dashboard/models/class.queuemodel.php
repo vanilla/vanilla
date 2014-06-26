@@ -367,7 +367,7 @@ class QueueModel extends Gdn_Model {
       }
 
       foreach ($errors as $id => $value) {
-         $this->Validation->AddValidationResult('QueueID', "{$id}: $value");
+         $this->Validation->AddValidationResult('Errors', "{$id}: $value");
       }
 
       return sizeof($errors) == 0;
@@ -580,7 +580,6 @@ class QueueModel extends Gdn_Model {
       if (!$queueItem) {
          throw new Gdn_UserException("Item not found in queue.", 404);
       }
-
 
       if ($queueItem['Status'] != 'unread') {
          Trace('QueueID: ' . $queueItem['QueueID'] . ' already processed.  Skipping.');

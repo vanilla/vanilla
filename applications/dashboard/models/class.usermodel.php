@@ -557,7 +557,7 @@ class UserModel extends Gdn_Model {
          $RoleIDs = array();
          foreach ($AllRoles as $RoleID => $Role) {
             $Name = strtolower($Role['Name']);
-            if (in_array($Name, $Roles)) {
+            if (in_array($Name, $Roles) || in_array($RoleID, $Roles)) {
                $RoleIDs[] = $RoleID;
             }
          }

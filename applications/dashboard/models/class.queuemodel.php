@@ -340,40 +340,6 @@ class QueueModel extends Gdn_Model {
    }
 
    /**
-    * Approve content in the queue.
-    *
-    * @param array $where
-    * @return bool
-    */
-   public function approveWhere($where) {
-      $queueItems = $this->getQueueItems($where);
-
-      $errors = array();
-
-      if (sizeof($queueItems) == 0) {
-         $error = 'Not found';
-         if (GetValue('ForeignID', $where)) {
-            $error = 'Foreign ID: ' . $where['ForeignID'];
-         }
-         $errors['Not Found'] = $error;
-         Trace('No item(s) found');
-      }
-      foreach($queueItems as $item) {
-         $valid = $this->approve($item);
-         if (!$valid) {
-            $errors[$item['QueueID']] = $this->Validation->ResultsText();
-         }
-         $this->Validation->Results(TRUE);
-      }
-
-      foreach ($errors as $id => $value) {
-         $this->Validation->AddValidationResult('Errors', "{$id}: $value");
-      }
-
-      return sizeof($errors) == 0;
-   }
-
-   /**
     * Approve an item in the queue.
     *
     * @param array|string $queueItem QueueID or array containing queue row.
@@ -531,37 +497,57 @@ class QueueModel extends Gdn_Model {
 
    }
 
+
    /**
-    * Deny items from the queue.
-    *
-    * @param array $where Key value pair to be removed.
+    * @param array $where
+    * @param string $action
+    * @param VanillaController $sender
     * @return bool
     */
-   public function denyWhere($where) {
+   public function approveOrDenyWhere($where, $action = 'approve', $sender = null) {
+
+      if (!is_string($action) || !method_exists($this, $action)) {
+         throw new Gdn_UserException('Unknown Method.');
+      }
 
       $queueItems = $this->getQueueItems($where);
+
+      $whereMsg = '';
+      foreach ($where as $k => $v) {
+         $whereMsg .= "$k = $v and";
+      }
+      $whereMsg = substr($whereMsg, 0, -3);
 
       $errors = array();
 
       if (sizeof($queueItems) == 0) {
-
-         $errors[] = 'not found...';
-         Trace('No item(s) found');
+         $this->Validation->AddValidationResult('Not Found', $whereMsg);
+         return false;
       }
       foreach($queueItems as $item) {
-         $valid = $this->deny($item);
+         $valid = $this->{$action}($item);
          if (!$valid) {
-            $errors[$item['QueueID']] = $this->Validation->ResultsText();
+            $errors[$whereMsg] = $this->Validation->ResultsText();
+         } else {
+            switch ($action) {
+               case 'approve':
+                  $sender->SetData('Approved', $whereMsg);
+                  break;
+               case 'deny':
+                  $sender->SetData('Denied', $whereMsg);
+                  break;
+               default:
+                  $sender->SetData($action, $whereMsg);
+            }
          }
          $this->Validation->Results(TRUE);
       }
 
       foreach ($errors as $id => $value) {
-         $this->Validation->AddValidationResult('QueueID', "Error in id {$id}: $value");
+         $this->Validation->AddValidationResult('FieldErrors', "{$id} - $value");
       }
 
       return sizeof($errors) == 0;
-
    }
 
    /**

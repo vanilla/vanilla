@@ -1526,7 +1526,16 @@ class CategoryModel extends Gdn_Model {
             // Check to see if this category uses custom permissions.
             if ($CustomPermissions) {
                $PermissionModel = Gdn::PermissionModel();
-               $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
+               if (GetValue('Permission', $FormPostValues, array())) {
+                  $Permissions = $PermissionModel->PivotPermissions(GetValue('Permission', $FormPostValues, array()), array('JunctionID' => $CategoryID));
+               } elseif (GetValue('Permissions', $FormPostValues, array())) {
+                  $Permissions = GetValue('Permissions', $FormPostValues, array());
+                  foreach ($Permissions as &$Permission) {
+                     TouchValue('JunctionTable', $Permission, 'Category');
+                     TouchValue('JunctionColumn', $Permission, 'PermissionCategoryID');
+                     TouchValue('JunctionID', $Permission, $CategoryID);
+                  }
+               }
                $PermissionModel->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
 
                if (!$Insert) {

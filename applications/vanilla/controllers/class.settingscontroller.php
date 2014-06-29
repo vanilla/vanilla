@@ -130,10 +130,12 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('jquery.atwho.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('global.js');
 
       if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
          $this->AddCssFile('style.css');
+         $this->AddCssFile('vanillicon.css', 'static');
       } else {
          $this->AddCssFile('admin.css');
       }

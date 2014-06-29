@@ -33,14 +33,14 @@ echo $this->Form->Errors();
 $this->FireEvent("BeforePreferencesRender");
 
 foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
-   echo Wrap(T($PreferenceGroup == 'Notifications' ? 'General' : $PreferenceGroup), 'h3');
+   echo Wrap(T($PreferenceGroup == 'Notifications' ? 'General' : $PreferenceGroup), 'h2');
    ?>
    <table class="PreferenceGroup">
       <thead>
          <tr>
          <?php
          echo Wrap(T('Notification'), 'td', array('style' => 'text-align: left'));
-         
+
          $CountTypes = 0;
          foreach ($this->Data("PreferenceTypes.{$PreferenceGroup}") as $PreferenceType) {
             echo Wrap(T($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
@@ -62,13 +62,13 @@ foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
                }
                if ($ConfigCount == 0)
                   continue;
-               
+
                echo '<tr>';
                $Desc = GetValue($Name, $this->Data("PreferenceList.{$PreferenceGroup}"));
                if (is_array($Desc))
                   list($Desc, $Location) = $Desc;
                echo Wrap($Desc, 'td', array('class' => 'Description'));
-               
+
                $LastName = '';
                $i = 0;
                foreach ($Names as $Name) {
@@ -91,7 +91,7 @@ foreach ($this->Data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
                   $LastName = $Name;
                   $i++;
                }
-               
+
                echo '</tr>';
             }
          ?>

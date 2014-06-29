@@ -86,6 +86,14 @@ class DiscussionsController extends VanillaController {
       // Determine offset from $Page
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $Page = PageNumber($Offset, $Limit);
+
+      // Allow page manipulation
+      $this->EventArguments['Page'] = &$Page;
+      $this->EventArguments['Offset'] = &$Offset;
+      $this->EventArguments['Limit'] = &$Limit;
+      $this->FireEvent('AfterPageCalculation');
+
+      // Set canonical URL
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
       
       // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.

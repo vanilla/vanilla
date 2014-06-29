@@ -155,7 +155,7 @@ if (!function_exists('ButtonGroup')):
                   echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
                }
             echo '</ul>';
-            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+            echo Anchor(Sprite('SpDropdownHandle', 'Sprite', T('Expand for more options.')), '#', $ButtonClass.' Handle');
 
          echo '</div>';
       }
@@ -294,6 +294,7 @@ function CssClass($Row, $InList = TRUE) {
 
       $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
       $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
+      $CssClass .= GetValue('Participated', $Row) == '1' ? ' Participated' : '';
       if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {
          $CountUnreadComments = $Row['CountUnreadComments'];
          if ($CountUnreadComments === TRUE) {
@@ -575,7 +576,7 @@ if (!function_exists('IPAnchor')) {
 }
 
 if (!function_exists('panelHeading')) {
-/**
+   /**
     * Define default head tag for the side panel.
     *
     * @param string $content The content of the tag.
@@ -1009,8 +1010,13 @@ if (!function_exists('SocialSignInButton')) {
 }
 
 if (!function_exists('Sprite')) {
-	function Sprite($Name, $Type = 'Sprite') {
-		return '<span class="'.$Type.' '.$Name.'"></span>';
+	function Sprite($Name, $Type = 'Sprite', $Text = FALSE) {
+      $Sprite = '<span class="'.$Type.' '.$Name.'"></span>';
+      if ($Text) {
+         $Sprite .= '<span class="sr-only">' . $Text . '</span>';
+      }
+
+		return $Sprite;
 	}
 }
 

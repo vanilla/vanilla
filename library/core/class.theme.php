@@ -317,14 +317,26 @@ class Gdn_Theme {
     */
    public static function Logo() {
       $Logo = C('Garden.Logo');
+      $Properties = array();
+
       if ($Logo) {
          $Logo = ltrim($Logo, '/');
+
          // Fix the logo path.
-         if (StringBeginsWith($Logo, 'uploads/'))
+         if (StringBeginsWith($Logo, 'uploads/')) {
             $Logo = substr($Logo, strlen('uploads/'));
+         }
+
+         // Set optional title text
+         $LogoTitle = C('Garden.LogoTitle');
+         if ($LogoTitle) {
+            $Properties['title'] = $LogoTitle;
+         }
       }
       $Title = C('Garden.Title', 'Title');
-      echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
+      $Properties['alt'] = $Title;
+
+      echo $Logo ? Img(Gdn_Upload::Url($Logo), $Properties) : $Title;
    }
 
    /**

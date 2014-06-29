@@ -8,7 +8,7 @@ if ($this->Data !== FALSE) {
    }
    ?>
 <div class="Box BoxCategories">
-   <h4><?php echo T('Categories'); ?></h4>
+   <?php echo panelHeading(T('Categories')); ?>
    <ul class="PanelInfo PanelCategories">
    <?php
    echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.

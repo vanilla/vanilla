@@ -1147,13 +1147,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Session = Gdn::Session();
 
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
-         if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
-           Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
-         } else {
-         Logger::event(
-            'permission_denied',
-            Logger::INFO,
-            '{username} was denied permission {permission}.',
+         Logger::logAccess(
+           'security_denied',
+            Logger::NOTICE,
+            '{username} was denied access to {path}.',
             array(
                'permission' => $Permission,
             )

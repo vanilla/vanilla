@@ -1143,10 +1143,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       $Session = Gdn::Session();
 
       if (!$Session->CheckPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
-         Logger::event(
-           'permission_denied',
-            Logger::INFO,
-            '{username} was denied permission {permission}.',
+         Logger::logAccess(
+           'security_denied',
+            Logger::NOTICE,
+            '{username} was denied access to {path}.',
             array(
                'permission' => $Permission,
             )

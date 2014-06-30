@@ -157,7 +157,7 @@ class Logger {
          'timestamp' => time(),
          'method' => Gdn::Request()->RequestMethod(),
          'domain' => rtrim(Url('/', true), '/'),
-         'path' => Url('', '/')
+         'path' => Gdn::Request()->Path()
       );
       $context = $context + $defaults;
       static::getLogger()->log($level, $message, $context);

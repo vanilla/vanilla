@@ -9,9 +9,15 @@
  */
 class ModController extends DashboardController {
 
-   protected $pageSize = 30;
+   /**
+    * @var int Default Number of results per page.
+    */
+   public $pageSize = 30;
 
-   protected $queues = array('premoderation', 'reported', 'spam');
+   /**
+    * @var array Valid queue names.  Any queue that starts with 'testing' will be allowed.
+    */
+   public $queues = array('premoderation', 'reported', 'spam');
 
    /**
     * @var Gdn_Form
@@ -79,6 +85,7 @@ class ModController extends DashboardController {
          }
       }
       //default page to display if no request arguments
+      $this->Render('blank','utility','dashboard');
 
    }
 
@@ -98,7 +105,7 @@ class ModController extends DashboardController {
       $this->setData(array(
             'Queues' => $queueTotals,
          ));
-      $this->Render();
+      $this->Render('blank','utility','dashboard');
    }
 
    /**
@@ -189,7 +196,7 @@ class ModController extends DashboardController {
             'Totals' => $totals,
          )
       );
-      $this->Render();
+      $this->Render('blank','utility','dashboard');
    }
 
    /**
@@ -237,7 +244,7 @@ class ModController extends DashboardController {
          throw new Gdn_UserException('Error saving record to queue.');
       }
       $this->SetData('QueueID', $queueID);
-      $this->Render();
+      $this->Render('blank','utility','dashboard');
 
    }
 
@@ -266,7 +273,7 @@ class ModController extends DashboardController {
       $queueModel->Delete($queueID);
 
       $this->SetData('QueueID', $queueID);
-      $this->Render();
+      $this->Render('blank','utility','dashboard');
 
    }
 
@@ -290,7 +297,7 @@ class ModController extends DashboardController {
       }
 
       $this->SetData('Item', $item);
-      $this->Render();
+      $this->Render('blank','utility','dashboard');
    }
 
 
@@ -301,9 +308,16 @@ class ModController extends DashboardController {
     *
     */
    public function relation() {
+
+      $this->Permission('Garden.Moderation.Manage');
+
       if ($this->RequestMethod != 'GET') {
          throw new Gdn_UserException('Invalid request method.  Only GET is accepted.');
       }
+
+      $this->Render('blank','utility','dashboard');
+
+
    }
 
    /**
@@ -326,10 +340,9 @@ class ModController extends DashboardController {
       $validationResults = $queueModel->ValidationResults();
       if (count($validationResults) > 0) {
          $this->form->SetValidationResults($validationResults);
-//         throw new Gdn_UserException('Invalid request, validation failed.');
       }
       $this->SetData('QueueID', $queueID);
-      $this->Render();
+      $this->Render('blank','utility','dashboard');
    }
 
    /**
@@ -352,7 +365,7 @@ class ModController extends DashboardController {
       $queueModel->Delete($queueID);
 
       $this->SetData('QueueID', $queueID);
-      $this->Render();
+      $this->Render('blank','utility','dashboard');
    }
 
 
@@ -370,7 +383,7 @@ class ModController extends DashboardController {
       $approved = $queueModel->approve($queueID);
 
       $this->SetData('Approved', $approved);
-      $this->Render('blank', 'utility', 'dashboard');
+      $this->Render('blank','utility','dashboard');
 
    }
 
@@ -383,28 +396,38 @@ class ModController extends DashboardController {
 
       $this->Permission('Garden.Moderation.Manage');
 
+
       $queueModel = QueueModel::Instance();
       $denied = $queueModel->deny($queueID);
 
       $this->SetData('Denied', $denied);
-      $this->Render('blank', 'utility', 'dashboard');
+      $this->Render('blank','utility','dashboard');
 
    }
 
+   /**
+    * Reporting endpoint.
+    *
+    * Example:
+    *    URL: POST http://localhost/api/v1/mod.json/report/?access_token=d7db8b7f0034c13228e4761bf1bfd434
+    *
+    * {
+    *    "ForeignID" : "148",
+    *    "ForeignType" : "Discussion",
+    *    "Reason" : "Reason",
+    *    "ReportUserID" : 3
+    * }
+    *
+    * @throws Gdn_UserException
+    */
    public function report() {
 
-      /*
-      POST http://localhost/api/v1/mod.json/report/?access_token=d7db8b7f0034c13228e4761bf1bfd434
-      {
-         "ForeignID" : "148",
-         "ForeignType" : "Discussion",
-         "Reason" : "Reason",
-         "ReportUserID" : 3
-      }
-      */
 
       $queueModel = QueueModel::Instance();
       // Validate request
+      if (Gdn::Request()->RequestMethod() != 'POST') {
+         throw new Gdn_UserException('Invalid Resuest Method: ' . Gdn::Request()->RequestMethod());
+      }
       $post = array_change_key_case($this->Request->Post());
       $queue = 'reported';
       if (GetValue('queue', $post)) {
@@ -433,7 +456,7 @@ class ModController extends DashboardController {
          $this->SetData('Reported', true);
          $this->SetData('QueueID', $queueID);
       }
-      $this->Render();
+      $this->Render('blank','utility','dashboard');
    }
 
 }

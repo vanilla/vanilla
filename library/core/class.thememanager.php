@@ -350,15 +350,18 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       $oldTheme = $this->EnabledTheme();
       RemoveFromConfig('Garden.Theme');
       $newTheme = $this->EnabledTheme();
-      Logger::event(
-         'theme_changed',
-         'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
-         array(
-            'themeType' => 'desktop',
-            'oldTheme' => $oldTheme,
-            'newTheme' => $newTheme
-         )
-      );
+
+      if ($oldTheme != $newTheme) {
+         Logger::event(
+            'theme_changed',
+            'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
+            array(
+               'themeType' => 'desktop',
+               'oldTheme' => $oldTheme,
+               'newTheme' => $newTheme
+            )
+         );
+      }
    }
 
    public function EnabledTheme() {

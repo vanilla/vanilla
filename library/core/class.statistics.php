@@ -63,7 +63,8 @@ class Gdn_Statistics extends Gdn_Plugin {
             'Cookies'   => FALSE
          ));
          $Response = $ProxyRequest->Request(array(
-            'Url'       => $FinalURL
+            'Url'       => $FinalURL,
+            'Log'       => FALSE
          ), $RequestParameters);
       } catch (Exception $e) {
          $Response = FALSE;

@@ -1806,7 +1806,7 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
 
-   public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
+   public function SaveRoles($UserID, $RoleIDs, $RecordEvent) {
       if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
          $RoleNames = array_map('trim', explode(',', $RoleIDs));
@@ -1851,7 +1851,7 @@ class UserModel extends Gdn_Model {
 
       $this->ClearCache($UserID, array('roles', 'permissions'));
 
-      if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
+      if ($RecordEvent && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
          $User = $this->GetID($UserID);
          $Session = Gdn::Session();
 
@@ -1873,6 +1873,24 @@ class UserModel extends Gdn_Model {
 
          $RemovedRoles = array_diff($OldRoles, $NewRoles);
          $NewRoles = array_diff($NewRoles, $OldRoles);
+
+         foreach ($RemovedRoles as $RoleName) {
+            Logger::event(
+               'role_remove',
+               Logger::INFO,
+               "{username} removed {toUsername} from the {role} role.",
+               ['toUsername' => $User->Name, 'role' => $RoleName]
+            );
+         }
+
+         foreach ($NewRoles as $RoleName) {
+            Logger::event(
+               'role_add',
+               Logger::INFO,
+               "{username} added {toUsername} to the {role} role.",
+               ['toUsername' => $User->Name, 'role' => $RoleName]
+            );
+         }
 
          $RemovedCount = count($RemovedRoles);
          $NewCount = count($NewRoles);

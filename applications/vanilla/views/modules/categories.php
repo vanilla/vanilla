@@ -12,8 +12,7 @@ if ($this->Data !== FALSE) {
    <ul class="PanelInfo PanelCategories">
    <?php
    echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.
-      Anchor(T('All Categories')
-      .' <span class="Aside"><span class="Count">'.BigPlural($CountDiscussions, '%s discussion').'</span></span>', '/categories', 'ItemLink')
+      Anchor('<span class="Aside"><span class="Count">'.BigPlural($CountDiscussions, '%s discussion').'</span></span> '.T('All Categories'), '/categories', 'ItemLink')
       .'</li>';
 
    $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
@@ -30,13 +29,12 @@ if ($this->Data !== FALSE) {
 
       echo '<li class="ClearFix '.$CssClass.'">';
 
-      if ($DoHeadings && $Category->Depth == 1) {
-         echo htmlspecialchars($Category->Name)
-            .' <span class="Aside"><span class="Count Hidden">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
-      } else {
-         $CountText = ' <span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
+      $CountText = '<span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
 
-         echo Anchor(htmlspecialchars($Category->Name).$CountText, CategoryUrl($Category), 'ItemLink');
+      if ($DoHeadings && $Category->Depth == 1) {
+         echo $CountText.' '.htmlspecialchars($Category->Name);
+      } else {
+         echo Anchor($CountText.' '.htmlspecialchars($Category->Name), CategoryUrl($Category), 'ItemLink');
       }
       echo "</li>\n";
    }

@@ -31,6 +31,8 @@ class VanillaController extends Gdn_Controller {
       $this->AddJsFile('jquery.atwho.js');
       $this->AddJsFile('global.js');
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
+
 
       // Add modules
 //      $this->AddModule('MeModule');

@@ -670,6 +670,25 @@ $Construct->Table('Log')
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
+$Construct->Table('Queue')
+   ->PrimaryKey('QueueID', 'int')
+   ->Column('Queue', 'varchar(50)')
+   ->Column('DateInserted', 'datetime', true, 'index')
+   ->Column('InsertUserID', 'int')
+   ->Column('CategoryID', 'int', true)
+   ->Column('Name', 'varchar(255)', true)
+   ->Column('Body', 'text')
+   ->Column('Format', 'varchar(20)')
+   ->Column('ForeignType', 'varchar(50)')
+   ->Column('ForeignIPAddress', 'varchar(15)', true)
+   ->Column('ForeignUserID', 'int')
+   ->Column('Status', 'varchar(50)')
+   ->Column('DateStatus', 'datetime', true)
+   ->Column('StatusUserID', 'int', true)
+   ->Column('Attributes', 'text', true)
+   ->Column('ForeignID', 'varchar(255)', true, 'unique')
+   ->Set($Explicit, $Drop);
+
 $Construct->Table('Regarding')
    ->PrimaryKey('RegardingID')
    ->Column('Type', 'varchar(255)', FALSE, 'key')
@@ -748,6 +767,24 @@ $Construct
    ->Column('OldUserID', 'int')
    ->Column('NewUserID', 'int')
    ->Set();
+
+$Construct
+   ->Table('Attachment')
+   ->PrimaryKey('AttachmentID')
+   ->Column('Type', 'varchar(64)') // ex: zendesk-case, vendor-item
+   ->Column('ForeignID', 'varchar(50)', FALSE, 'index') // ex: d-123 for DiscussionID 123, u-555 for UserID 555
+   ->Column('ForeignUserID', 'int', FALSE, 'key') // the user id of the record we are attached to (de-normalization)
+   ->Column('Source', 'varchar(64)') // ex: Zendesk, Vendor
+   ->Column('SourceID', 'varchar(32)') // ex: 1
+   ->Column('SourceURL', 'varchar(255)') 
+   ->Column('Attributes', 'text', TRUE)
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertUserID', 'int', FALSE, 'key')
+   ->Column('InsertIPAddress', 'varchar(64)')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
+   ->Set($Explicit, $Drop);
 
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.

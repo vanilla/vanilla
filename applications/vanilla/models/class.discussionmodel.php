@@ -1365,6 +1365,21 @@ class DiscussionModel extends VanillaModel {
    }
 
    /**
+    * Evented wrapper for Gdn_Model::SetField
+    *
+    * @param integer $RowID
+    * @param string $Property
+    * @param mixed $Value
+    */
+   public function SetField($RowID, $Property, $Value = FALSE) {
+       $this->EventArguments['DiscussionID'] = $RowID;
+       $this->EventArguments['SetField'] = array($Property => $Value);
+
+       parent::SetField($RowID, $Property, $Value);
+       $this->fireEvent('AfterSetField');
+   }
+
+   /**
     * Inserts or updates the discussion via form values.
     *
     * Events: BeforeSaveDiscussion, AfterSaveDiscussion.
@@ -1504,15 +1519,17 @@ class DiscussionModel extends VanillaModel {
                }
 
                // Check for spam.
+
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
             	if ($Spam)
                   return SPAM;
 
-               // Check for approval
-					$ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-					if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
-               	LogModel::Insert('Pending', 'Discussion', $Fields);
-               	return UNAPPROVED;
+               if (!GetValue('Approved', $FormPostValues)) {
+                  $QueueModel = QueueModel::Instance();
+                  $Premoderation = $QueueModel->Premoderate('Discussion', $Fields);
+                  if ($Premoderation) {
+                     return UNAPPROVED;
+                  }
                }
 
                // Create discussion

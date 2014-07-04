@@ -613,6 +613,7 @@ class QueueModel extends Gdn_Model {
             $queueRow['ForeignType'] = 'Comment';
             $queueRow['DiscussionID'] = $data['DiscussionID'];
             $queueRow['CategoryID'] = $Discussion->CategoryID;
+            $queueRow['Name'] = 'Re: ' . $Discussion->Name;
             break;
          case 'discussion':
             $queueRow['ForeignType'] = 'Discussion';

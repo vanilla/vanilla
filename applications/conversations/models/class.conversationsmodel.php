@@ -43,10 +43,6 @@ abstract class ConversationsModel extends Gdn_Model {
          trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $Type), 'ConversationsModel', 'CheckForSpam'), E_USER_ERROR);
       }
 
-      $CountSpamCheck = Gdn::Session()->GetAttribute('Count'.$Type.'SpamCheck', 0);
-      $DateSpamCheck = Gdn::Session()->GetAttribute('Date'.$Type.'SpamCheck', 0);
-      $SecondsSinceSpamCheck = time() - Gdn_Format::ToTimestamp($DateSpamCheck);
-
       // Get spam config settings
       $SpamCount = C("Conversations.$Type.SpamCount", 1);
       if (!is_numeric($SpamCount) || $SpamCount < 1)
@@ -60,9 +56,31 @@ abstract class ConversationsModel extends Gdn_Model {
       if (!is_numeric($SpamLock) || $SpamLock < 60)
          $SpamLock = 60; // 60 second minimum lockout
 
+      // Check for a spam lock first.
+      $Now = time();
+      $TimeSpamLock = (int)Gdn::Session()->GetAttribute("Time{$Type}SpamLock", 0);
+      $WaitTime = $SpamLock - ($Now - $TimeSpamLock);
+      if ($WaitTime > 0) {
+         $Spam = TRUE;
+         $this->Validation->AddValidationResult(
+            'Body',
+            sprintf(
+               T('A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'),
+               $SpamCount,
+               $SpamTime,
+               $WaitTime
+            )
+         );
+         return $Spam;
+      }
+
+      $CountSpamCheck = Gdn::Session()->GetAttribute('Count'.$Type.'SpamCheck', 0);
+      $TimeSpamCheck = (int)Gdn::Session()->GetAttribute('Time'.$Type.'SpamCheck', 0);
+      $SecondsSinceSpamCheck = time() - $TimeSpamCheck;
+
       // Apply a spam lock if necessary
       $Attributes = array();
-      if ($SecondsSinceSpamCheck < $SpamLock && $CountSpamCheck >= $SpamCount && $DateSpamCheck !== FALSE) {
+      if ($SecondsSinceSpamCheck < $SpamTime && $CountSpamCheck >= $SpamCount) {
          $Spam = TRUE;
          $this->Validation->AddValidationResult(
             'Body',
@@ -75,12 +93,12 @@ abstract class ConversationsModel extends Gdn_Model {
          );
 
          // Update the 'waiting period' every time they try to post again
-         $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::ToDateTime();
+         $Attributes["Time{$Type}SpamLock"] = $Now;
+         $Attributes['Count'.$Type.'SpamCheck'] = 0;
       } else {
-
          if ($SecondsSinceSpamCheck > $SpamTime) {
             $Attributes['Count'.$Type.'SpamCheck'] = 1;
-            $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::ToDateTime();
+            $Attributes['Time'.$Type.'SpamCheck'] = $Now;
          } else {
             $Attributes['Count'.$Type.'SpamCheck'] = $CountSpamCheck + 1;
          }

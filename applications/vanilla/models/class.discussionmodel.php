@@ -1519,15 +1519,17 @@ class DiscussionModel extends VanillaModel {
                }
 
                // Check for spam.
+
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
             	if ($Spam)
                   return SPAM;
 
-               // Check for approval
-					$ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-					if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
-               	LogModel::Insert('Pending', 'Discussion', $Fields);
-               	return UNAPPROVED;
+               if (!GetValue('Approved', $FormPostValues)) {
+                  $QueueModel = QueueModel::Instance();
+                  $Premoderation = $QueueModel->Premoderate('Discussion', $Fields);
+                  if ($Premoderation) {
+                     return UNAPPROVED;
+                  }
                }
 
                // Create discussion

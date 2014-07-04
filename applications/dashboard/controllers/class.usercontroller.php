@@ -328,7 +328,7 @@ class UserController extends DashboardController {
 
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       if (!$User)
-         throw NotFoundException($User);
+         throw NotFoundException('User');
 
 //      $this->Form = new Gdn_Form();
 

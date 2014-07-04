@@ -86,4 +86,39 @@ abstract class ConversationsModel extends Gdn_Model {
 
       return $Spam;
    }
+
+   /**
+    * Get all the members of a conversation from the $ConversationID.
+    *
+    * @param int $ConversationID The conversation ID.
+    *
+    * @return array Array of user IDs.
+    */
+   public function GetConversationMembers($ConversationID) {
+      $ConversationMembers = array();
+
+      $UserConversation = new Gdn_Model('UserConversation');
+      $UserMembers = $UserConversation->GetWhere(array(
+            'ConversationID' => $ConversationID
+      ))->ResultArray();
+
+      if (is_array($UserMembers) && count($UserMembers)) {
+         $ConversationMembers = array_column($UserMembers, 'UserID');
+      }
+
+      return $ConversationMembers;
+   }
+
+   /**
+    * Check if user posting to the conversation is already a member.
+    *
+    * @param int $ConversationID The conversation ID.
+    * @param int $UserID The user id.
+    *
+    * @return bool
+    */
+   public function ValidConversationMember($ConversationID, $UserID) {
+      $ConversationMembers = $this->GetConversationMembers($ConversationID);
+      return (in_array($UserID, $ConversationMembers));
+   }
 }

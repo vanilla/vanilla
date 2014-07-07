@@ -308,7 +308,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 			// Make sure that the file extension is allowed.
 			$Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
 			if (!InArrayI($Extension, $this->_AllowedFileExtensions))
-				$Ex = sprintf(T('You cannot upload files with this extension (%s). Allowed extension(s) are %s.'), $Extension, implode(', ', $this->_AllowedFileExtensions));
+				$Ex = sprintf(T('You cannot upload files with this extension (%s). Allowed extension(s) are %s.'), htmlspecialchars($Extension), implode(', ', $this->_AllowedFileExtensions));
 		}
 
 		if($Ex) {

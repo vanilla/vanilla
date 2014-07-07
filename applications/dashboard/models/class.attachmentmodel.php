@@ -92,7 +92,7 @@ class AttachmentModel extends Gdn_Model {
       );
    }
 
-   public function Enabled() {
+   public static function Enabled() {
       return C('Garden.AttachmentsEnabled', FALSE);
    }
 

@@ -3188,6 +3188,10 @@ if (!function_exists('SliceParagraph')) {
 
 if (!function_exists('SliceString')) {
    function SliceString($String, $Length, $Suffix = '…') {
+      if (!$Length) {
+         return $String;
+      }
+      
       if (function_exists('mb_strimwidth')) {
       	static $Charset;
       	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');

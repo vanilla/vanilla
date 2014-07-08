@@ -180,6 +180,7 @@ class UtilityController extends DashboardController {
     * @access public
     */
    public function Sort() {
+      $this->Permission('Garden.Settings.Manage');
       $Session = Gdn::Session();
       $TransientKey = GetPostValue('TransientKey', '');
       $Target = GetPostValue('Target', '');

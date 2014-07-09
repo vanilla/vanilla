@@ -245,7 +245,7 @@ class DiscussionController extends VanillaController {
       $this->FireEvent('BeforeDiscussionRender');
 
       $AttachmentModel = AttachmentModel::Instance();
-      if ($AttachmentModel->Enabled()) {
+      if (AttachmentModel::Enabled()) {
          $AttachmentModel->JoinAttachments($this->Data['Discussion'], $this->Data['Comments']);
 
          $this->FireEvent('FetchAttachmentViews');

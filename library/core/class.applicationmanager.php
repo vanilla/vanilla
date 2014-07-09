@@ -2,7 +2,7 @@
 
 /**
  * Application Manager
- * 
+ *
  * Manages available applications, enabling and disabling them.
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
@@ -14,7 +14,7 @@
  */
 
 class Gdn_ApplicationManager {
-   
+
    /**
     * An array of available applications. Never access this directly, instead
     * use $this->AvailableApplications();
@@ -30,7 +30,7 @@ class Gdn_ApplicationManager {
     * @var array
     */
    private $_EnabledApplications = NULL;
-   
+
    /**
     * The valid paths to search for applications.
     *
@@ -47,7 +47,7 @@ class Gdn_ApplicationManager {
    public function AvailableApplications() {
       if (!is_array($this->_AvailableApplications)) {
          $ApplicationInfo = array();
-         
+
          $AppFolders = Gdn_FileSystem::Folders(PATH_APPLICATIONS); // Get an array of all application folders
          $ApplicationAboutFiles = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, 'settings' . DS . 'about.php', $AppFolders); // Now look for about files within them.
          // Include them all right here and fill the application info array
@@ -104,23 +104,23 @@ class Gdn_ApplicationManager {
 
       return $this->_EnabledApplications;
    }
-   
+
    public function CheckApplication($ApplicationName) {
       if (array_key_exists($ApplicationName, $this->EnabledApplications()))
          return TRUE;
-         
+
       return FALSE;
    }
-   
+
    public function GetApplicationInfo($ApplicationName, $Target = NULL) {
       $ApplicationInfo = GetValue($ApplicationName, $this->AvailableApplications(), NULL);
       if (is_null($ApplicationInfo)) return FALSE;
-      
+
       if (!is_null($Target))
          return GetValueR($Target, $ApplicationInfo, FALSE);
       return $ApplicationInfo;
    }
-   
+
    public function AvailableVisibleApplications() {
       $AvailableApplications = $this->AvailableApplications();
       foreach ($AvailableApplications as $ApplicationName => $Info) {
@@ -181,10 +181,10 @@ class Gdn_ApplicationManager {
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
 
       SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
-      
+
       $this->EventArguments['AddonName'] = $ApplicationName;
       Gdn::PluginManager()->CallEventHandlers($this, 'ApplicationManager', 'AddonEnabled');
-      
+
       return TRUE;
    }
 
@@ -195,14 +195,14 @@ class Gdn_ApplicationManager {
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
       if ($ApplicationFolder == '')
          throw new Exception(T('The application folder was not properly defined.'));
-      
+
       // Hook directly into the autoloader and force it to load the newly tested application
       Gdn_Autoloader::AttachApplication($ApplicationFolder);
-      
+
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
-      
+
       // Call the application's setup method
       $Hooks = $ApplicationName.'Hooks';
       if (!class_exists($Hooks)) {
@@ -214,7 +214,7 @@ class Gdn_ApplicationManager {
          $Hooks = new $Hooks();
          $Hooks->Setup();
       }
-      
+
       return TRUE;
    }
 
@@ -248,9 +248,21 @@ class Gdn_ApplicationManager {
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       $Locale = Gdn::Locale();
       $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
-      
+
       $this->EventArguments['AddonName'] = $ApplicationName;
       Gdn::PluginManager()->CallEventHandlers($this, 'ApplicationManager', 'AddonDisabled');
+   }
+
+   /**
+    * Returns whether or not an application is enabled.
+    *
+    * @param string $Name The name of the application.
+    * @return bool Whether or not the application is enabled.
+    * @since 2.2
+    */
+   public function IsEnabled($Name) {
+      $Enabled = $this->EnabledApplications();
+      return isset($Enabled[$Name]) && $Enabled[$Name];
    }
 
    /**

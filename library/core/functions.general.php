@@ -3578,3 +3578,27 @@ if (!function_exists('PasswordStrength')) {
       return $Response;
    }
 }
+
+if (!function_exists('IsSafeLink')) {
+
+   /**
+    * Used to determine if a link is on safe for use.
+    *
+    * @param $Link http link to be checked.
+    * @return bool
+    */
+   function IsSafeLink($Link) {
+
+      if (substr($Link, 0, 1) == '/') {
+         return TRUE;
+      }
+
+      $ParsedUrl = parse_url($Link);
+      if ($ParsedUrl['host'] == Gdn::Request()->Host()) {
+         return TRUE;
+      }
+
+      return FALSE;
+   }
+
+}

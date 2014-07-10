@@ -4396,8 +4396,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 .SocialIcon-Disqus .Icon {
   background-position: 0 0;
 }
-.SocialIcon.Disqus,
-.SocialIcon.Disqus.HasText .Icon {
+.SocialIcon-Disqus,
+.SocialIcon-Disqus.HasText .Icon {
   background-color: #2e9fff;
 }
 .SocialIcon-Disqus:hover {

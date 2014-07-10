@@ -3589,12 +3589,8 @@ if (!function_exists('IsSafeUrl')) {
     */
    function IsSafeUrl($Url) {
 
-      if (substr($Url, 0, 1) == '/') {
-         return TRUE;
-      }
-
       $ParsedUrl = parse_url($Url);
-      if ($ParsedUrl['host'] == Gdn::Request()->Host()) {
+      if ($ParsedUrl['host'] == Gdn::Request()->Host() || is_null($ParsedUrl['host'])) {
          return TRUE;
       }
 

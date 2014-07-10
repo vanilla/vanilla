@@ -3579,21 +3579,21 @@ if (!function_exists('PasswordStrength')) {
    }
 }
 
-if (!function_exists('IsSafeLink')) {
+if (!function_exists('IsSafeUrl')) {
 
    /**
-    * Used to determine if a link is on safe for use.
+    * Used to determine if a URL is on safe for use.
     *
-    * @param $Link http link to be checked.
+    * @param $Url http url to be checked.
     * @return bool
     */
-   function IsSafeLink($Link) {
+   function IsSafeUrl($Url) {
 
-      if (substr($Link, 0, 1) == '/') {
+      if (substr($Url, 0, 1) == '/') {
          return TRUE;
       }
 
-      $ParsedUrl = parse_url($Link);
+      $ParsedUrl = parse_url($Url);
       if ($ParsedUrl['host'] == Gdn::Request()->Host()) {
          return TRUE;
       }

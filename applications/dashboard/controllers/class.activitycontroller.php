@@ -346,7 +346,7 @@ class ActivityController extends Gdn_Controller {
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Target = $this->Request->Get('Target', '/activity');
          if (IsSafeUrl($Target)) {
-            Redirect($this->Request->Get('Target', '/activity'));
+            Redirect($Target);
          } else {
             Redirect(Url('/activity'));
          }

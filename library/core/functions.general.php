@@ -3590,7 +3590,7 @@ if (!function_exists('IsSafeUrl')) {
    function IsSafeUrl($Url) {
 
       $ParsedUrl = parse_url($Url);
-      if ($ParsedUrl['host'] == Gdn::Request()->Host() || is_null($ParsedUrl['host'])) {
+      if (empty($ParsedUrl['host']) || $ParsedUrl['host'] == Gdn::Request()->Host()) {
          return TRUE;
       }
 

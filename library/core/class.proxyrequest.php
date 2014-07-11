@@ -185,7 +185,6 @@ class ProxyRequest {
     * @return type 
     */
    public function Request($Options = NULL, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
-      
       /*
        * Allow requests that just want to use defaults to provide a string instead
        * of an optionlist.
@@ -490,6 +489,7 @@ class ProxyRequest {
       $logContext['responseCode'] = $this->ResponseStatus;
       $logContext['responseTime'] = $this->ResponseTime;
       if (Debug()) {
+         $logContext['QueryParams'] = $QueryParams;
          if ($this->ContentType == 'application/json') {
             $body = @json_decode($this->ResponseBody, true);
             if (!$body) {

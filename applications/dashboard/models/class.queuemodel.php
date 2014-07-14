@@ -521,6 +521,8 @@ class QueueModel extends Gdn_Model {
       $errors = array();
 
       if (sizeof($queueItems) == 0) {
+         $context['Where'] = $where;
+         Logger::event('cleanspeak_error', Logger::ERROR, 'Content not found.', $context);
          $this->Validation->AddValidationResult('Not Found', $whereMsg);
          return false;
       }

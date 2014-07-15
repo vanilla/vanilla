@@ -603,7 +603,6 @@ class QueueModel extends Gdn_Model {
          'Status' => val('Status', $data, 'unread'),
          'ForeignUserID' => val('InsertUserID', $data, Gdn::Session()->UserID),
          'ForeignIPAddress' => val('InsertIPAddress', $data, Gdn::Request()->IpAddress()),
-         'Body' => $data['Body'],
          'Format' => val('Format', $data, C('Garden.InputFormatter')),
          'ForeignID' => val('ForeignID', $data, self::generateForeignID($data))
       );
@@ -615,10 +614,12 @@ class QueueModel extends Gdn_Model {
             $queueRow['ForeignType'] = 'Comment';
             $queueRow['DiscussionID'] = $data['DiscussionID'];
             $queueRow['CategoryID'] = $Discussion->CategoryID;
+            $queueRow['Body'] = $data['Body'];
             break;
          case 'discussion':
             $queueRow['ForeignType'] = 'Discussion';
             $queueRow['Name'] = $data['Name'];
+            $queueRow['Body'] = $data['Body'];
             if (GetValue('Announce', $data)) {
                $queueRow['Announce'] = $data['Announce'];
             }
@@ -642,6 +643,7 @@ class QueueModel extends Gdn_Model {
          case 'activitycomment':
             $queueRow['ForeignType'] = 'ActivityComment';
             $queueRow['ActivityID'] = $data['ActivityID'];
+            $queueRow['Body'] = $data['Body'];
             break;
          default:
             throw new Gdn_UserException('Unknown Type: ' . $recordType);

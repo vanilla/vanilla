@@ -1374,6 +1374,9 @@ class ActivityModel extends Gdn_Model {
    }
 
    protected function NotifyWallPost($WallPost) {
+      if (!GetValue('RegardingUserID', $WallPost)) {
+         return;
+      }
       $NotifyUser = Gdn::UserModel()->GetID($WallPost['ActivityUserID']);
 
       $Activity = array(

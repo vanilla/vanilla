@@ -631,9 +631,12 @@ class QueueModel extends Gdn_Model {
             $queueRow['ForeignType'] = 'Activity';
             $queueRow['Body'] = $data['Story'];
             $queueRow['HeadlineFormat'] = $data['HeadlineFormat'];
-            $queueRow['RegardingUserID'] = $data['RegardingUserID'];
+            $queueRow['ActivityType'] = 'Status';
+            if (GetValue('RegardingUserID', $data)) {
+               $queueRow['RegardingUserID'] = $data['RegardingUserID'];
+               $queueRow['ActivityType'] = 'WallPost';
+            }
             $queueRow['ActivityUserID'] = $data['ActivityUserID'];
-            $queueRow['ActivityType'] = 'WallPost';
             $queueRow['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
             break;
          case 'activitycomment':

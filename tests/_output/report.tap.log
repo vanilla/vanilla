@@ -1,0 +1,7 @@
+TAP version 13
+ok 1 - setup (InstallCest::setupTest)
+ok 2 - log in as admin user (SigninCest::loginTest)
+1..2
+ok 3 - ExampleTest::testMe
+ok 4 - functions\generalTest::testGetValue
+1..4

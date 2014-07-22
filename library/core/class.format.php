@@ -1578,16 +1578,18 @@ EOT;
       // Preliminary decoding
       $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
       $Mixed = strtr($Mixed, self::$_UrlTranslations);
+      $Mixed = preg_replace('`[\']`', '', $Mixed);
 
       // Test for Unicode PCRE support
       // On non-UTF8 systems this will result in a blank string.
       $UnicodeSupport = (preg_replace('`[\pP]`u', '', 'P') != '');
 
       // Convert punctuation, symbols, and spaces to hyphens
-      if ($UnicodeSupport)
+      if ($UnicodeSupport) {
          $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
-      else
+      } else {
          $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);
+      }
 
       // Lowercase, no trailing or repeat hyphens
       $Mixed = preg_replace('`-+`', '-', strtolower($Mixed));

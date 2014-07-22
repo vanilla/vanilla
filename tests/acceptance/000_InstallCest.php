@@ -5,9 +5,13 @@ class InstallCest {
 
     public function _before() {
 
-        exec('mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "drop database if exists ' . MYSQL_DATABASE . ' "');
-        exec('mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "create database if not exists ' . MYSQL_DATABASE . ' "');
-        @exec('rm ' .  __DIR__ . '/../../conf/config.php');
+        exec(
+            'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "drop database if exists ' . MYSQL_DATABASE . ' "'
+        );
+        exec(
+            'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "create database if not exists ' . MYSQL_DATABASE . ' "'
+        );
+        @exec('rm ' . __DIR__ . '/../../conf/config.php');
 
     }
 
@@ -15,11 +19,15 @@ class InstallCest {
     }
 
 
+    public function isWebServerConfigured() {
+
+    }
+
     /**
+     * @depends isWebServerConfigured
      * @param AcceptanceTester $I
      */
     public function setupTest(AcceptanceTester $I) {
-
 
         $I->wantTo('setup');
         $I->amOnPage('/');

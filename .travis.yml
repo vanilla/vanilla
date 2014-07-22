@@ -9,6 +9,7 @@ install:
   - composer install
 
 before_script:
+  - sudo apt-get update
   - sudo apt-get install nginx
   - sudo apt-get install php5-fpm
   - sudo cp .travis_nginx.conf /etc/nginx/nginx.conf

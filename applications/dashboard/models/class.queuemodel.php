@@ -521,6 +521,8 @@ class QueueModel extends Gdn_Model {
       $errors = array();
 
       if (sizeof($queueItems) == 0) {
+         $context['Where'] = $where;
+         Logger::event('cleanspeak_error', Logger::ERROR, 'Content not found.', $context);
          $this->Validation->AddValidationResult('Not Found', $whereMsg);
          return false;
       }
@@ -601,7 +603,6 @@ class QueueModel extends Gdn_Model {
          'Status' => val('Status', $data, 'unread'),
          'ForeignUserID' => val('InsertUserID', $data, Gdn::Session()->UserID),
          'ForeignIPAddress' => val('InsertIPAddress', $data, Gdn::Request()->IpAddress()),
-         'Body' => $data['Body'],
          'Format' => val('Format', $data, C('Garden.InputFormatter')),
          'ForeignID' => val('ForeignID', $data, self::generateForeignID($data))
       );
@@ -613,10 +614,12 @@ class QueueModel extends Gdn_Model {
             $queueRow['ForeignType'] = 'Comment';
             $queueRow['DiscussionID'] = $data['DiscussionID'];
             $queueRow['CategoryID'] = $Discussion->CategoryID;
+            $queueRow['Body'] = $data['Body'];
             break;
          case 'discussion':
             $queueRow['ForeignType'] = 'Discussion';
             $queueRow['Name'] = $data['Name'];
+            $queueRow['Body'] = $data['Body'];
             if (GetValue('Announce', $data)) {
                $queueRow['Announce'] = $data['Announce'];
             }
@@ -629,14 +632,18 @@ class QueueModel extends Gdn_Model {
             $queueRow['ForeignType'] = 'Activity';
             $queueRow['Body'] = $data['Story'];
             $queueRow['HeadlineFormat'] = $data['HeadlineFormat'];
-            $queueRow['RegardingUserID'] = $data['RegardingUserID'];
+            $queueRow['ActivityType'] = 'Status';
+            if (GetValue('RegardingUserID', $data)) {
+               $queueRow['RegardingUserID'] = $data['RegardingUserID'];
+               $queueRow['ActivityType'] = 'WallPost';
+            }
             $queueRow['ActivityUserID'] = $data['ActivityUserID'];
-            $queueRow['ActivityType'] = 'WallPost';
             $queueRow['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
             break;
          case 'activitycomment':
             $queueRow['ForeignType'] = 'ActivityComment';
             $queueRow['ActivityID'] = $data['ActivityID'];
+            $queueRow['Body'] = $data['Body'];
             break;
          default:
             throw new Gdn_UserException('Unknown Type: ' . $recordType);

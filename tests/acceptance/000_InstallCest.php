@@ -11,7 +11,7 @@ class InstallCest {
         exec(
             'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "create database if not exists ' . MYSQL_DATABASE . ' "'
         );
-        @unlink( __DIR__ . '/../../conf/config.php');
+        @unlink(__DIR__ . '/../../conf/config.php');
 
     }
 

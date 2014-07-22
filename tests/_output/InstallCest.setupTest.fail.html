@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
+<head>
+    <title>Vanilla 2</title>
+    <link rel="stylesheet" type="text/css" href="/applications/dashboard/design/setup.css?v=2.2.15.1" media="all"/>
+    <link rel="canonical" href="http://codeception.local/index.php?p=/setup"/>
+    <meta property="og:site_name" content="Vanilla 2"/>
+    <meta property="og:url" content="http://codeception.local/index.php?p=/setup"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/applications/dashboard/js/setup.js?v=2.2.15.1" type="text/javascript"></script>
+</head>
+<body id="dashboard_setup_index" class="Dashboard Setup index ">
+<div id="Frame">
+    <div id="Content">
+        <form method="post" action="/index.php?p=/dashboard/setup&amp;">
+            <div>
+                <input type="hidden" id="Form_TransientKey" name="TransientKey" value=""/><input type="hidden"
+                                                                                                 id="Form_hpt"
+                                                                                                 name="hpt" value=""
+                                                                                                 style="display: none;"/><input
+                    type="hidden" id="Form_RewriteUrls" name="RewriteUrls" value=""/>
+
+                <div class="Title">
+                    <h1>
+                        <img src="/applications/dashboard/design/images/vanilla_logo.png" alt="Vanilla"/>
+
+                        <p>Version 2.2.15.1 Installer</p>
+                    </h1>
+                </div>
+                <div class="Form">
+                    <ul>
+                        <li>
+                            <label for="Form_Database-dot-Host">Database Host</label>
+                            <input type="text" id="Form_Database-dot-Host" name="Database-dot-Host" value="localhost"
+                                   class="InputBox"/></li>
+                        <li>
+                            <label for="Form_Database-dot-Name">Database Name</label>
+                            <input type="text" id="Form_Database-dot-Name" name="Database-dot-Name" value="dbname"
+                                   class="InputBox"/></li>
+                        <li>
+                            <label for="Form_Database-dot-User">Database User</label>
+                            <input type="text" id="Form_Database-dot-User" name="Database-dot-User" value="dbuser"
+                                   class="InputBox"/></li>
+                        <li>
+                            <label for="Form_Database-dot-Password">Database Password</label>
+                            <input type="password" id="Form_Database-dot-Password" name="Database-dot-Password" value=""
+                                   class="InputBox"/></li>
+                        <li class="Warning">
+                            <div>
+                                Yes, the following information can be changed later.
+                            </div>
+                        </li>
+                        <li>
+                            <label for="Form_Garden-dot-Title">Application Title</label>
+                            <input type="text" id="Form_Garden-dot-Title" name="Garden-dot-Title" value="Vanilla 2"
+                                   class="InputBox"/></li>
+                        <li>
+                            <label for="Form_Email">Admin Email</label>
+                            <input type="text" id="Form_Email" name="Email" value="" class="InputBox"/></li>
+                        <li>
+                            <label for="Form_Name">Admin Username</label>
+                            <input type="text" id="Form_Name" name="Name" value="" class="InputBox"/></li>
+                        <li>
+                            <label for="Form_Password">Admin Password</label>
+                            <input type="password" id="Form_Password" name="Password" value="" class="InputBox"/></li>
+                        <li class="Last">
+                            <label for="Form_PasswordMatch">Confirm Password</label>
+                            <input type="password" id="Form_PasswordMatch" name="PasswordMatch" value=""
+                                   class="InputBox"/></li>
+                    </ul>
+                    <div class="Button">
+                        <input type="submit" id="Form_Continuerarr" name="Continue_%26rarr%3B" value="Continue &rarr;"
+                               class="Button"/>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

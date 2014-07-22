@@ -9,4 +9,4 @@ modules:
     enabled: [Filesystem, FunctionalHelper, PhpBrowser]
     config:
         PhpBrowser:
-            url: 'http://codeception.local/'
+            url: 'http://codeception.local'

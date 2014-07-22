@@ -194,6 +194,8 @@ class ActivityModel extends Gdn_Model {
          ->From('Activity a')
          ->Join('Activity a2', 'a.ActivityID = a2.ActivityID') // self-join for index speed.
          ->Join('ActivityType t', 'a2.ActivityTypeID = t.ActivityTypeID');
+         
+      $this->FireEvent('AfterActivityQuery');         
 
       // Add prefixes to the where.
       foreach ($Where as $Key => $Value) {
@@ -1129,6 +1131,11 @@ class ActivityModel extends Gdn_Model {
 
          return; // don't notify users of something they did.
       }
+      
+      // Fire event before sending an email, so that a Plugin can do something before that happens
+      $this->EventArguments['Activity'] = &$Activity;
+      $this->FireEvent('BeforeProcessingActivityNotifications');
+      
 
       // Check the user's preference.
       if ($Preference) {

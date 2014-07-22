@@ -18,6 +18,7 @@ before_script:
 
 script:
   # Check coding standards compliance
+  - php codecept run  # self tests
 #  - vendor/bin/phpcs ./library/core
 #  - vendor/bin/phpcs ./applications
 #  - vendor/bin/phpcs ./plugins

@@ -11,7 +11,7 @@ class InstallCest {
         exec(
             'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "create database if not exists ' . MYSQL_DATABASE . ' "'
         );
-        @exec('rm ' . __DIR__ . '/../../conf/config.php');
+        @unlink( __DIR__ . '/../../conf/config.php');
 
     }
 
@@ -19,8 +19,10 @@ class InstallCest {
     }
 
 
-    public function isWebServerConfigured() {
-
+    public function isWebServerConfigured(AcceptanceTester $I) {
+        $I->wantTo('Check http://codeception.local');
+        $I->amOnPage('/');
+        $I->seeElement('#dashboard_setup_index');
     }
 
     /**
@@ -31,7 +33,7 @@ class InstallCest {
 
         $I->wantTo('setup');
         $I->amOnPage('/');
-        $I->see('Installer');
+        $I->seeElement('#dashboard_setup_index');
 
         $I->fillField('Database-dot-Host', MYSQL_HOST);
         $I->fillField('Database-dot-Name', MYSQL_DATABASE);

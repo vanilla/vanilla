@@ -1797,6 +1797,26 @@ class ImportModel extends Gdn_Model {
                array('CategoryID' => $Category['CategoryID']));
          }
       }
+
+      // Check for unique categories
+      $Categories = CategoryModel::Categories();
+      foreach ($Categories as $Category) {
+         $Codes[] = $Category['UrlCode'];
+      }
+      if (count(array_unique($Codes)) != count($Categories)) {
+         foreach ($Categories as $Category) {
+            $UrlCode = $Category['UrlCode'];
+            $ParentCategory = CategoryModel::Categories($Category['ParentCategoryID']);
+            if ($ParentCategory && $ParentCategory['CategoryID'] != -1 && count(array_keys($Codes, $UrlCode)) > 1) {
+               $UrlCode = $ParentCategory['UrlCode'] . '-' . $UrlCode;
+               Gdn::SQL()->Put(
+                  'Category',
+                  array('UrlCode' => $UrlCode),
+                  array('CategoryID' => $Category['CategoryID']));
+            }
+         }
+      }
+
       // Rebuild the category tree.
       $CategoryModel = new CategoryModel();
       $CategoryModel->RebuildTree();

@@ -62,6 +62,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     */
    public function ParseSpecialFields($Fields = array()) {
       foreach ($Fields as $Label => $Value) {
+         $Value = Gdn_Format::Text($Value);
          switch ($Label) {
             case 'Twitter':
                $Fields['Twitter'] = Anchor($Value, 'http://twitter.com/'.$Value);
@@ -182,7 +183,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             if (!in_array($Label, $this->MagicLabels))
                $Value = Gdn_Format::Links(htmlspecialchars($Value));
             echo ' <dt class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.Gdn_Format::Text($Label).'</dt> ';
-            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.$Value.'</dd> ';
+            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Label).'">'.Gdn_Format::Html($Value).'</dd> ';
          }
       } catch (Exception $ex) {
          // No errors

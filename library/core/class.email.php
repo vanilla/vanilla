@@ -44,6 +44,8 @@ class Gdn_Email extends Gdn_Pluggable {
       $this->PhpMailer->Hostname = C('Garden.Email.Hostname', '');
       $this->PhpMailer->Encoding = 'quoted-printable';
       $this->Clear();
+      $this->AddHeader('Precedence', 'list');
+      $this->AddHeader('X-Auto-Response-Suppress', 'All');
       parent::__construct();
    }
    

@@ -6,8 +6,8 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @copyright 2003-2014 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Garden
  * @since 2.0
  */
@@ -2811,6 +2811,34 @@ if (!function_exists('Redirect')) {
    }
 }
 
+if (!function_exists('redirectUrl')) {
+   /**
+    * Redirect to a specific url that can be outside of the site.
+    *
+    * @param string $url The url to redirect to.
+    * @param int $code The http status code.
+    */
+   function redirectUrl($url, $code = 302) {
+      if (!$url) {
+         $url = Url('', true);
+      }
+
+      // Close any db connections before exit
+      $Database = Gdn::Database();
+      $Database->CloseConnection();
+      // Clear out any previously sent content
+      @ob_end_clean();
+
+      if (!in_array($code, array(301, 302))) {
+         $code = 302;
+      }
+
+      safeHeader("Location: ". $url, true, $code);
+
+      exit();
+   }
+}
+
 if (!function_exists('ReflectArgs')) {
    /**
     * Reflect the arguments on a callback and returns them as an associative array.
@@ -3056,7 +3084,7 @@ if (!function_exists('SaveToConfig')) {
     *  - string: The key to save.
     *  - array: An array of key/value pairs to save.
     * @param mixed|null $Value The value to save.
-    * @param array $Options An array of additional options for the save.
+    * @param array|bool $Options An array of additional options for the save.
     *  - Save: If this is false then only the in-memory config is set.
     *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
     * @return bool: Whether or not the save was successful. NULL if no changes were necessary.

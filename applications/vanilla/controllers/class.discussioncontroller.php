@@ -57,7 +57,7 @@ class DiscussionController extends VanillaController {
    public function Index($DiscussionID = '', $DiscussionStub = '', $Page = '') {
       // Setup head
       $Session = Gdn::Session();
-      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('discussion.js');
       $this->AddJsFile('autosave.js');
       Gdn_Theme::Section('Discussion');
@@ -243,6 +243,17 @@ class DiscussionController extends VanillaController {
       $this->AddDefinition('DiscussionID', $DiscussionID);
 
       $this->FireEvent('BeforeDiscussionRender');
+
+      $AttachmentModel = AttachmentModel::Instance();
+      if (AttachmentModel::Enabled()) {
+         $AttachmentModel->JoinAttachments($this->Data['Discussion'], $this->Data['Comments']);
+
+         $this->FireEvent('FetchAttachmentViews');
+         if ($this->DeliveryMethod() === DELIVERY_METHOD_XHTML) {
+            require_once $this->FetchViewLocation('attachment', 'attachments', 'dashboard');
+         }
+      }
+
       $this->Render();
    }
 
@@ -738,7 +749,7 @@ body { background: transparent !important; }
 
       // Javascript files & options
       $this->AddJsFile('jquery.gardenmorepager.js');
-      $this->AddJsFile('jquery.autogrow.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('discussion.js');
       $this->RemoveJsFile('autosave.js');
       $this->AddDefinition('DoInform', '0'); // Suppress inform messages on embedded page.

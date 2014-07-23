@@ -223,6 +223,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('w.Participated')
             ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
 			$this->SQL
@@ -231,6 +232,7 @@ class DiscussionModel extends VanillaModel {
 				->Select('0', '', 'Dismissed')
 				->Select('0', '', 'Bookmarked')
 				->Select('0', '', 'CountCommentWatch')
+            ->Select('0', '', 'Participated')
 				->Select('d.Announce','','IsAnnounce');
       }
 
@@ -370,7 +372,8 @@ class DiscussionModel extends VanillaModel {
             ->Join('UserDiscussion w', "w.DiscussionID = d2.DiscussionID and w.UserID = $UserID", 'left')
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
-            ->Select('w.CountComments', '', 'CountCommentWatch');
+            ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('w.Participated');
       }
 
       $Data = $Sql->Get();
@@ -428,6 +431,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('w.Participated')
             ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
             //->BeginWhereGroup()
             //->Where('w.DateLastViewed', NULL)
@@ -441,6 +445,7 @@ class DiscussionModel extends VanillaModel {
 				->Select('0', '', 'Dismissed')
 				->Select('0', '', 'Bookmarked')
 				->Select('0', '', 'CountCommentWatch')
+            ->Select('0', '', 'Participated')
 				->Select('d.Announce','','IsAnnounce');
       }
 
@@ -726,6 +731,7 @@ class DiscussionModel extends VanillaModel {
          $this->SQL->Select('w.UserID', '', 'WatchUserID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.Participated')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
          // Don't join in the user table when we are a guest.
@@ -839,6 +845,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('w.Participated')
             ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
 			$this->SQL
@@ -1166,6 +1173,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('ca.PermissionCategoryID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.Participated')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
@@ -1211,6 +1219,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.*')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.Participated')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->From('Discussion d')
@@ -1254,6 +1263,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('ca.PermissionCategoryID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.Participated')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
@@ -1352,6 +1362,21 @@ class DiscussionModel extends VanillaModel {
             )
          );
       }
+   }
+
+   /**
+    * Evented wrapper for Gdn_Model::SetField
+    *
+    * @param integer $RowID
+    * @param string $Property
+    * @param mixed $Value
+    */
+   public function SetField($RowID, $Property, $Value = FALSE) {
+       $this->EventArguments['DiscussionID'] = $RowID;
+       $this->EventArguments['SetField'] = array($Property => $Value);
+
+       parent::SetField($RowID, $Property, $Value);
+       $this->fireEvent('AfterSetField');
    }
 
    /**
@@ -2039,6 +2064,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
          ->Select('w.UserID', '', 'WatchUserID')
+         ->Select('w.Participated')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')

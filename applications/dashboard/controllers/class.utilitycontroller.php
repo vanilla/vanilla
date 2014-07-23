@@ -265,6 +265,7 @@ class UtilityController extends DashboardController {
    public function Sprites() {
       $this->RemoveCssFile('admin.css');
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       $this->MasterView = 'default';
 
       $this->CssClass = 'SplashMessage NoPanel';
@@ -555,6 +556,8 @@ class UtilityController extends DashboardController {
       $this->MasterView = 'default';
       $this->RemoveCssFile('admin.css');
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
+
       $this->SetData('_NoPanel', TRUE);
       $this->Render();
    }

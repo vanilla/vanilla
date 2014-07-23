@@ -322,6 +322,9 @@ class PocketsPlugin extends Gdn_Plugin {
    }
 
    public function ProcessPockets($Sender, $Location, $CountHint = NULL) {
+      if (Gdn::Controller()->DeliveryMethod() != DELIVERY_METHOD_XHTML) {
+         return;
+      }
       if (Gdn::Controller()->Data('_NoMessages'))
          return;
 

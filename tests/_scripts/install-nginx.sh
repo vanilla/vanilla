@@ -23,23 +23,21 @@ PHP_FPM_CONF="$DIR/php-fpm.conf"
 echo "PHP_FPM_CONF $PHP_FPM_CONF"
 
 echo "
-    [global]
+[global]
 
-    [travis]
-    user = $USER
-    group = $USER
-    listen = $PHP_FPM_SOCK
-    listen.mode = 0666
-    pm = static
-    pm.max_children = 2
+[travis]
+user = $USER
+group = $USER
+listen = $PHP_FPM_SOCK
+listen.mode = 0666
+pm = static
+pm.max_children = 2
 
-    php_admin_value[memory_limit] = 128M
+php_admin_value[memory_limit] = 128M
 " > $PHP_FPM_CONF
 
 echo "PHP FPM Conf:"
 cat $PHP_FPM_CONF
-
-echo "Starting PHP FPM with Conf $DIR/php-fpm.conf"
 
 # nginx configuration
 echo "

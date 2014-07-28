@@ -39,6 +39,8 @@ echo "
 echo "PHP FPM Conf:"
 cat tests/_scripts/php-fpm.conf
 
+echo "Starting PHP FPM with Conf $DIR/php-fpm.conf"
+
 sudo $PHP_FPM_BIN \
     --fpm-config "$DIR/php-fpm.conf"
 

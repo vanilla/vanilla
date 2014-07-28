@@ -9,7 +9,7 @@ install:
   - composer install
 
 before_script:
-  - tests/_scripts/install-nginx.sh
+  - ./tests/_scripts/install-nginx.sh
   - git clone https://github.com/vanilla/addons.git
   - composer global require 'codeception/codeception=*'
 #  - vendor/bin/phpcs --config-set default_standard addons/standards/Vanilla

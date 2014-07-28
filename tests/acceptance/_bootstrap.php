@@ -8,5 +8,5 @@ define('VANILLA_ADMIN_PASSWORD', 'admin');
 
 define('MYSQL_HOST', 'localhost');
 define('MYSQL_USER', 'root');
-define('MYSQL_PASSWORD', 'root');
+define('MYSQL_PASSWORD', '');
 define('MYSQL_DATABASE', 'codeception_vanilla');

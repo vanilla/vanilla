@@ -5,13 +5,13 @@ class InstallCest {
 
     public function _before() {
 
-        exec(
-            'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "drop database if exists ' . MYSQL_DATABASE . ' "'
-        );
-        exec(
-            'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "create database if not exists ' . MYSQL_DATABASE . ' "'
-        );
-        @unlink(__DIR__ . '/../../conf/config.php');
+//        exec(
+//            'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "drop database if exists ' . MYSQL_DATABASE . ' "'
+//        );
+//        exec(
+//            'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "create database if not exists ' . MYSQL_DATABASE . ' "'
+//        );
+//        @unlink(__DIR__ . '/../../conf/config.php');
 
     }
 

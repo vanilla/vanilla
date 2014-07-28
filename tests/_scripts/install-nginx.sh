@@ -11,7 +11,7 @@ sudo apt-get update -qq
 sudo apt-get install -yqq nginx realpath
 sudo service nginx stop
 
-ROOT_PATH=$(realpath "$DIR/../vanilla")
+ROOT_PATH=$(realpath "$DIR/../../")
 PHP_FPM_SOCK=$(realpath "$DIR")/php-fpm.sock
 
 # php-fpm configuration

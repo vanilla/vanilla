@@ -19,6 +19,8 @@ PHP_FPM_SOCK=$(realpath "$DIR")/php-fpm.sock
 PHP_FPM_BIN="$HOME/.phpenv/versions/$TRAVIS_PHP_VERSION/sbin/php-fpm"
 PHP_FPM_CONF="$DIR/php-fpm.conf"
 
+echo "PHP_FPM_CONF $PHP_FPM_CONF"
+
 echo "
     [global]
 
@@ -31,7 +33,7 @@ echo "
     pm.max_children = 2
 
     php_admin_value[memory_limit] = 128M
-" > $PHP_FPM_CONF
+" > tests/_scripts/php-fpm.conf
 
 sudo $PHP_FPM_BIN \
     --fpm-config "$DIR/php-fpm.conf"

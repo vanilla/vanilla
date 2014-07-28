@@ -3,8 +3,7 @@ define('APPLICATION', 'Vanilla');
 define('APPLICATION_VERSION', '2.2.15.1');
 
 // Here you can initialize variables that will be available to your tests
-//define('PATH_ROOT', getcwd());
-define('PATH_ROOT', '/Users/johnashton/development/vanilla');
+define('PATH_ROOT', realpath(__DIR__ . '/../../'));
 if (!defined('PATH_CONF')) {
     define('PATH_CONF', PATH_ROOT . '/conf');
 }

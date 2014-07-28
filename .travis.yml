@@ -9,6 +9,7 @@ install:
   - composer install
 
 before_script:
+  - mysql -e 'create database codeception_vanilla;'
   - sh tests/_scripts/install-nginx.sh
   - git clone https://github.com/vanilla/addons.git
   - composer global require 'codeception/codeception=*'

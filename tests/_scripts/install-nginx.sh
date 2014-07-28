@@ -34,15 +34,12 @@ echo "
     pm.max_children = 2
 
     php_admin_value[memory_limit] = 128M
-" > tests/_scripts/php-fpm.conf
+" > $PHP_FPM_CONF
 
 echo "PHP FPM Conf:"
-cat tests/_scripts/php-fpm.conf
+cat $PHP_FPM_CONF
 
 echo "Starting PHP FPM with Conf $DIR/php-fpm.conf"
-
-sudo $PHP_FPM_BIN \
-    --fpm-config "$DIR/php-fpm.conf"
 
 # nginx configuration
 echo "

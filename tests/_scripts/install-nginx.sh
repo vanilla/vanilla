@@ -4,6 +4,7 @@ set -e
 
 echo "Installing NGINX for Travis"
 
+NGINX_CONF="/etc/nginx/sites-enabled/default"
 DIR=$(dirname "$0")
 USER=$(whoami)
 
@@ -35,6 +36,9 @@ echo "
     php_admin_value[memory_limit] = 128M
 " > tests/_scripts/php-fpm.conf
 
+echo "PHP FPM Conf:"
+cat tests/_scripts/php-fpm.conf
+
 sudo $PHP_FPM_BIN \
     --fpm-config "$DIR/php-fpm.conf"
 
@@ -50,7 +54,10 @@ echo "
 			include			fastcgi_params;
 		}
 	}
-" | sudo tee  > /dev/null
+" | sudo tee $NGINX_CONF > /dev/null
+
+echo "NGINX Conf:"
+cat $NGINX_CONF
 
 echo "Restarting Services"
 

@@ -41,21 +41,50 @@ cat $PHP_FPM_CONF
 
 # nginx configuration
 echo "
-	server {
-	    server_name codeception.local;
-		listen	80;
-		root	$ROOT_PATH/;
-		index	index.php index.html;
+    server {
 
-#        location / {
-#            try_files $uri $uri/ /index.php$request_uri;
-#        }
+        server_name codeception.local;
+        listen	80;
+        root	$ROOT_PATH/;
+        index	index.php index.html;
 
-		location ~ \.php {
-			fastcgi_pass	unix:$PHP_FPM_SOCK;
-			include			fastcgi_params;
-		}
-	}
+        # Safeguard against serving configs
+        location ~* "/\.htaccess$" { deny all; return 403; }
+        location ~* "/\.git" { deny all; return 403; }
+        location ~* "/conf/.*$" { deny all; return 403; }
+        location ^~ "/favicon.ico" { access_log off; log_not_found off; return 404; }
+
+        # Basic PHP handler
+        location ~* "^/index\.php" {
+          # send to fastcgi
+          fastcgi_pass	unix:$PHP_FPM_SOCK;
+          include			fastcgi_params;
+       }
+
+       # PHP
+       location ~* "^/cgi-bin/.+\.php" {
+          root $ROOT_PATH;
+
+          # send to fastcgi
+          fastcgi_pass	unix:$PHP_FPM_SOCK;
+          include			fastcgi_params;
+       }
+
+       # Don't let any other php files run by themselves
+       location ~* "\.php" {
+          rewrite ^ /index.php?p=$uri last;
+       }
+
+       # Default location
+       location / {
+          try_files $uri @vanilla;
+       }
+
+       location @vanilla {
+          rewrite ^ /index.php?p=$uri last;
+       }
+
+	};
 " | sudo tee $NGINX_CONF > /dev/null
 
 echo "NGINX Conf:"

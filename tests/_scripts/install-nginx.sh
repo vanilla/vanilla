@@ -72,16 +72,16 @@ echo "
 
        # Don't let any other php files run by themselves
        location ~* "\.php" {
-          rewrite ^ /index.php?p=$uri last;
+          rewrite ^ /index.php?p=\$uri last;
        }
 
        # Default location
        location / {
-          try_files $uri @vanilla;
+          try_files \$uri @vanilla;
        }
 
        location @vanilla {
-          rewrite ^ /index.php?p=$uri last;
+          rewrite ^ /index.php?p=\$uri last;
        }
 
 	};

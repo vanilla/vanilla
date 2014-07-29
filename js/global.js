@@ -1199,8 +1199,19 @@ jQuery(document).ready(function($) {
 
       $container.addClass('Open').closest('.ImgExt').addClass('Open');
 
-      var width = $preview.width(), height = $preview.height(), videoid = $container.attr('id').replace('youtube-', '');
+      var width = $preview.width(), height = $preview.height(), videoid = '';
 
+      try {
+         videoid = $container.attr('id').replace('youtube-', '');
+      } catch (e) {
+         console.log("YouTube parser found invalid id attribute.");
+      }
+
+      // Verify we have a valid videoid
+      var pattern = /^[a-zA-Z0-9_-]+$/;
+      if (videoid.match(pattern) == null) {
+         return false;
+      }
 
       var html = '<iframe width="'+width+'" height="'+height+'" src="//www.youtube.com/embed/'+videoid+'?autoplay=1" frameborder="0" allowfullscreen></iframe>';
       $player.html(html);

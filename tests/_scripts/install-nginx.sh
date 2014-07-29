@@ -47,9 +47,9 @@ echo "
 		root	$ROOT_PATH/;
 		index	index.php index.html;
 
-        location / {
-            try_files $uri $uri/ /index.php$request_uri;
-        }
+#        location / {
+#            try_files $uri $uri/ /index.php$request_uri;
+#        }
 
 		location ~ \.php {
 			fastcgi_pass	unix:$PHP_FPM_SOCK;

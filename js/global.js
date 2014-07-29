@@ -642,7 +642,7 @@ jQuery(document).ready(function($) {
          });
      });
    };
-   $('.Popin').popin();
+   $('.Popin').not('.Message .Popin').popin();
 
    var hijackClick = function(e) {
       var $elem = $(this);
@@ -691,7 +691,7 @@ jQuery(document).ready(function($) {
 
       return false;
    };
-   $(document).delegate('.Hijack', 'click', hijackClick);
+   $(document).delegate('.Hijack:not(.Message .Hijack)', 'click', hijackClick);
 
 
 
@@ -1034,8 +1034,14 @@ jQuery(document).ready(function($) {
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
 	if (informMessageStack) {
-		informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
-		gdn.inform(informMessageStack);
+        var informMessages;
+        try {
+            informMessages = $.parseJSON($.base64Decode(informMessageStack));
+            informMessageStack = {'InformMessages' : informMessages};
+            gdn.inform(informMessageStack);
+        } catch (e) {
+            console.log('informMessageStack contained invalid JSON');
+        }
 	}
 
 	// Ping for new notifications on pageload, and subsequently every 1 minute.

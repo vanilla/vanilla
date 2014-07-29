@@ -44,7 +44,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'css_expression' => 1,
        'deny_attribute' => $Attributes,
        'unique_ids' => 0,
-       'elements' => '*-applet-form-input-textarea-iframe-script-style-embed-object',
+       'elements' => '*-applet-form-input-textarea-iframe-script-style-embed-object-select-option-button-fieldset-optgroup-legend',
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
        'valid_xhtml' => 0,
@@ -77,7 +77,10 @@ class HTMLawedPlugin extends Gdn_Plugin {
 //         $Config['hook_tag'] = 'HTMLawedHookTag';
       }
 
-      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+      // Block some IDs
+      $GLOBALS['hl_Ids'] = array('Definitions' => 1, 'InformMessageStack' => 1);
+
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); a=class(noneof=Hijack|Popin)';
 
       $Result = htmLawed($Html, $Config, $Spec);
       

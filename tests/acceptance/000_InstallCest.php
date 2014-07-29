@@ -47,6 +47,7 @@ class InstallCest {
 
         $I->click('Continue');
         $I->dontSee('Access denied');
+        $I->see('Getting Started with Vanilla');
 
     }
 

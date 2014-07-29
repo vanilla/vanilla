@@ -43,7 +43,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
        'cdata' => 3,
        'css_expression' => 1,
        'deny_attribute' => $Attributes,
-       'unique_ids' => 0,
+       'unique_ids' => 1,
        'elements' => '*-applet-form-input-textarea-iframe-script-style-embed-object-select-option-button-fieldset-optgroup-legend',
        'keep_bad' => 0,
        'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
@@ -77,13 +77,30 @@ class HTMLawedPlugin extends Gdn_Plugin {
 //         $Config['hook_tag'] = 'HTMLawedHookTag';
       }
 
-      // Block some IDs
-      $GLOBALS['hl_Ids'] = array('Definitions' => 1, 'InformMessageStack' => 1);
+      // Block some IDs so you can't break Javascript
+      $GLOBALS['hl_Ids'] = array(
+         'Bookmarks' => 1,
+         'CommentForm' => 1,
+         'Content' => 1,
+         'Definitions' => 1,
+         'DiscussionForm' => 1,
+         'Foot' => 1,
+         'Form_Comment' => 1,
+         'Form_User_Password' => 1,
+         'Form_User_SignIn' => 1,
+         'Head' => 1,
+         'HighlightColor' => 1,
+         'InformMessageStack' => 1,
+         'Menu' => 1,
+         'PagerMore' => 1,
+         'Panel' => 1,
+         'Status' => 1,
+      );
 
-      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); a=class(noneof=Hijack|Popin)';
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); a=class(noneof=Hijack|Dismiss/nomatch=%pop[in|up|down]|flyout|ajax%i)';
 
       $Result = htmLawed($Html, $Config, $Spec);
-      
+
       return $Result;
 	}
 

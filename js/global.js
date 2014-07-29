@@ -270,11 +270,11 @@ jQuery(document).ready(function($) {
       //$('a.Popup').popup();
 		//$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
 
-      $('a.Popup').popup();
-      $('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
+      $('a.Popup').not('.Message a.Popup').popup();
+      $('a.PopConfirm').not('.Message a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
    }
 
-   $(document).delegate(".PopupWindow", 'click', function() {
+   $(document).delegate(".PopupWindow:not(.Message .PopupWindow)", 'click', function() {
       var $this = $(this);
 
       if ($this.hasClass('NoMSIE') && /msie/.test(navigator.userAgent.toLowerCase())) {
@@ -302,14 +302,14 @@ jQuery(document).ready(function($) {
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.
    if ($.fn.popup)
-      $('a.Popdown').popup({hijackForms: false});
+      $('a.Popdown').not('.Message a.Popdown').popup({hijackForms: false});
 
    // This turns SignInPopup anchors into in-page popups
    if ($.fn.popup)
-      $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
+      $('a.SignInPopup').not('.Message a.SignInPopup').popup({containerCssClass:'SignInPopup'});
 
    if ($.fn.popup)
-      $(document).delegate('.PopupClose', 'click', function(event){
+      $(document).delegate('.PopupClose:not(.Message .PopupClose)', 'click', function(event){
          var Popup = $(event.target).parents('.Popup');
          if (Popup.length) {
             var PopupID = Popup.prop('id');
@@ -318,7 +318,7 @@ jQuery(document).ready(function($) {
       });
 
    // Make sure that message dismissalls are ajax'd
-   $(document).delegate('a.Dismiss', 'click', function() {
+   $(document).delegate('a.Dismiss:not(.Message a.Dismiss)', 'click', function() {
       var anchor = this;
       var container = $(anchor).parent();
       var transientKey = gdn.definition('TransientKey');
@@ -336,7 +336,7 @@ jQuery(document).ready(function($) {
    // without a refresh. The form must be within an element with the "AjaxForm"
    // class.
    if ($.fn.handleAjaxForm)
-      $('.AjaxForm').handleAjaxForm();
+      $('.AjaxForm').not('.Message .AjaxForm').handleAjaxForm();
 
    // Make the highlight effect themable.
    if ($.effects && $.effects.highlight) {
@@ -710,7 +710,7 @@ jQuery(document).ready(function($) {
       return false;
    });
    var lastOpen = null;
-   $(document).delegate('.ToggleFlyout', 'click', function(e) {
+   $(document).delegate('.ToggleFlyout:not(.Message .ToggleFlyout)', 'click', function(e) {
 
       var $flyout = $('.Flyout', this);
         var isHandle = false;

@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
 
    // Set up paging
    if ($.morepager)
-      $('.MorePager').livequery(function() {
+      $('.MorePager').not('.Message .MorePager').livequery(function() {
          $(this).morepager({
             pageContainerSelector: 'ul.Discussions:last, ul.Drafts:last',
             afterPageLoaded: function() { $(document).trigger('DiscussionPagingComplete'); }

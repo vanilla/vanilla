@@ -163,7 +163,7 @@ jQuery(document).ready(function($) {
 
    // Set up paging
    if ($.morepager)
-      $('.MorePager').morepager({
+      $('.MorePager').not('.Message .MorePager').morepager({
          pageContainerSelector: 'ul.DataList:first'
       });
 

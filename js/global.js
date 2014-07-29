@@ -270,8 +270,8 @@ jQuery(document).ready(function($) {
       //$('a.Popup').popup();
 		//$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
 
-      $('a.Popup').not('.Message a.Popup').popup();
-      $('a.PopConfirm').not('.Message a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
+      $('a.Popup:not(.Message a.Popup)').popup();
+      $('a.PopConfirm:not(.Message a.PopConfirm)').popup({'confirm' : true, 'followConfirm' : true});
    }
 
    $(document).delegate(".PopupWindow:not(.Message .PopupWindow)", 'click', function() {
@@ -302,11 +302,11 @@ jQuery(document).ready(function($) {
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.
    if ($.fn.popup)
-      $('a.Popdown').not('.Message a.Popdown').popup({hijackForms: false});
+      $('a.Popdown:not(.Message a.Popdown)').popup({hijackForms: false});
 
    // This turns SignInPopup anchors into in-page popups
    if ($.fn.popup)
-      $('a.SignInPopup').not('.Message a.SignInPopup').popup({containerCssClass:'SignInPopup'});
+      $('a.SignInPopup:not(.Message a.SignInPopup)').popup({containerCssClass:'SignInPopup'});
 
    if ($.fn.popup)
       $(document).delegate('.PopupClose:not(.Message .PopupClose)', 'click', function(event){

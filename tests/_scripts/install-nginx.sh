@@ -84,7 +84,7 @@ echo "
           rewrite ^ /index.php?p=\$uri last;
        }
 
-	};
+    }
 " | sudo tee $NGINX_CONF > /dev/null
 
 echo "NGINX Conf:"

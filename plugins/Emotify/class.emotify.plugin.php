@@ -254,7 +254,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
             $Emoticons[$gif] = $i;
       }
       $Emoticons = array_flip($Emoticons);
-      
+
 		$Sender->AddDefinition('Emoticons', base64_encode(json_encode($Emoticons)));
 	}
 	

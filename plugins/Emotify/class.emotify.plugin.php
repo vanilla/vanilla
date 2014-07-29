@@ -8,7 +8,7 @@
 $PluginInfo['Emotify'] = array(
 	'Name' => 'Emotify :)',
 	'Description' => 'Replaces <a href="http://en.wikipedia.org/wiki/Emoticon">emoticons</a> (smilies) with friendly pictures.',
-	'Version' 	=>	 '2.0.5',
+	'Version' 	=>	 '2.0.5.1',
 	'MobileFriendly' => TRUE,
 	'Author' 	=>	 "Mark O'Sullivan",
 	'AuthorEmail' => 'mark@vanillaforums.com',

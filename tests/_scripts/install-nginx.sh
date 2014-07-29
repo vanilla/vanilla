@@ -42,6 +42,7 @@ cat $PHP_FPM_CONF
 # nginx configuration
 echo "
 	server {
+	    server_name codeception.local;
 		listen	80;
 		root	$ROOT_PATH/;
 		index	index.php index.html;

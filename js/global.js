@@ -139,24 +139,20 @@ jQuery(document).ready(function($) {
       gdn.focused = true;
    });
 
-   // Grab a definition from hidden inputs in the page
+   // Grab a definition from object in the page
    gdn.definition = function(definition, defaultVal, set) {
       if (defaultVal == null)
          defaultVal = definition;
 
-      var $def = $('#Definitions #' + definition);
-      var def;
-
-      if(set) {
-         $def.val(defaultVal);
-         def = defaultVal;
-      } else {
-         def = $def.val();
-         if ($def.length == 0)
-            def = defaultVal;
+      if(!(definition in definitions)) {
+         return defaultVal;
       }
 
-      return def;
+      if(set) {
+         definitions[definition] = defaultVal;
+      }
+
+      return definitions[definition];
    }
 
    gdn.disable = function(e, progressClass) {

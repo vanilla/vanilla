@@ -113,8 +113,12 @@ class DashboardHooks implements Gdn_IPlugin {
 
       // Allow return to mobile site
 		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
-		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile)) {
 		   $Sender->AddAsset('Foot', Wrap(Anchor(T('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
+      }
+
+      // Allow global translation of TagHint
+      $Sender->AddDefinition("TagHint", T("TagHint", "Start to type..."));
    }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {

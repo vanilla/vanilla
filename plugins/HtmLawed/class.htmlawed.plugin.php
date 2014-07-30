@@ -97,7 +97,7 @@ class HTMLawedPlugin extends Gdn_Plugin {
          'Status' => 1,
       );
 
-      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); a=class(noneof=Hijack|Dismiss/nomatch=%pop[in|up|down]|flyout|ajax%i)';
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); a=class(noneof=Hijack|Dismiss|MorePager/nomatch=%pop[in|up|down]|flyout|ajax%i)';
 
       $Result = htmLawed($Html, $Config, $Spec);
 

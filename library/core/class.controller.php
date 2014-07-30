@@ -679,15 +679,19 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('Search', $this->_Definitions))
          $this->_Definitions['Search'] = T('Search');
 
-      $Return = '<!-- Various definitions for Javascript //-->
-<div id="Definitions" style="display: none;">
-';
-
-      foreach ($this->_Definitions as $Term => $Definition) {
-         $Return .= '<input type="hidden" id="'.$Term.'" value="'.Gdn_Format::Form($Definition).'" />'."\n";
+      // Output a JavaScript object with all the definitions
+      $Definitions = array();
+      foreach($this->_Definitions as $Term => $Definition) {
+         $Definitions[] = "'{$Term}' : " . json_encode($Definition);
       }
 
-      return $Return .'</div>';
+      $Result = array();
+      $Result[] = '<!-- Various definitions for Javascript //-->';
+      $Result[] = '<script>';
+      $Result[] = "var definitions = {\n" . implode(",\n", $Definitions) . "}";
+      $Result[] = '</script>';
+
+      return implode("\n", $Result);
    }
 
    /**

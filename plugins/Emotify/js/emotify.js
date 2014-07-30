@@ -4,8 +4,13 @@ jQuery(document).ready(function($) {
    emotify = function(textbox) {
       // Pick up the emoticons from the def list
       var emoticons = gdn.definition('Emoticons', false);
-      if (emoticons)
-         emoticons = eval("("+$.base64Decode(emoticons)+")");
+      if (emoticons) {
+         try {
+            emoticons = $.parseJSON($.base64Decode(emoticons));
+         } catch(e) {
+            console.log("Emotify produced invalid JSON.");
+         }
+      }
 	 
       var frm = textbox.parents('form');
       var buts = '';

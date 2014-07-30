@@ -41,7 +41,7 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 ## Self-Hosting Requirements
 
-* PHP version 5.2 or newer
+* PHP version 5.2 or newer with --enable-mbstring
 * pdo_mysql module must be enabled
 * MySQL 5 or newer
 

@@ -262,7 +262,10 @@ class PagerModule extends Gdn_Module {
 
       $this->CssClass = ConcatSep(' ', $this->CssClass, 'NumberedPager');
 
+      // Get total page count, allowing override
       $PageCount = ceil($this->TotalRecords / $this->Limit);
+      $this->EventArguments['PageCount'] = &$PageCount;
+      $this->FireEvent('BeforePagerSetsCount');
       $this->_PageCount = $PageCount;
       $CurrentPage = ceil($this->Offset / $this->Limit) + 1;
 

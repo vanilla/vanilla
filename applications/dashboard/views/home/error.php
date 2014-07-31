@@ -4,7 +4,7 @@
       <h1><?php echo $this->Data('Title', T('Whoops!')); ?></h1>
       <div id="Message">
          <?php
-         echo Gdn_Format::Markdown($this->Data('Exception', 'Add your message here foo.'));
+         echo Gdn_Format::Markdown($this->Data('Exception', 'No error message supplied.'));
          ?>
       </div>
    </div>

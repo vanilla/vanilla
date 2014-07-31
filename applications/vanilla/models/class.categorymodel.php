@@ -133,9 +133,12 @@ class CategoryModel extends Gdn_Model {
 
       if ($ID !== FALSE) {
          if (!is_numeric($ID) && $ID) {
+            $Code = $ID;
             foreach (self::$Categories as $Category) {
-               if ($Category['UrlCode'] == $ID)
+               if ($Category['UrlCode'] === $Code) {
                   $ID = $Category['CategoryID'];
+                  break;
+               }
             }
          }
 

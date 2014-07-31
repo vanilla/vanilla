@@ -267,6 +267,18 @@ class Gdn_ApplicationManager {
    }
 
    /**
+    * Returns whether or not an application is enabled.
+    *
+    * @param string $Name The name of the application.
+    * @return bool Whether or not the application is enabled.
+    * @since 2.2
+    */
+   public function IsEnabled($Name) {
+      $Enabled = $this->EnabledApplications();
+      return isset($Enabled[$Name]) && $Enabled[$Name];
+   }
+
+   /**
     * Undocumented method.
     *
     * @param string $ApplicationName Undocumented variable.

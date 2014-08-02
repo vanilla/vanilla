@@ -70,14 +70,14 @@ class PostController extends VanillaController {
       );
 
       if (C('Vanilla.Categories.Use')) {
-         $Result = array_merge($Result, array(
+         $Result = $Result + array(
             '2' => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
             '1' => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
-         ));
+         );
       } else {
-         $Result = array_merge($Result, array(
+         $Result = $Result + array(
             '1' => '@'.T('In recent discussions.'),
-         ));
+         );
       }
 
       return $Result;

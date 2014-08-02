@@ -6,17 +6,14 @@ Part 1: CSS / Design
 1. Copy this "default" theme folder and rename it to your new theme name.
 2. Open the "about.php" file and edit the information to reflect your theme. Be
    sure to change the array key like this: $ThemeInfo['YourThemeNameHere'].
-3. Create a "design" subfolder and add a "custom.css" file to it.
+3. Create a "design" subfolder and add a "custom.css" file to it. 
+   Use it to selectively override CSS - it is called after the default styles.
 4. Create a "views" subfolder and copy "/applications/dashboard/views/default.master.tpl" to it.
 5. Go to your Dashboard, Themes, and apply your new theme.
-6. Edit the copied CSS files to look however you wish!
 
-Other things you should know:
-
-* All non-forum pages should be edited in the global "style.css" file.
-
-* If you want to edit the look & feel of the administrative screens, also
+If you want to edit the look & feel of the administrative screens, also
   add a design/customadmin.css in step 3.
+
 
 Part 2: HTML / Views (Advanced)
 ====================================================

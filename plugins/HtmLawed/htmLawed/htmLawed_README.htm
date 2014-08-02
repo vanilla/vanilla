@@ -110,8 +110,8 @@ span.totop a, span.totop a:visited {color: #6699cc;}
 
 <div id="body">
 <br />
-<div class="comment">htmLawed_README.txt, 22 July 2012<br />
-htmLawed 1.1.13, 22 July 2012<br />
+<div class="comment">htmLawed_README.txt, 2 August 2014<br />
+htmLawed 1.1.18, 2 August 2014<br />
 Copyright Santosh Patnaik<br />
 Dual licensed with LGPL 3 and GPL 2+<br />
 A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed">http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed</a>&#160;</div>
@@ -121,9 +121,9 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s1" id="s1"></a><span class="item-no">1</span>&#160; About htmLawed
 </h2><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; htmLawed is a highly customizable single-file PHP script to make text secure, and standard- and admin policy-compliant for use in the body of HTML 4, XHTML 1 or 1.1, or generic XML documents. It is thus a configurable input (X)HTML filter, processor, purifier, sanitizer, beautifier, etc., and an alternative to the <a href="http://tidy.sourceforge.net">HTMLTidy</a>&#160;application.<br />
+&#160; htmLawed is a PHP script to process text with HTML markup to make it more compliant with HTML standards and administrative policies. It works by making HTML well-formed with balanced and properly nested tags, neutralizing code that may be used for cross-site scripting (XSS) attacks, allowing only specified HTML tags and attributes, and so on. Such <em>lawing in</em>&#160;of HTML in text used in (X)HTML or XML documents ensures that it is in accordance with the aesthetics, safety and usability requirements set by administrators.<br />
 <br />
-&#160; The <em>lawing in</em>&#160;of input text is needed to ensure that HTML code in the text is standard-compliant, does not introduce security vulnerabilities, and does not break the aesthetics, design or layout of web-pages. htmLawed tries to do this by, for example, making HTML well-formed with balanced and properly nested tags, neutralizing code that may be used for cross-site scripting (<span class="term">XSS</span>) attacks, and allowing only specified HTML elements/tags and attributes.<br />
+&#160; htmLawed is highly customizable, and fast with low memory usage. Its free and open-source code is in one small file, does not require extensions or libraries, and works in older versions of PHP as well. It is a good alternative to the HTML <a href="http://tidy.sourceforge.net">Tidy</a>&#160;application.<br />
 
 <div class="sub-section"><h3>
 <a name="s1.1" id="s1.1"></a><span class="item-no">1.1</span>&#160; Example uses
@@ -151,8 +151,8 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; * &#160;<strong>beautify</strong>&#160;or <strong>compact</strong>&#160;HTML &#160;^~`<br />
 <br />
-&#160; * &#160;<strong>restrict elements</strong>&#160; ^~`<br />
-&#160; * &#160;proper closure of empty elements like <span class="term">img</span>&#160; ^`<br />
+&#160; * &#160;can <strong>restrict elements</strong>&#160; ^~`<br />
+&#160; * &#160;ensures proper closure of empty elements like <span class="term">img</span>&#160; ^`<br />
 &#160; * &#160;<strong>transform deprecated elements</strong>&#160;like <span class="term">u</span>&#160; ^~`<br />
 &#160; * &#160;HTML <strong>comments</strong>&#160;and <span class="term">CDATA</span>&#160;sections can be permitted &#160;^~`<br />
 &#160; * &#160;elements like <span class="term">script</span>, <span class="term">object</span>&#160;and <span class="term">form</span>&#160;can be permitted &#160;~<br />
@@ -161,7 +161,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 &#160; * &#160;remove <strong>invalid attributes</strong>&#160; ^`<br />
 &#160; * &#160;element and attribute names are <strong>lower-cased</strong>&#160; ^<br />
 &#160; * &#160;provide <strong>required attributes</strong>, like <span class="term">alt</span>&#160;for <span class="term">image</span>&#160; ^`<br />
-&#160; * &#160;<strong>transform deprecated attributes</strong>&#160; ^~`<br />
+&#160; * &#160;<strong>transforms deprecated attributes</strong>&#160; ^~`<br />
 &#160; * &#160;attributes <strong>declared only once</strong>&#160; ^`<br />
 <br />
 &#160; * &#160;<strong>restrict attribute values</strong>, including <strong>element-specifically</strong>&#160; ^~`<br />
@@ -214,35 +214,38 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s1.3" id="s1.3"></a><span class="item-no">1.3</span>&#160; History
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; htmLawed was developed for use with <span class="term">LabWiki</span>, a wiki software developed at PHP Labware, as a suitable software could not be found. Existing PHP software like <span class="term">Kses</span>&#160;and <span class="term">HTMLPurifier</span>&#160;were deemed inadequate, slow, resource-intensive, or dependent on external applications like <span class="term">HTML Tidy</span>.<br />
+&#160; htmLawed was created in 2007 for use with <span class="term">LabWiki</span>, a wiki software developed at PHP Labware, as a suitable software could not be found. Existing PHP software like <span class="term">Kses</span>&#160;and <span class="term">HTMLPurifier</span>&#160;were deemed inadequate, slow, resource-intensive, or dependent on an extension or external application like <span class="term">HTML Tidy</span>. The core logic of htmLawed, that of identifying HTML elements and attributes, was based on the <span class="term">Kses</span>&#160;(version 0.2.2) HTML filter software of Ulf Harnhammar (it can still be used with code that uses <span class="term">Kses</span>; see <a href="#s2.6">section 2.6</a>.).<br />
 <br />
-&#160; htmLawed started as a modification of Ulf Harnhammar's <span class="term">Kses</span>&#160;(version 0.2.2) software, and is compatible with code that uses <span class="term">Kses</span>; see <a href="#s2.6">section 2.6</a>.<br />
+&#160; See <a href="#s4.3">section 4.3</a>&#160;for a detailed log of changes in htmLawed over the years, and <a href="#s4.10">section 4.10</a>&#160;for acknowledgements.<br />
 
 </div>
 <div class="sub-section"><h3>
 <a name="s1.4" id="s1.4"></a><span class="item-no">1.4</span>&#160; License &amp; copyright
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; htmLawed is free and open-source software dual licensed under LGPL license version <a href="http://www.gnu.org/licenses/lgpl-3.0.txt">3</a>, and GPL license version <a href="http://www.gnu.org/licenses/gpl-2.0.txt">2</a>&#160;(or later), and copyrighted by Santosh Patnaik, MD, PhD.<br />
+&#160; htmLawed is free and open-source software dual copyrighted by Santosh Patnaik, MD, PhD, and licensed under LGPL license version <a href="http://www.gnu.org/licenses/lgpl-3.0.txt">3</a>, and GPL license version <a href="http://www.gnu.org/licenses/gpl-2.0.txt">2</a>&#160;(or later).<br />
 
 </div>
 <div class="sub-section"><h3>
 <a name="s1.5" id="s1.5"></a><span class="item-no">1.5</span>&#160; Terms used here
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; * &#160;<em>administrator</em>&#160;- or admin; person setting up the code to pass input through htmLawed; also, <em>user</em><br />
+&#160; In this document, only HTML body-level elements are considered. htmLawed does not have support for head-level elements, <span class="term">body</span>, and the frame-level elements, <span class="term">frameset</span>, <span class="term">frame</span>&#160;and <span class="term">noframes</span>, and these elements are ignored here.<br />
+<br />
+&#160; * &#160;<em>administrator</em>&#160;- or admin; person setting up the code that utilizes htmLawed; also, <em>user</em><br />
 &#160; * &#160;<em>attributes</em>&#160;- name-value pairs like <span class="term">href="http&#58;//x.com"</span>&#160;in opening tags<br />
-&#160; * &#160;<em>author</em>&#160;- <em>writer</em><br />
+&#160; * &#160;<em>author</em>&#160;- see <em>writer</em><br />
 &#160; * &#160;<em>character</em>&#160;- atomic unit of text; internally represented by a numeric <em>code-point</em>&#160;as specified by the <em>encoding</em>&#160;or <em>charset</em>&#160;in use<br />
 &#160; * &#160;<em>entity</em>&#160;- markup like <span class="term">&amp;gt;</span>&#160;and <span class="term">&amp;#160;</span>&#160;used to refer to a character<br />
 &#160; * &#160;<em>element</em>&#160;- HTML element like <span class="term">a</span>&#160;and <span class="term">img</span><br />
-&#160; * &#160;<em>element content</em>&#160;- &#160;content between the opening and closing tags of an element, like <span class="term">click</span>&#160;of <span class="term">&lt;a href="x"&gt;click&lt;/a&gt;</span><br />
+&#160; * &#160;<em>element content</em>&#160;- &#160;content between the opening and closing tags of an element, like <span class="term">click</span>&#160;of the <span class="term">&lt;a href="x"&gt;click&lt;/a&gt;</span>&#160;element<br />
 &#160; * &#160;<em>HTML</em>&#160;- implies XHTML unless specified otherwise<br />
-&#160; * &#160;<em>input</em>&#160;- text string given to htmLawed to process<br />
+&#160; * &#160;<em>HTML body</em>&#160;- Complete HTML documents typically have a <em>head</em>&#160;and a <em>body</em>&#160;container. Information in <em>head</em>&#160;specifies title of the document, etc., whereas that in the body informs what is to be displayed on a web-page; it is only the elements for <em>body</em>, except <span class="term">frames</span>, <span class="term">frameset</span>&#160;and <span class="term">noframes</span>&#160;that htmLawed is concerned with<br />
+&#160; * &#160;<em>input</em>&#160;- text given to htmLawed to process<br />
 &#160; * &#160;<em>processing</em>&#160;- involves filtering, correction, etc., of input<br />
-&#160; * &#160;<em>safe</em>&#160;- absence or reduction of certain characters and HTML elements and attributes in the input that can otherwise potentially and circumstantially expose web-site users to security vulnerabilities like cross-site scripting attacks (XSS)<br />
-&#160; * &#160;<em>scheme</em>&#160;- URL protocol like <span class="term">http</span>&#160;and <span class="term">ftp</span><br />
-&#160; * &#160;<em>specs</em>&#160;- standard specifications<br />
+&#160; * &#160;<em>safe</em>&#160;- absence or reduction of certain characters and HTML elements and attributes in HTML of text that can otherwise potentially, and circumstantially, expose text readers to security vulnerabilities like cross-site scripting attacks (XSS)<br />
+&#160; * &#160;<em>scheme</em>&#160;- a URL protocol like <span class="term">http</span>&#160;and <span class="term">ftp</span><br />
+&#160; * &#160;<em>specifications</em>&#160;- standard specifications, for HTML4, HTML5, Ruby, etc.<br />
 &#160; * &#160;<em>style property</em>&#160;- terms like <span class="term">border</span>&#160;and <span class="term">height</span>&#160;for which declarations are made in values for the <span class="term">style</span>&#160;attribute of elements<br />
 &#160; * &#160;<em>tag</em>&#160;- markers like <span class="term">&lt;a href="x"&gt;</span>&#160;and <span class="term">&lt;/a&gt;</span>&#160;delineating element content; the opening tag can contain attributes<br />
 &#160; * &#160;<em>tag content</em>&#160;- consists of tag markers <span class="term">&lt;</span>&#160;and <span class="term">&gt;</span>, element names like <span class="term">div</span>, and possibly attributes<br />
@@ -250,16 +253,35 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 &#160; * &#160;<em>writer</em>&#160;- end-user like a blog commenter providing the input that is to be processed; also, <em>author</em><br />
 
 </div>
+<div class="sub-section"><h3>
+<a name="s1.6" id="s1.6"></a><span class="item-no">1.6</span>&#160; Availability
+</h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
+<br />
+&#160; htmLawed can be downloaded for free at its <a href="http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed">website</a>. Besides the <span class="term">htmLawed.php</span>&#160;file, the download has the htmLawed documentation (this document) in plain <a href="htmLawed_README.txt">text</a>&#160;and <a href="htmLawed_README.htm">HTML</a>&#160;formats, a script for <a href="htmLawedTest.php">testing</a>, and a text file for <a href="htmLawed_TESTCASE.txt">test-cases</a>. htmLawed is also available as a PHP class (OOP code) on its website.<br />
+
+</div>
 </div>
 <div class="section"><h2>
 <a name="s2" id="s2"></a><span class="item-no">2</span>&#160; Usage
 </h2><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; htmLawed should work with PHP 4.4 and higher. Either <span class="term">include()</span>&#160;the <span class="term">htmLawed.php</span>&#160;file or copy-paste the entire code.<br />
+&#160; htmLawed works in PHP version 4.4 or higher. Either <span class="term">include()</span>&#160;the <span class="term">htmLawed.php</span>&#160;file, or copy-paste the entire code. To use with PHP 4.3, have the following code included:<br />
 <br />
-&#160; To easily <strong>test</strong>&#160;htmLawed using a form-based interface, use the provided <a href="htmLawedTest.php">demo</a>&#160;(<span class="term">htmLawed.php</span>&#160;and <span class="term">htmLawedTest.php</span>&#160;should be in the same directory on the web-server).<br />
+
+<code class="code">&#160; &#160; if(!function_exists(&#39;ctype_digit&#39;)){</code>
 <br />
-&#160; <strong>Note</strong>: For code for usage of the htmLawed class (for htmLawed in OOP), please refer to this <a href="http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed/oop.htm">page</a>&#160;on the htmLawed website; the filtering itself can be configured, etc., as described here.<br />
+
+<code class="code">&#160; &#160; &#160;function ctype_digit($var){</code>
+<br />
+
+<code class="code">&#160; &#160; &#160; return ((int) $var == $var);</code>
+<br />
+
+<code class="code">&#160; &#160; &#160;}</code>
+<br />
+
+<code class="code">&#160; &#160; }</code>
+<br />
 
 <div class="sub-section"><h3>
 <a name="s2.1" id="s2.1"></a><span class="item-no">2.1</span>&#160; Simple
@@ -271,7 +293,13 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <code class="code">&#160; &#160; $processed = htmLawed($text);</code>
 <br />
 <br />
-&#160; <strong>Note</strong>: If input is from a <span class="term">$_GET</span>&#160;or <span class="term">$_POST</span>&#160;value, and <span class="term">magic quotes</span>&#160;are enabled on the PHP setup, run <span class="term">stripslashes()</span>&#160;on the input before passing to htmLawed.<br />
+&#160; With the <span class="term">htmLawed class</span>&#160;(<a href="#s1.6">section 1.6</a>), usage is:<br />
+<br />
+
+<code class="code">&#160; &#160; $processed = htmLawed&#58;&#58;hl($text);</code>
+<br />
+<br />
+&#160; <strong>Notes</strong>: (1) If input is from a <span class="term">$_GET</span>&#160;or <span class="term">$_POST</span>&#160;value, and <span class="term">magic quotes</span>&#160;are enabled on the PHP setup, run <span class="term">stripslashes()</span>&#160;on the input before passing to htmLawed. (2) htmLawed does not have support for head-level elements, <span class="term">body</span>, and the frame-level elements, <span class="term">frameset</span>, <span class="term">frame</span>&#160;and <span class="term">noframes</span>.<br />
 <br />
 &#160; By default, htmLawed will process the text allowing all valid HTML elements/tags, secure URL scheme/CSS style properties, etc. It will allow <span class="term">CDATA</span>&#160;sections and HTML comments, balance tags, and ensure proper nesting of elements. Such actions can be configured using two other optional arguments -- <span class="term">$config</span>&#160;and <span class="term">$spec</span>:<br />
 <br />
@@ -279,9 +307,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <code class="code">&#160; &#160; $processed = htmLawed($text, $config, $spec);</code>
 <br />
 <br />
-&#160; These extra parameters are detailed below. Some examples are shown in <a href="#s2.9">section 2.9</a>.<br />
-<br />
-&#160; <strong>Note</strong>: For maximum protection against <span class="term">XSS</span>&#160;and other scripting attacks (e.g., by disallowing Javascript code), consider using the <span class="term">safe</span>&#160;parameter; see <a href="#s3.6">section 3.6</a>.<br />
+&#160; The <span class="term">$config</span>&#160;and <span class="term">$spec</span>&#160;arguments are detailed below. Some examples are shown in <a href="#s2.9">section 2.9</a>. For maximum protection against <span class="term">XSS</span>&#160;and other scripting attacks (e.g., by disallowing Javascript code), consider using the <span class="term">safe</span>&#160;parameter; see <a href="#s3.6">section 3.6</a>.<br />
 
 </div>
 <div class="sub-section"><h3>
@@ -321,13 +347,13 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 &#160; Anti-link-spam measure; see <a href="#s3.4.7">section 3.4.7</a><br />
 <br />
 &#160; <span class="term">0</span>&#160;- no measure taken &#160;*<br />
-&#160; <span class="term">array("regex1", "regex2")</span>&#160;- will ensure a <span class="term">rel</span>&#160;attribute with <span class="term">nofollow</span>&#160;in its value in case the <span class="term">href</span>&#160;attribute value matches the regular expression pattern <span class="term">regex1</span>, and/or will remove <span class="term">href</span>&#160;if its value matches the regular expression pattern <span class="term">regex2</span>. E.g., <span class="term">array("/./", "/&#58;//\W&#42;(?!(abc\.com|xyz\.org))/")</span>; see <a href="#s3.4.7">section 3.4.7</a>&#160;for more.<br />
+&#160; <em>array("regex1", "regex2")</em>&#160;- will ensure a <span class="term">rel</span>&#160;attribute with <span class="term">nofollow</span>&#160;in its value in case the <span class="term">href</span>&#160;attribute value matches the regular expression pattern <span class="term">regex1</span>, and/or will remove <span class="term">href</span>&#160;if its value matches the regular expression pattern <span class="term">regex2</span>. E.g., <span class="term">array("/./", "/&#58;//\W&#42;(?!(abc\.com|xyz\.org))/")</span>; see <a href="#s3.4.7">section 3.4.7</a>&#160;for more.<br />
 <br />
 &#160; <strong>anti_mail_spam</strong><br />
 &#160; Anti-mail-spam measure; see <a href="#s3.4.7">section 3.4.7</a><br />
 <br />
 &#160; <span class="term">0</span>&#160;- no measure taken &#160;*<br />
-&#160; <span class="term">word</span>&#160;- <span class="term">@</span>&#160;in mail address in <span class="term">href</span>&#160;attribute value is replaced with specified <span class="term">word</span><br />
+&#160; <em>word</em>&#160;- <span class="term">@</span>&#160;in mail address in <span class="term">href</span>&#160;attribute value is replaced with specified <em>word</em><br />
 <br />
 &#160; <strong>balance</strong><br />
 &#160; Balance tags for well-formedness and proper nesting; see <a href="#s3.3.3">section 3.3.3</a><br />
@@ -371,7 +397,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 &#160; Denied HTML attributes; see <a href="#s3.4">section 3.4</a><br />
 <br />
 &#160; <span class="term">0</span>&#160;- none &#160;*<br />
-&#160; <span class="term">string</span>&#160;- dictated by values in <span class="term">string</span><br />
+&#160; <em>string</em>&#160;- dictated by values in <em>string</em><br />
 &#160; <span class="term">on&#42;</span>&#160;(like <span class="term">onfocus</span>) attributes not allowed - "<br />
 <br />
 &#160; <strong>direct_nest_list</strong><br />
@@ -397,13 +423,13 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 &#160; Name of an optional hook function to alter the input string, <span class="term">$config</span>&#160;or <span class="term">$spec</span>&#160;before htmLawed starts its main work; see <a href="#s3.7">section 3.7</a><br />
 <br />
 &#160; <span class="term">0</span>&#160;- no hook function &#160;*<br />
-&#160; <span class="term">name</span>&#160;- <span class="term">name</span>&#160;is name of the hook function (<span class="term">kses_hook</span>&#160; ^)<br />
+&#160; <em>name</em>&#160;- <em>name</em>&#160;is name of the hook function (<span class="term">kses_hook</span>&#160; ^)<br />
 <br />
 &#160; <strong>hook_tag</strong><br />
 &#160; Name of an optional hook function to alter tag content finalized by htmLawed; see <a href="#s3.4.9">section 3.4.9</a><br />
 <br />
 &#160; <span class="term">0</span>&#160;- no hook function &#160;*<br />
-&#160; <span class="term">name</span>&#160;- <span class="term">name</span>&#160;is name of the hook function<br />
+&#160; <em>name</em>&#160;- <em>name</em>&#160;is name of the hook function<br />
 <br />
 &#160; <strong>keep_bad</strong><br />
 &#160; Neutralize bad tags by converting <span class="term">&lt;</span>&#160;and <span class="term">&gt;</span>&#160;to entities, or remove them; see <a href="#s3.3.3">section 3.3.3</a><br />
@@ -477,7 +503,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; <span class="term">0</span>&#160;- no &#160;^<br />
 &#160; <span class="term">1</span>&#160;- remove duplicate and/or invalid ones &#160;*<br />
-&#160; <span class="term">word</span>&#160;- remove invalid ones and replace duplicate ones with new and unique ones based on the <span class="term">word</span>; the admin-specified <span class="term">word</span>, like <span class="term">my_</span>, should begin with a letter (a-z) and can contain letters, digits, <span class="term">.</span>, <span class="term">_</span>, <span class="term">-</span>, and <span class="term">&#58;</span>.<br />
+&#160; <em>word</em>&#160;- remove invalid ones and replace duplicate ones with new and unique ones based on the <em>word</em>; the admin-specified <em>word</em>, like <span class="term">my_</span>, should begin with a letter (a-z) and can contain letters, digits, <span class="term">.</span>, <span class="term">_</span>, <span class="term">-</span>, and <span class="term">&#58;</span>.<br />
 <br />
 &#160; <strong>valid_xhtml</strong><br />
 &#160; Magic parameter to make input the most valid XHTML without needing to specify other relevant <span class="term">$config</span>&#160;parameters; see <a href="#s3.5">section 3.5</a><br />
@@ -497,7 +523,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s2.3" id="s2.3"></a><span class="item-no">2.3</span>&#160; Extra HTML specifications using the $spec parameter
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; The <span class="term">$spec</span>&#160;argument can be used to disallow an otherwise legal attribute for an element, or to restrict the attribute's values. This can also be helpful as a security measure (e.g., in certain versions of browsers, certain values can cause buffer overflows and denial of service attacks), or in enforcing admin policy compliance. <span class="term">$spec</span>&#160;is specified as a string of text containing one or more <em>rules</em>, with multiple rules separated from each other by a semi-colon (<span class="term">;</span>). E.g.,<br />
+&#160; The <span class="term">$spec</span>&#160;argument of htmLawed can be used to disallow an otherwise legal attribute for an element, or to restrict the attribute's values. This can also be helpful as a security measure (e.g., in certain versions of browsers, certain values can cause buffer overflows and denial of service attacks), or in enforcing admin policies. <span class="term">$spec</span>&#160;is specified as a string of text containing one or more <em>rules</em>, with multiple rules separated from each other by a semi-colon (<span class="term">;</span>). E.g.,<br />
 <br />
 
 <code class="code">&#160; &#160; $spec = &#39;i=-&#42;; td, tr=style, id, -&#42;; a=id(match="/[a-z][a-z\d.&#58;\-&#96;"]&#42;/i"/minval=2), href(maxlen=100/minlen=34); img=-width,-alt&#39;;</code>
@@ -526,7 +552,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 &#160; * &#160;<span class="term">a=-&#42;, href, title</span>&#160;- none except <span class="term">href</span>&#160;and <span class="term">title</span><br />
 &#160; * &#160;<span class="term">a=-&#42;, -id, href, title</span>&#160;- none except <span class="term">href</span>&#160;and <span class="term">title</span><br />
 <br />
-&#160; Rules regarding <strong>attribute values</strong>&#160;are optionally specified inside round brackets after attribute names in slash ('/')-separated <em>parameter = value</em>&#160;pairs. E.g., <span class="term">title(maxlen=30/minlen=5)</span>. None, or one or more of the following parameters may be specified:<br />
+&#160; Rules regarding <strong>attribute values</strong>&#160;are optionally specified inside round brackets after attribute names in slash ('/')-separated <em>parameter = value</em>&#160;pairs. E.g., <span class="term">title(maxlen=30/minlen=5)</span>. None or one or more of the following parameters may be specified:<br />
 <br />
 &#160; * &#160;<span class="term">oneof</span>&#160;- one or more choices separated by <span class="term">|</span>&#160;that the value should match; if only one choice is provided, then the value must match that choice<br />
 <br />
@@ -558,7 +584,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; <strong>Special characters</strong>: The characters <span class="term">;</span>, <span class="term">,</span>, <span class="term">/</span>, <span class="term">(</span>, <span class="term">)</span>, <span class="term">|</span>, <span class="term">~</span>&#160;and space have special meanings in the rules. Words in the rules that use such characters, or the characters themselves, should be <em>escaped</em>&#160;by enclosing in pairs of double-quotes (<span class="term">"</span>). A back-tick (<span class="term">&#96;</span>) can be used to escape a literal <span class="term">"</span>. An example rule illustrating this is <span class="term">input=value(maxlen=30/match="/^\w/"/default="your &#96;"ID&#96;"")</span>.<br />
 <br />
-&#160; <strong>Note</strong>: To deny an attribute for all elements for which it is legal, <span class="term">$config["deny_attribute"]</span>&#160;(see <a href="#s3.4">section 3.4</a>) can be used instead of <span class="term">$spec</span>. Also, attributes can be allowed element-specifically through <span class="term">$spec</span>&#160;while being denied globally through <span class="term">$config["deny_attribute"]</span>. The <span class="term">hook_tag</span>&#160;parameter (<a href="#s3.4.9">section 3.4.9</a>) can also be used to implement the <span class="term">$spec</span>&#160;functionality.<br />
+&#160; <strong>Note</strong>: To deny an attribute for all elements for which it is legal, <span class="term">$config["deny_attribute"]</span>&#160;(see <a href="#s3.4">section 3.4</a>) can be used instead of <span class="term">$spec</span>. Also, attributes can be allowed element-specifically through <span class="term">$spec</span>&#160;while being denied globally through <span class="term">$config["deny_attribute"]</span>. The <span class="term">hook_tag</span>&#160;parameter (<a href="#s3.4.9">section 3.4.9</a>) can also be possibly used to implement a functionality like that achieved using <span class="term">$spec</span>&#160;functionality.<br />
 <br />
 &#160; <span class="term">$spec</span>&#160;can also be used to permit custom, non-standard attributes as well as custom rules for standard attributes. Thus, the following value of <span class="term">$spec</span>&#160;will permit the custom uses of the standard <span class="term">rel</span>&#160;attribute in <span class="term">input</span>&#160;(not permitted as per standards) and of a non-standard attribute, <span class="term">vFlag</span>, in <span class="term">img</span>.<br />
 <br />
@@ -566,14 +592,14 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <code class="code">&#160; &#160; $spec = &#39;img=vFlag; input=rel&#39;</code>
 <br />
 <br />
-&#160; The attribute names can contain alphabets, colons (:) and hyphens (-) but must start with an alphabet.<br />
+&#160; The attribute names can contain alphabets, colons (:) and hyphens (-), but they must start with an alphabet.<br />
 
 </div>
 <div class="sub-section"><h3>
 <a name="s2.4" id="s2.4"></a><span class="item-no">2.4</span>&#160; Performance time &amp; memory usage
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; The time and memory used by htmLawed depends on its configuration and the size of the input, and the amount, nestedness and well-formedness of the HTML markup within it. In particular, tag balancing and beautification each can increase the processing time by about a quarter.<br />
+&#160; The time and memory consumed during text processing by htmLawed depends on its configuration, the size of the input, and the amount, nestedness and well-formedness of the HTML markup within the input. In particular, tag balancing and beautification each can increase the processing time by about a quarter.<br />
 <br />
 &#160; The htmLawed <a href="htmLawedTest.php">demo</a>&#160;can be used to evaluate the performance and effects of different types of input and <span class="term">$config</span>.<br />
 
@@ -582,15 +608,13 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s2.5" id="s2.5"></a><span class="item-no">2.5</span>&#160; Some security risks to keep in mind
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; When setting the parameters/arguments (like those to allow certain HTML elements) for use with htmLawed, one should bear in mind that the setting may let through potentially <em>dangerous</em>&#160;HTML code which is meant to steal user-data, deface a website, render a page non-functional, etc.<br />
-<br />
-&#160; Unless end-users, either people or software, supplying the content are completely trusted, security issues arising from the degree of HTML usage permission has to be kept in mind. For example, following increase security risks:<br />
+&#160; When setting the parameters/arguments (like those to allow certain HTML elements) for use with htmLawed, one should bear in mind that the setting may let through potentially <em>dangerous</em>&#160;HTML code which is meant to steal user-data, deface a website, render a page non-functional, etc. Unless end-users, either people or software, supplying the content are completely trusted, security issues arising from the degree of HTML usage permitted through htmLawed's setting should be considered. For example, following increase security risks:<br />
 <br />
 &#160; * &#160;Allowing <span class="term">script</span>, <span class="term">applet</span>, <span class="term">embed</span>, <span class="term">iframe</span>&#160;or <span class="term">object</span>&#160;elements, or certain of their attributes like <span class="term">allowscriptaccess</span><br />
 <br />
 &#160; * &#160;Allowing HTML comments (some Internet Explorer versions are vulnerable with, e.g., <span class="term">&lt;!--[if gte IE 4]&gt;&lt;script&gt;alert("xss");&lt;/script&gt;&lt;![endif]--&gt;</span><br />
 <br />
-&#160; * &#160;Allowing dynamic CSS expressions (a feature of the IE browser)<br />
+&#160; * &#160;Allowing dynamic CSS expressions (some Internet Explorer versions are vulnerable)<br />
 <br />
 &#160; * &#160;Allowing the <span class="term">style</span>&#160;attribute<br />
 <br />
@@ -598,7 +622,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; Permitting the <span class="term">&#42;style&#42;</span>&#160;attribute brings in risks of <em>click-jacking</em>, <em>phishing</em>, web-page overlays, etc., <em>even</em>&#160;when the <span class="term">safe</span>&#160;parameter is enabled (see <a href="#s3.6">section 3.6</a>). Except for URLs and a few other things like CSS dynamic expressions, htmLawed currently does not check every CSS style property. It does provide ways for the code-developer implementing htmLawed to do such checks through htmLawed's <span class="term">$spec</span>&#160;argument, and through the <span class="term">hook_tag</span>&#160;parameter (see <a href="#s3.4.8">section 3.4.8</a>&#160;for more). Disallowing <span class="term">style</span>&#160;completely and relying on CSS classes and stylesheet files is recommended.<br />
 <br />
-&#160; htmLawed does not check or correct the character <strong>encoding</strong>&#160;of the input it receives. In conjunction with permitting circumstances such as when the character encoding is left undefined through HTTP headers or HTML <span class="term">meta</span>&#160;tags, this can permit an exploit (like Google's UTF-7/XSS vulnerability of the past).<br />
+&#160; htmLawed does not check or correct the character <strong>encoding</strong>&#160;of the input it receives. In conjunction with permissive circumstances, such as when the character encoding is left undefined through HTTP headers or HTML <span class="term">meta</span>&#160;tags, this can allow for an exploit (like Google's <em>UTF-7/XSS</em>&#160;vulnerability of the past).<br />
 
 </div>
 <div class="sub-section"><h3>
@@ -667,7 +691,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s2.7" id="s2.7"></a><span class="item-no">2.7</span>&#160; Tolerance for ill-written HTML
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; htmLawed can work with ill-written HTML code in the input. However, HTML that is too ill-written may not be <em>read</em>&#160;as HTML, and be considered mere plain text instead. Following statements indicate the degree of <em>looseness</em>&#160;that htmLawed can work with, and can be provided in instructions to writers:<br />
+&#160; htmLawed can work with ill-written HTML code in the input. However, HTML that is too ill-written may not be <em>read</em>&#160;as HTML, and may therefore get identified as mere plain text. Following statements indicate the degree of <em>looseness</em>&#160;that htmLawed can work with, and can be provided in instructions to writers:<br />
 <br />
 &#160; * &#160;Tags must be flanked by <span class="term">&lt;</span>&#160;and <span class="term">&gt;</span>&#160;with no <span class="term">&gt;</span>&#160;inside -- any needed <span class="term">&gt;</span>&#160;should be put in as <span class="term">&amp;gt;</span>. It is possible for tag content (element name and attributes) to be spread over many lines instead of being on one. A space may be present between the tag content and <span class="term">&gt;</span>, like <span class="term">&lt;div &gt;</span>&#160;and <span class="term">&lt;img / &gt;</span>, but not after the <span class="term">&lt;</span>.<br />
 <br />
@@ -675,13 +699,13 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; * &#160;Attribute string of elements may be liberally spaced with tabs, line-breaks, etc.<br />
 <br />
-&#160; * &#160;Attribute values may not be double-quoted, or may be single-quoted.<br />
+&#160; * &#160;Attribute values may be single- and not double-quoted.<br />
 <br />
 &#160; * &#160;Left-padding of numeric entities (like, <span class="term">&amp;#0160;</span>, <span class="term">&amp;x07ff;</span>) with <span class="term">0</span>&#160;is okay as long as the number of characters between between the <span class="term">&amp;</span>&#160;and the <span class="term">;</span>&#160;does not exceed 8. All entities must end with <span class="term">;</span>&#160;though.<br />
 <br />
-&#160; * &#160;Named character entities must be properly cased. E.g., <span class="term">&amp;Lt;</span>&#160;or <span class="term">&amp;TILDE;</span>&#160;will not be let through without modification.<br />
+&#160; * &#160;Named character entities must be properly cased. Thus, <span class="term">&amp;Lt;</span>&#160;or <span class="term">&amp;TILDE;</span>&#160;will not be recognized as entities and will be <em>neutralized</em>.<br />
 <br />
-&#160; * &#160;HTML comments should not be inside element tags (okay between tags), and should begin with <span class="term">&lt;!--</span>&#160;and end with <span class="term">--&gt;</span>. Characters like <span class="term">&lt;</span>, <span class="term">&gt;</span>, and <span class="term">&amp;</span>&#160;may be allowed inside depending on <span class="term">$config</span>, but any <span class="term">--&gt;</span>&#160;inside should be put in as <span class="term">--&amp;gt;</span>. Any <span class="term">--</span>&#160;inside will be automatically converted to <span class="term">-</span>, and a space will be added before the comment delimiter <span class="term">--&gt;</span>.<br />
+&#160; * &#160;HTML comments should not be inside element tags (they can be between tags), and should begin with <span class="term">&lt;!--</span>&#160;and end with <span class="term">--&gt;</span>. Characters like <span class="term">&lt;</span>, <span class="term">&gt;</span>, and <span class="term">&amp;</span>&#160;may be allowed inside depending on <span class="term">$config</span>, but any <span class="term">--&gt;</span>&#160;inside should be put in as <span class="term">--&amp;gt;</span>. Any <span class="term">--</span>&#160;inside will be automatically converted to <span class="term">-</span>, and a space will be added before the comment delimiter <span class="term">--&gt;</span>.<br />
 <br />
 &#160; * &#160;<span class="term">CDATA</span>&#160;sections should not be inside element tags, and can be in element content only if plain text is allowed for that element. They should begin with <span class="term">&lt;[CDATA[</span>&#160;and end with <span class="term">]]&gt;</span>. Characters like <span class="term">&lt;</span>, <span class="term">&gt;</span>, and <span class="term">&amp;</span>&#160;may be allowed inside depending on <span class="term">$config</span>, but any <span class="term">]]&gt;</span>&#160;inside should be put in as <span class="term">]]&amp;gt;</span>.<br />
 <br />
@@ -696,22 +720,22 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 &#160; * &#160;With <span class="term">$config["unique_ids"]</span>&#160;not <span class="term">0</span>&#160;and the <span class="term">id</span>&#160;attribute being permitted, writers should carefully avoid using duplicate or invalid <span class="term">id</span>&#160;values as even though htmLawed will correct/remove the values, the final output may not be the one desired. E.g., when <span class="term">&lt;a id="home"&gt;&lt;/a&gt;&lt;input id="home" /&gt;&lt;label for="home"&gt;&lt;/label&gt;</span>&#160;is processed into<br />
 <span class="term">&lt;a id="home"&gt;&lt;/a&gt;&lt;input id="prefix_home" /&gt;&lt;label for="home"&gt;&lt;/label&gt;</span>.<br />
 <br />
-&#160; * &#160;Note that even if intended HTML is lost in a highly ill-written input, the processed output will be more secure and standard-compliant.<br />
+&#160; * &#160;Even if intended HTML is lost from an ill-written input, the processed output will be more secure and standard-compliant.<br />
 <br />
 &#160; * &#160;For URLs, unless <span class="term">$config["scheme"]</span>&#160;is appropriately set, writers should avoid using escape characters or entities in schemes. E.g., <span class="term">htt&amp;#112;</span>&#160;(which many browsers will read as the harmless <span class="term">http</span>) may be considered bad by htmLawed.<br />
 <br />
-&#160; * &#160;htmLawed will attempt to put plain text present directly inside <span class="term">blockquote</span>, <span class="term">form</span>, <span class="term">map</span>&#160;and <span class="term">noscript</span>&#160;elements (illegal as per the specs) inside auto-generated <span class="term">div</span>&#160;elements.<br />
+&#160; * &#160;htmLawed will attempt to put plain text present directly inside <span class="term">blockquote</span>, <span class="term">form</span>, <span class="term">map</span>&#160;and <span class="term">noscript</span>&#160;elements (illegal as per the specifications) inside auto-generated <span class="term">div</span>&#160;elements.<br />
 
 </div>
 <div class="sub-section"><h3>
 <a name="s2.8" id="s2.8"></a><span class="item-no">2.8</span>&#160; Limitations &amp; work-arounds
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; htmLawed's main objective is to make the input text <em>more</em>&#160;standard-compliant, secure for web-page readers, and free of HTML elements and attributes considered undesirable by the administrator. Some of its current limitations, regardless of this objective, are noted below along with work-arounds.<br />
+&#160; htmLawed's main objective is to make the input text <em>more</em>&#160;standard-compliant, secure for readers, and free of HTML elements and attributes considered undesirable by the administrator. Some of its current limitations, regardless of this objective, are noted below along with work-arounds.<br />
 <br />
-&#160; It should be borne in mind that no browser application is 100% standard-compliant, and that some of the standard specs (like asking for normalization of white-spacing within <span class="term">textarea</span>&#160;elements) are clearly wrong. Regarding security, note that <em>unsafe</em>&#160;HTML code is not necessarily legally invalid.<br />
+&#160; It should be borne in mind that no browser application is 100% standard-compliant, and that some of the standard specifications (like asking for normalization of white-spacing within <span class="term">textarea</span>&#160;elements) are clearly wrong. Regarding security, note that <em>unsafe</em>&#160;HTML code is not legally invalid per se.<br />
 <br />
-&#160; * &#160;htmLawed is meant for input that goes into the <span class="term">body</span>&#160;of HTML documents. HTML's head-level elements are not supported, nor are the frameset elements <span class="term">frameset</span>, <span class="term">frame</span>&#160;and <span class="term">noframes</span>.<br />
+&#160; * &#160;htmLawed is meant for input that goes into the <span class="term">body</span>&#160;of HTML documents. HTML's head-level elements are not supported, nor are the frameset elements <span class="term">frameset</span>, <span class="term">frame</span>&#160;and <span class="term">noframes</span>. Content of the latter elements can, however, be individually filtered through htmLawed.<br />
 <br />
 &#160; * &#160;It cannot transform the non-standard <span class="term">embed</span>&#160;elements to the standard-compliant <span class="term">object</span>&#160;elements. Yet, it can allow <span class="term">embed</span>&#160;elements if permitted (<span class="term">embed</span>&#160;is widely used and supported). Admins can certainly use the <span class="term">hook_tag</span>&#160;parameter (<a href="#s3.4.9">section 3.4.9</a>) to deploy a custom embed-to-object converter function.<br />
 <br />
@@ -721,7 +745,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; * &#160;By default, htmLawed won't check many attribute values for standard compliance. E.g., <span class="term">width="20m"</span>&#160;with the dimension in non-standard <span class="term">m</span>&#160;is let through. Implementing universal and strict attribute value checks can make htmLawed slow and resource-intensive. Admins should look at the <span class="term">hook_tag</span>&#160;parameter (<a href="#s3.4.9">section 3.4.9</a>) or <span class="term">$spec</span>&#160;to enforce finer checks.<br />
 <br />
-&#160; * &#160;The attributes, deprecated (which can be transformed too) or not, that it supports are largely those that are in the specs. Only a few of the proprietary attributes are supported.<br />
+&#160; * &#160;The attributes, deprecated (which can be transformed too) or not, that it supports are largely those that are in the specifications. Only a few of the proprietary attributes are supported.<br />
 <br />
 &#160; * &#160;Except for contained URLs and dynamic expressions (also optional), htmLawed does not check CSS style property values. Admins should look at using the <span class="term">hook_tag</span>&#160;parameter (<a href="#s3.4.9">section 3.4.9</a>) or <span class="term">$spec</span>&#160;for finer checks. Perhaps the best option is to disallow <span class="term">style</span>&#160;but allow <span class="term">class</span>&#160;attributes with the right <span class="term">oneof</span>&#160;or <span class="term">match</span>&#160;values for <span class="term">class</span>, and have the various class style properties in <span class="term">.css</span>&#160;CSS stylesheet files.<br />
 <br />
@@ -733,11 +757,11 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; * &#160;Except for optionally converting absolute or relative URLs to the other type, htmLawed will not alter URLs (e.g., to change the value of query strings or to convert <span class="term">http</span>&#160;to <span class="term">https</span>. Having absolute URLs may be a standard-requirement, e.g., when HTML is embedded in email messages, whereas altering URLs for other purposes is beyond htmLawed's goals. Admins may be able to use a custom hook function to enforce such checks (<span class="term">hook_tag</span>&#160;parameter; see <a href="#s3.4.9">section 3.4.9</a>).<br />
 <br />
-&#160; * &#160;Pairs of opening and closing tags that do not enclose any content (like <span class="term">&lt;em&gt;&lt;/em&gt;</span>) are not removed. This may be against the standard specs for certain elements (e.g., <span class="term">table</span>). However, presence of such standard-incompliant code will not break the display or layout of content. Admins can also use simple regex-based code to filter out such code.<br />
+&#160; * &#160;Pairs of opening and closing tags that do not enclose any content (like <span class="term">&lt;em&gt;&lt;/em&gt;</span>) are not removed. This may be against the standard specifications for certain elements (e.g., <span class="term">table</span>). However, presence of such standard-incompliant code will not break the display or layout of content. Admins can also use simple regex-based code to filter out such code.<br />
 <br />
-&#160; * &#160;htmLawed does not check for certain element orderings described in the standard specs (e.g., in a <span class="term">table</span>, <span class="term">tbody</span>&#160;is allowed before <span class="term">tfoot</span>). Admins may be able to use a custom hook function to enforce such checks (<span class="term">hook_tag</span>&#160;parameter; see <a href="#s3.4.9">section 3.4.9</a>).<br />
+&#160; * &#160;htmLawed does not check for certain element orderings described in the standard specifications (e.g., in a <span class="term">table</span>, <span class="term">tbody</span>&#160;is allowed before <span class="term">tfoot</span>). Admins may be able to use a custom hook function to enforce such checks (<span class="term">hook_tag</span>&#160;parameter; see <a href="#s3.4.9">section 3.4.9</a>).<br />
 <br />
-&#160; * &#160;htmLawed does not check the number of nested elements. E.g., it will allow two <span class="term">caption</span>&#160;elements in a <span class="term">table</span>&#160;element, illegal as per the specs. Admins may be able to use a custom hook function to enforce such checks (<span class="term">hook_tag</span>&#160;parameter; see <a href="#s3.4.9">section 3.4.9</a>).<br />
+&#160; * &#160;htmLawed does not check the number of nested elements. E.g., it will allow two <span class="term">caption</span>&#160;elements in a <span class="term">table</span>&#160;element, illegal as per the specifications. Admins may be able to use a custom hook function to enforce such checks (<span class="term">hook_tag</span>&#160;parameter; see <a href="#s3.4.9">section 3.4.9</a>).<br />
 <br />
 &#160; * &#160;htmLawed might convert certain entities to actual characters and remove backslashes and CSS comment-markers (<span class="term">/&#42;</span>) in <span class="term">style</span>&#160;attribute values in order to detect malicious HTML like crafted IE-specific dynamic expressions like <span class="term">&amp;#101;xpression...</span>. If this is too harsh, admins can allow CSS expressions through htmLawed core but then use a custom function through the <span class="term">hook_tag</span>&#160;parameter (<a href="#s3.4.9">section 3.4.9</a>) to more specifically identify CSS expressions in the <span class="term">style</span>&#160;attribute values. Also, using <span class="term">$config["style_pass"]</span>, it is possible to have htmLawed pass <span class="term">style</span>&#160;attribute values without even looking at them (<a href="#s3.4.8">section 3.4.8</a>).<br />
 <br />
@@ -745,7 +769,9 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; * &#160;Because of poor Unicode support in PHP, htmLawed does not remove the <em>high value</em>&#160;HTML-invalid characters with multi-byte code-points. Such characters however are extremely unlikely to be in the input. (see <a href="#s3.1">section 3.1</a>).<br />
 <br />
-&#160; * &#160;htmLawed does not check or correct the character encoding of the input it receives. In conjunction with permitting circumstances such as when the character encoding is left undefined through HTTP headers or HTML <span class="term">meta</span>&#160;tags, this can permit an exploit (like Google's UTF-7/XSS vulnerability of the past).<br />
+&#160; * &#160;htmLawed does not check or correct the character encoding of the input it receives. In conjunction with permitting circumstances such as when the character encoding is left undefined through HTTP headers or HTML <span class="term">meta</span>&#160;tags, this can permit an exploit (like Google's <em>UTF-7/XSS</em>&#160;vulnerability of the past). Also, htmLawed can mangle input text if it is not well-formed in terms of character encoding. Administrators can consider using code available elsewhere to check well-formedness of input text characters to correct any defect.<br />
+<br />
+&#160; * &#160;htmLawed is expected to work with input texts in ASCII-compatible single byte encodings such as national variants of ASCII (like ISO-646-DE/German of the ISO 646 standard), extended ASCII variants (like ISO 8859-10/Turkish of the ISO 8859/ISO Latin standard), ISO 8859-based Windows variants (like Windows 1252), EBCDIC, Shift JIS (Japanese), GB-Roman (Chinese), and KS-Roman (Korean). It should also properly handle texts with variable byte encodings like UTF-7 (Unicode) and UTF-8 (Unicode). However, htmLawed may mangle input texts with double byte encodings like UTF-16 (Unicode), JIS X 0208:1997 (Japanese) and K SX 1001:1992 (Korean), or the UTF-32 (Unicode) quadruple byte encoding. If an input text has such an encoding, administrators can use PHP's <a href="http://php.net/manual/en/book.iconv.php">iconv</a>&#160;functions, or some other mean, to convert text to UTF-8 before passing it to htmLawed.<br />
 <br />
 &#160; * &#160;Like any script using PHP's PCRE regex functions, PHP setup-specific low PCRE limit values can cause htmLawed to at least partially fail with very long input texts.<br />
 
@@ -835,9 +861,18 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <code class="code">&#160; &#160; $out = htmLawed($in, $config, $spec);</code>
 <br />
 <br />
+&#160; Allowing a custom attribute, <span class="term">vFlag</span>, in <span class="term">img</span>&#160;and permitting custom use of the standard attribute, <span class="term">rel</span>, in <span class="term">input</span>&#160;--<br />
+<br />
+
+<code class="code">&#160; &#160; $spec = &#39;img=vFlag; input=rel&#39;;</code>
+<br />
+
+<code class="code">&#160; &#160; $out = htmLawed($in, $config, $spec);</code>
+<br />
+<br />
 &#160; Some case-studies are presented below.<br />
 <br />
-&#160; <strong>1.</strong>&#160;A blog administrator wants to allow only <span class="term">a</span>, <span class="term">em</span>, <span class="term">strike</span>, <span class="term">strong</span>&#160;and <span class="term">u</span>&#160;in comments, but needs <span class="term">strike</span>&#160;and <span class="term">u</span>&#160;transformed to <span class="term">span</span>&#160;for better XHTML 1-strict compliance, and, he wants the <span class="term">a</span>&#160;links to be to <span class="term">http</span>&#160;or <span class="term">https</span>&#160;resources:<br />
+&#160; <strong>1.</strong>&#160;A blog administrator wants to allow only <span class="term">a</span>, <span class="term">em</span>, <span class="term">strike</span>, <span class="term">strong</span>&#160;and <span class="term">u</span>&#160;in comments, but needs <span class="term">strike</span>&#160;and <span class="term">u</span>&#160;transformed to <span class="term">span</span>&#160;for better XHTML 1-strict compliance, and, he wants the <span class="term">a</span>&#160;links to point only to <span class="term">http</span>&#160;or <span class="term">https</span>&#160;resources:<br />
 <br />
 
 <code class="code">&#160; &#160; $processed = htmLawed($in, array(&#39;elements&#39;=&gt;&#39;a, em, strike, strong, u&#39;, &#39;make_tag_strict&#39;=&gt;1, &#39;safe&#39;=&gt;1, &#39;schemes&#39;=&gt;&#39;&#42;&#58;http, https&#39;), &#39;a=href&#39;);</code>
@@ -880,7 +915,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; The character values are replaced with entities/characters and not character values referred to by the entities/characters to keep this task independent of the character-encoding of input text.<br />
 <br />
-&#160; The <span class="term">$config["clean_ms_char"]</span>&#160;parameter should not be used if authors do not copy-paste Microsoft-created text, or if the input text is not believed to use the <span class="term">Windows 1252</span>&#160;(<span class="term">Cp-1252</span>) or a similar encoding like <span class="term">Cp-1251</span>. Further, the input form and the web-pages displaying it or its content should have the character encoding appropriately marked-up.<br />
+&#160; The <span class="term">$config["clean_ms_char"]</span>&#160;parameter should not be used if authors do not copy-paste Microsoft-created text, or if the input text is not believed to use the <span class="term">Windows 1252</span>&#160;(<span class="term">Cp-1252</span>) or a similar encoding like <span class="term">Cp-1251</span>&#160;(otherwise, for example when UTF-8 encoding is in use, Japanese or Korean characters can get mangled). Further, the input form and the web-pages displaying it or its content should have the character encoding appropriately marked-up.<br />
 
 </div>
 <div class="sub-section"><h3>
@@ -1689,7 +1724,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s3.9" id="s3.9"></a><span class="item-no">3.9</span>&#160; Retaining non-HTML tags in input with mixed markup
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; htmLawed does not remove certain characters that though invalid are nevertheless discouraged in HTML documents as per the specs (see <a href="#s5.1">section 5.1</a>). This can be utilized to deal with input that contains mixed markup. Input that may have HTML markup as well as some other markup that is based on the <span class="term">&lt;</span>, <span class="term">&gt;</span>&#160;and <span class="term">&amp;</span>&#160;characters is considered to have mixed markup. The non-HTML markup can be rather proprietary (like markup for emoticons/smileys), or standard (like MathML or SVG). Or it can be programming code meant for execution/evaluation (such as embedded PHP code).<br />
+&#160; htmLawed does not remove certain characters that, though invalid, are nevertheless <em>discouraged</em>&#160;in HTML documents as per the specifications (see <a href="#s5.1">section 5.1</a>). This can be utilized to deal with input that contains mixed markup. Input that may have HTML markup as well as some other markup that is based on the <span class="term">&lt;</span>, <span class="term">&gt;</span>&#160;and <span class="term">&amp;</span>&#160;characters is considered to have mixed markup. The non-HTML markup can be rather proprietary (like markup for emoticons/smileys), or standard (like MathML or SVG). Or it can be programming code meant for execution/evaluation (such as embedded PHP code).<br />
 <br />
 &#160; To deal with such mixed markup, the input text can be pre-processed to hide the non-HTML markup by specifically replacing the <span class="term">&lt;</span>, <span class="term">&gt;</span>&#160;and <span class="term">&amp;</span>&#160;characters with some of the HTML-discouraged characters (see <a href="#s3.1.2">section 3.1.2</a>). Post-htmLawed processing, the replacements are reverted.<br />
 <br />
@@ -1718,7 +1753,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s4.1" id="s4.1"></a><span class="item-no">4.1</span>&#160; Support
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; A careful re-reading of this documentation will very likely answer your questions.<br />
+&#160; A careful reading of this documentation may provide an answer.<br />
 <br />
 &#160; Software updates and forum-based community-support may be found at <a href="http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed">http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed</a>. For general PHP issues (not htmLawed-specific), support may be found through internet searches and at <a href="http://php.net">http://php.net</a>.<br />
 
@@ -1728,25 +1763,33 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
 &#160; See <a href="#s2.8">section 2.8</a>.<br />
-<br />
-&#160; Readers are advised to cross-check information given in this document.<br />
 
 </div>
 <div class="sub-section"><h3>
 <a name="s4.3" id="s4.3"></a><span class="item-no">4.3</span>&#160; Change-log
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; (The release date for the downloadable package of files containing documentation, demo script, test-cases, etc., besides the <span class="term">htmLawed.php</span>&#160;file may be updated independently if the secondary files are revised.)<br />
+&#160; (The release date for the downloadable package of files containing documentation, demo script, test-cases, etc., besides the <span class="term">htmLawed.php</span>&#160;file, may be updated without a change-log entry if the secondary files, but not htmLawed per se, are revised.)<br />
 <br />
 &#160; <em>Version number - Release date. Notes</em><br />
+<br />
+&#160; 1.1.18 - 2 August 2014. Fix for a potential security vulnerability arising from specially encoded text with serial opening tags<br />
+<br />
+&#160; 1.1.17 - 11 March 2014. Removed use of PHP function preg_replace with <span class="term">e</span>&#160;modifier for compatibility with PHP 5.5<br />
+<br />
+&#160; 1.1.16 - 29 August 2013. Fix for a potential security vulnerability arising from specially encoded space characters in URL schemes/protocols<br />
+<br />
+&#160; 1.1.15 - 11 August 2013. Improved tidying/prettifying functionality<br />
+<br />
+&#160; 1.1.14 - 8 August 2012. Fix for possible segmental loss of incremental indentation during <span class="term">tidying</span>&#160;when <span class="term">balance</span>&#160;is disabled; fix for non-effectuation under some circumstances of a corrective behavior to preserve plain text within elements like <span class="term">blockquote</span>.<br />
 <br />
 &#160; 1.1.13 - 22 July 2012. Added feature allowing use of custom, non-standard attributes or custom rules for standard attributes<br />
 <br />
 &#160; 1.1.12 - 5 July 2012. Fix for a bug in identifying an unquoted value of the <span class="term">face</span>&#160;attribute<br />
 <br />
-&#160; 1.1.11 - 5 June 2012. Fix for possible problem with handling of multi-byte characters in attribute values in an mbstring.func_overload enviroment. <span class="term">$config["hook_tag"]</span>, if specified, now receives names of elements in closing tags.<br />
+&#160; 1.1.11 - 5 June 2012. Fix for possible problem with handling of multi-byte characters in attribute values in an mbstring.func_overload environment. <span class="term">$config["hook_tag"]</span>, if specified, now receives names of elements in closing tags.<br />
 <br />
-&#160; 1.1.10 - 22 October 2011. Fix for a bug in the <span class="term">tidy</span>&#160;functionality that caused the entire input to be replaced with a single space; new parameter, <span class="term">$config["direct_list_nest"]</span>&#160;to allow direct descendance of a list in a list. (5 April 2012. Dual licensing from LGPLv3 to LGPLv3 and GPLv2+.)<br />
+&#160; 1.1.10 - 22 October 2011. Fix for a bug in the <span class="term">tidy</span>&#160;functionality that caused the entire input to be replaced with a single space; new parameter, <span class="term">$config["direct_list_nest"]</span>&#160;to allow direct descendence of a list in a list. (5 April 2012. Dual licensing from LGPLv3 to LGPLv3 and GPLv2+.)<br />
 <br />
 &#160; 1.1.9.5 - 6 July 2011. Minor correction of a rule for nesting of <span class="term">li</span>&#160;within <span class="term">dir</span><br />
 <br />
@@ -1772,11 +1815,11 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; 1.1.1 - 27 September 2008. Better nesting correction when omitable closing tags are absent<br />
 <br />
-&#160; 1.1 - 29 June 2008. <span class="term">$config["hook_tag"]</span>&#160;and <span class="term">$config["format"]</span>&#160;introduced for custom tag/attribute check/modification/injection and output compaction/beautification; fixed a regex-in-$spec parsing bug<br />
+&#160; 1.1 - 29 June 2008. <span class="term">$config["hook_tag"]</span>&#160;and <span class="term">$config["tidy"]</span>&#160;introduced for custom tag/attribute check/modification/injection and output compaction/beautification; fixed a regex-in-$spec parsing bug<br />
 <br />
-&#160; 1.0.9 - 11 June 2008. Fixed bug in invalid HTML code-point entity check<br />
+&#160; 1.0.9 - 11 June 2008. Fix for a bug in checks for invalid HTML code-point entities<br />
 <br />
-&#160; 1.0.8 - 15 May 2008. <span class="term">bordercolor</span>&#160;attribute for <span class="term">table</span>, <span class="term">td</span>&#160;and <span class="term">tr</span><br />
+&#160; 1.0.8 - 15 May 2008. Permit <span class="term">bordercolor</span>&#160;attribute for <span class="term">table</span>, <span class="term">td</span>&#160;and <span class="term">tr</span><br />
 <br />
 &#160; 1.0.7 - 1 May 2008. Support for <span class="term">wmode</span>&#160;attribute for <span class="term">embed</span>; <span class="term">$config["show_setting"]</span>&#160;introduced; improved <span class="term">$config["elements"]</span>&#160;evaluation<br />
 <br />
@@ -1786,7 +1829,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; 1.0.4 - 10 March 2008. Improved corrections for <span class="term">blockquote</span>, <span class="term">form</span>, <span class="term">map</span>&#160;and <span class="term">noscript</span><br />
 <br />
-&#160; 1.0.3 - 3 March 2008. Character entities for soft-hyphens are now replaced with spaces (instead of being removed); a bug allowing <span class="term">td</span>&#160;directly inside <span class="term">table</span>&#160;fixed; <span class="term">safe</span>&#160;<span class="term">$config</span>&#160;parameter added<br />
+&#160; 1.0.3 - 3 March 2008. Character entities for soft-hyphens are now replaced with spaces (instead of being removed); fix for a bug allowing <span class="term">td</span>&#160;directly inside <span class="term">table</span>; <span class="term">$config["safe"]</span>&#160;introduced<br />
 <br />
 &#160; 1.0.2 - 13 February 2008. Improved implementation of <span class="term">$config["keep_bad"]</span><br />
 <br />
@@ -1819,7 +1862,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s4.6" id="s4.6"></a><span class="item-no">4.6</span>&#160; Comparison with <span class="term">HTMLPurifier</span>
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; The HTMLPurifier PHP library by Edward Yang is a very good HTML filtering script that uses object oriented PHP code. Compared to htmLawed, it (as of mid-2009):<br />
+&#160; The HTMLPurifier PHP library by Edward Yang is a very good HTML filtering script that uses object oriented PHP code. Compared to htmLawed, it (as of year 2010):<br />
 <br />
 &#160; * &#160;does not support PHP versions older than 5.0 (HTMLPurifier dropped PHP 4 support after version 2)<br />
 <br />
@@ -1863,7 +1906,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s4.10" id="s4.10"></a><span class="item-no">4.10</span>&#160; Acknowledgements
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; Nicholas Alipaz, Bryan Blakey, Pádraic Brady, Ulf Harnhammer, Gareth Heyes, Klaus Leithoff, Lukasz Pilorz, Shelley Powers, Edward Yang, and many anonymous users.<br />
+&#160; Nicholas Alipaz, Bryan Blakey, Pádraic Brady, Dac Chartrand, Ulf Harnhammer, Gareth Heyes, Klaus Leithoff, Lukasz Pilorz, Shelley Powers, Psych0tr1a, Lincoln Russell, Harro Verton, Edward Yang, and many anonymous users.<br />
 <br />
 &#160; Thank you!<br />
 
@@ -1885,7 +1928,7 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <a name="s5.2" id="s5.2"></a><span class="item-no">5.2</span>&#160; Valid attribute-element combinations
 </h3><span class="totop"><a href="#peak">(to top)</a></span><br style="clear: both;" />
 <br />
-&#160; Valid attribute-element combinations as per W3C specs.<br />
+&#160; Valid attribute-element combinations as per <a href="http://www.w3c.org">W3C</a>&#160;specs.<br />
 <br />
 &#160; * &#160;includes deprecated attributes (marked <span class="term">^</span>), attributes for the non-standard <span class="term">embed</span>&#160;element (marked <span class="term">&#42;</span>), and the proprietary <span class="term">bordercolor</span>&#160;(marked <span class="term">~</span>)<br />
 &#160; * &#160;only non-frameset, HTML body elements<br />
@@ -2095,11 +2138,11 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; <strong>Function arguments</strong>&#160;for htmLawed are:<br />
 <br />
-&#160; * &#160;<span class="term">$in</span>&#160;- 1st argument; a text string; the <strong>input text</strong>&#160;to be processed. Any extraneous slashes added by PHP when <em>magic quotes</em>&#160;are enabled should be removed beforehand using PHP's <span class="term">stripslashes()</span>&#160;function.<br />
+&#160; * &#160;<span class="term">$in</span>&#160;- first argument; a text string; the <strong>input text</strong>&#160;to be processed. Any extraneous slashes added by PHP when <em>magic quotes</em>&#160;are enabled should be removed beforehand using PHP's <span class="term">stripslashes()</span>&#160;function.<br />
 <br />
-&#160; * &#160;<span class="term">$config</span>&#160;- 2nd argument; an associative array; optional (named <span class="term">$C</span>&#160;in htmLawed code). The array has keys with names like <span class="term">balance</span>&#160;and <span class="term">keep_bad</span>, and the values, which can be boolean, string, or array, depending on the key, are read to accordingly set the <strong>configurable parameters</strong>&#160;(indicated by the keys). All configurable parameters receive some default value if the value to be used is not specified by the user through <span class="term">$config</span>. <em>Finalized</em>&#160;<span class="term">$config</span>&#160;is thus a filtered and possibly larger array.<br />
+&#160; * &#160;<span class="term">$config</span>&#160;- second argument; an associative array; optional; named <span class="term">$C</span>&#160;within htmLawed code. The array has keys with names like <span class="term">balance</span>&#160;and <span class="term">keep_bad</span>, and the values, which can be boolean, string, or array, depending on the key, are read to accordingly set the <strong>configurable parameters</strong>&#160;(indicated by the keys). All configurable parameters receive some default value if the value to be used is not specified by the user through <span class="term">$config</span>. <em>Finalized</em>&#160;<span class="term">$config</span>&#160;is thus a filtered and possibly larger array.<br />
 <br />
-&#160; * &#160;<span class="term">$spec</span>&#160;- 3rd argument; a text string; optional. The string has rules, written in an htmLawed-designated format, <strong>specifying</strong>&#160;element-specific attribute and attribute value restrictions. Function <span class="term">hl_spec()</span>&#160;is used to convert the string to an associative-array for internal use. <em>Finalized</em>&#160;<span class="term">$spec</span>&#160;is thus an array.<br />
+&#160; * &#160;<span class="term">$spec</span>&#160;- third argument; a text string; optional. The string has rules, written in an htmLawed-designated format, <strong>specifying</strong>&#160;element-specific attribute and attribute value restrictions. Function <span class="term">hl_spec()</span>&#160;is used to convert the string to an associative-array, named <span class="term">$S</span>&#160;within htmLawed code, for internal use. <em>Finalized</em>&#160;<span class="term">$spec</span>&#160;is thus an array.<br />
 <br />
 &#160; <em>Finalized</em>&#160;<span class="term">$config</span>&#160;and <span class="term">$spec</span>&#160;are made <strong>global variables</strong>&#160;while htmLawed is at work. Values of any pre-existing global variables with same names are noted, and their values are restored after htmLawed finishes processing the input (to capture the <em>finalized</em>&#160;values, the <span class="term">show_settings</span>&#160;parameter of <span class="term">$config</span>&#160;should be used). Depending on <span class="term">$config</span>, another global variable <span class="term">hl_Ids</span>, to track <span class="term">id</span>&#160;attribute values for uniqueness, may be set. Unlike the other two variables, this one is not reset (or unset) post-processing.<br />
 <br />
@@ -2126,13 +2169,13 @@ A PHP Labware internal utility &#45; <a href="http://www.bioinformatics.org/phpl
 <br />
 &#160; After this <em>initial processing</em>&#160;<span class="term">htmLawed()</span>&#160;identifies tags using regex and processes them with the help of <span class="term">hl_tag()</span>&#160;-- &#160;a large function that analyzes tag content, filtering it as per HTML standards, <span class="term">$config</span>&#160;and <span class="term">$spec</span>. Among other things, <span class="term">hl_tag()</span>&#160;transforms deprecated elements using <span class="term">hl_tag2()</span>, removes attributes from closing tags, checks attribute values as per <span class="term">$spec</span>&#160;rules using <span class="term">hl_attrval()</span>, and checks URL protocols using <span class="term">hl_prot()</span>. <span class="term">htmLawed()</span>&#160;performs tag balancing and nesting checks with a call to <span class="term">hl_bal()</span>, and optionally compacts/beautifies the output with proper white-spacing with a call to <span class="term">hl_tidy()</span>. The latter temporarily replaces white-space, and <span class="term">&lt;</span>, <span class="term">&gt;</span>&#160;and <span class="term">&amp;</span>&#160;characters inside <span class="term">pre</span>, <span class="term">script</span>&#160;and <span class="term">textarea</span>&#160;elements, and HTML comments and CDATA sections with control characters (code-points <span class="term">1</span>&#160;to <span class="term">5</span>, and <span class="term">7</span>).<br />
 <br />
-&#160; htmLawed permits the use of custom code or <strong>hook functions</strong>&#160;at two stages. The first, called inside <span class="term">htmLawed()</span>, allows the input text as well as the finalized $config and $spec values to be altered right after the initial processing (see <a href="#s3.7">section 3.7</a>). The second is called by <span class="term">hl_tag()</span>&#160;once the tag content is finalized (see <a href="#s3.4.9">section 3.4.9</a>).<br />
+&#160; htmLawed permits the use of custom code or <strong>hook functions</strong>&#160;at two stages. The first, called inside <span class="term">htmLawed()</span>, allows the input text as well as the finalized <span class="term">$config</span>&#160;and <span class="term">$spec</span>&#160;values to be altered right after the initial processing (see <a href="#s3.7">section 3.7</a>). The second is called by <span class="term">hl_tag()</span>&#160;once the tag content is finalized (see <a href="#s3.4.9">section 3.4.9</a>).<br />
 <br />
-&#160; Being dictated by the external and stable HTML standard, htmLawed's objective is very clear-cut and less concerned with tweakability. The code is only minimally annotated with comments -- it is not meant to instruct; PHP developers familiar with the HTML specs will see the logic, and others can always refer to the htmLawed documentation. The compact structuring of the statements is meant to aid in quickly grasping the logic, at least when viewed with code syntax highlighted.
+&#160; The functionality of htmLawed is dictated by the external HTML standard. It is thus coded for a clear-cut objective with not much concern for tweakability. The code is only minimally annotated with comments -- it is not meant to instruct; PHP developers familiar with the HTML specifications will see the logic, and others can always refer to the htmLawed documentation. The compact structuring of the statements is meant to aid a quick grasp of the logic.
 </div>
 </div>
 <br />
-<hr /><br /><br /><span class="subtle"><small>HTM version of <em><a href="htmLawed_README.txt">htmLawed_README.txt</a></em> generated on 22 Jul, 2012 using <a href="http://www.bioinformatics.org/phplabware/internal_utilities">rTxt2htm</a> from PHP Labware</small></span>
+<hr /><br /><br /><span class="subtle"><small>HTM version of <em><a href="htmLawed_README.txt">htmLawed_README.txt</a></em> generated on 02 Aug, 2014 using <a href="http://www.bioinformatics.org/phplabware/internal_utilities">rTxt2htm</a> from PHP Labware</small></span>
 </div><!-- ended div body -->
 </div><!-- ended div top -->
 </body>

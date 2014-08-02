@@ -1,6 +1,6 @@
 /*
-htmLawed_TESTCASE.txt, 22 July 2012
-htmLawed 1.1.13, 22 July 2012
+htmLawed_TESTCASE.txt, 2 August 2014
+htmLawed 1.1.18, 2 August 2014
 Copyright Santosh Patnaik
 Dual licensed with LGPL 3 and GPL 2+
 A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed
@@ -28,6 +28,7 @@ character encoding to Unicode/UTF-8
 <strong>Deprecated:</strong> <a id="id7" target="self" name="n">a</a>, <hr noshade="noshade" /><br />
 <strong>Casing:</strong> <a HREF=""></a><br />
 <strong>Custom:</strong> <img alt="image" my:data="portrait" /><br />
+<strong>Data-*:</strong> <a data-xml="x" data-xmnt="x" data-xmlnt="x" data-xmn:t="x" data-xmxm="x">a</a><br />
 <strong>Admin-restricted?:</strong> <a href="x" onclick="alert();"></a>
 
 <h6>Attribute values</h6>
@@ -47,6 +48,11 @@ character encoding to Unicode/UTF-8
 <blockquote><div>abc</div>def</blockquote><br />
 <blockquote>abc<div>def</div>ghi</blockquote><br />
 abc<div>def</div>ghi<br />
+<blockquote>QQQ<div>x</div><!-- comment --></blockquote><br />
+<blockquote><div>x</div><!-- comment -->QQQ</blockquote><br />
+<blockquote><!-- comment --><div>x</div>QQQ<div>x</div></blockquote><br />
+<blockquote><div>x<!-- comment --></div>QQQ</blockquote><p>x</p><br />
+<br />
 (try with blockquote parent)
 
 <h6>CDATA sections</h6>
@@ -129,8 +135,9 @@ Disallowed tag p
 <strong>Invalid:</strong> <image src="s" alt="a" /><br />
 <strong>Empty:</strong> <img src="s" alt="a" />, <img src="s" alt="a"></img>, <img src="s" alt="a">text</img><br />
 <strong>Content invalid:</strong> <a href="h">1<a>2</a></a><br />
-<strong>Content invalid?:</strong> <form></form><br /> (try setting 'form' as parent)
-<strong>Casing:</strong> <A href=""></a>
+<strong>Content invalid?:</strong> <form></form><br /> (try setting 'form' as parent)<br />
+<strong>Casing:</strong> <A href=""></a><br />
+<strong>Check for tidy:</strong> <br /><hr /></div><hr /></div><hr /></div><div>hi</div>
 
 <h6>Entities</h6>
 
@@ -199,6 +206,13 @@ text <img src="none" alt="none" /> 	<b>t<em> e <strong> x </strong> t</em></b>
 <strong>Malformed:</strong> <![cdata check ]]>, < ![CDATA check ]]>, < ![CDATA check ] ]><br />
 Invalid:</strong> <em <!-- check -->>comment in tag content</em>, <!--check-->
 
+<h6>HTML5</h6>
+
+<strong>figure and figcaption:</strong> <figure><img src="picture.jpg" alt="picture"><figcaption>Caption for the awesome picture</figcaption></figure>
+<strong>article:</strong> <h1>A</h1><p>B</p><article><h2>C</h2></article><article><h2>E</h2><p>F</p><p>G</p></article>
+<strong>meter</strong>: <p>Heat <meter min="100" max="200" value="150">150</meter>.</p>
+<strong>datalist</strong>: <input list="b" /><datalist id="b"><option value="c"><option value="d"></datalist>
+
 <h6>Ins-Del</h6>
 
 (depending on context, these elements can be of either block or inline type)<br />
@@ -259,6 +273,10 @@ Invalid:</strong> <em <!-- check -->>comment in tag content</em>, <!--check-->
 			</form>
 		</li></ul>
 </td></tr></table></li></ol>
+<strong>Menu</strong>: <menu type="toolbar"><li><menu label="File">
+      <button type="button" onclick="new()">New...</button>
+    </menu></li><li><menu label="Edit"><button type="button" onclick="cut()">Cut...</button></menu></li>
+    </menu>
 
 <h6>Microdata</h6>
 
@@ -272,6 +290,10 @@ Find me at <a href="http://www.xy.com" itemprop="url">www.xy.com</a>
 <strong>Proprietary tag</strong>: <p class=3DMsoNormal><o:p>&nbsp;</o:p></p><br />
 <strong>XML declaration</strong>: <?xml:namespace prefix = o ns = "urn:schemas-microsoft-com:office:office" /><br />
 <strong>XML-invalid character code-point (may not replicate)</strong>: <p class=3DMsoNormal>“Where is he?” asked both Mary – the one so lovely – and Jane.</p>
+
+<h6>Nesting</h6>
+
+<strong>Block or inline a</strong>: <p><a href="link">text</a></p><a href="link"><div>hi</div></a><br />
 
 <h6>Non-English text-1</h6>
 
@@ -320,6 +342,7 @@ na Alemanha.
   <rp>(</rp><rt>aaa</rt><rp>)</rp>
 </ruby>
 
+
 <h6>Tables</h6>
 
 <strong>Omitted closing tags:</strong> <table>
@@ -346,6 +369,14 @@ na Alemanha.
 <tr><td>r2c1<td>r2c2
 </table><br />
 
+<h6>Tag transformation</h6>
+<strong>Font element intended as 'inline' element:</strong> <p><font color='red'>hi</font></p><br />
+<strong>Font element intended as 'block' element:</strong> <div><font color='red'><div>hi</div></font></div><br />
+<strong>Font element intended as 'block' element:</strong> <center><font color='red'><div>hi</div><div>QQQ</div></font></center><br />
+
+<h6>Tidy</h6>
+<strong>White-space handling:</strong> abc<em> def </em> ghi   abc <em>def</em> ghi
+
 <h6>URLs</h6>
 
 <strong>Relative and absolute:</strong> <a href="mailto:x"></a>, <a href="http://a.com/b/c/d.f"></a>, <a href="./../d.f"></a>, <a href="./d.f"></a>, <a href="d.f"></a>, <a href="#s"></a>, <a href="./../../d.f#s"></a><br />
@@ -356,6 +387,7 @@ na Alemanha.
 
 <h6>XSS</h6>
 
+<img alt="<img onmouseover=confirm(1)//"<"">
 '';!--"<xss>=&{()}<br />
 <img src="javascript%3Aalert('xss');" /><br />
 <img src="javascript:alert('xss');" /><br />
@@ -371,6 +403,7 @@ src=&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;&#97;&#108;&#1
 <a style=";-moz-binding:url(http://lukasz.pilorz.net/xss/xss.xml#xss)" href="http://example.com">test</a><br />
 <strong>Bad IE7:</strong> <a href="http://x&x=%22+style%3d%22background-image%3a+expression%28alert
 %28%27xss%3f%29%29">x</a><br />
+<strong>Opera:</strong> <a href="\xE2\x80\x83javascript:alert(123)">link</a>
 <strong>Bad IE7:</strong> <a style=color:expr/*comment*/ession(alert(document.domain))>xxx</a><br />
 <strong>Bad IE7:</strong> <a href="xxx" style="background: exp&#x72;ession(alert('xss'));">xxx</a><br />
 <strong>Bad IE7:</strong> <a href="xxx" style="background: &#101;xpression(alert('xss'));">xxx</a><br />
@@ -403,6 +436,10 @@ script:eval(document.all.mycode.expr)')">hi</a><br />
   > 3 <br />
 <._.> hi! <br />
 <<< ALERT >>> <br />
+<![if !vml]> some stuff <![endif]> <br />
+<?xml:namespace prefix = o ns = "urn:schemas-microsoft-com:office:office" /> <br />
+<uml:ns ns = "urn:www"> <br />
+<uml:ns ns = 'urn:www'> <br />
 if(13<age AND 21>age){say 'teen'} <br />
 age >51 and a smoking history of >51 pack-years <b>was</b> <br />
 age > 51 and a smoking history of >51 pack-years <b>was</b> <br />

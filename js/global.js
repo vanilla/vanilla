@@ -600,7 +600,7 @@ jQuery(document).ready(function($) {
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
 	if (informMessageStack) {
-		informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
+		informMessageStack = {'InformMessages' : $.parseJSON($.base64Decode(informMessageStack))};
 		gdn.inform(informMessageStack);
 	}
 	

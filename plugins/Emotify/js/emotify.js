@@ -5,8 +5,12 @@ $(function(){
 	 // Pick up the emoticons from the def list
 	var emoticons = gdn.definition('Emoticons', false);
 
-	if (emoticons)
-		emoticons = eval("("+$.base64Decode(emoticons)+")");
+    if (emoticons) {
+       try {
+          emoticons = $.parseJSON($.base64Decode(emoticons));
+       } catch(e) {
+       }
+    }
 	 
     var buts = '';
 	 var last = '';

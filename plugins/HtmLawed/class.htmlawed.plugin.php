@@ -101,7 +101,12 @@ class HTMLawedPlugin extends Gdn_Plugin {
 	}
 }
 
-function HTMLawedHookTag($Element, $Attributes) {
+function HTMLawedHookTag($Element, $Attributes = 0) {
+   // If second argument is not received, it means a closing tag is being handled
+   if($Attributes === 0){
+      return "</$Element>";
+   }
+
    $Attribs = '';
    foreach ($Attributes as $Key => $Value) {
       if (strcasecmp($Key, 'style') == 0) {
@@ -111,5 +116,8 @@ function HTMLawedHookTag($Element, $Attributes) {
 
       $Attribs .= " {$Key}=\"{$Value}\"";
    }
-   return "<{$Element}{$Attribs}>";
+
+   static $empty_elements = array('area'=>1, 'br'=>1, 'col'=>1, 'embed'=>1, 'hr'=>1, 'img'=>1, 'input'=>1, 'isindex'=>1, 'param'=>1);
+
+   return "<{$Element}{$Attribs}". (isset($empty_elements[$Element]) ? ' /' : ''). '>';
 }

@@ -226,7 +226,7 @@ class Gdn_Memcached extends Gdn_Cache {
          }
 
          if ($useLocal)
-            Gdn_Cache::localSet($realKey, $value);
+            $this->localSet($realKey, $value);
          return Gdn_Cache::CACHEOP_SUCCESS;
       }
 
@@ -238,7 +238,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
       if ($stored) {
          if ($useLocal)
-            Gdn_Cache::localSet($realKey, $value);
+            $this->localSet($realKey, $value);
          return Gdn_Cache::CACHEOP_SUCCESS;
       }
       return Gdn_Cache::CACHEOP_FAILURE;
@@ -277,7 +277,7 @@ class Gdn_Memcached extends Gdn_Cache {
          }
 
          if ($useLocal)
-            Gdn_Cache::localSet($realKey, $value);
+            $this->localSet($realKey, $value);
          return Gdn_Cache::CACHEOP_SUCCESS;
       }
 
@@ -289,7 +289,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
       if ($stored) {
          if ($useLocal)
-            Gdn_Cache::localSet($realKey, $value);
+            $this->localSet($realKey, $value);
          return Gdn_Cache::CACHEOP_SUCCESS;
       }
       return Gdn_Cache::CACHEOP_FAILURE;
@@ -312,7 +312,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
             // Skip this key if we already have it
             if ($useLocal) {
-               $local = Gdn_Cache::localGet($realKey);
+               $local = $this->localGet($realKey);
                if ($local !== Gdn_Cache::CACHEOP_FAILURE) {
                   $localData[$realKey] = $local;
                   continue;
@@ -326,7 +326,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
          // Completely short circuit if we already have everything
          if ($useLocal) {
-            $local = Gdn_Cache::localGet($realKey);
+            $local = $this->localGet($realKey);
             if ($local !== false)
                return $local;
          }
@@ -377,7 +377,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
          // Cache in process memory
          if ($useLocal && sizeof($data))
-            Gdn_Cache::localSet($data);
+            $this->localSet($data);
       }
 
       // Merge in local data

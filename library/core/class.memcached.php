@@ -54,7 +54,10 @@ class Gdn_Memcached extends Gdn_Cache {
       $this->RegisterFeature(Gdn_Cache::FEATURE_NOPREFIX);
       $this->RegisterFeature(Gdn_Cache::FEATURE_FORCEPREFIX);
       $this->RegisterFeature(Gdn_Cache::FEATURE_SHARD);
-      $this->RegisterFeature(Gdn_Cache::FEATURE_LOCAL);
+
+      if (C('Garden.Cache.Local', true)) {
+         $this->RegisterFeature(Gdn_Cache::FEATURE_LOCAL);
+      }
 
       $this->StoreDefaults = array(
          Gdn_Cache::FEATURE_COMPRESS      => FALSE,

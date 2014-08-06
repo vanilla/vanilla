@@ -236,6 +236,11 @@ abstract class Gdn_Cache {
       if (defined('CACHE_STORE_OVERRIDE') && defined('CACHE_METHOD_OVERRIDE') && CACHE_METHOD_OVERRIDE == $ActiveCache)
          return unserialize(CACHE_STORE_OVERRIDE);
 
+      // Use local cache?
+      $local = false;
+      if (C('Garden.Cache.Local', true))
+         $local = true;
+
       // Use APC cache?
       $apc = false;
       if (C('Garden.Apc', false) && C('Garden.Cache.ApcPrecache', false) && function_exists('apc_fetch'))
@@ -246,7 +251,7 @@ abstract class Gdn_Cache {
       $ActiveStoreKey = "Cache.{$ActiveCache}.Store";
 
       // Check memory
-      if (is_null($LocalStore)) {
+      if (is_null($LocalStore) && $local) {
          if (array_key_exists($ActiveCache, Gdn_Cache::$Stores)) {
             $LocalStore = Gdn_Cache::$Stores[$ActiveCache];
          }

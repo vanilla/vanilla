@@ -708,19 +708,27 @@ abstract class Gdn_Cache {
       return Gdn_Cache::$trace;
    }
 
-   protected static function LocalGet($key) {
-      if (!C('Garden.Cache.Local', true)) return Gdn_Cache::CACHEOP_FAILURE;
+   protected function LocalGet($key) {
+      if (!$this->hasFeature(Gdn_Cache::FEATURE_LOCAL)) return Gdn_Cache::CACHEOP_FAILURE;
 
       if (!array_key_exists($key, self::$localCache)) return Gdn_Cache::CACHEOP_FAILURE;
       return self::$localCache[$key];
    }
 
-   protected static function LocalSet($key, $value = null) {
-      if (!C('Garden.Cache.Local', true)) return;
+   protected function LocalSet($key, $value = null) {
+      if (!$this->hasFeature(Gdn_Cache::FEATURE_LOCAL)) return;
 
       if (!is_array($key))
          $key = array($key => $value);
       self::$localCache = array_merge(self::$localCache, $key);
+   }
+
+   /**
+    * Clear local cache (process memory cache)
+    *
+    */
+   protected static function LocalClear() {
+      self::$localCache = array();
    }
 
    /**

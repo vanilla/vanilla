@@ -386,7 +386,7 @@ class Emoji {
     * @return string The html that represents the emiji.
     */
    public function img($emoji_path, $emoji_name) {
-      return sprintf($this->format, $emoji_path, $emoji_name);
+      return sprintf($this->format, Url($emoji_path), $emoji_name);
    }
 
    /**

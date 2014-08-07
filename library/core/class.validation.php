@@ -313,7 +313,7 @@ class Gdn_Validation {
     * enforced.
     */
    public function DefineValidationFields($PostedFields, $Schema = NULL, $Insert = FALSE) {
-      $this->ValidationFields(FALSE);
+      $this->ValidationFields(TRUE);
 
       if ($Schema != NULL)
          $this->_Schema = $Schema;

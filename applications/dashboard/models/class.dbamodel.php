@@ -183,7 +183,6 @@ class DBAModel extends Gdn_Model {
             );
             $PermissionModel->Save($DefaultCategory);
          }
-         else print_r($Permissions);
       }
 
       return array('Complete' => TRUE);

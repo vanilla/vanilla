@@ -843,12 +843,13 @@ class UserModel extends Gdn_Model {
             if (isset($Fields['Email']) && $UserID == Gdn::Session()->UserID && $Fields['Email'] != Gdn::Session()->User->Email && !Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
                $User = Gdn::Session()->User;
                $Attributes = Gdn::Session()->User->Attributes;
-               
+
+               $RoleModel = new RoleModel();
                $ConfirmEmailRoleID = C('Garden.Registration.ConfirmEmailRole');
-               if (RoleModel::Roles($ConfirmEmailRoleID)) {
+               if ($RoleModel->GetByRoleID($ConfirmEmailRoleID)) {
                   // The confirm email role is set and it exists so go ahead with the email confirmation.
                   $EmailKey = TouchValue('EmailKey', $Attributes, RandomString(8));
-                  
+
                   if ($RoleIDs)
                      $ConfirmedEmailRoles = $RoleIDs;
                   else

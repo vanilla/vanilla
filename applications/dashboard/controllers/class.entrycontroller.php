@@ -172,7 +172,7 @@ class EntryController extends Gdn_Controller {
 
             // Attempt to authenticate.
             try {
-               if (!$this->Request->IsAuthenticatedPostBack()) {
+               if (!$this->Request->IsAuthenticatedPostBack() && !C('Garden.Embed.Allow')) {
                   $this->Form->AddError('Please try again.');
                   $Reaction = $Authenticator->FailedResponse();
                } else {
@@ -863,7 +863,7 @@ EOT;
          $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('%s is required.'), T(UserModel::SigninLabelCode())));
          $this->Form->ValidateRule('Password', 'ValidateRequired');
 
-         if (!$this->Request->IsAuthenticatedPostBack()) {
+         if (!$this->Request->IsAuthenticatedPostBack() && !C('Garden.Embed.Allow')) {
             $this->Form->AddError('Please try again.');
          }
 

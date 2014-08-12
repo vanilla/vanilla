@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 $PluginInfo['HtmLawed'] = array(
    'Description' => 'Adapts HtmLawed to work with Vanilla.',
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => NULL,
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,

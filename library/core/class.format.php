@@ -1655,7 +1655,7 @@ EOT;
          $CustomFormatter = C('Garden.Format.WysiwygFunction', FALSE);
 
       if (!is_string($Mixed)) {
-         return self::To($Mixed, 'Html');
+         return self::To($Mixed, 'Wysiwyg');
       } elseif (is_callable($CustomFormatter)) {
          return $CustomFormatter($Mixed);
       } else {

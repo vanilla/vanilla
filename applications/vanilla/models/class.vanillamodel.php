@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Vanilla
  */
- 
+
 /**
  * Introduces common methods that child classes can use.
  *
@@ -22,7 +22,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 abstract class VanillaModel extends Gdn_Model {
    /**
     * Class constructor. Defines the related database table name.
-    * 
+    *
     * @since 2.0.0
     * @access public
     *
@@ -31,13 +31,13 @@ abstract class VanillaModel extends Gdn_Model {
    public function __construct($Name = '') {
       parent::__construct($Name);
    }
-   
+
    /**
     * Checks to see if the user is spamming. Returns TRUE if the user is spamming.
-    * 
+    *
     * Users cannot post more than $SpamCount comments within $SpamTime
     * seconds or their account will be locked for $SpamLock seconds.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @todo Remove debugging info if/when this is working correctly.
@@ -47,34 +47,34 @@ abstract class VanillaModel extends Gdn_Model {
     */
    public function CheckForSpam($Type) {
       $Session = Gdn::Session();
-      
+
       // If spam checking is disabled or user is an admin, skip
       $SpamCheckEnabled = GetValue('SpamCheck', $this, TRUE);
-      if ($SpamCheckEnabled === FALSE || $Session->User->Admin || $Session->CheckPermission('Garden.Moderation.Manage')) 
+      if ($SpamCheckEnabled === FALSE || $Session->User->Admin || $Session->CheckPermission('Garden.Moderation.Manage'))
          return FALSE;
-      
+
       $Spam = FALSE;
-      
+
       // Validate $Type
       if (!in_array($Type, array('Comment', 'Discussion')))
          trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $Type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
-      
+
       $CountSpamCheck = $Session->GetAttribute('Count'.$Type.'SpamCheck', 0);
       $DateSpamCheck = $Session->GetAttribute('Date'.$Type.'SpamCheck', 0);
       $SecondsSinceSpamCheck = time() - Gdn_Format::ToTimestamp($DateSpamCheck);
-      
+
       // Get spam config settings
       $SpamCount = Gdn::Config('Vanilla.'.$Type.'.SpamCount');
-      if (!is_numeric($SpamCount) || $SpamCount < 2)
-         $SpamCount = 2; // 2 spam minimum
+      if (!is_numeric($SpamCount) || $SpamCount < 1)
+         $SpamCount = 1; // 1 spam minimum
 
       $SpamTime = Gdn::Config('Vanilla.'.$Type.'.SpamTime');
-      if (!is_numeric($SpamTime) || $SpamTime < 0)
+      if (!is_numeric($SpamTime) || $SpamTime < 30)
          $SpamTime = 30; // 30 second minimum spam span
-         
+
       $SpamLock = Gdn::Config('Vanilla.'.$Type.'.SpamLock');
-      if (!is_numeric($SpamLock) || $SpamLock < 30)
-         $SpamLock = 30; // 30 second minimum lockout
+      if (!is_numeric($SpamLock) || $SpamLock < 60)
+         $SpamLock = 60; // 60 second minimum lockout
 
       // Apply a spam lock if necessary
       $Attributes = array();
@@ -98,7 +98,7 @@ abstract class VanillaModel extends Gdn_Model {
                $SpamLock
             )
          );
-         
+
          // Update the 'waiting period' every time they try to post again
          $Attributes['Date'.$Type.'SpamCheck'] = Gdn_Format::ToDateTime();
       } else {
@@ -113,7 +113,7 @@ abstract class VanillaModel extends Gdn_Model {
       $UserModel = Gdn::UserModel();
       if ($Session->UserID)
          $UserModel->SaveAttribute($Session->UserID, $Attributes);
-      
+
       return $Spam;
-   }   
+   }
 }

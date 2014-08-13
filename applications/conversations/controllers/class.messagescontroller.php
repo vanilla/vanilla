@@ -151,6 +151,17 @@ class MessagesController extends ConversationsController {
 
       if ($this->Form->AuthenticatedPostBack()) {
          $ConversationID = $this->Form->GetFormValue('ConversationID', '');
+
+         // Make sure the user posting to the conversation is actually
+         // a member of it, or is allowed, like an admin.
+         if (!CheckPermission('Garden.Moderation.Manage')) {
+            $UserID = Gdn::Session()->UserID;
+            $ValidConversationMember = $this->ConversationModel->ValidConversationMember($ConversationID, $UserID);
+            if (!$ValidConversationMember) {
+               throw PermissionException();
+            }
+         }
+
          $Conversation = $this->ConversationModel->GetID($ConversationID, Gdn::Session()->UserID);
 
          $this->EventArguments['Conversation'] = $Conversation;

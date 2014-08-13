@@ -5,6 +5,9 @@ $Lock = array(30, 60, 90, 120, 240);
 $SpamCount = ArrayCombine($Count, $Count);
 $SpamTime = ArrayCombine($Time, $Time);
 $SpamLock = ArrayCombine(array(60, 120, 180, 240, 300, 600), array(1, 2, 3, 4, 5, 10));
+
+$ConversationsEnabled = Gdn::ApplicationManager()->IsEnabled('Conversations');
+
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
@@ -47,6 +50,40 @@ echo $this->Form->Errors();
             <?php echo T('minute(s)'); ?>
          </td>
       </tr>
+
+      <?php if ($ConversationsEnabled): ?>
+
+         <tr>
+            <td>
+               <?php echo $this->Form->DropDown('Conversations.Conversation.SpamCount', $SpamCount); ?>
+               <?php echo T('private conversation(s)'); ?>
+            </td>
+            <td class="Alt">
+               <?php echo $this->Form->DropDown('Conversations.Conversation.SpamTime', $SpamTime); ?>
+               <?php echo T('seconds'); ?>
+            </td>
+            <td>
+               <?php echo $this->Form->DropDown('Conversations.Conversation.SpamLock', $SpamLock); ?>
+               <?php echo T('minute(s)'); ?>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <?php echo $this->Form->DropDown('Conversations.ConversationMessage.SpamCount', $SpamCount); ?>
+               <?php echo T('reply to private conversation(s)'); ?>
+            </td>
+            <td class="Alt">
+               <?php echo $this->Form->DropDown('Conversations.ConversationMessage.SpamTime', $SpamTime); ?>
+               <?php echo T('seconds'); ?>
+            </td>
+            <td>
+               <?php echo $this->Form->DropDown('Conversations.ConversationMessage.SpamLock', $SpamLock); ?>
+               <?php echo T('minute(s)'); ?>
+            </td>
+         </tr>
+
+      <?php endif; ?>
+
    </tbody>
 </table>
 <ul>

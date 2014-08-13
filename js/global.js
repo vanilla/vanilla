@@ -1148,14 +1148,13 @@ jQuery(document).ready(function($) {
    });
 
    // Ajax/Save the ClientHour if it is different from the value in the db.
-   $('input:hidden[id$=SetHourOffset]').livequery(function() {
-      if (hourOffset != $(this).val()) {
-         $.post(
-            gdn.url('/utility/sethouroffset.json'),
-            { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
-         );
-      }
-   });
+   var setHourOffset = parseInt(gdn.definition('SetHourOffset', hourOffset));
+   if (hourOffset !== setHourOffset) {
+      $.post(
+         gdn.url('/utility/sethouroffset.json'),
+         { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
+      );
+   }
 
    // Add "checked" class to item rows if checkboxes are checked within.
    checkItems = function() {

@@ -614,6 +614,7 @@ class SettingsController extends DashboardController {
                $LocaleFound = TRUE;
 
          }
+         $this->SetData('DefaultLocale', $DefaultLocale);
          $this->SetData('DefaultLocaleWarning', !$LocaleFound);
          $this->SetData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
       }

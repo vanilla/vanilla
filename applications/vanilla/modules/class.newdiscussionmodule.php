@@ -29,7 +29,7 @@ class NewDiscussionModule extends Gdn_Module {
    public $Buttons = array();
 
    /** @var bool Whether to show button to all users & guests regardless of permissions. */
-   public $SkipPermissions = false;
+   public $ShowGuests = false;
 
    /** @var string Where to send users without permission when $SkipPermissions is enabled. */
    public $GuestUrl = '/entry/register';
@@ -80,8 +80,11 @@ class NewDiscussionModule extends Gdn_Module {
          $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', 'any');
       }
 
+      // Determine if this is a guest & we're using "New Discussion" button as call to action.
+      $PrivilegedGuest = ($this->ShowGuests && !Gdn::Session()->IsValid());
+
       // No module for you!
-      if (!$HasPermission && !$this->SkipPermissions) {
+      if (!$HasPermission && !$PrivilegedGuest) {
          return '';
       }
 
@@ -94,7 +97,7 @@ class NewDiscussionModule extends Gdn_Module {
             continue;
          }
 
-         // If SkipPermission is set & user has no permission, redirect all to $GuestUrl.
+         // If user !$HasPermission, they are $PrivilegedGuest so redirect to $GuestUrl.
          $Url = ($HasPermission) ? GetValue('AddUrl', $Type) : $this->GuestUrl;
          if (!$Url) {
             continue;

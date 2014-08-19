@@ -1482,14 +1482,10 @@ EOT;
          ->GetWhere(array('Code' => $this->Form->GetValue('InvitationCode')))
          ->FirstRow(DATASET_TYPE_ARRAY);
 
-      if (!$Invitation) {
-         $this->Form->AddError('Invitation not found.', 'Code');
-      } else {
-         if ($Expires = GetValue('DateExpires', $Invitation)) {
-            $Expires = Gdn_Format::ToTimestamp($Expires);
-            if ($Expires <= time()) {
+      if ($Expires = GetValue('DateExpires', $Invitation)) {
+         $Expires = Gdn_Format::ToTimestamp($Expires);
+         if ($Expires <= time()) {
 
-            }
          }
       }
 

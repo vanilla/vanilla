@@ -146,10 +146,10 @@ jQuery(document).ready(function($) {
          url: $(frm).attr('action'),
          data: $(frm).serialize() + '&DeliveryType=VIEW&DeliveryMethod=JSON',
          dataType: 'json',
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            $('span.Progress').remove();
+         error: function(xhr, textStatus, errorThrown) {
+            $('span.TinyProgress').remove();
             $(btn).show();
-            $.popup({}, XMLHttpRequest.responseText);
+            gdn.informError(xhr);
          },
          success: function(json) {
             gdn.inform(json);

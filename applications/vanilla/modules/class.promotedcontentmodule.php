@@ -61,6 +61,8 @@ class PromotedContentModule extends Gdn_Module {
       $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
       if (method_exists($this, $SelectorMethod)) {
          $this->SetData('Content', call_user_func(array($this, $SelectorMethod), $this->Selection));
+      } else {
+         $this->FireEvent($SelectorMethod);
       }
    }
    

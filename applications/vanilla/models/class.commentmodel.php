@@ -31,6 +31,8 @@ class CommentModel extends VanillaModel {
 
    protected $_Where = array();
 
+   public $pageCache;
+
    /**
     * Class constructor. Defines the related database table name.
     *
@@ -39,11 +41,12 @@ class CommentModel extends VanillaModel {
     */
    public function __construct() {
       parent::__construct('Comment');
+      $this->pageCache = Gdn::Cache()->ActiveEnabled();
       $this->FireEvent('AfterConstruct');
    }
 
    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
-      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!$this->pageCache || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return;
 
       if (count($Result) == 0)
@@ -329,7 +332,7 @@ class CommentModel extends VanillaModel {
    }
 
    public function PageWhere($DiscussionID, $Page, $Limit) {
-      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!$this->pageCache || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return FALSE;
 
       if ($Limit != C('Vanilla.Comments.PerPage', 30)) {
@@ -917,7 +920,7 @@ class CommentModel extends VanillaModel {
             ));
 
             // Update the cache.
-            if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+            if ($DiscussionID && $this->pageCache) {
                $CategoryCache = array(
                    'LastTitle'         => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
                    'LastUserID'        => $Fields['InsertUserID'],
@@ -1086,8 +1089,9 @@ class CommentModel extends VanillaModel {
    }
 
    public function RemovePageCache($DiscussionID, $From = 1) {
-      if (!Gdn::Cache()->ActiveEnabled())
+      if (!$this->pageCache) {
          return;
+      }
 
       $CountComments = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CountComments');
       $Limit = C('Vanilla.Comments.PerPage', 30);

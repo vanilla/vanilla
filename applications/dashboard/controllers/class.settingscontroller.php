@@ -619,6 +619,10 @@ class SettingsController extends DashboardController {
          $this->SetData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
       }
 
+      Trace(Gdn::Locale()->GetAvailableLocaleSources(), 'Locales');
+      Trace(Gdn::Locale()->Current(), 'Current Locale');
+      Trace(Gdn::Locale()->LocaleSources, 'Locale Sources');
+
       $this->SetData('AvailableLocales', $AvailableLocales);
       $this->SetData('EnabledLocales', $EnabledLocales);
       $this->SetData('Locales', $LocaleModel->AvailableLocales());

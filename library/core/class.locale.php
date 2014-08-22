@@ -86,6 +86,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       // Get locale sources
       $this->Locale = $LocaleName;
       $LocaleSources = $this->GetLocaleSources($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+      $this->LocaleSources = $LocaleSources;
       
       $Codeset = C('Garden.LocaleCodeset', 'UTF8');
       $CurrentLocale = str_replace('-', '_', $LocaleName);

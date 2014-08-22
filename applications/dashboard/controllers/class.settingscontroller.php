@@ -621,10 +621,14 @@ class SettingsController extends DashboardController {
 
       Trace(Gdn::Locale()->GetAvailableLocaleSources(), 'Locales');
       Trace(Gdn::Locale()->Current(), 'Current Locale');
-      Trace(Gdn::Locale()->LocaleSources, 'Locale Sources');
 
       $this->SetData('AvailableLocales', $AvailableLocales);
       $this->SetData('EnabledLocales', $EnabledLocales);
+
+      // Redo the folder search on the locales.
+      $LocaleSources = Gdn::Locale()->GetLocaleSources(Gdn::Locale()->Current(), Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), true);
+      Trace($LocaleSources, 'Locale Sources');
+
       $this->SetData('Locales', $LocaleModel->AvailableLocales());
       $this->Render();
    }

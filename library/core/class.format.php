@@ -1089,6 +1089,8 @@ class Gdn_Format {
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
+      $TwitchUrlMatch ='http://www.twitch.tv/([\w\d]+)';
+      $HitboxUrlMatch ='http://www.hitbox.tv/([\w\d]+)';
 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)
@@ -1158,6 +1160,21 @@ EOT;
         && !C('Garden.Format.DisableUrlEmbeds')) {
          $Result = <<<EOT
 <iframe src="//embed.gettyimages.com/embed/{$Matches[2]}" width="{$Matches[3]}" height="{$Matches[4]}" frameborder="0" scrolling="no"></iframe>
+EOT;
+
+// Twitch
+      } elseif (preg_match("`({$TwitchUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Twitch', true)
+        && !C('Garden.Format.DisableUrlEmbeds')) {
+         $Result = <<<EOT
+<object type="application/x-shockwave-flash" height="378" width="620" id="live_embed_player_flash" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel={$Matches[2]}" bgcolor="#000000"><param name="allowFullScreen" value="true" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf" /><param name="flashvars" value="hostname=www.twitch.tv&channel={$Matches[2]}&auto_play=true&start_volume=25" /></object><a href="http://www.twitch.tv/{$Matches[2]}" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline; text-align:center;">Watch live video from {$Matches[2]} on www.twitch.tv</a>
+EOT;
+
+//Hitbox
+      } elseif (preg_match("`({$HitboxUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Hitbox', true)
+        && !C('Garden.Format.DisableUrlEmbeds')) {
+         $Result = <<<EOT
+<iframe width="640" height="360" src="http://hitbox.tv/#!/embed/{$Matches[2]}" frameborder="0" allowfullscreen></iframe>
+<a href="http://www.hitbox.tv/{$Matches[2]}" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline; text-align:center;">Watch live video from {$Matches[2]} on www.hitbox.tv</a>
 EOT;
 
       // Unformatted links

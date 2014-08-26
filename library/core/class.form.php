@@ -389,7 +389,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
       $Input = $this->Input($FieldName, 'checkbox', $Attributes);
       if ($Label != '') $Input = '<label for="' . ArrayValueI('id', $Attributes,
-         $this->EscapeID($FieldName, FALSE)) . '" class="CheckBoxLabel"'.Attribute('title', GetValue('title', $Attributes)).'>' . $Input . ' ' .
+         $this->EscapeID($FieldName, FALSE)) . '" class="'.GetValue('class', $Attributes, 'CheckBoxLabel').'"'.Attribute('title', GetValue('title', $Attributes)).'>' . $Input . ' ' .
           T($Label) . '</label>';
 
       // Append validation error message

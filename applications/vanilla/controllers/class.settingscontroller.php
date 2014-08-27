@@ -276,7 +276,7 @@ class SettingsController extends Gdn_Controller {
       $this->RoleArray = $RoleModel->GetArray();
 
       $this->FireEvent('AddEditCategory');
-      $this->SetupDiscussionTypes([]);
+      $this->SetupDiscussionTypes(array());
 
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->AddHidden('CodeIsDefined', '0');

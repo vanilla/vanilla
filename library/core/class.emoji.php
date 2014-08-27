@@ -401,6 +401,11 @@ class Emoji {
       $this->editorList = $list;
    }
 
+   public function hasEditorList() {
+       $editorList = $this->getEmojiEditorList();
+       return !empty($editorList);
+   }
+
    /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
     *
@@ -507,7 +512,7 @@ class Emoji {
 
       // First, translate all aliases. Canonical emoji will get translated
       // out of a loop.
-      $emojiAliasList = $this->getEmojiEditorList();
+      $emojiAliasList = $this->aliases;
 
       // Loop through and apply changes to all visible aliases from dropdown
 		foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {

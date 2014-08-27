@@ -742,6 +742,7 @@ input.SmallInput {
 .Inline {
    display: inline;
 }
+div.Popup ul li label.Inline,
 form ul li label.Inline {
    display: inline-block;
 }

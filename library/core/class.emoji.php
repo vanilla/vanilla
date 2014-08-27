@@ -246,7 +246,7 @@ class Emoji {
          foreach ($emojis as $name => $data) {
             $emoji[] = array(
                 "name" => "". $name ."",
-                "url" =>  $emojiAssetPath . '/' . $data
+                "url" =>  Asset($emojiAssetPath . '/' . $data)
             );
          }
 

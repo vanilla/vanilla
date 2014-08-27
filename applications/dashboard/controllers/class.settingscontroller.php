@@ -615,6 +615,7 @@ class SettingsController extends DashboardController {
                $LocaleFound = TRUE;
 
          }
+         $this->SetData('DefaultLocale', $DefaultLocale);
          $this->SetData('DefaultLocaleWarning', !$LocaleFound);
          $this->SetData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
       }
@@ -1233,6 +1234,27 @@ class SettingsController extends DashboardController {
       }
 
       Redirect('/settings/banner');
+   }
+
+   /**
+    * Remove the share image from config & delete it.
+    *
+    * @since 2.1
+    * @param string $TransientKey Security token.
+    */
+   public function RemoveShareImage($TransientKey = '') {
+      $this->Permission('Garden.Settings.Manage');
+
+      $Session = Gdn::Session();
+      if (Gdn::Request()->IsAuthenticatedPostBack()) {
+         $ShareImage = C('Garden.ShareImage', '');
+         RemoveFromConfig('Garden.ShareImage');
+         $Upload = new Gdn_Upload();
+         $Upload->Delete($ShareImage);
+      }
+
+      $this->RedirectUrl = '/settings/banner';
+      $this->Render('Blank', 'Utility');
    }
 
 

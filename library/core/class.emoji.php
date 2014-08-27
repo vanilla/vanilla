@@ -504,7 +504,7 @@ class Emoji {
       $rdelim = preg_quote($this->rdelim, '`');
       $emoji = $this;
 
-      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) use ($emoji) {
+      $Text = preg_replace_callback("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function($m) use ($emoji) {
          $emoji_name = trim($m[1], ':');
          $emoji_path = $emoji->getEmoji($emoji_name);
          if ($emoji_path) {

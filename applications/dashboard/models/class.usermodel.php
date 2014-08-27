@@ -1883,7 +1883,7 @@ class UserModel extends Gdn_Model {
                'role_remove',
                Logger::INFO,
                "{username} removed {toUsername} from the {role} role.",
-               ['toUsername' => $User->Name, 'role' => $RoleName]
+               array('toUsername' => $User->Name, 'role' => $RoleName)
             );
          }
 
@@ -1892,7 +1892,7 @@ class UserModel extends Gdn_Model {
                'role_add',
                Logger::INFO,
                "{username} added {toUsername} to the {role} role.",
-               ['toUsername' => $User->Name, 'role' => $RoleName]
+               array('toUsername' => $User->Name, 'role' => $RoleName)
             );
          }
 

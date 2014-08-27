@@ -383,7 +383,7 @@ class Emoji {
    /**
     * Set the list of emoji that can be used by the editor.
     * 
-    * @param $value
+    * @param array $value The new editor list.
     */
    public function setEmojiEditorList($value) {
       // Convert the editor list to the proper format.

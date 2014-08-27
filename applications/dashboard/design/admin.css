@@ -738,6 +738,15 @@ input.SmallButton {
 input.SmallInput {
    width: 80px;
 }
+
+.Inline {
+   display: inline;
+}
+form ul li label.Inline {
+   display: inline-block;
+}
+
+
 /* FormTable */
 table {
    width: 100%;

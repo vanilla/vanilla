@@ -706,19 +706,20 @@ class DiscussionModel extends VanillaModel {
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
       $Offset = 0;
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
+      $CategoryID = val('d.CategoryID', $Wheres, 0);
       $GroupID = val('d.GroupID', $Wheres, 0);
       // Get the discussion IDs of the announcements.
-      $CacheKey = 'Announcements';
-      if ($GroupID > 0) {
-         $CacheKey .= ':' . $GroupID;
+      $CacheKey = $this->GetAnnouncementCacheKey(1, $CategoryID);
+      if ($GroupID == 0) {
+         $this->SQL->Cache($CacheKey);
       }
-       $this->SQL
-         ->Cache($CacheKey)
-         ->Select('d.DiscussionID')
+      $this->SQL->Select('d.DiscussionID')
          ->From('Discussion d')
          ->Where('d.Announce >', '0');
       if ($GroupID > 0) {
          $this->SQL->Where('d.GroupID', $GroupID);
+      } elseif ($CategoryID > 0) {
+         $this->SQL->Where('d.CategoryID', $CategoryID);
       }
 
       $AnnouncementIDs = $this->SQL->Get()->ResultArray();
@@ -792,6 +793,14 @@ class DiscussionModel extends VanillaModel {
 		$this->FireEvent('AfterAddColumns');
 
 		return $Data;
+   }
+
+   /**
+    * @param int $AnnouncementValue 1 = category only, 2 = global
+    * @param int $CategoryID Category ID
+    */
+   public function GetAnnouncementCacheKey($AnnouncementValue = 1, $CategoryID = 0) {
+      return 'Announcemnts';
    }
 
    /**

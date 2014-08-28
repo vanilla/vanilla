@@ -55,7 +55,7 @@
             echo $this->Form->TextBox('DiscoveryText', array('MultiLine' => TRUE, 'Wrap' => TRUE));
          ?>
       </li>
-      <?php $this->FireEvent('RegisterBeforeTerms'); ?>
+      <?php $this->FireEvent('RegisterFormBeforeTerms'); ?>
       <li>
          <?php
             echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));

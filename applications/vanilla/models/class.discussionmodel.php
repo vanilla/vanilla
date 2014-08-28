@@ -706,16 +706,22 @@ class DiscussionModel extends VanillaModel {
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
       $Offset = 0;
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
-
+      $GroupID = val('d.GroupID', $Wheres, 0);
       // Get the discussion IDs of the announcements.
       $CacheKey = 'Announcements';
-
-      $AnnouncementIDs = $this->SQL
+      if ($GroupID > 0) {
+         $CacheKey .= ':' . $GroupID;
+      }
+       $this->SQL
          ->Cache($CacheKey)
          ->Select('d.DiscussionID')
          ->From('Discussion d')
-         ->Where('d.Announce >', '0')->Get()->ResultArray();
+         ->Where('d.Announce >', '0');
+      if ($GroupID > 0) {
+         $this->SQL->Where('d.GroupID', $GroupID);
+      }
 
+      $AnnouncementIDs = $this->SQL->Get()->ResultArray();
       $AnnouncementIDs = ConsolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
 
       // Short circuit querying when there are no announcements.

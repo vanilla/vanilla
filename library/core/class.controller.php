@@ -701,8 +701,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     * @param string $Default One of the DELIVERY_TYPE_* constants.
     */
    public function DeliveryType($Default = '') {
-      if ($Default)
-         $this->_DeliveryType = $Default;
+      if ($Default) {
+         // Make sure we only set a defined delivery type.
+         // Use constants' name pattern instead of a strict whitelist for forwards-compatibility.
+         if (defined('DELIVERY_TYPE_'.$Default)) {
+            $this->_DeliveryType = $Default;
+         }
+         else {
+            throw new Exception(sprintf(T('Attempted to set invalid DeliveryType value (%s).'), $Default));
+         }
+      }
 
       return $this->_DeliveryType;
    }

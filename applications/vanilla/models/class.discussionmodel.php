@@ -796,12 +796,11 @@ class DiscussionModel extends VanillaModel {
    }
 
    /**
-    * @param int $AnnouncementValue 1 = category only, 2 = global.
     * @param int $CategoryID Category ID,
     * @return string $Key CacheKey name to be used for cache.
     */
-   public function GetAnnouncementCacheKey($AnnouncementValue = 1, $CategoryID = 0) {
-      $Key = 'Announcments';
+   public function GetAnnouncementCacheKey($CategoryID = 0) {
+      $Key = 'Announcements';
       if ($CategoryID > 0) {
          $Key .= ':' . $CategoryID;
       }
@@ -1516,7 +1515,7 @@ class DiscussionModel extends VanillaModel {
 
                // Clear the cache if necessary.
                if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements');
+                  $CacheKeys = array($this->GetAnnouncementCacheKey(GetValue('CategoryID', $Stored)));
                   $this->SQL->Cache($CacheKeys);
                }
 
@@ -1569,7 +1568,7 @@ class DiscussionModel extends VanillaModel {
 
                   // Clear the cache if necessary.
                   if (GetValue('Announce', $Fields)) {
-                     Gdn::Cache()->Remove('Announcements');
+                     Gdn::Cache()->Remove($this->GetAnnouncementCacheKey(GetValue('CategoryID', $Fields)));
                   }
                }
 

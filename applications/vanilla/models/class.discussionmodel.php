@@ -796,11 +796,16 @@ class DiscussionModel extends VanillaModel {
    }
 
    /**
-    * @param int $AnnouncementValue 1 = category only, 2 = global
-    * @param int $CategoryID Category ID
+    * @param int $AnnouncementValue 1 = category only, 2 = global.
+    * @param int $CategoryID Category ID,
+    * @return string $Key CacheKey name to be used for cache.
     */
    public function GetAnnouncementCacheKey($AnnouncementValue = 1, $CategoryID = 0) {
-      return 'Announcemnts';
+      $Key = 'Announcments';
+      if ($CategoryID > 0) {
+         $Key .= ':' . $CategoryID;
+      }
+      return $Key;
    }
 
    /**

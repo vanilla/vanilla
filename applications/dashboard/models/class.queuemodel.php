@@ -66,7 +66,7 @@ class QueueModel extends Gdn_Model {
       $SaveData = array();
       $Attributes = array();
 
-      // Grab the current attachment.
+      // Grab the current queue.
       if (isset($data['QueueID'])) {
          $PrimaryKeyVal = $data['QueueID'];
          $Insert = FALSE;
@@ -75,6 +75,18 @@ class QueueModel extends Gdn_Model {
             $Attributes = @unserialize($CurrentItem['Attributes']);
             if (!$Attributes)
                $Attributes = array();
+         }
+      } elseif (isset($data['ForeignID'])) {
+         $CurrentItem = $this->SQL->GetWhere('Queue', array('QueueID' => $data['ForeignID']))->FirstRow(DATASET_TYPE_ARRAY);
+         if ($CurrentItem) {
+            $PrimaryKeyVal = $CurrentItem['QueueID'];
+            $Insert = FALSE;
+            $Attributes = @unserialize($CurrentItem['Attributes']);
+            if (!$Attributes)
+               $Attributes = array();
+         } else {
+            $PrimaryKeyVal = FALSE;
+            $Insert = TRUE;
          }
       } else {
          $PrimaryKeyVal = FALSE;
@@ -126,12 +138,19 @@ class QueueModel extends Gdn_Model {
       // Validate the form posted values.
       if ($this->Validate($SaveData, $Insert) === TRUE) {
          $Fields = $this->Validation->ValidationFields();
+         $this->EventArguments['Fields'] =& $Fields;
 
          if ($Insert === FALSE) {
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
             $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
          } else {
+            $this->FireEvent('BeforeInsert');
             $PrimaryKeyVal = $this->Insert($Fields);
+
+            if ($PrimaryKeyVal) {
+               $this->EventArguments['QueueID'] = $PrimaryKeyVal;
+               $this->FireEvent('AfterInsert');
+            }
          }
       } else {
          $PrimaryKeyVal = FALSE;
@@ -311,17 +330,16 @@ class QueueModel extends Gdn_Model {
       $Qm->EventArguments['Data'] =& $data;
       $Qm->EventArguments['Options'] =& $Options;
       $Qm->EventArguments['Premoderate'] =& $IsPremoderation;
+      $row = array();
+      $Qm->EventArguments['Queue'] =& $fields;
 
       $Qm->FireEvent('CheckPremoderation');
 
       $IsPremoderation = $Qm->EventArguments['Premoderate'];
 
       if ($IsPremoderation) {
-
-         if (GetValue('ForeignID', $Qm->EventArguments)) {
-            $data['ForeignID'] = $Qm->EventArguments['ForeignID'];
-         }
          $queueRow = self::convertToQueueRow($recordType, $data);
+         $queueRow = array_replace($queueRow, $row);
          // Allow InsertUserID to be overwritten
          if (isset($Qm->EventArguments['InsertUserID']) && !$ApprovalRequired) {
             $queueRow['InsertUserID'] = $Qm->EventArguments['InsertUserID'];
@@ -604,7 +622,7 @@ class QueueModel extends Gdn_Model {
          'ForeignUserID' => val('InsertUserID', $data, Gdn::Session()->UserID),
          'ForeignIPAddress' => val('InsertIPAddress', $data, Gdn::Request()->IpAddress()),
          'Format' => val('Format', $data, C('Garden.InputFormatter')),
-         'ForeignID' => val('ForeignID', $data, self::generateForeignID($data))
+         'ForeignID' => val('ForeignID', $data, self::generateForeignID($data, null, $recordType))
       );
 
       switch (strtolower($recordType)) {
@@ -614,6 +632,7 @@ class QueueModel extends Gdn_Model {
             $queueRow['ForeignType'] = 'Comment';
             $queueRow['DiscussionID'] = $data['DiscussionID'];
             $queueRow['CategoryID'] = $Discussion->CategoryID;
+            $queueRow['Name'] = sprintf(T('Re: %s'), val('Name', $Discussion));
             $queueRow['Body'] = $data['Body'];
             break;
          case 'discussion':
@@ -757,43 +776,38 @@ class QueueModel extends Gdn_Model {
     * @throws Gdn_UserException Unknown content type.
     */
    public static function generateForeignID($data = null, $newID = null, $contentType = null) {
+      $contentType = strtolower($contentType);
 
-      if ($data == null && $newID != null) {
-         switch (strtolower($contentType)) {
-            case 'comment':
-               return 'C-' . $newID;
-               break;
-            case 'discussion':
-               return 'D-' . $newID;
-               break;
-            case 'activity':
-               return 'A-' . $newID['ActivityID'];
-               break;
-            case 'activitycomment':
-               return 'AC-' . $newID;
-               break;
-            default:
-               throw new Gdn_UserException('Unknown content type');
-
+      if (!$contentType) {
+         if (GetValue('CommentID', $data)) {
+            $contentType = 'comment';
          }
-         return;
-      }
-      if (GetValue('CommentID', $data)) {
-         //comment
-         return 'C-' . $data['CommentID'];
-      }
-      if (GetValue('DiscussionID', $data)) {
-         //discussion
-         return 'D-' . $data['DiscussionID'];
-      }
-      if (GetValue('ActivityID', $data)) {
-         //activity comment
-         return 'AC-' . $data['ActivityID'];
+         if (GetValue('DiscussionID', $data)) {
+            $contentType = 'discussion';
+         }
+         if (GetValue('ActivityID', $data)) {
+            $contentType = 'activity';
+         }
+         if (GetValue('ActivityCommentID', $data)) {
+            $contentType = 'activitycomment';
+         }
+         throw new Gdn_UserException('Unknown content type');
       }
 
-      return uniqid('', true);
+      $unique = str_replace('.', '', uniqid('', true));
 
-
+      switch ($contentType) {
+         case 'comment':
+            return 'C-'.($newID ?: val('CommentID', $data, $unique));
+         case 'discussion':
+            return 'D-'.($newID ?: val('DiscussionID', $data, $unique));
+         case 'activity':
+            return 'A-'.($newID ?: val('ActivityID', $data, $unique));
+         case 'activitycomment':
+            return 'AC-'.($newID ?: val('ActivityCommentID', $data, $unique));
+         default:
+            throw new Gdn_UserException('Unknown content type');
+      }
    }
 
    public function validate($FormPostValues, $Insert = FALSE) {

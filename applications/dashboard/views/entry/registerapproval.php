@@ -60,7 +60,7 @@
          echo $this->Form->Label("Security Check", '');
          echo $this->Form->Captcha();
       ?></li>
-      <?php $this->FireEvent('RegisterBeforeTerms'); ?>
+      <?php $this->FireEvent('RegisterFormBeforeTerms'); ?>
       <li>
          <?php
             echo $this->Form->CheckBox('TermsOfService', $TermsOfServiceText, array('value' => '1'));

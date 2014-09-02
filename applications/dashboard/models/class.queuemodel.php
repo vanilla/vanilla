@@ -602,19 +602,13 @@ class QueueModel extends Gdn_Model {
     */
    public function isContentOnline($queueItem) {
       $ID = $this->GetIDFromForeignID($queueItem['ForeignID']);
-      switch (strtolower($queueItem['ForeignType'])) {
-         case 'discussion';
-            $model = new DiscussionModel();
-            break;
-         case 'comment':
-            $model = new CommentModel();
-            break;
-         default:
-            return false;
+      $model = $this->getModel($queueItem['ForeignType']);
+      if (!$model) {
+         throw Gdn_ErrorException('Error loading model.');
       }
       $content = $model->GetID($ID);
       if ($content) {
-         $model->Delete($ID);
+         return true;
       }
       return false;
    }
@@ -992,27 +986,45 @@ class QueueModel extends Gdn_Model {
     * Handle content removal.
     *
     * @param $existingQueueRow
-    * @throws Gdn_UserException
     */
    public function removeContent($existingQueueRow) {
 
-      switch (strtolower($existingQueueRow['ForeignType'])) {
+      $ID = $this->GetIDFromForeignID($existingQueueRow['ForeignID']);
+      if (!$ID) {
+         switch (strtolower($existingQueueRow['ForeignType'])) {
+            case 'discussion':
+               $ID = $existingQueueRow['DiscussionID'];
+               break;
+            case 'comment':
+               $ID = $existingQueueRow['CommentID'];
+               break;
+            default:
+               return;
+         }
+      }
+      $model = $this->getModel($existingQueueRow['ForeignType']);
+      $model->Delete($ID);
 
+   }
+
+   public function getModel($contentType) {
+      switch (strtolower($contentType)) {
          case 'discussion':
-            // Content Removal.
             $model = new DiscussionModel();
-            $model->Delete($existingQueueRow['DiscussionID']);
             break;
          case 'comment':
-            // Content Removal.
             $model = new CommentModel();
-            $model->Delete($existingQueueRow['CommentID']);
+            break;
+         case 'activity':
+            $model = new ActivityModel();
+            break;
+         case 'activitycomment':
+            $model = new Gdn_Model('ActivityComment');
             break;
          default:
-            throw new Gdn_UserException('Unknown type');
-
+            return false;
       }
-
+      return $model;
    }
 
 }

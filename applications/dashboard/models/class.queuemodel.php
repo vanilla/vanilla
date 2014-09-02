@@ -552,12 +552,15 @@ class QueueModel extends Gdn_Model {
 
    /**
     * Deny an item from the queue.
+    * 
+    * Optionally if the item is online; we will remove it
     *
     * @param array|string $queueItem QueueID or queue row
+    * @param bool $remove Remove content if online.
     * @return bool true if item was updated
     * @throws Gdn_UserException Item not found
     */
-   public function deny($queueItem) {
+   public function deny($queueItem, $remove = true) {
 
       if (is_numeric($queueItem)) {
          $queueItem = $this->GetID($queueItem);
@@ -582,9 +585,40 @@ class QueueModel extends Gdn_Model {
          return false;
       }
 
+      if ($remove && $this->isContentOnline($queueItem)) {
+         //Check if content is online.
+         $this->removeContent($queueItem);
+      }
+
       return true;
 
    }
+
+   /**
+    * Check if content is online.
+    *
+    * @param array $queueItem Item from the queue.
+    * @return bool
+    */
+   public function isContentOnline($queueItem) {
+      $ID = $this->GetIDFromForeignID($queueItem['ForeignID']);
+      switch (strtolower($queueItem['ForeignType'])) {
+         case 'discussion';
+            $model = new DiscussionModel();
+            break;
+         case 'comment':
+            $model = new CommentModel();
+            break;
+         default:
+            return false;
+      }
+      $content = $model->GetID($ID);
+      if ($content) {
+         $model->Delete($ID);
+      }
+      return false;
+   }
+
 
    /**
     * Convert save data to an array that can be saved in the queue.
@@ -790,6 +824,14 @@ class QueueModel extends Gdn_Model {
 
    }
 
+   public function GetIDFromForeignID($foreignID) {
+      $ID = stristr($foreignID, '-');
+      if ($ID != false) {
+         $ID = str_replace('-', '', $ID);
+      }
+      return $ID;
+   }
+
    public function validate($FormPostValues, $Insert = FALSE) {
 
       if (!$Insert) {
@@ -939,7 +981,7 @@ class QueueModel extends Gdn_Model {
             $this->Save($existingQueueRow);
          }
 
-         $this->removeContentIfRequired($existingQueueRow);
+         $this->removeContent($existingQueueRow);
       }
 
       return $queueID;
@@ -952,7 +994,7 @@ class QueueModel extends Gdn_Model {
     * @param $existingQueueRow
     * @throws Gdn_UserException
     */
-   public function removeContentIfRequired($existingQueueRow) {
+   public function removeContent($existingQueueRow) {
 
       switch (strtolower($existingQueueRow['ForeignType'])) {
 

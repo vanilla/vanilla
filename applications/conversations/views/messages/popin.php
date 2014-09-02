@@ -30,7 +30,7 @@ if (count($this->Data('Conversations'))):
          <b class="Subject"><?php echo Anchor($Subject, "/messages/{$Row['ConversationID']}#latest"); ?></b>
          <?php
          $Excerpt = SliceString(Gdn_Format::PlainText($Row['LastBody'], $Row['LastFormat']), 80);
-         echo Wrap(nl2br($Excerpt), 'div', array('class' => 'Excerpt'));
+         echo Wrap(nl2br(htmlspecialchars($Excerpt)), 'div', array('class' => 'Excerpt'));
          ?>
          <div class="Meta">
             <?php 

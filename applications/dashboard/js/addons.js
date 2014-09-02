@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "GET",
          url: testUrl,
-         data: {'DeliveryType':'JSON'},
+         data: {'DeliveryType':'VIEW'},
          dataType: 'html',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old errors from the form
@@ -80,7 +80,7 @@ jQuery(document).ready(function($) {
       $.ajax({
          type: "GET",
          url: testUrl,
-         data: {'DeliveryType':'JSON'},
+         data: {'DeliveryType':'VIEW'},
          dataType: 'html',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             // Remove any old errors from the form

@@ -183,8 +183,7 @@ class Gdn_ApplicationManager {
       SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
       
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
-      $Locale = Gdn::Locale();
-      $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
+      Gdn::Locale()->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
       
       return TRUE;
    }

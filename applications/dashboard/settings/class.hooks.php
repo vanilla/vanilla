@@ -217,6 +217,39 @@ class DashboardHooks implements Gdn_IPlugin {
    }
 
    /**
+    * Queue any items that have been logged for moderation.
+    *
+    * @param LogModel $sender
+    * @param array $args
+    */
+   public function logModel_afterInsert_handler($sender, $args) {
+      $logID = $args['LogID'];
+      $log = $args['Log'];
+
+      if ($log['Operation'] === 'Moderate') {
+         // Queue the record as a reported.
+         $queue = QueueModel::Instance();
+         $record = unserialize($log['Data']);
+         $row = QueueModel::convertToQueueRow($log['RecordType'], $record);
+         $row['Queue'] = 'reported';
+         $id = $queue->Save($row);
+      }
+   }
+
+   /**
+    * Dequeue items that have been approved in the log.
+    *
+    * @param LogModel $sender
+    * @param array $args
+    */
+   public function logModel_afterRestore_handler($sender, $args) {
+      $log = $args['Log'];
+      $queue = QueueModel::Instance();
+      $foreignID = QueueModel::generateForeignID(null, $log['RecordID'], $log['RecordType']);
+      $queue->Delete(array('ForeignID' => $foreignID));
+   }
+
+   /**
     * Method for plugins that want a friendly /sso method to hook into.
     *
     * @param RootController $Sender

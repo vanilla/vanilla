@@ -459,6 +459,12 @@ class LogModel extends Gdn_Pluggable {
       $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
       Gdn::Database()->Query($Sql);
 
+      // Clear the page cache too.
+      $CommentModel = new CommentModel();
+      foreach ($DiscussionIDs as $ID) {
+         $CommentModel->RemovePageCache($ID);
+      }
+
       $this->_RecalcIDs['Discussion'] = array();
    }
 

@@ -185,7 +185,6 @@ class ProxyRequest {
     * @return type 
     */
    public function Request($Options = NULL, $QueryParams = NULL, $Files = NULL, $ExtraHeaders = NULL) {
-      
       /*
        * Allow requests that just want to use defaults to provide a string instead
        * of an optionlist.

@@ -46,6 +46,37 @@ class DiscussionModel extends VanillaModel {
       parent::__construct('Discussion');
    }
 
+   /**
+    * Determines whether or not the current user can edit a discussion.
+    *
+    * @param object|array $discussion The discussion to examine.
+    * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
+    * @return bool Returns true if the user can edit or false otherwise.
+    */
+   public static function canEdit($discussion, &$timeLeft = 0) {
+      // Users with global edit permission can edit.
+      if (Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', val('PermissionCategoryID', $discussion))) {
+         return true;
+      }
+
+      // Non-mods can't edit if they aren't the author.
+      if (Gdn::Session()->UserID != val('InsertUserID', $discussion)) {
+         return false;
+      }
+
+      // Determine if we still have time to edit.
+      $timeInserted = strtotime(val('DateInserted', $discussion));
+      $editContentTimeout = C('Garden.EditContentTimeout', -1);
+
+      $canEdit = $editContentTimeout == -1 || $timeInserted + $editContentTimeout > time();
+
+      if ($canEdit && $editContentTimeout > 0) {
+         $timeLeft = $timeInserted + $editContentTimeout - time();
+      }
+
+      return $canEdit;
+   }
+
    public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
       $Result = array('Complete' => TRUE);
       switch ($Column) {
@@ -1372,11 +1403,15 @@ class DiscussionModel extends VanillaModel {
     * @param mixed $Value
     */
    public function SetField($RowID, $Property, $Value = FALSE) {
-       $this->EventArguments['DiscussionID'] = $RowID;
-       $this->EventArguments['SetField'] = array($Property => $Value);
+      $this->EventArguments['DiscussionID'] = $RowID;
+      if (!is_array($Property)) {
+         $this->EventArguments['SetField'] = array($Property => $Value);
+      } else {
+         $this->EventArguments['SetField'] = $Property;
+      }
 
-       parent::SetField($RowID, $Property, $Value);
-       $this->fireEvent('AfterSetField');
+      parent::SetField($RowID, $Property, $Value);
+      $this->fireEvent('AfterSetField');
    }
 
    /**
@@ -1519,15 +1554,17 @@ class DiscussionModel extends VanillaModel {
                }
 
                // Check for spam.
+
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
             	if ($Spam)
                   return SPAM;
 
-               // Check for approval
-					$ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-					if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
-               	LogModel::Insert('Pending', 'Discussion', $Fields);
-               	return UNAPPROVED;
+               if (!GetValue('Approved', $FormPostValues)) {
+                  $QueueModel = QueueModel::Instance();
+                  $Premoderation = $QueueModel->Premoderate('Discussion', $Fields);
+                  if ($Premoderation) {
+                     return UNAPPROVED;
+                  }
                }
 
                // Create discussion

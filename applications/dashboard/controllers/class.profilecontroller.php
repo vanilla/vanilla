@@ -1293,7 +1293,11 @@ class ProfileController extends Gdn_Controller {
          }
 
          if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-            $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit My Thumbnail'), '/profile/thumbnail', array('Garden.Profiles.Edit','Garden.ProfilePicture.Edit'), array('class' => 'ThumbnailLink'));
+            $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit My Thumbnail'), '/profile/thumbnail', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'ThumbnailLink'));
+         }
+
+         if ($this->User->Photo != '') {
+            $Module->AddLink('Options', Sprite('SpDelete').' '.T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'), $Session->TransientKey())), array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'RemovePictureLink'));
          }
       }
 
@@ -1302,7 +1306,7 @@ class ProfileController extends Gdn_Controller {
          $this->EventArguments['User'] = $this->User;
          $this->FireEvent('GetConnections');
          if (count($this->Data('Connections')) > 0) {
-            $Module->AddLink('Options', Sprite('SpConnection').' '.T('Social'), '/profile/connections', 'Garden.SignIn.Allow');
+            $Module->AddLink('Options', Sprite('SpConnection').' '.T('Social'), '/profile/connections', 'Garden.SignIn.Allow', array('class' => 'link-social'));
          }
       }
    }

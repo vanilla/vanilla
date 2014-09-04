@@ -632,6 +632,10 @@ class ImportModel extends Gdn_Model {
             $SQLPath = 'import/import_'.date('Y-m-d_His').'.sql';
             $this->Data('SQLPath', $SQLPath);
          }
+      } else {
+         // Importing will overwrite our System user record.
+         // Our CustomFinalization step (e.g. vbulletinimportmodel) needs this to be regenerated.
+         RemoveFromConfig('Garden.SystemUserID');
       }
 
       return TRUE;

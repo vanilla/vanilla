@@ -374,10 +374,15 @@ class ModController extends DashboardController {
     * Approve an item in the queue.
     *
     * @param $queueID
+    * @throws Gdn_UserException
     */
    public function approve($queueID) {
 
       $this->Permission('Garden.Moderation.Manage');
+
+      if (Gdn::Request()->RequestMethod() !== 'POST') {
+         throw new Gdn_UserException("This resource only accepts POST.", 405);
+      }
 
       $queueModel = QueueModel::Instance();
       $approved = $queueModel->approve($queueID);
@@ -391,10 +396,14 @@ class ModController extends DashboardController {
     * Deny an item in the queue.
     *
     * @param $queueID
+    * @throws Gdn_UserException
     */
    public function deny($queueID) {
 
       $this->Permission('Garden.Moderation.Manage');
+      if (Gdn::Request()->RequestMethod() !== 'POST') {
+         throw new Gdn_UserException("This resource only accepts POST.", 405);
+      }
 
 
       $queueModel = QueueModel::Instance();
@@ -422,6 +431,9 @@ class ModController extends DashboardController {
     */
    public function report() {
 
+      if (Gdn::Request()->RequestMethod() !== 'POST') {
+         throw new Gdn_UserException("This resource only accepts POST.", 405);
+      }
 
       $queueModel = QueueModel::Instance();
       // Validate request

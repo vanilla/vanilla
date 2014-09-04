@@ -718,8 +718,8 @@ class PermissionModel extends Gdn_Model {
 	 */
    public function Save($Values, $SaveGlobal = FALSE) {
       // Get the list of columns that are available for permissions.
-      $PermissionColumns = Gdn::PermissionModel()->DefineSchema()->Fields();
-      $Values = array_intersect_key($Values, $PermissionColumns);
+      //$PermissionColumns = Gdn::PermissionModel()->DefineSchema()->Fields();
+      //$Values = array_intersect_key($Values, $PermissionColumns);
 
       // Figure out how to find the existing permission.
       if(array_key_exists('PermissionID', $Values)) {

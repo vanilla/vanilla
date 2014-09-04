@@ -772,7 +772,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
       $Years = array();
       $Years[0] = T('Year');
-      for($i = $EndYear; $i >= $StartYear; --$i) {
+      for($i = $StartYear; $i <= $EndYear; ++$i) {
          $Years[$i] = $i;
       }
 

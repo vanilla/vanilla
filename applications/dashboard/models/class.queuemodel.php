@@ -331,7 +331,7 @@ class QueueModel extends Gdn_Model {
       $Qm->EventArguments['Options'] =& $Options;
       $Qm->EventArguments['Premoderate'] =& $IsPremoderation;
       $row = array();
-      $Qm->EventArguments['Queue'] =& $fields;
+      $Qm->EventArguments['Queue'] =& $row;
 
       $Qm->FireEvent('CheckPremoderation');
 

@@ -481,7 +481,7 @@ EOT;
 
             // Don't overwrite the user photo if the user uploaded a new one.
             $Photo = GetValue('Photo', $User);
-            if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+            if (!GetValue('Photo', $Data) || ($Photo && !IsUrl($Photo))) {
                unset($Data['Photo']);
             }
 

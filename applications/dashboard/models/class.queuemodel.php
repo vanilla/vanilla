@@ -839,6 +839,14 @@ class QueueModel extends Gdn_Model {
       return $ID;
    }
 
+   public function GetIDFromForeignID($foreignID) {
+      $ID = stristr($foreignID, '-');
+      if ($ID != false) {
+         $ID = str_replace('-', '', $ID);
+      }
+      return $ID;
+   }
+
    public function validate($FormPostValues, $Insert = FALSE) {
 
       if (!$Insert) {

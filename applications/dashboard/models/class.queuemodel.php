@@ -77,7 +77,7 @@ class QueueModel extends Gdn_Model {
                $Attributes = array();
          }
       } elseif (isset($data['ForeignID'])) {
-         $CurrentItem = $this->SQL->GetWhere('Queue', array('QueueID' => $data['ForeignID']))->FirstRow(DATASET_TYPE_ARRAY);
+         $CurrentItem = $this->SQL->GetWhere('Queue', array('ForeignID' => $data['ForeignID']))->FirstRow(DATASET_TYPE_ARRAY);
          if ($CurrentItem) {
             $PrimaryKeyVal = $CurrentItem['QueueID'];
             $Insert = FALSE;

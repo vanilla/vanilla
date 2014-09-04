@@ -474,17 +474,18 @@ class ImportModel extends Gdn_Model {
     * Get a custom import model based on the import's source.
     */
    public function GetCustomImportModel() {
-      $Header = $this->GetImportHeader();
-      $Source = GetValue('Source', $Header, '');
       $Result = NULL;
 
-      if (substr_compare('vbulletin', $Source, 0, 9, TRUE) == 0)
-         $Result = new vBulletinImportModel();
-      elseif (substr_compare('vanilla 1', $Source, 0, 9, TRUE) == 0)
-         $Result = new Vanilla1ImportModel();
+      // Get import type name.
+      $Header = $this->GetImportHeader();
+      $Source = str_replace(' ', '', val('Source', $Header, ''));
 
-      if ($Result !== NULL)
+      // Figure out if we have a custom import model for it.
+      $SourceModelName = $Source.'ImportModel';
+      if (class_exists($SourceModelName)) {
+         $Result = new $SourceModelName();
          $Result->ImportModel = $this;
+      }
 
       return $Result;
    }

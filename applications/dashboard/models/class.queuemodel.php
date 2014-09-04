@@ -375,7 +375,7 @@ class QueueModel extends Gdn_Model {
          throw new Gdn_UserException("Item not found in queue.", 404);
       }
 
-      if ($queueItem['Status'] != 'unread') {
+      if ($queueItem['Status'] == 'approved') {
          Trace('QueueID: ' . $queueItem['QueueID'] . ' already processed.  Skipping.');
          return true;
       }
@@ -590,7 +590,7 @@ class QueueModel extends Gdn_Model {
          throw new Gdn_UserException("Item not found in queue.", 404);
       }
 
-      if ($queueItem['Status'] != 'unread') {
+      if ($queueItem['Status'] == 'denied') {
          Trace('QueueID: ' . $queueItem['QueueID'] . ' already processed.  Skipping.');
          return true;
       }

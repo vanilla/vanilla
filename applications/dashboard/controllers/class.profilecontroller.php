@@ -1296,7 +1296,7 @@ class ProfileController extends Gdn_Controller {
             $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit My Thumbnail'), '/profile/thumbnail', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'ThumbnailLink'));
          }
 
-         if ($this->User->Photo != '') {
+         if ($this->User->Photo != '' && $AllowImages) {
             $Module->AddLink('Options', Sprite('SpDelete').' '.T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'), $Session->TransientKey())), array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'RemovePictureLink'));
          }
       }

@@ -322,6 +322,7 @@ if (!$PermissionTableExists) {
       'Garden.Activity.View' => 1,
       'Garden.Curation.Manage' => 1,
       'Garden.Moderation.Manage' => 1,
+      'Garden.PersonalInfo.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 1,
       'Garden.Email.View' => 1
@@ -331,6 +332,7 @@ if (!$PermissionTableExists) {
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
       'Garden.SignIn.Allow' => 1,
+      'Garden.Settings.View' => 1,
       'Garden.Settings.Manage' => 1,
       'Garden.Users.Add' => 1,
       'Garden.Users.Edit' => 1,
@@ -338,6 +340,8 @@ if (!$PermissionTableExists) {
       'Garden.Users.Approve' => 1,
       'Garden.Activity.Delete' => 1,
       'Garden.Activity.View' => 1,
+      'Garden.Messages.Manage' => 1,
+      'Garden.PersonalInfo.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 1,
       'Garden.AdvancedNotifications.Allow' => 1,

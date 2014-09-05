@@ -104,16 +104,18 @@ class Gdn_Session {
       if ($JunctionTable && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
+            $Pass = FALSE;
             foreach ($Permission as $PermissionName) {
                if($this->CheckPermission($PermissionName, FALSE, $JunctionTable, $JunctionID)) {
 						if(!$FullMatch)
 							return TRUE;
+                  $Pass = TRUE;
 					} else {
 						if($FullMatch)
 							return FALSE;
 					}
             }
-            return TRUE;
+            return $Pass;
          } else {
             if ($JunctionID !== '') {
                $Result = array_key_exists($Permission, $Permissions)

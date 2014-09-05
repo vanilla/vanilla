@@ -709,13 +709,18 @@ class DiscussionModel extends VanillaModel {
       $CategoryID = val('d.CategoryID', $Wheres, 0);
       $GroupID = val('d.GroupID', $Wheres, 0);
       // Get the discussion IDs of the announcements.
-      $CacheKey = $this->GetAnnouncementCacheKey(1, $CategoryID);
+      $CacheKey = $this->GetAnnouncementCacheKey($CategoryID);
       if ($GroupID == 0) {
          $this->SQL->Cache($CacheKey);
       }
       $this->SQL->Select('d.DiscussionID')
-         ->From('Discussion d')
-         ->Where('d.Announce >', '0');
+         ->From('Discussion d');
+
+      if ($CategoryID > 0) {
+         $this->SQL->Where('d.Announce >', '0');
+      } else {
+         $this->SQL->Where('d.Announce', 1);
+      }
       if ($GroupID > 0) {
          $this->SQL->Where('d.GroupID', $GroupID);
       } elseif ($CategoryID > 0) {
@@ -1514,9 +1519,16 @@ class DiscussionModel extends VanillaModel {
                $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
 
                // Clear the cache if necessary.
-               if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
-                  $CacheKeys = array($this->GetAnnouncementCacheKey(GetValue('CategoryID', $Stored)));
-                  $this->SQL->Cache($CacheKeys);
+               $CacheKeys = array();
+               if (val('Announce', $Stored) != val('Announce', $Fields)) {
+                  $CacheKeys[] = $this->GetAnnouncementCacheKey();
+                  $CacheKeys[] = $this->GetAnnouncementCacheKey(val('CategoryID', $Stored));
+               }
+               if (val('CategoryID', $Stored) != val('CategoryID', $Fields)) {
+                  $CacheKeys[] = $this->GetAnnouncementCacheKey(val('CategoryID', $Fields));
+               }
+               foreach ($CacheKeys as $CacheKey) {
+                  Gdn::Cache()->Remove($CacheKey);
                }
 
                self::SerializeRow($Fields);

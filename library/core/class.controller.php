@@ -1305,10 +1305,6 @@ class Gdn_Controller extends Gdn_Pluggable {
          if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
             echo $View ? 'TRUE' : 'FALSE';
          } else if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            // Add definitions to the page
-            if ($this->SyndicationMethod === SYNDICATION_NONE)
-               $this->AddAsset('Foot', $this->DefinitionList());
-
             // Render
             $this->RenderMaster();
          } else {
@@ -1739,6 +1735,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $this->EventArguments['Cdns'] = &$Cdns;
             $this->FireEvent('AfterJsCdns');
+
+            $this->Head->AddScript('', 'text/javascript', array('content' => $this->DefinitionList(false)));
 
             foreach ($this->_JsFiles as $Index => $JsInfo) {
                $JsFile = $JsInfo['FileName'];

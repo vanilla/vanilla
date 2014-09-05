@@ -21,6 +21,7 @@ Vanilla.scrollTo = function(q) {
 Vanilla.parent = function() {};
 Vanilla.parent.callRemote = function(func, args, success, failure) { console.log("callRemote stub: "+func, args); };
 
+window.gdn = window.gdn || {};
 window.Vanilla = Vanilla;
 
 })(window, jQuery);
@@ -129,7 +130,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 
-	gdn = {focused: true};
+	gdn.focused = true;
 	gdn.Libraries = {};
 
    $(window).blur(function() {
@@ -144,15 +145,15 @@ jQuery(document).ready(function($) {
       if (defaultVal == null)
          defaultVal = definition;
 
-      if(!(definition in definitions)) {
+      if (!(definition in gdn.meta)) {
          return defaultVal;
       }
 
-      if(set) {
-         definitions[definition] = defaultVal;
+      if (set) {
+         gdn.meta[definition] = defaultVal;
       }
 
-      return definitions[definition];
+      return gdn.meta[definition];
    }
 
    gdn.disable = function(e, progressClass) {
@@ -178,6 +179,17 @@ jQuery(document).ready(function($) {
          return true;
       else
          return false;
+   }
+
+   gdn.getMeta = function(key, defaultValue) {
+      if (gdn.meta[key] === undefined) {
+         return defaultValue;
+      } else {
+         return gdn.meta[key];
+      }
+   };
+   gdn.setMeta = function(key, value) {
+      gdn.meta[key] = value;
    }
 
    gdn.querySep = function(url) {

@@ -610,11 +610,12 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
-    * Undocumented method.
+    * Gets the javascript definition list used to pass data to the client.
     *
-    * @todo Method DefinitionList() needs a description.
+    * @param bool $wrap Whether or not to wrap the result in a `script` tag.
+    * @return string Returns a string containing the `<script>` tag of the definitions. .
     */
-   public function DefinitionList() {
+   public function DefinitionList($wrap = true) {
       $Session = Gdn::Session();
       if (!array_key_exists('TransportError', $this->_Definitions))
          $this->_Definitions['TransportError'] = T('Transport error: %s', 'A fatal error occurred while processing the request.<br />The server returned the following response: %s');
@@ -680,7 +681,10 @@ class Gdn_Controller extends Gdn_Pluggable {
          $this->_Definitions['Search'] = T('Search');
 
       // Output a JavaScript object with all the definitions.
-      $result = '<script>gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions).';</script>';
+      $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions).';';
+      if ($wrap) {
+         $result = "<script>$result</script>";
+      }
       return $result;
    }
 

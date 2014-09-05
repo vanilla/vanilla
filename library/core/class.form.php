@@ -154,6 +154,7 @@ class Gdn_Form extends Gdn_Pluggable {
       TouchValue('class', $Attributes, '');
       $Attributes['class'] .= ' TextBox BodyBox';
 
+      $Attributes['format'] = htmlspecialchars($Attributes['format']);
       $this->SetValue('Format', $Attributes['format']);
       
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);

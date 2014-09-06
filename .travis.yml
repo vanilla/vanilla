@@ -10,6 +10,7 @@ install:
 
 before_script:
   - mysql -e 'create database codeception_vanilla;'
+  - mysql -uroot -e "GRANT ALL PRIVILEGES ON codeception_vanilla.* TO codeception@localhost IDENTIFIED BY 'codeception'"
   - sh tests/_scripts/install-nginx.sh
   - git clone https://github.com/vanilla/addons.git
   - composer global require 'codeception/codeception=*'

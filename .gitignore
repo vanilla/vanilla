@@ -31,9 +31,7 @@ nbproject/project.properties
 nbproject/project.xml
 /vendor/
 
-tests/_data
 tests/_output
-tests/_support
 tests/acceptance/AcceptanceTester.php
 tests/unit/UnitTester.php
 tests/functional/FunctionalTester.php

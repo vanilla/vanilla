@@ -20,7 +20,9 @@ coverage:
 modules:
     config:
         Db:
-            dsn: ''
-            user: ''
-            password: ''
+            dsn: 'mysql:host=localhost;dbname=codeception_vanilla'
+            user: 'codeception'
+            password: 'codeception'
             dump: tests/_data/dump.sql
+            populate: true
+            cleanup: false

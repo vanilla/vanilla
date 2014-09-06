@@ -1,35 +1,29 @@
 <?php
-use \AcceptanceTester;
+use \FunctionalTester;
 
-class InstallCest {
+class FunctionalSetup {
 
     public function _before() {
-
-//        exec(
-//            'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "drop database if exists ' . MYSQL_DATABASE . ' "'
-//        );
-//        exec(
-//            'mysql -u' . MYSQL_USER . ' -p' . MYSQL_PASSWORD . ' -e "create database if not exists ' . MYSQL_DATABASE . ' "'
-//        );
-//        @unlink(__DIR__ . '/../../conf/config.php');
-
     }
 
     public function _after() {
     }
 
 
-    public function isWebServerConfigured(AcceptanceTester $I) {
-        $I->wantTo('Check http://codeception.local');
+    public function CheckOrSetupVanilla(FunctionalTester $I) {
+        $I->wantToTest('Check http://codeception.local');
         $I->amOnPage('/');
-        $I->seeElement('#dashboard_setup_index');
+        $bodyClass = $I->grabAttributeFrom('body', 'class');
+        if (stristr($bodyClass, 'Setup') !== false) {
+            $this->setupTest($I);
+        } else {
+            $I->see('Howdy, Stranger!');
+        }
+
+
     }
 
-    /**
-     * @depends isWebServerConfigured
-     * @param AcceptanceTester $I
-     */
-    public function setupTest(AcceptanceTester $I) {
+    protected function setupTest(FunctionalTester $I) {
 
         $I->wantTo('setup');
         $I->amOnPage('/');

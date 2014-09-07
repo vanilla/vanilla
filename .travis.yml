@@ -15,6 +15,7 @@ before_script:
   - git clone https://github.com/vanilla/addons.git
   - composer global require 'codeception/codeception=*'
   - ~/.composer/vendor/bin/codecept build
+  - phantomjs --webdriver=4444 &
 #  - vendor/bin/phpcs --config-set default_standard addons/standards/Vanilla
 
 script:

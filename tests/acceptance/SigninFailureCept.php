@@ -1,6 +1,8 @@
 <?php 
 $I = new AcceptanceTester($scenario);
 $I->wantTo('fail to sign in as admin user');
+$I->amOnPage('/');
+$I->see('Howdy, Stranger!');
 $I->amOnPage('/entry/signin');
 $I->fillField('Email', VANILLA_ADMIN_USER);
 $I->fillField('Password', 'abc123');

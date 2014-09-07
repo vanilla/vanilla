@@ -7,8 +7,16 @@
 class_name: AcceptanceTester
 modules:
     enabled:
-        - PhpBrowser
+#        - PhpBrowser
         - AcceptanceHelper
+        - WebDriver
     config:
-        PhpBrowser:
-            url: 'http://codeception.local'
+#        PhpBrowser:
+#            url: 'http://codeception.local'
+        WebDriver:
+            url: 'http://codeception.local/'
+            browser: chrome
+            window_size: 1024x768
+            wait: 10
+            capabilities:
+                unexpectedAlertBehaviour: 'accept'

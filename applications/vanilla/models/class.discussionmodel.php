@@ -1373,9 +1373,12 @@ class DiscussionModel extends VanillaModel {
     */
    public function SetField($RowID, $Property, $Value = FALSE) {
        $this->EventArguments['DiscussionID'] = $RowID;
-       $this->EventArguments['SetField'] = array($Property => $Value);
+       if (!is_array($Property)) {
+          $Property = array($Property => $Value);
+       }
+       $this->EventArguments['SetField'] = $Property;
 
-       parent::SetField($RowID, $Property, $Value);
+       parent::SetField($RowID, $Property);
        $this->fireEvent('AfterSetField');
    }
 

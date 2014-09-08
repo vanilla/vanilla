@@ -85,8 +85,8 @@ class Gdn_Session {
     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
     * @param string $JunctionTable The name of the junction table for a junction permission.
-	 * @param in $JunctionID The ID of the junction permission.
-	 * * @return boolean
+    * @param in $JunctionID The ID of the junction permission.
+    * * @return boolean
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User)) {
@@ -107,13 +107,13 @@ class Gdn_Session {
             $Pass = FALSE;
             foreach ($Permission as $PermissionName) {
                if($this->CheckPermission($PermissionName, FALSE, $JunctionTable, $JunctionID)) {
-						if(!$FullMatch)
-							return TRUE;
+                  if(!$FullMatch)
+                     return TRUE;
                   $Pass = TRUE;
-					} else {
-						if($FullMatch)
-							return FALSE;
-					}
+               } else {
+                  if($FullMatch)
+                     return FALSE;
+               }
             }
             return $Pass;
          } else {
@@ -252,31 +252,31 @@ class Gdn_Session {
       return $NewVisit;
    }
 
-	/**
+   /**
     *
     *
-	* @todo Add description.
-	* @param string|array $PermissionName
-	* @param mixed $Value
-	* @return NULL
-	*/
+   * @todo Add description.
+   * @param string|array $PermissionName
+   * @param mixed $Value
+   * @return NULL
+   */
 
-	public function SetPermission($PermissionName, $Value = NULL) {
-		if (is_string($PermissionName)) {
-			if ($Value === NULL || $Value === TRUE)
+   public function SetPermission($PermissionName, $Value = NULL) {
+      if (is_string($PermissionName)) {
+         if ($Value === NULL || $Value === TRUE)
             $this->_Permissions[] = $PermissionName;
          elseif ($Value === FALSE) {
             $Index = array_search($PermissionName, $this->_Permissions);
             if ($Index !== FALSE)
                unset($this->_Permissions[$Index]);
-			} elseif (is_array($Value))
+         } elseif (is_array($Value))
             $this->_Permissions[$PermissionName] = $Value;
-		} elseif (is_array($PermissionName)) {
-			if (array_key_exists(0, $PermissionName))
-				foreach ($PermissionName as $Name) $this->SetPermission($Name);
-			else
-				foreach ($PermissionName as $Name => $Value) $this->SetPermission($Name, $Value);
-		}
+      } elseif (is_array($PermissionName)) {
+         if (array_key_exists(0, $PermissionName))
+            foreach ($PermissionName as $Name) $this->SetPermission($Name);
+         else
+            foreach ($PermissionName as $Name => $Value) $this->SetPermission($Name, $Value);
+      }
     }
 
    /**
@@ -507,12 +507,12 @@ class Gdn_Session {
       return $Return;
    }
 
-	/**
-	 * Place a name/value pair into the user's session stash.
-	 */
-	public function Stash($Name = '', $Value = '', $UnsetOnRetrieve = TRUE) {
-		if ($Name == '')
-			return;
+   /**
+    * Place a name/value pair into the user's session stash.
+    */
+   public function Stash($Name = '', $Value = '', $UnsetOnRetrieve = TRUE) {
+      if ($Name == '')
+         return;
 
       // Grab the user's session
       $Session = $this->_GetStashSession($Value);
@@ -524,8 +524,8 @@ class Gdn_Session {
          $Session->Attributes[$Name] = $Value;
       } else if ($Name != '') {
          $Value = GetValue($Name, $Session->Attributes);
-			if ($UnsetOnRetrieve)
-				unset($Session->Attributes[$Name]);
+         if ($UnsetOnRetrieve)
+            unset($Session->Attributes[$Name]);
       }
       // Update the attributes
       if ($Name != '') {
@@ -541,13 +541,13 @@ class Gdn_Session {
          );
       }
       return $Value;
-	}
+   }
 
-	/**
-	 * Used by $this->Stash() to create & manage sessions for users & guests.
-	 * This is a stop-gap solution until full session management for users &
-	 * guests can be imlemented.
-	 */
+   /**
+    * Used by $this->Stash() to create & manage sessions for users & guests.
+    * This is a stop-gap solution until full session management for users &
+    * guests can be imlemented.
+    */
    private function _GetStashSession($ValueToStash) {
       $CookieName = C('Garden.Cookie.Name', 'Vanilla');
       $Name = $CookieName.'-sid';

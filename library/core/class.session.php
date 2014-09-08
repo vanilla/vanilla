@@ -90,15 +90,18 @@ class Gdn_Session {
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User)) {
-         if ($this->User->Banned || GetValue('Deleted', $this->User))
+         if ($this->User->Banned || GetValue('Deleted', $this->User)) {
             return FALSE;
-         elseif ($this->User->Admin)
+         }
+         elseif ($this->User->Admin) {
             return TRUE;
+         }
       }
 
       // Allow wildcard permission checks (e.g. 'any' Category)
-      if ($JunctionID == 'any')
+      if ($JunctionID == 'any') {
          $JunctionID = '';
+      }
 
       $Permissions = $this->GetPermissions();
       if ($JunctionTable && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
@@ -107,12 +110,14 @@ class Gdn_Session {
             $Pass = FALSE;
             foreach ($Permission as $PermissionName) {
                if($this->CheckPermission($PermissionName, FALSE, $JunctionTable, $JunctionID)) {
-                  if(!$FullMatch)
+                  if(!$FullMatch) {
                      return TRUE;
+                  }
                   $Pass = TRUE;
                } else {
-                  if($FullMatch)
+                  if($FullMatch) {
                      return FALSE;
+                  }
                }
             }
             return $Pass;

@@ -953,15 +953,16 @@ if (!function_exists('RegisterUrl')) {
    function RegisterUrl($Target = '', $force = false) {
       $registrationMethod = strtolower(C('Garden.Registration.Method'));
 
-      if ($registrationMethod === 'closed') {
+      if (strcasecmp($registrationMethod, 'closed') === 0) {
          return '';
-      }
-
-      // Check to see if there is even a sign in button.
-      if (!$force && $registrationMethod === 'connect') {
+      } elseif (!$force) {
          $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
-         if ($defaultProvider && !val('RegistrationUrl', $defaultProvider)) {
-            return '';
+         if ($defaultProvider) {
+            if ($url = val('RegisterUrlFinal', $defaultProvider)) {
+               return $url;
+            } else {
+               return '';
+            }
          }
       }
 
@@ -972,10 +973,14 @@ if (!function_exists('RegisterUrl')) {
 if (!function_exists('SignInUrl')) {
    function SignInUrl($target = '', $force = false) {
       // Check to see if there is even a sign in button.
-      if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') !== 0) {
+      if (!$force) {
          $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
-         if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
-            return '';
+         if ($defaultProvider) {
+            if ($url = val('SignInUrlFinal', $defaultProvider)) {
+               return $url;
+            } else {
+               return '';
+            }
          }
       }
 

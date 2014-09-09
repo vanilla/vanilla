@@ -32,6 +32,21 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       if (is_array($Attributes))
          $Row = array_merge($Attributes, $Row);
       unset($Row['Attributes']);
+
+      // Throw an event so that plugins can override their data.
+      Gdn::PluginManager()->EventArguments['Provider'] =& $Row;
+      Gdn::PluginManager()->CallEventHandlers(
+         Gdn::PluginManager(),
+         'AuthenticationProviderModel',
+         'Calculate'.$Row['AuthenticationSchemeAlias'],
+         'Handler'
+      );
+      unset(Gdn::PluginManager()->EventArguments['Provider']);
+
+      // Calculate the final urls of the provider.
+      TouchValue('SignInUrlFinal', $Row, $Row['SignInUrl']);
+      TouchValue('SignOutUrlFinal', $Row, $Row['SignOutUrl']);
+      TouchValue('RegisterUrlFinal', $Row, $Row['RegisterUrlFinal']);
    }
    
    /**

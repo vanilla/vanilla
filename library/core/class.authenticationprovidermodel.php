@@ -171,11 +171,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       // Validate the form posted values
       if ($this->Validate($Data, $Insert) === TRUE) {
          // Clear the default from other authentication providers.
-         $Default = GetValue('Default', $Data);
-         if ($Default) {
+         $IsDefault = GetValue('IsDefault', $Data);
+         if ($IsDefault) {
             $this->SQL->Put(
                $this->Name, 
-               array('Default' => 0),
+               array('IsDefault' => 0),
                array('AuthenticationKey <>' => GetValue('AuthenticationKey', $Data)));
          }
          

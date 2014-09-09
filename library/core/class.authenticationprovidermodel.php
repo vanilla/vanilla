@@ -16,6 +16,8 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
    const COLUMN_KEY = 'AuthenticationKey';
    const COLUMN_ALIAS = 'AuthenticationSchemeAlias';
    const COLUMN_NAME = 'Name';
+
+   protected static $DefaultProvider = null;
    
    public function __construct() {
       parent::__construct('UserAuthenticationProvider');
@@ -30,6 +32,21 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       if (is_array($Attributes))
          $Row = array_merge($Attributes, $Row);
       unset($Row['Attributes']);
+
+      // Throw an event so that plugins can override their data.
+      Gdn::PluginManager()->EventArguments['Provider'] =& $Row;
+      Gdn::PluginManager()->CallEventHandlers(
+         Gdn::PluginManager(),
+         'AuthenticationProviderModel',
+         'Calculate'.$Row['AuthenticationSchemeAlias'],
+         'Handler'
+      );
+      unset(Gdn::PluginManager()->EventArguments['Provider']);
+
+      // Calculate the final urls of the provider.
+      TouchValue('SignInUrlFinal', $Row, $Row['SignInUrl']);
+      TouchValue('SignOutUrlFinal', $Row, $Row['SignOutUrl']);
+      TouchValue('RegisterUrlFinal', $Row, $Row['RegisterUrlFinal']);
    }
    
    /**
@@ -38,10 +55,15 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     * @return array
     */
    public static function GetDefault() {
-      $Rows = self::GetWhereStatic(array('IsDefault' => 1));
-      if (empty($Rows))
-         return FALSE;
-      return array_pop($Rows);
+      if (!isset(self::$DefaultProvider)) {
+         $Rows = self::GetWhereStatic(array('IsDefault' => 1));
+         if (empty($Rows)) {
+            return FALSE;
+            self::$DefaultProvider = false;
+         }
+         self::$DefaultProvider = array_pop($Rows);
+      }
+      return self::$DefaultProvider;
    }
    
    public function GetProviders() {
@@ -149,11 +171,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       // Validate the form posted values
       if ($this->Validate($Data, $Insert) === TRUE) {
          // Clear the default from other authentication providers.
-         $Default = GetValue('Default', $Data);
-         if ($Default) {
+         $IsDefault = GetValue('IsDefault', $Data);
+         if ($IsDefault) {
             $this->SQL->Put(
                $this->Name, 
-               array('Default' => 0),
+               array('IsDefault' => 0),
                array('AuthenticationKey <>' => GetValue('AuthenticationKey', $Data)));
          }
          

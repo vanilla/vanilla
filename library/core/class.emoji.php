@@ -380,6 +380,11 @@ class Emoji {
       return $this->editorList;
    }
 
+   public function hasEditorList() {
+      $editorList = $this->getEmojiEditorList();
+      return !empty($editorList);
+   }
+
    /**
     * Set the list of emoji that can be used by the editor.
     * 
@@ -400,12 +405,7 @@ class Emoji {
       }
       $this->editorList = $list;
    }
-
-   public function hasEditorList() {
-       $editorList = $this->getEmojiEditorList();
-       return !empty($editorList);
-   }
-
+   
    /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
     *

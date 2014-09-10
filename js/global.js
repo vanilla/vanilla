@@ -1226,43 +1226,68 @@ jQuery(document).ready(function($) {
       return Youtube($container);
    });
 
+
    /**
-    * Twitter card embedding
+    * Twitter card embedding.
     *
+    * IIFE named just for clarity. Note: loading the Twitter widget JS
+    * asynchronously, and tying it into a promise, which will guarantee the
+    * script and its code is excuted before attempting to run the specific
+    * Twitter code. There used to be conflicts if another Twitter widget was
+    * included in the page, or if the connection was slow, resulting in
+    * `window.twttr` being undefined. The promise guarantees this won't happen.
     */
+   twitterCardEmbed = (function() {
+      'use strict';
 
-   if ($('div.twitter-card').length) {
-      // Twitter widgets library
-      window.twttr = (function (d,s,id) {
-         var t, js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
-         js.src="https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs);
-         return window.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
-      }(document, "script", "twitter-wjs"));
+      // Call to transform all tweet URLs into embedded cards. Expose to global
+      // scope for backwards compatibility, as it might be being used elsewhere.
+      window.tweets = function() {
+         $('.twitter-card').each(function(i, el){
+            if (!$(el).hasClass('twitter-card-loaded')) {
+               var card = $(el),
+                   tweetUrl = card.attr('data-tweeturl'),
+                   tweetID = card.attr('data-tweetid'),
+                   cardref = card.get(0);
 
-      twttr.ready(function(twttr){
-         setTimeout(tweets, 300);
-      });
-   }
+               // Candidate found, prepare transition.
+               card.addClass('twitter-card-preload');
 
-   function tweets() {
-      $('div.twitter-card').each(function(i, el){
-         var card = $(el);
-         var tweetUrl = card.attr('data-tweeturl');
-         var tweetID = card.attr('data-tweetid');
-         var cardref = card.get(0);
-
-         twttr.widgets.createTweet(
-            tweetID,
-            cardref,
-            function(iframe){ card.find('a.tweet-url').remove(); },
-            {
-               conversation: "none"
+               twttr.widgets.createTweet(tweetID, cardref, function(iframe) {
+                  card.find('.tweet-url').remove();
+                  // Fade it in.
+                  card.addClass('twitter-card-loaded');
+               }, {
+                  conversation: 'none'
+               });
             }
-         );
+         });
+      };
 
-      });
-   }
+      // Check for the existence of any Twitter card candidates.
+      if ($('div.twitter-card').length) {
+         $.when(
+            $.getScript('//platform.twitter.com/widgets.js')
+         ).done(function() {
+            // The promise returned successfully (script loaded and executed),
+            // so convert tweets already on page.
+            twttr.ready(tweets);
+
+            // Attach event for embed whenever new comments are posted, so they
+            // are automatically loaded. Currently works for new comments,
+            // and new private messages.
+            var newPostTriggers = [
+               'CommentAdded',
+               'MessageAdded'
+            ];
+
+            $(document).on(newPostTriggers.join(' '), function(e, data) {
+               twttr.ready(tweets);
+            });
+         });
+      }
+   }());
+
 
    /**
     * GitHub commit embedding

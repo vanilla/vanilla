@@ -4739,3 +4739,14 @@ Styleguide Attachments
    text-align: center;
    line-height: 1;
 }
+
+/**
+ * Twitter card embed.
+ */
+.twitter-card-preload {
+   opacity: 0;
+}
+.twitter-card-loaded {
+   transition: all 0.2s ease;
+   opacity: 1;
+}

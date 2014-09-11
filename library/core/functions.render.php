@@ -960,7 +960,7 @@ if (!function_exists('RegisterUrl')) {
       // Check to see if there is even a sign in button.
       if (!$force && $registrationMethod === 'connect') {
          $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
-         if ($defaultProvider && !val('RegistrationUrl', $defaultProvider)) {
+         if ($defaultProvider && !val('RegisterUrl', $defaultProvider)) {
             return '';
          }
       }

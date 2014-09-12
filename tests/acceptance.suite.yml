@@ -10,6 +10,7 @@ modules:
 #        - PhpBrowser
         - AcceptanceHelper
         - WebDriver
+        - Asserts
     config:
 #        PhpBrowser:
 #            url: 'http://codeception.local'

@@ -6,7 +6,7 @@
 
 class_name: FunctionalTester
 modules:
-    enabled: [Filesystem, FunctionalHelper, PhpBrowser, Db]
+    enabled: [Filesystem, FunctionalHelper, PhpBrowser, Db, Asserts]
     config:
         PhpBrowser:
             url: 'http://codeception.local'

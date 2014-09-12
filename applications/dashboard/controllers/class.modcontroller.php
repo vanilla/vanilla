@@ -84,9 +84,6 @@ class ModController extends DashboardController {
             throw new Gdn_UserException('Not Found', 404);
          }
       }
-      //default page to display if no request arguments
-      $this->Render('blank','utility','dashboard');
-
    }
 
    /**
@@ -105,7 +102,7 @@ class ModController extends DashboardController {
       $this->setData(array(
             'Queues' => $queueTotals,
          ));
-      $this->Render('blank','utility','dashboard');
+      $this->Render('blank', 'utility', 'dashboard');
    }
 
    /**
@@ -196,7 +193,7 @@ class ModController extends DashboardController {
             'Totals' => $totals,
          )
       );
-      $this->Render('blank','utility','dashboard');
+      $this->Render('blank', 'utility', 'dashboard');
    }
 
    /**

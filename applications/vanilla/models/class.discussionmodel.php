@@ -1554,7 +1554,7 @@ class DiscussionModel extends VanillaModel {
                }
 
                // Update the user's discussion count.
-               $this->UpdateUserDiscussionCount(Gdn::Session()->UserID, TRUE);
+               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], TRUE);
 
                // Mark the user as participated.
                $this->SQL->Replace('UserDiscussion',

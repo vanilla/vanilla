@@ -29,7 +29,6 @@ $ codecept run unit
 
 ```
 
-
 ## Coverage Reports
 
 ```

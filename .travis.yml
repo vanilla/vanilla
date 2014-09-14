@@ -23,7 +23,9 @@ before_script:
 
 script:
   # Check coding standards compliance
-  - ~/.composer/vendor/bin/codecept run  # self tests
+  - ~/.composer/vendor/bin/codecept run unit
+  - ~/.composer/vendor/bin/codecept run functional
+  - ~/.composer/vendor/bin/codecept run acceptance
 #  - vendor/bin/phpcs ./library/core
 #  - vendor/bin/phpcs ./applications
 #  - vendor/bin/phpcs ./plugins

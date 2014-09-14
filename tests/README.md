@@ -61,6 +61,18 @@ mysql -uroot -proot -e
 "GRANT ALL PRIVILEGES ON codeception_vanilla.* TO codeception@localhost IDENTIFIED BY 'codeception'"
 ```
 
+####Install and Start PhantomJS
+
+http://phantomjs.org/download.html
+
+```
+brew update && brew install phantomjs
+```
+
+Start PhantomJS.  Suggested to run this in a screen.
+```
+$ phantomjs --webdriver=4444 &
+```
 
 ####Create a local bootstrap file (optional).  
 

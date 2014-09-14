@@ -378,6 +378,11 @@ class Emoji {
       return $this->editorList;
    }
 
+   public function hasEditorList() {
+      $editorList = $this->getEmojiEditorList();
+      return !empty($editorList);
+   }
+
    /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
     *
@@ -386,7 +391,7 @@ class Emoji {
     * @return string The html that represents the emiji.
     */
    public function img($emoji_path, $emoji_name) {
-      return sprintf($this->format, $emoji_path, $emoji_name);
+      return sprintf($this->format, Url($emoji_path), $emoji_name);
    }
 
    /**
@@ -504,7 +509,7 @@ class Emoji {
       $rdelim = preg_quote($this->rdelim, '`');
       $emoji = $this;
 
-      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) use ($emoji) {
+      $Text = preg_replace_callback("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function($m) use ($emoji) {
          $emoji_name = trim($m[1], ':');
          $emoji_path = $emoji->getEmoji($emoji_name);
          if ($emoji_path) {

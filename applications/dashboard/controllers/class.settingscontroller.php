@@ -55,11 +55,12 @@ class SettingsController extends DashboardController {
 
       // Validate & set parameters
       $Session = Gdn::Session();
-      $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $ApplicationName : '';
+      if ($ApplicationName && !$Session->ValidateTransientKey($TransientKey)) {
+         $ApplicationName = '';
+      }
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $this->Filter = $Filter;
-      $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
 
       $ApplicationManager = new Gdn_ApplicationManager();
       $this->AvailableApplications = $ApplicationManager->AvailableVisibleApplications();
@@ -562,7 +563,7 @@ class SettingsController extends DashboardController {
       $EnabledLocales = $LocaleModel->EnabledLocalePacks();
 
       // Check to enable/disable a locale.
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->AuthenticatedPostBack()) {
+      if (($TransientKey && Gdn::Session()->ValidateTransientKey($TransientKey)) || $this->Form->AuthenticatedPostBack()) {
          if ($Op) {
             $Refresh = FALSE;
             switch(strtolower($Op)) {
@@ -614,6 +615,7 @@ class SettingsController extends DashboardController {
                $LocaleFound = TRUE;
 
          }
+         $this->SetData('DefaultLocale', $DefaultLocale);
          $this->SetData('DefaultLocaleWarning', !$LocaleFound);
          $this->SetData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
       }
@@ -643,7 +645,10 @@ class SettingsController extends DashboardController {
 
       // Validate and set properties
       $Session = Gdn::Session();
-      $PluginName = $Session->ValidateTransientKey($TransientKey) ? $PluginName : '';
+      if ($PluginName && !$Session->ValidateTransientKey($TransientKey)) {
+         $PluginName =  '';
+      }
+
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $this->Filter = $Filter;
@@ -1043,7 +1048,7 @@ class SettingsController extends DashboardController {
       }
       $this->SetData('AvailableThemes', $Themes);
 
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
+      if ($ThemeName != '' && Gdn::Session()->ValidateTransientKey($TransientKey)) {
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
             if ($ThemeInfo === FALSE)
@@ -1112,7 +1117,7 @@ class SettingsController extends DashboardController {
       $this->SetData('AvailableThemes', $Themes);
 
       // Process self-post.
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
+      if ($ThemeName != '' && Gdn::Session()->ValidateTransientKey($TransientKey)) {
 
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
@@ -1221,6 +1226,27 @@ class SettingsController extends DashboardController {
       }
 
       Redirect('/settings/banner');
+   }
+
+   /**
+    * Remove the share image from config & delete it.
+    *
+    * @since 2.1
+    * @param string $TransientKey Security token.
+    */
+   public function RemoveShareImage($TransientKey = '') {
+      $this->Permission('Garden.Settings.Manage');
+
+      $Session = Gdn::Session();
+      if (Gdn::Request()->IsAuthenticatedPostBack()) {
+         $ShareImage = C('Garden.ShareImage', '');
+         RemoveFromConfig('Garden.ShareImage');
+         $Upload = new Gdn_Upload();
+         $Upload->Delete($ShareImage);
+      }
+
+      $this->RedirectUrl = '/settings/banner';
+      $this->Render('Blank', 'Utility');
    }
 
 

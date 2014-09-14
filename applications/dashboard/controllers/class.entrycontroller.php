@@ -172,7 +172,7 @@ class EntryController extends Gdn_Controller {
 
             // Attempt to authenticate.
             try {
-               if (!$this->Request->IsAuthenticatedPostBack()) {
+               if (!$this->Request->IsAuthenticatedPostBack() && !C('Garden.Embed.Allow')) {
                   $this->Form->AddError('Please try again.');
                   $Reaction = $Authenticator->FailedResponse();
                } else {
@@ -361,7 +361,7 @@ class EntryController extends Gdn_Controller {
          $Url = str_ireplace('{target}', rawurlencode(Url($Target, TRUE)), $Url);
 
          if ($this->DeliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->Data('Method'), 'POST') != 0)
-            Redirect($Url, 302);
+            redirectUrl($Url, 302);
          else {
             $this->SetData('Url', $Url);
             $Script = <<<EOT
@@ -481,7 +481,7 @@ EOT;
 
             // Don't overwrite the user photo if the user uploaded a new one.
             $Photo = GetValue('Photo', $User);
-            if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+            if (!GetValue('Photo', $Data) || ($Photo && !IsUrl($Photo))) {
                unset($Data['Photo']);
             }
 
@@ -863,7 +863,7 @@ EOT;
          $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('%s is required.'), T(UserModel::SigninLabelCode())));
          $this->Form->ValidateRule('Password', 'ValidateRequired');
 
-         if (!$this->Request->IsAuthenticatedPostBack()) {
+         if (!$this->Request->IsAuthenticatedPostBack() && !C('Garden.Embed.Allow')) {
             $this->Form->AddError('Please try again.');
          }
 

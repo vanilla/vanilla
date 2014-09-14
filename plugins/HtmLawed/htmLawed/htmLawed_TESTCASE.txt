@@ -1,6 +1,6 @@
 /*
-htmLawed_TESTCASE.txt, 27 August 2013
-htmLawed 1.1.16, 29 August 2013
+htmLawed_TESTCASE.txt, 2 August 2014
+htmLawed 1.1.18, 2 August 2014
 Copyright Santosh Patnaik
 Dual licensed with LGPL 3 and GPL 2+
 A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed
@@ -387,6 +387,7 @@ na Alemanha.
 
 <h6>XSS</h6>
 
+<img alt="<img onmouseover=confirm(1)//"<"">
 '';!--"<xss>=&{()}<br />
 <img src="javascript%3Aalert('xss');" /><br />
 <img src="javascript:alert('xss');" /><br />

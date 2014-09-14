@@ -778,12 +778,19 @@ if (!function_exists('Debug')) {
       if ($Value === NULL)
          return $Debug;
 
+      $Changed = $Debug != $Value;
       $Debug = $Value;
       if ($Debug) {
          error_reporting(E_ALL & ~E_STRICT & ~E_DEPRECATED);
          ini_set('display_errors', 1);
-      } else
+         Logger::logLevel(LogLevel::DEBUG);
+      } else {
          error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+
+         if ($Changed) {
+            Logger::logLevel(C('Garden.LogLevel', LogLevel::INFO));
+         }
+      }
    }
 }
 
@@ -3188,6 +3195,10 @@ if (!function_exists('SliceParagraph')) {
 
 if (!function_exists('SliceString')) {
    function SliceString($String, $Length, $Suffix = '…') {
+      if (!$Length) {
+         return $String;
+      }
+      
       if (function_exists('mb_strimwidth')) {
       	static $Charset;
       	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');

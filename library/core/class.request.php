@@ -810,8 +810,12 @@ class Gdn_Request {
       static $AllowSSL = NULL; if ($AllowSSL === NULL) $AllowSSL = C('Garden.AllowSSL', FALSE);
       static $RewriteUrls = NULL; if ($RewriteUrls === NULL) $RewriteUrls = C('Garden.RewriteUrls', FALSE);
 
-      if (!$AllowSSL)
+      if (!$AllowSSL) {
          $SSL = NULL;
+      } elseif ($WithDomain === 'https') {
+         $SSL = true;
+         $WithDomain = true;
+      }
 
       // If we are explicitly setting ssl urls one way or another
       if (!is_null($SSL)) {

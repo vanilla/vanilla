@@ -47,7 +47,7 @@ Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
 Gdn::Config()->Load(PATH_CONF.'/config-defaults.php');
 
 // Load installation-specific configuration so that we know what apps are enabled
-Gdn::Config()->Load(PATH_CONF.'/config.php', 'Configuration', TRUE);
+Gdn::Config()->Load(Gdn::Config()->DefaultPath(), 'Configuration', TRUE);
 
 /**
  * Bootstrap Early

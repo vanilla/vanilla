@@ -16,6 +16,8 @@ before_script:
   - composer global require 'codeception/codeception=*'
   - ~/.composer/vendor/bin/codecept build
   - phantomjs --webdriver=4444 --webdriver-loglevel=WARN &
+# allow phantom js to start
+  - sleep 5
 #  - vendor/bin/phpcs --config-set default_standard addons/standards/Vanilla
 
 script:

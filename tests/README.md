@@ -3,21 +3,55 @@
 
 Vanilla testing is powered by [Codeception](http://codecepton.com).
 
+
+## Travis
+
+If you do not want ci run for your commit you can add [ci skip] to your commit message.
+
 Continuous integration testing run by [travis-ci.org](http://travis-ci.org).
 
-Testing results can be seen at [https://travis-ci.org/vanilla/vanilla](http://travis-ci.org/vanilla/vanilla)  
+Testing results can be seen at [https://travis-ci.org/vanilla/vanilla](http://travis-ci.org/vanilla/vanilla)
 
-##Quick Start
 
-###Install codeception with composer global.
+## Running Tests
+
+Run all test in suite.
+
+```
+$ codecept run
+
+```
+
+Run tests for one suite. (unit, acceptance, functional)
+
+```
+$ codecept run unit
+
+```
+
+
+## Coverage Reports
+
+```
+$ codecept run unit --coverage-html
+```
+
+Test are generated in tests/_output.
+To view the coverage reports go to [http://codeception.local/tests/_output/coverage/](http://codeception.local/tests/_output/coverage/)
+
+
+##Install and Setup Test Environment
+
+###Quick Start
+
+####Install codeception with composer global.
 
 ```
 $ cd ~
 $ composer global require 'codeception/codeception=*'
 ```
 
-
-###Configure your localhost for testing
+####Configure your localhost for testing
 
 ####Configure webserver hostname
 
@@ -153,14 +187,5 @@ $
 
 Now you can start creating your own tests.
 
-
-## Coverage Reports
-
-```
-$ codecept run unit --coverage-html
-```
-
-Test are generated in tests/_output.
-To view the coverage reports go to [http://codeception.local/tests/_output/coverage/](http://codeception.local/tests/_output/coverage/)
 
 

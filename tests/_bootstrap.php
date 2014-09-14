@@ -18,8 +18,8 @@ if (file_exists($localBootstrapFile)) {
     define('VANILLA_ADMIN_PASSWORD', 'admin');
 
     define('MYSQL_HOST', 'localhost');
-    define('MYSQL_USER', 'codeception');
-    define('MYSQL_PASSWORD', 'codeception');
+    define('MYSQL_USER', 'root');
+    define('MYSQL_PASSWORD', '');
     define('MYSQL_DATABASE', 'codeception_vanilla');
 
 }

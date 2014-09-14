@@ -4,3 +4,7 @@
 class_name: UnitTester
 modules:
     enabled: [Asserts, UnitHelper, Db]
+    config:
+        Db:
+            populate: true
+            cleanup: false

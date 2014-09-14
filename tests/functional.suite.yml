@@ -11,4 +11,5 @@ modules:
         PhpBrowser:
             url: 'http://codeception.local'
         Db:
+            populate: false
             cleanup: false

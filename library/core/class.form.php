@@ -157,13 +157,15 @@ class Gdn_Form extends Gdn_Pluggable {
       $Attributes['format'] = htmlspecialchars($Attributes['format']);
       $this->SetValue('Format', $Attributes['format']);
 
+      $Result = $this->TextBox($Column, $Attributes).$this->Hidden('Format');
+
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
       $this->EventArguments['Column'] = $Column;
       $this->EventArguments['Attributes'] = $Attributes;
-      $this->EventArguments['BodyBox'] = $this->TextBox($Column, $Attributes).$this->Hidden('Format');
+      $this->EventArguments['BodyBox'] =& $Result;
       $this->FireEvent('BeforeBodyBox');
 
-      return '<div class="bodybox-wrap">'.$this->EventArguments['BodyBox'].'</div>';
+      return '<div class="bodybox-wrap">'.$Result.'</div>';
    }
 
    /**

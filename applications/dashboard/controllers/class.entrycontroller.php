@@ -294,7 +294,7 @@ class EntryController extends Gdn_Controller {
     *  - Register
     *  - SignOut (not complete)
     */
-   protected function CheckOverride($Type, $Target, $TransientKey = NULL) {
+   public function CheckOverride($Type, $Target, $TransientKey = NULL) {
       if (!$this->Request->Get('override', TRUE))
          return;
 

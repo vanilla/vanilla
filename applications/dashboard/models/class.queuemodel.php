@@ -809,17 +809,15 @@ class QueueModel extends Gdn_Model {
       if (!$contentType) {
          if (GetValue('CommentID', $data)) {
             $contentType = 'comment';
-         }
-         if (GetValue('DiscussionID', $data)) {
+         } elseif (GetValue('DiscussionID', $data)) {
             $contentType = 'discussion';
-         }
-         if (GetValue('ActivityID', $data)) {
+         } elseif (GetValue('ActivityID', $data)) {
             $contentType = 'activity';
-         }
-         if (GetValue('ActivityCommentID', $data)) {
+         } elseif (GetValue('ActivityCommentID', $data)) {
             $contentType = 'activitycomment';
+         } else {
+            throw new Gdn_UserException('Unknown content type');
          }
-         throw new Gdn_UserException('Unknown content type');
       }
 
       $unique = str_replace('.', '', uniqid('', true));

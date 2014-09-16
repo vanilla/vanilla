@@ -338,4 +338,26 @@ class ConversationMessageModel extends ConversationsModel {
       }
       return $MessageID;
    }
+
+   /**
+    * @param array $FormPostValues
+    * @param bool $Insert
+    * @return bool
+    */
+   public function Validate($FormPostValues, $Insert = FALSE) {
+      $valid = parent::Validate($FormPostValues, $Insert);
+
+      if (!CheckPermission('Garden.Moderation.Manage') && C('Conversations.MaxRecipients')) {
+         $max = C('Conversations.MaxRecipients');
+         if (isset($FormPostValues['RecipientUserID']) && count($FormPostValues['RecipientUserID']) > $max) {
+            $this->Validation->AddValidationResult(
+               'To',
+               Plural($max, "You are limited to %s recipient.", "You are limited to %s recipients.")
+            );
+            $valid = false;
+         }
+      }
+
+      return $valid;
+   }
 }

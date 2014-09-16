@@ -1563,12 +1563,16 @@ class UserModel extends Gdn_Model {
       } else {
          $this->AddUpdateFields($FormPostValues);
          $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+         if (!$User) {
+            $User = array();
+         }
 
          // Block banning the superadmin or System accounts
-         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues))
+         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues)) {
             $this->Validation->AddValidationResult('Banned', 'You may not ban a System user.');
-         elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues))
+         } elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues)) {
             $this->Validation->AddValidationResult('Banned', 'You may not ban a user with the Admin flag set.');
+         }
       }
 
       $this->EventArguments['FormPostValues'] = $FormPostValues;
@@ -1879,7 +1883,7 @@ class UserModel extends Gdn_Model {
                'role_remove',
                Logger::INFO,
                "{username} removed {toUsername} from the {role} role.",
-               ['toUsername' => $User->Name, 'role' => $RoleName]
+               array('toUsername' => $User->Name, 'role' => $RoleName)
             );
          }
 
@@ -1888,7 +1892,7 @@ class UserModel extends Gdn_Model {
                'role_add',
                Logger::INFO,
                "{username} added {toUsername} to the {role} role.",
-               ['toUsername' => $User->Name, 'role' => $RoleName]
+               array('toUsername' => $User->Name, 'role' => $RoleName)
             );
          }
 

@@ -424,7 +424,11 @@ if (!function_exists('DiscussionUrl')):
  */
 function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
    $Discussion = (object)$Discussion;
-   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+   $Name = Gdn_Format::Url($Discussion->Name);
+   if (empty($Name)) {
+      $Name = 'x';
+   }
+   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.$Name;
    if ($Page) {
       if ($Page > 1 || Gdn::Session()->UserID)
          $Result .= '/p'.$Page;
@@ -950,7 +954,7 @@ if (!function_exists('DiscussionLink')) {
 }
 
 if (!function_exists('RegisterUrl')) {
-   function RegisterUrl($Target = '') {
+   function RegisterUrl($Target = '', $force = false) {
       $registrationMethod = strtolower(C('Garden.Registration.Method'));
 
       if ($registrationMethod === 'closed') {
@@ -960,7 +964,7 @@ if (!function_exists('RegisterUrl')) {
       // Check to see if there is even a sign in button.
       if (!$force && $registrationMethod === 'connect') {
          $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
-         if (!val('RegistrationUrl', $defaultProvider)) {
+         if ($defaultProvider && !val('RegisterUrl', $defaultProvider)) {
             return '';
          }
       }
@@ -972,9 +976,9 @@ if (!function_exists('RegisterUrl')) {
 if (!function_exists('SignInUrl')) {
    function SignInUrl($target = '', $force = false) {
       // Check to see if there is even a sign in button.
-      if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0) {
+      if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') !== 0) {
          $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
-         if (!val('SignInUrl', $defaultProvider)) {
+         if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
             return '';
          }
       }

@@ -233,8 +233,11 @@ for($i=-1, $ci=count($t); ++$i<$ci;){
    if($ql && isset($cT[$p])){echo '</', array_pop($q), '>'; unset($e, $x); --$i;}
    continue;
   }
-  if(!isset($cE[$e])){$q[] = $e;}
-  echo '<', $e, $a, '>'; unset($e); continue;
+  if ($e !== 'span' || !empty($a)) {
+   if(!isset($cE[$e])){$q[] = $e;}
+   echo '<', $e, $a, '>';
+  }
+  unset($e); continue;
  }
  // specific parent-child
  if(isset($cS[$p][$e])){

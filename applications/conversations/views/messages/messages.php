@@ -35,6 +35,9 @@ foreach ($this->MessageData->Result() as $Message) {
             ?>
          </span>
          <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
+         <?php
+         $this->FireEvent('AfterConversationMessageDate');
+         ?>
       </div>
       <div class="Message">
          <?php

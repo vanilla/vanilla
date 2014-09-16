@@ -650,7 +650,7 @@ class QueueModel extends Gdn_Model {
          'ForeignUserID' => val('InsertUserID', $data, Gdn::Session()->UserID),
          'ForeignIPAddress' => val('InsertIPAddress', $data, Gdn::Request()->IpAddress()),
          'Format' => val('Format', $data, C('Garden.InputFormatter')),
-         'ForeignID' => val('ForeignID', $data, self::generateForeignID($data, null, $recordType))
+         'ForeignID' => self::generateForeignID($data, null, $recordType)
       );
 
       switch (strtolower($recordType)) {
@@ -834,7 +834,6 @@ class QueueModel extends Gdn_Model {
          default:
             throw new Gdn_UserException('Unknown content type');
       }
-      return $ID;
    }
 
    public function GetIDFromForeignID($foreignID) {

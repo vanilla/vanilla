@@ -424,7 +424,11 @@ if (!function_exists('DiscussionUrl')):
  */
 function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
    $Discussion = (object)$Discussion;
-   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+   $Name = Gdn_Format::Url($Discussion->Name);
+   if (empty($Name)) {
+      $Name = 'x';
+   }
+   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.$Name;
    if ($Page) {
       if ($Page > 1 || Gdn::Session()->UserID)
          $Result .= '/p'.$Page;

@@ -290,11 +290,12 @@ class EntryController extends Gdn_Controller {
    /**
     * Check the default provider to see if it overrides one of the entry methods and then redirect.
     * @param string $Type One of the following.
+    * @access protected
     *  - SignIn
     *  - Register
     *  - SignOut (not complete)
     */
-   public function CheckOverride($Type, $Target, $TransientKey = NULL) {
+   protected function _CheckOverride($Type, $Target, $TransientKey = NULL) {
       if (!$this->Request->Get('override', TRUE))
          return;
 
@@ -804,7 +805,7 @@ EOT;
     * @param string $TransientKey (default: "")
     */
    public function SignOut($TransientKey = "", $Override = "0") {
-      $this->CheckOverride('SignOut', $this->Target(), $TransientKey);
+      $this->_CheckOverride('SignOut', $this->Target(), $TransientKey);
 
       if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->IsPostBack()) {
          $User = Gdn::Session()->User;
@@ -842,7 +843,7 @@ EOT;
     */
    public function SignIn($Method = FALSE, $Arg1 = FALSE) {
       if (!$this->Request->IsPostBack())
-         $this->CheckOverride('SignIn', $this->Target());
+         $this->_CheckOverride('SignIn', $this->Target());
 
       Gdn::Session()->EnsureTransientKey();
 
@@ -1204,7 +1205,7 @@ EOT;
     */
    public function Register($InvitationCode = '') {
       if (!$this->Request->IsPostBack())
-         $this->CheckOverride('Register', $this->Target());
+         $this->_CheckOverride('Register', $this->Target());
 
       $this->FireEvent("Register");
 

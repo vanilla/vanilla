@@ -1082,7 +1082,7 @@ class Gdn_Format {
       $Url = $Matches[4];
 
       $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
-      $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com\/(\d+)';
+      $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';

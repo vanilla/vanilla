@@ -670,7 +670,7 @@ EOT;
             if ($UserSelect == 'current') {
                if (Gdn::Session()->UserID == 0) {
                   // This shouldn't happen, but a use could sign out in another browser and click submit on this form.
-                  $this->Form->AddError('@You were uexpectidly signed out.');
+                  $this->Form->AddError('@You were unexpectedly signed out.');
                } else {
                   $UserSelect = Gdn::Session()->UserID;
                }

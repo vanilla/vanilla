@@ -491,21 +491,34 @@ class ProfileController extends Gdn_Controller {
    /**
     * Set 'NoMobile' cookie for current user to prevent use of mobile theme.
     *
-    * @since 2.0.?
-    * @access public
+    * @param string $type The type of mobile device. This can be one of the following:
+    * - desktop: Force the desktop theme.
+    * - mobile: Force the mobile theme.
+    * - tablet: Force the tablet theme (desktop).
+    * - app: Force the app theme (app).
+    * - 1: Unset the force cookie and use the user agent to determine the theme.
     */
-   public function NoMobile($Unset = 0) {
-      if ($Unset == 1) {
+   public function NoMobile($type = 'desktop') {
+      $type = strtolower($type);
+
+      if ($type == '1') {
+         Gdn_CookieIdentity::DeleteCookie('X-UA-Device-Force');
+         Redirect("/", 302);
+      } if (in_array($type, array('mobile', 'desktop', 'tablet', 'app'))) {
+         $type = $type;
+      } else {
+         $type = 'desktop';
+      }
+
+      if ($type == '1') {
          // Allow mobile again
          Gdn_CookieIdentity::DeleteCookie('VanillaNoMobile');
-      }
-      else {
+      } else {
          // Set 48-hour "no mobile" cookie
          $Expiration = time() + 172800;
-         $Expire = 0;
-         $UserID = ((Gdn::Session()->IsValid()) ? Gdn::Session()->UserID : 0);
-         $KeyData = $UserID."-{$Expiration}";
-         Gdn_CookieIdentity::SetCookie('VanillaNoMobile', $KeyData, array($UserID, $Expiration, 'force'), $Expire);
+         $Path = C('Garden.Cookie.Path');
+         $Domain = C('Garden.Cookie.Domain');
+         safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
       }
 
       Redirect("/", 302);

@@ -495,17 +495,26 @@ class ProfileController extends Gdn_Controller {
     * @access public
     */
    public function NoMobile($Unset = 0) {
+      $unset = strtolower($Unset);
+
+      if ($unset == '1') {
+         Gdn_CookieIdentity::DeleteCookie('X-UA-Device-Force');
+         Redirect("/", 302);
+      } if (in_array($unset, array('mobile', 'desktop', 'tablet', 'app'))) {
+         $type = $unset;
+      } else {
+         $type = 'desktop';
+      }
+
       if ($Unset == 1) {
          // Allow mobile again
          Gdn_CookieIdentity::DeleteCookie('VanillaNoMobile');
-      }
-      else {
+      } else {
          // Set 48-hour "no mobile" cookie
          $Expiration = time() + 172800;
-         $Expire = 0;
-         $UserID = ((Gdn::Session()->IsValid()) ? Gdn::Session()->UserID : 0);
-         $KeyData = $UserID."-{$Expiration}";
-         Gdn_CookieIdentity::SetCookie('VanillaNoMobile', $KeyData, array($UserID, $Expiration, 'force'), $Expire);
+         $Path = C('Garden.Cookie.Path');
+         $Domain = C('Garden.Cookie.Domain');
+         safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
       }
 
       Redirect("/", 302);

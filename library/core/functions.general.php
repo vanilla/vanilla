@@ -3545,7 +3545,7 @@ if (!function_exists('userAgentType')) {
       }
 
       // See if there is an override in the cookie.
-      if ($type = val('X-UA-Device-force', $_COOKIE)) {
+      if ($type = val('X-UA-Device-Force', $_COOKIE)) {
          return $type;
       }
 

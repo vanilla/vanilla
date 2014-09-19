@@ -81,6 +81,6 @@ $RecordCount = $this->Data('RecordCount');
 if ($RecordCount)
    echo '<span class="Gloss">'.Plural($RecordCount, '%s result', '%s results').'</span>';
 
-PagerModule::Write(array('Wrapper' => '<div %1$s>%2$s</div>'));
+echo $this->Pager->ToString();
 
 echo '</div>';

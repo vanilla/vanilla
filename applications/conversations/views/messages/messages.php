@@ -3,7 +3,7 @@ $Session = Gdn::Session();
 
 $Alt = FALSE;
 $CurrentOffset = $this->Offset;
-foreach ($this->MessageData->Result() as $Message) {
+foreach ($this->Data['Messages'] as $Message) {
    $CurrentOffset++;
    $Alt = $Alt == TRUE ? FALSE : TRUE;
    $Class = 'Item';

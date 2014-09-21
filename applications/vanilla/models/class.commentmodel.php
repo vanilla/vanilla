@@ -933,14 +933,13 @@ class CommentModel extends VanillaModel {
             $ActivityModel->Queue($Activity, 'BookmarkComment', array('CheckRecord' => TRUE));
          }
 
-         // Record user-comment activity.
-         if ($Discussion != FALSE) {
+         // Check user can still see the discussion.
+         if (($Discussion != FALSE) && ($UserModel->GetCategoryViewPermission(GetValue('InsertUserID', $Discussion), $Discussion->CategoryID))) {
+            // Record user-comment activity.
             $Activity['NotifyUserID'] = GetValue('InsertUserID', $Discussion);
             $ActivityModel->Queue($Activity, 'DiscussionComment');
-			}
-         
-         // Record advanced notifications.
-         if ($Discussion !== FALSE) {
+            
+	    // Record advanced notifications 
             $this->RecordAdvancedNotications($ActivityModel, $Activity, $Discussion);
          }
          
@@ -1018,6 +1017,10 @@ class CommentModel extends VanillaModel {
             continue;
          
          $UserID = $Row['UserID'];
+         // Check user can still see the discussion.
+         if (!Gdn::UserModel()->GetCategoryViewPermission($UserID, $Category['CategoryID']))
+            continue;
+
          $Name = $Row['Name'];
          if (strpos($Name, '.Email.') !== FALSE) {
             $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;

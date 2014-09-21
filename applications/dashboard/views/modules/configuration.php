@@ -33,11 +33,11 @@ echo $Form->Errors();
             break;
          case 'labelcheckbox':
             echo $Form->Label($LabelCode);
-            echo $Form->CheckBox($Row['Name']);
+            echo $Form->CheckBox($Row['Name'], '', $Row['Options']);
             break;
          case 'checkbox':
             echo $Description;
-            echo $Form->CheckBox($Row['Name'], T($LabelCode));
+            echo $Form->CheckBox($Row['Name'], T($LabelCode), $Row['Options']);
             break;
          case 'dropdown':
             echo $Form->Label($LabelCode, $Row['Name']);

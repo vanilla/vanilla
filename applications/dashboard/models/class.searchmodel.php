@@ -106,6 +106,7 @@ class SearchModel extends Gdn_Model {
       
       $this->_SearchMode = $SearchMode;
 
+      $this->EventArguments['Search'] = $Search;
       $this->FireEvent('Search');
       
       if(count($this->_SearchSql) == 0)
@@ -121,7 +122,6 @@ class SearchModel extends Gdn_Model {
 		
 		$Sql = str_replace($this->Database->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $this->_SearchSql)."\n)", $Sql);
 		
-		$this->EventArguments['Search'] = $Search;
 		$this->FireEvent('AfterBuildSearchQuery');
 
       if ($this->_SearchMode == 'like')

@@ -183,7 +183,7 @@ class Gdn_Theme {
                $Class = trim($Class.' HasCount');
                $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
             }
-            if (!$Session->IsValid())
+            if (!$Session->IsValid() || !Gdn::ApplicationManager()->CheckApplication('Conversations'))
                $Text = FALSE;
             break;
          case 'forumroot':

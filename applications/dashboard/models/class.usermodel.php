@@ -2560,7 +2560,10 @@ class UserModel extends Gdn_Model {
       
       // Remove activity comments.
       $this->GetDelete('ActivityComment', array('InsertUserID' => $UserID), $Content);
-      
+
+      // Remove comments in moderation queue
+      $this->GetDelete('Log', array('RecordUserID' => $UserID, 'Operation' => 'Pending'), $Content);
+
       // Clear out information on the user.
       $this->SetField($UserID, array(
           'About' => NULL,

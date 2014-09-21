@@ -933,14 +933,13 @@ class CommentModel extends VanillaModel {
             $ActivityModel->Queue($Activity, 'BookmarkComment', array('CheckRecord' => TRUE));
          }
 
-         // Record user-comment activity.
-         if ($Discussion != FALSE) {
+         // Check user can still see the discussion.
+         if (($Discussion != FALSE) && ($UserModel->GetCategoryViewPermission(GetValue('InsertUserID', $Discussion), $Discussion->CategoryID))) {
+            // Record user-comment activity.
             $Activity['NotifyUserID'] = GetValue('InsertUserID', $Discussion);
             $ActivityModel->Queue($Activity, 'DiscussionComment');
-			}
-         
-         // Record advanced notifications.
-         if ($Discussion !== FALSE) {
+            
+	    // Record advanced notifications 
             $this->RecordAdvancedNotications($ActivityModel, $Activity, $Discussion);
          }
          

@@ -1198,14 +1198,9 @@ class Gdn_Form extends Gdn_Pluggable {
     * @return string
     */
    public function Input($FieldName, $Type = 'text', $Attributes = FALSE) {
-      if (!is_array($Attributes)) $Attributes = array();
       if ($Type == 'text' || $Type == 'password') {
          $CssClass = ArrayValueI('class', $Attributes);
          if ($CssClass == FALSE) $Attributes['class'] = 'InputBox';
-      }
-
-      if ($Type == 'password') {
-         $Attributes['autocomplete'] = 'off';
       }
 
       // Show inline errors?

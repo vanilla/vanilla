@@ -1333,7 +1333,7 @@ class ActivityModel extends Gdn_Model {
          $RegardingUserIDs = GetValue('RegardingUserIDs', $OldActivity['Data'], array());
          $RegardingUserCount = GetValue('RegardingUserID_Count', $OldActivity['Data'], 0);
          array_unshift($RegardingUserIDs, $OldActivity['RegardingUserID']);
-         if (($i = array_search($NewActivity['RegardingUserID']), $RegardingUserIDs) !== FALSE) {
+         if (($i = array_search($NewActivity['RegardingUserID'])) !== FALSE) {
             unset($RegardingUserIDs[$i]);
             $RegardingUserIDs = array_values($RegardingUserIDs);
          }

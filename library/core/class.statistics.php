@@ -63,7 +63,8 @@ class Gdn_Statistics extends Gdn_Plugin {
             'Cookies'   => FALSE
          ));
          $Response = $ProxyRequest->Request(array(
-            'Url'       => $FinalURL
+            'Url'       => $FinalURL,
+            'Log'       => FALSE
          ), $RequestParameters);
       } catch (Exception $e) {
          $Response = FALSE;
@@ -122,7 +123,7 @@ class Gdn_Statistics extends Gdn_Plugin {
       $Request = array_merge($Request, array(
          'ServerHostname' => Url('/', TRUE),
          'ServerType' => Gdn::Request()->GetValue('SERVER_SOFTWARE'),
-         'PHPVersion' => phpversion(),
+         'PHPVersion' => str_replace(PHP_EXTRA_VERSION, '', PHP_VERSION),
          'VanillaVersion' => APPLICATION_VERSION
       ));
    }
@@ -686,7 +687,11 @@ class Gdn_Statistics extends Gdn_Plugin {
       $EmbedViews = 0;
 
       try {
-         if (C('Garden.Analytics.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
+         if (
+            C('Garden.Analytics.Views.Denormalize', FALSE) &&
+            Gdn::Cache()->ActiveEnabled() &&
+            Gdn::Cache()->Type() != Gdn_Cache::CACHE_TYPE_NULL)
+         {
             $CacheKey = "QueryCache.Analytics.CountViews";
 
             // Increment. If not success, create key.

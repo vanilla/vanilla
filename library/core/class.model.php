@@ -190,7 +190,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * Connects to the database and defines the schema associated with
     * $this->Name. Also instantiates and automatically defines
     * $this->Validation.
-    *
+    * @return Gdn_Schema Returns the schema for this model.
     */
    public function DefineSchema() {
       if (!isset($this->Schema)) {
@@ -203,6 +203,7 @@ class Gdn_Model extends Gdn_Pluggable {
 
          $this->Validation->ApplyRulesBySchema($this->Schema);
       }
+      return $this->Schema;
    }
 
 
@@ -277,8 +278,8 @@ class Gdn_Model extends Gdn_Pluggable {
 
 
    /**
-    * @param unknown_type $Fields
-    * @return unknown
+    * @param array $Fields
+    * @return bool
     * @todo add doc
     */
    public function Insert($Fields) {
@@ -306,9 +307,9 @@ class Gdn_Model extends Gdn_Pluggable {
 
 
    /**
-    * @param unknown_type $Fields
-    * @param unknown_type $Where
-    * @param unknown_type $Limit
+    * @param array $Fields
+    * @param array $Where
+    * @param array $Limit
     * @todo add doc
     */
    public function Update($Fields, $Where = FALSE, $Limit = FALSE) {

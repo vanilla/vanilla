@@ -251,13 +251,13 @@ class VanillaHooks implements Gdn_IPlugin {
       $Sender->Preferences['Notifications']['Email.DiscussionComment'] = T('Notify me when people comment on my discussions.');
       $Sender->Preferences['Notifications']['Email.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
       $Sender->Preferences['Notifications']['Email.Mention'] = T('Notify me when people mention me.');
-      $Sender->Preferences['Notifications']['Email.ParticipateComment'] = T('Notify me when people comment on discissions I\'ve participated in.');
+      $Sender->Preferences['Notifications']['Email.ParticipateComment'] = T('Notify me when people comment on discussions I\'ve participated in.');
 
 
       $Sender->Preferences['Notifications']['Popup.DiscussionComment'] = T('Notify me when people comment on my discussions.');
       $Sender->Preferences['Notifications']['Popup.BookmarkComment'] = T('Notify me when people comment on my bookmarked discussions.');
       $Sender->Preferences['Notifications']['Popup.Mention'] = T('Notify me when people mention me.');
-      $Sender->Preferences['Notifications']['Popup.ParticipateComment'] = T('Notify me when people comment on discissions I\'ve participated in.');
+      $Sender->Preferences['Notifications']['Popup.ParticipateComment'] = T('Notify me when people comment on discussions I\'ve participated in.');
 
 //      if (Gdn::Session()->CheckPermission('Garden.AdvancedNotifications.Allow')) {
 //         $Sender->Preferences['Notifications']['Email.NewDiscussion'] = array(T('Notify me when people start new discussions.'), 'Meta');
@@ -605,7 +605,7 @@ class VanillaHooks implements Gdn_IPlugin {
    public function Setup() {
       $Database = Gdn::Database();
       $Config = Gdn::Factory(Gdn::AliasConfig);
-      $Drop = Gdn::Config('Vanilla.Version') === FALSE ? TRUE : FALSE;
+      $Drop = FALSE; //Gdn::Config('Vanilla.Version') === FALSE ? TRUE : FALSE;
       $Explicit = TRUE;
 
       // Call structure.php to update database

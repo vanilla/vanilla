@@ -1775,8 +1775,11 @@ class ImportModel extends Gdn_Model {
          
          foreach ($Categories as $Category) {
             $UrlCode = urldecode(Gdn_Format::Url($Category['Name']));
-            if (strlen($UrlCode) > 50)
-               $UrlCode = $Category['CategoryID'];
+            if (strlen($UrlCode) > 50) {
+               $UrlCode = 'c'.$Category['CategoryID'];
+            } elseif (is_numeric($UrlCode)) {
+               $UrlCode = 'c'.$UrlCode;
+            }
             
             if (in_array($UrlCode, $TakenCodes)) {
                $ParentCategory = CategoryModel::Categories($Category['ParentCategoryID']);

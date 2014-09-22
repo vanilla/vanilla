@@ -91,7 +91,7 @@ class Gdn {
     * Get a configuration setting for the application.
     * @param string $Name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
     * @param mixed $Default The result to return if the configuration setting is not found.
-    * @return mixed The configuration setting.
+    * @return Gdn_Config|mixed The configuration setting.
     */
    public static function Config($Name = FALSE, $Default = FALSE) {
       $Config = self::$_Config;

@@ -112,9 +112,13 @@ class DashboardHooks implements Gdn_IPlugin {
       }
 
       // Allow return to mobile site
-		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
-		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+		$ForceNoMobile = val('X-UA-Device-Force', $_COOKIE);
+		if ($ForceNoMobile === 'desktop') {
 		   $Sender->AddAsset('Foot', Wrap(Anchor(T('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
+      }
+
+      // Allow global translation of TagHint
+      $Sender->AddDefinition("TagHint", T("TagHint", "Start to type..."));
    }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -247,6 +251,11 @@ class DashboardHooks implements Gdn_IPlugin {
 
       $sender->addGroup('etc', array('sort' => 100));
       if (Gdn::Session()->IsValid()) {
+         // Switch between the full site and mobile.
+         if (IsMobile()) {
+            $sender->addLink('etc.nomobile', array('text' => t('Full Site'), 'url' => '/profile/nomobile', 'icon' => icon('resize-full'), 'sort' => 100));
+         }
+
          $sender->addLink('etc.signout', array('text' => t('Sign Out'), 'url' => SignOutUrl(), 'icon' => icon('signout'), 'sort' => 100));
       } else {
          $sender->addLink('etc.signin', array('text' => t('Sign In'), 'url' => SignInUrl(), 'icon' => icon('signin'), 'sort' => 100));
@@ -324,7 +333,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
       // Show the invitations if we're using the invite registration method.
       if (strcasecmp(C('Garden.Registration.Method'), 'invitation') === 0)
-         $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => UserUrl($User, '', 'invitations'), 'icon' => icon('ticket')));
+         $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => UserUrl($user, '', 'invitations'), 'icon' => icon('ticket')));
 
       // Users can edit their own profiles and moderators can edit any profile.
       if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))

@@ -58,14 +58,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
    private $_AssetCollection;
 
    /**
-    * The name of the controller folder that contains the controller that has
-    * been requested.
-    *
-    * @var string
-    */
-   public $ControllerFolder;
-
-   /**
     * The name of the controller to be dispatched.
     *
     * @var string
@@ -126,7 +118,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       $this->Request = '';
       $this->_ApplicationFolder = '';
       $this->_AssetCollection = array();
-      $this->ControllerFolder = '';
       $this->ControllerName = '';
       $this->ControllerMethod = '';
       $this->_ControllerMethodArgs = array();
@@ -157,7 +148,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       return $this->ControllerMethod;
    }
 
-   public function ControllerArguments() {
+   public function ControllerArguments($Value = NULL) {
+      if ($Value !== NULL) {
+         $this->_ControllerMethodArgs = $Value;
+      }
       return $this->_ControllerMethodArgs;
    }
 
@@ -193,8 +187,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       try {
          $BlockExceptions = array(
-             '`^utility/ping(/.*)?$`i'              => self::BLOCK_ANY,
              '/^utility(\/.*)?$/'                   => self::BLOCK_NEVER,
+             '/^home\/error(\/.*)?/'                => self::BLOCK_NEVER,
              '/^plugin(\/.*)?$/'                    => self::BLOCK_NEVER,
              '/^sso(\/.*)?$/'                       => self::BLOCK_NEVER,
              '/^discussions\/getcommentcounts/'     => self::BLOCK_NEVER,
@@ -233,13 +227,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          $Request->WithURI(Gdn::Router()->GetDestination('UpdateMode'));
       }
 
-      // Analze the request AFTER checking for update mode.
+      // Analyze the request AFTER checking for update mode.
       $this->AnalyzeRequest($Request);
       $this->FireEvent('AfterAnalyzeRequest');
 
-      // If we're in updatemode and can block, redirect to signin
+      // If we're in update mode and can block, redirect to signin
       if (C('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
-         Redirect('/entry/signin?Target='.urlencode($this->Request));
+         if ($this->_DeliveryType === DELIVERY_TYPE_DATA) {
+            safeHeader('HTTP/1.0 401 Unauthorized', TRUE, 401);
+            safeHeader('Content-Type: application/json', TRUE);
+            echo json_encode(array('Code' => '401', 'Exception' => T('You must sign in.')));
+         } else {
+            Redirect('/entry/signin?Target='.urlencode($this->Request));
+         }
          exit();
       }
 
@@ -282,6 +282,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Set up a default controller method in case one isn't defined.
          $ControllerMethod = str_replace('_', '', $this->ControllerMethod);
          $Controller->OriginalRequestMethod = $ControllerMethod;
+         $this->EventArguments['ControllerMethod'] =& $ControllerMethod;
 
          // Take enabled plugins into account, as well
          $PluginReplacement = Gdn::PluginManager()->HasNewMethod($this->ControllerName(), $this->ControllerMethod);
@@ -304,7 +305,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          // Pass in the querystring values
          $Controller->ApplicationFolder = $this->_ApplicationFolder;
          $Controller->Application = $this->EnabledApplication();
-         $Controller->ControllerFolder = $this->ControllerFolder;
          $Controller->RequestMethod = $this->ControllerMethod;
          $Controller->RequestArgs = $this->_ControllerMethodArgs;
          $Controller->Request = $Request;
@@ -396,12 +396,22 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       if ($ApplicationFolder == '')
          $ApplicationFolder = $this->_ApplicationFolder;
 
-      foreach (Gdn::ApplicationManager()->AvailableApplications() as $ApplicationName => $ApplicationInfo) {
-         if (GetValue('Folder', $ApplicationInfo, FALSE) === $ApplicationFolder) {
-            $EnabledApplication = $ApplicationName;
-            $this->EventArguments['EnabledApplication'] = $EnabledApplication;
-            $this->FireEvent('AfterEnabledApplication');
-            return $EnabledApplication;
+      if (strpos($ApplicationFolder, 'plugins/') === 0) {
+         $Plugin = StringBeginsWith($ApplicationFolder, 'plugins/', FALSE, TRUE);
+
+         if (array_key_exists($Plugin, Gdn::PluginManager()->AvailablePlugins())) {
+            return $Plugin;
+         }
+
+         return FALSE;
+      } else {
+         foreach (Gdn::ApplicationManager()->AvailableApplications() as $ApplicationName => $ApplicationInfo) {
+            if (GetValue('Folder', $ApplicationInfo, FALSE) === $ApplicationFolder) {
+               $EnabledApplication = $ApplicationName;
+               $this->EventArguments['EnabledApplication'] = $EnabledApplication;
+               $this->FireEvent('AfterEnabledApplication');
+               return $EnabledApplication;
+            }
          }
       }
       return FALSE;
@@ -456,7 +466,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
       // Clear the slate
       $this->_ApplicationFolder = '';
-      $this->ControllerFolder = '';
       $this->ControllerName = '';
       $this->ControllerMethod = 'index';
       $this->_ControllerMethodArgs = array();
@@ -599,7 +608,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       }
 
       $ControllerName = $Controller.'Controller';
-      $ControllerPath = Gdn_Autoloader::Lookup($ControllerName);
+      $ControllerPath = Gdn_Autoloader::Lookup($ControllerName, array('MapType' => NULL));
 
       try {
 
@@ -629,8 +638,22 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                array_pop($InterimPath); // Get rid of the end. Useless;
                $InterimPath = explode('/', trim(array_pop($InterimPath)));
                $Application = array_pop($InterimPath);
-               if (!in_array($Application, $this->EnabledApplicationFolders()))
-                  return false;
+               $AddonType = array_pop($InterimPath);
+               switch ($AddonType) {
+                  case 'plugins':
+                     if (!in_array($Application, Gdn::PluginManager()->EnabledPluginFolders()))
+                        return false;
+                     $Application = 'plugins/'.$Application;
+                     break;
+                  case 'applications':
+                     if (!in_array($Application, $this->EnabledApplicationFolders()))
+                        return false;
+                     break;
+                  default:
+                     return false;
+               }
+
+
             } else {
                return false;
             }
@@ -650,7 +673,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
          $this->ControllerName = $Controller;
          $this->_ApplicationFolder = (is_null($Application) ? '' : $Application);
-         $this->ControllerFolder = '';
 
          $Length = sizeof($Parts);
          if ($Length > $ControllerKey + 1)

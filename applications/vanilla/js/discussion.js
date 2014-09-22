@@ -3,11 +3,6 @@ jQuery(document).ready(function($) {
        $.post(gdn.url('/post/notifynewdiscussion?discussionid='+gdn.definition('DiscussionID', '')));
 /* Comment Form */
 
-   if ($.autogrow)
-      $('textarea.TextBox').livequery(function() {
-         $(this).autogrow();
-      });
-
    // Hide it if they leave the area without typing
    $('div.CommentForm textarea').blur(function(ev) {
       var Comment = $(ev.target).val();
@@ -256,7 +251,7 @@ jQuery(document).ready(function($) {
 
    // Set up paging
    if ($.morepager)
-      $('.MorePager').morepager({
+      $('.MorePager').not('.Message .MorePager').morepager({
          pageContainerSelector: 'ul.Comments',
          afterPageLoaded: function() {$(document).trigger('CommentPagingComplete');}
       });

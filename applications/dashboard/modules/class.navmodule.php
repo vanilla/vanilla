@@ -198,7 +198,7 @@ class NavModule extends Gdn_Module {
       unset($link['url'], $link['text'], $link['class'], $link['icon'], $link['badge']);
 
       if ($icon)
-         $text = $icon.' '.$text;
+         $text = $icon.' <span class="text">'.$text.'</span>';
 
       if ($badge) {
          if (is_numeric($badge)) {

@@ -1024,6 +1024,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Write enabled state to config
       SaveToConfig("EnabledPlugins.{$PluginName}", TRUE);
+      Logger::event(
+         'addon_enabled',
+         LogLevel::NOTICE,
+         'The {addonName} plugin was enabled.',
+         array('addonName' => $PluginName)
+      );
 
       $this->EnabledPlugins[$PluginName] = TRUE;
 
@@ -1059,9 +1065,15 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       // 2. Perform necessary hook action
       $this->_PluginHook($PluginName, self::ACTION_DISABLE, TRUE);
 
-      // 3. Disable it
-      RemoveFromConfig("EnabledPlugins.{$PluginName}");
+      // 3. Disable it.
+      SaveToConfig("EnabledPlugins.{$PluginName}", false);
       unset($this->EnabledPlugins[$PluginName]);
+      Logger::event(
+         'addon_disabled',
+         LogLevel::NOTICE,
+         'The {addonName} plugin was disabled.',
+         array('addonName' => $PluginName)
+      );
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       Gdn::Locale()->Refresh();

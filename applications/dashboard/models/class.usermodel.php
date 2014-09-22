@@ -384,7 +384,11 @@ class UserModel extends Gdn_Model {
              'ActivityUserID' => $UserID,
              'RegardingUserID' => Gdn::Session()->UserID,
              'HeadlineFormat' => T('HeadlineFormat.Unban', '{RegardingUserID,You} unbanned {ActivityUserID,you}.'),
-             'Story' => $Story);
+             'Story' => $Story,
+             'Data' => array(
+                'Unban' => TRUE
+             )
+         );
 
          $ActivityModel->Queue($Activity);
 
@@ -553,7 +557,7 @@ class UserModel extends Gdn_Model {
          $RoleIDs = array();
          foreach ($AllRoles as $RoleID => $Role) {
             $Name = strtolower($Role['Name']);
-            if (in_array($Name, $Roles)) {
+            if (in_array($Name, $Roles) || in_array($RoleID, $Roles)) {
                $RoleIDs[] = $RoleID;
             }
          }
@@ -1559,12 +1563,16 @@ class UserModel extends Gdn_Model {
       } else {
          $this->AddUpdateFields($FormPostValues);
          $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+         if (!$User) {
+            $User = array();
+         }
 
          // Block banning the superadmin or System accounts
-         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues))
+         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues)) {
             $this->Validation->AddValidationResult('Banned', 'You may not ban a System user.');
-         elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues))
+         } elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues)) {
             $this->Validation->AddValidationResult('Banned', 'You may not ban a user with the Admin flag set.');
+         }
       }
 
       $this->EventArguments['FormPostValues'] = $FormPostValues;
@@ -1802,7 +1810,7 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
 
-   public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
+   public function SaveRoles($UserID, $RoleIDs, $RecordEvent) {
       if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
          $RoleNames = array_map('trim', explode(',', $RoleIDs));
@@ -1847,7 +1855,7 @@ class UserModel extends Gdn_Model {
 
       $this->ClearCache($UserID, array('roles', 'permissions'));
 
-      if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
+      if ($RecordEvent && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
          $User = $this->GetID($UserID);
          $Session = Gdn::Session();
 
@@ -1869,6 +1877,24 @@ class UserModel extends Gdn_Model {
 
          $RemovedRoles = array_diff($OldRoles, $NewRoles);
          $NewRoles = array_diff($NewRoles, $OldRoles);
+
+         foreach ($RemovedRoles as $RoleName) {
+            Logger::event(
+               'role_remove',
+               Logger::INFO,
+               "{username} removed {toUsername} from the {role} role.",
+               array('toUsername' => $User->Name, 'role' => $RoleName)
+            );
+         }
+
+         foreach ($NewRoles as $RoleName) {
+            Logger::event(
+               'role_add',
+               Logger::INFO,
+               "{username} added {toUsername} to the {role} role.",
+               array('toUsername' => $User->Name, 'role' => $RoleName)
+            );
+         }
 
          $RemovedCount = count($RemovedRoles);
          $NewCount = count($NewRoles);

@@ -155,7 +155,7 @@ if (!function_exists('ButtonGroup')):
                   echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
                }
             echo '</ul>';
-            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+            echo Anchor(Sprite('SpDropdownHandle', 'Sprite', T('Expand for more options.')), '#', $ButtonClass.' Handle');
 
          echo '</div>';
       }
@@ -294,6 +294,7 @@ function CssClass($Row, $InList = TRUE) {
 
       $CssClass .= GetValue('Closed', $Row) == '1' ? ' Closed' : '';
       $CssClass .= GetValue('InsertUserID', $Row) == $Session->UserID ? ' Mine' : '';
+      $CssClass .= GetValue('Participated', $Row) == '1' ? ' Participated' : '';
       if (array_key_exists('CountUnreadComments', $Row) && $Session->IsValid()) {
          $CountUnreadComments = $Row['CountUnreadComments'];
          if ($CountUnreadComments === TRUE) {
@@ -423,7 +424,11 @@ if (!function_exists('DiscussionUrl')):
  */
 function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
    $Discussion = (object)$Discussion;
-   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+   $Name = Gdn_Format::Url($Discussion->Name);
+   if (empty($Name)) {
+      $Name = 'x';
+   }
+   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.$Name;
    if ($Page) {
       if ($Page > 1 || Gdn::Session()->UserID)
          $Result .= '/p'.$Page;
@@ -571,6 +576,20 @@ if (!function_exists('IPAnchor')) {
          return Anchor(htmlspecialchars($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
       else
          return $IP;
+   }
+}
+
+if (!function_exists('panelHeading')) {
+   /**
+    * Define default head tag for the side panel.
+    *
+    * @param string $content The content of the tag.
+    * @param string $attributes The attributes of the tag.
+    *
+    * @return string The full tag.
+    */
+   function panelHeading($content, $attributes = '') {
+      return Wrap($content, 'h4', $attributes);
    }
 }
 
@@ -834,7 +853,7 @@ if (!function_exists('UserPhotoUrl')) {
       }
 
       if (!$Photo && function_exists('UserPhotoDefaultUrl'))
-         $Photo = UserPhotoDefaultUrl($User, $ImgClass);
+         $Photo = UserPhotoDefaultUrl($User);
 
       if ($Photo) {
          if (!isUrl($Photo)) {
@@ -935,24 +954,36 @@ if (!function_exists('DiscussionLink')) {
 }
 
 if (!function_exists('RegisterUrl')) {
-   function RegisterUrl($Target = '') {
+   function RegisterUrl($Target = '', $force = false) {
+      $registrationMethod = strtolower(C('Garden.Registration.Method'));
+
+      if ($registrationMethod === 'closed') {
+         return '';
+      }
+
+      // Check to see if there is even a sign in button.
+      if (!$force && $registrationMethod === 'connect') {
+         $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
+         if ($defaultProvider && !val('RegisterUrl', $defaultProvider)) {
+            return '';
+         }
+      }
+
       return '/entry/register'.($Target ? '?Target='.urlencode($Target) : '');
    }
 }
 
 if (!function_exists('SignInUrl')) {
-   function SignInUrl($Target = '') {
-      // See if there is a default authentication provider.
-//      $Provider = Gdn_AuthenticationProviderModel::GetDefault();
-//      if ($Provider) {
-//         $SignInUrl = $Provider['SignInUrl'];
-//         if ($SignInUrl) {
-//            $SignInUrl = str_ireplace('{target}', rawurlencode($Target), $SignInUrl);
-//            return $SignInUrl;
-//         }
-//      }
+   function SignInUrl($target = '', $force = false) {
+      // Check to see if there is even a sign in button.
+      if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') !== 0) {
+         $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
+         if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
+            return '';
+         }
+      }
 
-      return '/entry/signin'.($Target ? '?Target='.urlencode($Target) : '');
+      return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
    }
 }
 
@@ -976,16 +1007,17 @@ if (!function_exists('SocialSignInButton')) {
    function SocialSignInButton($Name, $Url, $Type = 'button', $Attributes = array()) {
       TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
       $Title = $Attributes['title'];
+      $Class = val('class', $Attributes, '');
 
       switch ($Type) {
          case 'icon':
             $Result = Anchor('<span class="Icon"></span>',
-               $Url, 'SocialIcon SocialIcon-'.$Name, $Attributes);
+               $Url, 'SocialIcon SocialIcon-'.$Name . ' ' . $Class, $Attributes);
             break;
          case 'button':
          default:
             $Result = Anchor('<span class="Icon"></span><span class="Text">'.$Title.'</span>',
-               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText', $Attributes);
+               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText ' . $Class, $Attributes);
             break;
       }
 
@@ -994,8 +1026,13 @@ if (!function_exists('SocialSignInButton')) {
 }
 
 if (!function_exists('Sprite')) {
-	function Sprite($Name, $Type = 'Sprite') {
-		return '<span class="'.$Type.' '.$Name.'"></span>';
+	function Sprite($Name, $Type = 'Sprite', $Text = FALSE) {
+      $Sprite = '<span class="'.$Type.' '.$Name.'"></span>';
+      if ($Text) {
+         $Sprite .= '<span class="sr-only">' . $Text . '</span>';
+      }
+
+		return $Sprite;
 	}
 }
 

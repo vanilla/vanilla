@@ -876,7 +876,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
             ->Select('w.Participated')
-            ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
+            ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$WatchUserID, 'left');
       } else {
 			$this->SQL
 				->Select('0', '', 'WatchUserID')

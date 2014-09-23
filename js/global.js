@@ -1483,10 +1483,11 @@ jQuery(document).ready(function($) {
 
       // Emoji, set in definition list in foot, by Emoji class. Make sure
       // that class is getting instantiated, otherwise emoji will be empty.
-      var emoji_array = gdn.definition('emoji', []);
-      var emoji = (emoji_array.length)
-         ? $.parseJSON(emoji_array)
-         : [];
+      var emoji = gdn.definition('emoji', []);
+
+      if ((typeof emoji) === 'string') {
+         emoji = emoji.length ? $.parseJSON(emoji) : [];
+      }
 
       // Handle iframe situation
       var iframe_window = (iframe)

@@ -250,7 +250,7 @@ class Emoji {
             );
          }
 
-         $c->AddDefinition('emoji', json_encode($emoji));
+         $c->AddDefinition('emoji', $emoji);
       }
 
       if(C('Garden.EmojiSet') === 'none') {

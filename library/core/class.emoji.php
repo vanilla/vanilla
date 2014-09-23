@@ -213,12 +213,13 @@ class Emoji {
          ':('          => 'frowning',
          ';)'          => 'wink',
          ':\\'         => 'confused',
+         ':/'          => 'confused',
          ':o'          => 'open_mouth',
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
          ":'("         => 'cry',
          ':|'          => 'neutral_face',
-       //'D:'          => 'anguished',
+         'D:'          => 'anguished',
          'B)'          => 'sunglasses',
          ':#'          => 'grin',
          'o:)'         => 'innocent',
@@ -226,6 +227,25 @@ class Emoji {
          '(*)'         => 'star',
          '>:)'         => 'smiling_imp'
        );
+
+      $this->editorList = array(
+         ':)'          => 'smile',
+         ':D'          => 'smiley',
+         ':('          => 'disappointed',
+         ';)'          => 'wink',
+         ':\\'         => 'confused',
+         ':o'          => 'open_mouth',
+         ':s'          => 'confounded',
+         ':p'          => 'stuck_out_tongue',
+         ":'("         => 'cry',
+         ':|'          => 'neutral_face',
+         'B)'          => 'sunglasses',
+         ':#'          => 'grin',
+         'o:)'         => 'innocent',
+         '<3'          => 'heart',
+         '(*)'         => 'star',
+         '>:)'         => 'smiling_imp'
+      );
 
       Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');
 

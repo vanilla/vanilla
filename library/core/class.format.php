@@ -33,6 +33,8 @@ class Gdn_Format {
     */
    public static $FormatLinks = TRUE;
 
+   public static $MentionsUrlFormat = '/profile/{name}';
+
    /**
     * The ActivityType table has some special sprintf search/replace values in the
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
@@ -1276,9 +1278,11 @@ EOT;
 
          // Handle @mentions.
          if(C('Garden.Format.Mentions')) {
+            $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
+
             $Mixed = preg_replace(
                '/(^|[\s,\.>])@(\w{1,50})\b/i', //{3,20}
-               '\1'.Anchor('@\2', '/profile/\\2'),
+               '\1'.Anchor('@$2', $urlFormat),
                $Mixed
             );
          }

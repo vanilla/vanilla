@@ -882,7 +882,7 @@ class UserController extends DashboardController {
             $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
             $User['RoleID'] = $DefaultRoles;
          }
-         elseif (is_int($User['RoleID'])) {
+         elseif (is_numeric($User['RoleID'])) {
             // UserModel->Save() demands an array for RoleID.
             $User['RoleID'] = array($User['RoleID']);
          }

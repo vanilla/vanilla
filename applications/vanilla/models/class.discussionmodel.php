@@ -1622,7 +1622,8 @@ class DiscussionModel extends VanillaModel {
                }
 
                // Update the user's discussion count.
-               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], TRUE);
+               $InsertUser = Gdn::UserModel()->GetID($Fields['InsertUserID']);
+               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], val('CountDiscussions', $InsertUser, 0) > 100);
 
                // Mark the user as participated.
                $this->SQL->Replace('UserDiscussion',
@@ -1904,7 +1905,7 @@ class DiscussionModel extends VanillaModel {
          $User = Gdn::UserModel()->GetID($UserID);
 
          $CountDiscussions = GetValue('CountDiscussions', $User);
-         if ($CountDiscussions < 100 || $CountDiscussions % 20 != 0) {
+         if ($CountDiscussions > 100 && $CountDiscussions % 20 !== 0) {
             $this->SQL->Update('User')
                ->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)
                ->Where('UserID', $UserID)

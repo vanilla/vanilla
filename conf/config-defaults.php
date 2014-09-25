@@ -25,6 +25,14 @@ $Configuration['Cache']['Enabled']                              = TRUE;
 $Configuration['Cache']['Method']                               = 'dirtycache';
 $Configuration['Cache']['Filecache']['Store']                   = PATH_CACHE.'/Filecache';
 
+$Configuration['Cache']['Memcached']['Option'][Memcached::OPT_COMPRESSION] = true;
+$Configuration['Cache']['Memcached']['Option'][Memcached::OPT_DISTRIBUTION] = Memcached::DISTRIBUTION_CONSISTENT;
+$Configuration['Cache']['Memcached']['Option'][Memcached::OPT_LIBKETAMA_COMPATIBLE] = true;
+$Configuration['Cache']['Memcached']['Option'][Memcached::OPT_NO_BLOCK] = true;
+$Configuration['Cache']['Memcached']['Option'][Memcached::OPT_TCP_NODELAY] = true;
+$Configuration['Cache']['Memcached']['Option'][Memcached::OPT_CONNECT_TIMEOUT] = 2000;
+$Configuration['Cache']['Memcached']['Option'][Memcached::OPT_SERVER_FAILURE_LIMIT] = 2;
+
 $Configuration['Garden']['ContentType']                         = 'text/html';
 $Configuration['Garden']['Charset']                             = 'utf-8';
 // An array of folders the application should never search through when searching for classes. (note: plugins had to be removed so that locale searches could get the locale folder from the plugin's folder).

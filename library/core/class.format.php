@@ -35,6 +35,10 @@ class Gdn_Format {
 
    public static $MentionsUrlFormat = '/profile/{name}';
 
+   public static $FormatWhitelist = array(
+      'Html', 'BBcode', 'Wysiwyg', 'Text', 'TextEx', 'Markdown'
+   );
+
    /**
     * The ActivityType table has some special sprintf search/replace values in the
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be

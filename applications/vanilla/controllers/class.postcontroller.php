@@ -227,6 +227,11 @@ class PostController extends VanillaController {
                $this->Form->SetFormValue('Name', $Name);
             }
 
+            //check format.
+            if (!in_array($this->Form->GetFormValue('Format'), Gdn_Format::$FormatWhitelist)) {
+               $this->Form->SetValue('Format', C('Garden.InputFormatter'));
+            }
+
             if ($this->Form->ErrorCount() == 0) {
                if ($Draft) {
                   $DraftID = $this->DraftModel->Save($FormValues);
@@ -556,6 +561,12 @@ class PostController extends VanillaController {
          }
 
       } else {
+
+         //check format.
+         if (!in_array($this->Form->GetFormValue('Format'), Gdn_Format::$FormatWhitelist)) {
+            $this->Form->SetFormValue('Format', C('Garden.InputFormatter'));
+         }
+
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);

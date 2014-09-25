@@ -65,6 +65,7 @@ class QueueModel extends Gdn_Model {
 
       $SaveData = array();
       $Attributes = array();
+      $ThrowEvent = FALSE;
 
       // Grab the current queue.
       if (isset($data['QueueID'])) {
@@ -84,6 +85,10 @@ class QueueModel extends Gdn_Model {
             $Attributes = @unserialize($CurrentItem['Attributes']);
             if (!$Attributes)
                $Attributes = array();
+
+            if ($CurrentItem['Queue'] !== $data['Queue']) {
+               $ThrowEvent = true;
+            }
          } else {
             $PrimaryKeyVal = FALSE;
             $Insert = TRUE;
@@ -142,7 +147,14 @@ class QueueModel extends Gdn_Model {
 
          if ($Insert === FALSE) {
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
+
+            if ($ThrowEvent) {
+               $this->EventArguments['QueueID'] = $PrimaryKeyVal;
+               $this->FireEvent('BeforeInsert');
+            }
             $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
+
+
          } else {
             $this->FireEvent('BeforeInsert');
             $PrimaryKeyVal = $this->Insert($Fields);
@@ -652,7 +664,6 @@ class QueueModel extends Gdn_Model {
          'Format' => val('Format', $data, C('Garden.InputFormatter')),
          'ForeignID' => self::generateForeignID($data, null, $recordType)
       );
-
       switch (strtolower($recordType)) {
          case 'comment':
             $DiscussionModel = new DiscussionModel();

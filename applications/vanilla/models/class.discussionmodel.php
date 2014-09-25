@@ -1837,7 +1837,8 @@ class DiscussionModel extends VanillaModel {
          $User = Gdn::UserModel()->GetID($UserID);
 
          $CountDiscussions = GetValue('CountDiscussions', $User);
-         if ($CountDiscussions > 100 && $CountDiscussions % 20 !== 0) {
+         // Increment if 100 or greater; Recalc on 120, 140 etc.
+         if ($CountDiscussions >= 100 && $CountDiscussions % 20 !== 0) {
             $this->SQL->Update('User')
                ->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)
                ->Where('UserID', $UserID)

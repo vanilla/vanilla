@@ -37,7 +37,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     */
    public $DeveloperContainer = NULL;
 
-   public static $FullLocales = array(
+   public static $SetLocales = array(
       'bg' => 'bg_BG',
       'bs' => 'bs_BA',
       'ca' => 'ca_ES',
@@ -58,7 +58,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       'lt' => 'lt_LT',
       'my' => 'my_MM',
       'nb' => 'nb_NO',
-      'no' => 'nb_NO',
+      'no' => array('no_NO', 'nn_NO'),
       'nl' => 'nl_NL',
       'pl' => 'pl_PL',
       'pt' => 'pt_BR',
@@ -132,11 +132,13 @@ class Gdn_Locale extends Gdn_Pluggable {
       );
 
       list($Language) = explode('_', $CurrentLocale, 2);
-      if (isset(self::$FullLocales[$Language])) {
-         $FullLocale = self::$FullLocales[$Language];
+      if (isset(self::$SetLocales[$Language])) {
+         $FullLocales = (array)self::$SetLocales[$Language];
 
-         $SetLocale[] = "$FullLocale.$Codeset";
-         $SetLocale[] = $FullLocale;
+         foreach ($FullLocales as $FullLocale) {
+            $SetLocale[] = "$FullLocale.$Codeset";
+            $SetLocale[] = $FullLocale;
+         }
       }
 
       $r = call_user_func_array('setlocale', $SetLocale);

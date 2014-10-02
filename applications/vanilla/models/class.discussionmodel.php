@@ -716,7 +716,7 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->Select('d.DiscussionID')
          ->From('Discussion d');
 
-      if ($CategoryID > 0) {
+      if ($CategoryID > 0 || $GroupID > 0) {
          $this->SQL->Where('d.Announce >', '0');
       } else {
          $this->SQL->Where('d.Announce', 1);

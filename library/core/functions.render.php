@@ -392,8 +392,11 @@ if (!function_exists('Anchor')) {
 			unset($Attributes['WithDomain']);
       }
 
+      // Don't convert Javascript to URL
+      $IsJS = preg_match('/(^javascript:)/', $Destination);
+
       $Prefix = substr($Destination, 0, 7);
-      if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
+      if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE) && !IsJS)
          $Destination = Gdn::Request()->Url($Destination, $WithDomain, $SSL);
 
       return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, 'UTF-8').'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';

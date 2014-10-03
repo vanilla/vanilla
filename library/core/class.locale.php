@@ -228,6 +228,17 @@ class Gdn_Locale extends Gdn_Pluggable {
             }
          }
 
+         // Get plugin-based locale definition files
+         $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName.'.php')), $PluginWhiteList);
+         if ($PluginLocaleSources !== FALSE) {
+            $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
+         }
+
+         $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
+         if ($PluginLocaleSources !== FALSE) {
+            $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
+         }
+
          // Get theme-based locale definition files.
          $Theme = C('Garden.Theme');
          if ($Theme) {

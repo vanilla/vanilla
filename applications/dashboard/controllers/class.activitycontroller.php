@@ -84,9 +84,9 @@ class ActivityController extends Gdn_Controller {
       if (!is_numeric($ActivityID) || $ActivityID < 0)
          $ActivityID = 0;
          
-      $this->ActivityData = $this->ActivityModel->GetWhere(array('ActivityID' => $ActivityID));
+      $this->Activities = $this->ActivityModel->GetWhere(array('ActivityID' => $ActivityID));
       $this->SetData('Comments', $this->ActivityModel->GetComments(array($ActivityID)));
-      $this->SetData('ActivityData', $this->ActivityData);
+      $this->SetData('Activities', $this->Activities);
       
       $this->Render();
    }

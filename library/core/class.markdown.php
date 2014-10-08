@@ -64,4 +64,12 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
 
 		return "\n". $this->hashBlock("<blockquote class=\"Quote\">\n$bq\n</blockquote>")."\n\n";
 	}
+
+	/* Same as parent, but do <pre><code> if there's newlines */
+	protected function makeCodeSpan($code) {
+		$code = htmlspecialchars(trim($code), ENT_NOQUOTES);
+		if (strpos($code, "\n"))
+			return $this->hashPart("<pre><code>$code</code></pre>");
+		return $this->hashPart("<code>$code</code>");
+	}
 }

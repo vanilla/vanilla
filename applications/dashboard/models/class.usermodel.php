@@ -1114,15 +1114,17 @@ class UserModel extends Gdn_Model {
          $Keys = array();
          // Make keys for cache query
          foreach ($IDs as $UserID) {
-            if (!$UserID) continue;
-
+            if (!$UserID) {
+               continue;
+            }
             $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          }
 
          // Query cache layer
          $CacheData = Gdn::Cache()->Get($Keys);
-         if (!is_array($CacheData))
+         if (!is_array($CacheData)) {
             $CacheData = array();
+         }
 
          foreach ($CacheData as $RealKey => $User) {
             if ($User === NULL) {
@@ -1130,6 +1132,7 @@ class UserModel extends Gdn_Model {
             } else {
                $ResultUserID = GetValue('UserID', $User);
             }
+            $this->SetCalculatedFields($User);
             $Data[$ResultUserID] = $User;
          }
 

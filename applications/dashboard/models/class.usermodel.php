@@ -1309,11 +1309,21 @@ class UserModel extends Gdn_Model {
     */
    public function GetSummary($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->UserQuery(TRUE);
-      return $this->SQL
+      $Data = $this->SQL
          ->Where('u.Deleted', 0)
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
+
+      // Set corrected PhotoUrls.
+      $Result =& $Data->Result();
+      foreach ($Result as &$Row) {
+         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+            $Row->Photo = Gdn_Upload::Url($Row->Photo);
+         }
+      }
+
+      return $Result;
    }
 
    /**

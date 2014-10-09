@@ -22,6 +22,7 @@ class Gdn_Database {
    public function __construct($Config = NULL) {
       $this->ClassName = get_class($this);
       $this->Init($Config);
+      $this->ConnectRetries = 1;
    }
 
    /// PROPERTIES ///
@@ -77,6 +78,9 @@ class Gdn_Database {
    /** @var string The username connecting to the database. */
    public $User;
 
+   /** @var int Number of retries when the db has gone away. */
+   public $ConnectRetries;
+
    /// METHODS ///
 
    /**
@@ -103,6 +107,7 @@ class Gdn_Database {
       if (!$this->_IsPersistent) {
          $this->CommitTransaction();
          $this->_Connection = NULL;
+         $this->_Slave = NULL;
       }
    }
 
@@ -317,8 +322,15 @@ class Gdn_Database {
                }
                break;
          }
+         }
+
+      // We will retry this query a few times if it fails.
+      $tries = $this->ConnectRetries + 1;
+      if ($tries < 1) {
+          $tries = 1;
 		}
 
+      for ($try = 0; $try < $tries; $try++) {
       if (val('Type', $Options) == 'select' && val('Slave', $Options, NULL) !== FALSE) {
          $PDO = $this->Slave();
          $this->LastInfo['connection'] = 'slave';
@@ -333,7 +345,10 @@ class Gdn_Database {
          $this->_CurrentResultSet->FreePDOStatement(FALSE);
       }
 
-      // Run the Query
+         $PDOStatement = null;
+         try {
+
+            // Prepare / Execute
       if (!is_null($InputParameters) && count($InputParameters) > 0) {
          $PDOStatement = $PDO->prepare($Sql);
 
@@ -347,7 +362,31 @@ class Gdn_Database {
       }
 
       if ($PDOStatement === FALSE) {
-         trigger_error(ErrorMessage($this->GetPDOErrorMessage($PDO->errorInfo()), $this->ClassName, 'Query', $Sql), E_USER_ERROR);
+               list($state, $code, $message) = $PDO->errorInfo();
+
+               // Detect mysql "server has gone away" and try to reconnect.
+               if ($code == 2006 && $try < $tries) {
+                  $this->closeConnection();
+                  continue;
+               } else {
+                  throw new Gdn_UserException($message, $code);
+               }
+      }
+
+            // If we get here then the pdo statement prepared properly.
+            break;
+
+         } catch (Gdn_UserException $uex) {
+            trigger_error($uex->getMessage(), E_USER_ERROR);
+         } catch (Exception $ex) {
+            list($state, $code, $message) = $PDO->errorInfo();
+            if ($code == 2006 && $try < $tries) {
+               $this->closeConnection();
+               continue;
+            }
+            trigger_error($message, E_USER_ERROR);
+         }
+
       }
 
       // Did this query modify data in any way?
@@ -368,12 +407,13 @@ class Gdn_Database {
       }
 
       if (isset($StoreCacheKey)) {
-         if ($CacheOperation == 'get')
+         if ($CacheOperation == 'get') {
             Gdn::Cache()->Store(
                $StoreCacheKey,
                (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->ResultArray() : $this->_CurrentResultSet),
                val('CacheOptions', $Options, array())
                );
+      }
       }
 
       return $this->_CurrentResultSet;
@@ -384,6 +424,7 @@ class Gdn_Database {
          $this->_InTransaction = !$this->Connection()->rollBack();
       }
    }
+
    public function GetPDOErrorMessage($ErrorInfo) {
       $ErrorMessage = '';
       if (is_array($ErrorInfo)) {

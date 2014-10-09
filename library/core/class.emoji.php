@@ -499,6 +499,39 @@ class Emoji {
    }
 
    /**
+    * Set the emoji from a manifest.
+    * @param array $manifest An emoji manifest with the following keys:
+    * - emoji: An array in the form: name => filename (ex. ['smile' => 'smile.png'])
+    * - aliases (optional): An array of emoji short forms: alias => emojiName  (ex. [':)' => 'smile'])
+    * - editor (optional): An array of emoji that will display in the editor: emojiName (ex: [smile,..])
+    * - format (optional): The string format of the emoji replacement.
+    * @param string $assetPath The asset path root to all of the emoji files.
+    */
+   public function setFromManifest($manifest, $assetPath = '') {
+      // Set the default asset root.
+      if ($assetPath) {
+         $this->setAssetPath(StringBeginsWith($assetPath, PATH_ROOT, true, true));
+      }
+
+      // Set the emoji settings from the manifest.
+      if (array_key_exists('emoji', $manifest)) {
+         $this->setEmoji($manifest['emoji']);
+      }
+
+      if (array_key_exists('aliases', $manifest)) {
+         $this->setAliases($manifest['aliases']);
+      }
+
+      if (!empty($manifest['format'])) {
+         $this->format = $manifest['format'];
+      }
+
+      if (array_key_exists('editor', $manifest)) {
+         $this->setEmojiEditorList($manifest['editor']);
+      }
+   }
+
+   /**
     * Translate all emoji aliases to their corresponding Html image tags.
     *
     * Thanks to punbb 1.3.5 (GPL License) for function, which was largely

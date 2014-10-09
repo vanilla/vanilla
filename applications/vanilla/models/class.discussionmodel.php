@@ -716,7 +716,7 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->Select('d.DiscussionID')
          ->From('Discussion d');
 
-      if ($CategoryID > 0) {
+      if ($CategoryID > 0 || $GroupID > 0) {
          $this->SQL->Where('d.Announce >', '0');
       } else {
          $this->SQL->Where('d.Announce', 1);
@@ -1396,8 +1396,12 @@ class DiscussionModel extends VanillaModel {
     * @param mixed $Value
     */
    public function SetField($RowID, $Property, $Value = FALSE) {
+      if (!is_array($Property)) {
+         $Property = array($Property => $Value);
+      }
+
        $this->EventArguments['DiscussionID'] = $RowID;
-       $this->EventArguments['SetField'] = array($Property => $Value);
+       $this->EventArguments['SetField'] = $Property;
 
        parent::SetField($RowID, $Property, $Value);
        $this->fireEvent('AfterSetField');
@@ -1585,7 +1589,7 @@ class DiscussionModel extends VanillaModel {
                }
 
                // Update the user's discussion count.
-               $this->UpdateUserDiscussionCount(Gdn::Session()->UserID, TRUE);
+               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], TRUE);
 
                // Mark the user as participated.
                $this->SQL->Replace('UserDiscussion',

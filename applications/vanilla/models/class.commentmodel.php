@@ -878,14 +878,15 @@ class CommentModel extends VanillaModel {
 
       // Make a quick check so that only the user making the comment can make the notification.
       // This check may be used in the future so should not be depended on later in the method.
-      if ($Fields['InsertUserID'] != $Session->UserID)
+      if (Gdn::Controller()->DeliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
          return;
+      }
 
       // Update the discussion author's CountUnreadDiscussions (ie.
       // the number of discussions created by the user that s/he has
       // unread messages in) if this comment was not added by the
       // discussion author.
-      $this->UpdateUser($Session->UserID, $IncUser && $Insert);
+      $this->UpdateUser($Fields['InsertUserID'], $IncUser && $Insert);
 
       // Mark the user as participated.
       $this->SQL->Replace('UserDiscussion',

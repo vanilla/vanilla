@@ -129,7 +129,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
          switch ($Label) {
             case 'Twitter':
-               $Fields['Twitter'] = Anchor('@'.$Value, 'http://twitter.com/'.$Value);
+               $Fields['Twitter'] = '@'.Anchor($Value, 'http://twitter.com/'.$Value);
                break;
             case 'Facebook':
                $Fields['Facebook'] = Anchor($Value, 'http://facebook.com/'.$Value);

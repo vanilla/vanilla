@@ -65,7 +65,6 @@ class QueueModel extends Gdn_Model {
 
       $SaveData = array();
       $Attributes = array();
-      $ThrowEvent = FALSE;
 
       // Grab the current queue.
       if (isset($data['QueueID'])) {
@@ -86,9 +85,6 @@ class QueueModel extends Gdn_Model {
             if (!$Attributes)
                $Attributes = array();
 
-            if ($CurrentItem['Queue'] !== $data['Queue']) {
-               $ThrowEvent = true;
-            }
          } else {
             $PrimaryKeyVal = FALSE;
             $Insert = TRUE;
@@ -147,22 +143,9 @@ class QueueModel extends Gdn_Model {
 
          if ($Insert === FALSE) {
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
-
-            if ($ThrowEvent) {
-               $this->EventArguments['QueueID'] = $PrimaryKeyVal;
-               $this->FireEvent('BeforeInsert');
-            }
             $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
-
-
          } else {
-            $this->FireEvent('BeforeInsert');
             $PrimaryKeyVal = $this->Insert($Fields);
-
-            if ($PrimaryKeyVal) {
-               $this->EventArguments['QueueID'] = $PrimaryKeyVal;
-               $this->FireEvent('AfterInsert');
-            }
          }
       } else {
          $PrimaryKeyVal = FALSE;
@@ -348,9 +331,9 @@ class QueueModel extends Gdn_Model {
       $Qm->FireEvent('CheckPremoderation');
 
       $IsPremoderation = $Qm->EventArguments['Premoderate'];
-
       if ($IsPremoderation) {
-         $queueRow = self::convertToQueueRow($recordType, $data);
+         $instance = self::Instance();
+         $queueRow = $instance->convertToQueueRow($recordType, $data);
          $queueRow = array_replace($queueRow, $row);
          // Allow InsertUserID to be overwritten
          if (isset($Qm->EventArguments['InsertUserID']) && !$ApprovalRequired) {
@@ -479,7 +462,7 @@ class QueueModel extends Gdn_Model {
                      array(
                         'Approved' => true,
                         'ApprovedUserID' => $this->getModeratorUserID(),
-                        'DateApproved' => Gdn_Format::ToDateTime()
+                        'DateApproved' => Gdn_Format::ToDateTime(),
                      )
                )
             );
@@ -706,6 +689,11 @@ class QueueModel extends Gdn_Model {
          default:
             throw new Gdn_UserException('Unknown Type: ' . $recordType);
       }
+
+
+      $this->EventArguments['Data'] = $data;
+      $this->EventArguments['QueueRow'] = &$queueRow;
+      $this->FireEvent('AfterConvertToQueueRow');
 
       return $queueRow;
 

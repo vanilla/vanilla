@@ -41,6 +41,18 @@ class Gdn_Request {
    }
 
    /**
+    * Gets/Sets the relative path to the asset include path.
+    *
+    * The asset root represents the folder that static assets are served from.
+    *
+    * @param $AssetRoot Optional An asset root to set
+    * @return string Returns the current asset root.
+    */
+   public function AssetRoot($AssetRoot = null) {
+      return $this->_ParsedRequestElement('AssetRoot', rtrim('/'.trim($AssetRoot, '/'), '/'));
+   }
+
+   /**
     * Generic chainable object creation method.
     *
     * This creates a new Gdn_Request object, loaded with the current Environment $_SERVER and $_ENV superglobal imports, such
@@ -549,6 +561,7 @@ class Gdn_Request {
 
       $ParsedWebRoot = trim($WebRoot,'/');
       $this->WebRoot($ParsedWebRoot);
+      $this->AssetRoot($ParsedWebRoot);
 
       /**
        * Resolve Domain
@@ -577,9 +590,9 @@ class Gdn_Request {
     * A second argument can be supplied, which causes the value of the specified key to be changed
     * to that of the second parameter itself.
     *
-    * @param $Key element key to retrieve or set
-    * @param $Value value of $Key key to set
-    * @return string | NULL
+    * @param string $Key element key to retrieve or set
+    * @param string $Value value of $Key key to set
+    * @return string|null
     */
    protected function _ParsedRequestElement($Key, $Value = NULL) {
       // Lazily parse if not already parsed

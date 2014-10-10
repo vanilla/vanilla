@@ -917,6 +917,44 @@ class Gdn_Request {
    }
 
    /**
+    * Conditionally gets the domain of the request.
+    *
+    * This method will return nothing or the domain with an http, https, or // scheme depending on {@link $withDomain}.
+    *
+    * @param bool $withDomain How to include the domain in the result.
+    * - false or /: The domain will not be returned.
+    * - //: The domain prefixed with //.
+    * - http: The domain prefixed with http://.
+    * - https: The domain prefixed with https://.
+    * - true: The domain prefixed with the current request scheme.
+    * @return string Returns the domain according to the rules set by {@see $withDomain}.
+    */
+   public function UrlDomain($withDomain = true) {
+      static $allowSSL = null;
+
+      if ($allowSSL === null) {
+         $allowSSL = C('Garden.AllowSSL', null);
+      }
+
+      if (!$withDomain || $withDomain === '/') {
+         return '';
+      }
+
+      if (!$allowSSL && $withDomain === 'https') {
+         $withDomain = 'http';
+      }
+
+      if ($withDomain === true) {
+         $withDomain = $this->Scheme().'://';
+      } elseif ($withDomain !== '//') {
+         $withDomain .= '://';
+      }
+
+      return $withDomain.$this->HostAndPort();
+   }
+
+
+   /**
     * Gets/Sets the relative path to the application's dispatcher.
     *
     * @param $WebRoot Optional Webroot to set

@@ -813,7 +813,7 @@ class UserModel extends Gdn_Model {
     */
    public function UserQuery($SafeData = FALSE) {
       if ($SafeData) {
-         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.About, u.Gender, u.CountVisits, u.InviteUserID, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Admin, u.Deleted, u.CountDiscussions, u.CountComments');
+         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.CountVisits, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Deleted, u.CountDiscussions, u.CountComments');
       } else {
          $this->SQL->Select('u.*');
       }
@@ -1312,11 +1312,21 @@ class UserModel extends Gdn_Model {
     */
    public function GetSummary($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->UserQuery(TRUE);
-      return $this->SQL
+      $Data = $this->SQL
          ->Where('u.Deleted', 0)
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
+
+      // Set corrected PhotoUrls.
+      $Result =& $Data->Result();
+      foreach ($Result as &$Row) {
+         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+            $Row->Photo = Gdn_Upload::Url($Row->Photo);
+         }
+      }
+
+      return $Result;
    }
 
    /**

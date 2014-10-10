@@ -53,7 +53,7 @@ foreach ($this->Data('AvailableLocales') as $Key => $Info) {
    // Hide skeleton locale pack
    if ($Key == 'skeleton')
       continue;
-
+      
    $ToggleText = $this->Data("EnabledLocales.$Key") ? 'Disable' : 'Enable';
    $RowClass = $this->Data("EnabledLocales.$Key") ? 'Enabled' : 'Disabled';
    if ($Alt) $RowClass .= ' Alt';
@@ -74,7 +74,7 @@ foreach ($this->Data('AvailableLocales') as $Key => $Info) {
          $RequiredApplications = GetValue('RequiredApplications', $Info, FALSE);
          $RequiredPlugins = GetValue('RequiredPlugins', $Info, FALSE);
 
-         $InfoItems = ArrayTranslate($Info, array('Locale' => T('Locale'), 'Version' => T('Version')));
+         $InfoItems = ArrayTranslate($Info, array('Locale' => T('_Locale'), 'Version' => T('Version')));
          $InfoString = ImplodeAssoc(': ', '<span>|</span>', $InfoItems);
 
 //            if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {

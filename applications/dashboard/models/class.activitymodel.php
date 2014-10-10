@@ -1297,6 +1297,9 @@ class ActivityModel extends Gdn_Model {
          $this->NotifyWallPost($Activity);
       }
 
+      $this->EventArguments['Activity'] = &$Activity;
+      $this->FireEvent('AfterSave');
+
       return $Activity;
    }
 

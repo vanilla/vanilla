@@ -544,12 +544,12 @@ class UserModel extends Gdn_Model {
 
       if (C('Garden.SSO.SynchRoles')) {
          // Translate the role names to IDs.
-
          $Roles = GetValue('Roles', $NewUser, '');
-         if (is_string($Roles))
+         if (is_string($Roles)) {
             $Roles = explode(',', $Roles);
-         else
+         } elseif (!is_array($Roles)) {
             $Roles = array();
+         }
          $Roles = array_map('trim', $Roles);
          $Roles = array_map('strtolower', $Roles);
 
@@ -629,6 +629,7 @@ class UserModel extends Gdn_Model {
             TouchValue('CheckCaptcha', $Options, FALSE);
             TouchValue('NoConfirmEmail', $Options, TRUE);
             TouchValue('NoActivity', $Options, TRUE);
+            TouchValue('SaveRoles', $Options, C('Garden.SSO.SynchRoles', false));
 
             Trace($UserData, 'Registering User');
             $UserID = $this->Register($UserData, $Options);

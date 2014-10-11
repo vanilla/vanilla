@@ -187,10 +187,13 @@ class CategoryModel extends Gdn_Model {
             $Category['PhotoUrl'] = '';
 
          if ($Category['DisplayAs'] == 'Default') {
-            if ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0))
+            if ($Category['Depth'] == 1 && C('Vanilla.Categories.DoHeadings')) {
+               $Category['DisplayAs'] = 'Heading';
+            } elseif ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0)) {
                $Category['DisplayAs'] = 'Categories';
-            else
+            } else {
                $Category['DisplayAs'] = 'Discussions';
+            }
          }
 
          if (!GetValue('CssClass', $Category))

@@ -556,7 +556,7 @@ class Gdn_Request {
 
       $Domain = FALSE;
       if ($Domain === FALSE || $Domain == '')
-         $Domain = $this->Host();
+         $Domain = $this->HostAndPort();
 
       if ($Domain != '' && $Domain !== FALSE) {
          if (!stristr($Domain,'://'))

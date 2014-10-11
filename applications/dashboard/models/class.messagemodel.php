@@ -124,8 +124,8 @@ class MessageModel extends Gdn_Model {
          }
          return $Result;
       }
-      
-      $Result = $this->SQL
+
+      $Messages = $this->SQL
          ->Select()
          ->From('Message')
          ->Where('Enabled', '1')
@@ -140,11 +140,15 @@ class MessageModel extends Gdn_Model {
          ->WhereNotIn('MessageID', $Prefs)
          ->OrderBy('Sort', 'asc')
          ->Get()->ResultArray();
-      
-      $Result = array_filter($Result, function($Message) use ($CategoryID) {
-         return $this->InCategory($CategoryID, GetValue('CategoryID', $Message), GetValue('IncludeSubcategories', $Message));
-      });
-      
+
+      $Result = array();
+
+      foreach ($Messages as $Message) {
+         if ($this->InCategory($CategoryID, GetValue('CategoryID', $Message), GetValue('IncludeSubcategories', $Message))) {
+            $Result[] = $Message;
+         }
+      }
+
       return $Result;
    }
    

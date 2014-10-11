@@ -213,12 +213,13 @@ class Emoji {
          ':('          => 'disappointed',
          ';)'          => 'wink',
          ':\\'         => 'confused',
+         ':/'          => 'confused',
          ':o'          => 'open_mouth',
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
          ":'("         => 'cry',
          ':|'          => 'neutral_face',
-       //'D:'          => 'anguished',
+         'D:'          => 'anguished',
          'B)'          => 'sunglasses',
          ':#'          => 'grin',
          'o:)'         => 'innocent',
@@ -226,6 +227,25 @@ class Emoji {
          '(*)'         => 'star',
          '>:)'         => 'smiling_imp'
        );
+
+      $this->editorList = array(
+         ':)'          => 'smile',
+         ':D'          => 'smiley',
+         ':('          => 'disappointed',
+         ';)'          => 'wink',
+         ':\\'         => 'confused',
+         ':o'          => 'open_mouth',
+         ':s'          => 'confounded',
+         ':p'          => 'stuck_out_tongue',
+         ":'("         => 'cry',
+         ':|'          => 'neutral_face',
+         'B)'          => 'sunglasses',
+         ':#'          => 'grin',
+         'o:)'         => 'innocent',
+         '<3'          => 'heart',
+         '(*)'         => 'star',
+         '>:)'         => 'smiling_imp'
+      );
 
       Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');
 
@@ -250,7 +270,7 @@ class Emoji {
             );
          }
 
-         $c->AddDefinition('emoji', json_encode($emoji));
+         $c->AddDefinition('emoji', $emoji);
       }
    }
 
@@ -411,10 +431,22 @@ class Emoji {
     *
     * @param string $emoji_path The full path to Emoji file.
     * @param string $emoji_name The name given to Emoji.
-    * @return string The html that represents the emiji.
+    * @return string The html that represents the emoji.
     */
    public function img($emoji_path, $emoji_name) {
-      return sprintf($this->format, Url($emoji_path), $emoji_name);
+      $dir = Asset(dirname($emoji_path));
+      $filename = basename($emoji_name);
+      $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
+      $basename = basename($filename, $ext);
+      $src = Asset($emoji_path);
+
+      $img = str_replace(
+         array('%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'),
+         array($src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext),
+         $this->format
+         );
+
+      return $img;
    }
 
    /**

@@ -28,6 +28,11 @@ if (!defined('VANILLA_CONSTANTS'))
 // Make sure a default time zone is set
 date_default_timezone_set('UTC');
 
+// Make sure the mb_* functions are utf8.
+if (function_exists('mb_internal_encoding')) {
+   mb_internal_encoding('UTF-8');
+}
+
 // Include the core function definitions
 require_once(PATH_LIBRARY_CORE.'/functions.error.php');
 require_once(PATH_LIBRARY_CORE.'/functions.general.php');

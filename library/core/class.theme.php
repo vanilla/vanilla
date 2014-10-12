@@ -42,8 +42,9 @@ class Gdn_Theme {
 
       if ($HomeLink) {
          $HomeUrl = GetValue('HomeUrl', $Options);
-         if (!$HomeUrl)
+         if (!$HomeUrl) {
             $HomeUrl = Url('/', TRUE);
+         }
 
          $Row = array('Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
@@ -73,7 +74,7 @@ class Gdn_Theme {
             $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
          }
 
-         $Row['Url'] = Url($Row['Url']);
+         $Row['Url'] = $Row['Url'] ? Url($Row['Url']) : '#';
          $CssClass = 'CrumbLabel '.GetValue('CssClass', $Row);
          if ($DataCount == count($Data))
             $CssClass .= ' Last';

@@ -868,20 +868,21 @@ class CategoryModel extends Gdn_Model {
    /**
     * Get all of the ancestor categories above this one.
     * @param int|string $Category The category ID or url code.
-    * @param bool $CheckPermissions Whether or not to only return the categories with view permission.
+    * @param bool $checkPermissions Whether or not to only return the categories with view permission.
+    * @param bool $includeHeadings Whether or not to include heading categories.
     * @return array
     */
-   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE) {
+   public static function GetAncestors($categoryID, $checkPermissions = true, $includeHeadings = false) {
       $Categories = self::Categories();
       $Result = array();
 
       // Grab the category by ID or url code.
-      if (is_numeric($CategoryID)) {
-         if (isset($Categories[$CategoryID]))
-            $Category = $Categories[$CategoryID];
+      if (is_numeric($categoryID)) {
+         if (isset($Categories[$categoryID]))
+            $Category = $Categories[$categoryID];
       } else {
          foreach ($Categories as $ID => $Value) {
-            if ($Value['UrlCode'] == $CategoryID) {
+            if ($Value['UrlCode'] == $categoryID) {
                $Category = $Categories[$ID];
                break;
             }
@@ -900,7 +901,7 @@ class CategoryModel extends Gdn_Model {
             break;
          $Max--;
 
-         if ($CheckPermissions && !$Category['PermsDiscussionsView']) {
+         if ($checkPermissions && !$Category['PermsDiscussionsView']) {
             $Category = $Categories[$Category['ParentCategoryID']];
             continue;
          }
@@ -909,16 +910,18 @@ class CategoryModel extends Gdn_Model {
             break;
 
          // Return by ID or code.
-         if (is_numeric($CategoryID))
+         if (is_numeric($categoryID))
             $ID = $Category['CategoryID'];
          else
             $ID = $Category['UrlCode'];
 
-         $Result[$ID] = $Category;
+         if ($includeHeadings || $Category['DisplayAs'] !== 'Heading') {
+            $Result[$ID] = $Category;
+         }
 
          $Category = $Categories[$Category['ParentCategoryID']];
       }
-      $Result = array_reverse($Result, TRUE); // order for breadcrumbs
+      $Result = array_reverse($Result, true); // order for breadcrumbs
       return $Result;
    }
 

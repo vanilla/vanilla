@@ -947,22 +947,23 @@ class CategoryModel extends Gdn_Model {
    }
 
    /**
+    * Get the subtree starting at a given parent.
     *
-    *
-    * @since 2.0.18
-    * @acces public
-    * @param int $ID
-    * @return array
+    * @param string $ParentCategory The ID or url code of the parent category.
+    * @param bool $IncludeParent Whether or not to include the parent in the result.
+    * @return array An array of categories.
     */
-   public static function GetSubtree($ID) {
+   public static function GetSubtree($ParentCategory, $IncludeParent = true) {
       $Result = array();
-      $Category = self::Categories($ID);
+      $Category = self::Categories($ParentCategory);
       if ($Category) {
-         $Result[$Category['CategoryID']] = $Category;
+         if ($IncludeParent) {
+            $Result[$Category['CategoryID']] = $Category;
+         }
          $ChildIDs = GetValue('ChildIDs', $Category);
 
          foreach ($ChildIDs as $ChildID) {
-            $Result = array_merge($Result, self::GetSubtree($ChildID));
+            $Result = array_replace($Result, self::GetSubtree($ChildID, true));
          }
       }
       return $Result;

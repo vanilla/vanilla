@@ -62,13 +62,17 @@ class Gdn_Theme {
 
       $Count = 0;
       $DataCount = 0;
+      $HomeLinkFound = false;
 
       foreach ($Data as $Row) {
          $DataCount++;
 
-         if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
+         if (Gdn::Request()->UrlCompare($Row['Url'], $DefaultRoute) === 0 && $HomeLinkFound) {
             continue; // don't show default route twice.
-
+         } else {
+            $HomeLinkFound = true;
+         }
+         
          // Add the breadcrumb wrapper.
          if ($Count > 0) {
             $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';

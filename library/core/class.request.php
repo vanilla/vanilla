@@ -917,6 +917,36 @@ class Gdn_Request {
    }
 
    /**
+    * Compare two urls for equality.
+    *
+    * @param string $url1 The first url to compare.
+    * @param string $url2 The second url to compare.
+    * @return int Returns 0 if the urls are equal or 1, -1 if they are not.
+    */
+   function UrlCompare($url1, $url2) {
+      $parts1 = parse_url($url1);
+      $parts2 = parse_url($url2);
+
+      $defaults = array(
+         PHP_URL_SCHEME => $this->Scheme(),
+         PHP_URL_HOST => $this->HostAndPort(),
+         PHP_URL_PATH => '/',
+         PHP_URL_QUERY => ''
+      );
+
+      $parts1 = array_replace($defaults, $parts1);
+      $parts2 = array_replace($defaults, $parts2);
+
+      if ($parts1[PHP_URL_HOST] === $parts2[PHP_URL_HOST]
+         && ltrim($parts1[PHP_URL_PATH], '/') === ltrim($parts2[PHP_URL_PATH], '/')
+         && $parts1[PHP_URL_QUERY] === $parts2[PHP_URL_QUERY]) {
+         return 0;
+      }
+
+      return strcmp($url1, $url2);
+   }
+
+   /**
     * Conditionally gets the domain of the request.
     *
     * This method will return nothing or the domain with an http, https, or // scheme depending on {@link $withDomain}.

@@ -904,6 +904,74 @@ class Gdn_Request {
    }
 
    /**
+    * Compare two urls for equality.
+    *
+    * @param string $url1 The first url to compare.
+    * @param string $url2 The second url to compare.
+    * @return int Returns 0 if the urls are equal or 1, -1 if they are not.
+    */
+   function UrlCompare($url1, $url2) {
+      $parts1 = parse_url($url1);
+      $parts2 = parse_url($url2);
+
+      $defaults = array(
+         PHP_URL_SCHEME => $this->Scheme(),
+         PHP_URL_HOST => $this->HostAndPort(),
+         PHP_URL_PATH => '/',
+         PHP_URL_QUERY => ''
+      );
+
+      $parts1 = array_replace($defaults, $parts1);
+      $parts2 = array_replace($defaults, $parts2);
+
+      if ($parts1[PHP_URL_HOST] === $parts2[PHP_URL_HOST]
+         && ltrim($parts1[PHP_URL_PATH], '/') === ltrim($parts2[PHP_URL_PATH], '/')
+         && $parts1[PHP_URL_QUERY] === $parts2[PHP_URL_QUERY]) {
+         return 0;
+      }
+
+      return strcmp($url1, $url2);
+   }
+
+   /**
+    * Conditionally gets the domain of the request.
+    *
+    * This method will return nothing or the domain with an http, https, or // scheme depending on {@link $withDomain}.
+    *
+    * @param bool $withDomain How to include the domain in the result.
+    * - false or /: The domain will not be returned.
+    * - //: The domain prefixed with //.
+    * - http: The domain prefixed with http://.
+    * - https: The domain prefixed with https://.
+    * - true: The domain prefixed with the current request scheme.
+    * @return string Returns the domain according to the rules set by {@see $withDomain}.
+    */
+   public function UrlDomain($withDomain = true) {
+      static $allowSSL = null;
+
+      if ($allowSSL === null) {
+         $allowSSL = C('Garden.AllowSSL', null);
+      }
+
+      if (!$withDomain || $withDomain === '/') {
+         return '';
+      }
+
+      if (!$allowSSL && $withDomain === 'https') {
+         $withDomain = 'http';
+      }
+
+      if ($withDomain === true) {
+         $withDomain = $this->Scheme().'://';
+      } elseif ($withDomain !== '//') {
+         $withDomain .= '://';
+      }
+
+      return $withDomain.$this->HostAndPort();
+   }
+
+
+   /**
     * Gets/Sets the relative path to the application's dispatcher.
     *
     * @param $WebRoot Optional Webroot to set

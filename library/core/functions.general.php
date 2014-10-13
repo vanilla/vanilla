@@ -2708,8 +2708,9 @@ endif;
 
 if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
-      if (!$Destination)
-         $Destination = Url('');
+      if (!$Destination) {
+         $Destination = '';
+      }
 
 //      if (Debug() && $Trace = Trace()) {
 //         Trace("Redirecting to $Destination");

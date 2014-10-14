@@ -341,8 +341,14 @@ class Gdn_Request {
       $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
       $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.StripWebRoot', FALSE));
 
-      $this->RequestHost(     isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? val('HTTP_X_FORWARDED_HOST',$_SERVER) : (isset($_SERVER['HTTP_HOST']) ? val('HTTP_HOST',$_SERVER) : val('SERVER_NAME',$_SERVER)));
-      $this->RequestMethod(   isset($_SERVER['REQUEST_METHOD']) ? val('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
+      $Host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? val('HTTP_X_FORWARDED_HOST',$_SERVER) : (isset($_SERVER['HTTP_HOST']) ? val('HTTP_HOST',$_SERVER) : val('SERVER_NAME',$_SERVER));
+
+      // The host can have the port passed in, remove it here if it exists
+      $Host = explode(':', $Host, 2);
+      $Host = $Host[0];
+
+      $this->RequestHost($Host);
+      $this->RequestMethod(isset($_SERVER['REQUEST_METHOD']) ? val('REQUEST_METHOD',$_SERVER) : 'CONSOLE');
 
       // Request IP
 

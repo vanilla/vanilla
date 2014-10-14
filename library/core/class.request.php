@@ -928,18 +928,16 @@ class Gdn_Request {
       $parts2 = parse_url($url2);
 
       $defaults = array(
-         PHP_URL_SCHEME => $this->Scheme(),
-         PHP_URL_HOST => $this->HostAndPort(),
-         PHP_URL_PATH => '/',
-         PHP_URL_QUERY => ''
+         'scheme' => $this->Scheme(),
+         'host' => $this->HostAndPort(),
       );
 
-      $parts1 = array_replace($defaults, $parts1);
-      $parts2 = array_replace($defaults, $parts2);
+      $parts1 = array_replace($parts1, $defaults);
+      $parts2 = array_replace($parts2, $defaults);
 
-      if ($parts1[PHP_URL_HOST] === $parts2[PHP_URL_HOST]
-         && ltrim($parts1[PHP_URL_PATH], '/') === ltrim($parts2[PHP_URL_PATH], '/')
-         && $parts1[PHP_URL_QUERY] === $parts2[PHP_URL_QUERY]) {
+      if ($parts1['host'] === $parts2['host']
+         && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')
+         && $parts1['query'] === $parts2['query']) {
          return 0;
       }
 

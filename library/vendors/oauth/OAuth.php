@@ -3,7 +3,7 @@
 
 /* Generic exception class
  */
-if(!class_exists('OAuthException')) {
+if (!class_exists('OAuthException')) {
   class OAuthException extends Exception {
     // pass
   }

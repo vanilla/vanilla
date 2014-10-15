@@ -590,8 +590,12 @@ if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
 
+$Construct->Table('Tag');
+$FullNameColumnExists = $Construct->ColumnExists('FullName');
+$TagCategoryColumnExists = $Construct->ColumnExists('CategoryID');
+
 // This is a fix for erroneous unique constraint.
-if ($Construct->TableExists('Tag')) {
+if ($Construct->TableExists('Tag') && $TagCategoryColumnExists) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
 
@@ -623,9 +627,6 @@ if ($Construct->TableExists('Tag')) {
       }
    }
 }
-
-$Construct->Table('Tag');
-$FullNameColumnExists = $Construct->ColumnExists('FullName');
 
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')

@@ -16,11 +16,13 @@ class TagModel extends Gdn_Model {
 
    protected $Types;
    protected static $instance;
+   public $StringTags;
 
    /// Methods ///
 
    public function  __construct($Name = '') {
       parent::__construct('Tag');
+      $this->StringTags = C('Plugins.Tagging.StringTags');
    }
 
    /**
@@ -115,12 +117,32 @@ class TagModel extends Gdn_Model {
             '' => array(
                'key' => '',
                'name' => 'Tag',
-               'default' => true
-               ));
+               'plural' => 'Tags',
+               'default' => true,
+               'addtag' => true
+            )
+         );
 
          $this->FireEvent('Types');
       }
+
       return $this->Types;
+   }
+
+   public function getTagTypes() {
+      $TagTypes = $this->Types();
+
+      if (!is_array($TagTypes)) {
+         $TagTypes = array();
+      }
+
+      // Sort by keys, and because the default, "Tags," has a blank key, it
+      // will be set as the first key, which is good for the tabs.
+      if (count($TagTypes)) {
+         ksort($TagTypes);
+      }
+
+      return $TagTypes;
    }
 
    /**
@@ -219,6 +241,52 @@ class TagModel extends Gdn_Model {
       }
 
       return $Tags;
+   }
+
+   /**
+    * Join the tags to a set of discussions.
+    * @param $data
+    */
+   public function joinTags(&$data) {
+      $ids = array();
+      foreach ($data as $row) {
+         $discussionId = val('DiscussionID', $row);
+         if ($discussionId)
+            $ids[] = $discussionId;
+      }
+
+      // Select the tags.
+      $all_tags = $this->SQL->Select('td.DiscussionID, t.TagID, t.Name, t.FullName')
+           ->From('TagDiscussion td')
+           ->Join('Tag t', 't.TagID = td.TagID')
+           ->WhereIn('td.DiscussionID', $ids)
+           ->Get()->ResultArray();
+
+      $all_tags = Gdn_DataSet::Index($all_tags, 'DiscussionID', array('Unique' => FALSE));
+
+      foreach ($data as &$row) {
+         $discussionId = val('DiscussionID', $row);
+         if (isset($all_tags[$discussionId])) {
+            $tags = $all_tags[$discussionId];
+
+            if ($this->StringTags) {
+               $tags = ConsolidateArrayValuesByKey($tags, 'Name');
+               SetValue('Tags', $row, implode(',', $tags));
+            } else {
+               foreach ($tags as &$trow) {
+                  unset($trow['DiscussionID']);
+               }
+               SetValue('Tags', $row, $tags);
+            }
+         } else {
+            if ($this->StringTags) {
+               SetValue('Tags', $row, '');
+            } else {
+               SetValue('Tags', $row, array());
+            }
+         }
+      }
+
    }
 
    public function saveDiscussion($discussion_id, $tags, $types = array(''), $category_id = 0, $new_type = '') {
@@ -412,6 +480,33 @@ class TagModel extends Gdn_Model {
       return $result;
    }
 
+   /**
+    * @param array $FormPostValues
+    * @param bool $Insert
+    * @return bool
+    */
+   public function Validate($FormPostValues, $Insert = FALSE) {
+      $this->DefineSchema();
+
+      $Type = GetValue('Type', $FormPostValues, '');
+      $SetType = FALSE;
+
+      // The model doesn't play well with empty string defaults so spoof an empty string default.
+      if ($Insert && !$Type) {
+         $FormPostValues['Type'] = 'Default';
+         $SetType = TRUE;
+      }
+
+      $Result = $this->Validation->Validate($FormPostValues, $Insert);
+
+      if ($SetType) {
+         $FormPostValues['Type'] = $Type;
+         $this->Validation->AddValidationField('Type', $FormPostValues);
+      }
+
+      return $Result;
+   }
+
    public static function ValidateTag($Tag) {
       // Tags can't contain commas.
       if (preg_match('`,`', $Tag))
@@ -428,6 +523,49 @@ class TagModel extends Gdn_Model {
             return FALSE;
       }
       return TRUE;
+   }
+
+   public function ValidateType($Type) {
+      $ValidType = false;
+      $TagTypes = $this->Types();
+
+      foreach ($TagTypes as $TypeKey => $TypeMeta) {
+         $TypeChecks = array(
+             strtolower($TypeKey),
+             strtolower($TypeMeta['key']),
+             strtolower($TypeMeta['name']),
+             strtolower($TypeMeta['plural'])
+         );
+
+         if (in_array(strtolower($Type), $TypeChecks)) {
+            $ValidType = true;
+            break;
+         }
+      }
+
+      return $ValidType;
+   }
+
+   public function CanAddTagForType($Type) {
+      $CanAddTagForType = false;
+      $TagTypes = $this->Types();
+
+      foreach ($TagTypes as $TypeKey => $TypeMeta) {
+         $TypeChecks = array(
+             strtolower($TypeKey),
+             strtolower($TypeMeta['key']),
+             strtolower($TypeMeta['name']),
+             strtolower($TypeMeta['plural'])
+         );
+
+         if (in_array(strtolower($Type), $TypeChecks)
+         && $TypeMeta['addtag']) {
+            $CanAddTagForType = true;
+            break;
+         }
+      }
+
+      return $CanAddTagForType;
    }
 
    public static function SplitTags($TagsString) {

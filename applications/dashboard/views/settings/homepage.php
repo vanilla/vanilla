@@ -66,7 +66,7 @@ jQuery(document).ready(function($) {
          echo WriteHomepageOption('Categories', 'categories', 'SpCategories', $CurrentTarget);
          // echo WriteHomepageOption('Categories &amp; Discussions', 'categories/discussions', 'categoriesdiscussions', $CurrentTarget);
       }
-      echo WriteHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
+      //echo WriteHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
       
       if (Gdn::PluginManager()->CheckPlugin('Reactions')) {
          echo WriteHomepageOption('Best Of', 'bestof', 'SpBestOf', $CurrentTarget);

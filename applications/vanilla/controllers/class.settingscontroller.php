@@ -130,10 +130,12 @@ class SettingsController extends Gdn_Controller {
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('jquery.atwho.js');
+      $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('global.js');
 
       if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
          $this->AddCssFile('style.css');
+         $this->AddCssFile('vanillicon.css', 'static');
       } else {
          $this->AddCssFile('admin.css');
       }
@@ -189,6 +191,12 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Comment.SpamCount',
          'Vanilla.Comment.SpamTime',
          'Vanilla.Comment.SpamLock',
+         'Conversations.Conversation.SpamCount',
+         'Conversations.Conversation.SpamTime',
+         'Conversations.Conversation.SpamLock',
+         'Conversations.ConversationMessage.SpamCount',
+         'Conversations.ConversationMessage.SpamTime',
+         'Conversations.ConversationMessage.SpamLock',
          'Vanilla.Comment.MaxLength',
          'Vanilla.Comment.MinLength'
       ));
@@ -208,12 +216,28 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussion.SpamTime', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussion.SpamLock', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussion.SpamLock', 'Integer');
+
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamCount', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamCount', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamTime', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamTime', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamLock', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamLock', 'Integer');
+
+         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamCount', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamCount', 'Integer');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamTime', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamTime', 'Integer');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamLock', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamLock', 'Integer');
+
+         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamCount', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamCount', 'Integer');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamTime', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamTime', 'Integer');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamLock', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamLock', 'Integer');
+
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Integer');
 
@@ -252,7 +276,7 @@ class SettingsController extends Gdn_Controller {
       $this->RoleArray = $RoleModel->GetArray();
 
       $this->FireEvent('AddEditCategory');
-      $this->SetupDiscussionTypes($this->Category);
+      $this->SetupDiscussionTypes(array());
 
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->AddHidden('CodeIsDefined', '0');
@@ -447,6 +471,8 @@ class SettingsController extends Gdn_Controller {
 
       // Get category data
       $this->Category = $this->CategoryModel->GetID($CategoryID);
+      if(!$this->Category)
+         throw NotFoundException('Category');
       $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
 
       // Set up head

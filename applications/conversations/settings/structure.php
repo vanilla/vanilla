@@ -33,6 +33,7 @@ $CountParticipantsExists = $Construct->ColumnExists('CountParticipants');
 $Construct
    ->PrimaryKey('ConversationID')
    ->Column('Type', 'varchar(10)', TRUE, 'index')
+   ->Column('ForeignID', 'varchar(40)', TRUE)
    ->Column('Subject', 'varchar(100)', NULL)
    ->Column('Contributors', 'varchar(255)')
    ->Column('FirstMessageID', 'int', TRUE, 'key')

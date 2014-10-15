@@ -836,6 +836,8 @@ class UserController extends DashboardController {
     * @param int $Offset The offset to start listing users at.
     */
    public function Summary($SortField = 'DateLastActive', $SortDirection = 'desc', $Limit = 30, $Offset = 0) {
+      // Added permission check Oct 2014 - Guest now requires Profiles.View for WP widget to work.
+      $this->Permission('Garden.Profiles.View');
       $this->Title(T('User Summary'));
 
       // Input validation
@@ -881,6 +883,10 @@ class UserController extends DashboardController {
          if (!isset($User['RoleID'])) {
             $DefaultRoles = C('Garden.Registration.DefaultRoles', array());
             $User['RoleID'] = $DefaultRoles;
+         }
+         elseif (is_numeric($User['RoleID'])) {
+            // UserModel->Save() demands an array for RoleID.
+            $User['RoleID'] = array($User['RoleID']);
          }
 
          if (!isset($User['Password'])) {

@@ -8,35 +8,32 @@ if ($this->Data !== FALSE) {
    }
    ?>
 <div class="Box BoxCategories">
-   <h4><?php echo T('Categories'); ?></h4>
+   <?php echo panelHeading(T('Categories')); ?>
    <ul class="PanelInfo PanelCategories">
    <?php
    echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.
-      Anchor(T('All Categories')
-      .' <span class="Aside"><span class="Count">'.BigPlural($CountDiscussions, '%s discussion').'</span></span>', '/categories', 'ItemLink')
+      Anchor('<span class="Aside"><span class="Count">'.BigPlural($CountDiscussions, '%s discussion').'</span></span> '.T('All Categories'), '/categories', 'ItemLink')
       .'</li>';
 
    $MaxDepth = C('Vanilla.Categories.MaxDisplayDepth');
-   $DoHeadings = C('Vanilla.Categories.DoHeadings');
-   
+
    foreach ($this->Data->Result() as $Category) {
       if ($Category->CategoryID < 0 || $MaxDepth > 0 && $Category->Depth > $MaxDepth)
          continue;
 
-      if ($DoHeadings && $Category->Depth == 1)
+      if ($Category->DisplayAs === 'Heading')
          $CssClass = 'Heading '.$Category->CssClass;
       else
          $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').' '.$Category->CssClass;
-      
+
       echo '<li class="ClearFix '.$CssClass.'">';
 
-      if ($DoHeadings && $Category->Depth == 1) {
-         echo htmlspecialchars($Category->Name)
-            .' <span class="Aside"><span class="Count Hidden">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
+      $CountText = '<span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
+
+      if ($Category->DisplayAs === 'Heading') {
+         echo $CountText.' '.htmlspecialchars($Category->Name);
       } else {
-         $CountText = ' <span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
-         
-         echo Anchor(htmlspecialchars($Category->Name).$CountText, CategoryUrl($Category), 'ItemLink');
+         echo Anchor($CountText.' '.htmlspecialchars($Category->Name), CategoryUrl($Category), 'ItemLink');
       }
       echo "</li>\n";
    }

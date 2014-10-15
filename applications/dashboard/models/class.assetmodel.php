@@ -56,8 +56,8 @@ class AssetModel extends Gdn_Model {
       if (get_magic_quotes_gpc())
          $RequestETags = stripslashes($RequestETags);
       $RequestETags = explode(',', $RequestETags);
-      foreach ($RequestETags as $RequestETags) {
-         if ($RequestETags == $ETag) {
+      foreach ($RequestETags as $RequestETag) {
+         if ($RequestETag == $ETag) {
             safeHeader("HTTP/1.0 304", TRUE, 304);
             die();
          }

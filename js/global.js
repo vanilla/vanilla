@@ -21,6 +21,7 @@ Vanilla.scrollTo = function(q) {
 Vanilla.parent = function() {};
 Vanilla.parent.callRemote = function(func, args, success, failure) { console.log("callRemote stub: "+func, args); };
 
+window.gdn = window.gdn || {};
 window.Vanilla = Vanilla;
 
 })(window, jQuery);
@@ -129,7 +130,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 
-	gdn = {focused: true};
+	gdn.focused = true;
 	gdn.Libraries = {};
 
    $(window).blur(function() {
@@ -139,24 +140,20 @@ jQuery(document).ready(function($) {
       gdn.focused = true;
    });
 
-   // Grab a definition from hidden inputs in the page
+   // Grab a definition from object in the page
    gdn.definition = function(definition, defaultVal, set) {
       if (defaultVal == null)
          defaultVal = definition;
 
-      var $def = $('#Definitions #' + definition);
-      var def;
-
-      if(set) {
-         $def.val(defaultVal);
-         def = defaultVal;
-      } else {
-         def = $def.val();
-         if ($def.length == 0)
-            def = defaultVal;
+      if (!(definition in gdn.meta)) {
+         return defaultVal;
       }
 
-      return def;
+      if (set) {
+         gdn.meta[definition] = defaultVal;
+      }
+
+      return gdn.meta[definition];
    }
 
    gdn.disable = function(e, progressClass) {
@@ -182,6 +179,17 @@ jQuery(document).ready(function($) {
          return true;
       else
          return false;
+   }
+
+   gdn.getMeta = function(key, defaultValue) {
+      if (gdn.meta[key] === undefined) {
+         return defaultValue;
+      } else {
+         return gdn.meta[key];
+      }
+   };
+   gdn.setMeta = function(key, value) {
+      gdn.meta[key] = value;
    }
 
    gdn.querySep = function(url) {
@@ -270,11 +278,11 @@ jQuery(document).ready(function($) {
       //$('a.Popup').popup();
 		//$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
 
-      $('a.Popup').popup();
-      $('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
+      $('a.Popup:not(.Message a.Popup)').popup();
+      $('a.PopConfirm:not(.Message a.PopConfirm)').popup({'confirm' : true, 'followConfirm' : true});
    }
 
-   $(document).delegate(".PopupWindow", 'click', function() {
+   $(document).delegate(".PopupWindow:not(.Message .PopupWindow)", 'click', function() {
       var $this = $(this);
 
       if ($this.hasClass('NoMSIE') && /msie/.test(navigator.userAgent.toLowerCase())) {
@@ -302,14 +310,14 @@ jQuery(document).ready(function($) {
    // This turns any anchor with the "Popdown" class into an in-page pop-up, but
    // it does not hijack forms in the popup.
    if ($.fn.popup)
-      $('a.Popdown').popup({hijackForms: false});
+      $('a.Popdown:not(.Message a.Popdown)').popup({hijackForms: false});
 
    // This turns SignInPopup anchors into in-page popups
    if ($.fn.popup)
-      $('a.SignInPopup').popup({containerCssClass:'SignInPopup'});
+      $('a.SignInPopup:not(.Message a.SignInPopup)').popup({containerCssClass:'SignInPopup'});
 
    if ($.fn.popup)
-      $(document).delegate('.PopupClose', 'click', function(event){
+      $(document).delegate('.PopupClose:not(.Message .PopupClose)', 'click', function(event){
          var Popup = $(event.target).parents('.Popup');
          if (Popup.length) {
             var PopupID = Popup.prop('id');
@@ -318,7 +326,7 @@ jQuery(document).ready(function($) {
       });
 
    // Make sure that message dismissalls are ajax'd
-   $(document).delegate('a.Dismiss', 'click', function() {
+   $(document).delegate('a.Dismiss:not(.Message a.Dismiss)', 'click', function() {
       var anchor = this;
       var container = $(anchor).parent();
       var transientKey = gdn.definition('TransientKey');
@@ -336,7 +344,7 @@ jQuery(document).ready(function($) {
    // without a refresh. The form must be within an element with the "AjaxForm"
    // class.
    if ($.fn.handleAjaxForm)
-      $('.AjaxForm').handleAjaxForm();
+      $('.AjaxForm').not('.Message .AjaxForm').handleAjaxForm();
 
    // Make the highlight effect themable.
    if ($.effects && $.effects.highlight) {
@@ -395,13 +403,17 @@ jQuery(document).ready(function($) {
          var tableId = $($.tableDnD.currentTable).attr('id');
          // Add in the transient key for postback authentication
          var transientKey = gdn.definition('TransientKey');
-         var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
+         var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = gdn.definition('WebRoot', '');
-         $.post(gdn.combinePaths(webRoot, 'index.php?p=/dashboard/utility/sort/'), data, function(response) {
-            if (response == 'TRUE')
-               $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
-
-         });
+         $.post(
+            gdn.url('/utility/sort.json'),
+            data,
+            function(response) {
+               if (response.Result) {
+                  $('#' + tableId + ' tbody tr td').effect("highlight", {}, 1000);
+               }
+            }
+         );
       }});
 
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters
@@ -642,7 +654,7 @@ jQuery(document).ready(function($) {
          });
      });
    };
-   $('.Popin').popin();
+   $('.Popin').not('.Message .Popin').popin();
 
    var hijackClick = function(e) {
       var $elem = $(this);
@@ -651,7 +663,9 @@ jQuery(document).ready(function($) {
       var href = $elem.attr('href');
       var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
 
-      if (!href)
+      // If empty, or starts with a fragment identifier, do not send
+      // an async request.
+      if (!href || href.trim().indexOf('#') === 0)
          return;
       gdn.disable(this, progressClass);
       e.stopPropagation();
@@ -689,7 +703,7 @@ jQuery(document).ready(function($) {
 
       return false;
    };
-   $(document).delegate('.Hijack', 'click', hijackClick);
+   $(document).delegate('.Hijack:not(.Message .Hijack)', 'click', hijackClick);
 
 
 
@@ -708,7 +722,7 @@ jQuery(document).ready(function($) {
       return false;
    });
    var lastOpen = null;
-   $(document).delegate('.ToggleFlyout', 'click', function(e) {
+   $(document).delegate('.ToggleFlyout:not(.Message .ToggleFlyout)', 'click', function(e) {
 
       var $flyout = $('.Flyout', this);
         var isHandle = false;
@@ -1032,8 +1046,14 @@ jQuery(document).ready(function($) {
 	// Pick up the inform message stack and display it on page load
 	var informMessageStack = gdn.definition('InformMessageStack', false);
 	if (informMessageStack) {
-		informMessageStack = {'InformMessages' : eval($.base64Decode(informMessageStack))};
-		gdn.inform(informMessageStack);
+        var informMessages;
+        try {
+            informMessages = $.parseJSON($.base64Decode(informMessageStack));
+            informMessageStack = {'InformMessages' : informMessages};
+            gdn.inform(informMessageStack);
+        } catch (e) {
+            console.log('informMessageStack contained invalid JSON');
+        }
 	}
 
 	// Ping for new notifications on pageload, and subsequently every 1 minute.
@@ -1067,7 +1087,7 @@ jQuery(document).ready(function($) {
    }
 
 	// Stash something in the user's session (or unstash the value if it was not provided)
-	stash = function(name, value) {
+	stash = function(name, value, callback) {
 		$.ajax({
 			type: "POST",
 			url: gdn.url('session/stash'),
@@ -1078,7 +1098,12 @@ jQuery(document).ready(function($) {
 			},
 			success: function(json) {
 				gdn.inform(json);
-				return json.Unstash;
+
+                if (typeof(callback) === 'function') {
+                    callback();
+                } else {
+				    return json.Unstash;
+                }
 			}
 		});
 
@@ -1086,13 +1111,21 @@ jQuery(document).ready(function($) {
 	}
 
 	// When a stash anchor is clicked, look for inputs with values to stash
-	$('a.Stash').click(function() {
-      // Embedded comments
+	$('a.Stash').click(function(e) {
+        // Embedded comments
 		var comment = $('#Form_Comment textarea').val(),
-         placeholder = $('#Form_Comment textarea').attr('placeholder'),
-         vanilla_identifier = gdn.definition('vanilla_identifier');
-		if (vanilla_identifier && comment != '' && comment != placeholder)
-			stash('CommentForForeignID_' + vanilla_identifier, comment);
+        placeholder = $('#Form_Comment textarea').attr('placeholder'),
+        vanilla_identifier = gdn.definition('vanilla_identifier');
+
+		if (vanilla_identifier && comment != '' && comment != placeholder) {
+            var href = $(this).attr('href');
+            e.preventDefault();
+
+
+			stash('CommentForForeignID_' + vanilla_identifier, comment, function() {
+                window.top.location = href;
+            });
+        }
 	});
 
    String.prototype.addCommas = function() {
@@ -1131,14 +1164,13 @@ jQuery(document).ready(function($) {
    });
 
    // Ajax/Save the ClientHour if it is different from the value in the db.
-   $('input:hidden[id$=SetHourOffset]').livequery(function() {
-      if (hourOffset != $(this).val()) {
-         $.post(
-            gdn.url('/utility/sethouroffset.json'),
-            { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
-         );
-      }
-   });
+   var setHourOffset = parseInt(gdn.definition('SetHourOffset', hourOffset));
+   if (hourOffset !== setHourOffset) {
+      $.post(
+         gdn.url('/utility/sethouroffset.json'),
+         { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
+      );
+   }
 
    // Add "checked" class to item rows if checkboxes are checked within.
    checkItems = function() {
@@ -1182,8 +1214,19 @@ jQuery(document).ready(function($) {
 
       $container.addClass('Open').closest('.ImgExt').addClass('Open');
 
-      var width = $preview.width(), height = $preview.height(), videoid = $container.attr('id').replace('youtube-', '');
+      var width = $preview.width(), height = $preview.height(), videoid = '';
 
+      try {
+         videoid = $container.attr('id').replace('youtube-', '');
+      } catch (e) {
+         console.log("YouTube parser found invalid id attribute.");
+      }
+
+      // Verify we have a valid videoid
+      var pattern = /^[a-zA-Z0-9_-]+$/;
+      if (videoid.match(pattern) == null) {
+         return false;
+      }
 
       var html = '<iframe width="'+width+'" height="'+height+'" src="//www.youtube.com/embed/'+videoid+'?autoplay=1" frameborder="0" allowfullscreen></iframe>';
       $player.html(html);
@@ -1199,43 +1242,68 @@ jQuery(document).ready(function($) {
       return Youtube($container);
    });
 
+
    /**
-    * Twitter card embedding
+    * Twitter card embedding.
     *
+    * IIFE named just for clarity. Note: loading the Twitter widget JS
+    * asynchronously, and tying it into a promise, which will guarantee the
+    * script and its code is excuted before attempting to run the specific
+    * Twitter code. There used to be conflicts if another Twitter widget was
+    * included in the page, or if the connection was slow, resulting in
+    * `window.twttr` being undefined. The promise guarantees this won't happen.
     */
+   twitterCardEmbed = (function() {
+      'use strict';
 
-   if ($('div.twitter-card').length) {
-      // Twitter widgets library
-      window.twttr = (function (d,s,id) {
-         var t, js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
-         js.src="https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs);
-         return window.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
-      }(document, "script", "twitter-wjs"));
+      // Call to transform all tweet URLs into embedded cards. Expose to global
+      // scope for backwards compatibility, as it might be being used elsewhere.
+      window.tweets = function() {
+         $('.twitter-card').each(function(i, el){
+            if (!$(el).hasClass('twitter-card-loaded')) {
+               var card = $(el),
+                   tweetUrl = card.attr('data-tweeturl'),
+                   tweetID = card.attr('data-tweetid'),
+                   cardref = card.get(0);
 
-      twttr.ready(function(twttr){
-         setTimeout(tweets, 300);
-      });
-   }
+               // Candidate found, prepare transition.
+               card.addClass('twitter-card-preload');
 
-   function tweets() {
-      $('div.twitter-card').each(function(i, el){
-         var card = $(el);
-         var tweetUrl = card.attr('data-tweeturl');
-         var tweetID = card.attr('data-tweetid');
-         var cardref = card.get(0);
-
-         twttr.widgets.createTweet(
-            tweetID,
-            cardref,
-            function(iframe){ card.find('a.tweet-url').remove(); },
-            {
-               conversation: "none"
+               twttr.widgets.createTweet(tweetID, cardref, function(iframe) {
+                  card.find('.tweet-url').remove();
+                  // Fade it in.
+                  card.addClass('twitter-card-loaded');
+               }, {
+                  conversation: 'none'
+               });
             }
-         );
+         });
+      };
 
-      });
-   }
+      // Check for the existence of any Twitter card candidates.
+      if ($('div.twitter-card').length) {
+         $.when(
+            $.getScript('//platform.twitter.com/widgets.js')
+         ).done(function() {
+            // The promise returned successfully (script loaded and executed),
+            // so convert tweets already on page.
+            twttr.ready(tweets);
+
+            // Attach event for embed whenever new comments are posted, so they
+            // are automatically loaded. Currently works for new comments,
+            // and new private messages.
+            var newPostTriggers = [
+               'CommentAdded',
+               'MessageAdded'
+            ];
+
+            $(document).on(newPostTriggers.join(' '), function(e, data) {
+               twttr.ready(tweets);
+            });
+         });
+      }
+   }());
+
 
    /**
     * GitHub commit embedding
@@ -1292,15 +1360,85 @@ jQuery(document).ready(function($) {
    }
 
    /**
-    * Textarea autogrow
+    * Textarea autosize.
     *
+    * Create wrapper for autosize library, so that the custom
+    * arguments passed do not need to be repeated for every call, if for some
+    * reason it needs to be binded elsewhere and the UX should be identical,
+    * otherwise just use autosize directly, passing arguments or none.
+    *
+    * Note: there should be no other calls to autosize, except for in this file.
+    * All previous calls to the old jquery.autogrow were called in their
+    * own files, which made managing this functionality less than optimal. Now
+    * all textareas will have autosize binded to them by default.
+    *
+    * @depends js/library/jquery.autosize.min.js
     */
+   gdn.autosize = function(textarea) {
+      // Check if library available.
+      if ($.fn.autosize) {
+         // Check if not already active on node.
+         if (!$(textarea).hasClass('textarea-autosize')) {
+            $(textarea).autosize({
+               append: '\n',
+               resizeDelay: 20, // Keep higher than CSS transition, else creep.
+               callback: function(el) {
+                  // This class adds the transition, and removes manual resize.
+                  $(el).addClass('textarea-autosize');
+               }
+            });
+         // Otherwise just trigger a resize refresh.
+         } else {
+            $(textarea).trigger('autosize.resize');
+         }
+      }
+   };
 
-   if ($.fn.autogrow) {
-      $('textarea.Autogrow').livequery(function() {
-         $(this).autogrow();
+   /**
+    * Bind autosize to relevant nodes.
+    *
+    * Attach autosize to all textareas. Previously this existed across multiple
+    * files, probably as it was slowly incorporated into different areas, but
+    * at this point it's safe to call it once here. The wrapper above makes
+    * sure that it will not throw any errors if the library is unavailable.
+    *
+    * Note: if there is a textarea not autosizing, it would be good to find out
+    * if there is another event for that exception, and if all fails, there
+    * is the livequery fallback, which is not recommended.
+    */
+   gdn.initAutosizeEvents = (function() {
+      $('textarea').each(function(i, el) {
+         // Attach to all immediately available textareas.
+         gdn.autosize(el);
+
+         // Also, make sure that focus on the textarea will trigger a resize,
+         // just to cover all possibilities.
+         $(el).on('focus', function(e) {
+            gdn.autosize(this);
+         });
       });
-   }
+
+      // For any dynamically loaded textareas that are inserted and have an
+      // event triggered to grab their node, or just events that should call
+      // a resize on the textarea. Attempted to bind to `appendHtml` event,
+      // but it required a (0ms) timeout, so it's being kept in Quotes plugin,
+      // where it's actually triggered.
+      var autosizeTriggers = [
+         'clearCommentForm',
+         'EditCommentFormLoaded',
+         'popupReveal'
+         //'appendHtml'
+      ];
+
+      $(document).on(autosizeTriggers.join(' '), function(e, data) {
+         var data = (typeof data == 'object') ? data : '';
+         $(data||e.target||this).parent().find('textarea').each(function(i, el) {
+            gdn.autosize(el);
+         });
+      });
+   }());
+
+
 
    /**
     * Uses highly modified jquery.atwho.js library. See the note in that
@@ -1317,6 +1455,11 @@ jQuery(document).ready(function($) {
     * @author Dane MacMillan
     */
    gdn.atCompleteInit = function(editorElement, iframe) {
+
+      if (!jQuery.fn.atwho) {
+         //console.warn('Editor missing atwho dependency.');
+         return false;
+      }
 
       // Added cache results to global, so all instances share the same data
       // and can build the cache together.
@@ -1679,6 +1822,44 @@ jQuery(document).ready(function($) {
       });
    }
 
+
+   /**
+    * Running magnific-popup. Image tag or text must be wrapped with an anchor
+    * tag. This will render the content of the anchor tag's href. If using an
+    * image tag, the anchor tag's href can point to either the same location
+    * as the image tag, or a higher quality version of the image. If zoom is
+    * not wanted, remove the zoom and mainClass properties, and it will just
+    * load the content of the anchor tag with no special effects.
+    *
+    * @documentation http://dimsemenov.com/plugins/magnific-popup/documentation.html
+    *
+    */
+   gdn.magnificPopup = (function() {
+      if ($.fn.magnificPopup) {
+         $('.mfp-image').each(function(i, el){
+            $(el).magnificPopup({
+               type: 'image',
+               mainClass: 'mfp-with-zoom',
+               zoom: {
+                  enabled: true,
+                  duration: 300,
+                  easing: 'ease',
+                  opener: function(openerElement) {
+                    return openerElement.is('img')
+                       ? openerElement
+                       : openerElement.find('img');
+                  }
+               }
+            });
+         });
+      }
+   }());
+
+
+
+
+
+
 });
 
 // Shrink large images to fit into message space, and pop into new window when clicked.
@@ -1726,7 +1907,7 @@ jQuery(window).load(function() {
       var container = img.closest('div.Message');
       if (img.naturalWidth() > container.width() && container.width() > 0) {
          img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
-         img.wrap('<a href="'+$(img).attr('src')+'"></a>');
+         img.wrap('<a href="'+$(img).attr('src')+'" target="_blank"></a>');
       }
    });
 

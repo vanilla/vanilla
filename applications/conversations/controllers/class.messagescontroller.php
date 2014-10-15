@@ -84,6 +84,12 @@ class MessagesController extends ConversationsController {
       $this->Permission('Conversations.Conversations.Add');
       $this->Form->SetModel($this->ConversationModel);
 
+      // Set recipient limit
+      if (!CheckPermission('Garden.Moderation.Manage') && C('Conversations.MaxRecipients')) {
+         $this->AddDefinition('MaxRecipients', C('Conversations.MaxRecipients'));
+         $this->SetData('MaxRecipients', C('Conversations.MaxRecipients'));
+      }
+
       if ($this->Form->AuthenticatedPostBack()) {
          $RecipientUserIDs = array();
          $To = explode(',', $this->Form->GetFormValue('To', ''));
@@ -94,6 +100,17 @@ class MessagesController extends ConversationsController {
                if (is_object($User))
                   $RecipientUserIDs[] = $User->UserID;
             }
+         }
+
+         // Enforce MaxRecipients
+         if (!$this->ConversationModel->AddUserAllowed(0, count($RecipientUserIDs))) {
+            // Reuse the Info message now as an error.
+            $this->Form->AddError(sprintf(
+               Plural($this->Data('MaxRecipients'),
+                  "You are limited to %s recipient.",
+                  "You are limited to %s recipients."),
+               C('Conversations.MaxRecipients')
+            ));
          }
 
          $this->EventArguments['Recipients'] = $RecipientUserIDs;
@@ -134,6 +151,17 @@ class MessagesController extends ConversationsController {
 
       if ($this->Form->AuthenticatedPostBack()) {
          $ConversationID = $this->Form->GetFormValue('ConversationID', '');
+
+         // Make sure the user posting to the conversation is actually
+         // a member of it, or is allowed, like an admin.
+         if (!CheckPermission('Garden.Moderation.Manage')) {
+            $UserID = Gdn::Session()->UserID;
+            $ValidConversationMember = $this->ConversationModel->ValidConversationMember($ConversationID, $UserID);
+            if (!$ValidConversationMember) {
+               throw PermissionException();
+            }
+         }
+
          $Conversation = $this->ConversationModel->GetID($ConversationID, Gdn::Session()->UserID);
 
          $this->EventArguments['Conversation'] = $Conversation;
@@ -157,6 +185,7 @@ class MessagesController extends ConversationsController {
             $MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
             $this->Conversation = $Conversation;
             $this->MessageData = $MessageData;
+            $this->Data['Messages'] = $MessageData;
 
             $this->View = 'messages';
          } else {
@@ -318,6 +347,8 @@ class MessagesController extends ConversationsController {
          $Limit
       );
 
+      $this->SetData('Messages', $this->MessageData);
+      
       // Figure out who's participating.
       $ParticipantTitle = ConversationModel::ParticipantTitle($this->Conversation, TRUE);
       $this->Participants = $ParticipantTitle;
@@ -368,8 +399,8 @@ class MessagesController extends ConversationsController {
 
       $this->Data['Breadcrumbs'][] = array(
           'Name' => $Subject,
-          Url('', '//'));
-
+          'Url' => Url('', '//'));
+      
       // Render view
       $this->Render();
    }

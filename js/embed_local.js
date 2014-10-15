@@ -115,7 +115,7 @@ jQuery(document).ready(function($) {
    }
 
    // If not embedded and we should be, redirect to the embedded version.
-   if (!inIframe && !inPopup && inConnect && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
+   if (!inIframe && !inPopup && !inConnect && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
       document.location = remoteUrl + '#' + path;
 
    if (inIframe) {
@@ -154,8 +154,14 @@ jQuery(document).ready(function($) {
          var isHttp = href.substr(0, 7) == 'http://' || href.substr(0,8) == 'https://',
             noTop = $(this).hasClass('SignOut') || $(this).hasClass('NoTop');
 
-         if (isHttp && href.substr(0, webroot.length) != webroot) {
-            $(this).attr('target', '_blank');
+         if ((isHttp && href.substr(0, webroot.length) != webroot) || $(this).hasClass('js-extern')) {
+            // Make sure the social sign in links are opened within the topmost
+            // window instead of a new window, otherwise forced embed problem.
+            var target = ($(this).closest('.Message').length)
+               ? '_blank'
+               : '_top';
+
+            $(this).attr('target', target);
          } else if (isEmbeddedComments) {
             // If clicking a pager link, just follow it.
             if ($(this).parents('.Pager').length > 0)
@@ -186,6 +192,7 @@ jQuery(document).ready(function($) {
          }
       });
    }
+
 
    $('#Form_Body').click(function() {
       $('.SignInPopup').click();

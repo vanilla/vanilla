@@ -13,13 +13,13 @@
 class DiscussionsController extends VanillaController {
    /**
     * Models to include.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var array
     */
    public $Uses = array('Database', 'DiscussionModel', 'Form');
-   
+
    /**
     * A boolean value indicating if discussion options should be displayed when
     * rendering the discussion view.
@@ -29,30 +29,30 @@ class DiscussionsController extends VanillaController {
     * @var boolean
     */
    public $ShowOptions;
-   
+
    /**
-    * Category object. 
-    * 
+    * Category object.
+    *
     * Used to limit which discussion are returned to a particular category.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var object
     */
    public $Category;
-   
+
    /**
     * Unique identifier for category.
-    * 
+    *
     * @since 2.0.0
     * @access public
     * @var int
     */
    public $CategoryID;
-   
+
    /**
     * "Table" layout for discussions. Mimics more traditional forum discussion layout.
-    * 
+    *
     * @param int $Page Multiplied by PerPage option to determine offset.
     */
    public function Table($Page = '0') {
@@ -60,13 +60,13 @@ class DiscussionsController extends VanillaController {
          $this->View = 'table';
       $this->Index($Page);
    }
-   
+
    /**
     * Default all discussions view: chronological by most recent comment.
-    * 
+    *
     * @since 2.0.0
     * @access public
-    * 
+    *
     * @param int $Page Multiplied by PerPage option to determine offset.
     */
    public function Index($Page = FALSE) {
@@ -82,22 +82,31 @@ class DiscussionsController extends VanillaController {
             break;
       }
       Gdn_Theme::Section('DiscussionList');
-      
+
       // Determine offset from $Page
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $Page = PageNumber($Offset, $Limit);
+
+      // Allow page manipulation
+      $this->EventArguments['Page'] = &$Page;
+      $this->EventArguments['Offset'] = &$Offset;
+      $this->EventArguments['Limit'] = &$Limit;
+      $this->FireEvent('AfterPageCalculation');
+
+      // Set canonical URL
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, TRUE, FALSE)), TRUE));
-      
+
       // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
       $MaxPages = C('Vanilla.Discussions.MaxPages');
       if ($MaxPages && $Page > $MaxPages) {
          throw NotFoundException();
       }
-      
+
       // Setup head.
       if (!$this->Data('Title')) {
          $Title = C('Garden.HomepageTitle');
-         if ($Title)
+         $DefaultControllerRoute = val('Destination', Gdn::Router()->GetRoute('DefaultController'));
+         if ($Title && ($DefaultControllerRoute == 'discussions'))
             $this->Title($Title, '');
          else
             $this->Title(T('Recent Discussions'));
@@ -106,35 +115,35 @@ class DiscussionsController extends VanillaController {
          $this->Description(C('Garden.Description', NULL));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/feed.rss', TRUE), $this->Head->Title());
-      
+
       // Add modules
       $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
       $this->SetData('Breadcrumbs', array(array('Name' => T('Recent Discussions'), 'Url' => '/discussions')));
-      
-      
+
+
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
       $DiscussionModel = new DiscussionModel();
       $DiscussionModel->Watching = TRUE;
-      
+
       // Get Discussion Count
       $CountDiscussions = $DiscussionModel->GetCount();
-      
+
       if ($MaxPages)
          $CountDiscussions = $MaxPages * $Limit;
-      
+
       $this->SetData('CountDiscussions', $CountDiscussions);
-      
+
       // Get Announcements
       $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
 		$this->SetData('Announcements', $this->AnnounceData !== FALSE ? $this->AnnounceData : array(), TRUE);
-      
+
       // Get Discussions
       $this->DiscussionData = $DiscussionModel->GetWhere(FALSE, $Offset, $Limit);
-      
+
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Offset . ' to ' . $Limit);
 
@@ -155,25 +164,21 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
 		$this->FireEvent('AfterBuildPager');
-      
+
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-      
-      // We don't want search engines to index these pages because they can go in through the individual categories MUCH faster.
-      if ($this->Head)
-         $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
-      
+
       $this->Render();
    }
-   
+
    public function Unread($Page = '0') {
       if (!Gdn::Session()->IsValid())
          Redirect('/discussions/index', 302);
-      
+
       // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
       $Layout = C('Vanilla.Discussions.Layout');
       switch($Layout) {
@@ -186,15 +191,15 @@ class DiscussionsController extends VanillaController {
             break;
       }
       Gdn_Theme::Section('DiscussionList');
-      
+
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', 'unread', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
-      
+
       // Validate $Page
       if (!is_numeric($Page) || $Page < 0)
          $Page = 0;
-      
+
       // Setup head.
       if (!$this->Data('Title')) {
          $Title = C('Garden.HomepageTitle');
@@ -207,7 +212,7 @@ class DiscussionsController extends VanillaController {
          $this->Description(C('Garden.Description', NULL));
       if ($this->Head)
          $this->Head->AddRss(Url('/discussions/unread/feed.rss', TRUE), $this->Head->Title());
-      
+
       // Add modules
       $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
@@ -217,20 +222,20 @@ class DiscussionsController extends VanillaController {
           array('Name' => T('Discussions'), 'Url' => '/discussions'),
           array('Name' => T('Unread'), 'Url' => '/discussions/unread')
       ));
-      
-      
+
+
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
       $DiscussionModel = new DiscussionModel();
       $DiscussionModel->Watching = TRUE;
-      
+
       // Get Discussion Count
       $CountDiscussions = $DiscussionModel->GetUnreadCount();
       $this->SetData('CountDiscussions', $CountDiscussions);
-      
+
       // Get Discussions
       $this->DiscussionData = $DiscussionModel->GetUnread($Page, $Limit);
-      
+
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Page . ' to ' . $Limit);
 
@@ -251,22 +256,22 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
 		$this->FireEvent('AfterBuildPager');
-      
+
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-      
+
       $this->Render();
    }
-   
+
    /**
     * Highlight route and include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -276,20 +281,20 @@ class DiscussionsController extends VanillaController {
       $this->Menu->HighlightRoute('/discussions');
       $this->AddCssFile('vanilla.css');
 		$this->AddJsFile('discussions.js');
-			
+
 		// Inform moderator of checked comments in this discussion
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
 		if (count($CheckedDiscussions) > 0)
 			ModerationController::InformCheckedDiscussions($this);
-         
+
       $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
-         
+
 		$this->FireEvent('AfterInitialize');
    }
-   
+
    /**
     * Display discussions the user has bookmarked.
-    * 
+    *
     * @since 2.0.0
     * @access public
     *
@@ -310,29 +315,29 @@ class DiscussionsController extends VanillaController {
             $this->View = 'index';
             break;
       }
-      
+
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $this->CanonicalUrl(Url(ConcatSep('/', 'discussions', 'bookmarked', PageNumber($Page, $Limit, TRUE, FALSE)), TRUE));
-      
+
       // Validate $Page
       if (!is_numeric($Page) || $Page < 0)
          $Page = 0;
-      
+
       $DiscussionModel = new DiscussionModel();
       $Wheres = array(
-         'w.Bookmarked' => '1', 
+         'w.Bookmarked' => '1',
          'w.UserID' => Gdn::Session()->UserID
       );
-      
+
       $this->DiscussionData = $DiscussionModel->Get($Page, $Limit, $Wheres);
       $this->SetData('Discussions', $this->DiscussionData);
       $CountDiscussions = $DiscussionModel->GetCount($Wheres);
       $this->SetData('CountDiscussions', $CountDiscussions);
       $this->Category = FALSE;
-      
+
       $this->SetJson('Loading', $Page . ' to ' . $Limit);
-      
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
 		$this->EventArguments['PagerType'] = 'Pager';
@@ -345,49 +350,49 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/bookmarked/%1$s'
       );
-      
+
       if (!$this->Data('_PagerUrl'))
          $this->SetData('_PagerUrl', 'discussions/bookmarked/{Page}');
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
 		$this->FireEvent('AfterBuildBookmarkedPager');
-      
+
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-      
+
       // Add modules
       $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
-      
+
       // Render default view (discussions/bookmarked.php)
       $this->SetData('Title', T('My Bookmarks'));
 		$this->SetData('Breadcrumbs', array(array('Name' => T('My Bookmarks'), 'Url' => '/discussions/bookmarked')));
       $this->Render();
    }
-   
+
    public function BookmarkedPopin() {
       $this->Permission('Garden.SignIn.Allow');
-      
+
       $DiscussionModel = new DiscussionModel();
       $Wheres = array(
-         'w.Bookmarked' => '1', 
+         'w.Bookmarked' => '1',
          'w.UserID' => Gdn::Session()->UserID
       );
-      
+
       $Discussions = $DiscussionModel->Get(0, 5, $Wheres)->Result();
       $this->SetData('Title', T('Bookmarks'));
       $this->SetData('Discussions', $Discussions);
       $this->Render('Popin');
    }
-   
+
    /**
     * Display discussions started by the user.
-    * 
+    *
     * @since 2.0.0
     * @access public
     *
@@ -396,7 +401,7 @@ class DiscussionsController extends VanillaController {
    public function Mine($Page = 'p1') {
       $this->Permission('Garden.SignIn.Allow');
       Gdn_Theme::Section('DiscussionList');
-      
+
       // Set criteria & get discussions data
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $Session = Gdn::Session();
@@ -405,7 +410,7 @@ class DiscussionsController extends VanillaController {
       $this->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
       $this->SetData('Discussions', $this->DiscussionData);
       $CountDiscussions = $this->SetData('CountDiscussions', $DiscussionModel->GetCount($Wheres));
-      
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
 		$this->EventArguments['PagerType'] = 'MorePager';
@@ -426,20 +431,20 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Limit', $Limit);
 
 		$this->FireEvent('AfterBuildMinePager');
-      
+
       // Deliver JSON data if necessary
       if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
          $this->SetJson('LessRow', $this->Pager->ToString('less'));
          $this->SetJson('MoreRow', $this->Pager->ToString('more'));
          $this->View = 'discussions';
       }
-      
+
       // Add modules
       $this->AddModule('DiscussionFilterModule');
       $this->AddModule('NewDiscussionModule');
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
-      
+
       // Render default view (discussions/mine.php)
       $this->SetData('Title', T('My Discussions'));
       $this->SetData('Breadcrumbs', array(array('Name' => T('My Discussions'), 'Url' => '/discussions/mine')));
@@ -477,29 +482,29 @@ class DiscussionsController extends VanillaController {
       $this->SetData('_Value', $CountBookmarks);
       $this->xRender('Value', 'utility', 'dashboard');
    }
-	
+
 	/**
 	 * Takes a set of discussion identifiers and returns their comment counts in the same order.
 	 */
 	public function GetCommentCounts() {
       $this->AllowJSONP(TRUE);
-      
+
 		$vanilla_identifier = GetValue('vanilla_identifier', $_GET);
 		if (!is_array($vanilla_identifier))
 			$vanilla_identifier = array($vanilla_identifier);
-         
+
       $vanilla_identifier = array_unique($vanilla_identifier);
-      
+
       $FinalData = array_fill_keys($vanilla_identifier, 0);
       $Misses = array();
       $CacheKey = 'embed.comments.count.%s';
       $OriginalIDs = array();
       foreach ($vanilla_identifier as $ForeignID) {
          $HashedForeignID = ForeignIDHash($ForeignID);
-         
+
          // Keep record of non-hashed identifiers for the reply
          $OriginalIDs[$HashedForeignID] = $ForeignID;
-         
+
          $RealCacheKey = sprintf($CacheKey, $HashedForeignID);
          $Comments = Gdn::Cache()->Get($RealCacheKey);
          if ($Comments !== Gdn_Cache::CACHEOP_FAILURE)
@@ -507,7 +512,7 @@ class DiscussionsController extends VanillaController {
          else
             $Misses[] = $HashedForeignID;
       }
-      
+
       if (sizeof($Misses)) {
          $CountData = Gdn::SQL()
             ->Select('ForeignID, CountComments')
@@ -515,20 +520,20 @@ class DiscussionsController extends VanillaController {
             ->Where('Type', 'page')
             ->WhereIn('ForeignID', $Misses)
             ->Get()->ResultArray();
-         
+
          foreach ($CountData as $Row) {
             // Get original identifier to send back
             $ForeignID = $OriginalIDs[$Row['ForeignID']];
             $FinalData[$ForeignID] = $Row['CountComments'];
-            
+
             // Cache using the hashed identifier
             $RealCacheKey = sprintf($CacheKey, $Row['ForeignID']);
             Gdn::Cache()->Store($RealCacheKey, $Row['CountComments'], array(
                Gdn_Cache::FEATURE_EXPIRY     => 60
             ));
-         }         
+         }
       }
-      
+
 		$this->SetData('CountData', $FinalData);
 		$this->DeliveryMethod = DELIVERY_METHOD_JSON;
 		$this->DeliveryType = DELIVERY_TYPE_DATA;
@@ -541,25 +546,25 @@ class DiscussionsController extends VanillaController {
    public function Sort($Target = '') {
       if (!Gdn::Session()->IsValid())
          throw PermissionException();
-         
+
       if (!$this->Request->IsAuthenticatedPostBack())
          throw ForbiddenException('GET');
-      
+
       // Get param
       $SortField = Gdn::Request()->Post('DiscussionSort');
       $SortField = 'd.'.StringBeginsWith($SortField, 'd.', TRUE, TRUE);
-      
+
       // Use whitelist here too to keep database clean
       if (!in_array($SortField, DiscussionModel::AllowedSortFields())) {
          throw new Gdn_UserException("Unknown sort $SortField.");
       }
-      
+
       // Set user pref
       Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, 'Discussions.SortField', $SortField);
-      
+
       if ($Target)
          Redirect($Target);
-      
+
       // Send sorted discussions.
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
       $this->Render();

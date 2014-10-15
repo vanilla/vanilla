@@ -134,7 +134,11 @@ if (!class_exists('HeadModule', FALSE)) {
             $Options = array();
          }
 
-         $Attributes = array('src' => Asset($Src, FALSE, GetValue('version', $Options)), 'type' => $Type);
+         $Attributes = array();
+         if ($Src) {
+            $Attributes['src'] = Asset($Src, FALSE, GetValue('version', $Options));
+         }
+         $Attributes['type'] = $Type;
          if (isset($Options['defer'])) {
             $Attributes['defer'] = $Options['defer'];
          }

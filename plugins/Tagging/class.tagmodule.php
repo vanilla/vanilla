@@ -24,13 +24,16 @@ class TagModule extends Gdn_Module {
    }
 
    public function __set($Name, $Value) {
-      if ($Name == 'Context')
+      if ($Name == 'Context') {
          $this->AutoContext($Value);
+      }
    }
 
    protected function AutoContext($Hint = NULL) {
       // If we're already configured, don't auto configure
-      if (!is_null($this->ParentID) && is_null($Hint)) return;
+      if (!is_null($this->ParentID) && is_null($Hint)) {
+         return;
+      }
 
       // If no hint was given, determine by environment
       if (is_null($Hint)) {
@@ -94,8 +97,9 @@ class TagModule extends Gdn_Module {
             $TagQuery->Where('t.CountDiscussions >', 0, FALSE)
                ->Cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
 
-            if ($this->CategorySearch)
+            if ($this->CategorySearch) {
                $TagQuery->Where('t.CategoryID', '-1');
+            }
 
             break;
       }
@@ -119,11 +123,13 @@ class TagModule extends Gdn_Module {
    }
 
    public function InlineDisplay() {
-      if (!$this->_TagData)
+      if (!$this->_TagData) {
          $this->GetData();
+      }
 
-      if ($this->_TagData->NumRows() == 0)
+      if ($this->_TagData->NumRows() == 0) {
          return '';
+      }
 
       $String = '';
       ob_start();
@@ -131,20 +137,16 @@ class TagModule extends Gdn_Module {
       <div class="InlineTags Meta">
          <?php echo T('Tagged'); ?>:
          <ul>
-         <?php
-         foreach ($this->_TagData->ResultArray() as $Tag) {
-            if ($Tag['Name'] != '') {
-         ?>
+         <?php foreach ($this->_TagData->ResultArray() as $Tag): ?>
+            <?php if ($Tag['Name'] != ''): ?>
             <li><?php
                echo Anchor(htmlspecialchars(TagFullName($Tag)),
                        TagUrl($Tag, '', '/'),
                        array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
                     );
             ?></li>
-         <?php
-            }
-         }
-         ?>
+            <?php endif; ?>
+         <?php endforeach; ?>
          </ul>
       </div>
       <?php
@@ -154,31 +156,30 @@ class TagModule extends Gdn_Module {
    }
 
    public function ToString() {
-      if (!$this->_TagData)
+      if (!$this->_TagData) {
          $this->GetData();
+      }
 
-      if ($this->_TagData->NumRows() == 0)
+      if ($this->_TagData->NumRows() == 0) {
          return '';
+      }
+
       $String = '';
       ob_start();
       ?>
       <div class="Box Tags">
-         <h4><?php echo T($this->ParentID > 0 ? 'Tagged' : 'Popular Tags'); ?></h4>
+         <?php echo panelHeading(T($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
          <ul class="TagCloud">
-         <?php
-         foreach ($this->_TagData->Result() as $Tag) {
-            if ($Tag['Name'] != '') {
-         ?>
-            <li><span><?php
-               echo Anchor(TagFullName($Tag),
-                       TagUrl($Tag),
-                       array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
-                    );
-            ?></span> <span class="Count"><?php echo number_format($Tag['CountDiscussions']); ?></span></li>
-         <?php
-            }
-         }
-         ?>
+         <?php foreach ($this->_TagData->Result() as $Tag): ?>
+            <?php if ($Tag['Name'] != ''): ?>
+            <li><?php
+               echo Anchor(TagFullName($Tag).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', array('class' => 'Count')),
+                  TagUrl($Tag),
+                  array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
+               );
+            ?></li>
+            <?php endif; ?>
+         <?php endforeach; ?>
          </ul>
       </div>
       <?php

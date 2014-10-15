@@ -133,7 +133,7 @@ class DiscussionsController extends VanillaController {
       $CountDiscussions = $DiscussionModel->GetCount();
 
       if ($MaxPages)
-         $CountDiscussions = $MaxPages * $Limit;
+         $CountDiscussions = min($MaxPages * $Limit, $CountDiscussions);
 
       $this->SetData('CountDiscussions', $CountDiscussions);
 

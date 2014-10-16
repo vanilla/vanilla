@@ -1,0 +1,20 @@
+.JsConnect-Container {
+   overflow: hidden;
+   margin: 5px 0;
+}
+
+.JsConnect-Connect {
+   line-height: 16px;
+/*   clear: both;*/
+}
+
+.JsConnect-Connect .UserPhoto {
+   float: left;
+   height: 32px;
+   width: 32px;
+   margin-right: 5px;
+}
+
+.JsConnect-Connect .ConnectLabel {
+   font-weight: bold;
+}

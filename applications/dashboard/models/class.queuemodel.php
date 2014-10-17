@@ -331,7 +331,14 @@ class QueueModel extends Gdn_Model {
       $Qm->FireEvent('CheckPremoderation');
 
       $IsPremoderation = $Qm->EventArguments['Premoderate'];
-      if ($IsPremoderation) {
+      $Rejected = val('Rejected', $Options, false);
+
+      if ($Rejected) {
+         return false;
+      }
+
+      if (!$Rejected && $IsPremoderation) {
+
          $instance = self::Instance();
          $queueRow = $instance->convertToQueueRow($recordType, $data);
          $queueRow = array_replace($queueRow, $row);
@@ -823,7 +830,11 @@ class QueueModel extends Gdn_Model {
 
       switch ($contentType) {
          case 'comment':
-            return 'C-'.($newID ?: val('CommentID', $data, $unique));
+            $commentID = val('CommentID', $data);
+            if (empty($commentID)) {
+               $commentID = $unique;
+            }
+            return 'C-' . $commentID;
          case 'discussion':
             return 'D-'.($newID ?: val('DiscussionID', $data, $unique));
          case 'activity':

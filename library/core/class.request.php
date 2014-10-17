@@ -914,19 +914,22 @@ class Gdn_Request {
       $parts1 = parse_url($url1);
       $parts2 = parse_url($url2);
 
-      $defaults = array(
-         'scheme' => $this->Scheme(),
-         'host' => $this->HostAndPort(),
-      );
 
-      $parts1 = array_replace($parts1, $defaults);
-      $parts2 = array_replace($parts2, $defaults);
+       $defaults = array(
+          'scheme' => $this->Scheme(),
+          'host' => $this->HostAndPort(),
+          'path' => '/',
+          'query' => ''
+       );
 
-      if ($parts1['host'] === $parts2['host']
-         && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')
-         && $parts1['query'] === $parts2['query']) {
-         return 0;
-      }
+       $parts1 = array_replace($defaults, $parts1);
+       $parts2 = array_replace($defaults, $parts2);
+
+       if ($parts1['host'] === $parts2['host']
+          && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')
+          && $parts1['query'] === $parts2['query']) {
+          return 0;
+       }
 
       return strcmp($url1, $url2);
    }

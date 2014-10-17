@@ -915,21 +915,21 @@ class Gdn_Request {
       $parts2 = parse_url($url2);
 
 
-       $defaults = array(
-          'scheme' => $this->Scheme(),
-          'host' => $this->HostAndPort(),
-          'path' => '/',
-          'query' => ''
-       );
+      $defaults = array(
+         'scheme' => $this->Scheme(),
+         'host' => $this->HostAndPort(),
+         'path' => '/',
+         'query' => ''
+      );
 
-       $parts1 = array_replace($defaults, $parts1);
-       $parts2 = array_replace($defaults, $parts2);
+      $parts1 = array_replace($defaults, $parts1);
+      $parts2 = array_replace($defaults, $parts2);
 
-       if ($parts1['host'] === $parts2['host']
-          && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')
-          && $parts1['query'] === $parts2['query']) {
-          return 0;
-       }
+      if ($parts1['host'] === $parts2['host']
+         && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')
+         && $parts1['query'] === $parts2['query']) {
+         return 0;
+      }
 
       return strcmp($url1, $url2);
    }

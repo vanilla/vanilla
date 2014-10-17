@@ -927,13 +927,16 @@ class Gdn_Request {
       $parts1 = parse_url($url1);
       $parts2 = parse_url($url2);
 
+
       $defaults = array(
          'scheme' => $this->Scheme(),
          'host' => $this->HostAndPort(),
+         'path' => '/',
+         'query' => ''
       );
 
-      $parts1 = array_replace($parts1, $defaults);
-      $parts2 = array_replace($parts2, $defaults);
+      $parts1 = array_replace($defaults, $parts1);
+      $parts2 = array_replace($defaults, $parts2);
 
       if ($parts1['host'] === $parts2['host']
          && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')

@@ -204,7 +204,7 @@ function GetDiscussionOptions($Discussion = NULL) {
 	// Build the $Options array based on current user's permission.
    // Can the user edit the discussion?
    if ($CanEdit)
-      $Options['EditDiscussion'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editdiscussion/'.$Discussion->DiscussionID);
+      $Options['EditDiscussion'] = array('Label' => T('Edit').$TimeLeft, 'Url' => '/vanilla/post/editdiscussion/'.$Discussion->DiscussionID);
 
    // Can the user announce?
    if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
@@ -320,7 +320,7 @@ function GetCommentOptions($Comment) {
 
 	// Can the user edit the comment?
 	if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $PermissionCategoryID))
-		$Options['EditComment'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
+		$Options['EditComment'] = array('Label' => T('Edit').$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
 
 	// Can the user delete the comment?
 	$SelfDeleting = ($CanEdit && $Session->UserID == $Comment->InsertUserID && C('Vanilla.Comments.AllowSelfDelete'));

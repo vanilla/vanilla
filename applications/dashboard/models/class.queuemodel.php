@@ -462,18 +462,19 @@ class QueueModel extends Gdn_Model {
          }
 
          $saveData = $this->convertToSaveData($queueItem);
-         if ($Attributes) {
-            $saveData['Attributes'] = serialize(
-               array(
-                  'Moderation' =>
-                     array(
-                        'Approved' => true,
-                        'ApprovedUserID' => $this->getModeratorUserID(),
-                        'DateApproved' => Gdn_Format::ToDateTime(),
-                     )
-               )
-            );
-         }
+// @todo. Need to get current attributes; if any before writing new ones.
+//         if ($Attributes) {
+//            $saveData['Attributes'] = serialize(
+//               array(
+//                  'Moderation' =>
+//                     array(
+//                        'Approved' => true,
+//                        'ApprovedUserID' => $this->getModeratorUserID(),
+//                        'DateApproved' => Gdn_Format::ToDateTime(),
+//                     )
+//               )
+//            );
+//         }
          $saveData['Approved'] = true;
 
          if (strtolower($queueItem['ForeignType']) == 'activitycomment') {

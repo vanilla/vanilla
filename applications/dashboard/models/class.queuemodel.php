@@ -477,7 +477,13 @@ class QueueModel extends Gdn_Model {
 //         }
          $saveData['Approved'] = true;
 
+         $this->EventArguments['QueueItem'] = $queueItem;
+         $this->EventArguments['SaveData'] =& $saveData;
+         $this->FireEvent('BeforeApproveSave');
+
          if (strtolower($queueItem['ForeignType']) == 'activitycomment') {
+            // Activity Comments do not have data/attributes.
+            unset($saveData['Data']);
             $ID = $model->Comment($saveData);
          } else {
             $ID = $model->Save($saveData);
@@ -496,6 +502,9 @@ class QueueModel extends Gdn_Model {
       }
       // Update Queue
       if (empty($foreignID)) {
+         if ($ContentType == 'Activity') {
+            $ID = val('ActivityID', $ID);
+         }
          $foreignID = $this->generateForeignID(null, $ID, $ContentType);
       }
       $saved = $this->Save(
@@ -832,7 +841,9 @@ class QueueModel extends Gdn_Model {
       switch ($contentType) {
          case 'comment':
             $commentID = val('CommentID', $data);
-            if (empty($commentID)) {
+            if (!empty($newID)) {
+               $commentID = $newID;
+            } elseif (empty($commentID)) {
                $commentID = $unique;
             }
             return 'C-' . $commentID;

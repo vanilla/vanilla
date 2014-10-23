@@ -143,7 +143,7 @@ class PostController extends VanillaController {
       
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
-      if ($this->Form->IsPostBack() == FALSE) {
+      if (!$this->Form->IsPostBack()) {
          // Prep form with current data for editing
          if (isset($this->Discussion)) {
             $this->Form->SetData($this->Discussion);
@@ -512,13 +512,7 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
-      if (!$this->Form->IsPostBack()) {
-         // Form was validly submitted
-         if (isset($this->Comment)) {
-            $this->Form->SetData((array)$this->Comment);
-         }
-            
-      } else {
+      if($this->Form->AuthenticatedPostBack()) {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
@@ -694,7 +688,13 @@ class PostController extends VanillaController {
             }
          }
       }
-      
+      else {
+         // Load form
+         if (isset($this->Comment)) {
+            $this->Form->SetData((array)$this->Comment);
+         }
+      }
+
       // Include data for FireEvent
       if (property_exists($this,'Discussion'))
          $this->EventArguments['Discussion'] = $this->Discussion;

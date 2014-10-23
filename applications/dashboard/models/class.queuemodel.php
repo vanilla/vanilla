@@ -488,6 +488,11 @@ class QueueModel extends Gdn_Model {
          } else {
             $ID = $model->Save($saveData);
          }
+
+         $this->EventArguments['QueueItem'] = $queueItem;
+         $this->EventArguments['ID'] = $ID;
+         $this->FireEvent('AfterApproveSave');
+
          // Add the validation results from the model to this one.
          $this->Validation->AddValidationResult($model->ValidationResults());
          $valid = count($this->ValidationResults()) == 0;

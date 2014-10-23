@@ -73,7 +73,7 @@ class ImportController extends DashboardController {
          }
 
          if($Imp->CurrentStep >= 1) {
-            if($this->Form->IsPostBack())
+            if($this->Form->AuthenticatedPostBack())
                $Imp->FromPost($this->Form->FormValues());
             try {
                $Result = $Imp->RunStep($Imp->CurrentStep);

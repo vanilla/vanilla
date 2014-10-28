@@ -63,7 +63,7 @@
       <li class="CaptchaInput">
       <?php
          echo $this->Form->Label("Security Check", '');
-         echo recaptcha_get_html($CaptchaPublicKey, NULL, $CaptchaSSL);
+         echo $this->Form->Captcha();
       ?></li>
       <?php $this->FireEvent('RegisterFormBeforeTerms'); ?>
       <li>

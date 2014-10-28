@@ -1349,25 +1349,6 @@ class EntryController extends Gdn_Controller {
    private function RegisterCaptcha() {
       Gdn::UserModel()->AddPasswordStrength($this);
 
-      // Add custom translation strings as JSON
-      Gdn::Controller()->Head->AddString('
-<script type="text/javascript">
-var RecaptchaOptions = {
-   custom_translations : {
-      instructions_visual : "' . T("Type the text:") . '",
-      instructions_audio  : "' . T("Type what you hear:") . '",
-      play_again          : "' . T("Play the sound again") . '",
-      cant_hear_this      : "' . T("Download the sounds as MP3") . '",
-      visual_challenge    : "' . T("Get a visual challenge") . '",
-      audio_challenge     : "' . T("Get an audio challenge") . '",
-      refresh_btn         : "' . T("Get a new challenge") . '",
-      help_btn            : "' . T("Help") . '",
-      incorrect_try_again : "' . T("Incorrect. Try again.") . '"
-   }
-};
-</script>');
-
-      include(CombinePaths(array(PATH_LIBRARY, 'vendors/recaptcha', 'functions.recaptchalib.php')));
       if ($this->Form->IsPostBack() === TRUE) {
          // Add validation rules that are not enforced by the model
          $this->UserModel->DefineSchema();

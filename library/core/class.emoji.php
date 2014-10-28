@@ -246,7 +246,7 @@ class Emoji {
          foreach ($emojis as $name => $data) {
             $emoji[] = array(
                 "name" => "". $name ."",
-                "url" =>  Asset($emojiAssetPath . '/' . $data)
+                "url" =>  Asset($this->buildFilePath($name))
             );
          }
 
@@ -289,6 +289,11 @@ class Emoji {
          $emojiFileName = $this->emojiOriginalUnaccountedFor[$emojiName];
       } else {
          return '';
+      }
+
+      // Emoji could be an array with filename as first element.
+      if (is_array($emojiFileName)) {
+         $emojiFileName = $emojiFileName[0];
       }
 
       return $filePath . '/' . $emojiFileName;

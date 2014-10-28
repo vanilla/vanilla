@@ -85,35 +85,42 @@ class Gdn_Session {
     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
     * @param string $JunctionTable The name of the junction table for a junction permission.
-	 * @param in $JunctionID The ID of the junction permission.
-	 * * @return boolean
+    * @param in $JunctionID The ID of the junction permission.
+    * * @return boolean
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User)) {
-         if ($this->User->Banned || GetValue('Deleted', $this->User))
+         if ($this->User->Banned || GetValue('Deleted', $this->User)) {
             return FALSE;
-         elseif ($this->User->Admin)
+         }
+         elseif ($this->User->Admin) {
             return TRUE;
+         }
       }
 
       // Allow wildcard permission checks (e.g. 'any' Category)
-      if ($JunctionID == 'any')
+      if ($JunctionID == 'any') {
          $JunctionID = '';
+      }
 
       $Permissions = $this->GetPermissions();
       if ($JunctionTable && !C('Garden.Permissions.Disabled.'.$JunctionTable)) {
          // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
          if (is_array($Permission)) {
+            $Pass = FALSE;
             foreach ($Permission as $PermissionName) {
                if($this->CheckPermission($PermissionName, FALSE, $JunctionTable, $JunctionID)) {
-						if(!$FullMatch)
-							return TRUE;
-					} else {
-						if($FullMatch)
-							return FALSE;
-					}
+                  if(!$FullMatch) {
+                     return TRUE;
+                  }
+                  $Pass = TRUE;
+               } else {
+                  if($FullMatch) {
+                     return FALSE;
+                  }
+               }
             }
-            return TRUE;
+            return $Pass;
          } else {
             if ($JunctionID !== '') {
                $Result = array_key_exists($Permission, $Permissions)
@@ -145,9 +152,15 @@ class Gdn_Session {
       if ($Authenticator == NULL)
          $Authenticator = Gdn::Authenticator();
 
+      if ($this->UserID) {
+         Logger::event('session_end', Logger::INFO, 'Session ended for {username}.');
+      }
+
       $Authenticator->AuthenticateWith()->DeAuthenticate();
       $this->SetCookie('-Vv', NULL, -3600);
       $this->SetCookie('-sid', NULL, -3600);
+
+      Gdn::PluginManager()->CallEventHandlers($this, 'Gdn_Session', 'End');
 
       $this->UserID = 0;
       $this->User = FALSE;
@@ -244,31 +257,31 @@ class Gdn_Session {
       return $NewVisit;
    }
 
-	/**
+   /**
     *
     *
-	* @todo Add description.
-	* @param string|array $PermissionName
-	* @param mixed $Value
-	* @return NULL
-	*/
+   * @todo Add description.
+   * @param string|array $PermissionName
+   * @param mixed $Value
+   * @return NULL
+   */
 
-	public function SetPermission($PermissionName, $Value = NULL) {
-		if (is_string($PermissionName)) {
-			if ($Value === NULL || $Value === TRUE)
+   public function SetPermission($PermissionName, $Value = NULL) {
+      if (is_string($PermissionName)) {
+         if ($Value === NULL || $Value === TRUE)
             $this->_Permissions[] = $PermissionName;
          elseif ($Value === FALSE) {
             $Index = array_search($PermissionName, $this->_Permissions);
             if ($Index !== FALSE)
                unset($this->_Permissions[$Index]);
-			} elseif (is_array($Value))
+         } elseif (is_array($Value))
             $this->_Permissions[$PermissionName] = $Value;
-		} elseif (is_array($PermissionName)) {
-			if (array_key_exists(0, $PermissionName))
-				foreach ($PermissionName as $Name) $this->SetPermission($Name);
-			else
-				foreach ($PermissionName as $Name => $Value) $this->SetPermission($Name, $Value);
-		}
+      } elseif (is_array($PermissionName)) {
+         if (array_key_exists(0, $PermissionName))
+            foreach ($PermissionName as $Name) $this->SetPermission($Name);
+         else
+            foreach ($PermissionName as $Name => $Value) $this->SetPermission($Name, $Value);
+      }
     }
 
    /**
@@ -342,7 +355,9 @@ class Gdn_Session {
     * @param bool $Persist If setting an identity, should we persist it beyond browser restart?
     */
    public function Start($UserID = FALSE, $SetIdentity = TRUE, $Persist = FALSE) {
-      if (!C('Garden.Installed', FALSE)) return;
+      if (!C('Garden.Installed', FALSE)) {
+         return;
+      }
       // Retrieve the authenticated UserID from the Authenticator module.
       $UserModel = Gdn::Authenticator()->GetUserModel();
       $this->UserID = $UserID !== FALSE ? $UserID : Gdn::Authenticator()->GetIdentity();
@@ -354,8 +369,10 @@ class Gdn_Session {
          $this->User = $UserModel->GetSession($this->UserID);
 
          if ($this->User) {
-            if ($SetIdentity)
+            if ($SetIdentity) {
                Gdn::Authenticator()->SetIdentity($this->UserID, $Persist);
+               Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
+            }
 
             $UserModel->EventArguments['User'] =& $this->User;
             $UserModel->FireEvent('AfterGetSession');
@@ -471,18 +488,36 @@ class Gdn_Session {
          $ForceValid = TRUE;
 
       if (!$ForceValid && $ValidateUser && $this->UserID <= 0)
-         return FALSE;
+         $Return = FALSE;
 
-      // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
-      return ($ForceValid && Gdn::Request()->IsPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE);
+      if (!isset($Return)) {
+         // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
+         $Return = ($ForceValid && Gdn::Request()->IsPostBack()) || ($ForeignKey == $this->_TransientKey && $this->_TransientKey !== FALSE);
+      }
+      if (!$Return) {
+         if (Gdn::Session()->User) {
+            Logger::event(
+               'csrf_failure',
+               Logger::ERROR,
+               'Invalid transient key for {username}.'
+            );
+         } else {
+            Logger::event(
+               'csrf_failure',
+               Logger::ERROR,
+               'Invalid transient key.'
+            );
+         }
+      }
+      return $Return;
    }
 
-	/**
-	 * Place a name/value pair into the user's session stash.
-	 */
-	public function Stash($Name = '', $Value = '', $UnsetOnRetrieve = TRUE) {
-		if ($Name == '')
-			return;
+   /**
+    * Place a name/value pair into the user's session stash.
+    */
+   public function Stash($Name = '', $Value = '', $UnsetOnRetrieve = TRUE) {
+      if ($Name == '')
+         return;
 
       // Grab the user's session
       $Session = $this->_GetStashSession($Value);
@@ -494,8 +529,8 @@ class Gdn_Session {
          $Session->Attributes[$Name] = $Value;
       } else if ($Name != '') {
          $Value = GetValue($Name, $Session->Attributes);
-			if ($UnsetOnRetrieve)
-				unset($Session->Attributes[$Name]);
+         if ($UnsetOnRetrieve)
+            unset($Session->Attributes[$Name]);
       }
       // Update the attributes
       if ($Name != '') {
@@ -511,13 +546,13 @@ class Gdn_Session {
          );
       }
       return $Value;
-	}
+   }
 
-	/**
-	 * Used by $this->Stash() to create & manage sessions for users & guests.
-	 * This is a stop-gap solution until full session management for users &
-	 * guests can be imlemented.
-	 */
+   /**
+    * Used by $this->Stash() to create & manage sessions for users & guests.
+    * This is a stop-gap solution until full session management for users &
+    * guests can be imlemented.
+    */
    private function _GetStashSession($ValueToStash) {
       $CookieName = C('Garden.Cookie.Name', 'Vanilla');
       $Name = $CookieName.'-sid';

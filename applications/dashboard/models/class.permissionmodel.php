@@ -413,47 +413,100 @@ class PermissionModel extends Gdn_Model {
       $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix);
       return $this->UnpivotPermissions($Permissions);
    }
-   
+
+   /**
+    * Get all of the global permissions for one or more roles.
+    *
+    * @param int|array $RoleID The role(s) to get the permissions for.
+    * @param string $LimitToSuffix Whether or not to limit the permissions to a suffix.
+    * @return Returns an
+    */
    public function GetGlobalPermissions($RoleID, $LimitToSuffix = '') {
-      $Namespaces = $this->GetAllowedPermissionNamespaces();
+      $RoleIDs = (array)$RoleID;
 
 		// Get the global permissions.
       $Data = $this->SQL
          ->Select('*')
          ->From('Permission p')
-         ->WhereIn('p.RoleID', array($RoleID, 0))
+         ->WhereIn('p.RoleID', array_merge($RoleIDs, array(0)))
          ->Where('p.JunctionTable is null')
          ->OrderBy('p.RoleID')
          ->Get()->ResultArray();
 
 		$this->_MergeDisabledPermissions($Data);
+      $Data = Gdn_DataSet::Index($Data, 'RoleID');
          
       $DefaultRow = $Data[0];
-      unset($DefaultRow['RoleID'], $DefaultRow['JunctionTable'], $DefaultRow['JunctionColumn'], $DefaultRow['JunctionID']);
-      if(count($Data) >= 2) {
-         $GlobalPermissions = $Data[1];   
-         unset($GlobalPermissions['RoleID'], $GlobalPermissions['JunctionTable'], $GlobalPermissions['JunctionColumn'], $GlobalPermissions['JunctionID']);
+      unset($Data[0], $DefaultRow['RoleID'], $DefaultRow['JunctionTable'], $DefaultRow['JunctionColumn'], $DefaultRow['JunctionID']);
+      $DefaultRow = $this->StripPermissions($DefaultRow, $DefaultRow, $LimitToSuffix);
+
+      foreach ($RoleIDs as $RoleID) {
+         if (isset($Data[$RoleID])) {
+            $Data[$RoleID] = array_intersect_key($Data[$RoleID], $DefaultRow);
+         } else {
+            $Data[$RoleID] = $DefaultRow;
+            $Data[$RoleID]['PermissionID'] = NULL;
+         }
+      }
+
+      if (count($RoleIDs) === 1) {
+         return array_pop($Data);
       } else {
-         $GlobalPermissions = $DefaultRow;
-         // Set all of the default permissions to the default.
-         foreach($DefaultRow as $PermissionName => $Value) {
-            $GlobalPermissions[$PermissionName] = $RoleID ? 0 : $Value & 1;
+         return $Data;
+      }
+   }
+
+   // Take a permission row and strip the global/local permissions from it.
+   public function StripPermissions($Row, $DefaultRow, $LimitToSuffix = '') {
+      static $Namespaces;
+      if (!isset($Namespaces)) {
+         $Namespaces = $this->GetAllowedPermissionNamespaces();
+      }
+
+      foreach ($DefaultRow as $PermissionName => $Value) {
+         if (in_array($PermissionName, array('PermissionID', 'RoleID', 'JunctionTable', 'JunctionColumn', 'JunctionID'))) {
+            continue;
+         }
+
+         if (!$this->IsGlobalPermission($Value, $PermissionName, $LimitToSuffix, $Namespaces)) {
+            unset($Row[$PermissionName]);
+            continue;
+         }
+
+         switch ($Row[$PermissionName]) {
+            case 3:
+               $Row[$PermissionName] = 1;
+               break;
+            case 2:
+               $Row[$PermissionName] = 0;
+               break;
          }
       }
-      
-      // Remove all of the permissions that don't apply globally.
-      foreach($DefaultRow as $PermissionName => $Value) {
-         if(!($Value & 2))
-            unset($GlobalPermissions[$PermissionName]); // permission not applicable
-         if(!empty($LimitToSuffix) && substr($PermissionName, -strlen($LimitToSuffix)) != $LimitToSuffix)
-            unset($GlobalPermissions[$PermissionName]); // permission not in $LimitToSuffix
-         if($index = strpos($PermissionName, '.')) {
-            if(!in_array(substr($PermissionName, 0, $index), $Namespaces) && !in_array(substr($PermissionName, 0, strrpos($PermissionName, '.')), $Namespaces))
-               unset($GlobalPermissions[$PermissionName]);; // permission not in allowed namespaces
+      return $Row;
+   }
+
+   /**
+    * Returns whether or not a permission is a global permission.
+    *
+    * @param $Value
+    * @param $PermissionName
+    * @param $LimitToSuffix
+    * @param $Namespaces
+    * @return bool
+    */
+   protected function IsGlobalPermission($Value, $PermissionName, $LimitToSuffix, $Namespaces) {
+      if(!($Value & 2)) {
+         return false;
+      }
+      if(!empty($LimitToSuffix) && substr($PermissionName, -strlen($LimitToSuffix)) != $LimitToSuffix) {
+         return false;
+      }
+      if($index = strpos($PermissionName, '.')) {
+         if(!in_array(substr($PermissionName, 0, $index), $Namespaces) && !in_array(substr($PermissionName, 0, strrpos($PermissionName, '.')), $Namespaces)) {
+            return false;
          }
       }
-      
-      return $GlobalPermissions;
+      return true;
    }
 
 	/** Merge junction permissions with global permissions if they are disabled.
@@ -664,6 +717,10 @@ class PermissionModel extends Gdn_Model {
 	 * @param bit $SaveGlobal Also save a junction permission to the global permissions.
 	 */
    public function Save($Values, $SaveGlobal = FALSE) {
+      // Get the list of columns that are available for permissions.
+      //$PermissionColumns = Gdn::PermissionModel()->DefineSchema()->Fields();
+      //$Values = array_intersect_key($Values, $PermissionColumns);
+
       // Figure out how to find the existing permission.
       if(array_key_exists('PermissionID', $Values)) {
          $Where = array('PermissionID' => $Values['PermissionID']);

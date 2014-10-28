@@ -33,6 +33,8 @@ class Gdn_Format {
     */
    public static $FormatLinks = TRUE;
 
+   public static $MentionsUrlFormat = '/profile/{name}';
+
    /**
     * The ActivityType table has some special sprintf search/replace values in the
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
@@ -1082,7 +1084,7 @@ class Gdn_Format {
       $Url = $Matches[4];
 
       $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
-      $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com\/(\d+)';
+      $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
@@ -1109,7 +1111,7 @@ class Gdn_Format {
         && !C('Garden.Format.DisableUrlEmbeds')) {
          $ID = $Matches[2];
          $Result = <<<EOT
-<div class="VideoWrap"><div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="//vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div></div>
+      <iframe src="//player.vimeo.com/video/{$ID}" width="{$Width}" height="{$Height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
 
       // Twitter
@@ -1276,9 +1278,11 @@ EOT;
 
          // Handle @mentions.
          if(C('Garden.Format.Mentions')) {
+            $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
+
             $Mixed = preg_replace(
                '/(^|[\s,\.>])@(\w{1,50})\b/i', //{3,20}
-               '\1'.Anchor('@\2', '/profile/\\2'),
+               '\1'.Anchor('@$2', $urlFormat),
                $Mixed
             );
          }
@@ -1578,16 +1582,18 @@ EOT;
       // Preliminary decoding
       $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
       $Mixed = strtr($Mixed, self::$_UrlTranslations);
+      $Mixed = preg_replace('`[\']`', '', $Mixed);
 
       // Test for Unicode PCRE support
       // On non-UTF8 systems this will result in a blank string.
       $UnicodeSupport = (preg_replace('`[\pP]`u', '', 'P') != '');
 
       // Convert punctuation, symbols, and spaces to hyphens
-      if ($UnicodeSupport)
+      if ($UnicodeSupport) {
          $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
-      else
+      } else {
          $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);
+      }
 
       // Lowercase, no trailing or repeat hyphens
       $Mixed = preg_replace('`-+`', '-', strtolower($Mixed));
@@ -1655,7 +1661,7 @@ EOT;
          $CustomFormatter = C('Garden.Format.WysiwygFunction', FALSE);
 
       if (!is_string($Mixed)) {
-         return self::To($Mixed, 'Html');
+         return self::To($Mixed, 'Wysiwyg');
       } elseif (is_callable($CustomFormatter)) {
          return $CustomFormatter($Mixed);
       } else {

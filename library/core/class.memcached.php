@@ -66,8 +66,22 @@ class Gdn_Memcached extends Gdn_Cache {
          Gdn_Cache::FEATURE_LOCAL         => TRUE
       );
 
-      foreach ($this->Option(NULL, array()) as $Option => $OptValue)
+      $DefaultOptions = array(
+         Memcached::OPT_COMPRESSION => true,
+         Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
+         Memcached::OPT_LIBKETAMA_COMPATIBLE => true,
+         Memcached::OPT_NO_BLOCK => true,
+         Memcached::OPT_TCP_NODELAY => true,
+         Memcached::OPT_CONNECT_TIMEOUT => 2000,
+         Memcached::OPT_SERVER_FAILURE_LIMIT => 2
+      );
+
+      $Options = $this->Option(NULL, array());
+      $Options = array_replace($DefaultOptions, $Options);
+
+      foreach ($Options as $Option => $OptValue) {
          $this->Memcache->setOption($Option, $OptValue);
+      }
 
    }
 
@@ -327,7 +341,7 @@ class Gdn_Memcached extends Gdn_Cache {
          unset($shards);
 
          if ($useLocal)
-            Gdn_Cache::localSet($realKey, $value);
+            $this->localSet($realKey, $value);
          return Gdn_Cache::CACHEOP_SUCCESS;
       }
 
@@ -339,7 +353,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
       if ($stored) {
          if ($useLocal)
-            Gdn_Cache::localSet($realKey, $value);
+            $this->localSet($realKey, $value);
          return Gdn_Cache::CACHEOP_SUCCESS;
       }
       return Gdn_Cache::CACHEOP_FAILURE;
@@ -376,7 +390,7 @@ class Gdn_Memcached extends Gdn_Cache {
          unset($shards);
 
          if ($useLocal)
-            Gdn_Cache::localSet($realKey, $value);
+            $this->localSet($realKey, $value);
          return Gdn_Cache::CACHEOP_SUCCESS;
       }
 
@@ -388,7 +402,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
       if ($stored) {
          if ($useLocal)
-            Gdn_Cache::localSet($realKey, $value);
+            $this->localSet($realKey, $value);
          return Gdn_Cache::CACHEOP_SUCCESS;
       }
       return Gdn_Cache::CACHEOP_FAILURE;
@@ -412,7 +426,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
             // Skip this key if we already have it
             if ($useLocal) {
-               $local = Gdn_Cache::localGet($realKey);
+               $local = $this->localGet($realKey);
                if ($local !== Gdn_Cache::CACHEOP_FAILURE) {
                   $localData[$realKey] = $local;
                   continue;
@@ -426,7 +440,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
          // Completely short circuit if we already have everything
          if ($useLocal) {
-            $local = Gdn_Cache::localGet($realKey);
+            $local = $this->localGet($realKey);
             if ($local !== false)
                return $local;
          }
@@ -483,7 +497,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
          // Cache in process memory
          if ($useLocal && sizeof($data))
-            Gdn_Cache::localSet($data);
+            $this->localSet($data);
       }
 
       // Merge in local data

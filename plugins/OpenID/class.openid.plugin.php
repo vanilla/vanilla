@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['OpenID'] = array(
 	'Name' => 'OpenID',
    'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; plugin.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -198,7 +198,7 @@ class OpenIDPlugin extends Gdn_Plugin {
          // Add the OpenID method to the controller.
          $Method = array(
             'Name' => 'OpenID',
-            'SignInHtml' => SocialSigninButton('OpenID', $Url, 'button')
+            'SignInHtml' => SocialSigninButton('OpenID', $Url, 'button', array('class' => 'js-extern'))
         );
 
          $Sender->Data['Methods'][] = $Method;
@@ -218,7 +218,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 	private function _GetButton() {
       $Url = $this->_AuthorizeHref();
 
-      return SocialSigninButton('OpenID', $Url, 'icon');
+      return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern'));
 	}
 
 	public function Base_BeforeSignInLink_Handler($Sender) {

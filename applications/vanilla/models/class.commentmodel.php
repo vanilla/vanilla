@@ -31,6 +31,8 @@ class CommentModel extends VanillaModel {
 
    protected $_Where = array();
 
+   public $pageCache;
+
    /**
     * Class constructor. Defines the related database table name.
     *
@@ -39,11 +41,12 @@ class CommentModel extends VanillaModel {
     */
    public function __construct() {
       parent::__construct('Comment');
+      $this->pageCache = Gdn::Cache()->ActiveEnabled() && C('Properties.CommentModel.pageCache', true);
       $this->FireEvent('AfterConstruct');
    }
 
    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
-      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!$this->pageCache || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return;
 
       if (count($Result) == 0)
@@ -329,7 +332,7 @@ class CommentModel extends VanillaModel {
    }
 
    public function PageWhere($DiscussionID, $Page, $Limit) {
-      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!$this->pageCache || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return FALSE;
 
       if ($Limit != C('Vanilla.Comments.PerPage', 30)) {
@@ -875,14 +878,15 @@ class CommentModel extends VanillaModel {
 
       // Make a quick check so that only the user making the comment can make the notification.
       // This check may be used in the future so should not be depended on later in the method.
-      if ($Fields['InsertUserID'] != $Session->UserID)
+      if (Gdn::Controller()->DeliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
          return;
+      }
 
       // Update the discussion author's CountUnreadDiscussions (ie.
       // the number of discussions created by the user that s/he has
       // unread messages in) if this comment was not added by the
       // discussion author.
-      $this->UpdateUser($Session->UserID, $IncUser && $Insert);
+      $this->UpdateUser($Fields['InsertUserID'], $IncUser && $Insert);
 
       // Mark the user as participated.
       $this->SQL->Replace('UserDiscussion',
@@ -917,7 +921,7 @@ class CommentModel extends VanillaModel {
             ));
 
             // Update the cache.
-            if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+            if ($DiscussionID && $this->pageCache) {
                $CategoryCache = array(
                    'LastTitle'         => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
                    'LastUserID'        => $Fields['InsertUserID'],
@@ -1086,8 +1090,9 @@ class CommentModel extends VanillaModel {
    }
 
    public function RemovePageCache($DiscussionID, $From = 1) {
-      if (!Gdn::Cache()->ActiveEnabled())
+      if (!$this->pageCache) {
          return;
+      }
 
       $CountComments = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CountComments');
       $Limit = C('Vanilla.Comments.PerPage', 30);

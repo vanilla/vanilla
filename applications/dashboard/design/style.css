@@ -2312,7 +2312,7 @@ form.Thumbnail .Warning {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 5000;
+  z-index: 998;
 }
 .MSIE .Overlay {
    background: gray;
@@ -3904,7 +3904,7 @@ body.embed .InformMessages {
 }
 .Flyout.Flags {
    top: 25px;
-   z-index: 1000;
+   z-index: 997;
 }
 .Reactions .FlagMenu .MenuItems .ReactButton {
    margin: 0px;
@@ -4039,6 +4039,18 @@ input + .ReactSprite {
 
 .Hidden {
    display: none;
+}
+
+/* Screen readers only, as part of Section 508 compliance. */
+.sr-only {
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   margin: -1px;
+   padding: 0;
+   overflow: hidden;
+   clip: rect(0,0,0,0);
+   border: 0;
 }
 
 /* Token input */
@@ -4384,8 +4396,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 .SocialIcon-Disqus .Icon {
   background-position: 0 0;
 }
-.SocialIcon.Disqus,
-.SocialIcon.Disqus.HasText .Icon {
+.SocialIcon-Disqus,
+.SocialIcon-Disqus.HasText .Icon {
   background-color: #2e9fff;
 }
 .SocialIcon-Disqus:hover {
@@ -4410,4 +4422,331 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .MeBox-SignIn.Inline .SocialIcon {
   display: inline-block;
+}
+
+/*
+# Attachments
+
+Components for Attachments.
+
+Styleguide Attachments
+*/
+
+/*
+## Utilities
+
+Styleguide Attachments.Utilities
+*/
+
+.pull-right {
+   float: right !important;
+}
+
+.pull-left {
+   float: left !important;
+}
+
+/*
+## Definition lists
+
+Styleguide Definitions
+*/
+
+.item-attachment dl {
+   margin-top: 0;
+   margin-bottom: 20px;
+}
+
+.item-attachment dt {
+   font-weight: 700;
+}
+
+.item-attachment dd {
+   margin-left: 0;
+}
+
+.item-attachment dt,
+.item-attachment dd {
+   line-height: 20px;
+}
+
+/* Horizontal layout */
+
+.item-attachment .dl-horizontal dt {
+   float: left;
+   width: 160px;
+   clear: left;
+   text-align: right;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.item-attachment .dl-horizontal dd {
+   margin-left: 180px;
+}
+
+/* Column layout */
+
+.item-attachment .dl-columns {
+   overflow: hidden;
+   margin-right: -10px;
+   margin-left: -10px;
+}
+
+.item-attachment .dl-columns:before,
+.item-attachment .dl-columns:after {
+   display: table;
+   content: " ";
+}
+
+.item-attachment .dl-columns:after {
+   clear: both;
+}
+
+.item-attachment .dl-columns dt {
+   width: 20%;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.item-attachment .dl-columns dd {
+   width: 30%;
+}
+
+.item-attachment .dl-columns dt,
+.item-attachment .dl-columns dd {
+   float: left;
+   padding: 0 10px;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   box-sizing: border-box;
+}
+
+/*
+## Media objects
+
+Styleguide Media
+*/
+
+.item-attachment .media {
+   overflow: hidden;
+}
+
+.item-attachment .media:before,
+.item-attachment .media:after {
+   display: table;
+   content: " ";
+}
+
+.item-attachment .media:after {
+   clear: both;
+}
+
+.item-attachment .media > .pull-left {
+   margin-right: 10px;
+}
+
+.item-attachment .media > .pull-right {
+   margin-right: 10px;
+}
+
+.item-attachment .media-body {
+   overflow: hidden;
+   zoom: 1;
+}
+
+.item-attachment .media-object {
+   display: block;
+}
+
+.item-attachment .media-heading {
+   margin: 0 0 5px !important; /* Hack */
+}
+
+.item-attachment .media-list {
+   padding-left: 0;
+   list-style: none;
+}
+
+/*
+## Alerts
+
+.alert-info    - Informative alert
+.alert-warning - Warning alert
+.alert-danger  - Danger alert
+
+Styleguide Alerts
+*/
+
+.item-attachment .alert {
+   padding: 12px;
+   margin-bottom: 20px;
+   color: #222;
+   background-color: #d8ecfc;
+   border-color: #d8ecfc;
+   border-style: solid;
+   border-width: 1px;
+   border-radius: 2px;
+}
+
+.item-attachment .alert a {
+   color: #090909;
+}
+
+.item-attachment .alert hr {
+   border-top-color: #c0e0fa;
+}
+
+.item-attachment .alert h4 {
+   margin-top: 0;
+   color: inherit;
+}
+
+.item-attachment .alert a {
+   /*   font-weight: bold;*/
+}
+
+.item-attachment .alert p,
+.item-attachment .alert ul {
+   margin-bottom: 0;
+}
+
+.item-attachment .alert p + p {
+   margin-top: 5px;
+}
+
+/* Informative alert */
+
+.item-attachment .alert-info {
+   color: #222;
+   background-color: #f9edbe;
+   border-color: #f9edbe;
+}
+
+.item-attachment .alert-info a {
+   color: #090909;
+}
+
+.item-attachment .alert-info hr {
+   border-top-color: #f7e7a7;
+}
+
+/* Warning alert */
+
+.item-attachment .alert-warning {
+   color: #222222;
+   background-color: #ffcc00;
+   border-color: #ffcc00;
+}
+.item-attachment .alert-warning a {
+   color: #090909;
+}
+.item-attachment .alert-warning hr {
+   border-top-color: #e6b800;
+}
+
+/* Danger alert */
+
+.item-attachment .alert-danger {
+   color: #fff;
+   background-color: #b90000;
+   border-color: #b90000;
+}
+
+.item-attachment .alert-danger a {
+   color: #e6e6e6;
+}
+.item-attachment .alert-danger hr {
+   border-top-color: #a00000;
+}
+
+/*
+## Base item
+
+Styleguide Item
+*/
+
+.item-attachment .item-heading {
+   margin-bottom: 0 !important; /* Hack */
+   font-weight: 500;
+}
+
+.item-attachment .item-body {
+   overflow: hidden;
+}
+
+.item-attachment .item-body:before,
+.item-attachment .item-body:after {
+   display: table;
+   content: " ";
+}
+
+.item-attachment .item-body:after {
+   clear: both;
+}
+
+.item-attachment .item-body > *:first-child {
+   margin-top: 0;
+}
+
+.item-attachment .item-body > *:last-child {
+   margin-bottom: 0;
+}
+
+.item-attachment .item-header + .item-body {
+   margin-top: 5px;
+}
+
+.item-attachment .item-meta {
+   font-size: 12px;
+   line-height: 20px;
+   color: #999;
+}
+
+.item-attachment .item-meta > span {
+   padding-right: 5px;
+   padding-left: 5px;
+}
+
+.item-attachment .item-meta > span:first-child {
+   padding-left: 0;
+}
+
+.item-attachment .item-meta > span:last-child {
+   padding-right: 0;
+}
+
+/*
+## Item attachments
+
+Styleguide Attachments
+*/
+
+.item-attachment {
+   margin-top: 20px;
+}
+
+.item-attachment .alert {
+   margin-bottom: 0;
+}
+
+.item-attachment .media-object .icon {
+   display: block;
+   min-width: 32px;
+   font-size: 32px;
+   text-align: center;
+   line-height: 1;
+}
+
+/**
+ * Twitter card embed.
+ */
+.twitter-card-preload {
+   opacity: 0;
+}
+.twitter-card-loaded {
+   transition: all 0.2s ease;
+   opacity: 1;
 }

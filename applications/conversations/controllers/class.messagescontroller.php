@@ -151,6 +151,17 @@ class MessagesController extends ConversationsController {
 
       if ($this->Form->AuthenticatedPostBack()) {
          $ConversationID = $this->Form->GetFormValue('ConversationID', '');
+
+         // Make sure the user posting to the conversation is actually
+         // a member of it, or is allowed, like an admin.
+         if (!CheckPermission('Garden.Moderation.Manage')) {
+            $UserID = Gdn::Session()->UserID;
+            $ValidConversationMember = $this->ConversationModel->ValidConversationMember($ConversationID, $UserID);
+            if (!$ValidConversationMember) {
+               throw PermissionException();
+            }
+         }
+
          $Conversation = $this->ConversationModel->GetID($ConversationID, Gdn::Session()->UserID);
 
          $this->EventArguments['Conversation'] = $Conversation;
@@ -174,6 +185,7 @@ class MessagesController extends ConversationsController {
             $MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
             $this->Conversation = $Conversation;
             $this->MessageData = $MessageData;
+            $this->SetData('Messages', $MessageData);
 
             $this->View = 'messages';
          } else {
@@ -335,6 +347,8 @@ class MessagesController extends ConversationsController {
          $Limit
       );
 
+      $this->SetData('Messages', $this->MessageData);
+      
       // Figure out who's participating.
       $ParticipantTitle = ConversationModel::ParticipantTitle($this->Conversation, TRUE);
       $this->Participants = $ParticipantTitle;
@@ -385,8 +399,8 @@ class MessagesController extends ConversationsController {
 
       $this->Data['Breadcrumbs'][] = array(
           'Name' => $Subject,
-          Url('', '//'));
-
+          'Url' => Url('', '//'));
+      
       // Render view
       $this->Render();
    }

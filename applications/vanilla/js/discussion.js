@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
 
          // Reveal the "Preview" button and hide this one
          $(this).parents('.CommentForm').find('.PreviewButton').show();
-         $(this).hide();
+         $(this).addClass('Hidden');
       }
 
       resetCommentForm(this);
@@ -157,7 +157,7 @@ jQuery(document).ready(function($) {
             } else if (preview) {
                // Reveal the "Edit" button and hide this one
                $(btn).hide();
-               $(parent).find('.WriteButton').show();
+               $(parent).find('.WriteButton').removeClass('Hidden');
 
                $(frm).trigger('PreviewLoaded', [frm]);
                $(frm).find('.TextBoxWrapper').hide().after(json.Data);
@@ -251,7 +251,7 @@ jQuery(document).ready(function($) {
 
    // Set up paging
    if ($.morepager)
-      $('.MorePager').morepager({
+      $('.MorePager').not('.Message .MorePager').morepager({
          pageContainerSelector: 'ul.Comments',
          afterPageLoaded: function() {$(document).trigger('CommentPagingComplete');}
       });

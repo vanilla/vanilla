@@ -70,12 +70,12 @@ class PostController extends VanillaController {
       );
 
       if (C('Vanilla.Categories.Use')) {
-         $Result = array_merge($Result, array(
+         $Result = array_replace($Result, array(
             '2' => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
             '1' => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
          ));
       } else {
-         $Result = array_merge($Result, array(
+         $Result = array_replace($Result, array(
             '1' => '@'.T('In recent discussions.'),
          ));
       }
@@ -168,7 +168,6 @@ class PostController extends VanillaController {
          $AllowedCategory = array_pop($AllowedCategories);
          $this->ShowCategorySelector = FALSE;
          $this->Form->AddHidden('CategoryID', $AllowedCategory['CategoryID']);
-         $this->Form->AddHidden('CategoryID');
 
          if ($this->Form->IsPostBack() && !$this->Form->GetFormValue('CategoryID')) {
             $this->Form->SetFormValue('CategoryID', $AllowedCategory['CategoryID']);

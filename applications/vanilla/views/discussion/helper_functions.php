@@ -1,4 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ */
+
+if (!defined('APPLICATION')) {
+   exit();
+}
 
 /**
  * Format content of comment or discussion.
@@ -68,6 +76,8 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->EventArguments['Comment'] = &$Comment;
    $Sender->EventArguments['Author'] = &$Author;
    $Sender->EventArguments['CssClass'] = &$CssClass;
+   $Sender->EventArguments['CurrentOffset'] = $CurrentOffset;
+   $Sender->EventArguments['Permalink'] = $Permalink;
 
    // DEPRECATED ARGUMENTS (as of 2.1)
 	$Sender->EventArguments['Object'] = &$Comment;
@@ -144,6 +154,9 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
             <?php
             $Sender->FireEvent('AfterCommentBody');
             WriteReactions($Comment);
+            if (GetValue('Attachments', $Comment)) {
+               WriteAttachments($Comment->Attachments);
+            }
             ?>
          </div>
       </div>
@@ -394,11 +407,12 @@ function WriteCommentForm() {
 		<div class="Foot Closed">
 			<div class="Note Closed SignInOrRegister"><?php
 			   $Popup =  (C('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
+			   $ReturnUrl = Gdn::Request()->PathAndQuery();
             echo FormatString(
                T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'),
                array(
-                  'SignInUrl' => Url(SignInUrl(Url(''))),
-                  'RegisterUrl' => Url(RegisterUrl(Url(''))),
+                  'SignInUrl' => Url(SignInUrl($ReturnUrl)),
+                  'RegisterUrl' => Url(RegisterUrl($ReturnUrl)),
                   'Popup' => $Popup
                )
             ); ?>
@@ -410,7 +424,7 @@ function WriteCommentForm() {
 	}
 
 	if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
-		echo $Controller->FetchView('comment', 'post');
+		echo $Controller->FetchView('comment', 'post', 'vanilla');
 }
 endif;
 
@@ -511,4 +525,4 @@ if (!function_exists('FormatMeAction')):
 
       return '<div class="AuthorAction">'.$Body.'</div>';
    }
-endif;
+endif; 

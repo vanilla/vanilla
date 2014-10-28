@@ -41,7 +41,7 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 ## Self-Hosting Requirements
 
-* PHP version 5.2 or newer
+* PHP version 5.2 or newer with --enable-mbstring
 * pdo_mysql module must be enabled
 * MySQL 5 or newer
 
@@ -124,7 +124,7 @@ Therefore, the next open source release after 2.1 will be 2.3. When the 2.3 beta
 Copyright &copy; 2009-2014 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.
 Vanilla Forums is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details. You should have received a copy of the GNU General Public License

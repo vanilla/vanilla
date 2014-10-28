@@ -135,6 +135,7 @@ class SettingsController extends Gdn_Controller {
 
       if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
          $this->AddCssFile('style.css');
+         $this->AddCssFile('vanillicon.css', 'static');
       } else {
          $this->AddCssFile('admin.css');
       }
@@ -180,10 +181,10 @@ class SettingsController extends Gdn_Controller {
       $this->Title(T('Flood Control'));
       $this->AddSideMenu('vanilla/settings/floodcontrol');
 
-      // Load up config options we'll be setting
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array(
+      // Check to see if Conversation is enabled.
+      $IsConversationsEnabled = Gdn::applicationManager()->checkApplication('Conversations');
+
+      $ConfigurationFields = array(
          'Vanilla.Discussion.SpamCount',
          'Vanilla.Discussion.SpamTime',
          'Vanilla.Discussion.SpamLock',
@@ -192,7 +193,24 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Comment.SpamLock',
          'Vanilla.Comment.MaxLength',
          'Vanilla.Comment.MinLength'
-      ));
+      );
+      if ($IsConversationsEnabled) {
+         $ConfigurationFields = array_merge(
+            $ConfigurationFields,
+            array(
+               'Conversations.Conversation.SpamCount',
+               'Conversations.Conversation.SpamTime',
+               'Conversations.Conversation.SpamLock',
+               'Conversations.ConversationMessage.SpamCount',
+               'Conversations.ConversationMessage.SpamTime',
+               'Conversations.ConversationMessage.SpamLock'
+            )
+         );
+      }
+      // Load up config options we'll be setting
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField($ConfigurationFields);
 
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
@@ -209,6 +227,7 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussion.SpamTime', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussion.SpamLock', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Discussion.SpamLock', 'Integer');
+
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamCount', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamCount', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamTime', 'Required');
@@ -217,6 +236,23 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamLock', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Integer');
+
+         if ($IsConversationsEnabled) {
+
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamCount', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamTime', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamLock', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamLock', 'Integer');
+
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamCount', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamTime', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamLock', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamLock', 'Integer');
+         }
 
          if ($this->Form->Save() !== FALSE) {
             $this->InformMessage(T("Your changes have been saved."));
@@ -253,7 +289,7 @@ class SettingsController extends Gdn_Controller {
       $this->RoleArray = $RoleModel->GetArray();
 
       $this->FireEvent('AddEditCategory');
-      $this->SetupDiscussionTypes($this->Category);
+      $this->SetupDiscussionTypes(array());
 
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->AddHidden('CodeIsDefined', '0');

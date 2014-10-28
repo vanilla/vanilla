@@ -398,14 +398,12 @@ class Emoji {
    public function setEmojiEditorList($value) {
       // Convert the editor list to the proper format.
       $list = array();
-      $aliases2 = array_flip($this->aliases);
       foreach ($value as $emoji) {
-         if (isset($this->aliases[$emoji])) {
+         if (isset($this->emoji[$emoji])) {
+            $list[$this->ldelim.$emoji.$this->rdelim] = $emoji;
+         }
+         elseif (isset($this->aliases[$emoji])) {
             $list[$emoji] = $this->aliases[$emoji];
-         } elseif (isset($aliases2[$emoji])) {
-            $list[$aliases2[$emoji]] = $emoji;
-         } elseif (isset($this->emoji[$emoji])) {
-            $list[$emoji] = ":$emoji:";
          }
       }
       $this->editorList = $list;

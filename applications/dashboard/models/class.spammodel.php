@@ -21,6 +21,19 @@ class SpamModel extends Gdn_Pluggable {
    }
 
    /**
+    * Return whether or not the spam model is disabled.
+    *
+    * @param bool|null $value
+    * @return bool
+    */
+   public static function Disabled($value = null) {
+      if ($value !== null) {
+         self::$Disabled = $value;
+      }
+      return self::$Disabled;
+   }
+
+   /**
     * Check whether or not the record is spam.
     * @param string $RecordType By default, this should be one of the following:
     *  - Comment: A comment.

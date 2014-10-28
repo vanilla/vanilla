@@ -2,10 +2,12 @@
 <div class="Box GuestBox">
    <h4><?php echo T('Howdy, Stranger!'); ?></h4>
    <p><?php echo T($this->MessageCode, $this->MessageDefault); ?></p>
-   <?php $this->FireEvent('BeforeSignInButton'); ?>
-   
+   <p><?php $this->FireEvent('BeforeSignInButton'); ?></p>
+
    <?php
-   if (strcasecmp(C('Garden.Registration.Method'), 'Connect') != 0) {
+   $signInUrl = SignInUrl($this->_Sender->SelfUrl);
+
+   if ($signInUrl) {
       echo '<div class="P">';
 
       echo Anchor(T('Sign In'), SignInUrl($this->_Sender->SelfUrl), 'Button Primary'.(SignInPopup() ? ' SignInPopup' : ''), array('rel' => 'nofollow'));

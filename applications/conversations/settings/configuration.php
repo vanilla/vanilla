@@ -8,3 +8,11 @@ $Configuration['Conversations']['Messages']['PerPage'] = '50';
 $Configuration['Conversations']['Message']['MaxLength'] = '2000';
 $Configuration['Conversations']['Message']['Format'] = 'Text';
 $Configuration['Conversations']['Subjects']['Visible'] = FALSE;
+
+// Flood control defaults.
+$Configuration['Conversations']['Conversation']['SpamCount'] = '2';
+$Configuration['Conversations']['Conversation']['SpamTime'] = '30';
+$Configuration['Conversations']['Conversation']['SpamLock'] = '60';
+$Configuration['Conversations']['ConversationMessage']['SpamCount'] = '2';
+$Configuration['Conversations']['ConversationMessage']['SpamTime'] = '30';
+$Configuration['Conversations']['ConversationMessage']['SpamLock'] = '60';

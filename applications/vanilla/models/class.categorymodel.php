@@ -32,6 +32,12 @@ class CategoryModel extends Gdn_Model {
    public static $Categories = NULL;
 
    /**
+    * Whether or not to explicitly shard the categories cache.
+    * @var bool
+    */
+   public static $ShardCache = FALSE;
+
+   /**
     * Whether or not to join the users in some calls.
     * Forums with a lot of categories may need to optimize using this setting and simpler views.
     * @var bool Whether or not to join users to recent posts.
@@ -109,7 +115,6 @@ class CategoryModel extends Gdn_Model {
             $Sql = Gdn::SQL();
             $Sql = clone $Sql;
             $Sql->Reset();
-            $Session = Gdn::Session();
 
             $Sql->Select('c.*')
                ->Select('lc.DateInserted', '', 'DateLastComment')
@@ -128,9 +133,12 @@ class CategoryModel extends Gdn_Model {
 
       if ($ID !== FALSE) {
          if (!is_numeric($ID) && $ID) {
+            $Code = $ID;
             foreach (self::$Categories as $Category) {
-               if ($Category['UrlCode'] == $ID)
+               if (strcasecmp($Category['UrlCode'], $Code) === 0) {
                   $ID = $Category['CategoryID'];
+                  break;
+               }
             }
          }
 
@@ -154,7 +162,10 @@ class CategoryModel extends Gdn_Model {
    protected static function BuildCache() {
       self::CalculateData(self::$Categories);
       self::JoinRecentPosts(self::$Categories);
-      Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+      Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(
+         Gdn_Cache::FEATURE_EXPIRY  => 600,
+         Gdn_Cache::FEATURE_SHARD   => self::$ShardCache
+      ));
    }
 
    /**
@@ -176,10 +187,13 @@ class CategoryModel extends Gdn_Model {
             $Category['PhotoUrl'] = '';
 
          if ($Category['DisplayAs'] == 'Default') {
-            if ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0))
+            if ($Category['Depth'] == 1 && C('Vanilla.Categories.DoHeadings')) {
+               $Category['DisplayAs'] = 'Heading';
+            } elseif ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0)) {
                $Category['DisplayAs'] = 'Categories';
-            else
+            } else {
                $Category['DisplayAs'] = 'Discussions';
+            }
          }
 
          if (!GetValue('CssClass', $Category))
@@ -634,6 +648,10 @@ class CategoryModel extends Gdn_Model {
       foreach ($IDs as $CID) {
          $Category = $Categories[$CID];
          $Categories[$CID]['Url'] = Url($Category['Url'], '//');
+         if ($Photo = val('Photo', $Category)) {
+            $Categories[$CID]['PhotoUrl'] = Gdn_Upload::Url($Photo);
+         }
+
          if ($Category['LastUrl'])
             $Categories[$CID]['LastUrl'] = Url($Category['LastUrl'], '//');
          $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
@@ -850,20 +868,21 @@ class CategoryModel extends Gdn_Model {
    /**
     * Get all of the ancestor categories above this one.
     * @param int|string $Category The category ID or url code.
-    * @param bool $CheckPermissions Whether or not to only return the categories with view permission.
+    * @param bool $checkPermissions Whether or not to only return the categories with view permission.
+    * @param bool $includeHeadings Whether or not to include heading categories.
     * @return array
     */
-   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE) {
+   public static function GetAncestors($categoryID, $checkPermissions = true, $includeHeadings = false) {
       $Categories = self::Categories();
       $Result = array();
 
       // Grab the category by ID or url code.
-      if (is_numeric($CategoryID)) {
-         if (isset($Categories[$CategoryID]))
-            $Category = $Categories[$CategoryID];
+      if (is_numeric($categoryID)) {
+         if (isset($Categories[$categoryID]))
+            $Category = $Categories[$categoryID];
       } else {
          foreach ($Categories as $ID => $Value) {
-            if ($Value['UrlCode'] == $CategoryID) {
+            if ($Value['UrlCode'] == $categoryID) {
                $Category = $Categories[$ID];
                break;
             }
@@ -882,7 +901,7 @@ class CategoryModel extends Gdn_Model {
             break;
          $Max--;
 
-         if ($CheckPermissions && !$Category['PermsDiscussionsView']) {
+         if ($checkPermissions && !$Category['PermsDiscussionsView']) {
             $Category = $Categories[$Category['ParentCategoryID']];
             continue;
          }
@@ -891,16 +910,18 @@ class CategoryModel extends Gdn_Model {
             break;
 
          // Return by ID or code.
-         if (is_numeric($CategoryID))
+         if (is_numeric($categoryID))
             $ID = $Category['CategoryID'];
          else
             $ID = $Category['UrlCode'];
 
-         $Result[$ID] = $Category;
+         if ($includeHeadings || $Category['DisplayAs'] !== 'Heading') {
+            $Result[$ID] = $Category;
+         }
 
          $Category = $Categories[$Category['ParentCategoryID']];
       }
-      $Result = array_reverse($Result, TRUE); // order for breadcrumbs
+      $Result = array_reverse($Result, true); // order for breadcrumbs
       return $Result;
    }
 
@@ -926,22 +947,23 @@ class CategoryModel extends Gdn_Model {
    }
 
    /**
+    * Get the subtree starting at a given parent.
     *
-    *
-    * @since 2.0.18
-    * @acces public
-    * @param int $ID
-    * @return array
+    * @param string $ParentCategory The ID or url code of the parent category.
+    * @param bool $IncludeParent Whether or not to include the parent in the result.
+    * @return array An array of categories.
     */
-   public static function GetSubtree($ID) {
+   public static function GetSubtree($ParentCategory, $IncludeParent = true) {
       $Result = array();
-      $Category = self::Categories($ID);
+      $Category = self::Categories($ParentCategory);
       if ($Category) {
-         $Result[$Category['CategoryID']] = $Category;
+         if ($IncludeParent) {
+            $Result[$Category['CategoryID']] = $Category;
+         }
          $ChildIDs = GetValue('ChildIDs', $Category);
 
          foreach ($ChildIDs as $ChildID) {
-            $Result = array_merge($Result, self::GetSubtree($ChildID));
+            $Result = array_replace($Result, self::GetSubtree($ChildID, true));
          }
       }
       return $Result;
@@ -1166,7 +1188,7 @@ class CategoryModel extends Gdn_Model {
       if ($Root) {
          $Root = (array)$Root;
          // Make the tree out of this category as a subtree.
-         $DepthAdjust = C('Vanilla.Categories.DoHeadings') ? -$Root['Depth'] : 0;
+         $DepthAdjust = -$Root['Depth'];
          $Result = self::_MakeTreeChildren($Root, $Categories, $DepthAdjust);
       } else {
          // Make a tree out of all categories.
@@ -1182,8 +1204,10 @@ class CategoryModel extends Gdn_Model {
    }
 
    protected static function _MakeTreeChildren($Category, $Categories, $DepthAdj = null) {
-      if (is_null($DepthAdj))
-         $DepthAdjust = C('Vanilla.Categories.DoHeadings') ? -1 : 0;
+      if (is_null($DepthAdj)) {
+         $DepthAdj = -val('Depth', $Category);
+      }
+
       $Result = array();
       foreach ($Category['ChildIDs'] as $ID) {
          if (!isset($Categories[$ID]))
@@ -1514,7 +1538,7 @@ class CategoryModel extends Gdn_Model {
          }
 
          // Save the permissions
-         if ($AllowDiscussions && $CategoryID) {
+         if ($CategoryID) {
             // Check to see if this category uses custom permissions.
             if ($CustomPermissions) {
                $PermissionModel = Gdn::PermissionModel();

@@ -8,7 +8,7 @@
    
    // Make sure to force this form to post to the correct place in case the view is
    // rendered within another view (ie. /dashboard/entry/index/):
-   echo $this->Form->Open(array('Action' => Url('/entry/register'), 'id' => 'Form_User_Register'));
+   echo $this->Form->Open(array('Action' => Url('/entry/registerinvitation'), 'id' => 'Form_User_Register'));
    echo $this->Form->Errors();
    ?>
    <ul>

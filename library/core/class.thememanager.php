@@ -157,6 +157,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
          }
 
+         // Add the mobile screenshot.
+         if (array_key_exists('mobilescreenshot', $ThemeFiles)) {
+            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', GetValue('mobilescreenshot', $ThemeFiles)),'/');
+            $SearchThemeInfo['MobileScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
+         }
+
          if (array_key_exists('hooks', $ThemeFiles)) {
             $SearchThemeInfo['HooksFile'] = GetValue('hooks', $ThemeFiles, FALSE);
             $SearchThemeInfo['RealHooksFile'] = realpath($SearchThemeInfo['HooksFile']);
@@ -244,7 +250,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          'about\.php'                           => 'about',
          '.*\.theme\.php'                       => 'about',
          'class\..*themehooks\.php'             => 'hooks',
-         'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot'
+         'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot',
+         'mobile\.(gif|jpg|jpeg|png)'           => 'mobilescreenshot'
       );
 
       $MatchedThemeFiles = array();
@@ -340,7 +347,21 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       if ($this->CurrentTheme() == 'default') {
          throw new Gdn_UserException(T('You cannot disable the default theme.'));
       }
+      $oldTheme = $this->EnabledTheme();
       RemoveFromConfig('Garden.Theme');
+      $newTheme = $this->EnabledTheme();
+
+      if ($oldTheme != $newTheme) {
+         Logger::event(
+            'theme_changed',
+            'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
+            array(
+               'themeType' => 'desktop',
+               'oldTheme' => $oldTheme,
+               'newTheme' => $newTheme
+            )
+         );
+      }
    }
 
    public function EnabledTheme() {
@@ -387,7 +408,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       return $ThemeInfo;
    }
 
-   public function EnableTheme($ThemeName) {
+   public function EnableTheme($ThemeName, $IsMobile = FALSE) {
       // Make sure to run the setup
       $this->TestTheme($ThemeName);
 
@@ -395,19 +416,45 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       $ThemeInfo = $this->GetThemeInfo($ThemeName);
       $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
 
+      $oldTheme = $IsMobile ? C('Garden.MobileTheme', 'mobile') : C('Garden.Theme', 'default');
+
       if ($ThemeFolder == '') {
          throw new Exception(T('The theme folder was not properly defined.'));
       } else {
          $Options = GetValueR("{$ThemeName}.Options", $this->AvailableThemes());
          if ($Options) {
-            SaveToConfig(array(
-               'Garden.Theme' => $ThemeName,
-               'Garden.ThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)));
+            if ($IsMobile) {
+               SaveToConfig(array(
+                  'Garden.MobileTheme' => $ThemeName,
+                  'Garden.MobileThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+               ));
+            } else {
+               SaveToConfig(array(
+                  'Garden.Theme' => $ThemeName,
+                  'Garden.ThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+               ));
+            }
          } else {
-            SaveToConfig('Garden.Theme', $ThemeName);
-            RemoveFromConfig('Garden.ThemeOptions');
+            if ($IsMobile) {
+               SaveToConfig('Garden.MobileTheme', $ThemeName);
+               RemoveFromConfig('Garden.MobileThemeOptions');
+            } else {
+               SaveToConfig('Garden.Theme', $ThemeName);
+               RemoveFromConfig('Garden.ThemeOptions');
+            }
          }
       }
+
+      Logger::event(
+         'theme_changed',
+         LogLevel::NOTICE,
+         'The {themeType} theme changed from {oldTheme} to {newTheme}.',
+         array(
+            'themeType' => $IsMobile ? 'mobile' : 'desktop',
+            'oldTheme' => $oldTheme,
+            'newTheme' => $ThemeName
+         )
+      );
 
       // Tell the locale cache to refresh itself.
       Gdn::Locale()->Refresh();

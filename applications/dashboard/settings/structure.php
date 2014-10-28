@@ -363,12 +363,22 @@ $PermissionModel->ClearPermissions();
 // Invitation Table
 $Construct->Table('Invitation')
 	->PrimaryKey('InvitationID')
-   ->Column('Email', 'varchar(200)')
-   ->Column('Code', 'varchar(50)')
-   ->Column('InsertUserID', 'int', TRUE, 'key')
-   ->Column('DateInserted', 'datetime')
+   ->Column('Email', 'varchar(200)', FALSE, 'index')
+   ->Column('Name', 'varchar(50)', TRUE)
+   ->Column('RoleIDs', 'text', TRUE)
+   ->Column('Code', 'varchar(50)', FALSE, 'unique.code')
+   ->Column('InsertUserID', 'int', TRUE, 'index.userdate')
+   ->Column('DateInserted', 'datetime', FALSE, 'index.userdate')
    ->Column('AcceptedUserID', 'int', TRUE)
+   ->Column('DateExpires', 'datetime', TRUE)
    ->Set($Explicit, $Drop);
+
+// Fix negative invitation expiry dates..
+$InviteExpiry = C('Garden.Registration.InviteExpiration');
+if ($InviteExpiry && substr($InviteExpiry, 0, 1) === '-') {
+   $InviteExpiry = substr($InviteExpiry, 1);
+   SaveToConfig('Garden.Registration.InviteExpiration', $InviteExpiry);
+}
 
 // ActivityType Table
 $Construct->Table('ActivityType')
@@ -580,8 +590,12 @@ if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
 
+$Construct->Table('Tag');
+$FullNameColumnExists = $Construct->ColumnExists('FullName');
+$TagCategoryColumnExists = $Construct->ColumnExists('CategoryID');
+
 // This is a fix for erroneous unique constraint.
-if ($Construct->TableExists('Tag')) {
+if ($Construct->TableExists('Tag') && $TagCategoryColumnExists) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
 
@@ -613,9 +627,6 @@ if ($Construct->TableExists('Tag')) {
       }
    }
 }
-
-$Construct->Table('Tag');
-$FullNameColumnExists = $Construct->ColumnExists('FullName');
 
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
@@ -738,6 +749,24 @@ $Construct
    ->Column('OldUserID', 'int')
    ->Column('NewUserID', 'int')
    ->Set();
+
+$Construct
+   ->Table('Attachment')
+   ->PrimaryKey('AttachmentID')
+   ->Column('Type', 'varchar(64)') // ex: zendesk-case, vendor-item
+   ->Column('ForeignID', 'varchar(50)', FALSE, 'index') // ex: d-123 for DiscussionID 123, u-555 for UserID 555
+   ->Column('ForeignUserID', 'int', FALSE, 'key') // the user id of the record we are attached to (de-normalization)
+   ->Column('Source', 'varchar(64)') // ex: Zendesk, Vendor
+   ->Column('SourceID', 'varchar(32)') // ex: 1
+   ->Column('SourceURL', 'varchar(255)') 
+   ->Column('Attributes', 'text', TRUE)
+   ->Column('DateInserted', 'datetime')
+   ->Column('InsertUserID', 'int', FALSE, 'key')
+   ->Column('InsertIPAddress', 'varchar(64)')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
+   ->Set($Explicit, $Drop);
 
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.

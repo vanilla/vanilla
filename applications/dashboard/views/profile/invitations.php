@@ -26,7 +26,10 @@ if ($this->InvitationData->NumRows() > 0) {
          <th class=""><?php echo T('Sent To', 'Recipient'); ?></th>
          <th class="Alt InviteMeta"><?php echo T('On'); ?></th>
          <th class="InviteMeta"><?php echo T('Status'); ?></th>
-         <th class="InviteCode Alt InviteMeta"><?php echo T('Invitation Code', 'Code'); ?></th>
+         <th class="Alt InviteMeta"><?php echo T('Expires'); ?></th>
+         <?php
+//         <th class="InviteCode Alt InviteMeta"><?php echo T('Invitation Code', 'Code'); <!--</th>-->
+         ?>
       </tr>
    </thead>
    <tbody>
@@ -36,26 +39,29 @@ $Alt = FALSE;
 foreach ($this->InvitationData->Format('Text')->Result() as $Invitation) {
    $Alt = $Alt == TRUE ? FALSE : TRUE;
 ?>
-   <tr<?php echo ($Alt ? ' class="Alt"' : ''); ?>>
+   <tr class="js-invitation" data-id="<?php echo $Invitation->InvitationID ?>">
       <td class="Alt"><?php
          if ($Invitation->AcceptedName == '') {
             echo $Invitation->Email;
             echo Wrap(
-               Anchor(T('Uninvite'), '/profile/uninvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'Uninvite')
+               Anchor(T('Uninvite'), "/profile/uninvite/{$Invitation->InvitationID}", 'Uninvite Hijack')
                .' | '.
-               Anchor(T('Send Again'), '/profile/sendinvite/'.$Invitation->InvitationID.'/'.$Session->TransientKey(), 'SendAgain')
+               Anchor(T('Send Again'), "/profile/sendinvite/{$Invitation->InvitationID}", 'SendAgain Hijack')
                , 'div');
-         }
-         else {
+         } else {
             $User = Gdn::UserModel()->GetID($Invitation->AcceptedUserID);
             echo UserAnchor($User);
+
+            echo Wrap(
+               Anchor(T('Remove'), "/profile/deleteinvitation/{$Invitation->InvitationID}", 'Delete Hijack')
+               , 'div');
          }
 
          if ($Invitation->AcceptedName == '') {
 
          }
       ?></td>
-      <td><?php echo Gdn_Format::Date($Invitation->DateInserted); ?></td>
+      <td><?php echo Gdn_Format::Date($Invitation->DateInserted, 'html'); ?></td>
       <td class="Alt"><?php
          if ($Invitation->AcceptedName == '') {
             echo T('Pending');
@@ -64,7 +70,18 @@ foreach ($this->InvitationData->Format('Text')->Result() as $Invitation) {
          }
             
       ?></td>
-      <td><?php echo $Invitation->Code; ?></td>
+      <td>
+         <?php
+         if (!$Invitation->DateExpires) {
+            echo T('Never expires', 'Never');
+         } else {
+            echo Gdn_Format::Date($Invitation->DateExpires, 'html');
+         }
+         ?>
+      </td>
+      <?php
+//      <td><?php echo $Invitation->Code; <!--</td>-->
+      ?>
    </tr>
 <?php } ?>
     </tbody>

@@ -2,7 +2,7 @@
 
 /**
  * Smart abstraction layer
- * 
+ *
  * Vanilla implementation of Smarty templating engine.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
@@ -24,7 +24,7 @@ class Gdn_Smarty {
 
    /// Methods ///
 
-   
+
    public function Init($Path, $Controller) {
       $Smarty = $this->Smarty();
 
@@ -48,7 +48,7 @@ class Gdn_Smarty {
             'CountNotifications' => (int)GetValue('CountNotifications', $Session->User, 0),
             'CountUnreadConversations' => (int)GetValue('CountUnreadConversations', $Session->User, 0),
             'SignedIn' => TRUE);
-         
+
          $Photo = $Session->User->Photo;
          if ($Photo) {
             if (!IsUrl($Photo)) {
@@ -79,7 +79,7 @@ class Gdn_Smarty {
             $Controller->Data[$Key] = (array)$Value;
          }
       }
-      
+
       $BodyClass = GetValue('CssClass', $Controller->Data, '', TRUE);
       $Sections = Gdn_Theme::Section(NULL, 'get');
       if (is_array($Sections)) {
@@ -87,27 +87,46 @@ class Gdn_Smarty {
             $BodyClass .= ' Section-'.$Section;
          }
       }
-     
+
       $Controller->Data['BodyClass'] = $BodyClass;
+
+      // Set the current locale for themes to take advantage of.
+      $Locale = Gdn::Locale()->Locale;
+      // Kludge en-CA into just en until we can make our default local en.
+      if ($Locale === 'en-CA') {
+         $Locale = 'en';
+      }
+      $CurrentLocale = array(
+         'Key' => $Locale,
+         'Lang' => str_replace('_', '-', $Locale) // mirrors html5 lang attribute
+      );
+      if (class_exists('Locale')) {
+         $CurrentLocale['Language'] = Locale::getPrimaryLanguage($Locale);
+         $CurrentLocale['Region'] = Locale::getRegion($Locale);
+         $CurrentLocale['DisplayName'] = Locale::getDisplayName($Locale, $Locale);
+         $CurrentLocale['DisplayLanguage'] = Locale::getDisplayLanguage($Locale, $Locale);
+         $CurrentLocale['DisplayRegion'] = Locale::getDisplayRegion($Locale, $Locale);
+      }
+      $Smarty->assign('CurrentLocale', $CurrentLocale);
 
       $Smarty->assign('Assets', (array)$Controller->Assets);
       $Smarty->assign('Path', Gdn::Request()->Path());
 
-      // Assigign the controller data last so the controllers override any default data.
+      // Assign the controller data last so the controllers override any default data.
       $Smarty->assign($Controller->Data);
 
       $Smarty->Controller = $Controller; // for smarty plugins
       $Smarty->security = TRUE;
-      
+
       $Smarty->security_settings['IF_FUNCS'] = array_merge($Smarty->security_settings['IF_FUNCS'],
          array('Category', 'CheckPermission', 'InSection', 'InCategory', 'MultiCheckPermission', 'GetValue', 'SetValue', 'Url'));
-      
+
       $Smarty->security_settings['MODIFIER_FUNCS'] = array_merge($Smarty->security_settings['MODIFIER_FUNCS'],
          array('sprintf'));
-      
+
       $Smarty->secure_dir = array($Path);
-   }   
-   
+   }
+
    /**
     * Render the given view.
     *
@@ -120,7 +139,7 @@ class Gdn_Smarty {
       $CompileID = $Smarty->compile_id;
       if (defined('CLIENT_NAME'))
          $CompileID = CLIENT_NAME;
-      
+
       $Smarty->template_dir = dirname($Path);
       $Smarty->display($Path, NULL, $CompileID);
    }
@@ -135,17 +154,17 @@ class Gdn_Smarty {
          $Smarty->cache_dir = PATH_CACHE . DS . 'Smarty' . DS . 'cache';
          $Smarty->compile_dir = PATH_CACHE . DS . 'Smarty' . DS . 'compile';
          $Smarty->plugins_dir[] = PATH_LIBRARY . DS . 'vendors' . DS . 'SmartyPlugins';
-         
+
 //         Gdn::PluginManager()->Trace = TRUE;
          Gdn::PluginManager()->CallEventHandlers($Smarty, 'Gdn_Smarty', 'Init');
-         
+
          $this->_Smarty = $Smarty;
       }
       return $this->_Smarty;
    }
-   
-   /** 
-    * See if the provided template causes any errors. 
+
+   /**
+    * See if the provided template causes any errors.
     * @param type $Path Path of template file to test.
     * @return boolean TRUE if template loads successfully.
     */

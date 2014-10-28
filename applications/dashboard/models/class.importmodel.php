@@ -1638,7 +1638,7 @@ class ImportModel extends Gdn_Model {
          $Sqls['Tag.CoundDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
       }
       
-      if ($this->ImportExists('Poll')) {
+      if ($this->ImportExists('Poll') && Gdn::Structure()->TableExists('Poll')) {
          $Sqls['PollOption.CountVotes'] = $this->GetCountSQL('count', 'PollOption', 'PollVote', 'CountVotes', 'PollOptionID');
          
          $Sqls['Poll.CountOptions'] = $this->GetCountSQL('count', 'Poll', 'PollOption', 'CountOptions', 'PollID');
@@ -1775,8 +1775,11 @@ class ImportModel extends Gdn_Model {
          
          foreach ($Categories as $Category) {
             $UrlCode = urldecode(Gdn_Format::Url($Category['Name']));
-            if (strlen($UrlCode) > 50)
-               $UrlCode = $Category['CategoryID'];
+            if (strlen($UrlCode) > 50) {
+               $UrlCode = 'c'.$Category['CategoryID'];
+            } elseif (is_numeric($UrlCode)) {
+               $UrlCode = 'c'.$UrlCode;
+            }
             
             if (in_array($UrlCode, $TakenCodes)) {
                $ParentCategory = CategoryModel::Categories($Category['ParentCategoryID']);

@@ -384,7 +384,11 @@ class UserModel extends Gdn_Model {
              'ActivityUserID' => $UserID,
              'RegardingUserID' => Gdn::Session()->UserID,
              'HeadlineFormat' => T('HeadlineFormat.Unban', '{RegardingUserID,You} unbanned {ActivityUserID,you}.'),
-             'Story' => $Story);
+             'Story' => $Story,
+             'Data' => array(
+                'Unban' => TRUE
+             )
+         );
 
          $ActivityModel->Queue($Activity);
 
@@ -540,12 +544,12 @@ class UserModel extends Gdn_Model {
 
       if (C('Garden.SSO.SynchRoles')) {
          // Translate the role names to IDs.
-
          $Roles = GetValue('Roles', $NewUser, '');
-         if (is_string($Roles))
+         if (is_string($Roles)) {
             $Roles = explode(',', $Roles);
-         else
+         } elseif (!is_array($Roles)) {
             $Roles = array();
+         }
          $Roles = array_map('trim', $Roles);
          $Roles = array_map('strtolower', $Roles);
 
@@ -553,7 +557,7 @@ class UserModel extends Gdn_Model {
          $RoleIDs = array();
          foreach ($AllRoles as $RoleID => $Role) {
             $Name = strtolower($Role['Name']);
-            if (in_array($Name, $Roles)) {
+            if (in_array($Name, $Roles) || in_array($RoleID, $Roles)) {
                $RoleIDs[] = $RoleID;
             }
          }
@@ -625,6 +629,7 @@ class UserModel extends Gdn_Model {
             TouchValue('CheckCaptcha', $Options, FALSE);
             TouchValue('NoConfirmEmail', $Options, TRUE);
             TouchValue('NoActivity', $Options, TRUE);
+            TouchValue('SaveRoles', $Options, C('Garden.SSO.SynchRoles', false));
 
             Trace($UserData, 'Registering User');
             $UserID = $this->Register($UserData, $Options);
@@ -809,7 +814,7 @@ class UserModel extends Gdn_Model {
     */
    public function UserQuery($SafeData = FALSE) {
       if ($SafeData) {
-         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.About, u.Gender, u.CountVisits, u.InviteUserID, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Admin, u.Deleted, u.CountDiscussions, u.CountComments');
+         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.CountVisits, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Deleted, u.CountDiscussions, u.CountComments');
       } else {
          $this->SQL->Select('u.*');
       }
@@ -1110,15 +1115,17 @@ class UserModel extends Gdn_Model {
          $Keys = array();
          // Make keys for cache query
          foreach ($IDs as $UserID) {
-            if (!$UserID) continue;
-
+            if (!$UserID) {
+               continue;
+            }
             $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          }
 
          // Query cache layer
          $CacheData = Gdn::Cache()->Get($Keys);
-         if (!is_array($CacheData))
+         if (!is_array($CacheData)) {
             $CacheData = array();
+         }
 
          foreach ($CacheData as $RealKey => $User) {
             if ($User === NULL) {
@@ -1126,6 +1133,7 @@ class UserModel extends Gdn_Model {
             } else {
                $ResultUserID = GetValue('UserID', $User);
             }
+            $this->SetCalculatedFields($User);
             $Data[$ResultUserID] = $User;
          }
 
@@ -1305,11 +1313,21 @@ class UserModel extends Gdn_Model {
     */
    public function GetSummary($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->UserQuery(TRUE);
-      return $this->SQL
+      $Data = $this->SQL
          ->Where('u.Deleted', 0)
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
+
+      // Set corrected PhotoUrls.
+      $Result =& $Data->Result();
+      foreach ($Result as &$Row) {
+         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+            $Row->Photo = Gdn_Upload::Url($Row->Photo);
+         }
+      }
+
+      return $Result;
    }
 
    /**
@@ -1559,12 +1577,16 @@ class UserModel extends Gdn_Model {
       } else {
          $this->AddUpdateFields($FormPostValues);
          $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+         if (!$User) {
+            $User = array();
+         }
 
          // Block banning the superadmin or System accounts
-         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues))
+         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues)) {
             $this->Validation->AddValidationResult('Banned', 'You may not ban a System user.');
-         elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues))
+         } elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues)) {
             $this->Validation->AddValidationResult('Banned', 'You may not ban a user with the Admin flag set.');
+         }
       }
 
       $this->EventArguments['FormPostValues'] = $FormPostValues;
@@ -1802,7 +1824,7 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
 
-   public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
+   public function SaveRoles($UserID, $RoleIDs, $RecordEvent) {
       if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
          $RoleNames = array_map('trim', explode(',', $RoleIDs));
@@ -1847,7 +1869,7 @@ class UserModel extends Gdn_Model {
 
       $this->ClearCache($UserID, array('roles', 'permissions'));
 
-      if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
+      if ($RecordEvent && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
          $User = $this->GetID($UserID);
          $Session = Gdn::Session();
 
@@ -1869,6 +1891,24 @@ class UserModel extends Gdn_Model {
 
          $RemovedRoles = array_diff($OldRoles, $NewRoles);
          $NewRoles = array_diff($NewRoles, $OldRoles);
+
+         foreach ($RemovedRoles as $RoleName) {
+            Logger::event(
+               'role_remove',
+               Logger::INFO,
+               "{username} removed {toUsername} from the {role} role.",
+               array('toUsername' => $User->Name, 'role' => $RoleName)
+            );
+         }
+
+         foreach ($NewRoles as $RoleName) {
+            Logger::event(
+               'role_add',
+               Logger::INFO,
+               "{username} added {toUsername} to the {role} role.",
+               array('toUsername' => $User->Name, 'role' => $RoleName)
+            );
+         }
 
          $RemovedCount = count($RemovedRoles);
          $NewCount = count($NewRoles);

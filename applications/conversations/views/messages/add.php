@@ -8,6 +8,12 @@
    echo $this->Form->Open();
    echo $this->Form->Errors();
 
+   if ($this->Data('MaxRecipients')) {
+      echo '<div class="Info">';
+      echo Plural($this->Data('MaxRecipients'), "You are limited to %s recipient.", "You are limited to %s recipients.");
+      echo '</div>';
+   }
+
    echo '<div class="P">';
       echo $this->Form->Label('Recipients', 'To');
       echo Wrap($this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));

@@ -7,8 +7,8 @@
 $PluginInfo['ProfileExtender'] = array(
    'Name' => 'Profile Extender',
    'Description' => 'Add fields (like status, location, or gamer tags) to profiles and registration.',
-   'Version' => '3.0',
-   'RequiredApplications' => array('Vanilla' => '2.1a1'),
+   'Version' => '3.0.1',
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE,
    //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
    'SettingsUrl' => '/dashboard/settings/profileextender',
@@ -124,6 +124,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          if ($Value == '')
             continue;
 
+         // Use plaintext for building these
+         $Value = Gdn_Format::Text($Value);
+
          switch ($Label) {
             case 'Twitter':
                $Fields['Twitter'] = Anchor('@'.$Value, 'http://twitter.com/'.$Value);
@@ -138,7 +141,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                $Fields['Google'] = Anchor('Google+', $Value, '', array('rel' => 'me'));
                break;
             case 'Website':
-               $Fields['Website'] = Anchor($Value, $Value);
+               $LinkValue = (IsUrl($Value)) ? $Value : 'http://'.$Value;
+               $Fields['Website'] = Anchor($Value, $LinkValue);
                break;
             case 'Real Name':
                $Fields['Real Name'] = Wrap(htmlspecialchars($Value), 'span', array('itemprop' => 'name'));
@@ -392,10 +396,13 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                continue;
             if (!GetValue('OnProfile', $AllFields[$Name]))
                continue;
+
+            // Non-magic fields must be plain text, but we'll auto-link
             if (!in_array($Name, $this->MagicLabels))
-               $Value = Gdn_Format::Links(htmlspecialchars($Value));
+               $Value = Gdn_Format::Links(Gdn_Format::Text($Value));
+
             echo ' <dt class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Text($AllFields[$Name]['Label']).'</dt> ';
-            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.$Value.'</dd> ';
+            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Html($Value).'</dd> ';
          }
       } catch (Exception $ex) {
          // No errors

@@ -3,7 +3,7 @@ jQuery(document).ready(function($) {
    $("#Form_Name").keyup(function(event) {
       if ($('#Form_CodeIsDefined').val() == '0') {
          $('#UrlCode').show();
-         var val = $(this).val().replace(/[ \/\\&.?;,<>'"]+/g, '-')
+         var val = $(this).val().replace(/[ \/\\&.?;,<>'"]+/g, '-');
          val = val.replace(/\-+/g, '-').toLowerCase();
          $("#Form_UrlCode").val(val);
          $("#UrlCode span").text(val);

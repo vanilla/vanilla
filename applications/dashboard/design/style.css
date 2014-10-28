@@ -52,6 +52,11 @@ textarea, input[type=text] {
    box-sizing: border-box;
 }
 
+.textarea-autosize {
+   transition: height 0.1s ease;
+   resize: none !important;
+}
+
 /* Elements that are disabled, make sure they reflect that with UX feedback. */
 [disabled] {
    opacity: 0.50;
@@ -90,7 +95,7 @@ body.NarrowForm #Content {
 body.Entry #Content {
    float: none;
    margin: 0 auto;
-   max-width: 500px;
+   max-width: 600px;
 }
 
 /* ============================================== General Styles & Typography */
@@ -2307,7 +2312,7 @@ form.Thumbnail .Warning {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 5000;
+  z-index: 998;
 }
 .MSIE .Overlay {
    background: gray;
@@ -3899,7 +3904,7 @@ body.embed .InformMessages {
 }
 .Flyout.Flags {
    top: 25px;
-   z-index: 1000;
+   z-index: 997;
 }
 .Reactions .FlagMenu .MenuItems .ReactButton {
    margin: 0px;
@@ -4034,6 +4039,18 @@ input + .ReactSprite {
 
 .Hidden {
    display: none;
+}
+
+/* Screen readers only, as part of Section 508 compliance. */
+.sr-only {
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   margin: -1px;
+   padding: 0;
+   overflow: hidden;
+   clip: rect(0,0,0,0);
+   border: 0;
 }
 
 /* Token input */
@@ -4235,4 +4252,501 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
    position: relative;
    top: -2px;
    padding: 0 0 0 2px;
+}
+
+/**
+ * Socialcons
+ */
+
+.SocialIcon {
+  display: inline-block;
+  overflow: hidden;
+  font-weight: bold;
+  line-height: 24px;
+  color: #fff !important;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.SocialIcon.HasText {
+  min-width: 210px;
+  line-height: 32px;
+}
+
+.SocialIcon .Icon {
+  width: 24px;
+  height: 24px;
+}
+
+.SocialIcon.HasText .Icon {
+  width: 32px;
+  height: 32px;
+}
+
+.SocialIcon .Text {
+  padding: 0 15px 0 10px;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.SocialIcon {
+  -webkit-transition: background-color 100ms;
+     -moz-transition: background-color 100ms;
+       -o-transition: background-color 100ms;
+          transition: background-color 100ms;
+}
+
+.SocialIcon .Icon,
+.SocialIcon .Text {
+  display: block;
+  float: left;
+  vertical-align: top;
+}
+
+.SocialIcon .Icon {
+  background-image: url('images/socialcons-small.png');
+  background-repeat: no-repeat;
+  background-size: 24px 168px;
+}
+.SocialIcon.HasText .Icon {
+  background-size: 32px 224px;
+  background-image: url('images/socialcons.png');
+}
+@media
+(-webkit-min-device-pixel-ratio: 2),
+(-o-min-device-pixel-ratio: 3 / 2),
+(min-device-pixel-ratio: 2) {
+  .SocialIcon .Icon {
+    background-image: url('images/socialcons-small@2x.png');
+  }
+  .SocialIcon.HasText .Icon {
+    background-image: url('images/socialcons@2x.png');
+  }
+}
+
+.SocialIcon-Facebook .Icon {
+  background-position: 0 -24px;
+}
+.SocialIcon-Facebook.HasText .Icon {
+  background-position: 0 -32px;
+}
+.SocialIcon-Facebook,
+.SocialIcon-Facebook.HasText .Icon {
+  background-color: #36609e;
+}
+.SocialIcon-Facebook:hover {
+  background-color: #294978;
+}
+
+.SocialIcon-Twitter .Icon {
+  background-position: 0 -144px;
+}
+.SocialIcon-Twitter.HasText .Icon {
+  background-position: 0 -192px;
+}
+.SocialIcon-Twitter,
+.SocialIcon-Twitter.HasText .Icon {
+  background-color: #2aa8df;
+}
+.SocialIcon-Twitter:hover {
+  background-color: #1c8aba;
+}
+
+.SocialIcon-Google .Icon {
+  background-position: 0 -72px;
+}
+.SocialIcon-Google.HasText .Icon {
+  background-position: 0 -96px;
+}
+.SocialIcon-Google,
+.SocialIcon-Google.HasText .Icon {
+  background-color: #da5442;
+}
+.SocialIcon-Google:hover {
+  background-color: #c33926;
+}
+
+.SocialIcon-OpenID .Icon {
+  background-position: 0 -120px;
+}
+.SocialIcon-OpenID.HasText .Icon {
+  background-position: 0 -160px;
+}
+.SocialIcon-OpenID,
+.SocialIcon-OpenID.HasText .Icon {
+  background-color: #f7921c;
+}
+.SocialIcon-OpenID:hover {
+  background-color: #d87808;
+}
+
+.SocialIcon-LinkedIn .Icon {
+  background-position: 0 -96px;
+}
+.SocialIcon-LinkedIn.HasText .Icon {
+  background-position: 0 -128px;
+}
+.SocialIcon-LinkedIn,
+.SocialIcon-LinkedIn.HasText .Icon {
+  background-color: #066c9a;
+}
+.SocialIcon-LinkedIn:hover {
+  background-color: #044a69;
+}
+
+.SocialIcon-Disqus .Icon {
+  background-position: 0 0;
+}
+.SocialIcon-Disqus,
+.SocialIcon-Disqus.HasText .Icon {
+  background-color: #2e9fff;
+}
+.SocialIcon-Disqus:hover {
+  background-color: #0087fa;
+}
+
+.SocialIcon-GitHub .Icon {
+  background-position: 0 -48px;
+}
+.SocialIcon-GitHub.HasText .Icon {
+  background-position: 0 -64px;
+}
+.SocialIcon-GitHub,
+.SocialIcon-GitHub.HasText .Icon {
+  background-color: #6b9ecf;
+}
+.SocialIcon-GitHub:hover {
+  background-color: #4485c3;
+}
+
+/* Woe unto whoever caused this */
+
+.MeBox-SignIn.Inline .SocialIcon {
+  display: inline-block;
+}
+
+/*
+# Attachments
+
+Components for Attachments.
+
+Styleguide Attachments
+*/
+
+/*
+## Utilities
+
+Styleguide Attachments.Utilities
+*/
+
+.pull-right {
+   float: right !important;
+}
+
+.pull-left {
+   float: left !important;
+}
+
+/*
+## Definition lists
+
+Styleguide Definitions
+*/
+
+.item-attachment dl {
+   margin-top: 0;
+   margin-bottom: 20px;
+}
+
+.item-attachment dt {
+   font-weight: 700;
+}
+
+.item-attachment dd {
+   margin-left: 0;
+}
+
+.item-attachment dt,
+.item-attachment dd {
+   line-height: 20px;
+}
+
+/* Horizontal layout */
+
+.item-attachment .dl-horizontal dt {
+   float: left;
+   width: 160px;
+   clear: left;
+   text-align: right;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.item-attachment .dl-horizontal dd {
+   margin-left: 180px;
+}
+
+/* Column layout */
+
+.item-attachment .dl-columns {
+   overflow: hidden;
+   margin-right: -10px;
+   margin-left: -10px;
+}
+
+.item-attachment .dl-columns:before,
+.item-attachment .dl-columns:after {
+   display: table;
+   content: " ";
+}
+
+.item-attachment .dl-columns:after {
+   clear: both;
+}
+
+.item-attachment .dl-columns dt {
+   width: 20%;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.item-attachment .dl-columns dd {
+   width: 30%;
+}
+
+.item-attachment .dl-columns dt,
+.item-attachment .dl-columns dd {
+   float: left;
+   padding: 0 10px;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   box-sizing: border-box;
+}
+
+/*
+## Media objects
+
+Styleguide Media
+*/
+
+.item-attachment .media {
+   overflow: hidden;
+}
+
+.item-attachment .media:before,
+.item-attachment .media:after {
+   display: table;
+   content: " ";
+}
+
+.item-attachment .media:after {
+   clear: both;
+}
+
+.item-attachment .media > .pull-left {
+   margin-right: 10px;
+}
+
+.item-attachment .media > .pull-right {
+   margin-right: 10px;
+}
+
+.item-attachment .media-body {
+   overflow: hidden;
+   zoom: 1;
+}
+
+.item-attachment .media-object {
+   display: block;
+}
+
+.item-attachment .media-heading {
+   margin: 0 0 5px !important; /* Hack */
+}
+
+.item-attachment .media-list {
+   padding-left: 0;
+   list-style: none;
+}
+
+/*
+## Alerts
+
+.alert-info    - Informative alert
+.alert-warning - Warning alert
+.alert-danger  - Danger alert
+
+Styleguide Alerts
+*/
+
+.item-attachment .alert {
+   padding: 12px;
+   margin-bottom: 20px;
+   color: #222;
+   background-color: #d8ecfc;
+   border-color: #d8ecfc;
+   border-style: solid;
+   border-width: 1px;
+   border-radius: 2px;
+}
+
+.item-attachment .alert a {
+   color: #090909;
+}
+
+.item-attachment .alert hr {
+   border-top-color: #c0e0fa;
+}
+
+.item-attachment .alert h4 {
+   margin-top: 0;
+   color: inherit;
+}
+
+.item-attachment .alert a {
+   /*   font-weight: bold;*/
+}
+
+.item-attachment .alert p,
+.item-attachment .alert ul {
+   margin-bottom: 0;
+}
+
+.item-attachment .alert p + p {
+   margin-top: 5px;
+}
+
+/* Informative alert */
+
+.item-attachment .alert-info {
+   color: #222;
+   background-color: #f9edbe;
+   border-color: #f9edbe;
+}
+
+.item-attachment .alert-info a {
+   color: #090909;
+}
+
+.item-attachment .alert-info hr {
+   border-top-color: #f7e7a7;
+}
+
+/* Warning alert */
+
+.item-attachment .alert-warning {
+   color: #222222;
+   background-color: #ffcc00;
+   border-color: #ffcc00;
+}
+.item-attachment .alert-warning a {
+   color: #090909;
+}
+.item-attachment .alert-warning hr {
+   border-top-color: #e6b800;
+}
+
+/* Danger alert */
+
+.item-attachment .alert-danger {
+   color: #fff;
+   background-color: #b90000;
+   border-color: #b90000;
+}
+
+.item-attachment .alert-danger a {
+   color: #e6e6e6;
+}
+.item-attachment .alert-danger hr {
+   border-top-color: #a00000;
+}
+
+/*
+## Base item
+
+Styleguide Item
+*/
+
+.item-attachment .item-heading {
+   margin-bottom: 0 !important; /* Hack */
+   font-weight: 500;
+}
+
+.item-attachment .item-body {
+   overflow: hidden;
+}
+
+.item-attachment .item-body:before,
+.item-attachment .item-body:after {
+   display: table;
+   content: " ";
+}
+
+.item-attachment .item-body:after {
+   clear: both;
+}
+
+.item-attachment .item-body > *:first-child {
+   margin-top: 0;
+}
+
+.item-attachment .item-body > *:last-child {
+   margin-bottom: 0;
+}
+
+.item-attachment .item-header + .item-body {
+   margin-top: 5px;
+}
+
+.item-attachment .item-meta {
+   font-size: 12px;
+   line-height: 20px;
+   color: #999;
+}
+
+.item-attachment .item-meta > span {
+   padding-right: 5px;
+   padding-left: 5px;
+}
+
+.item-attachment .item-meta > span:first-child {
+   padding-left: 0;
+}
+
+.item-attachment .item-meta > span:last-child {
+   padding-right: 0;
+}
+
+/*
+## Item attachments
+
+Styleguide Attachments
+*/
+
+.item-attachment {
+   margin-top: 20px;
+}
+
+.item-attachment .alert {
+   margin-bottom: 0;
+}
+
+.item-attachment .media-object .icon {
+   display: block;
+   min-width: 32px;
+   font-size: 32px;
+   text-align: center;
+   line-height: 1;
+}
+
+/**
+ * Twitter card embed.
+ */
+.twitter-card-preload {
+   opacity: 0;
+}
+.twitter-card-loaded {
+   transition: all 0.2s ease;
+   opacity: 1;
 }

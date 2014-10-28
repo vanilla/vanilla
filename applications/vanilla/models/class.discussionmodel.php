@@ -223,6 +223,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('w.Participated')
             ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
 			$this->SQL
@@ -231,6 +232,7 @@ class DiscussionModel extends VanillaModel {
 				->Select('0', '', 'Dismissed')
 				->Select('0', '', 'Bookmarked')
 				->Select('0', '', 'CountCommentWatch')
+            ->Select('0', '', 'Participated')
 				->Select('d.Announce','','IsAnnounce');
       }
 
@@ -370,7 +372,8 @@ class DiscussionModel extends VanillaModel {
             ->Join('UserDiscussion w', "w.DiscussionID = d2.DiscussionID and w.UserID = $UserID", 'left')
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
-            ->Select('w.CountComments', '', 'CountCommentWatch');
+            ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('w.Participated');
       }
 
       $Data = $Sql->Get();
@@ -428,6 +431,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('w.Participated')
             ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
             //->BeginWhereGroup()
             //->Where('w.DateLastViewed', NULL)
@@ -441,6 +445,7 @@ class DiscussionModel extends VanillaModel {
 				->Select('0', '', 'Dismissed')
 				->Select('0', '', 'Bookmarked')
 				->Select('0', '', 'CountCommentWatch')
+            ->Select('0', '', 'Participated')
 				->Select('d.Announce','','IsAnnounce');
       }
 
@@ -701,16 +706,28 @@ class DiscussionModel extends VanillaModel {
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 50);
       $Offset = 0;
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
-
+      $CategoryID = val('d.CategoryID', $Wheres, 0);
+      $GroupID = val('d.GroupID', $Wheres, 0);
       // Get the discussion IDs of the announcements.
-      $CacheKey = 'Announcements';
+      $CacheKey = $this->GetAnnouncementCacheKey($CategoryID);
+      if ($GroupID == 0) {
+         $this->SQL->Cache($CacheKey);
+      }
+      $this->SQL->Select('d.DiscussionID')
+         ->From('Discussion d');
 
-      $AnnouncementIDs = $this->SQL
-         ->Cache($CacheKey)
-         ->Select('d.DiscussionID')
-         ->From('Discussion d')
-         ->Where('d.Announce >', '0')->Get()->ResultArray();
+      if ($CategoryID > 0 || $GroupID > 0) {
+         $this->SQL->Where('d.Announce >', '0');
+      } else {
+         $this->SQL->Where('d.Announce', 1);
+      }
+      if ($GroupID > 0) {
+         $this->SQL->Where('d.GroupID', $GroupID);
+      } elseif ($CategoryID > 0) {
+         $this->SQL->Where('d.CategoryID', $CategoryID);
+      }
 
+      $AnnouncementIDs = $this->SQL->Get()->ResultArray();
       $AnnouncementIDs = ConsolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
 
       // Short circuit querying when there are no announcements.
@@ -726,6 +743,7 @@ class DiscussionModel extends VanillaModel {
          $this->SQL->Select('w.UserID', '', 'WatchUserID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.Participated')
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
          // Don't join in the user table when we are a guest.
@@ -780,6 +798,18 @@ class DiscussionModel extends VanillaModel {
 		$this->FireEvent('AfterAddColumns');
 
 		return $Data;
+   }
+
+   /**
+    * @param int $CategoryID Category ID,
+    * @return string $Key CacheKey name to be used for cache.
+    */
+   public function GetAnnouncementCacheKey($CategoryID = 0) {
+      $Key = 'Announcements';
+      if ($CategoryID > 0) {
+         $Key .= ':' . $CategoryID;
+      }
+      return $Key;
    }
 
    /**
@@ -839,6 +869,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
+            ->Select('w.Participated')
             ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
       } else {
 			$this->SQL
@@ -1166,6 +1197,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('ca.PermissionCategoryID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.Participated')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
@@ -1211,6 +1243,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('d.*')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.Participated')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->From('Discussion d')
@@ -1254,6 +1287,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('ca.PermissionCategoryID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Select('w.Participated')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')
@@ -1352,6 +1386,25 @@ class DiscussionModel extends VanillaModel {
             )
          );
       }
+   }
+
+   /**
+    * Evented wrapper for Gdn_Model::SetField
+    *
+    * @param integer $RowID
+    * @param string $Property
+    * @param mixed $Value
+    */
+   public function SetField($RowID, $Property, $Value = FALSE) {
+      if (!is_array($Property)) {
+         $Property = array($Property => $Value);
+      }
+
+       $this->EventArguments['DiscussionID'] = $RowID;
+       $this->EventArguments['SetField'] = $Property;
+
+       parent::SetField($RowID, $Property, $Value);
+       $this->fireEvent('AfterSetField');
    }
 
    /**
@@ -1470,9 +1523,16 @@ class DiscussionModel extends VanillaModel {
                $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
 
                // Clear the cache if necessary.
-               if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements');
-                  $this->SQL->Cache($CacheKeys);
+               $CacheKeys = array();
+               if (val('Announce', $Stored) != val('Announce', $Fields)) {
+                  $CacheKeys[] = $this->GetAnnouncementCacheKey();
+                  $CacheKeys[] = $this->GetAnnouncementCacheKey(val('CategoryID', $Stored));
+               }
+               if (val('CategoryID', $Stored) != val('CategoryID', $Fields)) {
+                  $CacheKeys[] = $this->GetAnnouncementCacheKey(val('CategoryID', $Fields));
+               }
+               foreach ($CacheKeys as $CacheKey) {
+                  Gdn::Cache()->Remove($CacheKey);
                }
 
                self::SerializeRow($Fields);
@@ -1524,12 +1584,12 @@ class DiscussionModel extends VanillaModel {
 
                   // Clear the cache if necessary.
                   if (GetValue('Announce', $Fields)) {
-                     Gdn::Cache()->Remove('Announcements');
+                     Gdn::Cache()->Remove($this->GetAnnouncementCacheKey(GetValue('CategoryID', $Fields)));
                   }
                }
 
                // Update the user's discussion count.
-               $this->UpdateUserDiscussionCount(Gdn::Session()->UserID, TRUE);
+               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], TRUE);
 
                // Mark the user as participated.
                $this->SQL->Replace('UserDiscussion',
@@ -1944,7 +2004,11 @@ class DiscussionModel extends VanillaModel {
     */
 	public function AddView($DiscussionID) {
       $IncrementBy = 0;
-      if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
+      if (
+         C('Vanilla.Views.Denormalize', FALSE) &&
+         Gdn::Cache()->ActiveEnabled() &&
+         Gdn::Cache()->Type() != Gdn_Cache::CACHE_TYPE_NULL)
+      {
          $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
          $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);
 
@@ -2035,6 +2099,7 @@ class DiscussionModel extends VanillaModel {
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
          ->Select('w.CountComments', '', 'CountCommentWatch')
          ->Select('w.UserID', '', 'WatchUserID')
+         ->Select('w.Participated')
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->Select('lcu.Name', '', 'LastName')

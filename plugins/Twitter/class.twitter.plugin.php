@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter Social Connect',
    'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.1.8',
+   'Version' => '1.1.9',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -24,7 +24,7 @@ $PluginInfo['Twitter'] = array(
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'Hidden' => TRUE,
+   'Hidden' => FALSE,
    'SocialConnect' => TRUE,
    'RequiresRegistration' => TRUE
 );
@@ -104,39 +104,37 @@ class TwitterPlugin extends Gdn_Plugin {
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
       if (isset($Sender->Data['Methods'])) {
-         if (!$this->IsConfigured())
+         if (!$this->SocialSignIn())
             return;
 
-         $ImgSrc = Asset('/plugins/Twitter/design/twitter-signin.png');
-         $ImgAlt = T('Sign In with Twitter');
-            $SigninHref = $this->_AuthorizeHref();
-            $PopupSigninHref = $this->_AuthorizeHref(TRUE);
+            $Url = $this->_AuthorizeHref();
 
             // Add the twitter method to the controller.
             $TwMethod = array(
                'Name' => 'Twitter',
-               'SignInHtml' => "<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" rel=\"nofollow\"><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
+               'SignInHtml' => SocialSigninButton('Twitter', $Url, 'button', array('class' => 'js-extern'))
+            );
 
          $Sender->Data['Methods'][] = $TwMethod;
       }
    }
 
    public function Base_SignInIcons_Handler($Sender, $Args) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
 			return;
 
 		echo "\n".$this->_GetButton();
 	}
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
 			return;
 
 		echo "\n".$this->_GetButton();
 	}
 
 	public function Base_BeforeSignInLink_Handler($Sender) {
-      if (!$this->IsConfigured())
+      if (!$this->SocialSignIn())
 			return;
 
 		// if (!IsMobile())
@@ -226,11 +224,9 @@ class TwitterPlugin extends Gdn_Plugin {
    }
 
 	private function _GetButton() {
-      $ImgSrc = Asset('/plugins/Twitter/design/twitter-icon.png');
-      $ImgAlt = T('Sign In with Twitter');
-      $SigninHref = $this->_AuthorizeHref();
-      $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-		return "<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"800\" popupWidth=\"800\" rel=\"nofollow\"><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
+      $Url = $this->_AuthorizeHref();
+
+      return SocialSigninButton('Twitter', $Url, 'icon', array('class' => 'js-extern'));
    }
 
 	public function Authorize($Query = FALSE) {
@@ -659,6 +655,10 @@ class TwitterPlugin extends Gdn_Plugin {
       return C('Plugins.Twitter.SocialReactions', TRUE) && $this->IsConfigured();
    }
 
+   public function SocialSignIn() {
+      return C('Plugins.Twitter.SocialSignIn', TRUE) && $this->IsConfigured();
+   }
+
    public function SetOAuthToken($Token, $Secret = NULL, $Type = 'request') {
       if (is_a($Token, 'OAuthToken')) {
          $Secret = $Token->secret;
@@ -749,7 +749,7 @@ class TwitterPlugin extends Gdn_Plugin {
          $CssClass = 'ReactButton PopupWindow';
       }
 
-      echo Anchor(Sprite('ReactTwitter', 'ReactSprite'), $Url, $CssClass);
+      echo Anchor(Sprite('ReactTwitter', 'Sprite ReactSprite', T('Share on Twitter')), $Url, $CssClass);
    }
 
    public function SocialController_Twitter_Create($Sender, $Args) {
@@ -758,6 +758,7 @@ class TwitterPlugin extends Gdn_Plugin {
          $Settings = array(
              'Plugins.Twitter.ConsumerKey' => $Sender->Form->GetFormValue('ConsumerKey'),
              'Plugins.Twitter.Secret' => $Sender->Form->GetFormValue('Secret'),
+             'Plugins.Twitter.SocialSignIn' => $Sender->Form->GetFormValue('SocialSignIn'),
              'Plugins.Twitter.SocialReactions' => $Sender->Form->GetFormValue('SocialReactions'),
              'Plugins.Twitter.SocialSharing' => $Sender->Form->GetFormValue('SocialSharing')
          );
@@ -768,6 +769,7 @@ class TwitterPlugin extends Gdn_Plugin {
       } else {
          $Sender->Form->SetValue('ConsumerKey', C('Plugins.Twitter.ConsumerKey'));
          $Sender->Form->SetValue('Secret', C('Plugins.Twitter.Secret'));
+         $Sender->Form->SetValue('SocialSignIn', $this->SocialSignIn());
          $Sender->Form->SetValue('SocialReactions', $this->SocialReactions());
          $Sender->Form->SetValue('SocialSharing', $this->SocialSharing());
       }

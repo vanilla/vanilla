@@ -56,7 +56,8 @@ class ActivityController extends Gdn_Controller {
       $this->AddJsFile('global.js');
       
       $this->AddCssFile('style.css');
-      
+      $this->AddCssFile('vanillicon.css', 'static');
+
       // Add Modules
       $this->AddModule('GuestModule');
       $this->AddModule('SignedInModule');
@@ -346,7 +347,12 @@ class ActivityController extends Gdn_Controller {
       }
 
       if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
-         Redirect($this->Request->Get('Target', '/activity'));
+         $Target = $this->Request->Get('Target', '/activity');
+         if (IsSafeUrl($Target)) {
+            Redirect($Target);
+         } else {
+            Redirect(Url('/activity'));
+         }
       }
       
       $this->SetData('Activities', $Activities);

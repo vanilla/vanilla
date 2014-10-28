@@ -90,7 +90,7 @@ window.vanilla.embed = function(host) {
 
    if (!window.gadgets) {
       if (!disablePath) {
-         if ("onhashchange" in window) {
+         if ("onhashchange" in window && !(document.documentMode < 8)) {
             if (window.addEventListener)
                window.addEventListener("hashchange", checkHash, false);
             else

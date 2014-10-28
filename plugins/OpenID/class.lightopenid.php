@@ -114,6 +114,18 @@ class LightOpenID
         }
     }
 
+       protected function fix_url($url) {
+              // Fix a malformed return url .
+            $urlp = parse_url($url);
+            if (isset($urlp['query'])) {
+              parse_str($urlp['query'], $query);
+              $urlp['query'] = http_build_query($query);
+              $url = "{$urlp['scheme']}://{$urlp['host']}{$urlp['path']}?{$urlp['query']}";
+            }
+            return $url;
+        }
+	
+
     /**
      * Checks if the server specified in the url exists.
      *
@@ -627,7 +639,7 @@ class LightOpenID
                              .  'openid.claimed_id=' . $this->claimed_id;
         }
 
-        if ($this->data['openid_return_to'] != $this->returnUrl) {
+         if ($this->fix_url($this->data['openid_return_to']) != $this->returnUrl) {
             # The return_to url must match the url of current request.
             # I'm assuing that noone will set the returnUrl to something that doesn't make sense.
             return false;

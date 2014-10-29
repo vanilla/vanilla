@@ -36,9 +36,6 @@ function WriteRangeTab($Range, $Sender) {
 </div>
 <div class="Picker"></div>
 <script type="text/javascript" src="<?php echo $this->Data('VanillaStatsUrl'); ?>/applications/vanillastats/js/remote.js"></script>
-<div class="DashboardSummaries">
-   <div class="Loading"></div>
-</div>
 <script type="text/javascript">
    var GraphPicker = new Picker();
    GraphPicker.Attach({

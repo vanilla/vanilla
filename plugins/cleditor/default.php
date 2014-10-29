@@ -57,7 +57,7 @@ v1.3.2 11Aug2014 - Dane
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.3.2',
+   'Version' => '1.3.3',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -79,6 +79,11 @@ class cleditorPlugin extends Gdn_Plugin {
 //	public function DiscussionController_Render_Before($Sender) {
 //		$this->_AddCLEditor($Sender);
 //	}
+
+   public function Base_Render_Before($Sender, $Args) {
+      // Save in memorty only so it does not persist after plugin is gone.
+      SaveToConfig('Garden.Html.SafeStyles', FALSE, FALSE);
+   }
 
    /**
     * @param AssetModel $Sender
@@ -176,6 +181,6 @@ EOT
    }
 
    public function Structure() {
-      SaveToConfig('Garden.Html.SafeStyles', FALSE);
+
    }
 }

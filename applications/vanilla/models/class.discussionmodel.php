@@ -232,6 +232,7 @@ class DiscussionModel extends VanillaModel {
             ->Select('0', '', 'Dismissed')
             ->Select('0', '', 'Bookmarked')
             ->Select('0', '', 'CountCommentWatch')
+            ->Select('0', '', 'Participated')
             ->Select('d.Announce','','IsAnnounce');
       }
 

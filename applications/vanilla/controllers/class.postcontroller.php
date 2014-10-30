@@ -560,6 +560,10 @@ class PostController extends VanillaController {
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
 
+         if (!$Editing) {
+            unset($FormValues['CommentID']);
+         }
+
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);
 

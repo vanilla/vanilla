@@ -522,7 +522,11 @@ class PostController extends VanillaController {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
-         
+
+         if (!$Editing) {
+            unset($FormValues['CommentID']);
+         }
+
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);
          

@@ -901,7 +901,7 @@ class CommentModel extends VanillaModel {
             if ($Category) {
                $CountComments = GetValue('CountComments', $Category, 0) + 1;
 
-               if ($CountComments < 1000 || $CountComments % 20 == 0) {
+               if ($CountComments < 1000 || ($CountComments < 50000 && $CountComments % 50 == 0)) {
                   $CountComments = $this->SQL
                      ->Select('CountComments', 'sum', 'CountComments')
                      ->From('Discussion')

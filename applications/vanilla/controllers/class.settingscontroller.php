@@ -405,13 +405,8 @@ class SettingsController extends Gdn_Controller {
       $RoleModel = new RoleModel();
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
-<<<<<<< HEAD
-      
-      if (!$CategoryID && $this->Form->IsPostBack()) {
-=======
 
       if (!$CategoryID && $this->Form->AuthenticatedPostBack()) {
->>>>>>> 2ce2e98... Fix PostBack checking conventions
          if ($ID = $this->Form->GetFormValue('CategoryID'))
             $CategoryID = $ID;
       }
@@ -439,10 +434,7 @@ class SettingsController extends Gdn_Controller {
 
          $this->FireEvent('AddEditCategory');
 
-<<<<<<< HEAD
-         if ($this->Form->IsPostBack() == FALSE) {
-            $this->Form->SetData($this->Category);
-         } else {
+         if ($this->Form->AuthenticatedPostBack()) {
             $Upload = new Gdn_Upload();
             $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
             if ($TmpImage) {
@@ -458,13 +450,6 @@ class SettingsController extends Gdn_Controller {
                );
                $this->Form->SetFormValue('Photo', $Parts['SaveName']);
             }
-=======
-      if ($this->Form->AuthenticatedPostBack()) {
-         $this->SetupDiscussionTypes($this->Category);
-         $Upload = new Gdn_Upload();
-         $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
-         if ($TmpImage) {
->>>>>>> 2ce2e98... Fix PostBack checking conventions
 
             if ($this->Form->Save()) {
                $Category = CategoryModel::Categories($CategoryID);
@@ -473,6 +458,8 @@ class SettingsController extends Gdn_Controller {
                if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
                   Redirect('vanilla/settings/managecategories');
             }
+         } else {
+            $this->Form->SetData($this->Category);
          }
 
          // Get all of the currently selected role/permission combinations for this junction.

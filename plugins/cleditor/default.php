@@ -80,8 +80,8 @@ class cleditorPlugin extends Gdn_Plugin {
 //		$this->_AddCLEditor($Sender);
 //	}
 
-   public function Base_Render_Before($Sender, $Args) {
-      // Save in memorty only so it does not persist after plugin is gone.
+   public function Gdn_Dispatcher_AppStartup_Handler($Sender, $Args) {
+      // Save in memory only so it does not persist after plugin is gone.
       SaveToConfig('Garden.Html.SafeStyles', FALSE, FALSE);
    }
 

@@ -261,7 +261,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Add Profile Field'));
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          // Get whitelisted properties
          $FormPostValues = $Sender->Form->FormValues();
          foreach ($FormPostValues as $Key => $Value) {
@@ -336,7 +336,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', 'Delete Field');
       if (isset($Args[0])) {
-         if ($Sender->Form->IsPostBack()) {
+         if ($Sender->Form->AuthenticatedPostBack()) {
             RemoveFromConfig('ProfileExtender.Fields.'.$Args[0]);
             $Sender->RedirectUrl = Url('/settings/profileextender');
          }

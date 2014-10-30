@@ -237,10 +237,8 @@ class SettingsController extends Gdn_Controller {
       $this->RoleArray = $RoleModel->GetArray();
       
       $this->FireEvent('AddEditCategory');
-      
-      if ($this->Form->IsPostBack() == FALSE) {
-         $this->Form->AddHidden('CodeIsDefined', '0');
-      } else {
+
+      if ($this->Form->AuthenticatedPostBack()) {
          // Form was validly submitted
          $IsParent = $this->Form->GetFormValue('IsParent', '0');
          $this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
@@ -255,6 +253,10 @@ class SettingsController extends Gdn_Controller {
             unset($CategoryID);
          }
       }
+      else {
+         $this->Form->AddHidden('CodeIsDefined', '0');
+      }
+
       // Get all of the currently selected role/permission combinations for this junction.
       $Permissions = $PermissionModel->GetJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
       $Permissions = $PermissionModel->UnpivotPermissions($Permissions, TRUE);
@@ -403,8 +405,8 @@ class SettingsController extends Gdn_Controller {
       $RoleModel = new RoleModel();
       $PermissionModel = Gdn::PermissionModel();
       $this->Form->SetModel($this->CategoryModel);
-      
-      if (!$CategoryID && $this->Form->IsPostBack()) {
+
+      if (!$CategoryID && $this->Form->AuthenticatedPostBack()) {
          if ($ID = $this->Form->GetFormValue('CategoryID'))
             $CategoryID = $ID;
       }
@@ -432,9 +434,7 @@ class SettingsController extends Gdn_Controller {
 
          $this->FireEvent('AddEditCategory');
 
-         if ($this->Form->IsPostBack() == FALSE) {
-            $this->Form->SetData($this->Category);
-         } else {
+         if ($this->Form->AuthenticatedPostBack()) {
             $Upload = new Gdn_Upload();
             $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
             if ($TmpImage) {
@@ -458,6 +458,8 @@ class SettingsController extends Gdn_Controller {
                if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
                   Redirect('vanilla/settings/managecategories');
             }
+         } else {
+            $this->Form->SetData($this->Category);
          }
 
          // Get all of the currently selected role/permission combinations for this junction.
@@ -466,6 +468,11 @@ class SettingsController extends Gdn_Controller {
 
          if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
             $this->SetData('PermissionData', $Permissions, TRUE);
+      }
+      else {
+         $this->Form->SetData($this->Category);
+         $this->SetupDiscussionTypes($this->Category);
+         $this->Form->SetValue('CustomPoints', $this->Category->PointsCategoryID == $this->Category->CategoryID);
       }
 
       $this->AddSideMenu('vanilla/settings/managecategories');
@@ -552,8 +559,7 @@ class SettingsController extends Gdn_Controller {
       $this->Permission('Garden.Settings.Manage');
       
       // Set delivery type to true/false
-      $TransientKey = GetIncomingValue('TransientKey');
-      if (Gdn::Request()->IsPostBack()) {
+      if (Gdn::Request()->IsAuthenticatedPostBack()) {
          $TreeArray = GetValue('TreeArray', $_POST);
          $Saves = $this->CategoryModel->SaveTree($TreeArray);
          $this->SetData('Result', TRUE);

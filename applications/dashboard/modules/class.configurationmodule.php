@@ -90,7 +90,7 @@ class ConfigurationModule extends Gdn_Module {
       
       $Form = $this->Form();
 
-      if ($Form->IsPostBack()) {
+      if ($Form->AuthenticatedPostBack()) {
          // Grab the data from the form.
          $Data = array();
 

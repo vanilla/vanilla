@@ -592,7 +592,7 @@ class SettingsController extends DashboardController {
             
             // Set default locale field if just doing enable/disable
             $this->Form->SetValue('Locale', C('Garden.Locale', 'en-CA'));
-         } elseif ($this->Form->IsPostBack()) {
+         } elseif ($this->Form->AuthenticatedPostBack()) {
             // Save the default locale.
             SaveToConfig('Garden.Locale', $this->Form->GetFormValue('Locale'));
             $Refresh = TRUE;
@@ -913,7 +913,7 @@ class SettingsController extends DashboardController {
          $ThemeManager = new Gdn_ThemeManager();
          $this->SetData('ThemeInfo', $ThemeManager->EnabledThemeInfo());
 
-         if ($this->Form->IsPostBack()) {
+         if ($this->Form->AuthenticatedPostBack()) {
             // Save the styles to the config.
             $StyleKey = $this->Form->GetFormValue('StyleKey');
 

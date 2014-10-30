@@ -365,7 +365,7 @@ class DiscussionController extends VanillaController {
     */
    public function Bookmark($DiscussionID) {
       // Make sure we are posting back.
-      if (!$this->Request->AuthenticatedPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Session = Gdn::Session();
@@ -491,7 +491,7 @@ class DiscussionController extends VanillaController {
     */
    public function Sink($DiscussionID = '', $Sink = TRUE, $From = 'list') {
       // Make sure we are posting back.
-      if (!$this->Request->AuthenticatedPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Discussion = $this->DiscussionModel->GetID($DiscussionID);
@@ -534,7 +534,7 @@ class DiscussionController extends VanillaController {
     */
    public function Close($DiscussionID = '', $Close = TRUE, $From = 'list') {
       // Make sure we are posting back.
-      if (!$this->Request->AuthenticatedPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Discussion = $this->DiscussionModel->GetID($DiscussionID);

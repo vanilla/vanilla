@@ -754,7 +754,7 @@ class TwitterPlugin extends Gdn_Plugin {
 
    public function SocialController_Twitter_Create($Sender, $Args) {
    	  $Sender->Permission('Garden.Settings.Manage');
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $Settings = array(
              'Plugins.Twitter.ConsumerKey' => $Sender->Form->GetFormValue('ConsumerKey'),
              'Plugins.Twitter.Secret' => $Sender->Form->GetFormValue('Secret'),

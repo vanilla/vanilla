@@ -333,7 +333,7 @@ class ProfileController extends Gdn_Controller {
       $this->FireEvent('BeforeEdit');
 
       // If seeing the form for the first time...
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $this->Form->SetFormValue('UserID', $UserID);
 
          if (!$this->CanEditUsername)
@@ -717,7 +717,7 @@ class ProfileController extends Gdn_Controller {
 
       $this->Form->InputPrefix = '';
 
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $Data = $this->Form->FormValues();
          Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, $Data);
       } else {

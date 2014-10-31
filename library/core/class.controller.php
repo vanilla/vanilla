@@ -1233,7 +1233,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
-         if (ob_get_level()) ob_clean();
+         if (ob_get_level()) {
+            ob_clean();
+         }
          $this->ContentType('application/json');
          $this->SetHeader('X-Content-Type-Options', 'nosniff');
       }
@@ -1273,7 +1275,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
          $ExitRender = $this->RenderData();
-         if ($ExitRender) return;
+         if ($ExitRender) {
+            return;
+         }
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1453,7 +1457,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
       }
 
-      if (ob_get_level()) ob_clean();
+      if (ob_get_level()) {
+         ob_clean();
+      }
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             safeHeader('Content-Type: text/xml', TRUE);
@@ -1590,8 +1596,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       // Try cleaning out any notices or errors.
-      if (ob_get_level()) ob_clean();
-
+      if (ob_get_level()) {
+         ob_clean();
+      }
 
       if ($Code >= 400 && $Code <= 505)
          safeHeader("HTTP/1.0 $Code", TRUE, $Code);

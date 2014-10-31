@@ -469,11 +469,6 @@ class SettingsController extends Gdn_Controller {
          if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
             $this->SetData('PermissionData', $Permissions, TRUE);
       }
-      else {
-         $this->Form->SetData($this->Category);
-         $this->SetupDiscussionTypes($this->Category);
-         $this->Form->SetValue('CustomPoints', $this->Category->PointsCategoryID == $this->Category->CategoryID);
-      }
 
       $this->AddSideMenu('vanilla/settings/managecategories');
       

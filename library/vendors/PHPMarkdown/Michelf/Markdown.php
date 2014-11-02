@@ -17,7 +17,7 @@ namespace Michelf;
 # Markdown Parser Class
 #
 
-class Markdown implements MarkdownInterface {
+class Markdown extends \Gdn_Pluggable implements MarkdownInterface {
 
 	### Version ###
 

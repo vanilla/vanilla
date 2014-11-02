@@ -11,6 +11,8 @@ require_once PATH_LIBRARY.'/vendors/PHPMarkdown/Michelf/MarkdownExtra.inc.php';
 
 /**
  * Our Markdown customizations as an extension of PHP Markdown.
+ *
+ * Vendor library has 1 edit: class `Markdown` must extend \Gdn_Pluggable.
  */
 class MarkdownVanilla extends Michelf\MarkdownExtra {
 
@@ -18,6 +20,8 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
     * Add spoiler tag: >!
     */
    public function __construct() {
+      $this->EventArguments['block_gamut'] =& $this->block_gamut;
+      $this->FireEvent('Init');
       $this->block_gamut += array(
          "doSpoilers"        => 55,
       );
@@ -30,7 +34,7 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
     * @param $text
     * @return string HTML.
     */
-   function doSpoilers($text) {
+   protected function doSpoilers($text) {
       $text = preg_replace_callback('/
            (                     # Wrap whole match in $1
             (?>
@@ -52,7 +56,7 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
     * @param $matches
     * @return string HTML.
     */
-   function _doSpoilers_callback($matches) {
+   protected function _doSpoilers_callback($matches) {
       $bq = $matches[1];
       // Trim one level of quoting - trim whitespace-only lines
       $bq = preg_replace('/^[ ]*>![ ]?|^[ ]+$/m', '', $bq);
@@ -75,14 +79,14 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
     * @param $matches
     * @return string HTML.
     */
-   function _doSpoilers_callback2($matches) {
+   protected function _doSpoilers_callback2($matches) {
       $pre = $matches[1];
       $pre = preg_replace('/^  /m', '', $pre);
       return $pre;
    }
 
    /**
-    * Quotes: Same as parent, but we added class="Quote"
+    * Quotes: Same as parent, but we added class="Quote".
     *
     * @param $matches
     * @return string HTML.
@@ -106,7 +110,7 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
    }
 
    /**
-    * Code: Same as parent, but do <pre><code> if there's newlines
+    * Code: Same as parent, but do <pre><code> if there's newlines.
     *
     * @param $code
     * @return string HTML.

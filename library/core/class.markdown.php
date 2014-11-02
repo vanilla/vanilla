@@ -17,6 +17,43 @@ require_once PATH_LIBRARY.'/vendors/PHPMarkdown/Michelf/MarkdownExtra.inc.php';
  *    - class `Markdown` __construct() must call parent::__construct().
  */
 class MarkdownVanilla extends Michelf\MarkdownExtra {
+
+   public function __construct() {
+      parent::__construct();
+
+      // Hook in strikeout by default.
+      $this->span_gamut += array(
+			"doStrikeout" => 15,
+      );
+   }
+
+   /**
+    * Instructions to handle strike tag: ~~text~~
+    *
+    * @param $text
+    * @return string HTML.
+    */
+   protected function doStrikeout($text) {
+		$text = preg_replace_callback('/
+				~~	   # open
+				(.+?)	# $1 = strike text
+				~~		# close
+			/xm',
+			array($this, '_doStrikeout_callback'), $text);
+
+		return $text;
+	}
+
+	/**
+    * Strikeout implementation. Chained from doStrikeout().
+    *
+    * @param $matches
+    * @return string HTML.
+    */
+	protected function _doStrikeout_callback($matches) {
+		return "<s>".$this->runSpanGamut($matches[1])."</s>";
+	}
+
    /**
     * Instructions to handle spoiler tag: >!
     *

@@ -135,7 +135,7 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
       
       $FireClass = !is_null($this->FireAs) ? $this->FireAs : $this->ClassName;
       $this->FireAs = NULL;
-      
+
       // Apply inline arguments to EventArguments
       if (is_array($Arguments))
          $this->EventArguments = array_merge($this->EventArguments, $Arguments);

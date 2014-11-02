@@ -1261,6 +1261,12 @@ EOT;
             $Mixed = $Formatter->Format($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
+
+            // nl2br
+            if(C('Garden.Format.ReplaceNewlines', TRUE)) {
+               $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+               $Mixed = FixNl2Br($Mixed);
+            }
             return $Mixed;
          }
       }

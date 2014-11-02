@@ -79,6 +79,12 @@ class Markdown extends \Gdn_Pluggable implements MarkdownInterface {
 	#
 	# Constructor function. Initialize appropriate member variables.
 	#
+	   // BEGIN VANILLA CHANGE
+		parent::__construct();
+		$this->EventArguments['block_gamut'] =& $this->block_gamut;
+      $this->FireEvent('Init');
+      // END VANILLA CHANGE
+
 		$this->_initDetab();
 		$this->prepareItalicsAndBold();
 	

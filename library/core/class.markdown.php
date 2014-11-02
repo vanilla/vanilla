@@ -12,24 +12,13 @@ require_once PATH_LIBRARY.'/vendors/PHPMarkdown/Michelf/MarkdownExtra.inc.php';
 /**
  * Our Markdown customizations as an extension of PHP Markdown.
  *
- * Vendor library has 1 edit: class `Markdown` must extend \Gdn_Pluggable.
+ * Vendor library has 2 edits:
+ *    - class `Markdown` must extend \Gdn_Pluggable.
+ *    - class `Markdown` __construct() must call parent::__construct().
  */
 class MarkdownVanilla extends Michelf\MarkdownExtra {
-
    /**
-    * Add spoiler tag: >!
-    */
-   public function __construct() {
-      $this->EventArguments['block_gamut'] =& $this->block_gamut;
-      $this->FireEvent('Init');
-      $this->block_gamut += array(
-         "doSpoilers"        => 55,
-      );
-      parent::__construct();
-   }
-
-   /**
-    * Handle spoiler tags.
+    * Instructions to handle spoiler tag: >!
     *
     * @param $text
     * @return string HTML.
@@ -38,10 +27,10 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
       $text = preg_replace_callback('/
            (                     # Wrap whole match in $1
             (?>
-              ^[ ]*>![ ]?        # ">" at the start of a line
+              ^[ ]*>![ ]?        # ">!" at the start of a line
                .+\n              # rest of the first line
               (.+\n)*            # subsequent consecutive lines
-              \n*                  # blanks
+              \n*                # blanks
             )+
            )
          /xm',
@@ -67,10 +56,18 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
       $bq = preg_replace('/^/m', "  ", $bq);
 
       // These leading spaces cause problem with <pre> content, so we need to fix that:
-      $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx', 
+      $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
          array(&$this, '_doSpoilers_callback2'), $bq);
 
-      return "\n". $this->hashBlock("<div class=\"Spoiler\">\n$bq\n</div>")."\n\n";
+      if (function_exists('FormatSpoiler')) {
+         // If an addon like Spoilers is ready for work.
+         $SpoilerText = FormatSpoiler($bq);
+      } else {
+         // Fallback simple format.
+         $SpoilerText = "<div class=\"Spoiler\">\n$bq\n</div>";
+      }
+
+      return "\n". $this->hashBlock($SpoilerText)."\n\n";
    }
 
    /**

@@ -15,14 +15,44 @@ require_once PATH_LIBRARY.'/vendors/PHPMarkdown/Michelf/MarkdownExtra.inc.php';
 class MarkdownVanilla extends Michelf\MarkdownExtra {
 
    /**
-    * Add spoiler tag: >!
+    * Add spoiler & strikeout tags.
     */
    public function __construct() {
       $this->block_gamut += array(
-         "doSpoilers"        => 55,
+         "doSpoilers"      => 55,
+      );
+      $this->span_gamut += array(
+			"doStrikeout"     => 15,
       );
       parent::__construct();
    }
+
+   /**
+    * Instructions to handle strike tag: ~~text~~
+    *
+    * @param $text
+    * @return string HTML.
+    */
+   protected function doStrikeout($text) {
+		$text = preg_replace_callback('/
+				~~	   # open
+				(.+?)	# $1 = strike text
+				~~		# close
+			/xm',
+			array($this, '_doStrikeout_callback'), $text);
+
+		return $text;
+	}
+
+	/**
+    * Strikeout implementation. Chained from doStrikeout().
+    *
+    * @param $matches
+    * @return string HTML.
+    */
+	protected function _doStrikeout_callback($matches) {
+		return "<s>".$this->runSpanGamut($matches[1])."</s>";
+	}
 
    /**
     * Handle spoiler tags.

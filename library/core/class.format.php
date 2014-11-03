@@ -1440,7 +1440,7 @@ EOT;
          return $Mixed;
 
       if (is_string($Mixed)) {
-         if (method_exists('Gdn_Format', $FormatMethod)) {
+         if (in_array($FormatMethod, self::$FormatWhitelist) && method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } elseif (function_exists('format'.$FormatMethod)) {
             $FormatMethod = 'format'.$FormatMethod;

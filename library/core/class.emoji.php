@@ -387,7 +387,7 @@ class Emoji {
 
    /**
     * Set the list of emoji that can be used by the editor.
-    * 
+    *
     * @param array $value The new editor list.
     */
    public function setEmojiEditorList($value) {
@@ -405,7 +405,7 @@ class Emoji {
       }
       $this->editorList = $list;
    }
-   
+
    /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
     *
@@ -414,7 +414,7 @@ class Emoji {
     * @return string The html that represents the emiji.
     */
    public function img($emoji_path, $emoji_name) {
-      return sprintf($this->format, Url($emoji_path), $emoji_name);
+      return sprintf($this->format, Asset($emoji_path), $emoji_name);
    }
 
    /**

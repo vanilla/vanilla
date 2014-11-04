@@ -35,6 +35,10 @@ class Gdn_Format {
 
    public static $MentionsUrlFormat = '/profile/{name}';
 
+   protected static $SanitizedFormats = array(
+      'Html', 'BBcode', 'Wysiwyg', 'Text', 'TextEx', 'Markdown'
+   );
+
    /**
     * The ActivityType table has some special sprintf search/replace values in the
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
@@ -1436,7 +1440,7 @@ EOT;
          return $Mixed;
 
       if (is_string($Mixed)) {
-         if (method_exists('Gdn_Format', $FormatMethod)) {
+         if (in_array($FormatMethod, self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } elseif (function_exists('format'.$FormatMethod)) {
             $FormatMethod = 'format'.$FormatMethod;

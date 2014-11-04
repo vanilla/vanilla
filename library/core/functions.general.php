@@ -3376,7 +3376,7 @@ if (!function_exists('ViewLocation')) {
          $Extensions = array('tpl', 'php');
 
          // 1. First we check the theme.
-         if ($Theme = Gdn::Controller()->Theme) {
+         if (Gdn::Controller() && $Theme = Gdn::Controller()->Theme) {
             foreach ($Extensions as $Ext) {
                $Paths[] = PATH_THEMES."/{$Theme}/views{$Controller}/$View.$Ext";
             }

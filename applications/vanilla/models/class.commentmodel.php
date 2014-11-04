@@ -20,6 +20,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class CommentModel extends VanillaModel {
+   const COMMENT_THRESHOLD_SMALL = 1000;
+   const COMMENT_THRESHOLD_LARGE = 50000;
+   const COUNT_RECALC_MOD = 50;
+
+
    /**
     * List of fields to order results by.
     *
@@ -901,7 +906,7 @@ class CommentModel extends VanillaModel {
             if ($Category) {
                $CountComments = GetValue('CountComments', $Category, 0) + 1;
 
-               if ($CountComments < 1000 || $CountComments % 20 == 0) {
+               if ($CountComments < self::COMMENT_THRESHOLD_SMALL || ($CountComments < self::COMMENT_THRESHOLD_LARGE && $CountComments % self::COUNT_RECALC_MOD == 0)) {
                   $CountComments = $this->SQL
                      ->Select('CountComments', 'sum', 'CountComments')
                      ->From('Discussion')

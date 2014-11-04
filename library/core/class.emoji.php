@@ -400,7 +400,7 @@ class Emoji {
          } elseif (isset($aliases2[$emoji])) {
             $list[$aliases2[$emoji]] = $emoji;
          } elseif (isset($this->emoji[$emoji])) {
-            $list[$emoji] = ":$emoji:";
+            $list[$this->ldelim.$emoji.$this->rdelim] = $emoji;
          }
       }
       $this->editorList = $list;

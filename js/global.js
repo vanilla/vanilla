@@ -1488,6 +1488,10 @@ jQuery(document).ready(function($) {
          ? $.parseJSON(emoji_array)
          : [];
 
+      // Emoji suggest template.
+      var emoji_suggest = gdn.getMeta('emojiSuggestTemplate',
+         '<li data-value=":${name}:" class="at-suggest-emoji"><img src="${url}" width="20" height="20" alt=":${name}:" class="emoji-img" /> <span class="emoji-name">${name}</span></li>');
+
       // Handle iframe situation
       var iframe_window = (iframe)
          ? iframe.contentWindow
@@ -1724,7 +1728,7 @@ jQuery(document).ready(function($) {
          })
          .atwho({
             at: ':',
-            tpl: '<li data-value=":${name}:" class="at-suggest-emoji"><img src="${url}" width="20" height="20" alt=":${name}:" class="emoji-img" /> <span class="emoji-name">${name}</span></li>',
+            tpl: emoji_suggest,
             limit: max_suggestions,
             data: emoji,
             cWindow: iframe_window

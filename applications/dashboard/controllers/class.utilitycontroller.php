@@ -224,30 +224,35 @@ class UtilityController extends DashboardController {
    public function Sort() {
       $this->Permission('Garden.Settings.Manage');
 
-      $Session = Gdn::Session();
-      $TransientKey = GetPostValue('TransientKey', '');
-      $Target = GetPostValue('Target', '');
-      if ($Session->ValidateTransientKey($TransientKey)) {
-         $TableID = GetPostValue('TableID', FALSE);
+      if (Gdn::Request()->IsAuthenticatedPostBack()) {
+         $TableID = Gdn::Request()->Post('TableID');
          if ($TableID) {
-            $Rows = GetPostValue($TableID, FALSE);
+            $Rows = Gdn::Request()->Post($TableID);
             if (is_array($Rows)) {
-               try {
-                  $Table = str_replace('Table', '', $TableID);
+               $Table = str_replace(array('Table', '`'), '', $TableID);
+               $ModelName = $Table.'Model';
+               if (class_exists($ModelName)) {
+                  $TableModel = new $ModelName();
+               } else {
                   $TableModel = new Gdn_Model($Table);
-                  foreach ($Rows as $Sort => $ID) {
-                     $TableModel->Update(array('Sort' => $Sort), array($Table.'ID' => $ID));
-                  }
-               } catch (Exception $ex) {
-                  $this->Form->AddError($ex->getMessage());
                }
+
+               foreach ($Rows as $Sort => $ID) {
+                  if (strpos($ID, '_') !== false) {
+                     list(,$ID) = explode('_', $ID, 2);
+                  }
+                  if (!$ID) {
+                     continue;
+                  }
+
+                  $TableModel->SetField($ID, 'Sort', $Sort);
+               }
+               $this->SetData('Result', true);
             }
          }
       }
-      if ($this->DeliveryType() != DELIVERY_TYPE_BOOL)
-         Redirect($Target);
 
-      $this->Render();
+      $this->Render('Blank');
    }
 
    /**

@@ -841,13 +841,19 @@ class DiscussionModel extends VanillaModel {
     * @param int $Limit Max number to get.
     * @param int $Offset Number to skip.
     * @param int $LastDiscussionID A hint for quicker paging.
+    * @param int $WatchUserID User to use for read/unread data.
     * @return Gdn_DataSet SQL results.
     */
-   public function GetByUser($UserID, $Limit, $Offset, $LastDiscussionID = FALSE) {
+   public function GetByUser($UserID, $Limit, $Offset, $LastDiscussionID = FALSE, $WatchUserID = FALSE) {
       $Perms = DiscussionModel::CategoryPermissions();
 
       if (is_array($Perms) && empty($Perms)) {
          return new Gdn_DataSet(array());
+      }
+
+      // Allow us to set perspective of a different user.
+      if (!$WatchUserID) {
+         $WatchUserID = $UserID;
       }
 
       // The point of this query is to select from one comment table, but filter and sort on another.
@@ -864,13 +870,13 @@ class DiscussionModel extends VanillaModel {
          ->OrderBy('d.DiscussionID', 'desc');
 
       // Join in the watch data.
-      if ($UserID > 0) {
+      if ($WatchUserID > 0) {
          $this->SQL
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
             ->Select('w.Participated')
-            ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
+            ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$WatchUserID, 'left');
       } else {
          $this->SQL
             ->Select('0', '', 'WatchUserID')
@@ -1743,6 +1749,10 @@ class DiscussionModel extends VanillaModel {
             continue;
 
          $UserID = $Row['UserID'];
+         // Check user can still see the discussion.
+         if (!Gdn::UserModel()->GetCategoryViewPermission($UserID, $Category['CategoryID']))
+            continue;
+            
          $Name = $Row['Name'];
          if (strpos($Name, '.Email.') !== FALSE) {
             $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;

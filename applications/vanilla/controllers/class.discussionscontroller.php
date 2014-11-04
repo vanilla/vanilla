@@ -159,6 +159,7 @@ class DiscussionsController extends VanillaController {
          $CountDiscussions,
          'discussions/%1$s'
       );
+      PagerModule::Current($this->Pager);
       if (!$this->Data('_PagerUrl'))
          $this->SetData('_PagerUrl', 'discussions/{Page}');
       $this->SetData('_Page', $Page);

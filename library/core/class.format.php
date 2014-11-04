@@ -1256,11 +1256,17 @@ EOT;
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
          } else {
-            require_once(PATH_LIBRARY.'/vendors/markdown/markdown.php');
-            $Mixed = Markdown($Mixed);
+            require_once(PATH_LIBRARY.'/core/class.markdown.php');
+            $Mixed = MarkdownVanilla::defaultTransform($Mixed);
             $Mixed = $Formatter->Format($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
+
+            // nl2br
+            if(C('Garden.Format.ReplaceNewlines', TRUE)) {
+               $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+               $Mixed = FixNl2Br($Mixed);
+            }
             return $Mixed;
          }
       }

@@ -218,11 +218,7 @@ class CategoriesController extends VanillaController {
          }
 
          // Load the subtree.
-         if (C('Vanilla.ExpandCategories'))
-            $Categories = CategoryModel::GetSubtree($CategoryIdentifier);
-         else
-            $Categories = array($Category);
-
+         $Categories = CategoryModel::GetSubtree($CategoryIdentifier, false);
          $this->SetData('Categories', $Categories);
 
          // Setup head
@@ -245,7 +241,10 @@ class CategoriesController extends VanillaController {
 
          // Get a DiscussionModel
          $DiscussionModel = new DiscussionModel();
-         $CategoryIDs = ConsolidateArrayValuesByKey($this->Data('Categories'), 'CategoryID');
+         $CategoryIDs = array($CategoryID);
+         if (C('Vanilla.ExpandCategories')) {
+            $CategoryIDs = array_merge($CategoryIDs, array_column($this->Data('Categories'), 'CategoryID'));
+         }
          $Wheres = array('d.CategoryID' => $CategoryIDs);
          $this->SetData('_ShowCategoryLink', count($CategoryIDs) > 1);
 
@@ -260,6 +259,12 @@ class CategoriesController extends VanillaController {
             $Offset = 0;
 
          $Page = PageNumber($Offset, $Limit);
+
+         // Allow page manipulation
+         $this->EventArguments['Page'] = &$Page;
+         $this->EventArguments['Offset'] = &$Offset;
+         $this->EventArguments['Limit'] = &$Limit;
+         $this->FireEvent('AfterPageCalculation');
 
          // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
          $MaxPages = C('Vanilla.Categories.MaxPages');
@@ -285,7 +290,9 @@ class CategoriesController extends VanillaController {
 
          // Build a pager
          $PagerFactory = new Gdn_PagerFactory();
-         $this->Pager = $PagerFactory->GetPager('Pager', $this);
+         $this->EventArguments['PagerType'] = 'Pager';
+         $this->FireEvent('BeforeBuildPager');
+         $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
          $this->Pager->ClientID = 'Pager';
          $this->Pager->Configure(
             $Offset,
@@ -296,6 +303,8 @@ class CategoriesController extends VanillaController {
          $this->Pager->Record = $Category;
          PagerModule::Current($this->Pager);
          $this->SetData('_Page', $Page);
+         $this->SetData('_Limit', $Limit);
+         $this->FireEvent('AfterBuildPager');
 
          // Set the canonical Url.
          $this->CanonicalUrl(CategoryUrl($Category, PageNumber($Offset, $Limit)));
@@ -347,7 +356,7 @@ class CategoriesController extends VanillaController {
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
 
       if ($Category) {
-         $Subtree = CategoryModel::GetSubtree($Category);
+         $Subtree = CategoryModel::GetSubtree($Category, false);
          $CategoryIDs = ConsolidateArrayValuesByKey($Subtree, 'CategoryID');
          $Categories = $this->CategoryModel->GetFull($CategoryIDs)->ResultArray();
       } else {

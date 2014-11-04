@@ -403,13 +403,17 @@ jQuery(document).ready(function($) {
          var tableId = $($.tableDnD.currentTable).attr('id');
          // Add in the transient key for postback authentication
          var transientKey = gdn.definition('TransientKey');
-         var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
+         var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = gdn.definition('WebRoot', '');
-         $.post(gdn.combinePaths(webRoot, 'index.php?p=/dashboard/utility/sort/'), data, function(response) {
-            if (response == 'TRUE')
-               $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
-
-         });
+         $.post(
+            gdn.url('/utility/sort.json'),
+            data,
+            function(response) {
+               if (response.Result) {
+                  $('#' + tableId + ' tbody tr td').effect("highlight", {}, 1000);
+               }
+            }
+         );
       }});
 
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters

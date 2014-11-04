@@ -382,7 +382,6 @@ if (!function_exists('Asset')) {
       if (IsUrl($Destination)) {
          $Result = $Destination;
       } else {
-         $aroot = Gdn::Request()->AssetRoot();
          $Result = Gdn::Request()->UrlDomain($WithDomain).Gdn::Request()->AssetRoot().'/'.ltrim($Destination, '/');
       }
 

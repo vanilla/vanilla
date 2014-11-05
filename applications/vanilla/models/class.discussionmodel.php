@@ -1076,13 +1076,29 @@ class DiscussionModel extends VanillaModel {
          }
 
          $Categories = CategoryModel::Categories();
-         $Count = 0;
 
-         foreach ($Categories as $Cat) {
-            if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms))
-               continue;
-            $Count += (int)$Cat['CountDiscussions'];
+//         $CountOld = 0;
+//         foreach ($Categories as $Cat) {
+//            if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms))
+//               continue;
+//            $CountOld += (int)$Cat['CountDiscussions'];
+//         }
+
+         if (!is_array($Perms)) {
+            $Perms = array_keys($Categories);
          }
+
+         $Count = 0;
+         foreach ($Perms as $CategoryID) {
+            if (isset($Categories[$CategoryID])) {
+               $Count += (int)$Categories[$CategoryID]['CountDiscussions'];
+            }
+         }
+
+//         if ($Count !== $CountOld) {
+//            throw new Exception("Category Count error!", 500);
+//         }
+
          return $Count;
       }
 

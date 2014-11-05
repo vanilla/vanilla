@@ -33,7 +33,7 @@ class DiscussionsController extends VanillaController {
    /**
     * Category object.
     *
-    * Used to limit which discussion are returned to a particular category.
+    * Used to limit which discussions are returned to a particular category.
     *
     * @since 2.0.0
     * @access public
@@ -49,6 +49,11 @@ class DiscussionsController extends VanillaController {
     * @var int
     */
    public $CategoryID;
+
+   /**
+    * @var array Limit the discussions to just this list of categories, checked for view permission.
+    */
+   protected $categoryIDs;
 
    /**
     * "Table" layout for discussions. Mimics more traditional forum discussion layout.
@@ -127,22 +132,31 @@ class DiscussionsController extends VanillaController {
       // Set criteria & get discussions data
       $this->SetData('Category', FALSE, TRUE);
       $DiscussionModel = new DiscussionModel();
-      $DiscussionModel->Watching = TRUE;
+
+      // Check for individual categories.
+      $categoryIDs = $this->getCategoryIDs();
+      $where = array();
+      if ($categoryIDs) {
+         $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
+      } else {
+         $DiscussionModel->Watching = TRUE;
+      }
 
       // Get Discussion Count
-      $CountDiscussions = $DiscussionModel->GetCount();
+      $CountDiscussions = $DiscussionModel->GetCount($where);
 
-      if ($MaxPages)
+      if ($MaxPages) {
          $CountDiscussions = min($MaxPages * $Limit, $CountDiscussions);
+      }
 
       $this->SetData('CountDiscussions', $CountDiscussions);
 
       // Get Announcements
-      $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements() : FALSE;
+      $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($where) : FALSE;
 		$this->SetData('Announcements', $this->AnnounceData !== FALSE ? $this->AnnounceData : array(), TRUE);
 
       // Get Discussions
-      $this->DiscussionData = $DiscussionModel->GetWhere(FALSE, $Offset, $Limit);
+      $this->DiscussionData = $DiscussionModel->GetWhere($where, $Offset, $Limit);
 
       $this->SetData('Discussions', $this->DiscussionData, TRUE);
       $this->SetJson('Loading', $Offset . ' to ' . $Limit);
@@ -389,6 +403,20 @@ class DiscussionsController extends VanillaController {
       $this->SetData('Title', T('Bookmarks'));
       $this->SetData('Discussions', $Discussions);
       $this->Render('Popin');
+   }
+
+   /**
+    * @return array
+    */
+   public function getCategoryIDs() {
+      return $this->categoryIDs;
+   }
+
+   /**
+    * @param array $categoryIDs
+    */
+   public function setCategoryIDs($categoryIDs) {
+      $this->categoryIDs = $categoryIDs;
    }
 
    /**

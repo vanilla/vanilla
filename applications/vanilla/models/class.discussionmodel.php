@@ -973,8 +973,6 @@ class DiscussionModel extends VanillaModel {
             else
                self::$_CategoryPermissions = array(); // no permission
          } else {
-            $SQL = Gdn::SQL();
-
             $Categories = CategoryModel::Categories();
             $IDs = array();
 
@@ -1029,7 +1027,7 @@ class DiscussionModel extends VanillaModel {
           'Url' => $Url
       ));
       if ($Body == '')
-         $Body = $ForeignUrl;
+         $Body = $Url;
       if ($Body == '')
          $Body = FormatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
 

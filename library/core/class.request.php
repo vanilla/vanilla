@@ -49,7 +49,12 @@ class Gdn_Request {
     * @return string Returns the current asset root.
     */
    public function AssetRoot($AssetRoot = null) {
-      return $this->_ParsedRequestElement('AssetRoot', rtrim('/'.trim($AssetRoot, '/'), '/'));
+      if ($AssetRoot !== null) {
+         $Result = $this->_ParsedRequestElement('AssetRoot', rtrim('/'.trim($AssetRoot, '/'), '/'));
+      } else {
+         $Result = $this->_ParsedRequestElement('AssetRoot');
+      }
+      return $Result;
    }
 
    /**

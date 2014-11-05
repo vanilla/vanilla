@@ -716,14 +716,14 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->Select('d.DiscussionID')
          ->From('Discussion d');
 
-      if ($CategoryID > 0 || $GroupID > 0) {
+      if (!is_array($CategoryID) && ($CategoryID > 0 || $GroupID > 0)) {
          $this->SQL->Where('d.Announce >', '0');
       } else {
          $this->SQL->Where('d.Announce', 1);
       }
       if ($GroupID > 0) {
          $this->SQL->Where('d.GroupID', $GroupID);
-      } elseif ($CategoryID > 0) {
+      } elseif (is_array($CategoryID) || $CategoryID > 0) {
          $this->SQL->Where('d.CategoryID', $CategoryID);
       }
 
@@ -760,7 +760,7 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->WhereIn('d.DiscussionID', $AnnouncementIDs);
 
       // If we aren't viewing announcements in a category then only show global announcements.
-      if (!$Wheres) {
+      if (!$Wheres || is_array($CategoryID)) {
          $this->SQL->Where('d.Announce', 1);
       } else {
          $this->SQL->Where('d.Announce >', 0);
@@ -806,7 +806,7 @@ class DiscussionModel extends VanillaModel {
     */
    public function GetAnnouncementCacheKey($CategoryID = 0) {
       $Key = 'Announcements';
-      if ($CategoryID > 0) {
+      if (!is_array($CategoryID) && $CategoryID > 0) {
          $Key .= ':' . $CategoryID;
       }
       return $Key;
@@ -1766,7 +1766,7 @@ class DiscussionModel extends VanillaModel {
          // Check user can still see the discussion.
          if (!Gdn::UserModel()->GetCategoryViewPermission($UserID, $Category['CategoryID']))
             continue;
-            
+
          $Name = $Row['Name'];
          if (strpos($Name, '.Email.') !== FALSE) {
             $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;

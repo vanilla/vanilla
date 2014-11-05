@@ -75,7 +75,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *
     * @var array The data from method calls.
     */
-   public $Data;
+   public $Data = array();
 
    /**
     * The Head module that this controller should use to add CSS files.
@@ -1227,7 +1227,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
-         ob_clean();
+         if (ob_get_level()) {
+            ob_clean();
+         }
          $this->ContentType('application/json');
          $this->SetHeader('X-Content-Type-Options', 'nosniff');
       }
@@ -1267,7 +1269,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
          $ExitRender = $this->RenderData();
-         if ($ExitRender) return;
+         if ($ExitRender) {
+            return;
+         }
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1429,7 +1433,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
 
-//      $this->SendHeaders();
+      $this->SendHeaders();
 
       // Check for a special view.
       $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), FALSE, FALSE, FALSE);
@@ -1443,7 +1447,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
       }
 
-      @ob_clean();
+      if (ob_get_level()) {
+         ob_clean();
+      }
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             safeHeader('Content-Type: text/xml', TRUE);
@@ -1580,8 +1586,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       // Try cleaning out any notices or errors.
-      @ob_clean();
-
+      if (ob_get_level()) {
+         ob_clean();
+      }
 
       if ($Code >= 400 && $Code <= 505)
          safeHeader("HTTP/1.0 $Code", TRUE, $Code);
@@ -1735,9 +1742,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // And now search for/add all JS files.
             $Cdns = array();
-            if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', FALSE)) {
+            if (!C('Garden.Cdns.Disable', false)) {
                $Cdns = array(
-                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'
+                  'jquery.js' => "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
                   );
             }
 

@@ -52,6 +52,7 @@
             echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
          ?>
       </li>
+      <?php $this->FireEvent('ExtendedRegistrationFields'); ?>
       <?php if ($this->Form->GetValue('DiscoveryText') || GetValue('DiscoveryText', $this->Form->ValidationResults()) ): ?>
       <li>
          <?php

@@ -329,6 +329,23 @@ class CategoryModel extends Gdn_Model {
       }
    }
 
+   /**
+    * Remove categories that a user does not have permission to view.
+    *
+    * @param array $categoryIDs An array of categories to filter.
+    * @return array Returns an array of category IDs that are okay to view.
+    */
+   public static function filterCategoryPermissions($categoryIDs) {
+      $permissionCategories = static::GetByPermission('Discussions.View');
+
+      if ($permissionCategories === true) {
+         return $categoryIDs;
+      } else {
+         $permissionCategoryIDs = array_keys($permissionCategories);
+         return array_intersect($categoryIDs, $permissionCategoryIDs);
+      }
+   }
+
    public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL, $Filter = array(), $PermFilter = array()) {
       static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
       $Field = $Map[$Permission];

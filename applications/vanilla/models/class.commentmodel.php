@@ -820,7 +820,14 @@ class CommentModel extends VanillaModel {
 
                // Check for premoderation
                if (!GetValue('Approved', $FormPostValues)) {
-                  $Premoderation = QueueModel::Premoderate('Comment', $Fields);
+                  $QueueModel = QueueModel::Instance();
+                  $Options = array();
+
+                  $this->EventArguments['Options'] = &$Options;
+                  $this->EventArguments['Fields'] = &$Fields;
+                  $this->FireEvent('BeforePremoderate');
+
+                  $Premoderation = $QueueModel->Premoderate('Comment', $Fields, $Options);
                   if ($Premoderation) {
                      return UNAPPROVED;
                   }

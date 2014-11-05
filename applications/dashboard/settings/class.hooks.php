@@ -230,7 +230,7 @@ class DashboardHooks implements Gdn_IPlugin {
          // Queue the record as a reported.
          $queue = QueueModel::Instance();
          $record = unserialize($log['Data']);
-         $row = QueueModel::convertToQueueRow($log['RecordType'], $record);
+         $row = $queue->convertToQueueRow($log['RecordType'], $record);
          $row['Queue'] = 'reported';
          $row['ForeignDateInserted'] = $record['DateInserted'];
          $id = $queue->Save($row);

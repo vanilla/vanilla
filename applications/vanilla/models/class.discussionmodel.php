@@ -1592,7 +1592,13 @@ class DiscussionModel extends VanillaModel {
 
                if (!GetValue('Approved', $FormPostValues)) {
                   $QueueModel = QueueModel::Instance();
-                  $Premoderation = $QueueModel->Premoderate('Discussion', $Fields);
+                  $Options = array();
+
+                  $this->EventArguments['Options'] = &$Options;
+                  $this->EventArguments['Fields'] = &$Fields;
+                  $this->FireEvent('BeforePremoderate');
+
+                  $Premoderation = $QueueModel->Premoderate('Discussion', $Fields, $Options);
                   if ($Premoderation) {
                      return UNAPPROVED;
                   }

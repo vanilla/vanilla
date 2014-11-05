@@ -65,7 +65,6 @@ class QueueModel extends Gdn_Model {
 
       $SaveData = array();
       $Attributes = array();
-      $ThrowEvent = FALSE;
 
       // Grab the current queue.
       if (isset($data['QueueID'])) {
@@ -86,9 +85,6 @@ class QueueModel extends Gdn_Model {
             if (!$Attributes)
                $Attributes = array();
 
-            if ($CurrentItem['Queue'] !== $data['Queue']) {
-               $ThrowEvent = true;
-            }
          } else {
             $PrimaryKeyVal = FALSE;
             $Insert = TRUE;
@@ -147,22 +143,9 @@ class QueueModel extends Gdn_Model {
 
          if ($Insert === FALSE) {
             $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
-
-            if ($ThrowEvent) {
-               $this->EventArguments['QueueID'] = $PrimaryKeyVal;
-               $this->FireEvent('BeforeInsert');
-            }
             $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
-
-
          } else {
-            $this->FireEvent('BeforeInsert');
             $PrimaryKeyVal = $this->Insert($Fields);
-
-            if ($PrimaryKeyVal) {
-               $this->EventArguments['QueueID'] = $PrimaryKeyVal;
-               $this->FireEvent('AfterInsert');
-            }
          }
       } else {
          $PrimaryKeyVal = FALSE;
@@ -348,9 +331,16 @@ class QueueModel extends Gdn_Model {
       $Qm->FireEvent('CheckPremoderation');
 
       $IsPremoderation = $Qm->EventArguments['Premoderate'];
+      $Rejected = val('Rejected', $Options, false);
 
-      if ($IsPremoderation) {
-         $queueRow = self::convertToQueueRow($recordType, $data);
+      if ($Rejected) {
+         return false;
+      }
+
+      if (!$Rejected && $IsPremoderation) {
+
+         $instance = self::Instance();
+         $queueRow = $instance->convertToQueueRow($recordType, $data);
          $queueRow = array_replace($queueRow, $row);
          // Allow InsertUserID to be overwritten
          if (isset($Qm->EventArguments['InsertUserID']) && !$ApprovalRequired) {
@@ -472,25 +462,37 @@ class QueueModel extends Gdn_Model {
          }
 
          $saveData = $this->convertToSaveData($queueItem);
-         if ($Attributes) {
-            $saveData['Attributes'] = serialize(
-               array(
-                  'Moderation' =>
-                     array(
-                        'Approved' => true,
-                        'ApprovedUserID' => $this->getModeratorUserID(),
-                        'DateApproved' => Gdn_Format::ToDateTime()
-                     )
-               )
-            );
-         }
+// @todo. Need to get current attributes; if any before writing new ones.
+//         if ($Attributes) {
+//            $saveData['Attributes'] = serialize(
+//               array(
+//                  'Moderation' =>
+//                     array(
+//                        'Approved' => true,
+//                        'ApprovedUserID' => $this->getModeratorUserID(),
+//                        'DateApproved' => Gdn_Format::ToDateTime(),
+//                     )
+//               )
+//            );
+//         }
          $saveData['Approved'] = true;
 
+         $this->EventArguments['QueueItem'] = $queueItem;
+         $this->EventArguments['SaveData'] =& $saveData;
+         $this->FireEvent('BeforeApproveSave');
+
          if (strtolower($queueItem['ForeignType']) == 'activitycomment') {
+            // Activity Comments do not have data/attributes.
+            unset($saveData['Data']);
             $ID = $model->Comment($saveData);
          } else {
             $ID = $model->Save($saveData);
          }
+
+         $this->EventArguments['QueueItem'] = $queueItem;
+         $this->EventArguments['ID'] = $ID;
+         $this->FireEvent('AfterApproveSave');
+
          // Add the validation results from the model to this one.
          $this->Validation->AddValidationResult($model->ValidationResults());
          $valid = count($this->ValidationResults()) == 0;
@@ -505,6 +507,9 @@ class QueueModel extends Gdn_Model {
       }
       // Update Queue
       if (empty($foreignID)) {
+         if ($ContentType == 'Activity') {
+            $ID = val('ActivityID', $ID);
+         }
          $foreignID = $this->generateForeignID(null, $ID, $ContentType);
       }
       $saved = $this->Save(
@@ -707,6 +712,11 @@ class QueueModel extends Gdn_Model {
             throw new Gdn_UserException('Unknown Type: ' . $recordType);
       }
 
+
+      $this->EventArguments['Data'] = $data;
+      $this->EventArguments['QueueRow'] = &$queueRow;
+      $this->FireEvent('AfterConvertToQueueRow');
+
       return $queueRow;
 
    }
@@ -835,7 +845,13 @@ class QueueModel extends Gdn_Model {
 
       switch ($contentType) {
          case 'comment':
-            return 'C-'.($newID ?: val('CommentID', $data, $unique));
+            $commentID = val('CommentID', $data);
+            if (!empty($newID)) {
+               $commentID = $newID;
+            } elseif (empty($commentID)) {
+               $commentID = $unique;
+            }
+            return 'C-' . $commentID;
          case 'discussion':
             return 'D-'.($newID ?: val('DiscussionID', $data, $unique));
          case 'activity':

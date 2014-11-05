@@ -12,7 +12,7 @@ class LogModel extends Gdn_Pluggable {
    protected static $_TransactionID = NULL;
 
    /// METHODS ///
-   
+
    public static function BeginTransaction() {
       self::$_TransactionID = TRUE;
    }
@@ -313,7 +313,7 @@ class LogModel extends Gdn_Pluggable {
          if ($LogRow2) {
             $LogID = $LogRow2['LogID'];
             $Set = array();
-            
+
             $Data = array_merge(unserialize($LogRow2['Data']), $Data);
 
             $OtherUserIDs = explode(',',$LogRow2['OtherUserIDs']);
@@ -350,11 +350,20 @@ class LogModel extends Gdn_Pluggable {
                   $Set['TransactionLogID'] = $LogID;
                }
             }
+            $L = self::_Instance();
+            $L->EventArguments['Update'] =& $Set;
+            $L->FireEvent('BeforeUpdate');
             
             Gdn::SQL()->Put(
                'Log',
                $Set,
                array('LogID' => $LogID));
+
+            $L->EventArguments['LogID'] = $LogID;
+            $L->EventArguments['LogRow2'] = $LogRow2;
+            $L->FireEvent('AfterUpdate');
+
+
          } else {
             $L = self::_Instance();
             $L->EventArguments['Log'] =& $LogRow;

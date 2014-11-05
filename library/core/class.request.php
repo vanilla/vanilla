@@ -924,8 +924,8 @@ class Gdn_Request {
     * @return int Returns 0 if the urls are equal or 1, -1 if they are not.
     */
    function UrlCompare($url1, $url2) {
-      $parts1 = parse_url($url1);
-      $parts2 = parse_url($url2);
+      $parts1 = parse_url($this->Url($url1));
+      $parts2 = parse_url($this->Url($url2));
 
 
       $defaults = array(

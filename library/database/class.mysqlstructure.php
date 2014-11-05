@@ -566,6 +566,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          'blob',
          'mediumblob',
          'longblob',
+         'bit',
       );
 
       if (!is_array($Column->Type) && !in_array($Column->Type, $ValidColumnTypes))

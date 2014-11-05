@@ -438,8 +438,7 @@ class Gdn_Database {
    public function Structure() {
       if(is_null($this->_Structure)) {
          $Name = $this->Engine . 'Structure';
-         $this->_Structure = Gdn::Factory($Name);
-         $this->_Structure->Database = $this;
+         $this->_Structure = Gdn::Factory($Name, $this);
       }
 
       return $this->_Structure;

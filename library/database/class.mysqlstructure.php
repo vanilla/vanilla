@@ -569,7 +569,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
          'bit',
       );
 
-      if (!is_array($Column->Type) && !in_array($Column->Type, $ValidColumnTypes))
+      if (!is_array($Column->Type) && !in_array(strtolower($Column->Type), $ValidColumnTypes))
          throw new Exception(sprintf(T('The specified data type (%1$s) is not accepted for the MySQL database.'), $Column->Type));
 
       $Return = '`'.$Column->Name.'` '.$Column->Type;

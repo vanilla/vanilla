@@ -45,6 +45,7 @@
             echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
          ?>
       </li>
+      <?php $this->FireEvent('ExtendedRegistrationFields'); ?>
       <?php $this->FireEvent('RegisterFormBeforeTerms'); ?>
       <li>
          <?php

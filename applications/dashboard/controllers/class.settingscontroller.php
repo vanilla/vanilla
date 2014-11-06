@@ -1136,7 +1136,7 @@ class SettingsController extends DashboardController {
             $this->Form->AddError($Ex);
          }
 
-         $AsyncRequest = ($this->DeliveryType() === DELIVERY_METHOD_JSON)
+         $AsyncRequest = ($this->DeliveryType() === DELIVERY_TYPE_VIEW)
             ? TRUE
             : FALSE;
 

@@ -382,18 +382,15 @@ if (!function_exists('Asset')) {
       if (IsUrl($Destination)) {
          $Result = $Destination;
       } else {
-         $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
-         if (!$WithDomain)
-            array_unshift($Parts, '/');
-
-         $Result = CombinePaths($Parts, '/');
+         $Result = Gdn::Request()->UrlDomain($WithDomain).Gdn::Request()->AssetRoot().'/'.ltrim($Destination, '/');
       }
 
       if ($AddVersion) {
-         if (strpos($Result, '?') === FALSE)
+         if (strpos($Result, '?') === FALSE) {
             $Result .= '?';
-         else
+         } else {
             $Result .= '&';
+         }
 
          // Figure out which version to put after the asset.
          $Version = APPLICATION_VERSION;
@@ -685,15 +682,15 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
       $Return = array();
       foreach ($Array as $Index => $AssociativeArray) {
 
-			if (is_object($AssociativeArray)) {
-				if($ValueKey === '') {
-					$Return[] = $AssociativeArray->$Key;
-				} elseif(property_exists($AssociativeArray, $ValueKey)) {
-					$Return[$AssociativeArray[$Key]] = $AssociativeArray->$ValueKey;
-				} else {
-					$Return[$AssociativeArray->$Key] = $DefaultValue;
-				}
-			} elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
+		if (is_object($AssociativeArray)) {
+			if($ValueKey === '') {
+				$Return[] = $AssociativeArray->$Key;
+			} elseif(property_exists($AssociativeArray, $ValueKey)) {
+				$Return[$AssociativeArray->$Key] = $AssociativeArray->$ValueKey;
+			} else {
+				$Return[$AssociativeArray->$Key] = $DefaultValue;
+			}
+		} elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
             if($ValueKey === '') {
                $Return[] = $AssociativeArray[$Key];
             } elseif (array_key_exists($ValueKey, $AssociativeArray)) {
@@ -3111,7 +3108,7 @@ if (!function_exists('SliceString')) {
       if (!$Length) {
          return $String;
       }
-      
+
       if (function_exists('mb_strimwidth')) {
       	static $Charset;
       	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
@@ -3129,14 +3126,10 @@ if (!function_exists('SmartAsset')) {
     */
    function SmartAsset($Destination = '', $WithDomain = FALSE, $AddVersion = FALSE) {
       $Destination = str_replace('\\', '/', $Destination);
-      if (substr($Destination, 0, 7) == 'http://' || substr($Destination, 0, 8) == 'https://') {
+      if (IsUrl($Destination)) {
          $Result = $Destination;
       } else {
-         $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
-         if (!$WithDomain)
-            array_unshift($Parts, '/');
-
-         $Result = CombinePaths($Parts, '/');
+         $Result = Gdn::Request()->UrlDomain($WithDomain).Gdn::Request()->AssetRoot().'/'.ltrim($Destination, '/');
       }
 
       if ($AddVersion) {
@@ -3382,7 +3375,7 @@ if (!function_exists('ViewLocation')) {
          $Extensions = array('tpl', 'php');
 
          // 1. First we check the theme.
-         if ($Theme = Gdn::Controller()->Theme) {
+         if (Gdn::Controller() && $Theme = Gdn::Controller()->Theme) {
             foreach ($Extensions as $Ext) {
                $Paths[] = PATH_THEMES."/{$Theme}/views{$Controller}/$View.$Ext";
             }

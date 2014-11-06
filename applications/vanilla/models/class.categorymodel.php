@@ -98,12 +98,12 @@ class CategoryModel extends Gdn_Model {
    }
 
    /**
+    * Gets either all of the categories or a single category.
     *
-    *
+    * @param int|string|bool $ID Either the category ID or the category url code.
+    * If nothing is passed then all categories are returned.
+    * @return array Returns either one or all categories.
     * @since 2.0.18
-    * @access public
-    * @param int $ID
-    * @return object DataObject
     */
    public static function Categories($ID = FALSE) {
 
@@ -326,6 +326,23 @@ class CategoryModel extends Gdn_Model {
       foreach (self::Categories() as $Category) {
          if ($Category['CategoryID'] > 0)
             return $Category;
+      }
+   }
+
+   /**
+    * Remove categories that a user does not have permission to view.
+    *
+    * @param array $categoryIDs An array of categories to filter.
+    * @return array Returns an array of category IDs that are okay to view.
+    */
+   public static function filterCategoryPermissions($categoryIDs) {
+      $permissionCategories = static::GetByPermission('Discussions.View');
+
+      if ($permissionCategories === true) {
+         return $categoryIDs;
+      } else {
+         $permissionCategoryIDs = array_keys($permissionCategories);
+         return array_intersect($categoryIDs, $permissionCategoryIDs);
       }
    }
 

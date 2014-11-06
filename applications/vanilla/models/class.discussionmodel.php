@@ -716,14 +716,14 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->Select('d.DiscussionID')
          ->From('Discussion d');
 
-      if ($CategoryID > 0 || $GroupID > 0) {
+      if (!is_array($CategoryID) && ($CategoryID > 0 || $GroupID > 0)) {
          $this->SQL->Where('d.Announce >', '0');
       } else {
          $this->SQL->Where('d.Announce', 1);
       }
       if ($GroupID > 0) {
          $this->SQL->Where('d.GroupID', $GroupID);
-      } elseif ($CategoryID > 0) {
+      } elseif (is_array($CategoryID) || $CategoryID > 0) {
          $this->SQL->Where('d.CategoryID', $CategoryID);
       }
 
@@ -760,7 +760,7 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->WhereIn('d.DiscussionID', $AnnouncementIDs);
 
       // If we aren't viewing announcements in a category then only show global announcements.
-      if (!$Wheres) {
+      if (!$Wheres || is_array($CategoryID)) {
          $this->SQL->Where('d.Announce', 1);
       } else {
          $this->SQL->Where('d.Announce >', 0);
@@ -806,7 +806,7 @@ class DiscussionModel extends VanillaModel {
     */
    public function GetAnnouncementCacheKey($CategoryID = 0) {
       $Key = 'Announcements';
-      if ($CategoryID > 0) {
+      if (!is_array($CategoryID) && $CategoryID > 0) {
          $Key .= ':' . $CategoryID;
       }
       return $Key;
@@ -973,8 +973,6 @@ class DiscussionModel extends VanillaModel {
             else
                self::$_CategoryPermissions = array(); // no permission
          } else {
-            $SQL = Gdn::SQL();
-
             $Categories = CategoryModel::Categories();
             $IDs = array();
 
@@ -1029,7 +1027,7 @@ class DiscussionModel extends VanillaModel {
           'Url' => $Url
       ));
       if ($Body == '')
-         $Body = $ForeignUrl;
+         $Body = $Url;
       if ($Body == '')
          $Body = FormatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
 
@@ -1078,13 +1076,29 @@ class DiscussionModel extends VanillaModel {
          }
 
          $Categories = CategoryModel::Categories();
-         $Count = 0;
 
-         foreach ($Categories as $Cat) {
-            if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms))
-               continue;
-            $Count += (int)$Cat['CountDiscussions'];
+//         $CountOld = 0;
+//         foreach ($Categories as $Cat) {
+//            if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms))
+//               continue;
+//            $CountOld += (int)$Cat['CountDiscussions'];
+//         }
+
+         if (!is_array($Perms)) {
+            $Perms = array_keys($Categories);
          }
+
+         $Count = 0;
+         foreach ($Perms as $CategoryID) {
+            if (isset($Categories[$CategoryID])) {
+               $Count += (int)$Categories[$CategoryID]['CountDiscussions'];
+            }
+         }
+
+//         if ($Count !== $CountOld) {
+//            throw new Exception("Category Count error!", 500);
+//         }
+
          return $Count;
       }
 
@@ -1752,7 +1766,7 @@ class DiscussionModel extends VanillaModel {
          // Check user can still see the discussion.
          if (!Gdn::UserModel()->GetCategoryViewPermission($UserID, $Category['CategoryID']))
             continue;
-            
+
          $Name = $Row['Name'];
          if (strpos($Name, '.Email.') !== FALSE) {
             $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;

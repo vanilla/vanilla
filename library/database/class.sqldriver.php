@@ -1283,10 +1283,16 @@ abstract class Gdn_SQLDriver {
     * @return Gdn_SQLDriver $this
     */
    public function Limit($Limit, $Offset = FALSE) {
+      // SQL chokes on ints over 2^31
+      if ($Limit > 2147483648) {
+         throw new Exception(T('Invalid limit defined.'));
+      }
+
       $this->_Limit = $Limit;
 
-      if ($Offset !== FALSE)
-         $this->_Offset = $Offset;
+      if ($Offset !== FALSE) {
+         $this->Offset($Offset);
+      }
 
       return $this;
    }
@@ -1387,6 +1393,11 @@ abstract class Gdn_SQLDriver {
     * @return Gdn_SQLDriver $this
     */
    public function Offset($Offset) {
+      // SQL chokes on ints over 2^31
+      if ($Offset > 2147483648) {
+         throw new Exception(T('Invalid offset defined.'));
+      }
+
       $this->_Offset = $Offset;
       return $this;
    }

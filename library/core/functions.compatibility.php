@@ -326,9 +326,9 @@ if (!function_exists('safeHeader')) {
     * context is not HTTP.
     *
     * @staticvar string $context
-    * @param type $header
-    * @param type $replace
-    * @param type $http_response_code
+    * @param string $header
+    * @param bool $replace
+    * @param int|null $http_response_code
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
       static $context;

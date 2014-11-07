@@ -150,7 +150,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          ?>
          <span class="MItem MCount ViewCount"><?php
             printf(PluralTranslate($Discussion->CountViews,
-               '%s view', '%s views', '%s view', '%s views'),
+               '%s view html', '%s views html', T('%s view'), T('%s views')),
                BigPlural($Discussion->CountViews, '%s view'));
          ?></span>
          <span class="MItem MCount CommentCount"><?php

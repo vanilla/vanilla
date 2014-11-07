@@ -184,13 +184,13 @@ function WriteListItem($Row, $Depth = 1) {
 
             <span class="MItem MItem-Count DiscussionCount"><?php
                printf(PluralTranslate($Row['CountAllDiscussions'],
-                  '%s discussion', '%s discussions', '%s discussion', '%s discussions'),
+                  '%s discussion html', '%s discussions html', T('%s discussion'), T('%s discussions')),
                   BigPlural($Row['CountAllDiscussions'], '%s discussion'));
             ?></span>
 
             <span class="MItem MItem-Count CommentCount"><?php
                printf(PluralTranslate($Row['CountAllComments'],
-                  '%s comment', '%s comments', '%s comment', '%s comments'),
+                  '%s comment html', '%s comments html', T('%s comment'), T('%s comments')),
                   BigPlural($Row['CountAllComments'], '%s comment'));
             ?></span>
 

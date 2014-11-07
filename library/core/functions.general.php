@@ -2805,7 +2805,9 @@ if (!function_exists('Redirect')) {
 
       // Close any db connections before exit
       $Database = Gdn::Database();
-      $Database->CloseConnection();
+      if ($Database instanceof Gdn_Database) {
+         $Database->CloseConnection();
+      }
       // Clear out any previously sent content
       @ob_end_clean();
 

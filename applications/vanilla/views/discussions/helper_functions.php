@@ -155,7 +155,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          ?></span>
          <span class="MItem MCount CommentCount"><?php
             printf(PluralTranslate($Discussion->CountComments,
-               '%s comment', '%s comments', '%s comment', '%s comments'),
+               '%s comment html', '%s comments html', T('%s comment'), T('%s comments')),
                BigPlural($Discussion->CountComments, '%s comment'));
          ?></span>
          <span class="MItem MCount DiscussionScore Hidden"><?php

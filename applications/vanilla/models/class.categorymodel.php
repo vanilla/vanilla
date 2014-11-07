@@ -201,6 +201,9 @@ class CategoryModel extends Gdn_Model {
 
          if (isset($Category['AllowedDiscussionTypes']) && is_string($Category['AllowedDiscussionTypes']))
             $Category['AllowedDiscussionTypes'] = unserialize($Category['AllowedDiscussionTypes']);
+
+         $Category['Name'] = TranslateContent($Category['Name']);
+         $Category['Description'] = TranslateContent($Category['Description']);
 		}
 
       $Keys = array_reverse(array_keys($Data));

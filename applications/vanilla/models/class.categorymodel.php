@@ -201,9 +201,6 @@ class CategoryModel extends Gdn_Model {
 
          if (isset($Category['AllowedDiscussionTypes']) && is_string($Category['AllowedDiscussionTypes']))
             $Category['AllowedDiscussionTypes'] = unserialize($Category['AllowedDiscussionTypes']);
-
-         $Category['Name'] = TranslateContent($Category['Name']);
-         $Category['Description'] = TranslateContent($Category['Description']);
 		}
 
       $Keys = array_reverse(array_keys($Data));
@@ -661,6 +658,12 @@ class CategoryModel extends Gdn_Model {
          $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+      }
+
+      // Translate name and description
+      foreach ($IDs as $ID) {
+         $Categories[$ID]['Name'] = TranslateContent($Categories[$ID]['Name']);
+         $Categories[$ID]['Description'] = TranslateContent($Categories[$ID]['Description']);
       }
    }
 

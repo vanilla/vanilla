@@ -751,7 +751,7 @@ EOT;
 
       if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->DeliveryType() != DELIVERY_TYPE_ALL) {
          $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-         $this->SetHeader('Content-Type', 'application/json; charset='.C('Garden.Charset', ''));
+         $this->SetHeader('Content-Type', 'application/json; charset='.C('Garden.Charset', 'utf-8'));
       } elseif ($CheckPopup) {
          $this->AddDefinition('CheckPopup', $CheckPopup);
       } else {

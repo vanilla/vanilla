@@ -4,7 +4,7 @@
  * Handles file uploads
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -57,7 +57,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 		if (!is_dir($UploadPath))
 			return FALSE;
 
-      if (!IsWritable($UploadPath) || !is_readable($UploadPath)) 
+      if (!IsWritable($UploadPath) || !is_readable($UploadPath))
 			return FALSE;
 
 		return TRUE;
@@ -125,6 +125,20 @@ class Gdn_Upload extends Gdn_Pluggable {
 		return $Result;
 	}
 
+   /**
+    * Parse a virtual filename that had previously been saved to the database.
+    *
+    * There are various formats supported for the name, mostly due to legacy concerns.
+    *
+    * - http(s)://domain/path.ext: A fully qualified url.
+    * - /path/from/uploads.ext: This is a locally uploaded file.
+    * - /path/to/uploads/path.ext: A full path starting from the uploads directory (deprecated).
+    * - ~type/path.ext: A specific type of upload provided by a plugin (deprecated).
+    * - type://domain/path.ext: A specific type of upload provied by a plugin with additional domain information.
+    *
+    * @param string $Name The virtual name of the file.
+    * @return array|bool Returns an array of parsed information or false if the parse failed.
+    */
    public static function Parse($Name) {
       $Result = FALSE;
       $Name = str_replace('\\', '/', $Name);
@@ -143,16 +157,35 @@ class Gdn_Upload extends Gdn_Pluggable {
 
          $Result = array('Name' => $Name, 'Type' => $Type, 'SaveName' => "~$Type/$Name", 'SaveFormat' => "~$Type/%s");
       } else {
-         $Name = ltrim($Name, '/');
-         // This is an upload in the uploads folder.
-         $Result = array('Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s');
+         $Parts = parse_url($Name);
+         if (empty($Parts['scheme'])) {
+            $Name = ltrim($Name, '/');
+            // This is an upload in the uploads folder.
+            $Result = array('Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s');
+         } else {
+            // This is a url in the format type:://domain/path.
+            $Result = array(
+               'Name' => ltrim(val('path', $Parts), '/'),
+               'Type' => $Parts['scheme'],
+               'Domain' => val('host', $Parts)
+            );
+
+            $SaveFormat = "{$Result['Type']}://{$Result['Domain']}/%s";
+            $Result['SaveName'] = sprintf($SaveFormat, $Result['Name']);
+            $Result['SaveFormat'] = $SaveFormat;
+         }
       }
 
-      $UrlPrefix = self::Urls($Result['Type']);
-      if ($UrlPrefix === FALSE)
+      if (!empty($Result['Domain'])) {
+         $UrlPrefix = self::Urls("{$Result['Type']}://{$Result['Domain']}");
+      } else {
+         $UrlPrefix = self::Urls($Result['Type']);
+      }
+      if ($UrlPrefix === FALSE) {
          $Result['Url'] = FALSE;
-      else
-         $Result['Url'] = $UrlPrefix.'/'.$Result['Name'];
+      } else {
+         $Result['Url'] = $UrlPrefix . '/' . $Result['Name'];
+      }
 
       return $Result;
    }
@@ -205,10 +238,11 @@ class Gdn_Upload extends Gdn_Pluggable {
       return $Path;
    }
 
-	public function SaveAs($Source, $Target) {
+	public function SaveAs($Source, $Target, $Options = array()) {
       $this->EventArguments['Path'] = $Source;
       $Parsed = self::Parse($Target);
       $this->EventArguments['Parsed'] =& $Parsed;
+      $this->EventArguments['Options'] = $Options;
       $Handled = FALSE;
       $this->EventArguments['Handled'] =& $Handled;
       $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
@@ -218,7 +252,7 @@ class Gdn_Upload extends Gdn_Pluggable {
          $Target = PATH_UPLOADS.'/'.$Parsed['Name'];
          if (!file_exists(dirname($Target)))
             mkdir(dirname($Target));
-         
+
          if (StringBeginsWith($Source, PATH_UPLOADS))
             rename($Source, $Target);
          elseif (!move_uploaded_file($Source, $Target))
@@ -245,7 +279,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
       if ($Urls === NULL) {
          $Urls = array('' => Asset('/uploads', TRUE));
-         
+
          $Sender = new stdClass();
          $Sender->Returns = array();
          $Sender->EventArguments = array();

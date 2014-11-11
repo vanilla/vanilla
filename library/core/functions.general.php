@@ -1849,7 +1849,7 @@ if (!function_exists('IsUrl')) {
          return FALSE;
       if (substr($Str, 0, 2) == '//')
          return TRUE;
-      if (strpos($Str, '://', 1) !== FALSE)
+      if (preg_match('`^https?://`i', $Str))
          return TRUE;
       return FALSE;
    }

@@ -150,13 +150,13 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
          ?>
          <span class="MItem MCount ViewCount"><?php
             printf(PluralTranslate($Discussion->CountViews,
-               T('%s view html'), T('%s views html'), T('%s view'), T('%s views')),
-               BigPlural($Discussion->CountViews, T('%s view')));
+               '%s view html', '%s views html', T('%s view'), T('%s views')),
+               BigPlural($Discussion->CountViews, '%s view'));
          ?></span>
          <span class="MItem MCount CommentCount"><?php
             printf(PluralTranslate($Discussion->CountComments,
-               T('%s comment html'), T('%s comments html'), T('%s comment'), T('%s comments')),
-               BigPlural($Discussion->CountComments, T('%s comment')));
+               '%s comment html', '%s comments html', T('%s comment'), T('%s comments')),
+               BigPlural($Discussion->CountComments, '%s comment'));
          ?></span>
          <span class="MItem MCount DiscussionScore Hidden"><?php
          $Score = $Discussion->Score;

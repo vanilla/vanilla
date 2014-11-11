@@ -112,8 +112,8 @@ class DashboardHooks implements Gdn_IPlugin {
       }
 
       // Allow return to mobile site
-		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
-		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile)) {
+		$ForceNoMobile = val('X-UA-Device-Force', $_COOKIE);
+		if ($ForceNoMobile === 'desktop') {
 		   $Sender->AddAsset('Foot', Wrap(Anchor(T('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
       }
 

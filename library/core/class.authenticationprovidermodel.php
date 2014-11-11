@@ -140,7 +140,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       $Attributes = array_diff_key($Data, $Columns);
             
       if (!empty($Attributes)) {
-         $Data = array_diff($Data, $Attributes);
+         $Data = array_diff_key($Data, $Attributes);
          $Data['Attributes'] = serialize($Attributes);
       }
       
@@ -154,11 +154,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
       // Validate the form posted values
       if ($this->Validate($Data, $Insert) === TRUE) {
          // Clear the default from other authentication providers.
-         $Default = GetValue('Default', $Data);
+         $Default = GetValue('IsDefault', $Data);
          if ($Default) {
             $this->SQL->Put(
                $this->Name, 
-               array('Default' => 0),
+               array('IsDefault' => 0),
                array('AuthenticationKey <>' => GetValue('AuthenticationKey', $Data)));
          }
          

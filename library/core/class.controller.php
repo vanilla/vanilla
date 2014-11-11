@@ -6,7 +6,7 @@
  * A base class that all controllers can inherit for common controller
  * properties and methods.
  *
- * @method void Render() Render the controller's view.
+ * @method void Render($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') Render the controller's view.
  * @param string $View
  * @param string $ControllerName
  * @param string $ApplicationFolder
@@ -75,7 +75,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *
     * @var array The data from method calls.
     */
-   public $Data;
+   public $Data = array();
 
    /**
     * The Head module that this controller should use to add CSS files.
@@ -610,11 +610,12 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
-    * Undocumented method.
+    * Gets the javascript definition list used to pass data to the client.
     *
-    * @todo Method DefinitionList() needs a description.
+    * @param bool $wrap Whether or not to wrap the result in a `script` tag.
+    * @return string Returns a string containing the `<script>` tag of the definitions. .
     */
-   public function DefinitionList() {
+   public function DefinitionList($wrap = true) {
       $Session = Gdn::Session();
       if (!array_key_exists('TransportError', $this->_Definitions))
          $this->_Definitions['TransportError'] = T('Transport error: %s', 'A fatal error occurred while processing the request.<br />The server returned the following response: %s');
@@ -679,19 +680,12 @@ class Gdn_Controller extends Gdn_Pluggable {
       if (!array_key_exists('Search', $this->_Definitions))
          $this->_Definitions['Search'] = T('Search');
 
-      // Output a JavaScript object with all the definitions
-      $Definitions = array();
-      foreach($this->_Definitions as $Term => $Definition) {
-         $Definitions[] = "'{$Term}' : " . json_encode($Definition);
+      // Output a JavaScript object with all the definitions.
+      $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions).';';
+      if ($wrap) {
+         $result = "<script>$result</script>";
       }
-
-      $Result = array();
-      $Result[] = '<!-- Various definitions for Javascript //-->';
-      $Result[] = '<script>';
-      $Result[] = "var definitions = {\n" . implode(",\n", $Definitions) . "}";
-      $Result[] = '</script>';
-
-      return implode("\n", $Result);
+      return $result;
    }
 
    /**
@@ -1233,7 +1227,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
-         ob_clean();
+         if (ob_get_level()) {
+            ob_clean();
+         }
          $this->ContentType('application/json');
          $this->SetHeader('X-Content-Type-Options', 'nosniff');
       }
@@ -1273,7 +1269,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
          $ExitRender = $this->RenderData();
-         if ($ExitRender) return;
+         if ($ExitRender) {
+            return;
+         }
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1319,10 +1317,6 @@ class Gdn_Controller extends Gdn_Pluggable {
          if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
             echo $View ? 'TRUE' : 'FALSE';
          } else if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            // Add definitions to the page
-            if ($this->SyndicationMethod === SYNDICATION_NONE)
-               $this->AddAsset('Foot', $this->DefinitionList());
-
             // Render
             $this->RenderMaster();
          } else {
@@ -1439,7 +1433,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
 
-//      $this->SendHeaders();
+      $this->SendHeaders();
 
       // Check for a special view.
       $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), FALSE, FALSE, FALSE);
@@ -1453,7 +1447,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
       }
 
-      @ob_clean();
+      if (ob_get_level()) {
+         ob_clean();
+      }
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             safeHeader('Content-Type: text/xml', TRUE);
@@ -1590,8 +1586,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       // Try cleaning out any notices or errors.
-      @ob_clean();
-
+      if (ob_get_level()) {
+         ob_clean();
+      }
 
       if ($Code >= 400 && $Code <= 505)
          safeHeader("HTTP/1.0 $Code", TRUE, $Code);
@@ -1745,14 +1742,16 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // And now search for/add all JS files.
             $Cdns = array();
-            if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', FALSE)) {
+            if (!C('Garden.Cdns.Disable', false)) {
                $Cdns = array(
-                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'
+                  'jquery.js' => "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
                   );
             }
 
             $this->EventArguments['Cdns'] = &$Cdns;
             $this->FireEvent('AfterJsCdns');
+
+            $this->Head->AddScript('', 'text/javascript', array('content' => $this->DefinitionList(false)));
 
             foreach ($this->_JsFiles as $Index => $JsInfo) {
                $JsFile = $JsInfo['FileName'];

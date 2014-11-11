@@ -595,8 +595,10 @@ class SettingsController extends DashboardController {
             $this->InformMessage(T("Your changes have been saved."));
          }
 
-         if ($Refresh)
+         if ($Refresh) {
             Gdn::Locale()->Refresh();
+            Redirect('/settings/locales');
+         }
       } elseif (!$this->Form->IsPostBack()) {
          $this->Form->SetValue('Locale', C('Garden.Locale', 'en-CA'));
       }
@@ -1142,7 +1144,7 @@ class SettingsController extends DashboardController {
             $this->Form->AddError($Ex);
          }
 
-         $AsyncRequest = ($this->DeliveryType() === DELIVERY_METHOD_JSON)
+         $AsyncRequest = ($this->DeliveryType() === DELIVERY_TYPE_VIEW)
             ? TRUE
             : FALSE;
 

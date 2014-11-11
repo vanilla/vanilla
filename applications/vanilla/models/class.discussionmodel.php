@@ -747,7 +747,7 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->Select('d.DiscussionID')
          ->From('Discussion d');
 
-      if ($CategoryID > 0) {
+      if ($CategoryID > 0 || $GroupID > 0) {
          $this->SQL->Where('d.Announce >', '0');
       } else {
          $this->SQL->Where('d.Announce', 1);
@@ -956,8 +956,9 @@ class DiscussionModel extends VanillaModel {
       Gdn::UserModel()->JoinUsers($Data, array('FirstUserID', 'LastUserID'));
       CategoryModel::JoinCategories($Data);
 
-      if (C('Vanilla.Views.Denormalize', FALSE))
+      if (C('Vanilla.Views.Denormalize', FALSE)) {
          $this->AddDenormalizedViews($Data);
+      }
 
       return $Data;
    }
@@ -1427,6 +1428,10 @@ class DiscussionModel extends VanillaModel {
     * @param mixed $Value
     */
    public function SetField($RowID, $Property, $Value = FALSE) {
+      if (!is_array($Property)) {
+         $Property = array($Property => $Value);
+      }
+
       $this->EventArguments['DiscussionID'] = $RowID;
       if (!is_array($Property)) {
          $this->EventArguments['SetField'] = array($Property => $Value);
@@ -1587,8 +1592,9 @@ class DiscussionModel extends VanillaModel {
                // Check for spam.
 
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
-            	if ($Spam)
+               if ($Spam) {
                   return SPAM;
+               }
 
                if (!GetValue('Approved', $FormPostValues)) {
                   $QueueModel = QueueModel::Instance();
@@ -1722,11 +1728,13 @@ class DiscussionModel extends VanillaModel {
             $CategoryID = GetValue('CategoryID', $Discussion, FALSE);
 
             // Update discussion counter for affected categories.
-            if ($Insert)
+            if ($Insert || $StoredCategoryID) {
                $this->IncrementNewDiscussion($Discussion);
+            }
 
-            if ($StoredCategoryID)
+            if ($StoredCategoryID) {
                $this->UpdateDiscussionCount($StoredCategoryID);
+            }
 
 				// Fire an event that the discussion was saved.
 				$this->EventArguments['FormPostValues'] = $FormPostValues;
@@ -2054,8 +2062,9 @@ class DiscussionModel extends VanillaModel {
 
          // Increment. If not success, create key.
          $Views = Gdn::Cache()->Increment($CacheKey);
-         if ($Views === Gdn_Cache::CACHEOP_FAILURE)
+         if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
             Gdn::Cache()->Store($CacheKey, 1);
+         }
 
          // Every X views, writeback to Discussions
          if (($Views % $WritebackLimit) == 0) {
@@ -2090,16 +2099,18 @@ class DiscussionModel extends VanillaModel {
          array('DiscussionID' => $DiscussionID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
 
       if ($UserDiscussion) {
-         if ($Bookmarked === NULL)
+         if ($Bookmarked === NULL) {
             $Bookmarked = !$UserDiscussion['Bookmarked'];
+         }
 
          // Update the bookmarked value.
          $this->SQL->Put('UserDiscussion',
             array('Bookmarked' => (int)$Bookmarked),
             array('DiscussionID' => $DiscussionID, 'UserID' => $UserID));
       } else {
-         if ($Bookmarked === NULL)
+         if ($Bookmarked === NULL) {
             $Bookmarked = TRUE;
+         }
 
          // Insert the new bookmarked value.
          $this->SQL->Options('Ignore', TRUE)
@@ -2270,8 +2281,9 @@ class DiscussionModel extends VanillaModel {
 
       $Log = GetValue('Log', $Options, TRUE);
       $LogOptions = GetValue('LogOptions', $Options, array());
-      if ($Log === TRUE)
+      if ($Log === TRUE) {
          $Log = 'Delete';
+      }
 
       LogModel::BeginTransaction();
 
@@ -2319,15 +2331,17 @@ class DiscussionModel extends VanillaModel {
     */
    protected function FormatTags($Tags) {
       // Don't bother if there aren't any tags
-      if (!$Tags)
+      if (!$Tags) {
          return '';
+      }
 
       // Get the array
       $TagsArray = Gdn_Format::Unserialize($Tags);
 
       // Compensate for deprecated space-separated format
-      if (is_string($TagsArray) && $TagsArray == $Tags)
+      if (is_string($TagsArray) && $TagsArray == $Tags) {
          $TagsArray = explode(' ', $Tags);
+      }
 
       // Safe format
       $TagsArray = Gdn_Format::Text($TagsArray);

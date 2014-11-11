@@ -51,7 +51,14 @@ class UserModel extends Gdn_Model {
       $Controller->AddDefinition('MinPassLength', C('Garden.Registration.MinPasswordLength'));
       $Controller->AddDefinition(
          'PasswordTranslations',
-         implode(',', array(T('Too Short'), T('Password '), T('Password Contains Username'), T('Password Very Weak'), T('Password Weak'), T('Password Ok'), T('Password Good'), T('Password Strong')))
+         implode(',', array(
+            T('Password Too Short', 'Too Short'),
+            T('Password Contains Username', 'Contains Username'),
+            T('Password Very Weak', 'Very Weak'),
+            T('Password Weak', 'Weak'),
+            T('Password Ok', 'OK'),
+            T('Password Good', 'Good'),
+            T('Password Strong', 'Strong')))
       );
    }
 

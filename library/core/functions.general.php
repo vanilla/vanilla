@@ -1799,6 +1799,21 @@ if (!function_exists('IsMobile')) {
    }
 }
 
+if (!function_exists('IsEmbed')) {
+    /**
+     * Returns whether or not the site is in mobile mode.
+     * @param mixed $value Sets a new value for mobile. Pass one of the following:
+     * - true: Force mobile.
+     * - false: Force desktop.
+     * - null: Reset and use the system determined mobile setting.
+     * - not specified: Use the current setting or use the system determined mobile setting.
+     * @return bool
+     */
+    function IsEmbed ($value = '') {
+        return false;
+    }
+}
+
 if (!function_exists('IsSearchEngine')) {
    function IsSearchEngine() {
       $Engines = array(

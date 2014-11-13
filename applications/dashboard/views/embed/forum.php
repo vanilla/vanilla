@@ -19,7 +19,7 @@ echo $this->Form->Errors();
 <div class="Info">
    <?php
    echo 'Your entire vanilla forum can be embedded into another page. This is typically done so you can insert your forum into another site with minimal theming effort. The preferred method is to ';
-   echo Anchor('customize your theme', 'settings/themes');
+   echo Anchor('customize your theme', 'settings/embedthemes');
    echo ' to match your existing website.';
    if (!$AllowEmbed) {
       echo Wrap('<span style="background: #ff0;">'.T('Embedding is currently DISABLED.').'</span>', 'p');

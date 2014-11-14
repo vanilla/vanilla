@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 // Get the information for displaying the connection information.
-if (!($ConnectName = $this->Form->GetFormValue('FullName')))
+if (!($ConnectName = $this->Form->GetFormValue('FullName'))) {
 	$ConnectName = $this->Form->GetFormValue('Name');
-
+}
 $ConnectPhoto = $this->Form->GetFormValue('Photo');
 if (!$ConnectPhoto) {
    $ConnectPhoto = '/applications/dashboard/design/images/usericon.gif';
@@ -11,7 +11,6 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 ?>
 <div class="Connect">
 	<h1><?php echo StringIsNullOrEmpty($ConnectSource) ? T("Sign in") : sprintf(T('%s Connect'), $ConnectSource); ?></h1>
-	<div>
 	<?php
 		echo $this->Form->Open();
 		echo $this->Form->Errors();
@@ -35,32 +34,35 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 			} else {
 				$NameFormat = '';
 			}
-			
-			$NameFormat = '%1$s';
+
 			echo sprintf(
 				$NameFormat,
 				'<span class="Name">'.htmlspecialchars($ConnectName).'</span>',
 				'<span class="Source">'.htmlspecialchars($ConnectSource).'</span>');
-			
-			echo Wrap(T('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3');
-         
-         echo '</div>';
-			?>
+  			?>
 		</div>
 		<?php endif; ?>
-	
-		<?php if ($this->Form->GetFormValue('UserID')): ?>
+
+		<?php
+      // user has account id and email
+      if ($this->Form->GetFormValue('UserID') && !$this->Form->GetFormValue('EmailVisible')): ?>
 		<div class="SignedIn">
 			<?php echo '<div class="Info">',T('You are now signed in.'),'</div>'; ?>
 		</div>
 		<?php
+
+      // lacking information
 		else:
-			$ExistingUsers = (array)$this->Data('ExistingUsers', array());
+         echo '<div class="Complete-Registration">'.T('Complete your registration below.').'</div>';
+         echo Wrap(T('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3');
+         $ExistingUsers = (array)$this->Data('ExistingUsers', array());
 			$NoConnectName = $this->Data('NoConnectName');
 			$PasswordMessage = T('ConnectLeaveBlank', 'Leave blank unless connecting to an existing account.');
 		?>
 			<ul>
-            <?php if ($this->Form->GetFormValue('EmailVisible')): ?>
+            <?php
+            // missing email
+            if ($this->Form->GetFormValue('EmailVisible')): ?>
             <li>
                <?php
                echo $this->Form->Label('Email', 'Email');
@@ -70,6 +72,7 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
             <?php endif; ?>
 				<li>
 					<?php
+               // account exists, let's reset
 					if (count($ExistingUsers) == 1 && $NoConnectName) {
 						$PasswordMessage = T('ConnectExistingPassword', 'Enter your existing account password.');
 						$Row = reset($ExistingUsers);
@@ -77,7 +80,10 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 							Wrap(sprintf(T('ConnectRegisteredName', 'Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', array('class' => 'ExistingUsername'));
 						$this->AddDefinition('NoConnectName', TRUE);
 						echo $this->Form->Hidden('UserSelect', array('Value' => $Row['UserID']));
-					} else {
+					}
+
+               // more than one account for user
+               else if (count($ExistingUsers) > 1) {
 						echo $this->Form->Label('Username', 'ConnectName');
 						echo '<div class="FinePrint">',T('ConnectChooseName', 'Choose a name to identify yourself on the site.'),'</div>';
 	
@@ -87,11 +93,13 @@ $ConnectSource = $this->Form->GetFormValue('ProviderName');
 							}
 							echo Wrap($this->Form->Radio('UserSelect', T('Other'), array('value' => 'other')), 'div');
 						}
-					}
-	
-					if (!$NoConnectName)
-						echo $this->Form->Textbox('ConnectName');
-					?>
+
+                  // no account associated with email, let's write a new username
+                  if (!$NoConnectName) {
+                     echo $this->Form->Textbox('ConnectName');
+                  }
+               }
+               ?>
 				</li>
 				<?php $this->FireEvent('RegisterBeforePassword'); ?>
 				<li id="ConnectPassword">

@@ -346,12 +346,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
       if (IsEmbed ())
       {
-         return C('Garden.Theme', 'EmbedFriendly');
+         return C('Garden.EmbedTheme', 'EmbedFriendly');
       }
 
       else if (IsMobile ())
       {
-         return C('Garden.Theme', 'default');
+         return C('Garden.MobileTheme', 'default');
       }
 
       else {

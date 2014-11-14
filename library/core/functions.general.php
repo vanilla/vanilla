@@ -1801,16 +1801,20 @@ if (!function_exists('IsMobile')) {
 
 if (!function_exists('IsEmbed')) {
     /**
-     * Returns whether or not the site is in mobile mode.
-     * @param mixed $value Sets a new value for mobile. Pass one of the following:
-     * - true: Force mobile.
-     * - false: Force desktop.
-     * - null: Reset and use the system determined mobile setting.
-     * - not specified: Use the current setting or use the system determined mobile setting.
+     * Returns whether or not the site is in embed mode.
+     * Pass one of the following:
+     * - true: Force embed.
+     * - false: Depends on IsMobile.
      * @return bool
      */
-    function IsEmbed ($value = '') {
-        return false;
+    function IsEmbed () {
+        if (isset ($_GET['embed']))
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
 

@@ -556,7 +556,7 @@ class ConversationModel extends ConversationsModel {
             'RecordID' => $ConversationID,
             'Story' => GetValue('Body', $FormPostValues),
             'Format' => GetValue('Format', $FormPostValues, C('Garden.InputFormatter')),
-            'Route' => "/messages/$ConversationID#$MessageID"
+            'Route' => "/messages/$ConversationID#Message_$MessageID"
          );
 
          $Subject = GetValue('Subject', $Fields);

@@ -6,7 +6,7 @@
  * A base class that all controllers can inherit for common controller
  * properties and methods.
  *
- * @method void Render() Render the controller's view.
+ * @method void Render($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') Render the controller's view.
  * @param string $View
  * @param string $ControllerName
  * @param string $ApplicationFolder

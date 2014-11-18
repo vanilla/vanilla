@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
 
    // Reveal the textarea and hide previews.
-   $('a.WriteButton').livequery('click', function() {
+   $(document).on('click', 'a.WriteButton', function() {
       if ($(this).hasClass('WriteButton')) {
          var frm = $(this).parents('.MessageForm').find('form');
          frm.trigger('WriteButtonClick', [frm]);

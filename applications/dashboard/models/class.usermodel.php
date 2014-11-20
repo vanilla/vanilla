@@ -91,6 +91,10 @@ class UserModel extends Gdn_Model {
          $this->SaveAttribute($UserID, 'BanLogID', $LogID);
       }
 
+      $this->EventArguments['UserID'] = $UserID;
+      $this->EventArguments['Options'] = $Options;
+      $this->FireEvent('Ban');
+
       if (GetValue('AddActivity', $Options, TRUE)) {
          switch (GetValue('Reason', $Options, '')) {
             case '':

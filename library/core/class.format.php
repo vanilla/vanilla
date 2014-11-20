@@ -36,7 +36,7 @@ class Gdn_Format {
    public static $MentionsUrlFormat = '/profile/{name}';
 
    protected static $SanitizedFormats = array(
-      'Html', 'BBcode', 'Wysiwyg', 'Text', 'TextEx', 'Markdown'
+      'Html', 'BBCode', 'Wysiwyg', 'Text', 'TextEx', 'Markdown'
    );
 
    /**

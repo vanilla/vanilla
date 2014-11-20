@@ -49,6 +49,7 @@ class Gdn_Database {
       if(!is_object($this->_Connection)) {
          try {
             $this->_Connection = new PDO(strtolower($this->Engine) . ':' . $this->Dsn, $this->User, $this->Password, $this->ConnectionOptions);
+            $this->_Connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
             if($this->ConnectionOptions[1002])
                $this->Query($this->ConnectionOptions[1002]);
             

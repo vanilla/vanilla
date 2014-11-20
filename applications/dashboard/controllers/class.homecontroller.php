@@ -47,6 +47,9 @@ class HomeController extends Gdn_Controller {
       $this->MasterView = 'default';
 
       $this->CssClass = 'SplashMessage NoPanel';
+      if ($this->Data('CssClass')) {
+         $this->CssClass .= ' '.$this->Data('CssClass');
+      }
 
       $this->SetData('_NoMessages', TRUE);
 

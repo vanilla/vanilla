@@ -11,13 +11,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['OpenID'] = array(
 	'Name' => 'OpenID',
-   'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; plugin.',
+   'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; and &lsquo;Steam&rsquo; plugins.',
    'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
 	'MobileFriendly' => TRUE,
-//   'SettingsUrl' => '/dashboard/plugin/openid',
+   'SettingsUrl' => '/settings/openid',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -106,6 +106,9 @@ class OpenIDPlugin extends Gdn_Plugin {
       if (!ini_get('allow_url_fopen')) {
          throw new Gdn_UserException('This plugin requires the allow_url_fopen php.ini setting.');
       }
+      if (!C('Plugins.OpenID.AllowSignIn')) {
+         SaveToConfig('Plugins.OpenID.AllowSignIn', TRUE);
+      }
    }
 
    /// Plugin Event Handlers ///
@@ -134,7 +137,15 @@ class OpenIDPlugin extends Gdn_Plugin {
          $Form->SetFormValue('UniqueID', $ID);
          $Form->SetFormValue('Provider', self::$ProviderKey);
          $Form->SetFormValue('ProviderName', 'OpenID');
-         $Form->SetFormValue('FullName', GetValue('namePerson/first', $Attr).' '.GetValue('namePerson/last', $Attr));
+
+         $FullName = array();
+         if ($First = GetValue('namePerson/first', $Attr)) {
+            array_push($FullName, $First);
+         }
+         if ($Last = GetValue('namePerson/last', $Attr)) {
+            array_push($FullName, $Last);
+         }
+         $Form->SetFormValue('FullName', implode(' ', $FullName));
 
          if ($Email = GetValue('contact/email', $Attr)) {
             $Form->SetFormValue('Email', $Email);
@@ -142,6 +153,11 @@ class OpenIDPlugin extends Gdn_Plugin {
 
          $Sender->SetData('Verified', TRUE);
          $Session->Stash('OpenID', $OpenID);
+
+         $this->EventArguments['OpenID'] = $OpenID;
+         $this->EventArguments['Form'] = $Form;
+         $this->FireEvent('AfterConnectData');
+
       }
    }
 
@@ -192,7 +208,7 @@ class OpenIDPlugin extends Gdn_Plugin {
    public function EntryController_SignIn_Handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
 
-      if (isset($Sender->Data['Methods'])) {
+      if (isset($Sender->Data['Methods']) && C('Plugins.OpenID.AllowSignIn')) {
          $Url = $this->_AuthorizeHref();
 
          // Add the OpenID method to the controller.
@@ -206,19 +222,22 @@ class OpenIDPlugin extends Gdn_Plugin {
    }
 
    public function Base_SignInIcons_Handler($Sender, $Args) {
-//      if (!$this->IsEnabled()) return;
-      echo "\n".$this->_GetButton();
+      if (C('Plugins.OpenID.AllowSignIn')) {
+         echo "\n".$this->_GetButton();
+      }
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-//      if (!$this->IsEnabled()) return;
-      echo "\n".$this->_GetButton();
+      if (C('Plugins.OpenID.AllowSignIn')) {
+         echo "\n".$this->_GetButton();
+      }
    }
 
 	private function _GetButton() {
-      $Url = $this->_AuthorizeHref();
-
-      return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern'));
+      if (C('Plugins.OpenID.AllowSignIn')) {
+         $Url = $this->_AuthorizeHref();
+         return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern'));
+      }
 	}
 
 	public function Base_BeforeSignInLink_Handler($Sender) {
@@ -228,7 +247,25 @@ class OpenIDPlugin extends Gdn_Plugin {
 		// if (!IsMobile())
 		// 	return;
 
-		if (!Gdn::Session()->IsValid())
+		if (!Gdn::Session()->IsValid() && C('Plugins.OpenID.AllowSignIn'))
 			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect OpenIDConnect'));
 	}
+
+   /*
+    * This OpenID plugin is requisite for some other sso plugins, but we may not always want the OpenID sso option.
+    * Let's allow users to remove the ability to sign in with OpenID.
+    */
+   public function SettingsController_OpenID_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+
+      $Conf = new ConfigurationModule($Sender);
+      $Conf->Initialize(array(
+         'Plugins.OpenID.AllowSignIn' => array('Control' => 'Checkbox', 'LabelCode' => 'Allow users to sign in with OpenID', 'Default' => TRUE)
+      ));
+
+      $Sender->AddSideMenu();
+      $Sender->SetData('Title', sprintf(T('%s Settings'), T('OpenID')));
+      $Sender->ConfigurationModule = $Conf;
+      $Conf->RenderAll();
+   }
 }

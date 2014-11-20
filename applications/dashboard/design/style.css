@@ -4418,6 +4418,31 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   background-color: #4485c3;
 }
 
+.SocialIcon-Steam .Icon {
+   font-family: "vanillicon";
+   font-weight: 400;
+   font-size: 18px;
+   background: 0;
+}
+.SocialIcon-Steam .Icon::before {
+   position: relative;
+   left: 3px;
+   content: "\f19c";
+}
+.SocialIcon-Steam.HasText .Icon {
+   background: 0;
+}
+.SocialIcon-Steam.HasText .Icon::before {
+   left: 7px;
+}
+.SocialIcon-Steam,
+.SocialIcon-Steam.HasText .Icon {
+   background-color: #000;
+}
+.SocialIcon-Steam:hover {
+   background-color: #333;
+}
+
 /* Woe unto whoever caused this */
 
 .MeBox-SignIn.Inline .SocialIcon {

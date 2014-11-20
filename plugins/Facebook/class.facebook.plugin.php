@@ -367,7 +367,7 @@ class FacebookPlugin extends Gdn_Plugin {
 
    public function SocialController_Facebook_Create($Sender, $Args) {
       $Sender->Permission('Garden.Settings.Manage');
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $Settings = array(
              'Plugins.Facebook.ApplicationID' => $Sender->Form->GetFormValue('ApplicationID'),
              'Plugins.Facebook.Secret' => $Sender->Form->GetFormValue('Secret'),

@@ -106,9 +106,6 @@ class OpenIDPlugin extends Gdn_Plugin {
       if (!ini_get('allow_url_fopen')) {
          throw new Gdn_UserException('This plugin requires the allow_url_fopen php.ini setting.');
       }
-      if (!C('Plugins.OpenID.AllowSignIn')) {
-         SaveToConfig('Plugins.OpenID.AllowSignIn', TRUE);
-      }
    }
 
    /// Plugin Event Handlers ///
@@ -138,14 +135,7 @@ class OpenIDPlugin extends Gdn_Plugin {
          $Form->SetFormValue('Provider', self::$ProviderKey);
          $Form->SetFormValue('ProviderName', 'OpenID');
 
-         $FullName = array();
-         if ($First = GetValue('namePerson/first', $Attr)) {
-            array_push($FullName, $First);
-         }
-         if ($Last = GetValue('namePerson/last', $Attr)) {
-            array_push($FullName, $Last);
-         }
-         $Form->SetFormValue('FullName', implode(' ', $FullName));
+         $Form->SetFormValue('FullName', trim(val('namePerson/first', $Attr).' '.val('namePerson/last', $Attr)));
 
          if ($Email = GetValue('contact/email', $Attr)) {
             $Form->SetFormValue('Email', $Email);
@@ -208,7 +198,7 @@ class OpenIDPlugin extends Gdn_Plugin {
    public function EntryController_SignIn_Handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
 
-      if (isset($Sender->Data['Methods']) && C('Plugins.OpenID.AllowSignIn')) {
+      if (isset($Sender->Data['Methods']) && !C('Plugins.OpenID.DisableSignIn')) {
          $Url = $this->_AuthorizeHref();
 
          // Add the OpenID method to the controller.
@@ -221,20 +211,24 @@ class OpenIDPlugin extends Gdn_Plugin {
       }
    }
 
+   public function SignInAllowed() {
+      return !C('Plugins.OpenID.DisableSignIn', FALSE);
+   }
+
    public function Base_SignInIcons_Handler($Sender, $Args) {
-      if (C('Plugins.OpenID.AllowSignIn')) {
+      if ($this->SignInAllowed()) {
          echo "\n".$this->_GetButton();
       }
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-      if (C('Plugins.OpenID.AllowSignIn')) {
+      if ($this->SignInAllowed()) {
          echo "\n".$this->_GetButton();
       }
    }
 
 	private function _GetButton() {
-      if (C('Plugins.OpenID.AllowSignIn')) {
+      if ($this->SignInAllowed()) {
          $Url = $this->_AuthorizeHref();
          return SocialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern'));
       }
@@ -247,7 +241,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 		// if (!IsMobile())
 		// 	return;
 
-		if (!Gdn::Session()->IsValid() && C('Plugins.OpenID.AllowSignIn'))
+		if (!Gdn::Session()->IsValid() && $this->SignInAllowed())
 			echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect OpenIDConnect'));
 	}
 
@@ -260,7 +254,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
       $Conf = new ConfigurationModule($Sender);
       $Conf->Initialize(array(
-         'Plugins.OpenID.AllowSignIn' => array('Control' => 'Checkbox', 'LabelCode' => 'Allow users to sign in with OpenID', 'Default' => TRUE)
+         'Plugins.OpenID.DisableSignIn' => array('Control' => 'Checkbox', 'LabelCode' => 'Disable OpenID sign in', 'Default' => FALSE)
       ));
 
       $Sender->AddSideMenu();

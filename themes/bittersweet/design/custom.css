@@ -2,7 +2,7 @@
   font-family: 'Bitter';
   font-style: normal;
   font-weight: 400;
-  src: local('Bitter-Regular'), url('http://themes.googleusercontent.com/static/fonts/bitter/v3/2PcBT6-VmYhQCus-O11S5-vvDin1pK8aKteLpeZ5c0A.woff') format('woff');
+  src: local('Bitter-Regular'), url('//themes.googleusercontent.com/static/fonts/bitter/v3/2PcBT6-VmYhQCus-O11S5-vvDin1pK8aKteLpeZ5c0A.woff') format('woff');
 }
 body,
 .SiteTitle,

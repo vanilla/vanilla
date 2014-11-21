@@ -198,7 +198,7 @@ class OpenIDPlugin extends Gdn_Plugin {
    public function EntryController_SignIn_Handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
 
-      if (isset($Sender->Data['Methods']) && !C('Plugins.OpenID.DisableSignIn')) {
+      if (isset($Sender->Data['Methods']) && $this->SignInAllowed()) {
          $Url = $this->_AuthorizeHref();
 
          // Add the OpenID method to the controller.

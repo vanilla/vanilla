@@ -145,31 +145,12 @@ class Gdn_FileSystem {
                   $Return[] = array($Path);
             }
          } else {
-            if ($DirectoryHandle = opendir($SourceFolder)) {
-               if ($DirectoryHandle === FALSE)
-                  trigger_error(ErrorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $SourceFolder), E_USER_ERROR);
-
-               // Search all subfolders
-               if ($WhiteList === TRUE)
-                  $WhiteList = scandir($SourceFolder);
-
-               $SubFolders = array();
-               foreach ($WhiteList as $WhiteFolder) {
-                  $SubFolder = CombinePaths(array($SourceFolder, $WhiteFolder));
-                  if (is_dir($SubFolder)) {
-                     $SubFolders[] = $SubFolder;
-                     $Path = CombinePaths(array($SubFolder, $FileName));
-                     // echo '<div style="color: red;">Looking For: '.$Path.'</div>';
-                     if (file_exists($Path)) {
-                        if ($ReturnFirst)
-                           return array($Path);
-                        else
-                           $Return[] = $Path;
-                     }
-                  }
+            foreach ($WhiteList as $Folder) {
+               $Path = CombinePaths(array($SourceFolder, $Folder, $FileName));
+               if (file_exists($Path)) {
+                  $Return[] = $Path;
                }
             }
-            closedir($DirectoryHandle);
          }
       }
 

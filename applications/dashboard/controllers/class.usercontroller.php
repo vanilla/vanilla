@@ -154,20 +154,34 @@ class UserController extends DashboardController {
             // user, adjusted for his ability to affect those roles
             $RequestedRoles = $this->Form->GetFormValue('RoleID');
 
-            if (!is_array($RequestedRoles)) $RequestedRoles = array();
+            if (!is_array($RequestedRoles)) {
+               $RequestedRoles = array();
+            }
             $RequestedRoles = array_flip($RequestedRoles);
             $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
 
-            // Put the data back into the forum object as if the user had submitted
-            // this themselves
+            // Put the data back into the form object as if the user had submitted this themselves.
             $this->Form->SetFormValue('RoleID', array_keys($UserNewRoles));
+
+            $NoPassword = (bool)$this->Form->GetFormValue('NoPassword');
+            if ($NoPassword) {
+               $this->Form->SetFormValue('Password', BetterRandomString(15, 'Aa0'));
+               $this->Form->SetFormValue('HashMethod', 'Random');
+            }
 
             $NewUserID = $this->Form->Save(array('SaveRoles' => TRUE, 'NoConfirmEmail' => TRUE));
             if ($NewUserID !== FALSE) {
-               $Password = $this->Form->GetValue('Password', '');
+               if ($NoPassword) {
+                  $Password = T('No password');
+               } else {
+                  $Password = $this->Form->GetValue('Password', '');
+               }
                $UserModel->SendWelcomeEmail($NewUserID, $Password, 'Add');
                $this->InformMessage(T('The user has been created successfully'));
                $this->RedirectUrl = Url('dashboard/user');
+            } elseif ($NoPassword) {
+               $this->Form->SetFormValue('Password', '');
+               $this->Form->SetFormValue('HashMethod', '');
             }
 
             $this->UserRoleData = $UserNewRoles;
@@ -328,7 +342,7 @@ class UserController extends DashboardController {
 
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       if (!$User)
-         throw NotFoundException($User);
+         throw NotFoundException('User');
 
 //      $this->Form = new Gdn_Form();
 

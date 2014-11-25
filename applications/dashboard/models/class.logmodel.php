@@ -12,7 +12,7 @@ class LogModel extends Gdn_Pluggable {
    protected static $_TransactionID = NULL;
 
    /// METHODS ///
-   
+
    public static function BeginTransaction() {
       self::$_TransactionID = TRUE;
    }
@@ -313,7 +313,7 @@ class LogModel extends Gdn_Pluggable {
          if ($LogRow2) {
             $LogID = $LogRow2['LogID'];
             $Set = array();
-            
+
             $Data = array_merge(unserialize($LogRow2['Data']), $Data);
 
             $OtherUserIDs = explode(',',$LogRow2['OtherUserIDs']);
@@ -350,11 +350,20 @@ class LogModel extends Gdn_Pluggable {
                   $Set['TransactionLogID'] = $LogID;
                }
             }
+            $L = self::_Instance();
+            $L->EventArguments['Update'] =& $Set;
+            $L->FireEvent('BeforeUpdate');
             
             Gdn::SQL()->Put(
                'Log',
                $Set,
                array('LogID' => $LogID));
+
+            $L->EventArguments['LogID'] = $LogID;
+            $L->EventArguments['LogRow2'] = $LogRow2;
+            $L->FireEvent('AfterUpdate');
+
+
          } else {
             $L = self::_Instance();
             $L->EventArguments['Log'] =& $LogRow;
@@ -458,6 +467,12 @@ class LogModel extends Gdn_Pluggable {
       $Px = Gdn::Database()->DatabasePrefix;
       $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
       Gdn::Database()->Query($Sql);
+
+      // Clear the page cache too.
+      $CommentModel = new CommentModel();
+      foreach ($DiscussionIDs as $ID) {
+         $CommentModel->RemovePageCache($ID);
+      }
 
       $this->_RecalcIDs['Discussion'] = array();
    }

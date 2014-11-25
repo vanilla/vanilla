@@ -399,8 +399,9 @@ function OptionsList($Discussion) {
          $Sender->Options .= '<li>'.Anchor(T('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack') . '</li>';
 
       // Edit discussion
-      if ($Discussion->FirstUserID == $Session->UserID || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
+      if (DiscussionModel::canEdit($Discussion)) {
          $Sender->Options .= '<li>'.Anchor(T('Edit'), 'vanilla/post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion') . '</li>';
+      }
 
       // Announce discussion
       if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID))

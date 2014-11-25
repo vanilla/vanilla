@@ -823,14 +823,19 @@ class CommentModel extends VanillaModel {
                if ($Spam)
                   return SPAM;
 
-               // Check for approval
-               $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
-               if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
-                  $DiscussionModel = new DiscussionModel();
-                  $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Fields));
-                  $Fields['CategoryID'] = GetValue('CategoryID', $Discussion);
-               	LogModel::Insert('Pending', 'Comment', $Fields);
-               	return UNAPPROVED;
+               // Check for premoderation
+               if (!GetValue('Approved', $FormPostValues)) {
+                  $QueueModel = QueueModel::Instance();
+                  $Options = array();
+
+                  $this->EventArguments['Options'] = &$Options;
+                  $this->EventArguments['Fields'] = &$Fields;
+                  $this->FireEvent('BeforePremoderate');
+
+                  $Premoderation = $QueueModel->Premoderate('Comment', $Fields, $Options);
+                  if ($Premoderation) {
+                     return UNAPPROVED;
+                  }
                }
 
                // Create comment.

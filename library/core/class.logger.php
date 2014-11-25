@@ -114,7 +114,7 @@ class Logger {
          if (Gdn::Cache()->Get($key) === FALSE) {
             self::event($event, $level, $message, $context);
             Gdn::Cache()->Store($key, time(), array(Gdn_Cache::FEATURE_EXPIRY => 300));
-      }
+         }
       }
    }
 

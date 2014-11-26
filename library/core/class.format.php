@@ -36,7 +36,7 @@ class Gdn_Format {
    public static $MentionsUrlFormat = '/profile/{name}';
 
    protected static $SanitizedFormats = array(
-      'Html', 'BBCode', 'Wysiwyg', 'Text', 'TextEx', 'Markdown'
+      'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
    );
 
    /**
@@ -1440,7 +1440,7 @@ EOT;
          return $Mixed;
 
       if (is_string($Mixed)) {
-         if (in_array($FormatMethod, self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
+         if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } elseif (function_exists('format'.$FormatMethod)) {
             $FormatMethod = 'format'.$FormatMethod;

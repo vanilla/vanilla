@@ -218,11 +218,7 @@ class CategoriesController extends VanillaController {
          }
 
          // Load the subtree.
-         if (C('Vanilla.ExpandCategories'))
-            $Categories = CategoryModel::GetSubtree($CategoryIdentifier);
-         else
-            $Categories = array($Category);
-
+         $Categories = CategoryModel::GetSubtree($CategoryIdentifier, false);
          $this->SetData('Categories', $Categories);
 
          // Setup head
@@ -245,7 +241,10 @@ class CategoriesController extends VanillaController {
 
          // Get a DiscussionModel
          $DiscussionModel = new DiscussionModel();
-         $CategoryIDs = ConsolidateArrayValuesByKey($this->Data('Categories'), 'CategoryID');
+         $CategoryIDs = array($CategoryID);
+         if (C('Vanilla.ExpandCategories')) {
+            $CategoryIDs = array_merge($CategoryIDs, array_column($this->Data('Categories'), 'CategoryID'));
+         }
          $Wheres = array('d.CategoryID' => $CategoryIDs);
          $this->SetData('_ShowCategoryLink', count($CategoryIDs) > 1);
 
@@ -347,7 +346,7 @@ class CategoriesController extends VanillaController {
       $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
 
       if ($Category) {
-         $Subtree = CategoryModel::GetSubtree($Category);
+         $Subtree = CategoryModel::GetSubtree($Category, false);
          $CategoryIDs = ConsolidateArrayValuesByKey($Subtree, 'CategoryID');
          $Categories = $this->CategoryModel->GetFull($CategoryIDs)->ResultArray();
       } else {

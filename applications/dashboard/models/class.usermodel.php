@@ -49,7 +49,17 @@ class UserModel extends Gdn_Model {
    public function AddPasswordStrength($Controller) {
       $Controller->AddJsFile('password.js');
       $Controller->AddDefinition('MinPassLength', C('Garden.Registration.MinPasswordLength'));
-      $Controller->AddDefinition('PasswordTranslations', T('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
+      $Controller->AddDefinition(
+         'PasswordTranslations',
+         implode(',', array(
+            T('Password Too Short', 'Too Short'),
+            T('Password Contains Username', 'Contains Username'),
+            T('Password Very Weak', 'Very Weak'),
+            T('Password Weak', 'Weak'),
+            T('Password Ok', 'OK'),
+            T('Password Good', 'Good'),
+            T('Password Strong', 'Strong')))
+      );
    }
 
    /**

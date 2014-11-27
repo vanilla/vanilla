@@ -4,7 +4,7 @@ $Session = Gdn::Session();
 ?>
 <h1><?php echo T('Outgoing Email'); ?></h1>
 <?php
-echo $this->Form->Open();
+echo $this->Form->Open(array('autocomplete' => 'off'));
 echo $this->Form->Errors();
 ?>
 <ul>
@@ -42,13 +42,13 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('SMTP User', 'Garden.Email.SmtpUser');
-         echo $this->Form->TextBox('Garden.Email.SmtpUser');
+         echo $this->Form->TextBox('Garden.Email.SmtpUser', array('autocomplete' => 'off'));
       ?>
    </li>
    <li>
       <?php
          echo $this->Form->Label('SMTP Password', 'Garden.Email.SmtpPassword');
-         echo $this->Form->Input('Garden.Email.SmtpPassword','password');
+         echo $this->Form->Input('Garden.Email.SmtpPassword', 'password', array('autocomplete' => 'off'));
       ?>
    </li>
    <li>

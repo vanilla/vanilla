@@ -977,7 +977,7 @@ class CategoryModel extends Gdn_Model {
          if ($IncludeParent) {
             $Result[$Category['CategoryID']] = $Category;
          }
-         $ChildIDs = GetValue('ChildIDs', $Category);
+         $ChildIDs = GetValue('ChildIDs', $Category, array());
 
          foreach ($ChildIDs as $ChildID) {
             $Result = array_replace($Result, self::GetSubtree($ChildID, true));

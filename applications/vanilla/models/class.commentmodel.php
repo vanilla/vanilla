@@ -691,6 +691,7 @@ class CommentModel extends VanillaModel {
          if (!isset($PrevWhere)) {
             $this->SQL->Where($Expr, $Value);
          } else {
+            $this->SQL->OrOp();
             $this->SQL->BeginWhereGroup();
             $this->SQL->OrWhere($PrevWhere[0], $PrevWhere[1]);
             $this->SQL->Where($Expr, $Value);

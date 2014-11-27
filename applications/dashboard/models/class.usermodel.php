@@ -1948,10 +1948,11 @@ class UserModel extends Gdn_Model {
    }
 
    public function Search($Keywords, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-      if (C('Garden.Registration.Method') == 'Approval')
+      if (C('Garden.Registration.Method') == 'Approval') {
          $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      else
+      } else {
          $ApplicantRoleID = 0;
+      }
 
       if (is_array($Keywords)) {
          $Where = $Keywords;
@@ -1962,14 +1963,14 @@ class UserModel extends Gdn_Model {
       // Check for an IP address.
       if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
          $IPAddress = $Keywords;
-      } elseif (strtolower($Keywords) == 'banned') {
-         $this->SQL->Where('u.Banned >', 0);
-      } elseif (preg_match('/^\d+$/', $Keywords)) {
-         $UserID = $Keywords;
-      } else {
-         // Check to see if the search exactly matches a role name.
-         $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
       }
+
+      if (preg_match('/^\d+$/', $Keywords)) {
+         $UserID = $Keywords;
+      }
+
+      // Check to see if the search exactly matches a role name.
+      $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
 
       $this->UserQuery();
       if ($ApplicantRoleID != 0) {
@@ -1977,33 +1978,47 @@ class UserModel extends Gdn_Model {
             ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
       }
 
-      if (isset($Where))
-         $this->SQL->Where($Where);
-
       if (isset($RoleID) && $RoleID) {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
-      } elseif (isset($IPAddress)) {
+      }
+
+      $this->SQL->BeginWhereGroup();
+
+      if (isset($Where)) {
+         $this->SQL->OrWhere($Where);
+      }
+
+      if (isset($IPAddress)) {
          $this->SQL
             ->BeginWhereGroup()
             ->OrWhere('u.InsertIPAddress', $IPAddress)
             ->OrWhere('u.LastIPAddress', $IPAddress)
             ->EndWhereGroup();
-      } elseif (isset($UserID)) {
-         $this->SQL->Where('u.UserID', $UserID);
-      } else {
-         // Search on the user table.
-         $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
-
-         if (is_array($Like)) {
-            $this->SQL
-               ->BeginWhereGroup()
-               ->OrLike($Like, '', 'right')
-               ->EndWhereGroup();
-         }
       }
 
-      if ($ApplicantRoleID != 0)
+      if (isset($UserID)) {
+         $this->SQL->OrWhere('u.UserID', $UserID);
+      }
+
+      if (strtolower($Keywords) == 'banned') {
+         $this->SQL->OrWhere('u.Banned >', 0);
+      }
+
+      // Search on the user table.
+      $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+
+      if (is_array($Like)) {
+         $this->SQL
+            ->BeginWhereGroup()
+            ->OrLike($Like, '', 'right')
+            ->EndWhereGroup();
+      }
+
+      $this->SQL->EndWhereGroup();
+
+      if ($ApplicantRoleID != 0) {
          $this->SQL->Where('ur.RoleID is null');
+      }
 
       $Data = $this->SQL
          ->Where('u.Deleted', 0)
@@ -2026,59 +2041,76 @@ class UserModel extends Gdn_Model {
    }
 
    public function SearchCount($Keywords = FALSE) {
-      if (C('Garden.Registration.Method') == 'Approval')
+      if (C('Garden.Registration.Method') == 'Approval') {
          $ApplicantRoleID = (int)C('Garden.Registration.ApplicantRoleID', 0);
-      else
+      } else {
          $ApplicantRoleID = 0;
+      }
 
-      if (is_array($Keywords)) {
-         $Where = $Keywords;
-         $Keywords = $Where['Keywords'];
-         unset($Where['Keywords']);
+      // Check for an IP address.
+      if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
+         $IPAddress = $Keywords;
+      }
+
+      if (preg_match('/^\d+$/', $Keywords)) {
+         $UserID = $Keywords;
       }
 
       // Check to see if the search exactly matches a role name.
-      $RoleID = FALSE;
-      if (strtolower($Keywords) == 'banned') {
-         $this->SQL->Where('u.Banned >', 0);
-      } elseif (isset($UserID)) {
-         $this->SQL->Where('u.UserID', $UserID);
-      } else {
-         $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
-      }
-
-      if (isset($Where))
-         $this->SQL->Where($Where);
+      $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');
 
       $this->SQL
          ->Select('u.UserID', 'count', 'UserCount')
          ->From('User u');
-      if ($ApplicantRoleID != 0)
-         $this->SQL->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
 
-      if ($RoleID) {
-         $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
-      } elseif (isset($UserID)) {
-         $this->SQL->Where('u.UserID', $UserID);
-      } else {
-         // Search on the user table.
-         $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
-
-         if (is_array($Like)) {
-            $this->SQL
-               ->BeginWhereGroup()
-               ->OrLike($Like, '', 'right')
-               ->EndWhereGroup();
-         }
+      if ($ApplicantRoleID != 0) {
+         $this->SQL
+            ->Join('UserRole ur', "u.UserID = ur.UserID and ur.RoleID = $ApplicantRoleID", 'left');
       }
 
-		$this->SQL
-         ->Where('u.Deleted', 0);
 
-      if ($ApplicantRoleID != 0)
+      if (isset($RoleID) && $RoleID) {
+         $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
+      }
+
+      $this->SQL->BeginWhereGroup();
+
+      if (isset($Where)) {
+         $this->SQL->OrWhere($Where);
+      }
+
+      if (isset($IPAddress)) {
+         $this->SQL
+            ->OrWhere('u.InsertIPAddress', $IPAddress)
+            ->OrWhere('u.LastIPAddress', $IPAddress);
+      }
+
+      if (isset($UserID)) {
+         $this->SQL->OrWhere('u.UserID', $UserID);
+      }
+
+      if (strtolower($Keywords) == 'banned') {
+         $this->SQL->OrWhere('u.Banned >', 0);
+      }
+
+      // Search on the user table.
+      $Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
+
+      if (is_array($Like)) {
+         $this->SQL
+            ->OrLike($Like, '', 'right');
+      }
+
+      $this->SQL->EndWhereGroup();
+
+      if ($ApplicantRoleID != 0) {
          $this->SQL->Where('ur.RoleID is null');
+      }
 
-		$Data =  $this->SQL->Get()->FirstRow();
+      $Data = $this->SQL
+         ->Where('u.Deleted', 0)
+         ->Get()
+         ->FirstRow();
 
       return $Data === FALSE ? 0 : $Data->UserCount;
    }

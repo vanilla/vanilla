@@ -19,6 +19,9 @@ function smarty_function_include_file($Params, &$Smarty) {
    if (strpos($Name, '..') !== false) {
       return '<!-- Error, moving up directory path not allowed -->';
    }
+   if (IsUrl($Name)) {
+      return '<!-- Error, urls are not allowed -->';
+   }
    $filename = rtrim($Smarty->template_dir, '/').'/'.$Name;
    if (!file_exists($filename)) {
       return '<!-- Error, file does not exist -->';

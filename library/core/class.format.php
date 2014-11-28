@@ -1086,8 +1086,7 @@ class Gdn_Format {
       if (!isset($Matches[4]) || $InTag || $InAnchor)
          return $Matches[0];
       $Url = $Matches[4];
-
-      $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
+      $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)(?:\&amp;list=(?P<list>[^&#]+))?([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
       $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
@@ -1095,22 +1094,35 @@ class Gdn_Format {
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
-
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)
          || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches))
          && C('Garden.Format.YouTube', true)
          && !C('Garden.Format.DisableUrlEmbeds')) {
+
          $ID = $Matches['ID'];
+         $Playlist = $Matches['list'];
          $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
          $Result = '<span class="VideoWrap">';
+
+         if (!empty($Playlist)) {
+            $Result .= <<<EOT
+ <iframe width="{$Width}" height="{$Height}" src="//www.youtube.com/embed/videoseries?list={$Playlist}&amp;showinfo=1" frameborder="0" allowfullscreen></iframe>
+EOT;
+         } else {
+            $Result = '<span class="VideoWrap">';
             $Result .= '<span class="Video YouTube" id="youtube-'.$ID.'">';
-               $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$ID.'"><img src="//img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
-               $Result .= '<span class="VideoPlayer"></span>';
+
+            $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$ID.'">';
+            $Result .= '<img src="//img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
+            $Result .= '<span class="VideoPlayer"></span>';
             $Result .= '</span>';
+
+         }
          $Result .= '</span>';
 
-      // Vimeo
+
+         // Vimeo
       } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)
         && !C('Garden.Format.DisableUrlEmbeds')) {
          $ID = $Matches[2];

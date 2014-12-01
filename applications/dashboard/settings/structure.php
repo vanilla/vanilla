@@ -262,7 +262,8 @@ $PermissionModel->Define(array(
    'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
    'Garden.Moderation.Manage',
    'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
-   'Garden.AdvancedNotifications.Allow'
+   'Garden.AdvancedNotifications.Allow',
+   'Garden.Community.Manage' => 'Garden.Settings.Manage'
    ));
 
 $PermissionModel->Undefine(array(
@@ -332,6 +333,7 @@ if (!$PermissionTableExists) {
       'Role' => 'Administrator',
       'Garden.SignIn.Allow' => 1,
       'Garden.Settings.Manage' => 1,
+      'Garden.Community.Manage' => 1,
       'Garden.Users.Add' => 1,
       'Garden.Users.Edit' => 1,
       'Garden.Users.Delete' => 1,

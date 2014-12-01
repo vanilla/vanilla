@@ -272,7 +272,7 @@ class SettingsController extends DashboardController {
     * @param int $ID Ban ID we're editing or deleting.
     */
    public function Bans($Action = '', $Search = '', $Page = '', $ID = '') {
-      $this->Permission('Garden.Moderation.Manage');
+      $this->Permission('Garden.Community.Manage');
 
       // Page setup
       $this->AddSideMenu();

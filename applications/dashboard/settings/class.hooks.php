@@ -122,14 +122,15 @@ class DashboardHooks implements Gdn_IPlugin {
    }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      /* @var SideMenuModule $Menu */
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
-      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.View');
 		$Menu->AddLink('Dashboard', T('Getting Started'), '/dashboard/settings/gettingstarted', 'Garden.Settings.Manage');
-		$Menu->AddLink('Dashboard', T('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.Manage');
+		$Menu->AddLink('Dashboard', T('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.View');
 
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
-		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Settings.Manage');
+		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Community.Manage');
       $Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage');
 
       $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Settings.Manage');
@@ -177,8 +178,10 @@ class DashboardHooks implements Gdn_IPlugin {
       $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Settings.Manage');
       $Menu->AddLink('Site Settings', T('Statistics'), 'dashboard/statistics', 'Garden.Settings.Manage');
 
-		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
-		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         $Menu->AddItem('Import', T('Import'), 'Garden.Settings.Manage', array('class' => 'Import'));
+         $Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
+      }
    }
 
    /**

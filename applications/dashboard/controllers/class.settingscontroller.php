@@ -125,7 +125,7 @@ class SettingsController extends DashboardController {
     * @access public
     */
    public function Banner() {
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->AddSideMenu('dashboard/settings/banner');
       $this->Title(T('Banner'));
 
@@ -447,6 +447,7 @@ class SettingsController extends DashboardController {
       $this->Title(T('Dashboard'));
 
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
+      $this->RequiredAdminPermissions[] = 'Garden.Community.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Edit';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Delete';
@@ -1220,7 +1221,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveFavicon($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Community.Manage')) {
          $Favicon = C('Garden.FavIcon', '');
          RemoveFromConfig('Garden.FavIcon');
          $Upload = new Gdn_Upload();
@@ -1237,9 +1238,8 @@ class SettingsController extends DashboardController {
     * @param string $TransientKey Security token.
     */
    public function RemoveShareImage($TransientKey = '') {
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
 
-      $Session = Gdn::Session();
       if (Gdn::Request()->IsAuthenticatedPostBack()) {
          $ShareImage = C('Garden.ShareImage', '');
          RemoveFromConfig('Garden.ShareImage');
@@ -1261,7 +1261,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveLogo($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Community.Manage')) {
          $Logo = C('Garden.Logo', '');
          RemoveFromConfig('Garden.Logo');
          @unlink(PATH_ROOT . DS . $Logo);
@@ -1279,7 +1279,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveMobileLogo($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Community.Manage')) {
          $MobileLogo = C('Garden.MobileLogo', '');
          RemoveFromConfig('Garden.MobileLogo');
          @unlink(PATH_ROOT . DS . $MobileLogo);

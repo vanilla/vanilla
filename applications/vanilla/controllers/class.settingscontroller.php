@@ -556,7 +556,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function ManageCategories() {
       // Check permission
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->AddSideMenu('vanilla/settings/managecategories');
 
       $this->AddJsFile('categories.js');
@@ -580,6 +580,10 @@ class SettingsController extends Gdn_Controller {
 
       // Enable/Disable Categories
       if (Gdn::Session()->ValidateTransientKey(GetValue(1, $this->RequestArgs))) {
+         if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            throw PermissionException('Garden.Settings.Manage');
+         }
+
          $Toggle = GetValue(0, $this->RequestArgs, '');
          if ($Toggle == 'enable') {
             SaveToConfig('Vanilla.Categories.Use', TRUE);

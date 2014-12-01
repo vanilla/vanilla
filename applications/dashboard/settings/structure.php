@@ -249,7 +249,6 @@ $PermissionModel->Define(array(
    'Garden.Email.View' => 'Garden.SignIn.Allow',
    'Garden.Settings.Manage',
    'Garden.Settings.View',
-   'Garden.Messages.Manage',
    'Garden.SignIn.Allow' => 1,
    'Garden.Users.Add',
    'Garden.Users.Edit',
@@ -273,7 +272,8 @@ $PermissionModel->Undefine(array(
    'Garden.Registration.Manage',
    'Garden.Roles.Manage',
    'Garden.Routes.Manage',
-   'Garden.Themes.Manage'
+   'Garden.Themes.Manage',
+   'Garden.Messages.Manage'
    ));
 
 if (!$PermissionTableExists) {

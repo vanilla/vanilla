@@ -527,7 +527,7 @@ EOT;
          // Check to automatically link the user.
          if ($AutoConnect && count($ExistingUsers) > 0) {
             foreach ($ExistingUsers as $Row) {
-               if ($this->Form->GetFormValue('Email') == $Row['Email']) {
+               if (strcasecmp($this->Form->GetFormValue('Email'), $Row['Email']) === 0) {
                   $UserID = $Row['UserID'];
                   $this->Form->SetFormValue('UserID', $UserID);
                   $Data = $this->Form->FormValues();

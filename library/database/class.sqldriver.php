@@ -332,7 +332,7 @@ abstract class Gdn_SQLDriver {
       $Split = preg_split($FieldOpRegex, $Field, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
       if(count($Split) > 1) {
          $Field = $Split[0];
-         $Op = $Split[1];
+         $Op = strtolower($Split[1]);
          if (count($Split) > 2) {
             $Value = null;
          }

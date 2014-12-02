@@ -70,6 +70,27 @@ class TagModel extends Gdn_Model {
          }
       }
    }
+   
+   public function Counts($Column, $UserID = NULL) {
+      $Px = $this->Database->DatabasePrefix;
+      // Delete all the orphaned tagdiscussion records
+      $Sql = 'delete td.* ' .
+             "from {$Px}TagDiscussion as td " .
+             "left join {$Px}Discussion as d ON td.DiscussionID = d.DiscussionID " .
+             'where d.DiscussionID is null';
+
+      $this->Database->Query($Sql);
+
+      $Result = array('Complete' => TRUE);
+      switch($Column) {
+      case 'CountDiscussions':
+         Gdn::Database()->Query(DBAModel::GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'DiscussionID', 'TagID', 'TagID'));
+         break;
+      default:
+         throw new Gdn_UserException("Unknown column $Column");
+      }
+      return $Result;
+   }
 
    public static function ValidateTag($Tag) {
       // Tags can't contain commas.

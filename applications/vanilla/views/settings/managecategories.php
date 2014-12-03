@@ -14,8 +14,7 @@ $Session = Gdn::Session();
    echo Wrap(T('Need More Help?'), 'h2');
    echo '<ul>';
    echo Wrap(Anchor(T("Video tutorial on managing categories"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
-   echo Wrap(Anchor(T('Managing Categories'), 'http://vanillaforums.org/docs/managecategories'), 'li');
-   echo Wrap(Anchor(T('Adding & Editing Categories'), 'http://vanillaforums.org/docs/managecategories#add'), 'li');
+   echo Wrap(Anchor(T('Managing Categories'), 'http://docs.vanillaforums.com/features/categories/'), 'li');
    echo '</ul>';
    ?>
 </div>

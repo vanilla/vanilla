@@ -4017,8 +4017,12 @@ input + .ReactSprite {
   display: none;
 }
 /* For vimeo/other embeds */
-.Section-Discussion .Message iframe {
+.Section-Discussion .Message iframe,
+.Section-BestOf iframe {
   max-width: 100%;
+}
+.Section-BestOf iframe {
+   height: auto;
 }
 
 /* Media */

@@ -249,7 +249,6 @@ $PermissionModel->Define(array(
    'Garden.Email.View' => 'Garden.SignIn.Allow',
    'Garden.Settings.Manage',
    'Garden.Settings.View',
-   'Garden.Messages.Manage',
    'Garden.SignIn.Allow' => 1,
    'Garden.Users.Add',
    'Garden.Users.Edit',
@@ -262,7 +261,8 @@ $PermissionModel->Define(array(
    'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
    'Garden.Moderation.Manage',
    'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
-   'Garden.AdvancedNotifications.Allow'
+   'Garden.AdvancedNotifications.Allow',
+   'Garden.Community.Manage' => 'Garden.Settings.Manage'
    ));
 
 $PermissionModel->Undefine(array(
@@ -272,7 +272,8 @@ $PermissionModel->Undefine(array(
    'Garden.Registration.Manage',
    'Garden.Roles.Manage',
    'Garden.Routes.Manage',
-   'Garden.Themes.Manage'
+   'Garden.Themes.Manage',
+   'Garden.Messages.Manage'
    ));
 
 if (!$PermissionTableExists) {
@@ -332,6 +333,7 @@ if (!$PermissionTableExists) {
       'Role' => 'Administrator',
       'Garden.SignIn.Allow' => 1,
       'Garden.Settings.Manage' => 1,
+      'Garden.Community.Manage' => 1,
       'Garden.Users.Add' => 1,
       'Garden.Users.Edit' => 1,
       'Garden.Users.Delete' => 1,

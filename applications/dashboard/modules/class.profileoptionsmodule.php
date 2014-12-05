@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Displays profile options like "Message", "Edit Profile", or "Back to Profile" buttons on the top of the profile page.
  */
 class ProfileOptionsModule extends Gdn_Module {
-   
+
    public function AssetTarget() {
       return 'Content';
    }
@@ -31,11 +31,8 @@ class ProfileOptionsModule extends Gdn_Module {
 //         $ProfileOptions[] = array('Text' => T('Back to Profile'), 'Url' => UserUrl($Controller->User), 'CssClass' => 'BackToProfile');
       } else {
          // Profile Editing
-         if ($Controller->User->UserID != $Session->UserID) {
-            if (CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Profiles.Edit'))
-               $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
-         } else if (C('Garden.UserAccount.AllowEdit')) {
-            $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => '/profile/edit');
+         if (hasEditProfile($Controller->User->UserID)) {
+            $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
          }
 
          // Ban/Unban

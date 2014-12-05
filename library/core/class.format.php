@@ -262,6 +262,7 @@ class Gdn_Format {
             $Result = $BBCodeFormatter->Format($Mixed);
             $Result = Gdn_Format::Links($Result);
             $Result = Gdn_Format::Mentions($Result);
+	    $Result = Emoji::instance()->translateToHtml($Result);
 
             return $Result;
          }
@@ -643,6 +644,7 @@ class Gdn_Format {
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
          $Mixed = self::Mentions($Mixed);
          $Mixed = self::Links($Mixed);
+	 $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
          return $Mixed;
       }
@@ -833,6 +835,7 @@ class Gdn_Format {
             $Mixed = Gdn_Format::Links($Mixed);
             // Mentions & Hashes
             $Mixed = Gdn_Format::Mentions($Mixed);
+	    $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
             // nl2br
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
@@ -851,6 +854,7 @@ class Gdn_Format {
             $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
+	    $Result = Emoji::instance()->translateToHtml($Result);
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
                $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                $Result = FixNl2Br($Result);
@@ -1265,6 +1269,7 @@ EOT;
             $Mixed = $Formatter->Format($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
+	    $Mixed = Emoji::instance()->translateToHtml($Mixed);
             return $Mixed;
          }
       }
@@ -1424,6 +1429,7 @@ EOT;
       $Str = self::Text($Str);
       $Str = self::Links($Str);
       $Str = self::Mentions($Str);
+      $Str = Emoji::instance()->translateToHtml($Str);
       return $Str;
    }
 
@@ -1682,6 +1688,8 @@ EOT;
          $Mixed = Gdn_Format::Links($Mixed);
          // Mentions & Hashes
          $Mixed = Gdn_Format::Mentions($Mixed);
+	 $Mixed = Emoji::instance()->translateToHtml($Mixed);
+
 
          return $Mixed;
       }

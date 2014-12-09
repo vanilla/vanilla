@@ -267,10 +267,11 @@ class CategoriesController extends VanillaController {
             throw NotFoundException();
          }
 
+         // Get Discussion Count
          $CountDiscussions = $DiscussionModel->GetCount($Wheres);
-         if ($MaxPages && $MaxPages * $Limit < $CountDiscussions) {
-            $CountDiscussions = $MaxPages * $Limit;
-         }
+
+         if ($MaxPages)
+            $CountDiscussions = min($MaxPages * $Limit, $CountDiscussions);
 
          $this->SetData('CountDiscussions', $CountDiscussions);
          $this->SetData('_Limit', $Limit);

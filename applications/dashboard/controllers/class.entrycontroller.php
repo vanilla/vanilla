@@ -504,6 +504,10 @@ EOT;
          $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
          $AutoConnect = C('Garden.Registration.AutoConnect');
 
+         if ($IsPostBack && $this->Form->GetFormValue('ConnectName')) {
+            $this->Form->SetFormValue('Name', $this->Form->GetFormValue('ConnectName'));
+         }
+
          // Get the existing users that match the name or email of the connection.
          $Search = FALSE;
          if ($this->Form->GetFormValue('Name') && $NameUnique) {

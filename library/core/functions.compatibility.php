@@ -327,7 +327,7 @@ if (!function_exists('safeHeader')) {
     *
     * @param string $header
     * @param bool $replace
-    * @param int $http_response_code
+    * @param int|null $http_response_code
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
       static $context = null;

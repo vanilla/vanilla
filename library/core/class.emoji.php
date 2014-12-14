@@ -252,6 +252,10 @@ class Emoji {
 
          $c->AddDefinition('emoji', json_encode($emoji));
       }
+
+      if(C('Garden.EmojiSet') === 'none') {
+         $this->enabled = false;
+      }
    }
 
    /**
@@ -541,6 +545,10 @@ class Emoji {
     * @return string Return the emoji-formatted post
     */
    public function translateToHtml($Text) {
+      if (!$this->enabled) {
+         return $Text;
+      }
+
 		$Text = ' '. $Text .' ';
 
       // First, translate all aliases. Canonical emoji will get translated

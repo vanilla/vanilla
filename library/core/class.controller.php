@@ -1468,7 +1468,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                echo $Callback.'('.json_encode($Data).');';
                return TRUE;
             } else {
-               safeHeader('application/json; charset='.C('Garden.Charset', 'utf-8'), TRUE);
+               safeHeader('Content-Type: application/json; charset='.C('Garden.Charset', 'utf-8'), TRUE);
                // This is a regular json request.
                echo json_encode($Data);
                return TRUE;

@@ -2420,7 +2420,7 @@ if (!function_exists('ProxyHead')) {
 
          $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
 
-         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
+         $HostHeader = $Host.($Port != 80) ? ":{$Port}" : '';
          $Header = array(
             'Host'            => $HostHeader,
             'User-Agent'      => ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),

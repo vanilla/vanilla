@@ -1785,6 +1785,9 @@ if (!function_exists('IsMobile')) {
       }
 
       $type = userAgentType();
+      // Check the config for an override. (ex. Consider tablets mobile)
+      $type = C('Garden.Devices.'.ucfirst($type), $type);
+
       switch ($type) {
          case 'app':
          case 'mobile':

@@ -446,6 +446,7 @@ class SettingsController extends DashboardController {
       $this->AddJsFile('settings.js');
       $this->Title(T('Dashboard'));
 
+      $this->RequiredAdminPermissions[] = 'Garden.Settings.View';
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Community.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Add';

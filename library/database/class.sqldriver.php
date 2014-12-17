@@ -1825,27 +1825,16 @@ abstract class Gdn_SQLDriver {
    public function Set($Field, $Value = '', $EscapeString = TRUE, $CreateNewNamedParameter = TRUE) {
       $Field = Gdn_Format::ObjectAsArray($Field);
 
-      if (!is_array($Field))
+      if (!is_array($Field)) {
          $Field = array($Field => $Value);
+      }
 
       foreach ($Field as $f => $v) {
          if (!is_object($v)) {
-            if (!is_array($v))
-               $v = array($v);
-
-            foreach($v as $FunctionName => $Val) {
-               if ($EscapeString === FALSE) {
-                  if (is_string($FunctionName) !== FALSE) {
-                     throw new Exception('MySql functions are no longer supported.', 400);
-                  } else {
-                     $this->_Sets[$this->EscapeIdentifier($f)] = $Val;
-                  }
-               } else {
-                  $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
-                  $this->_NamedParameters[$NamedParameter] = $Val;
-                  $this->_Sets[$this->EscapeIdentifier($f)] = is_string($FunctionName) !== FALSE ? $FunctionName.'('.$NamedParameter.')' : $NamedParameter;
-               }
+            if (is_array($v)) {
+               throw new Exception('Invalid type (array) in db update.', 400);
             }
+            $this->_Sets[$this->EscapeIdentifier($f)] = $v;
          }
       }
 

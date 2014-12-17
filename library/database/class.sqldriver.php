@@ -1814,7 +1814,13 @@ abstract class Gdn_SQLDriver {
             if (is_array($v)) {
                throw new Exception('Invalid type (array) in db update.', 400);
             }
-            $this->_Sets[$this->EscapeIdentifier($f)] = $v;
+            if ($EscapeString) {
+               $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
+               $this->_NamedParameters[$NamedParameter] = $v;
+               $this->_Sets[$this->EscapeIdentifier($f)] = $NamedParameter;
+            } else {
+               $this->_Sets[$this->EscapeIdentifier($f)] = $v;
+            }
          }
       }
 

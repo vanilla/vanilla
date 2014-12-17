@@ -93,6 +93,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');
       $Sender->Title(T('Dashboard'));
+      $Sender->RequiredAdminPermissions[] = 'Garden.Settings.View';
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';

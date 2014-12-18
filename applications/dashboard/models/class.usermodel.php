@@ -3455,14 +3455,27 @@ class UserModel extends Gdn_Model {
     * @param boolean $PasswordOK
     */
     public static function RateLimit($User, $PasswordOK) {
-        if (!Gdn::Cache()->ActiveEnabled()) {
+        if (function_exists('apc_store')) {
+
+            $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+            $UserRate = (int)apc_fetch($UserRateKey);
+            $UserRate += 1;
+            apc_store($UserRateKey, 1, self::LOGIN_RATE);
+
+            $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+            $SourceRate = (int)apc_fetch($SourceRateKey);
+            $SourceRate += 1;
+            apc_store($SourceRateKey, 1, self::LOGIN_RATE);
+
+        } elseif (!Gdn::Cache()->ActiveEnabled()) {
             $Now = time();
 
             // UserID rate limiting
 
             $UserModel = Gdn::UserModel();
             $LastLoginAttempt = $UserModel->GetAttribute($User->UserID, 'LastLoginAttempt', 0);
-            $UserRate = $UserModel->GetAttribute($User->UserID, 'LoginRate', 1);
+            $UserRate = $UserModel->GetAttribute($User->UserID, 'LoginRate', 0);
+            $UserRate += 1;
 
             if ($LastLoginAttempt + self::LOGIN_RATE <= $Now) {
                 $UserRate = 0;
@@ -3470,42 +3483,12 @@ class UserModel extends Gdn_Model {
 
             if (!$PasswordOK) {
                 $UserModel->SaveAttribute($User->UserID, 'LastLoginAttempt', $Now);
-                $UserModel->SaveAttribute($User->UserID, 'LoginRate', $UserRate + 1);
+                $UserModel->SaveAttribute($User->UserID, 'LoginRate', 1);
             }
 
             // IP rate limiting
-
-            $SourceRate = 1;
-            $IpAddress = Gdn::Request()->IpAddress();
-            // Hash the filenames of the IP cache
-            $Filename = 'ipcache_'.substr(md5($IpAddress), 0, 1).'.json';
-            $CacheFile = PATH_CACHE.DS.$Filename;
-
-            // Don't rate limit localhost
-            if ($IpAddress && $IpAddress != '127.0.0.1' && $IpAddress != '::1') {
-
-                if ($CacheContent = Gdn_FileSystem::GetContents($CacheFile)) {
-                    $CacheContent = json_decode($CacheContent, true);
-                    $NewCacheContent = array();
-
-                    //Check for the current IP and keep active entries
-                    foreach ($CacheContent as $Ip => $Rate) {
-                        if ($Rate[0] + self::LOGIN_RATE <= $Now) continue;
-                        if ($Ip == $IpAddress) {
-                            $SourceRate = $Rate[1] + 1;
-                        }
-                        $NewCacheContent[$Ip] = $Rate;
-                    }
-                    $NewCacheContent[$IpAddress] = array($Now, $SourceRate);
-
-                    if (!$PasswordOK) {
-                        Gdn_FileSystem::SaveFile($CacheFile, json_encode($NewCacheContent), LOCK_EX);
-                    }
-                } elseif (!$PasswordOK) {
-                    $CacheContent = array($IpAddress => array($Now, $SourceRate));
-                    Gdn_FileSystem::SaveFile($CacheFile, json_encode($CacheContent), LOCK_EX);
-                }
-            }
+            // TODO
+            $SourceRate = 0;
 
         } else {
 //          $CoolingDown = FALSE;

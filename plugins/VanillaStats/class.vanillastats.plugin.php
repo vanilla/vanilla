@@ -19,7 +19,7 @@
 $PluginInfo['VanillaStats'] = array(
    'Name' => 'Vanilla Statistics',
    'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
-   'Version' => '2.0.4',
+   'Version' => '2.0.4.1',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE,
@@ -93,6 +93,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
       // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');
       $Sender->Title(T('Dashboard'));
+      $Sender->RequiredAdminPermissions[] = 'Garden.Settings.View';
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Community.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';

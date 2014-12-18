@@ -1812,7 +1812,7 @@ abstract class Gdn_SQLDriver {
       foreach ($Field as $f => $v) {
          if (!is_object($v)) {
             if (is_array($v)) {
-               throw new Exception('Invalid type (array) in db update.', 400);
+               throw new Exception('Invalid value type (array) in INSERT/UPDATE statement.', 400);
             }
             if ($EscapeString) {
                $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);

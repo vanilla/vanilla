@@ -1442,8 +1442,11 @@ EOT;
     * @return mixed
     */
    public static function To($Mixed, $FormatMethod) {
-      if ($FormatMethod == '')
-         return $Mixed;
+      // Disallow blank Format.
+      if ($FormatMethod == '') {
+         // Set a sane default.
+         $FormatMethod = 'Html';
+      }
 
       if (is_string($Mixed)) {
          if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {

@@ -1519,11 +1519,6 @@ class DiscussionModel extends VanillaModel {
 
             $StoredCategoryID = FALSE;
 
-            // Disallow blank Format & allow forcing it.
-            if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter')) {
-               $Fields['Format'] = C('Garden.InputFormatter', '');
-            }
-
             if ($DiscussionID > 0) {
                // Updating
                $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
@@ -1552,8 +1547,9 @@ class DiscussionModel extends VanillaModel {
 
             } else {
                // Inserting.
+               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
+                  $Fields['Format'] = C('Garden.InputFormatter', '');
 
-               // Determine if notifications have been sent.
                if (C('Vanilla.QueueNotifications')) {
                   $Fields['Notified'] = ActivityModel::SENT_PENDING;
                }

@@ -1678,9 +1678,16 @@ class Gdn_Controller extends Gdn_Pluggable {
                if (StringBeginsWith($CssFile, 'http')) {
                   $this->Head->AddCss($CssFile, 'all', GetValue('AddVersion', $CssInfo, TRUE), $CssInfo['Options']);
                   continue;
-               } elseif(strpos($CssFile, '/') !== FALSE) {
-                  // A direct path to the file was given.
-                  $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
+               } elseif (strpos($CssFile, '/') !== FALSE) {
+                  $CssPaths = array();
+
+                  $AppFolder = $CssInfo['AppFolder'];
+                  if (empty($AppFolder)) {
+                     // A direct path to the file was given.
+                     $CssPaths[] = paths(PATH_ROOT, str_replace('/', DS, $CssFile));
+                  } else {
+                     $CssPaths[] = paths(PATH_APPLICATIONS, $AppFolder, 'design', $CssFile);
+                  }
                } else {
 //                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
                   $AppFolder = $CssInfo['AppFolder'];

@@ -271,7 +271,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function AddCategory() {
       // Check permission
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
 
       // Set up head
       $this->AddJsFile('jquery.alphanumeric.js');
@@ -470,7 +470,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function EditCategory($CategoryID = '') {
       // Check permission
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
 
       // Set up models
       $RoleModel = new RoleModel();

@@ -73,6 +73,7 @@ if (C('Vanilla.Categories.Use')) {
    $LastRight = 0;
    $OpenCount = 0;
    $Loop = 0;
+   $CanDelete = CheckPermission('Garden.Settings.Manage');
    foreach ($this->CategoryData->Result() as $Category) {
       if ($Category->CategoryID > 0) {
          // Only check stack if there is one
@@ -123,7 +124,7 @@ if (C('Vanilla.Categories.Use')) {
                   </td>
                   <td class="Buttons">'
                      .Anchor(T('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')
-                     .Anchor(T('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton')
+                     .($CanDelete ? Anchor(T('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
                   .'</td>
                </tr>
             </table>'

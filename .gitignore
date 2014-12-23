@@ -17,6 +17,10 @@
 *.kpf
 .DS_Store
 Thumbs.db
+*/.sass-cache/*
+*.scssc
+*.sassc
+*.kpf
 *.swp
 _notes
 */_archive/*
@@ -25,7 +29,9 @@ _notes
 .project
 .settings
 .buildpath
-.idea/*
+.idea
 /nbproject/private/
 nbproject/project.properties
 nbproject/project.xml
+/vendor/
+

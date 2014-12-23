@@ -57,11 +57,13 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
 
+/*
       if ($this->CanUpload) {
          $PermissionCategory = CategoryModel::PermissionCategory(Gdn::Controller()->Data('Category'));
          if (!GetValue('AllowFileUploads', $PermissionCategory, TRUE))
             $this->CanUpload = FALSE;
       }
+*/
    }
 
    public function AssetModel_StyleCss_Handler($Sender) {

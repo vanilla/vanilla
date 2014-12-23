@@ -1,0 +1,9 @@
+/* Copyright 2013 Zachary Doll */
+.Footer {
+  padding-top: 20px;
+}
+
+.Aside.Box form {
+  text-align: center;
+  padding: 20px;
+}

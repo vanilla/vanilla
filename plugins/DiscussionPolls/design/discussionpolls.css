@@ -1,0 +1,38 @@
+/* Copyright 2013 Zachary Doll */
+.DP_AnswerForm, .DP_ResultsForm {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid rgb(190, 200, 204);
+  border-radius: 5px;
+}
+
+.DP_ResultQuestion:not(:first-child), .DP_AnswerQuestion:not(:first-child) {
+  border-top: 1px solid rgb(190, 200, 204);
+}
+
+.DP_ResultOptions {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.DP_Bar {
+  display: inline-block;
+  background-color: #000;
+  color: #FFF;
+}
+
+.DP_Bar-0 {background-color: #ff7f2a; color: #000; }
+.DP_Bar-1 {background-color: #71c837; color: #000; }
+.DP_Bar-2 {background-color: #8d5fd3; color: #5f1e00; }
+.DP_Bar-3 {background-color: #dfff2a; color: #000; }
+.DP_Bar-4 {background-color: #379ec8; color: #000; }
+.DP_Bar-5 {background-color: #ff2a2a; color: #000; }
+.DP_Bar-6 {background-color: #c8ae37; color: #000; }
+.DP_Bar-7 {background-color: #5f6fd3; color: #000; }
+.DP_Bar-8 {background-color: #ff2af6; color: #000; }
+.DP_Bar-9 {background-color: #37c88c; color: #000; }
+
+.DP_VoteCount {
+  display: block;
+  float: right;
+}

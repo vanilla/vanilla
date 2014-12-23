@@ -93,7 +93,7 @@ class Gdn_Upload extends Gdn_Pluggable {
     * @param string $Name The name of the upload as saved in the database.
     */
    public function Delete($Name) {
-      $Parsed = $this->Parse($Name);
+      $Parsed = self::Parse($Name);
 
       // Throw an event so that plugins that have stored the file somewhere else can delete it.
       $this->EventArguments['Parsed'] =& $Parsed;

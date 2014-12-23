@@ -1,0 +1,47 @@
+div.AddFeed .Buttons {
+   padding-bottom: 20px;
+}
+
+#Content div.AddFeed ul li div.Info{
+   margin-top: 0px;
+}
+
+div.ActiveFeeds {
+   padding: 20px;
+}
+
+div.ActiveFeeds div.FeedItem {
+   border-bottom: 1px solid #e0e0e0;
+   margin: 10px 20px 0px 20px;
+   padding-bottom: 10px;
+   position: relative;
+}
+
+div.ActiveFeeds div.FeedItem div.FeedItemURL {
+   font-weight: bold;
+}
+
+div.ActiveFeeds div.FeedItem div.FeedItemInfo {
+   color: #555555;
+   font-size: 90%;
+}
+
+div.ActiveFeeds div.FeedItem div.FeedItemInfo span {
+   margin-right: 10px;
+}
+
+div.ActiveFeeds div.FeedItem div.DeleteFeed {
+   position: absolute;
+   top: 0px;
+   right: 0px;
+}
+
+div.Comment div.AutoFeedDiscussion img {
+   float: left;
+   padding: 0px 15px 15px 0px;
+   border: 0px;
+}
+
+div.Comment div.AutoFeedDiscussion {
+   overflow: hidden;
+}

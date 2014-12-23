@@ -1,0 +1,15 @@
+.UserSignature {
+   border-top: 1px solid #ddd;
+   border-top: 1px solid rgba(0, 0, 0, 0.1);
+   padding-top: 4px;
+   font-size: 11px;
+   margin-top: 10px;
+}
+
+.UserSignature p {
+   margin: 2px 0;
+}
+
+.UserSignature.HideImages img {
+   display: none;
+}

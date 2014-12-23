@@ -1,0 +1,235 @@
+/*div.AnswerTabs {
+	border-bottom: 1px solid #999;
+	background: none;
+	padding: 0  0 0 8px;
+}
+*/
+/*
+div.AnswerTabs li a,
+div.AnswerTabs li a:link,
+div.AnswerTabs li a:hover,
+div.AnswerTabs li a:active,
+div.AnswerTabs li a:visited {
+	display:inline-block;
+	line-height: normal;
+	-webkit-border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+	border-bottom: none;
+
+	-webkit-border-radius: none;
+	-moz-border-radius: none;
+	background: none;
+	border: none;
+}
+div.AnswerTabs li.Active a {
+	padding: 6px 10px 5px;
+	position: relative;
+	top: 1px;
+	border: 1px solid #999;
+	border-bottom: none;
+	background: #fff;
+}
+div.HeadingTabs div.SubTab {
+	font-size:16px;
+}
+*/
+.VotingSort .Active {
+   font-weight: bold;
+}
+.StatBox {
+   /* background: #004C9B; */
+	padding: 5px 5px 0;
+	float: right;
+	height: 38px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 18px;
+	line-height: 1.2;
+}
+.StatBox span {
+	display: block;
+	font-weight: normal;
+	font-size:9px;
+	line-height: 1;
+	padding-bottom:2px;
+	min-width:38px;
+}
+.StatBox,
+.StatBox a {
+	/* color: #99e2fe; */
+	display: block;
+}
+.StatBox a {
+	position: relative;
+	z-index: 10;
+}
+/*
+.StatBox a:hover {
+	color: #fff;
+	text-shadow: 0 0px 5px #fff;
+}
+*/
+/*
+.ViewsBox { background: #0065CE; }
+.FollowsBox { background: #0053A9; }
+*/
+.AnswersBox {
+	/* background: #0053A9; */
+	margin-right: 4px;
+   border-top-right-radius: 2px;
+   border-bottom-right-radius: 2px;
+	-webkit-border-top-right-radius: 2px;
+	-webkit-border-bottom-right-radius: 2px;
+	-moz-border-radius-topright: 2px;
+	-moz-border-radius-bottomright: 2px;
+}
+/*
+.HasAnswersBox { background: #013b76; }
+.HasAnswersBox a { color: #fff; }
+*/
+.VotesBox {
+	margin-left: 4px;
+   border-top-left-radius: 2px;
+	border-bottom-left-radius: 2px;
+	-webkit-border-top-left-radius: 2px;
+	-webkit-border-bottom-left-radius: 2px;
+	-moz-border-radius-topleft: 2px;
+	-moz-border-radius-bottomleft: 2px;
+}
+ul.Discussions div.ItemContent a.Title {
+	max-width: none;
+}
+
+ul.DataList li.Item {
+	position: relative;
+}
+ul.Discussions .Options {
+	float:none;
+	width:auto;
+	position: absolute;
+	top: 2px;
+	right: 215px;
+}
+ul.DataList div.Meta {
+	z-index: 5;
+}
+div.Meta span.CommentCount {
+	display: none;
+}
+ul.DataList div.Meta strong {
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;
+
+	position:absolute;
+	/*
+	right: 668px;
+	top: 6px;
+	*/
+	top: 24px;
+	left: 668px;
+	white-space: nowrap;
+}
+ul.MessageList li.Item {
+	background: #fff;
+}
+ul.MessageList div.Meta {
+	position: relative;
+}
+ul.MessageList div.Meta span.Votes {
+	text-align: center;
+	display: block;
+	position: absolute;
+	right: 684px;
+	line-height: normal;
+	padding: 0;
+}
+span.Votes a,
+span.Votes span {
+	display: block;
+}
+ul.MessageList div.Meta span.Votes span {
+	padding: 0;
+	/* color: #000; */
+	font-weight: bold;
+	font-size: 18px;
+	line-height: 1.2;	
+}
+.Voter span {
+   font-size: 13px;
+   font-weight: bold;
+   padding: 0 3px;
+}
+/*
+span.Votes span {
+	padding: 0 4px !important;
+	background: #0065CE;
+	color: #99E2FE !important;
+	min-width: 36px;
+}
+span.Votes a {
+	color: #99E2FE;
+	background: #004C9B;
+}
+span.Votes a.VoteUp {
+	padding: 5px 4px 3px;
+	-webkit-border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+   line-height: 100%;
+}
+span.Votes a.VoteDown {
+	padding: 3px 4px 5px;
+	-webkit-border-radius: 0 0 3px 3px;
+	-moz-border-radius: 0 0 3px 3px;
+   line-height: 100%;
+}
+span.Votes a:hover {
+	background: #013B76;
+	color: #fff;
+	text-shadow: 0 0px 5px #fff;	
+}
+*/
+
+/* Arrow Sprites */
+span.Voter i.ArrowSprite i {
+	display: none;
+}
+i.ArrowSprite {
+	display: inline-block;
+	height: 9px;
+	width: 13px;
+	background: url('arrow_sprite.png') top left no-repeat;
+}
+i.SpriteDown { background-position: bottom left; }
+a:hover i.SpriteUp {	background-position: top right; }
+a:hover i.SpriteDown {	background-position: bottom right; }
+
+/* Comments */
+ul.Discussions a.Bookmark { display: none; }
+body.Discussion a.Bookmark {
+	margin: 2px 6px 6px 8px;
+}
+ul.MessageList li.FirstComment {
+	border-bottom: none;
+}
+div.AnswerTabs {
+	margin-top: 12px;
+	padding: 6px 8px 0;
+	font-size: 11px;
+	color: #aaa;
+	text-align: right;
+	position: relative;
+	background: #f5f9ff;
+}
+div.AnswerTabs strong {
+	position: absolute;
+	left: 8px;
+	color: #000;
+	font-weight: bold;
+	font-size: 16px;
+	margin-right: 20px;
+}
+div.AnswerTabs ul {
+	display: inline-block;
+	margin: 0 10px;
+}

@@ -1,0 +1,24 @@
+.SocialIcon-Steam .Icon {
+   font-family: "vanillicon";
+   font-weight: 400;
+   font-size: 18px;
+   background: 0;
+}
+.SocialIcon-Steam .Icon::before {
+   position: relative;
+   left: 3px;
+   content: "\f19c";
+}
+.SocialIcon-Steam.HasText .Icon {
+   background: 0;
+}
+.SocialIcon-Steam.HasText .Icon::before {
+   left: 7px;
+}
+.SocialIcon-Steam,
+.SocialIcon-Steam.HasText .Icon {
+   background-color: #526f2a;
+}
+.SocialIcon-Steam:hover {
+   background-color: #395511;
+}

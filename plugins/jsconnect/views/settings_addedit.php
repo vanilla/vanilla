@@ -44,7 +44,10 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
      echo $this->Form->Label('Sign In Url', 'SignInUrl'),
-     '<div class="Info">'.T('The url that users use to sign in.').'</div>',
+     '<div class="Info">'.
+     T('The url that users use to sign in.').' '.
+     T('Use {target} to specify a redirect.').
+     '</div>',
       $this->Form->TextBox('SignInUrl', array('class' => 'InputBox BigInput'));
      ?>
    </li>
@@ -70,7 +73,7 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
       echo $this->Form->CheckBox('IsDefault', 'Make this connection your default signin method.');
-     ?> 
+     ?>
    </li>
    <li>
       <h2>Advanced</h2>
@@ -87,7 +90,7 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
       echo $this->Form->CheckBox('TestMode', 'This connection is in test-mode.');
-     ?> 
+     ?>
    </li>
 </ul>
 

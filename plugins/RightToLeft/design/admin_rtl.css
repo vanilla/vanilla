@@ -1,0 +1,30 @@
+html {
+  direction: rtl; }
+
+caption, th, td, .Flyout, .Dropdown {
+  text-align: inherit; }
+
+#Panel div.Box h4 {
+  background-position: 10px -145px no-repeat; }
+#Panel div.Dashboard h4 {
+  background-position: 10px 7px; }
+#Panel div.Appearance h4 {
+  background-position: 10px -1195px; }
+#Panel div.Users h4 {
+  background-position: 10px -292px; }
+#Panel div.Moderation h4 {
+  background-position: 10px -742px; }
+#Panel div.Forum h4 {
+  background-position: 10px -442px; }
+#Panel div.Reputation h4 {
+  background-position: 10px -540px; }
+#Panel div.Addons h4 {
+  background-position: 10px -240px; }
+#Panel div.SiteSettings h4 {
+  background-position: 10px -92px; }
+#Panel div.Import h4 {
+  background-position: 10px -1139px; }
+#Panel div.Pages h4 {
+  background-position: 10px -1244px; }
+#Panel div.Support h4 {
+  background-position: 10px -1298px; }

@@ -1,0 +1,50 @@
+html {
+   direction: rtl;
+}
+
+caption,
+th,
+td,
+.Flyout,
+.Dropdown {
+   text-align: inherit;
+}
+
+#Panel {
+   div.Box h4 {
+      background-position: 10px -145px no-repeat;
+   }
+   div.Dashboard h4 {
+      background-position: 10px 7px;
+   }
+   div.Appearance h4 {
+      background-position: 10px -1195px;
+   }
+   div.Users h4 {
+      background-position: 10px -292px;
+   }
+   div.Moderation h4 {
+      background-position: 10px -742px;
+   }
+   div.Forum h4 {
+      background-position: 10px -442px;
+   }
+   div.Reputation h4 {
+      background-position: 10px -540px;
+   }
+   div.Addons h4 {
+      background-position: 10px -240px;
+   }
+   div.SiteSettings h4 {
+      background-position: 10px -92px;
+   }
+   div.Import h4 {
+      background-position: 10px -1139px;
+   }
+   div.Pages h4 {
+      background-position: 10px -1244px;
+   }
+   div.Support h4 {
+      background-position: 10px -1298px;
+   }
+}

@@ -1,0 +1,38 @@
+.Profile table.IgnoreList .IgnoreUserPhoto {
+   height: 40px;
+   width: 40px;
+}
+
+.Profile table.IgnoreList .IgnoreUserPhoto img {
+   display: block;
+   height: 40px;
+   width: 40px;
+}
+
+.Profile table.IgnoreList th {
+   font-weight: bold;
+   padding-right: 15px;
+}
+
+.Profile table.IgnoreList td {
+   vertical-align: middle;
+   padding-right: 15px;
+   padding-bottom: 10px;
+}
+
+.Profile table.IgnoreList.Restricted {
+   opacity: 0.5;
+}
+
+.DataList .Ignored {
+   cursor: pointer;
+}
+
+.DataList .Ignored.IgnoreHide {
+   opacity: 0.4;
+}
+
+.Ignored.IgnoreHide .Item-BodyWrap, 
+.Ignored.IgnoreHide .CommentQuote {
+   display: none;
+}

@@ -1,0 +1,9 @@
+In order to use Vanilla's Solr plugin you must configure Solr on your server first. There is a good tutorial here: 
+
+http://www.cabotsolutions.com/2009/05/using-solr-lucene-for-full-text-search-with-mysql-db/
+
+The configuration files in this folder are only a guideline and must be modified to suit your purposes. If you want to use these configuration files then you can do the following:
+
+1. Place the configuration files in their proper locations.
+2. Edit solrconfig.xml and change #PATH_TO_CONFIG# to point to the location of data-config.xml
+3. Edit data-config.xml and add your database connection information.

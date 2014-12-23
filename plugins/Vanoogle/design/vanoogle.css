@@ -1,0 +1,33 @@
+body div#Body {
+	position: relative;	
+}
+#VanoogleResults {
+	position: absolute;
+	top: -5px;
+	right: 0;
+	background: white;
+	z-index: 1000;
+	-moz-box-shadow: 0 0 30px rgba(0, 0, 0, .7);
+	-webkit-box-shadow: 0 0 30px rgba(0, 0, 0, .7);
+	-goog-ms-box-shadow: 0 0 30px rgba(0, 0, 0, .7);
+	box-shadow: 0 0 30px rgba(0, 0, 0, .7);
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-goog-ms-border-radius: 10px;
+	padding: 0 10px;
+	max-width: 800px;
+	border: 1px solid #BEC8CC;
+}
+
+.gsc-branding {
+	display: none;
+}
+div.gsc-clear-button {
+	background-color: white;
+}
+#Head form.gsc-search-box {
+	background: transparent;
+}
+#VanoogleResults .gsc-result {
+	margin-bottom: 0;
+}

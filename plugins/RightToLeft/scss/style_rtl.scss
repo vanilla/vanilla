@@ -1,0 +1,170 @@
+// ## Vendors
+//
+// Library dependencies installed using Bower are automagically wired up when
+// running the `npm run build` command. Don't manually edit this section!
+//
+// bower:scss
+// endbower
+// bower:sass
+// endbower
+
+html {
+   direction: rtl;
+}
+
+caption,
+th,
+td,
+.Flyout,
+.Dropdown {
+   text-align: inherit;
+}
+
+#Panel .PanelInfo li {
+   text-align: inherit;
+}
+
+#Panel .FilterMenu .Aside, .PanelInfo .Aside {
+   float: left;
+}
+
+.UserBox .PhotoWrap, .MeBox .PhotoWrap {
+   float: right;
+   margin-right: 0;
+   margin-left: 5px;
+}
+
+.ControlOptions, .Options {
+   float: left;
+}
+
+.Block .PhotoWrap {
+   float: right;
+   margin: 0 0 0 5px;
+}
+
+.Author .PhotoWrap {
+   margin: 0 0 4px 10px;
+   float: right;
+}
+
+.ProfileOptions {
+   float: left;
+}
+
+.PhotoWrapSmall {
+   margin-right: 0;
+   margin-left: 5px;
+}
+
+.PopList {
+   .Item.Title a {
+      float: left;
+   }
+
+   .ItemContent {
+      margin-left: 0;
+      margin-right: 48px;
+   }
+}
+
+.Flyout.Flags {
+   right: 0;
+
+   &::before,
+   &:after {
+      left: inherit;
+      right: 7px;
+   }
+}
+
+.ReactButton {
+   .Count {
+      margin-left: 4px;
+      margin-right: 0;
+   }
+}
+
+.CommentForm .FormWrapper-Condensed {
+   padding: 10px 60px 10px 10px;
+}
+
+.CommentFormWrap {
+   .Author .PhotoWrap {
+      margin: 10px 10px 0 0;
+   }
+}
+
+.EmotifyDropdown {
+   left: -7px;
+   right: inherit;
+}
+
+.Pager {
+   direction: ltr;
+}
+
+#ConversationForm label {
+   text-align: inherit;
+}
+
+.IndexPhoto {
+   float: right;
+}
+
+.ButtonGroup.Multi > .Button.Handle {
+   border-right: 0;
+   border-left: 1px solid #999;
+   border-radius: 0;
+   border-top-left-radius: 2px;
+   border-bottom-left-radius: 2px;
+}
+
+.ButtonGroup.Multi > .NavButton:first-child,
+.ButtonGroup.Multi > .Button:first-child {
+   border-radius: 0;
+   border-top-right-radius: 2px;
+   border-bottom-right-radius: 2px;
+}
+
+.MItem {
+   > * {
+      display: inline-block;
+   }
+
+   &.LastCommentDate {
+      display: inline-block;
+   }
+}
+
+.AuthorWrap .Username,
+.DiscussionMeta .MItem.Category {
+   float: right;
+   margin-left: 5px;
+}
+
+time {
+   unicode-bidi: embed;
+}
+
+.MItem:first-child {
+   margin-right: 0;
+   margin-left: 8px;
+}
+
+.OptionsMenu {
+   .Flyout {
+      right: inherit;
+      left: -9px;
+
+      &::before {
+         left: 9px;
+         right: inherit;
+      }
+
+      &::after {
+         left: 9px;
+         right: inherit;
+      }
+   }
+}

@@ -1,0 +1,142 @@
+body.fileupload div#Content div.Info {
+   padding-bottom: 0px;
+   margin-bottom: 0px;
+}
+body.fileupload div#Content div.Info div.RealtimeMode {
+   display: block;
+   font-size: 85%;
+}
+body.fileupload div#Content div.Info div.RealtimeMode span {
+   padding: 2px 5px;  
+}
+body.fileupload div#Content div.Info div.RealtimeMode span.FileUploadRealtimeUnavailable {
+   color: #ff7c25;
+   background-color: #fff1e8;
+}
+body.fileupload div#Content div.Info div.RealtimeMode span.FileUploadRealtimeAvailable {
+   color: #40aa00;
+   background-color: #dfffcb;
+}
+#DiscussionForm ul.PostOptions {
+   margin-bottom: 0px;
+}
+body #DiscussionForm div.AttachFileWrapper form,
+body #DiscussionForm form.FileUpload {
+   background: transparent;
+   border: 0px;
+   padding: 0px;
+   margin: 0px;
+}
+div.AttachFileWrapper {
+   margin-bottom: 2px;
+   padding: 5px;
+   text-align: left;
+}
+div.AttachFileWrapper table.AttachFileContainer {
+   border-collapse: collapse;
+   border: none;
+}
+div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td {
+   padding: 3px;
+   vertical-align: middle;
+}
+div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar {
+   width: 126px;
+   border: 2px solid gray;
+   background-color: lightgrey;
+   height: 14px;
+   background: transparent url('../images/progress_base.gif') no-repeat center left;
+   border: 0px;
+}
+div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar div.ProgressTicker {
+   height: 100%;
+   background-color: lime;
+   background: transparent url('../images/progress_active.gif') no-repeat center left;
+   line-height: 14px;
+   font-size: 10px;
+   color: #444444;
+   padding-right: 2px;
+   text-align: right;
+}
+div.AttachFileWrapper div.AttachFileLink div.CurrentUploader input[type=file] {
+   display: none;
+}
+div.Attachments {
+   text-align: left;
+}
+li div.FileUploadBlock {
+   margin-bottom: 10px;
+}
+li div.FileUploadBlock h1 {
+   margin-bottom: 0px;
+}
+li div.FileUploadBlock div.Detail {
+   font-style: italic;
+}
+.PrototypicalAttachment {
+	zoom: 1;
+	*display: inline;
+}
+div.UploadProgress {
+   display: inline-block;
+}
+.AttachFileContainer .Attachment {
+   display: inline-block;
+	zoom: 1;
+	*display: inline;
+   position: relative;
+   margin: 3px;
+}
+.FilePreview {
+   border: none;
+}
+.MessageList .Item:hover { /* ie fix */
+   z-index: 100;
+}
+.Attachment img {
+   vertical-align: bottom;
+}
+/*.FilePreview img {
+	display: block;
+}*/
+.Attachment:hover {
+   z-index: 101;
+}
+.Attachment .FileHover {
+	display: none;
+}
+.Attachment .FileMeta {
+	padding: 0 4px;
+}
+.Attachment:hover .FileHover {
+	z-index: 101;
+	display: block;
+	background: #fff;
+	padding: 6px;
+	border: 1px solid #555;
+   box-shadow: 0px 2px 10px #000;
+	-moz-box-shadow: 0px 2px 10px #000;
+	-webkit-box-shadow: 0px 2px 10px #000;
+	position: absolute;
+	top: -7px;
+	left: -7px;
+}
+.FileMeta .FileAttributes, .FileMeta .FileName {
+   white-space: nowrap;
+}
+
+.Thumb-Default {
+   position: relative;
+   display: block;
+}
+.Thumb-Extension {
+   position: absolute;
+   display: block;
+   text-align: center;
+   bottom: 0;
+   padding: 4px;
+   text-transform: uppercase;
+   color: #777;
+   line-height: 1.2;
+   font-size: 12px;
+}

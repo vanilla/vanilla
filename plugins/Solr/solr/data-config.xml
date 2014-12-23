@@ -1,0 +1,38 @@
+<dataConfig>
+<dataSource driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/#DATABASE#?zeroDateTimeBehavior=convertToNull" user="#USERNAME#" password="#PASSWORD#"/>
+<document name="Discussions">
+	<entity 
+      name="Discussion"
+      pk="PrimaryID"
+      query="select d.DiscussionID * 10 + 1 as UniqueID, d.*, 'Discussion' as DocType from GDN_Discussion d;"
+      deltaImportQuery="select d.DiscussionID * 10 + 1 as UniqueID, d.*, 'Discussion' as DocType from GDN_Discussion d where d.DiscussionID = '${dataimporter.delta.DiscussionID}';"
+      deltaQuery="select d.DiscussionID from GDN_Discussion d where d.DateInserted > '${dataimporter.last_index_time}';">
+
+      <field column="UniqueID" />
+      <field column="DiscussionID" name="PrimaryID" />
+		<field column="DocType" />
+		<field column="CategoryID" />
+		<field column="InsertUserID" name="UserID" />
+		<field column="DateLastComment" name="DateInserted" />
+		<field column="Name" name="Title" />
+		<field column="Name" name="SearchTitle" />
+		<field column="Body" name="Summary" />
+	</entity>
+	<entity 
+      name="Comment"
+      pk="PrimaryID"
+      query="select c.CommentID * 10 + 1 as UniqueID, c.*, d.Name, d.CategoryID, 'Comment' as DocType from GDN_Comment c inner join GDN_Discussion d on c.DiscussionID = d.DiscussionID;"
+      deltaImportQuery="select c.CommentID * 10 + 1 as UniqueID, c.*, d.Name, d.CategoryID, 'Comment' as DocType from GDN_Comment c inner join GDN_Discussion d on c.DiscussionID = d.DiscussionID where c.CommentID = '${dataimporter.delta.CommentID}';"
+      deltaQuery="select c.CommentID from GDN_Comment c where c.DateInserted > '${dataimporter.last_index_time}';">
+
+      <field column="UniqueID" />
+      <field column="CommentID" name="PrimaryID" />
+		<field column="DocType" />
+		<field column="CategoryID" />
+		<field column="InsertUserID" name="UserID" />
+		<field column="DateInserted" />
+		<field column="Name" name="Title" />
+		<field column="Body" name="Summary" />
+	</entity>
+</document>
+</dataConfig>

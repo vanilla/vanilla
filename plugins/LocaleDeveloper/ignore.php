@@ -1,0 +1,57 @@
+<?php if (!defined('APPLICATION')) exit();
+
+$Definition['%1$s accepted %4$s invitation for membership.'] = '%1$s accepted %4$s invitation for membership.';
+$Definition['%1$s approved %4$s membership application.'] = '%1$s approved %4$s membership application.';
+$Definition['%1$s changed %4$s permissions.'] = '%1$s changed %4$s permissions.';
+$Definition['%1$s changed %6$s profile picture.'] = '%1$s changed %6$s profile picture.';
+$Definition['%1$s joined.'] = '%1$s joined.';
+$Definition['%1$s started a %8$s.'] = '%1$s started a %8$s.';
+$Definition['%3$s created an account for %1$s.'] = '%3$s created an account for %1$s.';
+$Definition['%1$s added  you to a %8$s.'] = '%1$s added  you to a %8$s.';
+$Definition['%1$s added you to a %8$s.'] = '%1$s added you to a %8$s.';
+$Definition['%1$s commented on %4$s %8$s.'] = '%1$s commented on %4$s %8$s.';
+$Definition['%1$s commented on your %8$s.'] = '%1$s commented on your %8$s.';
+$Definition['%1$s mentioned %3$s in a %8$s.'] = '%1$s mentioned %3$s in a %8$s.';
+
+$Definition['%1$s signed in.'] = '%1$s signed in.';
+$Definition['%1$s joined.'] = '%1$s joined.';
+$Definition['%1$s accepted %4$s invitation for membership.'] = '%1$s accepted %4$s invitation for membership.';
+$Definition['%1$s approved %4$s membership application.'] = '%1$s approved %4$s membership application.';
+$Definition['%3$s created an account for %1$s.'] = '%3$s created an account for %1$s.';
+$Definition['%1$s updated %6$s profile.'] = '%1$s updated %6$s profile.';
+$Definition['%1$s wrote on %4$s %5$s.'] = '%1$s wrote on %4$s %5$s.';
+$Definition['%1$s changed %6$s profile picture.'] = '%1$s changed %6$s profile picture.';
+$Definition['%1$s changed %4$s permissions.'] = '%1$s changed %4$s permissions.';
+$Definition['%1$s commented on %4$s %8$s.'] = '%1$s commented on %4$s %8$s.';
+$Definition['%1$s imported data.'] = '%1$s imported data.';
+$Definition['%1$s sent you a %8$s.'] = '%1$s sent you a %8$s.';
+$Definition['%1$s added you to a %8$s.'] = '%1$s added you to a %8$s.';
+$Definition['%1$s started a %8$s.'] = '%1$s started a %8$s.';
+$Definition['%1$s commented on %4$s %8$s.'] = '%1$s commented on %4$s %8$s.';
+$Definition['%1$s mentioned %3$s in a %8$s.'] = '%1$s mentioned %3$s in a %8$s.';
+$Definition['%1$s mentioned %3$s in a %8$s.'] = '%1$s mentioned %3$s in a %8$s.';
+$Definition['%1$s commented on your %8$s.'] = '%1$s commented on your %8$s.';
+
+$Definition['%1$s added  you to a %8$s.'] = '%1$s added  you to a %8$s.';
+$Definition['%1$s started a %8$s.'] = '%1$s started a %8$s.';
+$Definition['%1$s commented on %4$s %8$s.'] = '%1$s commented on %4$s %8$s.';
+$Definition['%1$s mentioned %3$s in a %8$s.'] = '%1$s mentioned %3$s in a %8$s.';
+$Definition['%1$s mentioned %3$s in a %8$s.'] = '%1$s mentioned %3$s in a %8$s.';
+$Definition['%1$s commented on your %8$s.'] = '%1$s commented on your %8$s.';
+$Definition['%1$s added  you to a %8$s.'] = '%1$s added  you to a %8$s.';
+$Definition['%1$s started a %8$s.'] = '%1$s started a %8$s.';
+$Definition['%1$s commented on %4$s %8$s.'] = '%1$s commented on %4$s %8$s.';
+$Definition['%1$s mentioned %3$s in a %8$s.'] = '%1$s mentioned %3$s in a %8$s.';
+$Definition['%1$s mentioned %3$s in a %8$s.'] = '%1$s mentioned %3$s in a %8$s.';
+$Definition['%1$s commented on your %8$s.'] = '%1$s commented on your %8$s.';
+$Definition['%1$s wrote:'] = '%1$s wrote:';
+$Definition['%1$s changed %6$s profile picture.'] = '%1$s changed %6$s profile picture.';
+$Definition['%1$s changed %4$s permissions.'] = '%1$s changed %4$s permissions.';
+$Definition['%1$s'] = '%1$s';
+$Definition['%1$s imported data.'] = '%1$s imported data.';
+$Definition['%1$s sent you a %8$s.'] = '%1$s sent you a %8$s.';
+
+$Definition['‹'] = '‹';
+$Definition['›'] = '›';
+$Definition['«'] = '«';
+$Definition['»'] = '»';

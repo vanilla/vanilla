@@ -1,0 +1,185 @@
+
+2010-09-17 / v1.4.5 / Phantom Inker (inker2576@yahoo.com)
+	* SECURITY FIX:  Fixed a bug that would allow arbitrary HTML
+		injection via the standard [acronym] tag.
+
+2010-08-16 / non-released / Phantom Inker (inker2576@yahoo.com)
+	* Added another unit test for unclosed lists.
+
+2010-06-05 / v1.4.4 / Phantom Inker (inker2576@yahoo.com)
+	* Fixed the long-standing bug in verbatim parsing so that
+		interior content is now truly verbatim and unprocessed.
+		This allows source code to be correctly represented inside
+		a [code] block even if it contains things like ['foo'].
+	* Fixed typos (missing $this-> and wrong variable names) in
+		SetDefaultRule() and SetWikiURL() that caused them to
+		reference things that didn't exist.
+	* Fixed a typo (missing backslash) in IsValidURL() that caused
+		it to miss some legal URLs.
+	* Fixed a bug that was incorrectly generating lists in some cases.
+
+2009-10-31 / non-released / Phantom Inker (inker2576@yahoo.com)
+	* Fixed a bug in SetWikiURL that referenced an invalid function
+		parameter.
+	* Fixed a bug in the lexer that was causing comments to produce
+		an invalid following state (and thus causing comments to
+		effectively turn off tag parsing thereafter!).
+	* Added tests for the comment bug, and for a reported (but not
+		yet reproduced) quote bug.
+
+2009-10-10 / v1.4.3 / Phantom Inker (inker2576@yahoo.com)
+	* Fixed a bug in plain mode that was causing tags processed in
+		plain mode to throw errors (it was calling a function that
+		had since been renamed).
+	* Added tests for plain mode to ensure this omission won't
+		happen again.
+
+2009-06-21 / v1.4.2 / Phantom Inker (inker2576@yahoo.com)
+	* SECURITY FIX: [img] tag was allowing HTML content to be passed
+		through.
+
+2009-04-03 / v1.4.1 / Phantom Inker (inker2576@yahoo.com)
+	* Fixed documentation for [quote] tag's url= attribute.
+
+2009-03-20 / v1.4.1 / Phantom Inker (inker2576@yahoo.com)
+	* Added support for SetURLTarget() and GetURLTarget(), and
+		extended support for SetURLTargeting().
+	* Added four more regression tests for URL targeting.
+
+2009-02-16 / v1.4.0 RELEASE / Phantom Inker (inker2576@yahoo.com)
+	* Replaced parsing logic for tags so that an equal-sign before
+	    whitespace can be considered part of a tag's value.  This
+	    allows [url=http://foo.com?bar=baz] to be parsed the way the
+	    user expects.  Note that this does break some (probably
+	    invalid) tags, but overall, the new parsing algorithm seems
+	    to be a win.
+	* Added several regression tests for the new tag-parsing logic.
+	* Added SetURLTargetable() and GetURLTargetable().  However, the
+	    default setting is to have this disabled for security reasons.
+	* Updated [url] tag to support URL targeting, using the standard
+	    target="" form.
+	* Fixed Wikify() so that wiki links with ' or , in them will be
+	    processed correctly.
+	* Added the _tag, _endtag, _hasend, and _params tag parameters.
+	* Added new appendix H for the tag parameters; added additional
+	    documentation for Set/GetURLTargetable().
+	* Added $debug flag to BBCodeLexer, replicated from the same flag in
+	    class BBCode itself.
+
+2009-01-08 / v1.3.4 / Phantom Inker (inker2576@yahoo.com)
+	* Replaced IsValidEmail() with e-mail validator from AddedBytes.com,
+	    which does a considerably better job of validating incorrect
+	    e-mails.  This fixes a bug were some e-mail addresses in [email]
+	    tags were being rejected even though they were legal.
+
+2008-12-01 / v1.3.3 / Phantom Inker (inker2576@yahoo.com)
+	* Added regression tests for [[wiki]] tags due to possible issue
+		identified in debugging CMXpress v0.9.8.
+
+2008-11-06 / v1.3.2 / Phantom Inker (inker2576@yahoo.com)
+	* Added regression tests for parsing equal signs in tags per tracker
+		ID #2220598.
+
+2008-08-08 / v1.3.1 RELEASE / Phantom Inker (inker2576@yahoo.com)
+	* Added profiler class and profiling code.
+	* Added support for removable sections in compressed version.
+	* Removed major performance bottleneck in Internal_ProcessSmileys()
+		that cut overall parsing times to about one third of what they
+		were before.
+	* Added PHP 4 compatiblity check for str_split; fixes a significant
+		bug on PHP 4 systems.
+	* Simplified test script's time output, since the new profiling code can
+		track it more accurately when debugging.
+
+2008-08-07 / v1.3 RELEASE / Phantom Inker (inker2576@yahoo.com)
+	* Exposed the functionality of FillTemplate() as a public function.
+	* Changed template-filling to have its default encoding be RAW, not
+		HTMLEncode().  This will affect any ENHANCED rule used with v1.2
+		or earlier; those rules MUST be converted to use the new /e
+		flag or they will not function properly.
+	* Changed 'plain_link' processing to use FillTemplate().
+	* Added URL/domain-name/email-address auto-detection (turned off by default).
+	* Added conformance tests for URL/etc. auto-detection.
+	* Added URL/etc. auto-detection APIs to documentation.
+	* Added 'k' flag and '.' operator to FillTemplate().
+	* Added FillTemplate() API to documentation.
+	* Added FillTemplate() example.
+	* Changed example programs to use "nbbc.php", not "src/nbbc_main.php".
+	* Added RSS example to demonstrate limiting and plain modes.
+	* Changed full example to offer checkboxes for testing various modes.
+	* Added an appendix containing sample CSS.
+	* Added usage sections to the documentation for limited-length mode,
+		plain-HTML mode, and URL-autodetection mode.
+	* Added new NBBC logo :-)
+    Stats:  127 KB source, 260 KB user's manual, 131 conformance tests [ALL PASS].
+
+2008-08-04 / v1.2 RELEASE / Phantom Inker (inker2576@yahoo.com)
+	* Added output-limiting mode.
+	* Added output-limit tails.
+	* Added fuzzy output limiting.
+	* Added plain-text mode.
+	* Added API documentation for output-limit and plain-text mode.
+	* Changed examples to use XHTML header declarations
+	* Added limiting example.
+	* Added strip_tags() calls to [url], [email], and [img] tags for safety.
+	* Fixed double-encoding bug in [url], [email], and [img] tags when specifying
+	   the URL as content instead of in the tag itself.
+	* Fixed double-encoding bug in the [color] and [acronym] tags.
+
+2008-07-30 / v1.1 RELEASE / Phantom Inker (inker2576@yahoo.com)
+    * Added more conformance tests and expanded some existing ones.
+	* Added performance-measuring to test_nbbc.php.
+	* Optimized lexer pattern to return fewer text tokens whenever possible.
+	* Optimized stack to use symbolic constants instead of strings.
+	* Optimized whitespace removal to perform fewer lexer calls.
+	* Optimized parser core when dealing with text/whitespace/newlines.
+	* Optimized text-collection to use output buffering instead of string cats.
+	* Optimized smiley conversions for the most common case.
+	* Several other small optimizations and cleanups.
+	* Overall performance improvement of about 30%.
+	* Fixed incorrect rule declaration logic for callback functions.
+	* Fixed section-link glitch in user's manual.
+	* Fixed bug that was prohibiting uncompressed version from working right.
+	* Removed (currently) unused BBCODE_OUTPUT_TEXT declarations (these probably
+	   need to be added in for real at a later date).
+	* Added sample CSS appendix to user's manual.
+	* Added short table-of-contents to user's manual for web site.
+	* Added five example scripts to the new examples/ directory.
+    Stats:  105 KB source, 217 KB user's manual, 121 conformance tests [ALL PASS].
+
+2008-07-29 / v1.0 RELEASE / Phantom Inker (inker2576@yahoo.com)
+    * Added newline-ignore mode and conformance tests for it.
+	* Finished writing first-edition user's manual.
+    Stats:  102 KB source, 212 KB user's manual, 120 conformance tests [ALL PASS].
+
+2008-07-24 / v1.0 RC5 / Phantom Inker (inker2576@yahoo.com)
+	* Added alternate tag-marker modes and conformance tests for it.
+	* Added ampersand pass-through mode and conformance tests for it.
+	* Fixed HTML-encoding error in BBCODE_VERBATIM tags; converted [code]
+		tag to use direct htmlspecialchars() calls.
+
+2008-07-23 / v1.0 RC4 / Phantom Inker (inker2576@yahoo.com)
+	* Updated tests to recognize new CSS classes in standard library's output.
+	* Fixed class-output bugs in standard library.
+
+2008-07-21 / v1.0 RC3 / Phantom Inker (inker2576@yahoo.com)
+	* Converted user's manual to new auto-generating format, and wrote
+		additional documentation.  User's manual is now about 90% complete.
+	* Reworked directory structure to be cleaner, and added support for
+		generating compacted "nbbc.php" version.
+
+2008-07-16 / v1.0 RC2 / Phantom Inker (inker2576@yahoo.com)
+	* Fix decoding issue to be more permissive, which corrects nesting errors
+		for broken [column] tags and other class-nesting issues.
+	* Add support for removing floating ending tags whose start tags had been
+		consumed during output-generation.
+
+2008-07-14 / v1.0 RC / Phantom Inker (inker2576@yahoo.com)
+	* Proposed final release candidate:  Implements full BBCode language, plus
+		smileys and wiki-links, with no apparent failures or caveats.
+    * Added conformance test script with 49 tests.
+
+2008-07-01 / alpha / Phantom Inker (inker2576@yahoo.com)
+	* First usable build; no version number.  Performs basic compiling and stack
+		transforms; currently very limited in what it can process.
+

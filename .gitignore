@@ -30,3 +30,8 @@ _notes
 nbproject/project.properties
 nbproject/project.xml
 /vendor/
+
+tests/_output
+tests/acceptance/AcceptanceTester.php
+tests/unit/UnitTester.php
+tests/functional/FunctionalTester.php

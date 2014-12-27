@@ -31,15 +31,31 @@ jQuery(document).ready(function($) {
    });
 
    // Hide/Reveal reset password input
-   $('#NewPassword').livequery(function() {
-      $(this).hide();
-   });
+   var hideNewPassword = function () {
+         $('#NewPassword').hide();
+      },
+      // When any of these events are triggered, the "New Password" input will
+      // be hidden
+      newPasswordTriggers = [
+         'popupReveal' // The user edit screen is loaded in a popup
+      ];
 
-   $(document).on('click', '.PasswordOptions', function() {
-      if ($("input:radio[name='ResetPassword']:checked").val() == 'Manual')
+   // Hide the password reset input on document ready
+   hideNewPassword();
+
+   // Hide the password reset input when any of the specified events are
+   // triggered
+   $(document).on(newPasswordTriggers.join(' '), hideNewPassword);
+
+   // When the password options are clicked, check to see if the admin/mod
+   // wishes to set a new password for the user. If that's the case, show the
+   // password reset input. Otherwise, hide it.
+   $(document).on('click', '.PasswordOptions', function () {
+      if ($("input:radio[name='ResetPassword']:checked").val() == 'Manual') {
          $('#NewPassword').slideDown('fast');
-      else
+      } else {
          $('#NewPassword').slideUp('fast');
+      }
    });
 
    // Make paging function in the user table

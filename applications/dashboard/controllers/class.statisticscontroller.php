@@ -78,7 +78,7 @@ class StatisticsController extends DashboardController {
       
       $AnalyticsEnabled = Gdn_Statistics::CheckIsEnabled();
       if ($AnalyticsEnabled) {
-         $ConfFile = PATH_CONF.'/config.php';
+         $ConfFile = Gdn::Config()->DefaultPath();
          $this->SetData('ConfWritable', $ConfWritable = is_writable($ConfFile));
          if (!$ConfWritable)
             $AnalyticsEnabled = FALSE;

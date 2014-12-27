@@ -172,7 +172,7 @@ class EntryController extends Gdn_Controller {
 
             // Attempt to authenticate.
             try {
-               if (!$this->Request->IsAuthenticatedPostBack()) {
+               if (!$this->Request->IsAuthenticatedPostBack() && !C('Garden.Embed.Allow')) {
                   $this->Form->AddError('Please try again.');
                   $Reaction = $Authenticator->FailedResponse();
                } else {
@@ -361,7 +361,7 @@ class EntryController extends Gdn_Controller {
          $Url = str_ireplace('{target}', rawurlencode(Url($Target, TRUE)), $Url);
 
          if ($this->DeliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->Data('Method'), 'POST') != 0)
-            Redirect($Url, 302);
+            redirectUrl($Url, 302);
          else {
             $this->SetData('Url', $Url);
             $Script = <<<EOT
@@ -481,7 +481,7 @@ EOT;
 
             // Don't overwrite the user photo if the user uploaded a new one.
             $Photo = GetValue('Photo', $User);
-            if (!GetValue('Photo', $Data) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+            if (!GetValue('Photo', $Data) || ($Photo && !IsUrl($Photo))) {
                unset($Data['Photo']);
             }
 
@@ -504,6 +504,10 @@ EOT;
          $EmailUnique = C('Garden.Registration.EmailUnique', TRUE);
          $AutoConnect = C('Garden.Registration.AutoConnect');
 
+         if ($IsPostBack && $this->Form->GetFormValue('ConnectName')) {
+            $this->Form->SetFormValue('Name', $this->Form->GetFormValue('ConnectName'));
+         }
+
          // Get the existing users that match the name or email of the connection.
          $Search = FALSE;
          if ($this->Form->GetFormValue('Name') && $NameUnique) {
@@ -523,7 +527,7 @@ EOT;
          // Check to automatically link the user.
          if ($AutoConnect && count($ExistingUsers) > 0) {
             foreach ($ExistingUsers as $Row) {
-               if ($this->Form->GetFormValue('Email') == $Row['Email']) {
+               if (strcasecmp($this->Form->GetFormValue('Email'), $Row['Email']) === 0) {
                   $UserID = $Row['UserID'];
                   $this->Form->SetFormValue('UserID', $UserID);
                   $Data = $this->Form->FormValues();
@@ -670,7 +674,7 @@ EOT;
             if ($UserSelect == 'current') {
                if (Gdn::Session()->UserID == 0) {
                   // This shouldn't happen, but a use could sign out in another browser and click submit on this form.
-                  $this->Form->AddError('@You were uexpectidly signed out.');
+                  $this->Form->AddError('@You were unexpectedly signed out.');
                } else {
                   $UserSelect = Gdn::Session()->UserID;
                }
@@ -751,7 +755,7 @@ EOT;
 
       if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->DeliveryType() != DELIVERY_TYPE_ALL) {
          $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-         $this->SetHeader('Content-Type', 'application/json');
+         $this->SetHeader('Content-Type', 'application/json; charset='.C('Garden.Charset', 'utf-8'));
       } elseif ($CheckPopup) {
          $this->AddDefinition('CheckPopup', $CheckPopup);
       } else {
@@ -863,7 +867,7 @@ EOT;
          $this->Form->ValidateRule('Email', 'ValidateRequired', sprintf(T('%s is required.'), T(UserModel::SigninLabelCode())));
          $this->Form->ValidateRule('Password', 'ValidateRequired');
 
-         if (!$this->Request->IsAuthenticatedPostBack()) {
+         if (!$this->Request->IsAuthenticatedPostBack() && !C('Garden.Embed.Allow')) {
             $this->Form->AddError('Please try again.');
          }
 

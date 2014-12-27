@@ -181,25 +181,36 @@ class SettingsController extends Gdn_Controller {
       $this->Title(T('Flood Control'));
       $this->AddSideMenu('vanilla/settings/floodcontrol');
 
-      // Load up config options we'll be setting
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array(
+      // Check to see if Conversation is enabled.
+      $IsConversationsEnabled = Gdn::applicationManager()->checkApplication('Conversations');
+
+      $ConfigurationFields = array(
          'Vanilla.Discussion.SpamCount',
          'Vanilla.Discussion.SpamTime',
          'Vanilla.Discussion.SpamLock',
          'Vanilla.Comment.SpamCount',
          'Vanilla.Comment.SpamTime',
          'Vanilla.Comment.SpamLock',
-         'Conversations.Conversation.SpamCount',
-         'Conversations.Conversation.SpamTime',
-         'Conversations.Conversation.SpamLock',
-         'Conversations.ConversationMessage.SpamCount',
-         'Conversations.ConversationMessage.SpamTime',
-         'Conversations.ConversationMessage.SpamLock',
          'Vanilla.Comment.MaxLength',
          'Vanilla.Comment.MinLength'
-      ));
+      );
+      if ($IsConversationsEnabled) {
+         $ConfigurationFields = array_merge(
+            $ConfigurationFields,
+            array(
+               'Conversations.Conversation.SpamCount',
+               'Conversations.Conversation.SpamTime',
+               'Conversations.Conversation.SpamLock',
+               'Conversations.ConversationMessage.SpamCount',
+               'Conversations.ConversationMessage.SpamTime',
+               'Conversations.ConversationMessage.SpamLock'
+            )
+         );
+      }
+      // Load up config options we'll be setting
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField($ConfigurationFields);
 
       // Set the model on the form.
       $this->Form->SetModel($ConfigurationModel);
@@ -223,23 +234,25 @@ class SettingsController extends Gdn_Controller {
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamTime', 'Integer');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamLock', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.SpamLock', 'Integer');
-
-         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamCount', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamCount', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamTime', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamTime', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamLock', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamLock', 'Integer');
-
-         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamCount', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamCount', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamTime', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamTime', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamLock', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamLock', 'Integer');
-
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Required');
          $ConfigurationModel->Validation->ApplyRule('Vanilla.Comment.MaxLength', 'Integer');
+
+         if ($IsConversationsEnabled) {
+
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamCount', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamTime', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamLock', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.Conversation.SpamLock', 'Integer');
+
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamCount', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamTime', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamLock', 'Required');
+            $ConfigurationModel->Validation->ApplyRule('Conversations.ConversationMessage.SpamLock', 'Integer');
+         }
 
          if ($this->Form->Save() !== FALSE) {
             $this->InformMessage(T("Your changes have been saved."));
@@ -258,7 +271,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function AddCategory() {
       // Check permission
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
 
       // Set up head
       $this->AddJsFile('jquery.alphanumeric.js');
@@ -276,7 +289,7 @@ class SettingsController extends Gdn_Controller {
       $this->RoleArray = $RoleModel->GetArray();
 
       $this->FireEvent('AddEditCategory');
-      $this->SetupDiscussionTypes($this->Category);
+      $this->SetupDiscussionTypes(array());
 
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->AddHidden('CodeIsDefined', '0');
@@ -457,7 +470,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function EditCategory($CategoryID = '') {
       // Check permission
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
 
       // Set up models
       $RoleModel = new RoleModel();
@@ -543,7 +556,7 @@ class SettingsController extends Gdn_Controller {
     */
    public function ManageCategories() {
       // Check permission
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->AddSideMenu('vanilla/settings/managecategories');
 
       $this->AddJsFile('categories.js');
@@ -567,6 +580,10 @@ class SettingsController extends Gdn_Controller {
 
       // Enable/Disable Categories
       if (Gdn::Session()->ValidateTransientKey(GetValue(1, $this->RequestArgs))) {
+         if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            throw PermissionException('Garden.Settings.Manage');
+         }
+
          $Toggle = GetValue(0, $this->RequestArgs, '');
          if ($Toggle == 'enable') {
             SaveToConfig('Vanilla.Categories.Use', TRUE);

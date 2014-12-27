@@ -54,7 +54,7 @@ class ConfigurationModule extends Gdn_Module {
    }
 
    /**
-    * 
+    *
     * @param Gdn_Form $NewValue
     * @return Gdn_Form
     */
@@ -68,10 +68,10 @@ class ConfigurationModule extends Gdn_Module {
 
       return $Form;
    }
-   
+
    public function HasFiles() {
       static $HasFiles = NULL;
-      
+
       if ($HasFiles === NULL) {
          $HasFiles = FALSE;
          foreach ($this->Schema() as $K => $Row) {
@@ -87,26 +87,35 @@ class ConfigurationModule extends Gdn_Module {
    public function Initialize($Schema = NULL) {
       if ($Schema !== NULL)
          $this->Schema($Schema);
-      
+
       $Form = $this->Form();
 
-      if ($Form->IsPostBack()) {
+      if ($Form->AuthenticatedPostBack()) {
          // Grab the data from the form.
          $Data = array();
+         $Post = $Form->FormValues();
 
          foreach ($this->_Schema as $Row) {
             $Name = $Row['Name'];
-            
+            $Config = $Row['Config'];
+
+            // For API calls make this a sparse save.
+            if ($this->Controller()->DeliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
+               continue;
+            }
+
             if (strtolower(GetValue('Control', $Row)) == 'imageupload') {
                $Form->SaveImage($Name, ArrayTranslate($Row, array('Prefix', 'Size')));
             }
-            
+
             $Value = $Form->GetFormValue($Name);
 
-            if ($Value == GetValue('Default', $Value, ''))
+            if ($Value == GetValue('Default', $Value, '')) {
                $Value = '';
+            }
 
-            $Data[$Name] = $Value;
+            $Data[$Config] = $Value;
+            $this->Controller()->SetData($Name, $Value);
          }
 
          // Save it to the config.
@@ -116,9 +125,10 @@ class ConfigurationModule extends Gdn_Module {
          // Load the form data from the config.
          $Data = array();
          foreach ($this->_Schema as $Row) {
-            $Data[$Row['Name']] = C($Row['Name'], GetValue('Default', $Row, ''));
+            $Data[$Row['Name']] = C($Row['Config'], GetValue('Default', $Row, ''));
          }
          $Form->SetData($Data);
+         $this->Controller()->Data = $Data;
       }
    }
 
@@ -126,13 +136,17 @@ class ConfigurationModule extends Gdn_Module {
       if (isset($SchemaRow['LabelCode']))
          return $SchemaRow['LabelCode'];
 
-      $LabelCode = trim(strrchr($SchemaRow['Name'], '.'), '.');
+      if (strpos($SchemaRow['Name'], '.') !== FALSE) {
+         $LabelCode = trim(strrchr($SchemaRow['Name'], '.'), '.');
+      } else {
+         $LabelCode = $SchemaRow['Name'];
+      }
 
       // Split camel case labels into seperate words.
       $LabelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $LabelCode);
       $LabelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $LabelCode);
       $LabelCode = trim($LabelCode);
-      
+
       $LabelCode = StringEndsWith($LabelCode, " ID", TRUE, TRUE);
 
       return $LabelCode;
@@ -169,6 +183,7 @@ class ConfigurationModule extends Gdn_Module {
             } else {
                $Row['Name'] = $Key;
             }
+            TouchValue('Config', $Row, $Row['Name']);
             $Schema[] = $Row;
          }
          $this->_Schema = $Schema;

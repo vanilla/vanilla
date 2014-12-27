@@ -2,5 +2,5 @@
 
 <h1><?php echo T('TermsOfService');?></h1>
 <div class="Legal">
-   <?php echo Markdown(T('TermsOfServiceText'));?>
+   <?php echo Gdn_Format::Markdown(T('TermsOfServiceText'));?>
 </div>

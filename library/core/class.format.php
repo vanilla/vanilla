@@ -33,6 +33,12 @@ class Gdn_Format {
     */
    public static $FormatLinks = TRUE;
 
+   public static $MentionsUrlFormat = '/profile/{name}';
+
+   protected static $SanitizedFormats = array(
+      'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
+   );
+
    /**
     * The ActivityType table has some special sprintf search/replace values in the
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
@@ -256,6 +262,7 @@ class Gdn_Format {
             $Result = $BBCodeFormatter->Format($Mixed);
             $Result = Gdn_Format::Links($Result);
             $Result = Gdn_Format::Mentions($Result);
+	    $Result = Emoji::instance()->translateToHtml($Result);
 
             return $Result;
          }
@@ -277,7 +284,7 @@ class Gdn_Format {
                $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed2);
                $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed2);
                $Mixed2 = preg_replace("#\[strike\](.*?)\[/strike\]#si",'<s>\\1</s>',$Mixed2);
-               $Mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si",'<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">\\1 said:</div><div class="QuoteText">\\3</div></blockquote>',$Mixed2);
+               $Mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si",'<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">'.sprintf(T('%s said:'), '\\1').'</div><div class="QuoteText">\\3</div></blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si",'<blockquote class="Quote">\\1</blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed2);
@@ -637,6 +644,7 @@ class Gdn_Format {
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
          $Mixed = self::Mentions($Mixed);
          $Mixed = self::Links($Mixed);
+	 $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
          return $Mixed;
       }
@@ -827,6 +835,7 @@ class Gdn_Format {
             $Mixed = Gdn_Format::Links($Mixed);
             // Mentions & Hashes
             $Mixed = Gdn_Format::Mentions($Mixed);
+	    $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
             // nl2br
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
@@ -845,6 +854,7 @@ class Gdn_Format {
             $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
+	    $Result = Emoji::instance()->translateToHtml($Result);
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
                $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                $Result = FixNl2Br($Result);
@@ -1082,7 +1092,7 @@ class Gdn_Format {
       $Url = $Matches[4];
 
       $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
-      $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com\/(\d+)';
+      $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
       $VineUrlMatch = 'https?://(?:www\.)?vine.co/v/([\w\d]+)';
@@ -1109,7 +1119,7 @@ class Gdn_Format {
         && !C('Garden.Format.DisableUrlEmbeds')) {
          $ID = $Matches[2];
          $Result = <<<EOT
-<div class="VideoWrap"><div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="//vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div></div>
+      <iframe src="//player.vimeo.com/video/{$ID}" width="{$Width}" height="{$Height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
 
       // Twitter
@@ -1254,11 +1264,12 @@ EOT;
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
          } else {
-            require_once(PATH_LIBRARY.'/vendors/markdown/markdown.php');
-            $Mixed = Markdown($Mixed);
+            require_once(PATH_LIBRARY.'/core/class.markdown.php');
+            $Mixed = MarkdownVanilla::defaultTransform($Mixed);
             $Mixed = $Formatter->Format($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
+	    $Mixed = Emoji::instance()->translateToHtml($Mixed);
             return $Mixed;
          }
       }
@@ -1276,9 +1287,11 @@ EOT;
 
          // Handle @mentions.
          if(C('Garden.Format.Mentions')) {
+            $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
+
             $Mixed = preg_replace(
                '/(^|[\s,\.>])@(\w{1,50})\b/i', //{3,20}
-               '\1'.Anchor('@\2', '/profile/\\2'),
+               '\1'.Anchor('@$2', $urlFormat),
                $Mixed
             );
          }
@@ -1416,6 +1429,7 @@ EOT;
       $Str = self::Text($Str);
       $Str = self::Links($Str);
       $Str = self::Mentions($Str);
+      $Str = Emoji::instance()->translateToHtml($Str);
       return $Str;
    }
 
@@ -1428,11 +1442,9 @@ EOT;
     * @return mixed
     */
    public static function To($Mixed, $FormatMethod) {
-      if ($FormatMethod == '')
-         return $Mixed;
-
+      // Process $Mixed based on its type.
       if (is_string($Mixed)) {
-         if (method_exists('Gdn_Format', $FormatMethod)) {
+         if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } elseif (function_exists('format'.$FormatMethod)) {
             $FormatMethod = 'format'.$FormatMethod;
@@ -1578,16 +1590,18 @@ EOT;
       // Preliminary decoding
       $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
       $Mixed = strtr($Mixed, self::$_UrlTranslations);
+      $Mixed = preg_replace('`[\']`', '', $Mixed);
 
       // Test for Unicode PCRE support
       // On non-UTF8 systems this will result in a blank string.
       $UnicodeSupport = (preg_replace('`[\pP]`u', '', 'P') != '');
 
       // Convert punctuation, symbols, and spaces to hyphens
-      if ($UnicodeSupport)
+      if ($UnicodeSupport) {
          $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
-      else
+      } else {
          $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);
+      }
 
       // Lowercase, no trailing or repeat hyphens
       $Mixed = preg_replace('`-+`', '-', strtolower($Mixed));
@@ -1655,7 +1669,7 @@ EOT;
          $CustomFormatter = C('Garden.Format.WysiwygFunction', FALSE);
 
       if (!is_string($Mixed)) {
-         return self::To($Mixed, 'Html');
+         return self::To($Mixed, 'Wysiwyg');
       } elseif (is_callable($CustomFormatter)) {
          return $CustomFormatter($Mixed);
       } else {
@@ -1672,6 +1686,8 @@ EOT;
          $Mixed = Gdn_Format::Links($Mixed);
          // Mentions & Hashes
          $Mixed = Gdn_Format::Mentions($Mixed);
+	 $Mixed = Emoji::instance()->translateToHtml($Mixed);
+
 
          return $Mixed;
       }

@@ -112,86 +112,86 @@ class Emoji {
       // Initialize the canonical list. (emoji)
       $this->emoji = array(
         // Smileys
-        'smile'                        => array('smile.png', '705'),
-        'smiley'                       => array('smiley.png', '704'),
-        'wink'                         => array('wink.png', '710'),
-        'blush'                        => array('blush.png', '711'),
-        'neutral_face'                 => array('neutral_face.png', '717'),
+        'smile'                        => 'smile.png',
+        'smiley'                       => 'smiley.png',
+        'wink'                         => 'wink.png',
+        'blush'                        => 'blush.png',
+        'neutral_face'                 => 'neutral_face.png',
 
-        'relaxed'                      => array('relaxed.png', '50'),
-        'grinning'                     => array('grinning.png', '701'),
-        'grin'                         => array('grin.png', '702'),
-        'joy'                          => array('joy.png', '703'),
-        'sweat_smile'                  => array('sweat_smile.png', '706'),
-        'lol'                          => array('lol.png', '707'),
-        'innocent'                     => array('innocent.png', '708'),
-        'smiling_imp'                  => array('smiling_imp.png', '709'),
-        'yum'                          => array('yum.png', '712'),
-        'relieved'                     => array('relieved.png', '713'),
-        'heart_eyes'                   => array('heart_eyes.png', '714'),
-        'sunglasses'                   => array('sunglasses.png', '715'),
-        'smirk'                        => array('smirk.png', '716'),
-        'neutral_face'                 => array('neutral_face.png', '717'),
-        'expressionless'               => array('expressionless.png', '718'),
-        'unamused'                     => array('unamused.png', '719'),
-        'sweat'                        => array('sweat.png', '720'),
-        'pensive'                      => array('pensive.png', '721'),
-        'confused'                     => array('confused.png', '722'),
-        'confounded'                   => array('confounded.png', '723'),
-        'kissing'                      => array('kissing.png', '724'),
-        'kissing_heart'                => array('kissing_heart.png', '725'),
-        'kissing_smiling_eyes'         => array('kissing_smiling_eyes.png', '726'),
-        'kissing_closed_eyes'          => array('kissing_closed_eyes.png', '727'),
-        'stuck_out_tongue'             => array('stuck_out_tongue.png', '728'),
-        'stuck_out_tongue_winking_eye' => array('stuck_out_tongue_winking_eye.png', '729'),
-        'stuck_out_tongue_closed_eyes' => array('stuck_out_tongue_closed_eyes.png', '730'),
-        'disappointed'                 => array('disappointed.png', '731'),
-        'worried'                      => array('worried.png', '732'),
-        'angry'                        => array('angry.png', '733'),
-        'rage'                         => array('rage.png', '734'),
-        'cry'                          => array('cry.png', '735'),
-        'persevere'                    => array('persevere.png', '736'),
-        'triumph'                      => array('triumph.png', '737'),
-        'disappointed_relieved'        => array('disappointed_relieved.png', '738'),
-        'frowning'                     => array('frowning.png', '739'),
-        'anguished'                    => array('anguished.png', '740'),
-        'fearful'                      => array('fearful.png', '741'),
-        'weary'                        => array('weary.png', '742'),
-        'sleepy'                       => array('sleepy.png', '743'),
-        'tired_face'                   => array('tired_face.png', '744'),
-        'grimacing'                    => array('grimacing.png', '745'),
-        'sob'                          => array('sob.png', '746'),
-        'open_mouth'                   => array('open_mouth.png', '747'),
-        'hushed'                       => array('hushed.png', '748'),
-        'cold_sweat'                   => array('cold_sweat.png', '749'),
-        'scream'                       => array('scream.png', '750'),
-        'astonished'                   => array('astonished.png', '751'),
-        'flushed'                      => array('flushed.png', '752'),
-        'sleeping'                     => array('sleeping.png', '753'),
-        'dizzy_face'                   => array('dizzy_face.png', '754'),
-        'no_mouth'                     => array('no_mouth.png', '755'),
-        'mask'                         => array('mask.png', '756'),
-        'star'                         => array('star.png', '123'),
-        'cookie'                       => array('cookie.png', '262'),
-        'warning'                      => array('warning.png', '71'),
-        'mrgreen'                      => array('mrgreen.png'),
+        'relaxed'                      => 'relaxed.png',
+        'grinning'                     => 'grinning.png',
+        'grin'                         => 'grin.png',
+        'joy'                          => 'joy.png',
+        'sweat_smile'                  => 'sweat_smile.png',
+        'lol'                          => 'lol.png',
+        'innocent'                     => 'innocent.png',
+        'smiling_imp'                  => 'smiling_imp.png',
+        'yum'                          => 'yum.png',
+        'relieved'                     => 'relieved.png',
+        'heart_eyes'                   => 'heart_eyes.png',
+        'sunglasses'                   => 'sunglasses.png',
+        'smirk'                        => 'smirk.png',
+        'neutral_face'                 => 'neutral_face.png',
+        'expressionless'               => 'expressionless.png',
+        'unamused'                     => 'unamused.png',
+        'sweat'                        => 'sweat.png',
+        'pensive'                      => 'pensive.png',
+        'confused'                     => 'confused.png',
+        'confounded'                   => 'confounded.png',
+        'kissing'                      => 'kissing.png',
+        'kissing_heart'                => 'kissing_heart.png',
+        'kissing_smiling_eyes'         => 'kissing_smiling_eyes.png',
+        'kissing_closed_eyes'          => 'kissing_closed_eyes.png',
+        'stuck_out_tongue'             => 'stuck_out_tongue.png',
+        'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
+        'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
+        'disappointed'                 => 'disappointed.png',
+        'worried'                      => 'worried.png',
+        'angry'                        => 'angry.png',
+        'rage'                         => 'rage.png',
+        'cry'                          => 'cry.png',
+        'persevere'                    => 'persevere.png',
+        'triumph'                      => 'triumph.png',
+        'disappointed_relieved'        => 'disappointed_relieved.png',
+        'frowning'                     => 'frowning.png',
+        'anguished'                    => 'anguished.png',
+        'fearful'                      => 'fearful.png',
+        'weary'                        => 'weary.png',
+        'sleepy'                       => 'sleepy.png',
+        'tired_face'                   => 'tired_face.png',
+        'grimacing'                    => 'grimacing.png',
+        'sob'                          => 'sob.png',
+        'open_mouth'                   => 'open_mouth.png',
+        'hushed'                       => 'hushed.png',
+        'cold_sweat'                   => 'cold_sweat.png',
+        'scream'                       => 'scream.png',
+        'astonished'                   => 'astonished.png',
+        'flushed'                      => 'flushed.png',
+        'sleeping'                     => 'sleeping.png',
+        'dizzy_face'                   => 'dizzy_face.png',
+        'no_mouth'                     => 'no_mouth.png',
+        'mask'                         => 'mask.png',
+        'star'                         => 'star.png',
+        'cookie'                       => 'cookie.png',
+        'warning'                      => 'warning.png',
+        'mrgreen'                      => 'mrgreen.png',
 
         // Love
-        'heart'                        => array('heart.png', '109'),
-        'broken_heart'                 => array('broken_heart.png', '506'),
-        'kiss'                         => array('kiss.png', '497'),
+        'heart'                        => 'heart.png',
+        'broken_heart'                 => 'broken_heart.png',
+        'kiss'                         => 'kiss.png',
 
         // Hand gestures
-        '+1'                           => array('+1.png', '435'),
-        '-1'                           => array('-1.png', '436'),
+        '+1'                           => '+1.png',
+        '-1'                           => '-1.png',
 
         // This is used for aliases that are set incorrectly or point
         // to items not listed in the emoji list.
         // errorEmoji
-        'grey_question'                => array('grey_question.png', '106'),
+        'grey_question'                => 'grey_question.png',
 
         // Custom icons, canonical naming
-        'trollface'                    => array('trollface.png', 'trollface')
+        'trollface'                    => 'trollface.png'
       );
 
       // Some aliases self-referencing the canonical list. Use this syntax.
@@ -227,6 +227,8 @@ class Emoji {
          '>:)'         => 'smiling_imp'
        );
 
+      Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');
+
       // Add emoji to definition list for whole site. This used to be in the
       // advanced editor plugin, but since moving atmentions to core, had to
       // make sure they were still being added. This will make sure that
@@ -244,11 +246,15 @@ class Emoji {
          foreach ($emojis as $name => $data) {
             $emoji[] = array(
                 "name" => "". $name ."",
-                "url" =>  $emojiAssetPath . '/' . reset($data)
+                "url" =>  Asset($emojiAssetPath . '/' . $data)
             );
          }
 
          $c->AddDefinition('emoji', json_encode($emoji));
+      }
+
+      if(C('Garden.EmojiSet') === 'none') {
+         $this->enabled = false;
       }
    }
 
@@ -281,10 +287,10 @@ class Emoji {
 
       if (isset($this->emoji[$emojiName])) {
          $filePath = $this->assetPath;
-         $emojiFileName = reset($this->emoji[$emojiName]);
+         $emojiFileName = $this->emoji[$emojiName];
       } elseif ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
          $filePath = $this->assetPathOriginal;
-         $emojiFileName = reset($this->emojiOriginalUnaccountedFor[$emojiName]);
+         $emojiFileName = $this->emojiOriginalUnaccountedFor[$emojiName];
       } else {
          return '';
       }
@@ -378,6 +384,32 @@ class Emoji {
       return $this->editorList;
    }
 
+   public function hasEditorList() {
+      $editorList = $this->getEmojiEditorList();
+      return !empty($editorList);
+   }
+
+   /**
+    * Set the list of emoji that can be used by the editor.
+    *
+    * @param array $value The new editor list.
+    */
+   public function setEmojiEditorList($value) {
+      // Convert the editor list to the proper format.
+      $list = array();
+      $aliases2 = array_flip($this->aliases);
+      foreach ($value as $emoji) {
+         if (isset($this->aliases[$emoji])) {
+            $list[$emoji] = $this->aliases[$emoji];
+         } elseif (isset($aliases2[$emoji])) {
+            $list[$aliases2[$emoji]] = $emoji;
+         } elseif (isset($this->emoji[$emoji])) {
+            $list[$this->ldelim.$emoji.$this->rdelim] = $emoji;
+         }
+      }
+      $this->editorList = $list;
+   }
+
    /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
     *
@@ -386,7 +418,7 @@ class Emoji {
     * @return string The html that represents the emiji.
     */
    public function img($emoji_path, $emoji_name) {
-      return sprintf($this->format, $emoji_path, $emoji_name);
+      return sprintf($this->format, Asset($emoji_path), $emoji_name);
    }
 
    /**
@@ -471,6 +503,39 @@ class Emoji {
    }
 
    /**
+    * Set the emoji from a manifest.
+    * @param array $manifest An emoji manifest with the following keys:
+    * - emoji: An array in the form: name => filename (ex. ['smile' => 'smile.png'])
+    * - aliases (optional): An array of emoji short forms: alias => emojiName  (ex. [':)' => 'smile'])
+    * - editor (optional): An array of emoji that will display in the editor: emojiName (ex: [smile,..])
+    * - format (optional): The string format of the emoji replacement.
+    * @param string $assetPath The asset path root to all of the emoji files.
+    */
+   public function setFromManifest($manifest, $assetPath = '') {
+      // Set the default asset root.
+      if ($assetPath) {
+         $this->setAssetPath(StringBeginsWith($assetPath, PATH_ROOT, true, true));
+      }
+
+      // Set the emoji settings from the manifest.
+      if (array_key_exists('emoji', $manifest)) {
+         $this->setEmoji($manifest['emoji']);
+      }
+
+      if (array_key_exists('aliases', $manifest)) {
+         $this->setAliases($manifest['aliases']);
+      }
+
+      if (!empty($manifest['format'])) {
+         $this->format = $manifest['format'];
+      }
+
+      if (array_key_exists('editor', $manifest)) {
+         $this->setEmojiEditorList($manifest['editor']);
+      }
+   }
+
+   /**
     * Translate all emoji aliases to their corresponding Html image tags.
     *
     * Thanks to punbb 1.3.5 (GPL License) for function, which was largely
@@ -480,11 +545,15 @@ class Emoji {
     * @return string Return the emoji-formatted post
     */
    public function translateToHtml($Text) {
+      if (!$this->enabled) {
+         return $Text;
+      }
+
 		$Text = ' '. $Text .' ';
 
       // First, translate all aliases. Canonical emoji will get translated
       // out of a loop.
-      $emojiAliasList = $this->getEmojiEditorList();
+      $emojiAliasList = $this->aliases;
 
       // Loop through and apply changes to all visible aliases from dropdown
 		foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
@@ -504,7 +573,7 @@ class Emoji {
       $rdelim = preg_quote($this->rdelim, '`');
       $emoji = $this;
 
-      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) use ($emoji) {
+      $Text = preg_replace_callback("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function($m) use ($emoji) {
          $emoji_name = trim($m[1], ':');
          $emoji_path = $emoji->getEmoji($emoji_name);
          if ($emoji_path) {
@@ -524,7 +593,6 @@ class Emoji {
    public static function instance() {
       if (Emoji::$instance === null) {
          Emoji::$instance = new Emoji();
-         Gdn::PluginManager()->CallEventHandlers(Emoji::instance(), 'Emoji', 'Init', 'Handler');
       }
 
       return Emoji::$instance;

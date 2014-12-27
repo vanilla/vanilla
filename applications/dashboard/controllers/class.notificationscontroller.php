@@ -73,7 +73,10 @@ class NotificationsController extends Gdn_Controller {
       
       $ActivityIDs = ConsolidateArrayValuesByKey($Activities, 'ActivityID');
       $ActivityModel->SetNotified($ActivityIDs);
-      
+
+      $Sender->EventArguments['Activities'] = &$Activities;
+      $Sender->FireEvent('InformNotifications');
+
       foreach ($Activities as $Activity) {
          if ($Activity['Photo'])
             $UserPhoto = Anchor(

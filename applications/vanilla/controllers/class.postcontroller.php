@@ -47,8 +47,8 @@ class PostController extends VanillaController {
     */
    public function Index($CurrentFormName = 'discussion') {
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
 		$this->SetData('CurrentFormName', $CurrentFormName);
 		$Forms = array();
@@ -70,12 +70,12 @@ class PostController extends VanillaController {
       );
 
       if (C('Vanilla.Categories.Use')) {
-         $Result = array_merge($Result, array(
+         $Result = array_replace($Result, array(
             '2' => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
             '1' => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
          ));
       } else {
-         $Result = array_merge($Result, array(
+         $Result = array_replace($Result, array(
             '1' => '@'.T('In recent discussions.'),
          ));
       }
@@ -99,8 +99,8 @@ class PostController extends VanillaController {
 
       // Setup head
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
       $Session = Gdn::Session();
 
@@ -188,7 +188,7 @@ class PostController extends VanillaController {
             $this->PopulateForm($this->Form);
          }
 
-      } else { // Form was submitted
+      } elseif ($this->Form->AuthenticatedPostBack()) { // Form was submitted
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->DiscussionModel->FilterForm($FormValues);
@@ -504,8 +504,8 @@ class PostController extends VanillaController {
 
       // Setup head
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
       // Setup comment model, $CommentID, $DraftID
       $Session = Gdn::Session();
@@ -559,6 +559,10 @@ class PostController extends VanillaController {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
+
+         if (!$Editing) {
+            unset($FormValues['CommentID']);
+         }
 
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);

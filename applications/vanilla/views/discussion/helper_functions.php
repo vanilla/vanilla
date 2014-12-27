@@ -208,34 +208,34 @@ function GetDiscussionOptions($Discussion = NULL) {
 
    // Can the user announce?
    if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))
-      $Options['AnnounceDiscussion'] = array('Label' => T('Announce'), 'Url' => 'vanilla/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Popup');
+      $Options['AnnounceDiscussion'] = array('Label' => T('Announce'), 'Url' => 'vanilla/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'AnnounceDiscussion Popup');
 
    // Can the user sink?
    if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID)) {
       $NewSink = (int)!$Discussion->Sink;
-      $Options['SinkDiscussion'] = array('Label' => T($Discussion->Sink ? 'Unsink' : 'Sink'), 'Url' => "/discussion/sink?discussionid={$Discussion->DiscussionID}&sink=$NewSink", 'Class' => 'Hijack');
+      $Options['SinkDiscussion'] = array('Label' => T($Discussion->Sink ? 'Unsink' : 'Sink'), 'Url' => "/discussion/sink?discussionid={$Discussion->DiscussionID}&sink=$NewSink", 'Class' => 'SinkDiscussion Hijack');
    }
 
    // Can the user close?
    if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID)) {
       $NewClosed = (int)!$Discussion->Closed;
-      $Options['CloseDiscussion'] = array('Label' => T($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'Class' => 'Hijack');
+      $Options['CloseDiscussion'] = array('Label' => T($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'Class' => 'CloseDiscussion Hijack');
    }
 
    if ($CanEdit && GetValueR('Attributes.ForeignUrl', $Discussion)) {
-      $Options['RefetchPage'] = array('Label' => T('Refetch Page'), 'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID, 'Class' => 'Hijack');
+      $Options['RefetchPage'] = array('Label' => T('Refetch Page'), 'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID, 'Class' => 'RefetchPage Hijack');
    }
 
    // Can the user move?
    if ($CanEdit && $Session->CheckPermission('Garden.Moderation.Manage')) {
-      $Options['MoveDiscussion'] = array('Label' => T('Move'), 'Url' => '/moderation/confirmdiscussionmoves?discussionid='.$Discussion->DiscussionID, 'Class' => 'Popup');
+      $Options['MoveDiscussion'] = array('Label' => T('Move'), 'Url' => '/moderation/confirmdiscussionmoves?discussionid='.$Discussion->DiscussionID, 'Class' => 'MoveDiscussion Popup');
    }
 
    // Can the user delete?
    if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID)) {
       $Category = CategoryModel::Categories($CategoryID);
 
-      $Options['DeleteDiscussion'] = array('Label' => T('Delete Discussion'), 'Url' => '/discussion/delete?discussionid='.$Discussion->DiscussionID.'&target='.urlencode(CategoryUrl($Category)), 'Class' => 'Popup');
+      $Options['DeleteDiscussion'] = array('Label' => T('Delete Discussion'), 'Url' => '/discussion/delete?discussionid='.$Discussion->DiscussionID.'&target='.urlencode(CategoryUrl($Category)), 'Class' => 'DeleteDiscussion Popup');
    }
 
    // DEPRECATED (as of 2.1)
@@ -407,11 +407,12 @@ function WriteCommentForm() {
 		<div class="Foot Closed">
 			<div class="Note Closed SignInOrRegister"><?php
 			   $Popup =  (C('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
+			   $ReturnUrl = Gdn::Request()->PathAndQuery();
             echo FormatString(
                T('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'),
                array(
-                  'SignInUrl' => Url(SignInUrl(Url(''))),
-                  'RegisterUrl' => Url(RegisterUrl(Url(''))),
+                  'SignInUrl' => Url(SignInUrl($ReturnUrl)),
+                  'RegisterUrl' => Url(RegisterUrl($ReturnUrl)),
                   'Popup' => $Popup
                )
             ); ?>
@@ -423,7 +424,7 @@ function WriteCommentForm() {
 	}
 
 	if (($Discussion->Closed == '1' && $UserCanClose) || ($Discussion->Closed == '0' && $UserCanComment))
-		echo $Controller->FetchView('comment', 'post');
+		echo $Controller->FetchView('comment', 'post', 'vanilla');
 }
 endif;
 
@@ -524,4 +525,4 @@ if (!function_exists('FormatMeAction')):
 
       return '<div class="AuthorAction">'.$Body.'</div>';
    }
-endif;
+endif; 

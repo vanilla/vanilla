@@ -181,6 +181,12 @@ class Gdn_ApplicationManager {
       $ApplicationFolder = ArrayValue('Folder', $ApplicationInfo, '');
 
       SaveToConfig('EnabledApplications'.'.'.$ApplicationName, $ApplicationFolder);
+      Logger::event(
+         'addon_enabled',
+         LogLevel::NOTICE,
+         'The {addonName} application was enabled.',
+         array('addonName' => $ApplicationName)
+      );
 
       $this->EventArguments['AddonName'] = $ApplicationName;
       Gdn::PluginManager()->CallEventHandlers($this, 'ApplicationManager', 'AddonEnabled');
@@ -241,6 +247,13 @@ class Gdn_ApplicationManager {
 
       // 2. Disable it
       RemoveFromConfig("EnabledApplications.{$ApplicationName}");
+
+      Logger::event(
+         'addon_disabled',
+         LogLevel::NOTICE,
+         'The {addonName} application was disabled.',
+         array('addonName' => $ApplicationName)
+      );
 
       // Clear the object caches.
       Gdn_Autoloader::SmartFree(Gdn_Autoloader::CONTEXT_APPLICATION, $ApplicationInfo);

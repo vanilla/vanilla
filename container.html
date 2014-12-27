@@ -5,14 +5,14 @@
       <script type="text/javascript" src="js/easyXDM/easyXDM.min.js"></script>
       <script type="text/javascript">
 //         document.domain = document.domain;
-         
+
          easyXDM.DomHelper.requiresJSON("js/easyXDM/json2.js");
-         
+
          var callRemote = function(func, args, callback) {
             var options = { func: func, args: args, success: success, failure: failure, id: Math.floor(Math.random()*4294967295) };
             this.postMessage(JSON.stringify(options));
          };
-         
+
          var callRemote = function(func, args, callback) {
             var options = { func: func, args: args };
 
@@ -23,7 +23,7 @@
 
             socket.postMessage(JSON.stringify(options));
          };
-         
+
          var callback = function(callbackID, args) {
 //            if (callbacks[callbackID] == undefined) {
 //               Vanilla.error("Unkown callback ID: "+callbackID);
@@ -36,7 +36,7 @@
 
             delete callbacks[callbackID];
          }
-         
+
          // Generates a random ID for use as a callback id
          var generateCbid = function() {
             var genRand = function(){
@@ -47,14 +47,14 @@
 
          // Object containing callbacks
          var iframe, callbacks = {};
-         
+
          function hide() {
             iframe.style.visibility = "hidden";
          }
          function show() {
-            iframe.style.visibility = "visible"; 
+            iframe.style.visibility = "visible";
          };
-            
+
          var socket = new easyXDM.Socket({
             swf: "js/easyXDM/easyxdm.swf",
             onReady: function(){
@@ -64,11 +64,11 @@
                iframe.allowtransparency = true;
                iframe.scrolling = "no";
                iframe.style.visibility = "hidden";
-               
+
                document.body.appendChild(iframe);
-               
+
                iframe.src = easyXDM.query.url;
-               
+
 //               if(iframe.addEventListener) {
 //                  iframe.addEventListener('DOMContentLoaded', loaded, true);
 //               } else if(iframe.attachEvent) {
@@ -77,13 +77,18 @@
 //                  loaded();
             },
             onMessage: function(message, origin) {
+               // This should only happen if the iframe is taking too long to load.
+               if (!iframe.contentWindow || !iframe.contentWindow.Vanilla || !iframe.contentWindow.Vanilla.parent) {
+                  return;
+               }
+
                var data = JSON.parse(message);
                var func = iframe.contentWindow.Vanilla.parent[data.func];
 
                data.args = data.args || [];
                if ((typeof data.args) == 'string')
                   data.args = [data.args];
-               
+
                if (data.func == 'setLocation') {
                   iframe.src = data.args[0];
                   return;
@@ -92,14 +97,14 @@
                   var args = data.args[1];
                   if (!args)
                      args = [];
-                  
+
                   callbacks[callbackID].apply(this, data.args[1]);
                   return;
                }
-               
+
                if ((typeof func) != 'function')
                   throw new Error(data.func+' is not a function.');
-               
+
                if (data.callbackID) {
                   // The function was called with a callback.
                   var callback = function() {

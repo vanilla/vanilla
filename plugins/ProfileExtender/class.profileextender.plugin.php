@@ -7,7 +7,7 @@
 $PluginInfo['ProfileExtender'] = array(
    'Name' => 'Profile Extender',
    'Description' => 'Add fields (like status, location, or gamer tags) to profiles and registration.',
-   'Version' => '3.0',
+   'Version' => '3.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE,
    //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
@@ -124,9 +124,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          if ($Value == '')
             continue;
 
+         // Use plaintext for building these
+         $Value = Gdn_Format::Text($Value);
+
          switch ($Label) {
             case 'Twitter':
-               $Fields['Twitter'] = Anchor('@'.$Value, 'http://twitter.com/'.$Value);
+               $Fields['Twitter'] = '@'.Anchor($Value, 'http://twitter.com/'.$Value);
                break;
             case 'Facebook':
                $Fields['Facebook'] = Anchor($Value, 'http://facebook.com/'.$Value);
@@ -138,7 +141,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                $Fields['Google'] = Anchor('Google+', $Value, '', array('rel' => 'me'));
                break;
             case 'Website':
-               $Fields['Website'] = Anchor($Value, $Value);
+               $LinkValue = (IsUrl($Value)) ? $Value : 'http://'.$Value;
+               $Fields['Website'] = Anchor($Value, $LinkValue);
                break;
             case 'Real Name':
                $Fields['Real Name'] = Wrap(htmlspecialchars($Value), 'span', array('itemprop' => 'name'));
@@ -392,10 +396,13 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                continue;
             if (!GetValue('OnProfile', $AllFields[$Name]))
                continue;
+
+            // Non-magic fields must be plain text, but we'll auto-link
             if (!in_array($Name, $this->MagicLabels))
-               $Value = Gdn_Format::Links(htmlspecialchars($Value));
+               $Value = Gdn_Format::Links(Gdn_Format::Text($Value));
+
             echo ' <dt class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Text($AllFields[$Name]['Label']).'</dt> ';
-            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.$Value.'</dd> ';
+            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Html($Value).'</dd> ';
          }
       } catch (Exception $ex) {
          // No errors
@@ -404,28 +411,53 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    
    /**
     * Save custom profile fields when saving the user.
+    *
+    * @param $Sender object
+    * @param $Args array
     */
-   public function UserModel_AfterSave_Handler($Sender) {
-      // Confirm we have submitted form values
-      $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments);
+   public function UserModel_AfterSave_Handler($Sender, $Args) {
+      $this->UpdateUserFields($Args['UserID'], $Args['FormPostValues']);
+   }
 
-      if (is_array($FormPostValues)) {
-         $UserID = GetValue('UserID', $Sender->EventArguments);
+   /**
+    * Save custom profile fields on registration.
+    *
+    * @param $Sender object
+    * @param $Args array
+    */
+   public function UserModel_AfterInsertUser_Handler($Sender, $Args) {
+      $this->UpdateUserFields($Args['InsertUserID'], $Args['User']);
+   }
+
+   /**
+    * Update user with new profile fields.
+    *
+    * @param $UserID int
+    * @param $Fields array
+    */
+   protected function UpdateUserFields($UserID, $Fields) {
+      // Confirm we have submitted form values
+      if (is_array($Fields)) {
+         // Retrieve whitelist & user column list
          $AllowedFields = $this->GetProfileFields();
          $Columns = Gdn::SQL()->FetchColumns('User');
 
-         foreach ($FormPostValues as $Name => $Field) {
+         foreach ($Fields as $Name => $Field) {
             // Whitelist
-            if (!array_key_exists($Name, $AllowedFields))
-               unset($FormPostValues[$Name]);
+            if (!array_key_exists($Name, $AllowedFields)) {
+               unset($Fields[$Name]);
+               continue;
+            }
             // Don't allow duplicates on User table
-            if (in_array($Name, $Columns))
-               unset($FormPostValues[$Name]);
+            if (in_array($Name, $Columns)) {
+               unset($Fields[$Name]);
+            }
          }
 
          // Update UserMeta if any made it thru
-         if (count($FormPostValues))
-            Gdn::UserModel()->SetMeta($UserID, $FormPostValues, 'Profile.');
+         if (count($Fields)) {
+            Gdn::UserModel()->SetMeta($UserID, $Fields, 'Profile.');
+         }
       }
    }
    

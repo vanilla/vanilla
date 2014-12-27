@@ -65,7 +65,7 @@ class SetupController extends DashboardController {
          // Need to go through all of the setups for each application. Garden,
          if ($this->Configure() && $this->Form->IsPostBack()) {
             // Get list of applications to enable during install
-            // Override by creating conf/config.php and adding this setting before install begins
+            // Override by creating the config and adding this setting before install begins
             $AppNames = C('Garden.Install.Applications', array('Conversations', 'Vanilla'));
             try {
                // Step through the available applications, enabling each of them.
@@ -82,6 +82,7 @@ class SetupController extends DashboardController {
                // Now that the application is installed, select a more user friendly error page.
                $Config = array('Garden.Installed' => TRUE);
                SaveToConfig($Config);
+               $this->FireEvent('Installed');
                
                // Go to the dashboard
                Redirect('/settings/gettingstarted');
@@ -224,10 +225,14 @@ class SetupController extends DashboardController {
             
             // Detect rewrite abilities
             $CanRewrite = (bool)$this->Form->GetFormValue('RewriteUrls');
-      
+
+            // Detect Internet connection for CDNs
+            $Disconnected = !(bool)@fsockopen('ajax.googleapis.com',80);
+
             SaveToConfig(array(
                'Garden.Version' => ArrayValue('Version', GetValue('Dashboard', $ApplicationInfo, array()), 'Undefined'),
                'Garden.RewriteUrls' => $CanRewrite,
+               'Garden.Cdns.Disable' => $Disconnected,
                'Garden.CanProcessImages' => function_exists('gd_info'),
                'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                'EnabledPlugins.HtmLawed' => 'HtmLawed' // Make sure html purifier is enabled so html has a default way of being safely parsed.
@@ -284,7 +289,7 @@ class SetupController extends DashboardController {
       
       // Make sure the config folder is writeable
       if (!$PermissionProblem) {
-         $ConfigFile = PATH_CONF.'/config.php';
+         $ConfigFile = Gdn::Config()->DefaultPath();
          if (!file_exists($ConfigFile))
             file_put_contents($ConfigFile, '');
          

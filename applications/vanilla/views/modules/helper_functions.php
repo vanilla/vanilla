@@ -13,29 +13,35 @@ function WriteModuleDiscussion($Discussion, $Px = 'Bookmark') {
       echo Anchor(Gdn_Format::Text($Discussion->Name, FALSE), DiscussionUrl($Discussion).($Discussion->CountCommentWatch > 0 ? '#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
    ?></div>
    <div class="Meta">
-      <?php   
+      <?php
          $Last = new stdClass();
          $Last->UserID = $Discussion->LastUserID;
          $Last->Name = $Discussion->LastName;
-         
+
          echo NewComments($Discussion);
-         
-         echo '<span class="MItem">'.Gdn_Format::Date($Discussion->LastDate, 'html').UserAnchor($Last).'</span>';         
+
+         echo '<span class="MItem">'.Gdn_Format::Date($Discussion->LastDate, 'html').UserAnchor($Last).'</span>';
       ?>
    </div>
 </li>
 <?php
 }
 
+/**
+ * Generates html output of $Content array
+ *
+ * @param array|object $Content
+ * @param PromotedContentModule $Sender
+ */
 function WritePromotedContent($Content, $Sender) {
    static $UserPhotoFirst = NULL;
    if ($UserPhotoFirst === NULL)
       $UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
-   
+
    $ContentType = GetValue('ItemType', $Content);
    $ContentID = GetValue("{$ContentType}ID", $Content);
    $Author = GetValue('Author', $Content);
-   
+
    switch (strtolower($ContentType)) {
       case 'comment':
          $ContentURL = CommentUrl($Content);
@@ -58,16 +64,16 @@ function WritePromotedContent($Content, $Sender) {
                echo UserAnchor($Author, 'Username');
                echo UserPhoto($Author);
             }
-            $Sender->FireEvent('AuthorPhoto'); 
+            $Sender->FireEvent('AuthorPhoto');
             ?>
          </span>
          <span class="AuthorInfo">
             <?php
             echo ' '.WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
             echo ' '.WrapIf(htmlspecialchars(GetValue('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
-            $Sender->FireEvent('AuthorInfo'); 
+            $Sender->FireEvent('AuthorInfo');
             ?>
-         </span>   
+         </span>
       </div>
       <div class="Meta CommentMeta CommentInfo">
          <span class="MItem DateCreated">
@@ -81,13 +87,13 @@ function WritePromotedContent($Content, $Sender) {
          $Sender->FireEvent('ContentInfo');
          ?>
       </div>
-      <div class="Title"><?php echo Anchor(Gdn_Format::Text($Content['Name'], FALSE), $ContentURL, 'DiscussionLink'); ?></div>
+      <div class="Title"><?php echo Anchor(Gdn_Format::Text(SliceString($Content['Name'], $Sender->TitleLimit), FALSE), $ContentURL, 'DiscussionLink'); ?></div>
       <div class="Body">
       <?php
-         echo Anchor(strip_tags(Gdn_Format::To($Content['Body'], $Content['Format'])), $ContentURL, 'BodyLink'); 
+         echo Anchor(strip_tags(Gdn_Format::To(SliceString($Content['Body'], $Sender->BodyLimit), $Content['Format'])), $ContentURL, 'BodyLink');
          $Sender->FireEvent('AfterBody'); // seperate event to account for less space.
       ?>
       </div>
    </div>
-<?php   
+<?php
 }

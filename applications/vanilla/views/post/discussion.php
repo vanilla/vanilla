@@ -69,12 +69,13 @@ if (!$CancelUrl) {
          echo $this->Form->Button('Save Draft', array('class' => 'Button DraftButton'));
       }
       echo $this->Form->Button('Preview', array('class' => 'Button PreviewButton'));
+      echo ' '.Anchor(T('Edit'), '#', 'Button WriteButton Hidden')."\n";
       $this->FireEvent('AfterFormButtons');
       echo Anchor(T('Cancel'), $CancelUrl, 'Button Cancel');
       echo '</div>';
-      
-      
-      
+
+
+
       echo $this->Form->Close();
       echo '</div>';
    ?>

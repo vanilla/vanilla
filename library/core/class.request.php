@@ -49,7 +49,12 @@ class Gdn_Request {
     * @return string Returns the current asset root.
     */
    public function AssetRoot($AssetRoot = null) {
-      return $this->_ParsedRequestElement('AssetRoot', rtrim('/'.trim($AssetRoot, '/'), '/'));
+      if ($AssetRoot !== null) {
+         $Result = $this->_ParsedRequestElement('AssetRoot', rtrim('/'.trim($AssetRoot, '/'), '/'));
+      } else {
+         $Result = $this->_ParsedRequestElement('AssetRoot');
+      }
+      return $Result;
    }
 
    /**
@@ -924,8 +929,8 @@ class Gdn_Request {
     * @return int Returns 0 if the urls are equal or 1, -1 if they are not.
     */
    function UrlCompare($url1, $url2) {
-      $parts1 = parse_url($url1);
-      $parts2 = parse_url($url2);
+      $parts1 = parse_url($this->Url($url1));
+      $parts2 = parse_url($this->Url($url2));
 
 
       $defaults = array(
@@ -935,8 +940,8 @@ class Gdn_Request {
          'query' => ''
       );
 
-      $parts1 = array_replace($defaults, $parts1);
-      $parts2 = array_replace($defaults, $parts2);
+      $parts1 = array_replace($defaults, $parts1 ?: array());
+      $parts2 = array_replace($defaults, $parts2 ?: array());
 
       if ($parts1['host'] === $parts2['host']
          && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')

@@ -299,18 +299,20 @@ if (!function_exists('requestContext')) {
     * @return string
     */
    function requestContext() {
-      static $context;
+      static $context = null;
       if (is_null($context)) {
          $context = C('Garden.RequestContext', null);
          if (is_null($context)) {
             $protocol = val('SERVER_PROTOCOL', $_SERVER);
-            if (preg_match('`^HTTP/`', $protocol))
+            if (preg_match('`^HTTP/`', $protocol)) {
                $context = 'http';
-            else
+            } else {
                $context = $protocol;
+            }
          }
-         if (is_null($context))
+         if (is_null($context)) {
             $context = 'unknown';
+         }
       }
       return $context;
    }
@@ -324,17 +326,22 @@ if (!function_exists('safeHeader')) {
     * context is not HTTP.
     *
     * @staticvar string $context
-    * @param type $header
-    * @param type $replace
-    * @param type $http_response_code
+    * @param string $header
+    * @param bool $replace
+    * @param int|null $http_response_code
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
-      static $context;
-      if (is_null($context))
+      static $context = null;
+      if (headers_sent()) {
+         return false;
+      }
+      if (is_null($context)) {
          $context = requestContext();
+      }
 
-      if ($context == 'http')
+      if ($context == 'http') {
          header($header, $replace, $http_response_code);
+      }
    }
 }
 
@@ -355,11 +362,13 @@ if (!function_exists('safeCookie')) {
     * @param boolean $httponly
     */
    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
-      static $context;
-      if (is_null($context))
+      static $context = null;
+      if (is_null($context)) {
          $context = requestContext();
+      }
 
-      if ($context == 'http')
+      if ($context == 'http') {
          setcookie ($name, $value, $expire, $path, $domain, $secure, $httponly);
+      }
    }
 }

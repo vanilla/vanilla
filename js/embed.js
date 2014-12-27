@@ -281,7 +281,7 @@ window.vanilla.embed = function(host) {
    var img = document.createElement('div');
    img.className = 'vn-loading';
    img.style.textAlign = 'center';
-   img.innerHTML = window.vanilla_loadinghtml ? vanilla_loadinghtml : '<img src="http://cdn.vanillaforums.com/images/progress.gif" />';
+   img.innerHTML = window.vanilla_loadinghtml ? vanilla_loadinghtml : '<img src="https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/progress.gif" />';
 
    var container = document.getElementById('vanilla-comments');
    // Couldn't find the container, so dump it out and try again.

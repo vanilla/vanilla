@@ -128,6 +128,11 @@ jQuery(document).ready(function($) {
          remotePostMessage('unembed', '*');
 
       setHeight = function(explicitHeight) {
+         // Offset height can be influenced by CSS styling, like height. A
+         // height of 0 is likely due to a theme modifying it, such as setting
+         // html,body{height:100%;}. Counter this by defining an auto height.
+         document.body.style.cssText += 'height:auto !important;';
+
          var newHeight = explicitHeight > 0 ? explicitHeight : document.body.offsetHeight;
          if (newHeight > minHeight && newHeight != currentHeight) {
             currentHeight = newHeight;

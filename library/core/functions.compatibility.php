@@ -364,11 +364,8 @@ if (!function_exists('safeCookie')) {
     */
    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
       static $context = null;
-<<<<<<< HEAD
-      if (is_null($context))
-=======
+
       if (is_null($context)) {
->>>>>>> d21ae61c20a86757af64e2895abf4733cc7282ff
          $context = requestContext();
       }
 

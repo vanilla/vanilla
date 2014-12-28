@@ -69,7 +69,7 @@ textarea, input[type=text] {
    margin: auto;
    width: 960px;
 }
-#Body .ContentColumn {
+.ContentColumn {
    margin: 0 0 0 230px
 }
 

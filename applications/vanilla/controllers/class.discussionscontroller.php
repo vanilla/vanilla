@@ -61,7 +61,7 @@ class DiscussionsController extends VanillaController {
     * @param int $Page Multiplied by PerPage option to determine offset.
     */
    public function Table($Page = '0') {
-      if ($this->SyndicationMethod == SYNDICATION_NONE)
+      if ($this->SyndicationMethod == SYNDICATION_NONE && !IsMobile())
          $this->View = 'table';
       $this->Index($Page);
    }
@@ -79,7 +79,7 @@ class DiscussionsController extends VanillaController {
       $Layout = C('Vanilla.Discussions.Layout');
       switch($Layout) {
          case 'table':
-            if ($this->SyndicationMethod == SYNDICATION_NONE)
+            if ($this->SyndicationMethod == SYNDICATION_NONE && !IsMobile())
                $this->View = 'table';
             break;
          default:
@@ -198,7 +198,7 @@ class DiscussionsController extends VanillaController {
       $Layout = C('Vanilla.Discussions.Layout');
       switch($Layout) {
          case 'table':
-            if ($this->SyndicationMethod == SYNDICATION_NONE)
+            if ($this->SyndicationMethod == SYNDICATION_NONE && !IsMobile())
                $this->View = 'table';
             break;
          default:
@@ -323,7 +323,7 @@ class DiscussionsController extends VanillaController {
       $Layout = C('Vanilla.Discussions.Layout');
       switch($Layout) {
          case 'table':
-            if ($this->SyndicationMethod == SYNDICATION_NONE)
+            if ($this->SyndicationMethod == SYNDICATION_NONE && !IsMobile())
                $this->View = 'table';
             break;
          default:

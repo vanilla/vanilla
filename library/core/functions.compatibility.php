@@ -332,6 +332,7 @@ if (!function_exists('safeHeader')) {
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
       static $context = null;
+
       if (headers_sent()) {
          return false;
       }
@@ -363,6 +364,7 @@ if (!function_exists('safeCookie')) {
     */
    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
       static $context = null;
+
       if (is_null($context)) {
          $context = requestContext();
       }

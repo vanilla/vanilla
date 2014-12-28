@@ -834,6 +834,8 @@ class DiscussionModel extends VanillaModel {
     *
     * Get discussions for a user.
     *
+    * Events: BeforeGetByUser
+    *
     * @since 2.1
     * @access public
     *
@@ -889,6 +891,8 @@ class DiscussionModel extends VanillaModel {
       } else {
          $this->SQL->Limit($Limit, $Offset);
       }
+
+      $this->FireEvent('BeforeGetByUser');
 
       $Data = $this->SQL->Get();
 

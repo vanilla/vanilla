@@ -953,7 +953,7 @@ class CategoryModel extends Gdn_Model {
       $Category = self::Categories($ID);
       if ($Category) {
          $Result[$Category['CategoryID']] = $Category;
-         $ChildIDs = GetValue('ChildIDs', $Category);
+         $ChildIDs = GetValue('ChildIDs', $Category, array());
 
          foreach ($ChildIDs as $ChildID) {
             $Result = array_merge($Result, self::GetSubtree($ChildID));

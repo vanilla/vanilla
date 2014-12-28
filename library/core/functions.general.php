@@ -1785,6 +1785,9 @@ if (!function_exists('IsMobile')) {
       }
 
       $type = userAgentType();
+      // Check the config for an override. (ex. Consider tablets mobile)
+      $type = C('Garden.Devices.'.ucfirst($type), $type);
+
       switch ($type) {
          case 'app':
          case 'mobile':
@@ -1849,7 +1852,7 @@ if (!function_exists('IsUrl')) {
          return FALSE;
       if (substr($Str, 0, 2) == '//')
          return TRUE;
-      if (strpos($Str, '://', 1) !== FALSE)
+      if (preg_match('`^https?://`i', $Str))
          return TRUE;
       return FALSE;
    }
@@ -2417,7 +2420,7 @@ if (!function_exists('ProxyHead')) {
 
          $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
 
-         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
+         $HostHeader = $Host.($Port != 80) ? ":{$Port}" : '';
          $Header = array(
             'Host'            => $HostHeader,
             'User-Agent'      => ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),

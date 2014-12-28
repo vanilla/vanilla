@@ -302,9 +302,7 @@ class DashboardHooks implements Gdn_IPlugin {
          return;
 
       // Users can edit their own profiles and moderators can edit any profile.
-      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))
-         || ($is_me && C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect')) {
-
+      if (hasEditProfile($user_id)) {
          $sender->addLink('main.editprofile', array('text' => t('Profile'), 'url' => UserUrl($user, '', 'edit'), 'icon' => icon('edit')));
       }
 
@@ -336,9 +334,7 @@ class DashboardHooks implements Gdn_IPlugin {
          $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => UserUrl($user, '', 'invitations'), 'icon' => icon('ticket')));
 
       // Users can edit their own profiles and moderators can edit any profile.
-      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))
-         || ($user_id == Gdn::Session()->UserID && C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect')) {
-
+      if (hasEditProfile($user_id)) {
          $sender->addLink('main.editprofile', array('text' => t('Edit Profile'), 'url' => UserUrl($user, '', 'edit'), 'icon' => icon('edit')));
       }
 

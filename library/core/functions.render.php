@@ -510,6 +510,33 @@ if (!function_exists('FormatUsername')) {
    }
 }
 
+if (!function_exists('hasEditProfile')) {
+   /**
+    * Determine whether or not a given user has the edit profile link.
+    *
+    * @param int $userID The user ID to check.
+    * @return bool Return true if the user should have the edit profile link or false otherwise.
+    */
+   function hasEditProfile($userID) {
+      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))) {
+         return true;
+      }
+      if ($userID != Gdn::Session()->UserID) {
+         return false;
+      }
+
+      $result = checkPermission('Garden.Profiles.Edit') && C('Garden.UserAccount.AllowEdit');
+
+      $result &= (
+            C('Garden.Profile.Titles') ||
+            C('Garden.Profile.Locations', FALSE) ||
+            C('Garden.Registration.Method') != 'Connect'
+         );
+
+      return $result;
+   }
+}
+
 if (!function_exists('HoverHelp')) {
    function HoverHelp($String, $Help) {
       return Wrap($String.Wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));

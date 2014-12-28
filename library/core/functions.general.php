@@ -382,18 +382,15 @@ if (!function_exists('Asset')) {
       if (IsUrl($Destination)) {
          $Result = $Destination;
       } else {
-         $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
-         if (!$WithDomain)
-            array_unshift($Parts, '/');
-
-         $Result = CombinePaths($Parts, '/');
+         $Result = Gdn::Request()->UrlDomain($WithDomain).Gdn::Request()->AssetRoot().'/'.ltrim($Destination, '/');
       }
 
       if ($AddVersion) {
-         if (strpos($Result, '?') === FALSE)
+         if (strpos($Result, '?') === FALSE) {
             $Result .= '?';
-         else
+         } else {
             $Result .= '&';
+         }
 
          // Figure out which version to put after the asset.
          $Version = APPLICATION_VERSION;
@@ -685,15 +682,15 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
       $Return = array();
       foreach ($Array as $Index => $AssociativeArray) {
 
-			if (is_object($AssociativeArray)) {
-				if($ValueKey === '') {
-					$Return[] = $AssociativeArray->$Key;
-				} elseif(property_exists($AssociativeArray, $ValueKey)) {
-					$Return[$AssociativeArray[$Key]] = $AssociativeArray->$ValueKey;
-				} else {
-					$Return[$AssociativeArray->$Key] = $DefaultValue;
-				}
-			} elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
+		if (is_object($AssociativeArray)) {
+			if($ValueKey === '') {
+				$Return[] = $AssociativeArray->$Key;
+			} elseif(property_exists($AssociativeArray, $ValueKey)) {
+				$Return[$AssociativeArray->$Key] = $AssociativeArray->$ValueKey;
+			} else {
+				$Return[$AssociativeArray->$Key] = $DefaultValue;
+			}
+		} elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
             if($ValueKey === '') {
                $Return[] = $AssociativeArray[$Key];
             } elseif (array_key_exists($ValueKey, $AssociativeArray)) {
@@ -1772,118 +1769,34 @@ if (!function_exists('InSubArray')) {
 if (!function_exists('IsMobile')) {
    /**
     * Returns whether or not the site is in mobile mode.
-    * @param mixed $Value Sets a new value for mobile. Pass one of the following:
+    * @param mixed $value Sets a new value for mobile. Pass one of the following:
     * - true: Force mobile.
     * - false: Force desktop.
     * - null: Reset and use the system determined mobile setting.
     * - not specified: Use the current setting or use the system determined mobile setting.
     * @return bool
     */
-   function IsMobile($Value = '') {
-      static $IsMobile = NULL;
-
-      if ($Value !== '')
-         $IsMobile = $Value;
-
-      // Short circuit so we only do this work once per pageload.
-      if ($IsMobile !== NULL) return $IsMobile;
-
-      // Start out assuming not mobile
-      $Mobile = 0;
-
-      // Check for a specific cookie override.
-      $ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
-      if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile)) {
-         return $IsMobile = FALSE;
+   function IsMobile($value = '') {
+      if ($value === true || $value === false) {
+         $type = $value ? 'mobile' : 'desktop';
+         userAgentType($type);
+      } elseif ($value === null) {
+         userAgentType(false);
       }
 
-      // The X-Device header can be set to explicitly state that we want mobile.
-      $Device = strtolower(GetValue('HTTP_X_UA_DEVICE', $_SERVER, ''));
-      switch ($Device) {
-         case 'desktop':
-            return $IsMobile = FALSE;
-         case 'tablet':
-            return $IsMobile = FALSE;
+      $type = userAgentType();
+      // Check the config for an override. (ex. Consider tablets mobile)
+      $type = C('Garden.Devices.'.ucfirst($type), $type);
+
+      switch ($type) {
+         case 'app':
          case 'mobile':
-            return $IsMobile = TRUE;
+            $IsMobile = true;
+            break;
+         default:
+            $IsMobile = false;
+            break;
       }
-
-      $AllHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
-      $HttpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
-      $UserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
-
-      // Match wap Accepts: header
-      if (!$Mobile) {
-         if(
-            (strpos($HttpAccept,'application/vnd.wap.xhtml+xml') > 0)
-            || (
-               (isset($_SERVER['HTTP_X_WAP_PROFILE'])
-               || isset($_SERVER['HTTP_PROFILE'])))
-            )
-            $Mobile++;
-      }
-
-      // Match mobile androids
-      if (!$Mobile) {
-         if(strpos($UserAgent,'android') !== false && strpos($UserAgent,'mobile') !== false)
-            $Mobile++;
-      }
-
-      // Match operamini in 'ALL_HTTP'
-      if (!$Mobile) {
-         if (strpos($AllHttp, 'operamini') > 0)
-            $Mobile++;
-      }
-
-      // Match discrete chunks of known mobile agents
-      if (!$Mobile) {
-         $DirectAgents = array(
-            'up.browser',
-            'up.link',
-            'mmp',
-            'symbian',
-            'smartphone',
-            'midp',
-            'wap',
-            'phone',
-            'opera m',
-            'kindle',
-            'webos',
-            'playbook',
-            'bb10',
-            'playstation vita',
-            'windows phone',
-            'iphone',
-            'ipod'
-         );
-         $DirectAgentsMatch = implode('|', $DirectAgents);
-         if (preg_match("/({$DirectAgentsMatch})/i", $UserAgent))
-            $Mobile++;
-      }
-
-      // Match starting chunks of known
-      if (!$Mobile) {
-         $MobileUserAgent = substr($UserAgent, 0, 4);
-         $MobileUserAgents = array(
-             'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
-             'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
-             'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
-             'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
-             'newt','noki','palm','pana','pant','phil','play','port','prox','qwap',
-             'sage','sams','sany','sch-','sec-','send','seri','sgh-','shar','sie-',
-             'siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-','tosh',
-             'tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp','wapr',
-             'webc','winw','winw','xda' ,'xda-');
-
-         if (in_array($MobileUserAgent, $MobileUserAgents))
-            $Mobile++;
-      }
-
-      $IsMobile = ($Mobile > 0);
-
-      $ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
-      if (($Mobile > 0) && $ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
-         $IsMobile = NULL;
 
       return $IsMobile;
    }
@@ -1939,7 +1852,7 @@ if (!function_exists('IsUrl')) {
          return FALSE;
       if (substr($Str, 0, 2) == '//')
          return TRUE;
-      if (strpos($Str, '://', 1) !== FALSE)
+      if (preg_match('`^https?://`i', $Str))
          return TRUE;
       return FALSE;
    }
@@ -2507,7 +2420,7 @@ if (!function_exists('ProxyHead')) {
 
          $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
 
-         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
+         $HostHeader = $Host.($Port != 80) ? ":{$Port}" : '';
          $Header = array(
             'Host'            => $HostHeader,
             'User-Agent'      => ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
@@ -2795,8 +2708,9 @@ endif;
 
 if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
-      if (!$Destination)
-         $Destination = Url('');
+      if (!$Destination) {
+         $Destination = '';
+      }
 
 //      if (Debug() && $Trace = Trace()) {
 //         Trace("Redirecting to $Destination");
@@ -2805,7 +2719,9 @@ if (!function_exists('Redirect')) {
 
       // Close any db connections before exit
       $Database = Gdn::Database();
-      $Database->CloseConnection();
+      if ($Database instanceof Gdn_Database) {
+         $Database->CloseConnection();
+      }
       // Clear out any previously sent content
       @ob_end_clean();
 
@@ -3198,7 +3114,7 @@ if (!function_exists('SliceString')) {
       if (!$Length) {
          return $String;
       }
-      
+
       if (function_exists('mb_strimwidth')) {
       	static $Charset;
       	if(is_null($Charset)) $Charset = Gdn::Config('Garden.Charset', 'utf-8');
@@ -3216,14 +3132,10 @@ if (!function_exists('SmartAsset')) {
     */
    function SmartAsset($Destination = '', $WithDomain = FALSE, $AddVersion = FALSE) {
       $Destination = str_replace('\\', '/', $Destination);
-      if (substr($Destination, 0, 7) == 'http://' || substr($Destination, 0, 8) == 'https://') {
+      if (IsUrl($Destination)) {
          $Result = $Destination;
       } else {
-         $Parts = array(Gdn_Url::WebRoot($WithDomain), $Destination);
-         if (!$WithDomain)
-            array_unshift($Parts, '/');
-
-         $Result = CombinePaths($Parts, '/');
+         $Result = Gdn::Request()->UrlDomain($WithDomain).Gdn::Request()->AssetRoot().'/'.ltrim($Destination, '/');
       }
 
       if ($AddVersion) {
@@ -3469,7 +3381,7 @@ if (!function_exists('ViewLocation')) {
          $Extensions = array('tpl', 'php');
 
          // 1. First we check the theme.
-         if ($Theme = Gdn::Controller()->Theme) {
+         if (Gdn::Controller() && $Theme = Gdn::Controller()->Theme) {
             foreach ($Extensions as $Ext) {
                $Paths[] = PATH_THEMES."/{$Theme}/views{$Controller}/$View.$Ext";
             }
@@ -3608,4 +3520,104 @@ if (!function_exists('IsSafeUrl')) {
       return FALSE;
    }
 
+}
+
+if (!function_exists('userAgentType')) {
+   /**
+    *
+    */
+   function userAgentType($value = null) {
+      static $type = null;
+
+      if ($value !== null) {
+         $type = $value;
+      }
+
+      if ($type !== null) {
+         return $type;
+      }
+
+      // Try and get the user agent type from the header if it was set from the server, varnish, etc.
+      $type = strtolower(GetValue('HTTP_X_UA_DEVICE', $_SERVER, ''));
+      if ($type) {
+         return $type;
+      }
+
+      // See if there is an override in the cookie.
+      if ($type = val('X-UA-Device-Force', $_COOKIE)) {
+         return $type;
+      }
+
+      // Now we will have to figure out the type based on the user agent and other things.
+      $allHttp = strtolower(GetValue('ALL_HTTP', $_SERVER));
+      $httpAccept = strtolower(GetValue('HTTP_ACCEPT', $_SERVER));
+      $userAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER));
+
+      // Check for a mobile app.
+      if (strpos($userAgent, 'vanillamobileapp') !== false) {
+         return $type = 'app';
+      }
+
+      // Match wap Accepts: header
+      if((strpos($httpAccept, 'application/vnd.wap.xhtml+xml') > 0)
+         || ((isset($_SERVER['HTTP_X_WAP_PROFILE']) || isset($_SERVER['HTTP_PROFILE'])))
+      ) {
+         return $type = 'mobile';
+      }
+
+      // Match mobile androids
+      if(strpos($userAgent,'android') !== false && strpos($userAgent,'mobile') !== false) {
+         return $type = 'mobile';
+      }
+
+      // Match operamini in 'ALL_HTTP'
+      if (strpos($allHttp, 'operamini') > 0) {
+         return $type = 'mobile';
+      }
+
+      // Match discrete chunks of known mobile agents
+      $directAgents = array(
+         'up.browser',
+         'up.link',
+         'mmp',
+         'symbian',
+         'smartphone',
+         'midp',
+         'wap',
+         'phone',
+         'opera m',
+         'kindle',
+         'webos',
+         'playbook',
+         'bb10',
+         'playstation vita',
+         'windows phone',
+         'iphone',
+         'ipod'
+      );
+      $directAgentsMatch = implode('|', $directAgents);
+      if (preg_match("/({$directAgentsMatch})/i", $userAgent)) {
+         return $type = 'mobile';
+      }
+
+      // Match starting chunks of known
+      $mobileUserAgent = substr($userAgent, 0, 4);
+      $mobileUserAgents = array(
+         'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
+         'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
+         'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
+         'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
+         'newt','noki','palm','pana','pant','phil','play','port','prox','qwap',
+         'sage','sams','sany','sch-','sec-','send','seri','sgh-','shar','sie-',
+         'siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-','tosh',
+         'tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp','wapr',
+         'webc','winw','winw','xda' ,'xda-');
+
+      if (in_array($mobileUserAgent, $mobileUserAgents)) {
+         return $type = 'mobile';
+      }
+
+      // None of the mobile matches work so we must be a desktop browser.
+      return $type = 'desktop';
+   }
 }

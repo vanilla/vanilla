@@ -304,13 +304,15 @@ if (!function_exists('requestContext')) {
          $context = C('Garden.RequestContext', null);
          if (is_null($context)) {
             $protocol = val('SERVER_PROTOCOL', $_SERVER);
-            if (preg_match('`^HTTP/`', $protocol))
+            if (preg_match('`^HTTP/`', $protocol)) {
                $context = 'http';
-            else
+            } else {
                $context = $protocol;
+            }
          }
-         if (is_null($context))
+         if (is_null($context)) {
             $context = 'unknown';
+         }
       }
       return $context;
    }
@@ -324,17 +326,23 @@ if (!function_exists('safeHeader')) {
     * context is not HTTP.
     *
     * @staticvar string $context
-    * @param type $header
-    * @param type $replace
-    * @param type $http_response_code
+    * @param string $header
+    * @param bool $replace
+    * @param int|null $http_response_code
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
       static $context = null;
-      if (is_null($context))
-         $context = requestContext();
 
-      if ($context == 'http')
+      if (headers_sent()) {
+         return false;
+      }
+      if (is_null($context)) {
+         $context = requestContext();
+      }
+
+      if ($context == 'http') {
          header($header, $replace, $http_response_code);
+      }
    }
 }
 
@@ -356,10 +364,16 @@ if (!function_exists('safeCookie')) {
     */
    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
       static $context = null;
+<<<<<<< HEAD
       if (is_null($context))
+=======
+      if (is_null($context)) {
+>>>>>>> d21ae61c20a86757af64e2895abf4733cc7282ff
          $context = requestContext();
+      }
 
-      if ($context == 'http')
+      if ($context == 'http') {
          setcookie ($name, $value, $expire, $path, $domain, $secure, $httponly);
+      }
    }
 }

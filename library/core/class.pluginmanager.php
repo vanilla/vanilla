@@ -857,7 +857,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       ${$VariableName} = array();
 
       foreach ($Lines as $Line) {
-         if ($InfoBuffer && substr(trim($Line), -2) == ');') {
+         if ($InfoBuffer && substr(trim($Line), -1) == ';') {
             $PluginInfoString .= $Line;
             $ClassBuffer = TRUE;
             $InfoBuffer = FALSE;

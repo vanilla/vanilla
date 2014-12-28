@@ -19,16 +19,41 @@ $PluginInfo['VanillaInThisDiscussion'] = array(
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
    'RegisterPermissions' => FALSE,
-   'SettingsPermission' => FALSE
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'SettingsUrl' => '/settings/inthisdiscussion'
 );
 
 class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
+   
+   // Setup settings page
+   public function SettingsController_InThisDiscussion_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->SetData('Title', T('In This Discussion Settings'));
+      $Sender->AddSideMenu('dashboard/settings/plugins');
+
+      $Conf = new ConfigurationModule($Sender);
+      $Conf->Initialize(array(          
+          'Plugins.VanillaInThisDiscussion.Limit' => array(
+             'Description' => T('User Limit'),
+             'Default' => 20,
+             'LabelCode' => T('Enter a limit for the number of users displayed')
+          )
+          ));
+
+      
+      $Conf->RenderAll();
+   }
 
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
+      // Handle limit
+      $Limit = C('Plugins.VanillaInThisDiscussion.Limit', 20);
+	  
+      // Render  
       include_once(PATH_PLUGINS.DS.'VanillaInThisDiscussion'.DS.'class.inthisdiscussionmodule.php');
       $InThisDiscussionModule = new InThisDiscussionModule($Sender);
-      $InThisDiscussionModule->GetData($Sender->Data('Discussion.DiscussionID'));
+      $InThisDiscussionModule->GetData($Sender->Data('Discussion.DiscussionID'),$Limit);
       $Sender->AddModule($InThisDiscussionModule);
+
    }
    
    public function Setup() {

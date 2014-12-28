@@ -494,7 +494,10 @@ class DiscussionController extends VanillaController {
 
       if ($this->Form->IsPostBack()) {
          // Save the property.
-         $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Discussion));
+         $CacheKeys = array(
+            $this->DiscussionModel->GetAnnouncementCacheKey(),
+            $this->DiscussionModel->GetAnnouncementCacheKey(val('CategoryID', $Discussion))
+         );
          $this->DiscussionModel->SQL->Cache($CacheKeys);
          $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->GetFormValue('Announce', 0));
 

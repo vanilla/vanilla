@@ -16,6 +16,22 @@ class UtilityController extends DashboardController {
    public $Uses = array('Form');
 
    /**
+    * Special-case HTTP headers that are otherwise unidentifiable as HTTP headers.
+    * Typically, HTTP headers in the $_SERVER array will be prefixed with
+    * `HTTP_` or `X_`. These are not so we list them here for later reference.
+    *
+    * @var array
+    */
+   protected static $specialHeaders = array(
+      'CONTENT_TYPE',
+      'CONTENT_LENGTH',
+      'PHP_AUTH_USER',
+      'PHP_AUTH_PW',
+      'PHP_AUTH_DIGEST',
+      'AUTH_TYPE'
+   );
+
+   /**
     * Gather all of the global styles together.
     * @param string ThemeType Either `desktop` or `mobile`.
     * @param string $Filename The basename of the file to
@@ -32,20 +48,35 @@ class UtilityController extends DashboardController {
    }
 
    public function Rack() {
-      header('Content-Type: application/json; charset=UTF-8');
+      header('Content-Type: application/json; charset=utf-8');
       date_default_timezone_set('America/Montreal');
 
       $keys = array('REQUEST_METHOD', 'SCRIPT_NAME', 'PATH_INFO', 'SERVER_NAME', 'SERVER_PORT', 'HTTP_ACCEPT', 'HTTP_ACCEPT_LANGUAGE', 'HTTP_ACCEPT_CHARSET', 'HTTP_USER_AGENT', 'HTTP_REMOTE_ADDR');
       $rack = array_intersect_key($_SERVER, array_fill_keys($keys, true));
-
       ksort($rack);
-      ksort($_SERVER);
+
+      // Extract the headers from $_SERVER.
+      $headers = array();
+      foreach ($_SERVER as $key => $value) {
+         $key = strtoupper($key);
+         if (strpos($key, 'X_') === 0 || strpos($key, 'HTTP_') === 0 || in_array($key, static::$specialHeaders)) {
+            if ($key === 'HTTP_CONTENT_TYPE' || $key === 'HTTP_CONTENT_LENGTH') {
+               continue;
+            }
+            $headers[$key] = $value;
+         }
+      }
+      ksort($headers);
 
       $result = array(
          'rack' => $rack,
-         'server' => $_SERVER,
+         'headers' => $headers,
          'get' => $_GET,
-         'cookie' => $_COOKIE
+         'cookie' => $_COOKIE,
+         'mobile' => array(
+            'userAgentType' => userAgentType(),
+            'isMobile' => IsMobile()
+         )
       );
 
       echo json_encode($result);
@@ -193,30 +224,35 @@ class UtilityController extends DashboardController {
    public function Sort() {
       $this->Permission('Garden.Settings.Manage');
 
-      $Session = Gdn::Session();
-      $TransientKey = GetPostValue('TransientKey', '');
-      $Target = GetPostValue('Target', '');
-      if ($Session->ValidateTransientKey($TransientKey)) {
-         $TableID = GetPostValue('TableID', FALSE);
+      if (Gdn::Request()->IsAuthenticatedPostBack()) {
+         $TableID = Gdn::Request()->Post('TableID');
          if ($TableID) {
-            $Rows = GetPostValue($TableID, FALSE);
+            $Rows = Gdn::Request()->Post($TableID);
             if (is_array($Rows)) {
-               try {
-                  $Table = str_replace('Table', '', $TableID);
+               $Table = str_replace(array('Table', '`'), '', $TableID);
+               $ModelName = $Table.'Model';
+               if (class_exists($ModelName)) {
+                  $TableModel = new $ModelName();
+               } else {
                   $TableModel = new Gdn_Model($Table);
-                  foreach ($Rows as $Sort => $ID) {
-                     $TableModel->Update(array('Sort' => $Sort), array($Table.'ID' => $ID));
-                  }
-               } catch (Exception $ex) {
-                  $this->Form->AddError($ex->getMessage());
                }
+
+               foreach ($Rows as $Sort => $ID) {
+                  if (strpos($ID, '_') !== false) {
+                     list(,$ID) = explode('_', $ID, 2);
+                  }
+                  if (!$ID) {
+                     continue;
+                  }
+
+                  $TableModel->SetField($ID, 'Sort', $Sort);
+               }
+               $this->SetData('Result', true);
             }
          }
       }
-      if ($this->DeliveryType() != DELIVERY_TYPE_BOOL)
-         Redirect($Target);
 
-      $this->Render();
+      $this->Render('Blank');
    }
 
    /**

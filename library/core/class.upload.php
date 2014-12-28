@@ -4,7 +4,7 @@
  * Handles file uploads
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @author Todd Burry <todd@vanillaforums.com> 
+ * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -14,59 +14,59 @@
 class Gdn_Upload extends Gdn_Pluggable {
    /// PROPERTIES ///
 
-	protected $_AllowedFileExtensions;
-	protected $_MaxFileSize;
-	protected $_UploadedFile;
+   protected $_AllowedFileExtensions;
+   protected $_MaxFileSize;
+   protected $_UploadedFile;
 
    /// METHODS ///
 
-	/**
-	 * Class constructor
-	 */
-	public function __construct() {
-		$this->Clear();
+   /**
+    * Class constructor
+    */
+   public function __construct() {
+      $this->Clear();
       parent::__construct();
       $this->ClassName = 'Gdn_Upload';
-	}
+   }
 
 
-	/**
-	 * Adds an extension (or array of extensions) to the array of allowed file
-	 * extensions.
-	 *
-	 * @param mixed The name (or array of names) of the extension to allow.
-	 */
-	public function AllowFileExtension($Extension) {
+   /**
+    * Adds an extension (or array of extensions) to the array of allowed file
+    * extensions.
+    *
+    * @param mixed The name (or array of names) of the extension to allow.
+    */
+   public function AllowFileExtension($Extension) {
       if ($Extension === NULL)
          $this->_AllowedFileExtensions = array();
-		elseif (is_array($Extension))
-			$this->_AllowedFileExtensions = array_merge($this->_AllowedFileExtensions, $Extension);
-		else
-			$this->_AllowedFileExtensions[] = $Extension;
-	}
+      elseif (is_array($Extension))
+         $this->_AllowedFileExtensions = array_merge($this->_AllowedFileExtensions, $Extension);
+      else
+         $this->_AllowedFileExtensions[] = $Extension;
+   }
 
-	public static function CanUpload($UploadPath=NULL) {
-		if (is_null($UploadPath))
-			$UploadPath = PATH_UPLOADS;
+   public static function CanUpload($UploadPath=NULL) {
+      if (is_null($UploadPath))
+         $UploadPath = PATH_UPLOADS;
 
-		if (ini_get('file_uploads') != 1)
-			return FALSE;
+      if (ini_get('file_uploads') != 1)
+         return FALSE;
 
-		if (!is_dir($UploadPath))
-			@mkdir($UploadPath);
-		if (!is_dir($UploadPath))
-			return FALSE;
+      if (!is_dir($UploadPath))
+         @mkdir($UploadPath);
+      if (!is_dir($UploadPath))
+         return FALSE;
 
-      if (!IsWritable($UploadPath) || !is_readable($UploadPath)) 
-			return FALSE;
+      if (!IsWritable($UploadPath) || !is_readable($UploadPath))
+         return FALSE;
 
-		return TRUE;
-	}
+      return TRUE;
+   }
 
-	public function Clear() {
-		$this->_MaxFileSize = self::UnformatFileSize(Gdn::Config('Garden.Upload.MaxFileSize', ''));
-		$this->_AllowedFileExtensions = Gdn::Config('Garden.Upload.AllowedFileExtensions', array());
-	}
+   public function Clear() {
+      $this->_MaxFileSize = self::UnformatFileSize(Gdn::Config('Garden.Upload.MaxFileSize', ''));
+      $this->_AllowedFileExtensions = Gdn::Config('Garden.Upload.AllowedFileExtensions', array());
+   }
 
    /**
     * Copy an upload locally so that it can be operated on.
@@ -107,24 +107,38 @@ class Gdn_Upload extends Gdn_Pluggable {
       }
    }
 
-	/** Format a number of bytes with the largest unit.
-	 * @param int $Bytes The number of bytes.
-	 * @param int $Precision The number of decimal places in the formatted number.
-	 * @return string the formatted filesize.
-	 */
-	public static function FormatFileSize($Bytes, $Precision = 1) {
-		$Units = array('B', 'K', 'M', 'G', 'T');
+   /** Format a number of bytes with the largest unit.
+    * @param int $Bytes The number of bytes.
+    * @param int $Precision The number of decimal places in the formatted number.
+    * @return string the formatted filesize.
+    */
+   public static function FormatFileSize($Bytes, $Precision = 1) {
+      $Units = array('B', 'K', 'M', 'G', 'T');
 
-		$Bytes = max((int)$Bytes, 0);
-		$Pow = floor(($Bytes ? log($Bytes) : 0) / log(1024));
-		$Pow = min($Pow, count($Units) - 1);
+      $Bytes = max((int)$Bytes, 0);
+      $Pow = floor(($Bytes ? log($Bytes) : 0) / log(1024));
+      $Pow = min($Pow, count($Units) - 1);
 
-		$Bytes /= pow(1024, $Pow);
+      $Bytes /= pow(1024, $Pow);
 
-		$Result = round($Bytes, $Precision).$Units[$Pow];
-		return $Result;
-	}
+      $Result = round($Bytes, $Precision).$Units[$Pow];
+      return $Result;
+   }
 
+   /**
+    * Parse a virtual filename that had previously been saved to the database.
+    *
+    * There are various formats supported for the name, mostly due to legacy concerns.
+    *
+    * - http(s)://domain/path.ext: A fully qualified url.
+    * - /path/from/uploads.ext: This is a locally uploaded file.
+    * - /path/to/uploads/path.ext: A full path starting from the uploads directory (deprecated).
+    * - ~type/path.ext: A specific type of upload provided by a plugin (deprecated).
+    * - type://domain/path.ext: A specific type of upload provied by a plugin with additional domain information.
+    *
+    * @param string $Name The virtual name of the file.
+    * @return array|bool Returns an array of parsed information or false if the parse failed.
+    */
    public static function Parse($Name) {
       $Result = FALSE;
       $Name = str_replace('\\', '/', $Name);
@@ -143,49 +157,68 @@ class Gdn_Upload extends Gdn_Pluggable {
 
          $Result = array('Name' => $Name, 'Type' => $Type, 'SaveName' => "~$Type/$Name", 'SaveFormat' => "~$Type/%s");
       } else {
-         $Name = ltrim($Name, '/');
-         // This is an upload in the uploads folder.
-         $Result = array('Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s');
+         $Parts = parse_url($Name);
+         if (empty($Parts['scheme'])) {
+            $Name = ltrim($Name, '/');
+            // This is an upload in the uploads folder.
+            $Result = array('Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s');
+         } else {
+            // This is a url in the format type:://domain/path.
+            $Result = array(
+               'Name' => ltrim(val('path', $Parts), '/'),
+               'Type' => $Parts['scheme'],
+               'Domain' => val('host', $Parts)
+            );
+
+            $SaveFormat = "{$Result['Type']}://{$Result['Domain']}/%s";
+            $Result['SaveName'] = sprintf($SaveFormat, $Result['Name']);
+            $Result['SaveFormat'] = $SaveFormat;
+         }
       }
 
-      $UrlPrefix = self::Urls($Result['Type']);
-      if ($UrlPrefix === FALSE)
+      if (!empty($Result['Domain'])) {
+         $UrlPrefix = self::Urls("{$Result['Type']}://{$Result['Domain']}");
+      } else {
+         $UrlPrefix = self::Urls($Result['Type']);
+      }
+      if ($UrlPrefix === FALSE) {
          $Result['Url'] = FALSE;
-      else
-         $Result['Url'] = $UrlPrefix.'/'.$Result['Name'];
+      } else {
+         $Result['Url'] = $UrlPrefix . '/' . $Result['Name'];
+      }
 
       return $Result;
    }
 
-	/**
-	 * Take a string formatted filesize and return the number of bytes.
-	 * @param string $Formatted The formatted filesize.
-	 * @return int The number of bytes in the string.
-	 */
-	public static function UnformatFileSize($Formatted) {
-		$Units = array('B' => 1, 'K' => 1024, 'M' => 1024 * 1024, 'G' => 1024 * 1024 * 1024, 'T' => 1024 * 1024 * 1024 * 1024);
+   /**
+    * Take a string formatted filesize and return the number of bytes.
+    * @param string $Formatted The formatted filesize.
+    * @return int The number of bytes in the string.
+    */
+   public static function UnformatFileSize($Formatted) {
+      $Units = array('B' => 1, 'K' => 1024, 'M' => 1024 * 1024, 'G' => 1024 * 1024 * 1024, 'T' => 1024 * 1024 * 1024 * 1024);
 
-		if(preg_match('/([0-9.]+)\s*([A-Z]*)/i', $Formatted, $Matches)) {
-			$Number = floatval($Matches[1]);
-			$Unit = strtoupper(substr($Matches[2], 0, 1));
-			$Mult = GetValue($Unit, $Units, 1);
+      if(preg_match('/([0-9.]+)\s*([A-Z]*)/i', $Formatted, $Matches)) {
+         $Number = floatval($Matches[1]);
+         $Unit = strtoupper(substr($Matches[2], 0, 1));
+         $Mult = GetValue($Unit, $Units, 1);
 
-			$Result = round($Number * $Mult, 0);
-			return $Result;
-		} else {
-			return FALSE;
-		}
-	}
+         $Result = round($Number * $Mult, 0);
+         return $Result;
+      } else {
+         return FALSE;
+      }
+   }
 
-	public function GetUploadedFileName() {
-		return GetValue('name', $this->_UploadedFile);
-	}
+   public function GetUploadedFileName() {
+      return GetValue('name', $this->_UploadedFile);
+   }
 
-	public function GetUploadedFileExtension() {
-		$Name = $this->_UploadedFile['name'];
-		$Info = pathinfo($Name);
-		return GetValue('extension', $Info, '');
-	}
+   public function GetUploadedFileExtension() {
+      $Name = $this->_UploadedFile['name'];
+      $Info = pathinfo($Name);
+      return GetValue('extension', $Info, '');
+   }
 
    public function GenerateTargetName($TargetFolder, $Extension = 'jpg', $Chunk = FALSE) {
       if (!$Extension) {
@@ -205,10 +238,11 @@ class Gdn_Upload extends Gdn_Pluggable {
       return $Path;
    }
 
-	public function SaveAs($Source, $Target) {
+   public function SaveAs($Source, $Target, $Options = array()) {
       $this->EventArguments['Path'] = $Source;
       $Parsed = self::Parse($Target);
       $this->EventArguments['Parsed'] =& $Parsed;
+      $this->EventArguments['Options'] = $Options;
       $Handled = FALSE;
       $this->EventArguments['Handled'] =& $Handled;
       $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
@@ -218,14 +252,14 @@ class Gdn_Upload extends Gdn_Pluggable {
          $Target = PATH_UPLOADS.'/'.$Parsed['Name'];
          if (!file_exists(dirname($Target)))
             mkdir(dirname($Target));
-         
+
          if (StringBeginsWith($Source, PATH_UPLOADS))
             rename($Source, $Target);
          elseif (!move_uploaded_file($Source, $Target))
             throw new Exception(sprintf(T('Failed to move uploaded file to target destination (%s).'), $Target));
       }
       return $Parsed;
-	}
+   }
 
    public static function Url($Name) {
       $Parsed = self::Parse($Name);
@@ -245,7 +279,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
       if ($Urls === NULL) {
          $Urls = array('' => Asset('/uploads', TRUE));
-         
+
          $Sender = new stdClass();
          $Sender->Returns = array();
          $Sender->EventArguments = array();
@@ -254,6 +288,8 @@ class Gdn_Upload extends Gdn_Pluggable {
          Gdn::PluginManager()->CallEventHandlers($Sender, 'Gdn_Upload', 'GetUrls');
       }
 
+
+
       if ($Type === NULL)
          return $Urls;
       if (isset($Urls[$Type]))
@@ -261,68 +297,68 @@ class Gdn_Upload extends Gdn_Pluggable {
       return FALSE;
    }
 
-	/**
-	 * Validates the uploaded file. Returns the temporary name of the uploaded file.
-	 */
-	public function ValidateUpload($InputName, $ThrowException = TRUE) {
-		$Ex = FALSE;
+   /**
+    * Validates the uploaded file. Returns the temporary name of the uploaded file.
+    */
+   public function ValidateUpload($InputName, $ThrowException = TRUE) {
+      $Ex = FALSE;
 
-		if (!array_key_exists($InputName, $_FILES) || (!is_uploaded_file($_FILES[$InputName]['tmp_name']) && GetValue('error', $_FILES[$InputName], 0) == 0)) {
-			// Check the content length to see if we exceeded the max post size.
-			$ContentLength = Gdn::Request()->GetValueFrom('server', 'CONTENT_LENGTH');
-			$MaxPostSize = self::UnformatFileSize(ini_get('post_max_size'));
-			if($ContentLength > $MaxPostSize) {
-				$Ex = sprintf(T('Gdn_Upload.Error.MaxPostSize', 'The file is larger than the maximum post size. (%s)'), self::FormatFileSize($MaxPostSize));
-			} else {
+      if (!array_key_exists($InputName, $_FILES) || (!is_uploaded_file($_FILES[$InputName]['tmp_name']) && GetValue('error', $_FILES[$InputName], 0) == 0)) {
+         // Check the content length to see if we exceeded the max post size.
+         $ContentLength = Gdn::Request()->GetValueFrom('server', 'CONTENT_LENGTH');
+         $MaxPostSize = self::UnformatFileSize(ini_get('post_max_size'));
+         if($ContentLength > $MaxPostSize) {
+            $Ex = sprintf(T('Gdn_Upload.Error.MaxPostSize', 'The file is larger than the maximum post size. (%s)'), self::FormatFileSize($MaxPostSize));
+         } else {
             $Ex = T('The file failed to upload.');
          }
-		} else {
-			switch ($_FILES[$InputName]['error']) {
-				case 1:
-				case 2:
-					$MaxFileSize = self::UnformatFileSize(ini_get('upload_max_filesize'));
-					$Ex = sprintf(T('Gdn_Upload.Error.PhpMaxFileSize', 'The file is larger than the server\'s maximum file size. (%s)'), self::FormatFileSize($MaxFileSize));
-					break;
-				case 3:
-				case 4:
-					$Ex = T('The file failed to upload.');
-					break;
-				case 6:
-					$Ex = T('The temporary upload folder has not been configured.');
-					break;
-				case 7:
-					$Ex = T('Failed to write the file to disk.');
-					break;
-				case 8:
-					$Ex = T('The upload was stopped by extension.');
-					break;
-			}
-		}
+      } else {
+         switch ($_FILES[$InputName]['error']) {
+            case 1:
+            case 2:
+               $MaxFileSize = self::UnformatFileSize(ini_get('upload_max_filesize'));
+               $Ex = sprintf(T('Gdn_Upload.Error.PhpMaxFileSize', 'The file is larger than the server\'s maximum file size. (%s)'), self::FormatFileSize($MaxFileSize));
+               break;
+            case 3:
+            case 4:
+               $Ex = T('The file failed to upload.');
+               break;
+            case 6:
+               $Ex = T('The temporary upload folder has not been configured.');
+               break;
+            case 7:
+               $Ex = T('Failed to write the file to disk.');
+               break;
+            case 8:
+               $Ex = T('The upload was stopped by extension.');
+               break;
+         }
+      }
 
-		$Foo = self::FormatFileSize($this->_MaxFileSize);
+      $Foo = self::FormatFileSize($this->_MaxFileSize);
 
-		// Check the maxfilesize again just in case the value was spoofed in the form.
-		if (!$Ex && $this->_MaxFileSize > 0 && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize) {
-			$Ex = sprintf(T('Gdn_Upload.Error.MaxFileSize', 'The file is larger than the maximum file size. (%s)'), self::FormatFileSize($this->_MaxFileSize));
-		} elseif(!$Ex) {
-			// Make sure that the file extension is allowed.
-			$Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
-			if (!InArrayI($Extension, $this->_AllowedFileExtensions))
-				$Ex = sprintf(T('You cannot upload files with this extension (%s). Allowed extension(s) are %s.'), htmlspecialchars($Extension), implode(', ', $this->_AllowedFileExtensions));
-		}
+      // Check the maxfilesize again just in case the value was spoofed in the form.
+      if (!$Ex && $this->_MaxFileSize > 0 && filesize($_FILES[$InputName]['tmp_name']) > $this->_MaxFileSize) {
+         $Ex = sprintf(T('Gdn_Upload.Error.MaxFileSize', 'The file is larger than the maximum file size. (%s)'), self::FormatFileSize($this->_MaxFileSize));
+      } elseif(!$Ex) {
+         // Make sure that the file extension is allowed.
+         $Extension = pathinfo($_FILES[$InputName]['name'], PATHINFO_EXTENSION);
+         if (!InArrayI($Extension, $this->_AllowedFileExtensions))
+            $Ex = sprintf(T('You cannot upload files with this extension (%s). Allowed extension(s) are %s.'), htmlspecialchars($Extension), implode(', ', $this->_AllowedFileExtensions));
+      }
 
-		if($Ex) {
-			if($ThrowException) {
-				throw new Gdn_UserException($Ex);
-			} else {
-				$this->Exception = $Ex;
-				return FALSE;
-			}
-		} else {
-			// If all validations were successful, return the tmp name/location of the file.
-			$this->_UploadedFile = $_FILES[$InputName];
-			return $this->_UploadedFile['tmp_name'];
-		}
-	}
+      if($Ex) {
+         if($ThrowException) {
+            throw new Gdn_UserException($Ex);
+         } else {
+            $this->Exception = $Ex;
+            return FALSE;
+         }
+      } else {
+         // If all validations were successful, return the tmp name/location of the file.
+         $this->_UploadedFile = $_FILES[$InputName];
+         return $this->_UploadedFile['tmp_name'];
+      }
+   }
 
 }

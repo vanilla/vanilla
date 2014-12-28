@@ -66,8 +66,22 @@ class Gdn_Memcached extends Gdn_Cache {
          Gdn_Cache::FEATURE_LOCAL         => TRUE
       );
 
-      foreach ($this->Option(NULL, array()) as $Option => $OptValue)
+      $DefaultOptions = array(
+         Memcached::OPT_COMPRESSION => true,
+         Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
+         Memcached::OPT_LIBKETAMA_COMPATIBLE => true,
+         Memcached::OPT_NO_BLOCK => true,
+         Memcached::OPT_TCP_NODELAY => true,
+         Memcached::OPT_CONNECT_TIMEOUT => 2000,
+         Memcached::OPT_SERVER_FAILURE_LIMIT => 2
+      );
+
+      $Options = $this->Option(NULL, array());
+      $Options = array_replace($DefaultOptions, $Options);
+
+      foreach ($Options as $Option => $OptValue) {
          $this->Memcache->setOption($Option, $OptValue);
+      }
 
    }
 

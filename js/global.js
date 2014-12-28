@@ -21,6 +21,7 @@ Vanilla.scrollTo = function(q) {
 Vanilla.parent = function() {};
 Vanilla.parent.callRemote = function(func, args, success, failure) { console.log("callRemote stub: "+func, args); };
 
+window.gdn = window.gdn || {};
 window.Vanilla = Vanilla;
 
 })(window, jQuery);
@@ -129,7 +130,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 
-	gdn = {focused: true};
+	gdn.focused = true;
 	gdn.Libraries = {};
 
    $(window).blur(function() {
@@ -144,15 +145,15 @@ jQuery(document).ready(function($) {
       if (defaultVal == null)
          defaultVal = definition;
 
-      if(!(definition in definitions)) {
+      if (!(definition in gdn.meta)) {
          return defaultVal;
       }
 
-      if(set) {
-         definitions[definition] = defaultVal;
+      if (set) {
+         gdn.meta[definition] = defaultVal;
       }
 
-      return definitions[definition];
+      return gdn.meta[definition];
    }
 
    gdn.disable = function(e, progressClass) {
@@ -178,6 +179,17 @@ jQuery(document).ready(function($) {
          return true;
       else
          return false;
+   }
+
+   gdn.getMeta = function(key, defaultValue) {
+      if (gdn.meta[key] === undefined) {
+         return defaultValue;
+      } else {
+         return gdn.meta[key];
+      }
+   };
+   gdn.setMeta = function(key, value) {
+      gdn.meta[key] = value;
    }
 
    gdn.querySep = function(url) {
@@ -391,13 +403,17 @@ jQuery(document).ready(function($) {
          var tableId = $($.tableDnD.currentTable).attr('id');
          // Add in the transient key for postback authentication
          var transientKey = gdn.definition('TransientKey');
-         var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
+         var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = gdn.definition('WebRoot', '');
-         $.post(gdn.combinePaths(webRoot, 'index.php?p=/dashboard/utility/sort/'), data, function(response) {
-            if (response == 'TRUE')
-               $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
-
-         });
+         $.post(
+            gdn.url('/utility/sort.json'),
+            data,
+            function(response) {
+               if (response.Result) {
+                  $('#' + tableId + ' tbody tr td').effect("highlight", {}, 1000);
+               }
+            }
+         );
       }});
 
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters
@@ -1226,43 +1242,68 @@ jQuery(document).ready(function($) {
       return Youtube($container);
    });
 
+
    /**
-    * Twitter card embedding
+    * Twitter card embedding.
     *
+    * IIFE named just for clarity. Note: loading the Twitter widget JS
+    * asynchronously, and tying it into a promise, which will guarantee the
+    * script and its code is excuted before attempting to run the specific
+    * Twitter code. There used to be conflicts if another Twitter widget was
+    * included in the page, or if the connection was slow, resulting in
+    * `window.twttr` being undefined. The promise guarantees this won't happen.
     */
+   twitterCardEmbed = (function() {
+      'use strict';
 
-   if ($('div.twitter-card').length) {
-      // Twitter widgets library
-      window.twttr = (function (d,s,id) {
-         var t, js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
-         js.src="https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs);
-         return window.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
-      }(document, "script", "twitter-wjs"));
+      // Call to transform all tweet URLs into embedded cards. Expose to global
+      // scope for backwards compatibility, as it might be being used elsewhere.
+      window.tweets = function() {
+         $('.twitter-card').each(function(i, el){
+            if (!$(el).hasClass('twitter-card-loaded')) {
+               var card = $(el),
+                   tweetUrl = card.attr('data-tweeturl'),
+                   tweetID = card.attr('data-tweetid'),
+                   cardref = card.get(0);
 
-      twttr.ready(function(twttr){
-         setTimeout(tweets, 300);
-      });
-   }
+               // Candidate found, prepare transition.
+               card.addClass('twitter-card-preload');
 
-   function tweets() {
-      $('div.twitter-card').each(function(i, el){
-         var card = $(el);
-         var tweetUrl = card.attr('data-tweeturl');
-         var tweetID = card.attr('data-tweetid');
-         var cardref = card.get(0);
-
-         twttr.widgets.createTweet(
-            tweetID,
-            cardref,
-            function(iframe){ card.find('a.tweet-url').remove(); },
-            {
-               conversation: "none"
+               twttr.widgets.createTweet(tweetID, cardref, function(iframe) {
+                  card.find('.tweet-url').remove();
+                  // Fade it in.
+                  card.addClass('twitter-card-loaded');
+               }, {
+                  conversation: 'none'
+               });
             }
-         );
+         });
+      };
 
-      });
-   }
+      // Check for the existence of any Twitter card candidates.
+      if ($('div.twitter-card').length) {
+         $.when(
+            $.getScript('//platform.twitter.com/widgets.js')
+         ).done(function() {
+            // The promise returned successfully (script loaded and executed),
+            // so convert tweets already on page.
+            twttr.ready(tweets);
+
+            // Attach event for embed whenever new comments are posted, so they
+            // are automatically loaded. Currently works for new comments,
+            // and new private messages.
+            var newPostTriggers = [
+               'CommentAdded',
+               'MessageAdded'
+            ];
+
+            $(document).on(newPostTriggers.join(' '), function(e, data) {
+               twttr.ready(tweets);
+            });
+         });
+      }
+   }());
+
 
    /**
     * GitHub commit embedding
@@ -1524,7 +1565,7 @@ jQuery(document).ready(function($) {
                      // Produce the suggestions based on data either
                      // cached or retrieved.
                      if (filter_more && !empty_query  && !gdn.atcache[query]) {
-                        $.getJSON('/user/tagsearch', {"q": query, "limit": server_limit}, function(data) {
+                        $.getJSON(gdn.url('/user/tagsearch'), {"q": query, "limit": server_limit}, function(data) {
                            callback(data);
 
                            // If data is empty, cache the results to prevent
@@ -1866,7 +1907,7 @@ jQuery(window).load(function() {
       var container = img.closest('div.Message');
       if (img.naturalWidth() > container.width() && container.width() > 0) {
          img.after('<div class="ImageResized">' + gdn.definition('ImageResized', 'This image has been resized to fit in the page. Click to enlarge.') + '</div>');
-         img.wrap('<a href="'+$(img).attr('src')+'"></a>');
+         img.wrap('<a href="'+$(img).attr('src')+'" target="_blank"></a>');
       }
    });
 

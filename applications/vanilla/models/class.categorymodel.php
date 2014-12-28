@@ -135,7 +135,7 @@ class CategoryModel extends Gdn_Model {
          if (!is_numeric($ID) && $ID) {
             $Code = $ID;
             foreach (self::$Categories as $Category) {
-               if ($Category['UrlCode'] === $Code) {
+               if (strcasecmp($Category['UrlCode'], $Code) === 0) {
                   $ID = $Category['CategoryID'];
                   break;
                }
@@ -953,7 +953,7 @@ class CategoryModel extends Gdn_Model {
       $Category = self::Categories($ID);
       if ($Category) {
          $Result[$Category['CategoryID']] = $Category;
-         $ChildIDs = GetValue('ChildIDs', $Category);
+         $ChildIDs = GetValue('ChildIDs', $Category, array());
 
          foreach ($ChildIDs as $ChildID) {
             $Result = array_merge($Result, self::GetSubtree($ChildID));

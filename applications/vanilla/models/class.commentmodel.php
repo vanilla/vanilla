@@ -20,6 +20,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class CommentModel extends VanillaModel {
+   const COMMENT_THRESHOLD_SMALL = 1000;
+   const COMMENT_THRESHOLD_LARGE = 50000;
+   const COUNT_RECALC_MOD = 50;
+
+
    /**
     * List of fields to order results by.
     *
@@ -31,6 +36,8 @@ class CommentModel extends VanillaModel {
 
    protected $_Where = array();
 
+   public $pageCache;
+
    /**
     * Class constructor. Defines the related database table name.
     *
@@ -39,11 +46,12 @@ class CommentModel extends VanillaModel {
     */
    public function __construct() {
       parent::__construct('Comment');
+      $this->pageCache = Gdn::Cache()->ActiveEnabled() && C('Properties.CommentModel.pageCache', true);
       $this->FireEvent('AfterConstruct');
    }
 
    public function CachePageWhere($Result, $PageWhere, $DiscussionID, $Page, $Limit = NULL) {
-      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!$this->pageCache || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return;
 
       if (count($Result) == 0)
@@ -329,7 +337,7 @@ class CommentModel extends VanillaModel {
    }
 
    public function PageWhere($DiscussionID, $Page, $Limit) {
-      if (!Gdn::Cache()->ActiveEnabled() || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
+      if (!$this->pageCache || !empty($this->_Where) || $this->_OrderBy[0][0] != 'c.DateInserted' || $this->_OrderBy[0][1] == 'desc')
          return FALSE;
 
       if ($Limit != C('Vanilla.Comments.PerPage', 30)) {
@@ -429,13 +437,16 @@ class CommentModel extends VanillaModel {
       if ($Session->UserID > 0) {
 
          // Max comments we could have seen
-         $CountWatch = $Limit * ($Offset + 1);
+         $CountWatch = $Limit + $Offset;
          if ($CountWatch > $TotalComments)
             $CountWatch = $TotalComments;
 
          // This dicussion looks familiar...
          if (is_numeric($Discussion->CountCommentWatch)) {
 
+            if ($CountWatch < $Discussion->CountCommentWatch)
+               $CountWatch = $Discussion->CountCommentWatch;
+               
             if (isset($Discussion->DateLastViewed))
                $NewComments |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
 
@@ -898,7 +909,7 @@ class CommentModel extends VanillaModel {
             if ($Category) {
                $CountComments = GetValue('CountComments', $Category, 0) + 1;
 
-               if ($CountComments < 1000 || $CountComments % 20 == 0) {
+               if ($CountComments < self::COMMENT_THRESHOLD_SMALL || ($CountComments < self::COMMENT_THRESHOLD_LARGE && $CountComments % self::COUNT_RECALC_MOD == 0)) {
                   $CountComments = $this->SQL
                      ->Select('CountComments', 'sum', 'CountComments')
                      ->From('Discussion')
@@ -918,7 +929,7 @@ class CommentModel extends VanillaModel {
             ));
 
             // Update the cache.
-            if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+            if ($DiscussionID && $this->pageCache) {
                $CategoryCache = array(
                    'LastTitle'         => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
                    'LastUserID'        => $Fields['InsertUserID'],
@@ -1087,8 +1098,9 @@ class CommentModel extends VanillaModel {
    }
 
    public function RemovePageCache($DiscussionID, $From = 1) {
-      if (!Gdn::Cache()->ActiveEnabled())
+      if (!$this->pageCache) {
          return;
+      }
 
       $CountComments = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CountComments');
       $Limit = C('Vanilla.Comments.PerPage', 30);

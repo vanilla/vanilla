@@ -494,7 +494,10 @@ class DiscussionController extends VanillaController {
 
       if ($this->Form->IsPostBack()) {
          // Save the property.
-         $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Discussion));
+         $CacheKeys = array(
+            $this->DiscussionModel->GetAnnouncementCacheKey(),
+            $this->DiscussionModel->GetAnnouncementCacheKey(val('CategoryID', $Discussion))
+         );
          $this->DiscussionModel->SQL->Cache($CacheKeys);
          $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->GetFormValue('Announce', 0));
 
@@ -792,7 +795,10 @@ body { background: transparent !important; }
 
       // Set discussion data if we have one for this page
       if ($Discussion) {
-         $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Discussion->PermissionCategoryID);
+         // Allow Vanilla.Comments.View to be defined to limit access to embedded comments only.
+         // Otherwise, go with normal discussion view permissions. Either will do.
+         $this->Permission(array('Vanilla.Discussions.View', 'Vanilla.Comments.View'), FALSE, 'Category', $Discussion->PermissionCategoryID);
+
          $this->SetData('Discussion', $Discussion, TRUE);
          $this->SetData('DiscussionID', $Discussion->DiscussionID, TRUE);
          $this->Title($Discussion->Name);

@@ -590,8 +590,12 @@ if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
 
+$Construct->Table('Tag');
+$FullNameColumnExists = $Construct->ColumnExists('FullName');
+$TagCategoryColumnExists = $Construct->ColumnExists('CategoryID');
+
 // This is a fix for erroneous unique constraint.
-if ($Construct->TableExists('Tag')) {
+if ($Construct->TableExists('Tag') && $TagCategoryColumnExists) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
 
@@ -623,9 +627,6 @@ if ($Construct->TableExists('Tag')) {
       }
    }
 }
-
-$Construct->Table('Tag');
-$FullNameColumnExists = $Construct->ColumnExists('FullName');
 
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
@@ -659,7 +660,7 @@ $Construct->Table('Log')
    ->Column('RecordDate', 'datetime')
    ->Column('RecordIPAddress', 'varchar(15)', NULL, 'index')
    ->Column('InsertUserID', 'int') // user that put record in the log
-   ->Column('DateInserted', 'datetime') // date item added to log
+   ->Column('DateInserted', 'datetime', FALSE, 'index') // date item added to log
    ->Column('InsertIPAddress', 'varchar(15)', NULL)
    ->Column('OtherUserIDs', 'varchar(255)', NULL)
    ->Column('DateUpdated', 'datetime', NULL)
@@ -757,7 +758,7 @@ $Construct
    ->Column('ForeignUserID', 'int', FALSE, 'key') // the user id of the record we are attached to (de-normalization)
    ->Column('Source', 'varchar(64)') // ex: Zendesk, Vendor
    ->Column('SourceID', 'varchar(32)') // ex: 1
-   ->Column('SourceURL', 'varchar(255)') 
+   ->Column('SourceURL', 'varchar(255)')
    ->Column('Attributes', 'text', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int', FALSE, 'key')

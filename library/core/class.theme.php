@@ -319,10 +319,11 @@ class Gdn_Theme {
 
    /**
     * Renders the banner logo, or just the banner title if the logo is not defined.
+    *
+    * @param array $Properties
     */
-   public static function Logo() {
+   public static function Logo($Properties = array()) {
       $Logo = C('Garden.Logo');
-      $Properties = array();
 
       if ($Logo) {
          $Logo = ltrim($Logo, '/');
@@ -332,14 +333,17 @@ class Gdn_Theme {
             $Logo = substr($Logo, strlen('uploads/'));
          }
 
-         // Set optional title text
-         $LogoTitle = C('Garden.LogoTitle');
-         if ($LogoTitle) {
-            $Properties['title'] = $LogoTitle;
+         // Set optional title text.
+         if (empty($Properties['title']) && C('Garden.LogoTitle')) {
+            $Properties['title'] = C('Garden.LogoTitle');
          }
       }
+
+      // Use the site title as alt if none was given.
       $Title = C('Garden.Title', 'Title');
-      $Properties['alt'] = $Title;
+      if (empty($Properties['alt'])) {
+         $Properties['alt'] = $Title;
+      }
 
       echo $Logo ? Img(Gdn_Upload::Url($Logo), $Properties) : $Title;
    }

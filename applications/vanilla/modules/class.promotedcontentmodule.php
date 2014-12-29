@@ -135,7 +135,7 @@ class PromotedContentModule extends Gdn_Module {
 
          // Get matching Discussions
          $Discussions = array();
-         if ($this->ContentType == 'all' || $this->ContentType == 'discussions') {
+         if ($this->ShowDiscussions()) {
             $Discussions = Gdn::SQL()->Select('d.*')
                ->From('Discussion d')
                ->WhereIn('d.InsertUserID', $UserIDs)
@@ -146,7 +146,7 @@ class PromotedContentModule extends Gdn_Module {
 
          // Get matching Comments
          $Comments = array();
-         if ($this->ContentType == 'all' || $this->ContentType == 'comments') {
+         if ($this->ShowComments()) {
             $Comments = Gdn::SQL()->Select('c.*')
                ->From('Comment c')
                ->WhereIn('InsertUserID', $UserIDs)
@@ -201,7 +201,7 @@ class PromotedContentModule extends Gdn_Module {
 
          // Get matching Discussions
          $Discussions = array();
-         if ($this->ContentType == 'all' || $this->ContentType == 'discussions') {
+         if ($this->ShowDiscussions()) {
             $Discussions = Gdn::SQL()->Select('d.*')
                ->From('Discussion d')
                ->WhereIn('d.InsertUserID', $UserIDs)
@@ -212,7 +212,7 @@ class PromotedContentModule extends Gdn_Module {
 
          // Get matching Comments
          $Comments = array();
-         if ($this->ContentType == 'all' || $this->ContentType == 'comments') {
+         if ($this->ShowComments()) {
             $Comments = Gdn::SQL()->Select('c.*')
                ->From('Comment c')
                ->WhereIn('InsertUserID', $UserIDs)
@@ -259,7 +259,7 @@ class PromotedContentModule extends Gdn_Module {
 
          // Get matching Discussions
          $Discussions = array();
-         if ($this->ContentType == 'all' || $this->ContentType == 'discussions') {
+         if ($this->ShowDiscussions()) {
             $Discussions = Gdn::SQL()->Select('d.*')
                ->From('Discussion d')
                ->Where('d.CategoryID', $CategoryID)
@@ -270,7 +270,7 @@ class PromotedContentModule extends Gdn_Module {
 
          // Get matching Comments
          $Comments = array();
-         if ($this->ContentType == 'all' || $this->ContentType == 'comments') {
+         if ($this->ShowComments()) {
             $CommentDiscussionIDs = Gdn::SQL()->Select('d.DiscussionID')
                ->From('Discussion d')
                ->Where('d.CategoryID', $CategoryID)
@@ -331,7 +331,7 @@ class PromotedContentModule extends Gdn_Module {
 
          // Get matching Discussions
          $Discussions = array();
-         if ($this->ContentType == 'all' || $this->ContentType == 'discussions') {
+         if ($this->ShowDiscussions()) {
             $Discussions = Gdn::SQL()->Select('d.*')
                ->From('Discussion d')
                ->Where('Score >', $MinScore)
@@ -343,7 +343,7 @@ class PromotedContentModule extends Gdn_Module {
 
          // Get matching Comments
          $Comments = array();
-         if ($this->ContentType == 'all' || $this->ContentType == 'comments') {
+         if ($this->ShowComments()) {
             $Comments = Gdn::SQL()->Select('c.*')
                ->From('Comment c')
                ->OrderBy('Score', 'DESC')
@@ -474,6 +474,12 @@ class PromotedContentModule extends Gdn_Module {
       $Content = array_filter($Content, array($this, 'SecurityFilter'));
    }
 
+   /**
+    * Determine if we have permission to view this content.
+    *
+    * @param $ContentItem
+    * @return bool
+    */
    protected function SecurityFilter($ContentItem) {
       $CategoryID = GetValue('CategoryID', $ContentItem, NULL);
       if (is_null($CategoryID) || $CategoryID === FALSE)
@@ -497,10 +503,38 @@ class PromotedContentModule extends Gdn_Module {
       $Content = array_slice($Content, 0, $Limit);
    }
 
+   /**
+    * Whether to display promoted comments.
+    *
+    * @return bool
+    */
+   public function ShowComments() {
+      return ($this->ContentType == 'all' || $this->ContentType == 'comments') ? true : false;
+   }
+
+   /**
+    * Whether to display promoted discussions.
+    *
+    * @return bool
+    */
+   public function ShowDiscussions() {
+      return ($this->ContentType == 'all' || $this->ContentType == 'discussions') ? true : false;
+   }
+
+   /**
+    * Default asset target for this module.
+    *
+    * @return string
+    */
    public function AssetTarget() {
       return 'Content';
    }
 
+   /**
+    * Render.
+    *
+    * @return string
+    */
    public function ToString() {
       if ($this->Data('Content', NULL) == NULL)
          $this->GetData();

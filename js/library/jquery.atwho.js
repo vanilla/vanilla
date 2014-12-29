@@ -455,7 +455,6 @@
             break;
           case KEY_CODE.DOWN:
           case KEY_CODE.UP:
-          case KEY_CODE.TAB:
             $.noop();
             break;
           default:
@@ -479,10 +478,10 @@
             view.prev();
             break;
           case KEY_CODE.DOWN:
-          case KEY_CODE.TAB:
             e.preventDefault();
             view.next();
             break;
+          case KEY_CODE.TAB:
           case KEY_CODE.ENTER:
             if (!view.visible()) {
               return;

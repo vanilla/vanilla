@@ -47,8 +47,8 @@ class PostController extends VanillaController {
     */
    public function Index($CurrentFormName = 'discussion') {
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
 		$this->SetData('CurrentFormName', $CurrentFormName);
 		$Forms = array();
@@ -70,12 +70,12 @@ class PostController extends VanillaController {
       );
 
       if (C('Vanilla.Categories.Use')) {
-         $Result = array_merge($Result, array(
+         $Result = array_replace($Result, array(
             '2' => '@'.sprintf(T('In <b>%s.</b>'), T('the category')),
             '1' => '@'.sprintf(sprintf(T('In <b>%s</b> and recent discussions.'), T('the category'))),
          ));
       } else {
-         $Result = array_merge($Result, array(
+         $Result = array_replace($Result, array(
             '1' => '@'.T('In recent discussions.'),
          ));
       }
@@ -99,8 +99,8 @@ class PostController extends VanillaController {
 
       // Setup head
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
       $Session = Gdn::Session();
 
@@ -168,7 +168,6 @@ class PostController extends VanillaController {
          $AllowedCategory = array_pop($AllowedCategories);
          $this->ShowCategorySelector = FALSE;
          $this->Form->AddHidden('CategoryID', $AllowedCategory['CategoryID']);
-         $this->Form->AddHidden('CategoryID');
 
          if ($this->Form->IsPostBack() && !$this->Form->GetFormValue('CategoryID')) {
             $this->Form->SetFormValue('CategoryID', $AllowedCategory['CategoryID']);
@@ -177,7 +176,7 @@ class PostController extends VanillaController {
 
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
-      if ($this->Form->IsPostBack() == FALSE) {
+      if (!$this->Form->IsPostBack()) {
          // Prep form with current data for editing
          if (isset($this->Discussion)) {
             $this->Form->SetData($this->Discussion);
@@ -189,7 +188,7 @@ class PostController extends VanillaController {
             $this->PopulateForm($this->Form);
          }
 
-      } else { // Form was submitted
+      } elseif ($this->Form->AuthenticatedPostBack()) { // Form was submitted
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->DiscussionModel->FilterForm($FormValues);
@@ -505,8 +504,8 @@ class PostController extends VanillaController {
 
       // Setup head
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
       // Setup comment model, $CommentID, $DraftID
       $Session = Gdn::Session();
@@ -550,16 +549,14 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
-      if (!$this->Form->IsPostBack()) {
-         // Form was validly submitted
-         if (isset($this->Comment)) {
-            $this->Form->SetData((array)$this->Comment);
-         }
-
-      } else {
+      if($this->Form->AuthenticatedPostBack()) {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
+
+         if (!$Editing) {
+            unset($FormValues['CommentID']);
+         }
 
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);
@@ -731,6 +728,12 @@ class PostController extends VanillaController {
                $this->SetJson('MyDrafts', T('My Drafts'));
                $this->SetJson('CountDrafts', $CountDrafts);
             }
+         }
+      }
+      else {
+         // Load form
+         if (isset($this->Comment)) {
+            $this->Form->SetData((array)$this->Comment);
          }
       }
 

@@ -267,7 +267,7 @@ class PagerModule extends Gdn_Module {
       $this->EventArguments['PageCount'] = &$PageCount;
       $this->FireEvent('BeforePagerSetsCount');
       $this->_PageCount = $PageCount;
-      $CurrentPage = ceil($this->Offset / $this->Limit) + 1;
+      $CurrentPage = PageNumber($this->Offset, $this->Limit);
 
       // Show $Range pages on either side of current
       $Range = C('Garden.Modules.PagerRange', 3);

@@ -356,7 +356,7 @@ class ProfileController extends Gdn_Controller {
       $this->FireEvent('BeforeEdit');
 
       // If seeing the form for the first time...
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $this->Form->SetFormValue('UserID', $UserID);
 
          if (!$CanEditUsername)
@@ -491,21 +491,34 @@ class ProfileController extends Gdn_Controller {
    /**
     * Set 'NoMobile' cookie for current user to prevent use of mobile theme.
     *
-    * @since 2.0.?
-    * @access public
+    * @param string $type The type of mobile device. This can be one of the following:
+    * - desktop: Force the desktop theme.
+    * - mobile: Force the mobile theme.
+    * - tablet: Force the tablet theme (desktop).
+    * - app: Force the app theme (app).
+    * - 1: Unset the force cookie and use the user agent to determine the theme.
     */
-   public function NoMobile($Unset = 0) {
-      if ($Unset == 1) {
+   public function NoMobile($type = 'desktop') {
+      $type = strtolower($type);
+
+      if ($type == '1') {
+         Gdn_CookieIdentity::DeleteCookie('X-UA-Device-Force');
+         Redirect("/", 302);
+      } if (in_array($type, array('mobile', 'desktop', 'tablet', 'app'))) {
+         $type = $type;
+      } else {
+         $type = 'desktop';
+      }
+
+      if ($type == '1') {
          // Allow mobile again
          Gdn_CookieIdentity::DeleteCookie('VanillaNoMobile');
-      }
-      else {
+      } else {
          // Set 48-hour "no mobile" cookie
          $Expiration = time() + 172800;
-         $Expire = 0;
-         $UserID = ((Gdn::Session()->IsValid()) ? Gdn::Session()->UserID : 0);
-         $KeyData = $UserID."-{$Expiration}";
-         Gdn_CookieIdentity::SetCookie('VanillaNoMobile', $KeyData, array($UserID, $Expiration, 'force'), $Expire);
+         $Path = C('Garden.Cookie.Path');
+         $Domain = C('Garden.Cookie.Domain');
+         safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
       }
 
       Redirect("/", 302);
@@ -681,7 +694,7 @@ class ProfileController extends Gdn_Controller {
       }
 
       // Get user data & prep form.
-      if ($this->Form->IsPostBack() && $this->Form->GetFormValue('UserID')) {
+      if ($this->Form->AuthenticatedPostBack() && $this->Form->GetFormValue('UserID')) {
          $UserID = $this->Form->GetFormValue('UserID');
       }
       $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
@@ -765,7 +778,7 @@ class ProfileController extends Gdn_Controller {
 
       $this->Form->InputPrefix = '';
 
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $Data = $this->Form->FormValues();
          Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, $Data);
       } else {
@@ -1268,6 +1281,10 @@ class ProfileController extends Gdn_Controller {
             $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), array('Garden.Users.Edit','Moderation.Profiles.Edit'), array('class' => 'ThumbnailLink'));
          }
       } else {
+         if (hasEditProfile($this->User->UserID)) {
+            $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+         }
+
          // Add profile options for the profile owner
          // Don't allow account editing if it has been turned off.
          // Don't allow password editing if using SSO Connect ONLY.
@@ -1278,8 +1295,6 @@ class ProfileController extends Gdn_Controller {
          // Vanilla's login form regardless of the state of their membership in the
          // external app.
          if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
-            $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
-
             // No password may have been set if they have only signed in with a connect plugin
             $PasswordLabel = T('Change My Password');
             if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")

@@ -61,6 +61,26 @@ class DbaController extends DashboardController {
       $this->AddSideMenu();
       $this->Render('Job');
    }
+
+   /**
+    * Set Member-like permissions on all roles with missing permissions.
+    *
+    * Useful for after an import that didn't include permissions
+    * but did include a whole lotta roles you don't want to edit manually.
+    */
+   public function FixPermissions() {
+      $this->Permission('Garden.Settings.Manage');
+
+      if ($this->Request->IsAuthenticatedPostBack()) {
+         $Result = $this->Model->FixPermissions();
+         $this->SetData('Result', $Result);
+      }
+
+      $this->SetData('Title', "Fix missing permission records after import");
+      $this->_SetJob($this->Data('Title'));
+      $this->AddSideMenu();
+      $this->Render('Job');
+   }
    
    public function FixUrlCodes($Table, $Column) {
       $this->Permission('Garden.Settings.Manage');

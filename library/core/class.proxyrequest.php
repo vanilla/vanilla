@@ -26,6 +26,7 @@ class ProxyRequest {
    public $ResponseHeaders;
    public $ResponseStatus;
    public $ResponseBody;
+   public $ResponseTime;
    
    public $ContentType;
    public $ContentLength;
@@ -105,7 +106,9 @@ class ProxyRequest {
    
    protected function CurlReceive(&$Handler) {
       $this->ResponseHeaders = array();
+      $startTime = microtime(true);
       $Response = curl_exec($Handler);
+      $this->ResponseTime = microtime(true) - $startTime;
       
       $this->ResponseStatus = curl_getinfo($Handler, CURLINFO_HTTP_CODE);
       $this->ContentType = strtolower(curl_getinfo($Handler, CURLINFO_CONTENT_TYPE));
@@ -200,6 +203,7 @@ class ProxyRequest {
       $this->ResponseStatus = "";
       $this->ResponseBody = "";
       $this->RequestBody = "";
+      $this->ResponseTime = 0;
       $this->ContentLength = 0;
       $this->ContentType = '';
       $this->ConnectionMode = '';
@@ -332,7 +336,12 @@ class ProxyRequest {
       $this->UseSSL = ($Scheme == 'https') ? TRUE : FALSE;
       
       $this->Action(" transfer mode: {$TransferMode}");
-      
+
+      $logContext = array(
+         'url' => $Url,
+         'method' => $RequestMethod
+      );
+
       /*
        * ProxyRequest can masquerade as the current user, so collect and encode
        * their current cookies as the default case is to send them.
@@ -466,12 +475,38 @@ class ProxyRequest {
       // Set URL
       curl_setopt($Handler, CURLOPT_URL, $Url);
       curl_setopt($Handler, CURLOPT_PORT, $Port);
-      
+
+      if (val('Log', $Options, TRUE)) {
+         Logger::event('http_request', Logger::DEBUG, '{method} {url}', $logContext);
+      }
+
       $this->CurlReceive($Handler);
 
       if ($Simulate) return NULL;
 
       curl_close($Handler);
+
+
+      $logContext['responseCode'] = $this->ResponseStatus;
+      $logContext['responseTime'] = $this->ResponseTime;
+      if (Debug()) {
+         if ($this->ContentType == 'application/json') {
+            $body = @json_decode($this->ResponseBody, true);
+            if (!$body) {
+               $body = $this->ResponseBody;
+            }
+            $logContext['responseBody'] = $body;
+         } else {
+            $logContext['responseBody'] = $this->ResponseBody;
+         }
+      }
+      if (val('Log', $Options, TRUE)) {
+         if ($this->ResponseClass('2xx')) {
+            Logger::event('http_response', Logger::DEBUG, '{responseCode} {method} {url} in {responseTime}s', $logContext);
+         } else {
+            Logger::event('http_response_error', Logger::DEBUG, '{responseCode} {method} {url} in {responseTime}s', $logContext);
+         }
+      }
       
       $this->Loud = $OldVolume;
       return $this->ResponseBody;

@@ -20,7 +20,7 @@ class MessageController extends DashboardController {
     * @access public
     */
    public function Add() {
-      $this->Permission('Garden.Messages.Manage');
+      $this->Permission('Garden.Community.Manage');
       // Use the edit form with no MessageID specified.
       $this->View = 'Edit';
       $this->Edit();
@@ -33,7 +33,7 @@ class MessageController extends DashboardController {
     * @access public
     */
    public function Delete($MessageID = '', $TransientKey = FALSE) {
-      $this->Permission('Garden.Messages.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->DeliveryType(DELIVERY_TYPE_BOOL);
       $Session = Gdn::Session();
 
@@ -80,7 +80,7 @@ class MessageController extends DashboardController {
       $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('messages.js');
 
-      $this->Permission('Garden.Messages.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->AddSideMenu('dashboard/message');
 
       // Generate some Controller & Asset data arrays
@@ -129,7 +129,7 @@ class MessageController extends DashboardController {
     * @access public
     */
    public function Index() {
-      $this->Permission('Garden.Messages.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->AddSideMenu('dashboard/message');
       $this->AddJsFile('jquery.autosize.min.js');
       $this->AddJsFile('jquery.tablednd.js');
@@ -187,6 +187,7 @@ class MessageController extends DashboardController {
       $ControllerData['Vanilla/Discussion/Index'] = T('Comments Page');
       $ControllerData['Vanilla/Post/Discussion'] = T('New Discussion Form');
       $ControllerData['Dashboard/Entry/SignIn'] = T('Sign In');
+      $ControllerData['Dashboard/Entry/Register'] = T('Registration');
       // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
       // $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
       $this->EventArguments['ControllerData'] = &$ControllerData;

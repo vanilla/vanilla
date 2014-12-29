@@ -139,6 +139,54 @@ class DBAModel extends Gdn_Model {
       
       return $Result;
    }
+
+   /**
+    * If any role has no permission records, set Member-like permissions on it.
+    *
+    * @return array
+    */
+   public function FixPermissions() {
+      $Roles = RoleModel::Roles();
+      $RoleModel = new RoleModel();
+      $PermissionModel = new PermissionModel();
+
+      // Find roles missing permission records
+      foreach ($Roles as $RoleID => $Role) {
+         $Permissions = $this->SQL->Select('*')->From('Permission p')
+            ->Where('p.RoleID', $RoleID)->Get()->ResultArray();
+
+         if (!count($Permissions)) {
+            // Set basic permission record
+            $DefaultRecord = array(
+               'RoleID' => $RoleID,
+               'JunctionTable' => null,
+               'JunctionColumn' => null,
+               'JunctionID' => null,
+               'Garden.Email.View' => 1,
+               'Garden.SignIn.Allow' => 1,
+               'Garden.Activity.View' => 1,
+               'Garden.Profiles.View' => 1,
+               'Garden.Profiles.Edit' => 1,
+               'Conversations.Conversations.Add' => 1
+            );
+            $PermissionModel->Save($DefaultRecord);
+
+            // Set default category permission
+            $DefaultCategory = array(
+               'RoleID' => $RoleID,
+               'JunctionTable' => 'Category',
+               'JunctionColumn' => 'PermissionCategoryID',
+               'JunctionID' => -1,
+               'Vanilla.Discussions.View' => 1,
+               'Vanilla.Discussions.Add' => 1,
+               'Vanilla.Comments.Add' => 1
+            );
+            $PermissionModel->Save($DefaultCategory);
+         }
+      }
+
+      return array('Complete' => TRUE);
+   }
    
    public function FixUrlCodes($Table, $Column) {
       $Model = $this->CreateModel($Table);

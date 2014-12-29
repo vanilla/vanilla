@@ -112,69 +112,76 @@ class DashboardHooks implements Gdn_IPlugin {
       }
 
       // Allow return to mobile site
-		$ForceNoMobile = Gdn_CookieIdentity::GetCookiePayload('VanillaNoMobile');
-		if ($ForceNoMobile !== FALSE && is_array($ForceNoMobile) && in_array('force', $ForceNoMobile))
+		$ForceNoMobile = val('X-UA-Device-Force', $_COOKIE);
+		if ($ForceNoMobile === 'desktop') {
 		   $Sender->AddAsset('Foot', Wrap(Anchor(T('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
+      }
+
+      // Allow global translation of TagHint
+      $Sender->AddDefinition("TagHint", T("TagHint", "Start to type..."));
    }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      /* @var SideMenuModule $Menu */
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
-      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Moderation.Manage');
-		$Menu->AddLink('Dashboard', T('Getting Started'), '/dashboard/settings/gettingstarted', 'Garden.Settings.Manage');
-		$Menu->AddLink('Dashboard', T('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.Manage');
+      $Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', 'Garden.Settings.View', array('class' => 'nav-dashboard'));
+      $Menu->AddLink('Dashboard', T('Getting Started'), '/dashboard/settings/gettingstarted', 'Garden.Settings.Manage', array('class' => 'nav-getting-started'));
+      $Menu->AddLink('Dashboard', T('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.View', array('class' => 'nav-tutorials'));
 
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
-		$Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Settings.Manage');
-      $Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage');
+      $Menu->AddLink('Appearance', T('Banner'), '/dashboard/settings/banner', 'Garden.Community.Manage', array('class' => 'nav-banner'));
+      $Menu->AddLink('Appearance', T('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage', array('class' => 'nav-homepage'));
 
-      $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Settings.Manage');
+      $Menu->AddLink('Appearance', T('Themes'), '/dashboard/settings/themes', 'Garden.Settings.Manage', array('class' => 'nav-themes'));
       if ($ThemeOptionsName = C('Garden.ThemeOptions.Name'))
-         $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Settings.Manage');
+         $Menu->AddLink('Appearance', T('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Settings.Manage', array('class' => 'nav-theme-options'));
 
-      $Menu->AddLink('Appearance', T('Mobile Themes'), '/dashboard/settings/mobilethemes', 'Garden.Settings.Manage');
+      $Menu->AddLink('Appearance', T('Mobile Themes'), '/dashboard/settings/mobilethemes', 'Garden.Settings.Manage', array('class' => 'nav-mobile-themes'));
       if ($MobileThemeOptionsName = C('Garden.MobileThemeOptions.Name'))
-         $Menu->AddLink('Appearance', T('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'Garden.Settings.Manage');
+         $Menu->AddLink('Appearance', T('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'Garden.Settings.Manage', array('class' => 'nav-mobile-theme-options'));
 
 
-		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Settings.Manage');
+      $Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Community.Manage', array('class' => 'nav-messages'));
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
-      $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
-		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Settings.Manage');
+      $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), array('class' => 'nav-users'));
+      $Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Settings.Manage', array('class' => 'nav-roles'));
 
-      $Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Settings.Manage');
-		$Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage');
+      $Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Settings.Manage', array('class' => 'nav-registration'));
+      $Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage', array('class' => 'nav-authentication'));
 
       if (C('Garden.Registration.Method') == 'Approval')
-         $Menu->AddLink('Users', T('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Users.Approve');
+         $Menu->AddLink('Users', T('Applicants') . ' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Users.Approve', array('class' => 'nav-applicants'));
 
       $Menu->AddItem('Moderation', T('Moderation'), FALSE, array('class' => 'Moderation'));
 
       if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), FALSE))
-         $Menu->AddLink('Moderation', T('Spam Queue'), 'dashboard/log/spam');
+         $Menu->AddLink('Moderation', T('Spam Queue'), 'dashboard/log/spam', FALSE, array('class' => 'nav-spam-queue'));
       if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE))
-         $Menu->AddLink('Moderation', T('Moderation Queue').' <span class="Popin" rel="/dashboard/log/count/moderate"></span>', 'dashboard/log/moderation');
-      $Menu->AddLink('Moderation', T('Change Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
-      $Menu->AddLink('Moderation', T('Banning'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
+         $Menu->AddLink('Moderation', T('Moderation Queue') . ' <span class="Popin" rel="/dashboard/log/count/moderate"></span>', 'dashboard/log/moderation', FALSE, array('class' => 'nav-moderation-queue'));
+      $Menu->AddLink('Moderation', T('Change Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage', array('class' => 'nav-change-log'));
+      $Menu->AddLink('Moderation', T('Banning'), 'dashboard/settings/bans', 'Garden.Community.Manage', array('class' => 'nav-bans'));
 
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
-      $Menu->AddLink('Forum', T('Social'), 'dashboard/social', 'Garden.Settings.Manage');
+      $Menu->AddLink('Forum', T('Social'), 'dashboard/social', 'Garden.Settings.Manage', array('class' => 'nav-social-settings'));
 
 		$Menu->AddItem('Reputation', T('Reputation'), FALSE, array('class' => 'Reputation'));
 
 		$Menu->AddItem('Add-ons', T('Addons'), FALSE, array('class' => 'Addons'));
-      $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Settings.Manage');
-      $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Settings.Manage');
-      $Menu->AddLink('Add-ons', T('Locales'), 'dashboard/settings/locales', 'Garden.Settings.Manage');
+      $Menu->AddLink('Add-ons', T('Plugins'), 'dashboard/settings/plugins', 'Garden.Settings.Manage', array('class' => 'nav-addons nav-plugins'));
+      $Menu->AddLink('Add-ons', T('Applications'), 'dashboard/settings/applications', 'Garden.Settings.Manage', array('class' => 'nav-addons nav-applications'));
+      $Menu->AddLink('Add-ons', T('Locales'), 'dashboard/settings/locales', 'Garden.Settings.Manage', array('class' => 'nav-addons nav-locales'));
 
       $Menu->AddItem('Site Settings', T('Settings'), FALSE, array('class' => 'SiteSettings'));
-      $Menu->AddLink('Site Settings', T('Outgoing Email'), 'dashboard/settings/email', 'Garden.Settings.Manage');
-      $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Settings.Manage');
-      $Menu->AddLink('Site Settings', T('Statistics'), 'dashboard/statistics', 'Garden.Settings.Manage');
+      $Menu->AddLink('Site Settings', T('Outgoing Email'), 'dashboard/settings/email', 'Garden.Settings.Manage', array('class' => 'nav-email nav-email-out'));
+      $Menu->AddLink('Site Settings', T('Routes'), 'dashboard/routes', 'Garden.Settings.Manage', array('class' => 'nav-routes'));
+      $Menu->AddLink('Site Settings', T('Statistics'), 'dashboard/statistics', 'Garden.Settings.Manage', array('class' => 'nav-statistics-settings'));
 
-		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Import'));
-		$Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage');
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         $Menu->AddItem('Import', T('Import'), 'Garden.Settings.Manage', array('class' => 'Import'));
+         $Menu->AddLink('Import', FALSE, 'dashboard/import', 'Garden.Settings.Manage', array('class' => 'nav-import'));
+      }
    }
 
    /**
@@ -298,9 +305,7 @@ class DashboardHooks implements Gdn_IPlugin {
          return;
 
       // Users can edit their own profiles and moderators can edit any profile.
-      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))
-         || ($is_me && C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect')) {
-
+      if (hasEditProfile($user_id)) {
          $sender->addLink('main.editprofile', array('text' => t('Profile'), 'url' => UserUrl($user, '', 'edit'), 'icon' => icon('edit')));
       }
 
@@ -332,9 +337,7 @@ class DashboardHooks implements Gdn_IPlugin {
          $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => UserUrl($user, '', 'invitations'), 'icon' => icon('ticket')));
 
       // Users can edit their own profiles and moderators can edit any profile.
-      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))
-         || ($user_id == Gdn::Session()->UserID && C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect')) {
-
+      if (hasEditProfile($user_id)) {
          $sender->addLink('main.editprofile', array('text' => t('Edit Profile'), 'url' => UserUrl($user, '', 'edit'), 'icon' => icon('edit')));
       }
 

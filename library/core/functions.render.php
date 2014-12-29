@@ -424,7 +424,11 @@ if (!function_exists('DiscussionUrl')):
  */
 function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
    $Discussion = (object)$Discussion;
-   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+   $Name = Gdn_Format::Url($Discussion->Name);
+   if (empty($Name)) {
+      $Name = 'x';
+   }
+   $Result = '/discussion/'.$Discussion->DiscussionID.'/'.$Name;
    if ($Page) {
       if ($Page > 1 || Gdn::Session()->UserID)
          $Result .= '/p'.$Page;
@@ -503,6 +507,33 @@ if (!function_exists('FormatUsername')) {
          default:
             return $Name;
       }
+   }
+}
+
+if (!function_exists('hasEditProfile')) {
+   /**
+    * Determine whether or not a given user has the edit profile link.
+    *
+    * @param int $userID The user ID to check.
+    * @return bool Return true if the user should have the edit profile link or false otherwise.
+    */
+   function hasEditProfile($userID) {
+      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))) {
+         return true;
+      }
+      if ($userID != Gdn::Session()->UserID) {
+         return false;
+      }
+
+      $result = checkPermission('Garden.Profiles.Edit') && C('Garden.UserAccount.AllowEdit');
+
+      $result &= (
+            C('Garden.Profile.Titles') ||
+            C('Garden.Profile.Locations', FALSE) ||
+            C('Garden.Registration.Method') != 'Connect'
+         );
+
+      return $result;
    }
 }
 
@@ -812,7 +843,7 @@ if (!function_exists('UserPhoto')) {
       $Title = htmlspecialchars(GetValue('Title', $Options, $Name));
 
       if ($FullUser && $FullUser['Banned']) {
-         $Photo = C('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');;
+         $Photo = C('Garden.BannedPhoto', 'http://cdn.vanillaforums.com/images/banned_large.png');
          $Title .= ' ('.T('Banned').')';
       }
 
@@ -950,24 +981,36 @@ if (!function_exists('DiscussionLink')) {
 }
 
 if (!function_exists('RegisterUrl')) {
-   function RegisterUrl($Target = '') {
+   function RegisterUrl($Target = '', $force = false) {
+      $registrationMethod = strtolower(C('Garden.Registration.Method'));
+
+      if ($registrationMethod === 'closed') {
+         return '';
+      }
+
+      // Check to see if there is even a sign in button.
+      if (!$force && $registrationMethod === 'connect') {
+         $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
+         if ($defaultProvider && !val('RegisterUrl', $defaultProvider)) {
+            return '';
+         }
+      }
+
       return '/entry/register'.($Target ? '?Target='.urlencode($Target) : '');
    }
 }
 
 if (!function_exists('SignInUrl')) {
-   function SignInUrl($Target = '') {
-      // See if there is a default authentication provider.
-//      $Provider = Gdn_AuthenticationProviderModel::GetDefault();
-//      if ($Provider) {
-//         $SignInUrl = $Provider['SignInUrl'];
-//         if ($SignInUrl) {
-//            $SignInUrl = str_ireplace('{target}', rawurlencode($Target), $SignInUrl);
-//            return $SignInUrl;
-//         }
-//      }
+   function SignInUrl($target = '', $force = false) {
+      // Check to see if there is even a sign in button.
+      if (!$force && strcasecmp(C('Garden.Registration.Method'), 'Connect') !== 0) {
+         $defaultProvider = Gdn_AuthenticationProviderModel::GetDefault();
+         if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
+            return '';
+         }
+      }
 
-      return '/entry/signin'.($Target ? '?Target='.urlencode($Target) : '');
+      return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
    }
 }
 

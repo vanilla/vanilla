@@ -25,6 +25,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
    public $Data = array();
 
    /**
+    * @var string The path to the default configuration file.
+    * @since 2.3
+    */
+   protected $DefaultPath;
+
+   /**
     * Configuration Source List
     *
     * This is an associative array of Gdn_ConfigurationSource objects indexed
@@ -82,6 +88,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
       parent::__construct();
       if (!is_null($DefaultGroup))
          $this->DefaultGroup = $DefaultGroup;
+
+      if (defined('PATH_CONF_DEFAULT')) {
+         $this->DefaultPath = PATH_CONF_DEFAULT;
+      } else {
+         $this->DefaultPath = PATH_CONF.'/config.php';
+      }
    }
 
    public function AutoSave($AutoSave = TRUE) {
@@ -126,6 +138,19 @@ class Gdn_Configuration extends Gdn_Pluggable {
              Gdn_Cache::FEATURE_NOPREFIX => TRUE
          ));
       }
+   }
+
+   /**
+    * Gets or sets the path of the default configuration file.
+    * @param string $Value Pass a value to set a new default config path.
+    * @return string Returns the current default config path.
+    * @since 2.3
+    */
+   public function DefaultPath($Value = null) {
+      if ($Value !== null) {
+         $this->DefaultPath = $Value;
+      }
+      return $this->DefaultPath;
    }
 
    /**
@@ -552,12 +577,26 @@ class Gdn_Configuration extends Gdn_Pluggable {
     */
    protected static function MergeConfig(&$Data, &$Loaded) {
       foreach ($Loaded as $Key => $Value) {
-         if (array_key_exists($Key,$Data) && is_array($Data[$Key]) && is_array($Value)) {
+         if (array_key_exists($Key,$Data) && is_array($Data[$Key]) && is_array($Value) && !self::isList($Value)) {
             self::MergeConfig($Data[$Key], $Value);
          } else {
             $Data[$Key] = $Value;
          }
       }
+   }
+
+   /**
+    * Determine if a given array is a list (or a hash)
+    *
+    * @param array $list
+    * @return boolean
+    */
+   protected static function isList(&$list) {
+       $n = count($list);
+       for ($i=0;$i<$n;$i++) {
+          if (!isset($list[$i]) && !key_exists($i, $list)) return false;
+       }
+       return true;
    }
 
    /**
@@ -632,7 +671,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
          $Data = $Data[$Group];
 
       // Do a sanity check on the config save.
-      if ($File == PATH_CONF.'/config.php') {
+      if ($File == $this->DefaultPath()) {
          if (!isset($Data['Database'])) {
             if ($Pm = Gdn::PluginManager()) {
                $Pm->EventArguments['Data'] = $Data;
@@ -655,10 +694,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
          trigger_error(ErrorMessage('Failed to define configuration file contents.', $Group, 'Save'), E_USER_ERROR);
 
       $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $File);
-      if ($this->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
-         $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data, array(
-             Gdn_Cache::FEATURE_NOPREFIX => TRUE
+      if ($this->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled()) {
+         Gdn::Cache()->Store($FileKey, $Data, array(
+             Gdn_Cache::FEATURE_NOPREFIX    => TRUE,
+             Gdn_Cache::FEATURE_EXPIRY      => 3600
          ));
+      }
 
       // Infrastructure deployment. Use old method.
       $TmpFile = tempnam(PATH_CONF, 'config');
@@ -905,7 +946,8 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
       // Write it there now.
       if ($Parent && $Parent->Caching() && $UseCache && !$LoadedFromCache) {
          Gdn::Cache()->Store($FileKey, $$Name, array(
-             Gdn_Cache::FEATURE_NOPREFIX => TRUE
+             Gdn_Cache::FEATURE_NOPREFIX    => TRUE,
+             Gdn_Cache::FEATURE_EXPIRY      => 3600
          ));
       }
 
@@ -1206,7 +1248,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                $Data = $Data[$Group];
 
             // Do a sanity check on the config save.
-            if ($this->Source == PATH_CONF.'/config.php') {
+            if ($this->Source == Gdn::Config()->DefaultPath()) {
 
                // Log root config changes
                try {
@@ -1239,7 +1281,8 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
             $FileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $this->Source);
             if ($this->Configuration && $this->Configuration->Caching() && Gdn::Cache()->Type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::Cache()->ActiveEnabled())
                $CachedConfigData = Gdn::Cache()->Store($FileKey, $Data, array(
-                   Gdn_Cache::FEATURE_NOPREFIX => TRUE
+                   Gdn_Cache::FEATURE_NOPREFIX  => TRUE,
+                   Gdn_Cache::FEATURE_EXPIRY    => 3600
                ));
 
             $TmpFile = tempnam(PATH_CONF, 'config');

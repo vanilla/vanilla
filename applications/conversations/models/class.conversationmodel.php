@@ -276,7 +276,7 @@ class ConversationModel extends ConversationsModel {
     * @param int $Limit The number of recipients to grab.
     * @return Gdn_DataSet SQL results.
     */
-   public function GetRecipients($ConversationID, $Limit = 10) {
+   public function GetRecipients($ConversationID, $Limit = 20) {
       $Data = $this->SQL
          ->Select('uc.*')
          ->From('UserConversation uc')
@@ -481,7 +481,7 @@ class ConversationModel extends ConversationsModel {
       if (
          $this->Validate($FormPostValues)
          && $MessageModel->Validate($FormPostValues)
-         && !$this->CheckForSpam()
+         && !$this->CheckForSpam('Conversation')
       ) {
          $Fields = $this->Validation->ValidationFields(); // All fields on the form that relate to the schema
 
@@ -498,7 +498,16 @@ class ConversationModel extends ConversationsModel {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
          $ConversationID = $this->SQL->Insert($this->Name, $Fields);
          $FormPostValues['ConversationID'] = $ConversationID;
-         $MessageID = $MessageModel->Save($FormPostValues);
+
+         // Notify the message model that it's being called as a direct result
+         // of a new conversation being created. As of now, this is being used
+         // so that spam checks between new conversations and conversation
+         // messages each have a separate counter. Without this, a new
+         // conversation will cause itself AND the message model spam counter
+         // to increment by 1.
+         $MessageID = $MessageModel->Save($FormPostValues, NULL, array(
+               'NewConversation' => TRUE
+         ));
 
          $this->SQL
             ->Update('Conversation')
@@ -547,7 +556,7 @@ class ConversationModel extends ConversationsModel {
             'RecordID' => $ConversationID,
             'Story' => GetValue('Body', $FormPostValues),
             'Format' => GetValue('Format', $FormPostValues, C('Garden.InputFormatter')),
-            'Route' => "/messages/$ConversationID#$MessageID"
+            'Route' => "/messages/$ConversationID#Message_$MessageID"
          );
 
          $Subject = GetValue('Subject', $Fields);

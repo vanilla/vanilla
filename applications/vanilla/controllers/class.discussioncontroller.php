@@ -58,8 +58,8 @@ class DiscussionController extends VanillaController {
       // Setup head
       $Session = Gdn::Session();
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('discussion.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('discussion.js');
       Gdn_Theme::Section('Discussion');
 
       // Load the discussion record
@@ -245,7 +245,7 @@ class DiscussionController extends VanillaController {
       $this->FireEvent('BeforeDiscussionRender');
 
       $AttachmentModel = AttachmentModel::Instance();
-      if ($AttachmentModel->Enabled()) {
+      if (AttachmentModel::Enabled()) {
          $AttachmentModel->JoinAttachments($this->Data['Discussion'], $this->Data['Comments']);
 
          $this->FireEvent('FetchAttachmentViews');
@@ -390,7 +390,7 @@ class DiscussionController extends VanillaController {
     */
    public function Bookmark($DiscussionID = NULL) {
       // Make sure we are posting back.
-      if (!$this->Request->IsPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Session = Gdn::Session();
@@ -492,9 +492,12 @@ class DiscussionController extends VanillaController {
          throw NotFoundException('Discussion');
       $this->Permission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          // Save the property.
-         $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Discussion));
+         $CacheKeys = array(
+            $this->DiscussionModel->GetAnnouncementCacheKey(),
+            $this->DiscussionModel->GetAnnouncementCacheKey(val('CategoryID', $Discussion))
+         );
          $this->DiscussionModel->SQL->Cache($CacheKeys);
          $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->GetFormValue('Announce', 0));
 
@@ -540,7 +543,7 @@ class DiscussionController extends VanillaController {
     */
    public function Sink($DiscussionID = '', $Sink = TRUE, $From = 'list') {
       // Make sure we are posting back.
-      if (!$this->Request->IsPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Discussion = $this->DiscussionModel->GetID($DiscussionID);
@@ -583,7 +586,7 @@ class DiscussionController extends VanillaController {
     */
    public function Close($DiscussionID = '', $Close = TRUE, $From = 'list') {
       // Make sure we are posting back.
-      if (!$this->Request->IsPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Discussion = $this->DiscussionModel->GetID($DiscussionID);
@@ -638,7 +641,7 @@ class DiscussionController extends VanillaController {
 
       $this->Permission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          if (!$this->DiscussionModel->Delete($DiscussionID))
             $this->Form->AddError('Failed to delete discussion');
 
@@ -792,7 +795,10 @@ body { background: transparent !important; }
 
       // Set discussion data if we have one for this page
       if ($Discussion) {
-         $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $Discussion->PermissionCategoryID);
+         // Allow Vanilla.Comments.View to be defined to limit access to embedded comments only.
+         // Otherwise, go with normal discussion view permissions. Either will do.
+         $this->Permission(array('Vanilla.Discussions.View', 'Vanilla.Comments.View'), FALSE, 'Category', $Discussion->PermissionCategoryID);
+
          $this->SetData('Discussion', $Discussion, TRUE);
          $this->SetData('DiscussionID', $Discussion->DiscussionID, TRUE);
          $this->Title($Discussion->Name);

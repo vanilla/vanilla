@@ -73,7 +73,12 @@ class LogController extends DashboardController {
     * @param string $Operation Comma-separated ist of action types to find.
     */
    public function Count($Operation) {
-      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE);
+      // Don't use Gdn_Controller->Permission() here because this isn't a "real page".
+      if (!Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
+         $this->StatusCode(403);
+         echo '';
+         return;
+      }
 
       if ($Operation == 'edits')
          $Operation = array('edit', 'delete');

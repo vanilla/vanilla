@@ -55,11 +55,12 @@ class SettingsController extends DashboardController {
 
       // Validate & set parameters
       $Session = Gdn::Session();
-      $ApplicationName = $Session->ValidateTransientKey($TransientKey) ? $ApplicationName : '';
+      if ($ApplicationName && !$Session->ValidateTransientKey($TransientKey)) {
+         $ApplicationName = '';
+      }
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $this->Filter = $Filter;
-      $AuthenticatedPostBack = $this->Form->AuthenticatedPostBack();
 
       $ApplicationManager = new Gdn_ApplicationManager();
       $this->AvailableApplications = $ApplicationManager->AvailableVisibleApplications();
@@ -124,7 +125,7 @@ class SettingsController extends DashboardController {
     * @access public
     */
    public function Banner() {
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->AddSideMenu('dashboard/settings/banner');
       $this->Title(T('Banner'));
 
@@ -271,7 +272,7 @@ class SettingsController extends DashboardController {
     * @param int $ID Ban ID we're editing or deleting.
     */
    public function Bans($Action = '', $Search = '', $Page = '', $ID = '') {
-      $this->Permission('Garden.Moderation.Manage');
+      $this->Permission('Garden.Community.Manage');
 
       // Page setup
       $this->AddSideMenu();
@@ -445,7 +446,9 @@ class SettingsController extends DashboardController {
       $this->AddJsFile('settings.js');
       $this->Title(T('Dashboard'));
 
+      $this->RequiredAdminPermissions[] = 'Garden.Settings.View';
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
+      $this->RequiredAdminPermissions[] = 'Garden.Community.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Edit';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Delete';
@@ -562,7 +565,7 @@ class SettingsController extends DashboardController {
       $EnabledLocales = $LocaleModel->EnabledLocalePacks();
 
       // Check to enable/disable a locale.
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->AuthenticatedPostBack()) {
+      if (($TransientKey && Gdn::Session()->ValidateTransientKey($TransientKey)) || $this->Form->AuthenticatedPostBack()) {
          if ($Op) {
             $Refresh = FALSE;
             switch(strtolower($Op)) {
@@ -587,15 +590,17 @@ class SettingsController extends DashboardController {
 
             // Set default locale field if just doing enable/disable
             $this->Form->SetValue('Locale', C('Garden.Locale', 'en-CA'));
-         } elseif ($this->Form->IsPostBack()) {
+         } elseif ($this->Form->AuthenticatedPostBack()) {
             // Save the default locale.
             SaveToConfig('Garden.Locale', $this->Form->GetFormValue('Locale'));
             $Refresh = TRUE;
             $this->InformMessage(T("Your changes have been saved."));
          }
 
-         if ($Refresh)
+         if ($Refresh) {
             Gdn::Locale()->Refresh();
+            Redirect('/settings/locales');
+         }
       } elseif (!$this->Form->IsPostBack()) {
          $this->Form->SetValue('Locale', C('Garden.Locale', 'en-CA'));
       }
@@ -614,6 +619,7 @@ class SettingsController extends DashboardController {
                $LocaleFound = TRUE;
 
          }
+         $this->SetData('DefaultLocale', $DefaultLocale);
          $this->SetData('DefaultLocaleWarning', !$LocaleFound);
          $this->SetData('MatchingLocalePacks', htmlspecialchars(implode(', ', $MatchingLocales)));
       }
@@ -643,7 +649,10 @@ class SettingsController extends DashboardController {
 
       // Validate and set properties
       $Session = Gdn::Session();
-      $PluginName = $Session->ValidateTransientKey($TransientKey) ? $PluginName : '';
+      if ($PluginName && !$Session->ValidateTransientKey($TransientKey)) {
+         $PluginName =  '';
+      }
+
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $this->Filter = $Filter;
@@ -884,7 +893,7 @@ class SettingsController extends DashboardController {
          $ThemeManager = new Gdn_ThemeManager();
          $this->SetData('ThemeInfo', $ThemeManager->EnabledThemeInfo());
 
-         if ($this->Form->IsPostBack()) {
+         if ($this->Form->AuthenticatedPostBack()) {
             // Save the styles to the config.
             $StyleKey = $this->Form->GetFormValue('StyleKey');
 
@@ -954,7 +963,7 @@ class SettingsController extends DashboardController {
 
          $this->SetData('ThemeInfo', $EnabledThemeInfo);
 
-         if ($this->Form->IsPostBack()) {
+         if ($this->Form->AuthenticatedPostBack()) {
             // Save the styles to the config.
             $StyleKey = $this->Form->GetFormValue('StyleKey');
 
@@ -982,7 +991,7 @@ class SettingsController extends DashboardController {
          $this->SetData('ThemeOptions', C('Garden.MobileThemeOptions'));
          $StyleKey = $this->Data('ThemeOptions.Styles.Key');
 
-         if (!$this->Form->IsPostBack()) {
+         if (!$this->Form->AuthenticatedPostBack()) {
             foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Options) {
                $Default = GetValue('Default', $Options, '');
                $Value = C("ThemeOption.{$Key}", '#DEFAULT#');
@@ -1043,7 +1052,7 @@ class SettingsController extends DashboardController {
       }
       $this->SetData('AvailableThemes', $Themes);
 
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
+      if ($ThemeName != '' && Gdn::Session()->ValidateTransientKey($TransientKey)) {
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
             if ($ThemeInfo === FALSE)
@@ -1112,7 +1121,7 @@ class SettingsController extends DashboardController {
       $this->SetData('AvailableThemes', $Themes);
 
       // Process self-post.
-      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $ThemeName != '') {
+      if ($ThemeName != '' && Gdn::Session()->ValidateTransientKey($TransientKey)) {
 
          try {
             $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
@@ -1129,7 +1138,7 @@ class SettingsController extends DashboardController {
             $this->Form->AddError($Ex);
          }
 
-         $AsyncRequest = ($this->DeliveryType() === DELIVERY_METHOD_JSON)
+         $AsyncRequest = ($this->DeliveryType() === DELIVERY_TYPE_VIEW)
             ? TRUE
             : FALSE;
 
@@ -1213,7 +1222,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveFavicon($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Community.Manage')) {
          $Favicon = C('Garden.FavIcon', '');
          RemoveFromConfig('Garden.FavIcon');
          $Upload = new Gdn_Upload();
@@ -1221,6 +1230,26 @@ class SettingsController extends DashboardController {
       }
 
       Redirect('/settings/banner');
+   }
+
+   /**
+    * Remove the share image from config & delete it.
+    *
+    * @since 2.1
+    * @param string $TransientKey Security token.
+    */
+   public function RemoveShareImage($TransientKey = '') {
+      $this->Permission('Garden.Community.Manage');
+
+      if (Gdn::Request()->IsAuthenticatedPostBack()) {
+         $ShareImage = C('Garden.ShareImage', '');
+         RemoveFromConfig('Garden.ShareImage');
+         $Upload = new Gdn_Upload();
+         $Upload->Delete($ShareImage);
+      }
+
+      $this->RedirectUrl = '/settings/banner';
+      $this->Render('Blank', 'Utility');
    }
 
 
@@ -1233,7 +1262,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveLogo($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Community.Manage')) {
          $Logo = C('Garden.Logo', '');
          RemoveFromConfig('Garden.Logo');
          @unlink(PATH_ROOT . DS . $Logo);
@@ -1251,7 +1280,7 @@ class SettingsController extends DashboardController {
     */
    public function RemoveMobileLogo($TransientKey = '') {
       $Session = Gdn::Session();
-      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Settings.Manage')) {
+      if ($Session->ValidateTransientKey($TransientKey) && $Session->CheckPermission('Garden.Community.Manage')) {
          $MobileLogo = C('Garden.MobileLogo', '');
          RemoveFromConfig('Garden.MobileLogo');
          @unlink(PATH_ROOT . DS . $MobileLogo);

@@ -154,6 +154,7 @@ class Gdn_Form extends Gdn_Pluggable {
       TouchValue('class', $Attributes, '');
       $Attributes['class'] .= ' TextBox BodyBox';
 
+      $Attributes['format'] = htmlspecialchars($Attributes['format']);
       $this->SetValue('Format', $Attributes['format']);
 
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
@@ -366,6 +367,8 @@ class Gdn_Form extends Gdn_Pluggable {
    public function CheckBox($FieldName, $Label = '', $Attributes = FALSE) {
       $Value = ArrayValueI('value', $Attributes, true);
       $Attributes['value'] = $Value;
+      $Display = GetValue('display', $Attributes, 'wrap');
+      unset($Attributes['display']);
 
       if (StringEndsWith($FieldName, '[]')) {
          if (!isset($Attributes['checked'])) {
@@ -388,9 +391,20 @@ class Gdn_Form extends Gdn_Pluggable {
          $this->AddErrorClass($Attributes);
 
       $Input = $this->Input($FieldName, 'checkbox', $Attributes);
-      if ($Label != '') $Input = '<label for="' . ArrayValueI('id', $Attributes,
-         $this->EscapeID($FieldName, FALSE)) . '" class="CheckBoxLabel"'.Attribute('title', GetValue('title', $Attributes)).'>' . $Input . ' ' .
-          T($Label) . '</label>';
+      if ($Label != '') {
+         $LabelElement = '<label for="'.
+            ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)).
+            '" class="'.GetValue('class', $Attributes, 'CheckBoxLabel').'"'.
+            Attribute('title', GetValue('title', $Attributes)).'>';
+
+         if ($Display === 'wrap') {
+            $Input =  $LabelElement.$Input.' '.T($Label).'</label>';
+         } elseif ($Display === 'before') {
+            $Input = $LabelElement.T($Label).'</label> '.$Input;
+         } else {
+            $Input = $Input.' '.$LabelElement.T($Label).'</label>';
+         }
+      }
 
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))
@@ -759,7 +773,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
       $Years = array();
       $Years[0] = T('Year');
-      for($i = $EndYear; $i >= $StartYear; --$i) {
+      for($i = $StartYear; $i <= $EndYear; ++$i) {
          $Years[$i] = $i;
       }
 
@@ -1411,6 +1425,8 @@ PASSWORDMETER;
       $Value = ArrayValueI('Value', $Attributes, 'TRUE');
       $Attributes['value'] = $Value;
       $FormValue = $this->GetValue($FieldName, ArrayValueI('Default', $Attributes));
+      $Display = GetValue('display', $Attributes, 'wrap');
+      unset($Attributes['display']);
 
       // Check for 'checked'
       if ($FormValue == $Value)
@@ -1422,10 +1438,16 @@ PASSWORDMETER;
       // Get standard radio Input
       $Input = $this->Input($FieldName, 'radio', $Attributes);
 
-      // Wrap with label
+      // Wrap with label.
       if ($Label != '') {
-         $Input = '<label for="' . ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)) .
-            '" class="RadioLabel">' . $Input . ' ' . T($Label) . '</label>';
+         $LabelElement = '<label for="'.ArrayValueI('id', $Attributes, $this->EscapeID($FieldName, FALSE)).'" class="'.GetValue('class', $Attributes, 'RadioLabel').'">';
+         if ($Display === 'wrap') {
+            $Input =  $LabelElement.$Input.' '.T($Label).'</label>';
+         } elseif ($Display === 'before') {
+            $Input = $LabelElement.T($Label).'</label> '.$Input;
+         } else {
+            $Input = $Input.' '.$LabelElement.T($Label).'</label>';
+         }
       }
 
       return $Input;
@@ -1652,6 +1674,11 @@ PASSWORDMETER;
       //} else {
       $KeyName = $this->EscapeFieldName('TransientKey');
       $PostBackKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST, $KeyName, FALSE);
+
+      // If this isn't a postback then return false if there isn't a transient key.
+      if (!$PostBackKey && !Gdn::Request()->IsPostBack()) {
+         return FALSE;
+      }
 
       // DEBUG:
       //$Result .= '<div>KeyName: '.$KeyName.'</div>';
@@ -2300,7 +2327,7 @@ PASSWORDMETER;
       if ($Valid === TRUE)
          return TRUE;
       else {
-         $this->AddError('@'.$Valid);
+         $this->AddError('@'.$Valid, $FieldName);
          return FALSE;
       }
 

@@ -147,10 +147,15 @@ abstract class Gdn_Cache {
       $ActiveCacheClass = 'Gdn_'.ucfirst($ActiveCache);
 
       if (!$AllowCaching || !$ActiveCache || !class_exists($ActiveCacheClass)) {
-
          $CacheObject = new Gdn_Dirtycache();
-      } else
+      } else {
          $CacheObject = new $ActiveCacheClass();
+      }
+
+      // Null caches should not acount as enabled.
+      if (!$ForceEnable && $CacheObject->Type() === Gdn_Cache::CACHE_TYPE_NULL) {
+         SaveToConfig('Cache.Enabled', FALSE, FALSE);
+      }
 
       if (method_exists($CacheObject,'Autorun'))
          $CacheObject->Autorun();
@@ -231,6 +236,7 @@ abstract class Gdn_Cache {
       if (defined('CACHE_STORE_OVERRIDE') && defined('CACHE_METHOD_OVERRIDE') && CACHE_METHOD_OVERRIDE == $ActiveCache)
          return unserialize(CACHE_STORE_OVERRIDE);
 
+      // Use APC cache?
       $apc = false;
       if (C('Garden.Apc', false) && C('Garden.Cache.ApcPrecache', false) && function_exists('apc_fetch'))
          $apc = true;
@@ -702,15 +708,27 @@ abstract class Gdn_Cache {
       return Gdn_Cache::$trace;
    }
 
-   protected static function LocalGet($key) {
+   protected function LocalGet($key) {
+      if (!$this->hasFeature(Gdn_Cache::FEATURE_LOCAL)) return Gdn_Cache::CACHEOP_FAILURE;
+
       if (!array_key_exists($key, self::$localCache)) return Gdn_Cache::CACHEOP_FAILURE;
       return self::$localCache[$key];
    }
 
-   protected static function LocalSet($key, $value = null) {
+   protected function LocalSet($key, $value = null) {
+      if (!$this->hasFeature(Gdn_Cache::FEATURE_LOCAL)) return;
+
       if (!is_array($key))
          $key = array($key => $value);
       self::$localCache = array_merge(self::$localCache, $key);
+   }
+
+   /**
+    * Clear local cache (process memory cache)
+    *
+    */
+   protected static function LocalClear() {
+      self::$localCache = array();
    }
 
    /**
@@ -733,7 +751,7 @@ abstract class Gdn_Cache {
    * @param int $Feature feature contant
    */
    public function UnregisterFeature($Feature) {
-      if (isset($this->Features[$Features]))
+      if (isset($this->Features[$Feature]))
          unset($this->Features[$Feature]);
    }
 

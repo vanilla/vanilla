@@ -7,8 +7,8 @@ $AddonUrl = Gdn::Config('Garden.AddonUrl');
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
    echo Wrap(Anchor(T("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
-   echo Wrap(Anchor(T('Theming Overview'), 'http://vanillaforums.org/page/Configuration-DashboardAppearanceThemes'), 'li');
-   echo Wrap(Anchor(T('Quick-Start Guide to Creating Themes for Vanilla'), 'http://vanillaforums.org/page/ThemeQuickStart'), 'li');
+   echo Wrap(Anchor(T('Theming Overview'), 'http://docs.vanillaforums.com/theming/'), 'li');
+   echo Wrap(Anchor(T('Quick-Start Guide to Creating Themes for Vanilla'), 'http://docs.vanillaforums.com/theming/quickstart/'), 'li');
    echo '</ul>';
    ?>
 </div>
@@ -165,7 +165,7 @@ if ($AddonUrl != '')
                   $RequiredApplications = GetValue('RequiredApplications', $ThemeInfo, FALSE);
                   if (is_array($RequiredApplications)) {
                      echo '<dl>
-                        <dt>'.T('Requires').'</dt>
+                        <dt>'.T('Requires: ').'</dt>
                         <dd>';
 
                      $i = 0;

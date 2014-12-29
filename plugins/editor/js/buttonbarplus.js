@@ -336,7 +336,7 @@
             ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
             ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
             ButtonBar.BindShortcut(TextArea, 'blockquote', 'ctrl+Q');
-            ButtonBar.BindShortcut(TextArea, 'post', 'tab');
+            //ButtonBar.BindShortcut(TextArea, 'post', 'tab');
          },
 
          BindShortcut: function(TextArea, Operation, Shortcut, ShortcutMode, OpFunction) {

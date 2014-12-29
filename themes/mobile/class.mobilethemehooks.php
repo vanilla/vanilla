@@ -23,7 +23,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
       }
       SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
 
-	  // The table discussions layout takes up too much space on small screens.
+      // The table discussions layout takes up too much space on small screens.
       SaveToConfig('Vanilla.Discussions.Layout', 'modern', FALSE);
    }
    

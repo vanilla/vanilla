@@ -185,7 +185,7 @@ class MessagesController extends ConversationsController {
             $MessageData = $this->ConversationMessageModel->GetNew($ConversationID, $LastMessageID);
             $this->Conversation = $Conversation;
             $this->MessageData = $MessageData;
-            $this->Data['Messages'] = $MessageData;
+            $this->SetData('Messages', $MessageData);
 
             $this->View = 'messages';
          } else {

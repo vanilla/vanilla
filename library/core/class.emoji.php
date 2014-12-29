@@ -210,7 +210,7 @@ class Emoji {
       $this->aliases = array(
          ':)'          => 'smile',
          ':D'          => 'smiley',
-         ':('          => 'disappointed',
+         ':('          => 'frowning',
          ';)'          => 'wink',
          ':\\'         => 'confused',
          ':o'          => 'open_mouth',
@@ -251,6 +251,10 @@ class Emoji {
          }
 
          $c->AddDefinition('emoji', json_encode($emoji));
+      }
+
+      if(C('Garden.EmojiSet') === 'none') {
+         $this->enabled = false;
       }
    }
 
@@ -400,7 +404,7 @@ class Emoji {
          } elseif (isset($aliases2[$emoji])) {
             $list[$aliases2[$emoji]] = $emoji;
          } elseif (isset($this->emoji[$emoji])) {
-            $list[$emoji] = ":$emoji:";
+            $list[$this->ldelim.$emoji.$this->rdelim] = $emoji;
          }
       }
       $this->editorList = $list;
@@ -541,6 +545,10 @@ class Emoji {
     * @return string Return the emoji-formatted post
     */
    public function translateToHtml($Text) {
+      if (!$this->enabled) {
+         return $Text;
+      }
+
 		$Text = ' '. $Text .' ';
 
       // First, translate all aliases. Canonical emoji will get translated

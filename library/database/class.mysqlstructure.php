@@ -542,8 +542,36 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @todo This method and $Column need descriptions.
     */
    protected function _DefineColumn($Column) {
-      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'mediumtext', 'longtext', 'text', 'decimal', 'numeric', 'float', 'double', 'enum', 'timestamp', 'tinyblob', 'blob', 'mediumblob', 'longblob')))
+      $ValidColumnTypes = array(
+         'tinyint',
+         'smallint',
+         'mediumint',
+         'int',
+         'bigint',
+         'char',
+         'varchar',
+         'varbinary',
+         'date',
+         'datetime',
+         'mediumtext',
+         'longtext',
+         'text',
+         'decimal',
+         'numeric',
+         'float',
+         'double',
+         'enum',
+         'timestamp',
+         'tinyblob',
+         'blob',
+         'mediumblob',
+         'longblob',
+         'bit',
+      );
+
+      if (!is_array($Column->Type) && !in_array(strtolower($Column->Type), $ValidColumnTypes)) {
          throw new Exception(sprintf(T('The specified data type (%1$s) is not accepted for the MySQL database.'), $Column->Type));
+      }
 
       $Return = '`'.$Column->Name.'` '.$Column->Type;
 

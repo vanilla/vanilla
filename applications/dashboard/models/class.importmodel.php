@@ -569,8 +569,13 @@ class ImportModel extends Gdn_Model {
 			if(!$this->ImportPath || !file_exists($this->ImportPath))
 				return array();
          ini_set('auto_detect_line_endings', TRUE);
-			$fpin = gzopen($this->ImportPath, 'rb');
-			$fpopened = TRUE;
+		if (function_exists('gzopen')) {
+                        $fpin = gzopen($this->ImportPath, 'rb');
+                        $fpopened = TRUE;
+                } elseif (function_exists('gzopen64')) {
+                        $fpin = gzopen64($this->ImportPath, 'rb');
+                        $fpopened = TRUE;
+                }
 		}
 
 		$Header = fgets($fpin);

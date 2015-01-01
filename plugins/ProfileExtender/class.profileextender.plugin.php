@@ -129,7 +129,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
          switch ($Label) {
             case 'Twitter':
-               $Fields['Twitter'] = Anchor('@'.$Value, 'http://twitter.com/'.$Value);
+               $Fields['Twitter'] = '@'.Anchor($Value, 'http://twitter.com/'.$Value);
                break;
             case 'Facebook':
                $Fields['Facebook'] = Anchor($Value, 'http://facebook.com/'.$Value);
@@ -261,7 +261,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Add Profile Field'));
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          // Get whitelisted properties
          $FormPostValues = $Sender->Form->FormValues();
          foreach ($FormPostValues as $Key => $Value) {
@@ -336,7 +336,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', 'Delete Field');
       if (isset($Args[0])) {
-         if ($Sender->Form->IsPostBack()) {
+         if ($Sender->Form->AuthenticatedPostBack()) {
             RemoveFromConfig('ProfileExtender.Fields.'.$Args[0]);
             $Sender->RedirectUrl = Url('/settings/profileextender');
          }
@@ -411,28 +411,53 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    
    /**
     * Save custom profile fields when saving the user.
+    *
+    * @param $Sender object
+    * @param $Args array
     */
-   public function UserModel_AfterSave_Handler($Sender) {
-      // Confirm we have submitted form values
-      $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments);
+   public function UserModel_AfterSave_Handler($Sender, $Args) {
+      $this->UpdateUserFields($Args['UserID'], $Args['FormPostValues']);
+   }
 
-      if (is_array($FormPostValues)) {
-         $UserID = GetValue('UserID', $Sender->EventArguments);
+   /**
+    * Save custom profile fields on registration.
+    *
+    * @param $Sender object
+    * @param $Args array
+    */
+   public function UserModel_AfterInsertUser_Handler($Sender, $Args) {
+      $this->UpdateUserFields($Args['InsertUserID'], $Args['User']);
+   }
+
+   /**
+    * Update user with new profile fields.
+    *
+    * @param $UserID int
+    * @param $Fields array
+    */
+   protected function UpdateUserFields($UserID, $Fields) {
+      // Confirm we have submitted form values
+      if (is_array($Fields)) {
+         // Retrieve whitelist & user column list
          $AllowedFields = $this->GetProfileFields();
          $Columns = Gdn::SQL()->FetchColumns('User');
 
-         foreach ($FormPostValues as $Name => $Field) {
+         foreach ($Fields as $Name => $Field) {
             // Whitelist
-            if (!array_key_exists($Name, $AllowedFields))
-               unset($FormPostValues[$Name]);
+            if (!array_key_exists($Name, $AllowedFields)) {
+               unset($Fields[$Name]);
+               continue;
+            }
             // Don't allow duplicates on User table
-            if (in_array($Name, $Columns))
-               unset($FormPostValues[$Name]);
+            if (in_array($Name, $Columns)) {
+               unset($Fields[$Name]);
+            }
          }
 
          // Update UserMeta if any made it thru
-         if (count($FormPostValues))
-            Gdn::UserModel()->SetMeta($UserID, $FormPostValues, 'Profile.');
+         if (count($Fields)) {
+            Gdn::UserModel()->SetMeta($UserID, $Fields, 'Profile.');
+         }
       }
    }
    

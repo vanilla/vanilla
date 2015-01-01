@@ -14,18 +14,41 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class DiscussionsModule extends Gdn_Module {
    public $Limit = 10;
    public $Prefix = 'Discussion';
-   
+
+   /**
+    * @var array Limit the discussions to just this list of categories, checked for view permission.
+    */
+   protected $categoryIDs;
+
+
    public function __construct() {
       parent::__construct();
       $this->_ApplicationFolder = 'vanilla';
+      $this->FireEvent('Init');
    }
-   
-   public function GetData($Limit = FALSE) {
-      if (!$Limit)
-         $Limit = $this->Limit;
-      
-      $DiscussionModel = new DiscussionModel();
-      $this->SetData('Discussions', $DiscussionModel->Get(0, $Limit, array('Announce' => 'all')));
+
+   /**
+    * Get the data for the module.
+    *
+    * @param int|bool $limit Override the number of discussions to display.
+    */
+   public function GetData($limit = FALSE) {
+      if (!$limit) {
+         $limit = $this->Limit;
+      }
+
+      $discussionModel = new DiscussionModel();
+
+      $categoryIDs = $this->getCategoryIDs();
+      $where = array('Announce' => 'all');
+
+      if ($categoryIDs) {
+         $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
+      } else {
+         $discussionModel->Watching = TRUE;
+      }
+
+      $this->SetData('Discussions', $discussionModel->Get(0, $limit, $where));
    }
 
    public function AssetTarget() {
@@ -36,9 +59,27 @@ class DiscussionsModule extends Gdn_Module {
       if (!$this->Data('Discussions')) {
          $this->GetData();
       }
-      
+
       require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
-      
+
       return parent::ToString();
+   }
+
+   /**
+    * Get a list of category IDs to limit.
+    *
+    * @return array
+    */
+   public function getCategoryIDs() {
+      return $this->categoryIDs;
+   }
+
+   /**
+    * Set a list of category IDs to limit.
+    *
+    * @param array $categoryIDs
+    */
+   public function setCategoryIDs($categoryIDs) {
+      $this->categoryIDs = $categoryIDs;
    }
 }

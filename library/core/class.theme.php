@@ -42,8 +42,9 @@ class Gdn_Theme {
 
       if ($HomeLink) {
          $HomeUrl = GetValue('HomeUrl', $Options);
-         if (!$HomeUrl)
+         if (!$HomeUrl) {
             $HomeUrl = Url('/', TRUE);
+         }
 
          $Row = array('Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
@@ -61,19 +62,23 @@ class Gdn_Theme {
 
       $Count = 0;
       $DataCount = 0;
+      $HomeLinkFound = false;
 
       foreach ($Data as $Row) {
          $DataCount++;
 
-         if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
+         if ($HomeLinkFound && Gdn::Request()->UrlCompare($Row['Url'], $DefaultRoute) === 0) {
             continue; // don't show default route twice.
+         } else {
+            $HomeLinkFound = true;
+         }
 
          // Add the breadcrumb wrapper.
          if ($Count > 0) {
             $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
          }
 
-         $Row['Url'] = Url($Row['Url']);
+         $Row['Url'] = $Row['Url'] ? Url($Row['Url']) : '#';
          $CssClass = 'CrumbLabel '.GetValue('CssClass', $Row);
          if ($DataCount == count($Data))
             $CssClass .= ' Last';

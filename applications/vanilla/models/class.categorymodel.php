@@ -98,12 +98,12 @@ class CategoryModel extends Gdn_Model {
    }
 
    /**
+    * Gets either all of the categories or a single category.
     *
-    *
+    * @param int|string|bool $ID Either the category ID or the category url code.
+    * If nothing is passed then all categories are returned.
+    * @return array Returns either one or all categories.
     * @since 2.0.18
-    * @access public
-    * @param int $ID
-    * @return object DataObject
     */
    public static function Categories($ID = FALSE) {
 
@@ -135,7 +135,7 @@ class CategoryModel extends Gdn_Model {
          if (!is_numeric($ID) && $ID) {
             $Code = $ID;
             foreach (self::$Categories as $Category) {
-               if ($Category['UrlCode'] === $Code) {
+               if (strcasecmp($Category['UrlCode'], $Code) === 0) {
                   $ID = $Category['CategoryID'];
                   break;
                }
@@ -187,10 +187,13 @@ class CategoryModel extends Gdn_Model {
             $Category['PhotoUrl'] = '';
 
          if ($Category['DisplayAs'] == 'Default') {
-            if ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0))
+            if ($Category['Depth'] == 1 && C('Vanilla.Categories.DoHeadings')) {
+               $Category['DisplayAs'] = 'Heading';
+            } elseif ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0)) {
                $Category['DisplayAs'] = 'Categories';
-            else
+            } else {
                $Category['DisplayAs'] = 'Discussions';
+            }
          }
 
          if (!GetValue('CssClass', $Category))
@@ -323,6 +326,23 @@ class CategoryModel extends Gdn_Model {
       foreach (self::Categories() as $Category) {
          if ($Category['CategoryID'] > 0)
             return $Category;
+      }
+   }
+
+   /**
+    * Remove categories that a user does not have permission to view.
+    *
+    * @param array $categoryIDs An array of categories to filter.
+    * @return array Returns an array of category IDs that are okay to view.
+    */
+   public static function filterCategoryPermissions($categoryIDs) {
+      $permissionCategories = static::GetByPermission('Discussions.View');
+
+      if ($permissionCategories === true) {
+         return $categoryIDs;
+      } else {
+         $permissionCategoryIDs = array_keys($permissionCategories);
+         return array_intersect($categoryIDs, $permissionCategoryIDs);
       }
    }
 
@@ -865,20 +885,21 @@ class CategoryModel extends Gdn_Model {
    /**
     * Get all of the ancestor categories above this one.
     * @param int|string $Category The category ID or url code.
-    * @param bool $CheckPermissions Whether or not to only return the categories with view permission.
+    * @param bool $checkPermissions Whether or not to only return the categories with view permission.
+    * @param bool $includeHeadings Whether or not to include heading categories.
     * @return array
     */
-   public static function GetAncestors($CategoryID, $CheckPermissions = TRUE) {
+   public static function GetAncestors($categoryID, $checkPermissions = true, $includeHeadings = false) {
       $Categories = self::Categories();
       $Result = array();
 
       // Grab the category by ID or url code.
-      if (is_numeric($CategoryID)) {
-         if (isset($Categories[$CategoryID]))
-            $Category = $Categories[$CategoryID];
+      if (is_numeric($categoryID)) {
+         if (isset($Categories[$categoryID]))
+            $Category = $Categories[$categoryID];
       } else {
          foreach ($Categories as $ID => $Value) {
-            if ($Value['UrlCode'] == $CategoryID) {
+            if ($Value['UrlCode'] == $categoryID) {
                $Category = $Categories[$ID];
                break;
             }
@@ -897,7 +918,7 @@ class CategoryModel extends Gdn_Model {
             break;
          $Max--;
 
-         if ($CheckPermissions && !$Category['PermsDiscussionsView']) {
+         if ($checkPermissions && !$Category['PermsDiscussionsView']) {
             $Category = $Categories[$Category['ParentCategoryID']];
             continue;
          }
@@ -906,16 +927,18 @@ class CategoryModel extends Gdn_Model {
             break;
 
          // Return by ID or code.
-         if (is_numeric($CategoryID))
+         if (is_numeric($categoryID))
             $ID = $Category['CategoryID'];
          else
             $ID = $Category['UrlCode'];
 
-         $Result[$ID] = $Category;
+         if ($includeHeadings || $Category['DisplayAs'] !== 'Heading') {
+            $Result[$ID] = $Category;
+         }
 
          $Category = $Categories[$Category['ParentCategoryID']];
       }
-      $Result = array_reverse($Result, TRUE); // order for breadcrumbs
+      $Result = array_reverse($Result, true); // order for breadcrumbs
       return $Result;
    }
 
@@ -941,22 +964,37 @@ class CategoryModel extends Gdn_Model {
    }
 
    /**
+    * Get the subtree starting at a given parent.
     *
-    *
-    * @since 2.0.18
-    * @acces public
-    * @param int $ID
-    * @return array
+    * @param string $parentCategory The ID or url code of the parent category.
+    * @param bool $includeParent Whether or not to include the parent in the result.
+    * @param bool|int $adjustDepth Whether or not to adjust the depth or a number to adjust the depth by.
+    * Passing `true` as this parameter will make the returned subtree look like the full tree which is useful for many
+    * views that expect the full category tree.
+    * @return array An array of categories.
     */
-   public static function GetSubtree($ID) {
+   public static function GetSubtree($parentCategory, $includeParent = true, $adjustDepth = false) {
       $Result = array();
-      $Category = self::Categories($ID);
+      $Category = self::Categories($parentCategory);
+
+      // Check to see if the depth should be adjusted.
+      // This value is true if called by a dev or a number if called recursively.
+      if ($adjustDepth === true) {
+         $adjustDepth = -val('Depth', $Category) + ($includeParent ? 1 : 0);
+      }
+
       if ($Category) {
-         $Result[$Category['CategoryID']] = $Category;
-         $ChildIDs = GetValue('ChildIDs', $Category);
+         if ($includeParent) {
+            if ($adjustDepth) {
+               $Category['Depth'] += $adjustDepth;
+            }
+
+            $Result[$Category['CategoryID']] = $Category;
+         }
+         $ChildIDs = val('ChildIDs', $Category, array());
 
          foreach ($ChildIDs as $ChildID) {
-            $Result = array_merge($Result, self::GetSubtree($ChildID));
+            $Result = array_replace($Result, self::GetSubtree($ChildID, true, $adjustDepth));
          }
       }
       return $Result;
@@ -1181,7 +1219,7 @@ class CategoryModel extends Gdn_Model {
       if ($Root) {
          $Root = (array)$Root;
          // Make the tree out of this category as a subtree.
-         $DepthAdjust = C('Vanilla.Categories.DoHeadings') ? -$Root['Depth'] : 0;
+         $DepthAdjust = -$Root['Depth'];
          $Result = self::_MakeTreeChildren($Root, $Categories, $DepthAdjust);
       } else {
          // Make a tree out of all categories.
@@ -1197,8 +1235,10 @@ class CategoryModel extends Gdn_Model {
    }
 
    protected static function _MakeTreeChildren($Category, $Categories, $DepthAdj = null) {
-      if (is_null($DepthAdj))
-         $DepthAdjust = C('Vanilla.Categories.DoHeadings') ? -1 : 0;
+      if (is_null($DepthAdj)) {
+         $DepthAdj = -val('Depth', $Category);
+      }
+
       $Result = array();
       foreach ($Category['ChildIDs'] as $ID) {
          if (!isset($Categories[$ID]))

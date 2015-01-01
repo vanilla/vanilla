@@ -243,6 +243,10 @@ class BanModel extends Gdn_Model {
       $BanID = parent::Save($FormPostValues, $Settings);
       $FormPostValues['BanID'] = $BanID;
 
+      $this->EventArguments['CurrentBan'] = $CurrentBan;
+      $this->EventArguments['FormPostValues'] = $FormPostValues;
+      $this->FireEvent('AfterSave');
+
       $this->ApplyBan($FormPostValues, $CurrentBan);
    }
 

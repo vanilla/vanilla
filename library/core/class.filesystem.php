@@ -223,30 +223,14 @@ class Gdn_FileSystem {
 
    /**
     * Returns the contents of the specified file, or FALSE if it does not
-    * exist. Note that this is only useful for static content since any php
-    * code will be parsed as if it were within this method of this object.
+    * exist.
     */
    public static function GetContents() {
       $File = CombinePaths(func_get_args());
       if (file_exists($File) && is_file($File))
-         return self::_GetContents($File);
+         return file_get_contents($File);
       else
          return FALSE;
-   }
-
-   /**
-    * Returns the contents of the specified file. Does not check for existence
-    * of the file first. Use the public self::GetContents() for the extra
-    * security.
-    *
-    * @param string $File The full path and name of the file being examined.
-    */
-   private static function _GetContents($File) {
-      ob_start();
-      include($File);
-      $Contents = ob_get_contents();
-      ob_end_clean();
-      return $Contents;
    }
 
    /**

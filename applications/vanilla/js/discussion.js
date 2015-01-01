@@ -11,14 +11,14 @@ jQuery(document).ready(function($) {
    });
 
    // Reveal the textarea and hide previews.
-   $('a.WriteButton, a.Cancel').livequery('click', function() {
+   $(document).on('click', 'a.WriteButton, a.Cancel', function() {
       if ($(this).hasClass('WriteButton')) {
          var frm = $(this).parents('.MessageForm').find('form');
          frm.trigger('WriteButtonClick', [frm]);
 
          // Reveal the "Preview" button and hide this one
          $(this).parents('.CommentForm').find('.PreviewButton').show();
-         $(this).hide();
+         $(this).addClass('Hidden');
       }
 
       resetCommentForm(this);
@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
 
    // Hijack comment form button clicks.
    var draftSaving = 0;
-   $('.CommentButton, a.PreviewButton, a.DraftButton').livequery('click', function() {
+   $(document).on('click', '.CommentButton, a.PreviewButton, a.DraftButton', function () {
       var btn = this;
       var parent = $(btn).parents('div.CommentForm, div.EditCommentForm');
       var frm = $(parent).find('form').first();
@@ -157,7 +157,7 @@ jQuery(document).ready(function($) {
             } else if (preview) {
                // Reveal the "Edit" button and hide this one
                $(btn).hide();
-               $(parent).find('.WriteButton').show();
+               $(parent).find('.WriteButton').removeClass('Hidden');
 
                $(frm).trigger('PreviewLoaded', [frm]);
                $(frm).find('.TextBoxWrapper').hide().after(json.Data);
@@ -257,16 +257,17 @@ jQuery(document).ready(function($) {
       });
 
    // Autosave comments
-   $('a.DraftButton').livequery(function() {
-      var btn = this;
-      $('div.CommentForm textarea').autosave({button: btn});
-   });
+   if ($.fn.autosave) {
+      $('div.CommentForm textarea').autosave({
+         button: $('a.DraftButton')
+      });
+   }
 
 
 /* Options */
 
    // Edit comment
-   $('a.EditComment').livequery('click', function() {
+   $(document).on('click', 'a.EditComment', function () {
       var btn = this;
       var container = $(btn).closest('.ItemComment');
       $(container).addClass('Editing');
@@ -304,7 +305,7 @@ jQuery(document).ready(function($) {
       return false;
    });
    // Reveal the original message when cancelling an in-place edit.
-   $('.Comment .Cancel a,.Comment a.Cancel').livequery('click', function() {
+   $(document).on('click', '.Comment .Cancel a, .Comment a.Cancel', function () {
       var btn = this;
       var $container = $(btn).closest('.ItemComment');
 

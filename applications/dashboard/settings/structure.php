@@ -249,7 +249,6 @@ $PermissionModel->Define(array(
    'Garden.Email.View' => 'Garden.SignIn.Allow',
    'Garden.Settings.Manage',
    'Garden.Settings.View',
-   'Garden.Messages.Manage',
    'Garden.SignIn.Allow' => 1,
    'Garden.Users.Add',
    'Garden.Users.Edit',
@@ -262,7 +261,8 @@ $PermissionModel->Define(array(
    'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
    'Garden.Moderation.Manage',
    'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
-   'Garden.AdvancedNotifications.Allow'
+   'Garden.AdvancedNotifications.Allow',
+   'Garden.Community.Manage' => 'Garden.Settings.Manage'
    ));
 
 $PermissionModel->Undefine(array(
@@ -272,7 +272,8 @@ $PermissionModel->Undefine(array(
    'Garden.Registration.Manage',
    'Garden.Roles.Manage',
    'Garden.Routes.Manage',
-   'Garden.Themes.Manage'
+   'Garden.Themes.Manage',
+   'Garden.Messages.Manage'
    ));
 
 if (!$PermissionTableExists) {
@@ -332,6 +333,7 @@ if (!$PermissionTableExists) {
       'Role' => 'Administrator',
       'Garden.SignIn.Allow' => 1,
       'Garden.Settings.Manage' => 1,
+      'Garden.Community.Manage' => 1,
       'Garden.Users.Add' => 1,
       'Garden.Users.Edit' => 1,
       'Garden.Users.Delete' => 1,
@@ -590,8 +592,12 @@ if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
 
+$Construct->Table('Tag');
+$FullNameColumnExists = $Construct->ColumnExists('FullName');
+$TagCategoryColumnExists = $Construct->ColumnExists('CategoryID');
+
 // This is a fix for erroneous unique constraint.
-if ($Construct->TableExists('Tag')) {
+if ($Construct->TableExists('Tag') && $TagCategoryColumnExists) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
 
@@ -623,9 +629,6 @@ if ($Construct->TableExists('Tag')) {
       }
    }
 }
-
-$Construct->Table('Tag');
-$FullNameColumnExists = $Construct->ColumnExists('FullName');
 
 $Construct->Table('Tag')
 	->PrimaryKey('TagID')
@@ -659,7 +662,7 @@ $Construct->Table('Log')
    ->Column('RecordDate', 'datetime')
    ->Column('RecordIPAddress', 'varchar(15)', NULL, 'index')
    ->Column('InsertUserID', 'int') // user that put record in the log
-   ->Column('DateInserted', 'datetime') // date item added to log
+   ->Column('DateInserted', 'datetime', FALSE, 'index') // date item added to log
    ->Column('InsertIPAddress', 'varchar(15)', NULL)
    ->Column('OtherUserIDs', 'varchar(255)', NULL)
    ->Column('DateUpdated', 'datetime', NULL)
@@ -757,7 +760,7 @@ $Construct
    ->Column('ForeignUserID', 'int', FALSE, 'key') // the user id of the record we are attached to (de-normalization)
    ->Column('Source', 'varchar(64)') // ex: Zendesk, Vendor
    ->Column('SourceID', 'varchar(32)') // ex: 1
-   ->Column('SourceURL', 'varchar(255)') 
+   ->Column('SourceURL', 'varchar(255)')
    ->Column('Attributes', 'text', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int', FALSE, 'key')

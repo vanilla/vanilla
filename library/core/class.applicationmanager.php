@@ -188,6 +188,10 @@ class Gdn_ApplicationManager {
          array('addonName' => $ApplicationName)
       );
 
+      // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
+      $Locale = Gdn::Locale();
+      $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
+
       $this->EventArguments['AddonName'] = $ApplicationName;
       Gdn::PluginManager()->CallEventHandlers($this, 'ApplicationManager', 'AddonEnabled');
 
@@ -204,10 +208,6 @@ class Gdn_ApplicationManager {
 
       // Hook directly into the autoloader and force it to load the newly tested application
       Gdn_Autoloader::AttachApplication($ApplicationFolder);
-
-      // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
-      $Locale = Gdn::Locale();
-      $Locale->Set($Locale->Current(), $this->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders(), TRUE);
 
       // Call the application's setup method
       $Hooks = $ApplicationName.'Hooks';

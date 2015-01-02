@@ -774,7 +774,9 @@ SaveToConfig('Garden.InputFormatter', C('Garden.InputFormatter'));
 
 // We need to undo cleditor's bad behavior for our reformed users.
 // If you still need to manipulate this, do it in memory instead (SAVE = false).
-SaveToConfig('Garden.Html.SafeStyles', TRUE);
+if (!C('Garden.Html.SafeStyles')) {
+   RemoveFromConfig('Garden.Html.SafeStyles');
+}
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');

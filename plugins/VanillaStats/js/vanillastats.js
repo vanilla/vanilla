@@ -39,7 +39,7 @@ jQuery(document).ready(function($){
       var dateRange = $('input.DateRange').val();
 
       $.ajax({
-         url: gdn.url('/index.php?p=/dashboard/settings/dashboardsummaries&DeliveryType=VIEW&Range='+range+'&DateRange='+dateRange),
+         url: gdn.url('/dashboard/settings/dashboardsummaries?DeliveryType=VIEW&Range='+range+'&DateRange='+dateRange),
          success: function(data) {
             $('div.DashboardSummaries').html(data);
          },

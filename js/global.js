@@ -403,13 +403,17 @@ jQuery(document).ready(function($) {
          var tableId = $($.tableDnD.currentTable).attr('id');
          // Add in the transient key for postback authentication
          var transientKey = gdn.definition('TransientKey');
-         var data = $.tableDnD.serialize() + '&DeliveryType=BOOL&TableID=' + tableId + '&TransientKey=' + transientKey;
+         var data = $.tableDnD.serialize() + '&TableID=' + tableId + '&TransientKey=' + transientKey;
          var webRoot = gdn.definition('WebRoot', '');
-         $.post(gdn.combinePaths(webRoot, 'index.php?p=/dashboard/utility/sort/'), data, function(response) {
-            if (response == 'TRUE')
-               $('#'+tableId+' tbody tr td').effect("highlight", {}, 1000);
-
-         });
+         $.post(
+            gdn.url('/utility/sort.json'),
+            data,
+            function(response) {
+               if (response.Result) {
+                  $('#' + tableId + ' tbody tr td').effect("highlight", {}, 1000);
+               }
+            }
+         );
       }});
 
    // Make sure that the commentbox & aboutbox do not allow more than 1000 characters
@@ -1561,7 +1565,7 @@ jQuery(document).ready(function($) {
                      // Produce the suggestions based on data either
                      // cached or retrieved.
                      if (filter_more && !empty_query  && !gdn.atcache[query]) {
-                        $.getJSON('/user/tagsearch', {"q": query, "limit": server_limit}, function(data) {
+                        $.getJSON(gdn.url('/user/tagsearch'), {"q": query, "limit": server_limit}, function(data) {
                            callback(data);
 
                            // If data is empty, cache the results to prevent

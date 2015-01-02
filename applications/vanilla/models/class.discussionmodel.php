@@ -834,6 +834,8 @@ class DiscussionModel extends VanillaModel {
     *
     * Get discussions for a user.
     *
+    * Events: BeforeGetByUser
+    *
     * @since 2.1
     * @access public
     *
@@ -889,6 +891,8 @@ class DiscussionModel extends VanillaModel {
       } else {
          $this->SQL->Limit($Limit, $Offset);
       }
+
+      $this->FireEvent('BeforeGetByUser');
 
       $Data = $this->SQL->Get();
 
@@ -1523,6 +1527,11 @@ class DiscussionModel extends VanillaModel {
                // Updating
                $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
 
+               // Block Format change if we're forcing the formatter.
+               if (C('Garden.ForceInputFormatter')) {
+                  unset($Fields['Format']);
+               }
+
                // Clear the cache if necessary.
                $CacheKeys = array();
                if (val('Announce', $Stored) != val('Announce', $Fields)) {
@@ -1542,13 +1551,15 @@ class DiscussionModel extends VanillaModel {
                SetValue('DiscussionID', $Fields, $DiscussionID);
                LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
 
-               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields))
+               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) {
                   $StoredCategoryID = GetValue('CategoryID', $Stored);
+               }
 
             } else {
                // Inserting.
-               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
+               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter')) {
                   $Fields['Format'] = C('Garden.InputFormatter', '');
+               }
 
                if (C('Vanilla.QueueNotifications')) {
                   $Fields['Notified'] = ActivityModel::SENT_PENDING;

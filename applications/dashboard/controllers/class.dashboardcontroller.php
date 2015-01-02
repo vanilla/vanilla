@@ -45,7 +45,7 @@ class DashboardController extends Gdn_Controller {
          $this->AddCssFile('vanillicon.css', 'static');
       } else {
          if (!C('Garden.Cdns.Disable', FALSE))
-            $this->AddCssFile('http://fonts.googleapis.com/css?family=Rokkitt');
+            $this->AddCssFile('https://fonts.googleapis.com/css?family=Rokkitt');
          $this->AddCssFile('admin.css');
          $this->AddCssFile('magnific-popup.css');
       }

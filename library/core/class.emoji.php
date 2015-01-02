@@ -210,7 +210,7 @@ class Emoji {
       $this->aliases = array(
          ':)'          => 'smile',
          ':D'          => 'smiley',
-         ':('          => 'disappointed',
+         ':('          => 'frowning',
          ';)'          => 'wink',
          ':\\'         => 'confused',
          ':o'          => 'open_mouth',
@@ -251,6 +251,10 @@ class Emoji {
          }
 
          $c->AddDefinition('emoji', json_encode($emoji));
+      }
+
+      if(C('Garden.EmojiSet') === 'none') {
+         $this->enabled = false;
       }
    }
 
@@ -387,7 +391,7 @@ class Emoji {
 
    /**
     * Set the list of emoji that can be used by the editor.
-    * 
+    *
     * @param array $value The new editor list.
     */
    public function setEmojiEditorList($value) {
@@ -400,12 +404,12 @@ class Emoji {
          } elseif (isset($aliases2[$emoji])) {
             $list[$aliases2[$emoji]] = $emoji;
          } elseif (isset($this->emoji[$emoji])) {
-            $list[$emoji] = ":$emoji:";
+            $list[$this->ldelim.$emoji.$this->rdelim] = $emoji;
          }
       }
       $this->editorList = $list;
    }
-   
+
    /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
     *
@@ -414,7 +418,7 @@ class Emoji {
     * @return string The html that represents the emiji.
     */
    public function img($emoji_path, $emoji_name) {
-      return sprintf($this->format, Url($emoji_path), $emoji_name);
+      return sprintf($this->format, Asset($emoji_path), $emoji_name);
    }
 
    /**
@@ -541,6 +545,10 @@ class Emoji {
     * @return string Return the emoji-formatted post
     */
    public function translateToHtml($Text) {
+      if (!$this->enabled) {
+         return $Text;
+      }
+
 		$Text = ' '. $Text .' ';
 
       // First, translate all aliases. Canonical emoji will get translated

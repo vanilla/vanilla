@@ -446,6 +446,7 @@ class SettingsController extends DashboardController {
       $this->AddJsFile('settings.js');
       $this->Title(T('Dashboard'));
 
+      $this->RequiredAdminPermissions[] = 'Garden.Settings.View';
       $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $this->RequiredAdminPermissions[] = 'Garden.Users.Edit';
@@ -1136,7 +1137,7 @@ class SettingsController extends DashboardController {
             $this->Form->AddError($Ex);
          }
 
-         $AsyncRequest = ($this->DeliveryType() === DELIVERY_METHOD_JSON)
+         $AsyncRequest = ($this->DeliveryType() === DELIVERY_TYPE_VIEW)
             ? TRUE
             : FALSE;
 

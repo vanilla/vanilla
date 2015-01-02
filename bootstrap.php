@@ -45,7 +45,8 @@ Gdn_Autoloader::Start();
 // Guard against broken cache files
 if (!class_exists('Gdn')) {
    // Throwing an exception here would result in a white screen for the user.
-   exit("Class GDN not found. This often indicates the .ini files in the folder 'cache' are out of date and should be deleted.");
+   // This error usually indicates the .ini files in /cache are out of date and should be deleted.
+   exit("Class Gdn not found.");
 }
 
 // Cache Layer

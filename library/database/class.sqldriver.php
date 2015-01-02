@@ -1285,7 +1285,7 @@ abstract class Gdn_SQLDriver {
    public function Limit($Limit, $Offset = FALSE) {
       // SQL chokes on ints over 2^31
       if ($Limit > 2147483648) {
-         throw new Exception(T('Invalid limit defined.'));
+         throw new Exception(T('Invalid limit defined.'), 400);
       }
 
       $this->_Limit = $Limit;
@@ -1395,7 +1395,7 @@ abstract class Gdn_SQLDriver {
    public function Offset($Offset) {
       // SQL chokes on ints over 2^31
       if ($Offset > 2147483648) {
-         throw new Exception(T('Invalid offset defined.'));
+         throw new Exception(T('Invalid offset defined.'), 400);
       }
 
       $this->_Offset = $Offset;

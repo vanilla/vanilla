@@ -805,7 +805,7 @@ class Gdn_Format {
     * @param mixed $Mixed An object, array, or string to be formatted.
     * @return string
     */
-   public static function Html($Mixed) {
+   public static function Html($Mixed, $Options = array()) {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
       } else {
@@ -832,10 +832,19 @@ class Gdn_Format {
             $Mixed = $Formatter->Format($Mixed);
 
             // Links
-            $Mixed = Gdn_Format::Links($Mixed);
+            if (val('Links', $Options, true)) {
+               $Mixed = Gdn_Format::Links($Mixed);
+            }
+
             // Mentions & Hashes
-            $Mixed = Gdn_Format::Mentions($Mixed);
-            $Mixed = Emoji::instance()->translateToHtml($Mixed);
+            if (val('Mentions', $Options, true)) {
+               $Mixed = Gdn_Format::Mentions($Mixed);
+            }
+
+            // Emoji
+            if (val('Emoji', $Options, true)) {
+               $Mixed = Emoji::instance()->translateToHtml($Mixed);
+            }
 
             // nl2br
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {

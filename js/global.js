@@ -1086,6 +1086,11 @@ jQuery(document).ready(function($) {
       setInterval(pingForNotifications, 60000);
    }
 
+   // Clear notifications alerts when they are accessed anywhere.
+   $(document).delegate('.NotificationsClear', 'click', function() {
+      $('.NotificationsAlert').remove();
+   });
+
 	// Stash something in the user's session (or unstash the value if it was not provided)
 	stash = function(name, value, callback) {
 		$.ajax({

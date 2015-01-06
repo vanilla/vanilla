@@ -1278,8 +1278,12 @@ class CategoryModel extends Gdn_Model {
       if ($this->Validate($FormPostValues, $Insert)) {
          $Fields = $this->Validation->SchemaValidationFields();
          $Fields = RemoveKeyFromArray($Fields, 'CategoryID');
-         $AllowDiscussions = ArrayValue('AllowDiscussions', $Fields) == '1' ? TRUE : FALSE;
-         $Fields['AllowDiscussions'] = $AllowDiscussions ? '1' : '0';
+
+         // make sure int fields are actually ints
+         $Fields['AllowDiscussions'] = (int) $Fields['AllowDiscussions'];
+         $Fields['HideAllDiscussions'] = (int) $Fields['HideAllDiscussions'];
+         $Fields['AllowFileUploads'] = (int) $Fields['AllowFileUploads'];
+         $Fields['Archived'] = (int) $Fields['Archived'];
 
          if ($Insert === FALSE) {
             $OldCategory = $this->GetID($CategoryID, DATASET_TYPE_ARRAY);

@@ -1521,7 +1521,10 @@ class UserModel extends Gdn_Model {
                if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes'])) {
                   $Fields['Attributes'] = serialize($Fields['Attributes']);
                }
-   
+
+               $Fields['Verified'] = (int) $Fields['Verified'];
+
+               // Perform save DB operation
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $UserID));
    
                // Record activity if the person changed his/her photo.

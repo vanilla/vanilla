@@ -172,6 +172,15 @@ class MessageModel extends Gdn_Model {
       }
       Gdn::Cache()->Remove('Messages');
 
+      // make sure int values really are ints or null
+      if ( ! $FormPostValues['CategoryID']) {
+         $FormPostValues['CategoryID'] = null;
+      }
+
+      $FormPostValues['IncludeSubcategories'] = (int) $FormPostValues['IncludeSubcategories'];
+      $FormPostValues['AllowDismiss'] = (int) $FormPostValues['AllowDismiss'];
+      $FormPostValues['Enabled'] = (int) $FormPostValues['Enabled'];
+
       return parent::Save($FormPostValues, $Settings);
    }
    

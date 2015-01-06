@@ -898,7 +898,18 @@ class Gdn_Autoloader_Map {
    public function MapType() {
       return $this->MapInfo['maptype']; //GetValue('maptype', $this->MapInfo);
    }
-
+   
+    /**
+    * Try to fix path that has backslash in Windows OS
+    *
+    * @path string 
+    * @return string
+    *
+    * Check to see if the path is not empty and if it is not in a form of drive: then replace any "\" with "/" to avoid 
+    * the parse_fn_file bug and it also further check to see if it has only one "/" and the OS is "WIN" then it will prepend "/" 
+    * in front of the path so it has the correct file path.
+    *  
+    */
     function fixBackSlash($path) {
         if (!empty($path) and !preg_match('/[A-Za-z]\:/',$path)) {
             $path = str_replace("\\", "/", $path);  // convert to / to avoid parse_in_file create array with missing \
@@ -907,7 +918,7 @@ class Gdn_Autoloader_Map {
             }
         }
         return $path;
-    }    
+    }
 
    public function Shutdown() {
 

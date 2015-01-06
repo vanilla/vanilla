@@ -8,7 +8,7 @@
 $PluginInfo['Akismet'] = array(
    'Name' => 'Akismet',
    'Description' => 'Akismet spam protection integration for Vanilla.',
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'SettingsUrl' => '/settings/akismet',
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -21,7 +21,7 @@ class AkismetPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
 
    /// METHODS ///
-   
+
    /**
     * @return Akismet
     */
@@ -29,32 +29,39 @@ class AkismetPlugin extends Gdn_Plugin {
       static $Akismet;
       if (!$Akismet) {
          $Key = C('Plugins.Akismet.Key', C('Plugins.Akismet.MasterKey'));
-         
+
          if (!$Key)
             return NULL;
-         
+
          $Akismet = new Akismet(Gdn::Request()->Url('/', TRUE), $Key);
-         
+
          $Server = C('Plugins.Akismet.Server');
          if ($Server) {
             $Akismet->setAkismetServer($Server);
          }
+
+         // As recommended, set Vanilla version so they can quickly find
+         // our API calls in their logs.
+         $Akismet->setAkismetVersion('vanilla-' . APPLICATION_VERSION);
       }
-      
+
       return $Akismet;
    }
 
    public function CheckAkismet($RecordType, $Data) {
       $UserID = $this->UserID();
-      
+
       if (!$UserID)
          return FALSE;
 
       $Akismet = self::Akismet();
-      
+
       if (!$Akismet)
          return FALSE;
-      
+
+      // http://blog.akismet.com/2012/06/19/pro-tip-tell-us-your-comment_type/
+      $Akismet->setCommentType('forum');
+
       $Akismet->setCommentAuthor($Data['Username']);
       $Akismet->setCommentAuthorEmail($Data['Email']);
 
@@ -63,14 +70,14 @@ class AkismetPlugin extends Gdn_Plugin {
       $Akismet->setUserIP($Data['IPAddress']);
 
       $Result = $Akismet->isCommentSpam();
-      
+
       return $Result;
    }
-   
+
    public function Setup() {
       $this->Structure();
    }
-   
+
    public function Structure() {
       // Get a user for operations.
       $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Akismet', 'Admin' => 2))->Value('UserID');
@@ -87,7 +94,7 @@ class AkismetPlugin extends Gdn_Plugin {
       }
       SaveToConfig('Plugins.Akismet.UserID', $UserID);
    }
-   
+
    public function UserID() {
       return C('Plugins.Akismet.UserID', NULL);
    }

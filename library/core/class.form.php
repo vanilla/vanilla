@@ -1908,6 +1908,18 @@ PASSWORDMETER;
    }
 
    /**
+    * Get form data array
+    *
+    * Returns an associative array containing all the pre-propulated field data
+    * for the current form.
+    *
+    * @return array
+    */
+   public function FormData() {
+      return $this->_DataArray;
+   }
+
+   /**
     * Gets the value associated with $FieldName from the sent form fields.
     * If $FieldName isn't found in the form, it returns $Default.
     *

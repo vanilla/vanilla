@@ -772,11 +772,13 @@ body { background: transparent !important; }
       }
       $vanilla_type = GetIncomingValue('vanilla_type', 'page');
       $vanilla_url = GetIncomingValue('vanilla_url', '');
+      $vanilla_forum_url = GetIncomingValue('vanilla_forum_url', '');
       $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
       $ForeignSource = array(
          'vanilla_identifier' => $vanilla_identifier,
          'vanilla_type' => $vanilla_type,
          'vanilla_url' => $vanilla_url,
+         'vanilla_forum_url' => $vanilla_forum_url,
          'vanilla_category_id' => $vanilla_category_id
       );
       $this->SetData('ForeignSource', $ForeignSource);
@@ -877,7 +879,7 @@ body { background: transparent !important; }
       foreach ($ForeignSource as $Key => $Val) {
          // Drop the foreign source information into the form so it can be used if creating a discussion
          $this->Form->AddHidden($Key, $Val);
-         
+
          // Also drop it into the definitions so it can be picked up for stashing comments
          $this->AddDefinition($Key, $Val);
       }

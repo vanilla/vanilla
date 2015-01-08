@@ -467,7 +467,7 @@ function WriteEmbedCommentForm() {
 
       // If we aren't ajaxing this call then we need to target the url of the parent frame.
       $ReturnUrl = $Controller->Data('ForeignSource.vanilla_url', Gdn::Request()->PathAndQuery());
-      
+
       if ($Session->IsValid()) {
          $AuthenticationUrl = Gdn::Authenticator()->SignOutUrl($ReturnUrl);
          echo Wrap(
@@ -481,7 +481,11 @@ function WriteEmbedCommentForm() {
          );
          echo $Controller->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         $AuthenticationUrl = SignInUrl($ReturnUrl);
+         $root = '';
+         if (val('vanilla_forum_url', $Controller->Data('ForeignSource'))) {
+            $root = trim(val('vanilla_forum_url', $Controller->Data('ForeignSource'), ''), '/');
+         }
+         $AuthenticationUrl = $root.SignInUrl($ReturnUrl);
          if ($AllowSigninPopup) {
             $CssClass = 'SignInPopup Button Stash';
          } else {
@@ -525,4 +529,4 @@ if (!function_exists('FormatMeAction')):
 
       return '<div class="AuthorAction">'.$Body.'</div>';
    }
-endif; 
+endif;

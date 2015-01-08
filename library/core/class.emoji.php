@@ -210,7 +210,7 @@ class Emoji {
       $this->aliases = array(
          ':)'          => 'smile',
          ':D'          => 'smiley',
-         ':('          => 'disappointed',
+         ':('          => 'frowning',
          ';)'          => 'wink',
          ':\\'         => 'confused',
          ':o'          => 'open_mouth',

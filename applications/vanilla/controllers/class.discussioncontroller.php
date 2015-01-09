@@ -877,7 +877,7 @@ body { background: transparent !important; }
       foreach ($ForeignSource as $Key => $Val) {
          // Drop the foreign source information into the form so it can be used if creating a discussion
          $this->Form->AddHidden($Key, $Val);
-
+         
          // Also drop it into the definitions so it can be picked up for stashing comments
          $this->AddDefinition($Key, $Val);
       }

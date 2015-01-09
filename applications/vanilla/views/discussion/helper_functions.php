@@ -481,7 +481,7 @@ function WriteEmbedCommentForm() {
          );
          echo $Controller->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         $AuthenticationUrl = SignInUrl($ReturnUrl);
+         $AuthenticationUrl = Url(SignInUrl($ReturnUrl), true);
          if ($AllowSigninPopup) {
             $CssClass = 'SignInPopup Button Stash';
          } else {

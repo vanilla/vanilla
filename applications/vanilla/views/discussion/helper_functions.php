@@ -481,11 +481,7 @@ function WriteEmbedCommentForm() {
          );
          echo $Controller->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         $root = '';
-         if (val('vanilla_forum_url', $Controller->Data('ForeignSource'))) {
-            $root = trim(val('vanilla_forum_url', $Controller->Data('ForeignSource'), ''), '/');
-         }
-         $AuthenticationUrl = $root.SignInUrl($ReturnUrl);
+         $AuthenticationUrl = SignInUrl($ReturnUrl);
          if ($AllowSigninPopup) {
             $CssClass = 'SignInPopup Button Stash';
          } else {

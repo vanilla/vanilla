@@ -772,13 +772,11 @@ body { background: transparent !important; }
       }
       $vanilla_type = GetIncomingValue('vanilla_type', 'page');
       $vanilla_url = GetIncomingValue('vanilla_url', '');
-      $vanilla_forum_url = GetIncomingValue('vanilla_forum_url', '');
       $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
       $ForeignSource = array(
          'vanilla_identifier' => $vanilla_identifier,
          'vanilla_type' => $vanilla_type,
          'vanilla_url' => $vanilla_url,
-         'vanilla_forum_url' => $vanilla_forum_url,
          'vanilla_category_id' => $vanilla_category_id
       );
       $this->SetData('ForeignSource', $ForeignSource);

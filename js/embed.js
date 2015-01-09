@@ -209,8 +209,6 @@ window.vanilla.embed = function(host) {
       var category_id = typeof(vanilla_category_id) == 'undefined' ? '' : vanilla_category_id;
       // If embedding comments, this value will be used to reference the foreign content. Defaults to the url of the page this file is included in.
       var foreign_url = typeof(vanilla_url) == 'undefined' ? document.URL.split('#')[0] : vanilla_url;
-      // Url of forum as supplied by script
-      var forum_url = typeof(vanilla_forum_url) == 'undefined' ? '' : vanilla_forum_url;
       // Are we forcing a locale via Multilingual plugin?
       var embed_locale = typeof(vanilla_embed_locale) == 'undefined' ? '' : vanilla_embed_locale;
       if (typeof(vanilla_lazy_load) == 'undefined')
@@ -232,10 +230,7 @@ window.vanilla.embed = function(host) {
             +'&vanilla_url='+encodeURIComponent(foreign_url);
 
          if (typeof(vanilla_type) != 'undefined')
-            result += '&vanilla_type='+encodeURIComponent(vanilla_type);
-
-         if (typeof(vanilla_forum_url) != 'undefined')
-            result += '&vanilla_forum_url='+encodeURIComponent(vanilla_forum_url);
+            result += '&vanilla_type='+encodeURIComponent(vanilla_type)
 
          if (typeof(vanilla_discussion_id) != 'undefined')
             result += '&vanilla_discussion_id='+encodeURIComponent(vanilla_discussion_id);

@@ -254,6 +254,25 @@ if (!function_exists('ValidateDecimal')) {
    }
 }
 
+if (!function_exists('ValidateString')) {
+   /**
+    * Validate that a value can be converted into a string.
+    *
+    * This function will pass on numbers or booleans because those values can be converted to a string.
+    *
+    * @param mixed $Value The value to validate.
+    * @param object $Field The database field object to validate against.
+    * @return bool Returns true if {@link $Value} is a valid string.
+    */
+   function ValidateString($Value, $Field) {
+      if (!$Value || (is_string($Value) && !trim($Value))) {
+         return true;
+      }
+
+      return is_scalar($Value);
+   }
+}
+
 if (!function_exists('ValidateTime')) {
    function ValidateTime($Value, $Field) {
       // TODO: VALIDATE AS HH:MM:SS OR HH:MM

@@ -280,7 +280,7 @@ class ConversationModel extends Gdn_Model {
          ->Join('ConversationMessage cm', 'uc.ConversationID = cm.ConversationID and uc.UserID = cm.InsertUserID', 'left')
          ->Where('uc.ConversationID', $ConversationID)
          // ->Where('uc.UserID <>', $IgnoreUserID)
-         ->GroupBy('uc.UserID, u.Name, u.Email, uc.Deleted')
+         ->GroupBy('uc.UserID, u.Name, u.Email, uc.Deleted, u.Photo')
          ->Get();
    }
    

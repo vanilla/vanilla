@@ -1414,6 +1414,11 @@ class DiscussionModel extends VanillaModel {
             if ($DiscussionID > 0) {
                // Updating
                $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+
+               // Block Format change if we're forcing the formatter.
+               if (C('Garden.ForceInputFormatter')) {
+                  unset($Fields['Format']);
+               }
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
@@ -1426,9 +1431,14 @@ class DiscussionModel extends VanillaModel {
 
                SetValue('DiscussionID', $Fields, $DiscussionID);
                LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
+
+               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) {
+                  $StoredCategoryID = GetValue('CategoryID', $Stored); 	$StoredCategoryID = GetValue('CategoryID', $Stored);
+               }
                
-               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) 
+               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) {
                   $StoredCategoryID = GetValue('CategoryID', $Stored);
+               }
                
             } else {
                // Inserting.

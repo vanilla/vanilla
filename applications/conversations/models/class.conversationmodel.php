@@ -276,7 +276,7 @@ class ConversationModel extends ConversationsModel {
     * @param int $Limit The number of recipients to grab.
     * @return Gdn_DataSet SQL results.
     */
-   public function GetRecipients($ConversationID, $Limit = 10) {
+   public function GetRecipients($ConversationID, $Limit = 20) {
       $Data = $this->SQL
          ->Select('uc.*')
          ->From('UserConversation uc')
@@ -556,7 +556,7 @@ class ConversationModel extends ConversationsModel {
             'RecordID' => $ConversationID,
             'Story' => GetValue('Body', $FormPostValues),
             'Format' => GetValue('Format', $FormPostValues, C('Garden.InputFormatter')),
-            'Route' => "/messages/$ConversationID#$MessageID"
+            'Route' => "/messages/$ConversationID#Message_$MessageID"
          );
 
          $Subject = GetValue('Subject', $Fields);

@@ -69,7 +69,7 @@ textarea, input[type=text] {
    margin: auto;
    width: 960px;
 }
-#Body .ContentColumn {
+.ContentColumn {
    margin: 0 0 0 230px
 }
 
@@ -3990,7 +3990,9 @@ input + .ReactSprite {
 .Video.YouTube .VideoPreview {
     cursor: pointer;
     position: relative;
+    max-width: 100%;
     display: inline-block;
+    height: auto;
 }
 .Video.YouTube .VideoPreview:after {
     background: url('http://cdn.vanillaforums.com/images/youtube-overlay-button.png') 0 -44px no-repeat transparent;
@@ -4006,6 +4008,21 @@ input + .ReactSprite {
 }
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
+}
+.Video.YouTube .VideoPreview img {
+  max-width: 100%;
+  height: auto !important;
+}
+.Video.YouTube .VideoPreview .ImageResized {
+  display: none;
+}
+/* For vimeo/other embeds */
+.Section-Discussion .Message iframe,
+.Section-BestOf iframe {
+  max-width: 100%;
+}
+.Section-BestOf iframe {
+   height: auto;
 }
 
 /* Media */

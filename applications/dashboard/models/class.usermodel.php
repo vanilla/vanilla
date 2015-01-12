@@ -49,7 +49,17 @@ class UserModel extends Gdn_Model {
    public function AddPasswordStrength($Controller) {
       $Controller->AddJsFile('password.js');
       $Controller->AddDefinition('MinPassLength', C('Garden.Registration.MinPasswordLength'));
-      $Controller->AddDefinition('PasswordTranslations', T('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
+      $Controller->AddDefinition(
+         'PasswordTranslations',
+         implode(',', array(
+            T('Password Too Short', 'Too Short'),
+            T('Password Contains Username', 'Contains Username'),
+            T('Password Very Weak', 'Very Weak'),
+            T('Password Weak', 'Weak'),
+            T('Password Ok', 'OK'),
+            T('Password Good', 'Good'),
+            T('Password Strong', 'Strong')))
+      );
    }
 
    /**
@@ -544,12 +554,12 @@ class UserModel extends Gdn_Model {
 
       if (C('Garden.SSO.SynchRoles')) {
          // Translate the role names to IDs.
-
          $Roles = GetValue('Roles', $NewUser, '');
-         if (is_string($Roles))
+         if (is_string($Roles)) {
             $Roles = explode(',', $Roles);
-         else
+         } elseif (!is_array($Roles)) {
             $Roles = array();
+         }
          $Roles = array_map('trim', $Roles);
          $Roles = array_map('strtolower', $Roles);
 
@@ -629,6 +639,7 @@ class UserModel extends Gdn_Model {
             TouchValue('CheckCaptcha', $Options, FALSE);
             TouchValue('NoConfirmEmail', $Options, TRUE);
             TouchValue('NoActivity', $Options, TRUE);
+            TouchValue('SaveRoles', $Options, C('Garden.SSO.SynchRoles', false));
 
             Trace($UserData, 'Registering User');
             $UserID = $this->Register($UserData, $Options);
@@ -813,7 +824,7 @@ class UserModel extends Gdn_Model {
     */
    public function UserQuery($SafeData = FALSE) {
       if ($SafeData) {
-         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.About, u.Gender, u.CountVisits, u.InviteUserID, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Admin, u.Deleted, u.CountDiscussions, u.CountComments');
+         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.CountVisits, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Deleted, u.CountDiscussions, u.CountComments');
       } else {
          $this->SQL->Select('u.*');
       }
@@ -1312,11 +1323,21 @@ class UserModel extends Gdn_Model {
     */
    public function GetSummary($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->UserQuery(TRUE);
-      return $this->SQL
+      $Data = $this->SQL
          ->Where('u.Deleted', 0)
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
+
+      // Set corrected PhotoUrls.
+      $Result =& $Data->Result();
+      foreach ($Result as &$Row) {
+         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+            $Row->Photo = Gdn_Upload::Url($Row->Photo);
+         }
+      }
+
+      return $Result;
    }
 
    /**

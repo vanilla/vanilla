@@ -188,7 +188,7 @@ class PostController extends VanillaController {
             $this->PopulateForm($this->Form);
          }
 
-      } else { // Form was submitted
+      } elseif ($this->Form->AuthenticatedPostBack()) { // Form was submitted
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->DiscussionModel->FilterForm($FormValues);
@@ -559,6 +559,10 @@ class PostController extends VanillaController {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
+
+         if (!$Editing) {
+            unset($FormValues['CommentID']);
+         }
 
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);

@@ -49,6 +49,7 @@
             echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
          ?>
       </li>
+      <?php $this->FireEvent('ExtendedRegistrationFields'); ?>
       <li>
          <?php
             echo $this->Form->Label('Why do you want to join?', 'DiscoveryText');

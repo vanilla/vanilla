@@ -165,7 +165,7 @@ if ($AddonUrl != '')
                   $RequiredApplications = GetValue('RequiredApplications', $ThemeInfo, FALSE);
                   if (is_array($RequiredApplications)) {
                      echo '<dl>
-                        <dt>'.T('Requires').'</dt>
+                        <dt>'.T('Requires: ').'</dt>
                         <dd>';
 
                      $i = 0;

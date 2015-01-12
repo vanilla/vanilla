@@ -1,5 +1,25 @@
 jQuery(document).ready(function($) {
 
+   // Reveal the textarea and hide previews.
+   $(document).on('click', 'a.WriteButton', function() {
+      if ($(this).hasClass('WriteButton')) {
+         var frm = $(this).parents('.MessageForm').find('form');
+         frm.trigger('WriteButtonClick', [frm]);
+
+         // Reveal the "Preview" button and hide this one
+         $(this).parents('.DiscussionForm').find('.PreviewButton').show();
+         $(this).addClass('Hidden');
+      }
+      resetDiscussionForm(this);
+      return false;
+   });
+
+   function resetDiscussionForm(sender) {
+      var parent = $(sender).parents('.DiscussionForm, .EditDiscussionForm');
+      $(parent).find('.Preview').remove();
+      $(parent).find('.bodybox-wrap .TextBoxWrapper').show();
+   }
+
    // Hijack comment form button clicks
    $('#CommentForm :submit').click(function() {
       var btn = this;
@@ -121,8 +141,12 @@ jQuery(document).ready(function($) {
                $(frm).prepend(json.ErrorMessages);
                json.ErrorMessages = null;
             } else if (preview) {
-               // Pop up the new preview.
-               $.popup({}, json.Data);
+               // Reveal the "Edit" button and hide this one
+               $(btn).hide();
+               $(frm).find('.WriteButton').removeClass('Hidden');
+
+               $(frm).trigger('PreviewLoaded', [frm]);
+               $(frm).find('.bodybox-wrap .TextBoxWrapper').hide().after(json.Data);
             } else if (!draft) {
                if (json.RedirectUrl) {
                   $(frm).triggerHandler('complete');

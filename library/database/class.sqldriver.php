@@ -1792,15 +1792,15 @@ abstract class Gdn_SQLDriver {
     * and updating of values to the db.
     *
     * @param mixed $Field The name of the field to save value as. Alternately this can be an array
-    * of $FieldName => $Value pairs, or even an object of $DataSet->Field
-    * properties containing one rowset.
+    * of $FieldName => $Value pairs, or even an object of $DataSet->Field properties containing one rowset.
     * @param string $Value The value to be set in $Field. Ignored if $Field was an array or object.
     * @param boolean $EscapeString A boolean value indicating if the $Value(s) should be escaped or not.
     * @param boolean $CreateNewNamedParameter A boolean value indicating that if (a) a named parameter is being
     * created, and (b) that name already exists in $this->_NamedParameters
     * collection, then a new one should be created rather than overwriting the
     * existing one.
-    * @return Gdn_SQLDriver $this
+    * @return Gdn_SQLDriver $this Returns this for fluent calls
+    * @throws \Exception Throws an exception if an invalid type is passed for {@link $Value}.
     */
    public function Set($Field, $Value = '', $EscapeString = TRUE, $CreateNewNamedParameter = TRUE) {
       $Field = Gdn_Format::ObjectAsArray($Field);
@@ -1810,12 +1810,11 @@ abstract class Gdn_SQLDriver {
       }
 
       foreach ($Field as $f => $v) {
-         if (!is_object($v)) {
-            if (is_array($v)) {
-               throw new Exception('Invalid value type (array) in INSERT/UPDATE statement.', 400);
-                  }
+         if (is_array($v) || is_object($v)) {
+            throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
+         } else {
             if ($EscapeString) {
-                  $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
+               $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
                $this->_NamedParameters[$NamedParameter] = $v;
                $this->_Sets[$this->EscapeIdentifier($f)] = $NamedParameter;
             } else {

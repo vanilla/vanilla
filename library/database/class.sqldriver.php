@@ -185,6 +185,20 @@ abstract class Gdn_SQLDriver {
    protected $_WhereConcatDefault;
 
    /**
+    * The logical operator used to concatenate where group clauses.
+    *
+    * @var string
+    */
+   protected $_WhereGroupConcat;
+
+   /**
+    * The default $_WhereGroupConcat that will be reverted back to after every where or where group clause is appended.
+    *
+    * @var string
+    */
+   protected $_WhereGroupConcatDefault;
+
+   /**
     * The number of where groups to open.
     *
     * @var int
@@ -234,6 +248,7 @@ abstract class Gdn_SQLDriver {
       $this->_WhereConcat = 'and';
       if($SetDefault) {
          $this->_WhereConcatDefault = 'and';
+         $this->_WhereGroupConcatDefault = 'and';
       }
 
       return $this;
@@ -256,11 +271,21 @@ abstract class Gdn_SQLDriver {
    }
 
    /**
+    * A convenience method that calls Gdn_DatabaseDriver::BeginWhereGroup with concatenated with an 'or.'
+    * @See Gdn_DatabaseDriver::BeginWhereGroup()
+    * @return Gdn_SQLDriver $this
+    */
+   public function OrBeginWhereGroup() {
+      return $this->OrOp()->BeginWhereGroup();
+   }
+
+   /**
     * Begin bracketed group in the where clause to group logical expressions together.
     *
     * @return Gdn_SQLDriver $this
     */
    public function BeginWhereGroup() {
+      $this->_WhereGroupConcat = $this->_WhereConcat;
       $this->_WhereGroupCount++;
       $this->_OpenWhereGroupCount++;
       return $this;
@@ -1466,6 +1491,7 @@ abstract class Gdn_SQLDriver {
       $this->_WhereConcat = 'or';
       if($SetDefault) {
          $this->_WhereConcatDefault = 'or';
+         $this->_WhereGroupConcatDefault = 'or';
       }
 
       return $this;
@@ -1683,6 +1709,8 @@ abstract class Gdn_SQLDriver {
       $this->_Wheres          = array();
       $this->_WhereConcat     = 'and';
       $this->_WhereConcatDefault = 'and';
+      $this->_WhereGroupConcat = 'and';
+      $this->_WhereGroupConcatDefault = 'and';
       $this->_WhereGroupCount = 0;
       $this->_OpenWhereGroupCount = 0;
       $this->_GroupBys        = array();
@@ -1916,6 +1944,10 @@ abstract class Gdn_SQLDriver {
       // Figure out the concatenation operator.
       $Concat = '';
 
+      if ($this->_OpenWhereGroupCount > 0) {
+         $this->_WhereConcat = $this->_WhereGroupConcat;
+      }
+
       if(count($this->_Wheres) > 0) {
          $Concat = str_repeat(' ', $this->_WhereGroupCount + 1) . $this->_WhereConcat . ' ';
       }
@@ -1928,6 +1960,7 @@ abstract class Gdn_SQLDriver {
 
       // Revert the concat back to 'and'.
       $this->_WhereConcat = $this->_WhereConcatDefault;
+      $this->_WhereGroupConcat = $this->_WhereGroupConcatDefault;
 
       $this->_Wheres[] = $Concat . $Sql;
 

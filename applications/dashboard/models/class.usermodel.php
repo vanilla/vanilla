@@ -1988,6 +1988,7 @@ class UserModel extends Gdn_Model {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
       } elseif (isset($IPAddress)) {
          $this->SQL
+            ->OrOp()
             ->BeginWhereGroup()
             ->OrWhere('u.InsertIPAddress', $IPAddress)
             ->OrWhere('u.LastIPAddress', $IPAddress)
@@ -2000,6 +2001,7 @@ class UserModel extends Gdn_Model {
 
          if (is_array($Like)) {
             $this->SQL
+               ->OrOp()
                ->BeginWhereGroup()
                ->OrLike($Like, '', 'right')
                ->EndWhereGroup();
@@ -2070,6 +2072,7 @@ class UserModel extends Gdn_Model {
 
          if (is_array($Like)) {
             $this->SQL
+               ->OrOp()
                ->BeginWhereGroup()
                ->OrLike($Like, '', 'right')
                ->EndWhereGroup();

@@ -1689,7 +1689,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                      // A plugin-relative path was given
                      $AppFolder = substr($AppFolder, strlen('plugins/'));
                      $CssPaths[] = paths(PATH_PLUGINS, $AppFolder, "design", $CssFile);
-                     $CssPaths[] = paths(PATH_PLUGINS, $AppFolder, $CssFile);
                   } else {
                      $CssPaths[] = paths(PATH_APPLICATIONS, $AppFolder, 'design', $CssFile);
                   }

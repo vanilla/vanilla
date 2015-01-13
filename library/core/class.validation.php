@@ -205,7 +205,9 @@ class Gdn_Validation {
                case 'longtext':
                case 'binary':
                case 'varbinary':
-                  $RuleNames[] = 'String';
+                  if (!in_array($Field, array('Attributes', 'Data', 'Preferences', 'Permissions'))) {
+                     $RuleNames[] = 'String';
+                  }
                   if ($Properties->Length != '')
                      $RuleNames[] = 'Length';
                   break;

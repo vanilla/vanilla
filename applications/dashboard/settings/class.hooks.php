@@ -189,14 +189,14 @@ class DashboardHooks implements Gdn_IPlugin {
     * This is done so comment & forum embedding can work in old IE.
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
-      safeHeader('P3P: CP="CAO PSA OUR"', TRUE);
+      safeHeader('P3P: CP="CAO PSA OUR"', true);
 
       if ($SSO = Gdn::Request()->Get('sso')) {
-         SaveToConfig('Garden.Registration.SendConnectEmail', FALSE, FALSE);
+         SaveToConfig('Garden.Registration.SendConnectEmail', false, false);
 
          $IsApi = preg_match('`\.json$`i', Gdn::Request()->Path());
 
-         $UserID = FALSE;
+         $UserID = false;
          try {
             $CurrentUserID = Gdn::Session()->UserID;
             $UserID = Gdn::UserModel()->SSO($SSO);
@@ -206,9 +206,13 @@ class DashboardHooks implements Gdn_IPlugin {
 
          if ($UserID) {
             Gdn::Session()->Start($UserID, !$IsApi, !$IsApi);
+            if ($IsApi) {
+               Gdn::Session()->ValidateTransientKey(true);
+            }
 
-            if ($UserID != $CurrentUserID)
+            if ($UserID != $CurrentUserID) {
                Gdn::UserModel()->FireEvent('AfterSignIn');
+            }
          } else {
             // There was some sort of error. Let's print that out.
             Trace(Gdn::UserModel()->Validation->ResultsText(), TRACE_WARNING);

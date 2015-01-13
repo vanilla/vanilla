@@ -44,6 +44,7 @@ $Definition['ValidateMatch'] = 'The %s fields do not match.';
 $Definition['ValidateStrength'] = 'The supplied %s is too weak. Try using a stronger password and use the strength meter as a guide.';
 $Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
 $Definition['ValidateBanned'] = 'That %s is not allowed.';
+$Definition['ValidateString'] = '%s is not a valid string.';
 $Definition['ValidateUrlStringRelaxed'] = '%s can not contain slashes, quotes or tag characters.';
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';

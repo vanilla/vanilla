@@ -437,13 +437,16 @@ class CommentModel extends VanillaModel {
       if ($Session->UserID > 0) {
 
          // Max comments we could have seen
-         $CountWatch = $Limit * ($Offset + 1);
+         $CountWatch = $Limit + $Offset;
          if ($CountWatch > $TotalComments)
             $CountWatch = $TotalComments;
 
          // This dicussion looks familiar...
          if (is_numeric($Discussion->CountCommentWatch)) {
 
+            if ($CountWatch < $Discussion->CountCommentWatch)
+               $CountWatch = $Discussion->CountCommentWatch;
+               
             if (isset($Discussion->DateLastViewed))
                $NewComments |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
 
@@ -691,6 +694,7 @@ class CommentModel extends VanillaModel {
          if (!isset($PrevWhere)) {
             $this->SQL->Where($Expr, $Value);
          } else {
+            $this->SQL->OrOp();
             $this->SQL->BeginWhereGroup();
             $this->SQL->OrWhere($PrevWhere[0], $PrevWhere[1]);
             $this->SQL->Where($Expr, $Value);

@@ -112,6 +112,7 @@ class Gdn_Validation {
       $this->AddRule('Integer', 'function:ValidateInteger');
       $this->AddRule('Boolean', 'function:ValidateBoolean');
       $this->AddRule('Decimal', 'function:ValidateDecimal');
+      $this->AddRule('String', 'function:ValidateString');
       $this->AddRule('Time', 'function:ValidateTime');
       $this->AddRule('Timestamp', 'function:ValidateTimestamp');
       $this->AddRule('Length', 'function:ValidateLength');
@@ -204,6 +205,7 @@ class Gdn_Validation {
                case 'longtext':
                case 'binary':
                case 'varbinary':
+                  $RuleNames[] = 'String';
                   if ($Properties->Length != '')
                      $RuleNames[] = 'Length';
                   break;

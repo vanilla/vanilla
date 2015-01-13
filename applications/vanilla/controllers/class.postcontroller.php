@@ -176,7 +176,7 @@ class PostController extends VanillaController {
 
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
-      if ($this->Form->IsPostBack() == FALSE) {
+      if (!$this->Form->IsPostBack()) {
          // Prep form with current data for editing
          if (isset($this->Discussion)) {
             $this->Form->SetData($this->Discussion);
@@ -188,7 +188,7 @@ class PostController extends VanillaController {
             $this->PopulateForm($this->Form);
          }
 
-      } else { // Form was submitted
+      } elseif ($this->Form->AuthenticatedPostBack()) { // Form was submitted
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->DiscussionModel->FilterForm($FormValues);
@@ -553,13 +553,7 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
-      if (!$this->Form->IsPostBack()) {
-         // Form was validly submitted
-         if (isset($this->Comment)) {
-            $this->Form->SetData((array)$this->Comment);
-         }
-
-      } else {
+      if($this->Form->AuthenticatedPostBack()) {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
@@ -738,6 +732,12 @@ class PostController extends VanillaController {
                $this->SetJson('MyDrafts', T('My Drafts'));
                $this->SetJson('CountDrafts', $CountDrafts);
             }
+         }
+      }
+      else {
+         // Load form
+         if (isset($this->Comment)) {
+            $this->Form->SetData((array)$this->Comment);
          }
       }
 

@@ -313,7 +313,7 @@ function GetCommentOptions($Comment) {
 
 	// Can the user edit the comment?
 	if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $PermissionCategoryID))
-		$Options['EditComment'] = array('Label' => T('Edit').' '.$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
+		$Options['EditComment'] = array('Label' => T('Edit').$TimeLeft, 'Url' => '/vanilla/post/editcomment/'.$Comment->CommentID, 'EditComment');
 
 	// Can the user delete the comment?
 	$SelfDeleting = ($CanEdit && $Session->UserID == $Comment->InsertUserID && C('Vanilla.Comments.AllowSelfDelete'));
@@ -474,7 +474,7 @@ function WriteEmbedCommentForm() {
          );
          echo $Controller->Form->Button('Post Comment', array('class' => 'Button CommentButton'));
       } else {
-         $AuthenticationUrl = SignInUrl($ReturnUrl);
+         $AuthenticationUrl = Url(SignInUrl($ReturnUrl), true);
          if ($AllowSigninPopup) {
             $CssClass = 'SignInPopup Button Stash';
          } else {

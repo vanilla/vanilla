@@ -1159,7 +1159,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          );
 
          if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
-           Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
+            Redirect('/entry/signin?Target='.urlencode($this->Request->PathAndQuery()));
          } else {
             Gdn::Dispatcher()->Dispatch('DefaultPermission');
             exit();
@@ -1678,9 +1678,20 @@ class Gdn_Controller extends Gdn_Pluggable {
                if (StringBeginsWith($CssFile, 'http')) {
                   $this->Head->AddCss($CssFile, 'all', GetValue('AddVersion', $CssInfo, TRUE), $CssInfo['Options']);
                   continue;
-               } elseif(strpos($CssFile, '/') !== FALSE) {
+               } elseif (strpos($CssFile, '/') !== FALSE) {
+                  $CssPaths = array();
+
+                  $AppFolder = $CssInfo['AppFolder'];
+                  if (empty($AppFolder)) {
                   // A direct path to the file was given.
-                  $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
+                     $CssPaths[] = paths(PATH_ROOT, str_replace('/', DS, $CssFile));
+                  } else if (StringBeginsWith($AppFolder, 'plugins/')) {
+                     // A plugin-relative path was given
+                     $AppFolder = substr($AppFolder, strlen('plugins/'));
+                     $CssPaths[] = paths(PATH_PLUGINS, $AppFolder, "design", $CssFile);
+                  } else {
+                     $CssPaths[] = paths(PATH_APPLICATIONS, $AppFolder, 'design', $CssFile);
+                  }
                } else {
 //                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
                   $AppFolder = $CssInfo['AppFolder'];

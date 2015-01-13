@@ -271,12 +271,9 @@ abstract class Gdn_SQLDriver {
     *
     * @param string $Field The name of the field on the left hand side of the expression.
     *   If $Field ends with an operator, then it used for the comparison. Otherwise '=' will be used.
-    * @param mixed $Value The value on the right side of the expression. This has different behaviour depending on the type.
-    *   <b>string</b>: The value will be used. If $EscapeValueSql is true then it will end up in a parameter.
-    *   <b>array</b>: DatabaseFunction => Value will be used. if DatabaseFunction contains a "%s" then sprintf will be used.
-    *     In this case Value will be assumed to be a string.
+    * @param mixed $Value The value on the right side of the expression. If $EscapeValueSql is true then it will end up in a parameter.
     *
-    * <b>New Syntax</b>
+    * <b>Syntax</b>
     * The $Field and Value expressions can begin with special characters to do certain things.
     * <ul>
     * <li><b>=</b>: This means that the argument is a function call.
@@ -298,24 +295,7 @@ abstract class Gdn_SQLDriver {
       }
 
       if(is_array($Value)) {
-         //$ValueStr = var_export($Value, TRUE);
-         $ValueStr = 'ARRAY';
-         Deprecated("Gdn_SQL->ConditionExpr(VALUE, {$ValueStr})", 'Gdn_SQL->ConditionExpr(VALUE, VALUE)');
-
-         if ($EscapeValueSql)
-            throw new Gdn_UserException('Invalid function call.');
-
-         $FunctionCall = array_keys($Value);
-         $FunctionCall = $FunctionCall[0];
-         $FunctionArg = $Value[$FunctionCall];
-         if($EscapeValueSql)
-            $FunctionArg = '[' . $FunctionArg . ']';
-
-         if(stripos($FunctionCall, '%s') === FALSE)
-            $Value = '=' . $FunctionCall . '(' . $FunctionArg . ')';
-         else
-            $Value = '=' . sprintf($FunctionCall, $FunctionArg);
-         $EscapeValueSql = FALSE;
+         throw new Exception('Gdn_SQL->ConditionExpr(VALUE, ARRAY) is not supported.', 500);
       } else if(!$EscapeValueSql && !is_null($Value)) {
          $Value = '@' . $Value;
       }
@@ -332,7 +312,7 @@ abstract class Gdn_SQLDriver {
       $Split = preg_split($FieldOpRegex, $Field, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
       if(count($Split) > 1) {
          $Field = $Split[0];
-         $Op = $Split[1];
+         $Op = strtolower($Split[1]);
          if (count($Split) > 2) {
             $Value = null;
          }
@@ -1812,39 +1792,33 @@ abstract class Gdn_SQLDriver {
     * and updating of values to the db.
     *
     * @param mixed $Field The name of the field to save value as. Alternately this can be an array
-    * of $FieldName => $Value pairs, or even an object of $DataSet->Field
-    * properties containing one rowset.
+    * of $FieldName => $Value pairs, or even an object of $DataSet->Field properties containing one rowset.
     * @param string $Value The value to be set in $Field. Ignored if $Field was an array or object.
     * @param boolean $EscapeString A boolean value indicating if the $Value(s) should be escaped or not.
     * @param boolean $CreateNewNamedParameter A boolean value indicating that if (a) a named parameter is being
     * created, and (b) that name already exists in $this->_NamedParameters
     * collection, then a new one should be created rather than overwriting the
     * existing one.
-    * @return Gdn_SQLDriver $this
+    * @return Gdn_SQLDriver $this Returns this for fluent calls
+    * @throws \Exception Throws an exception if an invalid type is passed for {@link $Value}.
     */
    public function Set($Field, $Value = '', $EscapeString = TRUE, $CreateNewNamedParameter = TRUE) {
       $Field = Gdn_Format::ObjectAsArray($Field);
 
-      if (!is_array($Field))
+      if (!is_array($Field)) {
          $Field = array($Field => $Value);
+      }
 
       foreach ($Field as $f => $v) {
-         if (!is_object($v)) {
-            if (!is_array($v))
-               $v = array($v);
-
-            foreach($v as $FunctionName => $Val) {
-               if ($EscapeString === FALSE) {
-                  if (is_string($FunctionName) !== FALSE) {
-                     throw new Exception('MySql functions are no longer supported.', 400);
-                  } else {
-                     $this->_Sets[$this->EscapeIdentifier($f)] = $Val;
-                  }
-               } else {
-                  $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
-                  $this->_NamedParameters[$NamedParameter] = $Val;
-                  $this->_Sets[$this->EscapeIdentifier($f)] = is_string($FunctionName) !== FALSE ? $FunctionName.'('.$NamedParameter.')' : $NamedParameter;
-               }
+         if (is_array($v) || is_object($v)) {
+            throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
+         } else {
+            if ($EscapeString) {
+               $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
+               $this->_NamedParameters[$NamedParameter] = $v;
+               $this->_Sets[$this->EscapeIdentifier($f)] = $NamedParameter;
+            } else {
+               $this->_Sets[$this->EscapeIdentifier($f)] = $v;
             }
          }
       }

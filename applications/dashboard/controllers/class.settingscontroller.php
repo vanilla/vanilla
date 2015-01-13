@@ -1012,6 +1012,76 @@ class SettingsController extends DashboardController {
    }
 
    /**
+    * Manage options for an embed theme.
+    *
+    * @since 2.0.0
+    * @access public
+    * @param string $Style Unique ID.
+    * @todo Why is this in a giant try/catch block?
+    */
+   public function EmbedThemeOptions($Style = NULL) {
+      $this->Permission('Garden.Settings.Manage');
+
+      try {
+         $this->AddJsFile('addons.js');
+         $this->AddSideMenu('dashboard/settings/embedthemeoptions');
+
+         $ThemeManager = Gdn::ThemeManager();
+         $EnabledThemeName = $ThemeManager->EmbedTheme();
+         $EnabledThemeInfo = $ThemeManager->GetThemeInfo($EnabledThemeName);
+
+         $this->SetData('ThemeInfo', $EnabledThemeInfo);
+
+         if ($this->Form->IsPostBack()) {
+            // Save the styles to the config.
+            $StyleKey = $this->Form->GetFormValue('StyleKey');
+
+            $ConfigSaveData = array(
+                'Garden.EmbedThemeOptions.Styles.Key' => $StyleKey,
+                'Garden.EmbedThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$StyleKey.Basename"));
+
+            // Save the text to the locale.
+            $Translations = array();
+            foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Default) {
+               $Value = $this->Form->GetFormValue($this->Form->EscapeString('Text_'.$Key));
+               $ConfigSaveData["ThemeOption.{$Key}"] = $Value;
+               //$this->Form->SetFormValue('Text_'.$Key, $Value);
+            }
+
+            SaveToConfig($ConfigSaveData);
+
+            $this->InformMessage(T("Your changes have been saved."));
+         } elseif ($Style) {
+            SaveToConfig(array(
+                'Garden.EmbedThemeOptions.Styles.Key' => $Style,
+                'Garden.EmbedThemeOptions.Styles.Value' => $this->Data("ThemeInfo.Options.Styles.$Style.Basename")));
+         }
+
+         $this->SetData('ThemeOptions', C('Garden.EmbedThemeOptions'));
+         $StyleKey = $this->Data('ThemeOptions.Styles.Key');
+
+         if (!$this->Form->IsPostBack()) {
+            foreach ($this->Data('ThemeInfo.Options.Text', array()) as $Key => $Options) {
+               $Default = GetValue('Default', $Options, '');
+               $Value = C("ThemeOption.{$Key}", '#DEFAULT#');
+               if ($Value === '#DEFAULT#')
+                  $Value = $Default;
+
+               $this->Form->SetFormValue($this->Form->EscapeString('Text_'.$Key), $Value);
+            }
+         }
+
+         $this->SetData('ThemeFolder', $EnabledThemeName);
+         $this->Title(T('Embed Theme Options'));
+         $this->Form->AddHidden('StyleKey', $StyleKey);
+      } catch (Exception $Ex) {
+         $this->Form->AddError($Ex);
+      }
+
+      $this->Render();
+   }
+
+   /**
     * Themes management screen.
     *
     * @since 2.0.0
@@ -1148,6 +1218,96 @@ class SettingsController extends DashboardController {
                exit;
             } else {
                Redirect('/settings/mobilethemes');
+            }
+         } else {
+            if ($AsyncRequest) {
+               echo $this->Form->ErrorString();
+               $this->Render('Blank', 'Utility', 'Dashboard');
+               exit;
+            }
+         }
+      }
+
+      $this->Render();
+   }
+
+   /**
+    * Mobile Themes management screen.
+    *
+    * @since 2.2.10.3
+    * @access public
+    * @param string $ThemeName Unique ID.
+    * @param string $TransientKey Security token.
+    */
+   public function EmbedThemes($ThemeName = '', $TransientKey = '') {
+      $IsEmbed = TRUE;
+      $IsMobile = FALSE;
+
+      $this->AddJsFile('addons.js');
+      $this->AddJsFile('addons.js');
+      $this->SetData('Title', T('Embed Themes'));
+
+      $this->Permission('Garden.Settings.Manage');
+      $this->AddSideMenu('dashboard/settings/embedthemes');
+
+      // Get currently enabled theme.
+      $EnabledThemeName = Gdn::ThemeManager()->EmbedTheme();
+      $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($EnabledThemeName);
+      $this->SetData('EnabledThemeInfo', $ThemeInfo);
+      $this->SetData('EnabledThemeFolder', GetValue('Folder', $ThemeInfo));
+      $this->SetData('EnabledTheme', $ThemeInfo);
+      $this->SetData('EnabledThemeName', GetValue('Name', $ThemeInfo, GetValue('Index', $ThemeInfo)));
+
+      // Get all themes.
+      $Themes = Gdn::ThemeManager()->AvailableThemes();
+
+      // Filter themes.
+      foreach ($Themes as $ThemeKey => $ThemeData) {
+
+         // Only show mobile themes.
+         // Actually, show all themes.
+         if (empty($ThemeData['IsEmbed'])) {
+            unset($Themes[$ThemeKey]);
+         }
+
+         // Remove themes that are archived
+         if (!empty($ThemeData['Archived'])) {
+            unset($Themes[$ThemeKey]);
+         }
+      }
+
+      uasort($Themes, array('SettingsController', '_NameSort'));
+      $this->SetData('AvailableThemes', $Themes);
+
+      // Process self-post.
+      if ($ThemeName != '' && Gdn::Session()->ValidateTransientKey($TransientKey)) {
+
+         try {
+            $ThemeInfo = Gdn::ThemeManager()->GetThemeInfo($ThemeName);
+            if ($ThemeInfo === FALSE) {
+               throw new Exception(sprintf(T("Could not find a theme identified by '%s'"), $ThemeName));
+            }
+
+            Gdn::Session()->SetPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
+            Gdn::ThemeManager()->EnableTheme($ThemeName, $IsMobile, $IsEmbed);
+            $this->EventArguments['ThemeName'] = $ThemeName;
+            $this->EventArguments['ThemeInfo'] = $ThemeInfo;
+            $this->FireEvent('AfterEnableTheme');
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex);
+         }
+
+         $AsyncRequest = ($this->DeliveryType() === DELIVERY_TYPE_VIEW)
+             ? TRUE
+             : FALSE;
+
+         if ($this->Form->ErrorCount() == 0) {
+            if ($AsyncRequest) {
+               echo 'Success';
+               $this->Render('Blank', 'Utility', 'Dashboard');
+               exit;
+            } else {
+               Redirect('/settings/embedthemes');
             }
          } else {
             if ($AsyncRequest) {

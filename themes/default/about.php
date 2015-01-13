@@ -17,5 +17,6 @@ $ThemeInfo['default'] = array(
    'Version' => APPLICATION_VERSION,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'IsEmbed' => true
 );

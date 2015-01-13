@@ -114,6 +114,13 @@ jQuery(document).ready(function($) {
       }
    }
 
+   function removeEmbedParameter (href)
+   {
+      var url = href.attr ('href');
+      url = url.replace ('embed=1', '');
+      href.attr ('href', url);
+   }
+
    // If not embedded and we should be, redirect to the embedded version.
    if (!inIframe && !inPopup && !inConnect && remoteUrl != '' && ((inDashboard && forceEmbedDashboard) || (!inDashboard && forceEmbedForum)))
       document.location = remoteUrl + '#' + path;
@@ -168,8 +175,10 @@ jQuery(document).ready(function($) {
                noTop = true;
 
             // Target the top of the page if clicking an anchor in a list of embedded comments
-            if (!noTop)
+            if (!noTop) {
                $(this).attr('target', '_top');
+               removeEmbedParameter ($(this));
+            }
 
             // Change the post-registration target to the page that is currently embedded.
             if ($(this).parents('.CreateAccount').length > 0) {

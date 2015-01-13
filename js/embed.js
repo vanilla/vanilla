@@ -226,6 +226,7 @@ window.vanilla.embed = function(host) {
 
       if (embed_type == 'comments') {
          result = '//' + host + '/discussion/embed/'
+            +'&embed=1'
             +'&vanilla_identifier='+encodeURIComponent(foreign_id)
             +'&vanilla_url='+encodeURIComponent(foreign_url);
 
@@ -244,6 +245,7 @@ window.vanilla.embed = function(host) {
          result = '//'
             +host
             +path
+            +'&embed=1'
             +'&remote='
             +encodeURIComponent(embedUrl)
             +'&locale='

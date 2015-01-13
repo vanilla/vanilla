@@ -1802,6 +1802,25 @@ if (!function_exists('IsMobile')) {
    }
 }
 
+if (!function_exists('IsEmbed')) {
+    /**
+     * Returns whether or not the site is in embed mode.
+     * Pass one of the following:
+     * - true: Force embed.
+     * - false: Depends on IsMobile.
+     * @return bool
+     */
+    function IsEmbed () {
+        if (isset ($_GET['embed']))
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+}
+
 if (!function_exists('IsSearchEngine')) {
    function IsSearchEngine() {
       $Engines = array(

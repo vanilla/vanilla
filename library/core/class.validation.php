@@ -2,7 +2,7 @@
 
 /**
  * Data validation
- * 
+ *
  * Manages data integrity validation rules. Can automatically define a set of
  * validation rules based on a @@Schema with $this->GenerateBySchema($Schema);
  *
@@ -205,7 +205,9 @@ class Gdn_Validation {
                case 'longtext':
                case 'binary':
                case 'varbinary':
-                  $RuleNames[] = 'String';
+                  if (!in_array($Field, array('Attributes', 'Data', 'Preferences', 'Permissions'))) {
+                     $RuleNames[] = 'String';
+                  }
                   if ($Properties->Length != '')
                      $RuleNames[] = 'Length';
                   break;
@@ -215,7 +217,7 @@ class Gdn_Validation {
                   $RuleNames[] = 'Enum';
                   break;
             }
-            
+
             if ($Field == 'Format') {
                $RuleNames[] = 'Format';
             }
@@ -240,23 +242,23 @@ class Gdn_Validation {
    public function ApplyRule($FieldName, $RuleName, $CustomError = '') {
       // Make sure that $FieldName is in the validation fields collection
       $this->ValidationFields();
-      
+
       if (!array_key_exists($FieldName, $this->_ValidationFields)) //  && $RuleName == 'Required'
          $this->_ValidationFields[$FieldName] = '';
-         
+
       $this->_ApplyRule($FieldName, $RuleName, $CustomError);
    }
-   
+
    /**
     * Apply an array of validation rules all at once.
-    * @param array $Fields 
+    * @param array $Fields
     */
    public function ApplyRules($Fields) {
       foreach ($Fields as $Index => $Row) {
          $Validation = GetValue('Validation', $Row);
          if (!$Validation)
             continue;
-         
+
          $FieldName = GetValue('Name', $Row, $Index);
          if (is_string($Validation)) {
             $this->ApplyRule($FieldName, $Validation);
@@ -271,7 +273,7 @@ class Gdn_Validation {
          }
       }
    }
-      
+
    protected function _ApplyRule($FieldName, $RuleName, $CustomError = '') {
       if (!is_array($this->_FieldRules))
          $this->_FieldRules = array();
@@ -291,7 +293,7 @@ class Gdn_Validation {
          $this->_FieldRules[$FieldName] = array_unique(array_merge($ExistingRules, $RuleName));
       }
    }
-   
+
 
    /**
     * Allows the explicit definition of a schema to use
@@ -326,7 +328,7 @@ class Gdn_Validation {
       foreach($this->_ValidationFields as $Field => $Val) {
          $this->AddValidationField($Field, $PostedFields);
       }
-      
+
       if ($Schema != NULL) {
          // 2. Any field that is required by the schema
          foreach($Schema as $Field => $Properties) {
@@ -351,7 +353,7 @@ class Gdn_Validation {
    public function ValidationFields() {
       if (!is_array($this->_ValidationFields))
          $this->_ValidationFields = array();
-         
+
       return $this->_ValidationFields;
    }
 
@@ -496,12 +498,12 @@ class Gdn_Validation {
          return sprintf('Validation does not exist: %s.', $RuleName);
       }
    }
-   
+
    public function UnapplyRule($FieldName, $RuleName = FALSE) {
       if ($RuleName) {
          if (isset($this->_FieldRules[$FieldName])) {
             $Index = array_search($RuleName, $this->_FieldRules[$FieldName]);
-            
+
             if ($Index !== FALSE)
                unset($this->_FieldRules[$FieldName][$Index]);
          }
@@ -509,7 +511,7 @@ class Gdn_Validation {
          unset($this->_FieldRules[$FieldName]);
          unset($this->_ValidationFields[$FieldName]);
       }
-      
+
    }
 
    /**
@@ -535,7 +537,7 @@ class Gdn_Validation {
       if ($HoneypotContents != '')
          $this->AddValidationResult($HoneypotName, "You've filled our honeypot! We use honeypots to help prevent spam. If you're  not a spammer or a bot, you should contact the application administrator for help.");
 
-      
+
       // Loop through the fields that should be validated
       foreach($this->_ValidationFields as $FieldName => $FieldValue) {
          // If this field has rules to be enforced...
@@ -619,14 +621,14 @@ class Gdn_Validation {
    public function Results($Reset = FALSE) {
       if (!is_array($this->_ValidationResults) || $Reset)
          $this->_ValidationResults = array();
-      
+
       return $this->_ValidationResults;
    }
-   
+
    public function ResultsText() {
       return self::ResultsAsText($this->Results());
    }
-   
+
    public static function ResultsAsText($Results) {
       $Errors = array();
       foreach ($Results as $Name => $Value) {
@@ -638,7 +640,7 @@ class Gdn_Validation {
             $Errors[] = trim(sprintf(T($Value), T($Name)), '.');
          }
       }
-      
+
       $Result = implode('. ', $Errors).'.';
       return $Result;
    }

@@ -665,7 +665,7 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
 
-   public function FilterForm($Data) {
+   public function FilterForm($Data, $Register = FALSE) {
       $Data = parent::FilterForm($Data);
       $Data = array_diff_key($Data,
          array('Admin' => 0, 'Deleted' => 0, 'CountVisits' => 0, 'CountInvitations' => 0, 'CountNotifications' => 0, 'Preferences' => 0,
@@ -677,7 +677,7 @@ class UserModel extends Gdn_Model {
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          unset($Data['RankID']);
       }
-      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
+      if (!$Register && !Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
          unset($Data['Name']);
       }
 

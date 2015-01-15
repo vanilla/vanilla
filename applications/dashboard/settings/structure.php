@@ -718,7 +718,7 @@ if (!file_exists(PATH_CACHE.'/Smarty/compile')) @mkdir(PATH_CACHE.'/Smarty/compi
 $users = Gdn::userModel()->getWhere(array('Admin' => 1))->resultArray();
 $affect = array_column($users, 'UserID');
 sort($affect);
-$affect = array_slice($affect, 1);
+$affect = array_shift($affect);
 if (count($affect)) {
    // Remove admin power & flush cache.
    Gdn::userModel()->update(array('Admin' => 0), array('UserID' => $affect));

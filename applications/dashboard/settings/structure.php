@@ -129,8 +129,12 @@ if ($SystemUserID) {
 if (!$SystemUserID) {
    // Try and find a system user.
    $SystemUserID = Gdn::SQL()->GetWhere('User', array('Name' => 'System', 'Admin' => 2))->Value('UserID');
-   if ($SystemUserID)
+   if ($SystemUserID) {
       SaveToConfig('Garden.SystemUserID', $SystemUserID);
+   } else {
+      // Create a new one if we couldn't find one.
+      Gdn::UserModel()->GetSystemUserID();
+   }
 }
 
 // UserRole Table

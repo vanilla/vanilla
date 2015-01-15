@@ -249,7 +249,7 @@ class Gdn_CookieIdentity {
       $CookieContents = implode('|',$Cookie);
 
       // Create the cookie.
-      setcookie($CookieName, $CookieContents, $CookieExpires, $Path, $Domain, NULL, TRUE);
+      safeCookie($CookieName, $CookieContents, $CookieExpires, $Path, $Domain, NULL, TRUE);
       $_COOKIE[$CookieName] = $CookieContents;
    }
 
@@ -326,7 +326,7 @@ class Gdn_CookieIdentity {
          $Domain = '';
 
       $Expiry = time() - 60 * 60;
-      setcookie($CookieName, "", $Expiry, $Path, $Domain);
+      safeCookie($CookieName, "", $Expiry, $Path, $Domain);
       $_COOKIE[$CookieName] = NULL;
    }
 

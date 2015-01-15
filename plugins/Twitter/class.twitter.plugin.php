@@ -52,7 +52,7 @@ class TwitterPlugin extends Gdn_Plugin {
          $this->_AccessToken = $Token;
       } if ($Token !== NULL && $Secret !== NULL) {
          $this->_AccessToken = new OAuthToken($Token, $Secret);
-//         setcookie('tw_access_token', $Token, 0, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
+//         safeCookie('tw_access_token', $Token, 0, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
       } elseif ($this->_AccessToken == NULL) {
 //         $Token = GetValue('tw_access_token', $_COOKIE, NULL);
          if ($Token)

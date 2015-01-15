@@ -112,6 +112,14 @@ class Gdn_Database {
    }
 
    /**
+    * Close connection regardless of persistence
+    *
+    */
+   public function ForceCloseConnection() {
+      $this->_Connection = NULL;
+   }
+
+   /**
     * Hook for cleanup via Gdn_Factory
     *
     */
@@ -387,7 +395,7 @@ class Gdn_Database {
                $this->closeConnection();
                continue;
             }
-            
+
             trigger_error($message, E_USER_ERROR);
          }
 

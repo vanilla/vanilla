@@ -643,7 +643,11 @@ class UserModel extends Gdn_Model {
    protected function _Insert($Fields, $Options = array()) {
       $this->EventArguments['InsertFields'] =& $Fields;
       $this->FireEvent('BeforeInsertUser');
-      
+
+      if (!val('Setup', $Options)) {
+         unset($Fields['Admin']);
+      }
+
       // Massage the roles for email confirmation.
       if (self::RequireConfirmEmail() && !GetValue('NoConfirmEmail', $Options)) {
          $ConfirmRoleID = C('Garden.Registration.ConfirmEmailRole');
@@ -1428,6 +1432,11 @@ class UserModel extends Gdn_Model {
       if (array_key_exists('Banned', $FormPostValues))
          $FormPostValues['Banned'] = ForceBool($FormPostValues['Banned'], '0', '1', '0');
 
+      if (array_key_exists('Confirmed', $FormPostValues))
+         $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
+
+      unset($FormPostValues['Admin']);
+
       // Validate the form posted values
       $UserID = GetValue('UserID', $FormPostValues);
       $Insert = $UserID > 0 ? FALSE : TRUE;
@@ -1648,8 +1657,8 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          
          // Insert the new user
-         $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
-         
+         $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE, 'Setup' => TRUE));
+
          if ($UserID) {
             $ActivityModel = new ActivityModel();
             $ActivityModel->Save(array(

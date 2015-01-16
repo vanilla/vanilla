@@ -372,6 +372,8 @@ class RoleModel extends Gdn_Model {
             ->Set('UserRole.RoleID', $ReplacementRoleID)
             ->Where(array('UserRole.RoleID' => $RoleID))
             ->Put();
+      } else {
+         $this->SQL->Delete('UserRole', array('RoleID' => $RoleID));
       }
       
       // Remove permissions for this role.

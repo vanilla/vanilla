@@ -716,7 +716,7 @@ if (!file_exists(PATH_CACHE.'/Smarty/compile')) @mkdir(PATH_CACHE.'/Smarty/compi
 // Disallow additional super-admin users.
 // Get admins' UserIDs, sort lowest to highest, & exempt lowest UserID.
 $users = Gdn::userModel()->getWhere(array('Admin' => 1))->resultArray();
-$affect = array_column($users, 'UserID');
+$affect = ConsolidateArrayValuesByKey($users, 'UserID');
 sort($affect);
 array_shift($affect);
 if (count($affect)) {

@@ -1336,7 +1336,7 @@ class UserModel extends Gdn_Model {
       // Set corrected PhotoUrls.
       $Result =& $Data->Result();
       foreach ($Result as &$Row) {
-         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+         if ($Row->Photo && !IsUrl($Row->Photo)) {
             $Row->Photo = Gdn_Upload::Url($Row->Photo);
          }
       }
@@ -1706,10 +1706,11 @@ class UserModel extends Gdn_Model {
                   }
 
                   if (isset($OldPhoto) && $OldPhoto != $Photo) {
-                     if (strpos($Photo, '//'))
+                     if (IsUrl($Photo)) {
                         $PhotoUrl = $Photo;
-                     else
+                     } else {
                         $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+                     }
 
                      $ActivityModel = new ActivityModel();
                      if ($UserID == Gdn::Session()->UserID) {
@@ -2020,7 +2021,7 @@ class UserModel extends Gdn_Model {
       $Result =& $Data->Result();
 
       foreach ($Result as &$Row) {
-         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+         if ($Row->Photo && !IsUrl($Row->Photo)) {
             $Row->Photo = Gdn_Upload::Url($Row->Photo);
          }
 

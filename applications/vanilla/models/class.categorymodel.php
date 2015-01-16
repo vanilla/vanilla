@@ -662,8 +662,9 @@ class CategoryModel extends Gdn_Model {
 
       // Translate name and description
       foreach ($IDs as $ID) {
-         $Categories[$ID]['Name'] = TranslateContent($Categories[$ID]['Name']);
-         $Categories[$ID]['Description'] = TranslateContent($Categories[$ID]['Description']);
+         $Code = $Categories[$ID]['UrlCode'];
+         $Categories[$ID]['Name'] = TranslateContent("Categories.".$Code.".Name", $Categories[$ID]['Name']);
+         $Categories[$ID]['Description'] = TranslateContent("Categories.".$Code.".Description", $Categories[$ID]['Description']);
       }
    }
 

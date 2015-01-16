@@ -272,7 +272,7 @@ class SettingsController extends DashboardController {
     * @param int $ID Ban ID we're editing or deleting.
     */
    public function Bans($Action = '', $Search = '', $Page = '', $ID = '') {
-      $this->Permission('Garden.Moderation.Manage');
+      $this->Permission('Garden.Settings.Manage');
 
       // Page setup
       $this->AddSideMenu();
@@ -290,11 +290,13 @@ class SettingsController extends DashboardController {
             $this->Form->SetModel($BanModel);
 
             if ($this->Form->AuthenticatedPostBack()) {
-               if ($ID)
+               if ($ID) {
                   $this->Form->SetFormValue('BanID', $ID);
+               }
+
                try {
                   // Save the ban.
-                  $this->Form->Save();
+                  $NewID = $this->Form->Save();
                } catch (Exception $Ex) {
                   $this->Form->AddError($Ex);
                }

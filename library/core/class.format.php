@@ -588,6 +588,14 @@ class Gdn_Format {
 
       $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
 
+      // Emulate %l and %e for Windows.
+      if (strpos($FullFormat, '%l') !== false) {
+          $FullFormat = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $FullFormat);
+      }
+      if (strpos($FullFormat, '%e') !== false) {
+          $FullFormat = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $FullFormat);
+      }
+
       $Result = strftime($FullFormat, $Timestamp);
 
       if ($Html) {

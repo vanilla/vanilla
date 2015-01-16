@@ -317,7 +317,7 @@ class Gdn_Validation {
     * enforced.
     */
    public function DefineValidationFields($PostedFields, $Schema = NULL, $Insert = FALSE) {
-      $this->ValidationFields(TRUE);
+      $this->ValidationFields();
 
       if ($Schema != NULL)
          $this->_Schema = $Schema;
@@ -350,8 +350,8 @@ class Gdn_Validation {
     *
     * @return array
     */
-   public function ValidationFields($Reset = FALSE) {
-      if (!is_array($this->_ValidationFields) || $Reset)
+   public function ValidationFields() {
+      if (!is_array($this->_ValidationFields))
          $this->_ValidationFields = array();
 
       return $this->_ValidationFields;

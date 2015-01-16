@@ -539,7 +539,8 @@ class Gdn_Request {
             $WebRoot = implode('/', array_slice($WebRoot, 0, $Key));
          } else {
             // Could not determine webroot.
-            $WebRoot = '';
+// TODO: revert this to empty string once nginx and/or vanilla know how to find WebRoot
+            $WebRoot = 'vanilla';
          }
 
       }

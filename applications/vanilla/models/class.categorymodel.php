@@ -676,6 +676,13 @@ class CategoryModel extends Gdn_Model {
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
       }
+
+      // Translate name and description
+      foreach ($IDs as $ID) {
+         $Code = $Categories[$ID]['UrlCode'];
+         $Categories[$ID]['Name'] = TranslateContent("Categories.".$Code.".Name", $Categories[$ID]['Name']);
+         $Categories[$ID]['Description'] = TranslateContent("Categories.".$Code.".Description", $Categories[$ID]['Description']);
+      }
    }
 
    /**

@@ -3270,6 +3270,22 @@ if (!function_exists('T')) {
    }
 }
 
+if (!function_exists('TranslateContent')) {
+   /**
+	 * Translates user-generated content into the selected locale's definition. Currently just an
+	 * alias for T().
+	 *
+	 * @param string $Code The code related to the language-specific definition.
+    *   Codes thst begin with an '@' symbol are treated as literals and not translated.
+	 * @param string $Default The default value to be displayed if the translation code is not found.
+	 * @return string The translated string or $Code if there is no value in $Default.
+	 * @see Gdn::Translate()
+	 */
+   function TranslateContent($Code, $Default = FALSE) {
+      return T($Code, $Default);
+   }
+}
+
 if (!function_exists('Theme')) {
    function Theme() {
       return Gdn::ThemeManager()->CurrentTheme();

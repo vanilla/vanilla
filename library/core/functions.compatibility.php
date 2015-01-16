@@ -17,20 +17,23 @@
 
 if (!function_exists('paths')) {
    /**
-    * Takes an array of path parts and concatenates them using the specified
-    * delimiter. Delimiters will not be duplicated. Example: all of the
-    * following arrays will generate the path "/path/to/vanilla/applications/dashboard"
-    * array('/path/to/vanilla', 'applications/dashboard')
-    * array('/path/to/vanilla/', '/applications/dashboard')
-    * array('/path', 'to', 'vanilla', 'applications', 'dashboard')
-    * array('/path/', '/to/', '/vanilla/', '/applications/', '/dashboard')
-    * 
-    * @param array $paths The array of paths to concatenate.
-    * @param string $delimiter The delimiter to use when concatenating. Defaults to system-defined directory separator.
-    * @returns The concatentated path.
+    * Concatenate path elements into single string
+    *
+    * Takes a variable number of arguments and concatenates them. Delimiters will
+    * not be duplicated. Example: all of the following invocations will generate
+    * the path "/path/to/vanilla/applications/dashboard"
+    *
+    * '/path/to/vanilla', 'applications/dashboard'
+    * '/path/to/vanilla/', '/applications/dashboard'
+    * '/path', 'to', 'vanilla', 'applications', 'dashboard'
+    * '/path/', '/to/', '/vanilla/', '/applications/', '/dashboard'
+    *
+    * @param function arguments
+    * @return the concatentated path.
     */
    function paths() {
       $paths = func_get_args();
+      $delimiter = '/';
       if (is_array($paths)) {
          $mungedPath = implode($delimiter, $paths);
          $mungedPath = str_replace(array($delimiter.$delimiter.$delimiter, $delimiter.$delimiter), array($delimiter, $delimiter), $mungedPath);

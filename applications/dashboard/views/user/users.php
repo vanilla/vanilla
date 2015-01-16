@@ -41,7 +41,7 @@ foreach ($this->UserData->Result() as $User) {
       <td><?php echo htmlspecialchars($User->LastIPAddress); ?></td>
       <?php endif; ?>
       <?php
-         $this->EventArgs['User'] = $User;
+         $this->EventArguments['User'] = $User;
          $this->FireEvent('UserCell');
       ?>
       <?php if ($EditUser || $DeleteUser) { ?>

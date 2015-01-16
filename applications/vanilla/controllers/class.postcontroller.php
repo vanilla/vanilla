@@ -155,7 +155,7 @@ class PostController extends VanillaController {
             $this->PopulateForm($this->Form);
          }
             
-      } else { // Form was submitted
+      } elseif($this->Form->AuthenticatedPostBack()) { // Form was submitted
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->DiscussionModel->FilterForm($FormValues);

@@ -1322,9 +1322,7 @@ EOT;
     * @return mixed
     */
    public static function To($Mixed, $FormatMethod) {
-      if ($FormatMethod == '')
-         return $Mixed;
-      
+      // Process $Mixed based on its type.
       if (is_string($Mixed)) {
          if (method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);

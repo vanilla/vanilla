@@ -6,11 +6,14 @@
  * @package Vanilla
  */
 
-// Only do this once, ever.
-if (!$Drop)
-   return;
-
 $SQL = Gdn::Database()->SQL();
+
+// Only do this once, ever.
+$Row = $SQL->Get('Discussion', '', 'asc', 1)->FirstRow(DATASET_TYPE_ARRAY);
+if ($Row) {
+   return;
+}
+
 $DiscussionModel = new DiscussionModel();
 
 // Prep default content

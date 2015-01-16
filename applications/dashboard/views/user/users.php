@@ -34,7 +34,7 @@ foreach ($this->UserData->Result() as $User) {
       <td><?php echo Gdn_Format::Date($User->DateLastActive, 'html'); ?></td>
       <td><?php echo htmlspecialchars($User->LastIPAddress); ?></td>
       <?php
-         $this->EventArgs['User'] = $User;
+         $this->EventArguments['User'] = $User;
          $this->FireEvent('UserCell');
       ?>
       <?php if ($EditUser || $DeleteUser) { ?>

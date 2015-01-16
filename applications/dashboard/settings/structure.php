@@ -642,6 +642,10 @@ $Construct->Table('Ban')
    ->Column('CountBlockedRegistrations', 'uint', 0)
    ->Column('InsertUserID', 'int')
    ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
@@ -708,3 +712,15 @@ SaveToConfig('Garden.Html.SafeStyles', TRUE);
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');
 if (!file_exists(PATH_CACHE.'/Smarty/cache')) @mkdir(PATH_CACHE.'/Smarty/cache');
 if (!file_exists(PATH_CACHE.'/Smarty/compile')) @mkdir(PATH_CACHE.'/Smarty/compile');
+
+// Disallow additional super-admin users.
+// Get admins' UserIDs, sort lowest to highest, & exempt lowest UserID.
+$users = Gdn::userModel()->getWhere(array('Admin' => 1))->resultArray();
+$affect = ConsolidateArrayValuesByKey($users, 'UserID');
+sort($affect);
+array_shift($affect);
+if (count($affect)) {
+   // Remove admin power & flush cache.
+   Gdn::userModel()->update(array('Admin' => 0), array('UserID' => $affect));
+   Gdn::cache()->flush();
+}

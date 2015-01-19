@@ -525,6 +525,7 @@ class Gdn_Validation {
     * @return boolean Whether or not the validation was successful.
     */
    public function Validate($PostedFields, $Insert = FALSE) {
+      $Bak = array($this->_CustomErrors, $this->_FieldRules, $this->_ValidationFields);
       $this->DefineValidationFields($PostedFields, $this->_Schema, $Insert);
 
       // Create an array to hold validation result messages
@@ -552,8 +553,10 @@ class Gdn_Validation {
                   // echo '<div>FieldName: '.$FieldName.'; Rule: '.$Rule.'</div>';
                   if (substr($Rule, 0, 9) == 'function:') {
                      $Function = substr($Rule, 9);
-                     if (!function_exists($Function))
+                     if (!function_exists($Function)) {
+                        list($this->_CustomErrors, $this->_FieldRules, $this->_ValidationFields) = $Bak;
                         trigger_error(ErrorMessage('Specified validation function could not be found.', 'Validation', 'Validate', $Function), E_USER_ERROR);
+                     }
 
                      // Call the function. Core-defined validation functions can
                      // be found in ./functions.validation.php
@@ -587,6 +590,7 @@ class Gdn_Validation {
             }
          }
       }
+      list($this->_CustomErrors, $this->_FieldRules, $this->_ValidationFields) = $Bak;
       return count($this->_ValidationResults) == 0 ? TRUE : FALSE;
    }
 

@@ -378,8 +378,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          
          // Get all field data, error check
          $AllFields = $this->GetProfileFields();
-         if (!is_array($AllFields) || !is_array($ProfileFields))
+         if (!is_array($AllFields) || !is_array($ProfileFields)) {
             return;
+         }
 
          // DateOfBirth is special case that core won't handle
          // Hack it in here instead
@@ -391,18 +392,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
          // Display all non-hidden fields
          $ProfileFields = array_reverse($ProfileFields);
+         $FormatOptions = array('Links' => FALSE, 'Mentions' => FALSE, 'Emoji' => FALSE);
          foreach ($ProfileFields as $Name => $Value) {
-            if (!$Value)
+            if (!$Value || !GetValue('OnProfile', $AllFields[$Name])) {
                continue;
-            if (!GetValue('OnProfile', $AllFields[$Name]))
-               continue;
+            }
 
             // Non-magic fields must be plain text, but we'll auto-link
-            if (!in_array($Name, $this->MagicLabels))
+            if (!in_array($Name, $this->MagicLabels)) {
                $Value = Gdn_Format::Links(Gdn_Format::Text($Value));
+            }
 
             echo ' <dt class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Text($AllFields[$Name]['Label']).'</dt> ';
-            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Html($Value).'</dd> ';
+            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Html($Value, $FormatOptions).'</dd> ';
          }
       } catch (Exception $ex) {
          // No errors

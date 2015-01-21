@@ -1719,7 +1719,6 @@ jQuery(document).ready(function($) {
                   }
                }
             },
-            display_timeout: 0,
             cWindow: iframe_window
          })
          .atwho({

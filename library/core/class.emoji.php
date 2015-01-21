@@ -23,6 +23,19 @@ class Emoji {
    protected $aliases;
 
    /**
+    * The archive is an array of deprecated emoji to new emoji that allows us to rename emoji with compatibility.
+    *
+    * The archive can be used for a couple of purposes.
+    *
+    * 1. If you want to remove an emoji from the lookup list then you can just move the entry from the `$emoji` array to
+    * the `$archive` array.
+    * 2. If you want to rename an emoji then copy it to the `$archive` array and then rename it in the `$emoji` array.
+    *
+    * @var array All of the emoji archive.
+    */
+   protected $archive;
+
+   /**
     * @var string The base path where the emoji are located.
     */
    protected $assetPath = '/resources/emoji';
@@ -35,7 +48,7 @@ class Emoji {
 
    /**
     * @var array An emoji alias list that represents the emoji that display
-    * in an editor dropdown. Typically, it is a copy of the alias list.
+    * in an editor drop down. Typically, it is a copy of the alias list.
     */
    protected $editorList;
 
@@ -131,7 +144,7 @@ class Emoji {
         'heart_eyes'                   => 'heart_eyes.png',
         'sunglasses'                   => 'sunglasses.png',
         'smirk'                        => 'smirk.png',
-        'neutral_face'                 => 'neutral_face.png',
+        'neutral'                      => 'neutral.png',
         'expressionless'               => 'expressionless.png',
         'unamused'                     => 'unamused.png',
         'sweat'                        => 'sweat.png',
@@ -142,7 +155,7 @@ class Emoji {
         'kissing_heart'                => 'kissing_heart.png',
         'kissing_smiling_eyes'         => 'kissing_smiling_eyes.png',
         'kissing_closed_eyes'          => 'kissing_closed_eyes.png',
-        'stuck_out_tongue'             => 'stuck_out_tongue.png',
+        'tongue'                       => 'tongue.png',
         'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
         'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
         'disappointed'                 => 'disappointed.png',
@@ -228,6 +241,10 @@ class Emoji {
          '>:)'         => 'smiling_imp'
        );
 
+      $this->archive = array(
+         'neutral_face' => 'neutral.png'
+      );
+
       $this->editorList = array(
          ':)'          => 'smile',
          ':D'          => 'smiley',
@@ -297,7 +314,7 @@ class Emoji {
     * Provide this method with the official emoji filename and it will return
     * the correct path.
     *
-    * @param string $emojiFileName File name of emoji icon.
+    * @param string $emojiName File name of emoji icon.
     * @return string Root-relative path.
     */
    public function buildFilePath($emojiName) {
@@ -308,6 +325,9 @@ class Emoji {
       if (isset($this->emoji[$emojiName])) {
          $filePath = $this->assetPath;
          $emojiFileName = $this->emoji[$emojiName];
+      } elseif (isset($this->archive[$emojiName])) {
+         $filePath = $this->assetPath;
+         $emojiFileName = $this->emoji[$this->archive[$emojiName]];
       } elseif ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
          $filePath = $this->assetPathOriginal;
          $emojiFileName = $this->emojiOriginalUnaccountedFor[$emojiName];

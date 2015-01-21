@@ -529,7 +529,7 @@ class PostController extends VanillaController {
 
       // Check permissions
       if ($Discussion && $Editing) {
-         // Permisssion to edit
+         // Permission to edit
          if ($this->Comment->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
@@ -729,8 +729,9 @@ class PostController extends VanillaController {
                $this->SetJson('CountDrafts', $CountDrafts);
             }
          }
-      }
-      else {
+      } elseif ($this->Request->IsPostBack()) {
+         throw new Gdn_UserException('Invalid CSRF token.', 401);
+      } else {
          // Load form
          if (isset($this->Comment)) {
             $this->Form->SetData((array)$this->Comment);

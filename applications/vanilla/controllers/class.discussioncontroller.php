@@ -112,8 +112,6 @@ class DiscussionController extends VanillaController {
             // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
             $this->Offset = floor($CountCommentWatch / $Limit) * $Limit;
          }
-         if ($ActualResponses <= $Limit)
-            $this->Offset = 0;
 
          if ($this->Offset == $ActualResponses)
             $this->Offset -= $Limit;

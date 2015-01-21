@@ -129,7 +129,7 @@ class Emoji {
         'smiley'                       => 'smiley.png',
         'wink'                         => 'wink.png',
         'blush'                        => 'blush.png',
-        'neutral_face'                 => 'neutral_face.png',
+        'neutral'                      => 'neutral.png',
 
         'relaxed'                      => 'relaxed.png',
         'grinning'                     => 'grinning.png',
@@ -144,7 +144,6 @@ class Emoji {
         'heart_eyes'                   => 'heart_eyes.png',
         'sunglasses'                   => 'sunglasses.png',
         'smirk'                        => 'smirk.png',
-        'neutral'                      => 'neutral.png',
         'expressionless'               => 'expressionless.png',
         'unamused'                     => 'unamused.png',
         'sweat'                        => 'sweat.png',
@@ -231,7 +230,7 @@ class Emoji {
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
          ":'("         => 'cry',
-         ':|'          => 'neutral_face',
+         ':|'          => 'neutral',
          'D:'          => 'anguished',
          'B)'          => 'sunglasses',
          ':#'          => 'grin',
@@ -255,7 +254,7 @@ class Emoji {
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
          ":'("         => 'cry',
-         ':|'          => 'neutral_face',
+         ':|'          => 'neutral',
          'B)'          => 'sunglasses',
          ':#'          => 'grin',
          'o:)'         => 'innocent',
@@ -327,7 +326,7 @@ class Emoji {
          $emojiFileName = $this->emoji[$emojiName];
       } elseif (isset($this->archive[$emojiName])) {
          $filePath = $this->assetPath;
-         $emojiFileName = $this->emoji[$this->archive[$emojiName]];
+         $emojiFileName = $this->archive[$emojiName];
       } elseif ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
          $filePath = $this->assetPathOriginal;
          $emojiFileName = $this->emojiOriginalUnaccountedFor[$emojiName];

@@ -5,7 +5,7 @@
    </ul>
 </div>
 <?php
-if ($this->ActivityData->NumRows() > 0) {
+if ($this->Activities->NumRows() > 0) {
    echo '<ul class="DataList Activities">';
    include($this->FetchViewLocation('activities', 'activity', 'dashboard'));
    echo '</ul>';

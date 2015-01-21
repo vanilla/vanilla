@@ -132,7 +132,6 @@ class Emoji {
         'neutral'                      => 'neutral.png',
 
         'relaxed'                      => 'relaxed.png',
-        'grinning'                     => 'grinning.png',
         'grin'                         => 'grin.png',
         'joy'                          => 'joy.png',
         'sweat_smile'                  => 'sweat_smile.png',
@@ -208,13 +207,6 @@ class Emoji {
       // This is used in cases where emoji image cannot be found.
       $this->emoji['error'] = &$this->emoji['grey_question'];
 
-      // Vanilla reactions, non-canonical referencing canonical
-      $this->emoji['lol']       = &$this->emoji['smile'];
-      $this->emoji['wtf']       = &$this->emoji['dizzy_face'];
-      $this->emoji['agree']     = &$this->emoji['grinning'];
-      $this->emoji['disagree']  = &$this->emoji['stuck_out_tongue_closed_eyes'];
-      $this->emoji['awesome']   = &$this->emoji['heart'];
-
       // Initialize the alias list. (emoticons)
       $this->aliases = array(
          ':)'          => 'smile',
@@ -230,7 +222,8 @@ class Emoji {
          ':|'          => 'neutral',
          'D:'          => 'anguished',
          'B)'          => 'sunglasses',
-         ':#'          => 'grin',
+         ':#'          => 'grimace',
+         ':*'          => 'kiss',
          'o:)'         => 'innocent',
          '<3'          => 'heart',
          '(*)'         => 'star',
@@ -239,8 +232,9 @@ class Emoji {
 
       $this->archive = array(
          'disappointed_relieved'        => 'disappointed_relieved.png',
-         'dizzy_face'       => 'dizzy_face.png',
+         'dizzy_face'       => 'dizzy.png',
          'broken_heart'     => 'heartbreak.png',
+         'grinning'         => 'grin.png',
          'heart_eyes'       => 'love.png',
          'neutral_face'     => 'neutral.png',
          'sob'              => 'bawling.png',
@@ -261,7 +255,7 @@ class Emoji {
          ":'("         => 'cry',
          ':|'          => 'neutral',
          'B)'          => 'sunglasses',
-         ':#'          => 'grin',
+         ':*'          => 'kiss',
          'o:)'         => 'innocent',
          '<3'          => 'heart',
          '(*)'         => 'star',

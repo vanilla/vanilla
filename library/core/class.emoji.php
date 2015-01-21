@@ -141,7 +141,7 @@ class Emoji {
         'smiling_imp'                  => 'smiling_imp.png',
         'yum'                          => 'yum.png',
         'relieved'                     => 'relieved.png',
-        'heart_eyes'                   => 'heart_eyes.png',
+        'love'                         => 'love.png',
         'sunglasses'                   => 'sunglasses.png',
         'smirk'                        => 'smirk.png',
         'expressionless'               => 'expressionless.png',
@@ -155,8 +155,6 @@ class Emoji {
         'kissing_smiling_eyes'         => 'kissing_smiling_eyes.png',
         'kissing_closed_eyes'          => 'kissing_closed_eyes.png',
         'tongue'                       => 'tongue.png',
-        'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
-        'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
         'disappointed'                 => 'disappointed.png',
         'worried'                      => 'worried.png',
         'angry'                        => 'angry.png',
@@ -164,7 +162,6 @@ class Emoji {
         'cry'                          => 'cry.png',
         'persevere'                    => 'persevere.png',
         'triumph'                      => 'triumph.png',
-        'disappointed_relieved'        => 'disappointed_relieved.png',
         'frowning'                     => 'frowning.png',
         'anguished'                    => 'anguished.png',
         'fearful'                      => 'fearful.png',
@@ -172,7 +169,7 @@ class Emoji {
         'sleepy'                       => 'sleepy.png',
         'tired_face'                   => 'tired_face.png',
         'grimacing'                    => 'grimacing.png',
-        'sob'                          => 'sob.png',
+        'bawling'                      => 'bawling.png',
         'open_mouth'                   => 'open_mouth.png',
         'hushed'                       => 'hushed.png',
         'cold_sweat'                   => 'cold_sweat.png',
@@ -180,7 +177,7 @@ class Emoji {
         'astonished'                   => 'astonished.png',
         'flushed'                      => 'flushed.png',
         'sleeping'                     => 'sleeping.png',
-        'dizzy_face'                   => 'dizzy_face.png',
+        'dizzy'                        => 'dizzy.png',
         'no_mouth'                     => 'no_mouth.png',
         'mask'                         => 'mask.png',
         'star'                         => 'star.png',
@@ -190,7 +187,7 @@ class Emoji {
 
         // Love
         'heart'                        => 'heart.png',
-        'broken_heart'                 => 'broken_heart.png',
+        'heartbreak'                   => 'heartbreak.png',
         'kiss'                         => 'kiss.png',
 
         // Hand gestures
@@ -241,7 +238,15 @@ class Emoji {
        );
 
       $this->archive = array(
-         'neutral_face' => 'neutral.png'
+         'disappointed_relieved'        => 'disappointed_relieved.png',
+         'dizzy_face'       => 'dizzy_face.png',
+         'broken_heart'     => 'heartbreak.png',
+         'heart_eyes'       => 'love.png',
+         'neutral_face'     => 'neutral.png',
+         'sob'              => 'bawling.png',
+         'stuck_out_tongue' => 'tongue.png',
+         'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
+         'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
       );
 
       $this->editorList = array(

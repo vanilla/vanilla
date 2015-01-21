@@ -662,7 +662,7 @@ $Construct->Table('Log')
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group'), FALSE, 'index')
    ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')
-   ->Column('RecordUserID', 'int', NULL) // user responsible for the record
+   ->Column('RecordUserID', 'int', NULL, 'index') // user responsible for the record; indexed for user deletion
    ->Column('RecordDate', 'datetime')
    ->Column('RecordIPAddress', 'varchar(15)', NULL, 'index')
    ->Column('InsertUserID', 'int') // user that put record in the log

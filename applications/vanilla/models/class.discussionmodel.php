@@ -437,7 +437,10 @@ class DiscussionModel extends VanillaModel {
             //->Where('w.DateLastViewed', NULL)
             //->OrWhere('d.DateLastComment >', 'w.DateLastViewed')
             //->EndWhereGroup()
-            ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE);
+            ->BeginWhereGroup()
+            ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE)
+            ->OrWhere('w.DateLastViewed', NULL)
+            ->EndWhereGroup();
       } else {
          $this->SQL
             ->Select('0', '', 'WatchUserID')

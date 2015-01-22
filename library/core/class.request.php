@@ -833,8 +833,9 @@ class Gdn_Request {
 
       $Port = $this->Port();
       $Host = $this->Host();
-      if (!in_array($Port, array(80, 443)))
-         $Host .= ':'.$Port;
+// BW 2014-01-21 - we don't care about port number, in fact it breaks things
+//      if (!in_array($Port, array(80, 443)))
+//         $Host .= ':'.$Port;
 
       if ($WithDomain === '//') {
          $Parts[] = '//'.$Host;

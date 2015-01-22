@@ -561,8 +561,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       if (is_array($Column->Enum))
          $Return .= "('".implode("','", $Column->Enum)."')";
 
-      if (!$Column->AllowNull)
+      if (!$Column->AllowNull) {
          $Return .= ' not null';
+      } else {
+         $Return .= ' null';
+      }
 
       if (!(is_null($Column->Default)) && strcasecmp($Column->Type, 'timestamp') != 0)
          $Return .= " default ".self::_QuoteValue($Column->Default);

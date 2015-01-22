@@ -129,8 +129,12 @@ if ($SystemUserID) {
 if (!$SystemUserID) {
    // Try and find a system user.
    $SystemUserID = Gdn::SQL()->GetWhere('User', array('Name' => 'System', 'Admin' => 2))->Value('UserID');
-   if ($SystemUserID)
+   if ($SystemUserID) {
       SaveToConfig('Garden.SystemUserID', $SystemUserID);
+   } else {
+      // Create a new one if we couldn't find one.
+      Gdn::UserModel()->GetSystemUserID();
+   }
 }
 
 // UserRole Table
@@ -696,6 +700,10 @@ $Construct->Table('Ban')
    ->Column('CountBlockedRegistrations', 'uint', 0)
    ->Column('InsertUserID', 'int')
    ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 

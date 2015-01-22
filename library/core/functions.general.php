@@ -1785,6 +1785,9 @@ if (!function_exists('IsMobile')) {
       }
 
       $type = userAgentType();
+      // Check the config for an override. (ex. Consider tablets mobile)
+      $type = C('Garden.Devices.'.ucfirst($type), $type);
+
       switch ($type) {
          case 'app':
          case 'mobile':
@@ -1849,7 +1852,7 @@ if (!function_exists('IsUrl')) {
          return FALSE;
       if (substr($Str, 0, 2) == '//')
          return TRUE;
-      if (strpos($Str, '://', 1) !== FALSE)
+      if (preg_match('`^https?://`i', $Str))
          return TRUE;
       return FALSE;
    }
@@ -2417,7 +2420,7 @@ if (!function_exists('ProxyHead')) {
 
          $Request = "HEAD $Path?$Query HTTP/1.1\r\n";
 
-         $HostHeader = $Host.($Post != 80) ? ":{$Port}" : '';
+         $HostHeader = $Host.($Port != 80) ? ":{$Port}" : '';
          $Header = array(
             'Host'            => $HostHeader,
             'User-Agent'      => ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
@@ -2705,8 +2708,9 @@ endif;
 
 if (!function_exists('Redirect')) {
    function Redirect($Destination = FALSE, $StatusCode = NULL) {
-      if (!$Destination)
-         $Destination = Url('');
+      if (!$Destination) {
+         $Destination = '';
+      }
 
 //      if (Debug() && $Trace = Trace()) {
 //         Trace("Redirecting to $Destination");
@@ -2715,7 +2719,9 @@ if (!function_exists('Redirect')) {
 
       // Close any db connections before exit
       $Database = Gdn::Database();
-      $Database->CloseConnection();
+      if ($Database instanceof Gdn_Database) {
+         $Database->CloseConnection();
+      }
       // Clear out any previously sent content
       @ob_end_clean();
 
@@ -3040,7 +3046,7 @@ function SetAppCookie($Name, $Value, $Expire = 0, $Force = FALSE) {
       $Domain = '';
 
    // Create the cookie.
-   setcookie($Key, $Value, $Expire, '/', $Domain, NULL, TRUE);
+   safeCookie($Key, $Value, $Expire, '/', $Domain, NULL, TRUE);
    $_COOKIE[$Key] = $Value;
 }
 endif;

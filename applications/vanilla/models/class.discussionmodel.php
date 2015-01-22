@@ -834,6 +834,8 @@ class DiscussionModel extends VanillaModel {
     *
     * Get discussions for a user.
     *
+    * Events: BeforeGetByUser
+    *
     * @since 2.1
     * @access public
     *
@@ -889,6 +891,8 @@ class DiscussionModel extends VanillaModel {
       } else {
          $this->SQL->Limit($Limit, $Offset);
       }
+
+      $this->FireEvent('BeforeGetByUser');
 
       $Data = $this->SQL->Get();
 
@@ -1251,7 +1255,7 @@ class DiscussionModel extends VanillaModel {
          ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$Session->UserID, 'left')
          ->Where('d.DiscussionID', $DiscussionID)
          ->Get()
-         ->FirstRow();
+         ->FirstRow($DataSetType);
 
       if (!$Discussion)
          return $Discussion;
@@ -1523,6 +1527,11 @@ class DiscussionModel extends VanillaModel {
                // Updating
                $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
 
+               // Block Format change if we're forcing the formatter.
+               if (C('Garden.ForceInputFormatter')) {
+                  unset($Fields['Format']);
+               }
+
                // Clear the cache if necessary.
                $CacheKeys = array();
                if (val('Announce', $Stored) != val('Announce', $Fields)) {
@@ -1542,13 +1551,15 @@ class DiscussionModel extends VanillaModel {
                SetValue('DiscussionID', $Fields, $DiscussionID);
                LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
 
-               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields))
+               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) {
                   $StoredCategoryID = GetValue('CategoryID', $Stored);
+               }
 
             } else {
                // Inserting.
-               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
+               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter')) {
                   $Fields['Format'] = C('Garden.InputFormatter', '');
+               }
 
                if (C('Vanilla.QueueNotifications')) {
                   $Fields['Notified'] = ActivityModel::SENT_PENDING;
@@ -1591,7 +1602,8 @@ class DiscussionModel extends VanillaModel {
                }
 
                // Update the user's discussion count.
-               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], TRUE);
+               $InsertUser = Gdn::UserModel()->GetID($Fields['InsertUserID']);
+               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], val('CountDiscussions', $InsertUser, 0) > 100);
 
                // Mark the user as participated.
                $this->SQL->Replace('UserDiscussion',
@@ -1875,7 +1887,8 @@ class DiscussionModel extends VanillaModel {
          $User = Gdn::UserModel()->GetID($UserID);
 
          $CountDiscussions = GetValue('CountDiscussions', $User);
-         if ($CountDiscussions < 100 || $CountDiscussions % 20 != 0) {
+         // Increment if 100 or greater; Recalc on 120, 140 etc.
+         if ($CountDiscussions >= 100 && $CountDiscussions % 20 !== 0) {
             $this->SQL->Update('User')
                ->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)
                ->Where('UserID', $UserID)

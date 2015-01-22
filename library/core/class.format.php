@@ -36,7 +36,7 @@ class Gdn_Format {
    public static $MentionsUrlFormat = '/profile/{name}';
 
    protected static $SanitizedFormats = array(
-      'Html', 'BBcode', 'Wysiwyg', 'Text', 'TextEx', 'Markdown'
+      'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
    );
 
    /**
@@ -262,6 +262,7 @@ class Gdn_Format {
             $Result = $BBCodeFormatter->Format($Mixed);
             $Result = Gdn_Format::Links($Result);
             $Result = Gdn_Format::Mentions($Result);
+            $Result = Emoji::instance()->translateToHtml($Result);
 
             return $Result;
          }
@@ -587,6 +588,14 @@ class Gdn_Format {
 
       $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
 
+      // Emulate %l and %e for Windows.
+      if (strpos($FullFormat, '%l') !== false) {
+          $FullFormat = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $FullFormat);
+      }
+      if (strpos($FullFormat, '%e') !== false) {
+          $FullFormat = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $FullFormat);
+      }
+
       $Result = strftime($FullFormat, $Timestamp);
 
       if ($Html) {
@@ -643,6 +652,7 @@ class Gdn_Format {
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
          $Mixed = self::Mentions($Mixed);
          $Mixed = self::Links($Mixed);
+         $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
          return $Mixed;
       }
@@ -833,6 +843,7 @@ class Gdn_Format {
             $Mixed = Gdn_Format::Links($Mixed);
             // Mentions & Hashes
             $Mixed = Gdn_Format::Mentions($Mixed);
+            $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
             // nl2br
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
@@ -851,6 +862,7 @@ class Gdn_Format {
             $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
+            $Result = Emoji::instance()->translateToHtml($Result);
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
                $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                $Result = FixNl2Br($Result);
@@ -1265,6 +1277,7 @@ EOT;
             $Mixed = $Formatter->Format($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
+            $Mixed = Emoji::instance()->translateToHtml($Mixed);
             return $Mixed;
          }
       }
@@ -1424,6 +1437,7 @@ EOT;
       $Str = self::Text($Str);
       $Str = self::Links($Str);
       $Str = self::Mentions($Str);
+      $Str = Emoji::instance()->translateToHtml($Str);
       return $Str;
    }
 
@@ -1436,11 +1450,9 @@ EOT;
     * @return mixed
     */
    public static function To($Mixed, $FormatMethod) {
-      if ($FormatMethod == '')
-         return $Mixed;
-
+      // Process $Mixed based on its type.
       if (is_string($Mixed)) {
-         if (in_array($FormatMethod, self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
+         if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } elseif (function_exists('format'.$FormatMethod)) {
             $FormatMethod = 'format'.$FormatMethod;
@@ -1682,6 +1694,8 @@ EOT;
          $Mixed = Gdn_Format::Links($Mixed);
          // Mentions & Hashes
          $Mixed = Gdn_Format::Mentions($Mixed);
+         $Mixed = Emoji::instance()->translateToHtml($Mixed);
+
 
          return $Mixed;
       }

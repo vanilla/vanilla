@@ -857,7 +857,7 @@ class Gdn_Request {
 
       $Port = $this->Port();
       $Host = $this->Host();
-      if (!in_array($Port, array(80, 443)))
+      if (!in_array($Port, array(80, 443)) && (strpos($Host, ':'.$Port) === FALSE))
          $Host .= ':'.$Port;
 
       if ($WithDomain === '//') {
@@ -940,8 +940,8 @@ class Gdn_Request {
          'query' => ''
       );
 
-      $parts1 = array_replace($defaults, $parts1);
-      $parts2 = array_replace($defaults, $parts2);
+      $parts1 = array_replace($defaults, $parts1 ?: array());
+      $parts2 = array_replace($defaults, $parts2 ?: array());
 
       if ($parts1['host'] === $parts2['host']
          && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')

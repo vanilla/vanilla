@@ -176,7 +176,7 @@ class PostController extends VanillaController {
 
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
-      if ($this->Form->IsPostBack() == FALSE) {
+      if (!$this->Form->IsPostBack()) {
          // Prep form with current data for editing
          if (isset($this->Discussion)) {
             $this->Form->SetData($this->Discussion);
@@ -188,7 +188,7 @@ class PostController extends VanillaController {
             $this->PopulateForm($this->Form);
          }
 
-      } else { // Form was submitted
+      } elseif ($this->Form->AuthenticatedPostBack()) { // Form was submitted
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->DiscussionModel->FilterForm($FormValues);
@@ -529,7 +529,7 @@ class PostController extends VanillaController {
 
       // Check permissions
       if ($Discussion && $Editing) {
-         // Permisssion to edit
+         // Permission to edit
          if ($this->Comment->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
@@ -549,13 +549,7 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
-      if (!$this->Form->IsPostBack()) {
-         // Form was validly submitted
-         if (isset($this->Comment)) {
-            $this->Form->SetData((array)$this->Comment);
-         }
-
-      } else {
+      if($this->Form->AuthenticatedPostBack()) {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
@@ -734,6 +728,13 @@ class PostController extends VanillaController {
                $this->SetJson('MyDrafts', T('My Drafts'));
                $this->SetJson('CountDrafts', $CountDrafts);
             }
+         }
+      } elseif ($this->Request->IsPostBack()) {
+         throw new Gdn_UserException('Invalid CSRF token.', 401);
+      } else {
+         // Load form
+         if (isset($this->Comment)) {
+            $this->Form->SetData((array)$this->Comment);
          }
       }
 

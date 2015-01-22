@@ -35,7 +35,7 @@ foreach ($Messages as $Message) {
             echo UserAnchor($Author, 'Name');
             ?>
          </span>
-         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
+         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted, 'html'); ?></span>
          <?php
          $this->FireEvent('AfterConversationMessageDate');
          ?>

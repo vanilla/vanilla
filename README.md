@@ -69,7 +69,7 @@ Vanilla is built to be simple, and its installation is no exception.
 Follow these steps to upgrade Vanilla when a new stable release is announced.
 
 
-* Backup your database and `conf/config.php` file somewhere safe.
+* Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
 * Go to `yourforum.com/index.php?p=/utility/update` to force any updates needed.
 * If it fails, try it a second times by refreshing the page.

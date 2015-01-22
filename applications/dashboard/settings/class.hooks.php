@@ -141,7 +141,7 @@ class DashboardHooks implements Gdn_IPlugin {
          $Menu->AddLink('Appearance', T('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'Garden.Settings.Manage');
 
 
-		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Settings.Manage');
+		$Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Messages.Manage');
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
@@ -160,7 +160,7 @@ class DashboardHooks implements Gdn_IPlugin {
       if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE))
          $Menu->AddLink('Moderation', T('Moderation Queue').' <span class="Popin" rel="/dashboard/log/count/moderate"></span>', 'dashboard/log/moderation');
       $Menu->AddLink('Moderation', T('Change Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage');
-      $Menu->AddLink('Moderation', T('Banning'), 'dashboard/settings/bans', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Moderation', T('Banning'), 'dashboard/settings/bans', 'Garden.Settings.Manage');
 
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
       $Menu->AddLink('Forum', T('Social'), 'dashboard/social', 'Garden.Settings.Manage');
@@ -189,14 +189,14 @@ class DashboardHooks implements Gdn_IPlugin {
     * This is done so comment & forum embedding can work in old IE.
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
-      safeHeader('P3P: CP="CAO PSA OUR"', TRUE);
+      safeHeader('P3P: CP="CAO PSA OUR"', true);
 
       if ($SSO = Gdn::Request()->Get('sso')) {
-         SaveToConfig('Garden.Registration.SendConnectEmail', FALSE, FALSE);
+         SaveToConfig('Garden.Registration.SendConnectEmail', false, false);
 
          $IsApi = preg_match('`\.json$`i', Gdn::Request()->Path());
 
-         $UserID = FALSE;
+         $UserID = false;
          try {
             $CurrentUserID = Gdn::Session()->UserID;
             $UserID = Gdn::UserModel()->SSO($SSO);
@@ -206,9 +206,13 @@ class DashboardHooks implements Gdn_IPlugin {
 
          if ($UserID) {
             Gdn::Session()->Start($UserID, !$IsApi, !$IsApi);
+            if ($IsApi) {
+               Gdn::Session()->ValidateTransientKey(true);
+            }
 
-            if ($UserID != $CurrentUserID)
+            if ($UserID != $CurrentUserID) {
                Gdn::UserModel()->FireEvent('AfterSignIn');
+            }
          } else {
             // There was some sort of error. Let's print that out.
             Trace(Gdn::UserModel()->Validation->ResultsText(), TRACE_WARNING);
@@ -302,9 +306,7 @@ class DashboardHooks implements Gdn_IPlugin {
          return;
 
       // Users can edit their own profiles and moderators can edit any profile.
-      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))
-         || ($is_me && C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect')) {
-
+      if (hasEditProfile($user_id)) {
          $sender->addLink('main.editprofile', array('text' => t('Profile'), 'url' => UserUrl($user, '', 'edit'), 'icon' => icon('edit')));
       }
 
@@ -336,9 +338,7 @@ class DashboardHooks implements Gdn_IPlugin {
          $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => UserUrl($user, '', 'invitations'), 'icon' => icon('ticket')));
 
       // Users can edit their own profiles and moderators can edit any profile.
-      if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))
-         || ($user_id == Gdn::Session()->UserID && C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect')) {
-
+      if (hasEditProfile($user_id)) {
          $sender->addLink('main.editprofile', array('text' => t('Edit Profile'), 'url' => UserUrl($user, '', 'edit'), 'icon' => icon('edit')));
       }
 

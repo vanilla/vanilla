@@ -2,7 +2,7 @@
 
 /**
  * Validation functions
- * 
+ *
  * All of these functions are used by ./class.validation.php to validate form
  * input strings. With the exception of ValidateRegex, each function receives
  * two parameters (the field value and the related database field properties)
@@ -24,7 +24,7 @@
 if (!function_exists('ValidateCaptcha')) {
    function ValidateCaptcha($Value = NULL) {
       require_once PATH_LIBRARY.'/vendors/recaptcha/functions.recaptchalib.php';
-      
+
       $CaptchaPrivateKey = C('Garden.Registration.CaptchaPrivateKey', '');
       $Response = recaptcha_check_answer($CaptchaPrivateKey, Gdn::Request()->IpAddress(), Gdn::Request()->Post('recaptcha_challenge_field', ''), Gdn::Request()->Post('recaptcha_response_field', ''));
       return $Response->is_valid ?  TRUE : 'The reCAPTCHA value was not entered correctly. Please try again.';
@@ -68,7 +68,7 @@ if (!function_exists('ValidateMeAction')) {
 if (!function_exists('ValidateNoLinks')) {
    /**
     * Check whether or not a
-    * 
+    *
     * @param string $Value
     * @return bool
     * @since 2.1
@@ -129,7 +129,7 @@ if (!function_exists('ValidateEmail')) {
    function ValidateEmail($Value, $Field = '') {
       if (!ValidateRequired($Value))
          return TRUE;
-      
+
       $Result = PHPMailer::ValidateAddress($Value);
       $Result = (bool)$Result;
       return $Result;
@@ -140,7 +140,7 @@ if (!function_exists('ValidateWebAddress')) {
    function ValidateWebAddress($Value, $Field = '') {
       if ($Value == '')
          return TRUE; // Required picks up this error
-      
+
       return filter_var($Value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED) !== FALSE;
    }
 }
@@ -148,13 +148,13 @@ if (!function_exists('ValidateWebAddress')) {
 if (!function_exists('ValidateUsernameRegex')) {
    function ValidateUsernameRegex() {
       static $ValidateUsernameRegex;
-      
+
       if (is_null($ValidateUsernameRegex)) {
          $ValidateUsernameRegex = sprintf("[%s]%s",
             C("Garden.User.ValidationRegex","\d\w_"),
             C("Garden.User.ValidationLength","{3,20}"));
       }
-      
+
       return $ValidateUsernameRegex;
    }
 }
@@ -162,7 +162,7 @@ if (!function_exists('ValidateUsernameRegex')) {
 if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
       $ValidateUsernameRegex = ValidateUsernameRegex();
-      
+
       return ValidateRegex(
          $Value,
          "/^({$ValidateUsernameRegex})?$/siu"
@@ -201,7 +201,7 @@ if (!function_exists('ValidateDate')) {
 				$Hour = ArrayValue(4, $Matches, 0);
 				$Minutes = ArrayValue(5, $Matches, 0);
 				$Seconds = ArrayValue(6, $Matches, 0);
-			   
+
             return checkdate($Month, $Day, $Year) && $Hour < 24 && $Minutes < 61 && $Seconds < 61;
          }
       }
@@ -256,6 +256,25 @@ if (!function_exists('ValidateDecimal')) {
    }
 }
 
+if (!function_exists('ValidateString')) {
+   /**
+    * Validate that a value can be converted into a string.
+    *
+    * This function will pass on numbers or booleans because those values can be converted to a string.
+    *
+    * @param mixed $Value The value to validate.
+    * @param object $Field The database field object to validate against.
+    * @return bool Returns true if {@link $Value} is a valid string.
+    */
+   function ValidateString($Value, $Field) {
+      if (!$Value || (is_string($Value) && !trim($Value))) {
+         return true;
+      }
+
+      return is_scalar($Value);
+   }
+}
+
 if (!function_exists('ValidateTime')) {
    function ValidateTime($Value, $Field) {
       // TODO: VALIDATE AS HH:MM:SS OR HH:MM
@@ -276,7 +295,7 @@ if (!function_exists('ValidateLength')) {
          $Diff = mb_strlen($Value, 'UTF-8') - $Field->Length;
       else
          $Diff = strlen($Value) - $Field->Length;
-         
+
       if ($Diff <= 0) {
          return TRUE;
       } else {
@@ -336,15 +355,15 @@ if (!function_exists('ValidateMinTextLength')) {
       if (isset($Post['Format'])) {
          $Value = Gdn_Format::To($Value, $Post['Format']);
       }
-      
+
       $Value = html_entity_decode(trim(strip_tags($Value)));
       $MinLength = GetValue('MinLength', $Field, 0);
-      
+
       if (function_exists('mb_strlen'))
          $Diff = $MinLength - mb_strlen($Value, 'UTF-8');
       else
          $Diff = $MinLength - strlen($Value);
-         
+
       if ($Diff <= 0) {
          return TRUE;
       } else {
@@ -356,7 +375,7 @@ if (!function_exists('ValidateMinTextLength')) {
 if (!function_exists('ValidateStrength')) {
    /**
     * Validate a password's strength
-    * 
+    *
     * @param string $Value
     * @param string $Field
     * @param array $FormValues

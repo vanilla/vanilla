@@ -411,6 +411,11 @@ class DiscussionsController extends VanillaController {
       $this->SetData('Discussions', $this->DiscussionData);
       $CountDiscussions = $this->SetData('CountDiscussions', $DiscussionModel->GetCount($Wheres));
 
+      $this->View = 'index';
+      if (C('Vanilla.Discussions.Layout') === 'table') {
+         $this->View = 'table';
+      }
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
 		$this->EventArguments['PagerType'] = 'MorePager';
@@ -445,10 +450,10 @@ class DiscussionsController extends VanillaController {
       $this->AddModule('CategoriesModule');
       $this->AddModule('BookmarkedModule');
 
-      // Render default view (discussions/mine.php)
+      // Render view
       $this->SetData('Title', T('My Discussions'));
       $this->SetData('Breadcrumbs', array(array('Name' => T('My Discussions'), 'Url' => '/discussions/mine')));
-      $this->Render('Index');
+      $this->Render();
    }
 
    public function UserBookmarkCount($UserID = FALSE) {

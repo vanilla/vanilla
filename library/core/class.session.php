@@ -226,7 +226,7 @@ class Gdn_Session {
       if (abs($Expires) < 31556926)
          $Expires = time() + $Expires;
 
-      setcookie($Name, $Value, $Expires, $Path, $Domain);
+      safeCookie($Name, $Value, $Expires, $Path, $Domain);
       $_COOKIE[$Name] = $Value;
    }
 
@@ -604,7 +604,7 @@ class Gdn_Session {
          if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
             $Domain = '';
 
-         setcookie($Name, $SessionID, $Expire, $Path, $Domain);
+         safeCookie($Name, $SessionID, $Expire, $Path, $Domain);
          $_COOKIE[$Name] = $SessionID;
       }
       $Session->Attributes = @unserialize($Session->Attributes);

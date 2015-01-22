@@ -5,12 +5,19 @@
       <?php
       $Data = $this->ActivityData;
       foreach ($Data->Result() as $Activity) {
-         $PhotoAnchor = Anchor(
-            Img($Activity['Photo'], array('class' => 'ProfilePhotoSmall')),
-            $Activity['PhotoUrl'], 'Photo');
+         if ($Activity['Photo']) {
+             $PhotoAnchor = Anchor(
+                Img($Activity['Photo'], array('class' => 'ProfilePhotoSmall')),
+                $Activity['PhotoUrl'], 'Photo');
+         }
          
          echo '<li class="Activity ' . $Activity['ActivityType'] . '">';
-         echo $PhotoAnchor.' '.$Activity['Headline'];
+         
+         if ($Activity['Photo']) {
+            echo $PhotoAnchor.' ';
+         }
+         
+         echo $Activity['Headline'];
          echo '</li>';
       }
       

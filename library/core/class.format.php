@@ -809,43 +809,6 @@ class Gdn_Format {
 
    /**
     * Takes a mixed variable, filters unsafe HTML and returns it.
-    * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
-    *
-    * @param mixed $Mixed An object, array, or string to be formatted.
-    * @return string
-    */
-   public static function HtmlFilter($Mixed) {
-      if (!is_string($Mixed)) {
-         return self::To($Mixed, 'HtmlFilter');
-      } else {
-         if (IsHtml($Mixed)) {
-            // Purify HTML with our formatter.
-            $Formatter = Gdn::Factory('HtmlFormatter');
-            if (is_null($Formatter)) {
-               // If there is no HtmlFormatter then make sure that script injections won't work.
-               return self::Display($Mixed);
-            }
-
-            // Allow the code tag to keep all enclosed HTML encoded.
-            $Mixed = preg_replace(
-               array('/<code([^>]*)>(.+?)<\/code>/sei'),
-               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'>\'.htmlspecialchars(RemoveQuoteSlashes(\'\2\')).\'</code>\''),
-               $Mixed
-            );
-
-            // Do HTML filtering before our special changes.
-            $Result = $Formatter->Format($Mixed);
-         }
-         else {
-            $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
-         }
-
-         return $Result;
-      }
-   }
-
-   /**
-    * Takes a mixed variable, filters unsafe HTML and returns it.
     * Does "magic" formatting of links, mentions, link embeds, emoji, & linebreaks.
     *
     * @param mixed $Mixed An object, array, or string to be formatted.
@@ -886,6 +849,43 @@ class Gdn_Format {
                $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                $Result = FixNl2Br($Result);
             }
+         }
+
+         return $Result;
+      }
+   }
+
+   /**
+    * Takes a mixed variable, filters unsafe HTML and returns it.
+    * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
+    *
+    * @param mixed $Mixed An object, array, or string to be formatted.
+    * @return string
+    */
+   public static function HtmlFilter($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'HtmlFilter');
+      } else {
+         if (IsHtml($Mixed)) {
+            // Purify HTML with our formatter.
+            $Formatter = Gdn::Factory('HtmlFormatter');
+            if (is_null($Formatter)) {
+               // If there is no HtmlFormatter then make sure that script injections won't work.
+               return self::Display($Mixed);
+            }
+
+            // Allow the code tag to keep all enclosed HTML encoded.
+            $Mixed = preg_replace(
+               array('/<code([^>]*)>(.+?)<\/code>/sei'),
+               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'>\'.htmlspecialchars(RemoveQuoteSlashes(\'\2\')).\'</code>\''),
+               $Mixed
+            );
+
+            // Do HTML filtering before our special changes.
+            $Result = $Formatter->Format($Mixed);
+         }
+         else {
+            $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
          }
 
          return $Result;

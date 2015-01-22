@@ -1766,6 +1766,18 @@ if (!function_exists('InSubArray')) {
    }
 }
 
+if (!function_exists('IsHtml')) {
+   /**
+    * Determine whether text contains HTML.
+    *
+    * @param string $Text
+    * @return bool Whether HTML was detected.
+    */
+   function IsHtml($Text) {
+      return strpos($Text, '<') !== FALSE || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Text);
+   }
+}
+
 if (!function_exists('IsMobile')) {
    /**
     * Returns whether or not the site is in mobile mode.

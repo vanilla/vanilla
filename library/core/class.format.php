@@ -811,7 +811,7 @@ class Gdn_Format {
     * Takes a mixed variable, filters unsafe HTML and returns it.
     * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
     *
-    * @param string $Mixed to be formatted.
+    * @param mixed $Mixed An object, array, or string to be formatted.
     * @return string
     */
    public static function HtmlFilter($Mixed) {

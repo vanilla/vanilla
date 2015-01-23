@@ -94,7 +94,7 @@ echo $this->Form->Errors();
          
          echo $this->Form->Simple(
             $this->Data('_PermissionFields', array()),
-         array('Wrap' => array('', '')));
+         array('Wrap' => array('', ''), 'ItemWrap' => array('<div class="P">', '</div>')));
 
          echo T('Check all permissions that apply for each role');
          echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');

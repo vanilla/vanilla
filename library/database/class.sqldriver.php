@@ -18,6 +18,9 @@
 
 abstract class Gdn_SQLDriver {
 
+   /** @const 2^31 is the max signed int range. */
+   const MAX_SIGNED_INT = 2147483648;
+
    public function __construct() {
       $this->ClassName = get_class($this);
       $this->Reset();
@@ -1288,10 +1291,16 @@ abstract class Gdn_SQLDriver {
     * @return Gdn_SQLDriver $this
     */
    public function Limit($Limit, $Offset = FALSE) {
+      // SQL chokes on ints over 2^31
+      if ($Limit > self::MAX_SIGNED_INT) {
+         throw new Exception(T('Invalid limit.'), 400);
+      }
+
       $this->_Limit = $Limit;
 
-      if ($Offset !== FALSE)
-         $this->_Offset = $Offset;
+      if ($Offset !== FALSE) {
+         $this->Offset($Offset);
+      }
 
       return $this;
    }
@@ -1392,6 +1401,11 @@ abstract class Gdn_SQLDriver {
     * @return Gdn_SQLDriver $this
     */
    public function Offset($Offset) {
+      // SQL chokes on ints over 2^31
+      if ($Offset > self::MAX_SIGNED_INT) {
+         throw new Exception(T('Invalid offset.'), 400);
+      }
+
       $this->_Offset = $Offset;
       return $this;
    }

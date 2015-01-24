@@ -34,7 +34,7 @@ if ($Session->IsValid()):
          $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert NotificationsAlert">'.$CountNotifications.'</span>' : '';
 
          echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
-         echo Anchor(Sprite('SpNotifications', 'Sprite Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton NotificationsClear', array('title' => T('Notifications')));
+         echo Anchor(Sprite('SpNotifications', 'Sprite Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton js-clear-notifications', array('title' => T('Notifications')));
          echo Sprite('SpFlyoutHandle', 'Arrow');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
 

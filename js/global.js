@@ -1087,7 +1087,7 @@ jQuery(document).ready(function($) {
    }
 
    // Clear notifications alerts when they are accessed anywhere.
-   $(document).on('click', '.NotificationsClear', function() {
+   $(document).on('click', '.js-clear-notifications', function() {
       $('.NotificationsAlert').remove();
    });
 

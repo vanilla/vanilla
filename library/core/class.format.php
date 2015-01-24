@@ -883,8 +883,7 @@ class Gdn_Format {
 
             // Do HTML filtering before our special changes.
             $Result = $Formatter->Format($Mixed);
-         }
-         else {
+         } else {
             $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
          }
 

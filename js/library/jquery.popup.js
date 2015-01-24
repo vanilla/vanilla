@@ -78,6 +78,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                         $.popup.close(settings);
                         settings.afterConfirm(json, settings.sender);
                         gdn.inform(json);
+                        gdn.processTargets(json.Targets);
+
                         if (json.RedirectUrl)
                            setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
                      }

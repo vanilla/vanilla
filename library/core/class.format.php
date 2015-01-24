@@ -818,7 +818,7 @@ class Gdn_Format {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
       } else {
-         if (IsHtml($Mixed)) {
+         if (self::IsHtml($Mixed)) {
             // Purify HTML
             $Mixed = Gdn_Format::HtmlFilter($Mixed);
             // Links
@@ -866,7 +866,7 @@ class Gdn_Format {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'HtmlFilter');
       } else {
-         if (IsHtml($Mixed)) {
+         if (self::IsHtml($Mixed)) {
             // Purify HTML with our formatter.
             $Formatter = Gdn::Factory('HtmlFormatter');
             if (is_null($Formatter)) {
@@ -911,6 +911,16 @@ class Gdn_Format {
          .'</div>'
          .'<div class="Caption">'.$Caption.'</div>'
       .'</div>';
+   }
+
+   /**
+    * Detect HTML for the purposes of doing advanced filtering.
+    *
+    * @param $Text
+    * @return bool
+    */
+   protected static function IsHtml($Text) {
+      return strpos($Text, '<') !== FALSE || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Text);
    }
 
    /**

@@ -355,6 +355,15 @@ class Emoji {
    }
 
    /**
+    * Check the alias array and filter out all of the emoji that are not present in the main emoji list.
+    */
+   protected function checkAliases() {
+      $this->aliases = array_filter($this->aliases, function ($emojiName) {
+         return isset($this->emojo[$emojiName]);
+      });
+   }
+
+   /**
     * Populate this with any aliases required for plugin, make sure they point
     * to canonical translation, and plugin will add everything to dropdown that
     * is listed. To expand, simply define more aliases that corresponded with
@@ -594,6 +603,9 @@ class Emoji {
 
       if (array_key_exists('aliases', $manifest)) {
          $this->setAliases($manifest['aliases']);
+      } else {
+         $this->checkAliases();
+      }
 
       if (array_key_exists('archive', $manifest)) {
          $this->setArchive($manifest['archive']);

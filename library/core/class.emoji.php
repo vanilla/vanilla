@@ -454,6 +454,24 @@ class Emoji {
       return $this;
    }
 
+   /**
+    * Gets the emoji format used in {@link Emoji::img()}.
+    *
+    * @return string Returns the current emoji format.
+    */
+   public function getFormat() {
+      return $this->format;
+   }
+
+   /**
+    * Sets the emoji format used in {@link Emoji::img()}.
+    *
+    * @param string $format
+    * @return Emoji Returns $this for fluent calls.
+    */
+   public function setFormat($format) {
+      $this->format = $format;
+      return $this;
    }
 
    /**

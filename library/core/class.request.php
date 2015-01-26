@@ -359,11 +359,11 @@ class Gdn_Request {
       $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.StripWebRoot', FALSE));
 
       if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
-         $Host = val('HTTP_X_FORWARDED_HOST', $_SERVER);
+         $Host = $_SERVER['HTTP_X_FORWARDED_HOST'];
       } elseif (isset($_SERVER['HTTP_HOST'])) {
-         $Host = val('HTTP_HOST', $_SERVER);
+         $Host = $_SERVER['HTTP_HOST'];
       } else {
-         $Host = val('SERVER_NAME', $_SERVER);
+         $Host = $_SERVER['SERVER_NAME'];
       }
 
       // The host can have the port passed in, remove it here if it exists

@@ -133,8 +133,7 @@ class ModerationController extends VanillaController {
    public static function InformCheckedDiscussions($Sender, $Force = FALSE) {
       $Session = Gdn::Session();
       $HadCheckedDiscussions = $Force;
-      $TransientKey = GetValue('TransientKey', $_POST);
-      if ($Session->IsValid() && Gdn::Request()->IsPostBack()) {
+      if ($Session->IsValid() && Gdn::Request()->IsAuthenticatedPostBack()) {
          // Form was posted, so accept changes to checked items.
          $CheckIDs = GetValue('CheckIDs', $_POST);
          if (empty($CheckIDs))

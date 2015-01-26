@@ -21,10 +21,10 @@ if (count($this->Data('Conversations'))):
    }
    $PhotoUser = UserBuilder($Row, 'LastInsert');
    ?>
-   <li class="Item" rel="<?php echo Url("/messages/{$Row['ConversationID']}#latest"); ?>">
+   <li class="Item" rel="<?php echo Url("/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?>">
       <div class="Author Photo"><?php echo UserPhoto($PhotoUser); ?></div>
       <div class="ItemContent">
-         <b class="Subject"><?php echo Anchor($Subject, "/messages/{$Row['ConversationID']}#latest"); ?></b>
+         <b class="Subject"><?php echo Anchor($Subject, "/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?></b>
          <?php
          $Excerpt = SliceString(Gdn_Format::PlainText($Row['LastBody'], $Row['LastFormat']), 80);
          echo Wrap(nl2br(htmlspecialchars($Excerpt)), 'div', array('class' => 'Excerpt'));

@@ -41,6 +41,23 @@ class Gdn_Request {
    }
 
    /**
+    * Gets/Sets the relative path to the asset include path.
+    *
+    * The asset root represents the folder that static assets are served from.
+    *
+    * @param $AssetRoot Optional An asset root to set
+    * @return string Returns the current asset root.
+    */
+   public function AssetRoot($AssetRoot = null) {
+      if ($AssetRoot !== null) {
+         $Result = $this->_ParsedRequestElement('AssetRoot', rtrim('/'.trim($AssetRoot, '/'), '/'));
+      } else {
+         $Result = $this->_ParsedRequestElement('AssetRoot');
+      }
+      return $Result;
+   }
+
+   /**
     * Generic chainable object creation method.
     *
     * This creates a new Gdn_Request object, loaded with the current Environment $_SERVER and $_ENV superglobal imports, such
@@ -549,6 +566,7 @@ class Gdn_Request {
 
       $ParsedWebRoot = trim($WebRoot,'/');
       $this->WebRoot($ParsedWebRoot);
+      $this->AssetRoot($ParsedWebRoot);
 
       /**
        * Resolve Domain
@@ -577,9 +595,9 @@ class Gdn_Request {
     * A second argument can be supplied, which causes the value of the specified key to be changed
     * to that of the second parameter itself.
     *
-    * @param $Key element key to retrieve or set
-    * @param $Value value of $Key key to set
-    * @return string | NULL
+    * @param string $Key element key to retrieve or set
+    * @param string $Value value of $Key key to set
+    * @return string|null
     */
    protected function _ParsedRequestElement($Key, $Value = NULL) {
       // Lazily parse if not already parsed
@@ -839,7 +857,7 @@ class Gdn_Request {
 
       $Port = $this->Port();
       $Host = $this->Host();
-      if (!in_array($Port, array(80, 443)))
+      if (!in_array($Port, array(80, 443)) && (strpos($Host, ':'.$Port) === FALSE))
          $Host .= ':'.$Port;
 
       if ($WithDomain === '//') {
@@ -902,6 +920,75 @@ class Gdn_Request {
 
       return $Result;
    }
+
+   /**
+    * Compare two urls for equality.
+    *
+    * @param string $url1 The first url to compare.
+    * @param string $url2 The second url to compare.
+    * @return int Returns 0 if the urls are equal or 1, -1 if they are not.
+    */
+   function UrlCompare($url1, $url2) {
+      $parts1 = parse_url($this->Url($url1));
+      $parts2 = parse_url($this->Url($url2));
+
+
+      $defaults = array(
+         'scheme' => $this->Scheme(),
+         'host' => $this->HostAndPort(),
+         'path' => '/',
+         'query' => ''
+      );
+
+      $parts1 = array_replace($defaults, $parts1 ?: array());
+      $parts2 = array_replace($defaults, $parts2 ?: array());
+
+      if ($parts1['host'] === $parts2['host']
+         && ltrim($parts1['path'], '/') === ltrim($parts2['path'], '/')
+         && $parts1['query'] === $parts2['query']) {
+         return 0;
+      }
+
+      return strcmp($url1, $url2);
+   }
+
+   /**
+    * Conditionally gets the domain of the request.
+    *
+    * This method will return nothing or the domain with an http, https, or // scheme depending on {@link $withDomain}.
+    *
+    * @param bool $withDomain How to include the domain in the result.
+    * - false or /: The domain will not be returned.
+    * - //: The domain prefixed with //.
+    * - http: The domain prefixed with http://.
+    * - https: The domain prefixed with https://.
+    * - true: The domain prefixed with the current request scheme.
+    * @return string Returns the domain according to the rules set by {@see $withDomain}.
+    */
+   public function UrlDomain($withDomain = true) {
+      static $allowSSL = null;
+
+      if ($allowSSL === null) {
+         $allowSSL = C('Garden.AllowSSL', null);
+      }
+
+      if (!$withDomain || $withDomain === '/') {
+         return '';
+      }
+
+      if (!$allowSSL && $withDomain === 'https') {
+         $withDomain = 'http';
+      }
+
+      if ($withDomain === true) {
+         $withDomain = $this->Scheme().'://';
+      } elseif ($withDomain !== '//') {
+         $withDomain .= '://';
+      }
+
+      return $withDomain.$this->HostAndPort();
+   }
+
 
    /**
     * Gets/Sets the relative path to the application's dispatcher.

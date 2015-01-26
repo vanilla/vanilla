@@ -100,11 +100,12 @@ class Gdn_PasswordHash extends PasswordHash {
             $Result = $ComputedHash == $Hash;
             break;
          case 'mybb':
-            $Parts = explode(':', $StoredHash, 2);
-            $Hash = GetValue(0, $Parts);
-            $Salt = GetValue(1, $Parts);
-            $ComputedHash = md5(md5($Salt).$Password);
-            $Result = $ComputedHash == $Hash;
+            // Hash has a fixed length of 32, and we concat the salt to it.
+            $SaltLength = strlen($StoredHash) - 32;
+            $Salt = trim(substr($StoredHash, -$SaltLength, $SaltLength));
+            $MyStoredHash = substr($StoredHash, 0, strlen($StoredHash) - $SaltLength);
+            $MyHash = md5(md5($Salt).md5($Password));
+            $Result = $MyHash == $MyStoredHash;
             break;
          case 'phpbb':
             require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
@@ -142,6 +143,10 @@ class Gdn_PasswordHash extends PasswordHash {
             
             $VbHash = md5(md5($Password).$Salt);
             $Result = $VbHash == $VbStoredHash;
+            break;
+         case 'vbulletin5': // Since 5.1
+            // md5 sum the raw password before crypt. Nice work as usual vb.
+            $Result = $StoredHash === crypt(md5($Password), $StoredHash);
             break;
          case 'xenforo':
             $Data = @unserialize($StoredHash);

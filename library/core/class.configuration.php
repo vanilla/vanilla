@@ -577,12 +577,26 @@ class Gdn_Configuration extends Gdn_Pluggable {
     */
    protected static function MergeConfig(&$Data, &$Loaded) {
       foreach ($Loaded as $Key => $Value) {
-         if (array_key_exists($Key,$Data) && is_array($Data[$Key]) && is_array($Value)) {
+         if (array_key_exists($Key,$Data) && is_array($Data[$Key]) && is_array($Value) && !self::isList($Value)) {
             self::MergeConfig($Data[$Key], $Value);
          } else {
             $Data[$Key] = $Value;
          }
       }
+   }
+
+   /**
+    * Determine if a given array is a list (or a hash)
+    *
+    * @param array $list
+    * @return boolean
+    */
+   protected static function isList(&$list) {
+       $n = count($list);
+       for ($i=0;$i<$n;$i++) {
+          if (!isset($list[$i]) && !key_exists($i, $list)) return false;
+       }
+       return true;
    }
 
    /**

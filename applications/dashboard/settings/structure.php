@@ -129,8 +129,12 @@ if ($SystemUserID) {
 if (!$SystemUserID) {
    // Try and find a system user.
    $SystemUserID = Gdn::SQL()->GetWhere('User', array('Name' => 'System', 'Admin' => 2))->Value('UserID');
-   if ($SystemUserID)
+   if ($SystemUserID) {
       SaveToConfig('Garden.SystemUserID', $SystemUserID);
+   } else {
+      // Create a new one if we couldn't find one.
+      Gdn::UserModel()->GetSystemUserID();
+   }
 }
 
 // UserRole Table
@@ -660,7 +664,7 @@ $Construct->Table('Log')
    ->Column('RecordDate', 'datetime')
    ->Column('RecordIPAddress', 'varchar(15)', NULL, 'index')
    ->Column('InsertUserID', 'int') // user that put record in the log
-   ->Column('DateInserted', 'datetime') // date item added to log
+   ->Column('DateInserted', 'datetime', FALSE, 'index') // date item added to log
    ->Column('InsertIPAddress', 'varchar(15)', NULL)
    ->Column('OtherUserIDs', 'varchar(255)', NULL)
    ->Column('DateUpdated', 'datetime', NULL)
@@ -696,6 +700,10 @@ $Construct->Table('Ban')
    ->Column('CountBlockedRegistrations', 'uint', 0)
    ->Column('InsertUserID', 'int')
    ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
@@ -758,7 +766,7 @@ $Construct
    ->Column('ForeignUserID', 'int', FALSE, 'key') // the user id of the record we are attached to (de-normalization)
    ->Column('Source', 'varchar(64)') // ex: Zendesk, Vendor
    ->Column('SourceID', 'varchar(32)') // ex: 1
-   ->Column('SourceURL', 'varchar(255)') 
+   ->Column('SourceURL', 'varchar(255)')
    ->Column('Attributes', 'text', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int', FALSE, 'key')

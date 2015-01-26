@@ -6,7 +6,7 @@
  * A base class that all controllers can inherit for common controller
  * properties and methods.
  *
- * @method void Render() Render the controller's view.
+ * @method void Render($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') Render the controller's view.
  * @param string $View
  * @param string $ControllerName
  * @param string $ApplicationFolder
@@ -75,7 +75,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     *
     * @var array The data from method calls.
     */
-   public $Data;
+   public $Data = array();
 
    /**
     * The Head module that this controller should use to add CSS files.
@@ -352,7 +352,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_Json = array();
       $this->_Headers = array(
          'X-Garden-Version'   => APPLICATION.' '.APPLICATION_VERSION,
-         'Content-Type'       => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', '') // PROPERLY ENCODE THE CONTENT
+         'Content-Type'       => Gdn::Config('Garden.ContentType', '').'; charset='.C('Garden.Charset', 'utf-8') // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
       );
 
@@ -1051,7 +1051,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function Initialize() {
       if (in_array($this->SyndicationMethod, array(SYNDICATION_ATOM, SYNDICATION_RSS))) {
-         $this->_Headers['Content-Type'] = 'text/xml; charset='.C('Garden.Charset', '');
+         $this->_Headers['Content-Type'] = 'text/xml; charset='.C('Garden.Charset', 'utf-8');
       }
 
       if (is_object($this->Menu))
@@ -1159,7 +1159,7 @@ class Gdn_Controller extends Gdn_Pluggable {
          );
 
          if (!$Session->IsValid() && $this->DeliveryType() == DELIVERY_TYPE_ALL) {
-            Redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
+            Redirect('/entry/signin?Target='.urlencode($this->Request->PathAndQuery()));
          } else {
             Gdn::Dispatcher()->Dispatch('DefaultPermission');
             exit();
@@ -1227,8 +1227,10 @@ class Gdn_Controller extends Gdn_Pluggable {
       // before fetching it (otherwise the json will not be properly parsed
       // by javascript).
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
-         ob_clean();
-         $this->ContentType('application/json');
+         if (ob_get_level()) {
+            ob_clean();
+         }
+         $this->ContentType('application/json; charset='.C('Garden.Charset', 'utf-8'));
          $this->SetHeader('X-Content-Type-Options', 'nosniff');
       }
 
@@ -1267,7 +1269,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
       if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
          $ExitRender = $this->RenderData();
-         if ($ExitRender) return;
+         if ($ExitRender) {
+            return;
+         }
       }
 
       if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1429,7 +1433,7 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
 
-//      $this->SendHeaders();
+      $this->SendHeaders();
 
       // Check for a special view.
       $ViewLocation = $this->FetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->DeliveryMethod()), FALSE, FALSE, FALSE);
@@ -1443,7 +1447,9 @@ class Gdn_Controller extends Gdn_Pluggable {
          $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::Request()->Scheme());
       }
 
-      @ob_clean();
+      if (ob_get_level()) {
+         ob_clean();
+      }
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_XML:
             safeHeader('Content-Type: text/xml', TRUE);
@@ -1457,12 +1463,12 @@ class Gdn_Controller extends Gdn_Pluggable {
          case DELIVERY_METHOD_JSON:
          default:
             if (($Callback = $this->Request->Get('callback', FALSE)) && $this->AllowJSONP()) {
-               safeHeader('Content-Type: application/javascript', TRUE);
+               safeHeader('Content-Type: application/javascript; charset='.C('Garden.Charset', 'utf-8'), TRUE);
                // This is a jsonp request.
                echo $Callback.'('.json_encode($Data).');';
                return TRUE;
             } else {
-               safeHeader('Content-Type: application/json', TRUE);
+               safeHeader('Content-Type: application/json; charset='.C('Garden.Charset', 'utf-8'), TRUE);
                // This is a regular json request.
                echo json_encode($Data);
                return TRUE;
@@ -1580,8 +1586,9 @@ class Gdn_Controller extends Gdn_Pluggable {
       }
 
       // Try cleaning out any notices or errors.
-      @ob_clean();
-
+      if (ob_get_level()) {
+         ob_clean();
+      }
 
       if ($Code >= 400 && $Code <= 505)
          safeHeader("HTTP/1.0 $Code", TRUE, $Code);
@@ -1592,11 +1599,11 @@ class Gdn_Controller extends Gdn_Pluggable {
       switch ($this->DeliveryMethod()) {
          case DELIVERY_METHOD_JSON:
             if (($Callback = $this->Request->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) && $this->AllowJSONP()) {
-               safeHeader('Content-Type: application/javascript', TRUE);
+               safeHeader('Content-Type: application/javascript; charset='.C('Garden.Charset', 'utf-8'), TRUE);
                // This is a jsonp request.
                exit($Callback.'('.json_encode($Data).');');
             } else {
-               safeHeader('Content-Type: application/json', TRUE);
+               safeHeader('Content-Type: application/json; charset='.C('Garden.Charset', 'utf-8'), TRUE);
                // This is a regular json request.
                exit(json_encode($Data));
             }
@@ -1605,12 +1612,12 @@ class Gdn_Controller extends Gdn_Pluggable {
 //            Gdn_ExceptionHandler($Ex);
 //            break;
          case DELIVERY_METHOD_XML:
-            safeHeader('Content-Type: text/xml', TRUE);
+            safeHeader('Content-Type: text/xml; charset='.C('Garden.Charset', 'utf-8'), TRUE);
             array_map('htmlspecialchars', $Data);
             exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
             break;
          default:
-            safeHeader('Content-Type: text/plain', TRUE);
+            safeHeader('Content-Type: text/plain; charset='.C('Garden.Charset', 'utf-8'), TRUE);
             exit($Ex->getMessage());
       }
    }
@@ -1671,9 +1678,20 @@ class Gdn_Controller extends Gdn_Pluggable {
                if (StringBeginsWith($CssFile, 'http')) {
                   $this->Head->AddCss($CssFile, 'all', GetValue('AddVersion', $CssInfo, TRUE), $CssInfo['Options']);
                   continue;
-               } elseif(strpos($CssFile, '/') !== FALSE) {
-                  // A direct path to the file was given.
-                  $CssPaths = array(CombinePaths(array(PATH_ROOT, str_replace('/', DS, $CssFile))));
+               } elseif (strpos($CssFile, '/') !== FALSE) {
+                  $CssPaths = array();
+
+                  $AppFolder = $CssInfo['AppFolder'];
+                  if (empty($AppFolder)) {
+                     // A direct path to the file was given.
+                     $CssPaths[] = paths(PATH_ROOT, str_replace('/', DS, $CssFile));
+                  } else if (StringBeginsWith($AppFolder, 'plugins/')) {
+                     // A plugin-relative path was given
+                     $AppFolder = substr($AppFolder, strlen('plugins/'));
+                     $CssPaths[] = paths(PATH_PLUGINS, $AppFolder, "design", $CssFile);
+                  } else {
+                     $CssPaths[] = paths(PATH_APPLICATIONS, $AppFolder, 'design', $CssFile);
+                  }
                } else {
 //                  $CssGlob = preg_replace('/(.*)(\.css)/', '\1*\2', $CssFile);
                   $AppFolder = $CssInfo['AppFolder'];
@@ -1735,9 +1753,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // And now search for/add all JS files.
             $Cdns = array();
-            if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', FALSE)) {
+            if (!C('Garden.Cdns.Disable', false)) {
                $Cdns = array(
-                  'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'
+                  'jquery.js' => "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
                   );
             }
 

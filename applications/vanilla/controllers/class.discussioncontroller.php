@@ -390,7 +390,7 @@ class DiscussionController extends VanillaController {
     */
    public function Bookmark($DiscussionID = NULL) {
       // Make sure we are posting back.
-      if (!$this->Request->IsPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Session = Gdn::Session();
@@ -492,7 +492,7 @@ class DiscussionController extends VanillaController {
          throw NotFoundException('Discussion');
       $this->Permission('Vanilla.Discussions.Announce', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          // Save the property.
          $CacheKeys = array(
             $this->DiscussionModel->GetAnnouncementCacheKey(),
@@ -543,7 +543,7 @@ class DiscussionController extends VanillaController {
     */
    public function Sink($DiscussionID = '', $Sink = TRUE, $From = 'list') {
       // Make sure we are posting back.
-      if (!$this->Request->IsPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Discussion = $this->DiscussionModel->GetID($DiscussionID);
@@ -586,7 +586,7 @@ class DiscussionController extends VanillaController {
     */
    public function Close($DiscussionID = '', $Close = TRUE, $From = 'list') {
       // Make sure we are posting back.
-      if (!$this->Request->IsPostBack())
+      if (!$this->Request->IsAuthenticatedPostBack())
          throw PermissionException('Javascript');
 
       $Discussion = $this->DiscussionModel->GetID($DiscussionID);
@@ -641,7 +641,7 @@ class DiscussionController extends VanillaController {
 
       $this->Permission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          if (!$this->DiscussionModel->Delete($DiscussionID))
             $this->Form->AddError('Failed to delete discussion');
 

@@ -20,6 +20,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class CommentModel extends VanillaModel {
+   const COMMENT_THRESHOLD_SMALL = 1000;
+   const COMMENT_THRESHOLD_LARGE = 50000;
+   const COUNT_RECALC_MOD = 50;
+
+
    /**
     * List of fields to order results by.
     *
@@ -432,13 +437,16 @@ class CommentModel extends VanillaModel {
       if ($Session->UserID > 0) {
 
          // Max comments we could have seen
-         $CountWatch = $Limit * ($Offset + 1);
+         $CountWatch = $Limit + $Offset;
          if ($CountWatch > $TotalComments)
             $CountWatch = $TotalComments;
 
          // This dicussion looks familiar...
          if (is_numeric($Discussion->CountCommentWatch)) {
 
+            if ($CountWatch < $Discussion->CountCommentWatch)
+               $CountWatch = $Discussion->CountCommentWatch;
+               
             if (isset($Discussion->DateLastViewed))
                $NewComments |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
 
@@ -901,7 +909,7 @@ class CommentModel extends VanillaModel {
             if ($Category) {
                $CountComments = GetValue('CountComments', $Category, 0) + 1;
 
-               if ($CountComments < 1000 || $CountComments % 20 == 0) {
+               if ($CountComments < self::COMMENT_THRESHOLD_SMALL || ($CountComments < self::COMMENT_THRESHOLD_LARGE && $CountComments % self::COUNT_RECALC_MOD == 0)) {
                   $CountComments = $this->SQL
                      ->Select('CountComments', 'sum', 'CountComments')
                      ->From('Discussion')

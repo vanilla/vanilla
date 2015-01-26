@@ -112,13 +112,6 @@ class Emoji {
     */
    public $rdelim = ':';
 
-   /**
-    *
-    * @var bool If set to true, original unaccounted for emoji will get merged
-    * into the custom set.
-    */
-   protected $mergeOriginals = false;
-
    /// Methods ///
 
    protected function __construct() {
@@ -326,9 +319,6 @@ class Emoji {
       } elseif (isset($this->archive[$emojiName])) {
          $filePath = $this->assetPath;
          $emojiFileName = $this->archive[$emojiName];
-      } elseif ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
-         $filePath = $this->assetPathOriginal;
-         $emojiFileName = $this->emojiOriginalUnaccountedFor[$emojiName];
       } else {
          return '';
       }
@@ -528,18 +518,6 @@ class Emoji {
    }
 
    /**
-    * Note: if setting this to true, it must be the first method called in a
-    * plugin that will use custom emojis, but also want to merge the unaccounted
-    * for original ones, otherwise the original emojis and path will not be
-    * stored.
-    *
-    * @param bool $bool
-    */
-   public function mergeOriginals($bool) {
-      $this->mergeOriginals = $bool;
-   }
-
-   /**
     *
     * @param array $aliases
     */
@@ -554,11 +532,6 @@ class Emoji {
     * @param string $assetPath
     */
    public function setAssetPath($assetPath) {
-      // Save original asset path for merging default emoji.
-      if ($this->mergeOriginals) {
-         $this->assetPathOriginal = $this->assetPath;
-      }
-
       $this->assetPath = $assetPath;
    }
 
@@ -568,17 +541,7 @@ class Emoji {
     * @param array $emoji
     */
    public function setEmoji($emoji) {
-      if (count(array_filter($emoji))) {
-         // Save the emoji that are unaccounted for in their custom set.
-         // This can be used if merging them with the custom set, as they
-         // have different assetPaths.
-         if ($this->mergeOriginals) {
-            $this->emojiOriginalUnaccountedFor = array_diff_key($this->emoji, $emoji);
-         }
-
-         // Set custom emoji.
-         $this->emoji = $emoji;
-      }
+      $this->emoji = $emoji;
    }
 
    /**

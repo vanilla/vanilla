@@ -808,7 +808,8 @@ class Gdn_Format {
    }
 
    /**
-    * Takes a mixed variable, filters unsafe html and returns it.
+    * Takes a mixed variable, filters unsafe HTML and returns it.
+    * Does "magic" formatting of links, mentions, link embeds, emoji, & linebreaks.
     *
     * @param mixed $Mixed An object, array, or string to be formatted.
     * @return string
@@ -817,36 +818,17 @@ class Gdn_Format {
       if (!is_string($Mixed)) {
          return self::To($Mixed, 'Html');
       } else {
-         $IsHtml = strpos($Mixed, '<') !== FALSE
-            || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Mixed);
-
-         if ($IsHtml) {
-            // The text contains html and must be purified.
-
-            $Formatter = Gdn::Factory('HtmlFormatter');
-            if(is_null($Formatter)) {
-               // If there is no HtmlFormatter then make sure that script injections won't work.
-               return self::Display($Mixed);
-            }
-
-            // Allow the code tag to keep all enclosed html encoded.
-            $Mixed = preg_replace(
-               array('/<code([^>]*)>(.+?)<\/code>/sei'),
-               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'>\'.htmlspecialchars(RemoveQuoteSlashes(\'\2\')).\'</code>\''),
-               $Mixed
-            );
-
-            // Do HTML filtering before our special changes
-            $Mixed = $Formatter->Format($Mixed);
-
+         if (self::IsHtml($Mixed)) {
+            // Purify HTML
+            $Mixed = Gdn_Format::HtmlFilter($Mixed);
             // Links
             $Mixed = Gdn_Format::Links($Mixed);
             // Mentions & Hashes
             $Mixed = Gdn_Format::Mentions($Mixed);
+            // Emoji
             $Mixed = Emoji::instance()->translateToHtml($Mixed);
-
             // nl2br
-            if(C('Garden.Format.ReplaceNewlines', TRUE)) {
+            if (C('Garden.Format.ReplaceNewlines', TRUE)) {
                $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
                $Mixed = FixNl2Br($Mixed);
             }
@@ -874,6 +856,42 @@ class Gdn_Format {
    }
 
    /**
+    * Takes a mixed variable, filters unsafe HTML and returns it.
+    * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
+    *
+    * @param mixed $Mixed An object, array, or string to be formatted.
+    * @return string
+    */
+   public static function HtmlFilter($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'HtmlFilter');
+      } else {
+         if (self::IsHtml($Mixed)) {
+            // Purify HTML with our formatter.
+            $Formatter = Gdn::Factory('HtmlFormatter');
+            if (is_null($Formatter)) {
+               // If there is no HtmlFormatter then make sure that script injections won't work.
+               return self::Display($Mixed);
+            }
+
+            // Allow the code tag to keep all enclosed HTML encoded.
+            $Mixed = preg_replace(
+               array('/<code([^>]*)>(.+?)<\/code>/sei'),
+               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'>\'.htmlspecialchars(RemoveQuoteSlashes(\'\2\')).\'</code>\''),
+               $Mixed
+            );
+
+            // Do HTML filtering before our special changes.
+            $Result = $Formatter->Format($Mixed);
+         } else {
+            $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
+         }
+
+         return $Result;
+      }
+   }
+
+   /**
     * Format a serialized string of image properties as html.
     * @param string $Body a serialized array of image properties (Image, Thumbnail, Caption)
     */
@@ -893,6 +911,16 @@ class Gdn_Format {
          .'</div>'
          .'<div class="Caption">'.$Caption.'</div>'
       .'</div>';
+   }
+
+   /**
+    * Detect HTML for the purposes of doing advanced filtering.
+    *
+    * @param $Text
+    * @return bool
+    */
+   protected static function IsHtml($Text) {
+      return strpos($Text, '<') !== FALSE || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Text);
    }
 
    /**

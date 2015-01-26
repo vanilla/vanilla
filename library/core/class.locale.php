@@ -270,6 +270,16 @@ class Gdn_Locale extends Gdn_Pluggable {
    }
 
    /**
+    * Return the first 2 letters of the current locale (the language code).
+    */
+   public function Langauge() {
+      if ($this->Locale == '')
+         return FALSE;
+      else
+         return substr($this->Locale, 0, 2);
+   }
+
+   /**
     * Load a locale definition file.
     *
     * @param string $Path The path to the locale.

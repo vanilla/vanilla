@@ -92,7 +92,7 @@ class Emoji {
     * - %1$s: The emoji path.
     * - %2$s: The emoji code.
     */
-   public $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
+   protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
 
    /**
     *
@@ -370,6 +370,19 @@ class Emoji {
    }
 
    /**
+    * Get the emoji editor list.
+    *
+    * @return array Returns an array of Emojis that can appear in an editor drop down.
+    */
+   public function getEditorList() {
+      if ($this->editorList === null) {
+         return $this->getAliases();
+      }
+
+      return $this->editorList;
+   }
+
+   /**
     * This is the canonical, e.g., official, list of emoji names along with
     * their associatedwith image file name. For an exhaustive list of emoji
     * names visit http://www.emoji-cheat-sheet.com/ and for the original image
@@ -398,11 +411,8 @@ class Emoji {
     * @return array List of Emojis that will appear in the editor.
     */
    public function getEmojiEditorList() {
-      if ($this->editorList === null) {
-         return $this->getAliases();
-      }
-
-      return $this->editorList;
+      Deprecated('getEmojiEditorList', 'getEditorList');
+      return $this->getEditorList();
    }
 
    public function hasEditorList() {
@@ -416,6 +426,18 @@ class Emoji {
     * @param array $value The new editor list.
     */
    public function setEmojiEditorList($value) {
+      Deprecated('setEmojiEditorList', 'setEditorList');
+      return $this->setEditorList;
+   }
+
+
+   /**
+    * Set the list of emoji that can be used by the editor.
+    *
+    * @param array $value The new editor list.
+    * @return Emoji Returns $this for fluent calls.
+    */
+   public function setEditorList($value) {
       // Convert the editor list to the proper format.
       $list = array();
       $aliases2 = array_flip($this->aliases);
@@ -429,6 +451,9 @@ class Emoji {
          }
       }
       $this->editorList = $list;
+      return $this;
+   }
+
    }
 
    /**

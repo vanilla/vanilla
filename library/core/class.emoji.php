@@ -231,16 +231,16 @@ class Emoji {
        );
 
       $this->archive = array(
-         'disappointed_relieved'        => 'disappointed_relieved.png',
-         'dizzy_face'       => 'dizzy.png',
-         'broken_heart'     => 'heartbreak.png',
-         'grinning'         => 'grin.png',
-         'heart_eyes'       => 'love.png',
-         'neutral_face'     => 'neutral.png',
-         'sob'              => 'bawling.png',
-         'stuck_out_tongue' => 'tongue.png',
-         'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
-         'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
+         'disappointed_relieved'          => 'disappointed_relieved.png',
+         'dizzy_face'                     => 'dizzy.png',
+         'broken_heart'                   => 'heartbreak.png',
+         'grinning'                       => 'grin.png',
+         'heart_eyes'                     => 'love.png',
+         'neutral_face'                   => 'neutral.png',
+         'sob'                            => 'bawling.png',
+         'stuck_out_tongue'               => 'tongue.png',
+         'stuck_out_tongue_winking_eye'   => 'stuck_out_tongue_winking_eye.png',
+         'stuck_out_tongue_closed_eyes'   => 'stuck_out_tongue_closed_eyes.png',
       );
 
       $this->editorList = array(
@@ -384,6 +384,26 @@ class Emoji {
     */
    public function getAssetPath() {
       return $this->assetPath;
+   }
+
+   /**
+    * Gets the emoji archive.
+    *
+    * @return array Returns an array of emoji name to emoji file names representing the emoji archie.
+    */
+   public function getArchive() {
+      return $this->archive;
+   }
+
+   /**
+    * Set the emoji archive.
+    *
+    * @param array $archive
+    * @return Emoji Returns $this for fluent calls.
+    */
+   public function setArchive($archive) {
+      $this->archive = $archive;
+      return $this;
    }
 
    /**
@@ -574,6 +594,11 @@ class Emoji {
 
       if (array_key_exists('aliases', $manifest)) {
          $this->setAliases($manifest['aliases']);
+
+      if (array_key_exists('archive', $manifest)) {
+         $this->setArchive($manifest['archive']);
+      } else {
+         $this->setArchive(array());
       }
 
       if (!empty($manifest['format'])) {

@@ -260,6 +260,12 @@ class CategoriesController extends VanillaController {
 
          $Page = PageNumber($Offset, $Limit);
 
+         // Allow page manipulation
+         $this->EventArguments['Page'] = &$Page;
+         $this->EventArguments['Offset'] = &$Offset;
+         $this->EventArguments['Limit'] = &$Limit;
+         $this->FireEvent('AfterPageCalculation');
+
          // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
          $MaxPages = C('Vanilla.Categories.MaxPages');
          if ($MaxPages && $Page > $MaxPages) {
@@ -284,7 +290,9 @@ class CategoriesController extends VanillaController {
 
          // Build a pager
          $PagerFactory = new Gdn_PagerFactory();
-         $this->Pager = $PagerFactory->GetPager('Pager', $this);
+         $this->EventArguments['PagerType'] = 'Pager';
+         $this->FireEvent('BeforeBuildPager');
+         $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
          $this->Pager->ClientID = 'Pager';
          $this->Pager->Configure(
             $Offset,
@@ -295,6 +303,8 @@ class CategoriesController extends VanillaController {
          $this->Pager->Record = $Category;
          PagerModule::Current($this->Pager);
          $this->SetData('_Page', $Page);
+         $this->SetData('_Limit', $Limit);
+         $this->FireEvent('AfterBuildPager');
 
          // Set the canonical Url.
          $this->CanonicalUrl(CategoryUrl($Category, PageNumber($Offset, $Limit)));

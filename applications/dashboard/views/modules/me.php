@@ -31,10 +31,10 @@ if ($Session->IsValid()):
       echo '<div class="MeMenu">';
          // Notifications
          $CountNotifications = $User->CountNotifications;
-         $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert">'.$CountNotifications.'</span>' : '';
+         $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert NotificationsAlert">'.$CountNotifications.'</span>' : '';
 
          echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
-         echo Anchor(Sprite('SpNotifications', 'Sprite Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton', array('title' => T('Notifications')));
+         echo Anchor(Sprite('SpNotifications', 'Sprite Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton js-clear-notifications', array('title' => T('Notifications')));
          echo Sprite('SpFlyoutHandle', 'Arrow');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
 
@@ -65,7 +65,7 @@ if ($Session->IsValid()):
             echo '<ul>';
                // echo Wrap(Wrap(T('My Account'), 'strong'), 'li');
                // echo Wrap('<hr />', 'li');
-               if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
+               if (hasEditProfile(Gdn::Session()->UserID)) {
                   echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Edit Profile'), 'profile/edit', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap link-editprofile'));
                } else {
                   echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap link-preferences'));

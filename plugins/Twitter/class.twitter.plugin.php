@@ -52,7 +52,7 @@ class TwitterPlugin extends Gdn_Plugin {
          $this->_AccessToken = $Token;
       } if ($Token !== NULL && $Secret !== NULL) {
          $this->_AccessToken = new OAuthToken($Token, $Secret);
-//         setcookie('tw_access_token', $Token, 0, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
+//         safeCookie('tw_access_token', $Token, 0, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
       } elseif ($this->_AccessToken == NULL) {
 //         $Token = GetValue('tw_access_token', $_COOKIE, NULL);
          if ($Token)
@@ -754,7 +754,7 @@ class TwitterPlugin extends Gdn_Plugin {
 
    public function SocialController_Twitter_Create($Sender, $Args) {
    	  $Sender->Permission('Garden.Settings.Manage');
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $Settings = array(
              'Plugins.Twitter.ConsumerKey' => $Sender->Form->GetFormValue('ConsumerKey'),
              'Plugins.Twitter.Secret' => $Sender->Form->GetFormValue('Secret'),

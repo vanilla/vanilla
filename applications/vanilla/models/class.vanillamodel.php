@@ -91,7 +91,7 @@ abstract class VanillaModel extends Gdn_Model {
          $Spam = TRUE;
          $this->Validation->AddValidationResult(
             'Body',
-            sprintf(
+            '@'.sprintf(
                T('You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'),
                $SpamCount,
                $SpamTime,

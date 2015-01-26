@@ -465,8 +465,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $PluginInfo = $this->GetPluginInfo($PluginName);
 
          // Remove plugin hooks from plugins that dont explicitly claim to be friendly with mobile themes
-         if (!GetValue('MobileFriendly', $PluginInfo))
-            $this->UnRegisterPlugin($PluginName.'Plugin');
+         if (!val('MobileFriendly', $PluginInfo)) {
+            $this->UnRegisterPlugin(val('ClassName', $PluginInfo));
+         }
       }
    }
 
@@ -857,7 +858,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       ${$VariableName} = array();
 
       foreach ($Lines as $Line) {
-         if ($InfoBuffer && substr(trim($Line), -2) == ');') {
+         if ($InfoBuffer && substr(trim($Line), -1) == ';') {
             $PluginInfoString .= $Line;
             $ClassBuffer = TRUE;
             $InfoBuffer = FALSE;

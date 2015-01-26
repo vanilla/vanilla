@@ -67,12 +67,12 @@ class Gdn_Theme {
       foreach ($Data as $Row) {
          $DataCount++;
 
-         if (Gdn::Request()->UrlCompare($Row['Url'], $DefaultRoute) === 0 && $HomeLinkFound) {
+         if ($HomeLinkFound && Gdn::Request()->UrlCompare($Row['Url'], $DefaultRoute) === 0) {
             continue; // don't show default route twice.
          } else {
             $HomeLinkFound = true;
          }
-         
+
          // Add the breadcrumb wrapper.
          if ($Count > 0) {
             $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
@@ -319,17 +319,33 @@ class Gdn_Theme {
 
    /**
     * Renders the banner logo, or just the banner title if the logo is not defined.
+    *
+    * @param array $Properties
     */
-   public static function Logo() {
+   public static function Logo($Properties = array()) {
       $Logo = C('Garden.Logo');
+
       if ($Logo) {
          $Logo = ltrim($Logo, '/');
+
          // Fix the logo path.
-         if (StringBeginsWith($Logo, 'uploads/'))
+         if (StringBeginsWith($Logo, 'uploads/')) {
             $Logo = substr($Logo, strlen('uploads/'));
+         }
+
+         // Set optional title text.
+         if (empty($Properties['title']) && C('Garden.LogoTitle')) {
+            $Properties['title'] = C('Garden.LogoTitle');
+         }
       }
+
+      // Use the site title as alt if none was given.
       $Title = C('Garden.Title', 'Title');
-      echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
+      if (empty($Properties['alt'])) {
+         $Properties['alt'] = $Title;
+      }
+
+      echo $Logo ? Img(Gdn_Upload::Url($Logo), $Properties) : $Title;
    }
 
    /**

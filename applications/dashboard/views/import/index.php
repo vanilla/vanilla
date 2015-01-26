@@ -5,7 +5,7 @@ $this->AddSideMenu();
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
-   echo '<li>', Anchor(T('Importing to Vanilla'), 'http://vanillaforums.com/porter'), '</li>';
+   echo '<li>', Anchor(T('Importing to Vanilla'), 'http://docs.vanillaforums.com/developers/importing/'), '</li>';
    echo '<li>', Anchor(T('The Vanilla 2 Exporter'), 'http://vanillaforums.org/addon/porter-core'), '</li>';
    echo '</ul>';
    ?>

@@ -157,17 +157,15 @@ class Gdn_Form extends Gdn_Pluggable {
       $Attributes['format'] = htmlspecialchars($Attributes['format']);
       $this->SetValue('Format', $Attributes['format']);
 
+      $Result = $this->TextBox($Column, $Attributes).$this->Hidden('Format');
+
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
       $this->EventArguments['Column'] = $Column;
       $this->EventArguments['Attributes'] = $Attributes;
-
-      $Result = '<div class="bodybox-wrap">';
       $this->EventArguments['BodyBox'] =& $Result;
       $this->FireEvent('BeforeBodyBox');
-      $Result .= $this->TextBox($Column, $Attributes).$this->Hidden('Format').
-         '</div>';
 
-      return $Result;
+      return '<div class="bodybox-wrap">'.$Result.'</div>';
    }
 
    /**
@@ -1929,6 +1927,18 @@ PASSWORDMETER;
    }
 
    /**
+    * Get form data array
+    *
+    * Returns an associative array containing all the pre-propulated field data
+    * for the current form.
+    *
+    * @return array
+    */
+   public function FormData() {
+      return $this->_DataArray;
+   }
+
+   /**
     * Gets the value associated with $FieldName from the sent form fields.
     * If $FieldName isn't found in the form, it returns $Default.
     *
@@ -2348,7 +2358,7 @@ PASSWORDMETER;
       if ($Valid === TRUE)
          return TRUE;
       else {
-         $this->AddError('@'.$Valid);
+         $this->AddError('@'.$Valid, $FieldName);
          return FALSE;
       }
 

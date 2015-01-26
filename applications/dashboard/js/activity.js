@@ -15,16 +15,6 @@ jQuery(document).ready(function($) {
       }
    });
 
-   // Reveal activity deletes on hover
-//   $('ul.Activities li').livequery(function() {
-//      $(this).find('a.Delete').hide();
-//      $(this).hover(function() {
-//         $(this).find('a.Delete').show();
-//      }, function() {
-//         $(this).find('a.Delete').hide();
-//      });
-//   });
-
 /* Comments */
 
    // Hide/reveal the comments when the comment link is clicked

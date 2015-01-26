@@ -6,8 +6,7 @@ $AllowEmbed = C('Garden.Embed.Allow');
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
-   echo Wrap(Anchor(T("Introducing Vanilla Comments"), 'http://vanillaforums.com/blog/news/introducing-vanilla-comments/'), 'li');
-   echo Wrap(Anchor(htmlspecialchars(T("Converting from the <Embed> Vanilla Plugin")), 'http://vanillaforums.com/blog/converting-embed-plugin/'), 'li');
+   echo Wrap(Anchor(T("Embedding Documentation"), 'http://docs.vanillaforums.com/features/embedding/'), 'li');
    echo '</ul>';
    ?>
 </div>
@@ -79,7 +78,7 @@ p.WarningMessage {
    <h1><?php echo T('Unviersal Forum Embed Code'); ?></h1>
    <div class="Info">
       <p><?php echo T('To embed your Vanilla forum into your web site, use the following code.'); ?></p>
-      <div class="CopyBox">&lt;script type="text/javascript" src="<?php echo Url('js/embed.js', TRUE); ?>">&lt;/script>
+      <div class="CopyBox">&lt;script type="text/javascript" src="<?php echo Asset('js/embed.js', TRUE); ?>">&lt;/script>
 &lt;noscript>Please enable JavaScript to view the &lt;a href="http://vanillaforums.com/?ref_noscript">discussions powered by Vanilla.&lt;/a>&lt;/noscript>
 &lt;div class="vanilla-credit">&lt;a class="vanilla-anchor" href="http://vanillaforums.com">Discussions by &lt;span class="vanilla-logo">Vanilla&lt;/span>&lt;/a>&lt;/div>
 </div>

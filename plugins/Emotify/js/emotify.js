@@ -39,6 +39,7 @@ jQuery(document).ready(function($) {
     
       // Hide emotify options when previewing
       frm.bind("PreviewLoaded", function(e, frm) {
+         frm = $(frm);
          frm.find('.EmotifyDropdown').removeClass('EmotifyDropdownActive');
          frm.find('.EmotifyDropdown').hide();
          frm.find('.EmoticonContainer').hide();
@@ -46,7 +47,7 @@ jQuery(document).ready(function($) {
     
       // Reveal emotify dropdowner when write button clicked
       frm.bind('WriteButtonClick', function(e, frm) {
-         frm.find('.EmotifyDropdown').show();
+         $(frm).find('.EmotifyDropdown').show();
       });
     
       // Hide emoticon box when textarea is focused

@@ -35,6 +35,10 @@ class Gdn_Format {
 
    public static $MentionsUrlFormat = '/profile/{name}';
 
+   protected static $SanitizedFormats = array(
+      'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
+   );
+
    /**
     * The ActivityType table has some special sprintf search/replace values in the
     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
@@ -258,6 +262,7 @@ class Gdn_Format {
             $Result = $BBCodeFormatter->Format($Mixed);
             $Result = Gdn_Format::Links($Result);
             $Result = Gdn_Format::Mentions($Result);
+	    $Result = Emoji::instance()->translateToHtml($Result);
 
             return $Result;
          }
@@ -279,7 +284,7 @@ class Gdn_Format {
                $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed2);
                $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si",'<s>\\1</s>',$Mixed2);
                $Mixed2 = preg_replace("#\[strike\](.*?)\[/strike\]#si",'<s>\\1</s>',$Mixed2);
-               $Mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si",'<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">\\1 said:</div><div class="QuoteText">\\3</div></blockquote>',$Mixed2);
+               $Mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si",'<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">'.sprintf(T('%s said:'), '\\1').'</div><div class="QuoteText">\\3</div></blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si",'<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si",'<blockquote class="Quote">\\1</blockquote>',$Mixed2);
                $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si",'\\1',$Mixed2);
@@ -583,6 +588,14 @@ class Gdn_Format {
 
       $FullFormat = T('Date.DefaultDateTimeFormat', '%c');
 
+      // Emulate %l and %e for Windows.
+      if (strpos($FullFormat, '%l') !== false) {
+          $FullFormat = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $FullFormat);
+      }
+      if (strpos($FullFormat, '%e') !== false) {
+          $FullFormat = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $FullFormat);
+      }
+
       $Result = strftime($FullFormat, $Timestamp);
 
       if ($Html) {
@@ -639,6 +652,7 @@ class Gdn_Format {
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
          $Mixed = self::Mentions($Mixed);
          $Mixed = self::Links($Mixed);
+	 $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
          return $Mixed;
       }
@@ -829,6 +843,7 @@ class Gdn_Format {
             $Mixed = Gdn_Format::Links($Mixed);
             // Mentions & Hashes
             $Mixed = Gdn_Format::Mentions($Mixed);
+	    $Mixed = Emoji::instance()->translateToHtml($Mixed);
 
             // nl2br
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
@@ -847,6 +862,7 @@ class Gdn_Format {
             $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
+	    $Result = Emoji::instance()->translateToHtml($Result);
             if(C('Garden.Format.ReplaceNewlines', TRUE)) {
                $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
                $Result = FixNl2Br($Result);
@@ -1091,6 +1107,8 @@ class Gdn_Format {
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
+      $TwitchUrlMatch = 'http://www.twitch.tv/([\w\d]+)';
+      $HitboxUrlMatch = 'http://www.hitbox.tv/([\w\d]+)';
 
       // Youtube
       if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)
@@ -1160,6 +1178,21 @@ EOT;
         && !C('Garden.Format.DisableUrlEmbeds')) {
          $Result = <<<EOT
 <iframe src="//embed.gettyimages.com/embed/{$Matches[2]}" width="{$Matches[3]}" height="{$Matches[4]}" frameborder="0" scrolling="no"></iframe>
+EOT;
+
+      // Twitch
+      } elseif (preg_match("`({$TwitchUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Twitch', true)
+        && !C('Garden.Format.DisableUrlEmbeds')) {
+         $Result = <<<EOT
+<object type="application/x-shockwave-flash" height="378" width="620" id="live_embed_player_flash" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel={$Matches[2]}" bgcolor="#000000"><param name="allowFullScreen" value="true" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf" /><param name="flashvars" value="hostname=www.twitch.tv&channel={$Matches[2]}&auto_play=true&start_volume=25" /></object><a href="http://www.twitch.tv/{$Matches[2]}" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline; text-align:center;">Watch live video from {$Matches[2]} on www.twitch.tv</a>
+EOT;
+
+      //Hitbox
+      } elseif (preg_match("`({$HitboxUrlMatch})`i", $Url, $Matches) && C('Garden.Format.Hitbox', true)
+        && !C('Garden.Format.DisableUrlEmbeds')) {
+         $Result = <<<EOT
+	 <iframe width="640" height="360" src="http://hitbox.tv/#!/embed/{$Matches[2]}" frameborder="0" allowfullscreen></iframe>
+<a href="http://www.hitbox.tv/{$Matches[2]}" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline; text-align:center;">Watch live video from {$Matches[2]} on www.hitbox.tv</a>
 EOT;
 
       // Unformatted links
@@ -1256,11 +1289,12 @@ EOT;
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
          } else {
-            require_once(PATH_LIBRARY.'/vendors/markdown/markdown.php');
-            $Mixed = Markdown($Mixed);
+            require_once(PATH_LIBRARY.'/core/class.markdown.php');
+            $Mixed = MarkdownVanilla::defaultTransform($Mixed);
             $Mixed = $Formatter->Format($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
+	    $Mixed = Emoji::instance()->translateToHtml($Mixed);
             return $Mixed;
          }
       }
@@ -1420,6 +1454,7 @@ EOT;
       $Str = self::Text($Str);
       $Str = self::Links($Str);
       $Str = self::Mentions($Str);
+      $Str = Emoji::instance()->translateToHtml($Str);
       return $Str;
    }
 
@@ -1432,11 +1467,9 @@ EOT;
     * @return mixed
     */
    public static function To($Mixed, $FormatMethod) {
-      if ($FormatMethod == '')
-         return $Mixed;
-
+      // Process $Mixed based on its type.
       if (is_string($Mixed)) {
-         if (method_exists('Gdn_Format', $FormatMethod)) {
+         if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
             $Mixed = self::$FormatMethod($Mixed);
          } elseif (function_exists('format'.$FormatMethod)) {
             $FormatMethod = 'format'.$FormatMethod;
@@ -1678,6 +1711,8 @@ EOT;
          $Mixed = Gdn_Format::Links($Mixed);
          // Mentions & Hashes
          $Mixed = Gdn_Format::Mentions($Mixed);
+	 $Mixed = Emoji::instance()->translateToHtml($Mixed);
+
 
          return $Mixed;
       }

@@ -69,7 +69,7 @@ Vanilla is built to be simple, and its installation is no exception.
 Follow these steps to upgrade Vanilla when a new stable release is announced.
 
 
-* Backup your database and `conf/config.php` file somewhere safe.
+* Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
 * Go to `yourforum.com/index.php?p=/utility/update` to force any updates needed.
 * If it fails, try it a second times by refreshing the page.
@@ -98,10 +98,11 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 ## Contributing
 
 * Troubleshoot issues you run into on the community forum so everyone can help & reference it later.
-* Got an idea or suggestion? Use the forum to discuss it.
-* File detailed issues on GitHub (version number, what you did, and actual vs expected outcomes).
-* Sign the Contributors' Agreement to send us code.
-* Use pull requests against the correct release.
+* Got an idea or suggestion? Use the [forum](http://vanillaforums.org/discussions) to discuss it.
+* File detailed [issues](https://github.com/vanilla/vanilla/issues) on GitHub (version number, what you did, and actual vs expected outcomes).
+* Sign the [Contributors' Agreement](http://vanillaforums.org/contributors) to send us code.
+* Use pull requests against the correct release (currently `stage` for most changes).
+* Keep our to-do list fresh by reviewing our open issues for resolved or duplicated items.
 
 ## Version Control Strategy
 
@@ -119,6 +120,12 @@ All open source releases (included pre-releases) are tagged.
 After `2.1`, we will be leap-frogging version numbers between `master` and releases.
 Releases will receive the next odd-point number and `master` will then jump to the next even-point number.
 Therefore, the next open source release after 2.1 will be 2.3. When the 2.3 beta begins, `master` will move to 2.4.
+
+## Reporting Security Issues
+
+Please disclose security issues responsibly by emailing support@vanillaforums.com with a full description.
+We'll work on releasing an updated version as quickly as possible.
+Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
 ## Legal Stuff
 Copyright &copy; 2009-2014 Vanilla Forums Inc.

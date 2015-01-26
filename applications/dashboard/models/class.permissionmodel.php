@@ -90,6 +90,7 @@ class PermissionModel extends Gdn_Model {
       $this->ClearPermissions();
       if ($this->Schema) {
          // Redefine the schema if it has been defined to reflect the permissions that were just added.
+         $this->Schema = NULL;
          $this->DefineSchema();
       }
    }

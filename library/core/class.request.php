@@ -363,7 +363,7 @@ class Gdn_Request {
       } elseif (isset($_SERVER['HTTP_HOST'])) {
          $Host = $_SERVER['HTTP_HOST'];
       } else {
-         $Host = $_SERVER['SERVER_NAME'];
+         $Host = val('SERVER_NAME', $_SERVER);
       }
 
       // The host can have the port passed in, remove it here if it exists

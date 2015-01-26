@@ -422,7 +422,7 @@ class Emoji {
    }
 
    public function hasEditorList() {
-      $editorList = $this->getEmojiEditorList();
+      $editorList = $this->getEditorList();
       return !empty($editorList);
    }
 
@@ -433,7 +433,7 @@ class Emoji {
     */
    public function setEmojiEditorList($value) {
       Deprecated('setEmojiEditorList', 'setEditorList');
-      return $this->setEditorList;
+      return $this->setEditorList($value);
    }
 
 
@@ -568,7 +568,7 @@ class Emoji {
       }
 
       if (array_key_exists('editor', $manifest)) {
-         $this->setEmojiEditorList($manifest['editor']);
+         $this->setEditorList($manifest['editor']);
       }
    }
 

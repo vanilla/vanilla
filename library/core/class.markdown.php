@@ -23,6 +23,7 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
       );
       $this->span_gamut += array(
 			"doStrikeout"     => 15,
+			"doSoftBreaks"    => 80,
       );
       parent::__construct();
    }
@@ -148,4 +149,19 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
       }
       return $this->hashPart("<code>$code</code>");
    }
+
+   /**
+    * Implement soft line breaks.
+    *
+    * @param $text
+    * @return mixed
+    */
+   protected function doSoftBreaks($text) {
+		# Do hard breaks:
+		return preg_replace_callback('/\n{1}/',
+			array($this, '_doSoftBreaks_callback'), $text);
+	}
+	protected function _doSoftBreaks_callback($matches) {
+		return $this->hashPart("<br$this->empty_element_suffix\n");
+	}
 }

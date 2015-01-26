@@ -899,26 +899,29 @@ class Gdn_Autoloader_Map {
       return $this->MapInfo['maptype']; //GetValue('maptype', $this->MapInfo);
    }
    
-    /**
-    * Try to fix path that has backslash in Windows OS
+   /**
+    * Fix path with backslash for Windows OS.
     *
-    * @path string 
+    * @param string $path
     * @return string
     *
     * Check to see if the path is not empty and if it is not in a form of drive: then replace any "\" with "/" to avoid 
     * the parse_fn_file bug and it also further check to see if it has only one "/" and the OS is "WIN" then it will prepend "/" 
     * in front of the path so it has the correct file path.
-    *  
     */
-    function fixBackSlash($path) {
-        if (!empty($path) and !preg_match('/[A-Za-z]\:/',$path)) {
-            $path = str_replace("\\", "/", $path);  // convert to / to avoid parse_in_file create array with missing \
-            if (preg_match('/^\/{1}\w/',$path)==TRUE and (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')) { // for some reason there is only 1 / then add / to have a valid network path
-                $path = "/" . $path;
-            }
-        }
-        return $path;
-    }
+   function fixBackSlash($path) {
+      if (!empty($path) && !preg_match('/[A-Za-z]\:/', $path)) {
+         // Convert to slash to avoid parse_in_file create array with missing backslash.
+         $path = str_replace("\\", "/", $path);
+
+         // If there is only 1 slash, add another to have a valid network path.
+         if (preg_match('/^\/{1}\w/', $path) == TRUE && (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')) {
+            $path = "/".$path;
+         }
+      }
+
+      return $path;
+   }
 
    public function Shutdown() {
 
@@ -935,7 +938,7 @@ class Gdn_Autoloader_Map {
       foreach ($this->Map as $SplitTopic => $TopicFiles) {
          $MapContents .= "[{$SplitTopic}]\n";
          foreach ($TopicFiles as $ClassName => $Location)
-          $Location = $this->fixBackSlash($Location);               
+            $Location = $this->fixBackSlash($Location);
             $MapContents .= "{$ClassName} = \"{$Location}\"\n";
       }
 

@@ -1490,7 +1490,9 @@ jQuery(document).ready(function($) {
          return {'name': i, 'filename': value, 'basename': parts[0], 'ext': '.'+parts[1]};
       });
       var emojiTemplate = (emoji.format  || '')
-         .replace(/{(.+?)}/, '$${$1}')
+         .replace(/{(.+?)}/g, '$${$1}')
+         .replace('%1$s', '${src}')
+         .replace('%2$s', '${name}')
          .replace('${src}', emoji.assetPath+'/${filename}')
          .replace('${dir}', emoji.assetPath);
       emojiTemplate = '<li data-value=":${name}:" class="at-suggest-emoji"><span class="emoji-wrap">'+emojiTemplate+'</span> <span class="emoji-name">${name}</span></li>';

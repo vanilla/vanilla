@@ -28,14 +28,6 @@ class EmotifyPlugin implements Gdn_IPlugin {
    public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
    }
-   
-	/**
-	 * Surpress Emoji rendering and autocomplete.
-	 */
-   	public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
-		SaveToConfig('Garden.EmojiSet', 'none', false);
-		Emoji::instance()->setFromManifest(['emoji' => []]);
-	}
 	
 	/**
 	 * Replace emoticons in comments.

@@ -115,8 +115,15 @@ class PostController extends VanillaController {
          $Category = CategoryModel::Categories($this->CategoryID);
       } else if ($CategoryUrlCode != '') {
          $CategoryModel = new CategoryModel();
-         $Category = $CategoryModel->GetByCode($CategoryUrlCode);
-         $this->CategoryID = $Category->CategoryID;
+         if (is_numeric($CategoryUrlCode)) {
+            $Category = CategoryModel::Categories($CategoryUrlCode);
+         } else {
+            $Category = $CategoryModel->GetByCode($CategoryUrlCode);
+         }
+
+         if ($Category) {
+            $this->CategoryID = val('CategoryID', $Category);
+         }
 
       }
       if ($Category) {

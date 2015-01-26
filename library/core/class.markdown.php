@@ -52,7 +52,7 @@ class MarkdownVanilla extends Michelf\MarkdownExtra {
     * @return string HTML.
     */
 	protected function _doStrikeout_callback($matches) {
-		return "<s>".$this->runSpanGamut($matches[1])."</s>";
+		return $this->hashPart("<s>".$this->runSpanGamut($matches[1])."</s>");
 	}
 
    /**

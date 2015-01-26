@@ -322,25 +322,22 @@ class Emoji {
 
    /**
     * Populate this with any aliases required for plugin, make sure they point
-    * to canonical translation, and plugin will add everything to dropdown that
+    * to canonical translation, and plugin will add everything to drop down that
     * is listed. To expand, simply define more aliases that corresponded with
     * canonical list.
     *
-    * Note: some aliases require htmlentities filtering, which is done directly
-    * before output in the dropdown, and while searching for the string to
+    * Note: some aliases require {@link htmlentities()} filtering, which is done directly
+    * before output in the drop down, and while searching for the string to
     * replace in the regex, NOT here. The reason for this is so the alias
-    * list does not get littered with characters entity encodings like &lt;,
+    * list does not get littered with characters entity encodings like `&lt;`,
     * which makes it difficult to immediately know what the aliases do. Also,
-    * htmlentities would have to be revered in areas such as title attributes,
+    * {@link htmlentities} would have to be revered in areas such as title attributes,
     * which counteracts the usefulness of having it done here.
     *
-    * @param string $emojiAlias Optional string to return matching translation
-    * @return string|array Canonical translation or full alias array
+    * @return array Returns an array of alias to emoji name entries.
     */
-   public function getAliases($emojiAlias = '') {
-      return (!$emojiAlias)
-         ? $this->aliases
-         : $this->aliases[$emojiAlias];
+   public function getAliases() {
+      return $this->aliases;
    }
 
    /**
@@ -472,13 +469,14 @@ class Emoji {
    }
 
    /**
+    * Set the aliases array.
     *
-    * @param array $aliases
+    * @param array $aliases The new aliases array.
+    * @return Emoji Returns $this for fluent calls.
     */
    public function setAliases($aliases) {
-      if (count(array_filter($aliases))) {
-         $this->aliases = $aliases;
-      }
+      $this->aliases = $aliases;
+      return $this;
    }
 
    /**

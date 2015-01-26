@@ -341,7 +341,13 @@ class Gdn_Request {
       $this->_EnvironmentElement('ConfigWebRoot', Gdn::Config('Garden.WebRoot'));
       $this->_EnvironmentElement('ConfigStripUrls', Gdn::Config('Garden.StripWebRoot', FALSE));
 
-      $Host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? val('HTTP_X_FORWARDED_HOST',$_SERVER) : (isset($_SERVER['HTTP_HOST']) ? val('HTTP_HOST',$_SERVER) : val('SERVER_NAME',$_SERVER));
+      if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+         $Host = val('HTTP_X_FORWARDED_HOST', $_SERVER);
+      } elseif (isset($_SERVER['HTTP_HOST'])) {
+         $Host = val('HTTP_HOST', $_SERVER);
+      } else {
+         $Host = val('SERVER_NAME', $_SERVER);
+      }
 
       // The host can have the port passed in, remove it here if it exists
       $Host = explode(':', $Host, 2);

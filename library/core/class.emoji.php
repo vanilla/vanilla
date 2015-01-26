@@ -278,6 +278,12 @@ class Emoji {
             );
          }
 
+         $emoji = array(
+            'assetPath' => Asset($this->getAssetPath()),
+            'format' => $this->getFormat(),
+            'emoji' => $this->getEmoji()
+         );
+
          $c->AddDefinition('emoji', $emoji);
       }
 
@@ -483,7 +489,7 @@ class Emoji {
     */
    public function img($emoji_path, $emoji_name) {
       $dir = Asset(dirname($emoji_path));
-      $filename = basename($emoji_name);
+      $filename = basename($emoji_path);
       $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
       $basename = basename($filename, $ext);
       $src = Asset($emoji_path);

@@ -455,20 +455,6 @@ class Emoji {
    }
 
    /**
-    * This is useful in case the custom set should be merged with the default
-    * set. Any custom emoji tags that match the default will overwrite the
-    * default.
-    *
-    * TODO: this will require the original assetPath to be stored if it's been
-    * overwritten.
-    *
-    * @param array $additionEmoji
-    */
-   public function mergeAdditionalEmoji($additionEmoji) {
-      return array_merge($this->emoji, $additionEmoji);
-   }
-
-   /**
     * Set the aliases array.
     *
     * @param array $aliases The new aliases array.

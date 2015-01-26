@@ -48,7 +48,7 @@ class UtilityController extends DashboardController {
    }
 
    public function Rack() {
-      header('Content-Type: application/json; charset=UTF-8');
+      safeHeader('Content-Type: application/json; charset=utf-8');
       date_default_timezone_set('America/Montreal');
 
       $keys = array('REQUEST_METHOD', 'SCRIPT_NAME', 'PATH_INFO', 'SERVER_NAME', 'SERVER_PORT', 'HTTP_ACCEPT', 'HTTP_ACCEPT_LANGUAGE', 'HTTP_ACCEPT_CHARSET', 'HTTP_USER_AGENT', 'HTTP_REMOTE_ADDR');

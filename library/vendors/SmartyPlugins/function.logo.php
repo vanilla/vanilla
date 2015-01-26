@@ -12,11 +12,30 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * Writes the site logo to the page.
  *
- * @param array The parameters passed into the function. This currently takes no parameters.
+ * @param array The parameters passed into the function.
  * @param Smarty The smarty object rendering the template.
- * @return The url.
+ * @return The HTML img tag or site title if no logo is set.
  */
 function smarty_function_logo($Params, &$Smarty) {
-   $Result = Gdn_Theme::Logo('Title');
+   $Options = array();
+
+   // Whitelist params to be passed on.
+   if (isset($Params['alt'])) {
+      $Options['alt'] = $Params['alt'];
+   }
+   if (isset($Params['class'])) {
+      $Options['class']  = $Params['class'];
+   }
+   if (isset($Params['title'])) {
+      $Options['title']  = $Params['title'];
+   }
+   if (isset($Params['height'])) {
+      $Options['height'] = $Params['height'];
+   }
+   if (isset($Params['width'])) {
+      $Options['width']  = $Params['width'];
+   }
+
+   $Result = Gdn_Theme::Logo($Options);
 	return $Result;
 }

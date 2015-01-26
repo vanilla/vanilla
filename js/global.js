@@ -1086,6 +1086,11 @@ jQuery(document).ready(function($) {
       setInterval(pingForNotifications, 60000);
    }
 
+   // Clear notifications alerts when they are accessed anywhere.
+   $(document).on('click', '.js-clear-notifications', function() {
+      $('.NotificationsAlert').remove();
+   });
+
 	// Stash something in the user's session (or unstash the value if it was not provided)
 	stash = function(name, value, callback) {
 		$.ajax({
@@ -1565,7 +1570,7 @@ jQuery(document).ready(function($) {
                      // Produce the suggestions based on data either
                      // cached or retrieved.
                      if (filter_more && !empty_query  && !gdn.atcache[query]) {
-                        $.getJSON('/user/tagsearch', {"q": query, "limit": server_limit}, function(data) {
+                        $.getJSON(gdn.url('/user/tagsearch'), {"q": query, "limit": server_limit}, function(data) {
                            callback(data);
 
                            // If data is empty, cache the results to prevent
@@ -1719,7 +1724,6 @@ jQuery(document).ready(function($) {
                   }
                }
             },
-            display_timeout: 0,
             cWindow: iframe_window
          })
          .atwho({

@@ -140,12 +140,12 @@ class Gdn_Statistics extends Gdn_Plugin {
     */
    public function Check() {
       // If we're hitting an exception app, short circuit here
-      if (!self::CheckIsAllowed()) {
+      if (!self::CheckIsEnabled()) {
          return;
       }
       Gdn::Controller()->AddDefinition('AnalyticsTask', 'tick');
 
-      if (self::CheckIsEnabled()) {
+      if (self::CheckIsAllowed()) {
          // At this point there is nothing preventing stats from working, so queue a tick.
          Gdn::Controller()->AddDefinition('TickExtra', $this->GetEncodedTickExtra());
       }

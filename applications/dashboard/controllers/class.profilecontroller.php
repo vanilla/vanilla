@@ -356,7 +356,7 @@ class ProfileController extends Gdn_Controller {
       $this->FireEvent('BeforeEdit');
 
       // If seeing the form for the first time...
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $this->Form->SetFormValue('UserID', $UserID);
 
          if (!$CanEditUsername)
@@ -694,7 +694,7 @@ class ProfileController extends Gdn_Controller {
       }
 
       // Get user data & prep form.
-      if ($this->Form->IsPostBack() && $this->Form->GetFormValue('UserID')) {
+      if ($this->Form->AuthenticatedPostBack() && $this->Form->GetFormValue('UserID')) {
          $UserID = $this->Form->GetFormValue('UserID');
       }
       $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
@@ -778,7 +778,7 @@ class ProfileController extends Gdn_Controller {
 
       $this->Form->InputPrefix = '';
 
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $Data = $this->Form->FormValues();
          Gdn::UserModel()->SavePreference(Gdn::Session()->UserID, $Data);
       } else {
@@ -1281,6 +1281,10 @@ class ProfileController extends Gdn_Controller {
             $Module->AddLink('Options', Sprite('SpThumbnail').' '.T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), array('Garden.Users.Edit','Moderation.Profiles.Edit'), array('class' => 'ThumbnailLink'));
          }
       } else {
+         if (hasEditProfile($this->User->UserID)) {
+            $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
+         }
+
          // Add profile options for the profile owner
          // Don't allow account editing if it has been turned off.
          // Don't allow password editing if using SSO Connect ONLY.
@@ -1291,8 +1295,6 @@ class ProfileController extends Gdn_Controller {
          // Vanilla's login form regardless of the state of their membership in the
          // external app.
          if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
-            $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
-
             // No password may have been set if they have only signed in with a connect plugin
             $PasswordLabel = T('Change My Password');
             if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla")

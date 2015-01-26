@@ -131,6 +131,7 @@ class MessageModel extends Gdn_Model {
          ->Where('Enabled', '1')
          ->BeginWhereGroup()
          ->WhereIn('Controller', $Exceptions)
+         ->OrOp()
          ->BeginWhereGroup()
          ->OrWhere('Application', $Application)
          ->Where('Controller', $Controller)

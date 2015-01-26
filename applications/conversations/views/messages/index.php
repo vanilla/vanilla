@@ -3,9 +3,9 @@
 <h1 class="H">
    <?php
    echo $this->Participants;
-   
+
    if ($this->Data('Conversation.Subject')) {
-      echo 
+      echo
          Bullet(' ').
          '<span class="Gloss">' .htmlspecialchars($this->Data('Conversation.Subject')).'</span>';
    }
@@ -30,6 +30,6 @@ echo $this->Pager->ToString('less');
    ?>
 </ul>
 </div>
-<?php 
+<?php
 echo $this->Pager->ToString();
 echo Gdn::Controller()->FetchView('addmessage');

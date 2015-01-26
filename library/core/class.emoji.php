@@ -53,11 +53,11 @@ class Emoji {
    protected $editorList;
 
    /**
-    * This array contains all of the emoji avaliable in the system. The array
-    * is in the following format:
+    * This array contains all of the emoji avaliable in the system. The array is in the following format:
+    *
     * ~~~
     * array (
-    *     'emoji_name' => array('filename.png', 'misc info'...)
+    *     'emoji_name' => 'filename.png'
     * )
     * ~~~
     *

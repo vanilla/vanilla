@@ -287,21 +287,6 @@ class Emoji {
    }
 
    /**
-    * Callback method for buildHiddenAliasListFromCanonicalList.
-    *
-    * Array passed as reference, to be used in above method,
-    * buildHiddenAliasListFromCanonicalLi, when calling array_walk withthis
-    * callback, which requires that the method as callback also specify object
-    * it belongs to.
-    *
-    * @param string $val Reference to passed array value
-    * @param string $key Reference to passed array key
-    */
-   public function buildAliasFormat(&$val, $key) {
-      $val = ":$val:";
-   }
-
-   /**
     * Provide this method with the official emoji filename and it will return
     * the correct path.
     *
@@ -324,24 +309,6 @@ class Emoji {
       }
 
       return $filePath . '/' . $emojiFileName;
-   }
-
-   /**
-    * This is to easily match the array of the visible alias list that all
-    * users will be able to select from. Call the mergeAliasAndEmojiLists()
-    * method to merge this array with the alias list, which will then be easy
-    * to loop through all the possible emoji displayable in the forum.
-    *
-    * An alias is [:)]=>[smile], and canonical alias is [:smile:]=>[smile]
-    *
-    * @return array Returns array that matches format of original alias list
-    */
-   public function buildHiddenAliasListFromCanonicalList() {
-      $caonicalListEmojiNamesCanonical = array_keys($this->getEmoji());
-      $caonicalListEmojiNamesAliases = $caonicalListEmojiNamesCanonical;
-      array_walk($caonicalListEmojiNamesAliases, array($this, 'buildAliasFormat'));
-
-      return array_combine($caonicalListEmojiNamesAliases, $caonicalListEmojiNamesCanonical);
    }
 
    /**
@@ -488,19 +455,6 @@ class Emoji {
          );
 
       return $img;
-   }
-
-   /**
-    * This is in case you want to merge the alias list with the canonical list
-    * and easily loop through the entire possible set of translations to
-    * perform in, for example, the translateToHtml() method, which
-    * loops through all the visible emojis, and the hidden canonical ones.
-    *
-    * @return array Returns array of alias list and canonical list, easily
-    *               loopable.
-    */
-   public function mergeAliasAndEmojiLists() {
-      return array_merge($this->getEmojiEditorList(), $this->buildHiddenAliasListFromCanonicalList());
    }
 
    /**

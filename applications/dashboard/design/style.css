@@ -386,7 +386,7 @@ textarea.TextBox {
 	width: auto;
 }
 .TextBoxWrapper textarea,
-.TextBoxWrapper input {
+.TextBoxWrapper input:not([type=radio]):not([type=checkbox]) {
    width: 100%;
    display: block;
 }

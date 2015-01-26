@@ -1605,7 +1605,7 @@ PASSWORDMETER;
       } elseif(is_a($Error, 'Exception')) {
          // Strip the extra information out of the exception.
          $Parts = explode('|', $Error->getMessage());
-         $Message = $Parts[0];
+         $Message = htmlspecialchars($Parts[0]);
          if (count($Parts) >= 3)
             $FileSuffix = ": {$Parts[1]}->{$Parts[2]}(...)";
          else
@@ -1615,10 +1615,10 @@ PASSWORDMETER;
             $ErrorCode = '@<pre>'.
                $Message."\n".
                '## '.$Error->getFile().'('.$Error->getLine().")".$FileSuffix."\n".
-               $Error->getTraceAsString().
+               htmlspecialchars($Error->getTraceAsString()).
                '</pre>';
          } else {
-            $ErrorCode = '@'.strip_tags($Error->getMessage());
+            $ErrorCode = '@'.htmlspecialchars(strip_tags($Error->getMessage()));
          }
       }
 

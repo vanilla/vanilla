@@ -4248,6 +4248,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
    cursor: pointer;
    padding: 0 5px;
+   line-height: 34px;
 }
 
 .atwho-view ul li:last-child {

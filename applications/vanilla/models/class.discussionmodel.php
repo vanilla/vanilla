@@ -1525,7 +1525,7 @@ class DiscussionModel extends VanillaModel {
 
             if ($DiscussionID > 0) {
                // Updating
-               $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+               $Stored = $this->GetID($DiscussionID, DATASET_TYPE_OBJECT);
 
                // Block Format change if we're forcing the formatter.
                if (C('Garden.ForceInputFormatter')) {
@@ -1692,7 +1692,7 @@ class DiscussionModel extends VanillaModel {
 
             // Get CategoryID of this discussion
 
-            $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+            $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_OBJECT);
             $CategoryID = GetValue('CategoryID', $Discussion, FALSE);
 
             // Update discussion counter for affected categories.

@@ -1665,7 +1665,7 @@ jQuery(document).ready(function($) {
 
                   // The last character prevents the matcher from trigger
                   // on nearly everything.
-                  return insert + hidden_unicode_chars.zwnj;
+                  return insert;
                },
 
                // Custom highlighting to accept spaces in names. This is

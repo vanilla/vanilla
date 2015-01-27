@@ -257,6 +257,10 @@ class Emoji {
          '>:)'         => 'naughty'
       );
 
+      if (C('Garden.EmojiSet') === 'none') {
+         $this->enabled = false;
+      }
+
       Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');
 
       // Add emoji to definition list for whole site. This used to be in the
@@ -268,7 +272,7 @@ class Emoji {
       // suggestions for emoji yet, but keep here for whenever Advanced Editor
       // is running.
       $c = Gdn::Controller();
-      if ($c) {
+      if ($c && $this->enabled) {
          $emojis = $this->getEmoji();
          $emojiAssetPath = $this->getAssetPath();
          $emoji = array();
@@ -287,10 +291,6 @@ class Emoji {
          );
 
          $c->AddDefinition('emoji', $emoji);
-      }
-
-      if(C('Garden.EmojiSet') === 'none') {
-         $this->enabled = false;
       }
    }
 
@@ -429,7 +429,7 @@ class Emoji {
     */
    public function hasEditorList() {
       $editorList = $this->getEditorList();
-      return !empty($editorList);
+      return $this->enabled && !empty($editorList);
    }
 
    /**

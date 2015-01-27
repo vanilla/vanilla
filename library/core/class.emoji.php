@@ -203,7 +203,8 @@ class Emoji {
       // Initialize the alias list. (emoticons)
       $this->aliases = array(
          ':)'          => 'smile',
-         ':D'          => 'smiley',
+         ':D'          => 'lol',
+         '=)'          => 'smiley',
          ':('          => 'frowning',
          ';)'          => 'wink',
          ':\\'         => 'confused',
@@ -239,7 +240,7 @@ class Emoji {
 
       $this->editorList = array(
          ':)'          => 'smile',
-         ':D'          => 'smiley',
+         ':D'          => 'lol',
          ':('          => 'disappointed',
          ';)'          => 'wink',
          ':\\'         => 'confused',

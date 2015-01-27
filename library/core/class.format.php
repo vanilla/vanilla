@@ -1318,12 +1318,12 @@ EOT;
          if (is_null($Formatter)) {
             return Gdn_Format::Display($Mixed);
          } else {
-            require_once(PATH_LIBRARY.'/core/class.markdown.php');
-            $Mixed = MarkdownVanilla::defaultTransform($Mixed);
+            require_once(PATH_LIBRARY.'/vendors/markdown/Michelf/MarkdownExtra.inc.php');
+            $Mixed = \Michelf\MarkdownExtra::defaultTransform($Mixed);
             $Mixed = $Formatter->Format($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
-	    $Mixed = Emoji::instance()->translateToHtml($Mixed);
+            $Mixed = Emoji::instance()->translateToHtml($Mixed);
             return $Mixed;
          }
       }

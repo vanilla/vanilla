@@ -130,7 +130,7 @@ class Emoji {
         'sweat_smile'                  => 'sweat_smile.png',
         'lol'                          => 'lol.png',
         'innocent'                     => 'innocent.png',
-        'smiling_imp'                  => 'smiling_imp.png',
+        'naughty'                      => 'naughty.png',
         'yum'                          => 'yum.png',
         'relieved'                     => 'relieved.png',
         'love'                         => 'love.png',
@@ -220,7 +220,7 @@ class Emoji {
          'o:)'         => 'innocent',
          '<3'          => 'heart',
          '(*)'         => 'star',
-         '>:)'         => 'smiling_imp'
+         '>:)'         => 'naughty'
        );
 
       $this->archive = array(
@@ -230,6 +230,7 @@ class Emoji {
          'grinning'                       => 'grin.png',
          'heart_eyes'                     => 'love.png',
          'neutral_face'                   => 'neutral.png',
+         'smiling_imp'                    => 'naughty.png',
          'sob'                            => 'bawling.png',
          'stuck_out_tongue'               => 'tongue.png',
          'stuck_out_tongue_winking_eye'   => 'stuck_out_tongue_winking_eye.png',
@@ -252,7 +253,7 @@ class Emoji {
          'o:)'         => 'innocent',
          '<3'          => 'heart',
          '(*)'         => 'star',
-         '>:)'         => 'smiling_imp'
+         '>:)'         => 'naughty'
       );
 
       Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');

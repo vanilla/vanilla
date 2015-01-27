@@ -1947,7 +1947,7 @@ blockquote {
 
 .emoji {
    margin-top: -2px;
-   margin-bottom: -2px; /* account for image padding */
+   margin-bottom: -3px; /* account for image padding */
 }
 
 blockquote.Quote, blockQuote.UserQuote {

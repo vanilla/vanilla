@@ -293,28 +293,14 @@ class Emoji {
    }
 
    /**
-    * Provide this method with the official emoji filename and it will return
-    * the correct path.
+    * This method is deprecated. See {@link Emoji::getEmojiPath()}.
     *
-    * @param string $emojiName File name of emoji icon.
-    * @return string Root-relative path.
+    * @param string $emojiName
+    * @return string
     */
-   public function buildFilePath($emojiName) {
-
-      // By default, just characters will be outputted (img alt text)
-      $filePath = $emojiFileName = '';
-
-      if (isset($this->emoji[$emojiName])) {
-         $filePath = $this->assetPath;
-         $emojiFileName = $this->emoji[$emojiName];
-      } elseif (isset($this->archive[$emojiName])) {
-         $filePath = $this->assetPath;
-         $emojiFileName = $this->archive[$emojiName];
-      } else {
-         return '';
-      }
-
-      return $filePath . '/' . $emojiFileName;
+   public function buildEmojiPath($emojiName) {
+      Deprecated('buildEmojiPath', 'getEmojiPath');
+      return $this->getEmojiPath($emojiName);
    }
 
    /**
@@ -394,22 +380,11 @@ class Emoji {
     * names visit http://www.emoji-cheat-sheet.com/ and for the original image
     * files being used, visit https://github.com/taninamdar/Apple-Color-Emoji
     *
-    * Note: every canonical emoji name points to an array of strings. This
-    * string is ordered CurrentName, OriginalName. Due to the reset()
-    * before returning the filename, the first element in the array will be
-    * returned, so in this instance CurrentName will be returned. The second,
-    * OriginalName, does not have to be written. If ever integrating more emoji
-    * files from Apple-Color-Emoji, and wanting to rename them from numbered
-    * files, use emojirename.php located in design/images/emoji/.
-    *
-    * @param type $emojiCanonical Optional string to return matching file name.
     * @return string|array File name or full canonical array
     */
-   public function getEmoji($emojiCanonical = '') {
+   public function getEmoji() {
       // Return first value from canonical array
-      return (!$emojiCanonical)
-         ? $this->emoji
-         : $this->buildFilePath($emojiCanonical);
+      return $this->emoji;
    }
 
    /**
@@ -421,6 +396,35 @@ class Emoji {
       return $this->getEditorList();
    }
 
+   /**
+    * Provide this method with the official emoji filename and it will return the correct path.
+    *
+    * @param string $emojiName File name of emoji icon.
+    * @return string Root-relative path.
+    */
+   public function getEmojiPath($emojiName) {
+
+      // By default, just characters will be outputted (img alt text)
+      $filePath = $emojiFileName = '';
+
+      if (isset($this->emoji[$emojiName])) {
+         $filePath = $this->assetPath;
+         $emojiFileName = $this->emoji[$emojiName];
+      } elseif (isset($this->archive[$emojiName])) {
+         $filePath = $this->assetPath;
+         $emojiFileName = $this->archive[$emojiName];
+      } else {
+         return '';
+      }
+
+      return $filePath . '/' . $emojiFileName;
+   }
+
+   /**
+    * Checks whether or not the emoji has an editor list.
+    *
+    * @return bool Returns true if there is an editor list or false otherwise.
+    */
    public function hasEditorList() {
       $editorList = $this->getEditorList();
       return !empty($editorList);
@@ -594,7 +598,7 @@ class Emoji {
 
       // Loop through and apply changes to all visible aliases from dropdown
 		foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
-         $emojiFilePath  = $this->getEmoji($emojiCanonical);
+         $emojiFilePath  = $this->getEmojiPath($emojiCanonical);
 
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
 				$Text = preg_replace(
@@ -612,7 +616,7 @@ class Emoji {
 
       $Text = preg_replace_callback("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function($m) use ($emoji) {
          $emoji_name = trim($m[1], ':');
-         $emoji_path = $emoji->getEmoji($emoji_name);
+         $emoji_path = $emoji->getEmojiPath($emoji_name);
          if ($emoji_path) {
             return $emoji->img($emoji_path, $emoji->ldelim.$emoji_name.$emoji->rdelim);
          } else {

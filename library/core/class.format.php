@@ -1323,7 +1323,7 @@ EOT;
             $Mixed = $Formatter->Format($Mixed);
             $Mixed = Gdn_Format::Links($Mixed);
             $Mixed = Gdn_Format::Mentions($Mixed);
-	         $Mixed = Emoji::instance()->translateToHtml($Mixed);
+            $Mixed = Emoji::instance()->translateToHtml($Mixed);
             return $Mixed;
          }
       }

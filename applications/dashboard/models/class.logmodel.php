@@ -452,14 +452,38 @@ class LogModel extends Gdn_Pluggable {
          return;
 
       $In = implode(',', array_keys($DiscussionIDs));
-      if (empty($In))
-         return;
-      
-      $Px = Gdn::Database()->DatabasePrefix;
-      $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
-      Gdn::Database()->Query($Sql);
+      if (!empty($In)) {
 
-      $this->_RecalcIDs['Discussion'] = array();
+         $Px = Gdn::Database()->DatabasePrefix;
+         $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
+         Gdn::Database()->Query($Sql);
+         $this->_RecalcIDs['Discussion'] = array();
+      }
+
+      $UserIDsComment = $this->_RecalcIDs['UserComment'];
+
+      $In = implode(',', array_keys($UserIDsComment));
+      if (!empty($In)) {
+
+         $Px = Gdn::Database()->DatabasePrefix;
+         $Sql = "update {$Px}User set CountComments = coalesce(CountComments, 0) + 1 where UserID in ($In)";
+         Gdn::Database()->Query($Sql);
+         $this->_RecalcIDs['UserComment'] = array();
+
+      }
+
+      $UserIDsDiscussion = $this->_RecalcIDs['UserDiscussion'];
+
+      $In = implode(',', array_keys($UserIDsDiscussion));
+      if (!empty($In)) {
+
+         $Px = Gdn::Database()->DatabasePrefix;
+         $Sql = "update {$Px}User set CountDiscussions = coalesce(CountDiscussions, 0) + 1 where UserID in ($In)";
+         Gdn::Database()->Query($Sql);
+         $this->_RecalcIDs['UserDiscussion'] = array();
+
+      }
+
    }
 
    public function Restore($Log, $DeleteLog = TRUE) {
@@ -623,6 +647,17 @@ class LogModel extends Gdn_Pluggable {
                         break;
                      case 'Comment':
                         $this->_RecalcIDs['Discussion'][$Log['ParentRecordID']] = TRUE;
+                        break;
+                  }
+               }
+
+               if ($Log['Operation'] == 'Pending') {
+                  switch ($Log['RecordType']) {
+                     case 'Discussion':
+                        $this->_RecalcIDs['UserDiscussion'][$Log['RecordUserID']] = TRUE;
+                        break;
+                     case 'Comment':
+                        $this->_RecalcIDs['UserComment'][$Log['RecordUserID']] = TRUE;
                         break;
                   }
                }

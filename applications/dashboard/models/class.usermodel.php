@@ -1552,6 +1552,15 @@ class UserModel extends Gdn_Model {
 
    /**
     * Generic save procedure.
+    *
+    * $Settings controls certain save functionality
+    *
+    *  SaveRoles - Save 'RoleID' field as user's roles. Default false.
+    *  HashPassword - Hash the provided password on update. Default true.
+    *  FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
+    *  ValidateEmail - Make sure the provided email addresses is formattted properly. Default true.
+    *  NoConfirmEmail - Disable email confirmation. Default false.
+    *
     */
    public function Save($FormPostValues, $Settings = FALSE) {
       // See if the user's related roles should be saved or not.
@@ -1637,7 +1646,7 @@ class UserModel extends Gdn_Model {
             $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
          }
 
-         if (!$Insert && array_key_exists('Password', $Fields)) {
+         if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
             // Encrypt the password for saving only if it won't be hashed in _Insert()
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);

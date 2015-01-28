@@ -1637,7 +1637,7 @@ class UserModel extends Gdn_Model {
             $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
          }
 
-         if (!$Insert && array_key_exists('Password', $Fields)) {
+         if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
             // Encrypt the password for saving only if it won't be hashed in _Insert()
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);

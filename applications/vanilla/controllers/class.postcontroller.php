@@ -106,6 +106,10 @@ class PostController extends VanillaController {
       
       Gdn_Theme::Section('PostDiscussion');
       
+      if ($CategoryUrlCode == '' && C('Vanilla.Categories.Default')) {
+         $CategoryUrlCode = C('Vanilla.Categories.Default');
+      }
+      
       // Set discussion, draft, and category data
       $DiscussionID = isset($this->Discussion) ? $this->Discussion->DiscussionID : '';
       $DraftID = isset($this->Draft) ? $this->Draft->DraftID : 0;

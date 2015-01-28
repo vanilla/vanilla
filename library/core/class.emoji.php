@@ -160,7 +160,7 @@ class Emoji {
         'weary'                        => 'weary.png',
         'sleepy'                       => 'sleepy.png',
         'tired_face'                   => 'tired_face.png',
-        'grimacing'                    => 'grimacing.png',
+        'grimace'                      => 'grimace.png',
         'bawling'                      => 'bawling.png',
         'open_mouth'                   => 'open_mouth.png',
         'hushed'                       => 'hushed.png',
@@ -218,9 +218,9 @@ class Emoji {
          'B)'          => 'sunglasses',
          ':#'          => 'grimace',
          ':*'          => 'kiss',
+         ':3'          => 'blush',
          'o:)'         => 'innocent',
          '<3'          => 'heart',
-         '(*)'         => 'star',
          '>:)'         => 'naughty'
        );
 
@@ -243,17 +243,17 @@ class Emoji {
          ':D'          => 'lol',
          ':('          => 'disappointed',
          ';)'          => 'wink',
-         ':\\'         => 'confused',
+         ':/'         => 'confused',
          ':o'          => 'open_mouth',
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
          ":'("         => 'cry',
          ':|'          => 'neutral',
          'B)'          => 'sunglasses',
+         ':#'          => 'grimace',
          ':*'          => 'kiss',
-         'o:)'         => 'innocent',
          '<3'          => 'heart',
-         '(*)'         => 'star',
+         'o:)'         => 'innocent',
          '>:)'         => 'naughty'
       );
 

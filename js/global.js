@@ -1091,6 +1091,10 @@ jQuery(document).ready(function($) {
       $('.NotificationsAlert').remove();
    });
 
+   $(document).on('change', '.js-nav-dropdown', function() {
+      window.location = $(this).val();
+   });
+
 	// Stash something in the user's session (or unstash the value if it was not provided)
 	stash = function(name, value, callback) {
 		$.ajax({

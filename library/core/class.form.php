@@ -2270,7 +2270,7 @@ PASSWORDMETER;
                break;
             case 'checkbox':
                $Result .= $Description
-                       . $this->CheckBox($Row['Name'], T($LabelCode));
+                       . $this->CheckBox($Row['Name'], $LabelCode);
                break;
             case 'dropdown':
                $Result .= $this->Label($LabelCode, $Row['Name'])

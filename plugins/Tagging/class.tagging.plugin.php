@@ -776,6 +776,17 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->SetData('Title', T('Delete Tag'));
       $Sender->Render('delete', '', 'plugins/Tagging');
    }
+   
+   /**
+    * Add update routines to the DBA controller
+    *
+    * @param DbaController $Sender
+    */
+   public function DbaController_CountJobs_Handler($Sender) {
+      $Name = 'Recalculate Tag.CountDiscussions';
+      $Url = "/dba/counts.json?" . http_build_query(array('table' => 'Tag', 'column' => 'CountDiscussions'));
+      $Sender->Data['Jobs'][$Name] = $Url;
+   }
 
    /**
     * Setup is called when the plugin is enabled.

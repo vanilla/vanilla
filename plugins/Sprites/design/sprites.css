@@ -101,7 +101,6 @@
 .SpPassword,
 .SpEdit,
 .SpInfraction,
-.SpActivity,
 .SpAllCategories,
 .SpMyDrafts,
 .SpDashboard, 
@@ -114,6 +113,9 @@
 .SpMessage,
 .SpMyDiscussions,
 .SpDiscussions,
+.SpSignOut,
+.SpApplicants,
+.SpSpam,
 .SpComments {
    display: inline-block;
    min-height: 14px;
@@ -166,3 +168,6 @@
 .SpIgnoreList,
 .SpDelete { background-position: -341px -5px; }
 .SpWhosOnline { background-position: -293px -29px; }
+.SpSignOut { background-position: -294px -101px; }
+.SpApplicants { background-position: -294px -29px; }
+.SpSpam { background-position: -342px -5px; }

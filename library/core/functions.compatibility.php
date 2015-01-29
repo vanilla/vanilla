@@ -15,9 +15,21 @@
  */
 
 /**
+ * Allow gzopen64 to be a fallback for gzopen. Workaround for a PHP bug.
+ *
+ * @see http://php.net/manual/en/function.gzopen.php
+ * @return mixed File pointer or false.
+ */
+if (!function_exists('gzopen') && function_exists('gzopen64')){
+   function gzopen($filename, $mode, $use_include_path = 0){
+      return gzopen64($filename, $mode, $use_include_path);
+   }
+}
+
+/**
  * Takes an associative array in the layout of parse_url, and constructs a URL from it
  *
- * see http://www.php.net/manual/en/function.http-build-url.php#96335
+ * @see http://www.php.net/manual/en/function.http-build-url.php#96335
  *
  * @param   mixed   (Part(s) of) an URL in form of a string or associative array like parse_url() returns
  * @param   mixed   Same as the first argument
@@ -299,7 +311,7 @@ if (!function_exists('requestContext')) {
     * @return string
     */
    function requestContext() {
-      static $context;
+      static $context = null;
       if (is_null($context)) {
          $context = C('Garden.RequestContext', null);
          if (is_null($context)) {
@@ -326,9 +338,9 @@ if (!function_exists('safeHeader')) {
     * context is not HTTP.
     *
     * @staticvar string $context
-    * @param type $header
-    * @param type $replace
-    * @param type $http_response_code
+    * @param string $header
+    * @param bool $replace
+    * @param int|null $http_response_code
     */
    function safeHeader($header, $replace = true, $http_response_code = null) {
       static $context = null;
@@ -362,7 +374,7 @@ if (!function_exists('safeCookie')) {
     * @param boolean $httponly
     */
    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
-      static $context;
+      static $context = null;
       if (is_null($context)) {
          $context = requestContext();
       }

@@ -32,6 +32,15 @@ class PromotedContentModule extends Gdn_Module {
    public $Selection;
 
    /**
+    * What type of content to fetch.
+    * - all
+    * - discussions
+    * - comments
+    * @var string
+    */
+   public $ContentType = 'all';
+
+   /**
     * How much content should be fetched
     * @var integer
     */
@@ -73,6 +82,8 @@ class PromotedContentModule extends Gdn_Module {
       $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
       if (method_exists($this, $SelectorMethod)) {
          $this->SetData('Content', call_user_func(array($this, $SelectorMethod), $this->Selection));
+      } else {
+         $this->FireEvent($SelectorMethod);
       }
    }
 
@@ -123,22 +134,28 @@ class PromotedContentModule extends Gdn_Module {
          $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
 
          // Get matching Discussions
-         $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->WhereIn('d.InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Discussions = array();
+         if ($this->ShowDiscussions()) {
+            $Discussions = Gdn::SQL()->Select('d.*')
+               ->From('Discussion d')
+               ->WhereIn('d.InsertUserID', $UserIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+         }
 
          // Get matching Comments
-         $Comments = Gdn::SQL()->Select('c.*')
-            ->From('Comment c')
-            ->WhereIn('InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Comments = array();
+         if ($this->ShowComments()) {
+            $Comments = Gdn::SQL()->Select('c.*')
+               ->From('Comment c')
+               ->WhereIn('InsertUserID', $UserIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
 
-         $this->JoinCategory($Comments);
+            $this->JoinCategory($Comments);
+         }
 
          // Interleave
          $Content = $this->Union('DateInserted', array(
@@ -183,22 +200,28 @@ class PromotedContentModule extends Gdn_Module {
          $UserIDs = ConsolidateArrayValuesByKey($UserIDs, 'UserID');
 
          // Get matching Discussions
-         $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->WhereIn('d.InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Discussions = array();
+         if ($this->ShowDiscussions()) {
+            $Discussions = Gdn::SQL()->Select('d.*')
+               ->From('Discussion d')
+               ->WhereIn('d.InsertUserID', $UserIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+         }
 
          // Get matching Comments
-         $Comments = Gdn::SQL()->Select('c.*')
-            ->From('Comment c')
-            ->WhereIn('InsertUserID', $UserIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Comments = array();
+         if ($this->ShowComments()) {
+            $Comments = Gdn::SQL()->Select('c.*')
+               ->From('Comment c')
+               ->WhereIn('InsertUserID', $UserIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
 
-         $this->JoinCategory($Comments);
+            $this->JoinCategory($Comments);
+         }
 
          // Interleave
          $Content = $this->Union('DateInserted', array(
@@ -235,29 +258,35 @@ class PromotedContentModule extends Gdn_Module {
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
 
          // Get matching Discussions
-         $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->Where('d.CategoryID', $CategoryID)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Discussions = array();
+         if ($this->ShowDiscussions()) {
+            $Discussions = Gdn::SQL()->Select('d.*')
+               ->From('Discussion d')
+               ->Where('d.CategoryID', $CategoryID)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+         }
 
          // Get matching Comments
-         $CommentDiscussionIDs = Gdn::SQL()->Select('d.DiscussionID')
-            ->From('Discussion d')
-            ->Where('d.CategoryID', $CategoryID)
-            ->OrderBy('DateLastComment', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+         $Comments = array();
+         if ($this->ShowComments()) {
+            $CommentDiscussionIDs = Gdn::SQL()->Select('d.DiscussionID')
+               ->From('Discussion d')
+               ->Where('d.CategoryID', $CategoryID)
+               ->OrderBy('DateLastComment', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
 
-         $Comments = Gdn::SQL()->Select('c.*')
-            ->From('Comment c')
-            ->WhereIn('DiscussionID', $CommentDiscussionIDs)
-            ->OrderBy('DateInserted', 'DESC')
-            ->Limit($this->Limit)
-            ->Get()->Result(DATASET_TYPE_ARRAY);
+            $Comments = Gdn::SQL()->Select('c.*')
+               ->From('Comment c')
+               ->WhereIn('DiscussionID', $CommentDiscussionIDs)
+               ->OrderBy('DateInserted', 'DESC')
+               ->Limit($this->Limit)
+               ->Get()->Result(DATASET_TYPE_ARRAY);
 
-         $this->JoinCategory($Comments);
+            $this->JoinCategory($Comments);
+         }
 
          // Interleave
          $Content = $this->Union('DateInserted', array(
@@ -301,23 +330,29 @@ class PromotedContentModule extends Gdn_Module {
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
 
          // Get matching Discussions
-         $Discussions = Gdn::SQL()->Select('d.*')
-            ->From('Discussion d')
-            ->Where('Score >', $MinScore)
-            ->OrderBy('Score', 'DESC')
-            ->Limit($this->Limit);
-         if ($MinScore !== FALSE) $Discussions->Where('Score >', $MinScore);
-         $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
+         $Discussions = array();
+         if ($this->ShowDiscussions()) {
+            $Discussions = Gdn::SQL()->Select('d.*')
+               ->From('Discussion d')
+               ->Where('Score >', $MinScore)
+               ->OrderBy('Score', 'DESC')
+               ->Limit($this->Limit);
+            if ($MinScore !== FALSE) $Discussions->Where('Score >', $MinScore);
+            $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
+         }
 
          // Get matching Comments
-         $Comments = Gdn::SQL()->Select('c.*')
-            ->From('Comment c')
-            ->OrderBy('Score', 'DESC')
-            ->Limit($this->Limit);
-         if ($MinScore !== FALSE) $Comments->Where('Score >', $MinScore);
-         $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
+         $Comments = array();
+         if ($this->ShowComments()) {
+            $Comments = Gdn::SQL()->Select('c.*')
+               ->From('Comment c')
+               ->OrderBy('Score', 'DESC')
+               ->Limit($this->Limit);
+            if ($MinScore !== FALSE) $Comments->Where('Score >', $MinScore);
+            $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
 
-         $this->JoinCategory($Comments);
+            $this->JoinCategory($Comments);
+         }
 
          // Interleave
          $Content = $this->Union('DateInserted', array(
@@ -439,6 +474,12 @@ class PromotedContentModule extends Gdn_Module {
       $Content = array_filter($Content, array($this, 'SecurityFilter'));
    }
 
+   /**
+    * Determine if we have permission to view this content.
+    *
+    * @param $ContentItem
+    * @return bool
+    */
    protected function SecurityFilter($ContentItem) {
       $CategoryID = GetValue('CategoryID', $ContentItem, NULL);
       if (is_null($CategoryID) || $CategoryID === FALSE)
@@ -462,10 +503,38 @@ class PromotedContentModule extends Gdn_Module {
       $Content = array_slice($Content, 0, $Limit);
    }
 
+   /**
+    * Whether to display promoted comments.
+    *
+    * @return bool
+    */
+   public function ShowComments() {
+      return ($this->ContentType == 'all' || $this->ContentType == 'comments') ? true : false;
+   }
+
+   /**
+    * Whether to display promoted discussions.
+    *
+    * @return bool
+    */
+   public function ShowDiscussions() {
+      return ($this->ContentType == 'all' || $this->ContentType == 'discussions') ? true : false;
+   }
+
+   /**
+    * Default asset target for this module.
+    *
+    * @return string
+    */
    public function AssetTarget() {
       return 'Content';
    }
 
+   /**
+    * Render.
+    *
+    * @return string
+    */
    public function ToString() {
       if ($this->Data('Content', NULL) == NULL)
          $this->GetData();

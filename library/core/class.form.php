@@ -157,17 +157,15 @@ class Gdn_Form extends Gdn_Pluggable {
       $Attributes['format'] = htmlspecialchars($Attributes['format']);
       $this->SetValue('Format', $Attributes['format']);
 
+      $Result = $this->TextBox($Column, $Attributes).$this->Hidden('Format');
+
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
       $this->EventArguments['Column'] = $Column;
       $this->EventArguments['Attributes'] = $Attributes;
-
-      $Result = '<div class="bodybox-wrap">';
       $this->EventArguments['BodyBox'] =& $Result;
       $this->FireEvent('BeforeBodyBox');
-      $Result .= $this->TextBox($Column, $Attributes).$this->Hidden('Format').
-         '</div>';
 
-      return $Result;
+      return '<div class="bodybox-wrap">'.$Result.'</div>';
    }
 
    /**
@@ -1605,7 +1603,7 @@ PASSWORDMETER;
       } elseif(is_a($Error, 'Exception')) {
          // Strip the extra information out of the exception.
          $Parts = explode('|', $Error->getMessage());
-         $Message = $Parts[0];
+         $Message = htmlspecialchars($Parts[0]);
          if (count($Parts) >= 3)
             $FileSuffix = ": {$Parts[1]}->{$Parts[2]}(...)";
          else
@@ -1615,10 +1613,10 @@ PASSWORDMETER;
             $ErrorCode = '@<pre>'.
                $Message."\n".
                '## '.$Error->getFile().'('.$Error->getLine().")".$FileSuffix."\n".
-               $Error->getTraceAsString().
+               htmlspecialchars($Error->getTraceAsString()).
                '</pre>';
          } else {
-            $ErrorCode = '@'.strip_tags($Error->getMessage());
+            $ErrorCode = '@'.htmlspecialchars(strip_tags($Error->getMessage()));
          }
       }
 
@@ -1905,6 +1903,18 @@ PASSWORDMETER;
 
       // print_r($this->_FormValues);
       return $this->_FormValues;
+   }
+
+   /**
+    * Get form data array
+    *
+    * Returns an associative array containing all the pre-propulated field data
+    * for the current form.
+    *
+    * @return array
+    */
+   public function FormData() {
+      return $this->_DataArray;
    }
 
    /**
@@ -2258,7 +2268,7 @@ PASSWORDMETER;
                break;
             case 'checkbox':
                $Result .= $Description
-                       . $this->CheckBox($Row['Name'], T($LabelCode));
+                       . $this->CheckBox($Row['Name'], $LabelCode);
                break;
             case 'dropdown':
                $Result .= $this->Label($LabelCode, $Row['Name'])
@@ -2327,7 +2337,7 @@ PASSWORDMETER;
       if ($Valid === TRUE)
          return TRUE;
       else {
-         $this->AddError('@'.$Valid);
+         $this->AddError('@'.$Valid, $FieldName);
          return FALSE;
       }
 

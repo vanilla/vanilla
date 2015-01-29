@@ -37,6 +37,41 @@ class Gdn_Locale extends Gdn_Pluggable {
     */
    public $DeveloperContainer = NULL;
 
+   public static $SetLocales = array(
+      'bg' => 'bg_BG',
+      'bs' => 'bs_BA',
+      'ca' => 'ca_ES',
+      'cs' => 'cs_CZ',
+      'da' => 'da_DK',
+      'de' => 'de_DE',
+      'el' => 'el_GR',
+      'es' => 'es_ES',
+      'fa' => 'fa_IR',
+      'fr' => 'fr_FR',
+      'he' => 'he_IL',
+      'hi' => 'hi_IN',
+      'hu' => 'hu_HU',
+      'id' => 'id_ID',
+      'it' => 'it_IT',
+      'ja' => 'ja_JP',
+      'ko' => 'ko_KR',
+      'lt' => 'lt_LT',
+      'my' => 'my_MM',
+      'nb' => 'nb_NO',
+      'no' => array('no_NO', 'nn_NO'),
+      'nl' => 'nl_NL',
+      'pl' => 'pl_PL',
+      'pt' => 'pt_BR',
+      'ro' => 'ro_RO',
+      'ru' => 'ru_RU',
+      'sv' => 'sv_SE',
+      'th' => 'th_TH',
+      'tr' => 'tr_TR',
+      'uk' => 'uk_UA',
+      'vi' => 'vi_VN',
+      'zh' => 'zh_CN'
+   );
+
    public $SavedDeveloperCalls = 0;
 
    public function __construct($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
@@ -89,11 +124,28 @@ class Gdn_Locale extends Gdn_Pluggable {
 
       $Codeset = C('Garden.LocaleCodeset', 'UTF8');
       $CurrentLocale = str_replace('-', '_', $LocaleName);
-      $SetLocale = $CurrentLocale.'.'.$Codeset;
-      setlocale(LC_TIME, $SetLocale, $CurrentLocale);
 
-      if (!is_array($LocaleSources))
+      $SetLocale = array(
+         LC_TIME,
+         "$CurrentLocale.$Codeset",
+         $CurrentLocale
+      );
+
+      list($Language) = explode('_', $CurrentLocale, 2);
+      if (isset(self::$SetLocales[$Language])) {
+         $FullLocales = (array)self::$SetLocales[$Language];
+
+         foreach ($FullLocales as $FullLocale) {
+            $SetLocale[] = "$FullLocale.$Codeset";
+            $SetLocale[] = $FullLocale;
+         }
+      }
+
+      $r = call_user_func_array('setlocale', $SetLocale);
+
+      if (!is_array($LocaleSources)) {
          $LocaleSources = array();
+      }
 
       // Create a locale config container
       $this->Unload();
@@ -149,6 +201,15 @@ class Gdn_Locale extends Gdn_Pluggable {
          $ApplicationLocaleSources = Gdn_FileSystem::FindAll(PATH_APPLICATIONS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $ApplicationWhiteList);
          if ($ApplicationLocaleSources !== FALSE)
             $LocaleSources = array_merge($LocaleSources, $ApplicationLocaleSources);
+
+         // Get plugin-based locale definition files
+         $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName.'.php')), $PluginWhiteList);
+         if ($PluginLocaleSources !== FALSE)
+            $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
+
+         $PluginLocaleSources = Gdn_FileSystem::FindAll(PATH_PLUGINS, CombinePaths(array('locale', $LocaleName, 'definitions.php')), $PluginWhiteList);
+         if ($PluginLocaleSources !== FALSE)
+            $LocaleSources = array_merge($LocaleSources, $PluginLocaleSources);
 
          // Get locale-based locale definition files.
          $EnabledLocales = C('EnabledLocales');

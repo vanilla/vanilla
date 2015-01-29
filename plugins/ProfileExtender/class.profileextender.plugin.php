@@ -7,7 +7,7 @@
 $PluginInfo['ProfileExtender'] = array(
    'Name' => 'Profile Extender',
    'Description' => 'Add fields (like status, location, or gamer tags) to profiles and registration.',
-   'Version' => '3.0.1',
+   'Version' => '3.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE,
    //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
@@ -129,7 +129,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
          switch ($Label) {
             case 'Twitter':
-               $Fields['Twitter'] = Anchor('@'.$Value, 'http://twitter.com/'.$Value);
+               $Fields['Twitter'] = '@'.Anchor($Value, 'http://twitter.com/'.$Value);
                break;
             case 'Facebook':
                $Fields['Facebook'] = Anchor($Value, 'http://facebook.com/'.$Value);
@@ -261,7 +261,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Add Profile Field'));
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          // Get whitelisted properties
          $FormPostValues = $Sender->Form->FormValues();
          foreach ($FormPostValues as $Key => $Value) {
@@ -271,7 +271,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
          // Make Options an array
          if ($Options = GetValue('Options', $FormPostValues)) {
-            $Options = explode("\n", preg_replace('`[^\w\s-]`', '', $Options));
+            $Options = explode("\n", preg_replace('/[^\w\s-]/u', '', $Options));
             if (count($Options) < 2)
                $Sender->Form->AddError('Must have at least 2 options.', 'Options');
             SetValue('Options', $FormPostValues, $Options);
@@ -336,7 +336,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', 'Delete Field');
       if (isset($Args[0])) {
-         if ($Sender->Form->IsPostBack()) {
+         if ($Sender->Form->AuthenticatedPostBack()) {
             RemoveFromConfig('ProfileExtender.Fields.'.$Args[0]);
             $Sender->RedirectUrl = Url('/settings/profileextender');
          }
@@ -378,8 +378,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          
          // Get all field data, error check
          $AllFields = $this->GetProfileFields();
-         if (!is_array($AllFields) || !is_array($ProfileFields))
+         if (!is_array($AllFields) || !is_array($ProfileFields)) {
             return;
+         }
 
          // DateOfBirth is special case that core won't handle
          // Hack it in here instead
@@ -392,17 +393,18 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // Display all non-hidden fields
          $ProfileFields = array_reverse($ProfileFields);
          foreach ($ProfileFields as $Name => $Value) {
-            if (!$Value)
+            // Skip empty and hidden fields.
+            if (!$Value || !GetValue('OnProfile', $AllFields[$Name])) {
                continue;
-            if (!GetValue('OnProfile', $AllFields[$Name]))
-               continue;
+            }
 
             // Non-magic fields must be plain text, but we'll auto-link
-            if (!in_array($Name, $this->MagicLabels))
+            if (!in_array($Name, $this->MagicLabels)) {
                $Value = Gdn_Format::Links(Gdn_Format::Text($Value));
+            }
 
             echo ' <dt class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Text($AllFields[$Name]['Label']).'</dt> ';
-            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::Html($Value).'</dd> ';
+            echo ' <dd class="ProfileExtend Profile'.Gdn_Format::AlphaNumeric($Name).'">'.Gdn_Format::HtmlFilter($Value).'</dd> ';
          }
       } catch (Exception $ex) {
          // No errors

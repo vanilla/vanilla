@@ -42,8 +42,9 @@ class Gdn_Theme {
 
       if ($HomeLink) {
          $HomeUrl = GetValue('HomeUrl', $Options);
-         if (!$HomeUrl)
+         if (!$HomeUrl) {
             $HomeUrl = Url('/', TRUE);
+         }
 
          $Row = array('Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
@@ -77,7 +78,7 @@ class Gdn_Theme {
             $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
          }
 
-         $Row['Url'] = Url($Row['Url']);
+         $Row['Url'] = $Row['Url'] ? Url($Row['Url']) : '#';
          $CssClass = 'CrumbLabel '.GetValue('CssClass', $Row);
          if ($DataCount == count($Data))
             $CssClass .= ' Last';
@@ -318,17 +319,33 @@ class Gdn_Theme {
 
    /**
     * Renders the banner logo, or just the banner title if the logo is not defined.
+    *
+    * @param array $Properties
     */
-   public static function Logo() {
+   public static function Logo($Properties = array()) {
       $Logo = C('Garden.Logo');
+
       if ($Logo) {
          $Logo = ltrim($Logo, '/');
+
          // Fix the logo path.
-         if (StringBeginsWith($Logo, 'uploads/'))
+         if (StringBeginsWith($Logo, 'uploads/')) {
             $Logo = substr($Logo, strlen('uploads/'));
+         }
+
+         // Set optional title text.
+         if (empty($Properties['title']) && C('Garden.LogoTitle')) {
+            $Properties['title'] = C('Garden.LogoTitle');
+         }
       }
+
+      // Use the site title as alt if none was given.
       $Title = C('Garden.Title', 'Title');
-      echo $Logo ? Img(Gdn_Upload::Url($Logo), array('alt' => $Title)) : $Title;
+      if (empty($Properties['alt'])) {
+         $Properties['alt'] = $Title;
+      }
+
+      echo $Logo ? Img(Gdn_Upload::Url($Logo), $Properties) : $Title;
    }
 
    /**

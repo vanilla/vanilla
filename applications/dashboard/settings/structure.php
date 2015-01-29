@@ -129,8 +129,12 @@ if ($SystemUserID) {
 if (!$SystemUserID) {
    // Try and find a system user.
    $SystemUserID = Gdn::SQL()->GetWhere('User', array('Name' => 'System', 'Admin' => 2))->Value('UserID');
-   if ($SystemUserID)
+   if ($SystemUserID) {
       SaveToConfig('Garden.SystemUserID', $SystemUserID);
+   } else {
+      // Create a new one if we couldn't find one.
+      Gdn::UserModel()->GetSystemUserID();
+   }
 }
 
 // UserRole Table
@@ -249,7 +253,6 @@ $PermissionModel->Define(array(
    'Garden.Email.View' => 'Garden.SignIn.Allow',
    'Garden.Settings.Manage',
    'Garden.Settings.View',
-   'Garden.Messages.Manage',
    'Garden.SignIn.Allow' => 1,
    'Garden.Users.Add',
    'Garden.Users.Edit',
@@ -262,7 +265,8 @@ $PermissionModel->Define(array(
    'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
    'Garden.Moderation.Manage',
    'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
-   'Garden.AdvancedNotifications.Allow'
+   'Garden.AdvancedNotifications.Allow',
+   'Garden.Community.Manage' => 'Garden.Settings.Manage'
    ));
 
 $PermissionModel->Undefine(array(
@@ -272,7 +276,8 @@ $PermissionModel->Undefine(array(
    'Garden.Registration.Manage',
    'Garden.Roles.Manage',
    'Garden.Routes.Manage',
-   'Garden.Themes.Manage'
+   'Garden.Themes.Manage',
+   'Garden.Messages.Manage'
    ));
 
 if (!$PermissionTableExists) {
@@ -322,6 +327,7 @@ if (!$PermissionTableExists) {
       'Garden.Activity.View' => 1,
       'Garden.Curation.Manage' => 1,
       'Garden.Moderation.Manage' => 1,
+      'Garden.PersonalInfo.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 1,
       'Garden.Email.View' => 1
@@ -331,13 +337,17 @@ if (!$PermissionTableExists) {
    $PermissionModel->Save(array(
       'Role' => 'Administrator',
       'Garden.SignIn.Allow' => 1,
+      'Garden.Settings.View' => 1,
       'Garden.Settings.Manage' => 1,
+      'Garden.Community.Manage' => 1,
       'Garden.Users.Add' => 1,
       'Garden.Users.Edit' => 1,
       'Garden.Users.Delete' => 1,
       'Garden.Users.Approve' => 1,
       'Garden.Activity.Delete' => 1,
       'Garden.Activity.View' => 1,
+      'Garden.Messages.Manage' => 1,
+      'Garden.PersonalInfo.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 1,
       'Garden.AdvancedNotifications.Allow' => 1,
@@ -656,7 +666,7 @@ $Construct->Table('Log')
    ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group'), FALSE, 'index')
    ->Column('TransactionLogID', 'int', NULL)
    ->Column('RecordID', 'int', NULL, 'index')
-   ->Column('RecordUserID', 'int', NULL) // user responsible for the record
+   ->Column('RecordUserID', 'int', NULL, 'index') // user responsible for the record; indexed for user deletion
    ->Column('RecordDate', 'datetime')
    ->Column('RecordIPAddress', 'varchar(15)', NULL, 'index')
    ->Column('InsertUserID', 'int') // user that put record in the log
@@ -696,6 +706,10 @@ $Construct->Table('Ban')
    ->Column('CountBlockedRegistrations', 'uint', 0)
    ->Column('InsertUserID', 'int')
    ->Column('DateInserted', 'datetime')
+   ->Column('InsertIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
 
@@ -771,6 +785,12 @@ $Construct
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.
 SaveToConfig('Garden.InputFormatter', C('Garden.InputFormatter'));
+
+// We need to undo cleditor's bad behavior for our reformed users.
+// If you still need to manipulate this, do it in memory instead (SAVE = false).
+if (!C('Garden.Html.SafeStyles')) {
+   RemoveFromConfig('Garden.Html.SafeStyles');
+}
 
 // Make sure the smarty folders exist.
 if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');

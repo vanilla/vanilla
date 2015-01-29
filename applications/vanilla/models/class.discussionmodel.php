@@ -437,7 +437,10 @@ class DiscussionModel extends VanillaModel {
             //->Where('w.DateLastViewed', NULL)
             //->OrWhere('d.DateLastComment >', 'w.DateLastViewed')
             //->EndWhereGroup()
-            ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE);
+            ->BeginWhereGroup()
+            ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE)
+            ->OrWhere('w.DateLastViewed', NULL)
+            ->EndWhereGroup();
       } else {
          $this->SQL
             ->Select('0', '', 'WatchUserID')
@@ -716,14 +719,14 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->Select('d.DiscussionID')
          ->From('Discussion d');
 
-      if ($CategoryID > 0 || $GroupID > 0) {
+      if (!is_array($CategoryID) && ($CategoryID > 0 || $GroupID > 0)) {
          $this->SQL->Where('d.Announce >', '0');
       } else {
          $this->SQL->Where('d.Announce', 1);
       }
       if ($GroupID > 0) {
          $this->SQL->Where('d.GroupID', $GroupID);
-      } elseif ($CategoryID > 0) {
+      } elseif (is_array($CategoryID) || $CategoryID > 0) {
          $this->SQL->Where('d.CategoryID', $CategoryID);
       }
 
@@ -760,7 +763,7 @@ class DiscussionModel extends VanillaModel {
       $this->SQL->WhereIn('d.DiscussionID', $AnnouncementIDs);
 
       // If we aren't viewing announcements in a category then only show global announcements.
-      if (!$Wheres) {
+      if (!$Wheres || is_array($CategoryID)) {
          $this->SQL->Where('d.Announce', 1);
       } else {
          $this->SQL->Where('d.Announce >', 0);
@@ -806,7 +809,7 @@ class DiscussionModel extends VanillaModel {
     */
    public function GetAnnouncementCacheKey($CategoryID = 0) {
       $Key = 'Announcements';
-      if ($CategoryID > 0) {
+      if (!is_array($CategoryID) && $CategoryID > 0) {
          $Key .= ':' . $CategoryID;
       }
       return $Key;
@@ -834,6 +837,8 @@ class DiscussionModel extends VanillaModel {
     *
     * Get discussions for a user.
     *
+    * Events: BeforeGetByUser
+    *
     * @since 2.1
     * @access public
     *
@@ -841,13 +846,19 @@ class DiscussionModel extends VanillaModel {
     * @param int $Limit Max number to get.
     * @param int $Offset Number to skip.
     * @param int $LastDiscussionID A hint for quicker paging.
+    * @param int $WatchUserID User to use for read/unread data.
     * @return Gdn_DataSet SQL results.
     */
-   public function GetByUser($UserID, $Limit, $Offset, $LastDiscussionID = FALSE) {
+   public function GetByUser($UserID, $Limit, $Offset, $LastDiscussionID = FALSE, $WatchUserID = FALSE) {
       $Perms = DiscussionModel::CategoryPermissions();
 
       if (is_array($Perms) && empty($Perms)) {
          return new Gdn_DataSet(array());
+      }
+
+      // Allow us to set perspective of a different user.
+      if (!$WatchUserID) {
+         $WatchUserID = $UserID;
       }
 
       // The point of this query is to select from one comment table, but filter and sort on another.
@@ -864,13 +875,13 @@ class DiscussionModel extends VanillaModel {
          ->OrderBy('d.DiscussionID', 'desc');
 
       // Join in the watch data.
-      if ($UserID > 0) {
+      if ($WatchUserID > 0) {
          $this->SQL
             ->Select('w.UserID', '', 'WatchUserID')
             ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->Select('w.CountComments', '', 'CountCommentWatch')
             ->Select('w.Participated')
-            ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left');
+            ->Join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$WatchUserID, 'left');
       } else {
          $this->SQL
             ->Select('0', '', 'WatchUserID')
@@ -889,6 +900,8 @@ class DiscussionModel extends VanillaModel {
       } else {
          $this->SQL->Limit($Limit, $Offset);
       }
+
+      $this->FireEvent('BeforeGetByUser');
 
       $Data = $this->SQL->Get();
 
@@ -967,8 +980,6 @@ class DiscussionModel extends VanillaModel {
             else
                self::$_CategoryPermissions = array(); // no permission
          } else {
-            $SQL = Gdn::SQL();
-
             $Categories = CategoryModel::Categories();
             $IDs = array();
 
@@ -1023,7 +1034,7 @@ class DiscussionModel extends VanillaModel {
           'Url' => $Url
       ));
       if ($Body == '')
-         $Body = $ForeignUrl;
+         $Body = $Url;
       if ($Body == '')
          $Body = FormatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
 
@@ -1072,13 +1083,29 @@ class DiscussionModel extends VanillaModel {
          }
 
          $Categories = CategoryModel::Categories();
-         $Count = 0;
 
-         foreach ($Categories as $Cat) {
-            if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms))
-               continue;
-            $Count += (int)$Cat['CountDiscussions'];
+//         $CountOld = 0;
+//         foreach ($Categories as $Cat) {
+//            if (is_array($Perms) && !in_array($Cat['CategoryID'], $Perms))
+//               continue;
+//            $CountOld += (int)$Cat['CountDiscussions'];
+//         }
+
+         if (!is_array($Perms)) {
+            $Perms = array_keys($Categories);
          }
+
+         $Count = 0;
+         foreach ($Perms as $CategoryID) {
+            if (isset($Categories[$CategoryID])) {
+               $Count += (int)$Categories[$CategoryID]['CountDiscussions'];
+            }
+         }
+
+//         if ($Count !== $CountOld) {
+//            throw new Exception("Category Count error!", 500);
+//         }
+
          return $Count;
       }
 
@@ -1521,7 +1548,12 @@ class DiscussionModel extends VanillaModel {
 
             if ($DiscussionID > 0) {
                // Updating
-               $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+               $Stored = $this->GetID($DiscussionID, DATASET_TYPE_OBJECT);
+
+               // Block Format change if we're forcing the formatter.
+               if (C('Garden.ForceInputFormatter')) {
+                  unset($Fields['Format']);
+               }
 
                // Clear the cache if necessary.
                $CacheKeys = array();
@@ -1542,13 +1574,15 @@ class DiscussionModel extends VanillaModel {
                SetValue('DiscussionID', $Fields, $DiscussionID);
                LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
 
-               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields))
+               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) {
                   $StoredCategoryID = GetValue('CategoryID', $Stored);
+               }
 
             } else {
                // Inserting.
-               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
+               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter')) {
                   $Fields['Format'] = C('Garden.InputFormatter', '');
+               }
 
                if (C('Vanilla.QueueNotifications')) {
                   $Fields['Notified'] = ActivityModel::SENT_PENDING;
@@ -1591,7 +1625,8 @@ class DiscussionModel extends VanillaModel {
                }
 
                // Update the user's discussion count.
-               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], TRUE);
+               $InsertUser = Gdn::UserModel()->GetID($Fields['InsertUserID']);
+               $this->UpdateUserDiscussionCount($Fields['InsertUserID'], val('CountDiscussions', $InsertUser, 0) > 100);
 
                // Mark the user as participated.
                $this->SQL->Replace('UserDiscussion',
@@ -1680,7 +1715,7 @@ class DiscussionModel extends VanillaModel {
 
             // Get CategoryID of this discussion
 
-            $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+            $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_OBJECT);
             $CategoryID = GetValue('CategoryID', $Discussion, FALSE);
 
             // Update discussion counter for affected categories.
@@ -1743,6 +1778,10 @@ class DiscussionModel extends VanillaModel {
             continue;
 
          $UserID = $Row['UserID'];
+         // Check user can still see the discussion.
+         if (!Gdn::UserModel()->GetCategoryViewPermission($UserID, $Category['CategoryID']))
+            continue;
+
          $Name = $Row['Name'];
          if (strpos($Name, '.Email.') !== FALSE) {
             $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;
@@ -1875,7 +1914,8 @@ class DiscussionModel extends VanillaModel {
          $User = Gdn::UserModel()->GetID($UserID);
 
          $CountDiscussions = GetValue('CountDiscussions', $User);
-         if ($CountDiscussions < 100 || $CountDiscussions % 20 != 0) {
+         // Increment if 100 or greater; Recalc on 120, 140 etc.
+         if ($CountDiscussions >= 100 && $CountDiscussions % 20 !== 0) {
             $this->SQL->Update('User')
                ->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)
                ->Where('UserID', $UserID)

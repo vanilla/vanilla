@@ -69,7 +69,7 @@ textarea, input[type=text] {
    margin: auto;
    width: 960px;
 }
-#Body .ContentColumn {
+.ContentColumn {
    margin: 0 0 0 230px
 }
 
@@ -386,7 +386,7 @@ textarea.TextBox {
 	width: auto;
 }
 .TextBoxWrapper textarea,
-.TextBoxWrapper input {
+.TextBoxWrapper input:not([type=radio]):not([type=checkbox]) {
    width: 100%;
    display: block;
 }
@@ -1947,7 +1947,7 @@ blockquote {
 
 .emoji {
    margin-top: -2px;
-   margin-bottom: -2px; /* account for image padding */
+   margin-bottom: -3px; /* account for image padding */
 }
 
 blockquote.Quote, blockQuote.UserQuote {
@@ -3990,7 +3990,9 @@ input + .ReactSprite {
 .Video.YouTube .VideoPreview {
     cursor: pointer;
     position: relative;
+    max-width: 100%;
     display: inline-block;
+    height: auto;
 }
 .Video.YouTube .VideoPreview:after {
     background: url('http://cdn.vanillaforums.com/images/youtube-overlay-button.png') 0 -44px no-repeat transparent;
@@ -4006,6 +4008,21 @@ input + .ReactSprite {
 }
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
+}
+.Video.YouTube .VideoPreview img {
+  max-width: 100%;
+  height: auto !important;
+}
+.Video.YouTube .VideoPreview .ImageResized {
+  display: none;
+}
+/* For vimeo/other embeds */
+.Section-Discussion .Message iframe,
+.Section-BestOf iframe {
+  max-width: 100%;
+}
+.Section-BestOf iframe {
+   height: auto;
 }
 
 /* Media */
@@ -4217,7 +4234,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .atwho-view .cur strong {
    color: #fff;
-   font: bold;
+   font-weight: bold;
 }
 
 .atwho-view ul {
@@ -4228,9 +4245,10 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 
 .atwho-view ul li {
    display: block;
-   padding: 5px 10px;
    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
    cursor: pointer;
+   padding: 0 5px;
+   line-height: 34px;
 }
 
 .atwho-view ul li:last-child {
@@ -4243,15 +4261,26 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
    font-weight: 400;
 }
 
-.at-suggest-emoji .emoji-img {
-   position: relative;
-   top: 3px;
+.at-suggest-emoji .emoji-wrap {
+   display: inline-block;
+   width: 34px;
+   overflow: hidden;
+   line-height: 34px;
+   text-align: center;
+   vertical-align: top;
+   /*padding-right: 5px;*/
+   /*background: #ff0;*/
+}
+.at-suggest-emoji .emoji-wrap > * {
+   display: inline-block;
+   line-height: 34px;
 }
 
 .at-suggest-emoji .emoji-name {
-   position: relative;
-   top: -2px;
-   padding: 0 0 0 2px;
+   display: inline-block;
+   line-height: 34px;
+   vertical-align: top;
+   /*background: #f0f;*/
 }
 
 /**

@@ -86,7 +86,7 @@ class ActivityController extends Gdn_Controller {
          
       $this->ActivityData = $this->ActivityModel->GetWhere(array('ActivityID' => $ActivityID));
       $this->SetData('Comments', $this->ActivityModel->GetComments(array($ActivityID)));
-      $this->SetData('ActivityData', $this->ActivityData);
+      $this->SetData('Activities', $this->ActivityData);
       
       $this->Render();
    }
@@ -112,12 +112,15 @@ class ActivityController extends Gdn_Controller {
             $this->Permission('Garden.Settings.Manage');
             $NotifyUserID = ActivityModel::NOTIFY_ADMINS;
             break;
-         default:
+         case '':
+         case 'feed': // rss feed
             $Filter = 'public';
             $this->Title(T('Recent Activity'));
             $this->Permission('Garden.Activity.View');
             $NotifyUserID = ActivityModel::NOTIFY_PUBLIC;
             break;
+         default:
+            throw NotFoundException();
       }
          
       // Which page to load
@@ -222,7 +225,7 @@ class ActivityController extends Gdn_Controller {
       $NewActivityID = 0;
       
       // Form submitted
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $Body = $this->Form->GetValue('Body', '');
          $ActivityID = $this->Form->GetValue('ActivityID', '');
          if (is_numeric($ActivityID) && $ActivityID > 0) {
@@ -293,7 +296,7 @@ class ActivityController extends Gdn_Controller {
       
       $Activities = array();
       
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $Data = $this->Form->FormValues();
          $Data = $this->ActivityModel->FilterForm($Data);
          if (!isset($Data['Format']) || strcasecmp($Data['Format'], 'Raw') == 0)

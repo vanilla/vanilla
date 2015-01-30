@@ -1278,15 +1278,21 @@ class CategoryModel extends Gdn_Model {
    /**
     * Rebuilds the category tree. We are using the Nested Set tree model.
     *
-    * @ref http://articles.sitepoint.com/article/hierarchical-data-database/2
-    * @ref http://en.wikipedia.org/wiki/Nested_set_model
+    * @param bool $BySort Rebuild the tree by sort order instead of existing tree order.
     *
     * @since 2.0.0
-    * @access public
+    * @ref http://articles.sitepoint.com/article/hierarchical-data-database/2
+    * @ref http://en.wikipedia.org/wiki/Nested_set_model
     */
-   public function RebuildTree() {
+   public function RebuildTree($BySort = false) {
       // Grab all of the categories.
-      $Categories = $this->SQL->Get('Category', 'TreeLeft, Sort, Name');
+      if ($BySort) {
+         $Order = 'Sort, Name';
+      } else {
+         $Order = 'TreeLeft, Sort, Name';
+      }
+
+      $Categories = $this->SQL->Get('Category', $Order);
       $Categories = Gdn_DataSet::Index($Categories->ResultArray(), 'CategoryID');
 
       // Make sure the tree has a root.

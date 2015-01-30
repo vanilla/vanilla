@@ -1646,7 +1646,7 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         if (in_array('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
+         if (array_key_exists('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
             $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
          }
 

@@ -24,7 +24,7 @@ class ImportModel extends Gdn_Model {
 	public $CurrentStep = 0;
 
 	public $Data = array();
-   
+
    public $ErrorType = '';
 
 	public $ImportPath = '';
@@ -42,7 +42,8 @@ class ImportModel extends Gdn_Model {
    	8 => 'InsertTables',
    	9 => 'UpdateCounts',
       10 => 'CustomFinalization',
-      11 => 'AddActivity'
+      11 => 'AddActivity',
+		12 => 'VerifyImport'
 	);
 
 	protected $_OverwriteSteps = array(
@@ -57,7 +58,8 @@ class ImportModel extends Gdn_Model {
    	8 => 'InsertTables',
    	9 => 'UpdateCounts',
       10 => 'CustomFinalization',
-      11 => 'AddActivity'
+      11 => 'AddActivity',
+		12 => 'VerifyImport'
    );
 
    protected $_OverwriteStepsDb = array(
@@ -69,7 +71,8 @@ class ImportModel extends Gdn_Model {
    	5 => 'InsertTables',
    	6 => 'UpdateCounts',
       7 => 'CustomFinalization',
-      8 => 'AddActivity'
+      8 => 'AddActivity',
+		9 => 'VerifyImport'
    );
 
 	/**
@@ -203,12 +206,12 @@ class ImportModel extends Gdn_Model {
          $this->ErrorType = 'Credentials';
 		}
 		return $Result;
-      
+
 	}
 
    public function CustomFinalization() {
       $this->SetRoleDefaults();
-      
+
       $Imp = $this->GetCustomImportModel();
       if ($Imp !== NULL)
          $Imp->AfterImport();
@@ -289,7 +292,7 @@ class ImportModel extends Gdn_Model {
                $St->Set(TRUE, TRUE);
             else
                $St->Reset();
-            
+
             if($DestModified)
                $DestStructure->Set();
          } catch(Exception $Ex) {
@@ -307,7 +310,7 @@ class ImportModel extends Gdn_Model {
 		foreach($this->Tables() as $Table => $TableInfo) {
          if(GetValue('Skip', $TableInfo))
             continue;
-         
+
 			$St->Table(self::TABLE_PREFIX.$Table);
          $Columns = $TableInfo['Columns'];
 
@@ -379,7 +382,7 @@ class ImportModel extends Gdn_Model {
             continue;
 
          $this->Data['CurrentStepMessage'] = $Table;
-         
+
 			if($Table == 'Permission')
             $this->SQL->Delete($Table, array('RoleID <>' => 0));
 			else
@@ -423,11 +426,11 @@ class ImportModel extends Gdn_Model {
     * @param string $ChildColumnName
     * @param string $ParentJoinColumn
     * @param string $ChildJoinColumn
-    * @return type 
+    * @return type
     */
    public function GetCountSQL(
       $Aggregate, // count, max, min, etc.
-      $ParentTable, $ChildTable, 
+      $ParentTable, $ChildTable,
       $ParentColumnName = '', $ChildColumnName = '',
       $ParentJoinColumn = '', $ChildJoinColumn = '') {
 
@@ -645,7 +648,7 @@ class ImportModel extends Gdn_Model {
                      $RowCount = $this->_InsertTable($TableName);
                      break;
                }
-               
+
             } else {
                switch($TableName) {
                   case 'Permission':
@@ -724,7 +727,7 @@ class ImportModel extends Gdn_Model {
 
 		$TableInfo =& $this->Tables($TableName);
 		$Columns = $TableInfo['Columns'];
-      
+
       foreach ($Columns as $Key => $Value) {
          if (StringBeginsWith($Key, '_'))
             unset($Columns[$Key]);
@@ -804,7 +807,7 @@ class ImportModel extends Gdn_Model {
 
    public function InsertPermissionTable() {
 //      $this->LoadState();
-      
+
       // Clear the permission table in case the step was only half done before.
       $this->SQL->Delete('Permission', array('RoleID <>' => 0));
 
@@ -815,7 +818,7 @@ class ImportModel extends Gdn_Model {
       $JunctionColumns = array_filter($PM->PermissionColumns('Category', 'PermissionCategoryID'));
       unset($JunctionColumns['PermissionID']);
       $JunctionColumns = array_merge(array('JunctionTable' => 'Category', 'JunctionColumn' => 'PermissionCategoryID', 'JunctionID' => -1), $JunctionColumns);
-      
+
       if ($this->ImportExists('Permission', 'JunctionTable')) {
          $ColumnSets = array(array_merge($GlobalColumns, $JunctionColumns));
          $ColumnSets[0]['JunctionTable'] = NULL;
@@ -828,22 +831,22 @@ class ImportModel extends Gdn_Model {
       $Data = $this->SQL->Get('zPermission')->ResultArray();
       foreach ($Data as $Row) {
          $Presets = array_map('trim', explode(',', GetValue('_Permissions', $Row)));
-         
+
          foreach ($ColumnSets as $ColumnSet) {
             $Set = array();
             $Set['RoleID'] = $Row['RoleID'];
-            
+
             foreach ($Presets as $Preset) {
                if (strpos($Preset, '.') !== FALSE) {
                   // This preset is a specific permission.
-                  
-                  if (array_key_exists($Preset, $ColumnSet)) {   
+
+                  if (array_key_exists($Preset, $ColumnSet)) {
                      $Set["`$Preset`"] = 1;
                   }
                   continue;
                }
                $Preset = strtolower($Preset);
-               
+
 
                foreach ($ColumnSet as $ColumnName => $Default) {
                   if (isset($Row[$ColumnName]))
@@ -1233,7 +1236,7 @@ class ImportModel extends Gdn_Model {
       $this->Data['Tables'] = $Tables;
       return TRUE;
    }
-	
+
 	public function ProcessImportFile() {
       // This one step can take a while so give it more time.
       set_time_limit(60 * 5);
@@ -1409,11 +1412,11 @@ class ImportModel extends Gdn_Model {
          $Queries[$Index] = rtrim($Sql, ';').';';
       }
       $Queries = "\n\n/* $CurrentStep */\n\n".implode("\n\n", $Queries);
-      
-      
+
+
       file_put_contents(PATH_UPLOADS.'/'.$SQLPath, $Queries, FILE_APPEND | LOCK_EX);
    }
-   
+
    /**
     * Set the category permissions based on the permission table.
     */
@@ -1424,26 +1427,26 @@ class ImportModel extends Gdn_Model {
       foreach ($Permissions as $Row) {
          $CategoryIDs[$Row['JunctionID']] = $Row['JunctionID'];
       }
-      
+
       // Update all of the child categories.
       $Root = CategoryModel::Categories(-1);
       $this->_SetCategoryPermissionIDs($Root, $Root['CategoryID'], $CategoryIDs);
    }
-   
+
    protected function _SetCategoryPermissionIDs($Category, $PermissionID, $IDs) {
       static $CategoryModel;
       if (!isset($CategoryModel))
          $CategoryModel = new CategoryModel();
-      
+
       $CategoryID = $Category['CategoryID'];
       if (isset($IDs[$CategoryID])) {
          $PermissionID = $CategoryID;
       }
-      
+
       if ($Category['PermissionCategoryID'] != $PermissionID) {
          $CategoryModel->SetField($CategoryID, 'PermissionCategoryID', $PermissionID);
       }
-      
+
       $ChildIDs = GetValue('ChildIDs', $Category, array());
       foreach ($ChildIDs as $ChildID) {
          $ChildCategory = CategoryModel::Categories($ChildID);
@@ -1451,33 +1454,33 @@ class ImportModel extends Gdn_Model {
             $this->_SetCategoryPermissionIDs($ChildCategory, $PermissionID, $IDs);
       }
    }
-   
+
    public function SetRoleDefaults() {
       if (!$this->ImportExists('Role', 'RoleID'))
          return;
-      
+
       $Data = $this->SQL->Get('zRole')->ResultArray();
-      
+
       $RoleDefaults = array(
-          'Garden.Registration.DefaultRoles' => array(), 
+          'Garden.Registration.DefaultRoles' => array(),
           'Garden.Registration.ApplicantRoleID' => 0,
           'Garden.Registration.ConfirmEmail' => FALSE,
           'Garden.Registration.ConfirmEmailRole' => '');
       $GuestRoleID = FALSE;
-      
+
       foreach ($Data as $Row) {
          if ($this->ImportExists('Role', '_Default'))
             $Name = $Row['_Default'];
          else
             $Name = GetValue('Name', $Row);
-         
+
          $RoleID = $Row['RoleID'];
-         
+
          if (preg_match('`anonymous`', $Name))
             $Name = 'guest';
          elseif (preg_match('`admin`', $Name))
             $Name = 'administrator';
-         
+
          switch (strtolower($Name)) {
             case 'email':
             case 'confirm email':
@@ -1556,13 +1559,13 @@ class ImportModel extends Gdn_Model {
    public function UpdateCounts() {
       // This option could take a while so set the timeout.
       set_time_limit(60*5);
-      
+
       // Define the necessary SQL.
       $Sqls = array();
 
       if(!$this->ImportExists('Discussion', 'LastCommentID'))
          $Sqls['Discussion.LastCommentID'] = $this->GetCountSQL('max', 'Discussion', 'Comment');
-      
+
       if(!$this->ImportExists('Discussion', 'DateLastComment')) {
          $Sqls['Discussion.DateLastComment'] = "update :_Discussion d
          left join :_Comment c
@@ -1600,7 +1603,7 @@ class ImportModel extends Gdn_Model {
          inner join :_Discussion d
            on d.FirstCommentID = c.CommentID";
       }
-      
+
       if(!$this->ImportExists('Discussion', 'CountComments'))
          $Sqls['Discussion.CountComments'] = $this->GetCountSQL('count', 'Discussion', 'Comment');
 
@@ -1613,18 +1616,18 @@ class ImportModel extends Gdn_Model {
              and c.DateInserted <= ud.DateLastViewed)";
 
       }
-      
+
       if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
          $Sqls['Tag.CoundDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
       }
-      
+
       if ($this->ImportExists('Poll') && Gdn::Structure()->TableExists('Poll')) {
          $Sqls['PollOption.CountVotes'] = $this->GetCountSQL('count', 'PollOption', 'PollVote', 'CountVotes', 'PollOptionID');
-         
+
          $Sqls['Poll.CountOptions'] = $this->GetCountSQL('count', 'Poll', 'PollOption', 'CountOptions', 'PollID');
          $Sqls['Poll.CountVotes'] = $this->GetCountSQL('sum', 'Poll', 'PollOption', 'CountVotes', 'CountVotes', 'PollID');
       }
-      
+
       if ($this->ImportExists('Activity', 'ActivityType')) {
          $Sqls['Activity.ActivityTypeID'] = "
             update :_Activity a
@@ -1636,13 +1639,13 @@ class ImportModel extends Gdn_Model {
       if ($this->ImportExists('Tag') && $this->ImportExists('TagDiscussion')) {
          $Sqls['Tag.CoundDiscussions'] = $this->GetCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'TagID');
       }
-      
+
       $Sqls['Category.CountDiscussions'] = $this->GetCountSQL('count', 'Category', 'Discussion');
       $Sqls['Category.CountComments'] = $this->GetCountSQL('sum', 'Category', 'Discussion', 'CountComments', 'CountComments');
       if (!$this->ImportExists('Category', 'PermissionCategoryID')) {
          $Sqls['Category.PermissionCategoryID'] = "update :_Category set PermissionCategoryID = -1";
       }
-      
+
       if($this->ImportExists('Conversation') && $this->ImportExists('ConversationMessage')) {
          $Sqls['Conversation.FirstMessageID'] = $this->GetCountSQL('min', 'Conversation', 'ConversationMessage', 'FirstMessageID', 'MessageID');
 
@@ -1658,7 +1661,7 @@ class ImportModel extends Gdn_Model {
             if(!$this->ImportExists('UserConversation', 'LastMessageID')) {
                if($this->ImportExists('UserConversation', 'DateLastViewed')) {
                   // Get the value from the DateLastViewed.
-                  $Sqls['UserConversation.LastMessageID'] = 
+                  $Sqls['UserConversation.LastMessageID'] =
                      "update :_UserConversation uc
                      set LastMessageID = (
                        select max(MessageID)
@@ -1668,7 +1671,7 @@ class ImportModel extends Gdn_Model {
                } else {
                   // Get the value from the conversation.
                   // In this case just mark all of the messages read.
-                  $Sqls['UserConversation.LastMessageID'] = 
+                  $Sqls['UserConversation.LastMessageID'] =
                      "update :_UserConversation uc
                      join :_Conversation c
                        on c.ConversationID = uc.ConversationID
@@ -1752,7 +1755,7 @@ class ImportModel extends Gdn_Model {
       if (!$this->ImportExists('Category', 'UrlCode')) {
          $Categories = CategoryModel::Categories();
          $TakenCodes = array();
-         
+
          foreach ($Categories as $Category) {
             $UrlCode = urldecode(Gdn_Format::Url($Category['Name']));
             if (strlen($UrlCode) > 50) {
@@ -1760,7 +1763,7 @@ class ImportModel extends Gdn_Model {
             } elseif (is_numeric($UrlCode)) {
                $UrlCode = 'c'.$UrlCode;
             }
-            
+
             if (in_array($UrlCode, $TakenCodes)) {
                $ParentCategory = CategoryModel::Categories($Category['ParentCategoryID']);
                if ($ParentCategory && $ParentCategory['CategoryID'] != -1) {
@@ -1783,5 +1786,59 @@ class ImportModel extends Gdn_Model {
       $this->SetCategoryPermissionIDs();
 
       return TRUE;
+	}
+
+	/**
+	 * Verify imported data
+	 */
+	public function VerifyImport() {
+		// When was the latest discussion posted?
+		$LatestDiscussion = $this->SQL->Get('Discussion', 'DateInserted', 'desc', 1);
+		if ($LatestDiscussion->count()) {
+			$this->Stat(
+				'Last Discussion',
+				$LatestDiscussion->Value('DateInserted')
+			);
+		} else {
+			$this->Stat(
+				'Last Discussion',
+				'None'
+			);
+		}
+
+		// Any discussions without a user associated with them?
+		$this->Stat(
+			'Orphaned Discussions',
+			$this->SQL->GetCount('Discussion', array('InsertUserID', '0'))
+		);
+
+		// When was the latest comment posted?
+		$LatestComment = $this->SQL->Get('Comment', 'DateInserted', 'desc', 1);
+		if ($LatestComment->count()) {
+			$this->Stat(
+				'Last Comment',
+				$LatestComment->Value('DateInserted')
+			);
+		} else {
+			$this->Stat(
+				'Last Comment',
+				'None'
+			);
+		}
+
+		// Any comments without a user associated with them?
+		$this->Stat(
+			'Orphaned Comments',
+			$this->SQL->GetCount('Discussion', array('InsertUserID', '0'))
+		);
+
+		// Any users without roles?
+		$UsersWithoutRoles = $this->SQL->From('User u')->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')->Where('ur.RoleID', NULL)->Get()->count();
+		$this->Stat(
+			'Users Without Roles',
+			$UsersWithoutRoles
+		);
+
+		return TRUE;
 	}
 }

@@ -809,9 +809,6 @@ if (!function_exists('FetchPageInfo')) {
             
          // Page Images
          if (count($PageInfo['Images']) == 0) {
-            if ($i > 10)
-               break;
-
             list($Width, $Height, $Type, $Attributes) = getimagesize($Image);
             $Images = DomGetImages($Dom, $Url);
             $PageInfo['Images'] = array_values($Images);

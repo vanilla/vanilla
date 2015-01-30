@@ -65,15 +65,10 @@ echo $this->Form->Errors();
 		<?php
 		//echo $this->Form->Radio('Overwrite', T('Garden.Import.Overwrite', 'Overwrite this forum.'), array('value' => 'overwrite', 'default' => 'overwrite'));
 		echo Wrap(T('Garden.Import.InputInstructions', 'Enter the email and password of the admin user from the data being imported.'), 'div');
-		
+
 		echo $this->Form->Label('Email', 'Email'),
 			$this->Form->TextBox('Email');
-		
-		echo $this->Form->Label('Password', 'Password'),
-			$this->Form->Input('Password', 'password');
-
-      echo $this->Form->CheckBox('UseCurrentPassword', 'Use My Current Password');
-		?>
+        ?>
 	</li><?php /*
 	<li>
 		<?php

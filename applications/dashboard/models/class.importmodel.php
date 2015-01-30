@@ -196,17 +196,7 @@ class ImportModel extends Gdn_Model {
 		if($Data->NumRows() == 0) {
 			$Result = FALSE;
 		} else {
-			$Data = $Data->FirstRow();
-         $HashMethod = GetValue('HashMethod', $Data);
-         if (!$HashMethod)
-            $HashMethod = $this->GetPasswordHashMethod();
-         
-			$PasswordHash = new Gdn_PasswordHash();
-         if (strcasecmp($HashMethod, 'reset') == 0 || $this->Data('UseCurrentPassword')) {
-            $Result = TRUE;
-         } else {
-            $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $HashMethod, GetValue('Name',$Data));
-         }
+			$Result = TRUE;
 		}
 		if(!$Result) {
 			$this->Validation->AddValidationResult('Email', T('ErrorCredentials'));
@@ -416,10 +406,6 @@ class ImportModel extends Gdn_Model {
          $this->Data['Overwrite'] = $Post['Overwrite'];
       if (isset($Post['Email']))
          $this->Data['OverwriteEmail'] = $Post['Email'];
-      if (isset($Post['Password'])) {
-         $this->Data['OverwritePassword'] = $Post['Password'];
-         $this->Data['UseCurrentPassword'] = GetValue('UseCurrentPassword', $Post);
-      }
       if (isset($Post['GenerateSQL']))
          $this->Data['GenerateSQL'] = $Post['GenerateSQL'];
    }
@@ -494,8 +480,6 @@ class ImportModel extends Gdn_Model {
       $D = $this->Data;
       $Post['Overwrite'] = GetValue('Overwrite', $D, 'Overwrite');
       $Post['Email'] = GetValue('OverwriteEmail', $D, '');
-      $Post['Password'] = GetValue('OverwritePassword', $D, '');
-      $Post['UseCurrentPassword'] = GetValue('UseCurrentPassword', $D, FALSE);
       $Post['GenerateSQL'] = GetValue('GenerateSQL', $D, FALSE);
    }
 
@@ -886,13 +870,9 @@ class ImportModel extends Gdn_Model {
    }
 
 	public function InsertUserTable() {
-      $UseCurrentPassword = $this->Data('UseCurrentPassword');
-
-      if ($UseCurrentPassword) {
-         $CurrentUser = $this->SQL->GetWhere('User', array('UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
-         $CurrentPassword = $CurrentUser['Password'];
-         $CurrentHashMethod = $CurrentUser['HashMethod'];
-      }
+        $CurrentUser = $this->SQL->GetWhere('User', array('UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+        $CurrentPassword = $CurrentUser['Password'];
+        $CurrentHashMethod = $CurrentUser['HashMethod'];
 
 		// Delete the current user table.
 		$this->SQL->Truncate('User');
@@ -909,11 +889,9 @@ class ImportModel extends Gdn_Model {
       $SqlArgs = array(':Email' => $AdminEmail);
       $SqlSet = '';
 
-      if ($UseCurrentPassword) {
-         $SqlArgs[':Password'] = $CurrentPassword;
-         $SqlArgs[':HashMethod'] = $CurrentHashMethod;
-         $SqlSet = ', Password = :Password, HashMethod = :HashMethod';
-      }
+      $SqlArgs[':Password'] = $CurrentPassword;
+      $SqlArgs[':HashMethod'] = $CurrentHashMethod;
+      $SqlSet = ', Password = :Password, HashMethod = :HashMethod';
 
       // If doing a password reset, save out the new admin password:
       if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0) {
@@ -937,10 +915,7 @@ class ImportModel extends Gdn_Model {
       if (!$User)
          $User = Gdn::UserModel()->GetByUsername(GetValue('OverwriteEmail', $this->Data));
 
-      $PasswordHash = new Gdn_PasswordHash();
-      if ($this->Data('UseCurrentPassword') || $PasswordHash->CheckPassword(GetValue('OverwritePassword', $this->Data), GetValue('Password', $User), GetValue('HashMethod', $User))) {
-         Gdn::Session()->Start(GetValue('UserID', $User), TRUE);
-      }
+	    Gdn::Session()->Start(GetValue('UserID', $User), TRUE);
 
 		return TRUE;
 	}

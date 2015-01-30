@@ -23,7 +23,7 @@ class ImportModel extends Gdn_Model {
 
    public $CurrentStep = 0;
 
-   public $Data = array();
+	public $Data = array();
 
    public $ErrorType = '';
 
@@ -42,8 +42,9 @@ class ImportModel extends Gdn_Model {
       8 => 'InsertTables',
       9 => 'UpdateCounts',
       10 => 'CustomFinalization',
-      11 => 'AddActivity'
-   );
+      11 => 'AddActivity',
+		12 => 'VerifyImport'
+	);
 
    protected $_OverwriteSteps = array(
       0 => 'Initialize',
@@ -57,7 +58,8 @@ class ImportModel extends Gdn_Model {
       8 => 'InsertTables',
       9 => 'UpdateCounts',
       10 => 'CustomFinalization',
-      11 => 'AddActivity'
+      11 => 'AddActivity',
+		12 => 'VerifyImport'
    );
 
    protected $_OverwriteStepsDb = array(
@@ -69,7 +71,8 @@ class ImportModel extends Gdn_Model {
       5 => 'InsertTables',
       6 => 'UpdateCounts',
       7 => 'CustomFinalization',
-      8 => 'AddActivity'
+      8 => 'AddActivity',
+		9 => 'VerifyImport'
    );
 
    /**
@@ -201,8 +204,10 @@ class ImportModel extends Gdn_Model {
       if(!$Result) {
          $this->Validation->AddValidationResult('Email', T('ErrorCredentials'));
          $this->ErrorType = 'Credentials';
-      }
-      return $Result;
+		}
+		return $Result;
+
+	}
 
    }
 
@@ -308,7 +313,7 @@ class ImportModel extends Gdn_Model {
          if(GetValue('Skip', $TableInfo))
             continue;
 
-         $St->Table(self::TABLE_PREFIX.$Table);
+			$St->Table(self::TABLE_PREFIX.$Table);
          $Columns = $TableInfo['Columns'];
 
          $DestStructure->Reset()->Get($Table);
@@ -380,7 +385,7 @@ class ImportModel extends Gdn_Model {
 
          $this->Data['CurrentStepMessage'] = $Table;
 
-         if($Table == 'Permission')
+			if($Table == 'Permission')
             $this->SQL->Delete($Table, array('RoleID <>' => 0));
          else
             $this->SQL->Truncate($Table);
@@ -1792,5 +1797,59 @@ class ImportModel extends Gdn_Model {
       $this->SetCategoryPermissionIDs();
 
       return TRUE;
-   }
+	}
+
+	/**
+	 * Verify imported data
+	 */
+	public function VerifyImport() {
+		// When was the latest discussion posted?
+		$LatestDiscussion = $this->SQL->Get('Discussion', 'DateInserted', 'desc', 1);
+		if ($LatestDiscussion->count()) {
+			$this->Stat(
+				'Last Discussion',
+				$LatestDiscussion->Value('DateInserted')
+			);
+		} else {
+			$this->Stat(
+				'Last Discussion',
+				'None'
+			);
+		}
+
+		// Any discussions without a user associated with them?
+		$this->Stat(
+			'Orphaned Discussions',
+			$this->SQL->GetCount('Discussion', array('InsertUserID', '0'))
+		);
+
+		// When was the latest comment posted?
+		$LatestComment = $this->SQL->Get('Comment', 'DateInserted', 'desc', 1);
+		if ($LatestComment->count()) {
+			$this->Stat(
+				'Last Comment',
+				$LatestComment->Value('DateInserted')
+			);
+		} else {
+			$this->Stat(
+				'Last Comment',
+				'None'
+			);
+		}
+
+		// Any comments without a user associated with them?
+		$this->Stat(
+			'Orphaned Comments',
+			$this->SQL->GetCount('Discussion', array('InsertUserID', '0'))
+		);
+
+		// Any users without roles?
+		$UsersWithoutRoles = $this->SQL->From('User u')->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')->Where('ur.RoleID', NULL)->Get()->count();
+		$this->Stat(
+			'Users Without Roles',
+			$UsersWithoutRoles
+		);
+
+		return TRUE;
+	}
 }

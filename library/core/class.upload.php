@@ -142,12 +142,13 @@ class Gdn_Upload extends Gdn_Pluggable {
    public static function Parse($Name) {
       $Result = FALSE;
       $Name = str_replace('\\', '/', $Name);
+      $PathUploads = str_replace('\\', '/', PATH_UPLOADS);
 
       if (preg_match('`^https?://`', $Name)) {
          $Result = array('Name' => $Name, 'Type' => 'external', 'SaveName' => $Name, 'SaveFormat' => '%s', 'Url' => $Name, );
          return $Result;
-      } elseif (StringBeginsWith($Name, PATH_UPLOADS)) {
-         $Name = ltrim(substr($Name, strlen(PATH_UPLOADS)), '/');
+      } elseif (StringBeginsWith($Name, $PathUploads)) {
+         $Name = ltrim(substr($Name, strlen($PathUploads)), '/');
          // This is an upload.
          $Result = array('Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s');
       } elseif (preg_match ('`^~([^/]*)/(.*)$`', $Name, $Matches)) {

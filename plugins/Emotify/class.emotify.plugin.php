@@ -29,6 +29,13 @@ class EmotifyPlugin implements Gdn_IPlugin {
       $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
    }
 	
+    /**
+    * Disable Emoji sets.
+    */
+    public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler() {
+        SaveToConfig('Garden.EmojiSet', 'none', false);
+    }
+	
 	/**
 	 * Replace emoticons in comments.
 	 */

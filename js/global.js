@@ -1086,6 +1086,15 @@ jQuery(document).ready(function($) {
       setInterval(pingForNotifications, 60000);
    }
 
+   // Clear notifications alerts when they are accessed anywhere.
+   $(document).on('click', '.js-clear-notifications', function() {
+      $('.NotificationsAlert').remove();
+   });
+
+   $(document).on('change', '.js-nav-dropdown', function() {
+      window.location = $(this).val();
+   });
+
 	// Stash something in the user's session (or unstash the value if it was not provided)
 	stash = function(name, value, callback) {
 		$.ajax({
@@ -1483,10 +1492,19 @@ jQuery(document).ready(function($) {
 
       // Emoji, set in definition list in foot, by Emoji class. Make sure
       // that class is getting instantiated, otherwise emoji will be empty.
-      var emoji_array = gdn.definition('emoji', []);
-      var emoji = (emoji_array.length)
-         ? $.parseJSON(emoji_array)
-         : [];
+      var emoji = gdn.getMeta('emoji', []);
+      var emojiList = $.map(emoji.emoji || [], function(value, i) {
+         var parts = value.split('.');
+
+         return {'name': i, 'filename': value, 'basename': parts[0], 'ext': '.'+parts[1]};
+      });
+      var emojiTemplate = (emoji.format  || '')
+         .replace(/{(.+?)}/g, '$${$1}')
+         .replace('%1$s', '${src}')
+         .replace('%2$s', '${name}')
+         .replace('${src}', emoji.assetPath+'/${filename}')
+         .replace('${dir}', emoji.assetPath);
+      emojiTemplate = '<li data-value=":${name}:" class="at-suggest-emoji"><span class="emoji-wrap">'+emojiTemplate+'</span> <span class="emoji-name">${name}</span></li>';
 
       // Handle iframe situation
       var iframe_window = (iframe)
@@ -1656,7 +1674,7 @@ jQuery(document).ready(function($) {
 
                   // The last character prevents the matcher from trigger
                   // on nearly everything.
-                  return insert + hidden_unicode_chars.zwnj;
+                  return insert;
                },
 
                // Custom highlighting to accept spaces in names. This is
@@ -1719,14 +1737,18 @@ jQuery(document).ready(function($) {
                   }
                }
             },
-            display_timeout: 0,
             cWindow: iframe_window
          })
          .atwho({
             at: ':',
-            tpl: '<li data-value=":${name}:" class="at-suggest-emoji"><img src="${url}" width="20" height="20" alt=":${name}:" class="emoji-img" /> <span class="emoji-name">${name}</span></li>',
+            tpl: emojiTemplate,
+            callbacks: {
+               tplEval: function(tpl, map) {
+                  console.log(map);
+               }
+            },
             limit: max_suggestions,
-            data: emoji,
+            data: emojiList,
             cWindow: iframe_window
          });
 

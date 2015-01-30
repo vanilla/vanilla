@@ -47,8 +47,8 @@ class PostController extends VanillaController {
     */
    public function Index($CurrentFormName = 'discussion') {
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
 		$this->SetData('CurrentFormName', $CurrentFormName);
 		$Forms = array();
@@ -99,8 +99,8 @@ class PostController extends VanillaController {
 
       // Setup head
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
       $Session = Gdn::Session();
 
@@ -115,8 +115,15 @@ class PostController extends VanillaController {
          $Category = CategoryModel::Categories($this->CategoryID);
       } else if ($CategoryUrlCode != '') {
          $CategoryModel = new CategoryModel();
-         $Category = $CategoryModel->GetByCode($CategoryUrlCode);
-         $this->CategoryID = $Category->CategoryID;
+         if (is_numeric($CategoryUrlCode)) {
+            $Category = CategoryModel::Categories($CategoryUrlCode);
+         } else {
+            $Category = $CategoryModel->GetByCode($CategoryUrlCode);
+         }
+
+         if ($Category) {
+            $this->CategoryID = val('CategoryID', $Category);
+         }
 
       }
       if ($Category) {
@@ -508,8 +515,8 @@ class PostController extends VanillaController {
 
       // Setup head
       $this->AddJsFile('jquery.autosize.min.js');
-      $this->AddJsFile('post.js');
       $this->AddJsFile('autosave.js');
+      $this->AddJsFile('post.js');
 
       // Setup comment model, $CommentID, $DraftID
       $Session = Gdn::Session();
@@ -533,7 +540,7 @@ class PostController extends VanillaController {
 
       // Check permissions
       if ($Discussion && $Editing) {
-         // Permisssion to edit
+         // Permission to edit
          if ($this->Comment->InsertUserID != $Session->UserID)
             $this->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
@@ -733,8 +740,9 @@ class PostController extends VanillaController {
                $this->SetJson('CountDrafts', $CountDrafts);
             }
          }
-      }
-      else {
+      } elseif ($this->Request->IsPostBack()) {
+         throw new Gdn_UserException('Invalid CSRF token.', 401);
+      } else {
          // Load form
          if (isset($this->Comment)) {
             $this->Form->SetData((array)$this->Comment);

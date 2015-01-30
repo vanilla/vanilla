@@ -187,10 +187,10 @@ class CategoryModel extends Gdn_Model {
             $Category['PhotoUrl'] = '';
 
          if ($Category['DisplayAs'] == 'Default') {
-            if ($Category['Depth'] == 1 && C('Vanilla.Categories.DoHeadings')) {
-               $Category['DisplayAs'] = 'Heading';
-            } elseif ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0)) {
+            if ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0)) {
                $Category['DisplayAs'] = 'Categories';
+            } elseif ($Category['Depth'] == (C('Vanilla.Categories.NavDepth', 0) + 1) && C('Vanilla.Categories.DoHeadings')) {
+               $Category['DisplayAs'] = 'Heading';
             } else {
                $Category['DisplayAs'] = 'Discussions';
             }
@@ -676,6 +676,13 @@ class CategoryModel extends Gdn_Model {
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
       }
+
+      // Translate name and description
+      foreach ($IDs as $ID) {
+         $Code = $Categories[$ID]['UrlCode'];
+         $Categories[$ID]['Name'] = TranslateContent("Categories.".$Code.".Name", $Categories[$ID]['Name']);
+         $Categories[$ID]['Description'] = TranslateContent("Categories.".$Code.".Description", $Categories[$ID]['Description']);
+      }
    }
 
    /**
@@ -966,21 +973,35 @@ class CategoryModel extends Gdn_Model {
    /**
     * Get the subtree starting at a given parent.
     *
-    * @param string $ParentCategory The ID or url code of the parent category.
-    * @param bool $IncludeParent Whether or not to include the parent in the result.
+    * @param string $parentCategory The ID or url code of the parent category.
+    * @param bool $includeParent Whether or not to include the parent in the result.
+    * @param bool|int $adjustDepth Whether or not to adjust the depth or a number to adjust the depth by.
+    * Passing `true` as this parameter will make the returned subtree look like the full tree which is useful for many
+    * views that expect the full category tree.
     * @return array An array of categories.
     */
-   public static function GetSubtree($ParentCategory, $IncludeParent = true) {
+   public static function GetSubtree($parentCategory, $includeParent = true, $adjustDepth = false) {
       $Result = array();
-      $Category = self::Categories($ParentCategory);
+      $Category = self::Categories($parentCategory);
+
+      // Check to see if the depth should be adjusted.
+      // This value is true if called by a dev or a number if called recursively.
+      if ($adjustDepth === true) {
+         $adjustDepth = -val('Depth', $Category) + ($includeParent ? 1 : 0);
+      }
+
       if ($Category) {
-         if ($IncludeParent) {
+         if ($includeParent) {
+            if ($adjustDepth) {
+               $Category['Depth'] += $adjustDepth;
+            }
+
             $Result[$Category['CategoryID']] = $Category;
          }
-         $ChildIDs = GetValue('ChildIDs', $Category, array());
+         $ChildIDs = val('ChildIDs', $Category, array());
 
          foreach ($ChildIDs as $ChildID) {
-            $Result = array_replace($Result, self::GetSubtree($ChildID, true));
+            $Result = array_replace($Result, self::GetSubtree($ChildID, true, $adjustDepth));
          }
       }
       return $Result;

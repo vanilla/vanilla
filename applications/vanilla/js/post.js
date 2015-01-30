@@ -167,11 +167,14 @@ jQuery(document).ready(function($) {
    });
 
    // Autosave
-   $('#Form_SaveDraft').livequery(function() {
-      var btn = this;
-      $('#CommentForm textarea').autosave({ button: btn });
-      $('#DiscussionForm textarea').autosave({ button: btn });
-   });
+   if ($.fn.autosave) {
+      var btn = $('#Form_SaveDraft');
 
-
+      $('#CommentForm textarea').autosave({
+         button: btn
+      });
+      $('#DiscussionForm textarea').autosave({
+         button: btn
+      });
+   }
 });

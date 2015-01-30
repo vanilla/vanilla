@@ -468,7 +468,10 @@ class DiscussionModel extends VanillaModel {
             //->Where('w.DateLastViewed', NULL)
             //->OrWhere('d.DateLastComment >', 'w.DateLastViewed')
             //->EndWhereGroup()
-            ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE);
+            ->BeginWhereGroup()
+            ->Where('d.CountComments >', 'COALESCE(w.CountComments, 0)', TRUE, FALSE)
+            ->OrWhere('w.DateLastViewed', NULL)
+            ->EndWhereGroup();
       } else {
 			$this->SQL
 				->Select('0', '', 'WatchUserID')
@@ -1580,7 +1583,7 @@ class DiscussionModel extends VanillaModel {
 
             if ($DiscussionID > 0) {
                // Updating
-               $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+               $Stored = $this->GetID($DiscussionID, DATASET_TYPE_OBJECT);
 
                // Block Format change if we're forcing the formatter.
                if (C('Garden.ForceInputFormatter')) {
@@ -1755,7 +1758,7 @@ class DiscussionModel extends VanillaModel {
 
             // Get CategoryID of this discussion
 
-            $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+            $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_OBJECT);
             $CategoryID = GetValue('CategoryID', $Discussion, FALSE);
 
             // Update discussion counter for affected categories.
@@ -1954,7 +1957,8 @@ class DiscussionModel extends VanillaModel {
          $User = Gdn::UserModel()->GetID($UserID);
 
          $CountDiscussions = GetValue('CountDiscussions', $User);
-         if ($CountDiscussions > 100 && $CountDiscussions % 20 !== 0) {
+         // Increment if 100 or greater; Recalc on 120, 140 etc.
+         if ($CountDiscussions >= 100 && $CountDiscussions % 20 !== 0) {
             $this->SQL->Update('User')
                ->Set('CountDiscussions', 'CountDiscussions + 1', FALSE)
                ->Where('UserID', $UserID)

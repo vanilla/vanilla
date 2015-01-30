@@ -15,9 +15,21 @@
  */
 
 /**
+ * Allow gzopen64 to be a fallback for gzopen. Workaround for a PHP bug.
+ *
+ * @see http://php.net/manual/en/function.gzopen.php
+ * @return mixed File pointer or false.
+ */
+if (!function_exists('gzopen') && function_exists('gzopen64')){
+   function gzopen($filename, $mode, $use_include_path = 0){
+      return gzopen64($filename, $mode, $use_include_path);
+   }
+}
+
+/**
  * Takes an associative array in the layout of parse_url, and constructs a URL from it
  *
- * see http://www.php.net/manual/en/function.http-build-url.php#96335
+ * @see http://www.php.net/manual/en/function.http-build-url.php#96335
  *
  * @param   mixed   (Part(s) of) an URL in form of a string or associative array like parse_url() returns
  * @param   mixed   Same as the first argument

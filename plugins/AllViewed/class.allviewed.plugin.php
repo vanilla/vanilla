@@ -17,19 +17,23 @@
  * v2.1
  * - Added SpMarkAllViewed and SpMarkCategoryViewed sprites to links
  * - Cleaned up formatting to match majority
+ * v2.2
+ * - Rename to "Mark All Viewed" (from "All Viewed")
+ * - Bug fix: children categories being marked as read when parent is
+ * - Bug fix: fix performance issues from over-querying
  * 
- * @copyright 2009 Vanilla Forums Inc.
+ * @copyright 2009-2014 Vanilla Forums Inc.
  * @author Matt Lincoln Russell <lincoln@vanillaforums.com>
  * @author Oliver Chung <shoat@cs.washington.edu>
  * @package AllViewed
  */
 
 $PluginInfo['AllViewed'] = array(
-   'Name' => 'All Viewed',
+   'Name' => 'Mark All Viewed',
    'Description' => 'Allows users to mark all discussions as viewed and mark category viewed.',
-   'Version' => '2.1',
-   'Author' => "Matt Lincoln Russell, Oliver Chung",
-   'AuthorEmail' => 'lincoln@vanillaforums.com, shoat@cs.washington.edu',
+   'Version' => '2.2',
+   'Author' => "Lincoln Russell",
+   'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com',
    'License' => 'GNU GPLv2',
    'MobileFriendly' => TRUE
@@ -45,7 +49,7 @@ class AllViewedPlugin extends Gdn_Plugin {
    * Adds "Mark All Viewed" to main menu.
    *
    * @since 1.0
-   * @access public
+   * @param Gdn_Controller $Sender
    */
    public function Base_Render_Before($Sender) {
       // Add "Mark All Viewed" to main menu
@@ -60,25 +64,35 @@ class AllViewedPlugin extends Gdn_Plugin {
     * Adds "Mark All Viewed" and (conditionally) "Mark Category Viewed" to MeModule menu.
     *
     * @since 2.0
-    * @access public
+    * @param MeModule $Sender
     */
    public function MeModule_FlyoutMenu_Handler($Sender) {
-      // Add "Mark All Viewed" to menu
-      if (Gdn::Session()->IsValid()) {
-         echo Wrap(Anchor(Sprite('SpMarkAllViewed').' '.T('Mark All Viewed'), '/discussions/markallviewed'), 'li', array('class' => 'MarkAllViewed'));
+      // Only for members
+      if(!Gdn::Session()->IsValid()) {
+         return;
+      }
 
-         $CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
-         if ($CategoryID > 0) {
-            echo Wrap(Anchor(Sprite('SpMarkCategoryViewed').' '.T('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}"), 'li', array('class' => 'MarkCategoryViewed'));
-         }
+      // Add "Mark All Viewed" to menu
+      echo Wrap(
+         Anchor(Sprite('SpMarkAllViewed').' '.T('Mark All Viewed'), '/discussions/markallviewed'),
+         'li', array('class' => 'MarkAllViewed'));
+
+      $CategoryID = (int)(empty(Gdn::Controller()->CategoryID) ? 0 : Gdn::Controller()->CategoryID);
+      if ($CategoryID > 0) {
+         $Anchor = "/discussions/markcategoryviewed/{$CategoryID}";
+         echo Wrap(
+            Anchor(Sprite('SpMarkCategoryViewed').' '.T('Mark Category Viewed'), $Anchor),
+            'li', array('class' => 'MarkCategoryViewed'));
       }
    }
 
    /**
-    * Helper function that actually sets the DateMarkedRead column in UserCategory
+    * Helper function that actually sets the DateMarkedRead column in UserCategory.
     *
     * @since 2.0
-    * @access private
+    * @param object $CategoryModel
+    * @param int $CategoryID
+    * @return null
     */
    private function MarkCategoryRead($CategoryModel, $CategoryID) {
       $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
@@ -86,18 +100,25 @@ class AllViewedPlugin extends Gdn_Plugin {
 
    /**
     * Allows user to mark all discussions in a specified category as viewed.
-    *
-    * @param DiscussionsController $Sender
+
     * @since 1.0
-    * @access public
+    * @param DiscussionsController $Sender
+    * @param int $CategoryID
     */
    public function DiscussionsController_MarkCategoryViewed_Create($Sender, $CategoryID) {
+      // Only for members
+      if(!Gdn::Session()->IsValid()) {
+         return;
+      }
+
+      // If we sent a category, mark it as viewed.
       if (strlen($CategoryID) > 0 && (int)$CategoryID > 0) {
          $CategoryModel = new CategoryModel();
          $this->MarkCategoryRead($CategoryModel, $CategoryID);
          $this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array($CategoryID));
       }
 
+      // Back from whence thy came
       Redirect(Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER'));
    }
 
@@ -105,51 +126,72 @@ class AllViewedPlugin extends Gdn_Plugin {
     * Helper function to recursively mark categories as read based on a Category's ParentID.
     *
     * @since 2.0
-    * @access private
+    * @param object $CategoryModel
+    * @param array $CategoriesToMark Contains category arrays.
+    * @param array $ParentIDs Numeric array of CategoryIDs.
+    * @return null
     */
-   private function RecursiveMarkCategoryRead($CategoryModel, $UnprocessedCategories, $ParentIDs) {
-      $CurrentUnprocessedCategories = array();
+   private function RecursiveMarkCategoryRead($CategoryModel, $CategoriesToMark, $ParentIDs) {
+      // Reset categories we are dealing with
+      $CurrentCategoriesToMark = array();
       $CurrentParentIDs = $ParentIDs;
-      foreach ($UnprocessedCategories as $Category) {
+
+      // Find the categories we are operating on
+      foreach ($CategoriesToMark as $Category) {
          if (in_array($Category["ParentCategoryID"], $ParentIDs)) {
+            // Mark this one
             $this->MarkCategoryRead($CategoryModel, $Category["CategoryID"]);
+
             // Don't add duplicate ParentIDs
             if (!in_array($Category["CategoryID"], $CurrentParentIDs)) {
                $CurrentParentIDs[] = $Category["CategoryID"];
             }
          } else {
-            // This keeps track of categories that we still need to check on recurse
-            $CurrentUnprocessedCategories[] = $Category;
+            // This keeps track of categories that we still need to check on recursively
+            $CurrentCategoriesToMark[] = $Category;
          }
       }
-      // Base case: if we have not found any new parent ids, we don't need to recurse
+
+      // If we have not found any new ParentIDs, we don't need to descend another level
       if (count($ParentIDs) != count($CurrentParentIDs)) {
-         $this->RecursiveMarkCategoryRead($CategoryModel, $CurrentUnprocessedCategories, $CurrentParentIDs);
+         $this->RecursiveMarkCategoryRead($CategoryModel, $CurrentCategoriesToMark, $CurrentParentIDs);
       }
    }
 
    /**
-    * Allows user to mark all discussions as viewed.
+    * User action: mark all discussions as viewed.
     *
     * @since 1.0
-    * @access public
+    * @param DiscussionController $Sender
     */
    public function DiscussionsController_MarkAllViewed_Create($Sender) {
+      // Only for members
+      if(!Gdn::Session()->IsValid()) {
+         return;
+      }
+
+      // Mark all viewed from root category
       $CategoryModel = new CategoryModel();
       $this->MarkCategoryRead($CategoryModel, -1);
       $this->RecursiveMarkCategoryRead($CategoryModel, CategoryModel::Categories(), array(-1));
-      Redirect($_SERVER["HTTP_REFERER"]);
+
+      // Back from whence thy came
+      Redirect(Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER'));
    }
 
    /**
     * Get the number of comments inserted since the given timestamp.
     *
     * @since 1.0
-    * @access public
+    * @param int $DiscussionID
+    * @param int $DateAllViewed Unix timestamp.
+    * @return int Number of comments.
     */
    public function GetCommentCountSince($DiscussionID, $DateAllViewed) {
       // Only for members
-      if(!Gdn::Session()->IsValid()) return;
+      if(!Gdn::Session()->IsValid()) {
+         return;
+      }
 
       // Validate DiscussionID
       $DiscussionID = (int) $DiscussionID;
@@ -166,10 +208,12 @@ class AllViewedPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Helper function to actually override a discussion's unread status
+    * Override a discussion's unread status.
     *
     * @since 2.0
-    * @access private
+    * @param object $Discussion
+    * @param int $DateAllViewed Unix timestamp.
+    * @return null
     */
    private function CheckDiscussionDate($Discussion, $DateAllViewed) {
       if (Gdn_Format::ToTimestamp($Discussion->DateInserted) > $DateAllViewed) {
@@ -190,16 +234,15 @@ class AllViewedPlugin extends Gdn_Plugin {
    /**
     * Modify CountUnreadComments to account for DateAllViewed.
     *
-    * Required in DiscussionModel->Get() just before the return:
-    *    $this->EventArguments['Data'] = $Data;
-    *    $this->FireEvent('AfterAddColumns');
-    * @link http://vanillaforums.org/discussion/13227
     * @since 1.0
-    * @access public
+    * @param DiscussionModel $Sender
+    * @return null
     */
    public function DiscussionModel_SetCalculatedFields_Handler($Sender) {
       // Only for members
-      if (!Gdn::Session()->IsValid()) return;
+      if (!Gdn::Session()->IsValid()) {
+         return;
+      }
 
       // Recalculate New count with each category's DateMarkedRead
       $Discussion = &$Sender->EventArguments['Discussion'];

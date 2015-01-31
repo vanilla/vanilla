@@ -492,7 +492,7 @@ class CommentModel extends VanillaModel {
 			}
 
          /**
-          * Fuzzy way of trying to automatically mark a cateogyr read again
+          * Fuzzy way of trying to automatically mark a category read again
           * if the user reads all the comments on the first few pages.
           */
 
@@ -526,7 +526,9 @@ class CommentModel extends VanillaModel {
                      // Loop over these and see if any are still unread
                      $MarkAsRead = TRUE;
                      while ($Discussion = $Discussions->NextRow(DATASET_TYPE_ARRAY)) {
-                        if ($Discussion['Read']) continue;
+                        if ($Discussion['Read']) {
+                           continue;
+                        }
                         $MarkAsRead = FALSE;
                         break;
                      }
@@ -534,7 +536,7 @@ class CommentModel extends VanillaModel {
                      // Mark this category read if all the new content is read
                      if ($MarkAsRead) {
                         $CategoryModel = new CategoryModel();
-                        $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
+                        $CategoryModel->SaveUserCategory($CategoryID, array('DateMarkedRead' => Gdn_Format::ToDateTime()));
                         unset($CategoryModel);
                      }
 

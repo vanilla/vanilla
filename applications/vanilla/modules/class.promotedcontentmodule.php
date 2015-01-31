@@ -334,10 +334,11 @@ class PromotedContentModule extends Gdn_Module {
          if ($this->ShowDiscussions()) {
             $Discussions = Gdn::SQL()->Select('d.*')
                ->From('Discussion d')
-               ->Where('Score >', $MinScore)
-               ->OrderBy('Score', 'DESC')
+               ->OrderBy('DateInserted', 'DESC')
                ->Limit($this->Limit);
-            if ($MinScore !== FALSE) $Discussions->Where('Score >', $MinScore);
+            if ($MinScore !== FALSE) {
+               $Discussions->Where('Score >', $MinScore);
+            }
             $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
          }
 
@@ -346,9 +347,11 @@ class PromotedContentModule extends Gdn_Module {
          if ($this->ShowComments()) {
             $Comments = Gdn::SQL()->Select('c.*')
                ->From('Comment c')
-               ->OrderBy('Score', 'DESC')
+               ->OrderBy('DateInserted', 'DESC')
                ->Limit($this->Limit);
-            if ($MinScore !== FALSE) $Comments->Where('Score >', $MinScore);
+            if ($MinScore !== FALSE) {
+               $Comments->Where('Score >', $MinScore);
+            }
             $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
 
             $this->JoinCategory($Comments);

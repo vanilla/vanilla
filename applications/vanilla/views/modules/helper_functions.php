@@ -50,8 +50,8 @@ function WritePromotedContent($Content, $Sender) {
          $ContentURL = DiscussionUrl($Content);
          break;
    }
-   $Sender->EventArgs['Content'] = $Content;
-   $Sender->EventArgs['ContentUrl'] = $ContentURL;
+   $Sender->EventArguments['Content'] = $Content;
+   $Sender->EventArguments['ContentUrl'] = $ContentURL;
 ?>
    <div id="<?php echo "Promoted_{$ContentType}_{$ContentID}"; ?>" class="<?php echo CssClass($Content); ?>">
       <div class="AuthorWrap">

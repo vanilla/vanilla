@@ -377,6 +377,40 @@ class PromotedContentModule extends Gdn_Module {
    }
 
    /**
+    * Selected content that passed the Promoted threshold.
+    *
+    * This uses the Reactions caching system & options.
+    *
+    * @param array $Parameters Not used.
+    * @return array $Content
+    */
+   protected function SelectByPromoted($Parameters) {
+      if (!class_exists('ReactionModel')) {
+         return;
+      }
+
+      $RecordTypes = array();
+      if ($this->ShowDiscussions()) {
+         $RecordTypes[] = 'Discussion';
+      }
+      if ($this->ShowComments()) {
+         $RecordTypes[] = 'Comments';
+      }
+
+      $ReactionModel = new ReactionModel();
+      $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
+      $Content = $ReactionModel->GetRecordsWhere(
+          array('TagID' => $PromotedTagID, 'RecordType' => $RecordTypes),
+          'DateInserted',
+          'desc',
+          $this->Limit);
+
+      $this->Prepare($Content);
+
+      return $Content;
+   }
+
+   /**
     * Attach CategoryID to Comments
     *
     * @param array $Comments

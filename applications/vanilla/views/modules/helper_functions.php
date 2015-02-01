@@ -38,9 +38,9 @@ function WritePromotedContent($Content, $Sender) {
    if ($UserPhotoFirst === NULL)
       $UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
 
-   $ContentType = GetValue('ItemType', $Content);
-   $ContentID = GetValue("{$ContentType}ID", $Content);
-   $Author = GetValue('Author', $Content);
+   $ContentType = val('RecordType', $Content);
+   $ContentID = val("{$ContentType}ID", $Content);
+   $Author = val('Author', $Content);
 
    switch (strtolower($ContentType)) {
       case 'comment':
@@ -69,8 +69,8 @@ function WritePromotedContent($Content, $Sender) {
          </span>
          <span class="AuthorInfo">
             <?php
-            echo ' '.WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
-            echo ' '.WrapIf(htmlspecialchars(GetValue('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
+            echo ' '.WrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
+            echo ' '.WrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
             $Sender->FireEvent('AuthorInfo');
             ?>
          </span>

@@ -420,7 +420,7 @@ class PromotedContentModule extends Gdn_Module {
 
          foreach ($Section as $Item) {
             $ItemField = GetValue($Field, $Item);
-            $Interleaved[$ItemField] = array_merge($Item, array('ItemType' => $SectionType));
+            $Interleaved[$ItemField] = array_merge($Item, array('RecordType' => $SectionType));
 
             ksort($Interleaved);
          }
@@ -438,10 +438,10 @@ class PromotedContentModule extends Gdn_Module {
    protected function Prepare(&$Content) {
 
       foreach ($Content as &$ContentItem) {
-         $ContentType = GetValue('ItemType', $ContentItem);
+         $ContentType = val('RecordType', $ContentItem);
 
          $Replacement = array();
-         $Fields = array('DiscussionID', 'CategoryID', 'DateInserted', 'DateUpdated', 'InsertUserID', 'Body', 'Format', 'ItemType');
+         $Fields = array('DiscussionID', 'CategoryID', 'DateInserted', 'DateUpdated', 'InsertUserID', 'Body', 'Format', 'RecordType');
 
          switch (strtolower($ContentType)) {
             case 'comment':

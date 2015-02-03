@@ -120,8 +120,12 @@ class MessagesController extends ConversationsController {
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
          if ($ConversationID !== FALSE) {
             $Target = $this->Form->GetFormValue('Target', 'messages/'.$ConversationID);
-
             $this->RedirectUrl = Url($Target);
+
+            $Conversation = $this->ConversationModel->GetID($ConversationID, Gdn::Session()->UserID);
+            $NewMessageID = val('FirstMessageID', $Conversation);
+            $this->EventArguments['MessageID'] = $NewMessageID;
+            $this->FireEvent('AfterConversationSave');
          }
       } else {
          if ($Recipient != '')

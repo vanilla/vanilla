@@ -205,7 +205,9 @@ class Gdn_Validation {
                case 'longtext':
                case 'binary':
                case 'varbinary':
-                  $RuleNames[] = 'String';
+                  if (!in_array($Field, array('Attributes', 'Data', 'Preferences', 'Permissions'))) {
+                     $RuleNames[] = 'String';
+                  }
                   if ($Properties->Length != '')
                      $RuleNames[] = 'Length';
                   break;
@@ -533,7 +535,7 @@ class Gdn_Validation {
       $HoneypotName = Gdn::Config('Garden.Forms.HoneypotName', '');
       $HoneypotContents = GetPostValue($HoneypotName, '');
       if ($HoneypotContents != '')
-         $this->AddValidationResult($HoneypotName, "You've filled our honeypot! We use honeypots to help prevent spam. If you're  not a spammer or a bot, you should contact the application administrator for help.");
+         $this->AddValidationResult($HoneypotName, "You've filled our honeypot! We use honeypots to help prevent spam. If you're not a spammer or a bot, you should contact the application administrator for help.");
 
 
       // Loop through the fields that should be validated

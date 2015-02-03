@@ -1,0 +1,11 @@
+# Automatically normalize line endings for all text-based files
+* text=auto
+
+# Enforce Unix newlines
+*.css   text eol=lf
+*.html  text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.less  text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf

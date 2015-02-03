@@ -187,10 +187,10 @@ class CategoryModel extends Gdn_Model {
             $Category['PhotoUrl'] = '';
 
          if ($Category['DisplayAs'] == 'Default') {
-            if ($Category['Depth'] == 1 && C('Vanilla.Categories.DoHeadings')) {
-               $Category['DisplayAs'] = 'Heading';
-            } elseif ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0)) {
+            if ($Category['Depth'] <= C('Vanilla.Categories.NavDepth', 0)) {
                $Category['DisplayAs'] = 'Categories';
+            } elseif ($Category['Depth'] == (C('Vanilla.Categories.NavDepth', 0) + 1) && C('Vanilla.Categories.DoHeadings')) {
+               $Category['DisplayAs'] = 'Heading';
             } else {
                $Category['DisplayAs'] = 'Discussions';
             }
@@ -675,6 +675,13 @@ class CategoryModel extends Gdn_Model {
          $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsCommentsAdd'] = $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+      }
+
+      // Translate name and description
+      foreach ($IDs as $ID) {
+         $Code = $Categories[$ID]['UrlCode'];
+         $Categories[$ID]['Name'] = TranslateContent("Categories.".$Code.".Name", $Categories[$ID]['Name']);
+         $Categories[$ID]['Description'] = TranslateContent("Categories.".$Code.".Description", $Categories[$ID]['Description']);
       }
    }
 
@@ -1271,15 +1278,21 @@ class CategoryModel extends Gdn_Model {
    /**
     * Rebuilds the category tree. We are using the Nested Set tree model.
     *
-    * @ref http://articles.sitepoint.com/article/hierarchical-data-database/2
-    * @ref http://en.wikipedia.org/wiki/Nested_set_model
+    * @param bool $BySort Rebuild the tree by sort order instead of existing tree order.
     *
     * @since 2.0.0
-    * @access public
+    * @ref http://articles.sitepoint.com/article/hierarchical-data-database/2
+    * @ref http://en.wikipedia.org/wiki/Nested_set_model
     */
-   public function RebuildTree() {
+   public function RebuildTree($BySort = false) {
       // Grab all of the categories.
-      $Categories = $this->SQL->Get('Category', 'TreeLeft, Sort, Name');
+      if ($BySort) {
+         $Order = 'Sort, Name';
+      } else {
+         $Order = 'TreeLeft, Sort, Name';
+      }
+
+      $Categories = $this->SQL->Get('Category', $Order);
       $Categories = Gdn_DataSet::Index($Categories->ResultArray(), 'CategoryID');
 
       // Make sure the tree has a root.

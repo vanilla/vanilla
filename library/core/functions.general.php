@@ -2053,11 +2053,11 @@ if (!function_exists('OffsetLimit')) {
     *  - <x>: This is a limit where offset is given in the next parameter.
     * @param int $LimitOrPageSize The page size or limit.
     */
-   function OffsetLimit($OffsetOrPage = '', $LimitOrPageSize = '') {
-      $LimitOrPageSize = is_numeric($LimitOrPageSize) ? $LimitOrPageSize : 50;
+   function OffsetLimit($OffsetOrPage = '', $LimitOrPageSize = '', $Throw = false) {
+      $LimitOrPageSize = is_numeric($LimitOrPageSize) ? (int)$LimitOrPageSize : 50;
 
       if (is_numeric($OffsetOrPage)) {
-         $Offset = $OffsetOrPage;
+         $Offset = (int)$OffsetOrPage;
          $Limit = $LimitOrPageSize;
       } elseif (preg_match('/p(\d+)/i', $OffsetOrPage, $Matches)) {
          $Page = $Matches[1];
@@ -2067,15 +2067,18 @@ if (!function_exists('OffsetLimit')) {
          $Offset = $Matches[1] - 1;
          $Limit = $Matches[2] - $Matches[1] + 1;
       } elseif (preg_match('/(\d+)lim(\d*)/i', $OffsetOrPage, $Matches)) {
-         $Offset = $Matches[1];
-         $Limit = $Matches[2];
+         $Offset = (int)$Matches[1];
+         $Limit = (int)$Matches[2];
          if (!is_numeric($Limit))
             $Limit = $LimitOrPageSize;
       } elseif (preg_match('/(\d+)lin(\d*)/i', $OffsetOrPage, $Matches)) {
          $Offset = $Matches[1] - 1;
-         $Limit = $Matches[2];
+         $Limit = (int)$Matches[2];
          if (!is_numeric($Limit))
             $Limit = $LimitOrPageSize;
+      } elseif ($OffsetOrPage && $Throw) {
+         // Some unrecognized page string was passed.
+         throw NotFoundException();
       } else {
          $Offset = 0;
          $Limit = $LimitOrPageSize;
@@ -3046,7 +3049,7 @@ function SetAppCookie($Name, $Value, $Expire = 0, $Force = FALSE) {
       $Domain = '';
 
    // Create the cookie.
-   setcookie($Key, $Value, $Expire, '/', $Domain, NULL, TRUE);
+   safeCookie($Key, $Value, $Expire, '/', $Domain, NULL, TRUE);
    $_COOKIE[$Key] = $Value;
 }
 endif;
@@ -3267,6 +3270,22 @@ if (!function_exists('T')) {
 	 */
    function T($Code, $Default = FALSE) {
       return Gdn::Translate($Code, $Default);
+   }
+}
+
+if (!function_exists('TranslateContent')) {
+   /**
+	 * Translates user-generated content into the selected locale's definition. Currently just an
+	 * alias for T().
+	 *
+	 * @param string $Code The code related to the language-specific definition.
+    *   Codes thst begin with an '@' symbol are treated as literals and not translated.
+	 * @param string $Default The default value to be displayed if the translation code is not found.
+	 * @return string The translated string or $Code if there is no value in $Default.
+	 * @see Gdn::Translate()
+	 */
+   function TranslateContent($Code, $Default = FALSE) {
+      return T($Code, $Default);
    }
 }
 

@@ -86,7 +86,7 @@ class ActivityController extends Gdn_Controller {
          
       $this->ActivityData = $this->ActivityModel->GetWhere(array('ActivityID' => $ActivityID));
       $this->SetData('Comments', $this->ActivityModel->GetComments(array($ActivityID)));
-      $this->SetData('ActivityData', $this->ActivityData);
+      $this->SetData('Activities', $this->ActivityData);
       
       $this->Render();
    }
@@ -112,12 +112,15 @@ class ActivityController extends Gdn_Controller {
             $this->Permission('Garden.Settings.Manage');
             $NotifyUserID = ActivityModel::NOTIFY_ADMINS;
             break;
-         default:
+         case '':
+         case 'feed': // rss feed
             $Filter = 'public';
             $this->Title(T('Recent Activity'));
             $this->Permission('Garden.Activity.View');
             $NotifyUserID = ActivityModel::NOTIFY_PUBLIC;
             break;
+         default:
+            throw NotFoundException();
       }
          
       // Which page to load

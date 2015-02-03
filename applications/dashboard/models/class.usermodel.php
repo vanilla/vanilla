@@ -669,7 +669,7 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
 
-   public function FilterForm($Data) {
+   public function FilterForm($Data, $Register = FALSE) {
       $Data = parent::FilterForm($Data);
       $Data = array_diff_key($Data,
          array('Admin' => 0, 'Deleted' => 0, 'CountVisits' => 0, 'CountInvitations' => 0, 'CountNotifications' => 0, 'Preferences' => 0,
@@ -681,7 +681,7 @@ class UserModel extends Gdn_Model {
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          unset($Data['RankID']);
       }
-      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
+      if (!$Register && !Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
          unset($Data['Name']);
       }
 
@@ -716,6 +716,10 @@ class UserModel extends Gdn_Model {
    protected function _Insert($Fields, $Options = array()) {
       $this->EventArguments['InsertFields'] =& $Fields;
       $this->FireEvent('BeforeInsertUser');
+
+      if (!val('Setup', $Options)) {
+         unset($Fields['Admin']);
+      }
 
       // Massage the roles for email confirmation.
       if (self::RequireConfirmEmail() && !GetValue('NoConfirmEmail', $Options)) {
@@ -1336,7 +1340,7 @@ class UserModel extends Gdn_Model {
       // Set corrected PhotoUrls.
       $Result =& $Data->Result();
       foreach ($Result as &$Row) {
-         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+         if ($Row->Photo && !IsUrl($Row->Photo)) {
             $Row->Photo = Gdn_Upload::Url($Row->Photo);
          }
       }
@@ -1552,6 +1556,15 @@ class UserModel extends Gdn_Model {
 
    /**
     * Generic save procedure.
+    *
+    * $Settings controls certain save functionality
+    *
+    *  SaveRoles - Save 'RoleID' field as user's roles. Default false.
+    *  HashPassword - Hash the provided password on update. Default true.
+    *  FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
+    *  ValidateEmail - Make sure the provided email addresses is formattted properly. Default true.
+    *  NoConfirmEmail - Disable email confirmation. Default false.
+    *
     */
    public function Save($FormPostValues, $Settings = FALSE) {
       // See if the user's related roles should be saved or not.
@@ -1577,6 +1590,8 @@ class UserModel extends Gdn_Model {
 
       if (array_key_exists('Confirmed', $FormPostValues))
          $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
+
+      unset($FormPostValues['Admin']);
 
       // Validate the form posted values
 
@@ -1631,11 +1646,11 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         if (in_array('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
+         if (array_key_exists('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
             $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
          }
 
-         if (!$Insert && array_key_exists('Password', $Fields)) {
+         if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
             // Encrypt the password for saving only if it won't be hashed in _Insert()
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
@@ -1704,10 +1719,11 @@ class UserModel extends Gdn_Model {
                   }
 
                   if (isset($OldPhoto) && $OldPhoto != $Photo) {
-                     if (strpos($Photo, '//'))
+                     if (IsUrl($Photo)) {
                         $PhotoUrl = $Photo;
-                     else
+                     } else {
                         $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+                     }
 
                      $ActivityModel = new ActivityModel();
                      if ($UserID == Gdn::Session()->UserID) {
@@ -1819,7 +1835,7 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
 
          // Insert the new user
-         $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
+         $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE, 'Setup' => TRUE));
 
          if ($UserID) {
             $ActivityModel = new ActivityModel();
@@ -1988,6 +2004,7 @@ class UserModel extends Gdn_Model {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
       } elseif (isset($IPAddress)) {
          $this->SQL
+            ->OrOp()
             ->BeginWhereGroup()
             ->OrWhere('u.InsertIPAddress', $IPAddress)
             ->OrWhere('u.LastIPAddress', $IPAddress)
@@ -2000,6 +2017,7 @@ class UserModel extends Gdn_Model {
 
          if (is_array($Like)) {
             $this->SQL
+               ->OrOp()
                ->BeginWhereGroup()
                ->OrLike($Like, '', 'right')
                ->EndWhereGroup();
@@ -2018,7 +2036,7 @@ class UserModel extends Gdn_Model {
       $Result =& $Data->Result();
 
       foreach ($Result as &$Row) {
-         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+         if ($Row->Photo && !IsUrl($Row->Photo)) {
             $Row->Photo = Gdn_Upload::Url($Row->Photo);
          }
 
@@ -2070,6 +2088,7 @@ class UserModel extends Gdn_Model {
 
          if (is_array($Like)) {
             $this->SQL
+               ->OrOp()
                ->BeginWhereGroup()
                ->OrLike($Like, '', 'right')
                ->EndWhereGroup();
@@ -2796,6 +2815,9 @@ class UserModel extends Gdn_Model {
 
       // Remove activity comments.
       $this->GetDelete('ActivityComment', array('InsertUserID' => $UserID), $Content);
+
+      // Remove comments in moderation queue
+      $this->GetDelete('Log', array('RecordUserID' => $UserID, 'Operation' => 'Pending'), $Content);
 
       // Clear out information on the user.
       $this->SetField($UserID, array(

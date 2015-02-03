@@ -18,6 +18,9 @@
 
 abstract class Gdn_SQLDriver {
 
+   /** @const 2^31 is the max signed int range. */
+   const MAX_SIGNED_INT = 2147483648;
+
    public function __construct() {
       $this->ClassName = get_class($this);
       $this->Reset();
@@ -185,6 +188,20 @@ abstract class Gdn_SQLDriver {
    protected $_WhereConcatDefault;
 
    /**
+    * The logical operator used to concatenate where group clauses.
+    *
+    * @var string
+    */
+   protected $_WhereGroupConcat;
+
+   /**
+    * The default $_WhereGroupConcat that will be reverted back to after every where or where group clause is appended.
+    *
+    * @var string
+    */
+   protected $_WhereGroupConcatDefault;
+
+   /**
     * The number of where groups to open.
     *
     * @var int
@@ -234,6 +251,7 @@ abstract class Gdn_SQLDriver {
       $this->_WhereConcat = 'and';
       if($SetDefault) {
          $this->_WhereConcatDefault = 'and';
+         $this->_WhereGroupConcatDefault = 'and';
       }
 
       return $this;
@@ -256,11 +274,21 @@ abstract class Gdn_SQLDriver {
    }
 
    /**
+    * A convenience method that calls Gdn_DatabaseDriver::BeginWhereGroup with concatenated with an 'or.'
+    * @See Gdn_DatabaseDriver::BeginWhereGroup()
+    * @return Gdn_SQLDriver $this
+    */
+   public function OrBeginWhereGroup() {
+      return $this->OrOp()->BeginWhereGroup();
+   }
+
+   /**
     * Begin bracketed group in the where clause to group logical expressions together.
     *
     * @return Gdn_SQLDriver $this
     */
    public function BeginWhereGroup() {
+      $this->_WhereGroupConcat = $this->_WhereConcat;
       $this->_WhereGroupCount++;
       $this->_OpenWhereGroupCount++;
       return $this;
@@ -1263,10 +1291,16 @@ abstract class Gdn_SQLDriver {
     * @return Gdn_SQLDriver $this
     */
    public function Limit($Limit, $Offset = FALSE) {
+      // SQL chokes on ints over 2^31
+      if ($Limit > self::MAX_SIGNED_INT) {
+         throw new Exception(T('Invalid limit.'), 400);
+      }
+
       $this->_Limit = $Limit;
 
-      if ($Offset !== FALSE)
-         $this->_Offset = $Offset;
+      if ($Offset !== FALSE) {
+         $this->Offset($Offset);
+      }
 
       return $this;
    }
@@ -1367,6 +1401,11 @@ abstract class Gdn_SQLDriver {
     * @return Gdn_SQLDriver $this
     */
    public function Offset($Offset) {
+      // SQL chokes on ints over 2^31
+      if ($Offset > self::MAX_SIGNED_INT) {
+         throw new Exception(T('Invalid offset.'), 400);
+      }
+
       $this->_Offset = $Offset;
       return $this;
    }
@@ -1466,6 +1505,7 @@ abstract class Gdn_SQLDriver {
       $this->_WhereConcat = 'or';
       if($SetDefault) {
          $this->_WhereConcatDefault = 'or';
+         $this->_WhereGroupConcatDefault = 'or';
       }
 
       return $this;
@@ -1683,6 +1723,8 @@ abstract class Gdn_SQLDriver {
       $this->_Wheres          = array();
       $this->_WhereConcat     = 'and';
       $this->_WhereConcatDefault = 'and';
+      $this->_WhereGroupConcat = 'and';
+      $this->_WhereGroupConcatDefault = 'and';
       $this->_WhereGroupCount = 0;
       $this->_OpenWhereGroupCount = 0;
       $this->_GroupBys        = array();
@@ -1792,15 +1834,15 @@ abstract class Gdn_SQLDriver {
     * and updating of values to the db.
     *
     * @param mixed $Field The name of the field to save value as. Alternately this can be an array
-    * of $FieldName => $Value pairs, or even an object of $DataSet->Field
-    * properties containing one rowset.
+    * of $FieldName => $Value pairs, or even an object of $DataSet->Field properties containing one rowset.
     * @param string $Value The value to be set in $Field. Ignored if $Field was an array or object.
     * @param boolean $EscapeString A boolean value indicating if the $Value(s) should be escaped or not.
     * @param boolean $CreateNewNamedParameter A boolean value indicating that if (a) a named parameter is being
     * created, and (b) that name already exists in $this->_NamedParameters
     * collection, then a new one should be created rather than overwriting the
     * existing one.
-    * @return Gdn_SQLDriver $this
+    * @return Gdn_SQLDriver $this Returns this for fluent calls
+    * @throws \Exception Throws an exception if an invalid type is passed for {@link $Value}.
     */
    public function Set($Field, $Value = '', $EscapeString = TRUE, $CreateNewNamedParameter = TRUE) {
       $Field = Gdn_Format::ObjectAsArray($Field);
@@ -1810,10 +1852,9 @@ abstract class Gdn_SQLDriver {
       }
 
       foreach ($Field as $f => $v) {
-         if (!is_object($v)) {
-            if (is_array($v)) {
-               throw new Exception('Invalid value type (array) in INSERT/UPDATE statement.', 400);
-            }
+         if (is_array($v) || is_object($v)) {
+            throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
+         } else {
             if ($EscapeString) {
                $NamedParameter = $this->NamedParameter($f, $CreateNewNamedParameter);
                $this->_NamedParameters[$NamedParameter] = $v;
@@ -1916,6 +1957,10 @@ abstract class Gdn_SQLDriver {
       // Figure out the concatenation operator.
       $Concat = '';
 
+      if ($this->_OpenWhereGroupCount > 0) {
+         $this->_WhereConcat = $this->_WhereGroupConcat;
+      }
+
       if(count($this->_Wheres) > 0) {
          $Concat = str_repeat(' ', $this->_WhereGroupCount + 1) . $this->_WhereConcat . ' ';
       }
@@ -1928,6 +1973,7 @@ abstract class Gdn_SQLDriver {
 
       // Revert the concat back to 'and'.
       $this->_WhereConcat = $this->_WhereConcatDefault;
+      $this->_WhereGroupConcat = $this->_WhereGroupConcatDefault;
 
       $this->_Wheres[] = $Concat . $Sql;
 

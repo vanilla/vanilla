@@ -219,11 +219,15 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
     * Free's the result resource referenced by $this->_PDOStatement.
     */
    public function FreePDOStatement($DestroyPDOStatement = TRUE) {
+      try {
       if (is_object($this->_PDOStatement))
          $this->_PDOStatement->closeCursor();
          
       if ($DestroyPDOStatement)
          $this->_PDOStatement = NULL;
+      } catch (Exception $ex) {
+         // Go past exceptions in case wait_timeout exceeded.
+      }
    }
    
    /**

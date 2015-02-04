@@ -249,9 +249,11 @@ class Gdn_UploadImage extends Gdn_Upload {
                      break;
                   case 6:
                      $TargetImage = imagerotate($TargetImage, -90, 0);
+                     list($Width, $Height) = array($Height, $Width);
                      break;
                   case 8:
                      $TargetImage = imagerotate($TargetImage, 90, 0);
+                     list($Width, $Height) = array($Height, $Width);
                    break;
                 }
             }
@@ -275,6 +277,8 @@ class Gdn_UploadImage extends Gdn_Upload {
       $Sender->EventArguments = array();
       $Sender->EventArguments['Path'] = $TargetPath;
       $Parsed = self::Parse($TargetPath);
+      $Parsed['Width'] = $Width;
+      $Parsed['Height'] = $Height;
       $Sender->EventArguments['Parsed'] =& $Parsed;
       $Sender->Returns = array();
       Gdn::PluginManager()->CallEventHandlers($Sender, 'Gdn_Upload', 'SaveAs');

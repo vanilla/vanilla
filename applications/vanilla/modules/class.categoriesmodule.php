@@ -13,8 +13,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class CategoriesModule extends Gdn_Module {
 
-   public $startDepth = 1;
-   public $endDepth;
+   public $startDepth = 1; //inclusive
+   public $endDepth; //inclusive
 
    public function __construct($Sender = '') {
       parent::__construct($Sender);

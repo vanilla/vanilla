@@ -1556,6 +1556,15 @@ class UserModel extends Gdn_Model {
 
    /**
     * Generic save procedure.
+    *
+    * $Settings controls certain save functionality
+    *
+    *  SaveRoles - Save 'RoleID' field as user's roles. Default false.
+    *  HashPassword - Hash the provided password on update. Default true.
+    *  FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
+    *  ValidateEmail - Make sure the provided email addresses is formattted properly. Default true.
+    *  NoConfirmEmail - Disable email confirmation. Default false.
+    *
     */
    public function Save($FormPostValues, $Settings = FALSE) {
       // See if the user's related roles should be saved or not.
@@ -1637,11 +1646,11 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         if (in_array('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
+         if (array_key_exists('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
             $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
          }
 
-         if (!$Insert && array_key_exists('Password', $Fields)) {
+         if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
             // Encrypt the password for saving only if it won't be hashed in _Insert()
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);

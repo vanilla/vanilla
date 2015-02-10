@@ -173,7 +173,7 @@ class CategoriesController extends VanillaController {
 
 
          if ($Category->DisplayAs == 'Categories') {
-            if (GetValue('Depth', $Category) > 0) {
+            if (GetValue('Depth', $Category) > C('Vanilla.Categories.NavDepth', 0)) {
                // Headings don't make sense if we've cascaded down one level.
                SaveToConfig('Vanilla.Categories.DoHeadings', FALSE, FALSE);
             }

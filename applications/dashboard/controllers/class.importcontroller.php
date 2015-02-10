@@ -184,8 +184,6 @@ class ImportController extends DashboardController {
             if(TRUE || strcasecmp($this->Form->GetFormValue('Overwrite'), 'Overwrite') == 0) {
                if (!StringBeginsWith($this->Form->GetFormValue('PathSelect'), 'Db:', TRUE)) {
                   $Validation->ApplyRule('Email', 'Required');
-                  if (!$this->Form->GetFormValue('UseCurrentPassword'))
-                     $Validation->ApplyRule('Password', 'Required');
                }
             }
 

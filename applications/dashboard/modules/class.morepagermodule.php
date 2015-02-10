@@ -90,6 +90,7 @@ class MorePagerModule extends PagerModule {
    private $_Totalled;
 
    public function __construct($Sender = '') {
+      parent::__construct($Sender);
       $this->ClientID = '';
       $this->CssClass = 'MorePager Foot';
       $this->Offset = 0;
@@ -103,7 +104,6 @@ class MorePagerModule extends PagerModule {
       $this->_PropertiesDefined = FALSE;
       $this->_Totalled = FALSE;
       $this->_LastOffset = 0;
-      parent::__construct($Sender);
    }
 
    function AssetTarget() {

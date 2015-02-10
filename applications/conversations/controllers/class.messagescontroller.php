@@ -120,8 +120,12 @@ class MessagesController extends ConversationsController {
          $ConversationID = $this->Form->Save($this->ConversationMessageModel);
          if ($ConversationID !== FALSE) {
             $Target = $this->Form->GetFormValue('Target', 'messages/'.$ConversationID);
-
             $this->RedirectUrl = Url($Target);
+
+            $Conversation = $this->ConversationModel->GetID($ConversationID, Gdn::Session()->UserID);
+            $NewMessageID = val('FirstMessageID', $Conversation);
+            $this->EventArguments['MessageID'] = $NewMessageID;
+            $this->FireEvent('AfterConversationSave');
          }
       } else {
          if ($Recipient != '')
@@ -175,6 +179,10 @@ class MessagesController extends ConversationsController {
                Redirect('messages/'.$ConversationID.'/#'.$NewMessageID, 302);
 
             $this->SetJson('MessageID', $NewMessageID);
+
+            $this->EventArguments['MessageID'] = $NewMessageID;
+            $this->FireEvent('AfterMessageSave');
+
             // If this was not a full-page delivery type, return the partial response
             // Load all new messages that the user hasn't seen yet (including theirs)
             $LastMessageID = $this->Form->GetFormValue('LastMessageID');
@@ -348,7 +356,7 @@ class MessagesController extends ConversationsController {
       );
 
       $this->SetData('Messages', $this->MessageData);
-      
+
       // Figure out who's participating.
       $ParticipantTitle = ConversationModel::ParticipantTitle($this->Conversation, TRUE);
       $this->Participants = $ParticipantTitle;
@@ -400,7 +408,7 @@ class MessagesController extends ConversationsController {
       $this->Data['Breadcrumbs'][] = array(
           'Name' => $Subject,
           'Url' => Url('', '//'));
-      
+
       // Render view
       $this->Render();
    }

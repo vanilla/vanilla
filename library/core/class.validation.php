@@ -325,9 +325,19 @@ class Gdn_Validation {
 
       // Add all of the fields from the schema.
       foreach ($this->GetSchemaRules() as $Field => $Rules) {
-         if (!array_key_exists($Field, $PostedFields) && (!$Insert || !in_array('Required', $Rules))) {
-            // Don't enforce missing fields that aren't required or required fields during an update.
-            continue;
+         $FieldInfo = $this->_Schema[$Field];
+
+         if (!array_key_exists($Field, $PostedFields)) {
+            $Required = in_array('Required', $Rules);
+
+            // Don't enforce fields that aren't required or required fields during a sparse update.
+            if (!$Required || !$Insert) {
+               continue;
+            }
+            // Fields with a non-null default can be left out.
+            if (val('Default', $FieldInfo, NULL) !== NULL) {
+               continue;
+            }
          }
          $Result[$Field] = val($Field, $PostedFields, NULL);
       }
@@ -347,9 +357,19 @@ class Gdn_Validation {
 
       // Add all of the fields from the schema.
       foreach ($this->GetSchemaRules() as $Field => $Rules) {
-         if (!$Insert && !array_key_exists($Field, $PostedFields) && !in_array('Required', $Rules)) {
-            // Don't enforce required fields on an update.
-            continue;
+         $FieldInfo = $this->_Schema[$Field];
+         
+         if (!array_key_exists($Field, $PostedFields)) {
+            $Required = in_array('Required', $Rules);
+
+            // Don't enforce fields that aren't required or required fields during a sparse update.
+            if (!$Required || !$Insert) {
+               continue;
+            }
+            // Fields with a non-null default can be left out.
+            if (val('Default', $FieldInfo, NULL) !== NULL) {
+               continue;
+            }
          }
          if (isset($Result[$Field])) {
             $Result[$Field] = array_unique(array_merge($Result[$Field], $Rules));

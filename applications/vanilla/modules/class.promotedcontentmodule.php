@@ -394,7 +394,7 @@ class PromotedContentModule extends Gdn_Module {
          $RecordTypes[] = 'Discussion';
       }
       if ($this->ShowComments()) {
-         $RecordTypes[] = 'Comments';
+         $RecordTypes[] = 'Comment';
       }
 
       $ReactionModel = new ReactionModel();
@@ -482,7 +482,7 @@ class PromotedContentModule extends Gdn_Module {
                $Fields = array_merge($Fields, array('CommentID'));
 
                // Comment specific
-               $Replacement['Name'] = GetValueR('Discussion.Name', $ContentItem);
+               $Replacement['Name'] = GetValueR('Discussion.Name', $ContentItem, $ContentItem['Name']);
                break;
 
             case 'discussion':

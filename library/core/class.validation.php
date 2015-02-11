@@ -128,6 +128,16 @@ class Gdn_Validation {
       $this->_SchemaRules = array();
 
       foreach($this->_Schema as $Field => $Properties) {
+         if (is_scalar($Properties)) {
+            $Properties = array(
+               'AutoIncrement' => FALSE,
+               'AllowNull' => TRUE,
+               'Type' => 'text',
+               'Length' => ''
+            );
+            $Properties = (object)$Properties;
+         }
+
          // Create an array to hold rules for this field
          $RuleNames = array();
 
@@ -358,7 +368,7 @@ class Gdn_Validation {
       // Add all of the fields from the schema.
       foreach ($this->GetSchemaRules() as $Field => $Rules) {
          $FieldInfo = $this->_Schema[$Field];
-         
+
          if (!array_key_exists($Field, $PostedFields)) {
             $Required = in_array('Required', $Rules);
 

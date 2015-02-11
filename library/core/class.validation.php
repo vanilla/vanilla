@@ -70,6 +70,12 @@ class Gdn_Validation {
 
 
    /**
+    * @var bool Whether or not to reset the validation results on validate.
+    */
+   protected $_ResetOnValidate = FALSE;
+
+
+   /**
     * An array of FieldName.RuleName => "Custom Error Message"s. See $this->ApplyRule.
     *
     * @var array
@@ -81,12 +87,14 @@ class Gdn_Validation {
     * Class constructor. Optionally takes a schema definition to generate
     * validation rules for.
     *
-    * @param Gdn_Schema $Schema A schema object to generate validation rules for.
+    * @param Gdn_Schema|array $Schema A schema object to generate validation rules for.
+    * @param bool Whether or not to reset the validation results on {@link Validate()}.
     */
-   public function __construct($Schema = FALSE) {
+   public function __construct($Schema = FALSE, $ResetOnValidate = FALSE) {
       if (is_object($Schema) || is_array($Schema)) {
          $this->SetSchema($Schema);
       }
+      $this->setResetOnValidate($ResetOnValidate);
 
       // Define the default validation functions
       $this->_Rules = array();
@@ -450,6 +458,26 @@ class Gdn_Validation {
       $this->_Rules[$RuleName] = $Rule;
    }
 
+   /**
+    * Whether or not the validation results etc should reset whenever {@link Validate()} is called.
+    *
+    * @return boolean Returns true if we reset or false otherwise.
+    */
+   public function resetOnValidate() {
+      return $this->_ResetOnValidate;
+   }
+
+   /**
+    * Set whether or not the validation results etc should reset whenever {@link Validate()} is called.
+    *
+    * @param boolean $ResetOnValidate True to reset or false otherwise.
+    * @return Gdn_Validation Returns `$this` for fluent calls.
+    */
+   public function setResetOnValidate($ResetOnValidate) {
+      $this->_ResetOnValidate = $ResetOnValidate;
+      return $this;
+   }
+
 
    /**
     * Adds a fieldname to the $this->_ValidationFields collection.
@@ -581,7 +609,7 @@ class Gdn_Validation {
     */
    public function Validate($PostedFields, $Insert = FALSE) {
       // Create an array to hold validation result messages
-      if (!is_array($this->_ValidationResults)) {
+      if (!is_array($this->_ValidationResults) || $this->resetOnValidate()) {
          $this->_ValidationResults = array();
       }
 

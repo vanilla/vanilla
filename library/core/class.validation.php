@@ -120,7 +120,7 @@ class Gdn_Validation {
 
 
    /**
-    * Examines the provided schema and fills $this->_Rules with rules based
+    * Examines the current schema and fills {@link Gdn_Validation::$_SchemaRules} with rules based
     * on the properties of each field in the table schema.
     *
     */
@@ -129,6 +129,7 @@ class Gdn_Validation {
 
       foreach($this->_Schema as $Field => $Properties) {
          if (is_scalar($Properties)) {
+            // Some code passes a record as a schema so account for that here.
             $Properties = array(
                'AutoIncrement' => FALSE,
                'AllowNull' => TRUE,
@@ -244,35 +245,6 @@ class Gdn_Validation {
       if (!array_key_exists($FieldName, $this->_ValidationFields)) //  && $RuleName == 'Required'
          $this->_ValidationFields[$FieldName] = '';
 
-      $this->_ApplyRule($FieldName, $RuleName, $CustomError);
-   }
-
-   /**
-    * Apply an array of validation rules all at once.
-    * @param array $Fields
-    */
-//   public function ApplyRules($Fields) {
-//      foreach ($Fields as $Index => $Row) {
-//         $Validation = GetValue('Validation', $Row);
-//         if (!$Validation)
-//            continue;
-//
-//         $FieldName = GetValue('Name', $Row, $Index);
-//         if (is_string($Validation)) {
-//            $this->ApplyRule($FieldName, $Validation);
-//         } elseif (is_array($Validation)) {
-//            foreach ($Validation as $Rule) {
-//               if (is_array($Rule)) {
-//                  $this->ApplyRule($FieldName, $Rule[0], $Rule[1]);
-//               } else {
-//                  $this->ApplyRule($FieldName, $Rule);
-//               }
-//            }
-//         }
-//      }
-//   }
-
-   protected function _ApplyRule($FieldName, $RuleName, $CustomError = '') {
       $this->ApplyRuleTo($this->_FieldRules, $FieldName, $RuleName, $CustomError);
    }
 
@@ -280,6 +252,7 @@ class Gdn_Validation {
     * Apply a rule to the given rules array.
     *
     * @param array $Array The rules array to apply the rule to.
+    * This should be either `$this->_FieldRules` or `$this->_SchemaRules`.
     * @param string $FieldName The name of the field that the rule applies to.
     * @param string $RuleName The name of the rule.
     * @param string $CustomError A custom error string when the rule is broken.
@@ -308,11 +281,11 @@ class Gdn_Validation {
     * Allows the explicit definition of a schema to use
     *
     * @param array $Schema
+    * @deprecated This method has been deprecated in favor of {@link Gdn_Validation::SetSchema()}.
     */
    public function ApplySchema($Schema) {
       Deprecated('ApplySchema', 'SetSchema');
-      $this->_Schema = $Schema;
-      $this->_SchemaRules = NULL;
+      $this->SetSchema($Schema);
    }
 
 
@@ -396,6 +369,7 @@ class Gdn_Validation {
     *
     * @param Gdn_Schema|array $Schema The new schema to set.
     * @return Gdn_Validation Returns `$this` for fluent calls.
+    * @throws \Exception Throws an exception when {@link $Schema} isn't an array or {@link Gdn_Schema} object.
     */
    public function SetSchema($Schema) {
       if ($Schema instanceof Gdn_Schema) {
@@ -495,10 +469,9 @@ class Gdn_Validation {
 
 
    /**
-    * Returns an array of field names that are in both $this->_ValidationFields
-    * AND $this->_Schema.
+    * Returns an array of field names that are in both $this->_ValidationFields AND $this->_Schema.
     *
-    * @return array
+    * @return array Returns an array of fields and values that were validated and in the schema.
     */
    public function SchemaValidationFields() {
       $Result = array_intersect_key($this->_ValidationFields, $this->_Schema);
@@ -575,6 +548,12 @@ class Gdn_Validation {
       }
    }
 
+   /**
+    * Remove a validation rule that was added with {@link Gdn_Validation::ApplyRule()}.
+    *
+    * @param $FieldName
+    * @param bool $RuleName
+    */
    public function UnapplyRule($FieldName, $RuleName = FALSE) {
       if ($RuleName) {
          if (isset($this->_FieldRules[$FieldName])) {
@@ -693,7 +672,8 @@ class Gdn_Validation {
     * Returns the $this->_ValidationResults array. You must use this method
     * because the array is read-only outside this object.
     *
-    * @return array
+    * @param bool $Reset Whether or not to clear the validation results.
+    * @return array Returns an array of validation results (errors).
     */
    public function Results($Reset = FALSE) {
       if (!is_array($this->_ValidationResults) || $Reset)
@@ -702,10 +682,21 @@ class Gdn_Validation {
       return $this->_ValidationResults;
    }
 
+   /**
+    * Get the validation results as a string of text.
+    *
+    * @return string Returns the validation results.
+    */
    public function ResultsText() {
       return self::ResultsAsText($this->Results());
    }
 
+   /**
+    * Format an array of validation results as a string.
+    *
+    * @param array $Results An array of validation results returned from {@link Gdn_Validation::Results()}.
+    * @return string Returns the validation results as a string.
+    */
    public static function ResultsAsText($Results) {
       $Errors = array();
       foreach ($Results as $Name => $Value) {

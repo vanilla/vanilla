@@ -454,8 +454,9 @@ if (!function_exists('CleanErrorArguments')) {
    }
 }
 
-// Set up Garden to handle php errors
-set_error_handler('Gdn_ErrorHandler', E_ALL);
+// Set up Garden to handle php errors.
+// Remove the "& ~E_STRICT" from time to time to clean up some easy strict errors.
+set_error_handler('Gdn_ErrorHandler', E_ALL & ~E_STRICT);
 set_exception_handler('Gdn_ExceptionHandler');
 
 

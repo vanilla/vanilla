@@ -1026,6 +1026,23 @@ class CategoryModel extends Gdn_Model {
    }
    
    /**
+    * Return the category that contains the permissions for the given category.
+    *
+    * @param mixed $Category
+    * @since 2.2
+    */
+   public static function PermissionCategory($Category) {
+      if (empty($Category))
+         return self::Categories(-1);
+
+      if (!is_array($Category) && !is_object($Category)) {
+         $Category = self::Categories($Category);
+      }
+
+      return self::Categories(GetValue('PermissionCategoryID', $Category));
+   }
+   
+   /**
     * Rebuilds the category tree. We are using the Nested Set tree model.
     * 
     * @ref http://articles.sitepoint.com/article/hierarchical-data-database/2

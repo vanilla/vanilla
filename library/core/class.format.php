@@ -1137,8 +1137,10 @@ class Gdn_Format {
       // https://www.youtube.com/watch?v=sjm_gBpJ63k
       // http://YOUTU.BE/sjm_gBpJ63k?list=PL4CFF79651DB8159B
       // http://youtu.be/GUbyhoU81sQ?t=1m8s
+      // https://m.youtube.com/watch?v=iAEKPcz9www
+      // https://youtube.com/watch?v=iAEKPcz9www
 
-      $YoutubeUrlMatch = '/https?:\/\/(?:www.)?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>\w*)))(?:\?|\&)?(?:list=(?P<listId>[\w]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?/i';
+      $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>\w*)))(?:\?|\&)?(?:list=(?P<listId>[\w]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?/i';
       $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';

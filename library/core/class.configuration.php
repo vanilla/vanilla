@@ -460,7 +460,8 @@ class Gdn_Configuration extends Gdn_Pluggable {
       if (!$UseSplitting) {
          $this->MassImport($ConfigurationSource->Export());
       } else {
-         self::MergeConfig($this->Data, $ConfigurationSource->Export());
+         $Loaded = $ConfigurationSource->Export();
+         self::MergeConfig($this->Data, $Loaded);
       }
    }
 
@@ -618,8 +619,10 @@ class Gdn_Configuration extends Gdn_Pluggable {
     * This method does that
     */
    public function OverlayDynamic() {
-      if ($this->Dynamic instanceof Gdn_ConfigurationSource)
-         self::MergeConfig($this->Data, $this->Dynamic->Export());
+      if ($this->Dynamic instanceof Gdn_ConfigurationSource) {
+         $Loaded = $this->Dynamic->Export();
+         self::MergeConfig($this->Data, $Loaded);
+      }
    }
 
    /**

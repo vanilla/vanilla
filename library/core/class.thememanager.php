@@ -57,7 +57,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       // If there is a hooks file in the theme folder, include it.
       $ThemeName = $this->CurrentTheme();
       $ThemeInfo = $this->GetThemeInfo($ThemeName);
-      $ThemeHooks = GetValue('RealHooksFile', $ThemeInfo, NULL);
+      $ThemeHooks = val('RealHooksFile', $ThemeInfo, NULL);
       if (file_exists($ThemeHooks))
          include_once($ThemeHooks);
    }
@@ -103,7 +103,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             sort($PathListing);
 
             $PathIntegrityHash = md5(serialize($PathListing));
-            if (GetValue('CacheIntegrityHash',$SearchPathCache) != $PathIntegrityHash) {
+            if (val('CacheIntegrityHash',$SearchPathCache) != $PathIntegrityHash) {
                // Trace('Need to re-index theme cache');
                // Need to re-index this folder
                $PathIntegrityHash = $this->IndexSearchPath($SearchPath, $CacheThemeInfo, $PathListing);
@@ -141,30 +141,30 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          $ThemePath = CombinePaths(array($SearchPath,$ThemeFolderName));
          $ThemeFiles = $this->FindThemeFiles($ThemePath);
 
-         if (GetValue('about', $ThemeFiles) === FALSE)
+         if (val('about', $ThemeFiles) === FALSE)
             continue;
 
-         $ThemeAboutFile = GetValue('about', $ThemeFiles);
+         $ThemeAboutFile = val('about', $ThemeFiles);
          $SearchThemeInfo = $this->ScanThemeFile($ThemeAboutFile);
 
          // Don't index archived themes.
-//         if (GetValue('Archived', $SearchThemeInfo, FALSE))
+//         if (val('Archived', $SearchThemeInfo, FALSE))
 //            continue;
 
          // Add the screenshot.
          if (array_key_exists('screenshot', $ThemeFiles)) {
-            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', GetValue('screenshot', $ThemeFiles)),'/');
+            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('screenshot', $ThemeFiles)),'/');
             $SearchThemeInfo['ScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
          }
 
          // Add the mobile screenshot.
          if (array_key_exists('mobilescreenshot', $ThemeFiles)) {
-            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', GetValue('mobilescreenshot', $ThemeFiles)),'/');
+            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('mobilescreenshot', $ThemeFiles)),'/');
             $SearchThemeInfo['MobileScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
          }
 
          if (array_key_exists('hooks', $ThemeFiles)) {
-            $SearchThemeInfo['HooksFile'] = GetValue('hooks', $ThemeFiles, FALSE);
+            $SearchThemeInfo['HooksFile'] = val('hooks', $ThemeFiles, FALSE);
             $SearchThemeInfo['RealHooksFile'] = realpath($SearchThemeInfo['HooksFile']);
          }
 
@@ -332,7 +332,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    }
 
    public function GetThemeInfo($ThemeName) {
-      return GetValue($ThemeName, $this->AvailableThemes(), FALSE);
+      return val($ThemeName, $this->AvailableThemes(), FALSE);
    }
 
    public function CurrentTheme() {
@@ -414,24 +414,24 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
       // Set the theme.
       $ThemeInfo = $this->GetThemeInfo($ThemeName);
-      $ThemeFolder = GetValue('Folder', $ThemeInfo, '');
+      $ThemeFolder = val('Folder', $ThemeInfo, '');
 
       $oldTheme = $IsMobile ? C('Garden.MobileTheme', 'mobile') : C('Garden.Theme', 'default');
 
       if ($ThemeFolder == '') {
          throw new Exception(T('The theme folder was not properly defined.'));
       } else {
-         $Options = GetValueR("{$ThemeName}.Options", $this->AvailableThemes());
+         $Options = valr("{$ThemeName}.Options", $this->AvailableThemes());
          if ($Options) {
             if ($IsMobile) {
                SaveToConfig(array(
                   'Garden.MobileTheme' => $ThemeName,
-                  'Garden.MobileThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+                  'Garden.MobileThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
                ));
             } else {
                SaveToConfig(array(
                   'Garden.Theme' => $ThemeName,
-                  'Garden.ThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+                  'Garden.ThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
                ));
             }
          } else {
@@ -464,7 +464,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    public function TestTheme($ThemeName) {
       // Get some info about the currently enabled theme.
       $EnabledTheme = $this->EnabledThemeInfo();
-      $EnabledThemeFolder = GetValue('Folder', $EnabledTheme, '');
+      $EnabledThemeFolder = val('Folder', $EnabledTheme, '');
       $OldClassName = $EnabledThemeFolder . 'ThemeHooks';
 
       // Make sure that the theme's requirements are met
@@ -472,14 +472,14 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       $EnabledApplications = $ApplicationManager->EnabledApplications();
 
       $NewThemeInfo = $this->GetThemeInfo($ThemeName);
-      $ThemeName = GetValue('Index', $NewThemeInfo, $ThemeName);
+      $ThemeName = val('Index', $NewThemeInfo, $ThemeName);
       $RequiredApplications = ArrayValue('RequiredApplications', $NewThemeInfo, FALSE);
       $ThemeFolder = ArrayValue('Folder', $NewThemeInfo, '');
       CheckRequirements($ThemeName, $RequiredApplications, $EnabledApplications, 'application'); // Applications
 
       // If there is a hooks file, include it and run the setup method.
       $ClassName = "{$ThemeFolder}ThemeHooks";
-      $HooksFile = GetValue("HooksFile", $NewThemeInfo, NULL);
+      $HooksFile = val("HooksFile", $NewThemeInfo, NULL);
       if (!is_null($HooksFile) && file_exists($HooksFile)) {
          include_once($HooksFile);
          if (class_exists($ClassName)) {

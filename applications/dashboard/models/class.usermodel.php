@@ -2455,8 +2455,8 @@ class UserModel extends Gdn_Model {
          $AllIPs[] = ForceIPv4($IP);
       if ($IP = GetValue('LastIPAddress', $User))
          $AllIPs[] = $IP;
-      $AllIPs = array_unique($AllIPs);
-      sort($AllIPs);
+      // This will be a unique list of IPs, most recently used last. array_unique keeps the first key found.
+      $AllIPs = array_reverse(array_unique(array_reverse($AllIPs)));
       $Fields['AllIPAddresses'] = $AllIPs;
 
       // Set the hour offset based on the client's clock.
@@ -3578,17 +3578,23 @@ class UserModel extends Gdn_Model {
       if (!is_array($Property))
          $Property = array($Property => $Value);
 
-      // Convert IP addresses to long.
+      $this->DefineSchema();
+      $Fields = $this->Schema->Fields();
+
       if (isset($Property['AllIPAddresses'])) {
          if (is_array($Property['AllIPAddresses'])) {
             $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
             $IPs = array_unique($IPs);
             $Property['AllIPAddresses'] = implode(',', $IPs);
+            // Ensure this isn't too big for our column
+            while (strlen($Property['AllIPAddresses']) > $Fields['AllIPAddresses']->Length) {
+              array_shift($IPs);
+              $Property['AllIPAddresses'] = implode(',', $IPs);
+            }
          }
       }
 
-      $this->DefineSchema();
-      $Set = array_intersect_key($Property, $this->Schema->Fields());
+      $Set = array_intersect_key($Property, $Fields);
       self::SerializeRow($Set);
 
 		$this->SQL

@@ -36,19 +36,7 @@ function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
 
    if (($ErrorReporting & $ErrorNumber) !== $ErrorNumber) {
       if (function_exists('Trace')) {
-         $Backtrace = debug_backtrace();
-         $Tr = '';
-         $i = 0;
-         foreach ($Backtrace as $Info) {
-            if (!isset($Info['file']))
-               continue;
-
-            $Tr .= "\n{$Info['file']} line {$Info['line']}.";
-            if ($i > 2)
-               break;
-            $i++;
-         }
-         Trace("$ErrorNumber: $Message{$Tr}", TRACE_NOTICE);
+         Trace("$Message in $File line $Line", TRACE_NOTICE);
       }
 
       // Ignore errors that are below the current error reporting level.

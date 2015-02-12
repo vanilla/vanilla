@@ -135,7 +135,7 @@ class Gdn_Validation {
    protected function ApplyRulesBySchema() {
       $this->_SchemaRules = array();
 
-      foreach($this->_Schema as $Field => $Properties) {
+      foreach ($this->_Schema as $Field => $Properties) {
          if (is_scalar($Properties)) {
             // Some code passes a record as a schema so account for that here.
             $Properties = array(
@@ -150,85 +150,81 @@ class Gdn_Validation {
          // Create an array to hold rules for this field
          $RuleNames = array();
 
-         if ($Properties->AutoIncrement === TRUE) {
-            // Skip all rules for auto-incrementing integer columns - they will
-         // not be inserted or updated.
-         } else {
-            // Force non-null fields without defaults to be required.
-            if ($Properties->AllowNull === FALSE && $Properties->Default == '') {
-               $RuleNames[] = 'Required';
-            }
-
-            // Force other constraints based on field type.
-            switch($Properties->Type) {
-               case 'bit':
-               case 'bool':
-               case 'boolean':
-                  $RuleNames[] = 'Boolean';
-                  break;
-
-               case 'tinyint':
-               case 'smallint':
-               case 'mediumint':
-               case 'int':
-               case 'integer':
-               case 'bigint':
-                  $RuleNames[] = 'Integer';
-                  break;
-
-               case 'double':
-               case 'float':
-               case 'real':
-               case 'decimal':
-               case 'dec':
-               case 'numeric':
-               case 'fixed':
-                  $RuleNames[] = 'Decimal';
-                  break;
-
-               case 'date':
-               case 'datetime':
-                  $RuleNames[] = 'Date';
-                  break;
-               case 'time':
-                  $RuleNames[] = 'Time';
-                  break;
-               case 'year':
-                  $RuleNames[] = 'Year';
-                  break;
-               case 'timestamp':
-                  $RuleNames[] = 'Timestamp';
-                  break;
-
-               case 'char':
-               case 'varchar':
-               case 'tinyblob':
-               case 'blob':
-               case 'mediumblob':
-               case 'longblob':
-               case 'tinytext':
-               case 'mediumtext':
-               case 'text':
-               case 'longtext':
-               case 'binary':
-               case 'varbinary':
-                  if (!in_array($Field, array('Attributes', 'Data', 'Preferences', 'Permissions'))) {
-                     $RuleNames[] = 'String';
-                  }
-                  if ($Properties->Length != '')
-                     $RuleNames[] = 'Length';
-                  break;
-
-               case 'enum':
-               case 'set':
-                  $RuleNames[] = 'Enum';
-                  break;
-            }
-
-            if ($Field == 'Format') {
-               $RuleNames[] = 'Format';
-            }
+         // Force non-null fields without defaults to be required.
+         if ($Properties->AllowNull === FALSE && $Properties->Default == '') {
+            $RuleNames[] = 'Required';
          }
+
+         // Force other constraints based on field type.
+         switch ($Properties->Type) {
+            case 'bit':
+            case 'bool':
+            case 'boolean':
+               $RuleNames[] = 'Boolean';
+               break;
+
+            case 'tinyint':
+            case 'smallint':
+            case 'mediumint':
+            case 'int':
+            case 'integer':
+            case 'bigint':
+               $RuleNames[] = 'Integer';
+               break;
+
+            case 'double':
+            case 'float':
+            case 'real':
+            case 'decimal':
+            case 'dec':
+            case 'numeric':
+            case 'fixed':
+               $RuleNames[] = 'Decimal';
+               break;
+
+            case 'date':
+            case 'datetime':
+               $RuleNames[] = 'Date';
+               break;
+            case 'time':
+               $RuleNames[] = 'Time';
+               break;
+            case 'year':
+               $RuleNames[] = 'Year';
+               break;
+            case 'timestamp':
+               $RuleNames[] = 'Timestamp';
+               break;
+
+            case 'char':
+            case 'varchar':
+            case 'tinyblob':
+            case 'blob':
+            case 'mediumblob':
+            case 'longblob':
+            case 'tinytext':
+            case 'mediumtext':
+            case 'text':
+            case 'longtext':
+            case 'binary':
+            case 'varbinary':
+               if (!in_array($Field, array('Attributes', 'Data', 'Preferences', 'Permissions'))) {
+                  $RuleNames[] = 'String';
+               }
+               if ($Properties->Length != '')
+                  $RuleNames[] = 'Length';
+               break;
+
+            case 'enum':
+            case 'set':
+               $RuleNames[] = 'Enum';
+               break;
+         }
+
+         if ($Field == 'Format') {
+            $RuleNames[] = 'Format';
+         }
+         
          // Assign the rules to the field.
          // echo '<div>Field: '.$Field.'</div>';
          // print_r($RuleNames);
@@ -326,7 +322,7 @@ class Gdn_Validation {
                continue;
             }
             // Fields with a non-null default can be left out.
-            if (val('Default', $FieldInfo, NULL) !== NULL) {
+            if (val('Default', $FieldInfo, NULL) !== NULL || val('AutoIncrement', $FieldInfo)) {
                continue;
             }
          }
@@ -358,7 +354,7 @@ class Gdn_Validation {
                continue;
             }
             // Fields with a non-null default can be left out.
-            if (val('Default', $FieldInfo, NULL) !== NULL) {
+            if (val('Default', $FieldInfo, NULL) !== NULL || val('AutoIncrement', $FieldInfo)) {
                continue;
             }
          }

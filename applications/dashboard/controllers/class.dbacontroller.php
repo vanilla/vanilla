@@ -85,7 +85,7 @@ class DbaController extends DashboardController {
    /**
     * Fix the category tree after an import that only gives a sort & parent.
     */
-   public function FixTree() {
+   public function RebuildCategoryTree() {
       $this->Permission('Garden.Settings.Manage');
 
       if ($this->Request->IsAuthenticatedPostBack()) {

@@ -252,7 +252,9 @@ class Gdn_LibraryMap {
             }
          }
          try {
-            $CacheContents = str_replace("\\", "/", $CacheContents);  // fix \\ to / to get around parse_ini_file issue that drop off \ when load network file    
+            // Fix slashes to get around parse_ini_file issue that drops off \ when loading network file.
+            $CacheContents = str_replace("\\", "/", $CacheContents);
+
             Gdn_FileSystem::SaveFile(PATH_CACHE.DS.$FileName, $CacheContents, LOCK_EX);
          }
          catch (Exception $e) {}

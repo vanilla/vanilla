@@ -10,18 +10,18 @@ $CountCheckedDiscussions = GetValue('CountCheckedDiscussions', $this->Data, 0);
 
 if ($CountNotAllowed > 0) {
    echo Wrap(sprintf(
-      'You do not have permission to move %1$s of the selected discussions.',
+      t('You do not have permission to move %1$s of the selected discussions.'),
       $CountNotAllowed
       ), 'p');
 
    echo Wrap(sprintf(
-      'You are about to move %1$s of the %2$s of the selected discussions.',
+      t('You are about to move %1$s of the %2$s of the selected discussions.'),
       $CountAllowed,
       $CountCheckedDiscussions
       ), 'p');
 } else {
 echo Wrap(sprintf(
-   'You are about to move %s.',
+   t('You are about to move %s.'),
    Plural($CountCheckedDiscussions, '%s discussion', '%s discussions')
    ), 'p');
 }
@@ -38,7 +38,7 @@ echo Wrap(sprintf(
    <li>
       <?php
          echo '<p>'.
-            $this->Form->CheckBox('RedirectLink', 'Leave a redirect link.'). 
+            $this->Form->CheckBox('RedirectLink', 'Leave a redirect link.').
             '</p>';
       ?>
    </li>

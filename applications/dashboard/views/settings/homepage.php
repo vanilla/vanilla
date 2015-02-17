@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
-   echo Wrap(Anchor(T("Configuring Vanilla's Homepage"), 'http://vanillaforums.org/docs/homepage'), 'li');
+   echo Wrap(Anchor(T("Configuring Vanilla's Homepage"), 'http://docs.vanillaforums.com/developers/configuration/homepage/'), 'li');
    echo Wrap(Anchor(T("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
    echo '</ul>';
    ?>

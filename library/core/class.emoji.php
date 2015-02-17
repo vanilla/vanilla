@@ -23,6 +23,19 @@ class Emoji {
    protected $aliases;
 
    /**
+    * The archive is an array of deprecated emoji to new emoji that allows us to rename emoji with compatibility.
+    *
+    * The archive can be used for a couple of purposes.
+    *
+    * 1. If you want to remove an emoji from the lookup list then you can just move the entry from the `$emoji` array to
+    * the `$archive` array.
+    * 2. If you want to rename an emoji then copy it to the `$archive` array and then rename it in the `$emoji` array.
+    *
+    * @var array All of the emoji archive.
+    */
+   protected $archive;
+
+   /**
     * @var string The base path where the emoji are located.
     */
    protected $assetPath = '/resources/emoji';
@@ -35,16 +48,16 @@ class Emoji {
 
    /**
     * @var array An emoji alias list that represents the emoji that display
-    * in an editor dropdown. Typically, it is a copy of the alias list.
+    * in an editor drop down. Typically, it is a copy of the alias list.
     */
    protected $editorList;
 
    /**
-    * This array contains all of the emoji avaliable in the system. The array
-    * is in the following format:
+    * This array contains all of the emoji avaliable in the system. The array is in the following format:
+    *
     * ~~~
     * array (
-    *     'emoji_name' => array('filename.png', 'misc info'...)
+    *     'emoji_name' => 'filename.png'
     * )
     * ~~~
     *
@@ -79,7 +92,7 @@ class Emoji {
     * - %1$s: The emoji path.
     * - %2$s: The emoji code.
     */
-   public $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
+   protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
 
    /**
     *
@@ -99,99 +112,87 @@ class Emoji {
     */
    public $rdelim = ':';
 
-   /**
-    *
-    * @var bool If set to true, original unaccounted for emoji will get merged
-    * into the custom set.
-    */
-   protected $mergeOriginals = false;
-
    /// Methods ///
 
    protected function __construct() {
       // Initialize the canonical list. (emoji)
       $this->emoji = array(
         // Smileys
-        'smile'                        => array('smile.png', '705'),
-        'smiley'                       => array('smiley.png', '704'),
-        'wink'                         => array('wink.png', '710'),
-        'blush'                        => array('blush.png', '711'),
-        'neutral_face'                 => array('neutral_face.png', '717'),
+        'smile'                        => 'smile.png',
+        'smiley'                       => 'smiley.png',
+        'wink'                         => 'wink.png',
+        'blush'                        => 'blush.png',
+        'neutral'                      => 'neutral.png',
 
-        'relaxed'                      => array('relaxed.png', '50'),
-        'grinning'                     => array('grinning.png', '701'),
-        'grin'                         => array('grin.png', '702'),
-        'joy'                          => array('joy.png', '703'),
-        'sweat_smile'                  => array('sweat_smile.png', '706'),
-        'lol'                          => array('lol.png', '707'),
-        'innocent'                     => array('innocent.png', '708'),
-        'smiling_imp'                  => array('smiling_imp.png', '709'),
-        'yum'                          => array('yum.png', '712'),
-        'relieved'                     => array('relieved.png', '713'),
-        'heart_eyes'                   => array('heart_eyes.png', '714'),
-        'sunglasses'                   => array('sunglasses.png', '715'),
-        'smirk'                        => array('smirk.png', '716'),
-        'neutral_face'                 => array('neutral_face.png', '717'),
-        'expressionless'               => array('expressionless.png', '718'),
-        'unamused'                     => array('unamused.png', '719'),
-        'sweat'                        => array('sweat.png', '720'),
-        'pensive'                      => array('pensive.png', '721'),
-        'confused'                     => array('confused.png', '722'),
-        'confounded'                   => array('confounded.png', '723'),
-        'kissing'                      => array('kissing.png', '724'),
-        'kissing_heart'                => array('kissing_heart.png', '725'),
-        'kissing_smiling_eyes'         => array('kissing_smiling_eyes.png', '726'),
-        'kissing_closed_eyes'          => array('kissing_closed_eyes.png', '727'),
-        'stuck_out_tongue'             => array('stuck_out_tongue.png', '728'),
-        'stuck_out_tongue_winking_eye' => array('stuck_out_tongue_winking_eye.png', '729'),
-        'stuck_out_tongue_closed_eyes' => array('stuck_out_tongue_closed_eyes.png', '730'),
-        'disappointed'                 => array('disappointed.png', '731'),
-        'worried'                      => array('worried.png', '732'),
-        'angry'                        => array('angry.png', '733'),
-        'rage'                         => array('rage.png', '734'),
-        'cry'                          => array('cry.png', '735'),
-        'persevere'                    => array('persevere.png', '736'),
-        'triumph'                      => array('triumph.png', '737'),
-        'disappointed_relieved'        => array('disappointed_relieved.png', '738'),
-        'frowning'                     => array('frowning.png', '739'),
-        'anguished'                    => array('anguished.png', '740'),
-        'fearful'                      => array('fearful.png', '741'),
-        'weary'                        => array('weary.png', '742'),
-        'sleepy'                       => array('sleepy.png', '743'),
-        'tired_face'                   => array('tired_face.png', '744'),
-        'grimacing'                    => array('grimacing.png', '745'),
-        'sob'                          => array('sob.png', '746'),
-        'open_mouth'                   => array('open_mouth.png', '747'),
-        'hushed'                       => array('hushed.png', '748'),
-        'cold_sweat'                   => array('cold_sweat.png', '749'),
-        'scream'                       => array('scream.png', '750'),
-        'astonished'                   => array('astonished.png', '751'),
-        'flushed'                      => array('flushed.png', '752'),
-        'sleeping'                     => array('sleeping.png', '753'),
-        'dizzy_face'                   => array('dizzy_face.png', '754'),
-        'no_mouth'                     => array('no_mouth.png', '755'),
-        'mask'                         => array('mask.png', '756'),
-        'star'                         => array('star.png', '123'),
-        'cookie'                       => array('cookie.png', '262'),
-        'warning'                      => array('warning.png', '71'),
-        'mrgreen'                      => array('mrgreen.png'),
+        'relaxed'                      => 'relaxed.png',
+        'grin'                         => 'grin.png',
+        'joy'                          => 'joy.png',
+        'sweat_smile'                  => 'sweat_smile.png',
+        'lol'                          => 'lol.png',
+        'innocent'                     => 'innocent.png',
+        'naughty'                      => 'naughty.png',
+        'yum'                          => 'yum.png',
+        'relieved'                     => 'relieved.png',
+        'love'                         => 'love.png',
+        'sunglasses'                   => 'sunglasses.png',
+        'smirk'                        => 'smirk.png',
+        'expressionless'               => 'expressionless.png',
+        'unamused'                     => 'unamused.png',
+        'sweat'                        => 'sweat.png',
+        'pensive'                      => 'pensive.png',
+        'confused'                     => 'confused.png',
+        'confounded'                   => 'confounded.png',
+        'kissing'                      => 'kissing.png',
+        'kissing_heart'                => 'kissing_heart.png',
+        'kissing_smiling_eyes'         => 'kissing_smiling_eyes.png',
+        'kissing_closed_eyes'          => 'kissing_closed_eyes.png',
+        'tongue'                       => 'tongue.png',
+        'disappointed'                 => 'disappointed.png',
+        'worried'                      => 'worried.png',
+        'angry'                        => 'angry.png',
+        'rage'                         => 'rage.png',
+        'cry'                          => 'cry.png',
+        'persevere'                    => 'persevere.png',
+        'triumph'                      => 'triumph.png',
+        'frowning'                     => 'frowning.png',
+        'anguished'                    => 'anguished.png',
+        'fearful'                      => 'fearful.png',
+        'weary'                        => 'weary.png',
+        'sleepy'                       => 'sleepy.png',
+        'tired_face'                   => 'tired_face.png',
+        'grimace'                      => 'grimace.png',
+        'bawling'                      => 'bawling.png',
+        'open_mouth'                   => 'open_mouth.png',
+        'hushed'                       => 'hushed.png',
+        'cold_sweat'                   => 'cold_sweat.png',
+        'scream'                       => 'scream.png',
+        'astonished'                   => 'astonished.png',
+        'flushed'                      => 'flushed.png',
+        'sleeping'                     => 'sleeping.png',
+        'dizzy'                        => 'dizzy.png',
+        'no_mouth'                     => 'no_mouth.png',
+        'mask'                         => 'mask.png',
+        'star'                         => 'star.png',
+        'cookie'                       => 'cookie.png',
+        'warning'                      => 'warning.png',
+        'mrgreen'                      => 'mrgreen.png',
 
         // Love
-        'heart'                        => array('heart.png', '109'),
-        'broken_heart'                 => array('broken_heart.png', '506'),
-        'kiss'                         => array('kiss.png', '497'),
+        'heart'                        => 'heart.png',
+        'heartbreak'                   => 'heartbreak.png',
+        'kiss'                         => 'kiss.png',
 
         // Hand gestures
-        '+1'                           => array('+1.png', '435'),
-        '-1'                           => array('-1.png', '436'),
+        '+1'                           => '+1.png',
+        '-1'                           => '-1.png',
 
         // This is used for aliases that are set incorrectly or point
         // to items not listed in the emoji list.
         // errorEmoji
-        'grey_question'                => array('grey_question.png', '106'),
+        'grey_question'                => 'grey_question.png',
 
         // Custom icons, canonical naming
-        'trollface'                    => array('trollface.png', 'trollface')
+        'trollface'                    => 'trollface.png'
       );
 
       // Some aliases self-referencing the canonical list. Use this syntax.
@@ -199,33 +200,68 @@ class Emoji {
       // This is used in cases where emoji image cannot be found.
       $this->emoji['error'] = &$this->emoji['grey_question'];
 
-      // Vanilla reactions, non-canonical referencing canonical
-      $this->emoji['lol']       = &$this->emoji['smile'];
-      $this->emoji['wtf']       = &$this->emoji['dizzy_face'];
-      $this->emoji['agree']     = &$this->emoji['grinning'];
-      $this->emoji['disagree']  = &$this->emoji['stuck_out_tongue_closed_eyes'];
-      $this->emoji['awesome']   = &$this->emoji['heart'];
-
       // Initialize the alias list. (emoticons)
       $this->aliases = array(
          ':)'          => 'smile',
-         ':D'          => 'smiley',
-         ':('          => 'disappointed',
+         ':D'          => 'lol',
+         '=)'          => 'smiley',
+         ':('          => 'frowning',
          ';)'          => 'wink',
          ':\\'         => 'confused',
+         ':/'          => 'confused',
          ':o'          => 'open_mouth',
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
          ":'("         => 'cry',
-         ':|'          => 'neutral_face',
-       //'D:'          => 'anguished',
+         ':|'          => 'neutral',
+         'D:'          => 'anguished',
          'B)'          => 'sunglasses',
-         ':#'          => 'grin',
+         ':#'          => 'grimace',
+         ':*'          => 'kiss',
+         ':3'          => 'blush',
          'o:)'         => 'innocent',
          '<3'          => 'heart',
-         '(*)'         => 'star',
-         '>:)'         => 'smiling_imp'
+         '>:)'         => 'naughty'
        );
+
+      $this->archive = array(
+         'disappointed_relieved'          => 'disappointed_relieved.png',
+         'dizzy_face'                     => 'dizzy.png',
+         'broken_heart'                   => 'heartbreak.png',
+         'grinning'                       => 'grin.png',
+         'heart_eyes'                     => 'love.png',
+         'neutral_face'                   => 'neutral.png',
+         'smiling_imp'                    => 'naughty.png',
+         'sob'                            => 'bawling.png',
+         'stuck_out_tongue'               => 'tongue.png',
+         'stuck_out_tongue_winking_eye'   => 'stuck_out_tongue_winking_eye.png',
+         'stuck_out_tongue_closed_eyes'   => 'stuck_out_tongue_closed_eyes.png',
+      );
+
+      $this->editorList = array(
+         ':)'          => 'smile',
+         ':D'          => 'lol',
+         ':('          => 'disappointed',
+         ';)'          => 'wink',
+         ':/'         => 'confused',
+         ':o'          => 'open_mouth',
+         ':s'          => 'confounded',
+         ':p'          => 'stuck_out_tongue',
+         ":'("         => 'cry',
+         ':|'          => 'neutral',
+         'B)'          => 'sunglasses',
+         ':#'          => 'grimace',
+         ':*'          => 'kiss',
+         '<3'          => 'heart',
+         'o:)'         => 'innocent',
+         '>:)'         => 'naughty'
+      );
+
+      if (C('Garden.EmojiSet') === 'none') {
+         $this->enabled = false;
+      }
+
+      Gdn::PluginManager()->CallEventHandlers($this, 'Emoji', 'Init', 'Handler');
 
       // Add emoji to definition list for whole site. This used to be in the
       // advanced editor plugin, but since moving atmentions to core, had to
@@ -236,7 +272,7 @@ class Emoji {
       // suggestions for emoji yet, but keep here for whenever Advanced Editor
       // is running.
       $c = Gdn::Controller();
-      if ($c) {
+      if ($c && $this->enabled) {
          $emojis = $this->getEmoji();
          $emojiAssetPath = $this->getAssetPath();
          $emoji = array();
@@ -244,93 +280,58 @@ class Emoji {
          foreach ($emojis as $name => $data) {
             $emoji[] = array(
                 "name" => "". $name ."",
-                "url" =>  $emojiAssetPath . '/' . reset($data)
+                "url" =>  Asset($emojiAssetPath . '/' . $data)
             );
          }
 
-         $c->AddDefinition('emoji', json_encode($emoji));
+         $emoji = array(
+            'assetPath' => Asset($this->getAssetPath()),
+            'format' => $this->getFormat(),
+            'emoji' => $this->getEmoji()
+         );
+
+         $c->AddDefinition('emoji', $emoji);
       }
    }
 
    /**
-    * Callback method for buildHiddenAliasListFromCanonicalList.
+    * This method is deprecated. See {@link Emoji::getEmojiPath()}.
     *
-    * Array passed as reference, to be used in above method,
-    * buildHiddenAliasListFromCanonicalLi, when calling array_walk withthis
-    * callback, which requires that the method as callback also specify object
-    * it belongs to.
-    *
-    * @param string $val Reference to passed array value
-    * @param string $key Reference to passed array key
+    * @param string $emojiName
+    * @return string
     */
-   public function buildAliasFormat(&$val, $key) {
-      $val = ":$val:";
+   public function buildEmojiPath($emojiName) {
+      Deprecated('buildEmojiPath', 'getEmojiPath');
+      return $this->getEmojiPath($emojiName);
    }
 
    /**
-    * Provide this method with the official emoji filename and it will return
-    * the correct path.
-    *
-    * @param string $emojiFileName File name of emoji icon.
-    * @return string Root-relative path.
+    * Check the alias array and filter out all of the emoji that are not present in the main emoji list.
     */
-   public function buildFilePath($emojiName) {
-
-      // By default, just characters will be outputted (img alt text)
-      $filePath = $emojiFileName = '';
-
-      if (isset($this->emoji[$emojiName])) {
-         $filePath = $this->assetPath;
-         $emojiFileName = reset($this->emoji[$emojiName]);
-      } elseif ($this->mergeOriginals && isset($this->emojiOriginalUnaccountedFor[$emojiName])) {
-         $filePath = $this->assetPathOriginal;
-         $emojiFileName = reset($this->emojiOriginalUnaccountedFor[$emojiName]);
-      } else {
-         return '';
-      }
-
-      return $filePath . '/' . $emojiFileName;
-   }
-
-   /**
-    * This is to easily match the array of the visible alias list that all
-    * users will be able to select from. Call the mergeAliasAndEmojiLists()
-    * method to merge this array with the alias list, which will then be easy
-    * to loop through all the possible emoji displayable in the forum.
-    *
-    * An alias is [:)]=>[smile], and canonical alias is [:smile:]=>[smile]
-    *
-    * @return array Returns array that matches format of original alias list
-    */
-   public function buildHiddenAliasListFromCanonicalList() {
-      $caonicalListEmojiNamesCanonical = array_keys($this->getEmoji());
-      $caonicalListEmojiNamesAliases = $caonicalListEmojiNamesCanonical;
-      array_walk($caonicalListEmojiNamesAliases, array($this, 'buildAliasFormat'));
-
-      return array_combine($caonicalListEmojiNamesAliases, $caonicalListEmojiNamesCanonical);
+   protected function checkAliases() {
+      $this->aliases = array_filter($this->aliases, function ($emojiName) {
+         return isset($this->emojo[$emojiName]);
+      });
    }
 
    /**
     * Populate this with any aliases required for plugin, make sure they point
-    * to canonical translation, and plugin will add everything to dropdown that
+    * to canonical translation, and plugin will add everything to drop down that
     * is listed. To expand, simply define more aliases that corresponded with
     * canonical list.
     *
-    * Note: some aliases require htmlentities filtering, which is done directly
-    * before output in the dropdown, and while searching for the string to
+    * Note: some aliases require {@link htmlentities()} filtering, which is done directly
+    * before output in the drop down, and while searching for the string to
     * replace in the regex, NOT here. The reason for this is so the alias
-    * list does not get littered with characters entity encodings like &lt;,
+    * list does not get littered with characters entity encodings like `&lt;`,
     * which makes it difficult to immediately know what the aliases do. Also,
-    * htmlentities would have to be revered in areas such as title attributes,
+    * {@link htmlentities} would have to be revered in areas such as title attributes,
     * which counteracts the usefulness of having it done here.
     *
-    * @param string $emojiAlias Optional string to return matching translation
-    * @return string|array Canonical translation or full alias array
+    * @return array Returns an array of alias to emoji name entries.
     */
-   public function getAliases($emojiAlias = '') {
-      return (!$emojiAlias)
-         ? $this->aliases
-         : $this->aliases[$emojiAlias];
+   public function getAliases() {
+      return $this->aliases;
    }
 
    /**
@@ -343,34 +344,31 @@ class Emoji {
    }
 
    /**
-    * This is the canonical, e.g., official, list of emoji names along with
-    * their associatedwith image file name. For an exhaustive list of emoji
-    * names visit http://www.emoji-cheat-sheet.com/ and for the original image
-    * files being used, visit https://github.com/taninamdar/Apple-Color-Emoji
+    * Gets the emoji archive.
     *
-    * Note: every canonical emoji name points to an array of strings. This
-    * string is ordered CurrentName, OriginalName. Due to the reset()
-    * before returning the filename, the first element in the array will be
-    * returned, so in this instance CurrentName will be returned. The second,
-    * OriginalName, does not have to be written. If ever integrating more emoji
-    * files from Apple-Color-Emoji, and wanting to rename them from numbered
-    * files, use emojirename.php located in design/images/emoji/.
-    *
-    * @param type $emojiCanonical Optional string to return matching file name.
-    * @return string|array File name or full canonical array
+    * @return array Returns an array of emoji name to emoji file names representing the emoji archie.
     */
-   public function getEmoji($emojiCanonical = '') {
-      // Return first value from canonical array
-      return (!$emojiCanonical)
-         ? $this->emoji
-         : $this->buildFilePath($emojiCanonical);
+   public function getArchive() {
+      return $this->archive;
    }
 
    /**
+    * Set the emoji archive.
     *
-    * @return array List of Emojis that will appear in the editor.
+    * @param array $archive
+    * @return Emoji Returns $this for fluent calls.
     */
-   public function getEmojiEditorList() {
+   public function setArchive($archive) {
+      $this->archive = $archive;
+      return $this;
+   }
+
+   /**
+    * Get the emoji editor list.
+    *
+    * @return array Returns an array of Emojis that can appear in an editor drop down.
+    */
+   public function getEditorList() {
       if ($this->editorList === null) {
          return $this->getAliases();
       }
@@ -379,63 +377,147 @@ class Emoji {
    }
 
    /**
+    * This is the canonical, e.g., official, list of emoji names along with
+    * their associatedwith image file name. For an exhaustive list of emoji
+    * names visit http://www.emoji-cheat-sheet.com/ and for the original image
+    * files being used, visit https://github.com/taninamdar/Apple-Color-Emoji
+    *
+    * @return string|array File name or full canonical array
+    */
+   public function getEmoji() {
+      // Return first value from canonical array
+      return $this->emoji;
+   }
+
+   /**
+    *
+    * @return array List of Emojis that will appear in the editor.
+    */
+   public function getEmojiEditorList() {
+      Deprecated('getEmojiEditorList', 'getEditorList');
+      return $this->getEditorList();
+   }
+
+   /**
+    * Provide this method with the official emoji filename and it will return the correct path.
+    *
+    * @param string $emojiName File name of emoji icon.
+    * @return string Root-relative path.
+    */
+   public function getEmojiPath($emojiName) {
+
+      // By default, just characters will be outputted (img alt text)
+      $filePath = $emojiFileName = '';
+
+      if (isset($this->emoji[$emojiName])) {
+         $filePath = $this->assetPath;
+         $emojiFileName = $this->emoji[$emojiName];
+      } elseif (isset($this->archive[$emojiName])) {
+         $filePath = $this->assetPath;
+         $emojiFileName = $this->archive[$emojiName];
+      } else {
+         return '';
+      }
+
+      return $filePath . '/' . $emojiFileName;
+   }
+
+   /**
+    * Checks whether or not the emoji has an editor list.
+    *
+    * @return bool Returns true if there is an editor list or false otherwise.
+    */
+   public function hasEditorList() {
+      $editorList = $this->getEditorList();
+      return $this->enabled && !empty($editorList);
+   }
+
+   /**
+    * Set the list of emoji that can be used by the editor.
+    *
+    * @param array $value The new editor list.
+    */
+   public function setEmojiEditorList($value) {
+      Deprecated('setEmojiEditorList', 'setEditorList');
+      return $this->setEditorList($value);
+   }
+
+
+   /**
+    * Set the list of emoji that can be used by the editor.
+    *
+    * @param array $value The new editor list.
+    * @return Emoji Returns $this for fluent calls.
+    */
+   public function setEditorList($value) {
+      // Convert the editor list to the proper format.
+      $list = array();
+      $aliases2 = array_flip($this->aliases);
+      foreach ($value as $emoji) {
+         if (isset($this->aliases[$emoji])) {
+            $list[$emoji] = $this->aliases[$emoji];
+         } elseif (isset($aliases2[$emoji])) {
+            $list[$aliases2[$emoji]] = $emoji;
+         } elseif (isset($this->emoji[$emoji])) {
+            $list[$this->ldelim.$emoji.$this->rdelim] = $emoji;
+         }
+      }
+      $this->editorList = $list;
+      return $this;
+   }
+
+   /**
+    * Gets the emoji format used in {@link Emoji::img()}.
+    *
+    * @return string Returns the current emoji format.
+    */
+   public function getFormat() {
+      return $this->format;
+   }
+
+   /**
+    * Sets the emoji format used in {@link Emoji::img()}.
+    *
+    * @param string $format
+    * @return Emoji Returns $this for fluent calls.
+    */
+   public function setFormat($format) {
+      $this->format = $format;
+      return $this;
+   }
+
+   /**
     * Accept an Emoji path and name, and return the corresponding HTML IMG tag.
     *
     * @param string $emoji_path The full path to Emoji file.
     * @param string $emoji_name The name given to Emoji.
-    * @return string The html that represents the emiji.
+    * @return string The html that represents the emoji.
     */
    public function img($emoji_path, $emoji_name) {
-      return sprintf($this->format, $emoji_path, $emoji_name);
+      $dir = Asset(dirname($emoji_path));
+      $filename = basename($emoji_path);
+      $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
+      $basename = basename($filename, $ext);
+      $src = Asset($emoji_path);
+
+      $img = str_replace(
+         array('%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'),
+         array($src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext),
+         $this->format
+         );
+
+      return $img;
    }
 
    /**
-    * This is in case you want to merge the alias list with the canonical list
-    * and easily loop through the entire possible set of translations to
-    * perform in, for example, the translateToHtml() method, which
-    * loops through all the visible emojis, and the hidden canonical ones.
+    * Set the aliases array.
     *
-    * @return array Returns array of alias list and canonical list, easily
-    *               loopable.
-    */
-   public function mergeAliasAndEmojiLists() {
-      return array_merge($this->getEmojiEditorList(), $this->buildHiddenAliasListFromCanonicalList());
-   }
-
-   /**
-    * This is useful in case the custom set should be merged with the default
-    * set. Any custom emoji tags that match the default will overwrite the
-    * default.
-    *
-    * TODO: this will require the original assetPath to be stored if it's been
-    * overwritten.
-    *
-    * @param array $additionEmoji
-    */
-   public function mergeAdditionalEmoji($additionEmoji) {
-      return array_merge($this->emoji, $additionEmoji);
-   }
-
-   /**
-    * Note: if setting this to true, it must be the first method called in a
-    * plugin that will use custom emojis, but also want to merge the unaccounted
-    * for original ones, otherwise the original emojis and path will not be
-    * stored.
-    *
-    * @param bool $bool
-    */
-   public function mergeOriginals($bool) {
-      $this->mergeOriginals = $bool;
-   }
-
-   /**
-    *
-    * @param array $aliases
+    * @param array $aliases The new aliases array.
+    * @return Emoji Returns $this for fluent calls.
     */
    public function setAliases($aliases) {
-      if (count(array_filter($aliases))) {
-         $this->aliases = $aliases;
-      }
+      $this->aliases = $aliases;
+      return $this;
    }
 
    /**
@@ -443,11 +525,6 @@ class Emoji {
     * @param string $assetPath
     */
    public function setAssetPath($assetPath) {
-      // Save original asset path for merging default emoji.
-      if ($this->mergeOriginals) {
-         $this->assetPathOriginal = $this->assetPath;
-      }
-
       $this->assetPath = $assetPath;
    }
 
@@ -457,16 +534,47 @@ class Emoji {
     * @param array $emoji
     */
    public function setEmoji($emoji) {
-      if (count(array_filter($emoji))) {
-         // Save the emoji that are unaccounted for in their custom set.
-         // This can be used if merging them with the custom set, as they
-         // have different assetPaths.
-         if ($this->mergeOriginals) {
-            $this->emojiOriginalUnaccountedFor = array_diff_key($this->emoji, $emoji);
-         }
+      $this->emoji = $emoji;
+   }
 
-         // Set custom emoji.
-         $this->emoji = $emoji;
+   /**
+    * Set the emoji from a manifest.
+    * @param array $manifest An emoji manifest with the following keys:
+    * - emoji: An array in the form: name => filename (ex. ['smile' => 'smile.png'])
+    * - aliases (optional): An array of emoji short forms: alias => emojiName  (ex. [':)' => 'smile'])
+    * - editor (optional): An array of emoji that will display in the editor: emojiName (ex: [smile,..])
+    * - format (optional): The string format of the emoji replacement.
+    * @param string $assetPath The asset path root to all of the emoji files.
+    */
+   public function setFromManifest($manifest, $assetPath = '') {
+      // Set the default asset root.
+      if ($assetPath) {
+         $this->setAssetPath(StringBeginsWith($assetPath, PATH_ROOT, true, true));
+      }
+
+      // Set the emoji settings from the manifest.
+      if (array_key_exists('emoji', $manifest)) {
+         $this->setEmoji($manifest['emoji']);
+      }
+
+      if (array_key_exists('aliases', $manifest)) {
+         $this->setAliases($manifest['aliases']);
+      } else {
+         $this->checkAliases();
+      }
+
+      if (array_key_exists('archive', $manifest)) {
+         $this->setArchive($manifest['archive']);
+      } else {
+         $this->setArchive(array());
+      }
+
+      if (!empty($manifest['format'])) {
+         $this->format = $manifest['format'];
+      }
+
+      if (array_key_exists('editor', $manifest)) {
+         $this->setEditorList($manifest['editor']);
       }
    }
 
@@ -480,15 +588,19 @@ class Emoji {
     * @return string Return the emoji-formatted post
     */
    public function translateToHtml($Text) {
+      if (!$this->enabled) {
+         return $Text;
+      }
+
 		$Text = ' '. $Text .' ';
 
       // First, translate all aliases. Canonical emoji will get translated
       // out of a loop.
-      $emojiAliasList = $this->getEmojiEditorList();
+      $emojiAliasList = $this->aliases;
 
       // Loop through and apply changes to all visible aliases from dropdown
 		foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
-         $emojiFilePath  = $this->getEmoji($emojiCanonical);
+         $emojiFilePath  = $this->getEmojiPath($emojiCanonical);
 
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
 				$Text = preg_replace(
@@ -504,9 +616,9 @@ class Emoji {
       $rdelim = preg_quote($this->rdelim, '`');
       $emoji = $this;
 
-      $Text = preg_replace_callback("`({$ldelim}[a-z_+-]+{$rdelim})`i", function($m) use ($emoji) {
+      $Text = preg_replace_callback("`({$ldelim}[a-z0-9_+-]+{$rdelim})`i", function($m) use ($emoji) {
          $emoji_name = trim($m[1], ':');
-         $emoji_path = $emoji->getEmoji($emoji_name);
+         $emoji_path = $emoji->getEmojiPath($emoji_name);
          if ($emoji_path) {
             return $emoji->img($emoji_path, $emoji->ldelim.$emoji_name.$emoji->rdelim);
          } else {
@@ -524,7 +636,6 @@ class Emoji {
    public static function instance() {
       if (Emoji::$instance === null) {
          Emoji::$instance = new Emoji();
-         Gdn::PluginManager()->CallEventHandlers(Emoji::instance(), 'Emoji', 'Init', 'Handler');
       }
 
       return Emoji::$instance;

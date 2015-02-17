@@ -3,7 +3,8 @@ $Session = Gdn::Session();
 
 $Alt = FALSE;
 $CurrentOffset = $this->Offset;
-foreach ($this->MessageData->Result() as $Message) {
+$Messages = $this->Data('Messages', array());
+foreach ($Messages as $Message) {
    $CurrentOffset++;
    $Alt = $Alt == TRUE ? FALSE : TRUE;
    $Class = 'Item';
@@ -34,12 +35,17 @@ foreach ($this->MessageData->Result() as $Message) {
             echo UserAnchor($Author, 'Name');
             ?>
          </span>
-         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted); ?></span>
+         <span class="MItem DateCreated"><?php echo Gdn_Format::Date($Message->DateInserted, 'html'); ?></span>
+         <?php
+         $this->FireEvent('AfterConversationMessageDate');
+         ?>
       </div>
       <div class="Message">
          <?php
          $this->FireEvent('BeforeConversationMessageBody');
          echo Gdn_Format::To($Message->Body, $Format);
+         $this->EventArguments['Message'] = &$Message;
+         $this->FireEvent('AfterConversationMessageBody');
          ?>
       </div>
    </div>

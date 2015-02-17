@@ -238,6 +238,27 @@ class Gdn_UploadImage extends Gdn_Upload {
          imagecopyresampled($TargetImage, $SourceImage, 0, 0, $XCoord, $YCoord, $Width, $Height, $WidthSource, $HeightSource);
          imagedestroy($SourceImage);
 
+         // Check for EXIF rotation tag, and rotate the image if present
+         if (function_exists('exif_read_data') && 
+               ( ($Type == IMAGETYPE_JPEG) || ($Type == IMAGETYPE_TIFF_II ) || ($Type == IMAGETYPE_TIFF_MM) ) ) { 
+            $ImageExif = exif_read_data($Source);
+            if (!empty($ImageExif['Orientation'])) {
+               switch ($ImageExif['Orientation']) {
+                  case 3:
+                     $TargetImage = imagerotate($TargetImage, 180, 0);
+                     break;
+                  case 6:
+                     $TargetImage = imagerotate($TargetImage, -90, 0);
+                     list($Width, $Height) = array($Height, $Width);
+                     break;
+                  case 8:
+                     $TargetImage = imagerotate($TargetImage, 90, 0);
+                     list($Width, $Height) = array($Height, $Width);
+                   break;
+                }
+            }
+         }
+
          // No need to check these, if we get here then whichever function we need will be available
          if ($OutputType == 'gif')
             imagegif($TargetImage, $TargetPath);
@@ -256,6 +277,8 @@ class Gdn_UploadImage extends Gdn_Upload {
       $Sender->EventArguments = array();
       $Sender->EventArguments['Path'] = $TargetPath;
       $Parsed = self::Parse($TargetPath);
+      $Parsed['Width'] = $Width;
+      $Parsed['Height'] = $Height;
       $Sender->EventArguments['Parsed'] =& $Parsed;
       $Sender->Returns = array();
       Gdn::PluginManager()->CallEventHandlers($Sender, 'Gdn_Upload', 'SaveAs');

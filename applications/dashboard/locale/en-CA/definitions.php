@@ -19,9 +19,6 @@ if (!function_exists('FormatPossessive')) {
    }
 }
 
-$Definition['Locale'] = 'en-CA';
-$Definition['_Locale'] = 'Locale';
-
 $Definition['Apply for Membership'] = 'Register';
 
 // THESE ARE RELATED TO VALIDATION FUNCTIONS IN /garden/library/core/validation.functions.php
@@ -47,6 +44,7 @@ $Definition['ValidateMatch'] = 'The %s fields do not match.';
 $Definition['ValidateStrength'] = 'The supplied %s is too weak. Try using a stronger password and use the strength meter as a guide.';
 $Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
 $Definition['ValidateBanned'] = 'That %s is not allowed.';
+$Definition['ValidateString'] = '%s is not a valid string.';
 $Definition['ValidateUrlStringRelaxed'] = '%s can not contain slashes, quotes or tag characters.';
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
@@ -143,7 +141,7 @@ $Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
 $Definition['Saved'] = 'Your changes have been saved.';
 $Definition['%s new plural'] = '%s new';
 $Definition['TermsOfService'] = 'Terms of Service';
-$Definition['TermsOfServiceText'] = 
+$Definition['TermsOfServiceText'] =
 "You agree, through your use of this service, that you will not use this
 community to post any material which is knowingly false and/or defamatory,
 inaccurate, abusive, vulgar, hateful, harassing, obscene, profane, sexually

@@ -262,9 +262,12 @@ class PagerModule extends Gdn_Module {
 
       $this->CssClass = ConcatSep(' ', $this->CssClass, 'NumberedPager');
 
+      // Get total page count, allowing override
       $PageCount = ceil($this->TotalRecords / $this->Limit);
+      $this->EventArguments['PageCount'] = &$PageCount;
+      $this->FireEvent('BeforePagerSetsCount');
       $this->_PageCount = $PageCount;
-      $CurrentPage = ceil($this->Offset / $this->Limit) + 1;
+      $CurrentPage = PageNumber($this->Offset, $this->Limit);
 
       // Show $Range pages on either side of current
       $Range = C('Garden.Modules.PagerRange', 3);
@@ -432,6 +435,8 @@ class PagerModule extends Gdn_Module {
          $Url = GetValue('Url', $Options, $Pager->Controller()->SelfUrl.'?Page={Page}&'.http_build_query($Get));
 
          $Pager->Configure($Offset, $Limit, $TotalRecords, $Url);
+      } elseif ($Url = val('Url', $Options)) {
+         $Pager->Url = $Url;
       }
 
       echo $Pager->ToString($WriteCount > 0 ? 'more' : 'less');

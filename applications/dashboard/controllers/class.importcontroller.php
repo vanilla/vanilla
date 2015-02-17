@@ -73,7 +73,7 @@ class ImportController extends DashboardController {
          }
 
          if($Imp->CurrentStep >= 1) {
-            if($this->Form->IsPostBack())
+            if($this->Form->AuthenticatedPostBack())
                $Imp->FromPost($this->Form->FormValues());
             try {
                $Result = $Imp->RunStep($Imp->CurrentStep);
@@ -184,8 +184,6 @@ class ImportController extends DashboardController {
             if(TRUE || strcasecmp($this->Form->GetFormValue('Overwrite'), 'Overwrite') == 0) {
                if (!StringBeginsWith($this->Form->GetFormValue('PathSelect'), 'Db:', TRUE)) {
                   $Validation->ApplyRule('Email', 'Required');
-                  if (!$this->Form->GetFormValue('UseCurrentPassword'))
-                     $Validation->ApplyRule('Password', 'Required');
                }
             }
 

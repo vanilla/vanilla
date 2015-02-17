@@ -39,25 +39,28 @@ echo $this->Form->Errors();
       </li>-->
    </ul>
    <script>
+      jQuery(document).ready(function($) {
+         SetProfileFormOptions($);
+      });
       $("select[name='FormType']").change(function() {
+         SetProfileFormOptions($);
+      });
+
+      // Set options based on field type selected.
+      function SetProfileFormOptions($) {
+         $("[name='Required']").prop('disabled', false);
+         $("[name='OnRegister']").prop('disabled', false);
+         $("[name='OnProfile']").prop('disabled', false);
          switch ($("select[name='FormType']").val()) {
             case 'Dropdown':
                $('.Label').slideDown('fast');
                $('.Options').slideDown('fast');
                $('.ShowOnProfiles').slideDown('fast');
-               $("[name='Required']").prop('checked', false);
-               $("[name='Required']").prop('disabled', false);
-               $("[name='OnRegister']").prop('checked', false);
-               $("[name='OnRegister']").prop('disabled', false);
                break;
             case 'DateOfBirth':
                $('.Label').slideUp('fast');
                $('.Options').slideUp('fast');
                $('.ShowOnProfiles').slideDown('fast');
-               $("[name='Required']").prop('checked', false);
-               $("[name='Required']").prop('disabled', false);
-               $("[name='OnRegister']").prop('checked', false);
-               $("[name='OnRegister']").prop('disabled', false);
                break;
             case 'CheckBox':
                $('.Label').slideDown('fast');
@@ -67,17 +70,15 @@ echo $this->Form->Errors();
                $("[name='Required']").prop('disabled', true);
                $("[name='OnRegister']").prop('checked', true);
                $("[name='OnRegister']").prop('disabled', true);
+               $("[name='OnProfile']").prop('checked', false);
+               $("[name='OnProfile']").prop('disabled', true);
                break;
             default:
                $('.Label').slideDown('fast');
                $('.Options').slideUp('fast');
                $('.ShowOnProfiles').slideDown('fast');
-               $("[name='Required']").prop('checked', false);
-               $("[name='Required']").prop('disabled', false);
-               $("[name='OnRegister']").prop('checked', false);
-               $("[name='OnRegister']").prop('disabled', false);
                break;
          }
-      });
+      }
    </script>
 <?php echo $this->Form->Close('Save');

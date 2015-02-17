@@ -196,17 +196,7 @@ class ImportModel extends Gdn_Model {
 		if($Data->NumRows() == 0) {
 			$Result = FALSE;
 		} else {
-			$Data = $Data->FirstRow();
-         $HashMethod = GetValue('HashMethod', $Data);
-         if (!$HashMethod)
-            $HashMethod = $this->GetPasswordHashMethod();
-         
-			$PasswordHash = new Gdn_PasswordHash();
-         if (strcasecmp($HashMethod, 'reset') == 0 || $this->Data('UseCurrentPassword')) {
-            $Result = TRUE;
-         } else {
-            $Result = $PasswordHash->CheckPassword($OverwritePassword, GetValue('Password', $Data), $HashMethod, GetValue('Name',$Data));
-         }
+			$Result = TRUE;
 		}
 		if(!$Result) {
 			$this->Validation->AddValidationResult('Email', T('ErrorCredentials'));
@@ -416,10 +406,6 @@ class ImportModel extends Gdn_Model {
          $this->Data['Overwrite'] = $Post['Overwrite'];
       if (isset($Post['Email']))
          $this->Data['OverwriteEmail'] = $Post['Email'];
-      if (isset($Post['Password'])) {
-         $this->Data['OverwritePassword'] = $Post['Password'];
-         $this->Data['UseCurrentPassword'] = GetValue('UseCurrentPassword', $Post);
-      }
       if (isset($Post['GenerateSQL']))
          $this->Data['GenerateSQL'] = $Post['GenerateSQL'];
    }
@@ -474,17 +460,18 @@ class ImportModel extends Gdn_Model {
     * Get a custom import model based on the import's source.
     */
    public function GetCustomImportModel() {
-      $Header = $this->GetImportHeader();
-      $Source = GetValue('Source', $Header, '');
       $Result = NULL;
 
-      if (substr_compare('vbulletin', $Source, 0, 9, TRUE) == 0)
-         $Result = new vBulletinImportModel();
-      elseif (substr_compare('vanilla 1', $Source, 0, 9, TRUE) == 0)
-         $Result = new Vanilla1ImportModel();
+      // Get import type name.
+      $Header = $this->GetImportHeader();
+      $Source = str_replace(' ', '', val('Source', $Header, ''));
 
-      if ($Result !== NULL)
+      // Figure out if we have a custom import model for it.
+      $SourceModelName = $Source.'ImportModel';
+      if (class_exists($SourceModelName)) {
+         $Result = new $SourceModelName();
          $Result->ImportModel = $this;
+      }
 
       return $Result;
    }
@@ -493,8 +480,6 @@ class ImportModel extends Gdn_Model {
       $D = $this->Data;
       $Post['Overwrite'] = GetValue('Overwrite', $D, 'Overwrite');
       $Post['Email'] = GetValue('OverwriteEmail', $D, '');
-      $Post['Password'] = GetValue('OverwritePassword', $D, '');
-      $Post['UseCurrentPassword'] = GetValue('UseCurrentPassword', $D, FALSE);
       $Post['GenerateSQL'] = GetValue('GenerateSQL', $D, FALSE);
    }
 
@@ -631,6 +616,10 @@ class ImportModel extends Gdn_Model {
             $SQLPath = 'import/import_'.date('Y-m-d_His').'.sql';
             $this->Data('SQLPath', $SQLPath);
          }
+      } else {
+         // Importing will overwrite our System user record.
+         // Our CustomFinalization step (e.g. vbulletinimportmodel) needs this to be regenerated.
+         RemoveFromConfig('Garden.SystemUserID');
       }
 
       return TRUE;
@@ -881,13 +870,9 @@ class ImportModel extends Gdn_Model {
    }
 
 	public function InsertUserTable() {
-      $UseCurrentPassword = $this->Data('UseCurrentPassword');
-
-      if ($UseCurrentPassword) {
-         $CurrentUser = $this->SQL->GetWhere('User', array('UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
-         $CurrentPassword = $CurrentUser['Password'];
-         $CurrentHashMethod = $CurrentUser['HashMethod'];
-      }
+        $CurrentUser = $this->SQL->GetWhere('User', array('UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+        $CurrentPassword = $CurrentUser['Password'];
+        $CurrentHashMethod = $CurrentUser['HashMethod'];
 
 		// Delete the current user table.
 		$this->SQL->Truncate('User');
@@ -904,11 +889,9 @@ class ImportModel extends Gdn_Model {
       $SqlArgs = array(':Email' => $AdminEmail);
       $SqlSet = '';
 
-      if ($UseCurrentPassword) {
-         $SqlArgs[':Password'] = $CurrentPassword;
-         $SqlArgs[':HashMethod'] = $CurrentHashMethod;
-         $SqlSet = ', Password = :Password, HashMethod = :HashMethod';
-      }
+      $SqlArgs[':Password'] = $CurrentPassword;
+      $SqlArgs[':HashMethod'] = $CurrentHashMethod;
+      $SqlSet = ', Password = :Password, HashMethod = :HashMethod';
 
       // If doing a password reset, save out the new admin password:
       if (strcasecmp($this->GetPasswordHashMethod(), 'reset') == 0) {
@@ -932,10 +915,7 @@ class ImportModel extends Gdn_Model {
       if (!$User)
          $User = Gdn::UserModel()->GetByUsername(GetValue('OverwriteEmail', $this->Data));
 
-      $PasswordHash = new Gdn_PasswordHash();
-      if ($this->Data('UseCurrentPassword') || $PasswordHash->CheckPassword(GetValue('OverwritePassword', $this->Data), GetValue('Password', $User), GetValue('HashMethod', $User))) {
-         Gdn::Session()->Start(GetValue('UserID', $User), TRUE);
-      }
+	    Gdn::Session()->Start(GetValue('UserID', $User), TRUE);
 
 		return TRUE;
 	}
@@ -1775,8 +1755,11 @@ class ImportModel extends Gdn_Model {
          
          foreach ($Categories as $Category) {
             $UrlCode = urldecode(Gdn_Format::Url($Category['Name']));
-            if (strlen($UrlCode) > 50)
-               $UrlCode = $Category['CategoryID'];
+            if (strlen($UrlCode) > 50) {
+               $UrlCode = 'c'.$Category['CategoryID'];
+            } elseif (is_numeric($UrlCode)) {
+               $UrlCode = 'c'.$UrlCode;
+            }
             
             if (in_array($UrlCode, $TakenCodes)) {
                $ParentCategory = CategoryModel::Categories($Category['ParentCategoryID']);

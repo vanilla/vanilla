@@ -50,6 +50,7 @@ class SearchController extends Gdn_Controller {
       $this->AddJsFile('global.js');
       
       $this->AddCssFile('style.css');
+      $this->AddCssFile('vanillicon.css', 'static');
       $this->AddCssFile('menu.css');
       $this->AddModule('GuestModule');
       parent::Initialize();
@@ -93,6 +94,7 @@ class SearchController extends Gdn_Controller {
       $SearchTerms = explode(' ', Gdn_Format::Text($Search));
       foreach ($ResultSet as &$Row) {
          $Row['Summary'] = SearchExcerpt(Gdn_Format::PlainText($Row['Summary'], $Row['Format']), $SearchTerms);
+         $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
          $Row['Format'] = 'Html';
       }
       

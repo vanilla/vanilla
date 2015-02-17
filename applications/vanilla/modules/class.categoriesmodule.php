@@ -12,39 +12,64 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the discussion categories.
  */
 class CategoriesModule extends Gdn_Module {
-   
+
+   public $startDepth = 1; //inclusive
+   public $endDepth; //inclusive
+
    public function __construct($Sender = '') {
       parent::__construct($Sender);
       $this->_ApplicationFolder = 'vanilla';
-      
-      // Load categories
-      $this->Data = FALSE;
-      if (C('Vanilla.Categories.Use') == TRUE && !C('Vanilla.Categories.HideModule')) {
-         $Categories = CategoryModel::Categories();
-         $Categories2 = $Categories;
-         
-         // Filter out the categories we aren't watching.
-         foreach ($Categories2 as $i => $Category) {
-            if (!$Category['PermsDiscussionsView'] || !$Category['Following']) {
-               unset($Categories[$i]);
-            }
-         }
-         
-         $Data = new Gdn_DataSet($Categories);
-         $Data->DatasetType(DATASET_TYPE_ARRAY);
-         $Data->DatasetType(DATASET_TYPE_OBJECT);
-         $this->Data = $Data;
-      }
+
+      $this->Visible = C('Vanilla.Categories.Use') && !C('Vanilla.Categories.HideModule');
    }
 
    public function AssetTarget() {
       return 'Panel';
    }
 
-   public function ToString() {
-      if ($this->Data)
-         return parent::ToString();
+   /**
+    * Get the data for this module.
+    */
+   protected function GetData() {
+      // Allow plugins to set different data.
+      $this->FireEvent('GetData');
+      if ($this->Data) {
+         return;
+      }
 
-      return '';
+      $Categories = CategoryModel::Categories();
+      $Categories2 = $Categories;
+
+      // Filter out the categories we aren't watching.
+      foreach ($Categories2 as $i => $Category) {
+         if (!$Category['PermsDiscussionsView'] || !$Category['Following']) {
+            unset($Categories[$i]);
+         }
+      }
+
+      $Data = new Gdn_DataSet($Categories);
+      $Data->DatasetType(DATASET_TYPE_ARRAY);
+      $Data->DatasetType(DATASET_TYPE_OBJECT);
+      $this->Data = $Data;
+   }
+
+   public function filterDepth(&$Categories, $startDepth, $endDepth) {
+      if ($startDepth != 1 || $endDepth) {
+         foreach ($Categories as $i => $Category) {
+            if (val('Depth', $Category) < $startDepth || ($endDepth && val('Depth', $Category) > $endDepth)) {
+               unset($Categories[$i]);
+            }
+         }
+      }
+   }
+
+   public function ToString() {
+      if (!$this->Data) {
+         $this->GetData();
+      }
+
+      $this->filterDepth($this->Data->Result(), $this->startDepth, $this->endDepth);
+
+      return parent::ToString();
    }
 }

@@ -31,10 +31,10 @@ if ($Session->IsValid()):
       echo '<div class="MeMenu">';
          // Notifications
          $CountNotifications = $User->CountNotifications;
-         $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert">'.$CountNotifications.'</span>' : '';
+         $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert NotificationsAlert">'.$CountNotifications.'</span>' : '';
 
          echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
-         echo Anchor(Sprite('SpNotifications', 'Sprite Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton', array('title' => T('Notifications')));
+         echo Anchor(Sprite('SpNotifications', 'Sprite Sprite16').Wrap(T('Notifications'), 'em').$CNotifications, UserUrl($User), 'MeButton FlyoutButton js-clear-notifications', array('title' => T('Notifications')));
          echo Sprite('SpFlyoutHandle', 'Arrow');
          echo '<div class="Flyout FlyoutMenu"></div></span>';
 
@@ -65,10 +65,10 @@ if ($Session->IsValid()):
             echo '<ul>';
                // echo Wrap(Wrap(T('My Account'), 'strong'), 'li');
                // echo Wrap('<hr />', 'li');
-               if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
-                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Edit Profile'), 'profile/edit', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap'));
+               if (hasEditProfile(Gdn::Session()->UserID)) {
+                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Edit Profile'), 'profile/edit', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap link-editprofile'));
                } else {
-                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap'));
+                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap link-preferences'));
                }
 
                if ($Session->CheckPermission(array('Garden.Settings.View', 'Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
@@ -76,23 +76,24 @@ if ($Session->IsValid()):
                   $CApplicant = $ApplicantCount > 0 ? ' '.Wrap($ApplicantCount, 'span class="Alert"') : '';
                   $CSpam = ''; //$SpamCount > 0 ? ' '.Wrap($SpamCount, 'span class="Alert"') : '';
                   $CModeration = $ModerationCount > 0 ? ' '.Wrap($ModerationCount, 'span class="Alert"') : '';
-                  echo Wrap(Anchor(Sprite('SpApplicants').' '.T('Applicants').$CApplicant, '/dashboard/user/applicants'), 'li');
+                  echo Wrap(Anchor(Sprite('SpApplicants').' '.T('Applicants').$CApplicant, '/dashboard/user/applicants'), 'li', array('class' => 'link-applicants'));
 
                   if ($Session->CheckPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
-                     echo Wrap(Anchor(Sprite('SpSpam').' '.T('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li');
+                     echo Wrap(Anchor(Sprite('SpSpam').' '.T('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li', array('class' => 'link-spam'));
                   }
 
                   if ($Session->CheckPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
-                     echo Wrap(Anchor(Sprite('SpMod').' '.T('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li');
+                     echo Wrap(Anchor(Sprite('SpMod').' '.T('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li', array('class' => 'link-moderation'));
                   }
 
                   if ($Session->CheckPermission(array('Garden.Settings.View', 'Garden.Settings.Manage'), FALSE)) {
-                     echo Wrap(Anchor(Sprite('SpDashboard').' '.T('Dashboard'), '/dashboard/settings'), 'li');
+                     echo Wrap(Anchor(Sprite('SpDashboard').' '.T('Dashboard'), '/dashboard/settings'), 'li', array('class' => 'link-dashboard'));
                   }
                }
 
                $this->FireEvent('FlyoutMenu');
-               echo Wrap('<hr />'.Anchor(Sprite('SpSignOut').' '.T('Sign Out'), SignOutUrl()), 'li', array('class' => 'SignInOutWrap SignOutWrap'));
+               echo Wrap('<hr />'.Anchor(Sprite('SpSignOut').' '.T('Sign Out'), SignOutUrl()), 'li', array('class' => 'SignInOutWrap SignOutWrap link-signout'));
+            echo '</ul>';
          echo '</div>';
          echo '</span>';
 

@@ -28,6 +28,11 @@ if (!defined('VANILLA_CONSTANTS'))
 // Make sure a default time zone is set
 date_default_timezone_set('UTC');
 
+// Make sure the mb_* functions are utf8.
+if (function_exists('mb_internal_encoding')) {
+   mb_internal_encoding('UTF-8');
+}
+
 // Include the core function definitions
 require_once(PATH_LIBRARY_CORE.'/functions.error.php');
 require_once(PATH_LIBRARY_CORE.'/functions.general.php');
@@ -36,6 +41,13 @@ require_once(PATH_LIBRARY_CORE.'/functions.compatibility.php');
 // Include and initialize the autoloader
 require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
 Gdn_Autoloader::Start();
+
+// Guard against broken cache files
+if (!class_exists('Gdn')) {
+   // Throwing an exception here would result in a white screen for the user.
+   // This error usually indicates the .ini files in /cache are out of date and should be deleted.
+   exit("Class Gdn not found.");
+}
 
 // Cache Layer
 Gdn::FactoryInstall(Gdn::AliasCache, 'Gdn_Cache', NULL, Gdn::FactoryRealSingleton, 'Initialize');
@@ -47,7 +59,7 @@ Gdn::FactoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
 Gdn::Config()->Load(PATH_CONF.'/config-defaults.php');
 
 // Load installation-specific configuration so that we know what apps are enabled
-Gdn::Config()->Load(PATH_CONF.'/config.php', 'Configuration', TRUE);
+Gdn::Config()->Load(Gdn::Config()->DefaultPath(), 'Configuration', TRUE);
 
 /**
  * Bootstrap Early

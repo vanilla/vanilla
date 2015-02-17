@@ -41,8 +41,8 @@ echo $this->Form->Errors();
          echo $this->Form->Label('Photo', 'PhotoUpload');
          if ($Photo = $this->Form->GetValue('Photo')) {
             echo Img(Gdn_Upload::Url($Photo));
-            echo '<br />'.Anchor(T('Delete Photo'), 
-               CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::Session()->TransientKey())), 
+            echo '<br />'.Anchor(T('Delete Photo'),
+               CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::Session()->TransientKey())),
                'SmallButton Danger PopConfirm');
          }
          echo $this->Form->Input('PhotoUpload', 'file');
@@ -56,7 +56,7 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Display As', 'DisplayAs');
-         echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions'));
+         echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions', 'Heading' => 'Heading'));
       ?>
    </li>
    <li>
@@ -81,9 +81,9 @@ echo $this->Form->Errors();
       <?php
 		if(count($this->PermissionData) > 0) {
          echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
-         
+
          echo '<div class="CategoryPermissions">';
-         
+
          if (count($this->Data('DiscussionTypes')) > 1) {
             echo '<div class="P DiscussionTypes">';
             echo $this->Form->Label('Discussion Types');
@@ -92,7 +92,7 @@ echo $this->Form->Errors();
             }
             echo '</div>';
          }
-         
+
          echo $this->Form->Simple(
             $this->Data('_PermissionFields', array()),
          array('Wrap' => array('', ''), 'ItemWrap' => array('<div class="P">', '</div>')));

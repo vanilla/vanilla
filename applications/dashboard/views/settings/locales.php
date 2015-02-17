@@ -5,8 +5,7 @@ $Session = Gdn::Session();
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
-   echo '<li>', Anchor(T('Enabling a Locale Pack'), 'http://vanillaforums.org/docs/Localization#Enabling'), '</li>';
-   echo '<li>', Anchor(T('Internationalization & Localization'), 'http://vanillaforums.org/docs/Localization'), '</li>';
+   echo '<li>', Anchor(T('Internationalization & Localization'), 'http://docs.vanillaforums.com/developers/locales/'), '</li>';
    echo '</ul>';
    ?>
 </div>
@@ -53,7 +52,7 @@ foreach ($this->Data('AvailableLocales') as $Key => $Info) {
    // Hide skeleton locale pack
    if ($Key == 'skeleton')
       continue;
-      
+
    $ToggleText = $this->Data("EnabledLocales.$Key") ? 'Disable' : 'Enable';
    $RowClass = $this->Data("EnabledLocales.$Key") ? 'Enabled' : 'Disabled';
    if ($Alt) $RowClass .= ' Alt';
@@ -74,7 +73,7 @@ foreach ($this->Data('AvailableLocales') as $Key => $Info) {
          $RequiredApplications = GetValue('RequiredApplications', $Info, FALSE);
          $RequiredPlugins = GetValue('RequiredPlugins', $Info, FALSE);
 
-         $InfoItems = ArrayTranslate($Info, array('Locale' => T('_Locale'), 'Version' => T('Version')));
+         $InfoItems = ArrayTranslate($Info, array('Locale' => T('Locale'), 'Version' => T('Version')));
          $InfoString = ImplodeAssoc(': ', '<span>|</span>', $InfoItems);
 
 //            if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {

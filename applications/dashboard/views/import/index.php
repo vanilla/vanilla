@@ -5,7 +5,7 @@ $this->AddSideMenu();
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
-   echo '<li>', Anchor(T('Importing to Vanilla'), 'http://vanillaforums.com/porter'), '</li>';
+   echo '<li>', Anchor(T('Importing to Vanilla'), 'http://docs.vanillaforums.com/developers/importing/'), '</li>';
    echo '<li>', Anchor(T('The Vanilla 2 Exporter'), 'http://vanillaforums.org/addon/porter-core'), '</li>';
    echo '</ul>';
    ?>
@@ -46,7 +46,7 @@ echo $this->Form->Errors();
             '</div>';
       }
       ?>
-		<?php 
+		<?php
          $OriginalFilename = GetValue('OriginalFilename', $this->Data);
 
          echo '<div>';
@@ -64,16 +64,11 @@ echo $this->Form->Errors();
 	<li>
 		<?php
 		//echo $this->Form->Radio('Overwrite', T('Garden.Import.Overwrite', 'Overwrite this forum.'), array('value' => 'overwrite', 'default' => 'overwrite'));
-		echo Wrap(T('Garden.Import.InputInstructions', 'Enter the email and password of the admin user from the data being imported.'), 'div');
-		
+		echo Wrap(T('Garden.Import.InputInstructions', 'Enter the email of the admin user from the data being imported.  Your current password will become this user\'s password.'), 'div');
+
 		echo $this->Form->Label('Email', 'Email'),
 			$this->Form->TextBox('Email');
-		
-		echo $this->Form->Label('Password', 'Password'),
-			$this->Form->Input('Password', 'password');
-
-      echo $this->Form->CheckBox('UseCurrentPassword', 'Use My Current Password');
-		?>
+        ?>
 	</li><?php /*
 	<li>
 		<?php
@@ -82,7 +77,7 @@ echo $this->Form->Errors();
 		T('Garden.Import.Merge.Description', 'This will merge all of the user and discussion data from the import into this forum.
 <b>Warning: If you merge the same data twice you will get duplicate discussions.</b>'),
 		'</div>';
-		
+
 		?>
 	</li> */?>
 </ul>

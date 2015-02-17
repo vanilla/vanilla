@@ -4,8 +4,13 @@ jQuery(document).ready(function($) {
    emotify = function(textbox) {
       // Pick up the emoticons from the def list
       var emoticons = gdn.definition('Emoticons', false);
-      if (emoticons)
-         emoticons = eval("("+$.base64Decode(emoticons)+")");
+      if (emoticons) {
+         try {
+            emoticons = $.parseJSON($.base64Decode(emoticons));
+         } catch(e) {
+            console.log("Emotify produced invalid JSON.");
+         }
+      }
 	 
       var frm = textbox.parents('form');
       var buts = '';
@@ -34,6 +39,7 @@ jQuery(document).ready(function($) {
     
       // Hide emotify options when previewing
       frm.bind("PreviewLoaded", function(e, frm) {
+         frm = $(frm);
          frm.find('.EmotifyDropdown').removeClass('EmotifyDropdownActive');
          frm.find('.EmotifyDropdown').hide();
          frm.find('.EmoticonContainer').hide();
@@ -41,7 +47,7 @@ jQuery(document).ready(function($) {
     
       // Reveal emotify dropdowner when write button clicked
       frm.bind('WriteButtonClick', function(e, frm) {
-         frm.find('.EmotifyDropdown').show();
+         $(frm).find('.EmotifyDropdown').show();
       });
     
       // Hide emoticon box when textarea is focused

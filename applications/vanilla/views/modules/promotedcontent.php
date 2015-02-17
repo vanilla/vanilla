@@ -3,14 +3,14 @@ require_once $this->FetchViewLocation('helper_functions');
 
 ?>
 <div class="Box BoxPromoted">
-   <h4><?php echo T('Promoted Content'); ?></h4>
+   <?php echo panelHeading(T('Promoted Content')); ?>
    <div class="PanelInfo DataList">
       <?php
       $Content = $this->Data('Content');
       $ContentItems = sizeof($Content);
-      
+
       if ($Content):
-         
+
          if ($this->Group):
             $Content = array_chunk($Content, $this->Group);
          endif;
@@ -26,7 +26,7 @@ require_once $this->FetchViewLocation('helper_functions');
                WritePromotedContent($ContentChunk, $this);
             endif;
          endforeach;
-         
+
       endif;
       ?>
    </div>

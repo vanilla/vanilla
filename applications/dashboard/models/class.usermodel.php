@@ -49,7 +49,17 @@ class UserModel extends Gdn_Model {
    public function AddPasswordStrength($Controller) {
       $Controller->AddJsFile('password.js');
       $Controller->AddDefinition('MinPassLength', C('Garden.Registration.MinPasswordLength'));
-      $Controller->AddDefinition('PasswordTranslations', T('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
+      $Controller->AddDefinition(
+         'PasswordTranslations',
+         implode(',', array(
+            T('Password Too Short', 'Too Short'),
+            T('Password Contains Username', 'Contains Username'),
+            T('Password Very Weak', 'Very Weak'),
+            T('Password Weak', 'Weak'),
+            T('Password Ok', 'OK'),
+            T('Password Good', 'Good'),
+            T('Password Strong', 'Strong')))
+      );
    }
 
    /**
@@ -80,6 +90,10 @@ class UserModel extends Gdn_Model {
       if ($LogID) {
          $this->SaveAttribute($UserID, 'BanLogID', $LogID);
       }
+
+      $this->EventArguments['UserID'] = $UserID;
+      $this->EventArguments['Options'] = $Options;
+      $this->FireEvent('Ban');
 
       if (GetValue('AddActivity', $Options, TRUE)) {
          switch (GetValue('Reason', $Options, '')) {
@@ -384,7 +398,11 @@ class UserModel extends Gdn_Model {
              'ActivityUserID' => $UserID,
              'RegardingUserID' => Gdn::Session()->UserID,
              'HeadlineFormat' => T('HeadlineFormat.Unban', '{RegardingUserID,You} unbanned {ActivityUserID,you}.'),
-             'Story' => $Story);
+             'Story' => $Story,
+             'Data' => array(
+                'Unban' => TRUE
+             )
+         );
 
          $ActivityModel->Queue($Activity);
 
@@ -540,12 +558,12 @@ class UserModel extends Gdn_Model {
 
       if (C('Garden.SSO.SynchRoles')) {
          // Translate the role names to IDs.
-
          $Roles = GetValue('Roles', $NewUser, '');
-         if (is_string($Roles))
+         if (is_string($Roles)) {
             $Roles = explode(',', $Roles);
-         else
+         } elseif (!is_array($Roles)) {
             $Roles = array();
+         }
          $Roles = array_map('trim', $Roles);
          $Roles = array_map('strtolower', $Roles);
 
@@ -553,7 +571,7 @@ class UserModel extends Gdn_Model {
          $RoleIDs = array();
          foreach ($AllRoles as $RoleID => $Role) {
             $Name = strtolower($Role['Name']);
-            if (in_array($Name, $Roles)) {
+            if (in_array($Name, $Roles) || in_array($RoleID, $Roles)) {
                $RoleIDs[] = $RoleID;
             }
          }
@@ -625,6 +643,7 @@ class UserModel extends Gdn_Model {
             TouchValue('CheckCaptcha', $Options, FALSE);
             TouchValue('NoConfirmEmail', $Options, TRUE);
             TouchValue('NoActivity', $Options, TRUE);
+            TouchValue('SaveRoles', $Options, C('Garden.SSO.SynchRoles', false));
 
             Trace($UserData, 'Registering User');
             $UserID = $this->Register($UserData, $Options);
@@ -650,7 +669,7 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
 
-   public function FilterForm($Data) {
+   public function FilterForm($Data, $Register = FALSE) {
       $Data = parent::FilterForm($Data);
       $Data = array_diff_key($Data,
          array('Admin' => 0, 'Deleted' => 0, 'CountVisits' => 0, 'CountInvitations' => 0, 'CountNotifications' => 0, 'Preferences' => 0,
@@ -662,7 +681,7 @@ class UserModel extends Gdn_Model {
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          unset($Data['RankID']);
       }
-      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
+      if (!$Register && !Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
          unset($Data['Name']);
       }
 
@@ -697,6 +716,10 @@ class UserModel extends Gdn_Model {
    protected function _Insert($Fields, $Options = array()) {
       $this->EventArguments['InsertFields'] =& $Fields;
       $this->FireEvent('BeforeInsertUser');
+
+      if (!val('Setup', $Options)) {
+         unset($Fields['Admin']);
+      }
 
       // Massage the roles for email confirmation.
       if (self::RequireConfirmEmail() && !GetValue('NoConfirmEmail', $Options)) {
@@ -809,7 +832,7 @@ class UserModel extends Gdn_Model {
     */
    public function UserQuery($SafeData = FALSE) {
       if ($SafeData) {
-         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.About, u.Gender, u.CountVisits, u.InviteUserID, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Admin, u.Deleted, u.CountDiscussions, u.CountComments');
+         $this->SQL->Select('u.UserID, u.Name, u.Photo, u.CountVisits, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Deleted, u.CountDiscussions, u.CountComments');
       } else {
          $this->SQL->Select('u.*');
       }
@@ -1110,15 +1133,17 @@ class UserModel extends Gdn_Model {
          $Keys = array();
          // Make keys for cache query
          foreach ($IDs as $UserID) {
-            if (!$UserID) continue;
-
+            if (!$UserID) {
+               continue;
+            }
             $Keys[] = FormatString(self::USERID_KEY, array('UserID' => $UserID));
          }
 
          // Query cache layer
          $CacheData = Gdn::Cache()->Get($Keys);
-         if (!is_array($CacheData))
+         if (!is_array($CacheData)) {
             $CacheData = array();
+         }
 
          foreach ($CacheData as $RealKey => $User) {
             if ($User === NULL) {
@@ -1126,6 +1151,7 @@ class UserModel extends Gdn_Model {
             } else {
                $ResultUserID = GetValue('UserID', $User);
             }
+            $this->SetCalculatedFields($User);
             $Data[$ResultUserID] = $User;
          }
 
@@ -1305,11 +1331,21 @@ class UserModel extends Gdn_Model {
     */
    public function GetSummary($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->UserQuery(TRUE);
-      return $this->SQL
+      $Data = $this->SQL
          ->Where('u.Deleted', 0)
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
+
+      // Set corrected PhotoUrls.
+      $Result =& $Data->Result();
+      foreach ($Result as &$Row) {
+         if ($Row->Photo && !IsUrl($Row->Photo)) {
+            $Row->Photo = Gdn_Upload::Url($Row->Photo);
+         }
+      }
+
+      return $Result;
    }
 
    /**
@@ -1520,6 +1556,15 @@ class UserModel extends Gdn_Model {
 
    /**
     * Generic save procedure.
+    *
+    * $Settings controls certain save functionality
+    *
+    *  SaveRoles - Save 'RoleID' field as user's roles. Default false.
+    *  HashPassword - Hash the provided password on update. Default true.
+    *  FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
+    *  ValidateEmail - Make sure the provided email addresses is formattted properly. Default true.
+    *  NoConfirmEmail - Disable email confirmation. Default false.
+    *
     */
    public function Save($FormPostValues, $Settings = FALSE) {
       // See if the user's related roles should be saved or not.
@@ -1546,6 +1591,8 @@ class UserModel extends Gdn_Model {
       if (array_key_exists('Confirmed', $FormPostValues))
          $FormPostValues['Confirmed'] = ForceBool($FormPostValues['Confirmed'], '0', '1', '0');
 
+      unset($FormPostValues['Admin']);
+
       // Validate the form posted values
 
       if (array_key_exists('Gender', $FormPostValues))
@@ -1559,12 +1606,16 @@ class UserModel extends Gdn_Model {
       } else {
          $this->AddUpdateFields($FormPostValues);
          $User = $this->GetID($UserID, DATASET_TYPE_ARRAY);
+         if (!$User) {
+            $User = array();
+         }
 
          // Block banning the superadmin or System accounts
-         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues))
+         if (GetValue('Admin',$User) == 2 && GetValue('Banned', $FormPostValues)) {
             $this->Validation->AddValidationResult('Banned', 'You may not ban a System user.');
-         elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues))
+         } elseif (GetValue('Admin',$User) && GetValue('Banned', $FormPostValues)) {
             $this->Validation->AddValidationResult('Banned', 'You may not ban a user with the Admin flag set.');
+         }
       }
 
       $this->EventArguments['FormPostValues'] = $FormPostValues;
@@ -1595,11 +1646,11 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
          // Remove the primary key from the fields collection before saving
          $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey);
-         if (in_array('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
+         if (array_key_exists('AllIPAddresses', $Fields) && is_array($Fields['AllIPAddresses'])) {
             $Fields['AllIPAddresses'] = implode(',', $Fields['AllIPAddresses']);
          }
 
-         if (!$Insert && array_key_exists('Password', $Fields)) {
+         if (!$Insert && array_key_exists('Password', $Fields) && val('HashPassword', $Settings, true)) {
             // Encrypt the password for saving only if it won't be hashed in _Insert()
             $PasswordHash = new Gdn_PasswordHash();
             $Fields['Password'] = $PasswordHash->HashPassword($Fields['Password']);
@@ -1668,10 +1719,11 @@ class UserModel extends Gdn_Model {
                   }
 
                   if (isset($OldPhoto) && $OldPhoto != $Photo) {
-                     if (strpos($Photo, '//'))
+                     if (IsUrl($Photo)) {
                         $PhotoUrl = $Photo;
-                     else
+                     } else {
                         $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+                     }
 
                      $ActivityModel = new ActivityModel();
                      if ($UserID == Gdn::Session()->UserID) {
@@ -1783,7 +1835,7 @@ class UserModel extends Gdn_Model {
          $Fields = $this->Validation->SchemaValidationFields(); // Only fields that are present in the schema
 
          // Insert the new user
-         $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE));
+         $UserID = $this->_Insert($Fields, array('NoConfirmEmail' => TRUE, 'Setup' => TRUE));
 
          if ($UserID) {
             $ActivityModel = new ActivityModel();
@@ -1802,7 +1854,7 @@ class UserModel extends Gdn_Model {
       return $UserID;
    }
 
-   public function SaveRoles($UserID, $RoleIDs, $RecordActivity = TRUE) {
+   public function SaveRoles($UserID, $RoleIDs, $RecordEvent) {
       if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
          // The $RoleIDs are a comma delimited list of role names.
          $RoleNames = array_map('trim', explode(',', $RoleIDs));
@@ -1847,7 +1899,7 @@ class UserModel extends Gdn_Model {
 
       $this->ClearCache($UserID, array('roles', 'permissions'));
 
-      if ($RecordActivity && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
+      if ($RecordEvent && (count($DeleteRoleIDs) > 0 || count($InsertRoleIDs) > 0)) {
          $User = $this->GetID($UserID);
          $Session = Gdn::Session();
 
@@ -1869,6 +1921,24 @@ class UserModel extends Gdn_Model {
 
          $RemovedRoles = array_diff($OldRoles, $NewRoles);
          $NewRoles = array_diff($NewRoles, $OldRoles);
+
+         foreach ($RemovedRoles as $RoleName) {
+            Logger::event(
+               'role_remove',
+               Logger::INFO,
+               "{username} removed {toUsername} from the {role} role.",
+               array('toUsername' => $User->Name, 'role' => $RoleName)
+            );
+         }
+
+         foreach ($NewRoles as $RoleName) {
+            Logger::event(
+               'role_add',
+               Logger::INFO,
+               "{username} added {toUsername} to the {role} role.",
+               array('toUsername' => $User->Name, 'role' => $RoleName)
+            );
+         }
 
          $RemovedCount = count($RemovedRoles);
          $NewCount = count($NewRoles);
@@ -1934,6 +2004,7 @@ class UserModel extends Gdn_Model {
          $this->SQL->Join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
       } elseif (isset($IPAddress)) {
          $this->SQL
+            ->OrOp()
             ->BeginWhereGroup()
             ->OrWhere('u.InsertIPAddress', $IPAddress)
             ->OrWhere('u.LastIPAddress', $IPAddress)
@@ -1946,6 +2017,7 @@ class UserModel extends Gdn_Model {
 
          if (is_array($Like)) {
             $this->SQL
+               ->OrOp()
                ->BeginWhereGroup()
                ->OrLike($Like, '', 'right')
                ->EndWhereGroup();
@@ -1964,7 +2036,7 @@ class UserModel extends Gdn_Model {
       $Result =& $Data->Result();
 
       foreach ($Result as &$Row) {
-         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+         if ($Row->Photo && !IsUrl($Row->Photo)) {
             $Row->Photo = Gdn_Upload::Url($Row->Photo);
          }
 
@@ -2016,6 +2088,7 @@ class UserModel extends Gdn_Model {
 
          if (is_array($Like)) {
             $this->SQL
+               ->OrOp()
                ->BeginWhereGroup()
                ->OrLike($Like, '', 'right')
                ->EndWhereGroup();
@@ -2742,6 +2815,9 @@ class UserModel extends Gdn_Model {
 
       // Remove activity comments.
       $this->GetDelete('ActivityComment', array('InsertUserID' => $UserID), $Content);
+
+      // Remove comments in moderation queue
+      $this->GetDelete('Log', array('RecordUserID' => $UserID, 'Operation' => 'Pending'), $Content);
 
       // Clear out information on the user.
       $this->SetField($UserID, array(

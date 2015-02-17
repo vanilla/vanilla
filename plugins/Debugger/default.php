@@ -97,6 +97,10 @@ class DebuggerPlugin extends Gdn_Plugin {
    }
 
    public function Setup() {
-      // This setup method should trigger errors when it encounters them - the plugin manager will catch the errors...
+      SaveToConfig('Debug', TRUE);
+   }
+   
+   public function OnDisable() {
+       SaveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
    }
 }

@@ -1343,8 +1343,10 @@ EOT;
          if(C('Garden.Format.Mentions')) {
             $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
 
+            // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
+            $Pattern = (unicodeSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
             $Mixed = preg_replace(
-               '/(^|[\s,\.>])@(\w{1,50})\b/i', //{3,20}
+               '/(^|[\s,\.>])@('.$Pattern.'{1,64})\b/i', //{3,20}
                '\1'.Anchor('@$2', $urlFormat),
                $Mixed
             );
@@ -1646,12 +1648,8 @@ EOT;
       $Mixed = strtr($Mixed, self::$_UrlTranslations);
       $Mixed = preg_replace('`[\']`', '', $Mixed);
 
-      // Test for Unicode PCRE support
-      // On non-UTF8 systems this will result in a blank string.
-      $UnicodeSupport = (preg_replace('`[\pP]`u', '', 'P') != '');
-
       // Convert punctuation, symbols, and spaces to hyphens
-      if ($UnicodeSupport) {
+      if (unicodeSupport()) {
          $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
       } else {
          $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);

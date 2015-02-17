@@ -3362,6 +3362,17 @@ if (!function_exists('TrustedDomains')) {
    }
 }
 
+if (!function_exists('unicodeSupport')) {
+   /**
+    * Test for Unicode PCRE support. On non-UTF8 systems this will result in a blank string.
+    *
+    * @return bool
+    */
+   function unicodeSupport() {
+      return (preg_replace('`[\pP]`u', '', 'P') != '');
+   }
+}
+
 // Takes a route and prepends the web root (expects "/controller/action/params" as $Destination)
 if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {

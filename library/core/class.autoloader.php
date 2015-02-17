@@ -251,7 +251,7 @@ class Gdn_Autoloader {
       if (!preg_match("/^[a-zA-Z0-9_\x7f-\xff]*$/", $ClassName))
          return;
 
-      $MapType = val('MapType', $Options, self::GetMapType($ClassName));
+      $MapType = GetValue('MapType', $Options, self::GetMapType($ClassName));
 
       $DefaultOptions = array(
          'Quiet'              => FALSE,
@@ -302,7 +302,7 @@ class Gdn_Autoloader {
          $Extension
       ));
 
-      $MapGroupHashes = val($MapGroupIdentifier, self::$MapGroups, array());
+      $MapGroupHashes = GetValue($MapGroupIdentifier, self::$MapGroups, array());
       $PriorityHashes = array();
       $PriorityHashes = array();
       foreach ($MapGroupHashes as $MapHash => $Trash) {
@@ -353,11 +353,11 @@ class Gdn_Autoloader {
          $ResponseHashes = array();
          foreach ($ResultMapHashes as $MapHash => $PriorityInfo) {
 
-            if (val('duration', $PriorityInfo) == self::PRIORITY_ONCE)
+            if (GetValue('duration', $PriorityInfo) == self::PRIORITY_ONCE)
                unset(self::$Priorities[$ContextType][$PriorityType][$MapHash]);
 
             // If this request is being specific about the required maptype, reject anything that doesnt match
-            if (!is_null($MapType) && val('maptype', $PriorityInfo) != $MapType)
+            if (!is_null($MapType) && GetValue('maptype', $PriorityInfo) != $MapType)
                continue;
 
             $ResponseHashes[$MapHash] = $PriorityInfo;
@@ -381,11 +381,11 @@ class Gdn_Autoloader {
          'SaveToDisk'            => TRUE
       );
       if (array_key_exists($ContextType, self::$Prefixes))
-         $DefaultOptions['ContextPrefix'] = val($ContextType, self::$Prefixes);
+         $DefaultOptions['ContextPrefix'] = GetValue($ContextType, self::$Prefixes);
 
       $Options = array_merge($DefaultOptions, $Options);
 
-      $Extension = val('Extension', $Options, NULL);
+      $Extension = GetValue('Extension', $Options, NULL);
 
       // Determine cache root on-disk location
       $Hits = 0; str_replace(PATH_ROOT, '', $SearchPath, $Hits);
@@ -402,7 +402,7 @@ class Gdn_Autoloader {
       $MapHash = md5($MapIdentifier);
 
       // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
-      $MapHash = 'context:'.val($ContextType, array_flip(self::$ContextOrder)).'_'.$Extension.'_'.$MapHash;
+      $MapHash = 'context:'.GetValue($ContextType, array_flip(self::$ContextOrder)).'_'.$Extension.'_'.$MapHash;
       $MapHash = self::MakeMapHash($MapType, $ContextType, $Extension, $MapRootLocation);
 
       if (!is_array(self::$Maps))
@@ -450,7 +450,7 @@ class Gdn_Autoloader {
       $MapHash = md5($MapIdentifier);
 
       // Allow intrinsic ordering / layering of contexts by prefixing them with a context number
-      $MapHash = 'context:'.val($ContextType, array_flip(self::$ContextOrder)).'_'.$Extension.'_'.$MapHash;
+      $MapHash = 'context:'.GetValue($ContextType, array_flip(self::$ContextOrder)).'_'.$Extension.'_'.$MapHash;
 
       return $MapHash;
    }
@@ -572,12 +572,12 @@ class Gdn_Autoloader_Map {
       $this->Paths = array();
       $this->BuildOptions = $Options;
 
-      $ExtensionName = val('Extension', $Options, NULL);
-      $Recursive = val('SearchSubfolders', $Options, TRUE);
-      $ContextPrefix = val('ContextPrefix', $Options, NULL);
-      $MapIdentifier = val('MapIdentifier', $Options, NULL);
-      $SaveToDisk = val('SaveToDisk', $Options, TRUE);
-      $FileStructure = val('Structure', $Options, self::STRUCTURE_FLAT);
+      $ExtensionName = GetValue('Extension', $Options, NULL);
+      $Recursive = GetValue('SearchSubfolders', $Options, TRUE);
+      $ContextPrefix = GetValue('ContextPrefix', $Options, NULL);
+      $MapIdentifier = GetValue('MapIdentifier', $Options, NULL);
+      $SaveToDisk = GetValue('SaveToDisk', $Options, TRUE);
+      $FileStructure = GetValue('Structure', $Options, self::STRUCTURE_FLAT);
 
       $MapName = $MapType;
       if (!is_null($ExtensionName))
@@ -609,13 +609,13 @@ class Gdn_Autoloader_Map {
    public function AddPath($SearchPath, $Options) {
       $PathOptions = array(
          'path'         => $SearchPath,
-         'recursive'    => (bool)val('SearchSubfolders', $Options),
-         'filter'       => val('ClassFilter', $Options),
+         'recursive'    => (bool)GetValue('SearchSubfolders', $Options),
+         'filter'       => GetValue('ClassFilter', $Options),
          'topic'        => self::TOPIC_DEFAULT
       );
 
       if ($this->MapInfo['structure'] == self::STRUCTURE_SPLIT) {
-         $SplitTopic = val('SplitTopic', $Options, NULL);
+         $SplitTopic = GetValue('SplitTopic', $Options, NULL);
          if (is_null($SplitTopic))
             throw new Exception("Trying to use 'split' structure but no SplitTopic provided. Path: {$SearchPath}");
          $PathOptions['topic'] = $SplitTopic;
@@ -625,11 +625,11 @@ class Gdn_Autoloader_Map {
    }
 
    public function ContextType() {
-      return $this->MapInfo['contexttype']; //val('contexttype', $this->MapInfo);
+      return $this->MapInfo['contexttype']; //GetValue('contexttype', $this->MapInfo);
    }
 
    public function Extension() {
-      return $this->MapInfo['extension']; //val('extension', $this->MapInfo);
+      return $this->MapInfo['extension']; //GetValue('extension', $this->MapInfo);
    }
 
    protected function FindFile($Path, $SearchFiles, $Recursive) {
@@ -710,16 +710,16 @@ class Gdn_Autoloader_Map {
    }
 
    public function Lookup($ClassName, $MapOnly = TRUE) {
-      $MapName = $this->MapInfo['name'];
+      $MapName = $this->MapInfo['name']; //GetValue('name', $this->MapInfo);
 
       // Lazyload cache data
       if (is_null($this->Map)) {
          $this->Map = array();
-         $OnDiskMapFile = $this->MapInfo['ondisk'];
+         $OnDiskMapFile = $this->MapInfo['ondisk']; //GetValue('ondisk', $this->MapInfo);
 
          // Loading cache data from disk
          if (file_exists($OnDiskMapFile)) {
-            $Structure = $this->MapInfo['structure'];
+            $Structure = $this->MapInfo['structure']; //GetValue('structure', $this->MapInfo);
             $MapContents = parse_ini_file($OnDiskMapFile, TRUE);
 
             try {
@@ -746,9 +746,9 @@ class Gdn_Autoloader_Map {
          case 'split':
             // This file stored split, so look for this class in each virtual sub-path, by topic
             foreach ($this->Paths as $Path => $PathOptions) {
-               $LookupSplitTopic = val('topic', $PathOptions);
+               $LookupSplitTopic = GetValue('topic', $PathOptions);
                if (array_key_exists($LookupSplitTopic, $this->Map) && array_key_exists($ClassName, $this->Map[$LookupSplitTopic])) {
-                  return val($ClassName, $this->Map[$LookupSplitTopic]);
+                  return GetValue($ClassName, $this->Map[$LookupSplitTopic]);
                }
             }
             break;
@@ -758,7 +758,7 @@ class Gdn_Autoloader_Map {
             // This file is stored flat, so just look in the DEFAULT_TOPIC
             $LookupSplitTopic = self::TOPIC_DEFAULT;
             if (array_key_exists($LookupSplitTopic, $this->Map) && array_key_exists($ClassName, $this->Map[$LookupSplitTopic])) {
-               return val($ClassName, $this->Map[$LookupSplitTopic]);
+               return GetValue($ClassName, $this->Map[$LookupSplitTopic]);
             }
             break;
       }
@@ -776,14 +776,14 @@ class Gdn_Autoloader_Map {
          );
 
          foreach ($this->Paths as $Path => $PathOptions) {
-            $ClassFilter = val('filter', $PathOptions);
+            $ClassFilter = GetValue('filter', $PathOptions);
             if (!fnmatch($ClassFilter, $ClassName)) continue;
 
-            $Recursive = val('recursive', $PathOptions);
+            $Recursive = GetValue('recursive', $PathOptions);
             $File = $this->FindFile($Path, $Files, $Recursive);
 
             if ($File !== FALSE) {
-               $SplitTopic = val('topic', $PathOptions, self::TOPIC_DEFAULT);
+               $SplitTopic = GetValue('topic', $PathOptions, self::TOPIC_DEFAULT);
                $this->Map[$SplitTopic][$ClassName] = $File;
                $this->MapInfo['dirty'] = TRUE;
 
@@ -811,24 +811,24 @@ class Gdn_Autoloader_Map {
       if (!is_null($ExtraPaths)) {
          $ExtraPathsRemove = array();
          foreach ($ExtraPaths as $PathOpts) {
-            $ExtraPath = val('path', $PathOpts);
+            $ExtraPath = GetValue('path', $PathOpts);
             if (array_key_exists($ExtraPath, $this->Paths)) continue;
 
             $ExtraPathsRemove[] = $ExtraPath;
             $ExtraOptions = $this->BuildOptions;
-            $ExtraOptions['SplitTopic'] = val('topic', $PathOpts);
+            $ExtraOptions['SplitTopic'] = GetValue('topic', $PathOpts);
             $this->AddPath($ExtraPath, $ExtraOptions);
          }
       }
 
       foreach ($this->Paths as $Path => $PathOptions) {
 
-         $Recursive = val('recursive', $PathOptions);
+         $Recursive = GetValue('recursive', $PathOptions);
          $Files = $this->FindFiles($Path, $FileMasks, $Recursive);
          if ($Files === FALSE) continue;
 
          foreach ($Files as $File) {
-            $SplitTopic = val('topic', $PathOptions, self::TOPIC_DEFAULT);
+            $SplitTopic = GetValue('topic', $PathOptions, self::TOPIC_DEFAULT);
 
             $ProvidedClass = $this->GetClassNameFromFile($File);
             if ($ProvidedClass) {
@@ -896,50 +896,49 @@ class Gdn_Autoloader_Map {
    }
 
    public function MapType() {
-      return $this->MapInfo['maptype'];
+      return $this->MapInfo['maptype']; //GetValue('maptype', $this->MapInfo);
    }
-<<<<<<< HEAD
    
-    /**
-    * Try to fix path that has backslash in Windows OS
+   /**
+    * Fix path with backslash for Windows OS.
     *
-    * @path string 
+    * @param string $path
     * @return string
     *
     * Check to see if the path is not empty and if it is not in a form of drive: then replace any "\" with "/" to avoid 
     * the parse_fn_file bug and it also further check to see if it has only one "/" and the OS is "WIN" then it will prepend "/" 
     * in front of the path so it has the correct file path.
-    *  
     */
-    function fixBackSlash($path) {
-        if (!empty($path) and !preg_match('/[A-Za-z]\:/',$path)) {
-            $path = str_replace("\\", "/", $path);  // convert to / to avoid parse_in_file create array with missing \
-            if (preg_match('/^\/{1}\w/',$path)==TRUE and (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')) { // for some reason there is only 1 / then add / to have a valid network path
-                $path = "/" . $path;
-            }
-        }
-        return $path;
-    } 
-    
-=======
+   function fixBackSlash($path) {
+      if (!empty($path) && !preg_match('`^[a-z]:`i', $path)) {
+         // Convert to slash to avoid parse_in_file create array with missing backslash.
+         $path = str_replace("\\", "/", $path);
 
->>>>>>> 6f90419c868d080b357d575b4a04cc303a59a99c
+         // If there is only 1 slash, add another to have a valid network path.
+         if (preg_match('`^/[^/]`', $path) && stripos(PHP_OS, 'win') === 0) {		 
+            $path = "/".$path;
+         }
+      }
+
+      return $path;
+   }
+
    public function Shutdown() {
 
-      if (!val('dirty', $this->MapInfo)) return FALSE;
-      if (!val('save', $this->MapInfo)) return FALSE;
+      if (!GetValue('dirty', $this->MapInfo)) return FALSE;
+      if (!GetValue('save', $this->MapInfo)) return FALSE;
 
       if (!sizeof($this->Map))
          return FALSE;
 
-      $MapName = val('name', $this->MapInfo);
-      $FileName = val('ondisk', $this->MapInfo);
+      $MapName = GetValue('name', $this->MapInfo);
+      $FileName = GetValue('ondisk', $this->MapInfo);
 
       $MapContents = '';
       foreach ($this->Map as $SplitTopic => $TopicFiles) {
          $MapContents .= "[{$SplitTopic}]\n";
          foreach ($TopicFiles as $ClassName => $Location)
-          $Location = $this->fixBackSlash($Location);               
+            $Location = $this->fixBackSlash($Location);
             $MapContents .= "{$ClassName} = \"{$Location}\"\n";
       }
 

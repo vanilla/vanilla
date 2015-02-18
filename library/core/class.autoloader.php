@@ -910,12 +910,12 @@ class Gdn_Autoloader_Map {
     * in front of the path so it has the correct file path.
     */
    function fixBackSlash($path) {
-      if (!empty($path) && !preg_match('/[A-Za-z]\:/', $path)) {
+      if (!empty($path) && !preg_match('`^[a-z]:`i', $path)) {	  
          // Convert to slash to avoid parse_in_file create array with missing backslash.
          $path = str_replace("\\", "/", $path);
 
          // If there is only 1 slash, add another to have a valid network path.
-         if (preg_match('/^\/{1}\w/', $path) == TRUE && (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')) {
+         if (preg_match('`^/[^/]`', $path) && stripos(PHP_OS, 'win') === 0) {
             $path = "/".$path;
          }
       }

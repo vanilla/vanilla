@@ -640,7 +640,7 @@ class Gdn_Format {
       if (!is_string($Mixed))
          return self::To($Mixed, 'Display');
       else {
-         $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
+         $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', 'UTF-8'));
          $Mixed = str_replace(array("&quot;","&amp;"), array('"','&'), $Mixed);
          $Mixed = self::Mentions($Mixed);
          $Mixed = self::Links($Mixed);
@@ -687,9 +687,9 @@ class Gdn_Format {
          return self::To($Mixed, 'Form');
       else {
          if(C('Garden.Format.ReplaceNewlines', TRUE))
-            return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', '')));
+            return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', 'UTF-8')));
          else
-            return htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', ''));
+            return htmlspecialchars($Mixed, ENT_QUOTES, C('Garden.Charset', 'UTF-8'));
       }
    }
 
@@ -851,7 +851,7 @@ class Gdn_Format {
          } else {
             // The text does not contain html and does not have to be purified.
             // This is an optimization because purifying is very slow and memory intense.
-            $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
+            $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, C('Garden.Charset', 'UTF-8'));
             $Result = Gdn_Format::Mentions($Result);
             $Result = Gdn_Format::Links($Result);
 	    $Result = Emoji::instance()->translateToHtml($Result);
@@ -1188,7 +1188,7 @@ EOT;
          $Text = $Url;
          if (strpos($Text ,'%') !== FALSE) {
             $Text = rawurldecode($Text);
-            $Text = htmlspecialchars($Text, ENT_QUOTES, C('Garden.Charset', ''));
+            $Text = htmlspecialchars($Text, ENT_QUOTES, C('Garden.Charset', 'UTF-8'));
          }
 
          $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';

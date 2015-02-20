@@ -60,7 +60,7 @@ function GetTutorials($TutorialCode = '') {
          'VideoID' => '31493119'
       )
    );
-   
+
    // Default Thumbnails
    $Thumbnail = Asset('applications/dashboard/design/images/help-tn-200.jpg');
    $LargeThumbnail = Asset('applications/dashboard/design/images/help-tn-640.jpg');
@@ -68,22 +68,23 @@ function GetTutorials($TutorialCode = '') {
       $Tutorials[$i]['Thumbnail'] = $Thumbnail;
       $Tutorials[$i]['LargeThumbnail'] = $LargeThumbnail;
    }
-   
+
    if ($TutorialCode != '') {
       $Keys = ConsolidateArrayValuesByKey($Tutorials, 'Code');
       $Index = array_search($TutorialCode, $Keys);
       if ($Index === FALSE)
          return FALSE; // Not found!
-      
+
       // Found it, so define it's thumbnail location
       $Tutorial = GetValue($Index, $Tutorials);
       $VideoID = GetValue('VideoID', $Tutorial);
       try {
          $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php"));
-         $Tutorial['Thumbnail'] = GetValue('thumbnail_medium', GetValue('0', $Vimeo));
-         $Tutorial['LargeThumbnail'] = GetValue('thumbnail_large', GetValue('0', $Vimeo));
+
+         $Tutorial['Thumbnail'] = str_replace('http://', '//', valr('0.thumbnail_medium', $Vimeo));
+         $Tutorial['LargeThumbnail'] = str_replace('http://', '//', valr('0.thumbnail_large', $Vimeo));
       } catch (Exception $Ex) {
-         // Do nothing   
+         // Do nothing
       }
       return $Tutorial;
    } else {
@@ -91,11 +92,11 @@ function GetTutorials($TutorialCode = '') {
       try {
          foreach ($Tutorials as $Key => $Tutorial) {
             $Vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/".$Tutorial['VideoID'].".php"));
-            $Tutorials[$Key]['Thumbnail'] = GetValue('thumbnail_medium', GetValue('0', $Vimeo));
-            $Tutorials[$Key]['LargeThumbnail'] = GetValue('thumbnail_large', GetValue('0', $Vimeo));
+            $Tutorial['Thumbnail'] = str_replace('http://', '//', valr('0.thumbnail_medium', $Vimeo));
+            $Tutorial['LargeThumbnail'] = str_replace('http://', '//', valr('0.thumbnail_large', $Vimeo));
          }
       } catch (Exception $Ex) {
-         // Do nothing   
+         // Do nothing
       }
       return $Tutorials;
    }

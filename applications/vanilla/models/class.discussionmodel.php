@@ -1624,8 +1624,21 @@ class DiscussionModel extends VanillaModel {
                   }
                }
 
-               // Update the user's discussion count.
+               // Get the author user.
                $InsertUser = Gdn::UserModel()->GetID($Fields['InsertUserID']);
+
+               // User's first post?
+               if (!val('CountDiscussions', $InsertUser) ) {
+                  $this->SetField($DiscussionID, 'FirstDiscussion', 1);
+                  $this->FireEvent('FirstDiscussion');
+                  // First overall post?
+                  if (!val('CountComments', $InsertUser)) {
+                     $this->SetField($DiscussionID, 'FirstPost', 1);
+                     $this->FireEvent('FirstPost');
+                  }
+               }
+
+               // Update the user's discussion count.
                $this->UpdateUserDiscussionCount($Fields['InsertUserID'], val('CountDiscussions', $InsertUser, 0) > 100);
 
                // Mark the user as participated.
@@ -1739,6 +1752,7 @@ class DiscussionModel extends VanillaModel {
    }
 
    /**
+    * Notify users about a new discussion.
     *
     * @param type $Discussion
     * @param type $NotifiedUsers
@@ -1880,6 +1894,15 @@ class DiscussionModel extends VanillaModel {
       }
    }
 
+   /**
+    * Update category counters for a new discussion.
+    *
+    * @since 2.2
+    * @access public
+    *
+    * @param mixed $Discussion DiscussionID (int) or discussion array/object.
+    * @throws Exception
+    */
    public function IncrementNewDiscussion($Discussion) {
       if (is_numeric($Discussion)) {
          $Discussion = $this->GetID($Discussion);
@@ -1909,6 +1932,16 @@ class DiscussionModel extends VanillaModel {
             'LastUrl' => DiscussionUrl($Discussion, FALSE, '//').'#latest'));
    }
 
+   /**
+    * Update a user's discussion count.
+    *
+    * @since 2.2
+    * @access public
+    *
+    * @param $UserID
+    * @param bool $Inc
+    * @throws Exception
+    */
    public function UpdateUserDiscussionCount($UserID, $Inc = FALSE) {
       if ($Inc) {
          $User = Gdn::UserModel()->GetID($UserID);

@@ -446,7 +446,7 @@ class CommentModel extends VanillaModel {
 
             if ($CountWatch < $Discussion->CountCommentWatch)
                $CountWatch = $Discussion->CountCommentWatch;
-               
+
             if (isset($Discussion->DateLastViewed))
                $NewComments |= Gdn_Format::ToTimestamp($Discussion->DateLastComment) > Gdn_Format::ToTimestamp($Discussion->DateLastViewed);
 
@@ -889,6 +889,18 @@ class CommentModel extends VanillaModel {
       // This check may be used in the future so should not be depended on later in the method.
       if (Gdn::Controller()->DeliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
          return;
+      }
+
+      // User's first comment?
+      $InsertUser = Gdn::UserModel()->GetID($Fields['InsertUserID']);
+      if (!val('CountComments', $InsertUser)) {
+         $this->SetField($CommentID, 'FirstComment', 1);
+         $this->FireEvent('FirstComment');
+         // First overall post?
+         if (!val('CountDiscussions', $InsertUser)) {
+            $this->SetField($CommentID, 'FirstPost', 1);
+            $this->FireEvent('FirstPost');
+         }
       }
 
       // Update the discussion author's CountUnreadDiscussions (ie.

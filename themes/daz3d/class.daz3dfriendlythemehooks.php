@@ -2,9 +2,10 @@
 
 class Daz3DThemeHooks implements Gdn_IPlugin {
 
-   public function Setup() { }
+	public function Setup() { }
 
-   public function OnDisable() { }
+	public function OnDisable() { }
+
 	/*
 	public function SettingsController_AfterCurrentTheme_Handler($Sender) {
 		$SingleColumn = C('Themes.EmbedFriendly.SingleColumn');

@@ -7,29 +7,24 @@
 		<div id="{$BodyID}" class="{$BodyClass}">
 
 			<div id="Frame">
-				<div class="Head" id="Head">
-					<div class="Row">
-						<a href="{link path="/"}">{logo}</a>
-						<ul class="SiteMenu">
-							{dashboard_link}
-							{discussions_link}
-							{activity_link}
-							{inbox_link}
-							{custom_menu}
-							{profile_link}
-							{signinout_link}
-						</ul>
-					</div>
-				</div>
+				<div class="Head" id="Head"></div>
 				<div id="Body">
 					<div class="Row">
-						<div class="BreadcrumbsWrapper P">{breadcrumbs}</div>
-						<div class="Column PanelColumn" id="Panel">
-							{module name="MeModule" CssClass="FlyoutRight"}
-							{asset name="Panel"}
-							<div class="SiteSearch">{searchbox}</div>
-						</div>
-						<div class="Column ContentColumn" id="Content">{asset name="Content"}</div>
+						<div class="ForumHeader">
+							<ul class="SiteMenu">
+								{dashboard_link}
+								{discussions_link}
+								<li><a href="/vanilla/discussions/bookmarked/">Bookmarks</a></li>
+								{inbox_link}
+								{custom_menu}
+								{profile_link}
+							</ul>
+							<br class="display_medium_down clearfloat" />
+							<div class="Breadcrumbs">
+								{breadcrumbs}
+							</div>
+						</div><div class="clearfloat"></div>
+						<div class="Column ContentColumn page_content" id="Content">{asset name="Content"}</div>
 					</div>
 				</div>
 			</div>

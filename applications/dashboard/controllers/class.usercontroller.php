@@ -740,7 +740,7 @@ class UserController extends DashboardController {
          if (strpos($Field, '.') !== FALSE)
             $Field = array_pop(explode('.', $Field));
 
-         if (!in_array($Field, array('Name', 'Email', 'LastIPAddress', 'InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastVisit')))
+         if (!in_array($Field, array('Name', 'Email', 'LastIPAddress', 'InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastActive')))
             return FALSE;
 
          return array("$Field $Op" => $FilterValue);

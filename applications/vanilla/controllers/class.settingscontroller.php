@@ -581,21 +581,6 @@ class SettingsController extends Gdn_Controller {
       // Get category data
       $this->SetData('CategoryData', $this->CategoryModel->GetAll('TreeLeft'), TRUE);
 
-      // Enable/Disable Categories
-      if (Gdn::Session()->ValidateTransientKey(GetValue(1, $this->RequestArgs))) {
-         if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-            throw PermissionException('Garden.Settings.Manage');
-         }
-
-         $Toggle = GetValue(0, $this->RequestArgs, '');
-         if ($Toggle == 'enable') {
-            SaveToConfig('Vanilla.Categories.Use', TRUE);
-         } else if ($Toggle == 'disable') {
-            SaveToConfig('Vanilla.Categories.Use', FALSE);
-         }
-         Redirect('vanilla/settings/managecategories');
-      }
-
       // Setup & save forms
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -627,6 +612,31 @@ class SettingsController extends Gdn_Controller {
 
       // Render default view
       $this->Render();
+   }
+
+
+   /**
+    * Enable or disable the use of categories in Vanilla.
+    *
+    * @param bool $enabled Whether or not to enable/disable categories.
+    * @throws Exception Throws an exception if accessed through an invalid post back.
+    */
+   public function EnableCategories($enabled) {
+      $this->Permission('Garden.Settings.Manage');
+
+      if ($this->Form->AuthenticatedPostBack()) {
+         $enabled = (bool)$enabled;
+         SaveToConfig('Vanilla.Categories.Use', $enabled);
+         $this->SetData('Enabled', $enabled);
+
+         if ($this->DeliveryType() !== DELIVERY_TYPE_DATA) {
+            $this->RedirectUrl = Url('/vanilla/settings/managecategories');
+         }
+      } else {
+         throw ForbiddenException('GET');
+      }
+
+      return $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
    /**

@@ -26,10 +26,10 @@ $Session = Gdn::Session();
    if (C('Vanilla.Categories.Use')) {
       echo Anchor(T('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
       if (CheckPermission('Garden.Settings.Manage')) {
-         echo Wrap(Anchor(T("Don't use Categories"), 'vanilla/settings/managecategories/disable/' . Gdn::Session()->TransientKey(), 'SmallButton'));
+         echo Wrap(Anchor(T("Don't use Categories"), 'vanilla/settings/enablecategories?enabled=0', 'SmallButton Hijack'));
       }
    } elseif (CheckPermission('Garden.Settings.Manage')) {
-      echo Anchor(T('Use Categories'), 'vanilla/settings/managecategories/enable/'.Gdn::Session()->TransientKey(), 'SmallButton');
+      echo Anchor(T('Use Categories'), 'vanilla/settings/enablecategories?enabled=1'.Gdn::Session()->TransientKey(), 'SmallButton Hijack');
    }
 ?></div>
 <?php

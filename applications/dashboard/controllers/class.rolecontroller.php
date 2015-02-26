@@ -201,7 +201,20 @@ class RoleController extends DashboardController {
       // If seeing the form for the first time...
       if ($this->Form->AuthenticatedPostBack() === FALSE) {
          // Get the role data for the requested $RoleID and put it into the form.
-         $this->SetData('PermissionData', $PermissionModel->GetPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix), true);
+         $Permissions = $PermissionModel->GetPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix);
+         // Remove permissions the user doesn't have access to.
+         if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+               if (Gdn::Session()->CheckPermission($Permission)) {
+                  continue;
+               }
+
+               list($Px, $Sx) = explode('.', $Permission, 2);
+               unset($Permissions['_'.$Px][$Sx]);
+            }
+         }
+
+         $this->SetData('PermissionData', $Permissions, true);
 
          $this->Form->SetData($this->Role);
       } else {
@@ -265,6 +278,10 @@ class RoleController extends DashboardController {
 	}
 
    protected function RemoveRankPermissions() {
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         return;
+      }
+
       // Remove ranking permissions.
       $Permissions = $this->Form->GetFormValue('Permission');
       foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {

@@ -247,9 +247,24 @@ class RoleController extends DashboardController {
       $this->AddJsFile('jquery-ui.js');
       $this->Title(T('Roles & Permissions'));
 
-      if (!$RoleID)
-         $RoleData = $this->RoleModel->Get()->ResultArray();
-      else {
+      if (!$RoleID) {
+         $RoleData = $this->RoleModel->GetWithRankPermissions()->ResultArray();
+
+         // Check to see which roles can be modified.
+         foreach ($RoleData as &$Row) {
+            $CanModify = TRUE;
+
+            if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+               foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+                  if ($Row[$Permission] && !Gdn::Session()->CheckPermission($Permission)) {
+                     $CanModify = FALSE;
+                     break;
+                  }
+               }
+            }
+            $Row['CanModify'] = $CanModify;
+         }
+      } else {
          $Role = $this->RoleModel->GetID($RoleID);
          $RoleData = array($Role);
       }

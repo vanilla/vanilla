@@ -75,6 +75,26 @@ class RoleModel extends Gdn_Model {
    }
 
    /**
+    * Get all of the roles including their ranking permissions.
+    *
+    * @return Gdn_DataSet Returns all of the roles with the ranking permissions.
+    */
+   public function GetWithRankPermissions() {
+      $this->SQL
+         ->Select('r.*')
+         ->From('Role r')
+         ->LeftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null')
+         ->OrderBy('Sort', 'asc');
+
+      foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+         $this->SQL->Select("`$Permission`", '', $Permission);
+      }
+
+      $Result = $this->SQL->Get();
+      return $Result;
+   }
+
+   /**
     * Returns an array of RoleID => RoleName pairs.
     *
     * @return array

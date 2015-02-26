@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
- 
+
 /**
  * Manage users.
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -123,14 +123,8 @@ class UserController extends DashboardController {
       $this->AddSideMenu('dashboard/user');
 
       $RoleModel = new RoleModel();
-      $RoleData = $AllRoles = $RoleModel->GetArray();
-
-      // If not administrator, restrict to default registration roles.
-      if (!CheckPermission('Garden.Settings.Manage')) {
-         $DefaultRoleIDs = C('Garden.Registration.DefaultRoles', array(8));
-         $DefaultRoles = array_combine($DefaultRoleIDs, $DefaultRoleIDs);
-         $RoleData = array_intersect_key($AllRoles, $DefaultRoles);
-      }
+      $AllRoles = $RoleModel->GetArray();
+      $RoleData = $RoleModel->GetAssignable();
 
       // By default, people with access here can freely assign all roles
       $this->RoleData = $RoleData;
@@ -154,7 +148,9 @@ class UserController extends DashboardController {
             // user, adjusted for his ability to affect those roles
             $RequestedRoles = $this->Form->GetFormValue('RoleID');
 
-            if (!is_array($RequestedRoles)) $RequestedRoles = array();
+            if (!is_array($RequestedRoles)) {
+               $RequestedRoles = array();
+            }
             $RequestedRoles = array_flip($RequestedRoles);
             $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
 
@@ -559,7 +555,7 @@ class UserController extends DashboardController {
       // Only admins can reassign roles
       $RoleModel = new RoleModel();
       $AllRoles = $RoleModel->GetArray();
-      $RoleData = (CheckPermission('Garden.Settings.Manage')) ? $AllRoles : array();
+      $RoleData = $RoleModel->GetAssignable();
 
       $UserModel = new UserModel();
       $User = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
@@ -661,8 +657,9 @@ class UserController extends DashboardController {
             $UserImmutableRoles = array_intersect_key($ImmutableRoles, $UserRoleData);
 
             // Apply immutable roles
-            foreach ($UserImmutableRoles as $IMRoleID => $IMRoleName)
+            foreach ($UserImmutableRoles as $IMRoleID => $IMRoleName) {
                $UserNewRoles[$IMRoleID] = $IMRoleName;
+            }
 
             // Put the data back into the forum object as if the user had submitted
             // this themselves

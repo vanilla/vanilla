@@ -274,7 +274,6 @@ $PermissionModel->Undefine(array(
    'Garden.Email.Manage',
    'Garden.Plugins.Manage',
    'Garden.Registration.Manage',
-   'Garden.Roles.Manage',
    'Garden.Routes.Manage',
    'Garden.Themes.Manage',
    'Garden.Messages.Manage'

@@ -3013,6 +3013,10 @@ if (!function_exists('SaveToConfig')) {
     */
    function SaveToConfig($Name, $Value = '', $Options = array()) {
       Gdn::Config()->SaveToConfig($Name, $Value, $Options);
+
+      // Flush Zend OPcache after config file is saved.
+      if (function_exists('opcache_reset'))
+         opcache_reset();
    }
 }
 

@@ -24,7 +24,7 @@ $ViewPersonalInfo = $Session->CheckPermission('Garden.PersonalInfo.View');
       echo ' ', $this->Form->Button(T('Go'));
       echo ' ', sprintf(T('%s user(s) found.'), $this->Data('RecordCount'));
       echo '</div>';
-      
+
    ?>
 </div>
 <div class="Wrap">
@@ -35,8 +35,12 @@ $ViewPersonalInfo = $Session->CheckPermission('Garden.PersonalInfo.View');
          echo Anchor(T('Delete'), '#', 'Popup SmallButton');
       ?>
    </span>-->
-   
-   <?php echo Anchor(T('Add User'), 'dashboard/user/add', 'Popup SmallButton'); ?>
+
+   <?php
+   if (CheckPermission('Garden.Users.Add')) {
+      echo Anchor(T('Add User'), 'dashboard/user/add', 'Popup SmallButton');
+   }
+   ?>
 </div>
 <table id="Users" class="AltColumns">
    <thead>

@@ -105,12 +105,12 @@ class RoleModel extends Gdn_Model {
 
       $Sql->Select('r.RoleID, r.Name')
          ->From('Role r')
-         ->Join('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null'); // join to global permissions
+         ->LeftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null'); // join to global permissions
 
       // Don't select roles that I don't have a ranking permission for.
       foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
          if (!Gdn::Session()->CheckPermission($Permission)) {
-            $Sql->Where("`$Permission`", 0);
+            $Sql->Where("coalesce(`$Permission`, 0)", '0', FALSE, FALSE);
          }
       }
 

@@ -11,6 +11,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class PermissionModel extends Gdn_Model {
 
    /**
+    * @var array A list of permissions that define an increasing ranking of permissions.
+    */
+   public $RankPermissions = array(
+      'Garden.Moderation.Manage',
+      'Garden.Community.Manage',
+      'Garden.Users.Add',
+      'Garden.Settings.Manage'
+   );
+
+   /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {

@@ -87,6 +87,40 @@ class RoleModel extends Gdn_Model {
    }
 
    /**
+    * Get the roles that the current user is allowed to assign to another user.
+    *
+    * @return array Returns an array in the format `[RoleID => 'Role Name']`.
+    */
+   public function GetAssignable() {
+      // Administrators can assign all roles.
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+         return $this->GetArray();
+      }
+      // Users that can't edit other users can't assign any roles.
+      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
+         return array();
+      }
+
+      $Sql = Gdn::SQL();
+
+      $Sql->Select('r.RoleID, r.Name')
+         ->From('Role r')
+         ->Join('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null'); // join to global permissions
+
+      // Don't select roles that I don't have a ranking permission for.
+      foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+         if (!Gdn::Session()->CheckPermission($Permission)) {
+            $Sql->Where("`$Permission`", 0);
+         }
+      }
+
+      $Roles = $Sql->Get()->ResultArray();
+      $Roles = array_column($Roles, 'Name', 'RoleID');
+
+      return $Roles;
+   }
+
+   /**
     * Returns a resultset of all roles that have editable permissions.
     *
    public function GetEditablePermissions() {

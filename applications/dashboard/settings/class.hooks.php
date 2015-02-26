@@ -146,7 +146,10 @@ class DashboardHooks implements Gdn_IPlugin {
 
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), array('class' => 'nav-users'));
-      $Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Settings.Manage', array('class' => 'nav-roles'));
+
+      if (Gdn::Session()->CheckPermission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), FALSE)) {
+         $Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', FALSE, array('class' => 'nav-roles'));
+      }
 
       $Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Settings.Manage', array('class' => 'nav-registration'));
       $Menu->AddLink('Users', T('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage', array('class' => 'nav-authentication'));

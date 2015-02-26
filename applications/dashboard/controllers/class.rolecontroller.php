@@ -205,6 +205,8 @@ class RoleController extends DashboardController {
 
          $this->Form->SetData($this->Role);
       } else {
+         $this->RemoveRankPermissions();
+
          // If the form has been posted back...
          // 2. Save the data (validation occurs within):
          if ($RoleID = $this->Form->Save()) {
@@ -261,4 +263,16 @@ class RoleController extends DashboardController {
       }
 		return TRUE;
 	}
+
+   protected function RemoveRankPermissions() {
+      // Remove ranking permissions.
+      $Permissions = $this->Form->GetFormValue('Permission');
+      foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+         if (!Gdn::Session()->CheckPermission($Permission) && in_array($Permission, $Permissions)) {
+            $Index = array_search($Permission, $Permissions);
+            unset($Permissions[$Index]);
+         }
+      }
+      $this->Form->SetFormValue('Permission', $Permissions);
+   }
 }

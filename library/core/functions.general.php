@@ -1521,8 +1521,6 @@ if (!function_exists('GetMentions')) {
          return $Formatter->GetMentions($String);
       }
 
-      $Mentions = array();
-
       // This one grabs mentions that start at the beginning of $String
       preg_match_all(
          '/(?:^|[\s,\.>])@(\w{3,20})\b/i',
@@ -2770,8 +2768,6 @@ if (!function_exists('ReflectArgs')) {
     * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
     */
    function ReflectArgs($Callback, $Args1, $Args2 = NULL) {
-      $Result = array();
-
       if (is_string($Callback) && !function_exists($Callback))
          throw new Exception("Function $Callback does not exist");
 

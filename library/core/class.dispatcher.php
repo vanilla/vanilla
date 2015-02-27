@@ -518,9 +518,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
       switch ($Request->OutputFormat()) {
          case 'rss':
             $this->_SyndicationMethod = SYNDICATION_RSS;
+            $this->_DeliveryMethod = DELIVERY_METHOD_RSS;
             break;
          case 'atom':
             $this->_SyndicationMethod = SYNDICATION_ATOM;
+            $this->_DeliveryMethod = DELIVERY_METHOD_RSS;
             break;
          case 'default':
          default:

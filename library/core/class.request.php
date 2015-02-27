@@ -435,7 +435,9 @@ class Gdn_Request {
             SafeParseStr($Get, $Get, $Original);
          }
 
-         if (isset($Get['_p'])) {
+         if (isset($_SERVER['X_REWRITE']) && isset($_SERVER['PATH_INFO'])) {
+            $Path = $_SERVER['PATH_INFO'];
+         } elseif (isset($Get['_p'])) {
             $Path = $Get['_p'];
             unset($_GET['_p']);
          } elseif (isset($Get['p'])) {

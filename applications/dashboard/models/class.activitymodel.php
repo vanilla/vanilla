@@ -934,11 +934,12 @@ class ActivityModel extends Gdn_Model {
                   $this->SQL->Put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $_ActivityID));
                }
             }
+
+            // Send a notification to the original person.
+            if (val('ActivityType', $Activity) === 'WallPost') {
+               $this->NotifyWallComment($Comment, $Activity);
+            }
          }
-
-         // Send a notification to the original person.
-         $this->NotifyWallComment($Comment, $Activity);
-
 
          return $ID;
       }

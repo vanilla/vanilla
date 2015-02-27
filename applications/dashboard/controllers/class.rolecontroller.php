@@ -16,7 +16,7 @@ class RoleController extends DashboardController {
    /**
     * @var RoleModel
     */
-   protected $RoleModel;
+   public $RoleModel;
 
    /**
     * Set menu path. Automatically run on every use.

@@ -204,7 +204,7 @@ class RoleController extends DashboardController {
          $Permissions = $PermissionModel->GetPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix);
          // Remove permissions the user doesn't have access to.
          if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-            foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+            foreach ($this->RoleModel->RankPermissions as $Permission) {
                if (Gdn::Session()->CheckPermission($Permission)) {
                   continue;
                }
@@ -255,7 +255,7 @@ class RoleController extends DashboardController {
             $CanModify = TRUE;
 
             if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-               foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+               foreach ($this->RoleModel->RankPermissions as $Permission) {
                   if ($Row[$Permission] && !Gdn::Session()->CheckPermission($Permission)) {
                      $CanModify = FALSE;
                      break;
@@ -299,7 +299,7 @@ class RoleController extends DashboardController {
 
       // Remove ranking permissions.
       $Permissions = $this->Form->GetFormValue('Permission');
-      foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+      foreach ($this->RoleModel->RankPermissions as $Permission) {
          if (!Gdn::Session()->CheckPermission($Permission) && in_array($Permission, $Permissions)) {
             $Index = array_search($Permission, $Permissions);
             unset($Permissions[$Index]);

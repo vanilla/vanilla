@@ -12,10 +12,22 @@ class RoleModel extends Gdn_Model {
    public static $Roles = NULL;
 
    /**
+    * @var array A list of permissions that define an increasing ranking of permissions.
+    */
+   public $RankPermissions = array(
+      'Garden.Moderation.Manage',
+      'Garden.Community.Manage',
+      'Garden.Users.Add',
+      'Garden.Settings.Manage',
+      'Conversations.Moderation.Manage'
+   );
+
+   /**
     * Class constructor. Defines the related database table name.
     */
    public function __construct() {
       parent::__construct('Role');
+      $this->FireEvent('Init');
    }
 
    public function ClearCache() {
@@ -86,7 +98,7 @@ class RoleModel extends Gdn_Model {
          ->LeftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null')
          ->OrderBy('Sort', 'asc');
 
-      foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+      foreach ($this->RankPermissions as $Permission) {
          $this->SQL->Select("`$Permission`", '', $Permission);
       }
 
@@ -128,7 +140,7 @@ class RoleModel extends Gdn_Model {
          ->LeftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null'); // join to global permissions
 
       // Don't select roles that I don't have a ranking permission for.
-      foreach (Gdn::PermissionModel()->RankPermissions as $Permission) {
+      foreach ($this->RankPermissions as $Permission) {
          if (!Gdn::Session()->CheckPermission($Permission)) {
             $Sql->Where("coalesce(`$Permission`, 0)", '0', FALSE, FALSE);
          }

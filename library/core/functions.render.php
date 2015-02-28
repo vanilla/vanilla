@@ -858,7 +858,7 @@ if (!function_exists('UserPhoto')) {
          }
          $Href = Url(UserUrl($User));
          return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-            .Img($PhotoUrl, array('alt' => htmlspecialchars($Name), 'class' => $ImgClass))
+            .Img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';

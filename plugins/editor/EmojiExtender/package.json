@@ -1,0 +1,31 @@
+{
+  "name": "assets",
+  "private": true,
+  "devDependencies": {
+    "bower": "*",
+    "wiredep": "1.4.x",
+    "gulp": "3.6.x",
+    "gulp-load-plugins": "0.5.x",
+    "gulp-sass": "0.7.x",
+    "gulp-plumber": "0.6.1",
+    "gulp-size": "0.3.x",
+    "gulp-autoprefixer": "0.0.x",
+    "gulp-jshint": "1.5.x",
+    "gulp-csslint": "0.1.x",
+    "gulp-livereload": "1.3.x",
+    "gulp-bower-files": "0.2.x",
+    "gulp-cache": "0.1.x",
+    "gulp-imagemin": "0.5.x",
+    "gulp-flatten": "0.0.x",
+    "gulp-concat": "2.2.x",
+    "gulp-filter": "0.4.x"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "install": "bower install",
+    "build": "gulp",
+    "watch": "gulp watch"
+  }
+}

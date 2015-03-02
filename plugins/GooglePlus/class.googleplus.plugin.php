@@ -184,6 +184,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
     * Add 'Google+' option to the row.
     */
    public function Base_AfterReactions_Handler($Sender, $Args) {
+      if (!$this->SocialReactions()) {
+         return;
+      }
       echo Gdn_Theme::BulletItem('Share');
 //      if ($this->AccessToken()) {
 //         $Url = Url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE);

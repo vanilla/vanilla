@@ -45,7 +45,7 @@ If you professionally run a large community or enterprise forum, our cloud solut
 * pdo_mysql module must be enabled
 * MySQL 5 or newer
 
-Vanilla 2.1 will be the last version to support PHP 5.2. Vanilla 2.2 will require PHP 5.3. Vanilla is compatible up to PHP 5.6 (the current release) and we always recommend using the lastest PHP release whenever possible. We plan to raise our requirements to PHP 5.4 for the next version after
+Vanilla 2.1 will be the last version to support PHP 5.2. Vanilla 2.2 will require PHP 5.3. Vanilla is compatible up to PHP 5.6 (the current release) and we always recommend using the lastest PHP release whenever possible. We plan to raise our requirements to PHP 5.4 in the near future.
 
 Vanilla ships with a `.htaccess` file for Apache support. Nginx and IIS require additional configuration.
 

@@ -594,7 +594,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
    protected static function isList(&$list) {
        $n = count($list);
        for ($i=0;$i<$n;$i++) {
-          if (!isset($list[$i]) && !key_exists($i, $list)) return false;
+          if (!isset($list[$i]) && !array_key_exists($i, $list)) return false;
        }
        return true;
    }

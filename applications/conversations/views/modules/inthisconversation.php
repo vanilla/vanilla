@@ -11,7 +11,7 @@
          if (GetValue('Deleted', $User)) {
             echo Anchor(
                Wrap(
-                  Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')).' '.
+                  ($Photo ? Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')) : '').' '.
                   Wrap($Username, 'del', array('class' => 'Username')),
                   'span', array('class' => 'Conversation-User',)
                ),
@@ -21,7 +21,7 @@
          } else {
             echo Anchor(
                Wrap(
-                  Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')).' '.
+                  ($Photo ? Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')) : '').' '.
                   Wrap($Username, 'span', array('class' => 'Username')),
                   'span', array('class' => 'Conversation-User')
                ),

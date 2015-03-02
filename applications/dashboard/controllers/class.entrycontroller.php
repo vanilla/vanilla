@@ -407,6 +407,8 @@ EOT;
       $CurrentData = $this->Form->FormValues();
       try {
          $this->FireEvent('ConnectData');
+         $this->EventArguments['Form'] = $this->Form;
+         $this->FireEvent('AfterConnectData');
       } catch (Gdn_UserException $Ex) {
          $this->Form->AddError($Ex);
          return $this->Render('ConnectError');

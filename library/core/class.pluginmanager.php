@@ -415,7 +415,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
          $MethodName = strtolower($Method);
          // Loop through their individual methods looking for event handlers and method overrides.
          if (isset($MethodName[9])) {
-            $Suffix = array_pop(explode('_',$MethodName));
+            $Suffix = trim(strrchr($MethodName, '_'), '_');
             switch ($Suffix) {
                case 'handler':
                case 'before':

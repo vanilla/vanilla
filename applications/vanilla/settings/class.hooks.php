@@ -6,7 +6,7 @@
  * The class.hooks.php file is essentially a giant plugin container for an app
  * that is automatically enabled when the app is.
  *
- * @link http://vanillaforums.org/docs/PluginQuickStart
+ * @link http://docs.vanillaforums.com/developers/plugins/quickstart/
  * @since 2.0.0
  * @package Vanilla
  */

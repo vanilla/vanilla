@@ -71,12 +71,15 @@ if ($Session->IsValid()):
                   echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap link-preferences'));
                }
 
-               if ($Session->CheckPermission(array('Garden.Settings.View', 'Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
+               if ($Session->CheckPermission(array('Garden.Settings.View', 'Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Garden.Users.Approve', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
                   echo Wrap('<hr />', 'li');
                   $CApplicant = $ApplicantCount > 0 ? ' '.Wrap($ApplicantCount, 'span class="Alert"') : '';
                   $CSpam = ''; //$SpamCount > 0 ? ' '.Wrap($SpamCount, 'span class="Alert"') : '';
                   $CModeration = $ModerationCount > 0 ? ' '.Wrap($ModerationCount, 'span class="Alert"') : '';
-                  echo Wrap(Anchor(Sprite('SpApplicants').' '.T('Applicants').$CApplicant, '/dashboard/user/applicants'), 'li', array('class' => 'link-applicants'));
+
+                  if ($Session->CheckPermission('Garden.Users.Approve')) {
+                     echo Wrap(Anchor(Sprite('SpApplicants') . ' ' . T('Applicants') . $CApplicant, '/dashboard/user/applicants'), 'li', array('class' => 'link-applicants'));
+                  }
 
                   if ($Session->CheckPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), FALSE)) {
                      echo Wrap(Anchor(Sprite('SpSpam').' '.T('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li', array('class' => 'link-spam'));

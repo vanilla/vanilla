@@ -4,7 +4,7 @@
  *    - Documentation and latest version
  *          http://recaptcha.net/plugins/php/
  *    - Get a reCAPTCHA API Key
- *          https://www.google.com/recaptcha/admin/create
+ *          https://www.google.com/recaptcha/admin
  *    - Discussion group
  *          http://groups.google.com/group/recaptcha
  *
@@ -106,7 +106,7 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
 function recaptcha_get_html ($pubkey, $error = null, $use_ssl = false)
 {
 	if ($pubkey == null || $pubkey == '') {
-		echo (T('ToUseRecaptcha', "To use reCAPTCHA you must get an API key from <a href='https://www.google.com/recaptcha/admin/create'>https://www.google.com/recaptcha/admin/create</a>"));
+		echo (T('ToUseRecaptcha', "To use reCAPTCHA you must get an API key from <a href='https://www.google.com/recaptcha/admin'>https://www.google.com/recaptcha/admin</a>"));
       return;
    }
 	
@@ -153,7 +153,7 @@ class ReCaptchaResponse {
 function recaptcha_check_answer ($privkey, $remoteip, $challenge, $response, $extra_params = array())
 {
 	if ($privkey == null || $privkey == '') {
-		die ("To use reCAPTCHA you must get an API key from <a href='https://www.google.com/recaptcha/admin/create'>https://www.google.com/recaptcha/admin/create</a>");
+		die ("To use reCAPTCHA you must get an API key from <a href='https://www.google.com/recaptcha/admin'>https://www.google.com/recaptcha/admin</a>");
 	}
 
 	if ($remoteip == null || $remoteip == '') {
@@ -201,7 +201,7 @@ function recaptcha_check_answer ($privkey, $remoteip, $challenge, $response, $ex
  * @param string $appname The name of your application
  */
 function recaptcha_get_signup_url ($domain = null, $appname = null) {
-	return "https://www.google.com/recaptcha/admin/create?" .  _recaptcha_qsencode (array ('domains' => $domain, 'app' => $appname));
+	return "https://www.google.com/recaptcha/admin" .  _recaptcha_qsencode (array ('domains' => $domain, 'app' => $appname));
 }
 
 function _recaptcha_aes_pad($val) {

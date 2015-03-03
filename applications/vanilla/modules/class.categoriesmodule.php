@@ -13,6 +13,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class CategoriesModule extends Gdn_Module {
 
+   public $startDepth = 1; //inclusive
+   public $endDepth; //inclusive
+
    public function __construct($Sender = '') {
       parent::__construct($Sender);
       $this->_ApplicationFolder = 'vanilla';
@@ -50,10 +53,22 @@ class CategoriesModule extends Gdn_Module {
       $this->Data = $Data;
    }
 
+   public function filterDepth(&$Categories, $startDepth, $endDepth) {
+      if ($startDepth != 1 || $endDepth) {
+         foreach ($Categories as $i => $Category) {
+            if (val('Depth', $Category) < $startDepth || ($endDepth && val('Depth', $Category) > $endDepth)) {
+               unset($Categories[$i]);
+            }
+         }
+      }
+   }
+
    public function ToString() {
       if (!$this->Data) {
          $this->GetData();
       }
+
+      $this->filterDepth($this->Data->Result(), $this->startDepth, $this->endDepth);
 
       return parent::ToString();
    }

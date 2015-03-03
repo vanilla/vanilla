@@ -15,8 +15,16 @@ $PluginInfo['jsconnectAutoSignIn'] = array(
 class jsConnectAutoSignInPlugin extends Gdn_Plugin {
 
   public function Base_Render_Before($Sender, $Args) {
-    if (!Gdn::Session()->UserID && !in_array(strtolower($Sender->Request->Path()),array( 'entry/connect/jsconnect'))) {
+    if (!in_array(strtolower($Sender->Request->Path()),array( 'entry/connect/jsconnect'))) {
+      $magento_id = false;
+	  if ( ! empty(Gdn::Session( )->UserID)) {
+		  $meta = Gdn::UserModel( )->GetMeta(Gdn::Session( )->UserID, 'Profile.%', 'Profile.');
+		  $magento_id = $meta['MagentoID'];
+	  }
+
       $Sender->AddCssFile('jsconnectAuto.css', 'plugins/jsconnectAutoSignIn');
+      $Sender->Head->AddString('<script type="text/javascript">var magento_id = '.json_encode((int) $magento_id).';</script>');
+      $Sender->AddJSFile('jquery.cookie.js', 'plugins/jsconnectAutoSignIn');
       $Sender->AddJSFile('jsconnectAuto.js', 'plugins/jsconnectAutoSignIn');
       $Sender->AddDefinition('Connecting', T('jsconnectAutoSignIn.Connecting','Connecting...'));
       $Sender->AddDefinition('ConnectingUser', T('jsconnectAutoSignIn.ConnectingUser','Hi % just connecting you to forum...'));

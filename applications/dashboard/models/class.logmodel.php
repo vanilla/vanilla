@@ -447,19 +447,70 @@ class LogModel extends Gdn_Pluggable {
    }
 
    public function Recalculate() {
-      $DiscussionIDs = $this->_RecalcIDs['Discussion'];
-      if (count($DiscussionIDs) == 0)
-         return;
 
-      $In = implode(',', array_keys($DiscussionIDs));
-      if (empty($In))
-         return;
-      
-      $Px = Gdn::Database()->DatabasePrefix;
-      $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
-      Gdn::Database()->Query($Sql);
+      if ($DiscussionIDs = val('Discussion', $this->_RecalcIDs)) {
+         $In = implode(',', array_keys($DiscussionIDs));
 
-      $this->_RecalcIDs['Discussion'] = array();
+         if (!empty($In)) {
+            $Px = Gdn::Database()->DatabasePrefix;
+            $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
+            Gdn::Database()->Query($Sql);
+            $this->_RecalcIDs['Discussion'] = array();
+         }
+      }
+
+      if ($UserIDsComment = val('UserComment', $this->_RecalcIDs)) {
+         $counts = $this->arrayFlipAndCombine($UserIDsComment);
+
+         foreach($counts as $key => $value) {
+            Gdn::SQL()
+               ->Update('User')
+               ->Set('CountComments', 'coalesce(CountComments, 0) + '.$key, FALSE, FALSE)
+               ->Where('UserID', $value)
+               ->Put();
+         }
+         $this->_RecalcIDs['UserComment'] = array();
+      }
+
+      if ($UserIDsDiscussion = val('UserDiscussion', $this->_RecalcIDs)) {
+         $counts = $this->arrayFlipAndCombine($UserIDsDiscussion);
+
+         foreach($counts as $key => $value) {
+            Gdn::SQL()
+               ->Update('User')
+               ->Set('CountDiscussions', 'coalesce(CountDiscussions, 0) + '.$key, FALSE, FALSE)
+               ->Where('UserID', $value)
+               ->Put();
+         }
+         $this->_RecalcIDs['UserDiscussion'] = array();
+      }
+   }
+
+   /**
+    * Takes an array and returns a flip, making values the keys
+    * and making the keys values. In case of multiple values with
+    * the several occurrences, this reserves all original keys by
+    * pushing them onto an array.
+    *
+    * @param array $array An array in the format {[id1] => count,
+    *                                             [id2] => count }
+    * @return array A 2D array the format {[count] => [id1, id2]}
+    */
+   public function arrayFlipAndCombine($array) {
+      if (!$array) {
+         return;
+      }
+      $uniqueValues = array_unique(array_values($array));
+      $newArray = array();
+      foreach ($uniqueValues as $uniqueValue) {
+         $newArray[$uniqueValue] = array();
+         foreach ($array as $key => $value) {
+            if ($value == $uniqueValue) {
+               $newArray[$uniqueValue][] = $key;
+            }
+         }
+      }
+      return $newArray;
    }
 
    public function Restore($Log, $DeleteLog = TRUE) {
@@ -614,8 +665,8 @@ class LogModel extends Gdn_Pluggable {
                if ($Log['RecordType'] == 'User' && $Log['Operation'] == 'Ban') {
                   Gdn::UserModel()->SetField($ID, 'Banned', 0);
                }
-               
-               // Keep track of a discussion ID so that it's count can be recalculated.
+
+               // Keep track of a discussion ID so that its count can be recalculated.
                if ($Log['Operation'] != 'Edit') {
                   switch ($Log['RecordType']) {
                      case 'Discussion':
@@ -623,6 +674,27 @@ class LogModel extends Gdn_Pluggable {
                         break;
                      case 'Comment':
                         $this->_RecalcIDs['Discussion'][$Log['ParentRecordID']] = TRUE;
+                        break;
+                  }
+               }
+
+               if ($Log['Operation'] == 'Pending') {
+                  switch ($Log['RecordType']) {
+                     case 'Discussion':
+                        if (val('UserDiscussion', $this->_RecalcIDs) && val($Log['RecordUserID'], $this->_RecalcIDs['UserDiscussion'])) {
+                           $this->_RecalcIDs['UserDiscussion'][$Log['RecordUserID']]++;
+                        }
+                        else {
+                           $this->_RecalcIDs['UserDiscussion'][$Log['RecordUserID']] = 1;
+                        }
+                        break;
+                     case 'Comment':
+                        if (val('UserComment', $this->_RecalcIDs) && val($Log['RecordUserID'], $this->_RecalcIDs['UserComment'])) {
+                           $this->_RecalcIDs['UserComment'][$Log['RecordUserID']]++;
+                        }
+                        else {
+                           $this->_RecalcIDs['UserComment'][$Log['RecordUserID']] = 1;
+                        }
                         break;
                   }
                }

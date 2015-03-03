@@ -660,16 +660,7 @@ if (!function_exists('ConcatSep')) {
          array_shift($Strings);
       }
 
-      $Result = '';
-      foreach($Strings as $String) {
-         if(!$String)
-            continue;
-
-         if($Result)
-            $Result .= $Sep;
-         $Result .= $String;
-      }
-      return $Result;
+      return implode($Sep, $Strings);
    }
 }
 

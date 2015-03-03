@@ -480,39 +480,12 @@ class TagModel extends Gdn_Model {
       return $result;
    }
 
-   /**
-    * @param array $FormPostValues
-    * @param bool $Insert
-    * @return bool
-    */
-   public function Validate($FormPostValues, $Insert = FALSE) {
-      $this->DefineSchema();
-
-      $Type = GetValue('Type', $FormPostValues, '');
-      $SetType = FALSE;
-
-      // The model doesn't play well with empty string defaults so spoof an empty string default.
-      if ($Insert && !$Type) {
-         $FormPostValues['Type'] = 'Default';
-         $SetType = TRUE;
-      }
-
-      $Result = $this->Validation->Validate($FormPostValues, $Insert);
-
-      if ($SetType) {
-         $FormPostValues['Type'] = $Type;
-         $this->Validation->AddValidationField('Type', $FormPostValues);
-      }
-
-      return $Result;
-   }
-   
    public function Counts($Column, $UserID = NULL) {
       // Delete all the orphaned tagdiscussion records
       $Px = $this->Database->DatabasePrefix;
       $Sql = "delete td.* from {$Px}TagDiscussion as td left join {$Px}Discussion as d ON td.DiscussionID = d.DiscussionID where d.DiscussionID is null";
       $this->Database->Query($Sql);
-      
+
       $Result = array('Complete' => TRUE);
       switch($Column) {
          case 'CountDiscussions':

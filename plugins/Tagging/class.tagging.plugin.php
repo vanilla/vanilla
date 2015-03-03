@@ -25,7 +25,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.8.10',
+   'Version' => '1.8.11',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -624,6 +624,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $CanAddTags = (!empty($TagTypes[$Type]['addtag']) && $TagTypes[$Type]['addtag'])
          ? 1
          : 0;
+      $CanAddTags &= CheckPermission('Plugins.Tagging.Add');
 
       $Sender->SetData('_CanAddTags', $CanAddTags);
 
@@ -776,7 +777,7 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->SetData('Title', T('Delete Tag'));
       $Sender->Render('delete', '', 'plugins/Tagging');
    }
-   
+
    /**
     * Add update routines to the DBA controller
     *

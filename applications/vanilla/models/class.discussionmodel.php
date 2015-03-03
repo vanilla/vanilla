@@ -942,6 +942,9 @@ class DiscussionModel extends VanillaModel {
          $this->AddDenormalizedViews($Data);
       }
 
+      $this->EventArguments['Data'] =& $Data;
+      $this->FireEvent('AfterAddColumns');
+
       return $Data;
    }
 

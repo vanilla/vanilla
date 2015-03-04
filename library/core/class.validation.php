@@ -733,7 +733,10 @@ class Gdn_Validation {
          }
       }
 
-      $Result = implode('. ', $Errors).'.';
+      $Result = implode('. ', $Errors);
+      if ($Result) {
+         $Result .= '.';
+      }
       return $Result;
    }
 }

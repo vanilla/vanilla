@@ -21,6 +21,7 @@ class PromotedContentModule extends Gdn_Module {
     *  - rank        Author's Rank
     *  - category    Content's Category
     *  - score       Content's Score
+    *  - promoted
     * @var string
     */
    public $Selector;
@@ -133,11 +134,10 @@ class PromotedContentModule extends Gdn_Module {
 
       // Validate selection.
       $validation->applyRule('selection', 'String');
-      $validation->applyRule('selection', 'Required');
 
       // Validate selector.
       $validation->applyRule('selector', 'Required');
-      $selectorWhitelist = array('role', 'rank', 'category', 'score');
+      $selectorWhitelist = array('role', 'rank', 'category', 'score', 'promoted');
       if (isset($Parameters['selector']) && !in_array($Parameters['selector'], $selectorWhitelist)) {
          $validation->AddValidationResult('selector', 'Invalid selector.');
       }

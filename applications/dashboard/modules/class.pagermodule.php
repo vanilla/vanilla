@@ -435,6 +435,8 @@ class PagerModule extends Gdn_Module {
          $Url = GetValue('Url', $Options, $Pager->Controller()->SelfUrl.'?Page={Page}&'.http_build_query($Get));
 
          $Pager->Configure($Offset, $Limit, $TotalRecords, $Url);
+      } elseif ($Url = val('Url', $Options)) {
+         $Pager->Url = $Url;
       }
 
       echo $Pager->ToString($WriteCount > 0 ? 'more' : 'less');

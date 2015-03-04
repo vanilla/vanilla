@@ -16,7 +16,7 @@
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
    echo '<li>', Anchor(T('Vanilla Statistics Plugin'), '/settings/plugins#vanillastats-plugin'), '</li>';
-   echo '<li>', Anchor(T('Statistics Documentation'), 'http://vanillaforums.org/docs/vanillastatistics'), '</li>';
+   echo '<li>', Anchor(T('Statistics Documentation'), 'http://docs.vanillaforums.com/addons/statistics/'), '</li>';
    echo '</ul>';
    ?>
 </div>

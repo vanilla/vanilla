@@ -75,6 +75,7 @@ class PromotedContentModule extends Gdn_Module {
 
    public function __construct() {
       parent::__construct();
+      $this->_ApplicationFolder = 'vanilla';
    }
 
    public function GetData() {
@@ -334,10 +335,11 @@ class PromotedContentModule extends Gdn_Module {
          if ($this->ShowDiscussions()) {
             $Discussions = Gdn::SQL()->Select('d.*')
                ->From('Discussion d')
-               ->Where('Score >', $MinScore)
-               ->OrderBy('Score', 'DESC')
+               ->OrderBy('DateInserted', 'DESC')
                ->Limit($this->Limit);
-            if ($MinScore !== FALSE) $Discussions->Where('Score >', $MinScore);
+            if ($MinScore !== FALSE) {
+               $Discussions->Where('Score >', $MinScore);
+            }
             $Discussions = $Discussions->Get()->Result(DATASET_TYPE_ARRAY);
          }
 
@@ -346,9 +348,11 @@ class PromotedContentModule extends Gdn_Module {
          if ($this->ShowComments()) {
             $Comments = Gdn::SQL()->Select('c.*')
                ->From('Comment c')
-               ->OrderBy('Score', 'DESC')
+               ->OrderBy('DateInserted', 'DESC')
                ->Limit($this->Limit);
-            if ($MinScore !== FALSE) $Comments->Where('Score >', $MinScore);
+            if ($MinScore !== FALSE) {
+               $Comments->Where('Score >', $MinScore);
+            }
             $Comments = $Comments->Get()->Result(DATASET_TYPE_ARRAY);
 
             $this->JoinCategory($Comments);
@@ -369,6 +373,40 @@ class PromotedContentModule extends Gdn_Module {
 
       $this->Security($Content);
       $this->Condense($Content, $this->Limit);
+      return $Content;
+   }
+
+   /**
+    * Selected content that passed the Promoted threshold.
+    *
+    * This uses the Reactions caching system & options.
+    *
+    * @param array $Parameters Not used.
+    * @return array $Content
+    */
+   protected function SelectByPromoted($Parameters) {
+      if (!class_exists('ReactionModel')) {
+         return;
+      }
+
+      $RecordTypes = array();
+      if ($this->ShowDiscussions()) {
+         $RecordTypes[] = 'Discussion';
+      }
+      if ($this->ShowComments()) {
+         $RecordTypes[] = 'Comment';
+      }
+
+      $ReactionModel = new ReactionModel();
+      $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
+      $Content = $ReactionModel->GetRecordsWhere(
+          array('TagID' => $PromotedTagID, 'RecordType' => $RecordTypes),
+          'DateInserted',
+          'desc',
+          $this->Limit);
+
+      $this->Prepare($Content);
+
       return $Content;
    }
 
@@ -416,7 +454,7 @@ class PromotedContentModule extends Gdn_Module {
 
          foreach ($Section as $Item) {
             $ItemField = GetValue($Field, $Item);
-            $Interleaved[$ItemField] = array_merge($Item, array('ItemType' => $SectionType));
+            $Interleaved[$ItemField] = array_merge($Item, array('RecordType' => $SectionType));
 
             ksort($Interleaved);
          }
@@ -434,17 +472,17 @@ class PromotedContentModule extends Gdn_Module {
    protected function Prepare(&$Content) {
 
       foreach ($Content as &$ContentItem) {
-         $ContentType = GetValue('ItemType', $ContentItem);
+         $ContentType = val('RecordType', $ContentItem);
 
          $Replacement = array();
-         $Fields = array('DiscussionID', 'CategoryID', 'DateInserted', 'DateUpdated', 'InsertUserID', 'Body', 'Format', 'ItemType');
+         $Fields = array('DiscussionID', 'CategoryID', 'DateInserted', 'DateUpdated', 'InsertUserID', 'Body', 'Format', 'RecordType');
 
          switch (strtolower($ContentType)) {
             case 'comment':
                $Fields = array_merge($Fields, array('CommentID'));
 
                // Comment specific
-               $Replacement['Name'] = GetValueR('Discussion.Name', $ContentItem);
+               $Replacement['Name'] = GetValueR('Discussion.Name', $ContentItem, $ContentItem['Name']);
                break;
 
             case 'discussion':

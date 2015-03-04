@@ -484,7 +484,7 @@ class PostController extends VanillaController {
             'Format' => 'Html',
             'Attributes' => serialize($Attributes)
          );
-         $this->EventArguments['Discussion'] = $EmbeddedDiscussionData;
+         $this->EventArguments['Discussion'] =& $EmbeddedDiscussionData;
          $this->FireEvent('BeforeEmbedDiscussion');
          $DiscussionID = $this->DiscussionModel->SQL->Insert(
             'Discussion',

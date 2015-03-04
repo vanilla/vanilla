@@ -170,17 +170,19 @@ class DiscussionsController extends VanillaController {
       $PagerFactory = new Gdn_PagerFactory();
 		$this->EventArguments['PagerType'] = 'Pager';
 		$this->FireEvent('BeforeBuildPager');
+      if (!$this->Data('_PagerUrl')) {
+         $this->SetData('_PagerUrl', 'discussions/{Page}');
+      }
       $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->Configure(
          $Offset,
          $Limit,
          $CountDiscussions,
-         'discussions/%1$s'
+         $this->Data('_PagerUrl')
       );
       PagerModule::Current($this->Pager);
-      if (!$this->Data('_PagerUrl'))
-         $this->SetData('_PagerUrl', 'discussions/{Page}');
+
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
 		$this->FireEvent('AfterBuildPager');

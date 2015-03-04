@@ -8,7 +8,7 @@ $Keys = ConsolidateArrayValuesByKey($Tutorials, 'Code');
 $Index = array_search($CurrentTutorialCode, $Keys);
 if (!$Index)
    $Index = 0;
-   
+
 $CurrentTutorial = GetValue($Index, $Tutorials);
 $CurrentTutorialCode = GetValue('Code', $CurrentTutorial, '');
 ?>
@@ -62,7 +62,7 @@ div.Tutorials {
 <h1><?php echo T('Help &amp; Tutorials'); ?></h1>
 <div class="Tutorials">
    <div class="Video">
-      <iframe wmode="transparent" src="http://player.vimeo.com/video/<?php echo $CurrentTutorial['VideoID']; ?>?title=0&byline=0&portrait=0&color=D0D9E0" width="700" height="394?wmode=transparent" frameborder="0"></iframe>
+      <iframe wmode="transparent" src="//player.vimeo.com/video/<?php echo $CurrentTutorial['VideoID']; ?>?title=0&byline=0&portrait=0&color=D0D9E0" width="700" height="394?wmode=transparent" frameborder="0"></iframe>
    </div>
    <div class="VideoInfo">
       <?php

@@ -1,0 +1,25 @@
+{
+  "name": "advanced-editor",
+  "private": true,
+  "devDependencies": {
+    "bower": "*",
+    "wiredep": "1.4.x",
+    "grunt": "0.4.x",
+    "grunt-cli": "0.1.x",
+    "load-grunt-tasks": "0.4.x",
+    "time-grunt": "0.3.x",
+    "grunt-sass": "0.12.x",
+    "grunt-contrib-watch": "0.6.x",
+    "grunt-contrib-imagemin": "0.7.x",
+    "grunt-wiredep": "1.7.x",
+    "grunt-autoprefixer": "0.7.x"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "install": "bower install",
+    "build": "grunt",
+    "watch": "grunt watch"
+  }
+}

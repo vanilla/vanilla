@@ -438,7 +438,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
-    * Undocumented method.
+    * Adds a key-value pair to the definition collection for JavaScript.
     *
     * @param string $Term
     * @param string $Definition
@@ -446,9 +446,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function AddDefinition($Term, $Definition = NULL) {
       if(!is_null($Definition)) {
-         // Make sure the term is a valid id.
-         if (!preg_match('/[a-z][0-9a-z_\-]*/i', $Term))
-            throw new Exception('Definition term must start with a letter or an underscore and consist of alphanumeric characters.');
          $this->_Definitions[$Term] = $Definition;
       }
       return ArrayValue($Term, $this->_Definitions);

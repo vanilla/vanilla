@@ -63,7 +63,7 @@ PagerModule::Write(array('Sender' => $this, 'Limit' => 10));
 
                echo '</span>';
 
-               if ($Row['RecordIPAddress']) {
+               if (CheckPermission('Garden.PersonalInfo.View') && $Row['RecordIPAddress']) {
                   echo ' <span class="Meta">',
                      '<span class="Meta-Label">IP</span> ',
                      IPAnchor($Row['RecordIPAddress'], 'Meta-Value'),

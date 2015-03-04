@@ -2,7 +2,7 @@
 
 /**
  * Represents and manages configuration data
- * 
+ *
  * This generic model can be instantiated (with the configuration array
  * name it is intended to represent) and used directly, or it can be extended
  * and overridden for more complicated procedures related to different
@@ -56,10 +56,10 @@ class Gdn_ConfigurationModel {
     * @param string $ConfigurationArrayName The name of the configuration array that is being manipulated.
     * @param object $Validation
     */
-   public function __construct(&$Validation) {
+   public function __construct($Validation) {
       $this->Name = 'Configuration';
       $this->Data = array();
-      $this->Validation = &$Validation;
+      $this->Validation = $Validation;
    }
 
    /**
@@ -137,20 +137,20 @@ class Gdn_ConfigurationModel {
       // Fudge your way through the schema application. This will allow me to
       // force the validation object to expect the fieldnames contained in
       // $this->Data.
-      $this->Validation->ApplySchema($this->Data);
+      $this->Validation->SetSchema($this->Data);
       // Validate the form posted values
       if ($this->Validation->Validate($FormPostValues)) {
          // Merge the validation fields and the forced settings into a single array
          $Settings = $this->Validation->ValidationFields();
          if (is_array($this->_ForceSettings))
             $Settings = MergeArrays($Settings, $this->_ForceSettings);
-            
+
          $SaveResults = SaveToConfig($Settings);
-         
+
          // If the Live flag is true, set these in memory too
          if ($SaveResults && $Live)
             Gdn::Config()->Set($Settings, TRUE);
-         
+
          return $SaveResults;
       } else {
          return FALSE;
@@ -166,7 +166,7 @@ class Gdn_ConfigurationModel {
     * @todo $FormPostValues needs a description and correct variable type.
     */
    public function Validate($FormPostValues) {
-      $this->Validation->ApplySchema($this->Data);
+      $this->Validation->SetSchema($this->Data);
       // Validate the form posted values
       return $this->Validation->Validate($FormPostValues);
    }

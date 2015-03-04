@@ -293,7 +293,7 @@ if (!$PermissionTableExists) {
    // Set initial confirm email permissions.
    $PermissionModel->Save(array(
        'Role' => 'Unconfirmed',
-       'Garden.Signin.Allow' => 1,
+       'Garden.SignIn.Allow' => 1,
        'Garden.Activity.View' => 1,
        'Garden.Profiles.View' => 1,
        'Garden.Profiles.Edit' => 0,
@@ -303,7 +303,7 @@ if (!$PermissionTableExists) {
    // Set initial applicant permissions.
    $PermissionModel->Save(array(
       'Role' => 'Applicant',
-      'Garden.Signin.Allow' => 1,
+      'Garden.SignIn.Allow' => 1,
       'Garden.Activity.View' => 1,
       'Garden.Profiles.View' => 1,
       'Garden.Profiles.Edit' => 0,

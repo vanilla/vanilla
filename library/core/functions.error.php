@@ -16,7 +16,7 @@ class Gdn_ErrorException extends ErrorException {
 
    protected $_Context;
 
-   public function __construct($Message, $ErrorNumber, $File, $Line, $Context, $Backtrace) {
+   public function __construct($Message, $ErrorNumber, $File, $Line, $Context) {
       parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
       $this->_Context = $Context;
    }
@@ -28,29 +28,22 @@ class Gdn_ErrorException extends ErrorException {
 
 function Gdn_ErrorHandler($ErrorNumber, $Message, $File, $Line, $Arguments) {
    $ErrorReporting = error_reporting();
-   // Ignore errors that are below the current error reporting level.
-   if (($ErrorReporting & $ErrorNumber) != $ErrorNumber)
-      return FALSE;
 
-   $Backtrace = debug_backtrace();
+   // Don't do anything for @supressed errors.
+   if ($ErrorReporting === 0) {
+      return;
+   }
 
-   if (($ErrorNumber & (E_NOTICE | E_USER_NOTICE)) > 0 & function_exists('Trace')) {
-      $Tr = '';
-      $i = 0;
-      foreach ($Backtrace as $Info) {
-         if (!isset($Info['file']))
-            continue;
-
-         $Tr .= "\n{$Info['file']} line {$Info['line']}.";
-         if ($i > 2)
-            break;
-         $i++;
+   if (($ErrorReporting & $ErrorNumber) !== $ErrorNumber) {
+      if (function_exists('Trace')) {
+         Trace("$Message in $File line $Line", TRACE_NOTICE);
       }
-      Trace("$Message{$Tr}", TRACE_NOTICE);
+
+      // Ignore errors that are below the current error reporting level.
       return FALSE;
    }
 
-   throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments, $Backtrace);
+   throw new Gdn_ErrorException($Message, $ErrorNumber, $File, $Line, $Arguments);
 }
 
 /**
@@ -454,8 +447,9 @@ if (!function_exists('CleanErrorArguments')) {
    }
 }
 
-// Set up Garden to handle php errors
-set_error_handler('Gdn_ErrorHandler', E_ALL);
+// Set up Garden to handle php errors.
+// Remove the "& ~E_STRICT" from time to time to clean up some easy strict errors.
+set_error_handler('Gdn_ErrorHandler', E_ALL & ~E_STRICT);
 set_exception_handler('Gdn_ExceptionHandler');
 
 

@@ -778,14 +778,10 @@ if (!function_exists('Debug')) {
       $Changed = $Debug != $Value;
       $Debug = $Value;
       if ($Debug) {
-         error_reporting(E_ALL & ~E_STRICT & ~E_DEPRECATED);
-         ini_set('display_errors', 1);
-         Logger::logLevel(LogLevel::DEBUG);
+         Logger::logLevel(Logger::DEBUG);
       } else {
-         error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
-
          if ($Changed) {
-            Logger::logLevel(C('Garden.LogLevel', LogLevel::INFO));
+            Logger::logLevel(C('Garden.LogLevel', Logger::INFO));
          }
       }
    }

@@ -2,7 +2,7 @@
 
 /**
  * Model base class
- * 
+ *
  * This generic model can be instantiated (with the table name it is intended to
  * represent) and used directly, or it can be extended and overridden for more
  * complicated procedures related to different tables.
@@ -89,7 +89,7 @@ class Gdn_Model extends Gdn_Pluggable {
     * @var Gdn_Schema
     */
    public $Schema;
-   
+
    /**
     * Contains the sql driver for the object.
     *
@@ -145,17 +145,17 @@ class Gdn_Model extends Gdn_Pluggable {
 
    /**
     * Take all of the values that aren't in the schema and put them into the attributes column.
-    * 
+    *
     * @param array $Data
     * @param string $Name
     * @return array
     */
    protected function CollapseAttributes($Data, $Name = 'Attributes') {
       $this->DefineSchema();
-      
+
       $Row = array_intersect_key($Data, $this->Schema->Fields());
       $Attributes = array_diff_key($Data, $Row);
-      
+
       TouchValue($Name, $Row, array());
       if (isset($Row[$Name]) && is_array($Row[$Name]))
          $Row[$Name] = array_merge($Row[$Name], $Attributes);
@@ -163,10 +163,10 @@ class Gdn_Model extends Gdn_Pluggable {
          $Row[$Name] = $Attributes;
       return $Row;
    }
-   
+
    /**
     * Expand all of the values in the attributes column so they become part of the row.
-    * 
+    *
     * @param array $Row
     * @param string $Name
     * @return array
@@ -176,10 +176,10 @@ class Gdn_Model extends Gdn_Pluggable {
       if (isset($Row[$Name])) {
          $Attributes = $Row[$Name];
          unset($Row[$Name]);
-         
+
          if (is_string($Attributes))
             $Attributes = @unserialize($Attributes);
-         
+
          if (is_array($Attributes))
             $Row = array_merge($Row, $Attributes);
       }
@@ -201,7 +201,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $this->PrimaryKey = $this->PrimaryKey[0];
          }
 
-         $this->Validation->ApplyRulesBySchema($this->Schema);
+         $this->Validation->SetSchema($this->Schema);
       }
       return $this->Schema;
    }
@@ -244,30 +244,30 @@ class Gdn_Model extends Gdn_Pluggable {
       }
       return $PrimaryKeyVal;
    }
-   
+
    /**
     * Update a row in the database.
-    * 
+    *
     * @since 2.1
     * @param int $RowID
     * @param array|string $Property
-    * @param atom $Value 
+    * @param atom $Value
     */
    public function SetField($RowID, $Property, $Value = FALSE) {
       if (!is_array($Property))
          $Property = array($Property => $Value);
-      
-      $this->DefineSchema();      
+
+      $this->DefineSchema();
       $Set = array_intersect_key($Property, $this->Schema->Fields());
       self::SerializeRow($Set);
       $this->SQL->Put($this->Name, $Set, array($this->PrimaryKey => $RowID));
    }
-   
+
    /**
     * Serialize Attributes and Data columns in a row.
-    * 
+    *
     * @param array $Row
-    * @since 2.1 
+    * @since 2.1
     */
    public static function SerializeRow(&$Row) {
       foreach ($Row as $Name => &$Value) {
@@ -290,13 +290,13 @@ class Gdn_Model extends Gdn_Pluggable {
          // This is done after validation to allow custom validations to work.
          $SchemaFields = $this->Schema->Fields();
          $Fields = array_intersect_key($Fields, $SchemaFields);
-         
+
          // Quote all of the fields.
          $QuotedFields = array();
          foreach ($Fields as $Name => $Value) {
             if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
                $Value = empty($Value) ? NULL : serialize($Value);
-            
+
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 
@@ -318,8 +318,8 @@ class Gdn_Model extends Gdn_Pluggable {
       // primary key (always included in $Where when updating) might be "required"
       $AllFields = $Fields;
       if (is_array($Where))
-         $AllFields = array_merge($Fields, $Where); 
-         
+         $AllFields = array_merge($Fields, $Where);
+
       if ($this->Validate($AllFields)) {
          $this->AddUpdateFields($Fields);
 
@@ -333,7 +333,7 @@ class Gdn_Model extends Gdn_Pluggable {
          foreach ($Fields as $Name => $Value) {
             if (is_array($Value) && in_array($Name, array('Attributes', 'Data')))
                $Value = empty($Value) ? NULL : serialize($Value);
-            
+
             $QuotedFields[$this->SQL->QuoteIdentifier(trim($Name, '`'))] = $Value;
          }
 
@@ -360,10 +360,10 @@ class Gdn_Model extends Gdn_Pluggable {
       }
       return $Result;
    }
-   
+
    /**
     * Filter out any potentially insecure fields before they go to the database.
-    * @param array $Data 
+    * @param array $Data
     */
    public function FilterForm($Data) {
       $Data = array_diff_key($Data, array('Attributes' => 0, 'DateInserted' => 0, 'InsertUserID' => 0, 'InsertIPAddress' => 0, 'CheckBoxes' => 0,
@@ -398,14 +398,14 @@ class Gdn_Model extends Gdn_Pluggable {
 
       return $this->SQL->Get($this->Name, $OrderFields, $OrderDirection, $Limit, $PageNumber);
    }
-   
+
    /**
     * Returns a count of the # of records in the table
     * @param array $Wheres
     */
    public function GetCount($Wheres = '') {
       $this->_BeforeGet();
-      
+
       $this->SQL
          ->Select('*', 'count', 'Count')
          ->From($this->Name);
@@ -427,24 +427,24 @@ class Gdn_Model extends Gdn_Pluggable {
     * @param string $DatasetType The format of the result dataset.
     * @param array $Options options to pass to the database.
     * @return array|object
-    * 
+    *
     * @since 2.3 Added the $Options parameter.
     */
    public function GetID($ID, $DatasetType = FALSE, $Options = array()) {
       $this->Options($Options);
       $Result = $this->GetWhere(array($this->PrimaryKey => $ID))->FirstRow($DatasetType);
-      
+
       $Fields = array('Attributes', 'Data');
-      
+
       foreach ($Fields as $Field) {
          if (is_array($Result)) {
             if (isset($Result[$Field]) && is_string($Result[$Field])) {
                $Val = unserialize($Result[$Field]);
                if ($Val)
-                  $Result[$Field] = $Val; 
+                  $Result[$Field] = $Val;
                else
                   $Result[$Field] = $Val;
-            }               
+            }
          } elseif (is_object($Result)) {
             if (isset($Result->$Field) && is_string($Result->$Field)) {
                $Val = unserialize($Result->$Field);
@@ -455,7 +455,7 @@ class Gdn_Model extends Gdn_Pluggable {
             }
          }
       }
-      
+
       return $Result;
    }
 
@@ -471,7 +471,7 @@ class Gdn_Model extends Gdn_Pluggable {
     */
    public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
       $this->_BeforeGet();
-      
+
       return $this->SQL->GetWhere($this->Name, $Where, $OrderFields, $OrderDirection, $Limit, $Offset);
    }
 
@@ -544,7 +544,7 @@ class Gdn_Model extends Gdn_Pluggable {
          $Fields['UpdateIPAddress'] = Gdn::Request()->IpAddress();
       }
    }
-   
+
    /**
     * Gets/sets an option on the object.
     *
@@ -565,11 +565,11 @@ class Gdn_Model extends Gdn_Pluggable {
    }
 
 	public function SaveToSerializedColumn($Column, $RowID, $Name, $Value = '') {
-		
+
 		if (!isset($this->Schema)) $this->DefineSchema();
 		// TODO: need to be sure that $this->PrimaryKey is only one primary key
 		$FieldName = $this->PrimaryKey;
-		
+
 		// Load the existing values
 		$Row = $this->SQL
 			->Select($Column)
@@ -577,18 +577,18 @@ class Gdn_Model extends Gdn_Pluggable {
 			->Where($FieldName, $RowID)
 			->Get()
 			->FirstRow();
-		
+
 		if(!$Row) throw new Exception(T('ErrorRecordNotFound'));
 		$Values = Gdn_Format::Unserialize($Row->$Column);
-		
+
 		if (is_string($Values) && $Values != '')
 			throw new Exception(T('Serialized column failed to be unserialized.'));
-		
+
 		if (!is_array($Values)) $Values = array();
 		if (!is_array($Name)) $Name = array($Name => $Value); // Assign the new value(s)
 
 		$Values = Gdn_Format::Serialize(array_merge($Values, $Name));
-		
+
 		// Save the values back to the db
 		return $this->SQL
 			->From($this->Name)
@@ -596,12 +596,12 @@ class Gdn_Model extends Gdn_Pluggable {
 			->Set($Column, $Values)
 			->Put();
 	}
-   
-    
+
+
 	public function SetProperty($RowID, $Property, $ForceValue = FALSE) {
 		if (!isset($this->Schema)) $this->DefineSchema();
 		$PrimaryKey = $this->PrimaryKey;
-        
+
 		if ($ForceValue !== FALSE) {
             $Value = $ForceValue;
 		} else {
@@ -615,12 +615,12 @@ class Gdn_Model extends Gdn_Pluggable {
             ->Put();
 		return $Value;
    }
-   
+
    /**
     * Get something from $Record['Attributes'] by dot-formatted key
-    * 
+    *
     * Pass record byref
-    * 
+    *
     * @param array $Record
     * @param string $Attribute
     * @param mixed $Default Optional.
@@ -630,23 +630,23 @@ class Gdn_Model extends Gdn_Pluggable {
       $RV = "Attributes.{$Attribute}";
       return GetValueR($RV, $Record, $Default);
    }
-   
+
    /**
     * Set something on $Record['Attributes'] by dot-formatted key
-    * 
+    *
     * Pass record byref
-    * 
+    *
     * @param array $Record
     * @param string $Attribute
     * @param mixed $Value
-    * @return mixed 
+    * @return mixed
     */
    public static function SetRecordAttribute(&$Record, $Attribute, $Value) {
       if (!array_key_exists('Attributes', $Record))
          $Record['Attributes'] = array();
-      
+
       if (!is_array($Record['Attributes'])) return NULL;
-      
+
       $Work = &$Record['Attributes'];
       $Parts = explode('.', $Attribute);
       while ($Part = array_shift($Parts)) {
@@ -654,9 +654,9 @@ class Gdn_Model extends Gdn_Pluggable {
          $Work[$Part] = $SetValue;
          $Work = &$Work[$Part];
       }
-      
+
       return $Value;
    }
-   
+
 }
 

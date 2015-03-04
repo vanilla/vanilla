@@ -27,7 +27,7 @@ class PromotedContentModule extends Gdn_Module {
 
    /**
     * Parameters for the selector method
-    * @var type
+    * @var mixed
     */
    public $Selection;
 
@@ -73,11 +73,88 @@ class PromotedContentModule extends Gdn_Module {
     */
    public $Expiry = 60;
 
+   /**
+    * @var array Whitelist of accepted parameters.
+    */
+   public $Properties = array(
+      'Selector',
+      'Selection',
+      'ContentType',
+      'Limit',
+      'Group',
+      'TitleLimit',
+      'BodyLimit',
+      'Expiry'
+   );
+
    public function __construct() {
       parent::__construct();
       $this->_ApplicationFolder = 'vanilla';
    }
 
+   /**
+    * Set class properties.
+    *
+    * @param array $Parameters Use lowercase key names that map to class properties.
+    */
+   public function Load($Parameters = array()) {
+      $Result = $this->Validate($Parameters);
+      if ($Result === true) {
+         // Match existing properties to validates parameters.
+         foreach ($this->Properties as $Property) {
+            $key = strtolower($Property);
+            if (isset($Parameters[$key])) {
+               $this->$Property = $Parameters[$key];
+            }
+         }
+         return true;
+      } else {
+         // Error messages.
+         return $Result;
+      }
+   }
+
+   /**
+    * Validate data to be used as class properties.
+    *
+    * @param array $Parameters.
+    *
+    * @return mixed true on success or string (message) on error.
+    */
+   public function Validate($Parameters = array()) {
+      $validation = new Gdn_Validation();
+
+      // Validate integer properties.
+      $validation->applyRule('expiry', 'Integer');
+      $validation->applyRule('limit', 'Integer');
+      $validation->applyRule('bodylimit', 'Integer');
+      $validation->applyRule('titlelimit', 'Integer');
+      $validation->applyRule('group', 'Integer');
+
+      // Validate selection.
+      $validation->applyRule('selection', 'String');
+      $validation->applyRule('selection', 'Required');
+
+      // Validate selector.
+      $validation->applyRule('selector', 'Required');
+      $selectorWhitelist = array('role', 'rank', 'category', 'score');
+      if (isset($Parameters['selector']) && !in_array($Parameters['selector'], $selectorWhitelist)) {
+         $validation->AddValidationResult('selector', 'Invalid selector.');
+      }
+
+      // Validate ContentType.
+      $typeWhitelist = array('all', 'discussions', 'comments');
+      if (isset($Parameters['contenttype']) && !in_array($Parameters['contenttype'], $typeWhitelist)) {
+         $validation->AddValidationResult('contenttype', 'Invalid contenttype.');
+      }
+
+      $result = $validation->validate($Parameters);
+      return ($result === true) ? true : $validation->resultsText();
+   }
+
+   /**
+    * Get data based on class properties.
+    */
    public function GetData() {
       $this->SetData('Content', FALSE);
       $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
@@ -89,10 +166,11 @@ class PromotedContentModule extends Gdn_Module {
    }
 
    /**
-    * Select content based on author RoleID
+    * Select content based on author RoleID.
     *
-    * @param array $Parameters
-    * @return boolean
+    * @param mixed $Parameters
+    *
+    * @return array|false
     */
    protected function SelectByRole($Parameters) {
       if (!is_array($Parameters)) {
@@ -102,7 +180,7 @@ class PromotedContentModule extends Gdn_Module {
       }
 
       // Lookup role name -> roleID
-      if (is_string($RoleID)) {
+      if ($RoleID && is_string($RoleID)) {
          $RoleModel = new RoleModel();
          $Roles = explode(',', $RoleID);
          $RoleID = array();
@@ -118,7 +196,9 @@ class PromotedContentModule extends Gdn_Module {
          }
       }
 
-      if (empty($RoleID) || !sizeof($RoleID)) return FALSE;
+      if (empty($RoleID) || !sizeof($RoleID)) {
+         return false;
+      }
 
       // Check cache
       $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleID}";
@@ -177,14 +257,22 @@ class PromotedContentModule extends Gdn_Module {
    }
 
    /**
-    * Select content based on author RankID
+    * Select content based on author RankID.
     *
-    * @param array $Parameters
-    * @return boolean
+    * @param mixed $Parameters
+    *
+    * @return array|false
     */
    protected function SelectByRank($Parameters) {
-      $RankID = GetValue('RankID', $Parameters, NULL);
-      if (!$RankID) return FALSE;
+      if (!is_array($Parameters)) {
+         $RankID = $Parameters;
+      } else {
+         $RankID = GetValue('RankID', $Parameters, NULL);
+      }
+
+      if (!$RankID) {
+         return false;
+      }
 
       // Check cache
       $SelectorRankCacheKey = "modules.promotedcontent.rank.{$RankID}";
@@ -243,14 +331,22 @@ class PromotedContentModule extends Gdn_Module {
    }
 
    /**
-    * Select content based on its CategoryID
+    * Select content based on its CategoryID.
     *
-    * @param integer $CategoryID
-    * @return boolean
+    * @param mixed $Parameters
+    *
+    * @return array|false
     */
-   protected function SelectByCategory($CategoryID) {
-      $CategoryID = GetValue('CategoryID', $Parameters, NULL);
-      if (!$CategoryID) return FALSE;
+   protected function SelectByCategory($Parameters) {
+      if (!is_array($Parameters)) {
+         $CategoryID = $Parameters;
+      } else {
+         $CategoryID = GetValue('CategoryID', $Parameters, NULL);
+      }
+
+      if (!$CategoryID) {
+         return false;
+      }
 
       // Check cache
       $SelectorCategoryCacheKey = "modules.promotedcontent.category.{$CategoryID}";
@@ -278,6 +374,7 @@ class PromotedContentModule extends Gdn_Module {
                ->OrderBy('DateLastComment', 'DESC')
                ->Limit($this->Limit)
                ->Get()->Result(DATASET_TYPE_ARRAY);
+            $CommentDiscussionIDs = array_column($CommentDiscussionIDs, 'DiscussionID');
 
             $Comments = Gdn::SQL()->Select('c.*')
                ->From('Comment c')
@@ -308,21 +405,22 @@ class PromotedContentModule extends Gdn_Module {
    }
 
    /**
-    * Select content based on its Score
+    * Select content based on its Score.
     *
-    * @param array $Parameters
-    * @todo complete
-    * @return boolean
+    * @param mixed $Parameters
+    *
+    * @return array|false
     */
    protected function SelectByScore($Parameters) {
       if (!is_array($Parameters)) {
          $MinScore = $Parameters;
       } else {
-         $MinScore = GetValue('Score', $Parameters, NULL);
+         $MinScore = GetValue('Score', $Parameters, null);
       }
 
-      if (!is_integer($MinScore))
-         $MinScore = FALSE;
+      if (!is_integer($MinScore)) {
+         $MinScore = false;
+      }
 
       // Check cache
       $SelectorScoreCacheKey = "modules.promotedcontent.score.{$MinScore}";
@@ -382,7 +480,7 @@ class PromotedContentModule extends Gdn_Module {
     * This uses the Reactions caching system & options.
     *
     * @param array $Parameters Not used.
-    * @return array $Content
+    * @return array|false $Content
     */
    protected function SelectByPromoted($Parameters) {
       if (!class_exists('ReactionModel')) {
@@ -418,8 +516,9 @@ class PromotedContentModule extends Gdn_Module {
    protected function JoinCategory(&$Comments) {
       $DiscussionIDs = array();
 
-      foreach ($Comments as &$Comment)
+      foreach ($Comments as &$Comment) {
          $DiscussionIDs[$Comment['DiscussionID']] = TRUE;
+      }
       $DiscussionIDs = array_keys($DiscussionIDs);
 
       $Discussions = Gdn::SQL()->Select('d.*')
@@ -428,8 +527,9 @@ class PromotedContentModule extends Gdn_Module {
          ->Get()->Result(DATASET_TYPE_ARRAY);
 
       $DiscussionsByID = array();
-      foreach ($Discussions as $Discussion)
+      foreach ($Discussions as $Discussion) {
          $DiscussionsByID[$Discussion['DiscussionID']] = $Discussion;
+      }
       unset($Discussions);
 
       foreach ($Comments as &$Comment) {
@@ -482,7 +582,7 @@ class PromotedContentModule extends Gdn_Module {
                $Fields = array_merge($Fields, array('CommentID'));
 
                // Comment specific
-               $Replacement['Name'] = GetValueR('Discussion.Name', $ContentItem, $ContentItem['Name']);
+               $Replacement['Name'] = GetValueR('Discussion.Name', $ContentItem, val('Name', $ContentItem));
                break;
 
             case 'discussion':
@@ -508,7 +608,9 @@ class PromotedContentModule extends Gdn_Module {
     * @param array $Content Content array, by reference
     */
    protected function Security(&$Content) {
-      if (!is_array($Content)) return;
+      if (!is_array($Content)) {
+         return;
+      }
       $Content = array_filter($Content, array($this, 'SecurityFilter'));
    }
 
@@ -520,15 +622,17 @@ class PromotedContentModule extends Gdn_Module {
     */
    protected function SecurityFilter($ContentItem) {
       $CategoryID = GetValue('CategoryID', $ContentItem, NULL);
-      if (is_null($CategoryID) || $CategoryID === FALSE)
-         return FALSE;
+      if (is_null($CategoryID) || $CategoryID === FALSE) {
+         return false;
+      }
 
       $Category = CategoryModel::Categories($CategoryID);
       $CanView = GetValue('PermsDiscussionsView', $Category);
-      if (!$CanView)
-         return FALSE;
+      if (!$CanView) {
+         return false;
+      }
 
-      return TRUE;
+      return true;
    }
 
    /**
@@ -574,8 +678,9 @@ class PromotedContentModule extends Gdn_Module {
     * @return string
     */
    public function ToString() {
-      if ($this->Data('Content', NULL) == NULL)
+      if ($this->Data('Content', NULL) == NULL) {
          $this->GetData();
+      }
 
       return parent::ToString();
    }

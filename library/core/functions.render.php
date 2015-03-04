@@ -231,21 +231,27 @@ if (!function_exists('Condense')) {
 
 if (!function_exists('CountString')) {
    function CountString($Number, $Url = '', $Options = array()) {
-      if (is_string($Options))
-         $Options = array('cssclass' => $Options);
-      $Options = array_change_key_case($Options);
-      $CssClass = GetValue('cssclass', $Options, '');
-
-      if ($Number === NULL && $Url) {
-         $CssClass = ConcatSep(' ', $CssClass, 'Popin TinyProgress');
-         $Url = htmlspecialchars($Url);
-         $Result = "<span class=\"$CssClass\" rel=\"$Url\"></span>";
-      } elseif ($Number) {
-         $Result = " <span class=\"Count\">$Number</span>";
-      } else {
-         $Result = '';
+      if (!$Number && $Number !== Null) {
+         return '';
       }
-      return $Result;
+      
+      if (is_array($Options)) {
+         $Options = array_change_key_case($Options);
+         $CssClass = val('cssclass', $Options, '');
+      } else {
+         $CssClass = $Options;
+      }
+      
+      if ($Number) {
+         $CssClass = trim($CssClass.' Count', ' ');
+         return "<span class=\"$CssClass\">$Number</span>";
+      } elseif ($Number === NULL && $Url) {
+         $CssClass = trim($CssClass.' Popin TinyProgress', ' ');
+         $Url = htmlspecialchars($Url);
+         return "<span class=\"$CssClass\" rel=\"$Url\"></span>";
+      } else {
+         return '';
+      }
    }
 }
 

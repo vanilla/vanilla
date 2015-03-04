@@ -610,4 +610,28 @@ class DiscussionsController extends VanillaController {
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
       $this->Render();
    }
+
+   /**
+    * Endpoint for the PromotedContentModule's data.
+    *
+    * Parameters & values must be lowercase and via GET.
+    *
+    * @see PromotedContentModule
+    */
+   public function Promoted() {
+      // Create module & set data.
+      $PromotedModule = new PromotedContentModule();
+      $Status = $PromotedModule->Load(Gdn::Request()->Get());
+      if ($Status === true) {
+         // Good parameters.
+         $PromotedModule->GetData();
+         $this->SetData('Content', $PromotedModule->Data('Content'));
+      } else {
+         $this->SetData('Errors', $Status);
+      }
+
+      // Deliver JSON results.
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->Render();
+   }
 }

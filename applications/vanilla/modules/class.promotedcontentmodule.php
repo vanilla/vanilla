@@ -28,7 +28,7 @@ class PromotedContentModule extends Gdn_Module {
 
    /**
     * Parameters for the selector method
-    * @var mixed
+    * @var string|int
     */
    public $Selection;
 
@@ -120,7 +120,7 @@ class PromotedContentModule extends Gdn_Module {
     *
     * @param array $Parameters.
     *
-    * @return mixed true on success or string (message) on error.
+    * @return string|true True on success or string (message) on error.
     */
    public function Validate($Parameters = array()) {
       $validation = new Gdn_Validation();
@@ -168,7 +168,7 @@ class PromotedContentModule extends Gdn_Module {
    /**
     * Select content based on author RoleID.
     *
-    * @param mixed $Parameters
+    * @param array|int $Parameters
     *
     * @return array|false
     */
@@ -259,7 +259,7 @@ class PromotedContentModule extends Gdn_Module {
    /**
     * Select content based on author RankID.
     *
-    * @param mixed $Parameters
+    * @param array|int $Parameters
     *
     * @return array|false
     */
@@ -333,7 +333,7 @@ class PromotedContentModule extends Gdn_Module {
    /**
     * Select content based on its CategoryID.
     *
-    * @param mixed $Parameters
+    * @param array|int $Parameters
     *
     * @return array|false
     */
@@ -407,7 +407,7 @@ class PromotedContentModule extends Gdn_Module {
    /**
     * Select content based on its Score.
     *
-    * @param mixed $Parameters
+    * @param array|int $Parameters
     *
     * @return array|false
     */

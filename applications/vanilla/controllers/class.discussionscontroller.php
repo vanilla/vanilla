@@ -630,8 +630,7 @@ class DiscussionsController extends VanillaController {
          $this->SetData('Errors', $Status);
       }
 
-      // Deliver JSON results.
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $this->Render();
+      $this->DeliveryMethod();
+      $this->Render('promotedcontent', 'modules', 'vanilla');
    }
 }

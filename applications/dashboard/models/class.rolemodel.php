@@ -351,9 +351,7 @@ class RoleModel extends Gdn_Model {
 
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {
-         $this->Validation->AddValidationField('Permission', $FormPostValues);
-         $Fields = $this->Validation->ValidationFields();
-         $Permissions = ArrayValue('Permission', $Fields);
+         $Permissions = ArrayValue('Permission', $FormPostValues);
          $Fields = $this->Validation->SchemaValidationFields();
 
          if ($Insert === FALSE) {

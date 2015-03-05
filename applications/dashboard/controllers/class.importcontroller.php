@@ -2,9 +2,9 @@
 
 /**
  * Manages imports and exports of data.
- * 
+ *
  * This controller could use a code audit. Don't use it as sample code.
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -16,7 +16,7 @@ class ImportController extends DashboardController {
       parent::Initialize();
       Gdn_Theme::Section('Dashboard');
    }
-   
+
    /**
     * Export core Vanilla and Conversations tables.
     *
@@ -49,7 +49,7 @@ class ImportController extends DashboardController {
 
       $Ex->EndExport();
    }
-   
+
    /**
     * Manage importing process.
     *
@@ -98,7 +98,7 @@ class ImportController extends DashboardController {
          }
          $Imp->SaveState();
          $this->Form->SetValidationResults($Imp->Validation->Results());
-         
+
          $this->SetData('Stats', GetValue('Stats', $Imp->Data, array()));
          $this->SetData('CurrentStep', $Imp->CurrentStep);
          $this->SetData('CurrentStepMessage', GetValue('CurrentStepMessage', $Imp->Data, ''));
@@ -112,7 +112,7 @@ class ImportController extends DashboardController {
       $this->AddJsFile('import.js');
       $this->Render();
    }
-   
+
    /**
     * Main import page.
     *
@@ -224,7 +224,7 @@ class ImportController extends DashboardController {
       }
       $this->Render();
    }
-   
+
    /**
     * Restart the import process. Undo any work we've done so far and erase state.
     *

@@ -13,7 +13,7 @@ if (!$CancelUrl) {
    <?php
 		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
 			echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
-	
+
       echo '<div class="FormWrapper">';
       echo $this->Form->Open();
       echo $this->Form->Errors();
@@ -23,11 +23,11 @@ if (!$CancelUrl) {
 			echo '<div class="P">';
 				echo '<div class="Category">';
 				echo $this->Form->Label('Category', 'CategoryID'), ' ';
-				echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
+				echo $this->Form->CategoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'IncludeNull' => TRUE));
 				echo '</div>';
 			echo '</div>';
       }
-      
+
       echo '<div class="P">';
 			echo $this->Form->Label('Discussion Title', 'Name');
 			echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
@@ -35,8 +35,8 @@ if (!$CancelUrl) {
 
       $this->FireEvent('BeforeBodyInput');
 		echo '<div class="P">';
-         echo $this->Form->BodyBox('Body', array('Table' => 'Discussion'));
-      
+         echo $this->Form->BodyBox('Body', array('Table' => 'Discussion', 'FileUpload' => true));
+
 //	      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'format' => $this->Data('Discussion.Format'))), 'div', array('class' => 'TextBoxWrapper'));
 		echo '</div>';
 
@@ -59,7 +59,7 @@ if (!$CancelUrl) {
 	         echo '<ul class="List Inline PostOptions">' . $Options .'</ul>';
 			echo '</div>';
       }
-      
+
       $this->FireEvent('AfterDiscussionFormOptions');
 
       echo '<div class="Buttons">';

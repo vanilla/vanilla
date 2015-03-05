@@ -942,6 +942,9 @@ class DiscussionModel extends VanillaModel {
          $this->AddDenormalizedViews($Data);
       }
 
+      $this->EventArguments['Data'] =& $Data;
+      $this->FireEvent('AfterAddColumns');
+
       return $Data;
    }
 
@@ -1539,11 +1542,10 @@ class DiscussionModel extends VanillaModel {
             $Fields = $this->Validation->SchemaValidationFields();
 
             // Get DiscussionID if one was sent
-            $DiscussionID = intval(ArrayValue('DiscussionID', $Fields, 0));
+            $DiscussionID = intval(val('DiscussionID', $Fields, 0));
 
-            // Remove the primary key from the fields for saving
-            $Fields = RemoveKeyFromArray($Fields, 'DiscussionID');
-
+            // Remove the primary key from the fields for saving.
+            unset($Fields['DiscussionID']);
             $StoredCategoryID = FALSE;
 
             if ($DiscussionID > 0) {

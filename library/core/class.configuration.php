@@ -712,9 +712,13 @@ class Gdn_Configuration extends Gdn_Pluggable {
          $Result = rename($TmpFile, $File);
       }
 
-      if ($Result && function_exists('apc_delete_file')) {
-         // This fixes a bug with some configurations of apc.
-         @apc_delete_file($File);
+      if ($Result) {
+         if (function_exists('apc_delete_file')) {
+            // This fixes a bug with some configurations of apc.
+            @apc_delete_file($File);
+         } elseif (function_exists('opcache_invalidate')) {
+            @opcache_invalidate($File);
+         }
       }
 
       return $Result;
@@ -1295,9 +1299,13 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                $Result = rename($TmpFile, $this->Source);
             }
 
-            if ($Result && function_exists('apc_delete_file')) {
-               // This fixes a bug with some configurations of apc.
-               @apc_delete_file($this->Source);
+            if ($Result) {
+               if (function_exists('apc_delete_file')) {
+                  // This fixes a bug with some configurations of apc.
+                  @apc_delete_file($this->Source);
+               } elseif (function_exists('opcache_invalidate')) {
+                  @opcache_invalidate($this->Source);
+               }
             }
 
             $this->Dirty = FALSE;

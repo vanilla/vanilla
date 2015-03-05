@@ -2452,11 +2452,11 @@ class UserModel extends Gdn_Model {
       if (!is_array($AllIPs))
          $AllIPs = array();
       if ($IP = GetValue('InsertIPAddress', $User))
-         $AllIPs[] = ForceIPv4($IP);
+         array_unshift($AllIPs, ForceIPv4($IP));
       if ($IP = GetValue('LastIPAddress', $User))
-         $AllIPs[] = $IP;
-      // This will be a unique list of IPs, most recently used last. array_unique keeps the first key found.
-      $AllIPs = array_reverse(array_unique(array_reverse($AllIPs)));
+         array_unshift($AllIPs, $IP);
+      // This will be a unique list of IPs, most recently used first. array_unique keeps the first key found.
+      $AllIPs = array_unique($AllIPs);
       $Fields['AllIPAddresses'] = $AllIPs;
 
       // Set the hour offset based on the client's clock.
@@ -3588,7 +3588,7 @@ class UserModel extends Gdn_Model {
             $Property['AllIPAddresses'] = implode(',', $IPs);
             // Ensure this isn't too big for our column
             while (strlen($Property['AllIPAddresses']) > $Fields['AllIPAddresses']->Length) {
-              array_shift($IPs);
+              array_pop($IPs);
               $Property['AllIPAddresses'] = implode(',', $IPs);
             }
          }

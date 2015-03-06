@@ -45,7 +45,7 @@ If you professionally run a large community or enterprise forum, our cloud solut
 * pdo_mysql module must be enabled
 * MySQL 5 or newer
 
-Vanilla 2.1 will be the last version to support PHP 5.2. PHP 5.4 or higher will be required in the future.
+Vanilla 2.1 will be the last version to support PHP 5.2. Vanilla 2.2 will require PHP 5.3. Vanilla is compatible up to PHP 5.6 (the current release) and we always recommend using the lastest PHP release whenever possible. We plan to raise our requirements to PHP 5.4 in the near future.
 
 Vanilla ships with a `.htaccess` file for Apache support. Nginx and IIS require additional configuration.
 
@@ -109,17 +109,14 @@ To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Por
 We've adopted the [git flow branching model](http://nvie.com/posts/a-successful-git-branching-model) in our projects.
 The creators of git flow released a [short intro video](http://vimeo.com/16018419) to explain the model.
 
-The `master` branch is production-ready for a our cloud product but is not yet vetted for open source release.
-Only small patches and `hotfix/x` branches land against `master`, and it always has a stable version number.
-The `develop` and `stage` branches are pre-production and are where we land `feature/x` branches for integration testing.
+The `master` branch is production-ready for a our cloud product but is not yet vetted for open source release (alternate platforms).
+Reviewed, stable changes land against `master`.
+
+The `stage` branch is pre-production and are where we land riskier changesets for further integration testing. We typically aim to merge `stage` into `master` on a monthly basis.
 
 Our open source release branches are named by version number, e.g. `2.0` and `2.1`.
 We begin release branches with a beta (b1) designation and progress them thru release candidate to stable.
 All open source releases (included pre-releases) are tagged.
-
-After `2.1`, we will be leap-frogging version numbers between `master` and releases.
-Releases will receive the next odd-point number and `master` will then jump to the next even-point number.
-Therefore, the next open source release after 2.1 will be 2.3. When the 2.3 beta begins, `master` will move to 2.4.
 
 ## Reporting Security Issues
 

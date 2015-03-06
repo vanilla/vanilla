@@ -16,7 +16,7 @@ $PluginInfo['editor'] = array(
       'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit'
    ),
    'SettingsUrl' => '/settings/editor',
-   'SettingsPermission' => 'Garden.Setttings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
 class EditorPlugin extends Gdn_Plugin {
@@ -158,7 +158,7 @@ class EditorPlugin extends Gdn_Plugin {
           'emoji' => true,
           'links' => true,
           'images' => false,
-          'uploads' => true,
+          'uploads' => false,
 
           'sep-align' => true, // separator
           'alignleft' => true,
@@ -387,11 +387,14 @@ class EditorPlugin extends Gdn_Plugin {
     * @param array $editorToolbarAll Holds the "kitchen sink" of editor actions
     * @return array Returns the array of allowed editor toolbar actions
     */
-   protected function getEditorToolbar() {
+   protected function getEditorToolbar($attributes = array()) {
       $editorToolbar        = array();
       $editorToolbarAll     = array();
       $allowedEditorActions = $this->getAllowedEditorActions();
       $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
+      if (val('FileUpload', $attributes)) {
+         $allowedEditorActions['uploads'] = true;
+      }
       $fontColorList        = $this->getFontColorList();
       $fontFormatOptions = $this->getFontFormatOptions();
       $fontFamilyOptions = $this->getFontFamilyOptions();
@@ -684,6 +687,11 @@ class EditorPlugin extends Gdn_Plugin {
       // when in embedded. The only problem is figuring out how to know when
       // content is embedded.
 
+      $attributes = array();
+      if (val('Attributes', $Args)) {
+         $attributes = val('Attributes', $Args);
+      }
+
       // TODO move this property to constructor
       $this->Format = $Sender->GetValue('Format');
 
@@ -717,7 +725,7 @@ class EditorPlugin extends Gdn_Plugin {
           */
          if (!isset($c->Data['_EditorToolbar'])) {
 
-            $editorToolbar = $this->getEditorToolbar();
+            $editorToolbar = $this->getEditorToolbar($attributes);
             $this->EventArguments['EditorToolbar'] =& $editorToolbar;
             $this->FireEvent('InitEditorToolbar');
 

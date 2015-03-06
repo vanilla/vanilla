@@ -1,6 +1,3 @@
-# Automatically normalize line endings for all text-based files
-* text=auto
-
 # Enforce Unix newlines
 *.css   text eol=lf
 *.html  text eol=lf

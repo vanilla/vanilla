@@ -1998,18 +1998,22 @@ code, pre {
    -webkit-border-radius: 2px;
    background: #ff9;
    padding: 4px 8px;
-   white-space: pre;
    font-family: monospace;
    overflow: auto;
-	border: 1px solid #eec;
+   border: 1px solid #eec;
+}
+code {
+   white-space: pre-wrap;
 }
 pre {
    display: block;
    margin: 1em 0;
+   white-space: pre;
 }
 pre code {
    border: none;
    padding: 0;
+   white-space: pre;
 }
 mark {
     padding: 0 2px;

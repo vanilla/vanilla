@@ -30,7 +30,7 @@
    }
 
    echo '<div class="P">';
-   echo $this->Form->BodyBox('Body', array('Table' => 'ConversationMessage'));
+   echo $this->Form->BodyBox('Body', array('Table' => 'ConversationMessage', 'FileUpload' => true));
 //      echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
    echo '</div>';
 
@@ -38,7 +38,7 @@
    echo $this->Form->Button('Start Conversation', array('class' => 'Button Primary DiscussionButton'));
    echo Anchor(T('Cancel'), '/messages/inbox', 'Button Cancel');
    echo '</div>';
-   
+
    echo $this->Form->Close();
    echo '</div>';
    ?>

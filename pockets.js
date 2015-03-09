@@ -19,6 +19,25 @@ jQuery(document).ready(function($) {
       }
    };
 
+   var toggleRepeat = function() {
+      var selected = $("select[name$=Location] option:selected").text();
+      switch (selected) {
+         case 'Custom':
+            $('label[for="Form_RepeatType"]').hide();
+            $('.RadioLabel').hide();
+            $('.RepeatEveryOptions').hide();
+            $('.RepeatIndexesOptions').hide();
+            break;
+         default:
+            $('label[for="Form_RepeatType"]').show();
+            $('.RadioLabel').show();
+            revealRepeatOptions();
+      }
+   }
+
+   $("select[name$=Location]").change(toggleRepeat);
+   $(document).ready(toggleRepeat);
+
    $("input[name$=RepeatType]").click(revealRepeatOptions);
 
    revealRepeatOptions();

@@ -201,7 +201,9 @@ class PromotedContentModule extends Gdn_Module {
       }
 
       // Check cache
-      $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleID}";
+      sort($RoleID);
+      $RoleIDKey = implode('-', $RoleID);
+      $SelectorRoleCacheKey = "modules.promotedcontent.role.{$RoleIDKey}";
       $Content = Gdn::Cache()->Get($SelectorRoleCacheKey);
 
       if ($Content == Gdn_Cache::CACHEOP_FAILURE) {

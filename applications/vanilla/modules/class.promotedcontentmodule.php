@@ -266,13 +266,26 @@ class PromotedContentModule extends Gdn_Module {
     * @return array|false
     */
    protected function SelectByRank($Parameters) {
+      // Must have Ranks enabled.
+      if (!class_exists('RankModel')) {
+         return false;
+      }
+
       if (!is_array($Parameters)) {
          $RankID = $Parameters;
       } else {
          $RankID = GetValue('RankID', $Parameters, NULL);
       }
 
-      if (!$RankID) {
+      // Check for Rank passed by name.
+      if (!is_numeric($RankID)) {
+         $RankModel = new RankModel();
+         $Rank = $RankModel->GetWhere(array('Name' => $RankID))->FirstRow();
+         $RankID = val('RankID', $Rank);
+      }
+
+      // Disallow blank or multiple ranks.
+      if (!$RankID || is_array($RankID)) {
          return false;
       }
 
@@ -347,14 +360,11 @@ class PromotedContentModule extends Gdn_Module {
       }
 
       // Allow category names, and validate category exists.
-      // Disallow multiple categories.
-      if (is_array($CategoryID)) {
-         $CategoryID = array_shift($CategoryID);
-      }
       $Category = CategoryModel::Categories($CategoryID);
       $CategoryID = val('CategoryID', $Category);
 
-      if (!$CategoryID) {
+      // Disallow invalid or multiple categories.
+      if (!$CategoryID || is_array($CategoryID)) {
          return false;
       }
 

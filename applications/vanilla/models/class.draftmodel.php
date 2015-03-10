@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Vanilla
  */
- 
+
 /**
  * Manages unpublished drafts of comments and discussions.
  *
@@ -22,17 +22,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class DraftModel extends VanillaModel {
    /**
     * Class constructor. Defines the related database table name.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
    public function __construct() {
       parent::__construct('Draft');
    }
-   
+
    /**
     * Build base SQL query used by get methods.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -41,13 +41,13 @@ class DraftModel extends VanillaModel {
          ->Select('d.*')
          ->From('Draft d');
    }
-   
+
 	/**
 	 * Gets drafts matching the given criteria.
-	 * 
+	 *
     * @since 2.0.0
     * @access public
-	 * 
+	 *
 	 * @param int $UserID Unique ID of user that wrote the drafts.
 	 * @param int $Offset Number of results to skip.
 	 * @param int $Limit Max number of drafts to return.
@@ -60,7 +60,7 @@ class DraftModel extends VanillaModel {
 
       if (!is_numeric($Limit) || $Limit < 1)
          $Limit = 100;
-         
+
       $this->DraftQuery();
       $this->SQL
          ->Select('d.Name, di.Name', 'coalesce', 'Name')
@@ -68,19 +68,19 @@ class DraftModel extends VanillaModel {
          ->Where('d.InsertUserID', $UserID)
          ->OrderBy('d.DateInserted', 'desc')
          ->Limit($Limit, $Offset);
-         
+
       if (is_numeric($DiscussionID) && $DiscussionID > 0)
          $this->SQL->Where('d.DiscussionID', $DiscussionID);
-      
+
       return $this->SQL->Get();
    }
-   
+
    /**
 	 * Gets data for a single draft.
-	 * 
+	 *
     * @since 2.0.0
     * @access public
-	 * 
+	 *
 	 * @param int $DraftID Unique ID of draft to get data for.
 	 * @return object SQL results.
 	 */
@@ -91,13 +91,13 @@ class DraftModel extends VanillaModel {
          ->Get()
          ->FirstRow();
    }
-   
+
    /**
 	 * Gets number of drafts a user has.
-	 * 
+	 *
     * @since 2.0.0
     * @access public
-	 * 
+	 *
 	 * @param int $UserID Unique ID of user to count drafts for.
 	 * @return int Total drafts.
 	 */
@@ -110,48 +110,52 @@ class DraftModel extends VanillaModel {
          ->FirstRow()
          ->CountDrafts;
    }
-   
+
    /**
 	 * Insert or update a draft from form values.
-	 * 
+	 *
     * @since 2.0.0
     * @access public
-	 * 
+	 *
 	 * @param array $FormPostValues Form values sent from form model.
 	 * @return int Unique ID of draft.
 	 */
    public function Save($FormPostValues) {
       $Session = Gdn::Session();
-      
+
       // Define the primary key in this model's table.
       $this->DefineSchema();
-      
-      // Add & apply any extra validation rules:      
+
+      // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Body', 'Required');
       $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
          $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
          $this->Validation->ApplyRule('Body', 'Length');
       }
-      
+
       // Get the DraftID from the form so we know if we are inserting or updating.
       $DraftID = ArrayValue('DraftID', $FormPostValues, '');
       $Insert = $DraftID == '' ? TRUE : FALSE;
-      
+
+      if (!$DraftID) {
+         unset($FormPostValues['DraftID']);
+      }
+
       // Remove the discussionid from the form value collection if it's empty
       if (array_key_exists('DiscussionID', $FormPostValues) && $FormPostValues['DiscussionID'] == '')
          unset($FormPostValues['DiscussionID']);
-      
+
       if ($Insert) {
          // If no categoryid is defined, grab the first available.
          if (ArrayValue('CategoryID', $FormPostValues) === FALSE)
             $FormPostValues['CategoryID'] = $this->SQL->Get('Category', '', '', 1)->FirstRow()->CategoryID;
-            
+
       }
       // Add the update fields because this table's default sort is by DateUpdated (see $this->Get()).
       $this->AddInsertFields($FormPostValues);
       $this->AddUpdateFields($FormPostValues);
-      
+
       // Remove checkboxes from the fields if they were unchecked
       if (ArrayValue('Announce', $FormPostValues, '') === FALSE)
          unset($FormPostValues['Announce']);
@@ -161,12 +165,12 @@ class DraftModel extends VanillaModel {
 
       if (ArrayValue('Sink', $FormPostValues, '') === FALSE)
          unset($FormPostValues['Sink']);
-         
+
       // Validate the form posted values
       if ($this->Validate($FormPostValues, $Insert)) {
          $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
          $DraftID = intval(ArrayValue('DraftID', $Fields, 0));
-         
+
          // If the post is new and it validates, make sure the user isn't spamming
          if ($DraftID > 0) {
             // Update the draft
@@ -179,18 +183,18 @@ class DraftModel extends VanillaModel {
             $this->UpdateUser($Session->UserID);
          }
       }
-      
+
       return $DraftID;
    }
 
    /**
 	 * Deletes a specified draft.
-	 * 
+	 *
 	 * This is a hard delete that completely removes it.
-	 * 
+	 *
     * @since 2.0.0
     * @access public
-	 * 
+	 *
 	 * @param int $DraftID Unique ID of the draft to be deleted.
 	 * @return bool Always returns TRUE.
 	 */
@@ -202,26 +206,26 @@ class DraftModel extends VanillaModel {
          ->Where('DraftID', $DraftID)
          ->Get()
          ->FirstRow();
-         
+
       $this->SQL->Delete('Draft', array('DraftID' => $DraftID));
       if (is_object($DraftUser))
          $this->UpdateUser($DraftUser->InsertUserID);
 
       return TRUE;
    }
-   
+
    /**
 	 * Updates a user's draft count.
-	 * 
+	 *
     * @since 2.0.0
     * @access public
-	 * 
+	 *
 	 * @param int $UserID Unique ID of the user to be updated.
 	 */
    public function UpdateUser($UserID) {
       // Retrieve a draft count
       $CountDrafts = $this->GetCount($UserID);
-      
+
       // Update CountDrafts column of user table fot this user
       Gdn::UserModel()->SetField($UserID, 'CountDrafts', $CountDrafts);
    }

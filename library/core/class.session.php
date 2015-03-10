@@ -258,31 +258,37 @@ class Gdn_Session {
    }
 
    /**
+    * Set a permission for the current runtime.
     *
+    * @param string|array $PermissionName
+    * @param null|bool $Value
     *
-   * @todo Add description.
-   * @param string|array $PermissionName
-   * @param mixed $Value
-   * @return NULL
-   */
-
+    * @return NULL
+    */
    public function SetPermission($PermissionName, $Value = NULL) {
       if (is_string($PermissionName)) {
-         if ($Value === NULL || $Value === TRUE)
+         if ($Value === NULL || $Value === TRUE) {
             $this->_Permissions[] = $PermissionName;
-         elseif ($Value === FALSE) {
+         } elseif ($Value === FALSE) {
             $Index = array_search($PermissionName, $this->_Permissions);
-            if ($Index !== FALSE)
+            if ($Index !== FALSE) {
                unset($this->_Permissions[$Index]);
-         } elseif (is_array($Value))
+            }
+         } elseif (is_array($Value)) {
             $this->_Permissions[$PermissionName] = $Value;
+         }
       } elseif (is_array($PermissionName)) {
-         if (array_key_exists(0, $PermissionName))
-            foreach ($PermissionName as $Name) $this->SetPermission($Name);
-         else
-            foreach ($PermissionName as $Name => $Value) $this->SetPermission($Name, $Value);
+         if (array_key_exists(0, $PermissionName)) {
+            foreach ($PermissionName as $Name) {
+               $this->SetPermission($Name);
+            }
+         } else {
+            foreach ($PermissionName as $Name => $Value) {
+               $this->SetPermission($Name, $Value);
+            }
+         }
       }
-    }
+   }
 
    /**
     * Gets the currently authenticated user's preference for the specified

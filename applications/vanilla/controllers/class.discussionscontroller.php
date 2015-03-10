@@ -626,6 +626,11 @@ class DiscussionsController extends VanillaController {
          // Good parameters.
          $PromotedModule->GetData();
          $this->SetData('Content', $PromotedModule->Data('Content'));
+
+         // Pass display properties to the view.
+         $this->Group = $PromotedModule->Group;
+         $this->TitleLimit = $PromotedModule->TitleLimit;
+         $this->BodyLimit = $PromotedModule->BodyLimit;
       } else {
          $this->SetData('Errors', $Status);
       }

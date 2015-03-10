@@ -346,6 +346,14 @@ class PromotedContentModule extends Gdn_Module {
          $CategoryID = GetValue('CategoryID', $Parameters, NULL);
       }
 
+      // Allow category names, and validate category exists.
+      // Disallow multiple categories.
+      if (is_array($CategoryID)) {
+         $CategoryID = array_shift($CategoryID);
+      }
+      $Category = CategoryModel::Categories($CategoryID);
+      $CategoryID = val('CategoryID', $Category);
+
       if (!$CategoryID) {
          return false;
       }

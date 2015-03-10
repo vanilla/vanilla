@@ -561,7 +561,7 @@ class PromotedContentModule extends Gdn_Module {
       }
 
       $Interleaved = array_reverse($Interleaved);
-      return $Interleaved;
+      return array_values($Interleaved);
    }
 
    /**

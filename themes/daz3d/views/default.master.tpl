@@ -23,6 +23,24 @@
 							<div class="Breadcrumbs">
 								{breadcrumbs}
 							</div>
+
+							<!-- Injecting thread title and/or styling vanilla breadcrumbs to match Shop breadcrumbs -->
+							{literal}
+							<script>
+								$forumThreadTitle = $( "#Item_0 h1" ).text();
+								$forumLastBreadcrumb = $( ".Breadcrumbs" ).find( "span" ).last();
+								$forumBreadcrumbInsertion = $forumLastBreadcrumb.parent().parent();
+
+								// If on a non-thread page, style the last breadcrumb,
+								// else add the thread name to the breadcrumbs	
+								if ( $forumThreadTitle == "" ) {
+									$forumLastBreadcrumb.addClass( "CurrentForumPage" );
+								} else {
+									$forumBreadcrumbInsertion.after( "<span class='Crumb'> › </span><span class='CurrentForumPage'>" + $forumThreadTitle + "</span>" );
+								}
+							</script>
+							{/literal}
+
 						</div><div class="clearfloat"></div>
 						<div class="Column ContentColumn page_content" id="Content">{asset name="Content"}</div>
 					</div>

@@ -224,7 +224,11 @@ class Gdn_Validation {
          if ($Field == 'Format') {
             $RuleNames[] = 'Format';
          }
-         
+
+         if (empty($RuleNames)) {
+            $RuleNames[] = 'None';
+         }
+
          // Assign the rules to the field.
          // echo '<div>Field: '.$Field.'</div>';
          // print_r($RuleNames);

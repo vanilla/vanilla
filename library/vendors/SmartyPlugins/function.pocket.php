@@ -17,11 +17,12 @@
 function smarty_function_pocket($Params, $Smarty) {
    if (!class_exists('PocketsPlugin'))
       return '';
-   
+
    $Name = GetValue('name', $Params);
    unset($Params['name']);
+   $Params['sender'] = $Smarty;
    
    $Result = PocketsPlugin::PocketString($Name, $Params);
-   
+
 	return $Result;
 }

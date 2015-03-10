@@ -12,7 +12,7 @@
 					<div class="Row">
 						<div class="ForumHeader crumbs daz-sticky" data-daz-sticky-side="top">
 							<div class="SiteMenuWrapper">
-								<i class="fd-navicon daz-toggler" data-toggleelem="#ForumMenu"></i>
+								<i class="fd-gears daz-toggler" data-toggleelem="#ForumMenu"></i>
 								<ul id="ForumMenu" class="SiteMenu">
 									{dashboard_link}
 									{discussions_link}

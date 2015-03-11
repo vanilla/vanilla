@@ -798,8 +798,16 @@ class UserModel extends Gdn_Model {
       $Join = GetValue('Join', $Options, array('Name', 'Email', 'Photo'));
       $UserPhotoDefaultUrl = function_exists('UserPhotoDefaultUrl');
 
-      foreach ($Data as &$Row) {
-         foreach ($Prefixes as $Px) {
+      // Workaround for https://github.com/facebook/hhvm/issues/1482
+      if (is_object($Data))
+        $RowResults = $Data->Result();
+      while (list($Index, $Current) = each ($Data)) {
+        if (is_array($Current)) {
+          $Row &= $RowResults[$Index];
+        } else {
+          $Row = $Current;
+        }
+        foreach ($Prefixes as $Px) {
             $ID = GetValue($Px.'UserID', $Row);
             if (is_numeric($ID)) {
                $User = GetValue($ID, $Users, FALSE);
@@ -820,8 +828,6 @@ class UserModel extends Gdn_Model {
                   SetValue($Px.$Column, $Row, NULL);
                }
             }
-
-
          }
       }
    }

@@ -463,7 +463,16 @@ class CategoryModel extends Gdn_Model {
     */
    public static function JoinCategories(&$Data, $Column = 'CategoryID', $Options = array()) {
       $Join = GetValue('Join', $Options, array('Name' => 'Category', 'PermissionCategoryID', 'UrlCode' => 'CategoryUrlCode'));
-      foreach ($Data as &$Row) {
+              // workaround for https://github.com/facebook/hhvm/issues/1482
+      if(is_object($Data))
+        $RowResults = $Data->Result();
+      while(list($Index, $Current) = each($Data)){
+         if(is_array($Current)){
+           $Row &= $RowResults[$Index];
+         } else {
+           $Row = $Current;
+         } 
+         
          $ID = GetValue($Column, $Row);
          $Category = self::Categories($ID);
          foreach ($Join as $N => $V) {

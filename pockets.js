@@ -23,15 +23,10 @@ jQuery(document).ready(function($) {
       var selected = $("select[name$=Location] option:selected").text();
       switch (selected) {
          case 'Custom':
-            $('label[for="Form_RepeatType"]').hide();
-            $('.RadioLabel').hide();
-            $('.RepeatEveryOptions').hide();
-            $('.RepeatIndexesOptions').hide();
+            $('.js-repeat').hide();
             break;
          default:
-            $('label[for="Form_RepeatType"]').show();
-            $('.RadioLabel').show();
-            revealRepeatOptions();
+            $('.js-repeat').show();
       }
    }
 

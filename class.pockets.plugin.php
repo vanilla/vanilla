@@ -17,7 +17,7 @@ $PluginInfo['Pockets'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
    'RequiredApplications' => array('Vanilla' => '2.1'),
-   'RegisterPermissions' => array('Plugins.Pockets.Manage', 'Garden.AdFree.Allow'),
+   'RegisterPermissions' => array('Plugins.Pockets.Manage', 'Garden.NoAds.Allow'),
    'SettingsUrl' => '/settings/pockets',
    'SettingsPermission' => 'Plugins.Pockets.Manage',
    'MobileFriendly' => TRUE,
@@ -472,7 +472,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
       $PermissionModel = Gdn::PermissionModel();
       $PermissionModel->Define(array(
-         'Garden.AdFree.Allow' => 0
+         'Garden.NoAds.Allow' => 0
       ));
    }
 

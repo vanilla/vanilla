@@ -56,8 +56,8 @@ class Pocket {
    /** $var array The repeat frequency. */
    public $MobileNever = FALSE;
 
-   /** $var boolean Is the pocket an ad? */
-   public $IsAd = FALSE;
+   /** $var string Pocket type */
+   public $Type;
 
    /** $var bool Whether to disable the pocket for embedded comments. * */
    public $EmbeddedNever = FALSE;
@@ -83,7 +83,7 @@ class Pocket {
          return FALSE;
       }
 
-      if ($this->IsAd && Gdn::Session()->CheckPermission('Garden.AdFree.Allow')) {
+      if ($this->IsAd() && Gdn::Session()->CheckPermission('Garden.NoAds.Allow')) {
          return FALSE;
       }
 
@@ -156,13 +156,17 @@ class Pocket {
       $this->Page = $Data['Page'];
       $this->MobileOnly = $Data['MobileOnly'];
       $this->MobileNever = $Data['MobileNever'];
-      $this->IsAd = $Data['Type'] == Pocket::TYPE_AD;
+      $this->Type = val('Type', $Data, Pocket::TYPE_DEFAULT);
       $this->EmbeddedNever = GetValue('EmbeddedNever', $Data);
       $this->ShowInDashboard = GetValue('ShowInDashboard', $Data);
 
       // parse the frequency.
       $Repeat = $Data['Repeat'];
       list($this->RepeatType, $this->RepeatFrequency) = Pocket::ParseRepeat($Repeat);
+   }
+
+   public function isAd() {
+      return $this->Type == Pocket::TYPE_AD;
    }
 
    public static $NameTranslations = array('conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments');

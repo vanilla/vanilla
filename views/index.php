@@ -35,6 +35,8 @@ echo Wrap($this->Data('Title'), 'h1');
       foreach ($this->Data('PocketData') as $PocketRow) {
       	 $MobileOnly = $PocketRow['MobileOnly'];
       	 $MobileNever = $PocketRow['MobileNever'];
+          $NoAds = $PocketRow['Type'] == Pocket::TYPE_AD;
+
          echo '<tr'.($PocketRow['Disabled'] != Pocket::DISABLED ? '' : ' class="Disabled"').'>';
 
          echo '<td>',
@@ -47,7 +49,7 @@ echo Wrap($this->Data('Title'), 'h1');
             '</td>';
 
          echo '<td>',htmlspecialchars($PocketRow['Page']), '</td>';
-         echo '<td  class="Alt">', htmlspecialchars($PocketRow['Location']); 
+         echo '<td  class="Alt">', htmlspecialchars($PocketRow['Location']);
          if ($MobileOnly) {
          	echo '<br>(', T('Shown only on mobile'), ')';
          }
@@ -56,6 +58,9 @@ echo Wrap($this->Data('Title'), 'h1');
          }
          if ($MobileNever && $MobileOnly) {
          	echo '<br><b>(', T('Hidden for everything!'), ')</b>';
+         }
+         if ($NoAds) {
+            echo '<br>(', T('Users with the no ads permission will not see this pocket.'), ')';
          }
          echo'</td>';
          echo '<td>', nl2br(htmlspecialchars(substr($PocketRow['Body'], 0, 200))), '</td>';

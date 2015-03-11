@@ -19,6 +19,20 @@ jQuery(document).ready(function($) {
       }
    };
 
+   var toggleRepeat = function() {
+      var selected = $("select[name$=Location] option:selected").text();
+      switch (selected) {
+         case 'Custom':
+            $('.js-repeat').hide();
+            break;
+         default:
+            $('.js-repeat').show();
+      }
+   }
+
+   $("select[name$=Location]").change(toggleRepeat);
+   $(document).ready(toggleRepeat);
+
    $("input[name$=RepeatType]").click(revealRepeatOptions);
 
    revealRepeatOptions();

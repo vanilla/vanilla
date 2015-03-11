@@ -934,6 +934,11 @@ class ActivityModel extends Gdn_Model {
                   $this->SQL->Put('Activity', array('DateUpdated' => $Comment['DateInserted']), array('ActivityID' => $_ActivityID));
                }
             }
+
+            // Send a notification to the original person.
+            if (val('ActivityType', $Activity) === 'WallPost') {
+               $this->NotifyWallComment($Comment, $Activity);
+            }
          }
 
          return $ID;
@@ -1366,6 +1371,30 @@ class ActivityModel extends Gdn_Model {
 //      decho($NewActivity, 'MergedActivity');
 //      die();
       return $NewActivity;
+   }
+
+   /**
+    * Notify the user of wall comments.
+    *
+    * @param $WallPost
+    */
+   protected function NotifyWallComment($Comment, $WallPost) {
+      $NotifyUser = Gdn::UserModel()->GetID($WallPost['ActivityUserID']);
+
+      $Activity = array(
+         'ActivityType' => 'WallComment',
+         'ActivityUserID' => $Comment['InsertUserID'],
+         'Format' => $Comment['Format'],
+         'NotifyUserID' => $WallPost['ActivityUserID'],
+         'RecordType' => 'ActivityComment',
+         'RecordID' => $Comment['ActivityCommentID'],
+         'RegardingUserID' => $WallPost['ActivityUserID'],
+         'Route' => UserUrl($NotifyUser, ''),
+         'Story' => $Comment['Body'],
+         'HeadlineFormat' => T('HeadlineFormat.NotifyWallComment', '{ActivityUserID,User} commented on your <a href="{Url,url}">wall</a>.')
+      );
+
+      $this->Save($Activity, 'WallComment');
    }
 
    protected function NotifyWallPost($WallPost) {

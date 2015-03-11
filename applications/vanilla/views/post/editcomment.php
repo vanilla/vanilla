@@ -8,7 +8,7 @@ $Session = Gdn::Session();
             <?php
             echo $this->Form->Open();
             echo $this->Form->Errors();
-            echo $this->Form->BodyBox('Body', array('Table' => 'Comment', 'tabindex' => 1));
+            echo $this->Form->BodyBox('Body', array('Table' => 'Comment', 'tabindex' => 1, 'FileUpload' => true));
             echo "<div class=\"Buttons\">\n";
             echo Anchor(T('Cancel'), '/', 'Button Cancel').' ';
             echo $this->Form->Button('Save Comment', array('class' => 'Button Primary CommentButton', 'tabindex' => 2));

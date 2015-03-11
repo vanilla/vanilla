@@ -876,11 +876,12 @@ class Gdn_Format {
             }
 
             // Allow the code tag to keep all enclosed HTML encoded.
-            $Mixed = preg_replace(
-               array('/<code([^>]*)>(.+?)<\/code>/sei'),
-               array('\'<code\'.RemoveQuoteSlashes(\'\1\').\'>\'.htmlspecialchars(RemoveQuoteSlashes(\'\2\')).\'</code>\''),
-               $Mixed
-            );
+            $Mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function($Matches) {
+               $Result = "<code{$Matches[1]}>".
+                  htmlspecialchars($Matches[2]).
+                  '</code>';
+               return $Result;
+            }, $Mixed);
 
             // Do HTML filtering before our special changes.
             $Result = $Formatter->Format($Mixed);
@@ -1128,7 +1129,19 @@ class Gdn_Format {
          return $Matches[0];
       $Url = $Matches[4];
 
-      $YoutubeUrlMatch = 'https?://(www\.)?youtube\.com\/watch\?(.*)?v=(?P<ID>[^&#]+)([^#]*)(?P<HasTime>#t=(?P<Time>[0-9]+))?';
+      // Supported youtube embed urls:
+      //
+      // http://www.youtube.com/playlist?list=PL4CFF79651DB8159B
+      // https://www.youtube.com/playlist?list=PL4CFF79651DB8159B
+      // https://www.youtube.com/watch?v=sjm_gBpJ63k&list=PL4CFF79651DB8159B&index=1
+      // http://youtu.be/sjm_gBpJ63k
+      // https://www.youtube.com/watch?v=sjm_gBpJ63k
+      // http://YOUTU.BE/sjm_gBpJ63k?list=PL4CFF79651DB8159B
+      // http://youtu.be/GUbyhoU81sQ?t=1m8s
+      // https://m.youtube.com/watch?v=iAEKPcz9www
+      // https://youtube.com/watch?v=iAEKPcz9www
+
+      $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>\w*)))(?:\?|\&)?(?:list=(?P<listId>[\w]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?/i';
       $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
@@ -1136,24 +1149,55 @@ class Gdn_Format {
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
+
       $TwitchUrlMatch = 'http://www.twitch.tv/([\w\d]+)';
       $HitboxUrlMatch = 'http://www.hitbox.tv/([\w\d]+)';
 
       // Youtube
-      if ((preg_match("`{$YoutubeUrlMatch}`", $Url, $Matches)
-         || preg_match('`(?:https?)://(www\.)?youtu\.be\/(?P<ID>[^&#]+)(?P<HasTime>#t=(?P<Time>[0-9]+))?`', $Url, $Matches))
+      if ((preg_match($YoutubeUrlMatch, $Url, $Matches))
          && C('Garden.Format.YouTube', true)
          && !C('Garden.Format.DisableUrlEmbeds')) {
-         $ID = $Matches['ID'];
-         $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
-         $Result = '<span class="VideoWrap">';
-            $Result .= '<span class="Video YouTube" id="youtube-'.$ID.'">';
-               $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$ID.'"><img src="//img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
-               $Result .= '<span class="VideoPlayer"></span>';
+
+         $videoId = val('videoId', $Matches);
+         $listId = val('listId', $Matches);
+
+         if (!empty($listId)) {
+            //we're dealing with a playlist
+            if (empty($videoId)) {
+               //we're dealing with a playlist, no video
+               $Result = <<<EOT
+   <iframe width="{$Width}" height="{$Height}" src="//www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen></iframe>
+EOT;
+            } else {
+               //we're dealing with a video in a playlist
+               $Result = <<<EOT
+   <iframe width="{$Width}" height="{$Height}" src="https://www.youtube.com/embed/{$videoId}?list={$listId}" frameborder="0" allowfullscreen></iframe>
+EOT;
+            }
+         }
+         else  {
+            //we're dealing with a regular ol' youtube video embed
+            $minutes = val('minutes', $Matches);
+            $seconds = val('seconds', $Matches);
+            $fullUrl = $videoId.'?autoplay=1';
+            if (!empty($minutes)||!empty($seconds)) {
+               $time = $minutes*60+$seconds;
+               $fullUrl .= '&start='.$time;
+            }
+
+            $Result = '<span class="VideoWrap">';
+            $Result .= '<span class="Video YouTube" id="youtube-'.$fullUrl.'">';
+
+            $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$videoId.'">';
+            $Result .= '<img src="//img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
+            $Result .= '<span class="VideoPlayer"></span>';
             $Result .= '</span>';
+
+         }
          $Result .= '</span>';
 
-      // Vimeo
+
+         // Vimeo
       } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)
         && !C('Garden.Format.DisableUrlEmbeds')) {
          $ID = $Matches[2];

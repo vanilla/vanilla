@@ -40,14 +40,22 @@ if (!function_exists('ValidateRegex')) {
 
 if (!function_exists('ValidateRequired')) {
    function ValidateRequired($Value, $Field = '') {
-      if (is_array($Value) === TRUE)
-         return count($Value) > 0 ? TRUE : FALSE;
+      if (is_array($Value) === TRUE) {
+         return count($Value) > 0;
+      }
 
-      if (is_string($Value))
+      if (is_string($Value)) {
+         // Empty strings should pass if the default value of the field is an empty string.
+         if ($Value === '' && val('Default', $Field, NULL) === '') {
+            return TRUE;
+         }
+
          return trim($Value) == '' ? FALSE : TRUE;
+      }
 
-      if (is_numeric($Value))
+      if (is_numeric($Value)) {
          return TRUE;
+      }
 
       return FALSE;
    }

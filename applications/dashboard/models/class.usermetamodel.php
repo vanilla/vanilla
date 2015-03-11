@@ -106,7 +106,7 @@ class UserMetaModel extends Gdn_Model {
       $UserMetaData = $UserMetaQuery->Get();
       
       $UserMeta = array();
-      if ($UserMetaData->NumRows())
+      if ($UserMetaData->NumRows()) {
          if (is_array($UserID)) {
             while ($MetaRow = $UserMetaData->NextRow())
                $UserMeta[$MetaRow->UserID][$MetaRow->Name] = $MetaRow->Value;
@@ -114,8 +114,10 @@ class UserMetaModel extends Gdn_Model {
             while ($MetaRow = $UserMetaData->NextRow())
                $UserMeta[$MetaRow->Name] = $MetaRow->Value;
          }
-      else
+      } else {
          self::$MemoryCache[$Key] = $Default;
+         $UserMeta[$Key] = $Default;
+      }
       
       unset($UserMetaData);
       return $UserMeta;

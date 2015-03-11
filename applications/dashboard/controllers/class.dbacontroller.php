@@ -129,6 +129,18 @@ class DbaController extends DashboardController {
       $this->Render('Job');
    }
 
+   public function UserComment() {
+      $this->Permission('Garden.Settings.Manage');
+   }
+
+   public function UserDiscussion() {
+      $this->Permission('Garden.Settings.Manage');
+   }
+
+   public function UserRole() {
+      $this->Permission('Garden.Settings.Manage');
+   }
+
    protected function _SetJob($Name) {
       $Args = array_change_key_case($this->ReflectArgs);
       $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);

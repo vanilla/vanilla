@@ -226,9 +226,9 @@ class PocketsPlugin extends Gdn_Plugin {
          $Condition = Gdn_Condition::ToString($Sender->ConditionModule->Conditions(TRUE));
          $Form->SetFormValue('Condition', $Condition);
          if ($Form->GetFormValue('Ad', 0)) {
-            $Form->SetFormValue('Type', Pocket::AD_TYPE);
+            $Form->SetFormValue('Type', Pocket::TYPE_AD);
          } else {
-            $Form->SetFormValue('Type', Pocket::DEFAULT_TYPE);
+            $Form->SetFormValue('Type', Pocket::TYPE_DEFAULT);
          }
 
          $Saved = $Form->Save();
@@ -249,7 +249,7 @@ class PocketsPlugin extends Gdn_Plugin {
             $Pocket['EveryFrequency'] = GetValue(0, $RepeatFrequency, 1);
             $Pocket['EveryBegin'] = GetValue(1, $RepeatFrequency, 1);
             $Pocket['Indexes'] = implode(',', $RepeatFrequency);
-            $Pocket['Ad'] = $Pocket['Type'] == Pocket::AD_TYPE;
+            $Pocket['Ad'] = $Pocket['Type'] == Pocket::TYPE_AD;
             $Sender->ConditionModule->Conditions(Gdn_Condition::FromString($Pocket['Condition']));
             $Form->SetData($Pocket);
          } else {
@@ -397,9 +397,12 @@ class PocketsPlugin extends Gdn_Plugin {
       }
 
       $Result = '';
+
+      $ControllerName = Gdn::Controller()->ControllerName;
+
       foreach ($Pockets as $Pocket) {
          if (val('Location', $Pocket) == 'Custom' ) {
-            $Data['PageName'] = Pocket::PageName($Data['sender']->Controller->ControllerName);
+            $Data['PageName'] = Pocket::PageName($ControllerName);
             if ($Pocket->CanRender($Data)) {
                $Result .= $Pocket->ToString();
             }
@@ -464,7 +467,7 @@ class PocketsPlugin extends Gdn_Plugin {
          ->Column('MobileNever', 'tinyint', '0')
          ->Column('EmbeddedNever', 'tinyint', '0')
          ->Column('ShowInDashboard', 'tinyint', '0')
-         ->Column('Type', array(Pocket::DEFAULT_TYPE, Pocket::AD_TYPE), Pocket::DEFAULT_TYPE)
+         ->Column('Type', array(Pocket::TYPE_DEFAULT, Pocket::TYPE_AD), Pocket::TYPE_DEFAULT)
          ->Set($Explicit, $Drop);
 
       $PermissionModel = Gdn::PermissionModel();

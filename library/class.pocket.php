@@ -22,8 +22,8 @@ class Pocket {
    const REPEAT_EVERY = 'every';
    const REPEAT_INDEX = 'index';
 
-   const AD_TYPE = 'ad';
-   const DEFAULT_TYPE = 'default';
+   const TYPE_AD = 'ad';
+   const TYPE_DEFAULT = 'default';
 
 
    /** $var string The text to display in the pocket. */
@@ -156,7 +156,7 @@ class Pocket {
       $this->Page = $Data['Page'];
       $this->MobileOnly = $Data['MobileOnly'];
       $this->MobileNever = $Data['MobileNever'];
-      $this->IsAd = $Data['Type'] == Pocket::AD_TYPE;
+      $this->IsAd = $Data['Type'] == Pocket::TYPE_AD;
       $this->EmbeddedNever = GetValue('EmbeddedNever', $Data);
       $this->ShowInDashboard = GetValue('ShowInDashboard', $Data);
 

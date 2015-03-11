@@ -35,7 +35,7 @@ echo Wrap($this->Data('Title'), 'h1');
       foreach ($this->Data('PocketData') as $PocketRow) {
       	 $MobileOnly = $PocketRow['MobileOnly'];
       	 $MobileNever = $PocketRow['MobileNever'];
-          $AdFree = $PocketRow['Type'] == Pocket::AD_TYPE;
+          $AdFree = $PocketRow['Type'] == Pocket::TYPE_AD;
 
          echo '<tr'.($PocketRow['Disabled'] != Pocket::DISABLED ? '' : ' class="Disabled"').'>';
 

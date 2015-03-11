@@ -91,8 +91,8 @@ echo $Form->Errors();
          echo '<div class="Info2">', T("Most pockets shouldn't be displayed in the dashboard."), '</div>';
          echo $Form->CheckBox("ShowInDashboard", T("Display in dashboard. (not recommended)"));
 
-         echo '<div class="Info2">', T("Users with the permission Garden.NoAds.Allow will not see this pocket."), '</div>';
-         echo $Form->CheckBox("Ad", T("This pocket is an Ad."));
+         echo '<div class="Info2">', T("Users with the no ads permission will not see this pocket."), '</div>';
+         echo $Form->CheckBox("Ad", T("This pocket is an ad."));
       ?>
    </li>
    <li>

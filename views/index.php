@@ -60,7 +60,7 @@ echo Wrap($this->Data('Title'), 'h1');
          	echo '<br><b>(', T('Hidden for everything!'), ')</b>';
          }
          if ($NoAds) {
-            echo '<br>(', T('Hidden for users with the Garden.NoAds.Allow permission.'), ')';
+            echo '<br>(', T('Users with the no ads permission will not see this pocket.'), ')';
          }
          echo'</td>';
          echo '<td>', nl2br(htmlspecialchars(substr($PocketRow['Body'], 0, 200))), '</td>';

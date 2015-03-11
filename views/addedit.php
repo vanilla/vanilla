@@ -48,12 +48,12 @@ echo $Form->Errors();
       <?php
          echo $Form->Label('Repeat', 'RepeatType');
 //
-         echo '<div>', $Form->Radio('RepeatType', 'Before', array('Value' => Pocket::REPEAT_BEFORE)), '</div>';
+         echo '<div>', $Form->Radio('RepeatType', 'Before', array('Value' => Pocket::REPEAT_BEFORE, 'Default' => true)), '</div>';
 //
          echo '<div>', $Form->Radio('RepeatType', 'After', array('Value' => Pocket::REPEAT_AFTER)), '</div>';
 //
          echo '<div>', $Form->Radio('RepeatType', 'Repeat Every', array('Value' => Pocket::REPEAT_EVERY)), '</div>';
-         
+
          // Options for repeat every.
          echo '<div class="RepeatOptions RepeatEveryOptions P">',
             '<div class="Info2">', T('Enter numbers starting at 1.'), '</div>',
@@ -78,18 +78,21 @@ echo $Form->Errors();
          echo $Form->Label('Conditions', '');
          // echo '<div class="Info2">', T('Limit the pocket to one or more roles or permissions.'), '</div>';
          // $this->ConditionModule->Render();
-         
+
          echo '<div class="Info2">', T('Limit the display of this pocket to "mobile only".'), '</div>';
          echo $Form->CheckBox("MobileOnly", T("Only display on mobile browsers."));
-         
+
          echo '<div class="Info2">', T('Limit the display of this pocket for mobile devices.'), '</div>';
          echo $Form->CheckBox("MobileNever", T("Never display on mobile browsers."));
-         
+
          echo '<div class="Info2">', T('Limit the display of this pocket for embedded comments.'), '</div>';
          echo $Form->CheckBox("EmbeddedNever", T("Don't display for embedded comments."));
-         
+
          echo '<div class="Info2">', T("Most pockets shouldn't be displayed in the dashboard."), '</div>';
          echo $Form->CheckBox("ShowInDashboard", T("Display in dashboard. (not recommended)"));
+
+         echo '<div class="Info2">', T("Users with the permission Garden.AdFree.Allow will not see this pocket."), '</div>';
+         echo $Form->CheckBox("Ad", T("This pocket is an Ad."));
       ?>
    </li>
    <li>

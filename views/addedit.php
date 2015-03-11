@@ -44,7 +44,7 @@ echo $Form->Errors();
          }
       ?>
    </li>
-   <li>
+   <li class="js-repeat">
       <?php
          echo $Form->Label('Repeat', 'RepeatType');
 //

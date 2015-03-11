@@ -20,8 +20,7 @@ function smarty_function_pocket($Params, $Smarty) {
 
    $Name = GetValue('name', $Params);
    unset($Params['name']);
-   $Params['sender'] = $Smarty;
-   
+
    $Result = PocketsPlugin::PocketString($Name, $Params);
 
 	return $Result;

@@ -59,11 +59,12 @@ class DiscussionsController extends VanillaController {
     * "Table" layout for discussions. Mimics more traditional forum discussion layout.
     *
     * @param int $Page Multiplied by PerPage option to determine offset.
+    * @param array $where Discussions query filter.
     */
-   public function Table($Page = '0') {
+   public function Table($Page = '0', $where = array()) {
       if ($this->SyndicationMethod == SYNDICATION_NONE)
          $this->View = 'table';
-      $this->Index($Page);
+      $this->Index($Page, $where);
    }
 
    /**
@@ -73,8 +74,9 @@ class DiscussionsController extends VanillaController {
     * @access public
     *
     * @param int $Page Multiplied by PerPage option to determine offset.
+    * @param array $where Discussions query filter.
     */
-   public function Index($Page = FALSE) {
+   public function Index($Page = FALSE, $where = array()) {
       // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
       $Layout = C('Vanilla.Discussions.Layout');
       switch($Layout) {
@@ -140,7 +142,6 @@ class DiscussionsController extends VanillaController {
 
       // Check for individual categories.
       $categoryIDs = $this->getCategoryIDs();
-      $where = array();
       if ($categoryIDs) {
          $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
       } else {

@@ -224,7 +224,7 @@ class Gdn_Validation {
          if ($Field == 'Format') {
             $RuleNames[] = 'Format';
          }
-         
+
          // Assign the rules to the field.
          // echo '<div>Field: '.$Field.'</div>';
          // print_r($RuleNames);
@@ -271,13 +271,11 @@ class Gdn_Validation {
          $RuleName = array($RuleName);
       }
 
-      if (count($RuleName) > 0) {
-         $ExistingRules = val($FieldName, $Array, array());
+      $ExistingRules = val($FieldName, $Array, array());
 
-         // Merge the new rules with the existing ones (array_merge) and make
-         // sure there is only one of each rule applied (array_unique).
-         $Array[$FieldName] = array_unique(array_merge($ExistingRules, $RuleName));
-      }
+      // Merge the new rules with the existing ones (array_merge) and make
+      // sure there is only one of each rule applied (array_unique).
+      $Array[$FieldName] = array_unique(array_merge($ExistingRules, $RuleName));
    }
 
 

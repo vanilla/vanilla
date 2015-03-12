@@ -178,9 +178,10 @@ class DiscussionsController extends VanillaController {
       $this->Pager->Configure(
          $Offset,
          $Limit,
-         $CountDiscussions,
+         $this->Data('CountDiscussions'),
          $this->Data('_PagerUrl')
       );
+
       PagerModule::Current($this->Pager);
 
       $this->SetData('_Page', $Page);

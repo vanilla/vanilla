@@ -211,8 +211,12 @@ if (!function_exists('val')) {
     * @return mixed The value from the array or object.
     */
    function val($key, $collection, $default = false) {
-      if (is_array($collection) && array_key_exists($key, $collection)) {
-         return $collection[$key];
+      if (is_array($collection)) {
+         if (array_key_exists($key, $collection)) {
+            return $collection[$key];
+         } else {
+            return $default;
+         }
       } elseif (is_object($collection) && property_exists($collection, $key)) {
          return $collection->$key;
       }

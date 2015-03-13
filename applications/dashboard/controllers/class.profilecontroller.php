@@ -1426,11 +1426,13 @@ class ProfileController extends Gdn_Controller {
     * @return bool Always true.
     */
    public function GetUserInfo($UserReference = '', $Username = '', $UserID = '', $CheckPermissions = FALSE) {
-      if ($this->_UserInfoRetrieved)
+      if ($this->_UserInfoRetrieved) {
          return;
+      }
 
-      if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid())
+      if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid()) {
          throw PermissionException();
+      }
 
       // If a UserID was provided as a querystring parameter, use it over anything else:
       if ($UserID) {
@@ -1442,13 +1444,16 @@ class ProfileController extends Gdn_Controller {
       if ($UserReference == '') {
          if ($Username) {
             $this->User = $this->UserModel->GetByUsername($Username);
-         } else
+         } else {
             $this->User = $this->UserModel->GetID(Gdn::Session()->UserID);
+         }
       } elseif (is_numeric($UserReference) && $Username != '') {
          $this->User = $this->UserModel->GetID($UserReference);
       } else {
          $this->User = $this->UserModel->GetByUsername($UserReference);
       }
+
+      $this->FireEvent('UserLoaded');
 
       if ($this->User === FALSE) {
          throw NotFoundException('User');
@@ -1475,8 +1480,9 @@ class ProfileController extends Gdn_Controller {
          }
       }
 
-      if ($CheckPermissions && Gdn::Session()->UserID != $this->User->UserID)
+      if ($CheckPermissions && Gdn::Session()->UserID != $this->User->UserID) {
          $this->Permission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), FALSE);
+      }
 
       $this->AddSideMenu();
       $this->_UserInfoRetrieved = TRUE;

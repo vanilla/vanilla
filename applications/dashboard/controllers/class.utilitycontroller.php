@@ -47,41 +47,6 @@ class UtilityController extends DashboardController {
       Gdn_Theme::Section('Dashboard');
    }
 
-   public function Rack() {
-      safeHeader('Content-Type: application/json; charset=utf-8');
-      date_default_timezone_set('America/Montreal');
-
-      $keys = array('REQUEST_METHOD', 'SCRIPT_NAME', 'PATH_INFO', 'SERVER_NAME', 'SERVER_PORT', 'HTTP_ACCEPT', 'HTTP_ACCEPT_LANGUAGE', 'HTTP_ACCEPT_CHARSET', 'HTTP_USER_AGENT', 'HTTP_REMOTE_ADDR');
-      $rack = array_intersect_key($_SERVER, array_fill_keys($keys, true));
-      ksort($rack);
-
-      // Extract the headers from $_SERVER.
-      $headers = array();
-      foreach ($_SERVER as $key => $value) {
-         $key = strtoupper($key);
-         if (strpos($key, 'X_') === 0 || strpos($key, 'HTTP_') === 0 || in_array($key, static::$specialHeaders)) {
-            if ($key === 'HTTP_CONTENT_TYPE' || $key === 'HTTP_CONTENT_LENGTH') {
-               continue;
-            }
-            $headers[$key] = $value;
-         }
-      }
-      ksort($headers);
-
-      $result = array(
-         'rack' => $rack,
-         'headers' => $headers,
-         'get' => $_GET,
-         'cookie' => $_COOKIE,
-         'mobile' => array(
-            'userAgentType' => userAgentType(),
-            'isMobile' => IsMobile()
-         )
-      );
-
-      echo json_encode($result);
-   }
-
 //   /**
 //    * Call a method on the given model.
 //    */

@@ -303,7 +303,7 @@ class Gdn_Memcached extends Gdn_Cache {
             'key'    => $shardKey,
             'data'   => $chunks[$i]
          );
-         if (!key_exists($serverKey, $manifest->keys))
+         if (!array_key_exists($serverKey, $manifest->keys))
             $manifest->keys[$serverKey] = array();
          $manifest->keys[$serverKey][] = $shardKey;
          $j++;
@@ -324,7 +324,7 @@ class Gdn_Memcached extends Gdn_Cache {
       $realKey = $this->makeKey($key, $finalOptions);
 
       // Sharding, write real keys
-      if (key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
+      if (array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
 
          $manifest = $this->shard($realKey, $value, $shards);
          $shards = $manifest->shards;
@@ -373,7 +373,7 @@ class Gdn_Memcached extends Gdn_Cache {
       $realKey = $this->makeKey($key, $finalOptions);
 
       // Sharding, write real keys
-      if (key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
+      if (array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
 
          $manifest = $this->shard($realKey, $value, $shards);
          $shards = $manifest->shards;

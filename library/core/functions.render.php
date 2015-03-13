@@ -551,13 +551,15 @@ if (!function_exists('Img')) {
     * Returns an img tag.
     */
    function Img($Image, $Attributes = '', $WithDomain = FALSE) {
-      if ($Attributes == '')
-         $Attributes = array();
+      if ($Attributes != '') {
+         $Attributes = Attribute($Attributes);
+      }
 
-      if (!IsUrl($Image))
+      if (!IsUrl($Image)) {
          $Image = SmartAsset($Image, $WithDomain);
+      }
 
-      return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
+      return '<img src="'.$Image.'"'.$Attributes.' />';
    }
 }
 
@@ -858,7 +860,7 @@ if (!function_exists('UserPhoto')) {
          }
          $Href = Url(UserUrl($User));
          return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-            .Img($PhotoUrl, array('alt' => htmlspecialchars($Name), 'class' => $ImgClass))
+            .Img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';

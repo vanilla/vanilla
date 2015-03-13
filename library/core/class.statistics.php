@@ -45,10 +45,13 @@ class Gdn_Statistics extends Gdn_Plugin {
          $ApiMethod
       ));
 
+      $RequestHeaders = array();
+
       // Allow hooking of analytics events
       $this->EventArguments['AnalyticsMethod'] = &$Method;
       $this->EventArguments['AnalyticsArgs'] = &$RequestParameters;
       $this->EventArguments['AnalyticsUrl'] = &$FinalURL;
+      $this->EventArguments['AnalyticsHeaders'] = &$RequestHeaders;
       $this->FireEvent('SendAnalytics');
 
       // Sign request
@@ -65,7 +68,7 @@ class Gdn_Statistics extends Gdn_Plugin {
          $Response = $ProxyRequest->Request(array(
             'Url'       => $FinalURL,
             'Log'       => FALSE
-         ), $RequestParameters);
+         ), $RequestParameters, null, $RequestHeaders);
       } catch (Exception $e) {
          $Response = FALSE;
       }

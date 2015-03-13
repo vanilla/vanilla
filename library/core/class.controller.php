@@ -438,7 +438,7 @@ class Gdn_Controller extends Gdn_Pluggable {
    }
 
    /**
-    * Undocumented method.
+    * Adds a key-value pair to the definition collection for JavaScript.
     *
     * @param string $Term
     * @param string $Definition
@@ -446,9 +446,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function AddDefinition($Term, $Definition = NULL) {
       if(!is_null($Definition)) {
-         // Make sure the term is a valid id.
-         if (!preg_match('/[a-z][0-9a-z_\-]*/i', $Term))
-            throw new Exception('Definition term must start with a letter or an underscore and consist of alphanumeric characters.');
          $this->_Definitions[$Term] = $Definition;
       }
       return ArrayValue($Term, $this->_Definitions);
@@ -1398,6 +1395,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       if ($CleanOutut) {
          // Remove values that should not be transmitted via api
          $Remove = array('Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes', 'AccessToken');
+
+         // Remove PersonalInfo values for unprivileged requests.
          if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             $Remove[] = 'InsertIPAddress';
             $Remove[] = 'UpdateIPAddress';
@@ -1407,6 +1406,22 @@ class Gdn_Controller extends Gdn_Pluggable {
             if (C('Api.Clean.Email', TRUE))
                $Remove[] = 'Email';
             $Remove[] = 'DateOfBirth';
+            $Remove[] = 'Preferences';
+            $Remove[] = 'Banned';
+            $Remove[] = 'Admin';
+            $Remove[] = 'Confirmed';
+            $Remove[] = 'Verified';
+            $Remove[] = 'DiscoveryText';
+            $Remove[] = 'InviteUserID';
+            $Remove[] = 'DateSetInvitations';
+            $Remove[] = 'CountInvitations';
+            $Remove[] = 'CountNotifications';
+            $Remove[] = 'CountBookmarks';
+            $Remove[] = 'CountDrafts';
+            $Remove[] = 'HourOffset';
+            $Remove[] = 'Gender';
+            $Remove[] = 'Punished';
+            $Remove[] = 'Troll';
          }
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }

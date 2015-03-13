@@ -1388,7 +1388,7 @@ EOT;
             $urlFormat = str_replace('{name}', '$2', self::$MentionsUrlFormat);
 
             // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
-            $Pattern = (unicodeSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
+            $Pattern = (unicodeRegexSupport()) ? '[\pN\pL\pM\pPc]' : '\w';
             $Mixed = preg_replace(
                '/(^|[\s,\.>])@('.$Pattern.'{1,64})\b/i', //{3,20}
                '\1'.Anchor('@$2', $urlFormat),
@@ -1693,7 +1693,7 @@ EOT;
       $Mixed = preg_replace('`[\']`', '', $Mixed);
 
       // Convert punctuation, symbols, and spaces to hyphens
-      if (unicodeSupport()) {
+      if (unicodeRegexSupport()) {
          $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
       } else {
          $Mixed = preg_replace('`[\s_[^\w\d]]`', '-', $Mixed);

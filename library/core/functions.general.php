@@ -3362,13 +3362,13 @@ if (!function_exists('TrustedDomains')) {
    }
 }
 
-if (!function_exists('unicodeSupport')) {
+if (!function_exists('unicodeRegexSupport')) {
    /**
     * Test for Unicode PCRE support. On non-UTF8 systems this will result in a blank string.
     *
     * @return bool
     */
-   function unicodeSupport() {
+   function unicodeRegexSupport() {
       return (preg_replace('`[\pP]`u', '', 'P') != '');
    }
 }

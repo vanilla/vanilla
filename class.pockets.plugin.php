@@ -332,9 +332,11 @@ class PocketsPlugin extends Gdn_Plugin {
       if (Gdn::Controller()->DeliveryMethod() != DELIVERY_METHOD_XHTML) {
          return;
       }
-      if (Gdn::Controller()->Data('_NoMessages'))
-         return;
 
+      if (Gdn::Controller()->Data('_NoMessages') && $Location != 'Head') {
+         return;
+      }
+      
       // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
       $this->_LoadState();
 

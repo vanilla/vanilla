@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo '<h2 class="H">'.T('Edit My Thumbnail').'</h2>';
+echo '<h1 class="H">'.T('Edit My Thumbnail').'</h1>';
 echo $this->Form->Errors();
 echo $this->Form->Open(array('class' => 'Thumbnail'));
 ?>

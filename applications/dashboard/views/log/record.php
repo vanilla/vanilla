@@ -1,6 +1,8 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->Data('Title'); ?></h1>
-<div class="Info"><?php echo T('Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.'); ?></div>
+<div class="Info"><?php echo T('Edits and deletions are recorded here. Use &lsquo;Restore&rsquo; to undo any change.');
+   echo '<br>'.sprintf(T('We start logging edits on a post %s minutes after it is first created.'),  C('Garden.Log.FloodControl', 20)); ?>
+</div>
 <?php
 echo '<noscript><div class="Errors"><ul><li>', T('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->Open();

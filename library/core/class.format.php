@@ -1601,7 +1601,9 @@ EOT;
     * @return unknown
     */
    public static function ToTimestamp($DateTime = '') {
-      if (($TestTime = strtotime($DateTime)) !== FALSE) {
+      if ($DateTime === '0000-00-00 00:00:00') {
+         return false;
+      } elseif (($TestTime = strtotime($DateTime)) !== FALSE) {
          return $TestTime;
       } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $DateTime, $Matches)) {
          $Year = $Matches[1];

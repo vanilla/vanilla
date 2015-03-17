@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-require_once $this->FetchViewLocation('helper_functions', 'modules', 'vanilla');
+require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'modules', 'vanilla');
 
 ?>
 <div class="Box BoxPromoted">

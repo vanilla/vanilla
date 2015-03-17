@@ -77,6 +77,9 @@ class UserController extends DashboardController {
          if ($Keywords)
             $Offset = 0;
       }
+      if (!is_string($Keywords)) {
+         $Keywords = '';
+      }
 
       // Put the Keyword back in the form
       if ($Keywords)

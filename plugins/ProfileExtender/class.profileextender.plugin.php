@@ -69,7 +69,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Users', T('Profile Fields'), 'settings/profileextender', 'Garden.Settings.Manage');
    }
-   
+
    /**
     * Add non-checkbox fields to registration forms.
     */
@@ -112,7 +112,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       if ('0-00-00' == $Sender->Form->GetFormValue('DateOfBirth'))
          $Sender->Form->SetFormValue('DateOfBirth', NULL);
    }
-   
+
    /**
     * Special manipulations.
     */
@@ -149,10 +149,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                break;
          }
       }
-      
+
       return $Fields;
    }
-      
+
    /**
     * Add fields to edit profile form.
     */
@@ -235,7 +235,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
       include($this->GetView('profilefields.php'));
    }
-   
+
    /**
     * Settings page.
     */
@@ -345,7 +345,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       }
       $Sender->Render('delete', '', 'plugins/ProfileExtender');
    }
-   
+
    /**
     * Display custom fields on Edit User form.
     */
@@ -372,10 +372,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 			      Gdn::UserModel()->SaveAttribute($Sender->User->UserID, 'CustomProfileFields', FALSE);
 			   }
          }
-         
+
          // Send them off for magic formatting
          $ProfileFields = $this->ParseSpecialFields($ProfileFields);
-         
+
          // Get all field data, error check
          $AllFields = $this->GetProfileFields();
          if (!is_array($AllFields) || !is_array($ProfileFields)) {
@@ -386,8 +386,11 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // Hack it in here instead
          if (C('ProfileExtender.Fields.DateOfBirth.OnProfile')) {
             // Do not use Gdn_Format::Date because it shifts to local timezone
-            $ProfileFields['DateOfBirth'] = date(T('Birthday Format','F j, Y'), Gdn_Format::ToTimestamp($Sender->User->DateOfBirth));
-            $AllFields['DateOfBirth'] = array('Label' => T('Birthday'), 'OnProfile' => TRUE);
+            $BirthdayStamp = Gdn_Format::ToTimestamp($Sender->User->DateOfBirth);
+            if ($BirthdayStamp) {
+               $ProfileFields['DateOfBirth'] = date(T('Birthday Format','F j, Y'), $BirthdayStamp);
+               $AllFields['DateOfBirth'] = array('Label' => T('Birthday'), 'OnProfile' => TRUE);
+            }
          }
 
          // Display all non-hidden fields
@@ -410,7 +413,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // No errors
       }
    }
-   
+
    /**
     * Save custom profile fields when saving the user.
     *
@@ -462,7 +465,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          }
       }
    }
-   
+
    /**
     * Import from CustomProfileFields or upgrade from ProfileExtender 2.0.
     */

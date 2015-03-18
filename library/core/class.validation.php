@@ -581,24 +581,12 @@ class Gdn_Validation {
          if (isset($this->_FieldRules[$FieldName])) {
             $Index = array_search($RuleName, $this->_FieldRules[$FieldName]);
 
-            if ($Index !== FALSE) {
+            if ($Index !== FALSE)
                unset($this->_FieldRules[$FieldName][$Index]);
-            }
-         }
-         if (array_key_exists($FieldName, $this->GetSchemaRules())) {
-            $Index = array_search($RuleName, $this->_SchemaRules[$FieldName]);
-
-            if ($Index !== FALSE) {
-               unset($this->_SchemaRules[$FieldName][$Index]);
-            }
          }
       } else {
-         $this->GetSchemaRules();
-         unset(
-            $this->_FieldRules[$FieldName],
-            $this->_ValidationFields[$FieldName],
-            $this->_SchemaRules[$FieldName]
-         );
+         unset($this->_FieldRules[$FieldName]);
+         unset($this->_ValidationFields[$FieldName]);
       }
 
    }

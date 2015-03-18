@@ -549,6 +549,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    public function ThemeFromType($Type) {
       if ($Type === 'mobile')
          return $this->MobileTheme();
+      else if ($Type == 'embed')
+         return $this->EmbedTheme ();
       else
          return $this->DesktopTheme();
    }

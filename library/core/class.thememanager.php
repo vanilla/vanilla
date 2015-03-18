@@ -163,6 +163,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $SearchThemeInfo['MobileScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
          }
 
+         // Add the embeded screenshot.
+         if (array_key_exists('embedscreenshot', $ThemeFiles)) {
+            $RelativeScreenshot = ltrim(str_replace(PATH_ROOT, '', GetValue('embedscreenshot', $ThemeFiles)),'/');
+            $SearchThemeInfo['EmbedScreenshotUrl'] = Asset($RelativeScreenshot, TRUE);
+         }
+
          if (array_key_exists('hooks', $ThemeFiles)) {
             $SearchThemeInfo['HooksFile'] = val('hooks', $ThemeFiles, FALSE);
             $SearchThemeInfo['RealHooksFile'] = realpath($SearchThemeInfo['HooksFile']);
@@ -251,7 +257,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          '.*\.theme\.php'                       => 'about',
          'class\..*themehooks\.php'             => 'hooks',
          'screenshot\.(gif|jpg|jpeg|png)'       => 'screenshot',
-         'mobile\.(gif|jpg|jpeg|png)'           => 'mobilescreenshot'
+         'mobile\.(gif|jpg|jpeg|png)'           => 'mobilescreenshot',
+         'embed\.(gif|jpg|jpeg|png)'            => 'embedscreenshot'
       );
 
       $MatchedThemeFiles = array();
@@ -336,7 +343,17 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
    }
 
    public function CurrentTheme() {
-      return C(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+      if (IsEmbed ()) {
+         return C('Garden.EmbedTheme', 'EmbedFriendly');
+      }
+
+      else if (IsMobile ()) {
+         return C('Garden.MobileTheme', 'default');
+      }
+
+      else {
+         return C('Garden.Theme', 'default');
+      }
    }
 
    public function DesktopTheme() {
@@ -408,7 +425,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       return $ThemeInfo;
    }
 
-   public function EnableTheme($ThemeName, $IsMobile = FALSE) {
+   public function EnableTheme($ThemeName, $IsMobile = FALSE, $IsEmbed = FALSE) {
       // Make sure to run the setup
       $this->TestTheme($ThemeName);
 
@@ -416,7 +433,17 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
       $ThemeInfo = $this->GetThemeInfo($ThemeName);
       $ThemeFolder = val('Folder', $ThemeInfo, '');
 
-      $oldTheme = $IsMobile ? C('Garden.MobileTheme', 'mobile') : C('Garden.Theme', 'default');
+      if ($IsMobile) {
+         $oldTheme = C('Garden.MobileTheme', 'mobile');
+      }
+
+      else if ($IsEmbed) {
+         $oldTheme = C('Garden.EmbedTheme', 'EmbedFriendly');
+      }
+
+      else {
+         $oldTheme = C('Garden.Theme', 'default');
+      }
 
       if ($ThemeFolder == '') {
          throw new Exception(T('The theme folder was not properly defined.'));
@@ -424,9 +451,15 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          $Options = valr("{$ThemeName}.Options", $this->AvailableThemes());
          if ($Options) {
             if ($IsMobile) {
+               SaveToConfig (array (
+                   'Garden.MobileTheme' => $ThemeName,
+                   'Garden.MobileThemeOptions.Name' => valr ("{$ThemeName}.Name", $this->AvailableThemes (), $ThemeFolder)
+               ));
+            }
+            else if ($IsEmbed) {
                SaveToConfig(array(
-                  'Garden.MobileTheme' => $ThemeName,
-                  'Garden.MobileThemeOptions.Name' => valr("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
+                   'Garden.EmbedTheme' => $ThemeName,
+                   'Garden.EmbedThemeOptions.Name' => GetValueR("{$ThemeName}.Name", $this->AvailableThemes(), $ThemeFolder)
                ));
             } else {
                SaveToConfig(array(
@@ -436,8 +469,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             }
          } else {
             if ($IsMobile) {
-               SaveToConfig('Garden.MobileTheme', $ThemeName);
-               RemoveFromConfig('Garden.MobileThemeOptions');
+               SaveToConfig ('Garden.MobileTheme', $ThemeName);
+               RemoveFromConfig ('Garden.MobileThemeOptions');
+            }
+            else if ($IsEmbed) {
+               SaveToConfig('Garden.EmbedTheme', $ThemeName);
+               RemoveFromConfig('Garden.EmbedThemeOptions');
             } else {
                SaveToConfig('Garden.Theme', $ThemeName);
                RemoveFromConfig('Garden.ThemeOptions');
@@ -451,7 +488,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             Logger::NOTICE,
             'The {themeType} theme changed from {oldTheme} to {newTheme}.',
             array(
-               'themeType' => $IsMobile ? 'mobile' : 'desktop',
+               'themeType' => $IsMobile ? 'mobile' : ($IsEmbed ? 'embed' : 'desktop'),
                'oldTheme' => $oldTheme,
                'newTheme' => $ThemeName
             )
@@ -503,6 +540,10 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
    public function MobileTheme() {
       return C('Garden.MobileTheme', 'default');
+   }
+
+   public function EmbedTheme() {
+      return C('Garden.EmbedTheme', 'EmbedFriendly');
    }
 
    public function ThemeFromType($Type) {

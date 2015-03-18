@@ -95,6 +95,7 @@ $Configuration['Garden']['Html']['AllowedElements']             = "a, abbr, acro
 $Configuration['Garden']['Search']['Mode']                      = 'boolean'; // matchboolean, match, boolean, like
 $Configuration['Garden']['Theme']                               = 'default';
 $Configuration['Garden']['MobileTheme']                         = 'mobile';
+$Configuration['Garden']['EmbedTheme']                          = 'EmbedFriendly';
 $Configuration['Garden']['Profile']['Public']                   = TRUE;
 $Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
 $Configuration['Garden']['Roles']['Manage']                     = TRUE;

@@ -924,6 +924,17 @@ class Gdn_Request {
          }
       }
 
+      // Is embed?
+      // @TODO should this be placed here?
+      if (IsEmbed ()) {
+         if (isset ($Query)) {
+            $Query .= '&embed=1';
+         }
+         else {
+            $Query = '?embed=1';
+         }
+      }
+
       if (isset($Query))
          $Result .= $Query;
 

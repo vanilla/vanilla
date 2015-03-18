@@ -141,6 +141,11 @@ class DashboardHooks implements Gdn_IPlugin {
       if ($MobileThemeOptionsName = C('Garden.MobileThemeOptions.Name'))
          $Menu->AddLink('Appearance', T('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'Garden.Settings.Manage', array('class' => 'nav-mobile-theme-options'));
 
+      if (C('Garden.Embed.Allow')) {
+         $Menu->AddLink('Appearance', T('Embed Themes'), '/dashboard/settings/embedthemes', 'Garden.Settings.Manage');
+         if ($EmbedThemeOptionsName = C('Garden.EmbedThemeOptions.Name'))
+            $Menu->AddLink('Appearance', T('Embed Theme Options'), '/dashboard/settings/embedthemeoptions', 'Garden.Settings.Manage');
+      }
 
       $Menu->AddLink('Appearance', T('Messages'), '/dashboard/message', 'Garden.Community.Manage', array('class' => 'nav-messages'));
 

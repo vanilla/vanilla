@@ -2096,10 +2096,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     */
    public function Title($Title = NULL, $Subtitle = NULL) {
       if (!is_null($Title))
-         $this->SetData('Title', $Title);
+         $this->SetData('Title', htmlspecialchars($Title));
 
       if (!is_null($Subtitle))
-         $this->SetData('_Subtitle', $Subtitle);
+         $this->SetData('_Subtitle', htmlspecialchars($Subtitle));
 
       return $this->Data('Title');
    }

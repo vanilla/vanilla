@@ -389,7 +389,7 @@ BLOCKQUOTE;
    }
 
    public function Setup() {
-      SaveToConfig('Garden.Html.SafeStyles', FALSE);
+      // Nothing to do here!
    }
 
    protected static function _StripMarkdownQuotes($Text) {
@@ -416,7 +416,7 @@ BLOCKQUOTE;
    }
 
    public function OnDisable() {
-      RemoveFromConfig('Garden.Html.SafeStyles');
+      // Nothing to do here!
    }
 
    public function Structure() {

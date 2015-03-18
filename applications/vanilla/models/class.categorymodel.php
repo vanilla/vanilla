@@ -463,7 +463,14 @@ class CategoryModel extends Gdn_Model {
     */
    public static function JoinCategories(&$Data, $Column = 'CategoryID', $Options = array()) {
       $Join = GetValue('Join', $Options, array('Name' => 'Category', 'PermissionCategoryID', 'UrlCode' => 'CategoryUrlCode'));
-      foreach ($Data as &$Row) {
+
+      if ($Data instanceof Gdn_DataSet) {
+         $Data2 = $Data->Result();
+      } else {
+         $Data2 =& $Data;
+      }
+
+      foreach ($Data2 as &$Row) {
          $ID = GetValue($Column, $Row);
          $Category = self::Categories($ID);
          foreach ($Join as $N => $V) {

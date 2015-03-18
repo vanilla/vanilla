@@ -445,16 +445,18 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
          }
       }
 
-      Logger::event(
-         'theme_changed',
-         LogLevel::NOTICE,
-         'The {themeType} theme changed from {oldTheme} to {newTheme}.',
-         array(
-            'themeType' => $IsMobile ? 'mobile' : 'desktop',
-            'oldTheme' => $oldTheme,
-            'newTheme' => $ThemeName
-         )
-      );
+      if ($oldTheme !== $ThemeName) {
+         Logger::event(
+            'theme_changed',
+            Logger::NOTICE,
+            'The {themeType} theme changed from {oldTheme} to {newTheme}.',
+            array(
+               'themeType' => $IsMobile ? 'mobile' : 'desktop',
+               'oldTheme' => $oldTheme,
+               'newTheme' => $ThemeName
+            )
+         );
+      }
 
       // Tell the locale cache to refresh itself.
       Gdn::Locale()->Refresh();

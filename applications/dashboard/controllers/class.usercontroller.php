@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
- 
+
 /**
  * Manage users.
- * 
+ *
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
@@ -64,23 +64,30 @@ class UserController extends DashboardController {
       list($Offset, $Limit) = OffsetLimit($Page, PagerModule::$DefaultPageSize);
       if (!$Keywords) {
          $Keywords = $this->Form->GetFormValue('Keywords');
-         if ($Keywords)
+         if ($Keywords) {
             $Offset = 0;
+         }
+      }
+
+      if (!is_string($Keywords)) {
+         $Keywords = '';
       }
 
       // Put the Keyword back in the form
-      if ($Keywords)
+      if ($Keywords) {
          $this->Form->SetFormValue('Keywords', $Keywords);
+      }
 
       $UserModel = new UserModel();
       //$Like = trim($Keywords) == '' ? FALSE : array('u.Name' => $Keywords, 'u.Email' => $Keywords);
       list($Offset, $Limit) = OffsetLimit($Page, 30);
 
       $Filter = $this->_GetFilter();
-      if ($Filter)
+      if ($Filter) {
          $Filter['Keywords'] = $Keywords;
-      else
+      } else {
          $Filter = $Keywords;
+      }
 
       $this->SetData('RecordCount', $UserModel->SearchCount($Filter));
 

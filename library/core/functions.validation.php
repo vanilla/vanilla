@@ -158,9 +158,13 @@ if (!function_exists('ValidateUsernameRegex')) {
       static $ValidateUsernameRegex;
 
       if (is_null($ValidateUsernameRegex)) {
+         // Set our default ValidationRegex based on Unicode support.
+         // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
+         $DefaultPattern = (unicodeRegexSupport()) ? '\pN\pL\pM\pPc' : '\w';
+
          $ValidateUsernameRegex = sprintf("[%s]%s",
-            C("Garden.User.ValidationRegex","\d\w_"),
-            C("Garden.User.ValidationLength","{3,20}"));
+            C("Garden.User.ValidationRegex", $DefaultPattern),
+            C("Garden.User.ValidationLength", "{3,20}"));
       }
 
       return $ValidateUsernameRegex;

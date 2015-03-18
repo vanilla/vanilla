@@ -1395,6 +1395,8 @@ class Gdn_Controller extends Gdn_Pluggable {
       if ($CleanOutut) {
          // Remove values that should not be transmitted via api
          $Remove = array('Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes', 'AccessToken');
+
+         // Remove PersonalInfo values for unprivileged requests.
          if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             $Remove[] = 'InsertIPAddress';
             $Remove[] = 'UpdateIPAddress';
@@ -1404,6 +1406,22 @@ class Gdn_Controller extends Gdn_Pluggable {
             if (C('Api.Clean.Email', TRUE))
                $Remove[] = 'Email';
             $Remove[] = 'DateOfBirth';
+            $Remove[] = 'Preferences';
+            $Remove[] = 'Banned';
+            $Remove[] = 'Admin';
+            $Remove[] = 'Confirmed';
+            $Remove[] = 'Verified';
+            $Remove[] = 'DiscoveryText';
+            $Remove[] = 'InviteUserID';
+            $Remove[] = 'DateSetInvitations';
+            $Remove[] = 'CountInvitations';
+            $Remove[] = 'CountNotifications';
+            $Remove[] = 'CountBookmarks';
+            $Remove[] = 'CountDrafts';
+            $Remove[] = 'HourOffset';
+            $Remove[] = 'Gender';
+            $Remove[] = 'Punished';
+            $Remove[] = 'Troll';
          }
          $Data = RemoveKeysFromNestedArray($Data, $Remove);
       }

@@ -2377,7 +2377,9 @@ PASSWORDMETER;
          'includenull',
          'yearrange',
          'fields',
-         'inlineerrors');
+         'inlineerrors',
+         'categorydata'
+      );
       $Return = '';
 
       // Build string from array

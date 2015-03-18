@@ -4,7 +4,7 @@
 <?php
 // Add the canonical Url.
 if (method_exists($Sender, 'CanonicalUrl')) {
-   $CanonicalUrl = htmlspecialchars($Sender->CanonicalUrl(), ENT_COMPAT, 'UTF-8');
+   $CanonicalUrl = htmlspecialchars($Sender->CanonicalUrl(), ENT_COMPAT, C('Garden.Charset', 'UTF-8'));
 
    echo '<div class="CanonicalUrl"><b>'.T('Canonical Url')."</b>: <a href=\"$CanonicalUrl\" accesskey=\"r\">$CanonicalUrl</a></div>";
 }

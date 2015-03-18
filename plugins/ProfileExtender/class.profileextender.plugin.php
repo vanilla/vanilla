@@ -69,7 +69,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Users', T('Profile Fields'), 'settings/profileextender', 'Garden.Settings.Manage');
    }
-   
+
    /**
     * Add non-checkbox fields to registration forms.
     */
@@ -112,7 +112,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       if ('0-00-00' == $Sender->Form->GetFormValue('DateOfBirth'))
          $Sender->Form->SetFormValue('DateOfBirth', NULL);
    }
-   
+
    /**
     * Special manipulations.
     */
@@ -149,10 +149,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                break;
          }
       }
-      
+
       return $Fields;
    }
-      
+
    /**
     * Add fields to edit profile form.
     */
@@ -235,7 +235,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
       include($this->GetView('profilefields.php'));
    }
-   
+
    /**
     * Settings page.
     */
@@ -271,7 +271,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
          // Make Options an array
          if ($Options = GetValue('Options', $FormPostValues)) {
-            $Options = explode("\n", preg_replace('/[^\w\s-]/u', '', $Options));
+            $Options = explode("\n", preg_replace('/[^\w\s-()]/u', '', $Options));
             if (count($Options) < 2)
                $Sender->Form->AddError('Must have at least 2 options.', 'Options');
             SetValue('Options', $FormPostValues, $Options);
@@ -345,7 +345,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
       }
       $Sender->Render('delete', '', 'plugins/ProfileExtender');
    }
-   
+
    /**
     * Display custom fields on Edit User form.
     */
@@ -372,10 +372,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 			      Gdn::UserModel()->SaveAttribute($Sender->User->UserID, 'CustomProfileFields', FALSE);
 			   }
          }
-         
+
          // Send them off for magic formatting
          $ProfileFields = $this->ParseSpecialFields($ProfileFields);
-         
+
          // Get all field data, error check
          $AllFields = $this->GetProfileFields();
          if (!is_array($AllFields) || !is_array($ProfileFields)) {
@@ -410,7 +410,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // No errors
       }
    }
-   
+
    /**
     * Save custom profile fields when saving the user.
     *
@@ -462,7 +462,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          }
       }
    }
-   
+
    /**
     * Import from CustomProfileFields or upgrade from ProfileExtender 2.0.
     */

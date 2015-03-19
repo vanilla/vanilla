@@ -19,6 +19,7 @@ $PluginInfo['Flagging'] = array(
    'SettingsUrl' => '/dashboard/plugin/flagging',
    'SettingsPermission' => 'Garden.Moderation.Manage',
    'HasLocale' => TRUE,
+   'MobileFriendly' => TRUE,
    'RegisterPermissions' => array('Plugins.Flagging.Notify'),
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',

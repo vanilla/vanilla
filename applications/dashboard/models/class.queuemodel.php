@@ -379,7 +379,7 @@ class QueueModel extends Gdn_Model {
 
       if ($queueItem['Status'] == 'approved') {
          Trace('QueueID: ' . $queueItem['QueueID'] . ' already processed.  Skipping.');
-         return true;
+         throw new Gdn_UserException('Item has already been approved.', 409);
       }
 
       if (stristr($queueItem['Queue'], 'testing') !== false) {

@@ -98,6 +98,8 @@ window.vanilla.initialize = function (host) {
 
    var processMessage = function(message) {
 
+      console.log (message);
+
       var id = message.shift ();
 
       var frame = VanillaFrames.get (id);
@@ -381,8 +383,8 @@ window.vanilla.initialize = function (host) {
    };
 
    // Expose embed method.
-   window.vanilla.embed = function (container) {
-      new VanillaFrame (container);
+   window.vanilla.embed = function (container, options) {
+      new VanillaFrame (container, options);
    };
 
    // Now embed the iframe.
@@ -437,7 +439,8 @@ window.vanilla.initialize = function (host) {
          'category_id' : category_id,
          'foreign_url' : foreign_url,
          'embed_locale' : embed_locale,
-         'path' : path
+         'path' : path,
+         'update_path' : true
       };
 
       window.vanilla.embed (container, options);

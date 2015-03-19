@@ -1140,8 +1140,10 @@ class Gdn_Format {
       // http://youtu.be/GUbyhoU81sQ?t=1m8s
       // https://m.youtube.com/watch?v=iAEKPcz9www
       // https://youtube.com/watch?v=iAEKPcz9www
+      // https://www.youtube.com/watch?v=p5kcBxL7-qI
+      // https://www.youtube.com/watch?v=bG6b3V2MNxQ#t=33
 
-      $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>\w*)))(?:\?|\&)?(?:list=(?P<listId>[\w]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?/i';
+      $YoutubeUrlMatch = '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]*)))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i';
       $VimeoUrlMatch = 'https?://(www\.)?vimeo\.com/(?:channels/[a-z0-9]+/)?(\d+)';
       $TwitterUrlMatch = 'https?://(?:www\.)?twitter\.com/(?:#!/)?(?:[^/]+)/status(?:es)?/([\d]+)';
       $GithubCommitUrlMatch = 'https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/commit/([\w\d]{40})';
@@ -1149,11 +1151,10 @@ class Gdn_Format {
       $InstagramUrlMatch = 'https?://(?:www\.)?instagr(?:\.am|am\.com)/p/([\w\d]+)';
       $PintrestUrlMatch = 'https?://(?:www\.)?pinterest.com/pin/([\d]+)';
       $GettyUrlMatch = 'http://embed.gettyimages.com/([\w\d=?&;+-_]*)/([\d]*)/([\d]*)';
-
       $TwitchUrlMatch = 'http://www.twitch.tv/([\w\d]+)';
       $HitboxUrlMatch = 'http://www.hitbox.tv/([\w\d]+)';
 
-      // Youtube
+      // YouTube
       if ((preg_match($YoutubeUrlMatch, $Url, $Matches))
          && C('Garden.Format.YouTube', true)
          && !C('Garden.Format.DisableUrlEmbeds')) {
@@ -1162,21 +1163,21 @@ class Gdn_Format {
          $listId = val('listId', $Matches);
 
          if (!empty($listId)) {
-            //we're dealing with a playlist
+            // Playlist.
             if (empty($videoId)) {
-               //we're dealing with a playlist, no video
+               // Playlist, no video.
                $Result = <<<EOT
    <iframe width="{$Width}" height="{$Height}" src="//www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen></iframe>
 EOT;
             } else {
-               //we're dealing with a video in a playlist
+               // Video in a playlist.
                $Result = <<<EOT
    <iframe width="{$Width}" height="{$Height}" src="https://www.youtube.com/embed/{$videoId}?list={$listId}" frameborder="0" allowfullscreen></iframe>
 EOT;
             }
          }
          else  {
-            //we're dealing with a regular ol' youtube video embed
+            // Regular ol' youtube video embed.
             $minutes = val('minutes', $Matches);
             $seconds = val('seconds', $Matches);
             $fullUrl = $videoId.'?autoplay=1';
@@ -1185,10 +1186,16 @@ EOT;
                $fullUrl .= '&start='.$time;
             }
 
-            $Result = '<span class="VideoWrap">';
-            $Result .= '<span class="Video YouTube" id="youtube-'.$fullUrl.'">';
+            // Jump to start time.
+            if ($start = val('start', $Matches)) {
+               $fullUrl .= '&start='.$start;
+               $start = '#t='.$start;
+            }
 
-            $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$videoId.'">';
+            $Result = '<span class="VideoWrap">';
+            $Result .= '<span class="Video YouTube" data-youtube="youtube-'.$fullUrl.'">';
+
+            $Result .= '<span class="VideoPreview"><a href="//youtube.com/watch?v='.$videoId.$start.'">';
             $Result .= '<img src="//img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></span>';
             $Result .= '<span class="VideoPlayer"></span>';
             $Result .= '</span>';
@@ -1197,7 +1204,7 @@ EOT;
          $Result .= '</span>';
 
 
-         // Vimeo
+      // Vimeo
       } elseif (preg_match("`{$VimeoUrlMatch}`", $Url, $Matches) && C('Garden.Format.Vimeo', true)
         && !C('Garden.Format.DisableUrlEmbeds')) {
          $ID = $Matches[2];

@@ -1,10 +1,8 @@
 if (window.vanilla == undefined)
    window.vanilla = {};
 
-if (window.vanilla.embeds == undefined)
-   window.vanilla.embeds = {};
+window.vanilla.initialize = function (host) {
 
-window.vanilla.embed = function(host) {
    var scripts = document.getElementsByTagName('script'),
       id = Math.floor((Math.random()) * 100000).toString(),
       embedUrl = window.location.href.split('#')[0],
@@ -20,7 +18,7 @@ window.vanilla.embed = function(host) {
             return definedValue.replace('%s', window['vanilla_'+name]);
       }
       return defaultValue;
-   }
+   };
 
    if (!currentPath || disablePath)
       currentPath = "/";
@@ -30,6 +28,8 @@ window.vanilla.embed = function(host) {
 
    if (window.gadgets)
       embedUrl = '';
+
+   var host_base_url;
 
    if (typeof(host) == 'undefined') {
       host = '';
@@ -50,48 +50,22 @@ window.vanilla.embed = function(host) {
       }
    }
 
-   window.vanilla.embeds[id] = this;
-   if (window.postMessage) {
-      onMessage = function(e) {
-         var message = e.data.split(':');
-         var frame = document.getElementById('vanilla'+id);
-         if (!frame || frame.contentWindow != e.source)
-            return;
-         processMessage(message);
-      }
-      if (window.addEventListener)
-         window.addEventListener("message", onMessage, false);
-      else
-         window.attachEvent("onmessage", onMessage);
-   } else {
-      var messageId = null;
-      setInterval(function() {
-         try {
-            var vid = 'vanilla' + id;
-            var hash = window.frames[vid].frames['messageFrame'].location.hash;
-            hash = hash.substr(6);
-         } catch(e) {
-            return;
-         }
-
-         var message = hash.split(':');
-         var newMessageId = message[0];
-         if (newMessageId == messageId)
-            return;
-
-         messageId = newMessageId;
-         message.splice(0, 1);
-         processMessage(message);
-      }, 200);
-   }
-
-   checkHash = function() {
+   // Check hash.
+   var checkHash = function() {
       var path = window.location.hash.substr(1);
       if (path != currentPath) {
          currentPath = path;
-         window.frames['vanilla'+id].location.replace(vanillaUrl(path));
+
+         var parts = path.split (':');
+         var id = parts.shift ();
+         path = parts.join (':');
+
+         var frame = VanillaFrames.get (id);
+         if (frame) {
+            frame.navigate (path);
+         }
       }
-   }
+   };
 
    if (!window.gadgets) {
       if (!disablePath) {
@@ -107,7 +81,7 @@ window.vanilla.embed = function(host) {
    }
 
    // Strip param out of str if it exists
-   stripParam = function(str, param) {
+   var stripParam = function(str, param) {
       var pIndex = str.indexOf(param);
       if (pIndex > -1) {
          var pStr = str.substr(pIndex);
@@ -120,178 +94,153 @@ window.vanilla.embed = function(host) {
          return str.substr(0, pIndex) + (trail.length > 0 ? pre : '') + trail;
       }
       return str;
-   }
+   };
 
-   processMessage = function(message) {
-      var iframe = document.getElementById('vanilla'+id);
+   var processMessage = function(message) {
+
+      var id = message.shift ();
+
+      var frame = VanillaFrames.get (id);
+
+      if (!frame) {
+         console.log ('Frame not found');
+         return;
+      }
+
+      var iframe = frame.iframe;
 
       if (message[0] == 'height') {
-         setHeight(message[1]);
+         frame.setHeight(message[1]);
 
          if (message[1] > 0) {
             iframe.style.visibility = "visible";
          }
 
       } else if (message[0] == 'location') {
-
-         if (message[1] != '') {
-            iframe.style.visibility = "visible";
-         }
-
-         if (disablePath) {
-            //currentPath = cmd[1];
-         } else {
-            currentPath = window.location.hash.substr(1);
-            if (currentPath != message[1]) {
-               currentPath = message[1];
-               // Strip off the values that this script added
-               currentPath = currentPath.replace('/index.php?p=', ''); // 1
-               currentPath = stripParam(currentPath, 'remote='); // 2
-               currentPath = stripParam(currentPath, 'locale='); // 3
-               window.location.hash = currentPath;
-            }
-         }
+         frame.updatePath (message[1]);
       } else if (message[0] == 'unload') {
-         if (window.attachEvent || scrollPosition('vanilla'+id) < 0)
-            document.getElementById('vanilla'+id).scrollIntoView(true);
+         if (window.attachEvent || frame.getScrollPosition () < 0)
+            iframe.scrollIntoView(true);
 
          iframe.style.visibility = "hidden";
 
       } else if (message[0] == 'scrolltop') {
-         window.scrollTo(0, document.getElementById('vanilla'+id).offsetTop);
+         window.scrollTo(0, iframe.offsetTop);
       } else if (message[0] == 'scrollto') {
-         window.scrollTo(0, document.getElementById('vanilla'+id).offsetTop - 40 + (message[1] * 1));
+         window.scrollTo(0, iframe.offsetTop - 40 + (message[1] * 1));
       } else if (message[0] == 'unembed') {
          document.location = 'http://' + host + window.location.hash.substr(1);
       }
-   }
+   };
 
-   scrollPosition = function(id) {
-      var node = document.getElementById(id),
-         top = 0,
-         topScroll = 0;
-      if (node.offsetParent) {
-         do {
-            top += node.offsetTop;
-            topScroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
-         } while (node = node.offsetParent);
-         return top - topScroll;
+   function registerMessageListener () {
+      if (typeof (window.postMessage) != 'undefined') {
+         var onMessage = function(e) {
+            var message = e.data.split(':');
+            processMessage(message);
+         };
+
+         if (window.addEventListener)
+            window.addEventListener("message", onMessage, false);
+         else
+            window.attachEvent("onmessage", onMessage);
+
       }
-      return -1;
-   }
+      else {
+         var messageId = null;
+         setInterval(function() {
+            try {
+               var vid = 'vanilla' + id;
+               var hash = window.frames[vid].frames['messageFrame'].location.hash;
+               hash = hash.substr(6);
+            } catch(e) {
+               return;
+            }
 
-   setHeight = function(height) {
-      if (optStr('height'))
-         return;
+            var message = hash.split(':');
+            var newMessageId = message[0];
+            if (newMessageId == messageId)
+               return;
 
-      document.getElementById('vanilla'+id).style['height'] = height + "px";
-      if (window.gadgets && gadgets.window && gadgets.window.adjustHeight) {
-         try {
-            gadgets.window.adjustHeight();
-         } catch (ex) {
-            // Do nothing...
-         }
+            messageId = newMessageId;
+            message.splice(0, 1);
+            self.processMessage(message);
+         }, 200);
       }
    }
 
-   vanillaUrl = function(path) {
-      // What type of embed are we performing?
-      var embed_type = typeof(vanilla_embed_type) == 'undefined' ? 'standard' : vanilla_embed_type;
-      // Are we loading a particular discussion based on discussion_id?
-      var discussion_id = typeof(vanilla_discussion_id) == 'undefined' ? 0 : vanilla_discussion_id;
-      // Are we loading a particular discussion based on foreign_id?
-      var foreign_id = typeof(vanilla_identifier) == 'undefined' ? '' : vanilla_identifier;
-      // Is there a foreign type defined? Possibly used to render the discussion
-      // body a certain way in the forum? Also used to filter down to foreign
-      // types so that matching foreign_id's across type don't clash.
-      var foreign_type = typeof(vanilla_type) == 'undefined' ? 'page' : vanilla_type;
-      // If embedding comments, should the newly created discussion be placed in a specific category?
-      var category_id = typeof(vanilla_category_id) == 'undefined' ? '' : vanilla_category_id;
-      // If embedding comments, this value will be used to reference the foreign content. Defaults to the url of the page this file is included in.
-      var foreign_url = typeof(vanilla_url) == 'undefined' ? document.URL.split('#')[0] : vanilla_url;
-      // Are we forcing a locale via Multilingual plugin?
-      var embed_locale = typeof(vanilla_embed_locale) == 'undefined' ? '' : vanilla_embed_locale;
-      if (typeof(vanilla_lazy_load) == 'undefined')
-         vanilla_lazy_load = true;
+   registerMessageListener ();
 
-      // If path was defined, and we're sitting at app root, use the defined path instead.
-      if (typeof(vanilla_path) != 'undefined' && path == '/')
-         path = vanilla_path;
+   var VanillaFrames = {
 
-      // Force type based on incoming variables
-      if (discussion_id != '' || foreign_id != '')
-         embed_type = 'comments';
+      'map' : {},
 
-      var result = '';
+      'add' : function (frame) {
+         this.map[frame.id] = frame;
+      },
 
-      if (embed_type == 'comments') {
-         result = '//' + host + '/discussion/embed/'
-            +'&embed=1'
-            +'&vanilla_identifier='+encodeURIComponent(foreign_id)
-            +'&vanilla_url='+encodeURIComponent(foreign_url);
+      'get' : function (id) {
+         return this.map[id];
+      },
 
-         if (typeof(vanilla_type) != 'undefined')
-            result += '&vanilla_type='+encodeURIComponent(vanilla_type)
+      'remove' : function () {
 
-         if (typeof(vanilla_discussion_id) != 'undefined')
-            result += '&vanilla_discussion_id='+encodeURIComponent(vanilla_discussion_id);
+      }
 
-         if (typeof(vanilla_category_id) != 'undefined')
-            result += '&vanilla_category_id='+encodeURIComponent(vanilla_category_id);
+   };
 
-         if (typeof(vanilla_title) != 'undefined')
-            result += '&title='+encodeURIComponent(vanilla_title);
+   // A single iframe with the forum loaded inside.
+   var VanillaFrame = function (container, settings)
+   {
+
+      this.container = container;
+      this.id = Math.floor (Math.random () * 100000);
+      this.settings = settings || {};
+
+      this.register ();
+      this.initialize ();
+      this.load ();
+   };
+
+   VanillaFrame.prototype.register = function () {
+      VanillaFrames.add (this);
+   };
+
+   VanillaFrame.prototype.initialize = function () {
+      var vanillaIframe = document.createElement('iframe');
+      this.iframe = vanillaIframe;
+
+      vanillaIframe.id = "vanilla"+id;
+      vanillaIframe.name = "vanilla"+id;
+      vanillaIframe.src = this.getURL (currentPath);
+      vanillaIframe.scrolling = "no";
+      vanillaIframe.frameBorder = "0";
+      vanillaIframe.allowTransparency = true;
+      vanillaIframe.border = "0";
+      vanillaIframe.width = "100%";
+      vanillaIframe.style.width = "100%";
+      vanillaIframe.style.border = "0";
+      vanillaIframe.style.display = "block"; // must be block
+
+      if (typeof (window.postMessage) != 'undefined') {
+         vanillaIframe.height = "0";
+         vanillaIframe.style.height = "0";
       } else {
-         result = '//'
-            +host
-            +path
-            +'&embed=1'
-            +'&remote='
-            +encodeURIComponent(embedUrl)
-            +'&locale='
-            +encodeURIComponent(embed_locale);
+         vanillaIframe.height = "300";
+         vanillaIframe.style.height = "300px";
       }
+   };
 
-      if (window.vanilla_sso) {
-         result += '&sso='+encodeURIComponent(vanilla_sso);
-      }
+   VanillaFrame.prototype.load = function () {
 
-      return result.replace(/\?/g, '&').replace('&', '?'); // Replace the first occurrence of amp with question.
-   }
-   var vanillaIframe = document.createElement('iframe');
-   vanillaIframe.id = "vanilla"+id;
-   vanillaIframe.name = "vanilla"+id;
-   vanillaIframe.src = vanillaUrl(currentPath);
-   vanillaIframe.scrolling = "no";
-   vanillaIframe.frameBorder = "0";
-   vanillaIframe.allowTransparency = true;
-   vanillaIframe.border = "0";
-   vanillaIframe.width = "100%";
-   vanillaIframe.style.width = "100%";
-   vanillaIframe.style.border = "0";
-   vanillaIframe.style.display = "block"; // must be block
+      var vanillaIframe = this.iframe;
+      var container = this.container;
 
-   if (window.postMessage) {
-      vanillaIframe.height = "0";
-      vanillaIframe.style.height = "0";
-   } else {
-      vanillaIframe.height = "300";
-      vanillaIframe.style.height = "300px";
-   }
+      var img = document.createElement('div');
+      img.className = 'vn-loading';
+      img.style.textAlign = 'center';
+      img.innerHTML = window.vanilla_loadinghtml ? vanilla_loadinghtml : '<img src="https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/progress.gif" />';
 
-
-   var img = document.createElement('div');
-   img.className = 'vn-loading';
-   img.style.textAlign = 'center';
-   img.innerHTML = window.vanilla_loadinghtml ? vanilla_loadinghtml : '<img src="https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/progress.gif" />';
-
-   var container = document.getElementById('vanilla-comments');
-   // Couldn't find the container, so dump it out and try again.
-   if (!container)
-      document.write('<div id="vanilla-comments"></div>');
-   container = document.getElementById('vanilla-comments');
-
-   if (container) {
       var loaded = function() {
          if (img) {
             container.removeChild(img);
@@ -310,23 +259,188 @@ window.vanilla.embed = function(host) {
       container.appendChild(img);
 
       // If jQuery is present in the page, include our defer-until-visible script
-      if (vanilla_lazy_load && typeof jQuery != 'undefined') {
+      if (this.getSetting ('lazy_loading') && typeof jQuery != 'undefined') {
          jQuery.ajax({
             url: host_base_url+'js/library/jquery.appear.js',
             dataType: 'script',
             cache: true,
             success: function() {
-//               setTimeout(function() {
-
                if (jQuery.fn.appear)
                   jQuery('#vanilla-comments').appear(function() {container.appendChild(vanillaIframe);});
                else
                   container.appendChild(vanillaIframe); // fallback
-//               }, 10000);
             }});
       } else {
          container.appendChild(vanillaIframe); // fallback: just load it
       }
+   };
+
+   VanillaFrame.prototype.getSetting = function (name, defaultValue) {
+
+      if (typeof (this.settings[name]) != 'undefined') {
+         return this.settings[name];
+      }
+      return defaultValue;
+   };
+
+   VanillaFrame.prototype.getURL = function (path) {
+      var result = '';
+
+      if (typeof (path) == 'undefined')
+         path = '/';
+
+      if (this.getSetting ('embed_type') == 'comments') {
+
+         result = '//' + host + '/discussion/embed/'
+         +'&embed=' + this.id
+         +'&vanilla_identifier='+encodeURIComponent(this.getSetting ('foreign_id'))
+         +'&vanilla_url='+encodeURIComponent(this.getSetting ('foreign_url'));
+
+         if (this.getSetting ('type'))
+            result += '&vanilla_type='+encodeURIComponent(this.getSetting ('type'));
+
+         if (this.getSetting ('discussion_id'))
+            result += '&vanilla_discussion_id='+encodeURIComponent(this.getSetting ('discussion_id'));
+
+         if (this.getSetting ('category_id'))
+            result += '&vanilla_category_id='+encodeURIComponent(this.getSetting ('category_id'));
+
+         if (this.getSetting ('title'))
+            result += '&title='+encodeURIComponent(this.getSetting ('title'));
+      }
+
+      else {
+         result = '//' +host +path
+         +'&embed=' + this.id
+         +'&remote=' +encodeURIComponent(embedUrl)
+         +'&locale=' +encodeURIComponent(embed_locale);
+      }
+
+      if (window.vanilla_sso) {
+         result += '&sso='+encodeURIComponent(this.getSetting ('sso'));
+      }
+
+      return result.replace(/\?/g, '&').replace('&', '?'); // Replace the first occurrence of amp with question.
+   };
+
+   VanillaFrame.prototype.setHeight = function (height) {
+      if (this.getSetting ('height'))
+         return;
+
+      this.iframe.style['height'] = height + "px";
+
+      /*
+      if (window.gadgets && gadgets.window && gadgets.window.adjustHeight) {
+         try {
+            gadgets.window.adjustHeight();
+         } catch (ex) {
+            // Do nothing...
+         }
+      }
+      */
+   };
+
+   VanillaFrame.prototype.getScrollPosition = function() {
+      var node = this.iframe,
+          top = 0,
+          topScroll = 0;
+      if (node.offsetParent) {
+         do {
+            top += node.offsetTop;
+            topScroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+         } while (node = node.offsetParent);
+         return top - topScroll;
+      }
+      return -1;
+   };
+
+   VanillaFrame.prototype.navigate = function (path) {
+      alert (path);
+   };
+
+   VanillaFrame.prototype.updatePath = function (path) {
+      if (path != '') {
+         this.iframe.style.visibility = "visible";
+      }
+
+      if (disablePath) {
+         //currentPath = cmd[1];
+      }
+
+      else if (this.getSetting ('update_path', true)) {
+         var currentPath = window.location.hash.substr(1);
+         if (currentPath != path) {
+            currentPath = path;
+            // Strip off the values that this script added
+            currentPath = currentPath.replace('/index.php?p=', ''); // 1
+            currentPath = stripParam(currentPath, 'remote='); // 2
+            currentPath = stripParam(currentPath, 'locale='); // 3
+            window.location.hash = this.getSetting ('base_path', '') + currentPath;
+         }
+      }
+   };
+
+   // Expose embed method.
+   window.vanilla.embed = function (container) {
+      new VanillaFrame (container);
+   };
+
+   // Now embed the iframe.
+   if (! (optStr ('no_embed', false))) {
+
+      var container = document.getElementById('vanilla-comments');
+      // Couldn't find the container, so dump it out and try again.
+      if (!container) {
+         document.write('<div id="vanilla-comments"></div>');
+         container = document.getElementById('vanilla-comments');
+      }
+
+      /**
+       * OPTIONS!
+       */
+      // What type of embed are we performing?
+      var embed_type = optStr ('embed_type', 'standard');
+
+      // Are we loading a particular discussion based on discussion_id?
+      var discussion_id = optStr ('discussion_id', 0);
+
+      // Are we loading a particular discussion based on foreign_id?
+      var foreign_id = optStr ('identifier', '');
+
+      // Force type based on incoming variables
+      if (discussion_id != 0 || foreign_id != '')
+         embed_type = 'comments';
+
+      // Is there a foreign type defined? Possibly used to render the discussion
+      // body a certain way in the forum? Also used to filter down to foreign
+      // types so that matching foreign_id's across type don't clash.
+      var foreign_type = optStr ('type', 'page');
+
+      // If embedding comments, should the newly created discussion be placed in a specific category?
+      var category_id = optStr ('category_id', '');
+
+      // If embedding comments, this value will be used to reference the foreign content. Defaults to the url of the page this file is included in.
+      var foreign_url = optStr ('url', document.URL.split('#')[0]);
+
+      // Are we forcing a locale via Multilingual plugin?
+      var embed_locale = optStr ('embed_locale', '');
+
+      // If path was defined, and we're sitting at app root, use the defined path instead.
+      if (typeof(vanilla_path) != 'undefined' && path == '/')
+         var path = vanilla_path;
+
+      var options = {
+         'embed_type' : embed_type,
+         'discussion_id' : discussion_id,
+         'foreign_id' : foreign_id,
+         'foreign_type' : foreign_type,
+         'category_id' : category_id,
+         'foreign_url' : foreign_url,
+         'embed_locale' : embed_locale,
+         'path' : path
+      };
+
+      window.vanilla.embed (container, options);
    }
 
    // Include our embed css into the page
@@ -338,9 +452,13 @@ window.vanilla.embed = function(host) {
 
    return this;
 };
+
 try {
-   if (window.location.hash.substr(0, 6) != "#poll:")
-      window.vanilla.embed();
+   if (
+       window.location.hash.substr(0, 6) != "#poll:"
+   ) {
+      window.vanilla.initialize();
+   }
 } catch(e) {
    var error = document.createElement('div');
    error.style.padding = "10px";

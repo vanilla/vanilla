@@ -927,11 +927,11 @@ class Gdn_Request {
       // Is embed?
       // @TODO should this be placed here?
       if (IsEmbed ()) {
-         if (isset ($Query)) {
-            $Query .= '&embed=1';
+         if (!empty ($Query)) {
+            $Query .= '&embed=' . (isset ($_GET['embed']) ? $_GET['embed'] : 1);
          }
          else {
-            $Query = '?embed=1';
+            $Query = '?embed=' . (isset ($_GET['embed']) ? $_GET['embed'] : 1);
          }
       }
 

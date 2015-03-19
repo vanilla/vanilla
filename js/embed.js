@@ -26,8 +26,10 @@ window.vanilla.initialize = function (host) {
    if (currentPath.substr(0, 1) != '/')
       currentPath = '/' + currentPath;
 
+   /*
    if (window.gadgets)
       embedUrl = '';
+   */
 
    var host_base_url;
 
@@ -51,6 +53,7 @@ window.vanilla.initialize = function (host) {
    }
 
    // Check hash.
+   /*
    var checkHash = function() {
       var path = window.location.hash.substr(1);
       if (path != currentPath) {
@@ -79,6 +82,7 @@ window.vanilla.initialize = function (host) {
          }
       }
    }
+   */
 
    // Strip param out of str if it exists
    var stripParam = function(str, param) {
@@ -98,10 +102,7 @@ window.vanilla.initialize = function (host) {
 
    var processMessage = function(message) {
 
-      console.log (message);
-
       var id = message.shift ();
-
       var frame = VanillaFrames.get (id);
 
       if (!frame) {
@@ -288,8 +289,17 @@ window.vanilla.initialize = function (host) {
    VanillaFrame.prototype.getURL = function (path) {
       var result = '';
 
+      // Check for root path
       if (typeof (path) == 'undefined')
          path = '/';
+
+      var basepath = this.getSetting ('base_path', '');
+      if (basepath) {
+
+         if (path.substr (0, basepath.length) === basepath) {
+            path = path.substr (basepath.length);
+         }
+      }
 
       if (this.getSetting ('embed_type') == 'comments') {
 
@@ -361,6 +371,8 @@ window.vanilla.initialize = function (host) {
    };
 
    VanillaFrame.prototype.updatePath = function (path) {
+
+
       if (path != '') {
          this.iframe.style.visibility = "visible";
       }

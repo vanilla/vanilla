@@ -452,11 +452,11 @@ class QueueModel extends Gdn_Model {
          if (GetValue('ForeignID', $queueItem)) {
             $parts = explode('-', $queueItem['ForeignID'], 2);
             $validContentParts = array('A', 'C', 'D', 'AC');
-            if (in_array($parts[0], $validContentParts)) {
-               $exisiting = $model->GetID($parts[1]);
-               if ($exisiting) {
+            if (is_numeric($parts[1]) && in_array($parts[0], $validContentParts)) {
+               $existing = $model->GetID($parts[1]);
+               if ($existing) {
                   Trace('Item has already been added');
-                  return true;
+                  throw new Gdn_UserException('Item has already been added', 409);
                }
             }
          }

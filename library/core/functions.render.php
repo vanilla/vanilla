@@ -231,7 +231,7 @@ if (!function_exists('Condense')) {
 
 if (!function_exists('CountString')) {
    function CountString($Number, $Url = '', $Options = array()) {
-      if (!$Number && $Number !== Null) {
+      if (!$Number && $Number !== null) {
          return '';
       }
       
@@ -245,7 +245,7 @@ if (!function_exists('CountString')) {
       if ($Number) {
          $CssClass = trim($CssClass.' Count', ' ');
          return "<span class=\"$CssClass\">$Number</span>";
-      } elseif ($Number === NULL && $Url) {
+      } elseif ($Number === null && $Url) {
          $CssClass = trim($CssClass.' Popin TinyProgress', ' ');
          $Url = htmlspecialchars($Url);
          return "<span class=\"$CssClass\" rel=\"$Url\"></span>";

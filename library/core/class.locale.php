@@ -147,12 +147,13 @@ class Gdn_Locale extends Gdn_Pluggable {
     *  automatically force a remapping.
     */
    public function Set($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
+      $CurrentLocale = self::Canonicalize($LocaleName);
+
       // Get locale sources
       $this->Locale = $LocaleName;
-      $LocaleSources = $this->GetLocaleSources($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
+      $LocaleSources = $this->GetLocaleSources($CurrentLocale, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
 
       $Codeset = C('Garden.LocaleCodeset', 'UTF8');
-      $CurrentLocale = str_replace('-', '_', $LocaleName);
 
       $SetLocale = array(
          LC_TIME,
@@ -288,7 +289,9 @@ class Gdn_Locale extends Gdn_Pluggable {
       // Look for a global locale.
       $configLocale = PATH_CONF.'/locale.php';
       if (file_exists($configLocale)) {
-         $result[$locale][] = $configLocale;
+         foreach (array_keys($result) as $locale) {
+            $result[$locale][] = $configLocale;
+         }
       }
 
       // Look for locale specific config locales.

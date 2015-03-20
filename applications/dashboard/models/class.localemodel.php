@@ -22,6 +22,7 @@ class LocaleModel {
          $AvailableLocales = array();
          foreach ($LocaleInfoPaths as $InfoPath) {
             $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
+            $this->CalculateLocaleInfo($LocaleInfo);
             $AvailableLocales[$LocaleInfo['Index']] = $LocaleInfo;
          }
          $this->_AvailableLocalePacks = $AvailableLocales;
@@ -36,6 +37,14 @@ class LocaleModel {
       $Locales = array_combine($Locales, $Locales);
    
       return $Locales;
+   }
+
+   protected function CalculateLocaleInfo(&$info) {
+      $canonicalLocale = Gdn_Locale::Canonicalize($info['Locale']);
+      if ($canonicalLocale !== $info['Locale']) {
+         $info['LocaleRaw'] = $info['Locale'];
+         $info['Locale'] = $canonicalLocale;
+      }
    }
 
    public function CopyDefinitions($SourcePath, $DestPath) {
@@ -70,6 +79,7 @@ class LocaleModel {
             $InfoPath = PATH_ROOT."/locales/$Key/definitions.php";
             if (file_exists($InfoPath)) {
                $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
+               $this->CalculateLocaleInfo($LocaleInfo);
                $Result[$Key] = current($LocaleInfo);
             } else {
                unset($Result[$Key]);
@@ -157,10 +167,10 @@ class LocaleModel {
 
       // Grab all of the definition files from the locale.
       $Paths = SafeGlob(PATH_ROOT."/locales/{$LocaleKey}/*.php");
-      
+
       // Unload the dynamic config
       Gdn::Locale()->Unload();
-      
+
       // Load each locale file, checking for errors
       foreach ($Paths as $Path) {
          Gdn::Locale()->Load($Path, FALSE);

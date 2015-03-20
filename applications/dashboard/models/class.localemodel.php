@@ -80,7 +80,7 @@ class LocaleModel {
             if (file_exists($InfoPath)) {
                $LocaleInfo = Gdn::PluginManager()->ScanPluginFile($InfoPath, 'LocaleInfo');
                $this->CalculateLocaleInfo($LocaleInfo);
-               $Result[$Key] = current($LocaleInfo);
+               $Result[$Key] = $LocaleInfo;
             } else {
                unset($Result[$Key]);
             }

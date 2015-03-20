@@ -82,6 +82,35 @@ class Gdn_Locale extends Gdn_Pluggable {
    }
 
    /**
+    * Canonicalize a locale string so different representations of the same locale can be used together.
+    *
+    * Example:
+    *
+    *     echo Gdn_Locale::Canonicalize('en-ca');
+    *     // prints en_CA
+    *
+    * @param string $locale The locale code to canonicalize.
+    * @return string Returns the canonicalized version of the locale code.
+    */
+   public static function Canonicalize($locale) {
+      $locale = str_replace(array('-', '@'), array('_', '__'), $locale);
+      $parts = explode('_', $locale, 2);
+      if (isset($parts[1])) {
+         $parts[1] = strtoupper($parts[1]);
+      }
+      $result = implode('_', $parts);
+      // Remove everything from the string except letters, numbers, dashes, and underscores.
+      $result = preg_replace('/([^\w-])/', '', $result);
+
+      // This is a bit of a kludge, but we are deprecating en_CA in favour of just en.
+      if ($result === 'en_CA') {
+         $result = 'en';
+      }
+
+      return $result;
+   }
+
+   /**
     * Reload the locale system
     */
    public function Refresh() {

@@ -271,7 +271,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
          // Make Options an array
          if ($Options = GetValue('Options', $FormPostValues)) {
-            $Options = explode("\n", preg_replace('/[^\w\s-()]/u', '', $Options));
+            $Options = explode("\n", preg_replace('/[^\w\s()-]/u', '', $Options));
             if (count($Options) < 2)
                $Sender->Form->AddError('Must have at least 2 options.', 'Options');
             SetValue('Options', $FormPostValues, $Options);

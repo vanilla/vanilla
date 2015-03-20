@@ -32,10 +32,10 @@ class LocaleModel {
 
    public function AvailableLocales() {
       // Get the list of locales that are supported.
-      $Locales = array_unique(ConsolidateArrayValuesByKey($this->AvailableLocalePacks(), 'Locale'), SORT_STRING);
-      asort($Locales);
-      $Locales = array_combine($Locales, $Locales);
-   
+      $Locales = array_column($this->AvailableLocalePacks(), 'Locale', 'Locale');
+      $Locales['en'] = 'en'; // the default locale is always available.
+      ksort($Locales);
+
       return $Locales;
    }
 

@@ -14,12 +14,12 @@ $Session = Gdn::Session();
 <div class="Info">
    <?php
    printf(
-      T('Locales are in your %s folder.', "Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here."),
+      T('Locales allow you to support other languages on your site.', "Locales allow you to support other languages on your site. Enable and disable locales you want to make available here."),
       '<code>'.PATH_ROOT.'/locales</code>'
    );
 
    if ($this->Data('DefaultLocaleWarning'))
-      echo '<div class="Errors"><ul><li>', sprintf(T('Your default locale won\'t display properly', 'Your default locale won\'t display properly until it is enabled below. Please enable the following: %s.'), $this->Data('MatchingLocalePacks')), '</li></ul></div>';
+      echo '<div class="Errors">', sprintf(T('Your default locale won\'t display properly', 'Your default locale won\'t display properly until it is enabled below. Please enable the following: %s.'), $this->Data('MatchingLocalePacks')), '</div>';
 
    echo
       '<p>',

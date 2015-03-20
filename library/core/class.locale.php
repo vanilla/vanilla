@@ -212,6 +212,97 @@ class Gdn_Locale extends Gdn_Pluggable {
       $this->FireEvent('AfterSet');
    }
 
+   /**
+    * Crawl applications or plugins for its locale files.
+    *
+    * @param string $basePath The base path. Either the plugins or applications path.
+    * @param string[] $folders The folders to crawl within the base path.
+    * @param array $result The result array to put all the translation paths.
+    */
+   protected function CrawlAddonLocaleSources($basePath, $folders, &$result) {
+      if (!is_array($folders)) {
+         return;
+      }
+
+      $paths = array();
+      foreach ($folders as $folder) {
+         $paths[] = $basePath."/$folder/locale";
+      }
+
+      // Get all of the locale files for the addons.
+      foreach ($paths as $path) {
+         // Look for individual locale files.
+         $localePaths = SafeGlob($path.'/*.php');
+         foreach ($localePaths as $localePath) {
+            $locale = self::Canonicalize(basename($localePath, '.php'));
+            $result[$locale][] = $localePath;
+         }
+
+         // Look for locale files in a directory.
+         // This should be deprecated very soon.
+         $localePaths = SafeGlob($path.'/*/definitions.php');
+         foreach ($localePaths as $localePath) {
+            $locale = self::Canonicalize(basename(dirname($localePath)));
+            $result[$locale][] = $localePath;
+         }
+      }
+   }
+
+   /**
+    * Crawl the various addons and locales for all of the applicable translation files.
+    *
+    * @param string[] $applicationWhiteList An array of enabled application folders.
+    * @param string[] $pluginWhiteList An array of enabled plugin folders.
+    * @return array Returns an array keyed by locale names where each value is an array of translation paths for that locale.
+    */
+   public function CrawlAllLocaleSources($applicationWhiteList, $pluginWhiteList) {
+      $result = array();
+
+      // Get all of the locale files for the applications.
+      $this->CrawlAddonLocaleSources(PATH_APPLICATIONS, $applicationWhiteList, $result);
+
+      // Get locale-based locale definition files.
+      $enabledLocales = C('EnabledLocales');
+      if (is_array($enabledLocales)) {
+         foreach ($enabledLocales as $localeKey => $locale) {
+            $locale = self::Canonicalize($locale);
+
+            // Grab all of the files in the locale's folder.
+            $translationPaths = SafeGlob(PATH_ROOT."/locales/{$localeKey}/*.php");
+            foreach($translationPaths as $translationPath) {
+               $result[$locale][] = $translationPath;
+            }
+         }
+      }
+
+      // Get all of the locale files for plugins.
+      // Notice that the plugins are processed here so that they have overriding power.
+      $this->CrawlAddonLocaleSources(PATH_PLUGINS, $pluginWhiteList, $result);
+
+      // Get theme-based locale definition files.
+      $theme = C('Garden.Theme');
+      if ($theme) {
+         $this->CrawlAddonLocaleSources(PATH_THEMES, array($theme), $result);
+      }
+
+      // Look for a global locale.
+      $configLocale = PATH_CONF.'/locale.php';
+      if (file_exists($configLocale)) {
+         $result[$locale][] = $configLocale;
+      }
+
+      // Look for locale specific config locales.
+      $paths = SafeGlob(PATH_CONF.'/locale-*.php');
+      foreach ($paths as $path) {
+         if (preg_match('`^locale-([\w-]+)$`i', basename($path, '.php'), $matches)) {
+            $locale = self::Canonicalize($matches[1]);
+            $result[$locale][] = $path;
+         }
+      }
+
+      return $result;
+   }
+
    public function GetLocaleSources($LocaleName, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping = FALSE) {
       $SafeLocaleName = preg_replace('/([^\w\d_-])/', '', $LocaleName); // Removes everything from the string except letters, numbers, dashes, and underscores
       $LocaleSources = array();

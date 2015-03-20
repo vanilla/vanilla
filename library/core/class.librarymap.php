@@ -32,9 +32,9 @@ class Gdn_LibraryMap {
     * Prepare a cache library for use, either by loading it from file, filling it with
     * pre existing data in array form, or leaving it empty and waiting for new entries.
     *
-    * @param string $CacheName name of cache library
-    * @param array $ExistingCacheArray optional array containing an initial seed cache
-    * @param string $CacheMode optional mode of the cache... defaults to flat
+    * @param string $CacheName The name of cache library.
+    * @param array|null $ExistingCacheArray An optional array containing an initial seed cache.
+    * @param string $CacheMode An optional mode of the cache. Defaults to flat.
     * @return void
     */
    public static function PrepareCache($CacheName, $ExistingCacheArray = NULL, $CacheMode = 'flat') {
@@ -204,23 +204,32 @@ class Gdn_LibraryMap {
     * Retrieve an item from the cache
     *
     * @param string $CacheName name of cache library
-    * @param string $CacheKey name of cache entry
+    * @param string|null $CacheKey name of cache entry
     * @return mixed cache entry or null on failure
     */
-   public static function GetCache($CacheName, $CacheKey) {
-      if ($CacheName != 'locale') return;
+   public static function GetCache($CacheName, $CacheKey = null) {
+      if ($CacheName != 'locale') {
+         return;
+      }
 
-      if (!array_key_exists($CacheName,self::$Caches))
+      if (!array_key_exists($CacheName,self::$Caches)) {
          self::PrepareCache($CacheName);
+      }
 
-      if (self::$Caches[$CacheName]['mode'] == 'flat')
+      if (self::$Caches[$CacheName]['mode'] == 'flat') {
          $Target = &self::$Caches[$CacheName]['cache'][$CacheName];
-      else
+      } else {
          $Target = &self::$Caches[$CacheName]['cache'];
+      }
       $Target = (array)$Target;
 
-      if (array_key_exists($CacheKey,$Target))
+      if ($CacheKey === null) {
+         return $Target;
+      }
+
+      if (array_key_exists($CacheKey,$Target)) {
          return $Target[$CacheKey];
+      }
 
       return NULL;
    }

@@ -246,6 +246,11 @@ class Gdn_Locale extends Gdn_Pluggable {
          foreach ($localePaths as $localePath) {
             $locale = self::Canonicalize(basename(dirname($localePath)));
             $result[$locale][] = $localePath;
+
+            $subPath = StringBeginsWith($localePath, PATH_ROOT, true, true);
+            $properPath = dirname($subPath).'.php';
+
+            trigger_error("Locales in $subPath is deprecated. Use $properPath instead.", E_USER_DEPRECATED);
          }
       }
    }

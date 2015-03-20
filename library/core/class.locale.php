@@ -45,6 +45,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       'da' => 'da_DK',
       'de' => 'de_DE',
       'el' => 'el_GR',
+      'en' => 'en_US',
       'es' => 'es_ES',
       'fa' => 'fa_IR',
       'fr' => 'fr_FR',
@@ -86,8 +87,8 @@ class Gdn_Locale extends Gdn_Pluggable {
     *
     * Example:
     *
-    *     echo Gdn_Locale::Canonicalize('en-ca');
-    *     // prints en_CA
+    *     echo Gdn_Locale::Canonicalize('en-us');
+    *     // prints en_US
     *
     * @param string $locale The locale code to canonicalize.
     * @return string Returns the canonicalized version of the locale code.
@@ -150,7 +151,7 @@ class Gdn_Locale extends Gdn_Pluggable {
       $CurrentLocale = self::Canonicalize($LocaleName);
 
       // Get locale sources
-      $this->Locale = $LocaleName;
+      $this->Locale = $CurrentLocale;
       $LocaleSources = $this->GetLocaleSources($CurrentLocale, $ApplicationWhiteList, $PluginWhiteList, $ForceRemapping);
 
       $Codeset = C('Garden.LocaleCodeset', 'UTF8');

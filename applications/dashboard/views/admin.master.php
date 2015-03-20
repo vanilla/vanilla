@@ -1,6 +1,6 @@
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
    <?php $this->RenderAsset('Head'); ?>
    <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
@@ -15,12 +15,12 @@
 			      $Session = Gdn::Session();
 					if ($Session->IsValid()) {
 						$this->FireEvent('BeforeUserOptionsMenu');
-						
+
 						$Name = $Session->User->Name;
 						$CountNotifications = $Session->User->CountNotifications;
 						if (is_numeric($CountNotifications) && $CountNotifications > 0)
 							$Name .= Wrap($CountNotifications);
-							
+
 						echo Anchor($Name, UserUrl($Session->User), 'Profile');
 						echo Anchor(T('Sign Out'), SignOutUrl(), 'Leave');
 					}

@@ -161,7 +161,7 @@ class CategoryModel extends Gdn_Model {
     */
    protected static function BuildCache() {
       self::CalculateData(self::$Categories);
-      self::JoinRecentPosts(self::$Categories);
+//      self::JoinRecentPosts(self::$Categories);
       Gdn::Cache()->Store(self::CACHE_KEY, self::$Categories, array(
          Gdn_Cache::FEATURE_EXPIRY  => 600,
          Gdn_Cache::FEATURE_SHARD   => self::$ShardCache
@@ -676,8 +676,9 @@ class CategoryModel extends Gdn_Model {
             $Categories[$CID]['PhotoUrl'] = Gdn_Upload::Url($Photo);
          }
 
-         if ($Category['LastUrl'])
+         if (!empty($Category['LastUrl'])) {
             $Categories[$CID]['LastUrl'] = Url($Category['LastUrl'], '//');
+         }
          $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
@@ -1049,6 +1050,7 @@ class CategoryModel extends Gdn_Model {
             unset($Categories[$ID]);
       }
 
+      self::JoinRecentPosts($Categories);
       foreach ($Categories as &$Category) {
          if ($Category['ParentCategoryID'] <= 0)
             self::JoinRecentChildPosts($Category, $Categories);

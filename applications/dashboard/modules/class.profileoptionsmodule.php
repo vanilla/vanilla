@@ -33,7 +33,7 @@ class ProfileOptionsModule extends Gdn_Module {
          // Profile Editing
          if (hasEditProfile($Controller->User->UserID)) {
             $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Edit Profile'), 'Url' => UserUrl($Controller->User, '', 'edit'));
-         } else {
+         } elseif ($Session->IsValid()) {
             $ProfileOptions[] = array('Text' => Sprite('SpEditProfile').' '.T('Preferences'), 'Url' => UserUrl($Controller->User, '', 'preferences'));
          }
 

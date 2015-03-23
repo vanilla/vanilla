@@ -132,7 +132,7 @@ class DbaController extends DashboardController {
    /**
     * Scan a table for invalid InsertUserID values and update with SystemUserID
     *
-    * @param bool $Table The name of the table to fix InsertUserID in.
+    * @param bool|string $Table The name of the table to fix InsertUserID in.
     */
    public function FixInsertUserID($Table = false) {
       $this->Permission('Garden.Settings.Manage');
@@ -164,6 +164,9 @@ class DbaController extends DashboardController {
       $this->Render('Job');
    }
 
+   /**
+    * Look for users with an invalid role and apply the role specified to those users.
+    */
    public function FixUserRole() {
       $this->Permission('Garden.Settings.Manage');
 

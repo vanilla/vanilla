@@ -228,17 +228,14 @@ class DBAModel extends Gdn_Model {
       return array('Complete' => TRUE);
    }
 
+   /**
+    * Apply the specified RoleID to all users without a valid role
+    *
+    * @param $RoleID
+    * @return bool|Gdn_DataSet|string
+    * @throws Exception
+    */
    public function FixUserRole($RoleID) {
-      //Array ( [0] => Array ( [UserID] => 2 ) [1] => Array ( [UserID] => 40268 ) )
-      $UsersWithoutRoles = $this->SQL
-         ->Select('u.UserID')
-         ->From('User u')
-         ->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')
-         ->LeftJoin('Role r', 'ur.RoleID = r.RoleID')
-         ->Where('r.Name', NULL)
-         ->Get()
-         ->ResultArray();
-
       $PDO = Gdn::Database()->Connection();
       $InsertQuery = "
          insert into :_UserRole

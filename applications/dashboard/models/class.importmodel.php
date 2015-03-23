@@ -1840,13 +1840,19 @@ class ImportModel extends Gdn_Model {
 		// Any comments without a user associated with them?
 		$this->Stat(
 			'Orphaned Comments',
-			$this->SQL->GetCount('Discussion', array('InsertUserID', '0'))
+			$this->SQL->GetCount('Comment', array('InsertUserID', '0'))
 		);
 
 		// Any users without roles?
-		$UsersWithoutRoles = $this->SQL->From('User u')->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')->Where('ur.RoleID', NULL)->Get()->count();
+		$UsersWithoutRoles = $this->SQL
+         ->From('User u')
+         ->LeftJoin('UserRole ur', 'u.UserID = ur.UserID')
+         ->LeftJoin('Role r', 'ur.RoleID = r.RoleID')
+         ->Where('r.Name', NULL)
+         ->Get()
+         ->Count();
 		$this->Stat(
-			'Users Without Roles',
+			'Users Without a Valid Role',
 			$UsersWithoutRoles
 		);
 

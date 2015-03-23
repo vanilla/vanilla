@@ -138,16 +138,11 @@ class PostController extends VanillaController {
 
       // Check permission
       if (isset($this->Discussion)) {
-
-         // Permission to edit
-         if ($this->Discussion->InsertUserID != $Session->UserID)
-            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
-
          // Make sure that content can (still) be edited.
-         $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-         $CanEdit = $EditContentTimeout == -1 || strtotime($this->Discussion->DateInserted) + $EditContentTimeout > time();
-         if (!$CanEdit)
-            $this->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $this->Category->PermissionCategoryID);
+         $CanEdit = DiscussionModel::canEdit($this->Discussion);
+         if (!$CanEdit) {
+            throw PermissionException('Vanilla.Discussions.Edit');
+         }
 
          // Make sure only moderators can edit closed things
          if ($this->Discussion->Closed)
@@ -595,7 +590,7 @@ class PostController extends VanillaController {
 
             // The comment is now half-saved.
             if (is_numeric($CommentID) && $CommentID > 0) {
-               if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+               if (in_array($this->DeliveryType(), array(DELIVERY_TYPE_ALL, DELIVERY_TYPE_DATA))) {
                   $this->CommentModel->Save2($CommentID, $Inserted, TRUE, TRUE);
                } else {
                   $this->JsonTarget('', Url("/vanilla/post/comment2.json?commentid=$CommentID&inserted=$Inserted"), 'Ajax');

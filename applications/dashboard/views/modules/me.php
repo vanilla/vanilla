@@ -18,6 +18,8 @@ if ($Session->CheckPermission('Garden.Users.Approve')) {
    $RoleModel = new RoleModel();
    $ApplicantCount = $RoleModel->GetApplicantCount();
    $DashboardCount += $ApplicantCount;
+} else {
+   $ApplicantCount = null;
 }
 
 $this->EventArguments['DashboardCount'] = &$DashboardCount;

@@ -139,9 +139,11 @@ class RoleModel extends Gdn_Model {
          ->From('Role r')
          ->LeftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null'); // join to global permissions
 
-      // Don't select roles that I don't have a ranking permission for.
+      // Community managers can assign permissions they have,
+      // but other users can't assign any ranking permissions.
+      $CM = Gdn::Session()->CheckPermission('Garden.Community.Manage');
       foreach ($this->RankPermissions as $Permission) {
-         if (!Gdn::Session()->CheckPermission($Permission)) {
+         if (!$CM || !Gdn::Session()->CheckPermission($Permission)) {
             $Sql->Where("coalesce(`$Permission`, 0)", '0', FALSE, FALSE);
          }
       }

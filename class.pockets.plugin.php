@@ -315,8 +315,9 @@ class PocketsPlugin extends Gdn_Plugin {
    }
 
    protected function _LoadState($Force = FALSE) {
-      if (!$Force && $this->StateLoaded)
+      if (!$Force && $this->StateLoaded) {
          return;
+      }
 
       $Pockets = Gdn::SQL()->Get('Pocket', 'Location, Sort, Name')->ResultArray();
       foreach ($Pockets as $Row) {
@@ -336,7 +337,7 @@ class PocketsPlugin extends Gdn_Plugin {
       if (Gdn::Controller()->Data('_NoMessages') && $Location != 'Head') {
          return;
       }
-      
+
       // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
       $this->_LoadState();
 
@@ -449,9 +450,10 @@ class PocketsPlugin extends Gdn_Plugin {
       $this->Structure();
    }
 
-   public function Structure($Explicit = FALSE, $Drop = FALSE) {
-   	  // It seems plugins need to be disabled and enabled for this to happen.
-   	  // Might want to warn users that upgrade.
+   public function Structure() {
+      // Pocket class isn't autoloaded on Enable.
+      require_once('library/class.pocket.php');
+
       $St = Gdn::Structure();
       $St->Table('Pocket')
          ->PrimaryKey('PocketID')
@@ -470,7 +472,7 @@ class PocketsPlugin extends Gdn_Plugin {
          ->Column('EmbeddedNever', 'tinyint', '0')
          ->Column('ShowInDashboard', 'tinyint', '0')
          ->Column('Type', array(Pocket::TYPE_DEFAULT, Pocket::TYPE_AD), Pocket::TYPE_DEFAULT)
-         ->Set($Explicit, $Drop);
+         ->Set();
 
       $PermissionModel = Gdn::PermissionModel();
       $PermissionModel->Define(array(

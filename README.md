@@ -77,6 +77,7 @@ Follow these steps to upgrade Vanilla when a new stable release is announced.
 To upgrade to **2.1 from 2.0.18**, add this step:
 
 * Delete the file [`/themes/mobile/views/discussions/helper_functions.php`](https://github.com/vanillaforums/Garden/blob/2.0/themes/mobile/views/discussions/helper_functions.php)
+* Delete the file [`/applications/dashboard/views/default.master.php`](https://github.com/vanilla/vanilla/blob/2.0/applications/dashboard/views/default.master.php)
 
 To upgrade from Vanilla **1.0**, you must export your data using the Vanilla Porter as if it were a migration. Your theme and any customizations will need to be recreated. Backup your Vanilla 1 data and files completely, then delete them from your server before attempting to install Vanilla 2.
 

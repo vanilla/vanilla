@@ -43,7 +43,7 @@ class ImportModel extends Gdn_Model {
       9 => 'UpdateCounts',
       10 => 'CustomFinalization',
       11 => 'AddActivity',
-		12 => 'VerifyImport'
+      12 => 'VerifyImport'
 	);
 
    protected $_OverwriteSteps = array(
@@ -59,7 +59,7 @@ class ImportModel extends Gdn_Model {
       9 => 'UpdateCounts',
       10 => 'CustomFinalization',
       11 => 'AddActivity',
-		12 => 'VerifyImport'
+      12 => 'VerifyImport'
    );
 
    protected $_OverwriteStepsDb = array(
@@ -72,7 +72,7 @@ class ImportModel extends Gdn_Model {
       6 => 'UpdateCounts',
       7 => 'CustomFinalization',
       8 => 'AddActivity',
-		9 => 'VerifyImport'
+      9 => 'VerifyImport'
    );
 
    /**

@@ -370,33 +370,45 @@ if (!function_exists('Anchor')) {
    /**
     * Builds and returns an anchor tag.
     */
-   function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = FALSE) {
-      if (!is_array($CssClass) && $CssClass != '')
-         $CssClass = array('class' => $CssClass);
-
-      if ($Destination == '' && $ForceAnchor === FALSE)
+   function Anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = false) {
+      if ($Destination == '' && $ForceAnchor === false) {
          return $Text;
-
-      if (!is_array($Attributes))
-         $Attributes = array();
-
-      $SSL = NULL;
-      if (isset($Attributes['SSL'])) {
-         $SSL = $Attributes['SSL'];
-         unset($Attributes['SSL']);
       }
 
-		$WithDomain = FALSE;
-      if (isset($Attributes['WithDomain'])) {
-         $WithDomain = $Attributes['WithDomain'];
-			unset($Attributes['WithDomain']);
+      if (is_array($CssClass)) {
+         $HtmlCssClass = Attribute($CssClass);
+      } elseif ($CssClass != '') {
+         $HtmlCssClass = Attribute(array('class' => $CssClass));
+      } else {
+         $HtmlCssClass = '';
+      }
+
+      if (!is_array($Attributes)) {
+         $HtmlAttributes = '';
+      } else {
+         if (isset($Attributes['SSL'])) {
+            $SSL = $Attributes['SSL'];
+            unset($Attributes['SSL']);
+         } else {
+            $SSL = null;
+         }
+
+         if (isset($Attributes['WithDomain'])) {
+            $WithDomain = $Attributes['WithDomain'];
+            unset($Attributes['WithDomain']);
+         } else {
+            $WithDomain = false;
+         }
+
+         $HtmlAttributes = Attribute($Attributes);
       }
 
       $Prefix = substr($Destination, 0, 7);
-      if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === FALSE))
+      if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === false)) {
          $Destination = Gdn::Request()->Url($Destination, $WithDomain, $SSL);
+      }
 
-      return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, 'UTF-8').'"'.Attribute($CssClass).Attribute($Attributes).'>'.$Text.'</a>';
+      return '<a href="'.htmlspecialchars($Destination, ENT_COMPAT, 'UTF-8').'"'.$HtmlCssClass.$HtmlAttributes.'>'.$Text.'</a>';
    }
 }
 

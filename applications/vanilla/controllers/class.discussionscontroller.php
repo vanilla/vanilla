@@ -178,9 +178,10 @@ class DiscussionsController extends VanillaController {
       $this->Pager->Configure(
          $Offset,
          $Limit,
-         $CountDiscussions,
+         $this->Data('CountDiscussions'),
          $this->Data('_PagerUrl')
       );
+
       PagerModule::Current($this->Pager);
 
       $this->SetData('_Page', $Page);
@@ -609,5 +610,33 @@ class DiscussionsController extends VanillaController {
       // Send sorted discussions.
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
       $this->Render();
+   }
+
+   /**
+    * Endpoint for the PromotedContentModule's data.
+    *
+    * Parameters & values must be lowercase and via GET.
+    *
+    * @see PromotedContentModule
+    */
+   public function Promoted() {
+      // Create module & set data.
+      $PromotedModule = new PromotedContentModule();
+      $Status = $PromotedModule->Load(Gdn::Request()->Get());
+      if ($Status === true) {
+         // Good parameters.
+         $PromotedModule->GetData();
+         $this->SetData('Content', $PromotedModule->Data('Content'));
+
+         // Pass display properties to the view.
+         $this->Group = $PromotedModule->Group;
+         $this->TitleLimit = $PromotedModule->TitleLimit;
+         $this->BodyLimit = $PromotedModule->BodyLimit;
+      } else {
+         $this->SetData('Errors', $Status);
+      }
+
+      $this->DeliveryMethod();
+      $this->Render('promotedcontent', 'modules', 'vanilla');
    }
 }

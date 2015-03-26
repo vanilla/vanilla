@@ -398,13 +398,8 @@ function OptionsList($Discussion) {
       if (C('Vanilla.Discussions.Dismiss', 1) && $Discussion->Announce == '1' && $Discussion->Dismissed != '1')
          $Sender->Options .= '<li>'.Anchor(T('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$Discussion->DiscussionID}", 'DismissAnnouncement Hijack') . '</li>';
 
-      // Determine if we still have time to edit
-      $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-      $CanEdit = $EditContentTimeout == -1 || strtotime($Discussion->DateInserted) + $EditContentTimeout > time();
-      $CanEdit = ($CanEdit && $Session->UserID == $Discussion->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
-
       // Edit discussion
-      if ($CanEdit) {
+      if (DiscussionModel::canEdit($Discussion)) {
          $Sender->Options .= '<li>'.Anchor(T('Edit'), 'vanilla/post/editdiscussion/'.$Discussion->DiscussionID, 'EditDiscussion') . '</li>';
       }
 

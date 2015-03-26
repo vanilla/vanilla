@@ -688,8 +688,7 @@ class ProfileController extends Gdn_Controller {
          $GdVersion = preg_replace('/[a-z ()]+/i', '', $GdInfo['GD Version']);
          if ($GdVersion < 2)
             throw new Exception(sprintf(T("This installation of GD is too old (v%s). Vanilla requires at least version 2 or compatible."),$GdVersion));
-      }
-      else {
+      } else {
          throw new Exception(sprintf(T("Unable to detect PHP GD installed on this system. Vanilla requires GD version 2 or better.")));
       }
 
@@ -745,23 +744,31 @@ class ProfileController extends Gdn_Controller {
             );
 
          } catch (Exception $Ex) {
+            // Throw the exception on API calls.
+            if ($this->DeliveryType() === DELIVERY_TYPE_DATA) {
+               throw $Ex;
+            }
             $this->Form->AddError($Ex);
          }
          // If there were no errors, associate the image with the user
          if ($this->Form->ErrorCount() == 0) {
-            if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'Photo' => $UserPhoto), array('CheckExisting' => TRUE)))
+            if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'Photo' => $UserPhoto), array('CheckExisting' => TRUE))) {
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
-            else
+            } else {
                $this->User->Photo = $UserPhoto;
+               SetValue('Photo', $this->Data['Profile'], $UserPhoto);
+               SetValue('PhotoUrl', $this->Data['Profile'], Gdn_Upload::Url(ChangeBasename($UserPhoto, 'n%s')));
+            }
          }
          // If there were no problems, redirect back to the user account
-         if ($this->Form->ErrorCount() == 0) {
+         if ($this->Form->ErrorCount() == 0 && $this->DeliveryType() !== DELIVERY_TYPE_DATA) {
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
             Redirect($this->DeliveryType() == DELIVERY_TYPE_VIEW ? UserUrl($this->User) : UserUrl($this->User, '', 'picture'));
          }
       }
-      if ($this->Form->ErrorCount() > 0)
+      if ($this->Form->ErrorCount() > 0 && $this->DeliveryType() !== DELIVERY_TYPE_DATA) {
          $this->DeliveryType(DELIVERY_TYPE_ALL);
+      }
 
       $this->Title(T('Change Picture'));
       $this->_SetBreadcrumbs(T('Change My Picture'), UserUrl($this->User, '', 'picture'));

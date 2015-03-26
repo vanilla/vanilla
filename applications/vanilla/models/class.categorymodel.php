@@ -108,7 +108,7 @@ class CategoryModel extends Gdn_Model {
    public static function Categories($ID = FALSE) {
 
       if (self::$Categories == NULL) {
-         
+
          // Try and get the categories from the cache.
          self::$Categories = Gdn::Cache()->Get(self::CACHE_KEY);
 
@@ -118,7 +118,7 @@ class CategoryModel extends Gdn_Model {
             $Sql->Reset();
 
             $Sql->Select('c.*')
-               ->Select('lc.DateInserted', '', 'DateLastComment')
+               //->Select('lc.DateInserted', '', 'DateLastComment')
                ->From('Category c')
                //->Join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
                ->OrderBy('c.TreeLeft');

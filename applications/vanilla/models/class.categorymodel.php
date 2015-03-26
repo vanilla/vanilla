@@ -108,6 +108,7 @@ class CategoryModel extends Gdn_Model {
    public static function Categories($ID = FALSE) {
 
       if (self::$Categories == NULL) {
+         
          // Try and get the categories from the cache.
          self::$Categories = Gdn::Cache()->Get(self::CACHE_KEY);
 
@@ -119,7 +120,7 @@ class CategoryModel extends Gdn_Model {
             $Sql->Select('c.*')
                ->Select('lc.DateInserted', '', 'DateLastComment')
                ->From('Category c')
-               ->Join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
+               //->Join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
                ->OrderBy('c.TreeLeft');
 
             self::$Categories = array_merge(array(), $Sql->Get()->ResultArray());
@@ -528,6 +529,7 @@ class CategoryModel extends Gdn_Model {
          if ($Comment) {
             $Row['LastUserID'] = $Comment['InsertUserID'];
             $Row['LastDateInserted'] = $Comment['DateInserted'];
+            $Row['DateLastComment'] = $Comment['DateInserted'];
          } else {
             $Row['NoComment'] = TRUE;
          }

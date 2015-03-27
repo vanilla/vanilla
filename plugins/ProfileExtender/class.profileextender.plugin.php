@@ -224,6 +224,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
    private function ProfileFields($Sender) {
       // Retrieve user's existing profile fields
       $this->ProfileFields = $this->GetProfileFields();
+	  unset($this->ProfileFields['MagentoID']);
 
       // Get user-specific data
       $this->UserFields = Gdn::UserModel()->GetMeta($Sender->Data("User.UserID"), 'Profile.%', 'Profile.');

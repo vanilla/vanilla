@@ -1758,10 +1758,12 @@ class CategoryModel extends Gdn_Model {
       if (!$Categories)
          return;
 
-      if (!$ID || !is_array($Categories)) {
+      // Extract actual category list
+      if (!$ID || !is_array($Categories) || !array_key_exists('categories', $Categories)) {
          Gdn::Cache()->Remove(self::CACHE_KEY);
          return;
       }
+      $Categories = $Categories['categories'];
 
       if (!array_key_exists($ID, $Categories)) {
          Gdn::Cache()->Remove(self::CACHE_KEY);

@@ -1037,6 +1037,7 @@ class CategoryModel extends Gdn_Model {
     * Get the subtree starting at a given parent.
     *
     * @param string $parentCategory The ID or url code of the parent category.
+    * @since 2.0.18
     * @param bool $includeParent Whether or not to include the parent in the result.
     * @param bool|int $adjustDepth Whether or not to adjust the depth or a number to adjust the depth by.
     * Passing `true` as this parameter will make the returned subtree look like the full tree which is useful for many
@@ -1105,6 +1106,7 @@ class CategoryModel extends Gdn_Model {
             unset($Categories[$ID]);
       }
 
+      //self::JoinRecentPosts($Categories);
       foreach ($Categories as &$Category) {
          if ($Category['ParentCategoryID'] <= 0)
             self::JoinRecentChildPosts($Category, $Categories);
@@ -1342,10 +1344,10 @@ class CategoryModel extends Gdn_Model {
     * Rebuilds the category tree. We are using the Nested Set tree model.
     *
     * @param bool $BySort Rebuild the tree by sort order instead of existing tree order.
+    * @ref http://en.wikipedia.org/wiki/Nested_set_model
     *
     * @since 2.0.0
-    * @ref http://articles.sitepoint.com/article/hierarchical-data-database/2
-    * @ref http://en.wikipedia.org/wiki/Nested_set_model
+    * @access public
     */
    public function RebuildTree($BySort = false) {
       // Grab all of the categories.

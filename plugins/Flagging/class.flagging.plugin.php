@@ -225,7 +225,7 @@ class FlaggingPlugin extends Gdn_Plugin {
       $Arguments = $Sender->RequestArgs;
       if (sizeof($Arguments) != 5) return;
       list($Context, $ElementID, $ElementAuthorID, $ElementAuthor, $EncodedURL) = $Arguments;
-      $URL = base64_decode(str_replace('-','=',$EncodedURL));
+      $URL = htmlspecialchars(base64_decode(str_replace('-','=',$EncodedURL)));
       
       $Sender->SetData('Plugin.Flagging.Data', array(
          'Context'         => $Context,

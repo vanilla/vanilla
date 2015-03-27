@@ -126,7 +126,7 @@ class CategoryModel extends Gdn_Model {
             if (!is_null($rebuildAfter) && time() < $rebuildAfter) {
                $rebuild = false;
             }
-            self::$Categories = val('categories', $categoriesCache);
+            self::$Categories = val('categories', $categoriesCache, null);
          }
          unset($categoriesCache);
 
@@ -159,7 +159,7 @@ class CategoryModel extends Gdn_Model {
          if (self::$Categories) {
             self::JoinUserData(self::$Categories, TRUE);
          } else {
-             return false;
+             return null;
          }
 
       }
@@ -179,7 +179,7 @@ class CategoryModel extends Gdn_Model {
             $Result = self::$Categories[$ID];
             return $Result;
          } else {
-            return NULL;
+            return null;
          }
       } else {
          $Result = self::$Categories;
@@ -1761,9 +1761,11 @@ class CategoryModel extends Gdn_Model {
       $Category = array_merge($Category, $Data);
       $Categories[$ID] = $Category;
 
+      // Update memcache entry
       self::$Categories = $Categories;
       unset($Categories);
       self::BuildCache();
+      
       self::JoinUserData(self::$Categories, TRUE);
    }
 

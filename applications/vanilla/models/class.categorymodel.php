@@ -558,7 +558,7 @@ class CategoryModel extends Gdn_Model {
       $Joined = FALSE;
 
       foreach ($Data as &$Row) {
-         if (!is_null($CategoryID) && $row['CategoryID'] != $CategoryID) {
+         if (!is_null($CategoryID) && $Row['CategoryID'] != $CategoryID) {
             continue;
          }
 
@@ -590,7 +590,7 @@ class CategoryModel extends Gdn_Model {
       }
 
       foreach ($Data as &$Row) {
-         if (!is_null($CategoryID) && $row['CategoryID'] != $CategoryID) {
+         if (!is_null($CategoryID) && $Row['CategoryID'] != $CategoryID) {
             continue;
          }
 

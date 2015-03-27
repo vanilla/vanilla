@@ -216,11 +216,12 @@ class CategoryModel extends Gdn_Model {
    /**
     * Build and augment the category cache
     *
-    * @param array $Categories
+    * @param integer $CategoryID restrict JoinRecentPosts to this ID
+    *
     */
-   protected static function BuildCache() {
+   protected static function BuildCache($CategoryID = null) {
       self::CalculateData(self::$Categories);
-      self::JoinRecentPosts(self::$Categories);
+      self::JoinRecentPosts(self::$Categories, $CategoryID);
 
       $expiry = self::CACHE_TTL + self::CACHE_GRACE;
       Gdn::Cache()->Store(self::CACHE_KEY, array(
@@ -551,12 +552,16 @@ class CategoryModel extends Gdn_Model {
       }
    }
 
-   public static function JoinRecentPosts(&$Data) {
+   public static function JoinRecentPosts(&$Data, $CategoryID = null) {
       $DiscussionIDs = array();
       $CommentIDs = array();
       $Joined = FALSE;
 
       foreach ($Data as &$Row) {
+         if (!is_null($CategoryID) && $row['CategoryID'] != $CategoryID) {
+            continue;
+         }
+
          if (isset($Row['LastTitle']) && $Row['LastTitle'])
             continue;
 
@@ -585,6 +590,10 @@ class CategoryModel extends Gdn_Model {
       }
 
       foreach ($Data as &$Row) {
+         if (!is_null($CategoryID) && $row['CategoryID'] != $CategoryID) {
+            continue;
+         }
+
          $Discussion = GetValue($Row['LastDiscussionID'], $Discussions);
          $NameUrl = 'x';
          if ($Discussion) {
@@ -1726,7 +1735,8 @@ class CategoryModel extends Gdn_Model {
          $this->SQL->Replace(
             'UserCategory',
             $Set,
-            array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $Category['CategoryID']));
+            array('UserID' => Gdn::Session()->UserID, 'CategoryID' => $Category['CategoryID'])
+         );
       }
       $Key = 'UserCategory_'.Gdn::Session()->UserID;
       Gdn::Cache()->Remove($Key);
@@ -1764,8 +1774,8 @@ class CategoryModel extends Gdn_Model {
       // Update memcache entry
       self::$Categories = $Categories;
       unset($Categories);
-      self::BuildCache();
-      
+      self::BuildCache($ID);
+
       self::JoinUserData(self::$Categories, TRUE);
    }
 

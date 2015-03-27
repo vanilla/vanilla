@@ -2,6 +2,10 @@
 
 if (is_array($this->ProfileFields)) {
    foreach ($this->ProfileFields as $Name => $Field) {
+      if ('MagentoID' === $Name) {
+         continue;
+      }
+
       $Options = array();
       if ($Field['FormType'] == 'Dropdown')
          $Options = array_combine($Field['Options'], $Field['Options']);

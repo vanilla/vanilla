@@ -158,7 +158,7 @@ class EditorPlugin extends Gdn_Plugin {
           'emoji' => true,
           'links' => true,
           'images' => false,
-          'uploads' => false,
+          'uploads' => true,
 
           'sep-align' => true, // separator
           'alignleft' => true,
@@ -392,8 +392,8 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll     = array();
       $allowedEditorActions = $this->getAllowedEditorActions();
       $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
-      if (val('FileUpload', $attributes)) {
-         $allowedEditorActions['uploads'] = true;
+      if (!val('FileUpload', $attributes)) {
+         $this->canUpload = false;
       }
       $fontColorList        = $this->getFontColorList();
       $fontFormatOptions = $this->getFontFormatOptions();
@@ -672,8 +672,8 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
       // Get max file uploads, to be used for max drops at once.
       $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
+      // Set canUpload definition here, but not Data (set in BeforeBodyBox) because it overwrites.
       $c->AddDefinition('canUpload', $this->canUpload);
-      $c->SetData('_canUpload', $this->canUpload);
    }
 
    /**
@@ -740,6 +740,10 @@ class EditorPlugin extends Gdn_Plugin {
 
          $Args['BodyBox'] = $View.$Args['BodyBox'];
       }
+
+      // Set canUpload (late in call, so our attributes are respected).
+      Gdn::Controller()->AddDefinition('canUpload', $this->canUpload);
+      Gdn::Controller()->SetData('_canUpload', $this->canUpload);
    }
 
    /**

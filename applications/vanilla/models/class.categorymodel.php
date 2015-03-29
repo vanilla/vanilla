@@ -750,8 +750,9 @@ class CategoryModel extends Gdn_Model {
             $Categories[$CID]['PhotoUrl'] = Gdn_Upload::Url($Photo);
          }
 
-         if ($Category['LastUrl'])
+         if (!empty($Category['LastUrl'])) {
             $Categories[$CID]['LastUrl'] = Url($Category['LastUrl'], '//');
+         }
          $Categories[$CID]['PermsDiscussionsView'] = $Session->CheckPermission('Vanilla.Discussions.View', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsAdd'] = $Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
          $Categories[$CID]['PermsDiscussionsEdit'] = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);

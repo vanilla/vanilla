@@ -1523,7 +1523,7 @@ if (!function_exists('GetMentions')) {
 
       // This one grabs mentions that start at the beginning of $String
       preg_match_all(
-         '/(?:^|[\s,\.>])@(\w{3,20})\b/i',
+         '/(?:^|[\s,\.>\)])@(\w{3,20})\b/i',
          $String,
          $Matches
       );

@@ -157,8 +157,8 @@ class EditorPlugin extends Gdn_Plugin {
          'sep-media' => true, // separator
           'emoji' => true,
           'links' => true,
-          'images' => false,
-          'uploads' => true,
+          'images' => true,
+          'uploads' => false,
 
           'sep-align' => true, // separator
           'alignleft' => true,
@@ -392,8 +392,9 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll     = array();
       $allowedEditorActions = $this->getAllowedEditorActions();
       $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
-      if (!val('FileUpload', $attributes)) {
-         $this->canUpload = false;
+      if (val('FileUpload', $attributes)) {
+         $allowedEditorActions['uploads'] = true;
+         $allowedEditorActions['images'] = false;
       }
       $fontColorList        = $this->getFontColorList();
       $fontFormatOptions = $this->getFontFormatOptions();
@@ -733,6 +734,9 @@ class EditorPlugin extends Gdn_Plugin {
             $c->SetData('_EditorToolbar', $editorToolbar);
          }
 
+         $c->AddDefinition('canUpload', $this->canUpload);
+         $c->SetData('_canUpload', $this->canUpload);
+
          // Determine which controller (post or discussion) is invoking this.
          // At the moment they're both the same, but in future you may want
          // to know this information to modify it accordingly.
@@ -740,10 +744,6 @@ class EditorPlugin extends Gdn_Plugin {
 
          $Args['BodyBox'] = $View.$Args['BodyBox'];
       }
-
-      // Set canUpload (late in call, so our attributes are respected).
-      Gdn::Controller()->AddDefinition('canUpload', $this->canUpload);
-      Gdn::Controller()->SetData('_canUpload', $this->canUpload);
    }
 
    /**

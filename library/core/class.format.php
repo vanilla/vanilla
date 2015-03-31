@@ -278,7 +278,7 @@ class Gdn_Format {
                $Mixed2 = preg_replace("#\[noparse\](.*?)\[/noparse\]#sie","str_replace(array('[',']',':'), array('&#91;','&#93;','&#58;'), htmlspecialchars('\\1'))",$Mixed2);
                $Mixed2 = str_ireplace(array("[php]", "[mysql]", "[css]"), "[code]", $Mixed2);
                $Mixed2 = str_ireplace(array("[/php]", "[/mysql]", "[/css]"), "[/code]", $Mixed2);
-               $Mixed2 = preg_replace("#\[code\](.*?)\[/code\]#sie","'<div class=\"PreContainer\"><pre>'.str_replace(array('[',']',':'), array('&#91;','&#93;','&#58;'), htmlspecialchars('\\1')).'</pre></div>'",$Mixed2);
+               $Mixed2 = Gdn_Format::replaceUnnestedBBCodeTags($Mixed2, '[code]', '[/code]', '<div class="PreContainer"><pre>', '</pre></div>');
                $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si",'<b>\\1</b>',$Mixed2);
                $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si",'<i>\\1</i>',$Mixed2);
                $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si",'<u>\\1</u>',$Mixed2);
@@ -316,6 +316,41 @@ class Gdn_Format {
          }
       }
    }
+
+   /**
+    * Replaces unnested bbcode tags. Particularly useful for code tags.
+    * Does not replace nested tags.
+    *
+    * @param string $string
+    * @param string $openingBBCodeTag
+    * @param string $closingBBCodeTag
+    * @param string $openingHtmlTag
+    * @param string $closingHtmlTag
+    * @param bool $noParse
+    * @return string
+    *
+    */
+   public static function replaceUnnestedBBCodeTags($string, $openingBBCodeTag, $closingBBCodeTag, $openingHtmlTag, $closingHtmlTag) {
+      preg_match_all("#".preg_quote($openingBBCodeTag)."|".preg_quote($closingBBCodeTag)."#si", $string, $matches, PREG_OFFSET_CAPTURE);
+      $stack = array();
+      $closingTagOffset = strlen($closingBBCodeTag);
+      foreach($matches[0] as $match) {
+         $first = array();
+         if ($match[0] === $openingBBCodeTag) {
+            $stack[] = $match;
+         } else {
+            $first = array_pop($stack);
+         }
+         if ($first && empty($stack)) {
+            $priorString = substr($string, 0, $first[1]);
+            $unparsedString = trim(substr($string, $match[1] + $closingTagOffset));
+            $newString = $openingHtmlTag.preg_replace("#".preg_quote($openingBBCodeTag)."(.*)".preg_quote($closingBBCodeTag)."#sie", "str_replace(array('[',']',':'), array('&#91;','&#93;','&#58;'), htmlspecialchars('\\1'))", substr($string, $first[1], $match[1] + $closingTagOffset - $first[1])).$closingHtmlTag;
+            return $priorString.$newString.Gdn_Format::replaceUnnestedBBCodeTags($unparsedString, $openingBBCodeTag, $closingBBCodeTag, $openingHtmlTag, $closingHtmlTag);
+         }
+      }
+      return $string;
+   }
+
 
    /** Format a number by putting K/M/B suffix after it when appropriate.
     *

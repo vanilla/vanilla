@@ -248,7 +248,6 @@ pre.CodeBlock {
   padding: 20px;
   font-size: inherit;
   margin: 5px 0;
-  -webkit-transition: padding 0.1s ease;
   transition: padding 0.1s ease; }
 
 .AlignLeft {

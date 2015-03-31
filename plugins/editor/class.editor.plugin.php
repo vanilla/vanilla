@@ -117,7 +117,7 @@ class EditorPlugin extends Gdn_Plugin {
       // Check upload permissions
       $this->canUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', false);
 
-      if ($this->canUpload) {
+      if (Gdn::ApplicationManager()->CheckApplication('Vanilla') && $this->canUpload) {
          $PermissionCategory = CategoryModel::PermissionCategory(Gdn::Controller()->Data('Category'));
          if (!GetValue('AllowFileUploads', $PermissionCategory, true)) {
             $this->canUpload = false;

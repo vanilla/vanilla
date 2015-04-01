@@ -203,7 +203,8 @@ class CategoryModel extends Gdn_Model {
       }
       if (is_null($isMaster)) {
          // Vote for master
-         $instanceKey = posix_getpid();
+         //$instanceKey = posix_getpid();
+         $instanceKey = getmypid();//posix_getpid() is not available on windows platforms. Using getmypid() instead.
          $masterKey = Gdn::cache()->add(self::MASTER_VOTE_KEY, $instanceKey, array(
             Gdn_Cache::FEATURE_EXPIRY => self::CACHE_GRACE
          ));

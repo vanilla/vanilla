@@ -189,22 +189,15 @@ function GetDiscussionOptions($Discussion = NULL) {
 		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
    $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion, GetValue('PermissionCategoryID', $Discussion));
 
-   // Determine if we still have time to edit
-   $EditContentTimeout = C('Garden.EditContentTimeout', -1);
-	$CanEdit = $EditContentTimeout == -1 || strtotime($Discussion->DateInserted) + $EditContentTimeout > time();
-   $CanEdit = ($CanEdit && $Session->UserID == $Discussion->InsertUserID) || $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID);
-
-	$TimeLeft = '';
-
-	if ($CanEdit && $EditContentTimeout > 0 && !$Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $PermissionCategoryID)) {
-		$TimeLeft = strtotime($Discussion->DateInserted) + $EditContentTimeout - time();
-		$TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::Seconds($TimeLeft).')' : '';
-	}
-
 	// Build the $Options array based on current user's permission.
    // Can the user edit the discussion?
-   if ($CanEdit)
+   $CanEdit = DiscussionModel::canEdit($Discussion, $TimeLeft);
+   if ($CanEdit) {
+      if ($TimeLeft) {
+         $TimeLeft = ' ('.Gdn_Format::Seconds($TimeLeft).')';
+      }
       $Options['EditDiscussion'] = array('Label' => T('Edit').$TimeLeft, 'Url' => '/vanilla/post/editdiscussion/'.$Discussion->DiscussionID);
+   }
 
    // Can the user announce?
    if ($Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $PermissionCategoryID))

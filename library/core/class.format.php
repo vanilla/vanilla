@@ -1030,13 +1030,18 @@ class Gdn_Format {
     * @return string
     */
    public static function Links($Mixed) {
-      if (!C('Garden.Format.Links', TRUE))
+      if (!C('Garden.Format.Links', TRUE)) {
             return $Mixed;
+      }
 
-      if (!is_string($Mixed))
+      if (!is_string($Mixed)) {
          return self::To($Mixed, 'Links');
-      else {
-         $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[\@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+      } else {
+         if (unicodeRegexSupport()) {
+            $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`iu";
+         } else {
+            $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
+         }
 
 //         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
 //         echo '<pre>', print_r($Parts, TRUE), '</pre>';

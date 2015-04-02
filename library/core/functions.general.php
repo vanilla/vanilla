@@ -12,8 +12,6 @@
  * @since 2.0
  */
 
-include PATH_LIBRARY.'/vendors/wordpress/functions.wordpress.php';
-
 if (!function_exists('AbsoluteSource')) {
    /**
     * Takes a source path (ie. an image src from an html page), and an

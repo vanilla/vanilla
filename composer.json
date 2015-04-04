@@ -1,17 +1,33 @@
 {
-    "name": "vanilla/vanilla",
-    "description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
-    "license": "GPLv2",
-    "authors": [
-        {
-            "name": "Todd Burry",
-            "email": "todd@vanillaforums.com"
-        }
-    ],
-    "require": {
+	"name": "vanilla/vanilla",
+	"description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
+	"type": "project",
+	"license": "GPLv2",
+	"authors": [
+		{
+			"name": "Todd Burry",
+			"email": "todd@vanillaforums.com"
+		},
+		{
+			"name": "Mark O'Sullivan",
+			"email": "mark@vanillaforums.com"
+		},
+		{
+			"name": "Tim Gunter",
+			"email": "tim@vanillaforums.com"
+		}
 
-    },
-    "require-dev": {
-        "squizlabs/php_codesniffer": "1.5.*"
-   }
+	],
+	"require": {
+	},
+	"autoload": {
+		"classmap": [
+			"library/"
+		],
+		"files": [
+			"library/core/functions.error.php",
+			"library/core/functions.general.php",
+			"library/core/functions.compatibility.php"
+		]
+	}
 }

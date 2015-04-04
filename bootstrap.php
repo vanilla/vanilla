@@ -45,13 +45,10 @@ if (function_exists('mb_internal_encoding')) {
     mb_internal_encoding('UTF-8');
 }
 
-// Include the core function definitions
-require_once(PATH_LIBRARY_CORE.'/functions.error.php');
-require_once(PATH_LIBRARY_CORE.'/functions.general.php');
-require_once(PATH_LIBRARY_CORE.'/functions.compatibility.php');
+// Include the core autoloader.
+require_once __DIR__.'/vendor/autoload.php';
 
-// Include and initialize the autoloader
-require_once(PATH_LIBRARY_CORE.'/class.autoloader.php');
+// Initialize the autoloader.
 Gdn_Autoloader::start();
 
 // Guard against broken cache files

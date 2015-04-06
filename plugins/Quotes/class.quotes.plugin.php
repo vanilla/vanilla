@@ -20,8 +20,8 @@
  */
 // Define the plugin:
 $PluginInfo['Quotes'] = array(
-    'Name' => 'Quotes',
-    'Description' => "Adds an option to each comment for users to easily quote each other.",
+    'Name' => T('Quotes'),
+    'Description' => T("Adds an option to each comment for users to easily quote each other."),
     'Version' => '1.6.10',
     'MobileFriendly' => TRUE,
     'RequiredApplications' => array('Vanilla' => '2.1'),

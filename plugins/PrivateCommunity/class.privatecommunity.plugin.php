@@ -10,8 +10,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['PrivateCommunity'] = array(
-   'Name' => 'Private Community',
-   'Description' => 'Adds an option to Roles & Permissions to make all pages only visible for signed-in community members.',
+   'Name' => T('Private Community'),
+   'Description' => T('Adds an option to Roles & Permissions to make all pages only visible for signed-in community members.'),
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

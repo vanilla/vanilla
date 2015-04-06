@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit;
 
 $PluginInfo['EmojiExtender'] = array(
-    'Name'        => "Emoji Sets",
-    'Description' => "Change your emoji set!",
+    'Name'        => T("Emoji Sets"),
+    'Description' => T("Change your emoji set!"),
     'Version'     => '1.1',
     'Author'      => "Becky Van Bussel",
     'AuthorEmail' => 'rvanbussel@vanillaforums.com',

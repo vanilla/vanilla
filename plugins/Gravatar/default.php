@@ -2,8 +2,8 @@
 
 // Define the plugin:
 $PluginInfo['Gravatar'] = array(
-   'Name' => 'Gravatar',
-   'Description' => 'Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.',
+   'Name' => T('Gravatar'),
+   'Description' => T('Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.'),
    'Version' => '1.4.3',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

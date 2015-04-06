@@ -10,8 +10,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['SplitMerge'] = array(
-   'Name' => 'Split / Merge',
-   'Description' => 'Allows moderators with discussion edit permission to split & merge discussions.',
+   'Name' => T('Split / Merge'),
+   'Description' => T('Allows moderators with discussion edit permission to split & merge discussions.'),
    'Version' => '1.2',
    'HasLocale' => TRUE,
    'Author' => "Mark O'Sullivan",

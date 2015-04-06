@@ -10,23 +10,23 @@ echo $this->Form->Errors();
       <?php
          // No password may have been set if they have only signed in with a connect plugin
          if (!$this->User->HashMethod || $this->User->HashMethod == "Vanilla") {
-	         echo $this->Form->Label('Old Password', 'OldPassword');
+	         echo $this->Form->Label(T('Old Password'), 'OldPassword');
 	         echo $this->Form->Input('OldPassword', 'password');
          }
       ?>
    </li>
    <li>
       <?php
-         echo $this->Form->Label('New Password', 'Password');
+         echo $this->Form->Label(T('New Password'), 'Password');
          echo $this->Form->Input('Password', 'password', array('Strength' => TRUE));
       ?>
    </li>
    <li>
       <?php
-         echo $this->Form->Label('Confirm Password', 'PasswordMatch');
+         echo $this->Form->Label(T('Confirm Password'), 'PasswordMatch');
          echo $this->Form->Input('PasswordMatch', 'password');
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Change Password', '', array('class' => 'Button Primary')); ?>
+<?php echo $this->Form->Close(T('Change Password'), '', array('class' => 'Button Primary')); ?>
 </div>

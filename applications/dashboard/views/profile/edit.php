@@ -8,7 +8,7 @@ echo $this->Form->Errors();
 <ul>
    <li class="User-Name">
       <?php
-         echo $this->Form->Label('Username', 'Name');
+         echo $this->Form->Label(T('Username'), 'Name');
          $Attributes = array();
          
          if (!$this->Data('_CanEditUsername')) {
@@ -21,7 +21,7 @@ echo $this->Form->Errors();
    <?php if ($this->Data('_CanViewPersonalInfo')) : ?>
    <li class="User-Email">
       <?php
-         echo $this->Form->Label('Email', 'Email');
+         echo $this->Form->Label(T('Email'), 'Email');
          
          if (!$this->Data('_CanEditEmail') && UserModel::NoEmail()) {
             
@@ -65,7 +65,7 @@ echo $this->Form->Errors();
    
    <li class="Gender User-Gender">
       <?php
-         echo $this->Form->Label('Gender', 'Gender');
+         echo $this->Form->Label(T('Gender'), 'Gender');
          echo $this->Form->RadioList('Gender', $this->GenderOptions, array('default' => 'u'))
       ?>
    </li>
@@ -73,7 +73,7 @@ echo $this->Form->Errors();
    <?php if (C('Garden.Profile.Titles', FALSE)): ?>
    <li class="User-Title">
       <?php
-         echo $this->Form->Label('Title', 'Title');
+         echo $this->Form->Label(T('Title'), 'Title');
          echo $this->Form->TextBox('Title');
       ?>
    </li>
@@ -82,7 +82,7 @@ echo $this->Form->Errors();
    <?php if (C('Garden.Profile.Locations', FALSE)): ?>
    <li class="User-Location">
       <?php
-         echo $this->Form->Label('Location', 'Location');
+         echo $this->Form->Label(T('Location'), 'Location');
          echo $this->Form->TextBox('Location');
       ?>
    </li>
@@ -92,5 +92,5 @@ echo $this->Form->Errors();
       $this->FireEvent('EditMyAccountAfter');
    ?>
 </ul>
-<?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary')); ?>
+<?php echo $this->Form->Close(T('Save'), '', array('class' => 'Button Primary')); ?>
 </div>

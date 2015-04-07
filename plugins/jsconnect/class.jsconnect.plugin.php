@@ -109,7 +109,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       return $qs;
    }
 
-   public static function ConnectUrl($Provider, $Secure = FALSE, $Callback = TRUE) {
+   public static function ConnectUrl($Provider, $Secure = FALSE) {
       if (!is_array($Provider))
          $Provider = self::GetProvider($Provider);
 
@@ -133,8 +133,8 @@ class JsConnectPlugin extends Gdn_Plugin {
          $Query['Target'] = '/';
 
       $Result = $Url.(strpos($Url, '?') === FALSE ? '?' : '&').http_build_query($Query);
-      if ($Callback)
-         $Result .= '&callback=?';
+      // to prevent caching
+	  $Result .= '&_='.time( );
       return $Result;
    }
 

@@ -358,7 +358,20 @@ class EntryController extends Gdn_Controller {
          $Roles = $this->Form->GetFormValue('Roles', NULL);
          $Roles = RoleModel::GetByName($Roles);
          $RoleIDs = array_keys($Roles);
-         
+
+         // only these roles can be changed via SSO
+         $CurrentRoles = array( );
+         foreach ($this->UserModel->GetRoles($UserID) as $CurrentRole) {
+            $CurrentRoles[] = $CurrentRole['RoleID'];
+         }
+         $ChangeRoles = array(
+            33, // Platinum Club
+            36, // Published Artist
+         );
+         $NonChangeableRoles = array_diff($CurrentRoles, $ChangeRoles);
+         $RoleIDs = array_intersect($RoleIDs, $ChangeRoles);
+         $RoleIDs = array_merge($RoleIDs, $NonChangeableRoles);
+
          if (empty($RoleIDs)) {
             // The user must have at least one role. This protects that.
             $RoleIDs = $this->UserModel->NewUserRoleIDs();

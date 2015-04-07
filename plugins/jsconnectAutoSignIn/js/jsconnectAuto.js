@@ -17,6 +17,10 @@ jQuery(document).ready(function ($) {
 					success: function (data) {
 						var action = '';
 
+						if (data.hasOwnProperty('verified')) {
+							data['verified'] = data['verified'] ? 1 : 0;
+						}
+
 						if (data['error']) {
 							action = gdn.url('/entry/jsconnect/error');
 						}

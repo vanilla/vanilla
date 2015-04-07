@@ -25,9 +25,14 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('jsconnectAuto.css', 'plugins/jsconnectAutoSignIn');
       $Sender->Head->AddString('<script type="text/javascript">var magento_id = '.json_encode((int) $magento_id).';</script>');
       $Sender->AddJSFile('jquery.cookie.js', 'plugins/jsconnectAutoSignIn');
-      $Sender->AddJSFile('jsconnectAuto.js', 'plugins/jsconnectAutoSignIn');
-      $Sender->AddDefinition('Connecting', T('jsconnectAutoSignIn.Connecting','Connecting...'));
-      $Sender->AddDefinition('ConnectingUser', T('jsconnectAutoSignIn.ConnectingUser','Hi % just connecting you to forum...'));
+      $Sender->AddJSFile('jsconnectAutoDaz.js', 'plugins/jsconnectAutoSignIn');
+      $Sender->Head->AddString('<script type="text/javascript">
+        $(window).on(\'beforeDazApi\', function( ) {
+            daz.api.addCall(\'Sso/auth\', { callbackClass: { }, callbackFunc: daz.forum.process_sso, onlyLive: true });
+        });
+      </script>');
+      $Sender->AddDefinition('Connecting', T('jsconnectAutoSignIn.Connecting','Signing In...'));
+      $Sender->AddDefinition('ConnectingUser', T('jsconnectAutoSignIn.ConnectingUser','Hi. We\'re signing you in now...'));
       if (C('Plugins.jsconnectAutoSignIn.HideConnectButton') || IsMobile()) {
         $Sender->Head->AddString('<style type="text/css">.ConnectButton{display:none!important;}</style>');
       }
@@ -58,6 +63,7 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
     $JsConnectProviders = array();
     foreach ($Providers as $Provider) {
       $Data = $Provider;
+      unset($Data['AssociationSecret']);
       $Target = Gdn::Request()->Get('Target');
       if (!$Target)
       $Target = '/'.ltrim(Gdn::Request()->Path());
@@ -75,6 +81,7 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
       $Data['Target'] = urlencode($Data['Target']);
       $Data['Name'] = Gdn_Format::Text($Data['Name']);
       $Data['SignInUrl'] = FormatString(GetValue('SignInUrl', $Provider, ''), $Data);
+      $Data['JsAuthenticateUrl'] = JsConnectPlugin::ConnectUrl($Provider, TRUE);
       $JsConnectProviders[] = $Data;
     }
     return empty($JsConnectProviders) ? FALSE: $JsConnectProviders;

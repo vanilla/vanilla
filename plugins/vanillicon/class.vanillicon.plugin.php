@@ -7,8 +7,8 @@
 
 // Define the plugin:
 $PluginInfo['vanillicon'] = array(
-   'Name' => 'Vanillicon',
-   'Description' => "Provides fun default user icons from vanillicon.com.",
+   'Name' => T('Vanillicon'),
+   'Description' => T("Provides fun default user icons from vanillicon.com."),
    'Version' => '2.0.0-beta',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',

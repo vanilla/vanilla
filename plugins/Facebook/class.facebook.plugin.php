@@ -10,8 +10,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Facebook'] = array(
-	'Name' => 'Facebook Social Connect',
-   'Description' => 'Users may sign into your site using their Facebook account.',
+	'Name' => T('Facebook Social Connect'),
+   'Description' => T('Users may sign into your site using their Facebook account.'),
    'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,

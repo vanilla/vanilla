@@ -25,8 +25,8 @@
  */
 
 $PluginInfo['AllViewed'] = array(
-   'Name' => 'All Viewed',
-   'Description' => 'Allows users to mark all discussions as viewed and mark category viewed.',
+   'Name' => T('All Viewed'),
+   'Description' => T('Allows users to mark all discussions as viewed and mark category viewed.'),
    'Version' => '2.1',
    'Author' => "Matt Lincoln Russell, Oliver Chung",
    'AuthorEmail' => 'lincoln@vanillaforums.com, shoat@cs.washington.edu',

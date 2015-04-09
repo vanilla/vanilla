@@ -10,8 +10,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['VanillaInThisDiscussion'] = array(
-   'Name' => 'In This Discussion',
-   'Description' => "Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla.",
+   'Name' => T('In This Discussion'),
+   'Description' => T("Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla."),
    'Version' => '1',
    'Requires' => FALSE, // This would normally be an array of plugin names/versions that this plugin requires
    'HasLocale' => FALSE,

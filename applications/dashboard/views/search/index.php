@@ -6,7 +6,7 @@ $Form->InputPrefix = '';
 echo  $Form->Open(array('action' => Url('/search'), 'method' => 'get')),
    '<div class="SiteSearch InputAndButton">',
    $Form->TextBox('Search'),
-   $Form->Button('Search', array('Name' => '')),
+   $Form->Button(T('Search'), array('Name' => '')),
    '</div>',
    $Form->Errors(),
    $Form->Close();

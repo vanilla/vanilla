@@ -10,23 +10,23 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Twitter'] = array(
-	'Name' => 'Twitter Social Connect',
-   'Description' => 'Users may sign into your site using their Twitter account.',
-   'Version' => '1.1.9',
-   'RequiredApplications' => array('Vanilla' => '2.0.12a'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
+    'Name' => T('Twitter Social Connect'),
+    'Description' => T('Users may sign into your site using their Twitter account.'),
+    'Version' => '1.1.9',
+    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
+    'RequiredTheme' => FALSE,
+    'RequiredPlugins' => FALSE,
 	'MobileFriendly' => TRUE,
-   'SettingsUrl' => '/dashboard/social/twitter',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'Hidden' => FALSE,
-   'SocialConnect' => TRUE,
-   'RequiresRegistration' => TRUE
+    'SettingsUrl' => '/dashboard/social/twitter',
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'HasLocale' => TRUE,
+    'RegisterPermissions' => FALSE,
+    'Author' => "Todd Burry",
+    'AuthorEmail' => 'todd@vanillaforums.com',
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'Hidden' => FALSE,
+    'SocialConnect' => TRUE,
+    'RequiresRegistration' => TRUE
 );
 
 require_once PATH_LIBRARY.'/vendors/oauth/OAuth.php';

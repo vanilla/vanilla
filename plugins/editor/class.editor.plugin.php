@@ -1,8 +1,8 @@
 <?php if(!defined('APPLICATION')) die();
 
 $PluginInfo['editor'] = array(
-   'Name' => 'Advanced Editor',
-   'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
+   'Name' => T('Advanced Editor'),
+   'Description' => T('Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.'),
    'Version' => '1.7.1',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',

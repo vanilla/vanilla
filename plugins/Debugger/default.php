@@ -10,7 +10,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Debugger'] = array(
-   'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
+   'Name' => T('Debugger'),
+   'Description' => T('The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.'),
    'Version' => '1.0.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE,

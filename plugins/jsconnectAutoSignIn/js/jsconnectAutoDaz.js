@@ -41,8 +41,29 @@ if ( ! daz) { var daz = { }; }
 			}
 			else {
 				if (magento_id === parseInt(data['uniqueid'], 10)) {
-					// no need to do anything
-					return;
+					// check the current data against the new data
+					var update = false;
+					var cur_data = gdn.definition('JsConnectData');
+					for (var idx in cur_data) {
+						if ('roles' === idx) {
+							var new_roles = data['roles'].split(',').sort().join(',').toLowerCase();
+							var old_roles = cur_data['roles'].split(',').sort().join(',').toLowerCase();
+
+							if (new_roles !== old_roles) {
+								update = true;
+								break;
+							}
+						}
+						else if (cur_data[idx] != data[idx]) {
+							update = true;
+							break;
+						}
+					}
+
+					if ( ! update) {
+						// no need to do anything
+						return;
+					}
 				}
 				else if (magento_id) {
 					// if this is reached, the wrong person is logged in

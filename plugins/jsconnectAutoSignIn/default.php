@@ -17,9 +17,32 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
   public function Base_Render_Before($Sender, $Args) {
     if (!in_array(strtolower($Sender->Request->Path()),array( 'entry/connect/jsconnect'))) {
       $magento_id = false;
-	  if ( ! empty(Gdn::Session( )->UserID)) {
-		  $meta = Gdn::UserModel( )->GetMeta(Gdn::Session( )->UserID, 'Profile.%', 'Profile.');
+	  if ( ! empty(Gdn::Session()->UserID)) {
+		  $meta = Gdn::UserModel()->GetMeta(Gdn::Session()->UserID, 'Profile.%', 'Profile.');
 		  $magento_id = $meta['MagentoID'];
+
+		  // get the current info for the user so it can be compared
+		  $User = Gdn::UserModel()->GetID(Gdn::Session()->UserID);
+
+		  // only some of the roles can be changed via SSO
+		  $CurrentRoles = array();
+		  foreach (Gdn::UserModel()->GetRoles(Gdn::Session()->UserID) as $CurrentRole) {
+			  $CurrentRoles[] = $CurrentRole['Name'];
+		  }
+		  $ChangeableRoles = array(
+			  'Platinum Club', // 34
+			  'Published Artist', // 35
+		  );
+		  $CurrentRoles = array_intersect($CurrentRoles, $ChangeableRoles);
+
+		  $CurrentData = array(
+			  'uniqueid' => $magento_id,
+			  'email' => $User->Email,
+			  'name' => $User->Name,
+			  'roles' => implode(',', $CurrentRoles),
+		  );
+
+		  $Sender->AddDefinition('JsConnectData', $CurrentData);
 	  }
 
       $Sender->AddCssFile('jsconnectAuto.css', 'plugins/jsconnectAutoSignIn');
@@ -81,7 +104,6 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
       $Data['Target'] = urlencode($Data['Target']);
       $Data['Name'] = Gdn_Format::Text($Data['Name']);
       $Data['SignInUrl'] = FormatString(GetValue('SignInUrl', $Provider, ''), $Data);
-      $Data['JsAuthenticateUrl'] = JsConnectPlugin::ConnectUrl($Provider, TRUE);
       $JsConnectProviders[] = $Data;
     }
     return empty($JsConnectProviders) ? FALSE: $JsConnectProviders;

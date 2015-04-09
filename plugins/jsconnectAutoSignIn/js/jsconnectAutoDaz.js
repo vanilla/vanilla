@@ -76,6 +76,7 @@ if ( ! daz) { var daz = { }; }
 						data[key] = '';
 					}
 				}
+
 				target = location.search.match(/Target=([^&]+)/);
 				action = gdn.url('/entry/connect/jsconnect?client_id=' + data['client_id'] + (target ? '&' + target[0] : ''));
 			}

@@ -71,7 +71,7 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
           Redirect($Target);
       }
     }
-    
+
     if(C('Plugins.jsconnectAutoSignIn.HideSignIn')){
       $Sender->Head->AddString('<script type="text/javascript">' .
         'jQuery(document).ready(function($){' .
@@ -80,7 +80,7 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
         '</script>');
     }
   }
-  //mobile and guest module-less friendly 
+  //mobile and guest module-less friendly
   public function GetProviders() {
     $Providers = JsConnectPlugin::GetProvider();
     $JsConnectProviders = array();

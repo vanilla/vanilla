@@ -1297,10 +1297,10 @@ class CategoryModel extends Gdn_Model {
          $Fields = RemoveKeyFromArray($Fields, 'CategoryID');
 
          // make sure int fields are actually ints
-         $Fields['AllowDiscussions'] = (int) $Fields['AllowDiscussions'];
-         $Fields['HideAllDiscussions'] = (int) $Fields['HideAllDiscussions'];
-         $Fields['AllowFileUploads'] = (int) $Fields['AllowFileUploads'];
-         $Fields['Archived'] = (int) $Fields['Archived'];
+         $Fields['AllowDiscussions'] = (int) ArrayValue('AllowDiscussions', $Fields);
+         $Fields['HideAllDiscussions'] = (int) ArrayValue('HideAllDiscussions', $Fields);
+         $Fields['AllowFileUploads'] = (int) ArrayValue('AllowFileUploads', $Fields);
+         $Fields['Archived'] = (int) ArrayValue('Archived', $Fields);
 
          if ($Insert === FALSE) {
             $OldCategory = $this->GetID($CategoryID, DATASET_TYPE_ARRAY);

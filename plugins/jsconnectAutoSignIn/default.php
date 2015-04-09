@@ -16,10 +16,12 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
 
   public function Base_Render_Before($Sender, $Args) {
     if (!in_array(strtolower($Sender->Request->Path()),array( 'entry/connect/jsconnect'))) {
+      $Providers = $this->GetProviders();
       $magento_id = false;
 	  if ( ! empty(Gdn::Session()->UserID)) {
-		  $meta = Gdn::UserModel()->GetMeta(Gdn::Session()->UserID, 'Profile.%', 'Profile.');
-		  $magento_id = $meta['MagentoID'];
+		  $magento_id = Gdn::SQL()->GetWhere('UserAuthentication', array('UserID' => Gdn::Session()->UserID,
+			  'ProviderKey' => $Providers[0]['AuthenticationKey']))->FirstRow(DATASET_TYPE_ARRAY);
+		  $magento_id = ArrayValue('ForeignUserKey', $magento_id);
 
 		  // get the current info for the user so it can be compared
 		  $User = Gdn::UserModel()->GetID(Gdn::Session()->UserID);
@@ -59,7 +61,6 @@ class jsConnectAutoSignInPlugin extends Gdn_Plugin {
       if (C('Plugins.jsconnectAutoSignIn.HideConnectButton') || IsMobile()) {
         $Sender->Head->AddString('<style type="text/css">.ConnectButton{display:none!important;}</style>');
       }
-      $Providers = $this->GetProviders();
       if($Providers){
         $Sender->AddDefinition('JsConnectProviders', json_encode($Providers));
       }

@@ -365,8 +365,8 @@ class EntryController extends Gdn_Controller {
             $CurrentRoles[] = $CurrentRole['RoleID'];
          }
          $ChangeRoles = array(
-            33, // Platinum Club
-            36, // Published Artist
+            34, // Platinum Club
+            35, // Published Artist
          );
          $NonChangeableRoles = array_diff($CurrentRoles, $ChangeRoles);
          $RoleIDs = array_intersect($RoleIDs, $ChangeRoles);

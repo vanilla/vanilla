@@ -386,8 +386,11 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
          // Hack it in here instead
          if (C('ProfileExtender.Fields.DateOfBirth.OnProfile')) {
             // Do not use Gdn_Format::Date because it shifts to local timezone
-            $ProfileFields['DateOfBirth'] = date(T('Birthday Format','F j, Y'), Gdn_Format::ToTimestamp($Sender->User->DateOfBirth));
-            $AllFields['DateOfBirth'] = array('Label' => T('Birthday'), 'OnProfile' => TRUE);
+            $BirthdayStamp = Gdn_Format::ToTimestamp($Sender->User->DateOfBirth);
+            if ($BirthdayStamp) {
+               $ProfileFields['DateOfBirth'] = date(T('Birthday Format','F j, Y'), $BirthdayStamp);
+               $AllFields['DateOfBirth'] = array('Label' => T('Birthday'), 'OnProfile' => TRUE);
+            }
          }
 
          // Display all non-hidden fields

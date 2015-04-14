@@ -436,7 +436,7 @@ class DiscussionPolls extends Gdn_Plugin {
     // Validate that all poll fields are filled out
     $Invalid = FALSE;
     $Error = '';
-    if(trim($FormPostValues['DP_Title']) == FALSE && !C('Plugins.DiscussionPolls.DisablePollTitle', FALSE)) {
+    if(!C('Plugins.DiscussionPolls.DisablePollTitle', FALSE) && trim($FormPostValues['DP_Title']) == FALSE) {
       $Invalid = TRUE;
       $Error = 'You must enter a valid poll title!';
     }

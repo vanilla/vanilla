@@ -724,6 +724,14 @@ class EntryController extends Gdn_Controller {
     * @param string $TransientKey (default: "")
     */
    public function SignOut($TransientKey = "") {
+	   // DAZ-- this should be overridden by the JSConnect plugin, but seems not to be
+	   // so it's hard-coded here
+	   $provider = JsConnectPlugin::GetProvider(1044711398);
+	   if ($provider) {
+		   header('Location: ' . $provider['SignOutUrl']);
+		   exit;
+	   }
+
       if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->IsPostBack()) {
          $User = Gdn::Session()->User;
 
@@ -758,7 +766,34 @@ class EntryController extends Gdn_Controller {
     * @return string Rendered XHTML template.
     */
    public function SignIn($Method = FALSE, $Arg1 = FALSE) {
-      Gdn::Session()->EnsureTransientKey();
+	   // DAZ-- this should be overridden by the JSConnect plugin, but seems not to be
+	   // so it's hard-coded here
+	   $provider = JsConnectPlugin::GetProvider(1044711398);
+	   if ($provider) {
+		   // modify the sign in URL to have the proper referer hash
+		   $sign_in_url = $provider['SignInUrl'];
+		   $ref_pos = strpos($sign_in_url, 'referer/');
+		   if ( ! $ref_pos) {
+			   if (strrpos('/', $sign_in_url) !== (strlen($sign_in_url) - 1)) {
+				   $sign_in_url .= '/';
+			   }
+
+			   $sign_in_url .= 'referer/';
+		   }
+		   else {
+			   $sign_in_url = substr($sign_in_url, 0, strpos($sign_in_url, 'referer/') + strlen('referer/'));
+		   }
+
+		   $referer = urldecode($_GET['Target']);
+		   $referer = preg_replace('%^/'.Gdn::Request()->WebRoot().'/%i', '', $referer);
+		   $referer = Gdn::Request()->Url($referer, TRUE);
+		   $referer = strtr(base64_encode($referer), '+/=', '-_,');
+
+		   header('Location: ' . $sign_in_url . $referer);
+		   exit;
+	   }
+
+	   Gdn::Session()->EnsureTransientKey();
 
       $this->AddJsFile('entry.js');
       $this->SetData('Title', T('Sign In'));
@@ -1104,6 +1139,14 @@ class EntryController extends Gdn_Controller {
     * @param string $InvitationCode Unique code given to invited user.
     */
    public function Register($InvitationCode = '') {
+	   // DAZ-- this should be overridden by the JSConnect plugin, but seems not to be
+	   // so it's hard-coded here
+	   $provider = JsConnectPlugin::GetProvider(1044711398);
+	   if ($provider) {
+		   header('Location: ' . $provider['RegisterUrl']);
+		   exit;
+	   }
+
       $this->FireEvent("Register");
 
       $this->Form->SetModel($this->UserModel);

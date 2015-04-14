@@ -724,14 +724,6 @@ class EntryController extends Gdn_Controller {
     * @param string $TransientKey (default: "")
     */
    public function SignOut($TransientKey = "") {
-	   // DAZ-- this should be overridden by the JSConnect plugin, but seems not to be
-	   // so it's hard-coded here
-	   $provider = JsConnectPlugin::GetProvider(1044711398);
-	   if ($provider) {
-		   header('Location: ' . $provider['SignOutUrl']);
-		   exit;
-	   }
-
       if (Gdn::Session()->ValidateTransientKey($TransientKey) || $this->Form->IsPostBack()) {
          $User = Gdn::Session()->User;
 

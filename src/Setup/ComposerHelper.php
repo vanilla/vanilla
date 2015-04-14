@@ -16,16 +16,16 @@ use Composer\Factory;
  */
 class ComposerHelper {
    /**
-    * Merge repositories and requirements from a separate composer.local.json.
+    * Merge repositories and requirements from a separate composer-local.json.
     *
     * This allows static development dependencies to be shipped with Vanilla, but can be customized with a
-    * composer.local.json file that specifies additional dependencies such as plugins or compatibility libraries.
+    * composer-local.json file that specifies additional dependencies such as plugins or compatibility libraries.
     *
     * @param Event $event The event being fired.
     */
    public static function preUpdate(Event $event) {
-      // Check for a composer.local.json.
-      $composerLocalPath = './composer.local.json';
+      // Check for a composer-local.json.
+      $composerLocalPath = './composer-local.json';
 
       if (!file_exists($composerLocalPath)) {
          return;

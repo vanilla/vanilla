@@ -26,6 +26,9 @@
 		"vanilla/garden-http": "~1.0"
 	},
 	"autoload": {
+		"psr-4": {
+			"Vanilla\\": "src"
+		},
 		"classmap": [
 			"library/"
 		],
@@ -35,8 +38,9 @@
 			"library/core/functions.compatibility.php"
 		]
 	},
-  	"require-dev": {
-		"vanilla/garden-http": "~1.0"
+	"scripts": {
+		"pre-install-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
+		"pre-update-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate"
 	},
 	"autoload-dev": {
 		"psr-4": {

@@ -321,6 +321,8 @@ class DiscussionPolls extends Gdn_Plugin {
       return FALSE;
     }
 
+	$FormPostValues['DP_Title'] = ArrayValue('DP_Title', $FormPostValues, '');
+
     // Only validate new polls
     // TODO: Remove this when poll editing becomes a thing
     $DiscussionID = GetValue('DiscussionID', $Sender->EventArguments, 0);
@@ -408,6 +410,8 @@ class DiscussionPolls extends Gdn_Plugin {
     }
 
     $FormPostValues = GetValue('FormPostValues', $Sender->EventArguments, array());
+
+	$FormPostValues['DP_Title'] = ArrayValue('DP_Title', $FormPostValues, '');
 
     // Unchecking the poll option will remove the poll
     if(!GetValue('DP_Attach', $FormPostValues)) {

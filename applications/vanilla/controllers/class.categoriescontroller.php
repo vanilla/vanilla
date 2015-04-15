@@ -109,12 +109,12 @@ class CategoriesController extends VanillaController {
    /**
     * "Table" layout for categories. Mimics more traditional forum category layout.
     */
-   public function Table($Category = '') {
+   public function Table($Category = '', $isRoot = TRUE) {
       if ($this->SyndicationMethod == SYNDICATION_NONE) {
          $this->View = 'table';
       } else
          $this->View = 'all';
-      $this->All($Category);
+      $this->All($Category, $isRoot);
    }
 
    /**
@@ -190,14 +190,14 @@ class CategoriesController extends VanillaController {
                switch($Layout) {
                   case 'mixed':
                      $this->View = 'discussions';
-                     $this->Discussions();
+                     $this->Discussions($CategoryIdentifier, FALSE);
                      break;
                   case 'table':
-                     $this->Table($CategoryIdentifier);
+                     $this->Table($CategoryIdentifier, FALSE);
                      break;
                   default:
                      $this->View = 'all';
-                     $this->All($CategoryIdentifier);
+                     $this->All($CategoryIdentifier, FALSE);
                      break;
                }
                return;
@@ -332,7 +332,7 @@ class CategoriesController extends VanillaController {
     * @since 2.0.17
     * @access public
     */
-   public function All($Category = '') {
+   public function All($Category = '', $isRoot = TRUE) {
       // Setup head.
       $this->Menu->HighlightRoute('/discussions');
       if (!$this->Title()) {
@@ -344,7 +344,9 @@ class CategoriesController extends VanillaController {
       }
       Gdn_Theme::Section('CategoryList');
 
-      $this->Description(C('Garden.Description', NULL));
+      if ($isRoot) {
+         $this->Description(C('Garden.Description', NULL));
+      }
 
       $this->SetData('Breadcrumbs', CategoryModel::GetAncestors(GetValue('CategoryID', $this->Data('Category'))));
 
@@ -384,29 +386,45 @@ class CategoriesController extends VanillaController {
     * @since 2.0.0
     * @access public
     */
-   public function Discussions() {
+   public function Discussions($Category = '', $isRoot = TRUE) {
       // Setup head
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
       $this->AddJsFile('discussions.js');
-      $Title = C('Garden.HomepageTitle');
-      if ($Title)
-         $this->Title($Title, '');
-      else
-         $this->Title(T('All Categories'));
-      $this->Description(C('Garden.Description', NULL));
+
+      $this->Menu->HighlightRoute('/discussions');
+      if (!$this->Title()) {
+         $Title = C('Garden.HomepageTitle');
+         if ($Title)
+            $this->Title($Title, '');
+         else
+            $this->Title(T('All Categories'));
+      }
+
+      if ($isRoot) {
+         $this->Description(C('Garden.Description', NULL));
+      }
+
       Gdn_Theme::Section('CategoryDiscussionList');
 
       // Set the category follow toggle before we load category data so that it affects the category query appropriately.
       $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
       $CategoryFollowToggleModule->SetToggle();
 
+      $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
+
+      if ($Category) {
+         $Subtree = CategoryModel::GetSubtree($Category, false);
+         $CategoryIDs = ConsolidateArrayValuesByKey($Subtree, 'CategoryID');
+         $Categories = $this->CategoryModel->GetFull($CategoryIDs)->ResultArray();
+      } else {
+         $Categories = $this->CategoryModel->GetFull()->ResultArray();
+      }
+      $this->SetData('Categories', $Categories);
+
       // Get category data and discussions
       $this->DiscussionsPerCategory = C('Vanilla.Discussions.PerCategory', 5);
       $DiscussionModel = new DiscussionModel();
-      $this->CategoryModel->Watching = !Gdn::Session()->GetPreference('ShowAllCategories');
-      $this->CategoryData = $this->CategoryModel->GetFull();
-      $this->SetData('Categories', $this->CategoryData);
       $this->CategoryDiscussionData = array();
       foreach ($this->CategoryData->Result() as $Category) {
          if ($Category->CategoryID > 0)
@@ -425,8 +443,15 @@ class CategoriesController extends VanillaController {
 
       $this->CanonicalUrl(Url('/categories', TRUE));
       $Path = $this->FetchViewLocation('helper_functions', 'discussions', FALSE, FALSE);
-      if ($Path)
+      if ($Path) {
          include_once $Path;
+      }
+
+      // For GetOptions function
+      $Path2 = $this->FetchViewLocation('helper_functions', 'categories', FALSE, FALSE);
+      if ($Path2) {
+         include_once $Path2;
+      }
       $this->Render();
    }
 

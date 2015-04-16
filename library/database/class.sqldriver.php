@@ -2015,6 +2015,15 @@ abstract class Gdn_SQLDriver {
    }
 
    /**
+    * Get the number of items in the where array.
+    *
+    * @return int Returns the number of items in the where array.
+    */
+   public function WhereCount() {
+      return count($this->_Wheres);
+   }
+
+   /**
     * Adds to the $this->_WhereIns collection. Used to generate a "where field
     * in (1,2,3)" query. Called by $this->WhereIn(), $this->OrWhereIn(),
     * $this->WhereNotIn(), and $this->OrWhereNotIn().

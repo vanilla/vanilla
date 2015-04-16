@@ -2049,6 +2049,12 @@ class UserModel extends Gdn_Model {
          }
       }
 
+      // Optimized searches need at least some criteria before performing a query.
+      if ($Optimize && $this->SQL->WhereCount() == 0 && !$RoleID) {
+         $this->SQL->Reset();
+         return new Gdn_DataSet(array());
+      }
+
       if ($ApplicantRoleID != 0) {
          $this->SQL->Where('ur.RoleID is null');
       }

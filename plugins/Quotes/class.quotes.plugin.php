@@ -422,11 +422,7 @@ BLOCKQUOTE;
    }
 
    public function Setup() {
-<<<<<<< HEAD
-     // Nothing to do here!
-=======
       // Nothing to do here!
->>>>>>> dbce95abd3cce20ed99b1219c9a3ab7ee4f85022
    }
 
    protected static function _StripMarkdownQuotes($Text) {
@@ -453,15 +449,10 @@ BLOCKQUOTE;
    }
 
    public function OnDisable() {
-<<<<<<< HEAD
-     // Nothing to do here!
-=======
       // Nothing to do here!
->>>>>>> dbce95abd3cce20ed99b1219c9a3ab7ee4f85022
    }
 
    public function Structure() {
       // Nothing to do here!
    }
-
 }

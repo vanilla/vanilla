@@ -501,7 +501,7 @@ class ActivityModel extends Gdn_Model {
       }
 
       // Is this a wall post?
-      if (!in_array($notifyUserId, $notifyUserIds)) {
+      if (!in_array(val('ActivityType', $activity), array('Status', 'WallPost')) || !in_array($notifyUserId, $notifyUserIds)) {
          return false;
       }
       // Is this on the user's wall?

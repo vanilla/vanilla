@@ -161,8 +161,11 @@ class ActivityController extends Gdn_Controller {
       }
 
       $comment = $this->ActivityModel->GetComment($ID);
-      $activity = $this->ActivityModel->GetID(val('ActivityID', $comment));
+      if (!$comment) {
+         throw NotFoundException('Comment');
+      }
 
+      $activity = $this->ActivityModel->GetID(val('ActivityID', $comment));
       if (!$activity) {
          throw NotFoundException('Activity');
       }
@@ -171,8 +174,9 @@ class ActivityController extends Gdn_Controller {
          throw PermissionException();
       }
       $this->ActivityModel->DeleteComment($ID);
-      if ($this->DeliveryType() === DELIVERY_TYPE_ALL)
+      if ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
          Redirect($Target);
+      }
 
       $this->Render('Blank', 'Utility', 'Dashboard');
    }

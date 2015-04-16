@@ -150,26 +150,42 @@ class ActivityController extends Gdn_Controller {
       $this->Render();
    }
 
-   public function DeleteComment($ID, $TK, $Target = '') {
-      $Session = Gdn::Session();
-
-      if (!$Session->ValidateTransientKey($TK))
-         throw PermissionException();
-
-      $Comment = $this->ActivityModel->GetComment($ID);
-      if (!$ID)
-         throw NotFoundException();
-
-      if ($Session->CheckPermission('Garden.Activity.Delete') || $Comment['InsertUserID'] = $Session->UserID) {
-         $this->ActivityModel->DeleteComment($ID);
-      } else {
+   public function DeleteComment($ID, $TK, $Target = '', $profileUserId = '', $insertUserId = '') {
+      if (!$this->canDelete($ID, $TK, $profileUserId, $insertUserId)) {
          throw PermissionException();
       }
-
+      $this->ActivityModel->DeleteComment($ID);
       if ($this->DeliveryType() === DELIVERY_TYPE_ALL)
          Redirect($Target);
 
       $this->Render('Blank', 'Utility', 'Dashboard');
+   }
+
+   public function canDelete($id, $transientKey, $profileUserId = '', $insertUserId = '') {
+      $session = Gdn::Session();
+      if (!$session->ValidateTransientKey($transientKey)) {
+         throw PermissionException();
+      }
+      if (!is_numeric($id)) {
+         throw Gdn_UserException('Invalid ID');
+      }
+
+      // User can delete any activity
+      if ($session->CheckPermission('Garden.Activity.Delete')) {
+         return true;
+      }
+
+      // We're on the user's profile
+      if ($profileUserId && $session->UserID == $profileUserId && $session->CheckPermission('Garden.Profiles.Edit')) {
+         return true;
+      }
+
+      // The user inserted the activity
+//      if ($insertUserId && $insertUserId == $session->UserID) {
+//         return true;
+//      }
+
+      return false;
    }
 
    /**
@@ -181,24 +197,10 @@ class ActivityController extends Gdn_Controller {
     * @param int $ActivityID Unique ID of item to delete.
     * @param string $TransientKey Verify intent.
     */
-   public function Delete($ActivityID = '', $TransientKey = '') {
-      $Session = Gdn::Session();
-      if (!$Session->ValidateTransientKey($TransientKey))
+   public function Delete($ActivityID = '', $TransientKey = '', $profileUserId = '', $insertUserId = '') {
+      if (!$this->canDelete($ActivityID, $TransientKey, $profileUserId, $insertUserId)) {
          throw PermissionException();
-
-      if (!is_numeric($ActivityID))
-         throw Gdn_UserException('Invalid activity ID');
-
-
-      $HasPermission = $Session->CheckPermission('Garden.Activity.Delete');
-      if (!$HasPermission) {
-         $Activity = $this->ActivityModel->GetID($ActivityID);
-         if (!$Activity)
-            throw NotFoundException('Activity');
-         $HasPermission = $Activity['InsertUserID'] == $Session->UserID;
       }
-      if (!$HasPermission)
-         throw PermissionException();
 
       $this->ActivityModel->Delete($ActivityID);
 

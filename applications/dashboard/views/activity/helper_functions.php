@@ -50,12 +50,8 @@ function WriteActivity($Activity, &$Sender, &$Session) {
    ?>
 <li id="Activity_<?php echo $Activity->ActivityID; ?>" class="<?php echo $CssClass; ?>">
    <?php
-   if (
-      $Session->IsValid()
-      && ($Session->UserID == $Activity->InsertUserID
-         || $Session->CheckPermission('Garden.Activity.Delete'))
-      )
-      echo '<div class="Options">'.Anchor('×', 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl), 'Delete').'</div>';
+   if (ActivityController::canDelete($Activity->ActivityID, $Session->TransientKey(),  $Sender->ProfileUserID, $Activity->InsertUserID))
+      echo '<div class="Options">'.Anchor('×', 'dashboard/activity/delete/'.$Activity->ActivityID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl).'&profileUserId='.$Sender->ProfileUserID.'&insertUserId='.$Activity->InsertUserID, 'Delete').'</div>';
 
    if ($PhotoAnchor != '') {
    ?>
@@ -159,8 +155,9 @@ function WriteActivityComment($Comment, &$Sender, &$Session) {
       <div class="Meta">
          <span class="DateCreated"><?php echo Gdn_Format::Date($Comment['DateInserted'], 'html'); ?></span>
          <?php
-            if ($Session->UserID == $Comment['InsertUserID'] || $Session->CheckPermission('Garden.Activity.Delete'))
-               echo Anchor(T('Delete'), "dashboard/activity/deletecomment?id={$Comment['ActivityCommentID']}&tk=".$Session->TransientKey().'&target='.urlencode(Gdn_Url::Request()), 'DeleteComment');
+            if (ActivityController::canDelete($Comment['ActivityCommentID'], $Session->TransientKey(), $Sender->ProfileUserID, val('InsertUserID', $Comment))) {
+               echo Anchor(T('Delete'), "dashboard/activity/deletecomment?id={$Comment['ActivityCommentID']}&tk=".$Session->TransientKey().'&target='.urlencode(Gdn_Url::Request()).'&profileUserId='.$Sender->ProfileUserID.'&insertUserId='.val('InsertUserID', $Comment), 'DeleteComment');
+            }
          ?>
       </div>
    </div>

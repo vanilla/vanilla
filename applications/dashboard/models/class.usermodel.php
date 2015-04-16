@@ -1997,8 +1997,10 @@ class UserModel extends Gdn_Model {
          $IPAddress = $Keywords;
       } elseif (strtolower($Keywords) == 'banned') {
          $this->SQL->Where('u.Banned >', 0);
+         $Keywords = '';
       } elseif (preg_match('/^\d+$/', $Keywords)) {
          $UserID = $Keywords;
+         $Keywords = '';
       } else {
          // Check to see if the search exactly matches a role name.
          $RoleID = $this->SQL->GetWhere('Role', array('Name' => $Keywords))->Value('RoleID');

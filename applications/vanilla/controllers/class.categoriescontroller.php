@@ -109,12 +109,12 @@ class CategoriesController extends VanillaController {
    /**
     * "Table" layout for categories. Mimics more traditional forum category layout.
     */
-   public function Table($Category = '', $isRoot = TRUE) {
+   public function Table($Category = '') {
       if ($this->SyndicationMethod == SYNDICATION_NONE) {
          $this->View = 'table';
       } else
          $this->View = 'all';
-      $this->All($Category, $isRoot);
+      $this->All($Category);
    }
 
    /**
@@ -332,7 +332,7 @@ class CategoriesController extends VanillaController {
     * @since 2.0.17
     * @access public
     */
-   public function All($Category = '', $isRoot = TRUE) {
+   public function All($Category = '') {
       // Setup head.
       $this->Menu->HighlightRoute('/discussions');
       if (!$this->Title()) {
@@ -344,7 +344,7 @@ class CategoriesController extends VanillaController {
       }
       Gdn_Theme::Section('CategoryList');
 
-      if ($isRoot) {
+      if (!$Category) {
          $this->Description(C('Garden.Description', NULL));
       }
 
@@ -386,7 +386,7 @@ class CategoriesController extends VanillaController {
     * @since 2.0.0
     * @access public
     */
-   public function Discussions($Category = '', $isRoot = TRUE) {
+   public function Discussions($Category = '') {
       // Setup head
       $this->AddCssFile('vanilla.css');
       $this->Menu->HighlightRoute('/discussions');
@@ -401,7 +401,7 @@ class CategoriesController extends VanillaController {
             $this->Title(T('All Categories'));
       }
 
-      if ($isRoot) {
+      if (!$Category) {
          $this->Description(C('Garden.Description', NULL));
       }
 
